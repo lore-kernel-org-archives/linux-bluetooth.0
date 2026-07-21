@@ -1,92 +1,90 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779D03BD646
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB9D22E3F0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784623299; cv=none; b=qfBpXiFuoXrLtWXsNX83GzIDlLh7ZfkJrTPyqpmyvEuKVLYUzo9nzhbpM07UV/EShGSBakX/gdoLGvR4tJhpAb1/m6WtuWrgyGilEf3rPpG2hWEhr4TkAZ4bQaDNqcJJFc9XeLwsEgsAUFLX4XHhZpq31UkzSqbsoNtglKT5WA8=
+	t=1784623305; cv=none; b=HMwNa9Ck7Aa5iBttPE8WVv1JTKpMBQOSUVPx6tHcfaMsQu3SgLCpv9IdmW5PE924DmRA00Mp7T0PUctH3o16YU5Ltf8opp1wcbAHERJxgrf7uKIVaKof1iGJ3K71nW0A5zVmPyVbV/f/qokQVDRU/aGz5iI+kw2kHzBthccDmGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784623299; c=relaxed/simple;
-	bh=f0/II6ESIdSuDHgMkh3dphrT27CLyVbZ2fMo243t8cw=;
+	s=arc-20240116; t=1784623305; c=relaxed/simple;
+	bh=U9vF0ps2Ko32G2k/1DMrteFWg3sY+tijApnpUSbRFig=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KzeqgCMPkF8BWswryf1NwA0TMU9VrxgQ41QHHbJ8tEFkeJpblTzCeU6N8/XaA3fDWCn5TggOiqlo4b0/l6rjtg7QhhheNpdOuQPgJGhb1Owv2n3AqAky/mHqUNXkt8yhTuDtpLclQlJiedtKZS5CD3OeLihSMwxBxPdXzWYcE8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=CgI5Kj9D; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=iCxtR6uS; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version; b=EaEkLrYRi55wiajveWegKdoSf5ENI04ecZ8agn727l8U+shEbkA8Le2s5zIStYc0c/KlFvOvs5ZklxPwUP6PypegzAUXmLPHH7+ONLUnpYbuvIe6zgKGubAwtyf1AN+OJkgx0qF2JQHcn/z6e+hIjZyIqNUX5qdHPRYD5bWdIrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FHnRXGdo; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=T+2HR/aP; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="CgI5Kj9D";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="iCxtR6uS"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66L460mY037541
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:36 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FHnRXGdo";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="T+2HR/aP"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66L6ESWc4107138
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	JHDUZPDhoziOM00C52qGxAR6roQUXx0eAST0KSvZCKk=; b=CgI5Kj9DyVfAEoAf
-	it/RVRVvmpZQHaZN3dbwUUmRgKueZlIPkl3FaeTqxD0WaqQe4haexTHkHph0dx2z
-	lwysyKDkyEjn5q6zoC/ADSCsETR5avU5MNOVBJkjOTa3RIgcf/WLLfHCd+TXz1a8
-	csurCzR/XUl63qD+Zn4JWWVfEGi6qIqL91UXimOiOWCcZmclU8falaexdUKb8IJU
-	ZHo21lx8SVcmJ0mgsAKBBsPH+PbReTCt4fDqddjFOOX9PV+DI8LRLRev4xRMZRb7
-	hx3I+3tN9ZnyFZqejh3+MGKxn36AoPoEUJC1DfbEqJaOvTOd7Ga5U0I0OvOQr9NN
-	tZBjmw==
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=iO86NuwyKvQ
+	dnHjwrXJALyjqHujjI35691E1ThLBoEY=; b=FHnRXGdoy0XCCspG47dDW3i+TDf
+	h25NzBxed/aaExVYzmHzXbu+f+UiPA7co3L8knffZ6zsvZPMQvgPHFQEPkVv1+m4
+	BOuzEnfBjjsgKyNXppif1TzzU85hfp02Mqa42ryczOzqlzR8W1pB86TkAlsvVanW
+	U18nJj2OLFKTDbapdlMT6FBjDCnnqWDinbpykKmwsoS9AsFTJJPswX0fI+CZx/6w
+	QL4r3F5qwD4sPImIhEh2m3gJ8Mw81Ts78VrnhmT7tcP0Va2us11GPUKnnguyK2xT
+	40jszvjbsOfedEpQnDV3k+wdHXx/23GX4jDCOJncfsKnogF7RFzhWOfqZGA==
 Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fj1es1650-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fhvqna5qk-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:36 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cab041eced3so13559971a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 01:41:36 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c9c26587e67so5286250a12.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 01:41:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784623296; x=1785228096; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JHDUZPDhoziOM00C52qGxAR6roQUXx0eAST0KSvZCKk=;
-        b=iCxtR6uSby6Mn++U32YX1A9ocN4jRs7Al87ZaYmb7JrGBC4bUCNvA+yy3AvPhmdR/h
-         eNaOFbMyDl4vb6inPvoN7z3qXa4a0agBUtYqJu0bnuG+PehrRLRgfVvel8xTXDRxvI+h
-         cTt8Eshp4RfUBQyZvbcLsMOKtgwA9ouXsUsr5mBoi/nK4gj/B9Bj7E5TDnB0ue+KIFym
-         AaFViKGyBX4cqO+CVNYZPKvhjc496pKBDkx9KLE7F8KBKk2+/fNaA6syBq1sw6VCPH2B
-         qR4JEqYLyabbz/4ViyQBBYnjTAunIrATPFFYO1AIy/k2a1X4UbSziENU5Ddpeh6AKyW+
-         skSA==
+        d=oss.qualcomm.com; s=google; t=1784623302; x=1785228102; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iO86NuwyKvQdnHjwrXJALyjqHujjI35691E1ThLBoEY=;
+        b=T+2HR/aPGPxJQOfS9WGmY7vXBsAdC7ckwcA6dnlXEac56bS7gTmhWuaigsk0yFCZ5z
+         jP9vhloaFEnpZFMvK5jLGRJ2z0cAKjVfDCLFhK3y72bqERS/dbP6wFGF4xHTV8/sLNSa
+         cazcAQnmADgK2qNS/byFz3Q2Q0I4BtSsuZiotM0VD6pnUXPZ2NMJlXZPmSRxVK7vKOE2
+         q4W6Lx35IYkYs+jfbpv09P48IkUKc5i56XfdEInlKlGGNimcHA43Lih/krztQmOSjHxq
+         YyhrARljkxsMIVKjjHNCd1qrbQVYHgrHCWZ+qOqZOCQy/3yYw1uPAr3Z4rIs7tBHmqJz
+         B8KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784623296; x=1785228096;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=JHDUZPDhoziOM00C52qGxAR6roQUXx0eAST0KSvZCKk=;
-        b=DT2DsbCOfwJwg6pBsVBqy+1ILS7j1YiwmhTiI/H2XeKQeG4/TDMhIarXoOaGnp6D7a
-         yT6xspqxFV0PE2egpDjEZjZJanuoM3FNpwOEneFlj7LVwlr39NVzB15OumFCE/oX7Tb8
-         ntizpVkzhJsbd8lhgWQQewzK9ULyHour3qckIX6i2NMee6nb0f6YBX/QNB/zVWOvUrhO
-         b/rrOFm4yYQS6noRxvsBeuBsunYfVP7KcXG36M7wc7SKkyjHyrlRavIy3nY8emL1UkWn
-         cicKG9W+NRtgY2E2hFL53NJDDF8UNP9nhJBjqXdfQK6PueODRHTh5ikYcGjZ3yxVLUOz
-         wX3A==
-X-Gm-Message-State: AOJu0YxRbqZmAu/PAvRK82iQCb5bMTWMzxeisTn0suti9j9Vl3gaEGaM
-	WHLSEsrUAyqrL/z5zBqpIJYj6Ud1ID08MIJEYJGdW4MgNTHaVVkpbqfbF4xZ5Qb6FcNo8DoPumH
-	sVKVMgj+yzWWaidnl3QjNyh1DT66coB6y5fCqD2pO8uX81YhkQ3nE8wizO3TT7/CNUUzfGKLsGE
-	piCtI=
-X-Gm-Gg: AfdE7cnF+XSjE1u7APwpVeYbFqb9UsW6wFUTeuiMBe1pTZNX76PcY5ISECVICe82lHo
-	4L6hXjgG6w0BWHlVMMYQbK3uef2RWSMsJA+kOSA+RFfTZsSqFaRLqiY6ynb8IZHukGpfvto2I0+
-	G9/awgHGQykwidlLd/4VlPVZbo4LS6PvxTHDyrd4uLOwVOMmJ/ZlljteFY+sPyADO+jgLt3CDo4
-	2s3mh8ruZOnExutuqy2Q+gl+qoUfHtxSgjRV/6SS0UZvLhULMZtkd9ppVwjbjsek9X96UqXMq/D
-	SunQudEkNBpRKiSdhsqUNDY4N/+rPdh/c6qZHCRfWwrJlLiWHxJGlfxSWigRqvtZmblmQjdUDkO
-	P5jbqZbjLgK/DjTayrxuKCV38MDAdxQ==
-X-Received: by 2002:a05:6a21:7002:b0:3c3:8aa8:6caf with SMTP id adf61e73a8af0-3c3ad6777c4mr19530531637.27.1784623295887;
-        Tue, 21 Jul 2026 01:41:35 -0700 (PDT)
-X-Received: by 2002:a05:6a21:7002:b0:3c3:8aa8:6caf with SMTP id adf61e73a8af0-3c3ad6777c4mr19530497637.27.1784623295419;
-        Tue, 21 Jul 2026 01:41:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784623302; x=1785228102;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iO86NuwyKvQdnHjwrXJALyjqHujjI35691E1ThLBoEY=;
+        b=sbEAo6vcADIoVGfs6AsLAmH4OQUX58U3wyxIgEW9rLNUsR9/oWwPRIBCR3vc/hiO+t
+         xzGDZ2z9WzjrIP/UPmZzsu2QzDCRt8ZsMFDvjGI++5S4A0PzgeFQHMLbIY94fAfr0phB
+         SV2NqSOwBb8REHdkVCQA4Hai9sqBo07YFx3G+j+Zym0Jw+C7moI4ptniS+tWXFpi/Uuy
+         vqhOnn0KNQjyVokoFdvNFf6OiCjAEMY0p9YVuKEOHfLfbQLtqvp+/zfchT4NBVsNdXGE
+         BzTFuVh2qL5aeYfCqYUvGvyS+1GUa97hv0cYMH607qwR8yJbpNfCsShyZqAu0l6bAlTw
+         bJwA==
+X-Gm-Message-State: AOJu0YwuiEBI1X3ROPl4bo38XlLBFaUoWDxEeqw5CkyVryz30XRdARkW
+	Y3zUS2EoCCS/jmUQd5DzQrJgAyuXldEagPqj/Dh8y3j4yD4EGtrl2OFpAKm3wLrgCKBgxra0pvg
+	7m5wqmEoFaCRphqc/OewdzvvjwjzdDHnSjzC54Y6q7n7AvqhKZqIYT8TccPhttI7akqiWvm9C0h
+	zO+XM=
+X-Gm-Gg: AfdE7cnUxn9xnQsaDJD4u057mH+MIRqts1pr8aKQgAzVl/FdEqmpygOnNefLZ/kmTjn
+	vPLDyvs0V+aw/oiH1y7J0ve13lG6oZ7hyjVOmdF3bwx6pa3P31KZHhDFNd+zcei1FwTZN98bYgR
+	JIvNdhcVwKnVi7KotfMOuyeP2RW7CbUUN+wmWjN/TDU+DysmslKLiIBFkJwc5l7iqUyGBvY6r8f
+	9Fj0Vh0x3w/Ia/mJYFDkprbXH+wd0noPS9fc3tksOPB+UQiZrdr76bHdbI/BvS2T2X2IZquZSHg
+	EhtTJlEj651QTAMx3BhGUG22s1pK+wSNjJHeIy5w0dVgGbNyY8h5znfEo4ykKhHnnDrEAZ5wzHK
+	1X1TZvJzZ/HzYjpRotvBouSisCEvu2Q==
+X-Received: by 2002:a05:6a21:a393:b0:3b2:8674:9830 with SMTP id adf61e73a8af0-3c38d90d347mr23892741637.14.1784623302455;
+        Tue, 21 Jul 2026 01:41:42 -0700 (PDT)
+X-Received: by 2002:a05:6a21:a393:b0:3b2:8674:9830 with SMTP id adf61e73a8af0-3c38d90d347mr23892713637.14.1784623301977;
+        Tue, 21 Jul 2026 01:41:41 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cbb7c5sm38063131c88.10.2026.07.21.01.41.32
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cbb7c5sm38063131c88.10.2026.07.21.01.41.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 01:41:35 -0700 (PDT)
+        Tue, 21 Jul 2026 01:41:41 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v5 1/2] rap: use session lookup for RAS operations
-Date: Tue, 21 Jul 2026 14:11:20 +0530
-Message-Id: <20260721084121.688467-2-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v5 2/2] profiles: centralize reflector setup
+Date: Tue, 21 Jul 2026 14:11:21 +0530
+Message-Id: <20260721084121.688467-3-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260721084121.688467-1-naga.akella@oss.qualcomm.com>
 References: <20260721084121.688467-1-naga.akella@oss.qualcomm.com>
@@ -96,292 +94,257 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=SPZykuvH c=1 sm=1 tr=0 ts=6a5f30c0 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX9EkklyTRDTjX
+ Q2t5ixravNd+Aj88NlEPL4vABrJXX8bedUGvMR6ruHcNZIeao1nJ5OwFoCa9+V6ZROJTBKEyK6L
+ TmcGMSQm6GyFr/NPei+a5ep7J1y4Jufb7mgmyRtXOWgjbcs7hASeAf1k1Ehy5Iq0+IT+bI1nKMu
+ kGTkKhkkb9mE3ZAqYIsT39es32ljiQMaQCOWZeUD0NnW0RMxLTuwbCxG/yzf/SDgeTiPVAYSyoM
+ 868rO5bQhNtWHUReYPnIMn43dqqGswsV3+oUvYR9TDS4kcSE/apFJWYNRClYpVs+t0b3fzKIQZS
+ CPqxQvv45WjTgFfgWIlMavY07nsTkIMMq9qYOVGy1xQ7G6OuYyDM112bPsdgHOoDm8de8a4kJxs
+ 4AWbp6mFs0R4olH4HI+0vQirx+zhsFLEu5oRfUeBwbQtpdNAFnAC1u4PXahFAlsFx0uuqW+jcvT
+ OacL2PPN2nK09u0wgGw==
+X-Proofpoint-ORIG-GUID: -R50k16xPww-VjPdbyB9CkUJKJx04t22
+X-Proofpoint-GUID: -R50k16xPww-VjPdbyB9CkUJKJx04t22
+X-Authority-Analysis: v=2.4 cv=M5F97Sws c=1 sm=1 tr=0 ts=6a5f30c7 cx=c_pps
  a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
- a=ucqL3kFcTJbZLder1q4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=uXYGvHFHBPWYZw0bQ00A:9
  a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-GUID: X0JBwYrPWNpyCcwjhFWGkhOiVrp645LJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX2HNc7GFod8mk
- 4c69/0CSOC3UA4rVLmegAAgcvfWsjGr0+sPYzds5VNmqbn780948NQ2ruIFO8xa6OoZTnv60+ew
- riLVtoY39S4tq/rdgwlp1TEuw3PlPtDKM8axsfK5slSDa81ON+FwJaoWrXqbwFD2NAhNuVt0YGC
- kjff9B/ZlRYSAAhQ763eljL3xlX2ueGM6B03ecL+J8aZeb4V7V9k83ehviU7L45lRYgT9jcL7cx
- jDiqjEPNdubf6K7oG7NkJQrrP19n82MylS0gQF1o0UcQsAO5RAe7Hkh2l6ngp2CBBzn9lRhP2/O
- vMUqf2B0oDby1N4B3MRtSfE31f+UIz9hjw452yAqJONZSxlDZpb0bSFvyqZabUILEti3CTI+sDR
- M6bXHtD3TLKkFx6GdCypdTQVlqopQA8kR8HLqA7hQhRR2ItNqxL3aVMJY1tjlFLB5J7oImclyFC
- xCBGQkaPJAvvFcKJNuw==
-X-Proofpoint-ORIG-GUID: X0JBwYrPWNpyCcwjhFWGkhOiVrp645LJ
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX1P7AZ/7WyH5E
- dxO2V9CHe0ZkuYBgC0oiY1yyR224ePS9gB9NgGJugkSfUV02yqDh/Ed6AEOxjPVtS7nBSxl4KfD
- EjLZIIKavQfkoZKMXIbM0cq/MFujjEE=
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX+VJmqNzPa/jD
+ e5KH9mvC+OwW5xrArq3583dUPY7N670jd+hOfe3tqjMwH4RngcDQ8nyufx9462H2MnJADr+PjsP
+ WovwbWRfK3SitzaK9TBbYql9frnn/EE=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-20_06,2026-07-20_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 priorityscore=1501 bulkscore=0 phishscore=0 lowpriorityscore=0
- spamscore=0 clxscore=1015 suspectscore=0 malwarescore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607210091
+ malwarescore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0 phishscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607210091
 
-Store disconnect information in RAP state and
-centralize attachment handling through dedicated helpers.
-Add bt_rap_get_session() and use it from all RAS
-GATT server callbacks instead of the previous accessed
-notification bridge. As part of the cleanup,
-remove the accessed callback registration APIs,
-related notification code, and the unused timeout.h include
+Add a helper for reflector initialization and track D-Bus registration
+state in rap_data. Simplify connection handling, move interface cleanup
+to object destruction, and streamline removal logic.
+Remove the legacy RAS accessed callback path and its registration
+handling from initialization and shutdown.
 ---
- src/shared/rap.c | 107 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/rap.h |   2 +
- 2 files changed, 105 insertions(+), 4 deletions(-)
+ profiles/ranging/rap.c | 137 +++++++++++++++++++++++++----------------
+ 1 file changed, 84 insertions(+), 53 deletions(-)
 
-diff --git a/src/shared/rap.c b/src/shared/rap.c
-index dfb272d3a..962b84240 100644
---- a/src/shared/rap.c
-+++ b/src/shared/rap.c
-@@ -19,7 +19,6 @@
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index 3ffc0da76..71cdc592b 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -65,10 +65,12 @@ struct rap_data {
+ 	void *hci_sm;  /* Per-device HCI state machine */
+ 	uint16_t conn_handle;  /* Last known connection handle */
+ 	struct cs_session active_session;  /* active==false when idle */
++	bool dbus_registered;
+ };
  
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
--#include "src/shared/timeout.h"
- #include "src/shared/att.h"
- #include "src/shared/gatt-db.h"
- #include "src/shared/gatt-server.h"
-@@ -291,6 +290,7 @@ struct bt_rap {
+ static struct queue *sessions;
+ static struct queue *adapter_list;  /* List of rap_adapter_data */
++static int rap_setup_reflector(struct rap_data *data);
+ 
+ /* Adapter data management */
+ static bool match_adapter(const void *data, const void *match_data)
+@@ -218,6 +220,13 @@ static bool match_data(const void *data, const void *match_data)
+ 
+ static void rap_data_free(struct rap_data *data)
+ {
++	if (data->dbus_registered) {
++		g_dbus_unregister_interface(btd_get_dbus_connection(),
++					    device_get_path(data->device),
++					    CS_INTERFACE);
++		data->dbus_registered = false;
++	}
++
+ 	if (data->service) {
+ 		btd_service_set_user_data(data->service, NULL);
+ 		bt_rap_set_user_data(data->rap, NULL);
+@@ -281,14 +290,13 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
+ 	struct rap_data *data;
  	struct bt_att *att;
+ 	struct btd_device *device;
++	int err;
  
- 	unsigned int idle_id;
-+	unsigned int disconn_id;
+ 	DBG("%p", rap);
  
- 	struct queue *notify;
- 	struct queue *pending;
-@@ -564,6 +564,40 @@ static void rap_detached(void *data, void *user_data)
- 	cb->detached(rap, cb->user_data);
+ 	data = queue_find(sessions, match_data, rap);
+-	if (data) {
+-		DBG("data is already present");
+-		return;
+-	}
++	if (data)
++		goto setup;
+ 
+ 	att = bt_rap_get_att(rap);
+ 	if (!att) {
+@@ -306,6 +314,11 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
+ 	data->rap = rap;
+ 
+ 	rap_data_add(data);
++
++setup:
++	err = rap_setup_reflector(data);
++	if (err)
++		error("Failed to set up reflector session: %d", err);
  }
  
-+static void rap_attached(void *data, void *user_data)
-+{
-+	struct bt_rap_cb *cb = data;
-+	struct bt_rap *rap = user_data;
-+
-+	if (!cb->attached)
-+		return;
-+
-+	cb->attached(rap, cb->user_data);
-+}
-+
-+static void rap_disconnected(int err, void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	rap->disconn_id = 0;
-+
-+	bt_rap_detach(rap);
-+}
-+
-+static void rap_attach_att(struct bt_rap *rap, struct bt_att *att)
-+{
-+	if (rap->disconn_id) {
-+		if (att == bt_rap_get_att(rap))
-+			return;
-+		bt_att_unregister_disconnect(rap->att, rap->disconn_id);
-+	}
-+
-+	rap->att = att;
-+	rap->disconn_id = bt_att_register_disconnect(rap->att,
-+							rap_disconnected,
-+							rap, NULL);
-+}
-+
- void bt_rap_detach(struct bt_rap *rap)
- {
- 	if (!queue_remove(sessions, rap))
-@@ -573,6 +607,9 @@ void bt_rap_detach(struct bt_rap *rap)
- 	bt_gatt_client_unref(rap->client);
- 	rap->client = NULL;
- 
-+	bt_att_unregister_disconnect(rap->att, rap->disconn_id);
-+	rap->att = NULL;
-+
- 	queue_foreach(bt_rap_cbs, rap_detached, rap);
- }
- 
-@@ -653,6 +690,29 @@ struct bt_att *bt_rap_get_att(struct bt_rap *rap)
- 	return bt_gatt_client_get_att(rap->client);
- }
- 
-+struct bt_rap *bt_rap_get_session(struct bt_att *att, struct gatt_db *db)
-+{
-+	const struct queue_entry *entry;
-+	struct bt_rap *rap;
-+
-+	for (entry = queue_get_entries(sessions); entry; entry = entry->next) {
-+		struct bt_rap *rap = entry->data;
-+
-+		if (att == bt_rap_get_att(rap))
-+			return rap;
-+	}
-+
-+	rap = bt_rap_new(db, NULL);
-+	if (!rap)
-+		return NULL;
-+
-+	rap->att = att;
-+
-+	bt_rap_attach(rap, NULL);
-+
-+	return rap;
-+}
-+
- struct bt_rap *bt_rap_ref(struct bt_rap *rap)
- {
- 	if (!rap)
-@@ -729,6 +789,7 @@ static void ras_features_read_cb(struct gatt_db_attribute *attrib,
- 				 uint8_t opcode, struct bt_att *att,
- 				 void *user_data)
- {
-+	struct ras *ras = user_data;
- 	/*
- 	 * Feature mask: bits 0-2 set:
- 	 *  - Real-time ranging
-@@ -737,6 +798,9 @@ static void ras_features_read_cb(struct gatt_db_attribute *attrib,
- 	 */
- 	uint8_t value[4] = { 0x01, 0x00, 0x00, 0x00 };
- 
-+	if (ras)
-+		bt_rap_get_session(att, ras->rapdb->db);
-+
- 	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
- }
- 
-@@ -745,6 +809,11 @@ static void ras_ondemand_read_cb(struct gatt_db_attribute *attrib,
- 				 uint8_t opcode, struct bt_att *att,
- 				 void *user_data)
- {
-+	struct ras *ras = user_data;
-+
-+	if (ras)
-+		bt_rap_get_session(att, ras->rapdb->db);
-+
- 	/* No static read data – on‑demand data is pushed via
- 	 * notifications
- 	 */
-@@ -761,6 +830,11 @@ static void ras_control_point_write_cb(struct gatt_db_attribute *attrib,
- 				       uint8_t opcode, struct bt_att *att,
- 				       void *user_data)
- {
-+	struct ras *ras = user_data;
-+
-+	if (ras)
-+		bt_rap_get_session(att, ras->rapdb->db);
-+
- 	/* Control point handler - implementation TBD */
- }
- 
-@@ -770,9 +844,13 @@ static void ras_data_ready_read_cb(struct gatt_db_attribute *attrib,
- 				   uint8_t opcode, struct bt_att *att,
- 				   void *user_data)
- {
-+	struct ras *ras = user_data;
- 	uint16_t counter = 0;
- 	uint8_t value[2];
- 
-+	if (ras)
-+		bt_rap_get_session(att, ras->rapdb->db);
-+
- 	put_le16(counter, value);
- 	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
- }
-@@ -783,8 +861,12 @@ static void ras_data_overwritten_read_cb(struct gatt_db_attribute *attrib,
- 					 uint8_t opcode, struct bt_att *att,
- 					 void *user_data)
- {
-+	struct ras *ras = user_data;
- 	uint8_t value[2] = { 0x00, 0x00 };
- 
-+	if (ras)
-+		bt_rap_get_session(att, ras->rapdb->db);
-+
- 	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
- }
- 
-@@ -806,6 +888,8 @@ static void ras_ranging_data_ccc_write_cb(struct gatt_db_attribute *attrib,
+ enum cs_dict_target {
+@@ -662,19 +675,13 @@ static void rap_remove(struct btd_service *service)
  		return;
  	}
  
-+	bt_rap_get_session(att, ras->rapdb->db);
-+
- 	if (offset) {
- 		gatt_db_attribute_write_result(attrib, id,
- 					BT_ATT_ERROR_INVALID_OFFSET);
-@@ -2795,27 +2879,42 @@ bool bt_rap_attach(struct bt_rap *rap, struct bt_gatt_client *client)
- {
- 	bt_uuid_t uuid;
- 
-+	if (queue_find(sessions, NULL, rap)) {
-+		if (client && !rap->client)
-+			goto clone;
-+		return true;
-+	}
-+
- 	if (!sessions)
- 		sessions = queue_new();
- 
- 	queue_push_tail(sessions, rap);
- 
--	if (!client)
-+	queue_foreach(bt_rap_cbs, rap_attached, rap);
-+
-+	if (!client) {
-+		if (rap->att)
-+			rap_attach_att(rap, rap->att);
- 		return true;
-+	}
- 
- 	if (rap->client)
- 		return false;
- 
-+clone:
- 	rap->client = bt_gatt_client_clone(client);
- 	if (!rap->client)
- 		return false;
- 
-+	rap_attach_att(rap, bt_gatt_client_get_att(client));
-+
- 	bt_gatt_client_idle_register(rap->client, rap_idle, rap, NULL);
- 
- 	bt_uuid16_create(&uuid, RAS_UUID16);
- 
--	gatt_db_foreach_service(rap->rrapdb->db, &uuid,
--				foreach_rap_service, rap);
-+	if (rap->rrapdb)
-+		gatt_db_foreach_service(rap->rrapdb->db, &uuid,
-+					foreach_rap_service, rap);
- 
- 	return true;
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-				    device_get_path(device),
+-				    CS_INTERFACE);
+-
+ 	rap_data_remove(data);
  }
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index 5582635e6..a44831e6e 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -15,6 +15,7 @@
- struct bt_rap;
- struct gatt_db;
- struct bt_gatt_client;
-+struct bt_att;
  
- /* Channel Sounding Events */
- struct bt_rap_hci_cs_options {
-@@ -171,6 +172,7 @@ bool bt_rap_attach(struct bt_rap *rap, struct bt_gatt_client *client);
- void bt_rap_detach(struct bt_rap *rap);
+-static int rap_accept(struct btd_service *service)
++static int rap_setup_reflector(struct rap_data *data)
+ {
+-	struct btd_device *device = btd_service_get_device(service);
++	struct btd_device *device = data->device;
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+-	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+-	struct rap_data *data = btd_service_get_user_data(service);
+ 	struct bt_att *att;
+ 	const bdaddr_t *bdaddr;
+ 	uint8_t bdaddr_type;
+@@ -682,26 +689,18 @@ static int rap_accept(struct btd_service *service)
+ 	char addr[18];
  
- struct bt_att *bt_rap_get_att(struct bt_rap *rap);
-+struct bt_rap *bt_rap_get_session(struct bt_att *att, struct gatt_db *db);
+ 	ba2str(device_get_address(device), addr);
+-	DBG("%s", addr);
  
- bool bt_rap_set_user_data(struct bt_rap *rap, void *user_data);
+-	if (!data) {
+-		error("RAP Service not handled by profile");
+-		return -EINVAL;
+-	}
+-
+-	/* init shared adapter HCI channel */
+-	if (!data->adapter_data) {
+-		data->adapter_data = rap_adapter_data_ref(adapter);
++	if (!data->hci_sm) {
+ 		if (!data->adapter_data) {
+-			error("Failed to get adapter HCI channel");
+-			return -EINVAL;
++			data->adapter_data = rap_adapter_data_ref(adapter);
++			if (!data->adapter_data) {
++				error("Failed to get adapter HCI channel");
++				return -EINVAL;
++			}
++			DBG("Using shared HCI channel for adapter (ref =%d)",
++				data->adapter_data->ref_count);
+ 		}
+-		DBG("Using shared HCI channel for adapter (ref_count=%d)",
+-			data->adapter_data->ref_count);
+-	}
  
+-	/* per-device HCI state machine */
+-	if (!data->hci_sm) {
+ 		data->hci_sm = bt_rap_attach_hci(data->rap,
+ 					data->adapter_data->hci,
+ 					btd_opts.defaults.bcs.role,
+@@ -721,38 +720,70 @@ static int rap_accept(struct btd_service *service)
+ 					data);
+ 	}
+ 
+-	if (!bt_rap_attach(data->rap, client)) {
+-		error("RAP unable to attach");
+-		return -EINVAL;
+-	}
+-
+-	/* Set up connection handle mapping for CS event routing */
+-	att = bt_rap_get_att(data->rap);
+-	bdaddr = device_get_address(device);
+-	bdaddr_type = device_get_le_address_type(device);
+-
+-	if (att && data->adapter_data->hci && data->hci_sm) {
+-		if (bt_hci_get_conn_handle(data->adapter_data->hci,
+-					(const uint8_t *) bdaddr, &handle)) {
+-			DBG("Found conn handle 0x%04X for %s", handle, addr);
+-			data->conn_handle = handle;
+-			bt_rap_set_conn_hndl(data->hci_sm,
++	/* Set up connection handle mapping for CS event routing. Retried on
++	 * every call until it succeeds, since att may not be available yet
++	 * the first time this runs (e.g. called from bt_rap_attach()'s
++	 * attached callback before rap->client/att are set).
++	 */
++	if (!data->conn_handle) {
++		att = bt_rap_get_att(data->rap);
++		bdaddr = device_get_address(device);
++		bdaddr_type = device_get_le_address_type(device);
++
++		if (att && data->adapter_data->hci) {
++			if (bt_hci_get_conn_handle(data->adapter_data->hci,
++				(const uint8_t *)bdaddr, &handle)) {
++				DBG("conn handle 0x%04X for %s", handle, addr);
++				data->conn_handle = handle;
++				bt_rap_set_conn_hndl(data->hci_sm,
+ 					data->rap, handle,
+-					(const uint8_t *) bdaddr,
++					(const uint8_t *)bdaddr,
+ 					bdaddr_type,
+ 					btd_device_is_initiator(device));
+-		} else {
+-			error("Failed to find connection handle for device %s",
+-				addr);
++			} else {
++				error("Failed to find conn for device %s",
++					addr);
++			}
+ 		}
+ 	}
+ 
+-	btd_service_connecting_complete(service, 0);
++	if (!data->dbus_registered) {
++		g_dbus_register_interface(btd_get_dbus_connection(),
++					  device_get_path(device),
++					  CS_INTERFACE, cs_dbus_methods,
++					  NULL, cs_dbus_properties, data, NULL);
++		data->dbus_registered = true;
++	}
++
++	return 0;
++}
++
++static int rap_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct rap_data *data = btd_service_get_user_data(service);
++	char addr[18];
++	int err;
+ 
+-	g_dbus_register_interface(btd_get_dbus_connection(),
+-				  device_get_path(data->device),
+-				  CS_INTERFACE, cs_dbus_methods,
+-				  NULL, cs_dbus_properties, data, NULL);
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (!data) {
++		error("RAP Service not handled by profile");
++		return -EINVAL;
++	}
++
++	if (!bt_rap_attach(data->rap, client)) {
++		error("RAP unable to attach");
++		return -EINVAL;
++	}
++
++	err = rap_setup_reflector(data);
++	if (err)
++		return err;
++
++	btd_service_connecting_complete(service, 0);
+ 
+ 	return 0;
+ }
 -- 
 
