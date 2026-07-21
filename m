@@ -1,70 +1,69 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C663FDC06
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 16:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080873FFAD1;
+	Tue, 21 Jul 2026 17:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784649773; cv=none; b=QMaSOrv0Nw1dUsTT4pVF8RYHcVOtot7TucK670lNvsBhyFLy1nL+vzDi8a5OglE4ItmrJsZ6aGDxCo+3YoFj7mkXL8L/hyFkIHkCA16u2ncsbT3y7mB0ZzjNlHEpifC5wVMOC+vfiPXPnBAVU00bRzK0lqJTR66Egoa0l7/4p0E=
+	t=1784655772; cv=none; b=tf0yQzUHOAVAjUsFa8AZKr34vpl2LusRgg+LpZ7UcWnlbaQ6FBlnIt0d/W9EBqzT/xtt0MiHG63MfkEZM/XAZtQB58FJdx/+yvDYgQe6/XoYSbk5r+znJrqPfifYI4T9R3aIktS1/UZsNQZyVbeSJrt2BPwuiBAZjufbu0dYM7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784649773; c=relaxed/simple;
-	bh=vhhWzyN+I0N7rNZjufC3YRpB5qa/zvBfQPTyWRUEH6Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1sz88v/a6FN7/5hqXSN7AIAupYhl9QjB7zTjpqUMkROoaB1cn8+qT+MjGX28j0tXhzwvt+ouY5ZefcbrwKKOjs931F+oIntmzVgeeuLyDsjoRMIYxamxyj2mi05VxXgHv/Hk/3zNjkKJpMLMZePHqM7f+xBjcFfsJNrD5ZsZ7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaKWe8Ut; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784655772; c=relaxed/simple;
+	bh=uX1TFoFmHp3s41wK4xd0cVaSj/v4V7louZzn5RsQkYs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LERdSnuCltnqQwkwt8szHYCdKEQJcm1LFpzE4DPzj3l3GtClqNhQyAxVUhlq0Atzb3GWaLnO5jMxHjjHZ6KwG24l2ybIVztYkX3gTnjuKLNCskm61SZ8DE+J/TKifPvneHW515cCgWGPw+8fw8oFjCvGF0mafD9kCcjRdZr6ZPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FSv4mG9m; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaKWe8Ut"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-963a722ed59so1947586241.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 09:02:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784649770; x=1785254570; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wE5VX25D0QUPiT5vUwaJH5UHOU0aSZrWQyQNqql837I=;
-        b=XaKWe8UtPYvooOlORnjrklQYM4/qHBwoyuJ4a9WPP73LKEQ7e5xmAdXiCccBgFW6Mi
-         LKqzAUSxd96RLiVuFmxS7LegG5ZvH3EmItV/ruYT/s0t14mJIng9E/WPzR1fPZuR1W4F
-         gt7DuTtgRw9SuDp9Ksh89K7zmg8KEW8RZbkVfXUSvJMiVQd3GoJuLJ7rj/411Ft0SVO+
-         FoypJc3v6jFxUKwFF/5GACHnb7abPC7oqJCOUivgZhq8etwhN89iZ6xM1V60diLRSgSx
-         f5kI1qdEVw4eZbPLMbraTktqJBIQwYoJjUij0KRXkkU6Vl4DK/DIwzviZ647gsP+cIkh
-         BsIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784649770; x=1785254570;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wE5VX25D0QUPiT5vUwaJH5UHOU0aSZrWQyQNqql837I=;
-        b=r9OoUiiXRHroFDjshw7G/sQZw1xgb2cFfCwJ5yjZcMP1OjUrvoP8aOvMvwgX7HieF3
-         oWBqgBkY5h4A9y5rU5DiH0K6swk6VQlH5KXHxo//GluYZTuH6IvWkEaUYdBdvMRkvGNi
-         ZRaY6vV4aUPycJMDMQLCYemi4YAk/hpVGn7uvNyccdoukbSVD53WaTqK6Ns+L/s3o9sb
-         OdHVTSQTH/FlzK5DEyoFx6/s4ps+OtQaQ/X4tizkEjsTgMblCAJin6GrEuJ48uEYCW/e
-         b+jNadX/Y5xf/cXKL1aNPAoQkmUZIInZlyfvUIDD1pmuMPG4wSH3O2qG8l3WzFk32JR5
-         ZLDQ==
-X-Gm-Message-State: AOJu0YxDe8DUDEM/iM9VWjv/3CSX0bzaBlLXpdmj/cIVZV8hX66MCAYX
-	BCgw/tcPj/O6ZRtBS5cTUMbVfZLn67NNBlma10JCV7HaG6oCywj72hmF
-X-Gm-Gg: AR+sD12P7lYv4PXHIXeE5H0ien55fTnE8Lhzqw5Pk4qOX7fQGhN5irG+pFE4GC1+NWJ
-	sNwkr1cN99Mb8bZWY5FZn3zEQnA2AhAucxrPQjiP4k68jnIh0LYL3G/cgHgaB0snOIwRHHGKedr
-	h3ZU3dsNoI4txInhxUsnXe4EtIsiOSFG1d79auHguJBNBUGQEzlpB7CeiRm6dsEWDOwKDpM7vAH
-	a2UjzTvhBdXDaI6eFVMjWS+/wCwUzT3Z4odB0lPYrLy0cWIP2MEFoTkZtmiPVKuHI3tcA6zYaNU
-	U7tT5MyiITdKwwPqCgvbJD/w1DZ0R21787zV+mu2RN4iUuqNH0gzTm+XD8twYKWYcujXJmNXFfK
-	NIxRke6xppgxioCZEWFSaGVN5uDe5HcaoqdyrD7w2WOGd3mdor0Hnoifkkh7Adzv6aVmB9olb/n
-	eva2Kfjyp2FA/aDc7XNzLH7d80d1NZcefNO2+i59uKa+icXErHrhPkiCGgFxYQ2vBT+KEzapzjn
-	c6o21g=
-X-Received: by 2002:a05:6102:4486:b0:739:4fa1:50af with SMTP id ada2fe7eead31-74753469470mr5448540137.2.1784649767844;
-        Tue, 21 Jul 2026 09:02:47 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-74757fad039sm12389612137.5.2026.07.21.09.02.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 09:02:47 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-07-21
-Date: Tue, 21 Jul 2026 12:02:40 -0400
-Message-ID: <20260721160240.884274-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FSv4mG9m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 238F11F00A3A;
+	Tue, 21 Jul 2026 17:42:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1784655770;
+	bh=Qs5Gg6NQG5qgry7TO0mMYwc3Oul0GiK8K1O+spC+UyE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=FSv4mG9mUQFAr5sS/AzRS6t9dXPzY9H/n8zXRKtdkGYE4Ksh60nZTc5xy9A/SPIX+
+	 SYW0ctYaAKjtcTRgVcJKxY5jgWZj9zNk6NYnMMVhicuxgcOfQL9jiHAHm107ZDCi2r
+	 o0ndpjhedyCgrWAV4sQaWaudG31mWVGpGPiYwxIw=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Dmitry Safonov <dima@arista.com>,
+	Francesco Ruggeri <fruggeri@arista.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Michal Luczaj <mhal@rbox.co>,
+	David Wei <dw@davidwei.uk>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Xin Long <lucien.xin@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Aleksa Sarai <aleksa@amutable.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.18 0134/1611] uaccess: fix ignored_trailing logic in copy_struct_to_user()
+Date: Tue, 21 Jul 2026 17:04:10 +0200
+Message-ID: <20260721152517.888258701@linuxfoundation.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260721152514.750365251@linuxfoundation.org>
+References: <20260721152514.750365251@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,36 +72,74 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit e13caf1c26587434f0b768193100440939c0fb91:
+6.18-stable review patch.  If anyone has any objections, please let me know.
 
-  Merge tag 'net-7.2-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-07-17 10:25:13 -0700)
+------------------
 
-are available in the Git repository at:
+From: Stefan Metzmacher <metze@samba.org>
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-07-21
+[ Upstream commit 4911de3145a797389577abfdf9a5185d36cc18d7 ]
 
-for you to fetch changes up to df541cd485ff80a5ddc579d99687bc7506df9851:
+Currently all callers pass ignored_trailing=NULL, but I have
+code that will make use of.
 
-  Bluetooth: btusb: validate Realtek vendor event length (2026-07-20 17:41:28 -0400)
+Now it actually behaves like documented:
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+* If @usize < @ksize, then the kernel is trying to pass userspace a newer
+  struct than it supports. Thus we only copy the interoperable portions
+  (@usize) and ignore the rest (but @ignored_trailing is set to %true if
+  any of the trailing (@ksize - @usize) bytes are non-zero).
 
- - hci_sync: Protect UUID list traversal
- - RFCOMM: Fix session UAF in set_termios
- - btusb: validate Realtek vendor event length
+Fixes: 424a55a4a908 ("uaccess: add copy_struct_to_user helper")
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Dmitry Safonov <dima@arista.com>
+Cc: Francesco Ruggeri <fruggeri@arista.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Michal Luczaj <mhal@rbox.co>
+Cc: David Wei <dw@davidwei.uk>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Aleksa Sarai <cyphar@cyphar.com>
+Cc: Christian Brauner <brauner@kernel.org>
+CC: Kees Cook <keescook@chromium.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Link: https://patch.msgid.link/71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org
+Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/uaccess.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-----------------------------------------------------------------
-Chengfeng Ye (2):
-      Bluetooth: hci_sync: Protect UUID list traversal
-      Bluetooth: RFCOMM: Fix session UAF in set_termios
+diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
+index 7657904c8db9c8..6973fee49f091c 100644
+--- a/include/linux/uaccess.h
++++ b/include/linux/uaccess.h
+@@ -499,7 +499,7 @@ copy_struct_to_user(void __user *dst, size_t usize, const void *src,
+ 			return -EFAULT;
+ 	}
+ 	if (ignored_trailing)
+-		*ignored_trailing = ksize < usize &&
++		*ignored_trailing = usize < ksize &&
+ 			memchr_inv(src + size, 0, rest) != NULL;
+ 	/* Copy the interoperable parts of the struct. */
+ 	if (copy_to_user(dst, src, size))
+-- 
+2.53.0
 
-Pengpeng Hou (1):
-      Bluetooth: btusb: validate Realtek vendor event length
 
- drivers/bluetooth/btusb.c      |  4 +++-
- include/net/bluetooth/rfcomm.h |  3 +++
- net/bluetooth/hci_sync.c       | 13 +++++++++++--
- net/bluetooth/rfcomm/core.c    | 17 +++++++++++++++++
- net/bluetooth/rfcomm/tty.c     |  7 +++----
- 5 files changed, 37 insertions(+), 7 deletions(-)
+
