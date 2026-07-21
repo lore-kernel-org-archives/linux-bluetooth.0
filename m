@@ -1,162 +1,151 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745644DC522
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 15:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E209446AA93;
+	Tue, 21 Jul 2026 15:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784647321; cv=none; b=F3MWAwS2KFqNUVgFikXMhN8sIWpUEGn71ebSE+5QrEM2f9fdhSOSYZPqYa1+DLMlYpu5tS7j9AziXp9t9btWgy4UyHAwpoD8q2n5rI9wsRKmS6abnXnR53NXgcBFNR5JRjKfZr8586wxnzeBFVg7wtfIT1AmsSUdvL0r/Ehg4oE=
+	t=1784648398; cv=none; b=J1R3W/yANAG6/PycjsUvMiNJuk2nOZwZLZZwH7GkRjrZEGjXZuEmfWFerQRLyJ5Sy+4V+nFPyGiHrZ9/8eFXTHY5zemqIyQVAkp6IlJQcB6cnBKIgTn0ysTvDwefo8c4667vjNorzsxkzyfN1yi1M+WvKWbAILrFUeFWtPC19BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784647321; c=relaxed/simple;
-	bh=qaTRHBEtObBK5L26WZ4xSDYhQdD9gP6UNdFZm824oRQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lU9J+MB9WR4hElsOYLNNXTwVE3ZV/V4EcLfJNDrbXEKdvA89/smB94H+Si2JFX/VwlWg1NKZf8p9H46z7TH1miztVnA49/7IWUoHihJT+dqoeMjXxyyZCBKkNiy08c1IfMfbJ+wJ4+yycCZaTMv8nzqchuaDXhCrLY9j3/IHQi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SLMCScLv; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784648398; c=relaxed/simple;
+	bh=yetQ53dELWRJINn29v7eetvLe1tM/VWTfka+ZAVmpDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ClL20CVj6PMWQof69H4KMSrb5I8xzmnnUNH3XLr/aYr+W9EiFsD/hUmF6ORXbcikNGxgfduAK5sAdGKW+apsyWYeZrLbC6KVaRzVwj1+5DKiPPrvagrByd2JgsjxSHwP9XlFaQKdXlWry1MNdKK8Otcl4VXGCQZMHsAeNhkD1xI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gT22enfO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLMCScLv"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c0cea8883so60768521cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:22:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784647319; x=1785252119; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=EGtXXlRT1Kv0dZVAFP0gsw1YuZ2VX/UhkkynDvkihhY=;
-        b=SLMCScLvztN2P4gU7DxhDmV/NSsowB+7/62CRsoDAZBYZHg4KKq7NWJdcP+cPxpXPz
-         Ap00KU085P/50c9EDlz2GkFb4z46KS3yNeu8GgOs3UIP55X7VJ+hZDRGOQBxDqBD+FZ+
-         1JwUPbyY4BT6vsHejFG+76O6A/AxKq2uvj0QMZL9YpxhfMpeSeD3pHfAjVrY0iJK/Vel
-         6JiOvnkM94Pc7xRV3Ud8a3013oKBc4LEQ4GHFPVjsQkcNn4IMO5px1i1XCTQkvQd7mqn
-         7c+pPM2DVYb5Mf9crS/expRZhXcf/uyG6lp+FLTKuvWj+l/DvE1CoEmIT8zb89C3Isv6
-         jBiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784647319; x=1785252119;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=EGtXXlRT1Kv0dZVAFP0gsw1YuZ2VX/UhkkynDvkihhY=;
-        b=TDrKl8Uz/KXcGJw/t9JiElWbyF+UdShPFWb3ZspvdarVsalW+YN3saAVD/H+JP2I/4
-         nE0/IT9Aw6kw2XtAPRrpeCxaimGtiEvoEPRF9vaQh0oUcSjYsLdhHmiSWk4J+yThLvVo
-         V7Ftf4BrShc8uPkfYKZ0r3sZd3Tu3adj5pKCXSec4GUKTxhVK7TuaXXMPas9dTSLz/a5
-         Ge9ccCG3nunocBies8pCqLbyuPVY79KWZYfqou0rFgrdBifm3c06mqzlIhwlbC9Rfumb
-         1xJ+/2/0TBdhx6Mo4JihbqA1UZ1DmZ4X+Ex/wK6OG2u7+zUg7Ck8ne0OPZBK+JGVTtJQ
-         fIkg==
-X-Gm-Message-State: AOJu0YwBOOhFRtQoLL+2ug04rNouPVHNtOth+J+8xLNA+8AgGUBNInam
-	0CxelwIgecNh1H8hvIbDeTqm1PxRM1JGfuMrfCMwJhKCWWpRI0rwWe+f69hK4Q==
-X-Gm-Gg: AfdE7cnA7kIMqkl3QM8Fx61Q7Z3XUj5E6wyMAQvgxFST9dNq6oZIr2HSF9m3/TVWC1o
-	E9XdmvBuTHF9Aw+bnGtq9XpZ2L6uoKWpwnjTX/+ajc7IgKhSASfMS5vQyq/HirrleYE61xUw4da
-	oY64rHdqRZdyLGb4isRD166gAsiX+3ywB5lbI0IhLzdyp0p2G5rO68LqUFPlKXRL6PKzS/GcKfN
-	sbnzY+LIjC7sYNe/gxy+c7ByNDvk63Ij5gH1S61mN5s2YJoeh12tY0GDODngC4uE0tEgM1KPTx7
-	FUPZnblCQZo4gSNjSrPlbScLngeIZxVb150//dRL4OxhsYTeeZjhxMCkanJodxZUW/VW0HujsAv
-	wX4zNkyjXwrE3a04AUMbr/9pjn9dKTdHDo9iX6oXr18zOAlb3QJd6UfnYwAOmR0YUOjp0Ftl/Lg
-	yI9y2yCOIKrw==
-X-Received: by 2002:a05:622a:1c05:b0:51e:c911:a704 with SMTP id d75a77b69052e-527a6de496emr909301cf.16.1784647319194;
-        Tue, 21 Jul 2026 08:21:59 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.200.72])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5214fae3268sm95588801cf.24.2026.07.21.08.21.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 08:21:58 -0700 (PDT)
-Message-ID: <6a5f8e96.043ad0dd.2200af.a8dc@mx.google.com>
-Date: Tue, 21 Jul 2026 08:21:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4466382693602889916=="
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gT22enfO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5238C1F000E9;
+	Tue, 21 Jul 2026 15:39:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1784648396;
+	bh=PDbcKYJ2dts9E8rmBpMaJS2oKdH/H1ecsS872g4HAMo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gT22enfOzixYhiVY9rvl+GbZP0du3BnZesIKu/dYNInWsHP8/T+4eZwQuZ5w3HXHt
+	 /781bTcXBnGa7L7bwScCeDXk8FHiJG9lV+LTvMCR5/JngGfsKlTldTBgyvKwsILM5b
+	 j1euTEw8QK1g2xCkru2QTdPTWYL39kGQAFimMDGM=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Dmitry Safonov <dima@arista.com>,
+	Francesco Ruggeri <fruggeri@arista.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Michal Luczaj <mhal@rbox.co>,
+	David Wei <dw@davidwei.uk>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Xin Long <lucien.xin@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Aleksa Sarai <aleksa@amutable.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 7.1 0185/2077] sockptr: fix usize check in copy_struct_from_sockptr() for user pointers
+Date: Tue, 21 Jul 2026 16:57:38 +0200
+Message-ID: <20260721152557.048001055@linuxfoundation.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260721152552.646164743@linuxfoundation.org>
+References: <20260721152552.646164743@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, enjou1224z@gmail.com
-Subject: RE: Bluetooth: mgmt: fix pairing command UAF
-In-Reply-To: <5f62804883f405b432f3b72656cc07dd5223e828.1784492458.git.xizh2024@lzu.edu.cn>
-References: <5f62804883f405b432f3b72656cc07dd5223e828.1784492458.git.xizh2024@lzu.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4466382693602889916==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+7.1-stable review patch.  If anyone has any objections, please let me know.
 
-This is automated email and please do not reply to this email!
+------------------
 
-Dear submitter,
+From: Stefan Metzmacher <metze@samba.org>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1131750
+[ Upstream commit db0493512931fe1e5a71612e6a358df1aa22d80c ]
 
----Test result---
+copy_struct_from_user will never hit the check_zeroed_user() call
+and will never return -E2BIG if new userspace passed new bits in a
+larger structure than the current kernel structure.
 
-Test Summary:
-CheckPatch                    FAIL      0.73 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      27.46 seconds
-CheckAllWarning               PASS      29.96 seconds
-CheckSparse                   PASS      28.66 seconds
-BuildKernel32                 PASS      26.52 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      498.82 seconds
-TestRunner_mgmt-tester        FAIL      217.43 seconds
-TestRunner_mesh-tester        FAIL      25.90 seconds
-IncrementalBuild              PASS      25.62 seconds
+As far as I can there are no critical/related uapi changes in
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/1] Bluetooth: mgmt: fix UAF in pair command cancellation
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#128: 
-Reported-by: Vega <vega@nebusec.ai>
-Assisted-by: Codex:gpt-5.4
+- include/net/bluetooth/bluetooth.h and net/bluetooth/sco.c
+  after the use of copy_struct_from_sockptr in v6.13-rc3
+- include/uapi/linux/tcp.h and net/ipv4/tcp_ao.c
+  after the use of copy_struct_from_sockptr in v6.6-rc1
 
-total: 0 errors, 1 warnings, 0 checks, 147 lines checked
+So that new callers will get the correct behavior from the start.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14701143.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.246 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.954 seconds
-Mesh - Send cancel - 2                               Timed out    1.987 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/470
-
+Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
+Fixes: ef84703a911f ("net/tcp: Add TCP-AO getsockopt()s")
+Fixes: faadfaba5e01 ("net/tcp: Add TCP_AO_REPAIR")
+Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malformed user input")
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Dmitry Safonov <dima@arista.com>
+Cc: Francesco Ruggeri <fruggeri@arista.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Michal Luczaj <mhal@rbox.co>
+Cc: David Wei <dw@davidwei.uk>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Aleksa Sarai <cyphar@cyphar.com>
+Cc: Christian Brauner <brauner@kernel.org>
+CC: Kees Cook <keescook@chromium.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Link: https://patch.msgid.link/cfaedbc33ae9d36adaabf04fa79424f30ff1efdd.1775576651.git.metze@samba.org
+Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ include/linux/sockptr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index 3e6c8e9d67aef6..ba88f4d78c1b16 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -91,7 +91,7 @@ static inline int copy_struct_from_sockptr(void *dst, size_t ksize,
+ 	size_t rest = max(ksize, usize) - size;
+ 
+ 	if (!sockptr_is_kernel(src))
+-		return copy_struct_from_user(dst, ksize, src.user, size);
++		return copy_struct_from_user(dst, ksize, src.user, usize);
+ 
+ 	if (usize < ksize) {
+ 		memset(dst + size, 0, rest);
+-- 
+2.53.0
 
 
---===============4466382693602889916==--
+
