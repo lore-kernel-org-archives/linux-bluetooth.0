@@ -1,313 +1,246 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40473976A9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85A9378828
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784643789; cv=pass; b=a+W5vpyDMzpwQg92tB6oW6CNyEkxXfh8aFTNqOCggw/WG6YzFhpg7Ogy11ZNIFLIXIFKs7geCI8IRE/Ik2vscSCEp+DJI2bRcjd0g7+8WBT6/4yVwWUXcrQ4xT1rSlBC7U4xZBluCl5azldZNUHMxyjgqIN/cbRtW1VCT9TLyEE=
+	t=1784644135; cv=pass; b=XqtD4Gjmi5iyMJpRSek4BJ7tXhs7UW/rRdwiOf9cxbxMBUO3L+UZNxxROXBRccitqpF+gFeNwTDDThcoIZBaY0KL5iBrWbfLSwL/boNn5MLbp4MR8Is0UnWUr0zX7iV73wMM6ze4YI77P7FNV5LzJcTXezith3VJ+A77Dxwb02g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784643789; c=relaxed/simple;
-	bh=+uP6RODyJ1w+lh3sNUMBK73br0e2XzV6wU27hKhRZeg=;
+	s=arc-20240116; t=1784644135; c=relaxed/simple;
+	bh=/XObGync8LF5uD4NItfTT98WgYVcbAUhgyFwZeuLv8U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zu9mZKUTwM5Hbq+sv8yiFRw5SxO1xZpTbACL/VXCczxBvAse6i+UU8FoEM7yme2E14j1I2Y40hBe09JcLYlGvhMGGc2OcYPzFcEj5p3np7kMWxIbHr9fqzSAa92k9R1JxFG09ypok6KoBUND/VstYkirQCTOBLkC9dwY3qQf8Qw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iMORtbYv; arc=pass smtp.client-ip=209.85.128.171
+	 To:Cc:Content-Type; b=S0VxlWPk1PH/bDQwscaQ7Tdtgh+ibPa1EPHM1gzj8JUdg9WcaoxPKZkQ0N2EabQBr71ALCkijpKkU07nPUIdTLa17z5+MFidnmmrFXRQaAdmaZnMwomsDfO5Lh1flinTcPSnX4SQYBr9YSDfhnL+A0wbqkvM4yWwF3B+NTKT/p0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YYw2fsPy; arc=pass smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMORtbYv"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-80cebd41372so105579637b3.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:23:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784643787; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYw2fsPy"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-81e6f0b4610so117507187b3.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:28:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784644133; cv=none;
         d=google.com; s=arc-20260327;
-        b=s6EXw0+rtKXrUpLts1mNJpTPBwejiyJoB9YhTaeS/FsHBnC/Arez517h5lWZ0ol8rT
-         dCbt+4b1eYpYHpMp3u2IvjKdwiTbr/+tyKETjMMc51JNs+ziXvigOFkrxvuE05ODBwjj
-         DuIAiDXZ7ShkZaOKU1F2ExPx6Gj605lbxLkJYyNvj/VUEjRM8GJAzSls9C5RiaWHpISH
-         +frR+JicCU8JWJVDRBUNgjWZhQDP1l4IGBcXBS9bjkPA/XbW2UWAbBWT7eFTALqBKRrj
-         EFhYcW0NzYnCBcxXXwenSFXGZ/LYO9Yz1aRLNXRz/qgjvZR/dNR7GLXCymXUC7+JJu2W
-         ITqw==
+        b=DiHEm7jq8dYxRnziEK3XMYYXr+8T1SQr7Kr7kTi+gsAJINnVZ999jkWzUPhGhwzZZ2
+         en6bHKGGr0xQi7S8an+9Imj1P3AkSyUznSvZmiWnd/U/YBp19BX1+lnue0RefGRrSGny
+         136/E7yICwj7GBI3+BOl5/O32JWKcpRH6aCt3f+ZXUU8QYwppXpCRlXTo3zUBnbEr4SI
+         3LuYn3zitdm8MnCB9FOlMD9IMcuTfcNgpnca6jSVeBM4ctPkYD4H8Vwuf+owLnpPCBau
+         gAJR0YtpH9XDU1Do3Vy4KzGgeBuFBzpw9jys4ZjjDQxJzkEYHY0DSXSTbXSyc23Pi3vy
+         cegw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=8E33owZra3iWA1DttrvFl1DQFau5A39b2eJSW7Ms1jA=;
-        fh=NpnlYs8kCHHkQEX9lj0fobHYWOcy19ezRLn6INaCLtw=;
-        b=fX8BOANQBzQHO9i+a+DBBfOQ7ujJhU7663B2IbkviVz6oMRcwioX2U2HRyhzdE2ePp
-         B/X2Rd1mPpEW8EwGHbSy59sootGcqoEgc1HncIAZGIAnnHKVD721UEPUtHPk+/HJ4xkF
-         dqOSMqwFt0VtMDWJ754MvT2xY0YppHFp359ptMSX+/2VtG468Ood/xXOhaguEWkkNC92
-         uoNx4xAS0o6thVhKlA5k68RUzlPfqX0CBGy+koMnDNyvsoM1je7/xywhKl4auBKgi/E3
-         Nrdz8/P6q4hFGPGnyLrk9xdPTEkA/7G+IwnBZpIQIx/tpf5owF5wSKG0A8uecYlncvfv
-         mFAQ==;
+        bh=Hzvh/69IIJP1fZXlO6gE1a1KGEe5Idh5edoVt/6oOpc=;
+        fh=h0t8UKtdkJEtExGnMDmoafJH1yFcBNHSNlp+JUzL/60=;
+        b=kz58A7YN/GwdezFfHYZe/0yYRInJI2e0KX3keJ/eyNhBU9ZWR63J8ncYvxHEjtZymZ
+         g77ZK4cGIV+PTScZPpuy8pF6uSUrGroFUP4+zuwuTlMfvGnku9VYgOYdtYovL1+BCn58
+         nEy5sasY11ULcIgRhGPNbPQqCkvm2KtRmdvIVnzG8pHy0fje7pse8XNKzNUqpXsKKJiC
+         u2lFz6cA9lQOy9kuOHpwYqqaWFcwnkxaIP8UkRTOtLKTaA7Iaac8TUp/hahZsdPGioxz
+         zuL/KiUaSKt6rVh8ZENNnGzU2JwCZJqrtLD1grqlAovi+o+1lmcSCN6I+5Wu3xMUhULZ
+         P5HA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784643787; x=1785248587; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784644133; x=1785248933; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=8E33owZra3iWA1DttrvFl1DQFau5A39b2eJSW7Ms1jA=;
-        b=iMORtbYv5dv8wiZX0EyJ1O29iW+gQFe7bB3IRyUzowbE2bd2NdQpRV6aXIlli4B+vr
-         6B3YaV3uCXE5+oSqhHzav96dpbUaCeCcRdmcASQw7K7M4wVfBxjQNdZzHRN9HSyTRXlG
-         ioJFfWSapBo447hhHWDPz1xumvyWnRXDdqucoiQ09gB46In8yzYXp/beP8cwkfck1co4
-         87YElagJz+x46a03/RK2myNgDUU2R5GNfveveqEDsMafrrI7S+iJZntDy6ngwaeuoyXH
-         nmztU1SIHu1yh2FOLe3Bbt8LE2voBTE3a6EEE7kcYK2FIt54BrFKzmFpUGYstQ0ULA+8
-         1W1g==
+        bh=Hzvh/69IIJP1fZXlO6gE1a1KGEe5Idh5edoVt/6oOpc=;
+        b=YYw2fsPyzdjCZll5rsbdscA387rKIi357u3dALHptIMkuZksRMqlP1YABqxSlMcrEj
+         WaN9NPT0oRSlHZq0rTEH2QpDJftY5qASSKxsiJEKZ0ciIRlrTRPhNjmQdWKMpVfF3HLZ
+         L+ntuI0wSAqMslSmEe0Yd6NOuzgjw7BdcIte1Oc/T9CljNA+XU6TjiWCE1BTHEKevrHc
+         Wu7FoViwJGZ+9m8so9HhVNT4TCTtlI/ONigzX1o2fLBtAa8/qiCeYgFiwXKAbHwUbHEa
+         xZBd5yibiaDW/Gy5xY9blY+IzNWH5TzFyYlNuZdFP6aoVAnvpRAoSmsKbyEKzETMEOG0
+         Xmug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784643787; x=1785248587;
+        d=1e100.net; s=20251104; t=1784644133; x=1785248933;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=8E33owZra3iWA1DttrvFl1DQFau5A39b2eJSW7Ms1jA=;
-        b=hWP9jgYFwE2noNDpzocIpgw8VkeitgDkww0KRBfhA1lPWIKFOyoGpq1WQ4f8F3eWkL
-         vzE2zqOBq+qji4KIC+fdibl34kHhjfzSKf+Iv9qo5lcqX3DOdsJUhyf1lTUYZvrGa+lH
-         +24SYAYZGovVKh+X0XVFZEgZNQdG97Qypaw1LfG1q/p91NpUYKRvHofs9HtBBxNnysP1
-         z1LI/RWsKXUQm15VpHkcpl35iaBg38n7CFgBhDSpVN6ITKDlb84g6nCxjEFTcfUSUZBa
-         1FOtI91Dy8g5Luamd+oaNOEmncix55OlKPcUX4+EqXMmEwtwmU2I8f3cxmnywdWIDbnr
-         Dp6A==
-X-Forwarded-Encrypted: i=1; AHgh+Rq0VQ2WzaACz9+A5zTZWO/j1Fmsj6eLbVrfIAMvUoXiG4V+0KpYDln/UzQoOaCQe2pjcX5Qu3O0zuJ/svjABg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyAcP0pRglwmEYMOhBdYnK5vDtAu8+lC8q1G1vvxNFKNhy+6vL
-	54fdAJ1shdIlZvDylJB8Z2DQ1o59+NmsY3fJmfIKKL3HI06RYJU5azTSxU8Yk7y9VACGVQ/tiAr
-	XUhCwboRU/au4aAA2Uo8tD/dO89kugDU=
-X-Gm-Gg: AR+sD12H/8xlVYE7H/xCTlBEAoT546B1beh7grM+Wl/nWJDvBF59eak8N7YBcOz/7IK
-	o4hfBWGbg3gU53obnOlOgn640gGZCCBViOelyJBVdnfFvsMVER7+LBRCYOLQLmYKhTNPD9l3xOO
-	Sx+AUAOcHTttOEs+YnYVyDFBecFhUCpcz2aYGh6ZDXTIJZxJl7o7rNyr/RIg2mjRnJYD4cfw9bO
-	xoe1PMHR4OGEHF8E7lBnEouVXLj9lr6/wP6DQeiTKAWqAFVIp+g2YjYkaSW0jJNWWePGr6Rq43S
-	Tim9hyj7EZlUrvEJ9sCeVfbg6Sem5eFa9VcL8SAt2KmdQB0Lc5AHiiHcAFE=
-X-Received: by 2002:a05:690c:d8d:b0:81e:cda5:5149 with SMTP id
- 00721157ae682-81ef252c29fmr56047407b3.28.1784643786644; Tue, 21 Jul 2026
- 07:23:06 -0700 (PDT)
+        bh=Hzvh/69IIJP1fZXlO6gE1a1KGEe5Idh5edoVt/6oOpc=;
+        b=iD4UI6GUxlizkoXbEKuMjuUMiEEMbB2nCFy/4LJJhzXgi8+SZQGFCuXmYj7c9/Fe73
+         7xjIoBSVK52k9uU257IFRv9Tm6TvDoRECbnWRlFJrIu/lGAEHAy1qtKq/upF/47eCkDr
+         D3eZSh0L7KydWTlroCGvHmI8kn28bL2K0qHIEvViP4GRnpw7nPD6C8ruxqooY1WAQts/
+         WYKLbzGWn/ucl9z9ke/s9kkoPTquWZPtX5BGjdXIFCvWYezdgRmpdnBSTYXhjnAWEzL/
+         4zshOU84uXLDyPQpMa3dH1BUU/NuOAFlJpFruTmAeO17Xszz3avPDXYHR7GKX8hbDkMP
+         f1Fw==
+X-Gm-Message-State: AOJu0Yy42snTDoha6v9Bk+hgjcf2WbqpYOy7cXeYQ9n+/tCWfowXTzPl
+	9Js8yMmDRZFleyqKJ0OEhULqi0ZojSXDytp+F+7FE3yR+tooj5fpDEVAhMGfwK5g57ks3fiNnGc
+	/zfRUvbsOtV4TylthEX2bpf2VbI25sVvPE/XQ3H8tRQ==
+X-Gm-Gg: AR+sD11NyPgbZ6rF4Sv2x3mXoj6S9MHZJ4MB4z5vtfgRvmM3TY1HSBmuF6039GZZpCG
+	fpb+Vu9Fpfw7Xqix14AFgH/mZy/dofpa7+MXp3Ad/Md0vG98k8K828FyFwh9l4uLwDiuXzo7ouw
+	tZ3R/wrDN+VGb0MAqlmqA/02nS6BsDQDNfFArPHJkDvTIOWHlx+4+Wpc87e3ozKdX0jTrBD+jxM
+	9/VTA9vDQC9MJqO2jJ2LaBP8G1AdnfNxl8plZGXihEh+86nPw5dMrw3O7x6PBpvkHj7Aiz6RtyX
+	s5AZt2v/9HgFa8pK9NzpLkby58f8hxMURu+7RhL+yj00H7Y1
+X-Received: by 2002:a05:690c:6d0f:b0:81d:6af3:b9b5 with SMTP id
+ 00721157ae682-81ef25a1889mr53344857b3.9.1784644132696; Tue, 21 Jul 2026
+ 07:28:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260719-support_vendor_hci-v1-1-764523a4ca3d@oss.qualcomm.com>
- <CABBYNZL_H2iRAshF-RCX41jbt0jots5i5W=aUUJC_wEN6wzp=w@mail.gmail.com> <0c5a924f-7382-407b-a0f4-dfd7dfe0d5e6@oss.qualcomm.com>
-In-Reply-To: <0c5a924f-7382-407b-a0f4-dfd7dfe0d5e6@oss.qualcomm.com>
+References: <cover.1753084800.git.Pakrohk@users.noreply.github.com> <patch.1753084801.git.Pakrohk@users.noreply.github.com>
+In-Reply-To: <patch.1753084801.git.Pakrohk@users.noreply.github.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 21 Jul 2026 10:22:54 -0400
-X-Gm-Features: AUfX_mwCBav23XEZkLVHWhF3Pl53P_3n7WJOkV4UZ2Ady6960GqNyx6hKzbfYNM
-Message-ID: <CABBYNZJbyfqLGNdXedi4+ZDNW0VNsiChaOTEb02Rz4rYd6UyNg@mail.gmail.com>
-Subject: Re: [PATCH RFC] Bluetooth: Add generic support for vendor HCI frames
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 21 Jul 2026 10:28:41 -0400
+X-Gm-Features: AUfX_mwQnPTNMM0hVSwtE8iDlgfty8UthdizMTrGpCSx606gz7D0dSwxIFucnrc
+Message-ID: <CABBYNZ+mrXB0jju86xd7VcxW=WU3vO=sK1vL-N5QRbXuQvEguQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/3] src: add HMAC-SHA256 to bt_crypto using
+ kernel AF_ALG
+To: Pakrohk <rhpcir@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	Pakrohk <Pakrohk@users.noreply.github.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Zijun,
+Hi Pakrohk,
 
-On Tue, Jul 21, 2026 at 4:52=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com=
-> wrote:
+On Tue, Jul 21, 2026 at 10:17=E2=80=AFAM Pakrohk <rhpcir@gmail.com> wrote:
 >
-> On 7/20/2026 10:30 PM, Luiz Augusto von Dentz wrote:
-> >> For Qualcomm multi-subsystem BT chips, the transport wire carries both
-> >> BT-HCI and PERI-HCI frames. PERI is a subsystem on the chip. Take the
-> >> upcoming QCC2072 support as an example:
-> >>
-> >>     Packet type                BT-HCI indicator   PERI-HCI indicator
-> >>     --------------------------------------------------------------
-> >>     CMD (Host -> Controller)   0x01                0x31
-> >>     ACL Data (bidirectional)   0x02                0x32
-> >>     EVENT (Controller -> Host) 0x04                0x34
-> > I would say this was fine, but you actuall need to reclassify these to
-> > 0xff and then use an extra byte for the vendor opcode. Btw, you said
-> > you could define H4 headers like this? The spec defines either:
-> >
-> > https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/C=
-ore_v6.3/out/en/host-controller-interface/three-wire-uart-transport-layer.h=
-tml#UUID-1cf959bb-57a0-e782-4324-a9bc4ee3f134_table-idm13359018144714
-> >
-> > Or
-> >
-> > https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/C=
-ore_v6.3/out/en/host-controller-interface/uart-transport-layer.html#UUID-83=
-881875-5fbb-c366-400f-055ba726f70e_table-idm13359015052542
-> >
-> Hi Luiz,
+> From: Pakrohk <Pakrohk@users.noreply.github.com>
 >
-> Let us label this approach =E2=80=94 which multiplexes the vendor indicat=
-or under 0xff =E2=80=94 Solution A:
+> Add HMAC-SHA256 computation to the bt_crypto library using the Linux
+> kernel AF_ALG interface. This follows the exact same pattern as the
+> existing cmac(aes) implementation.
 >
-> virtual HCI_VENDOR_PKT (0xff) + vendor indicator (0x31/0x32/0x34) + body =
-per indicator
-> I did consider this solution =E2=80=94 let us discuss it in the section b=
-elow.
+> The HMAC-SHA256 function is needed for verifying external quirk profile
+> signatures. The previous implementation used popen("openssl dgst ...")
+> which had command injection risks and an openssl CLI dependency.
 >
-> The PERI-HCI indicators (0x31/0x32/0x34) are defined by the Qualcomm Blue=
-tooth Extensions
-> specification for the USB (Bulk Serialization mode), H4 UART, and SPI tra=
-nsports. They have
-> already been deployed in several generations of commercial multi-subsyste=
-m BT chips.
+> Using kernel AF_ALG:
+>   - No external library dependencies
+>   - Matches existing BlueZ crypto patterns
+>   - No shell invocation or temp files
+>   - Works in bluetoothd's process context
 
-I know you probably don't want to change the format between the driver
-and controller=E2=80=94that's fair if it's already in use=E2=80=94but that =
-doesn't
-mean it's valid to use them as is outside the driver's scope.
+Well I guess kernel crypto doesn't want us to add new usage like this
+since AF_ALG is to be considered deprecated, even though I have to
+agree it is much simpler and probably safer than using an external
+crypto library.
 
-> > We end up defining vendor 0xff because it is at the end of the range
-> > which is probably safer.
-> >
+> The hmac(sha256) algorithm is available in all modern Linux kernels
+> via the crypto API (/proc/crypto).
 >
-> I am not sure that fully holds here:
+> Signed-off-by: Pakrohk <Pakrohk@users.noreply.github.com>
+> diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+> index cb99116..f5883bd 100644
+> --- a/src/shared/crypto.c
+> +++ b/src/shared/crypto.c
+> @@ -69,6 +69,7 @@ struct bt_crypto {
+>         int ecb_aes;
+>         int urandom;
+>         int cmac_aes;
+> +       int hmac_sha256;
+>  };
 >
-> First, vendors likely reason the same way =E2=80=94 "end of range is safe=
-r", Take Qualcomm as an example:
-> it already used 0xfb/0xfc/0xfd/0xfe as internal indicators.
-
-You can use that within the driver to controller transport but not above th=
-at.
-
-> Second, current transport drivers already use 0xff in ways that break tha=
-t expectation,
-> as shown below:
+>  static int urandom_setup(void)
+> @@ -126,6 +127,28 @@ static int cmac_aes_setup(void)
+>         return fd;
+>  }
 >
-> 1) bpa10x uses 0xff as the wire indicator for HCI_DIAG_PKT (0xf0):
-> https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/bpa10x.c#L=
-72
+> +static int hmac_sha256_setup(void)
+> +{
+> +       struct sockaddr_alg salg;
+> +       int fd;
+> +
+> +       fd =3D socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
+> +       if (fd < 0)
+> +               return -1;
+> +
+> +       memset(&salg, 0, sizeof(salg));
+> +       salg.salg_family =3D AF_ALG;
+> +       strcpy((char *) salg.salg_type, "hash");
+> +       strcpy((char *) salg.salg_name, "hmac(sha256)");
+> +
+> +       if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
+> +               close(fd);
+> +               return -1;
+> +       }
+> +
+> +       return fd;
+> +}
+> +
+>  static struct bt_crypto *singleton;
 >
-> 2) btmrvl remaps its wire vendor type 0xFE onto 0xff to carry Marvell ven=
-dor events:
-> https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/btmrvl_sdi=
-o.c#L797
+>  struct bt_crypto *bt_crypto_new(void)
+> @@ -159,6 +182,16 @@ struct bt_crypto *bt_crypto_new(void)
+>                 return NULL;
+>         }
 >
-> 3) hci_vhci uses it for the handshake that creates the virtual hdev:
-> https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/hci_vhci.c=
-#L462
-> https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/hci_vhci.c=
-#L523
-
-Actually this reinforces my point that vendors should just multiplex
-using 0xff, otherwise this will multiply. Still, I don't think this
-proliferates outside the driver, so my comments hold: we should just
-use 0xff to communicate vendor packets. That way, tools like btmon
-understand it is a vendor packet and we don't need to build multiple
-tables to express the domain of types each vendor uses.
-
-> >> To generically support vendor HCI frames:
-> >>
-> >> - Show them in btmon logs as they appear on the wire.
-> >> - Allow userspace to send/receive them via HCI_CHANNEL_USER, with a
-> >>   socket option to control RX, defaulting off to eliminate regression
-> >>   risk for existing applications.
-> > We shouldn't need to do this, we should just accept 0xff as the vendor
-> > packet type and then use the following byte as the real opcode (0x31,
-> > 0x32, 0x34). Otherwise, if we start accepting vendor packet types
-> > outside 0xff this will get crowded quickly and could potentially clash
-> > with future specs.
-> >
+> +       singleton->hmac_sha256 =3D hmac_sha256_setup();
+> +       if (singleton->hmac_sha256 < 0) {
+> +               close(singleton->cmac_aes);
+> +               close(singleton->urandom);
+> +               close(singleton->ecb_aes);
+> +               free(singleton);
+> +               singleton =3D NULL;
+> +               return NULL;
+> +       }
+> +
+>         return bt_crypto_ref(singleton);
+>  }
 >
-> The indicator is a full u8, the entire [0x10, 0xef] indicator range is cu=
-rrently
-> unused, and vendor indicators should be deliberately chosen to avoid conf=
-licting with
-> the BT SIG assignments.
-
-Well you already pointed out vendors are all over the place with their
-own packet types.
-
-> >> - Add hdev->recv_vendor() to handle vendor frames in hci_rx_work() lik=
-e
-> >>   BT frame handlers.
-> >> - Add hci_send_vendor_frame() API similar to existing __hci_cmd_send()=
-.
-> > Encoding/decoding of the frames should be transparent. I'm fine adding
-> > code to the likes of btmon to decode vendor packets, we already have
-> > something similar for Intel although that uses a vendor event not a
-> > vendor packet (both use 0xff, causing the confusion). The user of the
-> > user channel shall be able to read/write starting with 0xff then
-> > decode/encode the next byte as the actual vendor opcode.
-> >
-> >> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> >> ---
-> >> Hi Luiz
-> >> To address the below concerns you raised on previous
-> >> discussion, and inspired from your suggestion to add hdev callback:
-> >>
-> >> - Not use safer skb helper like skb_pull_data()
-> >> - It will skip sending to the monitor, making debugging much harder
-> >>
-> >> Looking forward to your further comments.
-> >>
-> >> Why hdev->is_vendor() instead of multiplexing vendor frames under a
-> >> virtual HCI_VENDOR_PKT + vendor indicator byte ?
-> >>
-> >> 1) The virtual HCI_VENDOR_PKT isn't used by the core itself
-> >>    currently, and may be removed later.
-> >> 2) It makes full use of the indicator (hci_skb_pkt_type(skb)) space,
-> >>    which is large enough to accommodate vendor frames without an
-> >>    extra layer of nesting inside HCI_VENDOR_PKT.
-> >> 3) It lets userspace and btmon logs see the exact same frame as it
-> >>    appears on the wire.
+> @@ -183,6 +216,7 @@ void bt_crypto_unref(struct bt_crypto *crypto)
+>         close(crypto->urandom);
+>         close(crypto->ecb_aes);
+>         close(crypto->cmac_aes);
+> +       close(crypto->hmac_sha256);
 >
-> As noted above, I chose is_vendor() over Solution A. My reasoning follows=
-,
-> for your reference.
->
-> 1) Userspace sees exactly what is on the wire, in the same form as BT-HCI=
- frames =E2=80=94
->    clear and consistent, as shown below:
->   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
->   =E2=94=82 Frame =E2=94=82 BT-HCI   =E2=94=82 PERI-HCI   =E2=94=82 PERI-=
-HCI   =E2=94=82
->   =E2=94=82       =E2=94=82 existing =E2=94=82 is_vendor()=E2=94=82 Solut=
-ion A =E2=94=82
->   =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=A4
->   =E2=94=82 CMD   =E2=94=82 0x01 =E2=80=A6   =E2=94=82 0x31 =E2=80=A6    =
- =E2=94=82 0xff 0x31=E2=80=A6 =E2=94=82
->   =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=A4
->   =E2=94=82 ACL   =E2=94=82 0x02 =E2=80=A6   =E2=94=82 0x32 =E2=80=A6    =
- =E2=94=82 0xff 0x32=E2=80=A6 =E2=94=82
->   =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=BC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=A4
->   =E2=94=82 EVENT =E2=94=82 0x04 =E2=80=A6   =E2=94=82 0x34 =E2=80=A6    =
- =E2=94=82 0xff 0x34=E2=80=A6 =E2=94=82
->   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
-> 2) is_vendor() puts PERI-HCI on an equal footing with BT-HCI, so userspac=
-e and the transport
->    driver can reuse the existing BT-HCI path rather than add a separate e=
-ncode/decode layer =E2=80=94
->    less effort on both sides.
->
-> Could you please give me a clear direction
-> Solution A or is_vendor()?
-
-There might be a simpler approach, just consider anything other then
-the known packets a vendor packet, so it is automatically stamped with
-HCI_VENDOR_PKT then push it back to driver from processing.
-
-> I need it before I can move forward with the remaining QCC2072 btusb deve=
-lopment work.
->
-> thank you.
->
->
+>         free(crypto);
+>         singleton =3D NULL;
+> @@ -1005,3 +1039,35 @@ bool bt_crypto_sirk(struct bt_crypto *crypto, cons=
+t char *str, uint16_t vendor,
+>         /* Encrypt sirk using k as LTK with sef function */
+>         return bt_crypto_sef(crypto, k, sirk_plaintext, sirk);
+>  }
+> +
+> +bool bt_crypto_hmac_sha256(struct bt_crypto *crypto,
+> +                               const uint8_t *key, size_t key_len,
+> +                               const uint8_t *msg, size_t msg_len,
+> +                               uint8_t res[32])
+> +{
+> +       ssize_t len;
+> +       int fd;
+> +
+> +       if (!crypto)
+> +               return false;
+> +
+> +       fd =3D alg_new(crypto->hmac_sha256, key, key_len);
+> +       if (fd < 0)
+> +               return false;
+> +
+> +       len =3D send(fd, msg, msg_len, 0);
+> +       if (len < 0) {
+> +               close(fd);
+> +               return false;
+> +       }
+> +
+> +       len =3D read(fd, res, 32);
+> +       if (len < 0) {
+> +               close(fd);
+> +               return false;
+> +       }
+> +
+> +       close(fd);
+> +
+> +       return true;
+> +}
+> diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+> index d85f807..6b234bc 100644
+> --- a/src/shared/crypto.h
+> +++ b/src/shared/crypto.h
+> @@ -62,3 +62,8 @@ bool bt_crypto_sirk(struct bt_crypto *crypto, const cha=
+r *str, uint16_t vendor,
+>                         uint8_t sirk[16]);
+>  bool bt_crypto_rsi(struct bt_crypto *crypto, const uint8_t sirk[16],
+>                                         uint8_t rsi[6]);
+> +
+> +bool bt_crypto_hmac_sha256(struct bt_crypto *crypto,
+> +                               const uint8_t *key, size_t key_len,
+> +                               const uint8_t *msg, size_t msg_len,
+> +                               uint8_t res[32]);
 >
 
 
