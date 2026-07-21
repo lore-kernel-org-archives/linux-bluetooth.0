@@ -1,71 +1,71 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30CF384223
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B422C21DD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784643461; cv=none; b=IgmdbbK48zVqdUgTl90waGibKGrNXtGGhXi+VBfP7K77/+N8H/q+z976p5+pECPSZ6xDvCekqmkp4GnBEo1y1g3z7aKbb3bjhTNvJ6zN3vooK0TmOm9XtCTKa95cdI3BdNd10ajSBQ1QWfS2oENvvi3/QpAW5rMb1POiffRT7hQ=
+	t=1784643465; cv=none; b=NPXxlCXYCd1mjQxHRUSI7qDnsGCilHylYpNlB3vSUEDqwlHII3AtWoighGAVuLMC/eXw9hVOTlNK/vHWBuQjjKQHgOVjLghHoK8n3No9UiavDArwci1J813leMARQC6/Lh5nbINuNJoGMdycBVGG9OZgLmeOUvKt0olosElmNFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784643461; c=relaxed/simple;
-	bh=cGYcBN8QNwoXcSRwMXFtPvITAaTZhzUGN2w82c4JzpQ=;
+	s=arc-20240116; t=1784643465; c=relaxed/simple;
+	bh=/b5udHkisZ2TmsXtdiMxGURlg8rmryFUbvdeg/84nAM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sPcd7qbcwXddzKB1cnwzL3tmyXhvt55wcyIYZtREJsX2vF8OD5PsPEZpyydOz/P53LOJ11Syj6Ey8V10bxSiXQXukhu0nEUoagOv6EwHqu14kvTyHzzimHELqpAMC/qKJXPKFPTRDNqlg1ThpIslLvEkH6F0KXZQdc9oZTmnfjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rPqfdXDJ; arc=none smtp.client-ip=209.85.221.54
+	 MIME-Version:Content-Type; b=XABw/mJ4C4focrzrt5gIB8/qOI0ZFtOImy9Qfu4fEtchzADd8CIDvx4sctNKg1I49wfSQpoBW+H2GfPUXnONoObVxJJuvdwhJ6MTn8YmyiZM3hyp27BB3Mxdxfw20lWF14ddfB6uMpEpIaHsUzj6LQwgt7oTGcP26R+SrJRSrzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+EtOkkE; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPqfdXDJ"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-47f633e6058so3936345f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:17:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+EtOkkE"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-47f81a3ccf9so475245f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784643458; x=1785248258; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784643462; x=1785248262; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=qkoxN0znauoPMGiuKdwbQidCINH+qH1aVg+lX9KBYXQ=;
-        b=rPqfdXDJMkFI6+W5v8JC5uwOmvC0+dRPmFgW3XlK2ztxEjXiOWOtiTkTTmHWy3EgM6
-         i8DKAhz3px3CVWvJGKqeupqW1044sOhjBPdUyMyoFE0dbkjJm6YI2kHH5I9/h09m6VMd
-         nClTfb57M3+piqGg+v1wlXk9MPAHnrTGi1NA6WDOlPv+iLdyRh17JOauD8xnUVc7eyC8
-         mB4tisydPeyiJWm3wY/ZebWicMm6LIZEch2KKloSohMg/+EkUvbjejjax62d0vTYym9y
-         0clSVn92CP4AB8cKIV/0QfpYMW6WirlaCjqcocyRFeLZ+mAGu7YkWv1rs7E9fgrCp8qW
-         4w1A==
+        bh=kWUzRK6FxN5Gqef01dVdaBoEHOZA4ReC+nBZ8gqoA5Q=;
+        b=m+EtOkkE3JRyhhbTshEszX+9tuICfYWQQMn4WCoqM7WZuBrkVIwxXahUllnZXLWOcb
+         SvAqxbpJdx1GbaboPOIjOmqa4S4tH8qoModPc72MpSqCaovVqefZweMsSXBM8rGJwetc
+         V7OfctxbxxGCwrKLbZRqhvqtosDtJQs5anSAw28WCuyPKyjWNIlqATMZKCK8l66DBirU
+         YgDIN5V9MeOXnCE2Cav8N6/WjoJc1704wpFFFpQ0qHSmVa6yHbBmo2fRHtJzy7DiaWhD
+         Mn9wkY5CaD6Kdn2spiZ77zYVUNitSpu3R/iwPo5MtXpPe6awDPL81eagya92Gj1Yjb4j
+         9DYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784643458; x=1785248258;
+        d=1e100.net; s=20251104; t=1784643462; x=1785248262;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=qkoxN0znauoPMGiuKdwbQidCINH+qH1aVg+lX9KBYXQ=;
-        b=kPmHZgTfrpts3/pjZjlIcI+t/20W4l/s47wOUBASPJmpB861+ALAB8bu53g6LbplGZ
-         z/lfLeDB8HVp3Qn06wF+TvtY/tWheskZnjl7eE/M8QUZ0+/v+mfiwy6VjgX05usO4gPP
-         OcZoaOzFDKy6FQJCvXWNHahNMXvrxJFjeRmv3mQdrp9cezxVNt8l1ygasZ/eTjbT3za9
-         QjwgcCASCBChBatpPWMRjMoZQYh+tpAiHvP9XCTOg8OCRMtDCLjPzvaehaHdSbXDVIlr
-         g5jRQmaBA7wFEOTs8u4EG9y/GrcSiFm0rDjQInKqplR5m0PaPzF6ChzF4p+4mPn2RKsF
-         6g4Q==
-X-Gm-Message-State: AOJu0YwowQCHag0JLuECvOL/RIoH5g9GbzTUWVnVnOTZw95CQXaNdPvb
-	vltJivwAnIigHS4n8zO+/yjXH6Hh8yjZD4TorjUGNFHDEau1ZBKqIJyK2El43WFdrnwDfw==
-X-Gm-Gg: AR+sD11XrCasQdQdl1njqqhGXWfpzo9vpfLj7Lsfjnrh/SNxHq9ZPpDnJ/lypadm54E
-	ksYI6iOQOILQI3HV4d/7mQxVT7m+8TPB6jGa1nRsh9KWiAlAc59TuU22/tdVrBzjuxLQH5m4psa
-	0db4IcZ3PbdevY1++y1SLqsJhCJiUnc/J8Gda/feGP/S7ScT2sUrBVG7q5zrn4c6MrhHXe6BTmZ
-	FwLcoOb8n3UqVjgDSY+og7mkHdBKYGM1V2mY6UpoSU9SclYLqIv2W3XPycJeKbg1N3v/VGnZV7z
-	YxoWlx5KBUlv+z7SS60ayDQK+e+OKj9DF4yln3I1/wc24CAJLecsdwn+ecjv/NDmdVgZ9zC4qwM
-	C+WZGxwglIpu33DdX87i3edPHrTF66bNQNpnv74BRJzOZkAPQnPFjKK4SP4xdwiOOhZy333kOLA
-	D3m4iT
-X-Received: by 2002:a5d:5d0e:0:b0:46e:8226:96ba with SMTP id ffacd0b85a97d-47f623036aamr23657067f8f.13.1784643457542;
-        Tue, 21 Jul 2026 07:17:37 -0700 (PDT)
+        bh=kWUzRK6FxN5Gqef01dVdaBoEHOZA4ReC+nBZ8gqoA5Q=;
+        b=oQ6P6XIVOgb+QdE77eQOAsxn/ji25pgP1ZNkMkwCx83rZIsLMjTul1mvSZlDFREUux
+         ep8wuLSr1bZqC5bBpvSNZUEypQvULElnuHupFDr5xNCsHimS6DJh7jlpC8G3VmnFOAPD
+         zWiBlQOVrLueXnwoQQNMoElOPkfJa278Ecn093D7ege1zxT4FwgsTikD/F557cKSeho6
+         8t1RAsPJ/CkhPmyqlUGTIo6iTumxcGrzyJjSC4sLSVBgqNZGss89Gn+YXTc8J/7qoEoX
+         jA4aBsHfULRU1MeIxsP0DxduBBm/tTmWGK/qmyDqWWBBPgmG+3HNoG+g1Bn600Hj/Fhi
+         5djw==
+X-Gm-Message-State: AOJu0Yw+j8pyjw1rpo3LRPliQegIVKM8+jLoBarv3QyIBDe5s8PtkwVc
+	6SQ7YoslW1Wc2cUxQDpRMTb/tsuAvSEGdGpBRjAAMAcqgcirERCyUXbhRYm2cTZB1Hr2Dg==
+X-Gm-Gg: AR+sD12f23kGZ9kfg7TCxJZQNKw+jydUG0uL0StBtxzItfhvIzjsoTzp3OiS41hjQFN
+	n/5gLPURrgBQiKivXvn4FwmA1LiVAVTUp70iIYfhbmIZTOsmMHhs5I+Z4pDkq2bIxU04UFYaW41
+	YeDyoC4lVp5ewrv00Bcba7DIqx1nmscydkKYZnwJRfWPVkog3me2eevfutsW60sJ/YH7ijmlm0g
+	/k0z5dATjnJTyUIBYAE8XE1Pm4wuuD1dcnmoshH7nMx/YJzbFZE6qg4rPNOY7oRXVFr1649+H2/
+	+vgOUDYzj3f2THBpgebXrqUnQr7mNhsgulfb89nNvYH8zJIxeKgpDbBf06gmyz2U+LkGofe1Ick
+	Zq+aU18Vfz1XNPcWwdS3bUtcOxmB2Gp3G6Wk0DGMpdvO7VQ40jWH6LheuvNCMFL/7NFH3bc8pFZ
+	9A80+o
+X-Received: by 2002:a05:6000:2907:b0:47f:83cb:ace9 with SMTP id ffacd0b85a97d-47f83cbae07mr561440f8f.22.1784643461920;
+        Tue, 21 Jul 2026 07:17:41 -0700 (PDT)
 Received: from pakrohk.localdoman ([89.34.36.164])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e49acesm37898270f8f.6.2026.07.21.07.17.36
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e49acesm37898270f8f.6.2026.07.21.07.17.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 07:17:37 -0700 (PDT)
+        Tue, 21 Jul 2026 07:17:41 -0700 (PDT)
 From: Pakrohk <rhpcir@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	marcel@holtmann.org,
 	Pakrohk <Pakrohk@users.noreply.github.com>
-Subject: [PATCH BlueZ v2 2/3] input: add HID gamepad quirk fallback for broken SDP records
-Date: Tue, 21 Jul 2026 17:47:17 +0330
-Message-ID: <patch.1753084802.git.Pakrohk@users.noreply.github.com>
+Subject: [PATCH BlueZ v2 3/3] tools: add bluez-quirkctl for managing quirk profiles
+Date: Tue, 21 Jul 2026 17:47:18 +0330
+Message-ID: <patch.1753084803.git.Pakrohk@users.noreply.github.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1753084800.git.Pakrohk@users.noreply.github.com>
 References: <cover.1753084800.git.Pakrohk@users.noreply.github.com>
@@ -80,144 +80,249 @@ Content-Transfer-Encoding: 8bit
 
 From: Pakrohk <Pakrohk@users.noreply.github.com>
 
-Add a modular gamepad quirk system to profiles/input/ that provides HID
-report descriptor fallbacks when BlueZ's SDP parser fails.
+Add bluez-quirkctl, a CLI tool for managing external gamepad quirk
+profiles. This tool validates JSON profiles, manages HMAC-SHA256 keys,
+and installs/removes signed profiles to the system directory.
 
-When extract_hid_record() returns -ENOENT for a known gamepad, the quirk
-system checks registered quirks and injects a fallback HID descriptor so
-the kernel's HID driver can create an input device.
+Usage:
+  bluez-quirkctl install <file.json>   - validate, sign, install
+  bluez-quirkctl remove <name>         - uninstall a profile
+  bluez-quirkctl list                  - list installed profiles
+  bluez-quirkctl validate <file.json>  - check without installing
 
-Two tiers of quirk support:
+Security model:
+  - Install/remove requires root (checked via getuid())
+  - HMAC key auto-generated in /var/lib/bluez/quirks/.hmac_key (0600)
+  - Profiles installed to /var/lib/bluez/quirks/ (0644)
+  - HMAC-SHA256 computed using bt_crypto (kernel AF_ALG)
+  - Symlinks rejected during loading
+  - Descriptor size capped at 2048 bytes
 
-Built-in quirks:
-  Hardcoded C entries for known broken controllers. Currently supports
-  DualShock 4 v2 / TG170W (054c:09cc) with a minimal BT HID descriptor
-  matching report ID 0x11 (78 bytes, as expected by hid-playstation).
-
-External quirk profiles:
-  JSON files in /var/lib/bluez/quirks/ with HMAC-SHA256 signatures.
-  Loaded at bluetoothd startup. Enables community-maintained support
-  without BlueZ source modifications.
-
-Architecture:
-  quirk.h     - quirk struct definition and dispatch API
-  quirk.c     - quirk registry and dispatch logic
-  quirk-profile.h/c - external JSON profile loader with HMAC verification
-  quirks/tg170w.c - built-in quirk for DualShock 4 v2
-
-The quirk only activates when SDP parsing fails AND the device matches
-a registered quirk. This does not globally weaken HID parsing.
-
-Multi-factor matching avoids false positives:
-  match = (vendor_id == 0x054c && product_id == 0x09cc)
-       || (device_name == "Wireless Controller"
-           && SDP provider contains "Sony")
+The tool links against libbluetooth-internal and libshared-mainloop
+for access to bt_crypto_hmac_sha256().
 
 Signed-off-by: Pakrohk <Pakrohk@users.noreply.github.com>
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 8017e07..0089c3d 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -1089,11 +1089,8 @@ static int hidp_add_connection(struct input_device *idev)
+diff --git a/Makefile.tools b/Makefile.tools
+index 44da0ce..ecce5b4 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -581,5 +581,6 @@ bin_PROGRAMS += tools/bluez-quirkctl
  
- 	err = extract_hid_record(idev, req);
- 	if (err < 0) {
--		/* Try gamepad quirk fallback for known broken devices */
--		if (gamepad_quirk_match(idev)) {
--			DBG("HID SDP failed, trying gamepad quirk");
--			err = gamepad_quirk_apply(idev, req);
--		}
-+		DBG("HID SDP failed, trying gamepad quirk");
-+		err = gamepad_quirk_apply(idev, req);
- 	}
+ tools_bluez_quirkctl_SOURCES = tools/quirkctl.c
+ tools_bluez_quirkctl_CFLAGS = $(JSONC_CFLAGS)
+-tools_bluez_quirkctl_LDADD = $(JSONC_LIBS)
++tools_bluez_quirkctl_LDADD = lib/libbluetooth-internal.la \
++				src/libshared-mainloop.la $(JSONC_LIBS)
+ endif
+diff --git a/tools/quirkctl.c b/tools/quirkctl.c
+index 5c35e97..93f3207 100644
+--- a/tools/quirkctl.c
++++ b/tools/quirkctl.c
+@@ -30,10 +30,16 @@
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <sys/sendfile.h>
+ #include <pwd.h>
  
- 	if (err < 0) {
-diff --git a/profiles/input/quirk-profile.c b/profiles/input/quirk-profile.c
-index 8ec3835..4240154 100644
---- a/profiles/input/quirk-profile.c
-+++ b/profiles/input/quirk-profile.c
-@@ -28,22 +28,20 @@
+ #include <json-c/json.h>
  
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/hidp.h"
-+#include "bluetooth/sdp.h"
-+#include "bluetooth/sdp_lib.h"
- 
- #include "src/log.h"
- 
- #include "quirk.h"
- #include "quirk-profile.h"
- 
--/* Accessors from src/device.h and src/service.h */
--extern struct btd_service *input_device_get_service(
--					struct input_device *idev);
--extern struct btd_device *btd_service_get_device(
--					const struct btd_service *service);
--extern uint16_t btd_device_get_vendor(struct btd_device *device);
--extern uint16_t btd_device_get_product(struct btd_device *device);
--extern bool device_name_known(struct btd_device *device);
--extern void device_get_name(struct btd_device *device,
--					char *name, size_t len);
-+#include "gdbus/gdbus.h"
-+
-+#include "src/device.h"
-+#include "src/service.h"
 +#include "src/shared/crypto.h"
-+#include "device.h"
- 
- #define MAX_EXTERNAL_QUIRKS 32
- #define HMAC_KEY_PATH QUIRK_PROFILE_DIR "/.hmac_key"
-@@ -67,6 +65,7 @@ struct external_quirk {
- 
- static struct external_quirk *ext_quirks[MAX_EXTERNAL_QUIRKS + 1];
- static int num_ext_quirks;
++
++static const char *prog;
 +static struct bt_crypto *crypto;
++
+ #define QUIRK_DIR "/var/lib/bluez/quirks"
+ #define USER_QUIRK_DIR "/.config/bluez/quirks"
+ #define HMAC_KEY_PATH QUIRK_DIR "/.hmac_key"
+@@ -42,7 +48,166 @@
+ #define JSON_EXT ".json"
+ #define SIG_EXT ".sig"
  
- /*
-  * Parse a hex string like "0501 0905" into a byte buffer.
-@@ -139,77 +138,23 @@ static char *read_file(const char *path, size_t *out_len)
+-static const char *prog;
++/*
++ * Copy file using sendfile(2).
++ */
++static int copy_file(const char *src, const char *dst)
++{
++	int fd_in, fd_out;
++	struct stat st;
++	ssize_t sent;
++
++	fd_in = open(src, O_RDONLY);
++	if (fd_in < 0)
++		return -1;
++
++	if (fstat(fd_in, &st) < 0) {
++		close(fd_in);
++		return -1;
++	}
++
++	fd_out = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0644);
++	if (fd_out < 0) {
++		close(fd_in);
++		return -1;
++	}
++
++	sent = sendfile(fd_out, fd_in, NULL, st.st_size);
++	close(fd_in);
++	close(fd_out);
++
++	return (sent == st.st_size) ? 0 : -1;
++}
++
++/*
++ * Load HMAC key from disk. Returns key length or -1 on failure.
++ */
++static int load_hmac_key(uint8_t *key, int max_len)
++{
++	FILE *f;
++	long fsize;
++	char *hex;
++	int key_len, i;
++	char *end;
++
++	f = fopen(HMAC_KEY_PATH, "re");
++	if (!f)
++		return -1;
++
++	fseek(f, 0, SEEK_END);
++	fsize = ftell(f);
++	if (fsize < 0 || fsize > 1024) {
++		fclose(f);
++		return -1;
++	}
++	rewind(f);
++
++	hex = malloc(fsize + 1);
++	if (!hex) {
++		fclose(f);
++		return -1;
++	}
++
++	if (fread(hex, 1, fsize, f) != (size_t)fsize) {
++		free(hex);
++		fclose(f);
++		return -1;
++	}
++	fclose(f);
++	hex[fsize] = '\0';
++
++	end = hex + strlen(hex) - 1;
++	while (end > hex && (*end == '\n' || *end == '\r' || *end == ' '))
++		*end-- = '\0';
++
++	key_len = strlen(hex) / 2;
++	if (key_len > max_len)
++		key_len = max_len;
++
++	for (i = 0; i < key_len; i++) {
++		unsigned int byte;
++		char buf[3];
++
++		buf[0] = hex[i * 2];
++		buf[1] = hex[i * 2 + 1];
++		buf[2] = '\0';
++		if (sscanf(buf, "%2x", &byte) != 1) {
++			free(hex);
++			return -1;
++		}
++		key[i] = (uint8_t)byte;
++	}
++
++	free(hex);
++	return key_len;
++}
++
++/*
++ * Compute HMAC-SHA256 using bt_crypto (kernel AF_ALG).
++ * Returns hex string of 32-byte digest, or NULL on failure.
++ */
++static char *compute_hmac(const char *file_path)
++{
++	FILE *f;
++	long fsize;
++	uint8_t *data;
++	uint8_t key[HMAC_KEY_SIZE];
++	uint8_t digest[32];
++	char hex[HMAC_KEY_SIZE * 2 + 1];
++	char *result;
++	int key_len, i;
++
++	if (!crypto)
++		return NULL;
++
++	/* Read the file */
++	f = fopen(file_path, "re");
++	if (!f)
++		return NULL;
++
++	fseek(f, 0, SEEK_END);
++	fsize = ftell(f);
++	if (fsize < 0 || fsize > 1024 * 1024) {
++		fclose(f);
++		return NULL;
++	}
++	rewind(f);
++
++	data = malloc(fsize);
++	if (!data) {
++		fclose(f);
++		return NULL;
++	}
++
++	if (fread(data, 1, fsize, f) != (size_t)fsize) {
++		free(data);
++		fclose(f);
++		return NULL;
++	}
++	fclose(f);
++
++	/* Load the HMAC key */
++	key_len = load_hmac_key(key, HMAC_KEY_SIZE);
++	if (key_len <= 0) {
++		free(data);
++		return NULL;
++	}
++
++	/* Compute HMAC-SHA256 */
++	if (!bt_crypto_hmac_sha256(crypto, key, key_len, data, fsize, digest)) {
++		free(data);
++		return NULL;
++	}
++	free(data);
++
++	/* Convert to hex string */
++	for (i = 0; i < 32; i++)
++		snprintf(hex + i * 2, 3, "%02x", digest[i]);
++	hex[64] = '\0';
++
++	result = strdup(hex);
++	return result;
++}
+ 
+ static void usage(void)
+ {
+@@ -139,43 +304,6 @@ static int ensure_hmac_key(void)
+ 	return 0;
  }
  
- /*
-- * Compute HMAC-SHA256 using openssl CLI.
+-/*
+- * Compute HMAC-SHA256 via openssl CLI.
 - */
--static char *hmac_sha256(const uint8_t *key, int key_len,
--			 const void *data, size_t data_len)
+-static char *compute_hmac(const char *file_path)
 -{
--	char key_hex[HMAC_KEY_SIZE * 2 + 1];
--	char *cmd;
--	char *result = NULL;
--	FILE *p, *tmpf;
--	int i;
--	const char *tmpfile = "/tmp/.bluez_quirk_hmac_input";
+-	char cmd[1024];
 -	char line[256];
--	char *eq, *end;
+-	char *result = NULL;
+-	FILE *p;
+-	char *eq;
 -
--	for (i = 0; i < key_len; i++)
--		snprintf(key_hex + i * 2, 3, "%02x", key[i]);
--	key_hex[key_len * 2] = '\0';
+-	snprintf(cmd, sizeof(cmd),
+-		"openssl dgst -sha256 -hmac \"$(cat " HMAC_KEY_PATH ")\" "
+-		"-hex < '%s' 2>/dev/null", file_path);
 -
--	tmpf = fopen(tmpfile, "we");
--	if (!tmpf)
--		return NULL;
--
--	fwrite(data, 1, data_len, tmpf);
--	fclose(tmpf);
--
--	cmd = malloc(strlen(key_hex) + 128);
--	if (!cmd) {
--		unlink(tmpfile);
--		return NULL;
--	}
--
--	snprintf(cmd, strlen(key_hex) + 128,
--		"openssl dgst -sha256 -hmac '%s' -hex < %s 2>/dev/null",
--		key_hex, tmpfile);
--
--	p = popen(cmd, "re");
--	free(cmd);
--	unlink(tmpfile);
--
+-	p = popen(cmd, "r");
 -	if (!p)
 -		return NULL;
 -
@@ -225,7 +330,8 @@ index 8ec3835..4240154 100644
 -		eq = strstr(line, "= ");
 -		if (eq) {
 -			eq += 2;
--			end = eq + strlen(eq) - 1;
+-			/* trim */
+-			char *end = eq + strlen(eq) - 1;
 -			while (end > eq && (*end == '\n' || *end == '\r'
 -						|| *end == ' '))
 -				*end-- = '\0';
@@ -238,184 +344,62 @@ index 8ec3835..4240154 100644
 -	return result;
 -}
 -
--/*
-- * Verify HMAC signature.
-+ * Verify HMAC-SHA256 signature using bt_crypto (kernel AF_ALG).
-  */
- static bool verify_signature(const char *json_path,
- 			     const uint8_t *hmac_key, int key_len)
- {
- 	char sig_path[1024];
- 	size_t sig_len, json_len;
--	char *sig_hex, *json_data, *expected_sig;
-+	char *sig_hex, *json_data;
- 	char *end;
-+	uint8_t computed[32];
-+	char computed_hex[65];
-+	int i;
- 	bool valid;
- 
-+	if (!crypto)
-+		return false;
-+
- 	snprintf(sig_path, sizeof(sig_path), "%s" SIG_EXT, json_path);
- 
- 	sig_hex = read_file(sig_path, &sig_len);
-@@ -228,21 +173,25 @@ static bool verify_signature(const char *json_path,
- 		return false;
- 	}
- 
--	expected_sig = hmac_sha256(hmac_key, key_len, json_data, json_len);
--	free(json_data);
--
--	if (!expected_sig) {
-+	if (!bt_crypto_hmac_sha256(crypto, hmac_key, key_len,
-+				(const uint8_t *) json_data, json_len,
-+				computed)) {
-+		free(json_data);
- 		free(sig_hex);
- 		return false;
- 	}
-+	free(json_data);
-+
-+	for (i = 0; i < 32; i++)
-+		snprintf(computed_hex + i * 2, 3, "%02x", computed[i]);
-+	computed_hex[64] = '\0';
- 
--	valid = (strcmp(sig_hex, expected_sig) == 0);
-+	valid = (strcmp(sig_hex, computed_hex) == 0);
- 
- 	if (!valid)
- 		DBG("Signature mismatch for %s", json_path);
- 
- 	free(sig_hex);
--	free(expected_sig);
- 	return valid;
- }
- 
-@@ -516,6 +465,12 @@ int load_external_quirks(const char *dir)
- 	if (!dir)
- 		dir = QUIRK_PROFILE_DIR;
- 
-+	if (!crypto) {
-+		crypto = bt_crypto_new();
-+		if (!crypto)
-+			DBG("quirk-profile: failed to init crypto");
-+	}
-+
- 	d = opendir(dir);
- 	if (!d) {
- 		DBG("quirk-profile: cannot open %s: %s", dir, strerror(errno));
-@@ -586,4 +541,9 @@ void free_external_quirks(void)
- 		ext_quirks[i] = NULL;
- 	}
- 	num_ext_quirks = 0;
-+
-+	if (crypto) {
-+		bt_crypto_unref(crypto);
-+		crypto = NULL;
-+	}
- }
-diff --git a/profiles/input/quirk.c b/profiles/input/quirk.c
-index 053f45b..fa5e7e6 100644
---- a/profiles/input/quirk.c
-+++ b/profiles/input/quirk.c
-@@ -36,23 +36,6 @@ static struct gamepad_quirk *quirks[] = {
- 	NULL
- };
- 
--bool gamepad_quirk_match(struct input_device *idev)
--{
--	int i;
--
--	/* Check built-in quirks first */
--	for (i = 0; quirks[i]; i++) {
--		if (quirks[i]->match(idev))
--			return true;
--	}
--
--	/* Then check external (file-based) quirks */
--	if (external_quirk_match(idev))
--		return true;
--
--	return false;
--}
--
- int gamepad_quirk_apply(struct input_device *idev,
- 			struct hidp_connadd_req *req)
- {
-@@ -69,9 +52,5 @@ int gamepad_quirk_apply(struct input_device *idev,
- 	}
- 
- 	/* Try external quirks */
--	if (external_quirk_match(idev)) {
--		return external_quirk_apply(idev, req);
--	}
--
--	return -1;
-+	return external_quirk_apply(idev, req);
- }
-diff --git a/profiles/input/quirk.h b/profiles/input/quirk.h
-index 08e0bce..f2fc81b 100644
---- a/profiles/input/quirk.h
-+++ b/profiles/input/quirk.h
-@@ -24,13 +24,10 @@ struct gamepad_quirk {
- 			struct hidp_connadd_req *req);
- };
- 
--bool gamepad_quirk_match(struct input_device *idev);
--
- int gamepad_quirk_apply(struct input_device *idev,
- 			struct hidp_connadd_req *req);
- 
- /* External quirk support (quirk-profile.c) */
--bool external_quirk_match(struct input_device *idev);
- int external_quirk_apply(struct input_device *idev,
- 			struct hidp_connadd_req *req);
- 
-diff --git a/profiles/input/quirks/tg170w.c b/profiles/input/quirks/tg170w.c
-index d3f37a8..d82c3fa 100644
---- a/profiles/input/quirks/tg170w.c
-+++ b/profiles/input/quirks/tg170w.c
-@@ -38,9 +38,14 @@
- #include "bluetooth/sdp.h"
- #include "bluetooth/sdp_lib.h"
- 
-+#include "gdbus/gdbus.h"
-+
- #include "src/log.h"
-+#include "src/device.h"
-+#include "src/service.h"
- 
- #include "../quirk.h"
-+#include "../device.h"
- 
  /*
-  * DualShock 4 Bluetooth HID Report Descriptor.
-@@ -124,25 +129,6 @@ static const uint8_t tg170w_hid_report_descriptor[] = {
- #define TG170W_VID  0x054c  /* Sony */
- #define TG170W_PID  0x09cc  /* DualShock 4 v2 */
+  * Validate JSON profile structure.
+  */
+@@ -390,14 +518,10 @@ static int cmd_install(const char *path)
+ 		return 1;
+ 	}
  
--/* Opaque structs - we don't pull in heavy headers */
--struct input_device;
--struct btd_device;
--struct btd_service;
--
--/* Declarations from src/device.h and src/service.h */
--extern struct btd_service *input_device_get_service(
--					struct input_device *idev);
--extern struct btd_device *btd_service_get_device(
--					const struct btd_service *service);
--extern uint16_t btd_device_get_vendor(struct btd_device *device);
--extern uint16_t btd_device_get_product(struct btd_device *device);
--extern const sdp_record_t *btd_device_get_record(
--					struct btd_device *device,
--					const char *uuid);
--extern bool device_name_known(struct btd_device *device);
--extern void device_get_name(struct btd_device *device,
--					char *name, size_t len);
--
- static bool tg170w_match(struct input_device *idev)
+-	{
+-		char cmd[1024];
+-		snprintf(cmd, sizeof(cmd), "cp '%s' '%s'", path, dest);
+-		if (system(cmd) != 0) {
+-			fprintf(stderr, "Failed to copy profile\n");
+-			free(name);
+-			return 1;
+-		}
++	if (copy_file(path, dest) < 0) {
++		fprintf(stderr, "Failed to copy profile\n");
++		free(name);
++		return 1;
+ 	}
+ 
+ 	if (chmod(dest, 0644) < 0) {
+@@ -510,6 +634,8 @@ static int cmd_list(void)
+ 
+ int main(int argc, char *argv[])
  {
- 	struct btd_service *service;
++	int ret;
++
+ 	prog = argv[0];
+ 
+ 	if (argc < 2) {
+@@ -522,7 +648,14 @@ int main(int argc, char *argv[])
+ 			fprintf(stderr, "Usage: %s install <file.json>\n", prog);
+ 			return 1;
+ 		}
+-		return cmd_install(argv[2]);
++		crypto = bt_crypto_new();
++		if (!crypto) {
++			fprintf(stderr, "Failed to init crypto\n");
++			return 1;
++		}
++		ret = cmd_install(argv[2]);
++		bt_crypto_unref(crypto);
++		return ret;
+ 	}
+ 
+ 	if (strcmp(argv[1], "remove") == 0) {
+@@ -533,9 +666,8 @@ int main(int argc, char *argv[])
+ 		return cmd_remove(argv[2]);
+ 	}
+ 
+-	if (strcmp(argv[1], "list") == 0) {
++	if (strcmp(argv[1], "list") == 0)
+ 		return cmd_list();
+-	}
+ 
+ 	if (strcmp(argv[1], "validate") == 0) {
+ 		if (argc < 3) {
 
