@@ -1,155 +1,102 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6797E2BEC34
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2026 00:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEE7346E6D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2026 01:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784679322; cv=none; b=l9so6JYxm9wxy1s7r4yVu8xugdHnjH0aD0TibbxvdVu3bt2YlNPY91HShf9KhqTOCLCv2YxPqvD72zZ0d+A14nDszdqrHT9ei83Rh4zalQJnGdmMH3VToDTTxBbuBQvfLB/+UmBopZogJ60gD/tc3D5uWeGOx/PYVBkkr26QpiQ=
+	t=1784682287; cv=none; b=jQF4NoevDCV8uf0UPNPB7mn6WzrOQVffDZO8UKOpiwCgT84m5J00fzsyNYQm+vQFvz1RDKOJvHB2F1riaUX8VVJlTryCWiNAOVErQebJgrGGEO0NUkfiluHgIjjOlXtugEnE8ka4UoQIeWdu+R5sZvKZ7VRPFx5GrUvBjcqoZCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784679322; c=relaxed/simple;
-	bh=d9g1Tc9tmYbuSOmCrSNkVN8ZsiQamlsCM3orbPFVRVY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O8A4Kyx+JyiVZE/Rw8cT3slBGEa/XlFTHe0U5djQzb3BMPalIYcW70NtzAZUbFNoP604WGLigS6N8FMq14T8GXM40ecH+tLMzMDGHXXWChyDA2G1Cv8mm8orMVuf11MoCTEZ6prO0LXGlQhRdFzAMbh+ni7mz6TvqxujbRjzfwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G2MYSK5a; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1784682287; c=relaxed/simple;
+	bh=kecp9iIyPzIYTtGqjlPcM+9ObwUZhuaRjF8iPbnwslg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MtYgdhYsIgMumrXDESzFIuHenks+pkGhhWdKNoSP31OTH65CcuZP6jGb1xhigN6wkdwy8KQfNbZXgJWoWYeI01A2FPBSqk0b+axy/fapIzslvmkoTCi+MMd9HfMcjIjHgCGr0H714FlQUswXKc2PEn8s4JBcIXogBNsNQqA926w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPPcDr1r; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G2MYSK5a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784679319; x=1816215319;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=d9g1Tc9tmYbuSOmCrSNkVN8ZsiQamlsCM3orbPFVRVY=;
-  b=G2MYSK5a0JzkxsLa5lNsYpwpq/lKLEDSzgV2mMEGbxKzOLG1HxfGEvdZ
-   +TFHqLK39pK+yMksVDcSC8ywm3L3MAfVnk285O5kys4Vz8K3M9fPEb/lF
-   tjWhetzZJNeoovyhX6iVtqDEOUpM6UYyhYCy3IxujsI9aXiEtakC+IjW7
-   7vrt2Yg+LvZSBQokuPg0DDhS0YJAhrx6U6ghwafPPLqhx3x9W1ceYydG2
-   plETIXl1/irSlQFN7IDZYmV4HYAU08Pgl/x5n/O6rP/qRtO5XrUrOuUFK
-   M40EV6sVEzF5RStYe3GB07sLn4TuicLQHInQ+EZ2SOLXvZqCMSMznfbIC
-   Q==;
-X-CSE-ConnectionGUID: 0JVTJzAZTTSoNU6OZsFuNg==
-X-CSE-MsgGUID: XETLrhsFQLeSCr0zpiXyqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11853"; a="89121545"
-X-IronPort-AV: E=Sophos;i="6.25,177,1779174000"; 
-   d="scan'208";a="89121545"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2026 17:15:18 -0700
-X-CSE-ConnectionGUID: uhkWowC+SUC4ablYKEAv3A==
-X-CSE-MsgGUID: tJribj75T4KScJI3JtLJYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,177,1779174000"; 
-   d="scan'208";a="255270715"
-Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
-  by fmviesa008.fm.intel.com with ESMTP; 21 Jul 2026 17:15:15 -0700
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	bhelgaas@google.com,
-	ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel_pcie: Add vendor_rst PCI sysfs for PLDR
-Date: Wed, 22 Jul 2026 05:44:33 +0530
-Message-ID: <20260722001434.804931-1-chandrashekar.devegowda@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260612012832.2395034-1-chandrashekar.devegowda@intel.com>
-References: <20260612012832.2395034-1-chandrashekar.devegowda@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPPcDr1r"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51bfbe05683so109595331cf.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 18:04:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784682285; x=1785287085; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=kecp9iIyPzIYTtGqjlPcM+9ObwUZhuaRjF8iPbnwslg=;
+        b=lPPcDr1rAfTP5kL7F3aXwsUyQpnvxQbZnMp5s+ZHr5ufLzuYRGu8rhxAimWmcBuVkK
+         GA7zj2vh52Y8Nbl5LPKsqwGzDioEnMtb2MjJa59iTSpZm+kV6uu3LxiWlWt9pmjwnWHK
+         MGZNjXgAJWOMqyHzvU4uyPq4OlgEN11m9L1qU+0VnE/Pgi7J8BHG+nPth3aueudUixYe
+         CEgpLjx66JdFVY4pxLzYIqEhcca7Woxpf7FT1mcTh/L7/hIi14EXkgfxVSxV0dLO+Wpl
+         Q4Yp/AWKzEI1WhvHyi7cCeOHjPZr6TgBHOWceGa/Uj98ciSlJODuAY4mL3VmN8l+gPp6
+         5ZbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784682285; x=1785287085;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=kecp9iIyPzIYTtGqjlPcM+9ObwUZhuaRjF8iPbnwslg=;
+        b=hOCSK1pwpqSbaoyBhwNSf5Z9oA00lohRFXKf+ch51F73RD8iPO6v7MnV7e/F8q0F3p
+         +wm6SRKnyxapdd890fi8EenIq0UqI1KHQUOWSiPhgDKCA66VFu0fDh95glOJXbearjiY
+         U5FZEImnAMjN1K+4OkOuXomaBPHgsAWSyj+Xlod6l+TVb+PimtScOncvfakq4duA4RMu
+         4X6t6kI8IRRmMpMWpu4lY72K1Z6uVvH5Nw9F/Majy8cbDfv/+WIYbDUFWlktGoR96UqY
+         YzKwJGanNo78+PWRcwaWmKfeiAtMda7qI1PnHPEGgYFVV3YRQP9ZJBm49XyQDUliaKdC
+         2Beg==
+X-Gm-Message-State: AOJu0YzDYMQqOihI9IbnA+JgUAyznl1P2QtUMFM6dz62en8JJdpM7qjx
+	LnkiXBtNfemEoyXxmVAOwPWz1vOViKAPYkkU+R0K8W1CMkHJxr/GPa0cAySNvA==
+X-Gm-Gg: AR+sD10wC+4uOqgrhkVycGjjK3xhyIcqr/yEIjwpcaASPV1Ve3cL8GMryuZ2y21mG2O
+	Zf3/bH1eQicqOkNTNvcuYGHjfLwA26/uEjAZVR3f295i8ZXLAXgi0xXV3DBdcLHu5d1jhyNze7P
+	XgzXsDeg6ejXm7BTXuAFbbbB6B3Ao54KdQHCWj7iBmEwybkghFz8cpcTZZcDplcmX/HV1SKumfp
+	Hckp7uTwqjk4kcKYqOBlqPWFUzcC6CBuLM+jIzZuJFGUf9IwYCbSlCwrkw4bA3SQuNIny81QgrG
+	m/xg5IND2Dc4VOI7RyoMEEXvxaFNPEPi13opOY9MgSrWBtU9pouT5wTvyFEKd1d8IK1D5dHN7Bz
+	jFYFvB7emxGpAMrpizoknSGBgi/otkgxIsdussgUAzZNMgMgtVgHlAWOCd/SwunKxbN2rZFWERL
+	IhNxpFYlx9
+X-Received: by 2002:ac8:58d5:0:b0:516:e974:6f72 with SMTP id d75a77b69052e-5213e082509mr205792541cf.50.1784682284869;
+        Tue, 21 Jul 2026 18:04:44 -0700 (PDT)
+Received: from [172.17.0.2] ([20.62.207.244])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-907baa0ef54sm8710586d6.39.2026.07.21.18.04.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jul 2026 18:04:44 -0700 (PDT)
+Message-ID: <6a60172c.ce53cff3.307de8.6f60@mx.google.com>
+Date: Tue, 21 Jul 2026 18:04:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6965598145432948596=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com
+Subject: RE: [v3] Bluetooth: btintel_pcie: Add vendor_rst PCI sysfs for PLDR
+In-Reply-To: <20260722001434.804931-1-chandrashekar.devegowda@intel.com>
+References: <20260722001434.804931-1-chandrashekar.devegowda@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add a read-write sysfs entry at /sys/bus/pci/devices/<BDF>/vendor_rst
-to allow userspace to trigger PLDR (Product Level Device Reset).
-Reading the attribute displays supported reset types. Writing
-integer 0 triggers PLDR. Any other input is rejected with
--EINVAL and a warning log.
+--===============6965598145432948596==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btintel_pcie.c:2781
+error: drivers/bluetooth/btintel_pcie.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 42 +++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 2e28847263ab..a412ca7ff3ad 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2781,7 +2781,10 @@ static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
- 	data->reset_type = type;
- 
- 	pci_dev_get(data->pdev);
--	schedule_work(&data->reset_work);
-+	if (!schedule_work(&data->reset_work)) {
-+		pci_dev_put(data->pdev);
-+		clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
-+	}
- }
- 
- static void btintel_pcie_hci_reset(struct hci_dev *hdev)
-@@ -2791,6 +2794,36 @@ static void btintel_pcie_hci_reset(struct hci_dev *hdev)
- 	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- }
- 
-+static ssize_t vendor_rst_store(struct device *dev,
-+				struct device_attribute *attr,
-+				const char *buf, size_t count)
-+{
-+	unsigned int val;
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
-+
-+	if (!data || !data->hdev)
-+		return -ENODEV;
-+
-+	if (kstrtouint(buf, 10, &val) || val != 0) {
-+		bt_dev_warn(data->hdev, "PLDR rejected: invalid input");
-+		return -EINVAL;
-+	}
-+
-+	bt_dev_info(data->hdev, "PLDR triggered via sysfs");
-+	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_PLDR);
-+
-+	return count;
-+}
-+
-+static ssize_t vendor_rst_show(struct device *dev,
-+			       struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "0 - PLDR\n");
-+}
-+
-+static DEVICE_ATTR_RW(vendor_rst);
-+
- static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- {
- 	struct btintel_pcie_dev_recovery *rec;
-@@ -3010,6 +3043,11 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto exit_error;
- 
-+	err = device_create_file(&pdev->dev, &dev_attr_vendor_rst);
-+	if (err)
-+		bt_dev_warn(data->hdev, "Failed to create vendor_rst sysfs (%d)",
-+			    err);
-+
- 	bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
- 		   data->cnvr);
- 	return 0;
-@@ -3046,6 +3084,8 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
- 
-+	device_remove_file(&pdev->dev, &dev_attr_vendor_rst);
-+
- 	/* Cancel pending reset work. Skip only when remove() is called from
- 	 * within the reset work itself (PLDR device_reprobe path) to avoid
- 	 * deadlock. current_work() returns the work_struct of the caller if
--- 
-2.43.0
 
+--===============6965598145432948596==--
