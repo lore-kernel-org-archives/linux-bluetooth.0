@@ -1,184 +1,379 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2294F433BCA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 22:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7154241695
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2026 00:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784671409; cv=pass; b=TAg4vImtI0zXbufFJAh726vgn3tNKHyivH/+EEnDa+o8o9qgCzUoXgYlM7gIxxH1CNjR+O0HP4cZEBQXe+Mj+Ud7agRBdaQHcFu79uSR9N6k8OIYlekrkdAigJLzOaU8e+IfBjK8adWXgwUO7tZ7rq+dFY175+6UlbctfH2p8aA=
+	t=1784678796; cv=pass; b=G3IuvmYrO03vf9b5uSYzlh0aMH4yx/el1Ufbhm1RN2oYXogfmFGFYPl3xab7mQjSgYoubp08DsQZaM4Q6nvaLfZOSyZkpK3gWRnoV6n/Dgk7x2WaYUhzque++YsknZL8bL9Z+IQ3REtQKuiwtlQTR6vGR7f3Ty/TC2KOk53WC3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784671409; c=relaxed/simple;
-	bh=rI9jeh8i2zsoQUULh9O5Soadz68HN6s/+jSCTDJ86SU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ho2w1DFedZ7+D7xs6hWW0Lv0rbFILT0c2/9VgKPwgU8B++Wl4h5yxwXIwBdvFJJYLKX+fU+GQp7HuLE7IQd3JaNzxUzX3wUVXGXuW7i1iDnrZE5kB5z4SMe0oBA/dOpExPFYDVT3hqf+d0XcQPzAS20v89ipSHzkOrNTjg4Ut04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=k7RSBxlk; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1784678796; c=relaxed/simple;
+	bh=wMtYh10SKiiWG+RZaqeJCYVCugAbNzk3twBRkN577HM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DQTPHrXCmkFjCj3T/p6NILiLTioRE/9PrC0Fa5sj67FKYYajjwsyku1iHcZuZhqw8jK3GEP29ZYfT4hQSVE0o3dFGpORQjSV1i5xitxYNH6JunOJBkWR4FyLvr5eyPO46XLFbsv2Y80HPgQoU7LH7oeCD7ECckvd3kSCdvF1+V4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fb9AyN1q; arc=pass smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="k7RSBxlk"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h4Wbj29tlz49Pxf;
-	Wed, 22 Jul 2026 01:03:13 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1784671393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=n58rDKPT3dMIhZLPrhQRZ79sr5GcCZh4NxA7qyLTR7w=;
-	b=k7RSBxlk8+cxkblG4GiEtYgph0FjCnNAXqYYfK9ErQN0SLt7QJCPJp87+5bqoHSeNleDyJ
-	HrjkeT/Nf4nIZdRTkpNdBdb2MZ9UTLAbP654mG5k/0FjUl0f/pcdQ68f9uOUqsBMSxdBLq
-	C56rYtZQTMMiRImMYFH0tQihsmt2qlT/l9PfIOIh7zRwEecRl6FBBW8mMCKVvpwtQk2r0S
-	KyF1CCK7yhTS0JflNTnFSOHHdc9QZDRd3+qA1hvrvit5RWPoURpYwT74Mi1UxhpOE/Y7Nj
-	Q5hK42NdFkFBpnL4QTMItbJ1ewYvUf64JQVkFrKlC/KMN1eNNCX9k4j4gaU9jw==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784671393;
-	b=ImOQ4AV324ExjaONxdus+gRBCebSxqJeVuu/32tDBqvxxUctcixzO75Y/8PYRNf5OV2VH1
-	K59a2R1re2mnpxrbIngyy7+akugI3pTJo6C4hlRLCtLpcqBjCKHm5/w5HD+DuWxvb1QJIW
-	xwZEa/Fat3483WCYQRv6kVgfFv1KQ+FRFFvLvC1OqT1OfkNj6Wp1R2hmZ6NBV8wNY6TwnD
-	cMCiLR3C/XdcWBGDRzt35aB4eEAcR2ro+T5FrqByeNsR8sKM6wEIjT7GX73m7GhCrJO4wZ
-	gI157wkv8gZOw8dVTPQ1+t5S+zDYrfL+mY1BVhzRR9WmiIT/b3BEd+YrmrjWWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1784671393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=n58rDKPT3dMIhZLPrhQRZ79sr5GcCZh4NxA7qyLTR7w=;
-	b=K0P1dvhRenoSAoujR6K9SdLoDAuCTH0OTTSCGqihsJdFOxiNwfysvmKzqm9ttOJqHfeohP
-	+Lfii9odlJW+rHkQhgz00d0EWM5o6+vdXdXMQxQZCdj3Dfv7FLbykX8TCIOCpKQj5ylcRg
-	2N5gABmo/iu8MCZRPUNAIsrNhgB8moZ0vBQoCU95VjTk+t1Ki4sdJzvO3zFtAXRX+heA3s
-	6hng00iR8zhUFesatNPXQMY/mmiJV4XmpAAIJdJpsxkqNIREV0cSLey4T5FrhEY4rST3LO
-	BcUA2Fst0c68WohDiyLSvnFB0j/4yNERvHDa8gSh1pGd1E1GpAPRRdpVIWo7Zg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pauli.virtanen@iki.fi
-Message-ID: <09cfe8ec607004f1be5fd14459799b3fca6157b4.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: ISO: clear iso_data always when detaching
- conn from hcon
-From: Pauli Virtanen <pauli.virtanen@iki.fi>
-To: patchwork-bot+bluetooth@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Date: Wed, 22 Jul 2026 01:03:10 +0300
-In-Reply-To: <178466283139.1001510.13531091802205452302.git-patchwork-notify@kernel.org>
-References: 
-	<f3d8d52dcb2a5464393623a56369ea244c144460.1784559155.git.pav@iki.fi>
-	 <178466283139.1001510.13531091802205452302.git-patchwork-notify@kernel.org>
-Autocrypt: addr=pauli.virtanen@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fb9AyN1q"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6983d3dae7aso8016842a12.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 17:06:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784678782; cv=none;
+        d=google.com; s=arc-20260327;
+        b=esf4Tw6InAkw4GOBr/E6wl8gH2t8eBmSkpU5l5onfosOPm/VMNj3n5EKyYW/gutdSs
+         E2kzQ+GNggovkuiB7X/KScCBq2hIR6xoFsD89jyCAiAIaJGCFN4GpwUKk2swTNFZQZJj
+         G20hB+7gDjqyuX3bu2ch/YZWb/FWSQGtPs9sK/5c9iDsipKzhsDIXjF60g7GHEhYsMdt
+         WI+zUzaNOYiPbx5wA8G3oG6MgPKFVpdQGHzBm8XPSNCn/EsYxF8BcIoHDOKXA2bhSlu+
+         pQlKnSdSuIIrN8+HfgRNJsWiLppDASNUssiBGHVeW3g7xwIBwDK2euvc9tNhtT7S1bXt
+         A9sA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=53PZrj75wts3n5Ecooubh+ftBN8lAgLD2BXECoxLQP4=;
+        fh=ciTsz5tBK0j74K9T/JuOW0GmKKNxxEuB5TvkHDUZAFs=;
+        b=gw8jvx6iQUjkmiTcIxklakkDE2nW2iun5+f+AULA+SWJ3fgUKFJZIAeNfLSrSIFZO3
+         FidHEI35SA0bMOgqbBouj08AETY35FGl5mxUYEFGksByRS/dFYcM6E5hhe6iabWoNVaE
+         x2XOfe7ZVE1Z+uiFln0qBKuD2HY4DrU6LDriqidsv01wTRajqA4ghdBDh9sdI1GOmbJr
+         SuSH7GrkvNvZ/ASzr6C1WjpX/5X172aNeromkkctrkvsgx3Sz5tAP1ejlXL9wTwApQ9L
+         FkN3oqyUFWx+8wFMikLLvuj79GbnkY2AnzVe4k4fQoFSYWaRXyhEgOSIiOptDJdM+vjM
+         wVig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784678782; x=1785283582; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=53PZrj75wts3n5Ecooubh+ftBN8lAgLD2BXECoxLQP4=;
+        b=fb9AyN1q46RppApAPkU+AB9OV5cnNsfeh3tfzJaYcwwsR/qJ2dGu/hokNKSwcGq7Ve
+         L0sbN49MJDYQuYApndzG7cnQZYgw2EY6KbRVpOtdzMn4Tkkhnj2bwkM2x4yAlDJTT6ho
+         c8It6sNpwdRFszey0QK5fDF0VsVhqexZo4u27mwKonsTBVvDPjfg36nU9hq20dqCTEYC
+         QBG79S39AY7x58Lmc9jQauY0jGyfMSYBuqGnOtFWX0dRElxOjeA6veHHQlGAT2MqzFpu
+         4MCqI351t7faGdQJ4ratLngALNwBAzGAGGLBHIKV/UkwaqFUaMfh+9f27P7GJ1j2HNKe
+         UOsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784678782; x=1785283582;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=53PZrj75wts3n5Ecooubh+ftBN8lAgLD2BXECoxLQP4=;
+        b=soCMfJXGdasTRqrrKd6+Mi1yTN9U1OPGjF8dZgSi2Lgpkb2SD7Lb1XOT9rGhJC6TCQ
+         1RiwnR6T2z7hTBdcCvGsvFWzSiIFtkLGXWHXxAzFv4y84uOHa89pcix843fFdWBUx/D8
+         gnswxS2ICXHXMIgnayz4RCXR4Kz4146QC09XrTrgr8792nkXOYTjMrjtX+8fiziqDd/H
+         8CFQMbaQCVMfnUxoin/szkrecsI2+uaVXGxxUzZOtQu9NCIG+uqH1Ptvn7lwrQngdr0+
+         82WDNnzpvrDl6NNprHTVo+oMjqtdvQCIECDZOH0HVNzDlp7z1uixm3J52BUwYKhXEq8A
+         HmHQ==
+X-Forwarded-Encrypted: i=1; AHgh+RodBLL9wZxzIqxpPOSHnI/NIs9XAaGHI2yyHXdnJK0iUozdDGNkmCZO3f0zn0feaLkwNsAXcY0njLif+BtMnYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHYSpd/QsRXNqFoI5MTYc9bcxMMLt1Vr5AKNWmEG6f5/FhE0WU
+	2EvrETBrT8XmaM5d4E2utfjly0JtOoh3aKTQbottMhE2ibtUm5ECLdyq2Br86XolT6YYJdFC37l
+	413U3vwcLpf6oxoSwIekgfOkftoESW54=
+X-Gm-Gg: AR+sD10+oVLjZl6z38d+nhrUA9g3beTvVte3mQ6b0pw37DmwBVozigrDoCCS4/NyYZD
+	kQEEtUkXbdJ1SX8kgquKBdJdnxvHfE9KVUeoOQutHXi2xWTIpNM4Q2McjGqaXTdouXjuhNKO/J/
+	H1NRfWiqVnMtz97vXT1koySSnh/UcAttlKONoIJyY3USOmrRn2pLHwmiJkq2d+9EoFhymJR8zjX
+	Tdz5erfuas7gVJ14EOxOO1CWfWd9mJMIhfNE4zQVbJCv2v9EyUpONsdEe1uLn/i02StZhCvPDhx
+	jOKCWhErMDdyDeTxsd6836FymeQ3f0ZguhhFHYwHvd4C92s=
+X-Received: by 2002:a17:907:9729:b0:c1c:2253:7744 with SMTP id
+ a640c23a62f3a-c1c31015facmr82467866b.16.1784678782275; Tue, 21 Jul 2026
+ 17:06:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260717153238.2002330-1-yaojiale02@163.com> <CABBYNZJdEjqd2eKmQNvPodvifnPgVvih5fnFf5sdA7Kpi7T19w@mail.gmail.com>
+ <220b6be5.d3f.19f78e165aa.Coremail.19888972804@163.com> <CABBYNZLmjDkAGX-mBaySPnxp-mh2bPXaNh=b=dZ8wq9yeS2wRQ@mail.gmail.com>
+ <7930905e.40fa.19f833db829.Coremail.19888972804@163.com>
+In-Reply-To: <7930905e.40fa.19f833db829.Coremail.19888972804@163.com>
+From: Muhammad Bilal <meatuni001@gmail.com>
+Date: Wed, 22 Jul 2026 05:06:04 +0500
+X-Gm-Features: AUfX_mzWtsKF1d_UmZpPNa8IHVsANoTz84hdpZe2LlRTKMVWdA7eyGXYNKdh-9s
+Message-ID: <CADqcGBmY9TW+yrG5a3R4_fG_P8Rr2wMJpZkFC87ea=nm2dh+2A@mail.gmail.com>
+Subject: Re: Re: Re: [PATCH v3] Bluetooth: HIDP: add missing length check for
+ incoming frames
+To: jiale yao <19888972804@163.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Tim Bird <tim.bird@sony.com>, Kees Cook <kees@kernel.org>, 
+	Michael Bommarito <michael.bommarito@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+Hi Jiale,
 
-ti, 2026-07-21 kello 19:40 +0000, patchwork-bot+bluetooth@kernel.org
-kirjoitti:
-> Hello:
->=20
-> This patch was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->=20
-> On Mon, 20 Jul 2026 17:53:33 +0300 you wrote:
-> > When setting conn->hcon =3D NULL, also conn->hcon->iso_data =3D NULL is
-> > necessary, otherwise later iso_conn_free() will UAF.
-> >=20
-> > Fix clearing of iso_data in iso_sock_disconn()
-> >=20
-> > Fixes KASAN: slab-use-after-free in iso_conn_hold_unless_zero on
-> > iso_sock_release() followed by hci_abort_conn_sync().
-> >=20
-> > [...]
->=20
-> Here is the summary with links:
->   - Bluetooth: ISO: clear iso_data always when detaching conn from hcon
->     https://git.kernel.org/bluetooth/bluetooth-next/c/e824c0bbe0ec
->=20
-> You are awesome, thank you!
+Looks correct. Both goto failed paths free the skb properly now, and
+the intr_frame goto also avoids a NULL hdr deref.
 
-Was this version of the patch picked accidentally?
+Reviewed-by: Muhammad Bilal <meatuni001@gmail.com>
 
-This v1 breaks transition to BT_CLOSED state (tested via the new ISO
-Connect Linger - Success iso-tester patch), since iso_chan_del() is not
-necessarily called
+Thanks,
+Muhammad Bilal
 
-https://lore.kernel.org/linux-bluetooth/4463dae062ffcb12ad82c843052e35b550b=
-7924b.camel@iki.fi/
-
-The later versions changed title to "Bluetooth: ISO: fix UAF on socket
-close before shutdown completes". Sorry about the unclarity.
-
-***
-
-There's some remaining problems related to ISO socket teardown, present
-also in previous bluetooth-next/master versions (don't have patches for
-these yet):
-
-1)
-
-iso_sock_kill(sk) has
-
-	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket ||
-	    sock_flag(sk, SOCK_DEAD))
-		return;
-
-which always returns early, since sk->sk_socket is NULL after
-sock_orphan(), but sock_orphan() sets SOCK_DEAD. Looks like
-iso_sock_destruct() never runs in iso-tester. (SOCK_DEAD ->
-SOCK_DESTROY probably works here, likely should hold lock_sock for the
-whole segment).
-
-2)
-
-iso_conn_del() doesn't call sco_sock_kill(), so suspecting that release
-of sk in BT_CONNECTED state without preceding shutdown does not free
-the socket.
-
-3)
-
-Correctness of iso_conn_del() requires reasoning about "who has the
-last reference" with race conditions, which is maybe too complicated,
-perhaps it should directly clear iso_conn::hcon
-
---=20
-Pauli Virtanen
+On Tue, Jul 21, 2026 at 10:55=E2=80=AFAM jiale yao <19888972804@163.com> wr=
+ote:
+>
+> In hidp_recv_ctrl_frame() and hidp_recv_intr_frame(), skb->data[0] is
+> read without verifying that skb->len >=3D 1.  A zero-length L2CAP PDU
+> delivered via the HIDP control or interrupt channel causes an
+> out-of-bounds read.
+>
+> Use skb_pull_data(skb, 1) which combines the length check and pull
+> in one operation, matching the existing pattern in hidp_input_report()
+> and the fix in commit 6770d3a8acdf ("Bluetooth: bnep: reject short
+> frames before parsing") which addressed the same class of bug in BNEP.
+>
+> Assisted-by: Claude:deepseek-v4-pro
+> Signed-off-by: Jiale Yao <yaojiale02@163.com>
+> ---
+>  net/bluetooth/hidp/core.c | 25 +++++++++++++++----------
+>  1 file changed, 15 insertions(+), 10 deletions(-)
+>
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 0e24c5e2955e..e29fe66f01d4 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -560,16 +560,18 @@ static int hidp_process_data(struct hidp_session *s=
+ession, struct sk_buff *skb,
+>  static void hidp_recv_ctrl_frame(struct hidp_session *session,
+>                                         struct sk_buff *skb)
+>  {
+> -       unsigned char hdr, type, param;
+> +       unsigned char *hdr;
+> +       unsigned char type, param;
+>         int free_skb =3D 1;
+>
+>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+>
+> -       hdr =3D skb->data[0];
+> -       skb_pull(skb, 1);
+> +       hdr =3D skb_pull_data(skb, 1);
+> +       if (!hdr)
+> +               goto failed;
+>
+> -       type =3D hdr & HIDP_HEADER_TRANS_MASK;
+> -       param =3D hdr & HIDP_HEADER_PARAM_MASK;
+> +       type =3D *hdr & HIDP_HEADER_TRANS_MASK;
+> +       param =3D *hdr & HIDP_HEADER_PARAM_MASK;
+>
+>         switch (type) {
+>         case HIDP_TRANS_HANDSHAKE:
+> @@ -590,6 +592,7 @@ static void hidp_recv_ctrl_frame(struct hidp_session =
+*session,
+>                 break;
+>         }
+>
+> +failed:
+>         if (free_skb)
+>                 kfree_skb(skb);
+>  }
+> @@ -597,14 +600,15 @@ static void hidp_recv_ctrl_frame(struct hidp_sessio=
+n *session,
+>  static void hidp_recv_intr_frame(struct hidp_session *session,
+>                                 struct sk_buff *skb)
+>  {
+> -       unsigned char hdr;
+> +       unsigned char *hdr;
+>
+>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+>
+> -       hdr =3D skb->data[0];
+> -       skb_pull(skb, 1);
+> +       hdr =3D skb_pull_data(skb, 1);
+> +       if (!hdr)
+> +               goto failed;
+>
+> -       if (hdr =3D=3D (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
+> +       if (*hdr =3D=3D (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
+>                 hidp_set_timer(session);
+>
+>                 if (session->input)
+> @@ -616,9 +620,10 @@ static void hidp_recv_intr_frame(struct hidp_session=
+ *session,
+>                         BT_DBG("report len %d", skb->len);
+>                 }
+>         } else {
+> -               BT_DBG("Unsupported protocol header 0x%02x", hdr);
+> +               BT_DBG("Unsupported protocol header 0x%02x", *hdr);
+>         }
+>
+> +failed:
+>         kfree_skb(skb);
+>  }
+>
+> --
+> 2.34.1
+>
+>
+>
+>
+>
+>
+>
+> At 2026-07-21 03:47:21, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> w=
+rote:
+> >Hi,
+> >
+> >On Sun, Jul 19, 2026 at 1:38=E2=80=AFAM jiale yao <19888972804@163.com> =
+wrote:
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >> In hidp_recv_ctrl_frame() and hidp_recv_intr_frame(), skb->data[0] is
+> >> read without verifying that skb->len >=3D 1.  A zero-length L2CAP PDU
+> >> delivered via the HIDP control or interrupt channel causes an
+> >> out-of-bounds read.
+> >>
+> >> Use skb_pull_data(skb, 1) which combines the length check and pull
+> >> in one operation, matching the existing pattern in hidp_input_report()
+> >> and the fix in commit 6770d3a8acdf ("Bluetooth: bnep: reject short
+> >> frames before parsing") which addressed the same class of bug in BNEP.
+> >>
+> >> Assisted-by: Claude:deepseek-v4-pro
+> >> Signed-off-by: Jiale Yao <yaojiale02@163.com>
+> >> ---
+> >>  net/bluetooth/hidp/core.c | 21 ++++++++++++---------
+> >>  1 file changed, 12 insertions(+), 9 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> >> index 0e24c5e2955e..bb61602b02e1 100644
+> >> --- a/net/bluetooth/hidp/core.c
+> >> +++ b/net/bluetooth/hidp/core.c
+> >> @@ -560,16 +560,18 @@ static int hidp_process_data(struct hidp_session=
+ *session, struct sk_buff *skb,
+> >>  static void hidp_recv_ctrl_frame(struct hidp_session *session,
+> >>                                         struct sk_buff *skb)
+> >>  {
+> >> -       unsigned char hdr, type, param;
+> >> +       unsigned char *hdr;
+> >> +       unsigned char type, param;
+> >>         int free_skb =3D 1;
+> >>
+> >>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+> >>
+> >> -       hdr =3D skb->data[0];
+> >> -       skb_pull(skb, 1);
+> >> +       hdr =3D skb_pull_data(skb, 1);
+> >> +       if (!hdr)
+> >> +               return;
+> >
+> >https://sashiko.dev/#/patchset/20260717153238.2002330-1-yaojiale02%40163=
+.com
+> >
+> >It seems that by early returning we are leaking the skb.
+> >
+> >>
+> >> -       type =3D hdr & HIDP_HEADER_TRANS_MASK;
+> >> -       param =3D hdr & HIDP_HEADER_PARAM_MASK;
+> >> +       type =3D *hdr & HIDP_HEADER_TRANS_MASK;
+> >> +       param =3D *hdr & HIDP_HEADER_PARAM_MASK;
+> >>
+> >>         switch (type) {
+> >>         case HIDP_TRANS_HANDSHAKE:
+> >> @@ -597,14 +599,15 @@ static void hidp_recv_ctrl_frame(struct hidp_ses=
+sion *session,
+> >>  static void hidp_recv_intr_frame(struct hidp_session *session,
+> >>                                 struct sk_buff *skb)
+> >>  {
+> >> -       unsigned char hdr;
+> >> +       unsigned char *hdr;
+> >>
+> >>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+> >>
+> >> -       hdr =3D skb->data[0];
+> >> -       skb_pull(skb, 1);
+> >> +       hdr =3D skb_pull_data(skb, 1);
+> >> +       if (!hdr)
+> >> +               return;
+> >>
+> >> -       if (hdr =3D=3D (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
+> >> +       if (*hdr =3D=3D (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
+> >>                 hidp_set_timer(session);
+> >>
+> >>                 if (session->input)
+> >> --
+> >> 2.34.1
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>
+> >> At 2026-07-17 23:40:11, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com=
+> wrote:
+> >> >Hi,
+> >> >
+> >> >On Fri, Jul 17, 2026 at 11:33=E2=80=AFAM Jiale Yao <yaojiale02@163.co=
+m> wrote:
+> >> >>
+> >> >> In hidp_recv_ctrl_frame() and hidp_recv_intr_frame(), skb->data[0] =
+is
+> >> >> read without verifying that skb->len >=3D 1.  A zero-length L2CAP P=
+DU
+> >> >> delivered via the HIDP control or interrupt channel causes an
+> >> >> out-of-bounds read.
+> >> >>
+> >> >> Add pskb_may_pull(skb, 1) guards before both reads, matching the fi=
+x
+> >> >> in commit 6770d3a8acdf ("Bluetooth: bnep: reject short frames befor=
+e
+> >> >> parsing") which addressed the same class of bug in BNEP.
+> >> >>
+> >> >> Assisted-by: Claude:deepseek-v4-pro
+> >> >> Signed-off-by: Jiale Yao <yaojiale02@163.com>
+> >> >> ---
+> >> >>  net/bluetooth/hidp/core.c | 4 ++++
+> >> >>  1 file changed, 4 insertions(+)
+> >> >>
+> >> >> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> >> >> index 0e24c5e2955e..6c7da8aca732 100644
+> >> >> --- a/net/bluetooth/hidp/core.c
+> >> >> +++ b/net/bluetooth/hidp/core.c
+> >> >> @@ -565,6 +565,8 @@ static void hidp_recv_ctrl_frame(struct hidp_se=
+ssion *session,
+> >> >>
+> >> >>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+> >> >>
+> >> >> +       if (!pskb_may_pull(skb, 1))
+> >> >> +               return;
+> >> >
+> >> >We can probably replace this with skb_pull_data.
+> >> >
+> >> >>         hdr =3D skb->data[0];
+> >> >>         skb_pull(skb, 1);
+> >> >>
+> >> >> @@ -601,6 +603,8 @@ static void hidp_recv_intr_frame(struct hidp_se=
+ssion *session,
+> >> >>
+> >> >>         BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+> >> >>
+> >> >> +       if (!pskb_may_pull(skb, 1))
+> >> >> +               return;
+> >> >
+> >> >Ditto.
+> >> >
+> >> >>         hdr =3D skb->data[0];
+> >> >>         skb_pull(skb, 1);
+> >> >>
+> >> >> --
+> >> >> 2.34.1
+> >> >>
+> >> >
+> >> >
+> >> >--
+> >> >Luiz Augusto von Dentz
+> >
+> >
+> >
+> >--
+> >Luiz Augusto von Dentz
