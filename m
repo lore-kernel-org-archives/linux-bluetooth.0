@@ -1,48 +1,67 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5083E556B;
-	Wed, 22 Jul 2026 08:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C9623C8AE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2026 09:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784709107; cv=none; b=FLITnM19l11Cp34vG9VcsvT2zR1SVHytiQz0iyFQJl0A2PUXggUzq69WVNav4Aq3elnkpm3pD/cVVOascgVVcOw5JzdF3USb01Sh8JY5+XeHXPv2rLlx48AObq7IjEPh5kYzeMkLm+f08YC47pvd2mJPnWmZi/ikAioVw2DYb4E=
+	t=1784710980; cv=none; b=j31ZtSjfT+A0z5cRyNG7zQqSn30TQxwfaITvbMNhy7LOqImMCdnwgGy1BD1MVvuW0y8ljz1+6eAcGJtFho7qDDTMZL+5ibLfyPx3URobvvq2wvEuepba11V5Jw5T3/b/Vtw+gyf+38iyMgULbdG4+Uo3MiwVhChZ7Qi6fRzdxe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784709107; c=relaxed/simple;
-	bh=Flp6Ch4Lz/xGopy8Xp5tG0XHEEwjMSF/AQaI2Qf2P+0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SShK+KiQPlVNVklGtSJz0PABCzR2hgButi7PmLlFOxGjKTRuuJjmtcmLHx8+JDIi6cp/OlC0KjPtw8NuEnVfin7czZxYZVZ+3G1YjNEzktsDpyVo37Y1KXzazojUUMRAV+UNFiNI4hXbTDVPj7aBuaze+iSb/HQ0xWH4Ayjr65g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c29f836885a711f1aa26b74ffac11d73-20260722
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:e55cf362-8fe5-4627-8564-39815fc53c7c,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:e2e528d7525466bfc67c6ebf5e2d9f3a,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|136|850|865|898,TC:nil,Content:0|15|
-	50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0
-	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c29f836885a711f1aa26b74ffac11d73-20260722
-X-User: chenchangcheng@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <chenchangcheng@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 2106482765; Wed, 22 Jul 2026 16:31:39 +0800
-From: Chen Changcheng <chenchangcheng@kylinos.cn>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ccc194101@163.com,
-	Chen Changcheng <chenchangcheng@kylinos.cn>
-Subject: [PATCH] Bluetooth: btrsi: Move set_bt_context after successful HCI registration
-Date: Wed, 22 Jul 2026 16:31:36 +0800
-Message-Id: <20260722083136.175650-1-chenchangcheng@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1784710980; c=relaxed/simple;
+	bh=G2ietXSfNwWVcU0cuNL3LCv0JCuc3K9dheh/OkMhsdY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fBye5NPFfYD6dg+bgBx+qaAMluGzAFJBsbJF60ZPF4ax6Ze3dqvbCt95miGdRDhGCthu2OQ3Ogcl5aNTpglyK+riCqSe3MoECri8Ye8gUxYiU9qKezTgAzOGBfPtZDqlkskld6qRL9YKv+HkqKWcKg6ZVOz6E6jjeTxWZpcymcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nf4GBMUJ; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nf4GBMUJ"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5b2a22c52c1so2672343e87.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2026 02:02:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784710977; x=1785315777; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qRjIYe4N5qS7KSD23zLqXoVALBbgvhcQ54RY0q8JAGk=;
+        b=Nf4GBMUJoZhPDsy2u3WGq6EFbaa+hHLWHbm6lRC3Yj+XWrgY+TMK8NDNqgkcqGAk43
+         oXWCjqabKzr9m7t/oAupYVYfCok4qA9E513vNSzCb2VLDPZ96NYCOHYUeaD+P6p/jvE8
+         V9bGKRgzc9IlceLHHDoBK7hCyiBvqiL2P/40ClEu6JBzprTJ4Ddc+aEPBxIzVLHZBu+B
+         90XWryZMkhBt0mbah8T3DOg0QSv2VQElp1rGvYdsRBdwXC7lgmeZ63KdSH4rW15FBWSe
+         fzF43GGP7HmRNcZrmC+kiu2uY8wO4Z8oMGcjaSJQcApGEmhYTro9K3p6KTwHa8TcQ2Iz
+         AMLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784710977; x=1785315777;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=qRjIYe4N5qS7KSD23zLqXoVALBbgvhcQ54RY0q8JAGk=;
+        b=i6yT78jPvpu/tGAMCobxClPXytB7Ph30UIjLdIqEzR01m94k6nj67o7QxxNV9npl2q
+         unhIba4BhNFFlECQOYKAjVjVy23isG1fVnpafxnYOL2aHKN6OWAA83hox8A973miQrPo
+         OSrvYGbbuPKI91S3vOux8EssWoyPqFUggtnt41mjCCYk8GAsttKhMJkY7rHKhEFRQXgJ
+         hIsADpyY4gsTW+AISf6uuyNmdNjHNQRPCq/KnGV3dU5/KPmmiiOO8HqI3OMZezpAP2k2
+         fC08IoqtnlzvMz7RhLpm0CddPgeu3uH8Tb8NikbnfPl2Pp0kTS2Cptt5zEEt/wT6R8Yq
+         XR5A==
+X-Gm-Message-State: AOJu0Yzb3Ry7sstO4qbEQhQTOhZMLwQP39vhOkXR4C0NPWLOotJPqBSb
+	Z7YUQRGKRscT067uGdLfaBChEctgiZ+fjIl89XcSD0PK25O4V6CFP6RwJM5ORe98JlwCY5tn
+X-Gm-Gg: AR+sD11V8J/cG5XXCt2W/8tEkmMNUiIvMTD5IhVvJakq4sc/lpWRbJlS+D5HNCw11YV
+	GIWvRaQvi8ZZLKC1KQTS4sia+ggv4AG4lJf7AVtSw5rz6SgyJyGo85TVZ82ykDIAXYwJugCGhJL
+	86hihW1aBmNcY6BMxXCA2qRgbUUKMe5sYQRayRx1NN8GSJprCvR9PNwx1PCM4eR0sEBlEDZxVe7
+	oS8vHeTenTyL4fyJ9a4elngsJZkzqQw68Naf5AmVydPvhc2gFqM1ZdIX5wsoszgIAJ7/jvV7om3
+	1MTxMouQMjW/7NHt6V0i/NuU3F7jVg4WTOBkvluLc+2AQLH5Kr7SMWDKK13aYfo71GnfSftlCou
+	+eTos6x/cXFV4Wy68w//RBDBUphVPrEt/bKPploBCKy8S1fhZmqtBabPdM+gtbi8wEPsafqm2R1
+	VT/S4xNpBVXSw=
+X-Received: by 2002:a05:6512:3583:b0:5b0:1be6:25b3 with SMTP id 2adb3069b0e04-5b28f9acb4cmr3305675e87.31.1784710976546;
+        Wed, 22 Jul 2026 02:02:56 -0700 (PDT)
+Received: from pakrohk.localdoman ([2a02:4540:10c:b64f:36e1:ca9b:678e:f489])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b2a9bad8b5sm366899e87.33.2026.07.22.02.02.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jul 2026 02:02:55 -0700 (PDT)
+From: Pakrohk <rhpcir@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pakrohk <rhpcir@gmail.com>
+Subject: [PATCH BlueZ 0/1] input: HID gamepad quirk system for broken SDP records
+Date: Wed, 22 Jul 2026 12:22:36 +0330
+Message-ID: <20260722090246.212017-1-rhpcir@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,59 +70,42 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In rsi_hci_attach(), ops->set_bt_context() stores the newly allocated
-h_adapter into common->bt_adapter before hci_alloc_dev() and
-hci_register_dev() are called. If either of these fails, h_adapter
-is freed but common->bt_adapter remains a non-NULL dangling pointer.
+Some Bluetooth gamepads (like DualShock 4 v2) have incomplete or malformed
+HID SDP records, causing BlueZ to fail with -ENOENT. Windows and Android
+handle this gracefully; Linux does not.
 
-This causes a deterministically reachable use-after-free when the
-device operates in a BT+WiFi coexistence mode and CONFIG_RSI_COEX
-is enabled. The following software-only trigger paths exist:
+This patch adds a minimal quirk system that only activates for specifically
+matched devices. When extract_hid_record() fails, the dispatcher tries
+built-in quirks before giving up. The quirk injects the correct BT HID
+report descriptor so the kernel's hid-playstation driver can create an
+input device.
 
-  1. SDIO driver .remove  (rsi_disconnect)
-  2. USB  driver .disconnect (rsi_disconnect)
-  3. SDIO driver .shutdown (rsi_shutdown)
-  4. Hibernation .freeze  (rsi_freeze)
+The patch includes one quirk (TG170W / DualShock 4 v2) as an example.
+The system is modular -- new quirks can be added as separate files in
+quirks/.
 
-All four paths check:
-    if (IS_ENABLED(CONFIG_RSI_COEX) && coex_mode > 1 && bt_adapter)
-        rsi_bt_ops.detach(bt_adapter);  // use-after-free
+I previously included an external quirk profile system (JSON + HMAC
+signatures) and a crypto extension to bt_crypto. Based on your feedback,
+I've stripped those out. The core quirk system works without them.
 
-coex_mode is set during rsi_91x_init(), before rsi_hci_attach() is
-called, and is not cleared on attach failure. Since set_bt_context()
-already wrote bt_adapter before the failure, the deinit paths see a
-non-NULL dangling pointer and proceed to detach it.
+Questions:
+1. Is this approach acceptable for upstream?
+2. For external quirk profiles (user-installable via JSON), what crypto
+   approach does BlueZ prefer? The existing bt_crypto uses AF_ALG which
+   is being deprecated. Should I wait for an upstream decision, use a
+   different library, or skip signatures entirely?
 
-Fix this by moving set_bt_context() after hci_register_dev() succeeds.
-On failure paths bt_adapter stays NULL, and the deinit callers correctly
-skip the detach call.
+Pakrohk (1):
+  input: add HID gamepad quirk system for broken SDP records
 
-Signed-off-by: Chen Changcheng <chenchangcheng@kylinos.cn>
----
- drivers/bluetooth/btrsi.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ profiles/input/quirk.c         |  77 +++++++++++
+ profiles/input/quirk.h         |  37 ++++++
+ profiles/input/quirks/tg170w.c | 232 +++++++++++++++++++++++++++++++++
+ 3 files changed, 346 insertions(+)
+ create mode 100644 profiles/input/quirk.c
+ create mode 100644 profiles/input/quirk.h
+ create mode 100644 profiles/input/quirks/tg170w.c
 
-diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
-index 59ad0b9b14c3..3f802b7c83f7 100644
---- a/drivers/bluetooth/btrsi.c
-+++ b/drivers/bluetooth/btrsi.c
-@@ -107,7 +107,6 @@ static int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops)
- 		return -ENOMEM;
- 
- 	h_adapter->priv = priv;
--	ops->set_bt_context(priv, h_adapter);
- 	h_adapter->proto_ops = ops;
- 
- 	hdev = hci_alloc_dev();
-@@ -136,6 +135,8 @@ static int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops)
- 		goto err;
- 	}
- 
-+	ops->set_bt_context(priv, h_adapter);
-+
- 	return 0;
- err:
- 	h_adapter->hdev = NULL;
 -- 
-2.25.1
+2.54.0
 
