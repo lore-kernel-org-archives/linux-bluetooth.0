@@ -1,249 +1,210 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6E1432300
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 11:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3701747D94B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 12:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784805510; cv=none; b=r+3MJ4zj2wc4H0/hOL9iz+NzMvvLBwmS4x6bVe8ryig69lHHxiUo2gq610KwYrxcKH4+jIJGiiAUM0qJy/8VKA0/RcQFvjDiIAJjauBTBenv3BxClG2g9u/TxQDRxIxh8a2rpQpqhTjPe7GGGepNItSIZgX3T+FRuR2e6MXJ1Qw=
+	t=1784810198; cv=none; b=msibu+iUMTarT7V80JrPcbjL6QEJr+Y/5SRn6YE9ECyTE/j8z8xfdyV0mN9risWcfb3gJ2FdY2YgHUOztVvh7Ed5oJ3+D/wB58v2CTAitZPEEmfNT6ZfPqo+s4p35MAw02fIzSGxBq2wzPyxCKdn1N5YKjNNbvSbCfa1u0FrehY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784805510; c=relaxed/simple;
-	bh=1kK754C6DIq905tXo1G0GWpWAdhBNFss+tgn5B7F5lM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BS0eG39H7MOrNBrjWWmfZ7vMXty3mGcClFXmuC5PTJgXxnwVUx6j7elRypOlOvvxzIeVqB4/cEFFq7YYKsH3f4AaIMU6hYp1cGnfrSCFwqNab98T65nURbOiK7ZUliEXmhWdOxj1yh0KvfzeNzISMV4q28heHIfrv5YkpkNXa4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dlNV2efX; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fmckQGGs; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1784810198; c=relaxed/simple;
+	bh=FHEw6eTv4uTtoazBa/yv/zQvtrrtf5o/PjlO9noQx5Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=b/wPRbFe5MpZ3TVYYEg53Ev6PtyBqAZ4vOgFCWJnAJnBvq3bM6MVJXlpvXZhG18aGAShP4xD0fDnjsH5iwEDzuP7JALRF7D2sjrTxQWUHe1Wsb9j0CA3mq2AS0o+q37x8P4dIgZ75ymokDyOSK/tAeOC8scu4uRxaVAobaFZA2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=hAgIEnSv; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Uwqsz7LB; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dlNV2efX";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fmckQGGs"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66N8qavw3668003
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 11:18:28 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="hAgIEnSv";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Uwqsz7LB"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66N8qfe13045134
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 12:36:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ItUM4hhcjDTFOB8mblvsJ6pDULGNPhKo1DxExHccibw=; b=dlNV2efXkAN0kc8Z
-	8RWBqyBkgMKWFQAtplsIy0BjosNjy/HgjqZ9mcontzg+NAyYA7dcEjgkDYsGd/yc
-	jf8d3miEug70gR0/W3MeTvrCorxq7ZjGA10S19ZAiFHSLXtmX5XW4IAAVNAHL84b
-	B2wC/kyp2j8SnYfbRqTGguV/A7xOSFcYbbPHR8beVhTsfKR/mIWZzrZdXZib7eRV
-	qtNEvx4FMlMKW4tgPWHY3nl4BlQbhEeCN6jKP0v27QT5EybhRLPAzidodD48D0ji
-	32DLd8Tz1rWi+tppSU8mjZDOt7+eD+vshWU1He89uNX+yVNJeOyH83YlHhochOqj
-	zMMaNA==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fk5cc2wpm-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=DThEr1s3tPcal1DMFLIWL4
+	XTiDVDWZM+qmnsHI11F08=; b=hAgIEnSvrIVorkdWTEuILW2Du/esJWk7pROvgr
+	LcVqk7EC54PAP5w00M1Y/ov6spjryb5Z4lwkyETebAKkqjNgz7L5jL1iIJKVXWeV
+	PmdEuJDFqVKwrUoBVWPfRFunBtAzwB1E1lR8ocRx/sxpvP1LvJi1dLhQ10KIoIpd
+	36WknYuSMX2i/zJ6oLm2nvJGKMtKe08deo3ENu9SThpVG9SgotR9z1kOj0pj12QV
+	IOXNb/Xh/5S9PPS/ayjnB8o9XXOPvbjhX9GVxvx5eE2XaH8ALV79X/Vbh9wpkYTS
+	dUKyj4EdQRcJLG9BQ7hd+JmvkK4/MJ7/FK4JcKLNvnn8gXTw==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fkeuq94fm-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 11:18:27 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2cc7ea29141so2830065ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 04:18:27 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 12:36:36 +0000 (GMT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2cf7dd9fd91so6875915ad.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 05:36:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784805506; x=1785410306; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ItUM4hhcjDTFOB8mblvsJ6pDULGNPhKo1DxExHccibw=;
-        b=fmckQGGsFc6pUBQMLLUq/rmMXw3OGY0z6V2Zo9iaFiT/7DnQmuklIGjqQIOvQQkp3s
-         hUL0Mch1j3yanIuM/gtXm5WxooMeZ0sG8zMr/IIcNMcKHsqdh3Mb3mVgVmyWhDQblmW6
-         1Ro+Nq0xutdfMC+60yTUhOAnuv+mfP2seYH5UA68S8tLwmLvrT1XnETm0yQ0eAb9bDdD
-         UXly/ogccVYMV4XziPx5unWPnBhl87iv8Fq7NpN1omVtO2YNkdWMVJz7oXI/yZk4Zgy/
-         CdWOttk3U0ETuOuDSZQWzm+ZRQBcwnnEuhbWzoWYooQsD6dRhfaAvse78id50bbcT1vH
-         fJ7Q==
+        d=oss.qualcomm.com; s=google; t=1784810196; x=1785414996; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=DThEr1s3tPcal1DMFLIWL4XTiDVDWZM+qmnsHI11F08=;
+        b=Uwqsz7LBbwE2zJljISggqBnSbC/eN2RvuhR/LwQ5sS9MCOEDGteZvCjRWaNtQTFq7s
+         HGvStXi88MsIYG6GHgF2obGwh1HR0PsOfInEGU1246oQ6w4bWASiCL6oATC0kwECEaYB
+         7VdpwA3uMPoMtOzqJLpLM9ZJkSUFbG93la6GgNXSD9ev7E1SfD6CoZ1Mds6ZihGvMDSm
+         /IsOFk/K4c8BKa8+VivEOuPR9XZfszwXLuJy8bBYlirw+TfUwN3bGQyhEUMDVj2drZ+a
+         JJ355k+hNKcldFgzvUKSSvqX2BLRTRhPlSCtPak3HK6iFxOdyot74tXIfRvUOseBkMdY
+         QV1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784805506; x=1785410306;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ItUM4hhcjDTFOB8mblvsJ6pDULGNPhKo1DxExHccibw=;
-        b=KITDGXME0pBKsZjRz1k0Y7+nN7rmwoht2cPRVUH/R0TIgW7LLHcbEOHQbDsARc7yCb
-         eeXI+7yOAr7r1xAMYlH8/Gv3hMIQ5iuQErKxtk3LtQ4vWr9qncXlrBDgSJEfaN3JnhHn
-         NfQn4/txcvwFoPkHmPSRhwZJCyfpZAVJj7ElGNFmO6Fzla/w0GbLZxYqX/ERxeLCma5h
-         1rcF0H70hGu9ovf6erKUGUNhuVTJUeWFWou8yBs6IUa4sFgr2JLt5P9NeuI8vHbgzl23
-         0IXdJlKjq0951hCObPntsrvAcYVWO+1rTSG6y/DLjXLrIPj3dQFZJiIg8Tv26huQxwuZ
-         bUqQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrHWlhNutLGNl3qnuNmL9i9cFtSOQ19KKzkn861yD8Iq7f9ARE1RVCm0uoqQUDBPWQnipKsmwIHLAm+mnl/kvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxpHmaVoDXT5/473JMexi6lmpMskl0aQZ7mp2hxEiI01RvHdgV
-	hr5GYeb1MihJ6LBPXvjmmVN/N4FmtJheXaJv+BnNxNHcupe/5+ui4JQnTNfQfl9u9iciFOFHAwW
-	+edLd0W43FFGm17gavoICgokUWeo6nUKw58+6dMamzavPO1lNuhMmuCp6Kcc8cQB3DToXrn4qSe
-	HBPF5nJQ==
-X-Gm-Gg: AR+sD103Ge9V6Gl9T2DEKD8SZ4K5KyCQHkM3NK2qToxryDs5+LPlbQauGQVlV5kkhTQ
-	3VfM6QL72ZjxUlaj2hA3omGBc93K583oR7RM+uqErooXLxyL8v134UW69jpblkNwydCclMem+DS
-	o4ZCafJStMw0dBeMmwE7xWd4RURZObyhV3U/S9MFr+MCflKb+hQcYBOnLR0WdL3fL0z/srLgKEV
-	HXy/QeXttjaQF2slUNQtj2EKGhabzrNzdU/P5ozjdPbfppeMbZzBDKU3ICrcS2sB1M9o6AGt4g5
-	jaMUplpWtUflUyWYW/dpbdR/PE6tK88sbFVXZ+zOazVC5ASqtc80IrgK1Mpp34IIdD7c9nPfZED
-	pmbKhvOKBfxRlqD9uwj06omIA5oGlHax2ifUd1ldj2J7Yv7I2rOrDSz6dhxHOgy8xfg==
-X-Received: by 2002:a17:903:124c:b0:2cc:e648:7e0c with SMTP id d9443c01a7336-2cfa6f8c2ffmr23522355ad.7.1784805506530;
-        Thu, 23 Jul 2026 04:18:26 -0700 (PDT)
-X-Received: by 2002:a17:903:124c:b0:2cc:e648:7e0c with SMTP id d9443c01a7336-2cfa6f8c2ffmr23522065ad.7.1784805506044;
-        Thu, 23 Jul 2026 04:18:26 -0700 (PDT)
-Received: from [10.133.33.62] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf8f3b46absm31470715ad.80.2026.07.23.04.18.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jul 2026 04:18:25 -0700 (PDT)
-Message-ID: <c17cedf9-a013-4ba1-be0e-46f5650ddd89@oss.qualcomm.com>
-Date: Thu, 23 Jul 2026 19:18:22 +0800
+        d=1e100.net; s=20251104; t=1784810196; x=1785414996;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=DThEr1s3tPcal1DMFLIWL4XTiDVDWZM+qmnsHI11F08=;
+        b=CZL9/IbY+QcXFtHSKfB5VaiK5Di5GqqnUvoM/5W4o9vB1RgLH40Vg9M32cEai7oOC2
+         Sp7WfRPF0K6p5kMqaSDnUKYhcI+3tUN8J1WQppUZPhV2yh1hCqr27wTRO8zaAG51Bk91
+         qDRApcLrhqIABpz+odQrOkac2YU/jw890HmRSPyEH/0kOjXm0SWoh3AGkzPNh+DMKQxz
+         Dj8Vbn8HXzUMX9SNceDKv52GmRW1QpKS5Dmnb93FC6d8b6mT3X8hoJthFho9oSHI9agM
+         WPDMq9kPbUsWSCaZYHJHrmbeIcefJ7XjtWuW1hLqESIsxBeiyzD/VRHEDblG3epRVWUj
+         CLVQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpZczBdOXZ1IzJ6F2+RMB9bVv/1x0KGLCBuZh2KyRyM3GtYIL4HUJ0sPZ8bzx2cHUYIbTfRhH1NAYXhuNugDBI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymTFKATk6lOw8JGUmQE6dkHSKbejX4rZYPB6MhDWiJsfb1GvfY
+	veuL+ZYpPCoRFjO2jrNaoOi0PuR0/1rvEdNPzbOB/8LYYu/kn5HLcuD3NvNdEXUW2TNeNkcPrql
+	w/IOE2rTn6ScY34gFmbgmqN+OXTkypSnyZXyNcTZFvFTMEv3OAqf2QBQ6zwTu3sAynQOtUN4=
+X-Gm-Gg: AR+sD12gKXlM2HsJu+CFrn0HcgUt8x8cR8fCt/6vFHK3IuPN7V4Pu5sGMZqsQywvta+
+	fU1N0gqff81GorWN9VlgMwJMsb5JV48YjmqxuUNIeKdzagHmCKW2fhuiSnvBfYHhG95+LjcWCZy
+	ZneH3zFpZWLsrXpEA5xdbQbW2iicXYHs2CxSmt3qL7/ksn2ur2RB8NlWZIfL8Q2/oIKb6bV40Nb
+	m/LFm3zcHisz8xhYw21o6pOoqzyXnYiFUexd+UGT4OPU0Q0KRsWsq6+iY9Quhi4o74XvTrpllhq
+	c/HtyPz3jDyBm+jJd4R0CbfIOAkX1o2KS+vUjb5uiR5QipV80+7/WlysPz5hseqGY1B7B3D0TsM
+	5SiUG4aEm4wPX3SPiHs2MezlYYLCvLQ==
+X-Received: by 2002:a17:903:1b07:b0:2ca:b8fd:f31 with SMTP id d9443c01a7336-2cfa6b77a8fmr37291625ad.15.1784810195753;
+        Thu, 23 Jul 2026 05:36:35 -0700 (PDT)
+X-Received: by 2002:a17:903:1b07:b0:2ca:b8fd:f31 with SMTP id d9443c01a7336-2cfa6b77a8fmr37291115ad.15.1784810195249;
+        Thu, 23 Jul 2026 05:36:35 -0700 (PDT)
+Received: from hu-samana-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf8efd76c4sm33851225ad.23.2026.07.23.05.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 05:36:34 -0700 (PDT)
+From: Rahul Samana <rahul.samana@oss.qualcomm.com>
+Subject: [PATCH 0/3] Bluetooth: qca: enable QCC2072 on RB3 Gen 2 Industrial
+ Mezz reworked for BT over UART
+Date: Thu, 23 Jul 2026 18:01:06 +0530
+Message-Id: <20260723-rb3-industrial-bt-uart-v1-0-3c8e580c09d1@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 3/3] Bluetooth: Add hdev->recv_bt_vendor() to
- handle BT vendor frames
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260722-support_vendor_hci-v2-0-132b506460a4@oss.qualcomm.com>
- <20260722-support_vendor_hci-v2-3-132b506460a4@oss.qualcomm.com>
- <CABBYNZL7ApV6wzTOLGu4gRxBU_89x+D-JNd27tg0X-sOmXqEog@mail.gmail.com>
-Content-Language: en-US
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-In-Reply-To: <CABBYNZL7ApV6wzTOLGu4gRxBU_89x+D-JNd27tg0X-sOmXqEog@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 5UMSeSDhtKyheSh2I10LFSF08OLfc-r6
-X-Proofpoint-GUID: 5UMSeSDhtKyheSh2I10LFSF08OLfc-r6
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIzMDExMSBTYWx0ZWRfXxS1I8DIhn8vs
- P84C6PuV9pLZLzgPeCw5eTAA7ijNWh2gbaEft/BauC9bMmXnDysJNcFsaMfLaEpaiF++dS5Pey4
- hNkw4XT0lnudN/gGcmIYQvdu8GE8SdQ=
-X-Authority-Analysis: v=2.4 cv=L/ItheT8 c=1 sm=1 tr=0 ts=6a61f883 cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIoJYmoC/yXMTQrCQAxA4auUrA3UKf7Uq0gXmWmiERklmRGh9
+ O6OuvwW7y3gbMoOp24B45e6PnLDdtNBulK+MOrcDKEP+/4QBrQ4oOa5ejGlO8aClaygjEdKJJJ
+ G2UGLn8ai79/4PP3tNd44le8N1vUDUOBBpnoAAAA=
+X-Change-ID: 20260723-rb3-industrial-bt-uart-f98acaffc9f5
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: Rahul Samana <rahul.samana@oss.qualcomm.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        quic_hbandi@quicinc.com, devicetree@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, quic_anubhavg@quicinc.com,
+        quic_mohamull@quicinc.com
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIzMDEyNCBTYWx0ZWRfXwjbEJzERfm8D
+ /al2kj40OAugyUkNvDqMP64lkr6S4nceYChHBQrV3Ik+FSRFb+0W+3mdR477rky4n6hVmThW9iN
+ Ykeq3fUacZP+Fb+6c/o159vNDSyAl/4=
+X-Proofpoint-ORIG-GUID: s2lDUYV_mcHUCoPsJzBu-xF5HHEz1gIQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIzMDEyNCBTYWx0ZWRfX/GgHdaaNgk3S
+ sUBp8DTjyAnaj6QZF3gDtbD4oxE4dXCS44TExJM9yUdCLX5LTb99mN0xu4aVr8f+S9a0RNKjBWA
+ F6CXKReRN/1St9PsMlrH3oH4QqGErCpB5fW7G5ViNeIQfAsO1LOIuk0L2nZbhVrrAsVVv+K+UPn
+ MBffRMmIuySrHNdUjn+A24waNHPtTDbbfjqF16KdK7et/7lwFPW95TqdyYALrbVxiFNnhBs5pil
+ 02QcevI5oYgx4X3tPTnbTAzzY6zOCxPbHoIbi4oNSl11gtuaVQoOvuZYXM+3bDZEbGtJi0fqyiP
+ +FgBGUlIySWsYbPu+NkJ3uZ+Hz/NSuWNr77PnhapspzcBUbsZO8cSgzJrRjbdmJ2Qy0d/ZnqNly
+ ReBGHFCLm9uF1ddTLD5HJ2Zf2deKVkINPuNPyksS5xBHA2JrhPBqKwzTxyGCOsnVXZOCPqVnNEJ
+ 4zVh2oCBmJw6c8BFG1Q==
+X-Authority-Analysis: v=2.4 cv=cPDQdFeN c=1 sm=1 tr=0 ts=6a620ad4 cx=c_pps
+ a=cmESyDAEBpBGqyK7t0alAg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
- a=ai_aT568vvjzOLvgrnMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIzMDExMSBTYWx0ZWRfXzWd4xrKHiXSl
- +EOwtYryMd+xkbbw+lJs/gbvybX3+ejeQoQqIaFx2oob2JrZrdHIzTpvyA5veq/Yh0wTSrZHCsu
- C7C17gOc8iISdB9nOkP2fsDAGEUV9kiQgVVc7bNm+frCJrEY2u9x8bLRYbjHvtKtKliLzXkBWqU
- aghQAvgQT+aemqGzzxGO+myHR6NRCp6Q6FtY8ab7VSaEWlVt9wsEqIBqk17neuvXiO3C0p4IAfI
- Fr8AZRPl0AiypvSjQuGgWobidY531LdUmMIQx+j6z1G0tEZOOmNDrDsRB2ror9p/3gDlmFwvDIr
- 1NJN6rv9ZD70nL0oxrfn0c97vnAfWNCodhy5Vy6wvxbpyqJ0bpwARwG5ldKaUKr2QpAO/5kPLhU
- OcnUFvNNDOp6BS5at34CEawA5slmgR5MF1tIkqqmp9OEhqgLGBfnnyPbH07xAw24Jlmk/F7yXeB
- vHGM8ADiE3ct9hL28Bw==
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=cndzWssY6XKUHHFbS9UA:9 a=QEXdDO2ut3YA:10
+ a=1OuFwYUASf3TG4hYMiVC:22
+X-Proofpoint-GUID: s2lDUYV_mcHUCoPsJzBu-xF5HHEz1gIQ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-23_03,2026-07-22_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0
- priorityscore=1501 impostorscore=0 spamscore=0 bulkscore=0 malwarescore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607230111
+ spamscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
+ clxscore=1015 suspectscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607230124
 
-On 7/23/2026 12:46 AM, Luiz Augusto von Dentz wrote:
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index 428261591288..12f3720f6cc8 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -646,6 +646,8 @@ struct hci_dev {
->>         int (*setup)(struct hci_dev *hdev);
->>         int (*shutdown)(struct hci_dev *hdev);
->>         int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
->> +       /* Return true if @skb was consumed, false otherwise */
->> +       bool (*recv_bt_vendor)(struct hci_dev *hdev, struct sk_buff *skb);
-> This should be probably called recv_vendor_ev or something like that.
-> 
+The RB3 Gen 2 Industrial mezzanine normally uses the M.2 E-key slot for
+Bluetooth over USB. This series enables a reworked Industrial mezzanine
+variant where the same M.2 E-key Bluetooth path is routed over UART4
+instead.
 
-For BT, besides VSEs, some vendors also reserve ACL handles for special usages, e.g.:
+The BT UART overlay is applied on top of the existing Industrial
+mezzanine overlay because the reworked board keeps the common Industrial
+mezzanine hardware description and only changes the Bluetooth transport
+routing.
 
-| Vendor | Coredump | Other                                   |
-|--------|----------|-----------------------------------------|
-| QCOM   | 0xEDD    | Enhanced Logging (0xEDC)                |
-| MTK    | 0xFC6F   | Firmware debug logging (0x05FF, 0x05FE) |
-| NXP    | 0xFFF    | —                                       |
+To support this board variant, add QCC2072 support to the Qualcomm
+Bluetooth UART driver. QCC2072 uses ORN firmware naming, board-id based
+NVM lookup, and requires the BCS calibration TLV to be combined with the
+selected NVM before download.
 
-So this hook may need to cover both. Any suggestion for a good name?
+The DTS changes also mark the QCS6490 PCIe root port as a PCI bridge so
+child nodes below the enumerated PCI topology can be matched. This is
+needed for the M.2 E-key connector graph endpoints used by the BT UART
+overlay.
 
->>         void (*recv_vendor_pkt)(struct hci_dev *hdev, struct sk_buff *skb);
->>         void (*notify)(struct hci_dev *hdev, unsigned int evt);
->>         void (*hw_error)(struct hci_dev *hdev, u8 code);
->> @@ -2329,6 +2331,7 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
->>  int hci_register_cb(struct hci_cb *hcb);
->>  int hci_unregister_cb(struct hci_cb *hcb);
->>
->> +bool hci_recv_bt_vendor(struct hci_dev *hdev, struct sk_buff *skb);
->>  int hci_send_vendor_frame(struct hci_dev *hdev, struct iov_iter *iter);
->>
+The series is split as follows:
 
-[...]
+- Patch 1 adds QCC2072 support to the Qualcomm Bluetooth UART driver,
+  including ORN firmware naming, board-id based NVM lookup and BCS
+  calibration TLV download together with the selected NVM.
+- Patch 2 marks the QCS6490 PCIe root port as a PCI bridge so the PCI
+  subsystem can associate the DT node with the enumerated PCI-to-PCI
+  bridge device used by the M.2 E-key graph.
+- Patch 3 describes the reworked RB3 Gen 2 Industrial mezzanine BT UART
+  path by adding the M.2 E-key connector graph links from port@0 to PCIe
+  and from port@3 to UART4, and composes this overlay on top of the
+  existing Industrial mezzanine overlay.
 
->>  static bool hci_req_is_complete(struct hci_dev *hdev)
->>  {
->>         struct sk_buff *skb;
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index ea858391c789..94c02b66bdfa 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -7801,6 +7801,11 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
->>                 goto done;
->>         }
->>
->> +       if (hci_recv_bt_vendor(hdev, skb)) {
->> +               hdev->stat.evt_rx++;
->> +               return;
->> +       }
-> This seems too early actually, I would have expected it to run after
-> hci_event_func or within it if ev->func is NULL, that said we
+This series depends on two M.2 power sequencing changes already posted
+upstream. The Eliza EVK series adds the QCC2072 PCI ID to the M.2 E-key
+power sequencing driver, which lets the connector power sequence bind to
+the enumerated QCC2072 WLAN function:
 
-I don't think running it after hci_event_func() works, because the VSE has already been
-corrupted by then, as explained below:
+  https://lore.kernel.org/all/20260703-eliza_evk-v1-0-7624440bd76d@oss.qualcomm.com/
 
-msft_vendor_evt() is the handler for all vendor events called by hci_event_func(), but many
-VSEs are not MSFT ones. Once the MSFT extension is enabled, it always calls skb_pull_data()
-and corrupts the non-MSFT VSEs.
+The Monza wireless series adds the generic hci_qca OF graph handling used
+by M.2 Bluetooth devices, so the Bluetooth serdev controller can acquire
+the UART power sequence from the M.2 connector graph instead of carrying a
+board-specific power-control path in this series:
 
-Besides, running it there is asymmetric with the ACL path: the event header is already pulled,
-but the ACL header isn't.
+  https://lore.kernel.org/all/20260710-monza-wireless-v3-0-46253587af64@oss.qualcomm.com/
 
-For ev->func is NULL:
-it may mean we don't need to care about that event, so the current behavior of ignoring it
-is reasonable.
+Tested on RB3 Gen 2 with the reworked Industrial mezzanine. Bluetooth
+setup completed successfully over UART4. The QCC2072 NVM and BCS
+calibration loading path was verified to request board-specific files
+when available and fall back to the default files otherwise.
 
-> currently assume HCI_EV_VENDOR=msft_vendor_evt which is probably not
-> valid, or maybe it is which then screw the whole idea that 0xff is
-> only used with 1 vendor specific domain, now if we try to squeesh both
-> a vendor event and a msft event handler their opcodes shall not
-> collide otherwise the whole thing doesn't work.
-> 
+Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+---
+Rahul Samana (3):
+      Bluetooth: qca: add QCC2072 support
+      arm64: dts: qcom: kodiak: mark PCIe root port as bridge
+      arm64: dts: qcom: rb3gen2: add Industrial BT UART overlay
 
-let me explain more for recv_bt_vendor() for BT as below:
+ arch/arm64/boot/dts/qcom/Makefile                  |   2 +
+ arch/arm64/boot/dts/qcom/kodiak.dtsi               |   1 +
+ ...s6490-rb3gen2-industrial-mezzanine-bt-uart.dtso | 133 +++++++++++++++++++++
+ drivers/bluetooth/btqca.c                          |  70 ++++++++++-
+ drivers/bluetooth/btqca.h                          |   2 +
+ drivers/bluetooth/hci_qca.c                        |  24 ++++
+ 6 files changed, 231 insertions(+), 1 deletion(-)
+---
+base-commit: 248951ddc14de84de3910f9b13f51491a8cd91df
+change-id: 20260723-rb3-industrial-bt-uart-f98acaffc9f5
 
-Design idea:
-let the transport driver consume whatever frames it is interested in first; for
-the rest, don't care how the stack handles them — it doesn't matter even if they are
-corrupted.
-
-Motivation:
-For the VSEs and vendor-reserved-handle ACLs that transport drivers are interested in, move
-their handling from the transport driver's RX path (IRQ-disabled context) to the stack's
-process context — i.e. avoid pre-processing them.
-
-Advantages:
--) Avoid skb_clone() in IRQ-disabled context of RX-path to improve performance
-   take INTEL diagnostic events as an example, btintel_diagnostics() skb_clone() them
--) Avoid re-processing VSEs that the driver has already handled.
-   Intel diagnostic events still arrive at hci_event_packet() in hci_rx_work(), even though
-   they have already been handled by btintel_diagnostics().
--) Log them via btmon to help debugging
-    Several existing transport drivers consume these frames directly without btmon logging
-
-I'd welcome your thoughts — especially on the hook name (point 1) and whether the
-placement/design here is acceptable. Happy to rework it based on your guidance.
-
-> Anyway, I had the impression you would be using a vendor packet not a
-> vendor event, or you use both?
-> 
-
-My PERI-HCI requirement is already addressed by recv_vendor_pkt() in [PATCH 2/3]
-
-This hook, recv_bt_vendor(), addresses concerns raised during the BT-HCI discussion. The same
-problem exists in many transport drivers, so it tries to address them for BT along the way
-
-I'd like to use it in the upcoming QCC2072 support as well, once these concerns are resolved.
-
->>         hci_dev_lock(hdev);
->>         kfree_skb(hdev->recv_event);
->>         hdev->recv_event = skb_clone(skb, GFP_KERNEL);
+Best regards,
+--  
+Rahul Samana <rahul.samana@oss.qualcomm.com>
 
