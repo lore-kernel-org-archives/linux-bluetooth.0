@@ -1,159 +1,143 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF55436344
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 09:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FC142BE8E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 09:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784800639; cv=none; b=Tsv2HNd0mbYqFhYlvTqdBncEpE02UfRGxKJERzCEMoirEHO5LrCHm/ophvjrBcu1Qc65jutkeFHczlQL/0OVt/M0hXToP2xR6ZRN3OX0EPl0qbOE4sVRY6Pf3UPBsXhr0ovnm5xj9wh6CI8xGdj56qbhBmRiIBp3Vsyz1lDieNE=
+	t=1784800684; cv=none; b=n7EnWLVkxF+PwPmGUxtfKBorzw8Kb/Rcal6JPdRm0UZZ7DiacJmFiMIdPgayPG0WTt7G61n1jEjfxEKnssT2fxgTMhz4YpPkcUbZWlSl4g06nbcfL7EhFES4dy6IuMzFD2TbSJJwswQkSR1q7ou5SSBkFixi0xi9gpQ+WI2RWp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784800639; c=relaxed/simple;
-	bh=W2CbQs96aNcvRwookk8Jcu/u0RGeb+cUthYTKV3XqDU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KVs7JENqrlunxBJGUqwdZdnGmkeVpQMv29Qn2X4ttQnP2c8AtrxsRF3DtBKQ8PZcANGOU6d+IQ1t6p2wUi9F82Iv45XTEry+/srUqRGcUde67MzoD8WMWTCS6Pvx0+IFkSUdmOS6smbSpAkyOQLIsnyLMi55cb1di4dilkyvexM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JW4TpvIo; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1784800684; c=relaxed/simple;
+	bh=Sq6f6yGw7SUPnpZ74/ZoCg5e+zQGX4QQ5+Cy3XXTWNU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UDOcB6B1rNEQl1Kqe/Ckcqg5Ol0SKBXXgZmZ9xavvspy0JxJm7H9TvPNmWmqt3RsQlPkOBruVuIOxI+JKpH8N8Zkr0LbSGqKVeenyYW3h0i3JV/L+rvf5Iqg+YCi5whOzpAGi6zfojLZRpp/6KChal0/cz275MR3JxTUzHfMB3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=heu95BVH; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JW4TpvIo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=DX
-	iBhX5vEaccAd09jJeCSTJOLPErarrdo95Sdq3PXcQ=; b=JW4TpvIoxrnOPkymRq
-	+1uIPBjgmpjtdj2M03/RzN3R2xyr9VCwAWeGBTXLB4MTFNRHEkHFvUwo4FpzxzTQ
-	IpNa9Msoc0mgDFfCGdVItGTAipbFeECUOc2AWdvJdTCeg3DwrQF37DIhX+IcG6KX
-	YUmHjhkZkL8BXM4qTmxTCAcec=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wBnoGpF5WFqzjaPKg--.45854S2;
-	Thu, 23 Jul 2026 17:56:22 +0800 (CST)
-From: zhangchen200426@163.com
-To: luiz.von.dentz@intel.com,
-	yang.li@amlogic.com,
-	tim.bird@sony.com,
-	naga.akella@oss.qualcomm.com,
-	gustavoars@kernel.org,
-	pav@iki.fi
-Cc: zhangchen01@kylinos.cn,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
-Date: Thu, 23 Jul 2026 17:56:16 +0800
-Message-Id: <20260723095616.1543159-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="heu95BVH"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51c2149571dso3254151cf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 02:58:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784800681; x=1785405481; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=kSkGJJvx2+t6ND7Xrn0RtlwhBa8Bvm5OR8UCExXR/Ls=;
+        b=heu95BVHc4aq5d8kDwOe58f3ktXlyP+9WJ9QOnHrNHAHpd+Z6EAUbE23h3YX4DOpKA
+         cQl8F3hoPVfM4/czN3T1rEVHiP+qvFCDJ6f4tLp8iEIFnVpwBi3PN0h7vGrX+aWrbVXH
+         GfoMSrXXibFAk3jCK/H9A5Sqg5lRpYUywqQFIsyMC/rCFvg2y1715Vtv8FK+gMavJ83r
+         4GUTVLiU5tSiqYro/nw6F6ZdvTGmdFQ2hpBoV4Ji1TYARJJkGMku6ahfUmn6T/xqdHS6
+         y6TZ6cc2/KlzLLgHwjVzrgUfA0LxoVC4HDnivJVi/MWc3pQecvRFuG8jFkGpONiTRcW1
+         o3vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784800681; x=1785405481;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=kSkGJJvx2+t6ND7Xrn0RtlwhBa8Bvm5OR8UCExXR/Ls=;
+        b=oM5whiSnTCvNwlahT245DbUlfrjUd/46Kn1zoMmFc1RZST567YugMNPpiITRK3SlxT
+         BpmBsOj5pz/NyyinNQZ7HVoZztw/nGseujx3LIzEz5p0+88/6XmIvLGYyvK3wMuD2XdI
+         +FNVtf9L+ifxNPtkoarrkTa1MEFrCqVX40CzjACodTYbTL7aS7aTov5vMDrpVKkoT6dj
+         mkDRwWQl4/SA3kTLCDWNv0xpcmIL8jMDnumKHJk0WBCu9sHXWDLofEXVDi8WqQsvspNg
+         Cr5yzQUWcf5G03DnCsI2sOu6fnYuSVz16nwLNr0iryDriyzowRNev8JlHXpgZIJuiK8G
+         hV/A==
+X-Gm-Message-State: AOJu0YzWwsaGidDq8SLutyL1HO8qFNPaJX1brtwH/rGWoqwofcHK5xCA
+	IPxEMbQQRf1xLlVG+utNtlOn/2DS1VPKUdJg1L2KOVLkgWEQLHLbhfla9aEAVA==
+X-Gm-Gg: AR+sD10YefagIkM6xew8gVTfLqy+bjCwcf0SIAS5ZWlUAmW78D8uY3hT8c/ij/VB+pR
+	CoyTAjumLO1sIMERi9zUF1anz+5PoO45Bi3YREUn9YCrMH613jhWpTULeBGN1TZ5z10tJoKqq1t
+	MLwhnvtL0mSXUxdhq2fA3a1EeQhd08QQBIg1CSLeVT4B6kMnEBvblnINouRI3RIkoBqtU47iy2E
+	B8qTLPuql1Z1/YzJFHGj6BJWG4q/L/sK1vI/EZPVuy4yy6qZxaWxmBl/MQ+eoi88Elw0LdHZMzY
+	RDthIYGTovLnEwsyB5kgJvGPzv9OF9MfUBlpHGLkgBK4/KjH2vlHmqom0lX5X3/P1wiFtkc4ffc
+	a4Hp9sDLnFMs2LH6SMRv2QLv/ooy1fZRNKVWd63OiXlVBuB3cKHY2jefrxH6pffaJQtP0cS7MjE
+	ngoO7g037Vhg==
+X-Received: by 2002:ac8:5741:0:b0:51a:8c97:fb90 with SMTP id d75a77b69052e-5283df4fe92mr19029061cf.57.1784800681267;
+        Thu, 23 Jul 2026 02:58:01 -0700 (PDT)
+Received: from [172.17.0.2] ([52.162.137.104])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-527d3b3f66dsm31518121cf.27.2026.07.23.02.58.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 02:58:00 -0700 (PDT)
+Message-ID: <6a61e5a8.3e3849ba.57e62.9471@mx.google.com>
+Date: Thu, 23 Jul 2026 02:58:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9026740846183621294=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBnoGpF5WFqzjaPKg--.45854S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxuF43CFWfWw45XF47JrWrKrg_yoW5tw1kpa
-	909a45ZrW8JrsxX3WfAa97Zrs5Xw1kurZrKrsFk34rZanYvrZ7tF1kCry2yry3ArWDJF17
-	XF4Igr17KrWkJwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UWyIbUUUUU=
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC6AZ9Gmph5UYvwgAA3M
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zuohongsheng@kylinos.cn
+Subject: RE: [BlueZ] gatt-server: Fix integer overflow
+In-Reply-To: <20260723084231.93626-1-zuohongsheng@kylinos.cn>
+References: <20260723084231.93626-1-zuohongsheng@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Chen Zhang <zhangchen01@kylinos.cn>
+--===============9026740846183621294==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Define HCI_Write_Link_Supervision_Timeout command, event structure, and
-corresponding event handler function.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1133054
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.42 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      20.28 seconds
+BluezMake                     PASS      490.77 seconds
+MakeCheck                     PASS      1.10 seconds
+MakeDistcheck                 PASS      150.84 seconds
+CheckValgrind                 PASS      147.90 seconds
+CheckSmatch                   WARNING   291.15 seconds
+bluezmakeextell               PASS      93.95 seconds
+IncrementalBuild              PASS      495.99 seconds
+ScanBuild                     PASS      863.79 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] gatt-server: Fix integer overflow
+WARNING:BRACES: braces {} are not necessary for single statement blocks
+#106: FILE: src/shared/gatt-server.c:1192:
++	if (len > UINT16_MAX) {
++		return false;
++	}
+
+/github/workspace/src/patch/14705742.patch total: 0 errors, 1 warnings, 26 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14705742.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.
+
+
+https://github.com/bluez/bluez/pull/2343
+
 ---
- include/net/bluetooth/hci.h      | 10 ++++++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 40 ++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 50f0eef71fb1..18a5a17eb218 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1239,6 +1239,16 @@ struct hci_cp_host_buffer_size {
- 	__le16   sco_max_pkt;
- } __packed;
- 
-+#define HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT	0x0c37
-+struct hci_cp_write_link_supervision_timeout {
-+	__le16	 handle;
-+	__le16	 timeout;
-+} __packed;
-+struct hci_rp_write_link_supervision_timeout {
-+	__u8	 status;
-+	__le16	 handle;
-+} __packed;
-+
- #define HCI_OP_READ_NUM_SUPPORTED_IAC	0x0c38
- struct hci_rp_read_num_supported_iac {
- 	__u8	status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e7133ff87fbf..866903a9b5c8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -702,6 +702,7 @@ struct hci_conn {
- 	__u8		le_features[248];
- 	__u16		pkt_type;
- 	__u16		link_policy;
-+	__u16		link_supervision_timeout;
- 	__u8		key_type;
- 	__u8		auth_type;
- 	__u8		sec_level;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 741d658e9630..3b1f4cf922c3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -606,6 +606,44 @@ static u8 hci_cc_write_voice_setting(struct hci_dev *hdev, void *data,
- 	return rp->status;
- }
- 
-+static u8 hci_cc_write_link_supervision_timeout(struct hci_dev *hdev, void *data,
-+						struct sk_buff *skb)
-+{
-+	struct hci_ev_status *rp = data;
-+	struct hci_cp_write_link_supervision_timeout *sent;
-+	struct hci_conn *conn;
-+	u16 handle;
-+	u8 status = rp->status;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT);
-+	if (!sent)
-+		return status;
-+
-+	handle = le16_to_cpu(sent->handle);
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, handle);
-+	if (!conn) {
-+		status = 0xFF;
-+		goto done;
-+	}
-+
-+	if (!status) {
-+		conn->link_supervision_timeout = __le16_to_cpu(sent->timeout);
-+		bt_dev_dbg(hdev, "handle 0x%4.4x timeout set to 0x%4.4x (%u ms)",
-+			   handle, conn->link_supervision_timeout,
-+			   conn->link_supervision_timeout * 5 / 8);
-+	}
-+
-+done:
-+	hci_dev_unlock(hdev);
-+
-+	return status;
-+}
-+
- static u8 hci_cc_read_num_supported_iac(struct hci_dev *hdev, void *data,
- 					struct sk_buff *skb)
- {
-@@ -4097,6 +4135,8 @@ static const struct hci_cc {
- 	HCI_CC_STATUS(HCI_OP_WRITE_CLASS_OF_DEV, hci_cc_write_class_of_dev),
- 	HCI_CC(HCI_OP_READ_VOICE_SETTING, hci_cc_read_voice_setting,
- 	       sizeof(struct hci_rp_read_voice_setting)),
-+	HCI_CC(HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT, hci_cc_write_link_supervision_timeout,
-+	       sizeof(struct hci_rp_write_link_supervision_timeout)),
- 	HCI_CC_STATUS(HCI_OP_WRITE_VOICE_SETTING, hci_cc_write_voice_setting),
- 	HCI_CC(HCI_OP_READ_NUM_SUPPORTED_IAC, hci_cc_read_num_supported_iac,
- 	       sizeof(struct hci_rp_read_num_supported_iac)),
--- 
-2.25.1
 
+--===============9026740846183621294==--
