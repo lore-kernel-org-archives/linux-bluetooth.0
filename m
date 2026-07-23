@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945B844C4EA;
-	Thu, 23 Jul 2026 19:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFC544C4F4;
+	Thu, 23 Jul 2026 19:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784834394; cv=none; b=Ji8gRK3po4xCLTDM3cDwV24ZON7aBuCXqKJOdqaydcz5Qmy8gZCYuKHw3unIHZ78Svmb3R0SEz9Sh2RTpP4Ti/MRTK+1gMXXjxvVA6g8tFatvpZg4d8g7c1RH4Axia0JIWGbs6EjbXutYz52YutvDTFUxqSLgLPEjO3R6RFSIEA=
+	t=1784834772; cv=none; b=P8bDN32PfILY7DK717kDfo6Lkb0sU6a6mG4g5354L4C29UPOuJm9bBrImEn3y79HVAhomB6YKiDIKRDCe4/fH2bMA1pQKY2GTZKtV+/jxnFkbHygOt8Zzw1lc0J64mYgsjhxJY03kJcAYC1B11CyzOHFu448vlewPBSTkVaSFro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784834394; c=relaxed/simple;
-	bh=vD/kNz1mSbptF8R4h/+7S5y3d+qsbZoguGFHMqb3OFI=;
+	s=arc-20240116; t=1784834772; c=relaxed/simple;
+	bh=/jtJlU9H6zpaxd29XrIc7xwE8uM1RQm7t7LTLa18ICE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZgIYXXN6FdbOWBKV0WzkfLXapojDF/M5Hxr16DsdXJlttWERW54OB1a+7Ks2euWh1tpr2gFnKyZgZB5Okgisn914WthouYPEvThLQ+bZDW4O7FAs3vr3KHAKeaS7ZO2nUOaPEMxjbxY0wPteNVV/p8Npf8sdmia8nQzKOCh8tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=np62X96+; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=ar32NlECcX9KD4G4ZAubDagYUO2GtzRTJWiQL/jjBS/QpT8GSqjG1WOpgXO0ThnObrbg4NGEYmneT3OEtRJzUDCqkCT7I7ryKFn6C7QPlm6m321731BieNXYKJtle4nW9umhzu6vpupxihsbNusLi7UH57Kp/JjXoJ8hxBsLLZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5LTJWjw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="np62X96+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D4F1F000E9;
-	Thu, 23 Jul 2026 19:19:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5LTJWjw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC301F000E9;
+	Thu, 23 Jul 2026 19:26:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784834388;
-	bh=g1et1ehML0/kGNVH6lDiCjlsje9E1J5r4c+e022yp3Y=;
+	s=k20260515; t=1784834771;
+	bh=m1QUQ80W86xt5R5xIiSEsXggmCPPjQUS5su/9iLfzuo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=np62X96+ZydrQjMsMKO7lLuiBzUAuw4qHpU99qXLrdUqwfxkDRQQlKtLi48BODIi6
-	 Dl72+Jk/YVeyNpxT0trfPWxl9DngXQrXyPtS/z8TGSiLsKuFnABE427Z08ls/BkYxl
-	 LxZE46Qb1ZqqnGmV9O+AbqtxDkl3N+ICRB8Bq4gSVHmUhrfNcRtZY2lkTxj2y6JzJ5
-	 7Wi/t11fLJT2H4SuZ1DRBK9liwPmAn9esVoF988rXD+vasR6hJJDuRd41j0tV5w7Y3
-	 kOgtLDoRqCLPbIKuH22KGuyysb7aXFu3pMcpvfHeAg2JBPV8oU6rBy7y0QAKiQWyYV
-	 qKIMugId7xQDg==
-Message-ID: <591cea7a-0892-42c7-aa38-51a90cd2c450@kernel.org>
-Date: Thu, 23 Jul 2026 21:19:38 +0200
+	b=n5LTJWjwMXxwVnyXQTQqMMezWB/4dc4xi8K79Ql4t4g68L63h2FkN9pqwzB3mhvxp
+	 pmrnF+2nC7UQq7mcwNvHGuZyMWbCjjELjt0To8iFhW3cpDGkwOYUH7ZlN2vN93jzBx
+	 aghqXePPcvcxAdsrnhke4/YyLi9n0xOhAZV+VVz9Q5GQkoxXtDSSKbmnQZqB0WL+4l
+	 57AMwRoc9hd/YwasymyxTTvQQqSmPzvA1MKxhK96pxqKv1c7EPx1KMtFUTr2Q88EBx
+	 7FX1PDQ5rodXzYNBqCk1lm2bCs57sRnVr3t/jq7P8XdoUvb1b0BG1s8pm6GgfY0G8+
+	 ssgRbqAmuFHOA==
+Message-ID: <13a29b0d-709b-421f-99e4-02c41dc5ffb4@kernel.org>
+Date: Thu, 23 Jul 2026 21:26:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -36,19 +36,20 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/3] Bluetooth: qca: add QCC2072 support
-To: Rahul Samana <rahul.samana@oss.qualcomm.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Rahul Samana <rahul.samana@oss.qualcomm.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>,
  Marcel Holtmann <marcel@holtmann.org>, Bartosz Golaszewski
  <brgl@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
  Rob Herring <robh@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_hbandi@quicinc.com, devicetree@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, quic_anubhavg@quicinc.com,
- quic_mohamull@quicinc.com
+ Konrad Dybcio <konradybcio@kernel.org>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, quic_hbandi@quicinc.com,
+ devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ quic_anubhavg@quicinc.com, quic_mohamull@quicinc.com
 References: <20260723-rb3-industrial-bt-uart-v1-0-3c8e580c09d1@oss.qualcomm.com>
  <20260723-rb3-industrial-bt-uart-v1-1-3c8e580c09d1@oss.qualcomm.com>
+ <vxyc3lgvofl3yrodrzgxh7dtw3aegdcy4bwn7nf6eivhz3ld64@i7romsdep7e7>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -94,29 +95,44 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20260723-rb3-industrial-bt-uart-v1-1-3c8e580c09d1@oss.qualcomm.com>
+In-Reply-To: <vxyc3lgvofl3yrodrzgxh7dtw3aegdcy4bwn7nf6eivhz3ld64@i7romsdep7e7>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 23/07/2026 14:31, Rahul Samana wrote:
-> Add QCC2072 as a supported Qualcomm Bluetooth controller.
+On 23/07/2026 21:06, Dmitry Baryshkov wrote:
+> On Thu, Jul 23, 2026 at 06:01:07PM +0530, Rahul Samana wrote:
+>> Add QCC2072 as a supported Qualcomm Bluetooth controller.
+>>
+>> QCC2072 uses the ORN firmware and NVM naming scheme. Select the NVM file
+>> and BCS calibration file using the controller board ID when available,
+>> with fallback to the default files.
+>>
+>> Register the QCC2072 compatible with hci_qca and route it through the
+>> same UART setup, speed switching and power-control paths as recent
+>> Qualcomm Bluetooth controllers.
+>>
+>> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+>> ---
+>>  drivers/bluetooth/btqca.c   | 70 ++++++++++++++++++++++++++++++++++++++++++++-
+>>  drivers/bluetooth/btqca.h   |  2 ++
+>>  drivers/bluetooth/hci_qca.c | 24 ++++++++++++++++
+>>  3 files changed, 95 insertions(+), 1 deletion(-)
 > 
-> QCC2072 uses the ORN firmware and NVM naming scheme. Select the NVM file
-> and BCS calibration file using the controller board ID when available,
-> with fallback to the default files.
-> 
-> Register the QCC2072 compatible with hci_qca and route it through the
-> same UART setup, speed switching and power-control paths as recent
-> Qualcomm Bluetooth controllers.
-> 
-> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+> I think you are a third engineer who submits a patch with this name and
+> with no mentions of the previous work. Are you working in parallel with
+> no idea what other team is doing, are you ignoring the previous work and
+> implementing it from scratch or are you picking up a patch made by
+> somebody else and killing the authorship / SoB tags?
 
+And the absolute mess in undocumented dependencies (thus undocumented
+ABI which already got accepted by Bartosz [1]), referencing some
+patchsets which are not clear to go thus eventually pushing undocumented
+ABI again and patchset which cannot be merged.
 
-Please run scripts/checkpatch.pl on the patches and fix reported
-warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
-patches and (probably) fix more warnings. Some warnings can be ignored,
-especially from --strict run, but the code here looks like it needs a
-fix. Feel free to get in touch if the warning is not clear.
+Broken process.
+
+[1]
+https://lore.kernel.org/all/9cc5af16-d95e-4f10-8b4a-5e29c136079c@kernel.org/
 
 Best regards,
 Krzysztof
