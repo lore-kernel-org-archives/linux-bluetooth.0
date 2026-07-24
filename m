@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5833B27DF;
-	Fri, 24 Jul 2026 20:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BAFDF59;
+	Fri, 24 Jul 2026 20:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784924460; cv=pass; b=MYDVHK9GD5ZunomE6Hnbg2h4fkLmueLd8ou5EfECqBA88H9w2NLetYR8iTpqFQHf6DZWONERRZvUH8I08bZgijF5tR1xXSTSeAiVW2kTNoviAS6gd0b9J3Ty5McByIwkVvMp2Gz6Kb37pY/5F41xNGFvQL9JUgpCM/hDYRJdV44=
+	t=1784924462; cv=pass; b=pvsBgzZQjhYys/DWR24cqawXIfVJORjfwvCYl4/o8LSV6tIXmKDljUsNxiD0QYYcma1DxRtQQgZFBz1zITqX/084uSbpYoIoOh502g+7SbrhKq6B8jdre3ilVSOAX0DasxB7n0NB6s2+suFNlyOgBg5t9WsxCR9E/1AuEr55pRk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784924460; c=relaxed/simple;
-	bh=1SpN3PbpJCN8EML1itNSGAUvXEydaaKunkKHi3Z5w+A=;
+	s=arc-20240116; t=1784924462; c=relaxed/simple;
+	bh=r1mrQYEbSXOMLLJrXhEjlo+6dNsR+rQfl8Fo8+tRcbE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eh3oPBr9/RrAYETBVmaM8qG3uZGfZDQjY9poeNeqSSGf9uE3YOWuZiE+7I6hdMBwLfndeHU06mNpvleW9DRwzdvn15p1zozoUICogyrb7Z97KHaqvkPJq/4TYxrqGBdfAppiOBI9k2WNpLSTgt+4y5CNLBO7RHaZpoN6EWy9mZc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=k4h00+Ue; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=Qfki2q4wlAC/AgfcA5d9PwBtF92c+6rzwYv7MGmgElq/G7Nsl7pZB1a37rkmf+lzRalOK8pHnYezCS1YJqHUhjm6c7BMZGAkPtUKRePV3kMH8OCFqBIOeU82pMPs4iYRyB3N6HenBqBVxV5t4UIX255aNs3e+EywPBOI9Fmy3Hk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=EkmrIE4Z; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="k4h00+Ue"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="EkmrIE4Z"
 Received: from monolith.lan (unknown [89.37.63.136])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KB52KzMzyZH;
-	Fri, 24 Jul 2026 23:20:45 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KBD4PqgzyQq;
+	Fri, 24 Jul 2026 23:20:52 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784924446;
+	t=1784924453;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k23S5RWRNobKoWy+fSjoSzTYLBv9zc75015Aso7VPxg=;
-	b=k4h00+Ue5PK0fKZ/M9QJEMTs40x5fOc0pB+grNUeDRhN7YWehqsIgvIv6EWpsAs8M4H4oG
-	MFp9wnriX/WjFLXpuYdr8yddQSXX8hD3KKPLiYpTaXD9U1oJOcBesJFJMFBQZZtECc+8VN
-	02JNbAWz89cp0ypXNndUF/jIMcCQaxM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924446;
-	b=mQmdP2NpnRBSNqnN7hJQ1sH0TpnCcqIIuKBqeUTgh9Ex4bYD90KR26lCe7qVUgq8QB8Zl2
-	gYw6pg/U2MLLT2MF4JEIxJ8PrsJkqp2MI/sqeEJ4P+5TCBlqwZ4c3d5kBj/M5c/Yb4Fag1
-	QblKb43jYIt541ChqnMy0TSmqrmNsOU=
+	bh=blpzDVZeHkyB9hZ00OWamntBW35ZDd0tWBbUkewuOfA=;
+	b=EkmrIE4Z73O9UrxDIcWnP/AEBlm7VCXPcixhYJCSjEwTtCjp0BilxyqJQ/NQ1MKwQDOJtR
+	kXM0h2hbYZlHnnkzkq0wnLwmVqGaNUynyF5utTh/gvQAN0z0lqiMCDQnENB55oKrgwMgFW
+	J9cX+oNaQdhQXl/UFPW3WrdGBuNCfMQ=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924453;
+	b=bwNu9+sIPmRHLluJwDecwkmdT7m4cddXen05MyUv47lghpHWgTKSkx0PmmdHyEufiUut+V
+	IaDq0PMas9Aqsk0+pNi0ceQ+5A3puj4Fyn0ZHTQcHW5C9W/vQsGE6cF2vaSC75H5GYU/A9
+	Ni3SrzEvwrFwUAxY7di8hF96T/gfiEk=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784924446;
+	s=meesny; t=1784924453;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k23S5RWRNobKoWy+fSjoSzTYLBv9zc75015Aso7VPxg=;
-	b=ijCG6OrhtoSYZqUVcUyHQNct2TlMuQDK29texEJX6GpA+sei+E3iLV9JNhqzEa6pBJKk4c
-	kBBp8RvdziSB2/t+FgpqnWjfFR1QSfSJGOEKegUUvOznYvbPWl/xLKqidCEpDeW0GI/Bj6
-	mLnYxeKsx+xtFSFiN94JgSag7hgmJuE=
+	bh=blpzDVZeHkyB9hZ00OWamntBW35ZDd0tWBbUkewuOfA=;
+	b=a5QFZAkrw9mrd4tSEBAmBUhVtFZElela4xx1VAmgaRCv3Qcy75SPN+/CgjHY4u/Q/4LtKZ
+	/iIWFUt40fA+EVb1E/0ooDoq+kT/yd/rzroPwOp4J2sWJQr92D/y/sfTHWfzGJl+M7ozb2
+	7JWJ3o4AGqTHW8oW4vUqLT3cwepgoI0=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -56,9 +56,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 03/11] Bluetooth: ISO: lock sk in iso_connect_ind
-Date: Fri, 24 Jul 2026 23:20:26 +0300
-Message-ID: <b7443b1e6093867fab5168677f6474e037e59f97.1784923689.git.pav@iki.fi>
+Subject: [PATCH 07/11] Bluetooth: ISO: fix leaking sk after socket release
+Date: Fri, 24 Jul 2026 23:20:30 +0300
+Message-ID: <f5cb2f1c158f50f91f613e9c7646673673da60ba.1784923689.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1784923689.git.pav@iki.fi>
 References: <cover.1784923689.git.pav@iki.fi>
@@ -70,84 +70,108 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Accessing iso_pi(sk)->conn requires lock_sock, which is not taken in the
-"ev3" part of iso_connect_ind.  It may also be NULL if socket has
-transitioned away from the LISTEN/CONNECT states before locking.
+iso_sock_kill() tests !sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket ||
+sock_flag(sk, SOCK_DEAD) for early return, but this is always true since
+sock_orphan(sk) sets SOCK_DEAD, so the sk reference released by socket
+always leaks, iso_sock_destruct is never called.
 
-Fix by adding lock/release. Recheck hcon is valid after lock acquire
-where needed.
+The socket reference also leaks when __iso_sock_close() does not set
+SOCK_ZAPPED, since iso_conn_del() does not call iso_sock_kill() after
+zapping.
 
-Fixes: 168d9bf9c7f0 ("Bluetooth: ISO: Reassemble PA data for bcast sink")
+Fix by replacing SOCK_DEAD by BT_SK_KILLED flag that is not used for
+something else, and lock_sock to ensure iso_sock_kill() puts sk only
+after socket release only once. Release and iso_conn_del may run
+concurrently. Call iso_sock_kill() from iso_conn_del() to clean sk up
+after zapping.
+
+Remove call to iso_sock_kill() from iso_sock_close(), as it's generally
+no-op there.
+
+Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/iso.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ net/bluetooth/iso.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index dbb8f43052f0..651661833966 100644
+index 80a58275891d..5f0f45a573a7 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -2369,7 +2369,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+@@ -62,6 +62,7 @@ static void iso_sock_kill(struct sock *sk);
+ enum {
+ 	BT_SK_BIG_SYNC,
+ 	BT_SK_PA_SYNC,
++	BT_SK_KILLED,
+ };
  
- 			lock_sock(sk);
+ struct iso_pinfo {
+@@ -295,6 +296,7 @@ static void iso_conn_del(struct hci_conn *hcon, int err)
+ 	iso_sock_clear_timer(sk);
+ 	iso_chan_del(sk, err);
+ 	release_sock(sk);
++	iso_sock_kill(sk);
+ 	sock_put(sk);
+ }
  
--			hcon = iso_pi(sk)->conn->hcon;
-+			hcon = iso_pi(sk)->conn ? iso_pi(sk)->conn->hcon : NULL;
- 			iso_pi(sk)->qos.bcast.encryption = ev2->encryption;
- 
- 			if (ev2->num_bis < iso_pi(sk)->bc_num_bis)
-@@ -2409,9 +2409,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 		if (!sk)
- 			goto done;
- 
--		hcon = iso_pi(sk)->conn->hcon;
-+		lock_sock(sk);
+@@ -798,24 +800,29 @@ static void iso_sock_cleanup_listen(struct sock *parent)
+  */
+ static void iso_sock_kill(struct sock *sk)
+ {
++	lock_sock(sk);
 +
-+		hcon = iso_pi(sk)->conn ? iso_pi(sk)->conn->hcon : NULL;
- 		if (!hcon)
--			goto done;
-+			goto release3;
- 
- 		if (ev3->data_status == LE_PA_DATA_TRUNCATED) {
- 			/* The controller was unable to retrieve PA data. */
-@@ -2419,12 +2421,12 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 			       HCI_MAX_PER_AD_TOT_LEN);
- 			hcon->le_per_adv_data_len = 0;
- 			hcon->le_per_adv_data_offset = 0;
--			goto done;
-+			goto release3;
- 		}
- 
- 		if (hcon->le_per_adv_data_offset + ev3->length >
- 		    HCI_MAX_PER_AD_TOT_LEN)
--			goto done;
-+			goto release3;
- 
- 		memcpy(hcon->le_per_adv_data + hcon->le_per_adv_data_offset,
- 		       ev3->data, ev3->length);
-@@ -2443,18 +2445,19 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 						    &base_len);
- 
- 			if (!base || base_len > BASE_MAX_LENGTH)
--				goto done;
-+				goto release3;
- 
--			lock_sock(sk);
- 			memcpy(iso_pi(sk)->base, base, base_len);
- 			iso_pi(sk)->base_len = base_len;
--			release_sock(sk);
- 		} else {
- 			/* This is a PA data fragment. Keep pa_data_len set to 0
- 			 * until all data has been reassembled.
- 			 */
- 			hcon->le_per_adv_data_len = 0;
- 		}
-+
-+release3:
+ 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket ||
+-	    sock_flag(sk, SOCK_DEAD))
++	    test_bit(BT_SK_KILLED, &iso_pi(sk)->flags)) {
 +		release_sock(sk);
- 	} else {
- 		sk = iso_get_sock(hdev, &hdev->bdaddr, BDADDR_ANY,
- 				  BT_LISTEN, iso_match_dst, BDADDR_ANY);
+ 		return;
++	}
+ 
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+ 
+ 	/* Sock is dead, so set conn->sk to NULL to avoid possible UAF */
+-	lock_sock(sk);
+ 	if (iso_pi(sk)->conn) {
+ 		iso_conn_lock(iso_pi(sk)->conn);
+ 		iso_pi(sk)->conn->sk = NULL;
+ 		iso_conn_unlock(iso_pi(sk)->conn);
+ 	}
+-	release_sock(sk);
+ 
+ 	/* Kill poor orphan */
+ 	bt_sock_unlink(&iso_sk_list, sk);
+ 	sock_set_flag(sk, SOCK_DEAD);
++	set_bit(BT_SK_KILLED, &iso_pi(sk)->flags);
++
++	release_sock(sk);
+ 	sock_put(sk);
+ }
+ 
+@@ -892,7 +899,6 @@ static void iso_sock_close(struct sock *sk)
+ 	iso_sock_clear_timer(sk);
+ 	__iso_sock_close(sk);
+ 	release_sock(sk);
+-	iso_sock_kill(sk);
+ }
+ 
+ static void iso_sock_init(struct sock *sk, struct sock *parent)
+@@ -2040,8 +2046,16 @@ static int iso_sock_release(struct socket *sock)
+ 		release_sock(sk);
+ 	}
+ 
++	/* Make sure sk is valid even if iso_conn_del() is concurrent */
++	sock_hold(sk);
++
++	lock_sock(sk);
+ 	sock_orphan(sk);
++	release_sock(sk);
++
+ 	iso_sock_kill(sk);
++
++	sock_put(sk);
+ 	return err;
+ }
+ 
 -- 
 2.55.0
 
