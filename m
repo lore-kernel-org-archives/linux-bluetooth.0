@@ -1,68 +1,68 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2379388E59
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57D344C65F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920360; cv=none; b=kp5H8YwoSg5XDGrFJTcpv4tEwPLAIU/tnLdp7OIgVS7byEx6SFmAVkrMm/18MVtcb/UC/c5f2c3zK0P6Ix+rDasc+synFlRJzPYPhFqFKWia7iUdSVlSQaEg4CkBfbHsD00bw0bs7OktgVF7gjqr1CV3ZaPJ0R/x0E2t9ih6k/s=
+	t=1784920361; cv=none; b=ECWdOw+FMm/plOcDwOhY7JCKeMeMdTku/btFpH7np8NtZ8ma5cvKM6DMypwIarAwxwGI55TCqZVTQ3wj3pgLSbvLFPpjwL0H1xPmjDBs6Z45rFS4GZUqomzHkVuE9O78N7VLQ3WNhZTmCG1tH5gjDWhRFXv60VOOe6Lu8coe3ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920360; c=relaxed/simple;
-	bh=9W70C79eQgUmQawhfh9tZ/xhkW3ovlnxqOvrdoOK8QY=;
+	s=arc-20240116; t=1784920361; c=relaxed/simple;
+	bh=ytA+ZiYq5ltE3R+uXulLHKYcnl2EI1p8mqXCpWWdWUk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ptYXqrfCQRaok+JtNNyXGreE3qCwPE+tdSKy04R0xf918peM6Ebh01gqbk1VF3uv2hHlH2gCur9pUMdL/ul3Isvpu8QflO+z+/6g0dYJJL3hI7flYx+Vi5eY8m83CEa7LzUB5Rc7cWDGVJMp6uUe0NE9QxIYqezz4jyvOOBJyOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llKoEE7N; arc=none smtp.client-ip=209.85.221.182
+	 MIME-Version; b=oODy5Dg8dXAtyZflwQm8RWqW1YzRIXUQThGz8tIeOHR/NL8BSshAHrcz+OyVdzTaJ0hdzqWnss7tbDUgrd3q4bzEiiXRIJ9WeUHivQB2A79iiKBfXgjok38PRaE2gltDLMLkSYuhoc0ZlVVNymiigG4TXKcPN5wD57FYmetXHow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceoNT8TL; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llKoEE7N"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5bf5370d38fso266010e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceoNT8TL"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5bfb5e20a90so478523e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784920358; x=1785525158; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784920359; x=1785525159; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=I2ikbyb54MQEaV5LoevLhX526SnfUQVrgPxPPfdb7no=;
-        b=llKoEE7NIp5TRfH5gN4D+8MLnrY7/w3ZaD30cq4Zj4PI/zc++rchRVQzYKR6TkjaYh
-         eqYO9s3lJJknGy7injQ+QEs3kLA6C4M0WhvLGm/CWkFC3TIP7FNzigAJiEtNOBgCK1Xm
-         Y4+LCARdgZNvWJ5mPWvK0HxKa+0bS5gWHCADHueXpt5kN/ZFm9BZ1CPysEGj5dyKCJlt
-         /g3ppf7TEn9NrKeen1MWi+goMCQ9Am6r7EG8NKZkBMM/BmwC/GM65tyYX7zURKJrwX2h
-         s2/CRGLVqFBKHDLEKju/rchgQ/1b+p8eWKNwL2w+A3CTTX42r8RnKFM0NZNL20+ykj95
-         6A0Q==
+        bh=+SPsEiIGqUBLuxNcyV5ClSeYJePE2hPXdSOngCHkYjU=;
+        b=ceoNT8TLDSo5eR7hj/eEocpVTb+czEDUNdE3/ESOQJw7Hu9GOd6ytiWpuQM71007fc
+         ufWaBNGZSKgF+49gzBSVEPVkzTXrf4JVT0KM8LhxnleHD3mZ3cJ55SF7V4I31D1lIB0B
+         sSNlnL0hX4KkQ4ALgI6zuF+MRojvoCRqgkc/WzdrDUEXxt/z9M9N62a4paCCvQFDX6oh
+         sUNie2uvx2C6Hx1ujpued4pDFubaDY6v+Fdgh0jK5wUlL85ycyooS8gy/Ojeu1l78FWo
+         bY5LHVz2Rn+IeKdMSX9OEObZxdwd7pw3tHD5QucddgQG1JmadOgcg59qFlu8S9scwVVI
+         doAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784920358; x=1785525158;
+        d=1e100.net; s=20251104; t=1784920359; x=1785525159;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=I2ikbyb54MQEaV5LoevLhX526SnfUQVrgPxPPfdb7no=;
-        b=KxmJw3xtnZtqW4dFgb2OOnd/E2dFYIPspEKtXXHsQfpXmv//wL2wXa2M4P3Z/ZBX67
-         IWMEJSw3eRK8yK/VnOcoIlOVAySaAz6VWN1IpJfw7VowdTZ8xGygufHAMHnsnObFDHS9
-         bdyDrIpfwLiPcoxi5WccTe3qFFprigjDlcMzQ+qp8WZ4pleXhUjkTMCDKQD06t+qWFK3
-         hP1dXcCsx6UDsbdHg6BzKjHkah0zmOmfSDosEpopcLwZ90/3Mmq1m20Q4dk9EdE7ijMk
-         yU6dK+GbtKbTNaRQcSLa6oGyCMPNCF2PSk9bULLVKQZAqN1kC8PZmeWzkcmmZAZIg2rx
-         +6zQ==
-X-Gm-Message-State: AOJu0YxojaT1ZlZeZqIcEjee4ArXla5spURbJsC1aKGzblxN9hIDzoCB
-	+0mtQShBClSht5HZhHKLzZP7cgNjBUO8EbfKVg4S2qIsLk4vj/03qCyJY/qir2pS
-X-Gm-Gg: AR+sD125gaDE04z9J3smKoETlgRafpSiYeRFeVBVbtuDo6u5YseBY7FT19kjNnPtjTs
-	5n53y1Rg9gXqZFWsVylJW4bE+kkUVNdS+IqUAdp+i+Z4Qbv1XKEyEJ9W73H/XSqZrHxoaxwO/0s
-	aWLFLgyCpN33UcpZGFE96FDy8TLWHdmjNPezhz4/P6q663xNr21MIVa4JfnqCcdbJ/6g6EXKd/m
-	YjN2xM5F1lOUvaVfV+VkFXP5dRCg5YApaf9RbjiKCitsWKdqpudwI722uuU1a7/0YiOFwYzKTAC
-	/FB7ojz5iEoddmt3Q+57rR/D0tgyoS7vn35Q932WMZiAzz/+3URm6hNWvzhmNNZxa5onQkkHA4y
-	zbLB30T3AKoomT70x4d7ZviQ9tZ0A+JfHMqPXHflgY6rDSAUfSCGr7/gXKJtINsQmAGiG4xXsC5
-	u0Cx95wIPIW4CzLg139IDmVAqwICIzuKfOKGVbI3OLbKaw2R8UZ+LQll1CwDRbAlKAjqs/aJv/
-X-Received: by 2002:a05:6122:1352:b0:5bd:b27c:bade with SMTP id 71dfb90a1353d-5c2da06aaeamr4320560e0c.5.1784920357669;
-        Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
+        bh=+SPsEiIGqUBLuxNcyV5ClSeYJePE2hPXdSOngCHkYjU=;
+        b=b2p++38qEvwRGQNgO22L471PTb5zwJ/nPLYWggMDMJy3yz263J1LQMclJZyWfZRWvF
+         Z+SqT/feP5Ff7VFsP2JFrl8jV3ayY2Ka6fydVxebn4G6Uk+4/6YL5zO0wcxBMMu5w/5p
+         p2Awsd58oOGmFhnwYoDZ5p+/9XSr989HChzCQ9z6bPS22jF9HnKbeoXtWUeUBv5RsF9z
+         SfREG6rY1s4hz6b3m8FsnzU8d/PHAHCOBQc9y/rkituXzTrrQUD8+sjmBiyVWAh8uP0R
+         LrLOenOsqis+nSEJ6Rd2PL1UqZ1lVipYZMBzogpeagIbQSYmATwficVCvTvIf9IZVg/S
+         9URQ==
+X-Gm-Message-State: AOJu0YxTVHUubKs8JtBdJuNnyHkmJozAs/ZfFkpbHveW8VkT55HB0Yog
+	+He9ahFjU67ggGT8Doi+VZQl7vWLupGZHTDGvqKm3fhFlEiDhrP+gBBk6MKENdf5
+X-Gm-Gg: AR+sD128qUc1eGoDQEHfU3DkjrCdKNsXswKh/XKEC3C57pwjBvnhXUzYNOqVXfXlInJ
+	E/jQJbu2I78Fx4is8oYp9wTrBYYnkb2ByU1GGnN/sI575E9PM3WsDJOtYlmAIoyJX88dKBHSFI/
+	E4IM18J2xA5SqDHMbG7Ty0HBqFPa4vxBJWhGCMriUg+Pw1nseJBAewCb4lI4y7ujYDA4uQrIGED
+	rFs6FlL/K6fu2GfFC8Xaiz1iJ2FDrHzDoYtS+zqD0usY52PA6ZQf0IBvQgkUIkMRNl9XeJZJFAL
+	hzpe+mVPXhCI7bYtXP/CxquxLNgrPF1GXRN5yoLvkQRBwnAxW3bOZ7KxHPU/ptlR/5mHshFS/iU
+	KYfOyJZyyx8QuCK4738L9Ezpg4BzwfKqBiwdlU45DA7B+Kg5yQzhXcV9oIZClX7PRLvG0rN7Bte
+	huBEcqWUh1uhHKGCoUvSttpeXZ7/JTsApA3HAGNT5iNMQJztzlRO/ZGciLDBou4j2e/8CO3RCS
+X-Received: by 2002:a05:6122:2895:b0:5bb:eebe:7ffd with SMTP id 71dfb90a1353d-5c2da07b556mr5069741e0c.8.1784920358574;
+        Fri, 24 Jul 2026 12:12:38 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
+        Fri, 24 Jul 2026 12:12:38 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 02/12] emulator/btdev: Add emulation support for HIDS 1.1 SCI commands
-Date: Fri, 24 Jul 2026 15:12:15 -0400
-Message-ID: <20260724191225.1815634-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 03/12] mgmt: Add Shorter Connection Interval setting and Load Connection Subrate
+Date: Fri, 24 Jul 2026 15:12:16 -0400
+Message-ID: <20260724191225.1815634-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
 References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
@@ -76,219 +76,234 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add BTDEV_TYPE_BREDRLE62 device type with support for Shorter
-Connection Interval (SCI) feature from Bluetooth 6.2 spec:
+Add the Shorter Connection Interval setting bit (25) to indicate
+controller support for SCI feature.
 
- - LE Connection Rate Request (0x20a1)
- - LE Set Default Rate Parameters (0x20a2)
- - LE Read Minimum Supported Connection Interval (0x20a3)
- - LE Connection Rate Change event (0x37)
- - Shorter Connection Intervals feature bits
+Add the Load Connection Subrate command (0x005C) which allows
+loading connection subrate parameters for devices that support
+shorter connection intervals as defined in Bluetooth 6.2.
 ---
- emulator/btdev.c  | 107 ++++++++++++++++++++++++++++++++++++++++++++++
- emulator/btdev.h  |   1 +
- emulator/hciemu.c |   3 ++
- emulator/hciemu.h |   1 +
- 4 files changed, 112 insertions(+)
+ doc/mgmt-protocol.rst | 125 ++++++++++++++++++++++++++++++++++++++++++
+ lib/bluetooth/mgmt.h  |  31 +++++++++++
+ 2 files changed, 156 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 3206caf5be86..68ec9698c6bc 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -7963,6 +7963,96 @@ static void set_le_60_commands(struct btdev *btdev)
- 	btdev->cmds = cmd_le_6_0;
- }
+diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
+index 35446dd974ac..f0564075f92f 100644
+--- a/doc/mgmt-protocol.rst
++++ b/doc/mgmt-protocol.rst
+@@ -321,6 +321,7 @@ following available bits:
+     22, LL Privacy
+     23, PAST Sender
+     24, PAST Receiver
++    25, Shorter Connection Interval
  
-+static int cmd_le_conn_rate(struct btdev *dev, const void *data, uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_conn_rate *cmd = data;
-+	struct bt_hci_evt_le_conn_rate_change ev;
-+	struct btdev_conn *conn;
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
-+
-+	conn = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!conn)
-+		status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+
-+	cmd_status(dev, status, BT_HCI_CMD_LE_CONN_RATE);
-+
-+	if (status)
-+		return 0;
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.status = BT_HCI_ERR_SUCCESS;
-+	ev.handle = cmd->handle;
-+	ev.interval = cmd->interval_min;
-+	ev.subrate = cmd->subrate_min;
-+	ev.latency = cpu_to_le16(0);
-+	ev.cont_number = cmd->cont_num;
-+	ev.supv_timeout = cmd->supv_timeout;
-+
-+	le_meta_event(dev, BT_HCI_EVT_LE_CONN_RATE_CHANGE, &ev, sizeof(ev));
-+	if (conn->link)
-+		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CONN_RATE_CHANGE,
-+				&ev, sizeof(ev));
-+
-+	return 0;
-+}
-+
-+static int cmd_le_set_def_rate(struct btdev *dev, const void *data, uint8_t len)
-+{
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_DEF_RATE, &status, sizeof(status));
-+
-+	return 0;
-+}
-+
-+static int cmd_le_read_conn_interval(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	struct {
-+		struct bt_hci_rsp_le_read_conn_interval rsp;
-+		struct bt_hci_le_conn_interval_group grp;
-+	} __attribute__ ((packed)) pdu;
-+
-+	memset(&pdu, 0, sizeof(pdu));
-+	pdu.rsp.status = BT_HCI_ERR_SUCCESS;
-+	pdu.rsp.num_grps = 1;
-+	pdu.grp.min = cpu_to_le16(0x0008);	/* 1.000 ms */
-+	pdu.grp.max = cpu_to_le16(0x0c80);	/* 400.000 ms */
-+	pdu.grp.stride = cpu_to_le16(0x0001);	/* 0.125 ms */
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_CONN_INTERVAL, &pdu, sizeof(pdu));
-+
-+	return 0;
-+}
-+
-+#define CMD_LE_62 \
-+	CMD(BT_HCI_CMD_LE_CONN_RATE, cmd_le_conn_rate, NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_DEF_RATE, cmd_le_set_def_rate, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_CONN_INTERVAL, cmd_le_read_conn_interval, NULL)
-+
-+static const struct btdev_cmd cmd_le_6_2[] = {
-+	CMD_COMMON_ALL,
-+	CMD_COMMON_BREDR_LE,
-+	CMD_COMMON_BREDR_20,
-+	CMD_COMMON_BREDR_LE_40,
-+	CMD_BREDR,
-+	CMD_LE,
-+	CMD_LE_50,
-+	CMD_LE_52,
-+	CMD_LE_60,
-+	CMD_LE_62,
-+	{}
-+};
-+
-+static void set_le_62_commands(struct btdev *btdev)
-+{
-+	btdev->commands[48] |= BIT(5);	/* LE Connection Rate Request */
-+	btdev->commands[48] |= BIT(6);	/* LE Set Default Rate Parameters */
-+	btdev->commands[48] |= BIT(7);	/* LE Read Min Supported Conn Interval */
-+	btdev->cmds = cmd_le_6_2;
-+}
-+
- static void set_le_commands(struct btdev *btdev)
- {
- 	set_common_commands_all(btdev);
-@@ -8037,6 +8127,12 @@ static void set_le_commands(struct btdev *btdev)
- 		set_le_60_commands(btdev);
- 		btdev->cmds = cmd_le_6_0;
- 	}
-+
-+	/* Extra LE commands for >= 6.2 adapters */
-+	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
-+		set_le_62_commands(btdev);
-+		btdev->cmds = cmd_le_6_2;
-+	}
- }
+ This command generates a Command Complete event on success or a Command Status
+ event on failure.
+@@ -4170,6 +4171,86 @@ Possible errors:
+ :Failed:
+ :Invalid Parameters:
  
- static void set_bredrle_commands(struct btdev *btdev)
-@@ -8112,6 +8208,13 @@ static void set_bredrle_features(struct btdev *btdev)
- 		btdev->le_features[7] |= BIT(7); /* LL Extended Features */
- 	}
- 
-+	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
-+		/* Shorter Connection Intervals */
-+		btdev->le_features[9] |= BIT(0);
-+		/* Shorter Connection Intervals (Host Support) */
-+		btdev->le_features[9] |= BIT(1);
-+	}
++Load Connection Subrate
++```````````````````````
 +
- 	btdev->feat_page_2[0] |= 0x01;	/* CPB - Central Operation */
- 	btdev->feat_page_2[0] |= 0x02;	/* CPB - Peripheral Operation */
- 	btdev->feat_page_2[0] |= 0x04;	/* Synchronization Train */
-@@ -8217,6 +8320,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
-+	case BTDEV_TYPE_BREDRLE62:
- 		btdev->crypto = bt_crypto_new();
- 		if (!btdev->crypto) {
- 			free(btdev);
-@@ -8240,6 +8344,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
-+	case BTDEV_TYPE_BREDRLE62:
- 		btdev->version = 0x09;
- 		set_bredrle_features(btdev);
- 		set_bredrle_commands(btdev);
-@@ -8933,6 +9038,7 @@ int btdev_set_msft_opcode(struct btdev *btdev, uint16_t opcode)
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
-+	case BTDEV_TYPE_BREDRLE62:
- 		btdev->msft_opcode = opcode;
- 		btdev->msft_cmds = cmd_msft;
- 		return 0;
-@@ -8991,6 +9097,7 @@ int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode)
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
-+	case BTDEV_TYPE_BREDRLE62:
- 		btdev->emu_opcode = opcode;
- 		btdev->emu_cmds = cmd_emu;
- 		return 0;
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index d473bd4b3414..145f7edaa262 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -53,6 +53,7 @@ enum btdev_type {
- 	BTDEV_TYPE_BREDRLE50,
- 	BTDEV_TYPE_BREDRLE52,
- 	BTDEV_TYPE_BREDRLE60,
-+	BTDEV_TYPE_BREDRLE62,
++:Command Code:		0x005C
++:Controller Index:	<controller id>
++:Command Parameters:	Param_Count (2 Octets)
++:...:			Address[] (6 Octets)
++:...:			Address_Type[] (1 Octet)
++:...:			Min_Connection_Interval[] (2 Octets)
++:...:			Max_Connection_Interval[] (2 Octets)
++:...:			Subrate_Min[] (2 Octets)
++:...:			Subrate_Max[] (2 Octets)
++:...:			Max_Latency[] (2 Octets)
++:...:			Continuation_Number[] (2 Octets)
++:...:			Supervision_Timeout[] (2 Octets)
++:...:			...[]
++:Return Parameters:
++
++This command is used to load connection subrate parameters from several devices
++into the kernel. This is only supported on controllers with Low Energy support
++and the Shorter Connection Interval (SCI) feature.
++
++This command operates on the same device entries as Load Connection Parameters
++(0x0035). If an entry for the given device already exists, the subrate-specific
++fields are updated on that entry. If no entry exists, a new one is created. The
++device must have been previously added via Load Connection Parameters or this
++command.
++
++Note that the Min_Connection_Interval and Max_Connection_Interval parameters in
++this command refer to the connection rate interval used with the LE Connection
++Rate Request procedure, which has different valid ranges than the connection
++interval in Load Connection Parameters. The Load Connection Parameters interval
++is specified in units of 1.25 ms (range: 6 to 3200), while the connection rate
++interval here is specified in units of 0.125 ms (range: 8 to 3200).
++
++Loading with multiple entries overwrites the subrate parameters for all listed
++devices. Loading with a single entry attempts to update the parameters if an
++entry for the given device already exists, or adds a new entry otherwise.
++
++Possible values for the Address_Type parameter:
++
++.. csv-table::
++	:header: "Value", "Description"
++	:widths: auto
++
++	0x00, BR/EDR
++	0x01, LE Public
++	0x02, LE Random
++
++The provided Address and Address_Type are the identity of a device. So either
++its public address or static random address.
++
++The Min_Connection_Interval and Max_Connection_Interval parameters specify the
++connection rate interval range in units of 0.125 ms (range: 0x0008 to 0x0C80,
++corresponding to 1.0 ms to 400.0 ms). These are distinct from the connection
++parameters interval in Load Connection Parameters which uses units of 1.25 ms.
++
++The Subrate_Min and Subrate_Max parameters specify the acceptable subrate factor
++range.
++
++The Max_Latency parameter specifies the maximum peripheral latency in units of
++subrated connection events.
++
++The Continuation_Number parameter specifies the number of continuation events
++the peripheral will be listened to.
++
++The Supervision_Timeout parameter specifies the link supervision timeout in
++units of 10 ms.
++
++This command can be used when the controller is not powered.
++
++This command generates a Command Complete event on success or a Command Status
++event on failure.
++
++Possible errors:
++
++:Invalid Parameters:
++:Invalid Index:
++:Not Supported:
++
+ Events
+ ------
+ 
+@@ -5396,3 +5477,47 @@ This event indicates that a requested outbound Mesh packet has completed and no
+ longer occupies a transmit slot.
+ 
+ This event will be sent to all management sockets.
++
++Connection Subrate
++``````````````````
++
++:Event Code:		0x0033
++:Controller Index:	<controller id>
++:Event Parameters:	Address (6 Octets)
++:...:			Address_Type (1 Octet)
++:...:			Status (1 Octet)
++:...:			Interval (2 Octets)
++:...:			Subrate (2 Octets)
++:...:			Latency (2 Octets)
++:...:			Continuation_Number (2 Octets)
++:...:			Supervision_Timeout (2 Octets)
++
++This event indicates that the connection rate has changed for a device. This
++can be a result of a successful LE Connection Rate Request or a change
++initiated by the remote device.
++
++Possible values for the Address_Type parameter:
++
++.. csv-table::
++	:header: "Value", "Description"
++	:widths: auto
++
++	0x01, LE Public
++	0x02, LE Random
++
++The Status indicates whether the connection rate change was successful.
++
++The Interval parameter specifies the new connection interval in units of
++0.125 ms.
++
++The Subrate parameter specifies the subrate factor.
++
++The Latency parameter specifies the peripheral latency.
++
++The Continuation_Number parameter specifies the number of continuation
++events.
++
++The Supervision_Timeout parameter specifies the supervision timeout in units
++of 10 ms.
++
++This event will be sent to all management sockets.
+diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
+index 7fab3d7a0bba..9df0c1ba2fbf 100644
+--- a/lib/bluetooth/mgmt.h
++++ b/lib/bluetooth/mgmt.h
+@@ -107,6 +107,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_LL_PRIVACY		BIT(22)
+ #define MGMT_SETTING_PAST_SENDER	BIT(23)
+ #define MGMT_SETTING_PAST_RECEIVER	BIT(24)
++#define MGMT_SETTING_SCI		BIT(25)
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ struct mgmt_rp_read_info {
+@@ -814,6 +815,23 @@ struct mgmt_cp_hci_cmd_sync {
+ 	uint8_t  params[];
+ } __packed;
+ 
++struct mgmt_conn_subrate {
++	struct mgmt_addr_info addr;
++	uint16_t min_interval;
++	uint16_t max_interval;
++	uint16_t subrate_min;
++	uint16_t subrate_max;
++	uint16_t max_latency;
++	uint16_t cont_num;
++	uint16_t supv_timeout;
++} __packed;
++
++#define MGMT_OP_LOAD_CONN_SUBRATE	0x005C
++struct mgmt_cp_load_conn_subrate {
++	uint16_t param_count;
++	struct mgmt_conn_subrate params[];
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -1107,6 +1125,17 @@ struct mgmt_ev_mesh_pkt_cmplt {
+ 	uint8_t	handle;
+ } __packed;
+ 
++#define MGMT_EV_CONN_SUBRATE			0x0033
++struct mgmt_ev_conn_subrate {
++	struct mgmt_addr_info addr;
++	uint8_t  status;
++	uint16_t interval;
++	uint16_t subrate;
++	uint16_t latency;
++	uint16_t cont_num;
++	uint16_t supv_timeout;
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1200,6 +1229,7 @@ static const char *mgmt_op[] = {
+ 	"Mesh Send",
+ 	"Mesh Send Cancel",
+ 	"HCI Cmd Sync",
++	"Load Connection Subrate",
  };
  
- enum btdev_hook_type {
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 15d806a62aa6..48ed63b413f4 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -437,6 +437,9 @@ struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
- 	case HCIEMU_TYPE_BREDRLE60:
- 		hciemu->btdev_type = BTDEV_TYPE_BREDRLE60;
- 		break;
-+	case HCIEMU_TYPE_BREDRLE62:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDRLE62;
-+		break;
- 	default:
- 		return NULL;
- 	}
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index e832d6350bb3..cdf1ebe16752 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -22,6 +22,7 @@ enum hciemu_type {
- 	HCIEMU_TYPE_BREDRLE50,
- 	HCIEMU_TYPE_BREDRLE52,
- 	HCIEMU_TYPE_BREDRLE60,
-+	HCIEMU_TYPE_BREDRLE62,
+ static const char *mgmt_ev[] = {
+@@ -1254,6 +1284,7 @@ static const char *mgmt_ev[] = {
+ 	"Advertisement Monitor Device Lost",
+ 	"Mesh Packet Found",
+ 	"Mesh Packet Complete",
++	"Connection Subrate",
  };
  
- enum hciemu_hook_type {
+ static const char *mgmt_status[] = {
 -- 
 2.54.0
 
