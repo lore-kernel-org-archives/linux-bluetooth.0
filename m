@@ -1,69 +1,69 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122B84534B3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8136450917
 	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920366; cv=none; b=YylNSR42l1490eMQw5AymayAXyUoZ/kil2zMr98etmD1zqNLySPnRs2lVT+8Y2u3X5JgtxdvLLlALis3AJLnLWXYeKUfMtYCcbrJSarcm61J8xyuJJvUyvprMjwIWAyVU5hpUEbgdfliI33fG2QPR/eqm49nBXgbFNVGoS2cYU4=
+	t=1784920367; cv=none; b=OCPSuPUNWS+BBd1UeMXlqxEf/mdoYLdE/wUVESWyq2FBp7/zjnu0Jcue5R+7CqdtXUX1nQCqKpxjiFkyoQJl8HY+FKztFPDUSf7kSrhPI9YwT6/IuNxRgLUrNJWK3WfdHvUBRgp5Jz69kIMnE2jJwF9qzcqH0D14FAjfUukdpu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920366; c=relaxed/simple;
-	bh=s0AzpSkm9aroVq4taXN4TFEJabOf9mzigcGU4G60X/g=;
+	s=arc-20240116; t=1784920367; c=relaxed/simple;
+	bh=iQ/V5/NhNRu5l1qSbyYeYSiwiGw0RriWg9knJcZtG8w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hfQbRw1ZvawQicOoDkyBP7rGsG5nXQUnqn2IFGg7aJoo10MRjUDxwnC5KevaGjAbEdEO+qqIJ670s9kTQ05DX4HfaeBQj/C9QVj7cULphMyA9G3iRHy+S65UR2xUS4dxLos0PPtF0EDovLew7bQLnTKIFWGPT+CU3jjOEGzoIBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YxfM0inv; arc=none smtp.client-ip=209.85.217.51
+	 MIME-Version; b=mOjVR6qgcWfRPyFIzZTpFVnCT/tLYepUfJ4tCH9naCPhgr8k3iYB88BJpbcRawjlGBDvW8DW4sYp9dcVwlW7GhCvw869fkeP7U6S6XejPGNKFvMKUv0j3EsJ+YAtcB5j+tk/zHkNeQlXg6PjhTi+VCC88Wul+EiEWpPjO4JyxYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nVNJqRdB; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxfM0inv"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-746d77537f8so397328137.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nVNJqRdB"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-96723c7151eso253141241.2
         for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1784920364; x=1785525164; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=bKZUldDKv+TzgBbtAILMHl5D8Pdp7TEL1kfyLI1s1M8=;
-        b=YxfM0invlrcJAf+6QfeLxg2VsYPDckJxfpusq9Tst6HCO+KcVdLi+3HMwYvlGiuN0x
-         JGjfI9UEEozY4RdnkSsaRMKNpx4a3wZJkP/mv9wnx2Ay8h6ylj9GFXBOeZODv4/RODIK
-         BWCUU0zXbvI0nOXyIjZzOQ62Qj6Wj+yVR9wW34A9YTib2ZU+JxyAGwWz+/IFkungu311
-         7ns3T+4FGIKEMA5VawvWekaRQyPdADM3sKzOYXvtxNyE5f8OExCtoQGlMsEgubAhKtC1
-         42xJS3cb8yZFeeLDPlGwgfYa5hto4WulVo91pl2ZxEwA15xRa9jTZ6sm1OfrbrHiGFgz
-         tQEA==
+        bh=kJEK77u7IozM7I1Qkyt4WdbGNj5dqUW09/KgAdHOw1o=;
+        b=nVNJqRdBonkaWWqT/iLzD/UilPbdTzEq0bHmUKkURU0s5tgYf1dUFD0XS2eRojyKIr
+         iUbc0ORucbRbV7xb/UBgDpkbfYowH7qx1h0Z7eqm0c+a+re0r2TsEUZNALVmvh/Un2Wz
+         hg7b1l+Oj0lLhO8hOvDFfEZl4t12LdsaWmp5ylXYv23TV++BDjlXNqQ6EyYG+Uvmcd8C
+         HdE9VcmYAFEFsHm1cldH2w6s1WysYjhXjNMK9HkodHpZIKw2C3o5YwRfWe3TTaVCLGK+
+         Cw+4mtWiel+sMxr7Iq9zLtASVqn0oAEcHBLOcGRjhgwp08tXpRAHw2dedoBX5OSMzCq0
+         Q2WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1784920364; x=1785525164;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=bKZUldDKv+TzgBbtAILMHl5D8Pdp7TEL1kfyLI1s1M8=;
-        b=Ke2OAL2PFocImHCUh9E97lSKPaG3wPbhXMkMjFDUrSXKthMHFXLj459ESku4eq25FB
-         JYK+94CMj5aDrj9ER/ZdlXQgh1W9v4deSCj9pSiLg5dOV7o8mQGMcFJIrFjJybgpOMEa
-         CPHuwwZSIJGDtB9QVpss+jWABbCZY3GPFnlKZrlvjDCEEcNF63wFc85yT9Yy6Djw18Vl
-         kEbIGs4MguqcR3vXJvdIxsu+2+M3gf1Dgf/DZ8ktUshGv/hhoVEypPs5J1zGzB6K3lIQ
-         VShGT3FHCXFd0usG3wmyHzXAk4oqHrsYrbmEmeBV93cttV2G9+8mVb222jllW/CF9u2L
-         TABw==
-X-Gm-Message-State: AOJu0YyefcNSbrDRe7XUv93xkgTZzpqemdUqABUxpMW3LHjoOSh5cTZL
-	z3AIRQw8Jdf3i6Gpyk3zr6E+VLqLVPjwKXurxFt/2rn3qtGHvWYp8uGcfcyYAs8r
-X-Gm-Gg: AR+sD13FpvZjwyhrL945GYLw/+fam2/sC34jR41Hl1Dckgj6T7+sxcVWBgFpRZ/93pJ
-	C7SFR28h7u2MV62yMiUMLR8hLirRtV7344yPJ/BuLSmWv8Ba/ZYpcBNEluS+qlBytp4r7lxDkGD
-	7UVxuHoVCkTyS0R2Nk7aSj+GR3ARaD7qcOcW+4e5CdM6Q1l0szWcr2xePCvjqAe9oO3T9wxicj6
-	+bF+J0qOlnCxrjr/ZbQiNf6bSMC/pFLk4NuX9T69Wuz1BMZAAvhjbjPOTX59EycBqXxxvcMo8u7
-	7uH3fZMQHYZwfTEvxuqdEzagfZFWy4awHcSGiJk7DZ04dk6N72Ibzfeh3SFIhB69mFko8eoRHLu
-	bZhYmXVZkbbt/auZ0QUL7KlE0On4zzpalJo0LER43rU89wt5I2HX7AkytmTDY3O4eiqtUqlRjsu
-	GtLALG50RAhxLe14wmobSAFBNa+Dd4AFcvnXnVPq2UrJbQUdhRavLwQmPsJ4yw1FI7HQvfRS2F6
-	6jDXYjVoOg=
-X-Received: by 2002:a05:6102:80a9:b0:739:15ef:cdfb with SMTP id ada2fe7eead31-74d5d9c013amr4892185137.5.1784920363858;
-        Fri, 24 Jul 2026 12:12:43 -0700 (PDT)
+        bh=kJEK77u7IozM7I1Qkyt4WdbGNj5dqUW09/KgAdHOw1o=;
+        b=REbATO1Q+n8IpM8AI5XfvQO8IeS9hm2xGqFSCz0GNJHPb6/HSZmwIDo2cdbjRRG8KC
+         ITmcnrrqLEAm7DszALbyAY/b2qBEn7YqqXXhgt1L+aUQrfdka3SH2B4/o8dVg+WUTDiY
+         +vkRlHUOEcMFzhrAZFFSneYlEASzwfsTBl46DNBN821tnAN8i1DDRWljsYbMNbj2UZV7
+         U1WUkGcKv6rquWpPZjtUi3G0M89skaoiu5Rftfkua90UC7t5n1ZxXX4hrso6J3fxUj9Z
+         I1mEcUEii6z49l7txmol9g7mzJrZQLxmtiV/bOXl2xsq3AS+jA4cm5h5+copSRtPA/QA
+         ayyw==
+X-Gm-Message-State: AOJu0YwFY0RdCeZmTnY7eYFUFDEpgxAc7f8WgwzXELaly1qNWZBkgdBc
+	NmldTQAp8gf+pbmCD+iReDURk5BVcCAxZ0Qanks+9RSQc3enxIpx4qYV8M41DfnR
+X-Gm-Gg: AR+sD12IeFjmynXrq/APRMRbi8jiK8gc6CzM2u44tLHNNTk2tALr0ddyUwiugFnihap
+	P5pfqCAk1ZEgKB/HrAsZhaUgvGWYdS0wlgXJ0OY34n2w/FoFUAE9DaSSumEhOV14QjIcE4KY394
+	8LLrIEHhcQzNCH3R1SiJPgbYG2I33OUL/pdcrtgKnWKA7uDuMA/X5xzb4SK1VyMu2YdIpdCSofi
+	ZI3lPaqO51BeGBgXnYSS74NjRfohV390PDiLLuTTrIvUX8XyEaNsiu7+dzouURQn7LdPsXlVc0Q
+	ftXbWY151OH+ZPVlDiVD81LYgO/yazLgq9G4v0B4bGAfhIhJKFSWq7u7Rq3GrON7P74t99+1iuE
+	5KxmI5tWC089dt8Q+csl8xCQWGOTFcHruBPxs0WmSJXEpRNPlWMANDmzAFmnB7BxWF9ndnFF1on
+	EVqlBtUutF/Z4GU6ADFsGeaTaa9lN7dGnRMS5/YU7aaB3ENzaUAadGcibmj/BqAVwAfF/pejl82
+	mVe7MXluUE=
+X-Received: by 2002:a05:6102:3f87:b0:73e:5068:824d with SMTP id ada2fe7eead31-74d5fdd01a9mr4493779137.14.1784920364499;
+        Fri, 24 Jul 2026 12:12:44 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 12:12:43 -0700 (PDT)
+        Fri, 24 Jul 2026 12:12:44 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 08/12] client/mgmt: Add conn-subrate command
-Date: Fri, 24 Jul 2026 15:12:21 -0400
-Message-ID: <20260724191225.1815634-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 09/12] mgmt-tester: Add HIDS recommended SCI parameter tests
+Date: Fri, 24 Jul 2026 15:12:22 -0400
+Message-ID: <20260724191225.1815634-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
 References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
@@ -77,156 +77,143 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add conn-subrate command to load connection subrate parameters
-for a device via MGMT_OP_LOAD_CONN_SUBRATE.
+Add Load Connection Subrate test cases using the recommended
+connection subrate parameters from the HOGP v1.2 specification for
+each of the four HID modes:
 
-Usage:
-  conn-subrate [-t type] <address> <min_interval> <max_interval> \
-               <subrate_min> <subrate_max> <max_latency> \
-               <cont_num> <supv_timeout>
+ - Fast: interval 1.25-5 ms, latency 0, subrate 1-4, cont_num 3
+ - Default: interval 7.5-15 ms, latency 0, subrate 1-4, cont_num 0
+ - Low Power: interval 7.5-15 ms, latency 100, subrate 1-4, cont_num 0
+ - Full Range: interval 1.25-15 ms, latency 0, subrate 1-4, cont_num 1
+
+Supervision timeouts are computed as (1 + Peripheral Latency) *
+Subrate Max * Connection Interval Max * 2 per the spec.
 ---
- client/mgmt.c             | 88 +++++++++++++++++++++++++++++++++++++++
- doc/bluetoothctl-mgmt.rst | 21 ++++++++++
- 2 files changed, 109 insertions(+)
+ tools/mgmt-tester.c | 104 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 104 insertions(+)
 
-diff --git a/client/mgmt.c b/client/mgmt.c
-index 50558a313866..cd2ef80221ad 100644
---- a/client/mgmt.c
-+++ b/client/mgmt.c
-@@ -6038,6 +6038,90 @@ static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
- 								NULL, NULL);
- }
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 15c9254e307e..4b432002d49f 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -4478,6 +4478,98 @@ static const struct generic_data load_conn_subrate_success_1 = {
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+ };
  
-+static void conn_subrate_rsp(uint8_t status, uint16_t len, const void *param,
-+							void *user_data)
-+{
-+	if (status != 0)
-+		error("Load Connection Subrate failed with status 0x%02x (%s)",
-+						status, mgmt_errstr(status));
-+	else
-+		print("Connection Subrate loaded successfully");
-+
-+	bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static const struct option conn_subrate_options[] = {
-+	{ "help",	0, 0, 'h' },
-+	{ "type",	1, 0, 't' },
-+	{ 0, 0, 0, 0 }
++/* HIDS 1.2 recommended SCI parameters (see HOGP v1.2 spec).
++ * Connection intervals are in units of 0.125 ms, supervision timeout in
++ * units of 10 ms.
++ *
++ * Fast mode: interval 1.25-5 ms, latency 0, subrate 1-4, cont_num 3,
++ * timeout >= (1 + 0) * 4 * 5 ms * 2 = 40 ms.
++ */
++static const uint8_t load_conn_subrate_hids_fast[] = {
++	0x01, 0x00,				/* param_count */
++	0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,	/* address */
++	0x01,					/* address type (LE Public) */
++	0x0a, 0x00,				/* min_interval (1.25 ms) */
++	0x28, 0x00,				/* max_interval (5 ms) */
++	0x01, 0x00,				/* subrate_min */
++	0x04, 0x00,				/* subrate_max */
++	0x00, 0x00,				/* max_latency */
++	0x03, 0x00,				/* cont_num */
++	0x04, 0x00,				/* supv_timeout (40 ms) */
++};
++static const struct generic_data load_conn_subrate_hids_fast_test = {
++	.send_opcode = MGMT_OP_LOAD_CONN_SUBRATE,
++	.send_param = load_conn_subrate_hids_fast,
++	.send_len = sizeof(load_conn_subrate_hids_fast),
++	.expect_status = MGMT_STATUS_SUCCESS,
 +};
 +
-+static void cmd_conn_subrate(int argc, char **argv)
-+{
-+	struct mgmt_cp_load_conn_subrate *cp;
-+	uint8_t type = BDADDR_LE_PUBLIC;
-+	int opt;
-+	uint16_t index;
-+	size_t cp_size;
++/* Default mode: interval 7.5-15 ms, latency 0, subrate 1-4, cont_num 0,
++ * timeout >= (1 + 0) * 4 * 15 ms * 2 = 120 ms.
++ */
++static const uint8_t load_conn_subrate_hids_default[] = {
++	0x01, 0x00,				/* param_count */
++	0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,	/* address */
++	0x01,					/* address type (LE Public) */
++	0x3c, 0x00,				/* min_interval (7.5 ms) */
++	0x78, 0x00,				/* max_interval (15 ms) */
++	0x01, 0x00,				/* subrate_min */
++	0x04, 0x00,				/* subrate_max */
++	0x00, 0x00,				/* max_latency */
++	0x00, 0x00,				/* cont_num */
++	0x0c, 0x00,				/* supv_timeout (120 ms) */
++};
++static const struct generic_data load_conn_subrate_hids_default_test = {
++	.send_opcode = MGMT_OP_LOAD_CONN_SUBRATE,
++	.send_param = load_conn_subrate_hids_default,
++	.send_len = sizeof(load_conn_subrate_hids_default),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
 +
-+	while ((opt = getopt_long(argc, argv, "+t:h", conn_subrate_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 't':
-+			type = strtol(optarg, NULL, 0);
-+			break;
-+		case 'h':
-+			bt_shell_usage();
-+			optind = 0;
-+			return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+		default:
-+			bt_shell_usage();
-+			optind = 0;
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
++/* Low Power mode: interval 7.5-15 ms, latency 100, subrate 1-4,
++ * cont_num 0, timeout >= (1 + 100) * 4 * 15 ms * 2 = 12120 ms.
++ */
++static const uint8_t load_conn_subrate_hids_low_power[] = {
++	0x01, 0x00,				/* param_count */
++	0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,	/* address */
++	0x01,					/* address type (LE Public) */
++	0x3c, 0x00,				/* min_interval (7.5 ms) */
++	0x78, 0x00,				/* max_interval (15 ms) */
++	0x01, 0x00,				/* subrate_min */
++	0x04, 0x00,				/* subrate_max */
++	0x64, 0x00,				/* max_latency (100) */
++	0x00, 0x00,				/* cont_num */
++	0xbc, 0x04,				/* supv_timeout (12120 ms) */
++};
++static const struct generic_data load_conn_subrate_hids_low_power_test = {
++	.send_opcode = MGMT_OP_LOAD_CONN_SUBRATE,
++	.send_param = load_conn_subrate_hids_low_power,
++	.send_len = sizeof(load_conn_subrate_hids_low_power),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
 +
-+	argc -= optind;
-+	argv += optind;
-+	optind = 0;
++/* Full Range mode: interval 1.25-15 ms, latency 0, subrate 1-4,
++ * cont_num 1, timeout >= (1 + 0) * 4 * 15 ms * 2 = 120 ms.
++ */
++static const uint8_t load_conn_subrate_hids_full_range[] = {
++	0x01, 0x00,				/* param_count */
++	0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,	/* address */
++	0x01,					/* address type (LE Public) */
++	0x0a, 0x00,				/* min_interval (1.25 ms) */
++	0x78, 0x00,				/* max_interval (15 ms) */
++	0x01, 0x00,				/* subrate_min */
++	0x04, 0x00,				/* subrate_max */
++	0x00, 0x00,				/* max_latency */
++	0x01, 0x00,				/* cont_num */
++	0x0c, 0x00,				/* supv_timeout (120 ms) */
++};
++static const struct generic_data load_conn_subrate_hids_full_range_test = {
++	.send_opcode = MGMT_OP_LOAD_CONN_SUBRATE,
++	.send_param = load_conn_subrate_hids_full_range,
++	.send_len = sizeof(load_conn_subrate_hids_full_range),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
 +
-+	if (argc < 8) {
-+		bt_shell_usage();
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	index = mgmt_index;
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	cp_size = sizeof(*cp) + sizeof(struct mgmt_conn_subrate);
-+	cp = malloc0(cp_size);
-+	if (!cp) {
-+		error("Unable to allocate memory");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	cp->param_count = cpu_to_le16(1);
-+	str2ba(argv[0], &cp->params[0].addr.bdaddr);
-+	cp->params[0].addr.type = type;
-+	cp->params[0].min_interval = cpu_to_le16(strtol(argv[1], NULL, 0));
-+	cp->params[0].max_interval = cpu_to_le16(strtol(argv[2], NULL, 0));
-+	cp->params[0].subrate_min = cpu_to_le16(strtol(argv[3], NULL, 0));
-+	cp->params[0].subrate_max = cpu_to_le16(strtol(argv[4], NULL, 0));
-+	cp->params[0].max_latency = cpu_to_le16(strtol(argv[5], NULL, 0));
-+	cp->params[0].cont_num = cpu_to_le16(strtol(argv[6], NULL, 0));
-+	cp->params[0].supv_timeout = cpu_to_le16(strtol(argv[7], NULL, 0));
-+
-+	if (mgmt_send(mgmt, MGMT_OP_LOAD_CONN_SUBRATE, index, cp_size, cp,
-+					conn_subrate_rsp, NULL, NULL) == 0) {
-+		error("Unable to send load connection subrate command");
-+		free(cp);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	free(cp);
-+}
-+
- static void cmd_select(int argc, char **argv)
- {
- 	mgmt_cancel_all(mgmt);
-@@ -6233,6 +6317,10 @@ static const struct bt_shell_menu mgmt_menu = {
- 		cmd_get_flags,		"Get device flags"		},
- 	{ "set-flags",		"[-f flags] [-t type] <address>",
- 		cmd_set_flags,		"Set device flags"		},
-+	{ "conn-subrate",	"[-t type] <address> <min_interval> "
-+				"<max_interval> <subrate_min> <subrate_max> "
-+				"<max_latency> <cont_num> <supv_timeout>",
-+		cmd_conn_subrate,	"Load Connection Subrate"	},
- 	{ "hci-cmd",		"<opcode> [event] [timeout] [param...]",
- 		cmd_hci_cmd,	"Send HCI Command and wait for Event"	},
- 	{} },
-diff --git a/doc/bluetoothctl-mgmt.rst b/doc/bluetoothctl-mgmt.rst
-index 646c2dcb4365..91406041c3cb 100644
---- a/doc/bluetoothctl-mgmt.rst
-+++ b/doc/bluetoothctl-mgmt.rst
-@@ -1293,6 +1293,27 @@ Set device flags
- :Example Clear all flags for LE public device:
- 	| **> set-flags -f 0x00 -t le_public 11:22:33:44:55:66**
+ static const uint8_t add_device_nval_1[] = {
+ 					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
+ 					0x00,
+@@ -13870,6 +13962,18 @@ int main(int argc, char *argv[])
+ 	test_bredrle62("Load Connection Subrate - Success 1",
+ 				&load_conn_subrate_success_1,
+ 				NULL, test_command_generic);
++	test_bredrle62("Load Connection Subrate - HIDS Fast",
++				&load_conn_subrate_hids_fast_test,
++				NULL, test_command_generic);
++	test_bredrle62("Load Connection Subrate - HIDS Default",
++				&load_conn_subrate_hids_default_test,
++				NULL, test_command_generic);
++	test_bredrle62("Load Connection Subrate - HIDS Low Power",
++				&load_conn_subrate_hids_low_power_test,
++				NULL, test_command_generic);
++	test_bredrle62("Load Connection Subrate - HIDS Full Range",
++				&load_conn_subrate_hids_full_range_test,
++				NULL, test_command_generic);
  
-+conn-subrate
-+------------
-+
-+Load Connection Subrate
-+
-+:Usage: **> conn-subrate [-t type] <address> <min_interval> <max_interval>
-+	<subrate_min> <subrate_max> <max_latency> <cont_num> <supv_timeout>**
-+:[-t type]: Address type - 1 for LE Public, 2 for LE Random
-+:<address>: Bluetooth address of the device
-+:<min_interval>: Minimum connection interval (units of 0.125 ms)
-+:<max_interval>: Maximum connection interval (units of 0.125 ms)
-+:<subrate_min>: Minimum subrate factor
-+:<subrate_max>: Maximum subrate factor
-+:<max_latency>: Maximum peripheral latency (subrated connection events)
-+:<cont_num>: Continuation number
-+:<supv_timeout>: Supervision timeout (units of 10 ms)
-+:Example Load subrate for LE public address device:
-+	| **> conn-subrate -t 1 00:11:22:33:44:55 8 3200 1 4 0 2 200**
-+:Example Load subrate for LE random address device:
-+	| **> conn-subrate -t 2 AA:BB:CC:DD:EE:FF 16 1600 2 8 0 4 100**
-+
- RESOURCES
- =========
- 
+ 	test_bredrle("Add Device - Invalid Params 1",
+ 				&add_device_fail_1,
 -- 
 2.54.0
 
