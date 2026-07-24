@@ -1,121 +1,120 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9CA18AE3
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 00:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A87E3264C2;
+	Fri, 24 Jul 2026 04:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784851279; cv=none; b=G1VOIdACkmACxvRWe1yQWeIXBj0xQ9EuSJvZP1RuP1D45KF++LZNlzWSdVFnY4OgkT+IjaFv/Q05SWXkuhZxc0UHuaaKqVqqohuiYqcXxyq57+tACnmURj9amDiPrBCpOem0cfoEBisgVZKHW4T1TIcy7NgXSHiXiDHigSo+px0=
+	t=1784869083; cv=none; b=rIUgdE4hctFmKeANe6LF+sQ7mfiqD4vYKNEyTrO8iUX6NW5s2l+N8Sjq2YK3sobyG6FB5buuYFSFcPCkN+UFjiOA7gUeR5JBnSASPmtTLTtHYBfw9L5/vMvstkarKpqewjVB0GUXf+Y5qfy87PYocKJlBk//4jAUBUvmfz6kFBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784851279; c=relaxed/simple;
-	bh=8ZMp6tVXob0AiNHs/Byci2tQIPbyu46/rnF/G3Sn4r8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SjDhovY10Tg1AISES/dVdEOWsVZu704DPl+NKOEXe/3UZTzb8BsmN23U8+xsU9FFuh/PRDiDR6RuXPROw2jISosfmmbBeCpg7c63cjFEY0X18cbRF0+IgqLPP3H96UuJ+hzEaFdstxq2VJ4KswVo8Cax7Y8v1ZGQFwyyXgqIpQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pjmk29Lc; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784869083; c=relaxed/simple;
+	bh=muNGbVSE63ZwLx6JTwUqy7Oq+2WVsxviAG63JXRC72A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T7JZDOMZCMUn/07GDAp4Gf+rx8XYrFq+zZXLXu+eG7PjACNkI6luzqeA4pmTjmZnILpG+AXXBt2W4H3WeOZoumrANhhbF9yF01LEZdw5V6qwQFF/EtMqokhpQYbvx+KuFpci6bUpXRto2GRm/uP0xHDRsT5k4g25g2th590ndqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dCJEMHRn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pjmk29Lc"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-92e5c92c389so97629185a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2026 17:01:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784851277; x=1785456077; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=zFWuZ86LJsEfIN+bMJTKLHl+ihxz5c9uq70AAOfLZ2I=;
-        b=pjmk29Lc1uc0ulkmkrFOG4JOvOgIJvfaEkVWE/vVdYs6baafuEa6moeSTl3xtCpIkF
-         oTeWj3n7hkrGYL/ojGt5CeHTgOXLHz3DRVGw63/dQlCzEji594Q1rumPl3ugL7+Q6ANA
-         vg78p0oQ5QYxTLxl+rwkMYQwjuIF/eZjbN5PZqNdyDL9pG5vOTHe39+9bxN5mBDozpOU
-         BFxcxnPnvG89aNasf/WPRiL0hF0wSzna3sJZaEbymUBa4XdQRx/WBhdrt4agGpyB08dK
-         iS4p2DrH50NC1IBRdSVEDpJ8YlGGQ3uCWKLlmdlFJxF17DSaXtTxEBRpYUdQLB+7zEzY
-         6CRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784851277; x=1785456077;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=zFWuZ86LJsEfIN+bMJTKLHl+ihxz5c9uq70AAOfLZ2I=;
-        b=KyxUeXbICp45DljjWRdRRbk2aQLIhWv611RyGciESfwBT7Y1OKJLPZeH7+/Y+gLgri
-         3gSgY3Vre9aWidRyUBRRR6YAaBOfqQIUJyCUWmiVLVgfPOmmpPOxWupyC4cGt8kMjYcM
-         i9n2a1YO4OZe+Cc1p0JMbkExrc/0S5oWxfKgrvQuBZ7umoBWifygvPxjtP/XBHS+/5bI
-         BVeYKyxaYdUH/1QAGlOjQ4hGHBHjrABP4yxgJkoBHxt8IFLyBwllgjhvFkdo8h38VYzV
-         r3qEaO/NhUE6u9KKB1JqaTbdthQS74GZnUFZXCo8LIQU3o3YNNjD1ChtJRvQP/pjzBRc
-         vvfQ==
-X-Gm-Message-State: AOJu0YzzyEQtdifxLVrZnBaen9pFngzQMPCi+ZqLVwuemomYnD/KB39g
-	aXadoayqnwYB2M9F4t5GEGmLuKRCSaTNkBwqQAqwc4ZK0ooBGIvN0aKAZIgh3Q==
-X-Gm-Gg: AR+sD13zOBZs4Ka5Y+EUhCaBFhKzuPzk7oD7JaS4/YdA9dpnFtMKl/uEVJCrU7f7QqE
-	CdC3JUbd/zlyOPzWQRWZdw5WUkLF0Ws7VCSPmiGInVGAzBEggZHmVZLdJqKWk8uty+9dYhgLIbd
-	JJ5w1eRFbod7pYyQDf4mhwE9ZqaErPH/8S/Am+eOzzhSesfJs+t9h1qF130R9EwYHbLJaOz/Nyz
-	usLqSB/3n/Gr5TpoAnqZzaZaW4CfzCk0nbOlZ/+fjbLufHC5AOqn7jF6YcX5pu86SU/ak1O77dW
-	S+NJQ8NUrNFWdhe/bHm6ToTfhh3OmidKQT2G/1td/WMvhvSm614UsUrtuuEeV0tk0NEdjPGUsOx
-	QHtR577ucq9KgqY0SX01UY5EGL31SzGK7D43zfEYtqhdaUOAw0npecb0q4gpzm/en2kjXbtOfro
-	yyN9EVPfQCWz0nmmAvqlwH
-X-Received: by 2002:a05:620a:7117:b0:92e:9cb3:3f71 with SMTP id af79cd13be357-93103895366mr602401585a.36.1784851277361;
-        Thu, 23 Jul 2026 17:01:17 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.122.146])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-930f68a8b16sm534609285a.12.2026.07.23.17.01.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2026 17:01:16 -0700 (PDT)
-Message-ID: <6a62ab4c.5cacff2a.cfceb.0419@mx.google.com>
-Date: Thu, 23 Jul 2026 17:01:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2983884683554318127=="
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dCJEMHRn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0pO6hUB0iIxD4TyXUYlqc7LrnsyhEtYUcjdZrQrosCo=; b=dCJEMHRn3xYqVAfuYYkzbIPIp3
+	Inq2NxvS38Srj9Jj4S6ZY+acCFPe1cObOEJRiTmc+Ezv/JVCiqJtb50wgxpJaBky5Nu/S0t47ipvB
+	GO715i4MWZCMen5TGlZJM+oZYzf5tt+pLPElmDgc+RediL8nEVrUwocrewR2SlAwypnL/5SzFO3c7
+	hbasNQagNIq0oEqoKbmWsN8LzbUg4tQAcYUct//pUr5JQCGXI0GhKjzCVct4bqY6ZFn/o2fpDIOyn
+	WM1czYp32/cejCQe5997e7Om4NX3n1Iz1mj01qp/3S6PZafVrfY6vZWI0M0Di/xGIL4vifq4/n0q2
+	RPRVg4gQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wn7yp-0000000FTwy-42lv;
+	Fri, 24 Jul 2026 04:57:51 +0000
+Date: Thu, 23 Jul 2026 21:57:51 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	daniel@makrotopia.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v8 5/9] block: implement NVMEM provider
+Message-ID: <amLwz6WuHYUwKKJo@infradead.org>
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+ <20260703-block-as-nvmem-v8-5-98ae32bfc49a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, qwe.aldo@gmail.com
-Subject: RE: [v2] Bluetooth: SCO: give the socket its own sco_conn reference
-In-Reply-To: <20260723232902.792805-1-qwe.aldo@gmail.com>
-References: <20260723232902.792805-1-qwe.aldo@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260703-block-as-nvmem-v8-5-98ae32bfc49a@oss.qualcomm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
---===============2983884683554318127==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Jul 03, 2026 at 03:45:18PM +0200, Loic Poulain wrote:
+> +	  Allow block devices (or partitions) to act as NVMEM providers,
 
-This is automated email and please do not reply to this email!
+Based on the code below I don't think you actually support partitions.
 
-Dear submitter,
+> +static int blk_nvmem_reg_read(void *priv, unsigned int from, void *val, size_t bytes)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1133573
+Overly long line.
 
----Test result---
+> +{
+> +	dev_t devt = (dev_t)(uintptr_t)priv;
+> +	size_t bytes_left = bytes;
+> +	loff_t pos = from;
+> +	int ret = 0;
+> +
+> +	struct file *bdev_file __free(fput) =
+> +		bdev_file_open_by_dev(devt, BLK_OPEN_READ, NULL, NULL);
 
-Test Summary:
-CheckPatch                    PASS      0.75 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.15 seconds
-BuildKernel                   PASS      25.23 seconds
-CheckAllWarning               PASS      28.01 seconds
-CheckSparse                   PASS      26.67 seconds
-BuildKernel32                 PASS      24.81 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      461.05 seconds
-TestRunner_sco-tester         PASS      31.22 seconds
-IncrementalBuild              PASS      24.43 seconds
+Please try to avoid all that magic autfree stuff that makes the code
+impossible to read about.
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+> +	if (IS_ERR(bdev_file))
+> +		return PTR_ERR(bdev_file);
+> +
+> +	while (bytes_left) {
 
+.. and just use __kernel_read instead of badly reimplementing it.
 
-https://github.com/bluez/bluetooth-next/pull/486
+> +	config.name = dev_name(dev);
+> +	config.owner = THIS_MODULE;
+> +	config.priv = (void *)(uintptr_t)dev->devt;
 
----
-Regards,
-Linux Bluetooth
+Why is this storing the dev_t and not the block device itself?
 
+> +
+> +		blk_nvmem_add(disk->part0);
 
---===============2983884683554318127==--
+Hmm, and you're always doing it for the whole device.  So the intefaces
+really should be based on a gendisk, not a block_device.
+
+Also once you register the whole devices as nvmem provider, we really
+should keep it from being used a block device, shouldn't we?
