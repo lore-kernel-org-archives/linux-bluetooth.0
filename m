@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DBC3ADB97;
-	Fri, 24 Jul 2026 20:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF813A1E67;
+	Fri, 24 Jul 2026 20:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784924528; cv=pass; b=U0W9u8zcF6o7+twTE/ERvxv8QTmsqF+rVpzp6u9gNlirdLGmLcjkH+f1iCNtotoWRnvo0uf2aC4Ykp40k6F7FMMUKEh+CPn8mJUaO8ecBz3O7L1BDxRsUhcKXI+Vrn/XGs/S1GohII33edfwquvSVpVJqDBIH64A1lbu7fdL7xU=
+	t=1784924530; cv=pass; b=lDCpWOd/5JG0AGcFXNim1AOoKTxn5XZ1tokONeGGdj2vGfEtQrFtd/oZUlTECXI9CT32bEXzUpuwfh7H1VVaxxzr4AgLxKGcaf8jmbqd87PwuNxpjctfwTGIdxMtVGsMTYV67VyMy2baOHR6lWPmT9PTUU6pOHW8v7HOYfsBO9o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784924528; c=relaxed/simple;
-	bh=n/+mhAVUxazbWJa6Bud9xSojL6eW7r1MVvaLMyusoXo=;
+	s=arc-20240116; t=1784924530; c=relaxed/simple;
+	bh=tcMBm2dVOcDlfzrNh0HhverVF3HbHIOncLJSsVeRL2U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rR9SVqSYH2BYPbIEvLAzDkRCmS+4d7/C1mZVGVL9ggwdB4xGRQnq55xwxzTW5OAxwEb/b/MHyuFH1zavYqb9YUCUEUEEW/ixgwpcg21YhSD/FMIDfYwtpCbjF7T/0qiyi9cuBLw2RMY4W/VNWJ28eHvut806lQjRq2FA3XDR2pg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Lw0rC9iw; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=mcPOed/49SbuSsjdffsf0R6vIx6WJ1Ngqri70aBMIBs9l1xl4ggD6v16l53g5OXplOCtQwIDtH/vZPyEKrQrAffEBMVFyY9xcstW0lUfrCdI1XpP00l1vMZ/Arl0BkfQzsTDTeDTuSeFuPn3BISG6nLLx+NFiy1ni4lyCyTm2Wo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=U6CSNPQy; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Lw0rC9iw"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="U6CSNPQy"
 Received: from monolith.lan (unknown [89.37.63.136])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KCZ4VM6zyPm;
-	Fri, 24 Jul 2026 23:22:02 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KCd2DLmzyVm;
+	Fri, 24 Jul 2026 23:22:05 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784924524;
+	t=1784924526;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+VDcVRE0XFMxw0TsZdeSr2A6qJbaBYCqcIPzVhQA98U=;
-	b=Lw0rC9iwdvdvtYRWn5fS2PzbbUDZva7tfC4ogJYzGVsNZ5PL7wzYi8ae4bh5eLRLRLQsUB
-	+8I0rivsHk68F5SM9R2fYUnPNO0qj27M1Cqkg4zfm73fzBtCcONkXr+l75EappEtsfctyg
-	D+7PzgPyYhCAEItWuDJLfDr6YSGq+Ow=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924524;
-	b=Le85S1U/JM3a1lawV+InZFpFN9eH0j26anhNCBo4enp3bkrWUs1U7xqkVLVSMTnZAlEu/n
-	U7AeNI8vZ/cz2mnj/BV+qo3PKgKK+py9z3ONrmjXe0DeAGe2kBVqS7A3tS30n2bsw6LW7v
-	Ya+H5WVwlEFQeSJSvjkPaWtzL6bc5/A=
+	bh=6NcDNrmp9hpCK1prRMPvKQzVwRCfKNPIjYJwflZJUUs=;
+	b=U6CSNPQy0CFQVatJE+rRzPpPKkjYqKG/qjcgDsckKgsDitffgcaU292NutyxDw3YzenQ9d
+	DkIOmwiOAWxUVPt52gfVwKR3MuHD1fImf4PnYB3s5RK955FY6r1X/+XMWlvXnzhBC2LKjZ
+	8tSedA7eJKYrJGBVc3k+7A3TEC3C8jE=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924526;
+	b=k0jf+7NkgZu0Lzd7NrLD/3NygnZyssrsfbInbnPtZfcOif8nFaor4addTwAXExDFT7owME
+	DbAyvwBoZeo1vFno65PfJ4OIuk3le0z7jhntDMn1jMSGoMOnLgYfzVyVI8vwGd6NHckJZd
+	Miaurs9mbLZ1/o6XFglA44RtuE0pFsE=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784924524;
+	s=meesny; t=1784924526;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+VDcVRE0XFMxw0TsZdeSr2A6qJbaBYCqcIPzVhQA98U=;
-	b=rmCbBI5IbGnLe6EyrT03KbyxJJxE55+vDHLMaPv3Qg8UjW+uoixTFfaIQ6c3fAnsTI57XJ
-	zliNbpynDVP5yY4xXaJSDN/nRWe/Xf2A8DiGk2hx9wqmTj5CloxKHatG77VuCqUrTQg0eB
-	h5HihkQbF7gh1yAl7KE1F2izOHun8uc=
+	bh=6NcDNrmp9hpCK1prRMPvKQzVwRCfKNPIjYJwflZJUUs=;
+	b=uvA5zAYzXaxNoGI8MfGkV5McasevNHS3BSAZakcUVmNGt+yJn/6ono+dJ/vQpNTXb/DnWx
+	10dja/8D57xkKtZvcaxfq4xsDlo9gtmfnY8pSTQLl90C6kEi4szADaTb+p/Llq9aX0fIcA
+	i3FO4gSaG4CpUWhCXEcJN5dnRUXszOY=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -56,9 +56,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 10/11] Bluetooth: ISO: fix refcounting of iso_conn
-Date: Fri, 24 Jul 2026 23:20:33 +0300
-Message-ID: <f6f26dd792edde315f27480f61f36cf9cc0bca0d.1784923689.git.pav@iki.fi>
+Subject: [PATCH 11/11] Bluetooth: ISO: fix race of kfree vs kref_get_unless_zero
+Date: Fri, 24 Jul 2026 23:20:34 +0300
+Message-ID: <b84fd01c20f0d2975c7817da345a6937d67cf314.1784923689.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1784923689.git.pav@iki.fi>
 References: <cover.1784923689.git.pav@iki.fi>
@@ -68,134 +68,226 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-iso_conn_del() and iso_chan_del() have a race that results to double-put
-of iso_conn:
+hci_conn::iso_data is accessed and modified without lock or RCU.
+This leads to a race
 
-    [Task hdev->workqueue]         [Task 2]
-    iso_conn_del                   iso_chan_del
-      iso_conn_hold_unless_zero      iso_conn_lock
-      iso_conn_lock                  conn->sk = NULL
-                                     iso_conn_unlock
-      sk = iso_sock_hold(conn)  <---------´
-      if (!sk) iso_conn_put          iso_conn_put
-      iso_conn_put /* UAF */
+    [Task hdev->workqueue]                 	[Task 2]
+    iso_recv                                    iso_conn_put(conn)
+      conn = LOAD hcon->iso_data                  iso_conn_free(conn)
+      iso_conn_hold_unless_zero(conn)               hcon->iso_data = NULL
+                                                    kfree(conn)
+        kref_get_unless_zero(&conn->ref) /* UAF */
 
-The extra put for !sk in iso_conn_del() is currently required since
-failing iso_chan_add() may leave iso_conn not associated with any sk.
+and also to races in iso_conn_add() vs. iso_conn_free().
 
-Fix by having iso_pi(sk)->conn own refcount when non-NULL, so
-iso_conn_del does not need to put it.  Adjust the iso_conn_add()
-refcounting so that conn is put if it does not get associated with an
-sk.
+Fix by adding spinlock hci_conn::proto_lock and using it to guard
+hci_conn::iso_data.
 
 Fixes: dc26097bdb86 ("Bluetooth: ISO: Use kref to track lifetime of iso_conn")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/iso.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ include/net/bluetooth/hci_core.h |  4 +-
+ net/bluetooth/hci_conn.c         |  2 +
+ net/bluetooth/iso.c              | 64 ++++++++++++++++++++++++++------
+ 3 files changed, 58 insertions(+), 12 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e7133ff87fbf..3df59849dcbe 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -767,9 +767,11 @@ struct hci_conn {
+ 	struct dentry	*debugfs;
+ 
+ 	struct hci_dev	*hdev;
++
++	spinlock_t	proto_lock; /* lock guarding protocol data */
+ 	void		*l2cap_data;
+ 	void		*sco_data;
+-	void		*iso_data;
++	void		*iso_data __guarded_by(&proto_lock);
+ 
+ 	struct list_head link_list;
+ 	struct hci_conn	*parent;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1966cd153d97..ebb04badf10c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1123,6 +1123,8 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
+ 	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
+ 	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
+ 
++	spin_lock_init(&conn->proto_lock);
++
+ 	atomic_set(&conn->refcnt, 0);
+ 
+ 	hci_dev_hold(hdev);
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index bfd39baa8503..30de99ba4b30 100644
+index 30de99ba4b30..a461c8a4efed 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -108,9 +108,6 @@ static void iso_conn_free(struct kref *ref)
- 
+@@ -109,9 +109,16 @@ static void iso_conn_free(struct kref *ref)
  	BT_DBG("conn %p", conn);
  
--	if (conn->sk)
--		iso_pi(conn->sk)->conn = NULL;
--
  	if (conn->hcon) {
- 		conn->hcon->iso_data = NULL;
- 		if (!test_and_set_bit(ISO_CONN_DROPPED, conn->flags))
-@@ -145,6 +142,14 @@ static struct iso_conn *iso_conn_hold_unless_zero(struct iso_conn *conn)
- 	return conn;
+-		conn->hcon->iso_data = NULL;
+-		if (!test_and_set_bit(ISO_CONN_DROPPED, conn->flags))
+-			hci_conn_drop(conn->hcon);
++		spin_lock(&conn->hcon->proto_lock);
++
++		/* Check we are not racing with iso_conn_add */
++		if (conn->hcon->iso_data == conn) {
++			conn->hcon->iso_data = NULL;
++			if (!test_and_set_bit(ISO_CONN_DROPPED, conn->flags))
++				hci_conn_drop(conn->hcon);
++		}
++
++		spin_unlock(&conn->hcon->proto_lock);
+ 	}
+ 
+ 	kfree_skb(conn->rx_skb);
+@@ -126,7 +133,21 @@ static void iso_conn_put(struct iso_conn *conn)
+ 
+ 	BT_DBG("conn %p refcnt %d", conn, kref_read(&conn->ref));
+ 
++	/* The following race vs. iso_conn_del() is possible:
++	 *
++	 * 1. conn->hcon != NULL here
++	 * 2. kref_put puts the last reference
++	 * 3. concurrent iso_conn_del() gets iso_conn_hold_unless_zero() -> NULL
++	 *    and returns immediately, so conn->hcon is not cleared
++	 * 4. iso_conn_free() dereferences conn->hcon
++	 *
++	 * To avoid UAF in step 4, take RCU before decrementing the refcount.
++	 */
++	rcu_read_lock();
++
+ 	kref_put(&conn->ref, iso_conn_free);
++
++	rcu_read_unlock();
  }
  
-+static struct iso_conn *iso_conn_hold(struct iso_conn *conn)
-+{
-+	BT_DBG("conn %p refcnt %u", conn, kref_read(&conn->ref));
-+
-+	kref_get(&conn->ref);
-+	return conn;
-+}
-+
- static struct sock *iso_sock_hold(struct iso_conn *conn)
+ static struct iso_conn *iso_conn_hold_unless_zero(struct iso_conn *conn)
+@@ -205,22 +226,28 @@ static void iso_sock_disable_timer(struct sock *sk)
+ 
+ /* ---- ISO connections ---- */
+ static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
++	__must_hold(&hcon->hdev->lock)
  {
- 	if (!conn || !bt_sock_linked(&iso_sk_list, conn->sk))
-@@ -210,7 +215,6 @@ static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
+-	struct iso_conn *conn = hcon->iso_data;
++	struct iso_conn *conn;
+ 
+-	conn = iso_conn_hold_unless_zero(conn);
++	spin_lock(&hcon->proto_lock);
++
++	conn = iso_conn_hold_unless_zero(hcon->iso_data);
+ 	if (conn) {
+ 		if (!conn->hcon) {
+ 			iso_conn_lock(conn);
  			conn->hcon = hcon;
  			iso_conn_unlock(conn);
  		}
--		iso_conn_put(conn);
++		spin_unlock(&hcon->proto_lock);
  		return conn;
  	}
  
-@@ -279,10 +283,8 @@ static void iso_conn_del(struct hci_conn *hcon, int err)
- 	sk = iso_sock_hold(conn);
+-	conn = kzalloc_obj(*conn);
+-	if (!conn)
++	conn = kzalloc_obj(*conn, GFP_ATOMIC);
++	if (!conn) {
++		spin_unlock(&hcon->proto_lock);
+ 		return NULL;
++	}
+ 
+ 	kref_init(&conn->ref);
+ 	spin_lock_init(&conn->lock);
+@@ -229,6 +256,8 @@ static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
+ 	conn->hcon = hcon;
+ 	conn->tx_sn = 0;
+ 
++	spin_unlock(&hcon->proto_lock);
++
+ 	BT_DBG("hcon %p conn %p", hcon, conn);
+ 
+ 	return conn;
+@@ -269,10 +298,12 @@ static void iso_chan_del(struct sock *sk, int err)
+ static void iso_conn_del(struct hci_conn *hcon, int err)
+ 	__must_hold(&hcon->hdev->lock)
+ {
+-	struct iso_conn *conn = hcon->iso_data;
++	struct iso_conn *conn;
+ 	struct sock *sk;
+ 
+-	conn = iso_conn_hold_unless_zero(conn);
++	spin_lock(&hcon->proto_lock);
++	conn = iso_conn_hold_unless_zero(hcon->iso_data);
++	spin_unlock(&hcon->proto_lock);
+ 	if (!conn)
+ 		return;
+ 
+@@ -296,10 +327,12 @@ static void iso_conn_del(struct hci_conn *hcon, int err)
+ 
+ done:
+ 	/* No sk access to conn->hcon any more (lock_sock + hdev->lock) */
++	spin_lock(&hcon->proto_lock);
+ 	iso_conn_lock(conn);
+ 	conn->hcon = NULL;
+ 	hcon->iso_data = NULL;
  	iso_conn_unlock(conn);
++	spin_unlock(&hcon->proto_lock);
  
--	if (!sk) {
--		iso_conn_put(conn);
-+	if (!sk)
- 		goto done;
--	}
- 
- 	iso_sock_disable_timer(sk);
- 
-@@ -320,7 +322,7 @@ static int __iso_chan_add(struct iso_conn *conn, struct sock *sk,
- 		return -EIO;
+ 	iso_conn_put(conn);
+ }
+@@ -421,6 +454,8 @@ static int iso_connect_bis(struct sock *sk)
+ 			iso_pi(sk)->bc_sid = hcon->sid;
  	}
  
--	iso_pi(sk)->conn = conn;
-+	iso_pi(sk)->conn = iso_conn_hold(conn);
- 	conn->sk = sk;
- 	clear_bit(ISO_CONN_DROPPED, conn->flags);
- 
-@@ -427,6 +429,7 @@ static int iso_connect_bis(struct sock *sk)
++	lockdep_assert_held(&hcon->hdev->lock);
++
+ 	conn = iso_conn_add(hcon);
+ 	if (!conn) {
+ 		hci_conn_drop(hcon);
+@@ -524,6 +559,8 @@ static int iso_connect_cis(struct sock *sk)
+ 		}
  	}
  
- 	err = iso_chan_add(conn, sk, NULL);
-+	iso_conn_put(conn);
- 	if (err)
++	lockdep_assert_held(&hcon->hdev->lock);
++
+ 	conn = iso_conn_add(hcon);
+ 	if (!conn) {
+ 		hci_conn_drop(hcon);
+@@ -855,8 +892,8 @@ static void iso_sock_disconn(struct sock *sk)
+ 		 */
+ 		if (bis_sk) {
+ 			hcon->state = BT_OPEN;
+-			hcon->iso_data = NULL;
+-			iso_pi(sk)->conn->hcon = NULL;
++			set_bit(ISO_CONN_DROPPED, iso_pi(sk)->conn->flags);
++
+ 			iso_sock_clear_timer(sk);
+ 			iso_chan_del(sk, bt_to_errno(hcon->abort_reason));
+ 			sock_put(bis_sk);
+@@ -1306,6 +1343,8 @@ static int iso_listen_bis(struct sock *sk)
  		goto unlock;
- 
-@@ -529,6 +532,7 @@ static int iso_connect_cis(struct sock *sk)
  	}
  
- 	err = iso_chan_add(conn, sk, NULL);
-+	iso_conn_put(conn);
- 	if (err)
- 		goto unlock;
- 
-@@ -1310,10 +1314,9 @@ static int iso_listen_bis(struct sock *sk)
++	lockdep_assert_held(&hcon->hdev->lock);
++
+ 	conn = iso_conn_add(hcon);
+ 	if (!conn) {
+ 		hci_conn_drop(hcon);
+@@ -2591,7 +2630,10 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
+ 		return -ENOENT;
  	}
  
- 	err = iso_chan_add(conn, sk, NULL);
--	if (err) {
--		hci_conn_drop(hcon);
-+	iso_conn_put(conn);
-+	if (err)
- 		goto unlock;
--	}
++	spin_lock(&hcon->proto_lock);
+ 	conn = iso_conn_hold_unless_zero(hcon->iso_data);
++	spin_unlock(&hcon->proto_lock);
++
+ 	hcon = NULL;
  
- unlock:
- 	release_sock(sk);
-@@ -2551,8 +2554,10 @@ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
- 		struct iso_conn *conn;
- 
- 		conn = iso_conn_add(hcon);
--		if (conn)
-+		if (conn) {
- 			iso_conn_ready(conn);
-+			iso_conn_put(conn);
-+		}
- 	} else {
- 		iso_conn_del(hcon, bt_to_errno(status));
- 	}
+ 	hci_dev_unlock(hdev);
 -- 
 2.55.0
 
