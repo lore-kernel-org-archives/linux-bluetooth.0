@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B563644DB69
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E75D44C665;
+	Fri, 24 Jul 2026 19:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784919669; cv=none; b=PYIN7hkQWf3uNzRq/3fCTdLlbP7LbKFoHCii2hDDEJJvfzL/JYWlNUH+5nlbltKv5JSzPPXP0oFeGBtKJGeFDulNEtXDKWre1Jf5PLySryFCdRWgoNBHC7alBvnaI+Jk7cCTOscIV29S956IlUMy6mDOS7fvZo9kB3Z6tUyOirk=
+	t=1784919670; cv=none; b=p2DfOm4cSgdrO3EXGQcG717ZM4vJwCQz4qtAzcA4XBxoeo27hFEHTdTF/OEbjscpGbErs9JLPzBkXPZQEIlOw0GkCEFD8gH2VMKQbUhGbGpI4AcLRK1b083tpiM7YUB52Bn+yGdS1IDbEMHntJLQ//rHhBUZ1tZCEGMkmISiyIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784919669; c=relaxed/simple;
-	bh=l2nzx0+Z6hzla6FcIPtHvH1T+lr73sZYBUkC8732Yp0=;
+	s=arc-20240116; t=1784919670; c=relaxed/simple;
+	bh=PP1zfFatwH9Eoxl5Bp/t+XKX+QccPA2KtKAMrbtIwPk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MiVcNcBzSp7QCcfFw7Z6spiU6FL5PrWPVcHNkT3RkR4Pb6TFfdBMFNNXNmc+uv1zA0iwxVBPF4eUqGgxr+/EYbgCRviNBv2G2hIjA+aYgGRl2DgxhS3He4u3/+5aqpNPK14euMpE/JHc576jB9WEuHcMacMCrzuRliU8v3QMsw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1BdB6dp; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=bNuZEiYyOi9w8RCW8S13fcEAn3EwMLatVbLfw/kucqnl5YpVvQBRgXx6I6qhgpnD87z02LD0KvxwIn6iz0lvmyH5Gf7JCsVjwBpvOGd6iQh+e4oP3ZQVegjT1zLIEsJ1sPdMNspx72GNoMb3e3YDtT4i9kx1BaIL2X2JZQVu+RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EkY8wNFM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1BdB6dp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B09E1F00A3D;
-	Fri, 24 Jul 2026 19:00:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EkY8wNFM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF581F0155B;
+	Fri, 24 Jul 2026 19:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784919652;
-	bh=O3zk6dl/vSpoUshkG4u2lrDXlQeoasZp2WG5QQWIPYE=;
+	s=k20260515; t=1784919649;
+	bh=J8uBhasEdyS93FlRgjpW7W6YMfqspF1QUxEV/9S74mY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=X1BdB6dp+mjI4QMsWUgBXeWEpYGUYDyh0ZfyQHOKIbMiXIeSaYr8rkeajQZ4/8X2k
-	 qdt5advX9yLeXsozYOEGDZWla7a/st5IC6FfmJlc3vVE4JwCJtwzW8G55r4TlcNomW
-	 3Is+UIESgpZlG5yagyAUhxzv/Tm9nhydcVJJ7uTkVw1MFLcYPo/6VX1z+IHkz27p9a
-	 0N1zla0cryxLoQIPpXBpW40jeyfF7YcmNUa8O0vzftQAo1Un+gBzHNKsemz7a351Eg
-	 VpdR4s0Rmzml4Ql1dIn9ix0bqa7qauUAOyVbmCEz/BuCzs3Vsk0CTnATeii7Gx1QCH
-	 xAyUE/fgdGxmg==
+	b=EkY8wNFM+AVv0R5+uCNGz6y45JnBfXEh5fXlhxY+JuD6jJtH5EhCwoFEXUrSjJF1T
+	 0FMUjyEWLXM9fEZtJp8uKc+D/jjWLyR5yQoZplfM16o11xx+/QC/EctrGDK2JJ+dFf
+	 kcuwvqcgPnhSh8xHplfp/i0T8zCR+49jd00JR3c4RD9qcpmykDTK3U3yHsv12qeCcA
+	 naRhhwmG8jzMgGpBiQLDlSc9VGeffBnYimu1HB9H2Nk2auIVgZMxWcg3OkuiC6WAx9
+	 8GMx7zcWNEFkJdTxbS6DPHh4GrLVrkY+v0gXcGb1dAhSbXgqT++dNtjEvPjXjkuFjm
+	 lqX68IHEvrJbA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19978380CEF6;
-	Fri, 24 Jul 2026 19:00:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A8B380CEF6;
+	Fri, 24 Jul 2026 19:00:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/1] Bluetooth: fix pending command UAF in EIR updates
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix advertising data UAFs
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178491961963.3273549.7571796979195702086.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Jul 2026 19:00:19 +0000
-References: <cover.1784746530.git.zihanx@nebusec.ai>
-In-Reply-To: <cover.1784746530.git.zihanx@nebusec.ai>
-To: Ren Wei <enjou1224z@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, dmantipov@yandex.ru, vega@nebusec.ai, zihanx@nebusec.ai
+ <178491961639.3273549.12844487841228908666.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Jul 2026 19:00:16 +0000
+References: <20260723153440.3224299-1-nicoyip.dev@gmail.com>
+In-Reply-To: <20260723153440.3224299-1-nicoyip.dev@gmail.com>
+To: Chengfeng Ye <nicoyip.dev@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 24 Jul 2026 00:43:45 +0800 you wrote:
-> From: Zihan Xi <zihanx@nebusec.ai>
+On Thu, 23 Jul 2026 23:34:40 +0800 you wrote:
+> hci_find_adv_instance() returns an adv_info pointer that is valid only
+> while hdev->lock is held.  The advertising command-sync paths perform
+> instance lookups without that lock and, in some cases, retain the pointer
+> while waiting for a controller response.
 > 
-> Hi Linux kernel maintainers,
-> 
-> We found and validated a bug in net/bluetooth/mgmt.c. The bug is
-> reachable by a root process via the Bluetooth management control socket
-> and a virtual HCI controller created through /dev/vhci. We've tested the
-> fix with the reproducer, and it should not affect other management
-> commands.
+> An advertising termination event can therefore interleave as follows:
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/1] Bluetooth: mgmt: fix pending command UAF in EIR updates
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c22eb0db0c62
+  - [v2] Bluetooth: hci_sync: Fix advertising data UAFs
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a3ad01d51d4b
 
 You are awesome, thank you!
 -- 
