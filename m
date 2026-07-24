@@ -1,68 +1,68 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD76538AC88
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2379388E59
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920359; cv=none; b=X+tV98Yq6ciMiKWLmX97gJfvASAK96SG5auk6xYFM116K2NJL3S4SbggicyVan6KT4BCJZcQhl1iyhwi6vnns5121aiDj/FugCIDWVfksZOkkf+SLcX0I0jj5GGVrTkstVzJm4iyMNEqFE0qKJ+HCqRXaMnzGIxnbEb6hQcECUU=
+	t=1784920360; cv=none; b=kp5H8YwoSg5XDGrFJTcpv4tEwPLAIU/tnLdp7OIgVS7byEx6SFmAVkrMm/18MVtcb/UC/c5f2c3zK0P6Ix+rDasc+synFlRJzPYPhFqFKWia7iUdSVlSQaEg4CkBfbHsD00bw0bs7OktgVF7gjqr1CV3ZaPJ0R/x0E2t9ih6k/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920359; c=relaxed/simple;
-	bh=8arYTOG08D7fxxHVJHDL1/W/JHhpSVXNAqwxat/+k04=;
+	s=arc-20240116; t=1784920360; c=relaxed/simple;
+	bh=9W70C79eQgUmQawhfh9tZ/xhkW3ovlnxqOvrdoOK8QY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OSs+Ycx0P6uzKG2+JCXn8qZ0EiXnLODK/H7SoxOa5qgtGrc3qtS3d5WfPGIqKsIm3+KxcFnsM2iLMg8gh2rIdb7xKnCsHWq5mH/+8FOVmv8WmhJYIJVLRV7lFylYrsA7wcfp+y5sYK6bCBy9Z51sz2sJslg1Ko6CPETyqOPP+xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQUkziCz; arc=none smtp.client-ip=209.85.222.46
+	 MIME-Version; b=ptYXqrfCQRaok+JtNNyXGreE3qCwPE+tdSKy04R0xf918peM6Ebh01gqbk1VF3uv2hHlH2gCur9pUMdL/ul3Isvpu8QflO+z+/6g0dYJJL3hI7flYx+Vi5eY8m83CEa7LzUB5Rc7cWDGVJMp6uUe0NE9QxIYqezz4jyvOOBJyOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llKoEE7N; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQUkziCz"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-9771d9759d4so270245241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llKoEE7N"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5bf5370d38fso266010e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784920357; x=1785525157; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784920358; x=1785525158; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=QXzG5OMLeGIR+r5lhnLfx7pEiMDgqM6t2rmsoQmq6aA=;
-        b=jQUkziCzb8EWmgafsBqNhHagZ0isq+fYXBptON/n83cMefhL4wE8MlK1Y4nM3G+uZR
-         u3YU28o+JQJuY4KTBGDahlLB1vkPv9P4XPEU67EBThOUmbJgIivQwQdveSqH/YHB84I1
-         4nIcfSGQbaThFsKO2N/QTcK52xAv1WM8qREQMLjLm01Lju1BAzu8arz35kR8AmEPFuJD
-         /LSQ2LU00xQVF7KiuaPVgY2yDIThu8S34lKLa+BZjanHS82i3vnm+eJQhb1Ne2mYzUAp
-         B9bhhQDYPvnueInN5h73NAsXWSzUPlGCpIQvXFrfdxzBj7C8SEByR9b+qOaiKZ/ZXmRT
-         5EiQ==
+        bh=I2ikbyb54MQEaV5LoevLhX526SnfUQVrgPxPPfdb7no=;
+        b=llKoEE7NIp5TRfH5gN4D+8MLnrY7/w3ZaD30cq4Zj4PI/zc++rchRVQzYKR6TkjaYh
+         eqYO9s3lJJknGy7injQ+QEs3kLA6C4M0WhvLGm/CWkFC3TIP7FNzigAJiEtNOBgCK1Xm
+         Y4+LCARdgZNvWJ5mPWvK0HxKa+0bS5gWHCADHueXpt5kN/ZFm9BZ1CPysEGj5dyKCJlt
+         /g3ppf7TEn9NrKeen1MWi+goMCQ9Am6r7EG8NKZkBMM/BmwC/GM65tyYX7zURKJrwX2h
+         s2/CRGLVqFBKHDLEKju/rchgQ/1b+p8eWKNwL2w+A3CTTX42r8RnKFM0NZNL20+ykj95
+         6A0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784920357; x=1785525157;
+        d=1e100.net; s=20251104; t=1784920358; x=1785525158;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=QXzG5OMLeGIR+r5lhnLfx7pEiMDgqM6t2rmsoQmq6aA=;
-        b=C2DPPZUg+U3x9Bg8AkmD4ZtyrZRXPItGYwXe/UE2NZgY+P5ZUE5ShRbOj6S9zWu6U2
-         +gQ40A6pbFyEclbudzVkKDtG7Y+QTb4eufSiFSolG6qr55DcXrJvuUkmXywjSUO8c8Ah
-         1YlAsAKzQJgrCn9L0D1FYUVpXl/8bXpo38L9SLLz9U76wO6KZLd5S1F8OvhVwtDgoZ7x
-         8c/oVrfynId3tCND11nTbvwLsHh6AenFUP38eLO08kN+EzLHNAm2TeNAlBdTE+zlrAog
-         HwblrE5bPQEhsnp/MXlwNCMzwjbzuC/cuQxL3pJd1EPE5mzeQuoCBkRZps0KmI6srGbU
-         HA3w==
-X-Gm-Message-State: AOJu0YzmaSFgdu6mrP8swAuJQ348zNRmUsR9/zWtEYdHgno1oAlAradj
-	QnhVmK4DMj2y2+ruGoq8ibGNe3bs8doIzOjQeuhepUG41Tfe6dnymgW0r3eU9geI
-X-Gm-Gg: AR+sD11GUseOz7SzBawFU1xXIMI1vqvMkgIOK4grrHvvU5rKv0IkMRbGmoCmjfFd+9H
-	W17ZypcgP3Brf15Ec61lJ98YNI1My6INqeIcVRB9FzNHj9tx9Fib1LvNGoYYI15tTgCDX2dHemu
-	L2WAyELli/LiHGPioLDuFKv/tR7tMpXKku9/HUpoK94ht3xFPYL1UFAEBnSvooUyh/K+VNMKLSd
-	IwY6CFPC7deBGqbuV2zgxUZYA+7VaIov9Eoue/PG2mFAbcmqICd7XapeEFseUcq3YdP78Qb34oJ
-	piZ6KH60El6imLq+/AnS7dDUz0VVtsRLQApQh8ihc7Ep5zDCVgyJie/t4mok2s1wHWuKd4/sqaZ
-	y2N8S+XP4hhJ+8Rw1NPm9pPMXiEa51jghBxehaFh0Coz5jIl8lmvuNvvnF+vyQssRO/Mbo2l/l0
-	Hj+fRtvqTamRJmEsZg1KaYBNBIIjsaNU09w9NrDnNcVVCG2tH7EKlMw/urXvgM3irehdHd1vIm
-X-Received: by 2002:a05:6102:f98:b0:73a:2195:4386 with SMTP id ada2fe7eead31-74d6060a001mr4420579137.24.1784920356640;
-        Fri, 24 Jul 2026 12:12:36 -0700 (PDT)
+        bh=I2ikbyb54MQEaV5LoevLhX526SnfUQVrgPxPPfdb7no=;
+        b=KxmJw3xtnZtqW4dFgb2OOnd/E2dFYIPspEKtXXHsQfpXmv//wL2wXa2M4P3Z/ZBX67
+         IWMEJSw3eRK8yK/VnOcoIlOVAySaAz6VWN1IpJfw7VowdTZ8xGygufHAMHnsnObFDHS9
+         bdyDrIpfwLiPcoxi5WccTe3qFFprigjDlcMzQ+qp8WZ4pleXhUjkTMCDKQD06t+qWFK3
+         hP1dXcCsx6UDsbdHg6BzKjHkah0zmOmfSDosEpopcLwZ90/3Mmq1m20Q4dk9EdE7ijMk
+         yU6dK+GbtKbTNaRQcSLa6oGyCMPNCF2PSk9bULLVKQZAqN1kC8PZmeWzkcmmZAZIg2rx
+         +6zQ==
+X-Gm-Message-State: AOJu0YxojaT1ZlZeZqIcEjee4ArXla5spURbJsC1aKGzblxN9hIDzoCB
+	+0mtQShBClSht5HZhHKLzZP7cgNjBUO8EbfKVg4S2qIsLk4vj/03qCyJY/qir2pS
+X-Gm-Gg: AR+sD125gaDE04z9J3smKoETlgRafpSiYeRFeVBVbtuDo6u5YseBY7FT19kjNnPtjTs
+	5n53y1Rg9gXqZFWsVylJW4bE+kkUVNdS+IqUAdp+i+Z4Qbv1XKEyEJ9W73H/XSqZrHxoaxwO/0s
+	aWLFLgyCpN33UcpZGFE96FDy8TLWHdmjNPezhz4/P6q663xNr21MIVa4JfnqCcdbJ/6g6EXKd/m
+	YjN2xM5F1lOUvaVfV+VkFXP5dRCg5YApaf9RbjiKCitsWKdqpudwI722uuU1a7/0YiOFwYzKTAC
+	/FB7ojz5iEoddmt3Q+57rR/D0tgyoS7vn35Q932WMZiAzz/+3URm6hNWvzhmNNZxa5onQkkHA4y
+	zbLB30T3AKoomT70x4d7ZviQ9tZ0A+JfHMqPXHflgY6rDSAUfSCGr7/gXKJtINsQmAGiG4xXsC5
+	u0Cx95wIPIW4CzLg139IDmVAqwICIzuKfOKGVbI3OLbKaw2R8UZ+LQll1CwDRbAlKAjqs/aJv/
+X-Received: by 2002:a05:6122:1352:b0:5bd:b27c:bade with SMTP id 71dfb90a1353d-5c2da06aaeamr4320560e0c.5.1784920357669;
+        Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.35
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 12:12:36 -0700 (PDT)
+        Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 01/12] input/hog-lib: Add discovery support for HIDS 1.1 SCI attributes
-Date: Fri, 24 Jul 2026 15:12:14 -0400
-Message-ID: <20260724191225.1815634-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 02/12] emulator/btdev: Add emulation support for HIDS 1.1 SCI commands
+Date: Fri, 24 Jul 2026 15:12:15 -0400
+Message-ID: <20260724191225.1815634-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
 References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
@@ -76,199 +76,219 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support for discovering and reading HIDS 1.1 SCI (Subrated
-Connection Interval) characteristics:
+Add BTDEV_TYPE_BREDRLE62 device type with support for Shorter
+Connection Interval (SCI) feature from Bluetooth 6.2 spec:
 
- - HID SCI Mode (0x2c39)
- - HID SCI Information (0x2c3a)
-
-When the HID Information flags indicate SCI is supported (bit 2),
-the SCI Mode and SCI Information characteristics are read after
-the HID Information is obtained.
+ - LE Connection Rate Request (0x20a1)
+ - LE Set Default Rate Parameters (0x20a2)
+ - LE Read Minimum Supported Connection Interval (0x20a3)
+ - LE Connection Rate Change event (0x37)
+ - Shorter Connection Intervals feature bits
 ---
- profiles/input/hog-lib.c | 106 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 105 insertions(+), 1 deletion(-)
+ emulator/btdev.c  | 107 ++++++++++++++++++++++++++++++++++++++++++++++
+ emulator/btdev.h  |   1 +
+ emulator/hciemu.c |   3 ++
+ emulator/hciemu.h |   1 +
+ 4 files changed, 112 insertions(+)
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index 70a1bdcbf4df..054356371ea7 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -56,6 +56,8 @@
- #define HOG_REPORT_UUID		0x2A4D
- #define HOG_PROTO_MODE_UUID	0x2A4E
- #define HOG_CONTROL_POINT_UUID	0x2A4C
-+#define HOG_SCI_MODE_UUID	0x2C39
-+#define HOG_SCI_INFO_UUID	0x2C3A
- 
- #define HOG_REPORT_TYPE_INPUT	1
- #define HOG_REPORT_TYPE_OUTPUT	2
-@@ -64,6 +66,8 @@
- #define HOG_PROTO_MODE_BOOT    0
- #define HOG_PROTO_MODE_REPORT  1
- 
-+#define HOG_INFO_FLAG_SCI_SUPPORTED	0x04
-+
- #define HID_INFO_SIZE			4
- #define ATT_NOTIFICATION_HEADER_SIZE	3
- 
-@@ -98,6 +102,8 @@ struct bt_hog {
- 	struct queue		*gatt_op;
- 	struct gatt_db		*gatt_db;
- 	struct gatt_db_attribute	*report_map_attr;
-+	uint16_t		sci_mode_handle;
-+	uint16_t		sci_info_handle;
- };
- 
- struct report {
-@@ -152,6 +158,10 @@ static void destroy_gatt_req(void *data)
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 3206caf5be86..68ec9698c6bc 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -7963,6 +7963,96 @@ static void set_le_60_commands(struct btdev *btdev)
+ 	btdev->cmds = cmd_le_6_0;
  }
  
- static void read_report_map(struct bt_hog *hog);
-+static void sci_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data);
-+static void sci_info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data);
- 
- static void remove_gatt_req(struct gatt_request *req, uint8_t status)
++static int cmd_le_conn_rate(struct btdev *dev, const void *data, uint8_t len)
++{
++	const struct bt_hci_cmd_le_conn_rate *cmd = data;
++	struct bt_hci_evt_le_conn_rate_change ev;
++	struct btdev_conn *conn;
++	uint8_t status = BT_HCI_ERR_SUCCESS;
++
++	conn = queue_find(dev->conns, match_handle,
++				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
++	if (!conn)
++		status = BT_HCI_ERR_UNKNOWN_CONN_ID;
++
++	cmd_status(dev, status, BT_HCI_CMD_LE_CONN_RATE);
++
++	if (status)
++		return 0;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.status = BT_HCI_ERR_SUCCESS;
++	ev.handle = cmd->handle;
++	ev.interval = cmd->interval_min;
++	ev.subrate = cmd->subrate_min;
++	ev.latency = cpu_to_le16(0);
++	ev.cont_number = cmd->cont_num;
++	ev.supv_timeout = cmd->supv_timeout;
++
++	le_meta_event(dev, BT_HCI_EVT_LE_CONN_RATE_CHANGE, &ev, sizeof(ev));
++	if (conn->link)
++		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CONN_RATE_CHANGE,
++				&ev, sizeof(ev));
++
++	return 0;
++}
++
++static int cmd_le_set_def_rate(struct btdev *dev, const void *data, uint8_t len)
++{
++	uint8_t status = BT_HCI_ERR_SUCCESS;
++
++	cmd_complete(dev, BT_HCI_CMD_LE_SET_DEF_RATE, &status, sizeof(status));
++
++	return 0;
++}
++
++static int cmd_le_read_conn_interval(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	struct {
++		struct bt_hci_rsp_le_read_conn_interval rsp;
++		struct bt_hci_le_conn_interval_group grp;
++	} __attribute__ ((packed)) pdu;
++
++	memset(&pdu, 0, sizeof(pdu));
++	pdu.rsp.status = BT_HCI_ERR_SUCCESS;
++	pdu.rsp.num_grps = 1;
++	pdu.grp.min = cpu_to_le16(0x0008);	/* 1.000 ms */
++	pdu.grp.max = cpu_to_le16(0x0c80);	/* 400.000 ms */
++	pdu.grp.stride = cpu_to_le16(0x0001);	/* 0.125 ms */
++
++	cmd_complete(dev, BT_HCI_CMD_LE_READ_CONN_INTERVAL, &pdu, sizeof(pdu));
++
++	return 0;
++}
++
++#define CMD_LE_62 \
++	CMD(BT_HCI_CMD_LE_CONN_RATE, cmd_le_conn_rate, NULL), \
++	CMD(BT_HCI_CMD_LE_SET_DEF_RATE, cmd_le_set_def_rate, NULL), \
++	CMD(BT_HCI_CMD_LE_READ_CONN_INTERVAL, cmd_le_read_conn_interval, NULL)
++
++static const struct btdev_cmd cmd_le_6_2[] = {
++	CMD_COMMON_ALL,
++	CMD_COMMON_BREDR_LE,
++	CMD_COMMON_BREDR_20,
++	CMD_COMMON_BREDR_LE_40,
++	CMD_BREDR,
++	CMD_LE,
++	CMD_LE_50,
++	CMD_LE_52,
++	CMD_LE_60,
++	CMD_LE_62,
++	{}
++};
++
++static void set_le_62_commands(struct btdev *btdev)
++{
++	btdev->commands[48] |= BIT(5);	/* LE Connection Rate Request */
++	btdev->commands[48] |= BIT(6);	/* LE Set Default Rate Parameters */
++	btdev->commands[48] |= BIT(7);	/* LE Read Min Supported Conn Interval */
++	btdev->cmds = cmd_le_6_2;
++}
++
+ static void set_le_commands(struct btdev *btdev)
  {
-@@ -1105,6 +1115,85 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	DBG("bcdHID: 0x%04X bCountryCode: 0x%02X Flags: 0x%02X",
- 			hog->bcdhid, hog->bcountrycode, hog->flags);
- 
-+	/* Read SCI attributes if SCI is supported */
-+	if (hog->flags & HOG_INFO_FLAG_SCI_SUPPORTED) {
-+		if (hog->sci_mode_handle)
-+			read_char(hog, hog->attrib, hog->sci_mode_handle,
-+						sci_mode_read_cb, hog);
-+		if (hog->sci_info_handle)
-+			read_char(hog, hog->attrib, hog->sci_info_handle,
-+						sci_info_read_cb, hog);
+ 	set_common_commands_all(btdev);
+@@ -8037,6 +8127,12 @@ static void set_le_commands(struct btdev *btdev)
+ 		set_le_60_commands(btdev);
+ 		btdev->cmds = cmd_le_6_0;
+ 	}
++
++	/* Extra LE commands for >= 6.2 adapters */
++	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
++		set_le_62_commands(btdev);
++		btdev->cmds = cmd_le_6_2;
 +	}
-+
-+remove:
-+	remove_gatt_req(req, status);
-+}
-+
-+static void sci_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data)
-+{
-+	struct gatt_request *req = user_data;
-+	uint8_t value;
-+	ssize_t vlen;
-+
-+	if (status != 0) {
-+		error("HID SCI Mode read failed: %s", att_ecode2str(status));
-+		goto remove;
-+	}
-+
-+	vlen = dec_read_resp(pdu, plen, &value, sizeof(value));
-+	if (vlen != 1) {
-+		error("ATT protocol error");
-+		goto remove;
-+	}
-+
-+	DBG("SCI Mode: 0x%02X", value);
-+
-+remove:
-+	remove_gatt_req(req, status);
-+}
-+
-+static void sci_info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data)
-+{
-+	struct gatt_request *req = user_data;
-+	uint8_t value[14];
-+	ssize_t vlen;
-+	uint8_t min_conn_interval;
-+	uint8_t num_grps;
-+	uint8_t i;
-+
-+	if (status != 0) {
-+		error("HID SCI Information read failed: %s",
-+						att_ecode2str(status));
-+		goto remove;
-+	}
-+
-+	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
-+	if (vlen < 2) {
-+		error("ATT protocol error");
-+		goto remove;
-+	}
-+
-+	min_conn_interval = value[0];
-+	num_grps = value[1];
-+
-+	DBG("SCI Info: Minimum Supported Connection Interval: %.3f ms "
-+		"(0x%02x) Number of Supported Subgroups: %d",
-+		min_conn_interval * 0.125, min_conn_interval, num_grps);
-+
-+	for (i = 0; i < num_grps && (2 + i * 6 + 5) < vlen; i++) {
-+		uint16_t min, max, stride;
-+		size_t off = 2 + i * 6;
-+
-+		min = get_le16(&value[off]);
-+		max = get_le16(&value[off + 2]);
-+		stride = get_le16(&value[off + 4]);
-+
-+		DBG("  Subgroup[%u]: Min %.3f ms Max %.3f ms Stride %.3f ms",
-+			i, min * 0.125, max * 0.125, stride * 0.125);
-+	}
-+
- remove:
- 	remove_gatt_req(req, status);
  }
-@@ -1150,6 +1239,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 	struct gatt_primary *primary = hog->primary;
- 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
- 	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
-+	bt_uuid_t sci_mode_uuid, sci_info_uuid;
- 	struct report *report;
- 	GSList *l;
- 	uint16_t info_handle = 0, proto_mode_handle = 0;
-@@ -1167,6 +1257,8 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
- 	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
- 	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
-+	bt_uuid16_create(&sci_mode_uuid, HOG_SCI_MODE_UUID);
-+	bt_uuid16_create(&sci_info_uuid, HOG_SCI_INFO_UUID);
  
- 	for (l = chars; l; l = g_slist_next(l)) {
- 		struct gatt_char *chr, *next;
-@@ -1201,6 +1293,10 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 			proto_mode_handle = chr->value_handle;
- 		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
- 			hog->ctrlpt_handle = chr->value_handle;
-+		else if (bt_uuid_cmp(&uuid, &sci_mode_uuid) == 0)
-+			hog->sci_mode_handle = chr->value_handle;
-+		else if (bt_uuid_cmp(&uuid, &sci_info_uuid) == 0)
-+			hog->sci_info_handle = chr->value_handle;
+ static void set_bredrle_commands(struct btdev *btdev)
+@@ -8112,6 +8208,13 @@ static void set_bredrle_features(struct btdev *btdev)
+ 		btdev->le_features[7] |= BIT(7); /* LL Extended Features */
  	}
  
- 	if (proto_mode_handle) {
-@@ -1360,7 +1456,7 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
- {
- 	struct bt_hog *hog = user_data;
- 	bt_uuid_t uuid, report_uuid, report_map_uuid, info_uuid;
--	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
-+	bt_uuid_t proto_mode_uuid, ctrlpt_uuid, sci_mode_uuid, sci_info_uuid;
- 	uint16_t handle, value_handle;
- 	struct iovec map = {};
- 
-@@ -1414,6 +1510,14 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
- 	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
- 	if (!bt_uuid_cmp(&ctrlpt_uuid, &uuid))
- 		hog->ctrlpt_handle = value_handle;
++	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
++		/* Shorter Connection Intervals */
++		btdev->le_features[9] |= BIT(0);
++		/* Shorter Connection Intervals (Host Support) */
++		btdev->le_features[9] |= BIT(1);
++	}
 +
-+	bt_uuid16_create(&sci_mode_uuid, HOG_SCI_MODE_UUID);
-+	if (!bt_uuid_cmp(&sci_mode_uuid, &uuid))
-+		hog->sci_mode_handle = value_handle;
-+
-+	bt_uuid16_create(&sci_info_uuid, HOG_SCI_INFO_UUID);
-+	if (!bt_uuid_cmp(&sci_info_uuid, &uuid))
-+		hog->sci_info_handle = value_handle;
- }
+ 	btdev->feat_page_2[0] |= 0x01;	/* CPB - Central Operation */
+ 	btdev->feat_page_2[0] |= 0x02;	/* CPB - Peripheral Operation */
+ 	btdev->feat_page_2[0] |= 0x04;	/* Synchronization Train */
+@@ -8217,6 +8320,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
++	case BTDEV_TYPE_BREDRLE62:
+ 		btdev->crypto = bt_crypto_new();
+ 		if (!btdev->crypto) {
+ 			free(btdev);
+@@ -8240,6 +8344,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
++	case BTDEV_TYPE_BREDRLE62:
+ 		btdev->version = 0x09;
+ 		set_bredrle_features(btdev);
+ 		set_bredrle_commands(btdev);
+@@ -8933,6 +9038,7 @@ int btdev_set_msft_opcode(struct btdev *btdev, uint16_t opcode)
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
++	case BTDEV_TYPE_BREDRLE62:
+ 		btdev->msft_opcode = opcode;
+ 		btdev->msft_cmds = cmd_msft;
+ 		return 0;
+@@ -8991,6 +9097,7 @@ int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode)
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
++	case BTDEV_TYPE_BREDRLE62:
+ 		btdev->emu_opcode = opcode;
+ 		btdev->emu_cmds = cmd_emu;
+ 		return 0;
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index d473bd4b3414..145f7edaa262 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -53,6 +53,7 @@ enum btdev_type {
+ 	BTDEV_TYPE_BREDRLE50,
+ 	BTDEV_TYPE_BREDRLE52,
+ 	BTDEV_TYPE_BREDRLE60,
++	BTDEV_TYPE_BREDRLE62,
+ };
  
- static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
+ enum btdev_hook_type {
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index 15d806a62aa6..48ed63b413f4 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -437,6 +437,9 @@ struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
+ 	case HCIEMU_TYPE_BREDRLE60:
+ 		hciemu->btdev_type = BTDEV_TYPE_BREDRLE60;
+ 		break;
++	case HCIEMU_TYPE_BREDRLE62:
++		hciemu->btdev_type = BTDEV_TYPE_BREDRLE62;
++		break;
+ 	default:
+ 		return NULL;
+ 	}
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index e832d6350bb3..cdf1ebe16752 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -22,6 +22,7 @@ enum hciemu_type {
+ 	HCIEMU_TYPE_BREDRLE50,
+ 	HCIEMU_TYPE_BREDRLE52,
+ 	HCIEMU_TYPE_BREDRLE60,
++	HCIEMU_TYPE_BREDRLE62,
+ };
+ 
+ enum hciemu_hook_type {
 -- 
 2.54.0
 
