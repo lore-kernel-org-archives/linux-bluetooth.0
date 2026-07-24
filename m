@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749C23B27C1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3593B1ED0;
 	Fri, 24 Jul 2026 20:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784924453; cv=pass; b=kpMzOhZ1rcLAwBijMQ+zyvpzEPKKvQHhio+278zINX8RoNg24iqJuRluqBKqYEFdpjzwwtEUIZwzMKmjErdmtU1Mrz6FzJJgAGiegRURp788y1zelL6AgD/gGe2Y+c8+Hgv+xCg8gLWkXpMZ51XsO7hTBPDgrLusRF6+0j0VdGE=
+	t=1784924453; cv=pass; b=ZmIvW5GnMis88hgzkp7wXFQRXgsA1mjMRsz91vfiLxWKDxdWJSx5yLIEXZsx78QK1LU9h4R2tcCxyL4kxCSuKwPQZ5W1wzBiFB80R3GPF7oAnf7S8w67dCQJ0qAuLC9kWH3fbKbMjosW5zhmL+Ny9/UrlSDNAxh7cLHYNzZgRsM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784924453; c=relaxed/simple;
-	bh=zBdnU5qqOpG2EAi0UHShZDaqXgYifMh/DS9uXCqR8RI=;
+	bh=ALR5Hey1h7iT4ay7fhEOxY6T8Ih4UpfalhKZjCGkCTA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=geTeqehYz/KOibh0qiBkBDmCf4aXN5BNdnUTQGtGWUTFmpGXZtFdmd+U5CtVP+iiq8ujFPcH7LL2khomlhPzHxglnba3st8OfbIEz55FvWB2GriUo8y/tgE+yASxqxTt2mFD+IXujQj+SYjX0qatC67s+ufsjDfakFg6VRV4cDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=BEZgnSEJ; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=mzOj/AXDteEdqoeLXjQ5UD3ANw4NdPbJJV12lnQZWgNCKAb0Dsxap+nOAhih9gbXSaftH0UA+L6mDVxF0C9xa2i34pQ8iGEmiXpOvi2BXynHl9fSfZMi516E3ZFZmEs0PDYjJMkh2TqA1peEL854EtpTiV0Q8eD59G3Pupkdx1s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=m886MbvH; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="BEZgnSEJ"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="m886MbvH"
 Received: from monolith.lan (unknown [89.37.63.136])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KB86SxWzybb;
-	Fri, 24 Jul 2026 23:20:48 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6KB3437HzyWH;
+	Fri, 24 Jul 2026 23:20:43 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784924450;
+	t=1784924444;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9Q2K2lP9evOiz1Steo7+JHozlCGL/NBNyKabBb6lZCg=;
-	b=BEZgnSEJUCIPvpG9qnIRt8qaisZzHCTOgh7pk4iqj88qtKWxe0/MG9s2aodqjJMlZq8pPY
-	6NIx5eK8OaanMvLdSpC+kUlVPDjwKRIdWzOJCqRDf+SMAWFuu+4YA8ta+QBfs+LOq968Eg
-	xE0bQIcsBCGulvqBZry2CzUJWMVudMs=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924450;
-	b=kiaBZKANL8Tbdt7AvYQiFhi09wDH+psJgEs3Fwc1D2lCmnKivX+puaRup9T8Hhd9AeOMMt
-	nEd6DhyACaeFisStcyL1eWlh8wzC8cYnddLcQH0A44w/VLFZVyb69dRAhGcTw3B1qVucbl
-	u8U7Pj0kE/wfVFpNPbNu0cHTtebrQWo=
+	bh=O3bRRtWRb6d2zGegRge4CYAsYPMzrVUU76L0leF7cPA=;
+	b=m886MbvHyH8eM4mWLxOFFuwkjCCRyhbtqh0+5Gaa3iaw7/H/YlT65/nt4LfLeZfVo8dvdt
+	sZ/FlQShXAoA+IXdXi80te13bJPRyOkkcqBFOEmC2e2ckzLERIOmiOs3+1iJi08wMgowK/
+	VMgvBcX7Eq9CvEK5NnAGw7xiPg9Ezlk=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784924444;
+	b=iUZjDXQ1ZQ1deACwk6/toTEjuu0mdJl3jdno5dBGdyioDdUKaZ/i+VA7lZl1ihS/JjtEbc
+	QGqjWz+Kx3mCWUEPk2UGKXKSQ2kMP9Hl0IoUqxSdwdEOC0zuEwTV/XBxT6wBUHlZO4D+yw
+	iS+94IYmrGPQS6BggUV3DLe1Wqfgly0=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784924450;
+	s=meesny; t=1784924444;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9Q2K2lP9evOiz1Steo7+JHozlCGL/NBNyKabBb6lZCg=;
-	b=A9gsuSVO+qM0dfsaqnRYQE/jj7OVa/uhi1zzdo/ks1dt7P02/eSz4Ci0L4oawJKE3b87SC
-	ZTgfLdvfJkMW4xZ3DfUqVMkUkOQ8nVAGSLSZVy6GFhQXWoCoWu7AtzzpKF5QrbmEZF95IR
-	yDKiEwAQxUkY7vSIzXqnNclLi0Flk8w=
+	bh=O3bRRtWRb6d2zGegRge4CYAsYPMzrVUU76L0leF7cPA=;
+	b=ZT9LefE4wUkoUkgh/gQfglbDr0UnE5nmVTrlFOzsirwXPkOilv+7sqo1Qwcnep+7mEBC9Z
+	/NPvjh5ZO/pHZsOY3ImrhFi7UkEkk3gsCoQNnTsL1aoDxRxTEvf1CRGScX2TuREUsgaQ0+
+	3DmAzyKjeuAGwKlVqW/9bSDdNvKJbEs=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -56,9 +56,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 05/11] Bluetooth: ISO: validate sockaddr_iso first in iso_sock_rebind_bis()
-Date: Fri, 24 Jul 2026 23:20:28 +0300
-Message-ID: <7b2ce38199de98371bae313cc69dc25d7ab8768b.1784923689.git.pav@iki.fi>
+Subject: [PATCH 02/11] Bluetooth: ISO: lock sk in iso_sock_getname
+Date: Fri, 24 Jul 2026 23:20:25 +0300
+Message-ID: <868ddc69b94f3bae21707ac898cf4c385797adae.1784923689.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1784923689.git.pav@iki.fi>
 References: <cover.1784923689.git.pav@iki.fi>
@@ -70,40 +70,37 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_sock_rebind_bis() updates socket iso_pi(sk)->bc_num_bis before
-validating the BIS values, so it's possible to end up with bc_num_bis
-inconsistent.
+Accessing iso_pi(sk)->conn requires lock_sock, which is not held here.
 
-Assign to iso_pi(sk)->bc_num_bis only after validation.
+Fix by adding the lock/release.
 
-Fixes: 80837140c1f2 ("Bluetooth: ISO: Allow binding a PA sync socket")
+Fixes: 2df108c227b2 ("Bluetooth: ISO: Fix using BT_SK_PA_SYNC to detect BIS sockets")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/iso.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/iso.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index e51253e5c161..5de4a2f886eb 100644
+index 299a9336b5e1..dbb8f43052f0 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -1039,15 +1039,15 @@ static int iso_sock_rebind_bis(struct sock *sk, struct sockaddr_iso *sa,
- 		goto done;
+@@ -1472,6 +1472,8 @@ static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+ 
++	lock_sock(sk);
++
+ 	addr->sa_family = AF_BLUETOOTH;
+ 
+ 	if (peer) {
+@@ -1493,6 +1495,8 @@ static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 		sa->iso_bdaddr_type = iso_pi(sk)->src_type;
  	}
  
--	iso_pi(sk)->bc_num_bis = sa->iso_bc->bc_num_bis;
--
--	for (int i = 0; i < iso_pi(sk)->bc_num_bis; i++)
-+	for (int i = 0; i < sa->iso_bc->bc_num_bis; i++)
- 		if (sa->iso_bc->bc_bis[i] < 0x01 ||
- 		    sa->iso_bc->bc_bis[i] > 0x1f) {
- 			err = -EINVAL;
- 			goto done;
- 		}
- 
-+	iso_pi(sk)->bc_num_bis = sa->iso_bc->bc_num_bis;
++	release_sock(sk);
 +
- 	memcpy(iso_pi(sk)->bc_bis, sa->iso_bc->bc_bis,
- 	       iso_pi(sk)->bc_num_bis);
+ 	return len;
+ }
  
 -- 
 2.55.0
