@@ -1,67 +1,71 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5466D388E59
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD76538AC88
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920357; cv=none; b=a+6NLohjZhX7XGQ9Jjaw1gwXFH1xRbQ8MJpvFsj2n5IeKMrigEx8vcA+ng0af7vKQ+Ce6SoFyLhQkGrAZfwPLtYEipOJa1satHmxeOrIegIRyX43OI8c4YHDiIhAOmcGSbqlqe2wT/VpD42xFU1Z+V4o9FM+YRtomO1bOpuXUP4=
+	t=1784920359; cv=none; b=X+tV98Yq6ciMiKWLmX97gJfvASAK96SG5auk6xYFM116K2NJL3S4SbggicyVan6KT4BCJZcQhl1iyhwi6vnns5121aiDj/FugCIDWVfksZOkkf+SLcX0I0jj5GGVrTkstVzJm4iyMNEqFE0qKJ+HCqRXaMnzGIxnbEb6hQcECUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920357; c=relaxed/simple;
-	bh=xfFnOWdfn2jwVExP26PVoON2pA4TIghYvfbmW/2yzMM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Rv+TUEVCxQJN1Fbeh3mJd12asr4DkTxhpm+GIvcBHr/deB6EetSrys9nvHMEKrbmMi30Ad69c+09Cc4YrTbL9IKepdMWeL61BFZJj+31Xx9qUmomwHHHB3goQCzOfxiz/nL9vUi2+8aW5Gt5AqHq9DaqUG2G5DyFTa9oVxXJE2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A2wy97rl; arc=none smtp.client-ip=209.85.221.172
+	s=arc-20240116; t=1784920359; c=relaxed/simple;
+	bh=8arYTOG08D7fxxHVJHDL1/W/JHhpSVXNAqwxat/+k04=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OSs+Ycx0P6uzKG2+JCXn8qZ0EiXnLODK/H7SoxOa5qgtGrc3qtS3d5WfPGIqKsIm3+KxcFnsM2iLMg8gh2rIdb7xKnCsHWq5mH/+8FOVmv8WmhJYIJVLRV7lFylYrsA7wcfp+y5sYK6bCBy9Z51sz2sJslg1Ko6CPETyqOPP+xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQUkziCz; arc=none smtp.client-ip=209.85.222.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A2wy97rl"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5bf94664327so310307e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQUkziCz"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-9771d9759d4so270245241.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784920355; x=1785525155; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=eUApa3BZ8XuzRpfBLClOEfWTHKBZMZcbBHkwUd/zYJc=;
-        b=A2wy97rlcaUR2a+reY+ezINyI/Ep/Ru2RIb43/RCO4AGhFDIebmwTervltQpxUACKd
-         7166Dxt0wNVsEXzh1XgH3RODFj668YvN06qdHwlMhZZAAqpK6NUtNm0Xk2L8d0Oi34z4
-         E6WBrQ/FW1stuaJnGLzC3AJ+ikfaxyieTZeO4HYaiZ3X7m67eusvrH2fvKRrE3dlQbus
-         s4PgwZ/qy2nVd5Epo0xgbgt7/I1dZgHjh1LrZ15NWS7f8dxKKEoHhSXtT0SXnJGD1d7o
-         0WNH4co1/TjsbTaxBS4cgnTz/i1lA3+7Mkop0JOoxli/XAzaGLZ79khNqaGTvnxNjOo7
-         sPaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784920355; x=1785525155;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1784920357; x=1785525157; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=eUApa3BZ8XuzRpfBLClOEfWTHKBZMZcbBHkwUd/zYJc=;
-        b=V29sQLOQnvMCyNFjUwZH7YacsJ72jXCsy9AKwxetCY4UwcMIWrh8x4EObtLXSi49el
-         s0QTyq8XTBbqZsgZ+j/S3K/shUHLy5Oa3x2l162FxrpRvHGk3z/ksRJCMIW/1/JFnGdh
-         umWFp24753/p17HEexlCsFC1+srTPCB+t3WhAhmiODaij+bdJpiudu1VWLhm6BlLcLYO
-         u4mKcAhaIaaxENI2czlmi0Uyoym3bjBk23UBtEVK2jspi8pHnZZSCDS13ulTS6AjYXYq
-         OeoP1KPS5t0W5NiIKjj0lJhTTWStxBeDZI+olKrPlA+MHt7hXqXIpWYObskNADlWRpRa
-         ke6Q==
-X-Gm-Message-State: AOJu0Yzjsl+WLvjwd0zf6JMFpvXSrQLT7FBD+NALm7JDs14/uwGEFGmP
-	p3ToaFnW/GhkyVO7ixKDiz72G6Tz7z7oplFXqSCExkz7hkt9TyxJUAipEiPtaGw7
-X-Gm-Gg: AR+sD10+wSYVZYpsXmv6wlmvtPuum2eW80aVPWL8wgLiAtJB1oujelb+NeuSO9ncXzu
-	ASD8tPnqrYatYLOoHiOEf3pqjv/KrKfufEhqvKdsvHMBQ/a5X58Rm3FVqH5NnWLnRxqeQeycom/
-	JhmEMuygi67UcPZ17RQZ4hUyKrzVfgB3AyUu5M4tdU5/n2Hyz72LR4u07Bjuz+proRgSn1cSFZm
-	eL33t3BIpzgy5v2v4sRijm2VzdB1xQH1Nz7K9vTJ7/O4va3sj8M+hfCK7GjTC240+TEq7if491U
-	w15lzN7Ru1Vt+GcHLkUIUnbRT01lRn9GUQnrSgKYYM15FBATRbTpMxwrzDSeZIi5Lc5NOrd23D+
-	Wp6TVrNyk+mgQwf5CMw1QDo2XUgChKpBGJ9dxHPQ03MIIlwv6d/vBdI2SgjNzIDvaLUrgiVHj4s
-	gLfmXsOIP1LxExjUPVUHQbwI59R0D40qfLn/nFVxfYnZdyam6iaCDcAK/tliXuwqJRMJABvrg0
-X-Received: by 2002:a05:6122:6991:b0:5bf:bb66:414f with SMTP id 71dfb90a1353d-5c2da1ad401mr4264802e0c.11.1784920355086;
-        Fri, 24 Jul 2026 12:12:35 -0700 (PDT)
+        bh=QXzG5OMLeGIR+r5lhnLfx7pEiMDgqM6t2rmsoQmq6aA=;
+        b=jQUkziCzb8EWmgafsBqNhHagZ0isq+fYXBptON/n83cMefhL4wE8MlK1Y4nM3G+uZR
+         u3YU28o+JQJuY4KTBGDahlLB1vkPv9P4XPEU67EBThOUmbJgIivQwQdveSqH/YHB84I1
+         4nIcfSGQbaThFsKO2N/QTcK52xAv1WM8qREQMLjLm01Lju1BAzu8arz35kR8AmEPFuJD
+         /LSQ2LU00xQVF7KiuaPVgY2yDIThu8S34lKLa+BZjanHS82i3vnm+eJQhb1Ne2mYzUAp
+         B9bhhQDYPvnueInN5h73NAsXWSzUPlGCpIQvXFrfdxzBj7C8SEByR9b+qOaiKZ/ZXmRT
+         5EiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784920357; x=1785525157;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=QXzG5OMLeGIR+r5lhnLfx7pEiMDgqM6t2rmsoQmq6aA=;
+        b=C2DPPZUg+U3x9Bg8AkmD4ZtyrZRXPItGYwXe/UE2NZgY+P5ZUE5ShRbOj6S9zWu6U2
+         +gQ40A6pbFyEclbudzVkKDtG7Y+QTb4eufSiFSolG6qr55DcXrJvuUkmXywjSUO8c8Ah
+         1YlAsAKzQJgrCn9L0D1FYUVpXl/8bXpo38L9SLLz9U76wO6KZLd5S1F8OvhVwtDgoZ7x
+         8c/oVrfynId3tCND11nTbvwLsHh6AenFUP38eLO08kN+EzLHNAm2TeNAlBdTE+zlrAog
+         HwblrE5bPQEhsnp/MXlwNCMzwjbzuC/cuQxL3pJd1EPE5mzeQuoCBkRZps0KmI6srGbU
+         HA3w==
+X-Gm-Message-State: AOJu0YzmaSFgdu6mrP8swAuJQ348zNRmUsR9/zWtEYdHgno1oAlAradj
+	QnhVmK4DMj2y2+ruGoq8ibGNe3bs8doIzOjQeuhepUG41Tfe6dnymgW0r3eU9geI
+X-Gm-Gg: AR+sD11GUseOz7SzBawFU1xXIMI1vqvMkgIOK4grrHvvU5rKv0IkMRbGmoCmjfFd+9H
+	W17ZypcgP3Brf15Ec61lJ98YNI1My6INqeIcVRB9FzNHj9tx9Fib1LvNGoYYI15tTgCDX2dHemu
+	L2WAyELli/LiHGPioLDuFKv/tR7tMpXKku9/HUpoK94ht3xFPYL1UFAEBnSvooUyh/K+VNMKLSd
+	IwY6CFPC7deBGqbuV2zgxUZYA+7VaIov9Eoue/PG2mFAbcmqICd7XapeEFseUcq3YdP78Qb34oJ
+	piZ6KH60El6imLq+/AnS7dDUz0VVtsRLQApQh8ihc7Ep5zDCVgyJie/t4mok2s1wHWuKd4/sqaZ
+	y2N8S+XP4hhJ+8Rw1NPm9pPMXiEa51jghBxehaFh0Coz5jIl8lmvuNvvnF+vyQssRO/Mbo2l/l0
+	Hj+fRtvqTamRJmEsZg1KaYBNBIIjsaNU09w9NrDnNcVVCG2tH7EKlMw/urXvgM3irehdHd1vIm
+X-Received: by 2002:a05:6102:f98:b0:73a:2195:4386 with SMTP id ada2fe7eead31-74d6060a001mr4420579137.24.1784920356640;
+        Fri, 24 Jul 2026 12:12:36 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.34
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 12:12:34 -0700 (PDT)
+        Fri, 24 Jul 2026 12:12:36 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 00/12] Add support for Shorter Connection Interval (SCI)
-Date: Fri, 24 Jul 2026 15:12:13 -0400
-Message-ID: <20260724191225.1815634-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 01/12] input/hog-lib: Add discovery support for HIDS 1.1 SCI attributes
+Date: Fri, 24 Jul 2026 15:12:14 -0400
+Message-ID: <20260724191225.1815634-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
+References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,93 +76,199 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This series adds support for the Shorter Connection Interval (SCI) feature
-introduced in Bluetooth Core Specification 6.2 and used by HIDS 1.1 / HOGP
-v1.2.
+Add support for discovering and reading HIDS 1.1 SCI (Subrated
+Connection Interval) characteristics:
 
-SCI allows an LE ACL connection to use very short connection intervals (as
-low as 1.25 ms) combined with a subrating factor, so a device such as a HID
-peripheral can achieve low input latency while keeping power consumption
-manageable. The connection rate parameters (connection interval range,
-subrate factor range, peripheral latency, continuation number and
-supervision timeout) are negotiated with the LE Connection Rate Request
-procedure.
+ - HID SCI Mode (0x2c39)
+ - HID SCI Information (0x2c3a)
 
-The series covers the full stack:
+When the HID Information flags indicate SCI is supported (bit 2),
+the SCI Mode and SCI Information characteristics are read after
+the HID Information is obtained.
+---
+ profiles/input/hog-lib.c | 106 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 105 insertions(+), 1 deletion(-)
 
-- HIDS 1.1 GATT discovery: the HID SCI Mode (0x2C39) and HID SCI Information
-  (0x2C3A) characteristics, and the SCI flags in the HID Information
-  characteristic.
-
-- Management interface: a new Shorter Connection Interval setting (bit 25) to
-  advertise controller support, a Load Connection Subrate command (0x005C) to
-  load per-device connection subrate parameters, and a Connection Subrate
-  event (0x0033) to report rate changes. Parameters are persisted per device
-  in the [ConnectionSubrate] storage group.
-
-- bluetoothctl: a conn-subrate command in the mgmt submenu to load subrate
-  parameters, pre or post connection.
-
-- monitor (btmon) decoding for the new command, setting and event.
-
-- Emulation and tests: btdev and bthost gain SCI command/event support, and
-  mgmt-tester and l2cap-tester cover the setting, the Load Connection Subrate
-  command and connections for each of the four HOGP v1.2 recommended modes
-  (Fast, Default, Low Power and Full Range), on both the client (central) and
-  server (peripheral) side.
-
-The corresponding kernel support (HCI commands/events, the SCI feature init
-sequence and the MGMT Load Connection Subrate command) has already been
-submitted separately.
-
-HCI reference for the feature this series builds on:
-
-  Commands (OGF 0x08):
-    HCI_LE_Connection_Rate_Request              0x00A1 (octet 48 bit 5)
-    HCI_LE_Set_Default_Rate_Parameters          0x00A2 (octet 48 bit 6)
-    HCI_LE_Read_Min_Supported_Conn_Interval     0x00A3 (octet 48 bit 7)
-
-  Event:
-    LE Connection Rate Change                   subevent 0x37
-
-  Feature bits (LE feature page 1, via LE Read All Local Features):
-    Shorter Connection Intervals                page 1 bit 8
-    Shorter Connection Intervals (Host Support) page 1 bit 9
-
-Luiz Augusto von Dentz (12):
-  input/hog-lib: Add discovery support for HIDS 1.1 SCI attributes
-  emulator/btdev: Add emulation support for HIDS 1.1 SCI commands
-  mgmt: Add Shorter Connection Interval setting and Load Connection
-    Subrate
-  mgmt-tester: Add tests for SCI setting and Load Connection Subrate
-  adapter: Add support for loading connection subrate parameters
-  monitor: Add decoding for Load Connection Subrate, SCI setting and
-    event
-  doc: Document ConnectionSubrate storage format
-  client/mgmt: Add conn-subrate command
-  mgmt-tester: Add HIDS recommended SCI parameter tests
-  l2cap-tester: Add SCI mode tests for LE client connections
-  emulator/bthost: Add LE Connection Rate Request support
-  l2cap-tester: Add SCI mode tests for LE server connections
-
- client/mgmt.c             |  88 ++++++++++++++++++
- doc/bluetoothctl-mgmt.rst |  21 +++++
- doc/mgmt-protocol.rst     | 125 ++++++++++++++++++++++++++
- doc/settings-storage.txt  |  22 +++++
- emulator/btdev.c          | 107 ++++++++++++++++++++++
- emulator/btdev.h          |   1 +
- emulator/bthost.c         |  36 ++++++++
- emulator/bthost.h         |  14 +++
- emulator/hciemu.c         |   3 +
- emulator/hciemu.h         |   1 +
- lib/bluetooth/mgmt.h      |  31 +++++++
- monitor/packet.c          |  62 +++++++++++++
- profiles/input/hog-lib.c  | 106 +++++++++++++++++++++-
- src/adapter.c             | 172 ++++++++++++++++++++++++++++++++++++
- tools/l2cap-tester.c      | 181 ++++++++++++++++++++++++++++++++++++++
- tools/mgmt-tester.c       | 163 ++++++++++++++++++++++++++++++++++
- 16 files changed, 1132 insertions(+), 1 deletion(-)
-
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 70a1bdcbf4df..054356371ea7 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -56,6 +56,8 @@
+ #define HOG_REPORT_UUID		0x2A4D
+ #define HOG_PROTO_MODE_UUID	0x2A4E
+ #define HOG_CONTROL_POINT_UUID	0x2A4C
++#define HOG_SCI_MODE_UUID	0x2C39
++#define HOG_SCI_INFO_UUID	0x2C3A
+ 
+ #define HOG_REPORT_TYPE_INPUT	1
+ #define HOG_REPORT_TYPE_OUTPUT	2
+@@ -64,6 +66,8 @@
+ #define HOG_PROTO_MODE_BOOT    0
+ #define HOG_PROTO_MODE_REPORT  1
+ 
++#define HOG_INFO_FLAG_SCI_SUPPORTED	0x04
++
+ #define HID_INFO_SIZE			4
+ #define ATT_NOTIFICATION_HEADER_SIZE	3
+ 
+@@ -98,6 +102,8 @@ struct bt_hog {
+ 	struct queue		*gatt_op;
+ 	struct gatt_db		*gatt_db;
+ 	struct gatt_db_attribute	*report_map_attr;
++	uint16_t		sci_mode_handle;
++	uint16_t		sci_info_handle;
+ };
+ 
+ struct report {
+@@ -152,6 +158,10 @@ static void destroy_gatt_req(void *data)
+ }
+ 
+ static void read_report_map(struct bt_hog *hog);
++static void sci_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data);
++static void sci_info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data);
+ 
+ static void remove_gatt_req(struct gatt_request *req, uint8_t status)
+ {
+@@ -1105,6 +1115,85 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	DBG("bcdHID: 0x%04X bCountryCode: 0x%02X Flags: 0x%02X",
+ 			hog->bcdhid, hog->bcountrycode, hog->flags);
+ 
++	/* Read SCI attributes if SCI is supported */
++	if (hog->flags & HOG_INFO_FLAG_SCI_SUPPORTED) {
++		if (hog->sci_mode_handle)
++			read_char(hog, hog->attrib, hog->sci_mode_handle,
++						sci_mode_read_cb, hog);
++		if (hog->sci_info_handle)
++			read_char(hog, hog->attrib, hog->sci_info_handle,
++						sci_info_read_cb, hog);
++	}
++
++remove:
++	remove_gatt_req(req, status);
++}
++
++static void sci_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct gatt_request *req = user_data;
++	uint8_t value;
++	ssize_t vlen;
++
++	if (status != 0) {
++		error("HID SCI Mode read failed: %s", att_ecode2str(status));
++		goto remove;
++	}
++
++	vlen = dec_read_resp(pdu, plen, &value, sizeof(value));
++	if (vlen != 1) {
++		error("ATT protocol error");
++		goto remove;
++	}
++
++	DBG("SCI Mode: 0x%02X", value);
++
++remove:
++	remove_gatt_req(req, status);
++}
++
++static void sci_info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct gatt_request *req = user_data;
++	uint8_t value[14];
++	ssize_t vlen;
++	uint8_t min_conn_interval;
++	uint8_t num_grps;
++	uint8_t i;
++
++	if (status != 0) {
++		error("HID SCI Information read failed: %s",
++						att_ecode2str(status));
++		goto remove;
++	}
++
++	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
++	if (vlen < 2) {
++		error("ATT protocol error");
++		goto remove;
++	}
++
++	min_conn_interval = value[0];
++	num_grps = value[1];
++
++	DBG("SCI Info: Minimum Supported Connection Interval: %.3f ms "
++		"(0x%02x) Number of Supported Subgroups: %d",
++		min_conn_interval * 0.125, min_conn_interval, num_grps);
++
++	for (i = 0; i < num_grps && (2 + i * 6 + 5) < vlen; i++) {
++		uint16_t min, max, stride;
++		size_t off = 2 + i * 6;
++
++		min = get_le16(&value[off]);
++		max = get_le16(&value[off + 2]);
++		stride = get_le16(&value[off + 4]);
++
++		DBG("  Subgroup[%u]: Min %.3f ms Max %.3f ms Stride %.3f ms",
++			i, min * 0.125, max * 0.125, stride * 0.125);
++	}
++
+ remove:
+ 	remove_gatt_req(req, status);
+ }
+@@ -1150,6 +1239,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 	struct gatt_primary *primary = hog->primary;
+ 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+ 	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
++	bt_uuid_t sci_mode_uuid, sci_info_uuid;
+ 	struct report *report;
+ 	GSList *l;
+ 	uint16_t info_handle = 0, proto_mode_handle = 0;
+@@ -1167,6 +1257,8 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
+ 	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
+ 	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
++	bt_uuid16_create(&sci_mode_uuid, HOG_SCI_MODE_UUID);
++	bt_uuid16_create(&sci_info_uuid, HOG_SCI_INFO_UUID);
+ 
+ 	for (l = chars; l; l = g_slist_next(l)) {
+ 		struct gatt_char *chr, *next;
+@@ -1201,6 +1293,10 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 			proto_mode_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
+ 			hog->ctrlpt_handle = chr->value_handle;
++		else if (bt_uuid_cmp(&uuid, &sci_mode_uuid) == 0)
++			hog->sci_mode_handle = chr->value_handle;
++		else if (bt_uuid_cmp(&uuid, &sci_info_uuid) == 0)
++			hog->sci_info_handle = chr->value_handle;
+ 	}
+ 
+ 	if (proto_mode_handle) {
+@@ -1360,7 +1456,7 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 	bt_uuid_t uuid, report_uuid, report_map_uuid, info_uuid;
+-	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
++	bt_uuid_t proto_mode_uuid, ctrlpt_uuid, sci_mode_uuid, sci_info_uuid;
+ 	uint16_t handle, value_handle;
+ 	struct iovec map = {};
+ 
+@@ -1414,6 +1510,14 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
+ 	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
+ 	if (!bt_uuid_cmp(&ctrlpt_uuid, &uuid))
+ 		hog->ctrlpt_handle = value_handle;
++
++	bt_uuid16_create(&sci_mode_uuid, HOG_SCI_MODE_UUID);
++	if (!bt_uuid_cmp(&sci_mode_uuid, &uuid))
++		hog->sci_mode_handle = value_handle;
++
++	bt_uuid16_create(&sci_info_uuid, HOG_SCI_INFO_UUID);
++	if (!bt_uuid_cmp(&sci_info_uuid, &uuid))
++		hog->sci_info_handle = value_handle;
+ }
+ 
+ static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
 -- 
 2.54.0
 
