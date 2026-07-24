@@ -1,68 +1,68 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B06E388E59
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A47B44E67F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 19:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920364; cv=none; b=hn6lSMzbkp0ma7SUl0pSEz98SEKznLWvjLjrcmPmQEiyJa0QhF5htP3XFG8GBOji37AN1CU7v979iZi2ETPILPsE7m2obCFGwM3Iw40A1buryC2Z6O/g5zUwJVfMW5ExfLLpkereovPhd6kPUrw9YacDdBUTb0RxFgw8F8cofXU=
+	t=1784920365; cv=none; b=GAOW0oCcjL3RhmYsDYhVDIxx9pmvIZNzmkWPriP7A/LUpF0GpLpwmbzLn+MFLbA+HzkDCVn8T25Q9a4Tbx8lbDFC/9OJe7WgQZBCQKHy47vEmaeErf8+oTGGhr1OI7AWLbo5f0/OW0Q1KI6HMzL5Gv7RV/VvpYT0M53n5cIUZS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920364; c=relaxed/simple;
-	bh=e93OsVryTlPEyuFKYJhe+iyj1K0ueuJ5vVx1aresM/k=;
+	s=arc-20240116; t=1784920365; c=relaxed/simple;
+	bh=8JNB+35w9Lano8J8NIMUc0MAg2cQjB6ysCX7Ivd6S+w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nkw+ZuZkeiRSqYnbXcr5d1ZCJhDwr3j3nfI1cspjT9EOE4X5OersjjHYJ0QXlxvi3cYxU0s2noZTT543xAnY12sW+Z0qKC+QaNWTru9GPPpN2och8rZIGPZss3JxDclUABcnbTmeZ90i+zou49VEtQ4cXZga/KymkAc3EYFmjis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lV0c8/Og; arc=none smtp.client-ip=209.85.217.43
+	 MIME-Version; b=ULmltq+axFZhQfVgq+sGrSpYPUbZwe7pacOgSTT6Nal5RnWOOZf3y2dj6USkmoiGAUQDBB/gVyJEdbgqmCz1vI8qyfEfjZqcuBoUi3JIp7jnY3TeGOcETq7t05jLQWpyYy5Ag45iXMbiUOELkWkXdlPlmoI6+05QzK3OG7TiNss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZZlnYJbK; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lV0c8/Og"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-73a442f7cd3so501894137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZlnYJbK"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5bf9506704fso248141e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2026 12:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784920362; x=1785525162; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784920363; x=1785525163; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=o3ek8X/dQIrL5JRdvOQGlOrkTv+B4TfrTsOWVOJ3nT8=;
-        b=lV0c8/OgEpUObhyBwKE+qrkvKDltVEA8DnmxL8sQak2sCCJc+2Om2ZbCbBAmgVcDxl
-         KKWdjchsFAisQ+YeafvgiyI1mLlBKh3NsRdlPi2Amdau++orsT0R25lm95ayuDu5Zhb8
-         PLcde6W/AwAFxQygRs8olBdEKP9HqG8FRuc90KegOGAH4oHj1xzGzLn0cHBhsGF6gL8p
-         /xBw9XqEJ8xRy69Q9k2QO+XyThZ8sKIzH44nuERiaKgKFfwdFNbp7INYWE9KPBblJ7nU
-         L23+mwhDgNIaRdTzGIdpSQhuUymG/XcCJGEcyif5Fgf2FgNk6tDiDzedlUINpg+QGrsn
-         opIw==
+        bh=KpdN95T/FiKDdstHIc/UTa2FGWkVuFdAXDTdpTJ0Lzg=;
+        b=ZZlnYJbKl5Uv7mg0rV/RRm3p1qlo349IrBiqtv2if5ulvD7TZhFkbSJNlg4Ja3qRRX
+         lZpQBfanvXnEeE4Lu7U2ty+lvNMEPEWEcDyan05uI4vrXZmNacGN0zLLKo2PZJHZWRy8
+         selibMYCaNd+xKRXxOUJD6Jr/BvNz/p/ACVSLdSpq87bOTAJN8bmgpyJ0OCf7yqWeXmY
+         wZBvd5beKrNjrlm2lqMZcGFF41TwQjMkWk40LfX656UaqQcWKmfnj51lZWoLwpM0pvyq
+         mwIQXzK/W4RtYezjKCaClh7/ucrh2TjFSvDJ4dGIuqYL5AhB7MeODrNcE4VntetAStXy
+         HiqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784920362; x=1785525162;
+        d=1e100.net; s=20251104; t=1784920363; x=1785525163;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=o3ek8X/dQIrL5JRdvOQGlOrkTv+B4TfrTsOWVOJ3nT8=;
-        b=VrJ/oUjopso458BRwK8kamSG8Ch/A5PPb51JW3cpmMtedt+HnH9auxDM9x+VQ5Ud/J
-         vbIO9BAQxmMuByIrqwYRL31Aq8a4snf8cb2QeOVL6xEnzTrYM6ig6pAjHHsaE4oA28Ku
-         i3y5qN+hSku78//mLbQ1Z3mZ1OgUmDANTuQM2wrLluKCyU+w0cNiBsp6DeAH5xb3fxkV
-         jKxG8vOB+Ow2rUkFRz7dhqBWldMHM5DpKO4zrxyBbFHcSznsaShMLnnw4cGqbl8hrKjy
-         DiCQVpFqschIHnwFHkRKDRBsY3gAm4p08qczi0UFf5AwcOCNjFQcXb6A7pgsHvDbdsKr
-         aEeQ==
-X-Gm-Message-State: AOJu0YxeGjxgA98S6Hnn3AIs3A6MYVA8A8lThF9IjX2ME7O8EZDTnXQs
-	cBtzcTZbYF8zAdn4Gs5KZYZvf4KCXFCzsov8rzUQOM3A9eCqszrUCrfXj3uDfvEa
-X-Gm-Gg: AR+sD112w/d67vhCIOuFgKW0iqkZ8lFJQJiVfvIOiqzvZDWKeLCshxuyb1eWHC+gnaW
-	44mtPzqn4ZNTGJe3xOEi/YiomlGYkxUdJcY/RuIlt5/9qCg7eZ1F9xZQaTSdIdGZjfxOmce+NPD
-	J7dKy/1QIBx9J9C207gQpbmJfNbXWm+B7S7cy3QjeXZNghjbPmeve3YXfMC+d4rgj7MX0ulPOyJ
-	ZM2w8aK8DhnDrBD/kqHvUHfB9SSVZnPvAhqmZQkhuaRNK38p6y7facFVtKC0YNTQMUpq5WUStIA
-	CyGJr2Y8Qyba4Bt/BWGa1J3S2W7f6efp84oElJTIytdit1kwsWSof7ocCanzNZjgMWsvImom+PI
-	zc7jsdxAY7iS9l68A1tyaSeLfN5cWULcpgO508+zxX3MTQaz5qt5Coyeg2wMxPVs4wvCxLGPM8G
-	HVuM5EgWyAoYcjJ83SWYtOFP/i0cmJkNaSWj3I9JYcfWYCoO/OfL1FIZynB2Az0513vTKN+wsX
-X-Received: by 2002:a05:6102:f9b:b0:737:5c42:858b with SMTP id ada2fe7eead31-74d5e3d4033mr5283907137.11.1784920362225;
-        Fri, 24 Jul 2026 12:12:42 -0700 (PDT)
+        bh=KpdN95T/FiKDdstHIc/UTa2FGWkVuFdAXDTdpTJ0Lzg=;
+        b=ancNYB+nrYgmg+TXQt6Feu9Snvub0aELHG0cI09k8zJHS1H/aTXrXltgOyj4/13LJF
+         bIwgP7br4TppwkVX/viDyh9uB8nxe+xlxanxzg8qRb0VtVt7cLMCKvu5mDOmAFOlWcAM
+         rHL+NFT5vzB2nBT8fu0NXVuQBKqPGrK78SGXf8mo/hqf+1bSV9WQl1gUSmrRabp3qjH+
+         5cL9mGKLqM3CCZZ4cdGzz3/CzuzE5e2YrHjHKxl94U41YKLjCmzZL2zA8aX5xkhuG/K9
+         kVPQQakmvBq6Ubm2ZQPp2Gt1um6DOXZy3RzaOBy726BUJbm9M4u5MueAxxKGNl8b91ie
+         tIRw==
+X-Gm-Message-State: AOJu0YwSD2MPwj5K2lQgAcqzgy3Uu2SRenJzIjAjGk2z+U/T+OSWOHbi
+	hlktavH2lVBN3nwwXyGiVwdUiXAd8R6rfjZ7WcDvRuszUcwUyY/+LWcFVbzjM50/
+X-Gm-Gg: AR+sD104Hfsxy7SyQHCvoJqVoo8GdPCeNbOBv+OoahORUDSXimlvX5tbO7PMT3MyHQy
+	ZEksAhvX9uHA/m+WMjmLq3uKMpBd20aFu0Jms/02u0G2eoMZK+W1x5U6lVj3HulkOQRKKpMHf6d
+	/03akVRsXAQHYD2gsBYDqnAlLfCVkgDCmNbXnMS/6ekvpUohSPxdEQnjz+htcvwjubLeS16rsvq
+	VEXNpiGEnpeO2n9XlTguYV5Tpibko6JGUGDVbDl3srbjgyNVWLY5I9A5PxvJulP04ybqUiURn81
+	tHKsPeCdy+4yTotcgld1sP/5cg2mAatUS/4UIp4ImkcLkkZVrYJMKAPUzbDSY92aGs/Uxm+4nwV
+	hqIjgHP+6PYWNi0JGxaFVT0dnyNO5P9auxkFg/A6Q7c1pgEW9+dOp2socOfKh0etmyrBwkfCSNy
+	szxpz7XdiAiCoOhJ9z+/PWp6s1Lea+nfs/BDMOSusA9tF5j1z4gb9ANCO7JQzEvDu61MvDTdUf
+X-Received: by 2002:a05:6122:3a12:b0:5bd:9dbd:60bb with SMTP id 71dfb90a1353d-5c2da17126amr4164637e0c.9.1784920363107;
+        Fri, 24 Jul 2026 12:12:43 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.41
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97774c8b921sm488554241.4.2026.07.24.12.12.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 12:12:41 -0700 (PDT)
+        Fri, 24 Jul 2026 12:12:42 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 06/12] monitor: Add decoding for Load Connection Subrate, SCI setting and event
-Date: Fri, 24 Jul 2026 15:12:19 -0400
-Message-ID: <20260724191225.1815634-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 07/12] doc: Document ConnectionSubrate storage format
+Date: Fri, 24 Jul 2026 15:12:20 -0400
+Message-ID: <20260724191225.1815634-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
 References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
@@ -76,121 +76,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add decoding support for the new MGMT_OP_LOAD_CONN_SUBRATE (0x005C)
-command, the MGMT_EV_CONN_SUBRATE (0x0033) event and the Shorter
-Connection Interval setting bit (25) to btmon.
+Document the [ConnectionSubrate] group in the device info file which
+stores per-device connection subrate parameters for the SCI feature.
 ---
- monitor/packet.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ doc/settings-storage.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 82afef6011d2..0d3b23cc3fb7 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -14941,6 +14941,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
- 	{ 22, "LL Privacy"		},
- 	{ 23, "PAST Sender"		},
- 	{ 24, "PAST Receiver"		},
-+	{ 25, "Shorter Connection Interval"	},
- 	{}
- };
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+index 15f55f9ed908..8bd677e24548 100644
+--- a/doc/settings-storage.txt
++++ b/doc/settings-storage.txt
+@@ -361,3 +361,25 @@ Long term key) related to a remote device.
  
-@@ -15101,6 +15102,27 @@ static void mgmt_print_connection_parameter(const void *data)
- 	print_field("Supervision timeout: %u", supv_timeout);
- }
- 
-+static void mgmt_print_connection_subrate(const void *data)
-+{
-+	uint8_t address_type = get_u8(data + 6);
-+	uint16_t min_interval = get_le16(data + 7);
-+	uint16_t max_interval = get_le16(data + 9);
-+	uint16_t subrate_min = get_le16(data + 11);
-+	uint16_t subrate_max = get_le16(data + 13);
-+	uint16_t max_latency = get_le16(data + 15);
-+	uint16_t cont_num = get_le16(data + 17);
-+	uint16_t supv_timeout = get_le16(data + 19);
+   CCC_LE		Integer		CCC value for LE transport
+   CCC_BR/EDR		Integer		CCC value for BR/EDR transport
 +
-+	mgmt_print_address(data, address_type);
-+	print_field("Min connection interval: %u", min_interval);
-+	print_field("Max connection interval: %u", max_interval);
-+	print_field("Subrate min: %u", subrate_min);
-+	print_field("Subrate max: %u", subrate_max);
-+	print_field("Max latency: %u", max_latency);
-+	print_field("Continuation number: %u", cont_num);
-+	print_field("Supervision timeout: %u", supv_timeout);
-+}
 +
- static void mgmt_print_link_key(const void *data)
- {
- 	uint8_t address_type = get_u8(data + 6);
-@@ -16026,6 +16048,22 @@ static void mgmt_load_connection_parameters_cmd(const void *data, uint16_t size)
- 		mgmt_print_connection_parameter(data + 2 + (i * 15));
- }
- 
-+static void mgmt_load_conn_subrate_cmd(const void *data, uint16_t size)
-+{
-+	uint16_t num_parameters = get_le16(data);
-+	int i;
++[ConnectionSubrate] group contains:
 +
-+	print_field("Parameters: %u", num_parameters);
++  MinInterval		Integer		Minimum Connection Interval
++					(in units of 0.125 ms)
 +
-+	if (size - 2 != num_parameters * 21) {
-+		packet_hexdump(data + 2, size - 2);
-+		return;
-+	}
++  MaxInterval		Integer		Maximum Connection Interval
++					(in units of 0.125 ms)
 +
-+	for (i = 0; i < num_parameters; i++)
-+		mgmt_print_connection_subrate(data + 2 + (i * 21));
-+}
++  SubrateMin		Integer		Minimum Subrate Factor
 +
- static void mgmt_read_unconf_index_list_rsp(const void *data, uint16_t size)
- {
- 	uint16_t num_controllers = get_le16(data);
-@@ -17096,6 +17134,9 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x005B, "Send HCI command and wait for event",
- 				mgmt_hci_cmd_sync_cmd, 6, false,
- 				mgmt_hci_cmd_sync_rsp, 0, false},
-+	{ 0x005C, "Load Connection Subrate",
-+				mgmt_load_conn_subrate_cmd, 2, false,
-+				mgmt_null_rsp, 0, true },
- 	{ }
- };
- 
-@@ -17620,6 +17661,25 @@ static void mgmt_mesh_packet_cmplt_evt(const void *data, uint16_t size)
- 	print_field("Handle: %d", handle);
- }
- 
-+static void mgmt_conn_subrate_evt(const void *data, uint16_t size)
-+{
-+	uint8_t address_type = get_u8(data + 6);
-+	uint8_t status = get_u8(data + 7);
-+	uint16_t interval = get_le16(data + 8);
-+	uint16_t subrate = get_le16(data + 10);
-+	uint16_t latency = get_le16(data + 12);
-+	uint16_t cont_num = get_le16(data + 14);
-+	uint16_t supv_timeout = get_le16(data + 16);
++  SubrateMax		Integer		Maximum Subrate Factor
 +
-+	mgmt_print_address(data, address_type);
-+	mgmt_print_status(status);
-+	print_field("Interval: %u", interval);
-+	print_field("Subrate: %u", subrate);
-+	print_field("Latency: %u", latency);
-+	print_field("Continuation number: %u", cont_num);
-+	print_field("Supervision timeout: %u", supv_timeout);
-+}
++  MaxLatency		Integer		Maximum Peripheral Latency
++					(in units of subrated connection
++					events)
 +
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -17717,6 +17777,8 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_mesh_device_found_evt, 22, false },
- 	{ 0x0032, "Mesh Packet Complete",
- 			mgmt_mesh_packet_cmplt_evt, 1, true },
-+	{ 0x0033, "Connection Subrate",
-+			mgmt_conn_subrate_evt, 18, true },
- 	{ }
- };
- 
++  ContinuationNumber	Integer		Number of continuation events
++
++  SupervisionTimeout	Integer		Link Supervision Timeout
++					(in units of 10 ms)
 -- 
 2.54.0
 
