@@ -1,189 +1,260 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E65388390
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 08:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD7831714F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 09:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784969706; cv=none; b=q5V1XmVIsorDDDingFgRL+N/jO2F2PLWlvFkXE7gppRCtXqec7fvGWNYba9xbqM0EzT2y3AQIpbmfnrOg8TVJKqnvkyVwNAAIzpqA8Tk6w6EaxeRj/wlfr92AwDrqcaCMHaFXHutUXmSpCixuaX0zsxEmhNl51UFbBtbRbSj4PA=
+	t=1784973242; cv=none; b=tIxrbNQLlGmF5xx/FjW0TR/SFpRTQP/8q8hLYIOWNKG6qBLsmqBsXBPI/rAyo0YMxrZx20LtIRhW+aFTKYtLZtS/XmcWwsDFVMjxc2NpNlOiZxdzw+DHe4v7XVPokLikaqmdqQ3+4xCwF06haGe7z1NTFwjoUozFrdwJIcZ0G/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784969706; c=relaxed/simple;
-	bh=3gOwQ2Veh3ermpnFQs85a7ka/v3tpSUQ9crEUy28sgo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jNvO3CD6fRsXd+QK7jHgdlarh8lMRGIYhqOb+uVJY/hr8ofAPBcAtHZT1m4QeLbvajQaCZuKVK1THnKkpuONEaNq6/phuzhX2LIZi/XRIiJaN23u57BAco7m5exAkRDxbzheuJsVXzvl4muQk/JpdeiXJ56oGgQ/3gZzoHFkd3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Va9P2BlA; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kXdW8//Z; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1784973242; c=relaxed/simple;
+	bh=VWEunNI0KlzajewIvsdUHQ30+0kN5QhCPtYOoa5rhB4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p50YuXQO17xDZf/MxOWA0CQ191rPWSP5qWvEOFqPFz1N1+o821bRhEy/DCfSufMFsY81KNEqIPM4FFX4jOcD3J3M7qDStEnVLWEA1CHsq1e+w2BiyujjMuR/7zDeDpNqF0LE3CXVA/vZB0q2g5RC6Dn0cHETYuloc8aOrZObvUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=AQyHPwL+; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Va9P2BlA";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kXdW8//Z"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66P4m02Y704275
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 08:55:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	pQ5dLwxvUjCjqtpx0GNX+yrJf8Z4XMgfa2yK6gqTwU8=; b=Va9P2BlAX3WQFpRq
-	Aq13rcHJMlxX/rMCd0kdt9PnRTmmuvuzYkX89jsM2PcTUJgN/yFlIyEusH598q2f
-	eKQJmQtLoqBpWr7aTi9QSIvAzLEm678SWX6a+Xxm3ZJ/D6gzf8HH/JI0qpx8ZkOC
-	lDbHD9xfI7JZ0VaobnX0VJWPs9h+4CxjnsoE9zQtdCWbA2axCbGTogF86lvJ+E8s
-	FvtqgSZKKlY2E6n7nc7UvpP08cs1/9gpYcPxmk88DgIVIF5F5Rsq/GYE2E6dk9mh
-	teCJuIIGnRFFl91+Ay0F88n3h4lc9PNT/9abJp8klZZenqmqXwWRFZAzAJlolLOA
-	Siaj3Q==
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fmpee8d23-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 08:55:03 +0000 (GMT)
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2ced1ed870fso2599415ad.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 01:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784969703; x=1785574503; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pQ5dLwxvUjCjqtpx0GNX+yrJf8Z4XMgfa2yK6gqTwU8=;
-        b=kXdW8//ZsXaJ9GLBvSqgI8XslfDOHxlOHtAf1x/1HZSY8P4BRVmH6yRFmXAe9+wntk
-         XG8MjpV0j3fCDLvEE+4YZZlEhDWBviE9bfdwwTa/ghFcyud20oHmvoo5mHn30ijEjXur
-         tucNRhviJfx10mp6NA/2vYzavttqGJRUUOarCDrtPf6ev9tQJ4KmOPPL/AxhVllW0aRF
-         oXLxzun33V9WO7p+QiYYbnpx64vYJ0inhUyCjmmrq2cXvz004S+y67Xrpjr1nMWrnU1G
-         6+CHSXX1ZjU3KSCeUTh4J9UQRpYNe4jKPfITfIrkT1kLMADfYc+YkAxzTHvvIsEzuUyF
-         QM5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784969703; x=1785574503;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=pQ5dLwxvUjCjqtpx0GNX+yrJf8Z4XMgfa2yK6gqTwU8=;
-        b=eQhgJrfSM6caGVeyMxbTbdCLEZTqaKGrdp9WEOVEBkHCo7BeckswXZ+6J56ip0/LuB
-         BOokzCExI1Lj3gLUIgxV3MJRHsUKEnkqdnQ3QyUaxwamkdYdF/7IuLX8VgmBM3C8xlSH
-         1hQOv8l+Z/wNZvVqh6uPy9XUdaLdBGzXcQ6o++uuWULNSpAGukNS2hwu59xqjqVNcbH6
-         KKrwLTA04pXmSQkKLSK0RK2uNBEUFIjhra1ivUDwNqKfD8AKezdgzYHpAlCMljg9A3QM
-         uGfOyxt0PkNrWLocPsWB58ADtcCv2mP25Nxue063eSl20rwZz4QQ53JElrDXJxmYV888
-         qzDA==
-X-Forwarded-Encrypted: i=1; AHgh+RrOu/D46xw1PJiPrd9Bl+xm9TEjiLY56vfOnTnpOgxNHBi1BfpzTueiYsb3zih18V4uPLSYSwXwGjFuqfppXN0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGa50x5Pmd/aC6UAOocCXAqgbCCW/sTZDHLhoCugfvtsTaDMaZ
-	jzV3JM1kuQRiv56hZ+e6OgcCDj6VShFeOV/+utyHD+NfYj58wTnVHzPAiTAzevbFFUhsMzaaRdR
-	bRfGhnqPOnYUPuc0qrjl5KXte02gj8VGX/s9iGgocFMSb9XZzEb7Gfd1kV9SGTuX/WT0Kpec=
-X-Gm-Gg: AR+sD13jGwUDfO5eq/YO+Dr4tszkAdCSn3QYVqPiYyIq8xeqa6JiR9nw8mDPios3sbf
-	VYWo0m1X8hyLiaih4yoVBLCweMiepk+1xPzXaBBbRgzJ9QFtFzhCm8NI5+W3D7m23PpXq0VJsWa
-	mxg33rszwzvVsSQqEFZw12EgUVI5YmaQKVmkNZlb9m4Cu2NDGOQSzHBup9cjRhLh9UEaTj6hQr+
-	tHmYP28PWpuhDqi6heLOTtdtPcg/gBz7Q2RNpYTQDi+MLd6XPUaNsR507dN24Mwqa1SKAxv/Hp4
-	Ulg1GTXB7D8LsL2fQoj1ue34EMdXvXOZLvcKcAAxMnwwlO3Un7DrFL+Zlgng0uOT08Md2Inc5mD
-	Q9V9yhBHzLJvJkx8v8k4q6g0iU0MZ0qlSvd+nS9VDsHw6d/s=
-X-Received: by 2002:a17:902:d491:b0:2ca:ecf6:9115 with SMTP id d9443c01a7336-2cfde7901b2mr14124435ad.2.1784969702698;
-        Sat, 25 Jul 2026 01:55:02 -0700 (PDT)
-X-Received: by 2002:a17:902:d491:b0:2ca:ecf6:9115 with SMTP id d9443c01a7336-2cfde7901b2mr14124225ad.2.1784969702276;
-        Sat, 25 Jul 2026 01:55:02 -0700 (PDT)
-Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-314bc419c52sm7823000eec.10.2026.07.25.01.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jul 2026 01:55:01 -0700 (PDT)
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Sat, 25 Jul 2026 01:54:49 -0700
-Subject: [PATCH 11/11] Bluetooth: hci_core: Don't treat
- HCI_DRV_PKT/HCI_DIAG_PKT as unknown type
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AQyHPwL+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=NLT5I73L0oilb/ExGbjJ3snomNermyh77ziD5ZXQYfk=;
+	b=AQyHPwL+u/A9Au4W0gVkX1XhK1KrXeDgVMBcZZ10TMwR8bBaKgehCqMBGdkudi
+	CxEXjJJhi66RStKrxOjOw7szD5uwOd2qcHWuLfhzIGMNSsdcGQv7U6ApMi9XfmhG
+	jzBkvxDu5tvmE1+HQdQlyyJ5a1wK0IANcLavhXXlAAGac=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgBnkPdzh2RqVTQKIQ--.45326S2;
+	Sat, 25 Jul 2026 17:52:53 +0800 (CST)
+From: zhangchen200426@163.com
+To: pmenzel@molgen.mpg.de
+Cc: gustavoars@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	luiz.von.dentz@intel.com,
+	naga.akella@oss.qualcomm.com,
+	pav@iki.fi,
+	tim.bird@sony.com,
+	yang.li@amlogic.com,
+	zhangchen01@kylinos.cn,
+	zhangchen200426@163.com
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
+Date: Sat, 25 Jul 2026 17:52:51 +0800
+Message-Id: <20260725095251.2267431-1-zhangchen200426@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <a5980d04-4d39-4d3d-bbc8-738abd394fd6@molgen.mpg.de>
+References: <a5980d04-4d39-4d3d-bbc8-738abd394fd6@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260725-generic_fix-v1-11-305aec261a19@oss.qualcomm.com>
-References: <20260725-generic_fix-v1-0-305aec261a19@oss.qualcomm.com>
-In-Reply-To: <20260725-generic_fix-v1-0-305aec261a19@oss.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
-        Manish Mandlik <mmandlik@google.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zijun Hu <zijun.hu@oss.qualcomm.com>
-X-Mailer: b4 0.15.2
-X-Authority-Analysis: v=2.4 cv=Jr3Bas4C c=1 sm=1 tr=0 ts=6a6479e7 cx=c_pps
- a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=bbCMvEgGTdwX0zQgW7YA:9 a=QEXdDO2ut3YA:10
- a=GvdueXVYPmCkWapjIL-Q:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI1MDA4MyBTYWx0ZWRfX7FLus84vqx1i
- UZcBDkIcSY44zkHVfQTN1s6RR2UeVc811KXzMclcdZrjrS/MdoNd9fahDIz2oPnuWC/jgsQR0Vr
- nVvsBl/9JnFjEKMCQk3uh8bpvh+qMoY=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI1MDA4MyBTYWx0ZWRfX8VBGv46bmY+f
- XCf9iGgaFBsk9UVYBmQl+lbRVtT0YrFbeJR0fM2l6/fc9T1UAZaXfcv2dgo12WCQsLK9Q6czShd
- FLTIFJZ69yZob1zjJGT/yF6Q+WZd71l2rI3dboeO5RMOFsuhrNXzUX+qrR1qJ4A1bTgIF8+d09F
- TL7pxA9iBcXUnrKFWWADKUWoGZA0vsnAkIYMkrrKcrVQ4IA7LsjDp1dtgJCbwc8EPJUr89fJMgI
- kxy3Ebbz9ztbtNEqrTBWKq4PradAliz9oiVhe80LRhg6Mrz+qKi01dW/nVzlK3JiEEORRQfqr92
- Um/WbkNCLJIxGhwofE7IR1DFeru3KanIjrKBqM6zGgLQ9KHfl2InNxw6tCmfcA2Bp+LXenVNSzA
- ctZIZP7758t/guYm3XNVCw2IkFx+1hZXxxFptASgtRDmF99FTgACxBIgMVOFqlyftrdaBUbYeqI
- dh1hf6AzgFlNdhuvBRw==
-X-Proofpoint-ORIG-GUID: 2hJtuSNpDCXMFvoOLid47zyWuyrM84ki
-X-Proofpoint-GUID: 2hJtuSNpDCXMFvoOLid47zyWuyrM84ki
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-25_02,2026-07-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 malwarescore=0 spamscore=0 adultscore=0
- impostorscore=0 phishscore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607250083
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PSgvCgBnkPdzh2RqVTQKIQ--.45326S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Wr1DurWUuw4DJr4DJr1kZrb_yoW3WF15pa
+	yYka98Gr48Jr1fX3WfZ3ykuFs5Zws7XrW7Gr4qqa4Fyan0vrWkKr40y345Kry7CrWkGF1a
+	vF42grW2kryDJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUGjgwUUUUU=
+X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC6BWyT2pkh3WpzgAA3b
 
-Both HCI_DRV_PKT and HCI_DIAG_PKT reach hci_rx_work(), and leverage
-the default switch case to free them silently. Relying on the default
-case is prone to mislead readers into thinking either that:
+Dear Paul
 
-1) they never arrive at hci_rx_work(), and the function does not
-   handle them at all; or
-2) they are unknown packet types, which normally fall into the
-   default switch case.
+Thank you for providing the comments.
 
-Fix by giving both their own switch cases that free them explicitly.
+On Fri, 24 Jul 2026 11:23:26 +0200, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Chen,
+>
+>
+> Thank you for your patch.
+>
+> Am 24.07.26 um 10:54 schrieb zhangchen200426@163.com:
+> > From: Chen Zhang <zhangchen01@kylinos.cn>
+> > 
+> > Some speakers do not actively initiate disconnection when power off. As
+>
+> … powering …
+>
+> > a result, the center can only wait for a timeout to disconnect, with the
+>
+> What does “the center” refer to?
+In the scenario where a phone actively connects to a speaker, the phone acts as the central device and the speaker is the peripheral device. You can also say the phone is the master and the speaker is the slave. The center refers to the central device.
+>
+> > default timeout being 20s. In certain scenarios, this can significantly
+> > impact user experience. For example, if a speaker is playing music and
+> > is then turned off, it takes 20s before the music starts playing from
+> > the center.
+> > 
+> > Define HCI_Write_Link_Supervision_Timeout command, event structure, and
+> > corresponding event handler function, set the timeout to 5s after ACL
+> > link is established.
+>
+> Why five seconds and not less? How do Chromium OS or Android do it?
+In environments with significant interference, a larger timeout value should generally lead to better connection stability. The 5-second value was chosen based on a comprehensive evaluation and can be considered an empirical value. For reference, the Android system defaults to 8 seconds. You can find the corresponding logic in the on_acl_br_edr_connected and btm_acl_role_changed functions in the Android 17 source code at packages/modules/Bluetooth/system/stack/acl/btm_acl.cc.
+>
+> Please also document one test setup up, where you could reproduce it.
+The local setup uses RTL8852BU and MT7922 modules.
+After connecting the PC to the speaker via scanning, use the hcitool to query the link supervision timeout. The steps are as follows:
+hcitool con
+Connections:
+        < ACL BE:EC:CC:19:7C:D9 handle 70 state 1 lm CENTRAL AUTH ENCRYPT
 
-Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
----
-Previous version:
-https://lore.kernel.org/all/20260719-fix_hci_rx_work-v1-1-2d7fdeed3640@oss.qualcomm.com
+hcitool cmd 0x03 0x0036 0x46 0x00
+< HCI Command: ogf 0x03, ocf 0x0036, plen 2
+  46 00
+> HCI Event: 0x0e plen 8
+  01 36 0C 00 46 00 00 7D
+Here, 00 7D represents the timeout value 0x7D00, which converts to the actual time: 32000*0.625ms = 20000ms.
 
-Changes since previous version:
-- Improve commit title and message.
----
- net/bluetooth/hci_core.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Then, power off the speaker and observe how long it takes for btmon to print the HCI disconnection message.
+The reason for the disconnection is Connection Timeout.
+> HCI Event: Disconnect Complete (0x05) plen 4        #1 [hci0] 17:17:48.806247
+        Status: Success (0x00)
+        Handle: 70
+        Reason: Connection Timeout (0x08)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9d5adf882509..85f1b44fed9b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4051,16 +4051,24 @@ static void hci_rx_work(struct work_struct *work)
- 			hci_scodata_packet(hdev, skb);
- 			break;
- 
- 		case HCI_ISODATA_PKT:
- 			BT_DBG("%s ISO data packet", hdev->name);
- 			hci_isodata_packet(hdev, skb);
- 			break;
- 
-+		case HCI_DRV_PKT:
-+			kfree_skb(skb);
-+			break;
-+
-+		case HCI_DIAG_PKT:
-+			kfree_skb(skb);
-+			break;
-+
- 		default:
- 			kfree_skb(skb);
- 			break;
- 		}
- 	}
- }
- 
- static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+Some devices actively initiate a disconnection when powered off. In this case, the link supervision timeout will not take effect, so the issue cannot be reproduced.
+The reason for the disconnection is Remote User Terminated Connection.
+> ACL Data RX: Handle 69 flags 0x02 dlen 12        #1158 [hci0] 17:22:17.418475
+      L2CAP: Disconnection Request (0x06) ident 16 len 4
+        Destination CID: 66
+        Source CID: 68
+< ACL Data TX: Handle 69 flags 0x00 dlen 12        #1159 [hci0] 17:22:17.418514
+      L2CAP: Disconnection Response (0x07) ident 16 len 4
+        Destination CID: 66
+        Source CID: 68
+> HCI Event: Disconnect Complete (0x05) plen 4     #1161 [hci0] 17:22:17.671651
+        Status: Success (0x00)
+        Handle: 69
+        Reason: Remote User Terminated Connection (0x13)
+>
+> > Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
+> > ---
+> >   include/net/bluetooth/hci.h      | 10 +++++++
+> >   include/net/bluetooth/hci_core.h |  1 +
+> >   net/bluetooth/hci_event.c        | 50 ++++++++++++++++++++++++++++++++
+> >   3 files changed, 61 insertions(+)
+> > 
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 50f0eef71fb1..18a5a17eb218 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -1239,6 +1239,16 @@ struct hci_cp_host_buffer_size {
+> >   	__le16   sco_max_pkt;
+> >   } __packed;
+> >   
+> > +#define HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT	0x0c37
+> > +struct hci_cp_write_link_supervision_timeout {
+> > +	__le16	 handle;
+> > +	__le16	 timeout;
+>
+> How about appending the unit for the timeout: timeout_s.
+If there are no other issues with this patch review, I'll upload a v3 version and update the 'timeout' to 'timeout_ms'.
+>
+> > +} __packed;
+> > +struct hci_rp_write_link_supervision_timeout {
+> > +	__u8	 status;
+> > +	__le16	 handle;
+> > +} __packed;
+> > +
+> >   #define HCI_OP_READ_NUM_SUPPORTED_IAC	0x0c38
+> >   struct hci_rp_read_num_supported_iac {
+> >   	__u8	status;
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index e7133ff87fbf..866903a9b5c8 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -702,6 +702,7 @@ struct hci_conn {
+> >   	__u8		le_features[248];
+> >   	__u16		pkt_type;
+> >   	__u16		link_policy;
+> > +	__u16		link_supervision_timeout;
+>
+> Ditto.
+>
+> >   	__u8		key_type;
+> >   	__u8		auth_type;
+> >   	__u8		sec_level;
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 741d658e9630..653184d0dfc7 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -606,6 +606,44 @@ static u8 hci_cc_write_voice_setting(struct hci_dev *hdev, void *data,
+> >   	return rp->status;
+> >   }
+> >   
+> > +static u8 hci_cc_write_link_supervision_timeout(struct hci_dev *hdev, void *data,
+> > +						struct sk_buff *skb)
+> > +{
+> > +	struct hci_ev_status *rp = data;
+> > +	struct hci_cp_write_link_supervision_timeout *sent;
+> > +	struct hci_conn *conn;
+> > +	u16 handle;
+> > +	u8 status = rp->status;
+> > +
+> > +	bt_dev_dbg(hdev, "status 0x%2.2x", status);
+> > +
+> > +	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT);
+> > +	if (!sent)
+> > +		return status;
+> > +
+> > +	handle = le16_to_cpu(sent->handle);
+> > +
+> > +	hci_dev_lock(hdev);
+> > +
+> > +	conn = hci_conn_hash_lookup_handle(hdev, handle);
+> > +	if (!conn) {
+> > +		status = 0xFF;
+> > +		goto done;
+> > +	}
+> > +
+> > +	if (!status) {
+> > +		conn->link_supervision_timeout = __le16_to_cpu(sent->timeout);
+> > +		bt_dev_dbg(hdev, "handle 0x%4.4x timeout set to 0x%4.4x (%u ms)",
+> > +			   handle, conn->link_supervision_timeout,
+> > +			   conn->link_supervision_timeout * 5 / 8);
+> > +	}
+> > +
+> > +done:
+> > +	hci_dev_unlock(hdev);
+> > +
+> > +	return status;
+> > +}
+> > +
+> >   static u8 hci_cc_read_num_supported_iac(struct hci_dev *hdev, void *data,
+> >   					struct sk_buff *skb)
+> >   {
+> > @@ -3240,6 +3278,16 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+> >   			hci_send_cmd(hdev, HCI_OP_CHANGE_CONN_PTYPE, sizeof(cp),
+> >   				     &cp);
+> >   		}
+> > +
+> > +		if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
+> > +			struct hci_cp_write_link_supervision_timeout cp;
+> > +
+> > +			cp.handle = ev->handle;
+> > +			cp.timeout = 0x1F40;	/* 8000 * 0.625ms = 5000ms */
+> > +			hci_send_cmd(hdev, HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT,
+> > +				     sizeof(cp), &cp);
+> > +		}
+> > +
+> >   	}
+> >   
+> >   	if (conn->type == ACL_LINK)
+> > @@ -4097,6 +4145,8 @@ static const struct hci_cc {
+> >   	HCI_CC_STATUS(HCI_OP_WRITE_CLASS_OF_DEV, hci_cc_write_class_of_dev),
+> >   	HCI_CC(HCI_OP_READ_VOICE_SETTING, hci_cc_read_voice_setting,
+> >   	       sizeof(struct hci_rp_read_voice_setting)),
+> > +	HCI_CC(HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT, hci_cc_write_link_supervision_timeout,
+> > +	       sizeof(struct hci_rp_write_link_supervision_timeout)),
+> >   	HCI_CC_STATUS(HCI_OP_WRITE_VOICE_SETTING, hci_cc_write_voice_setting),
+> >   	HCI_CC(HCI_OP_READ_NUM_SUPPORTED_IAC, hci_cc_read_num_supported_iac,
+> >   	       sizeof(struct hci_rp_read_num_supported_iac)),
+>
+>
+
 
 -- 
-2.34.1
+Regards,
+    Chen Zhang
 
