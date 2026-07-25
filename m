@@ -1,68 +1,65 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4533A7F75;
-	Sat, 25 Jul 2026 09:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1954C346AC0
+	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 10:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784973582; cv=pass; b=Unhyh8R/yBEt1kdeIADIHZOPKQZQ4Stpe+FsuYZkmoAqHJCmGfv2BYqWN0vYf4rPOxJauXB8aox4pcdzwntV5PkDE9Vv08UmfCd9/vI8HRxuABJ6jUYZHukylijeS74fjohxXok7QGJsocRllqRyRJCfteWyHmmuhpOr0uhOogU=
+	t=1784973774; cv=pass; b=Z3IX60F82D5pvEVKl9G9uIEoLnqhTzmMgbDKvN7wX04oolHNulm5jH7szekbBsKub4ksyOh0xrzYXVcwQxQ3SgdTtrswpnQucuG4N1srz90ltTJpJNEX3lzswdJKgM8skfejIH2oP5Sgcj5A9fpjvUrmvxwi+6xVhHAox6/mCV8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784973582; c=relaxed/simple;
-	bh=AT6jMuFQwR00+Cr2wrMgKntno/NK9EU+Z1skvvtIFKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V9xwcOGIbUu2tq7siR1oP4UtiP6j1Il1HPfRbbbbycVGw0nQ351byT1WB2doj1c4v2N2cFCHhEU3XNKZ9s7OiE6c1dIIQEE9SwpXJ7/NzW37yChNHBOoEBySWe/1/egvGN4HLicgmKkzyXRFf+dEZVPiEEflTNsfSj3e90tOjoA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=oFDCIhwj; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1784973774; c=relaxed/simple;
+	bh=QgpIRQN8FBDT8NG+biWkaUzGCCxT12wy76QBf2JYfmM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G2yJbFU1IB0AF9jW1k255S86EDn8UgTM82c1QvpLhOJ+4v1vh+MvCvFCAPECVD1cQDY6F5+5pr5LrKOGknZXfZKkoJ739ZHBH53+P91K/4o2df0d/u1KmDnSOquCNsakAB6QHq0hY1zcOT8gTOFIbpMwNgrR4V/o+dm6lZPuKXQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=lYjpBYuP; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="oFDCIhwj"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="lYjpBYuP"
 Received: from monolith.lan (unknown [185.65.133.169])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6gLy4VQ2zyl5;
-	Sat, 25 Jul 2026 12:59:38 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784973579;
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h6gQW5nGCz49QMh;
+	Sat, 25 Jul 2026 13:02:43 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1784973764;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OVfwS13F09Yn4rQY8CGeqczZgn4+mT2dtS2HMUNWKLs=;
-	b=oFDCIhwjsG3rDaWblrMxGqMEXCaM0j7pHb6kaX2lx/IejFK74gL01Ep57M8uYoSY40LY2w
-	G4zcSFhp9hOKl+GT1WJ4lbvEr4Tk+cUYDei2pdlpq3oexlpkZZQprc2n/Ma40qCxLyQv2c
-	qI5ppfw7Um10SIcP3xEOANGB6PRs2JI=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784973579;
-	b=VkkN4WfO0z4o1H2IfRGrPBCtUvxefqMvaI29e3f9H9zRMIwMw91aTXEAnRl5NXdbQG92Na
-	07xaLZfpLsRhwD4Ppq3v3g8k2KXc/osDgaLpI0Vg0qJTMG1ZcT7DsqmoswFb8M1dsaxj+n
-	hyIUAa5C54IUpK4yNuItF3Vjp5hAeTc=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tINuCDy+cBxAKSWRL8FvKdEE3IaCz4mL6Q/s1A+gUwc=;
+	b=lYjpBYuPInZTHy2Isr0FmlWdseyCJuE4j1dM+F90ILjddjGvw0pTTLskIVcMNJPCojSOcY
+	5+xDjiZ3SpPve5yPc1GJYYDUaitS/hg2aubFGMZK33zGAQu8MrVFfIyqABJH1y5nwEi6zU
+	PszSqv6+K3QLE6mKPEYy8jmDD0wUdPuu12rpeTl06T6qKCNt8Hpse+Um3Ll0dpSveeWms/
+	dNtVtKVaGBdx6AsH/sVTg4/6RDFssMTcKYs/QcPzG21f08QPn23U5egq5ofyka4qqcuNfq
+	2MF2qvJyInU72VakbjcAOWSpo/OZXyjHi0IGWbPg90EDrNv2i/Gr/naCfICIZg==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784973764;
+	b=SaZVdxENmGVsNxNV18UoojzijJGv/JgRTzBhDxvNoE3UgeYX70mRHgnziOjLunmVaYPZMf
+	Odncipzbe1HhKBlCCSQESgTvfLqR1/5xBHhFSmTKuX7B5prk0PWal7noF6dd/DgauL8vbX
+	EIq4/m3iPYhCAmCDnSS8mNtcVOA8ZhtwrtCoO+HRp5gSAgJEwMmKZDQr/gsvmKJ5XrCt/8
+	p1yjXwsligU39+9swIoIMT1O4qJIfxkq0LO7YEf13812wZKu4spdN0HJgq8C0FmfBf46da
+	8j6rVhb4SrhjL/iNR21yBtbkNt9/UL90s2nlgGDa05XBEI4+WGxBqIBUUgjgFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784973579;
+	s=lahtoruutu; t=1784973764;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OVfwS13F09Yn4rQY8CGeqczZgn4+mT2dtS2HMUNWKLs=;
-	b=bycrc75QQDs4Tn3bFTmZlEgWUDXo7kvp8AGcCFYUYlaAiLR74iKPC3l9sjE8uYwG66qWM0
-	15PfkG4qqfaSap1qc2TT7w6QS9bjlRXAY721DV1enSouvFKpPz/5w2N9/xo+nCqpwVPQ0C
-	B9poFsIjVlYl713GTiQPksSr5C/YLhU=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tINuCDy+cBxAKSWRL8FvKdEE3IaCz4mL6Q/s1A+gUwc=;
+	b=rvuMegRdJ533mQOIvlhypybiMvi1SpHGkr8wqrHbnDWpatmW3ojD2snMD6I9dzgZ+3nE/N
+	Fv3tfPJNuERNweZ2bJjQwCeTHjJjCDWtlbTsMp92I1FKCgbvMLeXZ65yE2z0uKZ+EDbK2O
+	hvKEp79xOpzeAXzuhlrElc34xo87CUHO5QTE3oqpxd1+R4m9YStTfvDvC1jk10JIt3z67q
+	1Ie3TMFoBl33rwg7PiEqN8kRssr3OjYDoP8ft9oY4vdnYfaJhcHf5+u93gUDPsRlteIBm/
+	ccteTtA/mjIVm1eGx+76TtthaAw3NH6s/x3nDbURCXirxI0xadmr+kXBN36fEw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	oss@fourdim.xyz,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 7/7] Bluetooth: hci_sync: remove unnecessary hci_conn_get in create_conn_sync
-Date: Sat, 25 Jul 2026 12:59:23 +0300
-Message-ID: <060f924a73949939547a5889d889bfbc64317ea0.1784973264.git.pav@iki.fi>
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: hci_sync: add conditional locking annotations
+Date: Sat, 25 Jul 2026 13:02:36 +0300
+Message-ID: <528c354dca68f05cfd17df7c80f8b04419c0fb74.1784973709.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1784973264.git.pav@iki.fi>
-References: <cover.1784973264.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,78 +68,59 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_conn_get() without already held reference is data race against
-concurrent deletion.
+Add context analysis annotations to functions doing conditional locking,
+to suppress analysis warnings.
 
-In previous patches, the refcount has been changed to be taken before
-starting the hci_sync task, so remove these extra get() + put() as they
-are not needed.
-
-Fixes: 76c2d047410ba ("Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()")
+Fixes: a3ad01d51d4b ("Bluetooth: hci_sync: Fix advertising data UAFs")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-
-Notes:
-    v5:
-    - no change
-    v4:
-    - no change
-
- net/bluetooth/hci_sync.c | 13 -------------
- 1 file changed, 13 deletions(-)
+ net/bluetooth/hci_sync.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 0f76221db2bd..7779d9d1663a 100644
+index d5554fbf3129..f5545f270f09 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -6717,11 +6717,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 
- 	bt_dev_dbg(hdev, "conn %p", conn);
- 
--	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
--	 * clear_bit() at done.
--	 */
--	hci_conn_get(conn);
--
- 	clear_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->state = BT_CONNECT;
- 
-@@ -6736,7 +6731,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 			conn->state = BT_OPEN;
- 			hci_abort_conn_sync(hdev, conn,
- 					    HCI_ERROR_REJ_LIMITED_RESOURCES);
--			hci_conn_put(conn);
- 			return -EBUSY;
- 		}
- 
-@@ -6834,7 +6828,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 
- 	/* Re-enable advertising after the connection attempt is finished. */
- 	hci_resume_advertising_sync(hdev);
--	hci_conn_put(conn);
- 	return err;
+@@ -1255,6 +1255,7 @@ hci_set_ext_adv_params_sync(struct hci_dev *hdev, u8 instance,
  }
  
-@@ -7109,11 +7102,6 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 	else
- 		cp.role_switch = 0x00;
- 
--	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
--	 * clear_bit() below.
--	 */
--	hci_conn_get(conn);
--
- 	/* Mark create connection in flight so hci_cancel_connect_sync() can
- 	 * cancel it while blocking on the connection complete event.
- 	 */
-@@ -7125,7 +7113,6 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 				       conn->conn_timeout, NULL);
- 
- 	clear_bit(HCI_CONN_CREATE, &conn->flags);
--	hci_conn_put(conn);
- 
- 	return err;
+ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
+ 		    HCI_MAX_EXT_AD_LENGTH);
+@@ -1343,6 +1344,7 @@ int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
  }
+ 
+ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	struct hci_cp_le_set_ext_adv_params cp;
+ 	struct hci_rp_le_set_ext_adv_params rp;
+@@ -1499,6 +1501,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ }
+ 
+ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length,
+ 		    HCI_MAX_EXT_AD_LENGTH);
+@@ -1552,6 +1555,7 @@ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+ }
+ 
+ static int __hci_set_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	struct hci_cp_le_set_scan_rsp_data cp;
+ 	u8 len;
+@@ -1693,6 +1697,7 @@ static int hci_set_per_adv_params_sync(struct hci_dev *hdev, u8 instance,
+ }
+ 
+ static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	DEFINE_FLEX(struct hci_cp_le_set_per_adv_data, pdu, data, length,
+ 		    HCI_MAX_PER_AD_LENGTH);
 -- 
 2.55.0
 
