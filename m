@@ -1,104 +1,71 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2293546EA;
-	Sat, 25 Jul 2026 11:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDBF369D66;
+	Sat, 25 Jul 2026 11:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784978491; cv=pass; b=fXdaioldRiRfwxGR5b09AROWPBuL+6xWLCR7ch0B2kXhnEGD7Ku7cEyfJ005A7bm6gSvVyHFGHBej7nqUBSQwOJ7bKjjEWprs7R4mu16ACEEEmp9Dp69EUNJ01mvDGdrrbunGfNbkdgvjAKEzQALNBqPOKXePWGuJGpeVGpS6tE=
+	t=1784979431; cv=pass; b=LKwoH0pYj7z4m4tp2gP17320do2mhp9A+I9iSld/MH1mj5Pxb6gs1VEM8kUXzIYF+7zw4/CUWvttPkedxtob2W5J7xsrgsa8mPExjb2ttGs9q+J3WXD+ArrUNdNpT2/pBGUAQp7iGwgoY0+qOlXL4gQirQtnb879/OZF8E6JpoU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784978491; c=relaxed/simple;
-	bh=JejLCo/eexvyEpdLq5sAhZBCHPdlMrUiM6XMmqfoWYg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=r303wwpSkA9tfhQB0KFPZrW/ElnzwFIucjdLHBc3LB2S7BS86c+o7q+q9wYidkEEdoz+3MWT/ZUJOWPqMhMkuZ88EB0U+xl5KkHVkt13o3xlcWiVnxRFHcNDgR7PwRoALqvCltEPfGICxdJ2jQoaB1X14niMLk6hgpT3t4YzxpE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Di4hL+PB; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1784979431; c=relaxed/simple;
+	bh=Q2pugquHUKvEq9a9fpNRnVKo3p5HzcNzXlQBSbkruiQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=da+01BlvCCVrKVKME+EbPvlV6D1CyR8bAe5eSEBIxwf4qFHXGH5O3OZJqOSBF2++2a0MAppB7/Z8VuRLEKLT1f40Md+Y6ghz80ZmSuCdRBAAUTJDB1ObXdItFRz13q3X1HqnkFswTn11HpEOPhHXLoRbGRhyzQKaNfkBCkqrgqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=k0L6hAhH; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Di4hL+PB"
-Received: from [192.168.1.195] (unknown [45.83.220.214])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="k0L6hAhH"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:1:e011::d301])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h6j9G0t3gz49QK5;
-	Sat, 25 Jul 2026 14:21:21 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h6jWP3DLdz49QHx;
+	Sat, 25 Jul 2026 14:37:05 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1784978482;
+	t=1784979425;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yGzVfLsgVwmgX4Qm7Hbm4pmzq4g+u9V32HWgEEt2HeY=;
-	b=Di4hL+PBDxKAAh+wSV02IlTgbLa3qpxex1kcnEw2ETRKZT4rsieZBv/cfnoh1gLht2ZkeP
-	+Ghx0or8ibPtwaHJPGnmlkENbFnWYYgLsNcspKgj8E1SIphLvMfDPp2odD2ivsT837UeFN
-	96g/ovfKmh5jzQLdHY7/Wq/NHaes1ysKnahS6pGsg784h1t+5fMx3CKQRpZPUyTWcBn3/c
-	86OW6zH+7Ch6b0A+xSCioXeWna6W6c5dwHFEtfZ6t1mbsflmaNr3JZ8qWEKWB40lInrHEs
-	SI4LAPRktylWHcXBgCGbMiKNchYvICbEtjjRcmc+dPNaE6qR+ndBo/IHR2SnrA==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784978482;
-	b=JemzIV7jchBfCt2ESFxBZJpUsU1EpV/IEjOQ8T73GFMwac7ziJevuVwFH5TdJI82BN4k0m
-	3s04eKwuLjgVG7fL9hATCoRiCIdIhH2rlG2YD/k5xS7KcMcOCwzHowd9vqUiWGFIegM0Qi
-	NLuNr/ZB/kHsaeUXF/3m2Al0D2VvKeofzhUgtczuGPzBvR3P5dHV7RsRpbhnIv1fpz7WXx
-	EwTySb6mDOgZpsYz5tnQLfMlopKxqw0ve+nKN2v/qhc7OTpZULtb5d2K5xvp5WvQEpeYFL
-	+0VcpRuOZc6Cj9ZcqrXr7BS2vOVNG/kfa5R9vxI1G1PRYeMHo+YSWPCZs7FhVQ==
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkYJynOMiW3GnsdQgBx1yOPVJaeCVfgudgf39/FfL6o=;
+	b=k0L6hAhHdzOnbrN4hsM7jxVtwt+D10Fwcn38h2uRGXw8Nnu+HrIitXkv4CCnWnpluqsKps
+	0jGgPzcrkXB8bQc8mCwf5xroKWhKdOsn7iPJ/9UwkQY9Yny6NT+kowIOOksKxdmmTZ1XcX
+	vc9Wh6LPh4uX0sVJeOy2QpSdiHBN4tvmihen0UxOWMXJgJbgew4zQ4PSkGrft0j4TEpKUI
+	UtoffG/wQQX7mwBMKf6527CkydYzdJhh9B6aWmnxTsQNElB8rD78hUXfUl1jFQYTRpLEd5
+	tNCTUZDf/sjGTuUVycLe6WC1b9Vwnc//a4baN32RZHBeGDtEw4C7OZo2v1McKw==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784979425;
+	b=R+qiaY7aDREnUUBA0ShETBgdEMbblKD+w+Zc3XCvKvV/xmVABAJyQGIpOPwqhFdyTwDdhv
+	RnY3qo6gtDJKCXq0FsvZWqvdHIYdDa/TVkmndfIpT1tyZbKmuGZ10130XfP5x2H4J9JjAS
+	yNO0kt383VqvDNSylntK6OG+hygDWdlRaRwL1i2obdDEfiROECpkcWAotbErmCln5qzltr
+	N9zjgXQ0o82Q0f+JbmNNQs40TNT60pDsas+JEsSbf1TI/pqMjQQ07QOHr8ZVtaPaio+QV2
+	FSdlVYZp0mJhHKxPKoFHYYTpSXksuKUXoGTq2Rteg26dP+AEGetAhM5iLtFzVQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1784978482;
+	s=lahtoruutu; t=1784979425;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yGzVfLsgVwmgX4Qm7Hbm4pmzq4g+u9V32HWgEEt2HeY=;
-	b=YQmPjfiVskUAlykcUzZ3vfRf545BjoSIV5co4eyGHwBTxrPClU6j4iMna9PzMwRWUUIzUe
-	v6ZBnS+VC6NkvzDs/FQ8M2XL13vRPZWGfpe9/ziNnoDtTjkCOfdd7Rz6Y/DBg4Atp1XWiQ
-	eDxmjuB+JO8We687WWydpoLUjEojk2CitKLBg2iEYcamDW5Wfe7fEnNe49s5UeKNTthAQq
-	OozLT7usUJ4a11dz3KWvNOh3mo1i+olnrSWm/abJTHYff0ZLtrypfminusX2+X6h2vRSGp
-	X1KSPuXWfhhnEDH8nvAALCz+Db7Ifh/NUsQCn4MmrUuWonA4uZttJwRH36Rayg==
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkYJynOMiW3GnsdQgBx1yOPVJaeCVfgudgf39/FfL6o=;
+	b=N4iSMpa9SvgeUvJb0rxJmONc4eWLBa5x5MUxV5N/kpdr59+MrqeRar9qG4v1CzNIEld9wn
+	ESo1v6M8fRV6blQc+msRy5wlrTvD1T4AkUcQBFdVkxjoJjv1jFeoJTHpu+hZQPCHM9oAxP
+	vN2dG+bG/X/+Z7lu7QB7VcMf/2JbZg3p+1VMWDMoDLHzeG06TQhbjbG3xIIdfoNgDEQkMa
+	y9edplEA8o2uzoMwfTOeICkNTpjFa5o82S0v8gOo0pGdN7L4ezMsBHseq7fvelgkKtBrI+
+	8gUri+LHCJkUfyS4SE1Mitj+hN3aQOHw0WJ4K1QY0Mk9bIKw7/32sEPVUm0JGg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <85848db4c55a05c6116e00f5344df93b57d0f65a.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: ISO: fix UAF in iso_conn_ready
+Message-ID: <c6e534e497ee771ca80e5f3c6223eaf305bca48c.camel@iki.fi>
+Subject: Re: [PATCH v2] Bluetooth: SCO: give the socket its own sco_conn
+ reference
 From: Pauli Virtanen <pav@iki.fi>
-To: Jiale Yao <yaojiale02@163.com>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Date: Sat, 25 Jul 2026 14:21:06 +0300
-In-Reply-To: <20260725105127.434136-1-yaojiale02@163.com>
-References: <20260725105127.434136-1-yaojiale02@163.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
- ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
- cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
- aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
- cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
- +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
- n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
- 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
- QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
- dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
- QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
- aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
- 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
- /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
- g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
- T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
- xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
- Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
- BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
- ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
- dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
- wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
- IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
- Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
- G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
- S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
- XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
- xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
- LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
- 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
- WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+To: Aldo Ariel Panzardo <qwe.aldo@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-kernel@vger.kernel.org,
+ 	stable@vger.kernel.org
+Date: Sat, 25 Jul 2026 14:37:04 +0300
+In-Reply-To: <20260723232902.792805-1-qwe.aldo@gmail.com>
+References: <20260723232902.792805-1-qwe.aldo@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
@@ -111,79 +78,242 @@ MIME-Version: 1.0
 
 Hi,
 
-la, 2026-07-25 kello 18:51 +0800, Jiale Yao kirjoitti:
-> When iso_connect_cfm() calls iso_conn_ready(), the latter reads
-> conn->sk without holding a reference. A concurrent close() on the
-> ISO socket triggers iso_sock_kill() which frees sk, leading to a
-> use-after-free when iso_conn_ready() subsequently accesses the
-> freed sk via lock_sock() and iso_sock_ready().
+to, 2026-07-23 kello 20:29 -0300, Aldo Ariel Panzardo kirjoitti:
+> sco_conn_del() drops a reference it does not own. It takes one transient
+> reference via sco_conn_hold_unless_zero() and releases it with the
+> sco_conn_put() that follows sco_sock_hold(); the additional put in the
+> !sk branch releases a second one:
 >=20
-> This was triggered by a vhci-based PoC that races
-> LE Setup ISO Data Path (0x206e) command completion against
-> close() on the ISO socket. The crash manifests as a KASAN
-> null-ptr-deref in iso_connect_cfm() at offset 0x3c from a NULL
-> pointer, with the call trace:
+>     conn =3D sco_conn_hold_unless_zero(conn);
+>     ...
+>     sk =3D sco_sock_hold(conn);
+>     sco_conn_unlock(conn);
+>     sco_conn_put(conn);
 >=20
->  iso_connect_cfm+0x311/0x15f0
->  hci_cc_le_setup_iso_path+0x46d/0x6f0
->  hci_cmd_complete_evt+0x26d/0x990
->  hci_event_packet+0x468/0xb40
->  hci_rx_work+0x255/0x6e0
+>     if (!sk) {
+>             sco_conn_put(conn);
+>             return;
+>     }
 >=20
-> Fix by replacing the bare pointer read with iso_sock_hold(conn)
-> under iso_conn_lock, which atomically elevates the refcount,
-> and add sock_put() on the exit path where the hold succeeded.
+> When close() races the controller's Disconnection Complete, sco_chan_del(=
+)
+> clears conn->sk and drops the socket's reference while sco_conn_del() is
+> running. sco_conn_del() then sees sk =3D=3D NULL, its own put drops the c=
+ount
+> to zero and frees the conn, and the second put writes to the freed kref:
 >=20
-> Fixes: ccf74f2390d60 ("Bluetooth: Add BTPROTO_ISO socket type")
-> Signed-off-by: Jiale Yao <yaojiale02@163.com>
+>     BUG: KASAN: slab-use-after-free in sco_conn_put.part.0+0x1a/0x190
+>     Write of size 4 at addr ffff8881099dec74 by task kworker/u17:3/413
+>     Workqueue: hci1 hci_rx_work
+>     Call Trace:
+>      sco_conn_put.part.0+0x1a/0x190
+>      hci_disconn_complete_evt+0x1ee/0x3e0
+>      hci_event_packet+0x54a/0x650
+>      hci_rx_work+0x321/0x3d0
+>     Allocated by task 413:
+>      sco_conn_add+0x72/0x1a0
+>      sco_connect_cfm+0x88/0x670
+>     Freed by task 413:
+>      sco_conn_del.isra.0+0x3f/0xf0
+>      hci_disconn_complete_evt+0x1ee/0x3e0
+>     refcount_t: underflow; use-after-free.
+>=20
+> Simply deleting the extra put is not enough, because the reference it
+> releases is not always accounted for elsewhere. __sco_chan_add() stores
+> the connection in the socket without taking a reference:
+>=20
+>     sco_pi(sk)->conn =3D conn;
+>=20
+> so the socket inherits whatever reference its caller happened to hold.
+> That works out for sco_conn_ready(), which takes an explicit
+> sco_conn_hold() beforehand and whose caller puts its own reference, and
+> for the success path of sco_connect(), where the reference returned by
+> sco_conn_add() is silently handed over and later released by
+> sco_sock_destruct(). It does not work out for the two error paths of
+> sco_connect(): if the socket state changed while the lock was dropped, or
+> if sco_chan_add() returns -EBUSY, the reference from sco_conn_add() is
+> never released and the connection is leaked. The extra put in
+> sco_conn_del() is what eventually reclaims those orphans, which is why
+> removing it in isolation trades a use-after-free for a leak.
+>=20
+> Make the ownership explicit instead. __sco_chan_add() now takes the
+> socket's reference itself, sco_connect() releases the one it got from
+> sco_conn_add() on every path, and the now redundant hold in
+> sco_conn_ready() is dropped. With the socket holding a counted reference,
+> a connection can no longer reach zero while conn->sk is set, so
+> sco_conn_free() no longer has to clear sco_pi(conn->sk)->conn. Every
+> reference then has exactly one owner: the one sco_conn_add() returns
+> belongs to its caller, the socket's is taken and released with the
+> channel, and sco_conn_del() and sco_sock_timeout() only ever hold
+> transient ones.
+>=20
+> Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_c=
+onn")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
 > ---
->  net/bluetooth/iso.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+> v2:
+>  - Do not just delete the extra put: make the socket own its reference,
+>    balance sco_connect()'s error paths and drop the redundant hold in
+>    sco_conn_ready(), per Pauli Virtanen's review.
+>  - Drop the now unreachable sco_pi(conn->sk)->conn clearing in
+>    sco_conn_free().
+>  - Indent the quoted code with spaces so gitlint stops complaining.
 >=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 2e95a153912c..c8103de41cdd 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -2074,7 +2074,7 @@ static bool iso_match_dst(struct sock *sk, void *da=
-ta)
->  static void iso_conn_ready(struct iso_conn *conn)
->  {
->  	struct sock *parent =3D NULL;
-> -	struct sock *sk =3D conn->sk;
-> +	struct sock *sk;
->  	struct hci_ev_le_big_sync_established *ev =3D NULL;
->  	struct hci_ev_le_pa_sync_established *ev2 =3D NULL;
->  	struct hci_ev_le_per_adv_report *ev3 =3D NULL;
-> @@ -2083,6 +2083,10 @@ static void iso_conn_ready(struct iso_conn *conn)
+> On hci_conn_drop() vs hci_connect_sco(), which was also asked about: the
+> reference hci_connect_sco() returns is released by hci_conn_drop() on
+> each error path of sco_connect(), and on the success path it is handed to
+> the connection and released by sco_conn_free(). That side looks balanced.
+> There is a separate asymmetry that this patch does not touch: when
+> sco_conn_add() returns a connection that already existed for the hcon,
+> hci_connect_sco() has taken a fresh hci_conn reference but sco_conn_free(=
+)
+> only ever issues one hci_conn_drop(). That looks like a pre-existing
+> hci_conn leak rather than an sco_conn one; I did not want to fold it into
+> this fix.
+
+There's a double drop on the error paths now, so it'll probably hit
+WARN_ON() if these are reached, but it's not fatal.
+
+The SCO refcounting rule probably should be that sco_conn owns one
+hci_conn_hold reference all of its lifetime.
+
+hci_connect_sco() returns a hci_conn with a new hci_conn_hold reference
+given to the caller.
+
+sco_connect_cfm() never gives callee a hci_conn_hold refcount.
+
+So probably (this will have to be thought out better and maybe separate
+patch):
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 5cab7e2fb898..0e1dd6a8e6d7 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -185,6 +185,8 @@ static void sco_sock_clear_timer(struct sock *sk)
+ }
+=20
+ /* ---- SCO connections ---- */
++
++/* Consumes hci_conn_hold refcount */
+ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ {
+ 	struct sco_conn *conn =3D hcon->sco_data;
+@@ -195,6 +197,9 @@ static struct sco_conn *sco_conn_add(struct
+hci_conn *hcon)
+ 			sco_conn_lock(conn);
+ 			conn->hcon =3D hcon;
+ 			sco_conn_unlock(conn);
++		} else {
++			/* We already own the refcount */
++			hci_conn_drop(hcon);
+ 		}
+ 		return conn;
+ 	}
+@@ -362,7 +367,6 @@ static int sco_connect(struct sock *sk)
+ 	if (sk->sk_state !=3D BT_OPEN && sk->sk_state !=3D BT_BOUND) {
+ 		release_sock(sk);
+ 		sco_conn_put(conn);
+-		hci_conn_drop(hcon);
+ 		err =3D -EBADFD;
+ 		goto unlock;
+ 	}
+@@ -371,7 +375,6 @@ static int sco_connect(struct sock *sk)
+ 	sco_conn_put(conn);
+ 	if (err) {
+ 		release_sock(sk);
+-		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+=20
+@@ -1449,7 +1452,6 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		bacpy(&sco_pi(sk)->src, &conn->hcon->src);
+ 		bacpy(&sco_pi(sk)->dst, &conn->hcon->dst);
+=20
+-		hci_conn_hold(conn->hcon);
+ 		__sco_chan_add(conn, sk, parent);
+=20
+ 		if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)-
+>flags))
+@@ -1505,7 +1507,7 @@ static void sco_connect_cfm(struct hci_conn
+*hcon, __u8 status)
+ 	if (!status) {
+ 		struct sco_conn *conn;
+=20
+-		conn =3D sco_conn_add(hcon);
++		conn =3D sco_conn_add(hci_conn_hold(hcon));
+ 		if (conn) {
+ 			sco_conn_ready(conn);
+ 			sco_conn_put(conn);
+
+>=20
+> Testing: the original defect reproduced 45 times across 2 independent
+> runs on unmodified v7.2-rc1-240-g71dfdfb0209b with KASAN, driven through
+> /dev/vhci by racing close() of an SCO socket against an injected
+> Disconnection Complete; both KASAN and the refcount_t underflow fired
+> every time. The BlueZ CI ran sco-tester against v1 with no regression.
+>=20
+>  net/bluetooth/sco.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index fcc597be5bbd..21f829575803 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -81,9 +81,6 @@ static void sco_conn_free(struct kref *r
 > =20
 >  	BT_DBG("conn %p", conn);
 > =20
-> +	iso_conn_lock(conn);
-> +	sk =3D iso_sock_hold(conn);
-> +	iso_conn_unlock(conn);
-> +
->  	if (sk) {
->  		/* Attempt to update source address in case of BIS Sender if
->  		 * the advertisement is using a random address.
-> @@ -2103,7 +2107,8 @@ static void iso_conn_ready(struct iso_conn *conn)
->  			}
->  		}
+> -	if (conn->sk)
+> -		sco_pi(conn->sk)->conn =3D NULL;
+> -
+>  	if (conn->hcon) {
+>  		conn->hcon->sco_data =3D NULL;
+>  		hci_conn_drop(conn->hcon);
+> @@ -265,10 +262,8 @@ static void sco_conn_del(struct hci_conn
+>  	sco_conn_unlock(conn);
+>  	sco_conn_put(conn);
 > =20
-> -		iso_sock_ready(conn->sk);
-> +		iso_sock_ready(sk);
-
-This should re-check conn->sk and socket state again after acquiring
-lock_sock to avoid state transition on closed socket.
-
-See
-https://lore.kernel.org/linux-bluetooth/b9341fe78dbe1ddd550b5099e6c87006fdb=
-4b3e5.camel@iki.fi/T/#m4ddb5fb1add7bd2375de3ce5a92335922dd14abd
-
-
-> +		sock_put(sk);
->  	} else {
->  		hcon =3D conn->hcon;
->  		if (!hcon)
+> -	if (!sk) {
+> -		sco_conn_put(conn);
+> +	if (!sk)
+>  		return;
+> -	}
+> =20
+>  	/* Kill socket */
+>  	lock_sock(sk);
+> @@ -283,7 +278,7 @@ static void __sco_chan_add(struct sco_co
+>  {
+>  	BT_DBG("conn %p", conn);
+> =20
+> -	sco_pi(sk)->conn =3D conn;
+> +	sco_pi(sk)->conn =3D sco_conn_hold(conn);
+>  	conn->sk =3D sk;
+> =20
+>  	if (parent)
+> @@ -366,12 +361,14 @@ static int sco_connect(struct sock *sk)
+>  	 */
+>  	if (sk->sk_state !=3D BT_OPEN && sk->sk_state !=3D BT_BOUND) {
+>  		release_sock(sk);
+> +		sco_conn_put(conn);
+>  		hci_conn_drop(hcon);
+>  		err =3D -EBADFD;
+>  		goto unlock;
+>  	}
+> =20
+>  	err =3D sco_chan_add(conn, sk, NULL);
+> +	sco_conn_put(conn);
+>  	if (err) {
+>  		release_sock(sk);
+>  		hci_conn_drop(hcon);
+> @@ -1439,7 +1436,6 @@ static void sco_conn_ready(struct sco_co
+>  		bacpy(&sco_pi(sk)->src, &conn->hcon->src);
+>  		bacpy(&sco_pi(sk)->dst, &conn->hcon->dst);
+> =20
+> -		sco_conn_hold(conn);
+>  		hci_conn_hold(conn->hcon);
+>  		__sco_chan_add(conn, sk, parent);
+> =20
 
 --=20
 Pauli Virtanen
