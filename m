@@ -1,49 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3E231714F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425B8355048;
 	Sat, 25 Jul 2026 09:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784973574; cv=pass; b=BI6gk5gVy5t2Is6MVq/M9P8nhcVrpx1kKa1opsNXMF6QiUQS/SUiT9vcGrL9SOHid17f5AKhAfq0gtAeuyBEc7xNlrGrFqDVUSIla/+uniF4aFV3SxBcX8jVS3fFYz2IRKRwOpdOiPNCstRlwz1h9/SsUR8fE8XF+FpqG9PmvfA=
+	t=1784973574; cv=pass; b=HAk0a8apwJnND8237Nq+x0LK46/CBtNZJaJZRJCxO8fe0yHSZsfaBZ3ctefvt/YB6AKXZ6W/qeOuoqbnWH2ynpG4oRC/2otaJXXhEg1qxXB0SStjucyIQiOTEc3kT/FJpBlFI8Yz6wVUeFxNpwUCLScWh14P+XIBpv9BtcxfhLI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784973574; c=relaxed/simple;
-	bh=vbQyhc+5++T1EA3TG3Moz2nX42dPvTgOGjj1AbedJxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hvrA5dYByehkRazph59SgmRFYNn8vDhEKfEG+47ADmcVy++BW80pDlSVq76n91i4oadn01r+4Ls1Yj+xI65bPy0k4lbhjS1oWjQN8wwyJvQ4xQgNDb91PUgXGRYAXZtujWmBTF1tIP36ksnRl3J9YoZixybX3WAkXmW5DKHfD7A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=DpUEJixl; arc=pass smtp.client-ip=195.140.195.201
+	bh=VsmwBwyFsL+7eKnpchCTySYjFHTvO2weTxpjTi4Oex0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qmnK2QIkI5dnwNbpg5OVmjHY3xZboI7aIY3N0K0G43H0mmBUsJsIEVRfKVs0WG6Hy4xGgBncunzEPYXHl/JZs/6K8ymt2gWXI/M3zGlggvs4bF6nTChrX2QEe6YSbiyOJLG1NxsBhFAUlCv3GoXWhC+JAEbYFFFWk/xhuy06PYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gvpysdhE; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="DpUEJixl"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gvpysdhE"
 Received: from monolith.lan (unknown [185.65.133.169])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6gLl46pVzyWx;
-	Sat, 25 Jul 2026 12:59:27 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h6gLn2ZRjzyl5;
+	Sat, 25 Jul 2026 12:59:29 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784973568;
+	t=1784973570;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qNKai6aFL/jaZa2uckG0N9ljlP2UXpjyPC5hdQbiols=;
-	b=DpUEJixlSE/+bxopq93FYnss5uggoPsXAI4camPY2IZtOe707LNTNQ+699ggYAb1Bko933
-	w9IbTihjrnykSIyhbsTbow8m55BkRHa1tpIhC/cd/vw2Z4UsLQ0q/rTS7ZtfDFc7Wu+xs2
-	hRhZZXojKPleUZuzU+Dm3MQkCEgGRys=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784973568;
-	b=Uqe5oe0FtwSnq+s6Xt4ugq83qh2l8AvS8QQLlTD2dTzixg9766R7x+EsxAU5TjOjptCL+i
-	GZYQSs7KgBwK3xgCFGs8Fy40HVoM+wP52Xxlzvod1tx8CW2Xveqt80SlSHElFXNFEts800
-	+9m6vZXDUDLqEJBIp+M+RUpVD6kknwk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dS/+rrw4u091YzxvdzOgScuiX8fI++1TP4gjMh+irX8=;
+	b=gvpysdhEaIqQT3sEdDTQ9JsrE3aV+zWVixawKT/qDVZg75Cit+3w7QFnWCuy1h2jMFmNql
+	5Y4SpPKjUVOuzStD4R4jH0Hlj6sP0bWbpUfAkSUeuiJNxmC/uZesoF21F7B5V6vaS5qBSg
+	yaa2OfmVh0v1LyN8/Gl3TEB7zr96CC8=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784973570;
+	b=H0fw06CXglEEbl9BXloXM//S+G0vkhWa8n/XLgVjtzHfioMCP1Bu/Kz6uABdMMn2dSCqua
+	jhqui+3ziphXwjzQasHyR0WW/tvwNsDEv1LrtIP57Y3l0X1/3nHWeDcRW98YwwuNkGqTWD
+	XBad2qDHY4rTLopIw0F5sV3zD+W+onE=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784973568;
+	s=meesny; t=1784973570;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qNKai6aFL/jaZa2uckG0N9ljlP2UXpjyPC5hdQbiols=;
-	b=vSHAUlaH2NoIPhRPXweCeWfuO8idNg9dS/5cLA+YGZVT7A1VOBMEmhW8O1JfGFHSIjfJOa
-	Jt25d9iPMNG5FTj+dOkEJOl/H1w+KF7J2zhH5Ohkg1MQalsAee00hf+lMtuRwamk/9GgPg
-	sOi8lGIPm9yQjLwPWvw3FCxCxuFy9vs=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dS/+rrw4u091YzxvdzOgScuiX8fI++1TP4gjMh+irX8=;
+	b=FGmAMJVErFUgbPX73m7xZlBW+d4BarxQFj8wxHb5bZ96v7Ag72CymnOPhyEC05hHZK846x
+	CBb10ckxHbw9waKLSmrn5B1lF3/d1trTs+Jz6o6jZoluKhKJ5oPDEnsyh8LJsHWoEo110a
+	RJU+acPEZXrE5Q6rMxDSQ7LF1fKqNz0=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -54,10 +57,12 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	luiz.dentz@gmail.com,
 	oss@fourdim.xyz,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 0/7] Bluetooth: hci_conn: hold conn references in hci_sync tasks
-Date: Sat, 25 Jul 2026 12:59:16 +0300
-Message-ID: <cover.1784973264.git.pav@iki.fi>
+Subject: [PATCH v5 1/7] Bluetooth: hci_conn: hold conn reference in abort_conn_sync()
+Date: Sat, 25 Jul 2026 12:59:17 +0300
+Message-ID: <2cbcaf1f4ecc03601653eff0763c07c41c901376.1784973264.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <cover.1784973264.git.pav@iki.fi>
+References: <cover.1784973264.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,45 +71,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Have hci_sync tasks hold reference to hci_conn pointer they want to use
-later.
+There is theoretical UAF if the conn is freed while the hci_sync task is
+running.
 
-Avoids UAFs and passing potentially reused (possible even if very
-unlikely) pointers to hci_conn_valid().
+Hold refcount to avoid that.
 
-hci_conn_del() dequeues running works for the same connection, but this
-has no effect if the work is already started running, which is the race
-condition here.
+Fixes: 227a0cdf4a02 ("Bluetooth: MGMT: Fix not generating command complete for MGMT_OP_DISCONNECT")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-v5:
-- resend
-- no need to check hci_conn_valid() in create_big_complete, the bit is
-  safe to clear also if hci_conn_del() has run
+Notes:
+    v5:
+    - no change
+    v4:
+    - no change
+    v3:
+    - split to multiple patches per different Fixes:
 
-v4:
-- Check !conn in hci_connect_big_sync() first.
-  It's probably bug in iso.c that it may call this with NULL, but
-  probably better fixed separately.
+ net/bluetooth/hci_conn.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-v3:
-- resending some rebased parts from
-  https://lore.kernel.org/linux-bluetooth/cover.1762100290.git.pav@iki.fi/
-  https://lore.kernel.org/linux-bluetooth/cover.1758481869.git.pav@iki.fi/
-
-Pauli Virtanen (7):
-  Bluetooth: hci_conn: hold conn reference in abort_conn_sync()
-  Bluetooth: hci_sync: hold conn in hci_connect_acl/le_sync() callbacks
-  Bluetooth: hci_sync: hold conn in hci_connect_big_sync() callback
-  Bluetooth: hci_sync: hold conn in hci_connect_pa_sync() callback
-  Bluetooth: hci_sync: hold conn in hci_past_sync() callback
-  Bluetooth: hci_sync: fix hci_conn_del() use in hci_le_create_conn_sync
-  Bluetooth: hci_sync: remove unnecessary hci_conn_get in
-    create_conn_sync
-
- net/bluetooth/hci_conn.c | 12 +++++-
- net/bluetooth/hci_sync.c | 85 +++++++++++++++++++++++++---------------
- 2 files changed, 65 insertions(+), 32 deletions(-)
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1966cd153d97..6036ff66d8d9 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3163,6 +3163,13 @@ static int abort_conn_sync(struct hci_dev *hdev, void *data)
+ 	return hci_abort_conn_sync(hdev, conn, conn->abort_reason);
+ }
+ 
++static void abort_conn_destroy(struct hci_dev *hdev, void *data, int err)
++{
++	struct hci_conn *conn = data;
++
++	hci_conn_put(conn);
++}
++
+ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -3188,7 +3195,10 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	 * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
+ 	 * already queue its callback on cmd_sync_work.
+ 	 */
+-	err = hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
++	err = hci_cmd_sync_run_once(hdev, abort_conn_sync, hci_conn_get(conn),
++				    abort_conn_destroy);
++	if (err)
++		hci_conn_put(conn);
+ 	return (err == -EEXIST) ? 0 : err;
+ }
+ 
 -- 
 2.55.0
 
