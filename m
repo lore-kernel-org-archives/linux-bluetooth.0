@@ -1,178 +1,157 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4035D28C854
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jul 2026 05:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D1519D065
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jul 2026 09:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785045282; cv=none; b=Flwo3Z3OFtBUXNcNqIe9kmo11dRJzCDvmgZVJOcaneowWqtq9XmrFE47rtk1Qda/zZgE23+3JgXQSK9C7li0kGCppGb/lfoOT1XCmj1zuiYl32jk36t9DL3bvJltzkWfogW5KuqxH1wUxYTgtTKFi8bBc8uRJ453V0OA8itJk9Q=
+	t=1785059734; cv=none; b=CHZpDplxgLw1gI2jNanPuJfB9uFBgcvAbpeMKOPnGtzpTExN1DYEV/wZOcAUecuSSVbmnp/l9gMcWtZSAoCf2vhATe+dM+qsjvSCR3zedGx/wwCOrqfm3J+oDMg7efspKWVUgyU+XDxXp7puTCvM4x3898/5Uwc4oVnjsOwqdUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785045282; c=relaxed/simple;
-	bh=JUR61lMsOeNdf24yMOleCWIFEBHl2tuSPKCBc8SrrCo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g/7S9pxNkrgHaM8SVG8WxVlUndHCA13VKw3KT7/twJa2hU0T7h7y7qpQRLhBnXyv3MoEwS9eO8oxaSLqq2siAr3aaEm78TSGgnJ0YKBfUg15ZPmkA9RXHnyhSXVCVK5DtaVTe3eC4QNekjGo8lbGhG9pCOJGJ3KmR7VTPkEX1JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com; spf=pass smtp.mailfrom=xbow.com; dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b=C6qupr1d; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xbow.com
+	s=arc-20240116; t=1785059734; c=relaxed/simple;
+	bh=KYeUB7c/bEzl+hfjDEWlw0VUvZ1O4Khc7XMWGp0JkXs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XaxcvXSDegIDFZqlD+slnHDwKmcNMU9c1k69ejyoECjX9ee8EivpWu+h8pdnUbEtfHxUKEbWRu3BUNgCaFyD1kWUP2JJnSyNuOyogNVrNfKqqbdZsJYJkPWfxmWic+q04yoGCA+pgjd/Azjtdn6PAYa5ZAqmzDmdQDN3Bf1RK20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEgTyEh7; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b="C6qupr1d"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ce98cb8165so19691095ad.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jul 2026 22:54:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEgTyEh7"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92edb12cdf2so112940885a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jul 2026 02:55:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=xbow.com; s=google; t=1785045278; x=1785650078; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2mXcDhh8khgWaS8xBEZuV37vbK/EffZ6ZIEOU3bJCAE=;
-        b=C6qupr1djxvHfxOQtL5il6LEaL84VmJ4xCK7AQaY5mI0e2Mvtw4RmW3xXNWHGQoYpc
-         CFozjkkT1pAmXR3Mm5IdEEIDSivgWJ3VHfysfwfUhA68uPt03xAN6bfpk53061dWI1MM
-         vG83zLmZqlPnNr/4Bj1uv/Lf8JFnPviTZIMb0magyF0FUWBxWQiS5QfDaUVaf9nvmV8r
-         F9ZdTd/ktGLgagswztFnAbIyjncTVzBAXl7edakegcyJb/E/NiWYaLztAPRsC05OTd+R
-         QnLdbeUEWXfloDenDeV/g1Z53c9oaqJtw6BPeFI/dsfG0CGTIYJWY7Jn5aPpadQN32Sm
-         +zEA==
+        d=gmail.com; s=20251104; t=1785059732; x=1785664532; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=b44n8bLOeFA5P4NFg8GFcE/5c4LMlSqR6OjsS7QlQmU=;
+        b=HEgTyEh7C9OQyhTbzPEnwFnc/ATQhSWTe2uW8RUznvVW1LKim7RspW2Go/tLxOkzWX
+         cRx0YLA8P8dTLYoBL7lqp+1iMeYiNqQpvZaGHkGYiMwZFRp3kezooAD9vnaFSK7lp+lx
+         JmWv4WvJLAwuaMaaYPKd9BR38SECvPPUlmCMkobiYR/tra2gHs2G5pA62hDivpxxGFMS
+         i2wgAni2SRYcVCGSBASyxoA0NyS++n7UWyvZBmbqISap1lkKtH7QcX9X2jyjXrsl1eCj
+         AnafBF68pEpQtlkWdLDIZggLA+BjILXBNdnFmLTwYqesl71u2DPRPN1mvk5/nyZlC3k2
+         yekw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785045278; x=1785650078;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2mXcDhh8khgWaS8xBEZuV37vbK/EffZ6ZIEOU3bJCAE=;
-        b=f+4JIfB2mjObS3KLJnc77wvzBwKsUqwieMHCOFJVTql0/FCBEW7h3S7r3mTFeb2lbR
-         p++6+DFKWIL596rSo39J1ptP58+danLR1/hpKLYR1FNxsTUDeuOruhE+j20fI+UCvlyb
-         bPTW/IfLp5ZJjZMkTEut8zA/sLnmSavYQxDu6pzWOJK+xIMhNdtQdES08bXBUKT/t+DG
-         bbo586o2GGHfm56WSehevGaZg+6Amakip2cM3Js73xetoEtegZ24ZssuZZf2Jb+1765z
-         kvAboUSrZOPV8b+xfYZ/ru3mKLmJTKf/BO1Fq+9179xVq1cdQsOgyLfA3VHsybHjTOj4
-         sZQg==
-X-Gm-Message-State: AOJu0YwVu9Z2L+X+Zm9yt5eXqOF/G5TSpTWTq/+MgfUcIvBV5aSH4Azp
-	p4/vdq+1a6aUv1506EkNJ8mOIzEPcdTzF7kEVGh0Scw8gTY7MRTfnSuAr6v4u6rmQ+ni81LVBVq
-	GA9yOKzc=
-X-Gm-Gg: AR+sD12AeNaOshrsKoLsbXeHofJQScYhLjUAVWKzmHEODDfHASjvvdtR1QQPfn9UM8P
-	76R5DboZcaYR4RUE6vb0vg7vc94LELWQGMehDL01S9VsUc82dGm8v7PfS9XyfQ7C0+qs4zNzS7d
-	GlcR4MjBdoJ/qZnVkfSn76XzG1pv0Id/9exPyELPZZP0cQ/wxSBwehf6wxQkrghXg5qbqafCWAr
-	W+UKqOJn+l7zuz2eKUjAMSX3/QTJriVnhf7n0NOy3ji/VyphkjggTlF0Y0dYPrpmuK8+hzXMngB
-	Iccql5uPlCLRYxwYX2bFoHEOc5vHb6UL7I11ClqrmHjhzvedJgJM5Ydig0n3KqKJtlmw+OCmO4w
-	m5vwAVNjzG5dQv8NhR7xW52cipa3SAL0GqS3Mpa5XkNKJEc3YgJFnmCOuoIwUv7nWlaDKTIZ410
-	wrMLTuh7+GWPb4QG/HWsAxiYoHq4f9XtFuSY9QkgBzgSgg+INT667jmrFHed7O
-X-Received: by 2002:a17:903:2f08:b0:2c9:c517:d08b with SMTP id d9443c01a7336-2cfdf45f0c5mr35503435ad.22.1785045278519;
-        Sat, 25 Jul 2026 22:54:38 -0700 (PDT)
-Received: from localhost.localdomain ([125.128.148.126])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfe1ab9c71sm12967045ad.73.2026.07.25.22.54.35
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 25 Jul 2026 22:54:38 -0700 (PDT)
-From: Baul Lee <baul.lee@xbow.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	federico.kirschbaum@xbow.com,
-	Baul Lee <baul.lee@xbow.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: SCO: fix sco_conn double free on outgoing connect
-Date: Sun, 26 Jul 2026 14:54:31 +0900
-Message-ID: <20260726055431.42350-1-baul.lee@xbow.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20251104; t=1785059732; x=1785664532;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=b44n8bLOeFA5P4NFg8GFcE/5c4LMlSqR6OjsS7QlQmU=;
+        b=Rv8Safyj3SAYEGE9MvPghEbU/cgjaYHXZKxvSpf9fpqBXbHhzmNJD0gud3sZNF/MDq
+         2qnx0dPdnMMJTIeA2E5SVPI5e+ZGmLyt4WLXBJn3qXSvg8xHdJPGaLZiGfO1U+gC/AC+
+         vqSumAdETcnVqJ1BQFzOeQgfZVIFkgSHq/E6Ztj6DFRVTaDI9yWim/IdmdetgaNaS81S
+         gpCsnYlddb61uMm75upDVZkbV8PzDb2GgurYfwJYibduq0Ej3k5XTzMc3m1YLQyPusJC
+         I9W6sN4HxIjUvdJQp74qhyCbmc1Kq61ooUmspbpvtAqwddX0aufBPlfnHIengHnAjH2b
+         A4Qg==
+X-Gm-Message-State: AOJu0Yw6mmbzIa9EBu6Nhoqy4R6eCmm/rtvlG2eYGZS5Ga5yYkOkuw+e
+	MwGfRUXksvBKUjVCZ1ddu1vwCUP08oVzzWBjoqWoIspeCFKjiMV18IDrE9st/g==
+X-Gm-Gg: AR+sD13wgkExccAXVKXU5c8/GxEkv8RiohbpJy1bUuPLiVn8MucVrcIYAgh3rfBeytv
+	RW/UeU6izd+vC90NPKw0DmfhRBKaimyUK9keKKwPL87dEhLJyO24nvDC9+cttIWJ94ESQi6mQ2+
+	wEUqmZfeQi+H4GXv8DSsnAsLkkGdJM0s27/bF0aCe4MdvUt1oxYGyIHWOaAvYMSuRfHNiEwXQiD
+	RwNjXm13Aelj44K1SdEYjEyxAsbf77OsCAHxqkZSygt0N95PR4S1mtwmCUY+3w1AuCcAZZeVVNc
+	gkbv8m4QCwIZUGEnZ98XKOV/xFUWFo/4QonJjriwcr2y7u0Z2sO7inysqbBtaOnKFxEdsmG9XA1
+	tfPNHMJ6XEw0csIMshhDlxPAZnt3f36QxaCXkxJEGJEc3w8Miy0ETWxkBc/BnA/Rey6epfVRc4n
+	B4zNlSSomA
+X-Received: by 2002:a05:620a:19aa:b0:915:675d:a2d with SMTP id af79cd13be357-932df6ea2bfmr438096085a.51.1785059732194;
+        Sun, 26 Jul 2026 02:55:32 -0700 (PDT)
+Received: from [172.17.0.2] ([172.210.0.102])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-932de635b7esm343495285a.31.2026.07.26.02.55.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jul 2026 02:55:31 -0700 (PDT)
+Message-ID: <6a65d993.6f91ca5b.260d6e.480c@mx.google.com>
+Date: Sun, 26 Jul 2026 02:55:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8896677854022598038=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, baul.lee@xbow.com
+Subject: RE: Bluetooth: SCO: fix sco_conn double free on outgoing connect
+In-Reply-To: <20260726055431.42350-1-baul.lee@xbow.com>
+References: <20260726055431.42350-1-baul.lee@xbow.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-sco_conn is refcounted with a kref that sco_conn_add() initialises to 1.
-That single reference is the connection's association reference, owned
-by the hcon and released when the link goes down.
+--===============8896677854022598038==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The incoming attach path takes an extra reference for the socket before
-__sco_chan_add(), but the outgoing path, sco_connect() -> sco_chan_add(),
-does not.  An outgoing SCO socket is therefore attached while conn->ref
-is still 1, and two unrelated teardown paths both release that one
-reference: sco_chan_del(), reached from close(), and the !sk branch of
-sco_conn_del(), reached from the sco_connect_cfm() / sco_disconn_cfm()
-callbacks.
+This is automated email and please do not reply to this email!
 
-When an outgoing SCO setup fails while the socket is being closed, the
-two race, starting from conn->ref == 1:
+Dear submitter,
 
-  1. sco_chan_del() clears conn->sk.
-  2. sco_conn_del() takes a temporary reference (ref 2) and, seeing
-     conn->sk already cleared, gets a NULL sk.
-  3. sco_chan_del() puts the reference it believes it owns (ref 1).
-  4. sco_conn_del() drops its temporary reference (ref 0) and the
-     sco_conn is freed.
-  5. sco_conn_del() takes the !sk branch and puts the freed object.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1134537
 
-KASAN reports a slab-use-after-free of the kmalloc-128 sco_conn in
-sco_chan_del(), followed by a refcount_t underflow.  Both operations are
-reachable from an unprivileged AF_BLUETOOTH / BTPROTO_SCO socket doing
-connect() and close().
+---Test result---
 
-Give the socket its own reference on the outgoing attach so that the two
-teardown owners no longer contend for a single reference, and drop the
-association reference in sco_conn_del()'s socket-kill path so that it is
-released exactly once there as well, symmetrically with the existing !sk
-branch.  sco_conn_ready() consequently has to take both references
-itself, because sco_connect_cfm() puts the one from sco_conn_add() as
-soon as sco_conn_ready() returns.
+Test Summary:
+CheckPatch                    FAIL      0.76 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      0.36 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      28.19 seconds
+CheckAllWarning               PASS      30.75 seconds
+CheckSparse                   PASS      30.22 seconds
+BuildKernel32                 PASS      27.15 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      533.50 seconds
+TestRunner_sco-tester         FAIL      35.18 seconds
+IncrementalBuild              PASS      27.47 seconds
 
-Discovered by XBOW, triaged by Baul Lee <baul.lee@xbow.com>
-Reported privately to the maintainers on 2026-07-10 with root-cause
-analysis, a PoC, a KASAN log and this fix; posting to the list was
-requested as the follow-up.
-
-Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: SCO: fix sco_conn double free on outgoing connect
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#142: 
 Reported-by: Federico Kirschbaum <federico.kirschbaum@xbow.com>
 Reported-by: Baul Lee <baul.lee@xbow.com>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#143: 
+Reported-by: Baul Lee <baul.lee@xbow.com>
 Cc: stable@vger.kernel.org
-Signed-off-by: Baul Lee <baul.lee@xbow.com>
+
+total: 0 errors, 2 warnings, 0 checks, 40 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14710765.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+Total: 30, Passed: 29 (96.7%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+SCO Disconnect - Success                             Timed out    2.151 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/497
+
 ---
- net/bluetooth/sco.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c05f79b7aa31..3db6552de06c 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -276,6 +276,9 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 	sco_chan_del(sk, err);
- 	release_sock(sk);
- 	sock_put(sk);
-+
-+	/* Drop the association reference, as the !sk branch above does */
-+	sco_conn_put(conn);
- }
- 
- static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
-@@ -296,10 +299,16 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
- 	int err = 0;
- 
- 	sco_conn_lock(conn);
--	if (conn->sk || sco_pi(sk)->conn)
-+	if (conn->sk || sco_pi(sk)->conn) {
- 		err = -EBUSY;
--	else
-+	} else {
-+		/* Take the socket reference, which sco_chan_del() drops when
-+		 * the socket detaches.  Without it the socket and the hcon
-+		 * would share the single reference from sco_conn_add().
-+		 */
-+		sco_conn_hold(conn);
- 		__sco_chan_add(conn, sk, parent);
-+	}
- 
- 	sco_conn_unlock(conn);
- 	return err;
-@@ -1452,6 +1461,13 @@ static void sco_conn_ready(struct sco_conn *conn)
- 		bacpy(&sco_pi(sk)->src, &conn->hcon->src);
- 		bacpy(&sco_pi(sk)->dst, &conn->hcon->dst);
- 
-+		/* Two references are needed here: the socket one, dropped by
-+		 * sco_chan_del(), and the association one, dropped by
-+		 * sco_conn_del().  Unlike the outgoing path, the reference
-+		 * from sco_conn_add() cannot serve as the latter, because
-+		 * sco_connect_cfm() puts it as soon as this function returns.
-+		 */
-+		sco_conn_hold(conn);
- 		sco_conn_hold(conn);
- 		hci_conn_hold(conn->hcon);
- 		__sco_chan_add(conn, sk, parent);
--- 
-2.50.1 (Apple Git-155)
 
+--===============8896677854022598038==--
