@@ -1,63 +1,156 @@
-Received: from mails.wedevs.org (mails.wedevs.org [107.172.252.250])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC9433A70A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jul 2026 20:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=107.172.252.250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31EE1DF72C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 02:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785099419; cv=none; b=Ywb8kheXXW4LBWzrncXRPU4hJIDJ73QdEFylRRJbNlMe8/3Qx5oxGZcPKRjrPAubEeV1eqSd0xUOhUpGEk0f60Oont93FGyoVTUGmLBkPQ3fCieDZUIuWPnBDg41vYJu/fTUIky5386kt5OH9ee3XZ7r5xAOeknLS5JVPcbmPGQ=
+	t=1785118221; cv=none; b=m7rZO5fwNMpjJAETZfw2StoDGeoSlVISVGuz5ecoOFGh8Zxabt5qQiNzY2v7TFzqwBZZDB93WljM5DFp5y5xC6fdfdeMaqybgypFcUcdgp3h8TBTy2/m/qkIxTcMT5Qgv4GxjV1jozluX0S7O3A2IWxtC6WOfu1SCBiV27+FCs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785099419; c=relaxed/simple;
-	bh=ECywIikZmMLxN5IlZMaV+SNXfbIFhrqx9i/69S/pLBA=;
-	h=Content-Type:MIME-Version:From:To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=crbE5e6R9gCsaokpMWZ+PXllm9Lwz2yOxSlvMv5Cqz1W3qdG56giUV9DqXG2oU7l+JJmif9gQsfzPEljqc2d8OtZKK5OZip5GTPZJD0RLuOYKV7tTRZbkCMCQBCeuxdfmWBQOtQy9a1iLP7NVy170GeDdsa/kQrbjqwbecf9ouY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mails.wedevs.org; spf=pass smtp.mailfrom=mails.wedevs.org; dkim=pass (2048-bit key) header.d=mails.wedevs.org header.i=@mails.wedevs.org header.b=WEamEN5R; dkim=permerror (0-bit key) header.d=mails.wedevs.org header.i=@mails.wedevs.org header.b=VsJqR5sH; arc=none smtp.client-ip=107.172.252.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mails.wedevs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.wedevs.org
+	s=arc-20240116; t=1785118221; c=relaxed/simple;
+	bh=Whi+bmed7+KW1Q7+AlYEm0UaRIUdwpcf/gH4IhNO6wY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SyeGknbZ7gSiS+FFYDR5nl2QNEBIadYktREb163BBm4gWOiWSeCoqpaksUyc6P5CAbXEp9dhRpuUnwLjY//ZrGEmDHDMMDzPTRP8qWCp8JLq7olvIXWCqHvREHyQYL3uJEqNpJMsKHvezJnLSCxGzAcNWAdI7TItzdxfqI4Dftk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Db7ohtil; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mails.wedevs.org header.i=@mails.wedevs.org header.b="WEamEN5R";
-	dkim=permerror (0-bit key) header.d=mails.wedevs.org header.i=@mails.wedevs.org header.b="VsJqR5sH"
-DKIM-Signature: v=1; a=rsa-sha256; s=202601r; d=mails.wedevs.org; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1785099418; bh=ECywIikZmMLxN5IlZMaV+SN
-	XfbIFhrqx9i/69S/pLBA=; b=WEamEN5R1R8k574WtnV7iKtyk7invHugVU3Q6yNi+5+s0u/bbB
-	4lxIsiMbGpUL9qmuWqC4NBxmspBvfIPl2+o7WiVXFqvOyRjV7UpX4PjSXdPtquRsq0B2FeBsC1T
-	KHXOTttvzObi7fnpu/Qq0T8xz3nYz8yGOn0hE0lDFUv64A2RjR5EtPzS6rqSfoc0NhoJLY0yRry
-	kTfmlU+XdmPflCfI/8raLFR4Ta8DJ5UPWozXI5BFkeXt4lf+Uz1YWNwDu8uh1rwWpVlmnG009gs
-	N7UyzjO2iHIRvLeCDU7AZyCo0ZejzolgHrUtvuUU9LfO2+uMb2loLHZ+qqTTk+2MGFA==;
-DKIM-Signature: v=1; a=ed25519-sha256; s=202601e; d=mails.wedevs.org; c=relaxed/relaxed;
-	h=Message-ID:Date:Subject:To:From; t=1785099418; bh=ECywIikZmMLxN5IlZMaV+SN
-	XfbIFhrqx9i/69S/pLBA=; b=VsJqR5sHDfmC+4B1RMhTE1Ivp1uTRJznsrikcettMW8SBiUXB1
-	LhRAflX4DE6hlKfqLiWDpPQgWElL+SZCSyAg==;
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Db7ohtil"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B5F6C2BCB3;
+	Mon, 27 Jul 2026 02:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1785118220;
+	bh=Whi+bmed7+KW1Q7+AlYEm0UaRIUdwpcf/gH4IhNO6wY=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=Db7ohtilNVI8SH/YHxsuX5+eU6c8HuqWDtCLIGtUNNXyoGS5oGIiMarSV47mbTWDf
+	 XEltPeI/Q6GjUjJLwSShRMzKnIKZFOR+WvIEI+tnuRdUfztGr45QnS/hEIGUtZFjTF
+	 tUqJH99PpYfTBKdHRZv4W0/QH3hJuet05tOYwHsML4DcxVrsAWg4AiViFGXZaAsiI6
+	 uqQK222ypPef8sdaqVkocRzdMxwre3Ob91qVP0wvodfolJw5tPPVnSg89YWYxMlY7h
+	 2K7HkKBzEQDyALxGoK5ywUPm2S8v13GO78+v+CqxRXc3YMD3E1d4RugFmINkKtth8F
+	 bpYE+TQ/N54fA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F76C531C9;
+	Mon, 27 Jul 2026 02:10:20 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Mon, 27 Jul 2026 10:10:18 +0800
+Subject: [PATCH BlueZ bluez v2] bap: Start BIG sync after receiving BIGInfo
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-From: Bug Report <bugreport@mails.wedevs.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug] Intel AX200 Bluetooth (8087:0029) firmware download failure -19
- on MECHREVO WUJIE15XA
-Date: Mon, 27 Jul 2026 04:56:55 +0800
-Message-ID: <178509941543.717042.15160055403720914460@mails.wedevs.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260727-big_sync-v2-1-053fd3bcc3be@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAAm+ZmoC/2WNyw7CIBREf6W5azG8qtGV/2EaQ/FKb9KCASXWh
+ n+XsHV5ZiZnNkgYCROcuw0iZkoUfAW568BOxjtkdK8MkssDP0rNRnK3tHrLdG+lRstPQgqo82f
+ EB32a6grj/MYvDDWeKL1CXNtBFq38d2XBBONG9VwoVHw0F7PMwZHd27DAUEr5Ad+DCSepAAAA
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785118218; l=2963;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=8K/J9AtTMnR/lHprg7bq6f69/gczMTTI4wUhzPwxCDc=;
+ b=/bsmj5TwlBDveUOO28rrpCDl4yhwfXtLOA4l5gxhlTGsdgXfBPwr8mEQQEyKrsgmtt0rbt/sV
+ aW0aXvhPK5/Br9YouXDQm+w6HhJEAUTC/DXp8ucnlVf0mAH+jr7b7rj
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-SGksCgpPbiBhIE1FQ0hSRVZPIFdVSklFMTVYQSBsYXB0b3AsIHRoZSBJbnRlbCBBWDIwMCBCbHVl
-dG9vdGgKY29udHJvbGxlciAoVVNCIElEIDgwODc6MDAyOSkgZmFpbHMgdG8gaW5pdGlhbGl6ZToK
-CiAgQmx1ZXRvb3RoOiBoY2kwOiBGVyBkb3dubG9hZCBlcnJvciByZWNvdmVyeSBmYWlsZWQgKC0x
-OSkKICBCbHVldG9vdGg6IGhjaTA6IHNlbmRpbmcgZnJhbWUgZmFpbGVkICgtMTkpCiAgQmx1ZXRv
-b3RoOiBoY2kwOiBSZWFkaW5nIHN1cHBvcnRlZCBmZWF0dXJlcyBmYWlsZWQgKC0xOSkKICBCbHVl
-dG9vdGg6IGhjaTA6IEhDSSBMRSBDb2RlZCBQSFkgZmVhdHVyZSBiaXQgaXMgc2V0LCBidXQgaXRz
-IHVzYWdlIGlzIG5vdCBzdXBwb3J0ZWQuCgpUaGUgV2lGaSBzaWRlIChpd2x3aWZpKSB3b3JrcyBm
-aW5lIGFuZCBjb25uZWN0cyBub3JtYWxseS4KCktlcm5lbDogTGludXggZGUgNi4xMi45NitkZWIx
-My1hbWQ2NCAjMSBTTVAgUFJFRU1QVF9EWU5BTUlDIERlYmlhbiA2LjEyLjk2LTEgKDIwMjYtMDct
-MjApIHg4Nl82NCBHTlUvTGludXgKRmlybXdhcmU6IGZpcm13YXJlLWFtZC1ncmFwaGljcyAyMDI2
-MDUxOS0xfmJwbzEzKzEKbHN1c2I6IEJ1cyAwMDEgRGV2aWNlIDAwNDogSUQgODA4NzowMDI5IElu
-dGVsIENvcnAuIEFYMjAwIEJsdWV0b290aAoKLTE5ICgtRU5PREVWKSBzdWdnZXN0cyB0aGUgQmx1
-ZXRvb3RoIGNvbnRyb2xsZXIgaXMgbm90IHJlc3BvbmRpbmcKdG8gZmlybXdhcmUgZG93bmxvYWQg
-cmVxdWVzdHMuIFRoaXMgaXMgYSBkdWFsLWJhbmQgQVgyMDAgbW9kdWxlCndoZXJlIG9ubHkgV2lG
-aSB3b3Jrcy4KCkFueSBzdWdnZXN0aW9ucyBmb3IgZnVydGhlciBkZWJ1Z2dpbmc/
+From: Yang Li <yang.li@amlogic.com>
+
+The current implementation starts BIG sync before receiving a BIGInfo
+report. According to the Bluetooth Core Specification, BIG sync should
+only be initiated after BIGInfo has been received.
+
+Starting BIG sync too early may cause unexpected controller behavior.
+
+Trigger BIG sync from the BIGInfo callback, following the same approach
+used by the short PA flow.
+
+Fixes: https://github.com/bluez/bluez/issues/2345
+
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v2:
+- Fixed build error.
+- Link to v1: https://patch.msgid.link/20260724-big_sync-v1-1-0a35013e30ba@amlogic.com
+---
+ profiles/audio/bap.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index dd4b3c8ff..42b7bb04c 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -3650,7 +3650,7 @@ static void setup_refresh_qos(void *data, void *user_data)
+ 	setup->qos = *bt_bap_stream_get_qos(stream);
+ }
+ 
+-static void iso_do_big_sync(GIOChannel *io, void *user_data)
++static gboolean iso_do_big_sync(GIOChannel *io, GIOCondition cond, void *user_data)
+ {
+ 	GError *err = NULL;
+ 	struct bap_setup *setup = user_data;
+@@ -3659,7 +3659,7 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
+ 	struct bt_iso_qos qos;
+ 	struct queue *links = bt_bap_stream_io_get_links(setup->stream);
+ 
+-	DBG("PA Sync done");
++	DBG("BIG info received, do BIG sync");
+ 
+ 	g_io_channel_unref(data->listen_io);
+ 	g_io_channel_shutdown(data->listen_io, TRUE, NULL);
+@@ -3682,6 +3682,7 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
+ 			BT_IO_OPT_INVALID)) {
+ 		error("bt_io_set: %s", err->message);
+ 		g_error_free(err);
++		return FALSE;
+ 	}
+ 
+ 	if (!bt_io_bcast_accept(io,
+@@ -3692,16 +3693,31 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
+ 			iso_bc_addr.bc_bis, BT_IO_OPT_INVALID)) {
+ 		error("bt_io_bcast_accept: %s", err->message);
+ 		g_error_free(err);
++		return FALSE;
+ 	}
++
++	return TRUE;
++}
++
++static void long_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
++{
++	struct bap_setup *setup = user_data;
++	struct bap_data *data = setup->data;
++
++	DBG("Long PA Sync done");
++
++	/* store io and add watch that will call iso_do_big_sync */
++	data->io_id = g_io_add_watch(io, G_IO_OUT, iso_do_big_sync,
++							setup);
+ }
+ 
+ static void pa_and_big_sync(struct bap_setup *setup)
+ {
+ 	GError *err = NULL;
+ 	struct bap_data *bap_data = setup->data;
+-
+ 	DBG("Create PA sync with this source");
+-	bap_data->listen_io = bt_io_listen(NULL, iso_do_big_sync, setup,
++
++	bap_data->listen_io = bt_io_listen(NULL, long_pa_sync_confirm_cb, setup,
+ 			NULL, &err,
+ 			BT_IO_OPT_SOURCE_BDADDR,
+ 			btd_adapter_get_address(bap_data->adapter),
+
+---
+base-commit: 89d477bb5494eef0b24e5667be62f854da250a97
+change-id: 20260724-big_sync-45c24ec09121
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
+
