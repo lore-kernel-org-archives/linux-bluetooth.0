@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBA742BC44;
-	Mon, 27 Jul 2026 20:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF84D427FAB;
+	Mon, 27 Jul 2026 20:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785185445; cv=none; b=PEtBe8tPLNsPu/8qkEET7FrqMndMzll1FjEPG00V6wuolve3eMpE9A5K49dqnuSQ9Blih0b0CNARo2go3cVQDOPtlhvvyJjNqIbvW1kQhRuGyDFrLAvIJgLhrFOdGclsSmITBDsJjn15fKjaBus7VFAfPBmMWjpV4Uyp12hkUNE=
+	t=1785185446; cv=none; b=IXrKIjbtc1qYEpt8wJ/DgG6nMRgr2qMgIT8XJfUrIa4uLeQb0VFy/y4scET84hBYt1AgiAbFXdTUW8QNiw6N4//zyW7JgCkDzOgsm3fsLomT40WoHMEHmBCF/7pqhY41BHWtDlKmMQQIB6RLXUbzcoQf0q2SykraazMEv6a3SGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785185445; c=relaxed/simple;
-	bh=RCPd6GbnvyfVjdV/dISyAzcVUZMw1aCy6FqlREEzx5w=;
+	s=arc-20240116; t=1785185446; c=relaxed/simple;
+	bh=V+S2Xn4psO8d+BxG9K2+1XitLSF5hl1UxlmPO8jjoKM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Eo2S/lhzoIZU+6sdHXTYfQqYRH37NOMNmIA9ZNe/sucBW0g2D9xVcj6XdRw0E43vmKorbzr9Gey75Gdk8lqhxMdI2hGbcjjcP3JbUlEiEq376x3HhsbpgSMa32ONj+bF0SEBFptjei6mqNK0yaGqRrenGg46nhE89U8BnSKDQEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NHKw0dFG; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=fXcMjWFINhFhzn82Tx7C8Pw7UyYgpPZ4LFpF0biVB1w3IzZQtnl8HV0024QATGTz9LZUCedWgxdUGYrk6v0W6U06KSmmCPYtSG0u1K0Vk3ooRptMn5sn8E9WxEI0M8wNuRe7VKfL+py/oo04Bn4j3iSNgDlQpasENVB7U07jDbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlPIVM3Q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NHKw0dFG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109341F00A3A;
-	Mon, 27 Jul 2026 20:50:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlPIVM3Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C15A1F000E9;
+	Mon, 27 Jul 2026 20:50:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785185444;
-	bh=VfAXffogEnldNo6DXQntixj26Xbp+v5BW/iDaaI/n4I=;
+	s=k20260515; t=1785185445;
+	bh=RS6pYWHXgojoqiODGdTZWB//jMBLHEwugdQdZLoh/Q0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=NHKw0dFGtiRNiNjBoRw0wTfhK9hEMGutXuizhWjmfiHMDo2f/coZyYBNPZogrTVw/
-	 8WKLkfaJxgoBK8JI4ETI80v3sLVmDpkbfgiOxiEnr7TB5DY/toReR9JsHcXE+loDCJ
-	 6/3hbLh6r3HEyUHx4+p1glMBE75Yjs/mKKkAkwjT1D6MtLPAKGctZU60+lPDfk4ieu
-	 TGi2iFvAseB8ik/u1ItRfXtVXvCXobBGDKrvUhevhXpVX7L+zxFa2w6seVjKAvslvp
-	 tgw7t8/W+iOHdwe8gW62126QUZnCN18lOdzR4xbpijL0Z67QqJAofIggkAb+OtyZk/
-	 cHz0INslr1PNw==
+	b=mlPIVM3Qqk0LIzsBAieYur6Ysgm+Mf66fYejkG1tkLe+jXoPOYUq4qgXOk/TIqVZG
+	 8uqbGwIiUOeTM5gLVpgU9AP0dbJGE/exwS7bOKV20ia9Zr+ltB4ACDMv8lthED6Y96
+	 dpV0efLK+PfT51zDupThj17b9TnwW596rymW0b0rmbfu6S9TORORGQqzATc3YFI52N
+	 HFzJ3axN2yLYI/4lfbJ6XsQMomTG4yGdqIvr4hjZvUfjk5cfCgzER4RvJ5dRMpmNj/
+	 4QVjJ7JLmaOlCctdbVO1aHraLv7HfHIQYU/HWgu1o5976AydmKgji1W6B4BTIKMe4+
+	 HHTTnGbo1/k6w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93937380664D;
-	Mon, 27 Jul 2026 20:50:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197AD380664D;
+	Mon, 27 Jul 2026 20:50:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6] Bluetooth: btintel_pcie: Add vendor_reset PCI sysfs
- for
- PLDR
+Subject: Re: [PATCH v3] Bluetooth: SCO: give the socket its own sco_conn
+ reference
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178518540913.1412337.16971564531930709335.git-patchwork-notify@kernel.org>
-Date: Mon, 27 Jul 2026 20:50:09 +0000
-References: <20260727052104.1026824-1-chandrashekar.devegowda@intel.com>
-In-Reply-To: <20260727052104.1026824-1-chandrashekar.devegowda@intel.com>
-To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org,
- luiz.dentz@gmail.com, bhelgaas@google.com, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, kiran.k@intel.com, alex@shazbot.org
+ <178518541063.1412337.17890508638369383289.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Jul 2026 20:50:10 +0000
+References: <20260725195230.967546-1-qwe.aldo@gmail.com>
+In-Reply-To: <20260725195230.967546-1-qwe.aldo@gmail.com>
+To: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+Cc: pav@iki.fi, luiz.dentz@gmail.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 27 Jul 2026 10:51:02 +0530 you wrote:
-> Add a read-write sysfs entry at /sys/bus/pci/devices/<BDF>/vendor_reset
-> to allow userspace to trigger PLDR (Product Level Device Reset).
-> Reading the attribute displays supported reset types. Writing
-> integer 0 triggers PLDR. Any other input is rejected with
-> -EINVAL and a warning log.
+On Sat, 25 Jul 2026 16:52:30 -0300 you wrote:
+> sco_conn_del() drops a reference it does not own. It takes one transient
+> reference via sco_conn_hold_unless_zero() and releases it with the
+> sco_conn_put() that follows sco_sock_hold(); the additional put in the
+> !sk branch releases a second one:
 > 
-> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+>     conn = sco_conn_hold_unless_zero(conn);
+>     ...
+>     sk = sco_sock_hold(conn);
+>     sco_conn_unlock(conn);
+>     sco_conn_put(conn);
 > 
 > [...]
 
 Here is the summary with links:
-  - [v6] Bluetooth: btintel_pcie: Add vendor_reset PCI sysfs for PLDR
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a7ef68421906
+  - [v3] Bluetooth: SCO: give the socket its own sco_conn reference
+    https://git.kernel.org/bluetooth/bluetooth-next/c/018d1e023ea5
 
 You are awesome, thank you!
 -- 
