@@ -1,149 +1,186 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEC141DE0F;
-	Mon, 27 Jul 2026 15:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AB041B8C7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785167882; cv=none; b=sykmmCQu0vzoAVvE6Q3CtqOWxILqEdjezVCWm7B9rL75MLsSEXw+W2Zi1F9GIY7+VLxxzdMp00Clzat7JEvO+wuWQ2Ru+ae6jIcFVbTxg1H7Z9O7rpuCjoM60h0rRg72ud8T9QpWzNuIzekyxU4njNu469YopjOVba+wx9d6uNw=
+	t=1785167889; cv=none; b=fG3TVVr1ZpYjpTp7oGjYJcACfO8CkY+kc2WQ4uCosu8UDuA2Xg0EIXh2V9qA7H4y3a6NcYWXfHpSFC+1PuijeIDEKgfGoESlOJttUi7TCk+NuHNSqfYjiCdh1DCxN37bxpB1mY0YXYch3R7NOnMqsGXWUtzwXh30SHvMBKwkp7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785167882; c=relaxed/simple;
-	bh=pDUtJiZTQ+4/Vfe0oEjXwhbfECdLzuCVl2652OtoVtc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QUO1sJ+ssO0QM8/neczUF9i6gNESrtQGeZYyzGlLNZ+ami13mTdR35NcbS22RgatDpVenBxxF+j/W50aSJ7X5vhgicecLJiOEeKoCo48MLwtUIS2cnIUR9oR2llHx4ozeAblPKkudxH+QM6KQZ1br0A4lji9M++rUFUfD0nCIcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=i0lXoSmb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785167889; c=relaxed/simple;
+	bh=0qgXgsgKz+Wf+EBl6K98gB4VaUU8bIC1KbXt+cAj0ug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KuEg9VgVEo84D8SBHyUxZcoIQs3DzUE69aMjuCS8xI3tYCmTOqlxyncQMHl9yfc1ul+1vmzuPZpO4cKSO4dzYE/jrtsLNgy+XhBkAkAqHGYUU8OeQnwrHrPjxq/pDq6PaXTTbywUXzIDdBxCS3gA53dR+z60rLM+sx+ilzV+6Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SxUsxFlS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=bG01MU3X; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i0lXoSmb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48ABA1F000E9;
-	Mon, 27 Jul 2026 15:58:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1785167880;
-	bh=5J/lI+qKpb41LhO6P0bEinWE6eJQ7l4VbAa1CfSBN88=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=i0lXoSmbJaa4b23UJKZu4c648gyjtRjADW29TxW2G0oGcqH0LVfNP6+A+7lDryhoc
-	 DJakAi8Pwn547CPJzaZxRZ0w9Rpn5nxcTxUbHuCZPAn2UKRhoVWvcGupJBG0BNtQOy
-	 XL/uF6p595xXYOGdznuXrMT8NVUckAgk+L+IVOLU=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Date: Mon, 27 Jul 2026 17:57:34 +0200
-Subject: [PATCH 3/3] Bluetooth: btusb: Fix short read errors in
- btusb_qca_send_vendor_req()
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SxUsxFlS";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="bG01MU3X"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66RFu5s5179491
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:58:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	4LVfiUpXLe7IIhGQGDrjXg5r0Ni0HjutTb9UTyNs+C8=; b=SxUsxFlS/7d6Yns0
+	iUZrDoVICIZA0MNpDx5vj3JI5tbW9KFxdauO75yWPAJwBcaC0b3A1gxD79xJZGaM
+	SVGY7izUUeF6kve/xBE/m9hBEiBj/UEInLukdoYu1LhZsscHNYiQrDW7JR56DwCD
+	hbCPgAnO2ArR+A9P2LxAlNsxtT8r2uL+y928lXAacKN/aGBkcdGVJLfPzN+4+8W8
+	ieW/AMWBdjsmSCQjJcYei2lwHyQubbGYPqP6VJu85lG04U5SJVMoz384xZWxmXfd
+	xnZcdyXFGbhRG4gofi1LHuS859bb3vmDDy9bf5vxGA2cBsRon4oc9WHMmHCvmcth
+	qtgOrA==
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com [209.85.128.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fpadkg0e8-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:58:07 +0000 (GMT)
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-81e8653ad27so66260397b3.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 08:58:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1785167886; x=1785772686; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4LVfiUpXLe7IIhGQGDrjXg5r0Ni0HjutTb9UTyNs+C8=;
+        b=bG01MU3XKNk+N3TIPHOI2d6+P1NxGGs9OoYSF/Lcm83YZ0VgjSaK4uINXg+MLbX4lF
+         cqO81kpkLUUMEOnHK69QCdpnVcJk5zFwIwbTLTdRyL9HL6vk6WJrsS7J3zF60Ua5qAHO
+         +K2DXvs6ePYaQSedTTY6vbOMwlY/JBtR4MrlKzs18FtjTWjmdFkOntIYzsN3VfI/39+3
+         wvBKXcubFj9DzdAHZ+WxOF1/K+gn2ZnMlspgukahdODTJJxHmC2qU54x8lM6m97e9Eyk
+         AMFwheiPL3MniR6pcdHx7s2098lE0W/HZw2vnaoiH0JuT+JlOAIziupqhWmqpLiwRQvO
+         Z+jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785167886; x=1785772686;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4LVfiUpXLe7IIhGQGDrjXg5r0Ni0HjutTb9UTyNs+C8=;
+        b=C1mTJ6/HeAltzqkCISx6xQJh9S4nigi/mdMn4xfXOjSpXqZjGSoTLQtCS+rGbxQ7ni
+         ZO+dclOVfozzxMZsIacfgo0p1eMNLJJI3PwSwCfto6NUz730MIrC0+qYXLiLyQb93Nu3
+         ENSDcrtU/TvJn+Q0OmsK6qYllzcGysplz4P6ZMpCDoyEUZlf9yjdgmoSYl657ZFtV1kG
+         wu/6yVmsgI5q1j/NHtq0TStr5XLjSzORz+pHh8t3nIWk7WFt/0bQikqzmWwa1u6JvLDF
+         SyJyzewX913Ku0jMSczMFfU3aQLLz2f/6/0FtqMFglkIDu3M+77/Ab5rycvVxvUJLGZd
+         WQXg==
+X-Forwarded-Encrypted: i=1; AHgh+Ro/GQr/GJGRncAXB4mV6QYDWUlRgDL9IaYXtb3DxpdZNFO0v7nRqZHLoF9VygEUpJQCBYQq8Z69NLHhJ2TDfFI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDfwBYc2vPozchDP9gCW62BHQB9VSXZLc9lRCEueWpUyOLmJQo
+	x5kJcq1U6EQzfSyYh5VPHRXPSXlFAhDZk9GygIDssRot0pIhYz8zffQyy1KbDNJD6b59MZMnbv/
+	j3iW6DZUY6Z2DsltTZe6loCgxnszQL0m6ND5XA6ZRJc7QM+E3qD4XKYw1wKkmn/VwsWAl/PU=
+X-Gm-Gg: AR+sD10bWeSFD+6mgm6a32MEdm27ciYdXtC6ZsRHvH5FCZmRjD2fxdeVY49n3IT+4Ye
+	y6h/9krsooP0w+qs9/X0+0JbQ3antbKeirQQMkhfDz6R5t0JK6gMd5Go7A4Wm/5VMrifVdoipVS
+	+EYvmyxjZdSLnDiP/aYgvPAJsCCw1YKpd52gCQCxKIaRSiqWx8WEkYDe1Wh1OmY6j81rEWqdNdB
+	60MRpkVPgcnxIy+Cbop4h16B4Ro+qFx00+QWkeG5qzvI2bNCkBnYedPSgH4nWjuhBpCZ6PixeRP
+	H25mSAVxAw6oCknNf1Ga/stvDvjyFndADIMuunoDaNQAfPEfW+fjYP3B5MLbN15HqmyX3ZzUr1e
+	4KiSAUKrflTXUd1gAMQkOoeMkhTlccl6m
+X-Received: by 2002:a05:690c:e3cd:b0:81e:ddfc:3d6c with SMTP id 00721157ae682-81f93aa9ec6mr370387b3.56.1785167885992;
+        Mon, 27 Jul 2026 08:58:05 -0700 (PDT)
+X-Received: by 2002:a05:690c:e3cd:b0:81e:ddfc:3d6c with SMTP id 00721157ae682-81f93aa9ec6mr370047b3.56.1785167885432;
+        Mon, 27 Jul 2026 08:58:05 -0700 (PDT)
+Received: from [192.168.1.10] ([122.177.243.103])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-81f657a14d9sm34165037b3.13.2026.07.27.08.57.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jul 2026 08:58:05 -0700 (PDT)
+Message-ID: <7b8d823b-8721-4dcf-8615-ba32e34c8e65@oss.qualcomm.com>
+Date: Mon, 27 Jul 2026 21:27:56 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/6] arm64: dts: qcom: kodiak: mark PCIe root port as
+ bridge
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring
+ <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        Manivannan Sadhasivam
+ <mani@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
+        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
+ <20260727-rb3-industrial-bt-uart-v2-5-2d100f30e202@oss.qualcomm.com>
+Content-Language: en-US
+From: Rahul Samana <rahul.samana@oss.qualcomm.com>
+In-Reply-To: <20260727-rb3-industrial-bt-uart-v2-5-2d100f30e202@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260727-bt-ctrl-v1-3-2e8650e9df01@linuxfoundation.org>
-References: <20260727-bt-ctrl-v1-0-2e8650e9df01@linuxfoundation.org>
-In-Reply-To: <20260727-bt-ctrl-v1-0-2e8650e9df01@linuxfoundation.org>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable <stable@kernel.org>
-X-Mailer: b4 0.16-dev-401aa
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2899;
- i=gregkh@linuxfoundation.org; h=from:subject:message-id;
- bh=pDUtJiZTQ+4/Vfe0oEjXwhbfECdLzuCVl2652OtoVtc=;
- b=owGbwMvMwCRo6H6F97bub03G02pJDFnp9V+CNHLuqodG7WH5rCcmU2fzI1gqfE/632PO2u+n/
- Q3/Wf62I5aFQZCJQVZMkeXLNp6j+ysOKXoZ2p6GmcPKBDKEgYtTACZi1MMwP5GZ9eibzyK/RVie
- Gn+8vyLo7FvnRoYFGzpSzWe3OjjVCnvb/W2JbPWL/pgCAA==
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp;
- fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+X-Proofpoint-ORIG-GUID: B1eY2B_JWW0gOUoLFYRS0FUGOftaRAzN
+X-Proofpoint-GUID: B1eY2B_JWW0gOUoLFYRS0FUGOftaRAzN
+X-Authority-Analysis: v=2.4 cv=Ns7htcdJ c=1 sm=1 tr=0 ts=6a67800f cx=c_pps
+ a=NMvoxGxYzVyQPkMeJjVPKg==:117 a=EvQFEFD3jZIngB+Plrtaxg==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=EUspDBNiAAAA:8 a=WbzeOWjvF3M0CV0e1dwA:9 a=+jEqtf1s3R9VXZ0wqowq2kgwd+I=:19
+ a=QEXdDO2ut3YA:10 a=kLokIza1BN8a-hAJ3hfR:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI3MDE0OCBTYWx0ZWRfX+gB3m1syGw5I
+ rS0f1Y4FwXhLspeotgRInZt7KyYTF7oQ+WuNKlxfrpMnukWiBFdNOGWvunJZ3tiCMhLFAa4k2Vc
+ IRyhtPDLmNI6++HLH26P8xVBSfMoAmj41hjPdxi9RpqNGSL8DcNTajDlOSnSM7l3atp8oariKXX
+ SJ7W0mI2tx+4qEGIsOzlnLkFLLqL3RqeGLbZkOHQDdAMAYRyP204CL89x3bYFs5IkPyOVcOUvpG
+ GAADPP4yUEjmhl5FpKYkrHjSh5vG7joS4CCIQwN9lZoAL7j82VJGs8lzLcPgAzl6RVFqfK9vxCx
+ p8oSMgT+z9mRgA1i/tetvtQn3geeRWymu53U0VoMpF89OlqUFqcDdoKyylzcqCxGu/eb0kwuJme
+ U/hk3dad12bRY4w/whFJ83LenVUYRXe8+8wEchmH9Z1PmnpTa3EWuEU5b8lfDYxA6CR2CF7dqfS
+ YSVZwgyfbX+39Yw3s5Q==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI3MDE0OCBTYWx0ZWRfX7EOKOgcHBrNw
+ pc9cH2cHNYnYEDS3GQ4iY0BgszxKys2GbNgLRTgxeJ+bFr1gIkAXhBg1D8HIw9FqUWA3MFcAfSy
+ g9c2oIL1t02GBkGq8au34dDWoH4fp/0=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-27_04,2026-07-24_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 malwarescore=0 impostorscore=0 phishscore=0 spamscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607270148
 
-If btusb_qca_send_vendor_req() gets a "short" read from a device, it
-will accidentally treat that as a "real" read and populate the returned
-value with some unknown and probably totally invalid data.
+Hi Konrad,
 
-Fix this logic error up by calling usb_control_msg_recv() which
-guarantees a "full" read happens, and then simplify the error checking
-for when btusb_qca_send_vendor_req() is called.
+Sorry, I missed carrying your Reviewed-by tag from v1 for this patch:
 
-Cc: stable <stable@kernel.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/bluetooth/btusb.c | 30 +++++++++---------------------
- 1 file changed, 9 insertions(+), 21 deletions(-)
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8f7ed469cac6..184e95c1625e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3424,28 +3424,16 @@ static const char *qca_get_fw_subdirectory(const struct qca_version *ver)
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
- 				     void *data, u16 size)
- {
--	int pipe, err;
--	u8 *buf;
--
--	buf = kmalloc(size, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
-+	int err;
- 
- 	/* Found some of USB hosts have IOT issues with ours so that we should
- 	 * not wait until HCI layer is ready.
- 	 */
--	pipe = usb_rcvctrlpipe(udev, 0);
--	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
--			      0, 0, buf, size, USB_CTRL_GET_TIMEOUT);
--	if (err < 0) {
-+	err = usb_control_msg_recv(udev, 0, request, USB_TYPE_VENDOR | USB_DIR_IN,
-+				   0, 0, data, size, USB_CTRL_GET_TIMEOUT,
-+				   GFP_KERNEL);
-+	if (err)
- 		dev_err(&udev->dev, "Failed to access otp area (%d)", err);
--		goto done;
--	}
--
--	memcpy(data, buf, size);
--
--done:
--	kfree(buf);
- 
- 	return err;
- }
-@@ -3652,7 +3640,7 @@ static bool btusb_qca_need_patch(struct usb_device *udev)
- 	struct qca_version ver;
- 
- 	if (btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
--				      sizeof(ver)) < 0)
-+				      sizeof(ver)))
- 		return false;
- 	/* only low ROM versions need patches */
- 	return !(le32_to_cpu(ver.rom_version) & ~0xffffU);
-@@ -3670,7 +3658,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 
- 	err = btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
- 					sizeof(ver));
--	if (err < 0)
-+	if (err)
- 		return err;
- 
- 	ver_rom = le32_to_cpu(ver.rom_version);
-@@ -3693,7 +3681,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 
- 	err = btusb_qca_send_vendor_req(udev, QCA_CHECK_STATUS, &status,
- 					sizeof(status));
--	if (err < 0)
-+	if (err)
- 		return err;
- 
- 	if (!(status & QCA_PATCH_UPDATED)) {
-@@ -3704,7 +3692,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 
- 	err = btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
- 					sizeof(ver));
--	if (err < 0)
-+	if (err)
- 		return err;
- 
- 	btdata->qca_dump.fw_version = le32_to_cpu(ver.patch_version);
+If the patch is otherwise okay, please feel free to apply it with the tag
+added. I will also include it if another revision is needed.
 
--- 
-2.55.0
+Thanks,
+Rahul
+
+
+On 27-07-2026 21:15, Rahul Samana wrote:
+> The PCI core needs to associate the DT node below the QCS6490 PCIe host
+> bridge with the enumerated PCI-to-PCI bridge device before child nodes can
+> be matched against the PCI topology.
+> 
+> Add compatible = "pciclass,0604" to pcie0_port so child nodes below the
+> bridge can be matched by the PCI device class.
+> 
+> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/kodiak.dtsi | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/kodiak.dtsi b/arch/arm64/boot/dts/qcom/kodiak.dtsi
+> index fa540d8c2615..12594967d2c2 100644
+> --- a/arch/arm64/boot/dts/qcom/kodiak.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/kodiak.dtsi
+> @@ -2296,6 +2296,7 @@ pcie0: pcie@1c00000 {
+>  			status = "disabled";
+>  
+>  			pcie0_port: pcie@0 {
+> +				compatible = "pciclass,0604";
+>  				device_type = "pci";
+>  				reg = <0x0 0x0 0x0 0x0 0x0>;
+>  				bus-range = <0x01 0xff>;
+> 
 
