@@ -1,88 +1,66 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F80E41D64A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65D137F74C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785167275; cv=none; b=cSn7SJCUcduc59KrTpdnrtD7H0FeDQb6G+7B+LbscyWgEArwl0hPuJH6eTXSrjcovJPHxt04RvQ8cD51Rdcjd3oHtGSbfe0J7+wpDVptH8LZFeDK7boPpVM0RnUvNWx0CyU+bZE/GPgNz7LCsLJp+VJyOKaE0Xdcdzjo9zUXVbU=
+	t=1785167552; cv=none; b=nHvaXWCVyMR4PGR6JCB4E/YdVfNBwxWgGcQvt6Qf3il8oBejjH9w5qHcQeer8kbNAc0lMzNSLCqp/k3ajSjxmET6diTAbQy8gSk5jcZyx5dq97+thnwAdTZ/WjQIBu5p5y+E/t9D2RIH2FZt1BnA9DbWERHTsucHkizABQACdYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785167275; c=relaxed/simple;
-	bh=EmNMDATglf3AftKoGe4gO7aU8HvSPpfpT+PUJBZEg6A=;
+	s=arc-20240116; t=1785167552; c=relaxed/simple;
+	bh=Ja3b/MXQK3SU070zBRG9MtfNTmonmTqhuXeRxJr9kCA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ge/MaZAY+zrReFVkeeV1YXedCiuW1ex8YkgT99T92+7BvP8/cmc4J36ssbbJR1JLYE2k0lbtUdT2Ez6sB94vYe7jVKTm3Tl2vUy6vljKjBo3lp6DUnmwQYwGhNwArLkAhCaKE0omUyaXR6CcjHTuBADXXDz5ja8BSUlXaQzhpZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JW0JT5v+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=J06EC+cx; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 In-Reply-To:To:Cc; b=JgGRaTIKnApCCIaETlZaxQXDgfPRd64cZVqCS6xd3M23MWBltEuXyYG4ZC9uQ2JuD0kTxoSRYR/ezETFJJ+1pxCTppyebS4vUO9UC7jCCL+FtYvEKkpXTwgI/pI0/bo/zO/3bmu9i6z5OAJ6gdWhXtnkWggz3siHFSOdvGh0ZYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk; spf=pass smtp.mailfrom=thegoodpenguin.co.uk; dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b=Z1sZmOyh; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JW0JT5v+";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="J06EC+cx"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66RDlaSd3663514
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:47:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9aAS9+E/tGC0hbzJfaKVQm0giC3eEl6eeIWKssyuhtU=; b=JW0JT5v+Wq0G/FR8
-	5At9htZPTdBAhfRDJAlyB/U5hQLg30P87Yn6KGKI/TSQT9KWCQvEpcN0n0MvIRMN
-	hu8f241huFMjkP5We5y3u6YBgp1e0bJR3HZyV0vznDqEw4+S1P6GqsDxJawdmWnS
-	Jnptqpw7WD53QgN6dW0Cy+tA5d+sE1fioZd/UMYDBOjx4xxUv/e7WZ2wEKB8w1TG
-	N96TnIe3ND/XDHv/Yn0WOO4oizMGmOi6R0TWZVRBzWOvQ0lRQXL9kPXQxCnuONkQ
-	ZfbonCWyeiqCWyIWCILE0Rih/QzoTrMXx0CYunaTVyCGW/lhwj1fyqTBOPQ5LpLh
-	cindOQ==
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com [209.85.128.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fp2asjac0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:47:51 +0000 (GMT)
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-81e8a76a273so73898407b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 08:47:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b="Z1sZmOyh"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47f752b3423so1775964f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 08:52:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1785167270; x=1785772070; darn=vger.kernel.org;
+        d=thegoodpenguin-co-uk.20251104.gappssmtp.com; s=20251104; t=1785167549; x=1785772349; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=9aAS9+E/tGC0hbzJfaKVQm0giC3eEl6eeIWKssyuhtU=;
-        b=J06EC+cxm0RaM7wFLn3w6qTWoNAckGhvBpCkUyJhMuTt8+BGpi4D8x1dtZPfKPKrBp
-         TgxLBXsylxvXSYyBTSAdhwJNQ22oUDAPwLLbLCIAELDkRg6MVsDEt+ISU2ef7H+Do4GM
-         Ba+q+uyC9SWAF8wQcRThdfAzyfipjyajCxM5mYRVLiQE9BShOO0bjyRaVjkHE81+naZk
-         V6uW7faEHOpOJbqbS17bZ0EBNOP1OlX7GhyDU89/RMahLkjytv+9yYXHrYl5FjMEBodD
-         zfriCTZx6aACBGwBbkMn+maEDbbj0ZLvqrNIdejqzIE+yiiVNDjd5ZP3turVIj4fJMSl
-         2gpg==
+        bh=weD0rbd4+5EXM6jyP/vcBkJFQ4s57OIU2OfRCbgEcig=;
+        b=Z1sZmOyhda3qrMA9SLerMXtkAsfvjJQXog+3SvWlqLPr0yUBVF4mWPwk4fdZoYx3jT
+         fG3F3Sy+GhSbmpnNFXtPnWktQ3U2sFhrGPgoSvXcj9Wx0ooDjeXqMQ2YniesUrrXo917
+         SU6lML04A+jwvhtplTLWS9q3HCDCFYSqw3s6CtjQyrNBn/2v/rJkN5LCxnjazKI7/F8F
+         IwNzPv+eAwtYzUrGlCmk4/0uiUoca677i7FGpP/D96RYc4opvKiAlyPIrYmEhV+jsuwi
+         R37OTFQodLcpgQXukVMKBzYisrCJfS1Jbi3oXgR8/eOaUWsijjgyKHDXiUKfSioWUgcZ
+         b2xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785167270; x=1785772070;
+        d=1e100.net; s=20251104; t=1785167549; x=1785772349;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9aAS9+E/tGC0hbzJfaKVQm0giC3eEl6eeIWKssyuhtU=;
-        b=Yoz7hn15Twp9+TGCKfCrjnyh6cY551EWV8XPam7cg5AXcUj2NIf5CBiAAhGOb/pRqA
-         v5m3mz3HKi1Ydn9Yk0jnC1wKpzpcnutHOymMyOILhhNQpUBQ/h9wqXV/H0z740PiKp7A
-         d5vTk3Da5V23lVJxzI3uKOsUhztGvrtDP7QzgcN15B+9eNISBdyqKKwbSZoez3P58fl5
-         xKRmwjZ20x87VzLoJETWY/8ktv9E+a5nU9MOw0GFlex1t3MDewRKDHifcBl/hFYSr+UE
-         StDfKeeS/YzSC9pTU85ZQvVz9LWiT3Yt81Ls2uWvAimshcwOuEGnGSJJXUOvoHz+pNSL
-         Wdfg==
-X-Forwarded-Encrypted: i=1; AHgh+RqH3BUbISqOND06j1wOcFPg04J2tWW5+4276EhEVMlUiVRje1/JC9W7VtAte3AkXdnFotTNjD1Zs8nWFAfzkog=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7KAw8QIA0yJfBbTbOVbzWg3X57MxtrNlGhH8vU5/dv7FUW0pB
-	Q0kz4SomOYmpjQL7FLUx4IAsdcWbMGhZYfJjdqSaU+qcKN3auVylrQ64KFuqN/qCLw1C/LWnPEq
-	R4Vwdhw+vRAsvzIZl4ZKUPqGb3UxM3OItR6eOxtpCkVjJY0aKeDGrnyeMFtxSPURFD3+PJf4=
-X-Gm-Gg: AR+sD10cs2mM1yaA4+vB+ZBhgTk8u67lN3+mXXDIiObFyfQ/bWRh9jJJkgh96XytEy7
-	m34YUbiHv1tKikddHaY0cJAgTCktOyZEDrUd/RSJfYvw4GR9dm564n5GBRdg5uWUrBTCz+wh+gH
-	LAK+PqeNV4Y+E3pqllLUnUALOiDFGSwHwoKiOQawYu0XNjgHFtWHRP59UQE1z9HVH2cIJ8ZHwu7
-	5M2L32t75PIFuQS12VcMtPeImsyXxatU7bFgvW8TojpwpvgSSS4B6kMg+KhwP9dFjdof+jRR3od
-	GYD1AjDTBOh0mSEjE8sq1jgRPorzy3ojzpLcIPS0t+xO2aOd3KYm2xmmGqPRdPt9xqR3+d95+kT
-	T5yI8YsMeTGWzCPYxLZxywazwSX6O3g==
-X-Received: by 2002:a05:690c:b9c:b0:81e:cc9f:3dfe with SMTP id 00721157ae682-81f93935c11mr495477b3.1.1785167270534;
-        Mon, 27 Jul 2026 08:47:50 -0700 (PDT)
-X-Received: by 2002:a05:690c:b9c:b0:81e:cc9f:3dfe with SMTP id 00721157ae682-81f93935c11mr495357b3.1.1785167270201;
-        Mon, 27 Jul 2026 08:47:50 -0700 (PDT)
-Received: from hu-samana-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81f657c727asm33307617b3.19.2026.07.27.08.47.42
+        bh=weD0rbd4+5EXM6jyP/vcBkJFQ4s57OIU2OfRCbgEcig=;
+        b=qcuX/2w6+I8hWcMfyPSM7ePkVhkOUlxh8Bir6PyS8PcmFS2SU0xiJEpDAoYYrGSaUd
+         VSFu6O5sAKVzEF6O8ZrohcTcq3+roVWs4wu25juSKZvoEDSdsQZcFMgTfQYF0qKTFbAj
+         evksU4hRsCxhv8x+m4lcPmuZVywfCIyB8njX7T0BJx0oraqW/p4hMP7yA73AxQtEGYvn
+         n52Nk5iCOpcYUCCwTZFKt518/qJdaxozlqzn3BG3rTuWja3c7iEqq0OzO69vs/OVvPao
+         c2wJD8Y/yvkeVRm7FEUjuYb9CmN4cGsrCVQW3TWluvtXORGzKP7GPqDck5JK7eaEAQi5
+         YRAA==
+X-Gm-Message-State: AOJu0YxPxkKhGFGtfoT1cPDkOQzbutmtc93dcZ+qv48OsIg0EvKBekqI
+	WlH4B1c1KuOT1APcQx/3Y3iCgxcJXjmzdIaOBU0MM8Z6Gjz6+pPUaN/LbpzK5VzANRI=
+X-Gm-Gg: AR+sD11+iB7Ft7PfpXwuGEJ175oqaAkb4Qh/GW8FKJZsZ0Rv1xaoAJ08QlXPgaYimQ1
+	9i5RZqspAlxDUSmBRaiZl/7NlZCXO4o+s4wEfRkG1/FmZhuMTy2znYoJQy0lQf8IUXIYS/U1hZ+
+	1tNi8TEgXM0sKQlY8MQafhv8AixBUwuFgZJlrNuW1ics3vQCwHlnz8+eQUX2SFpWj5//zCCIZDI
+	wWbsfoGGiybGmwJWpybND1dP26QYfKhbgPPrT1xTECWr6S2QfVytNEuHUtIyfBWrR74mLhYw198
+	TMBXlMK7IPekZZWQALRwXE1bFPiWgbfpmUlfu0hGOLGYZFv0ZQUaYFHEt9YS1lqoOzlWTwaCX3v
+	ozW5ac2r9EuuGw0Wd+Ningudi7COglEtsvZkVUSSF8VQmsjWX7Y89BDiHqw17dGChX/eg5SrWPM
+	tLSb6GZPRWvMlTrxvbK0U=
+X-Received: by 2002:a05:6000:41e9:b0:462:e086:35f with SMTP id ffacd0b85a97d-47f9fc9c6d3mr11694862f8f.21.1785167548935;
+        Mon, 27 Jul 2026 08:52:28 -0700 (PDT)
+Received: from [10.42.0.1] ([2a00:23c7:1d1a:9c01:7aab:bc55:e039:4aac])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c52fa9sm51005161f8f.20.2026.07.27.08.52.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2026 08:47:50 -0700 (PDT)
-From: Rahul Samana <rahul.samana@oss.qualcomm.com>
-Date: Mon, 27 Jul 2026 21:15:06 +0530
-Subject: [PATCH v2 6/6] arm64: dts: qcom: rb3gen2: add Industrial BT UART
- overlay
+        Mon, 27 Jul 2026 08:52:28 -0700 (PDT)
+From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
+Date: Mon, 27 Jul 2026 16:51:51 +0100
+Subject: [PATCH 1/2] Bluetooth: use a named initializer for acpi_device_id
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,223 +69,428 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260727-rb3-industrial-bt-uart-v2-6-2d100f30e202@oss.qualcomm.com>
-References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
-In-Reply-To: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: Rahul Samana <rahul.samana@oss.qualcomm.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
-        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Message-Id: <20260727-acpi-bluetooth-v1-1-b5558d53e6e7@thegoodpenguin.co.uk>
+References: <20260727-acpi-bluetooth-v1-0-b5558d53e6e7@thegoodpenguin.co.uk>
+In-Reply-To: <20260727-acpi-bluetooth-v1-0-b5558d53e6e7@thegoodpenguin.co.uk>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, 
+ "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
 X-Mailer: b4 0.15.2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI3MDE0OCBTYWx0ZWRfX+ZAP4hOnu8+5
- Lp3AmH+5ZsMssxWyLUhWVJDg58A2RFlC3jXO8g8xBUDNohm3lLUJ5izaTM1zE9XtEH1wgAQ3ckZ
- C2fx5B9edP6Fi/O59UQxK+Ec/+pqKMWqHbTIm9RZxHHbC08PhjK0xpSFCZaJuqnHTmL4h3pmjfC
- KZwi6QZu6csMcOkWg9VVWUGFs0CSlCJiFJCGsjW/ootP6YZhX6o7C6LTMoaMZOI93Gj65qS6Qcl
- Feyk1d5L5VVntwiHIzBebmkYkoSAdVNRf42DW/bjnsi1NZlq5YOEyogG2ZJ6gorh88peBn9eU8X
- VSYXsQIv9Yld+/bfUPq79YLLCsyDPFP7p0GSmTOuBkOi6mejwEULGZOPof3dqIygwyNkDeDpdWm
- asAP7h0S1g73VQM8Nq/WWd41YQWdiPtkR9reLnj/ALzuJnXbj+Eb8ysxNaSkRQfJPpEjxEWYyMO
- XAu5Flgt1mO5DYi8Log==
-X-Authority-Analysis: v=2.4 cv=UPbt2ify c=1 sm=1 tr=0 ts=6a677da7 cx=c_pps
- a=g1v0Z557R90hA0UpD/5Yag==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
- a=EUspDBNiAAAA:8 a=i_xuHGjCaTy6jZfIMc0A:9 a=QEXdDO2ut3YA:10
- a=MFSWADHSvvjO3QEy5MdX:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI3MDE0OCBTYWx0ZWRfX1IFJO1upOObb
- gynFykajzn8DE/agjEdvii61jFsrKxM2BYaJakgZnZ4OSSB3jcepbEx4m0/oznQtBni9kKV+dkp
- WGt5osnt4TWTTwWSZagX+1ZXR4a9jvE=
-X-Proofpoint-ORIG-GUID: 5Y1-TbpbbKpgS1EXKB7DNCbojGzrJMwW
-X-Proofpoint-GUID: 5Y1-TbpbbKpgS1EXKB7DNCbojGzrJMwW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-27_04,2026-07-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 bulkscore=0 clxscore=1015 spamscore=0
- adultscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607270148
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785167547; l=10992;
+ i=pzalewski@thegoodpenguin.co.uk; s=20260430; h=from:subject:message-id;
+ bh=Ja3b/MXQK3SU070zBRG9MtfNTmonmTqhuXeRxJr9kCA=;
+ b=YJ73/YIqCiyr/vIYyGSiLUiXYmypjvfpW2utq9i+Nw71F9839qNvRUz5ONX7UufuBwTwY6U2v
+ XjB552ytzJiCHb68oTOgLgWu7d7zpT4lYAt4i8ZNrJhW3ayKTvNE1Gf
+X-Developer-Key: i=pzalewski@thegoodpenguin.co.uk; a=ed25519;
+ pk=vHq4n9IonORH2GTzLv8r6CWAFHzgfBuNkQPXA8NSly0=
 
-The reworked RB3 Gen 2 Industrial mezzanine keeps the common Industrial
-mezzanine hardware description but routes QCC2072 Bluetooth over UART4
-instead of the default Bluetooth-over-USB path.
+Use a named initializer for the acpi_device_id fields which
+makes the code more readable and consistent with how lists
+are initialized in the rest of the kernel code base.
 
-Build this variant by applying the common Industrial mezzanine overlay
-first, followed by the BT UART overlay. The overlay models the M.2 E-key
-connector graph endpoints for PCIe and UART, and disables the on-board
-WCN6750 PMU and UART7 path so the M.2 QCC2072 Bluetooth controller can be
-used instead.
+While we are at it - unify the list terminator to have
+a single space between the brackets without a trailing
+coma.
 
-Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
 ---
- arch/arm64/boot/dts/qcom/Makefile                  |   2 +
- ...s6490-rb3gen2-industrial-mezzanine-bt-uart.dtso | 129 +++++++++++++++++++++
- 2 files changed, 131 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 336 ++++++++++++++++++++++----------------------
+ drivers/bluetooth/hci_h5.c  |   6 +-
+ drivers/bluetooth/hci_qca.c |  12 +-
+ 3 files changed, 177 insertions(+), 177 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
-index 6f33c4e2f09c..45786d3db14a 100644
---- a/arch/arm64/boot/dts/qcom/Makefile
-+++ b/arch/arm64/boot/dts/qcom/Makefile
-@@ -179,8 +179,10 @@ dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-rb3gen2.dtb
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 1a4fc3882fd2..01da3fecb536 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1314,174 +1314,174 @@ static struct bcm_device_data bcm43430_device_data = {
+ };
  
- qcs6490-rb3gen2-vision-mezzanine-dtbs := qcs6490-rb3gen2.dtb qcs6490-rb3gen2-vision-mezzanine.dtbo
- qcs6490-rb3gen2-industrial-mezzanine-dtbs := qcs6490-rb3gen2.dtb qcs6490-rb3gen2-industrial-mezzanine.dtbo
-+qcs6490-rb3gen2-industrial-mezzanine-bt-uart-dtbs := qcs6490-rb3gen2.dtb qcs6490-rb3gen2-industrial-mezzanine.dtbo qcs6490-rb3gen2-industrial-mezzanine-bt-uart.dtbo
+ static const struct acpi_device_id bcm_acpi_match[] = {
+-	{ "BCM2E00" },
+-	{ "BCM2E01" },
+-	{ "BCM2E02" },
+-	{ "BCM2E03" },
+-	{ "BCM2E04" },
+-	{ "BCM2E05" },
+-	{ "BCM2E06" },
+-	{ "BCM2E07" },
+-	{ "BCM2E08" },
+-	{ "BCM2E09" },
+-	{ "BCM2E0A" },
+-	{ "BCM2E0B" },
+-	{ "BCM2E0C" },
+-	{ "BCM2E0D" },
+-	{ "BCM2E0E" },
+-	{ "BCM2E0F" },
+-	{ "BCM2E10" },
+-	{ "BCM2E11" },
+-	{ "BCM2E12" },
+-	{ "BCM2E13" },
+-	{ "BCM2E14" },
+-	{ "BCM2E15" },
+-	{ "BCM2E16" },
+-	{ "BCM2E17" },
+-	{ "BCM2E18" },
+-	{ "BCM2E19" },
+-	{ "BCM2E1A" },
+-	{ "BCM2E1B" },
+-	{ "BCM2E1C" },
+-	{ "BCM2E1D" },
+-	{ "BCM2E1F" },
+-	{ "BCM2E20" },
+-	{ "BCM2E21" },
+-	{ "BCM2E22" },
+-	{ "BCM2E23" },
+-	{ "BCM2E24" },
+-	{ "BCM2E25" },
+-	{ "BCM2E26" },
+-	{ "BCM2E27" },
+-	{ "BCM2E28" },
+-	{ "BCM2E29" },
+-	{ "BCM2E2A" },
+-	{ "BCM2E2B" },
+-	{ "BCM2E2C" },
+-	{ "BCM2E2D" },
+-	{ "BCM2E2E" },
+-	{ "BCM2E2F" },
+-	{ "BCM2E30" },
+-	{ "BCM2E31" },
+-	{ "BCM2E32" },
+-	{ "BCM2E33" },
+-	{ "BCM2E34" },
+-	{ "BCM2E35" },
+-	{ "BCM2E36" },
+-	{ "BCM2E37" },
+-	{ "BCM2E38" },
+-	{ "BCM2E39" },
+-	{ "BCM2E3A" },
+-	{ "BCM2E3B" },
+-	{ "BCM2E3C" },
+-	{ "BCM2E3D" },
+-	{ "BCM2E3E" },
+-	{ "BCM2E3F" },
+-	{ "BCM2E40" },
+-	{ "BCM2E41" },
+-	{ "BCM2E42" },
+-	{ "BCM2E43" },
+-	{ "BCM2E44" },
+-	{ "BCM2E45" },
+-	{ "BCM2E46" },
+-	{ "BCM2E47" },
+-	{ "BCM2E48" },
+-	{ "BCM2E49" },
+-	{ "BCM2E4A" },
+-	{ "BCM2E4B" },
+-	{ "BCM2E4C" },
+-	{ "BCM2E4D" },
+-	{ "BCM2E4E" },
+-	{ "BCM2E4F" },
+-	{ "BCM2E50" },
+-	{ "BCM2E51" },
+-	{ "BCM2E52" },
+-	{ "BCM2E53" },
+-	{ "BCM2E54" },
+-	{ "BCM2E55" },
+-	{ "BCM2E56" },
+-	{ "BCM2E57" },
+-	{ "BCM2E58" },
+-	{ "BCM2E59" },
+-	{ "BCM2E5A" },
+-	{ "BCM2E5B" },
+-	{ "BCM2E5C" },
+-	{ "BCM2E5D" },
+-	{ "BCM2E5E" },
+-	{ "BCM2E5F" },
+-	{ "BCM2E60" },
+-	{ "BCM2E61" },
+-	{ "BCM2E62" },
+-	{ "BCM2E63" },
+-	{ "BCM2E64" },
+-	{ "BCM2E65" },
+-	{ "BCM2E66" },
+-	{ "BCM2E67" },
+-	{ "BCM2E68" },
+-	{ "BCM2E69" },
+-	{ "BCM2E6B" },
+-	{ "BCM2E6D" },
+-	{ "BCM2E6E" },
+-	{ "BCM2E6F" },
+-	{ "BCM2E70" },
+-	{ "BCM2E71" },
+-	{ "BCM2E72" },
+-	{ "BCM2E73" },
+-	{ "BCM2E74", (long)&bcm43430_device_data },
+-	{ "BCM2E75", (long)&bcm43430_device_data },
+-	{ "BCM2E76" },
+-	{ "BCM2E77" },
+-	{ "BCM2E78" },
+-	{ "BCM2E79" },
+-	{ "BCM2E7A" },
+-	{ "BCM2E7B", (long)&bcm43430_device_data },
+-	{ "BCM2E7C" },
+-	{ "BCM2E7D" },
+-	{ "BCM2E7E" },
+-	{ "BCM2E7F" },
+-	{ "BCM2E80", (long)&bcm43430_device_data },
+-	{ "BCM2E81" },
+-	{ "BCM2E82" },
+-	{ "BCM2E83" },
+-	{ "BCM2E84" },
+-	{ "BCM2E85" },
+-	{ "BCM2E86" },
+-	{ "BCM2E87" },
+-	{ "BCM2E88" },
+-	{ "BCM2E89", (long)&bcm43430_device_data },
+-	{ "BCM2E8A" },
+-	{ "BCM2E8B" },
+-	{ "BCM2E8C" },
+-	{ "BCM2E8D" },
+-	{ "BCM2E8E" },
+-	{ "BCM2E90" },
+-	{ "BCM2E92" },
+-	{ "BCM2E93" },
+-	{ "BCM2E94", (long)&bcm43430_device_data },
+-	{ "BCM2E95" },
+-	{ "BCM2E96" },
+-	{ "BCM2E97" },
+-	{ "BCM2E98" },
+-	{ "BCM2E99", (long)&bcm43430_device_data },
+-	{ "BCM2E9A" },
+-	{ "BCM2E9B", (long)&bcm43430_device_data },
+-	{ "BCM2E9C" },
+-	{ "BCM2E9D" },
+-	{ "BCM2E9F", (long)&bcm43430_device_data },
+-	{ "BCM2EA0" },
+-	{ "BCM2EA1" },
+-	{ "BCM2EA2", (long)&bcm43430_device_data },
+-	{ "BCM2EA3", (long)&bcm43430_device_data },
+-	{ "BCM2EA4", (long)&bcm43430_device_data }, /* bcm43455 */
+-	{ "BCM2EA5" },
+-	{ "BCM2EA6" },
+-	{ "BCM2EA7" },
+-	{ "BCM2EA8" },
+-	{ "BCM2EA9" },
+-	{ "BCM2EAA", (long)&bcm43430_device_data },
+-	{ "BCM2EAB", (long)&bcm43430_device_data },
+-	{ "BCM2EAC", (long)&bcm43430_device_data },
+-	{ },
++	{ .id = "BCM2E00" },
++	{ .id = "BCM2E01" },
++	{ .id = "BCM2E02" },
++	{ .id = "BCM2E03" },
++	{ .id = "BCM2E04" },
++	{ .id = "BCM2E05" },
++	{ .id = "BCM2E06" },
++	{ .id = "BCM2E07" },
++	{ .id = "BCM2E08" },
++	{ .id = "BCM2E09" },
++	{ .id = "BCM2E0A" },
++	{ .id = "BCM2E0B" },
++	{ .id = "BCM2E0C" },
++	{ .id = "BCM2E0D" },
++	{ .id = "BCM2E0E" },
++	{ .id = "BCM2E0F" },
++	{ .id = "BCM2E10" },
++	{ .id = "BCM2E11" },
++	{ .id = "BCM2E12" },
++	{ .id = "BCM2E13" },
++	{ .id = "BCM2E14" },
++	{ .id = "BCM2E15" },
++	{ .id = "BCM2E16" },
++	{ .id = "BCM2E17" },
++	{ .id = "BCM2E18" },
++	{ .id = "BCM2E19" },
++	{ .id = "BCM2E1A" },
++	{ .id = "BCM2E1B" },
++	{ .id = "BCM2E1C" },
++	{ .id = "BCM2E1D" },
++	{ .id = "BCM2E1F" },
++	{ .id = "BCM2E20" },
++	{ .id = "BCM2E21" },
++	{ .id = "BCM2E22" },
++	{ .id = "BCM2E23" },
++	{ .id = "BCM2E24" },
++	{ .id = "BCM2E25" },
++	{ .id = "BCM2E26" },
++	{ .id = "BCM2E27" },
++	{ .id = "BCM2E28" },
++	{ .id = "BCM2E29" },
++	{ .id = "BCM2E2A" },
++	{ .id = "BCM2E2B" },
++	{ .id = "BCM2E2C" },
++	{ .id = "BCM2E2D" },
++	{ .id = "BCM2E2E" },
++	{ .id = "BCM2E2F" },
++	{ .id = "BCM2E30" },
++	{ .id = "BCM2E31" },
++	{ .id = "BCM2E32" },
++	{ .id = "BCM2E33" },
++	{ .id = "BCM2E34" },
++	{ .id = "BCM2E35" },
++	{ .id = "BCM2E36" },
++	{ .id = "BCM2E37" },
++	{ .id = "BCM2E38" },
++	{ .id = "BCM2E39" },
++	{ .id = "BCM2E3A" },
++	{ .id = "BCM2E3B" },
++	{ .id = "BCM2E3C" },
++	{ .id = "BCM2E3D" },
++	{ .id = "BCM2E3E" },
++	{ .id = "BCM2E3F" },
++	{ .id = "BCM2E40" },
++	{ .id = "BCM2E41" },
++	{ .id = "BCM2E42" },
++	{ .id = "BCM2E43" },
++	{ .id = "BCM2E44" },
++	{ .id = "BCM2E45" },
++	{ .id = "BCM2E46" },
++	{ .id = "BCM2E47" },
++	{ .id = "BCM2E48" },
++	{ .id = "BCM2E49" },
++	{ .id = "BCM2E4A" },
++	{ .id = "BCM2E4B" },
++	{ .id = "BCM2E4C" },
++	{ .id = "BCM2E4D" },
++	{ .id = "BCM2E4E" },
++	{ .id = "BCM2E4F" },
++	{ .id = "BCM2E50" },
++	{ .id = "BCM2E51" },
++	{ .id = "BCM2E52" },
++	{ .id = "BCM2E53" },
++	{ .id = "BCM2E54" },
++	{ .id = "BCM2E55" },
++	{ .id = "BCM2E56" },
++	{ .id = "BCM2E57" },
++	{ .id = "BCM2E58" },
++	{ .id = "BCM2E59" },
++	{ .id = "BCM2E5A" },
++	{ .id = "BCM2E5B" },
++	{ .id = "BCM2E5C" },
++	{ .id = "BCM2E5D" },
++	{ .id = "BCM2E5E" },
++	{ .id = "BCM2E5F" },
++	{ .id = "BCM2E60" },
++	{ .id = "BCM2E61" },
++	{ .id = "BCM2E62" },
++	{ .id = "BCM2E63" },
++	{ .id = "BCM2E64" },
++	{ .id = "BCM2E65" },
++	{ .id = "BCM2E66" },
++	{ .id = "BCM2E67" },
++	{ .id = "BCM2E68" },
++	{ .id = "BCM2E69" },
++	{ .id = "BCM2E6B" },
++	{ .id = "BCM2E6D" },
++	{ .id = "BCM2E6E" },
++	{ .id = "BCM2E6F" },
++	{ .id = "BCM2E70" },
++	{ .id = "BCM2E71" },
++	{ .id = "BCM2E72" },
++	{ .id = "BCM2E73" },
++	{ .id = "BCM2E74", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E75", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E76" },
++	{ .id = "BCM2E77" },
++	{ .id = "BCM2E78" },
++	{ .id = "BCM2E79" },
++	{ .id = "BCM2E7A" },
++	{ .id = "BCM2E7B", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E7C" },
++	{ .id = "BCM2E7D" },
++	{ .id = "BCM2E7E" },
++	{ .id = "BCM2E7F" },
++	{ .id = "BCM2E80", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E81" },
++	{ .id = "BCM2E82" },
++	{ .id = "BCM2E83" },
++	{ .id = "BCM2E84" },
++	{ .id = "BCM2E85" },
++	{ .id = "BCM2E86" },
++	{ .id = "BCM2E87" },
++	{ .id = "BCM2E88" },
++	{ .id = "BCM2E89", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E8A" },
++	{ .id = "BCM2E8B" },
++	{ .id = "BCM2E8C" },
++	{ .id = "BCM2E8D" },
++	{ .id = "BCM2E8E" },
++	{ .id = "BCM2E90" },
++	{ .id = "BCM2E92" },
++	{ .id = "BCM2E93" },
++	{ .id = "BCM2E94", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E95" },
++	{ .id = "BCM2E96" },
++	{ .id = "BCM2E97" },
++	{ .id = "BCM2E98" },
++	{ .id = "BCM2E99", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E9A" },
++	{ .id = "BCM2E9B", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2E9C" },
++	{ .id = "BCM2E9D" },
++	{ .id = "BCM2E9F", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2EA0" },
++	{ .id = "BCM2EA1" },
++	{ .id = "BCM2EA2", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2EA3", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2EA4", .driver_data = (long)&bcm43430_device_data }, /* bcm43455 */
++	{ .id = "BCM2EA5" },
++	{ .id = "BCM2EA6" },
++	{ .id = "BCM2EA7" },
++	{ .id = "BCM2EA8" },
++	{ .id = "BCM2EA9" },
++	{ .id = "BCM2EAA", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2EAB", .driver_data = (long)&bcm43430_device_data },
++	{ .id = "BCM2EAC", .driver_data = (long)&bcm43430_device_data },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+ #endif
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 93cdde981840..60b90f1e11fc 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -1124,10 +1124,10 @@ static const struct h5_device_data h5_data_rtl8723bs = {
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id h5_acpi_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
+-	{ "OBDA0623", (kernel_ulong_t)&h5_data_rtl8723bs },
+-	{ "OBDA8723", (kernel_ulong_t)&h5_data_rtl8723bs },
++	{ .id = "OBDA0623", .driver_data = (kernel_ulong_t)&h5_data_rtl8723bs },
++	{ .id = "OBDA8723", .driver_data = (kernel_ulong_t)&h5_data_rtl8723bs },
+ #endif
+-	{ },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1222f97800f4..a6827300812f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2792,12 +2792,12 @@ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
  
- dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-rb3gen2-industrial-mezzanine.dtb
-+dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-rb3gen2-industrial-mezzanine-bt-uart.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-rb3gen2-vision-mezzanine.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-thundercomm-minipc-g1iot.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-thundercomm-rubikpi3.dtb
-diff --git a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2-industrial-mezzanine-bt-uart.dtso b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2-industrial-mezzanine-bt-uart.dtso
-new file mode 100644
-index 000000000000..67577d6f279f
---- /dev/null
-+++ b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2-industrial-mezzanine-bt-uart.dtso
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: BSD-3-Clause
-+/*
-+ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
-+ */
-+
-+/dts-v1/;
-+/plugin/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
-+
-+&{/} {
-+	vreg_wcn_3p3: regulator-wcn-3p3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "VREG_WCN_3P3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+
-+		regulator-boot-on;
-+	};
-+
-+	m2-e-connector {
-+		compatible = "pcie-m2-e-connector";
-+		vpcie3v3-supply = <&vreg_wcn_3p3>;
-+
-+		ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			port@0 {
-+				reg = <0>;
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+
-+				m2_e_pcie_ep: endpoint@0 {
-+					reg = <0>;
-+					remote-endpoint = <&pcie0_m2_e_ep>;
-+				};
-+			};
-+
-+			port@3 {
-+				reg = <3>;
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+
-+				m2_e_uart_ep: endpoint@0 {
-+					reg = <0>;
-+					remote-endpoint = <&uart4_m2_e_ep>;
-+				};
-+			};
-+		};
-+	};
-+};
-+
-+&qup_uart4_cts {
-+	bias-bus-hold;
-+};
-+
-+&qup_uart4_rts {
-+	drive-strength = <2>;
-+	bias-disable;
-+};
-+
-+&qup_uart4_rx {
-+	bias-pull-up;
-+};
-+
-+&qup_uart4_tx {
-+	drive-strength = <2>;
-+	bias-disable;
-+};
-+
-+&tlmm {
-+	qup_uart4_sleep_cts: qup-uart4-sleep-cts-state {
-+		pins = "gpio16";
-+		function = "gpio";
-+		bias-bus-hold;
-+	};
-+
-+	qup_uart4_sleep_rts: qup-uart4-sleep-rts-state {
-+		pins = "gpio17";
-+		function = "gpio";
-+		bias-pull-down;
-+	};
-+
-+	qup_uart4_sleep_tx: qup-uart4-sleep-tx-state {
-+		pins = "gpio18";
-+		function = "gpio";
-+		bias-pull-up;
-+	};
-+
-+	qup_uart4_sleep_rx: qup-uart4-sleep-rx-state {
-+		pins = "gpio19";
-+		function = "gpio";
-+		bias-pull-up;
-+	};
-+};
-+
-+&pcie0_m2_e {
-+	port {
-+		pcie0_m2_e_ep: endpoint {
-+			remote-endpoint = <&m2_e_pcie_ep>;
-+		};
-+	};
-+};
-+
-+&uart4 {
-+	interrupts-extended = <&intc GIC_SPI 605 IRQ_TYPE_LEVEL_HIGH>,
-+			      <&tlmm 19 IRQ_TYPE_EDGE_FALLING>;
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-1 = <&qup_uart4_sleep_cts>, <&qup_uart4_sleep_rts>,
-+		    <&qup_uart4_sleep_tx>, <&qup_uart4_sleep_rx>;
-+
-+	status = "okay";
-+
-+	port {
-+		uart4_m2_e_ep: endpoint {
-+			remote-endpoint = <&m2_e_uart_ep>;
-+		};
-+	};
-+};
-+
-+&uart7 {
-+	status = "disabled";
-+};
-+
-+&wcn6750_pmu {
-+	status = "disabled";
-+};
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
+-	{ "QCOM2066", (kernel_ulong_t)&qca_soc_data_qca2066 },
+-	{ "QCOM6390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-	{ "DLA16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-	{ "DLB16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-	{ "DLB26390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-	{ },
++	{ .id = "QCOM2066", .driver_data = (kernel_ulong_t)&qca_soc_data_qca2066 },
++	{ .id = "QCOM6390", .driver_data = (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ .id = "DLA16390", .driver_data = (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ .id = "DLB16390", .driver_data = (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ .id = "DLB26390", .driver_data = (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+ #endif
 
 -- 
-2.34.1
+2.43.0
 
