@@ -1,64 +1,89 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3335B3C0604;
-	Mon, 27 Jul 2026 05:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6C03DBD65
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 07:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785129711; cv=none; b=hWKCi02fVOb/m9kkm0HsNB4pxX3e1XM93rLtThg030oOAy5h5wWFvkzlsGxinxgGQuJ1/XQvOQRp+PzaLifNrPtE63dievqw6x+jptYGgsMXQhGBLP9mBhtnELMFZOcFKWVEQRFrILd8wHOBOVffFQI11drkYbnYxY6d8yxBEmg=
+	t=1785135617; cv=none; b=K27coqH4q30FKTT3+RIALqFyjV+Xj+u4X06iDdKlsQa03uLsIHCJ/dShp/dpZHixdZSpV7G4WYUVO7OEL/IdL1LkitrTIVMExwiBchOLl0aNTwSvX5w4t7JUQvziTHqPnSIKG7BS9Z0vSa7Jm03rgB31pDUdO8owomIYffgJSUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785129711; c=relaxed/simple;
-	bh=QqHBvA0I4/pjKd3ra7gKaKBBJYgNZF2jPTzcglgWGME=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DLSLo3TPqqOnCjQcaHKN+3QVmrg1PTMhvJbUY2gAVX93obqmvdof/qNISMCmkT/RPKv1kOGo9zkjgZj/+bkr4ZlGi9rQouC/qRksjLnsCkeAEV1fyZNcB7pHKUHmHaHL/Na6VAN6cK0F4pi7uQ9VrWV9pGIUVn+AI0eqQOr6bSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k6DSWqVF; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1785135617; c=relaxed/simple;
+	bh=QYC0wOFO5lY3FXi6A+gm2Te0n2hRVEJDdxKDjKxoD9I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FDBb2Sm8UJb5jnkSJQiFH9GAODDFvQzifkmSsDqO5gn+fdfKaGtzxBhc0GF5pgAudQt1Z2E/XsM8t7bSMSfQHHf3IU2xRlDRBg7FjNN+aOGn7l3u05cO01zbBpnp4tRhXvt0nStwVbl8HvIGdKTakAj0WPs0Gli4n4TR+0hMJq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JPsmwG87; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=LG8ztrw4; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k6DSWqVF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1785129708; x=1816665708;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QqHBvA0I4/pjKd3ra7gKaKBBJYgNZF2jPTzcglgWGME=;
-  b=k6DSWqVFBR509cYVJN9buyN9owf6q1en6cLNTOQpULimh+ErCF8o9ycK
-   t4jPwU+nZvtX9l40ecXePToXZOVdQjkPE+g8Ra2OVzBB9ZOWZlkDok51v
-   KpPjKXeY7/3wjhmm8rx0E0Al0t+bxy/GLZnosoX/V2W5DJZUgMTezW10M
-   GcBuEF1/WsyXqmihrWeH0pmldz1ikel0yY08yHHKqi6ZeBq70LPf+UZGm
-   l0qOp8rIgeTPPYuNGgqMYlV/5NCiyqo8qKGmNXkAGvzfO8POyiRJAe1HP
-   dOUr1tVrcEPGEcuh80VaEN21zkY2buSOefaKA8BBHt06eQIiFlvaHCXkE
-   A==;
-X-CSE-ConnectionGUID: JxNaCrHKR6W/TsrkIOprDg==
-X-CSE-MsgGUID: izkODjznTk2mqCM1anzs3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11857"; a="89583291"
-X-IronPort-AV: E=Sophos;i="6.25,187,1779174000"; 
-   d="scan'208";a="89583291"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2026 22:21:47 -0700
-X-CSE-ConnectionGUID: ldUmevhqQzaseBykPruIBQ==
-X-CSE-MsgGUID: fTZ421WgQAO476lVS2hruQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,187,1779174000"; 
-   d="scan'208";a="259942178"
-Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
-  by orviesa009.jf.intel.com with ESMTP; 26 Jul 2026 22:21:45 -0700
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JPsmwG87";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="LG8ztrw4"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66R1g3rs2257312
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 07:00:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=p1sWSrAxHV16wNl+mTy5gRyGWXc/NF3FLiv
+	t9YPqNII=; b=JPsmwG87fNsCqnF1lLMjUPwPnkoOjH9kOF/GBiQlSy9zI7AMAq6
+	/U6v/vpuRALRCXS0bUTdZVYwEHeIZmi+XwkC9D3d0213FoWJliVYO04xfbLJnghd
+	V871hdKEwzEr1jNkaE+BjkAdQh4B3A1v3pQ4l+eWUGTQUqueIW9GNmnIiKACzkLs
+	H5pEZoFRWjuCImbLY0CcpyjI/iEyy2eLP1pEwxBiGku5JHjcQ8kn2NvGqRPF3zH0
+	Wb22TyZkIfD/s/S7DlvgRGvxpuDhOj4u9IiZ7IEeiZtOBeiVfh8teMg99+hq1mIM
+	bAvlfy56gJkjL84N+v8Evr1swbmZSDAganw==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fmmfgw0v3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 07:00:03 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cb733fc5024so3334906a12.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 00:00:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1785135602; x=1785740402; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=p1sWSrAxHV16wNl+mTy5gRyGWXc/NF3FLivt9YPqNII=;
+        b=LG8ztrw44l5eeyG8L05LkfMhWW+27EpcTkiIVFnS7Bpv4ovpwIbhMpMcxUnpJTRPBU
+         vGitWR+lC9S/PUKyrAfb/c61+NO5rN99yMey8kJX2Lp6TMv/RBnyuCZ4P5+7jtQVbF5W
+         NbIzgs9+xUtTnaKePMr6Juc2O9myvH30FVP0Su9MY1l5RB5pgkATzrJc9Ga6bkXhqqVg
+         5J3+JHSwqFXhFea+SGlX8pNH3h3J5TZYzrSQrIXNfbnCXzBDZvhPxYUyawwovQLNe0Tf
+         XIXm/GWfVwpWpGIm5ujjoVp+ZDqlaGZT51oFxNbIbUrT6YGSYoL3JunWtTnOV10vobQq
+         qURA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785135602; x=1785740402;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=p1sWSrAxHV16wNl+mTy5gRyGWXc/NF3FLivt9YPqNII=;
+        b=F1IckckJbCec08R73QB/5As/rcJT6zAGf/mhdi/YCuWKDi7gcgqiNDkTdjyyC+Shqm
+         zYhNVc2jDIHeTNyHGGa7K73Mh2CySe97Bx6kCh73MBv9mKWExxqyDdRrqIL2RU7rFIiR
+         ILB6+uk9/1yqCixIZFD6asQ3pXAK3hgRV6L2Pt9Tp/Wuh5QyEo16CNA30qyq12nCHofu
+         VOrZ7x2iNXsQ5+tDQ7MNoGBa5P8nIi3LzaNiy5x+O/rXHtPer8X/gjHkL/Sn8+0vTk87
+         GQML3+J5RYsoJL+4qKig4T1aXedlumCS8axe+eIHaihWaGRSdJzYrLz1AwgnVykhZzLN
+         kFDA==
+X-Gm-Message-State: AOJu0YxojMwFzyxEAeOhzHhPbyu+9agPYVKWBSFSEcaKfyv9N8FzIt17
+	8ArNvFSco1SsccV11pFL4aBk5jzBaYyrf3bF9ebtXrXBF9OWcGVSea/ad+2QymepstNkgX3yb8D
+	oxIekweB6JMddaVKF6FnGG2tbrColRezd4udZ4iVoTc41q9FwwltA6+xltZXfmvjZyCDFtoP1D7
+	xq3ms=
+X-Gm-Gg: AR+sD101hx+D9VK6Zn0r7sRC46q+/EJFWUyo5FtE9gN4RU7BzF3vsLlVAKzXf7MHofK
+	ONo/oUTIH8KVKcfJX2Im086T5ESf9JSaSkmKu5LD9K/MXqQdJXK2YW2HtV//qd/CdqF64H+5Alb
+	pzkxnf3SC4n/4bvdJ8/lvNb+ilA3p4No6YcBT6ajGnpN/cZxE/hYedL6b4ht2COFLg84TNiieUo
+	7TX/nc+o3b3yACoLOVmnPiOA5JQnaHymMF2FTB84j81qOhGtlMNuoKWibMxYtA3uoYoMuCf/4Ph
+	5aekdBjNLAGBWRXO3cVY7shmu1/n7W2fjTC35pIhkgEbdfM4axi4laA36DcDU9lUYMjO5FzuciO
+	1f9pNqpUq50QcnnQN4gsAfecupOzEZw==
+X-Received: by 2002:a05:6a20:ce43:b0:3a0:bc61:62e6 with SMTP id adf61e73a8af0-3c67dab468fmr7652615637.8.1785135602132;
+        Mon, 27 Jul 2026 00:00:02 -0700 (PDT)
+X-Received: by 2002:a05:6a20:ce43:b0:3a0:bc61:62e6 with SMTP id adf61e73a8af0-3c67dab468fmr7652601637.8.1785135601728;
+        Mon, 27 Jul 2026 00:00:01 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-314bc3e1255sm43432530eec.4.2026.07.26.23.59.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2026 00:00:01 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-pci@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	bhelgaas@google.com,
-	ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	alex@shazbot.org,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: [PATCH v6] Bluetooth: btintel_pcie: Add vendor_reset PCI sysfs for PLDR
-Date: Mon, 27 Jul 2026 10:51:02 +0530
-Message-ID: <20260727052104.1026824-1-chandrashekar.devegowda@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260612012832.2395034-1-chandrashekar.devegowda@intel.com>
-References: <20260612012832.2395034-1-chandrashekar.devegowda@intel.com>
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v6 0/2] RAP: streamline session handling, reflector setup
+Date: Mon, 27 Jul 2026 12:29:52 +0530
+Message-Id: <20260727065954.1053484-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,144 +91,53 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: o7R2kHfL3DaymbHXsqXcFNmo8mH6wo8F
+X-Proofpoint-ORIG-GUID: o7R2kHfL3DaymbHXsqXcFNmo8mH6wo8F
+X-Authority-Analysis: v=2.4 cv=GdYnWwXL c=1 sm=1 tr=0 ts=6a6701f3 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=q7oXoo1SAt_vtFeS_wgA:9
+ a=_Vgx9l1VpLgwpw_dHYaR:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI3MDA2NyBTYWx0ZWRfX8sRpZ7qgNJoD
+ 78RkT+8p5FcZ/J46HaEFeg8Tmq6SQu0zEIr/X4Og/vJn8nQG7idVpSdZTcvjZeblSCcEMlJTXm3
+ fwIQDN0OaH+u5/V0tWOrBUQ+4g/LTeE=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI3MDA2NyBTYWx0ZWRfXxWInH7/pm6bG
+ lpJgu+zMkWONRyGJfbSNMQGpG/DfoxeByjcdrtRBwaCwNO1Q7/uqHyhvDu8JOfX9E2giozxtk+y
+ a/ij2z2AHX3cFC7vNTaYWF6aTyww6aMedv4Lzj1WC/7OERFPIdsM6Uv8gmGRciA//Iv7TJj2QbP
+ Fe9g33rpcVp0TPP3RHo1tNi4ODqn+j9s/FDx+ww/Tl4Kjl530oJDoNjugwWC+zUsOUqI1HVq0bH
+ ZUPFUPonPI4uvorAunNjQSWYwtkcMPwBH3ni3RM5fDu2h4VJQpl5vMmvZCkq0Jr0MAzJpp43ZbB
+ ykVyTCdXBn1wiIDx+pClP5Jm/Uxacn+MK1t+QCBlMV5zjW0+Xos9/aSQOSut2sH9upPXHdWfC1s
+ w0wxYSF/xqiQqi9Fz2yVnSj1boWNgeFmWUmbRUTWLd5LWgxnItGiAl6YHkJ3Gk2x/z5M3wngJug
+ 1Xd26YyAvUEtMG41KhQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-27_01,2026-07-24_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0 spamscore=0 malwarescore=0 phishscore=0
+ clxscore=1015 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607270067
 
-Add a read-write sysfs entry at /sys/bus/pci/devices/<BDF>/vendor_reset
-to allow userspace to trigger PLDR (Product Level Device Reset).
-Reading the attribute displays supported reset types. Writing
-integer 0 triggers PLDR. Any other input is rejected with
--EINVAL and a warning log.
+This series adds RAP users to the direct session lookup functionality.
 
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
----
-Changes in v6:
-  - Fixed .driver.dev_groups -> .dev_groups on struct pci_driver
-    (__pci_register_driver overwrites .driver.dev_groups with .dev_groups)
-  - Removed unrelated schedule_work() failure handling from
-    btintel_pcie_request_reset() that caused CI context mismatch
+The first patch refactors the shared RAP layer by introducing explicit
+attachment/disconnection helpers, adding bt_rap_get_session(), and
+using session lookup directly from the RAS GATT server callbacks.
 
-Changes in v5:
-  - Renamed sysfs from vendor_rst to vendor_reset (reviewer feedback)
-  - Switched from device_create_file() to driver dev_groups for
-    automatic race-free sysfs lifecycle management
-  - Added ABI doc at Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie
-  - Added WiFi impact description to ABI documentation
-  - Added MAINTAINERS F: entry for ABI doc
-  - v5: https://lore.kernel.org/all/20260723063520.1149474-1-chandrashekar.devegowda@intel.com/
+The second patch updates the ranging RAP profile accordingly.
+Reflector setup is consolidated into a dedicated helper, D-Bus registration
+state is tracked explicitly, cleanup is centralized in rap_data_free()
 
-Changes in v4:
-  - Rebased on latest bluetooth-next to fix CI apply failure
-  - v4: https://lore.kernel.org/all/20260722012158.813793-1-chandrashekar.devegowda@intel.com/
 
-Changes in v3:
-  - Dropped reset_type parameter approach from hdev->reset()
-  - Directly call btintel_pcie_request_reset() instead of manual
-    flag manipulation and schedule_work()
-  - Accept only integer 0 for PLDR trigger
-  - v3: https://lore.kernel.org/all/20260722001434.804931-1-chandrashekar.devegowda@intel.com/
+Naga Bhavani Akella (2):
+  rap: use session lookup for RAS operations
+  profiles: centralize reflector setup
 
-Changes in v2:
-  - Added reset_type parameter to hdev->reset() callback (1/2)
-  - vendor_rst sysfs used reset_type to select PLDR (2/2)
-  - v2: https://lore.kernel.org/all/20260618085016.9173-1-chandrashekar.devegowda@intel.com/
+ profiles/ranging/rap.c | 209 ++++++++++++++++++++++++++++-------------
+ src/shared/rap.c       | 143 +++++++++++++++++++++++++++-
+ src/shared/rap.h       |   2 +
+ 3 files changed, 285 insertions(+), 69 deletions(-)
 
-Changes in v1:
-  - Initial implementation
-  - v1: https://lore.kernel.org/all/20260612012832.2395034-1-chandrashekar.devegowda@intel.com/
- .../sysfs-bus-pci-drivers-btintel_pcie        | 15 ++++++++
- MAINTAINERS                                   |  1 +
- drivers/bluetooth/btintel_pcie.c              | 38 +++++++++++++++++++
- 3 files changed, 54 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie
-
-diff --git a/Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie b/Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie
-new file mode 100644
-index 000000000000..cceec6ac96bc
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie
-@@ -0,0 +1,15 @@
-+What:		/sys/bus/pci/devices/<BDF>/vendor_reset
-+Date:		22-Jul-2026
-+KernelVersion:	6.17
-+Contact:	linux-bluetooth@vger.kernel.org
-+Description:	This read-write attribute allows userspace to trigger a
-+		Product Level Device Reset (PLDR) on Intel PCIe Bluetooth
-+		controllers. Reading the attribute displays the supported
-+		reset type. Writing integer 0 triggers PLDR. Any other
-+		input is rejected with -EINVAL.
-+
-+		PLDR resets the entire on-chip platform shared between
-+		Bluetooth and WiFi. This means any driver attached to
-+		the WiFi device that shares hardware with this Bluetooth
-+		device will be released, the platform will be reset, and
-+		both the Bluetooth and WiFi devices will be re-probed.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index eb8cdcc76324..39d390f1ceb4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4625,6 +4625,7 @@ S:	Supported
- W:	http://www.bluez.org/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-+F:	Documentation/ABI/testing/sysfs-bus-pci-drivers-btintel_pcie
- F:	Documentation/devicetree/bindings/net/bluetooth/
- F:	drivers/bluetooth/
- 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index ef42b8d11d4d..005c77a4f5eb 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2790,6 +2790,43 @@ static void btintel_pcie_hci_reset(struct hci_dev *hdev)
- 	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- }
- 
-+static ssize_t vendor_reset_store(struct device *dev,
-+				  struct device_attribute *attr,
-+				  const char *buf, size_t count)
-+{
-+	unsigned int val;
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
-+
-+	if (!data || !data->hdev)
-+		return -ENODEV;
-+
-+	if (kstrtouint(buf, 10, &val) || val != 0) {
-+		bt_dev_warn(data->hdev, "PLDR rejected: invalid input");
-+		return -EINVAL;
-+	}
-+
-+	bt_dev_info(data->hdev, "PLDR triggered via sysfs");
-+	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_PLDR);
-+
-+	return count;
-+}
-+
-+static ssize_t vendor_reset_show(struct device *dev,
-+				 struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "0 - PLDR\n");
-+}
-+
-+static DEVICE_ATTR_RW(vendor_reset);
-+
-+static struct attribute *btintel_pcie_attrs[] = {
-+	&dev_attr_vendor_reset.attr,
-+	NULL,
-+};
-+
-+ATTRIBUTE_GROUPS(btintel_pcie);
-+
- static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- {
- 	struct btintel_pcie_dev_recovery *rec;
-@@ -3250,6 +3287,7 @@ static struct pci_driver btintel_pcie_driver = {
- 	.probe = btintel_pcie_probe,
- 	.remove = btintel_pcie_remove,
- 	.driver.pm = pm_sleep_ptr(&btintel_pcie_pm_ops),
-+	.dev_groups = btintel_pcie_groups,
- #ifdef CONFIG_DEV_COREDUMP
- 	.driver.coredump = btintel_pcie_coredump
- #endif
 -- 
-2.43.0
 
