@@ -1,67 +1,31 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE5389DE0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 15:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FFF38F926;
+	Mon, 27 Jul 2026 15:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785167554; cv=none; b=aTpZJY5UwxI53NJCkijjqkrga/GOdCl2gnUwedJag1O7MifHzSju2bqFFrAHI7gOwLZHqBbPzTXNm/FAO59OucvasH/L8p3MNYTFJvho8p0T4IczhCl68TUmthySpeXSPzs1A4DJh0yfQQYMLQYwA+HX6nuRFdoSp6v/83SF2+o=
+	t=1785167874; cv=none; b=qUkigrgezkXxyb/90x4GKeWEhmbRfMgIDpHPB9tOdApzdkmFVK2Sw2UFgn+RlzxlPAWHA1gPSKOxD1WoDRaM8FXYB+3vEGTkUhXHyIA58Je3R9gUZE+mtqCqWjFVrai0xzog9gDzo/+AaH8qRjQ0gne5IIiCVG7TvFyqz9wKlaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785167554; c=relaxed/simple;
-	bh=kzbOwDoIQccc/vmXk10i4bMS/XkPcDdFLODAuPx/f60=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RlMDcuaLN0oSxJFK0XTnqV1NYeNs9ClzaiYBWfK9YtXnmUW56EkuzLjkzAH1GfapKHb16NqR+k+VUrbIHNG4J1u1jMXbiuCmNAlCnL51tCM1z1crTcx5Mbyik4nXSu/KZOPcAp+Bl1HC4/NQKh+KGcwKB3U6EfpUT/5X5U58ERA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk; spf=pass smtp.mailfrom=thegoodpenguin.co.uk; dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b=MN43CIhn; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
+	s=arc-20240116; t=1785167874; c=relaxed/simple;
+	bh=r1pyYjYWM9je0zlQZ2arXiNcMXCvBlkttmhvuwKqH1A=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ky/4nALcP1OsCTL7zYl36lvkHeM/73Bfu5+IXPueFw3ZJo14YtxrTZwSIyeEhbUgdi4D79zrZ88tw7MaC97D9kb9H8fVZ9WDtbjNthYlHR2Aoj1xO1ksTGWpgNksMtvOcJdf5p6J7gpbgqTN5RpxykRilur9VJ+uZPUsqOJyOKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OUGJMPg8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b="MN43CIhn"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49548aebcd8so21671735e9.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 08:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=thegoodpenguin-co-uk.20251104.gappssmtp.com; s=20251104; t=1785167550; x=1785772350; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=yi9zpNI9ss5GZB7UaZ2xVdwfzZIpfrC3p37S+/6MGgU=;
-        b=MN43CIhnkRkGGKF50XYXKA8X7kQvPAnklPOPz2jV5Dw5sn/josglIEkl6ZiumVPzAi
-         /gMlWHOILy8t5/VEKkWZH7rCESbv0z9/iphDs/9ttYtriFJDmvOjbwGHOrjosJf6aY1g
-         /MPRBRKKI24ncWDP2aQPO986/XaRVF20MvkHLPPv/G7I+Qfe+15pSsctUKIhbuJpAmUE
-         Q3t0VwVMxQJB4kQjV8YnzfROLPWSZgeLOvRoxeUeFsB74v8kJYAOLIG8ZxjR90u7vYHS
-         a/6Mb1ZgZBiQUgx8ZYaGtbVybqIudpHtBxkOPecMNvG0vzy0/QK0xPEBtrcrzVbzVQqK
-         W9RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785167550; x=1785772350;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=yi9zpNI9ss5GZB7UaZ2xVdwfzZIpfrC3p37S+/6MGgU=;
-        b=BLsCFQ/HFHyZmMzkx7nAJ69C9UYzxvrp+aY6R+0cimi9thzAvKhTWRC4svRajzzxqe
-         Ls6cWzWYeH1BGVTfwyL1uCBa6tuGprAog1ZwD80kbxtV45wK6kVUHBqdgpLm/KaR9IRv
-         nuGCM+3hEq2tatih/Aa1HFK0jRVpkveduUxwRVFAptTrGVe2pWakQFypCxWGtaMyeS3l
-         5uiY0ik4dv7HF0NldtPpmf6Hp8mrcqzQ/5ofiOLUncVwUeJfZadjaXK3vQ9m3bf3ghuW
-         ckltl5o4oI+Q03w+M7NjdVdwlzqSjcHY1sQPkQ4i3Le3frmOlFdI5CBCAHzwfXwuuxX1
-         KbMA==
-X-Gm-Message-State: AOJu0YzUlfCNPeS9Jx2RCGYRZZS+k7Wmch+gJFDI9QiqXbmMPdOBP7bO
-	dfOGt8/+HfweHqEjwoihvy0TaSlVTuygTAD4im67CHnPVZP/hyQO86sVbX3jDfYBeKg=
-X-Gm-Gg: AR+sD13VWPMn2fKp76RZslSeZi4eYRo/ESyfZ6eGRQruiUfIvMMJXB0aekqB3tXqNhX
-	OyurMgp5XML0FmwxPhe+NYCCwRZyEAzyix/wNwvGk2fCkxtZppNKBSbc8rkrUiFGsZPE4UvEg0F
-	RQXxGxtWj7OrNxFhgybe1u/5uWOGKZvs7lMcvpgj0uJiFxetiozWU0koVcDK+HgyByzaowtxh0E
-	kBLIY3e5LRqM7cHge/E7mL5zKseCZ4Q8v3NkDrhBI++aKfid//UMCBZ1sskl7TtQ8fdwpVjMswo
-	P/buN76rUidrKxbIoFnnBP8qop3MHRZDAY2btFw6/2xrbT/EUA1Hr3G9n/nvPKRVl4Mc7kK5/dw
-	uRb4pLKBN22800diN9UgrrEMwQbxq0QGUOlUHYx2CtUEQsFIaoqNeZAFqvNr1ODKWLUKBenGZd/
-	d/h19pvlCjWA6y6X9f2ag=
-X-Received: by 2002:a05:600c:a20a:b0:495:472c:208d with SMTP id 5b1f17b1804b1-496b572ee46mr71194445e9.38.1785167549849;
-        Mon, 27 Jul 2026 08:52:29 -0700 (PDT)
-Received: from [10.42.0.1] ([2a00:23c7:1d1a:9c01:7aab:bc55:e039:4aac])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c52fa9sm51005161f8f.20.2026.07.27.08.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2026 08:52:29 -0700 (PDT)
-From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
-Date: Mon, 27 Jul 2026 16:51:52 +0100
-Subject: [PATCH 2/2] Bluetooth: hci_intel: drop unused assignment of
- acpi_device_id::driver_data
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OUGJMPg8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047F11F000E9;
+	Mon, 27 Jul 2026 15:57:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1785167872;
+	bh=x+BqVmp9tMlOnrF/CUNQXTwV5ciCXV0wEAYVrd3+4k0=;
+	h=From:Subject:Date:To:Cc;
+	b=OUGJMPg8DQdCyO1SMMueUYZD+gIitl6T6VqZ0D8JpbHjXWrJQTS/p9zihrF9Y2w+l
+	 7gZSfVM/46OqYriOAJlL2pEIdczIuhrOj/Eo2hoQi7o5u23B7L5gjUVsxFxM74UKJt
+	 jrjE1maqzHjf/R5D2DZMTs2MRzhzAQpfLKe2ztu4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 0/3] Bluetooth: fix short read errors in usb_control_msg()
+Date: Mon, 27 Jul 2026 17:57:31 +0200
+Message-Id: <20260727-bt-ctrl-v1-0-2e8650e9df01@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,53 +34,46 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260727-acpi-bluetooth-v1-2-b5558d53e6e7@thegoodpenguin.co.uk>
-References: <20260727-acpi-bluetooth-v1-0-b5558d53e6e7@thegoodpenguin.co.uk>
-In-Reply-To: <20260727-acpi-bluetooth-v1-0-b5558d53e6e7@thegoodpenguin.co.uk>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXM0QpAMBTG8VfRubaakZVXkYvtODgS2kZqeXfD5
+ a/+3xfBk2Py0GQRHJ3seVsTijwDnMw6kuA+GZRUtdRKCxsEBrcIU2qDpkSqqIBU744Gvr6ntvv
+ tDzsThncO9/0AGbpygWsAAAA=
+X-Change-ID: 20260727-bt-ctrl-a37aca3ce4e1
 To: Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Bartosz Golaszewski <brgl@kernel.org>
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, 
- "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1785167547; l=989;
- i=pzalewski@thegoodpenguin.co.uk; s=20260430; h=from:subject:message-id;
- bh=kzbOwDoIQccc/vmXk10i4bMS/XkPcDdFLODAuPx/f60=;
- b=F/kqOyVs64baHfD4XL+UqtL8dkTvR6Rv4KJmGRykOlVGsfFGiNWB2TKsryoqymwjGI0QmfHnW
- /p1MxYj6BOIBz2tDJZ8LDuhRvvCugViZtiZtaK8SUlXTIiXiiH/weI1
-X-Developer-Key: i=pzalewski@thegoodpenguin.co.uk; a=ed25519;
- pk=vHq4n9IonORH2GTzLv8r6CWAFHzgfBuNkQPXA8NSly0=
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable <stable@kernel.org>
+X-Mailer: b4 0.16-dev-401aa
+X-Developer-Signature: v=1; a=openpgp-sha256; l=887;
+ i=gregkh@linuxfoundation.org; h=from:subject:message-id;
+ bh=r1pyYjYWM9je0zlQZ2arXiNcMXCvBlkttmhvuwKqH1A=;
+ b=owGbwMvMwCRo6H6F97bub03G02pJDFnp9V8uJJfFPnSpe+TGoqPdssNpyc+v7HZ2Bnxdlh9Dh
+ LhbDvd3xLIwCDIxyIopsnzZxnN0f8UhRS9D29Mwc1iZQIYwcHEKwESmGTPMr194sIr1jtM7u5yY
+ E5Pnqn3e8vtWFMN8V72cQLXdWT/d1j2Z2/dszcrZM8p+AAA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp;
+ fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 
-This module sets the acpi_device_id::driver_data to 0 but
-the field is not actually used within the module, we can
-just drop it from the table.
+There are two drivers in the bluetooth stack that suffer from possible
+"short reads" when sending USB control messages.  Fix that error up in
+them which allows the error handling to become even simpler.
 
-While we are at it - use a named initializer for the
-acpi_device_id::id field and drop setting the list
-terminator fields explicitly as well.
-
-Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/bluetooth/hci_intel.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Greg Kroah-Hartman (3):
+      Bluetooth: btmtk: Fix short read errors in btmtk_usb_uhw_reg_read()
+      Bluetooth: btmtk: Fix short read errors in btmtk_usb_reg_read()
+      Bluetooth: btusb: Fix short read errors in btusb_qca_send_vendor_req()
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index c31105b91e47..ecf597f3e201 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1057,8 +1057,8 @@ static const struct hci_uart_proto intel_proto = {
- 
- #ifdef CONFIG_ACPI
- static const struct acpi_device_id intel_acpi_match[] = {
--	{ "INT33E1", 0 },
--	{ "INT33E3", 0 },
-+	{ .id = "INT33E1" },
-+	{ .id = "INT33E3" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, intel_acpi_match);
+ drivers/bluetooth/btmtk.c | 86 ++++++++++++++++++++---------------------------
+ drivers/bluetooth/btusb.c | 30 +++++------------
+ 2 files changed, 46 insertions(+), 70 deletions(-)
+---
+base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
+change-id: 20260727-bt-ctrl-a37aca3ce4e1
 
--- 
-2.43.0
+Best regards,
+--  
+Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
