@@ -1,174 +1,110 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from sonic303-31.consmr.mail.bf2.yahoo.com (sonic303-31.consmr.mail.bf2.yahoo.com [74.6.131.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3324474262
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 20:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681244756BC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 21:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.131.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785270618; cv=none; b=PlmfKI2phhhwMob3v+piFoWJGBm27/yCQ8ONRO+qqftRryd2LACpifnhxaqFc6EI02dX1AxtmUPUTgjZ1UvpuTnVyGsl7/EWgmkI2HxH6cto2+GOW3FGIHYt5SjfuoceUvD6MTijrqtK4glTmAXXThqoVjrR/0vc9WxiU/T3380=
+	t=1785275882; cv=none; b=REUT1sVnseC4pseyvx9HIobs4Ev/TxbClOEnKvrK+w2Swp5yoM23iqfQl7rWudtKWr8UwokQIVpuXBGL+utToi09hlrovBKJErhAsVW78jJINrB/BaiDoiMSKWiQlWLfbqlWAZ2y+OOYI/Cxrhdo6c9ofSHqt5pB0Dz8Nh5bDEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785270618; c=relaxed/simple;
-	bh=grqotrpH1Kg3aSCg/ZKuhKIQ2lZFybYXZoq3/fS5aqU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=E/jMhlw5WkmAcQvYXCBJKy4aJCvI3yubDJE0YkfFHzDizrraDH0RmJT1QpRmRavhORcw2DVnnxbsch+kZN89lgZ/tp4A6Iz3IwBBauO1rQu6Q6dVXk+qCY7L9EnPfYhqhKtGE8zMrKJi0lpMEQe20feTTKo1fJB0/tnoWLQXO6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oXNJUzep; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785275882; c=relaxed/simple;
+	bh=GoyXt2Ob6wheB8o0jhTCUtaDXqFm9Miw6kW2MIeW1/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=JH5T1ElEn/Biy9qc6dHpsnjEDutRPpr05ZRY1RU5+sQtr4192QnaGELxsqqbvyIhoYEBZaVrOwQfnZf297tOPZuMb8xLYBRk/831ZcBrKWUHx8XmUixQKjpmCBvxRgCLTSTRQBsYAlcrhmYVVGgo03lMBYnGxQACbl26oan9608=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=FpELQXHm; arc=none smtp.client-ip=74.6.131.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oXNJUzep"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cc891373e0so3697695ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 13:30:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785270615; x=1785875415; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=PhRHMGl8PlFNbjJFNwgPgvUy+NQ/qtbb0z1mCDGUfVg=;
-        b=oXNJUzepB3mctq3wXHjnwkGHndPbf0FtQg1onV0dmUJ4rHinRvRdpL2qxHbR2Y6RjC
-         FzOy9Xef6jfJ7V120vnHKC+qKeVf6D5o4zyV5QH1mJjw2IGFUWzKehfkxYe752prJ6k5
-         zr66O2JUy+4IlMSlQDu/9R1JLQAtF/rYU7PJG8ek+PwB1ZKEn3NNyNw38Q/g0INtBTpx
-         aXsg+b3YTd6ayA8PXRgh70XSBfcBZiWYDapOnYXMyuz0zeXu6BX8wonUliuefEhHfn7X
-         fS9D2X6fcrFWJud/EtuVQcPCtnNzkfqJBI42+pLvIQC4uQO5DjfxlZ/i5f3SHO1jRyL/
-         DxGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785270615; x=1785875415;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=PhRHMGl8PlFNbjJFNwgPgvUy+NQ/qtbb0z1mCDGUfVg=;
-        b=d+rtPNthgadNtH8LfXRH6CImSyfiJ9I5L7bRRNNkyHWf3ElX+hkf1b5ebsYOlXPID1
-         8zGrKvRLkKvo/YCxmOyZ8Zw7GmNNdMVzD+o0bTmUF7kPnwy86lPG6bTz0FpuIfBw9yc1
-         UY6nKUWZDS9kbLUf66vqRnFKKyyvteO+P/D2OGwz1cln9tWs3zYRt7e+nMVkgjbE2eCy
-         jyVBPfj2AcEEI02BGWE9XdhOyU4aynxsMMP6eiUcWUr1VoxQVjvvcahrfqAcUjP/CAJm
-         si9ZPajluZJDKxbcviLyy6GEu9HdMc0a2l9pRcAuJak3zo5qGHXjgJVsejy3lH52IlWE
-         SPTw==
-X-Gm-Message-State: AOJu0YzQPdbI3cfno9nZjHHPvfn4SvLJa8oRmeRsgNIEFuAr0jRXY8nB
-	eA9qifhukB+otg8iltlYJ1YhoF+iG9Doniq0QtuvI8sx6ZzajRMZvER3AWzYdw==
-X-Gm-Gg: AR+sD115Lss2Ho6EXNV7UYvHGxrUy/odZYLSLZplobgGgp8sipqPWpvuZ6p4/tOLNEO
-	gkL15443SqEfz6G5JPSZmodRZ4ZKCoVVJU+Vwl86FgKZhIv7YA6FwfdiLzALACRzcpzu9TFXyzS
-	z3tHwZ8dbRdz7ow0ieez0mFLYFgdCxETcn0KbFRDL+GeYYOmw/zOc+BVqSTGH+M24eVe1ZFX2Up
-	qq6rR4ZCfXIaXkknF1io0rfXWzqkoF8EWbcCkpUBv/AXKyqpeGTHNJVVb5/qgtu4EHV+uRH90IB
-	WbzpzwedVEInVtxd/YyikvSY5713t5wfuJSQrwoHwhYHoDLaAybfc4G30SATz+hWWZnmjCVPdbY
-	QDSUU5Oy9EXHHMtswjcdZZ+3ADtLn13BQQRLTRD7sdH0yN+p1sJ3vOoWDojfkd+hR0WnUiGWFiC
-	JY5JooC0EI3wB18HzjVLeMIkOMqwui5SN5m+AOUL7WRxsIcZT5+ttqDLrEjzojZwgroGVb
-X-Received: by 2002:a17:903:2407:b0:2c9:960c:f73b with SMTP id d9443c01a7336-2d015d22dd9mr47045335ad.24.1785270615057;
-        Tue, 28 Jul 2026 13:30:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.247.178])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b670cfsm1774961eec.8.2026.07.28.13.30.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 13:30:14 -0700 (PDT)
-Message-ID: <6a691156.21a19891.1e44db.73de@mx.google.com>
-Date: Tue, 28 Jul 2026 13:30:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8215124910164255846=="
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="FpELQXHm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1785275879; bh=TbVeXK9PgGNFb4O0oy8CE4lQ4QxdnItquwxhSacc1WA=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=FpELQXHmpySK4tYp6fuoVOIVnCXm7b3b2EAF/R9xsqZFA66YOfY2CofBnfsnxtpxKE2qEynw5MXmTir7RlrzXs/mkzSVLQPvl0t9ATbh3ogHcmZxuU2Oe2m9yKDa/3WZ8zaeV7iQaILnropVCif9FzhgvR3n6cwtWdN486EqA66I/9WPdVuA7+cpkhaLiNXgXrYowXTnoKK0NrQsiM3QH7v7ln/NRd8LsFrn/Eu5XmiHQC/pK+Fh8E5zB+ivNCyKhsWj9eNLfwxjUvB6DOVCd7RUnMWYhO+iK3T3OO6jRzEe7VDe0SwVBc6rV0CdcQlS/+cbvwdLtt4gaZMlrD2AIw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1785275879; bh=8ZuV1oPJ7/NbZpou9bp1sPWEgLOmsYCzXu37q7/mPhZ=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=ARFQvPgdRF4NJWUTyQbIDlnCNXAfUGWjwtblCv9zBA9D+Wb6XwUc6ObQJvQiWgzf09QTwVra518keYHApasvcNPjh7LF/9iOZC2uXS88XWI73yVPrZ0O6bjIq+U48/re7TRGcENAKAVfNmuOwLUXoZErPakA1ljfERHpb7t2CS3agHzJALK8/Anx7r1VGjiWdi65NWOx0BLW3eAm5vVfkmDjS6qDEx7p1WurW7GTaiYN3z8bv4sKEg76drV3wPWkxmvMv50VrBhDUVF/oS3IJdoD8CnObVIcQBy4Ib/Yj06t3I/6VrrgFPePEschxKJsXjR+18D34/026htNAC3uyw==
+X-YMail-OSG: XjHpv0oVM1mujqYCE6Q3Qk4juVb4YSkWkxki49SZRJOBU6el88tJTMVv0ktXZNW
+ .qKg0F6Utenpu9JdfG03Z8C0LuEaw7EFk_5PCXslcYuITqwGR1JxSYxnqxUvPHqvkDpeBSefMtel
+ IygEq8FkVfTG5FVzaZUd8TVm57NoZTpU2zcHR5QUnmGlzVERVlyL22M_V.RHLWOcUSZWz1BMeP9F
+ GpaYCvrH0HZTPdyFAhO3EalJXAGSKosCP3NazrPSVdyQFu5qQCjd2ZcOMV7bwyJB8STGo9oPXkld
+ T6.3RLebJhsGT5CGlhpKdcKGT1eFse0cqQW1v0kdxzvwVacAJXKU0sWszBzqX_nVLohz.50cjPml
+ 5atReTqjwhocTOl._S7nzp4k5plcLt_aY1XIAu_QlOUdSd5Z4aPvB3NvGA1fmozJe5dbtHh36vUB
+ SRQcD4kl290QbBRtGeGmO5vuRo.jCAty9alcAPI4zpo3C1SE15npaZNffr9.bhWZ9r_1Bv1Sozbn
+ gvB5D6LP2bfwuGRtqs_EGAwGKESFb0iD1HxKnuN9RnfktUzNBv6fru.Xtex8PDr_09wLYVMiwYj.
+ 21IC_wuqffgOoIPUtIMSmcBXmxZ88jIIhzGY0qYZdiMZp.4ec2Cxcr_7dU2kzE2MLDxUUpHBChjA
+ f_QAFVJE8zXyb9PYceBPgU9KAlmEusOZrtVo05GpHmaZ2z._qn4LhwH84UQ8qAzZQtUtvVWvgI3I
+ E_ydaFJQshoOi6yZzYhHmITkZZp4WKogmqW6djOvjpaN7lgoCAqI5iUcpJWRPcoXM2z6FuFlhNpJ
+ vcjuLhs3dtOFheWOxdPvg2BQ4U9LtEWuEmRP_aD6NWCpBarnZzyrNnxrolgxoIlie4EuvvwvktF0
+ TY8rdaI.ORdILNf6Kg253xjPM05haXqJbDUle92QBYBIsAa3YYRz9fiCs5yZ92VKU4OHwZvuxhua
+ 5YT.JbOKDTl4Ck8ySErGqPLYrFyauVQu6syN7OSwg3NVERezBk5T4MCnh1FYg6pCptBTpnspFXOu
+ _o4uO1qiZs8n27KITjLHdihhXq8bgblJ3cBCTz_AwjkcDl2TLFV.BtGFtv1VYnjyvEpwjhfG14AD
+ 8xpG1pfcIit9KGsAo3vlwLMqMLRxKDh8_2cu7PkhG2H_I42jxcgxWhccCGp_sJHE.3MVaToyE7tO
+ Ns1dk3N8n_VF6SvMScj6jmkz6UNvVf7CwTuxqKwwiY3lII7FUHyzv.wct6C.VWNg_gKQxTqT6FEj
+ Om75URc8sVZDMGGjglRtTkv7Tw9fXm5sukUJ3iPE0pxVcGWvyY9QeWEkPPEqwjKN8e2Y2JwKxAnF
+ ypfZPMF9OVUIRCSDVrV5pcMNmtb6hQWfSDZ5VLBua9.3ZIVo6ZZTMA8zj04NKUb..WIZejjb0hHv
+ nZnl_2O425rp4K34t1jQBzm_tGCfRpbfw7d0sbl9r55oStoe6L5nXVToKn3tNhTTXdZDV_Alj.qv
+ a9yCrLCJayHCF0vd74raNUNkhzeZSiRrxqcKfVjTw0hLXkrhZAVqKpjdtPr2Uc2S.Z6P85n.47Hm
+ IHp5pumBhlPPdhL1jWYNpFWI.EagGWN8HH4.eDG.NhZOXGVRAQDfqiBWfncXneNFwIRK9.8i8DP3
+ QyrLiruYFtyveNY4cGWojqzyQUZfi5p4CTzr_8YrMSXTwVElJTtiWwFNChcuJ5vDoJoKbRNVKA9n
+ RunvlhIDO9zuzgBy_eVQVQJcbD44cB4NdyGEGtG3G_h2NJ9MiqHcQwSt0LSqOWuY12JSXYzHicnc
+ DfNM6_USGhhZCZj8u.H0MD3WQoQqLkJTgd8YL1o.3KqPMKGUIzawS0fLvRO3R8ADmZbUNkYFtBq0
+ sg9tX7NVq4pHOyt97PMMry2GTU5e4P4IrK4uQVXXpOHRA3MnN0K1MYEWgukfmmEul2a4gYgyQZ0J
+ d6ASX2XUOwxDFAHwRn5c1e9a7r6WFeSz5NsXOIHEJPQ2p3xphUI2wdrokOtqI.veaP3Omb5.q8nM
+ 4qsA8xS1aJiYZ7NlScDk_O9kzm3BlwUrc.NtLByfJzGpNjXMCFX2ZDdlMoXmDOq.1N9akreWOccH
+ R1tdXBltZZPOZQxiiQfMW8oEQzu_ufv7fHujvcaeSXEtQ1Yx5MuH0klim5Ps7iAvAUhtzpWGsmC9
+ uqpQWFtisTkqTubmUdUFYQR8TrZrLXIm1CBytTAw.COHL89O5zk7Y351MPkvdTNOqTp9o4cNWRlA
+ o82WKfmoRuneWqcnTQXjz48SlW29rEHjtStEl1TXZXajgsEkVdykrmPDZ68pRvQF89uGCJPMYutc
+ ZbpPzJegYYCY.30zd3bfa7XT9WBByNvwQ
+X-Sonic-MF: <deaner92@yahoo.com>
+X-Sonic-ID: 04037b43-16f4-4667-ac29-7b15be3d4777
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.bf2.yahoo.com with HTTP; Tue, 28 Jul 2026 21:57:59 +0000
+Received: by hermes--production-ne1-6f6bdbdd7c-h2bbq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 58267813fdc2b2e316ffe8b1e820e324;
+          Tue, 28 Jul 2026 21:24:40 +0000 (UTC)
+From: Jeremy Dean <deaner92@yahoo.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeremy Dean <deaner92@yahoo.com>
+Subject: [PATCH] Bluetooth: btusb: Use DECLARE_FLEX_ARRAY() for qca_dump_hdr
+Date: Tue, 28 Jul 2026 21:24:31 +0000
+Message-ID: <20260728212431.106411-1-deaner92@yahoo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/3] Bluetooth: Add support for Shorter Connection Interval (SCI) feature
-In-Reply-To: <20260728182011.2334554-1-luiz.dentz@gmail.com>
-References: <20260728182011.2334554-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+References: <20260728212431.106411-1-deaner92.ref@yahoo.com>
 
---===============8215124910164255846==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Replace the deprecated zero-length array members in struct
+qca_dump_hdr with DECLARE_FLEX_ARRAY(), since C99 flexible array
+members are not permitted inside unions or as the sole member of
+a struct.
 
-This is automated email and please do not reply to this email!
+Verified via offsetof()/sizeof() comparison that struct layout
+(data/data0 offsets and overall size) is unchanged, and confirmed
+the driver still compiles cleanly with the change.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1136133
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.94 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.63 seconds
-SubjectPrefix                 PASS      0.20 seconds
-BuildKernel                   PASS      27.22 seconds
-CheckAllWarning               PASS      29.83 seconds
-CheckSparse                   PASS      28.29 seconds
-BuildKernel32                 PASS      26.08 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      502.86 seconds
-TestRunner_l2cap-tester       PASS      64.25 seconds
-TestRunner_iso-tester         PASS      87.98 seconds
-TestRunner_bnep-tester        PASS      19.65 seconds
-TestRunner_mgmt-tester        FAIL      227.70 seconds
-TestRunner_rfcomm-tester      PASS      26.75 seconds
-TestRunner_sco-tester         PASS      33.64 seconds
-TestRunner_ioctl-tester       PASS      27.17 seconds
-TestRunner_mesh-tester        FAIL      26.87 seconds
-TestRunner_smp-tester         PASS      23.54 seconds
-TestRunner_userchan-tester    PASS      20.04 seconds
-TestRunner_6lowpan-tester     PASS      23.07 seconds
-IncrementalBuild              PASS      61.52 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,3/3] Bluetooth: Add MGMT Load Connection Subrate command
-WARNING: Prefer using '"%s...", __func__' to using 'load_conn_subrate', this function's name, in a string
-#369: FILE: net/bluetooth/mgmt.c:8178:
-+		bt_dev_err(hdev, "load_conn_subrate: too big param_count value %u",
-
-WARNING: Prefer using '"%s...", __func__' to using 'load_conn_subrate', this function's name, in a string
-#377: FILE: net/bluetooth/mgmt.c:8186:
-+		bt_dev_err(hdev, "load_conn_subrate: expected %u bytes, got %u bytes",
-
-total: 0 errors, 2 warnings, 0 checks, 337 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14716338.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.267 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.678 seconds
-Mesh - Send cancel - 2                               Timed out    1.988 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/505
-
+Link: https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+Signed-off-by: Jeremy Dean <deaner92@yahoo.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8f7ed469cac6..b78c4a0e75fd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3103,10 +3103,10 @@ struct qca_dump_hdr {
+ 	__le16 seqno;
+ 	u8 reserved;
+ 	union {
+-		u8 data[0];
++		DECLARE_FLEX_ARRAY(u8, data);
+ 		struct {
+ 			__le32 ram_dump_size;
+-			u8 data0[0];
++			DECLARE_FLEX_ARRAY(u8, data0);
+ 		} __packed;
+ 	};
+ } __packed;
+-- 
+2.43.0
 
---===============8215124910164255846==--
