@@ -1,650 +1,319 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA11836C0CD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 23:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785193386; cv=pass; b=Uoow/fQu0IRcrdmwHc6LLdaYvnKZ1YttukC/f/17ELpIRvuKN0rAT6uQAELQpOo21E+e3QXSzH5v+NcTcKoGA5L5VbCvMco/wx3OvArI7t6GG4rTQnjdrpelsfXIChcEKbAC95iwUql5Gid/l6DhQfmXfu8Rdw7+/PxlaLRgu+c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785193386; c=relaxed/simple;
-	bh=S2ElOOyIpzGKjd06eMWA/QFgFiRvwoO3cul1H0H2UYI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NYAY+FjZz2hPOsW1Z2j0XtqOLp69zl+Ra7YMLYJNLZyS3BBUvEaLkJLofyZV6foNrnngTHi/nFn7VUJslCQFA75V8qFip/Suj6gjx/BQwtvnJwl9+fx5R5qvw59URqrICxWvMPZZgKHnVrmxK/NeE/LevVp6uSY5umL9EnHsDuo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAjR6Cdo; arc=pass smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A3E1A680B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 00:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785197833; cv=none; b=NkdzJgA1nAaLytdqBL6+U5tt3d0IZRt58O1g3kqkVAHEwe2JK81FJAcEvrrNb9U+r1bzNL5j1m4dlQlUbustPVLKAK+nqgDap4WIZ1atA1qNWGQ6WtRKkIf69SQNvrnTj6G0wr8eYDVKExQPY20+sCg1J0rqSaEy9g2jdzYLquE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785197833; c=relaxed/simple;
+	bh=8Js8wZRcpU48iTKQ/To9hKkMo2ZGHlw8eyR+n7PZ+lQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kX01a9I11p1XB9mBYU8aYpcQL2U1H3O8HGKUJDF1VzeNDPbIyE3yKqUdW7Orir6EatM2W0F4aeMy9HJBwZSfn+oYYFE77A0a98gulXcRPZvtPQL31FfhWwcCMglmrYcFUl/rJvPvFryupkavySXd8AEpWpSQnn7tORY/JaMNQ/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bQ9/UEAm; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAjR6Cdo"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-81eaf3709b4so36706167b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 16:03:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785193384; cv=none;
-        d=google.com; s=arc-20260327;
-        b=nski9KhEb33/qqqxGJ7jdjx980fBthYBwMi+ai6yR6TRDdMaG7QfmLhauxxO6LYa7I
-         5rCKz8VOLE48kQeVxj+X2VEr6oVsmJk5JMSFHxzieaQjSSPPvWMr1jlLRT6SSPxZNH9b
-         8J4J1i7o0vWK0KWsLg5pkjevsJsQ2t0IrUyRZ6y1j/HvOi5MBDXSmOrlv4+6jjpz0eMj
-         J7vIQbbIUUml+0c5/artrYNBrTqZ+NmD7fcBe3iigimyx7jSzPJJQz9eEpy2J0PZkugU
-         hue+oAKP96aR3VQcIG29DLjwkQ3EcAVwwIY8iOXxv0YYYoZLv5RV3P67tbsIFBNXb+lt
-         vmuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=T87UBkRSlLa1LPnrtDNvimQxWtBypy/F9WgGmSbJJhM=;
-        fh=o4fRN2YK+dAPrklANd2NlfjkmmPsL61ljm/B9RQmsB8=;
-        b=ffQ4MkBwPp3NMFhMdOJ7ah2dlsLiLsE8oOl/swIOvo5mRcgKGvb9/nlRqi6rNAVkBT
-         xItRdkv6OQ/O4eCF0+JEKKLAGX8PbVc3dx1q49BKU0aTeNBliocwzuiQK1YajULgAt7h
-         txbLH0QKOHx5eUztIOv3KMg1yEJJWtTNJ/dEABmu8sL68PHliTwwn/GPerSIpmLuC76z
-         KRVDHytwH3xUNJkJTZCU7yMsVxD2dKH8YXykmv5QmcSy+pzpY15JXSHtn54o6QWQZyek
-         w5cfSs5xPmY5XTGVLeKlLHVbb+czw3oo8DvvQS/CBdRjb+wwGXBjJwKXpHyNJlnXaXX+
-         oKXw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQ9/UEAm"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-84e507b079dso1912764b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2026 17:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785193384; x=1785798184; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=T87UBkRSlLa1LPnrtDNvimQxWtBypy/F9WgGmSbJJhM=;
-        b=CAjR6CdoGVJ6ci77WFuQf0DU1VAP5fwCU3suHpibvu9ZTxL6FNDc3im9RCuCk7apuu
-         WNWI9wsMH2z4SvsBVhg7OYQAxoOy55OByFwi7hmXzuRmWXMD3vySlJzw1ha2+o44/dh6
-         V0Hrf0u5o5bYig84SlLj13NEjJ/0nT+1V2XuO7HdKergX5vokE1XwyoNS9fYQS976Y29
-         NEhjM37qNgj0dE2AEdD7OSs2NSDpf4VSiXTz04+p4KZFVCSPSsTttjOaCHs4Mb11F53F
-         hhUrpB3H9koXHM0dTHWVsu5IZLC1L0HhGZrp1FhB5Z5fcAD3sTKY5bKHtVb6XUpn6Uo3
-         d9fg==
+        d=gmail.com; s=20251104; t=1785197831; x=1785802631; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=x3LqIU13UVLNl/mP5cmMkdDanFvCHhY96m+D7CkouA4=;
+        b=bQ9/UEAmmyRbPGic4BSCXU+/daby/6gsYQrTlrZxcUOrsNQX6eS+WuRCzey9Ex9IUB
+         7tdt5+St0UIQ7isWzXuObO3+OCCcI07MjhXs+RFQLfDaqy8kv5JTq65Rn3ZNbTBELEzv
+         SfPgQy2ynp7cLGTH+Znw87ry20ULmlPHQp2IhkepS5JLTnbYRjyH/qZkHPDA6W68A1j5
+         0SL71CIVak2X7PJw3DmS1GabllQdA1owHkkYiMPpf179Q0oEjlqz8kEB7QqfWwBqpYGL
+         UhRqCxIKvjWKu4xwyXjSBLpYKspOlzzi4Nxz42Fs5axRjSE1IfKNIxdDH8qKEwKTm1aR
+         +e+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785193384; x=1785798184;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=T87UBkRSlLa1LPnrtDNvimQxWtBypy/F9WgGmSbJJhM=;
-        b=qkU864tuWFS3lldw6+XZLB5CtaalOnP2HMPlfF05g7VDwU5Dtla7be2lz8ISgB0LTX
-         JjyIRUYtcMgROIiir4URXvmS1hnnQrVBeEPZ+woL015p8NlnSDEtAvACO9I2UDxjsviq
-         0x7qj9gfwTEN+O3Yae/YSIQKCnvruxBXASZdt30TiPFyKr1AudLRj0ICd0kSYIrEKYMS
-         Qu+1IoL4iU8hw3g36XLKKvhIqbb6fo/PIvh9OUVySMe8lw6lDYP/FPUdlT4FEgfyOqDY
-         EwzUm7ke8knywgpxOS3zI4k7736XcpDShMRQrgfjDiJApyEjfzE1+cLQeEn9g2yWxOth
-         GDiQ==
-X-Gm-Message-State: AOJu0YzI21VJ2ZWiEVp54qYAWPb2j/NNlsy6NfciM/+5mGcrDSJbZiZ4
-	3tN+89Bvp/RzOxUoK+jxmSTMlYSS593m4lbHwDKVvuagEFQD6L3062+vvu0TYNJCDTUUwLcAe2t
-	nWPLl71ewVU3pbfGK1Tw9QYKDHKV4N2Q=
-X-Gm-Gg: AR+sD12T+tCYQsZkM5S4v2hcb24Ae5V6FnSyc2SkRwcd+OJS6p+Orz8OVmQNLoNYsUb
-	aR+tybKQwQ98Gx1c/T+1rdl9mXMqKeuNzedQfzR03hdVr+hEuJc6ppYSOn3ul1NmH3CrUytTR6m
-	x8Kpg1MvH4BDBlhiX1h49iIJbPC8/yKiBZ78JAY1+UnJSwWh5GJ7GmfKwV2aR900Vz1iM7hTZDc
-	97OhYHQvLXd+TvMdX+j6ker3Fp1Xq+WSaqTvYz4sf6MqWHu+GicFZhMV9sxRA==
-X-Received: by 2002:a05:690c:3686:b0:80c:85b6:75b9 with SMTP id
- 00721157ae682-81f93ad3475mr7913477b3.66.1785193383607; Mon, 27 Jul 2026
- 16:03:03 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785197831; x=1785802631;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=x3LqIU13UVLNl/mP5cmMkdDanFvCHhY96m+D7CkouA4=;
+        b=nM30gvUj5ZCBSPw7s4gTevoO/E0vw0+GbtBOKkgrqho09r1QdEjgYn8aux8aJh+qMB
+         OWaNzsqSC1yn+M9sPccyGDQ9gjk9U+iHpdYZjx2sLC5le3mi8Q94JJw47dkT3Of1g7kB
+         20finLRV62eArrDRJ80osbiiv7UlNuRb5gFPBHJUF8KdngNSZfJ58IO1ZyF40NKwumxa
+         9aZtH0gWScVvg3nGlF0KP1+8i5gmrjzZgW/83xx+E3hpSc7nbmW4yVwsqD2b28BFWLUR
+         aq+JS2a6m2QEk1H74FCJRhn2uvx6KUE3esIAjHVcXyvl64s1QUTC61PLW0Z/jV9Ht+KP
+         fqcQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq3Kocdv5wfY0M/6UCezLLsRGAfzKA+/6gQPPFUdodNIyaJ8bWvfcKfQpMwgyy1IYxhTEYhq02O4BJOr6FuLCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgVVJizaC59jXqpYxOZz0DuAfJC6/jtv9Drzmg51eggEbzc293
+	meuJz+Ar4qVs3TpDF6lye7sPCwUct3T1RTj+lYQr2fHjivMJMLDc3ljM
+X-Gm-Gg: AR+sD13wFVvNRSs6Bfz97Ph8WMp8gldGtE7iEtQQDKDwV/IY5UM3jMGOjRvvmqWgngq
+	jyWHsJjrZZvAdUP/KdJ190+316gLVEzKTh8bqHrYdcvTGJED0V712ek5+gFHDSKKhTPyCF7lWZ5
+	aK5Fwuc7rjttfQEJ9Aec1aVG92vTXo0PmzRXvhIhKz6YEItT5vhjgAyXUdkQY8/yfF+Vct7ve1s
+	vzoRZveSrI58uVQDq4ZmIfZXzhSnWkjVHLYm9JBrHj1r9MI7rahWA/CiUR3E79P2iAsHA8Gq9su
+	qQINg+ZMZiVm5yIvLrCJYpWwQWC0MhnkzXTDUvQeRB37rVcaVPEb/5uN86GsXq5OtreSJgVK9aX
+	CYZzzqzvh/2dgj4xs4EtBKtclD21yoI0/OlrWWZ+4RkBDFhLzfJzz9vAoAgJt0mAc+HD0vtU=
+X-Received: by 2002:a05:6a00:3a0f:b0:848:2f74:d8d9 with SMTP id d2e1a72fcca58-84e9345816emr61485b3a.74.1785197831282;
+        Mon, 27 Jul 2026 17:17:11 -0700 (PDT)
+Received: from beelink.. ([94.156.205.29])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84e533ce1f7sm3629824b3a.34.2026.07.27.17.17.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2026 17:17:10 -0700 (PDT)
+From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+To: Pauli Virtanen <pav@iki.fi>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+Subject: [PATCH] Bluetooth: SCO: serialise sco_conn lifetime against sco_recv_scodata()
+Date: Mon, 27 Jul 2026 21:16:54 -0300
+Message-ID: <20260728001654.965175-1-qwe.aldo@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260722012311.35434-1-amirabudubai@gmail.com> <CABBYNZJk8sgQKjLKet1pp7fXD0uCo1O33WQ8F4LxN23A2S_r3g@mail.gmail.com>
-In-Reply-To: <CABBYNZJk8sgQKjLKet1pp7fXD0uCo1O33WQ8F4LxN23A2S_r3g@mail.gmail.com>
-From: Amir Abudubai <amirabudubai@gmail.com>
-Date: Mon, 27 Jul 2026 18:02:52 -0500
-X-Gm-Features: AUfX_mxXckyrxgVfMccbAQOjcbE9bhJ0484oFyrzxPEdQTi-Wi14SMxD6NJpf9w
-Message-ID: <CAEzAHR-7LQak12o_Xt7QrvLHRw3GSLDgco6o7Fru-wVXyBW7mQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Gate ACL delivery on HCI handle presence
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello Luiz,
+sco_recv_scodata() upgrades the weak hcon->sco_data back-pointer to a
+strong reference under hdev->lock:
 
-The main problem I found with increasing poll intervals is that the
-time to wait is highly dependent on the device. With the three I
-tested, one should be 2 intervals, one is a flat 3.1 ms, and the third
-seemingly doesn't need poll_sync at all. I figured per-device
-corrections would be impractical and adding 3 ms of latency would
-inconvenience users. I couldn't find a workable fix for poll_sync in
-general, so I added a fix for just the easy case I knew was causing a
-problem.
+	hci_dev_lock(hdev);
+	hcon = hci_conn_hash_lookup_handle(hdev, handle);
+	...
+	conn = sco_conn_hold_unless_zero(hcon->sco_data);
+	hci_dev_unlock(hdev);
 
-I sent a bug report a few days before the patch, but I didn't do a
-good job of explaining when it was a problem. I was encountering this
-when trying to use Linux as a low latency peripheral. Common centrals
-send the MTU request fast enough that it gets bundled with the
-connection complete. Android will try connecting for several seconds
-then give up, and bluetoothd will timeout in discovery and go into a
-glitched state. Here is the link to that report:
-https://lore.kernel.org/r/CAEzAHR-rM3V0hwyrc0H3xzS_gu965Kh2oyCra9aLjxNEsrCd=
-oQ@mail.gmail.com/
+but the pointer is cleared from the other side without that lock. When
+the last sco_conn reference is dropped, sco_conn_free() ran
 
-Triggering the delay on vendor specific handles was my mistake.
+	conn->hcon->sco_data = NULL;
 
-On Mon, Jul 27, 2026 at 3:34=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Amir,
->
-> On Tue, Jul 21, 2026 at 9:23=E2=80=AFPM Amir Abudubai <amirabudubai@gmail=
-.com> wrote:
-> >
-> > On some USB devices, the interrupt-IN endpoint can lag the bulk-IN
-> > endpoint by multiple polling intervals. Early ACL data can then reach
-> > HCI before the Connection Complete event establishes its handle, causin=
-g
-> > the data to be dropped for an unknown handle.
-> >
-> > This issue was observed and the fix verified on the following adapters:
-> >   * 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
-> >   * 7392:c611 Edimax Technology Co., Ltd Edimax Bluetooth Adapter
-> >
-> > Extend the existing poll_sync queue to support independent release gate=
-s
-> > while preserving its underlying behavior. Add an optional gate which
-> > holds ACL delivery until the HCI handle appears or a bounded timeout
-> > expires. Anchor both time gates to packet arrival to prevent timeout
-> > drift from accumulating as queued packets reach the FIFO head.
-> >
-> > BT_HCIBTUSB_EARLY_ACL_HOLD controls whether the gate is enabled by
-> > default. The force_early_acl_hold debugfs entry controls it per adapter
-> > while the adapter is down.
-> >
-> > Assisted-by: OpenCode:openai/gpt-5.6-sol
-> > Signed-off-by: Amir Abudubai <amirabudubai@gmail.com>
->
-> This really sounds like an over-engineered design; I'm not sure why it
-> couldn't be done by just increasing the number of polls we wait before
-> delivering the ACL packet, it has been quite a long while we don't
-> receive any reports of such races still exists. Also, some vendors use
-> special handles for debugging, these never have any completing event
-> or anything.
->
-> > ---
-> >  drivers/bluetooth/Kconfig |  10 ++
-> >  drivers/bluetooth/btusb.c | 292 +++++++++++++++++++++++++++++++++-----
-> >  2 files changed, 266 insertions(+), 36 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> > index 4e8c24d757e9..648c0d8b1496 100644
-> > --- a/drivers/bluetooth/Kconfig
-> > +++ b/drivers/bluetooth/Kconfig
-> > @@ -56,6 +56,16 @@ config BT_HCIBTUSB_POLL_SYNC
-> >           Say Y here to enable USB poll_sync for Bluetooth USB devices =
-by
-> >           default.
-> >
-> > +config BT_HCIBTUSB_EARLY_ACL_HOLD
-> > +       bool "Enable early ACL hold for Bluetooth USB devices by defaul=
-t"
-> > +       depends on BT_HCIBTUSB
-> > +       help
-> > +         Hold ACL packets whose connection handle is not yet known unt=
-il the
-> > +         connection appears or a bounded timeout expires.
-> > +
-> > +         Say Y here to enable early ACL hold for Bluetooth USB devices=
- by
-> > +         default.
-> > +
-> >  config BT_HCIBTUSB_BCM
-> >         bool "Broadcom protocol support"
-> >         depends on BT_HCIBTUSB
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 4d59b28ab30f..a59b0ed91d18 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -34,6 +34,8 @@ static bool disable_scofix;
-> >  static bool force_scofix;
-> >  static bool enable_autosuspend =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOS=
-USPEND);
-> >  static bool enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SY=
-NC);
-> > +static bool enable_early_acl_hold =3D
-> > +       IS_ENABLED(CONFIG_BT_HCIBTUSB_EARLY_ACL_HOLD);
-> >  static bool reset =3D true;
-> >
-> >  static struct usb_driver btusb_driver;
-> > @@ -956,6 +958,8 @@ struct btqca_data {
-> >  };
-> >
-> >  #define BTUSB_MAX_ISOC_FRAMES  10
-> > +#define BTUSB_RX_RECHECK_DELAY msecs_to_jiffies(1)
-> > +#define BTUSB_EARLY_ACL_HOLD_MIN_US    5000U
-> >
-> >  #define BTUSB_INTR_RUNNING     0
-> >  #define BTUSB_BULK_RUNNING     1
-> > @@ -987,7 +991,10 @@ struct btusb_data {
-> >         unsigned long flags;
-> >
-> >         bool poll_sync;
-> > +       bool early_acl_hold;
-> >         int intr_interval;
-> > +       unsigned long early_acl_timeout;
-> > +       ktime_t last_event;
-> >         struct work_struct  work;
-> >         struct work_struct  waker;
-> >         struct delayed_work rx_work;
-> > @@ -1252,14 +1259,100 @@ static inline void btusb_free_frags(struct btu=
-sb_data *data)
-> >         spin_unlock_irqrestore(&data->rxlock, flags);
-> >  }
-> >
-> > -static int btusb_recv_event(struct btusb_data *data, struct sk_buff *s=
-kb)
-> > +static void btusb_rx_queue_purge(struct btusb_data *data)
-> > +{
-> > +       unsigned long flags;
-> > +
-> > +       spin_lock_irqsave(&data->rxlock, flags);
-> > +       skb_queue_purge(&data->acl_q);
-> > +       spin_unlock_irqrestore(&data->rxlock, flags);
-> > +}
-> > +
-> > +static ktime_t btusb_rx_deadline(struct sk_buff *skb, unsigned long ti=
-meout)
-> >  {
-> > -       if (data->intr_interval) {
-> > -               /* Trigger dequeue immediately if an event is received =
-*/
-> > -               schedule_delayed_work(&data->rx_work, 0);
-> > +       return ktime_add_ns(skb->tstamp, jiffies_to_nsecs(timeout));
-> > +}
-> > +
-> > +static bool btusb_rx_hold_expired(struct sk_buff *skb, unsigned long t=
-imeout,
-> > +                                 ktime_t now)
-> > +{
-> > +       return !ktime_before(now, btusb_rx_deadline(skb, timeout));
-> > +}
-> > +
-> > +static unsigned long btusb_rx_hold_delay(struct sk_buff *skb,
-> > +                                        unsigned long timeout, ktime_t=
- now)
-> > +{
-> > +       s64 remaining =3D ktime_to_ns(ktime_sub(btusb_rx_deadline(skb, =
-timeout),
-> > +                                             now));
-> > +
-> > +       if (remaining <=3D 0)
-> > +               return 0;
-> > +
-> > +       return max_t(unsigned long, 1, nsecs_to_jiffies(remaining));
-> > +}
-> > +
-> > +static bool btusb_poll_sync_should_hold(struct btusb_data *data,
-> > +                                       struct sk_buff *skb, ktime_t no=
-w)
-> > +{
-> > +       unsigned long interval =3D READ_ONCE(data->intr_interval);
-> > +
-> > +       if (!interval || !ktime_before(data->last_event, skb->tstamp))
-> > +               return false;
-> > +
-> > +       return !btusb_rx_hold_expired(skb, interval, now);
-> > +}
-> > +
-> > +static bool btusb_acl_should_hold(struct btusb_data *data,
-> > +                                 struct sk_buff *skb, ktime_t now)
-> > +{
-> > +       unsigned long timeout =3D READ_ONCE(data->early_acl_timeout);
-> > +       u16 handle;
-> > +
-> > +       if (!timeout || hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL)=
- ||
-> > +           btusb_rx_hold_expired(skb, timeout, now) ||
-> > +           skb->len < HCI_ACL_HDR_SIZE)
-> > +               return false;
-> > +
-> > +       handle =3D le16_to_cpu(hci_acl_hdr(skb)->handle);
-> > +
-> > +       /* Only use the returned connection as an existence snapshot. *=
-/
-> > +       return !hci_conn_hash_lookup_handle(data->hdev, hci_handle(hand=
-le));
-> > +}
-> > +
-> > +static unsigned long btusb_rx_delay(struct btusb_data *data,
-> > +                                   struct sk_buff *skb, ktime_t now,
-> > +                                   bool poll_hold, bool acl_hold)
-> > +{
-> > +       unsigned long timeout;
-> > +
-> > +       if (poll_hold) {
-> > +               timeout =3D READ_ONCE(data->intr_interval);
-> > +               return btusb_rx_hold_delay(skb, timeout, now);
-> > +       }
-> > +
-> > +       if (acl_hold) {
-> > +               timeout =3D READ_ONCE(data->early_acl_timeout);
-> > +               return min(BTUSB_RX_RECHECK_DELAY,
-> > +                          btusb_rx_hold_delay(skb, timeout, now));
-> >         }
-> >
-> > -       return data->recv_event(data->hdev, skb);
-> > +       return 0;
-> > +}
-> > +
-> > +static int btusb_recv_event(struct btusb_data *data, struct sk_buff *s=
-kb)
-> > +{
-> > +       int err;
-> > +
-> > +       err =3D data->recv_event(data->hdev, skb);
-> > +
-> > +       if (READ_ONCE(data->intr_interval))
-> > +               data->last_event =3D ktime_get();
-> > +
-> > +       if (READ_ONCE(data->intr_interval) ||
-> > +           READ_ONCE(data->early_acl_timeout))
-> > +               mod_delayed_work(system_wq, &data->rx_work, 0);
-> > +
-> > +       return err;
-> >  }
-> >
-> >  static int btusb_recv_intr(struct btusb_data *data, void *buffer, int =
-count)
-> > @@ -1332,14 +1425,31 @@ static int btusb_recv_intr(struct btusb_data *d=
-ata, void *buffer, int count)
-> >
-> >  static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb=
-)
-> >  {
-> > -       /* Only queue ACL packet if intr_interval is set as it means
-> > -        * force_poll_sync has been enabled.
-> > -        */
-> > -       if (!data->intr_interval)
-> > +       bool poll_hold, acl_hold;
-> > +       bool queue_empty;
-> > +       ktime_t now;
-> > +
-> > +       if (!READ_ONCE(data->intr_interval) &&
-> > +           !READ_ONCE(data->early_acl_timeout))
-> > +               return data->recv_acl(data->hdev, skb);
-> > +
-> > +       now =3D ktime_get();
-> > +       /* hci_recv_frame() replaces this temporary monotonic arrival t=
-ime. */
-> > +       skb_set_delivery_time(skb, now, SKB_CLOCK_MONOTONIC);
-> > +
-> > +       queue_empty =3D skb_queue_empty(&data->acl_q);
-> > +       poll_hold =3D btusb_poll_sync_should_hold(data, skb, now);
-> > +       acl_hold =3D btusb_acl_should_hold(data, skb, now);
-> > +
-> > +       if (queue_empty && !poll_hold && !acl_hold)
-> >                 return data->recv_acl(data->hdev, skb);
-> >
-> >         skb_queue_tail(&data->acl_q, skb);
-> > -       schedule_delayed_work(&data->rx_work, data->intr_interval);
-> > +
-> > +       if (queue_empty)
-> > +               schedule_delayed_work(&data->rx_work,
-> > +                                     btusb_rx_delay(data, skb, now,
-> > +                                                    poll_hold, acl_hol=
-d));
-> >
-> >         return 0;
-> >  }
-> > @@ -1539,6 +1649,10 @@ static int btusb_submit_intr_urb(struct hci_dev =
-*hdev, gfp_t mem_flags)
-> >         struct btusb_data *data =3D hci_get_drvdata(hdev);
-> >         struct urb *urb;
-> >         unsigned char *buf;
-> > +       unsigned long early_acl_timeout =3D 0;
-> > +       int intr_interval =3D 0;
-> > +       unsigned int hold_us;
-> > +       unsigned int interval_us;
-> >         unsigned int pipe;
-> >         int err, size;
-> >
-> > @@ -1587,27 +1701,52 @@ static int btusb_submit_intr_urb(struct hci_dev=
- *hdev, gfp_t mem_flags)
-> >         }
-> >
-> >         /* Only initialize intr_interval if URB poll sync is enabled */
-> > -       if (!data->poll_sync)
-> > -               goto done;
-> > +       if (data->poll_sync) {
-> > +               /* The units are frames (milliseconds) for full and low=
- speed
-> > +                * devices, and microframes (1/8 millisecond) for highs=
-peed and
-> > +                * SuperSpeed devices.
-> > +                *
-> > +                * This is done once on open/resume so it shouldn't cha=
-nge even
-> > +                * if force_poll_sync changes.
-> > +                */
-> > +               switch (urb->dev->speed) {
-> > +               case USB_SPEED_SUPER_PLUS:
-> > +               case USB_SPEED_SUPER:
-> > +                       intr_interval =3D usecs_to_jiffies(urb->interva=
-l * 125);
-> > +                       break;
-> > +               default:
-> > +                       intr_interval =3D msecs_to_jiffies(urb->interva=
-l);
-> > +                       break;
-> > +               }
-> > +       }
-> >
-> > -       /* The units are frames (milliseconds) for full and low speed d=
-evices,
-> > -        * and microframes (1/8 millisecond) for highspeed and SuperSpe=
-ed
-> > -        * devices.
-> > -        *
-> > -        * This is done once on open/resume so it shouldn't change even=
- if
-> > -        * force_poll_sync changes.
-> > -        */
-> > -       switch (urb->dev->speed) {
-> > -       case USB_SPEED_SUPER_PLUS:
-> > -       case USB_SPEED_SUPER:   /* units are 125us */
-> > -               data->intr_interval =3D usecs_to_jiffies(urb->interval =
-* 125);
-> > -               break;
-> > -       default:
-> > -               data->intr_interval =3D msecs_to_jiffies(urb->interval)=
-;
-> > -               break;
-> > +       interval_us =3D 0;
-> > +       if (data->early_acl_hold && urb->interval > 0) {
-> > +               switch (urb->dev->speed) {
-> > +               case USB_SPEED_SUPER_PLUS:
-> > +               case USB_SPEED_SUPER:
-> > +               case USB_SPEED_HIGH:
-> > +                       interval_us =3D urb->interval * 125;
-> > +                       break;
-> > +               case USB_SPEED_FULL:
-> > +                       interval_us =3D urb->interval * USEC_PER_MSEC;
-> > +                       break;
-> > +               default:
-> > +                       break;
-> > +               }
-> >         }
-> >
-> > -done:
-> > +       if (interval_us) {
-> > +               /* Allow an event which misses one polling window to ar=
-rive in
-> > +                * the next.
-> > +                */
-> > +               hold_us =3D max(BTUSB_EARLY_ACL_HOLD_MIN_US, interval_u=
-s * 2);
-> > +               early_acl_timeout =3D usecs_to_jiffies(hold_us);
-> > +       }
-> > +
-> > +       WRITE_ONCE(data->intr_interval, intr_interval);
-> > +       WRITE_ONCE(data->early_acl_timeout, early_acl_timeout);
-> > +
-> >         usb_free_urb(urb);
-> >
-> >         return err;
-> > @@ -2077,18 +2216,22 @@ static int btusb_close(struct hci_dev *hdev)
-> >
-> >         BT_DBG("%s", hdev->name);
-> >
-> > -       cancel_delayed_work(&data->rx_work);
-> > +       /* Stop queued RX delivery before shutting down the endpoints. =
-*/
-> > +       cancel_delayed_work_sync(&data->rx_work);
-> >         cancel_work_sync(&data->work);
-> >         cancel_work_sync(&data->waker);
-> >
-> > -       skb_queue_purge(&data->acl_q);
-> > -
-> >         clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> >         clear_bit(BTUSB_BULK_RUNNING, &data->flags);
-> >         clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-> >         clear_bit(BTUSB_DIAG_RUNNING, &data->flags);
-> >
-> >         btusb_stop_traffic(data);
-> > +
-> > +       /* An in-flight URB completion may have requeued RX work. */
-> > +       cancel_delayed_work_sync(&data->rx_work);
-> > +
-> > +       btusb_rx_queue_purge(data);
-> >         btusb_free_frags(data);
-> >
-> >         err =3D usb_autopm_get_interface(data->intf);
-> > @@ -2114,9 +2257,9 @@ static int btusb_flush(struct hci_dev *hdev)
-> >
-> >         BT_DBG("%s", hdev->name);
-> >
-> > -       cancel_delayed_work(&data->rx_work);
-> > +       cancel_delayed_work_sync(&data->rx_work);
-> >
-> > -       skb_queue_purge(&data->acl_q);
-> > +       btusb_rx_queue_purge(data);
-> >
-> >         usb_kill_anchored_urbs(&data->tx_anchor);
-> >         btusb_free_frags(data);
-> > @@ -2497,11 +2640,40 @@ static void btusb_rx_work(struct work_struct *w=
-ork)
-> >  {
-> >         struct btusb_data *data =3D container_of(work, struct btusb_dat=
-a,
-> >                                                rx_work.work);
-> > +       unsigned long delay;
-> > +       unsigned long flags;
-> >         struct sk_buff *skb;
-> > +       bool poll_hold, acl_hold;
-> > +       ktime_t now;
-> > +
-> > +       for (;;) {
-> > +               spin_lock_irqsave(&data->rxlock, flags);
-> > +               now =3D ktime_get();
-> > +               skb =3D skb_peek(&data->acl_q);
-> > +
-> > +               if (!skb) {
-> > +                       spin_unlock_irqrestore(&data->rxlock, flags);
-> > +                       return;
-> > +               }
-> > +
-> > +               poll_hold =3D btusb_poll_sync_should_hold(data, skb, no=
-w);
-> > +               acl_hold =3D btusb_acl_should_hold(data, skb, now);
-> > +               if (!poll_hold && !acl_hold) {
-> > +                       skb =3D skb_dequeue(&data->acl_q);
-> > +                       data->recv_acl(data->hdev, skb);
-> > +                       spin_unlock_irqrestore(&data->rxlock, flags);
-> > +                       continue;
-> > +               }
-> > +
-> > +               delay =3D btusb_rx_delay(data, skb, now, poll_hold, acl=
-_hold);
-> > +               spin_unlock_irqrestore(&data->rxlock, flags);
-> >
-> > -       /* Dequeue ACL data received during the interval */
-> > -       while ((skb =3D skb_dequeue(&data->acl_q)))
-> > -               data->recv_acl(data->hdev, skb);
-> > +               /* A zero-delay event kick that raced with this worker =
-remains
-> > +                * pending; schedule_delayed_work() cannot move it late=
-r.
-> > +                */
-> > +               schedule_delayed_work(&data->rx_work, delay);
-> > +               return;
-> > +       }
-> >  }
-> >
-> >  static int btusb_setup_bcm92035(struct hci_dev *hdev)
-> > @@ -3967,6 +4139,51 @@ static const struct file_operations force_poll_s=
-ync_fops =3D {
-> >         .llseek         =3D default_llseek,
-> >  };
-> >
-> > +static ssize_t force_early_acl_hold_read(struct file *file,
-> > +                                        char __user *user_buf, size_t =
-count,
-> > +                                        loff_t *ppos)
-> > +{
-> > +       struct btusb_data *data =3D file->private_data;
-> > +       char buf[3];
-> > +
-> > +       buf[0] =3D data->early_acl_hold ? 'Y' : 'N';
-> > +       buf[1] =3D '\n';
-> > +       buf[2] =3D '\0';
-> > +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> > +}
-> > +
-> > +static ssize_t force_early_acl_hold_write(struct file *file,
-> > +                                         const char __user *user_buf,
-> > +                                         size_t count, loff_t *ppos)
-> > +{
-> > +       struct btusb_data *data =3D file->private_data;
-> > +       bool enable;
-> > +       int err;
-> > +
-> > +       err =3D kstrtobool_from_user(user_buf, count, &enable);
-> > +       if (err)
-> > +               return err;
-> > +
-> > +       /* Only allow changes while the adapter is down */
-> > +       if (test_bit(HCI_UP, &data->hdev->flags))
-> > +               return -EPERM;
-> > +
-> > +       if (data->early_acl_hold =3D=3D enable)
-> > +               return -EALREADY;
-> > +
-> > +       data->early_acl_hold =3D enable;
-> > +
-> > +       return count;
-> > +}
-> > +
-> > +static const struct file_operations force_early_acl_hold_fops =3D {
-> > +       .owner          =3D THIS_MODULE,
-> > +       .open           =3D simple_open,
-> > +       .read           =3D force_early_acl_hold_read,
-> > +       .write          =3D force_early_acl_hold_write,
-> > +       .llseek         =3D default_llseek,
-> > +};
-> > +
-> >  #define BTUSB_HCI_DRV_OP_SUPPORTED_ALTSETTINGS \
-> >                 hci_opcode_pack(HCI_DRV_OGF_DRIVER_SPECIFIC, 0x0000)
-> >  #define BTUSB_HCI_DRV_SUPPORTED_ALTSETTINGS_SIZE       0
-> > @@ -4464,6 +4681,7 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                 usb_enable_autosuspend(data->udev);
-> >
-> >         data->poll_sync =3D enable_poll_sync;
-> > +       data->early_acl_hold =3D enable_early_acl_hold;
-> >
-> >         err =3D hci_register_dev(hdev);
-> >         if (err < 0)
-> > @@ -4473,6 +4691,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >
-> >         debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, dat=
-a,
-> >                             &force_poll_sync_fops);
-> > +       debugfs_create_file("force_early_acl_hold", 0644, hdev->debugfs=
-, data,
-> > +                           &force_early_acl_hold_fops);
-> >
-> >         return 0;
-> >
-> >
-> > base-commit: 6f55ad8fb0acd861e5c4e526b2272fc71952e1e3
-> > --
-> > 2.43.0
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+with no hdev->lock held, so the RX path could read hcon->sco_data and
+call kref_get_unless_zero() on an sco_conn that was concurrently freed:
+
+	BUG: KASAN: slab-use-after-free in sco_conn_hold_unless_zero+0xbe/0x160
+	Write of size 4 by task kworker/u17:0
+	Workqueue: hci0 hci_rx_work
+	Call Trace:
+	 sco_conn_hold_unless_zero+0xbe/0x160
+	 sco_recv_scodata+0x13f/0x490
+	 hci_rx_work+0x3af/0x730
+
+kref_get_unless_zero() only guards against a zero refcount, not against
+the backing memory already being freed.
+
+Give hcon->sco_data an actual reference on the sco_conn it points to, so
+the object cannot be freed while the pointer is still installed, and only
+clear and drop it from sco_conn_del(), which runs under hdev->lock (its
+callers, sco_connect_cfm() and sco_disconn_cfm(), hold it). The reader in
+sco_recv_scodata() also takes hdev->lock, so the store and the read are
+now serialised: the RX path either observes NULL or a reference that is
+guaranteed to stay valid until it drops its own.
+
+sco_conn_add() no longer hands its kref_init() reference to the caller as
+the connection's only reference; that initial reference is the one owned
+by hcon->sco_data, and callers get their own via sco_conn_hold().
+
+Because the sco_conn can now outlive the socket (the association keeps it
+alive until the link goes down), the hci_conn can no longer be dropped
+from sco_conn_free() without regressing socket close: closing a connected
+SCO socket must still tear the link down. Move hci_conn ownership to the
+socket instead: __sco_chan_add() takes an hci_conn reference and it is
+released from sco_chan_del() and sco_sock_destruct(), exactly once. The
+sco_conn no longer owns an hci_conn reference, so sco_conn_add() stops
+consuming one and sco_connect() drops the hci_connect_sco() reference on
+every path; sco_connect_cfm() no longer needs its hci_conn_hold() dance.
+
+Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
+Cc: stable@vger.kernel.org
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+---
+ net/bluetooth/sco.c | 84 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 69 insertions(+), 15 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 3d4362a09..8df0fa48f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -84,12 +84,14 @@ static void sco_conn_free(struct kref *ref)
+ 	if (conn->sk)
+ 		sco_pi(conn->sk)->conn = NULL;
+ 
+-	if (conn->hcon) {
+-		conn->hcon->sco_data = NULL;
+-		hci_conn_drop(conn->hcon);
+-	}
++	/* hcon->sco_data is cleared and the association's reference on the
++	 * sco_conn is dropped in sco_conn_del() under hdev->lock, and the
++	 * hci_conn is now owned by the socket (held in __sco_chan_add() and
++	 * dropped in sco_chan_del()/sco_sock_destruct()), so there is nothing
++	 * left to release towards hcon here.
++	 */
+ 
+-	/* Ensure no more work items will run since hci_conn has been dropped */
++	/* Ensure no more work items will run before the connection is freed */
+ 	disable_delayed_work_sync(&conn->timeout_work);
+ 
+ 	kfree(conn);
+@@ -188,8 +190,11 @@ static void sco_sock_clear_timer(struct sock *sk)
+ }
+ 
+ /* ---- SCO connections ---- */
+-/* Consumes a reference on @hcon, which the returned sco_conn owns until it is
+- * freed. On failure (NULL return) the reference is left for the caller to drop.
++/* Returns a new reference the caller must drop with sco_conn_put(). The
++ * hcon->sco_data association holds its own reference on the sco_conn for the
++ * connection's lifetime; it is dropped in sco_conn_del() under hdev->lock.
++ * @hcon is not consumed: the hci_conn reference is taken and owned by the
++ * socket in __sco_chan_add().
+  */
+ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ {
+@@ -201,9 +206,6 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ 			sco_conn_lock(conn);
+ 			conn->hcon = hcon;
+ 			sco_conn_unlock(conn);
+-		} else {
+-			/* conn already owns a reference on hcon */
+-			hci_conn_drop(hcon);
+ 		}
+ 		return conn;
+ 	}
+@@ -227,7 +229,10 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ 
+ 	BT_DBG("hcon %p conn %p", hcon, conn);
+ 
+-	return conn;
++	/* kref_init() above set the association reference owned by
++	 * hcon->sco_data; hand the caller its own reference.
++	 */
++	return sco_conn_hold(conn);
+ }
+ 
+ /* Delete channel.
+@@ -242,9 +247,20 @@ static void sco_chan_del(struct sock *sk, int err)
+ 	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
+ 
+ 	if (conn) {
++		struct hci_conn *hcon;
++
+ 		sco_conn_lock(conn);
+ 		conn->sk = NULL;
++		hcon = conn->hcon;
+ 		sco_conn_unlock(conn);
++
++		/* Release the socket's own reference on the hci_conn taken in
++		 * __sco_chan_add() so that closing the socket still tears the
++		 * link down even while the sco_conn is kept alive by the
++		 * hcon->sco_data association reference.
++		 */
++		if (hcon)
++			hci_conn_drop(hcon);
+ 		sco_conn_put(conn);
+ 	}
+ 
+@@ -266,6 +282,15 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
++	/* Detach the connection from the hci_conn and drop the reference held
++	 * by the hcon->sco_data association.  The caller holds hdev->lock,
++	 * which serialises this NULL store and put against the read of
++	 * hcon->sco_data in sco_recv_scodata(), closing the use-after-free
++	 * where the RX path could upgrade an already-freed sco_conn.
++	 */
++	hcon->sco_data = NULL;
++	sco_conn_put(conn);
++
+ 	sco_conn_lock(conn);
+ 	sk = sco_sock_hold(conn);
+ 	sco_conn_unlock(conn);
+@@ -290,6 +315,13 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 	sco_pi(sk)->conn = sco_conn_hold(conn);
+ 	conn->sk = sk;
+ 
++	/* The socket owns a reference on the hci_conn for as long as it stays
++	 * attached; it is dropped in sco_chan_del()/sco_sock_destruct().  This
++	 * keeps close() tearing the link down now that the sco_conn can outlive
++	 * the socket through the hcon->sco_data association reference.
++	 */
++	hci_conn_hold(conn->hcon);
++
+ 	if (parent)
+ 		bt_accept_enqueue(parent, sk, true);
+ }
+@@ -371,6 +403,7 @@ static int sco_connect(struct sock *sk)
+ 	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
+ 		release_sock(sk);
+ 		sco_conn_put(conn);
++		hci_conn_drop(hcon);
+ 		err = -EBADFD;
+ 		goto unlock;
+ 	}
+@@ -379,6 +412,7 @@ static int sco_connect(struct sock *sk)
+ 	sco_conn_put(conn);
+ 	if (err) {
+ 		release_sock(sk);
++		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
+@@ -395,6 +429,11 @@ static int sco_connect(struct sock *sk)
+ 
+ 	release_sock(sk);
+ 
++	/* The socket took its own hci_conn reference in __sco_chan_add(); drop
++	 * the one returned by hci_connect_sco().
++	 */
++	hci_conn_drop(hcon);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+@@ -495,9 +534,26 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 
+ static void sco_sock_destruct(struct sock *sk)
+ {
++	struct sco_conn *conn = sco_pi(sk)->conn;
++
+ 	BT_DBG("sk %p", sk);
+ 
+-	sco_conn_put(sco_pi(sk)->conn);
++	/* If the channel was not already torn down via sco_chan_del(), drop the
++	 * socket's own references here.  sco_chan_del() clears sco_pi(sk)->conn,
++	 * so the hci_conn and sco_conn references are released exactly once.
++	 */
++	if (conn) {
++		struct hci_conn *hcon;
++
++		sco_conn_lock(conn);
++		hcon = conn->hcon;
++		sco_conn_unlock(conn);
++
++		if (hcon)
++			hci_conn_drop(hcon);
++		sco_pi(sk)->conn = NULL;
++		sco_conn_put(conn);
++	}
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
+ 	skb_queue_purge(&sk->sk_write_queue);
+@@ -1511,12 +1567,10 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
+ 	if (!status) {
+ 		struct sco_conn *conn;
+ 
+-		conn = sco_conn_add(hci_conn_hold(hcon));
++		conn = sco_conn_add(hcon);
+ 		if (conn) {
+ 			sco_conn_ready(conn);
+ 			sco_conn_put(conn);
+-		} else {
+-			hci_conn_drop(hcon);
+ 		}
+ 	} else
+ 		sco_conn_del(hcon, bt_to_errno(status));
+-- 
+2.43.0
+
