@@ -1,110 +1,121 @@
-Received: from sonic303-31.consmr.mail.bf2.yahoo.com (sonic303-31.consmr.mail.bf2.yahoo.com [74.6.131.230])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681244756BC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 21:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.131.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF1340A953
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 23:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785275882; cv=none; b=REUT1sVnseC4pseyvx9HIobs4Ev/TxbClOEnKvrK+w2Swp5yoM23iqfQl7rWudtKWr8UwokQIVpuXBGL+utToi09hlrovBKJErhAsVW78jJINrB/BaiDoiMSKWiQlWLfbqlWAZ2y+OOYI/Cxrhdo6c9ofSHqt5pB0Dz8Nh5bDEA=
+	t=1785280861; cv=none; b=IJJ7Jd8V9FWtSK2HODC/LKIpRY8OjF1aQzXy8qNuQlr7YRd2Xf60gZn8/dYNXJOVOOmD1bGIo0NuJMWa/f282rc4yMulerhem1Sl48u2M/SY4gYAwhJiEikdYP2oFoNrfKQz6pWjK8jrv3pUSXH32GOEkgqXAH5cd40NHHZJrXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785275882; c=relaxed/simple;
-	bh=GoyXt2Ob6wheB8o0jhTCUtaDXqFm9Miw6kW2MIeW1/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=JH5T1ElEn/Biy9qc6dHpsnjEDutRPpr05ZRY1RU5+sQtr4192QnaGELxsqqbvyIhoYEBZaVrOwQfnZf297tOPZuMb8xLYBRk/831ZcBrKWUHx8XmUixQKjpmCBvxRgCLTSTRQBsYAlcrhmYVVGgo03lMBYnGxQACbl26oan9608=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=FpELQXHm; arc=none smtp.client-ip=74.6.131.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1785280861; c=relaxed/simple;
+	bh=ODAPbLv3Fef4h1TRG8NhRGHTXpYCtz+NApigEuvstNs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GdS22nd9c62sOHp+I0OOIjmWW/SzqOuCPZiNJ7dXiBjAy/HPAGqzhM3adDUvb5/IejQJ5OKTQS5E5p+EAyRi4Y6fH2+UfTV4F/otlLCme+0hbN166y6FCdY1wH5GihImYIvvAVgNba5Tpp+6gPeqIypU/vlJ+reY3ev8i9fwEGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3lPMFzA; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="FpELQXHm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1785275879; bh=TbVeXK9PgGNFb4O0oy8CE4lQ4QxdnItquwxhSacc1WA=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=FpELQXHmpySK4tYp6fuoVOIVnCXm7b3b2EAF/R9xsqZFA66YOfY2CofBnfsnxtpxKE2qEynw5MXmTir7RlrzXs/mkzSVLQPvl0t9ATbh3ogHcmZxuU2Oe2m9yKDa/3WZ8zaeV7iQaILnropVCif9FzhgvR3n6cwtWdN486EqA66I/9WPdVuA7+cpkhaLiNXgXrYowXTnoKK0NrQsiM3QH7v7ln/NRd8LsFrn/Eu5XmiHQC/pK+Fh8E5zB+ivNCyKhsWj9eNLfwxjUvB6DOVCd7RUnMWYhO+iK3T3OO6jRzEe7VDe0SwVBc6rV0CdcQlS/+cbvwdLtt4gaZMlrD2AIw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1785275879; bh=8ZuV1oPJ7/NbZpou9bp1sPWEgLOmsYCzXu37q7/mPhZ=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=ARFQvPgdRF4NJWUTyQbIDlnCNXAfUGWjwtblCv9zBA9D+Wb6XwUc6ObQJvQiWgzf09QTwVra518keYHApasvcNPjh7LF/9iOZC2uXS88XWI73yVPrZ0O6bjIq+U48/re7TRGcENAKAVfNmuOwLUXoZErPakA1ljfERHpb7t2CS3agHzJALK8/Anx7r1VGjiWdi65NWOx0BLW3eAm5vVfkmDjS6qDEx7p1WurW7GTaiYN3z8bv4sKEg76drV3wPWkxmvMv50VrBhDUVF/oS3IJdoD8CnObVIcQBy4Ib/Yj06t3I/6VrrgFPePEschxKJsXjR+18D34/026htNAC3uyw==
-X-YMail-OSG: XjHpv0oVM1mujqYCE6Q3Qk4juVb4YSkWkxki49SZRJOBU6el88tJTMVv0ktXZNW
- .qKg0F6Utenpu9JdfG03Z8C0LuEaw7EFk_5PCXslcYuITqwGR1JxSYxnqxUvPHqvkDpeBSefMtel
- IygEq8FkVfTG5FVzaZUd8TVm57NoZTpU2zcHR5QUnmGlzVERVlyL22M_V.RHLWOcUSZWz1BMeP9F
- GpaYCvrH0HZTPdyFAhO3EalJXAGSKosCP3NazrPSVdyQFu5qQCjd2ZcOMV7bwyJB8STGo9oPXkld
- T6.3RLebJhsGT5CGlhpKdcKGT1eFse0cqQW1v0kdxzvwVacAJXKU0sWszBzqX_nVLohz.50cjPml
- 5atReTqjwhocTOl._S7nzp4k5plcLt_aY1XIAu_QlOUdSd5Z4aPvB3NvGA1fmozJe5dbtHh36vUB
- SRQcD4kl290QbBRtGeGmO5vuRo.jCAty9alcAPI4zpo3C1SE15npaZNffr9.bhWZ9r_1Bv1Sozbn
- gvB5D6LP2bfwuGRtqs_EGAwGKESFb0iD1HxKnuN9RnfktUzNBv6fru.Xtex8PDr_09wLYVMiwYj.
- 21IC_wuqffgOoIPUtIMSmcBXmxZ88jIIhzGY0qYZdiMZp.4ec2Cxcr_7dU2kzE2MLDxUUpHBChjA
- f_QAFVJE8zXyb9PYceBPgU9KAlmEusOZrtVo05GpHmaZ2z._qn4LhwH84UQ8qAzZQtUtvVWvgI3I
- E_ydaFJQshoOi6yZzYhHmITkZZp4WKogmqW6djOvjpaN7lgoCAqI5iUcpJWRPcoXM2z6FuFlhNpJ
- vcjuLhs3dtOFheWOxdPvg2BQ4U9LtEWuEmRP_aD6NWCpBarnZzyrNnxrolgxoIlie4EuvvwvktF0
- TY8rdaI.ORdILNf6Kg253xjPM05haXqJbDUle92QBYBIsAa3YYRz9fiCs5yZ92VKU4OHwZvuxhua
- 5YT.JbOKDTl4Ck8ySErGqPLYrFyauVQu6syN7OSwg3NVERezBk5T4MCnh1FYg6pCptBTpnspFXOu
- _o4uO1qiZs8n27KITjLHdihhXq8bgblJ3cBCTz_AwjkcDl2TLFV.BtGFtv1VYnjyvEpwjhfG14AD
- 8xpG1pfcIit9KGsAo3vlwLMqMLRxKDh8_2cu7PkhG2H_I42jxcgxWhccCGp_sJHE.3MVaToyE7tO
- Ns1dk3N8n_VF6SvMScj6jmkz6UNvVf7CwTuxqKwwiY3lII7FUHyzv.wct6C.VWNg_gKQxTqT6FEj
- Om75URc8sVZDMGGjglRtTkv7Tw9fXm5sukUJ3iPE0pxVcGWvyY9QeWEkPPEqwjKN8e2Y2JwKxAnF
- ypfZPMF9OVUIRCSDVrV5pcMNmtb6hQWfSDZ5VLBua9.3ZIVo6ZZTMA8zj04NKUb..WIZejjb0hHv
- nZnl_2O425rp4K34t1jQBzm_tGCfRpbfw7d0sbl9r55oStoe6L5nXVToKn3tNhTTXdZDV_Alj.qv
- a9yCrLCJayHCF0vd74raNUNkhzeZSiRrxqcKfVjTw0hLXkrhZAVqKpjdtPr2Uc2S.Z6P85n.47Hm
- IHp5pumBhlPPdhL1jWYNpFWI.EagGWN8HH4.eDG.NhZOXGVRAQDfqiBWfncXneNFwIRK9.8i8DP3
- QyrLiruYFtyveNY4cGWojqzyQUZfi5p4CTzr_8YrMSXTwVElJTtiWwFNChcuJ5vDoJoKbRNVKA9n
- RunvlhIDO9zuzgBy_eVQVQJcbD44cB4NdyGEGtG3G_h2NJ9MiqHcQwSt0LSqOWuY12JSXYzHicnc
- DfNM6_USGhhZCZj8u.H0MD3WQoQqLkJTgd8YL1o.3KqPMKGUIzawS0fLvRO3R8ADmZbUNkYFtBq0
- sg9tX7NVq4pHOyt97PMMry2GTU5e4P4IrK4uQVXXpOHRA3MnN0K1MYEWgukfmmEul2a4gYgyQZ0J
- d6ASX2XUOwxDFAHwRn5c1e9a7r6WFeSz5NsXOIHEJPQ2p3xphUI2wdrokOtqI.veaP3Omb5.q8nM
- 4qsA8xS1aJiYZ7NlScDk_O9kzm3BlwUrc.NtLByfJzGpNjXMCFX2ZDdlMoXmDOq.1N9akreWOccH
- R1tdXBltZZPOZQxiiQfMW8oEQzu_ufv7fHujvcaeSXEtQ1Yx5MuH0klim5Ps7iAvAUhtzpWGsmC9
- uqpQWFtisTkqTubmUdUFYQR8TrZrLXIm1CBytTAw.COHL89O5zk7Y351MPkvdTNOqTp9o4cNWRlA
- o82WKfmoRuneWqcnTQXjz48SlW29rEHjtStEl1TXZXajgsEkVdykrmPDZ68pRvQF89uGCJPMYutc
- ZbpPzJegYYCY.30zd3bfa7XT9WBByNvwQ
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: 04037b43-16f4-4667-ac29-7b15be3d4777
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.bf2.yahoo.com with HTTP; Tue, 28 Jul 2026 21:57:59 +0000
-Received: by hermes--production-ne1-6f6bdbdd7c-h2bbq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 58267813fdc2b2e316ffe8b1e820e324;
-          Tue, 28 Jul 2026 21:24:40 +0000 (UTC)
-From: Jeremy Dean <deaner92@yahoo.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeremy Dean <deaner92@yahoo.com>
-Subject: [PATCH] Bluetooth: btusb: Use DECLARE_FLEX_ARRAY() for qca_dump_hdr
-Date: Tue, 28 Jul 2026 21:24:31 +0000
-Message-ID: <20260728212431.106411-1-deaner92@yahoo.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3lPMFzA"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c15bf5000so2041301cf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 16:20:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785280859; x=1785885659; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tq4LvkhDyUYDMcm3CsQwDAlWv76Yp4qi4S2UeIUJDho=;
+        b=c3lPMFzAFyNhoA/9K7EvrYrgM6pXYYxGmON85GnXG31OC0VzXfb/lX20KzbhACn16B
+         svvk0M3S8/BTE+LQkK3Sytq/v0RQiPVL8+gGCrJ2GzSkb/GUEkZfDhg7f5EtUwN11bLx
+         qJVCsjbobbBkKaEnc5MD1Sw+rf+yFzSmUvlkQAijHRjkNctp5n16aYSQhhVUTuN0h5BH
+         SuXZBQa/mKVTOYrp0Cl9koxUsipGnasi8DxWkejCOFUDIGJ2ZiwCa8tJ6DcUiQES35S7
+         Ik2hFo9vwURuD04nyhIM3mvoQPUT/+Kr1fjrY0jSuFWU1Bby3g17krmZCcriK/468Ujk
+         frXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785280859; x=1785885659;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=tq4LvkhDyUYDMcm3CsQwDAlWv76Yp4qi4S2UeIUJDho=;
+        b=mnM9cj5Sq0Sdg+wIQAR+pfBDa/bW3CQQ8bWyg1Kdt/M16n+r/XzwktI6eE7i0qECa9
+         CsaLwK3z9bpmSSerstUVKeiuwMIxmGXILQPMHjYkBiienl6XrBnIr3/4N5UP44BfGfxo
+         Z69NI2tBXbfQ09PKQ5p0jdOKU9DLqCh9EQfPsHuQW1F2jNggJzOCPbhKSzu+0GMoOn+P
+         aUII7+pMH0GEcijx7xADQoe2f3oWPD948BDIKbILNnEkYzG9Zy1sRmHx8urusdnUOOat
+         H+56IxEVo7TZWyQNiYVqCaj6702Mxcm+vyBdkEgLGnRs0V8n9ySokv2QIrtEK57z+IIi
+         VkdQ==
+X-Gm-Message-State: AOJu0YwHVfamRqovw4GyNDk5AQJS7/AG7Gnk1e4EavVH/1h78eQEcu79
+	2T+551GJfgoLnfFNJo688vtAn4nxR86dMa+LtToJWbYCpA13cffSKkQ5eCDdXw==
+X-Gm-Gg: AR+sD12X0CWwvGjAL2ihhgjn1eqc0JKu9kIlMSfEW7OWHr/j1YnigqcrpuCHD7YaQw4
+	9dXXZCWL0K7WLPvnUCsoTm2KA6673ODJb16Q0XTfGPTIvqhG/JbIz3w5HzZvz5Ddh+fl5ZXoKc2
+	P7g7P8sxa7pmVq/S+fdgg74KRUdFLc8Km4SHm0ToFrnmIXHmvEprdqzcU54U/hQABtkGmD4BCdq
+	iukmGRjvl3del3UD/f/xygDm8gcFoqMlzgH7Ev1EClHAIasNrmr70tGa0aeCKHWj9XgkjAUkZbR
+	QUMXQCXrlQSCP52iProQQYxy6725AveiyHqWvVnQWuQkZrdXCuVEqgiXiu0S0YWHXQfjVhdyUum
+	I4VRN4M1QdfTp6OBBHYr0o/sKAAQpv3ezVTAIRNMLrghwo0TWZtqt2kzmD6Kgt3Af9wv9xSDLbf
+	GB2MssDEiEmOVK+dllJL/6sQPQKE+YWOyYsGjy8q7aU89ODPFfhQX4x3k5RFProkNs6KwXcD+V5
+	Rp2+HE=
+X-Received: by 2002:a05:622a:1b10:b0:51c:1ff:2515 with SMTP id d75a77b69052e-529d7135d23mr41229591cf.65.1785280858971;
+        Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
+Received: from [172.17.0.2] ([172.214.45.194])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529e2d822dbsm7899451cf.16.2026.07.28.16.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
+Message-ID: <6a69395a.b5fdfa5d.fb43f.151d@mx.google.com>
+Date: Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5327239976132046555=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-References: <20260728212431.106411-1-deaner92.ref@yahoo.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, deaner92@yahoo.com
+Subject: RE: Bluetooth: btusb: Use DECLARE_FLEX_ARRAY() for qca_dump_hdr
+In-Reply-To: <20260728212431.106411-1-deaner92@yahoo.com>
+References: <20260728212431.106411-1-deaner92@yahoo.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Replace the deprecated zero-length array members in struct
-qca_dump_hdr with DECLARE_FLEX_ARRAY(), since C99 flexible array
-members are not permitted inside unions or as the sole member of
-a struct.
+--===============5327239976132046555==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Verified via offsetof()/sizeof() comparison that struct layout
-(data/data0 offsets and overall size) is unchanged, and confirmed
-the driver still compiles cleanly with the change.
+This is automated email and please do not reply to this email!
 
-Link: https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-Signed-off-by: Jeremy Dean <deaner92@yahoo.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1136220
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.72 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.87 seconds
+CheckAllWarning               PASS      29.11 seconds
+CheckSparse                   PASS      28.02 seconds
+BuildKernel32                 PASS      25.90 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      492.88 seconds
+IncrementalBuild              PASS      25.18 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/506
+
 ---
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8f7ed469cac6..b78c4a0e75fd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3103,10 +3103,10 @@ struct qca_dump_hdr {
- 	__le16 seqno;
- 	u8 reserved;
- 	union {
--		u8 data[0];
-+		DECLARE_FLEX_ARRAY(u8, data);
- 		struct {
- 			__le32 ram_dump_size;
--			u8 data0[0];
-+			DECLARE_FLEX_ARRAY(u8, data0);
- 		} __packed;
- 	};
- } __packed;
--- 
-2.43.0
 
+--===============5327239976132046555==--
