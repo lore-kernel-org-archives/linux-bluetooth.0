@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CE61EFFB7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 06:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C36B22FDE6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 06:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785219891; cv=none; b=NlsgLfVwFtiVaLHuI3yhllnB/HqRkWN8ohD8AhbyV4Z2P4TQetvtTB1fbZhezikHzazPvISDTt3ijw+plRsbkthtR7Qr0Vy4O2U9ZXQPgRnnJBV//Uw9mVcH36YIr4LB8LmdScGaNw+P61A3Le2eW+5oUQnDsJl92Ch1mjdiKiI=
+	t=1785220004; cv=none; b=Vms8qOUsqOrU04EsI7lDRUcY69fyJv1KSIK0amNM3SGAcU0epsIFYZcYsBono0L45ntpN2HIpYXlhi7svupSyhUSLi8pAkWFCUAb59CWVB3JdM4MuQG8yNFUAbUCG8lk8rF2WC4JzJDexEY/h3AGZu8TyQ93jikaV4srghgJv08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785219891; c=relaxed/simple;
+	s=arc-20240116; t=1785220004; c=relaxed/simple;
 	bh=QGO8/sGPtzogws5vg1DJXHjzwIuWXEG6itfiKwUMMZE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XjGRejin1LT0AxHaf++644npCUGGXT5JY6zufaGEVWborDJd8Ww2M6EFKVjDN3nK9/n8IDRwjxw6nw2dU6xniWYUxDNQcy+QIyMi2vf06EjUsHmgswQ5LosSf32H2imRvoB0X0eRAmHPuxkv9E4QIlvrmzq4OOaLXfuAK90iqeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSTPqYZb; arc=none smtp.client-ip=10.30.226.201
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=grXtCvfBOzCVjWJS5waa86xI5EqC8SYFTQaxUQzDQoOM/kN1BpyRywG/02Q5Yvo7J86zR24rF8auAP+vz1Iqrl9OhJeZGaoixg0xNGuIn44eg0IeIpioa1LXodkOoShvbcYnAxzsyYExnD/18KB0cvZIdPMJR7+2ndDHe7JmJTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPcE3yc1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSTPqYZb"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7880EC2BCC6;
-	Tue, 28 Jul 2026 06:24:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPcE3yc1"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 03510C2BCC9;
+	Tue, 28 Jul 2026 06:26:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785219890;
+	s=k20201202; t=1785220004;
 	bh=QGO8/sGPtzogws5vg1DJXHjzwIuWXEG6itfiKwUMMZE=;
 	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=SSTPqYZbJC0KWnFsKmSwbjzt/eITvPEj3prpzGfKf2HnVuoS20v0uUNIdZIdaC2/s
-	 WVtk4t9oM9wUdUNb2u9xQDRiB/W69MsfQk54eCMQQ5dQ01tYfIBVaZfJr3rYAskQs/
-	 Kj3wLACjUvXpQwFkCZE5tjwMyy0zdZlQiHQQgRLbSJroco0FdeZ7rJkSanY6Z8EiQF
-	 wIaYf5MQqFm/sG297MHTuke+qhuy42TcVyNsiI2ZW/8gj7FMsHjbv5m9QaN0g1Lgez
-	 JPkDQMNVYyVari4SquSgfw2xXgpq0w1wRNT8L8O9fCS+T/IlOEwRB2RCGiUwhJ5sTd
-	 BgE6zYhK5iCPA==
+	b=bPcE3yc1Nul0N+qb3CDfQ1hWki7cTkXXscXleo/A7SiQdgubMPiIb55Zhebwmp8Qb
+	 8PI7tyVOba9bV4KvvCkTSh5yEzy0Q2kz5Ur+Abk5OIVMZLYpu8/qoCorX05Meg6E2a
+	 61s6Z4DGyoPmLLy885n6Ro74QlAGJ+saNwAmk9pDC5AYzsCQ4Ecb3KbFh2wvTpZImo
+	 W0jx/LewQT9IjPleeJyfgrVIOjFweam9yh1WpXurmE32b3GvCpsF6pmdCibjU3YmxO
+	 L9HxYtykJkRhZwqCXBGIVTiPxIHdBxtKQG1BMdLCkE2O7jeqJC5Xm88fn5rtBdEVLp
+	 xgkT4Hk3fgLnw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B0BC531F9;
-	Tue, 28 Jul 2026 06:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DCAC53219;
+	Tue, 28 Jul 2026 06:26:43 +0000 (UTC)
 From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Tue, 28 Jul 2026 14:24:45 +0800
+Date: Tue, 28 Jul 2026 14:26:42 +0800
 Subject: [PATCH BlueZ bluez v3] bap: Start BIG sync after receiving BIGInfo
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -39,19 +39,19 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260728-big_sync-v3-1-6751ba0802ce@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIACxLaGoC/2WNyw6CMBBFf4V0bU0fINGV/2GMaYcBJgFqWm1Ew
+Message-Id: <20260728-big_sync-v3-1-c2da19f3c00b@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAKFLaGoC/2WNyw6CMBBFf4V0bU0fINGV/2GMaYcBJgFqWm1Ew
  r9bu8K4vHPnnLuwgJ4wsFOxMI+RArkpBb0rGPRm6pBTkzJTQh1ErUpuqbuFeQJeVqBKBHGUSrL
  0fvfY0iurLswOT3yzazr3FB7Oz3kgylz+u6LkkgujKyE1amHN2YyD6wj24MasiWqL1htUfdFKt
  422ANriL7qu6wf3Hays5AAAAA==
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: Yang Li <yang.li@amlogic.com>
 X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1785219886; l=3109;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785220002; l=3109;
  i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
  bh=5EgeiC5D9YMy9T7q0OAiM45TunnWa5Fy8xH/jWQT53U=;
- b=m4G0f/D3/jAaYufOpj4N7Z1KcwGUUwLTeN5a6x5mlsz9Xxnr04RMlc5ERhsNIb/OpBoF9vLSd
- NqaTTBK84TcCgk/wQBn6zL0ow0rAGjLJKvMgVRUkOJSEjNGeHrFtok6
+ b=UJTsfVlY6cZcJYmzkY0eThOqH0i20eHfvd35JPwmvOUGzHSv8OsfWfySXvEhkWOcMw2xnveKv
+ 70LBSeCz4mGDDiHfI9N5l9f5CyCdOVy312/trjsKR4mqfamyua6OeGx
 X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
  pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
 X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
