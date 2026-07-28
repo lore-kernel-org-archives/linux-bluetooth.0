@@ -1,167 +1,103 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18A7330668
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 16:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEDA368291
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 16:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785254480; cv=none; b=eQ7i1/QvyWBYGds1UzjwUSUJIXBR1L6BGxEuhzfW/fPzYHVqFI26I48an0KDdIRQPbV3k4eBvG8jH4Q79ysgWylPKfV9yWoaYLpt8TkgpDckayTeS2BWLwuiW2Jt4Q1Sq0Vp9Oe9/8N+GF68dmhBxSXcA7kiVhaAwaUIOgZcoso=
+	t=1785254938; cv=none; b=le+O9QwfBrFzL/o7d4LIQ5e4D7XzItck6pKtt+o2mx0MpN3wylCWWtE62iI0yW/LtkIa+C9WxYCgTUM7aKtwSEAsYMKatioJbDPHNrERSXqHFVE4CXoK7aMKB4OVJF/dE6UEsUpn2xJNhjNq6dYPlJz7AaePpZcC4IXiWlyj9n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785254480; c=relaxed/simple;
-	bh=0UbX4+Fy4W6oJOwGg0BCEyRPI+BqZg4b5igrMxafkAE=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sjhkilSec0/TMOO8cOxZhBpX2/FQuU02gn8YM1t6y9dKgjJqZHRqUH0fjRuFES9Tefh/9ypYuSB8oHUa5HiXAywPjzSY/9V4KEMd5AlhH9rdVRaetKHe1a3NRrl3xd6TX0vMCS0wUmAGa+U5r+3Ux+msSCIqzEUuv3/VwvZwMC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DE0973EDA5;
-	Tue, 28 Jul 2026 16:01:09 +0000 (UTC)
-Message-ID: <12e961a0fdd2211fbca60a5ace35ae4490e53c1a.camel@hadess.net>
-Subject: Re: [PATCH BlueZ bluez v3] bap: Start BIG sync after receiving
- BIGInfo
-From: Bastien Nocera <hadess@hadess.net>
-To: yang.li@amlogic.com, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 28 Jul 2026 18:01:09 +0200
-In-Reply-To: <20260728-big_sync-v3-1-c2da19f3c00b@amlogic.com>
-References: <20260728-big_sync-v3-1-c2da19f3c00b@amlogic.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1785254938; c=relaxed/simple;
+	bh=M5kzdAEoPc5rbNRA4KFaC+3yUnwETH5W42yryDQOE1E=;
+	h=Content-Type:Date:Message-Id:Subject:Cc:From:To:Mime-Version:
+	 References:In-Reply-To; b=sTLHQffy6mlAK9+V7DzAvqvHxmZA/xUWc6XrzlezPbKwmvGe+i0bv3Ay8d3SakPWPaFdwRXGyGQbZZnU4TVPzQKRFAn9ojs8uxhvur2mhO5LB+KA8+bIA2jNoegcgSWvc/dFi8MVxHKqI13ckF1HCFY1oioWaesWboz2LCxmWNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me; spf=pass smtp.mailfrom=rcpassos.me; dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b=l3F46aSm; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=P5zPGlB5; arc=none smtp.client-ip=34.202.193.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rcpassos.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b="l3F46aSm";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="P5zPGlB5"
+Authentication-Results: purelymail.com; auth=pass
+DKIM-Signature: a=rsa-sha256; b=l3F46aSmkFjbDMkvZyRLDqImJ+0Lly+fJpq91VYTlIdfGTGI3T3JkVCrm4zLtacaJjjm3Qu/8whd0mKQVnwORd58j/qc6fJxA5+XLExezed9tsmmD74uGbs+8OtTe+t0q3wivfKLXiatDHJgbxa5JQoUxIDX8dpwDmDOXF+isKhbzlj2HIZIrJOJF/tbZ1q4/1nHWo7D4sn9nT93M8k4AivQkUQbbpFjKXWeY/KQIuAzdK71t6NuE3+frkOZyt39DcRrolBf8tB9b847THB+RHxrOUIH9UmfOPMfDXKVITjgg7W6trM2L1zF5YTTn/F/S8L0c1t6SIyd8ogHdNpDjg==; s=purelymail3; d=rcpassos.me; v=1; bh=M5kzdAEoPc5rbNRA4KFaC+3yUnwETH5W42yryDQOE1E=; h=Received:Date:Subject:From:To;
+DKIM-Signature: a=rsa-sha256; b=P5zPGlB5yHHFcn3IccLp9PNbpyOLLiRLnkBkOfCwxBebxPWXMhDF824GmHB3kh0mYAKqnuUh2V2z1LNtYgjlm6GrzH/5awBF4ueoGX2ZdnGJ3AZ3KiPr+e0Zy3l1XjMtNBMe7vRNaKtdpK6mReb8hBbuJIreaUDAOQ9EWE0vIotUnSVj9R7YNm3HYKRwwX04c8YjB/utJpD8nrjkuaxIbsGixf2otmkbWYseXM4p+XB3d0GQrf4wbil3ET6/ORlMSfEE/jINnjGdUTMgXyRjJTpyJfiNt6Ft/xNzM6CVc0YvQRnda3Aw5uMwlTwlTsBl5dJCVc3XQIHWxr53q5q62A==; s=purelymail3; d=purelymail.com; v=1; bh=M5kzdAEoPc5rbNRA4KFaC+3yUnwETH5W42yryDQOE1E=; h=Feedback-ID:Received:Date:Subject:From:To;
+Feedback-ID: 45355:7809:null:purelymail
+X-Pm-Original-To: linux-bluetooth@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id -1239418384;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Tue, 28 Jul 2026 16:08:37 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 28 Jul 2026 13:08:33 -0300
+Message-Id: <DKAC1T7FWOBS.15ACCNTX4EOFA@rcpassos.me>
+Subject: Re: [PATCH v2] Bluetooth: Properly disable remote wakeup for
+ MT7922/MT7925 on Ryzen platform
+Cc: "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>,
+ =?utf-8?b?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
+ =?utf-8?b?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
+ =?utf-8?b?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>,
+ <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>,
+ <linux-mediatek@lists.infradead.org>
+From: "Rafael Passos" <rafael@rcpassos.me>
+To: "Rong Zhang" <i@rong.moe>, "Rafael Passos" <rafael@rcpassos.me>, "Marcel
+ Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "Matthias Brugger" <matthias.bgg@gmail.com>,
+ "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTGJH3z8ACo8l0V5C5m9CZuIiwPpz8VP1Zdpp6sLk2PSqHN2nhYSoxYD3Fqm/ySTt0ASiRUbuclbRnM17pQnPlHdvlzE1sGaEL0YUOoWWH5WnHCWVFdUiXgQ/8+n6/uU/ceaY3Xq8KDItvQdbxpWh7vI070fM71Gx0ALYXAjiXGRa7BUgml5+I+IV9V4n4RFQpKK24x8rq14fSnnYCT3fAhdc8fFnWCcyhatx8MMK+c7e6XsSCmag6wwA/UZJJMFMkBvE5PDKyWSH32/pJZ261F/wNUGiTyGRjTa/Bf36QsDF1NSuEjOqhCvnK7m9DCja1Up/BcmvCYFRR6eEU5bvoZPHgAngL3NYXK2ajVT7j94aZW+gemEJsft5U3WkOFK8R8xgDNNXrHtYQEm4tkZZdmKWDlXndBfY3iYiQG/GyLQFTEbGEYdtekE5Njb5VpvjqJh/QEKsMPO8XTRh6QRBDncEedlWZOkHYjMOND0sE6EXkrJt1bXReXESCKKuVu5MCMRwgO2KebQkUAWO/S5kA+VOKIGED0gArb0hJP/gtie22q5pNu3gBWrW4ERuMMruf8sncWlJlpOxGzKrifasRmqA5ePgTxe+ElL3GEpkTs2S8hRZLcHFjE+oL41t/5TMiywegV6gs8BgcRLyfs4qD55TpiNFEU+zKe5R1EgSpg8Lw
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: aerc 0.21.0
+References: <20260701-btmtk-ryzen-remote-wakeup-v2-1-767ac7907472@rong.moe>
+ <DJRKO72HWZOI.QJYJUAC45QOJ@rcpassos.me>
+ <79D5F3E6-8F40-4422-BB2D-16691E377394@rong.moe>
+ <DJRP3YO7Y0WK.20KNRZIMX1CYK@rcpassos.me>
+ <F16A2A9A-A43F-45FE-8CC0-44A129360D47@rong.moe>
+ <DKA8F33O8HID.2UV2DWTLE6S48@rcpassos.me>
+ <133c4858657c55b31affd4bff1cbd68f812de5e1.camel@rong.moe>
+ <DKAA9VN5E4DS.2U03T6V5HEAAE@rcpassos.me>
+ <1ba1545c318214d988e899a95279b4b0f93bc24e.camel@rong.moe>
+In-Reply-To: <1ba1545c318214d988e899a95279b4b0f93bc24e.camel@rong.moe>
 
+Hi Rong,
+On Tue Jul 28, 2026 at 12:38 PM -03, Rong Zhang wrote:
+> You snipped too many lines. There should be a line similar to
+>
+>            |                               +-0c.0-[0d]----00.0  Advanced =
+Micro Devices, Inc. [AMD] XXXX [YYYY:ZZZZ]
+>
+> which is the root hub.
 
+Indeed.
++-02.1-[04-0e]----00.0-[05-0e]--+-00.0-[06]--
+|                               +-02.0-[07]----00.0  MEDIATEK Corp. MT7925 =
+(RZ717) Wi-Fi 7 160MHz [14c3:0717]
+|                               +-03.0-[08]----00.0  Realtek Semiconductor =
+Co., Ltd. RTL8125 2.5GbE Controller [10ec:8125]
+|                               +-04.0-[09]--
+|                               +-05.0-[0a]--
+|                               +-06.0-[0b]--
+|                               +-08.0-[0c]----00.0  Sandisk Corp SanDisk E=
+xtreme Pro / WD Black 2018/SN750/PC SN720 NVMe SSD [15b7:5002]
+|                               +-0c.0-[0d]----00.0  Advanced Micro Devices=
+, Inc. [AMD] 800 Series Chipset USB 3.x XHCI Controller [1022:43fc]
+|                               \-0d.0-[0e]----00.0  Advanced Micro Devices=
+, Inc. [AMD] 600 Series Chipset SATA Controller [1022:43f6]
 
-On Tue, 2026-07-28 at 14:26 +0800, Yang Li via B4 Relay wrote:
-> From: Yang Li <yang.li@amlogic.com>
->=20
-> The current implementation starts BIG sync before receiving a BIGInfo
-> report. According to the Bluetooth Core Specification, BIG sync
-> should
-> only be initiated after BIGInfo has been received.
->=20
-> Starting BIG sync too early may cause unexpected controller behavior.
->=20
-> Trigger BIG sync from the BIGInfo callback, following the same
-> approach
-> used by the short PA flow.
->=20
-> Fixes: https://github.com/bluez/bluez/issues/2345
->=20
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
-> Changes in v3:
-> - Fixed coding style warning.
-> - Link to v2:
-> https://patch.msgid.link/20260727-big_sync-v2-1-053fd3bcc3be@amlogic.com
->=20
-> Changes in v2:
-> - Fixed build error.
-> - Link to v1:
-> https://patch.msgid.link/20260724-big_sync-v1-1-0a35013e30ba@amlogic.com
-> ---
-> =C2=A0profiles/audio/bap.c | 25 +++++++++++++++++++++----
-> =C2=A01 file changed, 21 insertions(+), 4 deletions(-)
->=20
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index dd4b3c8ff..473e4cfc2 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -3650,7 +3650,8 @@ static void setup_refresh_qos(void *data, void
-> *user_data)
-> =C2=A0	setup->qos =3D *bt_bap_stream_get_qos(stream);
-> =C2=A0}
-> =C2=A0
-> -static void iso_do_big_sync(GIOChannel *io, void *user_data)
-> +static gboolean iso_do_big_sync(GIOChannel *io, GIOCondition cond,
-> +						void *user_data)
+> In the foreseeable future I am not going to have a desktop platform ($$$)
+I was lucky to upgrade before prices went up.
+> so I can't easily debug the issue myself. Hence, it would be helpful if
+> you could reliably reproduce the issue, so that we can have an in-depth
+> debug. But let's forget it for the time being since your device works
+> fine now!
 
-The return here is for:
-"The function should return FALSE if the event source should be
-removed."
-Not success or failure.
+I wouldn't mind helping debug this.
+I will look into buying the M.2 a/e -> USB and the PCI -> M.2 a/e.
+The bug first happened when I switch from Arch do Debian, months ago...
+If I can reproduce it, I will reply to this thread.
 
-See:
-https://docs.gtk.org/glib/callback.IOFunc.html
-https://docs.gtk.org/glib/func.io_add_watch.html
+Thanks,
+Rafael Passos
 
-> =C2=A0{
-> =C2=A0	GError *err =3D NULL;
-> =C2=A0	struct bap_setup *setup =3D user_data;
-> @@ -3659,7 +3660,7 @@ static void iso_do_big_sync(GIOChannel *io,
-> void *user_data)
-> =C2=A0	struct bt_iso_qos qos;
-> =C2=A0	struct queue *links =3D bt_bap_stream_io_get_links(setup-
-> >stream);
-> =C2=A0
-> -	DBG("PA Sync done");
-> +	DBG("BIG info received, do BIG sync");
-> =C2=A0
-> =C2=A0	g_io_channel_unref(data->listen_io);
-> =C2=A0	g_io_channel_shutdown(data->listen_io, TRUE, NULL);
-> @@ -3682,6 +3683,7 @@ static void iso_do_big_sync(GIOChannel *io,
-> void *user_data)
-> =C2=A0			BT_IO_OPT_INVALID)) {
-> =C2=A0		error("bt_io_set: %s", err->message);
-> =C2=A0		g_error_free(err);
-> +		return FALSE;
-
-This is wrong, this should be TRUE or better G_SOURCE_REMOVE.
-
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	if (!bt_io_bcast_accept(io,
-> @@ -3692,16 +3694,31 @@ static void iso_do_big_sync(GIOChannel *io,
-> void *user_data)
-> =C2=A0			iso_bc_addr.bc_bis, BT_IO_OPT_INVALID)) {
-> =C2=A0		error("bt_io_bcast_accept: %s", err->message);
-> =C2=A0		g_error_free(err);
-> +		return FALSE;
-
-Here too.
-
-> =C2=A0	}
-> +
-> +	return TRUE;
-> +}
-> +
-> +static void long_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
-> +{
-> +	struct bap_setup *setup =3D user_data;
-> +	struct bap_data *data =3D setup->data;
-> +
-> +	DBG("Long PA Sync done");
-> +
-> +	/* store io and add watch that will call iso_do_big_sync */
-> +	data->io_id =3D g_io_add_watch(io, G_IO_OUT, iso_do_big_sync,
-> +							setup);
-> =C2=A0}
-> =C2=A0
-> =C2=A0static void pa_and_big_sync(struct bap_setup *setup)
-> =C2=A0{
-> =C2=A0	GError *err =3D NULL;
-> =C2=A0	struct bap_data *bap_data =3D setup->data;
-> -
-> =C2=A0	DBG("Create PA sync with this source");
-> -	bap_data->listen_io =3D bt_io_listen(NULL, iso_do_big_sync,
-> setup,
-> +
-> +	bap_data->listen_io =3D bt_io_listen(NULL,
-> long_pa_sync_confirm_cb, setup,
-> =C2=A0			NULL, &err,
-> =C2=A0			BT_IO_OPT_SOURCE_BDADDR,
-> =C2=A0			btd_adapter_get_address(bap_data->adapter),
->=20
-> ---
-> base-commit: 89d477bb5494eef0b24e5667be62f854da250a97
-> change-id: 20260724-big_sync-45c24ec09121
->=20
-> Best regards,
