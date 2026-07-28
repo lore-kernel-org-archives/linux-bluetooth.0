@@ -1,165 +1,174 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117671D5CFE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 20:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3324474262
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 20:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785269737; cv=none; b=JcVhELyzlT7FOOc9oxAk7WbJmzD9HWKtSMvCKeeO/l8F1reG67c37c+g51hljZLFfpeYlKONM1aG9wockLxrtQ1Ea5j5pYsmJkkdo4sfagabxysrBMYQp21pJ1znfKSE4yLgFhmfmUMipiGm6kcE9szaoN5byz3oVRZXahBSOP0=
+	t=1785270618; cv=none; b=PlmfKI2phhhwMob3v+piFoWJGBm27/yCQ8ONRO+qqftRryd2LACpifnhxaqFc6EI02dX1AxtmUPUTgjZ1UvpuTnVyGsl7/EWgmkI2HxH6cto2+GOW3FGIHYt5SjfuoceUvD6MTijrqtK4glTmAXXThqoVjrR/0vc9WxiU/T3380=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785269737; c=relaxed/simple;
-	bh=GBpRrOVmi7JNzkhTZgZnofItQpSe0DOh1g0dT8AmpEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BLAjZPuC9UCl/cCFp5g06mcH3YrrnhxADxKWGydpl+dmbRiWN/CjcckkX/EwyHRR75NKIvzLgZB2nrLyvlRe51NIzt1wBaL2H041e5XcGcc+iktqRb+FUtOmqHmlO3W3gAVag312Bhy5q7Ls5euMFGWFW8juEWbkavycueiWfxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R6/10E02; arc=none smtp.client-ip=209.85.221.179
+	s=arc-20240116; t=1785270618; c=relaxed/simple;
+	bh=grqotrpH1Kg3aSCg/ZKuhKIQ2lZFybYXZoq3/fS5aqU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=E/jMhlw5WkmAcQvYXCBJKy4aJCvI3yubDJE0YkfFHzDizrraDH0RmJT1QpRmRavhORcw2DVnnxbsch+kZN89lgZ/tp4A6Iz3IwBBauO1rQu6Q6dVXk+qCY7L9EnPfYhqhKtGE8zMrKJi0lpMEQe20feTTKo1fJB0/tnoWLQXO6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oXNJUzep; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6/10E02"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5bfa6766cf6so92579e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 13:15:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oXNJUzep"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cc891373e0so3697695ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 13:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785269735; x=1785874535; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=AgFewBM+P7dksOw/4iikngQqad0tjKaW9YEAK0T1Clc=;
-        b=R6/10E02KgqQ3VSX5teGLpRz9wREKSR38llBNHmjWssRO1e0gyddLhLEC86Sd4M+I7
-         S9yu99XHcrIESf9zO6EV7AbLdN/TzRIoIGuGqduEhTVZGUOJHqEIQriJK/FvQGeX8kck
-         8cv2Ria0yzDGYre+DJeD7T20nVGuDHDiIc5SSUwIonC2BUn7yvahrerM8sY3w+jyNKM9
-         O0agjdTIcjt+VNQiHi0qoF7c7kbTAN5wSrxAp6Z5NCQ7bwKgy5sbaOg0j9sBFpOA+vJ1
-         gKRSmpRY54vB08Q2YhJGukkTPQj4JJDqQXp5DM7EjlbZ3a6k3duAzfHi5npBfiSbQDMj
-         2pXQ==
+        d=gmail.com; s=20251104; t=1785270615; x=1785875415; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=PhRHMGl8PlFNbjJFNwgPgvUy+NQ/qtbb0z1mCDGUfVg=;
+        b=oXNJUzepB3mctq3wXHjnwkGHndPbf0FtQg1onV0dmUJ4rHinRvRdpL2qxHbR2Y6RjC
+         FzOy9Xef6jfJ7V120vnHKC+qKeVf6D5o4zyV5QH1mJjw2IGFUWzKehfkxYe752prJ6k5
+         zr66O2JUy+4IlMSlQDu/9R1JLQAtF/rYU7PJG8ek+PwB1ZKEn3NNyNw38Q/g0INtBTpx
+         aXsg+b3YTd6ayA8PXRgh70XSBfcBZiWYDapOnYXMyuz0zeXu6BX8wonUliuefEhHfn7X
+         fS9D2X6fcrFWJud/EtuVQcPCtnNzkfqJBI42+pLvIQC4uQO5DjfxlZ/i5f3SHO1jRyL/
+         DxGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785269735; x=1785874535;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=AgFewBM+P7dksOw/4iikngQqad0tjKaW9YEAK0T1Clc=;
-        b=YBTD9vTqiCHsaeiN4Eedn2T0O3YWz3KItMUO40CyNwNuT0sVtCfVcv4o//Fis8jSrT
-         lG3bWmrOgloJ6Iimp0aNPAFelwRawjIkZ/lAoF+ri62miLOSZMcq4xn0revpEG/gdp1H
-         63yXllUQ3OL2GKOvDkZqc/p6lnRrgLOqeJD4QrkCHWpqDxoSjRyWDkLOZ0yTtFfCFvq0
-         pi2Ep4t5q6l7mT07g9iffE8Kie0Q/wSmNjAjvZOAvmrV0rV4HneNDINBp9+DkiYEMTmQ
-         t6XjGjfZQajRyL1GIHaZkyQXP2pcCRGEgSrQIYLGuk65Hj7AG/2stKV269kKo/uXBnNo
-         N0iw==
-X-Gm-Message-State: AOJu0Ywt55PTgBoeeXuOux27LsoVIQ7XEN1SE29CblR6JiGsH59KiTwd
-	CpNEno/Nlh3B75cie61nelU7iV+tJN79Qo0TjFBwsIO2FPYu7Kn31N53
-X-Gm-Gg: AR+sD11DZI3wBKFlBWBUAWDUE3SC9ovHfzi8Gz+jSF2uO4kRCgMDQ609nlbTn/oZoD3
-	99cbYs0AAkAs7+Vu2EbcyHYImdKHZeaabnl33dILKIvYwaQ+zj7sTW7p3Tv3Uf1XxrOWsBH6UTb
-	KqHd+/qX2LCpXnBHDunpr0MOLsSMRZibakDyYuDyHlBhgw3a5/eG5ozs4XekrJzIVLi9x7G6xck
-	vrIpRj9b5GIN/dEq2cP3bLppZY+O4POJ6j5DrP6kQ936IvYfN7GHfMI+QxaZOfHtUB/K/SMts3d
-	WDHVGV5GuGwsPFXvGKzvQOrflq2tIiGAgt0x/NbByQEkf9n8oIjR37RD5hKq7Tpox+xUQ0PUcTx
-	xwVZCl2ap1QyfrHq3myaAcchJxP5MNmtQfezKZh/825KxUuo5ZTskC/BFb2+2N+YrBpyNVrJKvB
-	hQHrBMaAEaDDVJXMBB+hdXMfrBztyf35BERsR8/UNenqJU3HtMCzQTjD7GaVsBar8HkjLoJVPQ
-X-Received: by 2002:a05:6122:4d81:b0:5a4:7e8b:3171 with SMTP id 71dfb90a1353d-5c33fa833a2mr2164406e0c.11.1785269734867;
-        Tue, 28 Jul 2026 13:15:34 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c34f280583sm393616e0c.17.2026.07.28.13.15.33
+        d=1e100.net; s=20251104; t=1785270615; x=1785875415;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=PhRHMGl8PlFNbjJFNwgPgvUy+NQ/qtbb0z1mCDGUfVg=;
+        b=d+rtPNthgadNtH8LfXRH6CImSyfiJ9I5L7bRRNNkyHWf3ElX+hkf1b5ebsYOlXPID1
+         8zGrKvRLkKvo/YCxmOyZ8Zw7GmNNdMVzD+o0bTmUF7kPnwy86lPG6bTz0FpuIfBw9yc1
+         UY6nKUWZDS9kbLUf66vqRnFKKyyvteO+P/D2OGwz1cln9tWs3zYRt7e+nMVkgjbE2eCy
+         jyVBPfj2AcEEI02BGWE9XdhOyU4aynxsMMP6eiUcWUr1VoxQVjvvcahrfqAcUjP/CAJm
+         si9ZPajluZJDKxbcviLyy6GEu9HdMc0a2l9pRcAuJak3zo5qGHXjgJVsejy3lH52IlWE
+         SPTw==
+X-Gm-Message-State: AOJu0YzQPdbI3cfno9nZjHHPvfn4SvLJa8oRmeRsgNIEFuAr0jRXY8nB
+	eA9qifhukB+otg8iltlYJ1YhoF+iG9Doniq0QtuvI8sx6ZzajRMZvER3AWzYdw==
+X-Gm-Gg: AR+sD115Lss2Ho6EXNV7UYvHGxrUy/odZYLSLZplobgGgp8sipqPWpvuZ6p4/tOLNEO
+	gkL15443SqEfz6G5JPSZmodRZ4ZKCoVVJU+Vwl86FgKZhIv7YA6FwfdiLzALACRzcpzu9TFXyzS
+	z3tHwZ8dbRdz7ow0ieez0mFLYFgdCxETcn0KbFRDL+GeYYOmw/zOc+BVqSTGH+M24eVe1ZFX2Up
+	qq6rR4ZCfXIaXkknF1io0rfXWzqkoF8EWbcCkpUBv/AXKyqpeGTHNJVVb5/qgtu4EHV+uRH90IB
+	WbzpzwedVEInVtxd/YyikvSY5713t5wfuJSQrwoHwhYHoDLaAybfc4G30SATz+hWWZnmjCVPdbY
+	QDSUU5Oy9EXHHMtswjcdZZ+3ADtLn13BQQRLTRD7sdH0yN+p1sJ3vOoWDojfkd+hR0WnUiGWFiC
+	JY5JooC0EI3wB18HzjVLeMIkOMqwui5SN5m+AOUL7WRxsIcZT5+ttqDLrEjzojZwgroGVb
+X-Received: by 2002:a17:903:2407:b0:2c9:960c:f73b with SMTP id d9443c01a7336-2d015d22dd9mr47045335ad.24.1785270615057;
+        Tue, 28 Jul 2026 13:30:15 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.247.178])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b670cfsm1774961eec.8.2026.07.28.13.30.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 13:15:34 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-07-28
-Date: Tue, 28 Jul 2026 16:15:27 -0400
-Message-ID: <20260728201527.2456032-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        Tue, 28 Jul 2026 13:30:14 -0700 (PDT)
+Message-ID: <6a691156.21a19891.1e44db.73de@mx.google.com>
+Date: Tue, 28 Jul 2026 13:30:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8215124910164255846=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,1/3] Bluetooth: Add support for Shorter Connection Interval (SCI) feature
+In-Reply-To: <20260728182011.2334554-1-luiz.dentz@gmail.com>
+References: <20260728182011.2334554-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The following changes since commit e095f249e2209674f6366f6db0383a2b96e19239:
+--===============8215124910164255846==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  net: ethernet: mtk_eth_soc: pass eth to mtk_handle_irq_rx in poll_controller (2026-07-28 15:53:49 +0200)
+This is automated email and please do not reply to this email!
 
-are available in the Git repository at:
+Dear submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-07-28
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1136133
 
-for you to fetch changes up to abd93c85c8667add738ee82aeab95dd9fc8265a2:
+---Test result---
 
-  Bluetooth: SCO: give the socket its own sco_conn reference (2026-07-28 16:13:48 -0400)
+Test Summary:
+CheckPatch                    FAIL      3.94 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.63 seconds
+SubjectPrefix                 PASS      0.20 seconds
+BuildKernel                   PASS      27.22 seconds
+CheckAllWarning               PASS      29.83 seconds
+CheckSparse                   PASS      28.29 seconds
+BuildKernel32                 PASS      26.08 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      502.86 seconds
+TestRunner_l2cap-tester       PASS      64.25 seconds
+TestRunner_iso-tester         PASS      87.98 seconds
+TestRunner_bnep-tester        PASS      19.65 seconds
+TestRunner_mgmt-tester        FAIL      227.70 seconds
+TestRunner_rfcomm-tester      PASS      26.75 seconds
+TestRunner_sco-tester         PASS      33.64 seconds
+TestRunner_ioctl-tester       PASS      27.17 seconds
+TestRunner_mesh-tester        FAIL      26.87 seconds
+TestRunner_smp-tester         PASS      23.54 seconds
+TestRunner_userchan-tester    PASS      20.04 seconds
+TestRunner_6lowpan-tester     PASS      23.07 seconds
+IncrementalBuild              PASS      61.52 seconds
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2,3/3] Bluetooth: Add MGMT Load Connection Subrate command
+WARNING: Prefer using '"%s...", __func__' to using 'load_conn_subrate', this function's name, in a string
+#369: FILE: net/bluetooth/mgmt.c:8178:
++		bt_dev_err(hdev, "load_conn_subrate: too big param_count value %u",
 
- - hci_sync: Fix advertising data UAFs
- - hci_conn: hold conn reference fixes
- - L2CAP: fix UAF in l2cap_le_connect_rsp
- - RFCOMM: validate skb length in rfcomm_recv_frame
- - ISO: Locking fixes
- - SCO: give the socket its own sco_conn reference
- - MGMT: fix UAF in pair command cancellation
- - MGMT: fix pending command UAF in EIR updates
- - HIDP: reject frames without a transaction header
- - HIDP: validate numbered report payloads
- - btmtk: Fix short read errors in btmtk_usb_uhw_reg_read()
- - btmtk: Fix short read errors in btmtk_usb_reg_read()
- - btusb: Fix short read errors in btusb_qca_send_vendor_req()
- - btintel: Validate length before parsing diagnostics TLV
+WARNING: Prefer using '"%s...", __func__' to using 'load_conn_subrate', this function's name, in a string
+#377: FILE: net/bluetooth/mgmt.c:8186:
++		bt_dev_err(hdev, "load_conn_subrate: expected %u bytes, got %u bytes",
 
-----------------------------------------------------------------
-Aldo Ariel Panzardo (1):
-      Bluetooth: SCO: give the socket its own sco_conn reference
+total: 0 errors, 2 warnings, 0 checks, 337 lines checked
 
-Chengfeng Ye (1):
-      Bluetooth: hci_sync: Fix advertising data UAFs
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Greg Kroah-Hartman (3):
-      Bluetooth: btmtk: Fix short read errors in btmtk_usb_uhw_reg_read()
-      Bluetooth: btmtk: Fix short read errors in btmtk_usb_reg_read()
-      Bluetooth: btusb: Fix short read errors in btusb_qca_send_vendor_req()
+/github/workspace/src/patch/14716338.patch has style problems, please review.
 
-Jiale Yao (2):
-      Bluetooth: L2CAP: fix UAF in l2cap_le_connect_rsp
-      Bluetooth: RFCOMM: validate skb length in rfcomm_recv_frame
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
-Pauli Virtanen (19):
-      Bluetooth: ISO: clear iso_data always when detaching conn from hcon
-      Bluetooth: ISO: fix CONNECTED -> CLOSED transition on shutdown/release
-      Bluetooth: ISO: lock sk in iso_sock_getname
-      Bluetooth: ISO: lock sk in iso_connect_ind
-      Bluetooth: ISO: fix timeout vs sync_timeout typo in check_bcast_qos
-      Bluetooth: ISO: validate sockaddr_iso first in iso_sock_rebind_bis()
-      Bluetooth: ISO: hold sk properly in iso_conn_ready
-      Bluetooth: ISO: fix leaking sk after socket release
-      Bluetooth: ISO: avoid deadlocks in iso_sock_timeout
-      Bluetooth: ISO: ensure no dangling hcon references in iso_conn
-      Bluetooth: ISO: fix refcounting of iso_conn
-      Bluetooth: ISO: fix race of kfree vs kref_get_unless_zero
-      Bluetooth: hci_conn: hold conn reference in abort_conn_sync()
-      Bluetooth: hci_sync: hold conn in hci_connect_acl/le_sync() callbacks
-      Bluetooth: hci_sync: hold conn in hci_connect_big_sync() callback
-      Bluetooth: hci_sync: hold conn in hci_connect_pa_sync() callback
-      Bluetooth: hci_sync: hold conn in hci_past_sync() callback
-      Bluetooth: hci_sync: fix hci_conn_del() use in hci_le_create_conn_sync
-      Bluetooth: hci_sync: remove unnecessary hci_conn_get in create_conn_sync
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Sangho Lee (2):
-      Bluetooth: HIDP: reject frames without a transaction header
-      Bluetooth: HIDP: validate numbered report payloads
 
-Zihan Xi (2):
-      Bluetooth: mgmt: fix UAF in pair command cancellation
-      Bluetooth: mgmt: fix pending command UAF in EIR updates
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
 
-Zijun Hu (1):
-      Bluetooth: btintel: Validate length before parsing diagnostics TLV
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.267 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
- drivers/bluetooth/btintel.c      |   3 +
- drivers/bluetooth/btmtk.c        |  86 ++++++------
- drivers/bluetooth/btusb.c        |  30 ++---
- include/net/bluetooth/hci_core.h |   4 +-
- net/bluetooth/hci_conn.c         |  14 +-
- net/bluetooth/hci_sync.c         | 216 +++++++++++++++++++++----------
- net/bluetooth/hidp/core.c        |  30 +++--
- net/bluetooth/iso.c              | 273 +++++++++++++++++++++++++++------------
- net/bluetooth/l2cap_core.c       |   5 +
- net/bluetooth/mgmt.c             |  84 +++++++++---
- net/bluetooth/rfcomm/core.c      |   5 +
- net/bluetooth/sco.c              |  22 ++--
- 12 files changed, 513 insertions(+), 259 deletions(-)
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.678 seconds
+Mesh - Send cancel - 2                               Timed out    1.988 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/505
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8215124910164255846==--
