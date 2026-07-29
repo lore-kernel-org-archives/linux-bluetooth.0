@@ -1,121 +1,98 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF1340A953
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 23:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B7C4369A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 00:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785280861; cv=none; b=IJJ7Jd8V9FWtSK2HODC/LKIpRY8OjF1aQzXy8qNuQlr7YRd2Xf60gZn8/dYNXJOVOOmD1bGIo0NuJMWa/f282rc4yMulerhem1Sl48u2M/SY4gYAwhJiEikdYP2oFoNrfKQz6pWjK8jrv3pUSXH32GOEkgqXAH5cd40NHHZJrXg=
+	t=1785285080; cv=none; b=Njhw7g/4PHEi9KR7Dm/u9yUVUJrZZX2PrjwAIWzLOmqhQua1ga8S11alh+H7OPEB9l1aHHGPpEOz4ZeemTTMPJurH/vJHnAZV4kZCXfDhAY+55MZnhYAFEJT8rDrgsj0921YYGkP3bsAmqp8rBlD9rTPDNL7y+eFVBZKU66VR2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785280861; c=relaxed/simple;
-	bh=ODAPbLv3Fef4h1TRG8NhRGHTXpYCtz+NApigEuvstNs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GdS22nd9c62sOHp+I0OOIjmWW/SzqOuCPZiNJ7dXiBjAy/HPAGqzhM3adDUvb5/IejQJ5OKTQS5E5p+EAyRi4Y6fH2+UfTV4F/otlLCme+0hbN166y6FCdY1wH5GihImYIvvAVgNba5Tpp+6gPeqIypU/vlJ+reY3ev8i9fwEGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3lPMFzA; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785285080; c=relaxed/simple;
+	bh=0vrX8e0vUswh1aNBdbAdhkn7LBgsDXbph2pVM4ethuA=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=ToIMAm3scNL8HRzFCiIsSIBDNfodd8gUthxLc2kfoM97fxtqubacibQslHDpOaAMYbX91Me/W1TdbovbvmapFRG8y6OehcFJ/lYIDA8i8RMPiFn2e1A7/2HGQFA2Il/ou29oy7REWKj2BspUFuUfYJe6mC6tpiK2WqZYkWTpR40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CZGPIsaH; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3lPMFzA"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c15bf5000so2041301cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2026 16:20:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785280859; x=1785885659; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=tq4LvkhDyUYDMcm3CsQwDAlWv76Yp4qi4S2UeIUJDho=;
-        b=c3lPMFzAFyNhoA/9K7EvrYrgM6pXYYxGmON85GnXG31OC0VzXfb/lX20KzbhACn16B
-         svvk0M3S8/BTE+LQkK3Sytq/v0RQiPVL8+gGCrJ2GzSkb/GUEkZfDhg7f5EtUwN11bLx
-         qJVCsjbobbBkKaEnc5MD1Sw+rf+yFzSmUvlkQAijHRjkNctp5n16aYSQhhVUTuN0h5BH
-         SuXZBQa/mKVTOYrp0Cl9koxUsipGnasi8DxWkejCOFUDIGJ2ZiwCa8tJ6DcUiQES35S7
-         Ik2hFo9vwURuD04nyhIM3mvoQPUT/+Kr1fjrY0jSuFWU1Bby3g17krmZCcriK/468Ujk
-         frXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785280859; x=1785885659;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=tq4LvkhDyUYDMcm3CsQwDAlWv76Yp4qi4S2UeIUJDho=;
-        b=mnM9cj5Sq0Sdg+wIQAR+pfBDa/bW3CQQ8bWyg1Kdt/M16n+r/XzwktI6eE7i0qECa9
-         CsaLwK3z9bpmSSerstUVKeiuwMIxmGXILQPMHjYkBiienl6XrBnIr3/4N5UP44BfGfxo
-         Z69NI2tBXbfQ09PKQ5p0jdOKU9DLqCh9EQfPsHuQW1F2jNggJzOCPbhKSzu+0GMoOn+P
-         aUII7+pMH0GEcijx7xADQoe2f3oWPD948BDIKbILNnEkYzG9Zy1sRmHx8urusdnUOOat
-         H+56IxEVo7TZWyQNiYVqCaj6702Mxcm+vyBdkEgLGnRs0V8n9ySokv2QIrtEK57z+IIi
-         VkdQ==
-X-Gm-Message-State: AOJu0YwHVfamRqovw4GyNDk5AQJS7/AG7Gnk1e4EavVH/1h78eQEcu79
-	2T+551GJfgoLnfFNJo688vtAn4nxR86dMa+LtToJWbYCpA13cffSKkQ5eCDdXw==
-X-Gm-Gg: AR+sD12X0CWwvGjAL2ihhgjn1eqc0JKu9kIlMSfEW7OWHr/j1YnigqcrpuCHD7YaQw4
-	9dXXZCWL0K7WLPvnUCsoTm2KA6673ODJb16Q0XTfGPTIvqhG/JbIz3w5HzZvz5Ddh+fl5ZXoKc2
-	P7g7P8sxa7pmVq/S+fdgg74KRUdFLc8Km4SHm0ToFrnmIXHmvEprdqzcU54U/hQABtkGmD4BCdq
-	iukmGRjvl3del3UD/f/xygDm8gcFoqMlzgH7Ev1EClHAIasNrmr70tGa0aeCKHWj9XgkjAUkZbR
-	QUMXQCXrlQSCP52iProQQYxy6725AveiyHqWvVnQWuQkZrdXCuVEqgiXiu0S0YWHXQfjVhdyUum
-	I4VRN4M1QdfTp6OBBHYr0o/sKAAQpv3ezVTAIRNMLrghwo0TWZtqt2kzmD6Kgt3Af9wv9xSDLbf
-	GB2MssDEiEmOVK+dllJL/6sQPQKE+YWOyYsGjy8q7aU89ODPFfhQX4x3k5RFProkNs6KwXcD+V5
-	Rp2+HE=
-X-Received: by 2002:a05:622a:1b10:b0:51c:1ff:2515 with SMTP id d75a77b69052e-529d7135d23mr41229591cf.65.1785280858971;
-        Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
-Received: from [172.17.0.2] ([172.214.45.194])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529e2d822dbsm7899451cf.16.2026.07.28.16.20.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
-Message-ID: <6a69395a.b5fdfa5d.fb43f.151d@mx.google.com>
-Date: Tue, 28 Jul 2026 16:20:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5327239976132046555=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CZGPIsaH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1785285078; x=1816821078;
+  h=date:from:to:cc:subject:message-id;
+  bh=0vrX8e0vUswh1aNBdbAdhkn7LBgsDXbph2pVM4ethuA=;
+  b=CZGPIsaHHmcjuZFZpKU3Fx93MNEGWSx83+zr5MbNKikspj2+M6sz2NX3
+   aJw/xpAcDU5UOglvFjezeQ+QQ1umOxAsLr5nlvq/R3roM7MShY2ivxFdx
+   gqpNVLzdHDv+f9b9vAZJjHDUiaek1gQAjd6FGF+j6Gp91PCyXR0Amx4AV
+   Rk0pdGCvq1STMD1Jv/1nT9DH0ynmQw2gU77mzieaUisi9gQsrwqwnkEbd
+   8vF89sn2nQ+zIbAIM9SgQJS6/wpllSnGBKiipY8iYpoVmsPOJkQ6iC5w7
+   mxoyd1qpY1Gcq5QhijzSHbnWoHkpZTkNzUySixRUrA0x8YJ+1kNV8mg69
+   Q==;
+X-CSE-ConnectionGUID: vKsx1BmJT1KAydpKEUorgQ==
+X-CSE-MsgGUID: xilxl/cHRs2nXgx3B5ffhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11859"; a="97395238"
+X-IronPort-AV: E=Sophos;i="6.25,191,1779174000"; 
+   d="scan'208";a="97395238"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2026 17:31:18 -0700
+X-CSE-ConnectionGUID: o7B8zieDRO24JKi06ZmY0Q==
+X-CSE-MsgGUID: imWg+K0EROyHYGdI+JWxdA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,191,1779174000"; 
+   d="scan'208";a="255939597"
+Received: from lkp-server02.sh.intel.com (HELO ea128546eb3d) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 28 Jul 2026 17:31:17 -0700
+Received: from kbuild by ea128546eb3d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wosCY-00000000et9-46ld;
+	Wed, 29 Jul 2026 00:31:14 +0000
+Date: Wed, 29 Jul 2026 08:31:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ a7ef68421906a8b1c4204dda9b2e52b90f6fd2ba
+Message-ID: <202607290855.XzXfUfTt-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, deaner92@yahoo.com
-Subject: RE: Bluetooth: btusb: Use DECLARE_FLEX_ARRAY() for qca_dump_hdr
-In-Reply-To: <20260728212431.106411-1-deaner92@yahoo.com>
-References: <20260728212431.106411-1-deaner92@yahoo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============5327239976132046555==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: a7ef68421906a8b1c4204dda9b2e52b90f6fd2ba  Bluetooth: btintel_pcie: Add vendor_reset PCI sysfs for PLDR
 
-This is automated email and please do not reply to this email!
+elapsed time: 1415m
 
-Dear submitter,
+configs tested: 21
+configs skipped: 0
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1136220
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+tested configs:
+alpha                            allnoconfig    gcc-16.1.0
+alpha                           allyesconfig    gcc-16.1.0
+alpha                              defconfig    gcc-16.1.0
+arc                             allmodconfig    gcc-16.1.0
+arc                             allyesconfig    gcc-16.1.0
+csky                            allmodconfig    gcc-16.1.0
+i386                            allmodconfig    gcc-14
+i386       buildonly-randconfig-001-20260729    gcc-14
+i386       buildonly-randconfig-002-20260729    gcc-14
+i386       buildonly-randconfig-003-20260729    gcc-14
+i386       buildonly-randconfig-004-20260729    gcc-14
+i386       buildonly-randconfig-005-20260729    gcc-14
+i386       buildonly-randconfig-006-20260729    gcc-14
+loongarch                          defconfig    clang-24
+nios2                           allmodconfig    gcc-11.5.0
+nios2                            allnoconfig    gcc-11.5.0
+parisc                          alldefconfig    gcc-16.1.0
+parisc                          allmodconfig    gcc-16.1.0
+parisc                          allyesconfig    gcc-16.1.0
+parisc                             defconfig    gcc-16.1.0
+sh                                 defconfig    gcc-16.1.0
 
-Test Summary:
-CheckPatch                    PASS      0.72 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.13 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      26.87 seconds
-CheckAllWarning               PASS      29.11 seconds
-CheckSparse                   PASS      28.02 seconds
-BuildKernel32                 PASS      25.90 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      492.88 seconds
-IncrementalBuild              PASS      25.18 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/506
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5327239976132046555==--
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
