@@ -1,75 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7A3C1D57
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 15:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76124D8D80
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 16:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785340243; cv=none; b=KoPW1TPPlvXvhPZ1ZaA/mUHuYNRr4g/SxIPoSjQL1jA9Q7tCCijMXfGYKderddhq/iiRntUpIOnxI/+wygrV9eKOyBI6JbZAsI1aP1vPDBe+S4DS9jjgoq/kBwfnK2Zeph6SHem9ZFIRV91IsXWIl661gFnagm5VCXRXZcK50Rg=
+	t=1785343233; cv=none; b=ODNzHsqFn3SOvVAvDAj1/mpemzm3jFo2QWZdOZ8ZfPZDNiGmq/0ItAPPIERzP0ELrNPJLDRoCMOU9fULcno9zKkHZ5jFE9SfXWeJ4PZ0JdNSHksvBkMFzWgHF/k1nqHoLHPeIbI4QX/knxm63yOt2kKo2ZonMESBryF2tE+TUHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785340243; c=relaxed/simple;
-	bh=BpiVMKr7JneSl5oK93DDF+X6Ar6Y5HLyu/At4+nbfos=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Iihw3TJYpv+yCVN4gMLimdL0adG/ikvdNY2aRu/rO5BGFyrnSAn24cUN/lGzmjPacrTw0XIN+lTFEUIZxEI75woCnVYFbV6aZ4SUy+0bdqGz3XnJfXEGpnlIHJjtBTf/dan8Wy9qKqymDJ0rCxoqivcAHP+ndWyuZkP+hIK02lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcCvIYnI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785343233; c=relaxed/simple;
+	bh=WkIjlD4ynPBX2yXYJJOiCRgMOzfRRfk9PHxaxeFJNiM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ua0z/iRJV42VsUYs2m8XpdDQroozqinvU8xMO3QpElaELF/ArsN47yYUCF06sJ1LZt2erTfi3zSyrSxNwvv65TQM+6APyZrmc/9hAeNBz3DF6FnMFtJx/ZcoO4tQqxLbN5Wsqc3NXQFCl8NrLc70wwKVSW+b6Y+YC+OcIaHqKbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cqrP8Hpz; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcCvIYnI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C7F81F000E9;
-	Wed, 29 Jul 2026 15:50:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785340242;
-	bh=kYwH4RpFMMENV25Xv5nqtHFq8SxI+Fqvw53knYt6NGo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fcCvIYnILlY8KcKQJpM4mb8lDIKb2rw57PgHs38263XTrOufNVGCf61/mynUW6U8P
-	 fKFWMvvOczbtu4d41E6FWtl4hBloQQ4f2hVtuu2Is/OJw39XcmD2JW1QKpqr/qfgXM
-	 wNRleJclF7mFG/tSBqutSe51oASpiNyUsrUmci8K2dJxv4JBF5CSPHn1CN/X5vrk3o
-	 XjIs98KhnXw2yiFlERtuWkTABoiauzIgObstAmBqJpzIfJse2Q/Bw0A0qlm7X2A4TJ
-	 3TnckBriduOzk8SGpIZsko5EpATaXmNeo1fnKp07bmkiD3AYeC8NscJ/Kd+MeMpicn
-	 2WmbVvVfpIguA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 85ABE39253CF;
-	Wed, 29 Jul 2026 15:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cqrP8Hpz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785343226;
+	bh=d1EoZU9ca1Kx/DO7blFRxH7qZ8fYp/WKIMv8wbvnTIM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=cqrP8HpzsfD/NZrVTMJwTP1nhx39Grz4GSP27qm+z+doBCznfJRedJXj4+F54WLM6
+	 lb8zKNF+ZnRvEVIJu0ayLCfTUeL82RAJLQOyuFUbwhlFWHtEA3OPfhti90vjRdjZtq
+	 n7q8KenSxHIoNFBeekObf7kTudS6RM0txB+Wx2XY=
+Received: from github.com (hubbernetes-node-56b66b9.ash1-iad.github.net [10.56.83.28])
+	by smtp.github.com (Postfix) with ESMTPA id D56381800DC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 09:40:26 -0700 (PDT)
+Date: Wed, 29 Jul 2026 09:40:26 -0700
+From: Bhavani <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/729f96-98e5a7@github.com>
+Subject: [bluez/bluez] 66d19b: bap: fixed the return value of GIOFunc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ bluez v2] bap: fixed the return value of GIOFunc
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178534020629.3138935.4210335244392986040.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Jul 2026 15:50:06 +0000
-References: <20260729-fix_iofunc-v2-1-f4043eff6664@amlogic.com>
-In-Reply-To: <20260729-fix_iofunc-v2-1-f4043eff6664@amlogic.com>
-To: Yang Li <yang.li@amlogic.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 66d19bb2a02792cf30cd723b65d4c2110930a31e
+      https://github.com/bluez/bluez/commit/66d19bb2a02792cf30cd723b65d4c2110930a31e
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2026-07-29 (Wed, 29 Jul 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/bap.c
 
-On Wed, 29 Jul 2026 14:51:43 +0800 you wrote:
-> From: Yang Li <yang.li@amlogic.com>
-> 
-> The GIOFunc should return FALSE if the event source should be removed.
-> 
-> Fixes: 322c39a64 ("bap: Start BIG sync after receiving BIGInfo")
-> 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> 
-> [...]
+  Log Message:
+  -----------
+  bap: fixed the return value of GIOFunc
 
-Here is the summary with links:
-  - [BlueZ,bluez,v2] bap: fixed the return value of GIOFunc
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=66d19bb2a027
+The GIOFunc should return FALSE if the event source should be removed.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: 322c39a64 ("bap: Start BIG sync after receiving BIGInfo")
 
 
+  Commit: fee4813d90af02c5f3882461ee6a1bc1d84931f2
+      https://github.com/bluez/bluez/commit/fee4813d90af02c5f3882461ee6a1bc1d84931f2
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-29 (Wed, 29 Jul 2026)
+
+  Changed paths:
+    M src/shared/rap.c
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  rap: use session lookup for RAS operations
+
+Store disconnect information in RAP state and
+centralize attachment handling through dedicated helpers.
+Add bt_rap_get_session() and use it from all RAS
+GATT server callbacks
+
+
+  Commit: 98e5a74736e218f08b9928a931e4d537735fd2d8
+      https://github.com/bluez/bluez/commit/98e5a74736e218f08b9928a931e4d537735fd2d8
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-29 (Wed, 29 Jul 2026)
+
+  Changed paths:
+    M profiles/ranging/rap.c
+
+  Log Message:
+  -----------
+  profiles: centralize reflector setup
+
+Add a helper for reflector initialization and track D-Bus registration
+state in rap_data. Simplify connection handling, move interface cleanup
+to object destruction, and streamline removal logic.
+
+
+Compare: https://github.com/bluez/bluez/compare/729f96089cf6...98e5a74736e2
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
