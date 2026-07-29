@@ -1,85 +1,67 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C49A43DA3A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 08:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85812F7F01
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 09:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785313605; cv=none; b=r/1JCiiNpab3ShF8bxd8lPcS4oua4lgOcCHRdtO51TPOuXmFdxJZel0yDePktupe1cXi8UFc+C0YkYfucq+uAkeC5xgODuTOXoRP9JhZKnZxVXAkYBuaE/SvJFJzid/htjO9r99xOzG0kryI7pmpPmFJDcPpdKFgWFF2vVgzoqY=
+	t=1785317407; cv=none; b=fAp82vHsFY0gKCg48T6xpscfwaNjkWaC2NpKbVf0kZ4FjNNQBSIOW5CmqO72RjlEEfHxM5HwofqoDjQLww9RE9PDtclkqcjp/dKPoXxrW57zFiT4WEz5Ht0nTtpPcobSPWUSfJF8cQNnR3nPfE98Yi2HHZCdLPylWS8S+mghB/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785313605; c=relaxed/simple;
-	bh=NRr/PPKE2tayn33AWBxWRxD9ZfM4ROw+JKEoMSSaRd0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=USXcVw81vMqnSS4F8IYvEUL9MkX7VlNbaVmaI+n4iQ348CiupXKUqlLd/dm8YeSMU94xx6//zaxGQgs7e6NvJfn0bQU7NYmtDmiMeQZaSGZobin26htTWiKogf0f7/R9Cq4flzN4AnTr9tGHgh5zvYiDkYsJspkHdAgsj5pnYfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pfS0RhGt; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1785317407; c=relaxed/simple;
+	bh=JMB7IRO1WZUD2pnlej+8yBH7HkhBoOBLl5JOfI4Q7IU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VhBJzkhd/Ka8G8OAoQNfrv2N2wRfK/J50TXeMtS/MsvxvGzOxd4UQAx2T0FHEYD+0QB0I7Z6GOEFIoH8JAK1TS90APJ8y7mA+1wWRO3vEbaSWZSqwo1Ct7Nte8oVcya2C0f3ZQA3mMBTx7xggL7w5HcBdhJ6O3rE7003LRm2mhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=T9ge20qv; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pfS0RhGt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=40
-	rBicJUszC8qh3xVLhwtMRSZ+FMA7+omUBnS/S45hA=; b=pfS0RhGtZ7iGy+R1UA
-	2TlqoFnffPofK0+EyEmJRzA5h7pIPNTg1DsvLNCSJ11tQGxSU1dP2pn7nlhprf7N
-	+JKhRqbPfE+MXwoLjU6eTxV/lLSGTtl3TaAKX18eUOfK6JkwvIbeBRw5L9P2G6Qh
-	gBs7CbH0Knhrkzt+l/M5p8w4M=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3X_4puWlqssxQLw--.22578S2;
-	Wed, 29 Jul 2026 16:26:19 +0800 (CST)
-From: zhangchen200426@163.com
-To: luiz.von.dentz@intel.com,
-	michael.bommarito@gmail.com,
-	kees@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Chen Zhang <zhangchen01@kylinos.cn>
-Subject: [PATCH] Bluetooth: virtio_bt: Fix memory leak in virtbt_probe
-Date: Wed, 29 Jul 2026 16:26:15 +0800
-Message-Id: <20260729082615.308918-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="T9ge20qv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785317404;
+	bh=SkSdi1iOk2GfEPk/4Uh5tjQEm8/ssvlUo8t1a8ih3CM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=T9ge20qvQv6UvKIsItyYSXJ/zeUJI3XGkAGlhxNoR5btoq8Qe8aXFNgoBWl4Z0kXh
+	 fNtQx2KUhh241jMmAWCJGT1wICga2FJExA7C4MSoZVSuPOalT1hzJazumou5UsE9+k
+	 AZGzoYubkLfNgYo6i4e15fgjK8ExWKDl2VIfG4v0=
+Received: from github.com (hubbernetes-node-2c3739e.ac4-iad.github.net [10.52.138.48])
+	by smtp.github.com (Postfix) with ESMTPA id B323DA1331
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 02:30:04 -0700 (PDT)
+Date: Wed, 29 Jul 2026 02:30:04 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1136408/000000-102aa8@github.com>
+Subject: [bluez/bluez] 102aa8: bap: fixed the return value of GIOFunc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3X_4puWlqssxQLw--.22578S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrurW3urW5Jryktw1Uuw1Utrb_yoWftFg_C3
-	WfZ347Zr1DGF18u3W8Cry5ZrWay3WrWF4kWwnaqas3W34DCr17Xa42qr1DAF17WrWUKr1U
-	Aws8XrsxCw4fCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8Hq2tUUUUU==
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbCwAttCmppuSu6awAA3s
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Chen Zhang <zhangchen01@kylinos.cn>
+  Branch: refs/heads/1136408
+  Home:   https://github.com/bluez/bluez
+  Commit: 102aa8f4db1b3a666cf02e29dcf7704743cfeb5b
+      https://github.com/bluez/bluez/commit/102aa8f4db1b3a666cf02e29dcf7704743cfeb5b
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2026-07-29 (Wed, 29 Jul 2026)
 
-In virtbt_probe, if virtio_find_vqs fails, it will return
-directly, causing a memory leak in vbt.
+  Changed paths:
+    M profiles/audio/bap.c
 
-Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
----
- drivers/bluetooth/virtio_bt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+  Log Message:
+  -----------
+  bap: fixed the return value of GIOFunc
 
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 140ab55c9fc5..5ca163f8ea70 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
- 
- 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
- 	if (err)
--		return err;
-+		goto alloc_vqs_failed;
- 
- 	hdev = hci_alloc_dev();
- 	if (!hdev) {
-@@ -400,6 +400,8 @@ static int virtbt_probe(struct virtio_device *vdev)
- 	hci_free_dev(hdev);
- failed:
- 	vdev->config->del_vqs(vdev);
-+alloc_vqs_failed:
-+	kfree(vbt);
- 	return err;
- }
- 
--- 
-2.25.1
+The GIOFunc should return FALSE if the event source should be removed.
 
+Fixes: 322c39a64 ("bap: Start BIG sync after receiving BIGInfo")
+
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
