@@ -1,98 +1,76 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B7C4369A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 00:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2836271A94;
+	Wed, 29 Jul 2026 00:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785285080; cv=none; b=Njhw7g/4PHEi9KR7Dm/u9yUVUJrZZX2PrjwAIWzLOmqhQua1ga8S11alh+H7OPEB9l1aHHGPpEOz4ZeemTTMPJurH/vJHnAZV4kZCXfDhAY+55MZnhYAFEJT8rDrgsj0921YYGkP3bsAmqp8rBlD9rTPDNL7y+eFVBZKU66VR2Y=
+	t=1785285665; cv=none; b=gypVhoSJnfeBQ6TfqvnTr4nt/NYILOzaFLckv3kHB2vcqSun7KbGY4fjFhmP5gP0qhFhjq+1vNFmck0wBJpAiN26Icv4qJDXMN314DX3Em3IanOpMVBX91KAdTv20XP0eKub440SHQ6mldJJwvsah5C3i606etfnSCDZ5vGoxIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785285080; c=relaxed/simple;
-	bh=0vrX8e0vUswh1aNBdbAdhkn7LBgsDXbph2pVM4ethuA=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=ToIMAm3scNL8HRzFCiIsSIBDNfodd8gUthxLc2kfoM97fxtqubacibQslHDpOaAMYbX91Me/W1TdbovbvmapFRG8y6OehcFJ/lYIDA8i8RMPiFn2e1A7/2HGQFA2Il/ou29oy7REWKj2BspUFuUfYJe6mC6tpiK2WqZYkWTpR40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CZGPIsaH; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1785285665; c=relaxed/simple;
+	bh=NRtgR1zjCOAghX1Ahzyssszlvo2JQGQUZJv6IQz8uXk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=n8WR53KxFWpEaiDVLF2bMQumxh8nK53aIcFedpCXzNX2zRKvgYFfBN17zLcLtysCawrI8j/rMAhrey+7Py5hBECXlbVuSqmU2OCv1d9cTSCcq/YnXUsmDTGUyFraVAO31eMA1NrhHYn+rsW6fnLBwL7o5yaV8/j17l1fcXTiJgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKeIccZ4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CZGPIsaH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1785285078; x=1816821078;
-  h=date:from:to:cc:subject:message-id;
-  bh=0vrX8e0vUswh1aNBdbAdhkn7LBgsDXbph2pVM4ethuA=;
-  b=CZGPIsaHHmcjuZFZpKU3Fx93MNEGWSx83+zr5MbNKikspj2+M6sz2NX3
-   aJw/xpAcDU5UOglvFjezeQ+QQ1umOxAsLr5nlvq/R3roM7MShY2ivxFdx
-   gqpNVLzdHDv+f9b9vAZJjHDUiaek1gQAjd6FGF+j6Gp91PCyXR0Amx4AV
-   Rk0pdGCvq1STMD1Jv/1nT9DH0ynmQw2gU77mzieaUisi9gQsrwqwnkEbd
-   8vF89sn2nQ+zIbAIM9SgQJS6/wpllSnGBKiipY8iYpoVmsPOJkQ6iC5w7
-   mxoyd1qpY1Gcq5QhijzSHbnWoHkpZTkNzUySixRUrA0x8YJ+1kNV8mg69
-   Q==;
-X-CSE-ConnectionGUID: vKsx1BmJT1KAydpKEUorgQ==
-X-CSE-MsgGUID: xilxl/cHRs2nXgx3B5ffhg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11859"; a="97395238"
-X-IronPort-AV: E=Sophos;i="6.25,191,1779174000"; 
-   d="scan'208";a="97395238"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2026 17:31:18 -0700
-X-CSE-ConnectionGUID: o7B8zieDRO24JKi06ZmY0Q==
-X-CSE-MsgGUID: imWg+K0EROyHYGdI+JWxdA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,191,1779174000"; 
-   d="scan'208";a="255939597"
-Received: from lkp-server02.sh.intel.com (HELO ea128546eb3d) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 28 Jul 2026 17:31:17 -0700
-Received: from kbuild by ea128546eb3d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wosCY-00000000et9-46ld;
-	Wed, 29 Jul 2026 00:31:14 +0000
-Date: Wed, 29 Jul 2026 08:31:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- a7ef68421906a8b1c4204dda9b2e52b90f6fd2ba
-Message-ID: <202607290855.XzXfUfTt-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKeIccZ4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AFFB1F000E9;
+	Wed, 29 Jul 2026 00:41:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785285664;
+	bh=zdwiH4Pzt2gpIpNaSlP+DgYYxGSpLDbfO1StAjYyqOI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=gKeIccZ4XcEpgUNAo9NtqiRqgKNdMj2tGS0gJD6KO61MWYF3OA527VR3XcydW0PCu
+	 MXtPxx1glPRYZQljeEAXXyaIIB/KwXjFidR0J5TWwMRV8KkEt11E+jbEvmkPULa3o3
+	 BeOXFz75J1nwupQEyT8oafv8Cy2SnJdlfGoYfGH1YmQyvddKJMUSeoB9M1RY2N5zhR
+	 s03a6hMk1EPWuTMDiHy7ek44NE020A5voDA8GTzZkDFHR/ukzuLi6F3/H+rjmU4ofS
+	 DMKdLOLsS9lQuvMSB+RzMOCVHYtsC6El/hT4n5ylXqa0+bYfKT3DWFuqrgvYdQN0V+
+	 GTkUdhrn7XGtQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19B7E3924A56;
+	Wed, 29 Jul 2026 00:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2026-07-28
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178528562865.2383814.13327563581193824452.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Jul 2026 00:40:28 +0000
+References: <20260728201527.2456032-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260728201527.2456032-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: a7ef68421906a8b1c4204dda9b2e52b90f6fd2ba  Bluetooth: btintel_pcie: Add vendor_reset PCI sysfs for PLDR
+Hello:
 
-elapsed time: 1415m
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-configs tested: 21
-configs skipped: 0
+On Tue, 28 Jul 2026 16:15:27 -0400 you wrote:
+> The following changes since commit e095f249e2209674f6366f6db0383a2b96e19239:
+> 
+>   net: ethernet: mtk_eth_soc: pass eth to mtk_handle_irq_rx in poll_controller (2026-07-28 15:53:49 +0200)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-07-28
+> 
+> [...]
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2026-07-28
+    https://git.kernel.org/netdev/net/c/0408e7f6f6a1
 
-tested configs:
-alpha                            allnoconfig    gcc-16.1.0
-alpha                           allyesconfig    gcc-16.1.0
-alpha                              defconfig    gcc-16.1.0
-arc                             allmodconfig    gcc-16.1.0
-arc                             allyesconfig    gcc-16.1.0
-csky                            allmodconfig    gcc-16.1.0
-i386                            allmodconfig    gcc-14
-i386       buildonly-randconfig-001-20260729    gcc-14
-i386       buildonly-randconfig-002-20260729    gcc-14
-i386       buildonly-randconfig-003-20260729    gcc-14
-i386       buildonly-randconfig-004-20260729    gcc-14
-i386       buildonly-randconfig-005-20260729    gcc-14
-i386       buildonly-randconfig-006-20260729    gcc-14
-loongarch                          defconfig    clang-24
-nios2                           allmodconfig    gcc-11.5.0
-nios2                            allnoconfig    gcc-11.5.0
-parisc                          alldefconfig    gcc-16.1.0
-parisc                          allmodconfig    gcc-16.1.0
-parisc                          allyesconfig    gcc-16.1.0
-parisc                             defconfig    gcc-16.1.0
-sh                                 defconfig    gcc-16.1.0
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
