@@ -1,190 +1,354 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237784772B4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 12:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0265A3C1D68
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 15:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785328298; cv=none; b=lhBREH6pIUswiBeTmAlVZRqMUfCqg+lnTje7BCoca0MPc1w+5G3T9i7K7ncHkPn3akPdJ7ScgLihBFjcFEPdkPGYRYWBV4rrKwGVa9t9xr7sV2PqNk6udO9AwZAS4C2tqjm3fzILGnurllFiT4ggYsqLW+dpPu3/Sb67hxGa1YA=
+	t=1785339264; cv=none; b=emxNq0PhS7nbRPm8dSjixwg9cC07Nl+1esZg/PoTKxJdc9d7C2pgk8Fs6VwVMT5aLpjWgG6IH8ax2DKHGvtyZJQndqe07CV4jTkePbQhK3fvmSaMjV4cnDpOISHs+tZ88MlWd06iClZpVC3xFXo4qKdr4Y3yliwb16jIIAqH5M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785328298; c=relaxed/simple;
-	bh=K7JENK6sa1LbpG3FYRwucrEeQvC/xIG5ldJRqbSaYOc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rhNwPhW537ZiFmAUUgT5MsW7EYGS7ueL3bQtieot/V1SW2Oy9Gyn8hjkShpsxa0S/QlfINfN2u7YQB0GH7CXBkbjOKu20DuabrhesFkq7L6FIYtj5SrO0OyTEPU34zJRDkIuQKwssAkOiCF6W1BjHLMkyluuP4GNQNQ/XPUFf5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=oimkaaSG; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=f8pzdW9V; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1785339264; c=relaxed/simple;
+	bh=FTSfYdAkm6JyzUIkyx48kt3whIeNH4LhmPGKgdXghc4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=rORx6VkMyYy+5cah5dPsU9KCJkBV/vd4FxdQ3gydFpxzaAbHGR83s9u3tqD0izj1rkYxQX9uME50SWv4UZTEYJi/Dm8aC/zgEi6JRUDjPNVWbg7B4lfmzA5FSsaysWKpE4fFrwcOkocsb/Ho7OkyygD3UstvzUehwf2zp52CFtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1ZSdkDO; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="oimkaaSG";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="f8pzdW9V"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66TBlqSp1511998
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 12:31:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	lxiDiTYlOyIpoH+2VCVs4iz6grC8x089+hk593hC4o0=; b=oimkaaSGYveBTVoV
-	NF53THaowvNxWrC4+ahInrr7lPlHlaj2dt7cdHXh7yQsp1anuipsBiiZWGgZX1nE
-	OzbVZWbolbrK9WZkD8MNuOBZO2Npe+0CFnB9aHJcI5np66pCARahSPetP6v1qmKy
-	rG5YMf3XA+vKy9BD8ld89TYf2fuQ/tknyCnhWum5lbwhaYTmy9hl8JbCX26RPQLe
-	jXCIPhHupJLakuDls2Oel/5ZvE63fRaO2S2bV+SiCnXTpcnM+y8zNtRYszmCX/3n
-	8sgpZ1Vj96aQLGfc4dmc+1tWcjmIU2zLWP4UEImOefuNI86dSxG1WGs8/09K+Wgt
-	cjEmBg==
-Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com [209.85.221.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fqgy9053e-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 12:31:32 +0000 (GMT)
-Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-5bf87ca30b3so14891e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 05:31:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1ZSdkDO"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-977310532a7so3603241.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 08:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1785328292; x=1785933092; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=lxiDiTYlOyIpoH+2VCVs4iz6grC8x089+hk593hC4o0=;
-        b=f8pzdW9V2f1amQtrgm362KNmOSxSGhPbcOynvBNqehkSQguSJXiSB3RJqNmjjG9Tsj
-         kAT/5bdDOzFKpZ6RN+SA9CUPOEcSnOrjR1EiuoAO/UnIrkOY6+EWpt7lRfw16zrrTYWy
-         g+Urrc6pg1MRe3UJY5IF71wfRheFuAad/RGUuVr3gCdi4I66eMFoPpVd4dvZBy15hc33
-         A1nzQDN2V4+I6aO27L+zWpQwoPltBW0kf2HnpRpZQM8jXPcc1os+RxkZkZUnYchKY8c0
-         81y8ldYTWKUSrp3u+XdamC4h7ClN/nPKRiuC6kxH36QU/Nv8nNOLCnqq6BlyrWu1/bIz
-         XW5w==
+        d=gmail.com; s=20251104; t=1785339259; x=1785944059; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dT/K8BMGY7PDA7PBhGefPkvkqgW1HPdsm39Oo9PnaX4=;
+        b=P1ZSdkDOf60mjX6o7f9KxPv9/QN58pXkuP6zWeYC2mlj/XcDLb/jwSc2qsTODqTaw8
+         lpgsXLxTZSRt2OiTW0Zn1VPNFoZgzIEVR/t5NjD1A0ThBs8zhtRllgZ30764L+dwcT9M
+         ++FvBrx7T1asHE0GlvZ9pP+rQ9khPLk6JQgxDiOkexjMATW3YWHdWWx3KE03zV3eVXus
+         uTu3ybZ/MjpkDSRvMdgWFwlpxP8w5r9GmNyBFFenqVItCPQVZ/5fwvIPgM35fkHMLvKC
+         N32G31mpxQZ6QKMq160CGSs1xrzbSFQZjXBv18kN+APkqKP4RZ4sdWbl7qs2Ez6jsajo
+         4vtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785328292; x=1785933092;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=lxiDiTYlOyIpoH+2VCVs4iz6grC8x089+hk593hC4o0=;
-        b=ks7XDuP84evc3QvtiB0y67VeGDjQGFbzm1mi6039PlEqIfrar/aXSD2h5Ddl96TBIk
-         7DBkT+dGx1Y7VXbqfQN55N+q1GRfDEHOUHidHm5k+M+rYMFbv0+GLrUf30wYyJ0AjXlk
-         P9te4oj2NiNcyDn1pEkSygKvGdDYo7M7cARfNHMfoDSEPQ1ffg8sV9C14JrvD1b8I4NM
-         d2/6ZP0/OCeWJ+iEmEc1PwVnDemE5ZwOA760uopMggrLJ2Rntoj1/7uXKf8gdVwUsarA
-         TlY+VzR2sqzILAiAyePiiEogGbzh1UhBJuAO6qwfN554nab+crtONsZoCQ4vIMpNz916
-         XmlQ==
-X-Forwarded-Encrypted: i=1; AHgh+Ro2VPBg3zbBkeMAkERZPG1BgOX38kuX2crg7zR0n5W0Rt1LcFX80Y5RZPTE4ONJBEZIKtsVym7wH3ogtu0rSLQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYMuLriw5n6xYRTJ+S4ygpqtR0vsNaRVwUTcECKY9t8voUsOHw
-	GHHjgP3/p+GQZ++PDTMGqfGfcnWd9GL8eg7hAMh68uq12qWvYP1336cGVIidysI9FJYut8uFf6a
-	LX+FYhobYeuI9VhTd2B/VqWk8Z9HljwVCSBGjarEuuyCNwZph5zkXBNNTpESOY/4CKYvVRWE=
-X-Gm-Gg: AR+sD13nLE0vTRUl+tqBHvvARVqi5E9nnU+nYxa7s/UUH4RvN+SOuODthwKuNfsfaAR
-	IDDzpoOIU9BMWDrGrjrLDw65Kp2X0znMPyl6ezkmfXSgvgjdtDRjwNGcW1fTll4Zn4S8sKfnED5
-	uKT6O3BDGpRZutgtlEq4a5OaHXw+jItB+Di5spRe4QsIf0vPsSs8tvk/EWb7llGcv7AMqppBeUX
-	+6MtZjogWkiTguItcBzVQQfCA9OpYckpu/auHfPZshlWaz9lR6Iz7y1RCIR/Y8Lku5J9m4KRLIL
-	lRDwuj/1GTLBoyIJIrlOhl/cJuo32LBM02Vyt1G+l3Orh8LFH5gdkPJ8H/eftpVCfTyqM5sbEMi
-	HIuWmiJBUyyWwzV5FTWsl/ENq
-X-Received: by 2002:a05:6102:3591:b0:745:17b0:10d5 with SMTP id ada2fe7eead31-754a1ba976amr1357751137.3.1785328291626;
-        Wed, 29 Jul 2026 05:31:31 -0700 (PDT)
-X-Received: by 2002:a05:6102:3591:b0:745:17b0:10d5 with SMTP id ada2fe7eead31-754a1ba976amr1357686137.3.1785328290927;
-        Wed, 29 Jul 2026 05:31:30 -0700 (PDT)
-Received: from [192.168.120.193] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1f83cde9cbsm109495366b.16.2026.07.29.05.31.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2026 05:31:30 -0700 (PDT)
-Message-ID: <794424df-4714-43a4-b4b8-e960998ad1f1@oss.qualcomm.com>
-Date: Wed, 29 Jul 2026 14:31:26 +0200
+        d=1e100.net; s=20251104; t=1785339259; x=1785944059;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=dT/K8BMGY7PDA7PBhGefPkvkqgW1HPdsm39Oo9PnaX4=;
+        b=XeAxXJ7Wpa0JqDpV0HoU0bl7AVVS5sLdbjiSEqltvK7QxTAlbxawLZkaOEkfUdLJ1A
+         4X7YvWymzx5fd889do6sfhgxTsBBawaUuEncsqGcgw9V+u1eHYm/I3w3oxc8GpuNys/D
+         hu7Wvl2UuLlehD9TDT3H5WkR3+jpq6XNoffIIi5kE4UPLnEJUrUtOXD/oPJAP/VNt2+o
+         w+JWB0Un6x4fuNSni/C9NylVg/XEyVwhxRI6q8PyT40vrHRYNMdxcY63iwwsMXpQz9eg
+         JGStaZgXCK8YzBYO8KR/ymDehoiC5wJSk6QTXVkJkaixZ2Q23WZk8wOW9wLesABflS0Q
+         nHEA==
+X-Gm-Message-State: AOJu0Yw2/Hhv/2wTO4jFVLRMAimddXTi/EjtoEXVKOOUwWSs8D1CjpqF
+	lZQwxOVThbIXU6mRDvTxJCGrQ4bqQyCuKreaFZZQxIkpof0GoBVv3vVHwca6EcRA
+X-Gm-Gg: AR+sD12/Swqijz1zF7duN6Y59jJKmmztF3QwYnHHKNnoIE0F4T4KMEBUx5jSw26mM+2
+	mELBaQooEmiOg3nu+RtO4uv8QXiOGTwNO+TU9FnBn3gJp7s6z6nig/kkQj14SQ3ec+hTmb3C589
+	HWI9p7jtEUg4xnRIaTlSuIZjMKRwBF6KjfxVMxIUgbCps2Sk8GWAa1JFjugCc1mSbNjEGKRxUYP
+	R+mHFCUxqk7LJ4i+2sRCcpubD0AuPQOL61QJEyTOHt5EGkwcN9FYGs6V7ox6yLpN3zYFeoCR6rK
+	9L1FGT6oFBgPVnBtfdt0RoGtrXGdaQJThTAApNqtqOBDkUrv3hC6p2gJ44TUoi/D0fdDCkPZHuD
+	Ni601tLxje2SkRANgoGUlFPKN+YMdTEhJsn37G6iTSLfSu36KWPYljCk6zvM7Hbqny1423B1ja5
+	isTXy9DO1ZAtbNuhWZayteKEdYaV4Dv8gW/1CeUSra34d6vAc9CUx/8xowu4MaCwdoFLpBqsHhG
+	rqIB45zQl+DYTa2ueB4Qm69Mi8Rs37OsGvMEe1hcUmdUO4fVctfaVwnVzXK
+X-Received: by 2002:a05:6102:4187:b0:634:2450:7998 with SMTP id ada2fe7eead31-75609263c13mr946160137.4.1785339258737;
+        Wed, 29 Jul 2026 08:34:18 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-755a74c0b80sm1820585137.4.2026.07.29.08.34.17
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2026 08:34:18 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/3] Bluetooth: Add support for Shorter Connection Interval (SCI) feature
+Date: Wed, 29 Jul 2026 11:34:10 -0400
+Message-ID: <20260729153412.2564039-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/6] arm64: dts: qcom: rb3gen2: add Industrial BT UART
- overlay
-To: Rahul Samana <rahul.samana@oss.qualcomm.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann
- <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Manivannan Sadhasivam
- <mani@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
-        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
- <20260727-rb3-industrial-bt-uart-v2-6-2d100f30e202@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260727-rb3-industrial-bt-uart-v2-6-2d100f30e202@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI5MDEwNCBTYWx0ZWRfX/YFdAkD7tIQU
- k/GTZ75BS9nSFJn/ppFd9CRWQi6VehIRcH0eqjLAVb1Pv0MUV0l2nvuKPA/A5GBg1lTcD/KCprV
- BGXRHpaRO10DB92hKL9MT4jA5MrlDKI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI5MDEwNCBTYWx0ZWRfX8y7ockejpj0I
- leCFYEDqaLdRboaeeBLvyQVM7B4okAw1Fe0kG1BHY3CWd6OJoM1N6q/SxE1rnrm+djNUUdoDXrR
- NttRHB8UgoCRAFO2wxEXMqFroP/V7fyIE0lju9zMJ7BtEP40WlleafzNBQ2k+P3FcDzoX+ZyLit
- F8IuZ2eCmrEiI7nTC6cAgbhiAyBq6vC/gTxIEhOFyYskOlFY6/6N4trKKBSc6R/OFav9nTXd6Cp
- hDgmPRLbRarvalTjhFGVuBTqsqXEyc5JEBY+OxsQtNHJV0MGUC3/DkteWmExARh00pshbnhdI6u
- YMdGJSr4P6LZTRsD+SNrj6mGRfpOAPJ62EHuv882h5grvt9PpJNrbd55m6OYI8cFBvdJFNdfOM9
- fzrZolNGomAfC4rsdRC+DXI+ru4sw/+p/MMUq/60wd8FYFlVS1UwUphi3JOfmjkLnDrSprctzKQ
- bsQnZlqWnc0qo3FS2kw==
-X-Authority-Analysis: v=2.4 cv=LtKiDHdc c=1 sm=1 tr=0 ts=6a69f2a4 cx=c_pps
- a=JIY1xp/sjQ9K5JH4t62bdg==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
- a=iMgkBSKgpprIcW5G8oEA:9 a=QEXdDO2ut3YA:10 a=tNoRWFLymzeba-QzToBc:22
-X-Proofpoint-GUID: CnbLj7OaYBVWGoWlOQFT2kzbc6ElgNkP
-X-Proofpoint-ORIG-GUID: CnbLj7OaYBVWGoWlOQFT2kzbc6ElgNkP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-29_04,2026-07-28_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 clxscore=1015
- adultscore=0 priorityscore=1501 phishscore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607290104
+Content-Transfer-Encoding: 8bit
 
-On 7/27/26 5:45 PM, Rahul Samana wrote:
-> The reworked RB3 Gen 2 Industrial mezzanine keeps the common Industrial
-> mezzanine hardware description but routes QCC2072 Bluetooth over UART4
-> instead of the default Bluetooth-over-USB path.
-> 
-> Build this variant by applying the common Industrial mezzanine overlay
-> first, followed by the BT UART overlay. The overlay models the M.2 E-key
-> connector graph endpoints for PCIe and UART, and disables the on-board
-> WCN6750 PMU and UART7 path so the M.2 QCC2072 Bluetooth controller can be
-> used instead.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-So is the onboard module disabled? Can we not just use two in parallel?
+Add HCI command, event and feature bit definitions for the Bluetooth
+6.2 Shorter Connection Interval feature:
 
-[...]
+Commands:
+ - HCI_OP_LE_CONN_RATE (0x20a1) - Connection Rate Request
+ - HCI_OP_LE_SET_DEF_RATE (0x20a2) - Set Default Rate Parameters
+ - HCI_OP_LE_READ_CONN_INTERVAL (0x20a3) - Read Min Supported
+   Connection Interval
 
-> +&pcie0_m2_e {
-> +	port {
-> +		pcie0_m2_e_ep: endpoint {
-> +			remote-endpoint = <&m2_e_pcie_ep>;
-> +		};
-> +	};
-> +};
-> +
-> +&uart4 {
-> +	interrupts-extended = <&intc GIC_SPI 605 IRQ_TYPE_LEVEL_HIGH>,
-> +			      <&tlmm 19 IRQ_TYPE_EDGE_FALLING>;
-> +	pinctrl-names = "default", "sleep";
-> +	pinctrl-1 = <&qup_uart4_sleep_cts>, <&qup_uart4_sleep_rts>,
-> +		    <&qup_uart4_sleep_tx>, <&qup_uart4_sleep_rx>;
-> +
-> +	status = "okay";
-> +
-> +	port {
-> +		uart4_m2_e_ep: endpoint {
-> +			remote-endpoint = <&m2_e_uart_ep>;
-> +		};
-> +	};
+Events:
+ - HCI_EVT_LE_CONN_RATE_CHANGE (0x37) - Connection Rate Change
 
-Let's define both PCIe and UART endpoint sin the SoC DTSI. And don't
-mention "m2" in their labels.
+Feature bits:
+ - HCI_LE_SCI - Shorter Connection Intervals
+ - HCI_LE_SCI_HOST - Shorter Connection Intervals (Host Support)
 
-Just pcie0_port0_ep and uart4_ep respectively.
+During controller init, when SCI is supported:
+ - Set Shorter Connection Intervals (Host Support) feature via
+   LE Set Host Feature
+ - Read Minimum Supported Connection Interval
+ - Set Default Rate Parameters
 
-Konrad
+The Connection Rate Change event handler updates the connection
+interval, latency and supervision timeout on the hci_conn.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci.h      | 53 ++++++++++++++++++++++++++++++++
+ include/net/bluetooth/hci_core.h |  8 +++++
+ net/bluetooth/hci_event.c        | 29 +++++++++++++++++
+ net/bluetooth/hci_sync.c         | 53 ++++++++++++++++++++++++++++++--
+ 4 files changed, 141 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 50f0eef71fb1..f895278c268f 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -653,6 +653,8 @@ enum {
+ #define HCI_LE_LL_EXT_FEATURE		0x80
+ #define HCI_LE_CS			0x40
+ #define HCI_LE_CS_HOST			0x80
++#define HCI_LE_SCI			0x01	/* byte 9 - Shorter Connection Intervals */
++#define HCI_LE_SCI_HOST			0x02	/* byte 9 - Shorter Connection Intervals (Host) */
+ 
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+@@ -2489,6 +2491,46 @@ struct hci_cp_le_set_host_feature_v2 {
+ 	__u8	bit_value;
+ } __packed;
+ 
++#define HCI_OP_LE_CONN_RATE			0x20a1
++struct hci_cp_le_conn_rate {
++	__le16	handle;
++	__le16	interval_min;
++	__le16	interval_max;
++	__le16	subrate_min;
++	__le16	subrate_max;
++	__le16	max_latency;
++	__le16	cont_num;
++	__le16	supv_timeout;
++	__le16	min_ce_len;
++	__le16	max_ce_len;
++} __packed;
++
++#define HCI_OP_LE_SET_DEF_RATE			0x20a2
++struct hci_cp_le_set_def_rate {
++	__le16	interval_min;
++	__le16	interval_max;
++	__le16	subrate_min;
++	__le16	subrate_max;
++	__le16	max_latency;
++	__le16	cont_num;
++	__le16	supv_timeout;
++	__le16	min_ce_len;
++	__le16	max_ce_len;
++} __packed;
++
++#define HCI_OP_LE_READ_CONN_INTERVAL		0x20a3
++struct hci_le_conn_interval_group {
++	__le16	min;
++	__le16	max;
++	__le16	stride;
++} __packed;
++
++struct hci_rp_le_read_conn_interval {
++	__u8	status;
++	__u8	num_grps;
++	struct hci_le_conn_interval_group grps[];
++} __packed;
++
+ /* ---- HCI Events ---- */
+ struct hci_ev_status {
+ 	__u8    status;
+@@ -3303,6 +3345,17 @@ struct hci_evt_le_cs_test_end_complete {
+ 	__u8	status;
+ } __packed;
+ 
++#define HCI_EVT_LE_CONN_RATE_CHANGE			0x37
++struct hci_evt_le_conn_rate_change {
++	__u8	status;
++	__le16	handle;
++	__le16	interval;
++	__le16	subrate;
++	__le16	latency;
++	__le16	cont_number;
++	__le16	supv_timeout;
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
+ 
+ /* Internal events generated by Bluetooth stack */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e7133ff87fbf..8126fed34613 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -720,6 +720,11 @@ struct hci_conn {
+ 	__u16		le_conn_interval;
+ 	__u16		le_conn_latency;
+ 	__u16		le_supv_timeout;
++	__u16		le_rate_interval;
++	__u16		le_subrate;
++	__u16		le_rate_latency;
++	__u16		le_cont_num;
++	__u16		le_rate_supv_timeout;
+ 	__u8		le_adv_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__u8		le_adv_data_len;
+ 	__u8		le_per_adv_data[HCI_MAX_PER_AD_TOT_LEN];
+@@ -2077,6 +2082,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define le_cs_host_capable(dev) \
+ 	((dev)->le_features[5] & HCI_LE_CS_HOST)
+ 
++#define le_sci_capable(dev) \
++	((dev)->le_features[9] & HCI_LE_SCI)
++
+ #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
+ 	(!hci_test_quirk((dev), HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG)))
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ea858391c789..d5ef7b3a50cb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7363,6 +7363,31 @@ static void hci_le_read_all_remote_features_evt(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_conn_rate_change_evt(struct hci_dev *hdev, void *data,
++					struct sk_buff *skb)
++{
++	struct hci_evt_le_conn_rate_change *ev = data;
++	struct hci_conn *conn;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
++
++	if (ev->status)
++		return;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
++	if (conn) {
++		conn->le_rate_interval = le16_to_cpu(ev->interval);
++		conn->le_subrate = le16_to_cpu(ev->subrate);
++		conn->le_rate_latency = le16_to_cpu(ev->latency);
++		conn->le_cont_num = le16_to_cpu(ev->cont_number);
++		conn->le_rate_supv_timeout = le16_to_cpu(ev->supv_timeout);
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
+ [_op] = { \
+ 	.func = _func, \
+@@ -7474,6 +7499,10 @@ static const struct hci_le_ev {
+ 		     sizeof(struct
+ 			    hci_evt_le_read_all_remote_features_complete),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x37 = HCI_EVT_LE_CONN_RATE_CHANGE] */
++	HCI_LE_EV(HCI_EVT_LE_CONN_RATE_CHANGE,
++		   hci_le_conn_rate_change_evt,
++		   sizeof(struct hci_evt_le_conn_rate_change)),
+ };
+ 
+ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 7a33513f1fc7..9dfab81e40f8 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4478,6 +4478,10 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 		events[6] |= 0x02;	/* LE CS Subevent Result Continue event */
+ 		events[6] |= 0x04;	/* LE CS Test End Complete event */
+ 	}
++
++	if (le_sci_capable(hdev))
++		events[6] |= 0x40;	/* LE Connection Rate Change event */
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
+ 				     sizeof(events), events, HCI_CMD_TIMEOUT);
+ }
+@@ -4646,12 +4650,46 @@ static int hci_le_set_host_feature_sync(struct hci_dev *hdev, u16 bit, u8 value)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
++static int hci_le_read_conn_interval_sync(struct hci_dev *hdev)
++{
++	if (!le_sci_capable(hdev))
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_CONN_INTERVAL,
++				     0, NULL, HCI_CMD_TIMEOUT);
++}
++
++static int hci_le_set_def_rate_sync(struct hci_dev *hdev)
++{
++	struct hci_cp_le_set_def_rate cp;
++
++	if (!le_sci_capable(hdev))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	/* Use the HIDS 1.2 recommended Full Range mode values as the default
++	 * rate parameters (see HOGP v1.2 spec). Connection intervals are in
++	 * units of 0.125 ms and the supervision timeout is in units of 10 ms.
++	 */
++	cp.interval_min = cpu_to_le16(0x000a);	/* 1.25 ms */
++	cp.interval_max = cpu_to_le16(0x0078);	/* 15 ms */
++	cp.subrate_min = cpu_to_le16(0x0001);
++	cp.subrate_max = cpu_to_le16(0x0004);
++	cp.max_latency = cpu_to_le16(0x0000);
++	cp.cont_num = cpu_to_le16(0x0001);
++	cp.supv_timeout = cpu_to_le16(0x000c);	/* 120 ms */
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEF_RATE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ /* Set Host Features, each feature needs to be sent separately since
+  * HCI_OP_LE_SET_HOST_FEATURE doesn't support setting all of them at once.
+  */
+ static int hci_le_set_host_features_sync(struct hci_dev *hdev)
+ {
+-	int err;
++	int err = 0;
+ 
+ 	if (cis_capable(hdev)) {
+ 		/* Connected Isochronous Channels (Host Support) */
+@@ -4662,9 +4700,16 @@ static int hci_le_set_host_features_sync(struct hci_dev *hdev)
+ 			return err;
+ 	}
+ 
+-	if (le_cs_capable(hdev))
++	if (le_cs_capable(hdev)) {
+ 		/* Channel Sounding (Host Support) */
+ 		err = hci_le_set_host_feature_sync(hdev, 47, 0x01);
++		if (err)
++			return err;
++	}
++
++	if (le_sci_capable(hdev))
++		/* Shorter Connection Intervals (Host Support) */
++		err = hci_le_set_host_feature_sync(hdev, 73, 0x01);
+ 
+ 	return err;
+ }
+@@ -4697,6 +4742,10 @@ static const struct hci_init_stage le_init3[] = {
+ 	HCI_INIT(hci_set_le_support_sync),
+ 	/* HCI_OP_LE_SET_HOST_FEATURE */
+ 	HCI_INIT(hci_le_set_host_features_sync),
++	/* HCI_OP_LE_READ_CONN_INTERVAL */
++	HCI_INIT(hci_le_read_conn_interval_sync),
++	/* HCI_OP_LE_SET_DEF_RATE */
++	HCI_INIT(hci_le_set_def_rate_sync),
+ 	{}
+ };
+ 
+-- 
+2.54.0
+
