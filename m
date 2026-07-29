@@ -1,133 +1,121 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E589456DFD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 11:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B14B48383F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 12:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785325176; cv=none; b=fSgLEkKKCWqU6aOPTFnC7g0ZcqyQcu6liqPiXChOdiTMvZBjgxemJfTZ9TrVQiVlrM/pRT7SPYe6vQFdl+hIutnuW7ybqbj05Um0aGCfExAoB4CEWU2C1Oq9ETY3WtFfocS4hQH+n/72pO/dWsyCL3PEy8e5gxDwA59p7zvMNdg=
+	t=1785328159; cv=none; b=PY5R1Ed9bzFjD+elrPPT+iwb2hrJdR62DzPeCsinVKEdEwqIbYC/V4rwPOOQ2jasGxLIBV2GpISagfINbtJChcS5DZ6YcF/KzjxZcz+7NLRxK5hCfO8Gdmc5NGUaETN9N+mD/wMZ2ZTbFFn99lhggbva8ApxTs/p4sPyXltZokM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785325176; c=relaxed/simple;
-	bh=5TBnpQHeKMRPqoQMPV8c/SnIYGpIncHYpL9cMcyUzYM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=XKoClA8OwcqcKgXHyHTeXIMj5TkUQfIQTgttTnb97KmhvhXGF85Mp4t9DswTgrIe3aehYFjOb9SIMlYKFUQnFRj7r2cJ4/bObJ1wypl0YYq1cClfxLoPUWTuyLRMbwcLSAdIyzkEVeU1WRnbqWnzt0F+oFHUva5etX1vzhV/5nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Mlcfnat/; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1785328159; c=relaxed/simple;
+	bh=sU7DS8mwXAZxSQ6WTuf0oI8pVLggqR+ncxENbE82z+o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=t5n7223XG/BQRlE7E6rDuAmN9kLmzQhlrPaQg4YuIFM7fvvELSB5pbAEncXu4ouDGAkdf0uSHx896tqlSj2MlkewrSqJbsbbUt6/yDHrisRVwSY63h0QGNEC5zV3ofNR5QEVY0AFczzr4dlcbaCKdDgXVzlJKdzdXGwunwWG7MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsP2ep2+; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Mlcfnat/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1785325174;
-	bh=vAs1yiqCYbfpwZVHMlm9a51UqVOrZ7BHXTh8w713xkg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Mlcfnat/Ptm2PuKby7AuaiR0WmocSOsBRlWo2ckrFgiXsm0HvozvkDvKoQUMRz7YW
-	 6gUAbDi9e28UmE47zkYvs4ZW6OxxyGvRs1i22IXDXMthun7bzeDdmKPPVYfwLyPQ0C
-	 AhWRlQYwz+OVhgawYO+qa8SdOpptJj8uxZ9cJYRY=
-Received: from github.com (hubbernetes-node-bc80831.ac4-iad.github.net [10.52.82.28])
-	by smtp.github.com (Postfix) with ESMTPA id 6EB8A780B6A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 04:39:34 -0700 (PDT)
-Date: Wed, 29 Jul 2026 04:39:34 -0700
-From: Bhavani <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1136563/000000-417b3d@github.com>
-Subject: [bluez/bluez] 26d1de: shared/rap: Add bcs_procedure_data aggregation
- and...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsP2ep2+"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c96b08cdd1cso540147a12.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 05:29:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785328152; x=1785932952; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=QKu0eBXlmZtan5WRhNEspAZWeaycYJhyK4AEP2avGh4=;
+        b=IsP2ep2++TnLihigm9PR4fJ8d2Cndn0CdKd8QlWqGFBz+jOPmTDgXwC6hnFzF0GTMy
+         SlEU+jaDyls6aJupSTxqP4Pn14eywNHwBWpWjETgUSgaIeBzXlgGD9ULsyxkL1oRG8m9
+         jVHRsdQZypLpGwVmbEaJ8QWVBOT6/FUUFVONLZwgN4zuBRuV7OUWGl5Pgo0BeK/jgvQp
+         9hpDeawfk/8noNSRNZ2a863uSzCZC59QB1ImpQ89FuwcLMlsC7v8uejQnXriLEo03IME
+         hR9IrvQeH/5hwlqII+w2Tv+JXNZpJz+fix/jlu02F5P/jlH/LXXt01/tXTq4G9EX6YBk
+         8/Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785328152; x=1785932952;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=QKu0eBXlmZtan5WRhNEspAZWeaycYJhyK4AEP2avGh4=;
+        b=FZab1PuwrkCZAs2GNnjApkZSopC7xDpos6s5bWDtyA19km5B69IE+1wrVrWoz83/wE
+         +vUxpSWKN9DyWwRjvj0dWjxWqGUsi2/xhw3a1TUTzSoiT/LhMvy9vGC8OKuZPa5ree/d
+         O8h/yPASTA55ABB7kp8jCAJvnsovh885zpizlHMkQR7J4siU1u3L0Veh+b/Bm33gy9y6
+         h8kt4sTh03Blapg2ScOeUzcmdLR2dJYiQNVebCCLMoF8tvT7fxYPIfps7ucSHNwlcrPs
+         MqoG1IFqypHe7h87t87D4huKVWwuO0mDvV68n4lTxd7eb02FZy0deYJuP0VcNStOuOkB
+         0kDg==
+X-Gm-Message-State: AOJu0YxiR8YxDrT/LOm3U045RZJhylpISdSaJnjc46Rh0/wTd5b1OwRP
+	jLWQJ9L19wn2lJUC0mOKDY2fXex1UbgybNJwq6DqRSAT0KR8lQAo2F0m+9tWAA==
+X-Gm-Gg: AR+sD12AerPCTZ7JWn7b4giPeWYzZu0awp47Hw0jXZ2fFkxfZISHxqASgJDpQoGaZ57
+	m6SzhL60y7wAw50AFxjTyEsAC6AME8UBBdw2InfHva8Zn9T0wzrVOixB8oD32Oj6tbv1bZSGVZ5
+	TqEhiNV4t9ET7csXbXR6EsuuvCp/gite1Sj7k9ibuWSOPua7eMRabXm6myqiHVS994uISPed/tn
+	IJlLArv1WSB8DngAWdjAv2VAac4ORatXd9ljOHVmYCe/5VJEBQZorxpil1jIsqvzL9HaMWcVNhv
+	AqVSPjVsHZ3oxbSzohXU0AFUM1OhWZvhdkY5JJIbpGo/tvJtioMi477WWoxOsm4MLRLIQPnewM3
+	HtB4mLwDr63E+VhVFvWH+k05HMEKQShvnhoX6kMb5P6aAaGqzB8v7Wmru8f9Z/RgIIyOW94QH0V
+	3tZEbKQOcUAGAvMfdznEnHDD16jcWoqSGWq34vp2r4R2djM9xIx3j08VHU6EmNIZdW93LwfA==
+X-Received: by 2002:a05:6a21:6083:b0:3c0:9c19:65b1 with SMTP id adf61e73a8af0-3c8ba6476cfmr7662390637.73.1785328152411;
+        Wed, 29 Jul 2026 05:29:12 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.226.199])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b124e4sm9022200eec.6.2026.07.29.05.29.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2026 05:29:11 -0700 (PDT)
+Message-ID: <6a69f217.a1accbb4.5fffb.7563@mx.google.com>
+Date: Wed, 29 Jul 2026 05:29:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5226598968907850034=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: Add CS procedure data aggregation and D-Bus export
+In-Reply-To: <20260729103019.4178720-2-naga.akella@oss.qualcomm.com>
+References: <20260729103019.4178720-2-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5226598968907850034==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1136563
-  Home:   https://github.com/bluez/bluez
-  Commit: 26d1de5e4c12686df8565bc796df00631bc9076c
-      https://github.com/bluez/bluez/commit/26d1de5e4c12686df8565bc796df00631bc9076c
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-07-29 (Wed, 29 Jul 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  shared/rap: Add bcs_procedure_data aggregation and procedure data API
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1136563
 
-Define bcs_procedure_data to hold per-procedure CS results from both
-the local initiator and remote reflector, including subevent step data,
-selected TX powers, procedure enable config, CS config, sw_time values,
-and BLE connection interval.
+---Test result---
 
-Add cs_proc_state with a 16-entry ring buffer in cstracker to track
-procedures keyed by procedure counter, accumulating results
-independently from each side until both report all-results-complete.
+Test Summary:
+CheckPatch                    PASS      1.79 seconds
+GitLint                       FAIL      0.76 seconds
+BuildEll                      PASS      20.35 seconds
+BluezMake                     PASS      540.34 seconds
+MakeCheck                     PASS      19.00 seconds
+MakeDistcheck                 PASS      160.12 seconds
+CheckValgrind                 PASS      229.19 seconds
+CheckSmatch                   PASS      313.06 seconds
+bluezmakeextell               PASS      103.83 seconds
+IncrementalBuild              PASS      546.37 seconds
+ScanBuild                     PASS      980.56 seconds
 
-Update parse_mode_{0,1,2,3}, parse_step, and parse_subevent_steps with
-output pointer parameters to capture remote reflector step data.
-Introduce parse_cs_local_initiator_data() to store local HCI subevent
-results, handling both initial and continuation events. Update
-parse_ras_data_segments() to route decoded RAS subevent data into the
-matching cs_proc_state as reflector results.
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,1/3] shared/rap: Add bcs_procedure_data aggregation and procedure data API
 
-Add bt_rap_set_procedure_data_cb() to register a callback fired once
-both local and remote results are complete for a given procedure.
-Add bt_rap_set_local_sw_time(), bt_rap_set_remote_sw_time(), and
-bt_rap_set_conn_interval() so callers such as rap_hci.c can supply the
-CS capability sw_time and connection interval required by upper-layer
-distance calculation algorithms.
-
-Remove unwanted function rap_detached , fix for rap profile level
-disconnections
+1: T1 Title exceeds max length (84>80): "[BlueZ,v2,1/3] shared/rap: Add bcs_procedure_data aggregation and procedure data API"
 
 
-  Commit: f98e4a98e84e347e5795046e06313a1ad63ee55c
-      https://github.com/bluez/bluez/commit/f98e4a98e84e347e5795046e06313a1ad63ee55c
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-29 (Wed, 29 Jul 2026)
+https://github.com/bluez/bluez/pull/2360
 
-  Changed paths:
-    M profiles/ranging/rap.c
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles/ranging: Emit CS ProcedureData signal over D-Bus
-
-Serialize completed BCS procedure data (subevent/step results,
-CS config, and procedure-enable parameters) into a byte blob and
-emit it via a new ProcedureData D-Bus signal on the CS interface,
-so an external ranging estimation daemon can consume raw controller
-measurements
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 417b3d11164f593a3a802c24d950bf9c7b1a7d32
-      https://github.com/bluez/bluez/commit/417b3d11164f593a3a802c24d950bf9c7b1a7d32
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-29 (Wed, 29 Jul 2026)
-
-  Changed paths:
-    M doc/org.bluez.ChannelSounding1.rst
-
-  Log Message:
-  -----------
-  doc: Update ProcedureData signal doc for byte-blob format
-
-Document the create_context CS configuration parameter added
-alongside the CS Create Config command.
-
-Update the ProcedureData signal signature from dict to array{byte},
-matching the byte-blob serialization now used in rap.c, and drop
-the per-field dict documentation (procedureCounter, subevent
-results, csConfigParam, etc.) that no longer applies since the
-signal now carries an opaque binary blob instead of a structured
-dict.
-
-
-Compare: https://github.com/bluez/bluez/compare/26d1de5e4c12%5E...417b3d11164f
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5226598968907850034==--
