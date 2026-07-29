@@ -1,91 +1,85 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C4D3C3BFA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 07:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C49A43DA3A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 08:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785311507; cv=none; b=ZaS3icdW/90EAIC90sU7H05dFYnlOjoyZMgIyshe5sgWMbuloew35aDY4SnHazrb1bh/yymvQjOymbUbl8GfBMmIehKCnRU5aqog7G9Ev5OGcQ1PA4ewwUyE7QHHlSL99oJC/YXSGeB/aRbpr3LkrvTIKpjHaTI+CS0rgvJygU4=
+	t=1785313605; cv=none; b=r/1JCiiNpab3ShF8bxd8lPcS4oua4lgOcCHRdtO51TPOuXmFdxJZel0yDePktupe1cXi8UFc+C0YkYfucq+uAkeC5xgODuTOXoRP9JhZKnZxVXAkYBuaE/SvJFJzid/htjO9r99xOzG0kryI7pmpPmFJDcPpdKFgWFF2vVgzoqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785311507; c=relaxed/simple;
-	bh=ig9oLUxmRnO+70c8qEM2wcAAJt7WVLIifjRLCEV4kjw=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AtyNa4Ace7TMhhi0zWlHbMJy4vMjw6K+GZkUNTQzl8MBOESqpmPiW44E+Y0nGv3XWM68iLMOhwxoDELP2DK5ILP/y1vManw1BUIEnOS7hMg7l3f6J5HOpM79URbZ/pqihzkR6hw+5KKs1h63OMZGuyAjgG7F5sw8x80NmA6qC6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E68CD3EDE2;
-	Wed, 29 Jul 2026 07:51:37 +0000 (UTC)
-Message-ID: <7e887551e24d1e16c9ad8bbd2305ff1318fd7db4.camel@hadess.net>
-Subject: Re: [PATCH BlueZ bluez] bap: fixed the return value of GIOFunc
-From: Bastien Nocera <hadess@hadess.net>
-To: yang.li@amlogic.com, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 29 Jul 2026 09:51:37 +0200
-In-Reply-To: <20260729-fix_iofunc-v1-1-653c8e9ac29a@amlogic.com>
-References: <20260729-fix_iofunc-v1-1-653c8e9ac29a@amlogic.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1785313605; c=relaxed/simple;
+	bh=NRr/PPKE2tayn33AWBxWRxD9ZfM4ROw+JKEoMSSaRd0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=USXcVw81vMqnSS4F8IYvEUL9MkX7VlNbaVmaI+n4iQ348CiupXKUqlLd/dm8YeSMU94xx6//zaxGQgs7e6NvJfn0bQU7NYmtDmiMeQZaSGZobin26htTWiKogf0f7/R9Cq4flzN4AnTr9tGHgh5zvYiDkYsJspkHdAgsj5pnYfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pfS0RhGt; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pfS0RhGt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=40
+	rBicJUszC8qh3xVLhwtMRSZ+FMA7+omUBnS/S45hA=; b=pfS0RhGtZ7iGy+R1UA
+	2TlqoFnffPofK0+EyEmJRzA5h7pIPNTg1DsvLNCSJ11tQGxSU1dP2pn7nlhprf7N
+	+JKhRqbPfE+MXwoLjU6eTxV/lLSGTtl3TaAKX18eUOfK6JkwvIbeBRw5L9P2G6Qh
+	gBs7CbH0Knhrkzt+l/M5p8w4M=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3X_4puWlqssxQLw--.22578S2;
+	Wed, 29 Jul 2026 16:26:19 +0800 (CST)
+From: zhangchen200426@163.com
+To: luiz.von.dentz@intel.com,
+	michael.bommarito@gmail.com,
+	kees@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Chen Zhang <zhangchen01@kylinos.cn>
+Subject: [PATCH] Bluetooth: virtio_bt: Fix memory leak in virtbt_probe
+Date: Wed, 29 Jul 2026 16:26:15 +0800
+Message-Id: <20260729082615.308918-1-zhangchen200426@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEFly99vOX8lSMTAZj4ORJAOinL89WWVr2ojVhQ9F8aQ0ZNtEUwN5V5eM2wPfNw6Ev+wIYpBrDPdFnXqx8D4RuAlgqT2zcsJj2a7iaffzg4D1hgXQLAwfZomX7uGJeUhSdk8hD5l1naw/M9/kF7/FJQFf5NXG39jAeV15h4u0V8zjct2NR1ZbBcrG1ffdOFleMpD7Q6fWIaAEDPVwbxx72tcSXBEWjAO0DtU21QRZjJ4AAmDq0bC1ZeVAJAfGTfHMhOq5UYN4HzpCqh2c/NpelrA8Q7HVI7XYIL/ZZaGkE4ZF9AyUx0sZRKjP8lMCuy4vDFoAKcNI0OI2sjEjoJzyXit1XGRJDwhHD7fIQ/OFXZFoLm59do2SVioa+smfyy9AhuGqdB67NuyHKj9WZVbNUHIxoFYuA+PYi4Oikawrd3Rox4iNkxslSDWhUq2cUpt03SX7K5K5iwUwwZDdmpMNDNwnW4/De7zxCeGJL12P+23Q4AkQirWQRcJDCAvqUYFzMTCXgtkFuxI7F5IQHDCupzpPWnZEUxfQmQIlxirX6z6coG8B1bXUg3wbfRl9Bh3Q922GhHsYUP7ogL6DZjg4smkPENPMJoy2XDSVwRrQHA/9pogBN9Qg+3XwuMPoFSRe0wokmnr2F3OZo/QBi0JEMaHTOpmYVnv/mJvET0QnZPQg
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3X_4puWlqssxQLw--.22578S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrurW3urW5Jryktw1Uuw1Utrb_yoWftFg_C3
+	WfZ347Zr1DGF18u3W8Cry5ZrWay3WrWF4kWwnaqas3W34DCr17Xa42qr1DAF17WrWUKr1U
+	Aws8XrsxCw4fCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8Hq2tUUUUU==
+X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbCwAttCmppuSu6awAA3s
 
-On Wed, 2026-07-29 at 09:47 +0800, Yang Li via B4 Relay wrote:
-> From: Yang Li <yang.li@amlogic.com>
->=20
-> The GIOFunc should return FALSE if the event source should be
-> removed.
->=20
-> Fixes: 322c39a64 (bap: Start BIG sync after receiving BIGInfo)
->=20
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+From: Chen Zhang <zhangchen01@kylinos.cn>
 
-Looks good, thanks.
+In virtbt_probe, if virtio_find_vqs fails, it will return
+directly, causing a memory leak in vbt.
 
-Although I would have still preferred G_SOURCE_REMOVE which makes it
-clearer what it does.
+Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
+---
+ drivers/bluetooth/virtio_bt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> ---
-> =C2=A0profiles/audio/bap.c | 4 +---
-> =C2=A01 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index 473e4cfc2..ff8f58a12 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -3683,7 +3683,6 @@ static gboolean iso_do_big_sync(GIOChannel *io,
-> GIOCondition cond,
-> =C2=A0			BT_IO_OPT_INVALID)) {
-> =C2=A0		error("bt_io_set: %s", err->message);
-> =C2=A0		g_error_free(err);
-> -		return FALSE;
-> =C2=A0	}
-> =C2=A0
-> =C2=A0	if (!bt_io_bcast_accept(io,
-> @@ -3694,10 +3693,9 @@ static gboolean iso_do_big_sync(GIOChannel
-> *io, GIOCondition cond,
-> =C2=A0			iso_bc_addr.bc_bis, BT_IO_OPT_INVALID)) {
-> =C2=A0		error("bt_io_bcast_accept: %s", err->message);
-> =C2=A0		g_error_free(err);
-> -		return FALSE;
-> =C2=A0	}
-> =C2=A0
-> -	return TRUE;
-> +	return FALSE;
-> =C2=A0}
-> =C2=A0
-> =C2=A0static void long_pa_sync_confirm_cb(GIOChannel *io, void *user_data=
-)
->=20
-> ---
-> base-commit: 729f96089cf66831d911385623ca932e0c245913
-> change-id: 20260729-fix_iofunc-e62cecc52b8e
->=20
-> Best regards,
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 140ab55c9fc5..5ca163f8ea70 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 
+ 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
+ 	if (err)
+-		return err;
++		goto alloc_vqs_failed;
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -400,6 +400,8 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
++alloc_vqs_failed:
++	kfree(vbt);
+ 	return err;
+ }
+ 
+-- 
+2.25.1
+
