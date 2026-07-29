@@ -1,69 +1,69 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3F84052A2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 15:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0B53E7625
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 15:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785339264; cv=none; b=clRWg1Rxa1cew8zufaxUmn5Z1+n7ka1rosrS0CPY2HPfy7qgifSTGEdI2HslHhnHXFuai/49C122dU1nhmjgeywQGCns/ukt9FcpYS4lAcSuqeJSBdQmNwnGqAMV54z1sivysWGoQlP/sk8g0jrRXudv4woRdaBezxORSpKSCHs=
+	t=1785339267; cv=none; b=EECrIEnhehumLltpoAFY6gLjOttaud/oDhBEYvqREVkoLLmU2u3ruro50OXijrNT/Pk5d6hSJEa/n+ou7U3SsUQ3dALb5Eny8XqKHqTcjMZqhcokfzmsnVNs0d2+7AhzlsYS86yovuFPQySrjVsL/KXQgisPlnYJG7dOqkdhvTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785339264; c=relaxed/simple;
-	bh=FTZvxnJgmOJXIylCJGBhAmG9TNfZKGbZ0On++E5Oqeg=;
+	s=arc-20240116; t=1785339267; c=relaxed/simple;
+	bh=PWvs7QiDhHkwZOotcU2hi3W+FtNJ+ZwbHngI5IFkKwA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PtICKKt/EE10pHXPwkY/zlB7qQ+EOkV/ZlqhIBni2mZ6xO3JDRNJlGdS24UHwq+cQU8oQy+/V5MyBMUeKWnJexXKEQ+seA9InCsbovBd+m9/IAyngF8B3gE74B9UMXi2kXdc5rUvmSgId/Fede0TPyuwhkETHnpqBHZKxmOPU3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCC99+bY; arc=none smtp.client-ip=209.85.217.54
+	 MIME-Version; b=m1pbeT5Il0e+pimLd3z/6vJXEZNO8WqCjD5pA3iDLW045KO4v6RBaLhVcegQM5Oa1MQGApmxvgB8knVUGs9WehD1dYBV0nFBgsoetW4pyq6jvgt5P/JrXcwx0qGQD8ji4iFdqAn1rT9l4eHbPxlza6guaxGkjbMchRoJG1Xvg2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EZ38H9vp; arc=none smtp.client-ip=209.85.217.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCC99+bY"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-7466771f1caso411668137.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 08:34:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZ38H9vp"
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-74ac3ea9c60so314748137.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jul 2026 08:34:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785339260; x=1785944060; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785339261; x=1785944061; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=zbzrFLRsHcF82vTXp3HI4m2wFpO5PWZJ3g7zftwDtnM=;
-        b=bCC99+bYmOt8K5dwZ7Ld/zPbC9GyMa/sDuUX9k51iKCy1lY4tBnzNOt4DyZx7Mhdzt
-         JubL67/nD1F6aqA1qKKL4iLDkjTDh1SmVum7W4QWNPAsTYVK0ICGtG7NoNRvmocp/Aac
-         X78R2IXO2JkwDR1FxKQYV+LF9ucN0ssch1NWSDXqr71BcdM/F84yTGHbNpoz+FakrfI2
-         mUlh1kc/zXlmmI1DtjdHKd/6Wy0D6ZB2yFgQ2J+feXrrfRtl8KgEWJg6tyRlZIZbb/Uy
-         b+PRQQUqDiNJMtWmsmWs9qyCExf7mS0em9kUpoDwlQry0cYbroVOjyR1xycFKD3gThDV
-         zoig==
+        bh=NZV+sz3BgRcg6BpIZzbMvmCNXzGmHCUdFVxaejO32zU=;
+        b=EZ38H9vpQZ5OdT/nE3mv6yin1XDRORINoOU8BKu/uw9J247sGYTK44yVwxmycqYGYY
+         H0FmM7fxPQAIh2J8ouaq3ebnU2aSOuZkXvGop+HTnIiN9EKPg0iJSplOz/ZVOSoQjlWo
+         mF2vjRqukbdZCX6ydxfmZOmc2IMolM0UxoE41XvxI1f00nriCa9kn4mhoEJloS9Ron8w
+         oQ/6v1LEqJn1dlyHlZwavj2LHalul4DXFQAc0lPtidPwi1Evvh5j7vbOwzBuRiqzb83C
+         /UOycQCRgSobbz7Xte24XJWgWOJMdwxNxkuQ1I604unYvGR4rGu2JKyIM7uA/QJ/IeK6
+         8/PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785339260; x=1785944060;
+        d=1e100.net; s=20251104; t=1785339261; x=1785944061;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=zbzrFLRsHcF82vTXp3HI4m2wFpO5PWZJ3g7zftwDtnM=;
-        b=aUiRRQ8xBhC206Lu2PxOC7Fol4G69pv8brHC67OHTh9nkCrnBDtDRB/xZwuhCQV0q2
-         l1ZIiZQWltMVB5qFFoE5Uxxuqn19YrzDXEOZ3sO64RtIHKyKbzQTFd1IP7QMomkRi6/Q
-         wT41PfoexAhmtZJDh5Y1jfJBgvWhojJzygRONSXaxVveVd6rrcmbTj94HHfPK9lZE883
-         AVAvYu4JoJEx7D4IDnYriYfQUVWCnu7wq4yTvfIFa0N/jVJTUraR6V098T+ag1DxmbP0
-         0k/wzKGnvEVh+NuAK31hSuoyq25gvSDunYgjnahFIm66Y8W7mqmFnm3fOsXx+jBi7D79
-         ibNw==
-X-Gm-Message-State: AOJu0Yy2ZwyanYBljyivZtrlgtnmDRI/IttXGDIA6UsyUhxVPwIC4BNt
-	TByHxGX58+MVkUHWNKuCW6NNS9/pj4gz/muMIJ6ko4ZudciYho9FPmNrPdotNX7c
-X-Gm-Gg: AR+sD11uwTPhz8W/zi1kwS4oHlS67gayygiKbpEWAYBs+yhOHtwvF2rHA8TWdaftAru
-	As9OH7rdj+C/gqVjpATa+igb1VIvSD82Ln/CRpUn+w0qIobPnjOAelqJuvnJuJPojZooP9XMi8g
-	dsBqe2xkL36bJTcV9h4lS2we7WDsFGGSgPmnE229/71xcqRyd5giFqVWQNXzVmML5EMsg5rpbQe
-	e1i7380gx+Cew8nt+mKqMkOmo5sG0GkDsxfur+N2VpZP/n3ee7CPCZXAigi7GnUhDjnnaYzgq6q
-	6lz4JtWRu77bZUHYACDOusDa6g2CWnmnDWMw2RMZY2HQDjynNXaHmQDH5za+MnZopnhOWaITzW1
-	CNV4p5VtM26Z0NKJiTVydEIt7IvIyLtJk4DyWQTuF4BRn2LX/nnMm/gWeifNvpQKS/mtfJwBMRC
-	e9LbgtsoyZ5sLrG1N4k+HqyKW3Vrodyfj8o3JnWl0S0u4OZqDLeX501j7Vz3oKTwO5tZuT7gFl0
-	auUdJpR7jA2CU00/iSNgcfPSALD7NXrAjQwPKNWTnBcd9mfNScVTaAkve+RxQCloy5QmA==
-X-Received: by 2002:a05:6102:3e85:b0:745:7f23:a876 with SMTP id ada2fe7eead31-7549f1461ecmr3279954137.1.1785339259493;
-        Wed, 29 Jul 2026 08:34:19 -0700 (PDT)
+        bh=NZV+sz3BgRcg6BpIZzbMvmCNXzGmHCUdFVxaejO32zU=;
+        b=dS6ortCS5dwxq37UP4RCkswH0zwHX/6eqY3l8yw+mmuW46dRYV//2DVGeZpjL6Ki4I
+         O9WBL/qBkz0WqIfmier6cD4EMCiVHTtOLx14ypJTtR/9J5vGsumTk1dXdjKj80vHCIGZ
+         Qb2bQLRCY9xf6RZMCa7wk59AAFgVZQ6etQacSM1dtkpDPY2BDl4cv8Xtv4jJE7PtZl1G
+         xJVx1mTiV6+o1Jm+SkWqJoBTdZchLuAP3g31FrhCYMqHfqfqQFSxIPGTrou2fOI2rhkW
+         I8WS5IhtUHzV379GXyCtKLTMc85t77mjY/r7mgf6pqb6rmBhDb9gggyZ3Gp2oQ1xFzyU
+         c3kA==
+X-Gm-Message-State: AOJu0YzypT4nYdcFd9sJh/Fbm2Jm7aIZLS7eD/1jKang8Y6RfFKsjLp0
+	uujQYql+BCpTLoGrSokY1BfSi41KR4uCc4PVJOVXiHL3c1HaNgCbtdqTlqr2KaB4
+X-Gm-Gg: AR+sD12IwMS12uzh36d3UOY88ByYpbq4CPQMXw63QDx4nZiGlDGC+A+T43k74MZkZtC
+	W/VZdMM9VMa62MjzJ5PfixS7Ypu/CEi1K8GRlQb2DvAHbTl2TrKza4P/0dL5Kov97UEPO4aksXW
+	AvNq7emy6ymLVOZpAQGz+ZHJn2B96Ip22s94CV3jRez/MAxiRTH/3zRjItx5MaKbogZFd6IOh2m
+	Ks9bzruuRFEfdSl7KgBaoOgX9R/8/HzlTOj83/Xzu7ddwTU/wcntqAtQB8YQlJe4wg7HM5dY5U7
+	4StUA6QZQobYtFQ0Hdha1B3OlDFuusNXbq3G2DVoxRFwwhi1YRNdmjY3lNByEYJdZfCNVvZQCta
+	avArBQx3zT99da/jA59E0MHfK7OFtiqxLdqMJD+QkTebX5cg/Y4etL7HAWSuCzUY+8uRhTSDRRj
+	b8RLkEiQ1Yyna+NcNWAkaru0estIF+2x1PM/3dE/PuIXF9czl0Yeaa6KWXJlUl1BkFmQtOFXS6y
+	Kml1TQHS6ySE6ySnp9qNGBM8q1APwFuitHaSpY1lq871Xtb8E5sEeiDZlw=
+X-Received: by 2002:a05:6102:370a:b0:631:af51:7d8e with SMTP id ada2fe7eead31-754a12afc76mr3260718137.17.1785339260682;
+        Wed, 29 Jul 2026 08:34:20 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-755a74c0b80sm1820585137.4.2026.07.29.08.34.18
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-755a74c0b80sm1820585137.4.2026.07.29.08.34.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 08:34:19 -0700 (PDT)
+        Wed, 29 Jul 2026 08:34:20 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/3] Bluetooth: Add MGMT Shorter Connection Interval setting
-Date: Wed, 29 Jul 2026 11:34:11 -0400
-Message-ID: <20260729153412.2564039-2-luiz.dentz@gmail.com>
+Subject: [PATCH v3 3/3] Bluetooth: Add MGMT Load Connection Subrate command
+Date: Wed, 29 Jul 2026 11:34:12 -0400
+Message-ID: <20260729153412.2564039-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260729153412.2564039-1-luiz.dentz@gmail.com>
 References: <20260729153412.2564039-1-luiz.dentz@gmail.com>
@@ -77,68 +77,406 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add MGMT_SETTING_SCI (bit 25) to advertise support for the Shorter
-Connection Interval (SCI) feature. It is reported in the supported
-settings whenever the controller is SCI capable, and in the current
-settings whenever LE is enabled and the controller is SCI capable
-(SCI has no separate enable command, so it is a passive capability).
+Add MGMT_OP_LOAD_CONN_SUBRATE (0x005C) command to load per-device
+connection subrate parameters when the SCI feature is supported.
+
+Add MGMT_EV_CONN_SUBRATE (0x0033) event to notify userspace when
+connection rate changes occur via the LE Connection Rate Change HCI
+event.
+
+Add subrate fields (subrate_min, subrate_max, max_latency, cont_num)
+to struct hci_conn_params to store the loaded subrate parameters, and
+the corresponding le_rate_* fields to struct hci_conn to track the
+parameters currently in use.
+
+When a single entry is loaded for an already-connected central, or on
+connection completion, the LE Connection Rate Request procedure is
+initiated to apply the parameters.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 2 ++
- include/net/bluetooth/mgmt.h     | 1 +
- net/bluetooth/mgmt.c             | 6 ++++++
- 3 files changed, 9 insertions(+)
+ include/net/bluetooth/hci_core.h |  10 +++
+ include/net/bluetooth/hci_sync.h |   1 +
+ include/net/bluetooth/mgmt.h     |  28 +++++++
+ net/bluetooth/hci_event.c        |  32 ++++++--
+ net/bluetooth/hci_sync.c         |  69 ++++++++++++++++
+ net/bluetooth/mgmt.c             | 132 +++++++++++++++++++++++++++++++
+ 6 files changed, 264 insertions(+), 8 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 8126fed34613..3c279c032547 100644
+index 3c279c032547..a5ea461f45c9 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -2084,6 +2084,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+@@ -815,6 +815,14 @@ struct hci_conn_params {
+ 	u16 conn_latency;
+ 	u16 supervision_timeout;
  
- #define le_sci_capable(dev) \
- 	((dev)->le_features[9] & HCI_LE_SCI)
-+#define le_sci_enabled(dev) \
-+	(le_enabled(dev) && le_sci_capable(dev))
++	u16 rate_min_interval;
++	u16 rate_max_interval;
++	u16 subrate_min;
++	u16 subrate_max;
++	u16 max_latency;
++	u16 cont_num;
++	u16 rate_supv_timeout;
++
+ 	enum {
+ 		HCI_AUTO_CONN_DISABLED,
+ 		HCI_AUTO_CONN_REPORT,
+@@ -2502,6 +2510,8 @@ void mgmt_advertising_removed(struct sock *sk, struct hci_dev *hdev,
+ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
+ void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
+ 				  bdaddr_t *bdaddr, u8 addr_type);
++void mgmt_conn_subrate_notify(struct hci_dev *hdev, struct hci_conn *conn,
++			      u8 status);
  
- #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
- 	(!hci_test_quirk((dev), HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG)))
+ int hci_abort_conn(struct hci_conn *conn, u8 reason);
+ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 0756d6fe77d4..a6579a868678 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -183,6 +183,7 @@ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 			    struct hci_conn_params *params);
++int hci_le_conn_rate_request(struct hci_dev *hdev, struct hci_conn *conn);
+ 
+ int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 08daed7a96d5..b285441db55b 100644
+index b285441db55b..1e22eab1081c 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -118,6 +118,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_LL_PRIVACY		BIT(22)
- #define MGMT_SETTING_PAST_SENDER	BIT(23)
- #define MGMT_SETTING_PAST_RECEIVER	BIT(24)
-+#define MGMT_SETTING_SCI		BIT(25)
+@@ -894,6 +894,23 @@ struct mgmt_cp_hci_cmd_sync {
+ } __packed;
+ #define MGMT_HCI_CMD_SYNC_SIZE		6
  
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4fd37ac79986..58f01fbfcf71 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -861,6 +861,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	if (past_receiver_capable(hdev))
- 		settings |= MGMT_SETTING_PAST_RECEIVER;
- 
-+	if (le_sci_capable(hdev))
-+		settings |= MGMT_SETTING_SCI;
++#define MGMT_OP_LOAD_CONN_SUBRATE	0x005C
++struct mgmt_conn_subrate {
++	struct mgmt_addr_info addr;
++	__le16 min_interval;
++	__le16 max_interval;
++	__le16 subrate_min;
++	__le16 subrate_max;
++	__le16 max_latency;
++	__le16 cont_num;
++	__le16 supv_timeout;
++} __packed;
++struct mgmt_cp_load_conn_subrate {
++	__le16 param_count;
++	struct mgmt_conn_subrate params[] __counted_by_le(param_count);
++} __packed;
++#define MGMT_LOAD_CONN_SUBRATE_SIZE	2
 +
- 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
- 
- 	return settings;
-@@ -952,6 +955,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (past_receiver_enabled(hdev))
- 		settings |= MGMT_SETTING_PAST_RECEIVER;
- 
-+	if (le_sci_enabled(hdev))
-+		settings |= MGMT_SETTING_SCI;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+@@ -1193,3 +1210,14 @@ struct mgmt_ev_mesh_device_found {
+ struct mgmt_ev_mesh_pkt_cmplt {
+ 	__u8	handle;
+ } __packed;
 +
- 	return settings;
++#define MGMT_EV_CONN_SUBRATE			0x0033
++struct mgmt_ev_conn_subrate {
++	struct mgmt_addr_info addr;
++	__u8	status;
++	__le16	interval;
++	__le16	subrate;
++	__le16	latency;
++	__le16	cont_num;
++	__le16	supv_timeout;
++} __packed;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d5ef7b3a50cb..734a91c3351f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5867,6 +5867,17 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		}
+ 	}
+ 
++	/* If we are central and have subrate parameters stored, queue a
++	 * connection rate request to apply them.
++	 */
++	if (conn->role == HCI_ROLE_MASTER && le_sci_capable(hdev)) {
++		struct hci_conn_params *p;
++
++		p = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++		if (p && p->subrate_max)
++			hci_le_conn_rate_request(hdev, conn);
++	}
++
+ unlock:
+ 	hci_update_passive_scan(hdev);
+ 	hci_dev_unlock(hdev);
+@@ -7371,18 +7382,23 @@ static void hci_le_conn_rate_change_evt(struct hci_dev *hdev, void *data,
+ 
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 
+-	if (ev->status)
+-		return;
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+ 	if (conn) {
+-		conn->le_rate_interval = le16_to_cpu(ev->interval);
+-		conn->le_subrate = le16_to_cpu(ev->subrate);
+-		conn->le_rate_latency = le16_to_cpu(ev->latency);
+-		conn->le_cont_num = le16_to_cpu(ev->cont_number);
+-		conn->le_rate_supv_timeout = le16_to_cpu(ev->supv_timeout);
++		/* Only update the stored rate parameters on success; on
++		 * failure the values in the event are not valid. Userspace is
++		 * notified either way.
++		 */
++		if (!ev->status) {
++			conn->le_rate_interval = le16_to_cpu(ev->interval);
++			conn->le_subrate = le16_to_cpu(ev->subrate);
++			conn->le_rate_latency = le16_to_cpu(ev->latency);
++			conn->le_cont_num = le16_to_cpu(ev->cont_number);
++			conn->le_rate_supv_timeout =
++				le16_to_cpu(ev->supv_timeout);
++		}
++		mgmt_conn_subrate_notify(hdev, conn, ev->status);
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 9dfab81e40f8..e981e45d523a 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7274,6 +7274,75 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
  }
  
++static int hci_le_conn_rate_request_sync(struct hci_dev *hdev, void *data)
++{
++	struct hci_conn *conn = data;
++	struct hci_conn_params *params;
++	struct hci_cp_le_conn_rate cp;
++
++	hci_dev_lock(hdev);
++
++	/* The request was queued asynchronously so re-validate the connection
++	 * and its parameters under hdev->lock. The connection may have been
++	 * torn down, or may not have a valid handle yet (still connecting),
++	 * and the parameters may have been removed in the meantime (e.g. by
++	 * Load Connection Parameters). Snapshot the rate values so the
++	 * blocking command below can run without holding hdev->lock.
++	 */
++	if (!hci_conn_valid(hdev, conn) ||
++	    HCI_CONN_HANDLE_UNSET(conn->handle)) {
++		hci_dev_unlock(hdev);
++		return -ECANCELED;
++	}
++
++	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++	if (!params) {
++		hci_dev_unlock(hdev);
++		return -ECANCELED;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle	= cpu_to_le16(conn->handle);
++	cp.interval_min	= cpu_to_le16(params->rate_min_interval);
++	cp.interval_max	= cpu_to_le16(params->rate_max_interval);
++	cp.subrate_min	= cpu_to_le16(params->subrate_min);
++	cp.subrate_max	= cpu_to_le16(params->subrate_max);
++	cp.max_latency	= cpu_to_le16(params->max_latency);
++	cp.cont_num	= cpu_to_le16(params->cont_num);
++	cp.supv_timeout	= cpu_to_le16(params->rate_supv_timeout);
++	cp.min_ce_len	= cpu_to_le16(0x0000);
++	cp.max_ce_len	= cpu_to_le16(0x0000);
++
++	hci_dev_unlock(hdev);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CONN_RATE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static void hci_le_conn_rate_request_destroy(struct hci_dev *hdev, void *data,
++					     int err)
++{
++	struct hci_conn *conn = data;
++
++	hci_conn_put(conn);
++}
++
++int hci_le_conn_rate_request(struct hci_dev *hdev, struct hci_conn *conn)
++{
++	int err;
++
++	/* Hold a reference to the connection so it cannot be freed while the
++	 * request is pending or running on the cmd_sync worker.
++	 */
++	err = hci_cmd_sync_queue(hdev, hci_le_conn_rate_request_sync,
++				 hci_conn_get(conn),
++				 hci_le_conn_rate_request_destroy);
++	if (err < 0)
++		hci_conn_put(conn);
++
++	return err;
++}
++
+ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+ {
+ 	struct hci_conn *conn = data;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 58f01fbfcf71..e376759ccf00 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8160,6 +8160,119 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				 NULL, 0);
+ }
+ 
++static int load_conn_subrate(struct sock *sk, struct hci_dev *hdev, void *data,
++			     u16 len)
++{
++	struct mgmt_cp_load_conn_subrate *cp = data;
++	const u16 max_param_count = ((U16_MAX - sizeof(*cp)) /
++				     sizeof(struct mgmt_conn_subrate));
++	u16 param_count, expected_len;
++	int i;
++
++	if (!lmp_le_capable(hdev) || !le_sci_capable(hdev))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_SUBRATE,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
++	param_count = __le16_to_cpu(cp->param_count);
++	if (param_count > max_param_count) {
++		bt_dev_err(hdev, "load_conn_subrate: too big param_count value %u",
++			   param_count);
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_SUBRATE,
++				       MGMT_STATUS_INVALID_PARAMS);
++	}
++
++	expected_len = struct_size(cp, params, param_count);
++	if (expected_len != len) {
++		bt_dev_err(hdev, "load_conn_subrate: expected %u bytes, got %u bytes",
++			   expected_len, len);
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_SUBRATE,
++				       MGMT_STATUS_INVALID_PARAMS);
++	}
++
++	bt_dev_dbg(hdev, "param_count %u", param_count);
++
++	hci_dev_lock(hdev);
++
++	for (i = 0; i < param_count; i++) {
++		struct mgmt_conn_subrate *param = &cp->params[i];
++		struct hci_conn_params *hci_param;
++		u16 min, max, subrate_min, subrate_max;
++		u16 max_latency, cont_num, supv_timeout;
++		u8 addr_type;
++
++		bt_dev_dbg(hdev, "Adding subrate %pMR (type %u)",
++			   &param->addr.bdaddr, param->addr.type);
++
++		if (param->addr.type == BDADDR_LE_PUBLIC) {
++			addr_type = ADDR_LE_DEV_PUBLIC;
++		} else if (param->addr.type == BDADDR_LE_RANDOM) {
++			addr_type = ADDR_LE_DEV_RANDOM;
++		} else {
++			bt_dev_err(hdev, "ignoring invalid connection subrate parameters");
++			continue;
++		}
++
++		min = le16_to_cpu(param->min_interval);
++		max = le16_to_cpu(param->max_interval);
++		subrate_min = le16_to_cpu(param->subrate_min);
++		subrate_max = le16_to_cpu(param->subrate_max);
++		max_latency = le16_to_cpu(param->max_latency);
++		cont_num = le16_to_cpu(param->cont_num);
++		supv_timeout = le16_to_cpu(param->supv_timeout);
++
++		/* Validate the parameters before storing them. Reject
++		 * logically inconsistent values instead of forwarding them to
++		 * the controller.
++		 */
++		if (min > max || subrate_min > subrate_max ||
++		    subrate_min < 1 || supv_timeout < 1) {
++			bt_dev_err(hdev, "ignoring invalid connection subrate parameters");
++			continue;
++		}
++
++		hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
++						addr_type);
++		if (!hci_param) {
++			bt_dev_err(hdev, "failed to add connection parameters");
++			continue;
++		}
++
++		hci_param->rate_min_interval = min;
++		hci_param->rate_max_interval = max;
++		hci_param->subrate_min = subrate_min;
++		hci_param->subrate_max = subrate_max;
++		hci_param->max_latency = max_latency;
++		hci_param->cont_num = cont_num;
++		hci_param->rate_supv_timeout = supv_timeout;
++
++		/* If the device is connected as central check if the
++		 * connection rate parameters need to be updated.
++		 */
++		if (!i && param_count == 1) {
++			struct hci_conn *conn;
++
++			conn = hci_conn_hash_lookup_le(hdev,
++						       &hci_param->addr,
++						       addr_type);
++			if (conn && conn->state == BT_CONNECTED &&
++			    conn->role == HCI_ROLE_MASTER &&
++			    (conn->le_rate_interval < min ||
++			     conn->le_rate_interval > max ||
++			     conn->le_subrate < subrate_min ||
++			     conn->le_subrate > subrate_max ||
++			     conn->le_rate_latency != max_latency ||
++			     conn->le_cont_num != cont_num ||
++			     conn->le_rate_supv_timeout != supv_timeout))
++				hci_le_conn_rate_request(hdev, conn);
++		}
++	}
++
++	hci_dev_unlock(hdev);
++
++	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_LOAD_CONN_SUBRATE, 0,
++				 NULL, 0);
++}
++
+ static int set_external_config(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 len)
+ {
+@@ -9577,6 +9690,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_VAR_LEN },
+ 	{ mesh_send_cancel,        MGMT_MESH_SEND_CANCEL_SIZE },
+ 	{ mgmt_hci_cmd_sync,       MGMT_HCI_CMD_SYNC_SIZE, HCI_MGMT_VAR_LEN },
++	{ load_conn_subrate,       MGMT_LOAD_CONN_SUBRATE_SIZE,
++						HCI_MGMT_VAR_LEN },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+@@ -10725,6 +10840,23 @@ int mgmt_init(void)
+ 	return hci_mgmt_chan_register(&chan);
+ }
+ 
++void mgmt_conn_subrate_notify(struct hci_dev *hdev, struct hci_conn *conn,
++			      u8 status)
++{
++	struct mgmt_ev_conn_subrate ev;
++
++	bacpy(&ev.addr.bdaddr, &conn->dst);
++	ev.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
++	ev.status = mgmt_status(status);
++	ev.interval = cpu_to_le16(conn->le_rate_interval);
++	ev.subrate = cpu_to_le16(conn->le_subrate);
++	ev.latency = cpu_to_le16(conn->le_rate_latency);
++	ev.cont_num = cpu_to_le16(conn->le_cont_num);
++	ev.supv_timeout = cpu_to_le16(conn->le_rate_supv_timeout);
++
++	mgmt_event(MGMT_EV_CONN_SUBRATE, hdev, &ev, sizeof(ev), NULL);
++}
++
+ void mgmt_exit(void)
+ {
+ 	hci_mgmt_chan_unregister(&chan);
 -- 
 2.54.0
 
