@@ -1,149 +1,106 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F11F3FF1B5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 12:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8742CCB9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 12:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785412876; cv=none; b=M67u2KasgEx73w/5cAwJEUQv//Ae9t5MbWGohihg8/yocYa9bHAg9luOTPvf6KP13D3/I3cjaTBKyC0Cxmo1VVRgg9HUC0m3EXdLftOTNh6ziTuyUvMhGg8AQWabSZbDvIdDqbnSMdbnwr9NDIuP64N/4U6xGbpx14unVh868HM=
+	t=1785413900; cv=none; b=cOL+CaO9YQspC7gSUofD7EMAZXz0wOyWsvULdQBaUHS/7OiD249pukP3dFZviaSLo9sDmE1n1AF2IQWlZkJH38J5zvhqw2gifGditS7V+z/B3ItO9vPj4f9Y7NMspA5jPtEloMseE9iO915JFcH7mSlvvt/Fs39ijKxpIOUb+Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785412876; c=relaxed/simple;
-	bh=QAIUSK1ScUk2VtPjt0neU1ySGTnpzmlanwMf+AejOQg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=T/5TfehJrUa+Ex+usdXGf/jQuMrK5Cc4qVjskpqGw82qrwgpCWaCBukrhfpiJ9RewY5pdzjwadekvT/XpdEhcbMpBA0pU0bd9awDXM3I4lCx1z1rfX1Rr62czYIn0/M/3vgMAnTeC1Xk+GMo+VqRSqsdgmmO8BrV0iDWOmEiKCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=niiFyFdQ; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785413900; c=relaxed/simple;
+	bh=kSsN03GnxoJBIoQA0nCO5cNxUI5HxHRIdApveJYZoOc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MvzYI42iE6L+NxcYqKVH4pM6QBUkd9HErWKlvzq3BavZc/7oVS+SNijOCZlH/HISMLJ8lnFk2Kf795QvEySVJSJsEpGWEAam+4/rTO7zpWDpAjHVI9qgsIcPqGIK6xk6t8qxeIs++Q4T6rTabQRHH9AwPmZetj1Cy0RHz4iGiHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gjQI/Ius; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="niiFyFdQ"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c04bf4711so18429241cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 05:01:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785412874; x=1786017674; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MOl4w/YDYTwA/vX6Lt9S2PPzOeYZLYct6jgBogVlH/k=;
-        b=niiFyFdQz38few2FqA053Fh7HYuwYZfq8Z1Vv0elcLHKkuA12kbtTLHU6w+GlE3cFp
-         Vn1w5VVBB6/v3F4de+/6CDiDu9WG0N9UeyRgtyIdnw90cCPLmmUf6J0DVLY6eeSgf3Ql
-         pSzp8V3a+vXBxndyDi4f+5p9gPCrAcDCsK28BUaDZ3CPURPniUob2gU8owB0fyyiwrza
-         TYE6K8Zrslg3HPWb7AVpiOmNlJhmgIYDYzrRo56qiD4sMVwxAK5bk1YXCETie76OMMmN
-         hj21cqVt2Od7o+QVzJchXSjYYrYFRW4l0oEkLJlrolL3O3tHQ5t/JOTMbfLVkcldmjh9
-         WVTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785412874; x=1786017674;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=MOl4w/YDYTwA/vX6Lt9S2PPzOeYZLYct6jgBogVlH/k=;
-        b=kpwVX65nllqgNwCWZxZQfLhgdv1FZqMGbWFNij3ObUIuT+Xy4r7oyWc5Dx8Cg2kbDE
-         Ah0wZJeWEZqx+LnjeRTjSWDDrC1t/o0A1RnpBnaGzt+OZf1qZqnD6IOicTIkgjik2nlj
-         yP08DcYk+6IX1p/lxTIMSz+23R9ssJ1rpJIQ4ZRJErsgtaJMEfEhIyyhu+YNvskD5X4y
-         HXSGJYqO9ajkD2b218PzxwIFEbrtB57t41eqyLAu21iyvNs+d9i3Au637D8sCaugzAzl
-         /JI13L9NJSPOU1ttY7tEGNNGeUMrnqgZIEKS9K9D6VNHcCguRaEYheOlhXVLtql5hXZi
-         sj0w==
-X-Gm-Message-State: AOJu0YySMRIx0K058x5WCqsb8ZW5VKeW7lkrt+h+nO/f5VckP3tGJqQ6
-	RgnY2Ra2oyD9LhHAhIQB0Q60iPUXdF5pSD9dJKb02MIu7DC3ZoCD9TmiUuwNmA==
-X-Gm-Gg: AR+sD13hZMoaDJRfNQScUpTSNMG9i0gNYHO9dqROFQs/FtvTpHWXZZZayEhhUDa68Lg
-	if8LCZGEdSXEHXmJfoTQGwR/sDPeMaN8mK9lUR1rKPsQODbFFWJr1JvVxq9xVLDVzX1wZtL6hCE
-	/bDcgOGcvrEljHZE23VIFX4vFlMxD3Yc/rtr7/bcp/apwbLmbr44Gtu/4faP593TEd7QXPTWMt6
-	IUDfhnT5ZMaPBuA3LU79rBUXMESYmsbptoeVa0nshdxvV2C7+mgrafbbqZ3j4VVEsFB6JXNnllG
-	8xNeza4q94/apVedyoBXS+1vROVFdH2B6iYDsuZzfWPtgFmNHXkpi0qcCP3H+aiDP+adKzq2tmx
-	i0G+QcDlhANRq/vlCXnuqpC4xxgxrSEBr9ulpQomz8EDSfFejnm8hdljRPIMO1CcBGFjmqT5QfH
-	DQEey++tM4kZrnw8sw0aNLCByX6S/7amle1/EAO3NLB/oHJybZcEwt61GgsYrzvCeco7E=
-X-Received: by 2002:a05:622a:120c:b0:51c:404:af7a with SMTP id d75a77b69052e-52b384b29fcmr23383631cf.31.1785412873985;
-        Thu, 30 Jul 2026 05:01:13 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.46.144])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529e30f2a96sm39380691cf.28.2026.07.30.05.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 05:01:13 -0700 (PDT)
-Message-ID: <6a6b3d09.a80a6acc.2aae2f.2a94@mx.google.com>
-Date: Thu, 30 Jul 2026 05:01:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7384948468031508650=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gjQI/Ius"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785413898;
+	bh=Z7PzcCvIyTUVW6OkJb2/sPB8hx1kKXYzFBE+aK/BL3c=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gjQI/Ius1C65vRlZpM9I2H/PRrX9QkO3VR8370vmf/K9HvR4L+gbqQs0VzU0Q/JaO
+	 paJT7leVhOvVoAXJIBVyPoqL/ZcQJNscbEOQ8pW49958A1u2WlxrZRoZbmzeOwEipH
+	 TyJn4sGSTr2eJSoOgkg6UPO0EgYnVwPU0eEIRxJw=
+Received: from github.com (hubbernetes-node-db697ad.va3-iad.github.net [10.48.67.64])
+	by smtp.github.com (Postfix) with ESMTPA id 17EE7281308
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 05:18:18 -0700 (PDT)
+Date: Thu, 30 Jul 2026 05:18:18 -0700
+From: Bhavani <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1137365/000000-8ac88e@github.com>
+Subject: [bluez/bluez] e45e34: doc: Add org.bluez.ChannelSoundingDistance1
+ docume...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nicoyip.dev@gmail.com
-Subject: RE: Bluetooth: hci_sync: Fix accept list UAF during suspend
-In-Reply-To: <20260730092331.2069741-1-nicoyip.dev@gmail.com>
-References: <20260730092331.2069741-1-nicoyip.dev@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7384948468031508650==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1137365
+  Home:   https://github.com/bluez/bluez
+  Commit: e45e34bc67bf179f59f7a3f03ba4d88d3417685c
+      https://github.com/bluez/bluez/commit/e45e34bc67bf179f59f7a3f03ba4d88d3417685c
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
 
-Dear submitter,
+  Changed paths:
+    M Makefile.am
+    A doc/org.bluez.ChannelSoundingDistance1.rst
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1137271
+  Log Message:
+  -----------
+  doc: Add org.bluez.ChannelSoundingDistance1 documentation
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.75 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      26.55 seconds
-CheckAllWarning               PASS      29.04 seconds
-CheckSparse                   PASS      27.76 seconds
-BuildKernel32                 PASS      25.73 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      492.07 seconds
-TestRunner_l2cap-tester       PASS      60.43 seconds
-TestRunner_iso-tester         PASS      79.77 seconds
-TestRunner_bnep-tester        PASS      18.83 seconds
-TestRunner_mgmt-tester        FAIL      221.14 seconds
-TestRunner_rfcomm-tester      PASS      26.11 seconds
-TestRunner_sco-tester         PASS      31.57 seconds
-TestRunner_ioctl-tester       PASS      26.50 seconds
-TestRunner_mesh-tester        FAIL      25.90 seconds
-TestRunner_smp-tester         PASS      23.14 seconds
-TestRunner_userchan-tester    PASS      19.88 seconds
-TestRunner_6lowpan-tester     PASS      23.03 seconds
-IncrementalBuild              PASS      25.17 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.246 seconds
-LL Privacy - Unpair 1                                Timed out    1.953 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.410 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
+Document the org.bluez.ChannelSoundingDistance1 interface, which
+exposes the DistanceMeters estimate computed by an external ranging
+provider registered via ChannelSoundingDistanceProviderManager1.
 
 
-https://github.com/bluez/bluetooth-next/pull/514
+  Commit: 607387474769ac7f362acf38c3c3beedc319786a
+      https://github.com/bluez/bluez/commit/607387474769ac7f362acf38c3c3beedc319786a
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M Makefile.am
+    A doc/org.bluez.ChannelSoundingDistanceProvider.rst
+
+  Log Message:
+  -----------
+  doc: Add org.bluez.ChannelSoundingDistanceProvider documentation
+
+Document the org.bluez.ChannelSoundingDistanceProvider1 interface,
+implemented by external clients to expose per-device Channel Sounding
+distance estimates that BlueZ reflects onto the corresponding device
+object.
 
 
---===============7384948468031508650==--
+  Commit: 8ac88e45b986c1a60e4f6d34d95f623485e72811
+      https://github.com/bluez/bluez/commit/8ac88e45b986c1a60e4f6d34d95f623485e72811
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/org.bluez.ChannelSoundingDistanceProviderManager.rst
+
+  Log Message:
+  -----------
+  doc: Add org.bluez.ChannelSoundingDistanceProviderManager documentation
+
+Document the org.bluez.ChannelSoundingDistanceProviderManager1
+interface, used by external clients to register and unregister
+themselves as Channel Sounding distance providers via
+RegisterDistanceProvider/UnregisterDistanceProvider.
+
+
+Compare: https://github.com/bluez/bluez/compare/e45e34bc67bf%5E...8ac88e45b986
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
