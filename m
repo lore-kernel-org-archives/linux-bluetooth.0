@@ -1,91 +1,114 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637A446AA8A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 19:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A66720D4FC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 19:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785438074; cv=none; b=TnRxyEd2mYKzKEvkm4mv+pnyG53K/g0S3PVlTl0xM/o3EO49gHs4yrYRSlzRya/iwb+HlFwWJhJ2cA7OPr/Dg5v9t1yivVJokvnI24vT4zWllFz4pyBPdaeUfQ530Z2R3/ludiBWxyYUBFfsgiH3+qxgSfrQsKyzj8Pm72K2cTQ=
+	t=1785440764; cv=none; b=GSRsRhYg7bWgIzjU3+R2Mtzt9DDvWrtvpfoqAL8MwTpBeQiwwzm8nTZ0JCbZNdLHWSjnD9M3JmffzkTG4MlLFOgA9Kv3VsYJWOG7FeVZ9AtPF2Ir7tFPoh9Gyr1EPg+gw4ew4mNMAYM6Z+8fAkexHt1ejn4EUQgPN7Qk5g8zlrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785438074; c=relaxed/simple;
-	bh=JpJa/7I93G0FgS9hqQhS7/3Vc6gL+KuE3nTzAV0CE2Q=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AEzExwzksIMHGvqFhhSTOQYAl+KNpcKC9hpckkAn/9vJw2dmYiCvmvXhZP4c4Gy8J6AkBmr2+pmbINXCU2FUceUjLEzMu3AYw3lJB0GHta6ajdgaSN85CH558DQ/eE1S40tgHqL1uhHgnVDFzLcqp9deX/yPvW+1MwffcOnojKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=JVuPtaFt; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1785440764; c=relaxed/simple;
+	bh=q9pXI1ETtEYdcFmdRSsCmxk53ZZ95JGG2oJ45ujt14I=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=eX1pyVMTiXQmm0Hs39PxDy+1oq1mhAsdJxQ6rRu9wUKatr8ns314i9C36Ilos0xljqYmrOw/77G+ILX+KZYcVcS9MUDKXrOrZd7yy5IleML8eDoVVqH99LBTyZOoPM1qAbzffj3/9ihq+x9TO4v1q4ADU8QaozcaDlsc++oFxDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TisJG8l7; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="JVuPtaFt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1785438060;
-	bh=Uvs6AMfdVkxmQNEc0qB1+mhFf5a/mz055kMWAGwOLjU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=JVuPtaFtjqlyeoDZXD90IqRAH5NEljNpeEbVqu8CNOiB9dqzGrNUJaGrCX/6zv2Mz
-	 r/qcX96NLTwb2FdJbXGVvUSGg/Ok6hxRdNUAyzJvtJIg16q5sqlhM01cP5hk/xyi5Y
-	 WKH9sEQOCQ7ZWPBV7Ge1guEs2xVj+7u0uVFP5Rpc=
-Received: from github.com (hubbernetes-node-a984dd9.ac4-iad.github.net [10.55.98.37])
-	by smtp.github.com (Postfix) with ESMTPA id 5A114406D9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 12:01:00 -0700 (PDT)
-Date: Thu, 30 Jul 2026 12:01:00 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1137629/000000-032ea0@github.com>
-Subject: [bluez/bluez] 032ea0: monitor: Decode Intel DDC LE extended features
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TisJG8l7"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-92e6391b114so17824985a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 12:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785440756; x=1786045556; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=vx8HQB1k9n4Z/v4z62XYau4y+gHh/pV8KxvPcrBA94A=;
+        b=TisJG8l7SCgA3Xrkw00aM9Z6dBeU2KJRsbbGrd9c8xB3cIih92x0OoYTtH3fJ7Ana3
+         m5FcPQoNVkidu/9IIoDS2D5dfh1gcZq/8TeAcADgKW4L8QbGgD7xcT6tGr1cxLc2dB0C
+         lyIgEGGKXeEbk3M53Evd57nfpK3Kz1hXp/NMPMqDnnu6X1X397qReojq7x696xa3cMQV
+         4/Nwxfsm+S5KBm+wVIfKsWk70Sp56pP05xKTA8j+CaHeRrkTs/Hfn8TH6VIRvQEDkslt
+         SbMJjkoolllIXajvfNklDc2sQWi3n2jQvLJpZPTYZvmNDH9fa2S5jZtiAs7SSEZBfDyl
+         1fzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785440756; x=1786045556;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=vx8HQB1k9n4Z/v4z62XYau4y+gHh/pV8KxvPcrBA94A=;
+        b=h+if3EmsBurcPKmr1h7WB+WgdHAcOSP1WDWuwrg8z0Byh6AkrGTMPZs8yZLE4t1Xg+
+         gVTb8Fv9DWL9Ao8rXPvnWWP06dk9VjfXqp8RMbrw6UehX4MRhoVZvXoXmmD56ZqaqLxN
+         0Km5JslOUDJxtuFbYmgIqdt5b6OPWJXUt07m9ampuE930fot2P7/A6PnBKKrVT0XSDEh
+         y2/xq/53e/Zw4sljo7gdxxTLxk7lfz9hIntu0k0GH0OMGz7PKRpV371HBk0lkswnivKX
+         2yjymEzKrLxC3uH3GPybxAv78a3Q6AIMAyZEOcgRhQmA7p0bwoszSWRezS2ulskwZBYm
+         oubw==
+X-Gm-Message-State: AOJu0Yxtjp5nmw7mUnjSyLm7/3rl6rxgPRUYOE6u+11BRqmYIwWAcJsw
+	MQ5wLHuW6j25Wpl9Dy8jPUp6WXfj877YLPk8MunvU5Gx7NK5DqvYALm9IajrMQ==
+X-Gm-Gg: AR+sD12iWxZdVcinfebkIk7Kk27syZyA2Uu4bCmfPCz/zMXoil5oN7o5n57uV/YFCEL
+	uVY9VQhY1MCANuTEAg2miYfI66xFGmgqSnYAB0URoPWnOXFzWqd9oleY6ar9hNlAPWf2Er+uras
+	NIGqlfKXGYx88I6c9jecIYaFVb12KI3GKUqQKriktWN19vRzevOVkx8SI5Eoyj8ktiEYDV7LiL7
+	xUVEpCgEMWSe1FrILBzCGdMXfomqM3M+vIMfzmabw+YYouWrajhIo+/yjazRP5olx9tI0C251jL
+	Y3cSlHPV60E/BHmpR6n6227zylsrtqSrSH5Clkx0s8VlNjTT4ADel+wpUYfqI6qZfKSOFCXIYoH
+	xiySkDGn1R4AhzJhe9cDdNSGNJx0Uq7M9Q5gvXgOT68c4mJBhiMatPl5Nf88Xm8q6z2ant46c01
+	NjTf5YvpubUHIkuAja5YO7gqP5+sGcCDR+3cHCbw2VtYsZuvL7LmTLSAbbjUskHDRGuVAmfPHbM
+	SHU
+X-Received: by 2002:a05:620a:a0db:20b0:92e:5137:2830 with SMTP id af79cd13be357-93486ee9d03mr329554385a.72.1785440756278;
+        Thu, 30 Jul 2026 12:45:56 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.87.150])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-933e733f4ffsm495518185a.38.2026.07.30.12.45.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jul 2026 12:45:55 -0700 (PDT)
+Message-ID: <6a6ba9f3.3d6d24e4.3347ce.79be@mx.google.com>
+Date: Thu, 30 Jul 2026 12:45:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1195625794806809625=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] monitor: Decode Intel DDC LE extended features
+In-Reply-To: <20260730175135.2865308-1-luiz.dentz@gmail.com>
+References: <20260730175135.2865308-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1195625794806809625==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1137629
-  Home:   https://github.com/bluez/bluez
-  Commit: 032ea05b41638c34a105bc2665fb495ec25faa82
-      https://github.com/bluez/bluez/commit/032ea05b41638c34a105bc2665fb495ec25faa82
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-07-30 (Thu, 30 Jul 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M monitor/intel.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  monitor: Decode Intel DDC LE extended features
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1137629
 
-The Intel DDC Config Write command (0x3f|0x008b) can carry identifier
-0x031f which holds the 248 octet LE extended features array, using the
-same layout as LE Read All Local Features: page 0 is 8 octets followed
-by 10 pages of 24 octets each.
+---Test result---
 
-Decode it with the existing LE feature tables instead of dumping raw
-hex, and make the parameter loop stop on truncated/padded entries.
-
-Example, setting only the SCI bits on page 1 (bits 8 and 9):
-
-  hcitool cmd 0x3F 0x008B 0xFA 0x1F 0x03 \
-      0xFF 0xF9 0x01 0x3F 0xBE 0x00 0x00 0x80 \
-      0x00 0x03 0x00 0x00 ... (padding up to 248 octets)
-
-  < HCI Command: Intel DDC Config Write (0x3f|0x008b) plen 251
-          Identifier: 0x031f
-          Features[0/0][8]:
-          ff f9 01 3f be 00 00 80                          ...?....
-            LE Encryption
-            Connection Parameter Request Procedure
-            ...
-            LL Extended Feature Set
-          Features[1/0][8]:
-          00 03 00 00 00 00 00 00                          ........
-            Shorter Connection Intervals
-            Shorter Connection Intervals (Host Support)
-          Features[1/1][8]:
-          00 00 00 00 00 00 00 00                          ........
-          ...
+Test Summary:
+CheckPatch                    PASS      0.50 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      20.14 seconds
+BluezMake                     PASS      513.53 seconds
+MakeCheck                     PASS      0.96 seconds
+MakeDistcheck                 PASS      154.32 seconds
+CheckValgrind                 PASS      145.77 seconds
+CheckSmatch                   PASS      296.87 seconds
+bluezmakeextell               PASS      96.29 seconds
+IncrementalBuild              PASS      518.94 seconds
+ScanBuild                     PASS      900.58 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2364
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1195625794806809625==--
