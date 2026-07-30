@@ -1,237 +1,399 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053834519BE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA4C38B14D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785427272; cv=none; b=D424/o7KbbBR1ePTQepjkDlF4LNOnlG1vQxdxXFjOWS2WER9YMekOSHTuaCP64Z4UqxA/nAxEkiX1oz4bWMrQnWcMh58qTKub9x+m42w3181uXB/2UqMPSkZSnH5MaucQqbbeiW+VXErWn03YjSXimgSUOA7PXPHZ+Q09L5EEF0=
+	t=1785427687; cv=none; b=LK8pA86mrDVIVG0GAHMWKuiLx64kjsPse5yW+rMfXMptICL1NkkXHA9u+0j/21ZWK5wX28QaTqEZobWphlIumikeiHX5qgIQcAVdPbO91ZyLONdYBbny9ttbqB2eZ++wcCdIc99bd5/uv0GODskowux3TWqldrQc17fNu3X5S0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785427272; c=relaxed/simple;
-	bh=WoEsQQXEHcp3Z4NugaMqCjtqYrDzpmWHIggHogkIi2k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qbTAIQwD1ZUmLxO2zLzeRhTAIl3/ckgX+hhARxpEdZOKqWD2e7DNC+FEmAUoBJDJALQ9x7xBma24no3Kho5Ui1WPBfAjnD8qLKlU2kXtF3g278BmMmwUWNmNknWx+Pxs3jL7xCa6K82UNKIx47w6+hCfH2khVbTcVQP8mcdtuwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=otwBB6sT; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XIlShTwK; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1785427687; c=relaxed/simple;
+	bh=DON+xAdKEmmim4qThnafUBdhRgpjD/0tKvb6wVZmFBs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lXaAMtBT13n2j7fJy2c4wiRhZObaGUuPWxM/u8WMUKhG6nHdw95RYhWQqbFYYW2wRqb3DAtNlz3IeB6XfsNswhAYWogIVGjXsqVhM1FvSDmby4yTFuwhCkfLPvm8m9Z2/0ZGkp5/WPUMaLV9Wv1Rzt1KvjgH9pbXTKg8BzjHYCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=f39NhbQn; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="otwBB6sT";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XIlShTwK"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66UFQrxU1223244
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:01:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Rc77KXcNF3bATkg/J0Hcy+3fqulP+axrKTzQn99rjZ0=; b=otwBB6sTYEC5Pwgk
-	p/a56NEtduZLgnFOT+mUbwZmBYWofu/93DrVNEGesvn2u1NO1kpmMFM7Y/EP7vAQ
-	AO13YWtHuG0oz/mSLBXD6mnMuDZhFC/5pqiqRnorHsmA68wDO/+wRCcq4UppCqev
-	eT2yaes1u/23RpAQDNO1tmdcq1oYCaPSMEpD+D91MJQ+xu4fenU/TzQh73qK61Uq
-	/TMmMHfwvxlyPIhE55OFFtX+GSYHkNr1kolzgGL3vrQdxzMPiTOEwTy9YG6N8coe
-	3oW3PLoWqs2jRYri8450gqjUbt6X3pksaQFP7MsW5DgGcw87aHzTbVjCx0BCZt0R
-	EdMuZA==
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com [209.85.222.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fr8jmrep2-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:01:08 +0000 (GMT)
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-977601a649cso2047613241.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 09:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1785427267; x=1786032067; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Rc77KXcNF3bATkg/J0Hcy+3fqulP+axrKTzQn99rjZ0=;
-        b=XIlShTwKkzIdXOFPe4qBOVxOT70qKjLoLWam7/CFqhqSajQQC/2ziVqrEo4e8+YtdX
-         R01D6MOKpV0ENW7GOFnOIMLJXcWn7kwO6Su1VLxgvpFKrbNOUS95xuBODdy/jJt7RJiY
-         8zF9TISp37I+Ob7kmTkIwkdxYmmfQvX3dqMT5+DyUZjwo/dtlcYRYuO25uoNk52csb0h
-         iTW+28YL3U0/U3eYspmDAtbZEFdkA6KpkrnxbZoQgl5+BNQne2AvnFQzGdtKIyVMHfeM
-         s3Ma9eXf+JDkO5UPAHT0TsNp0c4wUnnQ7DaY7kXVY7X3V4FuldjGxah8FvlAA65sB+qp
-         aojA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785427267; x=1786032067;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Rc77KXcNF3bATkg/J0Hcy+3fqulP+axrKTzQn99rjZ0=;
-        b=rlsC0zDTPg9UetytmZljj/2EmLdivjd+3Cf0dpLeiRtYVb27LH91zCWGhFpCjLsQDu
-         /2eHTAptPWAg4xs3kJmARCkN1kf701luQ1t2Kdg7JsfqKtTkOiM51QoCCarbAFkjHm8C
-         nwKhlVdO7fvmADhZyr04MK/hzpwwJ0iAT5QtCu20F/KzSiygZ42W8tjGArnhJVLjvFkY
-         AaSRd6tckUVP9KXNKEi8N3rC5b0SOxBGpDBu22MOezgJMxzBnFBD0McgNWdsZiCDMcik
-         uh+gS9kBQRkFUvCywyT8mHXZy2aKAlh4lww+H+l3VxAR3IuUC1xUhgWPQ51LkDVi16iz
-         eVlQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp9ygRccxZepab4o9120b0xTKmATt/TjulljkDlJIZQShna4epQNdG9BIxFmtC0+ikHKYSQbZnBfWAImC+FcV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywsnwru0F7/b8n+Zr265RpMkFkltpvQpxe13oLKB069sQ0nPBXz
-	JwZwOrpeJYmTmGloWUq36m0+E58Ll7ZCZarj1bSJtCfzWuKdd71lcWdsNxXEHZUYlUb0kA7klKR
-	+vCHtLSni/aJWwJEnajYZdJFXFYH6yui8PloskG/ETK3ulKDjayt5dQEZ2uQlF10K5VYfWjA=
-X-Gm-Gg: AR+sD13USDCd+nYLn9Yk4qhRwnNd15uKDURHTZip1DodBqgHzFess79YgQjyQ+gZR69
-	xfjcovJZi6OvZGHzT47lUzSHqla/EFIy5rIRFiKQIkLCEjRsesVcOeOfCJTauKnnK/xFmLBQHrq
-	FxuEnhaSExVAHgQ8cVIc6cuNk5Wz7Z5NhmTcwCG0CsANw2tr4k7Az22BeRuK2a6LlUbdf6YbUe0
-	2YBaAfdjB57Woh9gMh+rpou21yGQktlFY7x9Hv0cSxRDjwEllbJkt71LL4KdFu6zxhsbD4+kGJU
-	RCWp1mLDTJOmbic3l5te22LJ3lYHlDaR3VcMCkxqK7Kb0E4ZhV8A6xknpzS1NQVbM9ysBhge9u+
-	0TmHB9DGeTtR7bn441LDjbcbp9/EP8EIvmT9IlucGAWyAQ8nvSSi9+6kvDOORMHfX22kQvPCVaU
-	sQBd8iJUh37TUtOePxbpAgs0WcTPmMS1FIMJUl4AKdHaVLAvxHocD3
-X-Received: by 2002:a05:6102:c09:b0:74a:84ea:4f6c with SMTP id ada2fe7eead31-7574ff6c30amr1313437137.15.1785427267389;
-        Thu, 30 Jul 2026 09:01:07 -0700 (PDT)
-X-Received: by 2002:a05:6102:c09:b0:74a:84ea:4f6c with SMTP id ada2fe7eead31-7574ff6c30amr1313267137.15.1785427266454;
-        Thu, 30 Jul 2026 09:01:06 -0700 (PDT)
-Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:61cd:dcd3:c61a:ac3c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1fa8bb6deesm85168066b.53.2026.07.30.09.01.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 09:01:05 -0700 (PDT)
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Thu, 30 Jul 2026 18:00:40 +0200
-Subject: [PATCH v9 10/10] arm64: dts: qcom: arduino-imola: Describe NVMEM
- layout for WiFi/BT addresses
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="f39NhbQn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785427684;
+	bh=pQBXCSv5vYKsO3vOgDeeAKoG+CtxXsk331Q3f2/VPRk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=f39NhbQnEBZmArvuIYle7rbmsXmoMNbtTE6ulcua4tWlfQ3Nx7TFdxGajbmTdZhKj
+	 Tz56gHU60Qy9Wy0BkKUpIl3PsONWw3g5m2JEHgxBIn/yMl9ciQOdC8V3omomrEuYXb
+	 Qnq0zFdixEQ4iBDPLR4y4qr0Y6/zaAEtsQeldedg=
+Received: from github.com (hubbernetes-node-c3a9ba1.va3-iad.github.net [10.48.167.54])
+	by smtp.github.com (Postfix) with ESMTPA id DDAEA800B8E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 09:08:04 -0700 (PDT)
+Date: Thu, 30 Jul 2026 09:08:04 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/98e5a7-e45128@github.com>
+Subject: [bluez/bluez] 2f94d6: shared: Add bcs_procedure_data aggregation and
+ pro...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260730-block-as-nvmem-v9-10-f72935817dbf@oss.qualcomm.com>
-References: <20260730-block-as-nvmem-v9-0-f72935817dbf@oss.qualcomm.com>
-In-Reply-To: <20260730-block-as-nvmem-v9-0-f72935817dbf@oss.qualcomm.com>
-To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Saravana Kannan <saravanak@kernel.org>,
-        Christian Marangi <ansuelsmth@gmail.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, daniel@makrotopia.org,
-        Loic Poulain <loic.poulain@oss.qualcomm.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Authority-Analysis: v=2.4 cv=V4tNF+ni c=1 sm=1 tr=0 ts=6a6b7544 cx=c_pps
- a=R6oCqFB+Yf/t2GF8e0/dFg==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=EUspDBNiAAAA:8
- a=1BEw5LmG3YzgyHxDt7YA:9 a=QEXdDO2ut3YA:10 a=TD8TdBvy0hsOASGTdmB-:22
-X-Proofpoint-GUID: kMmwCT2aVTLWKJpuKQDdakJL9B4cFi98
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDEyMCBTYWx0ZWRfX1ieyNmzTmOfH
- Dou+E+uvoeUsL++jBzGLNnoEt/5SPck/EPZT0MSZpE23y2SxOLrIl7tt/qfzV5/ollM6ZcXpHvn
- fHptRMRGHNmk5pAEPehTiVevzPuL/qZgbGWTk9rt4LADFzZK9tenGDyhJ7yXyoHcxFqtNb3y9Hc
- ssV0tILhKo2I7QbUyVWHC1JXiUsfon6HqStn9PVXS/HUnO+JQMRvUA4/BObY4Pn94XTgxMclqU1
- AlREb5cyQR6JBF/JOZA/vbpS8SwdbtjWkmQhWbn3XunKflOCZt2tTmG9chZ+gTNi3kOoSSr5q0g
- +Sx68/2BvPLMct9EIoeyyC1pI0r77Pr5+ax4JVs8xvVmSX4tykJQgdKZuHiIt1Dg+TzhDWuX/Xn
- akoTNlh3fBreKA41uN5awONxzC6PKTKyOyRumRix3sBczRqgZ1cbQWCLJRl3tjdvQx7MxMnjS+A
- fDrMR+MZwzLP3/spwnQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDEyMCBTYWx0ZWRfXwVMcvKb8jEKq
- hyA/yTdrKAzZey/7haUaIUQlpCp/dA5jHpEZzarL21BIeDwmWJo6F6Ft3DB0INRKkor/FA/qH+d
- VNi55pRhlldTGXnxkfFMeQLYZqZ9PuM=
-X-Proofpoint-ORIG-GUID: kMmwCT2aVTLWKJpuKQDdakJL9B4cFi98
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-30_04,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0 impostorscore=0 suspectscore=0 phishscore=0
- adultscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300120
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Arduino Uno-Q, the eMMC boot1 partition is factory provisioned
-with device-specific information such as the WiFi MAC address
-and the Bluetooth BD address. This partition can serve as an
-alternative to additional non-volatile memory, such as a
-dedicated EEPROM.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2f94d65b8c80a879fffb0e82be391423d4992da6
+      https://github.com/bluez/bluez/commit/2f94d65b8c80a879fffb0e82be391423d4992da6
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
 
-The eMMC boot partitions are typically good candidates, as they
-are relatively small, read-only by default (and can be enforced
-as hardware read-only), and are not affected by board reflashing
-procedures, which generally target the eMMC user or GP partitions.
+  Changed paths:
+    M src/shared/rap.c
+    M src/shared/rap.h
 
-Describe the corresponding nvmem-layout for the WiFi and Bluetooth
-addresses, and point the WiFi and Bluetooth nodes to the appropriate
-NVMEM cells to retrieve them.
+  Log Message:
+  -----------
+  shared: Add bcs_procedure_data aggregation and procedure data API
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
----
- arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts | 32 ++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+Define bcs_procedure_data to hold per-procedure CS results from both
+the local initiator and remote reflector, including subevent step data,
+selected TX powers, procedure enable config, CS config, sw_time values,
+and BLE connection interval.
 
-diff --git a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-index bf088fa9807f040f0c8f405f9111b01790b09377..38839b8a361e76f6c1989924b16095b9d8815f66 100644
---- a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-+++ b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
-@@ -409,7 +409,33 @@ &sdhc_1 {
- 	no-sdio;
- 	no-sd;
- 
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+
- 	status = "okay";
-+
-+	card@0 {
-+		compatible = "mmc-card";
-+		reg = <0>;
-+
-+		partitions-boot1 {
-+			compatible = "fixed-layout";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+
-+			wifi_mac_addr: mac-addr@4400 {
-+				compatible = "mac-base";
-+				reg = <0x4400 0x6>;
-+				#nvmem-cell-cells = <1>;
-+			};
-+
-+			bd_addr: bd-addr@5400 {
-+				compatible = "mac-base";
-+				reg = <0x5400 0x6>;
-+				#nvmem-cell-cells = <1>;
-+			};
-+		};
-+	};
- };
- 
- &spi5 {
-@@ -512,6 +538,9 @@ bluetooth {
- 		vddch0-supply = <&pm4125_l22>;
- 		enable-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
- 		max-speed = <3000000>;
-+
-+		nvmem-cells = <&bd_addr 0>;
-+		nvmem-cell-names = "local-bd-address";
- 	};
- };
- 
-@@ -557,6 +586,9 @@ &wifi {
- 	qcom,ath10k-calibration-variant = "ArduinoImola";
- 	firmware-name = "qcm2290";
- 
-+	nvmem-cells = <&wifi_mac_addr 0>;
-+	nvmem-cell-names = "mac-address";
-+
- 	status = "okay";
- };
- 
+Add cs_proc_state with a 16-entry ring buffer in cstracker to track
+procedures keyed by procedure counter, accumulating results
+independently from each side until both report all-results-complete.
 
--- 
-2.34.1
+Update parse_mode_{0,1,2,3}, parse_step, and parse_subevent_steps with
+output pointer parameters to capture remote reflector step data.
+Introduce parse_cs_local_initiator_data() to store local HCI subevent
+results, handling both initial and continuation events. Update
+parse_ras_data_segments() to route decoded RAS subevent data into the
+matching cs_proc_state as reflector results.
 
+Add bt_rap_set_procedure_data_cb() to register a callback fired once
+both local and remote results are complete for a given procedure.
+Add bt_rap_set_local_sw_time(), bt_rap_set_remote_sw_time(), and
+bt_rap_set_conn_interval() so callers such as rap_hci.c can supply the
+CS capability sw_time and connection interval required by upper-layer
+distance calculation algorithms.
+
+Remove unwanted function rap_detached , fix for rap profile level
+disconnections
+
+
+  Commit: 6b74b0bb1f0077f9440016d235dd9aa0da23c2ff
+      https://github.com/bluez/bluez/commit/6b74b0bb1f0077f9440016d235dd9aa0da23c2ff
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles/ranging: Emit CS ProcedureData signal over D-Bus
+
+Serialize completed BCS procedure data (subevent/step results,
+CS config, and procedure-enable parameters) into a byte blob and
+emit it via a new ProcedureData D-Bus signal on the CS interface,
+so an external ranging estimation daemon can consume raw controller
+measurements
+
+
+  Commit: 1896d365decbb1f6c584a3a7827417c6057b10e7
+      https://github.com/bluez/bluez/commit/1896d365decbb1f6c584a3a7827417c6057b10e7
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M doc/org.bluez.ChannelSounding1.rst
+
+  Log Message:
+  -----------
+  doc: Update ProcedureData signal doc for byte-blob format
+
+Document the create_context CS configuration parameter added
+alongside the CS Create Config command.
+
+Update the ProcedureData signal signature from dict to array{byte},
+matching the byte-blob serialization now used in rap.c, and drop
+the per-field dict documentation (procedureCounter, subevent
+results, csConfigParam, etc.) that no longer applies since the
+signal now carries an opaque binary blob instead of a structured
+dict.
+
+
+  Commit: 92f6ea8766d06e164ec3addfe75e7fdaa3e760ad
+      https://github.com/bluez/bluez/commit/92f6ea8766d06e164ec3addfe75e7fdaa3e760ad
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M profiles/input/hog-lib.c
+
+  Log Message:
+  -----------
+  input/hog-lib: Add discovery support for HIDS 1.1 SCI attributes
+
+Add support for discovering and reading HIDS 1.1 SCI (Subrated
+Connection Interval) characteristics:
+
+ - HID SCI Mode (0x2c39)
+ - HID SCI Information (0x2c3a)
+
+When the HID Information flags indicate SCI is supported (bit 2),
+the SCI Mode and SCI Information characteristics are read after
+the HID Information is obtained.
+
+
+  Commit: a938cf48d0830a73833a15217f2f3f3191b91d8d
+      https://github.com/bluez/bluez/commit/a938cf48d0830a73833a15217f2f3f3191b91d8d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M emulator/btdev.c
+    M emulator/btdev.h
+    M emulator/hciemu.c
+    M emulator/hciemu.h
+
+  Log Message:
+  -----------
+  emulator/btdev: Add emulation support for HIDS 1.1 SCI commands
+
+Add BTDEV_TYPE_BREDRLE62 device type with support for Shorter
+Connection Interval (SCI) feature from Bluetooth 6.2 spec:
+
+ - LE Connection Rate Request (0x20a1)
+ - LE Set Default Rate Parameters (0x20a2)
+ - LE Read Minimum Supported Connection Interval (0x20a3)
+ - LE Connection Rate Change event (0x37)
+ - Shorter Connection Intervals feature bits
+
+
+  Commit: 794eea61584650457aaf2ffa8ec9c8cb7a278e57
+      https://github.com/bluez/bluez/commit/794eea61584650457aaf2ffa8ec9c8cb7a278e57
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M doc/mgmt-protocol.rst
+    M lib/bluetooth/mgmt.h
+
+  Log Message:
+  -----------
+  mgmt: Add Shorter Connection Interval setting and Load Connection Subrate
+
+Add the Shorter Connection Interval setting bit (25) to indicate
+controller support for SCI feature.
+
+Add the Load Connection Subrate command (0x005C) which allows
+loading connection subrate parameters for devices that support
+shorter connection intervals as defined in Bluetooth 6.2.
+
+
+  Commit: 46f08703a1522fffd73261cac252ccdac23b51d6
+      https://github.com/bluez/bluez/commit/46f08703a1522fffd73261cac252ccdac23b51d6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Add tests for SCI setting and Load Connection Subrate
+
+Add HCIEMU_TYPE_BREDRLE62 device type for testing Bluetooth 6.2
+features and add test cases:
+
+- Set Low Energy on 6.2 - SCI Setting: verifies that the SCI
+  setting bit (25) is reported in supported/current settings
+  for a 6.2 controller.
+- Load Connection Subrate - Invalid Params 1: verifies invalid
+  parameters are rejected.
+- Load Connection Subrate - Success 1: verifies loading valid
+  connection subrate parameters succeeds.
+
+
+  Commit: 071c21873dfab3286dc2895ebafd80357f256cf5
+      https://github.com/bluez/bluez/commit/071c21873dfab3286dc2895ebafd80357f256cf5
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  adapter: Add support for loading connection subrate parameters
+
+Implement load_conn_subrate() to load per-device connection subrate
+parameters via the new MGMT_OP_LOAD_CONN_SUBRATE command. Parameters
+are read from the [ConnectionSubrate] section of device info files
+and sent to the kernel when the SCI setting is supported.
+
+The subrate parameters include connection interval range, subrate
+factor range, max latency, continuation number, and supervision
+timeout as defined in the Bluetooth 6.2 SCI feature.
+
+
+  Commit: 594eaab8e50e837fd9aa87e9ae49bfaeb35d5d06
+      https://github.com/bluez/bluez/commit/594eaab8e50e837fd9aa87e9ae49bfaeb35d5d06
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add decoding for Load Connection Subrate, SCI setting and event
+
+Add decoding support for the new MGMT_OP_LOAD_CONN_SUBRATE (0x005C)
+command, the MGMT_EV_CONN_SUBRATE (0x0033) event and the Shorter
+Connection Interval setting bit (25) to btmon.
+
+
+  Commit: 062bf7b40f9fdd61eac8a72adcab0ce87e4a44cd
+      https://github.com/bluez/bluez/commit/062bf7b40f9fdd61eac8a72adcab0ce87e4a44cd
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M doc/settings-storage.txt
+
+  Log Message:
+  -----------
+  doc: Document ConnectionSubrate storage format
+
+Document the [ConnectionSubrate] group in the device info file which
+stores per-device connection subrate parameters for the SCI feature.
+
+
+  Commit: db7e82d95f3110256ef0973c3bb2376c5a1317ec
+      https://github.com/bluez/bluez/commit/db7e82d95f3110256ef0973c3bb2376c5a1317ec
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M client/mgmt.c
+    M doc/bluetoothctl-mgmt.rst
+
+  Log Message:
+  -----------
+  client/mgmt: Add conn-subrate command
+
+Add conn-subrate command to load connection subrate parameters
+for a device via MGMT_OP_LOAD_CONN_SUBRATE.
+
+Usage:
+  conn-subrate [-t type] <address> <min_interval> <max_interval> \
+               <subrate_min> <subrate_max> <max_latency> \
+               <cont_num> <supv_timeout>
+
+
+  Commit: 9122389484228e430d621318e90d20baeb4fba64
+      https://github.com/bluez/bluez/commit/9122389484228e430d621318e90d20baeb4fba64
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Add HIDS recommended SCI parameter tests
+
+Add Load Connection Subrate test cases using the recommended
+connection subrate parameters from the HOGP v1.2 specification for
+each of the four HID modes:
+
+ - Fast: interval 1.25-5 ms, latency 0, subrate 1-4, cont_num 3
+ - Default: interval 7.5-15 ms, latency 0, subrate 1-4, cont_num 0
+ - Low Power: interval 7.5-15 ms, latency 100, subrate 1-4, cont_num 0
+ - Full Range: interval 1.25-15 ms, latency 0, subrate 1-4, cont_num 1
+
+Supervision timeouts are computed as (1 + Peripheral Latency) *
+Subrate Max * Connection Interval Max * 2 per the spec.
+
+
+  Commit: c76fbeb918d34843fecd1a701d6e6111e048ad8d
+      https://github.com/bluez/bluez/commit/c76fbeb918d34843fecd1a701d6e6111e048ad8d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M tools/l2cap-tester.c
+
+  Log Message:
+  -----------
+  l2cap-tester: Add SCI mode tests for LE client connections
+
+Add L2CAP LE client connection tests that load Connection Subrate
+parameters (via MGMT_OP_LOAD_CONN_SUBRATE) before establishing the
+connection, using the HOGP v1.2 recommended values for each of the
+four HID SCI modes:
+
+ - Fast: interval 1.25-5 ms, latency 0, subrate 1-4, cont_num 3
+ - Default: interval 7.5-15 ms, latency 0, subrate 1-4, cont_num 0
+ - Low Power: interval 7.5-15 ms, latency 100, subrate 1-4, cont_num 0
+ - Full Range: interval 1.25-15 ms, latency 0, subrate 1-4, cont_num 1
+
+Add the test_l2cap_le_62 macro (HCIEMU_TYPE_BREDRLE62) since SCI
+requires a 6.2 controller. The subrate parameters are loaded with
+the client's runtime bdaddr during setup_powered_client before the
+outgoing LE connection is initiated.
+
+
+  Commit: 3aefec4b4151753dfcdaf6912a40f9432203474c
+      https://github.com/bluez/bluez/commit/3aefec4b4151753dfcdaf6912a40f9432203474c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  emulator/bthost: Add LE Connection Rate Request support
+
+Add bthost_le_conn_rate() to send the LE Connection Rate Request
+(0x20a1) command for a given connection handle.
+
+Also handle the LE Connection Rate Change event (0x37).
+
+This allows testing a peripheral (server) handling of the Shorter
+Connection Interval feature by having the emulated central initiate
+the connection rate request on connect.
+
+
+  Commit: e45128f029ce4017fbee4e1c7d4b79ca3555cfe4
+      https://github.com/bluez/bluez/commit/e45128f029ce4017fbee4e1c7d4b79ca3555cfe4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
+
+  Changed paths:
+    M tools/l2cap-tester.c
+
+  Log Message:
+  -----------
+  l2cap-tester: Add SCI mode tests for LE server connections
+
+Add L2CAP LE server connection tests that exercise the peripheral
+side of the Shorter Connection Interval feature. The emulated client
+(central) is configured via bthost_le_conn_rate() to send an LE
+Connection Rate Request once connected, using the HOGP v1.2
+recommended values for each of the four HID SCI modes (Fast, Default,
+Low Power, Full Range).
+
+
+Compare: https://github.com/bluez/bluez/compare/98e5a74736e2...e45128f029ce
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
