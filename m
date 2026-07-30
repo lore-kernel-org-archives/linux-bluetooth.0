@@ -1,73 +1,71 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D903FFFAB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 10:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE584119FC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 11:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785408083; cv=none; b=gBcVvOrAv4Hez7aQGwo1PqI9bJH9lxLSK6Ei0IthHUAS32yeykiCdFy6cMJsCIXjEddnWOXWsYQqtTQ0E22a71BaZFMdpzLs0FXyhq3MboD5+F8PJEtvhzK9OdLz1KIA/0GzE4w7wowdlNUka+ea8jSeLAt5NXVapwlYjNj/MYM=
+	t=1785410758; cv=none; b=dkRTEW7O8MIVpwhcO/sUU7R2YVMi99Hm5PvfS84HDqDMFJUpyJ4SF2knW6o4metbuF5HYV6baVpFWbpi7hjeCs7a4o+9Ru2ZCBwpaZrtrk8MCAkkKc0o2z/cVXUFhJJltQEcrz4lEBbONLqjqLtg8rAPuSYpxOMsjMxe1pJhjTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785408083; c=relaxed/simple;
-	bh=KNRAAbqu1Obt0UZbjeHAL9gbNhol/L5We/nxyOLLAyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I3FQDtiqbBkVlALguv1xn33CgGWXCvGtVgI3luTwgnrezbk+epwLpwwmriY1tlyLUWS+yOW8+70/ImVz0oXOTFGyjydKTzBlCaG708fGziqI48mzgBtOHmpO6WaeXwzpLHzM3xFQIvBDtc7APdbpC6RVMeHUAhMvpclte6jy/Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RbJEwkbN; arc=none smtp.client-ip=209.85.128.181
+	s=arc-20240116; t=1785410758; c=relaxed/simple;
+	bh=gRx1CiJmOGUyXwfLz5e+YxxQVxRoET7cBFYAUzsNIfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pXP3EUnbZtqvpvZs/cKCrcnLoW7Q3mlztq6wLk68x/2/JpnGoQDJ8L6KnbBEshJXQbpX+s5OD3AdmwWIWhkHu8JLxwFbOlmZWaDSlMIlonqxxQKCjjA1jJNNkyaJjZY3N6dyLWGvfmWdBmVjgRyHCWjycej7zAucGgtYAOQpxIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GeNbxlDg; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RbJEwkbN"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81f08502c4bso973257b3.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 03:41:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GeNbxlDg"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-384930ca5e2so1702590a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 04:25:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785408081; x=1786012881; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785410755; x=1786015555; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7ueDqaJswg5YZC13Y+Gtq4EWYGPBi+5EAXfQ3I53DMc=;
-        b=RbJEwkbNHoAYoScpr+KPIee7P6ydxzNrcPmg+x50BLwtwELfRp5wS53Q4dPAnXGO1h
-         bn3rHm2ngwQwzZStgjQwT4h0pSogtp2unynNOxJwSHRcigRLghb1DjYTiHNee16+ecuo
-         DhmYS3WOgn83DMR6dwNPyZY+EmP1hvurb5Ww9aFiMnZkWEUn2c93ymPw47/XsPGcbXCL
-         cqVuhd7XJ4tvOIhVwGDTju1vYWr9VyyiR+vziDcBxSgt455j5GPJZCRxj+bSCfKuUYWC
-         LhJk/hJIK0RiHU0eYIPKn2IXQqGYHuDwZfvo0KCijWchrBAfyf4pLs3l1eL6KZmgXXnC
-         JybA==
+        bh=/OxsOhh2TxKdW72mOsfXzYWaYqbneErDghJFAn2iUZE=;
+        b=GeNbxlDgaYDv8kfLh2XJUSE3hUjyM2J0B4GGQjksrBj4SKF6OnUVm362SoD+YPtGj1
+         rdrEoLg7/HKpxoYZn3/dJLpbYqUvqY5XapFhh4s7+ikmzguUkXdlyd5XsUKv0IzIevQp
+         9MZR+QK2IUwBvYK9VQLSBXv1wzdIBfWH/kIpN3I/9CE27Lf5WYRPkQYB6GJxer/o22HX
+         Mmu1QtKWTHbuFHPSVlwv+eqzg+qBqmLFyvwLXJdxb5aU9JEA5gGUQhxxPm1wWT85SYL8
+         RVpQccMpxb6KQROpmUicPWsrclXoU4qbj4FrfNgcLNIz2lshG5QlcvuGd1k9PsLiseeM
+         ISsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785408081; x=1786012881;
+        d=1e100.net; s=20251104; t=1785410755; x=1786015555;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=7ueDqaJswg5YZC13Y+Gtq4EWYGPBi+5EAXfQ3I53DMc=;
-        b=VLjwapaVEZVzojrTLvCCoa1RvRuywcfJ8RjMkCWZ2kTnQFAyptVPcohA6gQYeo5+++
-         HJjsJ+h8OezLQ3wWiNqW7CnAFc3Y1JvlFwoGOcagc2QiIQFdJId0wPfhpIYPGrgoAbdY
-         06tEfGuK9XsX4OuV3bHJuzIQQJG3J8N1FnlGS3TRQ4lpR3RzN3RfbZHP/eCyInMkpGeq
-         ZGNdvrxdELcHzHYXFMPZ6y02u2JrV7Pr1g4m9KTLzbbHAw9U8i4J5Ip9xTClcjV53OY7
-         vf09mgZHZ6jduZuDuLkWOpcsTDCoL2sXpGAYbnn2Q0A3Bkyv7CFRXs80G3ElkMkelhXI
-         IrEw==
-X-Gm-Message-State: AOJu0Ywnz7OVPiylX4IAT8HdaXCM8dr1OsD8TYGEU6uVqs9Cf62YjeMw
-	Mtw5NAMPuw3mn4aDrDBAMU4Ud35qdZNxfDHLaiNVFflmtC2TvYm9TLh4
-X-Gm-Gg: AR+sD10y1Y3PtISbBtaVGNyWBVd+wFr+JdFcCxZdHK+NrUGYTm8UTiSnYBHrDv5pPvz
-	l7sn8OoCn6/hgrm3NAPgDxyhJzH8vFYZxHQcTtTPC4z6Fh1hZce0mriVOGqvi/k69YZ3r9P+GmX
-	AL+V7resZttMgauzu07HbwH6eNW4OwFZmrHZcToyBBqyTggcAD2oLINxiC1FXz77MRGfR2zaMwa
-	GQN9Ugtgks8yLs5kClq2MMJFcHuJRFTLhbwjDnNhfyESjPn6d5sdCD/9/dytryGOsw5y+IM1zdm
-	+H2Lkx5tVgBT3idCtA9oKfocWqAHmpccP5ZvW6JGnj1aBrRH7/v+LrwcXEQ4hTaeg8iB5FT/1Rb
-	f1JbBFlU4PqwVOJ+FlIZoTkXC78oUkf5JsMI4ET+qPwhl6rAjn/Y3rvJ2v8Y6pQhM2TeUF2iB5t
-	yx/xFKHegUHdtDhViEYvIljN1o7pGlwtqvBS9AOZ5zfdZN9Q4COcAdlOsAd9CUuuxqKUcVvnOkx
-	SrJ3ToEBirc20Wl5TM2fxM42EPY0XFMGXxla2wk9805WFlm512ckbk=
-X-Received: by 2002:a05:690c:87:b0:81f:45f0:21b7 with SMTP id 00721157ae682-81fb872a7bdmr25021357b3.0.1785408081018;
-        Thu, 30 Jul 2026 03:41:21 -0700 (PDT)
-Received: from localhost.localdomain (45.78.65.84.16clouds.com. [45.78.65.84])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fb892f53esm7676037b3.21.2026.07.30.03.41.17
+        bh=/OxsOhh2TxKdW72mOsfXzYWaYqbneErDghJFAn2iUZE=;
+        b=r5XP8COFM0kc+FY/3eyQxpM/NV5/Kxbzl4mcVK6n2v15domRHpe4842of1IYgcgdG+
+         5EZnJFnhjYkAZ75vpKd9ACpaqo25oF8G+csrnXMDpOyNBHpCpeD9tXFehQxA3YWPdlTx
+         Eb/4bmamx6JKbjknt14xKV+n8z05z6FV9bK2ocg8cPUqKobLPoSuK2bJzusWEQUvWMCF
+         DpcOGfXdCWTtmob6W9dI+ZRqk8vFUqB10VuvVm2Q5vnyErY7Vt2O907nulKSso+2GUy1
+         Bu5IjSl8bu6oZlDJEWS5JgArhBOeqUCGaUho9zVOjOHyQzzXnKOAzSTkRtt60YUnxAFX
+         yEQw==
+X-Gm-Message-State: AOJu0YzUvX9dhIza9cn7XqOqqwbGPfxOTPPMaaOWXt/ghGy8gZtjnDVz
+	r47savZSm4/l1d1rtl8yw2uyFpzL5g96CGiPjs3eMTZ4PXYdaTED/UmI
+X-Gm-Gg: AR+sD12osvyTjPNgTVGaVfffabHHPupY4MuNY7HC6Av/Lkz/Bd/A+LGY8rc5SsZMgAr
+	1xo5ncrzcIWNfzoD/R4bI0cS0xABOYQ7jCm84EyxZ1Dq3GLgfU0d5VMzLaltfMIukwiuLlce2G5
+	kBQYR0Pp4sUooxNZZZEhJo69cmcvmFqX5OX68x2L4fx+GCO553SL0Zf6lFeqpJWpJXmovwMfTNn
+	Nlum1k/9Mv84LcXhlQhj9j5wRCvcOuOkVXzpAuYZdSjJAzyQZoN98X7U8+AOn7rdSMLTPfoR+cT
+	EUrxm1XXJP04eSc1dPBF5bw6ZX7t+KoHACf4Y/r3ZdnhM9GrvXAnO2/flEYjpp1ns09mVDp3L2L
+	Ml2UWxg9I3BjZQ94YK9iN43YMVXbR9cUPRWUJIeH8SrnZ7/t7oVUmvuyJm1L4oz9U9rV6/sdM+h
+	eMeIZfZN1O1ThBsDuRMVJnSNB6OaGYhLOYIYVvnG3ODNWQSFzMGWn18lFLe3sPIW+MoR1nvGMda
+	70A2YDdMWfhdn3tkDuZevqneTgJol+I
+X-Received: by 2002:a17:90b:2583:b0:37f:c69d:ce69 with SMTP id 98e67ed59e1d1-38f9bd83fa1mr2072964a91.10.1785410755120;
+        Thu, 30 Jul 2026 04:25:55 -0700 (PDT)
+Received: from oshada-HP-250-15-6-inch-G10-Notebook-PC ([124.43.23.194])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13e7275973dsm17869670c88.15.2026.07.30.04.25.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 03:41:20 -0700 (PDT)
-From: Chengfeng Ye <nicoyip.dev@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@intel.com>
+        Thu, 30 Jul 2026 04:25:54 -0700 (PDT)
+From: oshada imalka <developerimalka@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Chengfeng Ye <nicoyip.dev@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_conn: hold conn for LE timeout work
-Date: Thu, 30 Jul 2026 18:41:03 +0800
-Message-ID: <20260730104103.2080325-1-nicoyip.dev@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	oshada imalka <developerimalka@gmail.com>
+Subject: [PATCH] Bluetooth: hcli_ldisc: Remove reduntant braces
+Date: Thu, 30 Jul 2026 16:55:09 +0530
+Message-ID: <20260730112509.72623-1-developerimalka@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,140 +74,29 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-le_conn_timeout is embedded in struct hci_conn, but queuing the work
-does not hold a reference to the connection. hci_conn_del() uses
-cancel_delayed_work() because synchronous cancellation would deadlock
-when le_conn_timeout() itself calls hci_conn_del() while holding
-hdev->lock.
+Removed a redundant braces for a single if statement
 
-This leaves the following interleaving possible:
-
-  CPU 0                               CPU 1
-  le_conn_timeout()
-                                      hci_conn_del()
-                                        cancel_delayed_work() = false
-                                        hci_conn_cleanup()
-                                          put_device()
-                                            kfree(conn)
-  hci_conn_failed(conn, ...)
-
-The callback then dereferences the released connection. KASAN reported:
-
-  BUG: KASAN: slab-use-after-free in hci_conn_failed+0x232/0x250
-  Read of size 8 at addr ffff8881180e8e20 by task kworker/u33:1/111
-  Workqueue: hci0 le_conn_timeout
-  Call Trace:
-    hci_conn_failed+0x232/0x250
-    le_conn_timeout+0x23e/0x2c0
-    process_one_work+0x61b/0xf50
-    worker_thread+0x45b/0xd10
-
-  Allocated by task 115:
-    __hci_conn_add+0x1758/0x1b90
-    hci_connect_le+0x523/0x780
-    l2cap_chan_connect+0xfca/0x1bd0
-    l2cap_sock_connect+0x310/0x530
-
-  Freed by task 110:
-    kfree+0x149/0x330
-    device_release+0xc8/0x240
-    kobject_put+0x14d/0x280
-    hci_conn_del+0x561/0xe70
-    hci_abort_conn_sync+0x3e3/0x800
-
-Take a connection device reference before queuing le_conn_timeout. Drop
-it when the callback finishes, when queuing fails, or when cancellation
-removes a pending instance. If cancellation races an executing callback,
-the callback retains the reference until its final access, avoiding the
-use-after-free without waiting under hdev->lock.
-
-Fixes: 980ffc0a2cec ("Bluetooth: Fix LE connection timeout deadlock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
+Signed-off-by: Oshada Imalka <developerimalka@gmail.com>
 ---
- net/bluetooth/hci_conn.c  |  8 ++++++--
- net/bluetooth/hci_event.c | 25 ++++++++++++++++---------
- 2 files changed, 22 insertions(+), 11 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 1966cd153d97..501a2dd2543b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -723,10 +723,13 @@ static void le_conn_timeout(struct work_struct *work)
- 		hci_dev_lock(hdev);
- 		hci_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
- 		hci_dev_unlock(hdev);
--		return;
-+		goto done;
- 	}
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 2ad42c3bbaac..e7de8a278edd 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -756,9 +756,9 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 	hu->proto = p;
  
- 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
+ 	err = hci_uart_register_dev(hu);
+-	if (err) {
++	if (err)
+ 		return err;
+-	}
 +
-+done:
-+	hci_conn_put(conn);
- }
  
- struct iso_list_data {
-@@ -1267,7 +1270,8 @@ void hci_conn_del(struct hci_conn *conn)
- 			hdev->acl_cnt += conn->sent;
- 		break;
- 	case LE_LINK:
--		cancel_delayed_work(&conn->le_conn_timeout);
-+		if (cancel_delayed_work(&conn->le_conn_timeout))
-+			hci_conn_put(conn);
- 
- 		if (hdev->le_pkts) {
- 			if (!hci_conn_num(hdev, LE_LINK) ||
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 741d658e9630..e1e6b5092ce8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1566,10 +1566,13 @@ static u8 hci_cc_le_set_adv_enable(struct hci_dev *hdev, void *data,
- 		hci_dev_set_flag(hdev, HCI_LE_ADV);
- 
- 		conn = hci_lookup_le_connect(hdev);
--		if (conn)
--			queue_delayed_work(hdev->workqueue,
--					   &conn->le_conn_timeout,
--					   conn->conn_timeout);
-+		if (conn) {
-+			hci_conn_get(conn);
-+			if (!queue_delayed_work(hdev->workqueue,
-+						&conn->le_conn_timeout,
-+						conn->conn_timeout))
-+				hci_conn_put(conn);
-+		}
- 	} else {
- 		hci_dev_clear_flag(hdev, HCI_LE_ADV);
- 	}
-@@ -1614,10 +1617,13 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
- 			hci_dev_set_flag(hdev, HCI_LE_ADV_0);
- 
- 		conn = hci_lookup_le_connect(hdev);
--		if (conn)
--			queue_delayed_work(hdev->workqueue,
--					   &conn->le_conn_timeout,
--					   conn->conn_timeout);
-+		if (conn) {
-+			hci_conn_get(conn);
-+			if (!queue_delayed_work(hdev->workqueue,
-+						&conn->le_conn_timeout,
-+						conn->conn_timeout))
-+				hci_conn_put(conn);
-+		}
- 	} else {
- 		if (cp->num_of_sets) {
- 			if (adv)
-@@ -5771,7 +5777,8 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 			}
- 		}
- 	} else {
--		cancel_delayed_work(&conn->le_conn_timeout);
-+		if (cancel_delayed_work(&conn->le_conn_timeout))
-+			hci_conn_put(conn);
- 	}
- 
- 	/* The HCI_LE_Connection_Complete event is only sent once per connection.
+ 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 	clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
 -- 
-2.43.0
+2.53.0
 
