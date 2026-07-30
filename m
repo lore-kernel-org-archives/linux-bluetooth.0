@@ -1,35 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07792449990
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAF043A7FF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 16:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785427850; cv=none; b=Sf+Ttk13GEUt9HKIftCil+wPhvgG9zxvAXLk/2opE0Uz/RfDjJLQdzX7AugWtzGHvld50gJ0EmQaYKya66rPzX1G+uJA/4hPNaryO3mDZHH9FV3iX3he2Y2mAX/iMooEKeZm8Vq+Cq885Klhoz+lc5K04Fl56M7RnQhgRgiLDjA=
+	t=1785428310; cv=none; b=sF7k8aHjJwzkSTpgFZ9ROKexwvTmtZdJi5+jZNfLP5kig8Sx8WfzevkeL8XOphI35/kRViZRroyxuSIBRDkIXfOojb4r97qsAHtTV65qOyYaaG3DU6zagoIY6N8IkZ7PGIO2UXmPM3903+Ng06AIONbhm3pRZY+BfwDBq1aKLbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785427850; c=relaxed/simple;
-	bh=g3sUrcKFsiYBLq7goYjsytd0yuf5N1UOOddaIJLcNgg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sjryYr8WM3ORNaHWzdRY8ZMmnMSrjC8H8ROVRJMfE+GYL6OWoxwWrKIP6Ht4CMsYyJVqpULaOaXKZJGD654Bi+smtEeSDWgU0XW3u63jyxFaZqIE7ZchFbGuFqWtIwM3Fmaur9ECTsqytSQdeSh+LiAcpqaw/QP4NQXbzv9lzaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MZ6xm+74; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785428310; c=relaxed/simple;
+	bh=Hj5bQFLufHq00/MFPxI3PzESKTnahG8Mxs/8XVRXevY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nemiHYPTd/oKV7A+gfdo4vCVWuM2losuCMafdalPRRLmBm2LLXMneqnp6bc7cMAgkNq4ShXlcsg0ypYQJmi0p4scQNuQO9M3kVTVDQEWJPu3dKtSIR2+5lNuP3g0jGBzp89Pyo6PFzbftDFHeuZ5yY0Wb1ebXq1dXt9SW8XEkac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1aMY/7I; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MZ6xm+74"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA2B11F00A3E;
-	Thu, 30 Jul 2026 16:10:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785427848;
-	bh=kOzZL33DsCBzp1liv3NYg56ZfsqaZ81sjIHeTeIuSmI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=MZ6xm+745pnf+c3AlCOxt/ERVIRqVSR+ezGoqvoXo8dMiGnaQr+LHEdqfYX417yNI
-	 cf3x+bFBWdjZ/dvkwcQKwKBbD7PBzIUR2vQxwcAIYd30RdAdZf7VmDDRaVbCvejcux
-	 e46ww6LjCje83RN2BZXhqDKhs8lHV/Y7fVH2jislVvBdyTAwPWqBTRFRH0DuCjpipe
-	 qZ/V5baoIxgo653iQTFPcoAH6ErVR8FkWwR68iYR7KvMralHME9ArkmC+Zb1cGz+nz
-	 PVInZl9jtKidmUO29kuMisnWwUTpl2wAkjpW5+rMcNpMEEXDgfCKXASYgTp7/TSPp8
-	 Dv8WssxmJ3qlQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9385938119E7;
-	Thu, 30 Jul 2026 16:10:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1aMY/7I"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-ca7bea5e5b3so1830578a12.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 09:18:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785428307; x=1786033107; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/cr8O2fJ45DKO0g9LGdnpAZnqh9rioDZWF13F3loYRI=;
+        b=X1aMY/7IqFzqivCf4zSmr9zjPFrh/YO4QzKVWqETf6IgwK/icrytLbNSS5NErnaP8M
+         4pPyMUqzXR0qbETnnIESp5atcKnfvN7O9m3c6ez6Bg1gTZ8ed8SMAkB7C5zRiByruLc4
+         Bp//dXr6UXTtgr3CgH1Y7iaabicGNDDZHQQODMOjX55MJ7VG9XJeZq8gHY+Ai0h7lHoW
+         oX9Ueuf8nvkWz4ZzL1gv8qSFjP/wGW41Y2cqYuuIn0ru84StZLZonDRQm0Q48mZAJ5+M
+         WU/i2CacrvZY0BWAqaVqoU+Ilt2siapR6O4aFf0Ol8t/aDiKDJWj8Z4Ov8z/G4h7MjM7
+         +OXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785428307; x=1786033107;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/cr8O2fJ45DKO0g9LGdnpAZnqh9rioDZWF13F3loYRI=;
+        b=PdsdjIsAEDJuQqNmMbarXh7swdenE1/U0Py0irQ5+Hm80M0j6FfGNxBt0O2IgQQVLN
+         u+GUcEWrfOL/vWrKy+1+sPM2XDvZC3VRQDO/Hx8H6x4Im6V33YAmyKKkLDwG3a/qfqWf
+         wnClg984DGQXulPQnZoUcTCS+Hyid+qQw6jvy0FkUOrb2IFA8V4FnXYCSMu1ufXgs4/L
+         FozfwyCGXg2qtRoeg+CFZWXcEwHiQ6bvElrg+60wPHsprXLb7O+4KthY+oOkYUM7/Rx1
+         I0gULWEoUnXnIJkZXFdeKnf+0+VtiQXMtvR4S7N1v+MVNaoW90mo1ci9w1DGijDV7lO/
+         Gbew==
+X-Gm-Message-State: AOJu0Yx1ZmYDRJqz03wHyn8eBoeA+868n+vEN9490aZIHwrygs9dofBG
+	EtfKUywYi7JopZ6CBuF+wCcOfuVh8dRJiQwzylQoA+7KeGs+KQC6pdte
+X-Gm-Gg: AR+sD11gvIY9gst1dg02yKOZt+oOPj1E5HJdntd+yW9ahgMIzF6UDwDz+CuBuWm4phe
+	Fo1AMYsPnulJHu0pAC3CNvXJsP+zINcJw/h8sqiJ8i54esJnZ+wl98aY2Dpyv2bD7LR91oQVjhV
+	9O2eTlRWLRr3cmV3pgDTD8cO4lOliw2S3oXrqXyWauTmaHClokL1zaoTBEVUvTDchMJTEKW1slS
+	rFTLEvTs8hUnnv+9XBmTwQ+llZRuXsDsdZjibFc6VES4ziCp9+C/7uLTwoL2GEnNzrzeBr+R8VF
+	AEY+Vqcdc5HzjJMotdhsGRPxkHo7G6kth0TElQZ1jmSs3mysJisy6+lThEeZup2ot3uhe693XD1
+	yRt9i5pslUWCZ/fas7LQmUP8XDB9CIz7kPT5qPOKwe3fVARslJXuIQ8LCZN3af7HVSM98WU2F2p
+	r6bF2L5Xq6IIHGqY14SzO85Pfpt5rIinUSq/TLMgbptRn/fqBHSTtiFo93x57FBKDBam/InLhZX
+	hgEXROmiLigMPjv1I+4xH6UdSxH8tIqSxmIS3OuvYn9LF/ff3Sw2b+MREGu38qwjJCMsBxi3FG6
+	n7tqCs8=
+X-Received: by 2002:a05:6a21:684:b0:3c3:33df:4d9a with SMTP id adf61e73a8af0-3c9004561admr3400912637.1.1785428306587;
+        Thu, 30 Jul 2026 09:18:26 -0700 (PDT)
+Received: from localhost.localdomain ([101.251.7.10])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b124e4sm21359741eec.6.2026.07.30.09.18.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 30 Jul 2026 09:18:26 -0700 (PDT)
+From: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: validate QCA rampatch size
+Date: Thu, 30 Jul 2026 22:03:20 +0545
+Message-ID: <20260730161820.11631-1-acharyalaxman8848@gmail.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,69 +74,50 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 00/12] Add support for Shorter Connection
- Interval
- (SCI)
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178542781213.4069407.17479725999715799508.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Jul 2026 16:10:12 +0000
-References: <20260724191225.1815634-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260724191225.1815634-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+btusb_setup_qca_load_rampatch() reads the rampatch version structure at
+fw->data + info->ver_offset. A truncated rampatch can therefore make the
+driver read beyond the firmware buffer while parsing the version fields.
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+The download path also expects the complete device-specific rampatch
+header. Reject files too short to contain both the header and version
+structure before accessing either.
 
-On Fri, 24 Jul 2026 15:12:13 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This series adds support for the Shorter Connection Interval (SCI) feature
-> introduced in Bluetooth Core Specification 6.2 and used by HIDS 1.1 / HOGP
-> v1.2.
-> 
-> SCI allows an LE ACL connection to use very short connection intervals (as
-> low as 1.25 ms) combined with a subrating factor, so a device such as a HID
-> peripheral can achieve low input latency while keeping power consumption
-> manageable. The connection rate parameters (connection interval range,
-> subrate factor range, peripheral latency, continuation number and
-> supervision timeout) are negotiated with the LE Connection Rate Request
-> procedure.
-> 
-> [...]
+Fixes: 3267c884cefa ("Bluetooth: btusb: Add support for QCA ROME chipset family")
+Cc: stable@vger.kernel.org
+Signed-off-by: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Here is the summary with links:
-  - [BlueZ,v1,01/12] input/hog-lib: Add discovery support for HIDS 1.1 SCI attributes
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=92f6ea8766d0
-  - [BlueZ,v1,02/12] emulator/btdev: Add emulation support for HIDS 1.1 SCI commands
-    (no matching commit)
-  - [BlueZ,v1,03/12] mgmt: Add Shorter Connection Interval setting and Load Connection Subrate
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=794eea615846
-  - [BlueZ,v1,04/12] mgmt-tester: Add tests for SCI setting and Load Connection Subrate
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=46f08703a152
-  - [BlueZ,v1,05/12] adapter: Add support for loading connection subrate parameters
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=071c21873dfa
-  - [BlueZ,v1,06/12] monitor: Add decoding for Load Connection Subrate, SCI setting and event
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=594eaab8e50e
-  - [BlueZ,v1,07/12] doc: Document ConnectionSubrate storage format
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=062bf7b40f9f
-  - [BlueZ,v1,08/12] client/mgmt: Add conn-subrate command
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=db7e82d95f31
-  - [BlueZ,v1,09/12] mgmt-tester: Add HIDS recommended SCI parameter tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=912238948422
-  - [BlueZ,v1,10/12] l2cap-tester: Add SCI mode tests for LE client connections
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c76fbeb918d3
-  - [BlueZ,v1,11/12] emulator/bthost: Add LE Connection Rate Request support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3aefec4b4151
-  - [BlueZ,v1,12/12] l2cap-tester: Add SCI mode tests for LE server connections
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e45128f029ce
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8f7ed469cac..9801835d7c7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3526,6 +3526,7 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	struct qca_rampatch_version *rver;
+ 	const struct firmware *fw;
+ 	const char *fw_subdir;
++	size_t min_size;
+ 	u32 ver_rom, ver_patch, rver_rom;
+ 	u16 rver_rom_low, rver_rom_high, rver_patch;
+ 	char fwname[80];
+@@ -3551,6 +3552,15 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 
+ 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
+ 
++	min_size = max_t(size_t, info->rampatch_hdr,
++			 info->ver_offset + sizeof(*rver));
++	if (fw->size < min_size) {
++		bt_dev_err(hdev, "rampatch file is truncated (%zu < %zu)",
++			   fw->size, min_size);
++		err = -EINVAL;
++		goto done;
++	}
++
+ 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
+ 	rver_rom_low = le16_to_cpu(rver->rom_version_low);
+ 	rver_patch = le16_to_cpu(rver->patch_version);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.2
 
