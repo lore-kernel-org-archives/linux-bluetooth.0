@@ -1,113 +1,178 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE0A4307BC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 14:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5174326ED40;
+	Fri, 31 Jul 2026 15:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785509435; cv=none; b=igMU4cSQhG1jcvHwnLYxKAG9xvtuGoRRKBWzxXfJTZkySU0lYEL1x/gm6aBu5UaJ0g4M5KY9xjj9FHBmJ1/PJBvLUvHBFM2OHd43QNsYht7KZ+g6B+IQV4pqzEzOsytbcuQgMdbzedpzVJT8TTqDxR5VvdSFBJ0ZPKYR53KErz0=
+	t=1785510272; cv=none; b=u5nQl3R6FeE/T7tZ/HbIxgegMs/boSTUBmlOts8iUjjV7vSeoGxnERVKP0xY4KTzxUGBiFMYSEqttfLnszBH7Et8BTQnSqEiGE6mn14JGi0zCz1J8zPi6HJgmzZX28nsIQf74eDTMLVO4BBpAs18a5lHF1Hh330Y+Sfpccmz888=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785509435; c=relaxed/simple;
-	bh=BfzqBY1hgZN2IXxvdpyQrRrpvJOmUvCt4XFaeDb7y5w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rFvMlsPMmL/uawORwlss57+9e9ci64tlVp6lSVLVfXOTr6/OhEGVhGASJWPys5Mdy5/QbHKpKeE/00I5Wtbudv+l5q6TFls/JdIWHlYOW3X/lNCUVjAHL9DyC7ijCoN+ZYqmeQtxORPHDqKpmOiVCd/Vd7w8ahqlz6DfVfMqtkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOFuiqmq; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785510272; c=relaxed/simple;
+	bh=9laigUYa2MuN3S0z+86S/Z86VEXed6Dh+13S+CpbPXc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EWyJBVZRlkJQVGIac3Yamx/qt1Cxs0TIKkWIqTgSB6/Orlz+7XuV0P2dCnY+NEP6uU0dv5RP/4ps5QoBgr1a3l/t/Xx2juE+5farlqXtZfBy3oVvEfUAmpo7qbNGXwnthLxm/d9BHsDv3THpDbgPUYr0JxTK1TJE0l7HpZIJUdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AcO8yj5F; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOFuiqmq"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-930fad20240so53400485a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 07:50:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785509433; x=1786114233; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=xjUwzJpM/uCXdKN+lxxHNcyxZbz8UwKPVfqyFwxUIiM=;
-        b=NOFuiqmqGACOVamSpL/5rxf/OdA1LRft3S9v52qtjjAyyKE7/ifHQ+9kBbLRsQgaao
-         MQN/2p6Ry88+q069YEvXWEGDebdwjYfyexcf9tm98DM83ne2SR4IVtK0YBVRhzWuPx7s
-         8Od398MQdKhzKeGiTXfUVKvwiKsXjssMzSxkuZPPhKKFwMrk9zeC0vnydXgJo7JicX+S
-         9I8Dh5z2rqisrOTBhH1kdW1kME/6oAhoz2C1Al8ALALp2woIXHKOg4HCcyeoLQTrUF/l
-         5Fi0iVCBmqwiL11I6563DFyVycM3WclD3s5FbfGCmnWnGyb/f+ShncukMTc00RONj54G
-         5mMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785509433; x=1786114233;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=xjUwzJpM/uCXdKN+lxxHNcyxZbz8UwKPVfqyFwxUIiM=;
-        b=mgAZwytwdmQ45zzJ4O5EgrZrwXfweVBtRJ7ovYIlbpE1lGLPGsCsXtErr5WLTG3ppq
-         sqT0gtfMMS99DOg1/v0SXD8UdimWc15doUEkFkzORh87MwK+cXIT428ExC6JaSO2+MCY
-         /RL/bh2pJE0H9kOLnDT2NDhExRcv8SH7rbzkiflkSyH1+bWw+QSK23yokPvNy6yjuS6t
-         wx0wPCho7EavWWriHT+3n1QVfA7Yhl//lQVJCFrNy65DJfDSONw3biHmyQ9tNIn96gax
-         Y9F8ttbvLpGf6aUVfYIVkk2oqYNhePazW891Bsk3/Rs79ufcAUKSrS2W01WX/GXtyzNN
-         ASvw==
-X-Gm-Message-State: AOJu0Ywh3eMpSWde/XoJuPEFqa+t2LbHUhFXPi5Hnbo7ZjIlD+fXrKQy
-	I5Dio5stTx4cn5froOLMtJkgNtfXH90wHX9i0d1hS6xakzG95YdJYBhZPU+x/A==
-X-Gm-Gg: AR+sD11TpZZg0dX0ImHXS8fayLLDKnO7bEm+aHiLvlNxyCXNdaZaWytVlOizS5BPYQR
-	pTHysE8qH4jcS+ju4ilCEzs3Uhlt/ax6cgZ33iXV5VnSvEnLEIZ2KiQax1KFr3VX4hTppyb8JFP
-	39Uzut2NsoKZVNPurl/VqUm9I653O35V451WYejRloTu+FYTJsRG/UTm63qNEV0ffxsgkbveq7J
-	J8yqRanpMWEniKs2sawa5Yzva1eN/EGF0mjihQwnZHNam1MHmiI6cEywsxOFoJ8SIUUdVLoxZ+g
-	5zt1e7f48QCtifcVnGawOYyDk1Xc6u/1cKh5iRv9F35fdciG4u1Fsznz3TI1LDtB7ZE27VCbZne
-	qH/ScLItbIS9BFCy1qaSqoA6TCZ+T/ZUi/rKACoePtfJj0Hi0JDu3PbL673z8xu8fDHWP0ImYsP
-	sjzr4FniDbp3xP4SevF7BGWVatJ/VXGuEQl+GMsiTp7aKiG8hErJTqjm2cp2wkjkBYL0c=
-X-Received: by 2002:a05:620a:2802:b0:92e:e8c4:b66c with SMTP id af79cd13be357-934a0759561mr50642385a.9.1785509432727;
-        Fri, 31 Jul 2026 07:50:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.87.113])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9349c1c1d0esm70145185a.33.2026.07.31.07.50.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 07:50:32 -0700 (PDT)
-Message-ID: <6a6cb638.e317185c.3a4f18.f1e9@mx.google.com>
-Date: Fri, 31 Jul 2026 07:50:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0469661611534365616=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AcO8yj5F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A6631F000E9;
+	Fri, 31 Jul 2026 15:04:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785510271;
+	bh=JceEsEO2ao4jf6YgYLdNuBy0baoWJQllCmkuVRmvxPg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=AcO8yj5FxPea/QlOLuAR3Fu+Ire3V3klQFPZI5IUuPIX70VeocDEp5EysBbtDXjDY
+	 +6GFTGv+7lqSIs/SQG2wkqUt0iknNqaQjFGaot6QH4tkxo78HXh8kaTXs3WlzBH9EI
+	 E3/oR51sEaA7Y2/aRGneWBaAPO/Wwm3+EDtHUjwX/KiSkuV5WrjUY8qRahYwIKmjky
+	 D/CH2lzO11CCR+mf3pTQbr5C15Iumk5jrwHc5nA+aQKNjOvvKQPujtB7prE+m1orGp
+	 DXzbWrnE59LzSO/Q6uoc8GsKSpmw0N5TEnPrEF0b949grvNaq6FWEKXCX0uP8AA/5p
+	 nmGTItwLNEB3A==
+Message-ID: <c1875dd6-fe3a-4a69-a6fd-b461c8fba6e4@kernel.org>
+Date: Fri, 31 Jul 2026 17:04:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
-Subject: RE: [BlueZ,v1] unit/test-rap: Add PTS tests for CS
-In-Reply-To: <20260731131352.3154342-1-naga.akella@oss.qualcomm.com>
-References: <20260731131352.3154342-1-naga.akella@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0469661611534365616==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] dt-bindings: bluetooth: qca: add QCC2072
+To: Rahul Samana <rahul.samana@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, Manivannan Sadhasivam
+ <mani@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+ quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
+ <20260727-rb3-industrial-bt-uart-v2-1-2d100f30e202@oss.qualcomm.com>
+ <20260731-first-righteous-bear-dd72ed@quoll>
+ <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 31/07/2026 16:45, Rahul Samana wrote:
+> 
+> 
+> On 31-07-2026 15:16, Krzysztof Kozlowski wrote:
+>> On Mon, Jul 27, 2026 at 09:15:01PM +0530, Rahul Samana wrote:
+>>> QCC2072 can be used on M.2 E-key cards where the card power resources are
+>>> described by the pcie-m2-e-connector node. In that setup, the M.2 power
+>>> sequencing provider creates the Bluetooth serdev child after matching the
+>>> QCC2072 PCI function.
+>>>
+>>> Integrated non-M.2 designs need board-specific power resources. Document
+>>> only the compatible for now and leave those properties to be added with
+>>> matching driver support.
+>>>
+>>> Document the qcom,qcc2072-bt compatible used for QCC2072 Bluetooth
+>>> controllers connected over UART.
+>>>
+>>> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+>>
+>> NAK, exactly same comments as before.
+>>
+>> Nothing got improved, although what is weird - original SoB is gone, so
+>> this is legally dubious work.
+>>
+>> Best regards,
+>> Krzysztof
+>>
+> 
+> Hi Krzysztof,
+> 
+> Thanks for the review.
+> 
+> For the binding contents, I tried to capture the current scope in the binding
+> description itself. This series supports QCC2072 only as an M.2 E-key card,
+> where the card power resources are described by the pcie-m2-e-connector node
+> and the M.2 pwrseq provider creates the Bluetooth serdev child.
+> 
+> The binding also says:
+> 
+>   Integrated non-M.2 designs require board-specific power resources. Those
+>   properties, together with a static devicetree example, should be added when
+>   integrated non-M.2 support is added.
 
-Dear submitter,
+Bindings must be complete and your driver support is irrelevant here.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1138148
+If you claim this is a PCI device thus you do not need any resources,
+then the binding is not needed either. PCI devices are enumerable. And
+to prove it: look at your DTS. Do you see qcom,qcc2072-bt being used? No.
 
----Test result---
+> 
+> We do not currently have an integrated non-M.2 QCC2072 design, so I do not
+> have board-specific regulator supplies to document for that topology.
+> 
+> Could you please suggest how you would prefer this binding to be handled for
+> the current M.2-only use case? 
 
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      20.75 seconds
-BluezMake                     PASS      566.26 seconds
-MakeCheck                     PASS      19.29 seconds
-MakeDistcheck                 PASS      154.58 seconds
-CheckValgrind                 PASS      222.09 seconds
-CheckSmatch                   PASS      297.48 seconds
-bluezmakeextell               PASS      95.21 seconds
-IncrementalBuild              PASS      562.00 seconds
-ScanBuild                     PASS      903.55 seconds
+Drop the binding, you do not need it.
 
+Anyway the problem is that more comments were ignored.
 
+And why this is sent so many times?
 
-https://github.com/bluez/bluez/pull/2366
+https://lore.kernel.org/all/20260218114955.3970974-2-vivek.sahu@oss.qualcomm.com/
 
----
-Regards,
-Linux Bluetooth
+https://lore.kernel.org/all/20260529175342.3363935-1-yepuri.siddu@oss.qualcomm.com/
 
+and now by you.
 
---===============0469661611534365616==--
+How many times this will be sent in separate patchsets and asking for
+separate review ignoring previous review?
+
+Best regards,
+Krzysztof
