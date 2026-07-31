@@ -1,75 +1,64 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A462D29C8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 01:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECA72DB780;
+	Fri, 31 Jul 2026 04:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785460962; cv=none; b=p0PGctJKOnGZq3SjPDXv+S6aqDkTa4NY5w8yWItzdyNfNYUO6FVWBGeoeJfUxqHwifSFWbsrMNPYBsOBN9r+6v/cyrl41zWNFvyaE7X7TipTs7RbUwF7iGfCXJj2Je58V5CLRO/mUu6s80/zVLo4S8h1AysyLmx0xThhDf5toAc=
+	t=1785472171; cv=none; b=bGMQSl9A8GwGMzvgRDvg0+0lt2mv+sT7V1mcP7qGmnKBb69nnZshaCDFhy5LygLpnpAgFqNdovjyZI0/l1TgDZjSGa6znoiYc4jHv5DWWsXYLREmlWjseO9dx4S4Psxv+/IQZDYUKsFp7pkYekoKwQsYJNPM1/motU/VbGB9nUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785460962; c=relaxed/simple;
-	bh=ZIUWi9dvcoLnHPBax9+q/pSLqBUWF7Pfvg5A5+KMJl0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LIZ3sMKJk0zyzspf4kKgKyRJ+S3d+V+zXRT/ueBc2zZe3ZV/738u8xDXfRjpCSSHUZVNcQtV+/4dF2OtwJZoLTcsVuR/TNsQn+7GgrfPLahULSEQS3+O+1eH3PSDReY6vIdZytIU5MRqkW9b86M1ggGq5SEpvOvMltePhVOMS0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLmDHOFV; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785472171; c=relaxed/simple;
+	bh=xVT41tiow7rGr8rDiJVtMRgY3HThsFhiKy3F6dkB6iU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=si10ZayKdQrM8wYthYI4UHX/By+K3ZT6zsTtFKhsOHHJ+D7NACTQiZYupyqhC1kLraE7ifh40f7XZPiYV7Eyqa6pubnBXn6bCeC8Vhh5GI3s6SdkWdYgHYje+3w/fSVPVObYXONfupYSpZ6mMIa5uhGrboDZXDx63cdMV034M4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=IAvsapQT; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLmDHOFV"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-6acb51944d6so214830eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2026 18:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785460959; x=1786065759; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=R2bC2m+UA+ADWVx01F0KW8+8Fn1WRql8m2DlUCjKWoQ=;
-        b=fLmDHOFVjFKRMH3P1VSra+MZK12Gej97wORbr9KC1rR85izpDpuJ9sbc8TQhuE2EIs
-         3kPPYiQf+WJ28ZNrMNwj6l8DRNRI4k2eLfBp13oS/OJgiklUXRVsNQvSeKs/3zLLRlZ5
-         LI0xWCC/J2axfSciLjf/1Codv7UQNsqUQctymkvstSWGHo1hd6E6bkyFUpt+bR8U9T/T
-         wCGM0TX7w37oE8XkoZM4e/h07ND95UNfOGoI88YrxJw5kimqN6QGN9sUqWuysp65NHGw
-         hfTY8imqz0LJBgEc/IrYrgBQw0b2l20OrSn08X2/RleKLn2ZdwnGLTrH9yZCWRitXNKX
-         el1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785460959; x=1786065759;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=R2bC2m+UA+ADWVx01F0KW8+8Fn1WRql8m2DlUCjKWoQ=;
-        b=Rcv7VfBxvm9XPPcDIL0AeREqciBbEi+xkGu5TPmS/yRgYHxcignpXzCUCILT2/NTcC
-         WhlRx/3zOh+k6DgC7I1VLGdyWVIu6E/W3+zatFd+g7HwIEQ6DtqjXy7movwgKqX7kxVR
-         oBoLycICjVXDgBUS4oSQurD8t4+d0Lk/skbJZJrhfhBxquF5dqNL+Ncm/GiUKarjPwVD
-         c3/oIMNpxeAC4u2vmLHxrAb5N9ADayI4GQ+sE0BmmJjNz5bTVQ8OOXJo2/vf/3XkFWUy
-         iCxBIQXGNQJU/jzngV6nZaKbDwiLdnFXr+M7SojSRoLAU/6h7HwHXavi9PygdN6GQ7E6
-         Eo8w==
-X-Forwarded-Encrypted: i=1; AHgh+Rr/ORVSwZf+5CijJM7xlRWj9A4T0ST5uu7mOqH4RlzCHq7N4ShhhwyRrXyZwcRRzZxGQJnKhxAreD4SRrBtJR0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLy7rp9i578xDMOHHCMIh/eFu2RTvLoCqgO2lcAfwyIDwojYuT
-	aHv2uV2GtHEAmjxTbZM4PJR0Niyvuwdls24Zdg96oJvLUstSHjEENiOw
-X-Gm-Gg: AR+sD13CvfenHy0oL5ACbbFZEjA8u5iH7mTlO7agsfWBYUCpdpcUGsmzh7FW8yk1O1P
-	FOzuCTHnqGMHPYpl+y/POw19St4yKauA+8CN4OheaoiSbRqy82b4B3K2sVXXru4E5tk8Jz0mwPM
-	rmWLbvnW2JzJ64g7k33yMa4pOTwVgX8eIchiZJuASCmNpfP3fla8IiZy6e5PkKOlpZtPXgC4Jpv
-	wWb0ZiC9TNSZpX/DWcBnp/Xb5FFNmEx/iEdlw4247VAJVJaqjuJAJKEhyOPbwtAYKdgI1Fsqvjr
-	gp4eIAZk3IkiiQPqW03sz7++WJIv1qR+bSOITR34VYNQmkimYlTo2iT7rt0TumwW3U3LjNEF9Pj
-	8jXygP/daUakQlWhsK42O3olmwnO0pCRLAelBFrAkIr021wBTXSVSS4wzt6nGhaV7ZpJrAOlXOj
-	jAXxHy31506A+tmG65SYszC5EF9NuJ+0PEhD076jqvIz9EUS45MPc6F5U=
-X-Received: by 2002:a05:6820:4cc7:b0:6aa:e524:fd70 with SMTP id 006d021491bc7-6ae37dabfbbmr30249eaf.26.1785460958951;
-        Thu, 30 Jul 2026 18:22:38 -0700 (PDT)
-Received: from en1.. ([204.144.167.9])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6acbc2e1273sm2668311eaf.7.2026.07.30.18.22.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 18:22:38 -0700 (PDT)
-From: Amir Abudubai <amirabudubai@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Amir Abudubai <amirabudubai@gmail.com>
-Subject: [PATCH v2] Bluetooth: hci_core: Queue out-of-order ACL packets
-Date: Thu, 30 Jul 2026 20:22:04 -0500
-Message-ID: <3ebd064b6e7a9d3d8d72f1da618765affbd30cd7.1785459643.git.amirabudubai@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAEzAHR-7LQak12o_Xt7QrvLHRw3GSLDgco6o7Fru-wVXyBW7mQ@mail.gmail.com>
-References: <CAEzAHR-7LQak12o_Xt7QrvLHRw3GSLDgco6o7Fru-wVXyBW7mQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="IAvsapQT"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66V1uXA63063088;
+	Fri, 31 Jul 2026 04:29:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=lGlKRjmAC0x2z10mK08MbuMqi2JAh0ejIVP
+	hL9lmmy8=; b=IAvsapQT6LRVzdD348AQr8thgFNplQWZMzHwEH9r7x3cqCK8tD5
+	8B0WLrL3uXBwQt9MrhA5kRd8mJOLAEl1IRNtPOJjpuUZnZN48HK7KLfYjP1Fm3i3
+	Rqv0UagTLZed1QZKeDLfR1Eet4EnEVMU4gJeUC5z5jIYV/etMl8XJNE154YRy+rK
+	dvjQZz8jcbvT+UIHrAQXj74+lDGkAK1FQWw6ZveXmVXQI1JFWWfu2MKsED41wDMM
+	/p7NlSFO8tzsCWkE+kM7ohJyNDXuOeOtmFfCkOkTB1wKxlmReit3vi3hVgseWpbA
+	wOeWsoa5a4Mp8c7oW0h62/wS4JgrFm5iCNg==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4frj750gfm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 04:29:25 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 66V4TNPb002787;
+	Fri, 31 Jul 2026 04:29:23 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4fmp7ku4j4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 04:29:23 +0000 (GMT)
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 66V4TMjA002781;
+	Fri, 31 Jul 2026 04:29:23 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 66V4TMbS002776
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 04:29:22 +0000 (GMT)
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 90DDE638; Fri, 31 Jul 2026 12:29:21 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, chejiang@qti.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+        Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Subject: [PATCH v1] Bluetooth: mgmt: always reply when a queued mgmt command is cancelled
+Date: Fri, 31 Jul 2026 12:29:20 +0800
+Message-Id: <20260731042920.2431343-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,479 +66,102 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDAyNSBTYWx0ZWRfX6ZPjsa3jQgDR
+ jYlHNmx41Ke2lJIqxvHuAt/qGfzaQbWFzlOqRyjroGtRveVxj1OH3aOos1OFnOPtoi0rRwIbM8u
+ rS3V4lXk9mImVPUCo9TnzBS9bub4G6Q=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDAyNSBTYWx0ZWRfXy3gr1+8Dj+rQ
+ UZykn2fEgAB0ZH8RJmKqtaMVrka2kQXAiGumLcRUKXsQhwLT42Wg2B4vG31Wu6Dr0UgTDAv4trs
+ ZpLMCihSoUFdlGJRq/ABqA47e7tYBZN7dC7NFkxs0jDHJy1AE/LEXuVqi4OJGZ+kTVezAicyxr8
+ 5R4q0XR73FdoluBxLPnXqh1j6+b83qcO/om9yF9r4dfaVmOmD9REx0afxMgTxlK2PdB4PMacBu8
+ zb2ttmHRWKMiAxF6gfncdevmSIxl5799xwmqdQdnQcqlus+Mno1fqkcE05Tx44uI8iqZMg1jVIp
+ ccOGCIWnNnXlnFkX0Ck/5K3HMlRhInNjIe0O/3yltJMtnTlMzPOo9p5dsE92VC19Mu5dSXlNilx
+ vvfVbGzOP0bKMJ6D735MxVCkNTywf8dAnnbvmMmBQt/0H0pXAnaRfw4vGX6lSkIhFHeI/l8hd+4
+ VY85/iqHUsgFjZ3sRDA==
+X-Proofpoint-ORIG-GUID: jNIDJpSqHGXNTR0B5sjpLTy5qh3iyhzJ
+X-Proofpoint-GUID: jNIDJpSqHGXNTR0B5sjpLTy5qh3iyhzJ
+X-Authority-Analysis: v=2.4 cv=L9otheT8 c=1 sm=1 tr=0 ts=6a6c24a5 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=Um2Pa8k9VHT-vaBCBUpS:22 a=EUspDBNiAAAA:8 a=nXokoBoABDjQELSMSggA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-31_01,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 spamscore=0 phishscore=0 impostorscore=0 suspectscore=0
+ bulkscore=0 clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607310025
 
-On some USB adapters, the interrupt-IN endpoint can lag behind the
-bulk-IN endpoint by multiple polling intervals. Early ACL data can
-then arrive before the Connection Complete event establishes its
-handle, causing packets to be dropped due to an unknown handle.
+On boot, the kernel's HCI_AUTO_OFF timer powers a newly probed
+controller back off after 2 seconds if nothing has taken ownership of
+it yet. bluetooth.service is expected to take ownership within that
+window by powering the adapter on, but on slower boots bluetoothd can
+start late enough that the two race: HCI_AUTO_OFF fires and the
+controller is torn down and re-initialised while bluetoothd is still
+in the middle of its own adapter setup sequence.
 
-To resolve this, add a queue to hold ACL traffic received with an
-unknown handle. Re-check queued packets after processing HCI events,
-and drop packets if they remain unmatched when the 4 ms timeout expires.
-Introduce HCI_QUIRK_OUT_OF_ORDER_ACL to restrict this behavior to
-transports that set the quirk.
+When that teardown happens, any mgmt command bluetoothd had already
+queued for that adapter is cancelled - but userspace is never told.
+bluez's mgmt command queue is strictly serialised, so a command that
+never receives a reply blocks every command queued after it on that
+adapter indefinitely. In practice this means bluetoothd gets stuck
+before it can register the adapter, and reports no controller being
+available at all, even though the controller itself is healthy and
+fully usable moments later.
 
-Add BT_HCIBTUSB_EARLY_ACL_HOLD to set the default behavior for USB
-adapters, along with a force_early_acl_hold debugfs entry to control
-it per adapter while the adapter is down.
+Fix this by treating a cancelled command like any other failure
+instead of silently dropping it: always send a reply back to
+userspace, using the existing "cancelled" status value. This mirrors
+how other mgmt commands already behave when they fail for other
+reasons, and lets bluetoothd's normal error handling take over
+(log the failure and continue) instead of hanging forever.
 
-This issue was observed and the fix verified on:
-- 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
-- 7392:c611 Edimax Technology Co., Ltd Edimax Bluetooth Adapter
+Verified on a QCS6490 rb3gen2 board where this HCI_AUTO_OFF vs.
+bluetooth.service race was reproduced: before this change, hitting
+the race left the adapter permanently unavailable to bluetoothd until
+the service was restarted; after this change, hitting the same race
+no longer affects adapter registration and the controller comes up
+normally.
 
-Assisted-by: OpenCode:openai/gpt-5.6-sol
-Signed-off-by: Amir Abudubai <amirabudubai@gmail.com>
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 ---
-Hi Luiz,
+ net/bluetooth/mgmt.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-I worked on finding a simpler fix that didn't require adding latency,
-and this is what I got. I based it on Fluoride's fix for the same race
-condition. The main difference is doing it in HCI core, which comes
-out cleaner because all the logic for valid handles and timestamps is
-already in place.
-
- drivers/bluetooth/Kconfig         |  12 ++++
- drivers/bluetooth/btusb.c         |  59 ++++++++++++++++
- include/net/bluetooth/bluetooth.h |   6 ++
- include/net/bluetooth/hci.h       |   9 +++
- include/net/bluetooth/hci_core.h  |   3 +
- net/bluetooth/hci_core.c          | 111 +++++++++++++++++++++++++++---
- net/bluetooth/hci_sync.c          |   6 ++
- net/bluetooth/l2cap_core.c        |   2 +-
- 8 files changed, 199 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 4e8c24d757e9..027762e0da3f 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -56,6 +56,18 @@ config BT_HCIBTUSB_POLL_SYNC
- 	  Say Y here to enable USB poll_sync for Bluetooth USB devices by
- 	  default.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 167d75e34..9031b5d5d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -301,6 +301,8 @@ static u8 mgmt_errno_status(int err)
+ 		return MGMT_STATUS_ALREADY_CONNECTED;
+ 	case -ENOTCONN:
+ 		return MGMT_STATUS_DISCONNECTED;
++	case -ECANCELED:
++		return MGMT_STATUS_CANCELLED;
+ 	}
  
-+config BT_HCIBTUSB_EARLY_ACL_HOLD
-+	bool "Enable USB early ACL packet hold by default"
-+	depends on BT_HCIBTUSB
-+	default n
-+	help
-+	  Hold ACL packets for a nominal 4 milliseconds when their connection
-+	  handle has not been registered yet. This works around USB controllers
-+	  whose event endpoint can lag behind their ACL data endpoint.
-+
-+	  The default can be overridden per adapter using the
-+	  force_early_acl_hold debugfs entry while the adapter is down.
-+
- config BT_HCIBTUSB_BCM
- 	bool "Broadcom protocol support"
- 	depends on BT_HCIBTUSB
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index be82bbbc1b5c..2752bfb89670 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -34,6 +34,8 @@ static bool disable_scofix;
- static bool force_scofix;
- static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
- static bool enable_poll_sync = IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC);
-+static bool enable_early_acl_hold =
-+	IS_ENABLED(CONFIG_BT_HCIBTUSB_EARLY_ACL_HOLD);
- static bool reset = true;
+ 	return MGMT_STATUS_FAILED;
+@@ -1338,7 +1340,7 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
+ 	struct mgmt_mode *cp;
  
- static struct usb_driver btusb_driver;
-@@ -3964,6 +3966,57 @@ static const struct file_operations force_poll_sync_fops = {
- 	.llseek		= default_llseek,
- };
+ 	/* Make sure cmd still outstanding. */
+-	if (err == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
++	if (!mgmt_pending_valid(hdev, cmd))
+ 		return;
  
-+static ssize_t force_early_acl_hold_read(struct file *file,
-+					 char __user *user_buf, size_t count,
-+					 loff_t *ppos)
-+{
-+	struct btusb_data *data = file->private_data;
-+	char buf[3];
-+
-+	buf[0] = hci_dev_test_flag(data->hdev,
-+				   HCI_OUT_OF_ORDER_ACL_ENABLED) ? 'Y' : 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
-+
-+static ssize_t force_early_acl_hold_write(struct file *file,
-+					  const char __user *user_buf,
-+					  size_t count, loff_t *ppos)
-+{
-+	struct btusb_data *data = file->private_data;
-+	bool enabled;
-+	int err;
-+
-+	err = kstrtobool_from_user(user_buf, count, &enabled);
-+	if (err)
-+		return err;
-+
-+	/* Only allow changes while the adapter is down */
-+	if (test_bit(HCI_UP, &data->hdev->flags))
-+		return -EPERM;
-+
-+	if (hci_dev_test_flag(data->hdev, HCI_OUT_OF_ORDER_ACL_ENABLED) ==
-+	    enabled)
-+		return -EALREADY;
-+
-+	if (enabled)
-+		hci_dev_set_flag(data->hdev, HCI_OUT_OF_ORDER_ACL_ENABLED);
-+	else
-+		hci_dev_clear_flag(data->hdev, HCI_OUT_OF_ORDER_ACL_ENABLED);
-+
-+	return count;
-+}
-+
-+static const struct file_operations force_early_acl_hold_fops = {
-+	.owner		= THIS_MODULE,
-+	.open		= simple_open,
-+	.read		= force_early_acl_hold_read,
-+	.write		= force_early_acl_hold_write,
-+	.llseek		= default_llseek,
-+};
-+
- #define BTUSB_HCI_DRV_OP_SUPPORTED_ALTSETTINGS \
- 		hci_opcode_pack(HCI_DRV_OGF_DRIVER_SPECIFIC, 0x0000)
- #define BTUSB_HCI_DRV_SUPPORTED_ALTSETTINGS_SIZE	0
-@@ -4460,6 +4513,10 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (enable_autosuspend)
- 		usb_enable_autosuspend(data->udev);
+ 	cp = cmd->param;
+@@ -5651,9 +5653,6 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ 	struct mgmt_pending_cmd *cmd = data;
+ 	struct mgmt_cp_remove_adv_monitor *cp;
  
-+	hci_set_quirk(hdev, HCI_QUIRK_OUT_OF_ORDER_ACL);
-+	if (enable_early_acl_hold)
-+		hci_dev_set_flag(hdev, HCI_OUT_OF_ORDER_ACL_ENABLED);
-+
- 	data->poll_sync = enable_poll_sync;
- 
- 	err = hci_register_dev(hdev);
-@@ -4470,6 +4527,8 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
- 			    &force_poll_sync_fops);
-+	debugfs_create_file("force_early_acl_hold", 0644, hdev->debugfs, data,
-+			    &force_early_acl_hold_fops);
- 
- 	return 0;
- 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index b624da5026f5..19fd03103dff 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -486,6 +486,10 @@ struct mgmt_ctrl {
- 	u16 opcode;
- };
- 
-+struct hci_acl_ctrl {
-+	unsigned long expires;
-+};
-+
- struct bt_skb_cb {
- 	u8 pkt_type;
- 	u8 force_active;
-@@ -496,6 +500,7 @@ struct bt_skb_cb {
- 	union {
- 		struct l2cap_ctrl l2cap;
- 		struct hci_ctrl hci;
-+		struct hci_acl_ctrl hci_acl;
- 		struct mgmt_ctrl mgmt;
- 		struct scm_creds creds;
- 	};
-@@ -509,6 +514,7 @@ struct bt_skb_cb {
- #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
- #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
- #define hci_skb_sk(skb) bt_cb((skb))->hci.sk
-+#define hci_skb_acl_expires(skb) bt_cb((skb))->hci_acl.expires
- 
- static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
- {
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cd3520a29131..04b6bbc4c803 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -375,6 +375,14 @@ enum {
- 	 */
- 	HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
- 
-+	/* When this quirk is set, ACL packets received before their connection
-+	 * handle is registered may be queued briefly. This can happen on
-+	 * transports with separate event and ACL data channels.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_OUT_OF_ORDER_ACL,
-+
- 	__HCI_NUM_QUIRKS,
- };
- 
-@@ -468,6 +476,7 @@ enum {
- 	HCI_OFFLOAD_CODECS_ENABLED,
- 	HCI_LE_SIMULTANEOUS_ROLES,
- 	HCI_CMD_DRAIN_WORKQUEUE,
-+	HCI_OUT_OF_ORDER_ACL_ENABLED,
- 
- 	HCI_MESH_EXPERIMENTAL,
- 	HCI_MESH,
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 01b938c4b24a..f23b1a11e4b2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -516,10 +516,12 @@ struct hci_dev {
- 	struct work_struct	rx_work;
- 	struct work_struct	cmd_work;
- 	struct work_struct	tx_work;
-+	struct delayed_work	unknown_acl_work;
- 
- 	struct delayed_work	le_scan_disable;
- 
- 	struct sk_buff_head	rx_q;
-+	struct sk_buff_head	unknown_acl_q;
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
- 
-@@ -873,6 +875,7 @@ extern struct mutex hci_cb_list_lock;
- /* ----- HCI interface to upper protocols ----- */
- int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int l2cap_disconn_ind(struct hci_conn *hcon);
-+/* The caller retains ownership of skb only when -ENOENT is returned. */
- int l2cap_recv_acldata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb,
- 		       u16 flags);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9d5adf882509..a6531926e0cd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -47,6 +47,7 @@
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
-+static void hci_unknown_acl_work(struct work_struct *work);
- 
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-@@ -2511,6 +2512,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
- 	INIT_WORK(&hdev->tx_work, hci_tx_work);
-+	INIT_DELAYED_WORK(&hdev->unknown_acl_work, hci_unknown_acl_work);
- 	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_WORK(&hdev->error_reset, hci_error_reset);
- 
-@@ -2519,6 +2521,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 
- 	skb_queue_head_init(&hdev->rx_q);
-+	skb_queue_head_init(&hdev->unknown_acl_q);
- 	skb_queue_head_init(&hdev->cmd_q);
- 	skb_queue_head_init(&hdev->raw_q);
- 
-@@ -2669,6 +2672,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	disable_work_sync(&hdev->rx_work);
- 	disable_work_sync(&hdev->cmd_work);
- 	disable_work_sync(&hdev->tx_work);
-+	disable_delayed_work_sync(&hdev->unknown_acl_work);
- 	disable_work_sync(&hdev->power_on);
- 	disable_work_sync(&hdev->error_reset);
- 	disable_delayed_work_sync(&hdev->cmd_timer);
-@@ -3793,8 +3797,11 @@ static void hci_tx_work(struct work_struct *work)
- 
- /* ----- HCI RX task (incoming data processing) ----- */
- 
-+#define HCI_UNKNOWN_ACL_TIMEOUT_MS 4
-+
- /* ACL data packet */
--static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
-+static int hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb,
-+			      bool retry)
- {
- 	struct hci_acl_hdr *hdr;
- 	__u16 handle, flags;
-@@ -3804,7 +3811,7 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!hdr) {
- 		bt_dev_err(hdev, "ACL packet too small");
- 		kfree_skb(skb);
+-	if (status == -ECANCELED)
 -		return;
-+		return -EINVAL;
- 	}
+-
+ 	hci_dev_lock(hdev);
  
- 	handle = __le16_to_cpu(hdr->handle);
-@@ -3814,15 +3821,93 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
- 		   handle, flags);
- 
--	hdev->stat.acl_rx++;
-+	if (!retry)
-+		hdev->stat.acl_rx++;
- 
- 	err = l2cap_recv_acldata(hdev, handle, skb, flags);
--	if (err == -ENOENT)
--		bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
--			   handle);
--	else if (err)
-+	if (err == -ENOENT) {
-+		skb_push(skb, sizeof(*hdr));
-+		return err;
-+	}
-+
-+	if (err)
- 		bt_dev_dbg(hdev, "ACL packet recv for handle %d failed: %d",
- 			   handle, err);
-+
-+	return err;
-+}
-+
-+static bool hci_unknown_acl_expired(struct sk_buff *skb)
-+{
-+	return time_after_eq(jiffies, hci_skb_acl_expires(skb));
-+}
-+
-+static u16 hci_unknown_acl_handle(struct sk_buff *skb)
-+{
-+	return hci_handle(le16_to_cpu(hci_acl_hdr(skb)->handle));
-+}
-+
-+static void hci_drop_unknown_acl(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
-+		   hci_unknown_acl_handle(skb));
-+	kfree_skb(skb);
-+}
-+
-+static void hci_queue_unknown_acl(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	bt_dev_warn_ratelimited(hdev,
-+				"Queuing ACL packet for unknown connection handle %d",
-+				hci_unknown_acl_handle(skb));
-+	hci_skb_acl_expires(skb) =
-+		jiffies + msecs_to_jiffies(HCI_UNKNOWN_ACL_TIMEOUT_MS);
-+	skb_queue_tail(&hdev->unknown_acl_q, skb);
-+	queue_delayed_work(hdev->workqueue, &hdev->unknown_acl_work,
-+			   msecs_to_jiffies(HCI_UNKNOWN_ACL_TIMEOUT_MS));
-+}
-+
-+static void hci_retry_unknown_acl(struct hci_dev *hdev)
-+{
-+	unsigned int count = skb_queue_len(&hdev->unknown_acl_q);
-+	struct sk_buff *skb;
-+	unsigned long delay;
-+
-+	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		cancel_delayed_work(&hdev->unknown_acl_work);
-+		skb_queue_purge(&hdev->unknown_acl_q);
-+		return;
-+	}
-+
-+	while (count-- && (skb = skb_dequeue(&hdev->unknown_acl_q))) {
-+		if (hci_acldata_packet(hdev, skb, true) != -ENOENT)
-+			continue;
-+
-+		if (hci_unknown_acl_expired(skb)) {
-+			hci_drop_unknown_acl(hdev, skb);
-+			continue;
-+		}
-+
-+		skb_queue_tail(&hdev->unknown_acl_q, skb);
-+	}
-+
-+	if (skb_queue_empty(&hdev->unknown_acl_q)) {
-+		cancel_delayed_work(&hdev->unknown_acl_work);
-+		return;
-+	}
-+
-+	skb = skb_peek(&hdev->unknown_acl_q);
-+	delay = time_after(hci_skb_acl_expires(skb), jiffies) ?
-+		hci_skb_acl_expires(skb) - jiffies : 0;
-+	queue_delayed_work(hdev->workqueue, &hdev->unknown_acl_work,
-+			   max_t(unsigned long, 1, delay));
-+}
-+
-+static void hci_unknown_acl_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					   unknown_acl_work.work);
-+
-+	hci_retry_unknown_acl(hdev);
- }
- 
- /* SCO data packet */
-@@ -4039,11 +4124,21 @@ static void hci_rx_work(struct work_struct *work)
- 		case HCI_EVENT_PKT:
- 			BT_DBG("%s Event packet", hdev->name);
- 			hci_event_packet(hdev, skb);
-+			if (!skb_queue_empty(&hdev->unknown_acl_q))
-+				hci_retry_unknown_acl(hdev);
- 			break;
- 
- 		case HCI_ACLDATA_PKT:
- 			BT_DBG("%s ACL data packet", hdev->name);
--			hci_acldata_packet(hdev, skb);
-+			if (hci_acldata_packet(hdev, skb, false) == -ENOENT) {
-+				if (hci_test_quirk(hdev,
-+						   HCI_QUIRK_OUT_OF_ORDER_ACL) &&
-+				    hci_dev_test_flag(hdev,
-+						      HCI_OUT_OF_ORDER_ACL_ENABLED))
-+					hci_queue_unknown_acl(hdev, skb);
-+				else
-+					hci_drop_unknown_acl(hdev, skb);
-+			}
- 			break;
- 
- 		case HCI_SCODATA_PKT:
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 307fd47f8459..839f9fe91d20 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5396,9 +5396,11 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 		 */
- 		flush_work(&hdev->rx_work);
- 		flush_work(&hdev->cmd_work);
-+		cancel_delayed_work_sync(&hdev->unknown_acl_work);
- 
- 		skb_queue_purge(&hdev->cmd_q);
- 		skb_queue_purge(&hdev->rx_q);
-+		skb_queue_purge(&hdev->unknown_acl_q);
- 
- 		if (hdev->flush)
- 			hdev->flush(hdev);
-@@ -5503,6 +5505,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		cancel_delayed_work_sync(&hdev->cmd_timer);
-+		cancel_delayed_work_sync(&hdev->unknown_acl_work);
-+		skb_queue_purge(&hdev->unknown_acl_q);
- 		hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
- 		return err;
- 	}
-@@ -5512,6 +5516,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 	/* Flush RX and TX works */
- 	flush_work(&hdev->tx_work);
- 	flush_work(&hdev->rx_work);
-+	cancel_delayed_work_sync(&hdev->unknown_acl_work);
- 
- 	if (hdev->discov_timeout > 0) {
- 		hdev->discov_timeout = 0;
-@@ -5582,6 +5587,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 
- 	/* Drop queues */
- 	skb_queue_purge(&hdev->rx_q);
-+	skb_queue_purge(&hdev->unknown_acl_q);
- 	skb_queue_purge(&hdev->cmd_q);
- 	skb_queue_purge(&hdev->raw_q);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1156aba4e83c..a53179897054 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7799,7 +7799,7 @@ int l2cap_recv_acldata(struct hci_dev *hdev, u16 handle,
- 	hcon = hci_conn_hash_lookup_handle(hdev, handle);
- 	if (!hcon) {
- 		hci_dev_unlock(hdev);
--		kfree_skb(skb);
-+		/* Leave ownership with HCI so it can retry the packet. */
- 		return -ENOENT;
- 	}
- 
-
-base-commit: 735a14a2a4426760c5ff41ef3db5543fececcb75
+ 	cp = cmd->param;
 -- 
-2.43.0
+2.34.1
+
