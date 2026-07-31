@@ -1,253 +1,244 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4379D3F0750
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 19:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4040F31B838
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 19:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785525943; cv=pass; b=L7c7MAYwwpvQtIliZQj83nepeRLmRETB30Nlv4QRjJ4ew7dP0ffAedIDaC9p+5XJt+v6V68XSDVB3OZ/cJ8g4jmc0L5by4kvqR6JtoUNTst1rWJpNEEy/R2CbFu3ig3ONL0W+XoIl+8DTn73PzqZKXg8Y//TopIOsEcAjUhcqNo=
+	t=1785527126; cv=pass; b=qZvYNTMXRiCO7xMl9h6Xj1kDFXMNCVzWG/iyxtQGF2VVs7SNCKW6KIDMeFAPLwEpJk5yBcFfRtnX4P1lwdQ2+9pX+ulx6OHeuG05PqrrnVpgVOOZlZr7YMt5U3A1XKQx3nrsgD/uZ8DLJbcxo8PoEgGEy4X/5jA4pHA0ZYx2VzI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785525943; c=relaxed/simple;
-	bh=S90ycy4tRH3QBjth/kijjGG9ODJd1eKt3mDGuCPoosM=;
+	s=arc-20240116; t=1785527126; c=relaxed/simple;
+	bh=cCUEjVyvXPjvenluJvof0R5NUdQ/rRfIEr0ztvApjrk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rd4G4BGTe4P3sF4oniDJQPpUP+TznxMyxz0r3+5rfm74Avz8+s81qFkBCfYTl5KqCBWeehpiRQBxbymtJ6UNQO8DcbBOZkhgfjkBPhcZDfkb7I3QLVfX1UDkk+Q88sYzyrNgYgyA4Af8QAMlsUGS+IP4gxFeDDbQxhaC3lm9UDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=auzOVGOA; arc=pass smtp.client-ip=209.85.128.172
+	 To:Cc:Content-Type; b=smBVhqSbh58udnC8PIlDzubEht1+4h+TCbaCR5+5pVhOlAU087mIkuw5Z5cjYs8dbi8jedRBhtCFOLv8XmBG8gdZ8tP4knxR8dcA2HCecE3EjSuy1BUSFFZAPfG++33U5NYSkGnCXxWQmRZC7etLoIEQCoOveOtzjP1aKkMGXIA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sFIOj6sV; arc=pass smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="auzOVGOA"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-81062fdeaf5so34406867b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 12:25:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785525941; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sFIOj6sV"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-66899c7b57bso1890708d50.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2026 12:45:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785527124; cv=none;
         d=google.com; s=arc-20260327;
-        b=brnjwLVXCxdBVOCv50R8k2tcy9m0XyMBzR/J9a0KbPwNvkfXoSrzY605zsLs+zfQzO
-         CTz8Rpxo1z5QLpp9OhNDQWeFxvFH7XHaf4IRtvGlSFRvN8F33xifJfx7HtEMzSTsRRv9
-         FWxZSOeh7eEL+RLlFsrtrLewdxJWrq+/z2URCqzwt8wwBIzBXW9u1nptdm3+oFLiTJ5j
-         wxLmvspalUYrXiO5//J8i3tLdeSiie1If0WzQLRl3wNNwmEBR6GOSntWsX3ea27/URMt
-         U0ZsdA5l1H4WPssx83h5M1cAqzMCf4wn//ZCX7Ze1WPPGMErCo+Ipgf5csJZfApeBjqM
-         5OlQ==
+        b=czC0Rn0fN6VD49CTM3KSx7nRp8dX6NiGR+suMWMsWHDNaIqo2XTVkegWDMp9ECQ4/U
+         /BvIBT8l200lvj+/tiNLGswudAwOtTPba0x0PigKy/z3PeATmDc3+5WD0R26B9ADSolX
+         xQBmpLDno5ByM8OxkgX+5KIkAv5ngBMs5u0/ANhfgMgF2UkLEjg5mX7MYBEmi31znnr4
+         HJQwBahcWrMRB+JQfRaf24VUF+QSqRfmZkyTTUUId2U1OjWZgkEYKbsmiDhIdbWrYuI0
+         tMG9g/ESJDddf+jUuOyDcqC7Tuy8WBmbjr8zLBKc1SemPNgHtTRK008y9YitnbBQ4ee8
+         nA0A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=1xyf0jo2vh/33Eaju6Dp4kAQ5RCw7As82K7kpTj1cNo=;
-        fh=IX8aHAoifl9oVDsHvI21IN44BbFTiELLgSzH/biJvEs=;
-        b=OCuJfXOaj5Z04cJbWbdSwyEx/+iSaVg9FhTaNYc4UGj/gegtHrcBYy+J9SKC4Nmi1A
-         J7AUH/P1/Tr83q3YSr2egkVyWKTyVUqtmnHJB3lAc2QbN6EK4tk3QncWGDD1UA8WWjuE
-         190MYKOl5Xo2jQ3BONfoAEvA20B28RYXDuO0LYZX4OB9/1s9uhnonMf31gfBz8Vvun5Q
-         IbspOUoxPrh1I9KXR6Pu32DMqGBfcT6h5HZc04zzy3AOBr6C01obnDsnPjsxYu6qC9HW
-         ZPYHm80+w4G2Kpu81wf4ScLjcH4rAZdZ4TyYyuHMznE6aRDf9/psruixBEQKIlScHd2P
-         nP6w==;
+        bh=Ve9Rf+D9HJudBq0CAbi6hRU06X7OxOvTtvFT36AgLrY=;
+        fh=rxTrxiUM39Jum6iLJHCVZw2mYhD1eEJpeoDFUyMxsXo=;
+        b=N6YjLJnb6NLCWKt5k+od/QT19Go0j4tCPe61k5EFfyPmdAVzTUWoXph9aeEdtbWLl6
+         QvGu/ucO7HTqnBAq/rOd2zD3qQyiW4v6E559TYKiN/bJ120Hf7VF4XFzeFwzUFxebPqG
+         MjYCBPUPUMX1pwdB8TSXsWxMKVfYj05kBdVeQUEDQU6SgHIf8NsAY4ue6o7D2kpANeuU
+         ruUkwLZH4WswyTju3DCcju48YmJwNBS3XJSRO0+RRJUXL3/oz87AHYBhE5mrGgzKXdQW
+         FpJz+fRZ1M+L8s4ox1VNfnWDWLbDi/vhQBNNmVnXwTDWQy9WGerSyRXbduIfBcwn4w+c
+         OkGQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785525941; x=1786130741; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785527124; x=1786131924; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=1xyf0jo2vh/33Eaju6Dp4kAQ5RCw7As82K7kpTj1cNo=;
-        b=auzOVGOA0298lQ844/qAkyKB008ya+mPcFOSXvqhrX8r56sZwTnL3GPTDf37TD601b
-         gsftHkLs4W7kPRbUtCrSYztt5566NPjofTUh87ED2l+lNr6LeW3wEFjMs8CNyM2aiso5
-         0s1TwxSYyKsP+rZQBfD2RT0zmUxsf91uR0rY8fRuN80tkHQgIUzeQkcCk7Kbd6g26R3m
-         M5g/skEHqjwTcSRnMlD5fzR86Tsh8B5zz9dFWYRhIdAY+gRiOpBgp/gtpCbek+0aMuAO
-         MhMgrsYENm0Crd571rql9ZjP1lvnCp+1fEU70I7ZPUBq7bYd2d+aPoMP61kj8YIh2mlt
-         lVFA==
+        bh=Ve9Rf+D9HJudBq0CAbi6hRU06X7OxOvTtvFT36AgLrY=;
+        b=sFIOj6sVeNl53K1Nq+W5kTM1570NXZa7ADIHWTAk7dfx7PIQ5ixYwiMMKrbpx8slgp
+         DOSQKGZz4AigQ6rWLSe8k5tnWBhk5GXmHmE5+DdEeqAJ9+u5pnFKYO/b3oXTN5opkXtA
+         gpbs8k4Ab7rgToMZqs3lYFjOGfi/Cuki/Rzrs0Jf5shfoByKTUm8wmZEBazDd82Z5DwA
+         a4UTWWajdfI5IfHR+Uv57YxZOIvc1yJXdQ07Tfc4IUwRFDickdWE2UhXafxt/B9z50so
+         dRw5VtDoXWUDx5Ef/G2iHyswvOdlsViwMLExCsFWq+GOqBM8CPE3FKtOHtmtWiMtymDl
+         ucPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785525941; x=1786130741;
+        d=1e100.net; s=20251104; t=1785527124; x=1786131924;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1xyf0jo2vh/33Eaju6Dp4kAQ5RCw7As82K7kpTj1cNo=;
-        b=KtLQ9Fzw+OslGy9gcpuVBR8AqRyHL9eEK7JdEmR4mIQn9b3CxEKMt/UTHcztODjN5+
-         HHmuBcfYwt6QDq9xM7IOskw2GlWUm6VHTMgbsqYyU8m/woqOf7/O6Ca2hStnYKsnPJLW
-         YQgLhQQ/KMzE7k0y1qfZ4xga7yYfaJOZrfIWu5F7lMWRM2K1KcTKYV4W1PfppxPFfqIr
-         L2GsgRxItvl8foDSVMe+XXyCpTu9Nhh4tTStWhCFh8W2u/7sFBlhxzlvj1drfp8tMPOM
-         G3w1zE/8zs8VUt8tjbxLHRu2MnuG5F9XWKJp0gRZRjMzziwpY69ZCy5buhSbIyq8DkST
-         56AQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoBjJOk3wEOvlTbXTtXpz82b0ocrNmqy7BQI3JqUEaaWEiziHQwPS5+leu6yH1AnQh/mrPuGo7Kbt6J0kHuc1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYDc+TMRPciJT7uy3c/pzNhFmbMOjRbwsdUlhaBpA3YjrV3l9m
-	4g1lUviGHaqTLZjr6TWMcAgOfXgdtWQgixZqjNaG+JJ3LmWEF8Y2IW9luqTQZ4FtOhe3vp5qzU+
-	/Jh9x8diS5XpEwVG0uUmSI13Wz4vFEvk=
-X-Gm-Gg: AR+sD12C+j7Si9HOudT8MVH+yurij5FD7CwfBLMEazmkBW9Lhxy9jZRxer2t1FQ35Ia
-	mVqWF1I1Vr1p4LcGYxc5tnSnuAUXytIp6dlEDdKyWj1eug4s3PfSR1vWNufy3XW93tMIf8EZTRk
-	zBDseuRC9fkPs3KvvINFC92YqXlFyM/Yi9cabr9aK1N3znnpj6j+aUo9A6lBBqXOlenjokkv21G
-	qn/9FYkAKieSkBb/O6FNQ2OrvP9gPlJ0egnEJ2/Dos4vHKpEH/WyQCXec5irzfVN6duUX+ovWb0
-	9Odh0okNUeTnsBF10PakL0HDG8HTqJc0mvQGObNEbwbFHKCMaWs6kh/5DfQvwad+7jG+0qira5d
-	suzCE0T84JAx3e9B/3XeNk4H2rkmNn5uQ8gxMuisVfJ5m/ts=
-X-Received: by 2002:a05:690c:4:b0:81e:ba92:b253 with SMTP id
- 00721157ae682-81fcbbd3c32mr27835567b3.4.1785525940950; Fri, 31 Jul 2026
- 12:25:40 -0700 (PDT)
+        bh=Ve9Rf+D9HJudBq0CAbi6hRU06X7OxOvTtvFT36AgLrY=;
+        b=hEt1RwSlPghURnxxyp9aR20hX9aoAKFrN+oZ1JcjsZ2rqvjcoByc5jpQ8Qm57LAhNI
+         n08PRoYE69uusTCu2LHxiEseXvHqPq+bBjdr27Xv1kAy0MZv/WplSrtmqriOCYMfp1M6
+         CbSr9wMxSiASR5hj2y5F0KMMNv5SpUknbT3/eRsao1Qnfn2UjsyCrOjV6FR6zX47i2mK
+         stwv81gffRrxO3TSuPTcdTyyYI3RzdrE2lNDYJm7+QxD3EJrAow14pZ9AN0DfLQ8Az00
+         lvF2YbVEVNI38u5oaj4q5WqN74eUfGnZ1Und/H/rDQecs6gvwWcmJr8xEeXoh9Y/X/W2
+         liEw==
+X-Forwarded-Encrypted: i=1; AHgh+RpqeiPq6DNcOaOvRuxUQSO3c2VFz2uJSEsPMJom4yIUDpqoJYQbENHqmkXLiOdkbMCUb63tkAZYMDIHb1aXEF8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAKO6pcT5qon1dueM5L7hGUOuYPcOnR6b25Ty7hIIwpDclyKSy
+	KPYM27zY/3qFX/a4QIxZ73UZTxQqltksbngx+uuQhv2idFesJbTeM5lxqVt38ct+mdShsDqc6GG
+	hTsoIf+bBHhMDSEiyY3hhyIYjrqcbH40=
+X-Gm-Gg: AR+sD13UsgP1VK8uuFY3cq6CyfwMG5s7HBgzI/hQ62S0lpCtuaYGXa6JykpD4AD3OR8
+	Wth91GojF1jYAyKNEbbzWgtbME6AjSEldbRbppB5R6QVM5JYz2rXXRtdFj8udNgQyiyN2kco5ps
+	UaYeUquzuvzyFxiZrkyuVpnbrdGNV07KOVF6LHaaQuWROaCu7d+Hkrbp53bwxLr9DmQjmuK0zl6
+	d5dNs2VSs8fQ43Qyf3agafw+47OcMDWq7uVjC7C7s/j+OI/aupus+dQjdxnDGS+6xP+00eq/q7E
+	MYGnnPBCHLXRg4MfhRVP747zu7AEoPf18zwalT67k5HbCTF+vnPzzLSD5pFd0WCX4TrHuo30dS+
+	q2+5lTkixsG6EjzDPflgija9CDkskJvgfySo=
+X-Received: by 2002:a05:690e:4403:b0:667:f3d7:eb35 with SMTP id
+ 956f58d0204a3-6694efe0e97mr1089162d50.6.1785527124099; Fri, 31 Jul 2026
+ 12:45:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730104103.2080325-1-nicoyip.dev@gmail.com>
-In-Reply-To: <20260730104103.2080325-1-nicoyip.dev@gmail.com>
+References: <20260730092331.2069741-1-nicoyip.dev@gmail.com>
+In-Reply-To: <20260730092331.2069741-1-nicoyip.dev@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 31 Jul 2026 15:25:29 -0400
-X-Gm-Features: AUfX_mx8MIL0Vdvol_s4EExI8VXU0ClgTTiBoG80mkHApZhzKzpw4sRIz1VA3kM
-Message-ID: <CABBYNZJx46usjp0_snfRQ7pvWrxPE8NZqSyqyM0rMEsoHgZnow@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_conn: hold conn for LE timeout work
+Date: Fri, 31 Jul 2026 15:45:12 -0400
+X-Gm-Features: AUfX_mz6mvXtIkPFddN4aW93kRtgDysqoRVhdaYPe9M0YLfqc630_fEbIBqs7bA
+Message-ID: <CABBYNZKgxz4JbKv8fgTeWGEGV0P_pPmcy_YG=rLDroc_1wu==g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix accept list UAF during suspend
 To: Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@intel.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Chengfeng,
 
-On Thu, Jul 30, 2026 at 6:41=E2=80=AFAM Chengfeng Ye <nicoyip.dev@gmail.com=
+On Thu, Jul 30, 2026 at 5:23=E2=80=AFAM Chengfeng Ye <nicoyip.dev@gmail.com=
 > wrote:
 >
-> le_conn_timeout is embedded in struct hci_conn, but queuing the work
-> does not hold a reference to the connection. hci_conn_del() uses
-> cancel_delayed_work() because synchronous cancellation would deadlock
-> when le_conn_timeout() itself calls hci_conn_del() while holding
-> hdev->lock.
+> hci_update_event_filter_sync() walks hdev->accept_list while sending a
+> synchronous HCI command for each remote-wakeup device.  The suspend path
+> holds hdev->req_lock, but accept-list updates are serialized by hdev->loc=
+k.
+> Consequently, remove_device() can free the current list entry during the
+> controller wait.
 >
-> This leaves the following interleaving possible:
+> The following interleaving causes the use-after-free:
 >
->   CPU 0                               CPU 1
->   le_conn_timeout()
->                                       hci_conn_del()
->                                         cancel_delayed_work() =3D false
->                                         hci_conn_cleanup()
->                                           put_device()
->                                             kfree(conn)
->   hci_conn_failed(conn, ...)
+>   hci_update_event_filter_sync()    remove_device()
+>   fetch accept-list entry
+>   hci_set_event_filter_sync()
+>     wait for controller response    hci_dev_lock()
+>                                     list_del()
+>                                     kfree()
+>                                     hci_dev_unlock()
+>   read the freed list.next
 >
-> The callback then dereferences the released connection. KASAN reported:
+> KASAN reported:
 >
->   BUG: KASAN: slab-use-after-free in hci_conn_failed+0x232/0x250
->   Read of size 8 at addr ffff8881180e8e20 by task kworker/u33:1/111
->   Workqueue: hci0 le_conn_timeout
+>   BUG: KASAN: slab-use-after-free in hci_suspend_sync+0x835/0x910
+>   Read of size 8 at addr ffff88810bec8440 by task kworker/0:1/10
+>   Workqueue: events vhci_suspend_work
 >   Call Trace:
->     hci_conn_failed+0x232/0x250
->     le_conn_timeout+0x23e/0x2c0
->     process_one_work+0x61b/0xf50
->     worker_thread+0x45b/0xd10
+>    hci_suspend_sync+0x835/0x910
+>    hci_suspend_dev+0x182/0x450
+>    process_one_work+0x661/0x1090
+>    worker_thread+0x45b/0xd10
 >
->   Allocated by task 115:
->     __hci_conn_add+0x1758/0x1b90
->     hci_connect_le+0x523/0x780
->     l2cap_chan_connect+0xfca/0x1bd0
->     l2cap_sock_connect+0x310/0x530
+>   Allocated by task 86:
+>    hci_bdaddr_list_add_with_flags+0x1a8/0x400
+>    add_device+0x381/0x820
+>    hci_sock_sendmsg+0x1033/0x1ea0
 >
->   Freed by task 110:
->     kfree+0x149/0x330
->     device_release+0xc8/0x240
->     kobject_put+0x14d/0x280
->     hci_conn_del+0x561/0xe70
->     hci_abort_conn_sync+0x3e3/0x800
+>   Freed by task 91:
+>    kfree+0x131/0x3c0
+>    remove_device+0x429/0xb70
+>    hci_sock_sendmsg+0x1033/0x1ea0
 >
-> Take a connection device reference before queuing le_conn_timeout. Drop
-> it when the callback finishes, when queuing fails, or when cancellation
-> removes a pending instance. If cancellation races an executing callback,
-> the callback retains the reference until its final access, avoiding the
-> use-after-free without waiting under hdev->lock.
+> Snapshot the remote-wakeup addresses under hdev->lock.  Release the lock
+> before sending HCI commands.  This preserves list order and avoids
+> retaining an accept-list node across a controller wait.
 >
-> Fixes: 980ffc0a2cec ("Bluetooth: Fix LE connection timeout deadlock")
+> Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
 > ---
->  net/bluetooth/hci_conn.c  |  8 ++++++--
->  net/bluetooth/hci_event.c | 25 ++++++++++++++++---------
->  2 files changed, 22 insertions(+), 11 deletions(-)
+>  net/bluetooth/hci_sync.c | 38 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 31 insertions(+), 7 deletions(-)
 >
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 1966cd153d97..501a2dd2543b 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -723,10 +723,13 @@ static void le_conn_timeout(struct work_struct *wor=
-k)
->                 hci_dev_lock(hdev);
->                 hci_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
->                 hci_dev_unlock(hdev);
-> -               return;
-> +               goto done;
->         }
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index c0b1fc293b49..540da19d1d64 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -6250,6 +6250,8 @@ static int hci_pause_discovery_sync(struct hci_dev =
+*hdev)
+>  static int hci_update_event_filter_sync(struct hci_dev *hdev)
+>  {
+>         struct bdaddr_list_with_flags *b;
+> +       bdaddr_t *accept_list =3D NULL;
+> +       size_t i, num_entries =3D 0;
+>         u8 scan =3D SCAN_DISABLED;
+>         bool scanning =3D test_bit(HCI_PSCAN, &hdev->flags);
+>         int err;
+> @@ -6263,26 +6265,48 @@ static int hci_update_event_filter_sync(struct hc=
+i_dev *hdev)
+>         if (hci_test_quirk(hdev, HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL))
+>                 return 0;
 >
->         hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
+> +       hci_dev_lock(hdev);
 > +
-> +done:
-> +       hci_conn_put(conn);
->  }
->
->  struct iso_list_data {
-> @@ -1267,7 +1270,8 @@ void hci_conn_del(struct hci_conn *conn)
->                         hdev->acl_cnt +=3D conn->sent;
->                 break;
->         case LE_LINK:
-> -               cancel_delayed_work(&conn->le_conn_timeout);
-> +               if (cancel_delayed_work(&conn->le_conn_timeout))
-> +                       hci_conn_put(conn);
->
->                 if (hdev->le_pkts) {
->                         if (!hci_conn_num(hdev, LE_LINK) ||
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 741d658e9630..e1e6b5092ce8 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1566,10 +1566,13 @@ static u8 hci_cc_le_set_adv_enable(struct hci_dev=
- *hdev, void *data,
->                 hci_dev_set_flag(hdev, HCI_LE_ADV);
->
->                 conn =3D hci_lookup_le_connect(hdev);
-> -               if (conn)
-> -                       queue_delayed_work(hdev->workqueue,
-> -                                          &conn->le_conn_timeout,
-> -                                          conn->conn_timeout);
-> +               if (conn) {
-> +                       hci_conn_get(conn);
-> +                       if (!queue_delayed_work(hdev->workqueue,
-> +                                               &conn->le_conn_timeout,
-> +                                               conn->conn_timeout))
-> +                               hci_conn_put(conn);
+> +       list_for_each_entry(b, &hdev->accept_list, list)
+> +               if (b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)
+> +                       num_entries++;
+
+
+If !num_entries we can probably bail out here, or we do need to call
+hci_clear_event_filter_sync? If so, perhaps that should be called
+first.
+
+> +       if (num_entries) {
+> +               accept_list =3D kmalloc_array(num_entries, sizeof(*accept=
+_list),
+> +                                           GFP_KERNEL);
+> +               if (!accept_list) {
+> +                       hci_dev_unlock(hdev);
+> +                       return -ENOMEM;
 > +               }
->         } else {
->                 hci_dev_clear_flag(hdev, HCI_LE_ADV);
->         }
-> @@ -1614,10 +1617,13 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci=
-_dev *hdev, void *data,
->                         hci_dev_set_flag(hdev, HCI_LE_ADV_0);
+> +       }
+> +
+> +       i =3D 0;
+> +       list_for_each_entry(b, &hdev->accept_list, list)
+> +               if (b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)
+> +                       bacpy(&accept_list[i++], &b->bdaddr);
+> +
+> +       hci_dev_unlock(hdev);
+
+While this works, iterating twice if there are no entries is wasteful;
+we should bail out or rework this.
+
+>         /* Always clear event filter when starting */
+>         hci_clear_event_filter_sync(hdev);
 >
->                 conn =3D hci_lookup_le_connect(hdev);
-> -               if (conn)
-> -                       queue_delayed_work(hdev->workqueue,
-> -                                          &conn->le_conn_timeout,
-> -                                          conn->conn_timeout);
-> +               if (conn) {
-> +                       hci_conn_get(conn);
-> +                       if (!queue_delayed_work(hdev->workqueue,
-> +                                               &conn->le_conn_timeout,
-> +                                               conn->conn_timeout))
-> +                               hci_conn_put(conn);
-> +               }
->         } else {
->                 if (cp->num_of_sets) {
->                         if (adv)
-> @@ -5771,7 +5777,8 @@ static void le_conn_complete_evt(struct hci_dev *hd=
-ev, u8 status,
->                         }
->                 }
->         } else {
-> -               cancel_delayed_work(&conn->le_conn_timeout);
-> +               if (cancel_delayed_work(&conn->le_conn_timeout))
-> +                       hci_conn_put(conn);
+> -       list_for_each_entry(b, &hdev->accept_list, list) {
+> -               if (!(b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP))
+> -                       continue;
+> -
+> -               bt_dev_dbg(hdev, "Adding event filters for %pMR", &b->bda=
+ddr);
+> +       for (i =3D 0; i < num_entries; i++) {
+> +               bt_dev_dbg(hdev, "Adding event filters for %pMR",
+> +                          &accept_list[i]);
+>
+>                 err =3D  hci_set_event_filter_sync(hdev, HCI_FLT_CONN_SET=
+UP,
+>                                                  HCI_CONN_SETUP_ALLOW_BDA=
+DDR,
+> -                                                &b->bdaddr,
+> +                                                &accept_list[i],
+>                                                  HCI_CONN_SETUP_AUTO_ON);
+>                 if (err)
+>                         bt_dev_err(hdev, "Failed to set event filter for =
+%pMR",
+> -                                  &b->bdaddr);
+> +                                  &accept_list[i]);
+>                 else
+>                         scan =3D SCAN_PAGE;
 >         }
 >
->         /* The HCI_LE_Connection_Complete event is only sent once per con=
-nection.
+> +       kfree(accept_list);
+> +
+>         if (scan && !scanning)
+>                 hci_write_scan_enable_sync(hdev, scan);
+>         else if (!scan && scanning)
 > --
 > 2.43.0
+>
 
-We might be better off removing the le_conn_timeout completely and
-just make hci_le_create_conn_sync -> hci_le_directed_advertising_sync
-wait on the connection complete directly rather then using yet another
-work that can then race against the likes of hci_conn_del.
 
 --=20
 Luiz Augusto von Dentz
