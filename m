@@ -1,103 +1,303 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963AA395AD8
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 14:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785596260; cv=pass; b=I3SQr0HUw/Y9IOiyI6BY2X9exsJDMh12GpXHj+rzNBQ+sW6MjZGPzv6v1xh3OhJJ2BYpRyt2v7wBkx92W/f7Cx0ZGBBajZCkzC1k+O6wqMV+jhyJFjJo4wLtcdXKxK13eGdSwvijiwimLmLwClRYG5/Vro0uWjyafOXZaG0Z5h8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785596260; c=relaxed/simple;
-	bh=9jcsL2kmnS3mUEK7x24EyKaJQ0164vGOexLT+3HPn88=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uvNGtZ53HblufgCoxhRb0FfNtR9o72+8l4/YgkRR85moPfJF79iTAFvgqYLyOy84CqrrMBXpzEo0l2xFaBL/YBKqoZXRCBFzYQxUdCuQmsIvp5vYFkktk3BimrY1e+7rtoTNKFN+SBBDMT1nZyGl9/gwXr2c2/rApPVRFxzu9Xg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KWnCP5AR; arc=pass smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9A81C84A0
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 15:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785598278; cv=none; b=IocuvARopyB5RgWo772fG5K5oJu7SI7YLvjW7OgX3yt35daZbwYTMvrSZQsSiQgwwrnE5f92fnyR/nBU+W+oHrn/xHtqxx+NEW8TSbpxNPHZSW/4fySQYDcZthwMdmK0IUga+IMKldkK0rKNF/GOCd4qjS+jRlvgfq/g5kLRcQ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785598278; c=relaxed/simple;
+	bh=cllhpSoTBATTCyh6elfcpjdRCcZl+Fb0bW4cyY0RKsQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=THGGQt7gi0Rh+lnXeKi95j9IB/XINEeDEFqV0Ax70shoZr1rs81Ck1zhk/YY6J6gzCzYNgEuhDm7yArWlOlkAhi+X/RbAIiXqUdR5RKw7zmcwkDHeMCNvEpTE3afTJw7Oa4XlEEu+PEqjvQIM9ODC73abhSTIdInER3ElmAwaTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=k+adehg0; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=P59OxlqQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWnCP5AR"
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-69a33fb0031so363235a12.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 07:57:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785596257; cv=none;
-        d=google.com; s=arc-20260327;
-        b=EJgfJzcR4zJGU+HmfSbtuJCWmH2EN+nXVFG2SwLX6QcSGEajENQSM6QBX4yT5P60ru
-         nLIzmvO//spaXZQSHVRFHUKlSlSnp5erHsoGi6Mk/+YYnI3aTrGj8ndOw8YCHmvZj/jB
-         AjRcpJvoV1rtV3wF9k4PA791YmUFfVM+PsvzMilDeExB6LjloBsafnFPn5xsdADR4CNp
-         MJSXPEa6H3rdKb82eG27ZnL9vhjLq3Ef7f6+ku94xxgFxazBQSTWemefGMdPwdto/PFT
-         1FAGpD5YFImkTQFFWboRWmgrXhJjwo9JqRSvj4y8YLSXHIqLkZ8Z5CvzQpNn0+1I8PaI
-         jYUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=9jcsL2kmnS3mUEK7x24EyKaJQ0164vGOexLT+3HPn88=;
-        fh=J9tJc58vniaRqOUB5pOWDb9PpKQyMSOozJ88F96erRM=;
-        b=LgQ/6UEbRNY5HRoGBEJd+bgZa+lLSN1r+LBzflBfPcuGe3vzgb6TGKqK19QDLQlCL/
-         WqCx5YNxbqEGpMm0x3ZSn+2IqNqfPLgJ+yy3mhzOp3IfTYSKOPvNGjHIG2P84RltyRIA
-         QEzLWRpdut0/moj9De9otfaFUaN4H0zpt+5FijG3NFy1W39DOzqaHOCbgdflAcl8fYtn
-         /9x64sLwt2/5rZ/VdUTQgkZI5sW/8jXxcLX+8NXR4/rYhoaz1dJ8e1k7B13mXAFajY6X
-         63+tZixaUEKOyGAGrD6cSHFqaUJwijmC1uxLpBuqJxI9701mfhYvIwB7Ea5cpZQj+5u2
-         LbxA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="k+adehg0";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="P59OxlqQ"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 671Cad3A3218788
+	for <linux-bluetooth@vger.kernel.org>; Sat, 1 Aug 2026 15:31:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	nnbFUSqoIn3TJyknzi6e2bgEnjK0MawKfFYTi9Tjhgo=; b=k+adehg03UAUr5n1
+	JctvDcfY7rn0lfO2WuMar7imWyopKdZHuuXBuuznxhnOvYvd2s1mFKu0NMrssH9X
+	zr9TL3LutGkMa9OMj5qMxiJNAHET4EHvjwihg43cMC9Vjz/YMNkJKl2A/DmM3GmH
+	pqaUCT+jRyt5Dh4F11r5dD0Dulwxd6DbrLzr5iOpogeDrO6FgYaD6WYufZDBMN5l
+	pnKVetdDJz685cfI04X2l0e8kNJUCvBm2ZLRoIMkliQKnquhhCYREaDhYTAU1fCN
+	/HVLV2YJaNJtA02YiO/IOpm/lEidgABwr/We9V6G2LZKwIDfAGBRP0F9aXVlpDKe
+	iSIwZQ==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fs8tx16y1-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 15:31:15 +0000 (GMT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-38dbe39ce62so1822980a91.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 08:31:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785596257; x=1786201057; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+        d=oss.qualcomm.com; s=google; t=1785598270; x=1786203070; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9jcsL2kmnS3mUEK7x24EyKaJQ0164vGOexLT+3HPn88=;
-        b=KWnCP5ARPnMsgDr33mo/I9VgFf14yKwpb/GC7V+2TYOa/A95T2DITeQ6pCKvls4exE
-         mqtLMlLHDX81EFCdcf8VNcXuGiSaxjwziKaOKDXu254+IrqVioWOxV1oOraDM1iejewO
-         rpTikBCdSv98BzF3hNCmvjdw2LX9OWLxCM2myod8RpQsedfaUIDIjPmJtIt++yaUXmWy
-         ZoKJizl60eGwfGbkUEy+b8jzX9xBNapUsenrVLJAWxlut8ijmr8Aq6TBSsltB+aBvJMI
-         ubCSSC0Y5shhcZkGzuam8R6LkoXzZHTdVOhGVLYcp0AUZvKHznIQg1KkknG/cz52xzag
-         eOPA==
+        bh=nnbFUSqoIn3TJyknzi6e2bgEnjK0MawKfFYTi9Tjhgo=;
+        b=P59OxlqQ+LClSh3B6RUS+jF6Hc4uugXp7EYwp5bBDOeNnpKswxOipoxKxfoEz5tpNn
+         +w0+3JljZx+GPZVHAzHSiWuQULZovwUlVHFmtGf2kGT1RaxtDNeXRvy/ZYSfL0Vws/Gs
+         b8+CeachvFP2Vg41Y3cjKiI8aLszJnOYrIV3GyVqx61K5GQMd54S3+Ul23iufZS98bCh
+         Qk/o/YkUIiQdzxwCt8MOlMrpLSre7uNOA0a6w0mgIT3qLwn7Yy5arl3w71f+eoA7Q43B
+         wWx5Et3XzjNVDtUCK9KBcpKlksw0eZ0EHnEUL0bYgsfKOuOBO4CB5IFdKeJzX/3yWGhi
+         7DGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785596257; x=1786201057;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=9jcsL2kmnS3mUEK7x24EyKaJQ0164vGOexLT+3HPn88=;
-        b=q2Omye7FC37m7rBtPBRF6Wl68y+clokI7O2vDU5WHcIbAGeCdKKn6gSG/SCPkJm1pu
-         wZMsQPYsUljC1GT/o3zQ804MF+NpgqKX703E5I1y3nbJ0wzyTSX4A3xlD9vGo7/fGQcA
-         TxWRQG/iggM3GUjEF+6z0aFHJ5EUjuu3CEAMtZd9OO/3d8YPmPJrE6x+wXfVwpXy/NI/
-         KTIV3or20LJqVd7QbzxH6+/T5XH9n7xOGiyR9F9lHcjDPu+jwwPg3bY+2vgKP7TrYXWM
-         YGLY5q1MvdiqT9bhtYdvw8Fbxwgj2uXTzMM02nzFRjRx6iwkDBQ7vUDpFCKVV9mCSXUW
-         ww0g==
-X-Forwarded-Encrypted: i=1; AHgh+RoPbcpxuENTm1IKD5+O0qmpwZvAjN+sGyKqhO9x2RNd0G99D16C24o9I0eFaUzKN2law5OjDjWyum9VRS+hAWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7jQ0LPDbbLeTJTQHNIVp7TN7wiwi3YFuWLuS2/Nk81wqC7jSu
-	JK6Q44YYsNF/VDEBPdgL8gaYXuY5ngneiFj/hroX/Ei9p73Iw1EdSrNnYR9wPgLt23KMmebJZ3u
-	B1cbTts9Gb018LBH89MKOtpdvz9ynep8=
-X-Gm-Gg: AR+sD12mcKkub4hD/AOc6BlIDQ4qQFUaEz11dR3t74kUu4OtBTmXTpLOPrIKJfVgwXh
-	MLTwiN4tTb6WfiwO8LemwJ/U9GZVFHkdAZFRiO/2ua1+gmfEcCc8ula124Rg1yT8dYQnRs6ySYc
-	oi27ih6IjMqYZbMqaQgQkY1qSxW+sjAfKR4Ut3jWPFYhnfaGfePH3500iGwBIww8Fa9B9IRKsWA
-	EUzONLBGLoFHXfpFOl5prTuP82INllb0wqy8p2MTl77zceKPgQF0nODVxTs8+VE7NPFHlAjKTXT
-	dcOQu5JjhPK7RkZ3SThlqBsD+tYnoUjjtD8klmfr2lKjZoBjnN8AGe7pHwlRQuBXCco+ChaJ+s2
-	70Pdvdh2N
-X-Received: by 2002:a05:6402:2111:b0:699:6415:751e with SMTP id
- 4fb4d7f45d1cf-6a0a7d096f8mr1938361a12.4.1785596256583; Sat, 01 Aug 2026
- 07:57:36 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785598270; x=1786203070;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=nnbFUSqoIn3TJyknzi6e2bgEnjK0MawKfFYTi9Tjhgo=;
+        b=lTVJX4f4alfLo0/uZE0aJgQYM6IVA2e168WD2ZXknNNiM7VRolGEgyD+dQCbiXUzyz
+         6qYDzwUZ/eg+vNIkhidLJKjA6/gmfGvZJk16b6wRsz4g51Gde4HBv1rVylNRcqoMqHHx
+         0hUSzRAsGbhT9PzqMo6v3/xue+6lm1ggJKLjIKoMqfj4kKpYdgrSPF946o1LSuNbavjD
+         v7sukfVpzemLDvzawWLHSdksL2xrNbmy1MlBS4jQKs1Shj9N3Kwp3yAX8apxhvAgemFk
+         tf85LPPsrj0lu7cofhFasOR4WNYYBVB8RFOpJo0y9dh+vr3eMUTGG3WKGIRX0V7K0V//
+         Cz8A==
+X-Forwarded-Encrypted: i=1; AHgh+RpmxKqJb64GlMUcdu99ng6cgYp/vqkqV5ryKK8Gig+GYYIaesKKEBI7FqGpgnutoil1SNRVYhb2vGOP3ajhZok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/AgRFw7+/PeWAYSR4ES/kQ0S4t0GIRIOT2IR4uRyZljg8+DZj
+	0pttjXf6QVgFwwZNR65UD4Nh+O9AFDNrg+z3NTM9RjyOHqU4t/QuqmPp0rgjsK2OXajYodnRnzV
+	57XOQ9Y6dniViQmlv+EPMVBVLr+U8GUYTDeD0nmtraeyVHqOOroZLZxNSmhidmaubPgdn3F0=
+X-Gm-Gg: AR+sD10jeM+Ch8h6TxRYZwZo6biWKpDGKJR3zZsM3OR3jiAzw1a5We/35zAYSYJ2WWS
+	xL7h7dKhCPNmC1aeUKGnYf4EtNgjLs/YoqruO5N+vdTsrkdJZA6qBJY1JWepZOHISJKHhK9eHwg
+	pgrlpwlbZktAqFQI3kmvdCaUcNwepTp0RHaZ8VNnkf4t4T5r0pVXSj2I6xvsacoLGPdJOVSmR74
+	vfhjfHwzmEv1LSczBBC1jF8efi0LVkTkqyc8GISWOTyKLgyv2iCguuhROhT6XshSILoyv11vDDk
+	EX4P50W1WQ1NirC0Q+TfNJm9ygMAomWiQze8LBCVva2R6XNTU/8c8xERUObjpXe/xFCMoVAN+Mb
+	6vVIYoIeP06/voeaV8sxRUY3M3QXL
+X-Received: by 2002:a17:90b:17c5:b0:385:39ac:fe4b with SMTP id 98e67ed59e1d1-38fb263d5admr6158888a91.17.1785598269579;
+        Sat, 01 Aug 2026 08:31:09 -0700 (PDT)
+X-Received: by 2002:a17:90b:17c5:b0:385:39ac:fe4b with SMTP id 98e67ed59e1d1-38fb263d5admr6158843a91.17.1785598268995;
+        Sat, 01 Aug 2026 08:31:08 -0700 (PDT)
+Received: from [192.168.1.7] ([122.177.240.1])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13fab4e44bcsm20902752c88.12.2026.08.01.08.31.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Aug 2026 08:31:08 -0700 (PDT)
+Message-ID: <4523441f-498a-4bbd-80f3-97a7a9206c00@oss.qualcomm.com>
+Date: Sat, 1 Aug 2026 21:01:00 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730104103.2080325-1-nicoyip.dev@gmail.com>
- <CABBYNZJx46usjp0_snfRQ7pvWrxPE8NZqSyqyM0rMEsoHgZnow@mail.gmail.com> <CAAo+4rV0ncEcMGZVH+VHScJozqs5L4C3S-mW77s5GyRKeQ78Zg@mail.gmail.com>
-In-Reply-To: <CAAo+4rV0ncEcMGZVH+VHScJozqs5L4C3S-mW77s5GyRKeQ78Zg@mail.gmail.com>
-From: Chengfeng Ye <nicoyip.dev@gmail.com>
-Date: Sat, 1 Aug 2026 22:57:24 +0800
-X-Gm-Features: AUfX_mzHehqygWlg73i6eROY9af5HU3Udu-hd0Qa5VaoIeegBmsS60wFcCaDnSg
-Message-ID: <CAAo+4rVTXCjhbcNxSMBefTm8C9YWN03CMY2dXGK3izgbb4g+rw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_conn: hold conn for LE timeout work
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@intel.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] dt-bindings: bluetooth: qca: add QCC2072
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring
+ <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        Manivannan Sadhasivam
+ <mani@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
+        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
+ <20260727-rb3-industrial-bt-uart-v2-1-2d100f30e202@oss.qualcomm.com>
+ <20260731-first-righteous-bear-dd72ed@quoll>
+ <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
+ <c1875dd6-fe3a-4a69-a6fd-b461c8fba6e4@kernel.org>
+ <6d6465bb-47ac-464c-af4e-0ca72325705f@oss.qualcomm.com>
+ <8a388310-d3cc-4d02-abb6-0eb98c24cfce@kernel.org>
+Content-Language: en-US
+From: Rahul Samana <rahul.samana@oss.qualcomm.com>
+In-Reply-To: <8a388310-d3cc-4d02-abb6-0eb98c24cfce@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAxMDEyNCBTYWx0ZWRfX5uS+9/6/TxmC
+ H+LhU+Blz4uKDe9/YiPWf38xte7ZYXb02lze+pEYOyr8lm3MLn8WVzj7kFUBzFUrf5IUHrtLGyQ
+ Y70DMwTCWcZ9B08IfNe4kh/C1HSSKfpNkmuzWKaRXYZQ1NEQiTwHeAOccdjBX6PHwtIreHeO62K
+ oxrpiEVQQDjVZFjQ9rWc46ty08pHOw1SRD/MyeNWBNM8/ZXc3oZozSYsKMx3YHD5fL0WUJqmy7B
+ jMr+An/PX59t5CSjYJD6VI5yFt6cKbMcg6Pel34gaJq3TtJV9T8GE5bCRRZHTzRQHw4KkKjTGIl
+ 3KkGvW2vv2PD6NGp6GRGIakPuRMtpuoRjoOFdHG9WPaqdjbvQ4dOTshi9cjGokzCUrbdrgs6a7q
+ ZSqEpIdhS0x7i7INKArxppzFxl785N1YM/K/J1fYAR1YYq/pzadG5e+WhL7KZ3DkLxXlfu4vWoS
+ LbGrSEIkf+XFsO62P2g==
+X-Proofpoint-GUID: fq3laPJZVG3TJgj6cfSBhK4GWE09s5Eg
+X-Authority-Analysis: v=2.4 cv=T9C8ifKQ c=1 sm=1 tr=0 ts=6a6e1143 cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=2skDqgroqaW2kJZUe6+7Kg==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=QZOgD_54N6fV3tg6C9wA:9 a=QEXdDO2ut3YA:10
+ a=rl5im9kqc5Lf4LNbBjHf:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAxMDEyNCBTYWx0ZWRfX7u/qYk8CM30K
+ 4bOgpPywOuYo2W44UkxkftBEvNLmLpm0qk7dct5v2ouoZZyaick3UcziyTKL/RrHqqPukULSgWV
+ VinyCVSGjy0B2YXyYzYhpp8MrWFjDhE=
+X-Proofpoint-ORIG-GUID: fq3laPJZVG3TJgj6cfSBhK4GWE09s5Eg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-01_01,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608010124
 
-The v2 patch is [PATCH v2] Bluetooth: hci_sync: wait for directed
-advertising completion.
 
-Best regards,
-Chengfeng
+
+On 01-08-2026 20:18, Krzysztof Kozlowski wrote:
+> On 31/07/2026 17:51, Rahul Samana wrote:
+>>
+>>
+>> On 31-07-2026 20:34, Krzysztof Kozlowski wrote:
+>>> On 31/07/2026 16:45, Rahul Samana wrote:
+>>>>
+>>>>
+>>>> On 31-07-2026 15:16, Krzysztof Kozlowski wrote:
+>>>>> On Mon, Jul 27, 2026 at 09:15:01PM +0530, Rahul Samana wrote:
+>>>>>> QCC2072 can be used on M.2 E-key cards where the card power resources are
+>>>>>> described by the pcie-m2-e-connector node. In that setup, the M.2 power
+>>>>>> sequencing provider creates the Bluetooth serdev child after matching the
+>>>>>> QCC2072 PCI function.
+>>>>>>
+>>>>>> Integrated non-M.2 designs need board-specific power resources. Document
+>>>>>> only the compatible for now and leave those properties to be added with
+>>>>>> matching driver support.
+>>>>>>
+>>>>>> Document the qcom,qcc2072-bt compatible used for QCC2072 Bluetooth
+>>>>>> controllers connected over UART.
+>>>>>>
+>>>>>> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+>>>>>
+>>>>> NAK, exactly same comments as before.
+>>>>>
+>>>>> Nothing got improved, although what is weird - original SoB is gone, so
+>>>>> this is legally dubious work.
+>>>>>
+>>>>> Best regards,
+>>>>> Krzysztof
+>>>>>
+>>>>
+>>>> Hi Krzysztof,
+>>>>
+>>>> Thanks for the review.
+>>>>
+>>>> For the binding contents, I tried to capture the current scope in the binding
+>>>> description itself. This series supports QCC2072 only as an M.2 E-key card,
+>>>> where the card power resources are described by the pcie-m2-e-connector node
+>>>> and the M.2 pwrseq provider creates the Bluetooth serdev child.
+>>>>
+>>>> The binding also says:
+>>>>
+>>>>   Integrated non-M.2 designs require board-specific power resources. Those
+>>>>   properties, together with a static devicetree example, should be added when
+>>>>   integrated non-M.2 support is added.
+>>>
+>>> Bindings must be complete and your driver support is irrelevant here.
+>>>
+>>> If you claim this is a PCI device thus you do not need any resources,
+>>> then the binding is not needed either. PCI devices are enumerable. And
+>>> to prove it: look at your DTS. Do you see qcom,qcc2072-bt being used? No.
+>>>
+>>>>
+>>>> We do not currently have an integrated non-M.2 QCC2072 design, so I do not
+>>>> have board-specific regulator supplies to document for that topology.
+>>>>
+>>>> Could you please suggest how you would prefer this binding to be handled for
+>>>> the current M.2-only use case? 
+>>>
+>>> Drop the binding, you do not need it.
+>>>
+>>> Anyway the problem is that more comments were ignored.
+>>>
+>>
+>> Hi Krzysztof,
+>>
+>> Just to clarify the reason for adding this binding in v2: 
+>> v1 did not add a binding because this series only targets the M.2 use case.
+>>
+>> I added the minimal binding in v2 because checkpatch reported
+>> qcom,qcc2072-bt as an undocumented compatible, and I interpreted the request
+>> to fix the checkpatch warnings as requiring this compatible to be documented.
+>> I also had the earlier feedback in mind, where the indirect
+>> qcom,qcc2072-bt compatible was pushed back because it was undocumented:
+>>
+>> https://lore.kernel.org/all/20260703-eliza_evk-v1-3-7624440bd76d@oss.qualcomm.com/
+>>
+>> Based on your clarification here, I will drop the binding patch in v3 and
+>> keep qcom,qcc2072-bt only as the pwrseq-created child compatible for this
+>> M.2 case.
+> 
+> My previous statement is also valid, please read entire threads.
+> 
+> You cannot have undocumented qcom,qcc2072-bt.
+> 
+> I ask you to drop both, because they are not needed. But feel free to
+> prove me wrong, see my first paragraph in the previous reply.
+> 
+> 
+The PCIe M.2 power sequencing driver, pwrseq-pcie-m2.c, uses
+pwrseq_m2_pci_ids to translate the enumerated PCI function into the
+Bluetooth compatible used for the generated serdev child.
+
+For example, WCN7850 maps PCI ID 17cb:1107 to qcom,wcn7850-bt, then hci_qca
+matches that compatible to select qca_soc_data_wcn7850.
+
+For QCC2072, pwrseq-pcie-m2.c matches PCI ID 17cb:1112 and creates the
+generated Bluetooth serdev child with compatible "qcom,qcc2072-bt". The
+hci_qca driver then matches "qcom,qcc2072-bt" and uses qca_soc_data_qcc2072
+as the controller-specific data.
+
+That match data is needed by hci_qca to select the QCC2072 soc_type,
+firmware/NVM naming, calibration handling, and capabilities. Without some
+identity being passed from the PCI match to the generated serdev child,
+hci_qca cannot distinguish QCC2072 from the other Qualcomm UART Bluetooth
+controllers on this path.
+
+Please correct me if I misunderstood the concern or if you are asking for
+this identity to be passed from pwrseq-pcie-m2.c to hci_qca through a
+different mechanism.
+
+I can drop the binding patch, but unless there is a preferred alternative
+mechanism, I think we still need the pwrseq-pcie-m2 QCC2072 PCI ID support
+from patch 3 so the power sequencing driver can pass the QCC2072 identity
+into hci_qca through the generated serdev child:
+
+https://lore.kernel.org/all/20260727-rb3-industrial-bt-uart-v2-3-2d100f30e202@oss.qualcomm.com/
+
+Thanks,
+Rahul
+
+
+>>
+>>> And why this is sent so many times?
+>>>
+>>> https://lore.kernel.org/all/20260218114955.3970974-2-vivek.sahu@oss.qualcomm.com/
+>>>
+>>> https://lore.kernel.org/all/20260529175342.3363935-1-yepuri.siddu@oss.qualcomm.com/
+>>>
+>>> and now by you.
+>>>
+>>> How many times this will be sent in separate patchsets and asking for
+>>> separate review ignoring previous review?
+>>>
+>>
+>> Regarding the repeated submissions, the reason for carrying this forward from
+>> the earlier QCC2072 work is documented in the cover letter. This series was
+>> intended to continue that work for the RB3 Gen 2 Industrial M.2 use case, not
+>> to ignore the earlier reviews. 
+> 
+> If you continue the work, you do not ignore previous comments, so I do
+> not see how this is any sort of continuation. Looks like duplicating
+> work without looking at previous discussions at all.
+> 
+> Best regards,
+> Krzysztof
+
