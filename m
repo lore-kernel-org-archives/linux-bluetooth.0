@@ -1,211 +1,106 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71C7332637
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 07:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785567936; cv=none; b=EqsE+8iKPlQrFjk9fpATX/LCLhsbhpg8F1YGG8RLs0l/dg1CmRnl6ey2jiTu9XEREt0Pg3Hl1mYJX1YjiPf5lzOq9VKdf0E78Plzf/f6RNMtyfGFUtPYG46qYu6S3TZVp7ByPRs1t/2KoMncW3DMvcgGNRv4ttSGmq8XJ5tCOgI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785567936; c=relaxed/simple;
-	bh=9DGEFJCb/LWhVEPNiaXBiDRAi0qf+6RoHLzMHeTTwkU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KhsZ3EGVOSOebuTUWMPDJvwfXcpdiFEwoA3rfD5+W9aD3AjDoyWnPDJcP7AtIUyCxu5/DDcovYraB4lsLFR+X3eP681Q5giIQxiKJ2/SIuw69Hx3RnFLyL6zn+OE8rTUINLQqCBcl0LdmLQd1V/D0LUWgrwnUIo3dlPKg378ICk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p1M7KTiU; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6D72EEE83
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 07:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785568181; cv=pass; b=qAHwFG/ILGAoKpH4HPS1mZ8jfUypLAwWyseRg3NRtzZ/DiLPUnWwaXhEH1PF/iAQcWFmriKCwD74GTqteRb3Ha0BL3lZ7QCk2MU90HLV5HQSUE1nsZFgAsWftw0jhkCTdr+3VVPt+KsI9yRNsEptsKorq0+ZSIFVgk6h4vZdv1Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785568181; c=relaxed/simple;
+	bh=86+C5my5h7svLUe+SYOW2syp44/3E44wPf3m+bJSTm4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dYMPxZKPk7WgPRTVTR6MqgV202TBp5Ogbdo5jDv6LBekz5fB0aLVIzD6KV62yZvIfq6wckj+o3hN8hKMCKvafv0NdenvvW4ypsBR3DR+Mao1rKazHpmeSI7buhUjpUqwumHqoHCISYCtjG6ii44gfEuDRLltmS8wbAkztrXNPHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbZ/nbBu; arc=pass smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p1M7KTiU"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-380f3c1b087so237606a91.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 00:05:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbZ/nbBu"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-69f734cd461so418780a12.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 00:09:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785568179; cv=none;
+        d=google.com; s=arc-20260327;
+        b=AtASdHq5C5RHMbfU7hj4hUGvsvNkwCtsOoToyGXh4u1YS1stPhtXUPuhMDBFioGGHw
+         2te4nBxdeAX6Ff0bmqU9dWvC+XHx80mjzTrP4eOCoVrLX3zSEZ6HuAZ5Lvnsd/KjwdHX
+         SG7UmAAadgvXWXGt5SosMLhhA6hTAE4q1v+Mt7utPpIXpd5MP7gsqBZEpZTufCMGDgDY
+         c2c+0zIlhJmW0vaJmu6/hLnPo/hekh77OJs7Io3+RUUNuAl4l9/zNvAw1qOylxNO4RuZ
+         /w1fEMdL85vFdq+vm97rr8UMKd91ZSaq/7IfNcOVbNu5dtMQT/qZjZRmpRyFuYau+Vgd
+         l+bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=86+C5my5h7svLUe+SYOW2syp44/3E44wPf3m+bJSTm4=;
+        fh=+0ADAdrloTqkJn5ddMJKKdoxYNeFxGL6cQEg8+g7b48=;
+        b=KFW97FKRiEkJyb4Oz1kjF8DG0enFiuk8KMOSG2LVUIa51X2E9CeWPErFaRwLnmH/6J
+         BKdX/MYE+gnDFlEOnpcW/HFnUt5HX7KMjozNywYYANP/VK3TMWSkHzEbhkLkE6r8V8N9
+         YU3SgOQTIpydPsMqwG5boPBwI650kVwS622pL8XP0Memti70jR1WvW3uWgPSE76CkDXE
+         gwLsGfH9fjWAOhVNGfphOmpDsXqI5S0IVMQbZXBnr/jx3/Fc1MO0YU0oPr/N1msTxRmF
+         cQFXDCyT7z8TOjYWBKpOnIdpgErX1jye/D4YBVwp1U+mzlIbbbPyUiu4CVdiW71zCzJ4
+         XSjA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785567934; x=1786172734; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wzTWXeB+WeaO/vaut8/fORcsEVe1NWPMbRXBtC2FjPY=;
-        b=p1M7KTiUbTqdB6Jx5eAa8qX9VZeC9p9+EZMp4ATFl+Vp0NITad77BcblqUxPquzvU6
-         SsWyH+/+7x/W2m6ovoGLCawfSDXg6CGufvy4ZJzT4g5H81XnVdx+mGK0gyp+KblloWv3
-         XUAztNjpNhwPQVFrgiFnOn/au28ZkVIayz9137LL3/qYHDxOwvAUpzGB+Im9BTq0ah+s
-         Y/OsiJuTHooXXv0XMd2L5UXXBy64mLY0/+eRaiL+1j9c3SVKLDm9stMjd0GXv8izbLOl
-         KOacVFgGLQT1npV0cQrN/9CJXmK1xIB9Xlq8S+uvi6yl08zoxMC0pODtPk5/aF6/K96f
-         T0ag==
+        d=gmail.com; s=20251104; t=1785568179; x=1786172979; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=86+C5my5h7svLUe+SYOW2syp44/3E44wPf3m+bJSTm4=;
+        b=NbZ/nbBu1y50qgiqWf3daONzVPV/aQ2PfFZxQsHZUkPq7900zEI29RzYOrD5FUuBrp
+         Boi6gOkVBmdv24qW9EhRk8WJjQTRGGKiaFPteRtgxcEkqD9OTHpxO0e+5ru8F8eGXqdN
+         VHXWGpwPDHFmyTKVIvlEAufxy3dl+7I9URK9L8yNZk3cruz89xN+bC3KdwOUOIpo8Q9u
+         rlxnfebTRWfJynwMdzQYApF8VIXb3hu2mUxS+rhEy0dVfcp6qdCNSTpZMeWKwBB96L1h
+         wt7/8YV6MdzeU8nFw2WAdxBmOGMJC5yuaEhnNR6bs3/2zUujDF/P4gWij5cT49je+Uhx
+         LyyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785567934; x=1786172734;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wzTWXeB+WeaO/vaut8/fORcsEVe1NWPMbRXBtC2FjPY=;
-        b=UnB3t5QMuEuELLiIK4wskc7RzJvgx0EftEzRdpfDOMlzz0tEAnMmwVT/w1SSIs+uug
-         f5HWerpXPPrOAyMk6NjJDwBEBkGV+ni+NL6rMhriTNHP2Oi/TJ00dd6DWPxFdoBAuxan
-         hisCWROdGYQbb0Z9q6KQnuSdNhpgO6prmMDK0SmAURbR+Hwk9moUom6PnEHK5OsuOw3+
-         1CIXDnfiTfp51wCCRS0l4gl4rUHw9Jn9ZpiNGQiVtR5s9RW1BUVTMNmXbYvhkekOQ6/p
-         2VxP/vNRyYea/x9BO7hUp4rMCCyzohYH3V7WlDpdROpCdCbJFDxDjnpqk+wglB2vEjU0
-         MiIg==
-X-Gm-Message-State: AOJu0YyZuxy4ZgO++CGmzZmzd+HdCcsUC7Ic3MDBlgLY1Ya8VUb5teKX
-	qsrgd882/IZKS0LmsLB00iyk57hgqA4enLvN0ODbkMkhjYQOyuBTnJ5uSod5RlTn+hU=
-X-Gm-Gg: AR+sD13wZEpzrso0b30qkLdme6Id+mOKWTqWBD1gb4+PRsf7G979foRkmfq3MV0HG82
-	SpzbaeSFspf0pqX7Q5SGrV+zrhvmkhq/xGQBxSOgre9WAQ8C7YmYesn9sRZYtqltrBoTNzFQuWC
-	r92YzNJC1q+T5l/8HKSIN/p7FILT//TBN37VMXjQn6b0X3Gu+NBKb4SJ5pSXJP4OKjtBt8N/IhS
-	sYo2nfmJL/Wsb/YsWqymLcpfmjxbQ6LgwB/smDL57fDS7O3h+trZF252x7V1JFvH5to2qsToB3Y
-	4rpiQqSDbjpP2t/Ye/1V8wuRrtg2AknpXgUwo4LdPeJ+riLlGcNvqcqm/T4W2JT1jh9pvVH9fSw
-	H1chCY3hPyRDLZ6zPdObnKFzr1ZQB6VHAE5dIPWhMfmtbnhQUj2lf/aHq3LOix8TibAYD+OUO4p
-	s+Rqb8kqIaQN6AusMynE2SgJ8V86hbpuMiqctc2xcEpOailavqkskwLX1ArK05YRPVHkuFS0r90
-	J3FqzesclZKr69lNzzp2gEwyFHCyb8GlrQJC8reRX2XXo22W2QIQ7M=
-X-Received: by 2002:a17:902:f78b:b0:2c9:e846:a582 with SMTP id d9443c01a7336-2d05206277emr35924695ad.0.1785567934106;
-        Sat, 01 Aug 2026 00:05:34 -0700 (PDT)
-Received: from localhost.localdomain (45.78.65.84.16clouds.com. [45.78.65.84])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3153dd4f197sm13860675eec.6.2026.08.01.00.05.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Aug 2026 00:05:33 -0700 (PDT)
-From: Chengfeng Ye <nicoyip.dev@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Chengfeng Ye <nicoyip.dev@gmail.com>
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix accept list UAF during suspend
-Date: Sat,  1 Aug 2026 15:05:24 +0800
-Message-ID: <20260801070524.3547883-1-nicoyip.dev@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1785568179; x=1786172979;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=86+C5my5h7svLUe+SYOW2syp44/3E44wPf3m+bJSTm4=;
+        b=YCzf80WchONg+Q9WtWV4CsQHESWBCtbrxrDIFB+ZD/q3MbB7ObMp7xRJHFmu0bo/6D
+         x37SotWZsLNEJwfCJ2Q6BdlNkejgCALgJDqqhipgQPj4QrEkmHhkLcR3r0qDOL0sbhU3
+         p853S1Gd6bpbBoTdI6HV0EvN3CdfdDU60fz4ikbYQPCF5zzctfMDrsZgf9xSNLrQSyoq
+         Ck3UGXrXkbquqwpOdeKYsJT26KdcjUMnqT3nJ4yy1HclxkZgiji8UfYbFVQ6ktY20/MU
+         fKUL0XtF/TjnqkuBxaccxVbs2FzN2DqdYvlkKYKvmddCXHKBdR0SfUxB2MHjr+9bVcuc
+         zKoQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqHfi5vaJO/EPjRicKc7iL5+XvB93wWHHser5veWL4717ybAvUKDiqO+P9yC0r99yCIU6ARklc5KPRa8DGjolw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu+gmy2DJXF4kxV9QbkwUN9yzYqY6vCaNzHQlnih5mOPEwpMGM
+	g/RITed5qTktKk/tzCQYXvIP7v20f4iAVCvfXCHHUdeTszxK3zyEd5AT8z4JTlyXplGng+vLRFx
+	J7M12edXUQS5OYqN3JwxCeRfP/sxZ3Wo=
+X-Gm-Gg: AR+sD12FgJJkTSXDCaTQ/8KZ6shgyDohBkYBhTMjbrGcyga6FxQHv/0w7Lngs3tN6e0
+	SputS/FYCvdDKjL0E8ujwwI+RjyjyOrJfYiAb4u60lbnwCaA2pXaIcQzwZT4k4ebBXbH/R5/S1k
+	lQRJvxfh1IGmG6+Z67MkHrzFsJovMJgC4azteYyM3881TKUaVvRf6M6j27xEotF/xFl0TJ/B/0N
+	wpBJp+QBSdp5BQl1CdHai5j5g9vR4Hnd1FEyWCFxQjitPgvbla0MTtCRKkLiht4S0XkOpuoqYYX
+	VdxRj1qTplpDCtIKd/z6cyOZAzDcB0ZjKtpYLgtZKNAo5+xSb7HW9Nq/BMwvp2Z93eu+aF2kVg=
+	=
+X-Received: by 2002:a05:6402:3225:b0:69c:794d:4866 with SMTP id
+ 4fb4d7f45d1cf-6a0a7cfa5ecmr1146962a12.4.1785568178487; Sat, 01 Aug 2026
+ 00:09:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260730092331.2069741-1-nicoyip.dev@gmail.com> <CABBYNZKgxz4JbKv8fgTeWGEGV0P_pPmcy_YG=rLDroc_1wu==g@mail.gmail.com>
+In-Reply-To: <CABBYNZKgxz4JbKv8fgTeWGEGV0P_pPmcy_YG=rLDroc_1wu==g@mail.gmail.com>
+From: Chengfeng Ye <nicoyip.dev@gmail.com>
+Date: Sat, 1 Aug 2026 15:09:27 +0800
+X-Gm-Features: AUfX_mxuzcrXs9LVaK8RQ1P98mW6v5EMpHWj4MnqI6Wi_83WEfb4xA_oCB8RnfM
+Message-ID: <CAAo+4rVpfTkGL39Od6NM03bOCoeJZ5dt2R6bWR+M52-Z7FP4rw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix accept list UAF during suspend
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-hci_update_event_filter_sync() walks hdev->accept_list while sending a
-synchronous HCI command for each remote-wakeup device.  The suspend path
-holds hdev->req_lock, but accept-list updates are serialized by hdev->lock.
-Consequently, remove_device() can free the current list entry during the
-controller wait.
+Hi Luiz,
 
-The following interleaving causes the use-after-free:
+Thanks for your review. I have sent a v2 to ensure
+hci_clear_event_filter_sync() is called first. But I have not got a
+clear way to solve the issue without iterating the list twice, so I
+just add a bail out when num_entries == 0 to skip the second
+iteration. Let me know if the patch should be further refined.
 
-  hci_update_event_filter_sync()    remove_device()
-  fetch accept-list entry
-  hci_set_event_filter_sync()
-    wait for controller response    hci_dev_lock()
-                                    list_del()
-                                    kfree()
-                                    hci_dev_unlock()
-  read the freed list.next
-
-KASAN reported:
-
-  BUG: KASAN: slab-use-after-free in hci_suspend_sync+0x835/0x910
-  Read of size 8 at addr ffff88810bec8440 by task kworker/0:1/10
-  Workqueue: events vhci_suspend_work
-  Call Trace:
-   hci_suspend_sync+0x835/0x910
-   hci_suspend_dev+0x182/0x450
-   process_one_work+0x661/0x1090
-   worker_thread+0x45b/0xd10
-
-  Allocated by task 86:
-   hci_bdaddr_list_add_with_flags+0x1a8/0x400
-   add_device+0x381/0x820
-   hci_sock_sendmsg+0x1033/0x1ea0
-
-  Freed by task 91:
-   kfree+0x131/0x3c0
-   remove_device+0x429/0xb70
-   hci_sock_sendmsg+0x1033/0x1ea0
-
-Snapshot the remote-wakeup addresses under hdev->lock.  Release the lock
-before sending HCI commands.  Clear the controller event filter before
-building the snapshot, and skip allocation and the second list traversal
-when there are no matching entries.  This preserves the original filter
-and scan-state updates without retaining an accept-list node across a
-controller wait.
-
-Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/linux-bluetooth/20260730092331.2069741-1-nicoyip.dev@gmail.com/
-Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
----
-Changes in v2:
-- Clear the event filter before taking the accept-list snapshot.
-- Skip allocation and the second list walk when there are no matching entries.
-
-Link: https://lore.kernel.org/linux-bluetooth/20260730092331.2069741-1-nicoyip.dev@gmail.com/ [v1]
-
- net/bluetooth/hci_sync.c | 46 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 9 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c8d14128c363..8ccc3b22ef5b 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6313,6 +6313,8 @@ static int hci_pause_discovery_sync(struct hci_dev *hdev)
- static int hci_update_event_filter_sync(struct hci_dev *hdev)
- {
- 	struct bdaddr_list_with_flags *b;
-+	bdaddr_t *accept_list;
-+	size_t i, num_entries = 0;
- 	u8 scan = SCAN_DISABLED;
- 	bool scanning = test_bit(HCI_PSCAN, &hdev->flags);
- 	int err;
-@@ -6329,23 +6331,49 @@ static int hci_update_event_filter_sync(struct hci_dev *hdev)
- 	/* Always clear event filter when starting */
- 	hci_clear_event_filter_sync(hdev);
- 
--	list_for_each_entry(b, &hdev->accept_list, list) {
--		if (!(b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP))
--			continue;
-+	hci_dev_lock(hdev);
-+
-+	list_for_each_entry(b, &hdev->accept_list, list)
-+		if (b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)
-+			num_entries++;
-+
-+	if (!num_entries) {
-+		hci_dev_unlock(hdev);
-+		goto update_scan;
-+	}
-+
-+	accept_list = kmalloc_array(num_entries, sizeof(*accept_list),
-+				    GFP_KERNEL);
-+	if (!accept_list) {
-+		hci_dev_unlock(hdev);
-+		return -ENOMEM;
-+	}
-+
-+	i = 0;
-+	list_for_each_entry(b, &hdev->accept_list, list)
-+		if (b->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)
-+			bacpy(&accept_list[i++], &b->bdaddr);
-+
-+	hci_dev_unlock(hdev);
- 
--		bt_dev_dbg(hdev, "Adding event filters for %pMR", &b->bdaddr);
-+	for (i = 0; i < num_entries; i++) {
-+		bt_dev_dbg(hdev, "Adding event filters for %pMR",
-+			   &accept_list[i]);
- 
--		err =  hci_set_event_filter_sync(hdev, HCI_FLT_CONN_SETUP,
--						 HCI_CONN_SETUP_ALLOW_BDADDR,
--						 &b->bdaddr,
--						 HCI_CONN_SETUP_AUTO_ON);
-+		err = hci_set_event_filter_sync(hdev, HCI_FLT_CONN_SETUP,
-+						HCI_CONN_SETUP_ALLOW_BDADDR,
-+					 &accept_list[i],
-+					 HCI_CONN_SETUP_AUTO_ON);
- 		if (err)
- 			bt_dev_err(hdev, "Failed to set event filter for %pMR",
--				   &b->bdaddr);
-+				   &accept_list[i]);
- 		else
- 			scan = SCAN_PAGE;
- 	}
- 
-+	kfree(accept_list);
-+
-+update_scan:
- 	if (scan && !scanning)
- 		hci_write_scan_enable_sync(hdev, scan);
- 	else if (!scan && scanning)
--- 
-2.43.0
-
+Best,
+Chengfeng
