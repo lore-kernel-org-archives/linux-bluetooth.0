@@ -1,149 +1,218 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F58EEA8
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 08:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785571425; cv=none; b=kCTOepPuwrkI676p381vtZW1ftP59qkeTPqHXCcln7dhcKmH6WQatXRbmU8O+kfyqjRVqiAovhPir4f8jIZBxSCgzNv+WmLiY+Cv+SkY9HZt+DjKvstdKInvQ0PZqT9eYMBoc83EQkTwgRweEs19V4jRrNfFsxtHzIxjr5T+5CQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785571425; c=relaxed/simple;
-	bh=lvDydOKMjdabQEXfT5h0+WgHbx73/jNFkod/lqCfgcg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mCX5pVwVvK3h+giWxedR7f5PD7CCpFG0owIPtaZ3o4Eh8y70N2MiUlU1H65BMMcGdq3oFXRPA1CEOPApcAbKzRU7axlTYawb33/pcmta8GOIoLbb9gKpTp342yEGw9l7VlQxkhDHcZHcpjPiONDdfBgx5pGJwWk83es5yH9T52Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MfhIShzK; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CFC231A3B
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Aug 2026 08:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785574246; cv=pass; b=k6LKJLby8B2cI/OlEN/oCluiA1seKKhMvj5AUDHEC2/xIyMaXbtztdMcGDpHBC3NzFLVxqxnqeNRHSyKxLl6LtVJRV7YO4JuAlTGYf15/hhDf+o0V+UBD7jozOt2kmda9J+ODvnPcIEewEeAQ8VfFQpiG7+H+31lMAQtrrhKqgg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785574246; c=relaxed/simple;
+	bh=OA/IQfIHVZX8mp5DLLn2skk1qa8fi110PDwQ8uSe5aM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=T3Ye6vHYpbjCFoJBUO7M9ISpubseUEVjyquSCNxplOavEZpv1YfhwCyEgmsVMngtGt98FreOR9ti0RLbJHGLDLrTp/MJKLSt7jfiGc/2Y1CQuybPCeuuuN3nbpIHLfkCHEgckPvBTZvfS8k9GffLOp61hfv4D2lLU0a3WWfkUl4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=XY0O1Tlr; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MfhIShzK"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-51c1372f84dso10123631cf.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2026 01:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785571423; x=1786176223; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=PvIhtaAWNgtUpZy2kn7hTpCoIzywUpO/TRNd81bIPD8=;
-        b=MfhIShzK2/QoZXNdOzHl/dDh62ILOU92RhMUe0vdC77niW4MKTGp554lK69vZTeoi2
-         tmzQri6EEXm4vc8VEKMIeP0tcKKqHNQoaFGom06QKPVoQHpi+GJAR89hnsSiZlykdZUC
-         SIfJIbTzMrDq+RRzvBeXsg9OmjwZiiPLRvq3iPs8f2DQA812FrLaejHL9YhwwF/eVooW
-         /PXjIRTiVwyurAgjrGzZipdcPC52z4WzUA7WfBcLcCZLqekkowsOB72GW05fBeKcfO6o
-         bjItf347efDaymuwEf0RCtmOErJHPTE8eCnfL7kXLZcRtYIZfxXA4cON49E644gQqisl
-         IgwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785571423; x=1786176223;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=PvIhtaAWNgtUpZy2kn7hTpCoIzywUpO/TRNd81bIPD8=;
-        b=fwGsXMjNPyTTgGfQeRxBn/msmFCE8iaZBjmaz8hWpkOUZIVHjYmfP5iPBJ9DXlf8SJ
-         Vne2C3WWGjgLLIU4jmaf6HbvfRNtgbszs8lXl/GpYmqc2khGgo0mATSd4ReOXBnGURXA
-         ku45K/3PKTXsIV1cqKrvV34D05P/X/4gtk2rAuWq2bFGXXKUaIYfXoUSRrKcOQYGtmjW
-         E2V8kD/BYCX/M6YhlAzUpINrahhSHoMNrVm06UGAnwjDWQgEOLTTRCU5VPlcbetpfo/W
-         rx8/u9cSg4k2a/ElwGrBRHWOKv/BNIGZz2C4XSYpJ9VxGTA6jc8niq8zTvWPffx/COwv
-         bzWw==
-X-Gm-Message-State: AOJu0YzUyqWiR0MFUdsgX+cFAvz6aGWuwduJKv0IOnofgRLigv8DJQm7
-	b3khTIaijQMlA7D5gbVm/v0SsPaQzK9Yx+r5KHULO8uFkjqFT4klF/7pjOA3fg==
-X-Gm-Gg: AR+sD10rBIngx+V900xuN5oGV5T+6x3CUka8WbhQQpKIQtImywD7OW3qyC4tLoN+nO4
-	jYBV1ENJitSw0GNSEwE1klLkNt851GWtZsZNiy3O+VXTaKLKsqRna5SRIDC5rwOsd5B1pGOflQl
-	X8SYqt2AD7s987XMPS1OaXn3N1chHfy7iTVoxLJ9ycH2hgWdElWD3zDCU+ATZyIrTk6TI6AKVFm
-	wZiSjPaVhx/25m75thvxAERfl3F+rzabhKGcwgFTeiris0hPB4M6SO76QGcxf1/tPoQtqtwklc+
-	ZhP31fFvZi5OuhcQ9zDkdqR4fx5IMSC4LNnKZZVFrwW98VXgevLiLVDJBt22nRynBwzRGVnqDym
-	YMhSSyeTmNokfiFgI0jJ3V/TmyOc8jwX6AewCeIVVaAqbDmE+dx4PbPj4s70XpP5ESW5DuTCxGb
-	YZDhTC3n/vg1CLku6zcX/+C8qmovQpFJnYOs8UbhXukLxEakp6+OCloE6piU3gvwM7hdc=
-X-Received: by 2002:a05:622a:4d0f:b0:51a:ee21:d342 with SMTP id d75a77b69052e-52b567522acmr66406131cf.20.1785571423108;
-        Sat, 01 Aug 2026 01:03:43 -0700 (PDT)
-Received: from [172.17.0.2] ([9.234.149.180])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52b4ec01d54sm24167921cf.31.2026.08.01.01.03.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Aug 2026 01:03:42 -0700 (PDT)
-Message-ID: <6a6da85e.95751058.2710c0.934f@mx.google.com>
-Date: Sat, 01 Aug 2026 01:03:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4035672675889887547=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="XY0O1Tlr"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:5:f011::a05d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hBxMf1x1Pz4BKFl;
+	Sat, 01 Aug 2026 11:45:02 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1785573902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fxn5jmUfhp9OsJE5wEp23LDGyzYHlkGrFuHlwvwU3Jo=;
+	b=XY0O1Tlr7Oy2eHoYZ1D4HQeoRXiSRHstR/g1OliybhYgjxkmg88u7r2wmy5oa1yiPIOm1I
+	G49In7EB0FM+h+pmPv0kcQb3uQZixob3FV3k19GwORkIxbxPOtArv8aF4sqkWotVUuJUt/
+	VRNsyOlPLRHdYWrf0DGF9K9gS5e83NJZ8407gqs+7ghee/7IsGpPpHdcF73erEW7YgMU+v
+	RgUjuKqGCBqz4Ks1Hnmad5kwpjVNB9XbNv2G+Og27RZFPQT5LD+knCfXu0dXF+4HOuXygP
+	9DQmc7lHAQcPAkjS7u1fjt0rVgFkZL6ZM2IyPYUWZrwar2vU/1i1oBE1LzDeHA==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1785573902;
+	b=hM7pa1/Vckn0rmts+BIMsv+//5P+VvDxrtsyQ6zspwJggwxtLhhJTNHkoUtxOiHalODU+b
+	t+8R20aBGRTXoPGYVex3sUW6litG9Xw/ZXZt1kyb/6cRbQ1MT7zBP2aczZWpHMhjRmUAlW
+	p8SHZRxRD8DfM7R+slk+4SbexR5Fj84cy4mOzw0MWKxcFesbNCyiJZBMuMoFT9fwmVctCf
+	rXUYSBYea+cDVtop4koHbdg6CJ5Xm8VEHOJbpFqLFecJQdOR0ZlJ403F7VT9E74aeQ9wxh
+	J6HOfO3uNdpXcV4PxghIFNGjrY9nJtVqpppUhgw178LSwL7upvlXRKgTSWjM0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1785573902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fxn5jmUfhp9OsJE5wEp23LDGyzYHlkGrFuHlwvwU3Jo=;
+	b=jqbJ78+V/EFosFh8hEjdBflha0WKhQPHWyB/gKQAVGD8FZA8HFWqlXVeW0K7gFjPd3zBif
+	gjHYkyf4ymTJ8H0yyxvsGKsWF+TRyqkyf4FJUfPoix5qilpzRm/FSat9TcEpSeWdEhMQQb
+	btu20wqohjb9xbcDSMxf/OPpLkYu+PsB43codyJUMkaofUx2zB4oXpaCmRNH+E+vf1n7kZ
+	g5UcF+arI6TH+xMOAjPcy0EWyjN42BEWbs14dK3E+DIFAnHuWytrpqVDLAYhR+CFH4uC6w
+	XE/rhwj/1oDF4ztql+sJC6HttX8+TgVDCv++Km98HAAZ8J/HkJENwtGIH3h53Q==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <b108ce022c439d3a5a7453fc5c33952c0029daaf.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: hci_sync: add conditional locking annotations
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sat, 01 Aug 2026 11:45:00 +0300
+In-Reply-To: <20260731221840.GA4066390@ax162>
+References: 
+	<528c354dca68f05cfd17df7c80f8b04419c0fb74.1784973709.git.pav@iki.fi>
+	 <20260731221840.GA4066390@ax162>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nicoyip.dev@gmail.com
-Subject: RE: [v2] Bluetooth: hci_sync: Fix accept list UAF during suspend
-In-Reply-To: <20260801070524.3547883-1-nicoyip.dev@gmail.com>
-References: <20260801070524.3547883-1-nicoyip.dev@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4035672675889887547==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+pe, 2026-07-31 kello 15:18 -0700, Nathan Chancellor kirjoitti:
+> On Sat, Jul 25, 2026 at 01:02:36PM +0300, Pauli Virtanen wrote:
+> > Add context analysis annotations to functions doing conditional locking=
+,
+> > to suppress analysis warnings.
+> >=20
+> > Fixes: a3ad01d51d4b ("Bluetooth: hci_sync: Fix advertising data UAFs")
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+>=20
+> Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+>=20
+> It would be nice if this could be applied, as this breaks recent clang
+> builds due to context analysis being on by default and -Werror enabled
+> by default with many configurations now:
+>=20
+>   https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs=
+/30660246388
 
-Dear submitter,
+Do you think the Clang build can be enabled on Bluez testbot?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1138539
+My plan for this was:
 
----Test result---
+- Copy https://github.com/pv/bluez-ci-image under github.com/bluez
 
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.19 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.43 seconds
-CheckAllWarning               PASS      27.69 seconds
-CheckSparse                   PASS      34.47 seconds
-BuildKernel32                 PASS      24.87 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      460.26 seconds
-TestRunner_l2cap-tester       PASS      61.89 seconds
-TestRunner_iso-tester         PASS      84.13 seconds
-TestRunner_bnep-tester        PASS      18.74 seconds
-TestRunner_mgmt-tester        FAIL      221.75 seconds
-TestRunner_rfcomm-tester      PASS      25.75 seconds
-TestRunner_sco-tester         PASS      31.88 seconds
-TestRunner_ioctl-tester       PASS      27.15 seconds
-TestRunner_mesh-tester        FAIL      25.98 seconds
-TestRunner_smp-tester         PASS      23.62 seconds
-TestRunner_userchan-tester    PASS      20.30 seconds
-TestRunner_6lowpan-tester     PASS      23.37 seconds
-IncrementalBuild              PASS      24.18 seconds
+- Replace "ghcr.io/pv/bluez-ci-image:latest"=C2=A0
+  -> "ghcr.io/bluez/bluez-ci-image:latest"
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+- It should rebuild the image via github actions (may need push=C2=A0
+  a commit / rerun the action after copy), which uploads it to
+  https://github.com/orgs/bluez/packages
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.253 seconds
-LL Privacy - Unpair 1                                Timed out    1.919 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+- Adjust the image address in https://github.com/bluez/action-ci/pull/7
+  to ghcr.io/bluez/bluez-ci-image:latest and merge the change
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.840 seconds
-Mesh - Send cancel - 2                               Timed out    1.985 seconds
+- If there is some issue, the testbot can be rolled back by reverting
+  back to "FROM blueztestbot/bluez-build:latest"
 
+Later, the image can be updated by just pushing commits to the bluez-
+ci-image repository, easier than current process.
 
-https://github.com/bluez/bluetooth-next/pull/523
+>=20
+> > ---
+> >  net/bluetooth/hci_sync.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >=20
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index d5554fbf3129..f5545f270f09 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -1255,6 +1255,7 @@ hci_set_ext_adv_params_sync(struct hci_dev *hdev,=
+ u8 instance,
+> >  }
+> > =20
+> >  static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance=
+)
+> > +	__context_unsafe(/* conditional locking */)
+> >  {
+> >  	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
+> >  		    HCI_MAX_EXT_AD_LENGTH);
+> > @@ -1343,6 +1344,7 @@ int hci_update_adv_data_sync(struct hci_dev *hdev=
+, u8 instance)
+> >  }
+> > =20
+> >  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+> > +	__context_unsafe(/* conditional locking */)
+> >  {
+> >  	struct hci_cp_le_set_ext_adv_params cp;
+> >  	struct hci_rp_le_set_ext_adv_params rp;
+> > @@ -1499,6 +1501,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_de=
+v *hdev, u8 instance)
+> >  }
+> > =20
+> >  static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 ins=
+tance)
+> > +	__context_unsafe(/* conditional locking */)
+> >  {
+> >  	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length=
+,
+> >  		    HCI_MAX_EXT_AD_LENGTH);
+> > @@ -1552,6 +1555,7 @@ static int hci_set_ext_scan_rsp_data_sync(struct =
+hci_dev *hdev, u8 instance)
+> >  }
+> > =20
+> >  static int __hci_set_scan_rsp_data_sync(struct hci_dev *hdev, u8 insta=
+nce)
+> > +	__context_unsafe(/* conditional locking */)
+> >  {
+> >  	struct hci_cp_le_set_scan_rsp_data cp;
+> >  	u8 len;
+> > @@ -1693,6 +1697,7 @@ static int hci_set_per_adv_params_sync(struct hci=
+_dev *hdev, u8 instance,
+> >  }
+> > =20
+> >  static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance=
+)
+> > +	__context_unsafe(/* conditional locking */)
+> >  {
+> >  	DEFINE_FLEX(struct hci_cp_le_set_per_adv_data, pdu, data, length,
+> >  		    HCI_MAX_PER_AD_LENGTH);
+> > --=20
+> > 2.55.0
+> >=20
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4035672675889887547==--
+--=20
+Pauli Virtanen
