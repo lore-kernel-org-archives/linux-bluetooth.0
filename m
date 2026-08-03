@@ -1,69 +1,71 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9973AE1AF
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Aug 2026 20:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B619435EEC;
+	Mon,  3 Aug 2026 20:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785789505; cv=none; b=hraCg2fVlyG/LA7YFFjenie/fCi+yAOc5c/N1oxS2MMDRa1JyLRu7qyHSfTOsVVp7jKCdTVknc2QHVINDVk7JaxG8o8e0HomSjPGCqLQB6hluQpkd+MwtLUzoL1jGPE/nB5zafSBKZbCow/aCvRBnSov6GPu3eU22TC30pELVIg=
+	t=1785790030; cv=none; b=tNPEKgrUh95lRADMxO48LZ7ZBne3bUwOFCTYcCjcEFpDUKhFzCKQn8sWS/FyH51LpxmUQRAeO6tqOxAH/PCg9MAFl70af96hdlCEynsVeMiDoXAT5Cu79njzNGGxOvSjYXJtPBu7L8jT9a3dUBoxkHzOA2V2SfNJ/4ynzCjbzAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785789505; c=relaxed/simple;
-	bh=uZ8iUoaXisiv1vIZdrgil1qXPQafPvK7mpveNaip7ZI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SZeVkEia70YvlSRuBTMhqJeOc93QKm+jTr6ymx0+63qKLMBflB3/nFI1LIQsaI5vOGORQA0kXlHLa+Wqsz4w5kcq+y/cZUp/tikSBTUKdZAqbN1VoDnF/dgHbojRAcjXIB/i2yi2zdXOkMG2Zy54NTOanbNc9OpYHVcrZUY3+SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=inKSkr1W; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1785790030; c=relaxed/simple;
+	bh=/QgB3jtisskJxFKW92yfJO0NpIoT3PtBoD3VMzK+axs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qNrk3m0ZDbQ+ntWZfqihZjXc/YxuXQ612OuWBeBVFNV6i4UBj4GAjpY/sea9XQZNc/hwYl6Ln8vOqgDQK5vNT+A5tnIOcGeuLTE+onnRLz5lFOLajs/HzIdudOhrPi9qZTTH5JXTTwgqHdZllkn0y4J0m2cigaok4ACotrDtZ+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXgNvXu7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="inKSkr1W"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1785789503;
-	bh=4Q6WrkhlJkmt6SCasrTx2g13lwGHbDYyoONN5erLE7g=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=inKSkr1WVW+OrVDnuSBRoFo0FNLKYBTo4ueX67G2lEkWCBC1P0S5kFPAt7ZcBq8wU
-	 UefNCfRM24JZBDN+PTd/uWwEwn5zZS8h1RXFl8NPT5pdQa8s3r3YJgG1rQpNHudFyd
-	 +GIRq0xg/tzoQSgwQs/h6qBOwWXGaJ8aHX1lzOKU=
-Received: from github.com (hubbernetes-node-ad6df1d.ac4-iad.github.net [10.52.166.28])
-	by smtp.github.com (Postfix) with ESMTPA id 6591D780A0E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Aug 2026 13:38:23 -0700 (PDT)
-Date: Mon, 03 Aug 2026 13:38:23 -0700
-From: Jan-Michael Brummer <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1139642/000000-d768b7@github.com>
-Subject: [bluez/bluez] d768b7: Add cover art support
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXgNvXu7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D78A1F000E9;
+	Mon,  3 Aug 2026 20:47:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785790028;
+	bh=0ro0ZOzuINq+G1JR/FDaEUVjJk1Y5xMtbQw3/UqOQqA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gXgNvXu7vL7JL+29vQ0Sjf3NzVOpmDQpHsBEQP2Z6dMXXtG5Crd6qQNaYJc82YKoV
+	 nyI4e3X76krXYBSjSK4aecv5EEihFn8s0aWKkLENMSghrlY61c32Za6OmJOdDcVPv5
+	 Itso9F1xzp/nLrCqkIvvklLOubF6u3liDxeGUadOiyksa+7+fg5saIzRv6/ELNK71o
+	 s0kJQzOkduDu0BXQligCJ516P+kqJXsftYvnZGO5vNjDTOnpFnydPAuq60xp5REi3p
+	 96nX9CchF5UX4Qidr8we/NVJmVwyITT0IR+C06Jv5m7m3Ypg8FUDgr05Eigsltk1nX
+	 0fI163z9i4B2w==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Alexander Martyniuk <alexevgmart@gmail.com>,
+	lvc-project@linuxtesting.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: Re: [PATCH 5.10/5.15] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+Date: Mon,  3 Aug 2026 16:46:57 -0400
+Message-ID: <20260803203505.stable-0006@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260803081414.729798-1-alexevgmart@gmail.com>
+References: <20260803081414.729798-1-alexevgmart@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1139642
-  Home:   https://github.com/bluez/bluez
-  Commit: d768b73fad7be8ec4593d5d11751599306674e82
-      https://github.com/bluez/bluez/commit/d768b73fad7be8ec4593d5d11751599306674e82
-  Author: Jan-Michael Brummer <jan.brummer@tabos.org>
-  Date:   2026-08-03 (Mon, 03 Aug 2026)
+On Mon, Aug 03, 2026 at 11:14:12AM +0300, Alexander Martyniuk wrote:
+> Channel configuration that was duplicated in l2cap_sock_init() and the
+> various new_connection callbacks is consolidated into
+> l2cap_chan_set_defaults(), which now inherits from the parent channel
+> when one is supplied.
 
-  Changed paths:
-    M Makefile.plugins
-    A profiles/audio/avrcp-bip.c
-    A profiles/audio/avrcp-bip.h
-    M profiles/audio/avrcp.c
-    M profiles/audio/media.c
-    M src/bluetooth.service.in
+Did you even build test this?
 
-  Log Message:
-  -----------
-  Add cover art support
-
-Add bluetooth cover art support based on the existing code.
-Tested with VW head unit and Fairphone 5.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+-- 
+Thanks,
+Sasha
