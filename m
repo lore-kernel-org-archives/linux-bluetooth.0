@@ -1,113 +1,86 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3423A641F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Aug 2026 21:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A88B2F90C5
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Aug 2026 22:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785792551; cv=none; b=s6rJBrcgLoad6Sky86YYDGGM0AsVoPUBZO9ZB92xN09f6RogOKv2OP8CkULTie9eVWU2CETX1wcAbVlpc3VAsQRHTzDOye64vZJQeiyB5FHDmHxVhTykcU7Oa9uKGngzgLxZpwA95QtyqKPUaYqH7YBFCzlr9WJCGNyHgyxLOYQ=
+	t=1785796188; cv=none; b=UQa7ca2CuIjO8jgKNRl1AfRwgw7WeWAvMn/jzVGLPq9DrYCuRB+ZLGahNaNJFFHXqavWHnNDdWi5NNdbRjnWVZOPByZcNvg7EtrZk9niVjEBw2tWjIOCj+KjV1p2WrEsrAHKkKK7wYuiLkOQvrEkcUlY7U1wPKT4r567vexo8W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785792551; c=relaxed/simple;
-	bh=9JRbCV/V/QVqctpGF2oqn57FLFo4wTlsPEDcgZWv7cE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Dv5a5+Vfr6HZ09vOab/QtQgRBFdH0uiLuzl56FFGCjaXHEmVZNe9b3AJc0o5FT6IWHtCyMcseKx1EMT5ch6nFrDUjk5ufxjuRtzca1/Hwjz0qUhbeVfK2fySYs4ukc9maYL/hFCsNU7dfPoVvw2WAeA2Olz8Q+GBITqTZxvm458=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ucs7MAXA; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ucs7MAXA"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-ca7bea5e5b3so2939878a12.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Aug 2026 14:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785792550; x=1786397350; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=7aMbFPHfhqkJwAGDi+KoYmnsNHcfgvwMB4Zbid/pk28=;
-        b=Ucs7MAXAsB7d+Cy0r5DaBYXDISJSfxViOl+k4Y2aJwDidnCeFkUQg+joakxqedOruY
-         QufmU8HJvHbTEwnXX6VvIt36wkB718guUqaVw1Afriv4TsVi4KoNp0nNCHCu944VINvp
-         whNmg4mJG6hJrkDEXGhb0BlHDo0t9uKJY42t/PvEaQtfO1dzowSDi1OSUs1d60U2HJF9
-         yb8HZfGPCDPUO1Zl3/Dg/yvYnztPzNO0bqp82mewNeuBWuNOu8cnAR2Ca5YC68uoMJJO
-         4jwp6igk9/WFFrTQWlVM8CSPZyaJPWAdazLIxMDQtjXEQe12Z0/9ZqnZoBGMF1QbVvqS
-         B95A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785792550; x=1786397350;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=7aMbFPHfhqkJwAGDi+KoYmnsNHcfgvwMB4Zbid/pk28=;
-        b=Gr0ZZ5fwrkmPRHpQPrMCzxLWwy7X7MbTgfz8oBzMxk6CYClpugWr9mh3lEYzE93SfP
-         R82Rg/0j+FetahKRncAc80H3nSHhy1LjyWT8qfMwIglVg/i4AgvQJuOCzXS9iYQl7ht6
-         MZt/QuGFhy2YbPAXMqNzkQg0E3CRm4k6eCVEfLAkWcVePFVWPxgQ4DXLuI/7HUFdeC10
-         nap48ogd337eanFFT5tiNsHnGi0R6b0mMIAnfSvIhoJ6w1egYUhh1ZmIrmO9V6YsPWN5
-         7eanzbvN//5IZwHEtxYlKlmLJnf8ng4CpY6rpc8nLMvsAMaVneVZDKlnEOWqZXVOph7v
-         wxyA==
-X-Gm-Message-State: AOJu0YyhcrNUUaZxKtVmy9Q8uxH8fuU9M7zGCrUT1/48fIlpBXDiVhzN
-	sZt2BnB9fwMDv1CFI8sYj3gQsONVwxRpgFrefNcY+Pqwuaj33qgyDWAtTAkPD91v
-X-Gm-Gg: AR+sD13wTeYXr3Px2iG/fSWKbb7um99nNa3nQWzzV/GZfRDKbFAd7Y7gtW2gj3i8mWi
-	LfvI/FkQs2CDGCavRTw+H9gh5jTZf+OrzPd92fz4uOatsEPdAZ5wjUqJ+HsSphH0cMgAjudEd9V
-	w8rQu6i2Cx1LXMUdACsg7OdAhlfbfhKjdpdwPanmQtO+sGEIVkRjzIzjdRuKOxbBDLLwYgECqvT
-	BohYzInSwXJIudFZBgvew8xM54AxoRAdAUTMkZcCzkCnTBtQ49hcQbsmmdWC+3yIydJvYIcxO/G
-	DTDAgF5+KzO/97ZkrDoUW2WBu8NrlmtyVhGYfkM+jAX6tMHyPQ69aoVdoKhHPkX9QZKc4xKBFRj
-	hGczCTNwEZAZvT4TgrzlH9FJgl338UwwqO80P/0PxN6nmVp5/0ULkNu2pMhPgpsii4Dbh5y2eoQ
-	pgp/EUVPgzpEI07AxZ9k/DdjPdf+E+0ep69S08wq+EBUvcGjgllF8UEXTW+9EkxA/CsGg=
-X-Received: by 2002:a05:6a20:d80f:b0:3ba:cd5b:3dc8 with SMTP id adf61e73a8af0-3c92a5f1c89mr11260496637.31.1785792549590;
-        Mon, 03 Aug 2026 14:29:09 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.247.2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3153dd9be04sm38665824eec.9.2026.08.03.14.29.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 14:29:08 -0700 (PDT)
-Message-ID: <6a710824.c56fb102.15e4aa.742c@mx.google.com>
-Date: Mon, 03 Aug 2026 14:29:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2432660462367317764=="
+	s=arc-20240116; t=1785796188; c=relaxed/simple;
+	bh=qSaCiYyDEuQQiy0J85tHTk8vq3v94RvaebL7X21bQFg=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PKxiDbjHnub8ZdmYhW+42pIcoKgGDyBpNMX5YG/+NbrbqEnpqxl+hhFQXxZSQtooIVuOk1jrfCWPt7pHqhV5nSrIXYZx3Ozc4aWVThzivNINd4MAOrlH8yNAONhRudE+ilFe7nL/bmudT3A5LpAir/NCk13V5gMp3YOM1aYJoiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C196A3EB8D;
+	Mon,  3 Aug 2026 22:29:37 +0000 (UTC)
+Message-ID: <a2f0a4fdec3a761053ae83ee06c51adbe6cec3ff.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 1/1] Add cover art support
+From: Bastien Nocera <hadess@hadess.net>
+To: Jan-Michael Brummer <jan.brummer@tabos.org>, 
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 04 Aug 2026 00:29:37 +0200
+In-Reply-To: <6716CF9D-9856-4371-B55E-FFB8E6914B74@tabos.org>
+References: <20260803195620.255866-1-jan.brummer@tabos.org>
+	 <20260803195620.255866-2-jan.brummer@tabos.org>
+	 <2a1b99854117a6fbde6a7e28a4fb33edf239fe1f.camel@hadess.net>
+	 <6716CF9D-9856-4371-B55E-FFB8E6914B74@tabos.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jan.brummer@tabos.org
-Subject: RE: Add cover art support
-In-Reply-To: <20260803195620.255866-2-jan.brummer@tabos.org>
-References: <20260803195620.255866-2-jan.brummer@tabos.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: -100
+X-GND-Cause: dmFkZTFkaHFzhFrK4QbdDqwz7nmbEuogDrYZQmJPV46kd+WKHMv/cKcEEP2Ajz+stsjFbxOMy7LYSIl/qqdXQbHkBi60oL++rtheOuUTKHCvVA8Fv60Ab3ElxRRLnG5KL7toBw9sE3huINn8rR8PsvtN+ciqkf9pfsSOU7gVl9c3tE6+SpkyA+7uSZyt2Mv6THZAmwyRVfzukxyB0R1wV3+Gj6bR5G9nXT3IjeZYXepQTtMOvFaWqZjPWLKMwHPL3ujaQWR3BKNRXSp1uD4vV9jZv+1jgc9MHUyL0U0lwk/zXuARS2rVU/3C2ZEaejV5nlu1alpZ4ciDiqw8Qih5qF1jYIUgJIBDdVuwgyOfgQl1HerEFAvtPyPdLDUp4WplBGtyGkmcPWi+TyZwona1KqkLueP7uI888f/SCoPGF1izxqk8cHXwInP6fRXJ69iIM5FiFKgL5ByhsJVy6PXhG7Wa9FpIWH2pBaUQYgtvCeLcmGA8iqoJAA63Z4RflV40A5VBMD50cX62S49VAXkx/f+S4fzhWDxWD3hTOsTsdhMkyZSKlYe3gKBMQJ0FQPrvonLNRr5su3hNVrKHwaXB4eKCw0+fH/B7p+YBJwlBacbJ7Vjdx04FbC6IYGTKdxlwkrsZb2GGdt3Pow7e59DUcW1xUQf3ryy8HPu5x5cNt34Yh8v90g
+X-GND-State: clean
 
---===============2432660462367317764==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, 2026-08-03 at 23:03 +0200, Jan-Michael Brummer wrote:
+> Maybe you have an alternative solution in mind? I'm open to change
+> it.
 
-This is automated email and please do not reply to this email!
+I think you might need to extend MPRIS to allow making image data
+available instead of a URL.
 
-Dear submitter,
+This could also help with avoiding, say, gnome-shell having to make
+https calls to fetch a remote cover, or third-party playback control
+apps having to cross apps boundaries to get to another sandbox app's
+cover art.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1139642
+Maybe this new feature is what we want?
+https://gitlab.freedesktop.org/mpris/mpris-spec/-/merge_requests/4
 
----Test result---
+I looked through the MPRIS repo after writing the above.
 
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       PASS      0.21 seconds
-BuildEll                      PASS      20.82 seconds
-BluezMake                     PASS      559.76 seconds
-MakeCheck                     PASS      18.59 seconds
-MakeDistcheck                 PASS      162.14 seconds
-CheckValgrind                 PASS      233.65 seconds
-CheckSmatch                   PASS      318.88 seconds
-bluezmakeextell               PASS      104.34 seconds
-IncrementalBuild              PASS      553.71 seconds
-ScanBuild                     PASS      1009.10 seconds
+Cheers
 
-
-
-https://github.com/bluez/bluez/pull/2370
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2432660462367317764==--
+> Am 3. August 2026 22:56:39 MESZ schrieb Bastien Nocera
+> <hadess@hadess.net>:
+> > Hey,
+> >=20
+> > On Mon, 2026-08-03 at 21:55 +0200, Jan-Michael wrote:
+> > > =C2=A0# Filesystem lockdown
+> > > -ProtectHome=3Dtrue
+> > > +# Cover art referenced by MediaPlayer1 metadata (mpris:artUrl)
+> > > usually
+> > > +# lives in the user's home directory (e.g. ~/.cache of the
+> > > player),
+> > > so
+> > > +# bluetoothd needs read access to serve it via the AVRCP BIP
+> > > responder.
+> > > +ProtectHome=3Dread-only
+> > >=20
+> >=20
+> > This is going to be a show-stopper.
+> >=20
+> > Having a root-running daemon rummaging around in user's files is
+> > not
+> > something we want *at all*.
+> >=20
+> > Cheers
