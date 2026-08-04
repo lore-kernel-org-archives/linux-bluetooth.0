@@ -1,210 +1,81 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAA836729A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 14:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6F646AA85
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 15:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785853494; cv=none; b=Lx4Ufb49Hhs7qjYg43JAYvbJhmNx8pPtb9rsJxFpA0VGIhgqbC50KVRIODmGC9m+fY7ObVf8FB0AaQgICAcjEP2Q3GazcirsGysI8HDsHsPzJYPeh1J0XftriQTO1254z5b5pe/yYEmrMpCbXGjoNH6YSoOgbjtddtkcK9Gv7JM=
+	t=1785856314; cv=none; b=l41IlpCz8IBNYG/8GVO/T9zy222aUIPsMjmxs75vSGVlkE0bOcYDP6GqbI84PhqL/sHlpddwm8WMxNoKkE7qlGyS4gLOzL0I7n2ej4nZKQRoMi9bVDz3+6gwidTgcKo4tTmvxVfJzNiVotatSNDvBigehsE07e4g2BFLgoTbY3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785853494; c=relaxed/simple;
-	bh=3SWSycorHXv0USIP8zeAzRKKJNwp86p2nkOfuFKLQIE=;
+	s=arc-20240116; t=1785856314; c=relaxed/simple;
+	bh=R2ULMVtMnv0y0ovrErCahSFQm0IxfzNiNpacL30SRwc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T5tVi7nuXkbMFPzwWCXE2eb0Ae0N79VxBtJbuBisj9vdHRtqJwg6Ca8JqacdU+urGQ6CNFGf3gr2m2A6VdEdisFTnxVaYPeNhd/TdATABAX73TK9GlA7dpvEd1XBnv5tgOjwyM2kxCx5TX7h8EQ3QdG+cOHzJGftYyq6FCiTvd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 170223ECE3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 14:24:27 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	 Content-Type:MIME-Version; b=KoNma0lSLtveQUBcZV28gFMq1A3dNUhtLRKGFkuI8yDsx1aAmkd5qI34raqGxJ+Hnz+f8ClumsvHPBzmnqGDiiU92Rb5Ll+ScO0eNB/6MqnSPhkgGLlQjK9/wvce+k/FL1+SX0G7JXkisyLQ5NkBUtXzClLrfEFHm5oghhfifss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OeCqZu7Q; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OeCqZu7Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE100C2BCF4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 15:11:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1785856313;
+	bh=R2ULMVtMnv0y0ovrErCahSFQm0IxfzNiNpacL30SRwc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=OeCqZu7QmZx62L1HRY/P4mWT1o4TT7LXjgWNIRoHsMPaB6M8+ZPuUOHjLjRQNXpOo
+	 LqnbwPABLkUXj4U4vcl/hA3/y1JCMVpmZx/vdd7CMrOsvFyucL3esCQGwu4RJaQXJp
+	 p+cc0g/bhAyZM1PlAchnK6l921i4A+85VOS7MBXDn24NITxvNNgA7/UfGtgFz/Joki
+	 2BodudokJ4m9cbZdaQDEygIEtv6ycF8Cs+SypKXsGJSAvRZTSfT55yCE72hILEY2kt
+	 2IUJuJlS1q++G3RiRxk2KOQxOuzu9oR0xCgpqRnpdzRIh2jjWrSxNJfqpSTHtzKe1w
+	 J4uK2/m0Y8GIw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9B9F3C433E1; Tue,  4 Aug 2026 15:11:53 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ, v2 1/3] avrcp: Split off name parsing from parse_*_element()
-Date: Tue,  4 Aug 2026 16:23:30 +0200
-Message-ID: <20260804142419.2274153-2-hadess@hadess.net>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260804142419.2274153-1-hadess@hadess.net>
-References: <20260804142419.2274153-1-hadess@hadess.net>
+Subject: [Bug 221832] MT7925 (Foxcon T99H493.03) BT missing in lsusb on
+ Vivobook S16
+Date: Tue, 04 Aug 2026 15:11:53 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: lnxps@bbtex.net
+X-Bugzilla-Status: NEEDINFO
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221832-62941-c1pSB8HDyt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221832-62941@https.bugzilla.kernel.org/>
+References: <bug-221832-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 0
-X-GND-Cause: dmFkZTF+6bTVS6M0R1cAvQ/6Jib41lYaG4qYkqpPX3/B9gq/drn/1LRKpDvZEG6OLrStP1Fq4SlN+dr8aA5rpOfZbA/FHbKdwujHcVMmfjRKmFMSX2j0q6ZrNqn5Kj2VjMpuP0pls5Gk7VtyYTvrt+mccnNgrFv7GFYP3zuGCrLxikPo8VwER+Y/b85Z8atAOJt9HPs69WLEdLuNmC+4u2oU2oTJ0MSq0trEyj54SL2MJ+TE+0pPUghXE11DSrKk9/mpEO2fBpeopFTf6g+Sbv9fMdliKbUGp1RuEMM4RW3SDLxWl3iKn1QUKlHBTJ9vDM9NSbHPBm98eq36sSur+9kTPi38alYmUefHymVz6oSe+dyUdxTYAKCznPNHbtk2FIOjG/+jogKTm/dbELO4E2ldRnSlwnse844yB9kiskC9exeT+8Pzr9h+JBU+wlS6MM2ZakLFwSpI4Q/Qe1jcYzC3/eZ0dKaCmO5T8T2OfFrz8eGKYmd5R0whu+Kjvh04hykzjKWXrtuHSK9rp3/pKFdMLUzDQ7P28ltL81XlbdoELIl4rAEnXyFBOy/xT7aS0OQNkBDeDCsH8a+/J9KXfLgfoONcWpCUwzeqwMA25odgcEiMKRAtBPsayzgKvrWFQe9QwgSsMqWB+v3uMpHXpHDXzpdCbiRhQyjaRSxgcp2t4oLArw
-X-GND-State: clean
 
-This will allow us to use the name extraction code in
-parse_media_element() and parse_folder_element() separately, such
-as in tests.
----
- Makefile.plugins             |  1 +
- profiles/audio/avrcp-parse.c | 47 ++++++++++++++++++++++++++++++++++++
- profiles/audio/avrcp-parse.h | 19 +++++++++++++++
- profiles/audio/avrcp.c       | 26 +++++---------------
- 4 files changed, 73 insertions(+), 20 deletions(-)
- create mode 100644 profiles/audio/avrcp-parse.c
- create mode 100644 profiles/audio/avrcp-parse.h
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221832
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index ac667beda847..a505fcd6691f 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -37,6 +37,7 @@ builtin_modules += avrcp
- builtin_sources += profiles/audio/control.h profiles/audio/control.c \
- 			profiles/audio/avctp.h profiles/audio/avctp.c \
- 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
-+			profiles/audio/avrcp-parse.h profiles/audio/avrcp-parse.c \
- 			profiles/audio/avrcp-player.c
- endif
- 
-diff --git a/profiles/audio/avrcp-parse.c b/profiles/audio/avrcp-parse.c
-new file mode 100644
-index 000000000000..d3d0a070a4da
---- /dev/null
-+++ b/profiles/audio/avrcp-parse.c
-@@ -0,0 +1,47 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Red Hat Inc.
-+ *
-+ *
-+ */
-+
-+#include "avrcp-parse.h"
-+#include "src/shared/util.h"
-+
-+gboolean parse_media_element_name(uint8_t *operands, uint16_t len,
-+					 char *name, uint16_t *namesize)
-+{
-+	uint16_t namelen;
-+
-+	if (len < 13)
-+		return FALSE;
-+
-+	memset(name, 0, NAME_MAX_LEN);
-+	*namesize = get_be16(&operands[11]);
-+	namelen = MIN(*namesize, NAME_MAX_LEN - 1);
-+	if (namelen > 0) {
-+		memcpy(name, &operands[13], namelen);
-+		strtoutf8(name, namelen);
-+	}
-+
-+	return TRUE;
-+}
-+
-+gboolean parse_media_folder_name(uint8_t *operands, uint16_t len,
-+					char *name)
-+{
-+	uint16_t namelen;
-+
-+	if (len < 12)
-+		return FALSE;
-+
-+	memset(name, 0, NAME_MAX_LEN);
-+	namelen = MIN(get_be16(&operands[12]), NAME_MAX_LEN - 1);
-+	if (namelen > 0)
-+		memcpy(name, &operands[14], namelen);
-+
-+	return TRUE;
-+}
-diff --git a/profiles/audio/avrcp-parse.h b/profiles/audio/avrcp-parse.h
-new file mode 100644
-index 000000000000..f7a33c854442
---- /dev/null
-+++ b/profiles/audio/avrcp-parse.h
-@@ -0,0 +1,19 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Red Hat Inc.
-+ *
-+ *
-+ */
-+
-+#include <glib.h>
-+#include <inttypes.h>
-+
-+#define NAME_MAX_LEN 255
-+
-+gboolean parse_media_element_name(uint8_t *operands, uint16_t len,
-+					 char *name, uint16_t *namesize);
-+gboolean parse_media_folder_name(uint8_t *operands, uint16_t len,
-+					char *name);
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 2194a913580f..af3c72174764 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -52,6 +52,7 @@
- 
- #include "avctp.h"
- #include "avrcp.h"
-+#include "avrcp-parse.h"
- #include "control.h"
- #include "media.h"
- #include "player.h"
-@@ -2614,24 +2615,15 @@ static struct media_item *parse_media_element(struct avrcp *session,
- 	struct avrcp_player *player;
- 	struct media_player *mp;
- 	struct media_item *item;
--	uint16_t namelen, namesize;
--	char name[255];
-+	uint16_t namesize;
-+	char name[NAME_MAX_LEN];
- 	uint64_t uid;
- 	uint8_t count;
- 
--	if (len < 13)
-+	if (!parse_media_element_name(operands, len, name, &namesize))
- 		return NULL;
- 
- 	uid = get_be64(&operands[0]);
--
--	memset(name, 0, sizeof(name));
--	namesize = get_be16(&operands[11]);
--	namelen = MIN(namesize, sizeof(name) - 1);
--	if (namelen > 0) {
--		memcpy(name, &operands[13], namelen);
--		strtoutf8(name, namelen);
--	}
--
- 	count = operands[13 + namesize];
- 
- 	player = session->controller->player;
-@@ -2655,24 +2647,18 @@ static struct media_item *parse_media_folder(struct avrcp *session,
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
- 	struct media_item *item;
--	uint16_t namelen;
--	char name[255];
-+	char name[NAME_MAX_LEN];
- 	uint64_t uid;
- 	uint8_t type;
- 	uint8_t playable;
- 
--	if (len < 12)
-+	if (!parse_media_folder_name(operands, len, name))
- 		return NULL;
- 
- 	uid = get_be64(&operands[0]);
- 	type = operands[8];
- 	playable = operands[9];
- 
--	memset(name, 0, sizeof(name));
--	namelen = MIN(get_be16(&operands[12]), sizeof(name) - 1);
--	if (namelen > 0)
--		memcpy(name, &operands[14], namelen);
--
- 	item = media_player_create_folder(mp, name, type, uid);
- 	if (!item)
- 		return NULL;
--- 
-2.55.0
+--- Comment #2 from IQ (lnxps@bbtex.net) ---
+(In reply to Artem S. Tashkinov from comment #1)
+> This is a really old kernel.
+>=20
+> Please install the latest firmware and try either 7.1.6 or 7.2-rc6.
 
+same thing: tried, 7.2-rc5, nothing shows in lsusb, WIfi works.
+
+Latest firmware installed, it loads for Wifi but BT is not found.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
