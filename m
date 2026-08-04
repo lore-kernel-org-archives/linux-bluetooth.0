@@ -1,119 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34946355F53
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 17:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB4B476693
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 18:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785865547; cv=none; b=hmxc9zkHjcNEK+mAo6XWEgdaxN2Dw3wnm3yKPcz7MINMULGctonLGodFc1mY7x6YB0uffeqitx8n+ZvLHpy9GyYyeGcmtP5u9o9/4W/+kErenDxmCp4wVU8E30fhaKkbJNIxj+mqQAUl94B3ytpaXJ+Sfnqi7hB1TgE4knCr31M=
+	t=1785869487; cv=none; b=BXHVqcoAjm8q01qwqDIDL9/CEJEhsrYsorZerNq27Bf3Zy7b6b7vQ3yrq67ZOr8FFw2YSvqVBLw2kLSANWcPyd8Wt8mxmva5tEgxumG59YE6UpGhJ2YmBke2R0d4XBEiwt6JIdKRrLTvh9HarJ4VLUs26ljxikVd4s5xhJpkjRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785865547; c=relaxed/simple;
-	bh=mICIUew/5ACOFd6hLDzQIeKN4014lI6DwPDQhvTLghs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bVVSZ15EFfjv0y/XH+l0e4ZfjOXJSmb9ppU5kJvc2BYNBLSH/1MZrhHbaUDcNMm/c0v30pvp7dI76+uPk0sxIUGJOvQRhAIPDme6Mjk9ChruMZsCrM+XPfwzoeEibRZcNwqek+iwFy0Olcj1n47Nm/7qS1iuYoqFC5UjkqsW2ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5MSgu0e; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1785869487; c=relaxed/simple;
+	bh=PDBPXEOUxinMQ6xACcIO2cRSMSp4BMqBElCszvKN5vw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tQftvV5F8eYnpxdxVPzbFMDe2/b4IxcicRlpzK+pfKVJecIe6XccWoqglh+2TxWKKUx4Uswyagl2QCAndwwOEdOQKChRTQckahDZO2ar79ZeLI67pw23tVwYhHI43qGkw1aHuSfR8CH5WUotknnM4UDzO1/x3H3/B6DpiyX91Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AcVTskz2; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5MSgu0e"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EA1DC2BCF4
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 17:45:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785865546;
-	bh=mICIUew/5ACOFd6hLDzQIeKN4014lI6DwPDQhvTLghs=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Q5MSgu0eeJzfoSB8Uuwzt5Mb4wxgyDCisO6G8esqtwD6J8NRPUPKGWPyGxC0VGp9x
-	 pX9e+c9YEVJ+evcW3c73gwbrn9wf4ZkiBGBQYR5/AjzwKrTQPB5p6Y7p6HLUkPMK0X
-	 YQmXx9cunjQKz6bjxohoQRvWdZZ/Ksp+ixe7bh9hcdMs/jnDKN7kxj56TjBJHTC1os
-	 MLSgkUjvrK9OJEeSPIoD8X5R0YBysPASE0NbsKSHSlujBT8SfHuCarLzB8eLIf6LHC
-	 QlbP0wVqOPDRJMJJ1KVkhZKtc3czU2ogQwpj9RO4Mj3kS6IaHn2qy8YJoFUrXocyta
-	 6FlHe7OcPJZ6A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6C69EC3279F; Tue,  4 Aug 2026 17:45:46 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AcVTskz2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785869470;
+	bh=pWE7WpCF2rNIjcVnzWMLVbO8Heyg5cLPiGuK7OWn/Jw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=AcVTskz2kH2XxblUfNnv336uwOQ4GZuS1LhflEYuO4chFvoO6PauQmBWb/kKN7Te5
+	 Seh53Z9wgWKM0fWtzLPcIWmnY4tX2UFw1QTfn6YqYDlVlc7KncW+eAEJNsPc+gLzT/
+	 3kO75cvF8X9f2TF1MLWsJoBKzUWxM3CF8Bt+t68w=
+Received: from github.com (hubbernetes-node-d3cca06.va3-iad.github.net [10.48.75.103])
+	by smtp.github.com (Postfix) with ESMTPA id 9BDC0180637
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 11:51:10 -0700 (PDT)
+Date: Tue, 04 Aug 2026 11:51:10 -0700
+From: Bhavani <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221832] MT7925 (Foxcon T99H493.03) BT missing in lsusb on
- Vivobook S16
-Date: Tue, 04 Aug 2026 17:45:46 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lnxps@bbtex.net
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221832-62941-sTv44thfYA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221832-62941@https.bugzilla.kernel.org/>
-References: <bug-221832-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/master/e45128-690c16@github.com>
+Subject: [bluez/bluez] e0d2a5: monitor: Decode Intel DDC LE extended features
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221832
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: e0d2a5bfe1625ab18d88b066953948c0df07b7ae
+      https://github.com/bluez/bluez/commit/e0d2a5bfe1625ab18d88b066953948c0df07b7ae
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-30 (Thu, 30 Jul 2026)
 
---- Comment #6 from IQ (lnxps@bbtex.net) ---
-Firmware loaded:
+  Changed paths:
+    M monitor/intel.c
 
-[ 5246.175029] (NULL device *): Loading firmware from
-/lib/firmware/mediatek/mt7925/WIFI_RAM_CODE_MT7925_1_1.bin
-[ 5246.175030] (NULL device *): Loading firmware from
-/lib/firmware/mediatek/mt7925/WIFI_MT7925_PATCH_MCU_1_1_hdr.bin
-[ 5246.175031] (NULL device *): direct-loading
-mediatek/mt7925/WIFI_MT7925_PATCH_MCU_1_1_hdr.bin
-[ 5246.175032] (NULL device *): direct-loading
-mediatek/mt7925/WIFI_RAM_CODE_MT7925_1_1.bin
-[ 5246.175033] firmware_class: fw_set_page_data:
-fw-mediatek/mt7925/WIFI_RAM_CODE_MT7925_1_1.bin fw_priv=3D0000000041074eba
-data=3D000000009415c47a size=3D1254904
-[ 5246.175036] firmware_class: fw_set_page_data:
-fw-mediatek/mt7925/WIFI_MT7925_PATCH_MCU_1_1_hdr.bin fw_priv=3D00000000e254=
-796b
-data=3D00000000380b1f69 size=3D198112
-[ 5246.175165] (NULL device *): Loaded FW:
-mediatek/mt7925/WIFI_MT7925_PATCH_MCU_1_1_hdr.bin, sha256:
-089dd0252a7eb95feed55950ad0fd9e6f751a07b4cf22273de722b73fa50d49e
-[ 5246.175168] firmware_class: cache_firmware:
-mediatek/mt7925/WIFI_MT7925_PATCH_MCU_1_1_hdr.bin ret=3D0
-[ 5246.175829] (NULL device *): Loaded FW:
-mediatek/mt7925/WIFI_RAM_CODE_MT7925_1_1.bin, sha256:
-7e4ed27d1e9fe21cdefda35a22da32137b2473fada350617fb603489af19346a
-[ 5246.175832] firmware_class: cache_firmware:
-mediatek/mt7925/WIFI_RAM_CODE_MT7925_1_1.bin ret=3D0
-[ 5246.177579] (NULL device *): Loading firmware from
-/lib/firmware/updates/qcom/x1e80100/ASUSTeK/vivobook-s15/qccdsp8380.mbn
-[ 5246.177584] (NULL device *): direct-loading
-qcom/x1e80100/ASUSTeK/vivobook-s15/qccdsp8380.mbn
-[ 5246.177587] firmware_class: fw_set_page_data:
-fw-qcom/x1e80100/ASUSTeK/vivobook-s15/qccdsp8380.mbn fw_priv=3D000000005dd0=
-83df
-data=3D000000005f4d150a size=3D3072424
-[ 5246.179319] firmware_class: __free_fw_priv:
-fw-qcom/x1e80100/ASUSTeK/vivobook-s15/qcadsp8380.mbn fw_priv=3D000000008801=
-1a21
-data=3D0000000000000000 size=3D0
-[ 5246.179325] firmware_class: cache_firmware:
-qcom/x1e80100/ASUSTeK/vivobook-s15/qcadsp8380.mbn ret=3D-2
-[ 5246.179630] (NULL device *): Loaded FW:
-qcom/x1e80100/ASUSTeK/vivobook-s15/qccdsp8380.mbn, sha256:
-f98e3c974026f288994c12d218fafea7e77f03f6def183749a07d8a053a310fd
-[ 5246.179633] firmware_class: cache_firmware:
-qcom/x1e80100/ASUSTeK/vivobook-s15/qccdsp8380.mbn ret=3D0
+  Log Message:
+  -----------
+  monitor: Decode Intel DDC LE extended features
 
---=20
-You may reply to this email to add a comment.
+The Intel DDC Config Write command (0x3f|0x008b) can carry identifier
+0x031f which holds the 248 octet LE extended features array, using the
+same layout as LE Read All Local Features: page 0 is 8 octets followed
+by 10 pages of 24 octets each.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Decode it with the existing LE feature tables instead of dumping raw
+hex, and make the parameter loop stop on truncated/padded entries.
+
+Example, setting only the SCI bits on page 1 (bits 8 and 9):
+
+  hcitool cmd 0x3F 0x008B 0xFA 0x1F 0x03 \
+      0xFF 0xF9 0x01 0x3F 0xBE 0x00 0x00 0x80 \
+      0x00 0x03 0x00 0x00 ... (padding up to 248 octets)
+
+  < HCI Command: Intel DDC Config Write (0x3f|0x008b) plen 251
+          Identifier: 0x031f
+          Features[0/0][8]:
+          ff f9 01 3f be 00 00 80                          ...?....
+            LE Encryption
+            Connection Parameter Request Procedure
+            ...
+            LL Extended Feature Set
+          Features[1/0][8]:
+          00 03 00 00 00 00 00 00                          ........
+            Shorter Connection Intervals
+            Shorter Connection Intervals (Host Support)
+          Features[1/1][8]:
+          00 00 00 00 00 00 00 00                          ........
+          ...
+
+
+  Commit: 690c16df606733626a0a7d6bc2b83a3244d4ced1
+      https://github.com/bluez/bluez/commit/690c16df606733626a0a7d6bc2b83a3244d4ced1
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-08-04 (Tue, 04 Aug 2026)
+
+  Changed paths:
+    M unit/test-rap.c
+
+  Log Message:
+  -----------
+  unit/test-rap: Add PTS tests for CS
+
+RAS/SR/SGGIT/CHA/BV-05-C - Verifies the Ranging Data Ready characteristic
+exists in the GATT database with exactly the Indicate property
+RAS/SR/SGGIT/CHA/BV-06-C - Same characteristic-existence/property check,
+for an IUT configured to support both Indicate and Notify
+RAS/SR/SGGIT/CHA/BV-07-C - Same check, for an IUT supporting Indicate
+and Read on Ranging Data Ready
+RAS/SR/SGGIT/CHA/BV-08-C - Same check, for an IUT supporting all three
+Indicate, Notify, and Read
+RAS/SR/SGGIT/CHA/BV-09-C - Verifies the Ranging Data Overwritten char
+exists with exactly the Indicate
+RAS/SR/SGGIT/CHA/BV-10-C - Same check, for Indicate and Notify support
+RAS/SR/SGGIT/CHA/BV-11-C - Same check, for Indicate and Read support
+RAS/SR/SGGIT/CHA/BV-12-C - Same check, for Indicate, Notify and Read
+support
+
+RAP/REQ/CGGIT/SER/BV-01-C - Verifies the IUT correctly discovers Ranging
+service
+RAP/REQ/CGGIT/CHA/BV-01-C - Verifies the IUT discovers RAS Features
+characteristic and currently identifies Read property
+RAP/REQ/CGGIT/CHA/BV-02-C - Verifies the IUT discovers the Real-time
+Ranging Data characteristic with Notify and Indicate properties
+RAP/REQ/CGGIT/CHA/BV-03-C - Verifies the IUT discovers the On-Demand
+Ranging Data characteristic with Notify and Indicate properties
+RAP/REQ/CGGIT/CHA/BV-04-C - Verifies the IUT discovers the RAS Control
+point characteristic with Write Without Response and Indicate properties
+RAP/REQ/CGGIT/CHA/BV-05-C - Verifies the IUT discovers the Ranging Data
+Ready characteristic with Notify, Indicate, and Read properties
+RAP/REQ/CGGIT/CHA/BV-06-C - Verifies the IUT discovers the Ranging Data
+Overwritten characteristic with Notify, Indicate, and Read properties
+
+
+Compare: https://github.com/bluez/bluez/compare/e45128f029ce...690c16df6067
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
