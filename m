@@ -1,239 +1,231 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EEB479895;
-	Tue,  4 Aug 2026 16:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785861374; cv=none; b=BDURYSHr2N11G75Vq1cYmPsKuEnnh4Xjmt38Ql84PeRL6PXThuMuZ3VlkcsvGmxdeOFlDW7i7nQ+ErLbnGS5frEfv1Jnav/WEztlTyvouy0So2DGT48FVO/oUgY9y4OJm+qGoY2XLMfQE2a8m3dIVg6Ong1xru+1pXQNSV0xZlw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785861374; c=relaxed/simple;
-	bh=1OehUdJ53tVLxlPsRLeAgB9SH2XB7mrQ0auW96D5it8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ts/KeSdY/iMCnaV6BxjeqJonEux9zIeDzuxyXsdPWsaL/WhjbnGRR1j3j9ThanpcZsZ+C2BxjuFstb5NNQBe2XvG/Dbd1DhXtfLptFvH8563lMtDARqMBD02PFmJ2ehpwI/9TTecFJ/g+8l9PqKNAKiGkYJPMH+jFwLzhEbU/FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ku8aZn8d; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F7145C6E0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 16:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785862060; cv=pass; b=szS47Sbn3+rdYSLRa7ws5Ued+A7/QE4VW4tNCD/khTK2i8FBAV5ZmmISqVe55PhTXWUnbRszxFmdV2vTmowQenv9+aqw98kpuN4wYnuj3gWC+stNovMODXuDGu0Jp+sAqjDijuOXU+lU2hcHn+obIlRQjPn4UDzamKxYqSl+sP8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785862060; c=relaxed/simple;
+	bh=/u1M1jHLRXvaVo9JUVSvIZMqtocnq4ZHn9NqjK8qxQY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mdINPbzV9ydRXkTu1okCeJHszrdGqCE7FxpBX9WWqc00G9VwDoD9GOs/cj7q74z43lP4qA5FTVL33fr/ohQb24C1nAlpxXrrcGczjijpPv9aykm2fgSTWa4vaPXB0Mx74n8+0Px2+PmXb78q/EmpAmrxhtW9lYt+ntAWwrvhJ0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SPfoWqvm; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ku8aZn8d"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+phEtP839OmAXTAezANS2diupL0Drcp1+juhMBWBlYs=; b=ku8aZn8dwi2K8skwzigc5WZi+F
-	sGbkZQW9yPiF+Kdu3Yoz5X6M2D7aQZZd+Jpd/rZZjFGCN8At0x2aWiGAoj48JVD+ScNKu4nPi1M2f
-	BcwiziDIYhuAMSRGqJWL+W4WWLYMc86R7t2i4gYkpo8uaSszVtJmDGRTzoCM8TpGqz3rBT8kzz0jU
-	/nZyhx9clYVpEAKCzPLeeDhk6fPubdVM5pQfO3uZjMYurcf74js1uVqUizFWNvXjk21BlIBM8/Kro
-	SmpF9fydW3/wZr5b3xHPGM0rXAVgb+XvpViaXHFoTMjL+fnQgb+V31w0aniIm4wyKVEEPtbrtMCwl
-	jpr+p/Vw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wrI7Q-00000002LWG-0afw;
-	Tue, 04 Aug 2026 16:35:56 +0000
-Date: Tue, 4 Aug 2026 09:35:56 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	daniel@makrotopia.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v9 06/10] block: implement NVMEM provider
-Message-ID: <anIU7FSBT6VMzsf3@infradead.org>
-References: <20260730-block-as-nvmem-v9-0-f72935817dbf@oss.qualcomm.com>
- <20260730-block-as-nvmem-v9-6-f72935817dbf@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SPfoWqvm"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-66843536f94so5573031d50.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Aug 2026 09:47:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785862025; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eby4yqN5FrdKIZav5oZ8yRQCIINmyMsa5KKFGKipivGaZZzgdv0NQA0q2qq7oM5TP7
+         TSfsfyVYGAsUaQbxZk/BvkoXfwbdKj5jzO5JZ21iuqhE6lA4QjdjRu+4Hc2rV81q4ZPh
+         ssiMrmlnl2086+uOFCO4pasJqT34qYqbg38okKenvnJ5NM4ooitcFz3uQb/rnFBEE0ZI
+         37BxhhIG3JzFjctF1kFPAa5jJAaiQr+ZGNOGsyRjzMqSyvORaMBCaPz9Y47LTiQ1+gvi
+         otMS5GneXdzTlNglLbapfUgG7afTta+go0uftULw/UrkAXr5VC/80Go1ttcuJFcvgIAm
+         wG7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vfgKTWxv23+BNgSNAiqVggkSDwjfLWf6qHI2rywJaM4=;
+        fh=ArdDmUQzzfkt7diMa+kfWdd+IJsnjcf7biWiU4/zryA=;
+        b=QxibKGXZIvfS2srNCdbZ6nL8dsNYJ+w1dSC6oyLLTbDsnzz/7v9Miv7RLMNMmtemCW
+         y9XFnP2C73Xz/w5m87buBLzYPL07/mE/FIP0BmaZMjgFJmK8r3jGIy5yCyz6OxUyKww3
+         OgT74xTrGvlOpbmJlK+IQSkospmEErQWi7v5Py/81CopO/G6ffLe/GDF51RokS3u+Ysv
+         rHqbpax0YYKDOijvIRnSXRAwZYSMKcHE2cLQI2WAhg/2tBXJTUmjyz8CHViHe42oQTTH
+         QmcZXLNRjcqGxFdaevWCcwP5QFy2g19+aoRTZpAeCgAkseU6cDKCiSt9F7GpEZltDVJy
+         br8Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785862025; x=1786466825; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vfgKTWxv23+BNgSNAiqVggkSDwjfLWf6qHI2rywJaM4=;
+        b=SPfoWqvmInX0n9IDSA0PHndY4PZTZ3QUjcx75TXU9MjbzBp+phhepiyYOR1qm308Hq
+         KiwNa417KK3ZsSaoeY2u8EqjZYUDp4R5nxWOHgcZxWrdcurkrbBWhd6aNv15akwre9Qh
+         S6B/F6kb84knkli3UZRgKRi1bVRzpwBV78a04oBv+Fhm+b4kjthaOak94q9wheo++aB9
+         mBKPVDNxUPypyvTpu2WIW2FrAKgUUkpmdXVSiiAzrpzDLgAzgEZmxU5RTcasjyaoyx2J
+         sAKkTc3mN9ZYePyfRY/IzpF1UF66hdeM9V6DTeTrhldBAF+l7H2Eij15Iuzgo73kvlEl
+         qa4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785862025; x=1786466825;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vfgKTWxv23+BNgSNAiqVggkSDwjfLWf6qHI2rywJaM4=;
+        b=Dgzbnh9lcWdwna1CUGb8etKld+yUC0nYxV3YdpRzabQZXiPZzHYWU0MlnX7u/Bn2sm
+         LE17qmU7TqR9M6srkM7bEXAkh83YS/wBdIP1sWXx0xEzeE8VYL1GjUrUNs69aFqtxukF
+         eUeVhiENg3RL12PVnlkqcBoN/6UXq6WFG+aS/8vofTUWhDNAY8o8wZFWjGLZxZTdmp/c
+         frRu0kPNS0DtKoomHUUJxH2WFphm0Sdu/zqWtNKePWajZHxhE3yzTLFuE0JdHNurK9xC
+         +sPt4dlgnSRaFoot/Or7wh9t9Cit+AX5B3Mlno3ft8HWiknE5cwI37m/1C+bFNPzq+4g
+         4JSw==
+X-Gm-Message-State: AOJu0YzEuSDniXc8jo8KMHtU1srs+G0gTJK09fJN+rcUN3PZKtVlneAx
+	x1I83aa27QwkPYMCSmSt7Jj/F+T/eplLI+sBd6htAB3JW5F6/915rQbmrlmBN7G/9+8MFLPWKXC
+	TakfjKMu5rouQ/408WZ032s95ZhtruNP6rQ==
+X-Gm-Gg: AR+sD13iKLEl6zjZW26zKTw+wVXmgHHctkz/xHL2bF9sOL+RqKIlDxkYUbtoJyvlPUP
+	CN/suRIHdtYNIHPgVVlQEkvT0gJ1ElX8S/eH7Itvu/ocYzMq9z69zqBr7rLXjYCLsA2Q0kUGlD/
+	ADe+vJB9QBlM8r7opZe9eGzO7OJnsFRjAsi/gvFVktVQhrN2yZsQrkcX3SGmqY6mNtFUxUTCnCd
+	onmWkJs/sCqt37qps0eRgKa7+IsRxRqZVizlgfaPxU6LWvfotqriDq7tedS1HiS3Ap7ZI1KC56x
+	A+vxlVtehitMQBTee6TgIgSSgQoKfonLqMqvRLDWVArPgUTCSRuAIAfnpgURlFrVIi20r/vlSis
+	EU0uGVyZVoEzUllrntoXcfl5WWy7BAMIbHBfQeyVc71A8Sw==
+X-Received: by 2002:a53:b115:0:b0:668:99c8:bf15 with SMTP id
+ 956f58d0204a3-6699a8f6c97mr148197d50.11.1785862025197; Tue, 04 Aug 2026
+ 09:47:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730-block-as-nvmem-v9-6-f72935817dbf@oss.qualcomm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20260804142419.2274153-1-hadess@hadess.net> <20260804142419.2274153-3-hadess@hadess.net>
+In-Reply-To: <20260804142419.2274153-3-hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 4 Aug 2026 12:46:53 -0400
+X-Gm-Features: AUfX_myPsPKDQ5jruA-AfNR8tsNYn1gAa0rxzyDN0X65KBNRAg6Q-SqJ-UTFWzM
+Message-ID: <CABBYNZKoj_jr=msyTAiQ+AcV9Xf4MjCAjvcq0pDf8bWPBoypyQ@mail.gmail.com>
+Subject: Re: [BlueZ, v2 2/3] unit: Adapt poc_*_oob.c test into a new test
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Elman Shahbazov <shahbazovelman97@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 30, 2026 at 06:00:36PM +0200, Loic Poulain wrote:
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
-> 
-> NVMEM is registered for a block device whose OF node describes an NVMEM
-> layout, either via an "nvmem-layout" child or by being a "fixed-layout"
-> node itself (e.g. an eMMC boot partition associated through its mmc-card
-> node).
-> 
-> The NVMEM device is a read-only side channel: the block device stays
-> fully usable, reads are performed with a non-exclusive BLK_OPEN_READ
-> open, and no synchronization is done against concurrent writes to the
-> same region. This is acceptable for the intended use case of write-once,
-> factory-provisioned data.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Hi Bastien,
+
+On Tue, Aug 4, 2026 at 10:31=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
+>
+> Adapt poc_avrcp_oob.c and poc_folder_oob.c into unit tests.
+>
+> Co-authored-by: Elman Shahbazov <shahbazovelman97@gmail.com>
 > ---
->  block/Kconfig             |  11 +++++
->  block/Makefile            |   1 +
->  block/blk-nvmem.c         | 104 ++++++++++++++++++++++++++++++++++++++++++++++
->  block/blk.h               |   8 ++++
->  block/genhd.c             |   4 ++
->  block/partitions/core.c   |   5 +++
->  include/linux/blk_types.h |   4 ++
->  7 files changed, 137 insertions(+)
-> 
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 70e4a66d941ff66ecb0ec34f4f7eff7fd1e4be40..4899ad572c71ffdbb62460d57623216254893ddc 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -209,6 +209,17 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
->  	  by falling back to the kernel crypto API when inline
->  	  encryption hardware is not present.
->  
-> +config BLK_NVMEM
-> +	bool "Block device NVMEM provider"
-> +	depends on OF
-> +	depends on NVMEM
-> +	help
-> +	  Allow block devices (or partitions) to act as NVMEM providers,
-> +	  exposing factory-provisioned data such as MAC addresses or Wi-Fi
-> +	  calibration blobs to the drivers that consume them. This is
-> +	  typically used on embedded devices where such data is stored in a
-> +	  dedicated area of an eMMC, instead of a separate EEPROM or OTP.
+>  Makefile.am           |  9 +++++
+>  unit/test-avrcp-sec.c | 76 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 85 insertions(+)
+>  create mode 100644 unit/test-avrcp-sec.c
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 19c468d3a504..e3baa4155c1f 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -660,6 +660,15 @@ unit_test_avrcp_SOURCES =3D unit/test-avrcp.c \
+>  unit_test_avrcp_LDADD =3D lib/libbluetooth-internal.la \
+>                                 src/libshared-glib.la $(GLIB_LIBS)
+>
+> +unit_tests +=3D unit/test-avrcp-sec
 > +
->  source "block/partitions/Kconfig"
->  
->  config BLK_PM
-> diff --git a/block/Makefile b/block/Makefile
-> index e7bd320e3d6971a8abf584f5de42776bb54e8216..8200297fbcbab304beb4239d0c33da07011c3ed9 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -39,3 +39,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
->  					   blk-crypto-sysfs.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
->  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
-> +obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
-> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+> +unit_test_avrcp_sec_SOURCES =3D unit/test-avrcp-sec.c \
+> +                       profiles/audio/avrcp-parse.c \
+> +                       profiles/audio/avrcp-parse.h \
+> +                       src/log.h src/log.c
+> +unit_test_avrcp_sec_LDADD =3D lib/libbluetooth-internal.la \
+> +                               src/libshared-glib.la $(GLIB_LIBS)
+
+Any reason why this couldn't live inside test-avrcp.c?
+
+>  unit_tests +=3D unit/test-hfp
+>
+>  unit_test_hfp_SOURCES =3D unit/test-hfp.c
+> diff --git a/unit/test-avrcp-sec.c b/unit/test-avrcp-sec.c
 > new file mode 100644
-> index 0000000000000000000000000000000000000000..05bc35b9b8f373ccb606bdca35d211c41d2764fe
+> index 000000000000..a100b2d68e35
 > --- /dev/null
-> +++ b/block/blk-nvmem.c
-> @@ -0,0 +1,104 @@
+> +++ b/unit/test-avrcp-sec.c
+> @@ -0,0 +1,76 @@
 > +// SPDX-License-Identifier: GPL-2.0-or-later
 > +/*
-> + * block device NVMEM provider
 > + *
-> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> + *  BlueZ - Bluetooth protocol stack for Linux
 > + *
-> + * Useful on devices using a whole disk or a partition (e.g. an eMMC boot
-> + * partition) to store MAC addresses, Bluetooth addresses or Wi-Fi
-> + * calibration EEPROM data.
+> + *  Copyright (C) 2026  Red Hat Inc.
 > + *
-> + * The NVMEM device is a side channel onto a block device that stays fully
-> + * usable. This is somewhat mitigated by opening the device exclusively.
+> + *
 > + */
 > +
-> +#include <linux/cleanup.h>
-> +#include <linux/device.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/nvmem-provider.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of.h>
-> +#include <linux/property.h>
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
 > +
-> +#include "blk.h"
+> +#include <glib.h>
 > +
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
-> +			      void *val, size_t bytes)
+> +#include "src/shared/util.h"
+> +#include "src/shared/tester.h"
+> +#include "src/log.h"
+> +
+> +#include "profiles/audio/avrcp-parse.h"
+> +
+> +static void avrcp_element_name_oob(gconstpointer data)
 > +{
-> +	struct block_device *bdev = priv;
-> +	struct file *bdev_file;
-> +	loff_t pos = from;
-> +	ssize_t ret;
+> +       char name[255];
+> +       uint16_t namesize;
+> +       gboolean ret;
 > +
-> +	/* open and prevent other exclusive openers */
-> +	bdev_file = bdev_file_open_by_dev(bdev->bd_dev,
-> +					  BLK_OPEN_READ | BLK_OPEN_EXCL,
-> +					  blk_nvmem_reg_read, NULL);
-> +	if (IS_ERR(bdev_file))
-> +		return PTR_ERR(bdev_file);
+> +       /* Crafting a malicious payload.
+> +        * Actual packet length (len) =3D 14 bytes */
+> +       uint8_t malicious_packet[14] =3D {0};
 > +
-> +	ret = kernel_read(bdev_file, val, bytes, &pos);
-> +	if (ret >= 0 && ret != bytes)
-> +		ret = -EIO;
+> +       /* Specify namesize =3D 1000 (0x03E8 in Big Endian) at offset 11 =
+*/
+> +       malicious_packet[11] =3D 0x03;
+> +       malicious_packet[12] =3D 0xE8;
 > +
-> +	fput(bdev_file);
+> +       /* Launching the PoC. We transmit a 14-byte packet, but namesize=
+=3D1000... */
+> +       ret =3D parse_media_element_name(malicious_packet, sizeof(malicio=
+us_packet),
+> +                                      name, &namesize);
+> +       if (ret)
+> +               tester_test_passed();
+> +       else
+> +               tester_test_failed();
+> +}
 > +
-> +	return ret < 0 ? ret : 0;
+> +static void avrcp_folder_name_oob(gconstpointer data)
+> +{
+> +       char name[255];
+> +       gboolean ret;
+> +
+> +       /* Crafting a malicious payload.
+> +        * Actual packet length (len) =3D 14 bytes */
+> +       uint8_t malicious_packet[14] =3D {0};
+> +
+> +       /* Specify namesize =3D 1000 (0x03E8 in Big Endian) at offset 12 =
+*/
+> +       malicious_packet[12] =3D 0x03;
+> +       malicious_packet[13] =3D 0xE8;
+> +
+> +       /* Launching the PoC. We transmit a 14-byte packet, but namesize=
+=3D1000... */
+> +       ret =3D parse_media_folder_name(malicious_packet, sizeof(maliciou=
+s_packet),
+> +                                     name);
+> +       if (ret)
+> +               tester_test_passed();
+> +       else
+> +               tester_test_failed();
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +       tester_init(&argc, &argv);
+> +
+> +       tester_add("/avrcp-element-name-oob", NULL, NULL, avrcp_element_n=
+ame_oob, NULL);
+> +       tester_add("/avrcp-folder-name-oob", NULL, NULL, avrcp_folder_nam=
+e_oob, NULL);
+> +
+> +       return tester_run();
+> +}
+> --
+> 2.55.0
+>
+>
 
-The error handling here is a bit weird as you seem to handle the
-positive/negative values twice.  What about something like this instead?
 
-	bdev_file = bdev_file_open_by_dev(bdev->bd_dev,
-					  BLK_OPEN_READ | BLK_OPEN_EXCL,
-					  blk_nvmem_reg_read, NULL);
-	if (IS_ERR(bdev_file))
-		return PTR_ERR(bdev_file);
-	ret = kernel_read(bdev_file, val, bytes, &pos);
-	fput(bdev_file);
-
-	if (ret < 0)
-		return ret;
-	if (ret != bytes)
-		return -EIO;
-	return 0;
-
-?
-
-> +	struct device_node *child __free(device_node) =
-> +			of_get_child_by_name(np, "nvmem-layout");
-
-Please avoid the __cleanups stuff as it doesn't interact well with
-the goto basd cleanups usually used in block drivers.
-
-> +	config.id = NVMEM_DEVID_NONE;
-> +	config.dev = dev;
-> +	config.name = dev_name(dev);
-> +	config.owner = THIS_MODULE;
-> +	config.priv = bdev;
-> +	config.reg_read = blk_nvmem_reg_read;
-> +	config.size = bdev_nr_bytes(bdev);
-> +	config.word_size = 1;
-> +	config.stride = 1;
-> +	config.read_only = true;
-> +	config.root_only = true;
-> +	config.ignore_wp = true;
-> +	config.of_node = np;
-
-Maybe initialize all the static information at declaration time
-here?
-
-> +	bdev->bd_nvmem = nvmem;
-
-What guards access to this pointer?
-
+--=20
+Luiz Augusto von Dentz
