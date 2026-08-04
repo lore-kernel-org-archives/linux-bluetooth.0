@@ -1,86 +1,152 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp153-170.sina.com.cn (smtp153-170.sina.com.cn [61.135.153.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A88B2F90C5
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Aug 2026 22:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472E23C5849
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 00:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785796188; cv=none; b=UQa7ca2CuIjO8jgKNRl1AfRwgw7WeWAvMn/jzVGLPq9DrYCuRB+ZLGahNaNJFFHXqavWHnNDdWi5NNdbRjnWVZOPByZcNvg7EtrZk9niVjEBw2tWjIOCj+KjV1p2WrEsrAHKkKK7wYuiLkOQvrEkcUlY7U1wPKT4r567vexo8W4=
+	t=1785804466; cv=none; b=DfzeLeYFMTeRAf761IKUvxg9Gq5Q8CsUsvhAKKSwo94ov8K8jCi+/8F4Ko2FM0BQ1I0bLTKi7stMYX7Gw6dKK+s5t6T6zshUn8lfmYsglkXp8aurzip0HD1BOYeqBDiBvbhjtzgK0YsdfUEhTxleWRXQeTceuD12Gyr/nCdhDVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785796188; c=relaxed/simple;
-	bh=qSaCiYyDEuQQiy0J85tHTk8vq3v94RvaebL7X21bQFg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PKxiDbjHnub8ZdmYhW+42pIcoKgGDyBpNMX5YG/+NbrbqEnpqxl+hhFQXxZSQtooIVuOk1jrfCWPt7pHqhV5nSrIXYZx3Ozc4aWVThzivNINd4MAOrlH8yNAONhRudE+ilFe7nL/bmudT3A5LpAir/NCk13V5gMp3YOM1aYJoiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C196A3EB8D;
-	Mon,  3 Aug 2026 22:29:37 +0000 (UTC)
-Message-ID: <a2f0a4fdec3a761053ae83ee06c51adbe6cec3ff.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 1/1] Add cover art support
-From: Bastien Nocera <hadess@hadess.net>
-To: Jan-Michael Brummer <jan.brummer@tabos.org>, 
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 04 Aug 2026 00:29:37 +0200
-In-Reply-To: <6716CF9D-9856-4371-B55E-FFB8E6914B74@tabos.org>
-References: <20260803195620.255866-1-jan.brummer@tabos.org>
-	 <20260803195620.255866-2-jan.brummer@tabos.org>
-	 <2a1b99854117a6fbde6a7e28a4fb33edf239fe1f.camel@hadess.net>
-	 <6716CF9D-9856-4371-B55E-FFB8E6914B74@tabos.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1785804466; c=relaxed/simple;
+	bh=RwfhE0nCJyyH+f+M4aNiiUP0BZN1S7dVwwq0k3gfi3Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kHJWBikAqADJqEInC7zTDcOfpoVNyNWUMu98/+0/Hk49cVxqFev9i8n5zzz+wk9jf/RPJMHWvLcQwciC+9yJHSjEhxqqHk6CzelW37aipSPzgTgOxa7KzZErY7JY3SgcStt73U2Q/sl302EdcPmfAPyGJq1Q/XIqeLJso0Xwago=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=HWJVNb7j; arc=none smtp.client-ip=61.135.153.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="HWJVNb7j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1785804458;
+	bh=h3MllRhGRAiWTbUMsPUR6tWVm6AVeotBb0BSXJYSd7Q=;
+	h=From:Subject:Date:Message-ID;
+	b=HWJVNb7jX5TuNc8pwvevthknZhiwlz9n6ecOvg/MiDJPGJJ/3d46P1D2dsVQGftDY
+	 nTRxgjLu/Eiuz+7l4XdeWTf+TDq2QeuwRPSKjJNqhHEJoVu4Fxrt3A5iAlyQQpdeXb
+	 iRlPA7sscN4Kjy/pU08Ou9kU9vFmHjw62gxLrmog=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([221.216.154.155])
+	by sina.com (10.54.253.34) with ESMTP
+	id 6A71369D00004D5E; Tue, 4 Aug 2026 08:47:28 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 5350396292118
+X-SMAIL-UIID: 56B45D9821AC4D459F37AE1B4901F390-20260804-084728-1
+From: Hillf Danton <hdanton@sina.com>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	syzbot+e6382a2f53f5fc7453ac@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] Bluetooth: L2CAP: fix race l2cap_sock_cleanup_listen() vs. put_chan
+Date: Tue,  4 Aug 2026 08:47:13 +0800
+Message-ID: <20260804004717.919-1-hdanton@sina.com>
+In-Reply-To: <192fb711930f4f0b7d06266f78d638664e982318.camel@iki.fi>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFkaHFzhFrK4QbdDqwz7nmbEuogDrYZQmJPV46kd+WKHMv/cKcEEP2Ajz+stsjFbxOMy7LYSIl/qqdXQbHkBi60oL++rtheOuUTKHCvVA8Fv60Ab3ElxRRLnG5KL7toBw9sE3huINn8rR8PsvtN+ciqkf9pfsSOU7gVl9c3tE6+SpkyA+7uSZyt2Mv6THZAmwyRVfzukxyB0R1wV3+Gj6bR5G9nXT3IjeZYXepQTtMOvFaWqZjPWLKMwHPL3ujaQWR3BKNRXSp1uD4vV9jZv+1jgc9MHUyL0U0lwk/zXuARS2rVU/3C2ZEaejV5nlu1alpZ4ciDiqw8Qih5qF1jYIUgJIBDdVuwgyOfgQl1HerEFAvtPyPdLDUp4WplBGtyGkmcPWi+TyZwona1KqkLueP7uI888f/SCoPGF1izxqk8cHXwInP6fRXJ69iIM5FiFKgL5ByhsJVy6PXhG7Wa9FpIWH2pBaUQYgtvCeLcmGA8iqoJAA63Z4RflV40A5VBMD50cX62S49VAXkx/f+S4fzhWDxWD3hTOsTsdhMkyZSKlYe3gKBMQJ0FQPrvonLNRr5su3hNVrKHwaXB4eKCw0+fH/B7p+YBJwlBacbJ7Vjdx04FbC6IYGTKdxlwkrsZb2GGdt3Pow7e59DUcW1xUQf3ryy8HPu5x5cNt34Yh8v90g
-X-GND-State: clean
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2026-08-03 at 23:03 +0200, Jan-Michael Brummer wrote:
-> Maybe you have an alternative solution in mind? I'm open to change
-> it.
+On Mon, 03 Aug 2026 19:53:31 +0300 Pauli Virtanen wrote:
+> ma, 2026-08-03 kello 14:13 +0800, Hillf Danton kirjoitti:
+> > On Sun,  2 Aug 2026 15:12:28 +0300 Pauli Virtanen wrote:
+> > > For L2CAP sockets without owning sk->sk_socket, reading
+> > > l2cap_pi(sk)->chan may race against concurrent l2cap_sock_kill() ->
+> > > l2cap_sock_put_chan().  This excludes simultaneous proto_ops callbacks,
+> > > but access in l2cap_sock_cleanup_listen() has unsafe lockless read.
+> > > 
+> > > Fix the race by taking lock_sock() in l2cap_sock_kill() to
+> > > synchronize with l2cap_sock_cleanup_listen().  hold_unless_zero() is not
+> > > needed here, l2cap_pi(sk)->chan owns reference if it is non-NULL.
+> > > 
+> > > Fixes: 0e2c0392b9dc ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()")
+> > > Reported-by: syzbot+e6382a2f53f5fc7453ac@syzkaller.appspotmail.com
+> > > Closes: https://syzkaller.appspot.com/bug?extid=e6382a2f53f5fc7453ac
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > ---
+> > >  include/net/bluetooth/l2cap.h |  5 +++++
+> > >  net/bluetooth/l2cap_sock.c    | 23 +++++++++++++----------
+> > >  2 files changed, 18 insertions(+), 10 deletions(-)
+> > > 
+> > > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > > index ef6ce1c20a4f..3d9a32094347 100644
+> > > --- a/include/net/bluetooth/l2cap.h
+> > > +++ b/include/net/bluetooth/l2cap.h
+> > > @@ -699,7 +699,12 @@ struct l2cap_rx_busy {
+> > >  
+> > >  struct l2cap_pinfo {
+> > >  	struct bt_sock		bt;
+> > > +
+> > > +	/* With owning sk_socket chan may be read without lock, other access
+> > > +	 * should hold lock_sock.
+> > > +	 */
+> > >  	struct l2cap_chan	*chan;
+> > > +
+> > >  	struct list_head	rx_busy;
+> > >  };
+> > >  
+> > > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > > index 735167f73f31..9540617a0e6c 100644
+> > > --- a/net/bluetooth/l2cap_sock.c
+> > > +++ b/net/bluetooth/l2cap_sock.c
+> > > @@ -1312,7 +1312,12 @@ static void l2cap_sock_kill(struct sock *sk)
+> > >  
+> > >  	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+> > >  
+> > > +	/* Take lock to synchronize against access without owning sk->sk_socket,
+> > > +	 * eg. in l2cap_sock_cleanup_listen(). proto_ops etc. don't need lock.
+> > > +	 */
+> > > +	lock_sock(sk);
+> > >  	l2cap_sock_put_chan(sk);
+> > > +	release_sock(sk);
+> > >  
+> > >  	/* Kill poor orphan */
+> > >  	sock_set_flag(sk, SOCK_DEAD);
+> > 
+> > In l2cap_sock_teardown_cb(), sock is only zapped after cleanup including unlink,
+> > so why do you see a linked and zapped sock in l2cap_sock_cleanup_listen()?
+> 
+> l2cap_sock_cleanup_listen() is not a single critical section.
+> 
+> There is the following race:
+> 
+>    [Task 1]                         [Task 2 (hdev->workqueue)]
+>    l2cap_sock_release(parent)       l2cap_disconn_cfm
+>      l2cap_sock_cleanup_listen        l2cap_conn_del
+>        bt_accept_dequeue                l2cap_chan_del
+>          lock_sock(sk)                    l2cap_sock_teardown_cb
+>          bt_accept_unlink
+>            bt_sk(sk)->parent = NULL
+>          release_sock(sk) ----------------> lock_sock(sk)
+>                                             parent = bt_sk(sk)->parent /* == NULL */
+>        lock_sock(sk) <--------------------- release_sock(sk)
+>                                             sock_set_flag(sk, SOCK_ZAPPED)
+>                                         l2cap_sock_close_cb
+>                                           l2cap_sock_kill(sk)
+>                                             l2cap_sock_put_chan
+>        chan = READ l2cap_pi(sk)->chan         l2cap_pi(sk)->chan = NULL
+>        l2cap_chan_hold_unless_zero            l2cap_put_chan(chan)
+>          kref_get_unless_zero(&chan->ref)
+>
+The race window is still open after this work.
 
-I think you might need to extend MPRIS to allow making image data
-available instead of a URL.
-
-This could also help with avoiding, say, gnome-shell having to make
-https calls to fetch a remote cover, or third-party playback control
-apps having to cross apps boundaries to get to another sandbox app's
-cover art.
-
-Maybe this new feature is what we want?
-https://gitlab.freedesktop.org/mpris/mpris-spec/-/merge_requests/4
-
-I looked through the MPRIS repo after writing the above.
-
-Cheers
-
-> Am 3. August 2026 22:56:39 MESZ schrieb Bastien Nocera
-> <hadess@hadess.net>:
-> > Hey,
-> >=20
-> > On Mon, 2026-08-03 at 21:55 +0200, Jan-Michael wrote:
-> > > =C2=A0# Filesystem lockdown
-> > > -ProtectHome=3Dtrue
-> > > +# Cover art referenced by MediaPlayer1 metadata (mpris:artUrl)
-> > > usually
-> > > +# lives in the user's home directory (e.g. ~/.cache of the
-> > > player),
-> > > so
-> > > +# bluetoothd needs read access to serve it via the AVRCP BIP
-> > > responder.
-> > > +ProtectHome=3Dread-only
-> > >=20
-> >=20
-> > This is going to be a show-stopper.
-> >=20
-> > Having a root-running daemon rummaging around in user's files is
-> > not
-> > something we want *at all*.
-> >=20
-> > Cheers
+					     release_sock(sk)
+                                             sock_set_flag(sk, SOCK_ZAPPED)
+                                         l2cap_sock_close_cb
+                                           l2cap_sock_kill(sk)
+                                             l2cap_sock_put_chan
+					       l2cap_pi(sk)->chan = NULL
+					       l2cap_put_chan(chan)
+					     sock_set_flag(sk, SOCK_DEAD);
+					     sock_put(sk); // free sk
+        lock_sock(sk) // uaf
+        chan = READ l2cap_pi(sk)->chan
+        l2cap_chan_hold_unless_zero
