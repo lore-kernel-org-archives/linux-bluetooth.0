@@ -1,149 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BBC35950
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 15:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231C33515C9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 15:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785857017; cv=none; b=hv4cwbaAQszUefqF1cpOTnlDOn5dOl6p3p7mXCpdakvdi3qon2hwZ+L60cwkXLBRe/PnjTc81IctsdkVeUMebaCYuL8QjOWwSqgIgQ6ZdQZ+97BTgGmGIL4di7TdBZ+2Hy4ONIOhPwghawXRZ6wCxJzmJ8XScnzGZMPKulKuils=
+	t=1785857910; cv=none; b=m+MPE9IcIpLHbwYC9yxThlJsi2UCxQSPOkPbW+ddxxZCVqtTBe50dQJ915CTTT2nuLrpMRULq8QspuiuuF4QetQ0di2gulr/rbgxoBz1oQUdkL9n8mQ/AXNRB89P/Zo69qi6rJ8D3qp6rTfzkXkMVoOMQZP1Q9v2L61Vra1d2FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785857017; c=relaxed/simple;
-	bh=rh3J9i/fvRtRH4Oc3zsJQiXI+6w5T5KJdvaAehDwYvM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Zoox2i28vGgrqvFbRpisvP2o2BWiqiN3fWmY6wOKCsKvDuDXwVg3oVmH7xdhefAyJdQkgrxqRmhrpbTXEt5facWYHntMNjPr0VYeJc2hIySNcc/50EHH2Y3HEXKCXHdjhnwVqJaraeYnEr+JjEKGgI5UiYCipsYieYCCcQU6V3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j6WY4WfM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1785857910; c=relaxed/simple;
+	bh=50du/WgdOibErB7BtRZpe2lscFFuEIxWHxVUXMGS5x4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OBVsOFADFsrjCLc0Z4tTNwAsi9Ztw8E/7vwEjLgCPR0sfFNgCO91O8fVhkEQQ5q8ve2l8mxrx0Sledsm33SAirCl5dUKZo6m55xmcjG8lVl20LDu/dmbuZ0kD2T2B6vIjPz7Mx74BYaZjqOaM/xmDk7oFsfhhl1LMt3RKFFFGeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cca5z4JP; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j6WY4WfM"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2333BC2BCFA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 15:23:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785857017;
-	bh=rh3J9i/fvRtRH4Oc3zsJQiXI+6w5T5KJdvaAehDwYvM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=j6WY4WfMaLLUvXVuyhCZvzdm3viGRTYcfy/mi6FJPv2gPo2AVX4OHUMkOjm/z1t/D
-	 FmS1r9BhHihlmG6HfQeXk67kPLm76TIe1Bd11x39DKbpuz6NHyE/qELPATmEaq/QyI
-	 4iO09yR+WygME68i9wT17+RT857sZy4HC2iz064Dh+aUQ5lvuVo5mEk3q5ZKo7i7Jw
-	 y4oV5q7okUR/yq8CzojSDOnDsuYAtxtYm+7e0mgzHHkAfxzVdiHvV+K+5Slpb1vThd
-	 HIbI/i8y6Zb9GHyCnTvkYvZY/8+nSLbyqkejtwr1fBy1SMb2rcO/niCNrHscKFrh9K
-	 WXYtsvveoR7Lw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 046D4C3279F; Tue,  4 Aug 2026 15:23:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cca5z4JP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785857908;
+	bh=Qwatb5NHt8AaWb7laZFvZJwdVg80ZQgoyeTZqhB2Rt0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=cca5z4JPPTgQTI0Bd0LvEhIQ5cBYZ9TxUwT3uSzRicfyqBbhou/Lwgd8YyPMQoGYw
+	 t73fojm3vTVl2dxNTKfo2pkzm2tbgEh967xUQxBqqwdPoAghKmjR6kDwFT1IPcn1fk
+	 Y50d92gfQWvn/nUW5TRDQ9PzQKZhZeNLLFBN4OEU=
+Received: from github.com (hubbernetes-node-7c6ceb9.ash1-iad.github.net [10.56.196.48])
+	by smtp.github.com (Postfix) with ESMTPA id 292C152073D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 08:38:28 -0700 (PDT)
+Date: Tue, 04 Aug 2026 08:38:28 -0700
+From: Elman Shahbazov <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221754] RTL8852BE Bluetooth (0bda:b853) fails to init: Opcode
- 0xfcf0 failed: -16, hci0 never registers with mgmt (BD Address
- 00:00:00:00:00:00)
-Date: Tue, 04 Aug 2026 15:23:36 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: serge.brun@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: ANSWERED
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-221754-62941-LVZ0eCjtrm@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221754-62941@https.bugzilla.kernel.org/>
-References: <bug-221754-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/1140181/000000-7cfdc4@github.com>
+Subject: [bluez/bluez] 4c9e8e: avrcp: Split off name parsing from
+ parse_*_element()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221754
+  Branch: refs/heads/1140181
+  Home:   https://github.com/bluez/bluez
+  Commit: 4c9e8e655c8ca1e7bf762f2ef01c991a33edb2c6
+      https://github.com/bluez/bluez/commit/4c9e8e655c8ca1e7bf762f2ef01c991a33edb2c6
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-04 (Tue, 04 Aug 2026)
 
-serge.brun@gmail.com changed:
+  Changed paths:
+    M Makefile.plugins
+    A profiles/audio/avrcp-parse.c
+    A profiles/audio/avrcp-parse.h
+    M profiles/audio/avrcp.c
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |ANSWERED
+  Log Message:
+  -----------
+  avrcp: Split off name parsing from parse_*_element()
 
---- Comment #6 from serge.brun@gmail.com ---
-Update: this is fixed, and Adam's case is very likely the same root cause.
+This will allow us to use the name extraction code in
+parse_media_element() and parse_folder_element() separately, such
+as in tests.
 
-mihaits' repo (https://github.com/mihaits/rtl8852bd-bt-linux) nailed it. The
-actual problem was never the Opcode 0xfcf0 failure we were all chasing =E2=
-=80=94 that
-turned out to be a red herring. The real issue: this specific silicon cut
-(rom_version=3D3, aka "RTL8852BD") needs a firmware patch at "eco 4", and
-linux-firmware's rtl8852bu_fw.bin only ships eco 1/2 for this chip. It's a
-missing-firmware-content problem, not a driver bug =E2=80=94 no amount of d=
-river
-reloading, address reassignment, or rebuilding btusb was ever going to fix =
-it,
-since the firmware needed was never there to load in the first place.
 
-The fix extracts the eco-4 firmware from the Windows Bluetooth driver packa=
-ge
-(proprietary Realtek code, not redistributable, so each user has to pull it
-from their own vendor's driver download) and feeds it to a patched btrtl th=
-at
-knows how to apply it correctly =E2=80=94 apparently the tricky part is tha=
-t a specific
-memory pointer (0x801200cc) has to be set before streaming the firmware
-fragments, or they silently land in the wrong place and the patch never
-launches even though every command still reports success.
+  Commit: 22040db70404cb38f7ba3f879fdb56eb9eb0bc4d
+      https://github.com/bluez/bluez/commit/22040db70404cb38f7ba3f879fdb56eb9eb0bc4d
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-04 (Tue, 04 Aug 2026)
 
-What I did:
+  Changed paths:
+    M Makefile.am
+    A unit/test-avrcp-sec.c
 
-  $ git clone https://github.com/mihaits/rtl8852bd-bt-linux
-  $ cd rtl8852bd-bt-linux
-  $ sudo ./install.sh ~/Downloads/<lenovo-bluetooth-driver>.exe
+  Log Message:
+  -----------
+  unit: Adapt poc_*_oob.c test into a new test
 
-(Bluetooth driver .exe pulled from Lenovo's support site for my exact model=
- =E2=80=94
-support.lenovo.com > IdeaPad Pro 5 14AGP11 > Drivers & Software > Bluetooth
-[https://support.lenovo.com/ca/en/downloads/DS579027])
+Adapt poc_avrcp_oob.c and poc_folder_oob.c into unit tests.
 
-Result:
+Co-authored-by: Elman Shahbazov <shahbazovelman97@gmail.com>
 
-  $ hciconfig hci0
-  hci0:  Type: Primary  Bus: USB
-         BD Address: 14:B5:CD:7D:92:86  ACL MTU: 1021:6  SCO MTU: 255:12
-         UP RUNNING
 
-  $ sudo hcitool -i hci0 cmd 0x04 0x01
-  ... fw 0x3C91950E (patched), HCI 5.4
+  Commit: 7cfdc42e76c6ac511b0207230f413d5e04599b96
+      https://github.com/bluez/bluez/commit/7cfdc42e76c6ac511b0207230f413d5e04599b96
+  Author: Elman Shahbazov <shahbazovelman97@gmail.com>
+  Date:   2026-08-04 (Tue, 04 Aug 2026)
 
-Bluetooth is fully working now =E2=80=94 paired and streaming audio to head=
-phones
-without issue, survives a reboot.
+  Changed paths:
+    M profiles/audio/avrcp-parse.c
 
-Jeremy =E2=80=94 really appreciate you staying engaged on this even once it=
- became
-clear the fix wasn't going to be a Makefile/id_table change. Given this tur=
-ned
-out to be a firmware-content gap rather than something fixable in btusb.c, =
-it
-might be worth linking mihaits' repo from bluetooth-7.0's README for anyone
-who lands there first with a rom_version=3D3 8852BE =E2=80=94 could save th=
-e next person
-a lot of the loop we all just went through.
+  Log Message:
+  -----------
+  avrcp: Fix Out-of-Bounds Read in AVRCP GetFolderItems parsing
 
-Adam (comment #2) =E2=80=94 worth checking `dmesg | grep -i "RTL: rom_versi=
-on"` on
-your machine; if I read your comment correctly it also reports version=3D3,=
- so
-this should fix yours too.
+Co-Authored-by: Bastien Nocera <hadess@hadess.net>
 
-Thanks all & Claude =E2=80=94 closing this out as resolved on my end.
 
---=20
-You may reply to this email to add a comment.
+Compare: https://github.com/bluez/bluez/compare/4c9e8e655c8c%5E...7cfdc42e76c6
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
