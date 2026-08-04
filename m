@@ -1,202 +1,74 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602933D9558
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 17:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785864299; cv=pass; b=owmmqN09TrALqCEWqghFUHIVBFTPdjiRdsfrBh4fFbHngL4HuwHAFExBAb6QoIk1uO5adk/JvxuAU8xHkGAQVJD19p17uQVDozSntsRvCy/TaGtSieaXyfuaxEcy5IBF3EViUjxtf4K1d4eenKHkubcwaEIDr3ThcyzovQafELs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785864299; c=relaxed/simple;
-	bh=8oq58Kw3e1RY5V+nPTqZEO2efIz4sFxYjBLsUf8jM28=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HRxmuw3xnmq9Xb1NfpABiW17cbtn+isJKMqWkkLpzSSn/LMhHabwU/4k6pgWz5R8S/G6LQwUMQ1xh+6zJUzmzAIaK07nB2tj6M3tQRg2xk35GxZ83bVpFxm1iWW0rHWViTChRLbCLu+6sRmjuuq3mw7JkET3z+1q/FE5PAZ45Dc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctNgKf42; arc=pass smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6AE486E7D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 17:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785864646; cv=none; b=OwE3V3gKCLfaZRx2KOb9KapkB5i/wGrmKz3qihF+wjVjiMrg/ub3q/uQAIkvrurkD+fFj5Ktatjehwp/ES7NOoZWQlZamIbNasPnXg98+kELM6P+o/Mh5XSJzeiR4ocS3dGalOTbETOZyUcDg6tX7cgZSbwG4WFC0qO5PRvw8kw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785864646; c=relaxed/simple;
+	bh=/UkJ5y3ku+5FUjIb1WsG3Eg716dSHP25KdIszQyzuL0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=P0Mv7HAcHa1w2d2MCH9MLmbkI0ayZbqMGkBo++WSaFYn+bQjVB8hn5AQi/Wypfim663eNMADWPjPUfZakj0bVnqPAxS2awrg0rOQ6g7BDmXDI/ctaseJzLmAWA+DdiiKw343b7FG1jyhY5QhC8F+TjvfbdpcMy6DPANpsC5fehM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBmJmEIK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctNgKf42"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-6680ae2031fso8227d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Aug 2026 10:24:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785864295; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SrhAGI4Nrp6upSVLMjfQnMqMaVHp8ZhbwBZDqiKSRsFeyGM4+WHPyaKIrhy7b9S4/c
-         sMtiJ1YLIUt/NVye9kOZujZo9CHOmRHlwr+BvXTZ+nla1807Mev9UR95twu+S5dtoIYD
-         BoBVfaHjsI78Eqdi9Qc4jtIQq97/aZ74GRZ3fAzU2RljFKakj+G7P8vA3Hoy+OqzcV9m
-         QY2D1CUrAKrHLQtmO0W9HqSSccP/pIzf++fMNIsf9Q5xh3x7F/H7Mim6AQxTh0zNoIWz
-         g+QUgt4j7WHCkE2tk4ovZrYD5V/1l97Zf54lh5Xm8A/RcUcbcTSo4slFuZHjI7EONXNA
-         dpyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YCJrQoTfml5uDAW7GHqOcLpcahzFZHSJyluVSUxfSYM=;
-        fh=fHcfxdJCBGnevrig1mfvrgHnJ0EwkobW6eG71zTUs9k=;
-        b=E0UgmkenoRhdQmkf3GCcVcjpzIMewegD3AhTgZJ7mdedAJm5kDDZ2Y9E727Dg4A3Kg
-         Db8cIhua2Lm54BU1orY5jF40OVdUKGqq6Up3b3OU8p/Ty+m/DPr15JQx7gh2ZnNDUF0a
-         7uFzeAWhLFQMZMtyJV7FnA6CxomY7UP+sxAAbHtOI+sPXaFYSwcnGnte8oqP8aTyzw5y
-         gAun6z71jVuGy3W8AvLT6f6uHYWlYyWzzJtzjwGqgKs9o19gRCEaJsRxujwvQl3EYN3q
-         JKGb6bNiROeZ2OfVwKu7Aqw75IrvdMo69Qe/u57f3jlxqWAPgewugXdIeVTyde6Ii6Q5
-         rMyw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785864295; x=1786469095; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=YCJrQoTfml5uDAW7GHqOcLpcahzFZHSJyluVSUxfSYM=;
-        b=ctNgKf4209RDSHk/UydzBmiasH0cWOIG1oI+AbgEB2ojKBh68rsm8ZeYWfvvFnFhkq
-         Ti+nkg2gw4X+L9rG5jdNJy8MdMwAHKi+p0gxBNkmKLuqPMfaYV9LU9/+ozXej3X42e2z
-         1VNx2iHmQxXbZWKIcT45etZa9Q+I+Mm2BPHV73U6Yr7fUFIA7+MbvorkYoeHkgZ7ahEn
-         n1SCSBGV2kf5zB7wR7fqmFDZtAf24e5oNWv3o2M2F/FLwv2UC41g817zONaY/xAwX/lh
-         5Ta3gZVXJ5nr7M6xdZYDgOwdu1GGYXvSAloXV4cBIpIpM/dLoKHJmj14gER8B8mQMLY9
-         bBMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785864295; x=1786469095;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YCJrQoTfml5uDAW7GHqOcLpcahzFZHSJyluVSUxfSYM=;
-        b=kXYcAmYWxdYialIfs2CErbWxqVUMxfkYKLdHAS+JVoVnDOy5AUFUhZxyGH5iczxYLD
-         72wALBpLJf/c87l5imSM3zs5VFxB/1gDKgv9FmsHSdPk2+JRUAscoR3VavoYP33b48B6
-         Ko47+WGtbAnx6+2etXtr1UGEGJFmvqbjCVTBLMK1TTEBTGSBGBKvmfkClNuTt+5alnt6
-         T0AG7N+DiBfoBBw11TnLEX2NF7Ck9nAFwSt+TYeHUvi5fl38AQ7DddFVlZ7eC3JgzDOm
-         9zSjjla+e8DCcjNdQPP9piXjQsW/tx6/2tGzV/XhZkfnr3Z2LaenZwpQh+520wYTHg+G
-         4slQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoCNqOfnppz/KQ/4gc3bzYzuW7n9Hw6RpOj5JpqTxuP3eeuZ0Hnvw6GBZZ2PWKp8+Wk96f3kTkTTiy9OlpWQjc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFIVZvcrG67/I9KuTEZmiwzR+t170bbkUMNDsIhFgJQhgHqM1W
-	etS60yfdFq8O+T6wTCiZBqvVCcfAUxAcjFhy+Qj7sjOi9IT6ol/Nkf+VYk14WttdCOwzr0Q99k6
-	V8i56tq+wx2LlDbyMJSsI9dYvlULqkls=
-X-Gm-Gg: AR+sD12Cadl6SnBaU6csOntM2Xt+jUxTkfSfmg/84NGMnavkzdCjNJOhVYqqxv7hXvk
-	q2OlKxWkjG4zKeUFRpgL169hAuKpJ1LzZ0mpi1A3PF3HhzvACwwFymFy59Q/R9Og7/n0oFEjxas
-	vPRNsqmVtZ/cPvR11ZVyJ6JbzYgpS/lrheZiNR3abA1RNisnShcgcka6AyctMQSB7GpPDLTi6X/
-	D+Y8CDUVSckh56qX8WMjS3DZX/zXzbjdAbFBqiR7/VPSGQ9YRqdavvn43WGXwtpUdt6GtGthYHx
-	QyRYotMJsmsF7EvLLTd/G2uIFL45S9ZlxadXVlT6yXOrBzWJH/wHMoPXckumqmH3Y97x5tZGXaT
-	BdZbF6IBsO8Cg4oQderIFrCeutglbwn8mhdU=
-X-Received: by 2002:a05:690e:4410:b0:664:ddca:8183 with SMTP id
- 956f58d0204a3-6699abb1fe5mr202165d50.52.1785864295244; Tue, 04 Aug 2026
- 10:24:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBmJmEIK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D26961F00A3A;
+	Tue,  4 Aug 2026 17:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785864644;
+	bh=d0GvOfBycdBnAfLyTjna5yoaiVRQFb2E33hJvyc3Lv0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=WBmJmEIK2tlK+RgDbKpHBDmBJbqDAwQ90/PaW4ocbd+6QGWw4c4LC75dNSS5zxHb0
+	 p4ShzixGObA/U6Q94l7HnISHtKRjk4fyYEqGRUWa9tGGWAThvI/QRgu1zAzjJVxuRK
+	 NFlVJUsvnauCQFkinjcuPon/POSKR/gaCD71l9mteddl41f6QTny5aKXaBr6wT8h/L
+	 IgbqP+zryLCOP0851zXPFR7jbgzzpKLcRqbrMt5+C7W68V9v2MC1XWlLqxF1UsuQ8A
+	 FGv9S3heLdn8tQoqxzAQ1MDYCozPjfdaZ1eHCOWYN9P20zS4ACppTGvQRquTn+WpG4
+	 XknzGVOXQ7ByA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9390B392626C;
+	Tue,  4 Aug 2026 17:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260804-qca_logs_enable-v2-1-587d584ef4c2@oss.qualcomm.com>
-In-Reply-To: <20260804-qca_logs_enable-v2-1-587d584ef4c2@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 4 Aug 2026 13:24:44 -0400
-X-Gm-Features: AUfX_mxFhsqcpcjDD-uOrczblhUYQso4LgYYmrMNRKyCjeNfybAAYqJkcTz8CTo
-Message-ID: <CABBYNZJjM6P_+-mGL3SewuHRdeKBU8_RHomZNy-8L6JtOaXfbA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: qca: Allow capturing QCA debug logs in
- snoop logs
-To: Dishank Garg <dishank.garg@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
-	rahul.samana@oss.qualcomm.com, harshitha.reddy@oss.qualcomm.com, 
-	yepuri.siddu@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] monitor: Decode Intel DDC LE extended features
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178586460514.3699428.9244650513396028338.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Aug 2026 17:30:05 +0000
+References: <20260730175135.2865308-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260730175135.2865308-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Hi Dishank,
+Hello:
 
-On Tue, Aug 4, 2026 at 1:20=E2=80=AFAM Dishank Garg
-<dishank.garg@oss.qualcomm.com> wrote:
->
-> Add a debugfs flag to forward QCA diagnostic ACL packets as regular
-> ACL data, enabling their capture in Bluetooth snoop logs.
->
-> Signed-off-by: Dishank Garg <dishank.garg@oss.qualcomm.com>
-> ---
-> This series adds support for capturing QCA controller debug/diagnostic
-> logs in Bluetooth snoop logs. Currently, ACL packets carrying QCA
-> diagnostic data are intercepted and routed to the diagnostic layer via
-> hci_recv_diag(), which means they never show up in snoop captures.
-> This makes it hard to correlate QCA debug logs with the surrounding
-> HCI/ACL traffic when debugging issues, since the two have to be
-> captured and aligned separately.
->
-> The series adds a new debugfs knob, diag_as_acl, under the hci_qca
-> debugfs directory. When enabled, diagnostic ACL packets are forwarded
-> through the normal ACL receive path instead of being diverted to the
-> diagnostic layer, so they get captured in the standard Bluetooth snoop
-> log alongside all other traffic.
-> ---
-> Changes in v2:
-> - EDITME: describe what is new in this series revision.
-> - EDITME: use bulletpoints and terse descriptions.
-> - Link to v1: https://patch.msgid.link/20260804-qca_logs_enable-v1-1-4e20=
-9447da0e@oss.qualcomm.com
-> ---
->  drivers/bluetooth/hci_qca.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 1222f97800f4..6996966319e8 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -182,6 +182,7 @@ struct qca_data {
->         u64 rx_votes_on;
->         u64 tx_votes_off;
->         u64 rx_votes_off;
-> +       bool diag_as_acl;
->         u64 votes_on;
->         u64 votes_off;
->  };
-> @@ -698,6 +699,7 @@ static void qca_debugfs_init(struct hci_dev *hdev)
->         debugfs_create_u32("wake_retrans", mode, ibs_dir, &qca->wake_retr=
-ans);
->         debugfs_create_u32("tx_idle_delay", mode, ibs_dir,
->                            &qca->tx_idle_delay);
-> +       debugfs_create_bool("diag_as_acl", 0644, hdev->debugfs, &qca->dia=
-g_as_acl);
->  }
->
->  /* Flush protocol data */
-> @@ -998,12 +1000,14 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, =
-struct sk_buff *skb)
->
->  static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
->  {
-> +       struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> +       struct qca_data *qca =3D hu->priv;
->         /* We receive debug logs from chip as an ACL packets.
->          * Instead of sending the data to ACL to decode the
->          * received data, we are pushing them to the above layers
->          * as a diagnostic packet.
->          */
-> -       if (get_unaligned_le16(skb->data) =3D=3D QCA_DEBUG_HANDLE)
-> +       if (!READ_ONCE(qca->diag_as_acl) && get_unaligned_le16(skb->data)=
- =3D=3D QCA_DEBUG_HANDLE)
->                 return hci_recv_diag(hdev, skb);
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-This is going backwards, we don't want to process the debug handles,
-that is probably not using L2CAP, etc, so falling back to
-hci_recv_frame is a bad idea like captured by sashiko:
+On Thu, 30 Jul 2026 13:51:35 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> The Intel DDC Config Write command (0x3f|0x008b) can carry identifier
+> 0x031f which holds the 248 octet LE extended features array, using the
+> same layout as LE Read All Local Features: page 0 is 8 octets followed
+> by 10 pages of 24 octets each.
+> 
+> [...]
 
-https://sashiko.dev/#/patchset/20260804-qca_logs_enable-v2-1-587d584ef4c2%4=
-0oss.qualcomm.com
+Here is the summary with links:
+  - [BlueZ,v1] monitor: Decode Intel DDC LE extended features
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e0d2a5bfe162
 
-Btw, the likes of hci_send_to_monitor do have support for
-HCI_DIAG_PKT, so btmon don't have any problem decoding it, so either
-you don't know what you are talking about or you are using a tool that
-don't undertand vendor diagnostic monitor events (HCI_MON_VENDOR_DIAG)
-see https://github.com/bluez/bluez/blob/master/doc/btsnoop-protocol.rst.
-
->
->         return hci_recv_frame(hdev, skb);
->
-> ---
-> base-commit: f5a7e2ae5f0a9a5caf59501457938eeb249a7dc8
-> change-id: 20260803-qca_logs_enable-9b8197aaac09
->
-> Best regards,
-> --
-> Dishank Garg <dishank.garg@oss.qualcomm.com>
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
