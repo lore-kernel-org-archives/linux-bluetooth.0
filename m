@@ -1,95 +1,178 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD16A330B0B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2026 05:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785821777; cv=none; b=eCN+QiUFQdZhSi/bcGoJsJl36XyISCtLzofC4EY+fqDdDvWu9+19hQVU7uBBjzYWnFTCl1cGAA+1/JhGWlXz4XFghMkKVx29r8qEaU27XAc9A3/pWMmAn9vBLHn3vHeO1V/+1ly6cHYF9cTpED9/KWOxK9UfncfCDZ0mIqh1ePo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785821777; c=relaxed/simple;
-	bh=uUVoKRdDlnx2bbN6z4zltsxVi/aVw1j//qSChX3LVLg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i/NujaZh8c5e9X4aOXbrrFZbwUwxQHzoPVWv+hJOAf3A43mLITfGQ9+gCbMTeMLs+J9/9iJUDH+i/sPA02M7Fr7gp8BG9/iRHz7aBssesZM5SzyqYkOiXGa3C/x5bbZeZLsghTIauJsDQ8HhQVGG+m7nWYyrY7ooOrUBjqsCv9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3bEgGfF; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B16F2DCC05;
+	Tue,  4 Aug 2026 05:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785822030; cv=pass; b=Jx4tcxbYpj+ptX3I3ZmjmTUkJMckmMlBoGMFUgERCMFH1UR5anzO0PQ6a/gzXl9YWCsCinvr+jiEOD/f+S/O83qgh1npFOOO6+0auTKfPEF2AuDGO34L6PPaRFQeozaBSgaJuGBw1iIBI+Qmn/+Dy3IegiecIhc15AIWFhBkTFI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785822030; c=relaxed/simple;
+	bh=B7xWFAK91pYYaVg6yfQM4qX8/FSIQmzZ8LsFS0aXIeU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GMowJec9JKYt4ZZLdLje/Kvkgq4isvnHgQhEWQS5FxEAIez7eWaEUNin0SlA0hRSUZXO/NHhFHfZpwgSssjZH0ZIpCd8U/FQZpkcXr1PAWZTBjw2DkgzrmmvaT14g6kXnzhVwtml2eBglgRHoWvzEv04SJCzVEV23+krozV9/rk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Df++zpjG; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3bEgGfF"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4954dff6536so19203915e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Aug 2026 22:36:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785821774; x=1786426574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=uUVoKRdDlnx2bbN6z4zltsxVi/aVw1j//qSChX3LVLg=;
-        b=O3bEgGfFh7uKNeCd/IEzoSNvyLoAx6qPZGu6A0UOD8B7Ftc3H2bfAWCeBlbdoIJvc3
-         FREu78sTQD1dkdke1jpcKdnf/zKd7068+PJiSj5WhqdSsoHz9L4XYFEmVkWPNDieVdBm
-         tr7eW995LRSwf+wwBNYUb50y+rNQcroVKdfsCU0pS5VQl3HFeiXDk8OVs/HP9kHCwEoX
-         r0JHl5PRJIvzVhFxDp/LrKZ3PX3yrm5wn7AI6C+QkkVr/9D5gzOsgQWNLBy3EXxNpIU4
-         Q+5yHmRR/zG+trodQF+nu+k/7YZDsSF8jIoD9kQ40PdmN/IyCWeeMfglkfd+KZKdnAl1
-         AILA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785821774; x=1786426574;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=uUVoKRdDlnx2bbN6z4zltsxVi/aVw1j//qSChX3LVLg=;
-        b=Q3pkMvGy1lszzZ9+eWFq3yB1x+kzZq1BE/mFXRQI0J/O/azTx/h1NfG9dWh0w88khY
-         7L6N9UhqQcZA/05CjpzO0yDv/FzZa/8AKhQdj/H3fnQE74z+kqORTiCIZJzHsc6yVFR6
-         ZrFNwK2LhAAfP2uo5ABvVzT71ljdz30cs5tlWBv4QRNHU7CeYXM7+MM7ntlEmr+fIV6D
-         lJvNKzWKvIK4ZlQlVpTI4OaQxCot53ebAwUI7Qm64FZkDJnJg2dD/TkWxW05W5Xya/7m
-         Il/FdFoFk78KmOaYyk2Y2yHw7aQ+hGLUD3ib/NhEvKCqcp0lmD08EKQ6LT5Un7bEC9Y7
-         RzTA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro54mIhgYCNJKWTD4JsJyPsF6HXOLQuXI/jnyhCF5j96+ufav7I2TQK2Eq1LExn07c3OTH2yd1YxSO6ORbRAqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9S0vJvGTullbWwLi3+mQB95LF2LsnBtUYCQ45PO8h3PdYpFxZ
-	AgqnmY2UL3mjbEKk4tQAg4a2oa15lkYl+F1MqDsN3sLBOT4kaSIBEYAc
-X-Gm-Gg: AR+sD11gpVinym191quRpJXcm4SIRHYGlNcpgYT3unksDFMuFFV5la2wJOlz7DtZNKj
-	+jlIlE8giNvEjef3F22VD4VRv3DRvKqtUv0E2lY9rDgzNZu5kPz649pyYcrv9nologeFyYHNUkK
-	Xkvgx2Z0445FD8qFDbTBzrV8RTKT46e0VrjyJRaGlFuAd4WgxS8cEZXZpmJVVKIeVZFDc98ZwFI
-	6n+BxQEjosie05t7hLDgYfcu5WqYm/YHw+og7JPd/uhr6qYHV8iQ7Y9F81m1hBflIVG31BSfbr2
-	0Gu4+RJW9vRZqDKtX3cx0M1NTYWvO+Y4XUS9Q4cqwXjqKf8HPspdHsXf/z4EeaYy8cDAWsdCsqm
-	3vKkuS5d7Z9mI9ftJxtMcBbwWM5Ays+46O5btPGK32PTOPHdcEM9OP72J89lRoW9jJ6azzd1eHb
-	RpAaXhPqqiUgK1V7/anV22k0Lc2pNP2J3OwTU1vNzyuhBFjfbAO24CsM/ZEkg4HMl3kbY=
-X-Received: by 2002:a05:600c:154b:b0:499:49a6:4388 with SMTP id 5b1f17b1804b1-49949a643f9mr61634265e9.17.1785821773878;
-        Mon, 03 Aug 2026 22:36:13 -0700 (PDT)
-Received: from grower.astralinux.ru ([81.9.21.4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4994a0fca55sm58641705e9.13.2026.08.03.22.36.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 22:36:13 -0700 (PDT)
-From: Alexander Martyniuk <alexevgmart@gmail.com>
-To: sashal@kernel.org,
-	lvc-project@linuxtesting.org
-Cc: alexevgmart@gmail.com,
-	davem@davemloft.net,
-	gregkh@linuxfoundation.org,
-	gustavo.padovan@collabora.co.uk,
-	johan.hedberg@gmail.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	oss@fourdim.xyz,
-	stable@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 5.10/5.15] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-Date: Tue,  4 Aug 2026 08:35:55 +0300
-Message-ID: <20260804053555.945430-1-alexevgmart@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260803203505.stable-0006@kernel.org>
-References: <20260803203505.stable-0006@kernel.org>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Df++zpjG"
+Received: from [10.129.133.121] (unknown [185.65.133.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hDj776f4dz4BKKV;
+	Tue, 04 Aug 2026 08:40:19 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1785822021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B7xWFAK91pYYaVg6yfQM4qX8/FSIQmzZ8LsFS0aXIeU=;
+	b=Df++zpjGHuAcMcKysKXP1DhkLMsPlfYZL1FYss+yHhSuoAr2fYV1vl8Wi+rLnSOLHArkoo
+	onruiEdBKjhbZQrhxH2D84Y3qY1yqiPGtBcGUUSahrUxZiY2cOD4+eeJod8Oj8X7nol8kT
+	AbT+BB6mN+Sb4CcmSPVfdLIgXnG4gUm4jft9wvEMFZBulEfjmNivwLrBXYo4NMX4K6RCAB
+	AaELhYmLSTQMajl3v+8lgJqvyZPVc6TQPRnFhjAogXywhbiq+SgI4XVoGVc3EeLfZ76Czk
+	SE/mk5JrkTAtcPqvwSMxoTJR4IQQUAGD20C97ZQDfVw0t+xl1jgJ8OSXwsdL9w==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1785822021;
+	b=Z654D0/Lrz4I4jrrYSEw8BwXwj4fg1Dr6swybmL09YrWIyrlmJZ1COLMofURNtosJk2Zev
+	/KAyoK6iSKo5AhX7et8ifPO7uNMOmhMmnxKmax/Ny9qzFaKWRuAAQqZkOzhmwfMhHir0bF
+	mCbfHIiSvDbATed45cix7NwkZ8W7W3OA7+zZX8tc4RzpRRWh3ZSQwAmVIBENKhrvGL3K0Y
+	bnQ2TBXw5SGih3+pYBW0Rmz30gjcQSYOOnRzzFpAb2vRdBHof3BdxtgdndUPGB9SSyT3NH
+	4/jbsFDYXpXETJWASeha/o/MjWvDkfvbp9f3rpbVL4LzTFKISgI0bCN7BXj1ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1785822021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B7xWFAK91pYYaVg6yfQM4qX8/FSIQmzZ8LsFS0aXIeU=;
+	b=kp0HbTS7IiXBWSjaIULlhVieMpcOFGHVX03mAKx0LA/snHJrdZjqLR47OJR1RzVtMMiDXR
+	mAhryzd3vOa66QiJnS19+s25G16o6nN3xQDSsazOWN8Aw9PLytEq5fTviyhC/goziuyuPC
+	I8DweTgYeEG3GGfkQaeqU3cWD3g6yCZMBFp6QAUJQIbFQelapNLgvabMiUxA95vLpWhrHZ
+	cp9TJpzTL41hCu7yIGpnzORYIU23Wxuh60Hi2G+hIHsUXNukhHpZieEU18LnXR+IlAmPwE
+	nPSX891mIuAkOI6r3drqkVh7YUWT9+L7CKcuQ5+EAeyArBJoUdzkX9b2rbKX1w==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <152f33eec417ee82f74df8be814e68a6064d2efb.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: L2CAP: fix race l2cap_sock_cleanup_listen()
+ vs. put_chan
+From: Pauli Virtanen <pav@iki.fi>
+To: Hillf Danton <hdanton@sina.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, 	linux-kernel@vger.kernel.org, 
+	syzbot+e6382a2f53f5fc7453ac@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Date: Tue, 04 Aug 2026 08:40:16 +0300
+In-Reply-To: <20260804004717.919-1-hdanton@sina.com>
+References: <20260804004717.919-1-hdanton@sina.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-> Did you even build test this?
+SGksCgp0aSwgMjAyNi0wOC0wNCBrZWxsbyAwODo0NyArMDgwMCwgSGlsbGYgRGFudG9uIGtpcmpv
+aXR0aToKPiBPbiBNb24sIDAzIEF1ZyAyMDI2IDE5OjUzOjMxICswMzAwIFBhdWxpIFZpcnRhbmVu
+IHdyb3RlOgo+ID4gbWEsIDIwMjYtMDgtMDMga2VsbG8gMTQ6MTMgKzA4MDAsIEhpbGxmIERhbnRv
+biBraXJqb2l0dGk6Cj4gPiA+IE9uIFN1bizCoCAyIEF1ZyAyMDI2IDE1OjEyOjI4ICswMzAwIFBh
+dWxpIFZpcnRhbmVuIHdyb3RlOgo+ID4gPiA+IEZvciBMMkNBUCBzb2NrZXRzIHdpdGhvdXQgb3du
+aW5nIHNrLT5za19zb2NrZXQsIHJlYWRpbmcKPiA+ID4gPiBsMmNhcF9waShzayktPmNoYW4gbWF5
+IHJhY2UgYWdhaW5zdCBjb25jdXJyZW50Cj4gPiA+ID4gbDJjYXBfc29ja19raWxsKCkgLT4KPiA+
+ID4gPiBsMmNhcF9zb2NrX3B1dF9jaGFuKCkuwqAgVGhpcyBleGNsdWRlcyBzaW11bHRhbmVvdXMg
+cHJvdG9fb3BzCj4gPiA+ID4gY2FsbGJhY2tzLAo+ID4gPiA+IGJ1dCBhY2Nlc3MgaW4gbDJjYXBf
+c29ja19jbGVhbnVwX2xpc3RlbigpIGhhcyB1bnNhZmUgbG9ja2xlc3MKPiA+ID4gPiByZWFkLgo+
+ID4gPiA+IAo+ID4gPiA+IEZpeCB0aGUgcmFjZSBieSB0YWtpbmcgbG9ja19zb2NrKCkgaW4gbDJj
+YXBfc29ja19raWxsKCkgdG8KPiA+ID4gPiBzeW5jaHJvbml6ZSB3aXRoIGwyY2FwX3NvY2tfY2xl
+YW51cF9saXN0ZW4oKS7CoAo+ID4gPiA+IGhvbGRfdW5sZXNzX3plcm8oKSBpcyBub3QKPiA+ID4g
+PiBuZWVkZWQgaGVyZSwgbDJjYXBfcGkoc2spLT5jaGFuIG93bnMgcmVmZXJlbmNlIGlmIGl0IGlz
+IG5vbi0KPiA+ID4gPiBOVUxMLgo+ID4gPiA+IAo+ID4gPiA+IEZpeGVzOiAwZTJjMDM5MmI5ZGMg
+KCJCbHVldG9vdGg6IEwyQ0FQOiBGaXggdXNlLWFmdGVyLWZyZWUgaW4KPiA+ID4gPiBsMmNhcF9z
+b2NrX25ld19jb25uZWN0aW9uX2NiKCkiKQo+ID4gPiA+IFJlcG9ydGVkLWJ5Ogo+ID4gPiA+IHN5
+emJvdCtlNjM4MmEyZjUzZjVmYzc0NTNhY0BzeXprYWxsZXIuYXBwc3BvdG1haWwuY29tCj4gPiA+
+ID4gQ2xvc2VzOgo+ID4gPiA+IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL2J1Zz9leHRp
+ZD1lNjM4MmEyZjUzZjVmYzc0NTNhYwo+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFBhdWxpIFZpcnRh
+bmVuIDxwYXZAaWtpLmZpPgo+ID4gPiA+IC0tLQo+ID4gPiA+IMKgaW5jbHVkZS9uZXQvYmx1ZXRv
+b3RoL2wyY2FwLmggfMKgIDUgKysrKysKPiA+ID4gPiDCoG5ldC9ibHVldG9vdGgvbDJjYXBfc29j
+ay5jwqDCoMKgIHwgMjMgKysrKysrKysrKysrKy0tLS0tLS0tLS0KPiA+ID4gPiDCoDIgZmlsZXMg
+Y2hhbmdlZCwgMTggaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRpb25zKC0pCj4gPiA+ID4gCj4gPiA+
+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9sMmNhcC5oCj4gPiA+ID4gYi9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvbDJjYXAuaAo+ID4gPiA+IGluZGV4IGVmNmNlMWMyMGE0Zi4u
+M2Q5YTMyMDk0MzQ3IDEwMDY0NAo+ID4gPiA+IC0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9s
+MmNhcC5oCj4gPiA+ID4gKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgKPiA+ID4g
+PiBAQCAtNjk5LDcgKzY5OSwxMiBAQCBzdHJ1Y3QgbDJjYXBfcnhfYnVzeSB7Cj4gPiA+ID4gwqAK
+PiA+ID4gPiDCoHN0cnVjdCBsMmNhcF9waW5mbyB7Cj4gPiA+ID4gwqAJc3RydWN0IGJ0X3NvY2sJ
+CWJ0Owo+ID4gPiA+ICsKPiA+ID4gPiArCS8qIFdpdGggb3duaW5nIHNrX3NvY2tldCBjaGFuIG1h
+eSBiZSByZWFkIHdpdGhvdXQKPiA+ID4gPiBsb2NrLCBvdGhlciBhY2Nlc3MKPiA+ID4gPiArCSAq
+IHNob3VsZCBob2xkIGxvY2tfc29jay4KPiA+ID4gPiArCSAqLwo+ID4gPiA+IMKgCXN0cnVjdCBs
+MmNhcF9jaGFuCSpjaGFuOwo+ID4gPiA+ICsKPiA+ID4gPiDCoAlzdHJ1Y3QgbGlzdF9oZWFkCXJ4
+X2J1c3k7Cj4gPiA+ID4gwqB9Owo+ID4gPiA+IMKgCj4gPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9i
+bHVldG9vdGgvbDJjYXBfc29jay5jCj4gPiA+ID4gYi9uZXQvYmx1ZXRvb3RoL2wyY2FwX3NvY2su
+Ywo+ID4gPiA+IGluZGV4IDczNTE2N2Y3M2YzMS4uOTU0MDYxN2EwZTZjIDEwMDY0NAo+ID4gPiA+
+IC0tLSBhL25ldC9ibHVldG9vdGgvbDJjYXBfc29jay5jCj4gPiA+ID4gKysrIGIvbmV0L2JsdWV0
+b290aC9sMmNhcF9zb2NrLmMKPiA+ID4gPiBAQCAtMTMxMiw3ICsxMzEyLDEyIEBAIHN0YXRpYyB2
+b2lkIGwyY2FwX3NvY2tfa2lsbChzdHJ1Y3Qgc29jawo+ID4gPiA+ICpzaykKPiA+ID4gPiDCoAo+
+ID4gPiA+IMKgCUJUX0RCRygic2sgJXAgc3RhdGUgJXMiLCBzaywgc3RhdGVfdG9fc3RyaW5nKHNr
+LQo+ID4gPiA+ID5za19zdGF0ZSkpOwo+ID4gPiA+IMKgCj4gPiA+ID4gKwkvKiBUYWtlIGxvY2sg
+dG8gc3luY2hyb25pemUgYWdhaW5zdCBhY2Nlc3Mgd2l0aG91dAo+ID4gPiA+IG93bmluZyBzay0+
+c2tfc29ja2V0LAo+ID4gPiA+ICsJICogZWcuIGluIGwyY2FwX3NvY2tfY2xlYW51cF9saXN0ZW4o
+KS4gcHJvdG9fb3BzIGV0Yy4KPiA+ID4gPiBkb24ndCBuZWVkIGxvY2suCj4gPiA+ID4gKwkgKi8K
+PiA+ID4gPiArCWxvY2tfc29jayhzayk7Cj4gPiA+ID4gwqAJbDJjYXBfc29ja19wdXRfY2hhbihz
+ayk7Cj4gPiA+ID4gKwlyZWxlYXNlX3NvY2soc2spOwo+ID4gPiA+IMKgCj4gPiA+ID4gwqAJLyog
+S2lsbCBwb29yIG9ycGhhbiAqLwo+ID4gPiA+IMKgCXNvY2tfc2V0X2ZsYWcoc2ssIFNPQ0tfREVB
+RCk7Cj4gPiA+IAo+ID4gPiBJbiBsMmNhcF9zb2NrX3RlYXJkb3duX2NiKCksIHNvY2sgaXMgb25s
+eSB6YXBwZWQgYWZ0ZXIgY2xlYW51cAo+ID4gPiBpbmNsdWRpbmcgdW5saW5rLAo+ID4gPiBzbyB3
+aHkgZG8geW91IHNlZSBhIGxpbmtlZCBhbmQgemFwcGVkIHNvY2sgaW4KPiA+ID4gbDJjYXBfc29j
+a19jbGVhbnVwX2xpc3RlbigpPwo+ID4gCj4gPiBsMmNhcF9zb2NrX2NsZWFudXBfbGlzdGVuKCkg
+aXMgbm90IGEgc2luZ2xlIGNyaXRpY2FsIHNlY3Rpb24uCj4gPiAKPiA+IFRoZXJlIGlzIHRoZSBm
+b2xsb3dpbmcgcmFjZToKPiA+IAo+ID4gwqDCoCBbVGFzayAxXcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBbVGFzayAyIChoZGV2LT53b3JrcXVldWUpXQo+
+ID4gwqDCoCBsMmNhcF9zb2NrX3JlbGVhc2UocGFyZW50KcKgwqDCoMKgwqDCoCBsMmNhcF9kaXNj
+b25uX2NmbQo+ID4gwqDCoMKgwqAgbDJjYXBfc29ja19jbGVhbnVwX2xpc3RlbsKgwqDCoMKgwqDC
+oMKgIGwyY2FwX2Nvbm5fZGVsCj4gPiDCoMKgwqDCoMKgwqAgYnRfYWNjZXB0X2RlcXVldWXCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbDJjYXBfY2hhbl9kZWwKPiA+IMKgwqDCoMKgwqDC
+oMKgwqAgbG9ja19zb2NrKHNrKcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGwyY2FwX3NvY2tfdGVhcmRvd25fY2IKPiA+IMKgwqDCoMKgwqDCoMKgwqAgYnRfYWNjZXB0X3Vu
+bGluawo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnRfc2soc2spLT5wYXJlbnQgPSBOVUxMCj4g
+PiDCoMKgwqDCoMKgwqDCoMKgIHJlbGVhc2Vfc29jayhzaykgLS0tLS0tLS0tLS0tLS0tLT4gbG9j
+a19zb2NrKHNrKQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcGFyZW50ID0gYnRf
+c2soc2spLQo+ID4gPnBhcmVudCAvKiA9PSBOVUxMICovCj4gPiDCoMKgwqDCoMKgwqAgbG9ja19z
+b2NrKHNrKSA8LS0tLS0tLS0tLS0tLS0tLS0tLS0tIHJlbGVhc2Vfc29jayhzaykKPiA+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNvY2tfc2V0X2ZsYWcoc2ssCj4gPiBTT0NLX1pBUFBF
+RCkKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsMmNhcF9zb2NrX2Nsb3NlX2NiCj4gPiDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGwyY2FwX3NvY2tfa2lsbChzaykKPiA+IMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIGwyY2FwX3NvY2tfcHV0X2NoYW4KPiA+IMKgwqDCoMKgwqDCoCBj
+aGFuID0gUkVBRCBsMmNhcF9waShzayktPmNoYW7CoMKgwqDCoMKgwqDCoMKgIGwyY2FwX3BpKHNr
+KS0+Y2hhbiA9Cj4gPiBOVUxMCj4gPiDCoMKgwqDCoMKgwqAgbDJjYXBfY2hhbl9ob2xkX3VubGVz
+c196ZXJvwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsMmNhcF9wdXRfY2hhbihjaGFuKQo+ID4gwqDC
+oMKgwqDCoMKgwqDCoCBrcmVmX2dldF91bmxlc3NfemVybygmY2hhbi0+cmVmKQo+ID4gCj4gVGhl
+IHJhY2Ugd2luZG93IGlzIHN0aWxsIG9wZW4gYWZ0ZXIgdGhpcyB3b3JrLgo+IAo+IAkJCQkJwqDC
+oMKgwqAgcmVsZWFzZV9zb2NrKHNrKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+c29ja19zZXRfZmxhZyhzaywKPiBTT0NLX1pBUFBFRCkKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBsMmNhcF9zb2NrX2Nsb3NlX2NiCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGwyY2Fw
+X3NvY2tfa2lsbChzaykKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGwyY2FwX3Nv
+Y2tfcHV0X2NoYW4KPiAJCQkJCcKgwqDCoMKgwqDCoCBsMmNhcF9waShzayktPmNoYW4gPQo+IE5V
+TEwKPiAJCQkJCcKgwqDCoMKgwqDCoCBsMmNhcF9wdXRfY2hhbihjaGFuKQo+IAkJCQkJwqDCoMKg
+wqAgc29ja19zZXRfZmxhZyhzaywKPiBTT0NLX0RFQUQpOwo+IAkJCQkJwqDCoMKgwqAgc29ja19w
+dXQoc2spOyAvLyBmcmVlCj4gc2sKPiDCoMKgwqDCoMKgwqDCoCBsb2NrX3NvY2soc2spIC8vIHVh
+Zgo+IMKgwqDCoMKgwqDCoMKgIGNoYW4gPSBSRUFEIGwyY2FwX3BpKHNrKS0+Y2hhbgo+IMKgwqDC
+oMKgwqDCoMKgIGwyY2FwX2NoYW5faG9sZF91bmxlc3NfemVybwoKVGhlcmUgaXMgbm8gVUFGIHRo
+ZXJlLCBUYXNrIDEgaG9sZHMgYSByZWZlcmVuY2Ugb24gc2sgYXQgdGhpcyBwb2ludCwgaWYKeW91
+IGxvb2sgYXQgdGhlIGNvZGUgc29ja19wdXQoKSBmb2xsb3dzLgoKSSBkb24ndCB0aGluayB0aGVy
+ZSBpcyBhIHJlbWFpbmluZyBwcm9ibGVtLgoKLS0gClBhdWxpIFZpcnRhbmVuCgo=
 
-Yes, i did.
