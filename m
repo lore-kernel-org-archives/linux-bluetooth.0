@@ -1,133 +1,106 @@
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6424B3CB54B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 21:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA433D6472
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 21:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785965103; cv=none; b=aEKjLqsoOL+Ynzsi4ASytKqty3nLiHjuDJe0vBIQB+CJjoQkUmsdr2mjt1HNInkWygk9Q5W7ug5qiOxnlEMKBcy/mgsY5lvc4vr5oE7rLm1cuBdUTH/JZAKyEcXFdkKObEF3sdsdPgNXL0RcO//+ZBbkJdbYrCX3ul8bQJWWMYk=
+	t=1785966766; cv=none; b=rLGRQtF180drYP/iBtYdL75nJhoIM/IEnLRUfdCWXtZkXDGwwdv8koX60wFtXozeIQlPNVTZaNgCmPmvmhxqeZqU3oz3plm9qFROdu8N0cHlsuEkn347IOtzrQEIS6T/m1Qv33gbd7dkJMYJP0zhCN2zoId08Y4F1dYnuXRgUkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785965103; c=relaxed/simple;
-	bh=G2Gb8ryU9CB/tkIoI6Nf0ZbyezD1MDOliNvGtQxweb0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D4Fi8HflgSPdggAcdelPfhECPTA7eT/1yXoAe0R1oS1ONPSDlsE7YkD33e7IvdqwtvCm6tqyVxqj08BEKewdx7ucA6ZaSULd5arhOOSvkBtDR2jQc5hbRH7xgEaAOWVjG/fmtXrj+essCq5aFGy3Y/kcx7d80Z1aJbsIbWa1AcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tkjos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XSn3muos; arc=none smtp.client-ip=209.85.210.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tkjos.bounces.google.com
+	s=arc-20240116; t=1785966766; c=relaxed/simple;
+	bh=twMbHbNluWyXrZ9mKRyWJgP+aAyejVCzG6rbe6UOWdM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rIQ5TMAp94SLKOqbbdPV4akKc5WkOE/AZUCX5u61Ts30JymsHJKfAwmuWtxokeGXUUCYw+HYCNsPwdWHJQP+RtV5RrSbk6Nylrs7WDiKCziFONURyxkSnZWjxw9LOsrQmehjFiorjRyuIM8uIdJih/JbdvSboOQXsFbIaah3fa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HrBos8u3; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XSn3muos"
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8486c3411c8so1846002b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 14:24:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrBos8u3"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-45691990234so976773fac.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 14:52:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785965092; x=1786569892; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=40ts9A4u96ZUBLDRq3LwUF/0mcwzqzGt7HKamq8DGIs=;
-        b=XSn3muosSmxaYnU/p4J+DHvncxprTsDDCmpzmHDXSGZJrv3t9gb6bktHbdAHHnSiSP
-         vUOI9/QXXHlLzTIsXiPqM5/gO5fxuS9Oqxexpwewts+3PtcmdbvYFVL+xHicpRCbRDHG
-         vfIto1aGbDaNcjPnsMBq94vz7AhTftb+oLYr4Y/v/TQuIRgObFwsS3PPlifI7bIaMdNK
-         7wI3kh5OJaLC/cl2IHgyQdooBld2xzA0X/PO1Cju0WLUTTW/LblEZR11s6xV6yGbsSfy
-         V8Rp7djdbDlFyQlqhRAc/nuZJ/P6r9ud0KxF/m6cJJg8bPDIeLDBY0Bffp1lz4iV2KYT
-         XDdQ==
+        d=gmail.com; s=20251104; t=1785966764; x=1786571564; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=twMbHbNluWyXrZ9mKRyWJgP+aAyejVCzG6rbe6UOWdM=;
+        b=HrBos8u3ATRT0FBczo1QEYW7Suerz6HpLQimBH8ALRlaGaH8bl9MpADr63dIizTXak
+         YyWHMiUfCpbSM4Pyuy0vANRk8DzZrrb7m1hykIR67s1HyHcMb+40XFZmev2p8AxOEWRe
+         9phawsmZQiA1Oxhods85ojQErBcF/dh7L3MYdaRIGOwGoiS3D6R1ISdxWVASnkdp5ypx
+         ujFT40xceuCDj4X63BTCeiPQnvjYlhdZftTIGzxoMHDVWS9RXEKaGcnAYCDGKsGPyprk
+         I1opIJn5RAdcLexGSIVbtCOc1Q6cvGqUJ8ySHlqjqaYInyCEMhObOJYQ8vXtSkFI4pRG
+         YuRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785965092; x=1786569892;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=40ts9A4u96ZUBLDRq3LwUF/0mcwzqzGt7HKamq8DGIs=;
-        b=Z7UK8ysT0dtRM3WfLM8VkNDyCGWZKxcQMHYFgWJNx43woljvsrFBePkWm2ITVF4nba
-         tF5iaycqMWelVzqUT+Hs2IGPuOu5JZLcYNuE+pkFIpO6Fzal9EggZPyn3qy6UbViS1mW
-         eiB0BHF2AtwUgYLVivjDuLGrIiIlJXnbDAV69oBktK00n3X4azYnfRPUj7DzBl2khAqI
-         /3Otbt9u6uqz/ihvGj0hfL0rTqvZMQYffKut/R8jvA2PLNeJXLRUSv4tMyH7WjUpb1Z7
-         ymo7fq/FW0E33tRW38Qm2H9LawDtkG+pn8g35zoREOasNI9vaiJ1Mhi7Lw8lpxu3SEj/
-         mIWQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqwHAECYoA+MQqkeFZmAnelQN2EyIvvWfBbEtcnFPEgVSaKeduHhF3RPBrlFk9O2W5gulfY/I7i7hI3o8u0dqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnhvGwm6oUwMdvx1VNztaz5sCtE+DRFRJtpNscKdVLbycoYoEk
-	NGA0rl/IxH71aXuKJahg4z6UHv/qSuvQufk52U5BbPS0an38M2jPOH7eSM6S4NYWKu1hCi8za/n
-	AkQ==
-X-Received: from pgbeu25.prod.google.com ([2002:a05:6a02:4799:b0:cb3:9a4d:501])
- (user=tkjos job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:414a:b0:84e:2f2e:8c4b
- with SMTP id d2e1a72fcca58-84f2e0ccecfmr10983412b3a.32.1785965092256; Wed, 05
- Aug 2026 14:24:52 -0700 (PDT)
-Date: Wed,  5 Aug 2026 21:24:35 +0000
-In-Reply-To: <20260805212435.48618-1-tkjos@google.com>
+        d=1e100.net; s=20251104; t=1785966764; x=1786571564;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=twMbHbNluWyXrZ9mKRyWJgP+aAyejVCzG6rbe6UOWdM=;
+        b=IRLEt7OTWFQT8f4zE2/O9Gr78rjv64VmP4UNlLIinqKLGfmqiRa/HEmPm8n44n9RmI
+         05oTL8SJNYMumZIywJxzEcBzVavSKcYsf5RQ0Nq4u+xF51L76kYss1+0nNdjXsU1ow/F
+         Fh+n2quDxzSofO4IESysxXF3jSgXEgOntA0t7ySPSlyQPInS43gTouwoiq9XuBU74Pos
+         NwIixs4YkxHMfm2o0KsOrIxZxwn8m6cnDAxS8fa1jgUJY5c/6CJTAqUiliMXWgwec9Wq
+         NYjrr74CoRxahwc+PSjQ1fAzDsgqq3AoCJBzxeF963LcKLo85NzPpUpl4c5NH2JZdQPz
+         OJoA==
+X-Gm-Message-State: AOJu0YykVtviPaV25uXBcH5jma9O7X7DHI3JhZliNwXJpsQ5hZ2Ui9c1
+	lk03Ew0yb0GVUxBI4ncT7CjBg28//Pndp+u/1LSxwNdATxoVNLtWPKoZWCZNhA==
+X-Gm-Gg: AR+sD135Tycz3iZJcwNPnmzudMPX5lyqathaL9OMHVAsIy0phiyXtXU3gjEHa1BPTS5
+	P11DbGF2t/rTr/0ZdyxvVYPp8vopj7ylrz6kczrofHZEY9xUfpTY3fvWFJmsmyKWS1DBaAYVKxG
+	evultxMspRmG1vk1tbuwjfRe/J9GpVpWv7OTivLrrSmglDoAIXMaSWl7gq4imLHcRNtSWrJNJtW
+	8CsHdu/Ff8p7sp7wxUwHjBLK+/oozykG3Vp2XGudcOi4ZNe7OWb3hA+bI0kX+07Sv7bMNDt9ttq
+	Jqmx70kfIWlgan8jXky79wOHM78KlWcUNMK2b5oNYuGSYeyvjTWRhIdRa2DlFFxQt7iFhreNQEl
+	ODHx9m8vP5UI0n+8xCGS6MbOZM765eTZt4mU/C9i4/cP+tsA+cPpr732uJB4upoei991BYF3SM+
+	8djZH5u3Rp2DCHKcE736QIn0K2Sb4GhPsKhdCO3jUqFa9fnHPrf4B6oeKyXzAsRMR0wJzYYA==
+X-Received: by 2002:a05:6870:2305:b0:448:a3d6:c2d2 with SMTP id 586e51a60fabf-4599eecd5a1mr5249465fac.10.1785966764414;
+        Wed, 05 Aug 2026 14:52:44 -0700 (PDT)
+Received: from [172.17.0.2] ([172.212.172.241])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4599e63d64asm3562678fac.13.2026.08.05.14.52.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2026 14:52:43 -0700 (PDT)
+Message-ID: <6a73b0ab.e0660744.1a430a.88d1@mx.google.com>
+Date: Wed, 05 Aug 2026 14:52:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5170585292960892573=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, tkjos@google.com
+Subject: RE: [v2,1/2,5.10.y] Bluetooth: SCO: Fix UAF on sco_sock_timeout
+In-Reply-To: <20260805212435.48618-1-tkjos@google.com>
 References: <20260805212435.48618-1-tkjos@google.com>
-X-Mailer: git-send-email 2.55.0.629.g250fe7f194-goog
-Message-ID: <20260805212435.48618-2-tkjos@google.com>
-Subject: [PATCH v2 2/2 5.10.y] Bluetooth: SCO: Fix use-after-free in
- sco_recv_frame() due to missing sock_hold
-From: Todd Kjos <tkjos@google.com>
-To: stable@vger.kernel.org
-Cc: kernel-team@android.com, Lee Jones <lee@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, Hyunwoo Kim <imv4bel@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Sasha Levin <sashal@kernel.org>, 
-	Todd Kjos <tkjos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Hyunwoo Kim <imv4bel@gmail.com>
+--===============5170585292960892573==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit 598dbba9919c5e36c54fe1709b557d64120cb94b ]
+This is an automated email and please do not reply to this email.
 
-sco_recv_frame() reads conn->sk under sco_conn_lock() but immediately
-releases the lock without holding a reference to the socket. A concurrent
-close() can free the socket between the lock release and the subsequent
-sk->sk_state access, resulting in a use-after-free.
+Dear Submitter,
 
-Other functions in the same file (sco_sock_timeout(), sco_conn_del())
-correctly use sco_sock_hold() to safely hold a reference under the lock.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Fix by using sco_sock_hold() to take a reference before releasing the
-lock, and adding sock_put() on all exit paths.
+----- Output -----
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Todd Kjos <tkjos@google.com>
+error: patch failed: include/net/bluetooth/bluetooth.h:317
+error: include/net/bluetooth/bluetooth.h: patch does not apply
+error: patch failed: net/bluetooth/af_bluetooth.c:184
+error: net/bluetooth/af_bluetooth.c: patch does not apply
+error: patch failed: net/bluetooth/sco.c:76
+error: net/bluetooth/sco.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- net/bluetooth/sco.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 2fbd9c93440ce4936d47b3bd47aa1dc28da82c20..b49b2d6bb778e8956d4a297c9feecadd1557a3b9 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -312,7 +312,7 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
- 	struct sock *sk;
- 
- 	sco_conn_lock(conn);
--	sk = conn->sk;
-+	sk = sco_sock_hold(conn);
- 	sco_conn_unlock(conn);
- 
- 	if (!sk)
-@@ -321,11 +321,15 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
- 	BT_DBG("sk %p len %d", sk, skb->len);
- 
- 	if (sk->sk_state != BT_CONNECTED)
--		goto drop;
-+		goto drop_put;
- 
--	if (!sock_queue_rcv_skb(sk, skb))
-+	if (!sock_queue_rcv_skb(sk, skb)) {
-+		sock_put(sk);
- 		return;
-+	}
- 
-+drop_put:
-+	sock_put(sk);
- drop:
- 	kfree_skb(skb);
- }
--- 
-2.55.0.629.g250fe7f194-goog
 
+--===============5170585292960892573==--
