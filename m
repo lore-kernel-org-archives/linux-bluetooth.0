@@ -1,354 +1,67 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1D93932CE
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 15:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7686B47ACE4
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 15:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785942223; cv=none; b=gc5Keuns5OXTmOSOKkaMXOqrn8Kyn10G2vfr0TRsz6s1qZE0IV6wbM8EWDhvjZMhgQpaDHLUTaWEVcmH5K1bjJTazz+sJdgTFwiVzC20nSSmmXOcuIvh3K/0dIS55HSVyOwQsRPs9KXG4b4m7ET/Zc0/0K4y8CvDTGV+e8lUkwQ=
+	t=1785943525; cv=none; b=Ui7OYPPn79zVkIWeTXAcSMpcocZPYg6l5xTZa1y2l4nd5kw36JrvEp1BScBRuucKrheROYP6dRJLB3dhvj5fpOlW4BdTAJym3RUY9m/2Ig8+sh5qFG1cwutrtpUdLnrR8xvHJIRRn6tOtzNjN7QAh39MT7lL1oduCKN3T1yhlNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785942223; c=relaxed/simple;
-	bh=7INxH/baR5ofel/+BOedCj4IunxX/8gbvlc+BSgKm8Q=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=foXY2lFKACiDA9Q0a2CInbiplQYiwrc/RmVQT0T41xHdXmcUk3vTja3GqhS9gq/D118Xi8QL9rYnkx0Hwl+lqWNmLWkPvlBtXY77WgQlknsL0n8II5Z/g1DoEalCJEUyGPx62s/F9b/YDv9f967QLzy/qHn1YQCnUg6s26lZE/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DF7A03EC1C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 15:03:35 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1785943525; c=relaxed/simple;
+	bh=FHmwCbvcfzgC6ktCxiQ+oQIIe2vkN4p7sazEzaWwXu0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Vqnefk0A8f/uab2GUsFyLzUeviFHpDXS3XJtM2qqDkLc7vlsKcKo/SV4drhB/7vFRHzRsIjefwKuoIIhq8/hb6X1ZAboiV6WErO1Udpw8J8XKJH3CNi8r9hbsyuOM0LwRgxNVHXFVP1d0ezNRTd3Ih5/Kwykx4BkWcuDxWuOIXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FSNjmZLz; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FSNjmZLz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1785943512;
+	bh=9s6gkZWSk3jmbwsmdipvgvCn9NsAfNxfYzIXdEta4lk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FSNjmZLz47vQ+MvVwhTW7p8OJzT+PHwQVwTUtbVM7E3BrlsEa3AQaA/w39U64xb/Z
+	 qZjciioJUi43pxRvqB175ih1fga9fktNXj0XEIEwf4iZQ795JZnXu4139tY6z/ugHH
+	 UvG8alT+cqHinBVHgGTq/eypvVNC85e/eJmRyiIE=
+Received: from github.com (hubbernetes-node-76b9019.va3-iad.github.net [10.48.70.94])
+	by smtp.github.com (Postfix) with ESMTPA id 3763D181028
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 08:25:12 -0700 (PDT)
+Date: Wed, 05 Aug 2026 08:25:12 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ, v2] unit: Add test for sdp_xml_parse_record()
-Date: Wed,  5 Aug 2026 17:02:44 +0200
-Message-ID: <20260805150327.2669078-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.55.0
+Message-ID: <bluez/bluez/push/refs/heads/1140838/000000-b24d0e@github.com>
+Subject: [bluez/bluez] b24d0e: unit: Add test for sdp_xml_parse_record()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 49
-X-GND-Cause: dmFkZTFUzDbTVM1Dq7uTKIBc/uxZRuBdZr6mj4L+snIa58H+LXv8w2eJYyYU3ZiTFKpfYodFYohth19PK/9tGPX6lL5ccvGbqcRi6NpsgtD+OiL23hsaop4eu1PHTZi2FaKmHv0MdjlnVB7CT1EUVumYZRjrBxiY2SGKrtbzrEmf9jQHdL+XeiqUrNOiOl4sh7/eycWChKSUxOcdfaiiH8g2KNAwUKKDaa0y7srupQOwGSjfdPqNk4QxGImwQJL2kqpkoQoV+rOjy0m6h4lf+78Yx31QBTH4ndSIIJzrZ9m0zMKxQxjLHtFiRWZV+8hii4YjkZOzxfveb15S+akDnHUr4beWH6bDCxbg71v+fCbjrdT0M2NSkgIDtOJkmOWmdTt0Nffgdx2PdXxccacZJsCFLRe8o/DaSS3DyvGXK+SVXmvcOxOK1yNOY6BUiizKQEBAze6nLzQBDuu3QcV1ZunOuoHeGGGxKHngx6IpoaPh4r3ZR6YXwJlpyPh+qkeHL+jMDOdcGv3L42fQYXf8h+/5a3LxjOy/wZwYPIa9RUhlyEelqtaJuD/p7cG19JW7FRE0JH4GwwmzcnNkai+T8vnNJfHgH17tk0cHpqSp0APvoMr/6FApgUstlCrMdxL7iw34T7Qqn+FZywSgWl9rIrRj0MMkmwDO1yAgms8FESK8422WTQ
-X-GND-State: clean
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1140838
+  Home:   https://github.com/bluez/bluez
+  Commit: b24d0efdc9aa823d207b694eb8568b04633520b9
+      https://github.com/bluez/bluez/commit/b24d0efdc9aa823d207b694eb8568b04633520b9
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-05 (Wed, 05 Aug 2026)
+
+  Changed paths:
+    M Makefile.am
+    A unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+    A unit/sdp-xml/qt-SerialPortSDPRecord.xml
+    A unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit: Add test for sdp_xml_parse_record()
 
 This adds 2 example XML files from other repositories, under a fair use
 license exception.
----
-Changes since v1:
-- Added an "expected result" field, so expected failures can also pass
-  tests.
 
- Makefile.am                               |  10 ++
- unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123 ++++++++++++++++++++++
- unit/sdp-xml/qt-SerialPortSDPRecord.xml   |  57 ++++++++++
- unit/test-sdp-xml.c                       |  81 ++++++++++++++
- 4 files changed, 271 insertions(+)
- create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
- create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
- create mode 100644 unit/test-sdp-xml.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 19c468d3a504..1c62ee66bdce 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -637,6 +637,16 @@ unit_test_sdp_SOURCES = unit/test-sdp.c \
- unit_test_sdp_LDADD = lib/libbluetooth-internal.la \
- 				src/libshared-glib.la $(GLIB_LIBS)
- 
-+unit_tests += unit/test-sdp-xml
-+
-+unit_test_sdp_xml_SOURCES = unit/test-sdp-xml.c \
-+				src/sdp-xml.c src/sdp-xml.h \
-+				src/log.h src/log.c
-+unit_test_sdp_xml_LDADD = lib/libbluetooth-internal.la \
-+				src/libshared-glib.la $(GLIB_LIBS)
-+unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)"\"
-+unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
-+
- unit_tests += unit/test-avdtp
- 
- unit_test_avdtp_SOURCES = unit/test-avdtp.c \
-diff --git a/unit/sdp-xml/Bluetooth_HID-sdp_record.xml b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-new file mode 100644
-index 000000000000..687b0b15b520
---- /dev/null
-+++ b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-@@ -0,0 +1,123 @@
-+<?xml version="1.0" encoding="UTF-8" ?>
-+
-+<!--
-+
-+ From: https://github.com/AnesBenmerzoug/Bluetooth_HID/blob/master/sdp_record.xml
-+ A description of these fields can be found in the following links:
-+ http://www.bluecove.org/bluecove/apidocs/javax/bluetooth/ServiceRecord.html
-+ https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
-+
-+ -->
-+
-+<record>
-+	<attribute id="0x0001"> <!-- Service Class ID List -->
-+		<sequence>
-+			<uuid value="0x1124" /> <!-- Human Interface Device -->
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0004"> <!-- Protocol Descriptor List -->
-+		<sequence>
-+			<sequence>
-+				<uuid value="0x0100" /> <!-- L2CAP -->
-+				<uint16 value="0x0011" /> <!-- HIDP -->
-+			</sequence>
-+			<sequence>
-+				<uuid value="0x0011" /> <!-- HIDP -->
-+			</sequence>
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0005"> <!-- Browse Group List -->
-+		<sequence>
-+			<uuid value="0x1002" />
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0006"> <!-- Language Based Attribute ID List -->
-+		<sequence>
-+			<uint16 value="0x656e" /> <!-- code_ISO639 -->
-+			<uint16 value="0x006a" /> <!-- encoding -->
-+			<uint16 value="0x0100" /> <!-- base_offset -->
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0009"> <!-- Bluetooth Profile Descriptor List -->
-+		<sequence>
-+			<sequence>
-+				<uuid value="0x1124" /> <!-- Human Interface Device -->
-+				<uint16 value="0x0100" /> <!-- L2CAP -->
-+			</sequence>
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x000d"> <!-- Additional Protocol Descriptor Lists -->
-+		<sequence>
-+			<sequence>
-+				<sequence>
-+					<uuid value="0x0100" /> <!-- L2CAP -->
-+					<uint16 value="0x0013" />
-+				</sequence>
-+				<sequence>
-+					<uuid value="0x0011" /> <!-- HIDP -->
-+				</sequence>
-+			</sequence>
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0100">
-+		<text value="Bluetooth_Keyboard/Mouse" />
-+	</attribute>
-+	<attribute id="0x0101">
-+		<text value="USB > BT Keyboard/Mouse" />
-+	</attribute>
-+	<attribute id="0x0102">
-+		<text value="Raspberry Pi 3" />
-+	</attribute>
-+	<attribute id="0x0200">
-+		<uint16 value="0x0100" />
-+	</attribute>
-+	<attribute id="0x0201">
-+		<uint16 value="0x0111" />
-+	</attribute>
-+	<attribute id="0x0202">
-+		<uint8 value="0x40" />
-+	</attribute>
-+	<attribute id="0x0203">
-+		<uint8 value="0x00" />
-+	</attribute>
-+	<attribute id="0x0204">
-+		<boolean value="false" />
-+	</attribute>
-+	<attribute id="0x0205">
-+		<boolean value="false" />
-+	</attribute>
-+	<attribute id="0x0206">
-+		<sequence>
-+			<sequence>
-+				<uint8 value="0x22" />
-+				<text encoding="hex" value="05010906A1018501A100050719E029E71500250175019508810295017508810195087508150025650507190029658100C0C005010902A10185020901A1000509190129031500250175019503810275059501810105010930093109381581257F750895038106C0C0"/>
-+			</sequence>
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x0207">
-+		<sequence>
-+			<sequence>
-+				<uint16 value="0x0409" />
-+				<uint16 value="0x0100" />
-+			</sequence>
-+		</sequence>
-+	</attribute>
-+	<attribute id="0x020b">
-+		<uint16 value="0x0100" />
-+	</attribute>
-+	<attribute id="0x020c">
-+		<uint16 value="0x0c80" />
-+	</attribute>
-+	<attribute id="0x020d">
-+		<boolean value="true" />
-+	</attribute>
-+	<attribute id="0x020e">
-+		<boolean value="false" />
-+	</attribute>
-+	<attribute id="0x020f">
-+		<uint16 value="0x0640" />
-+	</attribute>
-+	<attribute id="0x0210">
-+		<uint16 value="0x0320" />
-+	</attribute>
-+</record>
-diff --git a/unit/sdp-xml/qt-SerialPortSDPRecord.xml b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
-new file mode 100644
-index 000000000000..1f62ccf11a41
---- /dev/null
-+++ b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
-@@ -0,0 +1,57 @@
-+<?xml version="1.0" encoding="UTF-8" ?>
-+
-+<!--
-+ This is an XML file describing an SDP service record for a Serial Port
-+ service.
-+
-+ You can use the linux sdptool command to create a file like this for
-+ publishing your Bluetooth services. See the "Creating a Bluetooth service"
-+ tutorial for more details.
-+
-+ From: https://radekp.github.io/qtmoko/api/bluetooth-bluetoothservice-serialportsdprecord-xml.html
-+-->
-+
-+ <record>
-+         <attribute id="0x0001">
-+                 <sequence>
-+                         <uuid value="0x1101" />
-+                 </sequence>
-+         </attribute>
-+         <attribute id="0x0004">
-+                 <sequence>
-+                         <sequence>
-+                                 <uuid value="0x0100" />
-+                         </sequence>
-+                         <sequence>
-+                                 <uuid value="0x0003" />
-+                                 <uint8 value="0x05" />
-+                         </sequence>
-+                 </sequence>
-+         </attribute>
-+         <attribute id="0x0005">
-+                 <sequence>
-+                         <uuid value="0x1002" />
-+                 </sequence>
-+         </attribute>
-+         <attribute id="0x0006">
-+                 <sequence>
-+                         <uint16 value="0x656e" />
-+                         <uint16 value="0x006a" />
-+                         <uint16 value="0x0100" />
-+                 </sequence>
-+         </attribute>
-+         <attribute id="0x0009">
-+                 <sequence>
-+                         <sequence>
-+                                 <uuid value="0x1101" />
-+                                 <uint16 value="0x0100" />
-+                         </sequence>
-+                 </sequence>
-+         </attribute>
-+         <attribute id="0x0100">
-+                 <text value="Serial Port" />
-+         </attribute>
-+         <attribute id="0x0101">
-+                 <text value="COM Port" />
-+         </attribute>
-+ </record>
-diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
-new file mode 100644
-index 000000000000..aef22b280498
---- /dev/null
-+++ b/unit/test-sdp-xml.c
-@@ -0,0 +1,81 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+
-+#include "bluetooth/sdp.h"
-+#include "bluetooth/sdp_lib.h"
-+
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/log.h"
-+#include "src/sdp-xml.h"
-+
-+struct test_data {
-+	GString *s;
-+	char *filename;
-+	gboolean expected_result;
-+};
-+
-+static void parse_xml(gconstpointer data, gsize len, gboolean expected_result)
-+{
-+	sdp_record_t *rec = NULL;
-+	gboolean ret;
-+
-+	rec = sdp_xml_parse_record(data, len);
-+	ret = rec ? TRUE : FALSE;
-+	if (ret == expected_result)
-+		tester_test_passed();
-+	else
-+		tester_test_failed();
-+	if (rec)
-+		sdp_record_free(rec);
-+}
-+
-+static void parse_xml_for_filename(gconstpointer data)
-+{
-+	struct test_data *t = (struct test_data *) data;
-+	char *path = NULL;
-+	GError *error = NULL;
-+	char *contents = NULL;
-+	gsize len;
-+
-+	path = g_build_filename(TOP_SRCDIR, "unit", "sdp-xml", t->filename, NULL);
-+	if (!g_file_get_contents(path, &contents, &len, &error)) {
-+		g_warning("Can't load file '%s': %s", path, error->message);
-+		g_free(path);
-+		g_error_free(error);
-+		tester_test_failed();
-+	}
-+	parse_xml(contents, len, t->expected_result);
-+	g_free(contents);
-+	g_free(path);
-+}
-+
-+#define DEFINE_TEST(fname, res)							\
-+	data.expected_result = res;						\
-+	data.filename = fname;							\
-+	tester_add("/" fname, &data, NULL, parse_xml_for_filename, NULL);
-+
-+int main(int argc, char *argv[])
-+{
-+	struct test_data data;
-+
-+	tester_init(&argc, &argv);
-+
-+	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
-+	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
-+
-+	return tester_run();
-+}
--- 
-2.55.0
 
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
