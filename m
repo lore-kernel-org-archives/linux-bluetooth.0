@@ -1,128 +1,132 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA4B3DD85E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 07:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3FC3ED5A6;
+	Wed,  5 Aug 2026 10:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785916761; cv=none; b=s6edA8bGtqssYDn/OtOZTt+2SMUFqdMbWaQaAn6kx/wVpckHltQgD5ssTqMLGZPZfXY1fs0q+j3uyFKeDqI8+5xnvvbkBH+HcLYw6D+Wx32ZUTmyEqXeICalYf9LrDOhS0quyCh/7ubxMBU1KjF0GaNI8dAh7C6/SfMThVnCFPY=
+	t=1785926217; cv=none; b=ZapAcZTy88wj0M7pIE340ajWAq/qOy+bNj3uK5Rf5g6XYty1q5J88zK2pGwqtTRdygx7sKegRbWCphyglrQiyZrKK3W7Ra2d/j+tthF3sRcDqM++5GPJLex0d6vH3u8xQycr6SDQ7GjWT1Pi72atzxDtIffWv33AhCC6lXb/uXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785916761; c=relaxed/simple;
-	bh=m9+c+Kb4a0Wvh7J3n9CxLyi8GSgZWsUUFso9J2v0G6A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ks4U+0XX6g16Ea+EDe2Q6vEd6lbFQBvbORCTexO6xOVreNzdH6nsfNQNOSwH+PPxZPkPZn1HWytEuMGxurdiFOpICldgZhfI6PmxSRG80QKikeI8sAkt7PCQrqMWDQBDV61s3pVjLuGKNFdUvYgUxyrxX0W2zV2u0x4SvtDO4H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CD97B3ED34;
-	Wed,  5 Aug 2026 07:59:07 +0000 (UTC)
-Message-ID: <45bc30093210c94efca124c980135176c2375c90.camel@hadess.net>
-Subject: Re: [BlueZ, v2 2/3] unit: Adapt poc_*_oob.c test into a new test
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Elman Shahbazov
-	 <shahbazovelman97@gmail.com>
-Date: Wed, 05 Aug 2026 09:59:07 +0200
-In-Reply-To: <CABBYNZKoj_jr=msyTAiQ+AcV9Xf4MjCAjvcq0pDf8bWPBoypyQ@mail.gmail.com>
-References: <20260804142419.2274153-1-hadess@hadess.net>
-	 <20260804142419.2274153-3-hadess@hadess.net>
-	 <CABBYNZKoj_jr=msyTAiQ+AcV9Xf4MjCAjvcq0pDf8bWPBoypyQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1785926217; c=relaxed/simple;
+	bh=wweRSA3jZ3JksQoGA6B2PixqNeG8hu3QgEAPHfsdFzU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I0pjpHdNVlq0gs/w+3YyWRv017C+kO/6q9xmvyFh45ewjanB51hDkITqF0ABV/U89KSTCjV7iUCVt7WTM6X+NWVnc7EcYCtqqqpRcPowkAZkVOV3wkEbrdYmgbVoRpWAnEGZqBOroNbP5REN78o5Xf/N9ekdj3pSCKktbOgjbl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Tof/fQnG; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Tof/fQnG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1785926191;
+	bh=1cSBFG13E11AsLThh/tacwvn7sqfCKvF2OEgcJZy1gY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=Tof/fQnGtdTeIJu4ZQcikxq0owMjX5M/xwZYBdwI0r6GSBbMgW4hVvfFymOhBdqTq
+	 eBcmnsmJKawlHcbbbodtapz6wnKX7FGIOVK7tjbdmX57/Jnt/wITMdBESTYvgOr4Hs
+	 37RA5eIMPwk32CYcJsHJV4Tp6GI/5VVqbAnEe/8Y=
+X-QQ-mid: zesmtpgz6t1785926185t0c81c0f3
+X-QQ-Originating-IP: /CnueA4ypeRJgnbz1VrRsGBrk6FsYmdfwWthFyjdBts=
+Received: from PEN002676 ( [124.126.19.250])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 05 Aug 2026 18:36:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 9662022247066101482
+EX-QQ-RecipientCnt: 5
+From: ZhaoJinming <zhaojinming@uniontech.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ZhaoJinming <zhaojinming@uniontech.com>
+Subject: [PATCH] Bluetooth: hci_serdev: Fix use-after-free in hci_uart_unregister_device()
+Date: Wed,  5 Aug 2026 18:36:12 +0800
+Message-ID: <0BDE51B0554940FB+20260805103612.916678-1-zhaojinming@uniontech.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEFXyRECVa4Gmr+4+k+hZIVTL2/135H2ukTJTBPMP9jDFt7PDO9bVzA4v6OkVCxayQoU9Q2g0ELlRAIkuXl+bJDZsiJ6P58Vv2gWnkEaQPknv1LL7t3S34cKMrOOZBpI9BaZpFFPaJTfXpipygi5WZCcImX0VGqxkNoo00d0l58MVOFJdDsc8pHdn7pMeCCYTxigfFgK+PpVJ1jBrx7Pe9LfxoHmlrkZZ/lZAeUALcYW6vmllTQ8o5EGkK2xOBP7Fg7qRni/usuhwkkSlv0cE2rvex5hFO/Yminsw/00dgDg9OtChCb0rReah5vaO/CsrCvCkSauLGb3NNiX8OP9zHBEEttFAP541joXF1tUiPgV01yV8qOjZVF+GIO/DHomBeroE7h25YPQ9k5MVbvqlt3sr9z5McDNWe3T5BvCrDdSADoN6RXiNrsTmIxqcWJN5o0uFLZ1p921PyD2k0vgQZpxO3C88nyl99mlKin5sLIPEmsJm/YM3zEctRhtv2Vbs3nvrIM8yKIoHk8sFbOZtU5KMdn+KbzegnhXW7Z5Ur99ylxhRduGbCuwmQ3hrDDXKMzAcRk2HAxbRD1vLrRPIdGXtYzPFNKwNO+wLVmurkW9P2TQ8avihr8fJMWd0Q+zn4VcjoCuFwJIE7AGVXu2K3qEZ/DtA6Rvt0VrG5noN9kBg
-X-GND-State: clean
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: MyhNtuNETree+iwqgL3l6cnLmc68yTGsl2OctM44KBGxQAYsi7UVd7Wm
+	vGCyuY4ztNn/1pcO6i9UPe2FD+yuV2FXs93enXRAjCSu0i3qcQ99nYdSFo7SXMb2vjcbqNw
+	gTFl5kLZ50qUMon6w7VsHRX7J7fCh0Y5COKKx5u0lpMlKKqw1DfgQ/zoPehO+2qWevwweuy
+	HTYdhIXA+Y3BNuLzptffSxg/Zk8QHsjjxZQ+Qah+CP0aHPvbD9Nc3OTE6YK9gysFn5LHDAZ
+	FktVMVK9stE3hkeOB2SCsdE0wobOdAaLZc4mjd8Hf00GWAg1U9itimWD70eXAdHMkGQ2P2U
+	pH1XVaEfvcihiNNcV4bbmIdX3yQS5v+1k6AISKOP/IxS8GLLBjdnfJjaUHAa9cwT/179pkz
+	vh99kPlTV6gbuAbxInyQ26RFh5kfgTMpDe54HfAVHwVbMEU4rWG4ytB9qXsHivMd7QIxZkz
+	AZut84OSBuLkEul7o+78dnsqRzapXS6RGM2cmmKnDaaS8mJEzFugCPAux9xszJBgoueKtez
+	cDp/kE5A0TWK/y8+JrkSBYCivl5UdpiPs8fQCokK9BJKyA2PxmxI1NgFww6kxfWDTMZEQHJ
+	qBqnSYNDFCT3/NDQKc6ntAuKVDJ8tYRCUAGf6kJ1GsdSKRCmtnuvfGlP3pRWjC1MgNsZNO1
+	xngSJXnEyXVMwcb/xEZjh3BmsKNfM4t/tgEka52McE2w5+PAjws5JRecdr8ap9guyUJVRPf
+	iCvEeMJWERQuUGFSeCbNdlwChwTSIGSnLR/QSRBaZUDYd7fCj7blwNUePGevpWy8Wjumy+K
+	6jEJ7LWAdwRp/A1ixvm7qfghCXXoshVsDlf0bNFmg0AlSsVtlA89WaLdbLaIzGKwZERCNBd
+	s3wGxxSIwg+0VS9XQDfoUze+UE+uifZnraCjEJR8+JUBG2o33CkRnZa5hfNgB+6ouGts3Rp
+	SX+UVb+gSNv2obWboHRV7HDnRtX7/s0Cd3UvMcc5z5RmtTgAt8PUKnfkXyoMBnZ0BOta6vX
+	fyQBTNOm3wqLlL6yc7woU2HviZ1mE=
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-RECHKSPAM: 0
 
-T24gVHVlLCAyMDI2LTA4LTA0IGF0IDEyOjQ2IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVHVlLCBBdWcgNCwgMjAyNiBhdCAxMDozMeKA
-r0FNIEJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4KPiB3cm90ZToKPiA+IAo+ID4g
-QWRhcHQgcG9jX2F2cmNwX29vYi5jIGFuZCBwb2NfZm9sZGVyX29vYi5jIGludG8gdW5pdCB0ZXN0
-cy4KPiA+IAo+ID4gQ28tYXV0aG9yZWQtYnk6IEVsbWFuIFNoYWhiYXpvdiA8c2hhaGJhem92ZWxt
-YW45N0BnbWFpbC5jb20+Cj4gPiAtLS0KPiA+IMKgTWFrZWZpbGUuYW3CoMKgwqDCoMKgwqDCoMKg
-wqDCoCB8wqAgOSArKysrKwo+ID4gwqB1bml0L3Rlc3QtYXZyY3Atc2VjLmMgfCA3Ngo+ID4gKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+ID4gwqAyIGZpbGVzIGNo
-YW5nZWQsIDg1IGluc2VydGlvbnMoKykKPiA+IMKgY3JlYXRlIG1vZGUgMTAwNjQ0IHVuaXQvdGVz
-dC1hdnJjcC1zZWMuYwo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvTWFrZWZpbGUuYW0gYi9NYWtlZmls
-ZS5hbQo+ID4gaW5kZXggMTljNDY4ZDNhNTA0Li5lM2JhYTQxNTVjMWYgMTAwNjQ0Cj4gPiAtLS0g
-YS9NYWtlZmlsZS5hbQo+ID4gKysrIGIvTWFrZWZpbGUuYW0KPiA+IEBAIC02NjAsNiArNjYwLDE1
-IEBAIHVuaXRfdGVzdF9hdnJjcF9TT1VSQ0VTID0gdW5pdC90ZXN0LWF2cmNwLmMgXAo+ID4gwqB1
-bml0X3Rlc3RfYXZyY3BfTERBREQgPSBsaWIvbGliYmx1ZXRvb3RoLWludGVybmFsLmxhIFwKPiA+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHNyYy9saWJzaGFyZWQtZ2xpYi5sYSAkKEdMSUJfTElCUykKPiA+IAo+ID4gK3VuaXRf
-dGVzdHMgKz0gdW5pdC90ZXN0LWF2cmNwLXNlYwo+ID4gKwo+ID4gK3VuaXRfdGVzdF9hdnJjcF9z
-ZWNfU09VUkNFUyA9IHVuaXQvdGVzdC1hdnJjcC1zZWMuYyBcCj4gPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJvZmlsZXMvYXVkaW8vYXZyY3AtcGFyc2Uu
-YyBcCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJv
-ZmlsZXMvYXVkaW8vYXZyY3AtcGFyc2UuaCBcCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgc3JjL2xvZy5oIHNyYy9sb2cuYwo+ID4gK3VuaXRfdGVzdF9h
-dnJjcF9zZWNfTERBREQgPSBsaWIvbGliYmx1ZXRvb3RoLWludGVybmFsLmxhIFwKPiA+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-c3JjL2xpYnNoYXJlZC1nbGliLmxhICQoR0xJQl9MSUJTKQo+IAo+IEFueSByZWFzb24gd2h5IHRo
-aXMgY291bGRuJ3QgbGl2ZSBpbnNpZGUgdGVzdC1hdnJjcC5jPwoKQmVjYXVzZSBtb3N0IG9mIHRo
-ZSBjb2RlIGluIHRlc3QtYXZyY3AuYyBpcyBtb2NrZWQgaW4gdW5pdC9hdnJjcC0KbGliLltjaF0g
-YW5kIGNvbmZsaWN0cyB3aXRoIGNvZGUgZnJvbSBwcm9maWxlcy9hdWRpby9hdnJjcC5jLiBJIHJl
-YWxseQpkaWQgdHJ5Li4uCgpJIGNhbiBjaGFuZ2UgdGhlIG5hbWUgb2YgdGhlIHRlc3QgaWYgbmVl
-ZGVkLgoKPiAKPiA+IMKgdW5pdF90ZXN0cyArPSB1bml0L3Rlc3QtaGZwCj4gPiAKPiA+IMKgdW5p
-dF90ZXN0X2hmcF9TT1VSQ0VTID0gdW5pdC90ZXN0LWhmcC5jCj4gPiBkaWZmIC0tZ2l0IGEvdW5p
-dC90ZXN0LWF2cmNwLXNlYy5jIGIvdW5pdC90ZXN0LWF2cmNwLXNlYy5jCj4gPiBuZXcgZmlsZSBt
-b2RlIDEwMDY0NAo+ID4gaW5kZXggMDAwMDAwMDAwMDAwLi5hMTAwYjJkNjhlMzUKPiA+IC0tLSAv
-ZGV2L251bGwKPiA+ICsrKyBiL3VuaXQvdGVzdC1hdnJjcC1zZWMuYwo+ID4gQEAgLTAsMCArMSw3
-NiBAQAo+ID4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wLW9yLWxhdGVyCj4g
-PiArLyoKPiA+ICsgKgo+ID4gKyAqwqAgQmx1ZVogLSBCbHVldG9vdGggcHJvdG9jb2wgc3RhY2sg
-Zm9yIExpbnV4Cj4gPiArICoKPiA+ICsgKsKgIENvcHlyaWdodCAoQykgMjAyNsKgIFJlZCBIYXQg
-SW5jLgo+ID4gKyAqCj4gPiArICoKPiA+ICsgKi8KPiA+ICsKPiA+ICsjaWZkZWYgSEFWRV9DT05G
-SUdfSAo+ID4gKyNpbmNsdWRlIDxjb25maWcuaD4KPiA+ICsjZW5kaWYKPiA+ICsKPiA+ICsjaW5j
-bHVkZSA8Z2xpYi5oPgo+ID4gKwo+ID4gKyNpbmNsdWRlICJzcmMvc2hhcmVkL3V0aWwuaCIKPiA+
-ICsjaW5jbHVkZSAic3JjL3NoYXJlZC90ZXN0ZXIuaCIKPiA+ICsjaW5jbHVkZSAic3JjL2xvZy5o
-Igo+ID4gKwo+ID4gKyNpbmNsdWRlICJwcm9maWxlcy9hdWRpby9hdnJjcC1wYXJzZS5oIgo+ID4g
-Kwo+ID4gK3N0YXRpYyB2b2lkIGF2cmNwX2VsZW1lbnRfbmFtZV9vb2IoZ2NvbnN0cG9pbnRlciBk
-YXRhKQo+ID4gK3sKPiA+ICvCoMKgwqDCoMKgwqAgY2hhciBuYW1lWzI1NV07Cj4gPiArwqDCoMKg
-wqDCoMKgIHVpbnQxNl90IG5hbWVzaXplOwo+ID4gK8KgwqDCoMKgwqDCoCBnYm9vbGVhbiByZXQ7
-Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgIC8qIENyYWZ0aW5nIGEgbWFsaWNpb3VzIHBheWxvYWQu
-Cj4gPiArwqDCoMKgwqDCoMKgwqAgKiBBY3R1YWwgcGFja2V0IGxlbmd0aCAobGVuKSA9IDE0IGJ5
-dGVzICovCj4gPiArwqDCoMKgwqDCoMKgIHVpbnQ4X3QgbWFsaWNpb3VzX3BhY2tldFsxNF0gPSB7
-MH07Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgIC8qIFNwZWNpZnkgbmFtZXNpemUgPSAxMDAwICgw
-eDAzRTggaW4gQmlnIEVuZGlhbikgYXQgb2Zmc2V0Cj4gPiAxMSAqLwo+ID4gK8KgwqDCoMKgwqDC
-oCBtYWxpY2lvdXNfcGFja2V0WzExXSA9IDB4MDM7Cj4gPiArwqDCoMKgwqDCoMKgIG1hbGljaW91
-c19wYWNrZXRbMTJdID0gMHhFODsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgLyogTGF1bmNoaW5n
-IHRoZSBQb0MuIFdlIHRyYW5zbWl0IGEgMTQtYnl0ZSBwYWNrZXQsIGJ1dAo+ID4gbmFtZXNpemU9
-MTAwMC4uLiAqLwo+ID4gK8KgwqDCoMKgwqDCoCByZXQgPSBwYXJzZV9tZWRpYV9lbGVtZW50X25h
-bWUobWFsaWNpb3VzX3BhY2tldCwKPiA+IHNpemVvZihtYWxpY2lvdXNfcGFja2V0KSwKPiA+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBuYW1lLCAmbmFtZXNpemUpOwo+ID4gK8KgwqDCoMKgwqDCoCBpZiAo
-cmV0KQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGVzdGVyX3Rlc3RfcGFzc2Vk
-KCk7Cj4gPiArwqDCoMKgwqDCoMKgIGVsc2UKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIHRlc3Rlcl90ZXN0X2ZhaWxlZCgpOwo+ID4gK30KPiA+ICsKPiA+ICtzdGF0aWMgdm9pZCBh
-dnJjcF9mb2xkZXJfbmFtZV9vb2IoZ2NvbnN0cG9pbnRlciBkYXRhKQo+ID4gK3sKPiA+ICvCoMKg
-wqDCoMKgwqAgY2hhciBuYW1lWzI1NV07Cj4gPiArwqDCoMKgwqDCoMKgIGdib29sZWFuIHJldDsK
-PiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgLyogQ3JhZnRpbmcgYSBtYWxpY2lvdXMgcGF5bG9hZC4K
-PiA+ICvCoMKgwqDCoMKgwqDCoCAqIEFjdHVhbCBwYWNrZXQgbGVuZ3RoIChsZW4pID0gMTQgYnl0
-ZXMgKi8KPiA+ICvCoMKgwqDCoMKgwqAgdWludDhfdCBtYWxpY2lvdXNfcGFja2V0WzE0XSA9IHsw
-fTsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgLyogU3BlY2lmeSBuYW1lc2l6ZSA9IDEwMDAgKDB4
-MDNFOCBpbiBCaWcgRW5kaWFuKSBhdCBvZmZzZXQKPiA+IDEyICovCj4gPiArwqDCoMKgwqDCoMKg
-IG1hbGljaW91c19wYWNrZXRbMTJdID0gMHgwMzsKPiA+ICvCoMKgwqDCoMKgwqAgbWFsaWNpb3Vz
-X3BhY2tldFsxM10gPSAweEU4Owo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoCAvKiBMYXVuY2hpbmcg
-dGhlIFBvQy4gV2UgdHJhbnNtaXQgYSAxNC1ieXRlIHBhY2tldCwgYnV0Cj4gPiBuYW1lc2l6ZT0x
-MDAwLi4uICovCj4gPiArwqDCoMKgwqDCoMKgIHJldCA9IHBhcnNlX21lZGlhX2ZvbGRlcl9uYW1l
-KG1hbGljaW91c19wYWNrZXQsCj4gPiBzaXplb2YobWFsaWNpb3VzX3BhY2tldCksCj4gPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIG5hbWUpOwo+ID4gK8KgwqDCoMKgwqDCoCBpZiAocmV0KQo+ID4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGVzdGVyX3Rlc3RfcGFzc2VkKCk7Cj4gPiArwqDCoMKg
-wqDCoMKgIGVsc2UKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHRlc3Rlcl90ZXN0
-X2ZhaWxlZCgpOwo+ID4gK30KPiA+ICsKPiA+ICtpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
-dltdKQo+ID4gK3sKPiA+ICvCoMKgwqDCoMKgwqAgdGVzdGVyX2luaXQoJmFyZ2MsICZhcmd2KTsK
-PiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgdGVzdGVyX2FkZCgiL2F2cmNwLWVsZW1lbnQtbmFtZS1v
-b2IiLCBOVUxMLCBOVUxMLAo+ID4gYXZyY3BfZWxlbWVudF9uYW1lX29vYiwgTlVMTCk7Cj4gPiAr
-wqDCoMKgwqDCoMKgIHRlc3Rlcl9hZGQoIi9hdnJjcC1mb2xkZXItbmFtZS1vb2IiLCBOVUxMLCBO
-VUxMLAo+ID4gYXZyY3BfZm9sZGVyX25hbWVfb29iLCBOVUxMKTsKPiA+ICsKPiA+ICvCoMKgwqDC
-oMKgwqAgcmV0dXJuIHRlc3Rlcl9ydW4oKTsKPiA+ICt9Cj4gPiAtLQo+ID4gMi41NS4wCj4gPiAK
-PiA+IAo+IAo=
+hci_uart_unregister_device() frees the HCI device (hci_free_dev)
+before cancelling write_work via cancel_work_sync(). If write_work
+is executing concurrently on another CPU, it can access hu->hdev
+(serdev.c:61) and write to hdev->stat (serdev.c:75, 83) after the
+memory has been freed.
+
+Additionally, HCI_UART_PROTO_READY is not cleared until after
+cancel_work_sync, so the write_wakeup serdev callback can still
+schedule write_work via hci_uart_tx_wakeup() even after
+hci_free_dev has freed the device.
+
+Fix this by mirroring the same ordering used in the tty/ldisc path
+(hci_uart_tty_close, hci_ldisc.c:565-593):
+1. Clear HCI_UART_PROTO_READY and close the serdev port
+2. Cancel write_work (no new work can be scheduled)
+3. Unregister the HCI device
+4. Close the protocol (may access hu->hdev, e.g. bcm_close)
+5. Free the HCI device
+
+Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
+---
+ drivers/bluetooth/hci_serdev.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 593d9cefbbf9..e06b9d5b3846 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -397,18 +397,22 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	struct hci_dev *hdev = hu->hdev;
+ 
+ 	cancel_work_sync(&hu->init_ready);
+-	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+-		hci_unregister_dev(hdev);
+-	hci_free_dev(hdev);
+-
+-	cancel_work_sync(&hu->write_work);
+-
+-	hu->proto->close(hu);
+ 
++	/* Clear HCI_UART_PROTO_READY first to prevent the write_wakeup
++	 * callback from re-scheduling write_work via hci_uart_tx_wakeup().
++	 */
+ 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		serdev_device_close(hu->serdev);
+ 	}
++
++	cancel_work_sync(&hu->write_work);
++
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++		hci_unregister_dev(hdev);
++
++	hu->proto->close(hu);
++	hci_free_dev(hdev);
+ 	percpu_free_rwsem(&hu->proto_lock);
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+-- 
+2.51.0
 
