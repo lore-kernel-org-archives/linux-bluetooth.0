@@ -1,75 +1,300 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C0F30D40F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 04:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E2C3DB331
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 06:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785903451; cv=none; b=D2GeRGujBVtCn7aRA4UnA6aduD12XRlMfZdHspMT0ApxNUoLeidKfjEhF7kUZDjIirF/+bMlcjbgA5f4bF7IcMCXob2aM4pgfBR/PhnlD4WY81uMq/6bOzepttcV++Zl6TDIIkfEsbftJp+BcBXsjMKJyCWIldVtVPM1SEcOAA0=
+	t=1785910741; cv=none; b=Z4sJmzdK93p+RRQ+tGtRCyBaOV7e8sTx4WT6UB5j0xfxlwj3MoYoM913kCJToAXpdu9vWX+HYy2paOmPxxY++WKgzqMpL79lfk1VXG2vpQOIvvBf99/i2bzoS8KvG9RXCS+4pAY/pKJ0RIdN0m+37/izes5Op/46kS7pZ3T5dcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785903451; c=relaxed/simple;
-	bh=Uk0jQ62/r6yVe8RFXRVC7TyHKSbWm/Tio0Oi3Jqfznk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kFVXT2RjWrG6Xf8y3V+0LYaniNsLPcvSnS4s5WCqeTE7KfS6AbIAeg70lP3rr3MMckUheG8UyNtBOMIs+2/H1hXw5G9pwY7OvJNRgVvI2hPRTu2sPb7oxo2uNXoNHObYyTiIsDfU5fVdorf08E2N59pTaib0DjN4OrVkHtvdnjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftVm1g6E; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1785910741; c=relaxed/simple;
+	bh=MbJ4xQgIXo1xsWEFSQw1SlfI9A5LaPiERjRMt5TCJJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NDOhCknwFaxPfiZoXu6i+gRhG2LXXD460csuTEYkiuI0d0QO2QadKegu4drQHnuR/0Wssu3Skhxx0EEEPKGeqhOsXLdV35dIUQ9A6mDEXtdifp0zQ8kYnSP1Uj21cnDJ1vGl/8lsgTtjMLYPG5cmEfJi8vBpg0QUNUx1qLzJmqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bGfZgjCP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QbQc9coV; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftVm1g6E"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B0D6C19425
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 04:17:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785903451;
-	bh=Uk0jQ62/r6yVe8RFXRVC7TyHKSbWm/Tio0Oi3Jqfznk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ftVm1g6EEMsgNu4rHTXbji3II3iox8mX9NkAnaWquTe9vqjDdAKwcTUGVfSY6sHWv
-	 IOtSEK8ecWxrvjP4+eB9UKR1vCQdjnCU/uupnBgwZhA3r8dRH1tRNienlrb6akC2H5
-	 brafLes74cCarb9gUW55R+ScjpDj9DyxMieNEeqgbaKKW97yp8ysQGUfTI23vgNiCz
-	 qIJhDPVi2VerlMF5ZsQHzaKyy+u+ep3YnVuJZlPuAeZGomOQ0a3y/k/QcWAOzdgPhw
-	 gEwMK/vDu9jxId6LjeYcGsip2sbg6VWn0Uk/W4smZp5/bUzm6gSSJensNyPh9vz6RE
-	 Di6OBNEdvBFPw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 05F00C41612; Wed,  5 Aug 2026 04:17:31 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221832] MT7925 (Foxcon T99H493.03) BT missing in lsusb on
- Vivobook S16
-Date: Wed, 05 Aug 2026 04:17:30 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lnxps@bbtex.net
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221832-62941-9hHyLaHFk3@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221832-62941@https.bugzilla.kernel.org/>
-References: <bug-221832-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bGfZgjCP";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QbQc9coV"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6755l79r1731919
+	for <linux-bluetooth@vger.kernel.org>; Wed, 5 Aug 2026 06:18:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	IUwwlRJ7oVartoiGymz2Uz94bLku19J9MoLLo0EivII=; b=bGfZgjCPLEsdbuX0
+	y2IqEjjJ2DAuvYcFOuXiQ2jfAkP4ncf8ZxNZzpDceIEwJduml2aBH1KlcgDj1NhC
+	A3VF4ajOodZhenUEq8Noxsw7AOS/4OK2MXYNziibP9FLpESvSQIOHc99HhhongMQ
+	Ew0A61aw+rSeyY9Xh4EJIyYksud7MmEmE7eNiFWybFJNDKq4y8Y4pitEG3bjBNOt
+	IaowQvGmK1KOAW5E0b9zqT20soR4+3Uxomit00/5o/ilti6m7JE7QbX+YJLBaI5u
+	K5id3rUMiaMuTlbAxyVfJMY69RPSiGw39oaISC6xx5AergGlkB2ZlgE3YwEm0xH8
+	2Fb7bw==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fugmgm6g2-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 06:18:58 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-38ec0f510a9so1373739a91.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Aug 2026 23:18:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1785910737; x=1786515537; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IUwwlRJ7oVartoiGymz2Uz94bLku19J9MoLLo0EivII=;
+        b=QbQc9coVQPRTRH+ro1Vr417S/ouEUO/a3VAuCqx2+OFKHK8J08hFaaF4JJKp5e49+i
+         6xWRQAeizLcifnbXsJGGs2vcgFHKGnTqdDHO8rRg9E089UBu4/07+oL7jGpi85J9xcu3
+         g8ap1ETeQLRw4oZO27Y6Y5QJif5uJh5yaSMLHYJj6pK/1Y5dX6WtsxNoIWGf0IuWbzkz
+         93YRL85TMMgQKZHWtdST//TRiIt4dcJ7Rfk+F7v2WxVCWm2zRvl1VNGnjscM9eQvT4of
+         lXwhadkIwa3qy+ECF4/ykG8vXptv1p+KKLtM+Rjj654AkBuRnF5Z50ALPcuKv71e2ge6
+         KzAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785910737; x=1786515537;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=IUwwlRJ7oVartoiGymz2Uz94bLku19J9MoLLo0EivII=;
+        b=jy5zAadipYKHFtUJbWkODxSKAOg3uzdcbRro8JOd/mfZPSvmtpHlRlFE7sDjcBAqgM
+         JDdhT7ywn61mlTh1zQxl0i1trKK6Yp5FZEfSWQCQnARVZLwAznWx802S9IExNKh2a9d+
+         lE8ocYC3OXjGd3J/1Wi65yPEPMhXjE4zELFNo36jZs4jePKQLdBFAeVoQrWzUfcgdXg1
+         6eSv0rNpv9OAyWmQKSirIyO8krge4GBCUpLKjvxUMK3h7hwqcm2Yhyw3tFn1dwMBOLLB
+         TK0CxkR/Bbcx6PkLuhV6M884yf0AKDA5ZD9S/Z6AM07VdkuHyYH8G6su0a1luACGijIx
+         3mhA==
+X-Forwarded-Encrypted: i=1; AHgh+RrrCUIFv8tIof5vsLmFBHTfm5kXCYIIvpHsEPolRyac2okMjoHhe3/wBL/Yznwl5DOCXYN0hiHuht3Fq+shJ5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPibWgLFycPvAYoTeUE/5daSZSxZMp1oxZsOqArfq9RUVX6swA
+	wYzDRCv7K6z37CC7kJ9JWyiU9ZejFMwk9wsvVMVzO/DCrHzjEz74Thj1KvE31Si3/hdGIHcVobr
+	s0PU1AIT25DmRSrA3eTnHoUklNK3NBmr/xFubSmqso92Nl312/Yv7zoG45YQ4DWHPB0VJvcY=
+X-Gm-Gg: AR+sD13EkqLaR7rwjREUUpCKOuYd9i1EdXqTzRvNe/1fUSMd20oKC2YPZomWy6Va4i7
+	LGCfxxsIvJ6Dg0CjXYUcjEjSEoH7jOWbprP4V2jFwa4Ntb1r39/TWCZwrAGteDZbDJzfidbCSio
+	GQMwFfvM5+EeRYLGqEPypRx6dHzBB26qcul9eqNJmOckQ6CsbPYJrhNy5v1rqjIU8tuVA/jHlnK
+	cYUovf7HPhBx4yIxadR+D4s86aURuLGHgCEtu9mlhr9v3Zm9Iq1Z43MGoDxKOJR3LWRfhgs4HKk
+	iOhsINeLWxYLjLUX1oj+go3Thy8q7q2puUx0Usmg/sYHXXgPF21OrHC99PAKThPzBtq3wQb1T+x
+	9HAXRFJDsVG2UdRGzjaZYtgaV7qliW2U=
+X-Received: by 2002:a17:90b:4b87:b0:37f:c2a8:ce45 with SMTP id 98e67ed59e1d1-3903c537d5fmr4245640a91.4.1785910737442;
+        Tue, 04 Aug 2026 23:18:57 -0700 (PDT)
+X-Received: by 2002:a17:90b:4b87:b0:37f:c2a8:ce45 with SMTP id 98e67ed59e1d1-3903c537d5fmr4245550a91.4.1785910736859;
+        Tue, 04 Aug 2026 23:18:56 -0700 (PDT)
+Received: from [10.217.252.136] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38febe308dbsm3451025a91.0.2026.08.04.23.18.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Aug 2026 23:18:56 -0700 (PDT)
+Message-ID: <a86124c9-a5ff-4265-8a14-68b25f010577@oss.qualcomm.com>
+Date: Wed, 5 Aug 2026 11:48:48 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/6] arm64: dts: qcom: rb3gen2: add Industrial BT UART
+ overlay
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann
+ <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        Manivannan Sadhasivam
+ <mani@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
+        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
+ <20260727-rb3-industrial-bt-uart-v2-6-2d100f30e202@oss.qualcomm.com>
+ <794424df-4714-43a4-b4b8-e960998ad1f1@oss.qualcomm.com>
+ <ce283ef7-2460-4fa4-a1f5-9757fd6b42b5@oss.qualcomm.com>
+ <6d61d749-440f-40ad-82e5-e1e909afad06@oss.qualcomm.com>
+ <b47345f1-1c7b-4424-9c6b-3dd02c0f4ab6@oss.qualcomm.com>
+ <bf7821a2-d813-4f89-b891-9c26d228ae67@oss.qualcomm.com>
+ <b5afd21c-4516-4a8c-bc8f-6598ec385d27@oss.qualcomm.com>
+ <am6572YrbAULTa88@baldur>
+Content-Language: en-US
+From: Rahul Samana <rahul.samana@oss.qualcomm.com>
+In-Reply-To: <am6572YrbAULTa88@baldur>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA1MDA0NyBTYWx0ZWRfX9FKjnSOxS1R4
+ N+5F0S61E5Qw67SIyCAUbKgDyMzFtVrB+ZbKeLI+hjEqCQZj1cN5DN8qY98a/IIkSr8h//uCqOx
+ iBQiQrJjHyQSCHx8sak13qjz4k2HqntQAoEGjlKQM8YRSFcJ/Dv+5DMa7q4G8KB95HZCx4jhb7Z
+ I36Q2OcnHoWemvUJ6++Lp6j82jc1+j+0FM5l5qDeR1m69Y54R2v9I4N86tjciCTqrQOZfuCwQEl
+ PKgY51D5DfdU/KiSiBirM3+VLV+VUo1wjz8Gcs+e0yAepuZzWKBJ55gJIlW4z3jiUmJzsOcPVZN
+ GDCEcl6oem2uzNtrzVewzLF7eRwP3pH2XLM3EhMQI2z6FiuTOOeu5ycmE41/gMk5+p2MZnziuaF
+ OnKotcv8LeaIsFimOsuN39LDr81nF9JYiiNDR+2jYHXNf+ENxsOyEyyyUYC4/J0qhJq+Fi/V+Vz
+ Pl0wOpEqiWeGryRspTw==
+X-Proofpoint-GUID: 9ZuMehrCNM3RwYQfCe6rl_gz5lsuc7Mn
+X-Proofpoint-ORIG-GUID: 9ZuMehrCNM3RwYQfCe6rl_gz5lsuc7Mn
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA1MDA0NyBTYWx0ZWRfX4vGhZxgDqSXw
+ X44aRQ0wEI5H7aGGv/+BebQf9tMfoFE7D9yrZ+Lhm3fTjVaYvrI2nqvFjwRcMkKiE0pY0fvE15N
+ 02QJaqF1AA7krkpxu4aojaeZovAz3R4=
+X-Authority-Analysis: v=2.4 cv=XYC5Co55 c=1 sm=1 tr=0 ts=6a72d5d2 cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
+ a=kUy7bicM43VmfkegJQAA:9 a=QEXdDO2ut3YA:10 a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-05_02,2026-08-04_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 bulkscore=0 impostorscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608050047
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221832
 
---- Comment #7 from IQ (lnxps@bbtex.net) ---
-I've tried the resolute 7.0.0 repo, this one doesn't even see the PCIe Wifi
-component... quite a piece of crap
 
---=20
-You may reply to this email to add a comment.
+On 02-08-2026 09:08, Bjorn Andersson wrote:
+> On Fri, Jul 31, 2026 at 11:20:07PM +0530, Rahul Samana wrote:
+>>
+>>
+>> On 31-07-2026 21:19, Konrad Dybcio wrote:
+>>> On 7/31/26 4:48 PM, Rahul Samana wrote:
+>>>>
+>>>>
+>>>> On 31-07-2026 18:20, Konrad Dybcio wrote:
+>>>>> On 7/31/26 8:53 AM, Rahul Samana wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 29-07-2026 18:01, Konrad Dybcio wrote:
+>>>>>>> On 7/27/26 5:45 PM, Rahul Samana wrote:
+>>>>>>>> The reworked RB3 Gen 2 Industrial mezzanine keeps the common Industrial
+>>>>>>>> mezzanine hardware description but routes QCC2072 Bluetooth over UART4
+>>>>>>>> instead of the default Bluetooth-over-USB path.
+>>>
+>>> I only noticed this now - are there 2 variants of the industrial
+>>> mezz being sold concurrently? Is the already-in-kernel one some
+>>> sort of a prototype SKU? i.e. should we support both?
+>>>
+>>>>>>>>
+>>>>>>>> Build this variant by applying the common Industrial mezzanine overlay
+>>>>>>>> first, followed by the BT UART overlay. The overlay models the M.2 E-key
+>>>>>>>> connector graph endpoints for PCIe and UART, and disables the on-board
+>>>>>>>> WCN6750 PMU and UART7 path so the M.2 QCC2072 Bluetooth controller can be
+>>>>>>>> used instead.
+>>>>>>>
+>>>>>>> So is the onboard module disabled? Can we not just use two in parallel?
+>>>>>>>
+>>>>>>
+>>>>>> The Industrial mezzanine variants do not support the on-board WCN6750
+>>>>>> wireless path. The common Industrial mezzanine overlay already disables
+>>>>>> the on-board Wi-Fi node.
+>>>>>
+>>>>> What does 'do not support' it mean here? They are physically present
+>>>>> as part of the SoM, so unless the lanes are somehow diverted away,
+>>>>> why is it not?
+>>>>>
+>>>>> Konrad
+>>>>
+>>>> Hi Konrad,
+>>>>
+>>>> The WCN6750 module is physically present on the SoM. What I meant is that
+>>>> the current Industrial mezzanine devicetree already disables the on-board
+>>>> Wi-Fi path, and this BT UART variant followed the same board-level policy
+>>>> for the on-board Bluetooth UART/PMU path.
+>>>
+>>> Okay, and do we know why that's the case in the first place?
+>>>
+>>>> For the endpoint labels, I can move the UART endpoint to the SoC DTSI,
+>>>> kodiak.dtsi, as uart4_ep.
+>>>
+>>> Please do
+>>>
+>>>> For the PCIe endpoint, the PCIe path to the M.2 QCC2072 device is not the
+>>>> PCIe0 root port in kodiak.dtsi. In the composed devicetree, it is
+>>>> behind the Industrial mezzanine PCIe switch, under:
+>>>>
+>>>>     /soc@0/pcie@1c00000/pcie@0/pcie@0,0/pcie@2,0
+>>>>
+>>>>
+>>>> So placing pcie0_port0_ep in kodiak.dtsi would not describe the actual
+>>>> topology.
+>>>
+>>> Yes, that was an omission from my side
+>>>
+>>>
+>>>> I tried adding a generic label/endpoint to that downstream port in the
+>>>> Industrial mezzanine overlay and referencing it from the BT UART overlay.
+>>>> However, when the overlays are compiled separately and then composed, that
+>>>> label is not available while applying the BT UART overlay, so the composed
+>>>> DTB build fails with FDT_ERR_NOTFOUND.
+>>>
+>>> I think this generic description is simply not achievable today without
+>>> a bigger plan in place
+>>>
+>>> Konrad
+>>
+>> Hi Konrad, Dmitry,
+>>
+>> Yes, both Industrial Kit variants need to be supported.
+>>
+>> The default Industrial Kit uses the common Industrial mezzanine hardware
+>> description and continues to use the existing Bluetooth-over-USB path.
+> 
+> "Kit uses the common" what do you even mean?! The mezzanine is a
+> physical thing, it doesn't _use_ anything! The mezzanine exists and the
+> DeviceTree describe what it is.
+> 
+>> The
+>> reworked Industrial Kit variant keeps the rest of the Industrial mezzanine
+>> hardware the same, but routes Bluetooth over UART4 instead.
+>>
+> 
+> Does "reworked mezzanine" mean what it usually does? I.e. that you have
+> taken the mezzanine and modified it?
+> 
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Hi Bjorn,
+
+Let me clarify.
+
+There are two physical RB3 Gen 2 Industrial mezzanine variants that need
+to be supported:
+
+1. The existing RB3 Gen 2 Industrial mezzanine variant currently
+   described in-tree, where the M.2 E-key interface routes Bluetooth over
+   USB.
+
+2. A reworked RB3 Gen 2 Industrial mezzanine variant, where the
+   mezzanine board was reworked to make the existing M.2 E-key interface
+   route Bluetooth over UART4.
+
+The reworked variant is a physical mezzanine board variant, not a
+software-only configuration of the same board.
+
+The intent of this overlay is to describe only that board-level
+difference while reusing the common Industrial mezzanine description for
+the hardware that remains unchanged.
+
+Thanks,
+Rahul
+
+
+> [..]
+>>
+>> I am open to other suggestions if there is a better way to model this within
+>> the current overlay structure.
+>>
+> 
+> I don't think it's possible to give you other suggestions as you haven't
+> described what this thing is, you just explaining how you're hacking
+> something together and ask us to help adjust your hack without knowing
+> what it is you're trying to describe with your DeviceTree.
+> 
+> Regards,
+> Bjorn
+> 
+>> Thanks,
+>> Rahul
+>>
+
