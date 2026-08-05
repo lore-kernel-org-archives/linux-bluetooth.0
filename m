@@ -1,328 +1,341 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC42F42AFB5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 13:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BFD329C48
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 14:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785936133; cv=none; b=KoHDyM8LQpUx6YT7fhEXDe8hd546l2one7IZTZEOfe4QrJREOaV42BFAtU8CzXMYB2jwxXQbfeB9JAWh3lWWB+vIUHddf9bleG9Qrwfsk6gdt8OPgVB8X2fMUFJM6lJCtLgb0xTOpNiCQG101/N9qmFO8/KAVxFhHUH9/+oQwe4=
+	t=1785939148; cv=none; b=E9HBplSTDI4RMerUsfIy98i4w6pth7gfoFi2Q3Isrt0hBlC4uIwKn0L5AkzoIKCKD3wB4CjtshhnbbxRFj7U7A1IVC61p5am9zDGDDYqrQ/ddNyD7xEDSTzkUSDmZP+Bgut2OLGrAw7bZdkTDZr14sf8Z1He2GI3ZvVucN4UW/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785936133; c=relaxed/simple;
-	bh=XDlTnEiRcwnJj+o7tyvRtU2DE2NZNN+aUR4wghtb0Wc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=OC7PmD/iiQgzo5P2gOXgGu2SkeK26V6qwW+uwtrHNz+44ZW2KBIqidVspDawRhdlJcWt1Ns37dfUZWnwUSDEQO5JmhqG7puFrvGBQJN67EVOwX6BCQfBAoE9UbkYcX8b5oFozu/iNjRADhmeQChNMsCBLoNKwWdoIqTY0RSMcqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hSJkDoZ9; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hSJkDoZ9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1785936129;
-	bh=XDlTnEiRcwnJj+o7tyvRtU2DE2NZNN+aUR4wghtb0Wc=;
-	h=From:To:Subject:Date:From;
-	b=hSJkDoZ92Uc38G2ZCWFwVJuawhGfYKmTuWAeTW46gDAWJK7fCFKOqFZ3QsapLuopX
-	 CITM6vD/E25upkjscXhFSm/oskEW4yOBZL0vnPVsZhwMQZ1+KNzFCsNqoaln/SgU0E
-	 caMC2t5SEJG/4F5uZqhkcWcdbSKo1v8BDblpIbcDJP+dK9PYWdQ2ufG0QhRe+xhmLz
-	 XRkgwZAMjI8cpEsL8TWCzGCPryLkb2mLGNEzyZBJaatoJdOcpIu5i3Bze38SZYQEXH
-	 BWtc5P8KBYDIGq21bfi7BWGlDBOikeNssAbiIuX2cwvTR7aQY8plO93EVO/yUFL4YI
-	 eTtxp4h7UqS4w==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7E0F417E025E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 15:22:09 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	s=arc-20240116; t=1785939148; c=relaxed/simple;
+	bh=rqlEmK/ig5NIcaQRrNRJFc16oVQ1FCL81ZIlEVZeVUU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DQBorD2TAR/M2Qf1H5rVNJguKEaC22ykqPbF7peHclBBYAvhueCAxdUABUBVHfl7nLkBRVurU9BPPp9YmnE7jE6jqrr7j+CbvXEkOQmVC1AMGl/aMSgMzt8P9xBIgizy+sZUSa8td9K2+IWUt5517hSAfpJaz3/zVBt9OGwd8/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id AFDD1581FB7
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 13:52:44 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C17091F6BE
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 13:52:36 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: MGMT: Add management security level changed event
-Date: Wed,  5 Aug 2026 15:22:03 +0200
-Message-ID: <20260805132203.176213-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [BlueZ, v1] unit: Add test for sdp_xml_parse_record()
+Date: Wed,  5 Aug 2026 15:52:20 +0200
+Message-ID: <20260805135228.2653665-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: 49
+X-GND-Cause: dmFkZTFfUkm97i/0C4MGgFMMkemgtMbOybsAB8fn+2b5b2IlSp1GH/UQwjveYdC0X499RCy5gFFhhaKkbl/q2aDdTb21yLHF2xIdYfZ5CbQYNoIAgHzWdvDVCgIpmeh1wbaTjukyb7eZFbE813XG23/TTnFEsH6aWqccIFQoISLGBucA+T8/2lUYuQ/bZK7pWXra3ueFR34MT7M1y1Q2zFd7+C0JcmIUlUS/te8HTOq2eG140Wo1ivI8Iei1w4Nrev6QL7OwJL6Vll5FFm4hkvG2P6k3fsTZIW9iHQlMcPTzBSGGqjs9DGkjvd6DcRs5bvoiBKyDiQD38IHDMu/EYRiXPRUNbGLjfzmQFFvkVm9f4x7RLwLjtxtAhtGsFVOHMRUrMR4f49I1Cs4aW4lwEslpKFPa/CiTGwOXQsufQiBqUQcOLez6arHMaJQH3cWt3uJtzBz6vMSvf8V0OsZcHcV64QtNcPh01ZPFdZELfYGxBMhuo0yZIgollgkulqGMBoXFeRziOOiIUm2NeloKwIB1gsHO6CpgKHiC2Py6LZvcVh04v1c5M092ItL7ay/31QAyOm5/5h3lioIOu0rtLARQtTQ4KGq0ajjk6PcwgI0GyIujvN7GmuuBxo4/iX4Q7ZdG6FcAEXt6AwDOk5AiK96VB1yOh17eFvV7cY6p+HyKDAnDuQ
 
-Add an event on device security level or encryption type change to
-let user space know which level is currently in use.
-Reset security level to 0 on disconnection so further connections
-will correctly report security level changes.
-
-This will be used for BlueZ qualification automation.
-
-Assisted-by: GPT:GPT-5.3-Codex
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+This adds 2 example XML files from other repositories, under a fair use
+license exception.
 ---
-v1->v2:
- - Add encryption type to the mgmt event
- - Send event on security level or encryption type change
-v2->v3:
- - Replace fixed security level and ancryption type parameters by TLV array
-   to allow later enhancement.
-v3->v4:
- - Change MGMT_EV_SECURITY_LEVEL_CHANGED to 0x0034
- - Add __counted_by for the tlv_data
- - dynamically allow the mgmt_ev_security_level_changed structure
+ Makefile.am                               |  10 ++
+ unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123 ++++++++++++++++++++++
+ unit/sdp-xml/qt-SerialPortSDPRecord.xml   |  57 ++++++++++
+ unit/test-sdp-xml.c                       |  69 ++++++++++++
+ 4 files changed, 259 insertions(+)
+ create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+ create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
+ create mode 100644 unit/test-sdp-xml.c
 
- include/net/bluetooth/hci_core.h | 15 ++++++++++--
- include/net/bluetooth/mgmt.h     | 14 +++++++++++
- net/bluetooth/hci_conn.c         |  8 +++++++
- net/bluetooth/hci_event.c        | 20 ++++++++++++++--
- net/bluetooth/mgmt.c             | 40 ++++++++++++++++++++++++++++++++
- 5 files changed, 93 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 01b938c4b24a..c7a4c0e74cbd 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2199,6 +2199,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 		conn->security_cfm_cb(conn, status);
- }
+diff --git a/Makefile.am b/Makefile.am
+index 19c468d3a504..1c62ee66bdce 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -637,6 +637,16 @@ unit_test_sdp_SOURCES = unit/test-sdp.c \
+ unit_test_sdp_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
  
-+void mgmt_security_level_changed(struct hci_conn *conn);
++unit_tests += unit/test-sdp-xml
 +
- static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- {
- 	struct hci_cb *cb;
-@@ -2221,11 +2223,20 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 		encrypt = 0x01;
- 
- 	if (!status) {
--		if (conn->sec_level == BT_SECURITY_SDP)
-+		bool sec_level_changed  = false;
++unit_test_sdp_xml_SOURCES = unit/test-sdp-xml.c \
++				src/sdp-xml.c src/sdp-xml.h \
++				src/log.h src/log.c
++unit_test_sdp_xml_LDADD = lib/libbluetooth-internal.la \
++				src/libshared-glib.la $(GLIB_LIBS)
++unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)"\"
++unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
 +
-+		if (conn->sec_level == BT_SECURITY_SDP) {
- 			conn->sec_level = BT_SECURITY_LOW;
-+			sec_level_changed = true;
-+		}
+ unit_tests += unit/test-avdtp
  
--		if (conn->pending_sec_level > conn->sec_level)
-+		if (conn->pending_sec_level > conn->sec_level) {
- 			conn->sec_level = conn->pending_sec_level;
-+			sec_level_changed = true;
-+		}
+ unit_test_avdtp_SOURCES = unit/test-avdtp.c \
+diff --git a/unit/sdp-xml/Bluetooth_HID-sdp_record.xml b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+new file mode 100644
+index 000000000000..687b0b15b520
+--- /dev/null
++++ b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+@@ -0,0 +1,123 @@
++<?xml version="1.0" encoding="UTF-8" ?>
 +
-+		if (sec_level_changed)
-+			mgmt_security_level_changed(conn);
- 	}
- 
- 	mutex_lock(&hci_cb_list_lock);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 1e22eab1081c..7d9cec30bf08 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -1221,3 +1221,17 @@ struct mgmt_ev_conn_subrate {
- 	__le16	cont_num;
- 	__le16	supv_timeout;
- } __packed;
++<!--
 +
-+#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
-+#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
-+#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
++ From: https://github.com/AnesBenmerzoug/Bluetooth_HID/blob/master/sdp_record.xml
++ A description of these fields can be found in the following links:
++ http://www.bluecove.org/bluecove/apidocs/javax/bluetooth/ServiceRecord.html
++ https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
 +
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL	0x0000
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE	0x0001
++ -->
 +
-+#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0034
-+struct mgmt_ev_security_level_changed {
-+	struct mgmt_addr_info addr;
-+	__u8	tlv_count;
-+	__u8	tlv_data[] __counted_by(tlv_count);
-+} __packed;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b1f911fd4ad6..d87a1bf096e4 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1202,6 +1202,11 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	if (!conn->parent) {
- 		struct hci_link *link, *t;
- 
-+		conn->sec_level = BT_SECURITY_SDP;
-+		clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+		clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+		mgmt_security_level_changed(conn);
++<record>
++	<attribute id="0x0001"> <!-- Service Class ID List -->
++		<sequence>
++			<uuid value="0x1124" /> <!-- Human Interface Device -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0004"> <!-- Protocol Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x0100" /> <!-- L2CAP -->
++				<uint16 value="0x0011" /> <!-- HIDP -->
++			</sequence>
++			<sequence>
++				<uuid value="0x0011" /> <!-- HIDP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0005"> <!-- Browse Group List -->
++		<sequence>
++			<uuid value="0x1002" />
++		</sequence>
++	</attribute>
++	<attribute id="0x0006"> <!-- Language Based Attribute ID List -->
++		<sequence>
++			<uint16 value="0x656e" /> <!-- code_ISO639 -->
++			<uint16 value="0x006a" /> <!-- encoding -->
++			<uint16 value="0x0100" /> <!-- base_offset -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0009"> <!-- Bluetooth Profile Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x1124" /> <!-- Human Interface Device -->
++				<uint16 value="0x0100" /> <!-- L2CAP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x000d"> <!-- Additional Protocol Descriptor Lists -->
++		<sequence>
++			<sequence>
++				<sequence>
++					<uuid value="0x0100" /> <!-- L2CAP -->
++					<uint16 value="0x0013" />
++				</sequence>
++				<sequence>
++					<uuid value="0x0011" /> <!-- HIDP -->
++				</sequence>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0100">
++		<text value="Bluetooth_Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0101">
++		<text value="USB > BT Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0102">
++		<text value="Raspberry Pi 3" />
++	</attribute>
++	<attribute id="0x0200">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x0201">
++		<uint16 value="0x0111" />
++	</attribute>
++	<attribute id="0x0202">
++		<uint8 value="0x40" />
++	</attribute>
++	<attribute id="0x0203">
++		<uint8 value="0x00" />
++	</attribute>
++	<attribute id="0x0204">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0205">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0206">
++		<sequence>
++			<sequence>
++				<uint8 value="0x22" />
++				<text encoding="hex" value="05010906A1018501A100050719E029E71500250175019508810295017508810195087508150025650507190029658100C0C005010902A10185020901A1000509190129031500250175019503810275059501810105010930093109381581257F750895038106C0C0"/>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0207">
++		<sequence>
++			<sequence>
++				<uint16 value="0x0409" />
++				<uint16 value="0x0100" />
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x020b">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x020c">
++		<uint16 value="0x0c80" />
++	</attribute>
++	<attribute id="0x020d">
++		<boolean value="true" />
++	</attribute>
++	<attribute id="0x020e">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x020f">
++		<uint16 value="0x0640" />
++	</attribute>
++	<attribute id="0x0210">
++		<uint16 value="0x0320" />
++	</attribute>
++</record>
+diff --git a/unit/sdp-xml/qt-SerialPortSDPRecord.xml b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+new file mode 100644
+index 000000000000..1f62ccf11a41
+--- /dev/null
++++ b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+@@ -0,0 +1,57 @@
++<?xml version="1.0" encoding="UTF-8" ?>
 +
- 		list_for_each_entry_safe(link, t, &conn->link_list, list) {
- 			struct hci_conn *child = link->conn;
- 
-@@ -1504,6 +1509,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	}
- 
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->conn_timeout = conn_timeout;
- 	conn->le_adv_phy = phy;
- 	conn->le_adv_sec_phy = sec_phy;
-@@ -1731,6 +1737,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->state = BT_CONNECT;
- 	set_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
- 	conn->conn_reason = conn_reason;
-@@ -1779,6 +1786,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 		int err;
- 
- 		acl->sec_level = BT_SECURITY_LOW;
-+		mgmt_security_level_changed(acl);
- 		acl->pending_sec_level = sec_level;
- 		acl->auth_type = auth_type;
- 		acl->conn_timeout = timeout;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9c8bf6708356..8ec12e62e864 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -767,6 +767,7 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
- 			status = HCI_ERROR_AUTH_FAILURE;
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			mgmt_security_level_changed(conn);
- 		}
- 
- 		/* Update the key encryption size with the connection one */
-@@ -3222,6 +3223,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (!status) {
-+		bool encrypt_change = false;
++<!--
++ This is an XML file describing an SDP service record for a Serial Port
++ service.
 +
- 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
- 		if (status)
- 			goto done;
-@@ -3244,8 +3247,10 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_AUTH, &hdev->flags))
- 			set_bit(HCI_CONN_AUTH, &conn->flags);
- 
--		if (test_bit(HCI_ENCRYPT, &hdev->flags))
-+		if (test_bit(HCI_ENCRYPT, &hdev->flags)) {
- 			set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+			encrypt_change = true;
-+		}
- 
- 		/* "Link key request" completed ahead of "connect request" completes */
- 		if (ev->encr_mode == 1 && !test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-@@ -3255,11 +3260,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			key = hci_find_link_key(hdev, &ev->bdaddr);
- 			if (key) {
- 				set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+				encrypt_change = true;
- 				hci_read_enc_key_size(hdev, conn);
- 				hci_encrypt_cfm(conn, ev->status);
- 			}
- 		}
- 
-+		if (encrypt_change)
-+			mgmt_security_level_changed(conn);
++ You can use the linux sdptool command to create a file like this for
++ publishing your Bluetooth services. See the "Creating a Bluetooth service"
++ tutorial for more details.
 +
- 		/* Get remote features */
- 		if (conn->type == ACL_LINK) {
- 			struct hci_cp_read_remote_features cp;
-@@ -3529,6 +3538,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, void *data,
- 		clear_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
- 		set_bit(HCI_CONN_AUTH, &conn->flags);
- 		conn->sec_level = conn->pending_sec_level;
-+		mgmt_security_level_changed(conn);
- 	} else {
- 		if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
- 			set_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
-@@ -3644,9 +3654,12 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
- 			    conn->type == LE_LINK)
- 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
++ From: https://radekp.github.io/qtmoko/api/bluetooth-bluetoothservice-serialportsdprecord-xml.html
++-->
 +
-+			mgmt_security_level_changed(conn);
- 		} else {
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			mgmt_security_level_changed(conn);
- 		}
- 	}
- 
-@@ -5240,8 +5253,10 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 	if (conn->type != LE_LINK)
- 		goto unlock;
- 
--	if (!ev->status)
-+	if (!ev->status) {
- 		conn->sec_level = conn->pending_sec_level;
-+		mgmt_security_level_changed(conn);
-+	}
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
- 
-@@ -5872,6 +5887,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	mgmt_device_connected(hdev, conn, NULL, 0);
- 
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->state = BT_CONFIG;
- 
- 	/* Store current advertising instance as connection advertising instance
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 09edd72acc22..b74c99bb8cb9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -177,6 +177,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_CONTROLLER_RESUME,
- 	MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
- 	MGMT_EV_ADV_MONITOR_DEVICE_LOST,
-+	MGMT_EV_SECURITY_LEVEL_CHANGED,
- };
- 
- static const u16 mgmt_untrusted_commands[] = {
-@@ -10777,6 +10778,45 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, NULL);
- }
- 
-+void mgmt_security_level_changed(struct hci_conn *conn)
++ <record>
++         <attribute id="0x0001">
++                 <sequence>
++                         <uuid value="0x1101" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0004">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x0100" />
++                         </sequence>
++                         <sequence>
++                                 <uuid value="0x0003" />
++                                 <uint8 value="0x05" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0005">
++                 <sequence>
++                         <uuid value="0x1002" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0006">
++                 <sequence>
++                         <uint16 value="0x656e" />
++                         <uint16 value="0x006a" />
++                         <uint16 value="0x0100" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0009">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x1101" />
++                                 <uint16 value="0x0100" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0100">
++                 <text value="Serial Port" />
++         </attribute>
++         <attribute id="0x0101">
++                 <text value="COM Port" />
++         </attribute>
++ </record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+new file mode 100644
+index 000000000000..bdb10fa5831b
+--- /dev/null
++++ b/unit/test-sdp-xml.c
+@@ -0,0 +1,69 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++
++#include "bluetooth/sdp.h"
++#include "bluetooth/sdp_lib.h"
++
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/log.h"
++#include "src/sdp-xml.h"
++
++static void parse_xml(gconstpointer data, gsize len)
 +{
-+	struct mgmt_ev_security_level_changed *ev;
-+	struct mgmt_tlv *tlv;
-+	u8 *tlv_data;
-+	u8 tlv_len;
++	sdp_record_t *rec = NULL;
 +
-+	tlv_len = 2 * (sizeof(*tlv) + sizeof(__u8));
-+	ev = kzalloc_flex(*ev, tlv_data, tlv_len, GFP_ATOMIC);
-+	if (!ev)
-+		return;
-+
-+	bacpy(&ev->addr.bdaddr, &conn->dst);
-+	ev->addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	ev->tlv_count = 2;
-+
-+	tlv_data = ev->tlv_data;
-+	tlv = (void *)tlv_data;
-+	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL);
-+	tlv->length = sizeof(__u8);
-+	tlv->value[0] = conn->sec_level;
-+
-+	tlv_data += sizeof(*tlv) + sizeof(__u8);
-+	tlv = (void *)tlv_data;
-+	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE);
-+	tlv->length = sizeof(__u8);
-+	if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_NONE;
-+	else if (test_bit(HCI_CONN_AES_CCM, &conn->flags))
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_AES_CCM;
-+	else
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_E0;
-+
-+	mgmt_event(MGMT_EV_SECURITY_LEVEL_CHANGED, conn->hdev, ev,
-+		   struct_size(ev, tlv_data, tlv_len), NULL);
-+
-+	kfree(ev);
++	rec = sdp_xml_parse_record(data, len);
++	if (rec) {
++		tester_test_passed();
++		sdp_record_free(rec);
++	} else {
++		tester_test_failed();
++	}
 +}
 +
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len)
- {
++static void parse_xml_for_filename(gconstpointer data)
++{
++	const char *filename = (const char *) data;
++	char *path = NULL;
++	GError *error = NULL;
++	char *contents = NULL;
++	gsize len;
++
++	path = g_build_filename(TOP_SRCDIR, "unit", "sdp-xml", filename, NULL);
++	if (!g_file_get_contents(path, &contents, &len, &error)) {
++		g_warning("Can't load file '%s': %s", path, error->message);
++		g_free(path);
++		g_error_free(error);
++		tester_test_failed();
++	}
++	parse_xml(contents, len);
++	g_free(contents);
++	g_free(path);
++}
++
++#define DEFINE_TEST(fname)							\
++	tester_add("/" fname, fname, NULL, parse_xml_for_filename, NULL);
++
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	DEFINE_TEST("Bluetooth_HID-sdp_record.xml");
++	DEFINE_TEST("qt-SerialPortSDPRecord.xml");
++
++	return tester_run();
++}
 -- 
-2.43.0
+2.55.0
 
