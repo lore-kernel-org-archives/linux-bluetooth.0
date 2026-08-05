@@ -1,148 +1,169 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B8A36DA04
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 14:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F113655C4;
+	Wed,  5 Aug 2026 14:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785939357; cv=none; b=IYSX1yEEuT/8obKYggcGdXNwFJwzuvmzb+yvXLThojVdjxyeg9vdzIGGR7zCI8vtQWr+moRMxwsuowtOLAefmw19dRxZ2O2QM2wFQg3zewFVEjr6GO8AwESCSsWt2+VO0favK53gio+ydO7/5TV0cA2QhacwjnGFjmApWOqUhRA=
+	t=1785940610; cv=none; b=NlRIMuwdwba6zEOpFLC6aVv3JS0eKD4eYKWSGC8hvCXksfiNr/fNCB6E3dm/8Uwr9wg0msBJaCtNBxOEnMsTDZ6j+iYMy5ILKmxmTjF2JMM84ar14cQP0V8420VX2DYEC0jgFBDzFH5ueGdHiNQYPNTsj++Qyw9noU6mFBY32Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785939357; c=relaxed/simple;
-	bh=ZEzHnwGG6m4bdIriL3B7dJw/qPoDdw2/sJFVibr+9dY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NX9C/Txs4h27uqfVbp4RVOEKtAWq4GMSQd7/bGxbBxHsSSW1Tn4k3m5+PXrQOqloLHQz3Ck8MDAHi9f3bjWaETww9Tp1czCJFtMNKwconHVDnqXaC9zgnuygOrRLR7tY2LLa+7dqQhI2cFtXjV8DA4e2OfZa8JoTeOb6Mxb5cRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qlDbhCJ5; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785940610; c=relaxed/simple;
+	bh=7GoSDoB93OWd6S7TY2lJhVqrkySeLyhqBbvZ98qHgmY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J9fwB8rgUrhMQLV9fKtH7yyvqoYPNnU+OO3z2t/TayPBdVRbLdGgU88cGiUlyddJ7FyKR8tqFzlC3zKvnFa0BlJLeXW75FZ55oh97OPEzv6JGYh4FCpdlj0nAExujac933Fz1OqqNgjTSFqseWMAkIXeTZgEPlfTG8s4S3BnG/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N64w5yGZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qlDbhCJ5"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-80cebd41372so16280237b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 07:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785939355; x=1786544155; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=AgPOzYPSMkHs6Q0kHYfhYkoG3bEuk2vOmvD9+pIBCEI=;
-        b=qlDbhCJ5FKqJj9i/WoZ0a4Qo9YMha4+BTuz4xP37P0Li+hLdISMJ2jvwqdeiZqcBgZ
-         kleS84dnVtiae4Ktk9mnb5BzyJfLYvjNDaELRqs2lW1+Pee9Du2ut0zQhIQO5lSNA2S9
-         0VsngFx4Gxa+TLevWtXkqVK6dFP2Ja4VfQm/vM138EtT17rslRD6g4IUl/d3SeIkGnMl
-         SdPGEkDY4qMQX2yNkpJN3otOugC+HGd3lLmGohWWSTEly0dnhLX8b++ZIwysZqDoyyLT
-         kdiNjyq3hPoVwpAmYbCs3TTC6mB/89Uy/kideMisvUB0eGYUmxan9AnkNurg4Yylc2Bb
-         Ogtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785939355; x=1786544155;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=AgPOzYPSMkHs6Q0kHYfhYkoG3bEuk2vOmvD9+pIBCEI=;
-        b=aSgvjbu+K0+ddn6RCBYpmVGh6QvQgNf2DWKcHy8qoDMcdzWSg12wnDen0sSZcwuPWA
-         bejl1SUbsSJcb134wju6u5lQzh17Rkcn5OtBA0dVO96ZXD0p3rOKqkF/vl9f3EwAKfCn
-         V7su6utxosbO92IYhiPOjEEqbPvS5lq9I+/ztf/Xi/jG132lDugkRYHRbtDERhUP3tWQ
-         EU8T7Pf77YdFFDe9JYHRCIUGQ239Y+f73lWO6KiRKUq+djSm4S2hZljZjRuj5nBclLVX
-         w91kLZd6msni6ER5ZJmHARwzuNugcEQAkIztbQfdLIovN8+dJiKE8ezl0w81JT2+8QyQ
-         Jp4w==
-X-Gm-Message-State: AOJu0YzqmtojPxbt+FHumaWyPoQk5KJk6f85wceiMaPy00B0zIJnhOXS
-	9b9IMlCaKfCoh2V6O1vSyLQa+iHhIVMW0slNWdSIE6Do8UGq21dFkm7UMQZgNQ==
-X-Gm-Gg: AR+sD12LognPJb9bATi051SrpfRx0p0+7nvmZVC4BZfMM1zz5NlyO0rXxEXLDvadOyU
-	XsU5fcV/6CuBrmXDYtDYz9xZs20JlOqkTEXfQqPZ1YzeazGWwvEESzKCmOLASiD2t/gs0nrVBZq
-	/zAm9lmaVWUvptP3A6zLnxN6imgTJ7n1hYc+ICBBwjjhaUKnfJNycemklfD1SuRICFS44bEiDOO
-	EL9DT09I0JGM/CxBUvOF2pwuVrROjOdsaoBr0KLH1WAsU9sDTdSF475BFNMU0qyPFkgu8t/mkbl
-	p2+NJL25BO8JAett405jumwkE6QtUHLZwYwlXP6Wlbs1wSiWEKvn7UrlK7HrkYjh7nd2a5/RYAZ
-	+BDbJXQxb1ESwxnAasIg67zpGU1IY7DylHw3nYkXBf6+Easa3lQp8w77+Wh5RQ8Zf1hRI9bepet
-	V8rpTKnRxuk5ggLswa0R6GpsBgPJ3/BlgIOTOKjt/DzWiUkC7k5zFF7pJ+I57NzpdbppW2
-X-Received: by 2002:a05:690c:c4e9:b0:81e:9b09:7263 with SMTP id 00721157ae682-820222bbbf6mr40869837b3.10.1785939355422;
-        Wed, 05 Aug 2026 07:15:55 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.224.87])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-820134cadb4sm21172167b3.44.2026.08.05.07.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 07:15:55 -0700 (PDT)
-Message-ID: <6a73459b.63b9d10f.2903c7.ffaa@mx.google.com>
-Date: Wed, 05 Aug 2026 07:15:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4413172768675875710=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N64w5yGZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ED911F00A3A;
+	Wed,  5 Aug 2026 14:36:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785940601;
+	bh=tM1i/5O7X4rW++TCZUi84s5/0oEu0OW0LHTYnEXJIaY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=N64w5yGZESz9WHBxo9icgkwglEJW/VSUyFIb4U/m50LvuvBibNYhDhSm47JTui3g9
+	 ftQV9U3RjxqTLipFGG+AccUh8bZxfHzo4B4KkK+KqWHgwzUxge1oMIzIRhtymGj4N8
+	 l+zgpB4RgaIotfSiGovMPaqnneqj1Ff5YaBCOiyUWGHgiNP0EIAVQa70ZzU2TI53nN
+	 q6hWRnHLer9uHb73k2lNtC0HfeR2gDEl3BubWRIVkgAAA0yKztH0evocxmC6LfJdNv
+	 W2lEUye2EIWwQjlAFPhvZ07tWwqtiXg2TRt3Rx2JBPpxSGNzv93Tau0+7QBbuS+mP/
+	 dTvy7w23wVKGQ==
+Message-ID: <768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org>
+Date: Wed, 5 Aug 2026 16:36:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [v4] Bluetooth: MGMT: Add management security level changed event
-In-Reply-To: <20260805132203.176213-1-frederic.danis@collabora.com>
-References: <20260805132203.176213-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4413172768675875710==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] dt-bindings: bluetooth: qca: add QCC2072
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Rahul Samana <rahul.samana@oss.qualcomm.com>,
+ Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org, quic_mohamull@quicinc.com,
+ quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260727-rb3-industrial-bt-uart-v2-1-2d100f30e202@oss.qualcomm.com>
+ <20260731-first-righteous-bear-dd72ed@quoll>
+ <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
+ <c1875dd6-fe3a-4a69-a6fd-b461c8fba6e4@kernel.org>
+ <6d6465bb-47ac-464c-af4e-0ca72325705f@oss.qualcomm.com>
+ <8a388310-d3cc-4d02-abb6-0eb98c24cfce@kernel.org>
+ <4523441f-498a-4bbd-80f3-97a7a9206c00@oss.qualcomm.com>
+ <6e0b9e79-ccd4-4689-9a6b-9b4fc556d5e4@kernel.org>
+ <gfhlyvoefcsvtjuxfo75qeham272cc5g2r3npjenzs5esjifiy@ro7dtkpxwizk>
+ <8ab6c26f-b648-447c-9fdd-f1424beb44f4@kernel.org>
+ <sewfntbhqtj2apfdi4ouan27artvj4lyxqizvinsvzltbofqu2@riuoo3fmczff>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <sewfntbhqtj2apfdi4ouan27artvj4lyxqizvinsvzltbofqu2@riuoo3fmczff>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 05/08/2026 16:12, Manivannan Sadhasivam wrote:
+> On Wed, Aug 05, 2026 at 02:33:51PM +0200, Krzysztof Kozlowski wrote:
+>> DT is not representation of internal device driver instantiation mechanism.
+>>
+> 
+> Here, the driver is just creating compatible for a real device. What difference
+> does it make if the BT node was defined statically in the DT vs created
+> dynamically? Both nodes do represent a real BT device, not driver's own
+> representation. And by the time the node was created, the device is physically
+> attached to the system.
 
-Dear submitter,
+What stops this power sequencing drivers, after more driver patches, the
+best if being part of some bigger series, to add properties like
+"linux,name-of-driver-to-bind" or whatever other SW properties?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1140807
+This is what happened in that linked thread:
+https://lore.kernel.org/all/20260326-pci-m2-e-v7-8-43324a7866e6@oss.qualcomm.com/
+The driver code is adding children under other nodes (references by
+graph) and it is nowhere documented. Maybe bindings of these other nodes
+allow it, maybe not. How do you even validate that?
 
----Test result---
+So answering your question - yes, there is a difference because:
+1. DTS we validate but whatever you add to driver code we do not and we
+cannot,
+2. DTS represents hardware but whatever you do in your driver code
+represents who knows what (maybe hardware, maybe not, can represent
+anything)
 
-Test Summary:
-CheckPatch                    PASS      1.60 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      26.07 seconds
-CheckAllWarning               PASS      27.59 seconds
-CheckSparse                   PASS      27.21 seconds
-BuildKernel32                 PASS      24.74 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      470.70 seconds
-TestRunner_l2cap-tester       PASS      67.80 seconds
-TestRunner_iso-tester         PASS      102.23 seconds
-TestRunner_bnep-tester        PASS      34.81 seconds
-TestRunner_mgmt-tester        FAIL      221.41 seconds
-TestRunner_rfcomm-tester      PASS      27.62 seconds
-TestRunner_sco-tester         PASS      33.32 seconds
-TestRunner_ioctl-tester       PASS      27.69 seconds
-TestRunner_mesh-tester        FAIL      26.21 seconds
-TestRunner_smp-tester         PASS      23.85 seconds
-TestRunner_userchan-tester    PASS      22.27 seconds
-TestRunner_6lowpan-tester     PASS      23.63 seconds
-IncrementalBuild              PASS      24.05 seconds
+And if you claim "I add hardware in the driver!", I respond - maybe
+true, maybe not, but look at this crap:
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=687bfbba5a1cb15cee51519c210141ed1c4b0ec7
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+Since we DISALLOWED venus-decoder and venus-encoder DT nodes, what did
+Bryan do? Squeezed via driver code fake disallowed nodes and even gave
+them compatibles not looking like compatibles, so any regex won't work.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.266 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+This power sequencing work here has the same problem of sneaking ABI,
+which I pointed out here:
+https://lore.kernel.org/all/9cc5af16-d95e-4f10-8b4a-5e29c136079c@kernel.org/
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.004 seconds
-Mesh - Send cancel - 2                               Timed out    1.985 seconds
+Look at above patch - nothing documents that ABI. The same as Bryan's
+fake venus-decoder and encore (not only fake but actually rejected). And
+to avoid ABI-check tools (or incoming tools), this power sequencing code
+does not even call a "compatible" a "compatible". No, it calls it
+"driver_data" nicely avoiding detection.
 
+This is terrible practice and I feel like allowing this patch is silent
+acknowledgment or agreement of such practice.
 
-https://github.com/bluez/bluetooth-next/pull/535
+It's about basic ABI principles - if you have DT ABI, it must be both
+clear in the drivers code and in DT bindings, instead of obfuscated
+calling a compatible driver data. If you don't, then this is not DT ABI
+and you are not allowed to use OF code to instantiate drivers. Use SW
+nodes or KHO-style whatever else is there.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4413172768675875710==--
+Best regards,
+Krzysztof
