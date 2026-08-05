@@ -1,137 +1,162 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6752F7445
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 17:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785951448; cv=none; b=mmyvPq8f6/jjGQCvefVhmdGDJxZAA4qRgaIAhw6nf2naUVeNr3+HSOXD6rQHmxs5+8juFmN3L4OSJEqMBJYAiQUGZbAteZH2kp5Xh8wosNSZoIcJsqx/ucSHaWYrFP17xSQlo7IUpMs0lmsCMXSAz3XBusAzIFWm0JInhDAOEm8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785951448; c=relaxed/simple;
-	bh=m2YiFunFFtKLfUBetGw/A1AcaxvVOxZnvxnNpKj/wvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FVZPqWVDe8R1qIZK0U7iESizmQ+1AbdHuPB+O7AIb/px78Bb9CD1HtFK2rMGmtEQ9PtKcuS5EEw7M3Z4uwMhcCmZts8B2Apg0QQ98RkRNe9HsGdaw/zw/0UoN5Omx2bci7W7sB4HNKJEir61jORhjdOTsfc7TjdJAN4KrWZue2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jgf2eTrA; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ECC3E16A8
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 19:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785957429; cv=pass; b=mVYUFq+6+uAnlx0l39qYHH1TUaw/mqsiUX7/+j7TNXoz9YqN70vkA4v6P9cjwCkQ/AKM6IVNl7FSf+UPGEG4SOlx0GGvMiD+8x9D02WvlnMAd/HTz6wxWANcrVQuD8eiFbq1YNVv1MkDrJBxyK/ubEkRhaNCHQVOqm3S0Zj6SyM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785957429; c=relaxed/simple;
+	bh=vAGc6aYy53n8Ge9kSp0L4eR4cVBIMAXOr4qdllGJ4L8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E7QhUHaSYmE3jURQZN8UKh1Ur27eQi2NN9lIjdKBmBNokwQlv6VcFCp+YSnwfKPEbmCDQcri15U1wlr52izVInl19/FVpW+hqg5KEPHvfRN/QVp9A2eawrPNIlBzP1V91vTShhial6VmnkpKDF2fpRTytoRc8HsMN4asZ//GAn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DqiCxx3D; arc=pass smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jgf2eTrA"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-38a0c7e841fso1638779a91.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 10:37:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DqiCxx3D"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-39ca300db70so13290771fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 12:17:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785957422; cv=none;
+        d=google.com; s=arc-20260327;
+        b=mTkkqGbEnsiqi/dR3BjUauyj/KslsoxMQlDdysYfWtIO/sOU/mKFdxQ8MriycE9/Qt
+         Ax0x34jpEM3gghg337Nj8KkofkF8entQTWunamfsCiBpAyO9x8fwaWMuwN0z0AWpp9+C
+         HX/bHJIVEjDb3jbk/Muj7FKtdlwcrFJuPsygnEp6HtamgO9h81MjQ5SJWhSHUEy0TUXt
+         AjaQNzLdeTr0Zn2O2qgHV/hOCg7/wItp2+2pi8CsH5xkIaGQsIusY5F97q53w/SUhp8+
+         9Ng3J7QtwJdlWHIYMEuiTldO00Bq/ns8EHEju1YhokfcaIeGQ4P0fLfKg70TtsMs7NmX
+         IK3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
+        fh=cv6ISHtDLr/X8oBhvmIrhqbOsClmSkigyXZlgRm4tF8=;
+        b=Vcul7ChjSQWJn2MpOclIZ8fjMFWn1Z4zwcobs/lqh5o9jBapGulntoWktvPc76uawr
+         fM6dlr2RhGBZB74Jh4+pqKYnOPeeNA1CkE6Dg5EBuYgWCHiBxuDqcnpoEwasvC5eOOiR
+         YbihgmCcbupRxxzwM1IDecUAcmZw7xzhEiggexfZM0x9wm0RkCF3286YevXVooRE4VOt
+         8xHXQ3fZz8OBhmNoanhdYztNjwJ4n3X1VbgMQ8t8KwPFLcHi/liAF1QT64dFKsb4SNuM
+         2h7wX8gEjld6SU6U7ErcfXeN1ZVe9+PgC8uREgaRpLJNg6mGQN3uv54Cm7BJcEjTtUYb
+         BSmQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785951446; x=1786556246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TBAPV/2b/g7lSUR8+pBxxLAS3EoPgJm7uPmHbpLLVeI=;
-        b=Jgf2eTrA7KaU+VvaGAel6HveF9m9UyNFSALgQ+cq6iOsBn2DXNkCy/nmte8+S5PNfi
-         brTjllWZy79pYvX5878qnP9PtAXYfx8Ziu7SSTrdwFZbORW8qt+eAMPF0Dy0vhzRXv92
-         11bXFezIpZVrBDdE4GLyvXua3JT/fj98qsYWKd2vKPVjPFFJR0iry0bDK2/M4QAH3DRD
-         c144MrE3xTQi1/6CEF0Od0poGwSY3rvxqCBHS8O2rxskOlDhFSgTcVSqGCk2VmG0LaSP
-         hS6Mnw4hzJBX9ZgzqkZS1idDB4nVF+DpSnQPbAQ9vwgwoRUli9m/jgMrnFfw0qpNC78h
-         Ld5g==
+        d=google.com; s=20251104; t=1785957422; x=1786562222; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
+        b=DqiCxx3DiTaycwe7AdZtoPwcpH2Pjb6vGcDysi2Z5gmyJ0HAE4MzwObahewCbTGuYB
+         pxFM08wLxt4+RQvjmLRVSnFuMNXwUlQos4d9dajUup9wcZ83pLGq6aJrlO7Ew2ZwCptd
+         QcyWR+s3xKKV+FpJoH7z5ZEb4tjMjX8VP1Cccanh98THWVPxgoj+rDH8Mtr40AGSmtg7
+         TM29Kxv+VWkfaR7MBWzZDS+NQIwwrfMGLvoYf8IVUPQlUeP5EjzQUtr7lCuL9oNmQfS0
+         AgC/fwweAN0pbPzO0VtDZN8K8zDHkWMNxf9RqR0Cu5HAZXApTA4kIJWT7NTHXXRxs5N8
+         sDNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785951446; x=1786556246;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TBAPV/2b/g7lSUR8+pBxxLAS3EoPgJm7uPmHbpLLVeI=;
-        b=sPt31hSoPoqSLg8+9jsUu3R7cpD/nN/5DofJu4JBjAd8OEsAkMyShvIRuBhNqKc6Bm
-         m3HBH3COeT2rg3FhXHVbnW6WhZ4+ZY4mHuf4bQaIKX78/HZT5U1dpkWMyrnOQwQKhZRk
-         thoUbqo9+ce87/1U7LKx7+oZUVJr+FUc6WjtK5P87x3ilp/k0R3R83r+1DkVsWVMWvTO
-         ATX5eFcPcsImCkKLgEmpHbxqv9sCTRhuhplU1aoRGz8ygDxu4by8kvw0Is9vaiFSimMx
-         5hrVmKptmed+C8axKrQ4hMJxlAkVk1HlscvLfxRzyGv8t6rnWB9sQFL5feaPSNdZamOb
-         ghEA==
-X-Gm-Message-State: AOJu0YwMdNQJOI0a0gIQ/cmlmbo7fk5fg2hv90tF0FH+n1mDZYanE/oj
-	S8GhbUvkkOce0BYVOtDSm0uh+gqGWcaGrjrQv2oLrfCHRhXM6OUUXKaz
-X-Gm-Gg: AR+sD13DRDGMJd/GHqv0jRfh1yzYxyhFE5WT+6donHFFw9S2q8mbeFm1i1JoufHMqQo
-	+Ul0l/gbpfACTzksQDc8c3UjSeBsRF96FPqTNeKUDkxfrIQ/GtsYlmXyJy6VH8bNOLgM1ok7wYc
-	AgZYZ/A71ifZ7O+VIT7YuujpfbqKot8Wef/K4j1plGLkb45EY597qUXr3DJ0Z7mX/671PvU+qva
-	5Rove/0AFuYgtaOSJ1WPOtDaB8cBuQdTEGou4GmZ4oW3QzVsFpjPfaT+EQqiWsX5FyBzYf2lQFX
-	rT+Ex6pvSeUdjT9vEH4DgBQ55lQkMhxpwNrFtjqsUQ59MXUBiNKLID29EnCI2IZTgF/ubyY1pyU
-	mwDadA+omzdiO9bNMwTnxQ85FokaeMwOv5w5IiYXQy42pblu80xcGL/4bstpDGnWydA/5bxBo4N
-	60Zo/qAUzwWipqdttLGWrejIegeRZyu6LIOulDPh0aKu1DK1BGEw+kJLN4symyVJYTdybC/ILLi
-	aajvgU/06zfDE2Jd1bBbw2GjlgUP5QApW5nPtMlb7pm0+ItEzx9N5oOraY/r1t3ppGYA5TRBiMp
-	fogGXk5BF2msU8ZqRYo86EULy0GqrDc+AJdIn39P/Yye4nEPHTRosu1Xlq3KHiFYkXPLQTt3Bj+
-	RNths4hB9lsK33YEm3USPSX2g5fYI4Gk8ejkCDMei7oiwwyHfbx9rbq1F5kph
-X-Received: by 2002:a17:90b:278c:b0:381:792d:f993 with SMTP id 98e67ed59e1d1-3903c5bf6fbmr9464083a91.17.1785951445652;
-        Wed, 05 Aug 2026 10:37:25 -0700 (PDT)
-Received: from localhost.localdomain ([2405:acc0:1306:9d5b:70f2:9802:a2e4:b516])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13fca50acddsm16109750c88.3.2026.08.05.10.37.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 05 Aug 2026 10:37:25 -0700 (PDT)
-From: Laxman Acharya <acharyalaxman8848@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Laxman Acharya <acharyalaxman8848@gmail.com>
-Subject: [PATCH] Bluetooth: hci_event: fix out-of-bounds read in LE PA report reassembly
-Date: Wed,  5 Aug 2026 23:22:01 +0545
-Message-ID: <20260805173701.6649-1-acharyalaxman8848@gmail.com>
-X-Mailer: git-send-email 2.51.2
+        d=1e100.net; s=20251104; t=1785957422; x=1786562222;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
+        b=MUnOS9eoFeeEeFX+mLYksONl/GckhVtg2Q/+PmH0sEW4vF0ZSWe55XpPDjsTm8xiCh
+         D3a+eE77JG0fvtXgReIL2IdiaZHNmTQSFTPXdrgvX5fK9NIsbBpmcpNaNTCFNjj2PklY
+         j/Sggvu0Go5cjQKVy9Te9OJSC7x1yoJoRii43eSVzY7x2yhj3XQynY5Zu8prf85JijVp
+         KQiGdDWDNcxiM6cDLyse2atWuW2j7HRyWpWG2Cmi99nSx43+QBU52zyQ+njRU0av9KcN
+         fhwk0925GAcm2Apxne8gH4fz4e0rT0XGp5rBb+1zrXjcU/idpWVxA9NMS1V6nEBvlFke
+         fkzw==
+X-Forwarded-Encrypted: i=1; AHgh+RrxsZ2111eD5Y2lZIIxG7kOjC2NdP2NkmuIMkXs6bYBpC0KMJdFzD/SHKOsvmRAlJb0FRXKoZVTgkbzhoFq7m0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIOnXVzRFT7v/AC1rRU1Uox0YPcEGDNcBOw5EB7l0zZTofraJU
+	xFT4PW2jgemlRsa4Wt7lnrpOpqbxzYNNVNlaoI0IC+nGh8X6rL4pRPWzLUp43B0W55d6oOxn1nm
+	xjbA03fP/l/KxxW5JrqZYvMSbjIXtcIi3KOuLfjfU
+X-Gm-Gg: AR+sD11hyP7PREdUh42lpaLk1/TLpXLtdjOBEdGwGMgY6tKkcpnj1+3yBpzMTE3yoyr
+	ZXCEAsxNc18dd2Unn4WTAQHqX9ZFx4xNZDlWcOXkbQDrapLYwzpUkKC4+PXDUJ7CZsf6BkhFIV5
+	wNH2F8HJYmBZo0VTppSBFWTpw7ujjfsoa9rLeK9DxWBKhOOgaoQM73Tera/oFx02hvZOlx9Fprl
+	C9dYQZnIGZkI7NUnVZyXYctfVei5QI8c1/r0Ho1ssuRuA0HKjOFj8gYRJUV9tpKbRUvg8MbavsP
+	EwJZQa3oyw1rBYP/gGCpNtbJKoQZmVCgF0UXh6jlIYbVdFzzhKQQBFikm/79CExF4nGeZIsgJcH
+	YZBD0Q5+KP33XSv/9kGgB/fCfmZHR4YWdD3NMtmQ+TFm7Kvyj6A23ai44jbIN731yJyTdK38hmw
+	RBifvDyjGkOqxoKEpdR70HEpja84Y=
+X-Received: by 2002:a05:651c:221e:b0:39f:bc94:eba6 with SMTP id
+ 38308e7fff4ca-39fbc94ec7cmr11124031fa.14.1785957421590; Wed, 05 Aug 2026
+ 12:17:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260804214406.750710-1-tkjos@google.com> <20260805011006.stable-0007@kernel.org>
+In-Reply-To: <20260805011006.stable-0007@kernel.org>
+From: Todd Kjos <tkjos@google.com>
+Date: Wed, 5 Aug 2026 12:16:48 -0700
+X-Gm-Features: AUfX_mw1nkkw5kkLj8bI2FW2wAiOLfVkEzSktWrAkzdsdv_wgjivU38R77dZlH8
+Message-ID: <CAHRSSEz69qwV6KzFuhU_cMq3QDBAotSvGrkW-rpHWWubpqqY2A@mail.gmail.com>
+Subject: Re: [PATCH 1/2 5.10.y] Bluetooth: SCO: Fix UAF on sco_sock_timeout
+To: Sasha Levin <sashal@kernel.org>
+Cc: stable@vger.kernel.org, kernel-team@android.com, 
+	Lee Jones <lee@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com, 
+	Xiangyu Chen <xiangyu.chen@windriver.com>, He Zhe <zhe.he@windriver.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-hci_le_per_adv_report_evt() is dispatched with a minimum length of
-sizeof(struct hci_ev_le_per_adv_report), which only covers the fixed
-part of the event and not the trailing data[] array:
+On Tue, Aug 4, 2026 at 6:13=E2=80=AFPM Sasha Levin <sashal@kernel.org> wrot=
+e:
+>
+> On Tue, Aug 04, 2026 at 09:44:05PM +0000, Todd Kjos wrote:
+> > @@ -192,7 +200,7 @@ static void sco_conn_del(struct hci_conn *hcon, int=
+ err)
+> >
+> >       /* Kill socket */
+> >       sco_conn_lock(conn);
+> > -     sk =3D conn->sk;
+> > +     sk =3D sco_sock_hold(conn);
+> >       sco_conn_unlock(conn);
+> >
+> >       if (sk) {
+>
+> I think that this hunk leaks a struct sock reference on 5.10.
 
-	struct hci_ev_le_per_adv_report {
-		__le16   sync_handle;
-		__u8     tx_power;
-		__u8     rssi;
-		__u8     cte_type;
-		__u8     data_status;
-		__u8     length;
-		__u8     data[];
-	} __packed;
+Yes, you are right.
 
-The handler notifies the ISO layer via hci_proto_connect_ind(), which
-reaches iso_connect_ind(). That function retrieves the stored event with
-hci_recv_event_data() and, while reassembling the periodic advertising
-data, does:
+>
+> Unlike upstream and the 5.15/6.1 backports, where the sock_hold(sk) sits
+> just before sco_conn_unlock() and the upstream hunk deletes it, 5.10 keep=
+s
+> its sock_hold(sk) inside the condition:
+>
+>         sco_conn_lock(conn);
+>         sk =3D conn->sk;
+>         sco_conn_unlock(conn);
+>
+>         if (sk) {
+>                 sock_hold(sk);
 
-	memcpy(hcon->le_per_adv_data + hcon->le_per_adv_data_offset,
-	       ev->data, ev->length);
+This reference is not needed in the new version, since in we take the
+reference above.
 
-ev->length is taken directly from the event and is never validated
-against the amount of data the event actually carries.  A controller
-that reports a length larger than the received event therefore causes
-the memcpy() to read past the end of the event buffer.  The leaked bytes
-are stored in hcon->le_per_adv_data and can subsequently be read back
-from user space via getsockopt(BT_ISO_BASE).
+>                 bh_lock_sock(sk);
+>                 sco_sock_clear_timer(sk);
+>                 sco_chan_del(sk, err);
+>                 bh_unlock_sock(sk);
+>                 sock_put(sk);
+>         }
+>
+> So after this patch the function takes two references (one in
+> sco_sock_hold(), one from the surviving sock_hold(sk)) and drops only one=
+.
+> That is a permanent struct sock leak on every SCO teardown, reachable by
+> any user with repeated connect/disconnect.
+>
+> While respinning, please also drop the Change-Id: trailers from both
+> patches.
 
-Validate that the event contains ev->length data bytes before it is
-consumed, mirroring the check already performed by
-hci_le_ext_adv_report_evt() and hci_le_adv_report_evt().
+Will do. Sorry about that.
 
-Signed-off-by: Laxman Acharya <acharyalaxman8848@gmail.com>
----
- net/bluetooth/hci_event.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 741d658e9..727545e0c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6604,6 +6604,13 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "sync_handle 0x%4.4x", le16_to_cpu(ev->sync_handle));
- 
-+	/* The reassembly in iso_connect_ind() copies ev->length bytes from the
-+	 * stored event, so make sure the event actually carries that many data
-+	 * bytes before it is consumed.
-+	 */
-+	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EV_LE_PER_ADV_REPORT, ev->length))
-+		return;
-+
- 	hci_dev_lock(hdev);
- 
- 	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, PA_LINK, &flags);
--- 
-2.51.2
-
+>
+> --
+> Thanks,
+> Sasha
