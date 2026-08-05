@@ -1,162 +1,166 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ECC3E16A8
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 19:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785957429; cv=pass; b=mVYUFq+6+uAnlx0l39qYHH1TUaw/mqsiUX7/+j7TNXoz9YqN70vkA4v6P9cjwCkQ/AKM6IVNl7FSf+UPGEG4SOlx0GGvMiD+8x9D02WvlnMAd/HTz6wxWANcrVQuD8eiFbq1YNVv1MkDrJBxyK/ubEkRhaNCHQVOqm3S0Zj6SyM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785957429; c=relaxed/simple;
-	bh=vAGc6aYy53n8Ge9kSp0L4eR4cVBIMAXOr4qdllGJ4L8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E7QhUHaSYmE3jURQZN8UKh1Ur27eQi2NN9lIjdKBmBNokwQlv6VcFCp+YSnwfKPEbmCDQcri15U1wlr52izVInl19/FVpW+hqg5KEPHvfRN/QVp9A2eawrPNIlBzP1V91vTShhial6VmnkpKDF2fpRTytoRc8HsMN4asZ//GAn8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DqiCxx3D; arc=pass smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841753CDBD3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 19:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785958865; cv=none; b=P40jxMZJ/t8HJai/5W5v87WxrG3HX6tmcDbLo/6OKBYKdUhUrU6V7OSKphNOe0H6P8KhLbMhCznUE+Q9vrwZUfoLBOSMuBGK6W3p1alpBM8fQt85ELc4onGBYDWKO7zhzvWhMO/FeSg3lHjee+EK0oYy0sFKqDlVpJS1ycQwA8Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785958865; c=relaxed/simple;
+	bh=ImIJYQ+dK21cjoezO4NYJ8/kO7nVUQ5MPInBBoP0rJw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZtB29+OQ5cq4YmJfId4xgdulWnohoh7DbBAIsiGLX00H+bB8hM3yPTcNOfsYJS+oHqF9qzNh5kIIDVHq6LV0LmX2h7GNxusT7zBYaAG/YcuaflQv2cDG2KYOIVpSzlIk+I1BuFQaz7y8XvEU0Jx/UruqigPTfcXn/ww8d+jwfMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FmHXD5sC; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DqiCxx3D"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-39ca300db70so13290771fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 12:17:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785957422; cv=none;
-        d=google.com; s=arc-20260327;
-        b=mTkkqGbEnsiqi/dR3BjUauyj/KslsoxMQlDdysYfWtIO/sOU/mKFdxQ8MriycE9/Qt
-         Ax0x34jpEM3gghg337Nj8KkofkF8entQTWunamfsCiBpAyO9x8fwaWMuwN0z0AWpp9+C
-         HX/bHJIVEjDb3jbk/Muj7FKtdlwcrFJuPsygnEp6HtamgO9h81MjQ5SJWhSHUEy0TUXt
-         AjaQNzLdeTr0Zn2O2qgHV/hOCg7/wItp2+2pi8CsH5xkIaGQsIusY5F97q53w/SUhp8+
-         9Ng3J7QtwJdlWHIYMEuiTldO00Bq/ns8EHEju1YhokfcaIeGQ4P0fLfKg70TtsMs7NmX
-         IK3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
-        fh=cv6ISHtDLr/X8oBhvmIrhqbOsClmSkigyXZlgRm4tF8=;
-        b=Vcul7ChjSQWJn2MpOclIZ8fjMFWn1Z4zwcobs/lqh5o9jBapGulntoWktvPc76uawr
-         fM6dlr2RhGBZB74Jh4+pqKYnOPeeNA1CkE6Dg5EBuYgWCHiBxuDqcnpoEwasvC5eOOiR
-         YbihgmCcbupRxxzwM1IDecUAcmZw7xzhEiggexfZM0x9wm0RkCF3286YevXVooRE4VOt
-         8xHXQ3fZz8OBhmNoanhdYztNjwJ4n3X1VbgMQ8t8KwPFLcHi/liAF1QT64dFKsb4SNuM
-         2h7wX8gEjld6SU6U7ErcfXeN1ZVe9+PgC8uREgaRpLJNg6mGQN3uv54Cm7BJcEjTtUYb
-         BSmQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FmHXD5sC"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-92ed19f4d60so16549785a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 12:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785957422; x=1786562222; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
-        b=DqiCxx3DiTaycwe7AdZtoPwcpH2Pjb6vGcDysi2Z5gmyJ0HAE4MzwObahewCbTGuYB
-         pxFM08wLxt4+RQvjmLRVSnFuMNXwUlQos4d9dajUup9wcZ83pLGq6aJrlO7Ew2ZwCptd
-         QcyWR+s3xKKV+FpJoH7z5ZEb4tjMjX8VP1Cccanh98THWVPxgoj+rDH8Mtr40AGSmtg7
-         TM29Kxv+VWkfaR7MBWzZDS+NQIwwrfMGLvoYf8IVUPQlUeP5EjzQUtr7lCuL9oNmQfS0
-         AgC/fwweAN0pbPzO0VtDZN8K8zDHkWMNxf9RqR0Cu5HAZXApTA4kIJWT7NTHXXRxs5N8
-         sDNg==
+        d=gmail.com; s=20251104; t=1785958862; x=1786563662; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=qlro30/qVIBohfYr7JjXtpORd9iMgb3uGN0XatSBPOg=;
+        b=FmHXD5sCtLM5Hu3zri1Qs6yew/35Q6EBW9xh3/u28up7sgyyl6N3aUjBPmSCh9iaZC
+         UvEKzWsnVYAo1XKVJMBmgaLFZ4rGOyk9BGlwdind/YggN3coOxUu0nt4F7394pmB0f2K
+         H0MpNWuIVcUEgVbcM26j5q3D8OobKY/odaQRjzJ+qygP7uTmqbUBG5v6n67rDmHX8yO4
+         VCN1MlS4VtX/JF4DSAq3RR8b79ONeEH1TtqvZWSOQdyAxTCj9x9LCX/BH05zYocovgDb
+         o8NUhJ4Xm3YeBqyPpIdrBJZvWY33wtoFlnvXJtU6hDn/P4SVPA/UiGv13MhtbKr1+W59
+         o87g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785957422; x=1786562222;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=eVhqHKh6CPIoyBOn7HJSUD7+ux8Hn/mWJpjfZX2/nAg=;
-        b=MUnOS9eoFeeEeFX+mLYksONl/GckhVtg2Q/+PmH0sEW4vF0ZSWe55XpPDjsTm8xiCh
-         D3a+eE77JG0fvtXgReIL2IdiaZHNmTQSFTPXdrgvX5fK9NIsbBpmcpNaNTCFNjj2PklY
-         j/Sggvu0Go5cjQKVy9Te9OJSC7x1yoJoRii43eSVzY7x2yhj3XQynY5Zu8prf85JijVp
-         KQiGdDWDNcxiM6cDLyse2atWuW2j7HRyWpWG2Cmi99nSx43+QBU52zyQ+njRU0av9KcN
-         fhwk0925GAcm2Apxne8gH4fz4e0rT0XGp5rBb+1zrXjcU/idpWVxA9NMS1V6nEBvlFke
-         fkzw==
-X-Forwarded-Encrypted: i=1; AHgh+RrxsZ2111eD5Y2lZIIxG7kOjC2NdP2NkmuIMkXs6bYBpC0KMJdFzD/SHKOsvmRAlJb0FRXKoZVTgkbzhoFq7m0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIOnXVzRFT7v/AC1rRU1Uox0YPcEGDNcBOw5EB7l0zZTofraJU
-	xFT4PW2jgemlRsa4Wt7lnrpOpqbxzYNNVNlaoI0IC+nGh8X6rL4pRPWzLUp43B0W55d6oOxn1nm
-	xjbA03fP/l/KxxW5JrqZYvMSbjIXtcIi3KOuLfjfU
-X-Gm-Gg: AR+sD11hyP7PREdUh42lpaLk1/TLpXLtdjOBEdGwGMgY6tKkcpnj1+3yBpzMTE3yoyr
-	ZXCEAsxNc18dd2Unn4WTAQHqX9ZFx4xNZDlWcOXkbQDrapLYwzpUkKC4+PXDUJ7CZsf6BkhFIV5
-	wNH2F8HJYmBZo0VTppSBFWTpw7ujjfsoa9rLeK9DxWBKhOOgaoQM73Tera/oFx02hvZOlx9Fprl
-	C9dYQZnIGZkI7NUnVZyXYctfVei5QI8c1/r0Ho1ssuRuA0HKjOFj8gYRJUV9tpKbRUvg8MbavsP
-	EwJZQa3oyw1rBYP/gGCpNtbJKoQZmVCgF0UXh6jlIYbVdFzzhKQQBFikm/79CExF4nGeZIsgJcH
-	YZBD0Q5+KP33XSv/9kGgB/fCfmZHR4YWdD3NMtmQ+TFm7Kvyj6A23ai44jbIN731yJyTdK38hmw
-	RBifvDyjGkOqxoKEpdR70HEpja84Y=
-X-Received: by 2002:a05:651c:221e:b0:39f:bc94:eba6 with SMTP id
- 38308e7fff4ca-39fbc94ec7cmr11124031fa.14.1785957421590; Wed, 05 Aug 2026
- 12:17:01 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785958862; x=1786563662;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=qlro30/qVIBohfYr7JjXtpORd9iMgb3uGN0XatSBPOg=;
+        b=aydzjbsr3abYZ+1968yWeb6pR93k3kGGXNLDxWSyT2iOa61wMX/wvyhBL/k8ydqk9e
+         o0fZYD7gGYKdZ0m4+va9tDv3uKKRKegnWFHi2MiU93G74NnuhC8nN/68WX03x6SFg2Qw
+         FVWsechjOmGwREjFaix+DG3Ln+QsE1BQUzHYIJIKONFDI/NgOjVwiM/6q8teVmWD2Uru
+         9N07CzKoZpHylR4AAoUz+wFU9Hb4ReMkh6urGcBUnp+PpW6KVJ6svnlUarQvUQesMk9n
+         8KOkyHjhuR3ao3ylhsSLxxb50UXxv9MubLV5gU/B7ScKRJMcjr2Nihs/lElZNwKBKKhy
+         HIIg==
+X-Gm-Message-State: AOJu0YytcsXGvAzHF3kgJInMcMUvRhcti1I3ilAS7f4o/q7KucCnPbzi
+	meKj4F0KHWqAbonYjMS0AzJTvRmGezw6Tl/VBmWaVf9EuZ4MUiEDiDrksrBwgg==
+X-Gm-Gg: AR+sD11EM8FcWxj6LmInhrFrPgF76uFIHDJKqt7Vi2bvQCry5q2dXuoJI892Agabn5d
+	siTsrtb+5BtFIiRz2kAoDhtWQ9Mp5nf2IOVTRJLSS823M9LgQsDHn3JY6YjcW4r3NjXJ/6sbYS4
+	ndrfU0qqc5B9xU23NXqRaBSETtMd5LW80pDyCz94nnJQ4tD0cikwMq8CzU06bPjCmfwtXD3AEeP
+	uU8FIs4W11Q6gSpeDJDFtcf32UmLq3oGT28zjq++dJvmt9zxWRg18h9CFu5IeqGZCJKAxqbw5i7
+	mTQ7kIryh4lli2jBCqfiymBD/+Aqm8scKoZbasc/Wvyt277Sr2Kec37Ee8aNnrzVbbpnMgITBmv
+	ejZObHPgMIGu0Pbfr2O2Rjlns/gNV833jGNBdLxHeb9bZHEexqHBOTmVRMpHcpyEEALe+GERscN
+	IwUsZFdqVFyhHhmkep5+A0vzGh6OwbiZP9L6Qq2cd1b3vZpszvvZJHUkSR4+YqKDSvFcEP1g==
+X-Received: by 2002:a05:620a:2846:b0:92e:57ea:8c8b with SMTP id af79cd13be357-93659240108mr173489585a.0.1785958862226;
+        Wed, 05 Aug 2026 12:41:02 -0700 (PDT)
+Received: from [172.17.0.2] ([172.171.254.156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9364a42a461sm220633985a.12.2026.08.05.12.41.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2026 12:41:01 -0700 (PDT)
+Message-ID: <6a7391cd.5cacff2a.2ca7ce.1146@mx.google.com>
+Date: Wed, 05 Aug 2026 12:41:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4094089241317567220=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260804214406.750710-1-tkjos@google.com> <20260805011006.stable-0007@kernel.org>
-In-Reply-To: <20260805011006.stable-0007@kernel.org>
-From: Todd Kjos <tkjos@google.com>
-Date: Wed, 5 Aug 2026 12:16:48 -0700
-X-Gm-Features: AUfX_mw1nkkw5kkLj8bI2FW2wAiOLfVkEzSktWrAkzdsdv_wgjivU38R77dZlH8
-Message-ID: <CAHRSSEz69qwV6KzFuhU_cMq3QDBAotSvGrkW-rpHWWubpqqY2A@mail.gmail.com>
-Subject: Re: [PATCH 1/2 5.10.y] Bluetooth: SCO: Fix UAF on sco_sock_timeout
-To: Sasha Levin <sashal@kernel.org>
-Cc: stable@vger.kernel.org, kernel-team@android.com, 
-	Lee Jones <lee@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
-	syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com, 
-	Xiangyu Chen <xiangyu.chen@windriver.com>, He Zhe <zhe.he@windriver.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, acharyalaxman8848@gmail.com
+Subject: RE: Bluetooth: hci_event: fix out-of-bounds read in LE PA report reassembly
+In-Reply-To: <20260805173701.6649-1-acharyalaxman8848@gmail.com>
+References: <20260805173701.6649-1-acharyalaxman8848@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Aug 4, 2026 at 6:13=E2=80=AFPM Sasha Levin <sashal@kernel.org> wrot=
-e:
->
-> On Tue, Aug 04, 2026 at 09:44:05PM +0000, Todd Kjos wrote:
-> > @@ -192,7 +200,7 @@ static void sco_conn_del(struct hci_conn *hcon, int=
- err)
-> >
-> >       /* Kill socket */
-> >       sco_conn_lock(conn);
-> > -     sk =3D conn->sk;
-> > +     sk =3D sco_sock_hold(conn);
-> >       sco_conn_unlock(conn);
-> >
-> >       if (sk) {
->
-> I think that this hunk leaks a struct sock reference on 5.10.
+--===============4094089241317567220==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yes, you are right.
+This is automated email and please do not reply to this email!
 
->
-> Unlike upstream and the 5.15/6.1 backports, where the sock_hold(sk) sits
-> just before sco_conn_unlock() and the upstream hunk deletes it, 5.10 keep=
-s
-> its sock_hold(sk) inside the condition:
->
->         sco_conn_lock(conn);
->         sk =3D conn->sk;
->         sco_conn_unlock(conn);
->
->         if (sk) {
->                 sock_hold(sk);
+Dear submitter,
 
-This reference is not needed in the new version, since in we take the
-reference above.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1140947
 
->                 bh_lock_sock(sk);
->                 sco_sock_clear_timer(sk);
->                 sco_chan_del(sk, err);
->                 bh_unlock_sock(sk);
->                 sock_put(sk);
->         }
->
-> So after this patch the function takes two references (one in
-> sco_sock_hold(), one from the surviving sock_hold(sk)) and drops only one=
-.
-> That is a permanent struct sock leak on every SCO teardown, reachable by
-> any user with repeated connect/disconnect.
->
-> While respinning, please also drop the Change-Id: trailers from both
-> patches.
+---Test result---
 
-Will do. Sorry about that.
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       FAIL      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.41 seconds
+CheckAllWarning               PASS      30.00 seconds
+CheckSparse                   PASS      28.64 seconds
+BuildKernel32                 PASS      26.48 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      500.72 seconds
+TestRunner_l2cap-tester       PASS      63.12 seconds
+TestRunner_iso-tester         PASS      82.78 seconds
+TestRunner_bnep-tester        PASS      19.41 seconds
+TestRunner_mgmt-tester        FAIL      226.06 seconds
+TestRunner_rfcomm-tester      PASS      25.61 seconds
+TestRunner_sco-tester         PASS      32.32 seconds
+TestRunner_ioctl-tester       PASS      26.98 seconds
+TestRunner_mesh-tester        FAIL      26.08 seconds
+TestRunner_smp-tester         PASS      24.08 seconds
+TestRunner_userchan-tester    PASS      20.45 seconds
+TestRunner_6lowpan-tester     PASS      23.48 seconds
+IncrementalBuild              PASS      25.91 seconds
 
->
-> --
-> Thanks,
-> Sasha
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: hci_event: fix out-of-bounds read in LE PA report reassembly
+
+7: B3 Line contains hard tab characters (\t): "	struct hci_ev_le_per_adv_report {"
+8: B3 Line contains hard tab characters (\t): "		__le16   sync_handle;"
+9: B3 Line contains hard tab characters (\t): "		__u8     tx_power;"
+10: B3 Line contains hard tab characters (\t): "		__u8     rssi;"
+11: B3 Line contains hard tab characters (\t): "		__u8     cte_type;"
+12: B3 Line contains hard tab characters (\t): "		__u8     data_status;"
+13: B3 Line contains hard tab characters (\t): "		__u8     length;"
+14: B3 Line contains hard tab characters (\t): "		__u8     data[];"
+15: B3 Line contains hard tab characters (\t): "	} __packed;"
+22: B3 Line contains hard tab characters (\t): "	memcpy(hcon->le_per_adv_data + hcon->le_per_adv_data_offset,"
+23: B3 Line contains hard tab characters (\t): "	       ev->data, ev->length);"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.258 seconds
+LL Privacy - Unpair 1                                Timed out    1.875 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.927 seconds
+Mesh - Send cancel - 2                               Timed out    1.989 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/537
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4094089241317567220==--
