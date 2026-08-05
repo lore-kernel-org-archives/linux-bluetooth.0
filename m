@@ -1,451 +1,257 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C619B4854F5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 16:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BA93BD643
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 16:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785947849; cv=pass; b=FxlvC5HsJWqLm8Z6hHz8T9924z+NQKA2SzA0ewFyhDtQZuzqzVgk/gxS3Za3uoGEWF/D/a+PjalnpZCTWZyUC3CqiTPHXLyWhuy+9ECPbkSBnLqoxHI+7R2Iw8tIWHsDeLD+Sg9ofDSPUYdEM8U50RYlCYLQ3tM/4Jg9yZ6y/Vc=
+	t=1785948255; cv=pass; b=C39OaZIiqcK8glse1qVBT5azuUVXkGUEN7PD/hLGJBF+SFXfkxQiqbTFNJzVmktRtyErZY8v+6YGVo+NxFyiX4hurud42wR+bWATUhoTbXESNkUbQUJXkO4x3qyNyf3trdmRpiSGM8pVLYfUk4TCMSABwlk64I1Q3MCmZXkKaNo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785947849; c=relaxed/simple;
-	bh=EPAeWG08i9SbGi5/kA0AW0wtzE4O9ymvZJSqP//cZv8=;
+	s=arc-20240116; t=1785948255; c=relaxed/simple;
+	bh=dnlr0vm4gt+oXDZuihMuHe5vB3r3Y1CjRHIpgSXuVhY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JJVFDMvgsuzyA7ZW8X3EmQIV34osqiiqNFpoxXbIK8vpH6gBJqdf8gx2QNaBQO8O6bGwBMJgJ78s0kmLLki5I+iEK1M+DQFZNjzCNPzFlusgDOzFzqu1DwhNw7MQ97wGqVXo7b9HeglQVvY72JU17rMorSXcM3KLbLgssR7uR5Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OJXNIw5m; arc=pass smtp.client-ip=74.125.224.53
+	 To:Cc:Content-Type; b=YO3buhKAniOFwFE3fWWlvnHkywrytmTyMo1Satq+bIL0AV30snbx6LqKLHCBdhVjDZ3WWoNoEcxOTf49O2Y0rgq4VHz/rxEwfk65QrABMXexRSIfDXI4mDzehPXeYr/61iodDH6i3YIpj1U5YCqNnA6wKCmcHAHd+Ci3cKg2zuc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XwszXaEQ; arc=pass smtp.client-ip=74.125.224.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJXNIw5m"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66807ba2f0fso1803174d50.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 09:37:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785947841; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XwszXaEQ"
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-668296d0ff3so1656831d50.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Aug 2026 09:44:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785948253; cv=none;
         d=google.com; s=arc-20260327;
-        b=PpKH8wkctQdi99sCqFxosTaJItFJO6INu2miDyUAnOSDrP47JpCoOAI2cBCnuglhr9
-         nEPSS91/mNe/T8mfb8H0XlJujAiGAypx2z3IXmTNs1Fl+fwtnTVY5+Glkr/1hyXmbBvG
-         byyFbhbxdOxoTFZoihj7aXmQlTmAgokDujLsDZASG1o5vG8fv0kPR85NNU+IIfZ8FdJu
-         uUDfii+vkiIR081HuJqMEG5aU8guoYFlPxxbHHvIhgkTvNVaIvVzrIMVLJ7WYJ+WWL5C
-         cGwV5gp07OdaBJH41A0d2yLwgjvd1dNfVgBi2MBcb2jJyYQppMMN30UPMjgLMR5XnNCr
-         sKBw==
+        b=qJoGXNcRMTJwAjg8o40DscArdzG8LqmmhusSv48KCuE+GKq5zwaU3a+fwleMRvZQ0+
+         nE6tXK4tWhqT4KzS2V9Sx+Heu1HeK3z4gOJuOx88Xr2zTjLIqrZGcZ9I5cFxTxdbmu/F
+         LCFUZWY9txAi6G3UC8Eob1s9oFOMma2hrq8pNzWXgOcPAQQ//wJ2uor17SYKVw0tCm7R
+         47QQ+hxBSAt+nRaoN0LXgsvPddEpZffNceHikPtR/8PsUoTx2D5/vMHiOAD0PcvgmxoU
+         MW0hLELBtZEMMPAQ13aPfqzT2v3FU2BY5NIXv8Ku7yGWi+zNyHN9fiWdPYO0+58faAcl
+         8Ifg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=spvRaLlDCPL97MUpZInPjPqdUfau+4Se8lUJrH2V8Oo=;
-        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
-        b=TNq4DSXPrx+TJR6ljPyQ1mkcuDPSFDC2ZO8SS1CEb6y8Do/TcRFgvK9VM69LnIFy6D
-         3ha2ZLaX/fTGgd4QYVfx6BM2phnahqZggW7m7inNMP9wHxs/VfSfatqzSg8OlzHwyR1e
-         cojybdZOsc+1r1EMmJCt22oJhUD0zp0NM3G/2kqkdiLAuyPOdbUB/n7dU87hjdyTjI8L
-         4+mKlLuJ0w8A81f64yWotRP/4ILl6OGWTzxLUB9+FgQeGdssZGXbXAerp3AsZyszW+OD
-         c9ZpRNbBE5VQEjf7Vhyqx/bCqQDRkt6PQqkY4fIWkONyNW90D1ElymKZXvTSTg1Jq1zq
-         sU7A==;
+        bh=lwzrvm4OnIwwb9wB6xFivMZEKkykQj/6iHbkvXX9SHs=;
+        fh=ArdDmUQzzfkt7diMa+kfWdd+IJsnjcf7biWiU4/zryA=;
+        b=nIGYwFErQZHmnxCa3WF6CH5fkkcx1/4huzw1EqEGIZqpoiMpq1GXxDWN6Z+n6WFlRn
+         tnOqjrfI27q/81PIM7foYZqmkMk1OqiTWYflzBEOrKzSvI/j0dhZL9woRcqsoQYAmdy9
+         j02QXoDtodi5S+V0p8xiozunwT2cVbDkMcE57uOwYlNTj3DzrnmFesYKqX8sb/K89nbB
+         oyduE8rbE4QaVYy4xbe/+h0O3UAumVj+1cZOaet7lHSQrMwGtJLkI1dzIaQUthUz+t/F
+         9YhSGDN8DsLiiXMjQCfHPX+rZwrPC93wywluZPbNGRR7LRo3HhL/fGfBIyajv/wvyylw
+         PecA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785947841; x=1786552641; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785948253; x=1786553053; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=spvRaLlDCPL97MUpZInPjPqdUfau+4Se8lUJrH2V8Oo=;
-        b=OJXNIw5mtEjUg6NNqs6slbG9iDrm13h+XOyHhJYE+o/yOW4VY1xxpDGx0bmvz9vf00
-         1W57XXkkGadsIKcexye//im0Hg+fGCgXCfYI+X8A1ttl3qWM57RO6v6y4P6tVwoSNBfb
-         XtWzkwFgvhCg+kCqKjsKqEDxRljR8Y3oit64BnT/tE/hZDHzHmCgbNy0JrYzo7QpZvMO
-         GjAgTgQ4SAVx5MrEXt60Ilp9xwCmAD2Ny01f8oOq06by9IUSICuJn9eset+U2kez7jJx
-         bfb4U8zPbmqwofcC0kZFf9XcmPV7evjUyOTpbhFMest2+kcJ/9XeINjECjPjYqngjwUk
-         kqPw==
+        bh=lwzrvm4OnIwwb9wB6xFivMZEKkykQj/6iHbkvXX9SHs=;
+        b=XwszXaEQVwPII3HDjFxOLyCcxxZOVK7BuOLfJKJVpbWkxri7alZn6FxdykAZk5r7JO
+         U1Gxp/+1pa6P+aOHiAjcbyyUxp+Xuvbkx8AqNp7h0Fau8vQCk/dVSpkcDZGqEOZ7T2VI
+         IOK1l0+dILkPtQl3WThr3C7mmLF8X9kxib0WrkCRFPRP5kI+7WsFlNY5E95tmiXIqKgL
+         CjYyS3ns7ghVPLKnX05vH+/ALlLlyJNLkjIi1BpSmaQVDzK204LMStO+JEYD3hAzBaD6
+         HNkdgBNwGrXTI6YfGo/fLYDBJ1G8i4NttjKR2ekBdHfBO0FKSn9/9TyeDGzxCh+ODL9Y
+         XG6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785947841; x=1786552641;
+        d=1e100.net; s=20251104; t=1785948253; x=1786553053;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=spvRaLlDCPL97MUpZInPjPqdUfau+4Se8lUJrH2V8Oo=;
-        b=gQK4WzIwFdyTmEyN6Gu7jz9qgbYIc3C9alY+EQLPGjI7r+aItUyUYyVYuHKyV1F9gh
-         Mb3t4JWzEdCjn8JBRYLguSz3ED5m8TIRoziOXkVuwgdE/i6ILQ7bX5+oROV8kjUMDmc+
-         cK4u6Pmri1uiLXRJq+waJC+nHVOtBnbQDnRf7l8BZ9GzziKYjcrMLh1YGUgoaX7qppnr
-         e2PNeViIvDEP0gwHQBzWdeTmvHiKjKZcuXM1bQI1VNb+GTHEU0mnKYF6WpPuk8UaN5JY
-         A1OiLl27cUI56FiNBnG/loL1uC+Mi9YRZ8zCk0hYC8LyeNg0dpSJYCB+qlaJZRrbhrjM
-         2RJg==
-X-Gm-Message-State: AOJu0Yz7MfAYqAYpbfl23fLrIwfXdJQ8CD2QfzfUHBkPZJlJEj/lWCjo
-	zBkZjOdS1HfP/d2ILFUq41h+svkYcFpiTCvvWxe/bIERk4sMbBnW0GzTiWXl4MhFESqbSOuCA3W
-	OroHmdu4ncpctwkiNywKypFpmDZWVrCfNgg==
-X-Gm-Gg: AR+sD13Rnlt1YR3H0Pi45BQjASz56HN8Cwo94b4R/bcWPaX+oUxS5z7KI+9sBHmT8Cg
-	zi16MUgX1G053fb6IkKUCb+uLBvm3kcTV75mHnh3b80X3SfpPkTbuCiWXnn16pV1DDIl4GTIfuI
-	GG6NACpwyMuAPx2E0+xT60q8LS1uMNeec6e5l5AaZVUE6AhUBZg8zvhnodTAiAGTlLeo04ynY+8
-	5mRLkMRrpZNCBoxXBxHKsXnXar1SRs+1h8P8ZaeJezP2SBTMuab5lbpB8+E/dHTpcygZEFKBnPj
-	lRC75ItP5KUygcArtil/FvPY9U92j7x/MXdlYe1FVU6xbzAuEhFcovUje6+HkJYLIESuf3Z8dq6
-	LMfaHt4EKkj60vwYyQZyfMOZyqCwIOeCqwzs=
-X-Received: by 2002:a53:a942:0:b0:667:c09c:4a36 with SMTP id
- 956f58d0204a3-6699a84c611mr3886738d50.11.1785947840884; Wed, 05 Aug 2026
- 09:37:20 -0700 (PDT)
+        bh=lwzrvm4OnIwwb9wB6xFivMZEKkykQj/6iHbkvXX9SHs=;
+        b=qb4tWRF5NlT6eo7Y+Z+OAviYvI7WF/yiRAlaBik3iOU3uoqzeN/t2dUduIiVHf8d3h
+         Fe5CmiTXNsc1QFk5owSECFRvjsVCwt+autttbo4T/2jfl/cK8jPBJxs1ogaTHDiosSgY
+         ztjjJabrVf1aIFWSywdEMkMsArwDL2MWghgSGPSIcW1zuPada4GpAfaCZRLKApDB1lhp
+         4g1HIs3jrMZOSqvIBwpuqXQ8+UjeqihSWldVaKoLLRSwUw9B3+KTsC2kgjNZPWUCXfzX
+         rxnYM0UGb+p2YO6oE2AEU8mp+fFPM21Ln7wjl8s4EkF1EMdC54juNlWYOs9ixdD7AfzU
+         JPcQ==
+X-Gm-Message-State: AOJu0YxzHbHQUCAg+aT99oy+0CwBeVWKcDzWPhHMZl4/XTpFvg9uDiyd
+	FPqBMJg2ZotZXizDyUQg8FzvSU3dXqASuQFhFP0xQqZBWYYdIzcretcm5bbvDcBlkNao/Cj8hS2
+	etaO/1ZApbQ3/Qzw53TD3OyPROIdn3yw=
+X-Gm-Gg: AR+sD10/R4ILh4OFFAxPV0Gv0kgWfasmfMmgthq/1ZJ8px5CGyPcfVJ0E6yKt9V0olb
+	LYNUKb2FFoNL4+q0vMaBrVSRcvQdxNRWiFPNzs0xL4BHT3c7pcdY5xuVx7plnj+mCH8A7qaRMUb
+	p74VZ38stKZSJhEjU1m0Po6tG1Nez9WSJwlswrB7pIe4nMuQ30dbP4zLgh0uO1YZs6Be7MgJLyc
+	KbhnLqKcVY1OsakypHmwrLEYmsKRZQ9BjDo/spvyibHH7PaiACaFBq/0L6Lm3JYYw8qAMFbn6rs
+	t/aVaRbJoy5TBG+TXcA54L3qFTQ+REWJE1RASOglYdBaDRQJ76QTzTkLX1iguoyA5AeOgMozDB3
+	cX3ZLcf76kQ6smaEQi2caEBnd70lSo3RvnDg=
+X-Received: by 2002:a05:690e:1688:b0:667:689d:531c with SMTP id
+ 956f58d0204a3-6699a893edamr4293742d50.5.1785948252808; Wed, 05 Aug 2026
+ 09:44:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260805150327.2669078-1-hadess@hadess.net>
-In-Reply-To: <20260805150327.2669078-1-hadess@hadess.net>
+References: <20260804142419.2274153-1-hadess@hadess.net> <20260804142419.2274153-3-hadess@hadess.net>
+ <CABBYNZKoj_jr=msyTAiQ+AcV9Xf4MjCAjvcq0pDf8bWPBoypyQ@mail.gmail.com> <45bc30093210c94efca124c980135176c2375c90.camel@hadess.net>
+In-Reply-To: <45bc30093210c94efca124c980135176c2375c90.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 5 Aug 2026 12:37:09 -0400
-X-Gm-Features: AUfX_mzQpBN-mZq5aGbsi-SXn2UfdbsQvYJEjhVZO5MJ1Eweh64YuCA0TE6ReNA
-Message-ID: <CABBYNZKpGvzN4BUxEFKH6WDpC5tq7iih3uBWrxR9aLRn_RBxpQ@mail.gmail.com>
-Subject: Re: [BlueZ, v2] unit: Add test for sdp_xml_parse_record()
+Date: Wed, 5 Aug 2026 12:44:01 -0400
+X-Gm-Features: AUfX_my83vofyzPgl6e3BbGxgiF-AAfmPxcsf6OuHdzm2dFVAcnOPZfJZi1Xq8Q
+Message-ID: <CABBYNZ+MYf9AxCm-nWEqf0qOGxScsU=Ghb0OrvuT2SdjGvD6ZA@mail.gmail.com>
+Subject: Re: [BlueZ, v2 2/3] unit: Adapt poc_*_oob.c test into a new test
 To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, 
+	Elman Shahbazov <shahbazovelman97@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Bastien,
 
-On Wed, Aug 5, 2026 at 11:07=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
-wrote:
+On Wed, Aug 5, 2026 at 3:59=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
+rote:
 >
-> This adds 2 example XML files from other repositories, under a fair use
-> license exception.
-> ---
-> Changes since v1:
-> - Added an "expected result" field, so expected failures can also pass
->   tests.
+> On Tue, 2026-08-04 at 12:46 -0400, Luiz Augusto von Dentz wrote:
+> > Hi Bastien,
+> >
+> > On Tue, Aug 4, 2026 at 10:31=E2=80=AFAM Bastien Nocera <hadess@hadess.n=
+et>
+> > wrote:
+> > >
+> > > Adapt poc_avrcp_oob.c and poc_folder_oob.c into unit tests.
+> > >
+> > > Co-authored-by: Elman Shahbazov <shahbazovelman97@gmail.com>
+> > > ---
+> > >  Makefile.am           |  9 +++++
+> > >  unit/test-avrcp-sec.c | 76
+> > > +++++++++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 85 insertions(+)
+> > >  create mode 100644 unit/test-avrcp-sec.c
+> > >
+> > > diff --git a/Makefile.am b/Makefile.am
+> > > index 19c468d3a504..e3baa4155c1f 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -660,6 +660,15 @@ unit_test_avrcp_SOURCES =3D unit/test-avrcp.c \
+> > >  unit_test_avrcp_LDADD =3D lib/libbluetooth-internal.la \
+> > >                                 src/libshared-glib.la $(GLIB_LIBS)
+> > >
+> > > +unit_tests +=3D unit/test-avrcp-sec
+> > > +
+> > > +unit_test_avrcp_sec_SOURCES =3D unit/test-avrcp-sec.c \
+> > > +                       profiles/audio/avrcp-parse.c \
+> > > +                       profiles/audio/avrcp-parse.h \
+> > > +                       src/log.h src/log.c
+> > > +unit_test_avrcp_sec_LDADD =3D lib/libbluetooth-internal.la \
+> > > +                               src/libshared-glib.la $(GLIB_LIBS)
+> >
+> > Any reason why this couldn't live inside test-avrcp.c?
 >
->  Makefile.am                               |  10 ++
->  unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123 ++++++++++++++++++++++
->  unit/sdp-xml/qt-SerialPortSDPRecord.xml   |  57 ++++++++++
->  unit/test-sdp-xml.c                       |  81 ++++++++++++++
->  4 files changed, 271 insertions(+)
->  create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
->  create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
->  create mode 100644 unit/test-sdp-xml.c
+> Because most of the code in test-avrcp.c is mocked in unit/avrcp-
+> lib.[ch] and conflicts with code from profiles/audio/avrcp.c. I really
+> did try...
 
-Why no reuse test-sdp?
+Ok, well then perhaps we should start testing what we really use in
+the avrcp plugin rather than the removed Android code, or we could
+have a bigger task: converting this type of code to src/shared/avrcp.c
+(e.g. bt_avrcp) so it can be unit tested.
 
-> diff --git a/Makefile.am b/Makefile.am
-> index 19c468d3a504..1c62ee66bdce 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -637,6 +637,16 @@ unit_test_sdp_SOURCES =3D unit/test-sdp.c \
->  unit_test_sdp_LDADD =3D lib/libbluetooth-internal.la \
->                                 src/libshared-glib.la $(GLIB_LIBS)
->
-> +unit_tests +=3D unit/test-sdp-xml
-> +
-> +unit_test_sdp_xml_SOURCES =3D unit/test-sdp-xml.c \
-> +                               src/sdp-xml.c src/sdp-xml.h \
-> +                               src/log.h src/log.c
-> +unit_test_sdp_xml_LDADD =3D lib/libbluetooth-internal.la \
-> +                               src/libshared-glib.la $(GLIB_LIBS)
-> +unit_test_sdp_xml_CFLAGS =3D $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=3D=
-\""$(srcdir)"\"
-> +unit_test_sdp_xml_CPPFLAGS =3D -I$(srcdir)/lib
-> +
->  unit_tests +=3D unit/test-avdtp
->
->  unit_test_avdtp_SOURCES =3D unit/test-avdtp.c \
-> diff --git a/unit/sdp-xml/Bluetooth_HID-sdp_record.xml b/unit/sdp-xml/Blu=
-etooth_HID-sdp_record.xml
-> new file mode 100644
-> index 000000000000..687b0b15b520
-> --- /dev/null
-> +++ b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-> @@ -0,0 +1,123 @@
-> +<?xml version=3D"1.0" encoding=3D"UTF-8" ?>
-> +
-> +<!--
-> +
-> + From: https://github.com/AnesBenmerzoug/Bluetooth_HID/blob/master/sdp_r=
-ecord.xml
-> + A description of these fields can be found in the following links:
-> + http://www.bluecove.org/bluecove/apidocs/javax/bluetooth/ServiceRecord.=
-html
-> + https://www.bluetooth.com/specifications/assigned-numbers/service-disco=
-very
-> +
-> + -->
-> +
-> +<record>
-> +       <attribute id=3D"0x0001"> <!-- Service Class ID List -->
-> +               <sequence>
-> +                       <uuid value=3D"0x1124" /> <!-- Human Interface De=
-vice -->
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0004"> <!-- Protocol Descriptor List -->
-> +               <sequence>
-> +                       <sequence>
-> +                               <uuid value=3D"0x0100" /> <!-- L2CAP -->
-> +                               <uint16 value=3D"0x0011" /> <!-- HIDP -->
-> +                       </sequence>
-> +                       <sequence>
-> +                               <uuid value=3D"0x0011" /> <!-- HIDP -->
-> +                       </sequence>
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0005"> <!-- Browse Group List -->
-> +               <sequence>
-> +                       <uuid value=3D"0x1002" />
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0006"> <!-- Language Based Attribute ID List -=
-->
-> +               <sequence>
-> +                       <uint16 value=3D"0x656e" /> <!-- code_ISO639 -->
-> +                       <uint16 value=3D"0x006a" /> <!-- encoding -->
-> +                       <uint16 value=3D"0x0100" /> <!-- base_offset -->
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0009"> <!-- Bluetooth Profile Descriptor List =
--->
-> +               <sequence>
-> +                       <sequence>
-> +                               <uuid value=3D"0x1124" /> <!-- Human Inte=
-rface Device -->
-> +                               <uint16 value=3D"0x0100" /> <!-- L2CAP --=
->
-> +                       </sequence>
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x000d"> <!-- Additional Protocol Descriptor Lis=
-ts -->
-> +               <sequence>
-> +                       <sequence>
-> +                               <sequence>
-> +                                       <uuid value=3D"0x0100" /> <!-- L2=
-CAP -->
-> +                                       <uint16 value=3D"0x0013" />
-> +                               </sequence>
-> +                               <sequence>
-> +                                       <uuid value=3D"0x0011" /> <!-- HI=
-DP -->
-> +                               </sequence>
-> +                       </sequence>
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0100">
-> +               <text value=3D"Bluetooth_Keyboard/Mouse" />
-> +       </attribute>
-> +       <attribute id=3D"0x0101">
-> +               <text value=3D"USB > BT Keyboard/Mouse" />
-> +       </attribute>
-> +       <attribute id=3D"0x0102">
-> +               <text value=3D"Raspberry Pi 3" />
-> +       </attribute>
-> +       <attribute id=3D"0x0200">
-> +               <uint16 value=3D"0x0100" />
-> +       </attribute>
-> +       <attribute id=3D"0x0201">
-> +               <uint16 value=3D"0x0111" />
-> +       </attribute>
-> +       <attribute id=3D"0x0202">
-> +               <uint8 value=3D"0x40" />
-> +       </attribute>
-> +       <attribute id=3D"0x0203">
-> +               <uint8 value=3D"0x00" />
-> +       </attribute>
-> +       <attribute id=3D"0x0204">
-> +               <boolean value=3D"false" />
-> +       </attribute>
-> +       <attribute id=3D"0x0205">
-> +               <boolean value=3D"false" />
-> +       </attribute>
-> +       <attribute id=3D"0x0206">
-> +               <sequence>
-> +                       <sequence>
-> +                               <uint8 value=3D"0x22" />
-> +                               <text encoding=3D"hex" value=3D"05010906A=
-1018501A100050719E029E71500250175019508810295017508810195087508150025650507=
-190029658100C0C005010902A10185020901A10005091901290315002501750195038102750=
-59501810105010930093109381581257F750895038106C0C0"/>
-> +                       </sequence>
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x0207">
-> +               <sequence>
-> +                       <sequence>
-> +                               <uint16 value=3D"0x0409" />
-> +                               <uint16 value=3D"0x0100" />
-> +                       </sequence>
-> +               </sequence>
-> +       </attribute>
-> +       <attribute id=3D"0x020b">
-> +               <uint16 value=3D"0x0100" />
-> +       </attribute>
-> +       <attribute id=3D"0x020c">
-> +               <uint16 value=3D"0x0c80" />
-> +       </attribute>
-> +       <attribute id=3D"0x020d">
-> +               <boolean value=3D"true" />
-> +       </attribute>
-> +       <attribute id=3D"0x020e">
-> +               <boolean value=3D"false" />
-> +       </attribute>
-> +       <attribute id=3D"0x020f">
-> +               <uint16 value=3D"0x0640" />
-> +       </attribute>
-> +       <attribute id=3D"0x0210">
-> +               <uint16 value=3D"0x0320" />
-> +       </attribute>
-> +</record>
-> diff --git a/unit/sdp-xml/qt-SerialPortSDPRecord.xml b/unit/sdp-xml/qt-Se=
-rialPortSDPRecord.xml
-> new file mode 100644
-> index 000000000000..1f62ccf11a41
-> --- /dev/null
-> +++ b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
-> @@ -0,0 +1,57 @@
-> +<?xml version=3D"1.0" encoding=3D"UTF-8" ?>
-> +
-> +<!--
-> + This is an XML file describing an SDP service record for a Serial Port
-> + service.
-> +
-> + You can use the linux sdptool command to create a file like this for
-> + publishing your Bluetooth services. See the "Creating a Bluetooth servi=
-ce"
-> + tutorial for more details.
-> +
-> + From: https://radekp.github.io/qtmoko/api/bluetooth-bluetoothservice-se=
-rialportsdprecord-xml.html
-> +-->
-> +
-> + <record>
-> +         <attribute id=3D"0x0001">
-> +                 <sequence>
-> +                         <uuid value=3D"0x1101" />
-> +                 </sequence>
-> +         </attribute>
-> +         <attribute id=3D"0x0004">
-> +                 <sequence>
-> +                         <sequence>
-> +                                 <uuid value=3D"0x0100" />
-> +                         </sequence>
-> +                         <sequence>
-> +                                 <uuid value=3D"0x0003" />
-> +                                 <uint8 value=3D"0x05" />
-> +                         </sequence>
-> +                 </sequence>
-> +         </attribute>
-> +         <attribute id=3D"0x0005">
-> +                 <sequence>
-> +                         <uuid value=3D"0x1002" />
-> +                 </sequence>
-> +         </attribute>
-> +         <attribute id=3D"0x0006">
-> +                 <sequence>
-> +                         <uint16 value=3D"0x656e" />
-> +                         <uint16 value=3D"0x006a" />
-> +                         <uint16 value=3D"0x0100" />
-> +                 </sequence>
-> +         </attribute>
-> +         <attribute id=3D"0x0009">
-> +                 <sequence>
-> +                         <sequence>
-> +                                 <uuid value=3D"0x1101" />
-> +                                 <uint16 value=3D"0x0100" />
-> +                         </sequence>
-> +                 </sequence>
-> +         </attribute>
-> +         <attribute id=3D"0x0100">
-> +                 <text value=3D"Serial Port" />
-> +         </attribute>
-> +         <attribute id=3D"0x0101">
-> +                 <text value=3D"COM Port" />
-> +         </attribute>
-> + </record>
-> diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
-> new file mode 100644
-> index 000000000000..aef22b280498
-> --- /dev/null
-> +++ b/unit/test-sdp-xml.c
-> @@ -0,0 +1,81 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2026  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <glib.h>
-> +
-> +#include "bluetooth/sdp.h"
-> +#include "bluetooth/sdp_lib.h"
-> +
-> +#include "src/shared/util.h"
-> +#include "src/shared/tester.h"
-> +#include "src/log.h"
-> +#include "src/sdp-xml.h"
-> +
-> +struct test_data {
-> +       GString *s;
-> +       char *filename;
-> +       gboolean expected_result;
-> +};
-> +
-> +static void parse_xml(gconstpointer data, gsize len, gboolean expected_r=
-esult)
-> +{
-> +       sdp_record_t *rec =3D NULL;
-> +       gboolean ret;
-> +
-> +       rec =3D sdp_xml_parse_record(data, len);
-> +       ret =3D rec ? TRUE : FALSE;
-> +       if (ret =3D=3D expected_result)
-> +               tester_test_passed();
-> +       else
-> +               tester_test_failed();
-> +       if (rec)
-> +               sdp_record_free(rec);
-> +}
-> +
-> +static void parse_xml_for_filename(gconstpointer data)
-> +{
-> +       struct test_data *t =3D (struct test_data *) data;
-> +       char *path =3D NULL;
-> +       GError *error =3D NULL;
-> +       char *contents =3D NULL;
-> +       gsize len;
-> +
-> +       path =3D g_build_filename(TOP_SRCDIR, "unit", "sdp-xml", t->filen=
-ame, NULL);
-> +       if (!g_file_get_contents(path, &contents, &len, &error)) {
-> +               g_warning("Can't load file '%s': %s", path, error->messag=
-e);
-> +               g_free(path);
-> +               g_error_free(error);
-> +               tester_test_failed();
-> +       }
-> +       parse_xml(contents, len, t->expected_result);
-> +       g_free(contents);
-> +       g_free(path);
-> +}
-> +
-> +#define DEFINE_TEST(fname, res)                                         =
-               \
-> +       data.expected_result =3D res;                                    =
-         \
-> +       data.filename =3D fname;                                         =
-         \
-> +       tester_add("/" fname, &data, NULL, parse_xml_for_filename, NULL);
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       struct test_data data;
-> +
-> +       tester_init(&argc, &argv);
-> +
-> +       DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
-> +       DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
-> +
-> +       return tester_run();
-> +}
-> --
-> 2.55.0
->
->
+> I can change the name of the test if needed.
+
+I'm not concerned about the name, I'm concerned about the number of
+unit test files which could otherwise be in a single file instead of
+duplicating a lot of context.
+
+> >
+> > >  unit_tests +=3D unit/test-hfp
+> > >
+> > >  unit_test_hfp_SOURCES =3D unit/test-hfp.c
+> > > diff --git a/unit/test-avrcp-sec.c b/unit/test-avrcp-sec.c
+> > > new file mode 100644
+> > > index 000000000000..a100b2d68e35
+> > > --- /dev/null
+> > > +++ b/unit/test-avrcp-sec.c
+> > > @@ -0,0 +1,76 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > +/*
+> > > + *
+> > > + *  BlueZ - Bluetooth protocol stack for Linux
+> > > + *
+> > > + *  Copyright (C) 2026  Red Hat Inc.
+> > > + *
+> > > + *
+> > > + */
+> > > +
+> > > +#ifdef HAVE_CONFIG_H
+> > > +#include <config.h>
+> > > +#endif
+> > > +
+> > > +#include <glib.h>
+> > > +
+> > > +#include "src/shared/util.h"
+> > > +#include "src/shared/tester.h"
+> > > +#include "src/log.h"
+> > > +
+> > > +#include "profiles/audio/avrcp-parse.h"
+> > > +
+> > > +static void avrcp_element_name_oob(gconstpointer data)
+> > > +{
+> > > +       char name[255];
+> > > +       uint16_t namesize;
+> > > +       gboolean ret;
+> > > +
+> > > +       /* Crafting a malicious payload.
+> > > +        * Actual packet length (len) =3D 14 bytes */
+> > > +       uint8_t malicious_packet[14] =3D {0};
+> > > +
+> > > +       /* Specify namesize =3D 1000 (0x03E8 in Big Endian) at offset
+> > > 11 */
+> > > +       malicious_packet[11] =3D 0x03;
+> > > +       malicious_packet[12] =3D 0xE8;
+> > > +
+> > > +       /* Launching the PoC. We transmit a 14-byte packet, but
+> > > namesize=3D1000... */
+> > > +       ret =3D parse_media_element_name(malicious_packet,
+> > > sizeof(malicious_packet),
+> > > +                                      name, &namesize);
+> > > +       if (ret)
+> > > +               tester_test_passed();
+> > > +       else
+> > > +               tester_test_failed();
+> > > +}
+> > > +
+> > > +static void avrcp_folder_name_oob(gconstpointer data)
+> > > +{
+> > > +       char name[255];
+> > > +       gboolean ret;
+> > > +
+> > > +       /* Crafting a malicious payload.
+> > > +        * Actual packet length (len) =3D 14 bytes */
+> > > +       uint8_t malicious_packet[14] =3D {0};
+> > > +
+> > > +       /* Specify namesize =3D 1000 (0x03E8 in Big Endian) at offset
+> > > 12 */
+> > > +       malicious_packet[12] =3D 0x03;
+> > > +       malicious_packet[13] =3D 0xE8;
+> > > +
+> > > +       /* Launching the PoC. We transmit a 14-byte packet, but
+> > > namesize=3D1000... */
+> > > +       ret =3D parse_media_folder_name(malicious_packet,
+> > > sizeof(malicious_packet),
+> > > +                                     name);
+> > > +       if (ret)
+> > > +               tester_test_passed();
+> > > +       else
+> > > +               tester_test_failed();
+> > > +}
+> > > +
+> > > +int main(int argc, char *argv[])
+> > > +{
+> > > +       tester_init(&argc, &argv);
+> > > +
+> > > +       tester_add("/avrcp-element-name-oob", NULL, NULL,
+> > > avrcp_element_name_oob, NULL);
+> > > +       tester_add("/avrcp-folder-name-oob", NULL, NULL,
+> > > avrcp_folder_name_oob, NULL);
+> > > +
+> > > +       return tester_run();
+> > > +}
+> > > --
+> > > 2.55.0
+> > >
+> > >
+> >
+
 
 
 --=20
