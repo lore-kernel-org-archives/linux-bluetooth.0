@@ -1,139 +1,354 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4223909BF;
-	Wed,  5 Aug 2026 14:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1D93932CE
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 15:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785941554; cv=none; b=HBkR5f7HlVyjaJLcQjD/1m2gL5BaqnJliQRNhT5SCrQORyHiT5H+oeGSxkDwyTZmE3Ktcxcwc93XB+b564bIJs97rkmVg0rPWhfqtbM5SuTt7NzIsix0PIocgAxgX54Fwh9vBxNdKbR4dmHvC4SPxBILT5/Qu0iXQzTjUQWqlNQ=
+	t=1785942223; cv=none; b=gc5Keuns5OXTmOSOKkaMXOqrn8Kyn10G2vfr0TRsz6s1qZE0IV6wbM8EWDhvjZMhgQpaDHLUTaWEVcmH5K1bjJTazz+sJdgTFwiVzC20nSSmmXOcuIvh3K/0dIS55HSVyOwQsRPs9KXG4b4m7ET/Zc0/0K4y8CvDTGV+e8lUkwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785941554; c=relaxed/simple;
-	bh=V1vMFzvbpOsVqDlP1F4HLLpMA2iy2wrtQgeOlHIvRcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UrL4nTPLaMudkgnowJxqSe+IFE9njwZaXkH32LLWvl67nqOklFTN9/hjEffnvlTQDBIkHtx1Qn5EoVUnuqM3bjtNw92Yl62gG7bxfchlcMrUzx52oqRD9WjmWzF8oiUIFdcsfA35jL6rK/14BIwr3gWUxbrGCwC3gpjjrsbCouM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uz8Jmq8v; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uz8Jmq8v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E271F000E9;
-	Wed,  5 Aug 2026 14:52:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785941553;
-	bh=ELhK4rl+r13PV2J/cKV8h4IXQk1HnwLW6SsE62SCcCM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Uz8Jmq8ve7/kkG2FNZKGvCTlvZLhpZJNbpuNuiR00/q4ZAOZwbCJtTDPFum/EvPJr
-	 IoxlHVX9XwcRfu469CsXQXFQAsuPocPub8051e5AERbZ1txkdazoqga4YTZ7XJoSe0
-	 EDSNuYANVeoppZFogTtSFraeg0t0PS+bOzPuSg/ZnQD0xHNAwxrf5j9ZOBOQwBpMmc
-	 4oTVyre+fKRpMkXJdzlrykf1ZF8/lZU9IlLJdCJe45GMhfvEqd3+c3AkmKtIzRezbU
-	 WCKixfhHoJWNTxojv61gU1PhFMm+HYf9Ogy4EKe8MytMpUjB+yCVhZiEIrarY5i3gi
-	 G5X493ZKh+ApQ==
-Date: Wed, 5 Aug 2026 16:52:15 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rahul Samana <rahul.samana@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
-	quic_anubhavg@quicinc.com
-Subject: Re: [PATCH v2 1/6] dt-bindings: bluetooth: qca: add QCC2072
-Message-ID: <5tkajres2vjkt436teaujcqyc3mjqr65rsfvwhjbmlk3fc3gpt@j6ozyfattae3>
-References: <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
- <c1875dd6-fe3a-4a69-a6fd-b461c8fba6e4@kernel.org>
- <6d6465bb-47ac-464c-af4e-0ca72325705f@oss.qualcomm.com>
- <8a388310-d3cc-4d02-abb6-0eb98c24cfce@kernel.org>
- <4523441f-498a-4bbd-80f3-97a7a9206c00@oss.qualcomm.com>
- <6e0b9e79-ccd4-4689-9a6b-9b4fc556d5e4@kernel.org>
- <gfhlyvoefcsvtjuxfo75qeham272cc5g2r3npjenzs5esjifiy@ro7dtkpxwizk>
- <8ab6c26f-b648-447c-9fdd-f1424beb44f4@kernel.org>
- <sewfntbhqtj2apfdi4ouan27artvj4lyxqizvinsvzltbofqu2@riuoo3fmczff>
- <768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org>
+	s=arc-20240116; t=1785942223; c=relaxed/simple;
+	bh=7INxH/baR5ofel/+BOedCj4IunxX/8gbvlc+BSgKm8Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=foXY2lFKACiDA9Q0a2CInbiplQYiwrc/RmVQT0T41xHdXmcUk3vTja3GqhS9gq/D118Xi8QL9rYnkx0Hwl+lqWNmLWkPvlBtXY77WgQlknsL0n8II5Z/g1DoEalCJEUyGPx62s/F9b/YDv9f967QLzy/qHn1YQCnUg6s26lZE/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DF7A03EC1C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Aug 2026 15:03:35 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ, v2] unit: Add test for sdp_xml_parse_record()
+Date: Wed,  5 Aug 2026 17:02:44 +0200
+Message-ID: <20260805150327.2669078-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org>
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 49
+X-GND-Cause: dmFkZTFUzDbTVM1Dq7uTKIBc/uxZRuBdZr6mj4L+snIa58H+LXv8w2eJYyYU3ZiTFKpfYodFYohth19PK/9tGPX6lL5ccvGbqcRi6NpsgtD+OiL23hsaop4eu1PHTZi2FaKmHv0MdjlnVB7CT1EUVumYZRjrBxiY2SGKrtbzrEmf9jQHdL+XeiqUrNOiOl4sh7/eycWChKSUxOcdfaiiH8g2KNAwUKKDaa0y7srupQOwGSjfdPqNk4QxGImwQJL2kqpkoQoV+rOjy0m6h4lf+78Yx31QBTH4ndSIIJzrZ9m0zMKxQxjLHtFiRWZV+8hii4YjkZOzxfveb15S+akDnHUr4beWH6bDCxbg71v+fCbjrdT0M2NSkgIDtOJkmOWmdTt0Nffgdx2PdXxccacZJsCFLRe8o/DaSS3DyvGXK+SVXmvcOxOK1yNOY6BUiizKQEBAze6nLzQBDuu3QcV1ZunOuoHeGGGxKHngx6IpoaPh4r3ZR6YXwJlpyPh+qkeHL+jMDOdcGv3L42fQYXf8h+/5a3LxjOy/wZwYPIa9RUhlyEelqtaJuD/p7cG19JW7FRE0JH4GwwmzcnNkai+T8vnNJfHgH17tk0cHpqSp0APvoMr/6FApgUstlCrMdxL7iw34T7Qqn+FZywSgWl9rIrRj0MMkmwDO1yAgms8FESK8422WTQ
+X-GND-State: clean
 
-On Wed, Aug 05, 2026 at 04:36:31PM +0200, Krzysztof Kozlowski wrote:
-> On 05/08/2026 16:12, Manivannan Sadhasivam wrote:
-> > On Wed, Aug 05, 2026 at 02:33:51PM +0200, Krzysztof Kozlowski wrote:
-> >> DT is not representation of internal device driver instantiation mechanism.
-> >>
-> > 
-> > Here, the driver is just creating compatible for a real device. What difference
-> > does it make if the BT node was defined statically in the DT vs created
-> > dynamically? Both nodes do represent a real BT device, not driver's own
-> > representation. And by the time the node was created, the device is physically
-> > attached to the system.
-> 
-> What stops this power sequencing drivers, after more driver patches, the
-> best if being part of some bigger series, to add properties like
-> "linux,name-of-driver-to-bind" or whatever other SW properties?
-> 
-> This is what happened in that linked thread:
-> https://lore.kernel.org/all/20260326-pci-m2-e-v7-8-43324a7866e6@oss.qualcomm.com/
-> The driver code is adding children under other nodes (references by
-> graph) and it is nowhere documented. Maybe bindings of these other nodes
-> allow it, maybe not. How do you even validate that?
-> 
+This adds 2 example XML files from other repositories, under a fair use
+license exception.
+---
+Changes since v1:
+- Added an "expected result" field, so expected failures can also pass
+  tests.
 
-So the concern is validating the properties that get added dynamically and I get
-that. How about inserting an overlay for the BT node instead of creating the
-node on the fly? Like, drivers/misc/lan966x_pci.dtso
+ Makefile.am                               |  10 ++
+ unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123 ++++++++++++++++++++++
+ unit/sdp-xml/qt-SerialPortSDPRecord.xml   |  57 ++++++++++
+ unit/test-sdp-xml.c                       |  81 ++++++++++++++
+ 4 files changed, 271 insertions(+)
+ create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+ create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
+ create mode 100644 unit/test-sdp-xml.c
 
-This way, the overlay would be validated against a binding and the driver would
-just be inserting it.
-
-> So answering your question - yes, there is a difference because:
-> 1. DTS we validate but whatever you add to driver code we do not and we
-> cannot,
-> 2. DTS represents hardware but whatever you do in your driver code
-> represents who knows what (maybe hardware, maybe not, can represent
-> anything)
-> 
-> And if you claim "I add hardware in the driver!", I respond - maybe
-> true, maybe not, but look at this crap:
-> https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=687bfbba5a1cb15cee51519c210141ed1c4b0ec7
-> 
-> Since we DISALLOWED venus-decoder and venus-encoder DT nodes, what did
-> Bryan do? Squeezed via driver code fake disallowed nodes and even gave
-> them compatibles not looking like compatibles, so any regex won't work.
-> 
-> This power sequencing work here has the same problem of sneaking ABI,
-> which I pointed out here:
-> https://lore.kernel.org/all/9cc5af16-d95e-4f10-8b4a-5e29c136079c@kernel.org/
-> 
-> Look at above patch - nothing documents that ABI. The same as Bryan's
-> fake venus-decoder and encore (not only fake but actually rejected). And
-> to avoid ABI-check tools (or incoming tools), this power sequencing code
-> does not even call a "compatible" a "compatible". No, it calls it
-> "driver_data" nicely avoiding detection.
-> 
-> This is terrible practice and I feel like allowing this patch is silent
-> acknowledgment or agreement of such practice.
-> 
-> It's about basic ABI principles - if you have DT ABI, it must be both
-> clear in the drivers code and in DT bindings, instead of obfuscated
-> calling a compatible driver data. If you don't, then this is not DT ABI
-> and you are not allowed to use OF code to instantiate drivers. Use SW
-> nodes or KHO-style whatever else is there.
-> 
-
-I did propose using SW nodes initially, but then it got changed to
-OF_DYNAMIC with review from Andy. But honestly, Andy only mentioned 'DT
-Overlay' [1], and I was the one decided to use OF_DYNAMIC.
-
-- Mani
-
-[1] https://lore.kernel.org/all/aWSwgRiEkT9unYw9@smile.fi.intel.com
-
+diff --git a/Makefile.am b/Makefile.am
+index 19c468d3a504..1c62ee66bdce 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -637,6 +637,16 @@ unit_test_sdp_SOURCES = unit/test-sdp.c \
+ unit_test_sdp_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
++unit_tests += unit/test-sdp-xml
++
++unit_test_sdp_xml_SOURCES = unit/test-sdp-xml.c \
++				src/sdp-xml.c src/sdp-xml.h \
++				src/log.h src/log.c
++unit_test_sdp_xml_LDADD = lib/libbluetooth-internal.la \
++				src/libshared-glib.la $(GLIB_LIBS)
++unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)"\"
++unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
++
+ unit_tests += unit/test-avdtp
+ 
+ unit_test_avdtp_SOURCES = unit/test-avdtp.c \
+diff --git a/unit/sdp-xml/Bluetooth_HID-sdp_record.xml b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+new file mode 100644
+index 000000000000..687b0b15b520
+--- /dev/null
++++ b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+@@ -0,0 +1,123 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++
++<!--
++
++ From: https://github.com/AnesBenmerzoug/Bluetooth_HID/blob/master/sdp_record.xml
++ A description of these fields can be found in the following links:
++ http://www.bluecove.org/bluecove/apidocs/javax/bluetooth/ServiceRecord.html
++ https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
++
++ -->
++
++<record>
++	<attribute id="0x0001"> <!-- Service Class ID List -->
++		<sequence>
++			<uuid value="0x1124" /> <!-- Human Interface Device -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0004"> <!-- Protocol Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x0100" /> <!-- L2CAP -->
++				<uint16 value="0x0011" /> <!-- HIDP -->
++			</sequence>
++			<sequence>
++				<uuid value="0x0011" /> <!-- HIDP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0005"> <!-- Browse Group List -->
++		<sequence>
++			<uuid value="0x1002" />
++		</sequence>
++	</attribute>
++	<attribute id="0x0006"> <!-- Language Based Attribute ID List -->
++		<sequence>
++			<uint16 value="0x656e" /> <!-- code_ISO639 -->
++			<uint16 value="0x006a" /> <!-- encoding -->
++			<uint16 value="0x0100" /> <!-- base_offset -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0009"> <!-- Bluetooth Profile Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x1124" /> <!-- Human Interface Device -->
++				<uint16 value="0x0100" /> <!-- L2CAP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x000d"> <!-- Additional Protocol Descriptor Lists -->
++		<sequence>
++			<sequence>
++				<sequence>
++					<uuid value="0x0100" /> <!-- L2CAP -->
++					<uint16 value="0x0013" />
++				</sequence>
++				<sequence>
++					<uuid value="0x0011" /> <!-- HIDP -->
++				</sequence>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0100">
++		<text value="Bluetooth_Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0101">
++		<text value="USB > BT Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0102">
++		<text value="Raspberry Pi 3" />
++	</attribute>
++	<attribute id="0x0200">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x0201">
++		<uint16 value="0x0111" />
++	</attribute>
++	<attribute id="0x0202">
++		<uint8 value="0x40" />
++	</attribute>
++	<attribute id="0x0203">
++		<uint8 value="0x00" />
++	</attribute>
++	<attribute id="0x0204">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0205">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0206">
++		<sequence>
++			<sequence>
++				<uint8 value="0x22" />
++				<text encoding="hex" value="05010906A1018501A100050719E029E71500250175019508810295017508810195087508150025650507190029658100C0C005010902A10185020901A1000509190129031500250175019503810275059501810105010930093109381581257F750895038106C0C0"/>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0207">
++		<sequence>
++			<sequence>
++				<uint16 value="0x0409" />
++				<uint16 value="0x0100" />
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x020b">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x020c">
++		<uint16 value="0x0c80" />
++	</attribute>
++	<attribute id="0x020d">
++		<boolean value="true" />
++	</attribute>
++	<attribute id="0x020e">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x020f">
++		<uint16 value="0x0640" />
++	</attribute>
++	<attribute id="0x0210">
++		<uint16 value="0x0320" />
++	</attribute>
++</record>
+diff --git a/unit/sdp-xml/qt-SerialPortSDPRecord.xml b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+new file mode 100644
+index 000000000000..1f62ccf11a41
+--- /dev/null
++++ b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+@@ -0,0 +1,57 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++
++<!--
++ This is an XML file describing an SDP service record for a Serial Port
++ service.
++
++ You can use the linux sdptool command to create a file like this for
++ publishing your Bluetooth services. See the "Creating a Bluetooth service"
++ tutorial for more details.
++
++ From: https://radekp.github.io/qtmoko/api/bluetooth-bluetoothservice-serialportsdprecord-xml.html
++-->
++
++ <record>
++         <attribute id="0x0001">
++                 <sequence>
++                         <uuid value="0x1101" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0004">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x0100" />
++                         </sequence>
++                         <sequence>
++                                 <uuid value="0x0003" />
++                                 <uint8 value="0x05" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0005">
++                 <sequence>
++                         <uuid value="0x1002" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0006">
++                 <sequence>
++                         <uint16 value="0x656e" />
++                         <uint16 value="0x006a" />
++                         <uint16 value="0x0100" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0009">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x1101" />
++                                 <uint16 value="0x0100" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0100">
++                 <text value="Serial Port" />
++         </attribute>
++         <attribute id="0x0101">
++                 <text value="COM Port" />
++         </attribute>
++ </record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+new file mode 100644
+index 000000000000..aef22b280498
+--- /dev/null
++++ b/unit/test-sdp-xml.c
+@@ -0,0 +1,81 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++
++#include "bluetooth/sdp.h"
++#include "bluetooth/sdp_lib.h"
++
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/log.h"
++#include "src/sdp-xml.h"
++
++struct test_data {
++	GString *s;
++	char *filename;
++	gboolean expected_result;
++};
++
++static void parse_xml(gconstpointer data, gsize len, gboolean expected_result)
++{
++	sdp_record_t *rec = NULL;
++	gboolean ret;
++
++	rec = sdp_xml_parse_record(data, len);
++	ret = rec ? TRUE : FALSE;
++	if (ret == expected_result)
++		tester_test_passed();
++	else
++		tester_test_failed();
++	if (rec)
++		sdp_record_free(rec);
++}
++
++static void parse_xml_for_filename(gconstpointer data)
++{
++	struct test_data *t = (struct test_data *) data;
++	char *path = NULL;
++	GError *error = NULL;
++	char *contents = NULL;
++	gsize len;
++
++	path = g_build_filename(TOP_SRCDIR, "unit", "sdp-xml", t->filename, NULL);
++	if (!g_file_get_contents(path, &contents, &len, &error)) {
++		g_warning("Can't load file '%s': %s", path, error->message);
++		g_free(path);
++		g_error_free(error);
++		tester_test_failed();
++	}
++	parse_xml(contents, len, t->expected_result);
++	g_free(contents);
++	g_free(path);
++}
++
++#define DEFINE_TEST(fname, res)							\
++	data.expected_result = res;						\
++	data.filename = fname;							\
++	tester_add("/" fname, &data, NULL, parse_xml_for_filename, NULL);
++
++int main(int argc, char *argv[])
++{
++	struct test_data data;
++
++	tester_init(&argc, &argv);
++
++	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
++	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
++
++	return tester_run();
++}
 -- 
-மணிவண்ணன் சதாசிவம்
+2.55.0
+
