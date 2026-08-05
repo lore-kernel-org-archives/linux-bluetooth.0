@@ -1,132 +1,212 @@
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3FC3ED5A6;
-	Wed,  5 Aug 2026 10:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0D346AA6B;
+	Wed,  5 Aug 2026 12:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785926217; cv=none; b=ZapAcZTy88wj0M7pIE340ajWAq/qOy+bNj3uK5Rf5g6XYty1q5J88zK2pGwqtTRdygx7sKegRbWCphyglrQiyZrKK3W7Ra2d/j+tthF3sRcDqM++5GPJLex0d6vH3u8xQycr6SDQ7GjWT1Pi72atzxDtIffWv33AhCC6lXb/uXY=
+	t=1785931798; cv=none; b=HAPqthJmsnFOF4MsaP6+wn4TZH/d3uIUkP2WGwoXiczDIZXnT1JDjCVbx9f6NsYpl/tSNEh+5JMMhwfBj161l9z0YRNbmilfX/5wvnB8YxpWp0M8i0OraTZxCiABIm7B+C7MuDXnHLTvzkc4TxARQj8oB1Yo94U9OuqMkUumA1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785926217; c=relaxed/simple;
-	bh=wweRSA3jZ3JksQoGA6B2PixqNeG8hu3QgEAPHfsdFzU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I0pjpHdNVlq0gs/w+3YyWRv017C+kO/6q9xmvyFh45ewjanB51hDkITqF0ABV/U89KSTCjV7iUCVt7WTM6X+NWVnc7EcYCtqqqpRcPowkAZkVOV3wkEbrdYmgbVoRpWAnEGZqBOroNbP5REN78o5Xf/N9ekdj3pSCKktbOgjbl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Tof/fQnG; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1785931798; c=relaxed/simple;
+	bh=TggrNnVWCqegCmN+qnDd/lbIP1Jj3+XKWs97+DYbKPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bw1fn9g45XY+lsN0JmXl1v9y9YF2scLiHr8FllriwSgC3CLM//j7b5jSXNDkvr21PzL/hocWUjWwnGoRPnlcmSEaHUOo89+hpZITytZK0/LmXyi7zt3rjqS1gYUrjSFtEN7frH6a7tQdoQhJY4ZRLQAdnbfeChS18U21xcGGxqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmgmVdXL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Tof/fQnG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1785926191;
-	bh=1cSBFG13E11AsLThh/tacwvn7sqfCKvF2OEgcJZy1gY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=Tof/fQnGtdTeIJu4ZQcikxq0owMjX5M/xwZYBdwI0r6GSBbMgW4hVvfFymOhBdqTq
-	 eBcmnsmJKawlHcbbbodtapz6wnKX7FGIOVK7tjbdmX57/Jnt/wITMdBESTYvgOr4Hs
-	 37RA5eIMPwk32CYcJsHJV4Tp6GI/5VVqbAnEe/8Y=
-X-QQ-mid: zesmtpgz6t1785926185t0c81c0f3
-X-QQ-Originating-IP: /CnueA4ypeRJgnbz1VrRsGBrk6FsYmdfwWthFyjdBts=
-Received: from PEN002676 ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 05 Aug 2026 18:36:15 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 9662022247066101482
-EX-QQ-RecipientCnt: 5
-From: ZhaoJinming <zhaojinming@uniontech.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ZhaoJinming <zhaojinming@uniontech.com>
-Subject: [PATCH] Bluetooth: hci_serdev: Fix use-after-free in hci_uart_unregister_device()
-Date: Wed,  5 Aug 2026 18:36:12 +0800
-Message-ID: <0BDE51B0554940FB+20260805103612.916678-1-zhaojinming@uniontech.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmgmVdXL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B812E1F00ADF;
+	Wed,  5 Aug 2026 12:09:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785931782;
+	bh=m0PaxOSw/nL8V3kNaa8yda1zYqp+YjlKb11BL70wWgY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=NmgmVdXLynMNJGUSa1OW3TrxVgbQUwB/CvtaNkKCfTjSb/JQZUT+eAKxLd51m4Xk7
+	 IDUqn1JKE4UlKrbnRZwxyUez2KVUO6Q22GlpVVsalRa5WMtyR5t6K2vpZtTP/rgQyL
+	 D3p1dtF1RTzlbkmkYTA0sSi75Z8us+pBFYFouiT9znrAL1fXFNMRa/Y1yXzAnZayz2
+	 QMlMh949vffxY/hHXwQLefJrV1xK6Ii3QC2K4y0W68lL538bA5orPr+8hdX6UXBCya
+	 SXrBfnyCkEd7N70cHwVox/TrvkUZjXEqZ9H8zpyOVM6zyx9x9R9twP2ANxQskL5nDO
+	 w4k6o8m/pNzFg==
+Date: Wed, 5 Aug 2026 14:09:21 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Rahul Samana <rahul.samana@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-pm@vger.kernel.org, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
+	quic_anubhavg@quicinc.com
+Subject: Re: [PATCH v2 1/6] dt-bindings: bluetooth: qca: add QCC2072
+Message-ID: <gfhlyvoefcsvtjuxfo75qeham272cc5g2r3npjenzs5esjifiy@ro7dtkpxwizk>
+References: <20260727-rb3-industrial-bt-uart-v2-0-2d100f30e202@oss.qualcomm.com>
+ <20260727-rb3-industrial-bt-uart-v2-1-2d100f30e202@oss.qualcomm.com>
+ <20260731-first-righteous-bear-dd72ed@quoll>
+ <712f8a14-d2a1-4a90-82f9-05cd694f2658@oss.qualcomm.com>
+ <c1875dd6-fe3a-4a69-a6fd-b461c8fba6e4@kernel.org>
+ <6d6465bb-47ac-464c-af4e-0ca72325705f@oss.qualcomm.com>
+ <8a388310-d3cc-4d02-abb6-0eb98c24cfce@kernel.org>
+ <4523441f-498a-4bbd-80f3-97a7a9206c00@oss.qualcomm.com>
+ <6e0b9e79-ccd4-4689-9a6b-9b4fc556d5e4@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: MyhNtuNETree+iwqgL3l6cnLmc68yTGsl2OctM44KBGxQAYsi7UVd7Wm
-	vGCyuY4ztNn/1pcO6i9UPe2FD+yuV2FXs93enXRAjCSu0i3qcQ99nYdSFo7SXMb2vjcbqNw
-	gTFl5kLZ50qUMon6w7VsHRX7J7fCh0Y5COKKx5u0lpMlKKqw1DfgQ/zoPehO+2qWevwweuy
-	HTYdhIXA+Y3BNuLzptffSxg/Zk8QHsjjxZQ+Qah+CP0aHPvbD9Nc3OTE6YK9gysFn5LHDAZ
-	FktVMVK9stE3hkeOB2SCsdE0wobOdAaLZc4mjd8Hf00GWAg1U9itimWD70eXAdHMkGQ2P2U
-	pH1XVaEfvcihiNNcV4bbmIdX3yQS5v+1k6AISKOP/IxS8GLLBjdnfJjaUHAa9cwT/179pkz
-	vh99kPlTV6gbuAbxInyQ26RFh5kfgTMpDe54HfAVHwVbMEU4rWG4ytB9qXsHivMd7QIxZkz
-	AZut84OSBuLkEul7o+78dnsqRzapXS6RGM2cmmKnDaaS8mJEzFugCPAux9xszJBgoueKtez
-	cDp/kE5A0TWK/y8+JrkSBYCivl5UdpiPs8fQCokK9BJKyA2PxmxI1NgFww6kxfWDTMZEQHJ
-	qBqnSYNDFCT3/NDQKc6ntAuKVDJ8tYRCUAGf6kJ1GsdSKRCmtnuvfGlP3pRWjC1MgNsZNO1
-	xngSJXnEyXVMwcb/xEZjh3BmsKNfM4t/tgEka52McE2w5+PAjws5JRecdr8ap9guyUJVRPf
-	iCvEeMJWERQuUGFSeCbNdlwChwTSIGSnLR/QSRBaZUDYd7fCj7blwNUePGevpWy8Wjumy+K
-	6jEJ7LWAdwRp/A1ixvm7qfghCXXoshVsDlf0bNFmg0AlSsVtlA89WaLdbLaIzGKwZERCNBd
-	s3wGxxSIwg+0VS9XQDfoUze+UE+uifZnraCjEJR8+JUBG2o33CkRnZa5hfNgB+6ouGts3Rp
-	SX+UVb+gSNv2obWboHRV7HDnRtX7/s0Cd3UvMcc5z5RmtTgAt8PUKnfkXyoMBnZ0BOta6vX
-	fyQBTNOm3wqLlL6yc7woU2HviZ1mE=
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <6e0b9e79-ccd4-4689-9a6b-9b4fc556d5e4@kernel.org>
 
-hci_uart_unregister_device() frees the HCI device (hci_free_dev)
-before cancelling write_work via cancel_work_sync(). If write_work
-is executing concurrently on another CPU, it can access hu->hdev
-(serdev.c:61) and write to hdev->stat (serdev.c:75, 83) after the
-memory has been freed.
+On Sat, Aug 01, 2026 at 05:49:53PM +0200, Krzysztof Kozlowski wrote:
+> On 01/08/2026 17:31, Rahul Samana wrote:
+> > 
+> > 
+> > On 01-08-2026 20:18, Krzysztof Kozlowski wrote:
+> >> On 31/07/2026 17:51, Rahul Samana wrote:
+> >>>
+> >>>
+> >>> On 31-07-2026 20:34, Krzysztof Kozlowski wrote:
+> >>>> On 31/07/2026 16:45, Rahul Samana wrote:
+> >>>>>
+> >>>>>
+> >>>>> On 31-07-2026 15:16, Krzysztof Kozlowski wrote:
+> >>>>>> On Mon, Jul 27, 2026 at 09:15:01PM +0530, Rahul Samana wrote:
+> >>>>>>> QCC2072 can be used on M.2 E-key cards where the card power resources are
+> >>>>>>> described by the pcie-m2-e-connector node. In that setup, the M.2 power
+> >>>>>>> sequencing provider creates the Bluetooth serdev child after matching the
+> >>>>>>> QCC2072 PCI function.
+> >>>>>>>
+> >>>>>>> Integrated non-M.2 designs need board-specific power resources. Document
+> >>>>>>> only the compatible for now and leave those properties to be added with
+> >>>>>>> matching driver support.
+> >>>>>>>
+> >>>>>>> Document the qcom,qcc2072-bt compatible used for QCC2072 Bluetooth
+> >>>>>>> controllers connected over UART.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Rahul Samana <rahul.samana@oss.qualcomm.com>
+> >>>>>>
+> >>>>>> NAK, exactly same comments as before.
+> >>>>>>
+> >>>>>> Nothing got improved, although what is weird - original SoB is gone, so
+> >>>>>> this is legally dubious work.
+> >>>>>>
+> >>>>>> Best regards,
+> >>>>>> Krzysztof
+> >>>>>>
+> >>>>>
+> >>>>> Hi Krzysztof,
+> >>>>>
+> >>>>> Thanks for the review.
+> >>>>>
+> >>>>> For the binding contents, I tried to capture the current scope in the binding
+> >>>>> description itself. This series supports QCC2072 only as an M.2 E-key card,
+> >>>>> where the card power resources are described by the pcie-m2-e-connector node
+> >>>>> and the M.2 pwrseq provider creates the Bluetooth serdev child.
+> >>>>>
+> >>>>> The binding also says:
+> >>>>>
+> >>>>>   Integrated non-M.2 designs require board-specific power resources. Those
+> >>>>>   properties, together with a static devicetree example, should be added when
+> >>>>>   integrated non-M.2 support is added.
+> >>>>
+> >>>> Bindings must be complete and your driver support is irrelevant here.
+> >>>>
+> >>>> If you claim this is a PCI device thus you do not need any resources,
+> >>>> then the binding is not needed either. PCI devices are enumerable. And
+> >>>> to prove it: look at your DTS. Do you see qcom,qcc2072-bt being used? No.
+> >>>>
+> >>>>>
+> >>>>> We do not currently have an integrated non-M.2 QCC2072 design, so I do not
+> >>>>> have board-specific regulator supplies to document for that topology.
+> >>>>>
+> >>>>> Could you please suggest how you would prefer this binding to be handled for
+> >>>>> the current M.2-only use case? 
+> >>>>
+> >>>> Drop the binding, you do not need it.
+> >>>>
+> >>>> Anyway the problem is that more comments were ignored.
+> >>>>
+> >>>
+> >>> Hi Krzysztof,
+> >>>
+> >>> Just to clarify the reason for adding this binding in v2: 
+> >>> v1 did not add a binding because this series only targets the M.2 use case.
+> >>>
+> >>> I added the minimal binding in v2 because checkpatch reported
+> >>> qcom,qcc2072-bt as an undocumented compatible, and I interpreted the request
+> >>> to fix the checkpatch warnings as requiring this compatible to be documented.
+> >>> I also had the earlier feedback in mind, where the indirect
+> >>> qcom,qcc2072-bt compatible was pushed back because it was undocumented:
+> >>>
+> >>> https://lore.kernel.org/all/20260703-eliza_evk-v1-3-7624440bd76d@oss.qualcomm.com/
+> >>>
+> >>> Based on your clarification here, I will drop the binding patch in v3 and
+> >>> keep qcom,qcc2072-bt only as the pwrseq-created child compatible for this
+> >>> M.2 case.
+> >>
+> >> My previous statement is also valid, please read entire threads.
+> >>
+> >> You cannot have undocumented qcom,qcc2072-bt.
+> >>
+> >> I ask you to drop both, because they are not needed. But feel free to
+> >> prove me wrong, see my first paragraph in the previous reply.
+> >>
+> >>
+> > The PCIe M.2 power sequencing driver, pwrseq-pcie-m2.c, uses
+> > pwrseq_m2_pci_ids to translate the enumerated PCI function into the
+> > Bluetooth compatible used for the generated serdev child.
+> > 
+> > For example, WCN7850 maps PCI ID 17cb:1107 to qcom,wcn7850-bt, then hci_qca
+> > matches that compatible to select qca_soc_data_wcn7850.
+> > 
+> > For QCC2072, pwrseq-pcie-m2.c matches PCI ID 17cb:1112 and creates the
+> > generated Bluetooth serdev child with compatible "qcom,qcc2072-bt". The
+> > hci_qca driver then matches "qcom,qcc2072-bt" and uses qca_soc_data_qcc2072
+> > as the controller-specific data.
+> 
+> The purpose of Devicetree is not to describe Linux internal driver
+> matching. Do not use compatibles for that.
+> 
+> 
+> > 
+> > That match data is needed by hci_qca to select the QCC2072 soc_type,
+> > firmware/NVM naming, calibration handling, and capabilities. Without some
+> > identity being passed from the PCI match to the generated serdev child,
+> > hci_qca cannot distinguish QCC2072 from the other Qualcomm UART Bluetooth
+> > controllers on this path.
+> > 
+> > Please correct me if I misunderstood the concern or if you are asking for
+> > this identity to be passed from pwrseq-pcie-m2.c to hci_qca through a
+> > different mechanism.
+> > 
+> > I can drop the binding patch, but unless there is a preferred alternative
+> > mechanism, I think we still need the pwrseq-pcie-m2 QCC2072 PCI ID support
+> > from patch 3 so the power sequencing driver can pass the QCC2072 identity
+> > into hci_qca through the generated serdev child:
+> 
+> You have plenty of options, starting from what is very common already -
+> driver name used by MFD or aux devices.
+> 
 
-Additionally, HCI_UART_PROTO_READY is not cleared until after
-cancel_work_sync, so the write_wakeup serdev callback can still
-schedule write_work via hci_uart_tx_wakeup() even after
-hci_free_dev has freed the device.
+It is not just a driver matching problem, but ensuring that we properly describe
+the BT device in DT. Since the BT interface of the M.2 device is not
+discoverable, we are currently using the PCIe IDs of the M.2 device to create
+the BT node dynamically under UART node using OF_DYNAMIC as proposed in this
+patch which got merged already [1]. Then we also create the serdev device and
+allow the existing BT hci_qca driver to probe and make use of the created DT
+node.
 
-Fix this by mirroring the same ordering used in the tty/ldisc path
-(hci_uart_tty_close, hci_ldisc.c:565-593):
-1. Clear HCI_UART_PROTO_READY and close the serdev port
-2. Cancel write_work (no new work can be scheduled)
-3. Unregister the HCI device
-4. Close the protocol (may access hu->hdev, e.g. bcm_close)
-5. Free the HCI device
+Since each BT device is unique, the compatible used in the dynamic node needs to
+be documented in the binding. But there is no need to describe any supplies or
+BT_EN GPIOs since they are already part of the M.2 binding.
 
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
- drivers/bluetooth/hci_serdev.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+- Mani
 
-diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index 593d9cefbbf9..e06b9d5b3846 100644
---- a/drivers/bluetooth/hci_serdev.c
-+++ b/drivers/bluetooth/hci_serdev.c
-@@ -397,18 +397,22 @@ void hci_uart_unregister_device(struct hci_uart *hu)
- 	struct hci_dev *hdev = hu->hdev;
- 
- 	cancel_work_sync(&hu->init_ready);
--	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
--		hci_unregister_dev(hdev);
--	hci_free_dev(hdev);
--
--	cancel_work_sync(&hu->write_work);
--
--	hu->proto->close(hu);
- 
-+	/* Clear HCI_UART_PROTO_READY first to prevent the write_wakeup
-+	 * callback from re-scheduling write_work via hci_uart_tx_wakeup().
-+	 */
- 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		serdev_device_close(hu->serdev);
- 	}
-+
-+	cancel_work_sync(&hu->write_work);
-+
-+	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
-+		hci_unregister_dev(hdev);
-+
-+	hu->proto->close(hu);
-+	hci_free_dev(hdev);
- 	percpu_free_rwsem(&hu->proto_lock);
- }
- EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+[1] https://lore.kernel.org/all/20260326-pci-m2-e-v7-8-43324a7866e6@oss.qualcomm.com/
+
 -- 
-2.51.0
-
+மணிவண்ணன் சதாசிவம்
