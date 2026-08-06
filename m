@@ -1,159 +1,225 @@
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3C53DD87F;
-	Thu,  6 Aug 2026 06:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2386378F2F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785998225; cv=none; b=ehiaZhZGvDJLZloEh90mU1Fh2UaE8/cB6/AOrtUxs/Uj6rMk2jidQ9jkakBMrpRmI5Dk6XiaMUPhOZwQ7uBCVovpKLx3WUhy9GPNMtT2mqgm5sZm0faZnYWHT8krbYJDbDGCE2ty1+V8t52b6prRcAoBMXOYmpkfn/szf1QW7vg=
+	t=1785998913; cv=none; b=Hxn4uhrtdTaOMjHAvNHSY6k9PM6uaquDRU2+NFflvTrCMD/kosi6S31IqEtwWOVvzzXXHcLWFZSqPtJt3yvChSl0Tv+nanD31K8qmNjUrpJWPnVxN7LA3ZSBEV8KjORCFl/8vgBdYMWuiY2BkZC8XTyypn3oL4y5Qi02FuyT+zU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785998225; c=relaxed/simple;
-	bh=UtZEdM1X81hEwX7/VeFHRFAm9tX4z31suDUqyoer+rM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ek6DhOCj9KpOQjqLErGLXoOJlpas7bTReEgCfF4SgpfjW5VCqcnac7dNRMqMzHhaATb+1O4ejAA5Swx8xmTjkW1bKSbBFeNmsyFj0wFSfzAtPnd2ceP3uvOJYQCDlfSpaqIk1OqD8Nbe1PjEGXTQyPkqbMTixB0/D228mCmLFyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=XF7HG/Zz; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1785998913; c=relaxed/simple;
+	bh=4XzGinvVm9lsOLwW/Djqr/sLriv1bnYOMJc0BEXVhmw=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=H9g3tRjhTGr9i/eKlSXEA1FDx/sQbZ5F3PKrj0cDfSAlbWrWSzW6xSxppjUv+dP0KC/aK3F9HYZ4jkVw8Z1+EiYcJgXKcQXC1MOnPiZMboV816pl/itraqeFgkBOa/gds731J662Zj7JKsvjumdtwDiM7nfSz2USx2n9HsiiiIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PltZdOlh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="XF7HG/Zz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1785998144;
-	bh=3aCaFbKDjbrgsWA9pX65sno3g8y9yQszPJrQTiaiiUo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=XF7HG/ZzWcaBrI5Tx+atc6SAPN0SaKr2z9E3gpU0wxNZPziECnhvJYJK4Ru6KRQ8y
-	 6gL2HFfO8Dws50/hx8MSt5/TezFk1aSrq2S8mY2686Qc539b5wDzz//EJWoRIWVhw2
-	 MVifQNmg1U/r/rACA5DGNRFUr1T/O/FQQ804M+X0=
-X-QQ-mid: esmtpsz18t1785998139t713a1b3e
-X-QQ-Originating-IP: meHIFHb/eE+sKBjPiO2vnCjlJI5G19NMZP2xmTBwoyQ=
-Received: from PEN002676 ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 06 Aug 2026 14:35:27 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 7208643304580338951
-EX-QQ-RecipientCnt: 9
-From: ZhaoJinming <zhaojinming@uniontech.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	ZhaoJinming <zhaojinming@uniontech.com>
-Subject: [PATCH] Bluetooth: btmtksdio: fix deadlock in close and reset paths
-Date: Thu,  6 Aug 2026 14:35:21 +0800
-Message-ID: <FD5D03449312D17C+20260806-btmtksdio-deadlock-fix-v1-1-3a2d4392d117@uniontech.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PltZdOlh"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AD3ABC2BCB9
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1785998912;
+	bh=4XzGinvVm9lsOLwW/Djqr/sLriv1bnYOMJc0BEXVhmw=;
+	h=From:To:Subject:Date:From;
+	b=PltZdOlhI0PVEZgnZpH0g75U37LPX+uB72T52zaelA1NnRAKKDCctS0A16nKdKcKJ
+	 OiSceq3eqObFJfJsMPcK9RUE66362/jHxjUjJSYehr4jScFo0EYZsumnDtj6d9ZDJs
+	 /152s2QZ++2fLi0RpzixkHrn3qiQTCqzoKndWzThvGaj9pvwgseS4uDdY3/guWKiFl
+	 26gUOFp8xKSaoKNI93wghN22YwjkP0uaRQhjNLxW03OquqtqhoIX0HsgeqmEbeCTrN
+	 JAyajd/A0p3cSQNUsbdVXE0vBsb/gCY1kFNXx+jq591E2f9hQs+gL7PSnfJvWHswLK
+	 YFEegPyGzeVMQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 80416C3279F; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221840] New: Regression: Intel Bluetooth (btintel/hci0) fails
+ firmware boot on 7.0.12, works on 6.17.10 (Dell Inspiron 3501, AX201)
+Date: Thu, 06 Aug 2026 06:48:32 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rohitanand9418@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-221840-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Change-ID: 20260806-btmtksdio-deadlock-fix-f9421f1a7879
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: MwhIHrVefHZTbIQJW/yOT8KZgKpd1+0ZMDcoJ5Hltu8eO0TmTrGEAKU9
-	TfGtNIWDK4iuVZVkdNTzXdPpl7RKAL0DXK5bCqEFsr9JqSVG4VhikSxbF4HhjlVQyiTFi2G
-	FnjavN4fnRF9DepxgMkm5fovaWikDrPfP/1Pko4YHmGFqqjEdW7vDsfyWUN7gO/eAmBGKq6
-	ryan8rEp8xz8LhE1qVxhqm8IQ839NP2b5PWWVAmBBVwjtfu3L9Owq1B/OfARA+2Mra6tfrg
-	KoGzF/912hOIz1oYq0C4kfOLiMM4AJapNplMOKywUbIAn6u0e1krhwiNUsPtQEKn5f/a/xI
-	ZTrvvruC2Ihvp4RlC9nt6pUjU3mnzq6xh5+rTENA7/9V7DZkwALKBzxtfCnJre3HyqMlin0
-	2IbFApJGlFT+T0OObqEIcnuafnjddMYRHDpebYQPGq1rduKOg3SFDMoaco+F0w5lyNQXejh
-	k4YcJDhC6QyuFOmYd3bNTFXjI8yI/IdwjJBIjG/QBCpDvyJw2caavRtp1KY40UCt8sZszOb
-	1Hw5lrM9whz3wjmcyuKBroAKeCaHb+fSeYAYCnoju3xMeyYj6q+CIX9o82b5MQ77C1iqmQG
-	ntwGNoIGqCJoJFlVpFVEmCc3cLNx8vlxbUts39XXhH1xf+MFip0bTY8os9QwCYOj8uaRy7S
-	TmwSiJIScE3IQo9vTsqNjlC85ojVXVu4NEOeN5xZeAfuveW3chylamadq3HyBJHdUgun58H
-	MM8/jV38dFAnt/oo78qjaU9ZTQFg2pO09ZvjLLRxFDJkuKBsTJnrEjnExSeThNV/avuUDzb
-	QImo0K14fIoe84NIe5H0b6zG8a4C1JqjPKkyY5pfPFcbO+5OIL+4x4FSVINUUE9Kz858EYh
-	IpurnPMeJ7BbzuP0N8OvBbHT65VGtvssrJB05yUtUUz7V6WvXIsiNfOyeCCWZv1+jjklFSx
-	eJAA+AjxzhiYTAPwEv6httCKsVijBxGWu49CiS/bB1YGM/fdQAGqCmssG03gDKxnAES8+rD
-	a5V6QmwQIdnrnONtj0
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
 
-btmtksdio_close() and btmtksdio_reset() call cancel_work_sync() on
-bdev->txrx_work while holding the sdio host lock, which is also acquired
-by btmtksdio_txrx_work().  If txrx_work is queued when close/reset runs,
-a worker thread may start it after the host lock is taken and block in
-sdio_claim_host(), while cancel_work_sync() waits for the work to
-finish.  The host lock is only released after cancel_work_sync()
-returns, so both sides wait forever, deadlocking close/reset.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221840
 
-Fix this by releasing the sdio host lock before calling
-cancel_work_sync(), then re-acquiring it afterwards.  The interrupt is
-already disabled (sdio_release_irq() in close, C_INT_EN_CLR in reset)
-before the work is cancelled, so no new work can be scheduled and
-cancel_work_sync() fully quiesces txrx_work before the device is torn
-down.  This mirrors the pattern already used by btmtksdio_flush(),
-which cancels the work without holding the host lock.
+            Bug ID: 221840
+           Summary: Regression: Intel Bluetooth (btintel/hci0) fails
+                    firmware boot on 7.0.12, works on 6.17.10 (Dell
+                    Inspiron 3501, AX201)
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: rohitanand9418@gmail.com
+        Regression: No
 
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
-btmtksdio_close() and btmtksdio_reset() call cancel_work_sync() on
-bdev->txrx_work while holding the sdio host lock that
-btmtksdio_txrx_work() also acquires. If txrx_work is queued at that
-point, a worker thread can start it and block in sdio_claim_host(),
-while cancel_work_sync() waits for the work to finish and the host lock
-is only released afterwards - a deadlock.
+Created attachment 310581
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310581&action=3Dedit
+dmesg comparison: working kernel 6.17.10 vs broken kernel 7.0.12
 
-This series releases the host lock around cancel_work_sync() so the work
-can always complete, mirroring the pattern already used by
-btmtksdio_flush().
----
+Overview:
 
----
- drivers/bluetooth/btmtksdio.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Intel Bluetooth AX201 CNVi companion radio ("Jefferson Peak", USB ID 8087:0=
+aaa)
+fails to complete firmware boot handshake on kernel 7.0.12.
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index c6f80c419e901e71b21e550449250a5a6755d100..879d580226d25ad398105a158de1545dace33718 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -746,8 +746,16 @@ static int btmtksdio_close(struct hci_dev *hdev)
- 
- 	sdio_release_irq(bdev->func);
- 
-+	/* No new work can be scheduled after sdio_release_irq(), so cancel the
-+	 * work outside the sdio host lock. btmtksdio_txrx_work() also claims
-+	 * the host, so canceling it while holding the lock would deadlock.
-+	 */
-+	sdio_release_host(bdev->func);
-+
- 	cancel_work_sync(&bdev->txrx_work);
- 
-+	sdio_claim_host(bdev->func);
-+
- 	btmtksdio_fw_pmctrl(bdev);
- 
- 	clear_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state);
-@@ -1293,8 +1301,18 @@ static void btmtksdio_reset(struct hci_dev *hdev)
- 
- 	sdio_writel(bdev->func, C_INT_EN_CLR, MTK_REG_CHLPCR, NULL);
- 	skb_queue_purge(&bdev->txq);
-+
-+	/* With the interrupt disabled, the SDIO IRQ handler can no longer
-+	 * schedule txrx_work. Cancel the work outside the sdio host lock;
-+	 * btmtksdio_txrx_work() also claims the host, so canceling it while
-+	 * holding the lock would deadlock.
-+	 */
-+	sdio_release_host(bdev->func);
-+
- 	cancel_work_sync(&bdev->txrx_work);
- 
-+	sdio_claim_host(bdev->func);
-+
- 	gpiod_set_value_cansleep(bdev->reset, 1);
- 	msleep(100);
- 	gpiod_set_value_cansleep(bdev->reset, 0);
+After firmware download completes, hci0 fails during "Waiting for device to
+boot", enters a USB reset loop, and never recovers until rebooting into ker=
+nel
+6.17.10.
 
----
-base-commit: 0d839570765118029aa8bf4a95444c6a11aacf85
-change-id: 20260806-btmtksdio-deadlock-fix-f9421f1a7879
+The same hardware, firmware, and BlueZ userspace work correctly on kernel
+6.17.10. The regression appears to be kernel-related.
 
-Best regards,
--- 
-ZhaoJinming <zhaojinming@uniontech.com>
+
+Steps to Reproduce:
+
+(1) Boot the machine into kernel 7.0.12+kali-amd64.
+
+(2) Wait for boot to complete. No user action is needed -- Bluetooth
+initializes automatically at boot.
+
+(3) Check dmesg for hci0 messages, or run `bluetoothctl show`.
+
+
+Expected Results:
+
+hci0 completes firmware boot (~15ms) and the controller powers on normally.
+
+
+Actual Results:
+
+hci0 times out during "Waiting for device to boot", enters a permanent USB
+reset loop, and the controller disappears from lsusb/rfkill entirely. Recov=
+ery
+requires rebooting into a different (working) kernel.
+
+
+System:
+
+Machine: Dell Inspiron 3501
+
+CPU: Intel Core i5-1135G7 (Tiger Lake-UP3)
+
+BIOS: 1.44.0
+
+Wireless: Intel Wi-Fi 6 AX201 (CNVio2), PCI ID 00:14.3, driver iwlwifi
+
+Bluetooth: Intel Bluetooth 9460/9560 "Jefferson Peak", USB ID 8087:0aaa, dr=
+iver
+btusb/btintel
+
+Firmware: intel/ibt-19-0-0.sfi, firmware revision 83-7.26
+
+Distribution: Kali Linux rolling
+
+BlueZ: tested with BlueZ 5.85-4 and 5.87-1. Issue reproduces identically on
+both versions.
+
+
+Kernel versions tested:
+
+GOOD -- 6.17.10+kali-amd64 (6.17.10-1kali1): Bluetooth initializes correctly
+("Device booted in 14813 usecs"), controller works normally. Full dmesg exc=
+erpt
+attached as dmesg-working-6.17.10.txt.
+
+BAD -- 7.0.12+kali-amd64 (7.0.12-2kali1): firmware download completes, but
+device boot fails and the controller enters a permanent reset loop. Full dm=
+esg
+excerpt attached as dmesg-broken-7.0.12.txt.
+
+
+Timing:
+
+Firmware loading time is essentially identical between the two kernels (183=
+9645
+usecs on 6.17.10 vs 1847614 usecs on 7.0.12). The regression happens after
+firmware loading, specifically during the device boot phase that follows it.
+
+
+Possible affected areas (speculation, not confirmed):
+
+btusb driver changes, or btintel firmware boot handling, or USB interrupt
+handling, or USB endpoint timing, or timeout handling changes between these
+kernel versions.
+
+
+Ruled out -- not a BlueZ/userspace issue:
+
+Tested with BlueZ 5.85-4 and 5.87-1, same result on both, so this is not a
+userspace regression.
+
+Ruled out -- not a firmware issue:
+
+The exact same firmware file works correctly on kernel 6.17.10, so the firm=
+ware
+itself is not at fault.
+
+Ruled out -- not USB power management:
+
+Tested with USB autosuspend fully disabled (btusb module parameter, a udev
+rule, and a TLP USB_DENYLIST entry). No change in behaviour.
+
+Ruled out -- not rfkill:
+
+The controller is confirmed unblocked (rfkill list shows soft/hard blocked:=
+ no)
+both before and during the failure.
+
+Ruled out -- not hardware failure:
+
+The same laptop, same physical adapter, works correctly every time on kernel
+6.17.10 and fails every time on kernel 7.0.12.
+
+Ruled out -- not a USB topology issue:
+
+Unbinding and rebinding the xHCI PCI controller while running the broken ke=
+rnel
+does not recover the device; it re-enters the same boot-timeout loop.
+
+
+Additional Information:
+
+Kernel 6.19.14+kali-amd64 is also installed on this system but has not yet =
+been
+tested; will update this report once tested, to narrow the regression range
+further. Two dmesg excerpts are attached separately (dmesg-working-6.17.10.=
+txt
+and dmesg-broken-7.0.12.txt) rather than pasted inline, since multi-line log
+output gets reflowed/collapsed by the comment box otherwise. Happy to test
+intermediate kernel versions or apply candidate patches -- both a working a=
+nd a
+broken kernel are readily available on this exact hardware right now.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
