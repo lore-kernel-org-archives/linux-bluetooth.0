@@ -1,225 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2386378F2F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A01E395240
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 07:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785998913; cv=none; b=Hxn4uhrtdTaOMjHAvNHSY6k9PM6uaquDRU2+NFflvTrCMD/kosi6S31IqEtwWOVvzzXXHcLWFZSqPtJt3yvChSl0Tv+nanD31K8qmNjUrpJWPnVxN7LA3ZSBEV8KjORCFl/8vgBdYMWuiY2BkZC8XTyypn3oL4y5Qi02FuyT+zU=
+	t=1786002496; cv=none; b=jHZjvExK2x2P+tKlV2DEqNwSDJ6EQuq+wjIFMTvYzColTC8TBhN/rggM9sEZjAep081SGOEX57Tr9nOgqAXIGGx/0GMbvj11pQ+yR1t+OE97CqAZ0f7XeLTkpeygopnTi3pmYQpsq8beht7o/DjnE7IomjkB0dy2cE7i5qM7RjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785998913; c=relaxed/simple;
-	bh=4XzGinvVm9lsOLwW/Djqr/sLriv1bnYOMJc0BEXVhmw=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=H9g3tRjhTGr9i/eKlSXEA1FDx/sQbZ5F3PKrj0cDfSAlbWrWSzW6xSxppjUv+dP0KC/aK3F9HYZ4jkVw8Z1+EiYcJgXKcQXC1MOnPiZMboV816pl/itraqeFgkBOa/gds731J662Zj7JKsvjumdtwDiM7nfSz2USx2n9HsiiiIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PltZdOlh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1786002496; c=relaxed/simple;
+	bh=Q06lwN35W0WcKA7Y2396KY11Fj5z18dLpFIS19dUM44=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=OuDsHiQBiy/MURKJLoV5GDDPTQ9EZYbDilRDAaneHcd5GqveKF+/jFdGqYIcjd8PIZG6a+DfNKZW5pnO9jjTk40HNXyrHlS58po4p8zUmNrWdjwYhw181vbKFM3od/BlKsRn0AbBaziARsrvrD/STBLGZf7zGN4WCj0ZOkZTJic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lvz4wapQ; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PltZdOlh"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AD3ABC2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785998912;
-	bh=4XzGinvVm9lsOLwW/Djqr/sLriv1bnYOMJc0BEXVhmw=;
-	h=From:To:Subject:Date:From;
-	b=PltZdOlhI0PVEZgnZpH0g75U37LPX+uB72T52zaelA1NnRAKKDCctS0A16nKdKcKJ
-	 OiSceq3eqObFJfJsMPcK9RUE66362/jHxjUjJSYehr4jScFo0EYZsumnDtj6d9ZDJs
-	 /152s2QZ++2fLi0RpzixkHrn3qiQTCqzoKndWzThvGaj9pvwgseS4uDdY3/guWKiFl
-	 26gUOFp8xKSaoKNI93wghN22YwjkP0uaRQhjNLxW03OquqtqhoIX0HsgeqmEbeCTrN
-	 JAyajd/A0p3cSQNUsbdVXE0vBsb/gCY1kFNXx+jq591E2f9hQs+gL7PSnfJvWHswLK
-	 YFEegPyGzeVMQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 80416C3279F; Thu,  6 Aug 2026 06:48:32 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221840] New: Regression: Intel Bluetooth (btintel/hci0) fails
- firmware boot on 7.0.12, works on 6.17.10 (Dell Inspiron 3501, AX201)
-Date: Thu, 06 Aug 2026 06:48:32 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rohitanand9418@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-221840-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lvz4wapQ"
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7ff05e5d009so22697637b3.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2026 00:48:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786002494; x=1786607294; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=1eQNlYbY2Nbic/4Lu7MlRYNAaPatjih/XHMnauhCWRg=;
+        b=Lvz4wapQoQvYGvttkkySHcaaJvHRi3hgqPGwub3qR75V1BcWiIxgW2W50pOLcZ8aWY
+         u22AE8HjVYkotaG1AxMcYByaugPLPMDuqI/elZjOQK0Qe47Lw9gT3eU4H2H7Ywk+jJOQ
+         G5Vt/S+WWXCKbCULB6emeCuQAh+DZ/XbDQNF+2U3Qb7Kk73QsMScyMsIfHnTCBUqjE/l
+         70tulj6TQLP1nOoLy6ARUS/9u1j/4Nn7UypaWBidSP5YYtn8thscsmoLhZSVQVyYz4js
+         /j3v5qQw1s2beQXZvATLovlQXfUwvZIINtEuepWve1H2pdQu/Em4NGFzO0g7e+OOqgb8
+         OdWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786002494; x=1786607294;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=1eQNlYbY2Nbic/4Lu7MlRYNAaPatjih/XHMnauhCWRg=;
+        b=qGxsAhKDWAy34WStywrTcxwLjnHiLwbtovWCwy36lJYdfFbHLE14WPrvMllzmEoHdY
+         dsNjFG5SqW3FsTiS1U7f+ZFGCm0GfMJhvQDSTKQyOHlEaEBeeiBuc7L6AM/zGux29zva
+         E1SiFsB8ioHb2ohNsHX9d+M2W7hInUajMtPep0DsGN5nJVvdvpvi92EqxwE/SDMglk5t
+         xjIm6C8yfvmYxs2Phf6nVK8cRUBKLqAZ+j29SUM7avwYqzwwaQ9k9Brm057rpuUiP0qS
+         yuQNPPp5JxSCSI65MvAsfURpZbb9/0Y2mNnWCFOC3ExWXpiRw8yklOGPXPOTo8L3ORpD
+         WrHQ==
+X-Gm-Message-State: AOJu0Yy7cRgvLhuqj7igwaA9RKzDolTKnOKEBOKSS1LI5rH4VLTmLVQn
+	Il5ptBVq3lAnhR2qkv9G2/TQ9okC/GfZat4Xoh6Vy9FDfyQxFthvQWGAxOqDsQ==
+X-Gm-Gg: AR+sD112XH2Ly+yLwUHTK5dE4NOq+gwb/8IKJb7SfZlWyQMQwcpxEx970r1rcsUBkOS
+	BLk++tz8LHApnv/EuUT0i2POG4oAlT00zesXjhm4Lk/4/Dp9+6UtE4vhryEL3fuKwshQUomSNFv
+	WFKlXAdiwoPsw/R/QN6612HOVPska63FwqWrrqLmxvJW4meE3HQbnv052dzHi+/yxivBYVfKe6p
+	O2Pzupp6rKbbTqRCmgj4pldgA6/kMLalFgMIyLUb6QL/2oVDBtHDwVEWVhzheO46db0+c4g4JiS
+	9coZmtbxheuotUbx+JMGWzXH46s33pA8ZbZgomHnTbQq0imHmwP1wsygm7GCsoxw+LFerWdUsh4
+	lp/APsBO/nPsMa9LpdEiU+tKc/36HsAF7iWsR9TgU3rdTn/avw5JG467X5glzWuL3DUH7yZVh4f
+	F516DkZxiy3LXEjaJT7XaW0/UGP+j0ObGXhEDdfqfMo1k4pPEz7vq2PaOzEpq1m4HM/D5X9A==
+X-Received: by 2002:a05:690c:6081:b0:7e8:a091:6c4b with SMTP id 00721157ae682-8202250b677mr70200237b3.24.1786002494291;
+        Thu, 06 Aug 2026 00:48:14 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.200.213])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-820132385dbsm34807207b3.16.2026.08.06.00.48.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2026 00:48:13 -0700 (PDT)
+Message-ID: <6a743c3d.37ff367d.260749.ca80@mx.google.com>
+Date: Thu, 06 Aug 2026 00:48:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4693065933394421474=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zhaojinming@uniontech.com
+Subject: RE: Bluetooth: btmtksdio: fix deadlock in close and reset paths
+In-Reply-To: <FD5D03449312D17C+20260806-btmtksdio-deadlock-fix-v1-1-3a2d4392d117@uniontech.com>
+References: <FD5D03449312D17C+20260806-btmtksdio-deadlock-fix-v1-1-3a2d4392d117@uniontech.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221840
+--===============4693065933394421474==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-            Bug ID: 221840
-           Summary: Regression: Intel Bluetooth (btintel/hci0) fails
-                    firmware boot on 7.0.12, works on 6.17.10 (Dell
-                    Inspiron 3501, AX201)
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: rohitanand9418@gmail.com
-        Regression: No
+This is automated email and please do not reply to this email!
 
-Created attachment 310581
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310581&action=3Dedit
-dmesg comparison: working kernel 6.17.10 vs broken kernel 7.0.12
+Dear submitter,
 
-Overview:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1141212
 
-Intel Bluetooth AX201 CNVi companion radio ("Jefferson Peak", USB ID 8087:0=
-aaa)
-fails to complete firmware boot handshake on kernel 7.0.12.
+---Test result---
 
-After firmware download completes, hci0 fails during "Waiting for device to
-boot", enters a USB reset loop, and never recovers until rebooting into ker=
-nel
-6.17.10.
+Test Summary:
+CheckPatch                    PASS      1.93 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      24.87 seconds
+CheckAllWarning               PASS      27.42 seconds
+CheckSparse                   PASS      26.24 seconds
+BuildKernel32                 PASS      24.28 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      452.08 seconds
+IncrementalBuild              PASS      23.62 seconds
 
-The same hardware, firmware, and BlueZ userspace work correctly on kernel
-6.17.10. The regression appears to be kernel-related.
-
-
-Steps to Reproduce:
-
-(1) Boot the machine into kernel 7.0.12+kali-amd64.
-
-(2) Wait for boot to complete. No user action is needed -- Bluetooth
-initializes automatically at boot.
-
-(3) Check dmesg for hci0 messages, or run `bluetoothctl show`.
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
-Expected Results:
+https://github.com/bluez/bluetooth-next/pull/538
 
-hci0 completes firmware boot (~15ms) and the controller powers on normally.
-
-
-Actual Results:
-
-hci0 times out during "Waiting for device to boot", enters a permanent USB
-reset loop, and the controller disappears from lsusb/rfkill entirely. Recov=
-ery
-requires rebooting into a different (working) kernel.
+---
+Regards,
+Linux Bluetooth
 
 
-System:
-
-Machine: Dell Inspiron 3501
-
-CPU: Intel Core i5-1135G7 (Tiger Lake-UP3)
-
-BIOS: 1.44.0
-
-Wireless: Intel Wi-Fi 6 AX201 (CNVio2), PCI ID 00:14.3, driver iwlwifi
-
-Bluetooth: Intel Bluetooth 9460/9560 "Jefferson Peak", USB ID 8087:0aaa, dr=
-iver
-btusb/btintel
-
-Firmware: intel/ibt-19-0-0.sfi, firmware revision 83-7.26
-
-Distribution: Kali Linux rolling
-
-BlueZ: tested with BlueZ 5.85-4 and 5.87-1. Issue reproduces identically on
-both versions.
-
-
-Kernel versions tested:
-
-GOOD -- 6.17.10+kali-amd64 (6.17.10-1kali1): Bluetooth initializes correctly
-("Device booted in 14813 usecs"), controller works normally. Full dmesg exc=
-erpt
-attached as dmesg-working-6.17.10.txt.
-
-BAD -- 7.0.12+kali-amd64 (7.0.12-2kali1): firmware download completes, but
-device boot fails and the controller enters a permanent reset loop. Full dm=
-esg
-excerpt attached as dmesg-broken-7.0.12.txt.
-
-
-Timing:
-
-Firmware loading time is essentially identical between the two kernels (183=
-9645
-usecs on 6.17.10 vs 1847614 usecs on 7.0.12). The regression happens after
-firmware loading, specifically during the device boot phase that follows it.
-
-
-Possible affected areas (speculation, not confirmed):
-
-btusb driver changes, or btintel firmware boot handling, or USB interrupt
-handling, or USB endpoint timing, or timeout handling changes between these
-kernel versions.
-
-
-Ruled out -- not a BlueZ/userspace issue:
-
-Tested with BlueZ 5.85-4 and 5.87-1, same result on both, so this is not a
-userspace regression.
-
-Ruled out -- not a firmware issue:
-
-The exact same firmware file works correctly on kernel 6.17.10, so the firm=
-ware
-itself is not at fault.
-
-Ruled out -- not USB power management:
-
-Tested with USB autosuspend fully disabled (btusb module parameter, a udev
-rule, and a TLP USB_DENYLIST entry). No change in behaviour.
-
-Ruled out -- not rfkill:
-
-The controller is confirmed unblocked (rfkill list shows soft/hard blocked:=
- no)
-both before and during the failure.
-
-Ruled out -- not hardware failure:
-
-The same laptop, same physical adapter, works correctly every time on kernel
-6.17.10 and fails every time on kernel 7.0.12.
-
-Ruled out -- not a USB topology issue:
-
-Unbinding and rebinding the xHCI PCI controller while running the broken ke=
-rnel
-does not recover the device; it re-enters the same boot-timeout loop.
-
-
-Additional Information:
-
-Kernel 6.19.14+kali-amd64 is also installed on this system but has not yet =
-been
-tested; will update this report once tested, to narrow the regression range
-further. Two dmesg excerpts are attached separately (dmesg-working-6.17.10.=
-txt
-and dmesg-broken-7.0.12.txt) rather than pasted inline, since multi-line log
-output gets reflowed/collapsed by the comment box otherwise. Happy to test
-intermediate kernel versions or apply candidate patches -- both a working a=
-nd a
-broken kernel are readily available on this exact hardware right now.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+--===============4693065933394421474==--
