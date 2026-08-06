@@ -1,26 +1,27 @@
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BEA36F91D
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D483318EC9
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786022566; cv=none; b=N1rm12csiNXRr15/SKbF9+q3HVAdaoCdc08IBkncnjT5/fGK5yttuxpIiB9iwk8Skl4XIqS/o1t806PeAxI7HAgcpXMY6RmrStlESLURmF6hcESsPAw0pLk5gebbHZuJnz9sBUGHbDt1NSPGeP1o6AHmiA8wsFMfQw00PvqpOOU=
+	t=1786022566; cv=none; b=T4a1x6Vk+YwJv7hN9SLCC0Ep0QGMozeFuwRBEublw2YcQQoG7jid9P+TjXpbcoKmwGFvfB5yXcm6PptEbtKkTCCDcJBEBeRKb41yQcHyhjE5cIbqjU/bMZVI2UI8ZhQ2lVaMy5EUZJjNBMpA+IVYC3BtMs9kK++dTdhNPiqrkhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786022566; c=relaxed/simple;
-	bh=3SWSycorHXv0USIP8zeAzRKKJNwp86p2nkOfuFKLQIE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EIhAHzokYWTHmi2cLc98EN6QSq60BtLzUSxuX/ZDGUw6PkeA1tGDhZ7zs0tLpoOPwwf9zZZ6jN893ECrDOrIhbV9grEG/HV/yUMEgdMWChIYruvvMcV1F6U6GacvHYd25Nl81+DlMMklRm0DS+b/xxzx6JPpVKj7ahazXm+MTyA=
+	bh=4uTaAq/vc21q98jBtlHLPm/pc2I7APHHZHBbEBQf13A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XsXRveHrcKTGnxiT3COD6OZz24vbCwYhKNrXf3x6/oV3TcbRJiMmh7koZR/hfXp+8AcCwjiMv5UOAEUz9JbzPoy1oKsMsNBQw3a/nx9/Jyf0qHoWP/UvvXsw+olFx4t4iqsG3Nc5eeLmYWMliY7enMBtvr5w+AmxQkZojZz9CCY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 16C403E962
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:40 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9321D3F4F9;
+	Thu,  6 Aug 2026 13:22:41 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ, v3 3/5] avrcp: Split off name parsing from parse_*_element()
-Date: Thu,  6 Aug 2026 15:21:04 +0200
-Message-ID: <20260806132231.3052523-4-hadess@hadess.net>
+Cc: Elman Shahbazov <shahbazovelman97@gmail.com>
+Subject: [BlueZ, v3 5/5] avrcp: Fix Out-of-Bounds Read in AVRCP GetFolderItems parsing
+Date: Thu,  6 Aug 2026 15:21:06 +0200
+Message-ID: <20260806132231.3052523-6-hadess@hadess.net>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260806132231.3052523-1-hadess@hadess.net>
 References: <20260806132231.3052523-1-hadess@hadess.net>
@@ -32,179 +33,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTFWaOHj/GAi5A4lKgxKmCkINabAwOMxUGBBbO8ob8OUq9jkBRd4zNumNMG1Cx1WH8f19orjYuPZVkPMBDrOOqLuBVeGpTGA3CNBQnQRRgmx5enIDRLfef0uqyOfCwKpuV82VU3Do7V7sBXJaXu83HRs2q1oqNeks0mzE51BOYCdkWmoOS0EwXaGXO8tpZFJ25IhzdCch0vCCYuyxnhT1nmBlIqm/KiXKv3IkCDWofjPi9xo+2dwxr/Urt9ZWyEUlNNahuNIcX64ZcHSguzvVBMV1KsTHXaCFSqrA0QWUsJDwgN9rjaHLV2PgBdVpPSAckoDXQwYkOhmZWWVT+LMUNXlSAI5yKKd7D6H9CfIbwxaj49O1FpZ3ueGHIWjZGrbWHj2ImeuVyhPXa4Kfg9ExbsFkyGmkO52ZCyIvLJk3FTgxLYzFEpulMShqgDyf4yohpbiRMabqNfYjipyjvcl58CdVzVLcvEhnygFj31qrnEP7SL4HpEW1GkPXchpRJtkM7RtptCli1fR7rwKDZEXWt1nUX0b0UnKwtezO7vhIk9fkVn8cxRQ20c6RFfNE3M7ZB76L3x/GJUvcMuysG0IXJ5MJG7e1D66HbROyGSOjiolLD7dSHKAL0TZGA+kQBGhvpi1w+muXtKWdeK+89LnqmjiQkv7UyfmIjBrwkYAB6yAKA
+X-GND-Cause: dmFkZTExch6bGo9l+F+n8sWi19Tdp5I+JHuPU4b4FC3pRSRTSdDWqDXtBA3BgWCtk2JbCRjP+dM+NsZ86mVZl088WvtADKxh7M4lUpzCDjar8B+R7Hlg9qjBk2zMO26fY1RnZ8biX1NnpTgbwSH+2sf6o23tWaf9gfXzV9BckuSJO1rv8bZqQ27Xgg82IyetnXphbsHmmVTxo1szBTUYz4KekaoZ086g+nbGOHUMPXkYqxuVAfBOuM5QhrOtGu+nUhw2AT1dnN/j/VSoqMQXMw/7h7iewvJLLeQs+D3uujuUs0djzQnI0MzXah2j9MXkAJ0OpQ7VPxJVTdaoWGhMZU31W//Zdw1Z1P2ZS4xNZHbt2K4zbmkcxguvJSQ2Et8rhPbZhk9bNqlmhToR3vKfGZ79KKPwX79uQPHz4CBjd4A/0HsXOcTE++RXkadQ2eOFKJ38FNBeLqa7PquRGG24NM8yrk/61J4CtjuyOlGijRIhHWqNxDG89/MlmZBKx9yusGE4w+/cb6ZmJd/cK5PYvUTDXU9SrElgyWn1OlZ/5ZBztPtMXarMaOPMofIUastr5XPAdh0WBWJqmGeJMfxPEkWhrIh0tzf8Pxouqp4cChhSYoiRMX1kuXD409gUS+gYCjtvHKaDg8ZdLXS3BPCWB9F8BEjPp1cIaxcMC8DZ1TgWBYXkDA
 X-GND-State: clean
-X-GND-Score: 0
+X-GND-Score: -100
 
-This will allow us to use the name extraction code in
-parse_media_element() and parse_folder_element() separately, such
-as in tests.
+From: Elman Shahbazov <shahbazovelman97@gmail.com>
+
+Co-Authored-by: Bastien Nocera <hadess@hadess.net>
 ---
- Makefile.plugins             |  1 +
- profiles/audio/avrcp-parse.c | 47 ++++++++++++++++++++++++++++++++++++
- profiles/audio/avrcp-parse.h | 19 +++++++++++++++
- profiles/audio/avrcp.c       | 26 +++++---------------
- 4 files changed, 73 insertions(+), 20 deletions(-)
- create mode 100644 profiles/audio/avrcp-parse.c
- create mode 100644 profiles/audio/avrcp-parse.h
+ profiles/audio/avrcp-parse.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index ac667beda847..a505fcd6691f 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -37,6 +37,7 @@ builtin_modules += avrcp
- builtin_sources += profiles/audio/control.h profiles/audio/control.c \
- 			profiles/audio/avctp.h profiles/audio/avctp.c \
- 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
-+			profiles/audio/avrcp-parse.h profiles/audio/avrcp-parse.c \
- 			profiles/audio/avrcp-player.c
- endif
- 
 diff --git a/profiles/audio/avrcp-parse.c b/profiles/audio/avrcp-parse.c
-new file mode 100644
-index 000000000000..d3d0a070a4da
---- /dev/null
+index d3d0a070a4da..251580fd9c55 100644
+--- a/profiles/audio/avrcp-parse.c
 +++ b/profiles/audio/avrcp-parse.c
-@@ -0,0 +1,47 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Red Hat Inc.
-+ *
-+ *
-+ */
+@@ -20,8 +20,12 @@ gboolean parse_media_element_name(uint8_t *operands, uint16_t len,
+ 		return FALSE;
+ 
+ 	memset(name, 0, NAME_MAX_LEN);
+-	*namesize = get_be16(&operands[11]);
++	*namesize = MIN(get_be16(&operands[11]), len - 13);
+ 	namelen = MIN(*namesize, NAME_MAX_LEN - 1);
 +
-+#include "avrcp-parse.h"
-+#include "src/shared/util.h"
-+
-+gboolean parse_media_element_name(uint8_t *operands, uint16_t len,
-+					 char *name, uint16_t *namesize)
-+{
-+	uint16_t namelen;
-+
-+	if (len < 13)
++	if (len < 13 + *namesize)
 +		return FALSE;
 +
-+	memset(name, 0, NAME_MAX_LEN);
-+	*namesize = get_be16(&operands[11]);
-+	namelen = MIN(*namesize, NAME_MAX_LEN - 1);
-+	if (namelen > 0) {
-+		memcpy(name, &operands[13], namelen);
-+		strtoutf8(name, namelen);
-+	}
-+
-+	return TRUE;
-+}
-+
-+gboolean parse_media_folder_name(uint8_t *operands, uint16_t len,
-+					char *name)
-+{
-+	uint16_t namelen;
-+
-+	if (len < 12)
-+		return FALSE;
-+
-+	memset(name, 0, NAME_MAX_LEN);
-+	namelen = MIN(get_be16(&operands[12]), NAME_MAX_LEN - 1);
-+	if (namelen > 0)
-+		memcpy(name, &operands[14], namelen);
-+
-+	return TRUE;
-+}
-diff --git a/profiles/audio/avrcp-parse.h b/profiles/audio/avrcp-parse.h
-new file mode 100644
-index 000000000000..f7a33c854442
---- /dev/null
-+++ b/profiles/audio/avrcp-parse.h
-@@ -0,0 +1,19 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Red Hat Inc.
-+ *
-+ *
-+ */
-+
-+#include <glib.h>
-+#include <inttypes.h>
-+
-+#define NAME_MAX_LEN 255
-+
-+gboolean parse_media_element_name(uint8_t *operands, uint16_t len,
-+					 char *name, uint16_t *namesize);
-+gboolean parse_media_folder_name(uint8_t *operands, uint16_t len,
-+					char *name);
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 2194a913580f..af3c72174764 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -52,6 +52,7 @@
+ 	if (namelen > 0) {
+ 		memcpy(name, &operands[13], namelen);
+ 		strtoutf8(name, namelen);
+@@ -39,7 +43,8 @@ gboolean parse_media_folder_name(uint8_t *operands, uint16_t len,
+ 		return FALSE;
  
- #include "avctp.h"
- #include "avrcp.h"
-+#include "avrcp-parse.h"
- #include "control.h"
- #include "media.h"
- #include "player.h"
-@@ -2614,24 +2615,15 @@ static struct media_item *parse_media_element(struct avrcp *session,
- 	struct avrcp_player *player;
- 	struct media_player *mp;
- 	struct media_item *item;
--	uint16_t namelen, namesize;
--	char name[255];
-+	uint16_t namesize;
-+	char name[NAME_MAX_LEN];
- 	uint64_t uid;
- 	uint8_t count;
+ 	memset(name, 0, NAME_MAX_LEN);
+-	namelen = MIN(get_be16(&operands[12]), NAME_MAX_LEN - 1);
++	namelen = MIN(get_be16(&operands[12]), len - 14);
++	namelen = MIN(namelen, NAME_MAX_LEN - 1);
+ 	if (namelen > 0)
+ 		memcpy(name, &operands[14], namelen);
  
--	if (len < 13)
-+	if (!parse_media_element_name(operands, len, name, &namesize))
- 		return NULL;
- 
- 	uid = get_be64(&operands[0]);
--
--	memset(name, 0, sizeof(name));
--	namesize = get_be16(&operands[11]);
--	namelen = MIN(namesize, sizeof(name) - 1);
--	if (namelen > 0) {
--		memcpy(name, &operands[13], namelen);
--		strtoutf8(name, namelen);
--	}
--
- 	count = operands[13 + namesize];
- 
- 	player = session->controller->player;
-@@ -2655,24 +2647,18 @@ static struct media_item *parse_media_folder(struct avrcp *session,
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
- 	struct media_item *item;
--	uint16_t namelen;
--	char name[255];
-+	char name[NAME_MAX_LEN];
- 	uint64_t uid;
- 	uint8_t type;
- 	uint8_t playable;
- 
--	if (len < 12)
-+	if (!parse_media_folder_name(operands, len, name))
- 		return NULL;
- 
- 	uid = get_be64(&operands[0]);
- 	type = operands[8];
- 	playable = operands[9];
- 
--	memset(name, 0, sizeof(name));
--	namelen = MIN(get_be16(&operands[12]), sizeof(name) - 1);
--	if (namelen > 0)
--		memcpy(name, &operands[14], namelen);
--
- 	item = media_player_create_folder(mp, name, type, uid);
- 	if (!item)
- 		return NULL;
 -- 
 2.55.0
 
