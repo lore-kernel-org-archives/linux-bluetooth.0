@@ -1,27 +1,26 @@
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1AC332EBD
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AD534E741
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786022570; cv=none; b=HEUnIdiz95FihnPQQFyS0hTQANRS84UnCenTIHF1T97AUTXlNSylRxLea4w5FDlYOtE367JUeQjmXLvp6Yy+p5B+/88tMcN5WO8kmR1s1fFXui8wpg2D1ivVJLNoiGsz2OdvrmFVuQYpDpD1YV4NlCJnOOjZVo34s5BKO8+T45Y=
+	t=1786022576; cv=none; b=uNdTQ045Y31m7WfirWyrflZ1Ac+slLXGpqfsQdtDIwNojUL46gJiCt+3avOD51VHLR9Dx0XH5HuWXXtvuloy39zmdrWxAuJgu4VMKmzwy+gs8hQIpxfiYyMjNgswlSYBxRePZDoJwxAsNz27I/mmTNnxrJgnAWbLk8Ey53VGTZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786022570; c=relaxed/simple;
-	bh=t37ZIVaf4SA3IX/yD9feVmBlfFhbzX4lw5kikVvTThc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cOBCu0Vt/+7N4zvFe1M5D1linrA4Cd2mG/+cuYtZYHm/pRCakdw5NQj0wXS1liHlN24EIdXOjmi8RJS/EtaxhBV+WzPkrLuZEjchA2XDS81EtsV4vSVYQLSnEvcLuvTAehT5g1Ttv86N0vQ0Yfgo04Mqk5mp8SfSp7uKwYk5JIg=
+	s=arc-20240116; t=1786022576; c=relaxed/simple;
+	bh=hvsesfqTlfgBFEVUtN2TDJiPrKtVcNKRN3Dct6fdteQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X6HzXyXw7+nqH6DctzM7gH869iEBi/BgZD+Nx2LQImiswhLgIm61hsUmtyCpfzaMwRt7aYWWZshD3LqkroOjVkl++8rsDoNq8cQzbLQWl2uTkeTLyGIJexGqyHHENrzuzCoNWuoxU04GU2mpslJLRAMjgPQnmGmcNyCfo1Bota4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 47C573F4F3;
-	Thu,  6 Aug 2026 13:22:41 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9BD813EC51
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 13:22:40 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Elman Shahbazov <shahbazovelman97@gmail.com>
-Subject: [BlueZ, v3 4/5] unit: Adapt poc_*_oob.c test into a new test
-Date: Thu,  6 Aug 2026 15:21:05 +0200
-Message-ID: <20260806132231.3052523-5-hadess@hadess.net>
+Subject: [BlueZ, v3 2/5] unit: Remove left-over test-avrcp Android test
+Date: Thu,  6 Aug 2026 15:21:03 +0200
+Message-ID: <20260806132231.3052523-3-hadess@hadess.net>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260806132231.3052523-1-hadess@hadess.net>
 References: <20260806132231.3052523-1-hadess@hadess.net>
@@ -31,123 +30,6098 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTExch6bGo9l+F+n8sWi19Tdp5I+JHuPU4b4FC3pRSRTSdDWqDXtBA3BgWCtk2JbCRjP+dM+NsZ86mVZl088WvtADKxh7M4lUpzCDjar8B+R7Hlg9qjBk2zMO26fY1RnZ8biX1NnpTgbwSH+2sf6o23tWaf9gfXzV9BckuSJO1rv8bZqQ27Xgg82IyetnXphbsHmmVTxo1szBTUYz4KekaoZ086g+nbGOHUMPXkYqxuVAfBOuM5QhrOtGu+nUhw2AT1dnN/j/VSoqMQXMw/7h7iewvJLLeQs+D3uujuUs0djzQnI0MzXah2j9MXkAJ0OpQ7VPxJVTdaoWGhMZU31W//ZoVRIEiiVRoXf0B3WpBq1D8Q9dHieyz3Y2AOs9fa3j9mQUzyVACJA/ES8xVlL85aB3QDts2rLqIDEie96LBG+y/WjWwJ/4jyiqCuKEa4KzwcMroZedsntwia9Tqa/UjUE7+89OOko+aRyEjvf+vGvI9cgXsErdZazlkHu/RwI/LtBfLCZ+hD4Zkk2rIFULKh9eyrJ4CgGCgnzrDrxW3iTZvyt0hdxY/lwKfw0NdVYLkSpPOTMcKM2cTcVDz0OussI0ryaCsWtZ4y/9QiaAhapvZDWLcGHcI+njYe/S25CTz+81RkD+DUMDqEJ1sxSgSFw3tqbaDUgJfDh0iLtpvFRWw
+X-GND-Cause: dmFkZTFN1xlITUzcnLPZG91qLihjVVOq1gapRZNfc2Jw6BT0RSxoHubRBHdHIdmcroHKfzFFLdTrvKqoji9VsqXw1KlKWTPnO7fqYxaM6Ep7R+ZqHTpY4UGBS//KnW9pEqqBZ4jYbqI4gitScx9H3xEEM9s5PYZxm5Wl8b3M2sXjce2cwf9X0pOKdvP1pX4TGATzz7QRxY9WMW5jXlex1/sYsuhGWWzpdlS7M1dHV92YoyW1MRWUWdKplGJOis9QPAc1uF/5CENbsu2Pzzf1A/bahp4im8TTyJxGEMSC/lvEBJoFw/dn7ieqwoPpOUOyJRuym8kvl5cofb+3Bw409JgmhPi6PgKvSOru0wGKBrt4iDknBS44cFSgdd0pq69Xx8DflPD3o0+aq9oHfPil7WUni2uaKWoFv5F4L1npkhSII35pJ77UKV2tMXKHM2zhkDS+Jz2EhmibSn2SQR+cWTaMV/1NPB4iAzTR2wojWers2k79i+6dB+l4imkcHHaxCvuMv+AjOvZ/jMiWfdlZUqeopvoBSGOiqIy4sHwOb6iwpZbgNqK8m1V6jNxSZkAUj/2RgFIJQg9XzQHyT2xkCapbdP5SzNbEzywIN3W5+9QuIxzWf0DonUuQecn1UAhUTt7ch2CuWApLPhdu1xwsRQBjNWZOYZ/Vqk+jHHkWQkF2NeXLuA
 X-GND-State: clean
-X-GND-Score: -100
+X-GND-Score: 0
 
-Adapt poc_avrcp_oob.c and poc_folder_oob.c into unit tests.
+This test was supposed to exercise the avrcp-lib from the Android
+backend, but that backend was removed, and the library moved into
+the unit/ directory.
 
-Co-authored-by: Elman Shahbazov <shahbazovelman97@gmail.com>
+The tests provide 0% coverage towards profiles/audio so they're just
+dead code we should remove.
 ---
- Makefile.am       |  9 ++++++
- unit/test-avrcp.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 unit/test-avrcp.c
+ Makefile.am       |    9 -
+ unit/avrcp-lib.c  | 3604 ---------------------------------------------
+ unit/avrcp-lib.h  |  343 -----
+ unit/test-avrcp.c | 2084 --------------------------
+ 4 files changed, 6040 deletions(-)
+ delete mode 100644 unit/avrcp-lib.c
+ delete mode 100644 unit/avrcp-lib.h
+ delete mode 100644 unit/test-avrcp.c
 
 diff --git a/Makefile.am b/Makefile.am
-index f4f638323c79..72b7862ef2e8 100644
+index 19c468d3a504..f4f638323c79 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -651,6 +651,15 @@ unit_test_avctp_SOURCES = unit/test-avctp.c \
+@@ -651,15 +651,6 @@ unit_test_avctp_SOURCES = unit/test-avctp.c \
  				unit/avctp.c unit/avctp.h
  unit_test_avctp_LDADD = src/libshared-glib.la $(GLIB_LIBS)
  
-+unit_tests += unit/test-avrcp
-+
-+unit_test_avrcp_SOURCES = unit/test-avrcp.c \
-+			profiles/audio/avrcp-parse.c \
-+			profiles/audio/avrcp-parse.h \
-+			src/log.h src/log.c
-+unit_test_avrcp_LDADD = lib/libbluetooth-internal.la \
-+				src/libshared-glib.la $(GLIB_LIBS)
-+
+-unit_tests += unit/test-avrcp
+-
+-unit_test_avrcp_SOURCES = unit/test-avrcp.c \
+-				src/log.h src/log.c \
+-				unit/avctp.c unit/avctp.h \
+-				unit/avrcp-lib.c unit/avrcp-lib.h
+-unit_test_avrcp_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
+-
  unit_tests += unit/test-hfp
  
  unit_test_hfp_SOURCES = unit/test-hfp.c
+diff --git a/unit/avrcp-lib.c b/unit/avrcp-lib.c
+deleted file mode 100644
+index 720775fd2603..000000000000
+--- a/unit/avrcp-lib.c
++++ /dev/null
+@@ -1,3604 +0,0 @@
+-// SPDX-License-Identifier: LGPL-2.1-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+- *
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#define _GNU_SOURCE
+-#include <stdbool.h>
+-#include <glib.h>
+-#include <errno.h>
+-#include <string.h>
+-
+-#include "bluetooth/bluetooth.h"
+-
+-#include "src/shared/util.h"
+-#include "src/log.h"
+-
+-#include "avctp.h"
+-#include "avrcp-lib.h"
+-
+-
+-/* Packet types */
+-#define AVRCP_PACKET_TYPE_SINGLE		0x00
+-#define AVRCP_PACKET_TYPE_START			0x01
+-#define AVRCP_PACKET_TYPE_CONTINUING		0x02
+-#define AVRCP_PACKET_TYPE_END			0x03
+-
+-#define AVRCP_CHARSET_UTF8	0x006a
+-
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
+-
+-struct avrcp_header {
+-	uint8_t company_id[3];
+-	uint8_t pdu_id;
+-	uint8_t packet_type:2;
+-	uint8_t rsvd:6;
+-	uint16_t params_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_HEADER_LENGTH 7
+-
+-#elif __BYTE_ORDER == __BIG_ENDIAN
+-
+-struct avrcp_header {
+-	uint8_t company_id[3];
+-	uint8_t pdu_id;
+-	uint8_t rsvd:6;
+-	uint8_t packet_type:2;
+-	uint16_t params_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_HEADER_LENGTH 7
+-
+-#else
+-#error "Unknown byte order"
+-#endif
+-
+-struct avrcp_browsing_header {
+-	uint8_t pdu_id;
+-	uint16_t params_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_BROWSING_HEADER_LENGTH 3
+-
+-struct get_capabilities_req {
+-	uint8_t cap;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-
+-struct get_capabilities_rsp {
+-	uint8_t cap;
+-	uint8_t number;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-
+-struct list_attributes_rsp {
+-	uint8_t number;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-
+-struct list_values_req {
+-	uint8_t attr;
+-} __attribute__ ((packed));
+-
+-struct list_values_rsp {
+-	uint8_t number;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-
+-struct get_value_req {
+-	uint8_t number;
+-	uint8_t attrs[0];
+-} __attribute__ ((packed));
+-
+-struct attr_value {
+-	uint8_t attr;
+-	uint8_t value;
+-} __attribute__ ((packed));
+-
+-struct value_rsp {
+-	uint8_t number;
+-	struct attr_value values[0];
+-} __attribute__ ((packed));
+-
+-struct set_value_req {
+-	uint8_t number;
+-	struct attr_value values[0];
+-} __attribute__ ((packed));
+-
+-struct get_attribute_text_req {
+-	uint8_t number;
+-	uint8_t attrs[0];
+-} __attribute__ ((packed));
+-
+-struct text_value {
+-	uint8_t attr;
+-	uint16_t charset;
+-	uint8_t len;
+-	char data[0];
+-} __attribute__ ((packed));
+-
+-struct get_attribute_text_rsp {
+-	uint8_t number;
+-	struct text_value values[0];
+-} __attribute__ ((packed));
+-
+-struct get_value_text_req {
+-	uint8_t attr;
+-	uint8_t number;
+-	uint8_t values[0];
+-} __attribute__ ((packed));
+-
+-struct get_value_text_rsp {
+-	uint8_t number;
+-	struct text_value values[0];
+-} __attribute__ ((packed));
+-
+-struct media_item {
+-	uint32_t attr;
+-	uint16_t charset;
+-	uint16_t len;
+-	char data[0];
+-} __attribute__ ((packed));
+-
+-struct get_element_attributes_req {
+-	uint64_t id;
+-	uint8_t number;
+-	uint32_t attrs[0];
+-} __attribute__ ((packed));
+-
+-struct get_element_attributes_rsp {
+-	uint8_t number;
+-	struct media_item items[0];
+-} __attribute__ ((packed));
+-
+-struct get_play_status_rsp {
+-	uint32_t duration;
+-	uint32_t position;
+-	uint8_t status;
+-} __attribute__ ((packed));
+-
+-struct register_notification_req {
+-	uint8_t event;
+-	uint32_t interval;
+-} __attribute__ ((packed));
+-
+-struct register_notification_rsp {
+-	uint8_t event;
+-	uint8_t data[0];
+-} __attribute__ ((packed));
+-
+-struct set_volume_req {
+-	uint8_t value;
+-} __attribute__ ((packed));
+-
+-struct set_volume_rsp {
+-	uint8_t value;
+-} __attribute__ ((packed));
+-
+-struct set_addressed_req {
+-	uint16_t id;
+-} __attribute__ ((packed));
+-
+-struct set_addressed_rsp {
+-	uint8_t status;
+-} __attribute__ ((packed));
+-
+-struct set_browsed_req {
+-	uint16_t id;
+-} __attribute__ ((packed));
+-
+-struct set_browsed_rsp {
+-	uint8_t status;
+-	uint16_t counter;
+-	uint32_t items;
+-	uint16_t charset;
+-	uint8_t depth;
+-	uint8_t data[0];
+-} __attribute__ ((packed));
+-
+-struct get_folder_items_req {
+-	uint8_t scope;
+-	uint32_t start;
+-	uint32_t end;
+-	uint8_t number;
+-	uint32_t attrs[0];
+-} __attribute__ ((packed));
+-
+-struct get_folder_items_rsp {
+-	uint8_t status;
+-	uint16_t counter;
+-	uint16_t number;
+-	uint8_t data[0];
+-} __attribute__ ((packed));
+-
+-struct change_path_req {
+-	uint16_t counter;
+-	uint8_t direction;
+-	uint64_t uid;
+-} __attribute__ ((packed));
+-
+-struct change_path_rsp {
+-	uint8_t status;
+-	uint32_t items;
+-} __attribute__ ((packed));
+-
+-struct get_item_attributes_req {
+-	uint8_t scope;
+-	uint64_t uid;
+-	uint16_t counter;
+-	uint8_t number;
+-	uint32_t attrs[0];
+-} __attribute__ ((packed));
+-
+-struct get_item_attributes_rsp {
+-	uint8_t status;
+-	uint8_t number;
+-	struct media_item items[0];
+-} __attribute__ ((packed));
+-
+-struct play_item_req {
+-	uint8_t scope;
+-	uint64_t uid;
+-	uint16_t counter;
+-} __attribute__ ((packed));
+-
+-struct play_item_rsp {
+-	uint8_t status;
+-} __attribute__ ((packed));
+-
+-struct search_req {
+-	uint16_t charset;
+-	uint16_t len;
+-	char string[0];
+-} __attribute__ ((packed));
+-
+-struct search_rsp {
+-	uint8_t status;
+-	uint16_t counter;
+-	uint32_t items;
+-} __attribute__ ((packed));
+-
+-struct add_to_now_playing_req {
+-	uint8_t scope;
+-	uint64_t uid;
+-	uint16_t counter;
+-} __attribute__ ((packed));
+-
+-struct add_to_now_playing_rsp {
+-	uint8_t status;
+-} __attribute__ ((packed));
+-
+-struct avrcp_control_handler {
+-	uint8_t id;
+-	uint8_t code;
+-	uint8_t rsp;
+-	ssize_t (*func) (struct avrcp *session, uint8_t transaction,
+-			uint16_t params_len, uint8_t *params, void *user_data);
+-};
+-
+-struct avrcp_browsing_handler {
+-	uint8_t id;
+-	ssize_t (*func) (struct avrcp *session, uint8_t transaction,
+-			uint16_t params_len, uint8_t *params, void *user_data);
+-};
+-
+-struct avrcp_continuing {
+-	uint8_t pdu_id;
+-	struct iovec pdu;
+-};
+-
+-struct avrcp {
+-	struct avctp *conn;
+-	struct avrcp_player *player;
+-
+-	const struct avrcp_control_handler *control_handlers;
+-	void *control_data;
+-	unsigned int control_id;
+-	uint16_t control_mtu;
+-
+-	struct avrcp_continuing *continuing;
+-
+-	const struct avrcp_passthrough_handler *passthrough_handlers;
+-	void *passthrough_data;
+-	unsigned int passthrough_id;
+-
+-	const struct avrcp_browsing_handler *browsing_handlers;
+-	void *browsing_data;
+-	unsigned int browsing_id;
+-
+-	avrcp_destroy_cb_t destroy;
+-	void *destroy_data;
+-};
+-
+-struct avrcp_player {
+-	const struct avrcp_control_ind *ind;
+-	const struct avrcp_control_cfm *cfm;
+-
+-	void *user_data;
+-};
+-
+-static inline uint32_t ntoh24(const uint8_t src[3])
+-{
+-	return src[0] << 16 | src[1] << 8 | src[2];
+-}
+-
+-static inline void hton24(uint8_t dst[3], uint32_t src)
+-{
+-	dst[0] = (src & 0xff0000) >> 16;
+-	dst[1] = (src & 0x00ff00) >> 8;
+-	dst[2] = (src & 0x0000ff);
+-}
+-
+-static void continuing_free(struct avrcp_continuing *continuing)
+-{
+-	g_free(continuing->pdu.iov_base);
+-	g_free(continuing);
+-}
+-
+-void avrcp_shutdown(struct avrcp *session)
+-{
+-	if (session->conn) {
+-		if (session->control_id > 0)
+-			avctp_unregister_pdu_handler(session->conn,
+-							session->control_id);
+-		if (session->passthrough_id > 0)
+-			avctp_unregister_passthrough_handler(session->conn,
+-						session->passthrough_id);
+-
+-		if (session->browsing_id > 0)
+-			avctp_unregister_browsing_pdu_handler(session->conn,
+-							session->browsing_id);
+-
+-		/* clear destroy callback that would call shutdown again */
+-		avctp_set_destroy_cb(session->conn, NULL, NULL);
+-		avctp_shutdown(session->conn);
+-	}
+-
+-	if (session->destroy)
+-		session->destroy(session->destroy_data);
+-
+-	if (session->continuing)
+-		continuing_free(session->continuing);
+-
+-	g_free(session->player);
+-	g_free(session);
+-}
+-
+-static struct avrcp_header *parse_pdu(uint8_t *operands, size_t operand_count)
+-{
+-	struct avrcp_header *pdu;
+-
+-	if (!operands || operand_count < sizeof(*pdu)) {
+-		error("AVRCP: packet too small (%zu bytes)", operand_count);
+-		return NULL;
+-	}
+-
+-	pdu = (void *) operands;
+-	pdu->params_len = ntohs(pdu->params_len);
+-
+-	if (operand_count != pdu->params_len + sizeof(*pdu)) {
+-		error("AVRCP: invalid parameter length (%u bytes)",
+-							pdu->params_len);
+-		return NULL;
+-	}
+-
+-	return pdu;
+-}
+-
+-static struct avrcp_browsing_header *parse_browsing_pdu(uint8_t *operands,
+-							size_t operand_count)
+-{
+-	struct avrcp_browsing_header *pdu;
+-
+-	if (!operands || operand_count < sizeof(*pdu)) {
+-		error("AVRCP: packet too small (%zu bytes)", operand_count);
+-		return NULL;
+-	}
+-
+-	pdu = (void *) operands;
+-	pdu->params_len = ntohs(pdu->params_len);
+-
+-	if (operand_count != pdu->params_len + sizeof(*pdu)) {
+-		error("AVRCP: invalid parameter length (%u bytes)",
+-							pdu->params_len);
+-		return NULL;
+-	}
+-
+-	return pdu;
+-}
+-
+-static uint8_t errno2status(int err)
+-{
+-	switch (err) {
+-	case -ENOSYS:
+-		return AVRCP_STATUS_INVALID_COMMAND;
+-	case -EINVAL:
+-		return AVRCP_STATUS_INVALID_PARAM;
+-	case 0:
+-		return AVRCP_STATUS_SUCCESS;
+-	case -ENOTDIR:
+-		return AVRCP_STATUS_NOT_DIRECTORY;
+-	case -EBADRQC:
+-		return AVRCP_STATUS_INVALID_SCOPE;
+-	case -ERANGE:
+-		return AVRCP_STATUS_OUT_OF_BOUNDS;
+-	case -ENOENT:
+-		return AVRCP_STATUS_DOES_NOT_EXIST;
+-	default:
+-		return AVRCP_STATUS_INTERNAL_ERROR;
+-	}
+-}
+-
+-static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+-					uint8_t *code, uint8_t *subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	const struct avrcp_control_handler *handler;
+-	struct avrcp_header *pdu;
+-	uint32_t company_id;
+-	ssize_t ret;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		pdu = (void *) operands;
+-		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+-		goto reject;
+-	}
+-
+-	company_id = ntoh24(pdu->company_id);
+-	if (company_id != IEEEID_BTSIG) {
+-		*code = AVC_CTYPE_NOT_IMPLEMENTED;
+-		return 0;
+-	}
+-
+-	DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id, pdu->params_len);
+-
+-	pdu->packet_type = 0;
+-	pdu->rsvd = 0;
+-
+-	if (!session->control_handlers)
+-		goto reject;
+-
+-	for (handler = session->control_handlers; handler->id; handler++) {
+-		if (handler->id == pdu->pdu_id)
+-			break;
+-	}
+-
+-	if (handler->id != pdu->pdu_id || handler->code != *code) {
+-		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+-		goto reject;
+-	}
+-
+-	if (!handler->func) {
+-		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+-		goto reject;
+-	}
+-
+-	ret = handler->func(session, transaction, pdu->params_len, pdu->params,
+-							session->control_data);
+-	if (ret == 0)
+-		return -EAGAIN;
+-
+-	if (ret < 0) {
+-		if (ret == -EAGAIN)
+-			return ret;
+-		pdu->params[0] = errno2status(ret);
+-		goto reject;
+-	}
+-
+-	*code = handler->rsp;
+-	pdu->params_len = htons(ret);
+-
+-	return AVRCP_HEADER_LENGTH + ret;
+-
+-reject:
+-	pdu->params_len = htons(1);
+-	*code = AVC_CTYPE_REJECTED;
+-
+-	return AVRCP_HEADER_LENGTH + 1;
+-}
+-
+-static bool handle_passthrough_pdu(struct avctp *conn, uint8_t op,
+-						bool pressed, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	const struct avrcp_passthrough_handler *handler;
+-
+-	if (!session->passthrough_handlers)
+-		return false;
+-
+-	for (handler = session->passthrough_handlers; handler->func;
+-								handler++) {
+-		if (handler->op == op)
+-			break;
+-	}
+-
+-	if (handler->func == NULL)
+-		return false;
+-
+-	return handler->func(session, pressed, session->passthrough_data);
+-}
+-
+-static void disconnect_cb(void *data)
+-{
+-	struct avrcp *session = data;
+-
+-	session->conn = NULL;
+-
+-	avrcp_shutdown(session);
+-}
+-
+-struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+-{
+-	struct avrcp *session;
+-
+-	session = g_new0(struct avrcp, 1);
+-
+-	session->conn = avctp_new(fd, imtu, omtu, version);
+-	if (!session->conn) {
+-		g_free(session);
+-		return NULL;
+-	}
+-
+-	session->passthrough_id = avctp_register_passthrough_handler(
+-							session->conn,
+-							handle_passthrough_pdu,
+-							session);
+-	session->control_id = avctp_register_pdu_handler(session->conn,
+-							AVC_OP_VENDORDEP,
+-							handle_vendordep_pdu,
+-							session);
+-	session->control_mtu = omtu - AVC_DATA_OFFSET;
+-
+-	/*
+-	 * 27.1.2 AV/C Command Frame
+-	 * An AV/C command frame contains up to 512 octets of data
+-	 */
+-	if (session->control_mtu > AVC_DATA_MTU)
+-		session->control_mtu = AVC_DATA_MTU;
+-
+-	avctp_set_destroy_cb(session->conn, disconnect_cb, session);
+-
+-	return session;
+-}
+-
+-static ssize_t handle_browsing_pdu(struct avctp *conn,
+-					uint8_t transaction, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	const struct avrcp_browsing_handler *handler;
+-	struct avrcp_browsing_header *pdu;
+-	int ret;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		pdu = (void *) operands;
+-		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+-		goto reject;
+-	}
+-
+-	DBG("AVRCP Browsing PDU 0x%02X, len 0x%04X", pdu->pdu_id,
+-							pdu->params_len);
+-
+-	if (!session->browsing_handlers) {
+-		pdu->pdu_id = AVRCP_GENERAL_REJECT;
+-		pdu->params[0] = AVRCP_STATUS_INTERNAL_ERROR;
+-		goto reject;
+-	}
+-
+-	for (handler = session->browsing_handlers; handler->id; handler++) {
+-		if (handler->id == pdu->pdu_id)
+-			break;
+-	}
+-
+-	if (handler->id != pdu->pdu_id) {
+-		pdu->pdu_id = AVRCP_GENERAL_REJECT;
+-		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+-		goto reject;
+-	}
+-
+-	if (!handler->func) {
+-		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+-		goto reject;
+-	}
+-
+-	ret = handler->func(session, transaction, pdu->params_len, pdu->params,
+-							session->control_data);
+-	if (ret == 0)
+-		return -EAGAIN;
+-
+-	if (ret < 0) {
+-		if (ret == -EAGAIN)
+-			return ret;
+-		pdu->params[0] = errno2status(ret);
+-		goto reject;
+-	}
+-
+-	pdu->params_len = htons(ret);
+-
+-	return AVRCP_BROWSING_HEADER_LENGTH + ret;
+-
+-reject:
+-	pdu->params_len = htons(1);
+-
+-	return AVRCP_BROWSING_HEADER_LENGTH + 1;
+-}
+-
+-static void browsing_disconnect_cb(void *data)
+-{
+-	struct avrcp *session = data;
+-
+-	session->browsing_id = 0;
+-}
+-
+-int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
+-								size_t omtu)
+-{
+-	int err;
+-
+-	err = avctp_connect_browsing(session->conn, fd, imtu, omtu);
+-	if (err < 0)
+-		return err;
+-
+-	session->browsing_id = avctp_register_browsing_pdu_handler(
+-							session->conn,
+-							handle_browsing_pdu,
+-							session,
+-							browsing_disconnect_cb);
+-
+-	return 0;
+-}
+-
+-void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+-							void *user_data)
+-{
+-	session->destroy = cb;
+-	session->destroy_data = user_data;
+-}
+-
+-static ssize_t get_capabilities(struct avrcp *session, uint8_t transaction,
+-				uint16_t params_len, uint8_t *params,
+-				void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_capabilities_req *req;
+-
+-	if (!params || params_len != sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	switch (req->cap) {
+-	case CAP_COMPANY_ID:
+-		req->params[0] = 1;
+-		hton24(&req->params[1], IEEEID_BTSIG);
+-		return 5;
+-	case CAP_EVENTS_SUPPORTED:
+-		if (!player->ind || !player->ind->get_capabilities)
+-			return -ENOSYS;
+-		return player->ind->get_capabilities(session, transaction,
+-							player->user_data);
+-	}
+-
+-	return -EINVAL;
+-}
+-
+-static ssize_t list_attributes(struct avrcp *session, uint8_t transaction,
+-				uint16_t params_len, uint8_t *params,
+-				void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->list_attributes)
+-		return -ENOSYS;
+-
+-	return player->ind->list_attributes(session, transaction,
+-							player->user_data);
+-}
+-
+-static bool check_attributes(uint8_t number, const uint8_t *attrs)
+-{
+-	int i;
+-
+-	for (i = 0; i < number; i++) {
+-		if (attrs[i] > AVRCP_ATTRIBUTE_LAST ||
+-					attrs[i] == AVRCP_ATTRIBUTE_ILEGAL)
+-			return false;
+-	}
+-
+-	return true;
+-}
+-
+-static ssize_t get_attribute_text(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_attribute_text_req *req;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_attribute_text)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-	if (params_len != sizeof(*req) + req->number)
+-		return -EINVAL;
+-
+-	if (!check_attributes(req->number, req->attrs))
+-		return -EINVAL;
+-
+-	return player->ind->get_attribute_text(session, transaction,
+-						req->number, req->attrs,
+-						player->user_data);
+-}
+-
+-static ssize_t list_values(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct list_values_req *req;
+-
+-	DBG("");
+-
+-	if (!params || params_len != sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-	if (req->attr > AVRCP_ATTRIBUTE_LAST ||
+-					req->attr == AVRCP_ATTRIBUTE_ILEGAL)
+-		return -EINVAL;
+-
+-	if (!player->ind || !player->ind->list_values)
+-		return -ENOSYS;
+-
+-	return player->ind->list_values(session, transaction, req->attr,
+-							player->user_data);
+-}
+-
+-static bool check_value(uint8_t attr, uint8_t number, const uint8_t *values)
+-{
+-	int i;
+-
+-	for (i = 0; i < number; i++) {
+-		/* Check for invalid value */
+-		switch (attr) {
+-		case AVRCP_ATTRIBUTE_EQUALIZER:
+-			if (values[i] < AVRCP_EQUALIZER_OFF ||
+-						values[i] > AVRCP_EQUALIZER_ON)
+-				return false;
+-			break;
+-		case AVRCP_ATTRIBUTE_REPEAT_MODE:
+-			if (values[i] < AVRCP_REPEAT_MODE_OFF ||
+-					values[i] > AVRCP_REPEAT_MODE_GROUP)
+-				return false;
+-			break;
+-		case AVRCP_ATTRIBUTE_SHUFFLE:
+-			if (values[i] < AVRCP_SHUFFLE_OFF ||
+-					values[i] > AVRCP_SHUFFLE_GROUP)
+-				return false;
+-			break;
+-		case AVRCP_ATTRIBUTE_SCAN:
+-			if (values[i] < AVRCP_SCAN_OFF ||
+-					values[i] > AVRCP_SCAN_GROUP)
+-				return false;
+-			break;
+-		}
+-	}
+-
+-	return true;
+-}
+-
+-static ssize_t get_value_text(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_value_text_req *req;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_value_text)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-	if (params_len != sizeof(*req) + req->number)
+-		return -EINVAL;
+-
+-	if (req->number > AVRCP_ATTRIBUTE_LAST ||
+-					req->number == AVRCP_ATTRIBUTE_ILEGAL)
+-		return -EINVAL;
+-
+-	if (!check_value(req->attr, req->number, req->values))
+-		return -EINVAL;
+-
+-	return player->ind->get_value_text(session, transaction, params[0],
+-						params[1], &params[2],
+-						player->user_data);
+-}
+-
+-static ssize_t get_value(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_value_req *req;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_value)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-	if (params_len < sizeof(*req) + req->number)
+-		return -EINVAL;
+-
+-	if (!check_attributes(req->number, req->attrs))
+-		return -EINVAL;
+-
+-	return player->ind->get_value(session, transaction, params[0],
+-					&params[1], player->user_data);
+-}
+-
+-static ssize_t set_value(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct set_value_req *req;
+-	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+-	uint8_t values[AVRCP_ATTRIBUTE_LAST];
+-	int i;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->set_value)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-	if (params_len < sizeof(*req) + req->number * sizeof(*req->values))
+-		return -EINVAL;
+-
+-	for (i = 0; i < req->number; i++) {
+-		attrs[i] = req->values[i].attr;
+-		values[i] = req->values[i].value;
+-
+-		if (!check_value(attrs[i], 1, &values[i]))
+-			return -EINVAL;
+-	}
+-
+-	return player->ind->set_value(session, transaction, req->number,
+-					attrs, values, player->user_data);
+-}
+-
+-static ssize_t get_play_status(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_play_status)
+-		return -ENOSYS;
+-
+-	return player->ind->get_play_status(session, transaction,
+-							player->user_data);
+-}
+-
+-static bool parse_attributes(struct get_element_attributes_req *req,
+-					uint16_t params_len, uint8_t number,
+-					uint32_t *attrs)
+-{
+-	int i;
+-
+-	for (i = 0; i < number && params_len >= sizeof(*attrs); i++,
+-					params_len -= sizeof(*attrs)) {
+-		attrs[i] = be32_to_cpu(req->attrs[i]);
+-
+-		if (attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+-				attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-			return false;
+-	}
+-
+-	return true;
+-}
+-
+-static ssize_t get_element_attributes(struct avrcp *session,
+-						uint8_t transaction,
+-						uint16_t params_len,
+-						uint8_t *params,
+-						void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_element_attributes_req *req;
+-	uint64_t uid;
+-	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_element_attributes)
+-		return -ENOSYS;
+-
+-	req = (void *) params;
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	if (!parse_attributes(req, params_len - sizeof(*req),
+-							req->number, attrs))
+-		return -EINVAL;
+-
+-	uid = get_be64(params);
+-
+-	return player->ind->get_element_attributes(session, transaction, uid,
+-							req->number, attrs,
+-							player->user_data);
+-}
+-
+-static ssize_t register_notification(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct register_notification_req *req;
+-	uint32_t interval;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->register_notification)
+-		return -ENOSYS;
+-
+-	if (!params || params_len != sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	interval = be32_to_cpu(req->interval);
+-
+-	return player->ind->register_notification(session, transaction,
+-							req->event, interval,
+-							player->user_data);
+-}
+-
+-static ssize_t set_volume(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct set_volume_req *req;
+-	uint8_t volume;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->set_volume)
+-		return -ENOSYS;
+-
+-	if (!params || params_len != sizeof(volume))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	volume = req->value & 0x7f;
+-
+-	return player->ind->set_volume(session, transaction, volume,
+-							player->user_data);
+-}
+-
+-static ssize_t set_addressed(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct set_addressed_req *req;
+-	uint16_t id;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->set_addressed)
+-		return -ENOSYS;
+-
+-	if (!params || params_len != sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	id = be16_to_cpu(req->id);
+-
+-	return player->ind->set_addressed(session, transaction, id,
+-							player->user_data);
+-}
+-
+-static void continuing_new(struct avrcp *session, uint8_t pdu_id,
+-					const struct iovec *iov, int iov_cnt,
+-					size_t offset)
+-{
+-	struct avrcp_continuing *continuing;
+-	int i;
+-	size_t len = 0;
+-
+-	continuing = g_new0(struct avrcp_continuing, 1);
+-	continuing->pdu_id = pdu_id;
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		if (i == 0 && offset) {
+-			len += iov[i].iov_len - offset;
+-			continue;
+-		}
+-
+-		len += iov[i].iov_len;
+-	}
+-
+-	continuing->pdu.iov_base = g_malloc0(len);
+-
+-	DBG("len %zu", len);
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		if (i == 0 && offset) {
+-			memcpy(continuing->pdu.iov_base,
+-						iov[i].iov_base + offset,
+-						iov[i].iov_len - offset);
+-			continuing->pdu.iov_len += iov[i].iov_len - offset;
+-			continue;
+-		}
+-
+-		memcpy(continuing->pdu.iov_base + continuing->pdu.iov_len,
+-					iov[i].iov_base, iov[i].iov_len);
+-		continuing->pdu.iov_len += iov[i].iov_len;
+-	}
+-
+-	session->continuing = continuing;
+-}
+-
+-static int avrcp_send_internal(struct avrcp *session, uint8_t transaction,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t pdu_id, uint8_t type,
+-					const struct iovec *iov, int iov_cnt)
+-{
+-	struct iovec pdu[iov_cnt + 1];
+-	struct avrcp_header hdr;
+-	int i;
+-
+-	/*
+-	 * If a receiver receives a start fragment or non-fragmented AVRCP
+-	 * Specific AV/C message when it already has an incomplete fragment
+-	 * from that sender then the receiver shall consider the first PDU
+-	 * aborted.
+-	 */
+-	if (session->continuing) {
+-		continuing_free(session->continuing);
+-		session->continuing = NULL;
+-	}
+-
+-	memset(&hdr, 0, sizeof(hdr));
+-
+-	pdu[0].iov_base = &hdr;
+-	pdu[0].iov_len = sizeof(hdr);
+-
+-	hdr.packet_type = type;
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		pdu[i + 1].iov_base = iov[i].iov_base;
+-
+-		if (pdu[0].iov_len + hdr.params_len + iov[i].iov_len <=
+-							session->control_mtu) {
+-			pdu[i + 1].iov_len = iov[i].iov_len;
+-			hdr.params_len += iov[i].iov_len;
+-			if (hdr.packet_type != AVRCP_PACKET_TYPE_SINGLE)
+-				hdr.packet_type = AVRCP_PACKET_TYPE_END;
+-			continue;
+-		}
+-
+-		/*
+-		 * Only send what can fit and store the remaining in the
+-		 * continuing iovec
+-		 */
+-		pdu[i + 1].iov_len = session->control_mtu -
+-					(pdu[0].iov_len + hdr.params_len);
+-		hdr.params_len += pdu[i + 1].iov_len;
+-
+-		continuing_new(session, pdu_id, &iov[i], iov_cnt - i,
+-							pdu[i + 1].iov_len);
+-
+-		hdr.packet_type = hdr.packet_type != AVRCP_PACKET_TYPE_SINGLE ?
+-						AVRCP_PACKET_TYPE_CONTINUING :
+-						AVRCP_PACKET_TYPE_START;
+-		break;
+-	}
+-
+-	hton24(hdr.company_id, IEEEID_BTSIG);
+-	hdr.pdu_id = pdu_id;
+-	hdr.params_len = htons(hdr.params_len);
+-
+-	return avctp_send_vendor(session->conn, transaction, code, subunit,
+-							pdu, iov_cnt + 1);
+-}
+-
+-static ssize_t request_continuing(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct iovec iov;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!params || params_len != 1 || !session->continuing ||
+-				session->continuing->pdu_id != params[0])
+-		return -EINVAL;
+-
+-	iov.iov_base = session->continuing->pdu.iov_base;
+-	iov.iov_len = session->continuing->pdu.iov_len;
+-
+-	DBG("len %zu", iov.iov_len);
+-
+-	session->continuing->pdu.iov_base = NULL;
+-
+-	err = avrcp_send_internal(session, transaction, AVC_CTYPE_STABLE,
+-					AVC_SUBUNIT_PANEL, params[0],
+-					AVRCP_PACKET_TYPE_CONTINUING, &iov, 1);
+-
+-	g_free(iov.iov_base);
+-
+-	if (err < 0)
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+-static ssize_t abort_continuing(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	DBG("");
+-
+-	if (!params || params_len != 1 || !session->continuing)
+-		return -EINVAL;
+-
+-	continuing_free(session->continuing);
+-	session->continuing = NULL;
+-
+-	avrcp_send_internal(session, transaction, AVC_CTYPE_ACCEPTED,
+-				AVC_SUBUNIT_PANEL, AVRCP_ABORT_CONTINUING,
+-				AVRCP_PACKET_TYPE_SINGLE, NULL, 0);
+-
+-	return 0;
+-}
+-
+-static const struct avrcp_control_handler player_handlers[] = {
+-		{ AVRCP_GET_CAPABILITIES,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_capabilities },
+-		{ AVRCP_LIST_PLAYER_ATTRIBUTES,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					list_attributes },
+-		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_attribute_text },
+-		{ AVRCP_LIST_PLAYER_VALUES,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					list_values },
+-		{ AVRCP_GET_PLAYER_VALUE_TEXT,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_value_text },
+-		{ AVRCP_GET_CURRENT_PLAYER_VALUE,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_value },
+-		{ AVRCP_SET_PLAYER_VALUE,
+-					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
+-					set_value },
+-		{ AVRCP_GET_PLAY_STATUS,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_play_status },
+-		{ AVRCP_GET_ELEMENT_ATTRIBUTES,
+-					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+-					get_element_attributes },
+-		{ AVRCP_REGISTER_NOTIFICATION,
+-					AVC_CTYPE_NOTIFY, AVC_CTYPE_INTERIM,
+-					register_notification },
+-		{ AVRCP_SET_ABSOLUTE_VOLUME,
+-					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
+-					set_volume },
+-		{ AVRCP_SET_ADDRESSED_PLAYER,
+-					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
+-					set_addressed },
+-		{ AVRCP_REQUEST_CONTINUING,
+-					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
+-					request_continuing },
+-		{ AVRCP_ABORT_CONTINUING,
+-					AVC_CTYPE_CONTROL, AVC_CTYPE_ACCEPTED,
+-					abort_continuing },
+-		{ },
+-};
+-
+-static void avrcp_set_control_handlers(struct avrcp *session,
+-				const struct avrcp_control_handler *handlers,
+-				void *user_data)
+-{
+-	session->control_handlers = handlers;
+-	session->control_data = user_data;
+-}
+-
+-static ssize_t set_browsed(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct set_browsed_req *req;
+-	uint16_t id;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->set_browsed)
+-		return -ENOSYS;
+-
+-	if (!params || params_len != sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	id = be16_to_cpu(req->id);
+-
+-	return player->ind->set_browsed(session, transaction, id,
+-							player->user_data);
+-}
+-
+-static ssize_t get_folder_items(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_folder_items_req *req;
+-	uint32_t start, end;
+-	uint16_t number;
+-	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	int i;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_folder_items)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	if (req->scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EBADRQC;
+-
+-	start = be32_to_cpu(req->start);
+-	end = be32_to_cpu(req->end);
+-
+-	if (start > end)
+-		return -ERANGE;
+-
+-	number = be16_to_cpu(req->number);
+-
+-	for (i = 0; i < number; i++) {
+-		attrs[i] = be32_to_cpu(req->attrs[i]);
+-
+-		if (attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+-				attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-			return -EINVAL;
+-	}
+-
+-	return player->ind->get_folder_items(session, transaction, req->scope,
+-						start, end, number, attrs,
+-						player->user_data);
+-}
+-
+-static ssize_t change_path(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct change_path_req *req;
+-	uint16_t counter;
+-	uint64_t uid;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->change_path)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	counter = be16_to_cpu(req->counter);
+-	uid = be64_to_cpu(req->uid);
+-
+-	return player->ind->change_path(session, transaction, counter,
+-					req->direction, uid, player->user_data);
+-}
+-
+-static ssize_t get_item_attributes(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct get_item_attributes_req *req;
+-	uint64_t uid;
+-	uint16_t counter;
+-	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	int i;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->get_item_attributes)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	if (req->scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EBADRQC;
+-
+-	uid = be64_to_cpu(req->uid);
+-	counter = be16_to_cpu(req->counter);
+-
+-	for (i = 0; i < req->number; i++) {
+-		attrs[i] = be32_to_cpu(req->attrs[i]);
+-
+-		if (attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+-				attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-			return -EINVAL;
+-	}
+-
+-	return player->ind->get_item_attributes(session, transaction,
+-						req->scope, uid, counter,
+-						req->number, attrs,
+-						player->user_data);
+-}
+-
+-static ssize_t play_item(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct play_item_req *req;
+-	uint64_t uid;
+-	uint16_t counter;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->play_item)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	if (req->scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EBADRQC;
+-
+-	uid = be64_to_cpu(req->uid);
+-	counter = be16_to_cpu(req->counter);
+-
+-	return player->ind->play_item(session, transaction, req->scope, uid,
+-						counter, player->user_data);
+-}
+-
+-static ssize_t search(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct search_req *req;
+-	char *string;
+-	uint16_t len;
+-	int ret;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->search)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	len = be16_to_cpu(req->len);
+-	if (!len)
+-		return -EINVAL;
+-
+-	string = strndup(req->string, len);
+-
+-	ret = player->ind->search(session, transaction, string,
+-							player->user_data);
+-
+-	free(string);
+-
+-	return ret;
+-}
+-
+-static ssize_t add_to_now_playing(struct avrcp *session, uint8_t transaction,
+-					uint16_t params_len, uint8_t *params,
+-					void *user_data)
+-{
+-	struct avrcp_player *player = user_data;
+-	struct add_to_now_playing_req *req;
+-	uint64_t uid;
+-	uint16_t counter;
+-
+-	DBG("");
+-
+-	if (!player->ind || !player->ind->add_to_now_playing)
+-		return -ENOSYS;
+-
+-	if (!params || params_len < sizeof(*req))
+-		return -EINVAL;
+-
+-	req = (void *) params;
+-
+-	if (req->scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EBADRQC;
+-
+-	uid = be64_to_cpu(req->uid);
+-	counter = be16_to_cpu(req->counter);
+-
+-	return player->ind->add_to_now_playing(session, transaction, req->scope,
+-							uid, counter,
+-							player->user_data);
+-}
+-
+-static const struct avrcp_browsing_handler browsing_handlers[] = {
+-		{ AVRCP_SET_BROWSED_PLAYER, set_browsed },
+-		{ AVRCP_GET_FOLDER_ITEMS, get_folder_items },
+-		{ AVRCP_CHANGE_PATH, change_path },
+-		{ AVRCP_GET_ITEM_ATTRIBUTES, get_item_attributes },
+-		{ AVRCP_PLAY_ITEM, play_item },
+-		{ AVRCP_SEARCH, search },
+-		{ AVRCP_ADD_TO_NOW_PLAYING, add_to_now_playing },
+-		{ },
+-};
+-
+-static void avrcp_set_browsing_handlers(struct avrcp *session,
+-				const struct avrcp_browsing_handler *handlers,
+-				void *user_data)
+-{
+-	session->browsing_handlers = handlers;
+-	session->browsing_data = user_data;
+-}
+-
+-void avrcp_register_player(struct avrcp *session,
+-				const struct avrcp_control_ind *ind,
+-				const struct avrcp_control_cfm *cfm,
+-				void *user_data)
+-{
+-	struct avrcp_player *player;
+-
+-	player = g_new0(struct avrcp_player, 1);
+-	player->ind = ind;
+-	player->cfm = cfm;
+-	player->user_data = user_data;
+-
+-	avrcp_set_control_handlers(session, player_handlers, player);
+-	avrcp_set_browsing_handlers(session, browsing_handlers, player);
+-	session->player = player;
+-}
+-
+-void avrcp_set_passthrough_handlers(struct avrcp *session,
+-			const struct avrcp_passthrough_handler *handlers,
+-			void *user_data)
+-{
+-	session->passthrough_handlers = handlers;
+-	session->passthrough_data = user_data;
+-}
+-
+-int avrcp_init_uinput(struct avrcp *session, const char *name,
+-							const char *address)
+-{
+-	return avctp_init_uinput(session->conn, name, address);
+-}
+-
+-int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+-					uint8_t subunit, uint8_t pdu_id,
+-					const struct iovec *iov, int iov_cnt)
+-{
+-	return avrcp_send_internal(session, transaction, code, subunit, pdu_id,
+-					AVRCP_PACKET_TYPE_SINGLE, iov, iov_cnt);
+-}
+-
+-static int status2errno(uint8_t status)
+-{
+-	switch (status) {
+-	case AVRCP_STATUS_INVALID_COMMAND:
+-		return -ENOSYS;
+-	case AVRCP_STATUS_INVALID_PARAM:
+-		return -EINVAL;
+-	case AVRCP_STATUS_SUCCESS:
+-		return 0;
+-	case AVRCP_STATUS_NOT_DIRECTORY:
+-		return -ENOTDIR;
+-	case AVRCP_STATUS_INVALID_SCOPE:
+-		return -EBADRQC;
+-	case AVRCP_STATUS_OUT_OF_BOUNDS:
+-		return -ERANGE;
+-	case AVRCP_STATUS_INTERNAL_ERROR:
+-	case AVRCP_STATUS_INVALID_PLAYER_ID:
+-	case AVRCP_STATUS_PLAYER_NOT_BROWSABLE:
+-	case AVRCP_STATUS_NO_AVAILABLE_PLAYERS:
+-	case AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED:
+-		return -EPERM;
+-	default:
+-		return -EPROTO;
+-	}
+-}
+-
+-static int parse_status(struct avrcp_header *pdu)
+-{
+-	if (pdu->params_len < 1)
+-		return -EPROTO;
+-
+-	return status2errno(pdu->params[0]);
+-}
+-
+-static int parse_browsing_status(struct avrcp_browsing_header *pdu)
+-{
+-	if (pdu->params_len < 1)
+-		return -EPROTO;
+-
+-	return status2errno(pdu->params[0]);
+-}
+-
+-static int avrcp_send_req(struct avrcp *session, uint8_t code, uint8_t subunit,
+-					uint8_t pdu_id, const struct iovec *iov,
+-					int iov_cnt, avctp_rsp_cb func,
+-					void *user_data)
+-{
+-	struct iovec pdu[iov_cnt + 1];
+-	struct avrcp_header hdr;
+-	int i;
+-
+-	memset(&hdr, 0, sizeof(hdr));
+-
+-	pdu[0].iov_base = &hdr;
+-	pdu[0].iov_len = sizeof(hdr);
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		pdu[i + 1].iov_base = iov[i].iov_base;
+-		pdu[i + 1].iov_len = iov[i].iov_len;
+-		hdr.params_len += iov[i].iov_len;
+-	}
+-
+-	hton24(hdr.company_id, IEEEID_BTSIG);
+-	hdr.pdu_id = pdu_id;
+-	hdr.packet_type = AVRCP_PACKET_TYPE_SINGLE;
+-	hdr.params_len = htons(hdr.params_len);
+-
+-	return avctp_send_vendor_req(session->conn, code, subunit, pdu,
+-						iov_cnt + 1, func, user_data);
+-}
+-
+-static int avrcp_send_browsing_req(struct avrcp *session, uint8_t pdu_id,
+-					const struct iovec *iov, int iov_cnt,
+-					avctp_browsing_rsp_cb func,
+-					void *user_data)
+-{
+-	struct iovec pdu[iov_cnt + 1];
+-	struct avrcp_browsing_header hdr;
+-	int i;
+-
+-	memset(&hdr, 0, sizeof(hdr));
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		pdu[i + 1].iov_base = iov[i].iov_base;
+-		pdu[i + 1].iov_len = iov[i].iov_len;
+-		hdr.params_len += iov[i].iov_len;
+-	}
+-
+-	hdr.pdu_id = pdu_id;
+-	hdr.params_len = htons(hdr.params_len);
+-
+-	pdu[0].iov_base = &hdr;
+-	pdu[0].iov_len = sizeof(hdr);
+-
+-	return avctp_send_browsing_req(session->conn, pdu, iov_cnt + 1,
+-							func, user_data);
+-}
+-
+-static int avrcp_send_browsing(struct avrcp *session, uint8_t transaction,
+-				uint8_t pdu_id, const struct iovec *iov,
+-				int iov_cnt)
+-{
+-	struct iovec pdu[iov_cnt + 1];
+-	struct avrcp_browsing_header hdr;
+-	int i;
+-
+-	memset(&hdr, 0, sizeof(hdr));
+-
+-	for (i = 0; i < iov_cnt; i++) {
+-		pdu[i + 1].iov_base = iov[i].iov_base;
+-		pdu[i + 1].iov_len = iov[i].iov_len;
+-		hdr.params_len += iov[i].iov_len;
+-	}
+-
+-	hdr.pdu_id = pdu_id;
+-	hdr.params_len = htons(hdr.params_len);
+-
+-	pdu[0].iov_base = &hdr;
+-	pdu[0].iov_len = sizeof(hdr);
+-
+-	return avctp_send_browsing(session->conn, transaction, pdu,
+-								iov_cnt + 1);
+-}
+-
+-static gboolean get_capabilities_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	struct get_capabilities_rsp *rsp;
+-	uint8_t number = 0;
+-	uint8_t *params = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_capabilities)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	switch (rsp->cap) {
+-	case CAP_COMPANY_ID:
+-	case CAP_EVENTS_SUPPORTED:
+-		break;
+-	default:
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (rsp->number > 0) {
+-		number = rsp->number;
+-		params = rsp->params;
+-	}
+-
+-	err = 0;
+-
+-done:
+-	player->cfm->get_capabilities(session, err, number, params,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-
+-int avrcp_get_capabilities(struct avrcp *session, uint8_t param)
+-{
+-	struct iovec iov;
+-	struct get_capabilities_req req;
+-
+-	req.cap = param;
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-					AVRCP_GET_CAPABILITIES, &iov, 1,
+-					get_capabilities_rsp, session);
+-}
+-
+-static gboolean register_notification_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	struct register_notification_rsp *rsp;
+-	uint8_t event = 0;
+-	uint16_t value16, value16_2[2];
+-	uint32_t value32;
+-	uint64_t value64;
+-	uint8_t *params = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->register_notification)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-	event = rsp->event;
+-
+-	if (event > AVRCP_EVENT_LAST) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	switch (event) {
+-	case AVRCP_EVENT_STATUS_CHANGED:
+-		if (pdu->params_len != sizeof(*rsp) + sizeof(uint8_t)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		params = rsp->data;
+-		break;
+-	case AVRCP_EVENT_VOLUME_CHANGED:
+-		if (pdu->params_len != sizeof(*rsp) + sizeof(uint8_t)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		params = rsp->data;
+-		params[0] &= 0x7f;
+-		break;
+-	case AVRCP_EVENT_TRACK_CHANGED:
+-		if (pdu->params_len != sizeof(*rsp) + sizeof(value64)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		value64 = get_be64(rsp->data);
+-		params = (uint8_t *) &value64;
+-		break;
+-	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
+-		if (pdu->params_len != sizeof(*rsp) + sizeof(value32)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		value32 = get_be32(rsp->data);
+-		params = (uint8_t *) &value32;
+-		break;
+-	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+-		if (pdu->params_len < sizeof(*rsp) + sizeof(value16_2)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		value16_2[0] = get_be16(rsp->data);
+-		value16_2[1] = get_be16(rsp->data + 2);
+-		params = (uint8_t *) value16_2;
+-		break;
+-	case AVRCP_EVENT_SETTINGS_CHANGED:
+-		if (pdu->params_len < sizeof(*rsp) + sizeof(uint8_t)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		params = rsp->data;
+-		break;
+-	case AVRCP_EVENT_UIDS_CHANGED:
+-		if (pdu->params_len < sizeof(*rsp) + sizeof(value16)) {
+-			err = -EPROTO;
+-			goto done;
+-		}
+-		value16 = get_be16(rsp->data);
+-		params = (uint8_t *) &value16;
+-		break;
+-	}
+-
+-	err = 0;
+-
+-done:
+-	return player->cfm->register_notification(session, err, code, event,
+-						params, player->user_data);
+-}
+-
+-int avrcp_register_notification(struct avrcp *session, uint8_t event,
+-							uint32_t interval)
+-{
+-	struct iovec iov;
+-	struct register_notification_req req;
+-
+-	if (event > AVRCP_EVENT_LAST)
+-		return -EINVAL;
+-
+-	req.event = event;
+-	req.interval = cpu_to_be32(interval);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
+-				AVRCP_REGISTER_NOTIFICATION, &iov, 1,
+-				register_notification_rsp, session);
+-}
+-
+-static gboolean list_attributes_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu = (void *) operands;
+-	struct list_attributes_rsp *rsp;
+-	uint8_t number = 0;
+-	uint8_t *attrs = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->list_attributes)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	number = rsp->number;
+-	if (number > 0)
+-		attrs = rsp->params;
+-
+-	err = 0;
+-
+-done:
+-	player->cfm->list_attributes(session, err, number, attrs,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_list_player_attributes(struct avrcp *session)
+-{
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_LIST_PLAYER_ATTRIBUTES, NULL, 0,
+-				list_attributes_rsp, session);
+-}
+-
+-static int parse_text_rsp(struct avrcp_header *pdu, uint8_t *number,
+-					uint8_t *attrs, char **text)
+-{
+-	uint8_t *ptr;
+-	uint16_t params_len;
+-	int i;
+-
+-	if (pdu->params_len < 1)
+-		return -EPROTO;
+-
+-	*number = pdu->params[0];
+-	if (*number > AVRCP_ATTRIBUTE_LAST) {
+-		*number = 0;
+-		return -EPROTO;
+-	}
+-
+-	params_len = pdu->params_len - 1;
+-	for (i = 0, ptr = &pdu->params[1]; i < *number && params_len > 0; i++) {
+-		struct text_value *val;
+-
+-		if (params_len < sizeof(*val))
+-			goto fail;
+-
+-		val = (void *) ptr;
+-
+-		attrs[i] = val->attr;
+-
+-		params_len -= sizeof(*val);
+-		ptr += sizeof(*val);
+-
+-		if (val->len > params_len)
+-			goto fail;
+-
+-		if (val->len > 0) {
+-			text[i] = g_strndup(val->data, val->len);
+-			params_len -= val->len;
+-			ptr += val->len;
+-		}
+-	}
+-
+-	if (i != *number)
+-		goto fail;
+-
+-	return 0;
+-
+-fail:
+-	for (i -= 1; i >= 0; i--)
+-		g_free(text[i]);
+-
+-	*number = 0;
+-
+-	return -EPROTO;
+-}
+-
+-static gboolean get_attribute_text_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	uint8_t number = 0;
+-	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+-	char *text[AVRCP_ATTRIBUTE_LAST];
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_attribute_text)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	err = parse_text_rsp(pdu, &number, attrs, text);
+-
+-done:
+-	player->cfm->get_attribute_text(session, err, number, attrs, text,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t number,
+-								uint8_t *attrs)
+-{
+-	struct iovec iov[2];
+-
+-	if (!number || number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	iov[1].iov_base = attrs;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, iov, 2,
+-				get_attribute_text_rsp, session);
+-}
+-
+-static gboolean list_values_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	struct list_values_rsp *rsp;
+-	uint8_t number = 0;
+-	uint8_t *values = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->list_values)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	if (rsp->number > 0) {
+-		number = rsp->number;
+-		values = rsp->params;
+-	}
+-
+-	err = 0;
+-
+-done:
+-	player->cfm->list_values(session, err, number, values,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_list_player_values(struct avrcp *session, uint8_t attr)
+-{
+-	struct iovec iov;
+-
+-	iov.iov_base = &attr;
+-	iov.iov_len = sizeof(attr);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-					AVRCP_LIST_PLAYER_VALUES, &iov, 1,
+-					list_values_rsp, session);
+-}
+-
+-static gboolean get_value_text_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	uint8_t number = 0;
+-	uint8_t values[AVRCP_ATTRIBUTE_LAST];
+-	char *text[AVRCP_ATTRIBUTE_LAST];
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_value_text)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	err = parse_text_rsp(pdu, &number, values, text);
+-
+-done:
+-	player->cfm->get_value_text(session, err, number, values, text,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_player_value_text(struct avrcp *session, uint8_t attr,
+-					uint8_t number, uint8_t *values)
+-{
+-	struct iovec iov[2];
+-	struct get_value_text_req req;
+-
+-	if (!number)
+-		return -EINVAL;
+-
+-	req.attr = attr;
+-	req.number = number;
+-
+-	iov[0].iov_base = &req;
+-	iov[0].iov_len = sizeof(req);
+-
+-	iov[1].iov_base = values;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-					AVRCP_GET_PLAYER_VALUE_TEXT, iov, 2,
+-					get_value_text_rsp, session);
+-}
+-
+-static int parse_value(struct avrcp_header *pdu, uint8_t *number,
+-					uint8_t *attrs, uint8_t *values)
+-{
+-	int i;
+-	struct value_rsp *rsp;
+-
+-	if (pdu->params_len < sizeof(*rsp))
+-		return -EPROTO;
+-
+-	rsp = (void *) pdu->params;
+-
+-	/*
+-	 * Check if PDU is big enough to hold the number of (attribute, value)
+-	 * tuples.
+-	 */
+-	if (rsp->number > AVRCP_ATTRIBUTE_LAST ||
+-			sizeof(*rsp) + rsp->number * 2 != pdu->params_len) {
+-		*number = 0;
+-		return -EPROTO;
+-	}
+-
+-	for (i = 0; i < rsp->number; i++) {
+-		attrs[i] = rsp->values[i].attr;
+-		values[i] = rsp->values[i].value;
+-	}
+-
+-	*number = rsp->number;
+-
+-	return 0;
+-}
+-
+-static gboolean get_value_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	uint8_t number = 0;
+-	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+-	uint8_t values[AVRCP_ATTRIBUTE_LAST];
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_value)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	err = parse_value(pdu, &number, attrs, values);
+-
+-done:
+-	player->cfm->get_value(session, err, number, attrs, values,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
+-							uint8_t *attrs)
+-
+-{
+-	struct iovec iov[2];
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	iov[1].iov_base = attrs;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE, iov, 2,
+-				get_value_rsp, session);
+-}
+-
+-static gboolean set_value_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->set_value)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	err = 0;
+-
+-done:
+-	player->cfm->set_value(session, err, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_set_player_value(struct avrcp *session, uint8_t number,
+-					uint8_t *attrs, uint8_t *values)
+-{
+-	struct iovec iov[2];
+-	struct attr_value val[AVRCP_ATTRIBUTE_LAST];
+-	int i;
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	for (i = 0; i < number; i++) {
+-		val[i].attr = attrs[i];
+-		val[i].value = values[i];
+-	}
+-
+-	iov[1].iov_base = val;
+-	iov[1].iov_len = sizeof(*val) * number;
+-
+-	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+-					AVRCP_SET_PLAYER_VALUE, iov, 2,
+-					set_value_rsp, session);
+-}
+-
+-static gboolean get_play_status_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	struct get_play_status_rsp *rsp;
+-	uint8_t status = 0;
+-	uint32_t position = 0;
+-	uint32_t duration = 0;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_play_status)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	duration = be32_to_cpu(rsp->duration);
+-	position = be32_to_cpu(rsp->position);
+-	status = rsp->status;
+-	err = 0;
+-
+-done:
+-	player->cfm->get_play_status(session, err, status, position, duration,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_play_status(struct avrcp *session)
+-{
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_GET_PLAY_STATUS, NULL, 0,
+-				get_play_status_rsp, session);
+-}
+-
+-static gboolean set_volume_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	struct set_volume_rsp *rsp;
+-	uint8_t value = 0;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->set_volume)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	value = rsp->value & 0x7f;
+-	err = 0;
+-
+-done:
+-	player->cfm->set_volume(session, err, value, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_set_volume(struct avrcp *session, uint8_t volume)
+-{
+-	struct iovec iov;
+-
+-	iov.iov_base = &volume;
+-	iov.iov_len = sizeof(volume);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+-				AVRCP_SET_ABSOLUTE_VOLUME, &iov, 1,
+-				set_volume_rsp, session);
+-}
+-
+-static int parse_attribute_list(uint8_t *params, uint16_t params_len,
+-				uint8_t number, uint32_t *attrs, char **text)
+-{
+-	struct media_item *item;
+-	int i;
+-
+-	if (number > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -EPROTO;
+-
+-	for (i = 0; i < number && params_len >= sizeof(*item); i++) {
+-		item = (void *) params;
+-
+-		item->attr = be32_to_cpu(item->attr);
+-		item->charset = be16_to_cpu(item->charset);
+-		item->len = be16_to_cpu(item->len);
+-
+-		params_len -= sizeof(*item);
+-		params += sizeof(*item);
+-		if (item->len > params_len)
+-			goto fail;
+-
+-		if (item->len > 0) {
+-			text[i] = g_strndup(item->data, item->len);
+-			attrs[i] = item->attr;
+-			params_len -= item->len;
+-			params += item->len;
+-		} else {
+-			text[i] = NULL;
+-			attrs[i] = 0;
+-		}
+-	}
+-
+-	return 0;
+-
+-fail:
+-	for (i -= 1; i >= 0; i--)
+-		g_free(text[i]);
+-
+-	return -EPROTO;
+-}
+-
+-static void free_attribute_list(uint8_t number, char **text)
+-{
+-	while(number--)
+-		g_free(text[number]);
+-}
+-
+-static int parse_elements(struct avrcp_header *pdu, uint8_t *number,
+-						uint32_t *attrs, char **text)
+-{
+-	struct get_element_attributes_rsp *rsp;
+-
+-	if (pdu->params_len < sizeof(*rsp))
+-		return -EPROTO;
+-
+-	rsp = (void *) pdu->params;
+-	if (rsp->number > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -EPROTO;
+-
+-	*number = rsp->number;
+-
+-	return parse_attribute_list(pdu->params + sizeof(*rsp),
+-						pdu->params_len - sizeof(*rsp),
+-						*number, attrs, text);
+-}
+-
+-static int parse_items(struct avrcp_browsing_header *pdu, uint8_t *number,
+-						uint32_t *attrs, char **text)
+-{
+-	struct get_item_attributes_rsp *rsp;
+-
+-	if (pdu->params_len < sizeof(*rsp))
+-		return -EPROTO;
+-
+-	rsp = (void *) pdu->params;
+-
+-	if (rsp->number > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -EPROTO;
+-
+-	*number = rsp->number;
+-
+-	return parse_attribute_list(pdu->params + sizeof(*rsp),
+-						pdu->params_len - sizeof(*rsp),
+-						*number, attrs, text);
+-}
+-
+-static gboolean get_element_attributes_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	uint8_t number = 0;
+-	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	char *text[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_element_attributes)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	if (code == AVC_CTYPE_REJECTED) {
+-		err = parse_status(pdu);
+-		goto done;
+-	}
+-
+-	err = parse_elements(pdu, &number, attrs, text);
+-
+-done:
+-	player->cfm->get_element_attributes(session, err, number, attrs, text,
+-							player->user_data);
+-
+-	if (err == 0)
+-		free_attribute_list(number, text);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_element_attributes(struct avrcp *session)
+-{
+-	struct iovec iov;
+-	struct get_element_attributes_req req;
+-
+-	/* This returns all attributes */
+-	memset(&req, 0, sizeof(req));
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_GET_ELEMENT_ATTRIBUTES, &iov, 1,
+-				get_element_attributes_rsp, session);
+-}
+-
+-static gboolean set_addressed_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_header *pdu;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->set_addressed)
+-		return FALSE;
+-
+-	pdu = parse_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_status(pdu);
+-
+-done:
+-	player->cfm->set_addressed(session, err, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id)
+-{
+-	struct iovec iov;
+-	struct set_addressed_req req;
+-
+-	req.id = cpu_to_be16(player_id);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+-					AVRCP_SET_ADDRESSED_PLAYER, &iov, 1,
+-					set_addressed_rsp, session);
+-}
+-
+-static char *parse_folder_list(uint8_t *params, uint16_t params_len,
+-								uint8_t depth)
+-{
+-	char **folders, *path;
+-	uint8_t count;
+-	size_t i;
+-
+-	folders = g_new0(char *, depth + 2);
+-	folders[0] = g_strdup("/Filesystem");
+-
+-	for (i = 0, count = 1; count <= depth && i < params_len; count++) {
+-		uint8_t len;
+-
+-		len = params[i++];
+-
+-		if (i + len > params_len || len == 0) {
+-			g_strfreev(folders);
+-			return NULL;
+-		}
+-
+-		folders[count] = util_memdup(&params[i], len);
+-		i += len;
+-	}
+-
+-	path = g_build_pathv("/", folders);
+-	g_strfreev(folders);
+-
+-	return path;
+-}
+-
+-static gboolean set_browsed_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	struct set_browsed_rsp *rsp;
+-	uint16_t counter = 0;
+-	uint32_t items = 0;
+-	char *path = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->set_browsed)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-	if (err < 0)
+-		goto done;
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	counter = be16_to_cpu(rsp->counter);
+-	items = be32_to_cpu(rsp->items);
+-
+-	path = parse_folder_list(rsp->data, pdu->params_len - sizeof(*rsp),
+-								rsp->depth);
+-	if (!path)
+-		err = -EPROTO;
+-
+-done:
+-	player->cfm->set_browsed(session, err, counter, items, path,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id)
+-{
+-	struct iovec iov;
+-	struct set_browsed_req req;
+-
+-	req.id = cpu_to_be16(player_id);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_SET_BROWSED_PLAYER,
+-					&iov, 1, set_browsed_rsp, session);
+-}
+-
+-static gboolean get_folder_items_rsp(struct avctp *conn,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	struct get_folder_items_rsp *rsp;
+-	uint16_t counter = 0, number = 0;
+-	uint8_t *params = NULL;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_folder_items)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-	if (err < 0)
+-		goto done;
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	counter = be16_to_cpu(rsp->counter);
+-	number = be16_to_cpu(rsp->number);
+-	params = rsp->data;
+-
+-	/* FIXME: Add proper parsing for each item type */
+-
+-done:
+-	player->cfm->get_folder_items(session, err, counter, number, params,
+-							player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
+-				uint32_t start, uint32_t end, uint8_t number,
+-				uint32_t *attrs)
+-{
+-
+-	struct iovec iov[2];
+-	struct get_folder_items_req req;
+-	int i;
+-
+-	req.scope = scope;
+-	req.start = cpu_to_be32(start);
+-	req.end = cpu_to_be32(end);
+-	req.number = number;
+-
+-	iov[0].iov_base = &req;
+-	iov[0].iov_len = sizeof(req);
+-
+-	if (!number)
+-		return avrcp_send_browsing_req(session, AVRCP_GET_FOLDER_ITEMS,
+-						iov, 1, get_folder_items_rsp,
+-						session);
+-
+-	for (i = 0; i < number; i++)
+-		attrs[i] = cpu_to_be32(attrs[i]);
+-
+-	iov[1].iov_base = attrs;
+-	iov[1].iov_len = number * sizeof(*attrs);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_GET_FOLDER_ITEMS,
+-					iov, 2, get_folder_items_rsp, session);
+-}
+-
+-static gboolean change_path_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	struct change_path_rsp *rsp;
+-	uint32_t items = 0;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->change_path)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-	if (err < 0)
+-		goto done;
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	items = be32_to_cpu(rsp->items);
+-
+-done:
+-	player->cfm->change_path(session, err, items, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
+-							uint16_t counter)
+-{
+-	struct iovec iov;
+-	struct change_path_req req;
+-
+-	req.counter = cpu_to_be16(counter);
+-	req.direction = direction;
+-	req.uid = cpu_to_be64(uid);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_CHANGE_PATH,
+-					&iov, 1, change_path_rsp, session);
+-}
+-
+-static gboolean get_item_attributes_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	uint8_t number = 0;
+-	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	char *text[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->get_item_attributes)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-	if (err < 0)
+-		goto done;
+-
+-	err = parse_items(pdu, &number, attrs, text);
+-
+-done:
+-	player->cfm->get_item_attributes(session, err, number, attrs, text,
+-							player->user_data);
+-
+-	if (err == 0)
+-		free_attribute_list(number, text);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
+-				uint64_t uid, uint16_t counter, uint8_t number,
+-				uint32_t *attrs)
+-{
+-	struct iovec iov[2];
+-	struct get_item_attributes_req req;
+-	int i;
+-
+-	req.scope = scope;
+-	req.uid = cpu_to_be64(uid);
+-	req.counter = cpu_to_be16(counter);
+-	req.number = number;
+-
+-	iov[0].iov_base = &req;
+-	iov[0].iov_len = sizeof(req);
+-
+-	if (!number)
+-		return avrcp_send_browsing_req(session,
+-						AVRCP_GET_ITEM_ATTRIBUTES,
+-						iov, 1, get_item_attributes_rsp,
+-						session);
+-
+-	if (number > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	for (i = 0; i < number; i++) {
+-		if (attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST ||
+-				attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL)
+-			return -EINVAL;
+-		attrs[i] = cpu_to_be32(attrs[i]);
+-	}
+-
+-	iov[1].iov_base = attrs;
+-	iov[1].iov_len = number * sizeof(*attrs);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_GET_ITEM_ATTRIBUTES,
+-					iov, 2, get_item_attributes_rsp,
+-					session);
+-}
+-
+-static gboolean play_item_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->play_item)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-
+-done:
+-	player->cfm->play_item(session, err, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_play_item(struct avrcp *session, uint8_t scope, uint64_t uid,
+-							uint16_t counter)
+-{
+-	struct iovec iov;
+-	struct play_item_req req;
+-
+-	if (scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EINVAL;
+-
+-	req.scope = scope;
+-	req.uid = cpu_to_be64(uid);
+-	req.counter = cpu_to_be16(counter);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_PLAY_ITEM, &iov, 1,
+-						play_item_rsp, session);
+-}
+-
+-static gboolean search_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	struct search_rsp *rsp;
+-	uint16_t counter = 0;
+-	uint32_t items = 0;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->search)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-	if (err < 0)
+-		goto done;
+-
+-	if (pdu->params_len < sizeof(*rsp)) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	rsp = (void *) pdu->params;
+-
+-	counter = be16_to_cpu(rsp->counter);
+-	items = be32_to_cpu(rsp->items);
+-
+-	err = 0;
+-
+-done:
+-	player->cfm->search(session, err, counter, items, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_search(struct avrcp *session, const char *string)
+-{
+-	struct iovec iov[2];
+-	struct search_req req;
+-	size_t len;
+-
+-	if (!string)
+-		return -EINVAL;
+-
+-	len = strnlen(string, UINT8_MAX);
+-
+-	req.charset = cpu_to_be16(AVRCP_CHARSET_UTF8);
+-	req.len = cpu_to_be16(len);
+-
+-	iov[0].iov_base = &req;
+-	iov[0].iov_len = sizeof(req);
+-
+-	iov[1].iov_base = (void *) string;
+-	iov[1].iov_len = len;
+-
+-	return avrcp_send_browsing_req(session, AVRCP_SEARCH, iov, 2,
+-							search_rsp, session);
+-}
+-
+-static gboolean add_to_now_playing_rsp(struct avctp *conn, uint8_t *operands,
+-					size_t operand_count, void *user_data)
+-{
+-	struct avrcp *session = user_data;
+-	struct avrcp_player *player = session->player;
+-	struct avrcp_browsing_header *pdu;
+-	int err;
+-
+-	DBG("");
+-
+-	if (!player || !player->cfm || !player->cfm->add_to_now_playing)
+-		return FALSE;
+-
+-	pdu = parse_browsing_pdu(operands, operand_count);
+-	if (!pdu) {
+-		err = -EPROTO;
+-		goto done;
+-	}
+-
+-	err = parse_browsing_status(pdu);
+-
+-done:
+-	player->cfm->add_to_now_playing(session, err, player->user_data);
+-
+-	return FALSE;
+-}
+-
+-int avrcp_add_to_now_playing(struct avrcp *session, uint8_t scope, uint64_t uid,
+-							uint16_t counter)
+-{
+-	struct iovec iov;
+-	struct add_to_now_playing_req req;
+-
+-	if (scope > AVRCP_MEDIA_NOW_PLAYING)
+-		return -EINVAL;
+-
+-	req.scope = scope;
+-	req.uid = cpu_to_be64(uid);
+-	req.counter = cpu_to_be16(counter);
+-
+-	iov.iov_base = &req;
+-	iov.iov_len = sizeof(req);
+-
+-	return avrcp_send_browsing_req(session, AVRCP_ADD_TO_NOW_PLAYING,
+-					&iov, 1, add_to_now_playing_rsp,
+-					session);
+-}
+-
+-int avrcp_get_capabilities_rsp(struct avrcp *session, uint8_t transaction,
+-						uint8_t number, uint8_t *events)
+-{
+-	struct iovec iov[2];
+-	struct get_capabilities_rsp rsp;
+-
+-	if (number > AVRCP_EVENT_LAST)
+-		return -EINVAL;
+-
+-	rsp.cap = CAP_EVENTS_SUPPORTED;
+-	rsp.number = number;
+-
+-	iov[0].iov_base = &rsp;
+-	iov[0].iov_len = sizeof(rsp);
+-
+-	iov[1].iov_base = events;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_GET_CAPABILITIES,
+-				iov, 2);
+-}
+-
+-int avrcp_list_player_attributes_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs)
+-{
+-	struct iovec iov[2];
+-	struct list_attributes_rsp rsp;
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	rsp.number = number;
+-
+-	iov[0].iov_base = &rsp;
+-	iov[0].iov_len = sizeof(rsp);
+-
+-	if (!number)
+-		return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_LIST_PLAYER_ATTRIBUTES,
+-				iov, 1);
+-
+-	iov[1].iov_base = attrs;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_LIST_PLAYER_ATTRIBUTES,
+-				iov, 2);
+-}
+-
+-int avrcp_get_player_attribute_text_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *attrs, const char **text)
+-{
+-	struct iovec iov[1 + AVRCP_ATTRIBUTE_LAST * 2];
+-	struct text_value val[AVRCP_ATTRIBUTE_LAST];
+-	int i;
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	for (i = 0; i < number; i++) {
+-		uint8_t len = 0;
+-
+-		if (attrs[i] > AVRCP_ATTRIBUTE_LAST ||
+-					attrs[i] == AVRCP_ATTRIBUTE_ILEGAL)
+-			return -EINVAL;
+-
+-		if (text[i])
+-			len = strlen(text[i]);
+-
+-		val[i].attr = attrs[i];
+-		val[i].charset = cpu_to_be16(AVRCP_CHARSET_UTF8);
+-		val[i].len = len;
+-
+-		iov[i + 1].iov_base = &val[i];
+-		iov[i + 1].iov_len = sizeof(val[i]);
+-
+-		iov[i + 2].iov_base = (void *) text[i];
+-		iov[i + 2].iov_len = len;
+-	}
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-			AVC_SUBUNIT_PANEL, AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-			iov, 1 + i * 2);
+-}
+-
+-int avrcp_list_player_values_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *values)
+-{
+-	struct iovec iov[2];
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	iov[1].iov_base = values;
+-	iov[1].iov_len = number;
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_LIST_PLAYER_VALUES,
+-				iov, 2);
+-}
+-
+-int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+-				uint32_t position, uint32_t duration,
+-				uint8_t status)
+-{
+-	struct iovec iov;
+-	struct get_play_status_rsp rsp;
+-
+-	rsp.duration = cpu_to_be32(duration);
+-	rsp.position = cpu_to_be32(position);
+-	rsp.status = status;
+-
+-	iov.iov_base = &rsp;
+-	iov.iov_len = sizeof(rsp);
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_GET_PLAY_STATUS,
+-				&iov, 1);
+-}
+-
+-int avrcp_get_player_values_text_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *values, const char **text)
+-{
+-	struct iovec iov[1 + AVRCP_ATTRIBUTE_LAST * 2];
+-	struct text_value val[AVRCP_ATTRIBUTE_LAST];
+-	int i;
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	for (i = 0; i < number; i++) {
+-		uint8_t len = 0;
+-
+-		if (text[i])
+-			len = strlen(text[i]);
+-
+-		val[i].attr = values[i];
+-		val[i].charset = cpu_to_be16(AVRCP_CHARSET_UTF8);
+-		val[i].len = len;
+-
+-		iov[i + 1].iov_base = &val[i];
+-		iov[i + 1].iov_len = sizeof(val[i]);
+-
+-		iov[i + 2].iov_base = (void *) text[i];
+-		iov[i + 2].iov_len = len;
+-	}
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_GET_PLAYER_VALUE_TEXT,
+-				iov, 1 + i * 2);
+-}
+-
+-int avrcp_get_current_player_value_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *attrs, uint8_t *values)
+-{
+-	struct iovec iov[1 + AVRCP_ATTRIBUTE_LAST];
+-	struct attr_value val[AVRCP_ATTRIBUTE_LAST];
+-	int i;
+-
+-	if (number > AVRCP_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &number;
+-	iov[0].iov_len = sizeof(number);
+-
+-	for (i = 0; i < number; i++) {
+-		val[i].attr = attrs[i];
+-		val[i].value = values[i];
+-
+-		iov[i + 1].iov_base = &val[i];
+-		iov[i + 1].iov_len = sizeof(val[i]);
+-	}
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-			AVC_SUBUNIT_PANEL, AVRCP_GET_CURRENT_PLAYER_VALUE,
+-			iov, 1 + i);
+-}
+-
+-int avrcp_set_player_value_rsp(struct avrcp *session, uint8_t transaction)
+-{
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-			AVC_SUBUNIT_PANEL, AVRCP_SET_PLAYER_VALUE, NULL, 0);
+-}
+-
+-int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t *params, size_t params_len)
+-{
+-	struct iovec iov;
+-
+-	iov.iov_base = params;
+-	iov.iov_len = params_len;
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				&iov, 1);
+-}
+-
+-int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t code, uint8_t event,
+-					void *data, size_t len)
+-{
+-	struct iovec iov[2];
+-	uint16_t *player;
+-	uint8_t *volume;
+-
+-	if (event > AVRCP_EVENT_LAST)
+-		return -EINVAL;
+-
+-	iov[0].iov_base = &event;
+-	iov[0].iov_len = sizeof(event);
+-
+-	switch (event) {
+-	case AVRCP_EVENT_STATUS_CHANGED:
+-		if (len != sizeof(uint8_t))
+-			return -EINVAL;
+-		break;
+-	case AVRCP_EVENT_VOLUME_CHANGED:
+-		if (len != sizeof(uint8_t))
+-			return -EINVAL;
+-		volume = data;
+-		if (volume[0] > 127)
+-			return -EINVAL;
+-		break;
+-	case AVRCP_EVENT_TRACK_CHANGED:
+-		if (len != sizeof(uint64_t))
+-			return -EINVAL;
+-
+-		put_be64(*(uint64_t *) data, data);
+-		break;
+-	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
+-		if (len != sizeof(uint32_t))
+-			return -EINVAL;
+-
+-		put_be32(*(uint32_t *) data, data);
+-		break;
+-	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+-		if (len != 4)
+-			return -EINVAL;
+-
+-		player = data;
+-		player[0] = cpu_to_be16(player[0]);
+-		player[1] = cpu_to_be16(player[1]);
+-
+-		break;
+-	case AVRCP_EVENT_SETTINGS_CHANGED:
+-		if (len < sizeof(uint8_t))
+-			return -EINVAL;
+-		break;
+-	case AVRCP_EVENT_UIDS_CHANGED:
+-		if (len != sizeof(uint16_t))
+-			return -EINVAL;
+-
+-		put_be16(*(uint16_t *) data, data);
+-		break;
+-	default:
+-		return avrcp_send(session, transaction, code, AVC_SUBUNIT_PANEL,
+-					AVRCP_REGISTER_NOTIFICATION, iov, 1);
+-	}
+-
+-	iov[1].iov_base = data;
+-	iov[1].iov_len = len;
+-
+-	return avrcp_send(session, transaction, code, AVC_SUBUNIT_PANEL,
+-					AVRCP_REGISTER_NOTIFICATION, iov, 2);
+-}
+-
+-int avrcp_set_volume_rsp(struct avrcp *session, uint8_t transaction,
+-							uint8_t volume)
+-{
+-	struct iovec iov;
+-
+-	if (volume > 127)
+-		return -EINVAL;
+-
+-	iov.iov_base = &volume;
+-	iov.iov_len = sizeof(volume);
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_SET_ABSOLUTE_VOLUME,
+-				&iov, 1);
+-}
+-
+-int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
+-							uint8_t status)
+-{
+-	struct iovec iov;
+-
+-	iov.iov_base = &status;
+-	iov.iov_len = sizeof(status);
+-
+-	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+-				AVC_SUBUNIT_PANEL, AVRCP_SET_ADDRESSED_PLAYER,
+-				&iov, 1);
+-}
+-
+-static int avrcp_status_rsp(struct avrcp *session, uint8_t transaction,
+-						uint8_t pdu_id, uint8_t status)
+-{
+-	struct iovec iov;
+-
+-	if (status > AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED)
+-		return -EINVAL;
+-
+-	iov.iov_base = &status;
+-	iov.iov_len = sizeof(status);
+-
+-	return avrcp_send_browsing(session, transaction, pdu_id, &iov, 1);
+-}
+-
+-int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint16_t counter,
+-					uint32_t items, uint8_t depth,
+-					const char **folders)
+-{
+-	struct iovec iov[UINT8_MAX * 2 + 1];
+-	struct set_browsed_rsp rsp;
+-	uint16_t len[UINT8_MAX];
+-	int i;
+-
+-	if (status != AVRCP_STATUS_SUCCESS)
+-		return avrcp_status_rsp(session, transaction,
+-					AVRCP_SET_BROWSED_PLAYER, status);
+-
+-	rsp.status = status;
+-	rsp.counter = cpu_to_be16(counter);
+-	rsp.items = cpu_to_be32(items);
+-	rsp.charset = cpu_to_be16(AVRCP_CHARSET_UTF8);
+-	rsp.depth = depth;
+-
+-	iov[0].iov_base = &rsp;
+-	iov[0].iov_len = sizeof(rsp);
+-
+-	if (!depth)
+-		return avrcp_send_browsing(session, transaction,
+-						AVRCP_SET_BROWSED_PLAYER,
+-						iov, 1);
+-
+-	for (i = 0; i < depth; i++) {
+-		if (!folders[i])
+-			return -EINVAL;
+-
+-		len[i] = strlen(folders[i]);
+-
+-		iov[i * 2 + 2].iov_base = (void *) folders[i];
+-		iov[i * 2 + 2].iov_len = len[i];
+-
+-		len[i] = cpu_to_be16(len[i]);
+-
+-		iov[i * 2 + 1].iov_base = &len[i];
+-		iov[i * 2 + 1].iov_len = sizeof(len[i]);
+-	}
+-
+-	return avrcp_send_browsing(session, transaction,
+-					AVRCP_SET_BROWSED_PLAYER, iov,
+-					depth * 2 + 1);
+-}
+-
+-int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint16_t counter,
+-					uint8_t number, uint8_t *type,
+-					uint16_t *len, uint8_t **params)
+-{
+-	struct iovec iov[UINT8_MAX * 2 + 1];
+-	struct get_folder_items_rsp rsp;
+-	uint8_t item[UINT8_MAX][3];
+-	int i;
+-
+-	if (status != AVRCP_STATUS_SUCCESS)
+-		return avrcp_status_rsp(session, transaction,
+-					AVRCP_GET_FOLDER_ITEMS, status);
+-
+-	rsp.status = status;
+-	rsp.counter = cpu_to_be16(counter);
+-	rsp.number = cpu_to_be16(number);
+-
+-	iov[0].iov_base = &rsp;
+-	iov[0].iov_len = sizeof(rsp);
+-
+-	for (i = 0; i < number; i++) {
+-		item[i][0] = type[i];
+-		put_be16(len[i], &item[i][1]);
+-
+-		iov[i * 2 + 1].iov_base = item[i];
+-		iov[i * 2 + 1].iov_len = sizeof(item[i]);
+-
+-		iov[i * 2 + 2].iov_base = params[i];
+-		iov[i * 2 + 2].iov_len = len[i];
+-	}
+-
+-	return avrcp_send_browsing(session, transaction, AVRCP_GET_FOLDER_ITEMS,
+-							iov, number * 2 + 1);
+-}
+-
+-int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
+-						uint8_t status, uint32_t items)
+-{
+-	struct iovec iov;
+-	struct change_path_rsp rsp;
+-
+-	if (status != AVRCP_STATUS_SUCCESS)
+-		return avrcp_status_rsp(session, transaction, AVRCP_CHANGE_PATH,
+-									status);
+-
+-	rsp.status = status;
+-	rsp.items = cpu_to_be32(items);
+-
+-	iov.iov_base = &rsp;
+-	iov.iov_len = sizeof(rsp);
+-
+-	return avrcp_send_browsing(session, transaction, AVRCP_CHANGE_PATH,
+-								&iov, 1);
+-}
+-
+-static bool pack_attribute_list(struct iovec *iov, uint8_t number,
+-					uint32_t *attrs, const char **text)
+-{
+-	int i;
+-	struct media_item val[AVRCP_MEDIA_ATTRIBUTE_LAST];
+-
+-	for (i = 0; i < number; i++) {
+-		uint16_t len = 0;
+-
+-		if (attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST ||
+-				attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL)
+-			return false;
+-
+-		if (text[i])
+-			len = strlen(text[i]);
+-
+-		val[i].attr = cpu_to_be32(attrs[i]);
+-		val[i].charset = cpu_to_be16(AVRCP_CHARSET_UTF8);
+-		val[i].len = cpu_to_be16(len);
+-
+-		iov[i].iov_base = &val[i];
+-		iov[i].iov_len = sizeof(val[i]);
+-
+-		iov[i + 1].iov_base = (void *) text[i];
+-		iov[i + 1].iov_len = len;
+-	}
+-
+-	return true;
+-}
+-
+-int avrcp_get_item_attributes_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint8_t number,
+-					uint32_t *attrs, const char **text)
+-{
+-	struct iovec iov[AVRCP_MEDIA_ATTRIBUTE_LAST * 2 + 1];
+-	struct get_item_attributes_rsp rsp;
+-
+-	if (number > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -EINVAL;
+-
+-	if (status != AVRCP_STATUS_SUCCESS)
+-		return avrcp_status_rsp(session, transaction,
+-					AVRCP_GET_ITEM_ATTRIBUTES, status);
+-
+-	rsp.status = status;
+-	rsp.number = number;
+-
+-	iov[0].iov_base = &rsp;
+-	iov[0].iov_len = sizeof(rsp);
+-
+-	if (!pack_attribute_list(&iov[1], number, attrs, text))
+-		return -EINVAL;
+-
+-	return avrcp_send_browsing(session, transaction,
+-					AVRCP_GET_ITEM_ATTRIBUTES, iov,
+-					number * 2 + 1);
+-}
+-
+-int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction,
+-								uint8_t status)
+-{
+-	return avrcp_status_rsp(session, transaction, AVRCP_PLAY_ITEM,
+-								status);
+-}
+-
+-int avrcp_search_rsp(struct avrcp *session, uint8_t transaction, uint8_t status,
+-					uint16_t counter, uint32_t items)
+-{
+-	struct iovec iov;
+-	struct search_rsp rsp;
+-
+-	if (status != AVRCP_STATUS_SUCCESS)
+-		return avrcp_status_rsp(session, transaction, AVRCP_SEARCH,
+-								status);
+-
+-	rsp.status = status;
+-	rsp.counter = cpu_to_be16(counter);
+-	rsp.items = cpu_to_be32(items);
+-
+-	iov.iov_base = &rsp;
+-	iov.iov_len = sizeof(rsp);
+-
+-	return avrcp_send_browsing(session, transaction, AVRCP_SEARCH,
+-								&iov, 1);
+-}
+-
+-int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction,
+-								uint8_t status)
+-{
+-	return avrcp_status_rsp(session, transaction, AVRCP_ADD_TO_NOW_PLAYING,
+-								status);
+-}
+-
+-int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+-{
+-	uint8_t params[5];
+-
+-	if (!vendor)
+-		return avctp_send_passthrough(session->conn, op, NULL, 0);
+-
+-	hton24(params, vendor);
+-	put_be16(op, &params[3]);
+-
+-	return avctp_send_passthrough(session->conn, AVC_VENDOR_UNIQUE, params,
+-								sizeof(params));
+-}
+diff --git a/unit/avrcp-lib.h b/unit/avrcp-lib.h
+deleted file mode 100644
+index 5adb321880e8..000000000000
+--- a/unit/avrcp-lib.h
++++ /dev/null
+@@ -1,343 +0,0 @@
+-/* SPDX-License-Identifier: LGPL-2.1-or-later */
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+- *
+- *
+- */
+-
+-/* Control PDU ids */
+-#define AVRCP_GET_CAPABILITIES		0x10
+-#define AVRCP_LIST_PLAYER_ATTRIBUTES	0X11
+-#define AVRCP_LIST_PLAYER_VALUES	0x12
+-#define AVRCP_GET_CURRENT_PLAYER_VALUE	0x13
+-#define AVRCP_SET_PLAYER_VALUE		0x14
+-#define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT	0x15
+-#define AVRCP_GET_PLAYER_VALUE_TEXT	0x16
+-#define AVRCP_DISPLAYABLE_CHARSET	0x17
+-#define AVRCP_CT_BATTERY_STATUS		0x18
+-#define AVRCP_GET_ELEMENT_ATTRIBUTES	0x20
+-#define AVRCP_GET_PLAY_STATUS		0x30
+-#define AVRCP_REGISTER_NOTIFICATION	0x31
+-#define AVRCP_REQUEST_CONTINUING	0x40
+-#define AVRCP_ABORT_CONTINUING		0x41
+-#define AVRCP_SET_ABSOLUTE_VOLUME	0x50
+-#define AVRCP_SET_ADDRESSED_PLAYER	0x60
+-#define AVRCP_SET_BROWSED_PLAYER	0x70
+-#define AVRCP_GET_FOLDER_ITEMS		0x71
+-#define AVRCP_CHANGE_PATH		0x72
+-#define AVRCP_GET_ITEM_ATTRIBUTES	0x73
+-#define AVRCP_PLAY_ITEM			0x74
+-#define AVRCP_SEARCH			0x80
+-#define AVRCP_ADD_TO_NOW_PLAYING	0x90
+-#define AVRCP_GENERAL_REJECT		0xA0
+-
+-/* Notification events */
+-#define AVRCP_EVENT_STATUS_CHANGED		0x01
+-#define AVRCP_EVENT_TRACK_CHANGED		0x02
+-#define AVRCP_EVENT_TRACK_REACHED_END		0x03
+-#define AVRCP_EVENT_TRACK_REACHED_START		0x04
+-#define AVRCP_EVENT_PLAYBACK_POS_CHANGED	0x05
+-#define AVRCP_EVENT_SETTINGS_CHANGED		0x08
+-#define AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED	0x09
+-#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED	0x0a
+-#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED	0x0b
+-#define AVRCP_EVENT_UIDS_CHANGED		0x0c
+-#define AVRCP_EVENT_VOLUME_CHANGED		0x0d
+-#define AVRCP_EVENT_LAST			AVRCP_EVENT_VOLUME_CHANGED
+-
+-/* Status codes */
+-#define AVRCP_STATUS_INVALID_COMMAND		0x00
+-#define AVRCP_STATUS_INVALID_PARAM		0x01
+-#define AVRCP_STATUS_PARAM_NOT_FOUND		0x02
+-#define AVRCP_STATUS_INTERNAL_ERROR		0x03
+-#define AVRCP_STATUS_SUCCESS			0x04
+-#define AVRCP_STATUS_UID_CHANGED		0x05
+-#define AVRCP_STATUS_NOT_DIRECTORY		0x08
+-#define AVRCP_STATUS_DOES_NOT_EXIST		0x09
+-#define AVRCP_STATUS_INVALID_SCOPE		0x0a
+-#define AVRCP_STATUS_OUT_OF_BOUNDS		0x0b
+-#define AVRCP_STATUS_INVALID_PLAYER_ID		0x11
+-#define AVRCP_STATUS_PLAYER_NOT_BROWSABLE	0x12
+-#define AVRCP_STATUS_NO_AVAILABLE_PLAYERS	0x15
+-#define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED	0x16
+-
+-/* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+-#define CAP_COMPANY_ID				0x02
+-#define CAP_EVENTS_SUPPORTED			0x03
+-
+-/* Player Attributes */
+-#define AVRCP_ATTRIBUTE_ILEGAL			0x00
+-#define AVRCP_ATTRIBUTE_EQUALIZER		0x01
+-#define AVRCP_ATTRIBUTE_REPEAT_MODE		0x02
+-#define AVRCP_ATTRIBUTE_SHUFFLE			0x03
+-#define AVRCP_ATTRIBUTE_SCAN			0x04
+-#define AVRCP_ATTRIBUTE_LAST			AVRCP_ATTRIBUTE_SCAN
+-
+-/* equalizer values */
+-#define AVRCP_EQUALIZER_OFF		0x01
+-#define AVRCP_EQUALIZER_ON		0x02
+-
+-/* repeat mode values */
+-#define AVRCP_REPEAT_MODE_OFF		0x01
+-#define AVRCP_REPEAT_MODE_SINGLE	0x02
+-#define AVRCP_REPEAT_MODE_ALL		0x03
+-#define AVRCP_REPEAT_MODE_GROUP		0x04
+-
+-/* shuffle values */
+-#define AVRCP_SHUFFLE_OFF		0x01
+-#define AVRCP_SHUFFLE_ALL		0x02
+-#define AVRCP_SHUFFLE_GROUP		0x03
+-
+-/* scan values */
+-#define AVRCP_SCAN_OFF			0x01
+-#define AVRCP_SCAN_ALL			0x02
+-#define AVRCP_SCAN_GROUP		0x03
+-
+-/* media attributes */
+-#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL	0x00
+-#define AVRCP_MEDIA_ATTRIBUTE_TITLE	0x01
+-#define AVRCP_MEDIA_ATTRIBUTE_ARTIST	0x02
+-#define AVRCP_MEDIA_ATTRIBUTE_ALBUM	0x03
+-#define AVRCP_MEDIA_ATTRIBUTE_TRACK	0x04
+-#define AVRCP_MEDIA_ATTRIBUTE_N_TRACKS	0x05
+-#define AVRCP_MEDIA_ATTRIBUTE_GENRE	0x06
+-#define AVRCP_MEDIA_ATTRIBUTE_DURATION	0x07
+-#define AVRCP_MEDIA_ATTRIBUTE_LAST	AVRCP_MEDIA_ATTRIBUTE_DURATION
+-
+-/* Media Scope */
+-#define AVRCP_MEDIA_PLAYER_LIST			0x00
+-#define AVRCP_MEDIA_PLAYER_VFS			0x01
+-#define AVRCP_MEDIA_SEARCH			0x02
+-#define AVRCP_MEDIA_NOW_PLAYING			0x03
+-
+-/* SDP features */
+-#define AVRCP_FEATURE_CATEGORY_1	0x0001
+-#define AVRCP_FEATURE_CATEGORY_2	0x0002
+-#define AVRCP_FEATURE_CATEGORY_3	0x0004
+-#define AVRCP_FEATURE_CATEGORY_4	0x0008
+-#define AVRCP_FEATURE_PLAYER_SETTINGS	0x0010
+-#define AVRCP_FEATURE_GROUP_NAVIGATION	0x0020
+-#define AVRCP_FEATURE_BROWSING		0x0040
+-#define AVRCP_FEATURE_MULTIPLE_PLAYERS	0x0080
+-
+-/* Company IDs for vendor dependent commands */
+-#define IEEEID_BTSIG		0x001958
+-
+-struct avrcp;
+-
+-struct avrcp_control_ind {
+-	int (*get_capabilities) (struct avrcp *session, uint8_t transaction,
+-							void *user_data);
+-	int (*list_attributes) (struct avrcp *session, uint8_t transaction,
+-							void *user_data);
+-	int (*get_attribute_text) (struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs,
+-					void *user_data);
+-	int (*list_values) (struct avrcp *session, uint8_t transaction,
+-					uint8_t attr, void *user_data);
+-	int (*get_value_text) (struct avrcp *session, uint8_t transaction,
+-					uint8_t attr, uint8_t number,
+-					uint8_t *values, void *user_data);
+-	int (*get_value) (struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs,
+-					void *user_data);
+-	int (*set_value) (struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs,
+-					uint8_t *values, void *user_data);
+-	int (*get_play_status) (struct avrcp *session, uint8_t transaction,
+-					void *user_data);
+-	int (*get_element_attributes) (struct avrcp *session,
+-					uint8_t transaction, uint64_t uid,
+-					uint8_t number, uint32_t *attrs,
+-					void *user_data);
+-	int (*register_notification) (struct avrcp *session,
+-					uint8_t transaction, uint8_t event,
+-					uint32_t interval, void *user_data);
+-	int (*set_volume) (struct avrcp *session, uint8_t transaction,
+-					uint8_t volume, void *user_data);
+-	int (*set_addressed) (struct avrcp *session, uint8_t transaction,
+-					uint16_t id, void *user_data);
+-	int (*set_browsed) (struct avrcp *session, uint8_t transaction,
+-					uint16_t id, void *user_data);
+-	int (*get_folder_items) (struct avrcp *session, uint8_t transaction,
+-					uint8_t scope, uint32_t start,
+-					uint32_t end, uint16_t number,
+-					uint32_t *attrs, void *user_data);
+-	int (*change_path) (struct avrcp *session, uint8_t transaction,
+-					uint16_t counter, uint8_t direction,
+-					uint64_t uid, void *user_data);
+-	int (*get_item_attributes) (struct avrcp *session, uint8_t transaction,
+-					uint8_t scope, uint64_t uid,
+-					uint16_t counter, uint8_t number,
+-					uint32_t *attrs, void *user_data);
+-	int (*play_item) (struct avrcp *session, uint8_t transaction,
+-					uint8_t scope, uint64_t uid,
+-					uint16_t counter, void *user_data);
+-	int (*search) (struct avrcp *session, uint8_t transaction,
+-					const char *string, void *user_data);
+-	int (*add_to_now_playing) (struct avrcp *session, uint8_t transaction,
+-					uint8_t scope, uint64_t uid,
+-					uint16_t counter, void *user_data);
+-};
+-
+-struct avrcp_control_cfm {
+-	void (*get_capabilities) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *params,
+-					void *user_data);
+-	void (*list_attributes) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *attrs,
+-					void *user_data);
+-	void (*get_attribute_text) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *attrs,
+-					char **text, void *user_data);
+-	void (*list_values) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *values,
+-					void *user_data);
+-	void (*get_value_text) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *values,
+-					char **text, void *user_data);
+-	void (*get_value) (struct avrcp *session, int err,
+-					uint8_t number, uint8_t *attrs,
+-					uint8_t *values, void *user_data);
+-	void (*set_value) (struct avrcp *session, int err, void *user_data);
+-	void (*get_play_status) (struct avrcp *session, int err,
+-					uint8_t status, uint32_t position,
+-					uint32_t duration, void *user_data);
+-	void (*get_element_attributes) (struct avrcp *session, int err,
+-					uint8_t number, uint32_t *attrs,
+-					char **text, void *user_data);
+-	bool (*register_notification) (struct avrcp *session, int err,
+-					uint8_t code, uint8_t event,
+-					void *params, void *user_data);
+-	void (*set_volume) (struct avrcp *session, int err, uint8_t volume,
+-					void *user_data);
+-	void (*set_addressed) (struct avrcp *session, int err,
+-					void *user_data);
+-	void (*set_browsed) (struct avrcp *session, int err,
+-					uint16_t counter, uint32_t items,
+-					char *path, void *user_data);
+-	void (*get_folder_items) (struct avrcp *session, int err,
+-					uint16_t counter, uint16_t number,
+-					uint8_t *params, void *user_data);
+-	void (*change_path) (struct avrcp *session, int err,
+-					uint32_t items, void *user_data);
+-	void (*get_item_attributes) (struct avrcp *session, int err,
+-					uint8_t number, uint32_t *attrs,
+-					char **text, void *user_data);
+-	void (*play_item) (struct avrcp *session, int err, void *user_data);
+-	void (*search) (struct avrcp *session, int err, uint16_t counter,
+-					uint32_t items, void *user_data);
+-	void (*add_to_now_playing) (struct avrcp *session, int err,
+-					void *user_data);
+-};
+-
+-struct avrcp_passthrough_handler {
+-	uint8_t op;
+-	bool (*func) (struct avrcp *session, bool pressed, void *user_data);
+-};
+-
+-typedef void (*avrcp_destroy_cb_t) (void *user_data);
+-
+-struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
+-void avrcp_shutdown(struct avrcp *session);
+-void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+-							void *user_data);
+-int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
+-								size_t omtu);
+-
+-void avrcp_register_player(struct avrcp *session,
+-				const struct avrcp_control_ind *ind,
+-				const struct avrcp_control_cfm *cfm,
+-				void *user_data);
+-void avrcp_set_passthrough_handlers(struct avrcp *session,
+-			const struct avrcp_passthrough_handler *handlers,
+-			void *user_data);
+-int avrcp_init_uinput(struct avrcp *session, const char *name,
+-							const char *address);
+-int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+-					uint8_t subunit, uint8_t pdu_id,
+-					const struct iovec *iov, int iov_cnt);
+-int avrcp_get_capabilities(struct avrcp *session, uint8_t param);
+-int avrcp_register_notification(struct avrcp *session, uint8_t event,
+-							uint32_t interval);
+-int avrcp_list_player_attributes(struct avrcp *session);
+-int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t number,
+-							uint8_t *attrs);
+-int avrcp_list_player_values(struct avrcp *session, uint8_t attr);
+-int avrcp_get_player_value_text(struct avrcp *session, uint8_t attr,
+-					uint8_t number, uint8_t *values);
+-int avrcp_set_player_value(struct avrcp *session, uint8_t number,
+-					uint8_t *attrs, uint8_t *values);
+-int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
+-							uint8_t *attrs);
+-int avrcp_get_play_status(struct avrcp *session);
+-int avrcp_set_volume(struct avrcp *session, uint8_t volume);
+-int avrcp_get_element_attributes(struct avrcp *session);
+-int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id);
+-int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id);
+-int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
+-				uint32_t start, uint32_t end, uint8_t number,
+-				uint32_t *attrs);
+-int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
+-							uint16_t counter);
+-int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
+-				uint64_t uid, uint16_t counter, uint8_t number,
+-				uint32_t *attrs);
+-int avrcp_play_item(struct avrcp *session, uint8_t scope, uint64_t uid,
+-							uint16_t counter);
+-int avrcp_search(struct avrcp *session, const char *string);
+-int avrcp_add_to_now_playing(struct avrcp *session, uint8_t scope, uint64_t uid,
+-							uint16_t counter);
+-
+-int avrcp_get_capabilities_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *events);
+-int avrcp_list_player_attributes_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs);
+-int avrcp_get_player_attribute_text_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *attrs, const char **text);
+-int avrcp_list_player_values_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *values);
+-int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+-				uint32_t position, uint32_t duration,
+-				uint8_t status);
+-int avrcp_get_player_values_text_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *values, const char **text);
+-int avrcp_get_current_player_value_rsp(struct avrcp *session,
+-					uint8_t transaction, uint8_t number,
+-					uint8_t *attrs, uint8_t *values);
+-int avrcp_set_player_value_rsp(struct avrcp *session, uint8_t transaction);
+-int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t *params, size_t params_len);
+-int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t code, uint8_t event,
+-					void *data, size_t len);
+-int avrcp_set_volume_rsp(struct avrcp *session, uint8_t transaction,
+-							uint8_t volume);
+-int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
+-							uint8_t status);
+-int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint16_t counter,
+-					uint32_t items, uint8_t depth,
+-					const char **folders);
+-int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint16_t counter,
+-					uint8_t number, uint8_t *type,
+-					uint16_t *len, uint8_t **params);
+-int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
+-						uint8_t status, uint32_t items);
+-int avrcp_get_item_attributes_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status, uint8_t number,
+-					uint32_t *attrs, const char **text);
+-int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction,
+-					uint8_t status);
+-int avrcp_search_rsp(struct avrcp *session, uint8_t transaction, uint8_t status,
+-					uint16_t counter, uint32_t items);
+-int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction,
+-								uint8_t status);
+-
+-int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-new file mode 100644
-index 000000000000..a100b2d68e35
---- /dev/null
-+++ b/unit/test-avrcp.c
-@@ -0,0 +1,76 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Red Hat Inc.
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/log.h"
-+
-+#include "profiles/audio/avrcp-parse.h"
-+
-+static void avrcp_element_name_oob(gconstpointer data)
-+{
-+	char name[255];
-+	uint16_t namesize;
-+	gboolean ret;
-+
-+	/* Crafting a malicious payload.
-+	 * Actual packet length (len) = 14 bytes */
-+	uint8_t malicious_packet[14] = {0};
-+
-+	/* Specify namesize = 1000 (0x03E8 in Big Endian) at offset 11 */
-+	malicious_packet[11] = 0x03;
-+	malicious_packet[12] = 0xE8;
-+
-+	/* Launching the PoC. We transmit a 14-byte packet, but namesize=1000... */
-+	ret = parse_media_element_name(malicious_packet, sizeof(malicious_packet),
-+				       name, &namesize);
-+	if (ret)
-+		tester_test_passed();
-+	else
-+		tester_test_failed();
-+}
-+
-+static void avrcp_folder_name_oob(gconstpointer data)
-+{
-+	char name[255];
-+	gboolean ret;
-+
-+	/* Crafting a malicious payload.
-+	 * Actual packet length (len) = 14 bytes */
-+	uint8_t malicious_packet[14] = {0};
-+
-+	/* Specify namesize = 1000 (0x03E8 in Big Endian) at offset 12 */
-+	malicious_packet[12] = 0x03;
-+	malicious_packet[13] = 0xE8;
-+
-+	/* Launching the PoC. We transmit a 14-byte packet, but namesize=1000... */
-+	ret = parse_media_folder_name(malicious_packet, sizeof(malicious_packet),
-+				      name);
-+	if (ret)
-+		tester_test_passed();
-+	else
-+		tester_test_failed();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+
-+	tester_add("/avrcp-element-name-oob", NULL, NULL, avrcp_element_name_oob, NULL);
-+	tester_add("/avrcp-folder-name-oob", NULL, NULL, avrcp_folder_name_oob, NULL);
-+
-+	return tester_run();
-+}
+deleted file mode 100644
+index 7bed8fbaf74a..000000000000
+--- a/unit/test-avrcp.c
++++ /dev/null
+@@ -1,2084 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+- *
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <unistd.h>
+-#include <stdlib.h>
+-#include <stdbool.h>
+-#include <inttypes.h>
+-#include <string.h>
+-#include <fcntl.h>
+-#include <errno.h>
+-#include <sys/socket.h>
+-
+-#include <glib.h>
+-
+-#include "src/shared/util.h"
+-#include "src/shared/tester.h"
+-#include "src/log.h"
+-#include "bluetooth/bluetooth.h"
+-
+-#include "unit/avctp.h"
+-#include "unit/avrcp-lib.h"
+-
+-struct test_pdu {
+-	bool valid;
+-	bool fragmented;
+-	bool continuing;
+-	bool browse;
+-	uint8_t *data;
+-	size_t size;
+-};
+-
+-struct test_data {
+-	char *test_name;
+-	struct test_pdu *pdu_list;
+-};
+-
+-struct context {
+-	struct avrcp *session;
+-	guint source;
+-	guint browse_source;
+-	guint process;
+-	int fd;
+-	int browse_fd;
+-	unsigned int pdu_offset;
+-	const struct test_data *data;
+-};
+-
+-#define data(args...) ((const unsigned char[]) { args })
+-
+-#define raw_pdu(args...)					\
+-	{							\
+-		.valid = true,					\
+-		.data = util_memdup(data(args), sizeof(data(args))), \
+-		.size = sizeof(data(args)),			\
+-	}
+-
+-#define brs_pdu(args...)					\
+-	{							\
+-		.valid = true,					\
+-		.browse = true,					\
+-		.data = util_memdup(data(args), sizeof(data(args))), \
+-		.size = sizeof(data(args)),			\
+-	}
+-
+-#define frg_pdu(args...)					\
+-	{							\
+-		.valid = true,					\
+-		.fragmented = true,				\
+-		.data = util_memdup(data(args), sizeof(data(args))), \
+-		.size = sizeof(data(args)),			\
+-	}
+-
+-#define cont_pdu(args...)					\
+-	{							\
+-		.valid = true,					\
+-		.continuing = true,				\
+-		.data = util_memdup(data(args), sizeof(data(args))), \
+-		.size = sizeof(data(args)),			\
+-	}
+-
+-#define define_test(name, function, args...)				\
+-	do {								\
+-		const struct test_pdu pdus[] = {			\
+-			args, { }					\
+-		};							\
+-		static struct test_data data;				\
+-		data.test_name = g_strdup(name);			\
+-		data.pdu_list = util_memdup(pdus, sizeof(pdus));	\
+-		tester_add(name, &data, NULL, function, NULL);		\
+-	} while (0)
+-
+-static void test_free(gconstpointer user_data)
+-{
+-	const struct test_data *data = user_data;
+-	struct test_pdu *pdu;
+-	int i;
+-
+-	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
+-		g_free(pdu->data);
+-
+-	g_free(data->test_name);
+-	g_free(data->pdu_list);
+-}
+-
+-static void destroy_context(struct context *context)
+-{
+-	if (context->source > 0)
+-		g_source_remove(context->source);
+-
+-	if (context->browse_source > 0)
+-		g_source_remove(context->browse_source);
+-
+-	avrcp_shutdown(context->session);
+-
+-	test_free(context->data);
+-	g_free(context);
+-}
+-
+-static gboolean context_quit(gpointer user_data)
+-{
+-	struct context *context = user_data;
+-
+-	if (context->process > 0)
+-		g_source_remove(context->process);
+-
+-	destroy_context(context);
+-
+-	tester_test_passed();
+-
+-	return FALSE;
+-}
+-
+-static gboolean send_pdu(gpointer user_data)
+-{
+-	struct context *context = user_data;
+-	const struct test_pdu *pdu;
+-	ssize_t len;
+-
+-	pdu = &context->data->pdu_list[context->pdu_offset++];
+-
+-	if (pdu->browse) {
+-		len = write(context->browse_fd, pdu->data, pdu->size);
+-		tester_monitor('<', 0x0000, 0x001b, pdu->data, len);
+-	} else {
+-		len = write(context->fd, pdu->data, pdu->size);
+-		tester_monitor('<', 0x0000, 0x0017, pdu->data, len);
+-	}
+-
+-	g_assert_cmpint(len, ==, pdu->size);
+-
+-	if (pdu->fragmented)
+-		return send_pdu(user_data);
+-
+-	context->process = 0;
+-	return FALSE;
+-}
+-
+-static void context_process(struct context *context)
+-{
+-	if (!context->data->pdu_list[context->pdu_offset].valid) {
+-		context_quit(context);
+-		return;
+-	}
+-
+-	context->process = g_idle_add(send_pdu, context);
+-}
+-
+-static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+-							gpointer user_data)
+-{
+-	struct context *context = user_data;
+-	const struct test_pdu *pdu;
+-	unsigned char buf[512];
+-	ssize_t len;
+-	int fd;
+-
+-	pdu = &context->data->pdu_list[context->pdu_offset++];
+-
+-	g_assert(!pdu->browse);
+-
+-	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		context->source = 0;
+-		tester_debug("%s: cond %x\n", __func__, cond);
+-		return FALSE;
+-	}
+-
+-	fd = g_io_channel_unix_get_fd(channel);
+-
+-	len = read(fd, buf, sizeof(buf));
+-
+-	g_assert(len > 0);
+-
+-	tester_monitor('>', 0x0000, 0x0017, buf, len);
+-
+-	if (!pdu->continuing)
+-		g_assert_cmpint(len, ==, pdu->size);
+-
+-	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
+-
+-	if (!pdu->fragmented)
+-		context_process(context);
+-
+-	return TRUE;
+-}
+-
+-static gboolean browse_test_handler(GIOChannel *channel, GIOCondition cond,
+-							gpointer user_data)
+-{
+-	struct context *context = user_data;
+-	const struct test_pdu *pdu;
+-	unsigned char buf[512];
+-	ssize_t len;
+-	int fd;
+-
+-	pdu = &context->data->pdu_list[context->pdu_offset++];
+-
+-	g_assert(pdu->browse);
+-
+-	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		context->browse_source = 0;
+-		tester_debug("%s: cond %x\n", __func__, cond);
+-		return FALSE;
+-	}
+-
+-	fd = g_io_channel_unix_get_fd(channel);
+-
+-	len = read(fd, buf, sizeof(buf));
+-
+-	g_assert(len > 0);
+-
+-	tester_monitor('>', 0x0000, 0x001b, buf, len);
+-
+-	g_assert_cmpint(len, ==, pdu->size);
+-
+-	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
+-
+-	if (!pdu->fragmented)
+-		context_process(context);
+-
+-	return TRUE;
+-}
+-
+-static struct context *create_context(uint16_t version, gconstpointer data)
+-{
+-	struct context *context = g_new0(struct context, 1);
+-	GIOChannel *channel;
+-	int err, sv[2];
+-
+-	/* Control channel setup */
+-
+-	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+-	g_assert(!err);
+-
+-	context->session = avrcp_new(sv[0], 672, 672, version);
+-	g_assert(context->session != NULL);
+-
+-	channel = g_io_channel_unix_new(sv[1]);
+-
+-	g_io_channel_set_close_on_unref(channel, TRUE);
+-	g_io_channel_set_encoding(channel, NULL, NULL);
+-	g_io_channel_set_buffered(channel, FALSE);
+-
+-	context->source = g_io_add_watch(channel,
+-				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-				test_handler, context);
+-	g_assert(context->source > 0);
+-
+-	g_io_channel_unref(channel);
+-
+-	context->fd = sv[1];
+-
+-	/* Browsing channel setup */
+-
+-	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+-	g_assert(!err);
+-
+-	err = avrcp_connect_browsing(context->session, sv[0], 672, 672);
+-	g_assert(!err);
+-
+-	channel = g_io_channel_unix_new(sv[1]);
+-
+-	g_io_channel_set_close_on_unref(channel, TRUE);
+-	g_io_channel_set_encoding(channel, NULL, NULL);
+-	g_io_channel_set_buffered(channel, FALSE);
+-
+-	context->browse_source = g_io_add_watch(channel,
+-				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-				browse_test_handler, context);
+-	g_assert(context->browse_source > 0);
+-
+-	g_io_channel_unref(channel);
+-
+-	context->browse_fd = sv[1];
+-
+-	context->data = data;
+-
+-	return context;
+-}
+-
+-static void test_dummy(gconstpointer data)
+-{
+-	struct context *context =  create_context(0x0100, data);
+-
+-	context_quit(context);
+-}
+-
+-static bool handle_play(struct avrcp *session, bool pressed, void *user_data)
+-{
+-	return true;
+-}
+-
+-static bool handle_volume_up(struct avrcp *session, bool pressed,
+-							void *user_data)
+-{
+-	return true;
+-}
+-
+-static bool handle_channel_up(struct avrcp *session, bool pressed,
+-							void *user_data)
+-{
+-	return true;
+-}
+-
+-static bool handle_select(struct avrcp *session, bool pressed, void *user_data)
+-{
+-	return true;
+-}
+-
+-static bool handle_vendor_uniq(struct avrcp *session, bool pressed,
+-								void *user_data)
+-{
+-	return true;
+-}
+-
+-static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+-		{ AVC_PLAY, handle_play },
+-		{ AVC_VOLUME_UP, handle_volume_up },
+-		{ AVC_CHANNEL_UP, handle_channel_up },
+-		{ AVC_SELECT, handle_select },
+-		{ AVC_VENDOR_UNIQUE, handle_vendor_uniq },
+-		{ },
+-};
+-
+-static int get_capabilities(struct avrcp *session, uint8_t transaction,
+-							void *user_data)
+-{
+-	return -EINVAL;
+-}
+-
+-static int list_attributes(struct avrcp *session, uint8_t transaction,
+-							void *user_data)
+-{
+-	avrcp_list_player_attributes_rsp(session, transaction, 0, NULL);
+-
+-	return 0;
+-}
+-
+-static int get_attribute_text(struct avrcp *session, uint8_t transaction,
+-					uint8_t number, uint8_t *attrs,
+-					void *user_data)
+-{
+-	const char *text[number];
+-
+-	if (number) {
+-		memset(text, 0, number);
+-		text[0] = "equalizer";
+-	}
+-
+-	avrcp_get_player_attribute_text_rsp(session, transaction, number, attrs,
+-									text);
+-
+-	return 0;
+-}
+-
+-static int list_values(struct avrcp *session, uint8_t transaction,
+-						uint8_t attr, void *user_data)
+-{
+-	avrcp_list_player_values_rsp(session, transaction, 0, NULL);
+-
+-	return -EINVAL;
+-}
+-
+-static int get_value_text(struct avrcp *session, uint8_t transaction,
+-				uint8_t attr, uint8_t number, uint8_t *values,
+-				void *user_data)
+-{
+-	const char *text[number];
+-
+-	if (number) {
+-		memset(text, 0, number);
+-		text[0] = "on";
+-	}
+-
+-	avrcp_get_player_values_text_rsp(session, transaction, number,
+-								values, text);
+-
+-	return -EINVAL;
+-}
+-
+-static int get_value(struct avrcp *session, uint8_t transaction,
+-			uint8_t number, uint8_t *attrs, void *user_data)
+-{
+-	uint8_t values[number];
+-
+-	memset(values, 0, number);
+-
+-	avrcp_get_current_player_value_rsp(session, transaction, number, attrs,
+-									values);
+-
+-	return 0;
+-}
+-
+-static int set_value(struct avrcp *session, uint8_t transaction,
+-			uint8_t number, uint8_t *attrs, uint8_t *values,
+-			void *user_data)
+-{
+-	avrcp_set_player_value_rsp(session, transaction);
+-
+-	return 0;
+-}
+-
+-static int get_play_status(struct avrcp *session, uint8_t transaction,
+-							void *user_data)
+-{
+-	avrcp_get_play_status_rsp(session, transaction, 0xaaaaaaaa, 0xbbbbbbbb,
+-									0x00);
+-
+-	return 0;
+-}
+-
+-static int get_element_attributes(struct avrcp *session, uint8_t transaction,
+-					uint64_t uid, uint8_t number,
+-					uint32_t *attrs, void *user_data)
+-{
+-	struct context *context = user_data;
+-
+-	if (g_str_has_prefix(context->data->test_name, "/TP/RCR")) {
+-		uint8_t params[1024];
+-
+-		memset(params, 0x00, sizeof(params) / 2);
+-		memset(params + (sizeof(params) / 2), 0xff, sizeof(params) / 2);
+-
+-		avrcp_get_element_attrs_rsp(session, transaction, params,
+-							sizeof(params));
+-	} else
+-		avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
+-
+-	return 0;
+-}
+-
+-static int track_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	struct context *context = user_data;
+-	uint64_t track;
+-
+-	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-05-C") ||
+-		g_str_equal(context->data->test_name, "/TP/NFY/BV-08-C"))
+-		memset(&track, 0, sizeof(track));
+-	else
+-		memset(&track, 0xff, sizeof(track));
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-						AVRCP_EVENT_TRACK_CHANGED,
+-						&track, sizeof(track));
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-						AVRCP_EVENT_TRACK_CHANGED,
+-						&track, sizeof(track));
+-
+-	return 0;
+-}
+-
+-static int settings_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	uint8_t settings[3];
+-
+-	settings[0] = 0x01;
+-	settings[1] = 0x01;
+-	settings[2] = 0x02;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-						AVRCP_EVENT_SETTINGS_CHANGED,
+-						settings, sizeof(settings));
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-						AVRCP_EVENT_SETTINGS_CHANGED,
+-						settings, sizeof(settings));
+-
+-	return 0;
+-}
+-
+-static int available_players_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-					AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED,
+-					NULL, 0);
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-					AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED,
+-					NULL, 0);
+-
+-	return 0;
+-}
+-
+-static int addressed_player_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	uint16_t player[2];
+-
+-	player[0] = 0x0001;
+-	player[1] = 0x0001;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-					AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED,
+-					player, sizeof(player));
+-
+-	player[0] = 0x0200;
+-	player[1] = 0x0200;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-					AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED,
+-					player, sizeof(player));
+-
+-	return 0;
+-}
+-
+-static int uids_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	struct context *context = user_data;
+-	uint16_t counter;
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-09-C"))
+-		counter = 0x0000;
+-	else
+-		counter = 0x0001;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-						AVRCP_EVENT_UIDS_CHANGED,
+-						&counter, sizeof(counter));
+-
+-	if (!g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-11-C") &&
+-		!g_str_equal(context->data->test_name, "/TP/MCN/CB/BI-05-C"))
+-		return 0;
+-
+-	counter = 0x0200;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-						AVRCP_EVENT_UIDS_CHANGED,
+-						&counter, sizeof(counter));
+-
+-	return 0;
+-}
+-
+-static int now_playing_content_changed(struct avrcp *session,
+-					uint8_t transaction, uint32_t interval,
+-					void *user_data)
+-{
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-					AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED,
+-					NULL, 0);
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-					AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED,
+-					NULL, 0);
+-
+-	return 0;
+-}
+-
+-static int volume_changed(struct avrcp *session, uint8_t transaction,
+-					uint32_t interval, void *user_data)
+-{
+-	uint8_t volume = 0x00;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
+-					AVRCP_EVENT_VOLUME_CHANGED,
+-					&volume, sizeof(volume));
+-
+-	volume = 0x01;
+-
+-	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
+-					AVRCP_EVENT_VOLUME_CHANGED,
+-					&volume, sizeof(volume));
+-
+-	return 0;
+-}
+-
+-static int register_notification(struct avrcp *session, uint8_t transaction,
+-					uint8_t event, uint32_t interval,
+-					void *user_data)
+-{
+-	switch (event) {
+-	case AVRCP_EVENT_TRACK_CHANGED:
+-		return track_changed(session, transaction, interval, user_data);
+-	case AVRCP_EVENT_SETTINGS_CHANGED:
+-		return settings_changed(session, transaction, interval,
+-								user_data);
+-	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+-		return available_players_changed(session, transaction, interval,
+-								user_data);
+-	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+-		return addressed_player_changed(session, transaction, interval,
+-								user_data);
+-	case AVRCP_EVENT_UIDS_CHANGED:
+-		return uids_changed(session, transaction, interval, user_data);
+-	case AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED:
+-		return now_playing_content_changed(session, transaction,
+-							interval, user_data);
+-	case AVRCP_EVENT_VOLUME_CHANGED:
+-		return volume_changed(session, transaction,
+-							interval, user_data);
+-	default:
+-		return -EINVAL;
+-	}
+-}
+-
+-static int set_volume(struct avrcp *session, uint8_t transaction,
+-					uint8_t volume, void *user_data)
+-{
+-	avrcp_set_volume_rsp(session, transaction, volume);
+-
+-	return 0;
+-}
+-
+-static int set_addressed(struct avrcp *session, uint8_t transaction,
+-						uint16_t id, void *user_data)
+-{
+-	struct context *context = user_data;
+-	uint8_t status;
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BI-01-C"))
+-		status = AVRCP_STATUS_INVALID_PLAYER_ID;
+-	else
+-		status = AVRCP_STATUS_SUCCESS;
+-
+-	avrcp_set_addressed_player_rsp(session, transaction, status);
+-
+-	return 0;
+-}
+-
+-static int set_browsed(struct avrcp *session, uint8_t transaction,
+-						uint16_t id, void *user_data)
+-{
+-	struct context *context = user_data;
+-	const char *folders[1] = { "Filesystem" };
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BI-02-C"))
+-		avrcp_set_browsed_player_rsp(session, transaction,
+-						AVRCP_STATUS_INVALID_PLAYER_ID,
+-						0, 0, 0, NULL);
+-	else
+-		avrcp_set_browsed_player_rsp(session, transaction,
+-						AVRCP_STATUS_SUCCESS,
+-						0xabcd, 0, 1, folders);
+-
+-	return 0;
+-}
+-
+-static int get_folder_items(struct avrcp *session, uint8_t transaction,
+-				uint8_t scope, uint32_t start, uint32_t end,
+-				uint16_t number, uint32_t *attrs,
+-				void *user_data)
+-{
+-	struct context *context = user_data;
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BI-02-C"))
+-		return -ERANGE;
+-
+-	if (start > 1)
+-		return -ERANGE;
+-
+-	avrcp_get_folder_items_rsp(session, transaction, AVRCP_STATUS_SUCCESS,
+-						0xabcd, 0, NULL, NULL, NULL);
+-
+-	return 0;
+-}
+-
+-static int change_path(struct avrcp *session, uint8_t transaction,
+-					uint16_t counter, uint8_t direction,
+-					uint64_t uid, void *user_data)
+-{
+-	if (!uid)
+-		return -ENOTDIR;
+-
+-	avrcp_change_path_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0);
+-
+-	return 0;
+-}
+-
+-static int get_item_attributes(struct avrcp *session, uint8_t transaction,
+-					uint8_t scope, uint64_t uid,
+-					uint16_t counter, uint8_t number,
+-					uint32_t *attrs, void *user_data)
+-{
+-	struct context *context = user_data;
+-	uint8_t status;
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BI-05-C"))
+-		status = AVRCP_STATUS_UID_CHANGED;
+-	else
+-		status = AVRCP_STATUS_SUCCESS;
+-
+-	avrcp_get_item_attributes_rsp(session, transaction, status, 0, NULL,
+-									NULL);
+-
+-	return 0;
+-}
+-
+-static int play_item(struct avrcp *session, uint8_t transaction, uint8_t scope,
+-			uint64_t uid, uint16_t counter, void *user_data)
+-{
+-	if (!uid)
+-		return -ENOENT;
+-
+-	avrcp_play_item_rsp(session, transaction, AVRCP_STATUS_SUCCESS);
+-
+-	return 0;
+-}
+-
+-static int search(struct avrcp *session, uint8_t transaction,
+-					const char *string, void *user_data)
+-{
+-	avrcp_search_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0xaabb, 0);
+-
+-	return 0;
+-}
+-
+-static int add_to_now_playing(struct avrcp *session, uint8_t transaction,
+-				uint8_t scope, uint64_t uid, uint16_t counter,
+-				void *user_data)
+-{
+-	if (!uid)
+-		return -ENOENT;
+-
+-	avrcp_add_to_now_playing_rsp(session, transaction,
+-							AVRCP_STATUS_SUCCESS);
+-
+-	return 0;
+-}
+-
+-static const struct avrcp_control_ind control_ind = {
+-	.get_capabilities = get_capabilities,
+-	.list_attributes = list_attributes,
+-	.get_attribute_text = get_attribute_text,
+-	.list_values = list_values,
+-	.get_value_text = get_value_text,
+-	.get_value = get_value,
+-	.set_value = set_value,
+-	.get_play_status = get_play_status,
+-	.get_element_attributes = get_element_attributes,
+-	.register_notification = register_notification,
+-	.set_volume = set_volume,
+-	.set_addressed = set_addressed,
+-	.set_browsed = set_browsed,
+-	.get_folder_items = get_folder_items,
+-	.change_path = change_path,
+-	.get_item_attributes = get_item_attributes,
+-	.play_item = play_item,
+-	.search = search,
+-	.add_to_now_playing = add_to_now_playing,
+-};
+-
+-static void test_server(gconstpointer data)
+-{
+-	struct context *context = create_context(0x0100, data);
+-
+-	avrcp_set_passthrough_handlers(context->session, passthrough_handlers,
+-								context);
+-	avrcp_register_player(context->session, &control_ind, NULL, context);
+-
+-	g_idle_add(send_pdu, context);
+-}
+-
+-static void get_folder_items_rsp(struct avrcp *session, int err,
+-					uint16_t counter, uint16_t number,
+-					uint8_t *params, void *user_data)
+-{
+-	struct context *context = user_data;
+-
+-	g_assert_cmpint(err, ==, 0);
+-	g_assert_cmpint(counter, ==, 0xabcd);
+-	g_assert_cmpint(number, ==, 0);
+-
+-	context_quit(context);
+-}
+-
+-static void set_volume_rsp(struct avrcp *session, int err, uint8_t volume,
+-							void *user_data)
+-{
+-	struct context *context = user_data;
+-
+-	g_assert_cmpint(err, ==, 0);
+-	g_assert_cmpint(volume, ==, 1);
+-
+-	context_quit(context);
+-}
+-
+-static bool register_notification_rsp(struct avrcp *session, int err,
+-					uint8_t code, uint8_t event,
+-					void *params, void *user_data)
+-{
+-	struct context *context = user_data;
+-	uint8_t *p = params;
+-
+-	g_assert_cmpint(err, ==, 0);
+-
+-	switch (event) {
+-	case AVRCP_EVENT_VOLUME_CHANGED:
+-		if (g_str_equal(context->data->test_name, "/TP/VLH/BV-03-C")) {
+-			g_assert_cmpint(p[0], ==, 0);
+-			break;
+-		} else if (code == AVC_CTYPE_INTERIM) {
+-			g_assert_cmpint(p[0], ==, 0);
+-			return true;
+-		}
+-		g_assert_cmpint(p[0], ==, 1);
+-		break;
+-	}
+-
+-	context_quit(context);
+-
+-	return false;
+-}
+-
+-static const struct avrcp_control_cfm control_cfm = {
+-	.register_notification = register_notification_rsp,
+-	.set_volume = set_volume_rsp,
+-	.get_folder_items = get_folder_items_rsp,
+-};
+-
+-static void test_client(gconstpointer data)
+-{
+-	struct context *context = create_context(0x0100, data);
+-
+-	avrcp_register_player(context->session, NULL, &control_cfm, context);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-01-C"))
+-		avrcp_set_addressed_player(context->session, 0xabcd);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-03-C"))
+-		avrcp_set_browsed_player(context->session, 0xabcd);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-06-C") ||
+-		g_str_equal(context->data->test_name, "/TP/MPS/BV-08-C"))
+-		avrcp_get_folder_items(context->session,
+-					AVRCP_MEDIA_PLAYER_LIST, 0, 2, 0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-01-I"))
+-		avrcp_get_folder_items(context->session,
+-					AVRCP_MEDIA_PLAYER_LIST, 0, 2, 0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-01-C"))
+-		avrcp_get_folder_items(context->session,
+-					AVRCP_MEDIA_PLAYER_VFS, 0, 2, 0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-04-C"))
+-		avrcp_change_path(context->session, 0x01, 0x01, 0xaabb);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-07-C"))
+-		avrcp_get_item_attributes(context->session,
+-					AVRCP_MEDIA_PLAYER_VFS, 0x01, 0xaabb,
+-					0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/SRC/BV-01-C"))
+-		avrcp_search(context->session, "Country");
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/SRC/BV-03-C"))
+-		avrcp_get_folder_items(context->session, AVRCP_MEDIA_SEARCH,
+-						0, 2, 0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/SRC/BV-05-C"))
+-		avrcp_get_item_attributes(context->session,
+-					AVRCP_MEDIA_SEARCH, 0x01, 0xaabb,
+-					0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/NP/BV-01-C"))
+-		avrcp_play_item(context->session, AVRCP_MEDIA_NOW_PLAYING, 1,
+-									1);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/NP/BV-03-C"))
+-		avrcp_add_to_now_playing(context->session,
+-					AVRCP_MEDIA_NOW_PLAYING, 0x01, 0xaabb);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/NP/BV-05-C"))
+-		avrcp_get_folder_items(context->session,
+-					AVRCP_MEDIA_NOW_PLAYING, 0, 2, 0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MCN/NP/BV-08-C"))
+-		avrcp_get_item_attributes(context->session,
+-					AVRCP_MEDIA_NOW_PLAYING, 0x01, 0xaabb,
+-					0, NULL);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+-		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-01-C"))
+-		avrcp_list_player_attributes(context->session);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-03-C")) {
+-		uint8_t attrs[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
+-						AVRCP_ATTRIBUTE_REPEAT_MODE };
+-
+-		avrcp_get_player_attribute_text(context->session, sizeof(attrs),
+-									attrs);
+-	}
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-05-C"))
+-		avrcp_list_player_values(context->session,
+-						AVRCP_ATTRIBUTE_EQUALIZER);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-07-C")) {
+-		uint8_t values[2] = { AVRCP_EQUALIZER_OFF, AVRCP_EQUALIZER_ON };
+-
+-		avrcp_get_player_value_text(context->session,
+-						AVRCP_ATTRIBUTE_EQUALIZER,
+-						sizeof(values), values);
+-	}
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-09-C")) {
+-		uint8_t attrs[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
+-						AVRCP_ATTRIBUTE_REPEAT_MODE };
+-
+-		avrcp_get_current_player_value(context->session, sizeof(attrs),
+-									attrs);
+-	}
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-11-C")) {
+-		uint8_t attrs[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
+-						AVRCP_ATTRIBUTE_REPEAT_MODE };
+-		uint8_t values[2] = { 0xaa, 0xff };
+-
+-		avrcp_set_player_value(context->session, sizeof(attrs), attrs,
+-								values);
+-	}
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-01-C"))
+-		avrcp_get_play_status(context->session);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
+-		avrcp_get_element_attributes(context->session);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
+-		avrcp_register_notification(context->session,
+-						AVRCP_EVENT_STATUS_CHANGED, 0);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-01-I"))
+-		avrcp_send_passthrough(context->session, IEEEID_BTSIG,
+-						AVC_VENDOR_NEXT_GROUP);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-02-I"))
+-		avrcp_send_passthrough(context->session, IEEEID_BTSIG,
+-						AVC_VENDOR_PREV_GROUP);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/VLH/BV-01-C"))
+-		avrcp_set_volume(context->session, 0x00);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/VLH/BV-03-C"))
+-		avrcp_register_notification(context->session,
+-						AVRCP_EVENT_VOLUME_CHANGED, 0);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/VLH/BI-03-C"))
+-		avrcp_set_volume(context->session, 0x01);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/VLH/BI-04-C"))
+-		avrcp_register_notification(context->session,
+-						AVRCP_EVENT_VOLUME_CHANGED, 0);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PTH/BV-01-C"))
+-		avrcp_send_passthrough(context->session, 0, AVC_PLAY);
+-
+-	if (g_str_equal(context->data->test_name, "/TP/PTH/BV-02-C"))
+-		avrcp_send_passthrough(context->session, 0, AVC_FAST_FORWARD);
+-}
+-
+-int main(int argc, char *argv[])
+-{
+-	tester_init(&argc, &argv);
+-
+-	__btd_log_init("*", 0);
+-
+-	/* Media Player Selection Commands and Notifications */
+-
+-	/* SetAddressedPlayer - CT */
+-	define_test("/TP/MPS/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x60, 0x00, 0x00,
+-				0x02, 0xab, 0xcd));
+-
+-	/* SetAddressedPlayer - TG */
+-	define_test("/TP/MPS/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x02, 0xab, 0xcd),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_STABLE,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x01, 0x04));
+-
+-	/* SetBrowsedPlayer - CT */
+-	define_test("/TP/MPS/BV-03-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
+-				0xab, 0xcd));
+-
+-	/* SetBrowsedPlayer - TG */
+-	define_test("/TP/MPS/BV-04-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
+-				0xab, 0xcd),
+-			brs_pdu(0x02, 0x11, 0x0e, 0x70, 0x00, 0x16,
+-				0x04, 0xab, 0xcd, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x6a, 0x01, 0x00, 0x0a,
+-				0x46, 0x69, 0x6c, 0x65, 0x73, 0x79,
+-				0x73, 0x74, 0x65, 0x6d));
+-
+-	/* AddressedPlayerChanged notification – TG */
+-	define_test("/TP/MPS/BV-05-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0b,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0b,
+-				0x00, 0x01, 0x00, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0b,
+-				0x02, 0x00, 0x02, 0x00));
+-
+-	/* GetFolderItems - CT */
+-	define_test("/TP/MPS/BV-06-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* AvailablePlayersChanged Notification – TG */
+-	define_test("/TP/MPS/BV-07-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0a,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x01, 0x0a),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x01, 0x0a));
+-
+-	/* GetFolderItems - CT */
+-	define_test("/TP/MPS/BV-08-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00));
+-
+-	/* GetFolderItems - TG */
+-	define_test("/TP/MPS/BV-09-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* SetAddressedPlayer - TG */
+-	define_test("/TP/MPS/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x02, 0xab, 0xcd),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_STABLE,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x01, 0x11));
+-
+-	/* SetBrowsedPlayer - TG */
+-	define_test("/TP/MPS/BI-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
+-				0xab, 0xcd),
+-			brs_pdu(0x02, 0x11, 0x0e, 0x70, 0x00, 0x01,
+-				0x11));
+-
+-	/*
+-	 * Media Content Navigation Commands and Notifications for Content
+-	 * Browsing.
+-	 */
+-
+-	/* GetFolderItems - Virtual FS - CT */
+-	define_test("/TP/MCN/CB/BV-01-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00));
+-
+-	/* GetFolderItems - Virtual FS - TG */
+-	define_test("/TP/MCN/CB/BV-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* GetFolderItems - Virtual FS - TG */
+-	define_test("/TP/MCN/CB/BV-03-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x02, 0xab, 0xcd),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_STABLE,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_SET_ADDRESSED_PLAYER,
+-				0x00, 0x00, 0x01, 0x04),
+-			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
+-				0xab, 0xcd),
+-			brs_pdu(0x02, 0x11, 0x0e, 0x70, 0x00, 0x16,
+-				0x04, 0xab, 0xcd, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x6a, 0x01, 0x00, 0x0a,
+-				0x46, 0x69, 0x6c, 0x65, 0x73, 0x79,
+-				0x73, 0x74, 0x65, 0x6d),
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* ChangePath - CT */
+-	define_test("/TP/MCN/CB/BV-04-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x0b,
+-				0xaa, 0xbb,		/* counter */
+-				0x01,			/* direction */
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01	/* Folder UID */));
+-
+-	/* ChangePath - TG */
+-	define_test("/TP/MCN/CB/BV-05-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x0b,
+-				0xaa, 0xbb,		/* counter */
+-				0x01,			/* direction */
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01	/* Folder UID */),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x05, 0x04, 0x00, 0x00, 0x00, 0x00));
+-
+-	/* ChangePath - TG */
+-	define_test("/TP/MCN/CB/BV-06-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x0b,
+-				0xaa, 0xbb,		/* counter */
+-				0x00,			/* direction */
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01	/* Folder UID */),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x05, 0x04, 0x00, 0x00, 0x00, 0x00));
+-
+-	/* GetItemAttributes - CT */
+-	define_test("/TP/MCN/CB/BV-07-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uuid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00));			/* num attr */
+-
+-	/* GetItemAttributes - TG */
+-	define_test("/TP/MCN/CB/BV-08-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uuid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00),			/* num attr */
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x02, 0x04, 0x00));
+-
+-	/* UIDcounter - TG */
+-	define_test("/TP/MCN/CB/BV-09-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0c,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x00, 0x00));
+-
+-	/* UIDcounter - TG */
+-	define_test("/TP/MCN/CB/BV-10-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0c,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x00, 0x01));
+-
+-	/* UIDcounter - TG */
+-	define_test("/TP/MCN/CB/BV-11-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0c,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x00, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x02, 0x00));
+-
+-	/* GetFolderItems - Virtual FS - TG */
+-	define_test("/TP/MCN/CB/BI-01-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x01, /* start */
+-				0x00, 0x00, 0x00, 0x00, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x01, 0x0b));
+-
+-	/* GetFolderItems - Virtual FS - TG */
+-	define_test("/TP/MCN/CB/BI-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x01, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x01, 0x0b));
+-
+-	/* GetFolderItems - Virtual FS - TG */
+-	define_test("/TP/MCN/CB/BI-03-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_VFS,
+-				0x00, 0x00, 0x00, 0x02, /* start */
+-				0x00, 0x00, 0x00, 0x03, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x01, 0x0b));
+-
+-	/* ChangePath - TG */
+-	define_test("/TP/MCN/CB/BI-04-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x0b,
+-				0xaa, 0xbb,		/* counter */
+-				0x01,			/* direction */
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00	/* Folder UID */),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_CHANGE_PATH,
+-				0x00, 0x01, 0x08));
+-
+-	/* UIDcounter - TG */
+-	define_test("/TP/MCN/CB/BI-05-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0c,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x00, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x03, 0x0c,
+-				0x02, 0x00),
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,
+-				0xaa, 0xbb,
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x01, 0x05));
+-
+-	/* Media Content Navigation Commands and Notifications for Search */
+-
+-	/* Search - CT */
+-	define_test("/TP/MCN/SRC/BV-01-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_SEARCH,
+-				0x00, 0x0b, 0x00, 0x6a,
+-				0x00, 0x07,
+-				0x43, 0x6f, 0x75, 0x6e, 0x74, 0x72, 0x79));
+-
+-	define_test("/TP/MCN/SRC/BV-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_SEARCH,
+-				0x00, 0x0b, 0x00, 0x6a,
+-				0x00, 0x07,
+-				0x43, 0x6f, 0x75, 0x6e, 0x74, 0x72, 0x79),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_SEARCH,
+-				0x00, 0x07, 0x04,
+-				0xaa, 0xbb,		/* counter */
+-				0x00, 0x00, 0x00, 0x00));
+-
+-	/* GetFolderItems - CT */
+-	define_test("/TP/MCN/SRC/BV-03-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_SEARCH,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00));
+-
+-	/* GetFolderItems - NowPlaying - TG */
+-	define_test("/TP/MCN/SCR/BV-04-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_SEARCH,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* GetItemAttributes - CT */
+-	define_test("/TP/MCN/SRC/BV-05-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_SEARCH,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uuid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00));			/* num attr */
+-
+-	/* GetItemAttributes - TG */
+-	define_test("/TP/MCN/SRC/BV-06-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_SEARCH,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00),			/* num attr */
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x02, 0x04, 0x00));
+-
+-	/* Media Content Navigation Commands and Notifications for NowPlaying */
+-
+-	/* PlayItem - NowPlaying - CT */
+-	define_test("/TP/MCN/NP/BV-01-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_PLAY_ITEM,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+-				0x00, 0x01));
+-
+-	/* PlayItem - NowPlaying - TG */
+-	define_test("/TP/MCN/NP/BV-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_PLAY_ITEM,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+-				0x00, 0x01),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_PLAY_ITEM,
+-				0x00, 0x01, 0x04));
+-
+-	/* AddToNowPlaying - NowPlaying - CT */
+-	define_test("/TP/MCN/NP/BV-03-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_ADD_TO_NOW_PLAYING,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01, /* uid */
+-				0xaa, 0xbb));
+-
+-	/* AddToNowPlaying - NowPlaying - TG */
+-	define_test("/TP/MCN/NP/BV-04-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_ADD_TO_NOW_PLAYING,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01, /* uid */
+-				0xaa, 0xbb),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_ADD_TO_NOW_PLAYING,
+-				0x00, 0x01, 0x04));
+-
+-	/* GetFolderItems - NowPlaying - CT */
+-	define_test("/TP/MCN/NP/BV-05-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00));
+-
+-	/* GetFolderItems - NowPlaying - TG */
+-	define_test("/TP/MCN/NP/BV-06-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+-
+-	/* NowPlayingContentChanged Notification – TG */
+-	define_test("/TP/MCN/NP/BV-07-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x09,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x01, 0x09),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x01, 0x09));
+-
+-	/* GetItemAttributes - CT */
+-	define_test("/TP/MCN/NP/BV-08-C", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00));			/* num attr */
+-
+-	/* GetItemAttributes - TG */
+-	define_test("/TP/MCN/CB/BV-09-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x0c, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x01,	/* uid */
+-				0xaa, 0xbb,		/* counter */
+-				0x00),			/* num attr */
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+-				0x00, 0x02, 0x04, 0x00));
+-
+-	/* PlayItem - NowPlaying - TG */
+-	define_test("/TP/MCN/NP/BI-01-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_PLAY_ITEM,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, /* uid */
+-				0xaa, 0xbb),		/* counter */
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_PLAY_ITEM,
+-				0x00, 0x01, 0x09));
+-
+-	/* AddToNowPlaying - NowPlaying - TG */
+-	define_test("/TP/MCN/NP/BI-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_ADD_TO_NOW_PLAYING,
+-				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
+-				0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, /* uid */
+-				0xaa, 0xbb),		/* counter */
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_ADD_TO_NOW_PLAYING,
+-				0x00, 0x01, 0x09));
+-
+-	/* Media Player Selection IOP tests */
+-
+-	/* Listing of available media players */
+-	define_test("/TP/MPS/BV-01-I", test_client,
+-			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
+-				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
+-				0x00, 0x00, 0x00, 0x00, /* start */
+-				0x00, 0x00, 0x00, 0x02, /* end */
+-				0x00));
+-
+-	/* Connection Establishment for Browsing tests */
+-
+-	/*
+-	 * Tests are checking connection establishment and release
+-	 * for browsing channel. Since we are connected through socketpair
+-	 * the tests are dummy
+-	 */
+-	define_test("/TP/CON/BV-01-C", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CON/BV-02-C", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CON/BV-03-C", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CON/BV-04-C", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CON/BV-05-C", test_dummy, raw_pdu(0x00));
+-
+-	/* Connection Establishment for Control tests */
+-
+-	/*
+-	 * Tests are checking connection establishement and release
+-	 * for control channel. Since we are connected through socketpair
+-	 * the tests are dummy
+-	 */
+-	define_test("/TP/CEC/BV-01-I", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CEC/BV-02-I", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CRC/BV-01-I", test_dummy, raw_pdu(0x00));
+-	define_test("/TP/CRC/BV-02-I", test_dummy, raw_pdu(0x00));
+-
+-	/* Information collection for control tests */
+-
+-	define_test("/TP/ICC/BV-01-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0xf8, 0x30,
+-				0xff, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0xf8, 0x30,
+-				0x07, 0x48, 0xff, 0xff, 0xff));
+-
+-	define_test("/TP/ICC/BV-02-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0xf8, 0x31,
+-				0x07, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0xf8, 0x31,
+-				0x07, 0x48, 0xff, 0xff, 0xff));
+-
+-	define_test("/TP/PTT/BV-01-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				0x44, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				0x44, 0x00));
+-
+-	define_test("/TP/PTT/BV-02-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				AVC_VOLUME_UP, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				AVC_VOLUME_UP, 0x00));
+-
+-	define_test("/TP/PTT/BV-03-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				AVC_CHANNEL_UP, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				AVC_CHANNEL_UP, 0x00));
+-
+-	define_test("/TP/PTT/BV-04-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				AVC_SELECT, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				AVC_SELECT, 0x00));
+-
+-	define_test("/TP/PTT/BV-05-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				AVC_PLAY, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				AVC_PLAY, 0x00),
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
+-				AVC_PLAY | 0x80, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
+-				AVC_PLAY | 0x80, 0x00));
+-
+-	/* Metadata transfer tests */
+-
+-	define_test("/TP/CFG/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
+-				0x01, 0x03));
+-
+-	define_test("/TP/CFG/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
+-				0x01, 0x02),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
+-				0x05, 0x02, 0x01, 0x00, 0x19, 0x58));
+-
+-	define_test("/TP/CFG/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
+-				0x01, 0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58, 0x10,
+-				0x00, 0x00, 0x01,
+-				AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Player Application Settings tests */
+-
+-	define_test("/TP/PAS/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
+-				0x00));
+-
+-	define_test("/TP/PAS/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
+-				0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
+-				0x01, 0x00));
+-
+-	define_test("/TP/PAS/BV-03-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x03, 0x02,
+-				AVRCP_ATTRIBUTE_EQUALIZER,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE));
+-
+-	define_test("/TP/PAS/BV-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x02, 0x01, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x0e, 0x01, 0x01, 0x00,
+-				0x6a, 0x09, 0x65, 0x71, 0x75, 0x61,
+-				0x6c, 0x69, 0x7a, 0x65, 0x72));
+-
+-	define_test("/TP/PAS/BV-05-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_LIST_PLAYER_VALUES,
+-				0x00, 0x00, 0x01,
+-				AVRCP_ATTRIBUTE_EQUALIZER));
+-
+-	define_test("/TP/PAS/BV-06-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_LIST_PLAYER_VALUES,
+-				0x00, 0x00, 0x01, AVRCP_ATTRIBUTE_EQUALIZER),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_LIST_PLAYER_VALUES,
+-				0x00, 0x00, 0x01, 0x00));
+-
+-	define_test("/TP/PAS/BV-07-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_VALUE_TEXT,
+-				0x00, 0x00, 0x04,
+-				AVRCP_ATTRIBUTE_EQUALIZER, 0x02,
+-				AVRCP_EQUALIZER_OFF,
+-				AVRCP_EQUALIZER_ON));
+-
+-	define_test("/TP/PAS/BV-08-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_VALUE_TEXT,
+-				0x00, 0x00, 0x03, AVRCP_ATTRIBUTE_EQUALIZER,
+-				0x01, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_VALUE_TEXT,
+-				0x00, 0x00, 0x07, 0x01, 0x01, 0x00,
+-				0x6a, 0x02, 0x6f, 0x6e));
+-
+-	define_test("/TP/PAS/BV-09-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE,
+-				0x00, 0x00, 0x03, 0x02,
+-				AVRCP_ATTRIBUTE_EQUALIZER,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE));
+-
+-	define_test("/TP/PAS/BV-10-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE,
+-				0x00, 0x00, 0x03, 0x02,
+-				AVRCP_ATTRIBUTE_EQUALIZER,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE,
+-				0x00, 0x00, 0x05, 0x02,
+-				AVRCP_ATTRIBUTE_EQUALIZER, 0x00,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE, 0x00));
+-
+-	define_test("/TP/PAS/BV-11-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_SET_PLAYER_VALUE,
+-				0x00, 0x00, 0x05, 0x02,
+-				AVRCP_ATTRIBUTE_EQUALIZER, 0xaa,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE, 0xff));
+-
+-	/* Get player app setting attribute text invalid behavior - TG */
+-	define_test("/TP/PAS/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x02, 0x01,
+-				/* Invalid attribute id */
+-				0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* List player application setting values invalid behavior - TG */
+-	define_test("/TP/PAS/BI-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_LIST_PLAYER_VALUES,
+-				0x00, 0x00, 0x01,
+-				/* Invalid attribute id */
+-				0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_LIST_PLAYER_VALUES,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Get player application setting value text invalid behavior - TG */
+-	define_test("/TP/PAS/BI-03-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_VALUE_TEXT,
+-				0x00, 0x00, 0x03, AVRCP_ATTRIBUTE_EQUALIZER,
+-				0x01,
+-				/* Invalid setting value */
+-				0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_GET_PLAYER_VALUE_TEXT,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Get current player application setting value invalid behavior - TG */
+-	define_test("/TP/PAS/BI-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE,
+-				0x00, 0x00, 0x02, 0x01,
+-				/* Invalid attribute */
+-				0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_GET_CURRENT_PLAYER_VALUE,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Set player application setting value invalid behavior - TG */
+-	define_test("/TP/PAS/BI-05-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				AVRCP_SET_PLAYER_VALUE,
+-				0x00, 0x00, 0x03, 0x01,
+-				AVRCP_ATTRIBUTE_REPEAT_MODE, 0x7f),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_SET_PLAYER_VALUE,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Media Information Commands */
+-
+-	/* Get play status - CT */
+-	define_test("/TP/MDI/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+-				0x00, 0x00, 0x00));
+-
+-	/* Get play status - TG */
+-	define_test("/TP/MDI/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+-				0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+-				0x00, 0x00, 0x09,
+-				0xbb, 0xbb, 0xbb, 0xbb, /* duration */
+-				0xaa, 0xaa, 0xaa, 0xaa, /* position */
+-				0x00));
+-
+-	/* Get element attributes - CT */
+-	define_test("/TP/MDI/BV-03-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+-
+-	/* Get element attributes - TG */
+-	define_test("/TP/MDI/BV-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x00));
+-
+-	/* Get element attributes - TG */
+-	define_test("/TP/MDI/BV-05-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x0d, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+-				0x00, 0x00, 0x00, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x00));
+-
+-	/* Notification Commands */
+-
+-	/* Register notification - CT */
+-	define_test("/TP/NFY/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, AVRCP_EVENT_STATUS_CHANGED,
+-				0x00, 0x00, 0x00, 0x00));
+-
+-	/* Register notification - TG */
+-	define_test("/TP/NFY/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
+-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+-				0xff, 0xff),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
+-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+-				0xff, 0xff));
+-
+-	/* Register notification - TG */
+-	define_test("/TP/NFY/BV-03-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05,
+-				AVRCP_EVENT_SETTINGS_CHANGED,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x04,
+-				AVRCP_EVENT_SETTINGS_CHANGED,
+-				0x01, 0x01, 0x02),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x04,
+-				AVRCP_EVENT_SETTINGS_CHANGED,
+-				0x01, 0x01, 0x02));
+-
+-	/* Register notification - Track Changed - No Selected Track - TG */
+-	define_test("/TP/NFY/BV-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
+-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+-				0xff, 0xff));
+-
+-	/* Register notification - Track Changed - Track Playing - TG */
+-	define_test("/TP/NFY/BV-05-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00));
+-
+-	/* Register notification - Track Changed - Selected Track - TG */
+-	define_test("/TP/NFY/BV-08-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-				0x00, 0x00));
+-
+-	/* Register notification - Register for events invalid behavior - TG */
+-	define_test("/TP/NFY/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05,
+-				/* Invalid event id */
+-				0xff,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
+-
+-	/* Invalid commands */
+-
+-	/* Invalid PDU ID - TG */
+-	define_test("/TP/INV/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58,
+-				/* Invalid PDU ID */
+-				0xff,
+-				0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
+-				0x48, 0x00, 0x00, 0x19, 0x58,
+-				0xff, 0x00, 0x00, 0x01,
+-				AVRCP_STATUS_INVALID_COMMAND));
+-
+-	/* Invalid PDU ID - Browsing TG */
+-	define_test("/TP/INV/BI-02-C", test_server,
+-			brs_pdu(0x00, 0x11, 0x0e, 0xff, 0x00, 0x00),
+-			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GENERAL_REJECT,
+-				0x00, 0x01, AVRCP_STATUS_INVALID_COMMAND));
+-
+-	/* Next Group command transfer - CT */
+-	define_test("/TP/BGN/BV-01-I", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
+-
+-	/* Next Group command transfer - TG */
+-	define_test("/TP/BGN/BV-01-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_NEXT_GROUP),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
+-				0x48, AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
+-
+-	/* Previous Group command transfer - CT */
+-	define_test("/TP/BGN/BV-02-I", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
+-
+-	/* Previous Group command transfer - TG */
+-	define_test("/TP/BGN/BV-02-I", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_PREV_GROUP),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
+-				0x48, AVC_OP_PASSTHROUGH,
+-				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+-				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
+-
+-	/* Volume Level Handling */
+-
+-	/* Set absolute volume – CT */
+-	define_test("/TP/VLH/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x00));
+-
+-	/* Set absolute volume – TG */
+-	define_test("/TP/VLH/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x00));
+-
+-	/* NotifyVolumeChange - CT */
+-	define_test("/TP/VLH/BV-03-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0d,
+-				0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x02, 0x0d,
+-				0x00));
+-
+-	/* NotifyVolumeChange - TG */
+-	define_test("/TP/VLH/BV-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0d,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x02, 0x0d,
+-				0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x02, 0x0d,
+-				0x01));
+-
+-	/* Set absolute volume – TG */
+-	define_test("/TP/VLH/BI-01-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x01));
+-
+-	/* Set absolute volume – TG */
+-	define_test("/TP/VLH/BI-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x80),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x00));
+-
+-	/* Set Absolute Volume invalid behavior CT */
+-	define_test("/TP/VLH/BI-03-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x01),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+-				0x00, 0x00, 0x01, 0x81));
+-
+-	/* Set Absolute Volume invalid behavior CT */
+-	define_test("/TP/VLH/BI-04-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x05, 0x0d,
+-				0x00, 0x00, 0x00, 0x00),
+-			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x02, 0x0d,
+-				0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
+-				0x00, 0x00, 0x02, 0x0d,
+-				0x81));
+-
+-	/* PASS THROUGH Handling */
+-
+-	/* Press and release – CT */
+-	define_test("/TP/PTH/BV-01-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_PLAY, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_PLAY),
+-			raw_pdu(0x10, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_PLAY | 0x80, 0x00));
+-
+-	define_test("/TP/PTH/BV-02-C", test_client,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_FAST_FORWARD, 0x00),
+-			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_FAST_FORWARD),
+-			raw_pdu(0x10, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_FAST_FORWARD | 0x80,
+-				0x00),
+-			raw_pdu(0x12, 0x11, 0x0e, AVC_CTYPE_ACCEPTED, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_FAST_FORWARD | 0x80),
+-			raw_pdu(0x20, 0x11, 0x0e, 0x00, 0x48,
+-				AVC_OP_PASSTHROUGH, AVC_FAST_FORWARD, 0x00));
+-
+-	/* Request continuing response - TG */
+-	define_test("/TP/RCR/BV-02-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+-			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x01, 0x01, 0xf9),
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
+-				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
+-			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x02, 0x01, 0xf9),
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
+-				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
+-			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x03, 0x00, 0x0e));
+-
+-	/* Abort continuing response - TG */
+-	define_test("/TP/RCR/BV-04-C", test_server,
+-			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+-			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+-				0x01, 0x01, 0xf9),
+-			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_ABORT_CONTINUING,
+-				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
+-			raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x00,
+-				0x00, 0x19, 0x58, AVRCP_ABORT_CONTINUING,
+-				0x00, 0x00, 0x00));
+-
+-	return tester_run();
+-}
 -- 
 2.55.0
 
