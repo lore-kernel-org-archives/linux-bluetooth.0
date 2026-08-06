@@ -1,94 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE3B4252BB
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A275C3D410C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786010120; cv=none; b=GE3uDFgu2PT7ciHqWJTeVsqlSIspGtHOYQYYa+j0wyPyUkYY3yLFJWZZa0KaZv/xOjYbsfYA8WMahWjFfWDxPzTMVQf1EmLKeUyue9IbwK+d6BBim9fRClTkSZZ7j4CalWt+1Y6RD+m0bAL9on4wRoBY+lG+FLIz0RJmN0pBSX0=
+	t=1786010379; cv=none; b=SS9s6bPGYinK/H/J+chUz1snIJ+feeTF5cdXrFDdoXWBlt4LG/WQK4ymrv8ieS96LjdggXxIuT/n8CF3jX+snCehRh0v+43d144asDXIW6OT4LOImPi7BUOSulVDJr5RrhEwMDY7QtKve4GvvzSeOr5RB8F23kQOpohsDQcF/tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786010120; c=relaxed/simple;
-	bh=Cfs7+FTinwitm9eXKnpr/CnOhQKaKTLv1eHs9aaig0k=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GkeliYfV33vcqIsFJU7QyY3BiyPQyED3wFpxvrozoGRjPvdrAl/5j+g3bfleGYhgpbL9CkVfbhSGftxPvFeHtxsRuT3dHn9mc9FD8PJ4vCkmrLzhiJZHW2YdjmqNfxxhH+mGoI85i3NLdPw+7KTvL2hqDErJWp1pb/JH8unfzrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBeEjeQd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBeEjeQd"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1EFDCC2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786010120;
-	bh=Cfs7+FTinwitm9eXKnpr/CnOhQKaKTLv1eHs9aaig0k=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=kBeEjeQdQ2hlBoPWee+hOJknvmvBfGPLUulz2nuj2RyyeiaDnMMdLXyQUfbU1EiWb
-	 Cp1CGcYP9za4qAP/AD2+RisFlZ9qa4KDnLaDRhgXPkYbwlQqgWZDDNe5izj93l16FA
-	 gelj9PPzduG+eyi2/q8y/6yEgileyZ8IIrTHjNA5JumQLYKhd9BOZzkeRdpreDYdZx
-	 X2MrY2Bemvm1F+neeXKkU1cfS1YSHDhUmZKq5/R9nhwsTDLgjzxa5YuAbkVYhDqigm
-	 baTuLfpqgD7acE8nvUizmUiVaeLOnMzhqnq3AXIAQSaWWgvukG+RxcCDsGIHP+0OKJ
-	 h1Oer4yvEITLQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0E7F6C3279F; Thu,  6 Aug 2026 09:55:20 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221840] Regression: Intel Bluetooth (btintel/hci0) fails
- firmware boot on 7.0.12, works on 6.17.10 (Dell Inspiron 3501, AX201)
-Date: Thu, 06 Aug 2026 09:55:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rohitanand9418@gmail.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221840-62941-FhMCXcXZWV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221840-62941@https.bugzilla.kernel.org/>
-References: <bug-221840-62941@https.bugzilla.kernel.org/>
+	s=arc-20240116; t=1786010379; c=relaxed/simple;
+	bh=xC/v44TYapdjaEIEo5sW8qzkNergQkzn14XWzKeg4ko=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=sPXwyoU2jquY6VOPlcCx8THRcig3zRDWNEY9WYGaEc8lZGuOsMgp50EGo7HEygcSUiruaH87NTRA0HKPt9Rh+iMOzqczA2WJ+lMa+zz71agrEnsiyO5m7YyMpWkl4bBhZq1A8J1E20NpRRMQISUQnput2BEy4q5xWDV/W6rmhGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 81667201D8;
+	Thu,  6 Aug 2026 09:59:34 +0000 (UTC)
+Message-ID: <e534cfe2f4fa335ebeb795e1c704584d77f3e1ed.camel@hadess.net>
+Subject: Re: [BlueZ, v2 1/3] avrcp: Split off name parsing from
+ parse_*_element()
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 06 Aug 2026 11:59:34 +0200
+In-Reply-To: <CABBYNZKb7_6CBD_Aq27PHUqA5=_P_NeyY4qcKOjCNk-dRN6-cw@mail.gmail.com>
+References: <20260804142419.2274153-1-hadess@hadess.net>
+	 <20260804142419.2274153-2-hadess@hadess.net>
+	 <CABBYNZKb7_6CBD_Aq27PHUqA5=_P_NeyY4qcKOjCNk-dRN6-cw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTEMwCIxH++Jf+V5ICPdxHGDl9hvjIdzXrGZfpGiXV4ZAowkFySFRv80HH+fKn4vjablNmwEJWfZUVCfH8Nk/BZyd7G9uw19f82F14DDFAfk6ZQXVdfMShkURMlBhXaO35M36v3IQNSKdte+HBm7kyUBnEkK2TzlbOLGwqHlAeLtd8OiybHPgQFoYAVXCYDVqgM1bssUMlISYPRFdqfdlOxreCxdnKLajp/bPhiBwQBYtGjWpulKJ5bs1Jc7+3MMDoHmKaBucQU0YXXyWpEZEdz20YGWm6N+Kpy47G8TZvqnI0gBrLAC6u8HzDrB76V+on9snsDA4aT6cs02xesX/b3TUtGrSvNCy6YeUfkHKWA6ZgsL+h1zd7G8Z5r3hFSWubcKuMSx1IwWuyzDrjIp6YsBUv4fWUvKjUB+oPo6XyPmLkomcr0yXEzQ6nZvgNU2FY+tZdeffCdD66NVEL/G8mQypkYfuhtiphPvlvAgZmgaoILsdCbmOK2pog96PQoZ9Uf3zeGo1VyMAXzKhDXbLtB6fpUbgONl0KKT6wHHv5BUKKhJgFyAZrijOO2GaHH8dAut7XRihReB9amXH1aPOlGGJKdhjWohtg5vuPvm3gGTAEvFSWsVY57AiG5+gTNkpjDZIombkw5jMMYkgTJOFojUnFSnW9zGU7Xpiqmz6ZOmKw
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221840
+T24gV2VkLCAyMDI2LTA4LTA1IGF0IDEzOjEyIC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVHVlLCBBdWcgNCwgMjAyNiBhdCAxMDozMeKA
+r0FNIEJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4KPiB3cm90ZToKPiA+IAo+ID4g
+VGhpcyB3aWxsIGFsbG93IHVzIHRvIHVzZSB0aGUgbmFtZSBleHRyYWN0aW9uIGNvZGUgaW4KPiA+
+IHBhcnNlX21lZGlhX2VsZW1lbnQoKSBhbmQgcGFyc2VfZm9sZGVyX2VsZW1lbnQoKSBzZXBhcmF0
+ZWx5LCBzdWNoCj4gPiBhcyBpbiB0ZXN0cy4KPiA+IC0tLQo+ID4gwqBNYWtlZmlsZS5wbHVnaW5z
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxICsKPiA+IMKgcHJvZmlsZXMvYXVkaW8vYXZy
+Y3AtcGFyc2UuYyB8IDQ3Cj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysK
+PiA+IMKgcHJvZmlsZXMvYXVkaW8vYXZyY3AtcGFyc2UuaCB8IDE5ICsrKysrKysrKysrKysrKwo+
+ID4gwqBwcm9maWxlcy9hdWRpby9hdnJjcC5jwqDCoMKgwqDCoMKgIHwgMjYgKysrKystLS0tLS0t
+LS0tLS0tLS0KPiA+IMKgNCBmaWxlcyBjaGFuZ2VkLCA3MyBpbnNlcnRpb25zKCspLCAyMCBkZWxl
+dGlvbnMoLSkKPiA+IMKgY3JlYXRlIG1vZGUgMTAwNjQ0IHByb2ZpbGVzL2F1ZGlvL2F2cmNwLXBh
+cnNlLmMKPiA+IMKgY3JlYXRlIG1vZGUgMTAwNjQ0IHByb2ZpbGVzL2F1ZGlvL2F2cmNwLXBhcnNl
+LmgKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL01ha2VmaWxlLnBsdWdpbnMgYi9NYWtlZmlsZS5wbHVn
+aW5zCj4gPiBpbmRleCBhYzY2N2JlZGE4NDcuLmE1MDVmY2Q2NjkxZiAxMDA2NDQKPiA+IC0tLSBh
+L01ha2VmaWxlLnBsdWdpbnMKPiA+ICsrKyBiL01ha2VmaWxlLnBsdWdpbnMKPiA+IEBAIC0zNyw2
+ICszNyw3IEBAIGJ1aWx0aW5fbW9kdWxlcyArPSBhdnJjcAo+ID4gwqBidWlsdGluX3NvdXJjZXMg
+Kz0gcHJvZmlsZXMvYXVkaW8vY29udHJvbC5oCj4gPiBwcm9maWxlcy9hdWRpby9jb250cm9sLmMg
+XAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwcm9m
+aWxlcy9hdWRpby9hdmN0cC5oCj4gPiBwcm9maWxlcy9hdWRpby9hdmN0cC5jIFwKPiA+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJvZmlsZXMvYXVkaW8v
+YXZyY3AuaAo+ID4gcHJvZmlsZXMvYXVkaW8vYXZyY3AuYyBcCj4gPiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJvZmlsZXMvYXVkaW8vYXZyY3AtcGFyc2Uu
+aAo+ID4gcHJvZmlsZXMvYXVkaW8vYXZyY3AtcGFyc2UuYyBcCj4gPiDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByb2ZpbGVzL2F1ZGlvL2F2cmNwLXBsYXll
+ci5jCj4gPiDCoGVuZGlmCj4gPiAKPiA+IGRpZmYgLS1naXQgYS9wcm9maWxlcy9hdWRpby9hdnJj
+cC1wYXJzZS5jIGIvcHJvZmlsZXMvYXVkaW8vYXZyY3AtCj4gPiBwYXJzZS5jCj4gPiBuZXcgZmls
+ZSBtb2RlIDEwMDY0NAo+ID4gaW5kZXggMDAwMDAwMDAwMDAwLi5kM2QwYTA3MGE0ZGEKPiA+IC0t
+LSAvZGV2L251bGwKPiA+ICsrKyBiL3Byb2ZpbGVzL2F1ZGlvL2F2cmNwLXBhcnNlLmMKPiA+IEBA
+IC0wLDAgKzEsNDcgQEAKPiA+ICsvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1v
+ci1sYXRlcgo+ID4gKy8qCj4gPiArICoKPiA+ICsgKsKgIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3Rv
+Y29sIHN0YWNrIGZvciBMaW51eAo+ID4gKyAqCj4gPiArICrCoCBDb3B5cmlnaHQgKEMpIDIwMjbC
+oCBSZWQgSGF0IEluYy4KPiA+ICsgKgo+ID4gKyAqCj4gPiArICovCj4gPiArCj4gPiArI2luY2x1
+ZGUgImF2cmNwLXBhcnNlLmgiCj4gPiArI2luY2x1ZGUgInNyYy9zaGFyZWQvdXRpbC5oIgo+ID4g
+Kwo+ID4gK2dib29sZWFuIHBhcnNlX21lZGlhX2VsZW1lbnRfbmFtZSh1aW50OF90ICpvcGVyYW5k
+cywgdWludDE2X3QgbGVuLAo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjaGFyICpuYW1lLCB1
+aW50MTZfdAo+ID4gKm5hbWVzaXplKQo+ID4gK3sKPiA+ICvCoMKgwqDCoMKgwqAgdWludDE2X3Qg
+bmFtZWxlbjsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgaWYgKGxlbiA8IDEzKQo+ID4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIEZBTFNFOwo+ID4gKwo+ID4gK8KgwqDCoMKg
+wqDCoCBtZW1zZXQobmFtZSwgMCwgTkFNRV9NQVhfTEVOKTsKPiA+ICvCoMKgwqDCoMKgwqAgKm5h
+bWVzaXplID0gZ2V0X2JlMTYoJm9wZXJhbmRzWzExXSk7Cj4gPiArwqDCoMKgwqDCoMKgIG5hbWVs
+ZW4gPSBNSU4oKm5hbWVzaXplLCBOQU1FX01BWF9MRU4gLSAxKTsKPiA+ICvCoMKgwqDCoMKgwqAg
+aWYgKG5hbWVsZW4gPiAwKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtZW1j
+cHkobmFtZSwgJm9wZXJhbmRzWzEzXSwgbmFtZWxlbik7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBzdHJ0b3V0ZjgobmFtZSwgbmFtZWxlbik7Cj4gPiArwqDCoMKgwqDCoMKgIH0K
+PiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgcmV0dXJuIFRSVUU7Cj4gPiArfQo+ID4gKwo+ID4gK2di
+b29sZWFuIHBhcnNlX21lZGlhX2ZvbGRlcl9uYW1lKHVpbnQ4X3QgKm9wZXJhbmRzLCB1aW50MTZf
+dCBsZW4sCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjaGFyICpuYW1lKQo+ID4gK3sKPiA+ICvC
+oMKgwqDCoMKgwqAgdWludDE2X3QgbmFtZWxlbjsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgaWYg
+KGxlbiA8IDEyKQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIEZBTFNF
+Owo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoCBtZW1zZXQobmFtZSwgMCwgTkFNRV9NQVhfTEVOKTsK
+PiA+ICvCoMKgwqDCoMKgwqAgbmFtZWxlbiA9IE1JTihnZXRfYmUxNigmb3BlcmFuZHNbMTJdKSwg
+TkFNRV9NQVhfTEVOIC0gMSk7Cj4gPiArwqDCoMKgwqDCoMKgIGlmIChuYW1lbGVuID4gMCkKPiA+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG1lbWNweShuYW1lLCAmb3BlcmFuZHNbMTRd
+LCBuYW1lbGVuKTsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqAgcmV0dXJuIFRSVUU7Cj4gPiArfQo+
+IAo+IFJhdGhlciB0aGFuIGNyZWF0aW5nIHlldCBhbm90aGVyIGZpbGUgaG93IGFib3V0IGhvc3Rp
+bmcgdGhpcyB1bmRlcgo+IHNoYXJlZC91dGlsLmggZGlyZWN0bHk/IEl0IGFscmVhZHkgZGVwZW5k
+cyBvbiBpdCBhbnl3YXksIHdlIGNvdWxkIGdvdAo+IHdpdGggc29tZXRoaW5nIGxpa2Ugc3RybnRv
+dXRmOCBvciBhIHNpbWlsYXIgZnVuY3Rpb24gdGhhdCBjaGVja3MgdGhlCj4gbGVuZ3RoLCBldGMs
+IGFjdHVhbGx5IGJlIG1heWJlIGJldHRlciB0byBkbyBpdCB1bmRlcgo+IHV0aWxfaW92X3B1bGxf
+dXRmOChpb3YsIGxlbiwgc3RyLCBzdHJfbWF4X2xlbikgc28gd2UgY2FuIGxvYWQgdGhlIHBkdQo+
+IGludG8gdGhlIGlvdiB0aGVuIHVzZSBpb3ZfcHVsbF9tZW0sIGV0YywgdG8gdmVyaWZ5IHRoYXQg
+d2UgaGF2ZQo+IGVub3VnaAo+IGJ5dGVzIGluIGEgZ2VuZXJpYyBtYW5uZXIuCgpUaGF0IHdvdWxk
+IGJlIG5pY2UgZm9sbG93LXVwIHdvcmsgdG8gYmUgZG9uZSwgYnV0IHRoaXMgcGF0Y2ggaXMKc3Bl
+Y2lmaWNhbGx5IGFib3V0IGJlaW5nIGFibGUgdG8gdGVzdCB0aGUgb3V0LW9mLWJvdW5kcyBhY2Nl
+c3MgY2F1c2VkCmJ5IHRob3NlIDIgcG9ydGlvbnMgb2YgY29kZSBpbiBwYXRjaCAjMi4KClRoZW4g
+dGhlIGZpeCBpcyBhcHBsaWVkIGluIHBhdGNoICMzLgoKRmluYWxseSwgd2UgY291bGQgb3B0aW1p
+c2UvY2xlYW4gdGhpcyB1cCBhbmQgcmVtb3ZlIHRoYXQgcGFyc2luZyBjb2RlLApidXQgdGhhdCB3
+b3VsZCBiZSBpbiBhIDR0aCBwYXRjaC4K
 
---- Comment #2 from rohitanand9418@gmail.com ---
-(In reply to Artem S. Tashkinov from comment #1)
-> This kernel release is not supported.
->=20
-> Can you reproduce the issue using 7.1.6 or 7.2-rc6 **with** the latest
-> firmware?
->=20
-> Also, are you dual-booting with Windows?
->=20
-> If you do, make sure you have disabled hybrid shutdown off in Windows.
->=20
-> To disable hybrid shutdown (Fast Startup) in Windows, open the Control
-> Panel, go to Power Options, click "Choose what the power buttons do," unl=
-ock
-> the settings, and uncheck "Turn on fast startup." Alternatively, disable
-> hibernation via admin command prompt using powercfg /hibernate off
-
-No dual-boot =E2=80=94 this machine runs Kali only, so Fast Startup/hybrid =
-shutdown
-doesn't apply here. Will test on 7.1.6 and/or 7.2-rc6 with latest firmware =
-and
-report back.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
