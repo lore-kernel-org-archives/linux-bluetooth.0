@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3C338AC75;
-	Thu,  6 Aug 2026 19:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9509A41836E;
+	Thu,  6 Aug 2026 19:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786046139; cv=none; b=WylGplWTEBcYi3nKpdQNMIxRLcKPQGgN0FI1Q+yoet+dADOoCYOGxn1nyD35xfv/ao06dgBzeHpJKvtZ6G2sSE40Wz5TgR3iemCyFj5bZQCACbZyGbiWZKtjvQfTKTEPhyvHxVax56KrK4ozIFMv+b396XgxI5/HbDRsI3QyjdU=
+	t=1786046142; cv=none; b=uyCL6dfb/QGixeoVqMWDB+V9CGHj290s4rWm/aiaR+UKuzaRaF5yk6LLQumO6lXh49EZ1twqId+Q+g0U6c19evVJdCr0t/qlB5s+k6FGuUUXndWnE0Tr9jZWW2uNK0jiLPINvITlC/CmHRDUD/JiM5wk0SBDs2FUpZiixmcZ5i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786046139; c=relaxed/simple;
-	bh=ZoJf7DCLdQTZIRqX+YeoXgeaZG948nbrbSoT7Bc4BuU=;
+	s=arc-20240116; t=1786046142; c=relaxed/simple;
+	bh=b2Uo1RVrDBJHNRw2oJx/d70ZON8LcjbWExQqISahIkY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lFdbj6SbKC/fVMIgCNFIlT/1L/z4lYlQssr1DuWBNPAo+a6OOvecZMTBZYvPX+l+QoRoNjaWOsv9NizykeF1rKW5Yz6eg4BucYm9IwG2US90KfTzLVcvl+yxdYTGOxzIRQsB97lA7BGNi8uqrujzDoOSPgD12dpcK/flAZYWqWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkLZHklg; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=CjDeyfs4dGzDfBw6qW7vYtyBXka1/ikNu/62M4TxrWwYRPeQc6jjGq9oY53J95IJ+1Gx514jdCa8FOm7if4EXLypFg3/Q+2GX4XHP+LQjHxbUAiizsK5LJdjJB4aF8p/KR8pGeUBRyRXvPPhkrSb7UXwzdwhP4mf8+Ra0q/MRDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM153pwH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkLZHklg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68D71F00ACF;
-	Thu,  6 Aug 2026 19:55:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM153pwH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26F6F1F0155B;
+	Thu,  6 Aug 2026 19:55:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786046137;
-	bh=8V8MSCxS1zSv5He6itY4ooM4bAabvALiETJahUY3Eu8=;
+	s=k20260515; t=1786046139;
+	bh=HVi+W9P3XGtHzzWZcFf4M2oEiOZ5Y6CWAFcc5O8u/7E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RkLZHklgqHB8KCQmWi1DR5ujcuhgafO9wwwBcA1llwPwY2TPBvWHveRJS6ByYX0wx
-	 vphm+5tCCUj2xLCA1Ijl7o/FgNpFhqwIGLmDTgWnUIXTJE4zKTBHq0xChnfNH6Hw6p
-	 akEUT7VG8YBQYkheNPZNz9fTArWJHi9rHMO4mWVZU6xzQUaGPp8AwtWcErFRUbgfxH
-	 3VTm4Mb6xj/x5R1qkEj2evnbCKImlK3GF9N4vTNci6OdUus9gWikROjp2nIRAzz5rk
-	 +2nKc3sHYeNG+1h3geahoSQcXEcQOJ1+wFYBXfbFHeP17uTpdBZvG2rW1zk5J5bPDu
-	 bJNDHkP0OmuxA==
+	b=PM153pwHLZyLYSCYPis20hbSbYRz7hkBTa8gboTHDId3aI4ipG3J4PNuVCTxJZRI9
+	 SjclwfCVWKxnjX8dZjnQYGHNeXLqcrUtPqG8u/0RLOxRd17M3rvDTwMbsBqTIvBIIs
+	 /GSzPfWwQJ3OWARG8UFRF1tyqmn/cYVr6BH3g7SyD2JHlJs50A9PQRzPH+Hoph4F1T
+	 djxS24z/BTJClmohgIzNAeF6C7vztLWwMmqXV+fqVdF9+y2r7syDytTVKmAO++7R6t
+	 MI9vGieTI4bI1lyUS3+I7DSk/jVTxPTNY/4aJmErznxEP9nDR+4d4YUx+dh7D6lCKS
+	 5hPRY/UtiWZcQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198823809A29;
-	Thu,  6 Aug 2026 19:54:58 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938AD3809A29;
+	Thu,  6 Aug 2026 19:54:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,52 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V6 0/4] Add PCIe M.2 Key E connector support for NXP i.MX
- boards
+Subject: Re: [PATCH V7] Bluetooth: btnxpuart: Add M.2 Bluetooth device support
+ using pwrseq
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178604609663.1449574.5164434195319660259.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Aug 2026 19:54:56 +0000
-References: <20260713023435.235765-1-sherry.sun@oss.nxp.com>
-In-Reply-To: <20260713023435.235765-1-sherry.sun@oss.nxp.com>
+ <178604609814.1449574.1250783761019962599.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Aug 2026 19:54:58 +0000
+References: <20260721030458.1160824-1-sherry.sun@oss.nxp.com>
+In-Reply-To: <20260721030458.1160824-1-sherry.sun@oss.nxp.com>
 To: Sherry Sun (OSS) <sherry.sun@oss.nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de,
- festevam@gmail.com, amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com,
- marcel@holtmann.org, luiz.dentz@gmail.com, hongxing.zhu@nxp.com,
- l.stach@pengutronix.de, lpieralisi@kernel.org, kwilczynski@kernel.org,
- mani@kernel.org, bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, sherry.sun@nxp.com
+Cc: amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, marcel@holtmann.org,
+ luiz.dentz@gmail.com, imx@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, sherry.sun@nxp.com
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 13 Jul 2026 10:34:31 +0800 you wrote:
+On Tue, 21 Jul 2026 11:04:58 +0800 you wrote:
 > From: Sherry Sun <sherry.sun@nxp.com>
 > 
-> This series adds support for NXP Wi-Fi/BT combo chips (88W9098, AW693)
-> inserted into PCIe M.2 Key E connectors on i.MX95-19x19-EVK boards.
+> Power supply to the M.2 Bluetooth device attached to the host using M.2
+> connector is controlled using the 'uart' pwrseq device. So add support
+> for getting the pwrseq device if the OF graph link is present.
 > 
-> For M.2 cards that rely on PCIe L2 link state and wake-up mechanisms, the
-> card must remain powered during suspend. Patch #2 uses the existing
-> dw_pcie_rp::skip_pwrctrl_off flag to skip power-off during suspend and skip
-> power-on during the init path.
+> Once obtained, pwrseq_power_on() is called to power up the M.2 Bluetooth
+> card. The power sequencer descriptor is obtained via pwrseq_get() with
+> the UART controller device (serdev->ctrl->dev), since the OF graph
+> link is defined on the UART controller node.
 > 
 > [...]
 
 Here is the summary with links:
-  - [V6,1/4] PCI: imx6: Move pci_pwrctrl_create_devices() to imx_pcie_probe()
-    (no matching commit)
-  - [V6,2/4] PCI: imx6: Add skip_pwrctrl_off flag support
-    (no matching commit)
-  - [V6,3/4] Bluetooth: btnxpuart: Add M.2 Bluetooth device support using pwrseq
+  - [V7] Bluetooth: btnxpuart: Add M.2 Bluetooth device support using pwrseq
     https://git.kernel.org/bluetooth/bluetooth-next/c/c424d3c907ec
-  - [V6,4/4] arm64: dts: imx95-19x19-evk: Describe the PCIe M.2 Key E connector
-    (no matching commit)
 
 You are awesome, thank you!
 -- 
