@@ -1,84 +1,93 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E52D10F2
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D22E3FE644
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786007610; cv=none; b=j3R8i/a/o+OjDcGOMnlTIEm20IqTLlVw87a4B/994iWFL9HUwqGeQI6TvG9bufNokWbil7NCVJ+EnQhKmPy1VM4sX4Nt8x84qp/jMe7UftAQI9DjL03/1kQBO1y5zd12ttcJEWnf9+mfOqTi3hvsO8YYJRsxH2u0RSlRzC/Ny+8=
+	t=1786007617; cv=none; b=J3z03uT0edOyPRWOampjGfgdBLEI2HviXlOoG8Qy9x1DdDbz67IinmnTJ36/r4TumXz+C1zOUJoP08o/kJCEDG7g/e77gnacn1CVc7eTynZUwKl3QAl5Pz5AeWfk8Id7T2Is9D6qASpKWreEtkorhbCRyXwTQgm4NvaNe2zK9Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786007610; c=relaxed/simple;
-	bh=BSHMgvarnar1oA6PCx/WIJKraDG8ri1MnMYA0eZTHiA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ube2iSLYnosYrNaeQqnLA5An3ihpgEmLYCX662XP0xpZy8INaYhrdDcmnvNcB83kZziA6lxc+BO0xnFv20Y05+sRkp5Tgp0FxHcyCNqWtnfFG1sczfP/+48iHsa6Mix30j0dejsXQLLL9RB2wBi4aM92G/YxxnSUTzjG6bDGqeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C781A3EB9F;
-	Thu,  6 Aug 2026 09:13:25 +0000 (UTC)
-Message-ID: <9b1784ef02eb8e74b68fb382d3958152caf1b045.camel@hadess.net>
-Subject: Re: [BlueZ, v2] unit: Add test for sdp_xml_parse_record()
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 06 Aug 2026 11:13:25 +0200
-In-Reply-To: <CABBYNZKpGvzN4BUxEFKH6WDpC5tq7iih3uBWrxR9aLRn_RBxpQ@mail.gmail.com>
-References: <20260805150327.2669078-1-hadess@hadess.net>
-	 <CABBYNZKpGvzN4BUxEFKH6WDpC5tq7iih3uBWrxR9aLRn_RBxpQ@mail.gmail.com>
+	s=arc-20240116; t=1786007617; c=relaxed/simple;
+	bh=tQPbDMPMbS120plOlbQ0aq5QzPpa637+FhG14fLDWr8=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DGlKUsPBZRL6hCIhr74C4/CHYRuG9VjREOJ9yoMSSWpNP6P/adKhrDR9Py1dRNcod/CVynHfRXIlTT2rvB6xyPgFSyLU5ur1LHUgrGbgSLnk++6wh2rvRkiP5UAaO4ORJF4zGJ2YPuNvTGXVorB9/YMxFNMbBGkQLtJqMolGapU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNM8UfB9; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNM8UfB9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE5E1C2BCFC
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2026 09:13:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1786007616;
+	bh=tQPbDMPMbS120plOlbQ0aq5QzPpa637+FhG14fLDWr8=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=eNM8UfB9LvYQXuMNrLjmsULDkINBzeVNuNP7miMAzvss5adc9dH8s/sKwSIwSJNW/
+	 4OpSdWd5w2vvNMcjt6yp1kD//HPs0zE+Q/QOh1qRggme3/vCfDbYdfxJaQWAUvGEy6
+	 U8qvbkVp8MP2lpFxFda5AkajoepqeeAdQocii9T0xyW/w9APTvgC4XaU5DigS+gsN4
+	 k3nfkYWsHfh2ZqxuqY9bVpiEqvlB4QaKpUs9gmd9fSDd9L7wxu5V9OZxF/yhWWpI/1
+	 kKbYeHLY/hXURn4VseIhTACxjxMTVuQVFxkvvjhIHtP6L88o3ATY5R8u0sEoF6hQVs
+	 kTvod8K27g/DA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id ACFDFC41613; Thu,  6 Aug 2026 09:13:36 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221840] Regression: Intel Bluetooth (btintel/hci0) fails
+ firmware boot on 7.0.12, works on 6.17.10 (Dell Inspiron 3501, AX201)
+Date: Thu, 06 Aug 2026 09:13:36 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEEDINFO
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status
+Message-ID: <bug-221840-62941-zh2RRcyubc@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221840-62941@https.bugzilla.kernel.org/>
+References: <bug-221840-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEjvzx1hpcZpdXhPMQu5a6V3F4pajV6zXQ4rLzcIhsGe2k1An6B7bN1QS4oGxh9LM5NkuUoNCQZt0SBu2zB+I1SOgnyv6+xg1+P3wt9FGKGn/iZ6pfSHIM+Tmq2k/OlQCMiNdt7ukHxTbAnuU3PbhvvjTJIYFFNzEg6RuGy9r7olpeDwBlMu8Sywgm/K8KpB/v9q0FWTpnWDt84jySm+oOZoec+cn+fvAonxIcWQ4gGEmVfOpZMAS0fQvlvNWxUBBWe5YxZkZENpPY57kCz7RKUn01fjHIVeUvaji+24dxxgSyqMuwooj4R7irVvWmdiY6dylCGlFD6olILPKzzJ5yYh6BPCMFVPStiPtGWn12t81pVHWYSi1ogamWwADF049mPadANsdiAtBlHZWCnVWzprhM+yH9iiLpEmNu40kyGbMOcdJWsegojhwaWQ8GoGpkOeyRfnBiKhKOWXq7gfPCWrUGL9mBU27EKur5g5Jiuqn6E8qBpcOsVUhr1PjOl+p6xQWSIq+05/BDKNarS2UPh0udGgV+KcCXuaWcnVuR5YWj0k0aClL64zWLqzhMK7AW3ctNx0bb6+FYUA3LzirJXAg/wv48SnJXTqgZ3Ds7rwh9kuesf6n9x/sk7LxjciVWKgZwqxOenscq21eGd1ygsxYK0s1q+h1rTNY/+LH5Sfg
 
-On Wed, 2026-08-05 at 12:37 -0400, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
->=20
-> On Wed, Aug 5, 2026 at 11:07=E2=80=AFAM Bastien Nocera <hadess@hadess.net=
->
-> wrote:
-> >=20
-> > This adds 2 example XML files from other repositories, under a fair
-> > use
-> > license exception.
-> > ---
-> > Changes since v1:
-> > - Added an "expected result" field, so expected failures can also
-> > pass
-> > =C2=A0 tests.
-> >=20
-> > =C2=A0Makefile.am=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 10 ++
-> > =C2=A0unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123
-> > ++++++++++++++++++++++
-> > =C2=A0unit/sdp-xml/qt-SerialPortSDPRecord.xml=C2=A0=C2=A0 |=C2=A0 57 ++=
-++++++++
-> > =C2=A0unit/test-sdp-xml.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 81 ++++++++++++++
-> > =C2=A04 files changed, 271 insertions(+)
-> > =C2=A0create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-> > =C2=A0create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
-> > =C2=A0create mode 100644 unit/test-sdp-xml.c
->=20
-> Why no reuse test-sdp?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221840
 
-Because I did not want to add XML parsing tests to something that
-didn't link against it, and separate test binaries can run in parallel
-(at least they can in meson), making running loads of small tests
-faster than running larger tests.
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Note that this patch is just the scaffolding for many other tests I
-have locally, so let me know quickly if folding this code into
-unit/sdp-xml.c is a requirement to getting it merged.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |NEEDINFO
 
-Cheers
+--- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
+This kernel release is not supported.
+
+Can you reproduce the issue using 7.1.6 or 7.2-rc6 **with** the latest
+firmware?
+
+Also, are you dual-booting with Windows?
+
+If you do, make sure you have disabled hybrid shutdown off in Windows.
+
+To disable hybrid shutdown (Fast Startup) in Windows, open the Control Pane=
+l,
+go to Power Options, click "Choose what the power buttons do," unlock the
+settings, and uncheck "Turn on fast startup." Alternatively, disable
+hibernation via admin command prompt using powercfg /hibernate off
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
