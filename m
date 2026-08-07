@@ -1,65 +1,65 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112E039EF25
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 07:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3D53A9615
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 07:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786086570; cv=none; b=gFAM3vyeppVQml7Qa96moFKx80tsyk5ZfB3RqM15aJjmZnE0luHhNVwuufpijp6Pww50mfDZd40Zo+5qYFYUggKeEW5Gu08auKjHdA2Z4PeCgom+03fcLOXMBLW7HtK0m8+VtFT9FZYv4UzJ3m6kBhHaLDvM335aZOr3cm/YQFs=
+	t=1786086575; cv=none; b=by4l5R0PCjd/O0h/x8insC0Y6lGAzGZZDfZh85rccjvn4nMVFzXgTX22ePSFgU/7IpeaabFJSxwccCNwbiWsPp4KUpvtqTMGaINx7tR/fTLTx62HfwRFIz03JBBaFckAOe4UOg4deSbmGlejTIJXVYTbdyBlYfRwlbMGgfiLvL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786086570; c=relaxed/simple;
-	bh=QxkayMbqWX5LGS74vcDIcAT7rAfRVg0XdeRJ09POBBQ=;
+	s=arc-20240116; t=1786086575; c=relaxed/simple;
+	bh=V023K0hi+oTiFbDLsSZ09eMRO04DxQuoCoXXxa/kW1M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N5MwjkYRofzLx1k2/pPwQOveVUMjZUQSZChwGGEHOrbtTEkIN+UxhQiUshyBlnbqY2cpq/NPC1sFiWhRixgOe0AY44WsOSPAiR3OHAtT6ie7w4YjIKeS7b8ugwUs1SH9zKZ4iFFYc35YNAH7axIttoLR0QlueQ98Is9UJLoLMDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com; spf=pass smtp.mailfrom=xbow.com; dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b=Mbo+uqYT; arc=none smtp.client-ip=209.85.128.175
+	 MIME-Version; b=JTT6ke/aBIa9JPELlmH7szctBWjHILJMCdsRTmsW049Bw8IU9kzSg4YcUHiH+dj8YN1Fe7yrhEgQQc597+TEjAzwUO4EIVSg2drzwSVmW1kQ5BGlW5zpi37Me35S2RxTupMGeAOFargU593kLYO3115KSGJ384vaOtl0f+TQBPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com; spf=pass smtp.mailfrom=xbow.com; dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b=RXPIn0Un; arc=none smtp.client-ip=74.125.224.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xbow.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b="Mbo+uqYT"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-80c5cb9a888so36972817b3.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 00:09:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b="RXPIn0Un"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-66896892b6cso4589831d50.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 00:09:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=xbow.com; s=google; t=1786086568; x=1786691368; darn=vger.kernel.org;
+        d=xbow.com; s=google; t=1786086572; x=1786691372; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Bf+D41gEUq1+J8o+TQe2hizsluGhOg1+Pa0bHuY97Ck=;
-        b=Mbo+uqYTm1Ql1CaGBhKx8wSLtV513CUpTMUPGQ9/T9rHej9Vhg3kIDG+5Ztv6UDoiU
-         OIRv8rEUnwvmRQfgBRxdqhZbJAX7fFYvajPVI5Hlz8iTS3iIeQdyNCstdwVfhmcG837a
-         SnWYJ6JkTB2fN5BzmsrwlQw2gPHSWZ90VdkePLkkA3yzLNr+vpNkxcg0hQRv7tRV+0Cr
-         M6G4H+IDZRLF9wwCjvAQrtO2xcx0GFyqvGeuoKN4NklUWrRW9Mfkn3SPU3HLlUM/OBb4
-         WJif/lycKnz+w4O15LKit0E/eng/cbK4zZ2p/8meGVHunRhG49ehthumk9UZTbxfms5U
-         rpdg==
+        bh=37V6VQj6ErQve4E9JugrxkbUJ1j5iYQpNy21OTRUL8c=;
+        b=RXPIn0UnQYlgeFRd047u3mvtsblpsPMAPuEVb8jKeoL2Y6x+vQu2ZIT7XI3lggHYlv
+         gHRsGJfMBlsD5BDYXCZk/gu7EJackap+ivcbwWU3uXl0Ojq5FyjtDF0Jtncm3KD8vdmz
+         CzkKhYG3RJbg87IRlSUiMG1oJPDS24u0X244pGnKWUd7MMXJZmp2qXWZneraYe4vdvdy
+         PFnME4YzTKziHVXMip+N3a8AENxPgmIpK/0F9UQvmtkdHHRIX4y5ddjEIuTOteF25FE1
+         lY6ktygKmHIAQq7bQ6PfYnYaEQeR+ENv+rr1ca/K9OaxZYE2EZ6+0WAg+IutU/m+U1Ac
+         FrxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786086568; x=1786691368;
+        d=1e100.net; s=20251104; t=1786086572; x=1786691372;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Bf+D41gEUq1+J8o+TQe2hizsluGhOg1+Pa0bHuY97Ck=;
-        b=VJ7CXuSVDn+FeS4TlcVGxFwQe3sfkgbRK41/BpwcE1p0FBxDcQ6IekNoVEgwDbEE6Q
-         gNWgPCowcRiAe3bMWN+C/bAKj/QfF44LMAROPQonhj9JwcPzLr+PbJ6ZvSwU20+/8AsM
-         HA9UAAFyGtePEmw707au8pGyIxsDTbqhkcpJb8UOyNWObdtfFRSG0WfxMoL8TznW3/b2
-         DmvDCSr+/ntaxyfzcv+thq31H+Y/tzjnjIHPfi4npPEZw1b5cUopEIzJ4pHGLMmg/O1m
-         aQmnDLOY6b3H+kx8DljqPjXV7O29Rrpi+gGt4tG2N0jmM1S52Jq5SleDh8wGPAj0zXtS
-         kVDw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrf92BXZg8UYujFseulLo2fXgphOkjahg+V1YXzKNFspsNL0zkVOgK0tHrL+oKLS8WTbjbyfOfjBmyREddFubk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxao/wsjB0bEBKQAsrEcULShGZQh6JW36SiOEQvx66627u5zCQM
-	uQmXL11H0Pk5A5stqNqALUrufqUvWb+wcz4jem8TsgVM6OL9kYFqaKSq75SKocK536E=
-X-Gm-Gg: AR+sD11q54tKmE2vTXTsi9HtyYaVxyyLoIVEm+N2JrA1JczRdXR3gqIR/wpe++Dks6e
-	x9M5D8JB59/dG+S2QCQ+8mLXCmoCR0MfGrP+BqrDS4GnU9kJUzP9zN9LP/B+5Fwhxb18CGzLazU
-	lPrW2oO0f/HIHNaOVeL8cPu5Rl7NnpK2npjUHBktSYO+INTfFzOYDFJeZQFRjqxC807CPBPSesO
-	4+e+8z0MHIbqj/YSQ9pjZx6S3pFQrODyZRHJXKlSh086dfDNbQIu7AbqBgxYxk7FfDELLZH91Nl
-	EmTFZgcf6/CJyPZprWTYrYjH2gVr589zeHSDOhuZgrpCxjTu5cMNRekzCtV4+ZWCYY2vwE1PjoP
-	PMLWOQCO4Tt9sVILiemB8i/D23kFt76hT8Fxz8SqOY3wN9uR1XlwGpJU1TresUkTzRnmTrx0oWE
-	IazlrpsyJkhD8joXqbTLfS44OigvbwOFiTlgvwYefirFrfGYQmdDet0S+vTvJYN/hPmykP0X+9x
-	rnzNJndgkaBNsJ8qYa1Tuvmc+5bijh1EKKWTMlW3Eu8TSnCm/fFCLNtTndh2K3dBgpluLKth25g
-	Zhl9mJcbtu8aRPWSeZG6iF6WpVSMRXtxOnM=
-X-Received: by 2002:a05:690c:2611:b0:80c:76fd:f732 with SMTP id 00721157ae682-82022539415mr125606277b3.26.1786086567779;
-        Fri, 07 Aug 2026 00:09:27 -0700 (PDT)
+        bh=37V6VQj6ErQve4E9JugrxkbUJ1j5iYQpNy21OTRUL8c=;
+        b=Pn3aOKIiQuhaTK9b3QFYJcoZ8iOBl3643CoHTvemsFH8zb/UtPBiWaTZXStMSih063
+         hjv73mxQ0pPyaRApE1rzZyKxUPtFd/Ot+ScjaHOYVc7W5CpzvDYqSF49ir1PxPs1S+8O
+         aKAKdLXifUu50fSjV6FZBHXv9XRfRd8tkfNVKyrnU7vQpftrnF3bJvDKgvXOQPViKBnH
+         XzuaKITw3iCoKPZIA+lhb5pnq448R3DDYdgTwVM6aavDLUV8CwLibdfC7D2gRapBatLo
+         tC5D0TcI5OWvdO03hLEA+8V+mqM8Ln4sMzfZyhXHqN4C0mAg9APxS0nev71KCeMp3Y/S
+         AzVQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rqew/77vgaFV3XWGInmVCPz1WxSzv577aaVuXeMLlaU77VrL2httV7ja6x7giowH3k3ZBCGMZjALupXzKlJWUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI0Cq+hicZYt/NqmXo53Eq7+G1CuhUjpEdoVoNasY9oRXW+Xkl
+	fNzpNsR4rJxkGPznCs0kmVhVUA+lN9Rh4yRZTHIQMMWw861qxdEgRstpJP0J76ilL0I=
+X-Gm-Gg: AR+sD12AwNrQG5jy7GmCCjbHhNhhuu4TG+pHHcjjZKArZpCaCFA9O0vYi2/pjt4X/7l
+	DVCoEH7GFJTm4blTqczuNbEIQI0UJJf0wfBjV8rMBvZxDz/bZnZjMDRRRvt9/6jLSoaKq9VUcc8
+	QQaUobhMqTvg4FXgd14NYOjZTFIOu114w8MDxtASCy/sMyppT3sTJqGcj00rqaZk8T7+8tbtHo0
+	lhZX0eSJZsWc2tLrUFXULZJJMTg0CaWyCYyo4lkxy9cKA+7vsoQzk3ote/5i9N7Heh8VLvuBOLN
+	lnIpKtUkGR5IVPV4INurgC4/GvkYyq4gTR1hvFtkwljAStrDLKEsMf3KEoCX0CyLv9SVyI4t7cj
+	5jtyqmssnB3wV2o/FoTzYxA+sRJlZtxgN7TGUP8eRsr3w3Cwop30EjO8s30xjrC8mPsaPP3Tnkq
+	aCXOluVsijWSyGSV2IK+mf/IVREdQ3lOGZjVKMdl5gH+SlpW6YKtBorib7T4R35QWFdwaluKrrV
+	TqiLtUoD5tyAX7sm5fVlHndTYcVdEaYmylVcDo4zV4V8vMqmnHrVcX+2Bz2uhlYnk2CfuhbQhYh
+	C6OdzsRjT3GFPqvHr2/KQFPaFmiZ1J8TJvk=
+X-Received: by 2002:a05:690c:4dc5:10b0:823:2ad3:d39a with SMTP id 00721157ae682-8232ad3da8cmr24377367b3.32.1786086571847;
+        Fri, 07 Aug 2026 00:09:31 -0700 (PDT)
 Received: from buildmachine.tailf331da.ts.net (ec2-3-14-143-233.us-east-2.compute.amazonaws.com. [3.14.143.233])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-823f0e64324sm5230367b3.19.2026.08.07.00.09.24
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-823f0e64324sm5230367b3.19.2026.08.07.00.09.28
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 07 Aug 2026 00:09:27 -0700 (PDT)
+        Fri, 07 Aug 2026 00:09:31 -0700 (PDT)
 From: Baul Lee <baul.lee@xbow.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
@@ -71,9 +71,9 @@ Cc: Baul Lee <baul.lee@xbow.com>,
 	linux-kernel@vger.kernel.org,
 	federico.kirschbaum@xbow.com,
 	stable@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: MGMT: remove the mesh walk from the socket destructor
-Date: Fri,  7 Aug 2026 16:09:14 +0900
-Message-ID: <20260807070916.85771-2-baul.lee@xbow.com>
+Subject: [PATCH 2/3] Bluetooth: MGMT: protect hdev->mesh_pending with hdev->lock
+Date: Fri,  7 Aug 2026 16:09:15 +0900
+Message-ID: <20260807070916.85771-3-baul.lee@xbow.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260807070916.85771-1-baul.lee@xbow.com>
 References: <20260807070916.85771-1-baul.lee@xbow.com>
@@ -85,87 +85,218 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_sock_destruct() calls mgmt_cleanup(), which walks hdev->mesh_pending
-on every registered controller looking for entries owned by the socket
-being destroyed, and completes the ones it finds.
+hdev->mesh_pending carries the queued struct mgmt_mesh_tx of the mesh
+mgmt interface.  It is extended and walked from syscall context under
+hci_dev_lock(hdev), in mgmt_mesh_add() and mgmt_mesh_foreach(), and it
+is unlinked and freed from the hci_cmd_sync worker under
+hci_req_sync_lock(hdev), in send_cancel(), mesh_send_done_sync() and
+mesh_next().  The two sides hold different mutexes, so the list has no
+protection: MGMT_OP_MESH_READ_FEATURES on one socket can be mid-walk
+while MGMT_OP_MESH_SEND_CANCEL on another frees the entry it is
+standing on.
 
-It can never find one.  mgmt_mesh_add() takes a reference on the owning
-socket for every entry it links onto the list and mgmt_mesh_remove()
-drops it again, so the socket's reference count cannot reach zero while
-one of its entries is there.
+[   47.418949] BUG: KASAN: slab-use-after-free in send_count+0x4c/0x6c
+[   47.419029] Read of size 1 at addr ffff000015943228 by task c2_race/191
+[   47.419546]  send_count+0x4c/0x6c
+[   47.419591]  mgmt_mesh_foreach+0x68/0x100
+[   47.419637]  mesh_features+0x180/0x184
+[   47.421345] Freed by task 59:
+[   47.421555]  mgmt_mesh_remove+0x94/0x110
+[   47.421589]  send_cancel+0xd8/0x1cc
+[   47.421627]  hci_cmd_sync_work+0xac/0x128
 
-The walk still races the list.  mgmt_mesh_next() loads mesh_tx->sk from
-every node it passes, including nodes owned by other sockets, while the
-cmd_sync worker unlinks and frees nodes of the same list under a
-different lock.  mgmt_cleanup() cannot take hdev->lock: it holds
-read_lock(&hci_dev_list_lock) across the walk, and hdev->lock sleeps.
-It is the one user of hdev->mesh_pending that cannot be brought under
-that lock.
+Offset 40 of the freed 96-byte object is mesh_tx->handle, the byte
+send_count() puts in the MESH_READ_FEATURES reply.  The walk also
+follows the LIST_POISON1 left by the concurrent list_del(), which oopses
+with hci_dev_lock held and never released, so every later mgmt command
+on that controller blocks.
 
-Remove mgmt_cleanup() and its caller.
+The same missing lock lets the worker free the object under mesh_send(),
+which reads mesh_tx->handle into the command complete after queueing:
+
+[   41.093914] BUG: KASAN: slab-use-after-free in mgmt_cmd_complete+0xd0/0x210
+[   41.094353] Read of size 1 at addr ffff00000a0dea28 by task c1_poc/162
+[   41.096944]  mgmt_mesh_remove+0x94/0x110
+[   41.096975]  mesh_send_start_complete+0x128/0x160
+
+That read already sits inside mesh_send()'s hci_dev_lock() section; it
+is the worker side that is missing the lock.
+
+Take hci_dev_lock(hdev) on the worker side, around the list work only
+and not around hci_disable_advertising_sync(), and assert it in the
+helpers that walk or extend the list.  hci_req_sync_lock -> hdev->lock
+is the order this subsystem already uses: hci_cmd_sync_work() calls
+entry->func under req_lock, and callbacks such as hci_update_eir_sync()
+take hci_dev_lock() inside it.
+
+mesh_next() and mesh_send_start_complete() are destroy callbacks, and
+hci_cmd_sync_clear() runs a destroy callback under cmd_sync_work_lock,
+which every mgmt caller of hci_cmd_sync_queue() takes with hdev->lock
+already held.  Both therefore return before hci_dev_lock() when err is
+-ECANCELED, as the other destroy callbacks in this file do.  Without
+those returns lockdep reports a circular dependency, reached by closing
+/dev/vhci while a mesh entry is queued behind a parked req_workqueue:
+
+[   78.211873] ffff00001b0340b8 (&hdev->lock){+.+.}-{4:4}, at: mesh_send_start_complete+0x88/0xf4
+               but task is already holding lock:
+[   78.212596] ffff00001b0347c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0x60/0xd4
+               -> #1 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}:
+[   78.214268]        hci_update_passive_scan+0x6c/0x84
+[   78.214455]        mgmt_set_powered_complete+0x1b0/0x1f8
+
+The other leg of the cycle, mgmt_set_powered_complete() calling
+hci_update_passive_scan() with hdev->lock held, is an existing in-tree
+path.  The entry such a return leaves on hdev->mesh_pending stays there,
+as entries already do across an unregister.
 
 Discovered by XBOW, triaged by Baul Lee <baul.lee@xbow.com>
 
 Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+Fixes: 3bb88524b7d0 ("Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach()")
 Cc: stable@vger.kernel.org
 Signed-off-by: Baul Lee <baul.lee@xbow.com>
 ---
- include/net/bluetooth/bluetooth.h |  1 -
- net/bluetooth/hci_sock.c          |  1 -
- net/bluetooth/mgmt.c              | 19 -------------------
- 3 files changed, 21 deletions(-)
+ net/bluetooth/mgmt.c      | 30 ++++++++++++++++++++++++++++--
+ net/bluetooth/mgmt_util.c |  8 ++++++++
+ 2 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index b624da5026f5..f49cec5f01e6 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -675,7 +675,6 @@ static inline bool iso_inited(void)
- 
- int mgmt_init(void);
- void mgmt_exit(void);
--void mgmt_cleanup(struct sock *sk);
- 
- void bt_sock_reclassify_lock(struct sock *sk, int proto);
- 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 070ca388f9ac..5073f4fc3289 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -2164,7 +2164,6 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- static void hci_sock_destruct(struct sock *sk)
- {
--	mgmt_cleanup(sk);
- 	skb_queue_purge(&sk->sk_receive_queue);
- 	skb_queue_purge(&sk->sk_write_queue);
- 	skb_queue_purge(&sk->sk_error_queue);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 167d75e34526..f13e73e3814f 100644
+index f13e73e3814f..583e05ec4377 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -10739,22 +10739,3 @@ void mgmt_exit(void)
+@@ -1081,6 +1081,8 @@ static void mesh_send_complete(struct hci_dev *hdev,
  {
- 	hci_mgmt_chan_unregister(&chan);
+ 	u8 handle = mesh_tx->handle;
+ 
++	lockdep_assert_held(&hdev->lock);
++
+ 	if (!silent)
+ 		mgmt_event(MGMT_EV_MESH_PACKET_CMPLT, hdev, &handle,
+ 			   sizeof(handle), NULL);
+@@ -1095,11 +1097,16 @@ static int mesh_send_done_sync(struct hci_dev *hdev, void *data)
+ 	hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
+ 	if (list_empty(&hdev->adv_instances))
+ 		hci_disable_advertising_sync(hdev);
++
++	hci_dev_lock(hdev);
++
+ 	mesh_tx = mgmt_mesh_next(hdev, NULL);
+ 
+ 	if (mesh_tx)
+ 		mesh_send_complete(hdev, mesh_tx, false);
+ 
++	hci_dev_unlock(hdev);
++
+ 	return 0;
  }
--
--void mgmt_cleanup(struct sock *sk)
--{
--	struct mgmt_mesh_tx *mesh_tx;
--	struct hci_dev *hdev;
--
--	read_lock(&hci_dev_list_lock);
--
--	list_for_each_entry(hdev, &hci_dev_list, list) {
--		do {
--			mesh_tx = mgmt_mesh_next(hdev, sk);
--
--			if (mesh_tx)
--				mesh_send_complete(hdev, mesh_tx, true);
--		} while (mesh_tx);
--	}
--
--	read_unlock(&hci_dev_list_lock);
--}
+ 
+@@ -1107,11 +1114,19 @@ static int mesh_send_sync(struct hci_dev *hdev, void *data);
+ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err);
+ static void mesh_next(struct hci_dev *hdev, void *data, int err)
+ {
+-	struct mgmt_mesh_tx *mesh_tx = mgmt_mesh_next(hdev, NULL);
++	struct mgmt_mesh_tx *mesh_tx;
+ 
+-	if (!mesh_tx)
++	if (err == -ECANCELED)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
++	mesh_tx = mgmt_mesh_next(hdev, NULL);
++	if (!mesh_tx) {
++		hci_dev_unlock(hdev);
++		return;
++	}
++
+ 	err = hci_cmd_sync_queue(hdev, mesh_send_sync, mesh_tx,
+ 				 mesh_send_start_complete);
+ 
+@@ -1119,6 +1134,8 @@ static void mesh_next(struct hci_dev *hdev, void *data, int err)
+ 		mesh_send_complete(hdev, mesh_tx, false);
+ 	else
+ 		hci_dev_set_flag(hdev, HCI_MESH_SENDING);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void mesh_send_done(struct work_struct *work)
+@@ -2304,12 +2321,17 @@ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err)
+ 	unsigned long mesh_send_interval;
+ 	u8 mgmt_err = mgmt_status(err);
+ 
++	if (err == -ECANCELED)
++		return;
++
+ 	/* Report any errors here, but don't report completion */
+ 
+ 	if (mgmt_err) {
+ 		hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
+ 		/* Send Complete Error Code for handle */
++		hci_dev_lock(hdev);
+ 		mesh_send_complete(hdev, mesh_tx, false);
++		hci_dev_unlock(hdev);
+ 		return;
+ 	}
+ 
+@@ -2415,6 +2437,8 @@ static int send_cancel(struct hci_dev *hdev, void *data)
+ 	struct mgmt_cp_mesh_send_cancel *cancel = (void *)cmd->param;
+ 	struct mgmt_mesh_tx *mesh_tx;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!cancel->handle) {
+ 		do {
+ 			mesh_tx = mgmt_mesh_next(hdev, cmd->sk);
+@@ -2429,6 +2453,8 @@ static int send_cancel(struct hci_dev *hdev, void *data)
+ 			mesh_send_complete(hdev, mesh_tx, false);
+ 	}
+ 
++	hci_dev_unlock(hdev);
++
+ 	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_MESH_SEND_CANCEL,
+ 			  0, NULL, 0);
+ 	mgmt_pending_free(cmd);
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index 6ea107c0e054..a822091f2907 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -369,6 +369,8 @@ void mgmt_mesh_foreach(struct hci_dev *hdev,
+ {
+ 	struct mgmt_mesh_tx *mesh_tx, *tmp;
+ 
++	lockdep_assert_held(&hdev->lock);
++
+ 	list_for_each_entry_safe(mesh_tx, tmp, &hdev->mesh_pending, list) {
+ 		if (!sk || mesh_tx->sk == sk)
+ 			cb(mesh_tx, data);
+@@ -379,6 +381,8 @@ struct mgmt_mesh_tx *mgmt_mesh_next(struct hci_dev *hdev, struct sock *sk)
+ {
+ 	struct mgmt_mesh_tx *mesh_tx;
+ 
++	lockdep_assert_held(&hdev->lock);
++
+ 	if (list_empty(&hdev->mesh_pending))
+ 		return NULL;
+ 
+@@ -394,6 +398,8 @@ struct mgmt_mesh_tx *mgmt_mesh_find(struct hci_dev *hdev, u8 handle)
+ {
+ 	struct mgmt_mesh_tx *mesh_tx;
+ 
++	lockdep_assert_held(&hdev->lock);
++
+ 	if (list_empty(&hdev->mesh_pending))
+ 		return NULL;
+ 
+@@ -410,6 +416,8 @@ struct mgmt_mesh_tx *mgmt_mesh_add(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_mesh_tx *mesh_tx;
+ 
++	lockdep_assert_held(&hdev->lock);
++
+ 	mesh_tx = kzalloc_obj(*mesh_tx);
+ 	if (!mesh_tx)
+ 		return NULL;
 -- 
 2.50.1 (Apple Git-155)
 
