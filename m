@@ -1,48 +1,49 @@
 Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57C8277CAD;
-	Fri,  7 Aug 2026 01:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4A33C1D4F;
+	Fri,  7 Aug 2026 02:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786065984; cv=pass; b=aGKAveNqMcHidX8Ek4gKi/ZeFHn33b0PRNXWSZb+0zAcwK2W/vQHXQt/GUyJGxaIpsFelxPfgUkG5NOwPb0Om1Q/exRthB7WfGz0AaJTz/NZxmtQMRvwenyTzw2JBfCAbuGZDYYMBqQaDhBNDNpgCPXw4SSX/6TJmBrxenUf5xU=
+	t=1786068245; cv=pass; b=fG6S77Ty1pT73G1EfWFwXSMiqjESN2cDhY0lYNqh1LfPaYu8E2G/DyOP12cDMj38flEJSq5yLPXSYEbuKjY2dITgZ1tj2SD4OuaqmYxA29iTQh6eZ4Vp5yhZ5laPtNZfLFYIQaG8BjULFe1vSX7SjFv8Yf8nM8GxBZZss/1N9Yk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786065984; c=relaxed/simple;
-	bh=M7p8nClWdOKdO/Iy8KBlzvIQAqX0giiAHElxJY2tIWI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XJ6IEBqYfoHHxiGHDdHlMwqUsL2IuF4cTvRq+aLGg3/JCXl+ETSNQjtObGLQqKEGoS3Kl96DCkeu+3j5jAxdNWSL2Egnz+YS/UGPFZCfYMvEtTxCM/IKTv0sjNAdevBapkr44qxaf4wuYviY35DJSBDn9S/d49q1pmywPDvsBCI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=pm7R2M1v; arc=pass smtp.client-ip=136.143.169.58
+	s=arc-20240116; t=1786068245; c=relaxed/simple;
+	bh=oZml56gj2jBKNO7ThWS41H4lB8QwbYwH0VSbflecyo0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DZj4pE3SYEVg66Z1JBfeQhnOAwuZBI4w50W4NsVsXvtq8ObSEb8NC+c4Sh1BMsaTHpUHz1f6ZiOpYDU63aR/lG/+pXLOzPW0bD0BOI/aQZDBFdS/M9PXY1oR3RzAG8zxajaB4wS+wIDuH5xSaLQnDnOxIe87dianNY6HrGm4+yk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=gmIXf5w5; arc=pass smtp.client-ip=136.143.169.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iusegentoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="pm7R2M1v"
-ARC-Seal: i=1; a=rsa-sha256; t=1786065968; cv=none; 
+	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="gmIXf5w5"
+ARC-Seal: i=1; a=rsa-sha256; t=1786068238; cv=none; 
 	d=zohomail.eu; s=zohoarc; 
-	b=ceZbqb/FDNekaunhtckroJSfadpolIGOcM5i5D/CnUJxeXkhH2TMCJuwebfKTx9TmGd7yvaWr9PUG8910Ijue9mKkWNgb5pXC5eo3Z0M1GB6Uv4V7NXrOxogp+7bTftK7R7rXZsx9GxRc51ReOUYo8TLO+8hBvW0Wl7BuQKr0NY=
+	b=JgPCqpBlVYERkKzB4la8o2lqFgwF25EFS6Ma5R7dGzuqNoZjOXOhp7XIKKcLLPUmOhMUGzwPzJYnpgbZz2kHcqJEaKKMyiKYu0Y7Pxj+ZPCCuf4qwBpyFSolYAvdOhWO73zIy9hHLYw9VjVG38FxbtXSPV44OcHl1lQ5wPMAaKk=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1786065968; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=s+fW6anuhNIq0JN/xgWNpNcBDbYEbLmHj0v1Zwzq2HQ=; 
-	b=FtbF8lXy6Wbgklqbs3cdrEkIvkv2ZXhEunwJt9bt3kvYrWltAS6DmFrx4jdBUlA8NAfR/ozxiZTAlxTelusLcebW/DCFXiXjbuQXkWE94R7g6WzM+aan63lMVB3EWH8GajqOnyswwutDVCoJi8OdsW5tbBdJZC9tWDq2l8ojrwc=
+	t=1786068238; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=qqLOH80rK4BG2aPXV3oGpbTkAHPUIWxCtrZaZX63BUg=; 
+	b=hgJ3hqbycK6VTvpz88oumBl76CGxBLQcG5CRyKYTsUNMHM9GqC9bHKgel7AkhQhbFuBV1yfJmde6BlQvJhnl5Yp9NdGw3I4VCUXbIaBfs9WIoT9wC7aHCA1d+iCDsgY920t8Axh6yclIS4CsZjfHRFE24hZbuhB2LIEOCTAcaQc=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
 	dkim=pass  header.i=iusegentoo.com;
 	spf=pass  smtp.mailfrom=ali@iusegentoo.com;
 	dmarc=pass header.from=<ali@iusegentoo.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786065968;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786068238;
 	s=zmail; d=iusegentoo.com; i=ali@iusegentoo.com;
 	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=s+fW6anuhNIq0JN/xgWNpNcBDbYEbLmHj0v1Zwzq2HQ=;
-	b=pm7R2M1vAsGZgSxCC+x5IhtdMvvJLGleCby+FyscXIr2uTNeXUojKjJetC0/h6ei
-	tXtBmS3BUC7LkD1/Qt8Vba6NtkNNPSxTD70zCbt2N+VQu/uaV7Sidmf8EuK6xPfNS85
-	xU5XJxwNtaNLLQTn5Srf0o9ei/0Jj8Ju2x72uZQ4=
-Received: by mx.zoho.eu with SMTPS id 178606596522099.0300871055781;
-	Fri, 7 Aug 2026 03:26:05 +0200 (CEST)
+	bh=qqLOH80rK4BG2aPXV3oGpbTkAHPUIWxCtrZaZX63BUg=;
+	b=gmIXf5w5vZCZ6XDvg+SrKmeA2eP12JP8U9f09sXjsnZly21WCVRDf8rzQnSujHwf
+	A3UI8exKlgz9tq+MRDOJwqBPMRWynRVzVDNgby3goVyy82nP+U64XDs8PTAPSkWuec8
+	5o2Xx8IHpdLiIDeo0AouVPcquOal5haKZtO7V/7g=
+Received: by mx.zoho.eu with SMTPS id 1786068236394936.9346439661545;
+	Fri, 7 Aug 2026 04:03:56 +0200 (CEST)
 From: Ali Ahmet Memis <ali@iusegentoo.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: MSFT: validate evt_prefix_len against the response length
-Date: Fri,  7 Aug 2026 01:25:54 +0000
-Message-ID: <20260807012555.97482-1-ali@iusegentoo.com>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: RFCOMM: take rfcomm_mutex for the deferred setup accept
+Date: Fri,  7 Aug 2026 02:03:44 +0000
+Message-ID: <20260807020345.111346-1-ali@iusegentoo.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -53,65 +54,130 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
 
-read_supported_features() only checks that the response covers the fixed
-part of struct msft_rp_read_supported_features, which is 11 bytes:
+rfcomm_sock_recvmsg() completes a deferred setup by calling
+rfcomm_dlc_accept() without holding any RFCOMM lock:
 
-	if (skb->len < sizeof(*rp)) {
-		bt_dev_err(hdev, "MSFT supported features length mismatch");
-		goto failed;
+	if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
+		rfcomm_dlc_accept(d);
+		return 0;
 	}
 
-evt_prefix[] is a flexible array member and rp->evt_prefix_len is an
-unvalidated u8 taken straight out of that response, so
+and rfcomm_dlc_accept() dereferences the session on its first line:
 
-	msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
-				   GFP_KERNEL);
+	struct sock *sk = d->session->sock->sk;
 
-copies up to 255 bytes from a reply that may have carried none of them.
-What is copied is data the controller never sent, and it is then used to
-match incoming vendor events in msft_vendor_evt().
+Every other path that touches d->session runs under rfcomm_mutex:
+rfcomm_dlc_open(), rfcomm_dlc_close(), rfcomm_dlc_exists(),
+rfcomm_dlc_send_rpn(), and the RFCOMM thread through
+rfcomm_process_sessions(). rfcomm_connect_ind() is even documented as
+"called under rfcomm_lock()". This call site is the only one that skips
+it.
 
-This is not an out-of-bounds access. An skb data allocation always has
-at least SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) bytes past the
-payload, which is more than the 255 byte maximum, so the read stays
-inside the allocation and KASAN does not report it. It is still a read
-of bytes the host was never given, with the length fully controlled by
-the controller.
+The RFCOMM_DEFER_SETUP bit looks like it serialises the accept against
+teardown, since __rfcomm_dlc_close() returns early when it wins the
+test_and_clear. But rfcomm_recv_disc() forces the state first:
 
-Reject a response that is too short for the prefix it declares.
+	d->state = BT_CLOSED;
+	__rfcomm_dlc_close(d, err);
 
-Verified with an emulated controller over /dev/vhci on a KASAN kernel,
-with vhci made to advertise an MSFT opcode the way btintel, btqca, btmtk
-and btrtl do unconditionally. A reply of exactly 11 bytes declaring
-evt_prefix_len = 255 reaches kmemdup and copies 255 bytes
-("skb->len=11 evt_prefix_len=255", with the copied buffer dumped); since
-the reply ends at the fixed part, all 255 come from past the end of the
-response. No KASAN report is produced, as expected from the allocation
-slack described above. With this patch the response is rejected with
-"MSFT event prefix length mismatch" and msft->evt_prefix is left unset.
+and the early return only covers BT_CONNECT, BT_CONFIG, BT_OPEN and
+BT_CONNECT2. With the state already BT_CLOSED that switch does not
+match, the bit is never consulted, and __rfcomm_dlc_close() falls
+through to rfcomm_dlc_unlink(), which sets d->session = NULL.
 
-Fixes: 145373cb1b1f ("Bluetooth: Add framework for Microsoft vendor extension")
+So a remote DISC on a deferred dlc clears the session while leaving
+RFCOMM_DEFER_SETUP set. The next recvmsg() then passes the
+test_and_clear and dereferences a NULL session. No timing window is
+needed: once the DISC has been processed, the dereference is
+unconditional.
+
+Give rfcomm_dlc_accept() the same shape as rfcomm_dlc_open() and
+rfcomm_dlc_close(): an exported wrapper that takes rfcomm_mutex and
+re-checks the session, around a __rfcomm_dlc_accept() that the two
+in-core callers, which already hold the mutex, keep using.
+
+Reproduced on a KASAN + PROVE_LOCKING kernel with a BR/EDR peer emulated
+over /dev/vhci: the peer brings up an ACL link, opens L2CAP on the
+RFCOMM PSM, starts a session, opens a dlc on a channel bound with
+BT_DEFER_SETUP, and sends DISC after the socket is accepted. recv() on
+the accepted socket then hits:
+
+  Oops: general protection fault
+  KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+  RIP: 0010:rfcomm_dlc_accept+0x54/0x350
+  Call Trace:
+    rfcomm_sock_recvmsg+0x1cd/0x230
+    sock_recvmsg+0x166/0x1c0
+    __sys_recvfrom+0x20d/0x300
+
+0x10 is the offset of sock in struct rfcomm_session. With this patch the
+same run completes with recv() returning 0 and no report, and lockdep
+stays quiet, confirming rfcomm_mutex is still taken before lock_sock on
+this path as it is on the thread side.
+
+Fixes: bb23c0ab8246 ("Bluetooth: Add support for deferring RFCOMM connection setup")
+Cc: stable@vger.kernel.org
 Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
 ---
- net/bluetooth/msft.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/rfcomm/core.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d7badce8746c..ded68568e6c9 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -165,6 +165,11 @@ static bool read_supported_features(struct hci_dev *hdev,
- 	if (rp->sub_opcode != MSFT_OP_READ_SUPPORTED_FEATURES)
- 		goto failed;
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 2e8c080b4d9e..9cdfea666a2c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1331,7 +1331,10 @@ static struct rfcomm_session *rfcomm_recv_disc(struct rfcomm_session *s,
+ 	return s;
+ }
  
-+	if (skb->len < sizeof(*rp) + rp->evt_prefix_len) {
-+		bt_dev_err(hdev, "MSFT event prefix length mismatch");
-+		goto failed;
-+	}
+-void rfcomm_dlc_accept(struct rfcomm_dlc *d)
++/* Must be called with rfcomm_mutex held, so that the session cannot be
++ * unlinked from under us.
++ */
++static void __rfcomm_dlc_accept(struct rfcomm_dlc *d)
+ {
+ 	struct sock *sk = d->session->sock->sk;
+ 	struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
+@@ -1353,6 +1356,21 @@ void rfcomm_dlc_accept(struct rfcomm_dlc *d)
+ 	rfcomm_send_msc(d->session, 1, d->dlci, d->v24_sig);
+ }
+ 
++void rfcomm_dlc_accept(struct rfcomm_dlc *d)
++{
++	rfcomm_lock();
 +
- 	if (rp->evt_prefix_len > 0) {
- 		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
- 					   GFP_KERNEL);
++	/* rfcomm_recv_disc() sets the dlc state to BT_CLOSED before calling
++	 * __rfcomm_dlc_close(), so the RFCOMM_DEFER_SETUP handshake there is
++	 * skipped and the session can already be unlinked by the time the
++	 * deferred accept runs from rfcomm_sock_recvmsg().
++	 */
++	if (d->session)
++		__rfcomm_dlc_accept(d);
++
++	rfcomm_unlock();
++}
++
+ static void rfcomm_check_accept(struct rfcomm_dlc *d)
+ {
+ 	if (rfcomm_check_security(d)) {
+@@ -1365,7 +1383,7 @@ static void rfcomm_check_accept(struct rfcomm_dlc *d)
+ 			d->state_change(d, 0);
+ 			rfcomm_dlc_unlock(d);
+ 		} else
+-			rfcomm_dlc_accept(d);
++			__rfcomm_dlc_accept(d);
+ 	} else {
+ 		set_bit(RFCOMM_AUTH_PENDING, &d->flags);
+ 		rfcomm_dlc_set_timer(d, RFCOMM_AUTH_TIMEOUT);
+@@ -1958,7 +1976,7 @@ static void rfcomm_process_dlcs(struct rfcomm_session *s)
+ 					d->state_change(d, 0);
+ 					rfcomm_dlc_unlock(d);
+ 				} else
+-					rfcomm_dlc_accept(d);
++					__rfcomm_dlc_accept(d);
+ 			}
+ 			continue;
+ 		} else if (test_and_clear_bit(RFCOMM_AUTH_REJECT, &d->flags)) {
 -- 
 2.55.0
 
