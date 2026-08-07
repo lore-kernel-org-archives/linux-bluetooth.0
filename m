@@ -1,103 +1,210 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx5.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D272DCBF8
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 17:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5892E7377;
+	Fri,  7 Aug 2026 19:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786124037; cv=none; b=LFzMafcFHVaJNYmzMoCrkuiwCXJAcPm7ZdM6eYWeLOsAnzILiQAiHj3Di8C2y9PG7gNpfsETyXccl+NDTqFLXKCG4iZ3Kkavm3evIJCdDqkJ502e0ITwbDXKwmdhNhr3CkaiyZHHPoyv7d+SGexV3A3IgQDeowAEsrKZEhu04sE=
+	t=1786129300; cv=none; b=g13c9kdph3bjgu1q/fOXjhSow9Tshoxg3GqiEME3hrpHEZw0sIBFuS8rdwHDETYx/5yuM6ZevKYD0mSOsPMTp4JCm68ULRxbuFJUxHmqABSNcqVuqeCaHlRDl852iVth+fJcc3AYHFo6tunwTJ1O92zlPC54wjaovTz3f2LRd/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786124037; c=relaxed/simple;
-	bh=jbpCWr66/kNOUoE/1GEAMQQQTzMvFSTyEnQ6Cfsn8Qc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aXrUuP1P3hHY9CVjEfjjL0XzsQ++fr/fb7qbU10cguPrzUsTV1EH17WQeEfAG3P9jOPKr53MyOivX2NmcfUhQ8tsf/TXvjv5yqQ4EFr6tkMUTkOUbEXliR7XkEzXWHhE2829KZqlWpUT0HoQxtkMQVkYqWx3xHfqDxO4SsvRoFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ghPMVrev; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786129300; c=relaxed/simple;
+	bh=4ge0zADTBq3gzDmnnOhp1wDE3J2Fv8J6ZgZNbtx7iuQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D+0ZlWfxsHomH56EO2SOWpleGTjMIksRrwGHRRlJadec11B2rSmvYvW5iJbiVxdpAYqRMQ9jjmnv3f1gk6NToxq6JP/V3EklMsJzOR2Qe6IbuqRreICR523ruwx+sWRndkvrelRGiG88XBqyImvJ3DcdeU3gSprmUlh4qdo00V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=sberdevices.ru; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=bTwi9dYn; arc=none smtp.client-ip=95.181.183.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sberdevices.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghPMVrev"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c9b373d5af0so2957526a12.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 10:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786124035; x=1786728835; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=jbpCWr66/kNOUoE/1GEAMQQQTzMvFSTyEnQ6Cfsn8Qc=;
-        b=ghPMVrevgzvxzblhvHyJnRpr3ALTe4P4UC0GtS+E4nIwpDXiB6k/wTMyLlPlfpwS/N
-         EZcjIasR2DGnAx9CPv43ZLZM5X1gMwgP/ohdcSLQNdrvkvGCdZx12CSsrjEwPSMsfKeE
-         n1Von2QwdgVdtBW+1DQo25YeaAJavnfDD3uFkz9EP11QOT3zInSj6H3VNUHY+3CEW4/D
-         AbhYD0QzHrmdyiSMKJaTH87qSo8QK80nRtCrAaCbwpuG0JgurV6LfL9zgDKiSnfSqRGt
-         3liMavZeuNiOY01pZ0fBG84CWK8NNLiXHfXxA7EoDBDIE3d21o3MsaAoKqGLaN6Zi1Pt
-         BXkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786124035; x=1786728835;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=jbpCWr66/kNOUoE/1GEAMQQQTzMvFSTyEnQ6Cfsn8Qc=;
-        b=S0FeU5ekQDBQl4dqd3wBBOTWSEmWnstQJ3uVL3Kho8lbgTcyvlXSfkLPX00hruNjsR
-         h9p2BYjF91VmrMfY+V+LzIRVzjiWV7RbMAeQy+Zw7fQiFdIGj7O3lMytnrL47n9k2T+Z
-         BdmJ88C3Kz9KBjrDGyWden3aH0DuaEc4joo5dvkjWPGrKbOYMIQj7yHsH849nOjfOcEr
-         mjogfPgvZ1HwUmCCpJjv6tIqJSaXOB5t29u5DdSQkvZkd/LfwMjAxhc7aV6iTWJKGS4p
-         R7ehLbUgA60kBGyhF8MhcX12EIIAxHiscOWJNMvC5sgPkURqEYXS7NhBbz8qdoKae7Mi
-         P2gg==
-X-Gm-Message-State: AOJu0YyvexuBsm8LoqJxcQOVej9yISDDYYzhZBf/nFP3WKhyiY+tYOai
-	vJ5ReHPjTty5B3IBlN66dhe2AE7TCzjsKjPIn4cGruXmtCoO8yf/qBBC3BvHJk3E
-X-Gm-Gg: AR+sD11AMo1UZ9lPp/3i+0DDA9BvmJL68Ue1btAKvXHsafDIG7gO53YOx9UFbFO4kql
-	E9fT7cf9QMC54EPsfDZxs/se91vqLvMpRT0Ge0KmAuvrr6PNHbqYsA/V2vCLwbxczHWwmY61eB/
-	v8pOMP2Km61OJl/Nhn6F6IHRTcXnlrup1GiiIdtZERTx+wRQBaWslxmrYFndk8uMueyX4R/Nax3
-	Zz04prIYuQNENOAfe56IatyfoC+ZLGlsy7jWatTunau6X5wrRydP3+Y2/874lxFuOkzIgZF9Ve2
-	2ElfzofCXW8cklYL71kOzWUfbG1WWAbCrkcoMT3PMY9/sxBu5vdqJOQWginRnob8I8/pQQYG2U3
-	fC9QNu6AG2ukxP0j3dJSTFnE6KJtTq3HYlFa7sdq5bzkyRCgqa+q7GaMeUle/95g30dcmb2MecA
-	rL4Z4jtw5X98n+QUSw5l7QN5voZ6JomQ6gPNc8wQqmpS08cTZir/VLqRjiK1+4nf7xFdefziGVE
-	gE=
-X-Received: by 2002:a05:6a20:a11a:b0:3bf:6237:4d3f with SMTP id adf61e73a8af0-3cbce8dd448mr2153153637.18.1786124034675;
-        Fri, 07 Aug 2026 10:33:54 -0700 (PDT)
-Received: from [172.17.0.2] ([40.81.6.241])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be8d60f4sm9736482eec.13.2026.08.07.10.33.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 10:33:54 -0700 (PDT)
-Message-ID: <6a761702.6c5720b3.b2c5.75b1@mx.google.com>
-Date: Fri, 07 Aug 2026 10:33:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4576899861712768468=="
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="bTwi9dYn"
+Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx5.sberdevices.ru (Postfix) with ESMTP id 2B2BD240003;
+	Fri,  7 Aug 2026 21:55:34 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx5.sberdevices.ru 2B2BD240003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1786128934;
+	bh=8cXbGW/Whro1VRy8jilLxlVto4f2KyTjsD19uRVzVpI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=bTwi9dYnwk36aFp1jlXQPmiRqMpr1XcUsIOWlGdCjPlXU8yrie+4xRrn+Ve2wMjhu
+	 x0AqlNMrTHUOxS8Lwsdcezm/gbsWiPYh74wfY4akhD5RBLkmyuSsVOW3gSK4aolpmR
+	 r18lveVfw1zWXoYWy/NE5tfB5wKc1oHwx6GCJPKLTVPeqv8WgAOUVrIun/GExn3nKQ
+	 Bq5o5NJdvc4uc/0k8KXPEWGh2ijZeAHUBKjhoWWrfELk/Qtqha+t72DvD7ag9qSw5Y
+	 kkvAEl8u4/OpAiWgNlvkgszJ7R722ZG8QO6q1XdmSbJEkaDhthZ7Utl2HRGxVBtGD4
+	 h7ByVEQJg2JvA==
+Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "YR2" (not verified))
+	by mx5.sberdevices.ru (Postfix) with ESMTPS;
+	Fri,  7 Aug 2026 21:55:31 +0300 (MSK)
+From: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
+To: <marcel@holtmann.org>, <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <avkrasnov@salutedevices.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>,
+	<rulkc@linuxtesting.org>, <linux-amlogic@lists.landau.one>, Pavel Shpakovskiy
+	<pashpakovskii@salutedevices.com>
+Subject: [PATCH v1] Bluetooth: mgmt: fix 'hdev->discovery.uuids' NULL dereference
+Date: Fri, 7 Aug 2026 21:54:21 +0300
+Message-ID: <20260807185456.336042-1-pashpakovskii@salutedevices.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, enjou1224z@gmail.com
-Subject: RE: Bluetooth: msft: fix vendor event use-after-free during open
-In-Reply-To: <ea4efa51cc3be16d3eb7726fe5486f0be6c47907.1786092373.git.edragain@163.com>
-References: <ea4efa51cc3be16d3eb7726fe5486f0be6c47907.1786092373.git.edragain@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-exch-cas-s-m1.sberdevices.ru (172.16.210.2) To
+ p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: pashpakovskii@sberdevices.ru
+X-KSMG-AntiSpam-Info: LuaCore: 113 0.3.113 b83a27b0bdff87150e3aba5d24ea90b4a220db99, {Tracking_smtp_not_equal_from}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, {Tracking_white_helo}, FromAlignment: n
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 205118 [Aug 07 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.22
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/08/07 15:45:00 #28658525
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
---===============4576899861712768468==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+'uuid_count' member of struct 'discovery_state' is assigned and read
+without any locks, so there is a chance of situation when
+uuid_count != 0, but uuids is NULL and there will be NULL pointer
+dereference.
 
-This is an automated email and please do not reply to this email.
+Possible race:
+'hci_update_passive_scan_sync'
+  'hci_discovery_filter_clear'
+    hdev->discovery.uuid_count = 0;
+      <----------------------preempted----------------------------->
+                        'start_service_discovery'
+                          // Set uuid_count to value != 0
+                          hdev->discovery.uuid_count = uuid_count;
+                          hdev->discovery.uuids = kmemdup(...);
+      <----------------------preempted----------------------------->
+    spin_lock(&hdev->discovery.lock);
+    kfree(hdev->discovery.uuids);
+    hdev->discovery.uuids = NULL;
+    spin_unlock(&hdev->discovery.lock);
 
-Dear Submitter,
+Now uuids == NULL and uuid_count != 0.
+So 'mgmt_device_found' -> 'is_filter_match' -> 'eir_has_uuids' receives
+non consistent discovery state, where NULL dereference of uuids happens.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+To fix it let's add discovery.lock around every read/write of uuid_count,
+uuids pair of struct members. It is also important to assign uuid_count
+value only after success kmemdup() allocation in
+start_service_discovery(), otherwise uuids is NULL, because kmemdup failed,
+but uuid_count is already assigned to non zero value.
 
------ Output -----
+The following panic happens:
 
-error: patch failed: net/bluetooth/msft.c:166
-error: net/bluetooth/msft.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+[ ] ------------[ cut here ]------------
+[ ] Unable to handle kernel NULL pointer dereference at virtual
+address 0000000000000000
+[ ] Internal error: Oops: 0000000096000006 [#1] PREEMPT SMP
+[ ] CPU: 0 PID: 15056 Comm: kworker/u9:2
+[ ] Workqueue: hci0 hci_rx_work
+[ ] pstate: 10400009 (nzcV daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[ ] pc : eir_has_uuids+0x2d8/0x590
+[ ] lr : is_filter_match+0x258/0x320
+...
+[ ] Call trace:
+[ ]  eir_has_uuids+0x2d8/0x590
+[ ]  is_filter_match+0x258/0x320
+[ ]  mgmt_device_found+0x5b0/0xafc
+[ ]  process_adv_report.part.0+0x8c8/0xf14
+[ ]  hci_le_adv_report_evt+0x338/0x3f0
+[ ]  hci_le_meta_evt+0x1f0/0x4c8
+[ ]  hci_event_packet+0x440/0xc9c
+[ ]  hci_rx_work+0x44c/0xaf8
+[ ]  process_one_work+0x54c/0x103c
+[ ]  worker_thread+0x6c4/0x10c4
+[ ]  kthread+0x274/0x2ec
+[ ]  ret_from_fork+0x10/0x20
+[ ] Code: 14000004 91004021 eb14003f 54000180 (f9400024)
+[ ] ---[ end trace 0000000000000000 ]---
 
-Please resolve the issue and submit the patches again.
-
-
+Fixes: 2935e556850e ("Bluetooth: hci_sync: fix double free in 'hci_discovery_filter_clear()'")
+Signed-off-by: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/mgmt.c             | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1ec..f14239d1a817e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -920,9 +920,9 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ 	hdev->discovery.result_filtering = false;
+ 	hdev->discovery.report_invalid_rssi = true;
+ 	hdev->discovery.rssi = HCI_RSSI_INVALID;
+-	hdev->discovery.uuid_count = 0;
+ 
+ 	spin_lock(&hdev->discovery.lock);
++	hdev->discovery.uuid_count = 0;
+ 	kfree(hdev->discovery.uuids);
+ 	hdev->discovery.uuids = NULL;
+ 	spin_unlock(&hdev->discovery.lock);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index de5bd6b637b20..7368a4ac0c839 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6164,12 +6164,14 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	hdev->discovery.result_filtering = true;
+ 	hdev->discovery.type = cp->type;
+ 	hdev->discovery.rssi = cp->rssi;
+-	hdev->discovery.uuid_count = uuid_count;
++
++	spin_lock(&hdev->discovery.lock);
+ 
+ 	if (uuid_count > 0) {
+ 		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
+ 						GFP_KERNEL);
+ 		if (!hdev->discovery.uuids) {
++			spin_unlock(&hdev->discovery.lock);
+ 			err = mgmt_cmd_complete(sk, hdev->id,
+ 						MGMT_OP_START_SERVICE_DISCOVERY,
+ 						MGMT_STATUS_FAILED,
+@@ -6179,6 +6181,9 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		}
+ 	}
+ 
++	hdev->discovery.uuid_count = uuid_count;
++	spin_unlock(&hdev->discovery.lock);
++
+ 	err = hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
+ 				 start_discovery_complete);
+ 	if (err < 0) {
+@@ -10243,6 +10248,7 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
+ 	     !hci_test_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER))))
+ 		return  false;
+ 
++	spin_lock(&hdev->discovery.lock);
+ 	if (hdev->discovery.uuid_count != 0) {
+ 		/* If a list of UUIDs is provided in filter, results with no
+ 		 * matching UUID should be dropped.
+@@ -10251,9 +10257,12 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
+ 				   hdev->discovery.uuids) &&
+ 		    !eir_has_uuids(scan_rsp, scan_rsp_len,
+ 				   hdev->discovery.uuid_count,
+-				   hdev->discovery.uuids))
++				   hdev->discovery.uuids)) {
++			spin_unlock(&hdev->discovery.lock);
+ 			return false;
++		}
+ 	}
++	spin_unlock(&hdev->discovery.lock);
+ 
+ 	/* If duplicate filtering does not report RSSI changes, then restart
+ 	 * scanning to ensure updated result with updated RSSI values.
+-- 
+2.43.0
 
---===============4576899861712768468==--
