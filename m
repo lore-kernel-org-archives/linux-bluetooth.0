@@ -1,62 +1,78 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA94448CEC
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 06:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAE7382F15
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 07:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786083213; cv=none; b=UzsRM3Ip4lZV1fdvPadYEc/FhkRhXELIBhRgfxkr1lbvI2iBEZLTi7UaUk1isjSrG38R/SAFrBVLB5+7GaCktWTEzas7oKwi5GHQzH++fyWSI5/r7ylfvQgtbgZqkFpqynrrSc2ArAUbWBpoonIur2j9NIF6yNQvehfSIm7ZaTs=
+	t=1786086566; cv=none; b=QmLrlRaUbL2d0+UuMdQh+KEonAhn4ADsN3z+txvsVabFUeIhlj/WLE4/6UdwJzTDXbFGXG6oCz8Qnj8ofnzlFOiuJ7faJRJ6pbZnBV7Gualujj8Rzeip7FaHfOn5Zly6MWBZCvD1vTZzx3zrQKEvkF6V2O1AOFy//+CA25LgOtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786083213; c=relaxed/simple;
-	bh=ziFcKOZWVuCvSf93ZGDIlIXnVkjgJMbHYykKQTdYxxc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sJDjvCQY/LcrcgtSPgkFWBmjvE7GyAqVSx/c69d1JnJwPxko2fX3+q8QrkHJ/+DxCDL45nkn71EoKgvnHnZBLTjwlHfngie9Da/4lNx5lToP9H8KTJRgXAEeETolx3MzF77vWXsfma4zehG+huuh1JSoBer/EJVJiN3MV4guBSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QqHjBe0L; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1786086566; c=relaxed/simple;
+	bh=cs+sCnn7xWiEgcV9ZSxKwtCGXZUQ9wbMPoLQAd9HEts=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eE9xpex51k6Hiofao84NOk4lu4FGEQIkwR956gnBFXgiiZLEbtDHBdLd56AO7EfkChOiyn90eloyg5uhz7TfOMSfl5WHGF1xtcYGF/BcdUWrI6NmHP3iCAKRVhzgt0atGijwOFqx4fC4r1axmo/hluOG+B1JUsl6AMmSo4Y1K/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com; spf=pass smtp.mailfrom=xbow.com; dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b=ZVE73slM; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xbow.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xbow.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QqHjBe0L"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6770GsEB3822188
-	for <linux-bluetooth@vger.kernel.org>; Fri, 7 Aug 2026 06:13:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=J9av/uEFvl5YU8d8fh7wR/6jVV0l9MxPF4R
-	qmvQm8kc=; b=QqHjBe0L3ER0z5VMozVXnG0IuvQXku9nwMwzSpLcD/loVUk6JG+
-	IpSygOq6xhxPsFBPqSgP5pRfnw++niXndk2OlwyVmCskFNPOZe09BYhNHjp87rb4
-	V7i5Kp40edStKl1UFYMUevHipR3srZuLPx8dw1lhRtRw3c/sMXKM3Vsi509RwmAc
-	dK32vbDIeDlH6X3AtmivfB7/347nXWfYS1rtr9OqoSuRHgg2FRU8S50jgyTrYUj0
-	wAzxRY2IqhwPVJTiFdRZS0/Za9793V2f64nVJ3zw3XdATXS2QjTQaa9f4oSI3+EW
-	BhpujlQ5g9f4aqvztKRvUYOYDJpteBX6ciw==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fvy6gthte-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 06:13:29 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 6776DQ2x027970;
-	Fri, 7 Aug 2026 06:13:26 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4fs9vkqnqa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 06:13:26 +0000 (GMT)
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 6776DP8X027966;
-	Fri, 7 Aug 2026 06:13:26 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6776DPql027965
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Aug 2026 06:13:25 +0000 (GMT)
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id B0C662161B; Fri,  7 Aug 2026 14:13:24 +0800 (CST)
-From: Jinwang Li <jinwang.li@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v1] client/btpclient: Fix missing errno.h include
-Date: Fri,  7 Aug 2026 14:13:16 +0800
-Message-Id: <20260807061316.1647216-1-jinwang.li@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=xbow.com header.i=@xbow.com header.b="ZVE73slM"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81ee6b2da98so45192927b3.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 00:09:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=xbow.com; s=google; t=1786086564; x=1786691364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=G7gB99jopYOI8TNqTIZ3KOn+F7j/uZRYCXYb3SJDHNc=;
+        b=ZVE73slM2iSPT9P/Bo1pcg7ZLuJREBXejbMiTHysbfpeeKrSNimG3C7FC9aapU3bA1
+         BKmEEJF+5HNIIXPMbw12NExY9BM20PWd+Ef2xTc7ChBk8regOpOUt2mCMZEShNsz79VX
+         pR3no+L1bFmvuxf3I3DOFje5QfScQWGA6UC0JFwwLJJMqPL9EOfBJQwyugdE5W+yankV
+         /8Uh1/Ko6axwshAL1SzIIt5icIjc2+RC1YSCjfstFcSJIJoSpxyU+RE4Tpd0WXq3h/2h
+         Pe8aAqZ5nEBUmUQCJIL2UUeiUt+QovYfjmmrddHWFC3BWY0xfLw+hSn6jgKTyTt/n0D3
+         VMnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786086564; x=1786691364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=G7gB99jopYOI8TNqTIZ3KOn+F7j/uZRYCXYb3SJDHNc=;
+        b=NI0vW9C4ztaTMefrZLvEf48RyrV5S4Hzy95XwvzdFy0uFI0x0WkJ72isWEp0H1aDaZ
+         UXKFPFfTvnDIew/KH9jCnxhCFXXFf/c/LqfVFX6HbXOsowcI2Bwxox93gd2q4jFXHzDq
+         asK6x29csj+m9Ic6mK0cBTQAxOgr9zEowJj31GnCQOScmEjouTkmBXbJAPq4Gg59i3RI
+         YflxX3PrZHe06IXOmJIOIdt2ZX8CU8fpch6uYbm0fzZXteTLkbQIiW2F/kRaauPD5LsQ
+         CbK3zjL7MI3tAUjgSkqXb8KTRcClOYQKZcIvy+/xBfFhnSSZhXOCaehPOWMqHiTqw9M5
+         Uzlg==
+X-Forwarded-Encrypted: i=1; AHgh+RoOOPqGlb+3ny3aje4KHV2VaCJKOYLFB/9whEA0z7TEzrke5JTyVI6R3/UwU+KEmwpOLL5999D+UQztH0v0uo8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaAgMUE9AqL5/T1K39XGLNjpWEwKaqfZHqPwmbsH8H2CnZ88U7
+	ML6k9WmsuW5j8/l/VavK+w/2peTiUHXqwYdJYVojLYCoxRkYb/V+lvK1R+LqGu2M2fo=
+X-Gm-Gg: AR+sD134/bSZhsD4VKV28FjXqAnAYLmgfO2h3AKWquhyU7q+7gO2ImDbWgahN74asBp
+	9PjMPouHbY8VhnMAEk5QYTlL9rhynQg5F9G01sErZU8HRgqca4+OjeUWINtahqaVsxAQFyGW+lF
+	Ce0hd6pv77Zl2M1Z6t/ZEJoW6t1FIMOfrRJMLNOIIXzhU7x5ISzNpW9isOrKgVBjQXnOFd6hM52
+	+7HVZXsV6ibPWb5Xf6M+ff+nAd4zbPAO0w5NHfX+WRcBPcA0t+HkU1l9mLM5RdVF7yK05bj8DnJ
+	6pMJokQ0SROfNIzUWU1tndVyHyTiB87X4W/LeMJDH+ZxgSnw5D/PiMC03lSmkYNWTC9stA2+8KR
+	dOg6ybQmcr1s1Wx7DurstoW5bMcC55I4y1H821ZGkWfVvDVj2OUAQ3XARjsRB28GPeskryyuFFP
+	suNd348O0LdTx2poYJW76ZKdhx7gGDzdwlOMsVcvXa0buNWn7tCmA876I3Bv/f14Vr5I/uSQCBp
+	rWvX06TM3zaPmJbV/gpHMdRNLnDzVbi/njZKyevNX8mfqW2LE5M1lDq5SjFISZjz1WguG2DpRT0
+	kbdDiqICyYadXdCi+Vyg43b+TmWylcVMAy0=
+X-Received: by 2002:a05:690c:6602:b0:80b:a1c7:9f95 with SMTP id 00721157ae682-8201bccf906mr129185607b3.5.1786086563843;
+        Fri, 07 Aug 2026 00:09:23 -0700 (PDT)
+Received: from buildmachine.tailf331da.ts.net (ec2-3-14-143-233.us-east-2.compute.amazonaws.com. [3.14.143.233])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-823f0e64324sm5230367b3.19.2026.08.07.00.09.20
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 07 Aug 2026 00:09:23 -0700 (PDT)
+From: Baul Lee <baul.lee@xbow.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Brian Gix <brian.gix@intel.com>
+Cc: Baul Lee <baul.lee@xbow.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	federico.kirschbaum@xbow.com
+Subject: [PATCH 0/3] Bluetooth: MGMT: fix use-after-free of struct mgmt_mesh_tx
+Date: Fri,  7 Aug 2026 16:09:13 +0900
+Message-ID: <20260807070916.85771-1-baul.lee@xbow.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -64,54 +80,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Authority-Analysis: v=2.4 cv=EYH4hvmC c=1 sm=1 tr=0 ts=6a757789 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=EUspDBNiAAAA:8 a=rfIcpyy1f7hbhnCKICkA:9
-X-Proofpoint-ORIG-GUID: lW815KkXFSuujcpSLOE0SzG_K94WQOJP
-X-Proofpoint-GUID: lW815KkXFSuujcpSLOE0SzG_K94WQOJP
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA3MDA0NCBTYWx0ZWRfX4ddug50jHF2h
- YZVw1vGGtg/ZRwU5kwCMYvYlWh43ulaU/UiyqvmloYYrck7FI8rcsIHWjdu859npUigKIWx/C9v
- 3SnQ2WTZScsBPaT4JI9K3m19E3jyvAI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA3MDA0NCBTYWx0ZWRfX4J75rpPfpc/6
- kZd6957zXQj4SmvuaA3Fujn4ngF4utT5yQ7+q+19DstTzaZPC2caHkEzuB+StYPEN8MPINSfdeR
- Q+mYxn8Ttg2KrVY+8qx7srupLqArp3kCZLYGXm1P3Ks8XWAtdWkbapiJ9HqNSao3xNvKDoPET3f
- qsl6lbHVvRPKHwGlydwfcHQcf2z9wvjO39yUfA1FzgZfIAcbDKkM6tEf06cM6aTfUzSnQWgpKgI
- dhjaAC6dp5xmtuu/GQAY2WolzjjqYwL99vKG1cyuecyfVmMPRDg8GxEq+FoiQk7J0CG0WEnKjHg
- h2U4JJBwOoLDperJCnPF93kw0Mqhlk3c+5oMbxYDuYVnk+qFOBTUpkCDIuNJwn7TprBKLfiQqiz
- Av0aqXseWaoiGIWVybx1XeFfbPPX4zhdJqNhkZLq5lSbFlmPldXYMPMveBbfTp3H0T/5FxbnQG5
- baT9Du8IGTF6h59YjBA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-07_01,2026-08-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- clxscore=1011 malwarescore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608070044
 
-EINVAL is used in create_uuid() but errno.h was not included,
-causing a build failure.
+hdev->mesh_pending is extended and walked from syscall context under
+hdev->lock, and unlinked and freed from the hci_cmd_sync worker under
+hci_req_sync_lock, so the list has no protection; the objects on it are
+also handed to hci_cmd_sync_queue() as raw pointers, and those work
+entries outlive the list.  Three use-after-frees follow, all reproduced
+under KASAN.
 
-Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
----
- client/btpclient/gatt.c | 1 +
- 1 file changed, 1 insertion(+)
+Patch 1 removes mgmt_cleanup(), the one walker of the list that cannot
+take hdev->lock.  Patch 2 puts the list under hdev->lock on the worker
+side and asserts it in the helpers.  Patch 3 gives the object a
+reference count for the work entry.  The order matters: the assertions
+in patch 2 have no violating caller left once patch 1 is in, and the
+reference in patch 3 is only well defined once every unlink happens
+under one lock.
 
-diff --git a/client/btpclient/gatt.c b/client/btpclient/gatt.c
-index d384b9c74..867bb6cf1 100644
---- a/client/btpclient/gatt.c
-+++ b/client/btpclient/gatt.c
-@@ -11,6 +11,7 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
- #include <stdlib.h>
- 
- #include <ell/ell.h>
+Reaching any of this needs CAP_NET_ADMIN in the init user namespace.
+hci_sock.c sets HCI_SOCK_TRUSTED at bind under capable() rather than
+ns_capable() and gates every later mgmt command on it, and the mesh
+commands additionally need HCI_MESH_EXPERIMENTAL.  Nothing in
+hci_event.c touches hdev->mesh_pending.
+
+Each reproducer was run at identical parameters on the unpatched and the
+patched kernel, built with KASAN, PROVE_LOCKING, DEBUG_LIST and
+DEBUG_ATOMIC_SLEEP: every splat the unpatched kernel produces is gone.
+
+Baul Lee (3):
+  Bluetooth: MGMT: remove the mesh walk from the socket destructor
+  Bluetooth: MGMT: protect hdev->mesh_pending with hdev->lock
+  Bluetooth: MGMT: reference-count struct mgmt_mesh_tx
+
+ include/net/bluetooth/bluetooth.h |  1 -
+ net/bluetooth/hci_sock.c          |  1 -
+ net/bluetooth/mgmt.c              | 72 ++++++++++++++++++++++++---------------
+ net/bluetooth/mgmt_util.c         | 31 +++++++++++++++--
+ net/bluetooth/mgmt_util.h         |  3 ++
+ 5 files changed, 76 insertions(+), 32 deletions(-)
+
 -- 
-2.34.1
-
+2.50.1 (Apple Git-155)
