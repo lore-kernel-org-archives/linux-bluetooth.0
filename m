@@ -1,111 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CA91D435F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786071224; cv=none; b=R6lqHBz9GmMSocJucJawoL8o6fNkf9k3/UWk4MVrPVeuU45CU5VelFMghefJpyycPn9GDb7XxfXtVUSX+7FhOGQjuwUZIEheQ15anlxZFBbn0GsINbUY3Mw8EMlaCeMrfM8pbwWxWFiiOi5b29BPLa2QFHf1MOtBnKbtQw3zUuY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786071224; c=relaxed/simple;
-	bh=6yxzoU1pGnDFzaCQRa1/UMYuwWNQOoGwV1xY9YEBBx0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hB8xqMIz98kIYO6jR+0KvsxeB+R7LDW7sLwOBqii93ZWXltApNhxtu1GskhPqQVshieMynelApDWg9LCooyjTN2R5Ta3GlrHYxND1fKH/j3gczCxxcozir56mn2sUPoJMxteHsQFQC6ZzHADgIag9Cvr8K5xfcopgC9Jv1LZ188=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0s8zFZx; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4B712B94
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786071600; cv=pass; b=PWew1ddMIhMhyWZeki1Z30wjws0d92VJ3Ll2mNKej6PaN+T9owrK4DBcWT7mEtbXRQ1ezv4J+2GWT28ItI2VeZcGpf9B1LwxJR0aYSYKnYKus0NeKvwjp0uNx3wcXpAsKpVpmqWfdEPtBvgZoUINdaxHh/oeGbA5ewZ8MbsOviE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786071600; c=relaxed/simple;
+	bh=J6lEaPQmLNxH0xoHH46Kpoyn5FE/S8Xi2mlS3KiyS0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EUQjdJcQR2OGLlMNW1WSiS8XvP+DcyWxh6LnB2HnmUVx/uhnu+tR2Y/WWWQ+U4DZcTUbFOe0onoiVrpE+l06KJfDr41LNoBszE6Yh/fNAziwu2QxJW0HhIUpZtWK94XzP/r8pfG1czwbgbX2vRnik5IjEYX1RPTyOI/AMnAsXHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=DW3RYZgY; arc=pass smtp.client-ip=136.143.169.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iusegentoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0s8zFZx"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 852CFC2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786071223;
-	bh=6yxzoU1pGnDFzaCQRa1/UMYuwWNQOoGwV1xY9YEBBx0=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=O0s8zFZxQ6HACOZGVVbgXHrdY9jZSNK+622PZduNSpZ06sDwKmpdNxGAPPRnx5ETS
-	 0D4+e6eeDDwW1d1fU39X/H+vI2p4rTVB5JBIfsJDKFc6bKkF4x5NWZb4PVcjuG82/H
-	 SXenSasMZfnPbBZfEy3ORq9R3z8At1umu8f8VmjO7sxvhmfwfhstkq6t38+76BRJF3
-	 RgWLxe7CYMHBRrBnvD5y+kGv1HG7N5sDtDMM2j3OHosO7ovYdQ08ErFreGZFHeF/bM
-	 aPOa5Gzk2IDXdPfvzRDLB1dIpceBq4b9YdUL++dEvREJDJSEYXr6prIVKZzvgG6sZN
-	 e+59JddrLQrXg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 72EDCC41613; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221832] MT7925 (Foxcon T99H493.03) BT missing in lsusb on
- Vivobook S16
-Date: Fri, 07 Aug 2026 02:53:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lnxps@bbtex.net
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221832-62941-rvOCIHmhPZ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221832-62941@https.bugzilla.kernel.org/>
-References: <bug-221832-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="DW3RYZgY"
+ARC-Seal: i=1; a=rsa-sha256; t=1786071594; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=a5+PHJZfNPxDfWP73vJgdUqhYfVGf1iLg9CCIRvVFRAcg5oBBQUCcXfSgLcQJ8+kEIKptNoeVm/34yTfErZEGH5KnzUXcE9tjfuKrZnJpb7zmW3c2Kd9vbprNwcFBQz0lbne0guJRWCn6I/udUTAM2b++EiKhfmC7PedEXrszAk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1786071594; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=7gC39IxLInlIOuh1EiWL0pp7xaxTgHLUzjJ3nfHstaI=; 
+	b=C3wGnDb05kLd+DJnCbgBbanytIGs/OsGjMvRp7bCbZzby9sveRuk7fGoJj/M4aqq6SDElcaaEojLLV5afImMPlbzWdz2xPKDGHB6H7Q4ml0Y1gBUWzf70pDHH6rWwHzwCA9ZRc3Gx7A5gIZfzKYIRMmZA0FwAacxeO7n/3pJIIs=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=iusegentoo.com;
+	spf=pass  smtp.mailfrom=ali@iusegentoo.com;
+	dmarc=pass header.from=<ali@iusegentoo.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786071594;
+	s=zmail; d=iusegentoo.com; i=ali@iusegentoo.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=7gC39IxLInlIOuh1EiWL0pp7xaxTgHLUzjJ3nfHstaI=;
+	b=DW3RYZgYJ4MOTxcnLRC4L2A4+qpt0h9DJ0XUgtT9VCAC6p7t/9KvdOQc95dfYie1
+	B2epg90uwiFL5J/rvr7fEdB9Gy1s2G6bRb8ujorunt9fLAzGmhPTPAYuiaqfbL1R1+N
+	dksgZ9WBFrV9oe2z9D/0viD4+lfr8NnCfyc65JHs=
+Received: by mx.zoho.eu with SMTPS id 178607159240470.43768942515999;
+	Fri, 7 Aug 2026 04:59:52 +0200 (CEST)
+From: Ali Ahmet Memis <ali@iusegentoo.com>
+To: Cen Zhang <zzzccc427@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	baijiaju1990@gmail.com
+Subject: Re: [PATCH] Bluetooth: MGMT: dequeue queued mesh send before freeing canceled tx
+Date: Fri,  7 Aug 2026 02:59:25 +0000
+Message-ID: <20260807025941.121018-1-ali@iusegentoo.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260703060024.570535-1-zzzccc427@gmail.com>
+References: <20260703060024.570535-1-zzzccc427@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221832
+Hi Cen,
 
---- Comment #9 from IQ (lnxps@bbtex.net) ---
-.
-[  121.044682] qcom-iris aa00000.video-codec: loading
-/lib/firmware/qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn.xz failed fo=
-r no
-such file or directory.
-[  121.044728] qcom-iris aa00000.video-codec: Direct firmware load for
-qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn failed with error -2
-[  121.044755] firmware_class: __free_fw_priv:
-fw-qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn fw_priv=3D000000001e317=
-614
-data=3D0000000000000000 size=3D0
-[  121.044874] qcom-iris aa00000.video-codec: firmware download failed
-[  121.117515] qcom-iris aa00000.video-codec: core init failed
-[  122.269583] rfkill: input handler disabled
-[  122.617337] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  122.996022] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  124.797661] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  124.896240] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  124.966805] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  125.315919] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  125.365047] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
-[  125.442740] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
-m]]
-*ERROR* Couldn't power up the GPU: -22
+On Fri, Jul 3, 2026 at 14:00, Cen Zhang wrote:
+> Dequeue any queued mesh_send_sync() for the target tx from send_cancel().
 
---=20
-You may reply to this email to add a comment.
+The analysis looks right to me, but the fix is scoped to send_cancel()
+and there is a second path that frees a mgmt_mesh_tx while a queued
+mesh_send_sync() still carries the pointer.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+mgmt_cleanup(), called from hci_sock_release(), walks every controller
+and completes the mesh entries belonging to the closing socket:
+
+	list_for_each_entry(hdev, &hci_dev_list, list) {
+		do {
+			mesh_tx = mgmt_mesh_next(hdev, sk);
+
+			if (mesh_tx)
+				mesh_send_complete(hdev, mesh_tx, true);
+		} while (mesh_tx);
+	}
+
+mesh_send_complete() reaches mgmt_mesh_remove(), which does the same
+list_del() + sock_put() + kfree() your commit message describes, with no
+hci_cmd_sync_dequeue() first. So closing the control socket right after
+MGMT_OP_MESH_SEND, or while mesh_next() has queued the send for the next
+tx, frees the object the queued mesh_send_sync() will dereference. That
+is the same use-after-free, reached without MGMT_OP_MESH_SEND_CANCEL.
+
+Separately, mgmt_cleanup() holds only hci_dev_list_lock, never
+hdev->lock, while it traverses hdev->mesh_pending and removes entries
+from it. mesh_send() inserts into that list under hci_dev_lock(hdev), so
+the list itself is walked unsynchronised against insertion. Note this
+one cannot be fixed by simply adding hci_dev_lock() there, since
+hci_dev_list_lock is an rwlock and hci_dev_lock() is a mutex; it needs
+the usual hci_dev_hold() and drop-the-list-lock dance.
+
+Given both, an explicit owner reference on mgmt_mesh_tx may end up
+simpler than dequeuing at each free site: the pending list holds one
+reference, the queued cmd_sync entry holds another via a destroy
+callback, and only the last put does sock_put() and kfree(). That would
+cover send_cancel() and mgmt_cleanup() together, and would not need
+every future caller to remember the dequeue.
+
+To be clear about what I did and did not do: this is from reading the
+code, I have not reproduced the socket-close variant, and I have not
+tested your patch.
+
+Regards,
+Ali Ahmet Memis
