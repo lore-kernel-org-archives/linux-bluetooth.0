@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68916431A22;
-	Fri,  7 Aug 2026 16:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000C547012A;
+	Fri,  7 Aug 2026 16:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786120251; cv=none; b=Uyxj5Ja5UDjAYLySd4Ah/HwdG/DKzKP1fMRNw4699tUb0jciaKaj+efV4jTK4ai488W22HLjr6vE7lvDAGj9TfRN7LEG2b1zjkGHgJT44UsqOinp9AJIkbWsvw0zhn8bPL1lPa0H1sT8kTN4UUdE0jXiFg87RpTw8fnTuC2S9TU=
+	t=1786120253; cv=none; b=Tx30MAU0ei5yYYl2H8z8RbIILT4KSqmxfLlVRUmm2YdRpLZ0CkOsjra3A3gF4HxdyQx3Ya8+U69VmHZCZu15hPXtIrmUvgJ9CQz31SHq1mDGqpvkkq9DtUTdoT1/DV0dFLHhmClWijmEaG5QA7Bo+4+0CrqkuBr/lxMybWMVP2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786120251; c=relaxed/simple;
-	bh=5U0tO2O6diPenFuV9RPUUQ3iVzExoFiqMUsnygvQrCY=;
+	s=arc-20240116; t=1786120253; c=relaxed/simple;
+	bh=rQ9g7WlfTq23NRrsutVgiQvCoPvLQxPLDgKCGGCgT3o=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=n0E19ZC7tgkDdoRVvIG8tsat3W/FR+qk445q+yDoghIpN5dUK20XN7oVNtVAhk2ZTtBWWt3PEibBRFlp1I34LZbC7VTb7oMmKLQnt/Xad1qhBSeTlO6/NVNvMwjC+HBuH16VinqA7LaUBGupoPQF49/uRVNpULpd8T0bDSA/3Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzxcJ7v2; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=L2ennJcLoZIM+ownfNL0F9ekIMumj3syfLGWWiaAw2grqAShD9hooA8a3u9siGfPh1bwBYb2WCXmQqU0hbbvZ+4PQPMDw8Yarxz6sbjWnn8VayjMwgVkYqThhjv2lPyaZEY/R5hn2gjDC9bbi2SwzFyfLE4Ztvas0vheUpINp1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQA4QYqs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzxcJ7v2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31C8D1F000E9;
-	Fri,  7 Aug 2026 16:30:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQA4QYqs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4A11F000E9;
+	Fri,  7 Aug 2026 16:30:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786120250;
-	bh=xf7bIefK68zTcZNgSP9NpCRxp9fLSxB948X+5p+GfEM=;
+	s=k20260515; t=1786120251;
+	bh=C4FQjZYTE//llKVhlhKFfqhrGlATGa8jtNdKQWtWEpA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=lzxcJ7v2occE1v3UJoDOXMjfWjB2Q8IE6EElOloK9IWkHHRvfZc5N1FcyHdOx93bV
-	 qmzRwXk35kelTrEC+Ai41cqhbTahazXRQ+OreQ0VWf5DpCw4fx5sIZ6kBJQ8Qm0VJv
-	 kgklF104zX18SdqVVUB3xp3rZfnJXgNeb5Eq1ZdrAWZ4W9XtJPhCG2IJvyekllHdWW
-	 zit2yXcwvju+VEQ9tTduuJtzLFxTy5HCE5p9WzxNbiH4FOcj3/uN3iTnD10uvKt4Fe
-	 FP24GTyRm1OR980+kgXhmP/8BwLxL6293JqqXoDnR30v1qhkLhINQCSfU8FxIOBLlF
-	 yvwRKxTE2wK1g==
+	b=RQA4QYqszNYnl8R7ruigrx21hZLPF9ZkAzQFnqsMctv4/zr0bM1332VVVQyh/wug5
+	 M/O+f1mVEoSLfFk14FfK8f/FTg4GEGsW35OyQVjk7Jh1XRa7IKDivOyr5Z3FFg8TiC
+	 8DlOoLQWuMc2XvS1+2PRMeZpnxInKdDLmYZJq3OlXD0Gu0mi7dKLkqKyMVQea44Jt9
+	 D9SBKES14YTXsHsKhe6joRhUh3LClEP6C9eXIhCgy/oVjC4VwUxarfQSpO9mS4mA0F
+	 dmo9aFaAtGBuNjRB1RSKCWvOuCaPA/byWTifQnOFfryTz6B8w4W0gk5dPZSzi+L6B/
+	 gcQXsmIYvttww==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19843380CEE3;
-	Fri,  7 Aug 2026 16:30:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93958380CEE3;
+	Fri,  7 Aug 2026 16:30:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_event: fix out-of-bounds read in LE PA
- report
- reassembly
+Subject: Re: [PATCH] Bluetooth: RFCOMM: take rfcomm_mutex for the deferred
+ setup
+ accept
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178612020889.1887768.16877650332160888837.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Aug 2026 16:30:08 +0000
-References: <20260805173701.6649-1-acharyalaxman8848@gmail.com>
-In-Reply-To: <20260805173701.6649-1-acharyalaxman8848@gmail.com>
-To: Laxman Acharya <acharyalaxman8848@gmail.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <178612021013.1887768.3117085684534014518.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Aug 2026 16:30:10 +0000
+References: <20260807020345.111346-1-ali@iusegentoo.com>
+In-Reply-To: <20260807020345.111346-1-ali@iusegentoo.com>
+To: Ali Ahmet Memis <ali@iusegentoo.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  5 Aug 2026 23:22:01 +0545 you wrote:
-> hci_le_per_adv_report_evt() is dispatched with a minimum length of
-> sizeof(struct hci_ev_le_per_adv_report), which only covers the fixed
-> part of the event and not the trailing data[] array:
+On Fri,  7 Aug 2026 02:03:44 +0000 you wrote:
+> rfcomm_sock_recvmsg() completes a deferred setup by calling
+> rfcomm_dlc_accept() without holding any RFCOMM lock:
 > 
-> 	struct hci_ev_le_per_adv_report {
-> 		__le16   sync_handle;
-> 		__u8     tx_power;
-> 		__u8     rssi;
-> 		__u8     cte_type;
-> 		__u8     data_status;
-> 		__u8     length;
-> 		__u8     data[];
-> 	} __packed;
+> 	if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
+> 		rfcomm_dlc_accept(d);
+> 		return 0;
+> 	}
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_event: fix out-of-bounds read in LE PA report reassembly
-    https://git.kernel.org/bluetooth/bluetooth-next/c/96995a7d94f3
+  - Bluetooth: RFCOMM: take rfcomm_mutex for the deferred setup accept
+    https://git.kernel.org/bluetooth/bluetooth-next/c/813afbffcb80
 
 You are awesome, thank you!
 -- 
