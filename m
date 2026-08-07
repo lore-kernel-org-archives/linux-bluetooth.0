@@ -1,176 +1,134 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC34C27466A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 15:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786116107; cv=none; b=AollE4vzzTMBxZWkGAqwSwD2K1ivjqh5QnCqVcKEtyIcTftLyrT1mytbsoz/Lu0DADHEasepwlImiUcJml5JC9ogrK0M6pBxNKCwDsC6qAciL95LJm/iMH4DbYxRJFP4esFXFNGrKyeihiDMPFO11+Km8jVTXQEjLJMEtJxlIDI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786116107; c=relaxed/simple;
-	bh=eXthG3pwF7AdjE6Zu2onIWo5e3+oLbrtMezp3Zvbm1g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QsfKAqjx8XUQ62MDALjyET0yaiXrPeAbdL/44NFHuueD+8o8U6Fr/hbDpT7Tb9cZfMusIlc8LVYV4RirXaKtrIuNl40XBf9aQf9MpWgU3wFLICjuIKgHnjwG7siO1cPsSeM7u/yCwV1l0yo3g/nBxUVATL4egxndQFM9UxyZKZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Cus5LkxS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SjgATUL1; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1998C38333A
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 15:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786117823; cv=pass; b=B/0NKHLuC1xCUHDZ12GILP3nO16HKwNW/So6zYJd9tGc+dwE6Q+SQcwe58/mDL7YhhLJp9JaajWnWfmZe8WL6F6W64sSlKDEneSyQN6CQLWYN3NAU7wFQsHvMxxaBIijuqYxb87WKf4159xSw33/dlJdEa/UZbZOk2r6vaKAKLg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786117823; c=relaxed/simple;
+	bh=5hZYlt6hYCz6LguU+w3n01grazUVwsdYgyMDvWa96nk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=T5k7V/qr5JHf4uK7y+dAyrWL//8t9pKz3vvAet/uaZgH4dVWlVP4+TS042NCmmul6RK1LpO3s4DcB339o4gv9ePxNJmnQnHiN/8bfUyxJjNrdb9e14D9tT28zEtLBbb2JJHE3yhuuizgqU89ksNJq6oJBtBbGHJ1a5sBcMLpy7w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aKAsYaY3; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Cus5LkxS";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SjgATUL1"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 677CgFLD263949
-	for <linux-bluetooth@vger.kernel.org>; Fri, 7 Aug 2026 15:21:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=fIN2n834rIS
-	hCbSttoGPoLBBWFwgRPau6O7pYEVDiZ4=; b=Cus5LkxSQyoPITe4InwwZGjjQEu
-	WTZbTdjdK/c9qnWkJE2zCIqmqK7LnFxDVclJkFQ8lO8SdfKIB5vPSmcVD6nBq30/
-	UkA7tlivEyfYpNst9mrXqceefX4Y3/t4Afm3W1nWrue64cwI0U4jzgExJdos/1Og
-	O+0XszP33YAWQHXl9fueznbnQUogEYYCyUuZSF+NxoqjuGbV0ZJfOMM1sKBMmN/X
-	Lz6o6sNfP27k4v8EXSad9pBEej/VM1X72O6QeLXqtH5Xyj1ih2hojYQzO3K/U24U
-	/YyKzvsWjnNFGFNZGsfnmNlB6II0oOBWtC7X0zKGEKCD0GgYTBItMXlcKPw==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fw9vu22rn-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 15:21:44 +0000 (GMT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-51c1eb52e1fso57851681cf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 08:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1786116104; x=1786720904; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=fIN2n834rIShCbSttoGPoLBBWFwgRPau6O7pYEVDiZ4=;
-        b=SjgATUL1Wrn4N+zXmWQ5Jg6ty4FX8SWqohQ7GOlJTJ2iqdpVDopxGgIFN2zzVAFYRX
-         rpTzas3tCPMZbuiXX5rwMerpWhrGjR2GMwNoJeAq/bEJTroI+xi9gln3EOhWQ6/8B0PZ
-         T+z+n3YNGXa+Tj0HIPZSUcNh3mbsRz0VUonzx5Mt091z/Jzq4V2QlP/hG8QBpfXMV/Ej
-         4MqLdslwf/lGRqbyTCd78dGInFQ4j2NKveYTPHzbbmrJ41EVzbqkkwIfYLKGsRZ7S3ot
-         NNnBtwIjdCfw1X8wa4447m1h2HMQwdAXE0grgbxBN5KC+/pdUETOFeellfNni3L+53oN
-         8x2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786116104; x=1786720904;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=fIN2n834rIShCbSttoGPoLBBWFwgRPau6O7pYEVDiZ4=;
-        b=Iy43i1d345djatGsAGmhW7ml4tUXsHGxZt0TQ5Nd36ewr9oA5RL5xPPVPLTYpVM7uy
-         QlCdtLU8cKURdown3MzD3D6o4ZJnO3I2pwsoCh4y5Mw3Ewf4+mabOcBnymtxDhlfmxab
-         F6otA3amL1R3+MxlR82EvScjbuNVSNcbEGmQHM1d+58c0GE0WJnzZTQs8QJUZfXI23JW
-         1rCwiPdnS+8c+d70beuJsmKRGz60RsFcTfdGb/9cs26U+o7Ga3i38uGcpusr1CErFcVp
-         wYDfzfIAEyF3f3aRw5mshdNLjZQsCnjPr5ePrvz1P0rJAerjsqltbBXiY3llOKWyS6Oq
-         vjtg==
-X-Forwarded-Encrypted: i=1; AHgh+RqCBrawtLmVXzpYjQsCJXpd/z2EjiF0ANxQKv4h1KP/U6ckRMtVzOYpVYdhlI/vaJAkvaOTsvRfEAlq45SMbtc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwednLLVK7vwjtnHHIQiGVe+vrYr3ugZ7MLJ/aUzD/GOOY/mLL/
-	A3gq5T5+ZpdO51YIPxaH7qR+SeY/duYlTrd3AuD/glhTEDNZrczPxxHXlDGizSq/dweNmIt/cJs
-	WkpCCnw2w95tIF8fSVLCAb/JBeU4sg064t+b+v4NBubh4cJLOmeDOodx1G1TQOJR2JbrgkpU=
-X-Gm-Gg: AR+sD11i1Ufb75arIIkoD1DoysrxY10SyKcbh+MWFkhTX0WL3VA3hfdCLfCbhfrSnoR
-	wa/ly05ZrHBWrm3A+8Hv1EFo7+YaPgKDdUJX57512pbre0XjwoVtw9BLK1c03AVSXr8z9eoJqwW
-	IVgSip9eHDUhvuYjWTTxn9TDsyqyDVJJt+8LrStrIUiQcNExHvNPxckvZ7cl+rNk5vXArUE0wJ3
-	RnZ7zweA3lAY7iVNbtRy/W6pkKS6jp5IIa3Zl+R7ns3SHKkAapjsypUs85euBMPdrtUxqCFp9ms
-	uZ77ivwHQD2gtjjW8luSyp+OsfbU9QqcWCXF6hBw1ZwYYt6eTvtlgGGx9w1Ziw7rBcjKxjsK23e
-	gN7oRPaPuCjb/ZkGVCM6lNJJPEJouV8c=
-X-Received: by 2002:a05:622a:480a:b0:51b:ee11:e71e with SMTP id d75a77b69052e-52ce5f7e829mr259021011cf.1.1786116103649;
-        Fri, 07 Aug 2026 08:21:43 -0700 (PDT)
-X-Received: by 2002:a05:622a:480a:b0:51b:ee11:e71e with SMTP id d75a77b69052e-52ce5f7e829mr259020311cf.1.1786116103200;
-        Fri, 07 Aug 2026 08:21:43 -0700 (PDT)
-Received: from QCOM-WFsSr66Fqw.qualcomm.com ([212.136.9.4])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a1e7c9d78asm774026a12.3.2026.08.07.08.21.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 08:21:42 -0700 (PDT)
-From: Igor Skalkin <igor.skalkin@oss.qualcomm.com>
-To: haoxiang_li2024@163.com
-Cc: error27@gmail.com, mst@redhat.com, marcel@holtmann.org,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Trilok Soni <trilok.soni@oss.qualcomm.com>,
-        Igor Skalkin <igor.skalkin@oss.qualcomm.com>
-Subject: Re: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
-Date: Fri,  7 Aug 2026 17:21:34 +0200
-Message-ID: <20260807152134.1525-1-igor.skalkin@oss.qualcomm.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260709114745.4030794-1-haoxiang_li2024@163.com>
-References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aKAsYaY3"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hGpWN6Gfhz49Q69;
+	Fri, 07 Aug 2026 18:50:08 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1786117809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5hZYlt6hYCz6LguU+w3n01grazUVwsdYgyMDvWa96nk=;
+	b=aKAsYaY3By4wpDhHZUhj6bpj8EBW3iJookTN29SqV5CMEUZxFwvAk52zj4evdiX0uVyi9t
+	9pgydS4ndxITp8h0+Yl79VzZB2n34FNfp/5YAy8wBoTqBdYUcIAbeW59/MW1jSRFXIYtBL
+	WLmQu7tfj0BWUXloWvLmKQ84WgXVRwTYhJLiuEH8EETOez8DL4ZWNPxQyu3h5DViNZzb4D
+	GCgn5uwNKOIHVLt9hJvfi75fBWPvn87Adf13tO9vjePO0XQphR09ytcfVUzoizHttWxMfX
+	qb5WobjtriTVSkQtTPV539YtK+rm6e6fCu//0jCLgnlTaUeoKbY659T8OK5QGQ==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1786117809;
+	b=Dm2OkXFM1T6LgKvTUM9TYuzLpRJEKdc/i0ZYtpznlulLuiMwxZxoZzZiDud9VcD58gRO7H
+	zi+0amOWhlJ3in9vNsS2XYpt+D0yxPoHqqMxAm4fHLZywEna/WbSEL058sFC5ONy0Kis6d
+	QzCWutRmJdzASoe33tbmj5IHkAo19c8fu1FfkNCsU6E9fvleQrolO1Ot4dbejpJujpLwZM
+	6Hj1TFPtaMXwbdPFwuOPzELwYM7bDKfiqBSWpUh7ZSNdOKUUNUlZQVSqPfU7cF3fe15ASI
+	3c2DGNLESnNZO7zFHxqtCvIqgIMO5V6pKCcVWrx49rJXjombnB3ObcQGKlMMBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1786117809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5hZYlt6hYCz6LguU+w3n01grazUVwsdYgyMDvWa96nk=;
+	b=hiqXOcnJGvWY7l0aGhD80XkMZjQVgZh0t8YyTqxdh2c6WtNcV6d4JJCWOVHWnHu0s/Hr+7
+	/dKgOZ8b5UvUrGrrv0mm6FDmC/TlKjtOlmpR4Bu7zB6uY8J7cQcWFnhsFrMGRc9Djfux4E
+	oryTgRR6qjlkZPxfrnWH+YhkfXns7SDp1OpxPEjY7UklBX2LKeo4/CFEVThmgOa0TAAZIc
+	CBPYinO69Sq3753Yby6uQGRUYS7vEq51fUk62ec76phaSJMO6U3+FFyIUaeQpgfzW3A/a5
+	RTlaIgPC8eojka6I1LzZ6fT2XymDY5fdtgKVbwmogMHNqmpUIvVYdp0z5z+qOw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <82419f940f030e932e0fbf6bac973257893bea30.camel@iki.fi>
+Subject: Re: Fwd: Use-after-free in net/bluetooth/iso.c (iso_sock_connect
+ race)
+From: Pauli Virtanen <pav@iki.fi>
+To: vova tokarev <vladimirelitokarev@gmail.com>, Luiz Augusto von Dentz
+	 <luiz.dentz@gmail.com>
+Cc: security@kernel.org, linux-bluetooth@vger.kernel.org
+Date: Fri, 07 Aug 2026 18:50:08 +0300
+In-Reply-To: <CAGBKPgNOmrroYBCrDekf7g92DoAvXeHJqZXoJo+vuzz-QtLwkQ@mail.gmail.com>
+References: 
+	<CAGBKPgM0Qm9UWQwKi4GBf+dB_b0PnBoST1WjWrh9-Pg=jupN9w@mail.gmail.com>
+	 <CAGBKPgNOmrroYBCrDekf7g92DoAvXeHJqZXoJo+vuzz-QtLwkQ@mail.gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: EGjy5ldBWhdugHXs07SI3jzDWJ5Kya_4
-X-Authority-Analysis: v=2.4 cv=SYbHsPRu c=1 sm=1 tr=0 ts=6a75f808 cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=dNlqnMcrdpbb+gQrTujlOQ==:17
- a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=EUspDBNiAAAA:8
- a=6wz9AUWKJ1XHrY9wszAA:9 a=a_PwQJl-kcHnX1M80qC6:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA3MDExOSBTYWx0ZWRfX1nL0D+HoIN8e
- EDMdt6yDiipS5NG7SYfshG9SxMw1yNttn2E4HmgdHaQGz4RTUMsKosaPEQg+HniockSHMuRNvoJ
- RI/TTTHSc/OewUZ4pjPcjTOR7CDDtsU=
-X-Proofpoint-GUID: EGjy5ldBWhdugHXs07SI3jzDWJ5Kya_4
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA3MDExOSBTYWx0ZWRfXzb0gE5pKjpsW
- CaV/Q6gMXOQrJjv89E49trvUIpR4LxEsydclA2q21ig3GjPB9PxZAJIX5yWzauKtkHxVnpfp6N/
- yhoqhGGD5B5sj9QpqtuF8iGm64FSa3Igl14GsptCNTakp4o4SqgpaIdVNHEWrZpfvGuu2cPMQIn
- ZYzmXKC+cCVwM4io45EEWfqIFqQIRdrPfDm35J2RhJgv3ml/CTih/9Ig4XjN+gAnwyFhkn4YlXO
- TfhNTHGdXah4uVXSTdT7TANIpqpm3YTc/VYLoF7bW+kVCk07TCsXTzzVhY7Oyg7RUK2tnPaS+fN
- XzvJ9ESIgtUGsLd9wa5q7RQD5P74EJs4+iCOQZueINLgm9N6Sd5gxSYZmeksnO1tayQ/CpgZeuz
- fFNKqrAvMTQj0tQLo92U5DmLIGNnUnejcFok/ZPpljIueI6rUtgDt49lTmQ1UH5sKTEN1ADR2eI
- Bq5PpR0YC7ON2FkLXww==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-07_02,2026-08-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1011 phishscore=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 suspectscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608070119
 
-I tested this against real hardware (not just QEMU-internal loopback):
-a MediaTek USB Bluetooth controller on the host, exposed to a guest
-kernel through QEMU's virtio-bt-pci device via HCI_CHANNEL_USER. This
-exercises the actual virtio transport and the real HCI core, not a
-mock. No other local changes to drivers/bluetooth/virtio_bt.c were
-present; this v4 patch was applied alone on top of plain v7.2-rc4.
+Hi,
 
-Test setup:
-- Host: Linux with a MediaTek USB BT controller (hci0), bluetooth.service
-  stopped/masked and the adapter taken down for the duration of the test
-  so QEMU could bind HCI_CHANNEL_USER exclusively.
-- Guest: v7.2-rc4 kernel with CONFIG_DEBUG_KMEMLEAK=y, booted via QEMU's
-  virtio-bt-pci device pointed at the host adapter.
-- This patch (v4) applied alone, on top of plain v7.2-rc4, nothing else
-  changed in virtio_bt.c; built as a loadable module for repeated
-  bind/unbind testing.
-- A module parameter (test-only, not part of this patch) let me force
-  a failure at each of the four points virtbt_probe() can now fail at,
-  to drive every branch of the new unwind ladder without needing to
-  fault-inject the real kernel functions.
+pe, 2026-08-07 kello 13:36 +0300, vova tokarev kirjoitti:
+> It's been almost two months since I reported this, and I haven't heard
+> back. Reaching out to you directly as the Bluetooth maintainer.
+>=20
+> The bug: iso_sock_connect() in net/bluetooth/iso.c drops the socket lock
+> (release_sock at line 1118) BEFORE iso_connect_cis() acquires
+> hci_dev_lock. During this window, a concurrent HCI Disconnection
+> Complete event can free the iso_conn via iso_conn_del() ->
+> iso_conn_free(), resulting in use-after-free when iso_connect_cis()
+> subsequently accesses it.
 
-Cases run, each followed by an explicit kmemleak scan:
+I'm not maintainer, but there are several UAF fixes for iso_conn races
+in iso.c in=C2=A0v7.2-rc6
 
-1. Happy path: probe succeeds, hci0 appears under
-   /sys/class/bluetooth, remove() runs cleanly.
-2. Five back-to-back insmod/rmmod cycles on the happy path, to catch
-   leaks or use-after-free that only show up cumulatively.
-3. Forced failure at virtio_find_vqs() -> err_free_vbt path.
-4. Forced failure at hci_alloc_dev() -> err_del_vqs path.
-5. Forced failure at virtbt_open_vdev(), i.e. after
-   virtio_device_ready() (post-DRIVER_OK) -> err_close_vdev path.
-6. Forced failure at hci_register_dev(), also post-DRIVER_OK and
-   post-open -> err_close_vdev path.
+Probably useful if you could verify whether the KASAN crash still
+reproduces on that version.
 
-Results for all six: no Oops/BUG, no lockdep or RCU-stall warnings,
-rmmod always succeeded, hci0 was present under
-/sys/class/bluetooth only when probe actually succeeded (cases 1-2),
-and kmemleak reported zero unreferenced objects after every case and
-in a final aggregate scan at the end of the run.
-
-This covers the ordering fix Sashiko flagged (hci_register_dev()
-moved after virtio_device_ready()/virtbt_open_vdev(), so no buffers
-are kicked before DRIVER_OK) and the vbt-leak/priv-cleanup fix on the
-virtio_find_vqs() failure path, both under a real transport rather
-than a stub.
-
-Tested-by: Igor Skalkin <igor.skalkin@oss.qualcomm.com>
-
-Happy to share the QEMU/kernel config and the fault-injection harness
-if useful for other reviewers.
+--=20
+Pauli Virtanen
