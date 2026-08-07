@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B881D435F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CA91D435F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786071124; cv=none; b=lvlCjOSKORQOxUBSNaCYXZUJ9duaTgVDVpom1eZOtC2usCNjuLHLFC5qor3+Eencm7LnZZ0eoVM2Cn6kcgbyJjl37+M/fJOUmm+xwdntcR1l2wLl14X7TnpxRzCvcXXi6avsi9e8QHT6xE4zrUlEvz4FleQnZvnX8SPYknnq+6Y=
+	t=1786071224; cv=none; b=R6lqHBz9GmMSocJucJawoL8o6fNkf9k3/UWk4MVrPVeuU45CU5VelFMghefJpyycPn9GDb7XxfXtVUSX+7FhOGQjuwUZIEheQ15anlxZFBbn0GsINbUY3Mw8EMlaCeMrfM8pbwWxWFiiOi5b29BPLa2QFHf1MOtBnKbtQw3zUuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786071124; c=relaxed/simple;
-	bh=ziYGmbhF72zdAuxRzO3gIOt8Cu1kR9eu8vjhSXVLe6w=;
+	s=arc-20240116; t=1786071224; c=relaxed/simple;
+	bh=6yxzoU1pGnDFzaCQRa1/UMYuwWNQOoGwV1xY9YEBBx0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fwnj0I/he/5fBjMIpnQduGu0uVFUimiKCKh3hAiNb3kl5WKFq4+BqsB5BRwCBtdIznq1tolDNm1gFeJ9XyNkMf5G9N+qzflZ4K/SDKgJNm4DFSF2OQx9iR+8PgJmjZwe09FUcbVnD5DXv/s8LsqBzyjyDHqr3Gp54rYhnlVNpnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t+lFnzgj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=hB8xqMIz98kIYO6jR+0KvsxeB+R7LDW7sLwOBqii93ZWXltApNhxtu1GskhPqQVshieMynelApDWg9LCooyjTN2R5Ta3GlrHYxND1fKH/j3gczCxxcozir56mn2sUPoJMxteHsQFQC6ZzHADgIag9Cvr8K5xfcopgC9Jv1LZ188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0s8zFZx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t+lFnzgj"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CE832C2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:52:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0s8zFZx"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 852CFC2BCB9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786071123;
-	bh=ziYGmbhF72zdAuxRzO3gIOt8Cu1kR9eu8vjhSXVLe6w=;
+	s=k20201202; t=1786071223;
+	bh=6yxzoU1pGnDFzaCQRa1/UMYuwWNQOoGwV1xY9YEBBx0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=t+lFnzgjFpAJg128PX+yOq844Nm49U6AHURu/ExUzPsd0+J5lpsVACa8Y5zFtqe5x
-	 5FyttwHlpF84gNPSw5QELCEcMDRmE/bNLP6OmxhuGi7dHKKmmdgEdmRrySwcJKHUvn
-	 LDYWTX7MEGshOKvi2UXIQn1UHZM8HksRGA5lTblwDSWmT0OgCXz3DuJNMm4mCJS3W5
-	 49Mslo4z9GKMXXSNFP+bXwhqkA3zCNmOibu/YRMaXPy9k692bWjNU6Zf86Rwg0d/0L
-	 BBb8sdCLF0QPPQdxf+d1gba+05nqDXe5fdQWxcwj7520Uw4yA4HsOvHDX6WBASOVfv
-	 u+yP2GhmQFeiQ==
+	b=O0s8zFZxQ6HACOZGVVbgXHrdY9jZSNK+622PZduNSpZ06sDwKmpdNxGAPPRnx5ETS
+	 0D4+e6eeDDwW1d1fU39X/H+vI2p4rTVB5JBIfsJDKFc6bKkF4x5NWZb4PVcjuG82/H
+	 SXenSasMZfnPbBZfEy3ORq9R3z8At1umu8f8VmjO7sxvhmfwfhstkq6t38+76BRJF3
+	 RgWLxe7CYMHBRrBnvD5y+kGv1HG7N5sDtDMM2j3OHosO7ovYdQ08ErFreGZFHeF/bM
+	 aPOa5Gzk2IDXdPfvzRDLB1dIpceBq4b9YdUL++dEvREJDJSEYXr6prIVKZzvgG6sZN
+	 e+59JddrLQrXg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B4D12C3279F; Fri,  7 Aug 2026 02:52:03 +0000 (UTC)
+	id 72EDCC41613; Fri,  7 Aug 2026 02:53:43 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 221832] MT7925 (Foxcon T99H493.03) BT missing in lsusb on
  Vivobook S16
-Date: Fri, 07 Aug 2026 02:52:03 +0000
+Date: Fri, 07 Aug 2026 02:53:43 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,7 +48,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221832-62941-YWKEFRuzKp@https.bugzilla.kernel.org/>
+Message-ID: <bug-221832-62941-rvOCIHmhPZ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-221832-62941@https.bugzilla.kernel.org/>
 References: <bug-221832-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,9 +64,45 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221832
 
---- Comment #8 from IQ (lnxps@bbtex.net) ---
-ps the DTB taken from 7.0.0 x1p42100-asus-vivobook-s15.dtb crashed the boot
-process (not video output, screen black)
+--- Comment #9 from IQ (lnxps@bbtex.net) ---
+.
+[  121.044682] qcom-iris aa00000.video-codec: loading
+/lib/firmware/qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn.xz failed fo=
+r no
+such file or directory.
+[  121.044728] qcom-iris aa00000.video-codec: Direct firmware load for
+qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn failed with error -2
+[  121.044755] firmware_class: __free_fw_priv:
+fw-qcom/x1p42100/ASUSTeK/vivobook-s15/qcvss8380.mbn fw_priv=3D000000001e317=
+614
+data=3D0000000000000000 size=3D0
+[  121.044874] qcom-iris aa00000.video-codec: firmware download failed
+[  121.117515] qcom-iris aa00000.video-codec: core init failed
+[  122.269583] rfkill: input handler disabled
+[  122.617337] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  122.996022] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  124.797661] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  124.896240] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  124.966805] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  125.315919] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  125.365047] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
+[  125.442740] msm_dpu ae01000.display-controller: [drm:adreno_load_gpu [ms=
+m]]
+*ERROR* Couldn't power up the GPU: -22
 
 --=20
 You may reply to this email to add a comment.
