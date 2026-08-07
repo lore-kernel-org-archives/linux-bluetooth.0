@@ -1,160 +1,96 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5F34B04B1
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 04:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF2537B02E;
+	Fri,  7 Aug 2026 06:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786076737; cv=none; b=ootb15ANqCAGr9Iz4GRbxsoJmAHTkjfhHr4nD5unRlfz1KAaZHSl05eaWLPmJs8cQW8NoZL758m6aUS29DxPxP2BBFYPBWDKMXJFC3LUkDwjq3i6toSFmMX6SClo+ufB2lMFgC/UxE/CgVvXstdx/F8sYiKSrtqQgmcAgtXCdX0=
+	t=1786082635; cv=none; b=jKFc3QZMTSM9dXcQLYfa7RZwUN7RsRGp88vYQD7XhZhFok+fbLHVEypJBSoAfugqj3qCc+thQTjAX930c547Dkd3OJwHBloeHqR47yDxlfIWoI30GdGAhgza3jD7DZFtZ8zJ+ahhuQoXz4Jsvn8M7cjD87TxvYyHr3AaSquK4xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786076737; c=relaxed/simple;
-	bh=VuHmqFUs5Y/uQ9VXlIEu6o0MLdimbxWAMIkKQs9kuSk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Qvu/qLktPQC54hLE1WqmHzIb4KvrWFch+LSYqdoBkdIvBMawLXlubPf8edOuhlOBiwQ79CHG+WthNvkx7R4aLfi6dLIlAtnzO1HS5b6Fz2QbwWdXJitcOoEhnTx8OY1Vvz4PSWyZAWafagTu/FpPy7vjqg82EuXkg7hl6vEhzQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Og3s7Kxv; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786082635; c=relaxed/simple;
+	bh=r79KBSafuypr2IL7FZR5tHn+AYGzsbkYbXZeTVqxWeI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MVGljVta2GzyxccQ4BpV0uMyrLCRC2/J8vcxTkU/pkg8/ldQA/CFLmDW3t+2q/Q+UO4kFcsgjdL4V5htEWgnvex+n4E0umBTYEvs0z9hVpBgQQ9Ctjweyl1GQ1wtR3inKJMjPG71O+B6kGTTjMBW70EhNEc46Hd87yZL+hMPw/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQG+Okni; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Og3s7Kxv"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-8114a4542b2so43590587b3.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2026 21:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786076735; x=1786681535; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=1ttC2BV7OhwDqvloUohJ4XLYG/fv5R57zEA682ZBvZw=;
-        b=Og3s7KxvPfEEXe0z1LD9qj1q2SxyJ5pfAlB4vPzuEOfzPNOHuOgZ6QqVDYK+GZuh05
-         C+7AbFqqYJdcBeNz2FQWEVpsDua5zGTBQbBPOr3Olb0W3f+4OwInBs6m0YOncBa2lr4D
-         UOoKRJ0MqBvYtRQRnuIchr7S3zrYiiPfqe2weMRH3h5qLYXbhinOkjpLkRxsxhIZJ5+y
-         n+KCNOB/Qi4W7UKyy8w2A2Ff8sL//7vaVrm1Vz7rDLPqwlYhESsOjW8rRlSwSwuA8eY4
-         uRIdjvLfJUkqSFhJvZiyA0fV7MHXoj61K04UlAZ2dYq25TdkdXzUDBiFUSJcBjQ66ECG
-         bpbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786076735; x=1786681535;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=1ttC2BV7OhwDqvloUohJ4XLYG/fv5R57zEA682ZBvZw=;
-        b=JIzPeIbFh/RaaVSm+aqlxBO/U0Rg/UGGEb8LYHqJWPfOeggNJxaRqPN8geAvkUAZ1N
-         7XN+YhNNqEEt+caKhpz05H3bRYT8g3uIus9fRQfeXL5SGaBsIqFxxzstVEkIffo0Ux8J
-         7/1BKlgs7ZtjI8wnGKTWkfzrOc5J3AxuzQ8I91tsw8YWiQ8AiINs34t8EZzXeH+dtF3H
-         dLYCCeeULI+5AHZZw3ahka3UsSpT744Gzl+T1N+pkNLIt0KvVy+Ex+0fNbwjdlWZIAVu
-         RNvWoRcilZ5MOiWOc2LxYopD3PMEUBIAgnbSR3IYTrvF1pKBIKF1ipiiKKpRBhZ+xAEx
-         OvQA==
-X-Gm-Message-State: AOJu0YzhJOBg2A5eGn+uh6sbf4E7J5nvNYkbKnNRR1aRXkfM0tWAlCsN
-	QYhtjEGr+G+7Lt8z9kQlNzm8BRTGoFBg2EnAWpHH/uC9GnTga0Vl5gmL2TzqWA==
-X-Gm-Gg: AR+sD11TxJxOhOjQ078JpR4i6XiX0S56T4GqUPG0QyQk7cJRBeDHUjsocyd0VNSXh2S
-	rf+tBrX9Ixqi7PzksxLiUSq9/Z3OI95hSmY6ZqyemtJl3bqk5iPegVwdB6LesxwrXvyYs0gqZZA
-	dGhMuldyYeHgEKx4VFjqBNPsN+WcHvLgG6j14XQ5rWX9JloiWE0fB+fAlYuaiCN68SDCfsGnZrY
-	jkqbazMz5oHxGgxj/3G1SZ79zeV13VRMVhug51I0b1gwn6y9Zz1INxKXEtZLxyiP4u26lxa7J2b
-	kYWXAmGTJ+Y/KrpYXBdm11QieAR0CjpIjsJ4SmFvWQ8suqbh66qpzbnIWKvq5oKzWRGLekkCzqx
-	SZl+IzGRehDRTr2mWCYfq+MiFeqwhsUgB0RTLn5Bo5XC8HXcpRUGFw6iZcm9gzCDWXx0zqDNPTH
-	IBH4/EIe49VFjW2X9fZ43nWqSD5KDECpxDbp5Di8ds41Rx7hhujiALPiCUQnZT8KeK0cQ=
-X-Received: by 2002:a05:690c:64c1:b0:81f:650d:1377 with SMTP id 00721157ae682-8202b0949a7mr121705967b3.35.1786076735076;
-        Thu, 06 Aug 2026 21:25:35 -0700 (PDT)
-Received: from [172.17.0.2] ([68.211.146.25])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-823f6238b91sm3419527b3.34.2026.08.06.21.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 21:25:34 -0700 (PDT)
-Message-ID: <6a755e3e.4f25dbb9.39b3ac.cd7d@mx.google.com>
-Date: Thu, 06 Aug 2026 21:25:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1655735176596779990=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQG+Okni"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E6771F000E9;
+	Fri,  7 Aug 2026 06:03:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786082634;
+	bh=OnjnoPTc2IU8C5hw2ZSi8CiARlOXZApAwqNm8RU5PYc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=JQG+OknipBtwjmOkl7R15Eji5ytxCL9qh/lVqe+DB/hJhj5SWrf+zLf4cNaj/CHCV
+	 xaDVax4X+pBh+FN2ei6AHbq0oyqY8A4+C0tj59Qi4UgqS8BPeLkO96Xo+LfcDtcjbP
+	 QoojMnK3xxD1VsakhQMR7w50A3/YBnlX6nG+3p3SmLVoHGyW4Xj8DBiUoO28VqID7I
+	 /y2iock8d2/fQ8Tt55Cdzl0NuuHxBxZq07PK52xtrFY3UDvLCuluegTT2Z/X5ltIbK
+	 uY1p1d7YLHEgIhy+Msw45EdRmIPtxMpGRNuI/9cFGi+k7kBCXMqrJRyuy+8YxhaOq7
+	 k5J1uKW/EV05A==
+Date: Fri, 7 Aug 2026 08:03:30 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Alessio Belle <alessio.belle@imgtec.com>, Luigi Santivetti <luigi.santivetti@imgtec.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Loic Poulain <loic.poulain@oss.qualcomm.com>, linux-pm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	imagination@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Subject: Re: [PATCH v3] power: sequencing: rename pwrseq_power_on/off() to
+ pwrseq_enable/disable()
+Message-ID: <nbsevqzspfbiptmq2mlxx2yo5z2wk5hdbc6f66yfjklmtl6hc7@ut47v44qgzgu>
+References: <20260731-pwrseq-vote-rename-v3-1-44e60b8be053@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ali@iusegentoo.com
-Subject: RE: Bluetooth: MSFT: validate evt_prefix_len against the response length
-In-Reply-To: <20260807012555.97482-1-ali@iusegentoo.com>
-References: <20260807012555.97482-1-ali@iusegentoo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260731-pwrseq-vote-rename-v3-1-44e60b8be053@oss.qualcomm.com>
 
---===============1655735176596779990==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Jul 31, 2026 at 03:42:18PM +0200, Bartosz Golaszewski wrote:
+> The way power sequencing works means that a call to pwrseq_power_on()
+> does not necessarily result in the pwrseq target being powered-on at
+> that time: it may have already been powered on before. Similarly: a call
+> to pwrseq_power_off() does not have to result in an actual powering off
+> of resources: there may still be other users that requested a power-on
+> before.
+> 
+> We will also introduce the concept of "non-controllable" pwrseq targets
+> soon which further increases the disconnect between the naming
+> convention and the actual semantics.
+> 
+> What consumers of pwrseq descriptors actually do is: they *vote* for a
+> powering on of a given target or retract that vote. These operations
+> could be called get/put in line with runtime PM but this could become
+> confusing since we already provide pwrseq_get/put() for a different
+> purpose. pwrseq_vote_on/off() also have been rejected as unusual in
+> the tree.
+> 
+> Change the name of the two functions to pwrseq_enable/disable() which
+> better reflects their purpose and semantics and also mirrors other
+> enable-counted resources like regulators and clocks. No functional change
+> intended.
+> 
+> If at any point users need to know *when* the exact power event happens,
+> we can provide that information in the form of a notifier.
+> 
+> Acked-by: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-This is automated email and please do not reply to this email!
+Acked-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-Dear submitter,
+- Mani
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1141853
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.00 seconds
-VerifyFixes                   PASS      0.22 seconds
-VerifySignedoff               PASS      0.22 seconds
-GitLint                       FAIL      0.50 seconds
-SubjectPrefix                 PASS      0.21 seconds
-BuildKernel                   PASS      29.37 seconds
-CheckAllWarning               PASS      30.27 seconds
-CheckSparse                   PASS      28.94 seconds
-BuildKernel32                 PASS      26.56 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      503.60 seconds
-TestRunner_l2cap-tester       PASS      65.25 seconds
-TestRunner_iso-tester         PASS      89.79 seconds
-TestRunner_bnep-tester        PASS      19.39 seconds
-TestRunner_mgmt-tester        FAIL      221.13 seconds
-TestRunner_rfcomm-tester      PASS      25.57 seconds
-TestRunner_sco-tester         PASS      32.03 seconds
-TestRunner_ioctl-tester       PASS      26.93 seconds
-TestRunner_mesh-tester        FAIL      25.99 seconds
-TestRunner_smp-tester         PASS      23.62 seconds
-TestRunner_userchan-tester    PASS      20.22 seconds
-TestRunner_6lowpan-tester     PASS      23.05 seconds
-IncrementalBuild              PASS      25.50 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: MSFT: validate evt_prefix_len against the response length
-
-6: B3 Line contains hard tab characters (\t): "	if (skb->len < sizeof(*rp)) {"
-7: B3 Line contains hard tab characters (\t): "		bt_dev_err(hdev, "MSFT supported features length mismatch");"
-8: B3 Line contains hard tab characters (\t): "		goto failed;"
-9: B3 Line contains hard tab characters (\t): "	}"
-14: B3 Line contains hard tab characters (\t): "	msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,"
-15: B3 Line contains hard tab characters (\t): "				   GFP_KERNEL);"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.242 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.403 seconds
-Mesh - Send cancel - 2                               Timed out    1.987 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/545
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1655735176596779990==--
+-- 
+மணிவண்ணன் சதாசிவம்
