@@ -1,149 +1,117 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5471231C91
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2026 01:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786065862; cv=none; b=sVCl3jAh3NpYwksBLY35IVtbC/x7Fof6Kg8flOrePghP2gRN9txKn5SxphM4pOSXYO2aFXVMrtlDQVpiBOQI+UxyWx68GY9prQdTbrgWtMXdvltHWPVWXGWBAqi264EGoFOkapbzUOj8RM6pcZb8NKbCt3vNLWy2A1JMLsknwVc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786065862; c=relaxed/simple;
-	bh=Y48Bu8ftOGgA51dtdprbH/3SwW4sJFO2CX5xPugceCM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ck6C1OQTz14q+b6bEYo/6ix2yPfoQRoGbVzlzwfAmMfslDvuIRp2R599AlID/V/+XwuHOso1OlEQuuMUZ6p8E1DNBTgtwQ0JSlcgiibn+S/FP2pYaELxIQofCWIDXg3nrrliDaOzWgCt8DwOI4Y47xCKreSogTO7EHgYfKBaCZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZF3qehz; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57C8277CAD;
+	Fri,  7 Aug 2026 01:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786065984; cv=pass; b=aGKAveNqMcHidX8Ek4gKi/ZeFHn33b0PRNXWSZb+0zAcwK2W/vQHXQt/GUyJGxaIpsFelxPfgUkG5NOwPb0Om1Q/exRthB7WfGz0AaJTz/NZxmtQMRvwenyTzw2JBfCAbuGZDYYMBqQaDhBNDNpgCPXw4SSX/6TJmBrxenUf5xU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786065984; c=relaxed/simple;
+	bh=M7p8nClWdOKdO/Iy8KBlzvIQAqX0giiAHElxJY2tIWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XJ6IEBqYfoHHxiGHDdHlMwqUsL2IuF4cTvRq+aLGg3/JCXl+ETSNQjtObGLQqKEGoS3Kl96DCkeu+3j5jAxdNWSL2Egnz+YS/UGPFZCfYMvEtTxCM/IKTv0sjNAdevBapkr44qxaf4wuYviY35DJSBDn9S/d49q1pmywPDvsBCI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=pm7R2M1v; arc=pass smtp.client-ip=136.143.169.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iusegentoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZF3qehz"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2cad8076b01so34736345ad.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2026 18:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786065861; x=1786670661; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5dpj+odImyjqm7gpO8EySGKAd7gDJNWl/ZQyEavYGXs=;
-        b=JZF3qehzL3d5bFhX3JYaxMsJBV0HXl6oBHj0cO1Q2KiYXk8isEja24K5UK1aqhXDut
-         TWhaAzV/xCCbUpm1QmroM9687WyMpbFTfDl3qavVhFOdPg8PboQL6ZjNPec84jWazZ7U
-         B2U++s8VaOjenwfephQECb6xUWYYs8200tELqrIsL2PxVMFZHZuDL7zzBsOC1m2nqssH
-         kmm1cPn7Y5dWPCy/hMTRmbKLzIsrpucrINgPM8lWM3hItsVyJIeOdQ+ke4R1ham6rLzw
-         7mKUnRoaLX/rvFkU9dp78JA4e0gq5JgBEucNELaF8TrGePxiqDaQZwPD3I1KzcxSYedU
-         19Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786065861; x=1786670661;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=5dpj+odImyjqm7gpO8EySGKAd7gDJNWl/ZQyEavYGXs=;
-        b=N4q1kDHDLlno2RfV5qXJZuNcHw4KBf5EKQAF/JrtOqyFBnZ0PVDx6iCU3+8x0STL5c
-         QwwEK9/lgp604nH3tiUWZvn67OkhSAYpUf1M4EjiJzv8OhNsV491RXO08QWqcElu9jwD
-         VyuDiz14ol3148T+33QHjOUCt7RqIakGfKz3IG0/sywkLciGbvFSpPGacCej19cmpnCH
-         FmoQOpGme/wAWKC1O8l+KW+hk2XDVWVSS0VJWVReZD6lfoVXS8pqkkJsuLodV8Io236b
-         1c0U4Fy2SDb021uLhxrvyJM/18tP3HI8EZPSU3KYqD6qO0P04y79oHcOTEGM4h14X+qK
-         hoWg==
-X-Gm-Message-State: AOJu0YxxwVDfQRMJpKF8xrmJkI5dv5Dh9Rw2jQXwHReRphKtsp9BmOds
-	YB0PtfM+srf8XfO4j8pYAFqpTL4FGM15s7i+v/WFiLQfSrGD1+ohYMAp7RjI3g==
-X-Gm-Gg: AR+sD135jIACmoPnPbl3V7px08UaVrSTF1M22WmyERgXlbyJxc/JWMVFRoEw/BhOu9b
-	Kkm01VMGtTO1641KVmsZ/mZTChM/bs/uGENQ3YUSk8P9PiSQhAU9Kz/b+9KAQETTuYWmCibEO8z
-	QfyS4UbyMubeO9P/vH2JuOGe+JmdVk9A+0VgETh6BtgGNqp6UXrE25WsbBmnvfAhJojnJBYNy8j
-	MTMWhx5RYq17d6BZ1ijFlpNK51wCTh+Z9wX9e8xSiEn+R0KSltTMr1TRNnvpmLiXTnFWIhmKN6G
-	Xn6Zr2taKHzh08w+aO8dvtvzj5MiNGdaZ1J76WojocAsUWqPYatIxYTb+d8j+G+9qz5v4MaAEBq
-	jsMtYvV2Z67IF/en7sVmCawbMvdWx5+gFrcMqv6fdlbZ/x160K65pDk4TjvTTJcfriZh5i9AEtP
-	t3FUc4rQZPEPAviFMm1YqBvX7wjaoPiEdJqNWSua9MN9P6i/zikd0Y0boZ6e3NqA0=
-X-Received: by 2002:a17:902:fdad:b0:2bf:9760:b94d with SMTP id d9443c01a7336-2d0ca7fd072mr240725455ad.15.1786065860966;
-        Thu, 06 Aug 2026 18:24:20 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.4.3])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315bec68468sm970204eec.31.2026.08.06.18.24.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 18:24:20 -0700 (PDT)
-Message-ID: <6a7533c4.436e7ae1.3d40ea.f1c6@mx.google.com>
-Date: Thu, 06 Aug 2026 18:24:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8250647669659926563=="
+	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="pm7R2M1v"
+ARC-Seal: i=1; a=rsa-sha256; t=1786065968; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=ceZbqb/FDNekaunhtckroJSfadpolIGOcM5i5D/CnUJxeXkhH2TMCJuwebfKTx9TmGd7yvaWr9PUG8910Ijue9mKkWNgb5pXC5eo3Z0M1GB6Uv4V7NXrOxogp+7bTftK7R7rXZsx9GxRc51ReOUYo8TLO+8hBvW0Wl7BuQKr0NY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1786065968; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=s+fW6anuhNIq0JN/xgWNpNcBDbYEbLmHj0v1Zwzq2HQ=; 
+	b=FtbF8lXy6Wbgklqbs3cdrEkIvkv2ZXhEunwJt9bt3kvYrWltAS6DmFrx4jdBUlA8NAfR/ozxiZTAlxTelusLcebW/DCFXiXjbuQXkWE94R7g6WzM+aan63lMVB3EWH8GajqOnyswwutDVCoJi8OdsW5tbBdJZC9tWDq2l8ojrwc=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=iusegentoo.com;
+	spf=pass  smtp.mailfrom=ali@iusegentoo.com;
+	dmarc=pass header.from=<ali@iusegentoo.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786065968;
+	s=zmail; d=iusegentoo.com; i=ali@iusegentoo.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=s+fW6anuhNIq0JN/xgWNpNcBDbYEbLmHj0v1Zwzq2HQ=;
+	b=pm7R2M1vAsGZgSxCC+x5IhtdMvvJLGleCby+FyscXIr2uTNeXUojKjJetC0/h6ei
+	tXtBmS3BUC7LkD1/Qt8Vba6NtkNNPSxTD70zCbt2N+VQu/uaV7Sidmf8EuK6xPfNS85
+	xU5XJxwNtaNLLQTn5Srf0o9ei/0Jj8Ju2x72uZQ4=
+Received: by mx.zoho.eu with SMTPS id 178606596522099.0300871055781;
+	Fri, 7 Aug 2026 03:26:05 +0200 (CEST)
+From: Ali Ahmet Memis <ali@iusegentoo.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: MSFT: validate evt_prefix_len against the response length
+Date: Fri,  7 Aug 2026 01:25:54 +0000
+Message-ID: <20260807012555.97482-1-ali@iusegentoo.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, amirabudubai@gmail.com
-Subject: RE: [v3] Bluetooth: l2cap: Create temporary hcon for inbound LE connections
-In-Reply-To: <20260806225237.51411-1-amirabudubai@gmail.com>
-References: <20260806225237.51411-1-amirabudubai@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
---===============8250647669659926563==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+read_supported_features() only checks that the response covers the fixed
+part of struct msft_rp_read_supported_features, which is 11 bytes:
 
-This is automated email and please do not reply to this email!
+	if (skb->len < sizeof(*rp)) {
+		bt_dev_err(hdev, "MSFT supported features length mismatch");
+		goto failed;
+	}
 
-Dear submitter,
+evt_prefix[] is a flexible array member and rp->evt_prefix_len is an
+unvalidated u8 taken straight out of that response, so
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1141804
+	msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
+				   GFP_KERNEL);
 
----Test result---
+copies up to 255 bytes from a reply that may have carried none of them.
+What is copied is data the controller never sent, and it is then used to
+match incoming vendor events in msft_vendor_evt().
 
-Test Summary:
-CheckPatch                    PASS      1.34 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.50 seconds
-GitLint                       PASS      0.26 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      24.67 seconds
-CheckAllWarning               PASS      26.91 seconds
-CheckSparse                   PASS      27.70 seconds
-BuildKernel32                 PASS      23.76 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      455.37 seconds
-TestRunner_l2cap-tester       PASS      62.51 seconds
-TestRunner_iso-tester         PASS      80.03 seconds
-TestRunner_bnep-tester        PASS      18.71 seconds
-TestRunner_mgmt-tester        FAIL      221.43 seconds
-TestRunner_rfcomm-tester      PASS      25.11 seconds
-TestRunner_sco-tester         PASS      31.57 seconds
-TestRunner_ioctl-tester       PASS      26.33 seconds
-TestRunner_mesh-tester        FAIL      25.00 seconds
-TestRunner_smp-tester         PASS      23.09 seconds
-TestRunner_userchan-tester    PASS      19.44 seconds
-TestRunner_6lowpan-tester     PASS      22.85 seconds
-IncrementalBuild              PASS      23.12 seconds
+This is not an out-of-bounds access. An skb data allocation always has
+at least SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) bytes past the
+payload, which is more than the 255 byte maximum, so the read stays
+inside the allocation and KASAN does not report it. It is still a read
+of bytes the host was never given, with the length fully controlled by
+the controller.
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+Reject a response that is too short for the prefix it declares.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.247 seconds
-LL Privacy - Unpair 1                                Timed out    1.857 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+Verified with an emulated controller over /dev/vhci on a KASAN kernel,
+with vhci made to advertise an MSFT opcode the way btintel, btqca, btmtk
+and btrtl do unconditionally. A reply of exactly 11 bytes declaring
+evt_prefix_len = 255 reaches kmemdup and copies 255 bytes
+("skb->len=11 evt_prefix_len=255", with the copied buffer dumped); since
+the reply ends at the fixed part, all 255 come from past the end of the
+response. No KASAN report is produced, as expected from the allocation
+slack described above. With this patch the response is rejected with
+"MSFT event prefix length mismatch" and msft->evt_prefix is left unset.
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.948 seconds
-Mesh - Send cancel - 2                               Timed out    1.989 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/542
-
+Fixes: 145373cb1b1f ("Bluetooth: Add framework for Microsoft vendor extension")
+Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/msft.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index d7badce8746c..ded68568e6c9 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -165,6 +165,11 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 	if (rp->sub_opcode != MSFT_OP_READ_SUPPORTED_FEATURES)
+ 		goto failed;
+ 
++	if (skb->len < sizeof(*rp) + rp->evt_prefix_len) {
++		bt_dev_err(hdev, "MSFT event prefix length mismatch");
++		goto failed;
++	}
++
+ 	if (rp->evt_prefix_len > 0) {
+ 		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
+ 					   GFP_KERNEL);
+-- 
+2.55.0
 
---===============8250647669659926563==--
