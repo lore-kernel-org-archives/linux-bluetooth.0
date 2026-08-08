@@ -1,165 +1,128 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A947934B66F;
-	Sat,  8 Aug 2026 22:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786226776; cv=pass; b=OoJyHAx0bmABgVS2G7O2tAuBgbjtu7+zGpdid2gm8yhvtsn5baAhtjXaAlgXQtvYjO3m4Fh2zk1HiPESzGLxbm71eBTJnXUCqhIhL/oeng2/YLuP672vh/c4eZXHFH6uPnMEg5OcsexwZl7dQnotW9xmlvMQVlftj7TZVwrSo7w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786226776; c=relaxed/simple;
-	bh=ZGpkRMcTUF9vsE0imEtYTMLOm61POpLyy/6dpgztaLA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DRMqBGsE9q6PWm2q1ZBd8knqVt7bwD/Yjs8wjjYkwaQt4xlJL19tqGkAOflyKwg784XvtYJDT9LBkglLf/WbOBfz9vKLDRhWn5UIRMGa0+gI5lPT6ijiB05G/O29/OPx61mjTdp7eIV9qoAh6SzV23et0w4bKK4ebJORw+OLUNc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=vIou7WP0; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AEC2F0C7E
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 22:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786228769; cv=none; b=hC8pn4L+1Lnhv/vNTrK43cgKwltw8meh8OjE7rcyGz4XO6JkwBNkWZyEHKc0GNGt0h91rBLTn6zU2m6wezCZBrXgyPCcOt7CQbgZ61tBYiXyFbz4+Vv+lKiBA4jcQazzHCEVAzy449MEjUZoCzB9ZqqqC0FvfRJMfxatmnqn/yw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786228769; c=relaxed/simple;
+	bh=DXHXGyta7VKW9Ucgzu2dgXRlM6oU/wDdkibdAk88uUQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=PNsc00XJHbiGSAbrimhHCJ8DVp77Ad6ZXe5cbNKQyMgpIzwCVDydLOrhQpdm1ZxlegMREfvoLocK/Y8fFvj2piTV4KP/yKV8aahRRFQcsiWC8JCD05Ld35p+u8NrGbcyxtWC6dN2mONeRE+7L+Dkxt07c7E4WL9KugKkh84jj6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kyx+5jLn; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="vIou7WP0"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hHZpl6GJ2zyRl;
-	Sun, 09 Aug 2026 01:06:07 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1786226768;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ZPPrB4lxQ645se+i5ucOW890+wON2Pj0mR4ABoEgBHM=;
-	b=vIou7WP00UjRbjf7cxDfcA+sriBlGXcqVerFcNLfob6GQXCnmoRMYeS6uOziEhtz2FfW5M
-	PNwRYl3cWhuOxdMD/VDFKxGsfCc0cnsa3necBc3H1LGQUG0luzZBjuEdUKeiVfjUhgRcAG
-	8rM/Kxn3ZJIwh4vk7/trOH2IPuZgeVs=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1786226768;
-	b=OwIymYy6b4vtuCnuF9NDo/W+xqR3XJiVZ5Jnx8H4cBb26khSM4Pi1aymInbjoCBE0+gt3o
-	EJkfgqbXFPzoZecPgfkRhhpQyBEgH0gVhqr/1CcCAr8+Dpj5oV4IBc1MBBI5TKmvpOKCbE
-	X4i7r46gEDhYVjirSkdsepxnEY5ZqlQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1786226768;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ZPPrB4lxQ645se+i5ucOW890+wON2Pj0mR4ABoEgBHM=;
-	b=kJDzVoZOXXdZWvh77aLOtX0bbwCxbm7Q7U/lmfqEa4o6HvJoOOFS0Mo+BcdQTeQ9tbmhB5
-	7lkvX9sX3LG7dvbJtIr2GZX/yPusFriXlY4nIgIB0gqa4+PVocxhU89heVjjSNKSqH2OE6
-	QWep6pkUkMs8OoDLVYaUdN/Onx8gLxw=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	oss@fourdim.xyz,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+9265e754091c2d27ea29@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: L2CAP: reject accept queue add unless BT_LISTEN
-Date: Sun,  9 Aug 2026 01:06:05 +0300
-Message-ID: <204b3dea7b0e001f64920ed1114d38c16afdb397.1786225848.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kyx+5jLn"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-38125cebfdaso870730a91.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Aug 2026 15:39:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786228767; x=1786833567; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=NeF6BMC502teMOj0xuE47dqh91bN5TU5Gy1d5oL5zOE=;
+        b=Kyx+5jLnomFgpB5Vs1NvDId+DWATV1J7sk8sM+WabRjfxS2Ve2RwBO+s3XYi4SCtTa
+         bRCnEU1ZOoGpEyRRxKX+RKkoaBftjHDFZz4Tge/WoAkleQFawO2B4itZo5BUX1cjSedj
+         0LntjJ6mijYmirxl0gXN92aGd9h/95/1BE00xp7GjFJ06+8lAAGT+Ew0Za08g5PPmz0+
+         /Um9GN27p6emAjcuNQnKhhy8QvUyYU5+Gu/jq/+VdQuiza0agh4sPY7uqtQ9YpnyLxp0
+         9xwehwD4hfYSRZ3TXTaW+ItUh+ShaxfqsMUJvGG1fBqFztZ4N5Bna9Miwrv71TToCakq
+         JfVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786228767; x=1786833567;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=NeF6BMC502teMOj0xuE47dqh91bN5TU5Gy1d5oL5zOE=;
+        b=SfK44/DQaMfcx4y+Tj9u2vwtLovQKyrw5oTCG1K8lcCGSqs/pmrb9hKUAZKoWHJ0Uy
+         sSGcyhGG/gFixI9/fbnxty5LHHLxQzQv8yIjzlGz1/M08WjAX7hB9eZjpNr/KrODR9+Y
+         vsk1ALSPfDQbaJE3/ZvGr5ssBF3Z7DN8JZVCqsbT9jrAgW+krtA+dQ4XSeEUSET8+/J2
+         /nFqWb+jNhbYDT9CzATqJbZdFTL0vxeeZI9kQU+HKfnr8sp7HauG7aqOE2aLleQZuQvj
+         XQVC1vD3jzObRR8+S4brkLdE12loF7tDhMAVNdKzYI9YXsCOpSTAYAqimTSGcCHaSpMR
+         Z0hg==
+X-Gm-Message-State: AOJu0YyPatEytmBeA/9QQMEh9FrZXyTAhgWTFibnK/4Ho2pztX3XBS1L
+	3vtlYUPfHdsJi51WAich9fUMM55xe7d+oZm2aNDTiZC3oEdfRvGT+cLf6UQU2g==
+X-Gm-Gg: AR+sD104C3OBL+d3c53aOV6kHRB2eK5dYK/V3Ug7xKLUCepHyoOUaDSzIBk1fLwhIEt
+	1NzJn5ubrXFlsjqsnmX4ZgEvRaAc65u5h0UUpAPfUQus9jOV8CLStDBpIRPTTT7JaMiv9qu5zOL
+	GND/iqkERzLa0MVOVa5bKjADCZ6wAvkGvLzDcc1vVXjJbq0hzh4n4Mce7iGOMkzFzxLSEMtqTqc
+	C4dcxgf5EySOMsM/TxoZNOthpxxigCt4m2F3IBQndciDGKbPwDeXNAOBZhm+LUAuqWAj0IGsbWd
+	Gz9p/wj81rqNdY/pwvuePI6Gb0ptkul+mGOnGpN7/M/9kAkCTB/IYv/yJNStiJToIG7E7oraF4l
+	Mdut9ru1/5KwmtB+7/KlCh/9qgdimhoFRf9LlRRkjajOHbJ+U88ddXyb4kn2w/B4UfCb4jl3f+X
+	DYjNW3TTWRhMe4CEXvFw2Y42OgqMxd6pwjGy2IDJuAi9wea5uDSec7pFywlOUiFIld
+X-Received: by 2002:a17:90b:53c6:b0:38e:101f:c867 with SMTP id 98e67ed59e1d1-392622eb744mr15487905a91.18.1786228767163;
+        Sat, 08 Aug 2026 15:39:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.3.215.34])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39085c393d5sm9673884a91.0.2026.08.08.15.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Aug 2026 15:39:26 -0700 (PDT)
+Message-ID: <6a77b01e.8f0cbdd2.40ecf.b59f@mx.google.com>
+Date: Sat, 08 Aug 2026 15:39:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8742517604337682049=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: L2CAP: reject accept queue add unless BT_LISTEN
+In-Reply-To: <204b3dea7b0e001f64920ed1114d38c16afdb397.1786225848.git.pav@iki.fi>
+References: <204b3dea7b0e001f64920ed1114d38c16afdb397.1786225848.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-New sk should not be added to parent socket accept queue after last
-l2cap_sock_cleanup_listen() has run in l2cap_sock_teardown_cb() and
-state set to BT_CLOSED, as that can result to UAF on dereferencing the
-dangling parent reference.
+--===============8742517604337682049==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-l2cap_sock_new_connection_cb() may race with parent l2cap_chan teardown,
-due to chan->state accessed without consistent locking:
+This is automated email and please do not reply to this email!
 
-  [Task 1]                           [Task 2]
-  l2cap_sock_release(parent)         l2cap_connect
-    l2cap_sock_shutdown                pchan = l2cap_global_chan_by_psm
-      l2cap_chan_lock(pchan)
-      l2cap_chan_close
-        l2cap_sock_teardown_cb
-          pchan->state = BT_CLOSED
-      l2cap_chan_unlock(pchan) ------> l2cap_chan_lock(pchan)
-                                       l2cap_new_connection
-                                         l2cap_sock_new_connection_cb
-      l2cap_chan_lock(pchan) <-------- l2cap_chan_unlock(pchan)
-      l2cap_sock_kill(parent)          /* bt_sk(sk)->parent dangling */
+Dear submitter,
 
-Fix by adding check for sk_state == BT_LISTEN after acquiring sk lock in
-l2cap_sock_new_connection_cb().  Add lock_sock() around sk_state writes
-where missing, to avoid data races.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142792
 
-Although the data races on pchan->state should be fixed too, this
-defensive sk_state check probably makes sense in any case.
+---Test result---
 
-Fixes: 2ff1a41a912d ("Bluetooth: L2CAP: Fix null-ptr-deref in l2cap_sock_state_change_cb()")
-Reported-by: syzbot+9265e754091c2d27ea29@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=9265e754091c2d27ea29
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Test Summary:
+CheckPatch                    PASS      0.55 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.06 seconds
+GitLint                       FAIL      0.19 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      27.48 seconds
+CheckAllWarning               PASS      30.25 seconds
+CheckSparse                   PASS      28.89 seconds
+BuildKernel32                 PASS      26.78 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      504.75 seconds
+TestRunner_l2cap-tester       PASS      64.78 seconds
+IncrementalBuild              PASS      25.38 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: L2CAP: reject accept queue add unless BT_LISTEN
+
+38: B2 Line has trailing whitespace: "    "
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/561
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    Fixing up chan->state locking is a bigger changeset, and should be done
-    separately.
-    
-#syz test
 
- net/bluetooth/l2cap_sock.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 735167f73f31..8c2ac8b911e0 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1568,6 +1568,11 @@ static int l2cap_sock_new_connection_cb(struct l2cap_chan *chan,
- 
- 	lock_sock(parent);
- 
-+	if (parent->sk_state != BT_LISTEN) {
-+		release_sock(parent);
-+		return -EINVAL;
-+	}
-+
- 	/* Check for backlog size */
- 	if (sk_acceptq_is_full(parent)) {
- 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-@@ -1731,10 +1736,14 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
- 	if (!sk)
- 		return;
- 
-+	lock_sock(sk);
-+
- 	sk->sk_state = state;
- 
- 	if (err)
- 		sk->sk_err = err;
-+
-+	release_sock(sk);
- }
- 
- static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
-@@ -1810,6 +1819,8 @@ static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
- 	if (!sk)
- 		return;
- 
-+	lock_sock(sk);
-+
- 	if (test_and_clear_bit(FLAG_PENDING_SECURITY, &chan->flags)) {
- 		sk->sk_state = BT_CONNECTED;
- 		chan->state = BT_CONNECTED;
-@@ -1817,6 +1828,8 @@ static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
- 
- 	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
- 	sk->sk_state_change(sk);
-+
-+	release_sock(sk);
- }
- 
- static void l2cap_sock_set_shutdown_cb(struct l2cap_chan *chan)
--- 
-2.55.0
-
+--===============8742517604337682049==--
