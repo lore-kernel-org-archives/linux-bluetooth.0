@@ -1,35 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7785A275870
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 19:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D23275870
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 19:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786216967; cv=none; b=J7+FjOgsN770m39lylOVrzbLakSb7jA5ZfY1+sRr+LVif8PmPrrmiQdHKWft09jFygpaev/6+7DCIlLRwtwxpcdEpzbvSv8RyvZOjeTZBz7+by5tqRwMMeAo/CNkYjPWXaqEH7cZFWBQAm0KUIG4uH2rUuvIVE3Jv5IgDwFz/ak=
+	t=1786216970; cv=none; b=peqxwrhQYUV15MUXcTojEIhjTVFBVJcshJGizr5MEj9QTX/fbd6gSQ4SjOpdzOh3iAXPFTZCFneb0bpOR+LQcaodH+OM1FtfCyH5eanvwCzcnJWWdan925bYh0Yy6ZIY2JaHUfNVsKIlTWgHFQYsma4+BE0bH/UD5lC/iF1Bvm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786216967; c=relaxed/simple;
-	bh=HDtufkpa+I5HL5UUAi6MxKzXa2aO329OK3GEh/Zlcig=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gTEnCA+CpbPVtXrSrBToOf67m06c5FS+uqBGvdnKkRVBPDaZpYaSxe/jYBj8p4AjT5zPbgba7xuvPS67+0phWvk8JKjnQV5lFyGxCaA2IQFJ8ovSCtcMt0XmgDQIJHRxBWUvCqcQVdznSbUqAW6KMX0cAZmCZB+YAh8G8ck+nP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VIkfMtPc; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1786216970; c=relaxed/simple;
+	bh=T4yiUFrlv4bruYAaUAwyuH0QVJQIxMk4v2hyglybE0c=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UrwTUzqUl+DpZvsZvYtKztZ5f13ysvBY/IGInJf4UaN7KDLqVtpOlY8aSnyC6i9qfp1rbZYWOHkmfDawlpbNHt6A+Rwdu0/I8c/eYLOv/dRL8+FQBUTjYTKi+XWDciL9i0CbH8iLyjPLCCNKd8Vh/eECToDdDswZyDUtGLh48Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=M/ffX8+S; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VIkfMtPc"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="M/ffX8+S"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786216965;
-	bh=GwxIiwO/J2ZUd1Bfg/c7cGZaOoNPaK4lUoqDCd/84Y0=;
+	s=pf2023; t=1786216968;
+	bh=iRR/mdvLZmU2CujztWhgMPKizYJkuJ3dlpZdb0PgtGE=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=VIkfMtPcfDTQVQ9SpJQtRIAfRr9famgpmNyBDd5pFytKOkVde9uSqgEE34HDwUaA4
-	 R/34Cs6wal47O9iIMHf+OSmCThIIbOgVH5jIYDcChe3wkdLm3RxC+5QkwyhB3zV3hC
-	 uyHWaozz1WJkLjplouXnTVTv5I7/3em9/Ju8rUb0=
-Received: from github.com (hubbernetes-node-44f0f93.va3-iad.github.net [10.48.76.94])
-	by smtp.github.com (Postfix) with ESMTPA id 9D86F180A7C
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 12:22:45 -0700 (PDT)
-Date: Sat, 08 Aug 2026 12:22:45 -0700
+	b=M/ffX8+SmuxO37COzOvhLElqjxrV2YaN6zOZoSFLuTel3dXw8hk0WQGfh/uo5P8AQ
+	 kKkEsqYsFzTbj+Od2/TqdYOqhSegrXDQsclsnfn+VGtvvCu6sCAnORRyFZz8lvs9FI
+	 BHzmpKYBhX4LSfY+xsJIDr0vYo/g7A1ehCO4fvWY=
+Received: from github.com (hubbernetes-node-b44799f.ac4-iad.github.net [10.52.12.27])
+	by smtp.github.com (Postfix) with ESMTPA id 7F7AEA07F0
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 12:22:48 -0700 (PDT)
+Date: Sat, 08 Aug 2026 12:22:48 -0700
 From: z4pdy <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1142763/000000-c92911@github.com>
-Subject: [bluez/bluez] c92911: client: Avoid scan prompt when discovery is
+Message-ID: <bluez/bluez/push/refs/heads/1142766/000000-306156@github.com>
+Subject: [bluez/bluez] 306156: client: Avoid scan prompt when discovery is
  alread...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -43,11 +43,11 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1142763
+  Branch: refs/heads/1142766
   Home:   https://github.com/bluez/bluez
-  Commit: c92911888f02409001eaa8df5022928137a4f913
-      https://github.com/bluez/bluez/commit/c92911888f02409001eaa8df5022928137a4f913
-  Author: z4pdy <z4pdyy@gmail.com>
+  Commit: 3061567c4084e3eecfec2e59d1c0f2f1de4d6f7a
+      https://github.com/bluez/bluez/commit/3061567c4084e3eecfec2e59d1c0f2f1de4d6f7a
+  Author: z4pdy <305461556+z4pdy@users.noreply.github.com>
   Date:   2026-08-08 (Sat, 08 Aug 2026)
 
   Changed paths:
