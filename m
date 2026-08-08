@@ -1,100 +1,128 @@
-Received: from outbound.ci.icloud.com (ci-2004k-snip4-11.eps.apple.com [57.103.89.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE5835DA77
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 04:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.89.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010FE54763
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 04:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786162602; cv=none; b=u1V63o4lXkhraYfaxjuO4tP2L7jeQBwYwJUxFn+0RqYR0gidmxxKLuW+MveggY+cC9YbybG7eWfR+VH6ATwZI8TsrvyWD8LcYAnw52gQW9gNoM9Dd7N7Iukb643fS7Dav+LYjvE1kUgQij1GEuXYXO14mdVQOmMWnYBjJWX2Dn0=
+	t=1786163663; cv=none; b=aK1H7uODYqwGsz7ODltelaVrPbxhSleYvaYrh+WhdAzjl0a3UbHvTecR/s5vFymvyGv4YUoA463eyI9upGI0h+9fandrikpbbdqNQzVFpR2p79xwvc+lGE0I2s3pXYrlmHGVMvvqWrZhlkQm43ItPDSqTDvb2CXv21586Il15kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786162602; c=relaxed/simple;
-	bh=g7d/prbK2/z6S2bLj7HJyMTJiL9Ge+lglYmNpeRowrg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hED9ITil70pLhV+bz/eHD6hHPOV52gIUeflX9BfKGwgGemfLHnWnEmNvmZ8cO3FjiN1nhNU4+iHxDwLu1pxXw0dC9wHaaYKls4bqLY5Q3Ct8wuuropkaJcJR83EF0AbahKsunXkLgdBb354xyxnSJp0bIiFmTCCwomuw+nX6VII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proxy-alt.dev; spf=pass smtp.mailfrom=proxy-alt.dev; dkim=pass (2048-bit key) header.d=proxy-alt.dev header.i=@proxy-alt.dev header.b=QRjYRgIZ; arc=none smtp.client-ip=57.103.89.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proxy-alt.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxy-alt.dev
+	s=arc-20240116; t=1786163663; c=relaxed/simple;
+	bh=/fpKtyH4sueWQ2eeomqm2G+VwDRNqvcMiDdi+/OdTG8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Pq9eanx3/7xJYLs10H9LhoxNN9HnWywaevMl6oSRAYlW8V9lBTZi1if2MAjB6+QlcoPacu3qrKXjpmH99SmFzuiudjCqhoku1tfe9dyyYQnafJBd8xhpgk7GctM9Vpjc+iLlYb9UB7U3zgHYX99l7mJ0viJRrfIEVF4vwL5/SCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bS2aaq+Y; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proxy-alt.dev header.i=@proxy-alt.dev header.b="QRjYRgIZ"
-Received: from outbound.ci.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-central-1k-60-percent-0 (Postfix) with ESMTPS id 5C3A8180012B;
-	Sat, 08 Aug 2026 04:16:37 +0000 (UTC)
-X-ICL-RepId: 019fdf96-4dc9-7e5e-9f04-0cb70b44168a
-X-ICL-Out-Info: HUtFAUMHWwJACUgATUQeDx5WFlZNRAJCTQ5JHV8DXRxCCkodXAFbEhVdRUMfWBNLXVgURy1HGV0IQFVSAUNFVhVPWFUJChtAH0EBHgxbHxwUXA4TH1RWAVBRHV8CCgRHBFsXRgNTRVEZFxFQAVgeVl5aF15NRx9ATWJJAVoZWxxAF0puTVMPDwBLF0sUGgpeBBccVhsXBlsUBEQBXQVdAkgJQANZBl0BQxdOCl4EXB9BFAhBAk8SHxFVDHMdRQRKCRQZXxkZD1cGB1hHFEcODxNMC0cCWjRWH1QZWgM=
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proxy-alt.dev; s=sig1; t=1786162597; x=1788754597; bh=UZCT8NW0xVC4WNU/ttySLkaGBycu0HHtAtf2ATVIqDQ=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=QRjYRgIZSKBAqKS2wqRPTRlHbdNOc5aTbNzT1OrMmmM4PS2nnTwtHtE8qQdma901tlTrrfZ6mfSb2+f1CybQwz8lo4Xcg3cG3o/wucCNEiJs94oVrMfqluEVkH84cWGwqB9dUspq0CuPfT9Kh5Sqk4/DByyUI/0OD+UWM7ZVLk5s1NrL21k/uZD4Tl3Y+4zXb41gfaAMU8p+Jr/1bPVRNoQm2BoQMhGypHQaNA9qdwP3NF3dvi4T0GmQcCikO2oOpzWldCKv2mjlCRAI3G3AHOS0spZvKvsMtzptdMJuZXePK+LvpwF8GtyPQS1U0nhuINptHbj11YbZNgy/6xh4Kg==
-mail-alias-created-date: 1786144344056
-Received: from localhost.localdomain (unknown [17.57.156.36])
-	by p00-icloudmta-asmtp-us-central-1k-60-percent-0 (Postfix) with ESMTPSA id C5CB9180009B;
-	Sat, 08 Aug 2026 04:16:36 +0000 (UTC)
-From: Proxy alt <proxy-alt@proxy-alt.dev>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	Proxy alt <proxy-alt@proxy-alt.dev>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: discover the CCC descriptor instead of assuming it
-Date: Sat,  8 Aug 2026 00:16:33 -0400
-Message-ID: <20260808041633.69337-1-proxy-alt@proxy-alt.dev>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260808031940.66686-1-proxy-alt@proxy-alt.dev>
-References: <20260808031940.66686-1-proxy-alt@proxy-alt.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bS2aaq+Y"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c9ef3e1337fso105758a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 21:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786163661; x=1786768461; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=td39VXGEsrjf0a+N8wCt1KnGBmjOdttG7rv7jtzoeRo=;
+        b=bS2aaq+YeyzaDKmDJSnX6sFqQsZPCKSLPHdxeGXz/6LYbdjrjL4Ae81sj7Xe+9XTT3
+         J8S7HUQptkhFPVoMdMzvl7aXlyNor0LgijuiXkb5SWeqNyGa5gEVKRWtdL9+wP2IgUxL
+         /hdW/gAFlbxNEcIa+hC8OoJUNYE456Mb6JHUgj914sdewM46zb4j2LWK5S05yGFf4ocl
+         722b/QkJt/0EhF0DYXbGsK7D2QrnG9d8olFtz+Zk3Jk0iWPVsEv/XSX3BocCcsagc34v
+         0asNppY8QmA6MgnYENUjLStJ0wV4TbGpJM6x3xLicGGjcOB1AiITy5tsI7qUeO+BcAev
+         Q5Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786163661; x=1786768461;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=td39VXGEsrjf0a+N8wCt1KnGBmjOdttG7rv7jtzoeRo=;
+        b=P2A7WF3237V3rg/a6z1raSLq618ctvhglIGjJfUzFNcAegWUHog53w4F/I5iUoInPN
+         tDL1BB3d7Fn5htpDbObpn8WmujhJIJ3kL/cSqufXELtzTwgLPPS2MHtMdP3J4kZ6ZTH5
+         wNOj6LUycCY/z3hxZ4n/reY7SHPS2joUfxElLR45KaN852CEmXXQAUO9uCLJLitcPH1R
+         kOX5nXLfkJ/d+SfIOfD2I5YsCDU0IUzSCS/lS8UjVWP7HwIiAiiXEEeSb7C4TuGGTCoi
+         /dJu/9V71HNwDVU6YbSmPJb3t2InJCHH7qXfwgA0LOxI/uBulk1sSL9dzGhNFHDLOUFD
+         aRew==
+X-Gm-Message-State: AOJu0YzLeLAm0dT767jqK/i5HNlAHiFQuhvCOTSCOhQfWUqkMSsNMqoD
+	o0Qj6yvbVes3Sf24iWbCx7B1ShKD7x4kg1CET3+G7eASDzc7qwQwMSI88ElAOwi9
+X-Gm-Gg: AR+sD12F5XAz0aHqhNnb3xkN4Y1/UMaFqPLxpxBqoHDuzn0W+6r12c5cF2q32MHOqyK
+	tFXXlRoAeySuG3AZKcCrXJZRotDaeDrJlyOvoHLCkSIaLX5QLT06y0dMY1FQgoc3H0gxrIe3a6O
+	TKVecD1S2u8FNCmdib+lHmJWTUdKLZcqcpiyYUJMJ0azFgWixcc0wAXhyAfbXSMSMA+vsl9j0az
+	bBAj50DRTOk4INqa4Lb1PuwEbR31I+jILqHOrM9xfArDmkdMQEx5hjAv6axh7hKnKIMb4yOTQ0F
+	THdM+GqrxUlfOemoZRRBIHQ5zpCAdcJfL3Nr6OZ5eCCcJyYYwE+Ob0tNrSW4gCiiLIJvNVc9boC
+	EX4zYh80AoyeCvx9hNq+9T+6ueuOyjI2mO8N2Zz+gqCaPEkk+A167QK2TKv8bG40YDyYu85oMP5
+	absQDtHIx6byOVb2JN3PbBGtv/9eCu+Su/5mOD9nkvFas9RxmMb6vHI8GxY9SU2ns40lGj2EQBI
+	rSBArs=
+X-Received: by 2002:a05:6a20:4309:b0:3c8:ead5:bf7b with SMTP id adf61e73a8af0-3cb85ded991mr31306337637.4.1786163661150;
+        Fri, 07 Aug 2026 21:34:21 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.253.35])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315beb88473sm13060832eec.17.2026.08.07.21.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Aug 2026 21:34:20 -0700 (PDT)
+Message-ID: <6a76b1cc.881e6cae.4accd.ccf6@mx.google.com>
+Date: Fri, 07 Aug 2026 21:34:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8239486681894501302=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 2bwRZ0EZHYhBy5dvoYJebpMYWxqbE3LB
-X-Authority-Info-Out: v=2.4 cv=TLNIilla c=1 sm=1 tr=0 ts=6a76ada5
- cx=c_apl:c_pps:t_out a=2G65uMN5HjSv0sBfM2Yj2w==:117
- a=2G65uMN5HjSv0sBfM2Yj2w==:17 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=fN7Wovw5WoxFwK9X2xEA:9
-X-Proofpoint-GUID: 2bwRZ0EZHYhBy5dvoYJebpMYWxqbE3LB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA4MDAzMCBTYWx0ZWRfX8eAJbUtTO9y5
- hep9BPwD02O2BMpaVZ0wyLzEw3VN7MA1Ga5QFwxhW+hFIjFj5HeYOg4p8hJaK+xANWThHd400DP
- HwVCzgmcHjVjFpjNefX5jQmscGjU5j5g6+pSzC/lRAryoTYcwnYR1uuh/u8GHP42fYF5trS2w49
- 0g9CAhiVRi6KbhtsnSQdxsd+iGCinBw8GFaQA+dwaXz4Zu/WfwfaAtw53NEj8u3Xt/lt7Q1Uzqy
- RQQ+/a7B7J9rlkadsR1XfBjPJ4ijEQ0NvNHuYUKB6WBUf/qBMBhubIGNaUBcQCdmOok2r27iZiN
- nz6TKD60ljpFGIRVBjqVk4S9ro/Stfvm13iZWTTYOjxdMA8VmCLnLxPmie3yK0=
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, proxy-alt@proxy-alt.dev
+Subject: RE: [BlueZ] shared/gatt-client: discover the CCC descriptor instead of assuming it
+In-Reply-To: <20260808031940.66686-1-proxy-alt@proxy-alt.dev>
+References: <20260808031940.66686-1-proxy-alt@proxy-alt.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-v1 breaks unit/test-bap, unit/test-mcp and unit/test-rap. MakeDistcheck
-caught it; I had run unit/test-gatt rather than make check before sending,
-which is my mistake and why the commit message says less than it should.
+--===============8239486681894501302==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Those three profiles have notify characteristics whose descriptor range is a
-single handle, so on current master the synthesis fires and no
-FIND_INFORMATION goes out for them. With the shortcut removed, discovery
-asks, and a 5-byte FIND_INFORMATION_REQ appears where the expected sequence
-had the next operation:
+This is automated email and please do not reply to this email!
 
-  ERROR:src/shared/tester.c:990:test_io_recv: assertion failed
-        (len == iov->iov_len): (5 == 7)
+Dear submitter,
 
-Everything after that shifts by one exchange and the tester aborts on the
-first mismatch. unit/test-gatt itself is unaffected - 192/193, identical
-before and after - but that is one suite, and stating it in the commit
-message implied a coverage I had not actually established.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142517
 
-I still believe the change is correct. With the shortcut gone,
-gatt_db_attribute_get_ccc() returns NULL, chrc->ccc_handle stays zero, and
-register_notify() already completes the request and registers the handler
-locally without writing anything.
+---Test result---
 
-That is now confirmed on the affected hardware, using tools/btgatt-client
-built from 690c16d, same device and adapter minutes apart:
+Test Summary:
+CheckPatch                    PASS      0.32 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      18.42 seconds
+BluezMake                     PASS      571.13 seconds
+MakeCheck                     PASS      0.98 seconds
+MakeDistcheck                 FAIL      118.10 seconds
+CheckValgrind                 PASS      144.24 seconds
+CheckSmatch                   PASS      249.75 seconds
+bluezmakeextell               PASS      89.99 seconds
+IncrementalBuild              PASS      574.78 seconds
+ScanBuild                     PASS      809.47 seconds
 
-  before   descr - handle: 0x0013, uuid: 00002902-...
-           < 12 13 00 01 00
-           att: Operation timed out: 0x12
-           Failed to register notify handler - error code: 0x0e
-           Device disconnected
+Details
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
 
-  after    discover_descs_cb() handle: 0x0013, uuid: 00002901-...
-           Registering notify handler with id: 1
-           zero writes to 0x0013, no error, link held for the full window
+../../test-driver: line 107: 52684 Aborted                 (core dumped) "$@" > $log_file 2>&1
+../../test-driver: line 107: 52701 Aborted                 (core dumped) "$@" > $log_file 2>&1
+../../test-driver: line 107: 52964 Aborted                 (core dumped) "$@" > $log_file 2>&1
+make[4]: *** [Makefile:10247: test-suite.log] Error 1
+make[3]: *** [Makefile:10355: check-TESTS] Error 2
+make[2]: *** [Makefile:10826: check-am] Error 2
+make[1]: *** [Makefile:10828: check] Error 2
+make: *** [Makefile:10749: distcheck] Error 1
 
-So the device's real attribute at that handle is a 0x2901 User Description,
-and once BlueZ asks rather than assumes, notify registration succeeds and
-the connection survives.
 
-v2 to follow with the expected PDU sequences in those three tests updated to
-include the FIND_INFORMATION exchanges that discovery now performs.
+https://github.com/bluez/bluez/pull/2387
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8239486681894501302==--
