@@ -1,156 +1,256 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A531DDC38
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 08:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786176024; cv=none; b=oc2wG9T3t6KB5TbJ/ch4OEoR+N2rT4p6o+C2TULcL9QQstS8jXl2QlWg0eiLNfm9TkbRE9TroB0Hd4MFy2u7BjKyc8LA795RYa5gQ7pfhxf51jgizsEhSZw6a/8KsMiAC+Dc2mdzQ7RdtgMsnA3K2C8d2kVqdeb+DyCQIfSFdzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786176024; c=relaxed/simple;
-	bh=IcvB9hCsje44D8/+GJW7QqGZy5SmnvtY2modLSnqiCg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fHsXdHt9X1PRPt5FOYLqVeEn5WpcBhgWSqtp7wiegFd9opuYzeLW7gvpbG7IQ9YHHXn7/m8bIIpf7hM4rJJjZIxR8jzGD3g17MA5TEN8bKQuLZm+ubhyU4cYultzdPrbQ/D0eDFtTqk95WDuk/1bwyp+0B0U1STp/TSRPe4b+8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwzJ1jyz; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B5A3B27C9
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 08:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786177850; cv=pass; b=QsGwfonYohK+1q5cF40fyMFfdTZJf5PjAHdJAeHuyz6Hv76/R3QpGfRjlx+CJmyX8kVye4AUamKB5lNBUA9H2vmmlXc6wjNJn5qdJVMzndt0Q/HHhRoKd93Yfx3S+hVw1NF8R5rjX7r5Plq43/KMQPdNNtVCAV277Xq4W4TG1e4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786177850; c=relaxed/simple;
+	bh=Da9BGpVBMFddF1qGiGluWnw/RovQvvUbxFtj8dAUD7Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZiVa25mNPmrWhqMe9b1ElOzHCdoCmnOQHwKPlTXfBtykJYJTPsS4bR2x9iXR4z84Sj4FsfXPRYVsmyeHHQ5svMYkDefU8EWUSV2Fx4Nw60ssZTbh7Ce2OcchvHoJ3zR3ED9af27Tn3NOqustxdoPeVZUW7JvnzUl5WmctSmQzgs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=g0Z33ZGl; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwzJ1jyz"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2caea3f742bso5650455ad.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Aug 2026 01:00:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786176022; x=1786780822; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=BecfFIa0aBgSwwvWkkSwW2jId+Luwg/RoN/KYjYNhDk=;
-        b=lwzJ1jyz53nAsM/mZ1XQQXjDN67oa7MQavAlPNfooLD8/dV8j/+Diz/mT0QpuaGcKl
-         0x2RMvDDSJ9VskLAs/U86HoD7sGv9Ai70b3L7h3fwWLt5KLnHvRLDxNinBs5cBBq/eo5
-         IZjiUB6NOfaU92BZ2JVBGWpBxFMtaoYW5Y/Ea78nR1t94AvNidZ0oPd+FVBBKJYQRsgc
-         JG2E0bKomJdDuATdovnLgmNWiuhOTOsFibMLhzfg8h/rQx9f+O6AI6Wm9PHgQO9P48fF
-         AgwVknXfERTpTu++o+hydSo4qQw3IpFVpJW06Vk8dOMPY3c9o+I7ivj/pyc5/04o6tFR
-         PeCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786176022; x=1786780822;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=BecfFIa0aBgSwwvWkkSwW2jId+Luwg/RoN/KYjYNhDk=;
-        b=S0LkO3YF525ORKBvieWrAHznRn99y+ZE4TKqZ6rkGP0LQcnq/SZaccuwytGHxHxLNi
-         ynHD7DnJE2Aj8Q7NZZGKQukhze1Hq/B4U8E3IRhNygoeC0UPwCAUwnpNS8RxagAtoWmH
-         qb4Kk+bz8S+4j3ehCk7ZauDmPLzHRvSN2TVWPS61OzyNzxm2lGBhY/Trf8oNda27qJWT
-         YycJVQtYQ8dYItlsBAQA5ZbfTv8sLvP5To9BGFOx6kCz+3+Z/QkacfRCNf63AjpCR3rl
-         eLak5TKWa7KxB9xNtHY3j1q3TbTW1BqDqa9kuxyq5r++PQKGS+3oXpO0aGNux4tizySw
-         Oq3w==
-X-Gm-Message-State: AOJu0Yw9Ko61/xqkxI/w7OEUpjhrrMc66fl4AAJhYCDaHP2YQJSfjME3
-	McIqMrMVNuQxtenYYSHvlfl4s6kblKDxPfO9iSWC+NGia9YXbs3phX8zf1/WiQ==
-X-Gm-Gg: AR+sD11KYcvyz+gwEvf1MmU50/5hgVCys7yl6HZp4I6sCvexxZGvra02/oV0qoazJR3
-	gZwISDDCL2yeEEgNIdqcW6IeqeEgOfQfzg3NXzxsBikyvrIjd8xiYjUrTf/40/xxj8L9d1g0gha
-	FaFcKpLeD0k9z52Tw1IS790MaCtz46KA3Y5Pw9HiB6sD0VGYt8m44TD4y63nkn8P5GOmeBSzthc
-	XJtSPItG5om92i2TDCRk9Dk39hUL2tP5/O3kgtmZg3nuVRNBmziItWAFjAzUX8AzjP3hYX8tWwm
-	yhlLw3LaxBaXeB3SghxsoKUMkeF+JcluH6khj0IoEwFHt/ZVXPEfYZt8wm80KHxjl947wn/YWLm
-	tXiMRehSzERsfqgWraxxW5dgykpMKTuyji3t7nNh3WRCAABuA35pnduO1Gh0vlT66keWGnRwg3E
-	uUtS/aREsaGYDqwVuodhNIbaVPMeB1O8USBQKAfg4j9f63Jp0iSy9DOL869I6akLGsCrF6
-X-Received: by 2002:a05:6300:220a:b0:3c3:a1e6:a626 with SMTP id adf61e73a8af0-3cb86026fc3mr37330986637.32.1786176021850;
-        Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.128.137])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be86e90asm15889529eec.3.2026.08.08.01.00.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
-Message-ID: <6a76e215.4a342cbc.f12fe.5122@mx.google.com>
-Date: Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6229015737024296344=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="g0Z33ZGl"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hHDjl06ZyzyQZ;
+	Sat, 08 Aug 2026 11:30:34 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1786177835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1+VKyKjWweCWGXrC+Py45Q3vh6gJStxqoGueway4/bE=;
+	b=g0Z33ZGlXv+GkERarj2aFYh6vMwKAWL8qibZ3B4UH/c0HK8rZnymIoUDT+lBFk+TT6PVpI
+	mkhJJJ//BIXbAcZkzankPJKiNpsgtGtGDmpOQ7GNt5MIUxwJKkrA+wbZT5/6W9tkz2h8j/
+	xy33lbdVPImb1npTqpRSn5+4ivs5Ujo=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1786177835;
+	b=muyAGCCe0h8BfwqW89cvHu8tSsACu4TLNfeaXj1a3FPfKO9Gs9r7XRFqILoNQs83Mbs/mS
+	Gcm5NC2//4Yk3kMaAB7x1Zm4aGZAAmF7/9I0weUd39c2ixy86LO/W+MC2YNCvaBVV/ReZW
+	N4IxlUN2DX6jVxHC2z2it3Zqcegu47M=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1786177835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1+VKyKjWweCWGXrC+Py45Q3vh6gJStxqoGueway4/bE=;
+	b=iuO9yaKxNjftv24QX0kvLD9OHyo3XWC2gc+v0UavwAeq84DJlV07koBQ8qV1VkFQQSwcFP
+	ggKDeB8EZcemk+I6XGq8pxgT5r9GaI13E58FrBQVAUUSefF7WFlzGxFY0U4Bvfe6T2t0P7
+	yA5NO4mN0Q2i8uQgvBym0QzmNqsEKnI=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] emulator: btvirt: support debug for -s socket server
+Date: Sat,  8 Aug 2026 11:30:33 +0300
+Message-ID: <3a0785ebc5ceef448c52d25545b142659d25ce24.1786177678.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zhangchen200426@163.com
-Subject: RE: [v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
-In-Reply-To: <20260808062541.3705446-1-zhangchen200426@163.com>
-References: <20260808062541.3705446-1-zhangchen200426@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6229015737024296344==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Support btdev debug -d when using socket server -s.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142545
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.24 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       FAIL      0.25 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      25.86 seconds
-CheckAllWarning               PASS      28.40 seconds
-CheckSparse                   PASS      27.13 seconds
-BuildKernel32                 PASS      24.78 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      458.71 seconds
-TestRunner_l2cap-tester       PASS      61.52 seconds
-TestRunner_iso-tester         PASS      91.80 seconds
-TestRunner_bnep-tester        PASS      19.64 seconds
-TestRunner_mgmt-tester        FAIL      219.47 seconds
-TestRunner_rfcomm-tester      PASS      25.64 seconds
-TestRunner_sco-tester         PASS      31.55 seconds
-TestRunner_ioctl-tester       PASS      26.45 seconds
-TestRunner_mesh-tester        FAIL      26.23 seconds
-TestRunner_smp-tester         PASS      23.57 seconds
-TestRunner_userchan-tester    PASS      20.05 seconds
-TestRunner_6lowpan-tester     PASS      23.05 seconds
-IncrementalBuild              PASS      23.90 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
-
-1: T1 Title exceeds max length (90>80): "[v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.248 seconds
-LL Privacy - Unpair 1                                Timed out    1.860 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.484 seconds
-Mesh - Send cancel - 2                               Timed out    1.988 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/558
-
+$ btvirt -d -s
+Bluetooth emulator ver 5.87
+Request for /tmp/bt-server-bredrle
+bredrle: host10: > 01 01 10 00                                      ....
+bredrle: host10: command 0x1001
+bredrle: host10: event 0x0e opcode 0x1001
+...
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2:
+    - Handle closing server with active clients correctly,
+      in case this is used from elsewhere than main.c
 
---===============6229015737024296344==--
+ emulator/main.c   | 16 ++++++++++++++
+ emulator/server.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++
+ emulator/server.h |  5 +++++
+ 3 files changed, 77 insertions(+)
+
+diff --git a/emulator/main.c b/emulator/main.c
+index 09d6e9adb..c21640adc 100644
+--- a/emulator/main.c
++++ b/emulator/main.c
+@@ -80,6 +80,13 @@ static void vhci_debug(const char *str, void *user_data)
+ 	printf("vhci%u: %s\n", i, str);
+ }
+ 
++static void server_debug(const char *str, void *user_data)
++{
++	const char *name = user_data;
++
++	printf("%s: %s\n", name, str);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	struct server *server1;
+@@ -231,6 +238,15 @@ int main(int argc, char *argv[])
+ 		server5 = server_open_unix(SERVER_TYPE_MONITOR, path);
+ 		if (!server5)
+ 			fprintf(stderr, "Failed to open monitor server\n");
++
++		if (debug_enabled) {
++			server_set_debug(server1, server_debug, "bredrle",
++									NULL);
++			server_set_debug(server2, server_debug, "bredr", NULL);
++			server_set_debug(server3, server_debug, "amp", NULL);
++			server_set_debug(server4, server_debug, "le", NULL);
++			server_set_debug(server5, server_debug, "mon", NULL);
++		}
+ 	}
+ 
+ 	if (tcp_port) {
+diff --git a/emulator/server.c b/emulator/server.c
+index 7790867b7..e3eda8458 100644
+--- a/emulator/server.c
++++ b/emulator/server.c
+@@ -30,6 +30,7 @@
+ #include "bluetooth/hci.h"
+ 
+ #include "src/shared/mainloop.h"
++#include "src/shared/queue.h"
+ #include "btdev.h"
+ #include "server.h"
+ 
+@@ -39,10 +40,15 @@ struct server {
+ 	enum server_type type;
+ 	uint16_t id;
+ 	int fd;
++	struct queue *clients;
++	server_debug_func_t debug_callback;
++	server_destroy_func_t debug_destroy;
++	void *debug_data;
+ };
+ 
+ struct client {
+ 	int fd;
++	struct server *server;
+ 	struct btdev *btdev;
+ 	uint8_t *pkt_data;
+ 	uint8_t pkt_type;
+@@ -51,10 +57,22 @@ struct client {
+ 	uint16_t pkt_offset;
+ };
+ 
++static void detach_client(void *data)
++{
++	struct client *client = data;
++
++	client->server = NULL;
++}
++
+ static void server_destroy(void *user_data)
+ {
+ 	struct server *server = user_data;
+ 
++	queue_destroy(server->clients, detach_client);
++
++	if (server->debug_destroy)
++		server->debug_destroy(server->debug_data);
++
+ 	close(server->fd);
+ 
+ 	free(server);
+@@ -64,6 +82,9 @@ static void client_destroy(void *user_data)
+ {
+ 	struct client *client = user_data;
+ 
++	if (client->server)
++		queue_remove(client->server->clients, client);
++
+ 	btdev_destroy(client->btdev);
+ 
+ 	close(client->fd);
+@@ -223,6 +244,18 @@ static int accept_client(int fd)
+ 	return nfd;
+ }
+ 
++static void dev_debug(const char *str, void *user_data)
++{
++	struct client *client = user_data;
++	struct server *server = client->server;
++	char buf[512];
++
++	if (server && server->debug_callback) {
++		snprintf(buf, sizeof(buf), "host%d: %s", client->fd, str);
++		server->debug_callback(buf, server->debug_data);
++	}
++}
++
+ static void server_accept_callback(int fd, uint32_t events, void *user_data)
+ {
+ 	struct server *server = user_data;
+@@ -279,6 +312,11 @@ done:
+ 		close(client->fd);
+ 		free(client);
+ 	}
++
++	client->server = server;
++	queue_push_tail(server->clients, client);
++
++	btdev_set_debug(client->btdev, dev_debug, client, NULL);
+ }
+ 
+ static int open_unix(const char *path)
+@@ -338,6 +376,8 @@ struct server *server_open_unix(enum server_type type, const char *path)
+ 		return NULL;
+ 	}
+ 
++	server->clients = queue_new();
++
+ 	return server;
+ }
+ 
+@@ -414,3 +454,19 @@ void server_close(struct server *server)
+ 
+ 	mainloop_remove_fd(server->fd);
+ }
++
++bool server_set_debug(struct server *server, server_debug_func_t callback,
++			void *user_data, server_destroy_func_t destroy)
++{
++	if (!server)
++		return false;
++
++	if (server->debug_destroy)
++		server->debug_destroy(server->debug_data);
++
++	server->debug_callback = callback;
++	server->debug_destroy = destroy;
++	server->debug_data = user_data;
++
++	return true;
++}
+diff --git a/emulator/server.h b/emulator/server.h
+index 7d6b7be74..1844a9871 100644
+--- a/emulator/server.h
++++ b/emulator/server.h
+@@ -24,3 +24,8 @@ struct server;
+ struct server *server_open_unix(enum server_type type, const char *path);
+ struct server *server_open_tcp(enum server_type type, uint16_t port);
+ void server_close(struct server *server);
++
++typedef void (*server_debug_func_t)(const char *str, void *user_data);
++typedef void (*server_destroy_func_t)(void *user_data);
++bool server_set_debug(struct server *server, server_debug_func_t callback,
++				void *user_data, server_destroy_func_t destroy);
+-- 
+2.55.0
+
