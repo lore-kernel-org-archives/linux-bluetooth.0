@@ -1,192 +1,156 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A362E762C
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 06:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A531DDC38
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 08:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786170421; cv=none; b=GRUwdkTrL3PwcIewQq2oO0NxrAU/1hrt3JiKVsgp6FK5KOb5UgF/RRychrSpxYJHAdab05NV/72bKgGayuzn8wLcSo/oQGBM+m0RAC2jZM/tdPALEGLP7QE7jnEF6j4VF5ms34IUxhfn+qQhfR5K4a56nAPJZSXXwBm8/ULBROw=
+	t=1786176024; cv=none; b=oc2wG9T3t6KB5TbJ/ch4OEoR+N2rT4p6o+C2TULcL9QQstS8jXl2QlWg0eiLNfm9TkbRE9TroB0Hd4MFy2u7BjKyc8LA795RYa5gQ7pfhxf51jgizsEhSZw6a/8KsMiAC+Dc2mdzQ7RdtgMsnA3K2C8d2kVqdeb+DyCQIfSFdzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786170421; c=relaxed/simple;
-	bh=5czDNVls+50ARHCX0Pt7WR4EIy95lXC+Z9MqZpQdKJ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GTXlT9U6kFsVTN+4xGVbc/1Zz27tIAI4fBoqCX+4/i9mxGGyqn6N7ueets3I2KUOoLe0gc+VNMzP0kdrd0QA/b2zo9z1C5mI5+dLxrW4JFsn7C7t9WKPOoNtGa86gCkzFOzYjOVRL7KgvRsrZkHbN0xFXKnCGZRlkyr8BaMFTe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=o5Nc8y8+; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1786176024; c=relaxed/simple;
+	bh=IcvB9hCsje44D8/+GJW7QqGZy5SmnvtY2modLSnqiCg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fHsXdHt9X1PRPt5FOYLqVeEn5WpcBhgWSqtp7wiegFd9opuYzeLW7gvpbG7IQ9YHHXn7/m8bIIpf7hM4rJJjZIxR8jzGD3g17MA5TEN8bKQuLZm+ubhyU4cYultzdPrbQ/D0eDFtTqk95WDuk/1bwyp+0B0U1STp/TSRPe4b+8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwzJ1jyz; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="o5Nc8y8+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=E4
-	fuskLPuOyFfJmOKLHesg2a7SHxnZCGjt/slebSr2E=; b=o5Nc8y8+OB7Vq827wQ
-	BYke8t9R8Dq4iJ2dYyeUPzuVPXzBbjJvsvKJiKaOws0xKyVU61ekId1NWEnUdGKb
-	0wTfR8ZPNjKs6iue2NNt6muG5At+Pqq6OZZJyDVaBDPjWHnO2LRFGKMcBTYec3Wo
-	/I/w9VrLnoB5R98kbNHlBKmnA=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wAnHWDoy3Zqlq4FAg--.14064S2;
-	Sat, 08 Aug 2026 14:25:45 +0800 (CST)
-From: zhangchen200426@163.com
-To: luiz.von.dentz@intel.com,
-	pmenzel@molgen.mpg.de,
-	pav@iki.fi,
-	yang.li@amlogic.com,
-	tim.bird@sony.com,
-	gustavoars@kernel.org,
-	naga.akella@oss.qualcomm.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Chen Zhang <zhangchen01@kylinos.cn>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
-Date: Sat,  8 Aug 2026 14:25:41 +0800
-Message-Id: <20260808062541.3705446-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwzJ1jyz"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2caea3f742bso5650455ad.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Aug 2026 01:00:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786176022; x=1786780822; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=BecfFIa0aBgSwwvWkkSwW2jId+Luwg/RoN/KYjYNhDk=;
+        b=lwzJ1jyz53nAsM/mZ1XQQXjDN67oa7MQavAlPNfooLD8/dV8j/+Diz/mT0QpuaGcKl
+         0x2RMvDDSJ9VskLAs/U86HoD7sGv9Ai70b3L7h3fwWLt5KLnHvRLDxNinBs5cBBq/eo5
+         IZjiUB6NOfaU92BZ2JVBGWpBxFMtaoYW5Y/Ea78nR1t94AvNidZ0oPd+FVBBKJYQRsgc
+         JG2E0bKomJdDuATdovnLgmNWiuhOTOsFibMLhzfg8h/rQx9f+O6AI6Wm9PHgQO9P48fF
+         AgwVknXfERTpTu++o+hydSo4qQw3IpFVpJW06Vk8dOMPY3c9o+I7ivj/pyc5/04o6tFR
+         PeCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786176022; x=1786780822;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=BecfFIa0aBgSwwvWkkSwW2jId+Luwg/RoN/KYjYNhDk=;
+        b=S0LkO3YF525ORKBvieWrAHznRn99y+ZE4TKqZ6rkGP0LQcnq/SZaccuwytGHxHxLNi
+         ynHD7DnJE2Aj8Q7NZZGKQukhze1Hq/B4U8E3IRhNygoeC0UPwCAUwnpNS8RxagAtoWmH
+         qb4Kk+bz8S+4j3ehCk7ZauDmPLzHRvSN2TVWPS61OzyNzxm2lGBhY/Trf8oNda27qJWT
+         YycJVQtYQ8dYItlsBAQA5ZbfTv8sLvP5To9BGFOx6kCz+3+Z/QkacfRCNf63AjpCR3rl
+         eLak5TKWa7KxB9xNtHY3j1q3TbTW1BqDqa9kuxyq5r++PQKGS+3oXpO0aGNux4tizySw
+         Oq3w==
+X-Gm-Message-State: AOJu0Yw9Ko61/xqkxI/w7OEUpjhrrMc66fl4AAJhYCDaHP2YQJSfjME3
+	McIqMrMVNuQxtenYYSHvlfl4s6kblKDxPfO9iSWC+NGia9YXbs3phX8zf1/WiQ==
+X-Gm-Gg: AR+sD11KYcvyz+gwEvf1MmU50/5hgVCys7yl6HZp4I6sCvexxZGvra02/oV0qoazJR3
+	gZwISDDCL2yeEEgNIdqcW6IeqeEgOfQfzg3NXzxsBikyvrIjd8xiYjUrTf/40/xxj8L9d1g0gha
+	FaFcKpLeD0k9z52Tw1IS790MaCtz46KA3Y5Pw9HiB6sD0VGYt8m44TD4y63nkn8P5GOmeBSzthc
+	XJtSPItG5om92i2TDCRk9Dk39hUL2tP5/O3kgtmZg3nuVRNBmziItWAFjAzUX8AzjP3hYX8tWwm
+	yhlLw3LaxBaXeB3SghxsoKUMkeF+JcluH6khj0IoEwFHt/ZVXPEfYZt8wm80KHxjl947wn/YWLm
+	tXiMRehSzERsfqgWraxxW5dgykpMKTuyji3t7nNh3WRCAABuA35pnduO1Gh0vlT66keWGnRwg3E
+	uUtS/aREsaGYDqwVuodhNIbaVPMeB1O8USBQKAfg4j9f63Jp0iSy9DOL869I6akLGsCrF6
+X-Received: by 2002:a05:6300:220a:b0:3c3:a1e6:a626 with SMTP id adf61e73a8af0-3cb86026fc3mr37330986637.32.1786176021850;
+        Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
+Received: from [172.17.0.2] ([57.151.128.137])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be86e90asm15889529eec.3.2026.08.08.01.00.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
+Message-ID: <6a76e215.4a342cbc.f12fe.5122@mx.google.com>
+Date: Sat, 08 Aug 2026 01:00:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6229015737024296344=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAnHWDoy3Zqlq4FAg--.14064S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Xw1fuF18Aw43urWDJF4rGrg_yoW7XrWfpa
-	909as8ZrW8Jr4fX3WfCaykZrs5Ww1kWrW7Krs2k34FyanYvrZ7tF1kC342yry3ArWDJF17
-	XF42grW7KryDJwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UP3kNUUUUU=
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC5wxmA2p2y+wv2gAA3A
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zhangchen200426@163.com
+Subject: RE: [v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
+In-Reply-To: <20260808062541.3705446-1-zhangchen200426@163.com>
+References: <20260808062541.3705446-1-zhangchen200426@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Chen Zhang <zhangchen01@kylinos.cn>
+--===============6229015737024296344==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Some speakers do not actively initiate disconnection when powering off. As
-a result, the central device can only wait for a timeout to disconnect,
-with the default timeout being 20s. In certain scenarios, this can
-significantly impact user experience. For example, a phone actively
-connects to a speaker, the phone acts as the central device and the speaker
-is the peripheral device. If the speaker is playing music and is then
-turned off, it takes 20s before the music starts playing from the phone.
+This is automated email and please do not reply to this email!
 
-Define HCI_Write_Link_Supervision_Timeout command, event structure, and
-corresponding event handler function, set the timeout to 5s after ACL
-link is established.
+Dear submitter,
 
-Changes in v4:
-- Fix sparse warning: convert the timeout to little-endian with
-  cpu_to_le16() when sending the command
-- Use hci_rp_write_link_supervision_timeout instead of hci_ev_status in
-  the command complete handler, matching the style of
-  hci_cc_write_link_policy()
-- Rename timeout_ms to timeout since the command parameter holds raw HCI
-  slots (0.625 ms units), not milliseconds
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142545
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202608080528.0kc5JCoL-lkp@intel.com/
-Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.24 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.10 seconds
+GitLint                       FAIL      0.25 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      25.86 seconds
+CheckAllWarning               PASS      28.40 seconds
+CheckSparse                   PASS      27.13 seconds
+BuildKernel32                 PASS      24.78 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      458.71 seconds
+TestRunner_l2cap-tester       PASS      61.52 seconds
+TestRunner_iso-tester         PASS      91.80 seconds
+TestRunner_bnep-tester        PASS      19.64 seconds
+TestRunner_mgmt-tester        FAIL      219.47 seconds
+TestRunner_rfcomm-tester      PASS      25.64 seconds
+TestRunner_sco-tester         PASS      31.55 seconds
+TestRunner_ioctl-tester       PASS      26.45 seconds
+TestRunner_mesh-tester        FAIL      26.23 seconds
+TestRunner_smp-tester         PASS      23.57 seconds
+TestRunner_userchan-tester    PASS      20.05 seconds
+TestRunner_6lowpan-tester     PASS      23.05 seconds
+IncrementalBuild              PASS      23.90 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures
+
+1: T1 Title exceeds max length (90>80): "[v4] Bluetooth: hci_event: Add HCI_Write_Link_Supervision_Timeout command/event structures"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.248 seconds
+LL Privacy - Unpair 1                                Timed out    1.860 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.484 seconds
+Mesh - Send cancel - 2                               Timed out    1.988 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/558
+
 ---
- include/net/bluetooth/hci.h      | 10 ++++++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 44 ++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 50f0eef71fb1..f3c91cc1fc45 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1239,6 +1239,16 @@ struct hci_cp_host_buffer_size {
- 	__le16   sco_max_pkt;
- } __packed;
- 
-+#define HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT	0x0c37
-+struct hci_cp_write_link_supervision_timeout {
-+	__le16	 handle;
-+	__le16	 timeout;	/* in units of 0.625 ms */
-+} __packed;
-+struct hci_rp_write_link_supervision_timeout {
-+	__u8	 status;
-+	__le16	 handle;
-+} __packed;
-+
- #define HCI_OP_READ_NUM_SUPPORTED_IAC	0x0c38
- struct hci_rp_read_num_supported_iac {
- 	__u8	status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e7133ff87fbf..866903a9b5c8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -702,6 +702,7 @@ struct hci_conn {
- 	__u8		le_features[248];
- 	__u16		pkt_type;
- 	__u16		link_policy;
-+	__u16		link_supervision_timeout;
- 	__u8		key_type;
- 	__u8		auth_type;
- 	__u8		sec_level;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ea858391c789..0ee6d5922ca4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -609,6 +609,37 @@ static u8 hci_cc_write_voice_setting(struct hci_dev *hdev, void *data,
- 	return rp->status;
- }
- 
-+static u8 hci_cc_write_link_supervision_timeout(struct hci_dev *hdev, void *data,
-+						struct sk_buff *skb)
-+{
-+	struct hci_rp_write_link_supervision_timeout *rp = data;
-+	struct hci_cp_write_link_supervision_timeout *sent;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-+
-+	if (rp->status)
-+		return rp->status;
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT);
-+	if (!sent)
-+		return rp->status;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+	if (conn) {
-+		conn->link_supervision_timeout = __le16_to_cpu(sent->timeout);
-+		bt_dev_dbg(hdev, "handle 0x%4.4x timeout 0x%4.4x (%u ms)",
-+			   __le16_to_cpu(rp->handle), conn->link_supervision_timeout,
-+			   conn->link_supervision_timeout * 5 / 8);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	return rp->status;
-+}
-+
- static u8 hci_cc_read_num_supported_iac(struct hci_dev *hdev, void *data,
- 					struct sk_buff *skb)
- {
-@@ -3243,6 +3274,16 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			hci_send_cmd(hdev, HCI_OP_CHANGE_CONN_PTYPE, sizeof(cp),
- 				     &cp);
- 		}
-+
-+		if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
-+			struct hci_cp_write_link_supervision_timeout cp;
-+
-+			cp.handle = ev->handle;
-+			cp.timeout = cpu_to_le16(0x1F40);	/* 8000 * 0.625ms = 5000ms */
-+			hci_send_cmd(hdev, HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT,
-+				     sizeof(cp), &cp);
-+		}
-+
- 	}
- 
- 	if (conn->type == ACL_LINK)
-@@ -4100,6 +4141,9 @@ static const struct hci_cc {
- 	HCI_CC_STATUS(HCI_OP_WRITE_CLASS_OF_DEV, hci_cc_write_class_of_dev),
- 	HCI_CC(HCI_OP_READ_VOICE_SETTING, hci_cc_read_voice_setting,
- 	       sizeof(struct hci_rp_read_voice_setting)),
-+	HCI_CC(HCI_OP_WRITE_LINK_SUPERVISION_TIMEOUT,
-+	       hci_cc_write_link_supervision_timeout,
-+	       sizeof(struct hci_rp_write_link_supervision_timeout)),
- 	HCI_CC_STATUS(HCI_OP_WRITE_VOICE_SETTING, hci_cc_write_voice_setting),
- 	HCI_CC(HCI_OP_READ_NUM_SUPPORTED_IAC, hci_cc_read_num_supported_iac,
- 	       sizeof(struct hci_rp_read_num_supported_iac)),
--- 
-2.25.1
 
+--===============6229015737024296344==--
