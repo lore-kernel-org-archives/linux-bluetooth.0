@@ -1,48 +1,124 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f9.google.com (mail-wm2-f9.google.com [74.125.225.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A852F2E401
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 20:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21042E401
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 20:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786219544; cv=none; b=XYb3dCjmHLW22aI8BZ9VAi72QNpmyRHnIY4iBrvK1rzMIGqRYw9PWd6pMGU9gy1VHd6pajGVMo5C+32DAd2TKwpx1GcIkPvnWgzjYqbfVwY06i0jIcyY3RqeSob7k/enXDG51IVUFnRltqOnEqbd+87ImIEx23tYpNBvvXUmOIM=
+	t=1786219691; cv=none; b=tlDDnRYF5i3zMWilvC2Ea0Dzu4NGV/LwWihm2mES3zMCMIcdHWweoq6pE1tkk6HMOCILeS1f1De0ZJmdl7x6oAvGvo6xRifrTB0Ov1OVicvArO/SaIR1Hyt5FNzOxMiAsJKwjPSqS3qkpW4iHH6veuB2qAVjsCPBdd5aPx1PHLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786219544; c=relaxed/simple;
-	bh=PSZOMK3caoDQdNt/v0QZJgbrcyqYzOtdy4k7S780ZXk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SqpFfeV24dv6zeEbPU/MLAXnuJYQ2wT3yVKysS3XQKWXG8rpdWe0fw7gyDrLbd32GZ6KnOkspeJKauZYC7bboyEn5h9rNbYFZrsUwIbP0Ku32cQ75Q1KmRsZ/gwc+psu2vvwwBRNDmGbEJjf2OX/KumbNzlBiJjZCZ4/v3SIfmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SZgCA498; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1786219691; c=relaxed/simple;
+	bh=x5MxKcfOu/qYpSo9NHaIZRXj4xb7zYL05HtIe9LSQ5U=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JAFzm6wDL9DYigTvuExHvXantLvxyhmLZLodtj/nYug4ihy7ABhICEU+pbe2v4ZalNkmdpWb3LkOGDN3UqWJ4XwW50usF7YC9wKxTDlSug4bPpWx0+vLKN4zphyS608MFwlBCH0eWoO5YtYm8y+kWqk1tm8B8Oprt5ELWOy3sK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKZnO4jG; arc=none smtp.client-ip=74.125.225.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SZgCA498"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786219542;
-	bh=o9OuI51TcXzNbzVEDUqqdETlu7dvKZ99F74VluD8Xvk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=SZgCA498c0qw5v+fHDwNkneD9oXcZ7QsdTpqDNuOeLo4W8Fz4gR41jYbgCiU9deeF
-	 WXkUiaokcOEuAVgkiE2oEy72SeifN9I54yDVTuGYEhr8YEZ1bipHDM2XtN8CgPkpzv
-	 3kRbk/tYfKu8zizcyqzAX8JEueOdDWnosvNQf5pA=
-Received: from github.com (hubbernetes-node-f13a5d1.ash1-iad.github.net [10.56.208.39])
-	by smtp.github.com (Postfix) with ESMTPA id D00C518035B
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 13:05:42 -0700 (PDT)
-Date: Sat, 08 Aug 2026 13:05:42 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKZnO4jG"
+Received: by mail-wm2-f9.google.com with SMTP id 5b1f17b1804b1-49553b57612so1809555e9.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Aug 2026 13:08:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786219688; x=1786824488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4+PTWIdlmooTL3LG4i1MPAxy2LP75W9IxWV8cdVB5u8=;
+        b=lKZnO4jGBpWuyICkd0PAGu9vVOk76KtbRSpbKxHrkw/P/NIMxytvysQcz3VRq9xc/o
+         ScH06y+ir1V7jCxSBGQyeboKqapVglYezZKpTde/ux3AZVlhCEVPVOWdmZHyreL7L9PP
+         dH/9cq1CkCtDtBh0yFcMCgU9cBaOP0RSLrCIkH2/4gx7HMO5RLxwCRowl96XxrENeokN
+         joIDINWkw0yWPpfD6T5FkxTsU09gDDCs/ftt9CshFkoZ58mUyzYiRXxZtDF1CcJypQd/
+         YloWOBjmXrZx6lWRosUoUVUK5Jm0uBN8r0r/npvItO3P0MWqskCje4R9OjF1nB1C2S58
+         Q6JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786219688; x=1786824488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=4+PTWIdlmooTL3LG4i1MPAxy2LP75W9IxWV8cdVB5u8=;
+        b=pBcInudun4hH5dsrpf3zWiZ3TB9UPweK8lyfKQX8C4Y8UGWtWNrIPlRS7Gschs1Fg8
+         Td36iNVnbK5DDfqunfZfyUu2bzbIAKF1+gYfty/dZyZsbFwpcT58q/o1YSOZT7oH9WQN
+         5K1HCAZ4mnQrh0XovRyXkyk4dndmR8reE9WzSmz60pbwD4s6jWYirpeg2lXN4t3x8kTb
+         qZGGn+Rm2Mt1Qud3iFjVNtWocPKK5hiFRT4hNEKVJjphhPDHCsUFEhoVyl2cE81LOCYK
+         ELDDHenyD+HABWroNq/WGr3r+RrqOujxmyngti8CRDiCLqR6o3wp4Hz55YUxugsfFbUw
+         P2Ag==
+X-Gm-Message-State: AOJu0Ywv34EHz2CSbtwZv9uE6X0xG3i56F3Dq7x/lWrjVQbn6kVFarSu
+	VjTzqi7sH6eeyGvPR9nswJTTtxFC3SrDhs1obSHONnu4vnpmDSU9+yzsOpoLuzl9QSY=
+X-Gm-Gg: AR+sD11Uy5VcdYWewXgDDmvx2kBRdBmkPjJcBsie9pgoOg+Vo/QmLF+gsaTZJbKm87l
+	rjTZkm8YI2z7HZR+s01h/qVuQDfATmykzl+2zKvKxAS5h6bRaiZrObei19OIJ4bPiGRKOOD2jBZ
+	g02Lyzt6msLgfPwVAgQdqSjuJyjD7uBmJqMAKicpgWG8u2Hgi0sp3FyaVLgYkmgfd6c0GCXgBKg
+	995R14/BJXssJh1LitDaTO6+3ZlT9gfEKPGEze51myBXfmhRHjbe8RM6FayDr+tJMwDIoWMqepE
+	VLtgfnm3TDMMEsPyXPSyhIdAdyY/Vg9hzFddi5EXho3List6pPWR5rD5YeAqUH9Vpfechgq06tA
+	SXiZ7vzzLyovYSoOON4t5tTPvx25LBW5DgzOBU1hHVyA5g2MuoXAD3Xd/kDmRcqkTur60zTDAHv
+	uqZxORc1UQbfd5gw1BQ9GdC7xiQXoxDMZqq2R4Yr/srOhR+LDSbgX3Qo89ws+RO6/My0+3RxXOs
+	qqldNxWK/t+
+X-Received: by 2002:a05:600c:6298:b0:495:503f:cf9a with SMTP id 5b1f17b1804b1-499619839d6mr86652915e9.9.1786219687781;
+        Sat, 08 Aug 2026 13:08:07 -0700 (PDT)
+Received: from arch (user-109-243-3-173.play-internet.pl. [109.243.3.173])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995ea3361esm145250395e9.15.2026.08.08.13.08.06
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Aug 2026 13:08:06 -0700 (PDT)
+From: z4pdyy@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1142763/c92911-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [PATCH BlueZ v2] client: Avoid scan prompt when discovery is already active
+Date: Sat,  8 Aug 2026 22:05:17 +0200
+Message-ID: <20260808200806.134373-1-z4pdyy@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1142763
-  Home:   https://github.com/bluez/bluez
+From: z4pdy <305461556+z4pdy@users.noreply.github.com>
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Check the adapter's Discovering property before prompting the user
+to start scanning. This avoids prompting to scan when discovery is
+already in progress, which previously resulted
+in an org.bluez.Error.InProgress error.
+
+Changes in v2:
+- Move variable declarations to the beginning of cmd_connect()
+to fix the ISO C90 build failure.
+---
+ client/main.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/client/main.c b/client/main.c
+index b5cad8afc..069e20485 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2290,6 +2290,8 @@ static void cmd_connect(int argc, char *argv[])
+ 	const char *method = "Connect";
+ 	char profile[128] = "";
+ 	GDBusProxy *proxy;
++	dbus_bool_t discovering;
++	DBusMessageIter iter;
+ 
+ 	if (check_default_ctrl() == FALSE)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+@@ -2297,8 +2299,18 @@ static void cmd_connect(int argc, char *argv[])
+ 	proxy = find_proxy_by_address(default_ctrl->devices, argv[1]);
+ 	if (!proxy) {
+ 		bt_shell_printf("Device %s not available\n", argv[1]);
+-		bt_shell_prompt_input(argv[1], "Scan and connect (yes,no):",
+-				      prompt_scan_connect, strdup(argv[1]));
++
++		if (g_dbus_proxy_get_property(default_ctrl->proxy,
++					"Discovering", &iter)) {
++			dbus_message_iter_get_basic(&iter, &discovering);
++
++			if (!discovering)
++				bt_shell_prompt_input(argv[1],
++					"Scan and connect (yes,no):",
++					prompt_scan_connect,
++					strdup(argv[1]));
++
++		}
+ 		return;
+ 	}
+ 
+-- 
+2.55.0
+
