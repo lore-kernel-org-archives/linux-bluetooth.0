@@ -1,74 +1,72 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E2935836E
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 05:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45CE2C0260
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Aug 2026 05:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786166985; cv=none; b=DHatThVvv8qBVt17WNoMw7ewtPyticdO3uKKPX7XpqJ2J8MfG/tPlDBhxotmIb09I2xtNNN7auAuRvXEFYwBTGdHe5uryVZPUmm0M4wZprCzX/DRExsGlW7uBS+akhl71W5gND0wqVSBYv0B3W3K4t5C0nDvQedXxNFcw8WLmcc=
+	t=1786167196; cv=none; b=bs2yHTgDEOqN8QzcMWf1Zm/h7K4x0v4jG/OFO+0UBWcTWIbdgrYhEN0GxURyFJVRCmzfO83BrBqv1nz2KEo0Yk/xZ1OCr0fnSxWlo9w6f+/ZFY2PfnNvD4pdBYc8KhPTbW4dTJdRatK34ldqVaoyxhdVr4E2DXLuI8uGal44lOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786166985; c=relaxed/simple;
-	bh=Q1wBHzLTIq4tK/+/Usog1Gd8RXUwm0ePB/TUbBnrev4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QKZTEx38tQN0ee3Cn1KB5nPTYhoJ8upd8QCDxpUAhnAAH3AncL+MOBm39YtVYw2a23h0J3QLRk/hVkH3IMZv60DuXUHme/euofZHZhW1qOy1zl7KhWqWbkblZxpc3uThPrQTiaY+SLKkifJugC98H+iE2HjEQB7Xq4GYTxsTSSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUcLGWss; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1786167196; c=relaxed/simple;
+	bh=f+PKGIJQf4ftrFEY6rgBleDvCwFwCbZ1sRMyIDjxU8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROj+F7nKYTnEFkgC4XlPvg2P79iHVblSgm5VRXNXXUFlA8I0zUzJBBS1qQMuMLVEprmx0dsTy0iH9M9gco2dfo6MsQJGeP++7gubqk8BQg4a4bh+d1RzXBqX2c0ZlHLo6Q7LNh7cfCpuMdxrTYWNyuh2BoeaAyk8LkplfYvISGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moCUv/Vu; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUcLGWss"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38e3efab7e0so186286a91.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 22:29:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moCUv/Vu"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-38dfe910e9dso213450a91.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2026 22:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786166984; x=1786771784; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786167195; x=1786771995; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wDC6YI5r3sz7/q8pUx056+kBWfhQJhpnlyWFVMa4m8E=;
-        b=mUcLGWssKgoP7FgjhR+lC7JaDoRkDyfw1n/Dokxm4FVsn9o5p5GcGgwlepQXETqT6n
-         oQmRWEDEIXv+oYHX1Atzlj4VKmPegAVP2Jh4COqvgIXJ7ENmhbdnRhV3DN52z2WlsVy3
-         ZcRfwpIXDwTNeC5CLMNt+vNqaAvj39DvUyMbwUk7PvaHDIfl92F6phAQpOQqmEXbGqPa
-         /wnXUHnNYevkTVqX3mMzMlhx1UOKw5N2yf7PxnbCjtzQSuDs70r1O3c6aSekcI1tAdL6
-         BQMjIGiR37qiKwNQwx7rFsSBFBMSa4riRAr1P2EUVOeLbn28hiNZiu8SLmnLXo8Oh/pK
-         bH+Q==
+        bh=oFroGAPZp4ej2DXNEJ/q4PSHjxNJnm1z9YjC9aaC1bA=;
+        b=moCUv/VuNa0roKLyGPgZ8RSunSnUUHis+uZXP9InriulBG2q3ODuYJlpWpKaY/bTqo
+         pqbFphIjLHEB37LRClrRwdDWnbbkIykQXbRODu/FPeOJbqTlUGfyyxevMrHO/ItiyPd4
+         +fkOtCvNms+E/FmP+IsrNq6AHy+rdK0fxnxEYQdCevsS6W/fc6TuJjJP8vpxDF5nFaGR
+         /Jgx36wpBl0Rbo4/fr79+Wh3Z6NXgn4nFk1aHCYc4prpef6gA3D1K6RBp+ZXbXGpyHBD
+         Nmy18NURe+4TfxCP20hrSSXy/I1BEtT86rtjyf/+F7/Ef3MKzV7Me7RX8uY477PPLpH4
+         VULg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786166984; x=1786771784;
+        d=1e100.net; s=20251104; t=1786167195; x=1786771995;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=wDC6YI5r3sz7/q8pUx056+kBWfhQJhpnlyWFVMa4m8E=;
-        b=Irkqar+ZXifiXIYgCv741ZXZjI8DNPuA+pMpsdnalj/qb6P76cHQCyd6b99IU39QlT
-         sMAaKfFmkYPG3YWBmob/Tg+chLF4AjpAU4Kt/Kqa75DbtlqPxJy+QNrcasbfSPINkaj+
-         0y8Afllds6KfOQ0SEwl8meQ3yp1f6rn9bKnlSU/J/x+tndwa4oeWPu24n/9rc4kyny26
-         KBgPPvjHjKqN1R47e73x9cBZm8KkKuHMFKOQN1IrAuqKgzj89YFVOHNgfr1FAcAppTJd
-         lldjjeGk2+NjY9gOR+mzkPo4jOhix2f75ePwRugQqoPok74Lb5qDMGqdzyzd4W1qjFEL
-         9KFQ==
-X-Forwarded-Encrypted: i=1; AHgh+RonwAvazsLjI5M2xW8Wf433qZcg6OoXjrkjgNnTzSVlJp8/65qTyu4ff/IUlgi/1epJSUYZhPCn66FxwnFwvow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNAMoFk+KwLBlyq8YLpLcobgD+fdj+5GzDAywo7jW1oYdOG9v0
-	tlXTeQUQJEIZIVUESFG+OUS2fzzKD7G7pP9iRDTjsymYRpmP6ilwHX1C
-X-Gm-Gg: AR+sD121Vl0/6V7QS4Bwpqp3/tqS4+DjvHlQrsuDOHX8TDHgEbUooirBSbCdNDl8Wex
-	vSO78Rnl1xPL5EcR01LrMf8gPCFU5FdN0P3I10jzQ0BuearybSNLa1nUS+JKSqaZq7XkwWke0uG
-	47dHCVm0DuJhuY5ZBqizIqjbHIr5nl4D+GnDebCYRevZvP3LpKoXVh40D4vq+qUW1ECxOp6vpNS
-	TFzjmDKTrgIZ4lu6IHS1YhFuZyTaCETTu8oX0trP259iyVGLmc19gRN3GO4S2/8c0GEuvlkgnFv
-	Xf439JqZC50NOmn33no217MgGPfnki0YljLCrIR8ZWzG1OF6W1Jf3Jda0v+JjDKiWBcAKSElLZc
-	WOzbm0dE6Q0q1/sVO9cAPZWZXvEpIVny45X2J5WxX84VyfkOj5laRRKqYqFmxSYOTCVhcekTGLd
-	aNixq5i0wYHgFTKtX3sfVUKgkKiI5aywhYRPRzaMyY7yY=
-X-Received: by 2002:a17:90b:58a3:b0:385:3ab:fecb with SMTP id 98e67ed59e1d1-392845e2350mr991461a91.4.1786166983672;
-        Fri, 07 Aug 2026 22:29:43 -0700 (PDT)
+        bh=oFroGAPZp4ej2DXNEJ/q4PSHjxNJnm1z9YjC9aaC1bA=;
+        b=Au1OSHSbwM9/WVf0qO24JIX4nELdSiBJi1Wm80Ef4RspQhxkRlDPXIw9vHOJyk62Qp
+         zBAaR3aIzb4dGz9rcd8IAWDAYffvtUIREpoP3f62z7Zx4NkH4jupIcYj4JygXbdamVjV
+         Mh6/eanWbRIoIFQaSVulJWnbUX4O+POMYwu/5x9QfClOZG71okHHetY4FtvE56JtG3Hg
+         K8OIx9TkYSy1TMS3QkNyhpNxNKMBuoBuL4y2FqoqaN8M5jUx7nrD9UAFBQ/xU/BcYaeP
+         Ch4G1bWyUeJB3kIsrdhFeVWRrVqOT/RBRZcpocLi10qNFDzV+9Ah9K27HE2FKl/aA8fG
+         9lkw==
+X-Forwarded-Encrypted: i=1; AHgh+RqSHeYL9sD8FvJIBYhWGI6+Spt37OEXdSfsmxMVkA8OMLoajO0ZG7BP6OX82aOr71W2Ng4fJ/uf0mcGA45e7ms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMIFNfXQA97amBTPfEnFihpwi25fVqbI22PF1Z4F3oxcVPoDgj
+	I7cBklG9CLmyCfSPf7F8kQgpq9tg83lsqfGywJACXEjECv0bklaqaT1I
+X-Gm-Gg: AR+sD11gCMwjDdXzGqoerWyzwBvZxY+Dfc/Jf/R5DOg+eDjwY+rRi/U+/eOelElvTab
+	bAhMMAssbranH8Xzu+TAWOclwwy0Mc2MEmZhzNeIy1cPMhERBckkTLLQyBYZk4oETbnAJNfusc4
+	5Qpbhs5390xAEGAdIIYgREjwVReFPJx8TbojsGEFTOcx+ZWkVFt7EwQTUChN5hY17tqWclUk6IU
+	v0cGxdo0P1EBanQW6iFUvRlMvw72xIDu05F4iym/HmVWj2IPqFHY+Tx51+3Ov+uvF4X5LF2oGam
+	SJMGIZ/zycLMMdHi7LYJ8UA2uBviECTlQzr+UcVGbPqM2lOoilLlhlVghC18e8ugUlzm7ZaFhuC
+	TX+HCaEAqNlVSLBl/JC+NtXeSK1QSeYmXtyfKNhszuI3Iwu9obIPM0NKCTr4orG2IynHIdyLbLH
+	CJCyuvoy/mdHndJK4BtC3fJ9loTkW3//omiWh2QT9mIyk=
+X-Received: by 2002:a17:90b:4e8d:b0:38d:ec31:4840 with SMTP id 98e67ed59e1d1-3903c5932femr29991164a91.13.1786167194908;
+        Fri, 07 Aug 2026 22:33:14 -0700 (PDT)
 Received: from lgs.. ([2001:250:5800:1000::f280])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-390b358a6c6sm1881112a91.3.2026.08.07.22.29.39
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3925fd95794sm4856341a91.7.2026.08.07.22.33.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 22:29:43 -0700 (PDT)
+        Fri, 07 Aug 2026 22:33:14 -0700 (PDT)
 From: Guangshuo Li <lgs201920130244@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Archie Pusaka <apusaka@chromium.org>,
-	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-	Hilda Wu <hildawu@realtek.com>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Guangshuo Li <lgs201920130244@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_h5: fix usage_count leak when autosuspend_delay is negative
-Date: Sat,  8 Aug 2026 13:26:54 +0800
-Message-ID: <20260808052655.2562268-1-lgs201920130244@gmail.com>
+Subject: [PATCH] Bluetooth: hci_intel: fix usage_count leak when autosuspend_delay is negative
+Date: Sat,  8 Aug 2026 13:30:57 +0800
+Message-ID: <20260808053057.2566366-1-lgs201920130244@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -78,44 +76,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-h5_btrtl_open() calls pm_runtime_use_autosuspend(), but
-h5_btrtl_close() does not call the matching
-pm_runtime_dont_use_autosuspend() when tearing down runtime PM.
+intel_set_power() calls pm_runtime_use_autosuspend() when powering on
+the device, but the power-off path does not call the matching
+pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 
 If the autosuspend delay is set to a negative value while autosuspend
 is enabled, the runtime PM core increments usage_count to prevent
 runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
-during driver teardown, this reference is not dropped and usage_count
-remains unbalanced.
+during teardown, this reference is not dropped and usage_count remains
+unbalanced.
 
 Add the missing pm_runtime_dont_use_autosuspend() call before disabling
 runtime PM.
 
 This issue was found by manual code inspection.
 
-Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
+Fixes: 74cdad37cd24 ("Bluetooth: hci_intel: Add runtime PM support")
 Cc: stable@vger.kernel.org
 Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 ---
- drivers/bluetooth/hci_h5.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_intel.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 93cdde981840..a5e7e9b0ea74 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -1023,8 +1023,10 @@ static void h5_btrtl_open(struct h5 *h5)
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index c31105b91e47..1919547ff2a1 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -345,6 +345,7 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
+ 			devm_free_irq(&idev->pdev->dev, idev->irq, idev);
+ 			device_wakeup_disable(&idev->pdev->dev);
  
- static void h5_btrtl_close(struct h5 *h5)
- {
--	if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags))
-+	if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags)) {
-+		pm_runtime_dont_use_autosuspend(&h5->hu->serdev->dev);
- 		pm_runtime_disable(&h5->hu->serdev->dev);
-+	}
- 
- 	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
- 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
++			pm_runtime_dont_use_autosuspend(&idev->pdev->dev);
+ 			pm_runtime_disable(&idev->pdev->dev);
+ 		}
+ 	}
 -- 
 2.43.0
 
