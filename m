@@ -1,105 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB28332EDE;
-	Sun,  9 Aug 2026 20:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3533D7D86
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 20:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786307455; cv=none; b=Z4SWeuIPerpGaKYRbE8i4uOHZ/2wmKQ1FDGr7/+H25TRQ0obc2Hd0G9bHfR8fPtFu3HYXKxdO9RXdgjTe9bEX1h573mbAghaFXfMaXrwtaCEu/Q6/UnWX79IHPBX9RoNoXsLVxHEfESokCXHIrJA9Q7+lxsGlZD0OItOPEftoYs=
+	t=1786307608; cv=none; b=DzD4asZsicuhkGzmRkmn/kWloO5LAA1MMYo158nz8y+fQxicEE0Y8YMGkmWkaO8ph+paWXG3bDr/ksQ9LpSip5MvzCNhSY2UnCVTSdcGDL7av1NFQMSJ8vtyf1cvu4c+9PZbYrNl1Skec4RWdELDtRjboVKr2tenm03QLq6pNLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786307455; c=relaxed/simple;
-	bh=i4nVUF3RXwu3UWbYxvk9uZ23EqHuzy6Obd0zFIVvk5M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=s9buqathzPJOLgI0qRiOzK8nq+gUMMyObanfc95LDMoLe2b5YEi/ITF1DjuybRK7loRA83vz+jEx0QCXx2NqrAoMXdAz4gxziZJCQlUyyNglPuQUB2AOzflhpVAVOKPmHmvuVWI0ARVmZaIGQqUuLyYEMKc794l7FtxgYci71Mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPDd0HLL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1786307608; c=relaxed/simple;
+	bh=4agbAAkAGD3oMiSpZdvKCh60G24wNAGbSC0k/Kyiixc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rSpif7CJUDI5kYRihS/JCIGw6LfCDFIk91p/gOEiUUkDBYrZY+FU6TVA4LYMfbPkgsX0m040ClEEihHL9TUl0k4CKOIvI2DzQ0ZXul0bSGvm/x2akE7KTC98vyKtaym1VVlwc49fmCUfcbNfrGa6km2XN91EKGI20so5vol2k1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSWHqKVp; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPDd0HLL"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ACA1C2BCB9;
-	Sun,  9 Aug 2026 20:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786307455;
-	bh=i4nVUF3RXwu3UWbYxvk9uZ23EqHuzy6Obd0zFIVvk5M=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=OPDd0HLLaMJxL7OZH2UBmOLYOCsV+UtJMRzKJPt2KQW5kSmweTXGlvoDk0pn5d0Ic
-	 EbbF+kYHz3PFF4EiJC1qEH7Dq58P9qd4nK/BxhE9m+3xSMM1XJvWl6zn+Ejj/zzIXl
-	 U7rsSxqDG2W7kTEVPz4Xz9bef17+Kc7HNmPeKjHEb2FnlLpmCO+W0N6dpVpkrzA0jg
-	 Uwl2bQA9Na+ZjcRs5KCOMC0j/yreOuD3ujMLuCMU5SIC98DtvwohBfeZzsKI1csRr7
-	 DcJ7M1kd7mOV7LSvK39cqd/uuA4jBDz/degEX9B8YDnRIy7IbFIS7hCCBxVgtvPtnQ
-	 X/v3EbrD2z/ng==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E69C5AD55;
-	Sun,  9 Aug 2026 20:30:55 +0000 (UTC)
-From: Richard Nunley via B4 Relay <devnull+richard.w.nunley.gmail.com@kernel.org>
-Date: Sun, 09 Aug 2026 15:30:50 -0500
-Subject: [PATCH] Bluetooth: btusb: Add Realtek RTL8821CE device 13d3:3558
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSWHqKVp"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-480001972b8so403533f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Aug 2026 13:33:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786307605; x=1786912405; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JKlBoJdds1FSyyPDGWKzuyJx/ZI/SpDQ5zKS7eJFwdA=;
+        b=SSWHqKVpumtPqCiZRNRH7l6sDPzFPvLavFh23s5jod4Cr7jA+DM5QlqPQ2UsTl095Y
+         U4I6Afvq9meksCIikuhUDB1TzjHVLiFSHimr45WBY/KGmXznCRCGbjbaysbKzddGQGv5
+         TDYKNbqYOxAWbaUogQETof6LZapGUsOYvm4qyr5ZIoCqNjvF3phlnptTRvSb8D/N1Kc8
+         L0ORck1wwAqdWm02b5TD3ZHiKtXcSZUF29vB8PDVXT1CifUAbrv81aS0hFL92nPfEVN5
+         t7/3wDH7glJVxmXJ4DkaslBve6PHb3wuf+brM4hs/kLkCLio0UmT6/Qzf4cgbjNWtnuf
+         qVhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786307605; x=1786912405;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JKlBoJdds1FSyyPDGWKzuyJx/ZI/SpDQ5zKS7eJFwdA=;
+        b=eCpFYPU5esYpgnM7JodtjC/T4NP6oGt22jTmqkG8DSvKPEh2TJmw4n4YjZxhRtnzMM
+         JnWTxECqXVZ2UmWaj3tCAlGpYMvY7cQroL26f3iViX9jak/luIOf/2zmmMbJ31CchvQI
+         Kl5YcCAu4P09PBkwqUjKqcSgcRGGP6ixGuxfz2afHrjNNCTpb1g6I5+Lj9CMGaUgEABa
+         KjRrb3mbWVzKteY0QMzvWLPvKK3FinLQEfWMtNp+Iwq3DE3Gh32HNkJ79/9PtRhPohwn
+         Xho4fxPKZepUQufnGl3IF7OOrr9ax9qAtZy/4SYxqwfaiSamvh4UlQAZH5Apv8EJ7fo1
+         dazQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq5f4Y6hfYvINSF1ZJeR+jxfbdLbVmD57cu5Pk4B+oRw9sTWNU0Bb4d1brDPpcxrU/EORqkJOmw1+VaOs2EcGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOATKvVrjosKCxuxiFAKmvVagIfdMycLqmE2Dr5LQGa1uA1DBu
+	GT8/8eAwBw19jJLt5n6r0w8zhybdB2t+CX1nSfZ26G+h/Kiox87azLxt
+X-Gm-Gg: AR+sD12siVz/g1ESk4Mcpzl70hcPHWODnJhHh+HiP3cCqOlAhUIERQAOxGhJDXVTjEU
+	njFkFZl0ujgCNYsHyOAOMOQrDb54x5Qhc1HvKuNXymZHYCv3cylWBdmIuJpkLCd7AItxJU7K+N8
+	LkHnxKnVwxQ6Gtkg/8RpQDZ8W3V7ZvETJDfRq15+DQ/iCqZozQwVO3QZTpbqwZOlMniAzkBanXA
+	i3DLu3lNI6aoFarLzuu8Tb1U/PUU59i1W7MtoeUfmWp2/89qypYG5c7GjIssusfmAYOAafB3WAq
+	HCd0GFJCQgtLFDSztuDavhEBefQatFsRkpaOh+ITm8IVWvwymAKEr3ObF/LGiosYGd62nWE1Ddo
+	FN9Ja03Fyi6iYEmJZM29SljeYkkFJY4z30XcJQK+sYEA2e1WE0DBWLNF04vyj6mrIjljvgG/4GV
+	vVR1oNJonJW2AzYyBzxejTccKXTmMEAEsy2TgGNLPvTMdO9otA5kgmYGIw9yQlf35y+3/P/QdMy
+	0pEUKn8Arc=
+X-Received: by 2002:a05:600c:8b35:b0:493:c634:952 with SMTP id 5b1f17b1804b1-4994e79e668mr477347155e9.7.1786307604765;
+        Sun, 09 Aug 2026 13:33:24 -0700 (PDT)
+Received: from foxbook (bgt135.neoplus.adsl.tpnet.pl. [83.28.83.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995dee21dcsm231804045e9.0.2026.08.09.13.33.23
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Sun, 09 Aug 2026 13:33:24 -0700 (PDT)
+Date: Sun, 9 Aug 2026 22:33:20 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: "Chris Lu (=?UTF-8?B?6Zm456ia5rOT?=)" <Chris.Lu@mediatek.com>
+Cc: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "i@rong.moe"
+ <i@rong.moe>, "Will-CY Lee (=?UTF-8?B?5p2O5pS/56mO?=)"
+ <Will-CY.Lee@mediatek.com>, "marcel@holtmann.org" <marcel@holtmann.org>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "SS
+ Wu (=?UTF-8?B?5ber5oay5qyj?=)" <ss.wu@mediatek.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "linux-bluetooth@vger.kernel.org"
+ <linux-bluetooth@vger.kernel.org>, "patchwork-bot+bluetooth@kernel.org"
+ <patchwork-bot+bluetooth@kernel.org>, "linux-mediatek@lists.infradead.org"
+ <linux-mediatek@lists.infradead.org>, "matthias.bgg@gmail.com"
+ <matthias.bgg@gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmtk: Disable remote wakeup for
+ MT7922/MT7925
+Message-ID: <20260809223320.24431a4a.michal.pecio@gmail.com>
+In-Reply-To: <99fb847b8fdedb1464798230407719912d6585c6.camel@mediatek.com>
+References: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe>
+	<178050901239.1520440.2026593395539384648.git-patchwork-notify@kernel.org>
+	<3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
+	<17FE08E9-2229-4C97-846F-6FA099E22C90@rong.moe>
+	<CABBYNZ+rR71SKUEuZBTf+E3SwRNzV2-s-zt8EwNJM3PSx9qB_A@mail.gmail.com>
+	<fd8587e97a48e49332a4ad36e51e18739d000250.camel@mediatek.com>
+	<4e96132bcfb267af05c06dc277b5ba6895e3ddde.camel@rong.moe>
+	<99fb847b8fdedb1464798230407719912d6585c6.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260809-master-v1-1-c62bc61debdd@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXM2wpAQBSF4VfRvjY1iPAqcjHGwlYOzUZK3t3g8
- qt/rYsEjiFUBhc5HCy8zB5RGJAdzNxDcetNsY4znetCTUY2OGVgm7xIYLskJR+vDh2f31FV/5a
- 9GWG3d033/QBDa/m7agAAAA==
-X-Change-ID: 20260809-master-aecb893ecf35
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Richard Nunley <richard.w.nunley@gmail.com>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1786307454; l=1415;
- i=richard.w.nunley@gmail.com; s=20260809; h=from:subject:message-id;
- bh=wLOaL/YgYl4wu8uYH7L47uT9+N/zEs5F96wJ8v2JHdQ=;
- b=t+NFz1yRiPyBNzMMOkM4oSU1aPF+IkaaUpaC+ZLrI0sI1dIhD97/qyhmj0oDpKbazt9tBk9Li
- tKlTwTRfY0PDaYQUJeMHo43LIE5/vHkljyNnNMG4Aqu1X0CShp2tKEr
-X-Developer-Key: i=richard.w.nunley@gmail.com; a=ed25519;
- pk=r+PiBAjnHd6R1vmsv4bP95gslouemyN27nQXIWcK3YQ=
-X-Endpoint-Received: by B4 Relay for richard.w.nunley@gmail.com/20260809
- with auth_id=930
-X-Original-From: Richard Nunley <richard.w.nunley@gmail.com>
-Reply-To: richard.w.nunley@gmail.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Richard Nunley <richard.w.nunley@gmail.com>
+On Mon, 29 Jun 2026 03:01:19 +0000, Chris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93) =
+wrote:
+> Hi Rong,
+>=20
+> Thanks for your understanding. We hope to find a better way to handle
+> this issue.
+>=20
+>=20
+> Hi Luiz,
+>=20
+> Regarding this issue, MediaTek Bluetooth team has already initialed an
+> internal investigation for problematic combination and will seek
+> assistance from AMD SOC team to investigate the root cause of this
+> issue.
 
-The IMC Networks Bluetooth controller with USB ID 13d3:3558 uses an
-RTL8821CE. Without BTUSB_REALTEK, btusb uses generic initialization and
-does not load the controller firmware. BLE connections then fail before
-pairing with HCI error 0x3e.
+Hi,
 
-Add the device ID to the RTL8821CE table. This enables loading
-rtl_bt/rtl8821c_fw.bin and rtl_bt/rtl8821c_config.bin, after which a
-BLE HID keyboard pairs successfully.
+I have seen multiple reports on Arch Linux forum of MTK Bluetooth chips
+sporadically locking up and no longer enumerating on AMD systems, also
+desktops, which had to be unplugged from power to restore operation.
 
-Signed-off-by: Richard Nunley <richard.w.nunley@gmail.com>
----
-Tested on a CachyOS 7.1.6 kernel with BlueZ 5.87 and a Corsair K65
-Plus BLE keyboard.
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+I have also seen claims that auto power management is broken in btusb:
+https://lore.kernel.org/linux-bluetooth/cover.1774348119.git.berto@igalia.c=
+om/T/#u
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index be82bbbc1..2bae85b00 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -509,6 +509,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3533), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3558), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek 8822CE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+This, if true, offers a plausible theory because:
+- URBs issued to suspended devices may fail, drivers may not notice,
+  make wrong assumptions about their HW state and confuse the chip
+- USB core doesn't reliably block submission of such URBs
+- they were also seen to break some xHCI controllers, in theory this
+  might be an HC problem - power cycling resets both device and HC
 
----
-base-commit: 43a556b2fd43f2df6dded59c2e26560a27874c24
-change-id: 20260809-master-aecb893ecf35
-
-Best regards,
---  
-Richard Nunley <richard.w.nunley@gmail.com>
-
-
+Regards,
+Michal
