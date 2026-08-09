@@ -1,48 +1,95 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-77.smtpout.orange.fr [80.12.242.77])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0260D45BE3
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 08:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D606D7262E;
+	Sun,  9 Aug 2026 13:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786264495; cv=none; b=EzQiFtSCxM5YOnypo8MIoi/aPGasZZ1QeU3ATumu9+jrsrRepz+MRmeNA631jZe85uiiupwr7UR05BDeqbEH1bdqbLzN01Kck3f+3jJudIZlkdAv2BL9GC0QPwCxlQP8IkO0G82YDC7qlRRmOAsHIZJUzHsnJALQjAC4ErtvWDs=
+	t=1786280489; cv=none; b=cLj9kiXTyZaZqjAzBvyWTxGaz563Cj6eP4upAjyKHmFxWE1LD4+DrECKgj6m5p54LG+vPtudDXWRvHoNHVaTCQOsSVeKqlt5HY4KtEKmwB0rHvEluZFttHM9/8BNMhXSEPk1gDk34zqdGfYBChxoDe6W/v0cpxxmnVid/8xOvug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786264495; c=relaxed/simple;
-	bh=Q5Ws3hysFw0MBrZyMGO/Ej5kMczLw1rJiaBUqI49lFY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Psf3WUNDCC7mmuz8ZQiWh1ExzFcURqxmm3P/CSB6QQgAISCEEF1IYQes3pIljBLg3kn6CWfgv39KiNBpgwEjPp1YTr1GGs8g4GOk+vRAo9fY78yYdlK2666V6dj0v78jGKMgwJDJL7JYSLrrQOUgKpXqLW+qEm6PO8eQhIriyHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TmEyrAZH; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1786280489; c=relaxed/simple;
+	bh=8JxPF2wVFEsqGB4GhHJNW//qUV8h15k0uLWlBkJTV+E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BwAeXne3sRiNCmw+mlaSYrU/LGbOh5DPrMcpMh7WgrUPNMI+XBFNEpBUDBD5s3ymyx6s5OtiRWER/YHrwPR2gKiFvr39Z8NHyKLfG0kMWsEDouzDFnKN3RIb4lNd/6TZoAq+YLklBKD5lDg6zT8ygVhksCEogx35JK5TEVHKi6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=CeR1oguz; arc=none smtp.client-ip=80.12.242.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TmEyrAZH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786264493;
-	bh=HiS8RYoeF3iYOZwafrKFupEuXj7cCR7XuxmLOcKnN7A=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=TmEyrAZH2+R2eBw3WIbDfl4GLz/vKEJ5cFX4V9wChk3cXYq+pyh5d3odJTjhGMOfS
-	 Jv/61dIHCzkHqLVnq45DZahAJt+aONO9o8VesmAgdcsF+owKLnrgKlbPzOkTmD+o95
-	 WEBLF2JwgQT8MT4+PUOLqpatcBbw85iKQaFKxVnI=
-Received: from github.com (hubbernetes-node-011657f.ac4-iad.github.net [10.52.221.74])
-	by smtp.github.com (Postfix) with ESMTPA id 3B32DA0733
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 01:34:53 -0700 (PDT)
-Date: Sun, 09 Aug 2026 01:34:53 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1125144/2c883e-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="CeR1oguz"
+Received: from device-101.home ([10.65.86.62])
+	by smtp.orange.fr with ESMTP
+	id t38MwuRNFK3UAt38MwZjAV; Sun, 09 Aug 2026 15:00:10 +0200
+Received: from device-101.home ([IPv6:2a01:cb10:785:b00:6128:9b8c:c203:905])
+	by smtp.orange.fr with ESMTPSA
+	id t38EwyWsFw9Fct38Ew8OlJ; Sun, 09 Aug 2026 15:00:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1786280402;
+	bh=iZkCY5PHbl/Gm2au6WQ1GHf7TeI3Ibsat+covrHw/nk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=CeR1oguzmj11cc/x1UFAo1Va2CfB7ZwnLlu8tHxTKml2o2hU02vNsNXq9xLONL5u9
+	 Y6Sx4u08uO6RYbNjngDBkHDkfvSuqpTHfR64xfY3qalB9HcRTvHM23IVHDB/g2vfiE
+	 ctqmWLYH0LtAWLg/Cs3hbXz0MOddKoFw0MvBNLLRka0dpKgqLk2t7wcR3FrEanXu/u
+	 M75mHTWCBjawDBKLE5XxtrJAeVtcAdh8vwI/fRjYxe2ikjEkfo12JuwH1PuEkmqoJd
+	 4mFZ8phYyzx/57/xJit5G9J7VIhHX2O9dU814n4/FGzJwxHXGIKqfHx6y6aO/mfy2b
+	 kFWhO9ypFUmOA==
+X-ME-Helo: device-101.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 09 Aug 2026 15:00:02 +0200
+X-ME-IP: 2a01:cb10:785:b00:6128:9b8c:c203:905
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btmrvl: Slightly simplify btmrvl_process_event()
+Date: Sun,  9 Aug 2026 14:59:59 +0200
+Message-ID: <9fc342cc7dd726868216174cd83d196d1ca18f94.1786280385.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1125144
-  Home:   https://github.com/bluez/bluez
+In btmrvl_process_event(), all error handling paths except one do a direct
+return. Update the only one that makes a goto to be consistent.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This does not change the behavior because ret is known to be != 0 when
+'exit' is reached.
+
+This simplifies the code, saves 2 LoC and pleases one of my coccinelle
+script that tries to spot erroneously mixed goto and return statements.
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/bluetooth/btmrvl_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index e25930351f64..d449fbdde464 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -87,8 +87,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 	event = (struct btmrvl_event *) skb->data;
+ 	if (event->ec != 0xff) {
+ 		BT_DBG("Not Marvell Event=%x", event->ec);
+-		ret = -EINVAL;
+-		goto exit;
++		return -EINVAL;
+ 	}
+ 
+ 	switch (event->data[0]) {
+@@ -165,7 +164,6 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
+-exit:
+ 	if (!ret)
+ 		kfree_skb(skb);
+ 
+-- 
+2.55.0
+
