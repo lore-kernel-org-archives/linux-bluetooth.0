@@ -1,121 +1,308 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FD2DF6C
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 14:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786284151; cv=none; b=WSlXmBsXkrm45AtWLTouBA6XrJ8znRvUIc/V21rRPQNZPhqeQcwd17pXhXmkIvK117dlHAclO82ZY08MYUJQE+lCXmlkCJOQUllkE3s4fsm2TPybw5QJUmFGX/MzCF7B4L+QEHa/PnhO+ivq8eq6I7gSeXVXxfZ9j7hAi2psj6g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786284151; c=relaxed/simple;
-	bh=tQ6U3QLsiknfagURBfPB1P0HUhcLtTm9oMwmWRZL+YA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AGNi6nQoNFsxmMnxB8/TKf6rwaKvVQTcTmQXg8GeVawlFGd2pGrlUQYBbpJfiSrqQiGZFQ9Y2ctkNvOPXg8BgX3ZWw68MCKzI892tvkKh6EWlQFsVEFVlGgEuq16jZ9qe+v/SF5CcDSTVZL5rpVWf9hHB2V5XLzRy/5uT+xHwR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPld/Gh3; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A153D524B
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 16:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786293927; cv=pass; b=iOvLbyCdE9P7ha9YJpGpIgJkNCPfl2QWQ6uguX+r5fBk8IeSEWlqfMqO49tMWRboginukmnpgdXMWxKuXUwNRpATcqaa90NnxpIZioV3M/ZdR0O7kH6mPcBTiF1iwl99DAgIYJChn0FmxpegjVWDoTY9kz3mWm/jRxm76Pk55g0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786293927; c=relaxed/simple;
+	bh=6nsXfZy45HT6CBHYCx+oIjqwbKlFYl81NKv4gvmChT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a61WyHHXEFmLwhCl5RbfVPsbgSP2S7l5ywOr15i8q76NZT7tut9j1osgPByp4Fbaum5zjivud9LT+eaI6mmuKYb8tzSlCTloLsvwYcZlaI9RGFLuRMytwbqNzdDrXAsDzqFQzt9uBJA7fF/21bNozpesEWXz2P2SYGfe2d2IpcE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=sqwThwBu; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPld/Gh3"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c9e0b89e228so418483a12.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Aug 2026 07:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786284149; x=1786888949; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=G+nVykoQAelCF4GZIPcav5sj0d6b0KSj6Xa+AlAAvvg=;
-        b=RPld/Gh3mwUkXIgW1H+0AxLZ+BKU3I+nFLmwydutRue7zVxGUrsc/+TKWJC88r76Em
-         rFzGHwam6HxGXpb+rnlgvtpMMuWNCpJbEfR63sfFyuaLz8PuIFeapK6+Fl+129Unny/s
-         YfeTvOUdd7vSIyV3bzvbhT1QCwYwnaoD6O/uF778SCs3IiU70z0lHa5CN8Dm12UT5ZoX
-         7b3JD4gsIyxm6SqRuwyrdKfJH0pWAzPaTx9xvPS0zvPM9p1g5N6yimHZSmhtK3RgoUQO
-         yJN4u8rsXvnorFe+JpwfshOf7G3eHnH5RXBryXs+WlR6sHF4QZIzL8SGWzCRDAD9EdZ5
-         PRtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786284149; x=1786888949;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=G+nVykoQAelCF4GZIPcav5sj0d6b0KSj6Xa+AlAAvvg=;
-        b=pkbIeiMDZB4MYpLc32XOY7bjLALU7+OM1Doxu6QZWqa50P+JVh+WYg7365KgK7CYjd
-         grYEoKH72PM5Qx8p7Gg7K5/dQX/1t18oj7LEonlZHVBR+9mOIohKKYLyUtujzuVJP7OL
-         SZPiGnfx8QTWrL+nIPeCI+JVrJCJdOCuinnzvBZItKOg5b3nSI+vVJ4dfnm0AudfOzad
-         GjlaI7PVO3ZDl2biRqmh+q9yaXzRDKLaRfXGHiv0TaPaf9jVBX2Cp2eRoULWB6MemZMU
-         ELGY0nx1E/LxXeRq0NhFh1b7qIAi5nbrRaEB+8fltP9vu64RyOJKQazLcBN2dbf1TQGR
-         nxfw==
-X-Gm-Message-State: AOJu0YyW5f3IGMrbzILSNsPD5gK0825b1zxsQBW11XPfT393o6jMgKRn
-	Kugo5xnY92R6+xQm8SiQ7wlzTdhBISp/txVhNpLBOyjiXY84KNkcjXh/hHFxBXJG
-X-Gm-Gg: AR+sD10VALnTRqZVxg9GkMoLqacDPHK26gjYNDEStY9CnXdwDN6rYMVEuRqCA3FaC24
-	XxKFTIFMYqcMMauLqS3KlFKzZsbSUFG0hMJrBQNGGd4Ifuq/4dabZEykQmWH3xQk2755A9m3OyR
-	xo6wKg4bED6+1CY8sq7CXS2V/7QI9axM+U5Sc1bcDwBPf3+cHEAbQ0ccMp/8OC/jsrW5FMAz64X
-	JfeX9rbMzqHC7Pmz4uGRJJvxonHaY7riwzT6JNZ4PNjKwJi8RcjyQQQM6E+irX59/j6jCcw+ab/
-	wWOQ3ONUxMcrxrliBmZPrBEtnORQDAxohYEwDKS6b/mFgxIMLaTYkYJI0u8D/6gLADtgzZPwNpC
-	rfBtOuL+v/n7/t4zY+dSffW6FhGxy8rdzFtVZ1qIdK8IKmLEru7Qge1bhyPKx0RSBqCGkhqrhO+
-	vkrPjGUG8YaURie7NzLx8HlC3zWFoTaQX26Z5HfHJNnkDcsrWezbg0A7Cu4s343skeydwMt1jh0
-	APJgg==
-X-Received: by 2002:a05:6a21:b95:b0:3c3:875d:c531 with SMTP id adf61e73a8af0-3cbce6f1862mr16140771637.6.1786284149339;
-        Sun, 09 Aug 2026 07:02:29 -0700 (PDT)
-Received: from [172.17.0.2] ([4.242.193.225])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be8d6074sm33968041eec.12.2026.08.09.07.02.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Aug 2026 07:02:28 -0700 (PDT)
-Message-ID: <6a788874.9edb5c9d.219adb.505a@mx.google.com>
-Date: Sun, 09 Aug 2026 07:02:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8728488611209983715=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="sqwThwBu"
+Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hJ3dw7475zyVG;
+	Sun, 09 Aug 2026 19:45:08 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1786293909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6w/TpEw0A3jImwxHVVxXlRHWp+J6Ntg1HrROaOsVbSQ=;
+	b=sqwThwBumEDfV7sNc5CB8XejcHCY8TSci7CeXEM1Aa6IYwqrUdNGrOXdUdeWiqu/MD1L70
+	Y8MEU8a0QDe9eHUq+cO9d/of7gX2YlVAaV58p/aLxjy2Jx4ARGq0BMuyqeRMQs/XQI6gX0
+	SaW5AmQtGuW8namhWVoi98W8sc5YI8s=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1786293909;
+	b=jQZPzT3he1YnO2+98bw/xrybn1g+t+l5Ke4PHb2DYGPZ2wTLfzv8I5edehIVg9jjerZhPF
+	Kp6UkG+zP/7SmEaT5tIxqxDRvMmc87ecMZw/JGRDh5fsSXJBsRevDNNo8EvSumu1dzDKoc
+	0BpAl5eh7fddv9/gxU+68o7enJfTWOo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1786293909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6w/TpEw0A3jImwxHVVxXlRHWp+J6Ntg1HrROaOsVbSQ=;
+	b=PfENFyPRGITR1d809j+NncAXD9SgZ/RIPI6hcnr6Ls44HxZ7rOfvFsOvnE9y2NBazkhzIp
+	Kv75C6SYhKVIcVioHDEDHJ6BRKkQ4PSJR7swsz5QY73dRCReGnege/G44vFi9iOXbi7BjO
+	jEwmcEPKtO4Z+Rb6HVS7M/PVJs92Scg=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] tools/l2cap-tester: add tests changing BT_SECURITY after connecting
+Date: Sun,  9 Aug 2026 19:45:05 +0300
+Message-ID: <b85da0d5625e37d6289be01e3b83663c115420df.1786293828.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, christophe.jaillet@wanadoo.fr
-Subject: RE: Bluetooth: btmrvl: Slightly simplify btmrvl_process_event()
-In-Reply-To: <9fc342cc7dd726868216174cd83d196d1ca18f94.1786280385.git.christophe.jaillet@wanadoo.fr>
-References: <9fc342cc7dd726868216174cd83d196d1ca18f94.1786280385.git.christophe.jaillet@wanadoo.fr>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8728488611209983715==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add tests that change BT_SECURITY value after connection established:
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142910
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      20.64 seconds
-CheckAllWarning               PASS      22.92 seconds
-CheckSparse                   PASS      22.71 seconds
-BuildKernel32                 PASS      21.69 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      373.38 seconds
-IncrementalBuild              PASS      21.26 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/562
-
+L2CAP BR/EDR Client PIN Code Change Sec - Success
+L2CAP LE Client Change Sec - Success
+L2CAP LE ATT Client Change Sec  - Success
+L2CAP LE EATT Client Change Sec - Success
 ---
-Regards,
-Linux Bluetooth
+ tools/l2cap-tester.c | 107 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 100 insertions(+), 7 deletions(-)
 
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 3011a811e..69c529aa8 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -127,6 +127,9 @@ struct l2cap_data {
+ 	 * The address is filled in with the client bdaddr at runtime.
+ 	 */
+ 	const struct l2cap_conn_subrate *conn_subrate;
++
++	/* Change security level to this after connecting */
++	int change_sec_level;
+ };
+ 
+ static void print_debug(const char *str, void *user_data)
+@@ -356,6 +359,17 @@ static const struct l2cap_data client_connect_pin_success_test = {
+ 	.client_pin_len = sizeof(pair_device_pin),
+ };
+ 
++static const struct l2cap_data client_connect_pin_change_sec_success_test = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.sec_level  = BT_SECURITY_MEDIUM,
++	.pin = pair_device_pin,
++	.pin_len = sizeof(pair_device_pin),
++	.client_pin = pair_device_pin,
++	.client_pin_len = sizeof(pair_device_pin),
++	.change_sec_level = BT_SECURITY_HIGH,
++};
++
+ static uint8_t l2_data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+ 
+ const uint8_t l2_data_32k[32768] = { [0 ... 4095] =  0x00,
+@@ -859,6 +873,13 @@ static const struct l2cap_data le_client_connect_success_test_2 = {
+ 	.sec_level  = BT_SECURITY_MEDIUM,
+ };
+ 
++static const struct l2cap_data le_client_change_sec_success_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.sec_level  = BT_SECURITY_LOW,
++	.change_sec_level = BT_SECURITY_MEDIUM,
++};
++
+ static const uint8_t cmd_reject_rsp[] = { 0x01, 0x01, 0x02, 0x00, 0x00, 0x00 };
+ 
+ static const struct l2cap_data le_client_connect_reject_test_1 = {
+@@ -1187,6 +1208,12 @@ static const struct l2cap_data le_att_client_connect_success_test_1 = {
+ 	.sec_level = BT_SECURITY_LOW,
+ };
+ 
++static const struct l2cap_data le_att_client_change_sec_success_test = {
++	.cid = 0x0004,
++	.sec_level = BT_SECURITY_LOW,
++	.change_sec_level = BT_SECURITY_MEDIUM,
++};
++
+ static const struct l2cap_data le_att_server_success_test_1 = {
+ 	.cid = 0x0004,
+ };
+@@ -1198,6 +1225,14 @@ static const struct l2cap_data le_eatt_client_connect_success_test_1 = {
+ 	.sec_level = BT_SECURITY_LOW,
+ };
+ 
++static const struct l2cap_data le_eatt_client_change_sec_success_test = {
++	.client_psm = 0x0027,
++	.server_psm = 0x0027,
++	.mode = BT_MODE_EXT_FLOWCTL,
++	.sec_level = BT_SECURITY_LOW,
++	.change_sec_level = BT_SECURITY_MEDIUM,
++};
++
+ static const uint8_t eatt_connect_req[] = {	0x27, 0x00, /* PSM */
+ 						0x40, 0x00, /* MTU */
+ 						0x40, 0x00, /* MPS */
+@@ -1848,11 +1883,12 @@ static bool check_mtu(struct test_data *data, int sk)
+ 	return true;
+ }
+ 
+-static gboolean check_phy(gpointer args)
++static gboolean check_phy_and_sec(gpointer args)
+ {
+ 	int sk = PTR_TO_INT(args);
+ 	struct test_data *data = tester_get_data();
+ 	const struct l2cap_data *l2data = data->test_data;
++	struct bt_security sec;
+ 	socklen_t len;
+ 
+ 	len = sizeof(data->phys);
+@@ -1874,6 +1910,24 @@ static gboolean check_phy(gpointer args)
+ 		return TRUE;
+ 	}
+ 
++	tester_print("Checking security level...");
++
++	len = sizeof(sec);
++	if (getsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0) {
++		tester_warn("getsockopt(BT_SECURITY): %s (%d)",
++							strerror(errno), errno);
++		tester_test_failed();
++		goto done;
++	}
++
++	if (l2data->change_sec_level && sec.level != l2data->change_sec_level) {
++		tester_print("sec.level %d != %d", sec.level,
++						l2data->change_sec_level);
++
++		/* Retry */
++		return TRUE;
++	}
++
+ 	data->step--;
+ 
+ done:
+@@ -1882,10 +1936,12 @@ done:
+ 	return FALSE;
+ }
+ 
+-static int check_phys(struct test_data *data, int sk)
++static int check_phys_and_sec(struct test_data *data, int sk)
+ {
+ 	const struct l2cap_data *l2data = data->test_data;
+ 	socklen_t len;
++	bool changed = false;
++	int err;
+ 
+ 	len = sizeof(data->phys);
+ 	data->phys = 0;
+@@ -1901,17 +1957,41 @@ static int check_phys(struct test_data *data, int sk)
+ 		return -EINVAL;
+ 	}
+ 
++	if (l2data->change_sec_level) {
++		struct bt_security sec;
++
++		memset(&sec, 0, sizeof(sec));
++		sec.level = l2data->change_sec_level;
++
++		tester_print("Changing security level to %d", sec.level);
++
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec,
++							sizeof(sec)) < 0) {
++			err = -errno;
++			tester_warn("Can't set security level: %s (%d)",
++							strerror(errno), errno);
++			return err;
++		}
++
++		changed = true;
++	}
++
+ 	if (l2data->phy) {
+ 		if (setsockopt(sk, SOL_BLUETOOTH, BT_PHY, &l2data->phy,
+ 						sizeof(l2data->phy)) < 0) {
++			err = -errno;
+ 			tester_warn("setsockopt(BT_PHY): %s (%d)",
+ 					strerror(errno), errno);
+-			return -errno;
++			return err;
+ 		}
+ 
+-		/* Wait for the PHY to change */
++		changed = true;
++	}
++
++	if (changed) {
++		/* Wait for the change */
+ 		data->step++;
+-		g_timeout_add(50, check_phy, INT_TO_PTR(sk));
++		g_timeout_add(50, check_phy_and_sec, INT_TO_PTR(sk));
+ 
+ 		return -EINPROGRESS;
+ 	}
+@@ -2094,7 +2174,7 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
+-	err = check_phys(data, sk);
++	err = check_phys_and_sec(data, sk);
+ 	if (err < 0) {
+ 		if (err == -EINPROGRESS) {
+ 			g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
+@@ -2824,7 +2904,7 @@ static gboolean l2cap_accept_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
+-	err = check_phys(data, sk);
++	err = check_phys_and_sec(data, sk);
+ 	if (err < 0) {
+ 		if (err == -EINPROGRESS) {
+ 			g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
+@@ -3157,6 +3237,10 @@ int main(int argc, char *argv[])
+ 					&client_connect_pin_success_test,
+ 					setup_powered_client, test_connect);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Client PIN Code Change Sec - Success",
++				&client_connect_pin_change_sec_success_test,
++				setup_powered_client, test_connect);
++
+ 	test_l2cap_bredr("L2CAP BR/EDR Client - Read Success",
+ 					&client_connect_read_success_test,
+ 					setup_powered_client, test_connect);
+@@ -3332,6 +3416,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE Client SMP - Success",
+ 				&le_client_connect_success_test_2,
+ 				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client Change Sec - Success",
++				&le_client_change_sec_success_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE Client - Command Reject",
+ 					&le_client_connect_reject_test_1,
+ 					setup_powered_client, test_connect);
+@@ -3466,6 +3553,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE ATT Client - Success",
+ 				&le_att_client_connect_success_test_1,
+ 				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE ATT Client Change Sec  - Success",
++				&le_att_client_change_sec_success_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE ATT Server - Success",
+ 				&le_att_server_success_test_1,
+ 				setup_powered_server, test_server);
+@@ -3473,6 +3563,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE EATT Client - Success",
+ 				&le_eatt_client_connect_success_test_1,
+ 				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE EATT Client Change Sec - Success",
++				&le_eatt_client_change_sec_success_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE EATT Server - Success",
+ 				&le_eatt_server_success_test_1,
+ 				setup_powered_server, test_server);
+-- 
+2.55.0
 
---===============8728488611209983715==--
