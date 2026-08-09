@@ -1,132 +1,127 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3533D7D86
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 20:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C933290D2
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 21:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786307608; cv=none; b=DzD4asZsicuhkGzmRkmn/kWloO5LAA1MMYo158nz8y+fQxicEE0Y8YMGkmWkaO8ph+paWXG3bDr/ksQ9LpSip5MvzCNhSY2UnCVTSdcGDL7av1NFQMSJ8vtyf1cvu4c+9PZbYrNl1Skec4RWdELDtRjboVKr2tenm03QLq6pNLA=
+	t=1786311425; cv=none; b=HEU5ttdZPzzUw9/ImLsnmPkVloVa+ZTDA40PaSKbaUdWeXmddSQiyA2U3uYimwJmQUPE/T/Q4IFJ/AtE51Z3cbYIPDlrM4kJxVAYlylEnZoLZ4wONOqAqLgMhE5bFcPqgenDWlb1khHvYtU77XoQzsGDWzG+dDweMW637P6SokU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786307608; c=relaxed/simple;
-	bh=4agbAAkAGD3oMiSpZdvKCh60G24wNAGbSC0k/Kyiixc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rSpif7CJUDI5kYRihS/JCIGw6LfCDFIk91p/gOEiUUkDBYrZY+FU6TVA4LYMfbPkgsX0m040ClEEihHL9TUl0k4CKOIvI2DzQ0ZXul0bSGvm/x2akE7KTC98vyKtaym1VVlwc49fmCUfcbNfrGa6km2XN91EKGI20so5vol2k1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSWHqKVp; arc=none smtp.client-ip=209.85.221.53
+	s=arc-20240116; t=1786311425; c=relaxed/simple;
+	bh=82kqrKsq4kHcYaaLM3VGGgLT5SO2g9lVzSKLUKY2rk4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=N2iJHcneVaoutgRDQbJJKZ33813xLoYzD+K39lXFO1qEMr4ZB75JOH8W+WWnxgtctKgnP/UVvq9pxp9l2BBLSAp+dXdKVu9+st0erOfQZrJf9IphqKS0dnnj6yuxbXp+xotr09m8kZ3fw8Pm+m5/8Im71MBkdG38iSUEuTRbVkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwzTFiGP; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSWHqKVp"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-480001972b8so403533f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Aug 2026 13:33:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwzTFiGP"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c9aea40d799so564733a12.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Aug 2026 14:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786307605; x=1786912405; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JKlBoJdds1FSyyPDGWKzuyJx/ZI/SpDQ5zKS7eJFwdA=;
-        b=SSWHqKVpumtPqCiZRNRH7l6sDPzFPvLavFh23s5jod4Cr7jA+DM5QlqPQ2UsTl095Y
-         U4I6Afvq9meksCIikuhUDB1TzjHVLiFSHimr45WBY/KGmXznCRCGbjbaysbKzddGQGv5
-         TDYKNbqYOxAWbaUogQETof6LZapGUsOYvm4qyr5ZIoCqNjvF3phlnptTRvSb8D/N1Kc8
-         L0ORck1wwAqdWm02b5TD3ZHiKtXcSZUF29vB8PDVXT1CifUAbrv81aS0hFL92nPfEVN5
-         t7/3wDH7glJVxmXJ4DkaslBve6PHb3wuf+brM4hs/kLkCLio0UmT6/Qzf4cgbjNWtnuf
-         qVhg==
+        d=gmail.com; s=20251104; t=1786311423; x=1786916223; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=qOqekPe54yz+zvKifdOxCdCOANTpsfvOyoefM9I3r4o=;
+        b=DwzTFiGPyOBuOzIMtgE2SosvYLeJ2GFY4nwZyptOVTyXhF6eXwxIEym5odiMvlpqcu
+         j9BubKMFwho8gg1CrTJfnWaLa09H2r9TSKE8EFajygzLmbBBNm9Jbv1PKXsZogf8kMbj
+         soWWGjkEq2od6GUK14hNTVjPWaiFjVosGHw0HLK7D695sybbx70UAF8ems6e4tWBw0Of
+         izj9kfoa7/jjqAHI/MSEFP/FtWtsGkY9YzMBAAAiLxAeQCkFOCUFO8FHG27hlHtgVLM1
+         Ua7PM8NJnhMrqVJLcMvcku+RHpDBnMSN0HiQ6aEf7gudoqeqpoVf28uJKHQ1buCHoque
+         dtrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786307605; x=1786912405;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=JKlBoJdds1FSyyPDGWKzuyJx/ZI/SpDQ5zKS7eJFwdA=;
-        b=eCpFYPU5esYpgnM7JodtjC/T4NP6oGt22jTmqkG8DSvKPEh2TJmw4n4YjZxhRtnzMM
-         JnWTxECqXVZ2UmWaj3tCAlGpYMvY7cQroL26f3iViX9jak/luIOf/2zmmMbJ31CchvQI
-         Kl5YcCAu4P09PBkwqUjKqcSgcRGGP6ixGuxfz2afHrjNNCTpb1g6I5+Lj9CMGaUgEABa
-         KjRrb3mbWVzKteY0QMzvWLPvKK3FinLQEfWMtNp+Iwq3DE3Gh32HNkJ79/9PtRhPohwn
-         Xho4fxPKZepUQufnGl3IF7OOrr9ax9qAtZy/4SYxqwfaiSamvh4UlQAZH5Apv8EJ7fo1
-         dazQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rq5f4Y6hfYvINSF1ZJeR+jxfbdLbVmD57cu5Pk4B+oRw9sTWNU0Bb4d1brDPpcxrU/EORqkJOmw1+VaOs2EcGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOATKvVrjosKCxuxiFAKmvVagIfdMycLqmE2Dr5LQGa1uA1DBu
-	GT8/8eAwBw19jJLt5n6r0w8zhybdB2t+CX1nSfZ26G+h/Kiox87azLxt
-X-Gm-Gg: AR+sD12siVz/g1ESk4Mcpzl70hcPHWODnJhHh+HiP3cCqOlAhUIERQAOxGhJDXVTjEU
-	njFkFZl0ujgCNYsHyOAOMOQrDb54x5Qhc1HvKuNXymZHYCv3cylWBdmIuJpkLCd7AItxJU7K+N8
-	LkHnxKnVwxQ6Gtkg/8RpQDZ8W3V7ZvETJDfRq15+DQ/iCqZozQwVO3QZTpbqwZOlMniAzkBanXA
-	i3DLu3lNI6aoFarLzuu8Tb1U/PUU59i1W7MtoeUfmWp2/89qypYG5c7GjIssusfmAYOAafB3WAq
-	HCd0GFJCQgtLFDSztuDavhEBefQatFsRkpaOh+ITm8IVWvwymAKEr3ObF/LGiosYGd62nWE1Ddo
-	FN9Ja03Fyi6iYEmJZM29SljeYkkFJY4z30XcJQK+sYEA2e1WE0DBWLNF04vyj6mrIjljvgG/4GV
-	vVR1oNJonJW2AzYyBzxejTccKXTmMEAEsy2TgGNLPvTMdO9otA5kgmYGIw9yQlf35y+3/P/QdMy
-	0pEUKn8Arc=
-X-Received: by 2002:a05:600c:8b35:b0:493:c634:952 with SMTP id 5b1f17b1804b1-4994e79e668mr477347155e9.7.1786307604765;
-        Sun, 09 Aug 2026 13:33:24 -0700 (PDT)
-Received: from foxbook (bgt135.neoplus.adsl.tpnet.pl. [83.28.83.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995dee21dcsm231804045e9.0.2026.08.09.13.33.23
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Sun, 09 Aug 2026 13:33:24 -0700 (PDT)
-Date: Sun, 9 Aug 2026 22:33:20 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: "Chris Lu (=?UTF-8?B?6Zm456ia5rOT?=)" <Chris.Lu@mediatek.com>
-Cc: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "i@rong.moe"
- <i@rong.moe>, "Will-CY Lee (=?UTF-8?B?5p2O5pS/56mO?=)"
- <Will-CY.Lee@mediatek.com>, "marcel@holtmann.org" <marcel@holtmann.org>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "SS
- Wu (=?UTF-8?B?5ber5oay5qyj?=)" <ss.wu@mediatek.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "linux-bluetooth@vger.kernel.org"
- <linux-bluetooth@vger.kernel.org>, "patchwork-bot+bluetooth@kernel.org"
- <patchwork-bot+bluetooth@kernel.org>, "linux-mediatek@lists.infradead.org"
- <linux-mediatek@lists.infradead.org>, "matthias.bgg@gmail.com"
- <matthias.bgg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: btmtk: Disable remote wakeup for
- MT7922/MT7925
-Message-ID: <20260809223320.24431a4a.michal.pecio@gmail.com>
-In-Reply-To: <99fb847b8fdedb1464798230407719912d6585c6.camel@mediatek.com>
-References: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe>
-	<178050901239.1520440.2026593395539384648.git-patchwork-notify@kernel.org>
-	<3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
-	<17FE08E9-2229-4C97-846F-6FA099E22C90@rong.moe>
-	<CABBYNZ+rR71SKUEuZBTf+E3SwRNzV2-s-zt8EwNJM3PSx9qB_A@mail.gmail.com>
-	<fd8587e97a48e49332a4ad36e51e18739d000250.camel@mediatek.com>
-	<4e96132bcfb267af05c06dc277b5ba6895e3ddde.camel@rong.moe>
-	<99fb847b8fdedb1464798230407719912d6585c6.camel@mediatek.com>
+        d=1e100.net; s=20251104; t=1786311423; x=1786916223;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=qOqekPe54yz+zvKifdOxCdCOANTpsfvOyoefM9I3r4o=;
+        b=BJCGgiJLRxnCRtrYOEsBrWqsAjc/umUK5I1Z2ZvTnO7Mc+6spvrIs/Csv5Pv+o3c/P
+         dTz/pc0IsPDxpn47IATvmHJCk0D0BEUicfCBxNauN2OAzvgGCNsqjZq5QHEd7CMTK5zQ
+         IbwkP6oMJ+2g8ZkzGM1ZMXiuAOTCSVQdt5lAIdC75ELTuiqkBkNh92eIP0v5Hi1OEFnz
+         W8HlgfgHHjcBJFBuwticRFQpM/hU/mPGv2U8sQYiqXL8sjkKPfSlFCNxdTAbZjboQJVk
+         tfGx56QRCXS7H7Q/mWzyXrK+y9m1z3v0r0Qpo/AuFBaS5s25jwiAZvMaclawd9j2LFX6
+         aZeA==
+X-Gm-Message-State: AOJu0YyoEm4Yp2UD3wlqXJEO0k7KcmUcwR1dBc5K68VyPJTj/dFoL7Mz
+	t69qI4gWay/i69C16I7vUEU4V1Oim0RAj4GCWYEu4u88/r/7Dhc4TSKANtw3tQ==
+X-Gm-Gg: AR+sD117udz4+rlv03xZpw93WIm8jSNQ/Y+Srl3t1SaGGdGbrIviatzShXB3UKMZNiN
+	6QvTq8XjRoNImJFrftWFpq5hLh45DgJb6UQ9/PRBmDgqmGxxHy5mWlHe6/KUDIPCmGF1AoEQZDn
+	yycMZhSvN0v9W7rknnsVgqxnYcpe+Ap9TuLzUMz/INbpUui4EvikIwoYP3CU7YZqYgTDZugFK63
+	MQPewi1DCW/MfmPn7zAY56nTyKu1Sw/YBz/PZ1ituoA0SacsvKGmlLmnQxk5pOFSB/KBKMlhBKI
+	Kfitt5t3GTmenG8jTohIEQlugs+Kzzr/VhGhAH8HE/uNRbtAvHNGIo8sk7dsmNPRX6vAz5Deq7i
+	BdDJc9E2tXWT2R/Up5MrTzuE/LTgqgKTAPBmPQ5I1k1Xu4G86Ojay26tHwLoWtmr9RZIM+TK3tb
+	+KQ3h0w9fzhRU6pYYO2tuv6RjH1Z20TRESEzVGIaJ0hFAMAT0MdP93r/jie465SahIA5xWQw==
+X-Received: by 2002:a05:6a20:e212:b0:3a2:7ef4:81df with SMTP id adf61e73a8af0-3cbce960c19mr13021510637.26.1786311422704;
+        Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.134.208])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be86d3fcsm35222297eec.4.2026.08.09.14.37.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
+Message-ID: <6a78f2fe.af4834b4.254dba.ec3a@mx.google.com>
+Date: Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1333309680019227629=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, richard.w.nunley@gmail.com
+Subject: RE: Bluetooth: btusb: Add Realtek RTL8821CE device 13d3:3558
+In-Reply-To: <20260809-master-v1-1-c62bc61debdd@gmail.com>
+References: <20260809-master-v1-1-c62bc61debdd@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, 29 Jun 2026 03:01:19 +0000, Chris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93) =
-wrote:
-> Hi Rong,
->=20
-> Thanks for your understanding. We hope to find a better way to handle
-> this issue.
->=20
->=20
-> Hi Luiz,
->=20
-> Regarding this issue, MediaTek Bluetooth team has already initialed an
-> internal investigation for problematic combination and will seek
-> assistance from AMD SOC team to investigate the root cause of this
-> issue.
+--===============1333309680019227629==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hi,
+This is automated email and please do not reply to this email!
 
-I have seen multiple reports on Arch Linux forum of MTK Bluetooth chips
-sporadically locking up and no longer enumerating on AMD systems, also
-desktops, which had to be unplugged from power to restore operation.
+Dear submitter,
 
-I have also seen claims that auto power management is broken in btusb:
-https://lore.kernel.org/linux-bluetooth/cover.1774348119.git.berto@igalia.c=
-om/T/#u
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142999
 
-This, if true, offers a plausible theory because:
-- URBs issued to suspended devices may fail, drivers may not notice,
-  make wrong assumptions about their HW state and confuse the chip
-- USB core doesn't reliably block submission of such URBs
-- they were also seen to break some xHCI controllers, in theory this
-  might be an HC problem - power cycling resets both device and HC
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      14.04 seconds
+VerifyFixes                   PASS      3.99 seconds
+VerifySignedoff               PASS      3.69 seconds
+GitLint                       FAIL      4.80 seconds
+SubjectPrefix                 PASS      1.71 seconds
+BuildKernel                   PASS      27.58 seconds
+CheckAllWarning               PASS      30.31 seconds
+CheckSparse                   PASS      33.96 seconds
+BuildKernel32                 PASS      26.79 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      507.97 seconds
+IncrementalBuild              PASS      35.52 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: btusb: Add Realtek RTL8821CE device 13d3:3558
+
+28: B2 Line has trailing whitespace: "--  "
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/564
+
+---
 Regards,
-Michal
+Linux Bluetooth
+
+
+--===============1333309680019227629==--
