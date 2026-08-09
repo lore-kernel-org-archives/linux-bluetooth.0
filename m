@@ -1,91 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414153290A5
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 08:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0260D45BE3
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 08:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786264046; cv=none; b=DTaG9W8RAZFL7MlZwJHlVURV53RadHV3XxPhMafhovvKeG8UjM7K55QLNB4o6jHqnY2+5iDk41oxFw9e7w3NPn2J1BW00NIHXpuwMxwTzj188KNNFEgEqzkDbVCRMOB29nw0YPMMfA3kW+3E/qrQZmJaiHWDSzLjWq1LcNG/Tyk=
+	t=1786264495; cv=none; b=EzQiFtSCxM5YOnypo8MIoi/aPGasZZ1QeU3ATumu9+jrsrRepz+MRmeNA631jZe85uiiupwr7UR05BDeqbEH1bdqbLzN01Kck3f+3jJudIZlkdAv2BL9GC0QPwCxlQP8IkO0G82YDC7qlRRmOAsHIZJUzHsnJALQjAC4ErtvWDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786264046; c=relaxed/simple;
-	bh=ZQYr6HUHgVa+nqvVPuFKNUAR1LAuO1sBB31YOTAUprk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bFb3OZavSxisdxt3toC3ebKpI+LQKFfkvSUnW6UGsl6QqlW7fymWONsODAsvfgPfG6RBUEitIt12CPHDrB1k90DSdSwV4iDHRxb0iONy/plShcGr6ZdP2qpzJB5r7mUeda4GGcG6uwaGVlP9rykU/dR7nnzqLDSEBk5vAsEecJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbKjVSjD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1786264495; c=relaxed/simple;
+	bh=Q5Ws3hysFw0MBrZyMGO/Ej5kMczLw1rJiaBUqI49lFY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Psf3WUNDCC7mmuz8ZQiWh1ExzFcURqxmm3P/CSB6QQgAISCEEF1IYQes3pIljBLg3kn6CWfgv39KiNBpgwEjPp1YTr1GGs8g4GOk+vRAo9fY78yYdlK2666V6dj0v78jGKMgwJDJL7JYSLrrQOUgKpXqLW+qEm6PO8eQhIriyHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TmEyrAZH; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbKjVSjD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3C23C2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 08:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1786264045;
-	bh=ZQYr6HUHgVa+nqvVPuFKNUAR1LAuO1sBB31YOTAUprk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=NbKjVSjDeAbtlElOQbwwZUpvhm02Be3BdxxUHNPjaky+ojnF/qEheBuiA2JT+UWh3
-	 Vuxi1k+IajEySEnH8679lDcz1lHlQfzKYz5gXRbI/xG3If7netu6olGSCPwMHd4wfp
-	 uPcffxAi0FgtMXbCMz8MY9JYwdO063dp9dlq7RATv93OPVvoB6uWrbMZDAiRKfTrkM
-	 +j86HCsLJeBFug9CHX03ojtSHNbP0ACVa3z0vszgS+SAPK35cp0RJvmDz+B/ZnWWuF
-	 CKnYx8cyaUpdZSnFhz2juCRhqBmETkoLFjPWaN45Dokm1PXrJFcMQAlCRNwRuPsCQX
-	 BuPwAm282pjMA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9EFE5C4160E; Sun,  9 Aug 2026 08:27:25 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TmEyrAZH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1786264493;
+	bh=HiS8RYoeF3iYOZwafrKFupEuXj7cCR7XuxmLOcKnN7A=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=TmEyrAZH2+R2eBw3WIbDfl4GLz/vKEJ5cFX4V9wChk3cXYq+pyh5d3odJTjhGMOfS
+	 Jv/61dIHCzkHqLVnq45DZahAJt+aONO9o8VesmAgdcsF+owKLnrgKlbPzOkTmD+o95
+	 WEBLF2JwgQT8MT4+PUOLqpatcBbw85iKQaFKxVnI=
+Received: from github.com (hubbernetes-node-011657f.ac4-iad.github.net [10.52.221.74])
+	by smtp.github.com (Postfix) with ESMTPA id 3B32DA0733
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 01:34:53 -0700 (PDT)
+Date: Sun, 09 Aug 2026 01:34:53 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221837] Bluetooth (RTL8852BU, 0bda:b853) never initializes. 
- Opcode 0xfcf0
-Date: Sun, 09 Aug 2026 08:27:25 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: rohanasrani3@gmail.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221837-62941-7xwDAYeImG@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221837-62941@https.bugzilla.kernel.org/>
-References: <bug-221837-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/1125144/2c883e-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221837
+  Branch: refs/heads/1125144
+  Home:   https://github.com/bluez/bluez
 
---- Comment #6 from Rohan (rohanasrani3@gmail.com) ---
-As I mentioned earlier, I don't have bluetooth or any other device blocked =
-in
-rfkill. You can still check the output:
-
-```
-1: ideapad_wlan: Wireless LAN
-        Soft blocked: no
-        Hard blocked: no
-2: ideapad_bluetooth: Bluetooth
-        Soft blocked: no
-        Hard blocked: no
-3: phy0: Wireless LAN
-        Soft blocked: no
-        Hard blocked: no
-4: hci0: Bluetooth
-        Soft blocked: no
-        Hard blocked: no
-```
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
