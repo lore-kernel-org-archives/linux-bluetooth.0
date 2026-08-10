@@ -1,150 +1,411 @@
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456B343F091;
-	Mon, 10 Aug 2026 20:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786392552; cv=pass; b=ILWujIQ+Mt6/nQTwqRp8+Ky5c2ZXNuODQCG2qS012GYdJhrXRinCdwk7sW1I3On0RgjU3oe9IRAPpIWt5MfIPbqwR4NXiAbnO8d3pxVyY+E2TWm4cDcJ0X+l0bFu9g9ve1VCepbQBpDQ51A5iYa+IQq2JUr2WVtWBKXW27gsDXc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786392552; c=relaxed/simple;
-	bh=WCCozJMhPP9/XuvSdx1lJY7SXkHp+hfMkQ8pVgig8s0=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 Date:MIME-Version; b=hcQbqH7OQyIDXV+/a5VFFPKzUBa9ouTtbYAasjzJt987D0p57mVL1S40YJAZkemJWWStZ/fuf5gaPIJiYaePGkNFgvNK6TEIVU2S6vditA/T3AxF/KeTPD5C+TtJPLJnjXL0edjDjnXzEaRQRoq7ypdrfUctchcHOXi6A4VaAEg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=Owh4u13Y; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6852639AD3B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Aug 2026 22:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786400544; cv=none; b=fxoL1ZNJmYMJsNAg51DBYlDUCRZSHKnyDAjHuR9L5rkEIkihgbLzwYSQtU2ibmZeOPIA/7wblJI6sx2104F8IoIAUuls3ktM7SEImNQRmkzZr9qAyxxFVhSBR+o0pOUsyaP5nMpG418GjH2kPmteo3K1sdtzd1X/VayjhEuAp4A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786400544; c=relaxed/simple;
+	bh=NaTg2OE2oXp8L4qKwUZKoYnprBeoDlLwi9wT4z5n1Ug=;
+	h=Content-Type:Message-ID:Date:MIME-Version:To:From:Subject; b=lB77XVP7Fh99rRWU1UI+XQw0GCbecXcW2rZ9JFSKIX+rsNNCoBOKn152cFDVTiUKN5j2gvuMev1hTuOHsiZT9Hlpj1gsgmG8QKgRid9bTnetLMmp7cB7nlSiFZfBLsZXybiPlGtA7UHGxAJy40SHdpYP+Tns6wYkf2soBYXg+ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de; spf=pass smtp.mailfrom=posteo.de; dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b=C4irXeIP; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="Owh4u13Y"
-ARC-Seal: i=1; a=rsa-sha256; t=1786392531; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Tm0PUocv/gi2E6HcqYTQT2pDn6KnObWb7LePlfoVSlX1p14pKnfF/fwNp+ORfSQQ3MpZCd0QmGSDz/TagA6F6VKoIVTQa8fU/QN4LYpwWvtHzy1TlilhCDF6IY74tnsb7zSsuTDFi6fTUFkHebOuLu3m8OmE3gNtojL8dGHGxaA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1786392531; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=aghQrEuv07Kg/49XIOsAMbUc4OCdIaCvXcCyXwdlBcU=; 
-	b=nIy+4B/HkFkqTW0IzpUNHE2CCy1o+ksIhCbzllmNl/rJxg4ovu1dnJoXNyxxFMCc29h8/sglY/faBWKKDcWKGl2iW46cCinvmuRM373DB3Ttp/jWV4jz+XHuXqesD4EpBcAkGvAliymw64FCWpwnGt/drN9zwGgZ4zX+USPyH+g=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786392531;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:In-Reply-To:Content-Type:Content-Transfer-Encoding:Date:Date:MIME-Version:Message-Id:Reply-To;
-	bh=aghQrEuv07Kg/49XIOsAMbUc4OCdIaCvXcCyXwdlBcU=;
-	b=Owh4u13YFFu/6vVccwUniknonGozUe9TD9M7C9qozuX8PByHKY1PZeimVCG2zmNf
-	oyH3Q6Ds66IZWHjTHa+btnG5rtyom6UnvD61NHylPxxoFWIPULAlm74epQLzyszJie4
-	EcsufKSzTTyou6vllmatKSiCKrN8nlz2k7EvgiAmb0tOswaAcV/JbS8w+zS+Vv+gsxV
-	MZSY4c095GHRx6tQZm+SgpsvAA7+JjbafNb2+TIiuK2zV/PGZFiHZvgv6WL58DD3p82
-	7RWrXz9tDdg1bBHfuGxGNDTsQxkVUsLG84t0oSBiTOvlyGXT2Bane23FMd1HkzAhaWB
-	ff3FypMz1Q==
-Received: by mx.zohomail.com with SMTPS id 178639252844422.461369694751397;
-	Mon, 10 Aug 2026 13:08:48 -0700 (PDT)
-Message-ID: <868e97331dc74f176db2d3efdd1c579049b8e493.camel@rong.moe>
-Subject: Re: [PATCH] Bluetooth: btmtk: Disable remote wakeup for
- MT7922/MT7925
-From: Rong Zhang <i@rong.moe>
-To: Michal Pecio <michal.pecio@gmail.com>, Chris Lu
- =?Big5?Q?=28=B3=B0=B8X=AAl=29?=
-	 <Chris.Lu@mediatek.com>
-Cc: Alberto Garcia <berto@igalia.com>, sean.wang@kernel.org, 
- "luiz.dentz@gmail.com"	 <luiz.dentz@gmail.com>, Will-CY Lee
- =?Big5?Q?=28=A7=F5=ACF=BFo=29?=	 <Will-CY.Lee@mediatek.com>,
- "marcel@holtmann.org" <marcel@holtmann.org>,  AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, SS Wu
- =?Big5?Q?=28=A7=C5=BE=CB=AAY=29?= <ss.wu@mediatek.com>, 
- "linux-kernel@vger.kernel.org"	 <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"	
- <linux-arm-kernel@lists.infradead.org>, "linux-bluetooth@vger.kernel.org"	
- <linux-bluetooth@vger.kernel.org>, "patchwork-bot+bluetooth@kernel.org"	
- <patchwork-bot+bluetooth@kernel.org>, "linux-mediatek@lists.infradead.org"	
- <linux-mediatek@lists.infradead.org>, "matthias.bgg@gmail.com"	
- <matthias.bgg@gmail.com>
-In-Reply-To: <20260809223320.24431a4a.michal.pecio@gmail.com>
-References: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe>
-		<178050901239.1520440.2026593395539384648.git-patchwork-notify@kernel.org>
-		<3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
-		<17FE08E9-2229-4C97-846F-6FA099E22C90@rong.moe>
-		<CABBYNZ+rR71SKUEuZBTf+E3SwRNzV2-s-zt8EwNJM3PSx9qB_A@mail.gmail.com>
-		<fd8587e97a48e49332a4ad36e51e18739d000250.camel@mediatek.com>
-		<4e96132bcfb267af05c06dc277b5ba6895e3ddde.camel@rong.moe>
-		<99fb847b8fdedb1464798230407719912d6585c6.camel@mediatek.com>
-	 <20260809223320.24431a4a.michal.pecio@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Aug 2026 04:03:38 +0800
+	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="C4irXeIP"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id D2D35240027
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 00:22:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de;
+	s=1984.8680eb; t=1786400533;
+	bh=rp8t7s94wwSeRqTmV1JBEuO2lyVt1Y1s5OFPtAeRK3A=;
+	h=Content-Type:Message-ID:Date:MIME-Version:To:From:Subject:From;
+	b=C4irXeIPB+7YmqS6P0vmNtigJLN3vqOUYnCjELmOar9c3cwjwy93M/TVmFhC1WBtl
+	 393qN5HgpB9u0Jvs41+5YoQi2A/xSEob4Q+pJmKqcWxovpQ7YlCObo4EqQHJB+OuJ8
+	 f4b6FZTlc6PSfVlUdvqhAgEZjDIjAgq3EO0MbBGTNNfEo4c0FQQJW+ojodfOzFp/Lu
+	 FnxtWsgAnR98TzXX7gXH1sWBsDqdRbDyDz9wKOYbsINCY7SNeNpENaTHdLIE8D+XB5
+	 nLW1mM7BuzQ8jnRSkDgqK1ixQZQBvXAEmIczBAyLf31k7Dv6qhZqQdiKwEnhjPFAhn
+	 wjDdhajBP3hRg==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4hJq4P30b1z6tsb
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 00:22:13 +0200 (CEST)
+Content-Type: multipart/mixed; boundary="------------xiWOwltlomZiPc0IxVwb8B0V"
+Message-ID: <28554782-1f3b-4537-b891-1c483a29e8c3@posteo.de>
+Date: Mon, 10 Aug 2026 22:22:13 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Evolution 3.56.2-10+b1 
-X-ZohoMailClient: External
+Content-Language: en-US, de-DE
+To: linux-bluetooth@vger.kernel.org
+From: Jonas Zunker <jonas-zunker@posteo.de>
+Subject: [BUG] Bluetooth: WCN6855 10ab:9309 stops reporting ISO TX completions
+ during BAP LC3
 
-Hi Michal,
+This is a multi-part message in MIME format.
+--------------xiWOwltlomZiPc0IxVwb8B0V
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Thanks for your insight.
+Hello,
 
-On Sun, 2026-08-09 at 22:33 +0200, Michal Pecio wrote:
-> On Mon, 29 Jun 2026 03:01:19 +0000, Chris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93=
-) wrote:
-> > Hi Rong,
-> >=20
-> > Thanks for your understanding. We hope to find a better way to handle
-> > this issue.
-> >=20
-> >=20
-> > Hi Luiz,
-> >=20
-> > Regarding this issue, MediaTek Bluetooth team has already initialed an
-> > internal investigation for problematic combination and will seek
-> > assistance from AMD SOC team to investigate the root cause of this
-> > issue.
->=20
-> Hi,
->=20
-> I have seen multiple reports on Arch Linux forum of MTK Bluetooth chips
-> sporadically locking up and no longer enumerating on AMD systems, also
-> desktops, which had to be unplugged from power to restore operation.
->=20
-> I have also seen claims that auto power management is broken in btusb:
-> https://lore.kernel.org/linux-bluetooth/cover.1774348119.git.berto@igalia=
-.com/T/#u
+   I am seeing a Bluetooth LE Audio/BAP failure with a Qualcomm WCN6855
+   controller and Sony WH-1000XM6 headphones.
 
-I believe the proper fix of autopm failure during initialization is
-https://lore.kernel.org/linux-bluetooth/20250319231235.812700-1-sean.wang@k=
-ernel.org/
+   BAP negotiation succeeds and the audio profile appears active, but no 
+sound is
+   heard. The attached btmon capture indicates that the controller stops 
+returning
+   HCI ISO transmit completions.
 
-Some time earlier this year I was planing to pick it up and push it
-forward, but it turned out I was too busy. Maybe I will find some time...
+   Observed sequence
+   =================
 
-That being said, the bug I encountered has nothing to with the device
-initialization though.
+   1. The sink and source ASE QoS configurations are accepted.
+   2. The Enable operation succeeds for both ASEs.
+   3. The connected isochronous stream is established successfully as CIS
+      handle 4.
+   4. Both host-to-controller and controller-to-host ISO data paths are 
+configured
+      successfully.
+   5. The sink and source ASEs both reach the Streaming state.
+   6. The host submits four 120-byte HCI ISO packets on CIS handle 4.
+   7. No Number Of Completed Packets event is received for CIS handle 4.
+   8. Number Of Completed Packets events for ACL handle 3 continue normally.
+   9. No further ISO audio packets are submitted, although application 
+playback
+      remains active.
 
->=20
-> This, if true, offers a plausible theory because:
-> - URBs issued to suspended devices may fail, drivers may not notice,
->   make wrong assumptions about their HW state and confuse the chip
-> - USB core doesn't reliably block submission of such URBs
+   The final ISO packets in the attached capture are:
 
-Not the case of my devices. Autosuspend and (non-remote) autowakeup
-always work fine. The only thing that triggers the bug is a random[1]
-remote wakeup.
+       < LE-CIS: Handle 4 SN 0 ... slen 120
+       < LE-CIS: Handle 4 SN 1 ... slen 120
+       < LE-CIS: Handle 4 SN 2 ... slen 120
+       < LE-CIS: Handle 4 SN 3 ... slen 120
 
-Usbmon always shows no URB between the autosuspend and the subsequent
-remote wakeup, expect for the interrupt from the root hub.
+   There is no completion event for CIS handle 4 after these packets.
 
-[1]: it happens when no Bluetooth device is trying to establish a
-connection.
+   This appears to exhaust the four initial HCI ISO transmit credits. 
+The host
+   cannot submit more audio because the controller does not replenish those
+   credits.
 
-> - they were also seen to break some xHCI controllers, in theory this
->   might be an HC problem - power cycling resets both device and HC
+   PipeWire/WirePlumber also reports:
 
-I also think this might be one of the reasons.
+       spa.bluez5.iso: Missing completion reports for packet ...
+       Bluetooth adapter firmware bug?
 
-Thanks,
-Rong
+   After approximately 20 seconds, the kernel reports:
 
->=20
-> Regards,
-> Michal
+       Bluetooth: hci0: link tx timeout
+       Bluetooth: hci0: killing stalled connection <headset-address>
+
+   I am not attaching my complete system journal. The kernel messages 
+above were
+   selected manually from the local logs.
+
+   Hardware
+   ========
+
+   - Bluetooth controller: Qualcomm WCN6855
+   - USB ID: 10ab:9309
+   - Kernel drivers: btusb / btqca
+   - Firmware patch file: qca/rampatch_usb_00130201.bin
+   - NVM file: qca/nvm_usb_00130201_gf.bin
+   - QCA ROM version: 0x130201
+   - QCA patch build: 0x994d
+   - QCA firmware build: 0x38e6
+   - Headset: Sony WH-1000XM6
+
+   Software
+   ========
+
+   - Distribution: Fedora 44
+   - Kernel: 7.1.7-200.fc44.x86_64
+   - Fedora BlueZ: bluez-5.87-3.fc44.x86_64
+   - Upstream BlueZ: latest master, locally built
+   - PipeWire: 1.6.8-1.fc44.x86_64
+   - WirePlumber: 0.5.14-1.fc44.x86_64
+   - linux-firmware: 20260622-1.fc44.noarch
+
+   The issue reproduces with both:
+
+   1. The unmodified Fedora bluez-5.87-3.fc44 package.
+   2. A locally built version of the latest upstream BlueZ master tree.
+
+   The same four-packet ISO TX stall occurs with both versions. 
+Therefore, the
+   failure does not appear to depend on my local BlueZ diagnostic changes.
+
+   The attached capture was recorded while using the upstream build. I 
+separately
+   reproduced the same behavior with the unmodified Fedora BlueZ package.
+
+   Reproduction
+   ============
+
+   1. Run either the Fedora-provided BlueZ daemon or an unmodified build 
+of the
+      latest upstream BlueZ master.
+   2. Pair and connect the Sony WH-1000XM6 over LE.
+   3. Select the XM6 BAP/LC3 audio profile in GNOME sound settings.
+   4. Start audio playback.
+   5. BAP setup succeeds and both ASEs reach Streaming.
+   6. No sound is heard.
+   7. btmon records four outgoing ISO packets on CIS handle 4.
+   8. No completion reports for CIS handle 4 follow.
+   9. The connection eventually hits the kernel TX timeout.
+
+   Completely removing and pairing the headset again does not change the 
+result.
+
+   Expected result
+   ===============
+
+   The controller should report completion of transmitted ISO packets 
+for CIS
+   handle 4, allowing the host to replenish its ISO transmit credits and 
+continue
+   sending LC3 audio.
+
+   Actual result
+   =============
+
+   The controller accepts four ISO packets but provides no completion 
+reports for
+   CIS handle 4. Audio transmission then stops, and the connection 
+eventually
+   times out.
+
+   Regression status
+   =================
+
+   I initially observed working LE Audio with the Fedora-provided stack, 
+but I have
+   not yet isolated a specific kernel or firmware version where the behavior
+   changed. I am therefore not marking this as a confirmed regression.
+
+   LLM disclosure
+   ==============
+
+   I used an LLM assistant to help analyze the btmon capture and draft 
+this report.
+   The capture and reproduction results come from my own system. I 
+reviewed the
+   technical claims and am responsible for the submitted report.
+
+   Please let me know if a longer btmon capture, controller information, 
+or a
+   comparison against another kernel would be useful.
+
+   Regards,
+   Jonas
+
+--------------xiWOwltlomZiPc0IxVwb8B0V
+Content-Type: application/octet-stream; name="xm6-wcn6855.btsnoop"
+Content-Disposition: attachment; filename="xm6-wcn6855.btsnoop"
+Content-Transfer-Encoding: base64
+
+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
+
+--------------xiWOwltlomZiPc0IxVwb8B0V--
