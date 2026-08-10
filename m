@@ -1,127 +1,202 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C933290D2
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Aug 2026 21:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA374377545;
+	Mon, 10 Aug 2026 07:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786311425; cv=none; b=HEU5ttdZPzzUw9/ImLsnmPkVloVa+ZTDA40PaSKbaUdWeXmddSQiyA2U3uYimwJmQUPE/T/Q4IFJ/AtE51Z3cbYIPDlrM4kJxVAYlylEnZoLZ4wONOqAqLgMhE5bFcPqgenDWlb1khHvYtU77XoQzsGDWzG+dDweMW637P6SokU=
+	t=1786345769; cv=none; b=ump+q9g3v8mLtNuZEmJxqyqdoi7p2gJ/Uix5rsCYTpZ6KFORkOoW1oX3n+VmKl8SmCIBvidRxrqnqxkjM4HmXLc+7WhCqtWUM/9A776WP0z3PHF8VJA8Dclz70qNnCiKgrhW8ebm8xttMgtgMiBNHK9x9RmR/ah5t5M/3YKRDcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786311425; c=relaxed/simple;
-	bh=82kqrKsq4kHcYaaLM3VGGgLT5SO2g9lVzSKLUKY2rk4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=N2iJHcneVaoutgRDQbJJKZ33813xLoYzD+K39lXFO1qEMr4ZB75JOH8W+WWnxgtctKgnP/UVvq9pxp9l2BBLSAp+dXdKVu9+st0erOfQZrJf9IphqKS0dnnj6yuxbXp+xotr09m8kZ3fw8Pm+m5/8Im71MBkdG38iSUEuTRbVkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwzTFiGP; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786345769; c=relaxed/simple;
+	bh=P5vFtYVPsjmocOMmCEGnPdPqqUzSZUUVkbcnkwzcuk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QJ+wZTPNtSr7swW1xgqqlgsXj9y4atzmhH9zjll1vIVpzhlG8DyM6esXw3T1DAXBPg5quN4jMKxrjSbDEx1CNJHw0ks1xUEf0hLn3EKcZbK+UskOZBd/FvKtr31lPVzgkGV/l+g2qW2aoJkHDvKKtiko7pNspaOwIH4wLv3sJ/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=j56gSqF4; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwzTFiGP"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c9aea40d799so564733a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Aug 2026 14:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786311423; x=1786916223; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qOqekPe54yz+zvKifdOxCdCOANTpsfvOyoefM9I3r4o=;
-        b=DwzTFiGPyOBuOzIMtgE2SosvYLeJ2GFY4nwZyptOVTyXhF6eXwxIEym5odiMvlpqcu
-         j9BubKMFwho8gg1CrTJfnWaLa09H2r9TSKE8EFajygzLmbBBNm9Jbv1PKXsZogf8kMbj
-         soWWGjkEq2od6GUK14hNTVjPWaiFjVosGHw0HLK7D695sybbx70UAF8ems6e4tWBw0Of
-         izj9kfoa7/jjqAHI/MSEFP/FtWtsGkY9YzMBAAAiLxAeQCkFOCUFO8FHG27hlHtgVLM1
-         Ua7PM8NJnhMrqVJLcMvcku+RHpDBnMSN0HiQ6aEf7gudoqeqpoVf28uJKHQ1buCHoque
-         dtrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786311423; x=1786916223;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qOqekPe54yz+zvKifdOxCdCOANTpsfvOyoefM9I3r4o=;
-        b=BJCGgiJLRxnCRtrYOEsBrWqsAjc/umUK5I1Z2ZvTnO7Mc+6spvrIs/Csv5Pv+o3c/P
-         dTz/pc0IsPDxpn47IATvmHJCk0D0BEUicfCBxNauN2OAzvgGCNsqjZq5QHEd7CMTK5zQ
-         IbwkP6oMJ+2g8ZkzGM1ZMXiuAOTCSVQdt5lAIdC75ELTuiqkBkNh92eIP0v5Hi1OEFnz
-         W8HlgfgHHjcBJFBuwticRFQpM/hU/mPGv2U8sQYiqXL8sjkKPfSlFCNxdTAbZjboQJVk
-         tfGx56QRCXS7H7Q/mWzyXrK+y9m1z3v0r0Qpo/AuFBaS5s25jwiAZvMaclawd9j2LFX6
-         aZeA==
-X-Gm-Message-State: AOJu0YyoEm4Yp2UD3wlqXJEO0k7KcmUcwR1dBc5K68VyPJTj/dFoL7Mz
-	t69qI4gWay/i69C16I7vUEU4V1Oim0RAj4GCWYEu4u88/r/7Dhc4TSKANtw3tQ==
-X-Gm-Gg: AR+sD117udz4+rlv03xZpw93WIm8jSNQ/Y+Srl3t1SaGGdGbrIviatzShXB3UKMZNiN
-	6QvTq8XjRoNImJFrftWFpq5hLh45DgJb6UQ9/PRBmDgqmGxxHy5mWlHe6/KUDIPCmGF1AoEQZDn
-	yycMZhSvN0v9W7rknnsVgqxnYcpe+Ap9TuLzUMz/INbpUui4EvikIwoYP3CU7YZqYgTDZugFK63
-	MQPewi1DCW/MfmPn7zAY56nTyKu1Sw/YBz/PZ1ituoA0SacsvKGmlLmnQxk5pOFSB/KBKMlhBKI
-	Kfitt5t3GTmenG8jTohIEQlugs+Kzzr/VhGhAH8HE/uNRbtAvHNGIo8sk7dsmNPRX6vAz5Deq7i
-	BdDJc9E2tXWT2R/Up5MrTzuE/LTgqgKTAPBmPQ5I1k1Xu4G86Ojay26tHwLoWtmr9RZIM+TK3tb
-	+KQ3h0w9fzhRU6pYYO2tuv6RjH1Z20TRESEzVGIaJ0hFAMAT0MdP93r/jie465SahIA5xWQw==
-X-Received: by 2002:a05:6a20:e212:b0:3a2:7ef4:81df with SMTP id adf61e73a8af0-3cbce960c19mr13021510637.26.1786311422704;
-        Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.134.208])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315be86d3fcsm35222297eec.4.2026.08.09.14.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
-Message-ID: <6a78f2fe.af4834b4.254dba.ec3a@mx.google.com>
-Date: Sun, 09 Aug 2026 14:37:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1333309680019227629=="
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="j56gSqF4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1786345743;
+	bh=UYRluZzxGaSjOirVB2ast2VDDRh/iHi+PYJTiCs1VIM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=j56gSqF4Gy9TmE6zG6batu98Wx5VO16BrAmF6sNpMl3cz8mpc4gvATNufsJc6mrMW
+	 A+5gdGfZAe+Ca7/FCKOcPL7RKEZsa/Nay7I41KNKtc8BOkWWTz6dPBT/qIJKpW1E8T
+	 qtkXRO2Nr1yyklctubKa8NbN/9JT3QRyE+1iOLg4=
+X-QQ-mid: esmtpgz12t1786345738taa639d42
+X-QQ-Originating-IP: eDEhmzxroT9+iZopgTA2ATmCWNhgBbNSSoXU14uEenY=
+Received: from PEN002676 ( [124.126.19.250])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 10 Aug 2026 15:08:47 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 9524870747045469990
+EX-QQ-RecipientCnt: 5
+From: ZhaoJinming <zhaojinming@uniontech.com>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	zhaojinming@uniontech.com
+Subject: [PATCH v2] Bluetooth: hci_serdev: Fix use-after-free in hci_uart_unregister_device()
+Date: Mon, 10 Aug 2026 15:08:45 +0800
+Message-ID: <D747A53C08BD2456+20260810-bluetooth-hci-serdev-uart-unregister-v2-1-690493a6ab95@uniontech.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <CABBYNZ+mwb4z_x-jwdJVftSLDGa3x_v6ghgUd2uND87q8fP1rg@mail.gmail.com>
+References: <CABBYNZ+mwb4z_x-jwdJVftSLDGa3x_v6ghgUd2uND87q8fP1rg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, richard.w.nunley@gmail.com
-Subject: RE: Bluetooth: btusb: Add Realtek RTL8821CE device 13d3:3558
-In-Reply-To: <20260809-master-v1-1-c62bc61debdd@gmail.com>
-References: <20260809-master-v1-1-c62bc61debdd@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260810-bluetooth-hci-serdev-uart-unregister-ce37ebb29283
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: OFOeSPWxxouH9aIZtTsKp8hLAXa3OkKH9iivzet75R+zt+0gY6vW8T5V
+	8FTn8P1nGrXw3qJz5jgblziCLL8YKIjrjE6Wr6Y8xSUH/76T/wiT5uKhPNRauUjb2VCkgBE
+	c97B1rBbhakSYavarhqaPHHyvkZNcNkZ263lQ/ljaCimkJ2O6UGVqLS9UyA0w2wwzfsrSxP
+	X92T5GJ5ssKssgOK1Oc6WwfORjQtGC3ScoLSQZ5s+UAt0ZXm1WRIgKaIisnTEKr5PJBBstg
+	/Lwrs6BIDWpVl2ZvKoZjxULCflatV/2ZjPxJchCSo4cJmPupwx2uYz3d8I1aOdPOzfvK47i
+	WeAs1KPlXdhbb8OZPXj1cbbundUhNVH1k/C0d+yWTYsADkMpZO+gbF9F72Z6v/nJXEqIZkQ
+	T0yy/XVdv7AgNuvnbL3YYYsl7PTaAvnPXEJFtWEsFBaC7uEgwKYjmXIVt2bbmwYKSCZuQA8
+	EQp0eDvWUaktGOZrelZ0qRBJUqplukeGO39MRUqo08vGCSsG9vU5AB6sFFgRkW5SEyS9RfY
+	ASx0EvyEw2GyiDIZuHlRpVwDn+jI55bS4Q0QWs2YvziHwwFKBEPgjAxOHWnOiFIh2Zuv2T2
+	dtrZk1LjmZWy9J4AFdrP8F1nSyjW1ddO3xPJPDtaqpHcT8GtVFV4IX5fbiRYZHAlkPymNaY
+	ZlABkZbSyp+0h6Pvc0SxNA3+dzHpArJXEwzjqiPYhLhEVv2BAnzoFYfS/vNI8bhBC91ui35
+	oDY6lrmk2UzT2+PfjUuc6ulMsEE7doUoU3eH/xh0sfNFihwvqX3vFVFC2h2Bc0MVnK1fhAF
+	ta3yVrx2S+RFnnzvQKm+xHEqaZxEq0C/NTJgc/J45cP0JTBrgFHT4NRIjGdXi/+uTIEqJiz
+	4xv3rucdHbS1nVm1YbQX8vzgQw2Ymhm0ip4sHZv+cN69JvjL2F3/Bdzt6qb5zOA2UaNbSXS
+	P159ckkx9q5Y4Mlw7xXDrkKdPqPJrTgLeRU5X91HNlEAzkD6B0OcemvI+Zq/eJ7TPZnL0TF
+	ffzugR4b5CCv5tuO+x
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 
---===============1333309680019227629==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_uart_unregister_device() frees the HCI device (hci_free_dev)
+before cancelling write_work via cancel_work_sync(). If write_work
+is executing concurrently on another CPU, it can access hu->hdev
+and write to hdev->stat after the memory has been freed.
 
-This is automated email and please do not reply to this email!
+Additionally, HCI_UART_PROTO_READY is not cleared until after
+cancel_work_sync, so the write_wakeup serdev callback can still
+schedule write_work via hci_uart_tx_wakeup() even after
+hci_free_dev has freed the device.
 
-Dear submitter,
+Fix this by mirroring the same ordering used in the tty/ldisc path
+(hci_uart_tty_close, hci_ldisc.c:565-593):
+1. Save the PROTO_READY state and clear it under the write lock so
+   a concurrent hci_uart_tx_wakeup() cannot re-schedule write_work
+2. Cancel write_work (no new work can be scheduled and no work is
+   in flight)
+3. Unregister the HCI device
+4. Close the protocol (may access hu->hdev and the serdev device)
+5. Close the serdev port (safe now that write_work is quiesced and
+   protocol is done)
+6. Free the HCI device
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1142999
+Also free any partially transmitted frame (hu->tx_skb) left over by
+write_work once the transmit path is quiesced, since hci_uart_close()
+would skip hci_uart_flush() because HCI_UART_PROTO_READY is cleared.
 
----Test result---
+Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
+---
+Fix a use-after-free in hci_uart_unregister_device() where the HCI
+device could be freed (hci_free_dev) before write_work was cancelled,
+allowing a concurrently running write_work to access hu->hdev after
+the memory had been freed.
 
-Test Summary:
-CheckPatch                    PASS      14.04 seconds
-VerifyFixes                   PASS      3.99 seconds
-VerifySignedoff               PASS      3.69 seconds
-GitLint                       FAIL      4.80 seconds
-SubjectPrefix                 PASS      1.71 seconds
-BuildKernel                   PASS      27.58 seconds
-CheckAllWarning               PASS      30.31 seconds
-CheckSparse                   PASS      33.96 seconds
-BuildKernel32                 PASS      26.79 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      507.97 seconds
-IncrementalBuild              PASS      35.52 seconds
+The teardown sequence is reordered to mirror the tty/ldisc path
+(hci_uart_tty_close) and to account for the serdev-specific teardown:
+the serdev port is closed only after write_work and the protocol are
+fully torn down, and any partially transmitted frame is freed once the
+transmit path is quiesced.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btusb: Add Realtek RTL8821CE device 13d3:3558
+Changes in v2:
+- Clear HCI_UART_PROTO_READY under percpu_down_write() to prevent a
+  concurrent hci_uart_tx_wakeup() from re-scheduling write_work via
+  the write_wakeup callback once the device is torn down.
+- Cancel write_work before closing the serdev device to avoid a
+  use-after-free in the serdev/TTY backend.
+- Close the serdev device after the protocol close, since some protocol
+  close handlers (e.g. qca_close) still access the serdev device.
+- Free any partially transmitted frame (hu->tx_skb) after write_work is
+  quiesced.
+---
+ drivers/bluetooth/hci_serdev.c | 46 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 6 deletions(-)
 
-28: B2 Line has trailing whitespace: "--  "
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/564
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 593d9cefbbf925b4d3f8d37a12420a99e08a9477..13346c205591056eaca6e4f0dae53db398064230 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -395,20 +395,54 @@ EXPORT_SYMBOL_GPL(hci_uart_register_device_priv);
+ void hci_uart_unregister_device(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
++	bool proto_ready;
+ 
++	/* Wait for init_ready to finish to prevent registration races */
+ 	cancel_work_sync(&hu->init_ready);
+-	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+-		hci_unregister_dev(hdev);
+-	hci_free_dev(hdev);
+ 
++	proto_ready = test_bit(HCI_UART_PROTO_READY, &hu->flags);
++	if (proto_ready) {
++		/* Clear HCI_UART_PROTO_READY under the write lock so a
++		 * concurrent hci_uart_tx_wakeup() cannot re-schedule
++		 * write_work via the write_wakeup callback once the device
++		 * is torn down.
++		 */
++		percpu_down_write(&hu->proto_lock);
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		percpu_up_write(&hu->proto_lock);
++	}
++
++	/* Unconditionally cancel write_work AFTER clearing PROTO_READY.
++	 * This ensures that concurrent protocol timers cannot requeue
++	 * write_work, permanently preventing double-free races and UAFs,
++	 * and guarantees no write_work is in flight before the serdev
++	 * device is closed.
++	 */
+ 	cancel_work_sync(&hu->write_work);
+ 
++	/* Free any partially transmitted frame left over by write_work now
++	 * that the transmit path is fully quiesced. hci_uart_close() would
++	 * skip hci_uart_flush() because HCI_UART_PROTO_READY is cleared.
++	 */
++	if (hu->tx_skb) {
++		kfree_skb(hu->tx_skb);
++		hu->tx_skb = NULL;
++	}
++
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++		hci_unregister_dev(hdev);
++
++	/* Close the protocol before freeing hdev (intrinsically purges queues).
++	 * Some protocol close handlers (e.g. qca_close) may still access the
++	 * serdev device, so keep the serdev port open until this completes.
++	 */
+ 	hu->proto->close(hu);
+ 
+-	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+-		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++	if (proto_ready)
+ 		serdev_device_close(hu->serdev);
+-	}
++
++	hci_free_dev(hdev);
++
+ 	percpu_free_rwsem(&hu->proto_lock);
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: db2ddb87143519e20a95aa36c60b36107b736a58
+change-id: 20260810-bluetooth-hci-serdev-uart-unregister-ce37ebb29283
 
-
---===============1333309680019227629==--
+Best regards,
+-- 
+ZhaoJinming <zhaojinming@uniontech.com>
