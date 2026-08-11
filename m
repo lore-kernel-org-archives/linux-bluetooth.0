@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079B43FDC05;
-	Tue, 11 Aug 2026 20:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525B8339362;
+	Tue, 11 Aug 2026 20:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786479059; cv=none; b=p6cPpaqP0fQWAdlDjCUOft3+j3r9ObXrpVgj8KYy2VMl7Yk6lEskbxHkZwfNYmGvYzCaTrTsespYdvAYgLvqk+ouyW+euNSAzsBFqobWeqbdoTzaiNXWY4UXVzPIIGlGQ8qykAQN9JhkNMS9qHzi9KnT3vJ+Kuo5CeFaU8uoq2A=
+	t=1786479062; cv=none; b=kOZ8sMKkJxQZ64dtrO+rKq4QzLElEaFgDNigWvdGJj8Moyfh6US2Nm7YZmtqDA9mokF2GOoSjDhBaV3NqG+BUcWUDfzjmEMl+/pkIVGT4V031X0XbYXNTxRZNVU56BxpkIgrsDykmcHMOyfCM4D6DvEjCDchubGACciB6+BFYng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786479059; c=relaxed/simple;
-	bh=9a+QKCP0OfWHvvbFdFY6bK5ksJiF2o4NCSjMZeBwjkQ=;
+	s=arc-20240116; t=1786479062; c=relaxed/simple;
+	bh=CjEUvMo9FrceCh5EuGDkOZ5Mu3Vf4ndFDjIeXl0M9fY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g1FYAxksGEaKeSeTpJLV9fYCunhfFnx2UEjP2q5Z0u70+p7FeGLy5eMjdWLZSxgjafPhFblJcY+BuBMuJ3uw2gPBeNinUE2spjgXnHuv7V/8MEccV0YTpqcg4V+sjo3bi7gVtfWQ1JGqYdmca9MkfFFAQfQQt7IakwmsW/sphnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLOb3V1r; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=jR+ynWE9mkqHKdnZIcRc/NVzk8m5oae2BJSqkVz3Qglq9H/EnOkJ39SD/4BhuQAOvq/DK468M5GRfPgTpHSOpVJSQJW3ECu2Z5DPlla/DUhCx2kYX/6F//XsNr0yfpx6CoX2oKkABeY7aw+qA2DknKC2MQy6Gjgy9ruK2DIZhRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6O4apfP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLOb3V1r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A284A1F00A3A;
-	Tue, 11 Aug 2026 20:10:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6O4apfP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272291F000E9;
+	Tue, 11 Aug 2026 20:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786479057;
-	bh=jJSsAqNBcxyOlNcZ4emtygxRWd3+DT3fYL+n/wjGjcM=;
+	s=k20260515; t=1786479059;
+	bh=HVb8BMA2Rm3P+1dmF5w88CK6rWOwc0GHqH9cK6spkEg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=LLOb3V1r1rXCxnOGoRV986HL3/my77x/HnGkMy0wS/Q0n/ZFybyOWKWzg16GuVM4c
-	 sGw128lMkVekVVGxl+uWVNBb6qtxAjGj4Xb9elVm+JamyGLnPWpgSQ7FeMN8WzsNgZ
-	 mUeAIVkL+jI7e8L0Bwj15nT4yFQaSfZCGgKTJfCepy9hgyPSdoUOeZvtq8YzLHfWAw
-	 g7auAugGnMiVsdQxOmUaV2buGbbIbMb2ahWaZfrOS4hRcz4WCB4nLmKtTV9YJj8MMz
-	 im4b6CdLAe7OzSq8lHvlu0Km6jGbgMWZrJK602pUvdE6EwVElavcImeEN0hWu5e7ix
-	 +Y3l9nUNnvKSA==
+	b=V6O4apfPsfGr8k6+Hl6BWOLiq6y12ez6eXdJa3vS2te7hiJgB4jVD7dmc1GtL2B4m
+	 CQaIARJ1bHou0bo8l52/iDvxoilg6ZjPpVctT+Ho13zGjXWuallnaZukjTDm1pBEmD
+	 uOy7RHtzlupR6M9vwBQVYD5b2Iyp3a/SOQ6o3wgnQFykLo0qT5OXS/XsC+uLWpAt9H
+	 hSmZEATSOa7FZQ+J3EEc8nOb+Uf2L8i8IgkfEWdSJrb0N1jGSLu9wWVH2MJ1aeJRAG
+	 54YGmBWYk3HS3bScKGdLipI+4ya43/T9krUE0IevGYecC3pOyRbA3aqSICTNem85JF
+	 lHP/xkeRSezSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A9B3809A0A;
-	Tue, 11 Aug 2026 20:10:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 567FA3809A0A;
+	Tue, 11 Aug 2026 20:10:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,41 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btmtksdio: fix deadlock in close and reset
- paths
+Subject: Re: [PATCH] Bluetooth: L2CAP: reject accept queue add unless
+ BT_LISTEN
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178647901335.1134064.2663051483826196708.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Aug 2026 20:10:13 +0000
+ <178647901488.1134064.17530228641432806685.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Aug 2026 20:10:14 +0000
 References: 
- <81B94E6D2ACC0BFD+20260810-btmtksdio-deadlock-fix-v2-1-0eb31f9066d6@uniontech.com>
+ <204b3dea7b0e001f64920ed1114d38c16afdb397.1786225848.git.pav@iki.fi>
 In-Reply-To: 
- <81B94E6D2ACC0BFD+20260810-btmtksdio-deadlock-fix-v2-1-0eb31f9066d6@uniontech.com>
-To: ZhaoJinming <zhaojinming@uniontech.com>
-Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
- marcel@holtmann.org, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+ <204b3dea7b0e001f64920ed1114d38c16afdb397.1786225848.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, oss@fourdim.xyz, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+9265e754091c2d27ea29@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 10 Aug 2026 18:22:38 +0800 you wrote:
-> btmtksdio_close() and btmtksdio_reset() call cancel_work_sync() on
-> bdev->txrx_work while holding the sdio host lock, which is also acquired
-> by btmtksdio_txrx_work().  If txrx_work is queued when close/reset runs,
-> a worker thread may start it after the host lock is taken and block in
-> sdio_claim_host(), while cancel_work_sync() waits for the work to
-> finish.  The host lock is only released after cancel_work_sync()
-> returns, so both sides wait forever, deadlocking close/reset.
+On Sun,  9 Aug 2026 01:06:05 +0300 you wrote:
+> New sk should not be added to parent socket accept queue after last
+> l2cap_sock_cleanup_listen() has run in l2cap_sock_teardown_cb() and
+> state set to BT_CLOSED, as that can result to UAF on dereferencing the
+> dangling parent reference.
+> 
+> l2cap_sock_new_connection_cb() may race with parent l2cap_chan teardown,
+> due to chan->state accessed without consistent locking:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btmtksdio: fix deadlock in close and reset paths
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fca8fe614904
+  - Bluetooth: L2CAP: reject accept queue add unless BT_LISTEN
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9db7e5fffbae
 
 You are awesome, thank you!
 -- 
