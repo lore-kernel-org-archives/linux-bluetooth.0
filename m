@@ -1,260 +1,127 @@
-Received: from out-3.smtp.github.com (out-3.smtp.github.com [192.30.252.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0F8357D18
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 15:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC37444C670
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 16:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786462983; cv=none; b=FpdxNZIygJAZvbAVXg1tc7sqpc+wehLCGkEoBJZ28ttqlBu1qdI3AnZL8BmLSbUK7KgCqyAUsdVmYcdN9bn+MBEy7DyyKmSrZMzwtIxo4BrfsT1ZjQMCBBSHb37qXyympAqdnLSrT+Jn8VNk+yeYBtKvo+YMYQpFbkVbVb/YX7U=
+	t=1786464560; cv=none; b=FPKs4pPMxBYc/GM1BJf4A+rm3yKjIO0C9LuGwE7gahlIaM6Of9q6ARlTrVZn4tgXzsgEaXIaFzMVL7WmocWxUYLWn0qyyCevme6g4olsUW17q5cPKxbCFif5ZLky4nM9UDvCEe4460//a0mPq4Q0itWaWyz2aoXSGtyC7h63X5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786462983; c=relaxed/simple;
-	bh=WOfZFR3/sKKxKyVEZ6YjwX84tx+OYs8HaYYRndFfVoM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GfOGzUalj61/taueeCloQaeMg5e1vNBr3w4zjN5HEq7FH2sRnd9PwX6VAn/lZx+sQ8X5B9pfWr4uRSmCjcsgZ5QcdlgG89r0w6Tebp7YXEAyNOy8i1OsiFcwmvtnbh5b1lMSNibDITjJF1hv3TuG6pibBhOwBv6UpfvzYzUvNI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HmyNgePl; arc=none smtp.client-ip=192.30.252.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1786464560; c=relaxed/simple;
+	bh=vc2WyX7OCbYPcMFgUPL13EO51GU0Tm+aFi9wLTgH4uk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=shKHsdzYUI/++aN3HW2hJ4oCSbp0zpZMpww0CepH4SxzJEhBJ8X5VzFAv/iBXCsjhbjEt5AEH8Y20h1C8wsGxXiF22I+SqMFmbwQhOw8O/XX0ud+KARsSENNOLI6hRtNeuWlXDNSpl57XFEuJuHAmE+d7Gz5PnET5AZpFxepP9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UVZzz7/R; arc=none smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HmyNgePl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786462980;
-	bh=iiHJY43B1CEO21OmD5kXA3REyBMJLo8+Pj/vHUDppbI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HmyNgePluWeMguDBfbqO4Qi54S6QlrfEX9kg+JZkFHCT0udjXpIiBQfPHiVFCwMMj
-	 EhQUznq2kP2Q3SMFUVI5UP3GLaVznM9G5wSOCACreKYhhESkp7aR4Yp8QnfcK3Rwfd
-	 hWsbh1IZYaZfvkSisWC9q+sZzwcP2sgHW83OPX7A=
-Received: from github.com (hubbernetes-node-9a88e96.va3-iad.github.net [10.48.137.44])
-	by smtp.github.com (Postfix) with ESMTPA id 62755341372
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 08:43:00 -0700 (PDT)
-Date: Tue, 11 Aug 2026 08:43:00 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1144151/000000-ba6f40@github.com>
-Subject: [bluez/bluez] 496623: unit: Add test for sdp_xml_parse_record()
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVZzz7/R"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-44cb057311bso584049fac.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 09:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786464558; x=1787069358; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=BEkQKWdyRgBgGY1eK+l2toqeI5KxNy4kZcSo/VAvtFw=;
+        b=UVZzz7/Rtz4V9b0GAg2rwZoreUmDXqgWWcP8rLlwYwLSQOQapvXANKpSttvjhx7DFQ
+         uKwoRJ+cou6B5FmCFz8a6Yjlsf3fbEAsDif01SWMnAHBswTavQKBjKs+86IPTekkmnRN
+         Cw4Pkq+3B3sVxJJMWe3zSyx9Y5pbX67tF6H+YEpiogNeSoeOuj5k7lRARU2VEAKUwAbc
+         9TqRcrlx/E/WVqzU1RFdsMKOrvX6JNH/mU74iN1Yv4wrv8wAzC9JbV3Sg1aC2QYA3jfU
+         BB66i8ocvx4fLS1w8/6LF7gpmLaKUG5Z3oeOtFLikdE4GmEdSGJ42P+HqhUqC5F7zxck
+         wWXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786464558; x=1787069358;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=BEkQKWdyRgBgGY1eK+l2toqeI5KxNy4kZcSo/VAvtFw=;
+        b=e0ruZT6LvERZvkjxZVccXB3WpJxyx1+eio1NR/XbbNCxklbiKLbdJVRZcCMQU3LW/P
+         zUSWHYhKjEh5giaBae3O6YQQkNYsBbXiOcc2UZcFjHIusbDToe5ZhyepdKMH1WTiPYdi
+         ZTPmlLPrLWNicq/5gr8N9XrnvZMhuthdnYgOxZeNdL6T1vOl9jtZp7x94as0KExpRRey
+         jui66/4utN6jTYAX2rwJLCmLUjjLd2LP4LSBOkkDHEZyQ85AfMOW5l54OqR5MInUim/t
+         D33xLSbBJmMxfMT3FliF35h+AlbQemvsAXez5RXzZtyfPHIznczzmO5YgjUEJl6h6Nag
+         N18A==
+X-Gm-Message-State: AOJu0YzYTkuRPQFUgtUobYyJFENhNSWOdrpyV6FFJ3cy1959HP8A9kyZ
+	yop7MpZYB9ek65sYL3fQh+vC2+9QIhvWYtOmD3CIyJedPrIUxJ2fxyllHcylog==
+X-Gm-Gg: AR+sD13/qi5hIb7oxcYCXBvNz9oaURyRXA0K7FKVhxgGb7HfF3IezJvqALIOqc7t7TR
+	cOsxitDFSt0spOt+webpInXgfR6Tv8K4SJhU4YZokLp55BgvFc2IDHYLtuCSCSVXYoghHeFDohy
+	1oSXyGn2FNAAgt21blsK7OdOmvp3Om5XSBCYSNluIcHGHblulZ1PP+uXLX8hecBKVDZan5Q7GUX
+	ovKCyvkNjqICV4scD7wf4o6XkYntEUr2dujUFGtt+7MPFbA5jUkHNdDlwbOunIYJcbO8sjL5onR
+	aTpTzuvrUk97F5QoNKihf6nlrH/npw9lm+RgPwhX6DkuLf6QFlhFvFTdxBbs5bjbb5ztQgCOCJw
+	rlD69K4dU/stgyqQm+4c7xU7t/9dVXaZrpNwNN3B9RNFu6+hIcvAxYdXTv/G2HrchGODUAc3+zx
+	CAOxQDLJb3+chdZ8Oknxi5SOoi0nM0RokYpNAfuW3wdKWO7R+AHLROZA7ffyZmfiLfet87
+X-Received: by 2002:a05:6870:1f10:b0:43c:2d3f:95f8 with SMTP id 586e51a60fabf-45e313bfc83mr1088238fac.0.1786464557683;
+        Tue, 11 Aug 2026 09:09:17 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.180.164])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-45e35645349sm8478fac.15.2026.08.11.09.09.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2026 09:09:17 -0700 (PDT)
+Message-ID: <6a7b492d.29a6ebfb.30161a.1bee@mx.google.com>
+Date: Tue, 11 Aug 2026 09:09:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0304145284112959912=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1,1/3] Bluetooth: btintel_pcie: parse FW memory region addresses via mailbox TLV
+In-Reply-To: <20260811154553.629211-1-kiran.k@intel.com>
+References: <20260811154553.629211-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0304145284112959912==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1144151
-  Home:   https://github.com/bluez/bluez
-  Commit: 496623162109aa1a97bf1a9c8e6049ea21336be8
-      https://github.com/bluez/bluez/commit/496623162109aa1a97bf1a9c8e6049ea21336be8
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M Makefile.am
-    A unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-    A unit/sdp-xml/qt-SerialPortSDPRecord.xml
-    A unit/test-sdp-xml.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  unit: Add test for sdp_xml_parse_record()
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1144161
 
-This adds 2 example XML files from other repositories, under a fair use
-license exception.
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      3.05 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       FAIL      1.26 seconds
+SubjectPrefix                 PASS      0.32 seconds
+BuildKernel                   PASS      17.68 seconds
+CheckAllWarning               PASS      20.39 seconds
+CheckSparse                   PASS      18.45 seconds
+BuildKernel32                 PASS      16.77 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      310.33 seconds
+IncrementalBuild              PASS      20.98 seconds
 
-  Commit: 9f971c42f87398dd8e3b701f718c9c3d26549a11
-      https://github.com/bluez/bluez/commit/9f971c42f87398dd8e3b701f718c9c3d26549a11
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v1,1/3] Bluetooth: btintel_pcie: parse FW memory region addresses via mailbox TLV
 
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML
-
-When element_end() processes </attribute>, it frees ctx_data->stack_head
-and clears the stack even if parsing is still nested inside a parent
-container.
-
-If a crafted ServiceRecord places a nested <attribute> inside <sequence>,
-a later sibling scalar element such as <uint64> can become the new stack
-head. When the closing </sequence> is then processed, compute_seq_size()
-is reached without first validating that the current node is actually
-a sequence.
-
-sdp_data_t.val stores both scalar members such as uint64 and the
-dataseq pointer in the same union. As a result, attacker-controlled
-scalar data can be reinterpreted as a linked-list pointer and traversed
-until bluetoothd crashes.
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
-
-Reported-by: Aisle Research
-Co-authored-by: Aisle Research
+1: T1 Title exceeds max length (82>80): "[v1,1/3] Bluetooth: btintel_pcie: parse FW memory region addresses via mailbox TLV"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
-  Commit: e033e4bf68f71c4c85a78ef3f4adad058b84b3d1
-      https://github.com/bluez/bluez/commit/e033e4bf68f71c4c85a78ef3f4adad058b84b3d1
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
+https://github.com/bluez/bluetooth-next/pull/572
 
-  Changed paths:
-    A unit/sdp-xml/compute-seq-size-type-confusion.xml
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add test for sdp-xml type-confusion bug
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
-
-Co-authored-by: Aisle Research
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: fa35605795af977c269e69e8e5830092d91fcbaa
-      https://github.com/bluez/bluez/commit/fa35605795af977c269e69e8e5830092d91fcbaa
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Fix memory leak when adding duplicate attributes
-
-When sdp_attr_add() fails because an attribute is duplicated, don't
-unset its pointer in the parsing context data. As the attribute wasn't
-added to the record, the ownership of the attribute didn't get passed
-to the record either.
-
-Don't set the pointer to NULL so it gets freed when cleaning up the
-context.
-
-Fixes those 2 ASan warnings:
-Direct leak of 48 byte(s) in 1 object(s) allocated from:
-    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x562042b747f2 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:350
-
-Indirect leak of 2 byte(s) in 1 object(s) allocated from:
-    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x562042b74bd7 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:425
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
-
-Reported-by: Aisle Research
-Co-authored-by: Aisle Research
-
-
-  Commit: a851bde7faa851727369bfa6ce01de635ef17b1a
-      https://github.com/bluez/bluez/commit/a851bde7faa851727369bfa6ce01de635ef17b1a
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    A unit/sdp-xml/duplicate-attribute.xml
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add test for sdp-xml duplicate attribute bug
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
-
-Co-authored-by: Aisle Research
-
-
-  Commit: ef4b6f6d4a7db8575b0de9a335e1662b8bf997d0
-      https://github.com/bluez/bluez/commit/ef4b6f6d4a7db8575b0de9a335e1662b8bf997d0
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Optimise parsing large sequences
-
-SDP sequences are stored as single-linked lists, so appending members
-to a sequence requires finding the tail of the list before the
-insertion.
-
-Finding the tail of the list always starts at the beginning of the list,
-so takes longer and longer as the list grows bigger.
-
-Keep track of the tail to avoid that problem. This cuts down the
-sequence_on_squared() test from around 3 to 4 seconds to less than
-0.1 seconds.
-
-
-  Commit: f48d1c05d77b726065c55c95159046ee7c96e9b9
-      https://github.com/bluez/bluez/commit/f48d1c05d77b726065c55c95159046ee7c96e9b9
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add test for slow element_end() append
-
-This uses 40k iterations as this takes a visible amount of time on a
-pretty fast desktop machine (3-4 secs on an i9 9900k).
-
-See: https://github.com/bluez/bluez/security/advisories/GHSA-4p57-mrcv-r2jc
-
-
-  Commit: c7d0d90bb243435cf6cd4c21ece05ba655eed25e
-      https://github.com/bluez/bluez/commit/c7d0d90bb243435cf6cd4c21ece05ba655eed25e
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Fix stack overflow when converting large sequences to XML
-
-Don't make convert_raw_data_to_xml() call itself recursively X times
-if there are X elements in a sequence.
-
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==1684518==ERROR: AddressSanitizer: stack-overflow on address 0x7fff7fb40d98 (pc 0x7fbe1ee95c2b bp 0x7fff7fb41610 sp 0x7fff7fb40d70 T0)
-    #0 0x7fbe1ee95c2b in printf_common(void*, char const*, __va_list_tag*) (/lib64/libasan.so.8+0x95c2b) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x7fbe1eeb72d6 in vsnprintf (/lib64/libasan.so.8+0xb72d6) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #2 0x7fbe1eeb94f4 in snprintf (/lib64/libasan.so.8+0xb94f4) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #3 0x000000401fc2 in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709
-    #4 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
-[...]
-    #246 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
-
-SUMMARY: AddressSanitizer: stack-overflow ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709 in convert_raw_data_to_xml
-
-
-  Commit: ba6f402e19e742a2e364eb006e6602631b3699c8
-      https://github.com/bluez/bluez/commit/ba6f402e19e742a2e364eb006e6602631b3699c8
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-11 (Tue, 11 Aug 2026)
-
-  Changed paths:
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add convert_sdp_record_to_xml() to SDP XML testing
-
-This tests SDP binary to XML conversion, including whether a fix for
-a stack overflow when dealing with large sequences, like in
-sequence_on_squared(), works correctly.
-
-
-Compare: https://github.com/bluez/bluez/compare/496623162109%5E...ba6f402e19e7
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============0304145284112959912==--
