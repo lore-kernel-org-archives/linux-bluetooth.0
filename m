@@ -1,210 +1,260 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from out-3.smtp.github.com (out-3.smtp.github.com [192.30.252.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6908D33DEC8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 15:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0F8357D18
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 15:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786461986; cv=none; b=dKsik+4RrGt4rl+Qx0GOGcrUrIaBkC6/i9e3mrYck62GHioWYuTqll3uFZT3CthOEcrPqzm0UEjruqtjzEKyKda9PIlx/Fo+IU4L3Q7A6xZvzNh7T7eccp0nvBAlFgDbafZT9bk0/8E8C06YjUjdk4g9gIIoKTWWhQJj5PHMsJg=
+	t=1786462983; cv=none; b=FpdxNZIygJAZvbAVXg1tc7sqpc+wehLCGkEoBJZ28ttqlBu1qdI3AnZL8BmLSbUK7KgCqyAUsdVmYcdN9bn+MBEy7DyyKmSrZMzwtIxo4BrfsT1ZjQMCBBSHb37qXyympAqdnLSrT+Jn8VNk+yeYBtKvo+YMYQpFbkVbVb/YX7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786461986; c=relaxed/simple;
-	bh=G4vvgeRCV+r1lK71fpWEHOV1rJMWMY3PeJhqTP+v+oE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CHDPsfu7/R8yZvY+dqrBiq9jdn97CS1FHlhjY841yyG4xw7JShPMIgVLf0rwALANeRGTAHq2TtLnZXp3doLrnWatS+ST9w21pUa56ubTUmpKY/XgagkwywWqij+rgkiTzC2OWQk0feCSFdW8+hd0iJ02acpaN08T9R0U5hh3mGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eByDXZ0W; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1786462983; c=relaxed/simple;
+	bh=WOfZFR3/sKKxKyVEZ6YjwX84tx+OYs8HaYYRndFfVoM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GfOGzUalj61/taueeCloQaeMg5e1vNBr3w4zjN5HEq7FH2sRnd9PwX6VAn/lZx+sQ8X5B9pfWr4uRSmCjcsgZ5QcdlgG89r0w6Tebp7YXEAyNOy8i1OsiFcwmvtnbh5b1lMSNibDITjJF1hv3TuG6pibBhOwBv6UpfvzYzUvNI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HmyNgePl; arc=none smtp.client-ip=192.30.252.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eByDXZ0W"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786461985; x=1817997985;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=G4vvgeRCV+r1lK71fpWEHOV1rJMWMY3PeJhqTP+v+oE=;
-  b=eByDXZ0WdBvrv/XatEMXLwFT9n3BcCdLQTZmxRprZhP/JG70Xzn8S7iB
-   HncZ+Cqyh498D199er9fbbYeea7evX2YaJhliP1w8d/SOgMZnBgzwvcqG
-   v2zFx3C5gUMefgrpAKMuogNBEjT8JrFLJxc6ZsyFAnlMbhNj9AfBJFwn/
-   UUatweLy/TOWZffak+3/0ZRlEm2UjN+1qNZI9HyRf3rSsheIFKy5nOvCI
-   6gSZcug+OwOrTc/QEbzH2Yk4xeiRU7KmxueE3CcSx6c6fwKLfjS1jJJ0L
-   K0wOyhyVVoJXtJktXzXDugSF1NQh1ZcEXnBUv60qcmur7jt9U/TmTFZ6H
-   g==;
-X-CSE-ConnectionGUID: /9Uv4M1rT72T4SqFapQijA==
-X-CSE-MsgGUID: t6gfpWnsRXm1L3PlPbW7dQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11872"; a="109786933"
-X-IronPort-AV: E=Sophos;i="6.25,218,1779174000"; 
-   d="scan'208";a="109786933"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2026 08:26:25 -0700
-X-CSE-ConnectionGUID: 4OTlQAf1Sma36MrlbF0zLA==
-X-CSE-MsgGUID: u0DrrIJmTU2p8V/mhBt+3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,218,1779174000"; 
-   d="scan'208";a="268523900"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa005.fm.intel.com with ESMTP; 11 Aug 2026 08:26:22 -0700
-From: Kiran K <kiran.k@intel.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HmyNgePl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1786462980;
+	bh=iiHJY43B1CEO21OmD5kXA3REyBMJLo8+Pj/vHUDppbI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HmyNgePluWeMguDBfbqO4Qi54S6QlrfEX9kg+JZkFHCT0udjXpIiBQfPHiVFCwMMj
+	 EhQUznq2kP2Q3SMFUVI5UP3GLaVznM9G5wSOCACreKYhhESkp7aR4Yp8QnfcK3Rwfd
+	 hWsbh1IZYaZfvkSisWC9q+sZzwcP2sgHW83OPX7A=
+Received: from github.com (hubbernetes-node-9a88e96.va3-iad.github.net [10.48.137.44])
+	by smtp.github.com (Postfix) with ESMTPA id 62755341372
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 08:43:00 -0700 (PDT)
+Date: Tue, 11 Aug 2026 08:43:00 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Catherine L <catherine.l@intel.com>,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 3/3] Bluetooth: btintel_pcie: Route debug traces to WiFi DBGC by default
-Date: Tue, 11 Aug 2026 21:15:53 +0530
-Message-ID: <20260811154553.629211-3-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260811154553.629211-1-kiran.k@intel.com>
-References: <20260811154553.629211-1-kiran.k@intel.com>
+Message-ID: <bluez/bluez/push/refs/heads/1144151/000000-ba6f40@github.com>
+Subject: [bluez/bluez] 496623: unit: Add test for sdp_xml_parse_record()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Catherine L <catherine.l@intel.com>
+  Branch: refs/heads/1144151
+  Home:   https://github.com/bluez/bluez
+  Commit: 496623162109aa1a97bf1a9c8e6049ea21336be8
+      https://github.com/bluez/bluez/commit/496623162109aa1a97bf1a9c8e6049ea21336be8
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
 
-Set dbg_output_mode to 0x06 (BTINTEL_PCIE_WIFI_DBGC) by default so
-firmware debug traces are forwarded to the WiFi DBGC. In this mode:
+  Changed paths:
+    M Makefile.am
+    A unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+    A unit/sdp-xml/qt-SerialPortSDPRecord.xml
+    A unit/test-sdp-xml.c
 
-  - Host DBGC fragment/data buffers are NOT allocated.
-  - Context info publishes dbgc_addr/size as 0.
+  Log Message:
+  -----------
+  unit: Add test for sdp_xml_parse_record()
 
-Add a small helper btintel_pcie_dbg_to_wifi() driven by a cached
-dbg_path_cache field in struct btintel_pcie_data, initialized to
-BTINTEL_PCIE_WIFI_DBGC in probe.
+This adds 2 example XML files from other repositories, under a fair use
+license exception.
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
-Signed-off-by: Catherine L <catherine.l@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 43 +++++++++++++++++++++++++++++---
- drivers/bluetooth/btintel_pcie.h | 16 ++++++++++++
- 2 files changed, 55 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 93963450ea95..a98edfe81ab8 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -180,6 +180,15 @@ static inline char *btintel_pcie_alivectxt_state2str(u32 alive_intr_ctxt)
- 	}
- }
- 
-+/* Returns true when firmware traces are routed to the WiFi DBGC. In that
-+ * mode the host must not allocate DBGC buffers and must not publish their
-+ * addresses in the context info.
-+ */
-+static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
-+{
-+	return data->dbg_path_cache != BTINTEL_PCIE_DRAM;
-+}
-+
- /* This function initializes the memory for DBGC buffers and formats the
-  * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
-  * size as the payload
-@@ -1847,6 +1856,15 @@ static void btintel_pcie_coredump_worker(struct work_struct *work)
- 	if (!data->hdev)
- 		goto out;
- 
-+	/* When firmware routes debug traces to the WiFi DBGC, no host
-+	 * DBGC buffers were allocated, so there is nothing to dump here.
-+	 */
-+	if (btintel_pcie_dbg_to_wifi(data)) {
-+		bt_dev_info(data->hdev,
-+			    "Skipping coredump: debug traces routed to WiFi DBGC");
-+		goto out;
-+	}
-+
- 	btintel_pcie_dump_traces(data->hdev);
- out:
- 	/* Release guard last so a new trigger can run only after this
-@@ -2217,9 +2235,18 @@ static void btintel_pcie_init_ci(struct btintel_pcie_data *data,
- 	ci->num_urbdq1 = data->rxq.count;
- 	ci->urbdq_db_vec = BTINTEL_PCIE_RXQ_NUM;
- 
--	ci->dbg_output_mode = 0x01;
--	ci->dbgc_addr = data->dbgc.frag_p_addr;
--	ci->dbgc_size = data->dbgc.frag_size;
-+	ci->dbg_output_mode = btintel_pcie_dbg_to_wifi(data) ?
-+			      BTINTEL_PCIE_WIFI_DBGC : BTINTEL_PCIE_DRAM;
-+	if (btintel_pcie_dbg_to_wifi(data)) {
-+		/* Firmware forwards debug traces to the WiFi DBGC, so no
-+		 * host DBGC buffer is needed; leave dbgc_addr/size as 0.
-+		 */
-+		ci->dbgc_addr = 0;
-+		ci->dbgc_size = 0;
-+	} else {
-+		ci->dbgc_addr = data->dbgc.frag_p_addr;
-+		ci->dbgc_size = data->dbgc.frag_size;
-+	}
- 	ci->dbg_preset = 0x00;
- }
- 
-@@ -2447,7 +2474,14 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	v_addr += ci_size;
- 
- 	/* Setup data buffers for dbgc */
--	err = btintel_pcie_setup_dbgc(data);
-+	if (btintel_pcie_dbg_to_wifi(data)) {
-+		/* Firmware routes traces to the WiFi DBGC; skip host DBGC
-+		 * buffer allocation entirely.
-+		 */
-+		err = 0;
-+	} else {
-+		err = btintel_pcie_setup_dbgc(data);
-+	}
- 	if (err)
- 		goto exit_error_txq;
- 
-@@ -3351,6 +3385,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
-+	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
- 	/* FLR can be invoked by echoing to debugfs path, so explicitly
- 	 * initialized
- 	 */
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 5aff1dfa888f..9baa214d9bbe 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -94,6 +94,20 @@
- /* Num of alloc Dbg buff (4) + (LSB(4), MSB(4), Size(4)) for each buffer */
- #define BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE	196
- 
-+/* dbg_output_mode values for the context info.
-+ *   BTINTEL_PCIE_DRAM: firmware writes traces to host DRAM DBGC buffers.
-+ *   BTINTEL_PCIE_WIFI_DBGC: firmware forwards traces to the WiFi DBGC; the
-+ *   host does NOT need to allocate DBGC fragment/data buffers and must
-+ *   publish dbgc_addr/size as 0 in the context info.
-+ *
-+ * Encoding of BTINTEL_PCIE_WIFI_DBGC (0x06):
-+ *   Bit[0] DBGC O/P  : 0 = SRAM (don't care, DBGI selected)
-+ *   Bit[1] DBGC I/P  : 1 = DBGI
-+ *   Bits[2:3] DBGI O/P : 01 = WiFi DBGC
-+ */
-+#define BTINTEL_PCIE_DRAM	0x01
-+#define BTINTEL_PCIE_WIFI_DBGC	0x06
-+
- /* Causes for the FH register interrupts */
- enum msix_fh_int_causes {
- 	BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0	= BIT(0),	/* cause 0 */
-@@ -503,6 +517,7 @@ struct btintel_pcie_dump_header {
-  * @hw_init_mask: initial unmaksed hw causes
-  * @boot_stage_cache: cached value of boot stage register
-  * @img_resp_cache: cached value of image response register
-+ * @dbg_path_cache: cached debug output routing mode (BT DRAM or WiFi DBGC)
-  * @cnvi: CNVi register value
-  * @cnvr: CNVr register value
-  * @gp0_received: condition for gp0 interrupt
-@@ -550,6 +565,7 @@ struct btintel_pcie_data {
- 
- 	u32	boot_stage_cache;
- 	u32	img_resp_cache;
-+	u32	dbg_path_cache;
- 
- 	u32	cnvi;
- 	u32	cnvr;
--- 
-2.54.0
+  Commit: 9f971c42f87398dd8e3b701f718c9c3d26549a11
+      https://github.com/bluez/bluez/commit/9f971c42f87398dd8e3b701f718c9c3d26549a11
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
 
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML
+
+When element_end() processes </attribute>, it frees ctx_data->stack_head
+and clears the stack even if parsing is still nested inside a parent
+container.
+
+If a crafted ServiceRecord places a nested <attribute> inside <sequence>,
+a later sibling scalar element such as <uint64> can become the new stack
+head. When the closing </sequence> is then processed, compute_seq_size()
+is reached without first validating that the current node is actually
+a sequence.
+
+sdp_data_t.val stores both scalar members such as uint64 and the
+dataseq pointer in the same union. As a result, attacker-controlled
+scalar data can be reinterpreted as a linked-list pointer and traversed
+until bluetoothd crashes.
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+
+Reported-by: Aisle Research
+Co-authored-by: Aisle Research
+
+
+  Commit: e033e4bf68f71c4c85a78ef3f4adad058b84b3d1
+      https://github.com/bluez/bluez/commit/e033e4bf68f71c4c85a78ef3f4adad058b84b3d1
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    A unit/sdp-xml/compute-seq-size-type-confusion.xml
+    M unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit: Add test for sdp-xml type-confusion bug
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+
+Co-authored-by: Aisle Research
+
+
+  Commit: fa35605795af977c269e69e8e5830092d91fcbaa
+      https://github.com/bluez/bluez/commit/fa35605795af977c269e69e8e5830092d91fcbaa
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  sdp-xml: Fix memory leak when adding duplicate attributes
+
+When sdp_attr_add() fails because an attribute is duplicated, don't
+unset its pointer in the parsing context data. As the attribute wasn't
+added to the record, the ownership of the attribute didn't get passed
+to the record either.
+
+Don't set the pointer to NULL so it gets freed when cleaning up the
+context.
+
+Fixes those 2 ASan warnings:
+Direct leak of 48 byte(s) in 1 object(s) allocated from:
+    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x562042b747f2 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:350
+
+Indirect leak of 2 byte(s) in 1 object(s) allocated from:
+    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x562042b74bd7 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:425
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+
+Reported-by: Aisle Research
+Co-authored-by: Aisle Research
+
+
+  Commit: a851bde7faa851727369bfa6ce01de635ef17b1a
+      https://github.com/bluez/bluez/commit/a851bde7faa851727369bfa6ce01de635ef17b1a
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    A unit/sdp-xml/duplicate-attribute.xml
+    M unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit: Add test for sdp-xml duplicate attribute bug
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+
+Co-authored-by: Aisle Research
+
+
+  Commit: ef4b6f6d4a7db8575b0de9a335e1662b8bf997d0
+      https://github.com/bluez/bluez/commit/ef4b6f6d4a7db8575b0de9a335e1662b8bf997d0
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  sdp-xml: Optimise parsing large sequences
+
+SDP sequences are stored as single-linked lists, so appending members
+to a sequence requires finding the tail of the list before the
+insertion.
+
+Finding the tail of the list always starts at the beginning of the list,
+so takes longer and longer as the list grows bigger.
+
+Keep track of the tail to avoid that problem. This cuts down the
+sequence_on_squared() test from around 3 to 4 seconds to less than
+0.1 seconds.
+
+
+  Commit: f48d1c05d77b726065c55c95159046ee7c96e9b9
+      https://github.com/bluez/bluez/commit/f48d1c05d77b726065c55c95159046ee7c96e9b9
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit: Add test for slow element_end() append
+
+This uses 40k iterations as this takes a visible amount of time on a
+pretty fast desktop machine (3-4 secs on an i9 9900k).
+
+See: https://github.com/bluez/bluez/security/advisories/GHSA-4p57-mrcv-r2jc
+
+
+  Commit: c7d0d90bb243435cf6cd4c21ece05ba655eed25e
+      https://github.com/bluez/bluez/commit/c7d0d90bb243435cf6cd4c21ece05ba655eed25e
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  sdp-xml: Fix stack overflow when converting large sequences to XML
+
+Don't make convert_raw_data_to_xml() call itself recursively X times
+if there are X elements in a sequence.
+
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==1684518==ERROR: AddressSanitizer: stack-overflow on address 0x7fff7fb40d98 (pc 0x7fbe1ee95c2b bp 0x7fff7fb41610 sp 0x7fff7fb40d70 T0)
+    #0 0x7fbe1ee95c2b in printf_common(void*, char const*, __va_list_tag*) (/lib64/libasan.so.8+0x95c2b) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x7fbe1eeb72d6 in vsnprintf (/lib64/libasan.so.8+0xb72d6) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #2 0x7fbe1eeb94f4 in snprintf (/lib64/libasan.so.8+0xb94f4) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #3 0x000000401fc2 in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709
+    #4 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
+[...]
+    #246 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
+
+SUMMARY: AddressSanitizer: stack-overflow ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709 in convert_raw_data_to_xml
+
+
+  Commit: ba6f402e19e742a2e364eb006e6602631b3699c8
+      https://github.com/bluez/bluez/commit/ba6f402e19e742a2e364eb006e6602631b3699c8
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit: Add convert_sdp_record_to_xml() to SDP XML testing
+
+This tests SDP binary to XML conversion, including whether a fix for
+a stack overflow when dealing with large sequences, like in
+sequence_on_squared(), works correctly.
+
+
+Compare: https://github.com/bluez/bluez/compare/496623162109%5E...ba6f402e19e7
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
