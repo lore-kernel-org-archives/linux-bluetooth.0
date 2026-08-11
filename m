@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7369F3BB11A;
-	Tue, 11 Aug 2026 20:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079B43FDC05;
+	Tue, 11 Aug 2026 20:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786479057; cv=none; b=AR74X13vY6iIQ87NI8PdnrsE53JUpdNJCtcXctZ+x7uaucNdbeO2d4eGBmkrZbk7DYcgzWPm1KGutDU5n0I7F7uuqevHeJr2Bnn3M+O+aH6SLYSwC1ENDxLL0yams0WIcKe0A9OHoKqSqC7alMJ+AC0IWBzMazx4MRoRMQEt+Kw=
+	t=1786479059; cv=none; b=p6cPpaqP0fQWAdlDjCUOft3+j3r9ObXrpVgj8KYy2VMl7Yk6lEskbxHkZwfNYmGvYzCaTrTsespYdvAYgLvqk+ouyW+euNSAzsBFqobWeqbdoTzaiNXWY4UXVzPIIGlGQ8qykAQN9JhkNMS9qHzi9KnT3vJ+Kuo5CeFaU8uoq2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786479057; c=relaxed/simple;
-	bh=CIso/86JLfrEPwILUe13FopFr/2qlvGV5Z54YAmf+pk=;
+	s=arc-20240116; t=1786479059; c=relaxed/simple;
+	bh=9a+QKCP0OfWHvvbFdFY6bK5ksJiF2o4NCSjMZeBwjkQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BumpaYteOo2dTod2vX5Je+XhZqfdjnvLvKL0ste+RMI3M0wIT6eDt8yWmOFlewlP4ybRQXszHQE0Hyg/ELY+1u4anbPwn9DcA+WuTLAy+thMxJe1FpTQ0NHO1LzuBcLHSGI/E9lh6EiVU0uI6m/2ZOHRaKaXwShCSmddYUWLLZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XLygJqAk; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=g1FYAxksGEaKeSeTpJLV9fYCunhfFnx2UEjP2q5Z0u70+p7FeGLy5eMjdWLZSxgjafPhFblJcY+BuBMuJ3uw2gPBeNinUE2spjgXnHuv7V/8MEccV0YTpqcg4V+sjo3bi7gVtfWQ1JGqYdmca9MkfFFAQfQQt7IakwmsW/sphnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLOb3V1r; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XLygJqAk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 164DE1F000E9;
-	Tue, 11 Aug 2026 20:10:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLOb3V1r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A284A1F00A3A;
+	Tue, 11 Aug 2026 20:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786479056;
-	bh=pPQFH9sSlBsoBtSiFBm+IlkSlH9WRsC3JjKwa7xNBbY=;
+	s=k20260515; t=1786479057;
+	bh=jJSsAqNBcxyOlNcZ4emtygxRWd3+DT3fYL+n/wjGjcM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=XLygJqAkPJKaJEBwn2Ij3bPL4xYvIsuCs9aJynHunIXXtE4EDAAReENDwnFrpi0AY
-	 mDa93CF1NUx5E93WV3DMVG4LO6cRxx0GKrFcAUlr1phbQ2FSwYSwO/HF38huFIAM+K
-	 4zOkyIUXC+CcxCo8YNJ9g9N40slXWPO1bycfW7bkQ5CmWlO2JVWEgYrWt1VcIe53/s
-	 jbWKxczdjpmIfCOUtdd3/4V1ROaqbldyIQowmoeSsscW5Nj2AWeJisCLJ1VQTttlvT
-	 nNf9eKwa5TuL91KD+jgtexkBa7FrtpI8ah8npM52YNXqoiWhB6ox3TpvgAnnWm41sZ
-	 ZwSjhhKLLhQdQ==
+	b=LLOb3V1r1rXCxnOGoRV986HL3/my77x/HnGkMy0wS/Q0n/ZFybyOWKWzg16GuVM4c
+	 sGw128lMkVekVVGxl+uWVNBb6qtxAjGj4Xb9elVm+JamyGLnPWpgSQ7FeMN8WzsNgZ
+	 mUeAIVkL+jI7e8L0Bwj15nT4yFQaSfZCGgKTJfCepy9hgyPSdoUOeZvtq8YzLHfWAw
+	 g7auAugGnMiVsdQxOmUaV2buGbbIbMb2ahWaZfrOS4hRcz4WCB4nLmKtTV9YJj8MMz
+	 im4b6CdLAe7OzSq8lHvlu0Km6jGbgMWZrJK602pUvdE6EwVElavcImeEN0hWu5e7ix
+	 +Y3l9nUNnvKSA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4578C3809A0A;
-	Tue, 11 Aug 2026 20:10:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A9B3809A0A;
+	Tue, 11 Aug 2026 20:10:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_bcm: fix usage_count leak when
- autosuspend_delay is negative
+Subject: Re: [PATCH v2] Bluetooth: btmtksdio: fix deadlock in close and reset
+ paths
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178647901188.1134064.781270046343002067.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Aug 2026 20:10:11 +0000
-References: <20260808051532.2553947-1-lgs201920130244@gmail.com>
-In-Reply-To: <20260808051532.2553947-1-lgs201920130244@gmail.com>
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, frederic.danis@linux.intel.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <178647901335.1134064.2663051483826196708.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Aug 2026 20:10:13 +0000
+References: 
+ <81B94E6D2ACC0BFD+20260810-btmtksdio-deadlock-fix-v2-1-0eb31f9066d6@uniontech.com>
+In-Reply-To: 
+ <81B94E6D2ACC0BFD+20260810-btmtksdio-deadlock-fix-v2-1-0eb31f9066d6@uniontech.com>
+To: ZhaoJinming <zhaojinming@uniontech.com>
+Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+ marcel@holtmann.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat,  8 Aug 2026 13:15:32 +0800 you wrote:
-> bcm_request_irq() calls pm_runtime_use_autosuspend(), but bcm_close()
-> does not call the matching pm_runtime_dont_use_autosuspend() when
-> tearing down runtime PM.
-> 
-> If the autosuspend delay is set to a negative value while autosuspend
-> is enabled, the runtime PM core increments usage_count to prevent
-> runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
-> during driver teardown, this reference is not dropped and usage_count
-> remains unbalanced.
+On Mon, 10 Aug 2026 18:22:38 +0800 you wrote:
+> btmtksdio_close() and btmtksdio_reset() call cancel_work_sync() on
+> bdev->txrx_work while holding the sdio host lock, which is also acquired
+> by btmtksdio_txrx_work().  If txrx_work is queued when close/reset runs,
+> a worker thread may start it after the host lock is taken and block in
+> sdio_claim_host(), while cancel_work_sync() waits for the work to
+> finish.  The host lock is only released after cancel_work_sync()
+> returns, so both sides wait forever, deadlocking close/reset.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_bcm: fix usage_count leak when autosuspend_delay is negative
-    https://git.kernel.org/bluetooth/bluetooth-next/c/32b42c0704fd
+  - [v2] Bluetooth: btmtksdio: fix deadlock in close and reset paths
+    https://git.kernel.org/bluetooth/bluetooth-next/c/fca8fe614904
 
 You are awesome, thank you!
 -- 
