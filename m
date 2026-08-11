@@ -1,124 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D442E330D2A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 20:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632743403E1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 20:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786481013; cv=none; b=n1lDqKXuRjsmXpp6C6me5beULLgSyrNjIqFUQuc3c7EN6wovq7fwzy6Ce7Up7UjWcm3e/fUltCofxsZADX306qLfqbMbW3hDMk12gvcx1JGuD6U8Ieaz9xDW/4+F2pjX+ISm6BUXtP3osgM7z9aGFioQgbm8h/8CyTDQbnd2wNc=
+	t=1786481807; cv=none; b=Rv8tbIdCEfH2DlwEuF9kAeboveGzu2M47S4dmdA1JaGotHsjhzjEtu2IxBP2+YoKNeA7cZd1ESlccOP5yYCwhuxRW97y2FsZNklBZAOceXikj3iRDt+mVcdEcad+YA610/MnuP3otFqfytvn26ySjAVNRIf+8iJPxGJoG3G+amA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786481013; c=relaxed/simple;
-	bh=tXesJWjeF5uCbVGx+ELyY76HyXUcJVX75wTZD9muvYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YK794eo5ZUlRZWy1s0iXU33ePts6PIeToIBLLZZFBp4XRhNs+26vFstPOll0tKC93nv9+rwtTbFjvpO+/fzGt2DoWFS1YRTbm6zN9KX9DlL3EWMkPw6xfpN6q8BikODKO/C5bEw1vCIe0eSW/TWqqxIl8N8SdvH7HGkX4kbxuXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YXzEcNVa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786481807; c=relaxed/simple;
+	bh=5gJhlA8pfPQINheeeu5rp7kIhXLRui0bWZjMElhilF0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UXrq4GgmxrB6oW6zEl+UrDgLDMNeehFN50mf9eV2kZ97mMJhbBAjGll2iLwmzJz6TbbjNXfNhiuAy9w9/gv9KNvQWMc32pe/ZcBD/9jPlEerXbzrgc4zxqGJn7F3YhAz28D9HcxVHNYtpd3ce8+YIvCYPGu/6SxtIJogNB6TLkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UXnBqvxz; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YXzEcNVa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B824F1F000E9;
-	Tue, 11 Aug 2026 20:43:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786481011;
-	bh=QNGAXvdq6ATKvNxtqQtI2n758q2trxqJ6k9AjfbzSzQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YXzEcNVaxCPp3ZSUwdL4KpJy0rWVITH0RK3OUJiPc1cyjG9WQCTjZCVKTYWTqKMB0
-	 KlpMmMcahnFTZPIk2U0krX3c/rbsdlc175N+k7csusbdxOH2GXPNtgZ8gvRkr59C+r
-	 YD9H7rOa5p3UwY1gNi7F0pz7UXZ1GYXzh42/aEWvhCM4PkKbSknQek4s6yFDQld+F8
-	 lRoKm0nwmtVcIyjFoSmyWnJ5qu8ZELBP86xCG1LN9vv0AVDMBmG40p+iXMBR4VG7ME
-	 Kivyc/QLM0FB4EQD8qru56IB+zbmOJK4fL4z4+rM8MyhUVIFR4KWR27f5kl9fZ7o6/
-	 48mY5OaH6lzbg==
-Date: Tue, 11 Aug 2026 13:43:27 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_sync: add conditional locking annotations
-Message-ID: <20260811204327.GA1477601@ax162>
-References: <528c354dca68f05cfd17df7c80f8b04419c0fb74.1784973709.git.pav@iki.fi>
- <20260731221840.GA4066390@ax162>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UXnBqvxz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1786481805;
+	bh=ZaZzxBpCPicPXShCcguo/BxdPZEnHnv1z/zszXOMWI0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=UXnBqvxz/5ncX9gSkSswYFdxcrztny8/SFZ3EYikEPQLqp2TvW7NzZX+6CUd/Q20l
+	 6QrVqM8f34gnyg5BubUpzVh6YcXp53VDsxvrc4SfvZ7qYmbwYYpwYGLOGd0JMrleaS
+	 BJmtRj9SkHiUo+UkjG2hIgatdKH7lBBAHOTvk+R8=
+Received: from github.com (hubbernetes-node-18da2dc.va3-iad.github.net [10.48.73.109])
+	by smtp.github.com (Postfix) with ESMTPA id 7903B501822
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 13:56:45 -0700 (PDT)
+Date: Tue, 11 Aug 2026 13:56:45 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/690c16-10df0b@github.com>
+Subject: [bluez/bluez] 45747c: tools/l2cap-tester: add tests changing
+ BT_SECURITY...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260731221840.GA4066390@ax162>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Fri, Jul 31, 2026 at 03:18:45PM -0700, Nathan Chancellor wrote:
-> On Sat, Jul 25, 2026 at 01:02:36PM +0300, Pauli Virtanen wrote:
-> > Add context analysis annotations to functions doing conditional locking,
-> > to suppress analysis warnings.
-> > 
-> > Fixes: a3ad01d51d4b ("Bluetooth: hci_sync: Fix advertising data UAFs")
-> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> 
-> Tested-by: Nathan Chancellor <nathan@kernel.org> # build
-> 
-> It would be nice if this could be applied, as this breaks recent clang
-> builds due to context analysis being on by default and -Werror enabled
-> by default with many configurations now:
-> 
->   https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/30660246388
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 45747c6d0c853e1d711f24d1e7dc85a99d085925
+      https://github.com/bluez/bluez/commit/45747c6d0c853e1d711f24d1e7dc85a99d085925
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
 
-Ping? Our builds with clang-23 and clang-24 continue to be broken on
--next because of this.
+  Changed paths:
+    M tools/l2cap-tester.c
 
-  https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/31525203557
-  https://github.com/ClangBuiltLinux/continuous-integration2/actions/runs/31526633508
+  Log Message:
+  -----------
+  tools/l2cap-tester: add tests changing BT_SECURITY after connecting
 
-> > ---
-> >  net/bluetooth/hci_sync.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index d5554fbf3129..f5545f270f09 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -1255,6 +1255,7 @@ hci_set_ext_adv_params_sync(struct hci_dev *hdev, u8 instance,
-> >  }
-> >  
-> >  static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> > +	__context_unsafe(/* conditional locking */)
-> >  {
-> >  	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> >  		    HCI_MAX_EXT_AD_LENGTH);
-> > @@ -1343,6 +1344,7 @@ int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> >  }
-> >  
-> >  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
-> > +	__context_unsafe(/* conditional locking */)
-> >  {
-> >  	struct hci_cp_le_set_ext_adv_params cp;
-> >  	struct hci_rp_le_set_ext_adv_params rp;
-> > @@ -1499,6 +1501,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
-> >  }
-> >  
-> >  static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
-> > +	__context_unsafe(/* conditional locking */)
-> >  {
-> >  	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length,
-> >  		    HCI_MAX_EXT_AD_LENGTH);
-> > @@ -1552,6 +1555,7 @@ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
-> >  }
-> >  
-> >  static int __hci_set_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
-> > +	__context_unsafe(/* conditional locking */)
-> >  {
-> >  	struct hci_cp_le_set_scan_rsp_data cp;
-> >  	u8 len;
-> > @@ -1693,6 +1697,7 @@ static int hci_set_per_adv_params_sync(struct hci_dev *hdev, u8 instance,
-> >  }
-> >  
-> >  static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> > +	__context_unsafe(/* conditional locking */)
-> >  {
-> >  	DEFINE_FLEX(struct hci_cp_le_set_per_adv_data, pdu, data, length,
-> >  		    HCI_MAX_PER_AD_LENGTH);
-> > -- 
-> > 2.55.0
-> > 
+Add tests that change BT_SECURITY value after connection established:
 
--- 
-Cheers,
-Nathan
+L2CAP BR/EDR Client PIN Code Change Sec - Success
+L2CAP LE Client Change Sec - Success
+L2CAP LE ATT Client Change Sec  - Success
+L2CAP LE EATT Client Change Sec - Success
+
+
+  Commit: ea77a7229c76a88e348c502a66ce500278cfa868
+      https://github.com/bluez/bluez/commit/ea77a7229c76a88e348c502a66ce500278cfa868
+  Author: z4pdy <305461556+z4pdy@users.noreply.github.com>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Avoid scan prompt when discovery is already active
+
+Check the adapter's Discovering property before prompting the user
+to start scanning. This avoids prompting to scan when discovery is
+already in progress, which previously resulted
+in an org.bluez.Error.InProgress error.
+
+Changes in v2:
+- Move variable declarations to the beginning of cmd_connect()
+to fix the ISO C90 build failure.
+
+
+  Commit: 10df0bb748449ba00ffe04fc4d77f4d287b97161
+      https://github.com/bluez/bluez/commit/10df0bb748449ba00ffe04fc4d77f4d287b97161
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-08-11 (Tue, 11 Aug 2026)
+
+  Changed paths:
+    M emulator/main.c
+    M emulator/server.c
+    M emulator/server.h
+
+  Log Message:
+  -----------
+  emulator: btvirt: support debug for -s socket server
+
+Support btdev debug -d when using socket server -s.
+
+$ btvirt -d -s
+Bluetooth emulator ver 5.87
+Request for /tmp/bt-server-bredrle
+bredrle: host10: > 01 01 10 00                                      ....
+bredrle: host10: command 0x1001
+bredrle: host10: event 0x0e opcode 0x1001
+...
+
+
+Compare: https://github.com/bluez/bluez/compare/690c16df6067...10df0bb74844
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
