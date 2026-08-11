@@ -1,39 +1,43 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6C738DC66
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 03:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF047394496
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 03:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786418883; cv=none; b=NCbTcmBCoprxzD//UkTdLnzuJecSBbSz1ksiDbLyzXjSYwgw5Gh9bm2O4YsleC/Vq1xV81GWwNCBVrNNSgYkIBfM+kGB3I6/bvaNw5BOXKQ7Itggm10cEfcGE/5m0+G/AxKD8Kww8pUO7tF/3lNXb5V/gVlWWkSH4kuXhBU5b6k=
+	t=1786418884; cv=none; b=I4JDDe7JOVqrFu8JiJAZm8dc0Z6iytMTS+l4leIhRkE92WExywrBvLdgchvRcZI4o1rshdSy/yvnCZ9tVWZD50y4B/WgNulREHEPK0mBsq3bRK/yUVskUWyY+oaN6t2DsSoOVZJgKm6OSJwmLawpKZht8nwoM9kfZVnYAKvb4v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786418883; c=relaxed/simple;
-	bh=Z1UMnQkQ7RHnbzSQtXUxBC+spluPC7yPs/hg1k9MK/k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FuyK3HwLGTXYcsQc9nH7kE626jTRt+VMbEywJKRGLNHkRVwSplR84Un/7nZTxNrAiSKmU4//kqcnTGTyHqaDI4Xeb3ko6LI5EG+YXLcX654CRL9WQZ+IoPFu6wS3I9Ha3D+zOGjwb75VP+a7JMX225umIycBTA7/w0ehB/2tx3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RdWMXj2Y; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1786418884; c=relaxed/simple;
+	bh=NAEBUQQ2AUnEn6xuldI9PfMUSZtDCVv6anOxeEpm3Y0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QGOfBbs5bNcMHic0CgaHpQe9iqnRCJ6DG0kIHq5oftBJTPR5BjRv7KBjThGLMQvQMP7v0I1gBMCmDej3RwC1VvrDf2UTRhBM/rpNDBaRfjVb8PqxilR/g2KqzRzZdkF+aw2hT+sxfyMTKH5CnRDv1BnVpoLkHww/mWV8FI1ENjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rEfg5VHa; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RdWMXj2Y"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rEfg5VHa"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786418879;
+	t=1786418880;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IZ63MsPGPL9yGX0NSI+upDbrCQu3p5KU0q6reB3Ro8w=;
-	b=RdWMXj2Yxakg8Mxj+b3v3CIvjVUZ76PWmjIC5fMG4crMK/ePeoRVMTcd3NDFpvUn5sxd3q
-	oQ9qYP1UIbRjxlI16WKz0eJnD3SxYC/oOgDVF5fPTeHGouufGbbsVtajBGQyTNy+lwPl6m
-	b9m4WscOJdQKr3YwcAOWYvmHMoByEys=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U8JLY3isdF3184j5qDWC92G4CjVW3t6zd0a3jfPW79E=;
+	b=rEfg5VHa53FA4Mc7/XKF2zQdPMj6EIirDjTrxaqnguqqE3SEzOBOC78ePolhuNStZW5AR/
+	uNRFwTI3wjlUmXfUWPz15oDX3lw8ruchMnUSn0Qtuj+xSD/S+36D8cdgGbsGUzk+E2pWwY
+	0XJpJS521pk5ulS+2rFwFKC2nYCFbfM=
 From: Yi Cong <cong.yi@linux.dev>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
 	stable@vger.kernel.org,
 	Yi Cong <yicong@kylinos.cn>
-Subject: [PATCH 0/2] Bluetooth: virtio_bt: harden probe error paths
-Date: Tue, 11 Aug 2026 11:27:00 +0800
-Message-Id: <20260811032702.67908-1-cong.yi@linux.dev>
+Subject: [PATCH 1/2] Bluetooth: virtio_bt: fix leak of vbt on virtio_find_vqs failure
+Date: Tue, 11 Aug 2026 11:27:01 +0800
+Message-Id: <20260811032702.67908-2-cong.yi@linux.dev>
+In-Reply-To: <20260811032702.67908-1-cong.yi@linux.dev>
+References: <20260811032702.67908-1-cong.yi@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,24 +49,40 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Yi Cong <yicong@kylinos.cn>
 
-This small series hardens the two error paths in virtbt_probe() that
-currently leak or leave dangling state behind:
+If virtio_find_vqs() fails, the function returns without freeing the
+allocated 'vbt' or clearing 'vdev->priv'.  Add a 'free_priv' label to
+release them, and let 'failed' fall through to it.
 
-  1/2 - if virtio_find_vqs() fails, the allocated 'vbt' and the
-        'vdev->priv' pointer that already references it are leaked.
-  2/2 - if virtbt_open_vdev() fails after hci_register_dev() has
-        succeeded, the hdev is freed without unregistering, leaving a
-        dangling entry in the global HCI device list (UAF).
+Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Yi Cong <yicong@kylinos.cn>
+---
+ drivers/bluetooth/virtio_bt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-  Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-
-Yi Cong (2):
-  Bluetooth: virtio_bt: fix leak of vbt on virtio_find_vqs failure
-  Bluetooth: virtio_bt: unregister hdev before freeing on open failure
-
- drivers/bluetooth/virtio_bt.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index c20d54088c8c4..b674fe0c2779e 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -315,7 +315,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 
+ 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
+ 	if (err)
+-		return err;
++		goto free_priv;
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -404,6 +404,9 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
++free_priv:
++	vdev->priv = NULL;
++	kfree(vbt);
+ 	return err;
+ }
+ 
 -- 
 2.25.1
 
