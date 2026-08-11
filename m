@@ -1,87 +1,87 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69DC432E60
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 10:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2C72DC32C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 11:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786445981; cv=none; b=YEOE/JdzqEuegXr6gBtNslowRA0ats9Djmtlo06WUNX6uGQLxRV3rIWFG0WEzd2PvH+J5kFTgYhBU/uuWZizxCh9yldeKO7QSzmqIE7DcwkWIV3GM3cpkDRpyzF5HUxMqKC05Q+/pzhN6KqoFEqkHdz3TEtR/DE/jw4o+YB7aUM=
+	t=1786446131; cv=none; b=p8NT1CMkcZB3pyPUp+3enZEX2OVjhWnJL9imrrBPZICzXi7RV9NbpHZPzwVC0CBMcnTbB8xr9IlWrN6K/D13K9TOZ0C841DtiWE3QMwZ1gMIxVUvDnS3t+iWSdcBHOu8cNoRcSeRzIm+ptBnSriIr6ND8ph7gJoDW6BnWzSzNFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786445981; c=relaxed/simple;
-	bh=Wc/L1rcCPuO2hZ6WlKjHGrGjzyyrJehQInhXOKby2dc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=miC7NsbX+aO+B5Tug4NIuzCHC4vMSfAV1KX/HrJJyRhtf4wZJcj1x8e1SX2/3DZSUjtICbMZjz4gYPgdS61M/6xllqXNgjqPGBVXCUWAKZx/IJb1AYkPskGa7oK7raWiRBBNxkDc1djodAmJYgYJFqkG5ZA1J83qTK5QTuimDQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EDjjV8Xf; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=I3DDksFY; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1786446131; c=relaxed/simple;
+	bh=2+yZtpEZjwtu9PFm+zS5xw9Xzg6lp4JOcXbE3FdUjiY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:References:
+	 In-Reply-To:Content-Type; b=WkUwNsgf0/verose0+4e3rhUegqVWu88c82GXBib/rheK3wXoBgLgt3usqWS003R0t1sGURCKK7NbyN3xh8qloEkGpX822xI7qh5QHah3QwBK/C6VO4hKxVVUBYUtmF2Q3tnX17j059Hi5N7HovRUQLTWtfGFigSVFG3+ko4iXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JK5/w9hR; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kBcp9El7; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EDjjV8Xf";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="I3DDksFY"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67BAMOOK027816
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 10:59:39 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JK5/w9hR";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kBcp9El7"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67BAM7UU384755
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 11:02:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	qZ1aqfiqbRJvbP/KfVnH1D5+qDlEv3lhxnG9TbFMG/A=; b=EDjjV8Xf46u06atd
-	d09KThvZAvppN9wb1ud1og2tYtx2xnY+la28kMQ3vmsSOai8yvYVIKOziBWLuLRr
-	0PjfTFkCPQgl+aPgnJXI+Vx/ju5RKitGYGxHFVvqAfa0TqE+nx+49DRN3m6Qg3nQ
-	FYAHx6dEwpIeWSiNK5eLWWYw5hjijhyfPiWPmrgindb69NTLD/ieND3w5JoSeSM8
-	GGvuqwWdYp0bCewGlbG8sU+DN5t6C4K5ZtnNunldRm334rGV6T9CKBrRPGBNvO2o
-	qov0AdyWKxSLz+t6AgyWyI3Bp9o83XteIJPy8jBAPkN+dEUg7ZVJ6hZ/BKaYTuhE
-	NJIf2g==
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fyjjsktu3-1
+	Q0CBqDzUBMWkkmGLJWwO6MBllI12zw+bsJYjwa/xfLI=; b=JK5/w9hRNyCulgQu
+	EbupFi3BFyVGTHp7YI6nYSWDxz/kCVx3rOiM49nYznbw1FKp/LrrW4fZziU+UM8w
+	+Az2eyDqbCcrGKz1zANVaIQJOPErjEFDynbba7C7NdqDN1PXAJXVHHs6eJbMn68d
+	hZVnafgqI5UuY2/7h93ZYvajBOPRFKCEKJ+N9E+e3vWw6ZILvKSd+wZtnic9Zl1+
+	NqIJEGO7A8R5OL1/VXpB9HF/RjAWtx+8MtAAOejOgRWoq4xlPPb0dM90+d5RBXAc
+	wqumsSITDOdYL7CWEp8rkHms14wFocl4DR45nrc2U7518FnRz9NFf7j34ALPHQKx
+	T/4uXw==
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com [209.85.219.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fyjk23u5p-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 10:59:39 +0000 (GMT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8486c3411c8so4060009b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 03:59:38 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 11:02:09 +0000 (GMT)
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8f08560ea44so4504116d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 04:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1786445978; x=1787050778; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qZ1aqfiqbRJvbP/KfVnH1D5+qDlEv3lhxnG9TbFMG/A=;
-        b=I3DDksFYQIg0kwWD0H1pnwVvg9FuG1P64JnLZO0UNYmnq/DB2TIOjv1CvdBaBR1JSO
-         UzjBe91OSehqcdeXbDP6wpVG2zb1ubO9bh+/fYJA1QUJas1dS1L5iPmES9+Ze7ZEs2NM
-         6OPRg4WupWaF3YoikzA8tXPAfeuXFLTlY6iHUZ8n1kpo1x+8Z82MJX5qdxuGuJakjbl6
-         OrKGLs39OLosFbGgpaHcyF+R4pWHYTougBLzv0TwFC+GXPoJc2RopW23OaAqKZxLy1p7
-         hZWJ/ihjU7fH4U0LKcbRnCNI5WI6mybfKQuA+BhkQpyc9Z4fQMozrz+EvZoW4jW4UIkz
-         PCJQ==
+        d=oss.qualcomm.com; s=google; t=1786446126; x=1787050926; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:to:subject:from:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Q0CBqDzUBMWkkmGLJWwO6MBllI12zw+bsJYjwa/xfLI=;
+        b=kBcp9El7Kzex6hoUW7DHFrYsLDyZ51VL03ySgi0e8ws5Mm1/0hWKV4TE/pbWs9HAy0
+         kSbbW/7pNGpB2deC9WQUP0AVBbYGjF007k7KRg/y0z5j72wU6f5vu2Ir6Pnn3vNqKhzZ
+         Mthm2rnwUrshZNuUGbNz8pi1d10LghD+nGpSaNqd0OyHlL3Bsm27JNUXYCBOP1l6c8ae
+         zIf3iWA+AKwpM2knIbVnjhHgsnKa2mNw9N4xCchq27ma4Okas8M7etYu5QESxlVU4MIu
+         mCB9O4CMlkpqmGp7mns8CSXqLQJsWE0Jrkz2Rig6ClFdHwkgGPFo5NHDUsL0AHzuckJw
+         BewQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786445978; x=1787050778;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qZ1aqfiqbRJvbP/KfVnH1D5+qDlEv3lhxnG9TbFMG/A=;
-        b=RAiIYuI+dYb6NTmmKt100Ilf5uBVehtXWhgYL8j0oh5r4y+GgYElVwCqXS1OcQTPQj
-         +pAmyJDo+BEoif1Fu6q6SHq3CyER4jyWei1K8TjCtlmvQvUN+f/jKyf5UhmtrrIXWZLl
-         MgZc0E9O17seg5JUKnskkjUT8LkqUUkIz7eyd6dS6d2+8/Py6sVOavhc2IjW6IEUwjRC
-         119DWYrF4mCQptQATUuLIU4bDI0pVOR/9C6G7CESsSxlC3mb88pqcLrQvbqf4D5SUAOn
-         OziEs90+vxF0SdTQRENkPKgxLEPPyzdCMHXhzyuwt8KWJn+lz2az3ckuhj/JCjr9Wg1p
-         sn9w==
-X-Forwarded-Encrypted: i=1; AHgh+RqrYc8AAModiJ49Lxbf15hqJsA5Sq+Lvv+vBh31R4EiLiHZBBhycRLddEduwOOdb0/dh8DNnwG9a2VjW+YXkZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPKeGJK+785Vu/cIE3yd00+Lhp6gHecvDR4R0JeeXLniHBUsUl
-	5Em3+volRseSYHyz57bqHHS3n3pMnjJ+rTE9+atFVfNoU0i7QDCKyPqUSbSNyqkIxfIFwXGHfTg
-	/ADEvJl27mlQjPPQ3QOFb1Tjmsqzlu75jDy62r5EwT2gSw/cnsnuq0IKrZGA3pdcfpK4R7rk=
-X-Gm-Gg: AR+sD10+u/+cQeQmlHrRMzAd1TzqvP6CTd2M+WxW6Bg5nvAbUYYtgtqDx5m/bVooOWn
-	bqoCH19ast9CrAgoSgtY9Epq0S1e2lCJ/0GL9mgbq+fcjjDONz4FtZoC5wmifYSON5k5pVXD7ix
-	QbYw5Vx6HRzInuadn6IYLS3+5V1uLcwMORUbYlmcyKgL0DXCHXjpjamC1emk1O/wSQIS0BjJwK7
-	gL8UJCKFs9WiL4/gQ9w1juMw2Jiurui09DOmlMmdAXLOrUzsgf9oYR40J1Dy2CC6GGABPbiCK9e
-	9pOPzwUh/LLk5hCUdmuLg/7npTMLzbHeF5ZnUu0Q97ABgMT6OkTUDEFfiF0jc9An08gSgzRh9DX
-	iRLcI+lIFTi2Vc6nsLEdvFikqOl4=
-X-Received: by 2002:a05:6a00:1910:b0:842:7296:dba with SMTP id d2e1a72fcca58-84fa8670a54mr2141480b3a.7.1786445978143;
-        Tue, 11 Aug 2026 03:59:38 -0700 (PDT)
-X-Received: by 2002:a05:6a00:1910:b0:842:7296:dba with SMTP id d2e1a72fcca58-84fa8670a54mr2141431b3a.7.1786445977389;
-        Tue, 11 Aug 2026 03:59:37 -0700 (PDT)
-Received: from [10.239.97.158] ([114.94.8.21])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84fa91b5ba1sm553303b3a.20.2026.08.11.03.59.34
+        d=1e100.net; s=20251104; t=1786446126; x=1787050926;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Q0CBqDzUBMWkkmGLJWwO6MBllI12zw+bsJYjwa/xfLI=;
+        b=YdgHfNKKLZwaiLeqZ1epOp8r9Ymjpx8WzAKOVlOdLl1wegTWzfM5KeZ0bWT01Ra1bk
+         MJScUHCt4Egv4JEgeEHUsbMIcmqgH0yBchy6CUBBj+RxE+2l2wbJyA4kfeqeF+uxgtTH
+         vG0W8bBxZpqvLq1crhP9VrJw4YXIZ5nMzLbdipVPx0ie4GQXrM2aYw0BFrmXUS83kCLl
+         KXRijHUi79QbcyTRthfx8Smu9OT2yWZQypPYxCkc8ig2rf3BH8Hr4ajw0TjKNUsqrZbh
+         pm3g2rFlM32QXvvjDT69ArA6yeG3KKE+Zxz81vLTPPXkV+yD5qZiQ4ht6cEyOX/hq0J3
+         7iWA==
+X-Gm-Message-State: AOJu0Yyeawc92AjorkY0jm8ozLIrIsplSoDfhOCQFA3QXq49mcHyQoxb
+	8O9buM7oazhhF3M1IN3TIvee2Gl7fdsWuxPIh7DB3BArnF1B5hqvNZdoz7+oT4p9AUCKUfEU83j
+	3itmiipCY5AiIwl5Q8nfA+dn+id/tIrtzcEgYoU6BA2n0rv9IwYssFNnGPbuq5+0Uus7Y0s+JB/
+	PZGg8=
+X-Gm-Gg: AR+sD12gtuyIa/MDsaPs9NVLiygDfUoMXc5rHdCZ6N395qp0fDbXcHSPPMBzIFrA2PH
+	jJhGVletdS8PmxwFIKUPM3OXOdjCPhRPCm6fE2VRuteZqNf9hMNmAmDpsWNPNqPYGOvcrDro0X4
+	15kbjno7IXd9fzafUUI6AwwOg7hfP/rRDOBLwPSxAG9SSQZjVCFS/sdoNOhX3xWCG9xG8QXJove
+	zEV1xS9CpseUvEIwqeSwAYo/DcA25pVwYYBue2Y1kCBp5N1pqsn+Ftd3pxpjaDj5q0T/ggyudUL
+	kI7BAJEmwg8GzB53HUQqKG5mib/1qUb5BH5uewgQN9fXHAjdl3pULVadATf5DLJALlcX33b3fyj
+	ohuyC3LYua8aJDXXCaqI0SLRyp/D8GQzlkjGLFpWYKXhNhE4WBHM/wp60QEYGmjNPhx5j3JVKsU
+	e2hSMIrPFaExx2+JI+kr/OUzo1pCRZAak35wQ7gmZud/Xl1EO0dtmQHl1mmFvDK9CEBOg=
+X-Received: by 2002:a05:622a:1e16:b0:51c:1132:c80d with SMTP id d75a77b69052e-52d585d8e12mr20069371cf.28.1786446125701;
+        Tue, 11 Aug 2026 04:02:05 -0700 (PDT)
+X-Received: by 2002:a05:622a:1e16:b0:51c:1132:c80d with SMTP id d75a77b69052e-52d585d8e12mr20068731cf.28.1786446125223;
+        Tue, 11 Aug 2026 04:02:05 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c20e410066bsm37703866b.14.2026.08.11.04.02.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2026 03:59:36 -0700 (PDT)
-Message-ID: <f3c1f58d-66ab-41f3-9f25-682196ecb230@oss.qualcomm.com>
-Date: Tue, 11 Aug 2026 18:59:32 +0800
+        Tue, 11 Aug 2026 04:02:04 -0700 (PDT)
+Message-ID: <f1e1dcdd-cca7-4670-abf0-febf16c72e15@oss.qualcomm.com>
+Date: Tue, 11 Aug 2026 13:02:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -89,170 +89,118 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: mgmt: always reply when a queued mgmt
- command is cancelled
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        chejiang@qti.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com
-References: <20260731042920.2431343-1-shuai.zhang@oss.qualcomm.com>
- <CABBYNZJuenvKSvHuf6DCkt9hpdhuECm3gf5hiV+FyS2E9AM7nQ@mail.gmail.com>
-Content-Language: en-US
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <CABBYNZJuenvKSvHuf6DCkt9hpdhuECm3gf5hiV+FyS2E9AM7nQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODExMDA5MSBTYWx0ZWRfXzaZuHpnQhNAO
- kdHYqX3AK0dRIPqYiaYHuTrr7vU3vtmqgviWAeT15Ef68gFMVYsWk/BoAwOc8aqYOVDXjJCcFYp
- Q/+CeyDog+Hcf35g8nXva/T0HysNFkA=
-X-Proofpoint-GUID: mC0feKFyEA5t-GgiMD_Oy-qa20S7_aT4
-X-Proofpoint-ORIG-GUID: mC0feKFyEA5t-GgiMD_Oy-qa20S7_aT4
-X-Authority-Analysis: v=2.4 cv=cfDiaHDM c=1 sm=1 tr=0 ts=6a7b009b cx=c_pps
- a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=EUspDBNiAAAA:8 a=racmn3MOU509EMJz4VAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=2VI0MkxyNR6bbpdq8BZq:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODExMDA5MSBTYWx0ZWRfX2dyFJeNK1kFH
- A4RXZPA7CHbAeEFaPm9O0oyWx9cB8f7Eakw1aZlNMw5vQC6bt8MtmxjoLclvTlWMexpCesLsOx6
- cCAyVXho+KAyuLrpuF+KCAJik3fSyZjndGtPxEsxmh2F3hLuXeDMsHiOfWw0tPHyIj9nl5Qz910
- 8hj85OdKfbq6H1qDtHIkACwKmT1PmkF+amEK9UgP5KuYmR/QTlcXS9J0G/E1/efI3CyFPI/rh/R
- zIYAKiYn/iuUY1kdSd3E9l6DUBYtor3ENeIdwxsEVX1TASy//4qLHwSB0UfEioLkCTv+HnyhjX1
- siQdnhP82bjKm1EH2X2Aaxi0NREwIJgtyCGuFnS+NQURe2jE+0D4rahakEWXcpP2k9Hrb2bklC9
- EdDu0ZlfwaYNBNeZqyj5l49JsZLEgHkynNx2/iMY+GtLJ7JLNuEyQkxIoPh2v63BwNWEaFoVEt7
- jXpOX7ThAzbHKzEO0iQ==
+From: johannes.goede@oss.qualcomm.com
+Subject: Re: [1/2] Bluetooth: hci_sync: Clear HCI_CMD_PENDING when dropping
+ the last request
+To: linux-bluetooth@vger.kernel.org,
+        Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+References: <20260811083730.71393-1-johannes.goede@oss.qualcomm.com>
+ <6a7ae9ed.9e118ab0.227f96.1808@mx.google.com>
+Content-Language: en-US, nl
+In-Reply-To: <6a7ae9ed.9e118ab0.227f96.1808@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODExMDA5MSBTYWx0ZWRfX3aFgJiWt2h+Z
+ 8oEiBdcxyAzIGD1sC4hOEmvnXmMAmlDDMq95EwhX93PT1Hj4cSIs9+SvyH4idqxL9pnQxfLeqs4
+ 62Z/suCWA81/epD1JRpGXBMsQ/eZLAI=
+X-Proofpoint-GUID: ocRzBsyEvnYPtkUqYHVMtM8g95vRexxv
+X-Proofpoint-ORIG-GUID: ocRzBsyEvnYPtkUqYHVMtM8g95vRexxv
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODExMDA5MSBTYWx0ZWRfX8URacHhFPHKu
+ LM3KBoGTh8NGOusyqjH96ONzrwMwICPekWTtl4ccDcjZ+8iX7wLJN/0ptiuL3vRuINOMRRSUz/H
+ Bol4TmLZbUmBGZ4aA+zpytQV1W+ou9n+vfq2Kg6YrFzhhJdhR8SswhfKkhLFP+2yArvfPlhHbCq
+ +sgYa3s/8o4XXMwRt4gdmcpfA6zHOjuEOs2i2RHEHqzNzI70q4JRr+N5GDxIidEsvjfngfVhq5c
+ D+FN9mF69g9bY6XJoA/J9YtR9rW663jvTxSJKN9RkIgOnq98KfPqrS3XhT9M1V/PoB38hxsFf7v
+ yIC4WEIVblPNI4Rumjo9/yt67jqfOtujiQKKC3PTaHCCL34IxmO/yso2yb423LqLWgGeE4dFkQU
+ z0eyKwYh1LmaazK3r7b5IU1rD1OUOEJci1gZiG69/u3VCgIAU43BS0FBRFg7AQfpIxDZLeRQBBY
+ CEvzkmg1iKcrOC+fsnA==
+X-Authority-Analysis: v=2.4 cv=eJ4jSnp1 c=1 sm=1 tr=0 ts=6a7b0131 cx=c_pps
+ a=oc9J++0uMp73DTRD5QyR2A==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=VwQbUJbxAAAA:8
+ a=Byx-y9mGAAAA:8 a=pGLkceISAAAA:8 a=8HR8Mm1p1tuL_I0jY3oA:9 a=QEXdDO2ut3YA:10
+ a=iYH6xdkBrDN1Jqds4HTS:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-11_01,2026-08-10_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 phishscore=0 impostorscore=0 clxscore=1015
- bulkscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608110091
+ impostorscore=0 spamscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ adultscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608110091
 
-Hi Luiz
+Hi,
 
-Sorry for the delayed response. I was OOO last week.
+On 11-Aug-26 11:22, bluez.test.bot@gmail.com wrote:
+> This is automated email and please do not reply to this email!
+> 
+> Dear submitter,
+> 
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1143947
+> 
+> ---Test result---
+> 
+> Test Summary:
+> CheckPatch                    PASS      1.86 seconds
+> VerifyFixes                   PASS      0.13 seconds
+> VerifySignedoff               PASS      0.13 seconds
+> GitLint                       PASS      0.67 seconds
+> SubjectPrefix                 PASS      0.26 seconds
+> BuildKernel                   PASS      28.31 seconds
+> CheckAllWarning               PASS      30.35 seconds
+> CheckSparse                   PASS      28.39 seconds
+> BuildKernel32                 PASS      29.13 seconds
+> CheckKernelLLVM               SKIP      0.00 seconds
+> TestRunnerSetup               PASS      503.14 seconds
+> TestRunner_l2cap-tester       PASS      64.96 seconds
+> TestRunner_iso-tester         PASS      81.82 seconds
+> TestRunner_bnep-tester        PASS      19.39 seconds
+> TestRunner_mgmt-tester        FAIL      226.68 seconds
+> TestRunner_rfcomm-tester      PASS      26.62 seconds
+> TestRunner_sco-tester         PASS      32.84 seconds
+> TestRunner_ioctl-tester       PASS      27.17 seconds
+> TestRunner_mesh-tester        FAIL      26.97 seconds
+> TestRunner_smp-tester         PASS      24.42 seconds
+> TestRunner_userchan-tester    PASS      20.61 seconds
+> TestRunner_6lowpan-tester     PASS      24.04 seconds
+> IncrementalBuild              PASS      29.81 seconds
+> 
+> Details
+> ##############################
+> Test: CheckKernelLLVM - SKIP
+> Desc: Build kernel with LLVM + context analysis
+> Output:
+> Clang not found
+> ##############################
+> Test: TestRunner_mgmt-tester - FAIL
+> Desc: Run mgmt-tester with test-runner
+> Output:
+> Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+> 
+> Failed Test Cases
+> Read Exp Feature - Success                           Failed       0.252 seconds
+> ##############################
+> Test: TestRunner_mesh-tester - FAIL
+> Desc: Run mesh-tester with test-runner
+> Output:
+> Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+> 
+> Failed Test Cases
+> Mesh - Send cancel - 1                               Timed out    2.102 seconds
+> Mesh - Send cancel - 2                               Timed out    1.984 seconds
 
-On 7/31/2026 11:25 PM, Luiz Augusto von Dentz wrote:
-> Hi Shuai,
->
-> On Fri, Jul 31, 2026 at 12:29 AM Shuai Zhang
-> <shuai.zhang@oss.qualcomm.com> wrote:
->> On boot, the kernel's HCI_AUTO_OFF timer powers a newly probed
->> controller back off after 2 seconds if nothing has taken ownership of
->> it yet. bluetooth.service is expected to take ownership within that
->> window by powering the adapter on, but on slower boots bluetoothd can
->> start late enough that the two race: HCI_AUTO_OFF fires and the
->> controller is torn down and re-initialised while bluetoothd is still
->> in the middle of its own adapter setup sequence.
->>
->> When that teardown happens, any mgmt command bluetoothd had already
->> queued for that adapter is cancelled - but userspace is never told.
->> bluez's mgmt command queue is strictly serialised, so a command that
->> never receives a reply blocks every command queued after it on that
->> adapter indefinitely. In practice this means bluetoothd gets stuck
->> before it can register the adapter, and reports no controller being
->> available at all, even though the controller itself is healthy and
->> fully usable moments later.
->>
->> Fix this by treating a cancelled command like any other failure
->> instead of silently dropping it: always send a reply back to
->> userspace, using the existing "cancelled" status value. This mirrors
->> how other mgmt commands already behave when they fail for other
->> reasons, and lets bluetoothd's normal error handling take over
->> (log the failure and continue) instead of hanging forever.
->>
->> Verified on a QCS6490 rb3gen2 board where this HCI_AUTO_OFF vs.
->> bluetooth.service race was reproduced: before this change, hitting
->> the race left the adapter permanently unavailable to bluetoothd until
->> the service was restarted; after this change, hitting the same race
->> no longer affects adapter registration and the controller comes up
->> normally.
->>
->> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
->> ---
->>   net/bluetooth/mgmt.c | 7 +++----
->>   1 file changed, 3 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 167d75e34..9031b5d5d 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -301,6 +301,8 @@ static u8 mgmt_errno_status(int err)
->>                  return MGMT_STATUS_ALREADY_CONNECTED;
->>          case -ENOTCONN:
->>                  return MGMT_STATUS_DISCONNECTED;
->> +       case -ECANCELED:
->> +               return MGMT_STATUS_CANCELLED;
->>          }
->>
->>          return MGMT_STATUS_FAILED;
->> @@ -1338,7 +1340,7 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
->>          struct mgmt_mode *cp;
->>
->>          /* Make sure cmd still outstanding. */
->> -       if (err == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
->> +       if (!mgmt_pending_valid(hdev, cmd))
->>                  return;
-> On set_powered_sync:
->
->      mutex_lock(&hdev->mgmt_pending_lock);
->
->      /* Make sure cmd still outstanding. */
->      if (!__mgmt_pending_listed(hdev, cmd)) {
->          mutex_unlock(&hdev->mgmt_pending_lock);
->          return -ECANCELED;
->      }
->
-> Which is why we consider -ECANCELED as a NOP, also if you dig deeper
-> you will see that hci_power_off -> hci_dev_do_close ->
-> hci_dev_close_sync -> if (!auto_off) __mgmt_power_off ->
-> mgmt_pending_foreach(0, hdev, true, cmd_complete_rsp, &match);
->
-> So the reason this is not working as intended is because we are not
-> clearing HCI_AUTO_OFF once we receive Set Powered command only once we
-> run hci_power_on_sync which create a race where the likes of
-> bluetoothd will be trying to power the adapter but power_off work is
-> still pending, so we should probably clear HCI_AUTO_OFF whenever
-> setting HCI_MGMT as at that point we know there is a user already
-> there is no point in powering it off.
+I'm seeing the exact same failures in other CI runs from recent
+patches, e.g. :
 
-Agreed on mgmt_set_powered_complete, will drop that hunk in v2.
+https://lore.kernel.org/linux-bluetooth/20260808062541.3705446-1-zhangchen200426@163.com/T/#t
 
-On mgmt_remove_adv_monitor_complete: the __mgmt_power_off() path you
-describe only runs when auto_off=0, i.e. when bluetoothd explicitly
-closes the adapter during normal operation.
+So I'm assuming that these are pre-existing CI issues and
+not caused by this patch.
 
-In the race we are fixing, bluetoothd starts late and the HCI_AUTO_OFF
-timer expires before it finishes adapter initialisation, so auto_off=1.
-In that case __mgmt_power_off() is never called and there is no other
-path that replies to the cancelled commands. hci_cmd_sync_clear()
-cancels them with -ECANCELED, and the complete callback is the only
-place left to send a reply. Silently returning there is what causes
-bluetoothd's serialised mgmt queue to stall indefinitely.
+Regards,
+
+Hans
 
 
->
->>          cp = cmd->param;
->> @@ -5651,9 +5653,6 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
->>          struct mgmt_pending_cmd *cmd = data;
->>          struct mgmt_cp_remove_adv_monitor *cp;
->>
->> -       if (status == -ECANCELED)
->> -               return;
->> -
->>          hci_dev_lock(hdev);
->>
->>          cp = cmd->param;
->> --
->> 2.34.1
->>
-
-Thanks,
-
-Shuai
-
->
