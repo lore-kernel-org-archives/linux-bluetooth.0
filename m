@@ -1,154 +1,167 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5277F394496
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 03:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786418891; cv=none; b=iNhwRcwQxc38CExQCDkGKlCOvgf91WRW24qCTcVPpCi2fb/FVsMmXX0FgpU881DXsls5qMg/s/nPj2LUUI6TPPs9L85yPm9MPTjE9+V5BVnOahzheR10vTQjSxrDjmPugZ4Gr/EDnueHPTu0fV5wjrJa3n0mFX82ZGnCVxrfFqs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786418891; c=relaxed/simple;
-	bh=n35oIzTh8SACAuU0wX2d0y5TUvShgPlwU7+xyslre8E=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=H9m1upZVCU7eWqqTuxRpXVo29kl/ao2bey43SfWOwdX9p2bcFJg21lUcWUdtjlvNO9gGvx8IGzY3GrzgW5E0vSm9LJcNd64E5JT0uwo5zKAVfNZoQFbveIozwAbh04KptpiKuhtHDDNfgYmXryGQPg39qf5bEFdFrzQTgJR0GGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V5q6V6fX; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFFB306765
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 04:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786423470; cv=pass; b=qQwlDwoGr0CBSDUuLFC7sjHmO6GUQP59yppm4fgmYwi95yL4VoszKc0FtFPUjXwOe6xpTXxX7EqNtl6O6/PRzPHOhA19BEOkB8qg+eRLt6alDk4HjAUefO5AvI6TtACvZOS6KEjf3nErjunYKqS33X6NmHJL7xkDvVzOtEr0TJU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786423470; c=relaxed/simple;
+	bh=CHvnt+c9/ZsiwBoYHEfWqDZt4dGfPzdYE0pq4+SLD1w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HRbfG8tbFsxkTyGW2Uyp2QvHwpCH+KkldxnUxO8L9zjikmBi92nvUVTzNLmpnoMNO3Gznk8kzdC1tH/e85c5FT0r4Dayimo17Ip5RJen6uBhi/vFUDBahdNV88ba5QvoDadHo0Ipm4XTP8nGG0bw4aOWs/FjpN9i3XhdnYXDhek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxhJnUf8; arc=pass smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5q6V6fX"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2cca0c5799eso25550225ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Aug 2026 20:28:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxhJnUf8"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-51bfad59921so15434621cf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Aug 2026 21:44:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786423468; cv=none;
+        d=google.com; s=arc-20260327;
+        b=S/53LUefhyGfKUBQU5deOQvQU9Pd3A+pYLoIWd/E12CdJtA3+71oLcUSDZWryOHcxv
+         yjWkzjmEcvA6eU6bCoO4PsJrwBwemm/rxSu7G7yFJkIKM3rYRawFVqr5jexKJo5YNJop
+         O4JfJIBKojsmtI7s8TVshUZxUxpGp7i2vy5cuevDV4bHBrkntjE9cRSrtUHFzxos6bvy
+         Wq+VrRK4+YTxWPkJ1TXRSnmYMncDkZZJbI8xdos7jv4LfdKxuTuaDlCkh/Bt/e9mXvrm
+         1fGPtr568FmC98zOzW90afQXiF6yrnNcg/GSdyln1ZKkpoKJrgefW6YJ27DJHbN/Nvyy
+         q9sA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=CHvnt+c9/ZsiwBoYHEfWqDZt4dGfPzdYE0pq4+SLD1w=;
+        fh=YXwOjxO/F2hs8wxX6HqE2jfYmkc2sJDAnb60i+ZkkHc=;
+        b=ECtGRMQims4/jF4DSqqrhu+v3F2I1Ui+VITNLzFpcQfYeMk3hj0tbxehTp40qmIjvV
+         6H1Hls1r3POqxFplelzslKUdey8W8ZBbvo2att+U6wnseKHv7/fE9jy92890D0Rmc5rE
+         fvbz51dcqHC88uLpFnMIe8BbQiq4daGw9P9P1j/ZtTAg+uWOxG91W1byQTRQVIMu2m9N
+         +f8OZxYmBQX/WUtWqQJIgcVuLYYCTssxwVDVsvFVelo4kJiapaxplLzgzv28w45P/65P
+         EqBdi1eaRLuavjY11KLMVl/KQDD14sRTNR9h7Inf5+m5wFljWnZvx5/m789yaM9EWVyN
+         ZxSQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786418890; x=1787023690; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=1R0D93cEVrdvuTHwnHMRyw2zK2a0o45qN8c16eyKSMw=;
-        b=V5q6V6fXoDq4qYJZVGNSkz+T9W0lf7WUGrt7olx/i+qYC2ckE8xmuNqvNIapwKjeLE
-         SOHqxiWPLbd2LsykIUT907iX3EXUQ6/7EzrBpcnA/hZtXeNxrf6U0zvEZekQdmaon1gy
-         EdD5h5rMevV4fDRwO1jdilRCQaU+3w/vIoBbAwhUrQmPJpka4DE/Z4J6OxqY2L9n9S+F
-         nVaeM6LIPevwH1iV522dZvfTEuhGV95vQta2VcDBzUlTgU7gD7lVLBwBSEAtkov6f7WQ
-         bvFLt8A0/F8PmJ7y09/+2ExNGVjuJ/Owg+9+PNXYcMEKKWFI5kq9uqrxN80vIxEI02Sa
-         iXMw==
+        d=gmail.com; s=20251104; t=1786423468; x=1787028268; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=CHvnt+c9/ZsiwBoYHEfWqDZt4dGfPzdYE0pq4+SLD1w=;
+        b=cxhJnUf8ZZp3fOOKrvLqL6mR63pGa/wpfk2WwBTQb1WGWIrxXDE0oFpLxZfyu9fS3/
+         2N8G4/JCc5NZuXxsNIK6CLp44Ye02m4XafMN5zs/H7aZtNeMxoMLdeWBvhMA4t2ppbid
+         Bw8RjabAH8BqkqxQVhOr1NamojHrGCJRfbLrPUGMHAYtqaF1OxufyLkpr2t722LmZGUN
+         +iove67SJp6zL7ANr68FNATpw5gG7WAQKf/VzrNnDhcmIwi90GdavIX+lRFJI5qE75R3
+         sZx1XWkv59YjmZQhD92dVRaO+JDuP9N9VrspP2CpyAGgE2CRtLVZs5CqdFOFGKCOu3+8
+         RsFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786418890; x=1787023690;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=1R0D93cEVrdvuTHwnHMRyw2zK2a0o45qN8c16eyKSMw=;
-        b=DmTAWY2qlrreD8/t4x7OkRHD+4S9SWGHYdHz3n5Uybvchzxsg1tsC3w5kPit6bWH17
-         CCoFXlv4mKcBZTUDK68Fx9hzJFCmuBrOSdOTOk/dPruTiLfw95GrRIJrUOaUoIo0i4q/
-         6YcGuWDUiLhUB2wmqvu9v5MIGdYqxlAf9ANAYtccuNbPg6N4QOXVJwivo9nADOzzWu1u
-         4BdRU3HuzNyrLxm2BVvkdaRbK3oT4vbmApt9OIrO/M26BOjyD5SRuuecwZa+T4AZE26v
-         STNuHLcW8P+3Mj0v+gSnakL4DAg7Wwdzk7Uk/w8RB443UX4mAhDrX950BN32Fdjxscmh
-         C6ug==
-X-Gm-Message-State: AOJu0YxBNv4yNIr2tNZ9DYRiMQfHvN3C476n0FU2o5EmsSEDvzSdgg53
-	M3yznMpNM/3629fR4XPdU9PWvXdkrJ6uTVZT5PMKuPL/jUX+B+PXx65SH5Gk3Q==
-X-Gm-Gg: AR+sD13TTAPdI1qQ+NyWXpVD5C22xbFyPRTY8rO2XqdpfFCGyBgWS/cw4/yBSu0cCY5
-	YfPps5ka+1/OdnLJcSP0r8WWqlXWJcvsVAnHmEDZjzfLrwrhmvt8sfap7zaZIPau9VLpvFz+udw
-	r1Q/KTodVt2D1bNM+VSQQQsn6M3Yw+jFUClHhP+NiRfkiUv3cX/TFu3BnKbK+HIO9Fs5QIcgmUy
-	n2+gwJBMjdkfvXdZ1JDTJAZ2m3SEBrxxilXXjEpFNDboN69ezugGlJBbM7IR/sI7Cr2TRun5bpH
-	jF//VYtKn/jVbX5L7cQMF0dygDgcpBzc7YVSq+bI8uDYoj9hfECAwdGB0m8Mcc3o3AESbFsPoHI
-	4A3AzZjqD9kRe0mIghCReUZu4wPowXClM571psRpRoBRTiRabO+/uoQ8iMKsljflTM7wvx26DNq
-	RrGf1Sf73tjh/2LIlTyY6sYbbdedNC6YjUODh9P2X/XNQSGYGebyGwxwb5wvoC5sUGYQ==
-X-Received: by 2002:a17:90b:4d11:b0:380:21b7:e727 with SMTP id 98e67ed59e1d1-392ec59cafcmr179368a91.14.1786418889566;
-        Mon, 10 Aug 2026 20:28:09 -0700 (PDT)
-Received: from [172.17.0.2] ([4.155.111.52])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-392d5190d05sm1704912a91.3.2026.08.10.20.28.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Aug 2026 20:28:09 -0700 (PDT)
-Message-ID: <6a7a96c9.2bb73dab.28b2d.eb4a@mx.google.com>
-Date: Mon, 10 Aug 2026 20:28:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6121363468193001262=="
+        d=1e100.net; s=20251104; t=1786423468; x=1787028268;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=CHvnt+c9/ZsiwBoYHEfWqDZt4dGfPzdYE0pq4+SLD1w=;
+        b=ZU7k5FN6//oPf4AIcjLodNxgbCefd/zv/e4QdEc8i4fP9G8h7DxVqxdSR9Q8pvcUQa
+         HtbbRw1Gu5lAe5544+UgBRRC3zzLhmsx/lN7Xqix+ggBQbggUJSyh94jYwEez5kZcCoE
+         +xNr3ssDzykT2a0KMbfbyT8sj8n3UT7ZlsGPbN+ZRDwLv5SE8gsvGdSYaZudZani8qve
+         JsVdiJNx6D/F7pejOKr/fpF+945TANFcSsEKEF9H0RLmCmAuir+0/qAnBFNUP1Wzcbmh
+         NEpp7WmMCrBkgX7No/9cEyLO221dV9EwJ3U3gzKKlBr9h0cyv8dyK7wc+iVpMnRwcVDB
+         D/Sw==
+X-Forwarded-Encrypted: i=1; AHgh+Roc91UwrY23kimxTiKvk5nSLs7pQR+tPIWtJGaPSPcz8n25HxlpTFqG5K3oADW705sac47Zn1lK6o1NAh4rnR4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCizpq5LsYhA9+/5JYRe5cD5ghDwqdfzDxyyCI3qua+uFcJIVi
+	w7Y1L7WISMAdbHkkz5sp7efGt0YkTHM7Z7gWJDR4cR/qbj9pvkVWaa9UvkKkujwWfIqHv1w5ktH
+	oEj9VJKDKAiRxQCYPgC86rRVxQU042to=
+X-Gm-Gg: AR+sD10vXxHC3As0OeUKaWR8dcpaGZvWP6PD5bxZYayh84KTtEUGh+WJ5g//07N04ei
+	wB5hpCgdGN6nI7iba98IXVH/QVSNZeZPZjG++u8C2SjN1I5nkcujtm0VO9qMo6yk0PTbbXm4+RY
+	y0D2ONo2qq7QtqmMzP+j56SjqmiEooO0GdhDp8VnGhpXxrzLwmF7atnKm1NjRBjVuTfptrjRshr
+	xw56mwX8anRgVr5yhNzOG30wiaMtFaIpzGBwCaWvftyxV7th6qbbhLshch6OF35N25zNOCT7TtX
+	D6dUQYvw2eOWkEk0mH0OKrollHqddw3HhTIuUQn2uWl3pg==
+X-Received: by 2002:a05:622a:48a:b0:52d:41d0:89e8 with SMTP id
+ d75a77b69052e-52d586750e0mr4849541cf.33.1786423467749; Mon, 10 Aug 2026
+ 21:44:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, daniel@makrotopia.org
-Subject: RE: device_schedule_reprobe(): core helper and conversions
-In-Reply-To: <anpxXANMYTlOHbPo@makrotopia.org>
-References: <anpxXANMYTlOHbPo@makrotopia.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: ZW Tang <tangzw515@gmail.com>
+Date: Tue, 11 Aug 2026 12:44:16 +0800
+X-Gm-Features: AUfX_myovcwt3pdqNsO8mCqeMjbo9YmO-hz_6-8ufDqY1Au9ibUU4a7AxVngAuM
+Message-ID: <CAA2SOT5U4fUJg2DOKr0-YKm0g5xAutjLKvkci99k5kQ6GMtf0g@mail.gmail.com>
+Subject: [BUG] Bluetooth: KASAN null-ptr-deref in klist_put during HCI
+ connection sysfs teardown
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============6121363468193001262==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+I am reporting a KASAN null-ptr-deref triggered by a syzkaller
+reproducer on Linux 7.2-rc3.
 
-Dear submitter,
+The crash happens during Bluetooth HCI/vhci teardown. The reproducer
+creates Bluetooth L2CAP/BNEP sockets and issues BNEPCONNADD. When the
+syz-executor exits, vhci_release() unregisters the HCI device, which
+flushes HCI connections and reaches hci_conn_del_sysfs(). During this
+sysfs cleanup path, device_move() tries to move a child device away
+from the HCI connection device, and the kernel crashes in klist_put()
+while removing the device from the old parent's klist.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1143724
+This looks like a Bluetooth HCI connection sysfs lifetime / teardown
+ordering issue, rather than a generic klist problem.
 
----Test result---
+Reproducer:
+syz reproducer: https://pastebin.com/raw/n2k0FdAq
+kernel config: https://pastebin.com/raw/j608iPvW
+console output: https://pastebin.com/raw/Sy0Am14Y
 
-Test Summary:
-CheckPatch                    PASS      2.79 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.06 seconds
-GitLint                       PASS      0.77 seconds
-SubjectPrefix                 FAIL      0.25 seconds
-BuildKernel                   PASS      27.53 seconds
-CheckAllWarning               PASS      30.70 seconds
-CheckSparse                   PASS      30.35 seconds
-BuildKernel32                 PASS      27.17 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      502.65 seconds
-TestRunner_l2cap-tester       PASS      63.14 seconds
-TestRunner_iso-tester         PASS      85.31 seconds
-TestRunner_bnep-tester        PASS      19.27 seconds
-TestRunner_mgmt-tester        FAIL      219.15 seconds
-TestRunner_rfcomm-tester      PASS      25.44 seconds
-TestRunner_sco-tester         PASS      31.90 seconds
-TestRunner_ioctl-tester       PASS      27.55 seconds
-TestRunner_mesh-tester        FAIL      26.88 seconds
-TestRunner_smp-tester         PASS      23.87 seconds
-TestRunner_userchan-tester    PASS      20.01 seconds
-TestRunner_6lowpan-tester     PASS      23.47 seconds
-IncrementalBuild              PASS      30.37 seconds
+Kernel:
+HEAD commit: 1137d8b5df06137fb49513cc923b3b24d94cb809
+git tree: torvalds/linux
+kernel version: 7.2.0-rc3 #1 PREEMPT(full) (QEMU Ubuntu 24.10)
 
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+Crash log excerpt:
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.252 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+Oops: general protection fault, probably for non-canonical address
+0xdffffc000000000b: 0000 [#1] SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+CPU: 1 UID: 0 PID: 22881 Comm: syz-executor Not tainted 7.2.0-rc3 #1
+PREEMPT(full)
+Hardware name: QEMU Ubuntu 24.10 PC (i440FX + PIIX, 1996), BIOS
+1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010+0x4b/0x170
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.786 seconds
-Mesh - Send cancel - 2                               Timed out    1.986 seconds
+Call Trace:
+<TASK>
+klist_remove+0x12a/0x2d0
+device_move+0x136/0xf10
+hci_conn_del_sysfs+0x87/0x1b0
+hci_conn_del+0x5ca/0x11e0
+hci_conn_hash_flush+0x184/0x290
+hci_dev_close_sync+0x656/0x1350
+hci_dev_do_close+0x31/0xc0
+hci_unregister_dev+0x23f/0x6a0
+vhci_release+0x181/0x230
+__fput+0x401/0xb50
+task_work_run+0x172/0x280
+do_exit+0xa54/0x3030
+do_group_exit+0xd3/0x2a0
+get_signal+0x26db/0x2790
+arch_do_signal_or_restart+0x80/0x910
+exit_to_user_mode_loop+0x115/0x660
+do_syscall_64+0x5ba/0x7a0
+entry_SYSCALL_64_after_hwframe+0x76/0x7e
+</TASK>
 
+Registers around the fault:
 
-https://github.com/bluez/bluetooth-next/pull/567
+RAX: dffffc0000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: 000000000000000b RSI: ffff8880006d5940 RDI: 0000000000000058
+RBP: ffff888075ce9c60 R12: 0000000000000000
 
----
-Regards,
-Linux Bluetooth
+The NULL-deref range and RDI=0x58 suggest that klist_put() is
+dereferencing a field through a NULL klist pointer while device_move()
+is removing the device from its old parent's klist. Since this is
+reached from hci_conn_del_sysfs(), it may indicate that a child device
+under the HCI connection sysfs device is being moved or removed after
+its parent klist state has already been cleared, or that the same
+child/connection sysfs relation can be torn down more than once during
+HCI device unregister.
 
 
---===============6121363468193001262==--
+Thanks
