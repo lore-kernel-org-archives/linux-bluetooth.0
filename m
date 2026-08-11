@@ -1,57 +1,59 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA917331A7E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 15:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C421331A7E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2026 15:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786461980; cv=none; b=bw5fGb1kmTPq4gpmIDHpaT6wEsq9l5SN7KftFECgzjFcBcQOi/lwwmgDw9SEYnN2WHkbyL/lMP/ghsINar8nm/ccn4k1xEGS7mXK8DBqW7PrZ6vQBs6J43sba+WuylL/Wn+J9PKYIcVwllfdAS7txny7bCaFGZWYaNBc5T77HSU=
+	t=1786461982; cv=none; b=E4F1uD1xoRR2G2PhEdk2XirLSeN7+uBlU3E7hy848R7E3kPVRXEo/YhZ8rA7Ay/+44FQkJiQEfWucPvfQMo9UCl+y6BHYT/ikBYXtKo2AxGfsO5x1mjzb0upDtrQ+/KY3d42GCbIAz2gGSLuKTI3T49roKwjwpbzXsf0U/zDSW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786461980; c=relaxed/simple;
-	bh=acMM2W58ae0Vb8QtHntv6AwP46vHGCv/GYemJNptYXE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mQ4zeuXZK94v+jQA9s3kln/ase2fNQtwSmvHVJ6sBVpxFLTjTXfrGogLAz0/wiVH/aM+YXWZ63kJMJgbT/ufQvkfUDfn48P3u9l2Fsl+kNTxSAQmdhbKNorXzTq0t3U3Uh7dJdyLPVMoyXd95fLKGhSa2g5U/9IBcEhUIzQwcG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SpDp9qvD; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1786461982; c=relaxed/simple;
+	bh=a3TYwQvZO5yw+XuYN4YQCh/WlFsctdOII4Xw6Ebk0nM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lNyqL1XnMTyzKNX4CNnEKccRcNp6O8QHwtSFor0fmNfCj3RwzYJ5QA4/Ia6Awu0AVlvIQt9qKvwB+Q0emzSSlsP8eBfzKEqKpARz9uMXF4BcMSJ2j1jyxHe5X5a6hQ6rQR9nmPRFq/JupD/QFwYOmY4Ox0Q8SRbM5b0c2/uH1yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BQ10FoN+; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SpDp9qvD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BQ10FoN+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786461979; x=1817997979;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=acMM2W58ae0Vb8QtHntv6AwP46vHGCv/GYemJNptYXE=;
-  b=SpDp9qvDOd3fnev9Qw2RsQrxg+mIogCP5DPmsLRWvC7sGn7FcnvrOX6Q
-   F10Gk+Rh2ux3OGixXf6lG0SGUiQBgF4yon1a8RbPz9A0jYtjkamwXwKIp
-   n5s3KP0vijuh6C7tK/EvTh6o4v3QJfFCD/fuCOM7keBPH/SnYXAcgx+qM
-   3lsGzPN84n5V0OTlV3wg9Fu6kt8pJm+GfAOFctkWrSIOGQEdverhnw/tN
-   HKBVDdYnfuaPWkCCZJV2equGEXdzSgG6/8CZmsdR8HJ9b/W268wC2c03N
-   oR5E2SyjkKnLqobucog1QLJ38OoyQ/V9nyJqpJiMgx0ybs0A+h/1u9O3A
-   w==;
-X-CSE-ConnectionGUID: aIMPb3u7SICjG3Bs0bEfZw==
-X-CSE-MsgGUID: CgD0XI/1T3C1e2wEGBhd9A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11872"; a="109786922"
+  t=1786461982; x=1817997982;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=a3TYwQvZO5yw+XuYN4YQCh/WlFsctdOII4Xw6Ebk0nM=;
+  b=BQ10FoN+iIj/7ztFXthvRxNgPI6r6gb1f4KNQqUQe8TJ2EnuAP/rRvKD
+   7BXcjOZe71QSBhZVqaKWd7zh6cEBivBNOnwcXpO8n9qv/hTcZZ2tZ/D0+
+   gMRBhYKeEvCeixusmMYA5hD8mUQo1YnajKkXXS0fUt3PehTNg56EoKGSd
+   bNU8tbvHgVX6iHT3CjABlpyZ+URIoAu/GVEJQctU4y+cMJ8wPzxrLE+ij
+   iKvp9ydmIssLleeqjNSkOTHdHIxJLShiJ6bzjrdf3sQUAn7O96Aa6bIV/
+   mnEGlM50uS6Nd1/o/BRX4GulDGxMS1zkfUZ4akPGsYd1uUmXxPP9XHlNX
+   g==;
+X-CSE-ConnectionGUID: N0FgIhe4QYidDkGFlGgUgA==
+X-CSE-MsgGUID: 7Br4Cr8zTQmS0f92DMxJwg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11872"; a="109786927"
 X-IronPort-AV: E=Sophos;i="6.25,218,1779174000"; 
-   d="scan'208";a="109786922"
+   d="scan'208";a="109786927"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2026 08:26:18 -0700
-X-CSE-ConnectionGUID: CC8Nkz9fQL2JeARhAOi+sw==
-X-CSE-MsgGUID: 3fHD1xYMTf+MpMpED+omKg==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2026 08:26:21 -0700
+X-CSE-ConnectionGUID: OH3gooFcSPGjBKfTtUYbQg==
+X-CSE-MsgGUID: b3rGshOTRWKs6eQ09EK4iA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,218,1779174000"; 
-   d="scan'208";a="268523863"
+   d="scan'208";a="268523882"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa005.fm.intel.com with ESMTP; 11 Aug 2026 08:26:15 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 11 Aug 2026 08:26:19 -0700
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: ravishankar.srivatsa@intel.com,
 	chethan.tumkur.narayan@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 1/3] Bluetooth: btintel_pcie: parse FW memory region addresses via mailbox TLV
-Date: Tue, 11 Aug 2026 21:15:51 +0530
-Message-ID: <20260811154553.629211-1-kiran.k@intel.com>
+Subject: [PATCH v1 2/3] Bluetooth: btintel_pcie: sync mbox tlv parsing with GP0 alive interrupt
+Date: Tue, 11 Aug 2026 21:15:52 +0530
+Message-ID: <20260811154553.629211-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260811154553.629211-1-kiran.k@intel.com>
+References: <20260811154553.629211-1-kiran.k@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,671 +62,133 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Performing a target access to read the mbox TLV table while the driver
+is concurrently posting RX buffers to the firmware causes the hardware
+to return 0 for the target address, resulting in an invalid/empty TLV
+parse.
 
-Implement GP1 mailbox interrupt handling to receive memory region
-addresses from firmware via a TLV-based protocol. When firmware sends
-a BUILD_SPECIFIC_RESOURCES_MAPPING mailbox message, the driver reads
-a TLV table from device memory containing addresses and sizes of
-debug memory regions (exception dump, DCCM, SDS, ECL, SMEM).
+Add a synchronization handshake between the mbox TLV read operation
+performed by the mbox worker and the GP0 (alive) MSI-X interrupt (which
+signals completion of RX buffer posting). The worker now waits for the
+alive interrupt before initiating the target access, ensuring the
+hardware returns valid data.
 
-This enables the driver to dynamically discover dump region locations
-instead of using hardcoded addresses, supporting current and future
-Intel BT PCIe controller variants.
-
-Replace per-device hardcoded exception memory address and size
-constants in btintel_pcie_read_hwexp() with the dynamically populated
-values from dump_info, making exception dump handling consistent with
-other dump regions.
-
-Key changes:
-- Rewrite GP1 handler to parse mailbox registers and queue TLV work
-- Add btintel_parse_mbox_tlv() for parsing FW-provided TLV data
-- Add mbox_work workqueue for deferred TLV processing
-- Store parsed region addresses in btintel_pcie_dump_mem_info
-- Add cnvi_bt field to btintel_data for HW variant identification
-- Rename fw_git_sha1 to fw_sha for consistency
-- Remove hardcoded HWEXP address/size macros and use dump_info
-
-Assisted-by: GitHub-Copilot:claude-opus-4.7
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Assisted-by: Gemini:gemini-3.1-pro-preview
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- drivers/bluetooth/btintel.c      |   7 +
- drivers/bluetooth/btintel.h      |   1 +
- drivers/bluetooth/btintel_pcie.c | 343 +++++++++++++++++++++++++++++--
- drivers/bluetooth/btintel_pcie.h |  53 ++++-
- 4 files changed, 381 insertions(+), 23 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 42 +++++++++++++++++++++++++++++---
+ drivers/bluetooth/btintel_pcie.h | 10 +++++++-
+ 2 files changed, 48 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index bcb2514b7bc0..cbeb27033aa1 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -66,6 +66,7 @@ static struct {
- 	const char *driver_name;
- 	u8         hw_variant;
- 	u32        fw_build_num;
-+	u32        fw_sha;
- } coredump_info;
- 
- const guid_t btintel_guid_dsm =
-@@ -560,6 +561,7 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 
- 	coredump_info.hw_variant = INTEL_HW_VARIANT(version->cnvi_bt);
- 	coredump_info.fw_build_num = version->build_num;
-+	coredump_info.fw_sha = version->git_sha1;
- 
- 	bt_dev_info(hdev, "%s timestamp %u.%u buildtype %u build %u", variant,
- 		    2000 + (version->timestamp >> 8), version->timestamp & 0xff,
-@@ -2337,6 +2339,7 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 					   struct intel_version_tlv *ver,
- 					   u32 *boot_param)
- {
-+	struct btintel_data *intel_data = hci_get_priv(hdev);
- 	const struct firmware *fw;
- 	char fwname[128];
- 	int err;
-@@ -2449,6 +2452,7 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 		btintel_reset_to_bootloader(hdev);
- 
- done:
-+	intel_data->cnvi_bt = ver->cnvi_bt;
- 	release_firmware(fw);
- 	return err;
- }
-@@ -3486,6 +3490,9 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 
- 	btintel_version_info_tlv(hdev, &new_ver);
- 
-+	/* Update ver with the operational firmware version */
-+	*ver = new_ver;
-+
- finish:
- 	/* Set the event mask for Intel specific vendor events. This enables
- 	 * a few extra events that are useful during general operation. It
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 966ec1b02be2..ef232820c31b 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -247,6 +247,7 @@ enum {
- struct btintel_data {
- 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
- 	int (*acpi_reset_method)(struct hci_dev *hdev);
-+	u32 cnvi_bt;
- };
- 
- #define btintel_set_flag(hdev, nr)					\
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 005c77a4f5eb..3d67f9495dba 100644
+index 3d67f9495dba..93963450ea95 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -75,14 +75,8 @@ struct btintel_pcie_dev_recovery {
- 
- #define BTINTEL_PCIE_MAGIC_NUM    0xA5A5A5A5
- 
--#define BTINTEL_PCIE_BLZR_HWEXP_SIZE		1024
--#define BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR	0xB00A7C00
- 
--#define BTINTEL_PCIE_SCP_HWEXP_SIZE		4096
--#define BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR		0xB030F800
- 
--#define BTINTEL_PCIE_SCP2_HWEXP_SIZE		4096
--#define BTINTEL_PCIE_SCP2_HWEXP_DMP_ADDR	0xB031D000
- 
- #define BTINTEL_PCIE_MAGIC_NUM	0xA5A5A5A5
- 
-@@ -726,7 +720,7 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.write_ptr) +
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.wrap_ctr) +
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.trigger_reason) +
--		sizeof(*tlv) + sizeof(data->dmp_hdr.fw_git_sha1) +
-+		sizeof(*tlv) + sizeof(data->dmp_hdr.fw_sha) +
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
- 		sizeof(*tlv) + strlen(ts) +
-@@ -775,8 +769,8 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 				  sizeof(data->dmp_hdr.wrap_ctr));
- 	p = btintel_pcie_copy_tlv(p, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
- 				  sizeof(data->dmp_hdr.trigger_reason));
--	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
--				  sizeof(data->dmp_hdr.fw_git_sha1));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_SHA, &data->dmp_hdr.fw_sha,
-+				  sizeof(data->dmp_hdr.fw_sha));
- 	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
- 				  sizeof(data->dmp_hdr.cnvr_top));
- 	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
-@@ -957,10 +951,294 @@ static inline bool btintel_pcie_in_error(struct btintel_pcie_data *data)
- 	return	data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_ABORT_HANDLER;
- }
- 
-+static const char *btintel_pcie_tlv_str(u8 tlv_type)
-+{
-+	switch (tlv_type) {
-+	case BTINTEL_PCIE_TLV_TYPE_EXCEPTION_DUMP_ADDRESS:
-+		return "EXCEPTION_DUMP_ADDRESS";
-+	case BTINTEL_PCIE_TLV_TYPE_DCCM_MEM_ADDRESS:
-+		return "DCCM_MEM_ADDRESS";
-+	case BTINTEL_PCIE_TLV_TYPE_SDS_MEM_ADDRESS:
-+		return "SDS_MEM_ADDRESS";
-+	case BTINTEL_PCIE_TLV_TYPE_ECL_MEM_ADDRESS:
-+		return "ECL_MEM_ADDRESS";
-+	case BTINTEL_PCIE_TLV_TYPE_SMEM_ADDRESS:
-+		return "SMEM_ADDRESS";
-+	default:
-+		return "UNKNOWN";
+@@ -987,6 +987,24 @@ static int btintel_parse_mbox_tlv(struct btintel_pcie_data *data)
+ 	struct mbox_tlv *tlv;
+ 	struct btintel_data *cnvi_data = hci_get_priv(data->hdev);
+ 	u8 hw_variant = INTEL_HW_VARIANT(cnvi_data->cnvi_bt);
++	long t;
++
++	/* Wait for GP0 alive interrupt to post RX buffers */
++	t = wait_event_timeout(data->mbox_parse_wait_q,
++			       test_bit(BTINTEL_PCIE_MBOX_PARSE_READY, &data->flags),
++			       msecs_to_jiffies(BTINTEL_PCIE_MBOX_INTR_TIMEOUT_MS));
++	if (!t) {
++		bt_dev_warn(data->hdev,
++			    "Timeout (%u ms) waiting for alive interrupt before mbox TLV parse; skipping",
++			    BTINTEL_PCIE_MBOX_INTR_TIMEOUT_MS);
++		return 0;
 +	}
-+}
++	clear_bit(BTINTEL_PCIE_MBOX_PARSE_READY, &data->flags);
 +
-+static int btintel_parse_mbox_tlv(struct btintel_pcie_data *data)
-+{
-+	/* Custom TLV structure for mailbox parsing
-+	 * len is __le16 as per agreement with FW
-+	 */
-+	struct mbox_tlv {
-+		u8 type;
-+		__le16 len;
-+		u8 val[];
-+	} __packed;
++	bt_dev_info(data->hdev,
++		    "mbox TLV parse started at %lld ns (%lld us after mbox interrupt)",
++		    ktime_to_ns(ktime_get()),
++		    ktime_to_us(ktime_sub(ktime_get(), data->mbox_intr_ts)));
+ 
+ 	memset(&data->dump_info, 0, sizeof(data->dump_info));
+ 
+@@ -1227,12 +1245,22 @@ static void btintel_pcie_msix_gp1_handler(struct btintel_pcie_data *data)
+ 	if (target_access &&
+ 	    !test_and_set_bit(BTINTEL_PCIE_MAIL_BOX_INTR,
+ 				   &data->flags)) {
++		/* Arm the mbox<->alive handshake */
++		clear_bit(BTINTEL_PCIE_MBOX_PARSE_READY, &data->flags);
++		set_bit(BTINTEL_PCIE_MBOX_PARSE_PENDING, &data->flags);
++		data->mbox_intr_ts = ktime_get();
 +
-+	u8 *buffer, *ptr;
-+	u32 buffer_len, remaining;
-+	int err;
-+	u32 tbl_addr, tbl_size;
-+	struct mbox_tlv *tlv;
-+	struct btintel_data *cnvi_data = hci_get_priv(data->hdev);
-+	u8 hw_variant = INTEL_HW_VARIANT(cnvi_data->cnvi_bt);
++		bt_dev_info(data->hdev,
++			    "mbox interrupt received at %lld ns; queuing mbox_work",
++			    ktime_to_ns(data->mbox_intr_ts));
 +
-+	memset(&data->dump_info, 0, sizeof(data->dump_info));
-+
-+	/* Snapshot to avoid TOCTOU with the GP1 IRQ handler */
-+	tbl_size = READ_ONCE(data->debug_table_size);
-+	tbl_addr = READ_ONCE(data->debug_table_addr);
-+
-+	if (!tbl_size || !tbl_addr)
-+		return -EINVAL;
-+
-+	tbl_size = ALIGN_DOWN(tbl_size, 4);
-+
-+	if (!tbl_size)
-+		return -EINVAL;
-+
-+	if (tbl_size > SZ_1M) {
-+		bt_dev_err(data->hdev, "Debug table size too large: %u",
-+			   tbl_size);
-+		return -EINVAL;
-+	}
-+
-+	buffer_len = tbl_size;
-+
-+	buffer = vmalloc(buffer_len);
-+	if (!buffer)
-+		return -ENOMEM;
-+
-+	btintel_pcie_mac_init(data);
-+
-+	err = btintel_pcie_read_device_mem(data, buffer, tbl_addr,
-+					   buffer_len);
-+	if (err)
-+		goto exit_on_error;
-+
-+	print_hex_dump(KERN_INFO, "Bluetooth: mbox_tlv: ", DUMP_PREFIX_OFFSET, 16, 1,
-+		       buffer, buffer_len, false);
-+
-+	ptr = buffer;
-+	remaining = buffer_len;
-+
-+	/* Parse TLV structures: type(1) + length(2) + value */
-+	while (remaining >= sizeof(struct mbox_tlv)) {
-+		u16 tlv_len;
-+		u32 tlv_total;
-+
-+		tlv = (struct mbox_tlv *)ptr;
-+		tlv_len = le16_to_cpu(tlv->len);
-+		tlv_total = sizeof(tlv->type) +
-+			    sizeof(tlv->len) + tlv_len;
-+
-+		if (tlv_total > remaining) {
-+			bt_dev_err(data->hdev,
-+				   "TLV parse error: type=%u, len=%u",
-+				   tlv->type, tlv_len);
-+			break;
+ 		WRITE_ONCE(data->debug_table_addr, addr);
+ 		WRITE_ONCE(data->debug_table_size, size);
+ 		if (!queue_work(data->dump_workqueue,
+-				&data->mbox_work))
+-			clear_bit(BTINTEL_PCIE_MAIL_BOX_INTR,
+-				  &data->flags);
++				&data->mbox_work)) {
++			clear_bit(BTINTEL_PCIE_MAIL_BOX_INTR, &data->flags);
++			clear_bit(BTINTEL_PCIE_MBOX_PARSE_PENDING, &data->flags);
 +		}
-+
-+		switch (tlv->type) {
-+		case BTINTEL_PCIE_TLV_TYPE_EXCEPTION_DUMP_ADDRESS:
-+			if (tlv_len < 8) {
-+				bt_dev_err(data->hdev,
-+					   "TLV %s too short: %u",
-+					   btintel_pcie_tlv_str(tlv->type),
-+					   tlv_len);
-+				break;
-+			}
-+			data->dump_info.exception_dump_addr =
-+				get_unaligned_le32(&tlv->val[0]);
-+			data->dump_info.exception_dump_len =
-+				get_unaligned_le32(&tlv->val[4]);
-+			break;
-+		case BTINTEL_PCIE_TLV_TYPE_DCCM_MEM_ADDRESS:
-+			if (tlv_len < 8) {
-+				bt_dev_err(data->hdev,
-+					   "TLV %s too short: %u",
-+					   btintel_pcie_tlv_str(tlv->type),
-+					   tlv_len);
-+				break;
-+			}
-+			data->dump_info.dccm_addr_start =
-+				get_unaligned_le32(&tlv->val[0]);
-+			data->dump_info.dccm_addr_end =
-+				get_unaligned_le32(&tlv->val[4]);
-+			break;
-+		case BTINTEL_PCIE_TLV_TYPE_SDS_MEM_ADDRESS:
-+			/* hw_variant comes from cnvi_bt which is set during
-+			 * setup. If mailbox fires before setup completes,
-+			 * hw_variant is 0. Skip SDS parsing in that case.
-+			 */
-+			if (!hw_variant) {
-+				bt_dev_dbg(data->hdev, "SDS TLV: skipped, hw_variant not yet known");
-+				break;
-+			}
-+			if (tlv_len == 16 &&
-+			    hw_variant > BTINTEL_HWID_BZRI) {
-+				data->dump_info.sds_start_addr_start =
-+					get_unaligned_le32(&tlv->val[0]);
-+				data->dump_info.sds_start_addr_end =
-+					get_unaligned_le32(&tlv->val[4]);
-+				data->dump_info.sds_iosf_data_addr_start =
-+					get_unaligned_le32(&tlv->val[8]);
-+				data->dump_info.sds_iosf_data_addr_end =
-+					get_unaligned_le32(&tlv->val[12]);
-+			} else if (tlv_len == 24 &&
-+				   (hw_variant == BTINTEL_HWID_BZRI ||
-+				    hw_variant == BTINTEL_HWID_BZRIW)) {
-+				data->dump_info.sds_fixed_rom_addr_start =
-+					get_unaligned_le32(&tlv->val[0]);
-+				data->dump_info.sds_fixed_rom_addr_end =
-+					get_unaligned_le32(&tlv->val[4]);
-+				data->dump_info.sds_start_addr_start =
-+					get_unaligned_le32(&tlv->val[8]);
-+				data->dump_info.sds_start_addr_end =
-+					get_unaligned_le32(&tlv->val[12]);
-+				data->dump_info.sds_iosf_data_addr_start =
-+					get_unaligned_le32(&tlv->val[16]);
-+				data->dump_info.sds_iosf_data_addr_end =
-+					get_unaligned_le32(&tlv->val[20]);
-+			} else {
-+				bt_dev_err(data->hdev,
-+					   "SDS TLV: hw=0x%2.2x len=%u",
-+					   hw_variant, tlv_len);
-+			}
-+			break;
-+		case BTINTEL_PCIE_TLV_TYPE_ECL_MEM_ADDRESS:
-+			if (tlv_len < 8) {
-+				bt_dev_err(data->hdev,
-+					   "TLV %s too short: %u",
-+					   btintel_pcie_tlv_str(tlv->type),
-+					   tlv_len);
-+				break;
-+			}
-+			data->dump_info.ecl_addr_start =
-+				get_unaligned_le32(&tlv->val[0]);
-+			data->dump_info.ecl_addr_end =
-+				get_unaligned_le32(&tlv->val[4]);
-+			break;
-+		case BTINTEL_PCIE_TLV_TYPE_SMEM_ADDRESS:
-+			if (tlv_len < 8) {
-+				bt_dev_err(data->hdev,
-+					   "TLV %s too short: %u",
-+					   btintel_pcie_tlv_str(tlv->type),
-+					   tlv_len);
-+				break;
-+			}
-+			data->dump_info.smem_addr_start =
-+				get_unaligned_le32(&tlv->val[0]);
-+			data->dump_info.smem_addr_end =
-+				get_unaligned_le32(&tlv->val[4]);
-+			break;
-+		default:
-+			bt_dev_dbg(data->hdev,
-+				   "Unknown TLV type: %u length: %u",
-+				   tlv->type, tlv_len);
-+			break;
-+		}
-+
-+		/* Move to next TLV */
-+		ptr += tlv_total;
-+		remaining -= tlv_total;
-+	}
-+
-+	bt_dev_info(data->hdev,
-+		   "exception_dump: addr:0x%08x len:0x%08x",
-+		   data->dump_info.exception_dump_addr,
-+		   data->dump_info.exception_dump_len);
-+	bt_dev_info(data->hdev,
-+		   "dccm: start:0x%08x end:0x%08x",
-+		   data->dump_info.dccm_addr_start,
-+		   data->dump_info.dccm_addr_end);
-+	bt_dev_info(data->hdev,
-+		   "sds_fixed_rom: start:0x%08x end:0x%08x",
-+		   data->dump_info.sds_fixed_rom_addr_start,
-+		   data->dump_info.sds_fixed_rom_addr_end);
-+	bt_dev_info(data->hdev,
-+		   "sds: start:0x%08x end:0x%08x",
-+		   data->dump_info.sds_start_addr_start,
-+		   data->dump_info.sds_start_addr_end);
-+	bt_dev_info(data->hdev,
-+		   "sds_iosf: start:0x%08x end:0x%08x",
-+		   data->dump_info.sds_iosf_data_addr_start,
-+		   data->dump_info.sds_iosf_data_addr_end);
-+	bt_dev_info(data->hdev,
-+		   "ecl: start:0x%08x end:0x%08x",
-+		   data->dump_info.ecl_addr_start,
-+		   data->dump_info.ecl_addr_end);
-+	bt_dev_info(data->hdev,
-+		   "smem: start:0x%08x end:0x%08x",
-+		   data->dump_info.smem_addr_start,
-+		   data->dump_info.smem_addr_end);
-+
-+	vfree(buffer);
-+	return 0;
-+
-+exit_on_error:
-+	vfree(buffer);
-+	return err;
-+}
-+
- static void btintel_pcie_msix_gp1_handler(struct btintel_pcie_data *data)
- {
--	bt_dev_err(data->hdev, "Received gp1 mailbox interrupt");
--	btintel_pcie_dump_debug_registers(data->hdev);
-+	bool target_access = false;
-+	u32 addr = 0, size = 0;
-+
-+	/* Read the Mail box status and registers */
-+	data->mbox.mbox_status = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_STATUS_REG);
-+	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX1) {
-+		data->mbox.mbox1 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_1_REG);
-+		if (data->mbox.mbox1 ==
-+		    BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING) {
-+			bt_dev_info(data->hdev,
-+				    "mailbox for target access");
-+			target_access = true;
-+		}
-+	}
-+
-+	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX2) {
-+		data->mbox.mbox2 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_2_REG);
-+		if (target_access)
-+			addr = data->mbox.mbox2;
-+	}
-+
-+	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX3) {
-+		data->mbox.mbox3 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_3_REG);
-+		if (target_access)
-+			size = data->mbox.mbox3;
-+	}
-+
-+	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX4)
-+		data->mbox.mbox4 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_4_REG);
-+
-+	bt_dev_dbg(data->hdev,
-+		   "GP1: sts:0x%08x mb1:0x%08x mb2:0x%08x mb3:0x%08x mb4:0x%08x",
-+		   data->mbox.mbox_status, data->mbox.mbox1,
-+		   data->mbox.mbox2, data->mbox.mbox3,
-+		   data->mbox.mbox4);
-+
-+	if (target_access &&
-+	    !test_and_set_bit(BTINTEL_PCIE_MAIL_BOX_INTR,
-+				   &data->flags)) {
-+		WRITE_ONCE(data->debug_table_addr, addr);
-+		WRITE_ONCE(data->debug_table_size, size);
-+		if (!queue_work(data->dump_workqueue,
-+				&data->mbox_work))
-+			clear_bit(BTINTEL_PCIE_MAIL_BOX_INTR,
-+				  &data->flags);
-+	}
-+
-+	/* Mailbox is read, ack to FW */
-+	btintel_pcie_set_reg_bits(data,
-+				  BTINTEL_PCIE_CSR_IPC_DOORBELL_VEC_REG,
-+				  BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM);
- }
- 
- /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
-@@ -1287,7 +1565,8 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
- 
- static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
- {
--	int len, err, offset, pending;
-+	int err, offset, pending;
-+	u32 len;
- 	struct sk_buff *skb;
- 	u8 *buf, prefix[64];
- 	u32 addr, val;
-@@ -1307,23 +1586,27 @@ static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
- 		/* only from step B0 onwards */
- 		if (INTEL_CNVX_TOP_STEP(data->dmp_hdr.cnvi_top) != 0x01)
- 			return;
--		len = BTINTEL_PCIE_BLZR_HWEXP_SIZE; /* exception data length */
--		addr = BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR;
- 		break;
- 	case BTINTEL_CNVI_SCP:
--		len = BTINTEL_PCIE_SCP_HWEXP_SIZE;
--		addr = BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
--		break;
- 	case BTINTEL_CNVI_SCP2:
- 	case BTINTEL_CNVI_SCP2F:
--		len = BTINTEL_PCIE_SCP2_HWEXP_SIZE;
--		addr = BTINTEL_PCIE_SCP2_HWEXP_DMP_ADDR;
- 		break;
- 	default:
- 		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", data->dmp_hdr.cnvi_top);
- 		return;
  	}
  
-+	len = data->dump_info.exception_dump_len;
-+	addr = data->dump_info.exception_dump_addr;
+ 	/* Mailbox is read, ack to FW */
+@@ -1342,6 +1370,12 @@ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
+ 	if (submit_rx) {
+ 		btintel_pcie_reset_ia(data);
+ 		btintel_pcie_start_rx(data);
 +
-+	if (!addr || len < sizeof(__le32) || len > SZ_4K) {
-+		bt_dev_err(data->hdev, "Invalid exception address: 0x%8.8x or length: %u",
-+			   addr, len);
-+		return;
-+	}
-+
-+	len = ALIGN_DOWN(len, 4);
-+
- 	buf = kzalloc(len, GFP_KERNEL);
- 	if (!buf)
- 		goto exit_on_error;
-@@ -1576,6 +1859,20 @@ static void btintel_pcie_fwtrigger_worker(struct work_struct *work)
- 	clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags);
- }
- 
-+static void btintel_pcie_mbox_worker(struct work_struct *work)
-+{
-+	struct btintel_pcie_data *data = container_of(work,
-+					struct btintel_pcie_data, mbox_work);
-+
-+	if (!data->hdev)
-+		goto out;
-+
-+	btintel_parse_mbox_tlv(data);
-+out:
-+	/* Release guard last; matches set in gp1 handler. */
-+	clear_bit(BTINTEL_PCIE_MAIL_BOX_INTR, &data->flags);
-+}
-+
- static void btintel_pcie_rx_work(struct work_struct *work)
- {
- 	struct btintel_pcie_data *data = container_of(work,
-@@ -2380,6 +2677,7 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 		goto exit_error;
++		/* Complete the mbox<->alive handshake */
++		if (test_and_clear_bit(BTINTEL_PCIE_MBOX_PARSE_PENDING, &data->flags)) {
++			set_bit(BTINTEL_PCIE_MBOX_PARSE_READY, &data->flags);
++			wake_up(&data->mbox_parse_wait_q);
++		}
  	}
  
-+	data->dmp_hdr.cnvi_bt = ver_tlv.cnvi_bt;
- 	switch (INTEL_HW_PLATFORM(ver_tlv.cnvi_bt)) {
- 	case 0x37:
- 		break;
-@@ -2432,10 +2730,9 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 	data->dmp_hdr.fw_timestamp = ver_tlv.timestamp;
- 	data->dmp_hdr.fw_build_type = ver_tlv.build_type;
- 	data->dmp_hdr.fw_build_num = ver_tlv.build_num;
--	data->dmp_hdr.cnvi_bt = ver_tlv.cnvi_bt;
+ 	if (signal_waitq) {
+@@ -3295,6 +3329,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	init_waitqueue_head(&data->tx_wait_q);
+ 	data->tx_wait_done = false;
  
- 	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
--		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
-+		data->dmp_hdr.fw_sha = ver_tlv.git_sha1;
- 
- 	err = btintel_pcie_get_debug_info_addr(hdev);
- 	if (err)
-@@ -2715,6 +3012,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	disable_work_sync(&data->coredump_work);
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
-+	disable_work_sync(&data->mbox_work);
- 
- 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
- 
-@@ -2739,6 +3037,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 		enable_work(&data->coredump_work);
- 		enable_work(&data->hwexp_work);
- 		enable_work(&data->fwtrigger_work);
-+		enable_work(&data->mbox_work);
- 	}
- 
- out:
-@@ -3012,6 +3311,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	INIT_WORK(&data->coredump_work, btintel_pcie_coredump_worker);
- 	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_worker);
- 	INIT_WORK(&data->fwtrigger_work, btintel_pcie_fwtrigger_worker);
-+	INIT_WORK(&data->mbox_work, btintel_pcie_mbox_worker);
- 
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
-@@ -3081,6 +3381,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	disable_work_sync(&data->coredump_work);
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
-+	disable_work_sync(&data->mbox_work);
- 
- 	/* Cancel pending reset work. Skip only when remove() is called from
- 	 * within the reset work itself (PLDR device_reprobe path) to avoid
++	init_waitqueue_head(&data->mbox_parse_wait_q);
++
+ 	data->workqueue = alloc_ordered_workqueue(KBUILD_MODNAME, WQ_HIGHPRI);
+ 	if (!data->workqueue)
+ 		return -ENOMEM;
 diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 749369b24031..5ceb2ba1276f 100644
+index 5ceb2ba1276f..5aff1dfa888f 100644
 --- a/drivers/bluetooth/btintel_pcie.h
 +++ b/drivers/bluetooth/btintel_pcie.h
-@@ -18,6 +18,7 @@
- #define BTINTEL_PCIE_CSR_CI_ADDR_LSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x118)
- #define BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x11C)
- #define BTINTEL_PCIE_CSR_IMG_RESPONSE_REG	(BTINTEL_PCIE_CSR_BASE + 0x12C)
-+#define BTINTEL_PCIE_CSR_IPC_DOORBELL_VEC_REG	(BTINTEL_PCIE_CSR_BASE + 0x130)
- #define BTINTEL_PCIE_CSR_MBOX_1_REG		(BTINTEL_PCIE_CSR_BASE + 0x170)
- #define BTINTEL_PCIE_CSR_MBOX_2_REG		(BTINTEL_PCIE_CSR_BASE + 0x174)
- #define BTINTEL_PCIE_CSR_MBOX_3_REG		(BTINTEL_PCIE_CSR_BASE + 0x178)
-@@ -52,6 +53,8 @@
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
- 
-+#define BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM	(BIT(4))
-+
- /* Registers for MSI-X */
- #define BTINTEL_PCIE_CSR_MSIX_BASE		(0x2000)
- #define BTINTEL_PCIE_CSR_MSIX_FH_INT_CAUSES	(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0800)
-@@ -121,7 +124,8 @@ enum {
- 	BTINTEL_PCIE_COREDUMP_INPROGRESS,
+@@ -125,7 +125,9 @@ enum {
  	BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
  	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
--	BTINTEL_PCIE_SETUP_DONE
-+	BTINTEL_PCIE_SETUP_DONE,
-+	BTINTEL_PCIE_MAIL_BOX_INTR
+ 	BTINTEL_PCIE_SETUP_DONE,
+-	BTINTEL_PCIE_MAIL_BOX_INTR
++	BTINTEL_PCIE_MAIL_BOX_INTR,
++	BTINTEL_PCIE_MBOX_PARSE_PENDING,
++	BTINTEL_PCIE_MBOX_PARSE_READY
  };
  
  enum btintel_pcie_tlv_type {
-@@ -153,6 +157,14 @@ enum btintel_pcie_reset_type {
- 	BTINTEL_PCIE_IOSF_PRR_PLDR = 1,
- };
+@@ -178,6 +180,7 @@ enum btintel_pcie_mbox_msg {
  
-+enum btintel_pcie_mbox_msg {
-+	BTINTEL_PCIE_NO_USE = 0,
-+	BTINTEL_PCIE_TOP_SILENT_RESET,
-+	BTINTEL_PCIE_SB_AUDIO_DEVICE_REPORT,
-+	BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING,
-+	BTINTEL_PCIE_LAST_MESSAGE = 4095
-+};
+ /* Default interrupt timeout in msec */
+ #define BTINTEL_DEFAULT_INTR_TIMEOUT_MS	3000
++#define BTINTEL_PCIE_MBOX_INTR_TIMEOUT_MS	500
+ 
+ #define BTINTEL_PCIE_DX_TRANSITION_MAX_RETRIES	3
+ 
+@@ -588,6 +591,11 @@ struct btintel_pcie_data {
+ 	u32	debug_table_size;
+ 	struct btintel_pcie_dump_mem_info	dump_info;
+ 	struct btintel_pcie_mbox	mbox;
 +
- #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
- 
- /* Minimum and Maximum number of MSI-X Vector
-@@ -198,6 +210,12 @@ enum {
- /* RBD buffer size mapping */
- #define BTINTEL_PCIE_RBD_SIZE_4K	0x04
- 
-+#define BTINTEL_PCIE_TLV_TYPE_EXCEPTION_DUMP_ADDRESS  0x04
-+#define BTINTEL_PCIE_TLV_TYPE_DCCM_MEM_ADDRESS        0x05
-+#define BTINTEL_PCIE_TLV_TYPE_SDS_MEM_ADDRESS         0x06
-+#define BTINTEL_PCIE_TLV_TYPE_ECL_MEM_ADDRESS         0x07
-+#define BTINTEL_PCIE_TLV_TYPE_SMEM_ADDRESS           0x08
-+
- /*
-  * Struct for Context Information (v2)
-  *
-@@ -424,6 +442,32 @@ struct btintel_pcie_dbgc {
- 	struct data_buf *bufs;
- };
- 
-+struct btintel_pcie_dump_mem_info {
-+	u32	exception_dump_addr;
-+	u32	exception_dump_len;
-+	u32	dccm_addr_start;
-+	u32	dccm_addr_end;
-+	u32	sds_fixed_rom_addr_start;
-+	u32	sds_fixed_rom_addr_end;
-+	u32	sds_start_addr_start;
-+	u32	sds_start_addr_end;
-+	u32	sds_iosf_data_addr_start;
-+	u32	sds_iosf_data_addr_end;
-+	u32	ecl_addr_start;
-+	u32	ecl_addr_end;
-+	u32	smem_addr_start;
-+	u32	smem_addr_end;
-+};
-+
-+struct btintel_pcie_mbox {
-+	u32 mbox_flags;
-+	u32 mbox_status;
-+	u32 mbox1;
-+	u32 mbox2;
-+	u32 mbox3;
-+	u32 mbox4;
-+};
-+
- struct btintel_pcie_dump_header {
- 	const char	*driver_name;
- 	u32		cnvi_top;
-@@ -431,7 +475,7 @@ struct btintel_pcie_dump_header {
- 	u16		fw_timestamp;
- 	u8		fw_build_type;
- 	u32		fw_build_num;
--	u32		fw_git_sha1;
-+	u32		fw_sha;
- 	u32		cnvi_bt;
- 	u32		write_ptr;
- 	u32		wrap_ctr;
-@@ -522,6 +566,7 @@ struct btintel_pcie_data {
- 	struct work_struct	coredump_work;
- 	struct work_struct	hwexp_work;
- 	struct work_struct	fwtrigger_work;
-+	struct work_struct	mbox_work;
- 
- 	struct dma_pool	*dma_pool;
- 	dma_addr_t	dma_p_addr;
-@@ -539,6 +584,10 @@ struct btintel_pcie_data {
- 	u8	pm_sx_event;
- 	u32	debug_evt_addr;
- 	u32	debug_evt_size;
-+	dma_addr_t	debug_table_addr;
-+	u32	debug_table_size;
-+	struct btintel_pcie_dump_mem_info	dump_info;
-+	struct btintel_pcie_mbox	mbox;
++	/* Wait queue for mbox_worker to wait for GP0 alive interrupt */
++	wait_queue_head_t	mbox_parse_wait_q;
++	/* Timestamp captured in GP1 handler when mbox interrupt is received */
++	ktime_t	mbox_intr_ts;
  };
  
  static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
