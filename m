@@ -1,90 +1,90 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C4241B8CE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8F5415F06
 	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 10:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786529052; cv=none; b=rWaNrfZaFw7KKCrCdAFQo8rigc6JSSLu/dXs0tbLVGFIvLnebbJxmbQvFsfhmYhh4DMvNyXUrQRO0IHnN84x+DVrx6sDL4YQN2oSkAf+12a6Me15UIIDn5pOp5G6SOs5WN6TF12VwqVIpJ+vvoDsbtDdeHGVoH0ZPYab9HcHofo=
+	t=1786529052; cv=none; b=qLI7MH9kvSyzUEdetCPkFE7av11XxrknW4KpwMbEZVyuZpx1fVb5GGsXQZHgwvvTkLouWnbkZPdrpgpNW1/UN5IU28XB9/1C8bSGnqoLga3r8GmEvGXcBKHmwed6Ju02ChtbVY/8JpTz1rg3xJQRvUXh1ExzS158Mn/S+qrsPqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786529052; c=relaxed/simple;
-	bh=gyTwQ0ejxxkmFHwUFKLrJjJi2H3AYoK8T416JE1a1fA=;
+	bh=SotYMnWvmxS18djRkfr2qL4Bi3xHqUJAqLIenNpjgBc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RwLeddI5Zyth0+BhBO+HgBA8dP7/2wkMw7EQ4poQ9UJmZjRQH+u9RMmHBffnJl5uVsbXOqwxu/uGRM9GZZVubdeKVC25kaBIPEhOb6CT+Rqu3qPRf+AWzd5rRzkBCHT7KYhH2FDIZDejTl5NFx7yU4O9/yWFzVb2f8Uceg8qNgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=fAwtD7Th; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Z/7zG3f9; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version; b=upkPU+jRqwNT2+7LM6mYYHbwXM26y/1AQzqX/CqtRCi+E+5CdhAdaQMtccG4FKvGr8H2laxW5cyByVE6gHE5SgHFwY+u9pmuE/KAGLmeU6PSNnwkgiIc+UAoG+C7bR3Wr2SKmfRodYmxxMCj2+qVm/E520QEstxhbGMpFJ2uzMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Fa9T6AhZ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kiNqZ0Or; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="fAwtD7Th";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Z/7zG3f9"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Fa9T6AhZ";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kiNqZ0Or"
 Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67C9fxH73997301
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 10:04:06 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67C9fsoG3997200
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 10:04:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=ucSe0D2k30+
-	9WNVw7YDCgzGxZL9JUGsorHKbxUbxgck=; b=fAwtD7Thpz+8g+qrdY6PXCEAM76
-	oGDw8VC3rCgEiNki1MXwkqVpriK5zcuzYdYSW/bS4MQaDTmAqbp/Dui5ZcF9KX+R
-	k1D5HlhFkUnTR0nh3Ejh3wvjFdXbKOevS2rxgJRaaTUILMnkViQQmaRuJUbbAsHh
-	E9SDH0fIDvWxAAREsHMP+hSnzK48YAVjcKLlgEa6xa8dRPYqqhHJvGkRt7HEjWyP
-	4uPMY7T9Nj/kJynvDXbYmx0Wt4U/nLTBB5UoK5JwDdzVJPzhm6bFo1VcSbYs0UnG
-	eIrS+gXkNZR01eplaSyPMlpqb7IvTcd6mnOt3oJYIMTe3CQbXnvrfEeqElw==
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g08j5k983-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=9whFL18iu2Q
+	rgfkT214m9uxc0VaKgk9y9t/ZTcYknEA=; b=Fa9T6AhZDv4fDVaYxQMfnzATxvb
+	0nT9KUjwTP1/YW/FY0jnsZUGhfinqPOh5xe7NqppApfb0u0pgZXxWMDv3sPVG+F0
+	dPRJnthLr6s1/A2GxQkKchWjd6w6/sYjUX0dU+ZY0QQOd6zsthIW7AXNuRYlvIcM
+	pvm66W3iq9H6gNEaNbVkavq8b3FcLghPN8tNopIgxWyutBCkjY1LRzLvkMNQ/5vM
+	Gh1YQfqrezzhGeVwc6LQJkJBBhZaMa/oXxmaWeEKYKerBr0OrslJtAmexSp/OIFk
+	ia2S4keNa1Ub07XseuqrOCNDwJ56ENYdtpM+/oQ09GDXVbVOx5+Lo6sM7yw==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g08j5k985-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 10:04:06 +0000 (GMT)
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cbb20f82a0eso748579a12.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 03:04:06 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 10:04:07 +0000 (GMT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ce8a76df2dso12311085ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 03:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=oss.qualcomm.com; s=google; t=1786529046; x=1787133846; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ucSe0D2k30+9WNVw7YDCgzGxZL9JUGsorHKbxUbxgck=;
-        b=Z/7zG3f9VnA813IMrr7kUctlr1PRIn4T3UQPqL6f0PPwHrvyTYCOmQDcm4we7no3sU
-         dRU2aAh+FTxGO06aI21hHRScLY4ap5+KHw6Hs9/BUGAF2cLmO3ScBD/TFt1tHk7gQHhm
-         y1id9NQ2wJkN9tHOB4YDKfryCcL13+2bkArsp4LmQlKsu5uTxd0fO9h/S+UwqM0wE9a/
-         Wm53XTBRyEWfI2mmlpyLqp52JlJ6bR0GPKO6FApKRPf6eeJ3nfTbLASobD/kF2lJPgBm
-         t7I/e6Smjd+sU0mM8OJmo3gGotz1vg+uyKBElRBsJrnST4wOp7PcHVhSAg1HtCvZFj4+
-         4DLg==
+        bh=9whFL18iu2QrgfkT214m9uxc0VaKgk9y9t/ZTcYknEA=;
+        b=kiNqZ0OrS1QPsduuqRnp9vjjXjbtEc1ISKOEfVJvOWTnkEzT8HAJ5i/2/DiHqPNTA+
+         4v0WU+QFgntPfD7AfOUsSDQjjLCqKpytJTx699Nvm4ennwLeduBzlAmxUAYSHF2MtPV7
+         4E+w3kBCc+DbCo02E+VFA9Q5z8CW9y6+df63Dl8aDOQLcpTaLoxH/Xr+JXXunIC0q4z1
+         sOYynJmoRT/Oqo/NLCxMsNzgAU5ChbvLGVlC3LlrVuB1XBIRHmH/wT7ux5+j1kKFYtOz
+         udGuDQpRKHTXqb7MsT+a0lq8F2SjdmaW9mGurQ5ABAbkdV0AcR1Nj6Cy4VQiki3kUKYL
+         HMTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1786529046; x=1787133846;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ucSe0D2k30+9WNVw7YDCgzGxZL9JUGsorHKbxUbxgck=;
-        b=nY3gFN/U61EslacdSWvpyzFQE5+3stO44HB+ac6WhfmyXrStNUjzwI0faeHnGQjiUC
-         xfK/7i746fGCM2VBAS8kOrib2L+mZi8aco8Z0L6e0XMlwZS3TATOPskTe50jSwkypPc8
-         2+Xeef3q7uFSH0YCOZsqdfY1eTn7g8ND3qxq5FEhmVZTK1pd4BVbDyYL3mtO+OELEkbv
-         DsMZNifaa5ZjXgmXpKxcehKOaiT55aw/OwTWhxBUdg2YMcNYm1xUonhDsmAHercT32V/
-         UiohaWJjoi/Mj4XOD9utS2MROx3PlEp2P6on/PD3cfnp44+kBrtXFUDj27Xm6OSdS8qz
-         m4Cg==
-X-Gm-Message-State: AOJu0Yw8k33ifoVvhgbHoyRcWhOBrLDsZoK0TzgqIlWKboMa/Ao1DLs2
-	O6HaPgZQcxGq24rAgyFc0xYrGogt8IsTCUU2gkyLPGo6wdVkkqJ2ayAgcCTuFJfdrtNDtYhJjFz
-	G8Jkzrz3JrZtwjKaDW8je8HEbVElUipTJ6kI30fKP8z5o7bJXy5vImjMFgcq6Bf7pCPvD3tS4zn
-	BIQV4=
-X-Gm-Gg: AR+sD12dkmDPasMPZL3FbAntBAfkeofGx0qEC4EF0yw6Y9kkk/Dm2HHsaVsqLL95lp3
-	CtjeH6GX2ilezw0BtXrpqC+RqGX3c0KySaSVwavt3LyhDoI+YZUt710tVJkwjVhMUd1rYFyPIeL
-	/F+ctnf8tc8Rc1Uomzn3BjOKtlJ6tHXzrJqtgh9qZnMGK+X8XA92RhyDAgLCSbjJpCeRtAdID/D
-	VCJSY3z+S0l0ZFt2z2JAgGj6CbgVSMUSRE9QEIwischQINJltCpdAL9VzlJm9yjqlhmUHRwRgBb
-	zosnhF9I4mJ2zRpGVbBUD7FFDyV4gBypqPTj9L0uFI47BTXLnnfNOhCBhqPpFEsbA2dTIljJr9s
-	m6wYcTC1wk1+5ito9b/HzrKlorlhfPQ==
-X-Received: by 2002:a05:6a20:430c:b0:3bf:735d:7fb8 with SMTP id adf61e73a8af0-3cc3f78eb2emr4032388637.27.1786529045970;
+        bh=9whFL18iu2QrgfkT214m9uxc0VaKgk9y9t/ZTcYknEA=;
+        b=hCqMauuFRnBRm1Ps8hrgoj5d9QYztRvizpl6ZP/GRbv19rr3N9y6i0jaFtFxIALFPR
+         gVn7ozzenvIYoSevAFSW1OJAJsIa0/rXboxbm6B5I4dojsbVHj2/y+zSncF3ady3CX6S
+         Y2yJ1db0Jw4rf779tlI6QqlqgxpRi8XeyWBBWlZDnmF4MVToSPE+s4rsathh/W9TcbGF
+         dgXUp9nVrBMrV0FBJnXCaCatbejhEOwjVNCuJauaf+AoU+AVDITSBMzMaeK2iO83Z9IS
+         LaaH5cSOXEGAJk+BhXxksf71qH9NWb7s4uPCNAVrDdij4cUv3t2toOGZxDuwvDI0h6sh
+         zt0w==
+X-Gm-Message-State: AOJu0YxJLvTYpz6RUd4R/R2UXz8vw02no033sMbvtKPDFI/0B451rxIW
+	8LlOu17ORa9BPyakSLJ2PRXwoevcNDGtu1il3sDkTrM7Vs3WQSrKvoRIBqKImcLOHFR7RnPXF0o
+	XN4cN3iKUOtY0xuMI0cQZSBY4MMo6wdA5uIj5vgWAXoI4G3LaAPR7f5Yc6GIjKifeVh0oPSnx1e
+	sCjcs=
+X-Gm-Gg: AR+sD13cQUa1HXTtW8SVEtXzopDV21PvBfBJd3GQHzfGS9+Sa+AMaJph+JxX6DgqRAy
+	hB3tnpCidYjnO4bXVceUy/4xAHJqnyUBcMSv9fvHPLEX7rzoc4ZJL8W9mQY+aeSbWpyr1bgAT45
+	fCtKhdx3SsgGhjdfoR/U6dNv1w0LoCqC+bLmZyNENb8XSNB/bQBy1RY9oZlCUr1OoAbNke9NS5d
+	3ti/hfwsr7L+Wh2qQeRKkgK2xMQtPXtNld+3flXom9yPliv6Z4Qk4QF/d6KMSh7DFsUYcR3usRj
+	DJbcSqDCvuE6mc+4OOtOnZymcoBMGG8/mmBhkP5eA0H9rGddZwV8AUUcf4FbFUBCzLKjn8PTqZJ
+	Bx0HkWAooBCr8wEwYtieyEwATJFqwVg==
+X-Received: by 2002:a05:6a20:6f06:b0:3c3:8aa8:6caf with SMTP id adf61e73a8af0-3cc3f772897mr4605799637.27.1786529046425;
+        Wed, 12 Aug 2026 03:04:06 -0700 (PDT)
+X-Received: by 2002:a05:6a20:6f06:b0:3c3:8aa8:6caf with SMTP id adf61e73a8af0-3cc3f772897mr4605743637.27.1786529045965;
         Wed, 12 Aug 2026 03:04:05 -0700 (PDT)
-X-Received: by 2002:a05:6a20:430c:b0:3bf:735d:7fb8 with SMTP id adf61e73a8af0-3cc3f78eb2emr4031701637.27.1786529040690;
-        Wed, 12 Aug 2026 03:04:00 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31cf628e2aasm11069961eec.14.2026.08.12.03.03.58
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31cf628e2aasm11069961eec.14.2026.08.12.03.04.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Aug 2026 03:04:00 -0700 (PDT)
+        Wed, 12 Aug 2026 03:04:05 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v2 1/5] doc: Add org.bluez.CSDistance1 documentation
-Date: Wed, 12 Aug 2026 15:33:41 +0530
-Message-Id: <20260812100345.2956271-2-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 2/5] doc: Add org.bluez.CSDistanceProvider documentation
+Date: Wed, 12 Aug 2026 15:33:42 +0530
+Message-Id: <20260812100345.2956271-3-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260812100345.2956271-1-naga.akella@oss.qualcomm.com>
 References: <20260812100345.2956271-1-naga.akella@oss.qualcomm.com>
@@ -95,24 +95,24 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDA4MCBTYWx0ZWRfX04mahHxqSo+o
- dqK3QbrK6xxwLMMpIX3cR/eFCFMBATa74qm4Pd58c12fre/noPIqBUhtxV4VSsGbR+syV0vvj+z
- rD54tMK2tDJ0pLGUGnwIASJQsqMe7NA=
-X-Authority-Analysis: v=2.4 cv=evHvCIpX c=1 sm=1 tr=0 ts=6a7c4516 cx=c_pps
- a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDA4MCBTYWx0ZWRfX2FqIG0b3eydI
+ Np557tJeHMv9tN3ELrhbce3vKsS7t1xjLUlBR/9ZYHFUDT8JQBIQDj8Vw8eL+bS3yipfiioyXXp
+ yTIycy3218nv8QmhpULMmEhv5rH9l+0=
+X-Authority-Analysis: v=2.4 cv=evHvCIpX c=1 sm=1 tr=0 ts=6a7c4517 cx=c_pps
+ a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=DD9ecsvMZrLkcSy-0BsA:9
- a=_Vgx9l1VpLgwpw_dHYaR:22
-X-Proofpoint-GUID: vui6Xgh1NYMQWG9778sC4IPWXL2hoMMm
-X-Proofpoint-ORIG-GUID: vui6Xgh1NYMQWG9778sC4IPWXL2hoMMm
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDA4MCBTYWx0ZWRfX+S2mazL5boxW
- CJ2Vh7hqjtJA/Aq0PV//jAcHIBhh51AaK4pKdvr2XbM38JIMaGxw9GarbGyqpqq0GdjiJUFSJsd
- p+1n6CMP2Iq9AOk8EA2NJyWtuBTqPChRd+Wc8DqRfDZXwW0JnVPCWma6LCYkZqevCscZGeeojHw
- McnEEnqbGs9bkMO/8M41gqsOlqgmT0y+8R3PuqI6qmYbz/iglpBpR7zr8Ed/dBKjNrC7CaQ3chC
- TdyZJ+pSm7OngsZWZQW6SJAVOv5gyj80e1LCeIZ37G+jluOalXKBO25Uej0YqJ6Gd1+Z+gFwyRl
- +eR/JQnDKzts/IOm6OHAK5dui6C+RguoYhLEHY02eK3Z5oZeEo6mQNd7YUkv2cNkE1Vj2M05o4r
- vJCB32OHin+zGX4PPuD2FVmb3pq51C5zDuDVcDGCSA1CgGsJlXQ1gZNhjyOHYhZTT8Lt6qyTpVu
- FYJufbTckpnUazcNKtQ==
+ a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=3kjGGT6clJRvNyKHSloA:9
+ a=uG9DUKGECoFWVXl0Dc02:22
+X-Proofpoint-GUID: 3qenm9MKfEvt9FKOUO9hoIxBc96PpWbT
+X-Proofpoint-ORIG-GUID: 3qenm9MKfEvt9FKOUO9hoIxBc96PpWbT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDA4MCBTYWx0ZWRfX32uU505Fxts5
+ Dkj2LZmPqMSlhfWwneOiLPpk38vxqwV1Eti/kwWgM8DKuo6X3NzHJwP+PF9BOC9iiJ8FUe+FTAD
+ 1gHIjwUGtx7gS/CJH3GomA8GZu9ZUv5vcvgNJ52SovkOXCwROxv+mHwlMkK8LMyop7YTAXGLn3r
+ 6rj1v/OqHLzsAjcfl+9JpqSlfd8Bwh4B5jRnhm6A6MqufbSSYnPlB6Ag/hnwc4kShCpDDBZnHP2
+ 7hMWzlDFOASmnzHxi4/rG0KNbkjsGZh4Gr4tciUxPQzP1IT7ryE3MtcATn6l6i8FtWIV1EWXbuE
+ vFrGaLhjaxVRrcFroLuwsk883g4PimD9npwM2TGSgHtbGWwdzw0k5dHF/gC5LjZKJUl+ADdXR+D
+ QAV9m5gdTa1ECanln1eas6LW9bLytMAsGsw0FJuOqqaG6/Rwj0PodQjUOe8V2ymgt7kvqcBVVKq
+ Apph4Tj7ejn/lQIH+0Q==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-12_03,2026-08-10_03,2025-10-01_01
@@ -123,63 +123,63 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
  definitions=main-2608120080
 
-Document the org.bluez.CSDistance1 interface, which
-exposes the DistanceMeters estimate computed by an
-external ranging provider registered via
-CSDistanceProviderManager.
+Document the org.bluez.CSDistanceProvider interface,
+implemented by external clients to expose per-device Channel Sounding
+distance estimates that BlueZ reflects onto the corresponding device
+object.
 ---
- Makefile.am                   |  9 +++++++--
- doc/org.bluez.CSDistance1.rst | 36 +++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+), 2 deletions(-)
- create mode 100644 doc/org.bluez.CSDistance1.rst
+ Makefile.am                          |  9 +++++---
+ doc/org.bluez.CSDistanceProvider.rst | 32 ++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 3 deletions(-)
+ create mode 100644 doc/org.bluez.CSDistanceProvider.rst
 
 diff --git a/Makefile.am b/Makefile.am
-index 19c468d3a..00b4ac2b1 100644
+index 00b4ac2b1..53bbfd0d2 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -405,7 +405,8 @@ man_MANS += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
- man_MANS += doc/org.bluez.ThermometerManager.5 \
+@@ -406,7 +406,8 @@ man_MANS += doc/org.bluez.ThermometerManager.5 \
  		doc/org.bluez.Thermometer.5 \
  		doc/org.bluez.ThermometerWatcher.5
--man_MANS += doc/org.bluez.ChannelSounding1.5
-+man_MANS += doc/org.bluez.ChannelSounding1.5 \
-+	    doc/org.bluez.CSDistance1.5
+ man_MANS += doc/org.bluez.ChannelSounding1.5 \
+-	    doc/org.bluez.CSDistance1.5
++	    doc/org.bluez.CSDistance1.5 \
++	    doc/org.bluez.CSDistanceProvider.5
  endif
  manual_pages += doc/bluetoothd.8
  manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 \
-@@ -446,7 +447,8 @@ manual_pages += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
- manual_pages += doc/org.bluez.ThermometerManager.5 \
+@@ -448,7 +449,8 @@ manual_pages += doc/org.bluez.ThermometerManager.5 \
  		doc/org.bluez.Thermometer.5 \
  		doc/org.bluez.ThermometerWatcher.5
--manual_pages += doc/org.bluez.ChannelSounding1.5
-+manual_pages += doc/org.bluez.ChannelSounding1.5 \
-+	        doc/org.bluez.CSDistance1.5
+ manual_pages += doc/org.bluez.ChannelSounding1.5 \
+-	        doc/org.bluez.CSDistance1.5
++	        doc/org.bluez.CSDistance1.5 \
++	        doc/org.bluez.CSDistanceProvider.5
  
  EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
  			src/main.conf profiles/network/network.conf \
-@@ -535,6 +537,9 @@ EXTRA_DIST += doc/org.bluez.ThermometerManager.rst \
- 	      doc/org.bluez.Thermometer.rst \
+@@ -538,7 +540,8 @@ EXTRA_DIST += doc/org.bluez.ThermometerManager.rst \
  	      doc/org.bluez.ThermometerWatcher.rst
  
-+EXTRA_DIST += doc/org.bluez.ChannelSounding1.rst \
-+	      doc/org.bluez.CSDistance1.rst
-+
+ EXTRA_DIST += doc/org.bluez.ChannelSounding1.rst \
+-	      doc/org.bluez.CSDistance1.rst
++	      doc/org.bluez.CSDistance1.rst \
++	      doc/org.bluez.CSDistanceProvider.rst
+ 
  EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
  		doc/pts-opp.txt
- 
-diff --git a/doc/org.bluez.CSDistance1.rst b/doc/org.bluez.CSDistance1.rst
+diff --git a/doc/org.bluez.CSDistanceProvider.rst b/doc/org.bluez.CSDistanceProvider.rst
 new file mode 100644
-index 000000000..6ee70596e
+index 000000000..2d57dc8bd
 --- /dev/null
-+++ b/doc/org.bluez.CSDistance1.rst
-@@ -0,0 +1,36 @@
-+======================
-+org.bluez.CSDistance1
-+======================
++++ b/doc/org.bluez.CSDistanceProvider.rst
+@@ -0,0 +1,32 @@
++============================
++org.bluez.CSDistanceProvider
++============================
 +
-+-----------------------------------------
-+BlueZ D-Bus CSDistance API documentation
-+-----------------------------------------
++------------------------------------------------
++BlueZ D-Bus CSDistanceProvider API documentation
++------------------------------------------------
 +
 +:Version: BlueZ
 +:Date: July 2026
@@ -189,25 +189,21 @@ index 000000000..6ee70596e
 +Interface
 +=========
 +
-+:Service:	org.bluez
-+:Interface:	org.bluez.CSDistance1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++:Service:	<client D-Bus address>
++:Interface:	org.bluez.CSDistanceProvider1
++:Object path:	{provider_root}/{unique distance object path}
 +
 +Properties
 +----------
 +
-+double DistanceMeters [readonly]
-+`````````````````````````````````
++Objects provided on this interface contain the same properties as
++**org.bluez.ChannelSounding1(5)** interface. Additionally, this interface
++needs to have the Device property indicating the object path of the
++device this distance estimate provides.
 +
-+Estimated distance to the remote device, in meters, as last computed
-+from Channel Sounding measurement data.
++object Device [readonly]
++````````````````````````
 +
-+Providers from **org.bluez.CSDistanceProvider(5)** compute
-+this value from the raw procedure data reported via the **ProcedureData**
-+signal on **org.bluez.ChannelSounding1(5)**, and report it back to
-+**bluetoothd(8)** for reflection here.
-+
-+This property emits ``PropertiesChanged`` whenever a new estimate is
-+reported.
++The object path of the device that this distance estimate applies to.
 -- 
 
