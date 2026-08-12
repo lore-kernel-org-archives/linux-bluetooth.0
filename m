@@ -1,262 +1,300 @@
-Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D27837206F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 08:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A078A41A504
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 09:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786524794; cv=none; b=m55QcmJ8JrIalmlReKUxjB2kaQn2uZjfxBB7C0AS2VW4OrrwEConGCD653J1h8zqF2Ph5d7mhCGDZGv5dXoRIEk4nCd+JHYg/wZ10IZOt+o54Cmar4r1hTuk0/xBtDepO6mSZ99jYJMFMs/3zGD3Z/V4HyYFcJjCiOcLV2PQGpw=
+	t=1786527958; cv=none; b=HwEfVE5sFjkKvy6oeb26nofM7wTpLl+JNjn4LjPrLvYwycUmgChdSfQrxbEOOT0BVrs7J0rbbFd2vEZd1EQOr9mw0XtEzL0cdLvfam+D1N0W/DQHC7lg++LFMmcqlV07lYec3CreTfv8NUvAh2EZjpGvmPXMk7uNxlUFSaSISnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786524794; c=relaxed/simple;
-	bh=ve5vcp9BJ2aa6KnM67ZBsnkb2sbX6EEgNUAFPLLP6vI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RmHIH2YHyV6zxpUuCPOOVQDTfuDUGAmxUibivOViZmgDbHBDkkiv96gR35JPkd5oYxIc6dR5dO2QoYF13GcjPOiAJNnqA6sVnqcwQ5ZibOIZf1tIULS7OFDj7O5Jba3oU02tEGVwyUdPKa+8Kd2ly4xY+eVZRENkGePp9pBgjmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=StYVJxHZ; arc=none smtp.client-ip=192.30.252.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1786527958; c=relaxed/simple;
+	bh=vOOMazdawpzHWDI+WEw+shGfRGbEKuETkGkE8he4UuI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UCQjTRj/KuL9sf3KCYLnTR71zFHFfLLVIV0RQKFqSqqXLL+K/zClMr1vZhDQ99ejFTDrSnmjtoI3uVOnEvUDSnGMfU+jCWaeCRJDYOha2l3LhVuRSQcOykGNwbVhLpD7P2txF1PYySYqqIUcENDLikn9wlvdat37oy2VoytibEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgK+Ew9P; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="StYVJxHZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786524792;
-	bh=JmbxY5lFsR9WIEaoE5/A5wkmm0OYYrEDofh14AGKB84=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=StYVJxHZF+nbr3B4Q6WGD6y2sPvsvsLFwfDi8CK5RNLLBJytQpIvkiKJQHlUK909Q
-	 QbI3MNOsbxppsyZVxC8qiQ4wRAgYA3G4KYdYZ2FzVtssZRYtXoeW/moG+obtEpzD2P
-	 QjT1HFGifb1HZyEH6QPgnoWs8e6KdtH987jTQePk=
-Received: from github.com (hubbernetes-node-895afa7.ash1-iad.github.net [10.59.92.25])
-	by smtp.github.com (Postfix) with ESMTPA id 6C17584121F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 01:53:12 -0700 (PDT)
-Date: Wed, 12 Aug 2026 01:53:12 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1144549/000000-7551c6@github.com>
-Subject: [bluez/bluez] 9e504d: unit: Add test for sdp_xml_parse_record()
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgK+Ew9P"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c05dcdf49so9169951cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2026 02:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786527955; x=1787132755; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tX+brUfdYt/szXj/fLFvOyvLOGhms4JHL8sqSNxbzLY=;
+        b=MgK+Ew9PGMPYFWC5wGmYPaLx6j7Gvl37w49liwT6fSc3lxyO0azMEm59bbBtaI3Lre
+         7IOaGfk5aAFwmWUbAwhdgcKat+ouJF2AWo2p6YV2KQfIHcM6PExUUOlvyw7g6Pihk5BM
+         E47Q9FtbJhV/k0P66OgsunqSXkkoZ1mDTGp3DB8IbXBnX7EHHxw5ycWeLFIcQIWuwYAm
+         w14Ml3FbFv/z2b1Zgfx2VBK93/9+DkgLHQasQFbMFStV3Hf6Uxr4GGu/ABe10fFNgjRs
+         ggA3dFbQJOjWNHGx7R+XX5g4vrnvMQhCZOfBfyK7md1ZToNcIC1tktCAubtzXzgyoIP2
+         t4Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786527955; x=1787132755;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=tX+brUfdYt/szXj/fLFvOyvLOGhms4JHL8sqSNxbzLY=;
+        b=II7lr4s2Ynz42AA8mlxxsT14aC7Oe5kFzrPJiNeTq+Rp8+yWPZhYou8nkWo4Dp9PXN
+         llnuDr3kCN+Z3/JypInr7WzHC1jTgIp8dcCTg3GBUJMmjRgYs2vRDmWL0tJ84tYenmXU
+         SkA3RMR77dsM/qXhtyJ2SQJYIRQIoRXoSBalfJNf7fjwxVnaKFwlyOQZKs86kjUatc58
+         xJzSbgHRaBFjpTDQxZyo9PqKu/96KntMFtZa966FeFFRA16dL7HYTs5tSUlOn5LQqQQy
+         1CNEAtxhQF9bHAamrXSq2AkGEveQ95L5XInA1vIFkVTeQjsYO+oKWK5GR1oWefy/ggDQ
+         wIWw==
+X-Gm-Message-State: AOJu0Yz+V5FA1byUGKJb+VligNP2oEp5YHQ4V6B/AE7eZdso2ZXUT3WA
+	g2DjCppn3yyVOA/XpvStI3T12QuDaJhYX47wfJ1wWvau+ife/xDGU4pm7zPYAg==
+X-Gm-Gg: AR+sD10tJirUyVvq+NKN+SbuG31MZ44QxXR3ZZ7vtPgy3TRXGPRGVsso8OIE6CSquQv
+	82aExwNSwkx0ajGAQ1J6/WCSakqr2PrUU7o6rq/7ph/O/Prja0IXBx9UTgqSpkH0DMQAMW3ik1L
+	7CH/Fyt9ukZXMh2UqaXDZjk8r5B27GbFShv0pJ91Y3quo9fFUmeeg83my5l89WftARmXdu7sCzG
+	tD40qjz/0xQL9sHK3TN0ajG2DeFcs98s0WXHz4facpg9za9VEz6/0cWxwt0QbCEwAueVvfwvBQd
+	iEe4A243jt5RCqcPTn74gPrORZXWQ8YxyNbKhC7wNXBIBuUZHio24DfXT3Y/qT9r7xXS1U4yXj/
+	LfeqNsjpropqjnhvGeZlFA0Sil25cFeElXJpNO8+8db/7MhI7ww0fds8VX+YOPbHV5iUnoh3zip
+	ZbUxHuSOx2gQ/wHJ6Q/yPxPEqXTOWCnDEEXOv+exTLLaTz526NPzvP+BQorY8NMU0pyeEkzXIU
+X-Received: by 2002:ac8:5845:0:b0:51c:1a11:75cf with SMTP id d75a77b69052e-52d646b8fd9mr26927581cf.7.1786527955418;
+        Wed, 12 Aug 2026 02:45:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.83.158.136])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90a6c395efbsm17751696d6.25.2026.08.12.02.45.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Aug 2026 02:45:54 -0700 (PDT)
+Message-ID: <6a7c40d2.7f7f1747.34939d.b987@mx.google.com>
+Date: Wed, 12 Aug 2026 02:45:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3883684940575870145=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: 3 SDP XML security fixes
+In-Reply-To: <20260812080410.2116906-2-hadess@hadess.net>
+References: <20260812080410.2116906-2-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3883684940575870145==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1144549
-  Home:   https://github.com/bluez/bluez
-  Commit: 9e504ddc8bdc34b9dcdf10982c69f7dcab5cea70
-      https://github.com/bluez/bluez/commit/9e504ddc8bdc34b9dcdf10982c69f7dcab5cea70
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M Makefile.am
-    A unit/sdp-xml/Bluetooth_HID-sdp_record.xml
-    A unit/sdp-xml/qt-SerialPortSDPRecord.xml
-    A unit/test-sdp-xml.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  unit: Add test for sdp_xml_parse_record()
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1144549
 
-This adds 2 example XML files from other repositories, under a fair use
-license exception.
+---Test result---
 
+Test Summary:
+CheckPatch                    FAIL      4.32 seconds
+GitLint                       FAIL      3.30 seconds
+BuildEll                      PASS      20.39 seconds
+BluezMake                     PASS      593.99 seconds
+MakeCheck                     PASS      19.11 seconds
+MakeDistcheck                 PASS      156.18 seconds
+CheckValgrind                 PASS      230.92 seconds
+CheckSmatch                   PASS      319.34 seconds
+bluezmakeextell               PASS      103.13 seconds
+IncrementalBuild              PASS      666.91 seconds
+ScanBuild                     PASS      994.86 seconds
 
-  Commit: 7074b7d01e015769651701d893983121b7425697
-      https://github.com/bluez/bluez/commit/7074b7d01e015769651701d893983121b7425697
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML
-
-When element_end() processes </attribute>, it frees ctx_data->stack_head
-and clears the stack even if parsing is still nested inside a parent
-container.
-
-If a crafted ServiceRecord places a nested <attribute> inside <sequence>,
-a later sibling scalar element such as <uint64> can become the new stack
-head. When the closing </sequence> is then processed, compute_seq_size()
-is reached without first validating that the current node is actually
-a sequence.
-
-sdp_data_t.val stores both scalar members such as uint64 and the
-dataseq pointer in the same union. As a result, attacker-controlled
-scalar data can be reinterpreted as a linked-list pointer and traversed
-until bluetoothd crashes.
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
-
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v4,2/9] sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#72: 
 Reported-by: Aisle Research
+
+WARNING:BAD_SIGN_OFF: Non-standard signature: Co-authored-by:
+#73: 
 Co-authored-by: Aisle Research
 
-
-  Commit: a94a2ccddc2aae7381a0c405e1e23c22aba1c19c
-      https://github.com/bluez/bluez/commit/a94a2ccddc2aae7381a0c405e1e23c22aba1c19c
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    A unit/sdp-xml/compute-seq-size-type-confusion.xml
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add test for sdp-xml type-confusion bug
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
-
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#73: 
 Co-authored-by: Aisle Research
 
+/github/workspace/src/patch/14745004.patch total: 2 errors, 1 warnings, 47 lines checked
 
-  Commit: 406953a2229a3a86f07d9c7925f9c0cf88809ef4
-      https://github.com/bluez/bluez/commit/406953a2229a3a86f07d9c7925f9c0cf88809ef4
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-  Changed paths:
-    M src/sdp-xml.c
+/github/workspace/src/patch/14745004.patch has style problems, please review.
 
-  Log Message:
-  -----------
-  sdp-xml: Fix memory leak when adding duplicate attributes
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-When sdp_attr_add() fails because an attribute is duplicated, don't
-unset its pointer in the parsing context data. As the attribute wasn't
-added to the record, the ownership of the attribute didn't get passed
-to the record either.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Don't set the pointer to NULL so it gets freed when cleaning up the
-context.
 
-Fixes those 2 ASan warnings:
-Direct leak of 48 byte(s) in 1 object(s) allocated from:
+[BlueZ,v4,3/9] unit: Add test for sdp-xml type-confusion bug
+WARNING:BAD_SIGN_OFF: Non-standard signature: Co-authored-by:
+#55: 
+Co-authored-by: Aisle Research
+
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#55: 
+Co-authored-by: Aisle Research
+
+/github/workspace/src/patch/14745007.patch total: 1 errors, 1 warnings, 24 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14745007.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v4,4/9] sdp-xml: Fix memory leak when adding duplicate attributes
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#64: 
     #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x562042b747f2 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:350
 
-Indirect leak of 2 byte(s) in 1 object(s) allocated from:
-    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x562042b74bd7 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:425
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
-
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#73: 
 Reported-by: Aisle Research
+
+WARNING:BAD_SIGN_OFF: Non-standard signature: Co-authored-by:
+#74: 
 Co-authored-by: Aisle Research
 
-
-  Commit: 0448df4549fbe82371d4b05ffd5f02b29ee170a6
-      https://github.com/bluez/bluez/commit/0448df4549fbe82371d4b05ffd5f02b29ee170a6
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    A unit/sdp-xml/duplicate-attribute.xml
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit: Add test for sdp-xml duplicate attribute bug
-
-See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
-
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#74: 
 Co-authored-by: Aisle Research
 
+/github/workspace/src/patch/14745005.patch total: 2 errors, 2 warnings, 12 lines checked
 
-  Commit: cd6432449149171235b1fb556a3b7db4cf3f31e2
-      https://github.com/bluez/bluez/commit/cd6432449149171235b1fb556a3b7db4cf3f31e2
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-  Changed paths:
-    M src/sdp-xml.c
+/github/workspace/src/patch/14745005.patch has style problems, please review.
 
-  Log Message:
-  -----------
-  sdp-xml: Optimise parsing large sequences
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-SDP sequences are stored as single-linked lists, so appending members
-to a sequence requires finding the tail of the list before the
-insertion.
-
-Finding the tail of the list always starts at the beginning of the list,
-so takes longer and longer as the list grows bigger.
-
-Keep track of the tail to avoid that problem. This cuts down the
-sequence_on_squared() test from around 3 to 4 seconds to less than
-0.1 seconds.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: 6f3ce91d1f7a3b79bbd2d25a68b53ea8b2da4fee
-      https://github.com/bluez/bluez/commit/6f3ce91d1f7a3b79bbd2d25a68b53ea8b2da4fee
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+[BlueZ,v4,5/9] unit: Add test for sdp-xml duplicate attribute bug
+WARNING:BAD_SIGN_OFF: Non-standard signature: Co-authored-by:
+#55: 
+Co-authored-by: Aisle Research
 
-  Changed paths:
-    M unit/test-sdp-xml.c
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
+#55: 
+Co-authored-by: Aisle Research
 
-  Log Message:
-  -----------
-  unit: Add test for slow element_end() append
+/github/workspace/src/patch/14745012.patch total: 1 errors, 1 warnings, 19 lines checked
 
-This uses 40k iterations as this takes a visible amount of time on a
-pretty fast desktop machine (3-4 secs on an i9 9900k).
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-See: https://github.com/bluez/bluez/security/advisories/GHSA-4p57-mrcv-r2jc
+/github/workspace/src/patch/14745012.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: 0aec92f6bec3ba46abe27e5dab87ba514d0e4555
-      https://github.com/bluez/bluez/commit/0aec92f6bec3ba46abe27e5dab87ba514d0e4555
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+[BlueZ,v4,6/9] sdp-xml: Optimise parsing large sequences
+WARNING:LONG_LINE: line length of 86 exceeds 80 columns
+#104: FILE: src/sdp-xml.c:631:
++			ctx_data->stack_head->next->tail = ctx_data->stack_head->data;
 
-  Changed paths:
-    M src/sdp-xml.c
+/github/workspace/src/patch/14745009.patch total: 0 errors, 1 warnings, 36 lines checked
 
-  Log Message:
-  -----------
-  sdp-xml: Fix stack overflow when converting large sequences to XML
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Don't make convert_raw_data_to_xml() call itself recursively X times
-if there are X elements in a sequence.
+/github/workspace/src/patch/14745009.patch has style problems, please review.
 
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v4,7/9] unit: Add test for slow element_end() append
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#86: FILE: unit/test-sdp-xml.c:85:
++	struct test_data *t = (struct test_data *) data;
++	parse_xml(t->s->str, t->s->len, TRUE);
+
+/github/workspace/src/patch/14745011.patch total: 0 errors, 1 warnings, 57 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14745011.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v4,8/9] sdp-xml: Fix stack overflow when converting large sequences to XML
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#59: 
 ==1684518==ERROR: AddressSanitizer: stack-overflow on address 0x7fff7fb40d98 (pc 0x7fbe1ee95c2b bp 0x7fff7fb41610 sp 0x7fff7fb40d70 T0)
-    #0 0x7fbe1ee95c2b in printf_common(void*, char const*, __va_list_tag*) (/lib64/libasan.so.8+0x95c2b) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #1 0x7fbe1eeb72d6 in vsnprintf (/lib64/libasan.so.8+0xb72d6) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #2 0x7fbe1eeb94f4 in snprintf (/lib64/libasan.so.8+0xb94f4) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
-    #3 0x000000401fc2 in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709
-    #4 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
-[...]
-    #246 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
 
-SUMMARY: AddressSanitizer: stack-overflow ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709 in convert_raw_data_to_xml
+ERROR:SPACING: space required after that ',' (ctx:VxV)
+#87: FILE: src/sdp-xml.c:688:
++		int indent_level,void *data,
+ 		                ^
 
+/github/workspace/src/patch/14745008.patch total: 1 errors, 1 warnings, 30 lines checked
 
-  Commit: 7551c6e5a358c33f8d8b8665fd0b5a9bd71f4309
-      https://github.com/bluez/bluez/commit/7551c6e5a358c33f8d8b8665fd0b5a9bd71f4309
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-12 (Wed, 12 Aug 2026)
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-  Changed paths:
-    M unit/test-sdp-xml.c
+/github/workspace/src/patch/14745008.patch has style problems, please review.
 
-  Log Message:
-  -----------
-  unit: Add convert_sdp_record_to_xml() to SDP XML testing
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-This tests SDP binary to XML conversion, including whether a fix for
-a stack overflow when dealing with large sequences, like in
-sequence_on_squared(), works correctly.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-Compare: https://github.com/bluez/bluez/compare/9e504ddc8bdc%5E...7551c6e5a358
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v4,2/9] sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+1: T1 Title exceeds max length (87>80): "[BlueZ,v4,2/9] sdp-xml: Fix crash caused by type confusion when parsing crafted SDP XML"
+[BlueZ,v4,4/9] sdp-xml: Fix memory leak when adding duplicate attributes
+
+13: B1 Line exceeds max length (113>80): "    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)"
+17: B1 Line exceeds max length (113>80): "    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)"
+[BlueZ,v4,8/9] sdp-xml: Fix stack overflow when converting large sequences to XML
+
+1: T1 Title exceeds max length (81>80): "[BlueZ,v4,8/9] sdp-xml: Fix stack overflow when converting large sequences to XML"
+8: B1 Line exceeds max length (135>80): "==1684518==ERROR: AddressSanitizer: stack-overflow on address 0x7fff7fb40d98 (pc 0x7fbe1ee95c2b bp 0x7fff7fb41610 sp 0x7fff7fb40d70 T0)"
+9: B1 Line exceeds max length (156>80): "    #0 0x7fbe1ee95c2b in printf_common(void*, char const*, __va_list_tag*) (/lib64/libasan.so.8+0x95c2b) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)"
+10: B1 Line exceeds max length (116>80): "    #1 0x7fbe1eeb72d6 in vsnprintf (/lib64/libasan.so.8+0xb72d6) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)"
+11: B1 Line exceeds max length (115>80): "    #2 0x7fbe1eeb94f4 in snprintf (/lib64/libasan.so.8+0xb94f4) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)"
+12: B1 Line exceeds max length (101>80): "    #3 0x000000401fc2 in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709"
+13: B1 Line exceeds max length (101>80): "    #4 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994"
+15: B1 Line exceeds max length (103>80): "    #246 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994"
+17: B1 Line exceeds max length (121>80): "SUMMARY: AddressSanitizer: stack-overflow ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709 in convert_raw_data_to_xml"
+
+
+https://github.com/bluez/bluez/pull/2396
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3883684940575870145==--
