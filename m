@@ -1,160 +1,169 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20EA36196E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 10:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D34F40BCB8;
+	Thu, 13 Aug 2026 10:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786617004; cv=none; b=fDpx1yYlzR40GtYZWOdxFDDIKuNBYjEYNpcCbFSwF1oGA6w0B9BAT7+zeKXesbwYFnGBA+NSZwNPC7H0E9uMgwIjK9HcHhYvZHxDQM4DpagnMq9sYWKIbtycwihMuDumGg2SriUWAcR3ZKwF9b189/9ODYuN3Ius9U/3Qc28vJs=
+	t=1786617502; cv=none; b=fHmKfY2svPyyxb1342z8ll+ePH7lIrENgJcgQw2lwzUX9Yjb49R92k/7SmftcixhTFcQTM/yCH8EsISLQwKeeFsexhS5QKuhEzzo4O4Na+0J9iRpHalCXa1MRCIdYyWFjwRIkVfPqdTX0uaCEwNZknHWI7MhvU0RquXgDmuPHeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786617004; c=relaxed/simple;
-	bh=sgk8b2sm7mGHkt84H2hPWLZup+Me5lkss4NUXE07jiI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ze3OHAbRwmCDRu17fV0dUhdM56pTb4YyP8+GCzeRXqB4YetQCdtm0VJsTUzJWNpRPjbWUumM6/+REZ8T3MDL3YoZZdZhvGznl9eCZc2QL6uEPv6/+1CRflRXMQg/z0JzHNQfWWoiagTBe1lLYnho30c4uAm0nFRj+seLmG3LpAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyISZdV1; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786617502; c=relaxed/simple;
+	bh=/kRVz1U3ZfegwFqQOxCUV4huwE7hKwGWipJrnzciWs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ObAq4XPDjRibphm6U9ZW8PkBHJN72zUwq+vAzbUvbpZ2KpQ2ROQNE9hegLGuhjCPC0kGFMwoibu+N+n6dbboGa9zQ9bvjAMvKQ+aqXqfzUOJey/TWFVEJsM4BEMxuWIJ5PpFUIzHvbtYcJUW9hd/bodCAANO8OvV+mrvX0GF+co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=jWn/3hu4; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyISZdV1"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2cedda2ce6fso12982455ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 03:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786617002; x=1787221802; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qABy3NzKtZZ4FQ9RKBwgV3JJvRT5jXMGJXsdqijvpl0=;
-        b=DyISZdV1/iLlbWn6hXn6W40G1gNe2MDFJUnlJ7/FCy/lfP+Idh2W3r8ZVod2NsZB6D
-         AcjKQLIJJrihiOEZMYH84OxDCktgHHRDHuBDXf2b5T5wUMop209dd9DkNZyCRGu8cvix
-         NvOUDbvuEJaXo1Hy1CFwGdRAiiNr8TcV0dMr5D5EAfkYKj9OJVho3S9PmFp021uFmDfh
-         D+O5zKjrwdUPLMmWd2t62QBmJamKDHlBPpL4/SINGE5Jsgx2WmuTBxWbpC6N/zIDN1Fi
-         85f5hNVyRPgAu4dfpamk/cH4Z0qEkRakmjwzfDIEqQmsSupQVYPOzH6siIT38l6Q0uhz
-         oYxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786617002; x=1787221802;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qABy3NzKtZZ4FQ9RKBwgV3JJvRT5jXMGJXsdqijvpl0=;
-        b=Lgo19iBq9mPbv/VFYOiQ9HIP8J6F5fcvdztpmAxr1aHC7c50LH2zwc7YDJ0ggQwe75
-         qcpSu9+xQieG5v3QxjDpRdUUVW/tXO9OeiiJ+Ny3uOXVgdmHkHlAyE1clyZlT5rTMOte
-         edBpe+5xOnBmkJwNeHVHC+A/5JijP4D2AWAdaPUzUou20vep+d8W8fv8iDWC8bDwtIcr
-         0Q7/RH5OGT4fbSOraZnXO/5bjbWqouEfFUAStUnS/KjPoVMFbCfh60svNoXJ4+20s+6w
-         yxk2KuQEPg4drqx6kIEcCmIJuc0crczc7uGW+3ttS5/DImKuIYwo/J27jDqFjbTxWPq9
-         aY3A==
-X-Gm-Message-State: AOJu0YxNlZO/LqpCCYmebqIC3UOV3dqz7jQWlJo9INmQOSjtx1K2UFuM
-	9EyBJBZIYt8vhIGeOySJW7Kxj6GJRdlU/Vd4IbAXiqfwixsMIBbPF/gA1he2jw==
-X-Gm-Gg: AR+sD11pL3sVrnMTEkrJNm6MiEu9g7+EkqVmMtwNM4rj0euWfniGE2C3oTBlK/khSe2
-	wBt65dSBIV3TvHzZfQEkITdHNU5KZ56lgtE0Vr3UZskvRazwxrUeJtjoAb4Sdapfvo7M4XtkCI1
-	3KjJ47l6esdtDH+yTekvdihX/BIB6no07FHeAc730zkAcQV09M3Cyrt54/iIfG4E0R6mkstvWZI
-	AuBYLyqDAAwQdgl7F5yEFzFu44B18QXzK2fqzUOK+VIsUWpEZilBTGnZ7n8plfx0iNm/zmejjIQ
-	hF6zIZNfb+tlMtJ8MxFgYVpSbDvYvwLxdd1OloTVmq2FQ5ahpRyPtzUCWJuNr5ujV6n/stZATEN
-	4fM+z93GTly65AcYK7UvZ3yi29KMR3GvO/ZEJnAeba2WXLyj4o1DWHiTJWfFXRnFDeAx1Mi1eUt
-	0ch2NIRZ4h9Q3RJUtGc9muxhsoB4eruZvYWDhok2KDziddQSCvaXK9+nEMZdPDG2nptYJLZw==
-X-Received: by 2002:a17:902:db0a:b0:2ca:53e9:1277 with SMTP id d9443c01a7336-2d37d57ca88mr47628475ad.1.1786617002004;
-        Thu, 13 Aug 2026 03:30:02 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.210.246])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d37c4e8098sm7239785ad.84.2026.08.13.03.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Aug 2026 03:30:01 -0700 (PDT)
-Message-ID: <6a7d9ca9.b7b4cce5.26c54a.2b76@mx.google.com>
-Date: Thu, 13 Aug 2026 03:30:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7449095623589692808=="
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="jWn/3hu4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1786617480;
+	bh=IQyLvqN9dDAYZi5DwkH4unuif92cEgEkNYcYTlgaVi4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=jWn/3hu47y0uMkxmQu+b0Jf/qX9+ZQKE9Y7dmt98Nx2WTp1gkEUXNhSgJRa6/Ml8U
+	 9q+cxgPgZzygmr6AdBm3LDd1CHnKuyUc6XEM059E8pxWV8Nw1BeMJzWvqL2HsNtIhj
+	 6twOhW/otx70i75jPwyJIcWHB/y9zQ+XuNt2wg8g=
+X-QQ-mid: esmtpgz14t1786617464t25468cec
+X-QQ-Originating-IP: 4ViZsiiWz4vdabz+VkSGy9T46sLW7qLzow5ufxtS/jo=
+Received: from PEN002676 ( [124.126.19.250])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 13 Aug 2026 18:37:35 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6107983473547452707
+EX-QQ-RecipientCnt: 7
+From: ZhaoJinming <zhaojinming@uniontech.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Kiran K <kiran.k@intel.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ZhaoJinming <zhaojinming@uniontech.com>
+Subject: [PATCH] Bluetooth: btintel_pcie: Fix array bounds check bugs
+Date: Thu, 13 Aug 2026 18:37:34 +0800
+Message-ID: <460316663D6D34ED+20260813103734.222955-1-zhaojinming@uniontech.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: adv_monitor: Fix buffer overflow caused by integer overflow
-In-Reply-To: <20260813091937.2600061-2-hadess@hadess.net>
-References: <20260813091937.2600061-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: Nm+M45NE9/e2H4astSyiSPH5eN/CK9jbMwaKLx8Fu4+K5MSJCKwha1Mf
+	k74z6rToLK3EyklLS4PBq7PFl123xifAsk3kQSJTv5qWfRhpqXWAw2zwSjd4MyxUcNztIb/
+	uPozU0p/XLet7ZF/i4BeSbexkhhh+3olXwbqEqUTnV1MMn3UJxJD7jtYYsVc/uaDpVBDM6p
+	xhS9OrQ6J56yiuY5PX53uZf2IwqkTfyz6ovEHxj+ppt7uBcj6Q/6YUBA56aWDDcJB8U9wMC
+	gHtraQzVR3E4xJFBWHAVE3U0YaDnAagdB3Ynxon/kDaRqWBrLc/XrrsustXgO5wsHR+i5Df
+	5Hv0dZ+idORDKreh8lIxjYLkwvj0qcOfOanE2nhpVI5nG/5WIKYhkI+qnSUYUwTE2WENMpY
+	ER20pcdE0UsFJBk0HHLez3V8FX5qSbuCW65W0o/2sxnYnRsx9gydydEBLvodo9CH1x5Hp4K
+	mZqWJKWVPyohDHRh+Xp96qAUuTtNsV7Rs6o1fC/rrdrZGF3pphw/fefCUiCHW64uW85Q/Xj
+	2oCRqLOm4iJj6b4UthioFZLjGO/YjnFEw3UcZV8vJiIr1tPnu3/jz2nkU3bkwC2Zs5yDOK/
+	z0ltyin1SmWZNqb/Y1SBnULLbERVPcjWa61D4KHpgzw2dc1r5r887UDnuQg996rmOKNgvKm
+	vIRbvvG504xPYzp2GXdd06Nv8R+W0b5varv/bod1sHTKxsL+WofgPrFOzDLidlGNyI6CP5f
+	QhyQ+Td+ioyEl8MBB9nVrzl+DaaeCz6czcnQyGu+IV62BQvW+Zc3AnjKILCC65sjWQBl/Yj
+	His6saO51qh9u3QuyV+jKU95D09Z+5icWRgMKdoaHH6DNGZFGwR9KVWjYTnVsfpEkfSpfNo
+	FhBRoosHK8iCnjmRXahxhYnMYXIe7DCgSq+Yqk7vufRHQvjxy5i1PJ05h3Tpl6+BiIDi4dz
+	dZBsqooGCOLH3J52ZSKY4U33qJTss1VN7uM0zzVCctv6oacdA4UcuFRxV4dlb3c3l2OKgFe
+	JVslGz5BSw72e4LhGCP0UPmn6giscyd5lCmPLt1g==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 
---===============7449095623589692808==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Fix four array bounds issues in the Intel BT PCIe driver:
 
-This is automated email and please do not reply to this email!
+1. btintel_pcie_send_sync(): bounds check for tfd_index uses '>' instead
+   of '>='.  When tfd_index == txq->count (32), the check passes and
+   btintel_pcie_prepare_tx() writes past the end of txq->tfds[] and
+   txq->bufs[].
 
-Dear submitter,
+2. btintel_pcie_submit_rx(): same off-by-one on frbd_index.  When
+   frbd_index == rxq->count (64), the check passes and
+   btintel_pcie_prepare_rx() writes past the end of rxq->frbds[] and
+   rxq->bufs[].
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1145281
+3. btintel_pcie_msix_tx_handle(): cr_tia (device-controlled, from
+   shared DMA memory) is used to index txq->urbd0s[] before any bounds
+   check, and the urbd0->tfd_index check uses '>' instead of '>='.
 
----Test result---
+4. btintel_pcie_msix_rx_handle(): cr_tia (device-controlled) indexes
+   rxq->urbd1s[] with no bounds check.  urbd1->frbd_tag is a 16-bit
+   device-controlled field (0-65535) used directly as an index into
+   rxq->bufs[] (64 elements).
 
-Test Summary:
-CheckPatch                    FAIL      0.85 seconds
-GitLint                       PASS      0.45 seconds
-BuildEll                      PASS      20.54 seconds
-BluezMake                     PASS      601.93 seconds
-CheckSmatch                   WARNING   325.33 seconds
-bluezmakeextell               PASS      102.25 seconds
-IncrementalBuild              PASS      609.37 seconds
-ScanBuild                     PASS      989.74 seconds
+Fix all four by correcting the comparison operators and adding explicit
+bounds checks on device-controlled indices before array access.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/2] adv_monitor: Fix buffer overflow caused by integer overflow
-ERROR:BAD_SIGN_OFF: Unrecognized email address: '@ax-nnlabs (for merged_pattern_send_add_pattern())'
-#76: 
-Reported-by: @ax-nnlabs (for merged_pattern_send_add_pattern())
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research (for merged_pattern_send_add_pattern_rssi())'
-#77: 
-Reported-by: Aisle Research (for merged_pattern_send_add_pattern_rssi())
-
-/github/workspace/src/patch/14747617.patch total: 2 errors, 0 warnings, 54 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14747617.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,2/2] adv_monitor: Ignore additional patterns past what's supported
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Aisle Research'
-#56: 
-Suggested-by: Aisle Research
-
-/github/workspace/src/patch/14747616.patch total: 1 errors, 0 warnings, 17 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14747616.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/adv_monitor.c: note: in included file:./src/shared/mgmt.h:95:25: error: redefinition of unsigned int enum mgmt_io_capabilitysrc/adv_monitor.c: note: in included file:./src/shared/mgmt.h:95:25: error: redefinition of unsigned int enum mgmt_io_capabilitysrc/adv_monitor.c: note: in included file:./src/shared/mgmt.h:95:25: error: redefinition of unsigned int enum mgmt_io_capabilitysrc/adv_monitor.c: note: in included file:./src/shared/mgmt.h:95:25: error: redefinition of unsigned int enum mgmt_io_capability
-
-
-https://github.com/bluez/bluez/pull/2398
-
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel_pcie.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 2b7231be5973..32cfa0f5af1c 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -401,7 +401,7 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
+ 
+ 	tfd_index = data->ia.tr_hia[BTINTEL_PCIE_TXQ_NUM];
+ 
+-	if (tfd_index > txq->count)
++	if (tfd_index >= txq->count)
+ 		return -ERANGE;
+ 
+ 	/* Firmware raises alive interrupt on HCI_OP_RESET or
+@@ -502,7 +502,7 @@ static int btintel_pcie_submit_rx(struct btintel_pcie_data *data)
+ 
+ 	frbd_index = data->ia.tr_hia[BTINTEL_PCIE_RXQ_NUM];
+ 
+-	if (frbd_index > rxq->count)
++	if (frbd_index >= rxq->count)
+ 		return -ERANGE;
+ 
+ 	/* Prepare for RX submit. It updates the FRBD with the address of DMA
+@@ -1094,12 +1094,15 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
+ 	txq = &data->txq;
+ 
+ 	while (cr_tia != cr_hia) {
++		if (cr_tia >= txq->count)
++			return;
++
+ 		data->tx_wait_done = true;
+ 		wake_up(&data->tx_wait_q);
+ 
+ 		urbd0 = &txq->urbd0s[cr_tia];
+ 
+-		if (urbd0->tfd_index > txq->count)
++		if (urbd0->tfd_index >= txq->count)
+ 			return;
+ 
+ 		cr_tia = (cr_tia + 1) % txq->count;
+@@ -1584,9 +1587,21 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+ 	 * process all received CDs in this interrupt.
+ 	 */
+ 	while (cr_tia != cr_hia) {
++		if (cr_tia >= rxq->count) {
++			bt_dev_err(hdev, "RXQ: invalid cr_tia %u (count %u)",
++				   cr_tia, rxq->count);
++			return;
++		}
++
+ 		urbd1 = &rxq->urbd1s[cr_tia];
+ 		ipc_print_urbd1(data->hdev, urbd1, cr_tia);
+ 
++		if (urbd1->frbd_tag >= rxq->count) {
++			bt_dev_err(hdev, "RXQ: invalid frbd_tag %u (count %u)",
++				   urbd1->frbd_tag, rxq->count);
++			return;
++		}
++
+ 		buf = &rxq->bufs[urbd1->frbd_tag];
+ 		if (!buf) {
+ 			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %d",
 
---===============7449095623589692808==--
+base-commit: 3d6d817622b0a9721e3cc404df3469171582be13
+-- 
+2.51.0
+
