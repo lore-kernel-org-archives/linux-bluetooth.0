@@ -1,107 +1,96 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627E547B41C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 13:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD239472F73
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 13:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786626466; cv=none; b=q3F5QQ1NEdHPTR/lPhcF5tGf5yytwWmfJyNw+/edx0luuL87edOZIKmMfWwTZ+koHAH3BTYMjuF6sCy1hQWOikOFP0YtVtLruj/mTjTsmNzdOTS4asigLIMnWkVxmv3rLWpKtL3oNN5JKRqKPSijbxXE27iP1eivnTY+hldD1NM=
+	t=1786627427; cv=none; b=RUsj+fvuSgh+tNHYbvmaPv6cCq0v3p+A61K+OJjq9nGzHMlm5KqJFwRAtwt95XQEbG9BpMqKYbIvWHViRLDY2BszDU1QgxWFxueWMqSvUqX2vb9aXbQwjEDW6KX/595wX5YgLRqa4IwMX420QG+MGKKx92CpRyPKSg/xRAnT5oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786626466; c=relaxed/simple;
-	bh=PgCkBg+SaqY2ck5/bBDSS+1DtbuO8coJDwswlb7aiy8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mYmDNqf6Tx7g9AKLZ2i6dHrus7gbAH7sOvnjeLkQyPfPw/LBYViPVLwe8oyPlCkvF2CP0/Mq4f1fNR5iyRfbQUQhC2CkUlx+CFWjXDf8cRzojt+Zdnk+ZnUCG8WuEovkCFVi39IxifOEANBp0+95ERwCmyls4/Xu9UWkCQHpK8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=EWcNec1z; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1786627427; c=relaxed/simple;
+	bh=OEyzqY1ehWdK4EpMuKknlyHXg5Txx69Ju077+bEeRNA=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RipnUNx3zbVEFrjfRUjM7vbOe5fxkK8c5R93PneeL3tNkXZ7AMz3VTTcnFXhSaLzRcgNAlfkfRRaKc2sBF5tbBXhmqIWkojl59jhnJon6XMcgtg8teOv0+SyBB6V76GWcpUq6O2/eHWZcXmkjz0uZpQBIZk6XkV4XzKBaJZKfbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCY/B7d2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="EWcNec1z"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4953de5be0aso15070595e9.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 06:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1786626463; x=1787231263; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=fMxauQa/lOA4/+kENFd3ICiTI2KeojXJKd2HkM4Rljc=;
-        b=EWcNec1zcJYAmde1PZCkNdU1cZKydSyQN+a3KKI+2CXow72LAXSvzDW9boxiz5zFuD
-         NxR4xD+SZwVHvLuTMvjcliRS6cyLgkOiB6Wvxag5oP6ao4UO8Z3qkQAHq2HR4w8mcsRB
-         UnvUFCczQDFg/vRwVAvZ9UT/AfBP5R56hGPlqnKywwMt3vS80DK68VN+NIhy5L8/Bt22
-         z7Q+aVqcr7vACoC6Qi5/95f9EEunmqUdu/s5lLuiAH1YouBsHmXzBQ3eY5mhro+kIGRw
-         XU5oaRv9eZGQnI96hNxUqQv/H3Eh+kUMkPG5iuuO6htwC5S5Re6gD8gZA0b2PEi6o89w
-         ewwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786626463; x=1787231263;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=fMxauQa/lOA4/+kENFd3ICiTI2KeojXJKd2HkM4Rljc=;
-        b=DGCO7PRvT9Sn3u25MemFwl+5cP/sJb94K/ycEzNAS1MMDsv0EOLXtEUaofXUMbcBXr
-         Th2NB4Aay/YI4eAcTEB5qGafNRa6fHdUTtfp6WSVdmYpxueGYEdnw0hyy88+MouKkWip
-         V6NVna6vXboTOtOzuu6/Hl1lg3TffSUZGu5J6J2dNaNnvS35P/NnK7XY9e35/pQZqU6v
-         oqE/ZQnu1YnVQjceHmiD5hYmpvjl+dd/MesUnYl1SmEARK27LUTFiS23kmGtWfyXykTn
-         2sqkwhqk+SkWGTtUjA+WxvbR7WdNxoycoPUcvhVOxhnbsHSWGS8TnRTelMlYXmGTWMI6
-         GSnA==
-X-Forwarded-Encrypted: i=1; AHgh+RpJGekz+SvG7kVR7F3UDnXg2fZ3w6FXyIHXoPf7EF9NAXBU6nV0JEEl3F1ymBHqvjMADdV/dNbLiIcZ7PB/XAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpCxdH6t2BRU8Mf8wm6CbKHz1bpSJeluVL1BolbNx24sZQjdwt
-	IRa/zGmeLqYttA2r0HhZeVWcHmulXm2fxs9saMBAR5kyPspJ+RXpAzzVRmGn2d8Q1bA=
-X-Gm-Gg: AR+sD12d8cUsNXEGtvU2RklVW1olqDizvtqhANxnySp+ucFWYgCJwlXiZNpRY8j5Xnk
-	tOifKo2uqYztUH40fc0OYPR9J69RUsSZdebb5BfUELjr8pUVBg5YVyqlF3+zmGIIG3jNkyMkuwg
-	q0K9Qpg1oax8WOI5ljnJLDOUycW9Up8ejMxjwIBFTl7ND0m2KUkFppTohsVWGmsfCOmlOZJOEcT
-	3Nxp8ruXWNYNjSOy7sg2qNBHjR6Vt1T6xeW2swMny47MFTz3pi98v2rQ6E+4eSq0sbj4kSjRzne
-	VkOttuAWUI77FT6apdS930syym2zRzajmngrVrWsJNOm84axqbkuGB2yZObxIsNfDlCqpUtuqph
-	tQ/jZsk1EQsfyj88gMYnxBO1E6nuTK7FNnSJ7i18r7y1Ayv2fO1BalpHptewvi1bggUaBIqC5tD
-	5TWT3e/GPN0+yDLaWuziObsoPYSP+hv3x/jq62LACMLL5aJQ95IPx7vxpnM+r58w==
-X-Received: by 2002:a05:600c:b99:b0:499:7a5e:4c3f with SMTP id 5b1f17b1804b1-4998215a94fmr60223455e9.1.1786626462572;
-        Thu, 13 Aug 2026 06:07:42 -0700 (PDT)
-Received: from linux ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49981abd6desm72030885e9.0.2026.08.13.06.07.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Aug 2026 06:07:42 -0700 (PDT)
-From: Marco Crivellari <marco.crivellari@suse.com>
-To: daniel@makrotopia.org
-Cc: andrew@lunn.ch,
-	dakr@kernel.org,
-	davem@davemloft.net,
-	driver-core@lists.linux.dev,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	horms@kernel.org,
-	johannes.goede@oss.qualcomm.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	miriam.rachel.korenblit@intel.com,
-	netdev@vger.kernel.org,
-	olteanv@gmail.com,
-	pabeni@redhat.com,
-	rafael@kernel.org,
-	Marco Crivellari <marco.crivellari@suse.com>
-Subject: Re: [RFC PATCH 1/4] driver core: add device_schedule_reprobe()
-Date: Thu, 13 Aug 2026 15:07:06 +0200
-Message-ID: <20260813130706.238544-1-marco.crivellari@suse.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <anpxXANMYTlOHbPo@makrotopia.org>
-References: <anpxXANMYTlOHbPo@makrotopia.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCY/B7d2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9713E1F01558
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 13:23:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786627425;
+	bh=OEyzqY1ehWdK4EpMuKknlyHXg5Txx69Ju077+bEeRNA=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=mCY/B7d2EVA7uya/uFwelIwP0X0tP0Mf2IGzL5AGHE4pivNrIVFnmXngvxGiTnXoO
+	 zaBKGzTAHT2z666GhuGiVBkI35y2tiWosVoebvtsBSWMDg7L2p8ZShZSaV2o5EtFpr
+	 xciyo7Ztx+/lT0XCurJFdRDBdyfvKnJWzPHKTZM5TLABM8Wh2WzIW+b/55mZL64g1m
+	 wdiHuOJdCAf0PJAiPovK1kfdJDTUEmi+ZWH+w/DyfofuKQUlQu18Gf52Vo2BtBKP5V
+	 3RRQ4EilG+uTjNnFe6WIVhRItgR8BQGcqGrX2bR9LbW9zBjJpMbyGGQevBAdDFRNrz
+	 B1wRWBmKa6PTQ==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-39c95395230so19865711fa.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 06:23:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rrc5weaCELFY4keMK9v6wY5ZW8OTv5F0cxV2icglG79K9/ZbMO0x2WnLsVXtJjmLElLMfqWg0FmfQHzNzNkIPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR0/uEu2IkZnTSBrBXpIJoPFE48BLc3/PA8lSLVvO22lVjEAK/
+	0dpgKWVDcdFGjsaSFGjIP6vlQNTswpKL3hPLiPPzj0UnIyawAYUk6yzC/FhdRLwqqfUmdyNvAio
+	mrt16C98QnA0OUGAPazJeyN91u2UyegvtJZFsYnwyGw==
+X-Received: by 2002:a05:651c:b07:b0:3a1:2b72:b992 with SMTP id
+ 38308e7fff4ca-3a12b72ba9fmr1886351fa.23.1786627424290; Thu, 13 Aug 2026
+ 06:23:44 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 13 Aug 2026 06:23:43 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 13 Aug 2026 06:23:43 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260720-monza-wireless-v5-3-69ec6743543c@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260720-monza-wireless-v5-0-69ec6743543c@oss.qualcomm.com> <20260720-monza-wireless-v5-3-69ec6743543c@oss.qualcomm.com>
+Date: Thu, 13 Aug 2026 06:23:43 -0700
+X-Gmail-Original-Message-ID: <CAMRc=Md6dL8uggf8OJH=tNzCewh7N0AVdVEs5qQreRM3GvcNng@mail.gmail.com>
+X-Gm-Features: AUfX_mx61ZVP34DETlpjsRwYgr3TOISCyOvMoQJeDq10_4_GoxNP6u95XH3-RVQ
+Message-ID: <CAMRc=Md6dL8uggf8OJH=tNzCewh7N0AVdVEs5qQreRM3GvcNng@mail.gmail.com>
+Subject: Re: [PATCH v5 03/11] power: sequencing: Add pwrseq_is_controllable() API
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+On Mon, 20 Jul 2026 10:04:05 +0200, Loic Poulain
+<loic.poulain@oss.qualcomm.com> said:
+> On some boards a power sequencing target has no host-controllable enable
+> for its function, for instance when the enable line is not wired up to a
+> GPIO and is hardwired to an always-on level. The pcie-m2 "uart" target is
+> one such example: when the M.2 connector does not route the W_DISABLE2#
+> signal to a host GPIO, its enable/disable are no-ops and the consumer
+> cannot gate the Bluetooth function at all or exclusively.
+>
+> Add a generic pwrseq_is_controllable() helper. It reports whether the
+> target's final unit provides a host-controllable dedicated power actuator.
+> The target can implement a new optional is_controllable() callback,
+> reporting whether that actuator is effective on this target (for example
+> depending on GPIO presence). If the target does not provide the callback,
+> it is assumed to be controllable.
+>
+> Note this only describes the target's own enable actuator. It does not
+> imply that a power-off reaches an electrical OFF state, since a target may
+> have multiple consumers. It also does not mean that power is uncontrolled
+> for the target's dependencies: those may still be gated on their own. And
+> it does not restrict consumers from calling pwrseq_power_off() either,
+> which remains valid to drop this consumer's vote on the (possibly shared)
+> resources and dependencies of the target.
+>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-> +	queue_delayed_work(system_unbound_wq, &rp->work,
-> +			   msecs_to_jiffies(delay_ms));
+I don't think it'll make v7.3 but:
 
-Please note that system_unbound_wq is deprecated. The new unbound
-workqueue is system_dfl_wq.
-
-
-Thanks!
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
