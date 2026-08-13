@@ -1,75 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7859934EF07
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 11:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E66437F314;
+	Thu, 13 Aug 2026 11:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786620670; cv=none; b=LQrGebBN6UEIv+8NoMkb32uxlqYolTqTGh66o1mCphnjU80DWfRVpxN4k8XIu/mgbamWZxeSrLDSuquAiKSTDTFR+FxP7w1DLzRtjo8d05WZWmq0/wFen8712YXMuSODca+mOsxw50bpm19Sy9iEUTDBF/j1JhsLpO+vGgxbNk0=
+	t=1786621169; cv=none; b=SDYcQMHCa5bPeGQF7W7ThgMiItcOjYqYsSdCd1pNE2SGlTsFO3l+ZEz94HdSbCW5lmkMRBzTVw1xbwTFM5jkmlxTg2t2AIITkCbJaqxz1ZE9U/qJS7zuscFRxvk/E0Oh+EjXen7adFBT0z5vouaKSK8H8kQP7XPc0UmY3FI1Rm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786620670; c=relaxed/simple;
-	bh=MIgBcgeCPCt0/E7baL45B3avIfqJSNWzzGyn+2JKIT4=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HaNu9nvAW2PAe8mg+cReg28LV3qy5hadrERyuS0AkYn0MG7q/d6s3HYpklEGyeLra3MRxkVtiNEJ3iAPtxueMGki4JJz1Wz+jiysoCrkOd4NpLbKUccbjr4nVvqe1ac04o5wpqG+34IURbSRVft+oEzkMfRTx/nJjifCXxrIPSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N170bCAE; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786621169; c=relaxed/simple;
+	bh=u2pv9J8nw47sNeMqVwPr4tJKoJalsZjJD+z9MD5GOFg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=ffndHRenNExt0uHnV/AI9oOlgUwsHVPREsFl11V0iZn86AEsRss7G2R4yi5ZtDNN3PuMuOaJj0fcmjriHaQsglay0AH/J5kmNp7wUGGMfwX+N2B/M63+IGtNGectS7FZHPk1AOBONUeRmYY9Q3hXiopfqB68TzlJgxAdSztF9QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Q1bWgZII; arc=none smtp.client-ip=162.62.58.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N170bCAE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFCF41F00A3D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 11:31:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786620668;
-	bh=MIgBcgeCPCt0/E7baL45B3avIfqJSNWzzGyn+2JKIT4=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=N170bCAEoPmKVRCqVi7p43hphL+5Lc+pTZdSOukLcmObH62k3XD8Jh45etky31Yt5
-	 1OqCWZjfiFmbhA03SOHGxIFRYEMzROh9fXTgbQGxwKLFrTrawcmvHSQ/FhwOduc+zg
-	 i/isVWt7CFRHeAldEoNitfw24OIEkAr6uxIB23iWTWWZRDkRwEyM778Uyr2LgWUewb
-	 XUTEy7NFZP91ePkvRqQfntFdCMBXsomvdd1bV+oqaMmVFAUQJMyCBxHhvEKGjq6H6/
-	 Z36VZmSDI9LTTixpNWp/uqx2LeNQP24h0qP+k7AwGdtf574UIYfztPNuaX6PXhSwfk
-	 BeNuP4wMBsTLQ==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39db07589caso5209171fa.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2026 04:31:08 -0700 (PDT)
-X-Gm-Message-State: AOJu0YySwZ2+mrYXK/f0rN9LMRZezePdSNWKiTc+rSeiAWOpvzEJA4Ms
-	iRXp0VNdTSUKP78ZM8UB98z0xyGZJByCudYRagYS9sQ1NHxwUGhgVFu+TfS6uz18MU2HjKcC0jj
-	C1/vxKMvxCv3xcK8rMTnB/0WJB7qcktNivyWnJQJLfw==
-X-Received: by 2002:a05:651c:1986:b0:39a:da70:2c83 with SMTP id
- 38308e7fff4ca-3a11a52c79emr6890461fa.7.1786620667629; Thu, 13 Aug 2026
- 04:31:07 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 13 Aug 2026 06:31:05 -0500
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 13 Aug 2026 06:31:05 -0500
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <389052ce-6468-4968-98b0-c76ebc940db8@posteo.de>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Q1bWgZII"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1786621154; bh=VJ7rMVR58nGUE/0GwLtpRa0is1ObRAkjQvb9anXV1uU=;
+	h=From:To:Cc:Subject:Date;
+	b=Q1bWgZIIFuVDbqpfXocCs7sdvJuKddERiZ2TfFEXty2fokV0V2rM9nuPEIXGcPfaG
+	 8m0RA4zS8FkmrKySOysL2BQD5NKmCZZ3S6C2YsUclWSAkzjGPaOljM1PJZwLs6ohkl
+	 Yz+NI8Q7qzVfjyNrryx4q603LQbWPWxWBu/JgzCY=
+Received: from localhost.localdomain ([240e:452:ddba:7caa:95a3:f534:cc57:beeb])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id 9CA86CCE; Thu, 13 Aug 2026 19:39:10 +0800
+X-QQ-mid: xmsmtpt1786621150trgldhnoo
+Message-ID: <tencent_E5954D5C14D99713A73E3121B97EEDA6170A@qq.com>
+X-QQ-XMAILINFO: NcAdPGlpF/v/diuJkawnO0kZuTQeM0/JygEL6jx4N/D+CgnVl6SOugeWAzJvxK
+	 hO2830I77jRoi1KwQ18gx4BriTAfY83l4mP4Fgb5ys2VL9AQpEwlzErJq/IOJGTTX182Q2qbZh1X
+	 YsEWUDLeziZqLes3dZ9fkiPU6uVXgKEiPwZX26rmnBcd9PWIE7YZclqknTKi/WzkqqRQyhfMCvQK
+	 2arxyTU4+fgf0mdWsFj1mTKhtlGUN9PEYOiaqWZEWYnh9A59KsyDdf27Gt3UA59EE7qDODds17Vw
+	 BabY8HY9FDwX1gxLT4QwRX1HlzkA1Ucbq9xMRKR2h0TCMcFBag4Ep9dKHbThndmbay2ePwnHbkkB
+	 qTZ95iZl3rTkskeqyT/u0KwANNxeUi6O4KwL5RKQNbZ6T1/vPE57hZQNGJ2bdayPOOXCadl5UC5U
+	 zKFS4KInEFKyFsT2rduqL2FefpcsQ20Wl5f32gNZcChfqyqkXTDwDFyCbLHIMYlAK0p0Y+qEcb90
+	 hPetkzdf5JqZnDmTzn8mcHp2AAD6I9jkoLCnE2cgPhcHiTjoakOKCRFUZMgrn9Q9pZcmcC30H1gd
+	 s+JFvEFar3qivtJrmqFHxmts2JgZctIqkfhc0wRPVwWAeq7klMhFhOcvHkLMU6jrLS2EI8htf9mf
+	 8pQ2bRBN+XDwmvPXwHTmAC5D1tx5plUyDqXYXA/a/lhHrThlUKlCl/G+NLAxuk15SLPX/IAjwpdy
+	 UOsB16qQJMIxmH8gHP+lPu0F8Pl1RPWMwd9Qwpub7emVeTGT13YPwBbd4MiCI8rKsoCpqmkmAkF2
+	 oxdfBNw55AaCZkDc4d9RQjzy/Qx1gbPicfk3KcyjYanuz0gj4NcwIc3opmr4R7fGiP5F/sCuNksr
+	 bsGEPYVqxYCl38jtwrVfh68+7RfCsKmWXn+kyJET/8Q4UNwQx6J7cwW7YivLdfuhJi131NtvbIGY
+	 5coIM/m3dqxAmONAdL4oz2yD2MRvy/jvHaLmwpo2WOvtafEbGzhE2qHe67Jthytdn1U8WzdzvDW4
+	 0JhE8kRDfwOaGN87+B8YPbY+jyzmjnnPIqpptJVMOTCqs05RfA1/wfJsRpkXm0MwK3ylv5ElzlbI
+	 8PBpJWYOcLNCZnHECvEyg+PBMDRN4E2EB94s/KZ6az8Y9wfU4=
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+From: Hang Nan <2122295973@qq.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Hang Nan <2122295973@qq.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: ISO: fix use-after-free of listener socket in iso_conn_ready
+Date: Thu, 13 Aug 2026 19:39:09 +0800
+X-OQ-MSGID: <20260813113910.72336-1-2122295973@qq.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <28554782-1f3b-4537-b891-1c483a29e8c3@posteo.de>
- <CABBYNZ+3dd4qea4LZAXiEwD3MHkiK82y5S7RFE2EQzQx5jS+Rw@mail.gmail.com> <389052ce-6468-4968-98b0-c76ebc940db8@posteo.de>
-Date: Thu, 13 Aug 2026 06:31:05 -0500
-X-Gmail-Original-Message-ID: <CAMRc=Mfpo1JNEpwvVg2OOAb73oEuoXLo-FL94khfYLJjxN11mg@mail.gmail.com>
-X-Gm-Features: AUfX_myP8roE36N65xY_-xAdCGvsbBZY-c_c6lzZY-gtwnXHrc5TjhuYHc4JnNY
-Message-ID: <CAMRc=Mfpo1JNEpwvVg2OOAb73oEuoXLo-FL94khfYLJjxN11mg@mail.gmail.com>
-Subject: Re: [BUG] Bluetooth: WCN6855 10ab:9309 stops reporting ISO TX
- completions during BAP LC3
-To: Jonas Zunker <jonas-zunker@posteo.de>
-Cc: linux-bluetooth@vger.kernel.org, brgl@kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, 13 Aug 2026 09:39:53 +0200, Jonas Zunker <jonas-zunker@posteo.de> said:
-> Thanks, that makes sense.
->
-> CC'ing Bartosz since this looks like it may be related to the Qualcomm
-> Bluetooth driver or firmware.
->
->
+iso_conn_ready() looks up the BIS listener socket with iso_get_sock(),
+which takes a reference, and then, without re-checking its state,
+creates a child socket from it:
 
-Hi!
+    parent = iso_get_sock(hdev, ...);
+    if (!parent)
+        return;
 
-Thanks, Unfortunately I'll look at it in September at the earliest, as I'm OoO
-starting tomorrow.
+    lock_sock(parent);
+    sk = iso_sock_alloc(sock_net(parent), NULL, BTPROTO_ISO, ...);
+    ...
+    iso_chan_add(conn, sk, parent);
+    ...
+    release_sock(parent);
+    sock_put(parent);
 
-Bartosz
+If the listener socket is closed concurrently, between iso_get_sock()
+and lock_sock(), the reference taken by iso_get_sock() may be the last
+one: the close path drops the link-list reference, and once
+iso_conn_ready() drops its own reference at the end of the function the
+socket is freed.  The child socket, however, is already linked to the
+freed parent, and a later disconnect of the child runs iso_chan_del()
+-> bt_accept_unlink(), which dereferences the dangling parent pointer
+into the freed accept queue (a use-after-free).  The same dangling
+pointer is also dereferenced through parent->***() in
+iso_chan_del().
+
+Fix it the same way the connected (non-BIS) path was fixed in commit
+0d255e63fcf3 ("Bluetooth: ISO: hold sk properly in iso_conn_ready"):
+after taking the socket lock, re-check that the parent is still a
+listening, alive socket, and bail out otherwise.
+
+Fixes: ccf74f2390d60 ("Bluetooth: Add BTPROTO_ISO socket type")
+Cc: stable@vger.kernel.org
+
+Changes in v2:
+- Fix GitLint B3: replace hard tabs with spaces in the commit message
+  code snippet (no functional change)
+
+Signed-off-by: Hang Nan <2122295973@qq.com>
+---
+ net/bluetooth/iso.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index aa2ce78f56a2..069fc87a4e18 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2277,6 +2277,21 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 
+ 		lock_sock(parent);
+ 
++		/* The listener socket may have been closed concurrently
++		 * between iso_get_sock() and lock_sock(): the reference
++		 * taken by iso_get_sock() may be the last one, in which
++		 * case the socket is freed as soon as we drop it at the
++		 * end of this function.  Recheck that the parent is still
++		 * a valid, listening socket before creating a child
++		 * socket from it.
++		 */
++		if (parent->sk_state != BT_LISTEN ||
++		    sock_flag(parent, SOCK_ZAPPED)) {
++			release_sock(parent);
++			sock_put(parent);
++			return;
++		}
++
+ 		sk = iso_sock_alloc(sock_net(parent), NULL,
+ 				    BTPROTO_ISO, GFP_ATOMIC, 0);
+ 		if (!sk) {
+
