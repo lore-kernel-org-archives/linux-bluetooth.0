@@ -1,119 +1,188 @@
-Received: from sender-of-o57.zoho.eu (sender-of-o57.zoho.eu [136.143.169.57])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A1B453A34
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 08:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786696906; cv=pass; b=Xkb66DOJnxi5zxhIa55pHIKEiEUhfqPgYHQqj/PzRle0kd6SCNlrDnbHAqzQBDn1C7uOfuepnnlolGJ9MEyanU0rCzmFcyfh5VmwcQ3rgVrEyjRyy94qsEN0ewfsZMRWukhXx/uKspa6vEG+GvUcRQut9yWk+ooKdbPBzDxeINg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786696906; c=relaxed/simple;
-	bh=I6KpaMh3qiJgmfjFABN4uNolYwPYwhn+9V3eQ9TA3g0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r/7HcSuHl8NQEJoCLJvas+Yrz1LZVljpOn0VXYTr2WInrHlFh0+DLHB1O17pfaYB4WG/Fo/SLpVBKFN+1yOc5enOGpmMcuhCzhfVsWyqH0+8Lt1Q7yzWQTD4YhR1njmbR75NmKW8HGr8LMZtnLnK/gyf7KvS+Y+rxKhIda3uhag=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=MqBOK9mn; arc=pass smtp.client-ip=136.143.169.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iusegentoo.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="MqBOK9mn"
-ARC-Seal: i=1; a=rsa-sha256; t=1786696883; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=RHgnc6K09oZV8JoVygN5RrrjYlpYvR2qCJF256BaM9za4WNt9RJzisrvdT7/eQXORYbzAQocjasWQwQFV+SDqmRS5ecBe1M6rfWOkzy4Sufv15VlY9+PaCDS1gYzu9Nm+qfPj5eD04yI86ajDC/2F1CLtyEZSQgaQH9MN+5cCkQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1786696883; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=F7oT5md6Zr92jsZEkNRblXbG/f3dZQSoNCqZS5xIqTI=; 
-	b=d2WVQxVojfJqPYRrGwgK5sR8Ec9FIBpImOaYFk2mC3tdo7FErTcFSntBrfVs3xbsAtVNaNxT7YCKNTPVG29nrLGDGcFu0XG1hRUSlQjltLHk1OQhApnZo/SWlh+cJ3+Uo6py5rmNqduHcM+xCgu6GuqzjjDVS5z2mKX01UgAkNs=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=iusegentoo.com;
-	spf=pass  smtp.mailfrom=ali@iusegentoo.com;
-	dmarc=pass header.from=<ali@iusegentoo.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786696883;
-	s=zmail; d=iusegentoo.com; i=ali@iusegentoo.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=F7oT5md6Zr92jsZEkNRblXbG/f3dZQSoNCqZS5xIqTI=;
-	b=MqBOK9mn3OyCiN5a5BW+aibgKtTXC1f3+i2HxVrQo567L6sy72R0jPgFCrcUDgks
-	vLs37RJj2I/MxUpLEkxqWjo4EOWmK7wIzwfWOL/tkQz53tolPjDI/SgqeflEv48Xlbr
-	vbhOMZEWuqJykBWF9jeCTf39u/JbId9zdIAMIBYA=
-Received: by mx.zoho.eu with SMTPS id 1786696880253596.5822836158649;
-	Fri, 14 Aug 2026 10:41:20 +0200 (CEST)
-From: Ali Ahmet Memis <ali@iusegentoo.com>
-To: neeraj.sanjaykale@nxp.com,
-	amitkumar.karwar@nxp.com,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: alex.zhou@nxp.com,
-	song.xue_1@nxp.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btnxpuart: Validate the FW dump header length
-Date: Fri, 14 Aug 2026 08:41:08 +0000
-Message-ID: <20260814084110.920879-1-ali@iusegentoo.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260814081221.913676-1-ali@iusegentoo.com>
-References: <20260814081221.913676-1-ali@iusegentoo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564DE42900D;
+	Fri, 14 Aug 2026 08:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786697242; cv=none; b=pKVgOb2nQQZ5unaZh2ZcVTRYoP9dHwEM1GB/Yjz5X52lZ14kQmrQYNrYffPUgOiLGz9gfO0+5o4dd4QmBoSr8SnXe+ikPK1s93gPO4xPpNZk5RqV4BUp/RcygZj5o4hUh+xmmdUPYr+ubK8YaFVtf82FWzvYawN6Q2dNImxPQ8E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786697242; c=relaxed/simple;
+	bh=oiXce4jUZHdnhnnSSMImustRKHT7d7yjF9oak4hI4jM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eaLtk8OLH1MlJquBCG6i7tLFq4kU/mG7+gzsQ9aVTK7PCYCI1myEe4teUi4Z+eIjkT8/pupkbevnYfLx6aG/3Mcm3VC2JmIkhHCIjIeqzj3RRckRKiEr3AIHEgPvPp70ibDzAGa+OuEHI7DkNvGrDX2VkjwX5PVs6OwxYo8AXx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 685E44C28871AD;
+	Fri, 14 Aug 2026 10:46:48 +0200 (CEST)
+Message-ID: <1217891c-bf57-4c1a-9963-27400f60a5cd@molgen.mpg.de>
+Date: Fri, 14 Aug 2026 10:46:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btintel_pcie: Fix array bounds check bugs
+To: Zhao Jinming <zhaojinming@uniontech.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Kiran K <kiran.k@intel.com>,
+ Tedd Ho-Jeong An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <460316663D6D34ED+20260813103734.222955-1-zhaojinming@uniontech.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <460316663D6D34ED+20260813103734.222955-1-zhaojinming@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-nxp_process_fw_dump() pulls the ACL header off the frame and then reads
-seq_num and buf_len from a struct nxp_fw_dump_hdr placed at skb->data,
-without checking that the ACL payload is long enough to contain it.
+Dear Zhao,
 
-h4_recv_buf() collects HCI_ACL_HDR_SIZE bytes of header followed by the
-number of payload bytes named in that header, so skb->len is 4 + dlen
-with dlen supplied by the controller and possibly smaller than the 8
-byte dump header, or zero. A short frame with connection handle 0xfff
-therefore reads both fields from beyond the received data.
 
-Beyond the read itself, buf_len is what terminates a dump: a value of
-zero makes the driver call hci_devcd_complete() and reset the
-controller, so a truncated frame can end a dump early.
+Thank you for your patch. For the summary I’d use:
 
-Reject frames whose payload is shorter than the dump header.
+Bluetooth: btintel_pcie: Check array bounds of dev controlled indices
 
-Fixes: 998e447f443f ("Bluetooth: btnxpuart: Add support for HCI coredump feature")
-Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
----
-v2: Warn on the early exit path instead of dropping the frame silently,
-    as suggested by Neeraj. Dropped the trailing newline from the
-    suggested message, since bt_dev_warn() already appends one.
+Am 13.08.26 um 12:37 schrieb ZhaoJinming:
+> Fix four array bounds issues in the Intel BT PCIe driver:
+> 
+> 1. btintel_pcie_send_sync(): bounds check for tfd_index uses '>' instead
+>     of '>='.  When tfd_index == txq->count (32), the check passes and
+>     btintel_pcie_prepare_tx() writes past the end of txq->tfds[] and
+>     txq->bufs[].
+> 
+> 2. btintel_pcie_submit_rx(): same off-by-one on frbd_index.  When
+>     frbd_index == rxq->count (64), the check passes and
+>     btintel_pcie_prepare_rx() writes past the end of rxq->frbds[] and
+>     rxq->bufs[].
+> 
+> 3. btintel_pcie_msix_tx_handle(): cr_tia (device-controlled, from
+>     shared DMA memory) is used to index txq->urbd0s[] before any bounds
+>     check, and the urbd0->tfd_index check uses '>' instead of '>='.
+> 
+> 4. btintel_pcie_msix_rx_handle(): cr_tia (device-controlled) indexes
+>     rxq->urbd1s[] with no bounds check.  urbd1->frbd_tag is a 16-bit
+>     device-controlled field (0-65535) used directly as an index into
+>     rxq->bufs[] (64 elements).
 
-v1: https://lore.kernel.org/all/20260814081221.913676-1-ali@iusegentoo.com/
+Enumerating things in the commit message, is a good indicator to split 
+the commit into smaller ones.
 
- drivers/bluetooth/btnxpuart.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+> Fix all four by correcting the comparison operators and adding explicit
+> bounds checks on device-controlled indices before array access.
+> 
+> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+> Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
+> ---
+>   drivers/bluetooth/btintel_pcie.c | 21 ++++++++++++++++++---
+>   1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index 2b7231be5973..32cfa0f5af1c 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -401,7 +401,7 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
+>   
+>   	tfd_index = data->ia.tr_hia[BTINTEL_PCIE_TXQ_NUM];
+>   
+> -	if (tfd_index > txq->count)
+> +	if (tfd_index >= txq->count)
+>   		return -ERANGE;
+>   
+>   	/* Firmware raises alive interrupt on HCI_OP_RESET or
+> @@ -502,7 +502,7 @@ static int btintel_pcie_submit_rx(struct btintel_pcie_data *data)
+>   
+>   	frbd_index = data->ia.tr_hia[BTINTEL_PCIE_RXQ_NUM];
+>   
+> -	if (frbd_index > rxq->count)
+> +	if (frbd_index >= rxq->count)
+>   		return -ERANGE;
+>   
+>   	/* Prepare for RX submit. It updates the FRBD with the address of DMA
+> @@ -1094,12 +1094,15 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
+>   	txq = &data->txq;
+>   
+>   	while (cr_tia != cr_hia) {
+> +		if (cr_tia >= txq->count)
+> +			return;
+> +
+>   		data->tx_wait_done = true;
+>   		wake_up(&data->tx_wait_q);
+>   
+>   		urbd0 = &txq->urbd0s[cr_tia];
+>   
+> -		if (urbd0->tfd_index > txq->count)
+> +		if (urbd0->tfd_index >= txq->count)
+>   			return;
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 6a1cffe08d5f..f439d287146e 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -1370,10 +1370,19 @@ static int nxp_process_fw_dump(struct hci_dev *hdev, struct sk_buff *skb)
- 									  sizeof(*acl_hdr));
- 	struct nxp_fw_dump_hdr *fw_dump_hdr = (struct nxp_fw_dump_hdr *)skb->data;
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
--	__u16 seq_num = __le16_to_cpu(fw_dump_hdr->seq_num);
--	__u16 buf_len = __le16_to_cpu(fw_dump_hdr->buf_len);
-+	__u16 seq_num;
-+	__u16 buf_len;
- 	int err;
- 
-+	/* The ACL payload must be long enough to hold the FW dump header */
-+	if (skb->len < sizeof(*fw_dump_hdr)) {
-+		bt_dev_warn(hdev, "FW dump: invalid or corrupt fw dump chunk");
-+		goto free_skb;
-+	}
-+
-+	seq_num = __le16_to_cpu(fw_dump_hdr->seq_num);
-+	buf_len = __le16_to_cpu(fw_dump_hdr->buf_len);
-+
- 	if (seq_num == 0x0001) {
- 		if (test_and_set_bit(BTNXPUART_FW_DUMP_IN_PROGRESS, &nxpdev->tx_state)) {
- 			bt_dev_err(hdev, "FW dump already in progress");
--- 
-2.55.0
+gemini/gemini-3.1-pro-preview comments [1]:
 
+> If urbd0->tfd_index is invalid and we return early here, doesn't this permanently
+> stall the TX completion queue?
+> By returning early, cr_tia is never advanced. The next interrupt will process
+> the exact same corrupted descriptor and return early again.
+
+
+
+>   
+>   		cr_tia = (cr_tia + 1) % txq->count;
+> @@ -1584,9 +1587,21 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+>   	 * process all received CDs in this interrupt.
+>   	 */
+>   	while (cr_tia != cr_hia) {
+> +		if (cr_tia >= rxq->count) {
+> +			bt_dev_err(hdev, "RXQ: invalid cr_tia %u (count %u)",
+
+Maybe: RXQ: invalid cr_tia %u >= %u, contact device vendor
+
+> +				   cr_tia, rxq->count);
+> +			return;
+> +		}
+> +
+>   		urbd1 = &rxq->urbd1s[cr_tia];
+>   		ipc_print_urbd1(data->hdev, urbd1, cr_tia);
+>   
+> +		if (urbd1->frbd_tag >= rxq->count) {
+> +			bt_dev_err(hdev, "RXQ: invalid frbd_tag %u (count %u)",
+
+Ditto regarding the log message.
+
+> +				   urbd1->frbd_tag, rxq->count);
+> +			return;
+> +		}
+> +
+
+gemini/gemini-3.1-pro-preview comments [1]:
+
+> By returning early when urbd1->frbd_tag is invalid, we fail to advance cr_tia.
+> Will this permanently stall the RX completion queue since the next interrupt
+> will process the same corrupted descriptor?
+
+>   		buf = &rxq->bufs[urbd1->frbd_tag];
+
+gemini/gemini-3.1-pro-preview comments [1]:
+
+> Does this introduce a Time-of-Check to Time-of-Use (TOCTOU) vulnerability?
+> urbd1->frbd_tag is a bitfield inside a DMA-coherent structure. The code accesses
+> it once for the bounds check (above) and again here to index the array.
+> Can the compiler emit two separate memory reads, allowing the device to alter
+> the value after the check passes but before the array access?
+
+>   		if (!buf) {
+>   			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %d",
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://sashiko.dev/#/patchset/460316663D6D34ED%2B20260813103734.222955-1-zhaojinming%40uniontech.com
