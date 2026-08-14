@@ -1,94 +1,92 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934623469EE;
-	Fri, 14 Aug 2026 09:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6DC377AB6;
+	Fri, 14 Aug 2026 09:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786699772; cv=none; b=mvydSpR1lcfA45OPmUWo5WTOFAmDL7OCZ+J+tXVLF+OWadg7ddZEhVswMqBMa1kNs6wyNKKmmEuhQb7on4LBGAo12FKP6z82CBSNX3mGPtqWJVayz5cG+MPN5iqD1ncnWiSEjed/3R2x3QOSkAEl0ZBSsQzBzH7QhUzxY1kSdKM=
+	t=1786700239; cv=none; b=qfwPrttfaeugKz/HuogKbGXBubaFwsH/T9gfzWNNpdkeHCMS149lL+Anjt0LrDA3ME5RCrpe4ImOb22ZEZS3NDOk5C4EiGhyHdL1Ru5rECeTgI+mdnTbeKivIcbkF61pVbj9GoGJwE/uoHicdilhb5SmgcEKB9GU059z+jEpNHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786699772; c=relaxed/simple;
-	bh=BBUm2SdUKKNFFTsHjyEsFktq+fiAN+s0e+LPQ3vnIoU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bxK94Ar45Nup8RQxSC8SjfdL2cT/04llCuqbJl/treyi+heSfKzJs6vcY94m4v6zepUkOZebX80LXPbboiVNOa0R2cIQ57gDsTU71n/ZaP+UmpFSVEmZkBRo4ww2DajXmXiWVCm6RI/U8vc5HcNqYkLZbEAFcIR1rj5AIoRLSFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pkbVGOLw; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pkbVGOLw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=0J
-	LHZTe2EOR4+PpHpjRjpPfkYRKj6c1rp4X0nCAmFVU=; b=pkbVGOLwvutrEFrORF
-	ew6WzHcwV9f121JBTwRRiOH+/fKSu9jSF3lTrSq8gHI7cn20IrIBgKtsVxPPEkUF
-	dAGk+F0wX31AhhEYocQM1oHch5kSuoH9cAFr9u131Uh9PCrYD+m9WHN09hQJeLtN
-	VG3u2DLHT2PXS0aHReXRP8t0M=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD3CIDc335qQzYVPQ--.10550S2;
-	Fri, 14 Aug 2026 17:29:02 +0800 (CST)
-From: Gongwei Li <13875017792@163.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Kiran K <kiran.k@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gongwei Li <ligongwei@kylinos.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel_pcie: fix double free of IRQ in remove()
-Date: Fri, 14 Aug 2026 17:28:38 +0800
-Message-Id: <20260814092838.527062-1-13875017792@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1786700239; c=relaxed/simple;
+	bh=K/KaXCeoHfu/hBWvIMCEnINZxokCzjLOdlg+nxQgSuU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JAojU9UiyhoaAITWgLUrw/LK85z6abtd7+K+D//DZm7vE1A4IoAZVF3uAOaqmXKoBQsWOtHyuyXldXyIAVNgKKURV1pvaNppbOdADUg+4XWLwHhMx+BEp1naJYcNvj4S6ktOpLk4VL3IT0UFqwjfhe4lSDAWGEwVtk0O6Gkovos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 81DB44C28871AD;
+	Fri, 14 Aug 2026 11:36:59 +0200 (CEST)
+Message-ID: <080b7ab7-15ac-403f-9997-3dfb85c8efbf@molgen.mpg.de>
+Date: Fri, 14 Aug 2026 11:36:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3CIDc335qQzYVPQ--.10550S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CF1xZFyktrW7GrW7Kr4fGrg_yoW8WF43pa
-	98WFWFyrWkXr1UWwsrAa1fXFWUZayrurWfC3sFkw13Wr9xGryktF4rAFyjqr9xCrZYkF4Y
-	y3Z8tr95Gw1DXFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07joZXOUUUUU=
-X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/xtbC-h5pJGp+397ZyQAA3o
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btintel: Bound exception info print to the
+ received length
+To: Ali Ahmet Memis <ali@iusegentoo.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@intel.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260814080123.902388-1-ali@iusegentoo.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260814080123.902388-1-ali@iusegentoo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Gongwei Li <ligongwei@kylinos.cn>
+Dear Ali,
 
-The MSI-X IRQs are requested with devm_request_threaded_irq() in
-btintel_pcie_setup_irq(), but btintel_pcie_remove() releases them
-explicitly with free_irq() and then calls pci_free_irq_vectors().
 
-After .remove() returns, the driver core releases the remaining devm
-resources of the device, which calls free_irq() a second time on the
-vectors that were already freed and whose MSI-X interrupt domain has
-already been destroyed by pci_free_irq_vectors(), resulting in
-splats like:
+Thank you for your patch.
 
-  Trying to free already-free IRQ <n>
+Am 14.08.26 um 10:01 schrieb Ali Ahmet Memis:
+> btintel_hw_error() validates that the Intel exception info response is
+> exactly 13 bytes, and then prints the 12 bytes following the status byte
+> with a plain "%s". Nothing validates that those 12 bytes contain a NUL,
+> so the conversion can run past the end of the received response and into
+> whatever follows it in the skb.
+> 
+> Bound the conversion to the length that was actually received.
+> 
+> Fixes: 973bb97e5aee ("Bluetooth: btintel: Add generic function for handling hardware errors")
+> Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
+> ---
+>   drivers/bluetooth/btintel.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index bf567b7c5f00..4112f39f251f 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -288,7 +288,9 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+>   		goto unlock;
+>   	}
+>   
+> -	bt_dev_err(hdev, "Exception info %s", (char *)(skb->data + 1));
+> +	/* The exception info field is not guaranteed to be NUL terminated */
+> +	bt_dev_err(hdev, "Exception info %.*s", (int)(skb->len - 1),
+> +		   (char *)(skb->data + 1));
+>   
+>   	kfree_skb(skb);
 
-Fix this by using devm_free_irq(), which unregisters the devres
-entry and then frees the IRQ, keeping the free order introduced by
-the commit below intact: the IRQs are still released before
-pci_free_irq_vectors() and no double free happens on devm cleanup.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Fixes: 041677e7aad6 ("Bluetooth: btintel_pcie: Fix irq leak")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
----
- drivers/bluetooth/btintel_pcie.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 2b7231be5973..8fc4b8e3e4e1 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2966,7 +2966,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 		struct msix_entry *msix_entry;
- 
- 		msix_entry = &data->msix_entries[i];
--		free_irq(msix_entry->vector, msix_entry);
-+		devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry);
- 	}
- 
- 	pci_free_irq_vectors(pdev);
--- 
-2.25.1
+Kind regards,
 
+Paul
+
+
+PS: gemini/gemini-3.1-pro-preview found also other occurrences [1].
+
+
+[1]: 
+https://sashiko.dev/#/patchset/20260814080123.902388-1-ali%40iusegentoo.com
