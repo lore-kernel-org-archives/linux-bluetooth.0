@@ -1,202 +1,172 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013062.outbound.protection.outlook.com [52.101.72.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C309A3EDADC;
-	Fri, 14 Aug 2026 08:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786696412; cv=fail; b=lNurhD5kqfpkgGeBoF0SGpXK+C1V9Di5blsRXhSKEA7NsCPkjj99/EQ2AvuTsw0JrGbiH93eju6zIAD/DUTIE9xBPqY4fBRpJ02E5zehrVe99Ticnb73YIKL5AXcNwgH57nc6H0vg/TQjEB62faBDK8dYnsQTIA2/X2VawKsYKY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786696412; c=relaxed/simple;
-	bh=OBUfDkGu3yqlzaQt1hDHipUJhNzXAYrF7u9ITlUfLOg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nNfAcRXP3oLd8pu3fiifnTnhpU9kioooyezIYuK++N2i9xLLQK1TGhJuQzClpeGCb603/H6TuF8SloPmkXhUl9XhbySHnhJo09Mdw9b1CK3uhLsxBZyaT1jahS2Pm3enkk4kIT4K5h1J5Rdw72Q0cTIM3+mKxtPH2ZMeYtvCvS4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TAoFmzT/; arc=fail smtp.client-ip=52.101.72.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED183EC835
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 08:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786696642; cv=none; b=Gq/yjCFVt2b88Ba1txnSUqLPTqj9JcbLORw9dZTeWuipk8qDubHyRAft5Q76RuFU3qVkC4ymk2qI0+Jvw2wsAaNQKtTdlsBDshcq/UO/rqphVZ6X4eILzv1oT51xNnHxlwehnX2QROIGS2lEh8o6fVnZi8d0OxGYcPvgZYbDqdM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786696642; c=relaxed/simple;
+	bh=Gm7BZweBTzVzPzrmsvzXN09CqZ1PLIN8gIzO7MNVciY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Dpvt+W3cGfVJiepFTmr6FfKVfCNb6AdXq2ZDHQ6D32GidI288Y/hznyHfU2VL4P81v3D+oXMOj1f0vy3EotlJr3XfpG6muh616WlyjA7+Xcs9/l5iKBY4ub2ncbbpEeCzzHH5Gte1OniUKAZHP8XEGqFoCdZv5zyPAkj8Va5FCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AEOdYjq8; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TAoFmzT/"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MjS/LUMEXor5oxC5Shnuy46qyTLlix6GEcSA2Rf7gljYZDKekC+/8VqKR+8hKf7WpfS2mWuqz4cIgF3GBpjhhAIdxzhyoMgViKBdFlRsI6CAdrXMypZqUAQhLhY/aI1of/m10P5hsrVMikLJvjvhz+ds8Ly3oFwLUxNIH6hCVCEHM1hRM08IGhV/KRrkp6bFChh1b06f2OplSliRhe2zj1QtCDiwzzwuaMxFOfp6jNW7GUhXwio+aakIjQ2/ZWQSvJB1ej2O3G2Jb4qVHIpbI1t3JG4b9tWwSyoU08CkLJzuDBYLpdNs54CgFQkcqHtFsx1OSjBEDiNboxfC1Qn0Dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RZ+1XP3aMa9P3i15cFALaapvWJpwHn9KEAsLrKkjjZk=;
- b=oi/NjxYQF+uUhRyJ5eY/4X17r1WzhmOlxqu6KRVTYWEXg4MNGrHvfQtAT+ZmZkQZKgHml4WCoU96acCmqv8+s4KhaWYJ9DG3fFtdQ/l7uBatgLv79LuUH5EtITNFzZ4rhGX/WICMzoGigwks+QZVGusiMwaxRknIxgVcy/Zy8EZqEptelP7q1PcpbKltHeYY41yeX1SPaKTg2vU2NViQpgbqmb/iWyd3ZR4u4dr4zwD730BHsWdH2mlXbpCYNf4fNnlNJ4PRF9wFePAMEi1GXaxIfamP4Og6r3Xzk/5oqgYj42c7h7Jqr++6XGC7loaZkeMCb6CMys1YWxe0z4Rkrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RZ+1XP3aMa9P3i15cFALaapvWJpwHn9KEAsLrKkjjZk=;
- b=TAoFmzT/+ecXhPyenODDa93pzrCMB721IirKyle8fzIZsvbSDyYT9jNBDpnwZNNgtAzW5tpUiRFfKoSuv/BV9AOOAScKCTBF7IsKBnI8Zz4/MglGufb81bdb83cJNpz3VdyICyFG5dhFm2tK+XNpeuDqPpm48GdyvCV4S6LBX4G0HCV/p8olTLhn2MyVEaxDBfNHRfa8mdeLJ3Yr8YDHs1JKrY+OF5qCv/vJQnTMeqA2EjH6S1FnSCSWD3nUD2Dz8bYo5F8lpUmS4jFa31WUZUxNqdiulzxvFpVVyCIVJ6uWtKBl+RkJGKVp6lmmPkcLypO7GxpoAzbxJOO4GivMRQ==
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
- by AMCPR04MB12671.eurprd04.prod.outlook.com (2603:10a6:20b:770::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.14; Fri, 14 Aug
- 2026 08:33:11 +0000
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::9fb:29a:671a:cbe8]) by AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::9fb:29a:671a:cbe8%7]) with mapi id 15.21.0315.014; Fri, 14 Aug 2026
- 08:33:11 +0000
-From: Neeraj Kale <neeraj.sanjaykale@nxp.com>
-To: Ali Ahmet Memis <ali@iusegentoo.com>, Amitkumar Karwar
-	<amitkumar.karwar@nxp.com>, "marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, Alex Zhou <alex.zhou@nxp.com>,
-	Song Xue <song.xue_1@nxp.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btnxpuart: Validate the FW dump header length
-Thread-Topic: [PATCH] Bluetooth: btnxpuart: Validate the FW dump header length
-Thread-Index: AQHdK8eKa+4X99AG8kCia4nafaZMzw==
-Date: Fri, 14 Aug 2026 08:33:11 +0000
-Message-ID:
- <AS4PR04MB96922C991487A9E99C0A5714E7DA2@AS4PR04MB9692.eurprd04.prod.outlook.com>
-References: <20260814081221.913676-1-ali@iusegentoo.com>
-In-Reply-To: <20260814081221.913676-1-ali@iusegentoo.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_Enabled=True;MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_SiteId=686ea1d3-bc2b-4c6f-a92c-d99c5c301635;MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_SetDate=2026-08-14T08:31:03.0000000Z;MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_Name=NXP
- Confidential;MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_ContentBits=3;MSIP_Label_0d9c909a-577b-4ba2-96de-69ada94b137a_Method=Standard
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|AMCPR04MB12671:EE_
-x-ms-office365-filtering-correlation-id: a7b84655-a8bd-43f4-5f56-08def9dead24
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|366016|1800799024|19092799006|376014|56012099006|22082099003|18002099003|38070700021|10067099003|11063799006|6133799003;
-x-microsoft-antispam-message-info:
- 0ita/hj3Ug2oHxrRsSuje8GsLg9WqHBj4m0LMvU2wIkNUSIXpetZv4yvm4PA5AHxQyYghKqy2xha4uWh75yBm8EcH3F1uSDQYriBfnmb2MC0/3wLa+qya5xGfEgFjLbqT21nInUoyT4XmZcnBczQ6BfDwJbqNo3y8mQz+iU447o9y6WLEJYSliOmRNGMWZDfqP3ylE2XehTsLVffZCjdJu/nHVt898jXREen1EgpSJb9pp4EHWf7aPuVYjxsZN/TNRXOrY5ZxFjO5qzp+cNkxCPTmtf/TZqj/tgGbKR/dJ2zbemI+j7KXbxDxC209KE8XXjPBBJQKBChfnfY4N76mNlHm6DLyewMaW7v/B7vA4vga2sgVgVR4T6WVyhznuagJRjkjit1yZXP4BKlZUcmherhJZ7FashyiYOps1ZRDRjUy/UHim0ruDmSBFenMEYZ+IT8zQlDuL4nH59uaBMEDDpgXVSonL1/cN5P1hedH9XytCDxTEHYzgi00YONqb1+Os7ejEr2I1x6gkZSGYTlpnFpvfQMjzniIu9EyMCTQqAWoPe3HLbecF/kVlGHvh13LGyFSBtgLkQ0AVbeajaoCQloknPWwGitcLwkvdDTXstt1QFyJBiOuAiwbpxSvEgY7cn+zvvEz0yJiKV52NKOnKJI3OKrS/82x1j57YJEQjF2+AH9LfF8MGipea2M81giXj97SB9ffDJN1aNS+wEvSjxsA22Te86Ayj8tuNG9nfM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(19092799006)(376014)(56012099006)(22082099003)(18002099003)(38070700021)(10067099003)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?DSMIgiWRXCBE2FjXJS2h3WxyWtYyHEewH2vaBN5LfoFsA6J740eu1o+2TxLz?=
- =?us-ascii?Q?6ANlSVD1fsQR5BCBh7l5UEgfjg7c7SX/gK2W7ef7jowdGxWxWBfbuBm64kmC?=
- =?us-ascii?Q?G5/1CZn/caxmIE5acQvKDNLEZiuUkAPZnoFTb2gjsXIGofhQrxMNUZyqE7VT?=
- =?us-ascii?Q?tBR+q+anc3K+eXSM+SDqUDBA9grTwnj6EbsMvkqUJ8Karnbxx2A22CPNgLAE?=
- =?us-ascii?Q?aIj7bXKZqR/KYPdzU15Fh3ffKx/mYzh5ritEwy2QeWN9O8cZMRhUBHSxFtG/?=
- =?us-ascii?Q?MzjwDluX7BO9kDlaVECukbGXBKpoE+d6mQ+bOqhuAdGVp6dN61EM6iq55PP6?=
- =?us-ascii?Q?GgbnfD9kQ55FgXrPNmEkZrRDpSadVS6gmGi1Mr8o82dEgBUXzWVgSx82DvyK?=
- =?us-ascii?Q?m9ftxSXA0M6p3BjOF1Vf/Y4YTBTUIpQryMfmucb/uzi5g/dsEsOvw32/F1X9?=
- =?us-ascii?Q?0UYKvZHU4sDvksb8tpM8eP1q7quJI5VWcXoJQeokNeh5QMCd7mEYSw5xttQH?=
- =?us-ascii?Q?aMFiLk37Zp+S5I3dWz2FteGLrLrz91/AY3ShPaiK8Xjdj9Z6rncll0IQm5J/?=
- =?us-ascii?Q?e8DhooRKsMEpnZodDecRrjRxB1HfmKQpYqpo8GIUEx2xIcIXLJFeafa9gjCm?=
- =?us-ascii?Q?h9ScGh/g/2LcOEu33eN2KJs66v7Q38B/kZeX7ccS1ebWirEdCto7inU4YbuN?=
- =?us-ascii?Q?KUrwBLLCiq2vQ1fu9+E39fz32768du6DpraMzANNu12uCb9Mp2lMXBa7ARvF?=
- =?us-ascii?Q?aKaCCQNvt3tjniKO5ydl1pvaU5/I+YX2gJfroBUhdup575kxXlhlEtk03BCX?=
- =?us-ascii?Q?+sZK8Oj+8Tf6FygSOxAwhkpemeCvOVxXkfzFLc+WSBoMOdUt2GvkzkoYIfPJ?=
- =?us-ascii?Q?E5viRK2RNjfVcW2o9eQKI0R/JfpK9fzPm2j9dEpcJT8aGFKzPma7cBTEgfsi?=
- =?us-ascii?Q?xmlj3JVIVXu7dNvaWQhRECfMG6+WsdvbObTe1aw+f/bBBiArruFYRIaBR5WX?=
- =?us-ascii?Q?GhobVbXQ535nnCLUHcxMD8EHOE9/17sa2lfJCOBYI1sN1O8MS5GxcLCkAC8Y?=
- =?us-ascii?Q?kqquVMoMD53h2AW034Zx3M2ZHX4lbI3o2Yn49Zd7DZfKJj1cDH7J27P2JOdA?=
- =?us-ascii?Q?+52CqbYOK6cKZKafG+Fv1zRQTcGREorI92PIdENhRvfNExtYWeAPkZBXQ493?=
- =?us-ascii?Q?SGOaALNmYRlgFR4K1K9n9wCdeUAhMtAFw3JG7TpB/TCKiW+4U5Pdp9HGXU5c?=
- =?us-ascii?Q?+SE8/ho20xdxfPOkHH77asXVaZUH5vK4TRdFQkfFZdCIIDtT/iuCcnub5TcN?=
- =?us-ascii?Q?xdS0bfwNaNRCc9lW69x0ef8iEjHEzD9hGgpMzAhARZpFaGhJlFRXqyNTV68b?=
- =?us-ascii?Q?8kFXHMdU3oxGsLSaxzLDbACRqSe96XnI2tJJoFLxUttDXm44Ghyyu0vu2tgH?=
- =?us-ascii?Q?TsSUromvU36hI45yKDlWcwMpoa3EaAN1yD6yH7uIZk4o6Exb/VaxcaH7mPAn?=
- =?us-ascii?Q?Y/FqluDQXZsXll87gxmMmZrh/JDNSpNHAa5lI+PjbO2wr7hBcPrueYob8YYe?=
- =?us-ascii?Q?dR2nVikUFkA4KeVCJnxi0AeJXhv5DNy6A5bep69bHUMXKbQEOzoHULnc1EWw?=
- =?us-ascii?Q?hxORlahu3BGGaKbCrQl7/QuNh1eKvSxWe/dfl5b39LufxvYHJD+nbxPFKBHo?=
- =?us-ascii?Q?LLOflaJghw24WQwKSJi5EU2m2fhhi6g6JC0AasKXHm1AvVOSDULj+oRu/tgs?=
- =?us-ascii?Q?kENm3+d5BQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEOdYjq8"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-936cda0e3fbso63845585a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 01:37:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786696632; x=1787301432; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=hD57EtrVoeRFCqYfolwFy1DGq6G5+4Pj70zj8CVkyRw=;
+        b=AEOdYjq8l153O/Tvq2dWlyPUhhdilSHpAO116fY2aU9b48w8KyV1e41Y9hyoG4dXv6
+         hq+Cn7TN/FrIokEqrcJhYPjTTldpdpCH8uFWHFI7hOfz4TjwaWPxfBLHfhr9sr/W7kip
+         ZhnSIomgImwZXATAL2AVUF0MudlnMwLlYP7ShBinz2YN2JNgHIo7gmO3ZcvtXkffT2s+
+         iE+D8q7bf+GrRE5itS43L706q1G+sBoc+Ol8bRXCwHmE9TunnTNwpIEuTBmyiLHKeKPC
+         34vjmBiUiApTOZoCZ47ri5mNRCN8ZcOydWGJb/xj+c4psBOqD58+Cr1ZyrLjHRrc13LK
+         oX7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786696632; x=1787301432;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=hD57EtrVoeRFCqYfolwFy1DGq6G5+4Pj70zj8CVkyRw=;
+        b=sLEK9b4afyvjAPzS0xZhnqtimi8mnTW07gOq2W8QKOCrEiE2G00MsiPSH/mLi/jPiN
+         k094YBaUsQbY5UcD1cPUAtu3K80leO49a2R4v8MdPFy6N8ecr9vmUk5iloKxLHklFs7Z
+         yKXrkEJ1kn2pmCnscZA+0daMFtI82OsEfHDP0bbxqYUcLH3/UFMd5r2APAtUaUGAxCU/
+         4S5SSriHrrFA5DAfYeAkSiO5nCQz2ny4nlQ8N2KJDT0WgnVmXaXzliozgHToBS6lm/yX
+         k7POUGs6fFeayS20Ivm90Ukp8ln7grYyKC88jXoSCp48q+/uR9e7Pw+Sigu22jHFm007
+         1jgg==
+X-Gm-Message-State: AOJu0YxLXu8cYOHa9WMbIgJFGIanjwy8vNTdgraf1/uZnB6HmmgpyeWk
+	jdkLZxZGd95cZcODPdPQskD74rU7aRQH/xFq7k+EatZ1Z40/T90o0Gde34vUrw==
+X-Gm-Gg: AR+sD11DEs1ElQW1GZaFXEx/eq3KnynZ8gRtuHdROWFLMJXAAtashReCKmya2SDDgtk
+	riikgdSC1tGkxTsC5VwjyWMPjHYn0IJ8BnPMI3W8QYv5/yJ7UmVyrwL4yYJrN9nCfpOHynpeMRg
+	2PQsstEKxT5UzML+/B5jz68D115lwM7ee0D7tZKEMCGG95SNLjtNooY+q8QQ/lxV9DPsjjKlBzJ
+	oIRC9EA+Gnvh/fsWtxbmrVsuBlXwDmBucoD5R42o+c7wcEqdEJIGcLz1OPS99gsLHbk1sZREXul
+	bv8PlUk64pDz6U1xuzoOSfb4T0LCA7k9SGoTxg2YgrUprqjMPKHapYi53cvAw6pNrlzw4IiNdUN
+	dJTRj39Z+e+iF9pxeb+iT0eDaCmk5zq9D8j9r+FcLYZq4QAHik7KUebdfhXF1IrXy1W/W0IXP6R
+	bzh3kOCTAVXb890NcaAyuPkDhVBnjWhT0fzbnVZnMBsSKJ25RTe/uRQX3xm0GzOkulSEACdFeN
+X-Received: by 2002:a05:620a:3b15:b0:930:987c:c1da with SMTP id af79cd13be357-936d22c5b84mr289106985a.22.1786696632526;
+        Fri, 14 Aug 2026 01:37:12 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.95.162])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-936ce24564asm218821485a.40.2026.08.14.01.37.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Aug 2026 01:37:12 -0700 (PDT)
+Message-ID: <6a7ed3b8.0ea1c686.132cd9.5131@mx.google.com>
+Date: Fri, 14 Aug 2026 01:37:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6632028154175663154=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7b84655-a8bd-43f4-5f56-08def9dead24
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2026 08:33:11.5642
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wwlpzHEYoFWBjrhmIjA+7SXKopLJWjYfJNKHRzzIZ9naWtdCRhgMfmbOMZRfh/nBnT/ykTYVnd6fFLlbqAYw4lYjydyz1FFNR8RyZj2DvG8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMCPR04MB12671
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hildawu@realtek.com
+Subject: RE: [v6] Bluetooth: btrtl: Add firmware format v3 support
+In-Reply-To: <20260814065920.413487-1-hildawu@realtek.com>
+References: <20260814065920.413487-1-hildawu@realtek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Ali,
+--===============6632028154175663154==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thank you for the patch!
+This is automated email and please do not reply to this email!
 
-The fix looks correct. One minor suggestion: add a log message on the early=
--exit path so a truncated frame doesn't fail silently:
+Dear submitter,
 
-bt_dev_warn(hdev, "FW dump: invalid or corrupt fw dump chunk\n");
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1145861
 
-Thanks,
-Neeraj
+---Test result---
 
+Test Summary:
+CheckPatch                    FAIL      2.47 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       FAIL      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.44 seconds
+CheckAllWarning               PASS      28.92 seconds
+CheckSparse                   PASS      27.17 seconds
+BuildKernel32                 PASS      25.47 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      468.27 seconds
+IncrementalBuild              PASS      24.61 seconds
 
-> nxp_process_fw_dump() pulls the ACL header off the frame and then reads
-> seq_num and buf_len from a struct nxp_fw_dump_hdr placed at skb->data,
-> without checking that the ACL payload is long enough to contain it.
->
-> h4_recv_buf() collects HCI_ACL_HDR_SIZE bytes of header followed by the
-> number of payload bytes named in that header, so skb->len is 4 + dlen wit=
-h
-> dlen supplied by the controller and possibly smaller than the 8 byte dump
-> header, or zero. A short frame with connection handle 0xfff therefore rea=
-ds
-> both fields from beyond the received data.
->
-> Beyond the read itself, buf_len is what terminates a dump, a value of zer=
-o
-> makes the driver call hci_devcd_complete() and reset the controller, so a
-> truncated frame can end a dump early.
->
-> Reject frames whose payload is shorter than the dump header.
->
-> Fixes: 998e447f443f ("Bluetooth: btnxpuart: Add support for HCI coredump
-> feature")
-> Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
-> ---
->  drivers/bluetooth/btnxpuart.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
-c
-> index 6a1cffe08d5f..e540acdb784a 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -1370,10 +1370,17 @@ static int nxp_process_fw_dump(struct hci_dev
-> *hdev, struct sk_buff *skb)
->                                                                          =
- sizeof(*acl_hdr));
->         struct nxp_fw_dump_hdr *fw_dump_hdr =3D (struct nxp_fw_dump_hdr
-> *)skb->data;
->         struct btnxpuart_dev *nxpdev =3D hci_get_drvdata(hdev);
-> -       __u16 seq_num =3D __le16_to_cpu(fw_dump_hdr->seq_num);
-> -       __u16 buf_len =3D __le16_to_cpu(fw_dump_hdr->buf_len);
-> +       __u16 seq_num;
-> +       __u16 buf_len;
->         int err;
->
-> +       /* The ACL payload must be long enough to hold the FW dump header
-> */
-> +       if (skb->len < sizeof(*fw_dump_hdr))
-> +               goto free_skb;
-> +
-> +       seq_num =3D __le16_to_cpu(fw_dump_hdr->seq_num);
-> +       buf_len =3D __le16_to_cpu(fw_dump_hdr->buf_len);
-> +
->         if (seq_num =3D=3D 0x0001) {
->                 if (test_and_set_bit(BTNXPUART_FW_DUMP_IN_PROGRESS,
-> &nxpdev->tx_state)) {
->                         bt_dev_err(hdev, "FW dump already in progress");
-> --
-> 2.55.0
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v6] Bluetooth: btrtl: Add firmware format v3 support
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#803: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 1399 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14749594.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-NXP Confidential
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v6] Bluetooth: btrtl: Add firmware format v3 support
+
+21: B1 Line exceeds max length (85>80): "[    1.945295] Bluetooth: btrtl_read_chip_id() hci0: RTL: chip_id status=0x00 id=0x3e"
+22: B1 Line exceeds max length (116>80): "[    1.945547] Bluetooth: btrtl_initialize() hci0: RTL: examining hci_ver=0e hci_rev=000d lmp_ver=0e lmp_subver=8922"
+23: B1 Line exceeds max length (90>80): "[    1.945789] Bluetooth: rtl_read_rom_version() hci0: RTL: rom_version status=0 version=0"
+24: B1 Line exceeds max length (82>80): "[    1.946034] Bluetooth: btrtl_initialize() hci0: RTL: btrtl_initialize: key id 0"
+25: B1 Line exceeds max length (84>80): "[    1.946038] Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_fw.bin"
+26: B1 Line exceeds max length (88>80): "[    1.950522] Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_config.bin"
+28: B1 Line exceeds max length (113>80): "[    1.950844] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f000:00), chip id 62, cut 0x01, len 0000c704"
+29: B1 Line exceeds max length (85>80): "[    1.950862] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image version: c5900782"
+30: B1 Line exceeds max length (103>80): "[    1.950865] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f000.bin"
+31: B1 Line exceeds max length (113>80): "[    1.950882] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f002:00), chip id 62, cut 0x01, len 00034378"
+32: B1 Line exceeds max length (85>80): "[    1.950922] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image version: 2b84a8b2"
+33: B1 Line exceeds max length (103>80): "[    1.950925] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f002.bin"
+34: B1 Line exceeds max length (109>80): "[    1.951157] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f002.bin found"
+35: B1 Line exceeds max length (113>80): "[    1.951164] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f000:00), chip id 62, cut 0x01, len 0000c704"
+36: B1 Line exceeds max length (96>80): "[    1.951169] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip image, key_id mismatch (1, 0)"
+37: B1 Line exceeds max length (113>80): "[    1.951177] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f002:00), chip id 62, cut 0x01, len 00034378"
+38: B1 Line exceeds max length (96>80): "[    1.951179] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip image, key_id mismatch (1, 0)"
+39: B1 Line exceeds max length (113>80): "[    1.951181] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f000:00), chip id 62, cut 0x01, len 0000c704"
+40: B1 Line exceeds max length (96>80): "[    1.951184] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip image, key_id mismatch (2, 0)"
+41: B1 Line exceeds max length (113>80): "[    1.951185] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f002:00), chip id 62, cut 0x01, len 00034378"
+42: B1 Line exceeds max length (96>80): "[    1.951187] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip image, key_id mismatch (2, 0)"
+43: B1 Line exceeds max length (98>80): "[    1.951189] Bluetooth: rtlbt_parse_firmware_v3() hci0: RTL: image payload total len: 0x00040a7c"
+44: B1 Line exceeds max length (85>80): "[    2.429887] Bluetooth: rtl_finalize_download() hci0: RTL: Watchdog reset status 00"
+45: B1 Line exceeds max length (82>80): "[    2.430162] Bluetooth: rtl_finalize_download() hci0: RTL: fw version 0x2b84a8b2"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/579
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6632028154175663154==--
