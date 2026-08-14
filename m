@@ -1,102 +1,126 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D56B3009CB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 18:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786730501; cv=none; b=ZjxpD7kgQEo77P4Z4ngVI2s1jH6Lty/dJkLiczPQ4OrTyBF+tMYacDPgw3wlUZVcie2IyE+a916NwGAxTXPcxl8NFSbBxXeWnlTlTo1//nRQTBj+s4ZBxyuxHmK3pHQmIRqBFi1VrOoPgdNSElQ6FkmuPEpb2CqF43IvnZG1Aag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786730501; c=relaxed/simple;
-	bh=DgSYo1NCGQTdzAsT6Ma2dejB1MxlUSREwGiEv2rNj4A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RuTjYvZlWt5ZWGFve4AhQVXcsxWD3czYNO5MYvv39LgVM5T8hL88j+iggsZTO1u5kA3JLNDKNyKxGE7g+ThbTH8KmLNy+cZk+4ScZgnyW+5NebzGucn8odxNYX8N2UALrMyZWH2v5wf6pbtotDN+WXcG2nePm5EACJEuBBO+OiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TBDiOrHb; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F60E49252E;
+	Fri, 14 Aug 2026 18:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786732152; cv=pass; b=n0Ho0hx5yLsXCv3IzzLuRsxg6u8nxdS6SMIsiSji30eWjj8SK5ZSQ3z7sJOyWBHV/O9Dq22iwcPqg3S/cEg4f2yJhuvo2Y8d03OOpPwhPCPQ7Htv1hlu9V6pxtCRu2GqM6N/GLq2595Hs5INsZCW/gb6cgFae2BrrTQGK3qy7Ok=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786732152; c=relaxed/simple;
+	bh=f/J5TbdcHXZ3PTJLxvGCrdd4D/UAnGLsqYcs68vEADI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PPMrIoGA0F6KsJXp+XlwI5akGQ0oZiUi61yg/v0OSCRThfPNUMDjkNaBbgqqpxZLYTRGXiefCoVJTUDQvHDlD8WV6pfqe3+RTjsTXtAUi9ODUL/CdAaGQxRStwxTp/4dm5LVgpf40nsN07tHedqpbAeFbIul3NuCd1PzvNNIifE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com; spf=pass smtp.mailfrom=iusegentoo.com; dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b=kXNCMS1K; arc=pass smtp.client-ip=136.143.169.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iusegentoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iusegentoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TBDiOrHb"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-9063b380982so14079636d6.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 11:01:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786730499; x=1787335299; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=DgSYo1NCGQTdzAsT6Ma2dejB1MxlUSREwGiEv2rNj4A=;
-        b=TBDiOrHb2qoULVuCr1+ltYC6akb8Bn2Mc+3tSOaqBU/2SjBANCUzMU3qZ19mOyryo0
-         XaIz0fQ9ThWX0J37zBH7Y2Klg+s3MmsivmpE+ebolPB8XVkEj2C04IeByZW5tnYH0An2
-         7xIvO5lnrn/J4eghMNPNDCVO/15iKt3qgI3mFzGZM0EpRpWVSAoRBsNEJIXMDFedOeKy
-         woFD0PIRACYC4VhJY+k7zMsU0QNBnoszfYT7lbzSMzaMWjd+wnh1Rm5LoWS7UOWfEdkk
-         1yjZPdOplwsBNe4MipfZ4ywDO5ffLYSjzkx1Nb5nonVounp7ckKvycQT5EJkpTqtfvkl
-         AnQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786730499; x=1787335299;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=DgSYo1NCGQTdzAsT6Ma2dejB1MxlUSREwGiEv2rNj4A=;
-        b=VKhNZxIZpLZxZ2wCN2M4op39+IiRjywnr4ZZe6VU82e1QHZ8XyxpXEl4WezNfrTBap
-         0tK53msKjWXcRrzG3h/Dnhma3GLWeadCuFj5dJPe6Qf1ghgANS9bbFJ4O8xAUMv3Pbox
-         SZnIFBLdgQRiDJ+zDG8lTaC+aCd5cbxumqzRoN/2CusKbnBIanuft3q1uQUOENtHkzWd
-         YFd1+Twin+Ktq2sdF1D3QjqJXOYI3KuF9zjHwNM4PZVIb16rAohRIs3HedESNFby2lg0
-         O0goKRvKX35PmvOK6RQ5A/615hgm7lnzjs7CGL7rjwpunVR2aG1QFiBweOfOG1L018a5
-         AlpQ==
-X-Gm-Message-State: AOJu0YxDJONjlP5pqKDZl1YdCZDoYRIkAqR6ndhB89MakBnH1Uhy1xRO
-	IG4sONZB48gsUFUgi2MbONkPlmMUn7Dg5IHPfuL+aOQcqejmVKzLLkTy/gIVIQ==
-X-Gm-Gg: AR+sD13oYEXbOcByvULTy3qQ8vg5v+VupMJpjuhi4jjExxGeaoiItQiDAkqADIh9CyM
-	kDm/G2R9wDs9RLvhHUYNUyv1BfgbsrvI5BhH8iP2R67VdWECKc3/Mmfy5k+xyOBAgYCKTdIQOSu
-	hsT4dOtP7NeKKCnmz6FlCc8gLhBcFkRwtwSrS2oWoxnOdpWrQ3rKIJHgvQ+uU6G5nSbVfqJI51c
-	krpPCRBxQfETr+VcQy+1CTSyNJizrVR3YTldzkSadLBugCBIHEdMo+ajFTJYT8ryCzwSS22u/Iq
-	L6sSVS847p8rHon1EssJoYOJZtQvnac51nK+moVAT+HYw9BWP/i2E4S3h+cKysVWWnFLvfadAGb
-	hV3QCDalnNXeynLiEqylDYNxbl5bwQruF5QO+8GUffpJJ6NpIdwjGvdUByl5C0TD6rizJoH5iGL
-	Q3l5B66oK0AfQqt1nR2rYzUAdrEbRxdsvDyG6Jsdy4/FSVJ/g+KXq+IKwxGnG2vvBcjG96
-X-Received: by 2002:a05:6214:4599:b0:907:840e:bf0d with SMTP id 6a1803df08f44-90a91e36e9bmr89875506d6.27.1786730498884;
-        Fri, 14 Aug 2026 11:01:38 -0700 (PDT)
-Received: from [172.17.0.2] ([145.132.99.137])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90a93508b13sm23856066d6.28.2026.08.14.11.01.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Aug 2026 11:01:38 -0700 (PDT)
-Message-ID: <6a7f5802.c404bc25.3509cb.2fc5@mx.google.com>
-Date: Fri, 14 Aug 2026 11:01:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7080919296309271605=="
+	dkim=pass (1024-bit key) header.d=iusegentoo.com header.i=ali@iusegentoo.com header.b="kXNCMS1K"
+ARC-Seal: i=1; a=rsa-sha256; t=1786732143; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=i0pWXWWJFXmwArW82rrSkgOqpKzSPclaHavDTdfK4WxqDMnK4z20Zvf3UxEWJyXVdHxDyAEv2ds5uY8+S3S/VL7d5bN4+TtbJ2kB2nIwZnbqCLu/h0OLnQjiOlTVqF8PNq2WPa0YJC6bn/JNgRtRaFhS4mrqg/3n5851Re7o/AY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1786732143; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=WclBpSx112b+QyPbfG9yk3n7QWCF0qSA2wwxnaRAZQE=; 
+	b=X6/0NC84JjuvHmRdovr3aIQHZm/ZddeQuCOtPN7NfTahweQUAb9s9KzufmkoXZj8rYX9FvBmVjh2lACJCd6saJjQcV0yfHVL4+K/UbrpjVbJ9NHiLJz/fgSe3JFo49Zw1wYFuhNTbLFrGnztxCJNMap5xeA5CCK2or0pQSkUGoA=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=iusegentoo.com;
+	spf=pass  smtp.mailfrom=ali@iusegentoo.com;
+	dmarc=pass header.from=<ali@iusegentoo.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1786732143;
+	s=zmail; d=iusegentoo.com; i=ali@iusegentoo.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=WclBpSx112b+QyPbfG9yk3n7QWCF0qSA2wwxnaRAZQE=;
+	b=kXNCMS1K5k5oaVYDoOPYwQDyQ3jotmfPmEutoQ3wZht0+r/w925zUWXyLXrEK/0m
+	Z+wDAtOJQeVHzOHMV/LRc8/fdkq9M77cbZd3/pUiSH5Li3GbbMr4xPx/PR3gDuJ4wfD
+	fNv662XXUss1vq5MIUeQMWlqoNjWzUwIjwLuQkO0=
+Received: by mx.zoho.eu with SMTPS id 1786732140288659.8875099886181;
+	Fri, 14 Aug 2026 20:29:00 +0200 (CEST)
+From: Ali Ahmet Memis <ali@iusegentoo.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	neeraj.sanjaykale@nxp.com,
+	amitkumar.karwar@nxp.com,
+	marcel@holtmann.org,
+	alex.zhou@nxp.com,
+	song.xue_1@nxp.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: btnxpuart: Validate the FW dump header length
+Date: Fri, 14 Aug 2026 18:28:48 +0000
+Message-ID: <20260814182849.940976-1-ali@iusegentoo.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <CABBYNZKVQ0CxsviF92iP1Hj2rBiH_hmmEHirp8D=b-DvuaTNeA@mail.gmail.com>
+References: <CABBYNZKVQ0CxsviF92iP1Hj2rBiH_hmmEHirp8D=b-DvuaTNeA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] sdp-xml: Use a queue to collect sequence members
-In-Reply-To: <20260814173225.1410500-1-luiz.dentz@gmail.com>
-References: <20260814173225.1410500-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
---===============7080919296309271605==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+nxp_process_fw_dump() pulls the ACL header off the frame and then reads
+seq_num and buf_len from a struct nxp_fw_dump_hdr placed at skb->data,
+without checking that the ACL payload is long enough to contain it.
 
-This is an automated email and please do not reply to this email.
+h4_recv_buf() collects HCI_ACL_HDR_SIZE bytes of header followed by the
+number of payload bytes named in that header, so skb->len is 4 + dlen
+with dlen supplied by the controller and possibly smaller than the 8
+byte dump header, or zero. A short frame with connection handle 0xfff
+therefore reads both fields from beyond the received data.
 
-Dear Submitter,
+Beyond the read itself, buf_len is what terminates a dump: a value of
+zero makes the driver call hci_devcd_complete() and reset the
+controller, so a truncated frame can end a dump early.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Use skb_pull_data() to validate and pull the FW dump header before
+accessing its fields. Warn and reject the chunk if the header is
+truncated.
 
------ Output -----
-
-error: patch failed: src/sdp-xml.c:44
-error: src/sdp-xml.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: 998e447f443f ("Bluetooth: btnxpuart: Add support for HCI coredump feature")
+Signed-off-by: Ali Ahmet Memis <ali@iusegentoo.com>
 ---
-Regards,
-Linux Bluetooth
+v3: Use skb_pull_data() to validate and pull the FW dump header, as
+    suggested by Luiz.
+v2: Warn on the early exit path instead of dropping the frame silently,
+    as suggested by Neeraj. Dropped the trailing newline from the
+    suggested message, since bt_dev_warn() already appends one.
 
+v1: https://lore.kernel.org/all/20260814081221.913676-1-ali@iusegentoo.com/
 
---===============7080919296309271605==--
+ drivers/bluetooth/btnxpuart.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 6a1cffe08d5f..e6c15bc6a30b 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1368,12 +1368,21 @@ static int nxp_process_fw_dump(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_acl_hdr *acl_hdr = (struct hci_acl_hdr *)skb_pull_data(skb,
+ 									  sizeof(*acl_hdr));
+-	struct nxp_fw_dump_hdr *fw_dump_hdr = (struct nxp_fw_dump_hdr *)skb->data;
++	struct nxp_fw_dump_hdr *fw_dump_hdr;
+ 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+-	__u16 seq_num = __le16_to_cpu(fw_dump_hdr->seq_num);
+-	__u16 buf_len = __le16_to_cpu(fw_dump_hdr->buf_len);
++	__u16 seq_num;
++	__u16 buf_len;
+ 	int err;
+ 
++	fw_dump_hdr = skb_pull_data(skb, sizeof(*fw_dump_hdr));
++	if (!fw_dump_hdr) {
++		bt_dev_warn(hdev, "FW dump: invalid or corrupt fw dump chunk");
++		goto free_skb;
++	}
++
++	seq_num = __le16_to_cpu(fw_dump_hdr->seq_num);
++	buf_len = __le16_to_cpu(fw_dump_hdr->buf_len);
++
+ 	if (seq_num == 0x0001) {
+ 		if (test_and_set_bit(BTNXPUART_FW_DUMP_IN_PROGRESS, &nxpdev->tx_state)) {
+ 			bt_dev_err(hdev, "FW dump already in progress");
+-- 
+2.55.0
+
