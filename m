@@ -1,128 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6480846DFFC;
-	Fri, 14 Aug 2026 12:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970E9370AF1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 14:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786711795; cv=none; b=hU72iEsCE8wqqF0hQI4YEBCfHMMLC6DA2sTaAecanYJHDFBvMlKeX7QKxDG72DmkY3rlbhdBvrRr4Xt8c2tRFMLvenn8M5SkGSWiwJLYwqwiSUEnzcOQp82GqmlCGNPI7PiEm7uNOts/UeuVO+IxBvwA/0d4xVt+M/Ngr8QxgrE=
+	t=1786716050; cv=none; b=M9fJoHzIc2nujbkrnl3hNpejNLoaoIYkUhIYRwe+WEiRqaKDqDeXT6Maxew2M1lYHpAEjjnuOvbGI+/vYQzTC86l5jwjA2oaEgdsn84RZiGYrnGDQcGrcBWCbvwLsvh/8Fnppz9MNfkxVXswuzU/qOTV6Bql8RMZ1g//rpFBWxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786711795; c=relaxed/simple;
-	bh=N6Wm7zvO1O97Kiw/b6HRbmjzTds561mSYObozWbWlp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QdtxOcSDzDzXR9ITkjL+s0zwxAQmLpLAE98iIODtqPV9FsLa9jQgjvM6x/VxXT/5k0HJ+4j8ngzNxj6GV5uKL+DKNPQk5XBTpRVB0GSzic3TKGkMJCiYMvuH0c3LSC9UHzeFcTqjgeBbSYUPM/sGuQlZZ0ni7/XaEzRSQ6Br3zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YWTGi5Q7; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YWTGi5Q7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D80B61F000E9;
-	Fri, 14 Aug 2026 12:49:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786711787;
-	bh=/N/HX1GSPPOcqxWY/4dtIRIphxWYu1pio+UkOSgheTs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YWTGi5Q7f/pZmJbmyIgbKJXzr77Dl+/MMrgnXHtQhpdZC8lW4AM2lJ29i/13HYRdd
-	 ZQKimYvkaspsstjrhlp1dq/ocDqT+e9aYeFGesZYVmKzima9JfENh95wImTEFhAOOF
-	 InlnEDgETc0DXUW/G9AqEj8peU3XxtQ8u3hD8h31hatop8+Hh8AjZU393+lWriyc/Z
-	 EVITiCpW6A/dgpEBJrpHeJdXAzSOokK69IItB/oZQJMvMjkSmvkKYCrS9oZWm39vIJ
-	 V0pIfa1+uydAKd2dHEyqaNtmy1/312M8sPv1nFW1nNhSKMxOOlcZBEOhOyutdrHw5Y
-	 mPs6QRNcCyzvA==
-Date: Fri, 14 Aug 2026 14:49:31 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Daniel Scally <djrscally@gmail.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Sakari Ailus <sakari.ailus@linux.intel.com>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Sui Jingfeng <sui.jingfeng@linux.dev>
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-Message-ID: <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
- <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
- <aWSwgRiEkT9unYw9@smile.fi.intel.com>
- <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
- <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+	s=arc-20240116; t=1786716050; c=relaxed/simple;
+	bh=GXfGACyR0EkakL7HzVxDpBpsCaKRThf1LV6QTuTvUs0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=j6ESderVOlFTUUhi6o9weHGuuruiwbdicv7W4KXlHLD4Rb5uIPj1OBKoLU+zp39TY5gfGD3b6p0d4uJ4W9jsYyR56sJlS8COMYM/IxXmDyi7n4t1dud9LDfXE41hcB0VrRxYdQRA1iwrx+8mOE1ooWG7QHIjOct2c+yy/InN5kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EF9E23ECC4;
+	Fri, 14 Aug 2026 14:00:37 +0000 (UTC)
+Message-ID: <402e9994069430a05832cde20430880b9bd97636.camel@hadess.net>
+Subject: Re: [BlueZ, v3 2/5] unit: Remove left-over test-avrcp Android test
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 14 Aug 2026 16:00:37 +0200
+In-Reply-To: <CABBYNZK7iPm4_y++hmRypfqnZ2oE-3J0fWYnpYpA8fORgxsO7g@mail.gmail.com>
+References: <20260806132231.3052523-1-hadess@hadess.net>
+	 <20260806132231.3052523-3-hadess@hadess.net>
+	 <CABBYNZK7iPm4_y++hmRypfqnZ2oE-3J0fWYnpYpA8fORgxsO7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: -100
+X-GND-Cause: dmFkZTEXGw9ooNIju5hbBLVEVWBoU0iOfsAdPreSSDVIWeOYS9EhTXntm+7lz1/jzl9Yh4cxuN9TzYz+TvbXCZU7bAr6ewKgCqUF0Q0hS52rS9FWOJ/JcMBsxiqus9SaHPROI7UHt94tGBJOIymqu3Fn8GKpOzVOazewPPFdK8SF1iRCCq7t/3B2dN8WdNRxQcdDLY057DvCUcHgkCHsacDfIEO5ZMCpZxdgfdAA/szTdifbxB5NBJPtcg443CTI8omEFzhvr8xYxsUP0egKrT1WnY6xzJ7NVayt7Jc8WdzDAWKYxeEnvH5L3ZdMNu6iyB1T2Si1Sm36soh0ZNSnsTpQMuN5XOUnvQ8liG82kPtLV3gSh3S6TV+CLnEYPPQ3F3lEXsoTAzDa/slQMkUqdb0Jpf9izXstjtXZh/X2qDIcgt9//zLNC1/rgsIHRnmbC13dPWNLDDAOqlUqbNZdPw3ZZCbVV6UqwKUpINqyBzEr1YheeHH1GWJWCvVPNoIh6yMN8aWoDV2rKDburWF2vMuV97vjmsNv4+EhtJgpubS9oq8CmhjGnIhgzOt/YiAbv6iQbSVB2dtMTCf56XpSa3OiT0sOwhJ7K9Yu74SkQkUpE14Fn2poKYUzpHeP2ocAHU8j0XnlzJRsoTGgMy7k+WQEortb8qI8UuMy2IbIs/UjHAKfAQ
+X-GND-State: clean
 
-On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
-> On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
-> > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
-> > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
-> > > > + Dmitry Torokhov (who was against this patch previously)
-> > > > 
-> > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
-> > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> > > > > 
-> > > > > > Because the software node backend of the fwnode API framework lacks an
-> > > > > > implementation for the .device_get_match_data function callback.
-> > > > > 
-> > > > > Maybe this is done on purpose. Have you thought about this aspect?
-> > > > 
-> > > > IMO, software nodes were introduced to add sub-properties to the existing
-> > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
-> > > 
-> > > Potential doesn't mean the necessity.
-> > > 
-> > > > > > This makes it difficult to use(and/or test) a few drivers that originates
-> > > > > > from DT world on the non-DT platform.
-> > > > > 
-> > > > > How difficult? DSA implementation went to the way of taking DT overlay
-> > > > > approach. Why that one can't be applied here?
-> > > > 
-> > > > Sometimes you do not have any DT node at all.
-> > > 
-> > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
-> > > is able to create DT subtree on non-OF based platforms.
-> > > 
-> > 
-> > Maybe I should look into creating dynamic DT node for the device and insert it
-> > to the uart node. Theoretically it should work.
-> > 
-> 
-> It worked flawlessly. So I sent v4 incorporating this design:
-> https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
-> 
+On Thu, 2026-08-06 at 10:14 -0400, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+>=20
+> On Thu, Aug 6, 2026 at 9:29=E2=80=AFAM Bastien Nocera <hadess@hadess.net>
+> wrote:
+> >=20
+> > This test was supposed to exercise the avrcp-lib from the Android
+> > backend, but that backend was removed, and the library moved into
+> > the unit/ directory.
+> >=20
+> > The tests provide 0% coverage towards profiles/audio so they're
+> > just
+> > dead code we should remove.
+> > ---
+> > =C2=A0Makefile.am=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=
+=A0 9 -
+> > =C2=A0unit/avrcp-lib.c=C2=A0 | 3604 -----------------------------------=
+------
+> > ----
+> > =C2=A0unit/avrcp-lib.h=C2=A0 |=C2=A0 343 -----
+> > =C2=A0unit/test-avrcp.c | 2084 --------------------------
+> > =C2=A04 files changed, 6040 deletions(-)
+> > =C2=A0delete mode 100644 unit/avrcp-lib.c
+> > =C2=A0delete mode 100644 unit/avrcp-lib.h
+> > =C2=A0delete mode 100644 unit/test-avrcp.c
+> >=20
+> > diff --git a/Makefile.am b/Makefile.am
+> > index 19c468d3a504..f4f638323c79 100644
+> > --- a/Makefile.am
+> > +++ b/Makefile.am
+> > @@ -651,15 +651,6 @@ unit_test_avctp_SOURCES =3D unit/test-avctp.c \
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unit/avctp.c unit/avctp.h
+> > =C2=A0unit_test_avctp_LDADD =3D src/libshared-glib.la $(GLIB_LIBS)
+> >=20
+> > -unit_tests +=3D unit/test-avrcp
+> > -
+> > -unit_test_avrcp_SOURCES =3D unit/test-avrcp.c \
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src/log.h src/log.c \
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unit/avctp.c unit/avctp.h \
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unit/avrcp-lib.c unit/avrcp-lib.h
+> > -unit_test_avrcp_LDADD =3D lib/libbluetooth-internal.la \
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src/libshared-glib.la $(GLIB_LIBS)
+>=20
+> The tests are valid, what isn't valid is that it doesn't test the
+> right implementation, I understand this is a much bigger work though.
 
-Andy, I had to revive this old thread of a merged series as Krzk is not in
-favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
-objections are due to the fact that we are just adding BT nodes of a
-discoverable device (M.2 PCIe device) without any resources. So the node just
-contains the compatible to match with the serdev driver and nothing else.
+I'm pretty certain that reviving them is a complete rewrite, and right
+now, it just takes compile and testing time all for nothing.
 
-And he suggested to use swnodes or other similar mechanisms to plug with the
-serdev driver as that's the only thing we want here, not a true hardware
-description.
-
-Since you strongly objected the swnode approach in this series, I wanted to hear
-your opinion before I rework the code.
-
-- Mani
-
-[1] https://lore.kernel.org/linux-pci/768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org
-
--- 
-மணிவண்ணன் சதாசிவம்
+If somebody wants to revive those tests, they're a "git revert" away.
