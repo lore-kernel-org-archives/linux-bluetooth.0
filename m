@@ -1,185 +1,194 @@
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AD43C872C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 11:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339CC35AC3B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 11:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786706024; cv=none; b=USueWzI3oPWtRCXalOEgtr6vguYC2V1v9bzfZOgll2vqQoqVaKCWuBCemEtVVmuoneUUUXMUJdbmyRaDKm7dV/yw2LfqCegtQ8xl/hfqkYDrKLwqaXws/jIT5DzIxpi6ZcHfVkZ5X+aGlE906hwiOutNin0uAAGyrCD5rTQ6uns=
+	t=1786707117; cv=none; b=nam5rzVm9C2mSfihHpoAO3Y1gqQwp8VLNlzwYDPFhpuYWCWvlRrwH53tjEkcrzOP6/pRCPdaG40QGIcNq1oe4P2F1gXrxfM6uZeGC+YSc9CfowUz6F0SCpWoRrm91/oUsnjMbG67G7gKGSHNiAaCrn3JO2idsV3rrehpvvXY3DM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786706024; c=relaxed/simple;
-	bh=Tkgf4H20bsiWqgR+5i2IMHQ5E13bVeoBUTVgNlQxI74=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KuQTE2+Iry5KVQ043dHfre7EgwnQUNC7sHnbeobjur7l8aZF1ZYmCPG7sN75/Z1opJ/DXEU6LbupArBKLT+rVh7+36HipPPSgJ1R9H53osbSnnak97U4v9SBgSxUTEiWTUlGffeEgfGBZrOrr0JcihqMTlIBOBpjGsiqc7sLK4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=nwjxh1wO; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+	s=arc-20240116; t=1786707117; c=relaxed/simple;
+	bh=fMBdBr2ZpiJKYpQJ7h3M9QkHJL53CapDj7poIbP4HvM=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=epmgwNA6OhLdrKdxxS0/PPAljB3j7wI+ZJVWcUFnxwU5ylutC0J5eZQYLmlgYwO2GqYmSyV8y0P8uvinz6A8D648nrjCoT7An+c37RwdVXpjkRAJFG91IJMjvjZ1wA2kgKpmXWGFrlkZuf2+u9WQDpCWlgDHHTdxdDda3eGPFJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SUoE2EyL; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="nwjxh1wO"
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 67EBD9m241216102, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1786705989; bh=Tkgf4H20bsiWqgR+5i2IMHQ5E13bVeoBUTVgNlQxI74=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=nwjxh1wOnEXpCVeRz2jNm3hnPr8vNEaM7mgz1XlKAeZI3+CENOMut6oesqcyl+OrA
-	 /f2aoQngNHjYsudWqDmYFpi/Zo02sKm/j9JG5rJTD6/YcjOmG/lA/FfAoaxAh3DIqw
-	 81kTs4PclziX3pNzBG0a5QgrCsTRG5OhMGc1dhifLIr/rJoYhxK0dh/z/FDeJMFr/8
-	 Oi0ro4hwYPD0YqAIlVzyd0L9X4Hcc4PJtqcTuaWXXvODmffYOXDmkxsC5ZKbWFbV89
-	 XmLvPPBHq3qqhaXv/r+1JN16n8dSFE2wpXZ4IAn7XWQ5x1W7CVv7ionwuEc2y5t7nJ
-	 7RzZFkdRXo6Dw==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 67EBD9m241216102
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 14 Aug 2026 19:13:09 +0800
-Received: from RTKEXHMBS01.realtek.com.tw (172.21.6.40) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 14 Aug 2026 19:13:09 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS01.realtek.com.tw (172.21.6.40) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Fri, 14 Aug 2026 19:13:08 +0800
-Received: from RTKEXHMBS05.realtek.com.tw ([::1]) by
- RTKEXHMBS05.realtek.com.tw ([fe80::a236:c445:ce4a:140a%4]) with mapi id
- 15.02.2562.043; Fri, 14 Aug 2026 19:13:08 +0800
-From: Hilda Wu <hildawu@realtek.com>
-To: deniz <denizgu@protonmail.ch>, Ping-Ke Shih <pkshih@realtek.com>, Timlee
-	<timlee@realtek.com>, Zong-Zhe Yang <kevin_yang@realtek.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Max Chou <max.chou@realtek.com>, "alex_lu@realsil.com.cn"
-	<alex_lu@realsil.com.cn>, zoey_zhou <zoey_zhou@realsil.com.cn>,
-	=?utf-8?B?6Zmz5rOT5Y+h?= <kevinchen@realtek.com>
-Subject: RE: rtl_bt: RTL8852BU rom_version 3 has no matching in
- rtl8852bu_fw.bin
-Thread-Topic: rtl_bt: RTL8852BU rom_version 3 has no matching in
- rtl8852bu_fw.bin
-Thread-Index: AQHdInrfCmeFZYwQHE6ZIBmMM4B5DLaL8x4w
-Date: Fri, 14 Aug 2026 11:13:08 +0000
-Message-ID: <6027f64b0658478a91f0cadd4a6b051d@realtek.com>
-References: <6fA7_pnseglPl3sGOhJ9Blqy9rvnEcG0jTZEaJxRmt7Z9hyouvO-WtWss7N_xgZMoV7kzNlEDt4sBFiCIiyfsfpUUnB-uAtOMwVjVeX-SDg=@protonmail.ch>
-In-Reply-To: <6fA7_pnseglPl3sGOhJ9Blqy9rvnEcG0jTZEaJxRmt7Z9hyouvO-WtWss7N_xgZMoV7kzNlEDt4sBFiCIiyfsfpUUnB-uAtOMwVjVeX-SDg=@protonmail.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SUoE2EyL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1786707114; x=1818243114;
+  h=date:from:to:cc:subject:message-id;
+  bh=fMBdBr2ZpiJKYpQJ7h3M9QkHJL53CapDj7poIbP4HvM=;
+  b=SUoE2EyLJhWP7Isl0dEAOjxMGwtqT5Zq/19fsHOdwavSWnvQ/GpJ06Ss
+   EhYK5e3bWGUXK8XrEnmn8uUyHzi0Aa20wqcm9jD/eGI9aDeaRBzmPHAAf
+   Ui+BW5vbRIShewAWjb/GJ3vV9/ksOrWuI5ypDZ/D0E+I21fibkbicy31k
+   8/giWiYyqKReN0wsTbnoVjTWpMW2fc3WXbrqyKolaxjVdtZcLAlDcSO1l
+   Bmkm0OcCKGVLqXpX/aRrhoXydkiSG5NrQLbGaZgoItnwd+RuEEq09zWNt
+   P3qNZlFAtHfdtoZuXWbr9j0OMjCAozI70JNdLfJFrw5Gbi5QreR9VX3wp
+   A==;
+X-CSE-ConnectionGUID: FAnw+2dVRCG+J8XynD9eiw==
+X-CSE-MsgGUID: UVXwauggSVCP+aYTa75GXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11874"; a="87307840"
+X-IronPort-AV: E=Sophos;i="6.25,222,1779174000"; 
+   d="scan'208";a="87307840"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2026 04:31:53 -0700
+X-CSE-ConnectionGUID: vyPhnp2XQjync5U1BdXrhw==
+X-CSE-MsgGUID: GlqumX4FTJiYHXIaV8PewQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,222,1779174000"; 
+   d="scan'208";a="269389401"
+Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 14 Aug 2026 04:31:52 -0700
+Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wuq8b-00000000YhG-3Rgn;
+	Fri, 14 Aug 2026 11:31:49 +0000
+Date: Fri, 14 Aug 2026 19:30:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ d67f4a43e7ef8cff8aa8fe1df2f088390af41b6d
+Message-ID: <202608141936.W8KIEBcB-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-SGkgRGVuaXosDQoNClRoYW5rIHlvdSBmb3IgdGhlIGRldGFpbGVkIGFuYWx5c2lzIGFuZCB0aGUg
-cGFyc2VyIHRyYWNlIOKAlCBpdCBjbGVhcmx5IHBpbnBvaW50cyB0aGUgaXNzdWUuDQoNClJvb3Qg
-Y2F1c2U6DQpUaGUgUlRMODg1MkJVIGVjbyB2ZXJzaW9uIDQgdmFyaWFudCBvbiB0aGlzIGRldmlj
-ZSBpcyBjdXJyZW50bHkgbm90IHlldCBzdXBwb3J0ZWQgaW4gdGhlIHJlbGVhc2VkIGZpcm13YXJl
-LiBUaGUgZXhpc3RpbmcgZmlybXdhcmUgZG9lcyBub3QgY292ZXIgdGhpcyBlY28gdmVyc2lvbiwg
-d2hpY2ggaXMgd2h5IHRoZSBrZXJuZWwgcGFyc2VyIGNhbm5vdCBmaW5kIGEgbWF0Y2hpbmcgaW1h
-Z2UgYW5kIHJldHVybnMgLUVOT0RBVEEuDQoNCkN1cnJlbnQgc3RhdHVzOg0KRmlybXdhcmUgc3Vw
-cG9ydCBmb3IgZWNvIDQgaXMgY3VycmVudGx5IGluIHByZXBhcmF0aW9uIGFuZCBpcyB0YXJnZXRl
-ZCBmb3IgcmVsZWFzZSBieSBlbmQgb2YgTm92ZW1iZXIgMjAyNi4gT25jZSBhdmFpbGFibGUsIGl0
-IHdpbGwgYmUgc3VibWl0dGVkIHRvIGxpbnV4LWZpcm13YXJlIGFjY29yZGluZ2x5Lg0KDQpJbiB0
-aGUgbWVhbnRpbWUsIGlmIHlvdSdkIGxpa2UgdG8gdGVzdCBlYXJseSB3aXRoIGEgcHJlLXJlbGVh
-c2UgZmlybXdhcmUgYmluYXJ5LCB3ZSBhcmUgaGFwcHkgdG8gcHJvdmlkZSBvbmUg4oCUIHlvdXIg
-dmFsaWRhdGlvbiBmZWVkYmFjayB3b3VsZCBiZSB2ZXJ5IG11Y2ggYXBwcmVjaWF0ZWQuDQoNCldl
-IGFsc28gYWdyZWUgd2l0aCB5b3VyIHN1Z2dlc3Rpb24gdG8gaW1wcm92ZSB0aGUgZXJyb3IgbWVz
-c2FnZSBpbiBidHJ0bF9wYXJzZV9zZWN0aW9uKCkgdG8gbWFrZSB0aGlzIGtpbmQgb2YgZmFpbHVy
-ZSBlYXNpZXIgdG8gZGlhZ25vc2UuIFdlJ2xsIGZvbGxvdyB1cCB3aXRoIGEgc2VwYXJhdGUgcGF0
-Y2ggZm9yIHRoYXQuDQoNClNvcnJ5IGZvciB0aGUgd2FpdCwgYW5kIHRoYW5rIHlvdSBhZ2FpbiBm
-b3IgdGhlIHRob3JvdWdoIGludmVzdGlnYXRpb24uDQoNCkJlc3QgcmVnYXJkcywNCkhpbGRhDQoN
-Ci0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBkZW5peiA8ZGVuaXpndUBwcm90b25t
-YWlsLmNoPiANClNlbnQ6IFN1bmRheSwgQXVndXN0IDIsIDIwMjYgODozMSBQTQ0KVG86IEhpbGRh
-IFd1IDxoaWxkYXd1QHJlYWx0ZWsuY29tPjsgUGluZy1LZSBTaGloIDxwa3NoaWhAcmVhbHRlay5j
-b20+OyBUaW1sZWUgPHRpbWxlZUByZWFsdGVrLmNvbT47IFpvbmctWmhlIFlhbmcgPGtldmluX3lh
-bmdAcmVhbHRlay5jb20+OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0
-OiBydGxfYnQ6IFJUTDg4NTJCVSByb21fdmVyc2lvbiAzIGhhcyBubyBtYXRjaGluZyBpbiBydGw4
-ODUyYnVfZncuYmluDQoNCg0KRXh0ZXJuYWwgbWFpbCA6IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBm
-cm9tIG91dHNpZGUgdGhlIG9yZ2FuaXphdGlvbi4gRG8gbm90IHJlcGx5LCBjbGljayBsaW5rcywg
-b3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IHJlY29nbml6ZSB0aGUgc2VuZGVyIGFuZCBr
-bm93IHRoZSBjb250ZW50IGlzIHNhZmUuDQoNCg0KDQpIZWxsbyB0aGVyZSwgZm9yd2FyZGluZyB0
-aGlzIHJlcG9ydCB0byBwZW9wbGUgaW4gdGhlIGxpbnV4LWZpcm13YXJlIHJlcG8gd29ya2luZyBv
-biByZWFsdGVrIGRldmljZXMuDQoNCkEgc2ltaWxhciByZXBvcnQgd2FzIGZpbGVkIGhlcmU6IGh0
-dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWZpcm13YXJlL0NBUDllbWoyLThoWEIzdDNTRkQ2
-UlUyWnN0dHNpT3RKNlc0QnRvNGpYU3crZEI9PVRtQUBtYWlsLmdtYWlsLmNvbSBJdCBsb29rcyB0
-byBiZSBhIHdpZGVzcHJlYWQgcHJvYmxlbS4NCg0KVGhlIGN1cnJlbnQgcnRsX2J0L3J0bDg4NTJi
-dV9mdy5iaW4gKFJlbGVhc2UgVmVyc2lvbiAweDEyN0NfRkQ3OCwgY29tbWl0InJ0bF9idDogVXBk
-YXRlIFJUTDg4NTJCIEJUIFVTQiBGVyB0byAweDEyN0NfRkQ3OCIsIDIwMjYtMDMtMjYpIGNvbnRh
-aW5zIG5vIGZpcm13YXJlIHBhdGNoIG1hdGNoaW5nIHRoZSBFQ08gcmV2aXNpb24gb2YgdGhlIFJU
-TDg4NTJCVSBjb250cm9sbGVyIGluIExlbm92byBJZGVhUGFkcyBzaGlwcGluZyB0b2RheS4gQmx1
-ZXRvb3RoIGlzIGNvbXBsZXRlbHkgbm9uLWZ1bmN0aW9uYWwgYXMgYSByZXN1bHQuDQoNCkNvdWxk
-IGFuIHJvbSB2ZXJzaW9uIDMgKGVjbyA0KSBwYXRjaCBiZSBhZGRlZCBmb3IgUlRMODg1MkIgQlQg
-VVNCPw0KDQpJIGhhdmUgcHJvdmlkZWQgZGlhZ25vc3RpYyBkZXRhaWxzIGJlbG93LCBwbGVhc2Ug
-ZmVlbCBmcmVlIHRvIHJlYWNoIG91dCBmb3IgbW9yZS4NCg0KSGFwcHkgdG8gdGVzdCBhbnkgY2Fu
-ZGlkYXRlIGZpcm13YXJlIGFuZCByZXBvcnQgYmFjay4NClRoYW5rcywNCg0KRGVuaXoNCg0KDQot
-LS0tLS0tSGFyZHdhcmUtLS0tLS0tLS0tLS0tLQ0KDQoNCiAgTWFjaGluZSAgICAgICAgIDogTGVu
-b3ZvIElkZWFQYWQgIEJUIGNvbnRyb2xsZXIgICA6IDBiZGE6Yjg1MyAiQmx1ZXRvb3RoIFJhZGlv
-IiwgUmVhbHRlayAoVVNCKQ0KICBXaUZpIChzYW1lIE0uMikgOiBSVEw4ODUyQkUsIHJ0dzg5Xzg4
-NTJiZSwgUENJZSAwMTowMC4wIC0gd29ya3Mgbm9ybWFsbHkNCiAgRHJpdmVyICAgICAgICAgIDog
-YnR1c2IgKyBidHJ0bA0KICBsaW51eC1maXJtd2FyZSAgOiBsaW51eC1maXJtd2FyZS1yZWFsdGVr
-IDIwMjYwNjIyLTEgKEFyY2ggTGludXgpDQoNCkNvbnRyb2xsZXIgcmVwb3J0czoNCiAgQmx1ZXRv
-b3RoOiBoY2kwOiBSVEw6IGV4YW1pbmluZyBoY2lfdmVyPTBiIGhjaV9yZXY9MDAwYiBsbXBfdmVy
-PTBiIGxtcF9zdWJ2ZXI9ODg1Mg0KICBCbHVldG9vdGg6IGhjaTA6IFJUTDogcm9tX3ZlcnNpb24g
-c3RhdHVzPTAgdmVyc2lvbj0zDQogIEJsdWV0b290aDogaGNpMDogUlRMOiBidHJ0bF9pbml0aWFs
-aXplOiBrZXkgaWQgMA0KDQpUaGlzIG1hdGNoZXMgdGhlIGludGVuZGVkIElDIHRhYmxlIGVudHJ5
-IGluIGRyaXZlcnMvYmx1ZXRvb3RoL2J0cnRsLmMsIHNvIHRoZSBjb3JyZWN0IGZpcm13YXJlIGZp
-bGUgaXMgYmVpbmcgc2VsZWN0ZWQ6DQoNCiAgeyBJQ19JTkZPKFJUTF9ST01fTE1QXzg4NTJBLCAw
-eGIsIDB4YiwgSENJX1VTQiksDQogICAgLmNvbmZpZ19uZWVkZWQgPSBmYWxzZSwNCiAgICAuaGFz
-X3JvbV92ZXJzaW9uID0gdHJ1ZSwNCiAgICAuaGFzX21zZnRfZXh0ID0gdHJ1ZSwNCiAgICAuZndf
-bmFtZSAgPSAicnRsX2J0L3J0bDg4NTJidV9mdyIsDQogICAgLmNmZ19uYW1lID0gInJ0bF9idC9y
-dGw4ODUyYnVfY29uZmlnIiwNCiAgICAuaHdfaW5mbyAgPSAicnRsODg1MmJ1IiB9LA0KDQoNCi0t
-LS0tLS1Qcm9ibGVtLS0tLS0tLQ0KDQpidHJ0bF9wYXJzZV9zZWN0aW9uKCkgYWNjZXB0cyBvbmx5
-IHN1YnNlY3Rpb25zIHdob3NlIEVDTyByZXZpc2lvbiBtYXRjaGVzIHRoZQ0KY29udHJvbGxlcjoN
-Cg0KICAvKiBkcml2ZXJzL2JsdWV0b290aC9idHJ0bC5jICovDQogIGlmIChjb21tb25fc3Vic2Vj
-LT5lY28gIT0gYnRydGxfZGV2LT5yb21fdmVyc2lvbiArIDEpDQogICAgICAgICAgY29udGludWU7
-DQoNClRoZSBjb250cm9sbGVyIHJlcG9ydHMgcm9tX3ZlcnNpb24gPSAzLCBzbyBvbmx5IGFuIGVj
-byA0IHBhdGNoIGlzIGFjY2VwdGVkLg0KUGFyc2luZyB0aGUgc2hpcHBlZCBmaXJtd2FyZSB3aXRo
-IGFuIGV4YWN0IHJlcGxpY2Egb2YgdGhlIGtlcm5lbCBwYXJzZXIgZ2l2ZXM6DQoNCiAgZndfbGVu
-ICAgICAgIDogMTI5NzMzDQogIHNpZ25hdHVyZSAgICA6IFJUQlRDb3JlICAgICAgICAgIChSVExf
-RVBBVENIX1NJR05BVFVSRV9WMikNCiAgbnVtX3NlY3Rpb25zIDogMg0KDQogIHNlY3Rpb25bMF06
-IG9wY29kZT0weDAxIChSVExfUEFUQ0hfU05JUFBFVFMpIGxlbj0xMjk2ODYNCiAgICAgIHNlY3Rp
-b25faGRyLm51bSA9IDIgc3Vic2VjdGlvbnMNCiAgICAgIFsgMF0gc2tpcCAgIGVjbz0weDAxIHBy
-aW89MTUgbGVuPTY3MTMzICAgIGVjbyAxICE9IHJvbV92ZXJzaW9uKzEgKDQpDQogICAgICBbIDFd
-IHNraXAgICBlY289MHgwMiBwcmlvPTE1IGxlbj02MjUzMyAgICBlY28gMiAhPSByb21fdmVyc2lv
-bisxICg0KQ0KICAgICAgLT4gY29udHJpYnV0ZWQgMCBieXRlcw0KICBzZWN0aW9uWzFdOiBvcGNv
-ZGU9MHgwOCAobm90IGhhbmRsZWQgYnkgdGhlIHN3aXRjaCkgbGVuPTANCiAgICAgIC0+IGNvbnRy
-aWJ1dGVkIDAgYnl0ZXMNCg0KICB0b3RhbCBsZW4gYWNjdW11bGF0ZWQgPSAwDQoNCk9ubHkgZWNv
-IDEgYW5kIGVjbyAyIGFyZSBwcmVzZW50OyBlY28gMyBpcyBhYnNlbnQgYXMgd2VsbC4gQm90aCBz
-dWJzZWN0aW9ucyBhcmUgc2tpcHBlZCwgc28gbm8gcGF0Y2ggZGF0YSBpcyBjb2xsZWN0ZWQuDQoN
-CkkgYWxzbyBkb3dubG9hZGVkIHJ0bF9idC9ydGw4ODUyYnVfZncuYmluIGRpcmVjdGx5IGZyb20g
-dXBzdHJlYW0gbGludXgtZmlybXdhcmUgYW5kIGNvbmZpcm1lZCBpdCBpcyBieXRlLWlkZW50aWNh
-bCB0byB0aGUgcGFja2FnZWQgY29weSwgc28gdGhpcyBpcyBub3QgYSBkaXN0cmlidXRpb24gcGFj
-a2FnaW5nIGFydGlmYWN0Og0KDQoNCi0tLS0tLS0gQ29uc2VxdWVuY2UgLS0tLS0tLQ0KDQpXaXRo
-IHplcm8gYnl0ZXMgY29sbGVjdGVkLCBydGxidF9wYXJzZV9maXJtd2FyZV92MigpIHJldHVybnMg
-LUVOT0RBVEEsIG5vIGZpcm13YXJlIGlzIGRvd25sb2FkZWQgdG8gdGhlIGNvbnRyb2xsZXIsIGJ0
-cnRsX3NldHVwX3JlYWx0ZWsoKSBmYWlscywgYW5kIGhjaV9kZXZfb3BlbigpIGZhaWxzLiBIQ0lf
-U0VUVVAgaXMgdGhlcmVmb3JlIG5ldmVyIGNsZWFyZWQgYW5kIG1nbXRfaW5kZXhfYWRkZWQoKSBu
-ZXZlciBmaXJlcywgc28gYmx1ZXRvb3RoZCBuZXZlciBzZWVzIGEgY29udHJvbGxlciBhdCBhbGw6
-DQoNCiAgJCBibHVldG9vdGhjdGwgbGlzdCAgICAgICAgICAgICAgICAgIyBlbXB0eQ0KICAkIHN1
-ZG8gYnRtZ210IGluZm8NCiAgSW5kZXggbGlzdCB3aXRoIDAgaXRlbXMNCiAgJCBzdWRvIGJ0bWdt
-dCBjb25maWcNCiAgVW5jb25maWd1cmVkIGluZGV4IGxpc3Qgd2l0aCAwIGl0ZW1zDQoNClRoZSBj
-b250cm9sbGVyIGl0c2VsZiByZXNwb25kcyBjb3JyZWN0bHkgZnJvbSBzdG9jayBST00gZmlybXdh
-cmUuIGJ0bW9uIHNob3dzIGV2ZXJ5IGlkZW50aWZpY2F0aW9uIGFuZCBzZXR1cCBjb21tYW5kIHN1
-Y2NlZWRpbmcgLSB2ZW5kb3IgMHhmYzYxICh0d2ljZSksIFJlYWQgTG9jYWwgVmVyc2lvbiBJbmZv
-cm1hdGlvbiwgdmVuZG9yIDB4ZmM2ZCwgTVNGVCBSZWFkIFN1cHBvcnRlZCBGZWF0dXJlcywgYW5k
-IHRoZSBBT1NQIHZlbmRvciBjb21tYW5kIDB4ZmQ1MyBhbGwgcmV0dXJuIFN0YXR1czogU3VjY2Vz
-cy4gVGhlIG9ubHkgY29tbWFuZCB0aGF0IGRvZXMgbm90IGlzIHRoZSBNU0ZUIExFIFNldCBBZHZl
-cnRpc2VtZW50IEZpbHRlciBFbmFibGUsIHdoaWNoIHJldHVybnMgQ29tbWFuZCBEaXNhbGxvd2Vk
-ICgweDBjKSAtIGV4cGVjdGVkLCBnaXZlbiBubyBwYXRjaCBmaXJtd2FyZSB3YXMgZXZlciBsb2Fk
-ZWQuDQoNClJlcHJvZHVjZWQgaWRlbnRpY2FsbHkgb24ga2VybmVscyA2LjE4LjQwLTItbHRzIGFu
-ZCA3LjEuNC1hcmNoMS0xLg0KDQotLS0tLS0tIE5vdGUgb24gZGlhZ25vc2FiaWxpdHkgLS0tLS0t
-LQ0KDQpCb3RoIGVycm9yIHBhdGhzIGludm9sdmVkIGFyZSBzaWxlbnQsIHdoaWNoIG1hZGUgdGhp
-cyB2ZXJ5IGhhcmQgdG8gdHJhY2sgZG93bjoNCg0KICBydGxidF9wYXJzZV9maXJtd2FyZV92Migp
-OiAgIGlmICghbGVuKSByZXR1cm4gLUVOT0RBVEE7ICAgLyogbm8gbWVzc2FnZSAqLw0KICBidHJ0
-bF9zZXR1cF9ydGw4NzIzYigpOiAgICAgIGlmIChyZXQgPCAwKSBnb3RvIG91dDsgICAgICAgLyog
-bm8gbWVzc2FnZSAqLw0KDQpUaGUgb25seSBrZXJuZWwgb3V0cHV0IGlzIHRoZSBmaXJtd2FyZSBi
-ZWluZyBsb2FkZWQgZnJvbSBkaXNrLCBmb2xsb3dlZCBieSBub3RoaW5nIGF0IGFsbCAtIG5vIGRv
-d25sb2FkLCBubyBlcnJvci4gQSBzaW5nbGUgcnRsX2Rldl9lcnIoKSBuYW1pbmcgdGhlIHJlcXVp
-cmVkIHZlcnN1cyBhdmFpbGFibGUgRUNPIHJldmlzaW9ucyB3b3VsZCBtYWtlIHRoaXMgZGlhZ25v
-c2FibGUgaW4gc2Vjb25kcy4gSSBhbSBoYXBweSB0byBzZW5kIGEgc2VwYXJhdGUgcGF0Y2ggZm9y
-IHRoYXQgdG8gbGludXgtYmx1ZXRvb3RoIGlmIHVzZWZ1bC4NCg0KDQotLS0tLS0tIEVDTyBjb3Zl
-cmFnZSBhY3Jvc3MgdGhlIGZhbWlseSAtLS0tLS0tDQoNCkZvciByZWZlcmVuY2UsIEVDTyByZXZp
-c2lvbnMgcHJlc2VudCBpbiBsaW51eC1maXJtd2FyZS1yZWFsdGVrIDIwMjYwNjIyLTE6DQoNCiAg
-cnRsODg1MmF1X2Z3LmJpbiAgICAgIGVjbyAyDQogIHJ0bDg4NTJidV9mdy5iaW4gICAgICBlY28g
-MSwgMiAgICAgIDwtIHRoaXMgbWFjaGluZSBuZWVkcyBlY28gNA0KICBydGw4ODUyYnR1X2Z3LmJp
-biAgICAgZWNvIDENCiAgcnRsODg1MmN1X2Z3X3YyLmJpbiAgIGVjbyAxLCAyDQogIHJ0bDg4NTFi
-dV9mdy5iaW4gICAgICBlY28gMQ0KICBydGw4OTIyYXVfZncuYmluICAgICAgZWNvIDINCg0K
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: d67f4a43e7ef8cff8aa8fe1df2f088390af41b6d  Bluetooth: L2CAP: fix race l2cap_sock_cleanup_listen() vs. put_chan
+
+elapsed time: 2888m
+
+configs tested: 117
+configs skipped: 7
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+alpha                            allnoconfig    gcc-16.1.0
+alpha                           allyesconfig    gcc-16.1.0
+alpha                              defconfig    gcc-16.1.0
+arc                             allmodconfig    gcc-16.1.0
+arc                             allyesconfig    gcc-16.1.0
+arc                  randconfig-001-20260813    gcc-13.4.0
+arc                  randconfig-002-20260813    gcc-13.4.0
+arm                         exynos_defconfig    clang-17
+arm                       keystone_defconfig    gcc-16.1.0
+arm                  randconfig-001-20260813    gcc-13.4.0
+arm                  randconfig-002-20260813    gcc-13.4.0
+arm                  randconfig-003-20260813    gcc-13.4.0
+arm                  randconfig-004-20260813    gcc-13.4.0
+arm64                randconfig-001-20260813    gcc-16.1.0
+arm64                randconfig-002-20260813    gcc-16.1.0
+arm64                randconfig-003-20260813    gcc-16.1.0
+arm64                randconfig-004-20260813    gcc-16.1.0
+csky                            allmodconfig    gcc-16.1.0
+csky                 randconfig-001-20260813    gcc-16.1.0
+csky                 randconfig-002-20260813    gcc-16.1.0
+hexagon              randconfig-001-20260813    gcc-11.5.0
+hexagon              randconfig-002-20260813    gcc-11.5.0
+i386                            allmodconfig    gcc-14
+i386                buildonly-randconfig-001    gcc-14
+i386       buildonly-randconfig-001-20260813    gcc-14
+i386       buildonly-randconfig-001-20260814    clang-22
+i386       buildonly-randconfig-002-20260813    gcc-14
+i386       buildonly-randconfig-002-20260814    clang-22
+i386       buildonly-randconfig-003-20260813    gcc-14
+i386       buildonly-randconfig-003-20260814    clang-22
+i386       buildonly-randconfig-004-20260813    gcc-14
+i386       buildonly-randconfig-004-20260814    clang-22
+i386       buildonly-randconfig-005-20260813    gcc-14
+i386       buildonly-randconfig-005-20260814    clang-22
+i386       buildonly-randconfig-006-20260813    gcc-14
+i386       buildonly-randconfig-006-20260814    clang-22
+i386                 randconfig-001-20260813    clang-22
+i386                 randconfig-002-20260813    clang-22
+i386                 randconfig-003-20260813    clang-22
+i386                 randconfig-004-20260813    clang-22
+i386                 randconfig-005-20260813    clang-22
+i386                 randconfig-006-20260813    clang-22
+i386                 randconfig-007-20260813    clang-22
+i386                          randconfig-011    clang-22
+i386                 randconfig-011-20260813    clang-22
+i386                 randconfig-012-20260813    clang-22
+i386                 randconfig-013-20260813    clang-22
+i386                 randconfig-014-20260813    clang-22
+i386                 randconfig-015-20260813    clang-22
+i386                 randconfig-016-20260813    clang-22
+i386                 randconfig-017-20260813    clang-22
+loongarch                          defconfig    clang-24
+loongarch            randconfig-001-20260813    gcc-11.5.0
+loongarch            randconfig-002-20260813    gcc-11.5.0
+nios2                           allmodconfig    gcc-11.5.0
+nios2                            allnoconfig    gcc-11.5.0
+nios2                randconfig-001-20260813    gcc-11.5.0
+nios2                randconfig-002-20260813    gcc-11.5.0
+parisc                          allmodconfig    gcc-16.1.0
+parisc                          allyesconfig    gcc-16.1.0
+parisc                             defconfig    gcc-16.1.0
+parisc               randconfig-001-20260813    gcc-10.5.0
+parisc               randconfig-002-20260813    gcc-10.5.0
+powerpc              randconfig-001-20260813    gcc-10.5.0
+powerpc              randconfig-002-20260813    gcc-10.5.0
+powerpc64            randconfig-001-20260813    gcc-10.5.0
+powerpc64            randconfig-002-20260813    gcc-10.5.0
+riscv                randconfig-001-20260813    gcc-10.5.0
+riscv                randconfig-002-20260813    gcc-10.5.0
+s390                 randconfig-001-20260813    gcc-10.5.0
+s390                 randconfig-002-20260813    gcc-10.5.0
+sh                                 defconfig    gcc-16.1.0
+sh               ecovec24-romimage_defconfig    gcc-16.1.0
+sh                   randconfig-001-20260813    gcc-10.5.0
+sh                   randconfig-002-20260813    gcc-10.5.0
+sparc                randconfig-001-20260813    clang-20
+sparc                randconfig-002-20260813    clang-20
+sparc64              randconfig-001-20260813    clang-20
+sparc64              randconfig-002-20260813    clang-20
+um                   randconfig-001-20260813    clang-20
+um                   randconfig-002-20260813    clang-20
+um                          x86_64_defconfig    clang-24
+x86_64     buildonly-randconfig-001-20260813    gcc-14
+x86_64     buildonly-randconfig-002-20260813    gcc-14
+x86_64     buildonly-randconfig-003-20260813    gcc-14
+x86_64     buildonly-randconfig-004-20260813    gcc-14
+x86_64     buildonly-randconfig-005-20260813    gcc-14
+x86_64     buildonly-randconfig-006-20260813    gcc-14
+x86_64                                 kexec    clang-22
+x86_64               randconfig-001-20260813    gcc-13
+x86_64               randconfig-002-20260813    gcc-13
+x86_64               randconfig-003-20260813    gcc-13
+x86_64               randconfig-004-20260813    gcc-13
+x86_64               randconfig-005-20260813    gcc-13
+x86_64               randconfig-006-20260813    gcc-13
+x86_64               randconfig-011-20260813    gcc-14
+x86_64               randconfig-012-20260813    gcc-14
+x86_64               randconfig-013-20260813    gcc-14
+x86_64               randconfig-014-20260813    gcc-14
+x86_64               randconfig-015-20260813    gcc-14
+x86_64               randconfig-016-20260813    gcc-14
+x86_64                        randconfig-071    gcc-14
+x86_64               randconfig-071-20260813    gcc-14
+x86_64               randconfig-071-20260814    gcc-13
+x86_64               randconfig-072-20260813    gcc-14
+x86_64               randconfig-072-20260814    gcc-13
+x86_64               randconfig-073-20260813    gcc-14
+x86_64               randconfig-073-20260814    gcc-13
+x86_64               randconfig-074-20260813    gcc-14
+x86_64               randconfig-074-20260814    gcc-13
+x86_64               randconfig-075-20260813    gcc-14
+x86_64               randconfig-075-20260814    gcc-13
+x86_64               randconfig-076-20260813    gcc-14
+x86_64               randconfig-076-20260814    gcc-13
+x86_64                          rhel-9.4-bpf    gcc-14
+xtensa               randconfig-001-20260813    clang-20
+xtensa               randconfig-002-20260813    clang-20
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
