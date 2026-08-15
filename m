@@ -1,64 +1,64 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47C52BFC85
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 11:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BB62BFC85
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 11:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786795004; cv=none; b=dNEwLaeOcUrfBytGMeVBbh2G9zmoUf29OfuVOL+jJ5FFumPWmjBmZLo9yVYFzhreqNSMFI3/e12LAZMsp2vkbD3IzK8cLqNxLcoB5u234gRPP5IcpJHXQu1ucc9IBGszgt8DQn4evTBppIC9d2SSdE+dg6nfkyjS0zr+ZYGVi1Q=
+	t=1786795008; cv=none; b=tTMaEI6uKITATw5mnD7dqiFaksuebJlyhw0V14XL26WoJvn1ttHIcTQF3JGmA4L1nFIFAkf+YFIotVua88goVucrvDhIMkXQwWuzxoY6UWIFaqDt+duEQlbKd/Iml5XsJnUAhjsz5U113n3+8UlX8Z0hXvkmrQKa2RZoIYm6wx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786795004; c=relaxed/simple;
-	bh=jryRxjqTE3dL1Kz6tqHtb7AjwGT7zGFF9zHrjezAJBA=;
+	s=arc-20240116; t=1786795008; c=relaxed/simple;
+	bh=b5LQIwGVpyvdNO/WfDgWI7hUw5OYOoA0sgu5/kZeQg4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dxEJ3BoiNJebz8HOS9Y6hYSAzuDHOMakaqMTnliyOOCo/k29kMbY7/hUl0OijYPHABu3XpLtyCz0bFR5wom+/fkcF2zH+OHo8xmT2O4vRvSVx/28kMhCGP7k/s2CDae//6Bhbp6WHUITla52PpKYKFVrthI5QNEFdhk1zVE5Pqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QmzwoxCh; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=NUdgO4dEv6ANrYA69uaS3pT8wYVLLJO3Ga9s3lVoDtnYO4ixOXiwVCzxWRakXg2S5hi5IlINB1sillEujKoW0UUpU2aaT63h14gKWIbn20exohnl4JtFVrSwBLOk4ZyneWCq9bNqv2AwQAqVxObwScRS/+rqqT2F8P4u0WKBMWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4UAO/7J; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QmzwoxCh"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4994c49f588so15955365e9.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 04:56:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4UAO/7J"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4799b3f7c83so1335986f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 04:56:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786795001; x=1787399801; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786795005; x=1787399805; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=2EvcCjXX/E/EH5B0VOq94NnG4HOn80gOVENNBtRlSfE=;
-        b=QmzwoxChX9eYXhf8sV61oBYLvGLxWt5QlcG+qgxglyOgmuwSWtIkW84zy6i2ASFV3R
-         2nj7VijpRp/3kLyilleS3eSFHldJYU0FfnMnjBsUWRKG4ySOd6wvLandFNsC6O/shHwa
-         9i9/xOxswECYsUG9YqBrxYKfZWi1DOkJFV8voSABLXQ+nZVFlwh+hJXi+U3Y1Q4+5FuT
-         vevz7uQ8dsg5L3+1NFEo08Vc3x/BdTFQfEP5zy4QEPrW5jf2Fd6XR+1uJR/1/GLv165w
-         1EfOhN0Uig02/BPf+Hu22kjnrUTETZBzYPX8yn4XtGVcHrlncms3iiVNQSEKY7q9zPxF
-         jaxA==
+        bh=9/9+rmVvmvs6s8dnr8ttRWG5a1oyP8FaGHhemcTL1GA=;
+        b=m4UAO/7Jrx2eKOR2GDdqDlQ1zZmhcy2bvhoZSSSY0gP4y8lHFbaAO7bCLXbcZvJRCS
+         BupAgmNQ6zddMp2WtxJbXYgUNxOE82MwRBX1ckdJEQNiTPeawX0FiP/tg6W71Er4aiMA
+         Po6y+G6DLG66SEmvmJ/Jd7K8gA59c0SPNCK3CRaE8AGdR0moZpfhgb54WtrgdXf8Uf7G
+         +e0V3EDFQvsUCOCqqSzWzNJyGAlmFaX8Fmt2nWCUHa3ur2vUioUQPlDKpvFcOwyZ8QGL
+         P2NDvJg3so7fYhd7rJDH9rrxeLH9SDvs3bug5dkxkMLv/HYPr7lsO37W06kna48R6XmP
+         cxjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786795001; x=1787399801;
+        d=1e100.net; s=20251104; t=1786795005; x=1787399805;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2EvcCjXX/E/EH5B0VOq94NnG4HOn80gOVENNBtRlSfE=;
-        b=n5OGPgu/7X+z2zK66HxV+fqeRpqeb4qTWCAuVYUwENBjpu1RaOB/ZHtaiaQOnJ0DMj
-         B+yWXvDGbAQUOGM8haWkZ00Uex62ihODWADP6TrPLZG8vxcEoKCNCz4mqJ7o85o+XgKp
-         tTGGu6pHG/pLoxXK+lTLI9WEDCUphcfeLNmuW1PuSmt5rnmJIRX1lRK0bWWT3HZfBCwd
-         15kJBQ/JQvTQY4EtW5bQTNVMNKWb2jGZ7RwIFr3Q0Z2W7yTtKBLz54S5UfV7hCv0QyEz
-         vlRQ07hWb/dEZGNmkO6aR+jl57U8Vuw7+mibERwM2F4HP+hKnfSaTzNCGE3fVno0JMJy
-         jn6w==
-X-Forwarded-Encrypted: i=1; AHgh+Rq4jcUYt/pBMhn2JVvPzT2lvmDHpRqdYxJBYIQA1WH9BqJSnvF9QzOsZ41N7XMB19yocogEnjhap+WifrMnoPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVcB6dNP9BChETKCi7OP4BVQOj4H9KQCxQMUmlR6wy1tUtwSkn
-	SyZmH2VRmf1o9h2EjANA5VltAvPC93+C2ak7ls27oOuD2U/IJbaW7NTQ
-X-Gm-Gg: AR+sD11gLwvG8UATbTQ56M3Rr4XBklwLl19S8zXgPES0QzV4wTUbPC7gYHp28fO7rTS
-	RUtbJ2gQcTriUXqYFhvLEn/Cfz1SoK3p6P6sVRijhJSSTDVU/cjCh9Et1qm/L0YmfNbx5zJlfw5
-	t6AVU8WWKuM4Wtwe7x6OQmnY3E4n4VFIvv10EtMerl1C7i+TMxIDe9JaP8TYbTH7sud4LC3qtKy
-	tOehE+3hq1L1rqSUcWw3HJ0W+zvY9+39IM/Zm/EVIR70bKW3q0l2Dz6pm3XdcxsFpKA4fD8GBeT
-	AGffciXMJsOV5kjxNfEtIlJopXE9lD6JytLeX402D42qL4rraogbPovYtgHAiz0HU/B1Q+sVhEv
-	g5spUeQCBhXokKbNlfr9EicVoMPC6fuWK0JMqvaBF4pXYXIB8z4lDsbBWT9eGsUdfH1Tr0l8vO7
-	vQW9BkazOObM6jawh+AJChpcfs/G8wagVTo+BmHqyR0CETw7XjVDkYQXPstymd5LPXbCR6z8Qob
-	2slLjFRQ3nmnSTc+w==
-X-Received: by 2002:a05:600c:4309:b0:499:8afd:4a9f with SMTP id 5b1f17b1804b1-4998afd4d6cmr78007035e9.0.1786795000955;
-        Sat, 15 Aug 2026 04:56:40 -0700 (PDT)
+        bh=9/9+rmVvmvs6s8dnr8ttRWG5a1oyP8FaGHhemcTL1GA=;
+        b=U5BmY6u8G13DKm8+N+lLTCyHrUkZJvUhrCPJi3HeTkLebSk7LI+zP1Ni2pkcpL3VKe
+         tUpCZgdqMK4RxPvbT2H5GQtGQqUfYJcsXA6Cu8U+z5fohR1TGmr7Pd+Y+vmuLl1wjPuk
+         ztz36V3PKcGnphKxy8rwQ97lD6uTepCez4hTUagxDyDq1eCGOlnDt8BtFVjxQcHN2h1O
+         aWkdxlbg6mb4CM2vqcvJWaNTWIEfHxI9VFrlRotU0nRGVrKm9btBADbRZjj774W0gWqh
+         JiiVr16SocXnuDVmYy12wklv7sk6k+xYEFYNYsW77qmdv+9P89Rm7WJACf2/IK76QHg3
+         dmZw==
+X-Forwarded-Encrypted: i=1; AHgh+RoDxO6w0qaLSyz3oIxmKKBnciqb7a4eo7WEMg9c9ewE2n4SB4F0hclESHpCxzEoB+pxO2xeBY/VmYrQlaoDs5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0dbCFL/G6QToWdC9oCQ5VTm1cOFH84Mrl+Bq6QAt1qatfNVfC
+	rbQT5H4eSEwztyZ11emqRpoMuENUGba91RAzaLq82Gvk5OENrcwgHH9i
+X-Gm-Gg: AR+sD134Che/s5B7tnJTvdwg47dwE988TwHnrhjOOXGNIy/LAuBBNT2+Lcn71AX9gr8
+	eG59ifhcAVkGjoSYu11m9i4KA3JWVET2KPTjgtsrpUb/7+4XagzsU7UFxY+vgtEys4anBzL1mSQ
+	8Q8Ik5Ugx+ZmhK+LGRVAnuubmHfHWZB763wAufebNV5G6tL7n9VQT1tlGwDAu0iBvfcvO5Q5cWM
+	yU0Fj2a4NL35VoOEbCIEqD0P6ZRppIBS+8qz5MmDAt2w8hGP3Hef01egaUh/NPwY4Grm/d6US+R
+	x9cfWjbHM1NUVRb5bqrK85V3L/AE9rx6E4Y5Wc+M4Grc5joG7lmUzeUF2jtRMEmDOa0kUJEsR+J
+	dNbA7pqszTby63zh8CS0XKKyzDU7sVKQOe5LR4DC799R2N0gNPdf9UT92gSC9pm/q1jbcm+D9lA
+	mzpRobufUqwV+EYoNyvVeANNVIwuZ1YipWnHVToLWTBWf4KnqYb5HX/+D7/r8sO2vZngo123qnT
+	i6GDUZi7cw9
+X-Received: by 2002:a05:6000:25f5:b0:482:984d:fdd2 with SMTP id ffacd0b85a97d-482984dff83mr6257452f8f.20.1786795005196;
+        Sat, 15 Aug 2026 04:56:45 -0700 (PDT)
 Received: from archlinux.tailbe3ea7.ts.net ([185.19.153.11])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f2c129dsm16085455f8f.26.2026.08.15.04.56.38
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f2c129dsm16085455f8f.26.2026.08.15.04.56.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 04:56:40 -0700 (PDT)
+        Sat, 15 Aug 2026 04:56:44 -0700 (PDT)
 From: Ismail Tarim <ismailtarim7@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -69,9 +69,9 @@ Cc: Jing Cai <jing.cai@mediatek.com>,
 	linux-mediatek@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Ismail Tarim <ismailtarim7@gmail.com>
-Subject: [PATCH v2 1/2] Bluetooth: btmtk: Do not report success when subsys reset fails
-Date: Sat, 15 Aug 2026 14:56:23 +0300
-Message-ID: <20260815115624.8309-2-ismailtarim7@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: btmtk: Do not discard the subsystem reset timeout
+Date: Sat, 15 Aug 2026 14:56:24 +0300
+Message-ID: <20260815115624.8309-3-ismailtarim7@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260815115624.8309-1-ismailtarim7@gmail.com>
 References: <20260815115624.8309-1-ismailtarim7@gmail.com>
@@ -83,59 +83,59 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-btmtk_usb_subsys_reset() validates the subsystem reset by reading the
-chip id back. When that read succeeds at the bus level but yields an id
-of zero, the reset has demonstrably not taken effect: the function logs
-"Can't get device id, subsys reset fail." and then returns the return
-value of btmtk_usb_id_get(), which in that case is zero, i.e. success.
+When the MTK_BT_RST_DONE poll times out, btmtk_usb_subsys_reset() logs
+"Reset timeout" and keeps the error in err, but err is then overwritten
+by the return value of the following btmtk_usb_id_get() call, so the
+timeout is never reported to the caller.
 
-btusb_mtk_reset() returns that value unchanged, so its caller cannot
-tell a completed reset from a failed one.
+Commit 25b6d7593a3a ("Bluetooth: btmtk: introduce btmtk reset work")
+discarded the return value of the chip id read, so the function returned
+the timeout error as intended. Commit 3dcb122b3064 ("Bluetooth: btusb:
+mediatek: return error for failed reg access") started assigning err at
+that call and silently dropped it.
 
-Return -ENODEV when the chip id reads back as zero, leaving the existing
-MT6639 exemption intact.
+Keep the timeout in a separate variable and return it, restoring the
+original behaviour without changing the control flow.
 
-Observed on an MT7902 [13d3:3579]. The path can be reached on demand by
-asking the controller for a coredump, since btmtk requests a reset once
-the dump completes:
-
-  # echo 1 > /sys/class/bluetooth/hci0/device/coredump
-
-  Bluetooth: hci0: Mediatek coredump end
-  Bluetooth: hci0: Can't get device id, subsys reset fail.
-  usb 3-10: reset high-speed USB device number 5 using xhci_hcd
-  usb 3-10: device descriptor read/64, error -110
-  usb usb3-port10: attempt power cycle
-  usb usb3-port10: unable to enumerate USB device
-
-The same sequence occurs unprompted when the controller firmware asserts
-on its own.
-
-Note that this corrects the error reporting only; it does not by itself
-make the controller recoverable in the case above.
-
-Fixes: 25b6d7593a3a ("Bluetooth: btmtk: introduce btmtk reset work")
+Fixes: 3dcb122b3064 ("Bluetooth: btusb: mediatek: return error for failed reg access")
 Signed-off-by: Ismail Tarim <ismailtarim7@gmail.com>
 ---
- drivers/bluetooth/btmtk.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btmtk.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 66b346761043..dc702c0a6034 100644
+index dc702c0a6034..c0ed51567ed4 100644
 --- a/drivers/bluetooth/btmtk.c
 +++ b/drivers/bluetooth/btmtk.c
-@@ -968,8 +968,10 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- 	}
+@@ -860,6 +860,7 @@ static u32 btmtk_usb_reset_done(struct hci_dev *hdev)
  
- 	err = btmtk_usb_id_get(hdev, 0x70010200, &val);
--	if (err || (!val && dev_id != 0x6639))
-+	if (err || (!val && dev_id != 0x6639)) {
- 		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
-+		return err ? err : -ENODEV;
+ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ {
++	int reset_err = 0;
+ 	u32 val;
+ 	int err;
+ 
+@@ -958,8 +959,10 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ 
+ 	err = readx_poll_timeout(btmtk_usb_reset_done, hdev, val,
+ 				 val & MTK_BT_RST_DONE, 20000, 1000000);
+-	if (err < 0)
++	if (err < 0) {
+ 		bt_dev_err(hdev, "Reset timeout");
++		reset_err = err;
 +	}
  
- 	return err;
+ 	if (dev_id == 0x7922) {
+ 		err = btmtk_usb_uhw_reg_write(hdev, MTK_UDMA_INT_STA_BT, 0x000000FF);
+@@ -973,7 +976,7 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ 		return err ? err : -ENODEV;
+ 	}
+ 
+-	return err;
++	return reset_err;
  }
+ EXPORT_SYMBOL_GPL(btmtk_usb_subsys_reset);
+ 
 -- 
 2.55.0
 
