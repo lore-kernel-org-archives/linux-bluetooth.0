@@ -1,70 +1,73 @@
-Received: from sonic313-15.consmr.mail.bf2.yahoo.com (sonic313-15.consmr.mail.bf2.yahoo.com [74.6.133.125])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56A6126BE1
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 02:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.133.125
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DA21A6822
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2026 03:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786761737; cv=none; b=hYC8ap0UrWtVCPxeRmDAH/URUAH6mB/XdkUTIdvCv3GG+CPFOTXDuUU4gMdJM2HTt0EdiOJtM59aqd6zEPhuEGTjVXfaI0+myiB2a9mNfM8Ywve9eSpUfo1PEMslHGCMsV5f2Xh6pNDt6ysrQvMsNP84JB71QgDovmZRO51Ep0A=
+	t=1786764865; cv=none; b=RSvBPGDHduQ0G7bXwAB3lfzCy1sOgnJSj8vhi0eG+HJlsUyJSeslbGS43eBbP/gSAn5/xicgRXwroIKHN2N1RpGCuV+6wTbkEPlAzngALDqhazXPLc1Z2e0DrLJZt5kNFczQY0yhythKSQxB8eq6Uik2L9uasHFf8ntbL+XRegI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786761737; c=relaxed/simple;
-	bh=Dms7BAbaegS3O29hEUCmaITgxL9HXmTSHyZjCYxxmFE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=khUvG4zZ5aK6Catq5AAvSaPipLQ5fv1UjHJ8V3f2tvbqW7QHhNXOApt7ik5XBQdflILHb5kfhhjMKApgg0i0LgQoWBgOV6W/q7XUaiMGUXgKXlnWwRF/TPkL0Z0M3riODOzB+1ZycrlaJ2OiXFlrg5OvJv1M6sjozXjSmZ0lWOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ilK4UyVb; arc=none smtp.client-ip=74.6.133.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1786764865; c=relaxed/simple;
+	bh=2u0GRHTzdqDBD60dVwcN2/IRZa0Z8/g54oETAYVAwRM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEsknTfv5nXDkmCzNOnNbDVb9lKVBacAaFzZx65tKD07x+yZIJk9K/vl9+BnvIpVP53F9PW9XudZxTJ44EBRsrKos2UGJwPBnst8hQ1VrCzToY0VF2IprXPvQYHg1YHSiCyEHyjjKDVVYfeFQvfL+PnLinm9/gcA7/rZSvN4DSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ruwgpQTA; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ilK4UyVb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1786761735; bh=Dms7BAbaegS3O29hEUCmaITgxL9HXmTSHyZjCYxxmFE=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=ilK4UyVbY2EBo20n016UJoxFyiPu8MLaN7UCFsvRiWeQZ+PnVPD9DBRmIy8mndJgXIgGVVDDyS41NPZpTQIKOXlcv+ukbckDp7uG8XFck125L7GxeOY19y3b2aApqGDkMkESjd/7owXcj4j7+AFEsQXMpWoEHNeMYu9zSpP9dx33WU/L35pB7n8Oihxb4+ey54s6tZIBsD8J8zuMaTnN4SMe++0qr1PJeri/sc9cO9dZk7U+DPYoPLHNyuILdHUwkkx50R/KD164ngA8xRirxZ0ChoCgoX+gmYZBj2O1A3n1keNNm5IvKkdVWSxPRpBNK1iytq7hSGLkFrng5l6oTA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1786761735; bh=dBIrulJIFxh5Sx7FBgeAopyG0gwtmsuAJPHp7RJmBjd=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=bq6gj5TtTaiqnw5lytx8nLTOagfQMl2jHtLdAlQAXlSp2Ia54JZsbEbC1cRDu+k5aPgiLbfoXIXoUwtRP2GmBfAy25aoULpf3qo8vMv+6FE1QATgcgyIFZDTS0QMYU4GRwVhJYyYRqjx7dvfFPPnlhLzV2v70UJm50ocFtdMTzx8a9wlBhk/IVo4cci8UQVTrmOAxuC1xAe3NIWbAdTaQh+wIRWFWFzy5cZ+vwwZ4iz9KOM9sws264yvZfWuxX3uFgeZx1NNEw7OfwGTG5MfKxmnzBmRD6JJajaIJQhHbEC1IufArvj0N1LpCbY0voZZTl0Xef00zapMKBEhQfRh2w==
-X-YMail-OSG: S19Bk_kVM1n35a17CqaGKGG3uCuysjGc1yXecPsJH9gmwgCsAgjML8K8FH.Db5f
- ad8.MS_Ajqo0keAT_EiiVrdf75Rcki4yr423jbK.vThA57alxHJpWlli0RONraRP8iLBU7S82skS
- ks2o2kIs9irZos5yoidJL6.TFY2ivnWg29CLgPv.1OKo7sjt3nc0lcPYFnFWK8Jjxjd.gl2sWUOM
- LwpU_0R5lR6R.Mhfy.39Db1lo9ceSsUIqQpRVTAtWNukO_bGAc0PYry7owRolzlhk.cjChUSgf2g
- rIjLt9WEtwSFZ6D0heeCkrvldjiiA.qlw0l699WwIWBQBAFntn8jVuojAOpENmQsZbqZ5Sgw1a29
- 5dnRZreMZwb5XSEhh0kRPR4nRcL9yo5Ymjx2_o4QjKkcQWM9zRMItvyC.OpoQ5xPa5_L54Jz3X6T
- 0X1pPjtqMSA0tJ6GZme3Dj8GIiqc2hZO8l4O.KRbFHXpaFE5xhAuzZhquWMG30xW0ZBzHoIc2RbG
- tADR6Qldi0G95kC5e8LwcQw1ZgThq_2WVMGd9tCHtKcLtFHtM_NxRUQ.5oT.ROYbI7F7_elW4hKg
- 7XcjPXMcjx_8HNxFGQD5y3m3ntAS8uZB8CDUOqHCpB0WdRNgvvc5gW.JM8zJSndwBnDxJqTbW1F3
- 4WEbLttDhJKxgiJP.sdAlGJxbMK1s3FpT_XwFWA1IbrkiqmIPgHCQDFqZNXxkflH0ToAG9S8GwNU
- 8qUG6MwqqjLrjZplEzKu4AZJl_YlSCX.Wso6s6RAcUtbI.Cc5IgeP9S1t1X0sB_dOOpQlXyG28Vm
- qX9EuSkUf3iqUoVthsN8fHT3Xp9DIufaAp68shydcrREJmUUmLWzlufsRgvcC8z4FkiVS6qJgmhK
- 4DYRlYDI9V4Y5PKKLtp2uWbNzSLCd4LtsiZbQFgNxL.7H1fQD.G0ed3P6na_SwAsQskj3dhqnSFD
- Q6BYD.QqnPG17TPRaDuo_2stFnTzTp7ZU4DC_2DpXf6MWXuDhFr.gES9O6fTKRR8dLhMvjU4LV0.
- EmYZiTeo4FhP.ky0NqjmHcmL1ivNtvpy5amqEzrNQZLIGLXUyjYrMPdqMrfQRxtmPfkJFfhmAezy
- PYTAcOUsfXDRbs0a8L0A1H7uj_O0iW3wHmd7bZL1Qvynz1Clm29hP4mNs2NfUGT56r9HTEsJB0BB
- UbVgJWGgv9bbosVSGDwxdq__kp1sYH57e9mPr20zVZVrWhje0g0AsfI7ThB5BWUFAVJEqmPxdi6K
- erYw6SOZjzkgDIT5cRI8aOWaBcozKTIdW.mrD5wOyCTkMXcDpVu95_dOl4.k0lqQqX.NtAeVeFfy
- qgPK.TkJZnkUmwHAinM0VFto5xjigkODLxC3E7.wRluMi4XXdESmHnfaEDh4M7rc_Cbx3hU78iPO
- GIfOffoozVlESYRhDGyxfF52Gh4QX29vLaDZgZJKjUZ9Wb0XUJ0IryPE_7gy7vVG.eEOVEix.Ckj
- sl.XLKT6fbd5CoziwuCbjJ_Zr18E3qhuMucf1PkuyAEQ95.a5DgWuvJwtcqMXwz_5orNFizXUJ2i
- O550g189Of2khjpe282VIpeOZybDQnQh_i6KSgzyxZ8bs4GYN9Bv_3NFG_1y0ZPB_khdnVqT2IkT
- rIWXiZRe2xovsxU.aCMmx_.YkuOBrty4.sgEUk4HDhfMpgIJkxLjzFY9AmzArsdHL51Y7c41zN9z
- cZ4T4d1K6xEcrOPo4Vp8oFmb43wSRft6gn1KdRm17n6Ba2lncJiWTVnNE653hAbEOE4Dn.TpF9GF
- elQxqQ1dRu_mesWRyA3d1YLVnc.bcGNNyn21PqpsfMmlR1BRAvNqMeM7hMX6g.BmA5e67EfWw0CZ
- YPs4cbuWY3CC7gEBBeP8i5AHkOpNqY4JNkXCCP0JS6MJmnWvNa7WTmg6xsesi.IJhGUTQF81nvfx
- .z.gZBA3begtUfRcXjRQ.kqFRWLx9JzOlPJuEiDE7HawQxWmNaRYYIM_fxPJgXPKfJPGEnHySKqz
- FDsILaCKHtF4qo0Vl14.aTkROBWEM_ApohycDsqOYkrmqUZL6Ok546wmA3wt4PPrzjJM9M2y20Gq
- 9NEIi5eJxU6mqOChV8EFeNUZNYOQrVYztJVGXwO06rSCByQz3kPQS0JYev.21odji4UVyRb9uGrN
- UviAFW1_4qYJrmPZY7fZVnH0QUEg6KKl4MAQfvcwQM.Sgo8HfLWpk7r88_7etX1AMtA7kRl9PoeP
- fa226xHb9KoRbpMucOp6J2mCRCMkmKwABY.Gi
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: a1f7a8a0-0186-4317-b552-4058cd35c125
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.bf2.yahoo.com with HTTP; Sat, 15 Aug 2026 02:42:15 +0000
-Received: by hermes--production-bf1-54b5569bdc-79vtl (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 138283dac323a1a027ecdbedbbdc7afa;
-          Sat, 15 Aug 2026 02:21:31 +0000 (UTC)
-From: Jeremy Dean <deaner92@yahoo.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ruwgpQTA"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-39faa67fabaso9650721fa.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2026 20:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786764861; x=1787369661; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=RyihwzFYKn6w8cGBkzYZ/sFWq9QB5ppf5XFLNqtPVvs=;
+        b=ruwgpQTAxzKWB5GyoRCFo8ZIyrOfxxktRfWa4vk27yrhwnv2ljoAszXmNSRTBfBX0b
+         T1QhWE2RHFI9koNaW1Xz8BHlQBbx3skidrDT9DUq1PYswT5Tv4y7DN+EtcNpbr/y5i+U
+         LetAXqouV0kvav25n09c2XTTEb/MQkXoGr1ulMQeQ9e/tmSIJxyR9zuki4KQ84KAtfIO
+         aCYtCa+WUZyJPWbFoHzkNWnJ52QcwAFA6p4osZyFY0P3nKczC9vQw1q5t4As1ixdVGiu
+         O+y5AZAEwaRRiOQ64/zI8AieCRIscyT/EYY0sC+/EyyYoBdpfPSPt9jekF1RZVIiWO61
+         A1zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786764861; x=1787369661;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RyihwzFYKn6w8cGBkzYZ/sFWq9QB5ppf5XFLNqtPVvs=;
+        b=Y8zsj6Hfg+Crl8NbXmOXIbcImWKm0u8fMxkBjQizVN3LB+m3kjUqucQK+XLc9itlh0
+         htY1/nlpBbH9NIQKYk4gE+1MZV39E3AbbLmmCxmton8uJUnOr8y/UoE805U+9kG60Aiu
+         dEQrC6OY6PAje8MTH6mfqDEmLBZVfxO9MC8VAcZZRUqmSGoxTOiS4vlZEITzjwtX3sk/
+         tZ3H52ZoJD1AD1q5OG+bHNXpCb2NX7flIAzj2oXOAh1GJSE49d+FAbYG2cPHNSKGxypr
+         X9T1wYfTz4A0aOxmcU6TJ8YQPRCBpOtC9XxuKJbhbWENwMcXyuCGP8E7RtiW5YX4i1ww
+         jJHQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrlqltAUuW3gYohDCEmm/R6HSNJNZJLyn1LQI9M5G6pxY9C8u72nxrWTVpbEsrqGhbZYLkoOrm7Tr4LHrXeYRI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVVJsJ0uRpuDI8LHCahMFjJpvcCOVRtKedxFCyeYZ2DFMM6oRc
+	lUq4Xefsd07Dh5L5QVQFw6g/q6MJPlUZKH57X3gMFq2jPSHayJh6ZMl2
+X-Gm-Gg: AR+sD11PbU9+HwlVdK/WxV9iXg22Y9BHBR75c4o3zrGgWEYGO4HXLVqoLn509YK09eA
+	OLaIiDBDDi2ztY1mPrA4QY06E1Q90AQHH3HpVE95QDTP66YIjO0Fc3FyD+E4AxJFRB7NyfyVD2h
+	fdPdHJLMI8+O+cjOXgxrHvfukazhIOOxUaG6H690Hq5ZE5l0YMyD5i9i3ZrZQm1wF3H3KyHQw6J
+	hynQipm0L6z3t6MTbPEGFSdCpfBU///0AXAGIQzwNyh+Cootd/6Gux1YOdYDp6+KQT16bnfGhgu
+	JyYx86G0/4us7FbifpeM5YyXyLcybvhnRQFpYYE108vNCCd83Urhtra0RzNzPVCC19Ucz7TbcHS
+	cc9X2POnO4hsrBbSlRO5zI2kmViKyXAi6XZIrWCK1mPpaYtHU4dGBX5nq+UkiGOyWfPsY/piLpx
+	BXaKBObOxNmkuWMUxxAXGbP2N9i+b7np+yoEkTcLByMZw/N+DoVMtcLfeMUrVI1P0LuvjqvBeHu
+	w==
+X-Received: by 2002:a05:6512:3094:b0:5b0:1df9:2aed with SMTP id 2adb3069b0e04-5b45915e5d4mr1551124e87.5.1786764861406;
+        Fri, 14 Aug 2026 20:34:21 -0700 (PDT)
+Received: from localhost.localdomain ([188.162.14.60])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b458beda7fsm882707e87.43.2026.08.14.20.34.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Aug 2026 20:34:20 -0700 (PDT)
+From: Andrew Bille <andrewbille@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Use DECLARE_FLEX_ARRAY() for qca_dump_hdr
-Date: Sat, 15 Aug 2026 02:21:18 +0000
-Message-ID: <20260815022118.4272-1-deaner92@yahoo.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260728212431.106411-1-deaner92@yahoo.com>
-References: <20260728212431.106411-1-deaner92@yahoo.com>
+Cc: Daniel Drake <drake@endlessm.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Andrew Bille <andrewbille@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: treat 0bda:0002 as a generic HCI device
+Date: Sat, 15 Aug 2026 10:33:46 +0700
+Message-ID: <20260815033346.15882-1-andrewbille@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,5 +76,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's been a week or two -- has anyone had a chance to look at this?
-Any initial suggestions are invited.
+The 0bda:0002 Bluetooth controller reports itself as "CSR BS8510"
+and exposes a standard Bluetooth USB interface.
+
+It currently matches the vendor-wide Realtek quirk and is therefore
+initialized through btrtl. The controller does not respond to the
+Realtek-specific register access and initialization fails with:
+
+    Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
+
+No Bluetooth controller is then available to userspace.
+
+Add an exact match for 0bda:0002 before the generic Realtek entry so
+that the device is handled as a generic USB HCI controller.
+
+With this change the controller registers successfully. Scanning,
+pairing and A2DP audio have been tested successfully.
+
+Fixes: a2698a9bf9b0 ("Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support")
+Cc: stable@vger.kernel.org
+Assisted-by: ChatGPT:GPT-5.6-Sol
+Signed-off-by: Andrew Bille <andrewbille@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 184e95c1625e..fb9fdf90a3b9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -615,6 +615,9 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe130), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* CSR BS8510 device using a Realtek USB vendor ID */
++	{ USB_DEVICE(0x0bda, 0x0002) },
++
+ 	/* Realtek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_REALTEK },
+-- 
+2.47.3
+
