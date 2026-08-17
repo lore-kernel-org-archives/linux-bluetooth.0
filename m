@@ -1,242 +1,148 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E362C237E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 15:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153032773C3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 15:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786981710; cv=none; b=EMQ6uxR2shUmWs2NWY+YGF7n4VyEnr1vQ/MMu9CLA1cBRDd4c1zSZP8uWPmVQgUha8Aef4SAp8qKuNS5QYMZVdfahFpry7t8DEWdjay4A5B1mnkQKNA+pcbutJRoQKeSbZFtsbOviZa02dAtcLFuD8lcO7TkEEzHMLaP+Du3IXc=
+	t=1786981739; cv=none; b=Kqsnd0hOehgEplAHQbahfIfc1IvU9idUOpYldP4gKNycSpJ/hJp8H9BJT2ca26u8qf95sdUXmbHjqfdRzbzZP2V0Np+1NzZHSO8UP6ikfRHys5xaqnvOcd9m+5zY5j6T0GfP/e+LCbZl5/jOzrr+FIpyf2VFDy0HfmLt4/5cs+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786981710; c=relaxed/simple;
-	bh=6DnzgOtXmNQl+/ThzNMZ0cFYZA8gqSx6dqXNTBv7D8Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=omt4taz63t0H4CHmHSWO+dE/D3FLgTuW/MPayDFWbRff/6AoK7QbXH1Y1tuHuGK1YBZZL87aZruyUjoFo24lMNlDuRkkZM2uAyxO15Z/NKSJlHj3/CN1xIIKIHrbyWHgCwSozw0ARcRhTGn0Ybp5evd91GZj0v9PZMX681p0geA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from abreu.molgen.mpg.de (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2BD6E4C2C37D59;
-	Mon, 17 Aug 2026 17:48:22 +0200 (CEST)
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH BlueZ] obexd: Reference count the phonebook back-end setup and teardown
-Date: Mon, 17 Aug 2026 17:48:10 +0200
-Message-ID: <20260817154810.92634-1-pmenzel@molgen.mpg.de>
-X-Mailer: git-send-email 2.55.0
+	s=arc-20240116; t=1786981739; c=relaxed/simple;
+	bh=POuA5Z3tukynM4bd4/Zr6B2Rkfv7e5AtqlHvWPvIjHg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Rmwb1Cq9h8qKUGSuIEBoGxHxx/snkpByvloHt6SMg3/xUFAPf8He57Z70cauiWvP+FJp1oIjPTU1Cvcjt28UbGVwyB4N+5vZNJGrgVnLtypvcYUg9ui93CNvpLNwODq7rBqJorL+ybURudvGZNbTJHz35b+TueIr1PcafEiVuPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDeXQ3Et; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDeXQ3Et"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7e6b5737bb2so4195143a34.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 08:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786981737; x=1787586537; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=xZHPXUkbEuWpqp9gbUPTXgX/t3PBDpJC+lK86xezMUM=;
+        b=CDeXQ3Et2b3MDD4n/YYbpSu5HbPlXzVUUV0IIGZtif8ATmVxY30fkqXsJ8fX5kCEsL
+         N9+DZTjMzj50lauwCMC2L2H0PhnV6RDpmPEvXjCaudSOWERTFcwenKf066qeQX5Xc+D0
+         6P/IVEJ7hI4VWzI10L51RAiYVL3NS6OfChDBEZnwem83nslj09WEta6lyjq+5HFG5LWK
+         KBtQ79YVUwRwpocgZAD4gMolNDnIq+dlDhQ2MNHH2y46oOjDvaCSkQda6jfqpcbEcelH
+         KanuczJ5A/2KzwdFbY/7EJ276W8h3aBNMdkHwW7aIhYl+WR7sV7HcDwWjyUogEV8Gb+u
+         6c1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786981737; x=1787586537;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=xZHPXUkbEuWpqp9gbUPTXgX/t3PBDpJC+lK86xezMUM=;
+        b=N7o0xmOAMola94TBSwu6CEYkUVgGUVCtL76najYpOebpP6qbY5HYXgbpcgW96Wa+jw
+         fTFzVtWB6iOX3yqMNQrTwXKdWvuEC5CYHI8X/XAnIMdsOyEAZNh1w+ttQfCEYr4dMLsF
+         Lr63Uq9Z6n549X3Nl0RxYJaTLYc1FqJfKMqNjaDgr8EoNRD/oNIXwuLf9SPnFt/TGuqj
+         blzgoG61msBbXdura65HXm7xTqHpKRXx8mAkxmYVQD7FS1wQNzpKwXwl8UEO80vf7CFW
+         xplkj0JcbrcJ5IjPe+9fVAeX2+gy0pygGcfjx0abeq8sRgtoO1udg8Jb1RUxhLpMdGj2
+         oJqg==
+X-Gm-Message-State: AOJu0YwjOhC7FPnLzEpN5ru34NUnEOmnn3qMUBz5ME7TcRvitV8fpjJb
+	F/8HrwkhJjW5NdSiW/xfZ9727qXiPDWH/zT8XcCJVaFxr9UZs4UgaS7tZBBPgQ==
+X-Gm-Gg: AR+sD11qpyk99tiHNVy9f9S/T+9rjpRGSTOpA8LZ5W6oUOifCvkNC89z/11sulGoHi4
+	CvyVyZ2O4M7LCwZSAYULJHhbyggYzDaFjqH+ZYqEpCo2lrKdNXAzxDPjy3LGOpK0hu0Ww9Og2FD
+	rWVY82jiMuEjQ3nEvFuxd9++HcJ6kDQtmKHxdebNO0n8vnluHwMcMn4i0DA9SdbWoh3Bs5w4Med
+	mEIWk30tj5lC+PBD5eU+8YH79z02zy3FPIFxcurb/cs5sacrLjzeePIoL9Q/YO5pHd4i1Wkc3aV
+	UpZ/DtI6mCWhfNoVH63JunPPYLAm0TSF6SvQJqcuEVja2IXOhHnIfAB3E0+Gmrri1nt9bnH7qO7
+	v61n23guo9F5/TcJ8TuPWNrvjkZRcYQuqs+Ie3RgUuAkn9Sj4Q18nSMwmxn2Z+TjZEcJF00sTIC
+	pDTM2+CVwLslJD1z+EKfQi/VxrNtDk3CdFOrMDMhGnmm4MTjvb2Lg3U0Xt3MnODwKckw==
+X-Received: by 2002:a05:6830:61c9:b0:7e9:c8e3:4473 with SMTP id 46e09a7af769-7f423f8730amr1381590a34.16.1786981736716;
+        Mon, 17 Aug 2026 08:48:56 -0700 (PDT)
+Received: from [172.17.0.2] ([52.242.243.3])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f41bf2c916sm1880339a34.9.2026.08.17.08.48.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2026 08:48:56 -0700 (PDT)
+Message-ID: <6a832d68.01061b14.332950.c9b5@mx.google.com>
+Date: Mon, 17 Aug 2026 08:48:56 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2051742340201830502=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, valentin.kindschi@fiveco.ch
+Subject: RE: [v2] Bluetooth: hci_sync: pause advertising for the scan address update
+In-Reply-To: <20260817150323.520207-1-valentin.kindschi@fiveco.ch>
+References: <20260817150323.520207-1-valentin.kindschi@fiveco.ch>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Stopping obexd on Debian sid/unstable with *bluez* 5.87-1 logs a GObject
-critical:
+--===============2051742340201830502==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-    obexd[10687]: Terminating
-    systemd[1804]: Stopping obex.service - Bluetooth OBEX service...
-    obexd[10687]: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
-    systemd[1804]: Stopped obex.service - Bluetooth OBEX service.
+This is automated email and please do not reply to this email!
 
-Two builtin plugins use the phonebook back-end: pbap (pbap_init() at
-obexd/plugins/pbap.c:962, pbap_exit() at :1002) and irmc (irmc_init() at
-obexd/plugins/irmc.c:446, irmc_exit() at :473). Each calls phonebook_init()
-when it is loaded and phonebook_exit() when it is unloaded, but neither the
-callers nor the back-end track ownership of the singleton they share.
-plugin_init() therefore sets the back-end up twice and plugin_cleanup()
-tears it down twice. A gdb trace of the shutdown path confirms both pairs
-of calls.
+Dear submitter,
 
-The dummy back-end tolerates this by accident: phonebook_init() bails out
-early when root_folder is already set, and the second phonebook_exit() only
-repeats a g_free()/NULL assignment. The ebook back-end, which Debian builds
-(*bluez-obexd* depends on *libebook-1.2* and *libedataserver*), does not.
-Its phonebook_init() stores three GObject references in static variables
-and phonebook_exit() unconditionally drops all three, so the second
-teardown unrefs objects that were already finalized. The registry and the
-address book are effectively singletons in evolution-data-server and merely
-gain a second reference, but e_book_client_connect_sync() hands back a
-fresh client on every call, so the first client leaks and the second one is
-unreffed twice – hence a single critical rather than three.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1147270
 
-Put the ownership tracking in one place instead of duplicating it in every
-back-end: phonebook_init() and phonebook_exit() now live in a new shared
-obexd/plugins/phonebook.c and reference count the back-end, so only the
-first init and the last exit reach it. The back-end entry points are
-renamed to phonebook_driver_init()/phonebook_driver_exit() so that they
-cannot be called directly by mistake.
+---Test result---
 
-Assisted-by: Claude Code:claude-opus-5
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       PASS      0.28 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      26.01 seconds
+CheckAllWarning               PASS      28.50 seconds
+CheckSparse                   PASS      27.04 seconds
+BuildKernel32                 PASS      25.08 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      470.30 seconds
+TestRunner_l2cap-tester       PASS      64.83 seconds
+TestRunner_iso-tester         PASS      102.25 seconds
+TestRunner_bnep-tester        PASS      19.79 seconds
+TestRunner_mgmt-tester        FAIL      225.41 seconds
+TestRunner_rfcomm-tester      PASS      25.36 seconds
+TestRunner_sco-tester         PASS      32.38 seconds
+TestRunner_ioctl-tester       PASS      26.29 seconds
+TestRunner_mesh-tester        FAIL      26.19 seconds
+TestRunner_smp-tester         PASS      23.48 seconds
+TestRunner_userchan-tester    PASS      19.88 seconds
+TestRunner_6lowpan-tester     PASS      25.75 seconds
+IncrementalBuild              PASS      23.75 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.248 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.128 seconds
+Mesh - Send cancel - 2                               Timed out    1.984 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/601
+
 ---
- Makefile.obexd                    |  1 +
- obexd/plugins/phonebook-dummy.c   |  4 +--
- obexd/plugins/phonebook-ebook.c   |  4 +--
- obexd/plugins/phonebook-tracker.c |  4 +--
- obexd/plugins/phonebook.c         | 47 +++++++++++++++++++++++++++++++
- obexd/plugins/phonebook.h         | 10 +++++++
- 6 files changed, 64 insertions(+), 6 deletions(-)
- create mode 100644 obexd/plugins/phonebook.c
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 7ad74e1..9daa5aa 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -48,6 +48,7 @@ obexd_builtin_modules += pbap
- obexd_builtin_sources += obexd/plugins/pbap.c \
- 				obexd/plugins/vcard.h obexd/plugins/vcard.c \
- 				obexd/plugins/phonebook.h \
-+				obexd/plugins/phonebook.c \
- 				obexd/plugins/phonebook-@PLUGIN_PHONEBOOK@.c
- EXTRA_DIST += obexd/plugins/phonebook-dummy.c obexd/plugins/phonebook-ebook.c \
- 				obexd/plugins/phonebook-tracker.c
-diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-index 0dce13f..f308ea7 100644
---- a/obexd/plugins/phonebook-dummy.c
-+++ b/obexd/plugins/phonebook-dummy.c
-@@ -73,7 +73,7 @@ static void query_free(void *user_data)
- 	g_free(query);
- }
- 
--int phonebook_init(void)
-+int phonebook_driver_init(void)
- {
- 	if (root_folder)
- 		return 0;
-@@ -84,7 +84,7 @@ int phonebook_init(void)
- 	return 0;
- }
- 
--void phonebook_exit(void)
-+void phonebook_driver_exit(void)
- {
- 	g_free(root_folder);
- 	root_folder = NULL;
-diff --git a/obexd/plugins/phonebook-ebook.c b/obexd/plugins/phonebook-ebook.c
-index 5fc0498..beb72b2 100644
---- a/obexd/plugins/phonebook-ebook.c
-+++ b/obexd/plugins/phonebook-ebook.c
-@@ -625,7 +625,7 @@ next:
- 	return data;
- }
- 
--int phonebook_init(void)
-+int phonebook_driver_init(void)
- {
- 	EClient *client;
- 	GError *gerr = NULL;
-@@ -662,7 +662,7 @@ int phonebook_init(void)
- 	return 0;
- }
- 
--void phonebook_exit(void)
-+void phonebook_driver_exit(void)
- {
- 	g_object_unref(book_client);
- 	g_object_unref(address_book);
-diff --git a/obexd/plugins/phonebook-tracker.c b/obexd/plugins/phonebook-tracker.c
-index eb7a84f..36e73db 100644
---- a/obexd/plugins/phonebook-tracker.c
-+++ b/obexd/plugins/phonebook-tracker.c
-@@ -1420,14 +1420,14 @@ done:
- 	 */
- }
- 
--int phonebook_init(void)
-+int phonebook_driver_init(void)
- {
- 	g_type_init();
- 
- 	return 0;
- }
- 
--void phonebook_exit(void)
-+void phonebook_driver_exit(void)
- {
- }
- 
-diff --git a/obexd/plugins/phonebook.c b/obexd/plugins/phonebook.c
-new file mode 100644
-index 0000000..6afdb7a
---- /dev/null
-+++ b/obexd/plugins/phonebook.c
-@@ -0,0 +1,47 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  OBEX Server
-+ *
-+ *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdint.h>
-+
-+#include <glib.h>
-+
-+#include "phonebook.h"
-+
-+static unsigned int refcount = 0;
-+
-+int phonebook_init(void)
-+{
-+	int err;
-+
-+	if (refcount > 0) {
-+		refcount++;
-+		return 0;
-+	}
-+
-+	err = phonebook_driver_init();
-+	if (err < 0)
-+		return err;
-+
-+	refcount = 1;
-+
-+	return 0;
-+}
-+
-+void phonebook_exit(void)
-+{
-+	if (refcount == 0 || --refcount > 0)
-+		return;
-+
-+	phonebook_driver_exit();
-+}
-diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
-index c73ae73..b878b14 100644
---- a/obexd/plugins/phonebook.h
-+++ b/obexd/plugins/phonebook.h
-@@ -79,9 +79,19 @@ typedef void (*phonebook_entry_cb) (const char *id, uint32_t handle,
- typedef void (*phonebook_cache_ready_cb) (void *user_data);
- 
- 
-+/*
-+ * Set up and tear down the phonebook back-end. The back-end is shared by
-+ * the pbap and the irmc plugin, which are loaded and unloaded independently
-+ * of each other, so the calls are reference counted: only the first
-+ * phonebook_init() and the last phonebook_exit() reach the back-end.
-+ */
- int phonebook_init(void);
- void phonebook_exit(void);
- 
-+/* Implemented by the back-end, only called through the pair above. */
-+int phonebook_driver_init(void);
-+void phonebook_driver_exit(void);
-+
- /*
-  * Changes the current folder in the phonebook back-end. The PBAP core
-  * doesn't validate or restrict the possible values for the folders,
--- 
-2.54.0
 
+--===============2051742340201830502==--
