@@ -1,170 +1,214 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB152419303
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 18:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C53330B32
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 18:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786989970; cv=pass; b=ByQZdO47jono3IdZqJhTGzrYwO90g5/poB8LezWUBaGGSTJOxOSkJBao5i4TUoknHyKvWVOpotlMcm33DPdy3KeanA/iy0i3Tub3Nz3uJrGi1ugToGl8l5H82EOI7n4s+lSlbdWDmVdfnYuJtQTnhezSLs7YtcTF9BJgKpA8848=
+	t=1786992221; cv=pass; b=EGgHm5Qe9V6N01NcOEIuq+t3fkayXMhbc7EIYt3EgMVIBEi3Tcv/qwvxwQJC8qcovZbkIbZjItR+4VItTlXcRIM5a/xW0/A/zSArYgxAyxJAfh1ba66+w8VcpGIR7F7k41wqBtHpOyp3SK9B7zkRjp+lsiLHBr3paILDSjn1K+w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786989970; c=relaxed/simple;
-	bh=JlL4Z4kCZkMEBPHWiE/ViVx5PDkOaDSjW7qHiafpgq4=;
+	s=arc-20240116; t=1786992221; c=relaxed/simple;
+	bh=kFUN9djagA2d2V73MWLMnsNCDl9EhEQ6AKpalaiUFdQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X70PVLnQSd62Q7aQXMiZcnzSCmK67g2ve08ylRzj1v5MgeU3EQFbq+e0qXpPEDDQBGzwTRGb5ws8s5qROnCGSC4NxKI84lUSmYilDfNVXl6WK4c95Y4g0nS9dryARnSp2uUBQ3ITrDVvCTjFhu40+Cw94PTx1F7/jIk2QQBtJ64=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UoF288xH; arc=pass smtp.client-ip=209.85.128.172
+	 To:Cc:Content-Type; b=UQp+XZDKMwEQa39kaqNcZOqM1Szg8HZOB0WLEsV6aNvdA0nWjv3VAOecMFiWG0Z2ZYdvfsA410XqgWGWwDB2eMLxYPr837jJqZIN8HLLcq1Q8Ha6jD0K/o5MIAob549nMyCkOusLlGwn5nNH1sFHWPWXeMDtSHRjGcmq9od49gY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dl2R/dPa; arc=pass smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoF288xH"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-836c8bdac50so49241637b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 11:06:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786989968; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dl2R/dPa"
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-66c711b7f2aso5532271d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 11:43:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786992219; cv=none;
         d=google.com; s=arc-20260327;
-        b=PCgZpqS1jOrmCFRu3jytnoDiAxvz+tHvcV1LG9aqmsI3MtlDFWJ5zwxniKOZSOrzYo
-         ea+w0x//G8IvQaYeHUfjKYs9ziK0ict08E3b4H7kjbIF4R3EKMW3UQaOkOrlCao0lkUm
-         D2yc0Xfs1jrxGxDxFup05+5xVY8azLBxhXU9MGnZfDWv+gKVSgHKsLyhadRmqaeeRMQc
-         DB9gQ6x1tSmAf0GKIJtsgbdLoV6KyCNifLQsqLlbteMFSjs8eLIaiJOyKV+8fEjlDExb
-         PobbrA0tJi8mSfNAhnTWW5ePiPxktjUOFM9j9LWj530mR4ewL0AXEh/m4poYKepKUecJ
-         iRtA==
+        b=lXwDr7TsFbFYEDy3L0DmnuXiP7H2QnRJaQhOJv6YbyYZttPfZaoG9UrL2sohvsa6uF
+         TYhLpTzXWk8c9L5UWk/ZEaYNrxER+JZHbqV/TfJ3tFbkLXkb4uHQURNgc1OmelsBkf2m
+         8z9DXneqHYbCJ+/WRglexCx9eKLyczCASDH67ChrmE0acYd+bV2yMg+mjqf2xcLPG2Zu
+         anVPK8uAmIKVoS55cQLBaf/RrJnuqcirM4bhmqgsjHelbnZTW2w6TiiiI5BFEOFQtvA4
+         N5914tZKm944MV7AWxHcM0a5umRTBSSDZBlEQNbTu5s1P0Gc7NylmeYPdDisd8NbQerf
+         Qmgw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=KcQPlUyt9fGbPvuHNX86KFq9XHrXHuGXNoT23phPfOQ=;
-        fh=suUNCC6A8MUzZQXH4Ni4YK4h9tCYjyZbLvQI8u1bqpE=;
-        b=GrHriQyWrYzRl+4SvCzAROewainzMNg2VZtkojX02IfSC1iugT/uOAfh9hYlSwKCUZ
-         0+u1x/iAvX1R5V5xFbjZ7gNGogoRXqO8cFEf9yk9ObMdue/eWAcNqhFW+sZRLxUO//oE
-         c4nM+ElhKkFpJYSKHrDlN17TwKibnY36APnVFAoenCw/RJ/Ir5bGENROMpwUmootZhuP
-         exZ4tCkbYtFEIMOJt0gA6TWle0M7rWRzDDDNd+FhtceIXEF/D6j8WfW+17j/bjTBxG6M
-         ZZ39areJ16aiWCyyCPpLKIQmGWQE6iX8m87yDcHS5c23+yvs9kCRbiexxtaTlZ9I4dOm
-         XxoQ==;
+        bh=3TmBisPOhOA5pousfNjAC0K6au9wS+YV1klStzHvJk8=;
+        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
+        b=Z2/EV2zkkqDREiru3uNbaL+3PI79k1AR+WUN67d+BtwMdavxzhI8lAjRI8sMJ1V0ND
+         iQNC1q+CZelRMp8udkep2iieBhPZtrnLdl2H29d8CGkU4RH5cyJgYCY9YUhBZvqtoILB
+         F4kgwOlOPPXMkju9iLoFdOPySaGqBjxHRWYiP6jjRbRRPRPJr3tiC2ocdVzI5nDzzztS
+         gOe6k/BYiM3O08hOm+HPjC9XIaJ35LtwXA9m3FpgPzq8BUCJZele80938bfPD26JAbbf
+         aUF6Jl3Fsgng5TL6r0ag9D28fEwGS3Io5gUXXiP8wvPoLUDol2xOnvm5Ok8lbV1Lkzee
+         aBLA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786989968; x=1787594768; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786992219; x=1787597019; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=KcQPlUyt9fGbPvuHNX86KFq9XHrXHuGXNoT23phPfOQ=;
-        b=UoF288xH+Mns0z2qqrohxnUILeA0J7bJLIN2G364RvZGRS/0LfU1Ypa5U/OKPU3Q1G
-         bqe7CSd++6zp95NR8gtL04473B6JUohGiFO4Wb39Ykmx0lT7dhhco89uydKQggVEO7iN
-         YUD8sgURgdtF4Tl8vz2e/QaX8GS/oy/Z1AkHt6sd8uL+PH6xew4uesIFVOXBTgvak7Dl
-         Rr/MYGWktv03ErtBO1p3mvctya+BkHl++5U3tnAQPoBLbyn2Hi6bdusV26qQCZVA45+6
-         LKxjf908ihjgs7f15iWQSLNaJcVWXdfkjM8Cwcd/k+/8uzNcAj9jzfqJm6e+Ky8MmKNw
-         Bcdw==
+        bh=3TmBisPOhOA5pousfNjAC0K6au9wS+YV1klStzHvJk8=;
+        b=Dl2R/dPa7c0Q6jtuDmIKdV6sMoXjE4XS3aTvXY9Ym4y0LVp+i8cay0N5ysUiRuLLwA
+         eKyjzV1jB9ftj4xU4jRcqo3yRsIISF6eZrF3eDSfczeKZTv2aHs4l4z68hN69nInwOtE
+         no4db6TcZAtM9JuTPDFQt6aX5Qzd/FEKp4F/qa6K2+saE+/V4Gj9U7lHsCHl0HKCAeAD
+         vvuMe4Hf7s5DtcCN8f9IQCbm3c7ZBFGhz8PPJdqnBCawbPEdj/y2zhjLLfHqIVOrtJFu
+         IalLF+02arUnjlxFxndQlokRcPTbbqn3cPGIwY+hQSYstEGC4kQbAgeEtaQPkDlTwfB9
+         ukQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786989968; x=1787594768;
+        d=1e100.net; s=20251104; t=1786992219; x=1787597019;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=KcQPlUyt9fGbPvuHNX86KFq9XHrXHuGXNoT23phPfOQ=;
-        b=QQdV9QcFjvUevSTxqt22Y4FCj/MI6PUEkQInsSBdwRfAhIlujosit7jCotiFiC3sej
-         bjyHwOGI/T2xPjgRCEmqh0iDUEVtBrEknPJUgRngTR1Sz1OwY2NegZRn431O5bC8K70a
-         6dQgnuJwxuO91CjByWPQhq9IyVfxNvGyiZNFnkSK296zon7WXoh6cj0hDSVpvr8Tk8ax
-         f/dQGp5q5xQ95cnJ9RSJUHz20uKhWAdPQm3ML5NMDjsVdgA4OZsNx1hMX17epzTtRyNh
-         Xag3Rtc3j99sRhhKYwIvTS9HZiYajNyFB3lUVPsmhEiLJ3CJu9W2+pEu74O9icJDf5TA
-         A3ow==
-X-Forwarded-Encrypted: i=1; AHgh+RopJcQ0uagE5tvuqedv+s88B46nfAzUcibsON/76/nRr1aTO4hnJRsCAC1jF4QSi3hv+cEZN/+3iq0EViGM+GI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVd5qBhw8Qpmdbo0MMBuQ8ATqZ/V9sSgGnSObeaJMHMgsWjXXz
-	Met/m3my+kLBnwsQ6JPT0Icy91iB3muuf7+c04uVCpAcqTDkF6kqI9EgXMf/WOzTaA2Ub5SYl8z
-	9AbJwt1pvXKiO8RJBqhwigJxSErvtRaCpsoEvVs1YYoGM
-X-Gm-Gg: AR+sD12lVTZITiRKXPCiff+AEfTLK2OSyejKQjU4ZF0bzmhe1IVDXBd+PlYybYPMVk2
-	XMivQCjsR2VKyWV2/P/IDvWZpy6Jk0rb7P3cuIWP9zdRDTC476MaswM3qMUzw24ssgt0mX2t6EU
-	XmF3CBRD8Tfa46JLzRaRhxScbwqI4RqJ6tt3YeKGpDgxIayMRnkO/fjQpibvtX8BnrV2ksY0Yzi
-	r1qiwuAsamej6B8c2oqD8UgGwiTFa+uW/YqoA3WmNOIuL8ZdcYJ5rve97c4Zbcr6G41jVyXhrWW
-	jUVL4HmxKUm9v+zIqEuoW7d0hd+j8BESBZKHQcv0N8L8R8KsgDNLNIK/PNrfcP6OTrmccIm8jIj
-	IKnciBh0ts8T7E3w/6WPrfkHBiKkAco4=
-X-Received: by 2002:a05:690c:6606:b0:7db:ccda:a40d with SMTP id
- 00721157ae682-8412cd4982emr9774557b3.5.1786989967577; Mon, 17 Aug 2026
- 11:06:07 -0700 (PDT)
+        bh=3TmBisPOhOA5pousfNjAC0K6au9wS+YV1klStzHvJk8=;
+        b=BGOoRe64D+JJG7qp3OWDiQyeiCEwb1JJcvSPUrER/FSCYu6+++TDa7SwBowGZwyoa3
+         t8euXuY3b6OS47nd78QLVnreDfUfCQqVtV+3mi7liCkZcwk0RPJ8zBF9Aml8KYzfg0SP
+         3l0J0gDfjECD65oVH30jbj+bqsnbWw4VoaZO85FEip/Zlc0l3XMeGku+G7YqN04p/Z/d
+         uz1ncwzCGy7qzVOLHeyYIAKQC6mHyhdzaSw6v3sjAIgquy3d4efQtcIP3PdNVcErsnIk
+         9SiXzy4NzE3jJRfqkQ5RuHld10uwv6X+dYvAG+ANUM67KYC4dQXz79ZfiojOLAsmW4tM
+         powQ==
+X-Gm-Message-State: AOJu0Yzu2BGKOolko8qFMlvnVofB2WFXcQ6MDc7mdKfKLI7JeR41z0tg
+	60Re0FypIVbHOOH1T1WigHfb21RKuwXcecOkJp4gEXhiE1Cexkt25WCVL0AHjP/YR2CIOuC/wFG
+	8cZpcEHtb2rBH8UjLpwnrbfa1BY5xN5wnpvzrTFKScg==
+X-Gm-Gg: AR+sD12Ofp6hu3vq2hhOuFZyaYV6yfi1wEIv/OuWua0btaP7OOfnZXFs2a8hgkATkUo
+	zKCQ1yRFgbiHj4jNonoTozAYMtk/qyRvqd8/JyXqDgLRJ2TXAjdIrhkngXy5/p9eNM24iJgTD4d
+	kUaNZaz4n0DSrPcFf6DNni+c//zj6UYf/QyYX35aj4WQ9smY4megKVfCfFTHxEi1mswk/CK+ni0
+	OFN1Y/Z8U4cwny9iKpTxTlv+FEsIEv6s17wobg5Abigpt4jeapBicgKyngRVgznD8QZ7UHmKy4G
+	IwBe5KzNVvBK6zmSG30AVMauCLz32Gefhi+CMi7vS3kp+TQNknOTHPq5Kh4r3O4VvY+n4evReuO
+	BrRL0PbzhrbxlD0S7xMTn6HcCrm0AWUo=
+X-Received: by 2002:a05:690e:dc2:b0:66c:731c:8604 with SMTP id
+ 956f58d0204a3-66cb9e8f173mr987220d50.35.1786992218959; Mon, 17 Aug 2026
+ 11:43:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
+References: <20260814174731.1441738-1-luiz.dentz@gmail.com>
+ <20260814174731.1441738-2-luiz.dentz@gmail.com> <8664f27d1427fac3a37f3be0f97f40c6af4d097c.camel@hadess.net>
+In-Reply-To: <8664f27d1427fac3a37f3be0f97f40c6af4d097c.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Aug 2026 14:05:56 -0400
-X-Gm-Features: AcwNN1XMzSzXt9ZTguCz-D2FaYR1VfQ1zJWmPA_Y1wKxiOlQAox_14y6O9qpWcA
-Message-ID: <CABBYNZK=Pk_5UpB5F9RkUvk8kTzXYVi_dzB-yr4_yCTumTBE+A@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: mgmt: reply to cancelled mgmt commands
- instead of silently dropping
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	chejiang@qti.qualcomm.com, quic_chezhou@quicinc.com, 
-	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com, 
-	mengshi.wu@oss.qualcomm.com
+Date: Mon, 17 Aug 2026 14:43:26 -0400
+X-Gm-Features: AcwNN1X_un9hW1g_Js1JwMG586EvALm5zliOCxSaP4UJNhgnkMVkdyFhJbEj2HU
+Message-ID: <CABBYNZ+ynwx51S5pG2ioxFH0328jqhJ0AmzdDX32UCZR8F=zbw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 2/3] unit/test-sdp-xml: Give each test its own test_data
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Shuai,
+Hi Bastien,
 
-On Mon, Aug 17, 2026 at 2:01=E2=80=AFAM Shuai Zhang
-<shuai.zhang@oss.qualcomm.com> wrote:
+On Mon, Aug 17, 2026 at 4:41=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
 >
-> The kernel sets HCI_AUTO_OFF when a controller is first registered and
-> starts a 2-second timer. On slower boots bluetoothd and the HCI_AUTO_OFF
-> timer can race: hci_power_off() is already queued while bluetoothd is
-> still in the middle of its adapter setup sequence. hci_cmd_sync_clear()
-> then cancels any pending mgmt commands with -ECANCELED, including the
-> MGMT_OP_REMOVE_ADV_MONITOR sent by reset_adv_monitors() early in the
-> setup sequence.
+> On Fri, 2026-08-14 at 13:47 -0400, Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > DEFINE_TEST assigned the filename and expected result to a single
+> > test_data and passed its address to tester_add(), so every test
+> > shared
+> > one struct and ran with whatever the last registered test left in it.
+> >
+> > All the file based tests therefore parsed the same file, and a test
+> > pointing at a file that does not exist still passed.
+> >
+> > That in particular meant compute-seq-size-type-confusion.xml, the
+> > regression test for GHSA-7mmr-gwqx-vc34, was never actually parsed,
+> > and
+> > passed only because it inherited the expected result of the test
+> > registered after it.
 >
-> When auto_off=3D1, hci_dev_close_sync() skips __mgmt_power_off() entirely=
-,
-> so there is no fallback path to reply to the cancelled commands.
-> mgmt_remove_adv_monitor_complete() silently returns on -ECANCELED, leavin=
-g
-> the command with no reply. Since bluez's mgmt queue is strictly serialise=
-d,
-> this stalls all subsequent commands indefinitely, leaving bluetoothd unab=
-le
-> to register the adapter.
+> That's not quite correct. The fix introduced memory leaks, which you're
+> fixing in "sdp-xml: Fix leaking the parse stack on malformed input",
+> but it fixed the original crash.
 >
-> Fix by mapping -ECANCELED to MGMT_STATUS_CANCELLED in mgmt_errno_status()
-> and removing the early return in mgmt_remove_adv_monitor_complete(), so
-> bluetoothd receives a reply and can continue normally.
+> This test would only fail when run under ASan.
 >
-> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-> ---
->  net/bluetooth/mgmt.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ac4864e56..c660bd3cd 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -301,6 +301,8 @@ static u8 mgmt_errno_status(int err)
->                 return MGMT_STATUS_ALREADY_CONNECTED;
->         case -ENOTCONN:
->                 return MGMT_STATUS_DISCONNECTED;
-> +       case -ECANCELED:
-> +               return MGMT_STATUS_CANCELLED;
->         }
->
->         return MGMT_STATUS_FAILED;
-> @@ -5675,9 +5677,6 @@ static void mgmt_remove_adv_monitor_complete(struct=
- hci_dev *hdev,
->         struct mgmt_pending_cmd *cmd =3D data;
->         struct mgmt_cp_remove_adv_monitor *cp;
->
-> -       if (status =3D=3D -ECANCELED)
-> -               return;
-> -
->         hci_dev_lock(hdev);
->
->         cp =3D cmd->param;
-> --
-> 2.34.1
->
+> I just want to be clear that this fix doesn't have an impact on GHSA-
+> 7mmr-gwqx-vc34 being resolved earlier.
 
-Sashiko is flagging a couple of problems:
+Yeah, the model got confused, it seems it doesn't understand the macro
+expands the fname, I though it was off or something because it didn't
+seem to change anything with respect to the output.
 
-https://sashiko.dev/#/patchset/20260817060134.3298439-1-shuai.zhang%40oss.q=
-ualcomm.com
+> >
+> > Use an array with one entry per test instead.
+> >
+> > Assisted-by: Claude:claude-opus-5
+> > ---
+> >  unit/test-sdp-xml.c | 34 ++++++++++++++++++++++------------
+> >  1 file changed, 22 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+> > index b338788aa295..72e01f5f5806 100644
+> > --- a/unit/test-sdp-xml.c
+> > +++ b/unit/test-sdp-xml.c
+> > @@ -114,25 +114,35 @@ static void
+> > sequence_on_squared_teardown(gconstpointer data)
+> >       tester_teardown_complete();
+> >  }
+> >
+> > -#define DEFINE_TEST(fname, res)
+> > {                                     \
+> > -     data.expected_result =3D
+> > res;                                  \
+> > -     data.filename =3D
+> > fname;                                                \
+> > -     tester_add("/" fname, &data,
+> > NULL,                         \
+> > -                     parse_xml_for_filename,
+> > NULL);                        \
+> > -     }
+> > +#define DEFINE_TEST(fname, res) { .filename =3D fname,
+> > .expected_result =3D res }
+> > +
+> > +/*
+> > + * Each test needs its own test_data, sharing a single one would
+> > make every
+> > + * test run with the values assigned by the last one registered.
+> > + */
+> > +static struct test_data file_tests[] =3D {
+> > +     DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE),
+> > +     DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE),
+> > +     /* From
+> > https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+> >  */
+> > +     DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE),
+> > +     /* From
+> > https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+> >  */
+> > +     DEFINE_TEST("duplicate-attribute.xml", TRUE),
+> > +};
+> >
+> >  int main(int argc, char *argv[])
+> >  {
+> >       struct test_data data;
+> > +     unsigned int i;
+> >
+> >       tester_init(&argc, &argv);
+> >
+> > -     DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
+> > -     DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
+> > -     /* From
+> > https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+> >  */
+> > -     DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
+> > -     /* From
+> > https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+> >  */
+> > -     DEFINE_TEST("duplicate-attribute.xml", TRUE);
+> > +     for (i =3D 0; i < G_N_ELEMENTS(file_tests); i++) {
+> > +             char *name =3D g_strdup_printf("/%s",
+> > file_tests[i].filename);
+> > +
+> > +             tester_add(name, &file_tests[i], NULL,
+> > +                             parse_xml_for_filename, NULL);
+> > +             g_free(name);
+> > +     }
+> >
+> >       tester_add("/sequence_on_squared", &data,
+> >                  sequence_on_squared_setup,
+
+
 
 --=20
 Luiz Augusto von Dentz
