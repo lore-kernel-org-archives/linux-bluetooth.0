@@ -1,193 +1,219 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010064.outbound.protection.outlook.com [52.101.84.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512653A6B6F;
-	Sun, 16 Aug 2026 14:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1566E2405EB;
+	Mon, 17 Aug 2026 02:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786890377; cv=pass; b=gcWV84m/7tDMqQZMi4jnpwmkULcJv6O2mXR+onvu70zsyzdedBGsopA9fW6B7qgnkTwII2sp6CvJzuM37PwVuf/x+oWcKac+IP/T+9hHXlCbSbAZ3AQlIzDJjIlNDsaTN/zvCrpIesDimaTKaGcueemFG80i73jd0cMIcifY+Z8=
+	t=1786933523; cv=fail; b=Q2ULVOjOoSN863+DeTKyMv2F4x1nxCBOepIWMtCQCOu/4WslzGTzNZs4FWDBcb8aAODzUqCofyiEg/W8SNNh6tfLmQDd6nzrMchLNrVpYDsMVjn0hfXkfNQ3jEhoe5JaalAASOQUE7OemOkRntvErtfKAndvllC6Wmd+G38A9s0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786890377; c=relaxed/simple;
-	bh=N9RhH3ZdoJqEXKokXNgN1QLiiBiMq1ubzS0u60C/j1k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ki75ZsI/9ZPO83G/iuinXmV3L8gkeDE3Y0JwC/P5Y7hxrZko7sY8a2ABdHUFqvWPe0pa/yE54rBwnTmZvc/hOmwJlVyP6vZfs0EPsprOs1Jdjp+NGZHOtNCHx76TVokSwksnL1ZMZwJzSpNiEOUDNhhC3fNNAcE8LzPp6/NrJcA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=ivp/7Goa; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1786933523; c=relaxed/simple;
+	bh=J8pY1hpw5eLKfFzS7oB4I0SbOYCleYmVkGqGaH9T1Ok=;
+	h=From:Date:Subject:Content-Type:Message-Id:To:Cc:MIME-Version; b=El6lPMy0U+arHsDJ9PWFjqZEiWtgRp+t26RM8HvNhGcw4qcMouqQ3WKEdjgKu3+saQyshWsmfuySTyUo2wbwJ+GjvQ4AKCPlD/lTywC1dLc/FSwwfeS4f9KNzgmyVAI2HqU3iga+clM/ck1S+BMtzhJPKTy9mDCFUMAYMNP9oww=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=JeRJBR1/; arc=fail smtp.client-ip=52.101.84.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="ivp/7Goa"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:5:f011:31::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hNJDG4Qdkz49PxG;
-	Sun, 16 Aug 2026 17:26:06 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1786890367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0uCRFzGuboIOzZ6xcvU78o6ZZXbp3EUcxq3O1/WQ18Y=;
-	b=ivp/7GoaqiW+zxI76qUyTDs8CrCwVJWLLXnEcQhhfq1TYWABUvZ6i7MCNCmoDYMum0jKl2
-	DCH30dTdH+TgX5y/NfDo2Heb17XsUJOYZON3dd1CQLqTDkYPGQpCz09BT00GZtgUUYPSwf
-	NyEgLnpDVOj4a8SWzki+SqRJdtYGYev9JTmwkdYDWe2XPh8jLg/uIS0fdJnGk6wT8/ShTu
-	r/xG6nq2vwhP5n6Q2VFTOr4HCbQug/iISSvXtoMpP4yUb2niFTGjQ8w6/uSvcrOTGdU5PC
-	MEBCc5tC5a+0TazW49ht4imK8s9Z2P2jTXhKvMipBwb07RIRBEC4wH5uRn54DA==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1786890367;
-	b=sFV7JM+RciE+v800gTvJZCNOPTico5hH3Cy9Q9/sPHdmBeGyCFNozIu7LB88Kz2L6VNrJh
-	sCDrLnYjxUD9VpWF9lZP4XQruAJj2n2U1yfzY6f4RNQx/kU5ndvSm8KUQPodd18SGnekAd
-	77eF6PZA0k4B9Nwdm/MROdxERO/MkC3mFnMGDutyBvjvUOPYriCnDf0MjdmUegsKX7i4Tt
-	lkus+aucQIEOkezn+aWx/9S+b2siFvotv4svlJXeuitQBXi/HxAM6DCmZo3p0noh9yjdz4
-	T1sYkzuEu+rEFybQ56rWorUayhqE6d9Hqhno6dfK857/4u+d8YBbr8pLLL+i6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1786890367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0uCRFzGuboIOzZ6xcvU78o6ZZXbp3EUcxq3O1/WQ18Y=;
-	b=SQGmZ1iI9u092SQ6X8b+NRAhtszR50JcanYWklViJZ66u63Y7NNRtKLH2hgK2nJUcptmg8
-	J321cvlnQMxab+FREbNdkrUE39J0eq86FQd1IyBtE7YuA33t9+6hw0Wro0cu32toeCPZNM
-	fXXtBLq7iQRh+vTsQoIZzfbu48N/AAj3iCOhaxmyjH+enEw5aKboMH7SwHc10GkVn+1RRZ
-	hvpFqH3zlhmNV/o2pwYh6ZYNrDSN4kNKZBiLFIeBZfChQ3izzx0zrhKez4wrv+JHUZlvHm
-	a51cP8pmAKOzcyPLpsqwpU96pwe+6488K6p+P3yR3Ot7jItKMCfqCBCDaKucAw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <cd71d83c71abbd0cdba00c0aa9160d421e7c28d4.camel@iki.fi>
-Subject: Re: [PATCH v2] Bluetooth: ISO: fix use-after-free of listener
- socket in iso_conn_ready
-From: Pauli Virtanen <pav@iki.fi>
-To: Hang Nan <2122295973@qq.com>, linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz	
- <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Date: Sun, 16 Aug 2026 17:26:03 +0300
-In-Reply-To: <tencent_E5954D5C14D99713A73E3121B97EEDA6170A@qq.com>
-References: <tencent_E5954D5C14D99713A73E3121B97EEDA6170A@qq.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="JeRJBR1/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MHduzp1/zJOSUsDnvGK58cQWe70/3hNWxSdtIW/eCLn+QTT25SrqGwrKfIRUPzVdlwJR4czX9b6ek/BqEQr57jUjiYQXOvOctjwuroOoE1UyR3RfvQ3hBm5bU627FIKEfQ/if000DOrnTtcbWBmvf8JTYhK47QN7AYNdYs75KCE53gcEQTaui8u0Zb+YM5E1nYlUCnBCNvd23TtBulmWF2j42+cM5j5bRLtZO8E87N8GYTPvoumup2TpoqWKHr7mQgKSf66Gsf7NWKlrirxVXknuhvCtnBwFsdTpab48cMPugz+O9WaNGHpE0BSuiWF8DtfKwrjR4p9fmUIHUd1FQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=exhXdWiokIMDCwCTawWVUAAyYUAfkMt98TRlfGDdXwQ=;
+ b=Vw1s6slAGd6adsYNvBhHpCfxmThP0exL1Dv8uT5SFzu99t43u+2oxgU7QisXsC0D8frJnE2+Q88YvASVheiHkPVLvefNDwgVasYQN/jM5RxcKgtd1MNilGxD8jK5vRAmLGNMSgoM6oJMvI+xgr33+f4b2wSaa8XlvVnAudOF8xX1gEpQqyQRiBKUTHyVK0lGf93/sew1kfTrO9qGMLztX7p4EnCUnlfck4ycdq7kkYNYrwOtc2KEuxTn+Sw8M16oXsD29UqD5nkTIQPhjNMTJEWrzXjcLsCQ4V4ZGbDiXTc4esBB5177te2FlHLi5UP4YWGJyfbPKyPGTXYkr6Dxpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=exhXdWiokIMDCwCTawWVUAAyYUAfkMt98TRlfGDdXwQ=;
+ b=JeRJBR1/BWot4GbwPRk8Qo4Cq1Or+sD9RzbNq9KLBz8HDIe088hN3EV3tase/MoGxk4HkcJkL/GOypT3LAxNTx1cSNOQCbXhatPK7eFbTaxmWrMsd8eoSGP6rKX0CvadvkjE+AHRwLmDdqUCJB67grNieW+OZZOTals15s0WVj8XLPrz4Z5MNrfz7VpLZ1EzkjEaTunWgurvGBrA19hzuFbH/c2HEvjvCpbEyjYx3X3tRMqyyRXJ8b9UgQi5lm3tqT5qFGrYL5eG5xPgUoTwbz6tmVmtc76AtF3mmjdQbKHEXsk+y0DUgDlhndfmyrmSpQamLWVOG/514VD5SxzGVg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from VI2PR04MB11276.eurprd04.prod.outlook.com (2603:10a6:800:296::7)
+ by VI0PR04MB10101.eurprd04.prod.outlook.com (2603:10a6:800:24a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.17; Mon, 17 Aug
+ 2026 02:25:18 +0000
+Received: from VI2PR04MB11276.eurprd04.prod.outlook.com
+ ([fe80::60d7:a8e5:eb88:9be]) by VI2PR04MB11276.eurprd04.prod.outlook.com
+ ([fe80::60d7:a8e5:eb88:9be%5]) with mapi id 15.21.0315.016; Mon, 17 Aug 2026
+ 02:25:18 +0000
+From: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
+Date: Mon, 17 Aug 2026 10:27:39 +0800
+Subject: [PATCH] Bluetooth: btnxpuart: Check remote M.2 connector
+ availability before pwrseq
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260817-btnxpuart_m2-v1-1-a23e51020794@nxp.com>
+X-B4-Tracking: v=1; b=H4sIAJpxgmoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDC0Nz3aSSvIqC0sSikvhcI91ESwtDE0szSwtzwyQloJaCotS0zAqwcdG
+ xtbUA+L20bl4AAAA=
+X-Change-ID: 20260817-btnxpuart_m2-a9814969871b
+To: Amitkumar Karwar <amitkumar.karwar@nxp.com>, 
+ Neeraj Kale <neeraj.sanjaykale@nxp.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+ Frank Li <Frank.Li@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Sherry Sun <sherry.sun@nxp.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1786933674; l=2800;
+ i=sherry.sun@nxp.com; s=20260723; h=from:subject:message-id;
+ bh=c5elpSoQBdJO65aTCBFFpfKdzpiBcPZORqvTL7AM1KQ=;
+ b=PGU+zKgvOUaSKKA7dq1P+N9KM82HCKZ/Iy+3eldA2InsEiousCXDNr+Na+py9zFtCZfCdTxj7
+ 72mN/vmGEFdDLi7pbiiUfFX1tEsX/PW60svFw21saqEyMF+L/MZzOXx
+X-Developer-Key: i=sherry.sun@nxp.com; a=ed25519;
+ pk=YnYnIFJ2l+5v951x9shBVfHhminNi+3LTfFa3PxSdnI=
+X-ClientProxiedBy: SI3PR01CA0004.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:296::15) To VI2PR04MB11276.eurprd04.prod.outlook.com
+ (2603:10a6:800:296::7)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI2PR04MB11276:EE_|VI0PR04MB10101:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0971a511-c23b-4bb1-17bb-08defc06c768
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|23010399003|19092799006|6133799003|56012099006|10067099003|11063799006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	GsMVHm1IZ+x7Vd/ZgwRk/nzL0XzZUdjTxjL/fidN/YoqRUV7Lv/EtXfFNc2Vow2wond+U0gWDtQcC6XdZVxGaMSzZlYJkvtuO3d3+X9wwo/mZyKVcaBm2xEGYU4/vQVXtHjk6h0wHwE2RstK6AgQWdGpPC6sK0FpPssOr9vjsX5+d0Xg3+9BhIDp4vNUUDlT/QXI2tm8KwSj547NcWNiSa+arBfhdC+WXvH8Zt3slrmdeJ46DwypY9Iw1XN5tPcxXRcNtfZFFF/aioph1vbieuqEeIIKJcorUcIeIApE1lOUs9kt7YD5UiABb+CtH0pUI8PtuVU43WmXPpXI+foQ9hXwC2uUiCHEZnSbAEDwqVtr2/su4lfu9WlGe13qYJvEgGmRDChqOA46TlRl4wwzkSYFcudMIzjIntdkYHFT/CXlQHtffVlbCWRNoKciAry+fgjUbLFs/O9xEXywJFLt/xlQvWa8y1Ogm25J4E7B16dLt5FEBpmNw/+CfhMhEkdSpyDsKPAUjQsnH9/0W9TlrVZWDYQ4pvtwVATsdWaSzbQbOGbdtgC/rzIoVEgsr3guLqCeMqFh1dEWzpZlQ9A8h7WDbApJ26R3gO9EX/Yi5MrpbRStVR6CZ8UIL+yW2M4sa1SH6e1OF53SAANLRrh4KUMh51Ivj4k96CfvpUXCDE0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI2PR04MB11276.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(23010399003)(19092799006)(6133799003)(56012099006)(10067099003)(11063799006)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cm4yaW1MU0xMYkg5T3RZZUE3ejVxN2x5OHNwWUUvM1ZRY29DdUlyVUdYQUVi?=
+ =?utf-8?B?RlNtWFNIc3JvY2NQa3lvL2s2bXVSNXNGWklIUkNHcEdsS2NEbDlDSGZ4Y1pk?=
+ =?utf-8?B?QzVra0REdUl1QjFYTGJmQkdTZ2ppeURoNlUxRVpKd2FSaHUxcURxZXVvaE16?=
+ =?utf-8?B?dFJVczJLRzVrUXJqeit5Q2RqUjF3cXNGbEVtNHFabEhYV09DSVlKNW9kYUgz?=
+ =?utf-8?B?YnhaZGR4eTU4YkhzT3k0Q0dBMno3MlVpYXQrWTdYcDFuUWY2Q2duSUxiL0RJ?=
+ =?utf-8?B?VkZXWjZuOG5lTHVhbSs1WWV3eHVXVFhrZlVtU2JJS2RUck45L1oxY1RyQzYy?=
+ =?utf-8?B?VVJUQXNxSG90SGM3RCtReGZBUjVOZEFoajVqd2I1NS93ZjVhZW1GQVRqUDJR?=
+ =?utf-8?B?SGIyeUZ5eERySU1vcmxobHRkUW5XTkQ1enVoYSsvSDFBQXcwUTNJcmNENkFS?=
+ =?utf-8?B?dUFoNmVWYVFDRWV2YTBRNmpRZklUam5McWxwMVZ6K1pKc2h6VUdEV3BnTWJT?=
+ =?utf-8?B?Yjd4NHkzYmRwNTBIRlQrRkVmQnZlQVFFMngwVWJsaVpBWVJmR2ZWN1dPUkJD?=
+ =?utf-8?B?NHhJQ09hSUhucldBSEI4NHlhcWJFK3pyYkdyV3ZLUWtDMHpSdmVwNWxzVTFv?=
+ =?utf-8?B?MVY1cXRHb2NTVXAzbXlha0Ziam53QXpFUHJ4N1JDOG5QbkZjY010K3R5elRj?=
+ =?utf-8?B?dkY3TUtPYmdtN0wwR1Y1d1NwcUJNYW1mZk1hU2hVdjdydmpWaEYvSG14ajU3?=
+ =?utf-8?B?Ly9OQWcrdzdsbGV6SHd2OWF6SklvWStWY3FXcHhRNVBpY1dMQkF3bW5ZeVps?=
+ =?utf-8?B?ZklZT09rMFBKWHJXcHJqMndnbXFNS245Q04vdUVtUVhSTnZ6cUgwUVBYWnQ1?=
+ =?utf-8?B?VGk3Vy9NU3g3ZjV3MlFGQWRneGhFdmZ3aEo2OW9FNmhRcjg2Q3dDbWg4dXRQ?=
+ =?utf-8?B?cVkvemFNVitjVGtSeC85SnJDOXQ5d3Nid0xmZXkvYXhZVStWazd6MUJsWWlt?=
+ =?utf-8?B?Y0M4cktGL0hiSGd0Wmc3bUhZVE83Y050U1U1RXg1SW1HemRjNCtNbHVNbEJs?=
+ =?utf-8?B?eE5YcXNmT3I0a3BBR3M5U3M3SWRkYTBld1RFbDFiQWdEOFhXUG1hZWllaE43?=
+ =?utf-8?B?dHl2TVA5THR4ZHlxTUh3eDgycGcvNGhtRVpoZlJRUWozNUpuR0lkN0FPY2dL?=
+ =?utf-8?B?aHVhWWY3U3d5Nzh4RFNnNlBSbG5BTDl5QTJQMDNUUWx6b1dVRHlRaWVKYTlL?=
+ =?utf-8?B?c0pvNkRjSUhJOXF0MVgvMzJFYTNGZXlvMytnUWt6bFJ4TElBV3MycU1qYVZH?=
+ =?utf-8?B?aFJTT0Z3WEZNdzJXRXlFVlQxWmw3Rk5oSmJwMlg3SE5nMkZLSGFMeFJXMk1U?=
+ =?utf-8?B?Vy9qN2toRmd6RVU1WkJtT0ZjU3UzdzFVcGRSOE93WU4rM3FPdkxndDVtWWla?=
+ =?utf-8?B?M1RMUzdmaEFZMmdHc05hZlBwN3NzNVdhbXE1VUJyeFdQbTkvdkEvbjNvNk1R?=
+ =?utf-8?B?MHJnbzdpL2lFR2thVmpLMjVScU15eUk5ZmEwTERmMXBrR0dKdGE4V0xuL05P?=
+ =?utf-8?B?b1cveHVKM2ltSFVTMHJJMUQ0Y0lEN2FBTXZibGwwbHQwa21ZTndNL09BUm5s?=
+ =?utf-8?B?Y3Y2azdMUDI2ODhrMllENEdUeGtzMVVla1RvcmI5c0dTbEZROTE1cW9HUFZw?=
+ =?utf-8?B?QzQydXFKRWJ6YXhKTWpOSmJteXh3S2N0WmpMa21qb2RiTjF0YzFFd0VsQ2gv?=
+ =?utf-8?B?SWN3YVRFeFZyTXBoT1ExMWdwbzBUTHFjSEhPckc1WEdiMUpTMThrRnJEams1?=
+ =?utf-8?B?eTBSSG44WjJXWW1XUEozQkpaS0x1dTdIQnRtSkgyUWNlcVlSNStDbmJsTXJN?=
+ =?utf-8?B?blJ0dnQyU1BIYml2Sjl3SklrNW5UbGlETnZ3V0JkWFdTOUtTVXdrYWtLUGZY?=
+ =?utf-8?B?UkJuek04VFg0aWNUaWk5Q2dTVjVkSEFTQXdaY29FMVdpMDM5aVk4WVcybnVM?=
+ =?utf-8?B?R2lJbWxvQ2xVWi96a2hEQjdoaVAyU3J0RmQxR1N2TDNvYms4QnVoclgwemVx?=
+ =?utf-8?B?QzhnR0R6NWM1c2xyU25YQmZGdnQxNmxpL3ZNeWRxcllsVzNHYzFtZkhmbnZS?=
+ =?utf-8?B?ai9SWEY5eE1qY3FKUGhpL0xWdW1YdkkrTFVNcHdRYVdlU2lhUnlITmdGVVhM?=
+ =?utf-8?B?WVE2MjNPQnpDQ29BemFRMmdCb21uUXg2WTdLUGtQUE1RNk1TVGxtdnV2dmlw?=
+ =?utf-8?B?aHJ4SUtvV2tsZDhUdTBGWnlpWW5idXRxOEVlSkl6VE5TaXNmTWw5VHcrZi9J?=
+ =?utf-8?B?MUtIVnFBSlFmUnpsZ0tKTVJCU0ljTGFVeW40NXlpekJDUnpveFo5Tkt3MXBK?=
+ =?utf-8?Q?IoSkTMI7r53kdcBXLzC8/kPYTXI++H6ZUN3QU?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0971a511-c23b-4bb1-17bb-08defc06c768
+X-MS-Exchange-CrossTenant-AuthSource: VI2PR04MB11276.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2026 02:25:18.4379
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yLNG4uV2rrVXZ1x7uZlA1AvPBqXR8peQU9FR6vh/hgLVu91NGd6XuKZSC+Z20PJhT+kSJJZqfccLQLoB7uWmV2s96cWBFafDf5+INpD8c5HyA8U9K2Dwi8c378e8a94T
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10101
 
-to, 2026-08-13 kello 19:39 +0800, Hang Nan kirjoitti:
-> iso_conn_ready() looks up the BIS listener socket with iso_get_sock(),
-> which takes a reference, and then, without re-checking its state,
-> creates a child socket from it:
->=20
->     parent =3D iso_get_sock(hdev, ...);
->     if (!parent)
->         return;
->=20
->     lock_sock(parent);
->     sk =3D iso_sock_alloc(sock_net(parent), NULL, BTPROTO_ISO, ...);
->     ...
->     iso_chan_add(conn, sk, parent);
->     ...
->     release_sock(parent);
->     sock_put(parent);
->=20
-> If the listener socket is closed concurrently, between iso_get_sock()
-> and lock_sock(), the reference taken by iso_get_sock() may be the last
-> one: the close path drops the link-list reference, and once
-> iso_conn_ready() drops its own reference at the end of the function the
-> socket is freed.  The child socket, however, is already linked to the
-> freed parent, and a later disconnect of the child runs iso_chan_del()
-> -> bt_accept_unlink(), which dereferences the dangling parent pointer
-> into the freed accept queue (a use-after-free).  The same dangling
-> pointer is also dereferenced through parent->***() in
-> iso_chan_del().
->=20
-> Fix it the same way the connected (non-BIS) path was fixed in commit
-> 0d255e63fcf3 ("Bluetooth: ISO: hold sk properly in iso_conn_ready"):
-> after taking the socket lock, re-check that the parent is still a
-> listening, alive socket, and bail out otherwise.
->=20
-> Fixes: ccf74f2390d60 ("Bluetooth: Add BTPROTO_ISO socket type")
-> Cc: stable@vger.kernel.org
->=20
-> Changes in v2:
-> - Fix GitLint B3: replace hard tabs with spaces in the commit message
->   code snippet (no functional change)
+From: Sherry Sun <sherry.sun@nxp.com>
 
-Changelog should not be in the commit message, but below the --- line.
+The current code uses of_graph_is_present() to decide whether to enter
+the pwrseq path. However, of_graph_is_present() only checks for the
+structural presence of a port/ports sub-node and does not check the
+status property. This causes problems when a DT overlay disables the
+remote M.2 connector node (e.g., switching from PCIe WiFi to SDIO WiFi):
+the port node still exists, so of_graph_is_present() returns true, but
+the pwrseq provider never registers because the connector is disabled,
+leading to an infinite -EPROBE_DEFER loop.
 
-> Signed-off-by: Hang Nan <2122295973@qq.com>
-> ---
->  net/bluetooth/iso.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index aa2ce78f56a2..069fc87a4e18 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -2277,6 +2277,21 @@ static void iso_conn_ready(struct iso_conn *conn)
-> =20
->  		lock_sock(parent);
-> =20
-> +		/* The listener socket may have been closed concurrently
-> +		 * between iso_get_sock() and lock_sock(): the reference
-> +		 * taken by iso_get_sock() may be the last one, in which
-> +		 * case the socket is freed as soon as we drop it at the
-> +		 * end of this function.  Recheck that the parent is still
-> +		 * a valid, listening socket before creating a child
-> +		 * socket from it.
-> +		 */
+Replace of_graph_is_present() with a new helper that traverses the OF
+graph to the remote port parent (the M.2 connector node) and checks
+of_device_is_available(). When the remote connector is disabled, the
+pwrseq path is skipped, allowing the BT driver to fall through to the
+direct bluetooth child node path.
 
-The explanations are long. Assisted-by: some LLM?
+Fixes: 3c48135c1397 ("Bluetooth: btnxpuart: Add M.2 Bluetooth device support using pwrseq")
+Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
+---
+ drivers/bluetooth/btnxpuart.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-> +		if (parent->sk_state !=3D BT_LISTEN ||
-> +		    sock_flag(parent, SOCK_ZAPPED)) {
-> +			release_sock(parent);
-> +			sock_put(parent);
-> +			return;
-> +		}
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 81cdd8da5636..e2b8f7997e4e 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1809,6 +1809,28 @@ static void nxp_coredump_notify(struct hci_dev *hdev, int state)
+ 	kobject_uevent_env(&serdev->dev.kobj, KOBJ_CHANGE, envp);
+ }
+ 
++/*
++ * Check if the remote M.2 connector device linked via OF graph is present
++ * and available. This is used to determine whether the pwrseq path should
++ * be taken. When the remote connector node is disabled (e.g., by a DT
++ * overlay switching from PCIe WiFi to SDIO WiFi), the pwrseq path is
++ * skipped, allowing the BT driver to use a direct bluetooth child node
++ * instead.
++ */
++static bool nxp_m2_connector_is_available(struct device *dev)
++{
++	struct device_node *ep __free(device_node) =
++		of_graph_get_next_endpoint(dev_of_node(dev), NULL);
++
++	if (!ep)
++		return false;
++
++	struct device_node *remote __free(device_node) =
++		of_graph_get_remote_port_parent(ep);
++
++	return remote && of_device_is_available(remote);
++}
++
+ static int nxp_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct hci_dev *hdev;
+@@ -1863,7 +1885,7 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+ 		return err;
+ 	}
+ 
+-	if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev))) {
++	if (nxp_m2_connector_is_available(&serdev->ctrl->dev)) {
+ 		struct pwrseq_desc *pwrseq;
+ 
+ 		pwrseq = pwrseq_get(&serdev->ctrl->dev, "uart");
 
-The change itsef looks good to me.
+---
+base-commit: 4477a78374a57c3809b172ad30cceabda48c47c6
+change-id: 20260817-btnxpuart_m2-a9814969871b
 
-> +
->  		sk =3D iso_sock_alloc(sock_net(parent), NULL,
->  				    BTPROTO_ISO, GFP_ATOMIC, 0);
->  		if (!sk) {
+Best regards,
+-- 
+Sherry Sun <sherry.sun@nxp.com>
 
---=20
-Pauli Virtanen
