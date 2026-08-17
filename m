@@ -1,190 +1,127 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68D03ED3C4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 10:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098DA3F9F39;
+	Mon, 17 Aug 2026 10:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786963477; cv=none; b=GGVuaa+UTBDFb1mUO6kwAjxAN5Gnz8++A7o16MBE2HXSdmjPMKNCmtVvbjs8D/8la4GR5VVbMpUEVmMDTXQQnaa6qMc+1dHebvhTgOe37vcuiL8XE1B7YEybd0inmXnYo/9nNwT9eYtP8oY5VUjaiLCSZK+qbLIvqA8TIWHHl58=
+	t=1786963554; cv=none; b=eHYcYXxD90exdcf4zPEHTXYqzFQjkjqCVBXwMsD+I+IpLKMfQnn09Io5Rpxpz92T6wDSe2vmA1k6apaMI7W1SFFxDpWd5THGufVdnAnn8reJVXXGVZdSWeFd/1inHmeURstMoZ5Nf87RD2Y/rFQiaAjEH6k08zXcpFT8aW+7MRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786963477; c=relaxed/simple;
-	bh=JyfAv6mL8148/v16VYuUqAWpbXCsx2pxloVy4DX+sW4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XfUpiUMKDKLrPfW6bXLT96KMdTEf6lWReVAIhVSL9ObmRgTfdEZYRDWBrSVV4K+CvP7ko9tQEWd3jKzcG6Z4wRDXjTYFjd3BlxnX9q0wjXAXV9VNnQ/8x2dL62Z8+9svLNfM/ePlwjE/qJWVI/T7AwTjCJfhaI6RR6agYdveZFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHqwQorB; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHqwQorB"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2cc61541f8cso51889255ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 03:44:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786963474; x=1787568274; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=hJKIw7xzEdri+iwZDsK7i1u3UvVj/oofkEDxWiCdJiY=;
-        b=WHqwQorBU6rYUYuBNDXCaugj6kWg8O/vzN26KacafVt3WYkhoKJujpY27D5Hs0Mnon
-         46EkRLj2EHP5Sr/eNroaBcRc6F42hG4C1m+Rx3sCkc5DM4w0UD3PMWAeoeyJamfLMn+3
-         +CD+pY4+l5zYJOh+zo5lCorMmsZhJ0AFNaV+pgD20u7NfPimyU12ctGB2wLKvgHt0qNR
-         1rqIDmd6UXuW96o41ynabXzjkezqNsfcjw+RlVW/kztVJTlPJhfxVCLHrB3Sui8vI+Rl
-         iyrAoNwJmwOX/HBUES9nI0vV5yLtDEeRRbrC4+Y8EzRe6xb8hYZvp17bcNGJd86I9etM
-         flmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786963474; x=1787568274;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=hJKIw7xzEdri+iwZDsK7i1u3UvVj/oofkEDxWiCdJiY=;
-        b=NioDdnO/Lw2OSz6BHTL2qQpkVyIHVGwLY3f6WHDafvWMMGENWPEqBTtN/R0p2SLa/b
-         pagzLmTZphOrxMWx7K2SbWinV0Xhc9jAhvSTVoXJ8lFth/XKwR0WM0g7G6/GDa5BRjMz
-         pNUWPzOSJPB18EzibW2iXP8q1A4x+OrmtNC57WF2Jnl1NpkaB7SSrAZTf/8pGmFfS97e
-         b5X+N8PgRv/2Wwx/4PW4PrsIGp7DopJ5dFoXqi5LfQoENkLx4hRXRrhA4Tm4cQU1fH7N
-         QfcTPVr4Ht4bBzwSULpu2rRrRLqwnH2AkxnYKgcBOwFCUojQ4/KmP+zuhmajZ6E45E48
-         fDZA==
-X-Gm-Message-State: AOJu0Yzanh+YYaM0i5P1UnSTnvmikEvGAT9DmhsStBNql+Eo9cZcgD8h
-	jSqdulI8+WJBePRMNIABKOER2jrw94TNxo5zO/7ORX2QHcNeUnu9E3NSgYW9Fg==
-X-Gm-Gg: AR+sD135wBmW8qKNxq2RSA9Kv1BYxmBsLPvPHLZvpDFpDEVSHV/mUB1WKUsXhTjG0z2
-	h8O6lCdXHykVBYwhG6dAb3FH28IglxY9VUABcYaIGOndaYCdh2qKSRe0Oz3Ztjq5qfsEEBRrc14
-	cPUFY/hW1eBuFPPq3tTERd/pvMLN4fIfCkYY1boNtM/3HEPYWB22j9ZZ1qikPt+dY0D8WBFkJTH
-	oauLPpVqEKVE9GxJv3c1nacXiP0SdaXQKH2gkbPkxCeBUu7OXIdF24VlduS3sTSsEfmiQo3XE/0
-	rli0YiymbOYBXYgtDIzaFyUB9MuELUrR707+ULBrp6xAfpxeaXs/xYNFIMPxznYbu2PbksXVxH7
-	bbSJPiFtOvUm2pAmKC6zvSps2q5aA+MVrkmB+f2MKRK6HBJEZiz/VzYY1R0m+GiTRkfdsBEOosf
-	EbgX1Qiz7Ii5yNU6Wz9Hnd+NFqHerutM/u8nJxdBfou7S3ncWIPS7ftqSTe/H3OIeNRw+fZKHej
-	qEyq/7t
-X-Received: by 2002:a17:903:947:b0:2d0:401c:2edc with SMTP id d9443c01a7336-2d37f5cdb6cmr359797605ad.1.1786963473665;
-        Mon, 17 Aug 2026 03:44:33 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.216.212])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-32678dd26a0sm6875620eec.2.2026.08.17.03.44.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2026 03:44:33 -0700 (PDT)
-Message-ID: <6a82e611.7270d2fd.2a8f15.70cc@mx.google.com>
-Date: Mon, 17 Aug 2026 03:44:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8538915755817318347=="
+	s=arc-20240116; t=1786963554; c=relaxed/simple;
+	bh=XeVGDTKEG2Xuig58w6D3a2a5C5ZGZ/pNIVpyqcJ+nsc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UkdcNe+MnXrWpOo36maHR0fT1gHGVV0x1awgGbdwEguhYqgqIH6ADXj4BNrm/v6pAmwgl0qlrhNmTQejCalIKjFZ99ynOpWVSivbqhIJjMulNPVwVvjFQzMSqJBHiGwkieDfLG3XRhnXPxhlzXiXGTLUVLTTT5VNE5AjihP29hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BD9404C2C37D5E;
+	Mon, 17 Aug 2026 12:45:33 +0200 (CEST)
+Message-ID: <249ec9cf-a595-4e92-80ee-c47e5ea6ad73@molgen.mpg.de>
+Date: Mon, 17 Aug 2026 12:45:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kaihsin.chung@synaptics.corp-partner.google.com
-Subject: RE: Add support for the Synaptics BCM4384 Bluetooth controller.
-In-Reply-To: <20260817095550.648774-2-kaihsin.chung@synaptics.com>
-References: <20260817095550.648774-2-kaihsin.chung@synaptics.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
+To: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, linusw@kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kaihsin Chung <kaihsin.chung@synaptics.com>
+References: <20260817095550.648774-1-kaihsin.chung@synaptics.com>
+ <20260817095550.648774-3-kaihsin.chung@synaptics.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260817095550.648774-3-kaihsin.chung@synaptics.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============8538915755817318347==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1147103
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.73 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.71 seconds
-SubjectPrefix                 FAIL      0.17 seconds
-BuildKernel                   PASS      26.59 seconds
-CheckAllWarning               PASS      29.14 seconds
-CheckSparse                   PASS      27.88 seconds
-BuildKernel32                 PASS      25.74 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      471.48 seconds
-TestRunner_l2cap-tester       PASS      65.71 seconds
-TestRunner_iso-tester         PASS      91.40 seconds
-TestRunner_bnep-tester        PASS      19.30 seconds
-TestRunner_mgmt-tester        FAIL      228.63 seconds
-TestRunner_rfcomm-tester      PASS      25.30 seconds
-TestRunner_sco-tester         PASS      31.72 seconds
-TestRunner_ioctl-tester       PASS      26.89 seconds
-TestRunner_mesh-tester        FAIL      26.23 seconds
-TestRunner_smp-tester         PASS      23.84 seconds
-TestRunner_userchan-tester    PASS      20.05 seconds
-TestRunner_6lowpan-tester     PASS      22.79 seconds
-IncrementalBuild              PASS      26.59 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/2] dt-bindings: net: bluetooth: add BCM4384
-WARNING: From:/Signed-off-by: email address mismatch: 'From: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>' != 'Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>'
-
-total: 0 errors, 1 warnings, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14753286.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Dear Kaihsin,
 
 
-[2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
-WARNING: From:/Signed-off-by: email address mismatch: 'From: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>' != 'Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>'
+Thank you for your patch. Please remember to version patch iterations. 
+This should have been [PATCH v2 …]. `git format-patch -v2 …` would do that.
 
-total: 0 errors, 1 warnings, 31 lines checked
+Am 17.08.26 um 11:55 schrieb Kaihsin Chung:
+> Add support for the Synaptics 4384 Bluetooth controller
+> by adding the corresponding chip IDs.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+Please add a blank line between paragraphs.
 
-/github/workspace/src/patch/14753287.patch has style problems, please review.
+> Verify the change on the VIM3 platform.Verified
 
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+Please add a dot after the dot/period.
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+> that the controller initializes successfully and
+> that firmware loading and basic Bluetooth operation
+> work as expected.
+
+What is the VIM3 platform. Maybe extend a little. You could also paste 
+the new message.
+
+> Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>
+> ---
+>   drivers/bluetooth/btbcm.c   | 6 +++++-
+>   drivers/bluetooth/hci_bcm.c | 1 +
+>   2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 463d59890bef..63c4c788d9c4 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -31,6 +31,7 @@
+>   #define BDADDR_BCM4334B0 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb0, 0x34, 0x43}})
+>   #define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
+>   #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
+> +#define BDADDR_BCM4384B0 (&(bdaddr_t) {{0x93, 0x76, 0x00, 0xb0, 0x84, 0x43}})
+>   
+>   #define BCM_FW_NAME_LEN			64
+>   #define BCM_FW_NAME_COUNT_MAX		4
+> @@ -130,7 +131,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+>   	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
+>   	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
+>   	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A1) ||
+> -	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+> +	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B) ||
+> +	    !bacmp(&bda->bdaddr, BDADDR_BCM4384B0)) {
+>   		/* Try falling back to BDADDR EFI variable */
+>   		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
+>   			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+> @@ -514,6 +516,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+>   	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
+>   	{ 0x410c, "BCM43430B0"	},	/* 002.001.012 */
+>   	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
+> +	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
+> +	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
+>   	{ }
+>   };
+>   
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 9a103db7e355..e70b9f3fd968 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -1593,6 +1593,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+>   	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
+>   	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
+>   	{ .compatible = "brcm,bcm4335a0" },
+> +	{ .compatible = "brcm,bcm4384-bt" },
+>   	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
+>   	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
+>   	{ },
+
+Please feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+Kind regards,
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.240 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.924 seconds
-Mesh - Send cancel - 2                               Timed out    1.988 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/598
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8538915755817318347==--
+Paul
