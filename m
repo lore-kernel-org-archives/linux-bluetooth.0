@@ -1,196 +1,243 @@
-Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2513343B6CF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 16:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786984337; cv=none; b=MXWW6fAcioGSUC8XrlKBqMQw2NiRAHz/sae+F1+yCIt5qwvr1i1oWLpuvrHVq+a1sTQizGyPx4oxQVti2J7xghnUydioFTPr08kG5G+yTYsGZx5P8wjNOL+0Z1D6VnV5Klo+PI9PUhRtUiHNn5kHC7DHtnAPx1TBLac56huYEFU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786984337; c=relaxed/simple;
-	bh=OzOVqw7Y9HjgXBD3K4ivCtcHfnIW3SZe+5EYnS5grCE=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:References:
-	 In-Reply-To:MIME-Version; b=V5+BYfnkn+GJq5R0F5e/DvXPe1CBcyWIhnAw90RDX9KOKWlSMCfnU5iDOOUnLGTujX1BwvzfCEJK2bdpvKgSyPNbvhJe7MCg9uJgF91ajC3fmAay5RVC/IXBdpV8q8BOAW6rroVOjNgqX7YLED6iykmISuDjolagjvmw9xjk1fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=FBNjHV8V; arc=none smtp.client-ip=46.14.118.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9348C43F4BB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 16:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786984979; cv=pass; b=Ar+q/PZIT7IvYatY9HlUJ6R0i5f5twtQCySG+vIHz+ZWaWdAwMCuXKuMay+1YMnkJnkiY1HrDNDJyz5/z1sRxWOgTsq67tBi9nrwMmkTJxiTF2sQfJ7tDZHkCmnDw815xdsvpQ3oMXjZ0hmzFIQdUHy851q465ikw+viyy/y+9o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786984979; c=relaxed/simple;
+	bh=EkJmkr4i0XfDcLVsu3GNYhW4t/PNRuWRBy9eVihU4eE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gdfcjz8NFWu7sYRjcnuvOaSnyFGuAfKZtOyWVAthyjXKztZBGqGTS2+duqJF8JRVIz+9UJXlR/adTQqJCngjkeXXqtY1Yo9wiOx8N5SHb3/7sDMeuDk64EM9ARIgnrbcCwIU7lZExo4iMxvp8PKywGw/WC05tmI1jEr0P92IuF4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHPFdZW6; arc=pass smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="FBNjHV8V"
-Received: from [192.168.16.44] (port=45340 helo=remote.fiveco.ch)
-	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <valentin.kindschi@fiveco.ch>)
-	id 1ww0Fa-000000003tm-0JJG;
-	Mon, 17 Aug 2026 18:31:50 +0200
-Content-Language: fr-FR
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
-	t=1786984309; h=from:subject:to:date:message-id;
-	bh=OzOVqw7Y9HjgXBD3K4ivCtcHfnIW3SZe+5EYnS5grCE=;
-	b=FBNjHV8VZkduoAatdJeuuSg3tDktODWVm7M2nsU7bPOPitDK+b8xxuEY4hk4D/98sl/qfejHdyj
-	q+mDNPZtY9dFhkS7Y6pJK+8sNqZDfvyLH4d4E7RfxnV+NbsFUbd3t7IBZXeOR32hMyLKCU9AZp8dL
-	KENKdiCPZ7H/E4BptVs=
-Received: from FIVECO-MX01.fiveco.local (192.168.16.44) by
- FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 17 Aug 2026 18:31:49 +0200
-Received: from FIVECO-MX01.fiveco.local ([fe80::c512:b974:5da:2168]) by
- FIVECO-MX01.fiveco.local ([fe80::c512:b974:5da:2168%4]) with mapi id
- 15.01.2507.061; Mon, 17 Aug 2026 18:31:49 +0200
-From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH v3 2/2] Bluetooth: hci_event: keep HCI_LE_ADV set if the
- host cancelled
-Thread-Topic: [PATCH v3 2/2] Bluetooth: hci_event: keep HCI_LE_ADV set if the
- host cancelled
-Thread-Index: AQHdLll6H3Gt74RhrkC8rZuD3GrYrbaiR/GAgAAkF3A=
-Date: Mon, 17 Aug 2026 16:31:49 +0000
-Message-ID: <700f0c2d3c5d4ac8bea4774375703bba@fiveco.ch>
-References: <20260817150240.520181-1-valentin.kindschi@fiveco.ch>
- <20260817150240.520181-3-valentin.kindschi@fiveco.ch>
- <CABBYNZJ55q+jpSRrp7PS31hR6xbDEPNExQCADKGWFKtKKweMjQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJ55q+jpSRrp7PS31hR6xbDEPNExQCADKGWFKtKKweMjQ@mail.gmail.com>
-Accept-Language: fr-FR, fr-CH, en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHPFdZW6"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-836cda225c1so50796987b3.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 09:42:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786984974; cv=none;
+        d=google.com; s=arc-20260327;
+        b=A5XFvqyWfqwrvgV+WN9c+c0mCuxWBVbXBt0sOtpHpiNBFSGMmnitI9jhU/yU2cyAOW
+         HQMa8s6ZRMc8pcpphvPtH/Emoty+Lv8UeaMFpIoEvfJKIqwxNq/KwsVQzKA162xQh/9s
+         IR5ma/e3CodNQVCLKDUDmNAq8WDBXVomcZQqZRgCm0lQOuWGplA3swOqeEwaovDcYwPg
+         FVdP6m3s+ry+oMn486qmLR1+UFN2mLTHKeHAIWVfWx2g58WEUZAH1QpxjK1Dv+JWLncA
+         tZwWBH5FCftCUZ3kGajP+rFjJp9gKGD/ra0zXiU9vyCx7/11qR+W2QJu4Qg/Emb/O9wE
+         royA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=S/btAlrvPaD93Lrko/2BtnY6B4NRoou9llL+XSVCd+w=;
+        fh=heLnqCkMyiNj75Znlf4A3P4NUch6/SCrPFyRsCDNFDo=;
+        b=nU1McrBj+anAybgrWosR33gg3jsNfhgPn3kkDqBNJvFRSrvPPLOk/BWK1K+qmBS/c/
+         mLzxaDumiLNd2u2xOW4+NCx29AoY7vrImoOHP1lOW4oz9Wy6IcdCloZX9/fCUi8CIWfv
+         T3LzpcoiI3xsjGoGgU9tW2Ag3jkBgiiMu4S8Bm/UZ3nGqotajoIDUnXnLGYly5lP/yy2
+         JjVVrdTIl22boG+4coLXRZc2aCGV9WLDxapR/mMGb2ZBq6mVvi0/s9+i9kMf2ZPQM/MC
+         B6npbkqzO14YP1JW2tZ7cUcA1EsB06oek2ZTgLXZHoOHbXQBbQmkZOEwmC4zPnX+2wyL
+         P4fA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786984974; x=1787589774; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=S/btAlrvPaD93Lrko/2BtnY6B4NRoou9llL+XSVCd+w=;
+        b=LHPFdZW6lRnqTYHW60ekEN7LwPD/XOtMmKdf3xzuGRbaNPzO12wes4uvPKveW9nwdz
+         KtkuJRoamK2z7su1NLWKAwOKRtHPssFN6c2sNqrrxxjf3+xRGKjh3+3Tp4Vjpl+Gz/f2
+         DngfBxjRGIDakFTB8M9k79sZZO/8pqYNgPVzoNoWXyntXAS+ovVSreUJOoWgS6brJNDX
+         CdBkgetLTfoBZvDwadKJHKGgcSOz4RseDsBelZEU4didA3nWI+id7Rv2jUkRRwxJl7ke
+         Ufu2Lvyg8FUKwDFydD0wqV2vrWLUVxjVP15+ZypYrcdrjyaTTD+zmw8UWHTAgaNm8Rmy
+         m2DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786984974; x=1787589774;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=S/btAlrvPaD93Lrko/2BtnY6B4NRoou9llL+XSVCd+w=;
+        b=hxDnBwzSKpydKtVknOFVqQhBGRd8J2jetohqabu8tuDI7CgdhBWivaEFRpH6SFOkQl
+         LjxA8Lj/UOnOPl+22iFoickoHAUjwE5x6ZicwAg0eWmG/I+DvuZKnKuuBnadR4Z5FY4F
+         IPoTnrRbgeFFeaWDKL/bD+BZB7ihngCDtla9zzhwqW3QNKY1oC5HEsKAi/vSf8NVr9yt
+         k6ZfY27VgKVIlsVVAbVGmHlfQ/MsrJbK3wCpZoorUc0HB6rNe/TTsFsvmhgOn8lwN0n4
+         GGAZNkhVQewDO5yUFJkFdLgFL0o9Y5YVpozqJUA016jWU98O1eiDK6ipNc+i/8sxD1Za
+         4R/A==
+X-Gm-Message-State: AOJu0Yx8iy8cSjuXIE7+YyJ/FlUlZhODVDSYXjeHOWAPXhEiS9TKVRZ1
+	2IFongfThdkllXgNvNEtkO216am8utBjHr6YIztGK65lvVF76JdA6d7f80FLGoyzsvQJDt12fHu
+	GmyRjNxd09oLMeTiR7twKzjZXEHrZXYSLp0DG14llXA==
+X-Gm-Gg: AR+sD10LnS874FBmwpFi8/m27qMpSVaa3LxsDE5ldb9q76F0j3VzqqNQdd3Dn6BOaRv
+	+2y1XtuR/vEhFSQoMj3QY+AuuQyEEqpe+0vtiw+wiBFA0D6i5usX+mhLjkiYUBbUWsR1BxABsIg
+	88quIdrPvgN274+ujM0ICAwGTl+QgHAOaYgT7tidJkSdwPi/OKM3qgGOPvJU4RsjGW6PjuC6Rz+
+	YGY9RxTgCtnu52SxRyEoIeU3LWZjcaGL+xWAturTLNmNx2E6FU/DObBBaO7OaD3W/IYrtQMMRWj
+	9XQkzLGCWYKcwHdJkHQh3V6XDGjACqslxGRyq9JlknMLYoYYfI07d8UngoH5I4YXeZlbHGmcAsB
+	ZSiF5nHtjE/dp3O785AEWOZQ8LyE1
+X-Received: by 2002:a05:690c:ec2:b0:81e:893c:2c23 with SMTP id
+ 00721157ae682-8370dfb375amr114957297b3.11.1786984973996; Mon, 17 Aug 2026
+ 09:42:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Sophos-OBS: success
-X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.8.17.155719
-X-SASI-RCODE: 200
-X-SASI-SpamProbability: 10%
-X-SASI-Hits: ADVERT_CODE2 0.400000, BODY_SIZE_6000_6999 0.000000,
- BODY_SIZE_7000_LESS 0.000000, CTE_BASE64 0.000000, DKIM_ALIGNS 0.000000,
- DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
- IN_REP_TO 0.000000, LEGITIMATE_SIGNS 0.000000, MSG_THREAD 0.000000,
- MSG_THREAD_SOLO 0.000000, MULTIPLE_RCPTS 0.100000, NO_CTA_URI_FOUND 0.000000,
- NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000, OUTBOUND 0.000000,
- OUTBOUND_SOPHOS 0.000000, REFERENCES 0.000000, SENDER_NO_AUTH 0.000000,
- SUPERLONG_LINE 0.050000, SUSP_DH_NEG 0.000000, TRANSACTIONAL 0.000000,
- WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000, WEBMAIL_X_IP_HDR 0.000000,
- __ADVERT_CODE2 0.000000, __ANY_URI 0.000000, __B2B_PROBE 0.000000,
- __BODY_NO_MAILTO 0.000000, __BOUNCE_CHALLENGE_SUBJ 0.000000,
- __BOUNCE_NDR_SUBJ_EXEMPT 0.000000, __BULK_NEGATE 0.000000,
- __BUSINESS_SIGNATURE 0.000000, __CC_NAME 0.000000, __CT 0.000000,
- __CTE 0.000000, __CTYPE_CHARSET_QUOTED 0.000000, __CT_TEXT_PLAIN 0.000000,
- __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000, __DQ_NEG_DOMAIN 0.000000,
- __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000, __FORWARDED_MSG 0.000000,
- __FRAUD_BODY_WEBMAIL 0.000000, __FRAUD_MONEY_DENOMINATION 0.000000,
- __FRAUD_NEGATE 0.000000, __FRAUD_WEBMAIL 0.000000,
- __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
- __HAS_MSGID 0.000000, __HAS_REFERENCES 0.000000, __HAS_XOIP 0.000000,
- __HIGHBIT_ASCII_MIX 0.000000, __INVOICE_MULTILINGUAL 0.000000,
- __IN_REP_TO 0.000000, __MAIL_CHAIN 0.000000, __MIME_BOUND_CHARSET 0.000000,
- __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
- __MIME_VERSION 0.000000, __MSGID_32HEX 0.000000,
- __MSGID_DOMAIN_IN_REFERENCES 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
- __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
- __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
- __RCVD_EXIM_4_96_AES_128 0.000000, __RCVD_FROM_HOMEUSER 0.000000,
- __REFERENCES 0.000000, __SANE_MSGID 0.000000, __SCAN_D_NEG 0.000000,
- __SCAN_D_NEG2 0.000000, __SCAN_D_NEG_HEUR 0.000000,
- __SCAN_D_NEG_HEUR2 0.000000, __SL_HEAVY 0.000000, __SUBJ_ALPHA_END 0.000000,
- __SUBJ_ALPHA_NEGATE 0.000000, __SUBJ_REPLY 0.000000,
- __SUBJ_TRANSACTIONAL 0.000000, __SUBJ_TR_GEN 0.000000, __TO_GMAIL 0.000000,
- __TO_MALFORMED_2 0.000000, __TO_NAME 0.000000,
- __TO_NAME_DIFF_FROM_ACC 0.000000, __TO_REAL_NAMES 0.000000,
- __URI_MAILTO 0.000000, __URI_NO_WWW 0.000000, __URI_NS 0.000000
+References: <20260817150240.520181-1-valentin.kindschi@fiveco.ch>
+ <20260817150240.520181-3-valentin.kindschi@fiveco.ch> <CABBYNZJ55q+jpSRrp7PS31hR6xbDEPNExQCADKGWFKtKKweMjQ@mail.gmail.com>
+ <700f0c2d3c5d4ac8bea4774375703bba@fiveco.ch>
+In-Reply-To: <700f0c2d3c5d4ac8bea4774375703bba@fiveco.ch>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 17 Aug 2026 12:42:42 -0400
+X-Gm-Features: AcwNN1U0lbZ9sKvFCoDq7ZEQvI75MALh1DTXrlbrIEUc-kGiNRabIMye2jFeZVw
+Message-ID: <CABBYNZKLcM2L9VTNhyr=O+TMHK-CoyspCQA+yU_hP2ER-SOS+g@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] Bluetooth: hci_event: keep HCI_LE_ADV set if the
+ host cancelled
+To: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
+	"marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T2gsIHlvdSdyZSByaWdodC4gVGhlIHRlc3QgaXMgdG9vIG5hcnJvdyAtIGEgY29ubmVjdGlvbiB0
-aW1lb3V0IG9uIHRoZSBjZW50cmFsIHBhdGggc2hvdWxkIG5vdCBjbGVhciBpdCBlaXRoZXIuDQoN
-ClRoZSBjbGVhciBleGlzdHMgYmVjYXVzZSBhZHZlcnRpc2luZyBzdG9wcyB3aGVuIGEgcGVyaXBo
-ZXJhbCBjb25uZWN0aW9uIGlzIGNyZWF0ZWQsIHNvIHRoZSByb2xlIHNlZW1zIG1vcmUgcmVsZXZh
-bnQgdGhhbiB0aGUgc3RhdHVzIC0gYnV0IGV2LT5yb2xlIGlzIG5vdCBkZXBlbmRhYmxlIG9uIGEg
-ZmFpbGVkIGV2ZW50LCBhbmQgdGhlIGNvbm4gbG9va3VwIHRoYXQgd291bGQgZ2l2ZSBhIHRydXN0
-d29ydGh5IHJvbGUgaGFwcGVucyBhZnRlciB0aGlzIHBvaW50Lg0KDQpXZSBjb3VsZCBtb3ZlIHRo
-ZSBjbGVhciBiZWxvdyB0aGUgbG9va3VwIGFuZCBnYXRlIGl0IG9uIGNvbm4tPnJvbGUsIG9yIHNp
-bXBseSAhc3RhdHVzID8NCg0KVmFsZW50aW4gS2luZHNjaGkNCg0KLS0tLS1NZXNzYWdlIGQnb3Jp
-Z2luZS0tLS0tDQpEZcKgOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWls
-LmNvbT4gDQpFbnZvecOpwqA6IGx1bmRpLCAxNyBhb8O7dCAyMDI2IDE4OjEyDQrDgMKgOiBWYWxl
-bnRpbiBLaW5kc2NoaSA8dmFsZW50aW4ua2luZHNjaGlAZml2ZWNvLmNoPg0KQ2PCoDogbGludXgt
-Ymx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgbWFyY2VsQGhvbHRtYW5uLm9yZzsgam9oYW4uaGVk
-YmVyZ0BnbWFpbC5jb207IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IHN0YWJsZUB2Z2Vy
-Lmtlcm5lbC5vcmcNCk9iamV0wqA6IFJlOiBbUEFUQ0ggdjMgMi8yXSBCbHVldG9vdGg6IGhjaV9l
-dmVudDoga2VlcCBIQ0lfTEVfQURWIHNldCBpZiB0aGUgaG9zdCBjYW5jZWxsZWQNCg0KSGkgVmFs
-ZW50aW4sDQoNCk9uIE1vbiwgQXVnIDE3LCAyMDI2IGF0IDExOjAz4oCvQU0gVmFsZW50aW4gS2lu
-ZHNjaGkgPHZhbGVudGluLmtpbmRzY2hpQGZpdmVjby5jaD4gd3JvdGU6DQo+DQo+IGxlX2Nvbm5f
-Y29tcGxldGVfZXZ0KCkgY2xlYXJzIEhDSV9MRV9BRFYgYmVmb3JlIGxvb2tpbmcgYXQgdGhlIGV2
-ZW50IA0KPiBzdGF0dXMsIG9uIHRoZSBwcmVtaXNlIHN0YXRlZCBpbiBpdHMgY29tbWVudCB0aGF0
-IGFsbCBjb250cm9sbGVycyBzdG9wIA0KPiBhZHZlcnRpc2luZyB3aGVuIGEgY29ubmVjdGlvbiBp
-cyBjcmVhdGVkLg0KPg0KPiBUaGF0IHByZW1pc2UgZmFpbHMgZm9yIFVua25vd24gQ29ubmVjdGlv
-biBJZGVudGlmaWVyICgweDAyKSwgd2hpY2ggaXMgDQo+IHdoYXQgYW4gSENJX0xFX0Nvbm5lY3Rp
-b25fQ29tcGxldGUgY2FycmllcyBhZnRlciB0aGUgaG9zdCBpc3N1ZWQgTEUgDQo+IENyZWF0ZSBD
-b25uZWN0aW9uIENhbmNlbDogbm8gY29ubmVjdGlvbiB3YXMgY3JlYXRlZCBhbmQgdGhlIGNvbnRy
-b2xsZXIgDQo+IG5ldmVyIHN0b3BwZWQgYWR2ZXJ0aXNpbmcuIENsZWFyaW5nIHRoZSBmbGFnIHRo
-ZXJlIG1ha2VzIHRoZSBob3N0IA0KPiBiZWxpZXZlIGFkdmVydGlzaW5nIGlzIG9mZiB3aGlsZSB0
-aGUgY29udHJvbGxlciBoYXMgaXQgb24uDQo+DQo+IE90aGVyIG5vbi16ZXJvIHN0YXR1c2VzIG11
-c3Qga2VlcCBjbGVhcmluZyBpdC4gQWR2ZXJ0aXNpbmcgVGltZW91dA0KPiAoMHgzYykgaW4gcGFy
-dGljdWxhciBtZWFucyB0aGUgY29udHJvbGxlciBnYXZlIHVwIGFkdmVydGlzaW5nIG9uIGl0cyAN
-Cj4gb3duLCBzbyB0aGUgZmxhZyBoYXMgdG8gZ287IGxlYXZpbmcgaXQgc2V0IHdvdWxkIG1ha2Ug
-dGhlICJhbHJlYWR5IA0KPiBhZHZlcnRpc2luZyIgc2hvcnRjdXQgaW4gaGNpX3NjaGVkdWxlX2Fk
-dl9pbnN0YW5jZV9zeW5jKCkgc2tpcCB0aGUgSENJIA0KPiBjb21tYW5kcyBhbmQgc2lsZW50bHkg
-c3RvcCBhZHZlcnRpc2luZyBhbHRvZ2V0aGVyLg0KPg0KPiBXaXRoIGxlZ2FjeSBhZHZlcnRpc2lu
-ZyB0aGUgZGlzYWdyZWVtZW50IGlzIHNlbGYtc3VzdGFpbmluZy4gT24gdGhlIA0KPiBuZXh0IHNv
-ZnR3YXJlIHJvdGF0aW9uIHRpY2sgaGNpX2VuYWJsZV9hZHZlcnRpc2luZ19zeW5jKCkgcnVuczoN
-Cj4NCj4gICAtIGhjaV9kaXNhYmxlX2FkdmVydGlzaW5nX3N5bmMoKSByZXR1cm5zIGVhcmx5IHdp
-dGhvdXQgc2VuZGluZw0KPiAgICAgYW55dGhpbmcsIGJlY2F1c2UgSENJX0xFX0FEViBpcyBjbGVh
-cjsNCj4gICAtIExFIFNldCBBZHZlcnRpc2luZyBQYXJhbWV0ZXJzIGlzIHRoZW4gc2VudCB3aGls
-ZSB0aGUgY29udHJvbGxlciBpcw0KPiAgICAgc3RpbGwgYWR2ZXJ0aXNpbmcsIGFuZCBpcyBjb3Jy
-ZWN0bHkgcmVqZWN0ZWQgd2l0aCBDb21tYW5kIERpc2FsbG93ZWQNCj4gICAgICgweDBjKTsNCj4g
-ICAtIHRoZSBmdW5jdGlvbiByZXR1cm5zIGJlZm9yZSBMRSBTZXQgQWR2ZXJ0aXNpbmcgRW5hYmxl
-LCBzbyBub3RoaW5nDQo+ICAgICByZS1zZXRzIEhDSV9MRV9BRFYuDQo+DQo+IGhjaV9zY2hlZHVs
-ZV9hZHZfaW5zdGFuY2Vfc3luYygpIHJlLWFybXMgYWR2X2luc3RhbmNlX2V4cGlyZSBldmVyeSAN
-Cj4gSENJX0RFRkFVTFRfQURWX0RVUkFUSU9OICgyIHMpIGFuZCBpdHMgImFscmVhZHkgYWR2ZXJ0
-aXNpbmciIHNob3J0Y3V0IA0KPiB0ZXN0cyBIQ0lfTEVfQURWLCB3aGljaCBjYW4gbm8gbG9uZ2Vy
-IGJlY29tZSB0cnVlLCBzbyB0aGUgY29tbWFuZCBpcyANCj4gcmV0cmllZCBldmVyeSAyIHMgaW5k
-ZWZpbml0ZWx5Og0KPg0KPiAgIEJsdWV0b290aDogaGNpMDogT3Bjb2RlIDB4MjAwNiBmYWlsZWQ6
-IC0xNg0KPg0KPiBDYXB0dXJlZCBvbiBhIEJDTTQzNDU1IChubyBMRSBFeHRlbmRlZCBBZHZlcnRp
-c2luZykgYWZ0ZXIgYSBjZW50cmFsIA0KPiBjb25uZWN0aW9uIGF0dGVtcHQgdGltZWQgb3V0IGFu
-ZCB3YXMgY2FuY2VsbGVkOg0KPg0KPiAgIExFIFNldCBBZHZlcnRpc2luZyBQYXJhbWV0ZXJzICgw
-eDIwMDYpICAgU3VjY2Vzcw0KPiAgIExFIFNldCBBZHZlcnRpc2luZyBFbmFibGUgICAgICgweDIw
-MGEpICAgU3VjY2VzcyAgICAgICAgSENJX0xFX0FEViBzZXQNCj4gICBMRSBDcmVhdGUgQ29ubmVj
-dGlvbiBDYW5jZWwgICAoMHgyMDBlKSAgIFN1Y2Nlc3MNCj4gICBMRSBDb25uZWN0aW9uIENvbXBs
-ZXRlICAgICAgICAgICAgICAgICAgIFVua25vd24gQ29ubiBJZCAgPC0gZmxhZyBjbGVhcmVkDQo+
-ICAgTEUgU2V0IEFkdmVydGlzaW5nIFBhcmFtZXRlcnMgKDB4MjAwNikgICBDb21tYW5kIERpc2Fs
-bG93ZWQgIFsrMi4wMzMgc10NCj4gICBMRSBTZXQgQWR2ZXJ0aXNpbmcgUGFyYW1ldGVycyAoMHgy
-MDA2KSAgIENvbW1hbmQgRGlzYWxsb3dlZCAgWysyLjAxNiBzXQ0KPiAgIC4uLg0KPg0KPiBLZWVw
-IHRoZSBmbGFnIG9ubHkgZm9yIHRoZSBob3N0LWNhbmNlbGxlZCBjYXNlLg0KPg0KPiBGaXhlczog
-ZmJkOTZjMTUxY2RjICgiQmx1ZXRvb3RoOiBGaXggY2xlYXJpbmcgSENJX0xFX0FEViBmb3IgTEUg
-DQo+IGNvbm5lY3Rpb25zIikNCj4gQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcNCj4gQXNzaXN0
-ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01IGJ0bW9uDQo+IFNpZ25lZC1vZmYtYnk6IFZhbGVu
-dGluIEtpbmRzY2hpIDx2YWxlbnRpbi5raW5kc2NoaUBmaXZlY28uY2g+DQo+IC0tLQ0KPiBDaGFu
-Z2VzIGluIHYyOg0KPiAtIFJlYmFzZWQgb250byBibHVldG9vdGgtbmV4dDsgbm8gZnVuY3Rpb25h
-bCBjaGFuZ2UuDQo+ICAgdjEncyBoY2lfZXZlbnQuYyBjb250ZXh0IGxhY2tlZCB0aGUgaGNpX3N0
-b3JlX3dha2VfcmVhc29uKCkgY2FsbA0KPiAgIHByZXNlbnQgaW4gbWFpbmxpbmUsIHNvIHRoZSBo
-dW5rIGRpZCBub3QgYXBwbHkuDQo+DQo+ICBuZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIHwgOCAr
-KysrKy0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
-LSkNCj4NCj4gZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMgYi9uZXQvYmx1
-ZXRvb3RoL2hjaV9ldmVudC5jDQo+IC0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMNCj4g
-KysrIGIvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KPiBAQCAtNTcyMCwxMCArNTcyMCwxMiBA
-QCBzdGF0aWMgdm9pZCBsZV9jb25uX2NvbXBsZXRlX2V2dChzdHJ1Y3QgaGNpX2RldiAqaGRldiwg
-dTggc3RhdHVzLA0KPiAgICAgICAgIGhjaV9kZXZfbG9jayhoZGV2KTsNCj4gICAgICAgICBoY2lf
-c3RvcmVfd2FrZV9yZWFzb24oaGRldiwgYmRhZGRyLCBiZGFkZHJfdHlwZSk7DQo+DQo+IC0gICAg
-ICAgLyogQWxsIGNvbnRyb2xsZXJzIGltcGxpY2l0bHkgc3RvcCBhZHZlcnRpc2luZyBpbiB0aGUg
-ZXZlbnQgb2YgYQ0KPiAtICAgICAgICAqIGNvbm5lY3Rpb24sIHNvIGVuc3VyZSB0aGF0IHRoZSBz
-dGF0ZSBiaXQgaXMgY2xlYXJlZC4NCj4gKyAgICAgICAvKiBBZHZlcnRpc2luZyBzdG9wcyB3aGVu
-IGEgY29ubmVjdGlvbiBpcyBjcmVhdGVkLCBhbmQgd2hlbiB0aGUNCj4gKyAgICAgICAgKiBjb250
-cm9sbGVyIGdpdmVzIHVwIGFkdmVydGlzaW5nIG9uIGl0cyBvd24uIEl0IGtlZXBzIGFkdmVydGlz
-aW5nDQo+ICsgICAgICAgICogd2hlbiB0aGUgaG9zdCBjYW5jZWxsZWQgYW4gb3V0Z29pbmcgY29u
-bmVjdGlvbi4NCj4gICAgICAgICAgKi8NCj4gLSAgICAgICBoY2lfZGV2X2NsZWFyX2ZsYWcoaGRl
-diwgSENJX0xFX0FEVik7DQo+ICsgICAgICAgaWYgKHN0YXR1cyAhPSBIQ0lfRVJST1JfVU5LTk9X
-Tl9DT05OX0lEKQ0KPiArICAgICAgICAgICAgICAgaGNpX2Rldl9jbGVhcl9mbGFnKGhkZXYsIEhD
-SV9MRV9BRFYpOw0KDQpIbW0sIEkgd29uZGVyIGlmIHRoaXMgaXMgbm90IHZhbGlkIGZvciBhbGwg
-c3RhdHVzICE9IDAgdGhvdWdoLCBmb3IgZXhhbXBsZSBpZiB0aGUgY29ubmVjdGlvbiB0aW1lb3V0
-IHdlIHByb2JhYmx5IHNob3VsZG4ndCBjbGVhciBpdCBlaXRoZXIuDQoNCj4gICAgICAgICAvKiBD
-aGVjayBmb3IgZXhpc3RpbmcgY29ubmVjdGlvbjoNCj4gICAgICAgICAgKg0KPiAtLQ0KPiAyLjM0
-LjENCg0KDQoNCi0tDQpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo=
+Hi Valentin,
+
+On Mon, Aug 17, 2026 at 12:31=E2=80=AFPM Valentin Kindschi
+<valentin.kindschi@fiveco.ch> wrote:
+>
+> Oh, you're right. The test is too narrow - a connection timeout on the ce=
+ntral path should not clear it either.
+>
+> The clear exists because advertising stops when a peripheral connection i=
+s created, so the role seems more relevant than the status - but ev->role i=
+s not dependable on a failed event, and the conn lookup that would give a t=
+rustworthy role happens after this point.
+>
+> We could move the clear below the lookup and gate it on conn->role, or si=
+mply !status ?
+
+Try with !status, we need to confirm that doesn't break any CI test
+either. That said, it does look like it would clear it also for
+extended advertising where there could be multiple instances
+advertising, so I'm not sure if it's correct to assume that if one
+instance connects all others shall also be considered connected.
+
+> Valentin Kindschi
+>
+> -----Message d'origine-----
+> De : Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Envoy=C3=A9 : lundi, 17 ao=C3=BBt 2026 18:12
+> =C3=80 : Valentin Kindschi <valentin.kindschi@fiveco.ch>
+> Cc : linux-bluetooth@vger.kernel.org; marcel@holtmann.org; johan.hedberg@=
+gmail.com; linux-kernel@vger.kernel.org; stable@vger.kernel.org
+> Objet : Re: [PATCH v3 2/2] Bluetooth: hci_event: keep HCI_LE_ADV set if t=
+he host cancelled
+>
+> Hi Valentin,
+>
+> On Mon, Aug 17, 2026 at 11:03=E2=80=AFAM Valentin Kindschi <valentin.kind=
+schi@fiveco.ch> wrote:
+> >
+> > le_conn_complete_evt() clears HCI_LE_ADV before looking at the event
+> > status, on the premise stated in its comment that all controllers stop
+> > advertising when a connection is created.
+> >
+> > That premise fails for Unknown Connection Identifier (0x02), which is
+> > what an HCI_LE_Connection_Complete carries after the host issued LE
+> > Create Connection Cancel: no connection was created and the controller
+> > never stopped advertising. Clearing the flag there makes the host
+> > believe advertising is off while the controller has it on.
+> >
+> > Other non-zero statuses must keep clearing it. Advertising Timeout
+> > (0x3c) in particular means the controller gave up advertising on its
+> > own, so the flag has to go; leaving it set would make the "already
+> > advertising" shortcut in hci_schedule_adv_instance_sync() skip the HCI
+> > commands and silently stop advertising altogether.
+> >
+> > With legacy advertising the disagreement is self-sustaining. On the
+> > next software rotation tick hci_enable_advertising_sync() runs:
+> >
+> >   - hci_disable_advertising_sync() returns early without sending
+> >     anything, because HCI_LE_ADV is clear;
+> >   - LE Set Advertising Parameters is then sent while the controller is
+> >     still advertising, and is correctly rejected with Command Disallowe=
+d
+> >     (0x0c);
+> >   - the function returns before LE Set Advertising Enable, so nothing
+> >     re-sets HCI_LE_ADV.
+> >
+> > hci_schedule_adv_instance_sync() re-arms adv_instance_expire every
+> > HCI_DEFAULT_ADV_DURATION (2 s) and its "already advertising" shortcut
+> > tests HCI_LE_ADV, which can no longer become true, so the command is
+> > retried every 2 s indefinitely:
+> >
+> >   Bluetooth: hci0: Opcode 0x2006 failed: -16
+> >
+> > Captured on a BCM43455 (no LE Extended Advertising) after a central
+> > connection attempt timed out and was cancelled:
+> >
+> >   LE Set Advertising Parameters (0x2006)   Success
+> >   LE Set Advertising Enable     (0x200a)   Success        HCI_LE_ADV se=
+t
+> >   LE Create Connection Cancel   (0x200e)   Success
+> >   LE Connection Complete                   Unknown Conn Id  <- flag cle=
+ared
+> >   LE Set Advertising Parameters (0x2006)   Command Disallowed  [+2.033 =
+s]
+> >   LE Set Advertising Parameters (0x2006)   Command Disallowed  [+2.016 =
+s]
+> >   ...
+> >
+> > Keep the flag only for the host-cancelled case.
+> >
+> > Fixes: fbd96c151cdc ("Bluetooth: Fix clearing HCI_LE_ADV for LE
+> > connections")
+> > Cc: stable@vger.kernel.org
+> > Assisted-by: Claude:claude-opus-5 btmon
+> > Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+> > ---
+> > Changes in v2:
+> > - Rebased onto bluetooth-next; no functional change.
+> >   v1's hci_event.c context lacked the hci_store_wake_reason() call
+> >   present in mainline, so the hunk did not apply.
+> >
+> >  net/bluetooth/hci_event.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -5720,10 +5720,12 @@ static void le_conn_complete_evt(struct hci_dev=
+ *hdev, u8 status,
+> >         hci_dev_lock(hdev);
+> >         hci_store_wake_reason(hdev, bdaddr, bdaddr_type);
+> >
+> > -       /* All controllers implicitly stop advertising in the event of =
+a
+> > -        * connection, so ensure that the state bit is cleared.
+> > +       /* Advertising stops when a connection is created, and when the
+> > +        * controller gives up advertising on its own. It keeps adverti=
+sing
+> > +        * when the host cancelled an outgoing connection.
+> >          */
+> > -       hci_dev_clear_flag(hdev, HCI_LE_ADV);
+> > +       if (status !=3D HCI_ERROR_UNKNOWN_CONN_ID)
+> > +               hci_dev_clear_flag(hdev, HCI_LE_ADV);
+>
+> Hmm, I wonder if this is not valid for all status !=3D 0 though, for exam=
+ple if the connection timeout we probably shouldn't clear it either.
+>
+> >         /* Check for existing connection:
+> >          *
+> > --
+> > 2.34.1
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
