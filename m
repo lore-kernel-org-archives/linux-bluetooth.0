@@ -1,30 +1,31 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C4F5477E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 08:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DA53C3787
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 08:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786955702; cv=none; b=OrIyj0SpjIoaJ+t/Z0s2nsN7fQV5ZLzIYFfCkA942Nv3EKG34Mk4+FqNf2ISmSLwE5kkgW08CWVKeBeEINZG5bnzwbecnpy3KFiKZ+ja9x0QMuu19SKlMG0XCBUQNfM8p20zqSA8/DhrpCWKr1Xm1UfCSmPEDJp4vkMDLEXRDDY=
+	t=1786956098; cv=none; b=q/SKnM6DoJTFmbwr498+G3LWGkUIo5O7Z6xcBgo2OPqvq3j7GLWx9v0oHXFUStBROxXUN3AotYuI7YrCK6GTcIJHp6WTQMEb5/XpCzYd1XFnlS0uG6S5lN+a8tUkv75ivt6urx04bcJHGYBbEt+5r72B9zJC5ZXhrNDm/rsEnQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786955702; c=relaxed/simple;
-	bh=dq/UEZGtOcPYUJDy5jMxon+R0l4Hl0GpYUqVw220oLo=;
+	s=arc-20240116; t=1786956098; c=relaxed/simple;
+	bh=Gn4ZbxNEVJLxlk6wUfb7/O/CK2mSp0HSNjsqYiBBzUQ=;
 	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rZlRfFIy3WKojiQ7fIRtli3aJEGUlhe/9TMO3NZAgFiOoOXkVKALp5Scfd/5dBOHzZ1pHJTDQE7QoDCVhbUg3Id3uPh98VyCFWe0U/sl4HjSFTgkrIJWwwjhn0f4WFXqvkjqTx1dSnbVCxCY5YBkCrrc63tcHBh71q6oX3Ys+A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+	 Content-Type:MIME-Version; b=GsM5ZGCDjpwy9iWsR0rXoCPeJrvIE1X77n62qDTMXj8ZuTPz2P+eEN/wGFejeeuK+peA8PFAZ4UbjKnXWLwROlR3vCFdpL3XL7lpV33KrwHlqWqzhKhl2TanO1xtQrUoyvK+JbQrGFe+SXznH3+TrrTXrXXkL+OgK7AI55F8jsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E88763E9BC;
-	Mon, 17 Aug 2026 08:34:51 +0000 (UTC)
-Message-ID: <949a111b168f3ce54e60b4f625ad94b156ac738f.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v1] sdp-xml: Use a queue to collect sequence
- members
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 19B943EB90;
+	Mon, 17 Aug 2026 08:41:29 +0000 (UTC)
+Message-ID: <8664f27d1427fac3a37f3be0f97f40c6af4d097c.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v1 2/3] unit/test-sdp-xml: Give each test its own
+ test_data
 From: Bastien Nocera <hadess@hadess.net>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	linux-bluetooth@vger.kernel.org
-Date: Mon, 17 Aug 2026 10:34:51 +0200
-In-Reply-To: <20260814173225.1410500-1-luiz.dentz@gmail.com>
-References: <20260814173225.1410500-1-luiz.dentz@gmail.com>
+Date: Mon, 17 Aug 2026 10:41:28 +0200
+In-Reply-To: <20260814174731.1441738-2-luiz.dentz@gmail.com>
+References: <20260814174731.1441738-1-luiz.dentz@gmail.com>
+	 <20260814174731.1441738-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
@@ -35,188 +36,110 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTGVl6nSONEh41ByYeL+pKALquxE2Cwf3YJg2LoNiwWaWqD6VuQwKoCL10HHmLg2QMG0YEyWmjh3lOKs6pbZsbh+vq0kmJ6yXfNbgT1F5Mq/y3ihIexB23oHMqxrWt7OslxqNCD1idjt8ewbq+LK9KW5RqI4w9LHE0Y5UJnRVKcMm/0qTWb8RV2NpUpH5PMqDX/5Fwj+si9RaYjWJYCedmrOJnbuh/AyAkK4AuQkPXACD/Tjmee8X8lO0xhn/GQ8NMYcbGp6L/Qa0jFz1E+/ZiJhQCvwQcmvgsRD8SK1uXWj2kKrEftgO/fmCRwAGb+sHdLygGcDrKIzyBEdCJ8cyMuDERwC1HYKR9691Uj4u8HFzJ4D6MTTlwu4BfPLggTVF/+8qrSoeT+TAn8A1R9EqRWcSzAqL+QMHag1ixe0jbbyv6FFFvD88zXjCqbRtfQpqELpgQw2tCIqx5/xKMgghfQlqSjtb72O8YmCW19fOnYXuMYRU0bj41FBb674/xFnvS1jblrVcB8spuQYJFv544j5NTuWCAOYJRw6zyJM6w8yyWxeMavbTxaGtxG16/FPNPsLmJ4QcbF2fgGLOuw2VD9rccufV7T2sOlIwdv8AK7811UMx7eg9YyZTR6XjI7SdSbAD0vt/X39sokd2q4U3t72PGdMBichv5h0IQMOIUZLQg
-X-GND-State: clean
 X-GND-Score: -100
+X-GND-Cause: dmFkZTEx4HHALaOJ/XphvcxGcPItnSOZS7n7ZnDcm3IdV2LQ/TGBvJ/0nUFWDBz6OzI4azR+2Nj4IEdSBEdLhA9NcgTN02o2vDqC4mxug9dv8/mO05Wa4v3NRhSLER3qsrGIss0kkl+S/3X2b5R9hm5TBU/SYc0VonWF413AdWdwd6uuew/kNUSyowlT4nTlSz0aDQXE3+eyARKo9SnwKZM6U4afzfGZ7W22IOm9DZIlSRtHWWuHoVkeeyE0zoctmzfoY5dco7DVi1Nx/Dugcv3RtHoxg4Fp4d6p/iNaeG0+dWBAwnzgePnkeetMI951OqlXUf5NjD/IB98M2l1T+xiQ5oUQtZcfFwkL2wh0dWY9ZP9vw7J41MMho298YOmrQ2MHK4T68KJ4HWorJc/HsS8PnWEA4tdJsVBHbDqS1+CH8TuyBIb6Q3vqDLHpCSK8qRbNbmHLpEuN7QAlKEjryIepFu1GXhs2yv42syQGSVoPqE1ZsZgJHMLKKVInym9aleQkW+RtmNFvGOI8pvRn2aPmgQNprckhZRFpGO3Dq1I4eiZjw+GLKHVGjPwEQ/EZB2krVK4+Sp3IeMK0Wq2wCr16qtUn3nsCVF/BPdb7QQJqceP5YMghj1Hio5DHYYFjOTAI/oaeYfcH42Gi/j7ss1GiWwGmFa2R7cDX7M3wjSAtGtK88w
+X-GND-State: clean
 
-On Fri, 2026-08-14 at 13:32 -0400, Luiz Augusto von Dentz wrote:
+On Fri, 2026-08-14 at 13:47 -0400, Luiz Augusto von Dentz wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >=20
-> Appending a member to a sequence with sdp_seq_append() walks the
-> single-linked list to find its tail, so building a sequence is
-> O(n^2).
+> DEFINE_TEST assigned the filename and expected result to a single
+> test_data and passed its address to tester_add(), so every test
+> shared
+> one struct and ran with whatever the last registered test left in it.
 >=20
-> This was previously worked around by caching the tail of the sequence
-> in
-> struct sdp_xml_data, which required the caller to pick between
-> appending
-> to the cached tail and initialising val.dataseq, and to keep the
-> cache in
-> sync on every append.
+> All the file based tests therefore parsed the same file, and a test
+> pointing at a file that does not exist still passed.
 >=20
-> Collect the members in a struct queue instead, which tracks its own
-> tail,
-> and link them into val.dataseq once the element is closed. Appending
-> is a
-> plain queue_push_tail(), and the queue is destroyed along with the
-> rest
-> of the element so members that were never linked, such as on
-> malformed
-> input, are still freed.
+> That in particular meant compute-seq-size-type-confusion.xml, the
+> regression test for GHSA-7mmr-gwqx-vc34, was never actually parsed,
+> and
+> passed only because it inherited the expected result of the test
+> registered after it.
+
+That's not quite correct. The fix introduced memory leaks, which you're
+fixing in "sdp-xml: Fix leaking the parse stack on malformed input",
+but it fixed the original crash.
+
+This test would only fail when run under ASan.
+
+I just want to be clear that this fix doesn't have an impact on GHSA-
+7mmr-gwqx-vc34 being resolved earlier.
+
 >=20
-> The sequence_on_squared() test stays at less than 0.1 seconds.
-
-Fails to link sdptool without this patch:
-
-diff --git a/Makefile.tools b/Makefile.tools
-index 1a4e5660813b..84004c12c642 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -437,7 +437,7 @@ tools_hciconfig_LDADD =3D lib/libbluetooth-internal.la
- tools_hcitool_SOURCES =3D tools/hcitool.c src/oui.h src/oui.c
- tools_hcitool_LDADD =3D lib/libbluetooth-internal.la $(UDEV_LIBS)
-=20
--tools_sdptool_SOURCES =3D tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
-+tools_sdptool_SOURCES =3D tools/sdptool.c src/shared/queue.h src/shared/qu=
-eue.c src/shared/util.h src/shared/util.c src/sdp-xml.h src/sdp-xml.c
- tools_sdptool_LDADD =3D lib/libbluetooth-internal.la $(GLIB_LIBS)
-=20
- tools_ciptool_LDADD =3D lib/libbluetooth-internal.la
-
+> Use an array with one entry per test instead.
 >=20
 > Assisted-by: Claude:claude-opus-5
 > ---
-> =C2=A0src/sdp-xml.c | 60 ++++++++++++++++++++++++++++++++++++------------=
--
-> --
-> =C2=A01 file changed, 43 insertions(+), 17 deletions(-)
+> =C2=A0unit/test-sdp-xml.c | 34 ++++++++++++++++++++++------------
+> =C2=A01 file changed, 22 insertions(+), 12 deletions(-)
 >=20
-> diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-> index 5b448fe83410..bad9e289344f 100644
-> --- a/src/sdp-xml.c
-> +++ b/src/sdp-xml.c
-> @@ -25,6 +25,8 @@
-> =C2=A0#include "bluetooth/sdp.h"
-> =C2=A0#include "bluetooth/sdp_lib.h"
-> =C2=A0
-> +#include "shared/queue.h"
-> +
-> =C2=A0#include "sdp-xml.h"
-> =C2=A0
-> =C2=A0#define DBG(...) (void)(0)
-> @@ -44,7 +46,7 @@ struct sdp_xml_data {
-> =C2=A0	char type;			/* 0 =3D Text or Hexadecimal
-> */
-> =C2=A0	char *name;			/* Name, optional in the dtd
-> */
-> =C2=A0	/* TODO: What is it used for? */
-> -	sdp_data_t *tail;		/* Tail for O(1) dataseq
-> append */
-> +	struct queue *seq;		/* Members of a dataseq, if
-> any */
-> =C2=A0};
-> =C2=A0
-> =C2=A0struct context_data {
-> @@ -510,8 +512,37 @@ static void element_start(GMarkupParseContext
-> *context,
-> =C2=A0	}
+> diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+> index b338788aa295..72e01f5f5806 100644
+> --- a/unit/test-sdp-xml.c
+> +++ b/unit/test-sdp-xml.c
+> @@ -114,25 +114,35 @@ static void
+> sequence_on_squared_teardown(gconstpointer data)
+> =C2=A0	tester_teardown_complete();
 > =C2=A0}
 > =C2=A0
+> -#define DEFINE_TEST(fname, res)
+> {					\
+> -	data.expected_result =3D
+> res;					\
+> -	data.filename =3D
+> fname;						\
+> -	tester_add("/" fname, &data,
+> NULL,				\
+> -			parse_xml_for_filename,
+> NULL);			\
+> -	}
+> +#define DEFINE_TEST(fname, res) { .filename =3D fname,
+> .expected_result =3D res }
+> +
 > +/*
-> + * Link the members collected in elem->seq into elem->data-
-> >val.dataseq.
-> + *
-> + * Members are collected in a queue so that appending is O(1),
-> sdp_seq_append()
-> + * would otherwise have to walk to the tail of the sequence on every
-> append.
+> + * Each test needs its own test_data, sharing a single one would
+> make every
+> + * test run with the values assigned by the last one registered.
 > + */
-> +static void sdp_xml_data_flush_seq(struct sdp_xml_data *elem)
-> +{
-> +	const struct queue_entry *entry;
-> +	sdp_data_t *tail =3D NULL;
-> +
-> +	if (!elem->seq)
-> +		return;
-> +
-> +	for (entry =3D queue_get_entries(elem->seq); entry; entry =3D
-> entry->next) {
-> +		if (tail)
-> +			sdp_seq_append(tail, entry->data);
-> +		else
-> +			elem->data->val.dataseq =3D
-> sdp_seq_append(NULL,
-> +								entr
-> y->data);
-> +		tail =3D entry->data;
-> +	}
-> +
-> +	queue_destroy(elem->seq, NULL);
-> +	elem->seq =3D NULL;
-> +}
-> +
-> =C2=A0static void sdp_xml_data_free(struct sdp_xml_data *elem)
+> +static struct test_data file_tests[] =3D {
+> +	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE),
+> +	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE),
+> +	/* From
+> https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+> =C2=A0*/
+> +	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE),
+> +	/* From
+> https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+> =C2=A0*/
+> +	DEFINE_TEST("duplicate-attribute.xml", TRUE),
+> +};
+> =C2=A0
+> =C2=A0int main(int argc, char *argv[])
 > =C2=A0{
-> +	queue_destroy(elem->seq, (queue_destroy_func_t)
-> sdp_data_free);
-> +
-> =C2=A0	if (elem->data)
-> =C2=A0		sdp_data_free(elem->data);
+> =C2=A0	struct test_data data;
+> +	unsigned int i;
 > =C2=A0
-> @@ -568,6 +599,8 @@ static void element_end(GMarkupParseContext
-> *context,
-> =C2=A0		return;
-> =C2=A0	}
+> =C2=A0	tester_init(&argc, &argv);
 > =C2=A0
-> +	sdp_xml_data_flush_seq(ctx_data->stack_head);
+> -	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
+> -	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
+> -	/* From
+> https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+> =C2=A0*/
+> -	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
+> -	/* From
+> https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+> =C2=A0*/
+> -	DEFINE_TEST("duplicate-attribute.xml", TRUE);
+> +	for (i =3D 0; i < G_N_ELEMENTS(file_tests); i++) {
+> +		char *name =3D g_strdup_printf("/%s",
+> file_tests[i].filename);
 > +
-> =C2=A0	if (!strcmp(element_name, "sequence")) {
-> =C2=A0		if (!SDP_IS_SEQ(ctx_data->stack_head->data->dtd)) {
-> =C2=A0			g_set_error(err, G_MARKUP_ERROR,
-> @@ -610,28 +643,21 @@ static void element_end(GMarkupParseContext
-> *context,
+> +		tester_add(name, &file_tests[i], NULL,
+> +				parse_xml_for_filename, NULL);
+> +		g_free(name);
+> +	}
 > =C2=A0
-> =C2=A0	if (ctx_data->stack_head->next && ctx_data->stack_head->data
-> &&
-> =C2=A0					ctx_data->stack_head->next-
-> >data) {
-> -		sdp_data_t *tail;
-> -		switch (ctx_data->stack_head->next->data->dtd) {
-> +		struct sdp_xml_data *parent =3D ctx_data->stack_head-
-> >next;
-> +
-> +		switch (parent->data->dtd) {
-> =C2=A0		case SDP_SEQ8:
-> =C2=A0		case SDP_SEQ16:
-> =C2=A0		case SDP_SEQ32:
-> =C2=A0		case SDP_ALT8:
-> =C2=A0		case SDP_ALT16:
-> =C2=A0		case SDP_ALT32:
-> -			tail =3D ctx_data->stack_head->next->data-
-> >val.dataseq ?
-> -				ctx_data->stack_head->next->tail :
-> NULL;
-> -			if (tail) {
-> -				sdp_seq_append(tail,
-> -					ctx_data->stack_head->data);
-> -			} else {
-> -				ctx_data->stack_head->next->data-
-> >val.dataseq =3D
-> -					sdp_seq_append(NULL,
-> -						ctx_data-
-> >stack_head->data);
-> -			}
-> -			ctx_data->stack_head->next->tail =3D
-> -					ctx_data->stack_head->data;
-> -			ctx_data->stack_head->data =3D NULL;
-> -			ctx_data->stack_head->tail =3D NULL;
-> +			if (!parent->seq)
-> +				parent->seq =3D queue_new();
-> +
-> +			if (queue_push_tail(parent->seq,
-> +						ctx_data-
-> >stack_head->data))
-> +				ctx_data->stack_head->data =3D NULL;
-> =C2=A0			break;
-> =C2=A0		}
-> =C2=A0
+> =C2=A0	tester_add("/sequence_on_squared", &data,
+> =C2=A0		=C2=A0=C2=A0 sequence_on_squared_setup,
