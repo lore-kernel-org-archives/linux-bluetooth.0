@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA53246EF82;
-	Mon, 17 Aug 2026 19:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5822D470125;
+	Mon, 17 Aug 2026 19:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786996016; cv=none; b=VOiE4Eje245hrTPNXL3M0hdQWKIMWMKouKMWWEZxWCwOHh5uXqD4PCxsYEkhWggpGXsmAbsnZRGHsjIQBmqkKUYzyhZ5PcpO9VpR0OZzuq7AryhYtO4kz5VXTPBthiIuxrFF8UKpbINtopH5OrASWx0q8m2RzFjk/PMPf5yJEUc=
+	t=1786996017; cv=none; b=SYfuZOX9I0qvqQjdEqWUiNx01PJ3yswnMbnL0mWY1tiCXIwhuE1M+NCsQvHUxVpchgZVVQUa8pUb6XMtsVOwhc4bVtLf30HhoAZO/psydCkmD4fZa8uzcpRrM3oWQNzwxQ06DuYRThG7mkFziiaO9dAYRPjVUvSgLYOC8WFbJpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786996016; c=relaxed/simple;
-	bh=8rNJPOvWQeLSMlRINIAUAZDPECL7vEwSPcEYDpKEVDo=;
+	s=arc-20240116; t=1786996017; c=relaxed/simple;
+	bh=pRXq4uqLwzIuYq2KvrvP8OkgYJmCZtLc9BkOzaqciCo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DYvHEAGtRZq1rlH/jjiAHKkRXp3xhJfaKNR74PcIEkx2qTqM50SXZnCLsAovSD0MPkSTeg6jpRn8rrEYTuYp8hcmBxWfCmA3mZ+nibogRNy4AS5/CirlTngHrtDVZ5iYZBCaRIXZOjSMjJEDfnPxuo2uZpNB38zZUFFFQD2qGRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foTs1yhj; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=o0mMVhTogV6XW0RCcvtxeBH1DBRN0AjysoAg559YGTQLNfBOefc+OB2prMyOzE9ovpyqULVoCVri4cw/OdJJ85SGQtDPSnFokS9nBizSEBQA5jlCJi5KnQVkrHQWpv8aZfQaUDyLcJOtoWOHwOOZ8qdnBX+KbDrAYq/QQQMZUd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7oqdZ8h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foTs1yhj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F6751F00A3A;
-	Mon, 17 Aug 2026 19:46:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7oqdZ8h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99F71F000E9;
+	Mon, 17 Aug 2026 19:46:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786996014;
-	bh=LTWf/+YwmHFRhCjhh37NBeey88rf7DYi9mDCQWcAItk=;
+	s=k20260515; t=1786996016;
+	bh=rGl7wdqC72A2lpeYT9Lw86izhEPsQo8VKH2ZHiOpzuE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=foTs1yhjahbTjHY2OhKe9adS/J3VrGzfDZ5rs1s+/cYkdKFhZfXHZ1GAk4ULs8Zzz
-	 WjIHPHhWMQYWX9JzI/7qlgnkR3Y6GhEejjppedjdO19SZ6r3aQtEl7uWapg660609+
-	 VW9eUFhV9HF+LveANHl0D+rLcXMannDezWrYnHzTlG/AMi+ZO5iKZnsDxWCenxRlNP
-	 QcG0a5Xw6TNlHnfCwM2q+g0tt/A9z4Z7yklq6wp3bl6+kO8ejGXGgqRUZWIhNrOeuu
-	 Uhqa45ytlIJAjWY05jX53Vs/cGIxCjvin0Eqthwt06HOlzq2r9nMMGZ11naNUbNq6C
-	 kNNR52RnaEMOQ==
+	b=e7oqdZ8hhRl92lb+gvZJLEeFo8IRqCvHlAdIXvGNSWE88lXOQHmiTJHBeHS554B2o
+	 tJhzV4LFRNAK4fuRNtuCIam0xJWVZOAWAFmnnqP3Esrh5pUyeRehITyNXq3kji5x3L
+	 c3jiOqFmvXxCVFYpRKx1dgbrQcGacLH/OddE6hdUEN8cQ6+A+J5+T30ZhIPUg1WMk+
+	 t2xcg0gi4u59QrfUpv+Whre95LVNT0hROjooTzFgOfAEkSC7eNpK4HnCOn//CsgE0I
+	 QLTqkd/+TDRoucg+I23+aj58fd9On/SXJJQm0TiiSwTW0ClB9eTOsFxW16+TkJjZ3o
+	 DGLITT0YOLdqg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D08CB3926262;
-	Mon, 17 Aug 2026 19:46:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568363926262;
+	Mon, 17 Aug 2026 19:46:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,42 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: eir: Fix OOB read in eir_get_service_data()
+Subject: Re: [PATCH RESEND] Bluetooth: hci_sync: add conditional locking
+ annotations
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178699596638.1691257.16551460626446632057.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Aug 2026 19:46:06 +0000
-References: <20260815062419.37489-1-sammiee5311@gmail.com>
-In-Reply-To: <20260815062419.37489-1-sammiee5311@gmail.com>
-To: HyeongJun An <sammiee5311@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <178699596788.1691257.11633718585143607081.git-patchwork-notify@kernel.org>
+Date: Mon, 17 Aug 2026 19:46:07 +0000
+References: 
+ <1ceaa25d70f068adfe2c40290a629b73c382ec59.1786870726.git.pav@iki.fi>
+In-Reply-To: 
+ <1ceaa25d70f068adfe2c40290a629b73c382ec59.1786870726.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, nicoyip.dev@gmail.com, linux-kernel@vger.kernel.org,
+ nathan@kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 15 Aug 2026 15:24:19 +0900 you wrote:
-> eir_get_service_data() walks the advertising data for a Service Data
-> field with a matching UUID.  On a mismatch it advances:
+On Sun, 16 Aug 2026 11:59:01 +0300 you wrote:
+> Add context analysis annotations to functions doing conditional locking,
+> to suppress analysis warnings.
 > 
->     eir += dlen;
->     eir_len -= dlen;
-> 
-> eir_get_data() reports dlen as the field's data length, but the field
-> spans dlen + 2 bytes once its length and type bytes count, and more
-> when non-Service-Data fields were skipped to reach it.  The pointer
-> lands correctly on the next field.  eir_len does not, and the shortfall
-> compounds across fields until eir_get_data() reads the length and type
-> bytes of a "field" past the end of the buffer.
+> Fixes: a3ad01d51d4b ("Bluetooth: hci_sync: Fix advertising data UAFs")
+> Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: eir: Fix OOB read in eir_get_service_data()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/14a97a38ba8f
+  - [RESEND] Bluetooth: hci_sync: add conditional locking annotations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/26cf20d065b3
 
 You are awesome, thank you!
 -- 
