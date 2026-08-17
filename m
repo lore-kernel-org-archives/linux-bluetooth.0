@@ -1,170 +1,146 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F4418DB1F;
-	Mon, 17 Aug 2026 06:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24433A7F45
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 06:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786948518; cv=none; b=JJiX17bw9X3CG1KKksNynJeby0i8uN8svdOSWAId8QIhI9TxOHePz/I9hjQjSgs7SkwbDYkRf3FRDnSFEaqqMhwriXsAUnibaIc4gGNjMj78T3lxlMgLKKb90MjRvzvT+5y76Pjd7AiaC+0UtmqSABUbLmuM7lL4g4E2eCEeYL0=
+	t=1786948735; cv=none; b=U3HRHvD8V7ry9N+fGy9DBLwIDZr7YvxQ9pxhPunuw7jSldkeyhm0W8dKt6ruStrhiTfzpHytrC8ecqlsmEz54o1A+EBs2RaPSP4XevjP6g3LoDC8wYkfhNrAUf/+idfiCnxzHNNPAl5etDIJPVO84epBBO8xzRe9we/E/Qo/V0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786948518; c=relaxed/simple;
-	bh=OHb/Ukkl5wYeXcU02S+w/kjomGU6EOUWgSlaJ0dzaLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gxTToffa/+GnD3RPjl4Rqip1hbCpKThnYg7W8TR835C/zsG7rm3qVQHVN/0DbKh0h5qBNY3ym/mWH8c/DShlBNQUGJdFDuC3ZHsB3Unq+/cVUsHVDcIpsuIaPKHbwkXgo+BdJuwauij4SVYbU5BrVWQD6CBbq9RQbhKavYk6xds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt80AMwm; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1786948735; c=relaxed/simple;
+	bh=a4sOdvq3HTh2z6fQUkhCyJ9SX08y7VLd0AyFt59Yujs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rG2Ol//87JSEfYq9r7nsw6DSyFo3r7c6gC+EEz40+wIoFZna6VQvv8Z1Nww+v98cBID7nZMUafLoCBQFRFhviPnvIj0RQagiH+aLMA0kGbCw4M28xfcPOkuKTubQ6NtAGbTip449XG37hHKTnf4vPl+rNm1KbapQs4ujj6ERW7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fe+RNk1b; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gt80AMwm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786948517; x=1818484517;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OHb/Ukkl5wYeXcU02S+w/kjomGU6EOUWgSlaJ0dzaLA=;
-  b=Gt80AMwm3dRhwyIlWYe0uwLEBO0GF+ShUN4MLS1uMPOellMpIRM5ZUSI
-   BxHMi+3EFTyGFQ5p1OU1hLrD1xb7k4LNMERy7XBDuFAmryqvzwqA4K29a
-   n5yvb+vtE6EUj5h+IXabgkLqIdkxH/HH2S9VFu5mrfZGaJkBI5jEUegEV
-   kqvFOrYFSwv6MRcFkQwbMiKOjB/tFhC9Km2buQPGP/JltwmjC3nBn139f
-   +oxzFwfU/vkaJWPWlc+4WL3/uXT7Z4Oi+M8u2RWOK0dwsFQ9EU9cbUfDD
-   EEnzYT0PW1YnSou8X++QcnrYgl5PvpVAQVTYQmkK64ZXG7jx2vs9m+IYO
-   Q==;
-X-CSE-ConnectionGUID: bPZdBcAzTtW+ZqWAkUxZqQ==
-X-CSE-MsgGUID: gDw6KLBASFmqNheIplwzFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11877"; a="98780143"
-X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
-   d="scan'208";a="98780143"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2026 23:35:15 -0700
-X-CSE-ConnectionGUID: IhYXXzm8SKWwRseS0Ppuig==
-X-CSE-MsgGUID: LS7+ULQkQqmleKkMf5wgXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
-   d="scan'208";a="264865206"
-Received: from klitkey1-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.67])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2026 23:35:07 -0700
-Date: Mon, 17 Aug 2026 09:35:05 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	manivannan.sadhasivam@oss.qualcomm.com,
-	Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	"Derek J. Clark" <derekjohn.clark@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-Message-ID: <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
- <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
- <aWSwgRiEkT9unYw9@smile.fi.intel.com>
- <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
- <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
- <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fe+RNk1b"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6b0ab918216so1648564eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Aug 2026 23:38:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786948732; x=1787553532; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Ubz1J8alNI6NWl3QDiBoCr9sUnHuOLCyJvuVwxYSBYE=;
+        b=fe+RNk1b2QZN3o2fQQygE08lA77HXz3aNNQOkItCfKVnbBoRBNsTFd0YQXoUmW/af0
+         /ZAotSS44fyfQ+nXKcTvASriBZZFMREzQuzHxfkAH3vlYnzaB60VpVLgmTOE4BN4Ndov
+         gYQj7SJ6UElWbkhYAHByYYydFNpkZE1rxzKbi01JQ92m7TeFiA/n6CtmuRIk8E9oMpbh
+         riD0r9aAidovshGXz1oeN9QtGDr/YPyjlIdh3mVU03rYma2E3GM13G0u58A/K62lLllB
+         Dj8qAMRi6oO1hTovlacB7TiKuxdjDvyzNTw1kl8VIBknBFRUkrYqZNofGsmsGdIRjha8
+         4N8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786948732; x=1787553532;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Ubz1J8alNI6NWl3QDiBoCr9sUnHuOLCyJvuVwxYSBYE=;
+        b=l7y2YVSgDBapZeOTtjem0p2C5QmWKjQnx51nOZPdlPXcga4qvlGjuZ2qpx1T4E05/1
+         3BVKavNVkvEK8lt4iKaKzlkrAfznX/xzrOYWi3wSOvfP4cyIAXXQWL0y4Jx5rXJ4v93e
+         ZMR3h8V8mBURg5jxKtBa0jsSdb4iT25oCTPSZ57G2VUTbrn74iNzl0jCAQavBkrznQxL
+         ObEMTEAFZYRSvCUlI83e3S+H1sQ20RwnomslD4s2vq3afZ5HC9CCMedhYfY3GU2HlheF
+         ResxZDChes8dyTbh2yJCytdbVL+SIZxQ9bOT1u+TOTTn+DoU0ErIfeYjHveVqxe8iHu+
+         Dz/w==
+X-Gm-Message-State: AOJu0YwC6nyIwVqfMs/rEDUP6d7BGCAzF3h6p4OMupZEpsnWmInSmV55
+	8dVVbSFEqnAWU/7z3SbCSzpgg7JBzWhjaebofffpvoZnklTYGO/1bCV2iloSeg==
+X-Gm-Gg: AR+sD13ndvKE4dYbZFiqghN5/6hHuuBPYuqdftzT2/NZcgRS6AhD5yMCfsvK+2EYZRq
+	fcRWvNCEHxXEosVhQ3HW/Ukj+bAzlOtjLTDp1uidImAi4pQJxw5Rct78duFG19NZcbjnhggdnHu
+	yW6fJnZEXHfdhsy6BjpZkz2oQTOB9P3D/3zuw2tve2P6GftDZxGR/mX1793C+5w0obKAS8UCWBY
+	XMFWh393pPofUybsFTeA8k20rTyocpASNVSUOoUjRTHA4IZZOyvUBkjgj8RKXlz8zabC4WEr0Pc
+	iG4mDfGdrxodupijo/VuyqHx62lNkRxE3mKZaYXCWa0gQ4px+wFglCXq+9pnhgLc6PKRroxdiBh
+	n2Ujz4EMy180mUXTTmYL8WIrimOAXN5/Bd4hvNFiy4xCjjV1AjLFzgkjJI3D6UczUE+y8RrVR5N
+	VN22tVSyCXQ85pXEiRG/V1q5L4CZgUWrD8WxoNGNYjq/KFKrk0ARuzHLK1Ot9nM+LAf48=
+X-Received: by 2002:a4a:ee14:0:b0:6b0:4199:3cc4 with SMTP id 006d021491bc7-6b0d68ec5d6mr21188916eaf.27.1786948732495;
+        Sun, 16 Aug 2026 23:38:52 -0700 (PDT)
+Received: from [172.17.0.2] ([52.173.163.36])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b1165ac748sm769496eaf.3.2026.08.16.23.38.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Aug 2026 23:38:51 -0700 (PDT)
+Message-ID: <6a82ac7b.f2d4d140.35bd82.f7be@mx.google.com>
+Date: Sun, 16 Aug 2026 23:38:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0645529838779474129=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
+Subject: RE: [v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping
+In-Reply-To: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
+References: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Fri, Aug 14, 2026 at 02:49:31PM +0200, Manivannan Sadhasivam wrote:
-> On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
-> > On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
-> > > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
-> > > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
-> > > > > + Dmitry Torokhov (who was against this patch previously)
-> > > > > 
-> > > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
-> > > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> > > > > > 
-> > > > > > > Because the software node backend of the fwnode API framework lacks an
-> > > > > > > implementation for the .device_get_match_data function callback.
-> > > > > > 
-> > > > > > Maybe this is done on purpose. Have you thought about this aspect?
-> > > > > 
-> > > > > IMO, software nodes were introduced to add sub-properties to the existing
-> > > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
-> > > > 
-> > > > Potential doesn't mean the necessity.
-> > > > 
-> > > > > > > This makes it difficult to use(and/or test) a few drivers that originates
-> > > > > > > from DT world on the non-DT platform.
-> > > > > > 
-> > > > > > How difficult? DSA implementation went to the way of taking DT overlay
-> > > > > > approach. Why that one can't be applied here?
-> > > > > 
-> > > > > Sometimes you do not have any DT node at all.
-> > > > 
-> > > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
-> > > > is able to create DT subtree on non-OF based platforms.
-> > > > 
-> > > 
-> > > Maybe I should look into creating dynamic DT node for the device and insert it
-> > > to the uart node. Theoretically it should work.
-> > > 
-> > 
-> > It worked flawlessly. So I sent v4 incorporating this design:
-> > https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
-> > 
-> 
-> Andy, I had to revive this old thread of a merged series as Krzk is not in
-> favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
-> objections are due to the fact that we are just adding BT nodes of a
-> discoverable device (M.2 PCIe device) without any resources. So the node just
-> contains the compatible to match with the serdev driver and nothing else.
-> 
-> And he suggested to use swnodes or other similar mechanisms to plug with the
-> serdev driver as that's the only thing we want here, not a true hardware
-> description.
+--===============0645529838779474129==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-SW nodes are not for describing HW from scratch. They are for fixing missing
-pieces. If you can justify your case as a missing piece for the *existing*
-device (which is enumerated using standard mechanisms), you can add a property
-that fills the gap.
+This is automated email and please do not reply to this email!
 
-Unfortunately I see that there are `PROPERTY_ENTRY_STRING("compatible", ...)`
-cases in the kernel (only 9 drivers so far), and I can't say if they describing
-missing pieces or a SW-made descriptions of the hardware. For the latter the
-DT/ACPI/other means but swnodes should be used.
+Dear submitter,
 
-> Since you strongly objected the swnode approach in this series, I wanted to hear
-> your opinion before I rework the code.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1146959
 
-> [1] https://lore.kernel.org/linux-pci/768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org
+---Test result---
 
--- 
-With Best Regards,
-Andy Shevchenko
+Test Summary:
+CheckPatch                    PASS      0.65 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       FAIL      0.36 seconds
+SubjectPrefix                 PASS      0.15 seconds
+BuildKernel                   PASS      26.15 seconds
+CheckAllWarning               PASS      28.27 seconds
+CheckSparse                   PASS      26.99 seconds
+BuildKernel32                 PASS      24.81 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      461.94 seconds
+TestRunner_mgmt-tester        FAIL      221.57 seconds
+TestRunner_mesh-tester        FAIL      27.18 seconds
+IncrementalBuild              PASS      24.04 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping
+
+1: T1 Title exceeds max length (83>80): "[v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.248 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.792 seconds
+Mesh - Send cancel - 2                               Timed out    1.988 seconds
 
 
+https://github.com/bluez/bluetooth-next/pull/595
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0645529838779474129==--
