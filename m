@@ -1,146 +1,98 @@
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-200166.simplelogin.co (mail-200166.simplelogin.co [176.119.200.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24433A7F45
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 06:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786948735; cv=none; b=U3HRHvD8V7ry9N+fGy9DBLwIDZr7YvxQ9pxhPunuw7jSldkeyhm0W8dKt6ruStrhiTfzpHytrC8ecqlsmEz54o1A+EBs2RaPSP4XevjP6g3LoDC8wYkfhNrAUf/+idfiCnxzHNNPAl5etDIJPVO84epBBO8xzRe9we/E/Qo/V0w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786948735; c=relaxed/simple;
-	bh=a4sOdvq3HTh2z6fQUkhCyJ9SX08y7VLd0AyFt59Yujs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rG2Ol//87JSEfYq9r7nsw6DSyFo3r7c6gC+EEz40+wIoFZna6VQvv8Z1Nww+v98cBID7nZMUafLoCBQFRFhviPnvIj0RQagiH+aLMA0kGbCw4M28xfcPOkuKTubQ6NtAGbTip449XG37hHKTnf4vPl+rNm1KbapQs4ujj6ERW7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fe+RNk1b; arc=none smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45453B8BBF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 07:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=176.119.200.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786953258; cv=pass; b=sroalBRXDgwXxqj6AH1B6VKXybl9bh5v0nIy7kiFBgiXoqhQadxPmHom9XtEMNU7TBSIgO4JtEO8S/0j7pn+qsHM3f2/O0U9zqIa4661FLOsCMxPgRjtmQx6wLUo7npfqoupko0rKuq9Sx01QWEOiCridMEaFeIpupVl7hIsZsY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786953258; c=relaxed/simple;
+	bh=8ZDl+dRv9dMq0NT8gkWB9tebGYS+A1xWJMfzSEU6lwU=;
+	h=Date:Subject:MIME-Version:Content-Type:From:To:Cc:Message-ID; b=obdJ6nlFbK369rPwf2A7WLz+SojHYGM5SX6+JkxJje+7vrP2czQ/TWyDXiGS6mFDB9tr7nHSfI0fvjo2cvDIWCkTD9r+el9NH91JWgIeyjZFlRKwy0sHZZuUGPxQnS+Inc0Tc8vRF5gpRXvEOXMXBByc40K4eonRxO972yNqooQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kaiser.moe; spf=pass smtp.mailfrom=kaiser.moe; dkim=pass (1024-bit key) header.d=kaiser.moe header.i=@kaiser.moe header.b=QJSsgKD/; arc=pass smtp.client-ip=176.119.200.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kaiser.moe
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.moe
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fe+RNk1b"
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6b0ab918216so1648564eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Aug 2026 23:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786948732; x=1787553532; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Ubz1J8alNI6NWl3QDiBoCr9sUnHuOLCyJvuVwxYSBYE=;
-        b=fe+RNk1b2QZN3o2fQQygE08lA77HXz3aNNQOkItCfKVnbBoRBNsTFd0YQXoUmW/af0
-         /ZAotSS44fyfQ+nXKcTvASriBZZFMREzQuzHxfkAH3vlYnzaB60VpVLgmTOE4BN4Ndov
-         gYQj7SJ6UElWbkhYAHByYYydFNpkZE1rxzKbi01JQ92m7TeFiA/n6CtmuRIk8E9oMpbh
-         riD0r9aAidovshGXz1oeN9QtGDr/YPyjlIdh3mVU03rYma2E3GM13G0u58A/K62lLllB
-         Dj8qAMRi6oO1hTovlacB7TiKuxdjDvyzNTw1kl8VIBknBFRUkrYqZNofGsmsGdIRjha8
-         4N8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786948732; x=1787553532;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Ubz1J8alNI6NWl3QDiBoCr9sUnHuOLCyJvuVwxYSBYE=;
-        b=l7y2YVSgDBapZeOTtjem0p2C5QmWKjQnx51nOZPdlPXcga4qvlGjuZ2qpx1T4E05/1
-         3BVKavNVkvEK8lt4iKaKzlkrAfznX/xzrOYWi3wSOvfP4cyIAXXQWL0y4Jx5rXJ4v93e
-         ZMR3h8V8mBURg5jxKtBa0jsSdb4iT25oCTPSZ57G2VUTbrn74iNzl0jCAQavBkrznQxL
-         ObEMTEAFZYRSvCUlI83e3S+H1sQ20RwnomslD4s2vq3afZ5HC9CCMedhYfY3GU2HlheF
-         ResxZDChes8dyTbh2yJCytdbVL+SIZxQ9bOT1u+TOTTn+DoU0ErIfeYjHveVqxe8iHu+
-         Dz/w==
-X-Gm-Message-State: AOJu0YwC6nyIwVqfMs/rEDUP6d7BGCAzF3h6p4OMupZEpsnWmInSmV55
-	8dVVbSFEqnAWU/7z3SbCSzpgg7JBzWhjaebofffpvoZnklTYGO/1bCV2iloSeg==
-X-Gm-Gg: AR+sD13ndvKE4dYbZFiqghN5/6hHuuBPYuqdftzT2/NZcgRS6AhD5yMCfsvK+2EYZRq
-	fcRWvNCEHxXEosVhQ3HW/Ukj+bAzlOtjLTDp1uidImAi4pQJxw5Rct78duFG19NZcbjnhggdnHu
-	yW6fJnZEXHfdhsy6BjpZkz2oQTOB9P3D/3zuw2tve2P6GftDZxGR/mX1793C+5w0obKAS8UCWBY
-	XMFWh393pPofUybsFTeA8k20rTyocpASNVSUOoUjRTHA4IZZOyvUBkjgj8RKXlz8zabC4WEr0Pc
-	iG4mDfGdrxodupijo/VuyqHx62lNkRxE3mKZaYXCWa0gQ4px+wFglCXq+9pnhgLc6PKRroxdiBh
-	n2Ujz4EMy180mUXTTmYL8WIrimOAXN5/Bd4hvNFiy4xCjjV1AjLFzgkjJI3D6UczUE+y8RrVR5N
-	VN22tVSyCXQ85pXEiRG/V1q5L4CZgUWrD8WxoNGNYjq/KFKrk0ARuzHLK1Ot9nM+LAf48=
-X-Received: by 2002:a4a:ee14:0:b0:6b0:4199:3cc4 with SMTP id 006d021491bc7-6b0d68ec5d6mr21188916eaf.27.1786948732495;
-        Sun, 16 Aug 2026 23:38:52 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.163.36])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b1165ac748sm769496eaf.3.2026.08.16.23.38.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Aug 2026 23:38:51 -0700 (PDT)
-Message-ID: <6a82ac7b.f2d4d140.35bd82.f7be@mx.google.com>
-Date: Sun, 16 Aug 2026 23:38:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0645529838779474129=="
+	dkim=pass (1024-bit key) header.d=kaiser.moe header.i=@kaiser.moe header.b="QJSsgKD/"
+ARC-Seal: i=1; a=rsa-sha256; d=simplelogin.co; s=arc-20230626; t=1786953249;
+	cv=none; b=FAFRVykUQ3diJCi2rU8BYynly0xWz5+Le/rZqWnqTPw7GNJ4aOLwpTSycOfCv2/I0UP3eCip1fT2+2u6fCNMUHaNXCTPoQHGbK0j8TN8iCIqjWE++hRkTWL2+nUcLkGQ1vmxONrY9UNUl0RcZ45L1BQ+sZU7pRRjwBC1PoiI9yPknPIzY6mo6RgiyD4c5vEX3hGjP7790xnKvaotXBLW7qztaXDkvxbNLNdi1+TiZUVRlI3E6APw2UvyrdQYwZYiJ2BWSWeKbnkt7SEtGRqb4KgNraltaSTUgFcYzkoNpApLcK5Psz2SHpIKRCaivOuvm7uA18CqIFg19bNQ9n5m+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; d=simplelogin.co; s=arc-20230626;
+	t=1786953249; c=relaxed/simple;
+	bh=8ZDl+dRv9dMq0NT8gkWB9tebGYS+A1xWJMfzSEU6lwU=;
+	h=Date:Subject:From:To:Cc; b=OyZqX3srz6tHw2XUvY5HB0Zdaz+nOwFP/p76kNwehWrBEYBYAqi95mFKfghuwvbgsYxrcKXjGau8ZKvzXl3DQqPZxG4VgGfCS6wf8P1P+tDenmhAT+TdbussFbdAWwNPb5E2BhIcxHxNlc/HE6TV/9E2txUhyve6zhAY/Y14GAA4AhL6d5xnAyH8wQKAlmyZRb3kqrSSW/J6VwAt8pLDOz6sH6hHQtS/07fEzOyOGJDcevlSPa2Obqb8cI9ktzNeGRRZfuczoQXFWKe5r5ROTYM9m1Z+bb943wvN8v1HTUP5KJYPspiL5s+5coczN5OH9qQuSx4QS84g4xtbmvd9fg==
+ARC-Authentication-Results: i=1; mail.protonmail.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaiser.moe; s=dkim;
+	t=1786953248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uF8Zhxv3iYxWoabH7Xl9fF7C5+IhA7JUqLEBT77xttE=;
+	b=QJSsgKD/vbG5DeWqgdgK3X7NQQxJp0PX25/01xJgm7CTadZxeM9pNYW+crg7xthA6J76R4
+	taFXwDLPXx3Wkedvxcta2TVglu2CJV/FM6Aogrvh0Nh7GT79navKJkMxLlBcKgGTv5+H3M
+	FjYjvxvLHE/Ck9YTAbUE3j9AAfFb5sI=
+Date: Mon, 17 Aug 2026 07:54:04 +0000
+Subject: MT7902 Bluetooth (0489:e156) not supported - btusb/btmtk
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
-Subject: RE: [v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping
-In-Reply-To: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
-References: <20260817060134.3298439-1-shuai.zhang@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Kaiser Bh <kernel@kaiser.moe>
+To: Marcel Holtmann <marcel@holtmann.org>,Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <178695324809.6.15793290053564777912.1554499092@kaiser.moe>
+X-SimpleLogin-Type: Reply
+X-SimpleLogin-EmailLog-ID: 1554499092
+X-SimpleLogin-Want-Signing: yes
 
---===============0645529838779474129==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Reporting this rather than submitting a patch. Happy for a maintainer to
+pick these up.
 
-This is automated email and please do not reply to this email!
+Hardware: Minisforum UM880 Plus, MediaTek combo card
+          (BT reports hardware variant 0x7902; Wi-Fi binds mt7921e)
+USB ID: 0489:e156 (Foxconn/Hon Hai)
+Kernel: 7.1.8 (also tested 6.18.44-lts)
 
-Dear submitter,
+Symptom without patch:
+  Bluetooth: hci0: Opcode 0x0c03 failed: -110
+  No controller appears; Wi-Fi (mt7921e) works fine.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1146959
+Two issues found:
 
----Test result---
+1. drivers/bluetooth/btusb.c
+   USB ID 0489:e156 is missing from the device table. Neighbouring
+   IDs (0xe153, 0xe158) are present with BTUSB_MEDIATEK. Without the
+   entry, btusb binds via the generic vendor/interface rule but
+   without BTUSB_MEDIATEK, so btmtk setup never runs.
 
-Test Summary:
-CheckPatch                    PASS      0.65 seconds
-VerifyFixes                   PASS      0.10 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       FAIL      0.36 seconds
-SubjectPrefix                 PASS      0.15 seconds
-BuildKernel                   PASS      26.15 seconds
-CheckAllWarning               PASS      28.27 seconds
-CheckSparse                   PASS      26.99 seconds
-BuildKernel32                 PASS      24.81 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      461.94 seconds
-TestRunner_mgmt-tester        FAIL      221.57 seconds
-TestRunner_mesh-tester        FAIL      27.18 seconds
-IncrementalBuild              PASS      24.04 seconds
+   Adding:
+     { USB_DEVICE(0x0489, 0xe156), .driver_info =3D BTUSB_MEDIATEK |
+                                                  BTUSB_WIDEBAND_SPEECH },
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping
+   changes the error to:
+     Bluetooth: hci0: Unsupported hardware variant (00007902)
 
-1: T1 Title exceeds max length (83>80): "[v2] Bluetooth: mgmt: reply to cancelled mgmt commands instead of silently dropping"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+2. drivers/bluetooth/btmtk.c
+   Hardware variant 0x7902 is not handled in the setup switch.
+   Firmware BT_RAM_CODE_MT7902_1_1_hdr.bin already ships in
+   linux-firmware, and btmtk_fw_get_filename() generates the correct
+   path via the default branch.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.248 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+   Adding `case 0x7902:` alongside 0x7922/0x7925/0x7961 results in:
+     Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20250826211444
+     Bluetooth: hci0: Device setup in 2312557 usecs
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.792 seconds
-Mesh - Send cancel - 2                               Timed out    1.988 seconds
+   Controller then works normally; DualSense pairs and functions.
+   Grouping 0x7902 with the existing 79xx case works on my hardware,
+   but a maintainer may want to confirm this is the correct handling.
 
+Both changes tested on 6.18.44-lts, 7.1.8-arch1 and 7.1.8-zen via DKMS.
 
-https://github.com/bluez/bluetooth-next/pull/595
+Kind Regards,
+Kaiser Bh
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0645529838779474129==--
