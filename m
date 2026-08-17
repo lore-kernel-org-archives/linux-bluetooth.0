@@ -1,79 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5822D470125;
-	Mon, 17 Aug 2026 19:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF9844237C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 19:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786996017; cv=none; b=SYfuZOX9I0qvqQjdEqWUiNx01PJ3yswnMbnL0mWY1tiCXIwhuE1M+NCsQvHUxVpchgZVVQUa8pUb6XMtsVOwhc4bVtLf30HhoAZO/psydCkmD4fZa8uzcpRrM3oWQNzwxQ06DuYRThG7mkFziiaO9dAYRPjVUvSgLYOC8WFbJpo=
+	t=1786996515; cv=none; b=idVVzT0caoM5JgccQi+Av3Q8NfglFmsNZmZmgp24coe3h82owpSJgfyJupAig1VaIUapcXkCSSvsNuWnuQzTc2YF0PX9w0PQbQNrbnOe+ILF35Prk+nvcQ5fzZMQBJxNH55uL8GbPnGozIOxY59vnqGkWV0eFHvUx9qmscDMczk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786996017; c=relaxed/simple;
-	bh=pRXq4uqLwzIuYq2KvrvP8OkgYJmCZtLc9BkOzaqciCo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o0mMVhTogV6XW0RCcvtxeBH1DBRN0AjysoAg559YGTQLNfBOefc+OB2prMyOzE9ovpyqULVoCVri4cw/OdJJ85SGQtDPSnFokS9nBizSEBQA5jlCJi5KnQVkrHQWpv8aZfQaUDyLcJOtoWOHwOOZ8qdnBX+KbDrAYq/QQQMZUd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7oqdZ8h; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786996515; c=relaxed/simple;
+	bh=UGerogvGZvHvB9O5pU70y9w9CL5lrtSoBBF3vOxMets=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Wf/IT6BARWwyDFEycjgyCdyW2EO0K4cocBa9y2UDJ0ceMH9rQchJrdlavi4lZSQV4BKXkxEnlxkdNnXyJcR2cX1bzgaIF5i3tyrkg7j62z4rosBxUOEKtlSAL00md8KQFAuFVdPy6MVQ0yyt61eccJpWcTd7YPjfypwHF0mYFnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GgRJh144; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7oqdZ8h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99F71F000E9;
-	Mon, 17 Aug 2026 19:46:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786996016;
-	bh=rGl7wdqC72A2lpeYT9Lw86izhEPsQo8VKH2ZHiOpzuE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=e7oqdZ8hhRl92lb+gvZJLEeFo8IRqCvHlAdIXvGNSWE88lXOQHmiTJHBeHS554B2o
-	 tJhzV4LFRNAK4fuRNtuCIam0xJWVZOAWAFmnnqP3Esrh5pUyeRehITyNXq3kji5x3L
-	 c3jiOqFmvXxCVFYpRKx1dgbrQcGacLH/OddE6hdUEN8cQ6+A+J5+T30ZhIPUg1WMk+
-	 t2xcg0gi4u59QrfUpv+Whre95LVNT0hROjooTzFgOfAEkSC7eNpK4HnCOn//CsgE0I
-	 QLTqkd/+TDRoucg+I23+aj58fd9On/SXJJQm0TiiSwTW0ClB9eTOsFxW16+TkJjZ3o
-	 DGLITT0YOLdqg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568363926262;
-	Mon, 17 Aug 2026 19:46:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GgRJh144"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1786996513;
+	bh=p0PrU+6zXM9vSK+q9Ar9NdwZ3AkfJJeLlXnhx4bF078=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=GgRJh144MIANTWgr5hS7iZbmpZakRI4V9S6X8jPFiRRR4xn/O7pHmluSqz+m7BpJu
+	 LKQJd8mpGr3dshPodH3QdyYffFWVoFtETEBhXdrh7mW0Q2x8WkROui39QJew9W6gUY
+	 hYETN0zdFEv5eTDAtTIMbtST8fFjbRV4aiplzWIw=
+Received: from github.com (hubbernetes-node-c0b29af.ac4-iad.github.net [10.52.180.41])
+	by smtp.github.com (Postfix) with ESMTPA id 54362A1348
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 12:55:13 -0700 (PDT)
+Date: Mon, 17 Aug 2026 12:55:13 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1130150/4df3db-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND] Bluetooth: hci_sync: add conditional locking
- annotations
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178699596788.1691257.11633718585143607081.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Aug 2026 19:46:07 +0000
-References: 
- <1ceaa25d70f068adfe2c40290a629b73c382ec59.1786870726.git.pav@iki.fi>
-In-Reply-To: 
- <1ceaa25d70f068adfe2c40290a629b73c382ec59.1786870726.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, nicoyip.dev@gmail.com, linux-kernel@vger.kernel.org,
- nathan@kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1130150
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sun, 16 Aug 2026 11:59:01 +0300 you wrote:
-> Add context analysis annotations to functions doing conditional locking,
-> to suppress analysis warnings.
-> 
-> Fixes: a3ad01d51d4b ("Bluetooth: hci_sync: Fix advertising data UAFs")
-> Tested-by: Nathan Chancellor <nathan@kernel.org> # build
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> 
-> [...]
-
-Here is the summary with links:
-  - [RESEND] Bluetooth: hci_sync: add conditional locking annotations
-    https://git.kernel.org/bluetooth/bluetooth-next/c/26cf20d065b3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
