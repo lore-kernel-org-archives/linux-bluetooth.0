@@ -1,96 +1,180 @@
-Received: from mail-200173.simplelogin.co (mail-200173.simplelogin.co [176.119.200.173])
+Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B293DFC92
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 13:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=176.119.200.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786972172; cv=pass; b=sgktpP2GvIiP/zOPyHjRj6MOs7PMyY904z0nY/LDo5bE7/7abbhkYfwtaCeFZByMKL5/HxQcJ2VJPKYdkm7qwtbVzZqnnpdKFjbXSmHt3o9+oVVNHmFUFJ3Uie7LjvJYsA1gXijUQO9K5WuZ137HWdD6oPCFdoNKsakdLLJsLCg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786972172; c=relaxed/simple;
-	bh=DDbnyMUgcPWBKr202T9QLEXSXY/0pnL2T996ZFfK1ZU=;
-	h=Date:Subject:In-Reply-To:MIME-Version:Content-Type:From:To:Cc:
-	 Message-ID:References; b=lr/x7sIHbLMQIoSZJghmjLj9Dre7eCp1SZG19DRao25LoypqJEoq6j1y5ZJCQnCjqYUpD3L8wm1wLd0fnSWq6HdMxXQXD13WdmzYr+Tulih4eWdw8esuWpWGexaKlqZLDeuef1OmmM1tMnGKVgBX6R4Me5lvAvuK8D5SSxRukz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kaiser.moe; spf=pass smtp.mailfrom=kaiser.moe; dkim=pass (1024-bit key) header.d=kaiser.moe header.i=@kaiser.moe header.b=OCX32WCL; arc=pass smtp.client-ip=176.119.200.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kaiser.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C3F431A41
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 13:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786973104; cv=none; b=Tu3rFgXuEqoiz4kldzbAfob58Wog2A4uAAny8B9T1D/gULQMwxVWt+LinUSirmgNGzUy9fJPed26XqS6GrR/YZgh2Qhde6oen+OgEFwvUdc2X9gim/9euoPwZGWS3O9udJgM83SSyy0/YpzR4Wmtmbc3OiDBcXLacLBWqhmBUn4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786973104; c=relaxed/simple;
+	bh=Cy+yLC3rrTqpIOEPvW3JM5o6P8k4euE1aNNf9/VfvLE=;
+	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=i2i60cBySZ2DXCgRRN0RNWDRgjLpHVnFN8/QmfjiqyLkSlYEay4cKUSESLvhPd3cQCtfD91c54vtaJei0APUHtAOeWjYOlNXY671fLIJK7ZIIwWzkmQbCfFjEzNnNs+zzY1A6rwqS3qpy/Z97JGKd9w91yz0EcJQP3qtMskfSzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=4QznOFAT; arc=none smtp.client-ip=46.14.118.250
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kaiser.moe header.i=@kaiser.moe header.b="OCX32WCL"
-ARC-Seal: i=1; a=rsa-sha256; d=simplelogin.co; s=arc-20230626; t=1786972163;
-	cv=none; b=s+odKJ/GaeHvE6kiQNAHF7SXZpnbih3VEpVQYlDhtsfUjgGJvFZaVoUbsS3Wp5uhd04jaBQgJlLSUHtFZ6JiJWrw4qGlSy0CGZMYh4Tj8uUhEg74hskf8S2ennPPNzwGwNVJTY8TbbVWIpTAZJ/IezCfCWRFfe4VE9tJpPegfxTtPWb+fSd2s5r0uVSkSIccvfnNaJty7GHyCWFeNkeEJUN9kZlrCExw/tu2VwARssxPAtDh1fOkladTxSAzkHChqS0KRsuAsmMXGaHGhcMWzV4xIwNVgZ6dSRG0ZJeiSnYNIGv8KtbWDv4Zh3yi/mEhnGVXJK4j4n9oiBenn1dCRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=simplelogin.co; s=arc-20230626;
-	t=1786972163; c=relaxed/simple;
-	bh=DDbnyMUgcPWBKr202T9QLEXSXY/0pnL2T996ZFfK1ZU=;
-	h=Date:Subject:In-Reply-To:From:To:Cc:References; b=kdRMnvq1irGNcqqAtwKj6AUbyE6oYV70HG/+EaccBjYeBledfC7nj81CLA+uqdAhCDlJIR4DeIMJvv2ktASXtQA4DX9+hQ/X/BF3/snirJW/I9WlGFDXs+XkI78hnkEyGJJHn9wPT/uddiW9Aml6mSHi27pQgSI0CeVlr4xn79mJuXJjN/QsagNYaosJ6AR6H/2qiXUfm4bylAQj87ZEIA0Sp9hURv4f7oFX6PS11RALum2bBhu1qR8uULSiudT1Jf2z3Y4b11+vpLQcg3aPlqzKYBXvWWgDaq0P9hP69aVDu4KHENg2bEryzB8lJ7134/k8FJfbc4nltpEP4I+VsQ==
-ARC-Authentication-Results: i=1; mail.protonmail.ch
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaiser.moe; s=dkim;
-	t=1786972163;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qQN/F4//n7xZ4MdZ3eZXzKIdfjCsnb/7wxmgx9Md1A=;
-	b=OCX32WCLqfgaC5CKm0DUy7DKDSDgHi1R8FQovYWc18NCfjRGSet48q6RdBUwIoda5IMT+3
-	VCrhC+5qDGQynZGbbhZudPGlStblvrHr11gb8nt6807OWT/Vhy7wnaFpMcGnvx2G0j8aef
-	LHBThOrxYHwSFFMvyrnJaB03V6HBpTQ=
-Date: Mon, 17 Aug 2026 13:09:16 +0000
-Subject: Re: MT7902 Bluetooth (0489:e156) not supported - btusb/btmtk
-In-Reply-To: <520e859a-57c6-4ae1-b1d8-a9f6eaf51c36@molgen.mpg.de>
+	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="4QznOFAT"
+Received: from [192.168.16.44] (port=25336 helo=remote.fiveco.ch)
+	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <valentin.kindschi@fiveco.ch>)
+	id 1wvxKh-000000001Zb-0KGd;
+	Mon, 17 Aug 2026 15:24:55 +0200
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
+	t=1786973094; h=from:subject:to:date:message-id;
+	bh=Cy+yLC3rrTqpIOEPvW3JM5o6P8k4euE1aNNf9/VfvLE=;
+	b=4QznOFATRDH5J01r9Mzgk/kFAmKOtdwEvcmstC/UI5uWxxhiYTl0eO18X1/NPk4FQIkHopqBRI3
+	xDNCO8h8CVtfHAQecUGMVkYrSuhhl4jGP8Z+YFyO9I3HjrCMWBrEzlaqX2cx4F8e+LJcmxCJ/ESlk
+	Kt5d5ln+iE7BZ06UydI=
+Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
+ FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Mon, 17 Aug 2026 15:24:54 +0200
+From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/2] Bluetooth: fix a permanent LE Set Advertising Parameters retry loop after a cancelled central connection
+Date: Mon, 17 Aug 2026 15:24:47 +0200
+Message-ID: <20260817132449.509304-1-valentin.kindschi@fiveco.ch>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Kaiser Bh <kernel@kaiser.moe>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,linux-bluetooth@vger.kernel.org
-Message-ID: <178697216269.7.17668187426720180988.1555039931@kaiser.moe>
-References: <178695324809.6.15793290053564777912.1554499092@kaiser.moe>
- <520e859a-57c6-4ae1-b1d8-a9f6eaf51c36@molgen.mpg.de>
-X-SimpleLogin-Type: Reply
-X-SimpleLogin-EmailLog-ID: 1555039934
-X-SimpleLogin-Want-Signing: yes
+X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
+ FIVECO-MX01.fiveco.local (192.168.16.44)
+X-Sophos-OBS: success
+X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.8.17.125719
+X-SASI-RCODE: 200
+X-SASI-SpamProbability: 8%
+X-SASI-Hits: BODY_SIZE_4000_4999 0.000000, BODY_SIZE_5000_LESS 0.000000,
+ BODY_SIZE_7000_LESS 0.000000, CTE_8BIT 0.000000, DKIM_ALIGNS 0.000000,
+ DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
+ MULTIPLE_RCPTS 0.100000, NO_CTA_FOUND 0.000000, NO_CTA_URI_FOUND 0.000000,
+ NO_FUR_HEADER 0.000000, NO_URI_FOUND 0.000000, NO_URI_HTTPS 0.000000,
+ OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, SENDER_NO_AUTH 0.000000,
+ TRANSACTIONAL 0.000000, WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000,
+ WEBMAIL_X_IP_HDR 0.000000, __BODY_NO_MAILTO 0.000000, __BULK_NEGATE 0.000000,
+ __CT 0.000000, __CTE 0.000000, __CT_TEXT_PLAIN 0.000000,
+ __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000, __DQ_NEG_DOMAIN 0.000000,
+ __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
+ __FRAUD_MONEY_DENOMINATION 0.000000, __FROM_DOMAIN_NOT_IN_BODY 0.000000,
+ __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
+ __HAS_MSGID 0.000000, __HAS_XOIP 0.000000, __HAS_X_MAILER 0.000000,
+ __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
+ __MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
+ __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
+ __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
+ __RCVD_CTE 0.000000, __RCVD_EXIM_4_96_AES_128 0.000000,
+ __RCVD_FROM_HOMEUSER 0.000000, __SANE_MSGID 0.000000, __SL_HEAVY 0.000000,
+ __SUBJ_ALPHA_END 0.000000, __SUBJ_STARTS_S_BRACKETS 0.000000,
+ __SUBJ_TRANSACTIONAL 0.000000, __SUBJ_TR_GEN 0.000000,
+ __TO_MALFORMED_2 0.000000, __TO_NO_NAME 0.000000, __URI_NO_MAILTO 0.000000
 
-Hi Paul,
+A gateway device that advertises as a peripheral while also making
+outgoing central connections gets stuck logging
 
-Thanks for the reply. I went to prepare the patches and found both changes
-are already in bluetooth-next:
+	Bluetooth: hci0: Opcode 0x2006 failed: -16
 
-  btusb.c: { USB_DEVICE(0x0489, 0xe156), ... BTUSB_MEDIATEK ... }
-  btmtk.c: case 0x7902:
+every 2 s indefinitely, starting seconds after an outgoing connection
+attempt times out and is cancelled. Measured on one unit: 5326
+occurrences over 3 hours, ending only when bluetoothd was restarted,
+which resets the controller.
 
-So there's nothing to submit =E2=80=94 apologies for the noise. My running =
-kernel
-(7.1.8) predates them, which is why I hit the issue.
+The controller is behaving per specification: LE Set Advertising
+Parameters is Command Disallowed while advertising is enabled. The host
+issues it anyway, and then cannot recover.
 
+Sequence, from btmon (BCM43455, no LE Extended Advertising, so legacy
+advertising and the software rotation loop are in use):
 
-Kind Regards,
-Kaiser Bh
+  LE Create Connection                     Status Success
+  ... 13.8 s, peer does not answer ...
+  LE Set Advertising Parameters   0x2006    Success        \ done: resume
+  LE Set Advertising Enable       0x200a    Success        / HCI_LE_ADV set
+  LE Create Connection Cancel     0x200e    Success
+  LE Connection Complete                    Unknown Conn Id
+  LE Set Advertising Parameters   0x2006    Command Disallowed   [+63 ms]
+  LE Set Advertising Parameters   0x2006    Command Disallowed   [+1.954 s]
+  LE Set Advertising Parameters   0x2006    Command Disallowed   [+2.016 s]
+  ... every ~2.016 s, for hours, and no 0x200a is ever sent again
 
-On Monday, 17 August 2026 at 18:27, Paul Menzel - pmenzel at molgen.mpg.de =
-<pmenzel_at_molgen_mpg_de_jgzeoazf@simplelogin.co> wrote:
+Three connection attempts earlier in the same capture that *succeeded*
+show the same 0x2006 + 0x200a pair and do not trigger this. Only an
+attempt that times out and is cancelled does.
 
-> Dear Kaiser,
->=20
->=20
-> Am 17.08.26 um 09:54 schrieb Kaiser Bh:
-> > Reporting this rather than submitting a patch. Happy for a maintainer t=
-o
-> > pick these up.
->=20
-> [=E2=80=A6]
->=20
-> Thank you for the report. It would be great if you could submit two
-> patches for these.
->=20
->=20
-> Kind regards,
->=20
-> Paul
->=20
-> 
+Why it never recovers: hci_enable_advertising_sync() returns as soon as
+LE Set Advertising Parameters fails, before the LE Set Advertising Enable
+that would set HCI_LE_ADV. hci_schedule_adv_instance_sync() re-arms
+adv_instance_expire every HCI_DEFAULT_ADV_DURATION (2 s) and its
+"already advertising" shortcut tests HCI_LE_ADV, which can no longer
+become true. hci_disable_advertising_sync() cannot break the tie either -
+it returns without sending anything while HCI_LE_ADV is clear, which is
+exactly when the flag is wrong.
 
+Patch 1 removes the redundant advertising enable that creates the
+mismatch. Patch 2 stops HCI_LE_ADV being cleared for a connection
+complete that reports no connection.
+
+Patch 1 has been verified on the affected device. btmon counts:
+
+  before, 2.6 min capture: 78 LE Set Advertising Parameters sent,
+                           78 Command Disallowed, 0 LE Set Advertising
+                           Enable sent
+  after,  2.0 min capture:  3 LE Set Advertising Parameters sent,
+                            0 Command Disallowed, 5 LE Set Advertising
+                            Enable sent, all successful
+
+The enable being sent and accepted again is the point: HCI_LE_ADV gets
+set, so the rotation loop's shortcut works and nothing accumulates.
+
+Patch 2 was deployed together with patch 1, so its effect is not
+separately attributable on hardware; it is included because the same
+mismatch is reachable through le_conn_complete_evt() independently, and
+the current unconditional clear is wrong on its own terms.
+
+Both apply to bluetooth-next and, unchanged, to 6.12.y - the affected
+code is identical in both.
+
+A third, unrelated Command Disallowed on the same device - LE Set Random
+Address refused on every active scan restart because advertising is only
+paused for the address update when LL privacy is in use - is sent
+separately, as it has a different cause and touches hci_sync.c only.
+
+Tooling disclosure (Documentation/process/generated-content.rst):
+the bug was found and the patches drafted with the help of an AI coding
+assistant, over a debugging session on the affected hardware. The inputs
+were btmon captures and kernel logs from the device; the assistant was
+asked to identify what re-issues LE Set Advertising Parameters every 2 s
+and to propose a fix. Its first two proposed mechanisms were wrong and
+were discarded after being checked against the captures; a third proposed
+change (making hci_disable_advertising_sync() always emit the disable)
+was built and tested on the device, broke advertising registration
+outright, and was dropped. The two patches here are what survived. All
+code and reasoning were reviewed by the submitter, and the verification
+numbers above were measured on hardware.
+
+Changes in v2:
+- Rebased onto bluetooth-next. v1 was generated against 6.12.y and the
+  hci_event.c hunk did not apply to HEAD, because mainline calls
+  hci_store_wake_reason() in le_conn_complete_evt() and v1's context did
+  not include it. No functional change; the fix is identical.
+
+Valentin Kindschi (2):
+  Bluetooth: hci_conn: only re-enable advertising after a failed
+    peripheral connection
+  Bluetooth: hci_event: keep HCI_LE_ADV set when the host cancelled the
+    connection
+
+ net/bluetooth/hci_conn.c  |  3 ++-
+ net/bluetooth/hci_event.c |  8 +++++---
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+--
+2.34.1
