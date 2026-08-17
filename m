@@ -1,197 +1,119 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-42.smtp.github.com (out-42.smtp.github.com [192.30.252.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0BF42E8CB
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 16:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786983116; cv=pass; b=Skdy76JuFVff0KeGfc9uzY76nJSzncBiqts9d+jEqv+VE1df711VGdiqbTVOZY6HPQ2q4Gh+5fk7PhCyLxQsxguRDKpLtqTeRbvwhlT6HtRkAHyKNCxqGGtGepHVbcNepTJuFBsOqh88XZIvuPIgUZ/CMCYj2FMZ/YjOdVegb+Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786983116; c=relaxed/simple;
-	bh=TxKeIXRF86ivBxRjmnwES3EEmCq5bYW1Q/mhaUnlTv8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f6T1a1N8n3KLhAKZKYFTspEj4NSk17UMnKvbG6j9uSzHybjXatc1tHSBk7XCigV/WO3raA3BqXkX7iBAGKor/hVpDZIe/hhRzWyJpF64kB8lzHXcj+Upa9hGou6hjTEI1FAfDWckwfEB3FY8df638wOBVaXOamJsbbtezN4Ax1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/BhHyhD; arc=pass smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA8643B3D1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 16:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786983668; cv=none; b=lcNZKxfWbmokoJerdtCb1pbgztEgjpVzNLTq8oKCMWec47adlMbSFr1C5+j2WesnLkj7sLoWhM+y+MxbAtOaHK/nSexqVD+2xVA4o/9TAMp5ZG7f/Hi/UbPT0rT8VwxHYnASkmDBNAmuD5WgepLv1ItzihHE4P6QJ03Wv4W+5CQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786983668; c=relaxed/simple;
+	bh=uuC1U82a1MV0uLg8QRPRcudfWcnD1qivCC+pnYXkm84=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VS4tiPH+FHBuMsKkfnmxQzKs6l2QSQg8SX+KKDRuYBhRrYxjZJEOCzHPcWJyV00CChqTy0uLbRfK/NYcdemHOykjIAob8MtjSk0dgbFhdo31zYJ/JScU9D9Qmzbbe4SFwVEoEDTr7ovKOed1jaqs1vSpgeJyNCz8pIZDt6b23Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Di731VzN; arc=none smtp.client-ip=192.30.252.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/BhHyhD"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-836c8bde2dcso45689707b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 09:11:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786983111; cv=none;
-        d=google.com; s=arc-20260327;
-        b=pt98pphLxC6jpjXlQfaJBb8Xg5RCDx5EeL4zgtaEZlIuieOIqTSrlMSM+u5A9JLJfx
-         QCDu40xXadEC3VLztjuMTcRMbHLKc/0uwkALpxNV63fU4hMbExZHu9a0NMtp7VOMkGyK
-         ULopp11xBJ9ojKlnQTQVZRifpULGBLGNLGzY1o3UGmqpqk87Ru6TQDWo5PRJL4qavf3u
-         HqTuLPjM0Urp9rxdtv27jd+j0r3QrOB5IEF6OsJ2QO8nfo1fnm5id4tQXz0mYKiK48Rp
-         eIv2X75BfI1yOCLJbC5hX4Xwrjp6cx0TBtEN4rsGWvc77Chz77eqMQk9IKEyzO5Hh6XO
-         HErg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Jwyew6uejrvJvvSHLgbOIpVbgqj4gDfuSfCP1FEP7bw=;
-        fh=+Qn5MvUE9KQK3P2J9RgLcpUvl5JaNAJPH7s3l36hIbQ=;
-        b=L2X25YtrwOWNcR2aCB2fhm0fva1s59cTQkB6Gv35Dt0mPHCkQkZ4YI4dX+SOA6pniL
-         Tp85yzF7Jrd1W0ax+pkgRgi3NdBkqpSSZ/PyV/4FtvG9bLEw+lNv6TA5eH8mGnRT966r
-         /aOGIP5o2i6KQiHg1Yzbc3b9BI/m/3S11W4duBgy1XKFh/t/z0M5pEB8upvPBQ5jWtRp
-         Oa0MF+F5BYcN/T9t/Hucv1AMnjxXXHCBsjFz+uf5N2mdnhCZ5HKv29YafWrZxs6os1+E
-         Ic3BGThG/ISkeRufmfGoc1O7QvpmqX+yhBjxSc5fQbo12AJry+6k//tWpZdgrPAamL3E
-         xgrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786983111; x=1787587911; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Jwyew6uejrvJvvSHLgbOIpVbgqj4gDfuSfCP1FEP7bw=;
-        b=G/BhHyhDp1vGQKuDF0mu+K8w+u84AR3Ec7vBYiKP4Vz1lQijgDZ5+dvqPiZ5gI4bZe
-         eUig4MXdWeqMhFFAxWJx9Avn017Qlhgn9DTxMWFWNRp92t+2DZD50TXdOHINCcpyyx65
-         sJQUVqKWmH/bqjP7aVYjSfHSsu0Dq5ehDRSnbdUIawRYUTmn1y5zoWDRj3NWSi+t2HYn
-         2DsxlEUIcGmhADGEsW01BCGAuB1K+jxDwogP1+DCjdS4tRFYOB6zxYqql3F8uWwrpZAq
-         7bADdL7zURcB9joOcxpXW7bMcqFn+2jcJSp64CkX3FVqY9Mgy+/p7JZq1lyRBNDI/K/O
-         TCmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786983111; x=1787587911;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Jwyew6uejrvJvvSHLgbOIpVbgqj4gDfuSfCP1FEP7bw=;
-        b=EIhF2Q8EDeSDbzdvH1pvS3L1pozBQ04qVbRqxaDjDZ4zj5o30XG+Cu8UrIZ5OW2+y8
-         tnCtg/6oZw3AanVhwAwBgiATXh4J262MV57t005Vg0ZCj4OwRlK/rV01gMBTo9YmnR+y
-         n1VGrn6X1PlcBTKip3RqjmoeT07jzB1CMR8F7McU9sOgz4wk4oss2YuLBoY3aPOsZdXN
-         GoPXo2l8EL4HRDHZNTT95ZHAcug5b/J0MhqtHaaC8cxpozkgjk+JpbDhMXLwLABsuMTu
-         ucDVfBvfCAxNyXnT4eK/8ZFJMhdVHY9b4WtzKqJuNDQkFYElMVuS3jTzsM5mfnl3nx1R
-         XynQ==
-X-Gm-Message-State: AOJu0YwPrQ0vMN+1EbgoPQqcWZ4Uysx2bXKl/R0LHAqtniVJEjRjeZjI
-	7U4/nJWRirzBZ4xwJQqP402RKGlosSsAihey7O1mfn6hr07DRw2O8+9wbqsdB5L5yU1lCx4gTQy
-	NSwh3xfEd8Y3U4yIKOFMIH5M+72MSp6P6JhalK28kyF3z
-X-Gm-Gg: AR+sD10w+eKM8YFA/UIVIvC7DcO2uLs62y2oJP1kiAaYc59KJoBAJRhn4cDA5g5UB9v
-	PGRIupEx2/X88e1d8fHTDFUQeLqQpkGAx9N030rAhqb0o+gjn7JDjQxUr7pvLsV0WGMPalzsH+T
-	Np/s5S8s+6vGsdzz9LUM3ysHQt/Z/IbxzVVRCWgiZ0QTwvcYdsCNt7AyN2garDWt/okPeyx/P3w
-	ws+HYRgucA44i9VEisrcUU5iRinKtaYxmtgGEjiADXusBw9acUi5k0mWjskfe9XRnNAdukl2Uo/
-	yQwOpflMt5FTPu/wVEyTQXV2K+xwzBe2LZ9xIxePLNz4V52Xz4mJeMb8eb/o1WutVX5fWU2GC0P
-	uiKZLet/IFMUUWPNQ0qFD2HbCiZ6GEC1A8IojvB4=
-X-Received: by 2002:a05:690c:350c:b0:81f:3969:4abb with SMTP id
- 00721157ae682-837120f5e45mr99343807b3.29.1786983111180; Mon, 17 Aug 2026
- 09:11:51 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Di731VzN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1786983665;
+	bh=KqatuTFBJlwJHS8AvjdNtTcGXaoJB9V2MWNZU9h6hCY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Di731VzNnCnaH4lmwW6gb20Lb0RmE8zj1e0xPcqcDjWD9aZOfyxfY6l2F+pm0mV3L
+	 W41YIG8puY9fW9qtXbe1ciF+08ky8kYQXaY5pwza5M1WssQZYV+Fb9oXZmjFkN+6mo
+	 Hg5l9RajLbAiIoGWiKyhIHfvt21npiMSTt0jhUvM=
+Received: from github.com (hubbernetes-node-a5b6146.ash1-iad.github.net [10.56.206.56])
+	by smtp.github.com (Postfix) with ESMTPA id A74428412DD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 09:21:05 -0700 (PDT)
+Date: Mon, 17 Aug 2026 09:21:05 -0700
+From: Paul Menzel <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1147292/000000-03f0f6@github.com>
+Subject: [bluez/bluez] 03f0f6: obexd: Reference count the phonebook back-end
+ setu...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260817150240.520181-1-valentin.kindschi@fiveco.ch> <20260817150240.520181-3-valentin.kindschi@fiveco.ch>
-In-Reply-To: <20260817150240.520181-3-valentin.kindschi@fiveco.ch>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Aug 2026 12:11:39 -0400
-X-Gm-Features: AcwNN1UQ7PbI7dH28blaACAAUUeWuGN0Dkp1mCbuI2K_MqDLHz1Nx88r6KNdpmg
-Message-ID: <CABBYNZJ55q+jpSRrp7PS31hR6xbDEPNExQCADKGWFKtKKweMjQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] Bluetooth: hci_event: keep HCI_LE_ADV set if the
- host cancelled
-To: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Valentin,
+  Branch: refs/heads/1147292
+  Home:   https://github.com/bluez/bluez
+  Commit: 03f0f67b8b04b464cb99f8d8f2f7e5543508be35
+      https://github.com/bluez/bluez/commit/03f0f67b8b04b464cb99f8d8f2f7e=
+5543508be35
+  Author: Paul Menzel <pmenzel@molgen.mpg.de>
+  Date:   2026-08-17 (Mon, 17 Aug 2026)
 
-On Mon, Aug 17, 2026 at 11:03=E2=80=AFAM Valentin Kindschi
-<valentin.kindschi@fiveco.ch> wrote:
->
-> le_conn_complete_evt() clears HCI_LE_ADV before looking at the event
-> status, on the premise stated in its comment that all controllers stop
-> advertising when a connection is created.
->
-> That premise fails for Unknown Connection Identifier (0x02), which is
-> what an HCI_LE_Connection_Complete carries after the host issued
-> LE Create Connection Cancel: no connection was created and the
-> controller never stopped advertising. Clearing the flag there makes the
-> host believe advertising is off while the controller has it on.
->
-> Other non-zero statuses must keep clearing it. Advertising Timeout
-> (0x3c) in particular means the controller gave up advertising on its
-> own, so the flag has to go; leaving it set would make the
-> "already advertising" shortcut in hci_schedule_adv_instance_sync() skip
-> the HCI commands and silently stop advertising altogether.
->
-> With legacy advertising the disagreement is self-sustaining. On the next
-> software rotation tick hci_enable_advertising_sync() runs:
->
->   - hci_disable_advertising_sync() returns early without sending
->     anything, because HCI_LE_ADV is clear;
->   - LE Set Advertising Parameters is then sent while the controller is
->     still advertising, and is correctly rejected with Command Disallowed
->     (0x0c);
->   - the function returns before LE Set Advertising Enable, so nothing
->     re-sets HCI_LE_ADV.
->
-> hci_schedule_adv_instance_sync() re-arms adv_instance_expire every
-> HCI_DEFAULT_ADV_DURATION (2 s) and its "already advertising" shortcut
-> tests HCI_LE_ADV, which can no longer become true, so the command is
-> retried every 2 s indefinitely:
->
->   Bluetooth: hci0: Opcode 0x2006 failed: -16
->
-> Captured on a BCM43455 (no LE Extended Advertising) after a central
-> connection attempt timed out and was cancelled:
->
->   LE Set Advertising Parameters (0x2006)   Success
->   LE Set Advertising Enable     (0x200a)   Success        HCI_LE_ADV set
->   LE Create Connection Cancel   (0x200e)   Success
->   LE Connection Complete                   Unknown Conn Id  <- flag clear=
-ed
->   LE Set Advertising Parameters (0x2006)   Command Disallowed  [+2.033 s]
->   LE Set Advertising Parameters (0x2006)   Command Disallowed  [+2.016 s]
->   ...
->
-> Keep the flag only for the host-cancelled case.
->
-> Fixes: fbd96c151cdc ("Bluetooth: Fix clearing HCI_LE_ADV for LE connectio=
-ns")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-5 btmon
-> Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-> ---
-> Changes in v2:
-> - Rebased onto bluetooth-next; no functional change.
->   v1's hci_event.c context lacked the hci_store_wake_reason() call
->   present in mainline, so the hunk did not apply.
->
->  net/bluetooth/hci_event.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -5720,10 +5720,12 @@ static void le_conn_complete_evt(struct hci_dev *=
-hdev, u8 status,
->         hci_dev_lock(hdev);
->         hci_store_wake_reason(hdev, bdaddr, bdaddr_type);
->
-> -       /* All controllers implicitly stop advertising in the event of a
-> -        * connection, so ensure that the state bit is cleared.
-> +       /* Advertising stops when a connection is created, and when the
-> +        * controller gives up advertising on its own. It keeps advertisi=
-ng
-> +        * when the host cancelled an outgoing connection.
->          */
-> -       hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> +       if (status !=3D HCI_ERROR_UNKNOWN_CONN_ID)
-> +               hci_dev_clear_flag(hdev, HCI_LE_ADV);
+  Changed paths:
+    M Makefile.obexd
+    M obexd/plugins/phonebook-dummy.c
+    M obexd/plugins/phonebook-ebook.c
+    M obexd/plugins/phonebook-tracker.c
+    A obexd/plugins/phonebook.c
+    M obexd/plugins/phonebook.h
 
-Hmm, I wonder if this is not valid for all status !=3D 0 though, for
-example if the connection timeout we probably shouldn't clear it
-either.
+  Log Message:
+  -----------
+  obexd: Reference count the phonebook back-end setup and teardown
 
->         /* Check for existing connection:
->          *
-> --
-> 2.34.1
+Stopping obexd on Debian sid/unstable with *bluez* 5.87-1 logs a GObject
+critical:
+
+    obexd[10687]: Terminating
+    systemd[1804]: Stopping obex.service - Bluetooth OBEX service...
+    obexd[10687]: g_object_unref: assertion 'G_IS_OBJECT (object)' failed=
+
+    systemd[1804]: Stopped obex.service - Bluetooth OBEX service.
+
+Two builtin plugins use the phonebook back-end: pbap (pbap_init() at
+obexd/plugins/pbap.c:962, pbap_exit() at :1002) and irmc (irmc_init() at
+obexd/plugins/irmc.c:446, irmc_exit() at :473). Each calls phonebook_init=
+()
+when it is loaded and phonebook_exit() when it is unloaded, but neither t=
+he
+callers nor the back-end track ownership of the singleton they share.
+plugin_init() therefore sets the back-end up twice and plugin_cleanup()
+tears it down twice. A gdb trace of the shutdown path confirms both pairs=
+
+of calls.
+
+The dummy back-end tolerates this by accident: phonebook_init() bails out=
+
+early when root_folder is already set, and the second phonebook_exit() on=
+ly
+repeats a g_free()/NULL assignment. The ebook back-end, which Debian buil=
+ds
+(*bluez-obexd* depends on *libebook-1.2* and *libedataserver*), does not.=
+
+Its phonebook_init() stores three GObject references in static variables
+and phonebook_exit() unconditionally drops all three, so the second
+teardown unrefs objects that were already finalized. The registry and the=
+
+address book are effectively singletons in evolution-data-server and mere=
+ly
+gain a second reference, but e_book_client_connect_sync() hands back a
+fresh client on every call, so the first client leaks and the second one =
+is
+unreffed twice =E2=80=93 hence a single critical rather than three.
+
+Put the ownership tracking in one place instead of duplicating it in ever=
+y
+back-end: phonebook_init() and phonebook_exit() now live in a new shared
+obexd/plugins/phonebook.c and reference count the back-end, so only the
+first init and the last exit reach it. The back-end entry points are
+renamed to phonebook_driver_init()/phonebook_driver_exit() so that they
+cannot be called directly by mistake.
+
+Assisted-by: Claude Code:claude-opus-5
 
 
 
---=20
-Luiz Augusto von Dentz
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
