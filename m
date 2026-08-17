@@ -1,59 +1,59 @@
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE34470EBD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 21:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2CD4B0497
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 21:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787000453; cv=none; b=ZCS4IM2XJZ9q7gctPJ+ey+stsXzYNPjyxHxATprAh0W1PlPXkLTaXU1bPyCAw3+HPpkabjISq43DkjPXNoI0xzd7w/JN4ydoT+/P8cH/dGOPnTATGIiIOc/+t+4bevX3kvwq8xPDGiMNvrin60GSnSfVU0POCLiVBiZH1Q2XLco=
+	t=1787000453; cv=none; b=eJU6Tg3nMAIgDLRoQ48O1+gLofEZX+9pwFs9FMEhp9kljLxPCe1oYbdeQAzkmn34iy7e4Kinxr0alncj9WlZdr0818uTSYfRrdgEnHURyLHjyQI0rUAbJLhmr1hVOk/Df3vCik2LPF9XncCwsQb0XJU6XOTMroQNlhlpMy7lD4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787000453; c=relaxed/simple;
-	bh=fTQWt/pnrfJ+bvL+vgKtO2xn2nougNw77jFu58NBuU4=;
+	bh=s7K/oyMv1+bwCy02AXHnGYsiDWmyxyHW+lrmRwG3rF8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l91FtGm9VT5rWCfvovtsLvSbE5KtSsOaV+6xix5JSLxwYkGTLGjvT15LsHlECvn3K7kFmXFwyetFpfcmhD3cc7HFiEA/PtkaHrWPshiigWaqX6d3Hzo5v5/cjG8gq8I6MYtJhQlpNn+Z2+AZ6ZULabt07fT0ly2t4v44GzL2xU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VM2+ZrRM; arc=none smtp.client-ip=209.85.222.47
+	 MIME-Version; b=OE4LwSVLD1qB9aPkNwDXE1jlycmh+X8UlSuBHR00PZlnw7TyuE5BEao0xn28fXtZwXWzFJ2A6A2p5ZNTrwJXTKEXD+8AriX3IsenioSi+zcZLgyqU3T2q3RTZc4S3gPM51aqPmQMYpQMuuPIrXBuGhQeiBaq21OuNPkbn4oGjLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHPzrFuJ; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VM2+ZrRM"
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-9696319e14dso1193688241.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 14:00:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHPzrFuJ"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-9696319e14dso1193691241.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 14:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1787000451; x=1787605251; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=N9XllhlYJq6h/HiKT2Q+7HaFOp3lEdX9oujAdfynaxc=;
-        b=VM2+ZrRM5wZPZoJWAczJ6yy2pEyb8v4z7TQDwMYw1SUEEOPtdx4MoOPzHQ0ejoF2oo
-         IqKX9cTypFNy06I97EuF71wU3xJkgfRCsbRkwVR+Qw5+TqGwGrKpdz8GpJ799ufWn/0X
-         Xlehvb/qPGFO6pia47gy7VWHyhhGo+3zy/tRoZ9bqapKWhuj9Q3EsjnckNWVMdLlCA/7
-         wooLv3dqt5HbA39/c/BApDJmW7CrXvxziXHbEQXD1pE0jtyJF0mpsUF6mVM5Bopq8RL3
-         XzWEYKI5Lc4CzdbxJdO9Le9Wn9dVT5JrBGKPveozbpWry8FU+EzF+2JqmwgGn5FKolD4
-         oAHg==
+        bh=4FYqOuvmrzFmBWGwwTVNSK7c34xUj8KSq7BDeBfPh2s=;
+        b=HHPzrFuJTG2ajgAi4G5wFpLYNmjy5FdrtQZrxO19nujL+dEal38DpM3CevoFbcS3Bl
+         OsJBQ6rf0+ATYs82Ag7McSq9HcH6EZUi0/DW+astph3Xm1xFKMCErAs80IHrXs2BFBpW
+         GYDy1e+GAPkfDZquYkPNrCUYnZS/eFf/OUBHf5wGB2YijCX1kGzdt21ZghShInYpKwrf
+         akFj2KldKnv30TCa/T+++jXyKHtmiLoSZXyEY8KVUHV0G8sEXTLQRxydMbhxgLbL3rKR
+         Wd0/5t0/ubHWhTcMS0xe8tO5Kq7sK79OXFqiZL3jQCmE14Xb+QvxKUicwZe4nGaBzKRf
+         hWfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1787000451; x=1787605251;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=N9XllhlYJq6h/HiKT2Q+7HaFOp3lEdX9oujAdfynaxc=;
-        b=eFJra2JbWOypu8UM8MRw+W82Vo9PEZE9p0hk/8pT+Z/QCZwCG+Pl/m1Ii2HpY+r3ow
-         kyE734kyE8ptYrH9goqABcJzt+SWaQAR0voXKniAQDoNRufLcA6qUAQJGAehJpASfzLp
-         0q6LYZBN+Yinc4KMwCEsR1KvruRVL4BbiCeUMPXFFQm0CtIMjDocnFVoXUYlnHb5qeHo
-         PWBY768bCIyCykw50uOQdA3Rj7m74KGmuegBDwNyLn8MeAa+hPMu1FLx/EFH50vhAVrP
-         SpLqqZI9nFDYPnJla5HITqF478L2l73R5gSi1UxZCOHWJTihPj45WJCfvZO0vQ1slv2u
-         T+Dw==
-X-Gm-Message-State: AOJu0Yzi8d+cZC/P+6CBocvfwEeE6Y0zkuo/aCxixEolZn4e23ibLCNw
-	/h0dPvrLscEgdVSaZemiDuvzNUHkD/ec6P53DIvtIXMSCk4C7hvGTVPnEEWsviIO53DAZw==
-X-Gm-Gg: AR+sD12bwVbiDo985x5+TXJGyD6FPqQh7+Dy/X0+1fzKpYMBEKQJHZCXceQiPSHBrS1
-	gBNF+VgrKBRkPaAqsVrclyO4LOPJYLxoeWG5b/ncNIqtAhFmCg0BzQtLXavsNiiazvBoizzXIkj
-	iwQBm6caZqATCrQop+aEz3n5Aem5gDLTP6RSWLVdrHaAh6O/wfvgF2QVS+8pdrmottgb5zEafU3
-	WOz4M6OBj7+8+/eVMvwpRVCBLy9x2xMChXEdQqcHr+7btkp8LbIvxR3YbqRp4L3dCwchyoO5rGI
-	So5eBH+hq8ldnBB0sNVQFF8QK9plUb9a+3wmzSPFNiAk6Xywdsk82uCO99M2Ss6iDUuQfM7OIEM
-	wmicpjydNhdET6UMffqv3tNaj3FvJsLTk5uKCgipQAZT6+D81JwFxSMqrBuP1EWGYNfhiQ1JFj2
-	GTwvamxuh8XpIvG4SQZanUQkuMiDVwxWUyeyzjxGivpvhO9JpLkee+zLYcFTpXt1nGfi+qLhdRP
-	t4gULj5VVCcy2BSUMWHP2HvsIosDmD18vcuHAzGYZFmBubRQ0mz47uI
-X-Received: by 2002:a05:6102:a51:b0:6d4:ba3e:bf97 with SMTP id ada2fe7eead31-7747c5caa46mr670094137.4.1787000450526;
-        Mon, 17 Aug 2026 14:00:50 -0700 (PDT)
+        bh=4FYqOuvmrzFmBWGwwTVNSK7c34xUj8KSq7BDeBfPh2s=;
+        b=jXFtYwCI/8rrDqMk84nuH+hrEJ/KcTxH6GNkcrzj1uWfC+MLMz8aKoH2MfYJds1txk
+         8hzg++daFLOTSIuTgE+PqW+6pWnqlwkUvDzIFTbUbGLFoGIR1ozar/TVttIsXNiGNzuP
+         S2U6vq1jEpRb4vYdXfONEf3CXcA/uPQZTozD/8zJDI8oMpozkKEWKFZ2/WBtek0ZvEPw
+         EF4Uk5EAyC7KJde+PF7eUKjDSBpSGP92PTBZMd5OE9AUs91RpRhXVTKnZFgwZWRHQamw
+         HR1OHTVAI8JcxBx+d0nbe2fpXg1wfLLAOEode2P+4KMXyUZhINRvzlp7dWfTxEX5oBAX
+         V9jQ==
+X-Gm-Message-State: AOJu0Yz6sPFjjArMcP4RFrmLJvzJzHtMEjq+K16oK4vemKjytIFIhrIA
+	ivHI9MX1jR4M8G3arlFuhL7xObS8xeWNV/Mh4+buCL/4eZrWE26ovx0ahMW2J3hVnGmoaw==
+X-Gm-Gg: AR+sD118rVaGBz8kFk6QSTtTTIR7PacXSisKDUIvgk99tS82b9/hpoY3HSVm/6Z76dW
+	77xOGzzk2SCuKEFFmZzKQzbYVv5/wxHtg+jWawVn55Um3PlRzU/ARmzlrWSarbbs4fTtWBNLcIR
+	DWu7uQLYeou2WvujYoQ53wBhryEVdymhTIaF0xtTU2OHCxEy3alf2xbuXN5X/83WCExnflmxHOG
+	7jf4utM33/Wo6nmqm8Ya3VZNU3jjQHUdHcZ0yFWFw7jaxnD9cXRbmgqzRwNHjhqFs5erlnoX8SV
+	A0o/p8CHp/Wwy6OVraGY4esYqKwWMAFdJmPu+cKHikaXvnhj0EFtQMiE9jKkBpfxltSLU3KrxSe
+	HRRhGpHmTBxf/LcsZ/38KruFBMlnBhmAFFkoFuF7CoIaE0QurTgYPELcK3DqMAeA8ssl/qqP5yT
+	HszLZ5rHxjXTn9MF3kEiq7pUu7Wys/HDfPQKx6JSXs2MYBt5yQTj5hOsasoGLkJcu8NS3Oyap8U
+	47tTLs5mi63rFcxYONbiKiefVf68VZiR5dKRtt/i+r/Pt9y9r1/H5w=
+X-Received: by 2002:a05:6102:3fa8:b0:740:2664:801b with SMTP id ada2fe7eead31-7747e101d7cmr683716137.11.1787000451246;
+        Mon, 17 Aug 2026 14:00:51 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97c2c29e934sm2121511241.3.2026.08.17.14.00.50
         for <linux-bluetooth@vger.kernel.org>
@@ -61,9 +61,9 @@ Received: from lvondent-mobl5 ([72.188.211.115])
         Mon, 17 Aug 2026 14:00:50 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/4] sdp: Fix memory leak when freeing alternates
-Date: Mon, 17 Aug 2026 17:00:37 -0400
-Message-ID: <20260817210038.1839617-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/4] unit/test-sdp-xml: Add a test parsing alternates
+Date: Mon, 17 Aug 2026 17:00:38 -0400
+Message-ID: <20260817210038.1839617-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260817210038.1839617-1-luiz.dentz@gmail.com>
 References: <20260817210038.1839617-1-luiz.dentz@gmail.com>
@@ -77,43 +77,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-sdp_data_alloc_with_length() stores the members of SDP_ALT8, SDP_ALT16
-and SDP_ALT32 in val.dataseq, exactly like it does for the SDP_SEQ8,
-SDP_SEQ16 and SDP_SEQ32 sequences.
+None of the existing records contain an <alternate>, so nothing covered
+the SDP_ALT8, SDP_ALT16 and SDP_ALT32 handling.
 
-sdp_data_free() only calls data_seq_free() for the sequences though, so
-freeing an alternate frees the alternate itself and leaks every one of
-its members, along with anything they own in turn:
-
-209 (48 direct, 161 indirect) bytes in 1 blocks are definitely lost
-   at calloc (vg_replace_malloc.c:1678)
-   by sdp_data_alloc_with_length (sdp.c:350)
-   by sdp_data_alloc (sdp.c:486)
-   by sdp_xml_parse_int (sdp-xml.c:243)
-   by sdp_xml_parse_datatype (sdp-xml.c:421)
-   by element_start (sdp-xml.c:507)
-
-Free the members of alternates as well.
+Add a record with an alternate holding an integer, a string and a nested
+sequence, which leaks its members under valgrind without the previous
+sdp_data_free() fix.
 
 Assisted-by: Claude:claude-opus-5
 ---
- lib/bluetooth/sdp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ Makefile.am                |  1 +
+ unit/sdp-xml/alternate.xml | 12 ++++++++++++
+ unit/test-sdp-xml.c        |  1 +
+ 3 files changed, 14 insertions(+)
+ create mode 100644 unit/sdp-xml/alternate.xml
 
-diff --git a/lib/bluetooth/sdp.c b/lib/bluetooth/sdp.c
-index 8c0865398519..1e027f9ebe6d 100644
---- a/lib/bluetooth/sdp.c
-+++ b/lib/bluetooth/sdp.c
-@@ -972,6 +972,9 @@ void sdp_data_free(sdp_data_t *d)
- 	case SDP_SEQ8:
- 	case SDP_SEQ16:
- 	case SDP_SEQ32:
-+	case SDP_ALT8:
-+	case SDP_ALT16:
-+	case SDP_ALT32:
- 		data_seq_free(d);
- 		break;
- 	case SDP_URL_STR8:
+diff --git a/Makefile.am b/Makefile.am
+index 3c6cf92ab403..2754e1b7f2da 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -648,6 +648,7 @@ unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)
+ unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
+ 
+ EXTRA_DIST += unit/sdp-xml/Bluetooth_HID-sdp_record.xml		\
++	unit/sdp-xml/alternate.xml				\
+ 	unit/sdp-xml/compute-seq-size-type-confusion.xml	\
+ 	unit/sdp-xml/duplicate-attribute.xml			\
+ 	unit/sdp-xml/qt-SerialPortSDPRecord.xml
+diff --git a/unit/sdp-xml/alternate.xml b/unit/sdp-xml/alternate.xml
+new file mode 100644
+index 000000000000..a35ebccbc71f
+--- /dev/null
++++ b/unit/sdp-xml/alternate.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++<record>
++	<attribute id="0x0004">
++		<alternate>
++			<uint32 value="0x11223344" />
++			<text value="alternate-member" />
++			<sequence>
++				<uint16 value="0x0100" />
++			</sequence>
++		</alternate>
++	</attribute>
++</record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index b338788aa295..cb5b91717fca 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
+ 	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
+ 	/* From https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc */
+ 	DEFINE_TEST("duplicate-attribute.xml", TRUE);
++	DEFINE_TEST("alternate.xml", TRUE);
+ 
+ 	tester_add("/sequence_on_squared", &data,
+ 		   sequence_on_squared_setup,
 -- 
 2.54.0
 
