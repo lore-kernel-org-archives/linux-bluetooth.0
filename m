@@ -1,68 +1,72 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1E94B0497
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 21:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DF53C65E0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 21:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787000451; cv=none; b=EWsUycnEM4hpPvnVrVUqCqsomJa7L8KJQVrz4hNYP0bWoipbSE1knVHYjRNCBnzpOJUu2WdfFSpjCVhJ7g230PhF4g5u6PDxNlC/lvoELivHQKNqwWM5NM6BTiZP8UVAZjUaOvoM8PEIbItgFsw4KUkLachErE2HDRKjD0qtugQ=
+	t=1787000452; cv=none; b=clQ6C2VA89K1JxKNH15hjBkBSeNaAYmV4fpqkWgSJFn9BsSCr3o9aOgeDkqiP38aTeOcCBcJWm3h0XLwxE6UgnJwt4yrexvYe9z/flzeHbw//tDXDjvdBuPF4JCwGepayJKElh7MjCLKLqGr8JyA2nTCccMnzmBIKyf7Fq0jlso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787000451; c=relaxed/simple;
-	bh=TEVvOnCW3+Om8voazBxQAoJIXebPtE0NnIvYOEgbYUM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=EduxakVjaoTNkinLH8jHvJ+wxvh1AtUxG5OMXOHk3TgQ4KWs15dpeT9NaGpP2dWJnQGUDCxrIWm93XytkIbnJO+sIAy8YgJustH8jvwWoSM+DH6Ps0cr9x5tE2SvQwluqaE5th7BYujfvqwavWzb6A6Hne2Q7uyjD9RhEfJmnM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r/Xt5Mrv; arc=none smtp.client-ip=209.85.222.44
+	s=arc-20240116; t=1787000452; c=relaxed/simple;
+	bh=jF77E+Wzp/nx3cBMfwOuD/Iz2bMC5jvXavEMJQy63AQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f211qMH9zwbvjQN/Hm3KwD+zygVeSQWk2BqiY4GgkzhzA2PJo9plbOfXa2vL8jqbCG+80nSzEFJ94rBEn/+Jdc/yhQAo4VoDz29D2sDKmgVXjx7+/qRbAU3SGMr0Fyig5t23BohnKT29mEHDgDUiv5J+rVqjXA8SAUKaM5gFQyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mdf3KxRI; arc=none smtp.client-ip=209.85.222.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r/Xt5Mrv"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-977fca41f52so1752865241.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 14:00:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mdf3KxRI"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-97bf91b2e6eso555498241.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 14:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787000448; x=1787605248; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=19aE1gvd3JhQHdOu41/zzwUsXW3sfHO92kUTft3Ndd0=;
-        b=r/Xt5Mrv8qv1efyrf+dCCERmW7YcP4Qhna7Md8eRofU7NLcHNS5ICe0Fw1C6oJrVah
-         MpdojxhJM6EkloFI9GMyFUkb2ZC22QQFHkIhNDtG/+VJ3NiLd/kGbP7jUFTqsL5wdT6G
-         V9cKcKQsloJlzPtH22Kyn9jQpJPSn6e3aTrFIg1/coWafHIDr1SegBEpH26PWZhPhBlG
-         AhOwFRgmB5uEBLTL+T3EaWeBlp/+I+6MLsQhqN/yb2eZE+/fRYtHZdP9aipjvhDuPTam
-         knvGZJoapPaDKdfb9ut3zamN9mODkECX2bTUBhpit7As+lTpBzXlaV8lmWoXmLTi7Qgu
-         UyKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787000448; x=1787605248;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1787000450; x=1787605250; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=19aE1gvd3JhQHdOu41/zzwUsXW3sfHO92kUTft3Ndd0=;
-        b=qZrZFATGATLVNStkwICQnEpOCaYjsWBVVKrLOxH55QwYMoWbIov+I/A1CrA1SNUGcq
-         iTxb/D0ct6GqhWCWYexlWT0C48MdusOoXmpGoERtw5c1LqUwDawKDNH4pnKIJOOSJgNZ
-         6KhcLI1w11GurfD0vcsKwildMSNyArEbzd0o9c6FHG4/4pjXPd0aeFia93WzWzjrvccL
-         /81S78zJNVLvIax0dPzh0M0vg/G+po4LSNa6lZfTj5stR/hOpv4yf428ilWWUXVrTedk
-         /wJT/JEPRnoGnqFC19aaXLwgX0JsCtgTv0SUiJLRWoqPqQb10ruCBptOZa5Z+pNb/BXg
-         I35Q==
-X-Gm-Message-State: AOJu0Ywn+8/+VEHAmUXx/3KaCPivRY/7xD3FPGyCRZhvPAizWuJoKjl2
-	K3SjLy/Z+kMbevZpq1Lu/SAgoyrpBLf6Q3PSDkyxecpwNwNrGfCOhEGEWhCbSVEn6bogSg==
-X-Gm-Gg: AR+sD12gYU/9c9URHzAdvEfK504oD84UeP/RoLxH2lAUrmSpEedg7pooNQrup1KW8+U
-	cWqvyBcsh7E+8uPj+0IIDDYxjqkoA/nPjjN5WmjNkExwjdaIHtM8dQEunVhEQIqqQZR3Lh1haAO
-	Ft9KxLEGLKv5I6Eu/dAZkN7bQ2T/ETlaKe5Ybftdp+WIxusp5PpWTdV0Ax4rTsjuqoW8gJ+B8tY
-	jKdIu8kk0k5BBk57mLxpyG0XdBFiwPpL8dnvHXWhCrWB7YLi6GvSTIPJzY0hzcOVjWkzLhb9A19
-	hVzZMfxoCKVO6Qx4hvdKZe/BcoGUJzOUMhD1Bo2yqVSVh5HusvxwKKNnyCpUpqS50fQsf7cYSW/
-	VepWNjH9o4UzEV6aUr91k2w1HbkC2HQzxlK4E0wEkU5m1gw+WHkE8cMhxtpkO2CZeca14kk8/4m
-	X2xGkSKdhHXmdQTZpFUem/uCFrYY3t/IXccoVtGoMctc1Sf7yRnJOt9xAD19bBw9I8vQNngI8XN
-	dSpo8UA00ZqQw5RKovXo5BE8SZk0mv1qZ41QoVFx1ESNZ6QVlxENrI=
-X-Received: by 2002:a05:6102:512a:b0:76b:12e9:a443 with SMTP id ada2fe7eead31-76f2c43cbd6mr5860636137.9.1787000448408;
-        Mon, 17 Aug 2026 14:00:48 -0700 (PDT)
+        bh=NOdn8uH6vUr+RTDhO6/Gm+rtGQKbjeKrJV8Jbf1rsrY=;
+        b=Mdf3KxRIFalMt65BMsFB5GmfHrQ8gV1AyI9AmqczqaH+UakGYV5mnep7+vJ0x2U2qQ
+         2/XQuZfdSWyFepluida9EBSaM5iIE6lHsCgABAfPqRaUg08yqu2j1ANxqJMM4useuZYL
+         GznigH5hNgmzgKQVwfieNnvBC8KzsuPc/1Wlvg8wjaWg0t7nmFK+2JgyWu3bsmlPfVtu
+         eFsryyKByp/Qd7oGvGVTtx5RkrbFq1tfiduTdQklPViC8uZs9/sj6wIuBWpydM/kpd9d
+         YPWuzhrdzlJT+TluLsNMxfrsyaxKynjykuimWf4rffqeQR3GuPmokSree82CXOXsVE20
+         qfsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787000450; x=1787605250;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=NOdn8uH6vUr+RTDhO6/Gm+rtGQKbjeKrJV8Jbf1rsrY=;
+        b=J28tYxyktD0V5IoMLncgGjwTs0sIZ+/tjNerUa+wP80IcZC3HHgd0rEPYmOVAvCR+s
+         gPOdENomlFg4F1lEquuhklWeFWKrMU4iNyVVdtEIW6CWj/ON194yVectMUNaxC22aCrn
+         BqwbF9xZ8g6uSBMsAISdIpSdWQeu33gk7N8OZaeTe70IEEHBObHil7EZ/mpXC6aiNjuU
+         Q1Vahhu77Xnuyng+ow7Uoa3UmorO6uWnE2eCFZYV/Y2C4o46DTEiD46FAppLc6U/ubnK
+         LWZQhSCo+/qu4dQNSfvu9Q7z/173FnA3cntY+2UkA7Pxp/dHtAZwQsMSd3Kwr0Cxr6AK
+         xmeQ==
+X-Gm-Message-State: AOJu0Yw8Lyfv/ErIogghehf+HLHUMsz0ek7DwOOYxI8rqdellakAkbE3
+	YT+bEfrYET9MLMWo84VEg0jXllkC7Iprkdw+bMYuR6ZqppMGtNXRyZNOcBsvb/bW8j/ajQ==
+X-Gm-Gg: AR+sD11mmDEQSmmwVnwNRWHTDxSH9t3FPUq+HMumWUN6uipGe7B7Vttik0CPrY4clCz
+	u1Ib5PawBNjVD1AQGcRFrjYNVzFPvaCvz43IOoq48ADw42EoGU5YC/3KCtyU/eQmidHYRsvVaaS
+	zcpMrYv5hnD64xnrXltI9CSuyjOIGyPJMFnOqTrQboDGzV1cFWhMEHpCu1KW5dzOtjLiDlxZXpE
+	c3xCeZ6Tg3Ovyx9fXmmYLrbzKF6cP6J97FDjLhA60nyr9BZo+foMqsHCWOwjDY/vRu6XNqw1caI
+	11MqSJjb7xhDXChBOQMVkqd9XCPtGbooiVuJwqdjybfpItVBzHdbsgwv1Kw4iSZ4g7WQUuC9XGA
+	tmhGN7wo8kFtuxI4BSk1ptv//JETwu1Op/K64QcJJm/K3SFJJtcCf8IepJIp1ajKEkUbetdt5Mo
+	t6b+5f71B1thm7pP9IIwBvcI5gxjdm/oumqHhIrvm3BT0lg81w+2/0xZJcbnhdN7LjZTKzyNrvX
+	qnVNYAIx2HDSNU79bH48nGnvv7Yq4Co0TlaK4V284OmZvkDmsAmMpA=
+X-Received: by 2002:a05:6102:512c:b0:76f:eaa2:6fa7 with SMTP id ada2fe7eead31-7747adb4896mr796401137.2.1787000449741;
+        Mon, 17 Aug 2026 14:00:49 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97c2c29e934sm2121511241.3.2026.08.17.14.00.47
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97c2c29e934sm2121511241.3.2026.08.17.14.00.48
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2026 14:00:47 -0700 (PDT)
+        Mon, 17 Aug 2026 14:00:49 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/4] sdp-xml: Use a queue to collect sequence members
-Date: Mon, 17 Aug 2026 17:00:35 -0400
-Message-ID: <20260817210038.1839617-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/4] sdp-xml: Fix leaking the parse stack on malformed input
+Date: Mon, 17 Aug 2026 17:00:36 -0400
+Message-ID: <20260817210038.1839617-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260817210038.1839617-1-luiz.dentz@gmail.com>
+References: <20260817210038.1839617-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,150 +77,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Appending a member to a sequence with sdp_seq_append() walks the
-single-linked list to find its tail, so building a sequence is O(n^2).
+sdp_xml_parse_record() frees its context but never the elements left on
+ctx_data->stack_head.
 
-This was previously worked around by caching the tail of the sequence in
-struct sdp_xml_data, which required the caller to pick between appending
-to the cached tail and initialising val.dataseq, and to keep the cache in
-sync on every append.
+element_end() returns early without popping the stack when it rejects a
+document, for instance on a mismatched </sequence> close, so a malformed
+record leaves its elements behind and they are never freed.
 
-Collect the members in a struct queue instead, which tracks its own tail,
-and link them into val.dataseq once the element is closed. Appending is a
-plain queue_push_tail(), and the queue is destroyed along with the rest
-of the element so members that were never linked, such as on malformed
-input, are still freed.
+Free the remaining stack elements before returning. Found with the
+compute-seq-size-type-confusion.xml test:
 
-The sequence_on_squared() test stays at less than 0.1 seconds.
+56 (direct) + 1,072 (indirect) bytes in 1 blocks are definitely lost
+   at calloc (vg_replace_malloc.c:1678)
+   by sdp_xml_data_alloc (sdp-xml.c:73)
+   by element_start (sdp-xml.c:473)
+   by g_markup_parse_context_parse (gmarkup.c:1369)
+   by sdp_xml_parse_record (sdp-xml.c:696)
 
 Assisted-by: Claude:claude-opus-5
 ---
- Makefile.tools |  4 +++-
- src/sdp-xml.c  | 60 ++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 46 insertions(+), 18 deletions(-)
+ src/sdp-xml.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 1a4e5660813b..b3ef4ae1c3df 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -437,7 +437,9 @@ tools_hciconfig_LDADD = lib/libbluetooth-internal.la
- tools_hcitool_SOURCES = tools/hcitool.c src/oui.h src/oui.c
- tools_hcitool_LDADD = lib/libbluetooth-internal.la $(UDEV_LIBS)
- 
--tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
-+tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c \
-+			src/shared/queue.h src/shared/queue.c \
-+			src/shared/util.h src/shared/util.c
- tools_sdptool_LDADD = lib/libbluetooth-internal.la $(GLIB_LIBS)
- 
- tools_ciptool_LDADD = lib/libbluetooth-internal.la
 diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 5b448fe83410..bad9e289344f 100644
+index bad9e289344f..bcd5785f87ca 100644
 --- a/src/sdp-xml.c
 +++ b/src/sdp-xml.c
-@@ -25,6 +25,8 @@
- #include "bluetooth/sdp.h"
- #include "bluetooth/sdp_lib.h"
- 
-+#include "shared/queue.h"
-+
- #include "sdp-xml.h"
- 
- #define DBG(...) (void)(0)
-@@ -44,7 +46,7 @@ struct sdp_xml_data {
- 	char type;			/* 0 = Text or Hexadecimal */
- 	char *name;			/* Name, optional in the dtd */
- 	/* TODO: What is it used for? */
--	sdp_data_t *tail;		/* Tail for O(1) dataseq append */
-+	struct queue *seq;		/* Members of a dataseq, if any */
- };
- 
- struct context_data {
-@@ -510,8 +512,37 @@ static void element_start(GMarkupParseContext *context,
- 	}
+@@ -551,6 +551,17 @@ static void sdp_xml_data_free(struct sdp_xml_data *elem)
+ 	free(elem);
  }
  
-+/*
-+ * Link the members collected in elem->seq into elem->data->val.dataseq.
-+ *
-+ * Members are collected in a queue so that appending is O(1), sdp_seq_append()
-+ * would otherwise have to walk to the tail of the sequence on every append.
-+ */
-+static void sdp_xml_data_flush_seq(struct sdp_xml_data *elem)
++/* Free the elements left on the stack, e.g. by a document that is malformed */
++static void sdp_xml_data_free_stack(struct sdp_xml_data *elem)
 +{
-+	const struct queue_entry *entry;
-+	sdp_data_t *tail = NULL;
++	while (elem) {
++		struct sdp_xml_data *next = elem->next;
 +
-+	if (!elem->seq)
-+		return;
-+
-+	for (entry = queue_get_entries(elem->seq); entry; entry = entry->next) {
-+		if (tail)
-+			sdp_seq_append(tail, entry->data);
-+		else
-+			elem->data->val.dataseq = sdp_seq_append(NULL,
-+								entry->data);
-+		tail = entry->data;
++		sdp_xml_data_free(elem);
++		elem = next;
 +	}
-+
-+	queue_destroy(elem->seq, NULL);
-+	elem->seq = NULL;
 +}
 +
- static void sdp_xml_data_free(struct sdp_xml_data *elem)
+ static void element_end(GMarkupParseContext *context,
+ 		const char *element_name, gpointer user_data, GError **err)
  {
-+	queue_destroy(elem->seq, (queue_destroy_func_t) sdp_data_free);
-+
- 	if (elem->data)
- 		sdp_data_free(elem->data);
+@@ -696,6 +707,7 @@ sdp_record_t *sdp_xml_parse_record(const char *data, int size)
+ 	if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
+ 		error("XML parsing error");
+ 		g_markup_parse_context_free(ctx);
++		sdp_xml_data_free_stack(ctx_data->stack_head);
+ 		sdp_record_free(record);
+ 		free(ctx_data);
+ 		return NULL;
+@@ -703,6 +715,8 @@ sdp_record_t *sdp_xml_parse_record(const char *data, int size)
  
-@@ -568,6 +599,8 @@ static void element_end(GMarkupParseContext *context,
- 		return;
- 	}
+ 	g_markup_parse_context_free(ctx);
  
-+	sdp_xml_data_flush_seq(ctx_data->stack_head);
++	sdp_xml_data_free_stack(ctx_data->stack_head);
 +
- 	if (!strcmp(element_name, "sequence")) {
- 		if (!SDP_IS_SEQ(ctx_data->stack_head->data->dtd)) {
- 			g_set_error(err, G_MARKUP_ERROR,
-@@ -610,28 +643,21 @@ static void element_end(GMarkupParseContext *context,
+ 	free(ctx_data);
  
- 	if (ctx_data->stack_head->next && ctx_data->stack_head->data &&
- 					ctx_data->stack_head->next->data) {
--		sdp_data_t *tail;
--		switch (ctx_data->stack_head->next->data->dtd) {
-+		struct sdp_xml_data *parent = ctx_data->stack_head->next;
-+
-+		switch (parent->data->dtd) {
- 		case SDP_SEQ8:
- 		case SDP_SEQ16:
- 		case SDP_SEQ32:
- 		case SDP_ALT8:
- 		case SDP_ALT16:
- 		case SDP_ALT32:
--			tail = ctx_data->stack_head->next->data->val.dataseq ?
--				ctx_data->stack_head->next->tail : NULL;
--			if (tail) {
--				sdp_seq_append(tail,
--					ctx_data->stack_head->data);
--			} else {
--				ctx_data->stack_head->next->data->val.dataseq =
--					sdp_seq_append(NULL,
--						ctx_data->stack_head->data);
--			}
--			ctx_data->stack_head->next->tail =
--					ctx_data->stack_head->data;
--			ctx_data->stack_head->data = NULL;
--			ctx_data->stack_head->tail = NULL;
-+			if (!parent->seq)
-+				parent->seq = queue_new();
-+
-+			if (queue_push_tail(parent->seq,
-+						ctx_data->stack_head->data))
-+				ctx_data->stack_head->data = NULL;
- 			break;
- 		}
- 
+ 	return record;
 -- 
 2.54.0
 
