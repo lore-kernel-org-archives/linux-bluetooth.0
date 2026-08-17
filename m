@@ -1,171 +1,160 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BE6451986
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 17:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03FE45628B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 17:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786987961; cv=pass; b=LEd/xS+rOeWMsEymZ6NQHK4A/LS938uxT5Hrsc7xlILgGNcLG0d7bWgbCyZhB79QaZkPk1WNjmss5ND58PtHsWAu1lEDicQpffzP30Khw8eDWCNu6vtZZ4t+gUnm+MY9smihdKbYX7lDjGznbH35gyLMjWXZH0RsuEIrtqEL+UA=
+	t=1786988560; cv=pass; b=j7xw8BZqe1wNNDHt09SSR/u3glZs087eHs0NeNUL4ojRFyjw73wz59Bduvqenk4HwOkN5dTJymIv72yYzhEr/vtzX2Cxb8A26LGL16rsOhfQJaVtqDHp+wAFScTF/ZQDZ9yBz7I8l7DfS7QICSwGUygtiX5gOXuybxHIkGftp+g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786987961; c=relaxed/simple;
-	bh=UGXt1v8lzYIy5RWZxaevNP38Y360efpQ8u/2dkmbf6I=;
+	s=arc-20240116; t=1786988560; c=relaxed/simple;
+	bh=py5sQoQzN8QVO6RQX/oowl91MWw9P76SmG1bUer6xJQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b37oOCppIIZvn+VDmGVsWDdpIbg+OQ55m/e2jEF3mqFaoNwKu+W9k4rKLFsoEkZSitpzfUhiON0Evtog97Z7m+qj+7YygIkLtiDRfh0cP7n2OCaY/+7z8giYHrBRbSYWxtDCZ1i7xSjVA8EnQQRIfXLjOxrIvw2VnCVU9qJ5blc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UDNetXjZ; arc=pass smtp.client-ip=209.85.128.173
+	 To:Cc:Content-Type; b=lfpwmbTKx10vEiD7/REnZK6su48RTzwXLUik0l+2KkTx1LrEFq8YHKF2TVh8eQRFzvHJ/hYMWiiC8Zm4Cs8FJtV0Gu/TvhFAgLFoS3wHebsnEdfa0YAMtzgaSw8Sdy58xirBwMb3wKFjyA6PMuCVcAEjEEEcOZ5LHuQx8I4MTkw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XqK6fP81; arc=pass smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UDNetXjZ"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-836c718715fso43419747b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 10:32:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786987959; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XqK6fP81"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-66cad42593dso1127394d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 10:42:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786988558; cv=none;
         d=google.com; s=arc-20260327;
-        b=CyKLWsOTnfmXHiw+93C6HaIPKbme2ah2ytNpOQrEhRMMEluCgNGJOMHESkYp+gPC4p
-         /60sbW0QT5ElxykFJ1fo84uKMCCk2YqE50DMX5xKI5H3AoMgpe2TEqKNeC+xF4MqIbvo
-         mD86jGacmRHK4JhkSkpWFd+ygOwG7OZhmeaoP9sz8qnWmYjP/TNVz9Bk4Mp9TUPZPWpL
-         KzgfM3G9vyr1eWHUuElixtozAU9xWkRq/iNSAM7H0V1fmdcLz375NvwISZtkbSWTa2q/
-         GNm69zjzfu6J8SOzPgJRIn8kbTYYb8fskEFcAAiRyINVNyX14o7H7xY86ICQVRDAKHeq
-         oktg==
+        b=FpwBtGLgNWkg5zH0NazOjDxnLmqhqgPSBHrwsWjS7yBrQq44x89o7zmHZDNy1luCV/
+         +aDFvoRDS81OtkboCf9DAfwyYyHuZoEz7924eabYWX5XZcLIKPdDMH4Gfxw/owIjVfGI
+         lw2D+9jxSSN3SiC3ERDetQdFKp5knIptRYdvZOaLVqSQ4wSVh8NTd+KpwDJyaVsL5Qbd
+         votBFHztlFEj4FtStohUN2Brmp19y9LYTR9Dazn7Qc/afGgqjTcIXjXqF4ccNTVxMI7/
+         mGUWnLN0oAz3EMKHUCGPiWZHKUwxS7k6zz8r2v6kfaO2k3PU1IowpQSQAQrDBn6vhyVV
+         FVng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=O6NtOPuz7YXxI3CgzCU8k5jQwLkc89zpCvRdKJof0hU=;
-        fh=gypoUBZHTEZNASL+Gkd60Clgblo19E4jctzSq7t8qvE=;
-        b=X81xrpq5XXx9CIFm0E2FQ2CU3J3nWoJpnP0ZfnHkrQk/o0NVlW0QGjWdMDhNU4lWm+
-         YrRxliTvPyEvJIivf6nq1w6JaTBSIBw6ByCiQQ/ZLnAhxG9uy8s5UVfYt34amsTcatBI
-         XWJbSelFyZ2aLmHAHg1SrP0NtTG6asWjQ1uIp8cSbo2k6qtxUuiDZP3u7AqLiwQySC2T
-         X3YpxGY7Uy0B/HVc6bXPPoQZjuuhgEF7eoRwUBaWfV+L+LVhuE9RzLJfjdx4Uo6qbYX1
-         dkFT6KOaSd4xxZQyl2kmVXkpVxeA55YHMdT7kUcBDCse2W5L56Tat1Kvt53IEKouTDbP
-         gSSg==;
+        bh=FkLUzGUcrjYuBwFtQIWuVlWp9HJK2QnBFMiBnZ+u74k=;
+        fh=/z2HEQ5XafIYm0GAaOVRlnrZelsTuYiLcQduTLXAIVs=;
+        b=qNqqldKdvUEjhM8gx4Hvqetql1EufbX+iXSjZ0g7N+wjikM6ugeDqDjKGzL2PTwmyJ
+         98UcaSpEs8KevN+RH7lJO10GFQ2uwaPhU9TxG9cwf4+7neVjrG69E2c6XoucPxPnMHF7
+         QbUrROqwKrfwq6ZBfoogMVLxY55g1tcDc8xp86TfFtCYaWXde6AKKPQLA01OYmBX2Zrx
+         inh9ca1wIlrVLD6Uv7DjJ4x1sZszhmq0mezJG2Gs2ydAYejPZuulWxYKHWmhddIMKmpP
+         emH2VFpRZ4fxAOmay8xcptOhmZ0Du8u46eEQAn6Cpm3EJpYy1JEIB3DFvXrgPCEB1lwQ
+         7rbw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786987959; x=1787592759; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786988558; x=1787593358; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=O6NtOPuz7YXxI3CgzCU8k5jQwLkc89zpCvRdKJof0hU=;
-        b=UDNetXjZb9Fd/vySSD8ViJ2neIQqVKsB0pf7udmiLFhfESQ8vaAn+OuWHOP+IVRtQN
-         UEP2o5SvzoEkDFltBdDld8XRG3tvlRX38aodDR7KMWkFdZEUP5wQ6SVmCb8pSZZxf9ua
-         NxqfpQ9xaLPzu0XV0aoZkGPoXw1Xdc3OGHbORHGcz4ZiXNY6U5yth5lGQ7PHJrzWupkO
-         IElADA7BQf4kAU+lKSFCteeFgc9U4VukE1YmYlTv9PJj7rhvYGJxof04VEsEn4MvDCqg
-         RfSIB03xHYBYlKavz30g0ljW9Awy/4SWpfbVBrGqC/GjRGOSh4pnFtyNOgKm8KB8X30/
-         bC0g==
+        bh=FkLUzGUcrjYuBwFtQIWuVlWp9HJK2QnBFMiBnZ+u74k=;
+        b=XqK6fP81x9YzQgbeiozrnhL91e66YhVbM9Cp47YG/VUPZotKg05smEe4QVn/t4brfr
+         TE0XhApzo2+7qDazkjvcWE4+i3hSkjHSZs4n3j5h4WDGH5+EeyF/m5l530rZ/NYcwQzc
+         lQGU3i9dX4z5jagVul3cP7rxYTWzWrkNSUEvbaTQM8s9O4Y8sQNzycB1GxoIVzc1b4KX
+         Ti/dA9rfE3OY9YYodk4NBWmbUIefjz8yPf9JuCmBdGSSbfAaYMK/l77usPYQiUK8+tLb
+         tAgZ2Y2DwK16jC+fkqHOMA4Vl2CKTcQtP79gzKG3NbNDCW5p9be9DcJGIXU7r11uHDLK
+         qUBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786987959; x=1787592759;
+        d=1e100.net; s=20251104; t=1786988558; x=1787593358;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=O6NtOPuz7YXxI3CgzCU8k5jQwLkc89zpCvRdKJof0hU=;
-        b=Z8Glf7dWykOyhSNxURJSwzA5g14fqTJVw+Wius+YCy2zAx2rCAKZ+l4pj8THN+p36X
-         aUaV39sH8hBsQlVbIdszOA1haQXV+cmK7MHjitrWlFfmShGKXGnSDT/zszxcqHLfBHOi
-         YkTZOIXebUU1D8R7z4e4wcCdkm+TV85KBDWRMyAXhpWe12bEz6s9wOYyxkt8A9KMQy7O
-         mfI1KC4tuCh+6o0MPFNtU+RHdW3Iuv6ThEPVuKyOyv5zHtFs0dYAsHdVWuULqSGWRBET
-         UEf28If2dUVpMkDyQNBT0vSSa3GLG6hQvypaDHsR7xXyihqUvbY5Q4TtokByFjgrp4HY
-         Drdg==
-X-Forwarded-Encrypted: i=1; AHgh+RpjhRdYbB0B5KOqlG/vn6QGJAJdWr/pZfgH6Xbgm2us1IiTasnbjmXDZG9Mu4jvFtVC0r8GCI6zFmCQESpzaFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzacsdk+v/qC3Zi8fLPYI3KiJnyNEYn3m+ww5pAavmeCCYH5S+1
-	qGlYCNZmcQXCxAQC3K7XB39BPV3tmq9YOzFPikHXmxD/rmQya4kCurPbgQ6A1uUums7AYlWeK9X
-	Tae1hGJ3W9n9RbaMG9lE5xngh0WCjI0w=
-X-Gm-Gg: AR+sD10BEA8eBE4uDrWIZZjk7xPl5hLxQNAhHxMKrI1yvn7ZCANAwNxqENR8J13ZvJD
-	XIg4PQbUkv/WKRqH7gDhTdikBYQnHj+aXqbMXeaafwIjoh7BNUt26iwuHY5l6cvbur8IStauabU
-	shOHxYknXP52OrGSyfNutgRtSehagFeA+yx91cB2KvWH0z3OQYbwFQvQMKKlFqDLyx/9yxMxZFK
-	aCfSL60pw5L+lQtxMAz0AO0mK4tLjLAUaLa2eKkrpsFs5lRWVUeY/IKQ1aOYVLQA+nvYWlxeC02
-	fYHy1a66Llms2s7YxwW3i1q9/lvcBwx1Z3eHWrTUVCVIIUAisAxmAS9OdAseJ59oNw8+oyiImZh
-	7yUsL06pOO+4fM23tcvhO+mL/Lj3I5eA=
-X-Received: by 2002:a53:ee50:0:b0:667:8f12:c48 with SMTP id
- 956f58d0204a3-66c72cc4ba1mr6644503d50.26.1786987959233; Mon, 17 Aug 2026
- 10:32:39 -0700 (PDT)
+        bh=FkLUzGUcrjYuBwFtQIWuVlWp9HJK2QnBFMiBnZ+u74k=;
+        b=AxcpcS6GeDUMMQaiC7uYkPAlJSls/yzMDfKB5zvDgep8GkoLT1ercQOnxzj9DhBI00
+         6rClR2jRZS6tLNLQtixzI91crcIXUznjAuql/FhI9q4WDcB9S/m6jeO0hoUt7G6D/DET
+         jfSXse2ux+PH5DBJ5MpwYsOxfIFrSwps5CJXW1mMBx6tUtVaGfaku0Hzg3r1GCkeIiSi
+         iOOkOVsrr0lRzB5USKEJis9oqHZ1GcuevwNZU7+q9JQiuncp142K4p14ruHM5t4El3lv
+         cHn4k0OTvK/5Yf4IpXY9aSToYmNEAiHDOHFmrA+DV/OSGeQ3vD4u+1aIBMElY7uTe5gd
+         BmnA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqtm7ajo6BIQXkVQ5wDRbvto/Zq0APdkiVudUdpJAiY24xmdhl3sOUbu/tEtEzQ8OMV/R1+QHMhsNbQV1vOvfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqeuYGrrNadEECw4Ke1lvLjXI16e3FB+YEcQkm9qxR2xcWx1si
+	QRBgwxgE/2ylFcdMbd99h1buwuq/4XyLVfQdVNHJTYU9KpfW5zVEidJI0TMeLaXh5H4m/JhlP1b
+	UC1WkIadsVRJiFIcv8XmXzs8ZN3IQGL4=
+X-Gm-Gg: AR+sD13MO+XQrs12c1HW6902TITkma2m6jl7eJFn434eHz1cmJxJKjHWGJlUgXMd2UT
+	Hgp4vFFvzDJntwB9fXrR5fgcYrqtRX7f7d9YGf89pEp9I/6xw0O0kS+gevqEmdfSlru3dW9xmAH
+	AhxRy1YNPIfiEL87TofLzSqqAEZLEdB8ftEnewZtRJdX0Tq4hKcZ4ZGhR0pbzLGoKqLBJIYgiNI
+	iOZ6HUPW38gJIxATwG/Gllj0CBMXrQqA33mLPOPFW+qP+SN+sdSN+++d1WD6RYVCQ1BDKLPYg5f
+	OBZnM+qLabi3nOWGdhMeL+ZkZgATtkfmyYOFsZ8VRAIMVica5/SmmVRfvcV7pNY+KNecDOan6g5
+	xPnAvyLhDb1xcifiJIkjRoyENMfodJWs=
+X-Received: by 2002:a05:690c:60c7:b0:812:996f:176f with SMTP id
+ 00721157ae682-8370d9e0573mr87345337b3.11.1786988557548; Mon, 17 Aug 2026
+ 10:42:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260814231248.3096377-1-tristmd@gmail.com>
-In-Reply-To: <20260814231248.3096377-1-tristmd@gmail.com>
+References: <20260815033346.15882-1-andrewbille@gmail.com>
+In-Reply-To: <20260815033346.15882-1-andrewbille@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Aug 2026 13:32:27 -0400
-X-Gm-Features: AcwNN1X0vZKR87eRnLXX9W9oXASCIrnh3TRfwnQscaGmWvciEcy9UpEb8C34WZc
-Message-ID: <CABBYNZ+7UbQcO40RGEQNtfptWTf_BhnSmwounR-dOFZpmU=E7g@mail.gmail.com>
-Subject: Re: [PATCH bluetooth] Bluetooth: cancel devcoredump work during
- device teardown
-To: Tristan Madani <tristmd@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>, Manish Mandlik <mmandlik@google.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Tristan Madani <tristan@talencesecurity.com>
+Date: Mon, 17 Aug 2026 13:42:26 -0400
+X-Gm-Features: AcwNN1XrM9yJKJI-pUKg_fcRvQLM1qaf5RIOI7UnpDk6HM2pmlgJym67nzlbass
+Message-ID: <CABBYNZ+AWzMR2O2XLuk=GC+aHqYE9Adi6qdZcZoJ5VvPfhaL7g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: treat 0bda:0002 as a generic HCI device
+To: Andrew Bille <andrewbille@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Daniel Drake <drake@endlessm.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tristan,
+Hi Andrew,
 
-On Fri, Aug 14, 2026 at 7:12=E2=80=AFPM Tristan Madani <tristmd@gmail.com> =
-wrote:
+On Fri, Aug 14, 2026 at 11:34=E2=80=AFPM Andrew Bille <andrewbille@gmail.co=
+m> wrote:
 >
-> From: Tristan Madani <tristan@talencesecurity.com>
+> The 0bda:0002 Bluetooth controller reports itself as "CSR BS8510"
+> and exposes a standard Bluetooth USB interface.
 >
-> hci_devcd_setup() initializes dump_timeout and dump_rx work items
-> during device allocation, but hci_unregister_dev() does not cancel
-> them before the device is freed. If a devcoredump is in progress
-> when the device is unregistered, the dump_timeout delayed work timer
-> remains active. When it fires after hci_release_dev() frees the
-> hci_dev struct, it accesses freed memory.
+> It currently matches the vendor-wide Realtek quirk and is therefore
+> initialized through btrtl. The controller does not respond to the
+> Realtek-specific register access and initialization fails with:
 >
-> Add hci_devcd_destroy() to disable dump work items and purge the
-> dump queue, called from hci_unregister_dev() alongside the existing
-> disable_work_sync() calls.
+>     Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
 >
-> Fixes: 9695ef876fd1 ("Bluetooth: Add support for hci devcoredump")
+> No Bluetooth controller is then available to userspace.
+>
+> Add an exact match for 0bda:0002 before the generic Realtek entry so
+> that the device is handled as a generic USB HCI controller.
+
+Okay, but what happens to the actual device with id 0x0002? Have you
+confirmed with Realtek that no other device uses this ID? If another
+device uses it, this change will break support for that device.
+
+> With this change the controller registers successfully. Scanning,
+> pairing and A2DP audio have been tested successfully.
+
+I may fix your controller but if breaks others, it is not a long term
+solution. To be clear, 0x0bda is controlled by Realtek; putting a CSR
+device under it invades another vendor's domain.
+
+> Fixes: a2698a9bf9b0 ("Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/882=
+1A support")
 > Cc: stable@vger.kernel.org
-> Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
+> Assisted-by: ChatGPT:GPT-5.6-Sol
+> Signed-off-by: Andrew Bille <andrewbille@gmail.com>
 > ---
->  include/net/bluetooth/hci_core.h | 9 +++++++++
->  net/bluetooth/hci_core.c         | 2 ++
->  2 files changed, 11 insertions(+)
+>  drivers/bluetooth/btusb.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index 3df59849dcbea..5a60c3f94a462 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1800,6 +1800,15 @@ static inline void hci_devcd_setup(struct hci_dev =
-*hdev)
->  #endif
->  }
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 184e95c1625e..fb9fdf90a3b9 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -615,6 +615,9 @@ static const struct usb_device_id quirks_table[] =3D =
+{
+>         { USB_DEVICE(0x0489, 0xe130), .driver_info =3D BTUSB_REALTEK |
+>                                                      BTUSB_WIDEBAND_SPEEC=
+H },
 >
-> +static inline void hci_devcd_destroy(struct hci_dev *hdev)
-> +{
-> +#ifdef CONFIG_DEV_COREDUMP
-> +       disable_delayed_work_sync(&hdev->dump.dump_timeout);
-> +       disable_work_sync(&hdev->dump.dump_rx);
-> +       skb_queue_purge(&hdev->dump.dump_q);
-> +#endif
-> +}
+> +       /* CSR BS8510 device using a Realtek USB vendor ID */
+> +       { USB_DEVICE(0x0bda, 0x0002) },
 > +
->  int hci_dev_open(__u16 dev);
->  int hci_dev_close(__u16 dev);
->  int hci_dev_do_close(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5ba9fe8261ec8..d4d559dabf422 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2671,6 +2671,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
->         disable_delayed_work_sync(&hdev->cmd_timer);
->         disable_delayed_work_sync(&hdev->ncmd_timer);
->
-> +       hci_devcd_destroy(hdev);
-> +
->         hci_cmd_sync_clear(hdev);
->
->         hci_unregister_suspend_notifier(hdev);
+>         /* Realtek Bluetooth devices */
+>         { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+>           .driver_info =3D BTUSB_REALTEK },
 > --
 > 2.47.3
+>
 
-Sashiko found 2 issues, both seem valid to me:
-
-https://sashiko.dev/#/patchset/20260814182849.940976-1-ali%40iusegentoo.com
 
 --=20
 Luiz Augusto von Dentz
