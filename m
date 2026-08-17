@@ -1,201 +1,173 @@
-Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFBE41DEE7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 12:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B290A41F341;
+	Mon, 17 Aug 2026 13:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786971458; cv=none; b=YeJBSEzSlJKPgr3XeA4daXFZl+ga7QAbF5bx/nveRzFRVUsxwELj9DhrCEOYFq/nGlj3K/pC7KzgvdajyjTCEPbf0aQM3f+OJYzT/S4uUXLvsk0fuZRTI3iOVfg1+o5bHlUd1v3u7I3kLOiD+fYrkYVbkDnFCGPpCjDIn6Xf6hk=
+	t=1786971700; cv=none; b=GvyHVhBBj+Q0NbEjd2bkj7raJfT9UWYXW7LKuzioUU/RYK9uvgiTCMnzW4OxhkaA6XgzCgRoKZ9rJVydrpafXBX0vLtzifrJwH5kr4MuQhyYoOO7eU3mcN5igpHM7EbkRgWZpV3W4fZgDIDNvNfnIrh+6ai+FFIUBvIjXy4TTQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786971458; c=relaxed/simple;
-	bh=QzCIqujJVLpkrjFijyqBfUXFULhr5Y/Irtg7x2TkVr0=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=ImsxZ7TM3ve6EVj56rT9ccuki0G22AyiQzmhfOonwWnNEYYHCL6r/8EI5hkxj9TFc8D+TKxbkf2AHtbcKmlKUv7WNcr7QsMw28RUQgDCugO+rbHjye2vSyGr4s6TayjsJln39S9vEJ4dd4W3RPsVLtYodkCLNNIqKP7iGmGUSKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=u9V0G/TM; arc=none smtp.client-ip=46.14.118.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
+	s=arc-20240116; t=1786971700; c=relaxed/simple;
+	bh=zoVTlgD3cD2htjt1jPfKTgtfncDVduw8Z413cvKsh88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4eiyaQWc2bbZgQB3Y9RBnCaPVIzoPPm1N7eqNR9TKF0kVlUzTB0iu/H/hiwqe3Shf9qD2y/H1vvn7gGv+GMAhEHKtjIBNVxxtorccJ/UGkFxv7BIPAQQjIy9jEM4VVdPR1zJMNRLd+Z230dD73Tgz9x5nyNmbfhf+kN0JJ/0rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=miIRVYkp; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="u9V0G/TM"
-Received: from [192.168.16.44] (port=21959 helo=remote.fiveco.ch)
-	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <valentin.kindschi@fiveco.ch>)
-	id 1wvwu4-000000007B5-2kvt;
-	Mon, 17 Aug 2026 14:57:24 +0200
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
-	t=1786971444; h=from:subject:to:date:message-id;
-	bh=QzCIqujJVLpkrjFijyqBfUXFULhr5Y/Irtg7x2TkVr0=;
-	b=u9V0G/TMG7HyqZu/FCILt/HdSCSzkjmCYKKgPOUo2H4gjTF9yE/wJ+qgUkKWhTpovZZDMN0cjH4
-	mUHGtGezdaarJ11xyQ9sNLBTDb2bLZGjcpqxKli6iblBf5H0jERiJcPqfr8G8TRXiBcu3wi1Uz4xD
-	aVjjmhXKmF3AqgaP9xw=
-Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
- FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 17 Aug 2026 14:57:24 +0200
-From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-	<linux-kernel@vger.kernel.org>, Valentin Kindschi
-	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
-Subject: [PATCH] Bluetooth: hci_sync: pause advertising before setting the active scan address
-Date: Mon, 17 Aug 2026 14:57:07 +0200
-Message-ID: <20260817125707.508716-1-valentin.kindschi@fiveco.ch>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="miIRVYkp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1786971697; x=1818507697;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zoVTlgD3cD2htjt1jPfKTgtfncDVduw8Z413cvKsh88=;
+  b=miIRVYkpDIf4QrOQRKccQZmoZkosi77RBP5do+QYa2+fe2Bmn87MfBUl
+   U52RQwBrEYnV3iUmffGY11yadH36vHwh0u3+IMztkAAbln+nk5ZJ0dGFH
+   VmF7MuJdoNTkfgy14JoXCPShx/Irf7074sFqRxuUgfa6VTy74zhH3BOor
+   yAc6KUhgdMT0zslJUaqr9UJjQ7NllXVPDTi6w6c6mqualA8bLJZK4wv3w
+   3MV6UMdGspNUJUuKkfvMwJsD3I7jRaJRgjw8fnpYc97CQoUUTWAs4xlqQ
+   girJhKbUHLM+JyyUCaqBP8g65BrZbpsQOYxFuiZBl2W55bMUap7zBg3AD
+   A==;
+X-CSE-ConnectionGUID: RzVl9RYdRTGx2d5TjCE3vA==
+X-CSE-MsgGUID: FetLo2L/TjiFei7aMstdhQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11877"; a="87363062"
+X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
+   d="scan'208";a="87363062"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2026 06:01:35 -0700
+X-CSE-ConnectionGUID: azCg8Rr7T/S8kwEPBqJd8w==
+X-CSE-MsgGUID: yVvpOZZwRqG5LMVSYbkNLw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,228,1779174000"; 
+   d="scan'208";a="258705916"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa009.fm.intel.com with ESMTP; 17 Aug 2026 06:01:27 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 4048899; Mon, 17 Aug 2026 15:01:26 +0200 (CEST)
+Date: Mon, 17 Aug 2026 15:01:26 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	manivannan.sadhasivam@oss.qualcomm.com,
+	Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Stephan Gerhold <stephan.gerhold@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
+Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
+ fwnode callback
+Message-ID: <aoMGJqwcEAHWmZX9@black.igk.intel.com>
+References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
+ <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
+ <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
+ <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
+ <aWSwgRiEkT9unYw9@smile.fi.intel.com>
+ <6peb6afhpm4l7opxbdt3b5sx32longevwds5c3dlqji2hr5dlh@kxuvj55jkqgi>
+ <ljqd5ovcsg7t62tdzd77w5mv5buawm3x7xyapy7n7l7azcaorh@tytj46t2lxyb>
+ <ks2nm67zp5i2grzomu7mjb7uhkuwtd7w5stoqp5kri2clpxpsp@ayn42h7meh5l>
+ <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
- FIVECO-MX01.fiveco.local (192.168.16.44)
-X-Sophos-OBS: success
-X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.8.17.122719
-X-SASI-RCODE: 200
-X-SASI-SpamProbability: 8%
-X-SASI-Hits: BODY_SIZE_5000_5999 0.000000, BODY_SIZE_7000_LESS 0.000000,
- CTE_8BIT 0.000000, DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000,
- HTML_00_01 0.050000, HTML_00_10 0.050000, MULTIPLE_RCPTS 0.100000,
- NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000,
- OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, SENDER_NO_AUTH 0.000000,
- WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000, WEBMAIL_X_IP_HDR 0.000000,
- __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000, __BULK_NEGATE 0.000000,
- __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
- __CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
- __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
- __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
- __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
- __HAS_MSGID 0.000000, __HAS_XOIP 0.000000, __HAS_X_MAILER 0.000000,
- __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
- __MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
- __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
- __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
- __RCVD_CTE 0.000000, __RCVD_EXIM_4_96_AES_128 0.000000,
- __RCVD_FROM_HOMEUSER 0.000000, __SANE_MSGID 0.000000,
- __SHIPPING_ACTION 0.000000, __SL_HEAVY 0.000000, __SUBJ_ALPHA_END 0.000000,
- __SUBJ_STARTS_S_BRACKETS 0.000000, __TO_MALFORMED_2 0.000000,
- __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000, __URI_NO_WWW 0.000000,
- __URI_NS 0.000000
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aoKrmZzmYsyvRJ-5@ashevche-desk.local>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-hci_active_scan_sync() generates a non-resolvable private address and
-programs it with LE Set Random Address on every active scan start:
+On Mon, Aug 17, 2026 at 09:35:05AM +0300, Andy Shevchenko wrote:
+> On Fri, Aug 14, 2026 at 02:49:31PM +0200, Manivannan Sadhasivam wrote:
+> > On Mon, Jan 12, 2026 at 10:01:23PM +0530, Manivannan Sadhasivam wrote:
+> > > On Mon, Jan 12, 2026 at 02:32:21PM +0530, Manivannan Sadhasivam wrote:
+> > > > On Mon, Jan 12, 2026 at 10:27:45AM +0200, Andy Shevchenko wrote:
+> > > > > On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
+> > > > > > + Dmitry Torokhov (who was against this patch previously)
+> > > > > > 
+> > > > > > On Mon, Jan 12, 2026 at 09:56:06AM +0200, Andy Shevchenko wrote:
+> > > > > > > On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+> > > > > > > 
+> > > > > > > > Because the software node backend of the fwnode API framework lacks an
+> > > > > > > > implementation for the .device_get_match_data function callback.
+> > > > > > > 
+> > > > > > > Maybe this is done on purpose. Have you thought about this aspect?
+> > > > > > 
+> > > > > > IMO, software nodes were introduced to add sub-properties to the existing
+> > > > > > firmware nodes, but it has usecase/potential to go beyond that. More below.
+> > > > > 
+> > > > > Potential doesn't mean the necessity.
+> > > > > 
+> > > > > > > > This makes it difficult to use(and/or test) a few drivers that originates
+> > > > > > > > from DT world on the non-DT platform.
+> > > > > > > 
+> > > > > > > How difficult? DSA implementation went to the way of taking DT overlay
+> > > > > > > approach. Why that one can't be applied here?
+> > > > > > 
+> > > > > > Sometimes you do not have any DT node at all.
+> > > > > 
+> > > > > Yes, that is exactly the case I have referred to. The PCI core (in Linux)
+> > > > > is able to create DT subtree on non-OF based platforms.
+> > > > 
+> > > > Maybe I should look into creating dynamic DT node for the device and insert it
+> > > > to the uart node. Theoretically it should work.
+> > > 
+> > > It worked flawlessly. So I sent v4 incorporating this design:
+> > > https://lore.kernel.org/linux-pci/20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com/
+> > 
+> > Andy, I had to revive this old thread of a merged series as Krzk is not in
+> > favour of adding DT overlay or dynamic OF nodes for these BT devices [1]. His
+> > objections are due to the fact that we are just adding BT nodes of a
+> > discoverable device (M.2 PCIe device) without any resources. So the node just
+> > contains the compatible to match with the serdev driver and nothing else.
+> > 
+> > And he suggested to use swnodes or other similar mechanisms to plug with the
+> > serdev driver as that's the only thing we want here, not a true hardware
+> > description.
+> 
+> SW nodes are not for describing HW from scratch. They are for fixing missing
+> pieces. If you can justify your case as a missing piece for the *existing*
+> device (which is enumerated using standard mechanisms), you can add a property
+> that fills the gap.
+> 
+> Unfortunately I see that there are `PROPERTY_ENTRY_STRING("compatible", ...)`
+> cases in the kernel (only 9 drivers so far), and I can't say if they describing
+> missing pieces or a SW-made descriptions of the hardware. For the latter the
+> DT/ACPI/other means but swnodes should be used.
 
-	/* All active scans will be done with either a resolvable private
-	 * address (when privacy feature has been enabled) or non-resolvable
-	 * private address.
-	 */
-	err = hci_update_random_address_sync(hdev, true, scan_use_rpa(hdev),
-					     &own_addr_type);
+I have read all replies by @krzk and the question here, why don't you use
+auxiliary bus? It seems the best suit for the case.
 
-BLUETOOTH CORE SPECIFICATION Vol 4, Part E, 7.8.4 states the controller
-shall return Command Disallowed (0x0C) for LE Set Random Address while
-legacy advertising or scanning is enabled.
+> > Since you strongly objected the swnode approach in this series, I wanted to hear
+> > your opinion before I rework the code.
+> 
+> > [1] https://lore.kernel.org/linux-pci/768142f0-2638-41f3-a34f-dc80bb99eb7f@kernel.org
 
-Advertising is only stopped beforehand when LL privacy is in use.
-hci_pause_addr_resolution(), called just above, returns early when
-!use_ll_privacy(hdev), so its hci_pause_advertising_sync() never runs.
-On a device that advertises while active scanning - a peripheral that is
-also a central, such as a gateway - every scan start therefore issues a
-command the host can already know will be rejected:
+-- 
+With Best Regards,
+Andy Shevchenko
 
-	Bluetooth: hci0: Opcode 0x2005 failed: -16
 
-The address write is not retried either: hci_set_random_addr_sync()
-defers only when hdev->random_addr is already set, and it never becomes
-set because the write keeps failing, so HCI_RPA_EXPIRED is not used here.
-
-Observed on a BCM43455 with Privacy=off, one advertising instance and
-continuous active discovery, at the scan restart period (~10 s):
-
-  < LE Set Random Address  Address: 02:16:91:90:F1:D4 (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-  < LE Set Random Address  Address: 26:90:57:96:9A:3E (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-  < LE Set Random Address  Address: 16:32:01:BC:B5:CE (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-
-Pause advertising for the address update regardless of privacy, and
-resume it on every exit path. Previously the resume was guarded by
-use_ll_privacy() and only reached on the error path, which matched the
-pause being privacy-only.
-
-With the patch, the same scan restart on the same hardware:
-
-  < LE Set Advertising Enable                            Success
-  < LE Set Random Address                                Success
-  < LE Set Scan Parameters                               Success
-  < LE Set Scan Enable                                   Success
-  < LE Set Advertising Parameters                        Success
-  < LE Set Advertising Enable                            Success
-
-Over 35425 records / ~4 min of btmon with continuous active discovery and
-advertising enabled there were no Command Disallowed responses of any
-kind, against one per scan restart before. A central could still connect
-to the device, confirming advertising is restored after the pause.
-
-Tooling disclosure (Documentation/process/generated-content.rst): an AI
-coding assistant was used to investigate this and to draft the change;
-the patch text and code are its output, reviewed by me. Inputs were btmon
-captures and kernel logs from the affected device, with the request to
-identify what re-issues LE Set Random Address every ~10 s and to fix it.
-Three earlier explanations it proposed were discarded after being checked
-against the captures: bluetoothd restarting service discovery; RPA
-rotation (excluded, Privacy=off); and the static-address branch of
-hci_update_random_address_sync() (excluded, both random_address and
-static_address read 00:00:00:00:00:00). The cause was only established
-after decoding the command payloads, which showed a freshly generated
-non-resolvable address per attempt. Testing is as described above, on the
-device, using btmon and a second device to confirm connectability.
-
-Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-5 btmon
-Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
----
- net/bluetooth/hci_sync.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6074,6 +6074,14 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval,
- 	if (err)
- 		goto failed;
-
-+	/* LE Set Random Address is disallowed while advertising is enabled, so
-+	 * pause it for the address update. hci_pause_addr_resolution() above
-+	 * only does this when LL privacy is in use.
-+	 */
-+	err = hci_pause_advertising_sync(hdev);
-+	if (err)
-+		goto failed;
-+
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
- 	 * private address.
-@@ -6102,13 +6110,18 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval,
- 	err = hci_start_scan_sync(hdev, LE_SCAN_ACTIVE, interval,
- 				  hdev->le_scan_window_discovery,
- 				  own_addr_type, filter_policy, filter_dup);
--	if (!err)
-+	if (!err) {
-+		/* Advertising was paused for the address update above. */
-+		hci_resume_advertising_sync(hdev);
- 		return err;
-+	}
-
- failed:
--	/* Resume advertising if it was paused */
--	if (use_ll_privacy(hdev))
--		hci_resume_advertising_sync(hdev);
-+	/* Resume advertising if it was paused. hci_resume_advertising_sync()
-+	 * is a no-op when hdev->advertising_paused is not set, so this covers
-+	 * both the privacy and the address-update pause.
-+	 */
-+	hci_resume_advertising_sync(hdev);
-
- 	/* Resume passive scanning */
- 	hci_update_passive_scan_sync(hdev);
---
-2.34.1
