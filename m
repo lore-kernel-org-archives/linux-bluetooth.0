@@ -1,65 +1,129 @@
-Received: from out-6.smtp.github.com (out-6.smtp.github.com [192.30.252.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536F83F4841
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 10:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A693F8883
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 10:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786961011; cv=none; b=bsn9xNUG657BQPTmfF1kNO3ilm1NiVl0Oq6eSq80zIPypBXYOLpklKfLyufVyFiYf2oMHRvywicOULN8X6E4iR0yzjl3hvct6LYOLogbm9FJlNvaRv2xQfPi/YIZc0+tPKFdiAVr8UP7vuWWo0andPeq3nW0tFE4OsLB/GFHbH0=
+	t=1786962461; cv=none; b=Kh5r8Li3Swo3uvOdvkUfXXLUkcxzCt3xEFHrdBi6ByxV79Krb1Yz5O55MQ+qYIFrw4uxfdvDOrO+Blp0cOdrK4UQX9GtIFkvzBljuLFx8MOMfSyN1nnY/++8v7DcZ7fI4LOzsOIEnKHqY5hMCF3IGFV8tCtMqoV/nyJcbAfpOE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786961011; c=relaxed/simple;
-	bh=9KGNbsvkPv1oAMOYa5r6T1dE0d076T3V/sGN5gwvVb8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cmO5i+DIWS3N2PIeKWajOSotQV6WZUwfXWsIoWLD/IqY6rAqwHW30yHn4wC94qjIj9Qvv7m/YMABNssxvOFAxmNtkGS83qo6HaMMWa0ixu4kXyqn8EG7bKHMzjNcjHU/sCAJDo/gT633SqIy4dHSQE5yuopRExYXiw0V4zGMFu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DojuN3os; arc=none smtp.client-ip=192.30.252.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1786962461; c=relaxed/simple;
+	bh=as2WNDpTQR5ek+FXTSNK0J8LRtbnk1dxEPsHsigPr5s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=OU3ihmAIcqA/PiC2iBtgNvz3fieWj5TNFsyZDy5L7XtZV9odQXiWPMcGhWZRCeGbbNQzlTsoI+m8ZMgVx/8+rta3vcgHaK5cD2Fbsj+wbOY6VRFPuLIZHum2MTB4uEjA9QznYYz5Aebhe936eDnRJ4AZE/tILOhYTUMRGjn7e24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G335SYHZ; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DojuN3os"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1786961006;
-	bh=uIuBqyE/g0SpwrNWN/vLqgeL5dC7oOF9KX85GcmZwUU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DojuN3osldK6CPJgyRSA5wCJbVQ6SmWsDhgPRPRsr2b5s6WTWNSWOAXArR+DSy0kE
-	 bYMiMwiyXO0nie37qYYrKGP26RyVGipocofwDx0Qn9iW0CT9/hb3L6Vs4UQo23yDFz
-	 JKTc2lavXuwLKgsddfNiFZ9bBmNYvNaf2htrhDak=
-Received: from github.com (hubbernetes-node-f506961.va3-iad.github.net [10.48.71.99])
-	by smtp.github.com (Postfix) with ESMTPA id EAC487811A3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 03:03:25 -0700 (PDT)
-Date: Mon, 17 Aug 2026 03:03:25 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1147094/000000-bff6d7@github.com>
-Subject: [bluez/bluez] bff6d7: avrcp: Fix media/folder name not being set
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G335SYHZ"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6b026020b92so1663357eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 03:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786962457; x=1787567257; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=EjMW5K3DamMdsXutIgADaYVXA8RhhOQuUOCbQq/b4C8=;
+        b=G335SYHZ3iqU9e6kdLKmwXt99q6lZfVPEQmG1GJ9NnwTBh+6QZX6gL+9h1oJoPJEDp
+         tbkusCGlz8XaM2/rEgi+OU7ZASvL0Ccvap3Z9WcEo45GAzpCFoXWANiImuqKvXaTaNuq
+         HKYg4ftSxH2zSl0Kh+oJescU9fg+xScQMHg/ZlzT9F8oZ4Nqovyy7ikDo7WMBEUbXvDd
+         4PGuJmg/63HotBkzcD0XsMPpNGntOwRlTGN8xiSepmNPtr2+H02hN6Ok3QhTaccPGXaN
+         VJv/dRdBjBKhyUkYpowULHAX795zGTMgcf4h0Z1Kx6QxbFm5Etqjtmy6Gt9LG0gE/kye
+         lG9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786962457; x=1787567257;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=EjMW5K3DamMdsXutIgADaYVXA8RhhOQuUOCbQq/b4C8=;
+        b=jGkRHJ2fNWZqyElO+S+36SuEy0q9ttbCoUpDq0M/gTW25GjgdAuFzy6EMzGs3BFo20
+         /HTUBNYFbPG9lEO56gCiase5aOViC4eVUyWL/RzhZiEvhfA9693uhQeRPjqbY8D5rSKX
+         OnuZUutouK05f7bsmQfyK6wDAocAcyaA3/8vu/TMrfw0K9zYyrW5nNE/kx4aU9ty4u2Q
+         tPF0hnLNWdQRjpN3Kuqg5qaSJ6HJaFWbzdZqR/bJgYD7nONcPocOQfVIgVtkZPEsKsIz
+         SlujwRGyqXYwPSltzfSlzgbsN+BdXyKySw6VzrYrBrCi+s1m9xs4BrHv9DMPC5/c/t6b
+         NT0A==
+X-Gm-Message-State: AOJu0YyCzBnnSBeISBpUovdqtmuuLtL0+hSjkp9n0fAYM59NAkwjCMZF
+	5+yR7uD1UHY79SnaQeiYVpcAslwuWlvEr6sMtveZxe5IfWvBPqsW/J0vsdKOLA==
+X-Gm-Gg: AR+sD13d0X5/6S+wXgBqFrB8PFjx++2NQwyNSLM8yt0LccifIBgo93ZUl7a05ve94hw
+	jaR+T9/LuxTyAOWyQalYVSf2iITUp1nhVYfc0fNSCeGwlz+eoeHOY6cmbP36eB8wYUeRe1gXgZd
+	Uol80J29v5NUMNdwqZzCu7E1XSC05eQKd1rwWL+ZwxWWkizRl75LQXt+vliT7hh33pH7sHPRfkF
+	4bmirxpgvnl20We6H0obEEGDG3oEYJ5XCbPQsi3lSZJPWB9lNivypVg4BING/U5n8FvGwAKdo7l
+	QmD7BIUAiVGwjITG7ZXbrfdnkebvtW89D/YwhVyJaph//fnDlTbg32QPDiIp1N9QjQ3WtTkt8tN
+	51yq/Ra9M97JTAAuXuNwej0VNvuK4HvlGZT2pn0z8NpM1k6Jcc85ka6X3ilGYIVNQ0ffoEq+l0v
+	i9mJNoRQQSJlUZaE8pc+0jjxRLenP4VGgGjtTOzZPsqaqnwkw1sEAG47pUdPA6G/2/CyOoVV1IX
+	Wb3
+X-Received: by 2002:a05:6820:1627:b0:6b0:5bd1:4722 with SMTP id 006d021491bc7-6b0d6176dedmr19097223eaf.13.1786962456677;
+        Mon, 17 Aug 2026 03:27:36 -0700 (PDT)
+Received: from [172.17.0.2] ([172.202.78.8])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b1165ac753sm1146193eaf.1.2026.08.17.03.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2026 03:27:36 -0700 (PDT)
+Message-ID: <6a82e218.e7dc12fb.24606e.752f@mx.google.com>
+Date: Mon, 17 Aug 2026 03:27:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5550113233539371751=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: Bluetooth: btmtksdio: Fix SKB handling in the TX path
+In-Reply-To: <20260817095332.182994-2-chris.lu@mediatek.com>
+References: <20260817095332.182994-2-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5550113233539371751==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1147094
-  Home:   https://github.com/bluez/bluez
-  Commit: bff6d764989be510665d5f16055e70de13dccdf2
-      https://github.com/bluez/bluez/commit/bff6d764989be510665d5f16055e70de13dccdf2
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-17 (Mon, 17 Aug 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/avrcp.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  avrcp: Fix media/folder name not being set
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1147102
 
-*namelen was used before being set.
+---Test result---
 
-Fixes: bd8989620ed6 ("avrcp: Fix Out-of-Bounds Read in AVRCP GetFolderItems parsing")
+Test Summary:
+CheckPatch                    PASS      1.13 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      0.48 seconds
+SubjectPrefix                 PASS      0.20 seconds
+BuildKernel                   PASS      17.26 seconds
+CheckAllWarning               PASS      18.63 seconds
+CheckSparse                   PASS      21.78 seconds
+BuildKernel32                 PASS      16.31 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      298.53 seconds
+IncrementalBuild              PASS      17.27 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[2/2] Bluetooth: btmtksdio: Fix out-of-bounds DMA read in the TX path
+
+6: B3 Line contains hard tab characters (\t): "	err = sdio_writesb(bdev->func, MTK_REG_CTDR, skb->data,"
+7: B3 Line contains hard tab characters (\t): "			   round_up(skb->len, MTK_SDIO_BLOCK_SIZE));"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
+https://github.com/bluez/bluetooth-next/pull/597
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5550113233539371751==--
