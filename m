@@ -1,111 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723DD3B637E;
-	Tue, 18 Aug 2026 10:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8855E352C3C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 10:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787048317; cv=none; b=gLw4cm7TvCm7nD1F4G4ewVchABVvFTOxRalRlZMkpUQuKVPAxCWZJt9/LYrvYHW5e0QkSMcOxXjUGrvmzFSpH/umx3VsLWfepqEanA9kmH2dV3yDXPIzJZuyH//GV3yXdwClN/QjXK6sWH7IJNrs/HFH1tgobXTEyXraUr0gcjM=
+	t=1787049424; cv=none; b=JOnuJnmQjTOoiqjmnx2GHDtnghiLmtqR3Oos/8WbDYLynUwms/zdMPOYZIl0+njArlbpyGquIku3M09D65XEyrtv1IQSpTwnEUl5undnLH6xLkiDZvlGItjY54jIElhMnCHEJEeD57HcXmr/Dv+8XJtrRefxGTDn9scSZlPGriE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787048317; c=relaxed/simple;
-	bh=W1YH3+8VVyvfEepL+yHDGcRwlem1OIr1djZsbDMYCGI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p1G5xVdMRfQLxV06qynilKWYxdD4yZy4o34fIs4LTugLlkFxo8/wsjZA0jjOcXGAsPWHTG7lvYqwfbrGUtINGkgKk6AAScDTE0Af/HzL1vONOseCBgvm2Wrv6EY6Znbi8Ww5ESI93mj9hHaYjXK4lQ9oZLh5YLlOwVcV7ZrS/BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KV386nPW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787049424; c=relaxed/simple;
+	bh=3KasoFhtjpggFokhU5AklkXi0vJzE8KIaFk81mwF54U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VbS9Aanr8IagQ+9bSCkb60E/7l6n8N6aCIrWcjfUQk5Rgly22blk/AxgpE2oe9s1jfJqrTKQnNp12EZZzQID3YdznivgFnszbLOpKaPO7llB4hhAkhiIievEZs7ay4ioBYk38G6a11hwuZj7UlV3pBwhYEHm79bYzJRYkyIAMYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X51Z6dPn; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KV386nPW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECAF21F000E9;
-	Tue, 18 Aug 2026 10:18:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787048316;
-	bh=jwMVdHrvk7kTvruvTnXxLTgiBwjN9S2XLihzM95fzKA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=KV386nPWRRE08204XuIMIhxBIzXbvitBA2n8kC55lLchcC5H77jxWoNLp+CcZpgn3
-	 2LTsZDmsFve1IDOETXFC31pTaUC6MfVOaYE6NuvXCjh/RzCry0bp9mbFs2YZLEwSi6
-	 oDATN7X738a1cU1OBcGN4JFa2c6YxmKRqdxEVKExxYfuq7Doi24xvNkSfVcJwA4zmV
-	 a35f81ArZpZD7kevePUAlhXuTZMr71l2xfygQfsQub6A0mylXm3vaZqOT0UlpqPG07
-	 FpGyINUmTYl6VeIi1AW37N4uDPvYztCq/elHtEVXuU9F7lFFLOmQMxTQAQ+7ebylFv
-	 jC9UKQtXv+BQw==
-Message-ID: <63b6eb28-dc1b-4e51-89c0-1591ff216da5@kernel.org>
-Date: Tue, 18 Aug 2026 12:18:31 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X51Z6dPn"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-930f618435cso258549985a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 03:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787049422; x=1787654222; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=bl8kEFEfE/+g37Ux9zbwhW30qD2aF82VrIWPT3MNU24=;
+        b=X51Z6dPnWrjv/PyW5nvf5Z7hXkRMIw3EDq0BehFDGNQ8QE5surWmYxQNN75MNhL72v
+         SY+/0ylePusHOXrWWIN5uSys6kvXGIzv+Pg5GY3fm5+AhIOSWLe4HC4nEj3b3fADXhK3
+         qbJalddjiywIpkXvCt79SIcn4p6qImlOHuER4AmXil1Cqs3wK+OcSmSafR4SH4MeS4my
+         9cWsUKwPJ81aT5ZkjnV+luQ4+v1w98gRVYZ1uEEfmtVmRziv/BF+WK9lH8mN/zk2s9ms
+         st3HFNBx0z7UANcGDCoeUXIVGYUroF27KiwQGmyaDM3JKei6sseZHNk/yTry86k0PU1u
+         nG/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787049422; x=1787654222;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=bl8kEFEfE/+g37Ux9zbwhW30qD2aF82VrIWPT3MNU24=;
+        b=qImdcXex1uZZtByI1u+DQ0Dhsk1VbTO+yEnEHdQiYs49yuJUHV3P+q5F4Gh2OE5+jp
+         kpAlqZokbGiHFK24qXkJ8ih6gFXpFxsrxcu4fE3E0W8T6RtsaS5dL5PoPyCKPQMvfZ2/
+         dnTUA6iCO1JcGZq5FsZraX3BzmgB8DXjIFoyXs/dhVnhjeb/kBOwdHnUbgMxkaWyIgni
+         EgrPvedkcl5/3bB5HMWu8OtoxVm2Tk9QFKbl/Qi46KMvTf/BrDPRBoMevqhsUAEAaFMJ
+         B3oppzeVSQDK3D2lxE2Me8Lflp4Sa3VBKwZXWsCrsXlE4cDNuOvn+6tO9k9CiMt6evg8
+         T9eA==
+X-Gm-Message-State: AOJu0YyKJ+y1bUZoekbGVK/4RN4ed124AAcEe42zxx8Yz7SEKYXCbyEn
+	Ffxhd49PY2hPj0jXgxN5MC3zda3YO4uvvhsbPge/B+AFtrirR7ZaiRMdgGX5Yw==
+X-Gm-Gg: AR+sD13ilgF8I+LK1iSNja3hRf3/IwTkByw3T1Nc0/gZ/bFPItW8XXD49bJbcRRqE+w
+	WX/IKKoHVlDP6gyieWwU2Vjy8m+fMLIDHv96DU21KDo2pgrRIMeobYafvVrnuVgy9Iod8nojVgy
+	IlJ4+Wdl6gCuZwxam2lSJ4dZH3WkFih1jWqjc6LujE4eIxKX1ON95OvYKzcYlMZG2wLeEcauLjj
+	G/5qs6F9XGV5fG8cn1DueL85SG9oh46Pp/kH2b+UhN8pP2L671lWA2GEFJ/RAAnQ3sY2AiGwOru
+	4hV0H1xKs5fS+Co9SxiuRQhVOzFUT1QnmnKaK9Af09nbYfxuRNg5E6q8p31VI69Yt68H/JgEbF5
+	0GcRwP2JyjiDh/zOs3ofsjVtTEeKfSyInzpT5axHsHyiCqn0PQJxemuUZ2aSuouO9s+T0RjWj3J
+	ElL/43ZIibQqdpJw85rqgVZKQRYEqJIX7Sf9Xi11YH8WCJ94WXvfZoJar0nB2wbMqLkfI=
+X-Received: by 2002:a05:620a:a188:20b0:936:9fd4:e2bf with SMTP id af79cd13be357-936d230fc18mr2450766085a.37.1787049422279;
+        Tue, 18 Aug 2026 03:37:02 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.38.242])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9370342513bsm256223685a.40.2026.08.18.03.37.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Aug 2026 03:37:01 -0700 (PDT)
+Message-ID: <6a8435cd.0ea1c686.251490.1a49@mx.google.com>
+Date: Tue, 18 Aug 2026 03:37:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3860049605218792014=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_bcm4377: Ignore reserved PHY in ext adv
- reports on BCM4378
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Janne Grunau <j@jannau.net>,
- Neal Gompa <neal@gompa.dev>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, asahi@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260818-fix-bcm4378-ext-adv-v1-1-81a143eac194@kernel.org>
-Content-Language: en-US
-From: Sven Peter <sven@kernel.org>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ljs@kernel.org
+Subject: RE: Bluetooth: hci_bcm4377: Ignore reserved PHY in ext adv reports on BCM4378
 In-Reply-To: <20260818-fix-bcm4378-ext-adv-v1-1-81a143eac194@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20260818-fix-bcm4378-ext-adv-v1-1-81a143eac194@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3860049605218792014==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 18.08.26 11:49, Lorenzo Stoakes (ARM) wrote:
-> Commit ed2a2ef16a6b ("Bluetooth: Add quirk to ignore reserved PHY bits in
-> LE Extended Adv Report") added a quirk to handle creative use of the
-> reserved bits in the PHY fields for 4388 controllers in Apple silicon.
-> 
-> I observed the same issue with the BCM4378 Bluetooth controller (14e4:5f69,
-> rev 05) on an Apple MacBook Pro (13-inch, M2, 2022):
-> 
->> HCI Event: LE Meta Event (0x3e) plen 51
->        LE Extended Advertising Report (0x0d)
->          Num reports: 1
->          Entry 0
->            Event type: 0x2513
->              Props: 0x0013
->                Connectable
->                Scannable
->                Use legacy advertising PDUs
->              Data status: Complete
->              Reserved (0x2500)
->            Legacy PDU Type: Reserved (0x2513)
->            Address type: Random (0x01)
->            Address: EA:C1:82:F0:24:C6 (Static)
->            Primary PHY: Reserved
->            Secondary PHY: No packets
->            SID: no ADI field (0xff)
->            TX power: 127 dBm
->            RSSI: -57 dBm (0xc7)
->            Periodic advertising interval: 0.00 msec (0x0000)
->            Direct address type: Public (0x00)
->            Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->            Data length: 25
-> 
-> This results in the firmware rejecting connection attempts with
-> "Unsupported Feature or Parameter Value" (0x11).
-> 
-> Fix the issue by using the same quirk for BCM4378 devices too.
-> 
-> I tested this locally and confirmed that the issue is resolved.
-> 
-> This was observed when attempting to connect a Kinesis Advantage 360
-> keyboard to the MacBook.
-> 
-> Assisted-by: Claude:claude-fable-5
-> Fixes: 2e7ed5f5e69b ("Bluetooth: hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> ---
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Sven Peter <sven@kernel.org>
+Dear submitter,
 
-Kinda surprised no one ran into this so far tbh.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1147701
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+VerifyFixes                   PASS      0.42 seconds
+VerifySignedoff               PASS      0.18 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      25.73 seconds
+CheckAllWarning               PASS      28.79 seconds
+CheckSparse                   PASS      27.87 seconds
+BuildKernel32                 PASS      25.54 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      462.35 seconds
+IncrementalBuild              PASS      25.06 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
-Best,
+https://github.com/bluez/bluetooth-next/pull/607
+
+---
+Regards,
+Linux Bluetooth
 
 
-Sven
-
-
+--===============3860049605218792014==--
