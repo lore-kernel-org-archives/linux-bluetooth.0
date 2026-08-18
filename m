@@ -1,130 +1,110 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7D38AC8A;
-	Tue, 18 Aug 2026 07:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282A03D0BE5;
+	Tue, 18 Aug 2026 07:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787038685; cv=none; b=FNnxNuegiIZ0t7KOgkNcTiSVh+NzbqOCKezPbOjVXvXtMTxpJkfS7Cr/CYGvgUFkqXOxN5JJJgkaFrZmM4l7Sd9+XYFmbywRofJAKZk837a2R/Ap2m0HyGpbkAQiUgiczUZ5g9AqBOiEW9HYm3ADOLTPJoskJ5Bo98/rvHkil/I=
+	t=1787039629; cv=none; b=plzAxMBilSwY/ZH770mg+APPsf8Q9e4vgJYLhQZn4wzqz5moLQkDyN0HVsZiZGi73M1TRBxVtUN3afqtfpcPrSlZBGGAGEYxlmkKi/iGvK5Wg+/PL+nT1/pER9vQxy3nEcY1ZdnIUdTX6AGc+gd+jZJlP6mLz+IWqfM5YjXdszs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787038685; c=relaxed/simple;
-	bh=xK+Y+B7n0HypJyZFzzQ1G8TvSvX5hQztgIdbWqDMbFg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FtPyfXMMERg6BQpLnbc4kciRbSqj/2ADdgAnFQpnqsq0UdYlZMPfMbiyKJIEckL/piI/vhSB76lEVGA3V2tYa0Oa40M3I0OrTnXTdrwFFkZhi7mIa0tu+2IVha8070QI8wfN7KPnU4ffzwZFdj4svDyqr5ZiZVmoJT9pmz3h58o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 819C94C2C37F04;
-	Tue, 18 Aug 2026 09:37:39 +0200 (CEST)
-Message-ID: <0893514d-320a-4dfa-9012-afd98f99656b@molgen.mpg.de>
-Date: Tue, 18 Aug 2026 09:37:37 +0200
+	s=arc-20240116; t=1787039629; c=relaxed/simple;
+	bh=St19Pl0mftkYZFYjEf/SQrJWd+yl1c5vKDKc/ymbbek=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gtZrga4h5QuGBR0p3HMrOzXUgq1INjfJPVOxTSlMmtfbZQ7SJpYACymWYCn+9+MJ7jGK5Iet1ZNxHVnCTvQiaFQhoNVLZR7NtN5hmSaGcCQlBKURtmcXg18OTUF1VIzqGjGOzmNzZtLBH6zY2UItsD61/JfVbsvwwWvbzjYc1E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: ec0692c29ad911f19a56ed5b684f684d-20260818
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:d2326a37-bd2a-44f2-92ad-f6f7c88e8710,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:7db8b62,CLOUDID:70bffb1bdf9e52cce7602c3f90b7257c,BulkI
+	D:nil,BulkQuantity:0,SF:102|136|865|898,TC:nil,Content:0|15|50,EDM:-3|-100
+	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: ec0692c29ad911f19a56ed5b684f684d-20260818
+X-User: liujiajia@kylinos.cn
+Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liujiajia@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 299611927; Tue, 18 Aug 2026 15:53:38 +0800
+From: Jiajia Liu <liujiajia@kylinos.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Ying Hsu <yinghsu@chromium.org>,
+	Archie Pusaka <apusaka@chromium.org>,
+	Abhishek Pandit-Subedi <abhishekpandit@google.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jing Cai <jing.cai@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Chris Lu <chris.lu@mediatek.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jiajia Liu <liujiajia@kylinos.cn>
+Subject: [PATCH 1/2] Bluetooth: btusb: Fix leaked runtime PM reference in btusb_reset()
+Date: Tue, 18 Aug 2026 15:52:15 +0800
+Message-ID: <781dc2cd5ab0533fff9ee7fdcb92fff573431f18.1787039123.git.liujiajia@kylinos.cn>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
-To: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, linusw@kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kaihsin Chung <kaihsin.chung@synaptics.com>
-References: <20260818014948.996739-1-kaihsin.chung@synaptics.com>
- <20260818014948.996739-3-kaihsin.chung@synaptics.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260818014948.996739-3-kaihsin.chung@synaptics.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Kaihsin,
+btusb_reset() calls usb_autopm_get_interface() to resume the device
+before queuing a reset of it, but never calls the matching
+usb_autopm_put_interface().
 
+usb_queue_reset_device() ends up in usb_reset_device(), and since
+btusb provides no pre_reset/post_reset callbacks the interface is
+merely unbound and rebound: the interface device object survives
+this cycle, and so does its PM usage count, which is not cleared
+when the driver is unbound.
 
-Thank you for sending v2.
+As a result every reset permanently leaks a PM usage reference,
+preventing the interface from being runtime suspended again until it
+is unbound.
 
-Am 18.08.26 um 03:49 schrieb Kaihsin Chung:
-> Add support for the Synaptics 4384 Bluetooth controller
-> by adding the corresponding chip IDs.
-> 
-> Tested on the VIM3 platform. Verified that the controller initializes
-> successfully and that firmware loading and basic Bluetooth operation
-> work as expected.
-> 
-> The VIM3 is a Khadas single-board computer that I used as the host
-> platform for testing the BCM4384 Bluetooth controller.
+Calling usb_autopm_put_interface() right after queuing the reset: the
+reset runs asynchronously in a workqueue and usb_reset_device()
+resumes the device on its own.
 
-Both paragraphs could be merged:
+Fixes: c9209b269afd ("Bluetooth: btusb: Introduce generic USB reset")
+Assisted-by: Claude:qwen3.8-max
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
+---
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tested on the Khades single-board computer VIM3. Verified that the 
-controller initializes successfully and that firmware loading and basic 
-Bluetooth operation work as expected.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2bae85b0016c..cc19828893c6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1051,7 +1051,6 @@ static void btusb_reset(struct hci_dev *hdev)
+ 	int err;
+ 
+ 	data = hci_get_drvdata(hdev);
+-	/* This is not an unbalanced PM reference since the device will reset */
+ 	err = usb_autopm_get_interface(data->intf);
+ 	if (err) {
+ 		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
+@@ -1060,6 +1059,7 @@ static void btusb_reset(struct hci_dev *hdev)
+ 
+ 	bt_dev_err(hdev, "Resetting usb device.");
+ 	usb_queue_reset_device(data->intf);
++	usb_autopm_put_interface(data->intf);
+ }
+ 
+ static void btusb_intel_reset(struct hci_dev *hdev)
+-- 
+2.55.0
 
-> Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>
-
-Note, the author field uses a different address. It would be better if 
-they matched I would suggest to use the synaptics.com address.
-
-> ---
->   drivers/bluetooth/btbcm.c   | 6 +++++-
->   drivers/bluetooth/hci_bcm.c | 1 +
->   2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 463d59890bef..63c4c788d9c4 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -31,6 +31,7 @@
->   #define BDADDR_BCM4334B0 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb0, 0x34, 0x43}})
->   #define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
->   #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
-> +#define BDADDR_BCM4384B0 (&(bdaddr_t) {{0x93, 0x76, 0x00, 0xb0, 0x84, 0x43}})
->   
->   #define BCM_FW_NAME_LEN			64
->   #define BCM_FW_NAME_COUNT_MAX		4
-> @@ -130,7 +131,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
->   	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
->   	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
->   	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A1) ||
-> -	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
-> +	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B) ||
-> +	    !bacmp(&bda->bdaddr, BDADDR_BCM4384B0)) {
->   		/* Try falling back to BDADDR EFI variable */
->   		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
->   			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
-> @@ -514,6 +516,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
->   	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
->   	{ 0x410c, "BCM43430B0"	},	/* 002.001.012 */
->   	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
-> +	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
-
-What about A0? It’s not added in the hunks above. Please add a comment 
-in the commit message.
-
-> +	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
->   	{ }
->   };
->   
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 9a103db7e355..e70b9f3fd968 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -1593,6 +1593,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
->   	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
->   	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
->   	{ .compatible = "brcm,bcm4335a0" },
-> +	{ .compatible = "brcm,bcm4384-bt" },
->   	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
->   	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
->   	{ },
-
-
-Kind regards,
-
-Paul
