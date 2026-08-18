@@ -1,58 +1,73 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050DC3D79FD
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 10:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E4845DF6E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 11:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787050726; cv=none; b=UbbKfKbcyzh0atPt3vB8vWzDaBdzW/bg33AdZNO9xffa0mAAZd3zqmZ9kodOcsa3Iiv2e3xrSvHSVyT0wP9jjtpiz+R3o5mZusP4L/8Hu9z3e4sync7vhVeBEXj0RxG84XKI4tGuNqQ2Gbfr8wzeO8pDepQTKJ5Gk2o0SO5W70I=
+	t=1787051084; cv=none; b=bTTdQUQ/FKkaeQTlPiPrJOEeKEEX+Ul8ywUJYW1MtKkui5VpdSWkjmBnpOdV2EUVvv5Cf3AO1vK4euiOHDclxirxZWyILOWgShbY+oWJZiVQsvlMi//71jQuyJxwNNjotcFUU+3Ur5tPhlv194tnzOZOQoOJscdOwL7sd7q24Eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787050726; c=relaxed/simple;
-	bh=l5uJ+FqrIZxVY114n2V0iQ2cMeR6YX4hiLW35O4StlQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZEJzCAAEufzVM2mpIceSqbBGtsguao7Wkfqx3DrV2FqNiKLFtvPbHM1mHU9bTfn7LaNzHbfyNOvA6M1jahJxq3Kth6v7J/eQyNrP9ln95MU+fh3QFgQAFi7vTrtdYUxIPOTKIdyY0UsRNMbdcuiOfRD35v1Y60L6AwyUbxv0qEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+	s=arc-20240116; t=1787051084; c=relaxed/simple;
+	bh=A8BQeDXvl3zW0UsfQiN/q+NLyDRNpSxcvbVPBeHfuTw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uaSrUw3QbQmA8/NET90rI92hgtqzqP28zIy2TGu+G/oAtBxKrtJHMrkgbDgV1V0cEBZNO61qmphaRG0KpKqlaEQxluli3uhjKAzMObQgd378eynyMX/tIpzQGV0ooU7T3cKc0MEyU5qsLOStW1eb6ULMRb0KsVIz8vUseZc+CsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 129833E9B9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 10:58:35 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A350A3EC25;
+	Tue, 18 Aug 2026 11:04:33 +0000 (UTC)
+Message-ID: <4a1bb85f481bb2fc0d863cd2c84e9b03d00d1c14.camel@hadess.net>
+Subject: Re: [Security] Patch for stack buffer overflow and heap OOB read in
+ avrcp.c
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ] avctp: Fix typo in comment which contradicts the conditional below
-Date: Tue, 18 Aug 2026 12:58:21 +0200
-Message-ID: <20260818105827.600893-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.55.0
+To: nathan auvray <nathan.auvray60@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 18 Aug 2026 13:04:33 +0200
+In-Reply-To: <CAB6rVYfCF5+jpSTtZ8u+S4LxCZ+kGudm3OWU=-fCMbZJnYDZUg@mail.gmail.com>
+References: 
+	<CAB6rVYfCF5+jpSTtZ8u+S4LxCZ+kGudm3OWU=-fCMbZJnYDZUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTEXAnxJabMAZCofs6D+KoFNz2JeFxG1r4HdAGfbLyd0W1eDtKQCMHVJPXbhezaNXW0LCTxYg2atK6quz+8C4i43pcdmyKNzIe4eS2RZvkQ+ZBSnrXHGTRsZdevKFlTDeScfD9Ve+M9BfWFqf7rbjtkdXLbh5W0Km+XyviamPirs+/AqdyJ+Qk7LdIT6S2J2B6oB5h+nksmGqQBTRJkW25nY9W/wfRYQpUIhd+gzNEH7Jxxue3LWWlZIMzJBeCYCqSYmBSzUZlwACE2uUiHbGqR3mU+Oja6PtI4OpgolHo7W/a1DlL44RnxYB3LlqIjUB2Y+Z/CxrOqebW9gkzAL6tVxhvMeMbnXPJWN1iLsCC7DyGb4YmFngdPxKsitkVI9tUgUQN78qY//RfJGE1xptfcXPjZXlW5VM8gFqE9r31BuqWZku5D28nfxZtuCQBexi6G8HBpHI2UPuhpmLLRizdQSd1Y5UWoi7LakRZeJKlsP7tVarFT53l+EVgkRMLl0ZI/0vqsaNCpAcPeRH3HzjKcKfgsvgU8tR7uxSOUdd6v9aNBgDOcq0JVHlbzWGW1PNywn+WnSaodXvhnaytutjBKMS4eXH+X/mZ7d5DZb1Yv9xe6JVMbkJHOQ/NQ0/ktpkyJpeHWp5YlndPtIU0lgeXR6HfnflQTalqIfIX5woTC9OA
+X-GND-Score: -100
+X-GND-Cause: dmFkZTFlqnjtmC5sgNXayHfjyoube5kxoCtOixcpyBXAjZKuASIMmjQAhM/tQI/JAcmuJ/ZVV4gV0H+SwMxiQ7JkDnyESpJt4uY2CJL7rxHhzh0vGd5rtahGxu2lb4quTnZUWTLa6nZ8DgqYd+zlcFq6VS2BJ8ry/xPsVMYA2BTE/UMl8w6errzNa5i96J9XFzvfRcvAD7iNCi90040BSwKV3cuz46BlgNhZVcxkrrAgh+XON3n4/914PIpWaIZbQEbJrYjQ1F4br4/nizdW6sOkM7pT4Uv39iauA7IbdNwK8oAUer6ryAXGzcAu0j4YKQcenaLTwonzZPsBNlWY/UnR+kOyBug6Rte7kmJP86a4Y+Idx4yqvwAtaSxAXZbzqG3f4IcVyBKqod96Of82uXmZZjXMIYP+9X3UrFdrCuVLN0ixsUZ9KNA5jPi+KuVlhNyn6mtOYhkCzN57NYNy2eK2RYnYZSSA9oxlusdtuixn5F9eBQNtfpQ5cIke+i4qfCHVZ4Fhr8Scy/GRcYjRYUDy7tcnEmGiOOoOR+9EbyQfYRvHCaCH9Hn8xiytI6JK93Nz9TXIoh5ZFSFzjQS86dOGqt3NtWlfktlcFZgrWwpk7W4jSSrkoXbA9trWhET2aPHrZ528Jkosue6ch2vUFFmbGIpIlFp+yFUwKq5qx9YajdHJJg
 X-GND-State: clean
-X-GND-Score: 0
 
-The comment says "If the request set a callback send it directly" but
-checks for whether "the request did not set a callback" using
-if (!func)
----
- profiles/audio/avctp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hey Nathan,
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index f20e08c00ac8..336511bf9612 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1632,7 +1632,7 @@ static int avctp_send_req(struct avctp *session, uint8_t code,
- 	if (control == NULL)
- 		return -ENOTCONN;
- 
--	/* If the request set a callback send it directly */
-+	/* If the request did not set a callback send it directly */
- 	if (!func)
- 		return avctp_send(session->control, -1, AVCTP_COMMAND,
- 				code, subunit, opcode, operands, operand_count);
--- 
-2.55.0
+On Wed, 2026-07-22 at 19:53 +0200, nathan auvray wrote:
+> Hi,
+>=20
+> Here is a 2-patch series fixing two security vulnerabilities in AVRCP
+> profile response handling (profiles/audio/avrcp.c):
+>=20
+> 1. Fix stack buffer overflow in avrcp_list_player_attributes_rsp
 
+This was already reported privately before this patch was sent, and
+more comprehensive patches will soon be made public.
+
+> 2. Fix heap out-of-bounds read in parse_media_element
+
+This was already discussed and fixed upstream:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Dbd8989620ed=
+6e80755f06cfdb18f5b4a3913493c
+
+In the future, please use either the security advisories functionality
+on GitHub to report the security issues privately:
+https://github.com/bluez/bluez/security/advisories
+or email invididual patches with the [BlueZ] prefix, following standard
+kernel patch submissions, to report them publicly:
+https://www.kernel.org/doc/html/v7.0/process/submitting-patches.html
+
+Regards
+
+>=20
+> Best regards,
+> Rapido =3D)
