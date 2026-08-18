@@ -1,150 +1,199 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EC5379C57
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 01:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB575367B9C;
+	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787017816; cv=none; b=eefCyWmywuUloCQ48lF46KOtf4OSR6Ug14uZ+1WcTp2WfMglJKnSV35r9sPxRaqVkQd0feKy5YFKacSsvGyre7y4uRHfUub1pqz9xaokcZy6eALYfruaEvkcLMTJTMT3+qtFonZAkaXhwGfFrWAHcxHKDpVhelfmj/HvPVW826o=
+	t=1787022050; cv=none; b=uhy2MSDr8yjOXPJaZyRSSZ6uzU0lFt+8q9qeQ2lFUwHuDvPG8+uhw8ntoGwoI+3Ayjq/3ZrrBPF5c2mzbjLZBHMslWiEK7Bb4XqSUvOldqx7JTw9i5SIdGlEcYzev+R2rcIwVBDwQ3gBn+16wPtMWUfkbPfY5qbmclPkp2YXLKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787017816; c=relaxed/simple;
-	bh=pLaNn13sddGWIS+ZhZrAJO2CTuekFIIbbmQOGiSs1CY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rjXYQKWuOVE74Ujs6Sbfmnk9/eR4j9vFumbK/sjl+4i0vfx80ptgVbGllQovNHn4ZkYgFjI/oj+gt3jsfh5/llK3FC1SK3weiNhXNF9MsUERZBYbgNsqxFzSm1++hvpW4KU6EDV2OfRrI4cDeEh+1XKIltPY0Hdrv+xYSV3GrNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com; dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b=aJbhb+sV; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com
+	s=arc-20240116; t=1787022050; c=relaxed/simple;
+	bh=g9XLW7UcPt4/hTN4AzgZ6uktrVB634M81KfTlI/jUrQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=rtlVDEsBX3vIJqhAXAvPbHmUHiU8/Ka2sD+c3UmjFPntQntiX08oylX4mIEbfQq3RA5s8+Wzl9i529wPiW8eNQ72V+GepU9792MPhWrtf5mZV7A8Zgjrjc23Mi+dInSxoo8wPTewso/QNOTLkY5Hh7BjOZ59zbPitZPc0mE5ryY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GT3BHGwJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b="aJbhb+sV"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-38e58034d05so3137482a91.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2026 18:50:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=synaptics-corp-partner-google-com.20251104.gappssmtp.com; s=20251104; t=1787017811; x=1787622611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=af8ygkH1KGBuP0hwhu+QkUID7DsTVwf5aUZRxGZy9rc=;
-        b=aJbhb+sVjcLFdWMoFCUNurmcz8YwFqSirDHwsshX/XMMqMzVGHG2aOyggjVxBPMUCE
-         6UEnm/MIRvMl5+gZD7yWSOrI40yOXtTsUW7vkMHCfjpsqOQGPs+MIzN/iV6CLNY5kFqt
-         VCdmq6kH8x0ulXbf5LAIKiN9f6lfBwr0iDvyLrYuG86iI/ipRh4wqC+Na254ELyhROn4
-         fXOPRtG63CCSBq0ooXC9Z75kvKX2DC+iP0ubWS3MocqtG2NCSvCX12lYS21xSRy4GOuV
-         UXsolB0uG5mhEIdFOU7J8f6fSDUPQBhfBO1Q4h99s2IX9HuPxcPBpuTFRwE21SRXIg72
-         qucw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787017811; x=1787622611;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=af8ygkH1KGBuP0hwhu+QkUID7DsTVwf5aUZRxGZy9rc=;
-        b=Q6irvfA1Kg/t8VmnWl3zrxTAt6kDGT52wvJInrwolFjB3ya3YEQkp7UoFCprdWifQT
-         pDbNDUkOJtO93SDBttqGdJeI2w/bqCXj4IrfhsoVl9rFakEEbFCNxZ/I+PKKQbslH2QO
-         yU9R/gSRGkebGnGGh5Btz12q94aEwqn0B8KzrjajgwixHF3F9KVowYGeo8M8quBv/Z94
-         3ELDYPnJoMdqzcG69rssn8xP5NlP1H8RUo6ma7HYTMKeHXxQQQomv4jHJrPkN+zaqbF1
-         9YKNXqkpOW8zvjSp0J3kcDQZiYeW3B2UeE719IKt70YMEYzljLmNQfUShIwWagUmUxF/
-         bV9w==
-X-Gm-Message-State: AOJu0YzzpwSFY1MBftqsFBb3AJr3aaQa3eornyBpeNwT5BaqSAWwx+Gw
-	4Du/3Sz+C3Jj4wR0VdMKOcPHmfvNp6w0EZNuxxbrZx8CVL5Wn8myDYLa9cKnlKSLol5ox0rhYlu
-	0K4Q=
-X-Gm-Gg: AR+sD12aSHc60B9elydx037tCnx55cQyYj5BG8KQBFBZtduEpTQCRSXHGVdO3Uw0p85
-	yQGdunYUMhynO1zUa1WKNRZUdloS4VF0iZTK/3TP8YoXU00MD9VB3NAuh3CWMZK8tdI2rcfyMoW
-	RMa7rvVdeXbJfWqSI9nozmeyIAGkydCr59O4UnsL0mMM6h0IDKJqrlS6qOO/6dKN396LnvHUlLO
-	FS2L1WLNepMrx38IM+fRg2nrKfHcmAODa1zBpHMXZ8nys8lKYwJR9y9peSF/YGxR0HZnXNRPc0F
-	HL1joEd3FHOqK+Oi6QE0Re2jLSpIoN02dvUzEIRejRNZkRc4pF1fJDVRCcD+nrWpzV96gUaixiv
-	ZxZ/3vvdpaVHkT3cc6v641thvz95dGMZex9R0D1b8ciTUf0DBf/SOwKcMmZ1XohjSdBrpqfiW4i
-	9dED17UdaCzP69uUVF1CPwaINtyDeSLJrODEAO7TXqmq1/lQMLWfTgv32GXzEL0pj0PKoKxaarl
-	euFZDuJSNtbX1zbbBVSixFVYmbODHBBBQcLZw3FVOTJxdVx4AaR4yOwsCqlwBRcABHwRnnJXcnk
-	PBSmLw==
-X-Received: by 2002:a17:90b:388d:b0:395:4de5:1054 with SMTP id 98e67ed59e1d1-3955a7ebd62mr4312506a91.16.1787017811428;
-        Mon, 17 Aug 2026 18:50:11 -0700 (PDT)
-Received: from TPE-build-server-2.synaptics-inc.local (59-124-75-166.hinet-ip.hinet.net. [59.124.75.166])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39531e84118sm7364750a91.5.2026.08.17.18.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Aug 2026 18:50:10 -0700 (PDT)
-From: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>
-X-Google-Original-From: Kaihsin Chung <kaihsin.chung@synaptics.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	linusw@kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kaihsin Chung <kaihsin.chung@synaptics.com>
-Subject: [PATCH v2 2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
-Date: Tue, 18 Aug 2026 09:49:48 +0800
-Message-ID: <20260818014948.996739-3-kaihsin.chung@synaptics.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260818014948.996739-1-kaihsin.chung@synaptics.com>
-References: <20260818014948.996739-1-kaihsin.chung@synaptics.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GT3BHGwJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE45CC2BCF7;
+	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1787022049;
+	bh=g9XLW7UcPt4/hTN4AzgZ6uktrVB634M81KfTlI/jUrQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=GT3BHGwJcRE+rSKnyl9h38PSZ9/V/9N1HTB7vSsnRb3fFkE7cZne/UpF9SmLOOmSD
+	 okKywtALR5KS3KJPR9X9+D7eVLf8O2KWZGS/Cns/MAE5IJpz0yfBDtq+sqsVR1FiRu
+	 adqMqLe3VevTagLZHbXMS/jCwKhm3hJRKQZmlGEj96tN+GzSO81zK6VyQYs3ftgniP
+	 SYpd1BSPjHD8IJ5MplqAnlWbazISOC+p78oee5ZNELGggCYZ+4jqDNXFfdeudqiNjO
+	 A5DutE7hSnVbtoq+2uruQVkWmL/ShfpYmYAxttTLcw+V68J4UyWHumJaOy6tsRMGAh
+	 V+peLn0oDg0FA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 999F6C5B572;
+	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
+From: George Maraveyas via B4 Relay <devnull+george.0xfff.gmail.com@kernel.org>
+Date: Tue, 18 Aug 2026 04:55:20 +0200
+Subject: [PATCH RFC 1/2] USB: core: add helper to queue device
+ re-enumeration
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260818-mt7925-rfc-v1-1-284d856ac572@gmail.com>
+References: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
+In-Reply-To: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-bluetooth@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ George Maraveyas <george.0xfff@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787022047; l=4731;
+ i=george.0xfff@gmail.com; s=20260818; h=from:subject:message-id;
+ bh=LhOMiuJkFZB8vjWmzvqH/IlXANYNGRaUBImp9cDEvUE=;
+ b=QuWR3tLnrOCzrGaSnaIZkR2uHdWvmptm5sTiiiAiW3Eep00puYXgmpwDeEBL9c9CKl1b75KBC
+ ehFm4F+ABGyBF/fFA7duWiUvyBMr/772ri2HcsUGsMGoXN3epiLdcpR
+X-Developer-Key: i=george.0xfff@gmail.com; a=ed25519;
+ pk=Jz8kMnumjUlo1GJvJ5kdfkF3ZP8DjPbYaYQR5J8IHMI=
+X-Endpoint-Received: by B4 Relay for george.0xfff@gmail.com/20260818 with
+ auth_id=960
+X-Original-From: George Maraveyas <george.0xfff@gmail.com>
+Reply-To: george.0xfff@gmail.com
 
-Add support for the Synaptics 4384 Bluetooth controller
-by adding the corresponding chip IDs.
+From: George Maraveyas <george.0xfff@gmail.com>
 
-Tested on the VIM3 platform. Verified that the controller initializes
-successfully and that firmware loading and basic Bluetooth operation
-work as expected.
+USB drivers can use usb_queue_reset_device() when they need USB core to
+reset an already enumerated device asynchronously.
 
-The VIM3 is a Khadas single-board computer that I used as the host
-platform for testing the BCM4384 Bluetooth controller.
+There is currently no driver-facing helper corresponding to
+usb_queue_reset_device() which allows an interface driver to ask USB core
+to remove the current usb_device and enumerate the physical device on the
+port again.
 
-Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>
+The difference between the two is that a device reset continues using the
+existing usb_device and its current enumeration state while
+re-enumeration removes the existing usb_device and returns the port to
+the hub code, which then discovers the device again through the normal
+USB enumeration path.
+
+Add usb_queue_reenumerate_device() to provide this facility.
+
+The helper queues a logical disconnect on the parent hub port.
+hub_port_logical_disconnect() disables the port, records a logical
+connect-change event and queues the hub work.  The hub work later
+disconnects the existing usb_device and, if the physical device remains
+connected, attempts to enumerate it again through the normal hub path.
+
+Any retries or port recovery required during the subsequent enumeration
+remain the responsibility of the existing hub code.
+
+usb_remove_device() cannot provide the same behaviour because it also
+marks the port in removed_bits.  The hub connection path does not
+enumerate a device on a port while that bit remains set.
+
+The helper takes the device lock required by usb_hub_to_struct_hub() and
+holds a runtime-PM reference on the parent hub interface while the
+logical disconnect is queued.
+
+The helper does not decide when re-enumeration is needed.  That decision
+remains with the calling driver.
+
+The following MT7925 Bluetooth patch is the first user of the helper.  It
+requests re-enumeration after the controller has already enumerated
+successfully but later fails during Bluetooth setup and cannot be
+recovered by its existing reset path.
+
+Signed-off-by: George Maraveyas <george.0xfff@gmail.com>
 ---
- drivers/bluetooth/btbcm.c   | 6 +++++-
- drivers/bluetooth/hci_bcm.c | 1 +
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/usb/core/hub.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/usb.h    |  1 +
+ 2 files changed, 55 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 463d59890bef..63c4c788d9c4 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -31,6 +31,7 @@
- #define BDADDR_BCM4334B0 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb0, 0x34, 0x43}})
- #define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
- #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
-+#define BDADDR_BCM4384B0 (&(bdaddr_t) {{0x93, 0x76, 0x00, 0xb0, 0x84, 0x43}})
+diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
+index fcac92bd7..22279d438 100644
+--- a/drivers/usb/core/hub.c
++++ b/drivers/usb/core/hub.c
+@@ -6503,6 +6503,60 @@ void usb_queue_reset_device(struct usb_interface *iface)
+ }
+ EXPORT_SYMBOL_GPL(usb_queue_reset_device);
  
- #define BCM_FW_NAME_LEN			64
- #define BCM_FW_NAME_COUNT_MAX		4
-@@ -130,7 +131,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A1) ||
--	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B) ||
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM4384B0)) {
- 		/* Try falling back to BDADDR EFI variable */
- 		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
- 			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
-@@ -514,6 +516,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
- 	{ 0x410c, "BCM43430B0"	},	/* 002.001.012 */
- 	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
-+	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
-+	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
- 	{ }
- };
++/**
++ * usb_queue_reenumerate_device - queue logical disconnect and re-enumeration
++ * @iface: USB interface belonging to the device to re-enumerate
++ *
++ * Request that USB core logically disconnect the device and subsequently
++ * re-enumerate its parent hub port.  The actual device teardown and
++ * re-enumeration are handled asynchronously by the hub workqueue.
++ *
++ * This is intended for failures where resetting the existing usb_device is
++ * insufficient and the driver needs USB core to perform a full logical
++ * disconnect/re-enumeration cycle.
++ *
++ * Return: 0 if re-enumeration was queued successfully, or a negative error
++ * code otherwise.
++ */
++int usb_queue_reenumerate_device(struct usb_interface *iface)
++{
++	struct usb_device *udev = interface_to_usbdev(iface);
++	struct usb_interface *hub_intf;
++	struct usb_hub *hub;
++	int ret;
++
++	usb_lock_device(udev);
++
++	if (!udev->parent || udev->state == USB_STATE_NOTATTACHED) {
++		ret = -ENODEV;
++		goto out_unlock;
++	}
++
++	/*
++	 * usb_hub_to_struct_hub() requires either the hub or one of its
++	 * children to be locked.  @udev is locked above.
++	 */
++	hub = usb_hub_to_struct_hub(udev->parent);
++	if (!hub) {
++		ret = -ENODEV;
++		goto out_unlock;
++	}
++
++	hub_intf = to_usb_interface(hub->intfdev);
++	ret = usb_autopm_get_interface(hub_intf);
++	if (ret < 0)
++		goto out_unlock;
++
++	hub_port_logical_disconnect(hub, udev->portnum);
++	usb_autopm_put_interface(hub_intf);
++	ret = 0;
++
++out_unlock:
++	usb_unlock_device(udev);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(usb_queue_reenumerate_device);
++
+ /**
+  * usb_hub_find_child - Get the pointer of child device
+  * attached to the port which is specified by @port1.
+diff --git a/include/linux/usb.h b/include/linux/usb.h
+index 49ab8dbb8..9841029a2 100644
+--- a/include/linux/usb.h
++++ b/include/linux/usb.h
+@@ -789,6 +789,7 @@ extern int usb_lock_device_for_reset(struct usb_device *udev,
+ /* USB port reset for device reinitialization */
+ extern int usb_reset_device(struct usb_device *dev);
+ extern void usb_queue_reset_device(struct usb_interface *dev);
++int usb_queue_reenumerate_device(struct usb_interface *iface);
  
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 9a103db7e355..e70b9f3fd968 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1593,6 +1593,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- 	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
- 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
- 	{ .compatible = "brcm,bcm4335a0" },
-+	{ .compatible = "brcm,bcm4384-bt" },
- 	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
- 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
- 	{ },
+ extern struct device *usb_intf_get_dma_device(struct usb_interface *intf);
+ 
+
 -- 
-2.43.0
+2.53.0
+
 
