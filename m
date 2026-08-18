@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35D9439F89;
-	Tue, 18 Aug 2026 18:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B433E1D1A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 18:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787078304; cv=none; b=hnWj+q2W3n06gnRzkpl2g81MPMwqyxdzsyRu8Vqycw2KaFdiFtJdj11mSAN5Tb3oYJk3+w1dOphGh0VSzhYCY9EClOgu0h031nZfuEnTuU84Ylyo/DatnTDrhWJR8HMJESgeHczlUGkY/+7IU0P54d0zc1kqMhLzoKrFQbUTE24=
+	t=1787078310; cv=none; b=iCdQuQWE52NR73Tg2uTsjlsgXLKzROukphH8bYHtlPQLTvXqrDkq3Dn+mPptVbsndcd8UlIrHYuPrx49lwIiOebwVdaBmdIGfvZKFH31xn+21Qwa9vvham2wwV+IoKOnr8aIEj+HSmqWtoJ+F0M5R4uL8UywSryad3hJYRXl1iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787078304; c=relaxed/simple;
-	bh=9Et6U802MAJ3VBYDma8Je64T8dimNfOPxEopntQKyLc=;
+	s=arc-20240116; t=1787078310; c=relaxed/simple;
+	bh=tUfuR/qRW84LxIVZaVu6L3pAwwXm3NiD4+YIA9Jqg14=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hN4PQjE2OZbIJ5+UkAIwtPHhscX2dcdO0EbyDOtzMnueLLYjLxodIriy2a9U4A7TwxJTG43XwvFPb9k4opjy5xVLO+ZRJ/qewuSrhrZfA/66LiGjL4hh33epammK+sPiIrL+c9h4MbX27BQygPUrpSAYmVeRRYzXH/4QRGQ8vUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InlbM970; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=NmAS47lNWcXSt6JgmGT2nrOyw6kg1ipRJVdPz3kCLRyXRSBXM4AcDj9YlyqUnzvegxM5YoTVwCT5Wb7ZVkhE6kBeqokWr6HQ85yVa2WP8GuKpi3QlR/cn8Uq8SoMkBQEF0p5v03f/pEUZ26/D05lgGRwvjMcvI+YlsKwncn5bHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBIVUTEB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InlbM970"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CEB61F000E9;
-	Tue, 18 Aug 2026 18:38:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBIVUTEB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA3C61F000E9;
+	Tue, 18 Aug 2026 18:38:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787078303;
-	bh=8jKWle75SXBkx/oOCKHK5NlLaRBVvcq9G3i8DHlFWVI=;
+	s=k20260515; t=1787078308;
+	bh=wdKllLNBduaCJr80SbzUjoznhB859BIUWIYVN69ILno=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=InlbM970mGuCPY03IdKSw2B/poS4Z9OLK+XUIg4MDOgv8tgiZ8dcxhGRyfM3jIW+h
-	 ooM5R0aplrU9Axm9He/BxhRDlFJWjjLp6tgK6IYhU0qlDR+inLxK/blr72sf7KcpwY
-	 3gzOHX5kotdAUgDuFiBgn3mdcHdTW/oZzFvybuUB+zRY5aHGofZqrrYc+2rzv7BwTd
-	 ynvi9FmmTj2FO0sXvNLdzJE/zP/xzWUE9NqhhL3lOpuXbv3UzYD0BbEMs9dgfIkzvS
-	 GylOu2lO3idneZPKkDl7L1pEgNiBtTKmKo39UKndSJ3CtlPJ+vzChUkt8kXM36+pFa
-	 77PogWsSmFiSQ==
+	b=eBIVUTEBryEDH/5eGRfzMKKM4+2+uFINX+CzWfAb3hiMIgSRaJ1Ppb6pIGP38heeP
+	 wgdsRp9JtqSTAm3u7XJceX22J0Eyhnuw+NB2qJAtXrw2oKCQpw2A2tC2Y7VY/H+A9f
+	 N/x3dxERMtfHyUaRx/qX7qo9blK06PemqiVX61zV98CmWdmd4yFKKh2tqMzPRG+sDo
+	 mUhnY9pKd6m8Le0WX934ZIMikq7mGmlY3ZRk+b288sWu0UtOBWYXlL49dgmqqecZBF
+	 eeTi1X02gxhVBXXhdYJnYBn6LhIIl2ewZFGH2qTRrqTt8qeL+jD0XrLcSEH51hzWsS
+	 MLiZ8aMFtHtAA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5692D392704D;
-	Tue, 18 Aug 2026 18:37:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93826392704D;
+	Tue, 18 Aug 2026 18:37:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,44 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Bluetooth: hci_core: Return -ENOMEM when the sent_cmd
- clone fails
+Subject: Re: [PATCH BlueZ v2 1/4] sdp-xml: Use a queue to collect sequence
+ members
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178707825486.2194892.5994990121854718172.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Aug 2026 18:37:34 +0000
-References: <20260817205017.56524-1-johannes.goede@oss.qualcomm.com>
-In-Reply-To: <20260817205017.56524-1-johannes.goede@oss.qualcomm.com>
-To: Hans de Goede <johannes.goede@oss.qualcomm.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, iabdelka@qti.qualcomm.com,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
+ <178707826022.2194892.16036865943202250756.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Aug 2026 18:37:40 +0000
+References: <20260817210038.1839617-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260817210038.1839617-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 17 Aug 2026 22:50:16 +0200 you wrote:
-> From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+On Mon, 17 Aug 2026 17:00:35 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> hci_send_cmd_sync() returns -EINVAL when skb_clone() fails for sent_cmd,
-> which describes an invalid argument rather than an allocation failure.
+> Appending a member to a sequence with sdp_seq_append() walks the
+> single-linked list to find its tail, so building a sequence is O(n^2).
 > 
-> Return -ENOMEM instead. The only caller, hci_cmd_work(), tests the result
-> for zero, so there is no functional change.
+> This was previously worked around by caching the tail of the sequence in
+> struct sdp_xml_data, which required the caller to pick between appending
+> to the cached tail and initialising val.dataseq, and to keep the cache in
+> sync on every append.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] Bluetooth: hci_core: Return -ENOMEM when the sent_cmd clone fails
-    https://git.kernel.org/bluetooth/bluetooth-next/c/57f558cf1a3d
-  - [2/2] Bluetooth: hci_core: Handle skb_clone() failure in hci_send_cmd_sync()
-    (no matching commit)
+  - [BlueZ,v2,1/4] sdp-xml: Use a queue to collect sequence members
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b21edc49b2c3
+  - [BlueZ,v2,2/4] sdp-xml: Fix leaking the parse stack on malformed input
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=97521ab4dd79
+  - [BlueZ,v2,3/4] sdp: Fix memory leak when freeing alternates
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=078ef10a4531
+  - [BlueZ,v2,4/4] unit/test-sdp-xml: Add a test parsing alternates
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5abc0045b84a
 
 You are awesome, thank you!
 -- 
