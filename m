@@ -1,171 +1,170 @@
-Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A171FECBA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 17:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787075320; cv=none; b=fMXxVVVw6ERt7gILbM47Do87pRA40sNQpJsXx11bAZ5moADzkNXBsnhINWvdC4AFEfcMHcuEDmhK92cgii2GRTG7evm6zUTKPRNSNnjk/MdwHMfdTVbzIl7Tvbm73saRz2lq6ZSRnSJngv0yRN87F4dnhRwMl5x+cNI+6mocPaY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787075320; c=relaxed/simple;
-	bh=JE3SmwTkYSiXZiAfUiOVdaPaWE6EM4/aK4tgXbOlYKM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MmQobSYBMVFySptzW65HjR4C0aXwEurloRCVCqs1YS5Gea+Dm9+0ER6aMrR82iDuAwEEjtBxirO4wU9e3A4fU+EnyRCAE8aD23SQDu8svoW090el0w4V9QsGSNLw9aHFmeAmXY0g1y/9y6Xn42B4YXK1ZdyE9mY8cGcGCtZB0sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=keckC80o; arc=none smtp.client-ip=192.30.252.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922353DB630
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 18:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787076125; cv=pass; b=pKEeq9ozWw16HPN3Fo4CgSp98KqpgQQu5om1OpVAobWBcTDvNeGlPPgi/IREm1ls2rLkuSM3kfzBrUIC4PaI/Y8G8Ti4e009pmWgWpYLOBKKzbeVPkvC1R1pgViKJl3yavsxZ7zJ3630J9KS4Jlp+Oe26AxHlgL8JueqT4QoNiA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787076125; c=relaxed/simple;
+	bh=IgBGeJCDKiYKLE0gQ0v9DR22201l/v7euRFWqtsNNyc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZjkaU9s3LtQ5uBWvHswmoJWXMTEyW0EAWU7NrH8Jt37vuXKl/eZZMi0giVDB4pTyBKy6duF05AonKNmcmwNiQZU0Ag3i4vwFKIQANM6NPbELaWh8Q/pPXWVeP7EQiAeDq/EZ2Ip0bQmcxjVsq2yRAlttfW223mZ5DDGjAOx9jBY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DIfzexSO; arc=pass smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="keckC80o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787075318;
-	bh=6okbuqmHb/82EmHuFGvWD1R7HaRF5cv5H95Q74JafYo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=keckC80og3a8cKWiVPD+JQUETfkYEUlXsrmfmYaX+kdZmGEZfGDh5W9eQcC4I1kuQ
-	 Et+M0W2MpC2rYrSIABbzfSYbTVmM/qimis8HalnghaTAoZLJ6jfZvsURYDB8Y1yHPr
-	 KzZxDK368V5oEu03z6MmA8Zygoi7V4u2iE5CIZKU=
-Received: from github.com (hubbernetes-node-d36bec0.ac4-iad.github.net [10.52.157.25])
-	by smtp.github.com (Postfix) with ESMTPA id 309C9324376
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 10:48:38 -0700 (PDT)
-Date: Tue, 18 Aug 2026 10:48:38 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/bd8989-5abc00@github.com>
-Subject: [bluez/bluez] b21edc: sdp-xml: Use a queue to collect sequence
- members
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DIfzexSO"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-836ce5d6e85so3227397b3.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 11:02:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787076122; cv=none;
+        d=google.com; s=arc-20260327;
+        b=qoVMZpHptqC80Q9Prmjmui/LtEn7yl819cysAa8hVTm4dcG7O0GrWcO04jnWfBexjE
+         VFSFKSdhCuW7AupeaeXagClK4PPb0Nayo2BJcdR5VEXGKX1EbW5vWwTwKZxkN3KQj1Dw
+         pSnyw07aFeMIVdR8q7uPcyvSbJyoUtU6UNVT3bAmrM2aE2yQcC3W+LBbXmCOo50sazYu
+         cZP8ZOg/R9yWOsmGY/tGuFVup1jmxXtA4V7mWj/KVfJRl2fnTJD8/6bF+NAz8ST/h6Ex
+         cvUU4BPp98rIfxTqp6peTMd2LrUOOGzAEHTiw4i58iBnAjXMWipctsMIUmG608BRrKqq
+         ZTyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JnRPUTV0z7CVyIrMTRkfaLJ+Iek7vpJVoTQfaBHHeDA=;
+        fh=wOLdHjzt0df77H1A1+1nCfgPcFF1t+TagxUjFoo5STU=;
+        b=NEzQnO6RcwVWLanxFbBglyer4W7/J/OUqqmGJ0FT38TRSOQnKXGpOaU+HtHHJAbMaz
+         BlhDZy7hezYePoaYVprM00P4KINclCKSuddeTNpucEv+4v7YKQ0xPx+Yhizlqblzo9L1
+         gCCPJbR2zcQGrrLT5ZPrHGqN7/pTuxPrbmjhIRldUwEF+00atfVf6n1t8owMNJCq0+3H
+         D/Br7YFSAznwJ56DZhedy4FLXElSppVLDydHZfeLtLfsKZakbZjelHswFpCYNXh/UMiv
+         EjiiARirQQEMv994MsuOLEjedHo3W4fQvr/h+ODkDLvMIxHPVibnuPZv+clhTIKbvNtD
+         XwNA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787076122; x=1787680922; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JnRPUTV0z7CVyIrMTRkfaLJ+Iek7vpJVoTQfaBHHeDA=;
+        b=DIfzexSOYLQlik42YYH/zhzOl9u6/O5H/X8M4FfRYipyTqsaBGpqGKqxJKAbFBqJ8g
+         8EQBeaSrw+alMuxq2SeL+yfB6hifbqg5pFg1eafwKHy94SBi5WNz/nwDIsnQLbfMzLNX
+         qZS4TZ56sDZAI9MW29lgTdGUE4aumNRQf5CIPEhojPsy47Yu9VJ7lqM4WZnk1IXCWYHL
+         7piiWKw1TTP0WPsJ0IVbWrBJ7F9u9QCBMcrKa6rFT9Ukj7jEhsI7cNJzEdMwehzBu7wA
+         svSvlQXTFnRfOXVb0NAIWZmEbm6eMeR9Z188N+5NxZ8RLNMUq+YQUyPJJG7w2Mju7YFF
+         DGfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787076122; x=1787680922;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JnRPUTV0z7CVyIrMTRkfaLJ+Iek7vpJVoTQfaBHHeDA=;
+        b=j848w3ABW8pQw901UnuT7+vxbp2U+GgD616ZoFwCuqrHoya8n+k+o3csVuMi69VifH
+         dVIqT/CE/8Byfy8QeRTv2GAt5tSn2/W22i/+efUY7WBAVF8kckd6y3YJXtnmJJYXTREA
+         ZzMFgikO04+af53FbwAXvnfxmKBPDaZ6WScWBCxywt9rw5jJh2CFZN7S4N5ddxPOrZri
+         PClWXUbQPBY1PR310Aigs1kYL39J90ieO3p0kKxTNpz3mFjUddguz3k/U79R3zfsuahd
+         AJf9Ret5su7/enD4YxZQZc3pMVbMUiOAKjbQS+0Hvi+7XJnpA38TJCAZMmeUYQXmG7PA
+         lWaQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoX/TCLGqcwWQ7pVtFfHK3sGGeRkLp/hEOVxdBjZM+ulQaNzhqfhfZp5aC/u8oH4MeEQViejlVYFHHWfzSO5qI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYj4HlDfLWP2uv7cifi+z3hXlPzzsFV5qaGbaXrilL03uO9r4o
+	PZUK4KDFfvnnAZg+JC4igZEvyYpGTuPardwJ6KunnZmUDcE01wroA2ox+rpcpayApW9NVwfWUrD
+	uOAa/Y27i/1ocv7ocM1+2vK01rO12o+4=
+X-Gm-Gg: AR+sD11PlLdeIyyQB/c0MYGSALtI7SOh3YCdzNyeZp4pbcY5LR43ieUMLz1vSjX6aR7
+	W6lQkIZy8zvpF+480HGqJUIO8btXCKorP+lzJIEBt1/phlAYYvKS1+YM61j+GaQEgSRMzcWWyQI
+	ZcyoV7vB1hNPX5wgQad2GlFnvMNJ8F2AwnZUPxy5K/29J4+Xbx0ap4mk5HpCcCL5Og0jMVSs8xX
+	3c0Vf6PEN63DTu+FQAYsCbW6QSQ9ZEK2mF4h2A1qxzM/bJ5ub518YGmb3YkKP+s4be0VvZBuKDo
+	B4gxJmTtq7Vo4igxpK5fCrkRC6fEfXCGXWkRqkXPoQB3tbRtVteFlKnaOW1IzxSHdkWC99BuEqG
+	bSJ5z4PhQ+hZOkrKCSqfDcUK+SRjN4Vc=
+X-Received: by 2002:a05:690c:7003:b0:80b:9114:3b85 with SMTP id
+ 00721157ae682-83706f4684bmr152551277b3.0.1787076122204; Tue, 18 Aug 2026
+ 11:02:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20260817205017.56524-1-johannes.goede@oss.qualcomm.com> <20260817205017.56524-2-johannes.goede@oss.qualcomm.com>
+In-Reply-To: <20260817205017.56524-2-johannes.goede@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 18 Aug 2026 14:01:51 -0400
+X-Gm-Features: AcwNN1VwTn1hJ-am2OMW-FOMoM3ME9dN1GaV9yIHvOeEU0lqJnAdL3_Oyb6_pDY
+Message-ID: <CABBYNZ+Bhhx3rtq8i_FGu2a_oFyWquo_gTRcmPyM6HcFC3pkVg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_core: Handle skb_clone() failure in hci_send_cmd_sync()
+To: Hans de Goede <johannes.goede@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b21edc49b2c3675c7aea19286fdb2b887f29c0ff
-      https://github.com/bluez/bluez/commit/b21edc49b2c3675c7aea19286fdb2b887f29c0ff
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-17 (Mon, 17 Aug 2026)
+Hi Hans, Ibrahim,
 
-  Changed paths:
-    M Makefile.tools
-    M src/sdp-xml.c
+On Mon, Aug 17, 2026 at 4:50=E2=80=AFPM Hans de Goede
+<johannes.goede@oss.qualcomm.com> wrote:
+>
+> From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+>
+> hci_send_cmd_sync() does not handle the second skb_clone() failure as it
+> does the first one. At that point the command has already been sent and
+> HCI_CMD_PENDING is set, so an allocation failure leaves the flag set with
+> req_skb NULL. The response then matches nothing and the caller blocks for
+> HCI_INIT_TIMEOUT before getting -ETIMEDOUT, reporting a memory shortage a=
+s
+> a controller timeout.
+>
+> Clear the flag, cancel the pending request with -ENOMEM so the caller fai=
+ls
+> immediately instead of waiting out the timeout, and return -ENOMEM so
+> hci_cmd_work() does not arm cmd_timer for a request that no longer exists=
+.
+>
+> Clearing HCI_CMD_PENDING here is safe: all code touching that flag runs
+> from hdev->workqueue, which is an ordered workqueue, so those paths are
+> serialised and cannot race. The one exception is the cleanup added by
+> commit ed516e3f1aa6 ("Bluetooth: hci_sync: Clear HCI_CMD_PENDING when
+> dropping the last request"), which runs on hci_dev_open_sync() failure an=
+d
+> from hci_dev_close_sync(), and the workqueue is stopped before that runs.
+>
+> Fixes: 2615fd9a7c25 ("Bluetooth: hci_sync: Fix overwriting request callba=
+ck")
+> Signed-off-by: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+> Signed-off-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
+> ---
+>  net/bluetooth/hci_core.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 8aeb3024428b..9585b42e7970 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -4092,6 +4092,11 @@ static int hci_send_cmd_sync(struct hci_dev *hdev,=
+ struct sk_buff *skb)
+>             !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
+>                 kfree_skb(hdev->req_skb);
+>                 hdev->req_skb =3D skb_clone(hdev->sent_cmd, GFP_KERNEL);
+> +               if (!hdev->req_skb) {
+> +                       hci_dev_clear_flag(hdev, HCI_CMD_PENDING);
+> +                       hci_cmd_sync_cancel_sync(hdev, ENOMEM);
+> +                       err =3D -ENOMEM;
+> +               }
 
-  Log Message:
-  -----------
-  sdp-xml: Use a queue to collect sequence members
+Sashiko flagged a problem with this change:
 
-Appending a member to a sequence with sdp_seq_append() walks the
-single-linked list to find its tail, so building a sequence is O(n^2).
+https://sashiko.dev/#/patchset/20260817205017.56524-1-johannes.goede%40oss.=
+qualcomm.com
 
-This was previously worked around by caching the tail of the sequence in
-struct sdp_xml_data, which required the caller to pick between appending
-to the cached tail and initialising val.dataseq, and to keep the cache in
-sync on every append.
+Im with the opinion that this shouldn't cancel the request, because at
+this point it may already been sent to the hardware so maybe we should
+flag it somehow that req_skb wasn't able to be allocated, or something
+like that, but the command is still outstanding.
 
-Collect the members in a struct queue instead, which tracks its own tail,
-and link them into val.dataseq once the element is closed. Appending is a
-plain queue_push_tail(), and the queue is destroyed along with the rest
-of the element so members that were never linked, such as on malformed
-input, are still freed.
-
-The sequence_on_squared() test stays at less than 0.1 seconds.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: 97521ab4dd79a38b2c30d8d664b4e11f86680e88
-      https://github.com/bluez/bluez/commit/97521ab4dd79a38b2c30d8d664b4e11f86680e88
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-17 (Mon, 17 Aug 2026)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  sdp-xml: Fix leaking the parse stack on malformed input
-
-sdp_xml_parse_record() frees its context but never the elements left on
-ctx_data->stack_head.
-
-element_end() returns early without popping the stack when it rejects a
-document, for instance on a mismatched </sequence> close, so a malformed
-record leaves its elements behind and they are never freed.
-
-Free the remaining stack elements before returning. Found with the
-compute-seq-size-type-confusion.xml test:
-
-56 (direct) + 1,072 (indirect) bytes in 1 blocks are definitely lost
-   at calloc (vg_replace_malloc.c:1678)
-   by sdp_xml_data_alloc (sdp-xml.c:73)
-   by element_start (sdp-xml.c:473)
-   by g_markup_parse_context_parse (gmarkup.c:1369)
-   by sdp_xml_parse_record (sdp-xml.c:696)
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: 078ef10a4531e3fddbac332cf65077f317092555
-      https://github.com/bluez/bluez/commit/078ef10a4531e3fddbac332cf65077f317092555
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-17 (Mon, 17 Aug 2026)
-
-  Changed paths:
-    M lib/bluetooth/sdp.c
-
-  Log Message:
-  -----------
-  sdp: Fix memory leak when freeing alternates
-
-sdp_data_alloc_with_length() stores the members of SDP_ALT8, SDP_ALT16
-and SDP_ALT32 in val.dataseq, exactly like it does for the SDP_SEQ8,
-SDP_SEQ16 and SDP_SEQ32 sequences.
-
-sdp_data_free() only calls data_seq_free() for the sequences though, so
-freeing an alternate frees the alternate itself and leaks every one of
-its members, along with anything they own in turn:
-
-209 (48 direct, 161 indirect) bytes in 1 blocks are definitely lost
-   at calloc (vg_replace_malloc.c:1678)
-   by sdp_data_alloc_with_length (sdp.c:350)
-   by sdp_data_alloc (sdp.c:486)
-   by sdp_xml_parse_int (sdp-xml.c:243)
-   by sdp_xml_parse_datatype (sdp-xml.c:421)
-   by element_start (sdp-xml.c:507)
-
-Free the members of alternates as well.
-
-Assisted-by: Claude:claude-opus-5
+>         }
+>
+>         return err;
+> --
+> 2.55.0
+>
 
 
-  Commit: 5abc0045b84adcb47af26f88f699f33c0037a00c
-      https://github.com/bluez/bluez/commit/5abc0045b84adcb47af26f88f699f33c0037a00c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-17 (Mon, 17 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    A unit/sdp-xml/alternate.xml
-    M unit/test-sdp-xml.c
-
-  Log Message:
-  -----------
-  unit/test-sdp-xml: Add a test parsing alternates
-
-None of the existing records contain an <alternate>, so nothing covered
-the SDP_ALT8, SDP_ALT16 and SDP_ALT32 handling.
-
-Add a record with an alternate holding an integer, a string and a nested
-sequence, which leaks its members under valgrind without the previous
-sdp_data_free() fix.
-
-Assisted-by: Claude:claude-opus-5
-
-
-Compare: https://github.com/bluez/bluez/compare/bd8989620ed6...5abc0045b84a
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
