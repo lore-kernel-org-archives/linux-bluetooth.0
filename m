@@ -1,121 +1,108 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927236920C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 08:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3753B8BA4;
+	Tue, 18 Aug 2026 08:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787041932; cv=none; b=d0ZV9aZoLxyc2+MHnrY6N28aXwUI+Q1mClBi6yfd8K/h12XB98efWnc2VNDsQIqKUZYv4WX8zxMX0D2Tcmw2IP29uK471dFH0dT2um90vV12UzjHUiy5Shvuq/UDRU1lHcdhwJjahBZGJk8lTkFhty4nNayewytaGzbYILbdn0Q=
+	t=1787041947; cv=none; b=UjPqmqtk1MmqlNoiYlCJksHfj6+vlxvc/EXjqZSSLaNJw762/A3UZitJjXwRaajgHIEsjZmwkHuhXzU00PZIYMR6/HB40IjYnKbgr487PZkUqeWOL5AUk86l/L90Gtn6+Eq5RGtKMSJx1OgR4vDA8Jd6m3Hvy8Lp595HQuB3zgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787041932; c=relaxed/simple;
-	bh=cT32DFg8ivov3Gdkhqs5vsyJBZYcu0ejF+NS+135Ag0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=k0ikry0aNIILgzDw1HJI7dw472WB/1kE2hmAa/226zfw6uJPdloHq/yhS1oRWpWAKnwu+dQQ1qHChBRUVXcps7VrXUVeQojiRcpTDEKf1N/aGF2Svd+uobzCE9n0OPM++f/ZISENKxFzX7eNCOVHad8a1Vm7V7NZZVcLSKMOjEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=edZr1n8X; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787041947; c=relaxed/simple;
+	bh=H45/Vk2Wd40UkgyC6FVGv4vcqwRHS4NnK+v3eph+XCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rkXJXPf2TCKiMqZQyvW2BH7DOpq6LGefCB8XbDxeX9Wbswi4iBPS/+pxdhyRiFayPAFi3noFYHPAS2ClA9iz9mSwgRZPzLM8gvCWgOuyVVfybuUbhuY8chgcCRQuMp9B96F7Jhq6QzGPBn/lw7LmBe+9m+HcgnkPXsEloJ5/+nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y2Lt/Um3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edZr1n8X"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3810c5d691bso3133192a91.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 01:32:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787041931; x=1787646731; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=3FV5lhZhwbY7Rpnjd7EBH+nbMN5OXKmIZZmZdzbZZRs=;
-        b=edZr1n8XJkiZe/qHoqLPOLA1XuEfynTvlK9E0yAvWch98WJIBsQ60i/eofOAFUUJk0
-         xsChIkmZ4hNSIMSgnUpZdA6ydNtqMfDdq71gpOkJjZaXmPNHvQTzQWhDIryLJE2PGFdF
-         0M+8nd3736sQG7MN64K58JBr8kOGz6E6L248x0dYKtbD5MkDSZlrMHdSUWkxSuHVA3cT
-         fA7SmVCRctNdtXht7m7f3Sy+TuvDwZOauRD45fbRa3ebBqHWXnbkDkix5ycsB3jGvtPm
-         dxDm940FB6VItYl+YMfoA2H5fyjfF0iZVV6bjtbG4d88YUasZkGZ2ERRmqPgi3YQ6q+j
-         Isbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787041931; x=1787646731;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=3FV5lhZhwbY7Rpnjd7EBH+nbMN5OXKmIZZmZdzbZZRs=;
-        b=tE5488Q1yqtgKhOJDwTxpLvt0WuZDdETu/Foh9Fxv+632FpaQAx9CgKYKBIjlFeIv1
-         vYhiuFcQW3LlNohhLtCcxXp8+zVYDZr2iy0I+XatSs/5cpRIf2XSQJxlf69sY6FXcy5o
-         jaT9yaob4Su4pmPfYfZRZoooKtr/FaJ9u1oQyKOTdJkLT3hYnrcFl40gvnyfAcyy6N4y
-         fdrUd7KloH6fQxUzFSILiKM3YaEC/V0o/GGbDmW/xmxxMofIg1OTzUYbnWunyrP5mi6V
-         Gq5nQVZfV/NKCleCf9rmnRPPj21YCL1YOiZRHpiS/gMxRU34e5K8EQSBEoBy2MRqPDiO
-         FIMw==
-X-Gm-Message-State: AOJu0YyNuzRu+l8rcfb2uI1qZMQHJnHFYH4SuwdOIu/xty4K8agm/eb1
-	MzrMYGwLn/a9jBfzDSkoLKLi/29BayWB8okyhnNH1gT6ZNX1r36GFaZ8jhx66A==
-X-Gm-Gg: AR+sD10Y1YZjw2vlPXiyB9kcheie74wRoDockDSlScZg0mBMSI7eFp6XU2TvaHNOuvI
-	skQR9JOKeMlGLzhCPE0tCyQa0sBe/CKLgEGCEtE6ivxHEPAd4mFDnnwZPd8wAthw4TvXe1lTLMd
-	FBA3NM21t2T88WEqP0dDtvulLJj5rRJej273BLyEIKMOfpwQfbbVwSEq9sKV/RqnpGwQXWWIMPI
-	6nU67Nvwc2LTbm31qcgb+qFfKKvbyz0J4Pb3+NSMEE56iyEItOaNEmqEABwE/PyBf/67a8FU+N8
-	nTTfwmxUtbNsGinbjRcmaScfw1qI+mClM/eH78Q8mTtf6VyGW9u+/T8xWpn4pdcxFnNo2o4YBtV
-	1jh7cTKLLFxFJOmbrSqxrajY8rfQrbdfGlfkWsEvml0gKxEl0vdu3uX9inijf6uiixmisjDerky
-	Z2+8tfJZAO7fTVabaVmySYdovELQm1hBU8Vneb7SFZPR5xDWH4/pY6Ec4beUEV+Qf5gl+4YAHS0
-	IE9zw==
-X-Received: by 2002:a17:90b:4986:b0:38d:f94d:4c6e with SMTP id 98e67ed59e1d1-3955aa36b9bmr8421122a91.17.1787041927693;
-        Tue, 18 Aug 2026 01:32:07 -0700 (PDT)
-Received: from [172.17.0.2] ([52.157.33.131])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3267c388e26sm14776307eec.22.2026.08.18.01.32.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Aug 2026 01:32:07 -0700 (PDT)
-Message-ID: <6a841887.642c3f8d.18da66.ca8d@mx.google.com>
-Date: Tue, 18 Aug 2026 01:32:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0745894392358757235=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y2Lt/Um3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF9131F000E9;
+	Tue, 18 Aug 2026 08:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787041943;
+	bh=WBhVPa7Em4e5H/GpqI2kk5BMFpsOBV262URRmPCJ4oc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Y2Lt/Um3F8jMLR1Nyj93w2lOgX3xKsNywnI+r11g89E7ut0cRr+BowtxC7rxE9fke
+	 K+AS99si2ruEgdih+ML6ID51Ir71OrOoPbSYJqmKoVvMvhcp3wO9FjnA58VIz358e7
+	 PT3CurqU4gbCHEW7Hf8LbTj5ujlmW6LWJ/whgqUMvTIaZzhKu/PoYP0siy97DMDKel
+	 Wxybod8OGM0M/srMVy80b3l6SHC8fjIN9KwdZgHjOphcxBxfbgIJJxcxAHDzcQEu1g
+	 YEp0D7GPTnIR1GrBq5trsyr/EBiQLLK9w77tuIs6psbvmE5o9ZNUIxlkA8VQCSz7my
+	 D3K5TteMabNYA==
+Received: from johan by xi.lan with local (Exim 4.99.4)
+	(envelope-from <johan@kernel.org>)
+	id 1wwFF7-00000000nSF-2mWv;
+	Tue, 18 Aug 2026 10:32:21 +0200
+Date: Tue, 18 Aug 2026 10:32:21 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Guangshuo Li <lgs201920130244@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] Bluetooth: btmtksdio: fix usage_count leak when
+ autosuspend_delay is negative
+Message-ID: <aoQYld5vlDa4hChP@hovoldconsulting.com>
+References: <20260807151447.2530075-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, liujiajia@kylinos.cn
-Subject: RE: [1/2] Bluetooth: btusb: Fix leaked runtime PM reference in btusb_reset()
-In-Reply-To: <781dc2cd5ab0533fff9ee7fdcb92fff573431f18.1787039123.git.liujiajia@kylinos.cn>
-References: <781dc2cd5ab0533fff9ee7fdcb92fff573431f18.1787039123.git.liujiajia@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260807151447.2530075-1-lgs201920130244@gmail.com>
 
---===============0745894392358757235==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Aug 07, 2026 at 11:14:47PM +0800, Guangshuo Li wrote:
+> btmtksdio_setup() calls pm_runtime_use_autosuspend() when runtime PM
+> is supported, but btmtksdio_remove() does not call the matching
+> pm_runtime_dont_use_autosuspend() when removing the device.
+> 
+> If the autosuspend delay is set to a negative value while autosuspend
+> is enabled, the runtime PM core increments usage_count to prevent
+> runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
+> during driver teardown, this reference is not dropped and usage_count
+> remains unbalanced.
 
-This is automated email and please do not reply to this email!
+I noticed the bluetooth ones have already been picked up, but for the
+record:
 
-Dear submitter,
+As I've explained elsewhere, this is just misleading. There is no usage
+count leak here as the count is balanced whenever the user re-enables
+autosuspend through sysfs (by writing a non-negative timeout).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1147623
+Drivers should clean up after themselves and disable autosuspend, but
+this is more of a clean up than a fix and should not be backported.
 
----Test result---
+You've sent upwards of 60 of these in the matter of a just a few days,
+some which have even been picked up. Please send follow-ups (replies or
+v2s) as soon as possible to prevent further of these from getting
+merged.
 
-Test Summary:
-CheckPatch                    PASS      1.10 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.41 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      28.05 seconds
-CheckAllWarning               PASS      30.29 seconds
-CheckSparse                   PASS      29.07 seconds
-BuildKernel32                 PASS      26.38 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      504.49 seconds
-IncrementalBuild              PASS      27.54 seconds
+> Add the missing pm_runtime_dont_use_autosuspend() call in the remove
+> path before restoring the runtime PM usage reference.
+> 
+> This issue was found by manual code inspection.
+> 
+> Fixes: 7f3c563c575e ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
+> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+> ---
+>  drivers/bluetooth/btmtksdio.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index c6f80c419e90..4e1012e90979 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1480,6 +1480,9 @@ static void btmtksdio_remove(struct sdio_func *func)
+>  	if (test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
+>  		btmtksdio_close(hdev);
+>  
+> +	if (bdev->data->pm_runtime_supported)
+> +		pm_runtime_dont_use_autosuspend(bdev->dev);
+> +
+>  	/* Be consistent the state in btmtksdio_probe */
+>  	pm_runtime_get_noresume(bdev->dev);
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/605
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0745894392358757235==--
+Johan
