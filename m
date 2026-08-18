@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB610388868;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4C435202A;
 	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787022050; cv=none; b=FkR3dsrT0rUyMmQo/xQOYNxGkNCCkpGiXBHpsjSYSFnM5okKQdjbZLfThqBX4aHBPLyx9/JJrWBVkb94Dxg3jN7UOoxTnAA3o5iyozQ4dCf2pjXsCxQhj5YmZg0MIWySdOLZtAOW9UYzlzx5kejxVp2spXbZZ/L894OljVLBD80=
+	t=1787022050; cv=none; b=ZBJAmvSMlNE3BeguEyrRsq0csCAqu3vZcpIbkLeGKyMsVZ61N/fihgtmLSYYdqZkUux+OiTwxw/P91ZscpQPQimSXgfnS1abfVXWR6cJ2MmaqTc/rXWFrQyDTCreRJyO4YedcMM8a5/dHBTYpbhwy2g68YpDH3tu3nD9FHSeuCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787022050; c=relaxed/simple;
-	bh=lN8gr0eID1lGrFTTNUIMwNSjyBOb3TsnREZbiNkECnI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CUq8vaUfWBwKtWg9C51puEybJPRyQanNqmkTE0V6iaYLFUXSMw0L1DlZbBnwmuPAkUXOS/gnr34TnsmUUnQj7xnz9aFcPnRhJpKcFVqCxtPEYioADqZ1eTLnAWkIyhF0sfvQiTs/w51gCoGrCOqEJW9S+F4PLGBbHwRGAC4nd+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCg+PM7W; arc=none smtp.client-ip=10.30.226.201
+	bh=9x4AZrWZcZ63FIkowGQwQQitbL74pCyLw6EgRIg7ru0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NI/5UjbpKsp/yF0PqfiN8koNywZF6r8eNt1ITvzDydU7KcyUoKHkJCFPIcFFUvyWz9WGSUwRCNu1uAXAnIgcboJQetzOR2hXVh4gA4GzCQw/l+Fwqe5+EzvUcsXNNkZIyS6ONTX+LyxTvxmoPkwWKk9J1rvzYjxHff1sil0GCUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erkuNq+i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCg+PM7W"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB7E2C2BCF6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erkuNq+i"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84657C2BCB3;
 	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1787022049;
-	bh=lN8gr0eID1lGrFTTNUIMwNSjyBOb3TsnREZbiNkECnI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=PCg+PM7Wu34xP4J6pU+hUNvIEVAclWRTyQ35wJ2I8BJphLNlnrQ19zTlMmSrRMo7Z
-	 mcspFGeJhVb549bJfvEPONTECS5gsFq4Fa2atgbHYjiT7cxTj0n169oLzL7PV8+Jy8
-	 LYp5q4FGeY6AH8uTCmRloQcLCkxjWupaE0RqSaq70WK4+ncD6YHTV8Sn5bNYBqGEVY
-	 czgUiCY/AFwl47Y2epxQodJS8RymI0y3JX9DgEduVLAlNNwjHFJqq++DyRwSkxdMn3
-	 l2xRjBRSFv1bdD9hwROctuH7wKekAzUIK4ga3ZSP079AihIEVsjDb9lxQSaQh9PILE
-	 DUzGWhKMzOi/A==
+	bh=9x4AZrWZcZ63FIkowGQwQQitbL74pCyLw6EgRIg7ru0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=erkuNq+iuhQwEIGUOCdHr84Mr4inGzh4BbAEx3U4ktTTpTJ9ByylD8UrzTcGktrPl
+	 /yov7pxtLkPGgMIg6ExzcakMgj7atrVm53ZyfUcFnWt5ZDkr2cdqByADxKNnK82iTK
+	 ArtHyNMELmaTxJfSZuhjSaWvPIDXt+7iGkOetaJW8NB7cM0FkAQbpBiF1EjjIXGqIK
+	 CUU3nlSMX3KlDKkqczEwVzU12Sk3i2S1aaCZykNLvwuyH++UyoQ5Yuv98vSxJaCzeS
+	 flKz+FmcdQpJEigmH20ArfDGNhgvhtNUcd0HK6sVaT9fts5qnxsFM5e72qraJdg/bV
+	 4rxJHz/zY9iiQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F4EC5DF74;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E943C5DF70;
 	Tue, 18 Aug 2026 03:00:49 +0000 (UTC)
 From: George Maraveyas via B4 Relay <devnull+george.0xfff.gmail.com@kernel.org>
-Date: Tue, 18 Aug 2026 04:55:21 +0200
-Subject: [PATCH RFC 2/2] Bluetooth: mt7925: recover subsystem-reset timeout
- through USB re-enumeration
+Subject: [PATCH RFC 0/2] USB/Bluetooth: recover MT7925 after warm reboot
+Date: Tue, 18 Aug 2026 04:55:19 +0200
+Message-Id: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,9 +40,12 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260818-mt7925-rfc-v1-2-284d856ac572@gmail.com>
-References: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
-In-Reply-To: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/y2NQW7DIBBFr2LNuliAoRgriipF6gG6rbIYw9DQx
+ rgBJ4oU5e4lbpZ/5v/3blAoRyowNDfIdIklzqkG8dKAO2D6IhZ9zSC5fOW96Nm0GCs1y8Ex8r5
+ TFHgnvIU6+M0U4nWFfcLH+w72/8dyHr/JLQ/Ms5bpdK6q5dmdqBRcVUOzWU2GVxsXwrSd0Uprz
+ gRDR0dM7Q/Obw7TnKLDY+vmafuAjliI1TDFZWhk77mQFEbVSROsM9pr4kqicVaQRa3qE20P+/v
+ 9DzEpGtUCAQAA
+X-Change-ID: 20260818-mt7925-rfc-edd34ef031d9
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
  Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
@@ -54,11 +56,11 @@ Cc: linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-mediatek@lists.infradead.org, 
  George Maraveyas <george.0xfff@gmail.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787022047; l=5329;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787022047; l=5036;
  i=george.0xfff@gmail.com; s=20260818; h=from:subject:message-id;
- bh=tw21DpwflFbWWZ7xCtmAWfoLs4aafF589lcKdxB+wGk=;
- b=Ix8UDLUTd3fPtF4Fj9V9Qd5tWoAqB0bL7oV7Wy8yEsyle2hgNl34XqyvZ4pF2vAGU+VqagctJ
- 6n8FspmR5/4CqOkdPqZG3dZEfv488nXnL9APzijyoGt5lNuJYL0VPI/
+ bh=9x4AZrWZcZ63FIkowGQwQQitbL74pCyLw6EgRIg7ru0=;
+ b=UNa7XJ9EUgbQOFONkmEpkedo0rlgGQGvYZlI0IxpxOiMEYaus9gkcIqjLusIDEg7wgUkYj8ol
+ X1mNgNEEzAyAFcb04Noe+JMvpWkWdxMDAsaQBjy7rSwbL6vTQwTIfXF
 X-Developer-Key: i=george.0xfff@gmail.com; a=ed25519;
  pk=Jz8kMnumjUlo1GJvJ5kdfkF3ZP8DjPbYaYQR5J8IHMI=
 X-Endpoint-Received: by B4 Relay for george.0xfff@gmail.com/20260818 with
@@ -66,144 +68,108 @@ X-Endpoint-Received: by B4 Relay for george.0xfff@gmail.com/20260818 with
 X-Original-From: George Maraveyas <george.0xfff@gmail.com>
 Reply-To: george.0xfff@gmail.com
 
-From: George Maraveyas <george.0xfff@gmail.com>
+While dual booting Windows 11 and Linux on an ASUS ROG Strix B850-I
+Gaming WiFi, I found that the MediaTek MT7925 Bluetooth controller could
+remain unusable after a warm reboot even though its USB function had
+enumerated successfully.
 
-The MT7925 Bluetooth controller on an ASUS ROG Strix B850-I Gaming WiFi
-can remain unusable after a warm reboot even though its USB function
-initially enumerates normally.
+This investigation originally began on Ubuntu 26.04 LTS, where the
+failure was already present on the stock kernel, and remained
+reproducible after the work was moved to linux-next for upstream testing.
 
-The Bluetooth USB function on the test system is:
+The Bluetooth USB function on this system is 13d3:3602.  The problem was
+reproduced with ASUS motherboard BIOS versions 1644 and 1681.  Updating
+the BIOS did not change the failure.
 
-  idVendor=13d3, idProduct=3602
-  Manufacturer: MediaTek Inc.
-  Product: Wireless_Device
+A typical failure occurs after restarting directly from Windows 11 into
+Linux without removing power.  The MT7925 USB function enumerates, btusb
+begins setting up the controller, and the WMT function-control command
+eventually times out with -ETIMEDOUT (-110).  The existing MediaTek reset
+path then runs, but the subsequent MT7925 subsystem reset also times out
+and resetting the existing usb_device does not recover the controller.
 
-The problem was reproduced with ASUS motherboard BIOS versions 1644 and
-1681.  Updating from BIOS 1644 to 1681 did not change the failure.
+Powering the machine off and starting again was not a reliable workaround
+in later testing, especially after booting Windows and then Linux.
+Linux-to-Linux warm reboots after a failure were also inconsistent: on
+some boots Bluetooth recovered, while on others the failed controller
+state persisted.
 
-The Bluetooth firmware reported during testing was:
+When that state persisted across a reboot, the MT7925 could fail earlier
+while USB core was reading its descriptors.  USB core then handled the
+failure through its normal enumeration retry path and could eventually
+reach the existing port power-cycle.
 
-  HW/SW Version: 0x00000000
-  Build Time: 20260605184935
+The series was tested on top of Chia-Lin Kao's:
 
-A typical Windows 11-to-Linux failure is:
+  [PATCH v2] USB: hub: call ACPI _PRR reset during port power-cycle on
+  enumeration failure
 
-  1. The MT7925 USB function enumerates as 13d3:3602.
-  2. Bluetooth setup begins.
-  3. The WMT function-control command times out with -ETIMEDOUT (-110).
-  4. The existing MediaTek reset work runs.
-  5. btmtk_usb_subsys_reset() also times out.
-  6. Resetting the existing usb_device does not recover the controller.
+Kao's patch adds the ACPI _PRR reset to that existing mid-retry
+power-cycle.  It is required for the port recovery used on this machine,
+but it does not fix the original warm-reboot failure by itself.  On the
+first Linux boot after Windows, USB enumeration has already succeeded
+before the WMT command times out, so USB core does not enter the
+enumeration retry path where the power-cycle and _PRR reset occur.
 
-The relevant log contains:
+Patch 1 adds usb_queue_reenumerate_device().  It allows a driver to ask
+USB core to remove the current usb_device and enumerate the
+still-connected physical device again through the normal hub path.  It
+does not itself request a port power-cycle or an ACPI _PRR reset.
 
-  Bluetooth: hci0: Execution of wmt command timed out
-  Bluetooth: hci0: Failed to send wmt func ctrl (-110)
-  Bluetooth: hci0: MT7925 WMT func ctrl timed out (dev_id=0x7925), scheduling device reset
-  Bluetooth: hci0: Failed to read uhw reg(-110)
+Patch 2 changes one part of the existing MT7925 reset path.  After
+btmtk_usb_subsys_reset() returns, an MT7925 -ETIMEDOUT result causes the
+driver to request re-enumeration through the helper from Patch 1.  If
+that request cannot be queued, the existing usb_queue_reset_device()
+path remains as the fallback.  Other MediaTek devices and other reset
+results retain their existing behaviour.
 
-The WMT timeout handling and scheduling of the MediaTek reset already
-exist before this change.  This patch begins later, inside
-btusb_mtk_reset(), after btmtk_usb_subsys_reset() has returned.
+On the test system the re-enumerated MT7925 continued to fail descriptor
+reads.  The normal hub retry logic therefore eventually reached its
+existing port power-cycle, where Kao's prerequisite supplied the ACPI
+_PRR reset.  Enumeration then succeeded and Bluetooth setup completed.
 
-The existing path calls btmtk_usb_subsys_reset() and then queues
-usb_queue_reset_device().  On the affected MT7925 the subsystem reset
-returns -ETIMEDOUT, and resetting the existing usb_device does not recover
-the controller.
+Three controlled Windows 11-to-Linux warm restart tests recovered
+successfully with the series.  The observed average interval from the
+initial WMT timeout to successful Bluetooth setup was about 70.9 seconds.
 
-After btmtk_usb_subsys_reset() returns, check for an MT7925 device and an
--ETIMEDOUT result.  When both conditions are present, request
-re-enumeration through usb_queue_reenumerate_device(), added by Patch 1.
+Bluetooth remained unavailable during most of that interval, so someone
+testing the series should not expect the controller to return
+immediately after re-enumeration is requested.
 
-If the re-enumeration request is queued successfully, clear
-BTMTK_HW_RESET_ACTIVE and return the original subsystem-reset error.  If
-the request cannot be queued, report the error and continue into the
-existing usb_queue_reset_device() path.
+Since completing those controlled tests, I have continued to use the
+patched kernel as my daily Linux system.  On this machine it has been the
+only reliable way I have found to switch between Windows and Linux
+without repeated reboot or power-cycle attempts to recover Bluetooth.
 
-Other MediaTek devices and MT7925 reset results other than -ETIMEDOUT
-continue to use the existing recovery path unchanged.
+The test kernel was based on next-20260812 and reported:
 
-The re-enumeration request gives the MT7925 another chance to go through
-normal USB enumeration via the helper in Patch 1, which does this.  This
-patch calls that helper when the MT7925 subsystem reset has timed out.
+  7.2.0-rc7-next-20260812-mt7925-rfc-v1
 
-Chia-Lin Kao's preceding _PRR patch is required for the port recovery
-used on this machine.  Re-enumeration does not itself request a port
-power-cycle or an ACPI _PRR reset.  If the re-enumerated device continues
-to fail during enumeration, the existing hub retry path can reach its
-port power-cycle, where the _PRR prerequisite supplies the ACPI reset.
-
-The _PRR prerequisite does not fix this failure by itself because the
-first USB enumeration has already succeeded before the WMT timeout and
-subsequent subsystem-reset timeout occur.
-
-A representative successful recovery was:
-
-  Bluetooth: hci0: MT7925 subsystem reset timed out, requesting USB re-enumeration
-  usb 1-11: USB disconnect, device number 4
-  usb 1-11: device descriptor read/64, error -110
-  usb 1-11: device descriptor read/64, error -110
-  usb usb1-port11: attempt power cycle
-  usb 1-11: New USB device found, idVendor=13d3, idProduct=3602
-
-Three Windows 11-to-Linux warm restart tests recovered successfully with
-this series.  The observed average interval from the initial WMT timeout
-to successful Bluetooth setup was about 70.9 seconds.
-
-Bluetooth remains unavailable during most of this interval, so recovery
-should not be expected immediately after usb_queue_reenumerate_device()
-is called.
+I am sending this as an RFC because Patch 1 adds a USB-core interface.  I
+would particularly appreciate feedback on whether returning an
+already-enumerated device to the normal hub enumeration path through
+hub_port_logical_disconnect() is the appropriate interface for this
+recovery.
 
 Signed-off-by: George Maraveyas <george.0xfff@gmail.com>
 ---
+George Maraveyas (2):
+      USB: core: add helper to queue device re-enumeration
+      Bluetooth: mt7925: recover subsystem-reset timeout through USB re-enumeration
+
  drivers/bluetooth/btmtk.c |  4 ++++
- drivers/bluetooth/btusb.c | 16 ++++++++++++++++
- 2 files changed, 20 insertions(+)
+ drivers/bluetooth/btusb.c | 16 ++++++++++++++
+ drivers/usb/core/hub.c    | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/usb.h       |  1 +
+ 4 files changed, 75 insertions(+)
+---
+base-commit: 28d012efb4327f9c75d5e042a7c91e9a542efa98
+change-id: 20260818-mt7925-rfc-edd34ef031d9
+prerequisite-message-id: <20260706080117.3754550-1-acelan.kao@canonical.com>
+prerequisite-patch-id: 47a2729fbc473534f8ba52052b00723c54a26c17
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 66b346761..e8f02f1e3 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1413,6 +1413,10 @@ int btmtk_usb_setup(struct hci_dev *hdev)
- 		err = btmtk_usb_hci_wmt_sync(hdev, &wmt_params);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
-+
-+			if (dev_id == 0x7925 && err == -ETIMEDOUT)
-+				btmtk_reset_sync(hdev);
-+
- 			return err;
- 		}
- 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2bae85b00..5b56c26de 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2943,6 +2943,22 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
- 
- 	err = btmtk_usb_subsys_reset(hdev, btmtk_data->dev_id);
- 
-+	if (btmtk_data->dev_id == 0x7925 && err == -ETIMEDOUT) {
-+		int reenum_err;
-+
-+		bt_dev_warn(hdev,
-+			    "MT7925 subsystem reset timed out, requesting USB re-enumeration");
-+
-+		reenum_err = usb_queue_reenumerate_device(data->intf);
-+		if (!reenum_err) {
-+			clear_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags);
-+			return err;
-+		}
-+
-+		bt_dev_err(hdev, "Failed to queue USB re-enumeration (%d)",
-+			   reenum_err);
-+	}
-+
- 	usb_queue_reset_device(data->intf);
- 	clear_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags);
- 
-
--- 
-2.53.0
+Best regards,
+--  
+George Maraveyas <george.0xfff@gmail.com>
 
 
