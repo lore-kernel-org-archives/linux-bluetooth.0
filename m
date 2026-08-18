@@ -1,170 +1,171 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB7938DC7C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 16:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787072361; cv=pass; b=PQy91sMjVAkDzGZY6SImmD2SX95uAqrEyqgM7pqPgsnes1Gs38SDzsWe2Jl+jZkrwFrcWSuA9x9aVnLWhKzjcFL67bzBf94BUV6FEcDgFNvQyUmWJwjWZPFSU/HLvhpuMjenlaj8dyCfu0Y8Ht2mrG2DH4ptz+kebcayrUVSTzs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787072361; c=relaxed/simple;
-	bh=gZGzJWxOxuMRegb7oz5X6aa8mM8sryvxadYFctQKlTg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XoHVYnbvDkifkDV2jkxdUQ78UMd0X0THim8NP2XMiS82Fny/m4Xf5jKnegmaxsu+Pf3WD3WtRUJoYtwvBILXvQbf3TNYyjSh1uocXsQViQYr8pX0i4EHoeV/SobGZcTYHLy3sQ3WBo44/GLx/VHK2SVWVXKAASH3yea+iFJGqqU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MO2iTzXK; arc=pass smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A171FECBA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 17:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787075320; cv=none; b=fMXxVVVw6ERt7gILbM47Do87pRA40sNQpJsXx11bAZ5moADzkNXBsnhINWvdC4AFEfcMHcuEDmhK92cgii2GRTG7evm6zUTKPRNSNnjk/MdwHMfdTVbzIl7Tvbm73saRz2lq6ZSRnSJngv0yRN87F4dnhRwMl5x+cNI+6mocPaY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787075320; c=relaxed/simple;
+	bh=JE3SmwTkYSiXZiAfUiOVdaPaWE6EM4/aK4tgXbOlYKM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MmQobSYBMVFySptzW65HjR4C0aXwEurloRCVCqs1YS5Gea+Dm9+0ER6aMrR82iDuAwEEjtBxirO4wU9e3A4fU+EnyRCAE8aD23SQDu8svoW090el0w4V9QsGSNLw9aHFmeAmXY0g1y/9y6Xn42B4YXK1ZdyE9mY8cGcGCtZB0sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=keckC80o; arc=none smtp.client-ip=192.30.252.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MO2iTzXK"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-836ce6cbe1eso1850227b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 09:59:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787072359; cv=none;
-        d=google.com; s=arc-20260327;
-        b=sV2EsCKjvV2sHXDrGNeW5spBotlawRftrWOqbQZjP7bq6jjgXGJd9fUNJ/JOoWs4gn
-         YcRx9ztd+IwTp0ZyRf87C2mO3iVPnnROVgDod48Uyy8GTeEJxiix4VMGoTsJyLwum5eK
-         IijNjt/SmFgS9QhT9eajRlxvDbWBdF1ZMrV1MY/gj6/nyXjJZgiFIGU/IWciSdLrSzN6
-         kr9shX3y4ao01rV9XlfI/Dg/RgaRjonJYaMhYDPb2lFG1mKQY/3dpUtaTfPcY/WWwUe4
-         hlF9zPC8ab8FyWu3RvFeuZvk9d6gq/yRMQAyekSLMUj5cTFyhlRhmyLCUMY/8X9b1lzm
-         Bosg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gZGzJWxOxuMRegb7oz5X6aa8mM8sryvxadYFctQKlTg=;
-        fh=EQOfUM0IlHJPmYk9+dnF565qpFCACyLN6u78Auvm3C0=;
-        b=PdN484QnFI3obG3MOwOPm8ArT0MZAnyBsW9qiDZOs58Az8CUBkKA5W6ZLVzwh9vS7m
-         Lh4BMQaskBzwGQcmdUFeUa/g8hUHYpT6Hn9A0U/qCBRoD+CnbFv9nlug+LZsrGdHv2z6
-         fidVoz7PIUjLxr6LlfqKbTwjRS8w4s6vDLi2nwzSGJJUd7avBzX9Ek2NDz0G96ZB7dY4
-         0lZlMMKvtoE99Io27AWnEpOlnfpT0NP+4ka2ZHqhZW8LywP5QVNs2TVUS9dtKjEipLq9
-         IZ5cLYSmnc0fIhbNN97cKritTUaSr8TwpKQFfoCUcXBzxjBXbpR8Hrn7RAFLSfey4McX
-         pukw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787072359; x=1787677159; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=gZGzJWxOxuMRegb7oz5X6aa8mM8sryvxadYFctQKlTg=;
-        b=MO2iTzXKbb7QzIZCKxjLBILVmk87O0DFrVXohZIoPCJ8mNlKaqYzUrFyinftRGVgLw
-         zu4OgLC8tqWuNn0W/4pC8BhsfFAZcjWbNhFr6vO7M7oIfsA0I6/2de3ZyBAy9mVmyh/h
-         M4za9BReL4+a4SDBJ8EaHDwndFvlvHW9K5o1xtBn7nUUIxg9HtY3tBsBIvGiH/0AvOor
-         d/qK+f102eThtphLi13r9djWL0c8QVuKXAG1PySp8hOv+5YZcPCVvwCDnLoJCx0xJNz8
-         USawapMLauRVFKcRXUgMUdSSEaXre6I/kJTgNXN7iOwy2ikN9JM/WGQmO4IcrRTzL+3W
-         HuIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787072359; x=1787677159;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gZGzJWxOxuMRegb7oz5X6aa8mM8sryvxadYFctQKlTg=;
-        b=hgvOZEaUDRwkEyeZTzIuhD0qbQMIy9DDDZv9BcBOt10zP+I+1hjcC03zbkrKwh8t4d
-         SSsAriodfs2zeRxwJ04n7Sf4L8X6P/9IVdAkET7LBzEYtYagVcxp3MiHUkup3MeFqzl3
-         ZyES/JiW+PFP52wVvw5MwWbVocnHC0as4GxRm4JjZ5ZrATI3JDMOulvGSpkwg9mmP6qX
-         20UUhCwuILeVP7nzWliQ/K4VmGD/U4CmwEFGzGsJGFjT365z/qF2bMt/Puw0AzLadD5h
-         3UeOzLauvol7XRQXsv+oVPyHtNX8F2+5NaiKJU+uUomuRN9gejrHQegyfjCBLCQqYua6
-         RXhA==
-X-Forwarded-Encrypted: i=1; AHgh+Rr8FnB4MzMp/D5NwRWrXdc+/TpJH/MNovGYxFuo439ujd7ea5/EZxF8cxT8StRvcQZ9Uk9yBBo8hxE05J5jDw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcF9ursrDq5r8RVZz9cYl6AyYwoUthVQW7gsJOqI7DiB3titN5
-	m03le4w9l27mcUEyfL3LMKdOU+H0vmXa/KI8Fv7qzbx8Cc0wyxlBs8makWlXkOLiW8NBfwl26aR
-	z8KP13dP3IdeJzqkrmriHVw7Bpg1aBDc=
-X-Gm-Gg: AR+sD13vNw/MzJRheP7i+iJdpKEyxSGeaiIJ9WQOA9vS0+DPJCf+yVQ2rcSfuN0zS8m
-	pCwM83h9ovTvGTxhHRUH3abmzMIsU8AxiKtgJXeEYt8Zti/Gr5HVZA/aJjVyWyzvAAinMo9C99E
-	LPERbX4g8LSAf+ORWYQqPSOlHznVhDGUa2s/wB5KUy2trbvWFvkeyi5cInbx8pFQlu6xxNZWyhp
-	XuDGhICNsMFUoNOSM0brnKZlGdyzFjoXHyOK50CC66Ty8ylLKzglAczBZGyX8qB+ROGIwUZhgKg
-	QlRPe/cv7n8UzOAKNo08Od3hKw9vvwCYqL1iKDKZwxtEdHjMe5MJhEPkE00al6hD7UKlEsw/8Lm
-	oj9hJTrlEr4BJRCRhg4GMD7NcgkyUq+s=
-X-Received: by 2002:a05:690c:60c5:b0:80c:4923:cf4 with SMTP id
- 00721157ae682-8412e0c945amr38581887b3.10.1787072359139; Tue, 18 Aug 2026
- 09:59:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="keckC80o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787075318;
+	bh=6okbuqmHb/82EmHuFGvWD1R7HaRF5cv5H95Q74JafYo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=keckC80og3a8cKWiVPD+JQUETfkYEUlXsrmfmYaX+kdZmGEZfGDh5W9eQcC4I1kuQ
+	 Et+M0W2MpC2rYrSIABbzfSYbTVmM/qimis8HalnghaTAoZLJ6jfZvsURYDB8Y1yHPr
+	 KzZxDK368V5oEu03z6MmA8Zygoi7V4u2iE5CIZKU=
+Received: from github.com (hubbernetes-node-d36bec0.ac4-iad.github.net [10.52.157.25])
+	by smtp.github.com (Postfix) with ESMTPA id 309C9324376
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2026 10:48:38 -0700 (PDT)
+Date: Tue, 18 Aug 2026 10:48:38 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/bd8989-5abc00@github.com>
+Subject: [bluez/bluez] b21edc: sdp-xml: Use a queue to collect sequence
+ members
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <AS4PR04MB969206113CDC2F5C66994E6EE7A62@AS4PR04MB9692.eurprd04.prod.outlook.com>
- <20260818080104.563675-1-ali@iusegentoo.com> <CABBYNZ+yDwFJ7YFB60-SG6Tr1R+6BeE1E=06d5+UEK_y4j7g+Q@mail.gmail.com>
- <20260818162501.584425-1-ali@iusegentoo.com>
-In-Reply-To: <20260818162501.584425-1-ali@iusegentoo.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 18 Aug 2026 12:59:07 -0400
-X-Gm-Features: AcwNN1WzSMeUAVS9n4GTWLJsJ8_imbHXtk1Jbx8AVkGVYm0YZRZ6fs3Ru3WU4n4
-Message-ID: <CABBYNZLUUBbK47giBBG7KH=9vU7V_wuAcSYB-oTyr0k+7iYw=Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btnxpuart: Keep FW dump header in coredump chunks
-To: Ali Ahmet Memis <ali@iusegentoo.com>
-Cc: neeraj.sanjaykale@nxp.com, amitkumar.karwar@nxp.com, marcel@holtmann.org, 
-	alex.zhou@nxp.com, song.xue_1@nxp.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Ali,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b21edc49b2c3675c7aea19286fdb2b887f29c0ff
+      https://github.com/bluez/bluez/commit/b21edc49b2c3675c7aea19286fdb2b887f29c0ff
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-17 (Mon, 17 Aug 2026)
 
-On Tue, Aug 18, 2026 at 12:25=E2=80=AFPM Ali Ahmet Memis <ali@iusegentoo.co=
-m> wrote:
->
-> Hi Luiz,
->
-> On Tue, Aug 18, 2026 at 11:51 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Ok, but if that is the case why are we parsing the headers in the
-> > kernel? I thought the idea was that the kernel would assemble all the
-> > segments and then push the dump as a whole. However, the above
-> > suggests the NXP FW analyzer expects the headers. In that case I would
-> > just have each segment reported on its own rather than appending it to
-> > a separate skb including the headers.
->
-> The two fields are not just optional parsing for a concatenated
-> dump. They are what the driver uses to handle the dump state.
->
-> seq_num =3D=3D 0x0001 tells us that a new dump has started, so
-> hci_devcd_init() is called. buf_len =3D=3D 0 marks the end of the dump,
-> so hci_devcd_complete() is called.
->
-> The chunks are passed to hci_devcd_append() as they
-> arrive. nxp_process_fw_dump() does not check whether the dump is
-> currently active before calling it. That state is handled by the
-> coredump code itself.
+  Changed paths:
+    M Makefile.tools
+    M src/sdp-xml.c
 
-Yeah, and it concatenates the header states into a dump skb,
-interleaving data with headers. The worst part is that if the analyzer
-finds an issue with the header it can consider the entire trace
-malformed. This means both the kernel and userspace try to parse the
-same thing but may interpret what each chunk means differently.
+  Log Message:
+  -----------
+  sdp-xml: Use a queue to collect sequence members
 
-> > Id argue that this should be appended as is then, and the analyzer
-> > should be the one checking it, _or_ it needs changing and then it only
-> > process the dump _after_ reassemble.
->
-> The driver also does not otherwise interpret the chunk contents. It
-> does not validate the payload length against buf_len, slice the
-> payload, or remove anything from it. Once the chunk is long enough
-> to contain the header, the whole skb is passed to hci_devcd_append()
-> as-is, including the header.
->
-> So the length check is only there to make reading seq_num and buf_len
-> safe. It does not change what gets appended.
+Appending a member to a sequence with sdp_seq_append() walks the
+single-linked list to find its tail, so building a sequence is O(n^2).
 
-Well, it does change, it doesn't append anything if the chunk is less
-than a header and that won't even show up for the analyzer to analyze.
-Now, regarding this, I wonder if the driver receives a chunk smaller
-than the header size, whether we should either append it and leave
-interpretation to userspace, or 2 drop the entire dump because we
-can't guarantee its consistency if we suspect data corruption when the
-firmware is not supposed to generate chunks smaller than the header
-size.
+This was previously worked around by caching the tail of the sequence in
+struct sdp_xml_data, which required the caller to pick between appending
+to the cached tail and initialising val.dataseq, and to keep the cache in
+sync on every append.
 
-> The only packets we drop are those that are too short to contain
-> the header. Without the header, there is no seq_num or buf_len,
-> so we cannot determine whether the packet starts or ends a dump.
+Collect the members in a struct queue instead, which tracks its own tail,
+and link them into val.dataseq once the element is closed. Appending is a
+plain queue_push_tail(), and the queue is destroyed along with the rest
+of the element so members that were never linked, such as on malformed
+input, are still freed.
 
-Yeah, the decision of considering a chunk valid or not seems to be
-split between kernel and userspace. The kernel evaluates if the chunk
-is too short but won't check any data consistency after that;
-userspace will evaluate the headers but won't get a chance to evaluate
-if any small chunk was dropped in the process.
+The sequence_on_squared() test stays at less than 0.1 seconds.
 
---=20
-Luiz Augusto von Dentz
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 97521ab4dd79a38b2c30d8d664b4e11f86680e88
+      https://github.com/bluez/bluez/commit/97521ab4dd79a38b2c30d8d664b4e11f86680e88
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-17 (Mon, 17 Aug 2026)
+
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  sdp-xml: Fix leaking the parse stack on malformed input
+
+sdp_xml_parse_record() frees its context but never the elements left on
+ctx_data->stack_head.
+
+element_end() returns early without popping the stack when it rejects a
+document, for instance on a mismatched </sequence> close, so a malformed
+record leaves its elements behind and they are never freed.
+
+Free the remaining stack elements before returning. Found with the
+compute-seq-size-type-confusion.xml test:
+
+56 (direct) + 1,072 (indirect) bytes in 1 blocks are definitely lost
+   at calloc (vg_replace_malloc.c:1678)
+   by sdp_xml_data_alloc (sdp-xml.c:73)
+   by element_start (sdp-xml.c:473)
+   by g_markup_parse_context_parse (gmarkup.c:1369)
+   by sdp_xml_parse_record (sdp-xml.c:696)
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 078ef10a4531e3fddbac332cf65077f317092555
+      https://github.com/bluez/bluez/commit/078ef10a4531e3fddbac332cf65077f317092555
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-17 (Mon, 17 Aug 2026)
+
+  Changed paths:
+    M lib/bluetooth/sdp.c
+
+  Log Message:
+  -----------
+  sdp: Fix memory leak when freeing alternates
+
+sdp_data_alloc_with_length() stores the members of SDP_ALT8, SDP_ALT16
+and SDP_ALT32 in val.dataseq, exactly like it does for the SDP_SEQ8,
+SDP_SEQ16 and SDP_SEQ32 sequences.
+
+sdp_data_free() only calls data_seq_free() for the sequences though, so
+freeing an alternate frees the alternate itself and leaks every one of
+its members, along with anything they own in turn:
+
+209 (48 direct, 161 indirect) bytes in 1 blocks are definitely lost
+   at calloc (vg_replace_malloc.c:1678)
+   by sdp_data_alloc_with_length (sdp.c:350)
+   by sdp_data_alloc (sdp.c:486)
+   by sdp_xml_parse_int (sdp-xml.c:243)
+   by sdp_xml_parse_datatype (sdp-xml.c:421)
+   by element_start (sdp-xml.c:507)
+
+Free the members of alternates as well.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 5abc0045b84adcb47af26f88f699f33c0037a00c
+      https://github.com/bluez/bluez/commit/5abc0045b84adcb47af26f88f699f33c0037a00c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-17 (Mon, 17 Aug 2026)
+
+  Changed paths:
+    M Makefile.am
+    A unit/sdp-xml/alternate.xml
+    M unit/test-sdp-xml.c
+
+  Log Message:
+  -----------
+  unit/test-sdp-xml: Add a test parsing alternates
+
+None of the existing records contain an <alternate>, so nothing covered
+the SDP_ALT8, SDP_ALT16 and SDP_ALT32 handling.
+
+Add a record with an alternate holding an integer, a string and a nested
+sequence, which leaks its members under valgrind without the previous
+sdp_data_free() fix.
+
+Assisted-by: Claude:claude-opus-5
+
+
+Compare: https://github.com/bluez/bluez/compare/bd8989620ed6...5abc0045b84a
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
