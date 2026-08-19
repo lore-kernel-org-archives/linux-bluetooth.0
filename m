@@ -1,214 +1,201 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4BD2D9ECB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CA01F91F6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787143140; cv=none; b=Pqbt17ZKPwIk8eenpA9M+STDgW1ZHMi9ztv2HfVio6bu+ij9+d2JZrERs5U13fiurcuZxJUjBuSYzLgVi+EibCBIKIbTvrFdwB92Y8qD8/K3Kaw/J3XVLljid3yqtG8kZ6R22xQl45VW/Qs1+TrZtpHNRrYQR0kJoZEz5/VGDMI=
+	t=1787144070; cv=none; b=B0k2GXCoVpLy0i59/Lk7Az4Yu/rsDdko/RXajKamDanwoRF57stbgt0gVURMURASiidhWmDHiUcDva+aQkZeC/1fK8Riqdx4kW0gg36d6PkUo7Jnf8dc2fs3cv1QggHHVW6jTlQ6RNDpV8ahnJlafOKrZ47RdmualhmRW0ZX5Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787143140; c=relaxed/simple;
-	bh=ti+q3Ez+5lurJibGp/Ys+prKkmqpOm9ANEMYbROgczk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VHdvihToX/KzhoFDtV7qAa4GQyWjAlrpuGyqkOhTBy+vHakDFldyLuw2Gc4MPhTXqXtTO/wvnrwxY00spZLPb0QNkH8Zj0++G8akNONnsiuIzZ7UoSg2OqXlkDXfD8s2vn3OA5KWOEXywGhv14NpNA11LHgm8Mec4kdJKI74Us8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=LvPHDw8G; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JVg/VqKJ; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1787144070; c=relaxed/simple;
+	bh=CWUqQ1a2gb6hbuuM64I2hY7ukGRJCQGKjendK5/JXiY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LX5oHqH6c8JqiMXveeFm2VrUz9O3iFHIMB9c6oIDegR/MEqg9FZcacjS6ggho4DDBweJped8NkDT3Y9f4pyIFDMrA4DtKyrANub5SSuqaC/RkdoSL1IXZEqihQO4nc+U7yPTlZVLV58qAoAMFOftVMUZgA0FVfrG7a/fs7l0e2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=UVLOceN0; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gP19kFzH; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="LvPHDw8G";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JVg/VqKJ"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67JA7xqp516038
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:38:51 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="UVLOceN0";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gP19kFzH"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67JClxm64084641
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:54:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	oeaL78ack5YcCyf6GgMSt/F2woxmb8WSjxxW/++9c40=; b=LvPHDw8Gmw5gi+zw
-	2GOted65+0U5P8yXiBVt/EGYYo5UCVrqGmfpjzRS+xHJG3syk42AQYNvS0mLyL99
-	0EEj5THHfh1/JYa6S0qbpviZ0wFyRgI6kk+cvyW++njOqC6cOVSABG8y6rj5083a
-	M6ANQmAzoS+BvbaM/1P3dytcvz3oDPaAksJNqB1eHb6o56qizXiW1AqUNkWSmyWU
-	TXUyiR6s4MlD8CD8Xg20mODJI7fP2FiQKEZlyYiniLZOa6avpCAkt5uez6eeL3Ld
-	nNvClfQVooLqtbxZsBm2wzeoh7SXKu0JOM1iANNTySdlgSykFrHskKnhIji9VmAG
-	Vzgt2A==
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=mKPsanuWE/uy+9lSL1WjIdqDrY0ukplYS9d
+	DeqmBTqQ=; b=UVLOceN0OV++JnYVKDSz3WnxtNipTZcJ8yrGqkWuFw1QW4P6USA
+	ech/btVdeDvakvxuErvqfCtx7JjgML4ONNivEvJL+L5ZQZ5P9p+RO744rgpFtA9m
+	LAmyaVXCR8Prj7x5WzHaQrQ0z2sq8MEO5txlN/oxJtz9zOakpjgapcLqYYxxvcnM
+	KZUQSps1zNyfWZN9ckk0W1kEnIEI1UJ9UuUdYklbg4kvlbOyVgId9yZWbRFeYBBp
+	chj4GnVnN04hjAb+umwjGRiYmpoGLhp17/Us5m4WVtXzeQY/ZWIu9fPrz1/vSCYk
+	TuLeEsFoCCkaKyCSha6iwBtuW2ve4738ksg==
 Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g4yfpu509-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g4yfmb8p0-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:38:51 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-9308eafb465so195972885a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 05:38:51 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:54:28 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-930b6bdcb4fso142098285a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 05:54:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1787143131; x=1787747931; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=oeaL78ack5YcCyf6GgMSt/F2woxmb8WSjxxW/++9c40=;
-        b=JVg/VqKJPRukgcXnmm5Hbr3EbBiWbMWqUp1SOm42aBk9VGQSKJ1D2/k86yXPaFL6Z0
-         7Xf7GsdzG8b+i34oDOmT4Lmp/IL9zw0a+kagb/+yT57Af/5jTbucpselH8BWUk7SL6PP
-         fGEkhjsbIjxT/EBGa2XR306MV7ik7LgMSI9mbUJIaZDS+zhJ5Cbgf2x8l1pdgUaajxmB
-         zRD//pabdYicnY5WzcltxPbSwWarTcv9GBRDig/YzRRHLbWLwIpE2QMq7pq1nuLwrkRt
-         RkwbBzm3qhvQB7f++CJ01nSII4BY9K9cua6ocNmEYIHu+sKhYRMi2OB73TRiLMNHaOu5
-         Bpng==
+        d=oss.qualcomm.com; s=google; t=1787144067; x=1787748867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=mKPsanuWE/uy+9lSL1WjIdqDrY0ukplYS9dDeqmBTqQ=;
+        b=gP19kFzHlAeYqpZxoMO3/+QVUMDr5ZwzhMK2bWLovudsSrTs7pom2rkx3lA3sH33B+
+         5vndnXLtrCl+7aWzQKSrqjytqfITPbP6d4HLedhzqLranVFEUqmU4qanauuuVac4NIPL
+         DY0kaJg59qNQzEWpMqnMiqMHYE7P6tiujNJvDxOng7gZqTuZcDtpdXdlG/iDpXCdlDrw
+         qxA9avAgC0SYCj8a+XHG9ERYDTAHpNlFXuQBsDfc/H+4670P29gcvd9CpX325TRGXwCu
+         DflnDNf7riWNaNiVWlNmH+7/47v0R494Lw/XYBKyUrfSTHY4jCEql3IQg2zCv4nZoqL5
+         QoQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787143131; x=1787747931;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1787144067; x=1787748867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=oeaL78ack5YcCyf6GgMSt/F2woxmb8WSjxxW/++9c40=;
-        b=g7L3bWPB+GmT7W9hwu3Dzns53wtqltdGDXlni96KGj7kgt2qvg9LDdiv/+7Ky+ImHT
-         FioSKtvqOR+OTMz179lFBdlM3T5dfaNVHEUoTO5vtdT9u6WzBiLsWedJVns+HgcN80Tm
-         6xluCvPTCEqnMUs0ITxWqBnAGCbNBKohghWRPqNJJA2aLKwnDoyFyoluTn3hrIVoXVCb
-         4wSGkCxgC+n7fbuBCjT6QOsLCZKhCmKo9hgpZ7k8gvNa1eNFlxoW4bKJlptWDoW2eHuk
-         KO/QpKKb5KYYSnv261QM4kg8fNx34YeLml6UEmFWilCfbU5z7wIsBY7xueqD1Z2cI2vr
-         y3hg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr6ApvKwl6U/MAnGUcW8zWOS8WtQx4uF6Ig066h0VFQu/8PUzLxOCGsUTT2XmyccTNRalal14cD063OFADFw/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMBDQfvQ+Uo5I9p0ZCsJUFBHY4PNh3iY54h8ouRj/4LQw7jTEW
-	OlW60qZ7YMuzjZJ2WsrxPcL5ASpUucsNcaW9E1JuDY51IJiceRsxRyBX/FuOGFV+lggQRlrISry
-	GdUXFUugYYmN7pL5i9e4OEBCxVF1a8FmdwuRX71zPYWKh5so3RpnT66wL5IfspqUSsF2PQbXCzP
-	8WM0g=
-X-Gm-Gg: AR+sD134yzE3NRH0Prj7AT0qBiuFjjyBIM6esLLOc6ZnsE1M6+JKHkCeJ+ludcI+QZF
-	8s7pBXloiLyEFuOPfTIVIdLk8lluQ73zdxkyNcjNm/kJI2K+eSgarFaC9kuNXAqZYoscmSQOluz
-	3+N7l8JinKvp5r47ual+qh4jYONOSIhTyEMjA9VvZZ5zAQgvPF2bq1nnyWKQSlTUs0C2mc80rO+
-	MOZyv/HYXJ8uxSVzFjxQPFmxkM0kjyjetIQGNdOltIU6IyiQ7/mXpg1AKgFVWhWNWjU/O/USvXq
-	Qk9n6yyNHeG5AGE1xxZiDoIOv8VmFqWtkaaC5dcD7cl1kmqHna8hZohF1c+xqTYOyQwpNQ2TGO9
-	aovIEHSVg+GMIWyfN/e+RdsOq4s4Nf0+DCltiYiMYk0LY/nCiHbmGMrb6BXXxuZKbO+pqP29IiA
-	jmTUR07NkqVcvFRitXMcEDzAq6lD9sdCfMXWng3KdL0+W8lXfUxm1a7Mw+MUDs7E6PYaI=
-X-Received: by 2002:a05:620a:8803:b0:936:adc5:6a8e with SMTP id af79cd13be357-9371e21876fmr433032185a.13.1787143129694;
-        Wed, 19 Aug 2026 05:38:49 -0700 (PDT)
-X-Received: by 2002:a05:620a:8803:b0:936:adc5:6a8e with SMTP id af79cd13be357-9371e21876fmr433020685a.13.1787143128642;
-        Wed, 19 Aug 2026 05:38:48 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a3feec9d52sm896446a12.2.2026.08.19.05.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2026 05:38:47 -0700 (PDT)
-Message-ID: <73afb7ba-53c8-423e-81a2-7e923896c995@oss.qualcomm.com>
-Date: Wed, 19 Aug 2026 14:38:47 +0200
+        bh=mKPsanuWE/uy+9lSL1WjIdqDrY0ukplYS9dDeqmBTqQ=;
+        b=DURUsVxLY2GRoE6bhaScDKPWKaNSslQ8vLBGV2DKizTNOPy5d8+HR/PeIVIjHoSu1t
+         y2J8wIDVsg/LlO2ZfUBn5dMWGSIMh+eS86ge1tEBqquTkKIKCMJhSvFozkBZEMj0bjnz
+         5u0IxP3fMJ5Gg1vQDxaIO+L7mXy2xA30UVFgez+2kPvWX5JPMJRmSbbV3HjtNKsjMX5n
+         Hxr5ou1ANHZsz/zFAU1TtlGexeOTb/W9nT+NYbLlopKz+FeGrTeUeitcaW/8dvW+wi9m
+         /BSxDyWYA5lXd6v3GVvC/B2s+ZMpdensAaOS90+qcEu5TcsGm9tSd9TNldaFPzrv8Ezi
+         3+zg==
+X-Forwarded-Encrypted: i=1; AHgh+Ro7LCOT2ll24zfAQ82cmjD5EwEH+cxIUjfvnC3gdeFov/y33jUBGuHlUaC3cjsfdb3jz027QKWwiz+G6CgIaiw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXov+wniO2Hma0GHYael8jYhwedms2T2QXi2as5fEeWrN9yukr
+	CR6hfSr1EPbNMu6Q5l1xWtKb5+7THrrSDC6wWO3o/hWSqIr56juYS47bYu3r45fu7zMH8OcY7z9
+	ZjG8eJL2rvWo+NxjZK5Q61scGT/F7C8BOPym3027bFeq9KexsHVuUbt03dQMFQzWRW0nvmvvsq2
+	rnrF8=
+X-Gm-Gg: AR+sD13RbMvT2Fc/mf0lLRfAfq/JimWNakfvYOooT+d3P+l6kF2Y1v+/KWbw4+Lwlc9
+	z0viPEAPk5Phy+rrDYVIAYCMqQ9vXM0QIka2mAe+VyCZkufWTEHVJdjDGilw8BHSAAcSPI1yHXY
+	+EbkV3FjBWRkLvb1XfEju5SgCWOvbX5ykI4Ny/DIXzM1sQuiVAlDIW2K4aL4eITbRZ8+C+bgli4
+	w8XnpplYb3Yjk9vg3aHf29MbqH44L/Q8x12mynIUbrP176fYc7Orivu/818wX7PDFOFCiWV3EsC
+	BDDGAS/+Eb8SvBSN0FYCyBaNMmFk8H2VcEHMzczZs2G5C0//5FZOk12nHgMdDv+7LO6ZUDjXzaY
+	8KhIey5A27AKPHLKzP4fn2c/GOXUGy2iQxf33UIDlsosNRN5xvf5/Ar8Dgf37Z8ceEGZioggfMW
+	vAJID4sXGOmW06Gyg=
+X-Received: by 2002:a05:620a:46a0:b0:930:db8a:c608 with SMTP id af79cd13be357-9371e1f65e0mr387098585a.7.1787144067214;
+        Wed, 19 Aug 2026 05:54:27 -0700 (PDT)
+X-Received: by 2002:a05:620a:46a0:b0:930:db8a:c608 with SMTP id af79cd13be357-9371e1f65e0mr387093485a.7.1787144066723;
+        Wed, 19 Aug 2026 05:54:26 -0700 (PDT)
+Received: from shalem (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a3ff156811sm748577a12.19.2026.08.19.05.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 05:54:25 -0700 (PDT)
+From: Hans de Goede <johannes.goede@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Hans de Goede <johannes.goede@oss.qualcomm.com>,
+        Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_qca: Do not write to the serial port after it is closed
+Date: Wed, 19 Aug 2026 14:54:25 +0200
+Message-ID: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Hans de Goede <johannes.goede@oss.qualcomm.com>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_core: Handle skb_clone() failure in
- hci_send_cmd_sync()
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
-References: <20260817205017.56524-1-johannes.goede@oss.qualcomm.com>
- <20260817205017.56524-2-johannes.goede@oss.qualcomm.com>
- <CABBYNZ+Bhhx3rtq8i_FGu2a_oFyWquo_gTRcmPyM6HcFC3pkVg@mail.gmail.com>
-Content-Language: en-US, nl
-In-Reply-To: <CABBYNZ+Bhhx3rtq8i_FGu2a_oFyWquo_gTRcmPyM6HcFC3pkVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: bfDKZdFaTX3GECU0M47Gk7pFHmSH8azl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE5MDA5OCBTYWx0ZWRfXz2IE5mhbPxfB
- eaWNoHA6wAUJGmZ30mvIT9uTj0+wpPcjF9J6j/5L6N0fmsCU2+ZEmZpv/YdyObYKPUoPOXOtIZr
- DzMdjpKN6v86U+uXJ/8oaGt76DBDcFfUEjlOXsmjfa8t7IUXX6oSPGRzvBYae61yqe6HgEWsQhF
- FQqA/Q1ZvlkU1QlS1YdGKBXLA3HxGXPzNBsWo4odWuEoxXcaADmYYd1AfYh1uQezofl2LeYL+G6
- gaCVrbhgjHRuY9bZrzCk3eICA4pfa0oEDKJ2Moqa4kRTpVeIm4Q5iBRWynn64hVPhtxR/ZhcuHH
- jOGh91ZAGQ1EKQQzF0deZyJNCIBpc1ZHX3AggepRwPQWEVVfDPO4bvG7u4mTaE3XE9MOMljC9ib
- lCNjhF2Elj+x3dE/PLUU8smEcpA0CUOFzBjCoJMNibsCxt1Zu5y7TMVUSpRNrvuIA55JY1LXF2R
- sqQz4UFL2jL1HiWeSJg==
-X-Authority-Analysis: v=2.4 cv=aMrAb79m c=1 sm=1 tr=0 ts=6a85a3db cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE5MDEwMCBTYWx0ZWRfX5XVv1BAtr/Xh
+ QeimdROICCGRD+/gmCkyMMTmyBTZEmV/9M9viFZPyXWW2GToto/XRaeI74l7DeFKqN7OBz+uqTC
+ zScOf0aD0j/bY3bg8pS/daM2moB95VEBYcMzA5E2tN5ptWvBg9EcXvuNFtXb3Rnm3G8cWmp+7FH
+ hj7z0aiBWPGXK3J8WMKszYmSADmk33FOEx9+LnRKkxWWzDgkYlt6CXbSoFjCwJjhbNB5DZmM14U
+ ozuUGlKceWEi/FfqtUBRScqm2LTessOY5ZPbDVaNOLEraw0lzR72l7CkZYUGIRSZgONaNY5JsyT
+ xh9NvVG+vMdUuvO0QY35i6voBpsuWrNvmPpMPdxTbt2qgg8smh/LhWTUVwBrrABM/75ZZNNXDnj
+ BKbmadbFA8jVVm+E3d6yr7dQ1ADZL68d/hgR34hpN6xA6c6iGfcQMQzQ/JZatq0dMD7q230NAJc
+ P8jCTtyY7g6/zJmPi1Q==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE5MDEwMCBTYWx0ZWRfX3GDc+qjD15Dt
+ LzC1X72robLck1WkaJCQ6rHsYrlmWDH4GDgkfTnaX0fEQTLG6Nh0g+xFRQYaLqHTbbHpRiIyaBW
+ sMeY91t+tFYL3bu8Nt3vIYeFfFCsMAk=
+X-Proofpoint-GUID: dabAwsEfbaxpk3xpMGFY0uJNJmAFC76v
+X-Proofpoint-ORIG-GUID: dabAwsEfbaxpk3xpMGFY0uJNJmAFC76v
+X-Authority-Analysis: v=2.4 cv=J+SaKgnS c=1 sm=1 tr=0 ts=6a85a784 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=dlFzzRy74kIF9YYi:21 a=xqWC_Br6kY4A:10
  a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=c92rfblmAAAA:8
- a=EUspDBNiAAAA:8 a=HAoXxi4WUqF9RrtjM_8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22 a=GvGzcOZaWPEFPQC_NcjD:22
-X-Proofpoint-ORIG-GUID: bfDKZdFaTX3GECU0M47Gk7pFHmSH8azl
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE5MDA5OCBTYWx0ZWRfX98gHeqcdntka
- cIrMzJ1VfQnbuWHwWr9aHYNo30Pj+65Q9ckQ1KKO4BXnc7sRaChOoHgPFT0JVZLLAOaNNnNAmFr
- Go7R5RqyoM03AAT9bSr0iHaEbIi1u2E=
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8
+ a=J0bGeDfF202-RPBtlhQA:9 a=NFOGd7dJGGMPyQGDc5-O:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-19_03,2026-08-18_01,2025-10-01_01
+ definitions=2026-08-19_03,2026-08-19_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1011
- priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 suspectscore=0
+ malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608190098
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608190100
 
-Hi Luiz,
+From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
 
-On 18-Aug-26 20:01, Luiz Augusto von Dentz wrote:
-> Hi Hans, Ibrahim,
-> 
-> On Mon, Aug 17, 2026 at 4:50 PM Hans de Goede
-> <johannes.goede@oss.qualcomm.com> wrote:
->>
->> From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
->>
->> hci_send_cmd_sync() does not handle the second skb_clone() failure as it
->> does the first one. At that point the command has already been sent and
->> HCI_CMD_PENDING is set, so an allocation failure leaves the flag set with
->> req_skb NULL. The response then matches nothing and the caller blocks for
->> HCI_INIT_TIMEOUT before getting -ETIMEDOUT, reporting a memory shortage as
->> a controller timeout.
->>
->> Clear the flag, cancel the pending request with -ENOMEM so the caller fails
->> immediately instead of waiting out the timeout, and return -ENOMEM so
->> hci_cmd_work() does not arm cmd_timer for a request that no longer exists.
->>
->> Clearing HCI_CMD_PENDING here is safe: all code touching that flag runs
->> from hdev->workqueue, which is an ordered workqueue, so those paths are
->> serialised and cannot race. The one exception is the cleanup added by
->> commit ed516e3f1aa6 ("Bluetooth: hci_sync: Clear HCI_CMD_PENDING when
->> dropping the last request"), which runs on hci_dev_open_sync() failure and
->> from hci_dev_close_sync(), and the workqueue is stopped before that runs.
->>
->> Fixes: 2615fd9a7c25 ("Bluetooth: hci_sync: Fix overwriting request callback")
->> Signed-off-by: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
->> Signed-off-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
->> ---
->>  net/bluetooth/hci_core.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 8aeb3024428b..9585b42e7970 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -4092,6 +4092,11 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
->>             !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
->>                 kfree_skb(hdev->req_skb);
->>                 hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
->> +               if (!hdev->req_skb) {
->> +                       hci_dev_clear_flag(hdev, HCI_CMD_PENDING);
->> +                       hci_cmd_sync_cancel_sync(hdev, ENOMEM);
->> +                       err = -ENOMEM;
->> +               }
-> 
-> Sashiko flagged a problem with this change:
-> 
-> https://sashiko.dev/#/patchset/20260817205017.56524-1-johannes.goede%40oss.qualcomm.com
-> 
-> Im with the opinion that this shouldn't cancel the request, because at
-> this point it may already been sent to the hardware so maybe we should
-> flag it somehow that req_skb wasn't able to be allocated, or something
-> like that, but the command is still outstanding.
+hci_uart_close() closes the serdev port if HCI_QUIRK_NON_PERSISTENT_SETUP
+is set (for example, for the WCN399x family). A failed hci_dev_open_sync()
+following a successful qca_setup() calls hdev->close() but not
+hdev->shutdown(), so the port is closed while power->vregs_on is left true.
+qca_serdev_remove() then passes its power->vregs_on test and calls
+qca_power_off(), which writes to the closed port unconditionally.
 
-Ok, so maybe we should move the hdev->req_skb = skb_clone(hdev->sent_cmd, ...);
-to above hci_send_frame() ?  I don't really see a reason why that cannot
-be done first.
+Seen on a WCN3988 by unbinding the driver after a controller failure. The
+trace below is from a 7.0.0 based kernel, where qca_power_off() was still
+named qca_power_shutdown():
 
-And then the hdev->req_skb = skb_clone(hdev->sent_cmd, ...) and
-hci_send_frame() error handling could share a common err path both
-calling hci_cmd_sync_cancel_sync() ?
+  Unable to handle kernel NULL pointer dereference at virtual address
+  0000000000000038
+  Call trace:
+   tty_set_termios+0x50/0x238 (P)
+   ttyport_set_baudrate+0x84/0xc0
+   serdev_device_set_baudrate+0x24/0x40
+   qca_power_shutdown+0x158/0x1fc [hci_uart]
+   qca_serdev_remove+0x54/0x68 [hci_uart]
+   serdev_drv_remove+0x1c/0x2c
+   device_remove+0x4c/0x80
+   device_release_driver_internal+0x1cc/0x224
+   device_driver_detach+0x18/0x24
+   unbind_store+0xb4/0xc0
 
+Check HCI_UART_PROTO_READY, which hci_uart_close() clears in the same place
+it closes the port, before writing to it. The regulator disable is left
+unconditional so the controller is still powered down.
 
-Also while looking at this I noticed that hci_send_cmd_sync() exits with
-ENODATA when hci_skb_opcode(skb) == HCI_OP_NOP, but at this point it
-has already set hdev->sent_cmd and will also still set hdev->req_skb
-if the conditions for that are met.
+The dangling serport->tty that turns this into a use-after-free is
+addressed in a separate patch.
 
-I wonder if this is the right thing to do, or if the hci_skb_opcode(skb) ==
-HCI_OP_NOP check should be moved higher up in the function followed by
-an immediate kfree_skb(skb) + return -ENODATA ?
+Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
+Signed-off-by: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+Reviewed-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
+Signed-off-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
+---
+ drivers/bluetooth/hci_qca.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-Regards,
-
-Hans
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index c4575036483a..0cee54949221 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2229,8 +2229,8 @@ static void qca_power_off(struct hci_uart *hu)
+ 	bool sw_ctrl_state;
+ 	struct qca_power *power;
+ 
+-	/* From this point we go into power off state. But serial port is
+-	 * still open, stop queueing the IBS data and flush all the buffered
++	/* From this point we go into power off state. But serial port may
++	 * still be open, stop queueing the IBS data and flush all the buffered
+ 	 * data in skb's.
+ 	 */
+ 	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+@@ -2252,8 +2252,14 @@ static void qca_power_off(struct hci_uart *hu)
+ 	case QCA_WCN3990:
+ 	case QCA_WCN3991:
+ 	case QCA_WCN3998:
+-		host_set_baudrate(hu, 2400);
+-		qca_send_power_pulse(hu, false);
++		/* Both of these write to the serial port which may have
++		 * already been closed by hci_uart_close(), which closes
++		 * the port if HCI_QUIRK_NON_PERSISTENT_SETUP is set.
++		 */
++		if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++			host_set_baudrate(hu, 2400);
++			qca_send_power_pulse(hu, false);
++		}
+ 		break;
+ 	default:
+ 		break;
+-- 
+2.55.0
 
