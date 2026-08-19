@@ -1,66 +1,63 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA0B443A8B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FD4420E9F;
+	Wed, 19 Aug 2026 09:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787132403; cv=none; b=V5goFyVuK8KCL997HFb3h0SiLuySeABI0jbdBdpvteIUtf69VlLNRxI3JscZNRqG1L4+z6tV0I7bxDXhLK2hVN/IosKFbANWSRBQ6mdxxdC2EQfk4qRgX9WQRyXNzw/aTiHPvWk3CpjyLCB/kEBWzez5kabnIalnwrzZtMxEt0Y=
+	t=1787132675; cv=none; b=G4pX3qbcnqyoWCoKMxd5629QhdeRUoEv0iOvnKnRpY2gxkWDo793LHQitx2CDMOoPhnHKti6z+k2PWzFkIgdjLKu5GETt/uoWigbM4Qld5SYM6rWI+NJaohOlPSeUhExjpyodswphZuErR4WesKpH7Z4YEWR5XXxSq0OJFePhIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787132403; c=relaxed/simple;
-	bh=eoDMSDhD457vy8augvghLPNJbY1OB09jgxSv7iYud/M=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jSfSKPfvG7TVTaAnsBIvf0rpNj1Z2r2sfL7mo/211Xhwb4EzFrzIi63+5TsNybukcfFP1N1pf/iRHxSyZlLZznv6xfeALI3FdO/ETinqdvRbOn+V0DLlBVJ/Hzxa5TsPU1mxaRjN4SLkwxvNo1TEo4fA9HuOfiq8i29GMVVopmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Whdyzi8Y; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1787132675; c=relaxed/simple;
+	bh=4e8KfB2/Wtipn2kbc6ukAs3sB8JL1UNcTAomff3plqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hiATvvOlP5QIdbIb+975jqHlPi5XxYxtSR9qqanp0LLcTQdFHMc+D7HwsXFLfSVmqVeQkBNygqD/nUnasZMMqiheTgxx5CSxXxVOXawqmF63PIZt2oM+8lgfpZGYxQdLp2UwV6C45ItnFhlieupR5un9Zj4A6KQURyoYh5779Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9F+T7Qv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Whdyzi8Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787132397;
-	bh=rnjkS4M/o4DeResx1OPO1MbPq7HNlgJk5/kOF8qwGDo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Whdyzi8YznM5KDRPkilZ3+8dnnLzxEdca6zK5pBL2o4Xm7UrNlCOJsV/PXeAyx+43
-	 3N3qIT/iGbXP35l2vpLCgC+83+GgY848lKdrIgf2/ghLfc+UXvA4f0pOjKVhd3vmrQ
-	 uGgL6FUWRL718S48kp0lPeTqbu8H+8WeqXngsDTM=
-Received: from github.com (hubbernetes-node-5aa2be0.ac4-iad.github.net [10.52.152.41])
-	by smtp.github.com (Postfix) with ESMTPA id D8AB47811F5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 02:39:57 -0700 (PDT)
-Date: Wed, 19 Aug 2026 02:39:57 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1148341/000000-a51720@github.com>
-Subject: [bluez/bluez] a51720: test-runner: "-a" option also stands for
- "--all"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9F+T7Qv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F2901F000E9;
+	Wed, 19 Aug 2026 09:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787132674;
+	bh=Dkwr/Hje0BQ3+olEU0ZehfMJ6CUYHHUg12g0nukSveI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=L9F+T7QvaEVlxj3b7Uwo5a0hYQa3bXU8O9NRp4BqhA8+xbd6DbbiFAWHqX3os3lXt
+	 9TMWUvUw5JmO1kj564tlWxqvZsfVbjZGHdUcLqDIn4/l9JtEAmqh7q9zM9EkuBHl9e
+	 c6+IHw7gkqrXro9s0m+p1QBm4oRiuw7qmlMFjSeHYwz/RQPZSXzAH0lua55xM8OLpq
+	 UkylNNS/9JLGjm1u18npjHbaiWlDy8/zomvuvfoe4qxsNEYktWErOCQ2RdwPgLvPG8
+	 j3KRVgBaZzELQ/vtSCW51CkzTMTd230amLe023dkILmx1ve1yUS2NENElzhxqMdJ8y
+	 3jxjR2IlJFUPw==
+Date: Wed, 19 Aug 2026 11:44:30 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	luiz.dentz@gmail.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	linusw@kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kaihsin Chung <kaihsin.chung@synaptics.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: add BCM4384
+Message-ID: <20260819-grumpy-bloodhound-of-emphasis-2bf0fe@quoll>
+References: <20260818014948.996739-1-kaihsin.chung@synaptics.com>
+ <20260818014948.996739-2-kaihsin.chung@synaptics.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260818014948.996739-2-kaihsin.chung@synaptics.com>
 
-  Branch: refs/heads/1148341
-  Home:   https://github.com/bluez/bluez
-  Commit: a517209812a82f115f34a88673a8c736335ee0ab
-      https://github.com/bluez/bluez/commit/a517209812a82f115f34a88673a8c736335ee0ab
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
+On Tue, Aug 18, 2026 at 09:49:47AM +0800, Kaihsin Chung wrote:
+> Add the brcm,bcm4384-bt compatible string to support the
+> Synaptics BCM4384 Bluetooth controller.
+> 
+> Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml        | 1 +
 
-  Changed paths:
-    M tools/test-runner.c
+It's another version of this patchset with same mistakes. Please read
+previous feedback very carefully.
 
-  Log Message:
-  -----------
-  test-runner: "-a" option also stands for "--all"
+Best regards,
+Krzysztof
 
-In the options for most command-line tools, -a stands for --all, and so
-it does for test-runner. Add --all to the option description before
---auto as it's a more common option.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
