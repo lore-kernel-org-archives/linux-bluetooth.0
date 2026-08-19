@@ -1,220 +1,170 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E1F3BF694
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D5C3BA25F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787150640; cv=none; b=djq+m/owzTsQsWpvpssnyysVx1kTF18lMdvSOnwWxFsEL3Ahmnf448/OIZ/LuwvkaJxPKYlXz8bgwb8v4AhTjRqLTgQXipasEVnZXYkvWDDmr6wG17ms6HfsZvyYK/ymJt5A4vGL4NCYJmUlJ1EXhvx/umtRQ3pFFnezktUdwnE=
+	t=1787151056; cv=none; b=M4KdVZ+bmdJy9J9dpg7nXOtIs6DVbWCmtiP2SOLpLvjk/0Sz0iLr2o39LXOxEGStQKj6P5wasn8e8BxhjyOP4q83e21QMcnGZs0GTCNN8rk+2LDY1kK+AnlFtagn3+wPspaeUB3kzwgguV6ipnQDHdvpKFDfUcGuWnZCUciH9G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787150640; c=relaxed/simple;
-	bh=4iiR96Az290a6tIGBmKOMcH5ExE/9/axIEt9hkYPScc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bCGF8r/I4XWVwm7vqyeDgaNO+Yeg6PGsIi+cGi3ej6ZJepcF5jaiQ5Pql8MOu7ll3/ND5uTYf0S106Tj2rw1YX+u+g2C2qZoVaVPjKAZBO3LnN2ZErjX/jWLjIEDQxcm31W5TObM0jfV1PF1aG+0KR/6jlB13cL2Pzad1Znr9xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=q1/Xc1aF; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1787151056; c=relaxed/simple;
+	bh=PAtip0icsG04ct5twASOAmZxO2lttQWVyMJaFBwxkxU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Jqgmqv87tzlAUvARmFsDiRPbYLBBXgrW6iRYl4tT++NTGz/SuN+kdhFjV8yK4CadJ9GNnjVP+JIdhaPWlftqsXeU2OEsErbsEGVSZnsStfZu/y90sCMBH8iyrAlBBpH5kVSl5NZRgJx0oQQ02J9TZOnAvT9DbpGxLpVoC0015Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qQp/kl3i; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="q1/Xc1aF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1787150629;
-	bh=4iiR96Az290a6tIGBmKOMcH5ExE/9/axIEt9hkYPScc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=q1/Xc1aFFrlhU8FyzaXN/3ZNdXB7bKknTm2w6RNLQ4TRIypmK8LFFh0jH2deA0fo2
-	 78RgEvS2isHRZVHbnVwcuMgRrelocNl92jgnbdCCljrLSM4dVNmUIzkp4lt2tnjYDF
-	 3LTIml2j6nIq7QR7D97tL2Ft2zlW7bUUWb9fo1CN/IDUZwGLwB7MM0PsyNWadSHCIa
-	 ++WHV8g0HlnuH+qEa81qqiV1P7j9gd/mwM59QDXgEZHMizwxJz4KXgJvlmtJECT41m
-	 TFZbcWuYFlFtmUFC7PAPzGkJ6suXLwlob/Sox75SQE5UHzaIxSDwXmN9gHwEJcb6Rp
-	 3Xmh6ZrE4/0sw==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E4E0917E0FEA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 16:43:48 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 7/7] profiles/audio: make A2DP admin allowlist enforcement role-safe
-Date: Wed, 19 Aug 2026 16:43:37 +0200
-Message-ID: <20260819144337.889893-8-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260819144337.889893-1-frederic.danis@collabora.com>
-References: <20260819144337.889893-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qQp/kl3i"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-6b136c28c46so808384eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 07:50:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787151054; x=1787755854; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=CRntI7BEkIs5R8nwt8FY2dPApwj2bHZllX9zUoYLaTw=;
+        b=qQp/kl3iU9Gj1TXMed2TZxiLowAlYVkXTKKEu/TQ5eobALYR5HRlOpt5Li99wPVyB+
+         RKK3UlGBY9zqLCwUj8lKW/iFvgi6eLqjgOox66mM7XFi3ypIkMOT8DQ3xVBvVGHw26G8
+         vn90f2aHUS3lxMPphDgIJ21rbiqbFzaD1Y+u3U8uDmQ1pPAuOZvr3QPjvoAvjOeBs7gG
+         19bkfV4q5x5hASAa7d0/YOFIAXbgbMEuJsWvGbczQok+K0Q2Dz6QgtpbV5oFTd6bR2k1
+         1vW2a34+gz7nWAjcU03ElMSCqgau7oQk2kd2mk5ELFR5cTCaspjYEXgr0ERbyZqofUy+
+         h3vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787151054; x=1787755854;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CRntI7BEkIs5R8nwt8FY2dPApwj2bHZllX9zUoYLaTw=;
+        b=fGcF9//5YPeSttC8HEoSCX5FsX04LlnqYHvXobrmV8jrFbuDsyRpd6nlpHHRkgRN9U
+         Y/c3O+c70DYS39nPxyD9DRJGeUERvQT2FiCL17cEPBK8irw1cUHiVqaCD6+9ZIllK5aS
+         Zkw2sEZ+yj8431UwOFr7VzI+TVSPYoF6X6Wvs4fdRzpihQVSJt3GxhM6tmf0u5hfrGK1
+         z7CGJiwNfZMwwUHifq7X9mZZRCdCMPERradKnZCAyaEPOU/YJs7WqEMqY01ow03y9yxy
+         yD/kxXdwY10f4tWHeJ8ACkQBJP8znfLO3S0rCquvRl+APbx2Y/uxieWkEihmw2RQB6ZK
+         cC9A==
+X-Gm-Message-State: AOJu0Yw7/sOOHPOV2w7yGEjMxQ7VJ8uwE5VxNn4piptwtK1Sp12wlK3w
+	5XMxvQjqLdm4aIVeSWO6LsBu3hoUxIDZhTKVpsISfvBvCOfNObEtv88alAb8+q2F
+X-Gm-Gg: AR+sD10AmiU45IAI790c+7xXrbjhRUU/xs+lFDJWtq+4WNe+5me4MS3318UdAiW64An
+	A6pLDR7/uLfOp3xNOeP5bKHOkqvbFWM9x+JBH8qxFQjvsGjze9HMVjXxm81D4xGtiHqha1RCfyE
+	X4zw6A50k+p2Umx6MQtJjp/aRy1G8pVvdjmEaChVcYjr8ERJiJWSFWjsMQeubkeQFN2JsdW1jAk
+	PPvyngGpzhQEIsmhm4blsu0BARwOGIql85AUtjdupOpO6i5hhKGLcK3VpspZKeu8raew/Zed7xx
+	+0OqS8r/V7B+vbinmv2UAPCanrCSXOA7tlyCvE4fKG4U9lNeV0cQubyM31IbDUt79IX05X6TLvP
+	TydNBwthD24Tb2dA+E2KSsVxsRty5slWvAKe/HJ+RTnNTPUV6UWREPyxI6eqQMY4BgaeCno0o10
+	Ul8g7QNWd4SMMBR3Mxe4Ujsc/iGG7tc+/HMhDcOt4j3Ci5XCtFjMmS7sGaqPsKNZpxLRk=
+X-Received: by 2002:a05:6820:1509:b0:6b1:3db9:b758 with SMTP id 006d021491bc7-6b13db9b83cmr4479126eaf.9.1787151054003;
+        Wed, 19 Aug 2026 07:50:54 -0700 (PDT)
+Received: from [172.17.0.2] ([52.190.138.44])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b13cf0673esm2337048eaf.13.2026.08.19.07.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 07:50:53 -0700 (PDT)
+Message-ID: <6a85c2cd.92f6587b.23a616.9de9@mx.google.com>
+Date: Wed, 19 Aug 2026 07:50:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8502583888522254483=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xin.chen2@oss.qualcomm.com
+Subject: RE: [v1] Bluetooth: hci_core: use skb_get() instead of skb_clone() for req_skb
+In-Reply-To: <20260819135321.1444185-1-xin.chen2@oss.qualcomm.com>
+References: <20260819135321.1444185-1-xin.chen2@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Unify audio-side allowlist enforcement so A2DP behavior remains correct
-across dynamic policy updates, reconnects, and role-specific endpoint
-negotiation.
+--===============8502583888522254483==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Why:
-- Dynamic allowlist reapply could leave stale A2DP role state and dangling
-  role lists, leading to invalid reuse and instability during subsequent
-  signaling/SEP handling.
-- Policy enforcement happening late (at SetConfiguration time) allowed
-  blocked roles to remain visible during capability negotiation, which caused
-  retry/disconnect behavior until session managers were restarted.
+This is automated email and please do not reply to this email!
 
-What changed:
-- Harden A2DP server role removal bookkeeping:
-  - clear source_enabled/sink_enabled flags on remove
-  - clear server->sources/server->sinks list heads after free
-  - unregister shared server only when both roles are disabled
-- Enforce admin policy at SEP negotiation boundaries:
-  - add role-aware helper mapping local SEP type to policy UUID
-  - reject blocked roles in Get_Capability path
-  - reject blocked roles early in Set_Configuration path
-- Keep endpoint registration resilient when partial allowlists block specific
-  A2DP records, so allowed endpoints continue to register.
+Dear submitter,
 
-Result:
-- A2DP policy decisions are consistent with local role semantics.
-- Blocked roles are filtered earlier and more predictably.
-- Runtime policy transitions are stable, without requiring daemon/session
-  manager restarts to recover expected reconnect behavior.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148507
 
-Assisted-by: GPT:GPT-5.3-Codex
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.57 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.21 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      27.49 seconds
+CheckAllWarning               PASS      36.45 seconds
+CheckSparse                   PASS      28.82 seconds
+BuildKernel32                 PASS      30.75 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      502.50 seconds
+TestRunner_l2cap-tester       PASS      65.62 seconds
+TestRunner_iso-tester         PASS      92.86 seconds
+TestRunner_bnep-tester        PASS      23.15 seconds
+TestRunner_mgmt-tester        FAIL      219.44 seconds
+TestRunner_rfcomm-tester      PASS      25.53 seconds
+TestRunner_sco-tester         PASS      31.94 seconds
+TestRunner_ioctl-tester       PASS      26.49 seconds
+TestRunner_mesh-tester        FAIL      25.87 seconds
+TestRunner_smp-tester         PASS      24.03 seconds
+TestRunner_userchan-tester    PASS      20.04 seconds
+TestRunner_6lowpan-tester     PASS      23.09 seconds
+IncrementalBuild              PASS      25.15 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v1] Bluetooth: hci_core: use skb_get() instead of skb_clone() for req_skb
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#158: 
+[1] https://lore.kernel.org/all/20250430111617.1151390-1-quic_cxin@quicinc.com/
+
+total: 0 errors, 1 warnings, 0 checks, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14757472.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.249 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.238 seconds
+Mesh - Send cancel - 2                               Timed out    1.986 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/618
+
 ---
- profiles/audio/a2dp.c  | 38 ++++++++++++++++++++++++++++++++++----
- profiles/audio/media.c |  7 +++++++
- 2 files changed, 41 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index a4ba1dacf..0d4b8cc32 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -811,6 +811,20 @@ static void reverse_discover(struct avdtp *session, GSList *seps, int err,
- 	DBG("err %d", err);
- }
- 
-+static bool a2dp_sep_policy_allowed(struct avdtp *session,
-+					const struct a2dp_sep *sep)
-+{
-+	struct btd_adapter *adapter = avdtp_get_adapter(session);
-+	const char *uuid;
-+
-+	if (sep->type == AVDTP_SEP_TYPE_SOURCE)
-+		uuid = A2DP_SOURCE_UUID;
-+	else
-+		uuid = A2DP_SINK_UUID;
-+
-+	return btd_adapter_is_uuid_allowed(adapter, uuid);
-+}
-+
- static gboolean endpoint_setconf_ind(struct avdtp *session,
- 						struct avdtp_local_sep *sep,
- 						struct avdtp_stream *stream,
-@@ -827,6 +841,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- 	else
- 		DBG("Source %p: Set_Configuration_Ind", sep);
- 
-+	if (!a2dp_sep_policy_allowed(session, a2dp_sep))
-+		return FALSE;
-+
- 	a2dp_stream = a2dp_stream_get(a2dp_sep, session);
- 	if (!a2dp_stream)
- 		return FALSE;
-@@ -905,6 +922,11 @@ static gboolean endpoint_getcap_ind(struct avdtp *session,
- 	else
- 		DBG("Source %p: Get_Capability_Ind", sep);
- 
-+	if (!a2dp_sep_policy_allowed(session, a2dp_sep)) {
-+		*err = AVDTP_BAD_ACP_SEID;
-+		return FALSE;
-+	}
-+
- 	*caps = NULL;
- 
- 	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-@@ -2858,6 +2880,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 	GSList **l;
- 	uint32_t *record_id;
- 	sdp_record_t *record;
-+	int ret;
- 
- 	server = find_server(servers, adapter);
- 	if (server == NULL) {
-@@ -2918,12 +2941,13 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 		return NULL;
- 	}
- 
--	if (adapter_service_add(server->adapter, record) < 0) {
-+	ret = adapter_service_add(server->adapter, record);
-+	if (ret < 0) {
- 		error("Unable to register A2DP service record");
- 		sdp_record_free(record);
- 		a2dp_unregister_sep(sep);
- 		if (err)
--			*err = -EINVAL;
-+			*err = ret;
- 		return NULL;
- 	}
- 
-@@ -3687,8 +3711,11 @@ static void a2dp_source_server_remove(struct btd_profile *p,
- 	if (!server)
- 		return;
- 
-+	server->source_enabled = FALSE;
-+
- 	g_slist_free_full(server->sources,
- 					(GDestroyNotify) a2dp_unregister_sep);
-+	server->sources = NULL;
- 
- 	if (server->source_record_id) {
- 		adapter_service_remove(server->adapter,
-@@ -3696,7 +3723,7 @@ static void a2dp_source_server_remove(struct btd_profile *p,
- 		server->source_record_id = 0;
- 	}
- 
--	if (server->sink_record_id)
-+	if (server->sink_enabled)
- 		return;
- 
- 	a2dp_server_unregister(server);
-@@ -3734,14 +3761,17 @@ static void a2dp_sink_server_remove(struct btd_profile *p,
- 	if (!server)
- 		return;
- 
-+	server->sink_enabled = FALSE;
-+
- 	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
-+	server->sinks = NULL;
- 
- 	if (server->sink_record_id) {
- 		adapter_service_remove(server->adapter, server->sink_record_id);
- 		server->sink_record_id = 0;
- 	}
- 
--	if (server->source_record_id)
-+	if (server->source_enabled)
- 		return;
- 
- 	a2dp_server_unregister(server);
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 95f9580b0..26a6d7dea 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -3175,6 +3175,13 @@ static void app_register_endpoint(void *data, void *user_data)
- 						metadata, metadata_size,
- 						&features, &app->err);
- 	if (!endpoint) {
-+		if (app->err == -EPERM) {
-+			info("Skipping endpoint %s:%s (%s) blocked by admin allowlist",
-+				app->sender, path, uuid);
-+			app->err = 0;
-+			return;
-+		}
-+
- 		error("Unable to register endpoint %s:%s: %s", app->sender,
- 						path, strerror(-app->err));
- 		return;
--- 
-2.43.0
 
+--===============8502583888522254483==--
