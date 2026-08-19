@@ -1,58 +1,63 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from out-35.smtp.github.com (out-35.smtp.github.com [192.30.252.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13E5427FB3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11727443A8E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787130839; cv=none; b=UG8/de6H5VgFnraAVgUZ+QdEErE5YK18sKlgH+l9MiY7CTid5u2uy9xIl8OKK4F/K3doFGy5p0J3/mGGXYQ6qmEeBIyw5LWV5o/JJLYEkch6DYBIXit+HJlkfGkWmqwar1Mi43V+hvqRPowGe8xRZZ7KOMlWFuKtrZprSu+Jmgc=
+	t=1787132400; cv=none; b=QfB6vZDTUGbp/5XY6kZTOevMeEP+ba34rSrT+Qkpluz7YDx/RcEY+u8pt6ZMHZ/TOhQNjqE4pxeGnZCfzZzBkiuNuhZKebcluvajaWofxrGvg+0kSAHU6ccfoUy/e/+ZermzmR+uWKCWN2hSqJO4f0/eKdAcbB7X1MCFUMC91zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787130839; c=relaxed/simple;
-	bh=xqVZpSeWDEJOXOdLGycsggrVnZLJpaa+5/GxEEUFjgU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XZ98fKG3WtOt08woeS4Cnh2onuZCmFJEdLb491nknMfOZLRk5eHTXFIw8uZmvPT/i9x38Jl63MlRCKS+tMPFnuy7nxf4F9tTrVPZMIoJp+c2HtxN4q8NprzLLQLXLFPPPAHhQQANKg50wfg6u3q8WYcnTKPmjWocQqstdrzXUZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0AC91F481
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:55 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1787132400; c=relaxed/simple;
+	bh=2VkxWwzijT5EPw7ZUkbyMBGU7xRpLPQbrN5gby36EdE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gHN/ocZQALtGwcs35fOimfAgEo9SYSocb7LSOvQAcvgHup44j0Omv1TbRv9ssG+ECjwqxhlswTaR3ZQqWQLnilLTeiDvRfq7k8IuM3VtPAstR11mfESkJgTDfFOcV8CmjQDlTMA/ETR1+6wPRpZwaKZCqKMwIGXPFVAXaA06IWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Z44mAo9P; arc=none smtp.client-ip=192.30.252.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Z44mAo9P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787132394;
+	bh=UE21Hs4x85HOGqawc0IP3Jz0R7Imk61q/ycJ2ydzMEI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Z44mAo9PoptK5sQK9Pq9uv+3dNq3MtPRiVyOuQLFVnn1AZLyZCZV53tkSlOvu29YT
+	 Av33cLkN+A88Vg7372x2kcOFN8KpSrj9GLtnDwZbO178D6PlFFDGgVDSlA0HAeOsIA
+	 rydhsRHf9nHeejI7aMrYIGK/bzBaQKJBq3deQm0c=
+Received: from github.com (hubbernetes-node-0c1aad3.ac4-iad.github.net [10.52.161.13])
+	by smtp.github.com (Postfix) with ESMTPA id 96828740C90
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 02:39:54 -0700 (PDT)
+Date: Wed, 19 Aug 2026 02:39:54 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ] test-runner: "-a" option also stands for "--all"
-Date: Wed, 19 Aug 2026 11:13:45 +0200
-Message-ID: <20260819091347.1204005-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.55.0
+Message-ID: <bluez/bluez/push/refs/heads/1148340/000000-dc5d10@github.com>
+Subject: [bluez/bluez] dc5d10: doc: Fix typo in test-runner.rst
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 0
-X-GND-Cause: dmFkZTG18iyAMEIQjh4veXWtQlH0Odvj9ozjZBJUum9zgChOm20FdzK9SMBkyMCI1MwSB8ZsrMDyzAQn7VFNEJnNGAty5q0MJq/QBw0KRNd8QCLUTrz46Ux4vyqEazuazvhw/BmaLZHCkEoTi3Ixz6bEQrXrhpaPtwJNxyOLlNGqv5TltXTHRWRkM3XMseRY/7rWBbULvKlr0OmYsB33fOEWg8SCw+ZCdUj7Ow2XqxC5xhCi/4fyCqR69aPWzcUp/dX92TYxGrzazYt8i7tsm2e5XvN62PwbZkNVhT62c1zU+qFv472FbcED9TdtqZ0qlwVRiNRevVQAjuz+F9DG3nfAx/ekNiA5mDiq34A0AEMkXcmdNgZZf77zHJCDCxEy1iav+CzB/aEjeu8SK0LKIK3rOS3knP6cddGCwz0Z4/D/guPmYjvPzlkQ/BEOHZvLyCU5KxV+pDxA8Qr7aCEOPiyLhd14nxUFKRGv2WXPoihtIqJ0bwoGyp+0Pu2b0yyy8BQPKm+bF9cFgZiDFAruEKY4wd+qR3eWKK1z/BHGEccBeePIdCrbvJbO8j5hRinvvquRb78kDj8GEniK1HdXizYoP2ipQ44SkDgWCdfeunR0cVKCH6fSs4uY28Cu36f7zmZr5/eJVVpJKxAh1U8iMCAH6kqJyXWn4TOGW8PpKIWkwJ43jA
-X-GND-State: clean
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-In the options for most command-line tools, -a stands for --all, and so
-it does for test-runner. Add --all to the option description before
---auto as it's a more common option.
----
- tools/test-runner.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Branch: refs/heads/1148340
+  Home:   https://github.com/bluez/bluez
+  Commit: dc5d10adcdb446484a82b993ceaa40ebc655ce03
+      https://github.com/bluez/bluez/commit/dc5d10adcdb446484a82b993ceaa40ebc655ce03
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 0e3bfb8b71ec..9fecea4e7486 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -1216,7 +1216,7 @@ static void usage(void)
- 		"Usage:\n");
- 	printf("\ttest-runner [options] [--] <command> [args]\n");
- 	printf("Options:\n"
--		"\t-a, --auto             Find tests and run them\n"
-+		"\t-a, --all,--auto       Find tests and run them\n"
- 		"\t-b, --dbus             Start D-Bus system daemon\n"
- 		"\t-s, --dbus-session     Start D-Bus session daemon\n"
- 		"\t-d, --daemon           Start bluetoothd\n"
--- 
-2.55.0
+  Changed paths:
+    M doc/test-runner.rst
 
+  Log Message:
+  -----------
+  doc: Fix typo in test-runner.rst
+
+s/lunches/launches/
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
