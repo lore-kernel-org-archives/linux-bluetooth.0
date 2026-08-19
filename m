@@ -1,285 +1,125 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610FD477E51
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16D247ECFB
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 15:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787151358; cv=none; b=MuUFJuW5xTlaRqpQVFt1KCiidsO33YWpOSG7l9evIQi5N4dyuRbwaHiT8zWOs/AR5ydEmgeyd9Po6jNgUR7p1lTdLpMFg8BGXRDwhBKOgzpv+UbkvzT42A9+ExZS7lCdR9wrKxYWQ7nF0P7GYTMhwxL2/BN4v9osxPr6xWP9g+M=
+	t=1787152123; cv=none; b=coZJmhaKL+79e74yUx6CK5+bh5k4kF+uKcHcVOMKq5OkH26NcGZ3f4ooTkqmR//opTZtZAhbY1Tt8xPgAqTE385eDBV3dBVVbKrsI76KbmQBVIEch9lksllBXmc9V1QiPytsanYvi1Hibv1GNtwTSkmQjGShUp/uqiXBVGmz+xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787151358; c=relaxed/simple;
-	bh=cZMxYbFTeOMSstAiPD2Yy6Nkd2w+rkX+kPzZfRuX0IU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AHtWsd+mMLp0SdTdOpXUJL8B9wrjgisJhScuMzsgDOFEzNKITCwXkkvA1nGEw+KSYNiA7RRbQEjGKzVspwsgW4C1PfEx6eoY+uxQyENzF5JsnQ5ui5k3+4I4PIzTIpTsLyn49kp1NbnEA0IfjfaSCWkbkiw8QOcUnaP1ZeeiUuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EtRCb6cT; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1787152123; c=relaxed/simple;
+	bh=BmDiD1s+oybyVgZXkg8VaJ90UQO6xGYIA+btSrQJmcE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mS/46xRLkfG7xWI5e3sZPDjikfzHxT1XCZ94QaJjXw7cSGvQYPPpsIVn8cds9bfSMXpsVCFAiwbdO0c8p4NcZj5L2xILrR0QcaQfXGrRNwYhv+IUr4oheRXWRZbsgmB9MyhYfR3hW66WvtZxsPn4qKp/H0UyN6jRSwS52WyDF3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=D+iU2QMg; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EtRCb6cT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787151353;
-	bh=UyaCT369q5ajQ720oqpMLQUGC5pTFI3tKCmnceft7a4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=EtRCb6cTU/JPNZyGcshZZ+7EDDomY3GZiZgdyN7tlKyjWguTxkkg+4CidDmkLsdpI
-	 uI+Ztx3KIvmwS1hve6viTBi1fItXOwvmUFXeFhBxiotPJ3TtL3GDgh4bmlDQlwvtY9
-	 7VvhiiGXC0947x6zejD+S8OOxtme+2tLUGeLkMew=
-Received: from github.com (hubbernetes-node-17aed48.va3-iad.github.net [10.48.176.31])
-	by smtp.github.com (Postfix) with ESMTPA id 44EA4280C81
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 07:55:53 -0700 (PDT)
-Date: Wed, 19 Aug 2026 07:55:53 -0700
-From: fdanis-oss <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="D+iU2QMg"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c9e7391839cso961491a12.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 08:08:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=nebusec.ai; s=google; t=1787152118; x=1787756918; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=T1QNXsKrDhs8IsNcJ4pL+2qJquZRkLocf4zm8nsnwJk=;
+        b=D+iU2QMgaXCipNqmcERDuZFZVhtnNw/Q0cGfbT4XKv8eTgH/eqgamPn42JrnAq2AaQ
+         zvWiA0AXbq/mou/ddh1RWqeX6BkjJIVytBrBxTdxVYVHbItR/hDzr54ff5XP7JUqItAv
+         06zU3icDxWM/86wYn/obYYaLIRfaDQAreii8AKxQnmArJT1HrcViWwzYsZeCfDCjPGB5
+         y9ibgY+tjEoMIVDt/wuWMfKBxMbUH4pd6uioyRSnDNDMZcGqh51/KRxFLqK/BRO9YYKt
+         7wYGtaFqlntE50FOYuO0clRrhBjGD1E2yyfIJlvA9XJx2LyMjsOVFG5pb9a8ZTUT7W/g
+         S3dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787152118; x=1787756918;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=T1QNXsKrDhs8IsNcJ4pL+2qJquZRkLocf4zm8nsnwJk=;
+        b=HCg6XZplI2kXOreSm0NJ3AC5cxgangn0m3++GEAiW1nI37eYd3s0CnNVHGqQeosHcm
+         PZk6aL4m9plB6R8ccPAk6zXGVThrEKNu5fJbfOSThwRnKJOKooTXBC7MPHprE6w67gnB
+         Und6mJYmumbtbJlKeqWwfxI5w7niZaP+lCHme4GVnmdYx3xD09WL5E+h32EqwgijOkq1
+         Db1VpZNflseAqvfijaVLPwgZqiywjQLCX2cpSBRP/bEEBm2ujd4nVCtboQ+f16mYJWYn
+         sr72zlO51BB6unmjnfPPi14/tIyTlR+Mwt9ZlZaJXnHL04V1eSezwqhYhjDN7FKfCgDp
+         Cz7A==
+X-Gm-Message-State: AOJu0Yw/lq8UGm73uwu6+gKRA8ABfHB/4iTX+arMSwHidr4obqJz239n
+	0+y1/l6jsQA0vcPIymVQDVDvC+fd95T84Gco1EiivwMQDAfyPlF+lFzgyhdP3w/1LLpi4gHk9Cw
+	yl9rzVA==
+X-Gm-Gg: AR+sD10/jS6TIZgD+vnvEl/B16M3Twr9Ptv6fLLBr96WKx4A6LEtPJGsTjwFXWwJKa+
+	xCJ+W4CxLZflpcCST4hEopJ68C8Pk2SLZa2orI23QN4+ZceQXu7ByCyQEDqB4fdX45cq7nnzCrY
+	IgBJu/EFNOV3Z3pKcMsZyZZjdYUbcDAIQrruaik57hp3RRinxyaqtux5hZ9dXxOI7L3GRsBWPPB
+	+dM9Ope7tMXyzeHyMByDYf40i4e6Wcl9BiLim6srAHOnsTaEy1NagVKVtLr32yRGDaBll/sOZ+g
+	Q61LSkkHh7jH8M1iQZg/mDX78ysh92ZgVAmDwipavWtmOik16I12DQYuM2YFXOP5ZUnf2ec0zI0
+	jwBdmUXxGz1V8p7DRrOfZiIF/sBrgLyMI8KEN4DTp+Src8dDuWokzaMiG2OBcKwmAKfPKhoQYS3
+	l0TdA/ac5R/1QFiAs7aA1gaUBmgOfNxgH4skEEtkhpgGbYMkafRIpAcDIShscqQ0gRbbFyXbxHT
+	s+2N995RkE=
+X-Received: by 2002:a05:6a20:c706:b0:3c3:935a:af2c with SMTP id adf61e73a8af0-3cd00dc7d05mr10598065637.3.1787152118073;
+        Wed, 19 Aug 2026 08:08:38 -0700 (PDT)
+Received: from enjou-Legion-Y7000P-2019 ([167.71.204.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc15567543fsm723762a12.18.2026.08.19.08.08.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 08:08:36 -0700 (PDT)
+From: Ren Wei <weir@nebusec.ai>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1148530/000000-aa500e@github.com>
-Subject: [bluez/bluez] 5a5937: plugins/admin: make AdminPolicy state
- per-adapter
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	mcchou@chromium.org,
+	apusaka@chromium.org,
+	mmandlik@google.com,
+	alainm@chromium.org,
+	vega@nebusec.ai,
+	edragain@163.com,
+	weir@nebusec.ai
+Subject: [PATCH v2 0/1] Bluetooth: msft: fix vendor event use-after-free during open
+Date: Wed, 19 Aug 2026 23:08:42 +0800
+Message-ID: <cover.1787048594.git.edragain@163.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1148530
-  Home:   https://github.com/bluez/bluez
-  Commit: 5a5937c3163a69b13676cdc5f046265ecb1f36ec
-      https://github.com/bluez/bluez/commit/5a5937c3163a69b13676cdc5f0462=
-65ecb1f36ec
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
+From: Yong Wang <edragain@163.com>
 
-  Changed paths:
-    M plugins/admin.c
+Hi Linux maintainers,
 
-  Log Message:
-  -----------
-  plugins/admin: make AdminPolicy state per-adapter
+This patch fixes a race between `msft_do_open()` and `msft_vendor_evt()`.
 
-Fix AdminPolicy D-Bus updates being emitted on the wrong adapter path
-by removing the single global policy context and moving to per-adapter
-policy objects.
+Commit 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a
+hci_dev's life cycle") changed the open path to reuse the live
+`hdev->msft_data` object across power cycles. As a result,
+`msft_do_open()` may replace `msft->evt_prefix` while vendor events are
+still being processed during device initialization.
 
-Changes include:
-- track policy contexts in a policy queue keyed by adapter pointer
-- keep per-adapter device lists inside each policy context
-- emit ServiceAllowList changes using the callback's adapter context
-- scope device affected updates to the current adapter only
-- clean up probe/remove lifecycle so adapters are registered and torn
-  down independently
-- remove remaining global policy_data/devices coupling
+At the same time, `msft_vendor_evt()` reads `hdev->msft_data` and checks
+the event prefix before taking `hci_dev_lock()`. This can race with the
+open path and lead to a use-after-free on the prefix buffer, and on the
+failure path it can also observe stale `msft_data` state.
 
-Assisted-by: GPT:GPT-5.3-Codex
+Fix this by reading the supported feature data into temporary storage
+first and only publishing the updated MSFT state while holding
+`hci_dev_lock()`. Also make `msft_vendor_evt()` take `hci_dev_lock()`
+before inspecting the published MSFT state.
 
+We tested the fix and verified that the crash no longer occurs. We also
+verified that the existing MSFT monitor functionality still works.
 
-  Commit: 577bbc3243a43b0907bfb3ac5e44179eac6af801
-      https://github.com/bluez/bluez/commit/577bbc3243a43b0907bfb3ac5e441=
-79eac6af801
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
+Thanks,
+Yong
 
-  Changed paths:
-    M client/admin.c
-    M client/admin.h
-    M client/main.c
+Changes in v2:
+- Rework the cover letter to present this as a race/UAF fix rather than
+  a security issue.
+- Trim reproducer details that are not needed for patch review.
+- No functional code changes.
+v1 Link: https://lore.kernel.org/all/ea4efa51cc3be16d3eb7726fe5486f0be6c47907.1786092373.git.edragain@163.com/
 
-  Log Message:
-  -----------
-  client/bluetoothctl: make admin.allow controller-aware
+Yong Wang (1):
+  Bluetooth: msft: fix vendor event use-after-free during open
 
-Teach admin.allow to target the selected default controller.
+ net/bluetooth/msft.c | 70 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 43 insertions(+), 27 deletions(-)
 
-Replace single cached AdminPolicy proxies with per-controller proxy
-lookup keyed by controller object path, so controller selection changes
-are respected.
-
-Export controller default helpers from main.c for reuse by admin.c.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: 3bcb18efc9a33009f097badcd6fc86c08aed6345
-      https://github.com/bluez/bluez/commit/3bcb18efc9a33009f097badcd6fc8=
-6c08aed6345
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/adapter.c
-    M src/adapter.h
-
-  Log Message:
-  -----------
-  src/adapter: enforce allowlist for local services
-
-Apply admin allowlist to adapter/server service startup and
-registration, and reapply policy dynamically when allowlist changes.
-
-- Gate adapter profile probe by allowlist-derived UUID policy
-- Reapply active adapter profiles on allowlist updates (stop
-  disallowed, start newly allowed)
-- Block SDP service registration when UUID is not allowed
-- Reapply existing local SDP registrations at runtime by removing
-  services that become disallowed
-- Map both a2dp-source and a2dp-sink admin policy checks to
-  ADVANCED_AUDIO_UUID (0x110d). This keeps A2DP profile infrastructure
-  enabled when the A2DP class UUID is allowed, while specific local
-  Audio Source/Sink records remain filtered by their own UUID allowlist
-  checks
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: fd8828eb8fd4ff4394b92e354ebe4be1edbe4746
-      https://github.com/bluez/bluez/commit/fd8828eb8fd4ff4394b92e354ebe4=
-be1edbe4746
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M plugins/admin.c
-
-  Log Message:
-  -----------
-  plugins/admin: reapply allowlist on policy updates
-
-Invoke adapter allowlist reapply after SetServiceAllowList updates
-so runtime state follows policy changes immediately.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: 7f32f9c43ad7c4134a0080063daf3ff44722c5e1
-      https://github.com/bluez/bluez/commit/7f32f9c43ad7c4134a0080063daf3=
-ff44722c5e1
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M doc/org.bluez.AdminPolicySet.rst
-    M doc/org.bluez.AdminPolicyStatus.rst
-
-  Log Message:
-  -----------
-  doc: describe admin allowlist runtime enforcement
-
-Document that ServiceAllowList now also governs local adapter/server
-startup and registration, and that allowlist updates are applied
-immediately on initialized adapters.
-
-Clarify ServiceAllowList status semantics for both remote profile
-connection policy and local server policy.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: dc9aeb2dffc246a22a364ba8129cbe5e8b941531
-      https://github.com/bluez/bluez/commit/dc9aeb2dffc246a22a364ba8129cb=
-e5e8b941531
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/adapter.c
-    M src/adapter.h
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: unify admin allowlist checks for device services
-
-Consolidate device-side admin policy handling into one coherent model so
-incoming and outgoing A2DP behavior follows the configured allowlist
-consistently.
-
-Why:
-- The initial profile-aware adapter mapping fixed role-inverted A2DP case=
-s
-  for some paths, but device-side service gating still used mixed criteri=
-a.
-- Host-initiated Connect() could evaluate A2DP services with the wrong UU=
-ID
-  perspective, leading to valid flows being blocked (or blocked flows bei=
-ng
-  considered valid) under partial allowlists.
-
-What changed:
-- Use direct UUID allowlist checks for device service eligibility updates=
-.
-- Add A2DP role-aware mapping for device policy UUID selection:
-  - a2dp-sink -> A2DP Source UUID (110a)
-  - a2dp-source -> A2DP Sink UUID (110b)
-- Apply the same policy UUID resolution in:
-  - btd_device_all_services_allowed()
-  - btd_device_update_allowed_services()
-
-Result:
-- Device-service policy decisions now align with intended local A2DP role=
-
-  semantics for both remote-initiated and host-initiated connection paths=
-.
-- Admin allowlist enforcement remains strict while eliminating the observ=
-ed
-  false block during host->remote A2DP connect attempts.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: aa500e191647572383cdd8f15372cbbf531cbe66
-      https://github.com/bluez/bluez/commit/aa500e191647572383cdd8f15372c=
-bbf531cbe66
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  profiles/audio: make A2DP admin allowlist enforcement role-safe
-
-Unify audio-side allowlist enforcement so A2DP behavior remains correct
-across dynamic policy updates, reconnects, and role-specific endpoint
-negotiation.
-
-Why:
-- Dynamic allowlist reapply could leave stale A2DP role state and danglin=
-g
-  role lists, leading to invalid reuse and instability during subsequent
-  signaling/SEP handling.
-- Policy enforcement happening late (at SetConfiguration time) allowed
-  blocked roles to remain visible during capability negotiation, which ca=
-used
-  retry/disconnect behavior until session managers were restarted.
-
-What changed:
-- Harden A2DP server role removal bookkeeping:
-  - clear source_enabled/sink_enabled flags on remove
-  - clear server->sources/server->sinks list heads after free
-  - unregister shared server only when both roles are disabled
-- Enforce admin policy at SEP negotiation boundaries:
-  - add role-aware helper mapping local SEP type to policy UUID
-  - reject blocked roles in Get_Capability path
-  - reject blocked roles early in Set_Configuration path
-- Keep endpoint registration resilient when partial allowlists block spec=
-ific
-  A2DP records, so allowed endpoints continue to register.
-
-Result:
-- A2DP policy decisions are consistent with local role semantics.
-- Blocked roles are filtered earlier and more predictably.
-- Runtime policy transitions are stable, without requiring daemon/session=
-
-  manager restarts to recover expected reconnect behavior.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-Compare: https://github.com/bluez/bluez/compare/5a5937c3163a%5E...aa500e1=
-91647
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+-- 
+2.53.0
