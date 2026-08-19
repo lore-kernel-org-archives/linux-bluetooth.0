@@ -1,313 +1,273 @@
-Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1A81DDA18
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 20:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E726369997
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 21:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787172337; cv=none; b=kblBP0D1ovtfUJpIm5nw7tOkucZTqHqq6Il2oEV7QYeCHjGsX3gdtVmvjj6NNG5MNm35250PaX5nzfooYqcm2YM0cB0G7Ii29tn9fEeBMIFX52C1n2RmAcB80onstF6UvVQBjX/jmzgKqDVWcKvy1/DGGC2j8o0McfKIuQhZHlY=
+	t=1787174840; cv=none; b=hx2lblkBdJ0+ptF9jaGmLb7+OpR1Lu8dU5iJGxt5OHondyXHYMxxOLR13M+xduRn6QVsOak9QsiRPWjG4CH9gWE/VaaLx0NcmYGS6E/wXu6EkclQeqQX12/acwpwZB/T+CJ+/Pinp+oK+ZHxPl0F8/gFEaF8MxSbf8XKNaRTmtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787172337; c=relaxed/simple;
-	bh=/2h8cvQnrEVd6R4GLQqByk2NS48xTSGgLMbfxh7hHJs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WLnS9JkF39ULurD9wkKkyn/psOcAHvAC1xkGETvixTFBODcvpRqunszqSP5HZtrIbGHzFFJ6gsaf52uIEJlyEasRakzhf5OnfVxiL22uQZd+jB6lA3nkAIvObMUJhIm0I73lBfJABEbofNC+/pWdHHGklAgbJ0wuWp6KOO3O63M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HXGuUAKp; arc=none smtp.client-ip=192.30.252.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1787174840; c=relaxed/simple;
+	bh=hrtkVI/Dez57c0C5A0B8UFcaFIeP17NeOcCcVbNvROE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=IcBLEhL/qyPbFsIUEw11LsUCxgBUuFuhGsWKHYhBbr05VXbyPJ6FpwtFpiyDv7PM/bqlqZ7ITkYijrLzmKaX7U1uz1K8NrTbHXYVyoAbhRZwU+Mi7AL+v9VONJfuJOjyUUyr429ZdXhApxzEB7RZkBuNSNZHOGCOognADcX1U34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGlEfSFn; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HXGuUAKp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787172334;
-	bh=4lt8sD5AyjCTOhhzN0+2VPZW7xctlCB6oe+WrDqjD2w=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HXGuUAKp7iZ8TX6H/QQHQj3UQCcNsJAF8ELNWVAbuA2OWWlHvhCSubC27cSswTDlr
-	 YzgJ+ByRzru5KtSZ8E0X1CQzj2NKmqUziDL7lW1CZR9JnHVfyDpjdWTrZW6kaeZ6Ys
-	 ab90DvOG8K/xDzyqlW3Bqve6WAmSVl59KQvcp6GQ=
-Received: from github.com (hubbernetes-node-bc77e5c.ash1-iad.github.net [10.56.206.36])
-	by smtp.github.com (Postfix) with ESMTPA id 6BC7A920860
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:45:34 -0700 (PDT)
-Date: Wed, 19 Aug 2026 13:45:34 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1148699/000000-d917c2@github.com>
-Subject: [bluez/bluez] dcf17f: eir: Fix stack buffer overflow when parsing the
- re...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGlEfSFn"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-4ab89cff9c7so668630b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787174837; x=1787779637; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=hrtkVI/Dez57c0C5A0B8UFcaFIeP17NeOcCcVbNvROE=;
+        b=KGlEfSFnFpMImQCVuM9xQO8D27v8gmI0ZqeDKqHpHy8vkUSHlnbRzknr5W99RbLxcl
+         lhdCcSWa7tnHazjziDsCGVu38YEZ6qb87B4iW0gxlLJmbqSHc4vS1Pvsu9uNHBunmPVH
+         w4AcqgjNI9GIN37CEE4DK3a23s/L+EJUI2ZHV3zEmCh0nUd7l1jdUa0H5Whuw1S9vD2d
+         ZAEXCyh+oxEnhUngZb7/EFL+Lkk92vIfT234decDVJ8H0z1v7VypEb09AfJsq8X7eFMZ
+         05T2+7odXxTXkEA2+XHBP0e95GVcBtlCbCMwsOJ0w1B3Ne1dUUFeHGLf8mF6swvudAuk
+         mSXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787174837; x=1787779637;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=hrtkVI/Dez57c0C5A0B8UFcaFIeP17NeOcCcVbNvROE=;
+        b=pqMavgMFzqSiuRp5MsmjvtGvDI5xFP16NJFPzy9dQfnyKwy4N40nnqtlfNmG0hKhUJ
+         bm2NoSx/Eu4PvZwvU9malgMkCUH90SvXibsaPUUCSvUwiOsMGew7drlowRKdp31IBPgh
+         tzh7DyzEiwnF4qLxzd1yUwqX32lVfrDE7sfHnJCg3y3/D1z9GHtcx7EXFcSk5WccGhDG
+         EU2ZHB5O6zNU0pWxnuXZNG4UDLxnkqMOHrB6tiuzRmssKyDhQG5Pi2bnuLquyIIOCpbD
+         LLjCLZRtG+cSGVc7x2CELsg5NSLKJjt0j50QxbN/YMENP3IEVOskFY5N2QmvwJI+fcJQ
+         XhmQ==
+X-Gm-Message-State: AOJu0YymiAP2Tq82zpNes7qGjbzyoORxLZN29zI+stqaO1N31ptsSOf8
+	HFblWbKdjYZAVK60LsILkxBZLpE/WtMBniV5rUeMqP17xi7qraG4nDHwrpVb7g==
+X-Gm-Gg: AR+sD10rznyJ2W7wErH98bgvo2Ex5jHvizugEVkK2BDF/G4bujSviDgQytKMJ7VJVvc
+	RmCQYucnWspBIZd7gpFBs4a1LilmCpxlPLRTCRXsz2CKQk/oS074bHROJwyfcE6OaX/rwLzwsiO
+	O1yUmH7oULOTrLFjeQXe83kOaqGA7XR7yFdkjZ3/Toz4RXFdvdES+7eW3UnoBT/O30iv+Vv9z3R
+	gAekG9IrCw7wFAEXi+1lCFje0dAhXlzPhIZ03ncIhcrw7vZHn3cju3PryFxNDCPEOqmtWEHetWd
+	PnUmnI/FG+XRMUT6ECZJOeFroTkWTrEvWFHRwzuhi6cSwX8dvs/KP/8rtcIkNWYRQztQpVPpzkq
+	iLIDco38SozZjExSmlhOupQbYc2SzPPlQ6wb8OQO2Z9N1fgm3BdwvYjxHQ/Avl+/pBR2h+ZKgH0
+	QqSl93nsiOqjTX0l4fosucYTvPnDA6eeiW1Xn7C4ow+Bxa0M3kUFWlS8KxNV4Wmc1FFN+OLNbOu
+	gRLOQI=
+X-Received: by 2002:a05:6808:1919:b0:4a4:744:a4ff with SMTP id 5614622812f47-4b2bc8dd5a4mr7714156b6e.4.1787174836988;
+        Wed, 19 Aug 2026 14:27:16 -0700 (PDT)
+Received: from [172.17.0.2] ([20.186.237.135])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b290ac75a8sm7419809b6e.7.2026.08.19.14.27.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 14:27:16 -0700 (PDT)
+Message-ID: <6a861fb4.92178f4f.e1100.d371@mx.google.com>
+Date: Wed, 19 Aug 2026 14:27:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5196508198245362854=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/1148699
-  Home:   https://github.com/bluez/bluez
-  Commit: dcf17f0d657b62052945e214d592a703388e8c2b
-      https://github.com/bluez/bluez/commit/dcf17f0d657b62052945e214d592a=
-703388e8c2b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/eir.c
-
-  Log Message:
-  -----------
-  eir: Fix stack buffer overflow when parsing the remote name
-
-name2utf8() copies len bytes into a HCI_MAX_NAME_LENGTH + 2, so 250,
-byte stack buffer without clamping len first.
-
-eir_parse() only rejects a field once it runs past the end of the EIR
-data, and that data is up to 255 bytes, so field_len can be 254 and the
-data_len passed to name2utf8() can reach 253. strncpy() then writes 253
-bytes into the 250 byte buffer and leaves it unterminated, so the
-following g_strstrip() and g_strdup() also read past the end.
-
-The EIR data comes from a remote device, either in an extended inquiry
-response or in an advertising report, so the length is attacker
-controlled.
-
-Clamp len like the other name2utf8() copies already do. Parsing a 253
-byte EIR_NAME_COMPLETE field returned a 253 byte name before this
-change, and returns a 249 byte one after it.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: 187b0d78e5d3ac36b3be92b010384a0186f8ebd8
-      https://github.com/bluez/bluez/commit/187b0d78e5d3ac36b3be92b010384=
-a0186f8ebd8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/shared/util.c
-
-  Log Message:
-  -----------
-  shared/util: Make strnlenutf8 reject ill-formed sequences
-
-strnlenutf8() only checks the shape of the lead byte and that the
-following bytes are continuation bytes, so it accepts sequences that are
-not well-formed UTF-8:
-
-  C0 80        overlong encoding of U+0000
-  C0 AF        overlong encoding of '/'
-  ED A0 80     UTF-16 surrogate U+D800
-  F5 80 80 80  past the U+10FFFF limit
-
-strisutf8() and strtoutf8() are built on it, so a remote name containing
-any of those is considered valid and passed on unchanged, for instance
-to D-Bus, which does validate UTF-8 strictly and rejects them.
-
-Validate the sequences as defined by table 3-7 of the Unicode Standard
-instead, which constrains the range of the second byte for the E0, ED,
-F0 and F4 lead bytes and rejects the C0, C1 and F5 to FF ones outright.
-
-The decoding is split out into a helper that also reports the size of
-the maximal subpart of an ill-formed sequence, so that callers can skip
-over it, as recommended by section 3.9 of the Unicode Standard.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: f0fa6fffc5565880ab3a7e7dac534b824bc5024b
-      https://github.com/bluez/bluez/commit/f0fa6fffc5565880ab3a7e7dac534=
-b824bc5024b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/shared/util.c
-    M src/shared/util.h
-
-  Log Message:
-  -----------
-  shared/util: Add str2utf8
-
-There are five near copies of the same "turn a remote name into a UTF-8
-string" helper, in monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.=
-c,
-src/eir.c and src/shared/ad.c, and they do not agree with each other.
-
-Most truncate at the first ill-formed sequence, which throws away the
-rest of the name, while the monitor replaces every non-ASCII byte with a
-space, which mangles perfectly valid UTF-8 names as soon as one bad byte
-appears. Most also copy into a fixed size stack buffer first, which is
-what made the missing clamp in src/eir.c a buffer overflow.
-
-Add a single helper they can share. It allocates the result, so there is
-no truncation to a buffer size, and replaces each ill-formed sequence
-with U+FFFD REPLACEMENT CHARACTER rather than dropping the rest of the
-string, matching what g_utf8_make_valid() and the WHATWG Encoding
-Standard do.
-
-The result has been checked byte for byte against Python's
-bytes.decode('utf-8', errors=3D'replace') over all one and two byte
-sequences, a sample of the three byte ones and 200000 random inputs.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: 1977f8616adc6538ce255a00780878ab01a35b5d
-      https://github.com/bluez/bluez/commit/1977f8616adc6538ce255a0078087=
-8ab01a35b5d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M unit/test-util.c
-
-  Log Message:
-  -----------
-  unit/test-util: Add str2utf8 tests
-
-Cover the cases str2utf8() is meant to handle: well-formed input that
-has to be left alone, whitespace stripping, input that is not NUL
-terminated, and the ill-formed sequences that have to be replaced,
-including the overlong encodings, the UTF-16 surrogates and the code
-points past U+10FFFF.
-
-Also check that a maximal subpart is replaced by a single U+FFFD rather
-than one per byte, and that the result is always well-formed UTF-8.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: 762585f48fe9da48602d49df89b364ce60d95236
-      https://github.com/bluez/bluez/commit/762585f48fe9da48602d49df89b36=
-4ce60d95236
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M monitor/att.c
-    M profiles/audio/mcp.c
-    M profiles/gap/gas.c
-    M src/eir.c
-    M src/shared/ad.c
-    M unit/test-eir.c
-
-  Log Message:
-  -----------
-  Replace the name2utf8 copies with str2utf8
-
-monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c and src/eir.c
-each carried their own name2utf8(), and src/shared/ad.c open coded the
-same thing in ad_replace_name(), with none of them agreeing.
-
-Use the shared helper instead, which drops around 120 lines and gives
-every caller the same behaviour.
-
-Two things change as a result. The monitor used to replace every
-non-ASCII byte with a space as soon as one bad byte appeared, mangling
-the valid part of the name, and now only the ill-formed sequences are
-replaced. Everything else used to truncate at the first ill-formed
-sequence, throwing away the rest of the name, and now keeps it.
-
-The unit/test-eir expectations are updated accordingly, and they show
-the improvement: the name that used to be reported as "test =E0=A4=AA=E0=A4=
-=B0=E0=A5=80" is now
-reported as "test =E0=A4=AA=E0=A4=B0=E0=A5=80<U+FFFD>=E0=A5=8D=E0=A4=B7=E0=
-=A4=BE invalid".
-
-str2utf8() returns memory from malloc(), so the callers that used
-g_free() now use free().
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: e60d89e101c246d132a67ce62fd9d1409b6bc420
-      https://github.com/bluez/bluez/commit/e60d89e101c246d132a67ce62fd9d=
-1409b6bc420
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Fix the name truncation splitting UTF-8 sequences
-
-btd_device_device_set_name() copies the name with
-
-	strncpy(device->name, name, MAX_NAME_LENGTH);
-
-which cuts at 248 bytes without any regard for where the UTF-8
-characters start and end, so a longer name can be left with a partial
-sequence. The result is no longer valid UTF-8 and D-Bus rejects it when
-the Name property is emitted.
-
-A name made of 249 U+FFFD characters is 747 bytes long and cutting it at
-248 leaves a trailing "ef bf", two thirds of a character.
-
-Truncate on a character boundary instead. The same name now ends up 246
-bytes long and stays valid.
-
-This also means a name that is not valid UTF-8 to begin with, as can be
-had from the neard and sixaxis plugins, is now cut at the first
-ill-formed sequence rather than passed on as is.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: abaab92606f10aa20e8db894d4aeb886f2c42511
-      https://github.com/bluez/bluez/commit/abaab92606f10aa20e8db894d4aeb=
-886f2c42511
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M plugins/neard.c
-    M plugins/sixaxis.c
-    M profiles/gap/gas.c
-    M src/adapter.c
-    M src/device.c
-    M src/device.h
-
-  Log Message:
-  -----------
-  device: Rename btd_device_device_set_name to btd_device_set_name
-
-The "device" was in there twice.
-
-Assisted-by: Claude:claude-opus-5
-
-
-  Commit: d917c24c7417773fd668336ffd9177ce8a1fc730
-      https://github.com/bluez/bluez/commit/d917c24c7417773fd668336ffd917=
-7ce8a1fc730
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-08-19 (Wed, 19 Aug 2026)
-
-  Changed paths:
-    M unit/test-util.c
-
-  Log Message:
-  -----------
-  unit/test-util: Cover strtoutf8 with the str2utf8 tests
-
-strtoutf8() and str2utf8() are the two ways of dealing with a name that
-is not valid UTF-8, so run them over the same inputs and keep the two
-expected results side by side, which documents how they differ:
-strtoutf8() truncates at the first ill-formed sequence and leaves the
-whitespace alone, str2utf8() replaces the ill-formed sequences and
-strips.
-
-The expected results were checked against Python, taking the longest
-prefix that decodes as strict UTF-8, over every one, two and three byte
-sequence, 16646655 of them, with no mismatch.
-
-Assisted-by: Claude:claude-opus-5
-
-
-Compare: https://github.com/bluez/bluez/compare/dcf17f0d657b%5E...d917c24=
-c7417
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Replace the name2utf8 copies with str2utf8
+In-Reply-To: <20260819204008.2292225-2-luiz.dentz@gmail.com>
+References: <20260819204008.2292225-2-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5196508198245362854==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTE0ODY5OQoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgRkFJTCAgICAgIDIuNzkgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBG
+QUlMICAgICAgMS44NSBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAxMi43NCBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAg
+ICA0MjcuOTggc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
+MTguMTggc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTA3
+Ljg0IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE0OC40
+OCBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAxNzMuODAg
+c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgNjEuNDIgc2Vj
+b25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQQVNTICAgICAgOTQyLjI4IHNlY29u
+ZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDUzMi41OSBzZWNvbmRz
+CgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNo
+IC0gRkFJTApEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgpbQmx1ZVosdjEs
+MS84XSBlaXI6IEZpeCBzdGFjayBidWZmZXIgb3ZlcmZsb3cgd2hlbiBwYXJzaW5nIHRoZSByZW1v
+dGUgbmFtZQpXQVJOSU5HOkJBRF9TSUdOX09GRjogTm9uLXN0YW5kYXJkIHNpZ25hdHVyZTogQXNz
+aXN0ZWQtYnk6CiMxMTk6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCkVSUk9S
+OkJBRF9TSUdOX09GRjogVW5yZWNvZ25pemVkIGVtYWlsIGFkZHJlc3M6ICdDbGF1ZGU6Y2xhdWRl
+LW9wdXMtNScKIzExOTogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoKL2dpdGh1
+Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU4MDg5LnBhdGNoIHRvdGFsOiAxIGVycm9ycywgMSB3
+YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQg
+ZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2FsbHkgY29u
+dmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBsYWNlLgoK
+L2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU4MDg5LnBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09NTUlU
+X01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMgTUlT
+U0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9UQUcgU1BMSVRfU1RSSU5H
+IFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBw
+b3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+IENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKW0JsdWVaLHYxLDIvOF0gc2hhcmVkL3V0aWw6
+IE1ha2Ugc3RybmxlbnV0ZjggcmVqZWN0IGlsbC1mb3JtZWQgc2VxdWVuY2VzCldBUk5JTkc6QkFE
+X1NJR05fT0ZGOiBOb24tc3RhbmRhcmQgc2lnbmF0dXJlOiBBc3Npc3RlZC1ieToKIzEyMzogCkFz
+c2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoKRVJST1I6QkFEX1NJR05fT0ZGOiBVbnJl
+Y29nbml6ZWQgZW1haWwgYWRkcmVzczogJ0NsYXVkZTpjbGF1ZGUtb3B1cy01JwojMTIzOiAKQXNz
+aXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0
+Y2gvMTQ3NTgwOTAucGF0Y2ggdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDYgbGluZXMg
+Y2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0
+Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGlj
+YWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRodWIvd29ya3NwYWNl
+L3NyYy9wYXRjaC8xNDc1ODA5MC5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhf
+TUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJF
+RkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRP
+CgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2Ug
+cmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKCltCbHVlWix2MSwzLzhdIHNoYXJlZC91dGlsOiBBZGQgc3RyMnV0ZjgKV0FS
+TklORzpCQURfU0lHTl9PRkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5Ogoj
+MTIxOiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9P
+RkY6IFVucmVjb2duaXplZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMx
+MjE6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCi9naXRodWIvd29ya3NwYWNl
+L3NyYy9wYXRjaC8xNDc1ODA5MS5wYXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDYy
+IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBj
+aGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRo
+ZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dv
+cmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTgwOTEucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBD
+T01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05f
+T0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RP
+X0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywg
+cGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjEsNC84XSB1bml0L3Rlc3QtdXRpbDogQWRkIHN0
+cjJ1dGY4IHRlc3RzCldBUk5JTkc6QkFEX1NJR05fT0ZGOiBOb24tc3RhbmRhcmQgc2lnbmF0dXJl
+OiBBc3Npc3RlZC1ieToKIzExMDogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoK
+RVJST1I6QkFEX1NJR05fT0ZGOiBVbnJlY29nbml6ZWQgZW1haWwgYWRkcmVzczogJ0NsYXVkZTpj
+bGF1ZGUtb3B1cy01JwojMTEwOiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpX
+QVJOSU5HOlRZUE9fU1BFTExJTkc6ICd0cnVuJyBtYXkgYmUgbWlzc3BlbGxlZCAtIHBlcmhhcHMg
+J3R1cm4nPwojMTQzOiBGSUxFOiB1bml0L3Rlc3QtdXRpbC5jOjEwNjoKKwl7ICJ0cnVuY2F0ZWQi
+LCA0LCAidHJ1biIgfSwKIAkgICAgICAgICAgICAgICAgICAgXl5eXgoKV0FSTklORzpTVFJJTkdf
+RlJBR01FTlRTOiBDb25zZWN1dGl2ZSBzdHJpbmdzIGFyZSBnZW5lcmFsbHkgYmV0dGVyIGFzIGEg
+c2luZ2xlIHN0cmluZwojMTQ1OiBGSUxFOiB1bml0L3Rlc3QtdXRpbC5jOjEwODoKKwl7ICJhYlx4
+ZmYiImNkIiwgNSwgImFiIiBGRkZEICJjZCIgfSwKCldBUk5JTkc6U1RSSU5HX0ZSQUdNRU5UUzog
+Q29uc2VjdXRpdmUgc3RyaW5ncyBhcmUgZ2VuZXJhbGx5IGJldHRlciBhcyBhIHNpbmdsZSBzdHJp
+bmcKIzE0NzogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxMTA6CisJeyAiYWJceDgwIiJjZCIsIDUs
+ICJhYiIgRkZGRCAiY2QiIH0sCgpXQVJOSU5HOlNUUklOR19GUkFHTUVOVFM6IENvbnNlY3V0aXZl
+IHN0cmluZ3MgYXJlIGdlbmVyYWxseSBiZXR0ZXIgYXMgYSBzaW5nbGUgc3RyaW5nCiMxNDk6IEZJ
+TEU6IHVuaXQvdGVzdC11dGlsLmM6MTEyOgorCXsgImFiXHhlMlx4ODIiImNkIiwgNiwgImFiIiBG
+RkZEICJjZCIgfSwKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1ODA5Mi5wYXRjaCB0
+b3RhbDogMSBlcnJvcnMsIDUgd2FybmluZ3MsIDk1IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBz
+b21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAg
+ICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4
+IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTgwOTIu
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBt
+ZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBG
+SUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNF
+TlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRo
+ZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVos
+djEsNS84XSBSZXBsYWNlIHRoZSBuYW1lMnV0ZjggY29waWVzIHdpdGggc3RyMnV0ZjgKV0FSTklO
+RzpDT01NSVRfTE9HX0xPTkdfTElORTogUG9zc2libGUgdW53cmFwcGVkIGNvbW1pdCBkZXNjcmlw
+dGlvbiAocHJlZmVyIGEgbWF4aW11bSA3NSBjaGFycyBwZXIgbGluZSkKIzExNjogCnRoZSBpbXBy
+b3ZlbWVudDogdGhlIG5hbWUgdGhhdCB1c2VkIHRvIGJlIHJlcG9ydGVkIGFzICJ0ZXN0IOCkquCk
+sOClgCIgaXMgbm93CgpXQVJOSU5HOkJBRF9TSUdOX09GRjogTm9uLXN0YW5kYXJkIHNpZ25hdHVy
+ZTogQXNzaXN0ZWQtYnk6CiMxMjI6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUK
+CkVSUk9SOkJBRF9TSUdOX09GRjogVW5yZWNvZ25pemVkIGVtYWlsIGFkZHJlc3M6ICdDbGF1ZGU6
+Y2xhdWRlLW9wdXMtNScKIzEyMjogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoK
+V0FSTklORzpTVFJJTkdfRlJBR01FTlRTOiBDb25zZWN1dGl2ZSBzdHJpbmdzIGFyZSBnZW5lcmFs
+bHkgYmV0dGVyIGFzIGEgc2luZ2xlIHN0cmluZwojNDk2OiBGSUxFOiB1bml0L3Rlc3QtZWlyLmM6
+NDExOgorCS5uYW1lID0gInRlc3Qg4KSq4KSw4KWAIiAiXHhlZlx4YmZceGJkIiAi4KWN4KS34KS+
+IGludmFsaWQiLAoKV0FSTklORzpTVFJJTkdfRlJBR01FTlRTOiBDb25zZWN1dGl2ZSBzdHJpbmdz
+IGFyZSBnZW5lcmFsbHkgYmV0dGVyIGFzIGEgc2luZ2xlIHN0cmluZwojNTA2OiBGSUxFOiB1bml0
+L3Rlc3QtZWlyLmM6NDQwOgorCS5uYW1lID0gInRlc3QgXDAzMyRCIiAiXHhlZlx4YmZceGJkXHhl
+Zlx4YmZceGJkXHhlZlx4YmZceGJkXHhlZlx4YmZceGJkIgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3Jj
+L3BhdGNoLzE0NzU4MDkzLnBhdGNoIHRvdGFsOiAxIGVycm9ycywgNCB3YXJuaW5ncywgMzMzIGxp
+bmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVj
+a3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0
+eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtz
+cGFjZS9zcmMvcGF0Y2gvMTQ3NTgwOTMucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01Q
+TEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZG
+IFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tT
+VFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxl
+YXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjEsNi84XSBkZXZpY2U6IEZpeCB0aGUgbmFtZSB0cnVu
+Y2F0aW9uIHNwbGl0dGluZyBVVEYtOCBzZXF1ZW5jZXMKV0FSTklORzpCQURfU0lHTl9PRkY6IE5v
+bi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTIxOiAKQXNzaXN0ZWQtYnk6IENs
+YXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2duaXplZCBlbWFp
+bCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMjE6IApBc3Npc3RlZC1ieTogQ2xh
+dWRlOmNsYXVkZS1vcHVzLTUKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1ODA5NC5w
+YXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDIzIGxpbmVzIGNoZWNrZWQKCk5PVEU6
+IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxl
+IHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5n
+IC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3
+NTgwOTQucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdu
+b3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NU
+UlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BE
+WF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55
+IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpb
+Qmx1ZVosdjEsNy84XSBkZXZpY2U6IFJlbmFtZSBidGRfZGV2aWNlX2RldmljZV9zZXRfbmFtZSB0
+byBidGRfZGV2aWNlX3NldF9uYW1lCldBUk5JTkc6QkFEX1NJR05fT0ZGOiBOb24tc3RhbmRhcmQg
+c2lnbmF0dXJlOiBBc3Npc3RlZC1ieToKIzEwNDogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRl
+LW9wdXMtNQoKRVJST1I6QkFEX1NJR05fT0ZGOiBVbnJlY29nbml6ZWQgZW1haWwgYWRkcmVzczog
+J0NsYXVkZTpjbGF1ZGUtb3B1cy01JwojMTA0OiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUt
+b3B1cy01CgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTgwOTUucGF0Y2ggdG90YWw6
+IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBv
+ZiB0aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBt
+ZWNoYW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAt
+LWZpeC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU4MDk1LnBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2Fn
+ZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9Q
+QVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9U
+QUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJy
+b3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKW0JsdWVaLHYxLDgv
+OF0gdW5pdC90ZXN0LXV0aWw6IENvdmVyIHN0cnRvdXRmOCB3aXRoIHRoZSBzdHIydXRmOCB0ZXN0
+cwpXQVJOSU5HOkJBRF9TSUdOX09GRjogTm9uLXN0YW5kYXJkIHNpZ25hdHVyZTogQXNzaXN0ZWQt
+Ynk6CiMxMTM6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCkVSUk9SOkJBRF9T
+SUdOX09GRjogVW5yZWNvZ25pemVkIGVtYWlsIGFkZHJlc3M6ICdDbGF1ZGU6Y2xhdWRlLW9wdXMt
+NScKIzExMzogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoKV0FSTklORzpUWVBP
+X1NQRUxMSU5HOiAndHJ1bicgbWF5IGJlIG1pc3NwZWxsZWQgLSBwZXJoYXBzICd0dXJuJz8KIzE2
+MDogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxMDk6CisJeyAidHJ1bmNhdGVkIiwgNCwgInRydW4i
+LCAidHJ1biIgfSwKIAkgICAgICAgICAgICAgICAgICAgXl5eXgoKV0FSTklORzpUWVBPX1NQRUxM
+SU5HOiAndHJ1bicgbWF5IGJlIG1pc3NwZWxsZWQgLSBwZXJoYXBzICd0dXJuJz8KIzE2MDogRklM
+RTogdW5pdC90ZXN0LXV0aWwuYzoxMDk6CisJeyAidHJ1bmNhdGVkIiwgNCwgInRydW4iLCAidHJ1
+biIgfSwKIAkgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eCgpXQVJOSU5HOlNUUklOR19G
+UkFHTUVOVFM6IENvbnNlY3V0aXZlIHN0cmluZ3MgYXJlIGdlbmVyYWxseSBiZXR0ZXIgYXMgYSBz
+aW5nbGUgc3RyaW5nCiMxNjM6IEZJTEU6IHVuaXQvdGVzdC11dGlsLmM6MTExOgorCXsgImFiXHhm
+ZiIiY2QiLCA1LCAiYWIiIEZGRkQgImNkIiwgImFiIiB9LAoKV0FSTklORzpTVFJJTkdfRlJBR01F
+TlRTOiBDb25zZWN1dGl2ZSBzdHJpbmdzIGFyZSBnZW5lcmFsbHkgYmV0dGVyIGFzIGEgc2luZ2xl
+IHN0cmluZwojMTY2OiBGSUxFOiB1bml0L3Rlc3QtdXRpbC5jOjExMzoKKwl7ICJhYlx4ODAiImNk
+IiwgNSwgImFiIiBGRkZEICJjZCIsICJhYiIgfSwKCldBUk5JTkc6U1RSSU5HX0ZSQUdNRU5UUzog
+Q29uc2VjdXRpdmUgc3RyaW5ncyBhcmUgZ2VuZXJhbGx5IGJldHRlciBhcyBhIHNpbmdsZSBzdHJp
+bmcKIzE2OTogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxMTU6CisJeyAiYWJceGUyXHg4MiIiY2Qi
+LCA2LCAiYWIiIEZGRkQgImNkIiwgImFiIiB9LAoKV0FSTklORzpBUlJBWV9TSVpFOiBQcmVmZXIg
+QVJSQVlfU0laRSh1dGY4X3Rlc3RzKQojMjA1OiBGSUxFOiB1bml0L3Rlc3QtdXRpbC5jOjEzOToK
+Kwlmb3IgKGkgPSAwOyBpIDwgc2l6ZW9mKHV0ZjhfdGVzdHMpIC8gc2l6ZW9mKHV0ZjhfdGVzdHNb
+MF0pOyBpKyspIHsKCldBUk5JTkc6QVJSQVlfU0laRTogUHJlZmVyIEFSUkFZX1NJWkUodXRmOF90
+ZXN0cykKIzIzNDogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxNjY6CisJZm9yIChpID0gMDsgaSA8
+IHNpemVvZih1dGY4X3Rlc3RzKSAvIHNpemVvZih1dGY4X3Rlc3RzWzBdKTsgaSsrKSB7CgovZ2l0
+aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTgwOTYucGF0Y2ggdG90YWw6IDEgZXJyb3JzLCA4
+IHdhcm5pbmdzLCAxMzcgbGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9y
+dGVkIGRlZmVjdHMsIGNoZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5
+IGNvbnZlcnQgdG8gdGhlIHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFj
+ZS4KCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1ODA5Ni5wYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENP
+TU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VT
+IE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NU
+UklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFs
+c2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIwpUZXN0OiBHaXRMaW50IC0gRkFJTApEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CltC
+bHVlWix2MSw2LzhdIGRldmljZTogRml4IHRoZSBuYW1lIHRydW5jYXRpb24gc3BsaXR0aW5nIFVU
+Ri04IHNlcXVlbmNlcwoKNzogQjMgTGluZSBjb250YWlucyBoYXJkIHRhYiBjaGFyYWN0ZXJzIChc
+dCk6ICIJc3RybmNweShkZXZpY2UtPm5hbWUsIG5hbWUsIE1BWF9OQU1FX0xFTkdUSCk7IgoKCmh0
+dHBzOi8vZ2l0aHViLmNvbS9ibHVlei9ibHVlei9wdWxsLzI0MTUKCi0tLQpSZWdhcmRzLApMaW51
+eCBCbHVldG9vdGgKCg==
+
+--===============5196508198245362854==--
