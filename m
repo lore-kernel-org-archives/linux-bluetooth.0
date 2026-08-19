@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C563C10BD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 17:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159283C13EF;
+	Wed, 19 Aug 2026 17:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787159458; cv=none; b=kSB10TZ4k745sAdCZGFcNZ6jMrfxTNchauKCnSpkIgH6vR1im0LCyZjAqQDu1cot/dcFohU3Qeg+FP1b93KuGyzG6as8D+Ny2uXNkDiVq9CwnD3Q5XXnJ7aHpzFgoVqIUyflOid2whRvdKDypm14AfLYkLA8sLZ2ujbZaV06UfY=
+	t=1787159460; cv=none; b=aKnmRsfse75VmRAs+Vjhfgt/0ZaEOO1ZTPyS7wMigjNov7JC6RogZPZdk8q18yhKPwPEZsCHWeYZuj7WyxNMWhNKuQfn0fbS9ybzKbSaQ58ewOkansbiW8Z7XVRQW79LZan9NL0kIujeCZCnDh3a4tqisOYLVqHsvg5WUFxqPfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787159458; c=relaxed/simple;
-	bh=uKSLAFf6b2lv8NQ44hhLwmcN1uIMMkndL7Qjwr/Vkyg=;
+	s=arc-20240116; t=1787159460; c=relaxed/simple;
+	bh=UGJKchJC4n2gY1dhQyFSV4uaEp6udia2Ar0p7zG3+tU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R07KTMLmITe/bxIPjk2LXQKet8OAguw24dQlxN+9xcH2/fglT4Nhiq25deoO4WJSTGfTBbxXxJq8UapuE3dnOxtXoC+iLBcShr3+aDbhv7KhPLWpgFBHM7Ng4T66C6jGqBmlGV0S8wnRBVgu+b5FbLmlQsSmojFc3Qr3xVECpHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcxwRSBw; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=R2aK269MHO8SgWbWMst3bOXczWRQ/v9+MTc9wFtOBotiYVgikqh7S0uPhCrS4Ks56cmfEiMLibtJPPpVlBnZFWT6NuRohGXPJ7HUwSQTgLhuiivLYHFN/8soNeGzFtnu5/CxD/44v/YxY2efeFNyZEW+Hna5pyI3UCRQpBOh/vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I3KRlkX+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcxwRSBw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E4F1F00A3D;
-	Wed, 19 Aug 2026 17:10:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3KRlkX+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A728E1F000E9;
+	Wed, 19 Aug 2026 17:10:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787159457;
-	bh=xt3LwgeQ3akpSqA4yj9hu3whM071e/Unf11sK5S7LBQ=;
+	s=k20260515; t=1787159458;
+	bh=Lx/ol6yGQVQHJpcUaqVf68i0kinLwAiN5QVIVSAVol0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=lcxwRSBwvqBlOx3Gw6oizszsyTeY35yy5H2xWx5MXsSXYCp++v6WUCwtdtdFUSzUS
-	 mMaSQ/aLiAw9f+kjbY6JTGr7xmMC1UYGpoYEovTc5Fg8nvm0Upf9Dt1AIY+3gkVgTI
-	 a6ZlMGWmClLTxjkDXgOXxwZtkSIwRDiOmZ2+/Nf6b+yojKjG6SJblukyMOFqdCHA8O
-	 PtrLf5aNFthp1+DV37V21+aNmaA+Td06kTLGrY9x0kZOeJqVxKILzEORJvuGx2THby
-	 wxW3xEH/2at90Ue7LvZhmdWalCS1iTDKHnixTaBZMGkFjTbkWgav8vmJ0/RWw09Uu8
-	 K0PN/HBDc/Hfg==
+	b=I3KRlkX+UMcbj1tjxCSFht777xUEQ7UMhSvCH6UtQ5S9viDq/G+IW00/s+5gYWc7F
+	 rRvWf1PaR+ZJkm7IvLiKB3z5LRZgkXmV/TLYDiveP1e1W5+occh1cVBkhi4Ce9QgHN
+	 BC+TNCcLx8m774p+Xb/l+kYqLR6oovCGqjKk4LfM1+WWRWZUtj5k5R474pGgFanyJ2
+	 EbGsKxEPHZWUAYemwQMirr+9kVH3HHERdYhOeqbHfnBYxZy1z6jg2rHfmIjzLn5w9p
+	 veyZXR3awTbP/dGxwmOtr3HbWCqtC0/jcGq1LHRm35L7dsihdXgp8z6uhN295A4tu/
+	 MOsaXJzTtXvxQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5688638119E6;
-	Wed, 19 Aug 2026 17:10:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D094A38119E6;
+	Wed, 19 Aug 2026 17:10:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,42 +37,51 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/3] Bluetooth: btintel_pcie: parse FW memory addresses
- via
- mailbox TLV
+Subject: Re: [PATCH v1] Bluetooth: hci_core: use skb_get() instead of
+ skb_clone()
+ for req_skb
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178715940789.3583745.6902246283007182525.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Aug 2026 17:10:07 +0000
-References: <20260819143219.22728-1-kiran.k@intel.com>
-In-Reply-To: <20260819143219.22728-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
+ <178715940938.3583745.2165256517061172398.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Aug 2026 17:10:09 +0000
+References: <20260819135321.1444185-1-xin.chen2@oss.qualcomm.com>
+In-Reply-To: <20260819135321.1444185-1-xin.chen2@oss.qualcomm.com>
+To: Xin Chen <xin.chen2@oss.qualcomm.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_chejiang@quicinc.com, liulzhao@qti.qualcomm.com, cxin@qti.qualcomm.com,
+ stable@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 19 Aug 2026 20:02:17 +0530 you wrote:
-> From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+On Wed, 19 Aug 2026 21:53:21 +0800 you wrote:
+> BT enable fails intermittently with -ETIMEDOUT (-110).  The kernel log
+> shows the HCI Read Local Version command was sent and the firmware
+> replied with status 0x00 (logged by hci_req_cmd_complete() BT_DBG),
+> but the waiter in __hci_cmd_sync_sk() never woke up and timed out
+> after 10 s:
 > 
-> Implement GP1 mailbox interrupt handling to receive memory region
-> addresses from firmware via a TLV-based protocol. When firmware sends
-> a BUILD_SPECIFIC_RESOURCES_MAPPING mailbox message, the driver reads
-> a TLV table from device memory containing addresses and sizes of
-> debug memory regions (exception dump, DCCM, SDS, ECL, SMEM).
+>   bluetooth hci0: Opcode 0xfc00              // __hci_cmd_sync_sk
+>   bluetooth hci0: opcode 0xfc00 plen 1       // hci_cmd_sync_add
+>   bluetooth hci0: skb len 4                  // hci_cmd_sync_alloc
+>   bluetooth hci0: length 1                   // hci_req_sync_run
+>   Bluetooth: hci0 cmd_cnt 1 cmd queued 1     // hci_cmd_work
+>   Bluetooth: hci0 type 1 len 4               // hci_send_frame
+>   Bluetooth: opcode 0xfc00 status 0x00       // hci_req_cmd_complete
+>   <-- req_skb NULL: req_complete_skb not set,
+>       hci_cmd_sync_complete() never called,
+>       req_status stays HCI_REQ_PEND            -->
+>   <-- 10 s later: wait_event_interruptible_timeout expires -->
+>   bluetooth hci0: end: err -110              // __hci_cmd_sync_sk
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/3] Bluetooth: btintel_pcie: parse FW memory addresses via mailbox TLV
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6f5f8dcf6244
-  - [v2,2/3] Bluetooth: btintel_pcie: sync mbox tlv parsing with GP0 alive interrupt
-    https://git.kernel.org/bluetooth/bluetooth-next/c/185b9b3869fa
-  - [v2,3/3] Bluetooth: btintel_pcie: Route debug traces to WiFi DBGC by default
-    https://git.kernel.org/bluetooth/bluetooth-next/c/52eff0428bf2
+  - [v1] Bluetooth: hci_core: use skb_get() instead of skb_clone() for req_skb
+    https://git.kernel.org/bluetooth/bluetooth-next/c/be766d775060
 
 You are awesome, thank you!
 -- 
