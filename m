@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF511F936
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E1F3BF694
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 14:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787150640; cv=none; b=uiyya7QJRSmWdlhoID190uWis0bamODB2+QNkNgDRskK3+K/bWc/H+I3k5Qkz0oD6P7fcun9FDNlkQUmcYiKkQg603r24S2690KZQGuDGzbBBQ/uHQIYzyebkQndOCrU5y3YMK6WwF0Ph9QCyXjiX0Qdn9U9qO11Z7wQJGu41qg=
+	t=1787150640; cv=none; b=djq+m/owzTsQsWpvpssnyysVx1kTF18lMdvSOnwWxFsEL3Ahmnf448/OIZ/LuwvkaJxPKYlXz8bgwb8v4AhTjRqLTgQXipasEVnZXYkvWDDmr6wG17ms6HfsZvyYK/ymJt5A4vGL4NCYJmUlJ1EXhvx/umtRQ3pFFnezktUdwnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787150640; c=relaxed/simple;
-	bh=OiLLCNvAXstTt4KrVaCvT/AcrlhVSlHxzVjAsvl0Htg=;
+	bh=4iiR96Az290a6tIGBmKOMcH5ExE/9/axIEt9hkYPScc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z85A7CxeU+3Csvq/Km1m8J+Q7W6xRR4LMWoYyC7Wvp03a96TdyMkLLTG2QhiyALDQ9sE1Xlvu5nQiOhyHXMuUG0nZ9aoosxxPkyDKVCm1CXEyT6YcEXRHW49nOZa5VFHQpB8Re88gH2F1tZgtd+S2jF6oBBcqIPf61i4Fp2CCiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UY7Dhomf; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=bCGF8r/I4XWVwm7vqyeDgaNO+Yeg6PGsIi+cGi3ej6ZJepcF5jaiQ5Pql8MOu7ll3/ND5uTYf0S106Tj2rw1YX+u+g2C2qZoVaVPjKAZBO3LnN2ZErjX/jWLjIEDQxcm31W5TObM0jfV1PF1aG+0KR/6jlB13cL2Pzad1Znr9xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=q1/Xc1aF; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UY7Dhomf"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="q1/Xc1aF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1787150628;
-	bh=OiLLCNvAXstTt4KrVaCvT/AcrlhVSlHxzVjAsvl0Htg=;
+	s=mail; t=1787150629;
+	bh=4iiR96Az290a6tIGBmKOMcH5ExE/9/axIEt9hkYPScc=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UY7Dhomf1s6xrYftMcqAd6EEjRxq4qnjp6cZ3mie/LzBGw2MCHS6ckUYcKffVRXio
-	 2stVZL2DeVHZhXaD0Tl+nynbXUHxAy7Q1BQk8nCNltrQJtTz9EqAA3lebPFk/qCUd1
-	 Tzo3PhMKca9tZghVlpKq+x6kLOycwwUGFX0gOUEj5LzfgLTBMJ/5w7T09fSALSJxiA
-	 j7UrMDI2vEf8cglSGunEmtCGpYd3DFWyUfJNQ3HB0oKlrJw+o5rd6tI2jJfiroildf
-	 VjjBEijWK/WLueoj1zya9Ks4hTKS5/3+ThYLp4aOK9JacImUY/1lzfepjm95ri2sBh
-	 2nMPMlYuqCXfg==
+	b=q1/Xc1aFFrlhU8FyzaXN/3ZNdXB7bKknTm2w6RNLQ4TRIypmK8LFFh0jH2deA0fo2
+	 78RgEvS2isHRZVHbnVwcuMgRrelocNl92jgnbdCCljrLSM4dVNmUIzkp4lt2tnjYDF
+	 3LTIml2j6nIq7QR7D97tL2Ft2zlW7bUUWb9fo1CN/IDUZwGLwB7MM0PsyNWadSHCIa
+	 ++WHV8g0HlnuH+qEa81qqiV1P7j9gd/mwM59QDXgEZHMizwxJz4KXgJvlmtJECT41m
+	 TFZbcWuYFlFtmUFC7PAPzGkJ6suXLwlob/Sox75SQE5UHzaIxSDwXmN9gHwEJcb6Rp
+	 3Xmh6ZrE4/0sw==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id A94E617E0FC9
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E4E0917E0FEA
 	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 16:43:48 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 6/7] device: unify admin allowlist checks for device services
-Date: Wed, 19 Aug 2026 16:43:36 +0200
-Message-ID: <20260819144337.889893-7-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 7/7] profiles/audio: make A2DP admin allowlist enforcement role-safe
+Date: Wed, 19 Aug 2026 16:43:37 +0200
+Message-ID: <20260819144337.889893-8-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260819144337.889893-1-frederic.danis@collabora.com>
 References: <20260819144337.889893-1-frederic.danis@collabora.com>
@@ -50,165 +50,171 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Consolidate device-side admin policy handling into one coherent model so
-incoming and outgoing A2DP behavior follows the configured allowlist
-consistently.
+Unify audio-side allowlist enforcement so A2DP behavior remains correct
+across dynamic policy updates, reconnects, and role-specific endpoint
+negotiation.
 
 Why:
-- The initial profile-aware adapter mapping fixed role-inverted A2DP cases
-  for some paths, but device-side service gating still used mixed criteria.
-- Host-initiated Connect() could evaluate A2DP services with the wrong UUID
-  perspective, leading to valid flows being blocked (or blocked flows being
-  considered valid) under partial allowlists.
+- Dynamic allowlist reapply could leave stale A2DP role state and dangling
+  role lists, leading to invalid reuse and instability during subsequent
+  signaling/SEP handling.
+- Policy enforcement happening late (at SetConfiguration time) allowed
+  blocked roles to remain visible during capability negotiation, which caused
+  retry/disconnect behavior until session managers were restarted.
 
 What changed:
-- Use direct UUID allowlist checks for device service eligibility updates.
-- Add A2DP role-aware mapping for device policy UUID selection:
-  - a2dp-sink -> A2DP Source UUID (110a)
-  - a2dp-source -> A2DP Sink UUID (110b)
-- Apply the same policy UUID resolution in:
-  - btd_device_all_services_allowed()
-  - btd_device_update_allowed_services()
+- Harden A2DP server role removal bookkeeping:
+  - clear source_enabled/sink_enabled flags on remove
+  - clear server->sources/server->sinks list heads after free
+  - unregister shared server only when both roles are disabled
+- Enforce admin policy at SEP negotiation boundaries:
+  - add role-aware helper mapping local SEP type to policy UUID
+  - reject blocked roles in Get_Capability path
+  - reject blocked roles early in Set_Configuration path
+- Keep endpoint registration resilient when partial allowlists block specific
+  A2DP records, so allowed endpoints continue to register.
 
 Result:
-- Device-service policy decisions now align with intended local A2DP role
-  semantics for both remote-initiated and host-initiated connection paths.
-- Admin allowlist enforcement remains strict while eliminating the observed
-  false block during host->remote A2DP connect attempts.
+- A2DP policy decisions are consistent with local role semantics.
+- Blocked roles are filtered earlier and more predictably.
+- Runtime policy transitions are stable, without requiring daemon/session
+  manager restarts to recover expected reconnect behavior.
 
 Assisted-by: GPT:GPT-5.3-Codex
 ---
- src/adapter.c |  6 +++---
- src/adapter.h |  3 +++
- src/device.c  | 35 +++++++++++++++++++++++++++++++----
- 3 files changed, 37 insertions(+), 7 deletions(-)
+ profiles/audio/a2dp.c  | 38 ++++++++++++++++++++++++++++++++++----
+ profiles/audio/media.c |  7 +++++++
+ 2 files changed, 41 insertions(+), 4 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 0cc87f649..138c57800 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5403,7 +5403,7 @@ static const char *profile_allowlist_uuid(const struct btd_profile *profile)
- 	return NULL;
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index a4ba1dacf..0d4b8cc32 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -811,6 +811,20 @@ static void reverse_discover(struct avdtp *session, GSList *seps, int err,
+ 	DBG("err %d", err);
  }
  
--static bool adapter_profile_is_allowed(struct btd_adapter *adapter,
-+bool btd_adapter_is_profile_allowed(struct btd_adapter *adapter,
- 					const struct btd_profile *profile)
- {
- 	const char *uuid = profile_allowlist_uuid(profile);
-@@ -5422,7 +5422,7 @@ static void probe_profile(struct btd_profile *profile, void *data)
- 	if (profile->adapter_probe == NULL)
- 		return;
- 
--	if (!adapter_profile_is_allowed(adapter, profile)) {
-+	if (!btd_adapter_is_profile_allowed(adapter, profile)) {
- 		DBG("%s blocked by admin allowlist", profile->name);
- 		return;
- 	}
-@@ -5447,7 +5447,7 @@ static void reapply_profile(struct btd_profile *profile, void *data)
- 
- 	active = g_slist_find(adapter->profiles, profile) != NULL;
- 
--	if (adapter_profile_is_allowed(adapter, profile)) {
-+	if (btd_adapter_is_profile_allowed(adapter, profile)) {
- 		if (!active)
- 			probe_profile(profile, adapter);
- 		return;
-diff --git a/src/adapter.h b/src/adapter.h
-index a1c887c45..583168f4b 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -27,6 +27,7 @@
- 
- struct btd_adapter;
- struct btd_device;
-+struct btd_profile;
- struct queue;
- 
- struct btd_adapter *btd_adapter_get_default(void);
-@@ -299,6 +300,8 @@ bool btd_adapter_set_allowed_uuids(struct btd_adapter *adapter,
- 							struct queue *uuids);
- bool btd_adapter_is_uuid_allowed(struct btd_adapter *adapter,
- 							const char *uuid_str);
-+bool btd_adapter_is_profile_allowed(struct btd_adapter *adapter,
-+					const struct btd_profile *profile);
- void btd_adapter_reapply_allowed_uuids(struct btd_adapter *adapter);
- 
- void btd_adapter_load_conn_param(struct btd_adapter *adapter,
-diff --git a/src/device.c b/src/device.c
-index 65d84be56..c396372be 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2547,21 +2547,44 @@ static struct btd_service *find_connectable_service(struct btd_device *dev,
- 	return NULL;
- }
- 
-+static const char *service_policy_uuid(const struct btd_profile *profile)
++static bool a2dp_sep_policy_allowed(struct avdtp *session,
++					const struct a2dp_sep *sep)
 +{
-+	if (!profile)
-+		return NULL;
++	struct btd_adapter *adapter = avdtp_get_adapter(session);
++	const char *uuid;
 +
-+	/*
-+	 * For A2DP device services, apply admin policy by local role UUID:
-+	 * - a2dp-sink profile is local source role  (110a)
-+	 * - a2dp-source profile is local sink role  (110b)
-+	 */
-+	if (profile->name) {
-+		if (!strcmp(profile->name, "a2dp-sink"))
-+			return A2DP_SOURCE_UUID;
++	if (sep->type == AVDTP_SEP_TYPE_SOURCE)
++		uuid = A2DP_SOURCE_UUID;
++	else
++		uuid = A2DP_SINK_UUID;
 +
-+		if (!strcmp(profile->name, "a2dp-source"))
-+			return A2DP_SINK_UUID;
-+	}
-+
-+	return profile->remote_uuid;
++	return btd_adapter_is_uuid_allowed(adapter, uuid);
 +}
 +
- bool btd_device_all_services_allowed(struct btd_device *dev)
- {
- 	GSList *l;
- 	struct btd_adapter *adapter = dev->adapter;
- 	struct btd_service *service;
- 	struct btd_profile *profile;
-+	const char *uuid;
+ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 						struct avdtp_local_sep *sep,
+ 						struct avdtp_stream *stream,
+@@ -827,6 +841,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 	else
+ 		DBG("Source %p: Set_Configuration_Ind", sep);
  
- 	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
- 		service = l->data;
- 		profile = btd_service_get_profile(service);
-+		uuid = service_policy_uuid(profile);
- 
--		if (!profile || !profile->auto_connect)
-+		if (!profile || !profile->auto_connect || !uuid)
- 			continue;
- 
--		if (!btd_adapter_is_uuid_allowed(adapter, profile->remote_uuid))
-+		if (!btd_adapter_is_uuid_allowed(adapter, uuid))
- 			return false;
- 	}
- 
-@@ -2575,6 +2598,7 @@ void btd_device_update_allowed_services(struct btd_device *dev)
- 	struct btd_profile *profile;
- 	GSList *l;
- 	bool is_allowed;
-+	const char *uuid;
- 	char addr[18];
- 
- 	/* If service discovery is ongoing, let the service discovery complete
-@@ -2590,9 +2614,12 @@ void btd_device_update_allowed_services(struct btd_device *dev)
- 	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
- 		service = l->data;
- 		profile = btd_service_get_profile(service);
-+		uuid = service_policy_uuid(profile);
++	if (!a2dp_sep_policy_allowed(session, a2dp_sep))
++		return FALSE;
 +
-+		if (!profile || !uuid)
-+			continue;
+ 	a2dp_stream = a2dp_stream_get(a2dp_sep, session);
+ 	if (!a2dp_stream)
+ 		return FALSE;
+@@ -905,6 +922,11 @@ static gboolean endpoint_getcap_ind(struct avdtp *session,
+ 	else
+ 		DBG("Source %p: Get_Capability_Ind", sep);
  
--		is_allowed = btd_adapter_is_uuid_allowed(adapter,
--							profile->remote_uuid);
-+		is_allowed = btd_adapter_is_uuid_allowed(adapter, uuid);
- 		btd_service_set_allowed(service, is_allowed);
++	if (!a2dp_sep_policy_allowed(session, a2dp_sep)) {
++		*err = AVDTP_BAD_ACP_SEID;
++		return FALSE;
++	}
++
+ 	*caps = NULL;
+ 
+ 	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+@@ -2858,6 +2880,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+ 	GSList **l;
+ 	uint32_t *record_id;
+ 	sdp_record_t *record;
++	int ret;
+ 
+ 	server = find_server(servers, adapter);
+ 	if (server == NULL) {
+@@ -2918,12 +2941,13 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+ 		return NULL;
  	}
- }
+ 
+-	if (adapter_service_add(server->adapter, record) < 0) {
++	ret = adapter_service_add(server->adapter, record);
++	if (ret < 0) {
+ 		error("Unable to register A2DP service record");
+ 		sdp_record_free(record);
+ 		a2dp_unregister_sep(sep);
+ 		if (err)
+-			*err = -EINVAL;
++			*err = ret;
+ 		return NULL;
+ 	}
+ 
+@@ -3687,8 +3711,11 @@ static void a2dp_source_server_remove(struct btd_profile *p,
+ 	if (!server)
+ 		return;
+ 
++	server->source_enabled = FALSE;
++
+ 	g_slist_free_full(server->sources,
+ 					(GDestroyNotify) a2dp_unregister_sep);
++	server->sources = NULL;
+ 
+ 	if (server->source_record_id) {
+ 		adapter_service_remove(server->adapter,
+@@ -3696,7 +3723,7 @@ static void a2dp_source_server_remove(struct btd_profile *p,
+ 		server->source_record_id = 0;
+ 	}
+ 
+-	if (server->sink_record_id)
++	if (server->sink_enabled)
+ 		return;
+ 
+ 	a2dp_server_unregister(server);
+@@ -3734,14 +3761,17 @@ static void a2dp_sink_server_remove(struct btd_profile *p,
+ 	if (!server)
+ 		return;
+ 
++	server->sink_enabled = FALSE;
++
+ 	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
++	server->sinks = NULL;
+ 
+ 	if (server->sink_record_id) {
+ 		adapter_service_remove(server->adapter, server->sink_record_id);
+ 		server->sink_record_id = 0;
+ 	}
+ 
+-	if (server->source_record_id)
++	if (server->source_enabled)
+ 		return;
+ 
+ 	a2dp_server_unregister(server);
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 95f9580b0..26a6d7dea 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -3175,6 +3175,13 @@ static void app_register_endpoint(void *data, void *user_data)
+ 						metadata, metadata_size,
+ 						&features, &app->err);
+ 	if (!endpoint) {
++		if (app->err == -EPERM) {
++			info("Skipping endpoint %s:%s (%s) blocked by admin allowlist",
++				app->sender, path, uuid);
++			app->err = 0;
++			return;
++		}
++
+ 		error("Unable to register endpoint %s:%s: %s", app->sender,
+ 						path, strerror(-app->err));
+ 		return;
 -- 
 2.43.0
 
