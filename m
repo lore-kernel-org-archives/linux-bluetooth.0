@@ -1,271 +1,120 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B042D47605F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 15:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB573B71DA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 15:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787152135; cv=none; b=gOVzWFmbsK9Av4ue23qs2/Vy0bmSfMGAPTs9n0uYgqpt+Vfmi7+RPM5/CifLZaDaCXFMKZ3Tqspw0izZYZu7Gv9Ef67Se2p4l5pSZLOdDGqAnlyXUyIgwHXLhDUAuGr6bbBc0Vs1Vr5MBVVszXeSqQKpYKBR2wjJD6MFNowJ4tM=
+	t=1787152762; cv=none; b=nuVesLORndFQLhoiUTB1/DzWaCyKB2+9NZctHUCaXDEhDUMoDuUDDW90Y7EI68YB+dDoDWc6Vnc15q68LLs+uOYCCOUHqNNp0lWwQw3M5mQqkc5750xSFAf1oAGcpc/+k7XbWtIN0o8Hzlhge2y1PbAmn9i0mP3lKTODtMLDf/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787152135; c=relaxed/simple;
-	bh=VRoloCEixpP3ZL+v0f+4Zf9sENAFDaw6lpEJi/XbyOc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eeUuGhU0qInYidDDN8KXGqDZhOYaX6XS35t6Q7zZI2qp2mIUlFRcFdks9HP7JWdisL70Sg2doABs3KlRqY8exKSfkiZ6lMkdCugY77vkCh6xul6Z3WGVV7Aayz/y6xHbgvWdZuF37BeTNqXpyxWXNkgwPO46o60trQyDPQ4YnGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=sMp4+aMR; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	s=arc-20240116; t=1787152762; c=relaxed/simple;
+	bh=A8BdXVDercn0v1m0tN2bikYV3+m0fQV/6RL7TU6PB8M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=nkB+MjMQbSUYZtD8NlqTa+jINgV0uuRpTLgeKhUWVNZBA8Y2Iy78Z4eBkI7mHsUanBGwVObQDYMRyK8d6/3c+6OjT/uluDKokA9dYCEs361hjgn6eeSRNIN19npLz6JYgK+Yc49kzrTCoW+phEcBsT7whg0XNqSfaHojGsbRlRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q5H4whmn; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="sMp4+aMR"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8485ef63b68so1088571b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 08:08:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q5H4whmn"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51c0c45c580so6878241cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 08:19:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1787152131; x=1787756931; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=e7ZL37ywK5whEM3P/oeE6FWfJslEPtQULU2SoHzcKxs=;
-        b=sMp4+aMRg8SA+bVo0iEkhYwMwQ/fKrLxX2hK2U2brQwEekbPPmkAfwX94NL6+oWRpZ
-         zTbO7xpUFiv0PYV9WJotimriilBkUczVES0qjqMxoetogkx3TVVj6TeVcExxUHdn8hIo
-         EubPCWqVO2XbyJJCiV5L7lhvpj/YVQw8xod0oPxYWd7myNdoPB0gGjPB3afzaNlSdHhI
-         +AsJylA5dOfJF9VxhyDq8mkr4yCoPzais7YTiUIdBFzK2OD6W/kQwT4dIp4JHZ7mJEgE
-         z5jnpXTfuwCJhW5nwHb3/LEEE9Lrf3rD5pFmHKxuQMoAM3cbRgFuRCqIoxDfDxKlWHht
-         CkAw==
+        d=gmail.com; s=20251104; t=1787152760; x=1787757560; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8/9a+HYR6i+mR+XjomN/yxEqNknmbVm3BfeWdZq6Pos=;
+        b=q5H4whmnYhzq8f5x6R5iWqke0GXHrqDT9VN0TM7vuIBV4/LFVgV5fuCDZRCgMRQ/GK
+         p0QH2K7CU/hok0UXueYY/zK2rVmYXLVBMfbCQvI2qPwANfs1Boddo212sSDiIfh7FIi2
+         xMMU52KPv6Xp3ljpZtumg/dEIKKndyVixLKFy1hujnw+m5GfNZc/9EmFQHwbw55mBAfh
+         MxwHhJ7gUoYUKUMdvau0QVPsJZ8chzeBeaJKBFLkvkEORlHYuxxxRsASFxrd24bB0iW2
+         ZxC08Pxf3cV3wV3WU9OSaD20kYQ2Gen2L86+5Hex6NwH4gI8TOo2IqUGe767w8DuP+JL
+         sfsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787152131; x=1787756931;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e7ZL37ywK5whEM3P/oeE6FWfJslEPtQULU2SoHzcKxs=;
-        b=Xh9BQuDZPairhblFwWHtIVmfT9VnzYVx//uuXZPFn8H4pBEZjQnVhqcE2F0bpQo0GK
-         CmQQjEVpZQ9M3ytcZDxH6hneo9ZsD8+bsPYNZJwdc+qLLHbIuxd5De6RWoidfIm03BZv
-         kfb3DFLuPO7jzxyhVc3mJzaDxFZBJ2FPQEqJDUE+soWrryo8mktS8KMEOaK7uDz1nOPH
-         dnhd5cyWeONDijwo7NT6eNvJvOjP11/+8f+KSXegMJFZLzTHwlBzJBK66tZHxhQF0XVG
-         cc7ULj6B1i1nFR1ON9LWyJ9wSNixgAGT0D3boYGtiHrM2dqR3XMQ9Sz6cybJMgKcKACN
-         JmAQ==
-X-Gm-Message-State: AOJu0YxyvCDI16lJN0uWPO7SY18h+R9tkteDmtIdOO7X5fqHWe+uB7xA
-	GWPVRYMVC/tiUFrqRd2jUj47e13bBzNvPz61xhFe3G6qjjs9jd63HFhLtUPppZqO4R4QdxXNI0g
-	cVKXQ9g==
-X-Gm-Gg: AR+sD13DCFS2IkLddQp1aNtesu3hgBTjR25EkggiN/8CQoF8YIwA5nhaSrvI4BeGGD2
-	k78YImLZfU1mLTOH3M6+tE3pMbZPUKVTQZH/j5yKEf0mw4HX6JIsSZjM4AACx/69SFHsgKPsGrm
-	AFurUucQc4Hf1FB8nLKNyM7/D/mw2wmuZLMBqerfC7Ab+tqKEwmTWU5XjXOYJZ5SA5BeS+WSqTK
-	J5lin7jQnM+wIQf/5WK+vlbsOdcYc4yrX9a8zYBuS2Sf5ptRHXjG9/kyyAleCcuav+6NQnzzqag
-	mnFfNJd8FO8ZU7hvkqYFpaecJfd6cdbE6mBP/DTS8tYAJf87tmTo8S9kHCLmTTUvYVzLuw353Gy
-	lZtsmaOIKQy6Yy7mMN8BCpQRgWMUv+Acg3QFgHAp+9UOzGXd7D/cmULKHCgzBrAGG8DLbFlG0Oy
-	RuSGp+FPFmnOyGllkj6R+d1rZjoZ6vpNvCDMCBcyXA3BlRknwzcMIplzYDKxyuVFh6Z/jmLjI=
-X-Received: by 2002:a05:6a00:4c87:b0:847:83bc:d2a4 with SMTP id d2e1a72fcca58-851d36d24femr9807112b3a.2.1787152131107;
-        Wed, 19 Aug 2026 08:08:51 -0700 (PDT)
-Received: from enjou-Legion-Y7000P-2019 ([167.71.204.91])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc15567543fsm723762a12.18.2026.08.19.08.08.38
+        d=1e100.net; s=20251104; t=1787152760; x=1787757560;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=8/9a+HYR6i+mR+XjomN/yxEqNknmbVm3BfeWdZq6Pos=;
+        b=JXSCxFBuZw69WZjoNgraKzoQbn18Co8NBnIcgGQgcyyTza/9eUxKDyju4KifFwAGO7
+         EjWzETPglmmPrJltzfMLB03+PiB4aRJ9BhuKh3wU0JWjQpsgGhWtFBF/hqkC1Z8zqA0e
+         jRwKBrvQASQQxo+oU3BIRUaqfLCnQu32EEE2IIzbG09pcvWhhU6tQW5bK/SHfCneqSjf
+         uAnP4w9maCH2RHEesa2VH/nx1XLFViqSVApLd7eVkVU01OJYWZM0aBK34Yi5geYr3lZW
+         Bph8MWMneSlLW55MmQM0PpscLAlk4/hawOgb2RhmMkSytC7sHkhoGAbgaGGnPVYBLiMH
+         Z8FQ==
+X-Gm-Message-State: AOJu0YxqzemvsS6e98VYafs3vQ0iW+K0W9IOd4UqPrYlS9gEzGAK0yBF
+	9ehZVm3w927q1RO4DL3UqGEOqgYabby12waKG7EesIMmcHw/1YbxLp7un6RIPQ==
+X-Gm-Gg: AR+sD11uJAaY/wM9I/sVklnGImajtZa5ZYYDtnE0r9HcAh/S7OC12HHyiik9KbMHT3y
+	HWrRb+26lNHdqhI3yYnDQ1Egc0cmMyXN/+ARjZmREj4RIWS7Ij4Ow3CkoYHZ7jaVEwIGlG+Tc0G
+	a6oqeMOhze8CuDChSrDkca85OYYhNDt+dMpBGmRcwW7Ox9mWDYW+IJUvByynhI/Jk/Mb2m8E/E0
+	/1df16Z/q3WI60LyJTj0xzR68E/W7oj4ACN9qXUGpNtEYvGVmJBvxATqhTqfJhAzBdFC3uEpB2Q
+	nr/DcKfkI/Fpap1CaaJ0KZZbbtjG6xbqdHIWUiKFZVwc/yhxB1r66pQXmRAkiK2puFawqTGgMl2
+	HbvbLiWqMFLqh7FucXR24IX7BKbSBx9sKdAlYVl0TxfDqT1JlvXJOymOeLHgjDtos4K6Rsg/PXR
+	vfJ++dKES2mDL4lamxVTuq+ee1OCAvvMoaRt6IaIo4eV+9Ndrh5UNCk9UxFfuJK2mhE3QM6g==
+X-Received: by 2002:a05:622a:148c:b0:51c:164b:b242 with SMTP id d75a77b69052e-52dd57bfa81mr44617661cf.15.1787152759933;
+        Wed, 19 Aug 2026 08:19:19 -0700 (PDT)
+Received: from [172.17.0.2] ([172.190.118.184])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52dd86f33aasm12957481cf.17.2026.08.19.08.19.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 08:08:46 -0700 (PDT)
-From: Ren Wei <weir@nebusec.ai>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	mcchou@chromium.org,
-	apusaka@chromium.org,
-	mmandlik@google.com,
-	alainm@chromium.org,
-	vega@nebusec.ai,
-	edragain@163.com,
-	weir@nebusec.ai
-Subject: [PATCH v2 1/1] Bluetooth: msft: fix vendor event use-after-free during open
-Date: Wed, 19 Aug 2026 23:08:43 +0800
-Message-ID: <2e1dd2754cccae9180551049ff384bd04bbfb0b1.1787048594.git.edragain@163.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1787048594.git.edragain@163.com>
-References: <cover.1787048594.git.edragain@163.com>
+        Wed, 19 Aug 2026 08:19:19 -0700 (PDT)
+Message-ID: <6a85c977.f19865d3.3d094.30f3@mx.google.com>
+Date: Wed, 19 Aug 2026 08:19:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9171736756813212478=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v2,1/3] Bluetooth: btintel_pcie: parse FW memory addresses via mailbox TLV
+In-Reply-To: <20260819143219.22728-1-kiran.k@intel.com>
+References: <20260819143219.22728-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Yong Wang <edragain@163.com>
+--===============9171736756813212478==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Commit 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a
-hci_dev's life cycle") changed msft_do_open() to reuse the live
-hdev->msft_data object across power cycles.
+This is automated email and please do not reply to this email!
 
-That makes msft_do_open() free and replace msft->evt_prefix while the
-MSFT extension is already published through hdev->msft_data. On failure
-it can also clear hdev->msft_data and free the whole msft object.
+Dear submitter,
 
-At the same time, msft_vendor_evt() reads hdev->msft_data and checks
-msft->evt_prefix_len / msft->evt_prefix before taking hci_dev_lock().
-Since HCI vendor events may still be processed while HCI_INIT is set,
-vendor event handling can race with msft_do_open() and hit a use-after-
-free on the old prefix buffer or the msft_data object itself.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148516
 
-Fix this by reading the supported feature data into a temporary object
-first, then updating the live MSFT state only while holding
-hci_dev_lock(). Also make msft_vendor_evt() take hci_dev_lock() before
-reading hdev->msft_data and the event prefix state.
+---Test result---
 
-This keeps the published MSFT state stable across the open path and
-serializes it against vendor event processing.
+Test Summary:
+CheckPatch                    PASS      4.69 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       PASS      0.95 seconds
+SubjectPrefix                 PASS      0.37 seconds
+BuildKernel                   PASS      27.70 seconds
+CheckAllWarning               PASS      30.58 seconds
+CheckSparse                   PASS      29.12 seconds
+BuildKernel32                 PASS      26.62 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      505.00 seconds
+IncrementalBuild              PASS      29.04 seconds
 
-Fixes: 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle")
-Cc: stable@vger.kernel.org
-Reported-by: Vega <vega@nebusec.ai>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Yong Wang <edragain@163.com>
-Signed-off-by: Ren Wei <weir@nebusec.ai>
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/619
+
 ---
- net/bluetooth/msft.c | 70 +++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 27 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d7badce8746c..ff8629638299 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -133,13 +133,19 @@ struct msft_data {
- 	struct mutex filter_lock;
- };
- 
-+struct msft_supported_features {
-+	__u64 features;
-+	__u8  evt_prefix_len;
-+	__u8  *evt_prefix;
-+};
-+
- bool msft_monitor_supported(struct hci_dev *hdev)
- {
- 	return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR);
- }
- 
- static bool read_supported_features(struct hci_dev *hdev,
--				    struct msft_data *msft)
-+				    struct msft_supported_features *supported)
- {
- 	struct msft_cp_read_supported_features cp;
- 	struct msft_rp_read_supported_features *rp;
-@@ -166,17 +172,14 @@ static bool read_supported_features(struct hci_dev *hdev,
- 		goto failed;
- 
- 	if (rp->evt_prefix_len > 0) {
--		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
--					   GFP_KERNEL);
--		if (!msft->evt_prefix)
-+		supported->evt_prefix =
-+			kmemdup(rp->evt_prefix, rp->evt_prefix_len, GFP_KERNEL);
-+		if (!supported->evt_prefix)
- 			goto failed;
- 	}
- 
--	msft->evt_prefix_len = rp->evt_prefix_len;
--	msft->features = __le64_to_cpu(rp->features);
--
--	if (msft->features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
--		hdev->msft_curve_validity = true;
-+	supported->evt_prefix_len = rp->evt_prefix_len;
-+	supported->features = __le64_to_cpu(rp->features);
- 
- 	kfree_skb(skb);
- 	return true;
-@@ -631,6 +634,7 @@ int msft_resume_sync(struct hci_dev *hdev)
- void msft_do_open(struct hci_dev *hdev)
- {
- 	struct msft_data *msft = hdev->msft_data;
-+	struct msft_supported_features supported = {};
- 
- 	if (hdev->msft_opcode == HCI_OP_NOP)
- 		return;
-@@ -642,19 +646,29 @@ void msft_do_open(struct hci_dev *hdev)
- 
- 	bt_dev_dbg(hdev, "Initialize MSFT extension");
- 
--	/* Reset existing MSFT data before re-reading */
--	kfree(msft->evt_prefix);
--	msft->evt_prefix = NULL;
--	msft->evt_prefix_len = 0;
--	msft->features = 0;
--
--	if (!read_supported_features(hdev, msft)) {
--		hdev->msft_data = NULL;
--		kfree(msft);
-+	if (!read_supported_features(hdev, &supported)) {
-+		hci_dev_lock(hdev);
-+		kfree(msft->evt_prefix);
-+		msft->evt_prefix = NULL;
-+		msft->evt_prefix_len = 0;
-+		msft->features = 0;
-+		hci_dev_unlock(hdev);
- 		return;
- 	}
- 
--	if (msft_monitor_supported(hdev)) {
-+	hci_dev_lock(hdev);
-+
-+	kfree(msft->evt_prefix);
-+	msft->evt_prefix = supported.evt_prefix;
-+	msft->evt_prefix_len = supported.evt_prefix_len;
-+	msft->features = supported.features;
-+
-+	if (supported.features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
-+		hdev->msft_curve_validity = true;
-+
-+	hci_dev_unlock(hdev);
-+
-+	if (supported.features & MSFT_FEATURE_MASK_LE_ADV_MONITOR) {
- 		msft->resuming = true;
- 		msft_set_filter_enable(hdev, true);
- 		/* Monitors get removed on power off, so we need to explicitly
-@@ -1067,12 +1081,15 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- {
--	struct msft_data *msft = hdev->msft_data;
-+	struct msft_data *msft;
- 	u8 *evt_prefix;
- 	u8 *evt;
- 
-+	hci_dev_lock(hdev);
-+
-+	msft = hdev->msft_data;
- 	if (!msft)
--		return;
-+		goto unlock;
- 
- 	/* When the extension has defined an event prefix, check that it
- 	 * matches, and otherwise just return.
-@@ -1080,23 +1097,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 	if (msft->evt_prefix_len > 0) {
- 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
- 		if (!evt_prefix)
--			return;
-+			goto unlock;
- 
- 		if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
--			return;
-+			goto unlock;
- 	}
- 
- 	/* Every event starts at least with an event code and the rest of
- 	 * the data is variable and depends on the event code.
- 	 */
- 	if (skb->len < 1)
--		return;
-+		goto unlock;
- 
- 	evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
- 	if (!evt)
--		return;
--
--	hci_dev_lock(hdev);
-+		goto unlock;
- 
- 	switch (*evt) {
- 	case MSFT_EV_LE_MONITOR_DEVICE:
-@@ -1110,6 +1125,7 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 		break;
- 	}
- 
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--- 
-2.53.0
+
+--===============9171736756813212478==--
