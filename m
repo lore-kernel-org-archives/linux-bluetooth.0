@@ -1,138 +1,163 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582A93AEF55
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 16:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1A3283FE5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 16:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787156467; cv=pass; b=n2VNZKHS9CzUmgK+vQiq7CWzjrVKYrtM42WkM51T6xN/BR/CS14IOgPcA/vanruLMp3SRTqADQr40l7p3UPQGexs3plxtyoEPTEttDi8bv17L2Sr3O1eGmHCquJmFQNumRxyxqhUR80XnApJR9sS/7TEl063DuV5aKm617bQEyo=
+	t=1787156749; cv=pass; b=GuHOtUwuGpBafQ7btE6ZYdocf/CShwwiyKsAxILSSdjKCZGUaEwx3FHFlXjp5qYGD4efkscS2kW9yRsOxJRsnWuhzBG3uzfRTICwluZmQTCJkSWxPgylpgV0AJm/T8i5/iuE8k36lch9qUpX240k9TKpSPlVI6hngDJOc3TErPc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787156467; c=relaxed/simple;
-	bh=7m8VXYeB9OpD8Nsd8xAsp0vdhWVMnTy2Uk/uWxDSkYE=;
+	s=arc-20240116; t=1787156749; c=relaxed/simple;
+	bh=QTZ8swtijkfVi+YJxPypjtVivCBfWnCvFhHDw9Uxp70=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=duu7URS7wTTPqQxX2LJVHGcUI1xDdVlOEnhDhMp6iFW8UJhyNG1PAzmFH9edXEbS8idULh/XjdcJZpwlca2iORZ8pbOLszCouPJyjc1RzuEBWBzaIPyi0Y84H2JEKpKAcGhedvLqrqeP/v4n/p9SYxYwFmshFHRDhMHqBqKCaBs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rgiE74hr; arc=pass smtp.client-ip=209.85.128.174
+	 To:Cc:Content-Type; b=FSbOHzfSnwBYnulmcp8utAtG86aWMsAS5BFYLLoydf/GFBA6rmy2PuhpWqBueZy852+VQ1ZfyTArXtI2+48eqHDsKxW0/mh2jJoDXG7ByDc7SV+Kmr8pucDe2nMGgaGsyT279X4zK58VU+gMikBZEsYLIfUxQxKCOznodVLleWo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzCm3Q9I; arc=pass smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rgiE74hr"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-836ce6cbe1eso19344077b3.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:21:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787156465; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzCm3Q9I"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-836cbcd0a48so19000047b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:25:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787156747; cv=none;
         d=google.com; s=arc-20260327;
-        b=DF8rxriD4DAmYZvBiYxaJMVpdLX1XeSiOQ7GY8OirjnVChbE+PG7K5V1Cz4Z/wGhcr
-         d6RQTml2vy7kXbUtlArgO4zkQ7kgO75kuqPL/6urEO02ksa0NogCCl2x462AN+lwW3Qm
-         ECcWfkZFEWlgjdhfX+Mb0QrOZCITX0ULk+9QrcgfOV7WUwURdXx96FahMYlsJA3lKnjz
-         FLOA6dQTiY7hP4oi7dEdxj+dat9HbSGO78Hp/pC79kowtvr226RpCSBdpttg3iucjO0T
-         ZmJiRp5KreuhhT6BRqKXzvUS6I3rVz5pig1WOHpBsNlZqi3u0/JLnUOmHkrx4J42j8jX
-         2EjQ==
+        b=bulVG84Eb8t6rJSkktWBoQXvk+mOf752o1Zl3de+8tg3nyN6jOdvFwBY7dbCQDljgf
+         6HNhgijmzzuO+82Rayn+B4athBz7Qoo7lkdJF3Mq509I/GHrIu67fKOwnTzCBaUFDtDG
+         jg93MJ38kurD0H9nhn0NJCG1DYMO7G0Vj5sq9laTieUoGGd1nex9YDj5TNIR38jUpaFw
+         M4H2yeyxArcJ77Pf5by9Tcvs/3jyA1SBeUJg4L252F/3/7uKxENd9i/i4xqr9HE/rjTh
+         9DAVSxRDX5maBiccNWDFfdJFEse9loJ8H3a3lGDRyd3rAmskxfHmAXRmX0CLB+JAfbu6
+         jbnw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
-        fh=iCN6Yvulx+G3tJ+JPEjqPYPd+8Vdgenie90mkDmcUe8=;
-        b=XnmDdZ2XIm+95nkdRcq/qas/mBH56CEcUe2b9HfPriSDhnW22083OO+rDBbGfJG8G2
-         skOtScPDinaY6ljz0otV664828gz4F14WR3B6TDuxWnAiug9P4X/uTOJFjbHSA3pqhRI
-         kANjG1ab97/CQ1VH/Jb3MWkkeNA/iT1ztsOPxx3LHYzULgTTtxJQ5aM1qiyH3/WLgdmr
-         pTgctSvAjLFECtxbv9L/iODZZdqKPJiCL8tDbqzstY+CxZXW09O5sbES7/B0S+RzAcuk
-         6va0vPt4rO2qJgxYmuE9K/zBy3RsTEYFGy8u7gsK7gcXMfswFxDHf4OzpUoCnc5lSOHc
-         QXWA==;
+        bh=W5RCTORorN4Bf1q2o7H3rQstkMAtNNGlwtFQtYofGT0=;
+        fh=KvX31vT1+6+8GaKcNQXYEueCpVbvb3Ll0YQS1timrEc=;
+        b=OaG9YwmuZjLlt1DeTnzE6CDSF5P8kdh2I7YGusxnkKoi1/SGQz9brVs4tysX1T6XAP
+         RQfbNpkcIEMUL8psg2TQFC7eUGNhlS41CZmTFIO73bbEunEOdsFYK91cOVMcGhuWdtri
+         cmZcx9RMwvZ9v55NwXpJ+80xvVEaXOpJ1y8EVBLhmAUuwYRX4eQdjNZ9b15ISaRlxag0
+         0hXc5AqtvrpYSleQ9kO++g95hD+vglZhR/jocRBI0MPXpSve33Yexx3lzaf6/AI1X6Gp
+         06PhStedtIFm+RK+4ucWteALzJRiU6wpRh5pQiBLnKeX8M6NNnna3FPMlqbvXfzMplJD
+         RRkQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787156465; x=1787761265; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787156747; x=1787761547; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
-        b=rgiE74hrvV65R5h6/76tYlDCNmj/5agBYBBrvKyTvVRyGuiw42YHswrfblbB3PXyBa
-         efbuxsa1cb3o7cM5pkt3TJthi2nbKT5lwq4Xma6Xup7nYyfq8hV1i6ad+UxZbrPb/32Z
-         mOpduxx4MpzrXT2o55z90/zIHldB+szlLme1yqe5opFDb0KsFjli0tLrMm/AixNxUebW
-         NuuHQCAJHoJpgv4DfmfBHsbAj4oy0Ir7G5bQuzmhWYBYU2bvXrx4TCiSOqmE9KiwXQK3
-         GoFPPNraOeaDXmeDlORrA2MkJ/BMC9UzkVU0wQZbzgQnyS1oTSIGeFSzWMhH4YJOawqA
-         YRYA==
+        bh=W5RCTORorN4Bf1q2o7H3rQstkMAtNNGlwtFQtYofGT0=;
+        b=IzCm3Q9IPhbjf4P5i5Vr2s0EnW98xBjtdQLwrTdMUFzkOfYhWZNHIIJB/tge6I6nUl
+         ku3alYhF5Uhfved2w5uFSZFTEwVvsPI//gA+iDw8oss5PiW/4OzfIpVg0d9b6+og5otz
+         mmDiK0MEvEZntZFlpCGBLupmhzeEqHYN2y9kqASFRaB7cjzr0OxNPqia4d6M5D3dmt9S
+         Q9gdcIJog6bnphrt9fjsLFF0njWeCuLImRaTZ+JBaKWwON+CI6oNg0c0LFieHBsm9W1U
+         3Ed5DlZBsm19peXcK+vMwJ9zSBuz+eG8G6NBXWcgh/GZzrjkOmub/6qrfsEHdFYH3IO+
+         XqyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787156465; x=1787761265;
+        d=1e100.net; s=20251104; t=1787156747; x=1787761547;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
-        b=PT8YKbk6CIaXJtuKspiXxIY+dcNjj/i7HOet6N2LL6/UQeLI4Q9w05mKfeM4UH7axQ
-         AkEF1EG103RiIWMIj8i5zQS1+T8tinuMRd6uXIyuYhRvhFt1VE33/qrH+gDdYaq9lRHn
-         r5509B5qLzVuHEAPUtsg07srcUwbnmUEULGleH8e3oh1186L2K4hrIZte44OL7OnlC2+
-         u8cW0z+ibyUrClioXiQtVqS9S05fSTivtsIKklAuPcl7sLVTZ0QeKbnWAgZknYXvCkAo
-         WLzPdflHGYKZkdtS+lKlsMoER/lgyJzU7JMmgmd6aExzKlN8OYTzmo/A5ZLCgREMtbGi
-         M2Nw==
-X-Forwarded-Encrypted: i=1; AHgh+RqxsktfebL/9+hPD0j4IyD7NcG+55X8cehPxQmGMbhJ3vxTxmaL7+v9ds/2nMxDLJsjRcBbkVI0svDTlj/tl8A=@vger.kernel.org
-X-Gm-Message-State: AFuF++m7YUdWzjFb/YJtTLsqNsHcBtKZec2KclOyR8eop0/6mj0NVYER
-	NER/kCkXNlB0nwUIoj+Q0qY5Udhdp2MBrD0OA0G6ke4DQ0BcKjQfai/uZ03m2ND5uuc+4sEv9B7
-	+fTFn4ffcpg7tddtIrp4J08VMcdEg73A=
-X-Gm-Gg: AR+sD131oavOjpy8e4dpMMS5qkYJfjxtakejqitF30CnO55QiYiHwGr+St2PgSz03Su
-	qNH03GIaLUvqm6uctLA6f+5ffalxS1oqBvepBakBW+ReF9tZ9YSiESP8vUTijnmFAkv/34lizCK
-	wNMcRcD700fNyfF4/AmZL1w3EULIr8yWgbdj4vAvK9oHxdJCXLBzL8Ker4b9cb0s+JcHhGBtvap
-	6SNkSggC502HdSs6u/1df6L5Wa8TvcrasMVIPrgUruvup6iY6GIziusbrCiClI33Y+v1f232Ekm
-	quBb5uRiz97E3LPbQ7vKl0CNwZWQz6ug8X8w/sSWKBb4W0qS9fk049557FkRvOPc0Zar7jMhxY8
-	7PCQdcCQQwVrAVde/HCHzZAXbMgbx
-X-Received: by 2002:a05:690c:c630:b0:7b2:1bf1:8016 with SMTP id
- 00721157ae682-844dd14444cmr22494967b3.2.1787156464978; Wed, 19 Aug 2026
- 09:21:04 -0700 (PDT)
+        bh=W5RCTORorN4Bf1q2o7H3rQstkMAtNNGlwtFQtYofGT0=;
+        b=VGHCKHC3mqTWKKk+zdQ2f74rIOt4FZGLoW8HsAK0PO1VxD56b4DGDQvWNni/HsIshB
+         371aJ8e4dMHc/2vvXZcPs2dhBTCI4OSn5MsMyeIHB23gVEAAcqmJjkrY2U5atfnaNYxt
+         IWAJ8Zr5ux3/4MyprBFFYntpkN0YwPyNJ+r9tWXNCbXkKxsFtuhOeafFyiRKfrwFxbun
+         rfxdt2uS3miBVzBxy24IcfmByHhwQjR4QRL2WejoETh7HCbZpd5FsLf48nsw+OxGyqOv
+         9/A+eVnjrd8w+6j6IIkw6TwtRlxoNADnXT5sd8HfM3mrviQ/S3sQ/A/s8UFYChMHn9zk
+         VUzw==
+X-Forwarded-Encrypted: i=1; AHgh+RogJT5d3ftYrsKDjveuCh8EkduG5pzawa6rga4KpnJQmYN4AQIVLFdEXhE7abo33jwJkgoUHHfgFQqFFjpzFXc=@vger.kernel.org
+X-Gm-Message-State: AFuF++l0+BPb15CHlLInsdvg8U4qmmuGiLtpEs5NAg8ZjkwIbx9IOr+K
+	D85Zw1qxkGo4KbFk/cPJnK9mx9AVacjXXa/bvhriS7l3zXKaq0fTVREEeVhzjhit2ne5yQZG7fw
+	mrvUEHRhvlvn+qF89S8pP8DWWTDE6ekI=
+X-Gm-Gg: AR+sD10++FlAtRKLzYCsLRKdn2zfVlc5hy4rhdjTpOoMNIJhjdwPlihXF352R5loJae
+	SZCguYWGTfmcscGBvnPn7Bm9ppmNsmLqSmRFq9RBs4WiiUutUhDeGKXBiaH9o2xWHDYBruhLUPC
+	FEdfsgkfarLUQeq9TF10zFFgeB/k7tbCkIpw0tug3dVcKneYGyhXqq4jPVLfL8SZD/+uPJ+1EHI
+	tWTTCWr02dqZOTzYa2kd8uPYOVkNvY1TwoXTkQRUZXpyoJyJOtaSUEp3RF3wpd1acR08oX+yXmN
+	lKaFe7qpo/UgBn1EJd+5vPPQyCPXli7GJeT8K9bC4F41glv5zDPSmw8Gq2a5CmKUhe0U3Waefbc
+	plox+qaqRJrQlG1hD5zRU1g3zWdbEoe3XELn+JCc=
+X-Received: by 2002:a05:690c:1b:b0:81e:6c2e:f0f5 with SMTP id
+ 00721157ae682-844e2324f52mr29600307b3.28.1787156747164; Wed, 19 Aug 2026
+ 09:25:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260819064115.2449018-1-lijun01@kylinos.cn>
-In-Reply-To: <20260819064115.2449018-1-lijun01@kylinos.cn>
+References: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com> <340c1443-9e2b-4224-9029-f1defc644494@oss.qualcomm.com>
+In-Reply-To: <340c1443-9e2b-4224-9029-f1defc644494@oss.qualcomm.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 19 Aug 2026 12:20:52 -0400
-X-Gm-Features: AcwNN1WsCdi1WGEsaYhNl1e74CnX05dGw-1-_FS4h2yZ_1abo7De57EdI-8Zju0
-Message-ID: <CABBYNZ+ui5j6cum42s8pxnZYewZ=C4Bi0ihUXkrQyMrsKJMbeg@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
-To: Li Jun <lijun01@kylinos.cn>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Date: Wed, 19 Aug 2026 12:25:35 -0400
+X-Gm-Features: AcwNN1UAZPpOUZd10LjgTjceqxpa1OAV7zOqXLke9NZvRrCNfgsWSzvPlCS6wUc
+Message-ID: <CABBYNZ+cFGH0kD5iLw1WnUWuhSxkgwu0BZ1E0WYCzOg9D92quw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_qca: Do not write to the serial port after
+ it is closed
+To: Hans de Goede <johannes.goede@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Li,
+Hi Hans,
 
-On Wed, Aug 19, 2026 at 2:41=E2=80=AFAM Li Jun <lijun01@kylinos.cn> wrote:
+On Wed, Aug 19, 2026 at 8:59=E2=80=AFAM Hans de Goede
+<johannes.goede@oss.qualcomm.com> wrote:
 >
-> use SIMPLE_DEV_PM_OPS for btmrvl_sdio_pm_ops,and add the value of
-> .freeze .thaw .poweroff .restore.if these address are null, may cause
-> error in s4.
+> Hi All,
 >
-> Signed-off-by: Li Jun <lijun01@kylinos.cn>
-> ---
->  drivers/bluetooth/btmrvl_sdio.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+> On 19-Aug-26 14:54, Hans de Goede wrote:
+> > From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+> >
+> > hci_uart_close() closes the serdev port if HCI_QUIRK_NON_PERSISTENT_SET=
+UP
+> > is set (for example, for the WCN399x family). A failed hci_dev_open_syn=
+c()
+> > following a successful qca_setup() calls hdev->close() but not
+> > hdev->shutdown(), so the port is closed while power->vregs_on is left t=
+rue.
+> > qca_serdev_remove() then passes its power->vregs_on test and calls
+> > qca_power_off(), which writes to the closed port unconditionally.
+> >
+> > Seen on a WCN3988 by unbinding the driver after a controller failure. T=
+he
+> > trace below is from a 7.0.0 based kernel, where qca_power_off() was sti=
+ll
+> > named qca_power_shutdown():
+> >
+> >   Unable to handle kernel NULL pointer dereference at virtual address
+> >   0000000000000038
+> >   Call trace:
+> >    tty_set_termios+0x50/0x238 (P)
+> >    ttyport_set_baudrate+0x84/0xc0
+> >    serdev_device_set_baudrate+0x24/0x40
+> >    qca_power_shutdown+0x158/0x1fc [hci_uart]
+> >    qca_serdev_remove+0x54/0x68 [hci_uart]
+> >    serdev_drv_remove+0x1c/0x2c
+> >    device_remove+0x4c/0x80
+> >    device_release_driver_internal+0x1cc/0x224
+> >    device_driver_detach+0x18/0x24
+> >    unbind_store+0xb4/0xc0
+> >
+> > Check HCI_UART_PROTO_READY, which hci_uart_close() clears in the same p=
+lace
+> > it closes the port, before writing to it. The regulator disable is left
+> > unconditional so the controller is still powered down.
+> >
+> > The dangling serport->tty that turns this into a use-after-free is
+> > addressed in a separate patch.
 >
-> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_s=
-dio.c
-> index b91fc63bc9fe..197237e78a3c 100644
-> --- a/drivers/bluetooth/btmrvl_sdio.c
-> +++ b/drivers/bluetooth/btmrvl_sdio.c
-> @@ -1726,10 +1726,7 @@ static int btmrvl_sdio_resume(struct device *dev)
->         return 0;
->  }
+> That separate patch can be found here:
 >
-> -static const struct dev_pm_ops btmrvl_sdio_pm_ops =3D {
-> -       .suspend        =3D btmrvl_sdio_suspend,
-> -       .resume         =3D btmrvl_sdio_resume,
-> -};
-> +SIMPLE_DEV_PM_OPS(btmrvl_sdio_pm_ops, btmrvl_sdio_suspend, btmrvl_sdio_r=
-esume);
+> https://lore.kernel.org/linux-bluetooth/20260819125748.194377-1-johannes.=
+goede@oss.qualcomm.com/
 
-It looks like we are missing a static in front:
+Hmm, I wonder if both should go via bluetooth tree?
 
-https://sashiko.dev/#/patchset/20260819064115.2449018-1-lijun01%40kylinos.c=
-n
-
->  static struct sdio_driver bt_mrvl_sdio =3D {
->         .name           =3D "btmrvl_sdio",
-> --
-> 2.25.1
+> Regards,
+>
+> Hans
+>
+>
 >
 
 
