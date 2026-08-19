@@ -1,280 +1,140 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BB6481223
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 15:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787154338; cv=none; b=buanYLBrG91IATwW2+YRXHLBMa/Dfn3mp3Hz6WlxXx6peSwXaDY4TuNYA60mwiNlNATp6090qyo93EJQNgsCp6oTGPIQhiqsRBlmZDc5/4pKOAykHS+269KtEI7hhbBsbrZNqYp+jb2vM8SLoA7AF0LeBKnSDaYVS81Ivv76uE0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787154338; c=relaxed/simple;
-	bh=NyaIaBT9ZDMcyXAB6Iu1EEM0K/K8Kz+LnKjB/6jLHdk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bD3fXZwVRXvSI/Ab3iTz5uqSWFoAnw/USwwI6+sVHpwJ3HsxsePdtCEj300azOa030G8xxcXXtwdKDfuaSi8oKUcbitEO8BXTRMxuwiwKHaiweKCgXiMVkTl2bEZaqWVVOUdiQPi3tYWOwVd2d5hiktrKOq/j09MG0Q5xmU2WS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ikS/jVg3; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582A93AEF55
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 16:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787156467; cv=pass; b=n2VNZKHS9CzUmgK+vQiq7CWzjrVKYrtM42WkM51T6xN/BR/CS14IOgPcA/vanruLMp3SRTqADQr40l7p3UPQGexs3plxtyoEPTEttDi8bv17L2Sr3O1eGmHCquJmFQNumRxyxqhUR80XnApJR9sS/7TEl063DuV5aKm617bQEyo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787156467; c=relaxed/simple;
+	bh=7m8VXYeB9OpD8Nsd8xAsp0vdhWVMnTy2Uk/uWxDSkYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=duu7URS7wTTPqQxX2LJVHGcUI1xDdVlOEnhDhMp6iFW8UJhyNG1PAzmFH9edXEbS8idULh/XjdcJZpwlca2iORZ8pbOLszCouPJyjc1RzuEBWBzaIPyi0Y84H2JEKpKAcGhedvLqrqeP/v4n/p9SYxYwFmshFHRDhMHqBqKCaBs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rgiE74hr; arc=pass smtp.client-ip=209.85.128.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikS/jVg3"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8f032b47e3cso9395466d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 08:45:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rgiE74hr"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-836ce6cbe1eso19344077b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:21:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787156465; cv=none;
+        d=google.com; s=arc-20260327;
+        b=DF8rxriD4DAmYZvBiYxaJMVpdLX1XeSiOQ7GY8OirjnVChbE+PG7K5V1Cz4Z/wGhcr
+         d6RQTml2vy7kXbUtlArgO4zkQ7kgO75kuqPL/6urEO02ksa0NogCCl2x462AN+lwW3Qm
+         ECcWfkZFEWlgjdhfX+Mb0QrOZCITX0ULk+9QrcgfOV7WUwURdXx96FahMYlsJA3lKnjz
+         FLOA6dQTiY7hP4oi7dEdxj+dat9HbSGO78Hp/pC79kowtvr226RpCSBdpttg3iucjO0T
+         ZmJiRp5KreuhhT6BRqKXzvUS6I3rVz5pig1WOHpBsNlZqi3u0/JLnUOmHkrx4J42j8jX
+         2EjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
+        fh=iCN6Yvulx+G3tJ+JPEjqPYPd+8Vdgenie90mkDmcUe8=;
+        b=XnmDdZ2XIm+95nkdRcq/qas/mBH56CEcUe2b9HfPriSDhnW22083OO+rDBbGfJG8G2
+         skOtScPDinaY6ljz0otV664828gz4F14WR3B6TDuxWnAiug9P4X/uTOJFjbHSA3pqhRI
+         kANjG1ab97/CQ1VH/Jb3MWkkeNA/iT1ztsOPxx3LHYzULgTTtxJQ5aM1qiyH3/WLgdmr
+         pTgctSvAjLFECtxbv9L/iODZZdqKPJiCL8tDbqzstY+CxZXW09O5sbES7/B0S+RzAcuk
+         6va0vPt4rO2qJgxYmuE9K/zBy3RsTEYFGy8u7gsK7gcXMfswFxDHf4OzpUoCnc5lSOHc
+         QXWA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787154333; x=1787759133; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=7jySN9ZPRFbIUFsoY/2LrHKwfd14jPLyh0tsPtGkqzo=;
-        b=ikS/jVg3hcv30JH+IaEh8haEcfBV0/SuZ0s47YvSiRwSKEGczFHMtEJ7XJ55jFaiy6
-         rcutfyDU02T2afj6ELVXEScxdGQinp1yM1ljsLHTyTT7kvXb6eUv4hCRRmANFlePAfPi
-         quTnGJg0dJ6oTuzpFXV44FYb6HF6PEMVp8mgI9qstUPqX4GEL7zTkhECVvRBcpe62+LU
-         gcV1KLGLeZJdt8M9aD977YOR/GJbySvi537KaBqJXlHQx/LL/nOvhTLlBL5skr1fkKRC
-         Hz+mrz8vSVTLQVjPInpF4jPJVwkGmCXJsYsR6ule2pzF2oczfQkxu+zyrFAy8cbFAVCD
-         QVbA==
+        d=gmail.com; s=20251104; t=1787156465; x=1787761265; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
+        b=rgiE74hrvV65R5h6/76tYlDCNmj/5agBYBBrvKyTvVRyGuiw42YHswrfblbB3PXyBa
+         efbuxsa1cb3o7cM5pkt3TJthi2nbKT5lwq4Xma6Xup7nYyfq8hV1i6ad+UxZbrPb/32Z
+         mOpduxx4MpzrXT2o55z90/zIHldB+szlLme1yqe5opFDb0KsFjli0tLrMm/AixNxUebW
+         NuuHQCAJHoJpgv4DfmfBHsbAj4oy0Ir7G5bQuzmhWYBYU2bvXrx4TCiSOqmE9KiwXQK3
+         GoFPPNraOeaDXmeDlORrA2MkJ/BMC9UzkVU0wQZbzgQnyS1oTSIGeFSzWMhH4YJOawqA
+         YRYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787154333; x=1787759133;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=7jySN9ZPRFbIUFsoY/2LrHKwfd14jPLyh0tsPtGkqzo=;
-        b=Lz1nxk4sc/Dtz4mvWRG6Sdpu650t7IaIrNT2pAkNXqempgQD0JoMmPho3Fy2ls+AL9
-         UR8GbU9MVZQhOZHkuDliKaHCMbEqokRLnAy/3ZrmObbKbJtf8BklA7R9EWTnwlLpYNQY
-         WP2FuMoJ5tU258C/xsoPWPVBp7/ar/ITlVRUINORCZzNlXuHeKIbjy8DRm8IESIiD4jh
-         BXGjj3Si2TCfttilbSOKjlS75GD3iK3lQW/yXng7UdZawRhauohXrimFdteCOBTOXscV
-         K96eCIcLlj97gwCh+10fJ787qLjF3eeArx+X+c7sBTUNkDK5LVQolklbg5iQqCT3A1VZ
-         jAYw==
-X-Gm-Message-State: AFuF++mLIniNMaIkT4O7J3j6wnpgoS1k+myxLwxT3abUqgGGWRtmeLrm
-	i+bg0NgGdvvcAwxluvjOkgSqmhQbUKpO12aW+eCBTRr9h7CXHjCzltm4CrqmXA==
-X-Gm-Gg: AR+sD10KM32oEflto3J5k66t20iyDJKdEdZ1cCK9RlcUtvrCf027mgQbznp74O1XKfS
-	1ZpOvXzkdJpN1XwzQxgPAJgpYviJl7Sa04E0lPgj/f5ZCofscQsFUdyaDZssl9HZ8dtYqFfQdqV
-	Y9rzPcrMiNlLmSCMo42+sKaoIs9L27MmnTR8hv1pSaSNjdMMFknXCFeLXlFqKjPCOcEbZfagrT5
-	mXAS3PUOrgJib6lz0w80ZYZfooAGeozOtfbYhjtLANEXjd5G37w2AJ6bpjxcGtyBA5EYMvmFJLv
-	BzTX+M80D5efmkqtdayW2l4cItxJuwBjBqpMcVRGTKJCfW35GKAFfSG9Qz+2Fdez7KnpP4aNG3N
-	BGUJIDrX942I6EhPWQz+UyDLh6/+4TI7rvlVbU9lWNDcI23S676lYBeka/KGROHuaAFHBKxGjtA
-	rMMdcniCs6ne71d0H6U4AHN2A6tizeGx3k6kI14QlyTBAQCjF3f16Rm0pVM5jmhE9qtRU=
-X-Received: by 2002:a05:6214:76c:b0:8fe:5a1:c97e with SMTP id 6a1803df08f44-90c5eae9ed9mr48759506d6.29.1787154333026;
-        Wed, 19 Aug 2026 08:45:33 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.198.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90c5eee3936sm17216566d6.20.2026.08.19.08.45.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 08:45:32 -0700 (PDT)
-Message-ID: <6a85cf9c.656efdb0.17cbff.6c77@mx.google.com>
-Date: Wed, 19 Aug 2026 08:45:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6643732996335718428=="
+        d=1e100.net; s=20251104; t=1787156465; x=1787761265;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=c2YNqI+yjFdhnNUGgs7nsz5NAKMG1HDIJc25Zeyp/Z4=;
+        b=PT8YKbk6CIaXJtuKspiXxIY+dcNjj/i7HOet6N2LL6/UQeLI4Q9w05mKfeM4UH7axQ
+         AkEF1EG103RiIWMIj8i5zQS1+T8tinuMRd6uXIyuYhRvhFt1VE33/qrH+gDdYaq9lRHn
+         r5509B5qLzVuHEAPUtsg07srcUwbnmUEULGleH8e3oh1186L2K4hrIZte44OL7OnlC2+
+         u8cW0z+ibyUrClioXiQtVqS9S05fSTivtsIKklAuPcl7sLVTZ0QeKbnWAgZknYXvCkAo
+         WLzPdflHGYKZkdtS+lKlsMoER/lgyJzU7JMmgmd6aExzKlN8OYTzmo/A5ZLCgREMtbGi
+         M2Nw==
+X-Forwarded-Encrypted: i=1; AHgh+RqxsktfebL/9+hPD0j4IyD7NcG+55X8cehPxQmGMbhJ3vxTxmaL7+v9ds/2nMxDLJsjRcBbkVI0svDTlj/tl8A=@vger.kernel.org
+X-Gm-Message-State: AFuF++m7YUdWzjFb/YJtTLsqNsHcBtKZec2KclOyR8eop0/6mj0NVYER
+	NER/kCkXNlB0nwUIoj+Q0qY5Udhdp2MBrD0OA0G6ke4DQ0BcKjQfai/uZ03m2ND5uuc+4sEv9B7
+	+fTFn4ffcpg7tddtIrp4J08VMcdEg73A=
+X-Gm-Gg: AR+sD131oavOjpy8e4dpMMS5qkYJfjxtakejqitF30CnO55QiYiHwGr+St2PgSz03Su
+	qNH03GIaLUvqm6uctLA6f+5ffalxS1oqBvepBakBW+ReF9tZ9YSiESP8vUTijnmFAkv/34lizCK
+	wNMcRcD700fNyfF4/AmZL1w3EULIr8yWgbdj4vAvK9oHxdJCXLBzL8Ker4b9cb0s+JcHhGBtvap
+	6SNkSggC502HdSs6u/1df6L5Wa8TvcrasMVIPrgUruvup6iY6GIziusbrCiClI33Y+v1f232Ekm
+	quBb5uRiz97E3LPbQ7vKl0CNwZWQz6ug8X8w/sSWKBb4W0qS9fk049557FkRvOPc0Zar7jMhxY8
+	7PCQdcCQQwVrAVde/HCHzZAXbMgbx
+X-Received: by 2002:a05:690c:c630:b0:7b2:1bf1:8016 with SMTP id
+ 00721157ae682-844dd14444cmr22494967b3.2.1787156464978; Wed, 19 Aug 2026
+ 09:21:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: plugin/admin: Make allowlist adapter-scoped and enforce at runtime
-In-Reply-To: <20260819144337.889893-2-frederic.danis@collabora.com>
-References: <20260819144337.889893-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6643732996335718428==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148530
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.55 seconds
-GitLint                       PASS      2.31 seconds
-BuildEll                      PASS      20.25 seconds
-BluezMake                     PASS      573.96 seconds
-MakeCheck                     PASS      19.15 seconds
-MakeDistcheck                 PASS      156.08 seconds
-CheckValgrind                 PASS      223.41 seconds
-CheckSmatch                   PASS      299.38 seconds
-bluezmakeextell               PASS      96.93 seconds
-IncrementalBuild              PASS      645.06 seconds
-ScanBuild                     PASS      886.24 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,1/7] plugins/admin: make AdminPolicy state per-adapter
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#84: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#84: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757533.patch total: 1 errors, 1 warnings, 259 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757533.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,2/7] client/bluetoothctl: make admin.allow controller-aware
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#79: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#79: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757534.patch total: 1 errors, 1 warnings, 170 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757534.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,3/7] src/adapter: enforce allowlist for local services
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#86: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#86: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757531.patch total: 1 errors, 1 warnings, 178 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757531.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,4/7] plugins/admin: reapply allowlist on policy updates
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#74: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#74: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757532.patch total: 1 errors, 1 warnings, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757532.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,5/7] doc: describe admin allowlist runtime enforcement
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#78: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#78: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757535.patch total: 1 errors, 1 warnings, 28 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757535.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,6/7] device: unify admin allowlist checks for device services
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#97: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#97: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14757536.patch total: 1 errors, 1 warnings, 106 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757536.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,7/7] profiles/audio: make A2DP admin allowlist enforcement role-safe
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#80: 
-  blocked roles to remain visible during capability negotiation, which caused
-
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#101: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#101: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-WARNING:LONG_LINE_STRING: line length of 87 exceeds 80 columns
-#227: FILE: profiles/audio/media.c:3179:
-+			info("Skipping endpoint %s:%s (%s) blocked by admin allowlist",
-
-/github/workspace/src/patch/14757537.patch total: 1 errors, 3 warnings, 112 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14757537.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluez/pull/2414
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6643732996335718428==--
+References: <20260819064115.2449018-1-lijun01@kylinos.cn>
+In-Reply-To: <20260819064115.2449018-1-lijun01@kylinos.cn>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 19 Aug 2026 12:20:52 -0400
+X-Gm-Features: AcwNN1WsCdi1WGEsaYhNl1e74CnX05dGw-1-_FS4h2yZ_1abo7De57EdI-8Zju0
+Message-ID: <CABBYNZ+ui5j6cum42s8pxnZYewZ=C4Bi0ihUXkrQyMrsKJMbeg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
+To: Li Jun <lijun01@kylinos.cn>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Li,
+
+On Wed, Aug 19, 2026 at 2:41=E2=80=AFAM Li Jun <lijun01@kylinos.cn> wrote:
+>
+> use SIMPLE_DEV_PM_OPS for btmrvl_sdio_pm_ops,and add the value of
+> .freeze .thaw .poweroff .restore.if these address are null, may cause
+> error in s4.
+>
+> Signed-off-by: Li Jun <lijun01@kylinos.cn>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_s=
+dio.c
+> index b91fc63bc9fe..197237e78a3c 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -1726,10 +1726,7 @@ static int btmrvl_sdio_resume(struct device *dev)
+>         return 0;
+>  }
+>
+> -static const struct dev_pm_ops btmrvl_sdio_pm_ops =3D {
+> -       .suspend        =3D btmrvl_sdio_suspend,
+> -       .resume         =3D btmrvl_sdio_resume,
+> -};
+> +SIMPLE_DEV_PM_OPS(btmrvl_sdio_pm_ops, btmrvl_sdio_suspend, btmrvl_sdio_r=
+esume);
+
+It looks like we are missing a static in front:
+
+https://sashiko.dev/#/patchset/20260819064115.2449018-1-lijun01%40kylinos.c=
+n
+
+>  static struct sdio_driver bt_mrvl_sdio =3D {
+>         .name           =3D "btmrvl_sdio",
+> --
+> 2.25.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
