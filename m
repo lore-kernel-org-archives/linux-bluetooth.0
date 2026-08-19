@@ -1,69 +1,69 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0B0371D10
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 20:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C2637F001
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 20:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787172027; cv=none; b=Y+ZFzfFmnmxhxvKBrO7616WAc3Ad2eUYOBKfRVS1jza6nRAkWvEn3hA/bvsQ7NTnIALFIwK1vamfCR8VvPbk+ayFpLeNgspIYg06ng5RksaSv6eXMcWAeK7L0FZKTVIWGVbVFRbh7rZDOqIsBCVkMln5ZDCgICiaswuKcMGrvT8=
+	t=1787172028; cv=none; b=PcdZgB8Mg2dwwoKlSFzVwf3xy4/Xlb/tYnr4H815o9V7osLMNPKJM+sgoWK+tI2YjAF6Xa92514X2lO9PPIxKNbNvELzSS22oZZSOWRioC1j3oS9PeyClZem0NgiBwEoZyxwWkUZ+TVcwFvIWV9WppgeAQ78kDwijGX47+QoCH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787172027; c=relaxed/simple;
-	bh=ahObInvrva9aMMKIL/3vn0OQw4JG7dtPhgtBXawcSvU=;
+	s=arc-20240116; t=1787172028; c=relaxed/simple;
+	bh=EIR3ceh2QbomtjaCrykjt8CXzQtsSAKostH6+Xno+R0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YYskhDE24lhb8qSkIF895H34k80XydfslVB3CzmeasZyTnRc3zAnj1UgvVPtgtRd1FR70vwFgkp3vwJN4Pwbktu7QZaq8PPYurxbXl06FUN46CtdYbAZt5Kqw2H4OCwZCY/0Sg4ITYYbtCrBeIyTg5jupU5Z2FEynGC7QQtqm1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WrJITL4u; arc=none smtp.client-ip=209.85.221.172
+	 MIME-Version; b=N+Jwj9YbU9WAZy9vMz9qZxMKBIt7ZZnfiGXFozW6pC75jR/n9ieIhJPJdBvZV/7DzJ5uQqUMJePUY6qXShnlzzdR+6EklBKMXzSQGx12pUiDz5O/w33/fKMndIEkpMV7zKf1bYeof0sR+HrUMIMKM6mtBE2RLOGPbhZWZCxHZwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q6+AFUA1; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrJITL4u"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5bf5370d38fso640627e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:40:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q6+AFUA1"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5c276bfce7eso1287190e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:40:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787172022; x=1787776822; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787172024; x=1787776824; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=cKomyK2HCvuHIER+qlAQRsPVwTMy1kS2PJaoFissxpc=;
-        b=WrJITL4uTYnib8YGW0NSgtZbv063uZPxU3elA0q4bDyAwssvQZdtqpiqSiMaTMsS/R
-         YMujXHO05WLYCwRY1GwrF0iSSW8eP2lZdLIJPS3GbFOmw5QrfbBzRYi2LLXhJVa/HSrP
-         I0X2TKx8fYTYZNr5F1Y1sbceJaOYO7ldxTOy6lU3gaXNRv+NrYuAeSCq8GhPq0TujNVr
-         +Q5Q4p9t+dvZ1Vzn6LVRZC6fyatqrNUyWQsH/X5/NN/Ejx1U9yR5h5Ay5YSpYMuAN40u
-         24UDRs51kGHv0tgTBXVnmd6bKbIDAPuU64dXEaXIEcy7FH8CRt4VRFj/jCeId4KOQv6F
-         0bdw==
+        bh=D2v9HOgfmyEyulghzA5GwM4apa4ZL6DlrBvXj+54NVE=;
+        b=q6+AFUA1R8QPBuyBDfYCazd26CL9y+uxtwllxW78NRzCnQ9VR6erTTkaBnyqUZM6mx
+         yABgwCx5SfWIzPzr0wrG1lTGbGXPekCOJVAmpl+e3Qca5oZOcYVfhYQibN76YdZZE3qs
+         Hu4wwEumjXcPzVa4sfKZLI3yeJND085lJZsQxMwRTj4Gu1YYAgRxzjzPwl+de8bFn8jM
+         gbhC2nUmkXefur83vY0ddN0ieaGaahN8Ss0M3Ef4jvI47yhDNI+QLBt1STO78/QChG+o
+         BlRc5Y+oCFvjYMuqklkkkR7Cp95vSIBf6JN5Vc0MykMGatlNx1mrSSHdgWCLacEDG8j4
+         PyVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787172022; x=1787776822;
+        d=1e100.net; s=20251104; t=1787172024; x=1787776824;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=cKomyK2HCvuHIER+qlAQRsPVwTMy1kS2PJaoFissxpc=;
-        b=hW0YcLyVmbxOe8LNs39YMu+gwyskYLrlkkANnpMdyV6CuoJVMDDC6Qvnd6g0WBUxva
-         VaMwN5mq/N4Pgm3O9QcT3I/4iZSsKX0r5BKnUNnm9jOgkGF8Olnxuitpg6ADAOL1jIKJ
-         RmTn3mT8o1bWQ51cHSvR6UaIxSyjIMT5EwRyHA0TRmGsBT1EUwRj8PRsBOyssQi9YkOo
-         cZscluELaHqeXIZPhldanjtM+ja6AMA69HhlyMeTl5m47D9mUcxY8IlUyA30ny80fGWi
-         m8gHYiIYMxJREO0DAPZ5WxW9r1fWh5idjsO5aXNsrMPQjqHyXJPmlyGjx7eP6OBNBpiD
-         U98w==
-X-Gm-Message-State: AOJu0YwIrfnQSJyGjfOr1AAP1SRZGQOoXsMafpEqmfs+dDfIRrQqCABj
-	f9ZshBmJhJImxN7xgCrw5AN00DC6T2c55p7/1Kxy+ENgP/0h7S5Gi0jq4R+HJZKUHuECjQ==
-X-Gm-Gg: AR+sD12IT2kJRkhdEXLc4yvpc7iiZGcwuHqKnyQAdg7eM7cPEUwYBdLMI3IkHaqjoF0
-	AOYdAVGWH6BFbtXhu5SOiIWRo05ISwn2l/mYTV6BbBNxg1YqPwhip3VVDGozA/je6duQpHmxQod
-	1sYS4AGq+dsLBsCMuYja9AJclaBgYxir3RE2YqEcBqHfU0KNl4XfsPo0Rmw0nb/+YsMdyzpQ7Bh
-	I84RjcGm/Rfay8Z9tk2fXrs+br+uTNTO+2YAsKQh1VTRtJNdJYTk4vQRpO2+uzhzgxKip71McHD
-	vCw/DI4oEfSKjSCrc3m55jGMShmotaQ0Jo7oe+8PsZKsPu2pNovJZsf8pmP1hFRbXwlJCN+46bv
-	8JSauOYhtPK62NbJzxzh6HrrfMRBqQiU4GvxpebenPsq9bLUcOWKvKbygjJ5zS7ZsDXOLaWK5fe
-	j5yvFwRa0SjL9Qb94+ZJ8C+cZKbsip2Zq5CU34VOFzZGkiOjl22vVWxmEwvL52qcLpcZ8ht8vPa
-	2D4ezWeIxHoYEiUrHqdUlcV2QOaLvsLAODZ4xz7ObUWWGFFkQ1yung=
-X-Received: by 2002:a05:6122:2094:b0:5bc:42be:f758 with SMTP id 71dfb90a1353d-5c5e3bbbf9amr3147366e0c.3.1787172022194;
-        Wed, 19 Aug 2026 13:40:22 -0700 (PDT)
+        bh=D2v9HOgfmyEyulghzA5GwM4apa4ZL6DlrBvXj+54NVE=;
+        b=LMKiZHiv0KT8eC2f5mb/1n1v482Rxza6QJ9L3rKUQkiT2AVsG2BvpCI1PkSPKb1efu
+         MF6UCYVtcOzDOVpqdhHU5FQZja0RWgiKAZjFUEQHsbYCt57IXwK1pFGUxsR4SBgoob2e
+         3oDloFF0nYHby9DbrZww2oB0rr4zWpO1pXUVlwKQezG8hY2e7iSIAu2iZ+DYEO9L8Kyp
+         gc6bacysugai/RjXbrtUGXyf4J0Du5sbgS/KRjCzTQ6i3TEbTNADTATBflMfQZnUiM5z
+         vKHPIgq+8heB7CzEpHaBFO+LA3emZ1d3nyS2u8mCIYyMnubRvLKSLZCn3OwTNLrE+NMO
+         ZXmg==
+X-Gm-Message-State: AOJu0YyHfDsviBdKIstbZvwKnwR+683/IREQaOYMCDI6UdRxHLxGsolS
+	+TczZIVNpGqp1iUMhAwaW9Xn4P2lx500ySP5PUJtaMBXXfRAtHtsc0FMUgPJRCrF4m143w==
+X-Gm-Gg: AR+sD12JdbkUpMmlF3bv6qQw3atB3Wlg7Mfg1HhqUYrOLic/Z+NmOx9bApA5uyX5Anb
+	tUmXFnsksAIYNgBzUbsKKXRWi2e58H1iZPoTxnKYsouyJiJTScgtmUxmmTWaGtk1HtnALRJtMsn
+	pnYsWndKzXpaEwbIphjiU60Bcyos4a9KGTcQGaovUyaZgAFVGNmP/S2wE9jmUckbTWONiOiZfXh
+	BTYPtbfaKimZG8gnpt4Ue6KN/H2yQwdl3kNj58mt3RT/YDUEnAg/5rdlBCGiTeAUJxnJ1ygtxsS
+	Fm2405OTwpGZ1ACjTu54byF13o26b9eZwiUG8Htbfn/tH1+e8KX2xzvQyXyB7rMws4Jf45zY9xl
+	d0juBevxnF7pm6hHVNG3SGvc5dId4cR3tgX0H11u+KZ5FW/xyIhzTDZFViBUGPfXvMLWZLI5bO5
+	JepSF1X7SHmfzQ5aMlwxp0CH95fkIX4lasVGugPJ3Fw63TGq+4/Ba44Jv6fFvMqMwSbLgfQctwk
+	CFMo3v3ktFO/k4xhCy0Neb2HEGZb48SG0lRedt05ni0VKT3iHwYNdQ=
+X-Received: by 2002:a05:6122:32d5:b0:5bb:d233:70bd with SMTP id 71dfb90a1353d-5c5e3b67087mr3280257e0c.2.1787172023897;
+        Wed, 19 Aug 2026 13:40:23 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e2486864sm3496404e0c.0.2026.08.19.13.40.21
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e2486864sm3496404e0c.0.2026.08.19.13.40.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 13:40:21 -0700 (PDT)
+        Wed, 19 Aug 2026 13:40:23 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/8] shared/util: Make strnlenutf8 reject ill-formed sequences
-Date: Wed, 19 Aug 2026 16:40:02 -0400
-Message-ID: <20260819204008.2292225-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/8] shared/util: Add str2utf8
+Date: Wed, 19 Aug 2026 16:40:03 -0400
+Message-ID: <20260819204008.2292225-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260819204008.2292225-1-luiz.dentz@gmail.com>
 References: <20260819204008.2292225-1-luiz.dentz@gmail.com>
@@ -77,142 +77,103 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-strnlenutf8() only checks the shape of the lead byte and that the
-following bytes are continuation bytes, so it accepts sequences that are
-not well-formed UTF-8:
+There are five near copies of the same "turn a remote name into a UTF-8
+string" helper, in monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c,
+src/eir.c and src/shared/ad.c, and they do not agree with each other.
 
-  C0 80        overlong encoding of U+0000
-  C0 AF        overlong encoding of '/'
-  ED A0 80     UTF-16 surrogate U+D800
-  F5 80 80 80  past the U+10FFFF limit
+Most truncate at the first ill-formed sequence, which throws away the
+rest of the name, while the monitor replaces every non-ASCII byte with a
+space, which mangles perfectly valid UTF-8 names as soon as one bad byte
+appears. Most also copy into a fixed size stack buffer first, which is
+what made the missing clamp in src/eir.c a buffer overflow.
 
-strisutf8() and strtoutf8() are built on it, so a remote name containing
-any of those is considered valid and passed on unchanged, for instance
-to D-Bus, which does validate UTF-8 strictly and rejects them.
+Add a single helper they can share. It allocates the result, so there is
+no truncation to a buffer size, and replaces each ill-formed sequence
+with U+FFFD REPLACEMENT CHARACTER rather than dropping the rest of the
+string, matching what g_utf8_make_valid() and the WHATWG Encoding
+Standard do.
 
-Validate the sequences as defined by table 3-7 of the Unicode Standard
-instead, which constrains the range of the second byte for the E0, ED,
-F0 and F4 lead bytes and rejects the C0, C1 and F5 to FF ones outright.
-
-The decoding is split out into a helper that also reports the size of
-the maximal subpart of an ill-formed sequence, so that callers can skip
-over it, as recommended by section 3.9 of the Unicode Standard.
+The result has been checked byte for byte against Python's
+bytes.decode('utf-8', errors='replace') over all one and two byte
+sequences, a sample of the three byte ones and 200000 random inputs.
 
 Assisted-by: Claude:claude-opus-5
 ---
- src/shared/util.c | 90 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 62 insertions(+), 28 deletions(-)
+ src/shared/util.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/util.h |  7 +++++++
+ 2 files changed, 53 insertions(+)
 
 diff --git a/src/shared/util.c b/src/shared/util.c
-index 62dd1369b70d..e946214edbb9 100644
+index e946214edbb9..8ec9b52e6401 100644
 --- a/src/shared/util.c
 +++ b/src/shared/util.c
-@@ -2211,44 +2211,78 @@ char *strstrip(char *str)
+@@ -2315,3 +2315,49 @@ char *strtoutf8(char *str, size_t len)
+ 	memset(str + i, 0, len - i);
  	return str;
  }
- 
--size_t strnlenutf8(const char *str, size_t len)
-+/*
-+ * Decode the UTF-8 sequence at str, as defined by table 3-7 of the Unicode
-+ * Standard, and return its size, or 0 if it is ill-formed.
-+ *
-+ * sublen is set to the size of the maximal subpart of the sequence, that is
-+ * the number of leading bytes that could still have formed a well-formed
-+ * sequence, which is what the caller needs to skip over.
-+ */
-+static size_t utf8_seqlen(const unsigned char *str, size_t len, size_t *sublen)
++
++char *str2utf8(const uint8_t *str, size_t len)
 +{
-+	unsigned char lo = 0x80, hi = 0xbf;
-+	size_t size, i;
- 
-+	if (str[0] <= 0x7f) {
-+		*sublen = 1;
-+		return 1;
-+	}
++	char *utf8, *out, *stripped;
++	size_t i = 0;
 +
-+	if (str[0] >= 0xc2 && str[0] <= 0xdf) {
-+		size = 2;
-+	} else if (str[0] >= 0xe0 && str[0] <= 0xef) {
-+		size = 3;
-+		/* Reject the overlong encodings and the UTF-16 surrogates */
-+		if (str[0] == 0xe0)
-+			lo = 0xa0;
-+		else if (str[0] == 0xed)
-+			hi = 0x9f;
-+	} else if (str[0] >= 0xf0 && str[0] <= 0xf4) {
-+		size = 4;
-+		/* Reject the overlong encodings and anything past U+10FFFF */
-+		if (str[0] == 0xf0)
-+			lo = 0x90;
-+		else if (str[0] == 0xf4)
-+			hi = 0x8f;
-+	} else {
-+		/* C0 and C1 are overlong, F5 to FF are out of range, and a
-+		 * continuation byte cannot start a sequence.
-+		 */
-+		*sublen = 1;
-+		return 0;
-+	}
++	if (!str)
++		return NULL;
 +
-+	for (i = 1; i < size; i++) {
-+		if (i >= len || str[i] < lo || str[i] > hi) {
-+			*sublen = i;
-+			return 0;
++	/*
++	 * Invalid bytes are replaced with U+FFFD REPLACEMENT CHARACTER, which
++	 * is 3 bytes long, so that is the worst case size of the result.
++	 */
++	utf8 = malloc(len * 3 + 1);
++	if (!utf8)
++		return NULL;
++
++	out = utf8;
++
++	while (i < len) {
++		size_t sublen;
++		size_t size = utf8_seqlen(str + i, len - i, &sublen);
++
++		if (size) {
++			memcpy(out, str + i, size);
++			out += size;
++			i += size;
++			continue;
 +		}
 +
-+		/* Only the second byte has a restricted range */
-+		lo = 0x80;
-+		hi = 0xbf;
++		/* Replace the maximal subpart with U+FFFD */
++		*out++ = 0xef;
++		*out++ = 0xbf;
++		*out++ = 0xbd;
++		i += sublen;
 +	}
 +
-+	*sublen = size;
-+	return size;
-+}
++	*out = '\0';
 +
-+size_t strnlenutf8(const char *str, size_t len)
- {
- 	size_t i = 0;
++	/* Remove leading and trailing whitespace characters */
++	stripped = strstrip(utf8);
++	if (stripped != utf8)
++		memmove(utf8, stripped, strlen(stripped) + 1);
++
++	return utf8;
++}
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 562a5af31751..1984fb75f09e 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -143,6 +143,13 @@ bool strisutf8(const char *str, size_t length);
+ bool argsisutf8(int argc, char *argv[]);
+ char *strtoutf8(char *str, size_t len);
  
- 	while (i < len) {
--		unsigned char c = str[i];
--		size_t size = 0;
-+		size_t sublen;
- 
--		/* Check the first byte to determine the number of bytes in the
--		 * UTF-8 character.
--		 */
--		if ((c & 0x80) == 0x00)
--			size = 1;
--		else if ((c & 0xE0) == 0xC0)
--			size = 2;
--		else if ((c & 0xF0) == 0xE0)
--			size = 3;
--		else if ((c & 0xF8) == 0xF0)
--			size = 4;
--		else
--			/* Invalid UTF-8 sequence */
--			goto done;
--
--		/* Check the following bytes to ensure they have the correct
--		 * format.
--		 */
--		for (size_t j = 1; j < size; ++j) {
--			if (i + j >= len || (str[i + j] & 0xC0) != 0x80)
--				/* Invalid UTF-8 sequence */
--				goto done;
--		}
-+		if (!utf8_seqlen((const unsigned char *) str + i, len - i,
-+								&sublen))
-+			break;
- 
- 		/* Move to the next character */
--		i += size;
-+		i += sublen;
- 	}
- 
--done:
- 	return i;
- }
++/*
++ * Return a newly allocated, NUL terminated and whitespace stripped UTF-8
++ * copy of the first len bytes of str, with each ill-formed sequence replaced
++ * by U+FFFD REPLACEMENT CHARACTER. The result must be freed with free().
++ */
++char *str2utf8(const uint8_t *str, size_t len);
++
+ void *util_malloc(size_t size);
+ void *util_memdup(const void *src, size_t size);
  
 -- 
 2.54.0
