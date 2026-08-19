@@ -1,181 +1,115 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B072EAD1B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787144360; cv=none; b=g9gE7vRyTy0W0baUqKhAPeZa7bytdtYIHI4dbrsPCkrBCjyiDZmPy3ts49Qn/4qQAJMuI2+O9XBDu2qzbxpYXmVRxpmEWeC3yoiks7kC9LBAiM1BJejCbCMPHehLHmMtBe3XNKPXCP3PEB1moWpiiqVwBIsUP8M95NpTlzJLYBM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787144360; c=relaxed/simple;
-	bh=CuTKmQnaSx5nkqFsu5L1bo9ZzMMDup2P89U7vLFzymw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UfzS5TU/vMFgu4LO94R+aSNH9a9dE4aAzblQjvx22UR2i26pHZmW038sxWYRDfvkhS4nJsuPF1490soxu9s6Vg4Kbw9fxLxAnkPYy2q7YyHqFYInohu778Y3kxx0I1EeMuUQy/2wBqrRmZxdSmX+ko7oTbC2p/VwueW6xMNm4zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kMs+gCue; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AqbS7/HY; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B637721256C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787144871; cv=pass; b=X+8jksRSfDM7vHQ+lKaCRYfY82H7cnaBgvnl9pgeHd2/aPrGFPJJb5Vo7aKKdLtpcAq91EnwsoZALnMaqPrYTqTDrpY+x8CaRIRiPC0b1cEHJ2+4Kqs5z1/ve1K/SuSN1kpHkUOokUFX0RcW4G2kr80EGkG8JGfWmgc8cFT1UJI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787144871; c=relaxed/simple;
+	bh=yrRL2UHayrnPRIMIYAmYlSqghY+Wr5w6FGLp16zkbU0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=KlqdRdt+wV9dMsAfrYJi/w8kWehmnX7T9xzdmcV5pIfiYqbXyz0CvEn7/k76Jvl1XT90xsaHWgOPkWuso625yFmszqIL+7knCa650sWpteIl+abtV66UEL63betbLEWjNCx3RFlETRGfgwEDO9yu3M7yt7KOau4nXIuaccDLDpU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FJAHeZhT; arc=pass smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kMs+gCue";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AqbS7/HY"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67JClCrE321482
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:59:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	IzHa8M93DFFWzI1AxZRwzNbo7KrgJCHbFTJdy8UnY5M=; b=kMs+gCueZuPksMkV
-	GRNfnszoLPsoko2GRZQaH+61rUJOkjCZsTtw/Azr5yoYIEh+uwoIdVGhVMz2+bLB
-	FtRc/yPez17VPlTnyWnPgv1RouhbnHz8ZZQsRdsOdKUL5yVIiZ6Q+FnBAVPE2GDJ
-	KwgXXxAAu4oyNQaKIlWb+zmisC20r2hiziosnLNPwaLS0VXC3fitIFb7Ql26T1Go
-	t30V2qHtTTcxgBJZ5fvlvMInXJh51gDyoi+HWnsD78/G6MLuuEG5+c+4+rwPPhte
-	xTJy7I+wro7RGyORe4p1mFLcy2mskUc9k4tlIppF8AoOji/3XF85ZNasC2b8a3yx
-	c0m1lA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g4yftuav0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 12:59:18 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-930dda91cbdso190302985a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 05:59:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJAHeZhT"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47f3b39f2a1so821316f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 06:07:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787144868; cv=none;
+        d=google.com; s=arc-20260327;
+        b=n9oswoG38bJxNW3XOFMPb2oro0hgpYd1D3DU8YgFICUjfGTLz+EQmYlbJe1k/nX48U
+         mDe1ziraiTQCeAor07df+GS2rU5ph0RqCivpalu/CIMWyNztdDCJUcAGuyv6NReLJeWC
+         00Vt2w1Iwej1pqybiUYSzyOB7YJ6FChZEU71JQYthOiE0fjh8RtGscFScggDc9aKTOTC
+         H1sMxjmiT1aHvI71Hab8xxt1Y4wg4t9hWwDpIxp2eyfap3HnzDHXgpL3FsHidPaKrm+5
+         pxC46XyObVh0G2K7ki1YlQHvCKrDBptgWRtFELKuq+7ftCp25IZR4gKArrZDkuN8DzjS
+         voZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=HI1U40hbynKBbof+rOaONlG/R3s/eWpg5bJ4GpEZzYA=;
+        fh=T25WepgC057fh+HVfM8Pu5opYl2DUIUufO+dgki4HBg=;
+        b=a9Sx7z3F5OXb2v+b4AvrLiZLxdMTOcxP/3ZafoFhZxc1simXP2zHZq14x5NuqVPM+j
+         WEDcJ5FTYoUW3VDk1F+rQGTvpbZXLGneh2F7fUYb2ZcKqkWkUTCuPwPTsVP53N9LE0hT
+         WTIlTLWB06yJYdT5UjySux3TfIkjR8Lc59310hBmCm4uGcgZSyClS4XgT4L/NyVi4ZTc
+         a8pCX0nIvDIT+iWV5qz8bUey/KtnBMzBxjp/iiMl6+/m6IdyYPXoHHLSi/i8Th/34EPh
+         2/SKJCWaIO8UwZ5/KoO3610j4pGTkx3YoQrhaPtPxSFxSxK81/+pmjtbdhcMB2uD/nNY
+         e0Ug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1787144357; x=1787749157; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=IzHa8M93DFFWzI1AxZRwzNbo7KrgJCHbFTJdy8UnY5M=;
-        b=AqbS7/HYvKsLyx/Kenh3qgmjBoX2/rYIScg4521maH0ezo5AvTFFoWEQ4S8fRI8S/O
-         eWE4fMHbiJFxNuN74r2oeV5NzXHdXnerUQ4JLgaKoig2fLGvAvRuLpKq3yCZN1tOFqiF
-         iE9fJFHFpCx44uDMk+2v2NaPuh28bgFSoLJzbDa/0kyqSIududdlSIO9eTQSqgEexbct
-         BER09yEr3VN5TU902JRLAmgxjJ07JCMoUmvK4618jcw8EWoaRFY0yJDTxUxOh1mEsR5d
-         4bcniViE3VSKoXyTPM1U+XlJvOPDKe81Rc8NBx/veuIs+ZRsgIiZ4E4/no3pkCODMbwN
-         Khiw==
+        d=gmail.com; s=20251104; t=1787144868; x=1787749668; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=HI1U40hbynKBbof+rOaONlG/R3s/eWpg5bJ4GpEZzYA=;
+        b=FJAHeZhTRZNQP3X3mTD0naCckYznt2ShKhl0JFP7aiepZZZ2Z09NABuKlLEJPe7Rtu
+         u2VY4zMDm2Ahvm6tkkAwcCTJVzTm7wtqtI1zqfJD7UgMziqA3ZxiTUQG/S9rv17Y/0MS
+         i8wcVyj4wsx0uDjdgaHWM/vq/gcdpWK/gdzIdt3210XIaaxDJE9fXXN2F0LvvI2j9IIP
+         OHqaI34Tt92Brwh/59/b/3yHwLbr2/LHw6dEHxGlpE1gW90UyGkfTqpV+V7kG63HOe41
+         jyy16bh9uwidxMtolAlGrAOpY5IHzpF8fG9XL0I67R2M/o9aF+jlAU42f29GzHyv9k1U
+         hIwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787144357; x=1787749157;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=IzHa8M93DFFWzI1AxZRwzNbo7KrgJCHbFTJdy8UnY5M=;
-        b=HIUTPXrSajnleaucEc8WDqRcJJLGdlcsXOIJEE6zIRKiv+1HeR/m2e9R2umaBXBtJA
-         PimgZwjYC8rkPC+nRvY1Z0pZj1CVgbCXZOYwVjBpCck+48G4Rxp9SDVU64JOsx6ktjmr
-         nCqB5jjw7fH1z2WD8sXYygHQTH/ZGaGCKl/Sxg1u0agpmn5Usj6JiBIhCmZRaRR2KLIL
-         BuBJyksxPLTFZesagDMdCA80pOqYKOuGJVMVoxCcyvdIFn2hIiyjCyAlTvwmXnGZjwFW
-         DfJl2bYXxAVv08d04YRpBdJAWkBk4b0uoNsUgtxyU4aVK9/SMIAvVVKWnAoW7oDc53QE
-         IreQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp/rDoUz/mW1hiBGKj0TPIdWlNSawS0xUjAw7mDqetTra7i8caktRKk7aTlN8ysQm1jQfVT7TExzHHeZp2Trb4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU5TC1cdTCy7sJZFM+eCstY/Zlu3/OvXIuICidu+A8PwXJJr0+
-	otJ+Dt/tXDd43JDZ/lntATNpw6KMS++YaL8MCm/eWUQLWzslokMHGz46oNm8JhSeNydg985RbIG
-	6GL7vGiC2SICVYXGEtNXBtaN33KXNiPhn79ci2986A5wROH5h9/aFUNKpyTrWiKB87DwWFI0fFo
-	CZujY=
-X-Gm-Gg: AR+sD12yanvKAO00sj/1yLVlUp9lJGpTA+5mClveMF8pPCtzVISFfWjtPqzlMUbXQVk
-	BdmrA3h3JH7dJaXfyDGPCaEdgwQQgxFtblxY62XKK0a9uEVW1aGT9MaKeS20BMRVtnRs5JUnrdh
-	dqiRiXfGNWHFbe8tUtPdylIh4jYXesv4dC5wvDs+tA/qRyRBGISUSIA6q43xcDgjkutJ8vu4mHK
-	oOzQ7HaLVKqxo/9ewm4OYTXhJU7gBjOV0uDIt+rlUucZVALWgDq0c/HDLAKMBT7a+0IocUhLHRs
-	BtwRyiNY1a2fa+df93RRNbz7DjKptz5tV4PRxd+1DPXSdBzTVtzOBrXkYuekDZ7CD+pcvtq3NM3
-	/RJ3y962PyKklOeQEKM6bd2IUmMQvrwmPk2k52AWTVjOTsJqUd9Fj9tJZ7FrkzmvYjyXMixdK1Z
-	61Ej6jT9Z4i8UpL12Azyuk0Y685x0PnsWDth6n/htbvBpcThbr/qy2zakomO/nAx0A3mU=
-X-Received: by 2002:a05:620a:1792:b0:92e:5d44:73fc with SMTP id af79cd13be357-9371e23b130mr395729185a.12.1787144357019;
-        Wed, 19 Aug 2026 05:59:17 -0700 (PDT)
-X-Received: by 2002:a05:620a:1792:b0:92e:5d44:73fc with SMTP id af79cd13be357-9371e23b130mr395726285a.12.1787144356650;
-        Wed, 19 Aug 2026 05:59:16 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c243c8e4482sm67698466b.1.2026.08.19.05.59.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Aug 2026 05:59:15 -0700 (PDT)
-Message-ID: <340c1443-9e2b-4224-9029-f1defc644494@oss.qualcomm.com>
-Date: Wed, 19 Aug 2026 14:59:15 +0200
+        d=1e100.net; s=20251104; t=1787144868; x=1787749668;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=HI1U40hbynKBbof+rOaONlG/R3s/eWpg5bJ4GpEZzYA=;
+        b=G/MtlRm0lZWx1lUG5X9yI0OzrA1UGHP8NOW/sxS5LukVaZR+o3fsXSL16iUEcLADPi
+         Es2+LKDqQDi0xy+jhYD5esiP3kzsqGLIUzwbgm2ONjQuMxET8Sxw6JzbotFQmw19r5pe
+         pVWunC0z3x5UYpN1NXFTJi/AEnvqGxP/PEH3grjnm/CGqLHPi3F1zBXLcVePlQZfc7Y+
+         kv1GwXq7xP89sgfsqgZIMafmrtGYBDOvj7UZWc/BNJrolA2L5543GMMsGGEkvY3a+0Sn
+         n5PMI/ueFruQzfWy7xGJWitC4XB7ymxm1i1OpWi8ENS2nYVsrTz9xZPk/JzCbQdfeJlr
+         /Fng==
+X-Gm-Message-State: AFuF++kgcXs2k4m6TdAi39GDhSaD+zqBwSJ4Eu/QvRSQO24bTLe/Wyl2
+	9Ekw/OFZzgzG/DwIBIfSDpSdsrFxhVOfCGV2l2LlfmbFegbNxtrJvuCAH2sPWtds1Jh16Y4XSue
+	T08Fc2hUZ2BgkjrmVJotkkx1ZtC4JlV4=
+X-Gm-Gg: AR+sD13/kOOL9TTOOC2BzY2hztMmd++YBvs6nBIZszrhrJlU+8YYJ4sV1S2D2+R4cOB
+	8wUtbN+xNZ+F7Za63Jupfkif/LntE7hxpyTGEZYWjigshwW2r1/+GrYi401rKLQ0/roa3W8OW+K
+	ue8dX1bMSyhArB63uhuOPmcAAAL0VuxHPW3lJYv83nxkqBW8/Bs0zpwE3XUU1Hv7o9VmmacsDi3
+	ug3/VNflNI5GsnIbfEf2iAjinRLsLfSk94P4op2WazzzSWdeSt/b616CVQ84JW+5DId5a2b+iC6
+	NijPUoUma3b+RAl9pxlCg0kSVU14E5oAtzZZD3YeSsHKN8M=
+X-Received: by 2002:a05:6000:2408:b0:47f:c648:e280 with SMTP id
+ ffacd0b85a97d-482b1feb2bcmr7454618f8f.18.1787144867569; Wed, 19 Aug 2026
+ 06:07:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Hans de Goede <johannes.goede@oss.qualcomm.com>
-Subject: Re: [PATCH] Bluetooth: hci_qca: Do not write to the serial port after
- it is closed
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
-References: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com>
-Content-Language: en-US, nl
-In-Reply-To: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=FIorAeos c=1 sm=1 tr=0 ts=6a85a8a6 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=dlFzzRy74kIF9YYi:21 a=xqWC_Br6kY4A:10
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=Je4mtRru6RPz1SsRR2UA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE5MDEwMCBTYWx0ZWRfX3nu+YfN9/1Bo
- P7DMsV1qALvItAEopH6Ywg1vOMb9kRrClXUPF/Np98RHs3Fnc9RdTpsgUvzaSlVxV2A4Je2K+uP
- yK0hF5JGsQpBAF/wwJ7DsQijGsX3W28=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE5MDEwMCBTYWx0ZWRfXxb43iKHEnL3K
- qOSe9FjmzibW6T/e9cEyBockwNBaCUAMEdbPVD1vcbH2DGnNKLdpjrZChnyGkhzvVwSVEMFbdr6
- p4RVv8m0Vs4rRon3xDVww17MnwrAHZ70ZcwPsntjvnncSZN4V6s0LSZ3WnbpVjDR/EKfAHc2k9p
- 5kfhTbgIZN3uYXzvfoWPvc1PQ5J1XrYat6K2aOHVnHX+9wvY6nleZ5Vc6J75S3qUsbtsI1qVv76
- lzShzxZ1JiuyG7L8GokOn/J6mDiW9dQFPffo61xY8EMSwOZh4UGU4ZdCug2ZbMl+SQSVn6PPDo2
- R1lopf5PrCsi1Fprs1mJmoTpXk7fY0mP/EU42LEsuiH8E0fva9/YBA6vdP0X6UauAPliPZeraq2
- W5a8FxJG7hVm1AMHglKBUzpBh15qRZFeuqafv2tr9xXC5PyJCw84ikAjzyY1FGy2kQQDAlQL8Td
- pCj0jfoKEb9b/b39T5Q==
-X-Proofpoint-GUID: PRnqXNl7MT8c-R1CaeZ7aQnEiQhaGBsV
-X-Proofpoint-ORIG-GUID: PRnqXNl7MT8c-R1CaeZ7aQnEiQhaGBsV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-19_03,2026-08-19_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 malwarescore=0 adultscore=0 clxscore=1015 bulkscore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608190100
+From: Blc Dragon <fenix78563@gmail.com>
+Date: Wed, 19 Aug 2026 18:07:36 +0500
+X-Gm-Features: AcwNN1WKpi82lUqWHO1PaLeI-jk-1yWRBBT0UMt3fzu_OkU1ueK17Z4x7Xoi2uQ
+Message-ID: <CAP9emj0q4_GmZZ0-CL6fg=Mxd8FcXkj4LSwEfBhRn6jAgdeJ1Q@mail.gmail.com>
+Subject: Re: rtl_bt: RTL8852BU rom_version 3 has no matching in rtl8852bu_fw.bin
+To: hildawu@realtek.com
+Cc: linux-bluetooth@vger.kernel.org, denizgu@protonmail.ch, pkshih@realtek.com, 
+	timlee@realtek.com, kevin_yang@realtek.com, max.chou@realtek.com, 
+	alex_lu@realsil.com.cn
+Content-Type: text/plain; charset="UTF-8"
 
-Hi All,
+Hi Hilda,
 
-On 19-Aug-26 14:54, Hans de Goede wrote:
-> From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
-> 
-> hci_uart_close() closes the serdev port if HCI_QUIRK_NON_PERSISTENT_SETUP
-> is set (for example, for the WCN399x family). A failed hci_dev_open_sync()
-> following a successful qca_setup() calls hdev->close() but not
-> hdev->shutdown(), so the port is closed while power->vregs_on is left true.
-> qca_serdev_remove() then passes its power->vregs_on test and calls
-> qca_power_off(), which writes to the closed port unconditionally.
-> 
-> Seen on a WCN3988 by unbinding the driver after a controller failure. The
-> trace below is from a 7.0.0 based kernel, where qca_power_off() was still
-> named qca_power_shutdown():
-> 
->   Unable to handle kernel NULL pointer dereference at virtual address
->   0000000000000038
->   Call trace:
->    tty_set_termios+0x50/0x238 (P)
->    ttyport_set_baudrate+0x84/0xc0
->    serdev_device_set_baudrate+0x24/0x40
->    qca_power_shutdown+0x158/0x1fc [hci_uart]
->    qca_serdev_remove+0x54/0x68 [hci_uart]
->    serdev_drv_remove+0x1c/0x2c
->    device_remove+0x4c/0x80
->    device_release_driver_internal+0x1cc/0x224
->    device_driver_detach+0x18/0x24
->    unbind_store+0xb4/0xc0
-> 
-> Check HCI_UART_PROTO_READY, which hci_uart_close() clears in the same place
-> it closes the port, before writing to it. The regulator disable is left
-> unconditional so the controller is still powered down.
-> 
-> The dangling serport->tty that turns this into a use-after-free is
-> addressed in a separate patch.
+I can confirm the exact same issue on my hardware, and I'd be glad to
+take you up on the offer to test a pre-release firmware binary.
 
-That separate patch can be found here:
+  Machine        : Lenovo IdeaPad
+  BT controller  : 0bda:b853 (Realtek, USB), rom_version = 3
+  Wi-Fi (same M.2): RTL8852BE, rtw89_8852be - works fine
+  Driver         : btusb + btrtl
+  linux-firmware : 20260622 (Fedora)
+  Kernel         : 7.1.x
 
-https://lore.kernel.org/linux-bluetooth/20260819125748.194377-1-johannes.goede@oss.qualcomm.com/
+Same symptom as Deniz's report: rtl8852bu_fw.bin only carries eco 1/2,
+the controller needs eco 4, so no patch is applied, BD_ADDR stays
+00:00:00:00:00:00 and no controller is registered.
 
-Regards,
+If you can share a candidate rtl8852bu_fw.bin with the eco 4 patch, I'll
+install it and report back with dmesg / btmon and confirmation that the
+controller enumerates and pairs. Happy to test as many revisions as
+needed.
 
-Hans
+Thanks a lot for the quick turnaround and the fix!
 
-
-
+Best regards,
+Pavel
