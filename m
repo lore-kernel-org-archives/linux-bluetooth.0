@@ -1,81 +1,296 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C080374198
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 20:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1A81DDA18
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 20:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787172034; cv=none; b=rD852slgbK6ZXCoS4Ruy2f+nuZ+RwBozAtzehTm9nXrg1J/Y0lJ6p9X5EiZU9n1nNVM1MJLwOgskysNjOaQc9IXL4QXm2dVCk9RZhGRYqX3v3P0Y4RqLkYzG+JeToTBViuKMO/55tryOm58XJVN5XzoqKCsu8qmW0NKlqGAIKPE=
+	t=1787172337; cv=none; b=kblBP0D1ovtfUJpIm5nw7tOkucZTqHqq6Il2oEV7QYeCHjGsX3gdtVmvjj6NNG5MNm35250PaX5nzfooYqcm2YM0cB0G7Ii29tn9fEeBMIFX52C1n2RmAcB80onstF6UvVQBjX/jmzgKqDVWcKvy1/DGGC2j8o0McfKIuQhZHlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787172034; c=relaxed/simple;
-	bh=9hlHPMUSpZfSPV/kKGCmXt8+11ZbWbaMeWmI0IMSJ2k=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VbDFt+5R9398+Wwg/gRDRmQ+M08u/60M5bBJ/qoGFJ77OndtzQY3Og9fdKB3C9cXHhCQ5Q2zT0Z5H7F4DkgPSgoRW5GkEJPq+raT+3xLEfFrUFvLZ+9R2oPok5pxHvSQ3hc/mJvCABVslTETD2LkhoAxIbIpqIvE2qdOngvSBUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BRgTmgCX; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787172337; c=relaxed/simple;
+	bh=/2h8cvQnrEVd6R4GLQqByk2NS48xTSGgLMbfxh7hHJs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WLnS9JkF39ULurD9wkKkyn/psOcAHvAC1xkGETvixTFBODcvpRqunszqSP5HZtrIbGHzFFJ6gsaf52uIEJlyEasRakzhf5OnfVxiL22uQZd+jB6lA3nkAIvObMUJhIm0I73lBfJABEbofNC+/pWdHHGklAgbJ0wuWp6KOO3O63M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HXGuUAKp; arc=none smtp.client-ip=192.30.252.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRgTmgCX"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5c375a9e76cso1002767e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:40:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787172032; x=1787776832; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=OeOSMeS6K++zfh8cn0//khtf3rsH7G0Jb/ibEHEW2CE=;
-        b=BRgTmgCXyFLaRDj7PNt293jRJNwitGQ0jerwUx1Nc3BzAXD/9RBKh+otglxqOWEPLw
-         T58AvdpShgjS/AG8s1Qs4+SuVxIdO9iD6fIHfxzDrLtcTy7M8CnJKHBZkIZat3EMkQ70
-         RkmLI+rlnfwJCjo3z4ye3HgFjxbVGaQ+ZMeYuSIeblkqah3MSWvGR+f+I0cDqcErsMfA
-         NMZJX7W31B1dIPfiPAblpwOpWsU30xb6nmM3Q3Jilu1q1uz3MuCNYey0h3FsLOMoktDv
-         w/rNgS5JvFcz0HQIh4Vvozv4n/nxVwlTMPSvwXKC2ff3/qXqaK5QVKxJnXQJaWGqKWIz
-         2gLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787172032; x=1787776832;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=OeOSMeS6K++zfh8cn0//khtf3rsH7G0Jb/ibEHEW2CE=;
-        b=eR9XvVIlLX7RkFMLprEbgdGewf0Ew1aVh52av4jWXn8iAd+nSVqMcmlAA8KC0pHlTI
-         XigVioWlpDX8X4JQ75f6X08BWSipuaHjVeHUFCjvGtPdrB4CHMVlCwjrWb3vVlvix3/p
-         /7VnUXZc4rHlV+pL/U/1uKUxVkUTk6J9rGVtm+ml18kNNvyuX3VeAQlempZLLkI0q+tw
-         Of7telY6xS15NjUM/J6fMm4KCGxsQN+vIDvdKe77AVColAfAjM+5hoisVFXAT6WnKuFE
-         K1N2VexwxaZW4dNQP820aKvQB3eWLKVDrWFnbnc2mXOHngkFNsu3DJQVSt6EhzQJbNUg
-         dgFA==
-X-Gm-Message-State: AOJu0YzvvFY+PapktQOKzXRVAEdQ6PjNUR17QupWpbR0eLPe4iA83KET
-	3MkAqztfNP3GbJinTxaCAMDOdUW/oaGIEPYoE5eMjswtH3Qwn83UReUtMRx51PJdr1qKyQ==
-X-Gm-Gg: AR+sD13ibc9tJeY6VOwKKFBbPVt+DtZXpIV0tfIdTKT1JxCej+mH3EluPIzbB32WnhA
-	pjgAdgoX/JdlwXPxwpCG+iewZiB0YpH4At7miVafGQ1NovA4Rh5TMv77wTrSfwrQEqKQeMkX2Hu
-	FbT3/mhqvs02RsBY1fAEBUJxo2s1+0Awk7G2fTAB+KisVqedKQQDzJmtTE4HuEZKFcHzvtRi0hL
-	Y242N9LudoeuuYMxYCOnQd4iKcofruSyi8H6PkF6LeJly+Vfp4CqsvRwv9OQFlXx+HKB4IfC1xn
-	z92iRhLXj4qg/+U7X776j4UH1qC7Mi70eZS4Rr4sSIKIQTcezl55Sk5XPT240R56Unnv8jj3ZeW
-	tbwuBIAaSMsVm6MrXB7474NerWWH/TTXOWl/ky9mop3m/kncDgzPUVvfHcmLQeocpr6wQs/wDKR
-	J92mbjLuEzxE9rOO0mKK2BnLvesPzqNYiAD+A4J14SMdZM1dU3iYgCf9akgzhYLV2Vfmj5LVsat
-	Oyw8uhL8WCwkXB4QDw8p2//o0s4s3e8LQQR4mh8PfbddJST3LyXKq0=
-X-Received: by 2002:a05:6122:3309:b0:5bb:eebe:7ffd with SMTP id 71dfb90a1353d-5c5e3e4bd91mr3370996e0c.8.1787172031914;
-        Wed, 19 Aug 2026 13:40:31 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e2486864sm3496404e0c.0.2026.08.19.13.40.30
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 13:40:31 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HXGuUAKp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787172334;
+	bh=4lt8sD5AyjCTOhhzN0+2VPZW7xctlCB6oe+WrDqjD2w=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HXGuUAKp7iZ8TX6H/QQHQj3UQCcNsJAF8ELNWVAbuA2OWWlHvhCSubC27cSswTDlr
+	 YzgJ+ByRzru5KtSZ8E0X1CQzj2NKmqUziDL7lW1CZR9JnHVfyDpjdWTrZW6kaeZ6Ys
+	 ab90DvOG8K/xDzyqlW3Bqve6WAmSVl59KQvcp6GQ=
+Received: from github.com (hubbernetes-node-bc77e5c.ash1-iad.github.net [10.56.206.36])
+	by smtp.github.com (Postfix) with ESMTPA id 6BC7A920860
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 13:45:34 -0700 (PDT)
+Date: Wed, 19 Aug 2026 13:45:34 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 8/8] unit/test-util: Cover strtoutf8 with the str2utf8 tests
-Date: Wed, 19 Aug 2026 16:40:08 -0400
-Message-ID: <20260819204008.2292225-9-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260819204008.2292225-1-luiz.dentz@gmail.com>
-References: <20260819204008.2292225-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1148699/000000-d917c2@github.com>
+Subject: [bluez/bluez] dcf17f: eir: Fix stack buffer overflow when parsing the
+ re...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1148699
+  Home:   https://github.com/bluez/bluez
+  Commit: dcf17f0d657b62052945e214d592a703388e8c2b
+      https://github.com/bluez/bluez/commit/dcf17f0d657b62052945e214d592a=
+703388e8c2b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M src/eir.c
+
+  Log Message:
+  -----------
+  eir: Fix stack buffer overflow when parsing the remote name
+
+name2utf8() copies len bytes into a HCI_MAX_NAME_LENGTH + 2, so 250,
+byte stack buffer without clamping len first.
+
+eir_parse() only rejects a field once it runs past the end of the EIR
+data, and that data is up to 255 bytes, so field_len can be 254 and the
+data_len passed to name2utf8() can reach 253. strncpy() then writes 253
+bytes into the 250 byte buffer and leaves it unterminated, so the
+following g_strstrip() and g_strdup() also read past the end.
+
+The EIR data comes from a remote device, either in an extended inquiry
+response or in an advertising report, so the length is attacker
+controlled.
+
+Clamp len like the other name2utf8() copies already do. Parsing a 253
+byte EIR_NAME_COMPLETE field returned a 253 byte name before this
+change, and returns a 249 byte one after it.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 187b0d78e5d3ac36b3be92b010384a0186f8ebd8
+      https://github.com/bluez/bluez/commit/187b0d78e5d3ac36b3be92b010384=
+a0186f8ebd8
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M src/shared/util.c
+
+  Log Message:
+  -----------
+  shared/util: Make strnlenutf8 reject ill-formed sequences
+
+strnlenutf8() only checks the shape of the lead byte and that the
+following bytes are continuation bytes, so it accepts sequences that are
+not well-formed UTF-8:
+
+  C0 80        overlong encoding of U+0000
+  C0 AF        overlong encoding of '/'
+  ED A0 80     UTF-16 surrogate U+D800
+  F5 80 80 80  past the U+10FFFF limit
+
+strisutf8() and strtoutf8() are built on it, so a remote name containing
+any of those is considered valid and passed on unchanged, for instance
+to D-Bus, which does validate UTF-8 strictly and rejects them.
+
+Validate the sequences as defined by table 3-7 of the Unicode Standard
+instead, which constrains the range of the second byte for the E0, ED,
+F0 and F4 lead bytes and rejects the C0, C1 and F5 to FF ones outright.
+
+The decoding is split out into a helper that also reports the size of
+the maximal subpart of an ill-formed sequence, so that callers can skip
+over it, as recommended by section 3.9 of the Unicode Standard.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: f0fa6fffc5565880ab3a7e7dac534b824bc5024b
+      https://github.com/bluez/bluez/commit/f0fa6fffc5565880ab3a7e7dac534=
+b824bc5024b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M src/shared/util.c
+    M src/shared/util.h
+
+  Log Message:
+  -----------
+  shared/util: Add str2utf8
+
+There are five near copies of the same "turn a remote name into a UTF-8
+string" helper, in monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.=
+c,
+src/eir.c and src/shared/ad.c, and they do not agree with each other.
+
+Most truncate at the first ill-formed sequence, which throws away the
+rest of the name, while the monitor replaces every non-ASCII byte with a
+space, which mangles perfectly valid UTF-8 names as soon as one bad byte
+appears. Most also copy into a fixed size stack buffer first, which is
+what made the missing clamp in src/eir.c a buffer overflow.
+
+Add a single helper they can share. It allocates the result, so there is
+no truncation to a buffer size, and replaces each ill-formed sequence
+with U+FFFD REPLACEMENT CHARACTER rather than dropping the rest of the
+string, matching what g_utf8_make_valid() and the WHATWG Encoding
+Standard do.
+
+The result has been checked byte for byte against Python's
+bytes.decode('utf-8', errors=3D'replace') over all one and two byte
+sequences, a sample of the three byte ones and 200000 random inputs.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 1977f8616adc6538ce255a00780878ab01a35b5d
+      https://github.com/bluez/bluez/commit/1977f8616adc6538ce255a0078087=
+8ab01a35b5d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M unit/test-util.c
+
+  Log Message:
+  -----------
+  unit/test-util: Add str2utf8 tests
+
+Cover the cases str2utf8() is meant to handle: well-formed input that
+has to be left alone, whitespace stripping, input that is not NUL
+terminated, and the ill-formed sequences that have to be replaced,
+including the overlong encodings, the UTF-16 surrogates and the code
+points past U+10FFFF.
+
+Also check that a maximal subpart is replaced by a single U+FFFD rather
+than one per byte, and that the result is always well-formed UTF-8.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: 762585f48fe9da48602d49df89b364ce60d95236
+      https://github.com/bluez/bluez/commit/762585f48fe9da48602d49df89b36=
+4ce60d95236
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M monitor/att.c
+    M profiles/audio/mcp.c
+    M profiles/gap/gas.c
+    M src/eir.c
+    M src/shared/ad.c
+    M unit/test-eir.c
+
+  Log Message:
+  -----------
+  Replace the name2utf8 copies with str2utf8
+
+monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c and src/eir.c
+each carried their own name2utf8(), and src/shared/ad.c open coded the
+same thing in ad_replace_name(), with none of them agreeing.
+
+Use the shared helper instead, which drops around 120 lines and gives
+every caller the same behaviour.
+
+Two things change as a result. The monitor used to replace every
+non-ASCII byte with a space as soon as one bad byte appeared, mangling
+the valid part of the name, and now only the ill-formed sequences are
+replaced. Everything else used to truncate at the first ill-formed
+sequence, throwing away the rest of the name, and now keeps it.
+
+The unit/test-eir expectations are updated accordingly, and they show
+the improvement: the name that used to be reported as "test =E0=A4=AA=E0=A4=
+=B0=E0=A5=80" is now
+reported as "test =E0=A4=AA=E0=A4=B0=E0=A5=80<U+FFFD>=E0=A5=8D=E0=A4=B7=E0=
+=A4=BE invalid".
+
+str2utf8() returns memory from malloc(), so the callers that used
+g_free() now use free().
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: e60d89e101c246d132a67ce62fd9d1409b6bc420
+      https://github.com/bluez/bluez/commit/e60d89e101c246d132a67ce62fd9d=
+1409b6bc420
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix the name truncation splitting UTF-8 sequences
+
+btd_device_device_set_name() copies the name with
+
+	strncpy(device->name, name, MAX_NAME_LENGTH);
+
+which cuts at 248 bytes without any regard for where the UTF-8
+characters start and end, so a longer name can be left with a partial
+sequence. The result is no longer valid UTF-8 and D-Bus rejects it when
+the Name property is emitted.
+
+A name made of 249 U+FFFD characters is 747 bytes long and cutting it at
+248 leaves a trailing "ef bf", two thirds of a character.
+
+Truncate on a character boundary instead. The same name now ends up 246
+bytes long and stays valid.
+
+This also means a name that is not valid UTF-8 to begin with, as can be
+had from the neard and sixaxis plugins, is now cut at the first
+ill-formed sequence rather than passed on as is.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: abaab92606f10aa20e8db894d4aeb886f2c42511
+      https://github.com/bluez/bluez/commit/abaab92606f10aa20e8db894d4aeb=
+886f2c42511
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M plugins/neard.c
+    M plugins/sixaxis.c
+    M profiles/gap/gas.c
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  device: Rename btd_device_device_set_name to btd_device_set_name
+
+The "device" was in there twice.
+
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: d917c24c7417773fd668336ffd9177ce8a1fc730
+      https://github.com/bluez/bluez/commit/d917c24c7417773fd668336ffd917=
+7ce8a1fc730
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-19 (Wed, 19 Aug 2026)
+
+  Changed paths:
+    M unit/test-util.c
+
+  Log Message:
+  -----------
+  unit/test-util: Cover strtoutf8 with the str2utf8 tests
 
 strtoutf8() and str2utf8() are the two ways of dealing with a name that
 is not valid UTF-8, so run them over the same inputs and keep the two
@@ -89,153 +304,10 @@ prefix that decodes as strict UTF-8, over every one, two and three byte
 sequence, 16646655 of them, with no mismatch.
 
 Assisted-by: Claude:claude-opus-5
----
- unit/test-util.c | 94 +++++++++++++++++++++++++++++++++---------------
- 1 file changed, 66 insertions(+), 28 deletions(-)
 
-diff --git a/unit/test-util.c b/unit/test-util.c
-index f0b1bb7994fb..e605d17b6b56 100644
---- a/unit/test-util.c
-+++ b/unit/test-util.c
-@@ -83,65 +83,101 @@ static void test_min_max(const void *data)
- 	tester_test_passed();
- }
- 
--struct str2utf8_data {
-+struct utf8_data {
- 	const char *input;	/* Not NUL terminated, len bytes are used */
- 	size_t len;
--	const char *expected;
-+	const char *str2utf8;	/* Ill-formed sequences replaced, stripped */
-+	const char *strtoutf8;	/* Truncated at the first ill-formed one */
- };
- 
- #define FFFD "\xef\xbf\xbd"		/* U+FFFD REPLACEMENT CHARACTER */
- 
--static const struct str2utf8_data str2utf8_tests[] = {
-+static const struct utf8_data utf8_tests[] = {
- 	/* Nothing to do */
--	{ "", 0, "" },
--	{ "Pixel 7", 7, "Pixel 7" },
-+	{ "", 0, "", "" },
-+	{ "Pixel 7", 7, "Pixel 7", "Pixel 7" },
- 	/* Well-formed multi-byte sequences are kept as they are */
--	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5" },		/* U+20AC */
--	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a" },		/* U+1F50A */
-+	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5",		/* U+20AC */
-+						"\xe2\x82\xac 5" },
-+	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a",	/* U+1F50A */
-+						"\xf0\x9f\x94\x8a" },
- 	/* Leading and trailing whitespace is removed */
--	{ "  spaced  ", 10, "spaced" },
--	{ "\t\r\nname\n\r\t", 10, "name" },
--	{ "   ", 3, "" },
-+	{ "  spaced  ", 10, "spaced", "  spaced  " },
-+	{ "\t\r\nname\n\r\t", 10, "name", "\t\r\nname\n\r\t" },
-+	{ "   ", 3, "", "   " },
- 	/* The name is not NUL terminated, only len bytes are used */
--	{ "truncated", 4, "trun" },
-+	{ "truncated", 4, "trun", "trun" },
- 	/* A byte that can never appear in UTF-8 */
--	{ "ab\xff""cd", 5, "ab" FFFD "cd" },
-+	{ "ab\xff""cd", 5, "ab" FFFD "cd", "ab" },
- 	/* A continuation byte cannot start a sequence */
--	{ "ab\x80""cd", 5, "ab" FFFD "cd" },
-+	{ "ab\x80""cd", 5, "ab" FFFD "cd", "ab" },
- 	/* One U+FFFD per maximal subpart, not per byte */
--	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd" },
-+	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd", "ab" },
- 	/* A sequence cut short by len is still one maximal subpart */
--	{ "ab\xe2\x82\xac", 4, "ab" FFFD },
-+	{ "ab\xe2\x82\xac", 4, "ab" FFFD, "ab" },
- 	/* Latin-1 text is not valid UTF-8 */
--	{ "caf\xe9", 4, "caf" FFFD },
-+	{ "caf\xe9", 4, "caf" FFFD, "caf" },
- 	/* Overlong encodings are rejected, C0 and C1 are never valid */
--	{ "\xc0\x80", 2, FFFD FFFD },
--	{ "\xc0\xaf", 2, FFFD FFFD },
-+	{ "\xc0\x80", 2, FFFD FFFD, "" },
-+	{ "\xc0\xaf", 2, FFFD FFFD, "" },
- 	/* UTF-16 surrogates have no UTF-8 encoding */
--	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD },
-+	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD, "" },
- 	/* U+10FFFF is the last code point, F5 to FF are out of range */
--	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD },
--	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD },
-+	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
-+	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
- 	/* The last code point itself is fine */
--	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf" },
-+	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf",
-+						"\xf4\x8f\xbf\xbf" },
- 	/* Replacement and stripping combined */
--	{ " \xff ", 3, FFFD },
-+	{ " \xff ", 3, FFFD, " " },
- };
- 
- static void test_str2utf8(const void *data)
- {
- 	size_t i;
- 
--	for (i = 0; i < sizeof(str2utf8_tests) /
--				sizeof(str2utf8_tests[0]); i++) {
--		const struct str2utf8_data *test = &str2utf8_tests[i];
-+	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
-+		const struct utf8_data *test = &utf8_tests[i];
- 		char *str = str2utf8((const uint8_t *) test->input,
- 								test->len);
- 
- 		assert(str);
--		if (strcmp(str, test->expected)) {
-+		if (strcmp(str, test->str2utf8)) {
- 			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
--							test->expected, str);
-+							test->str2utf8, str);
-+			free(str);
-+			tester_test_failed();
-+			return;
-+		}
-+
-+		/* The result is always well-formed UTF-8 */
-+		assert(strisutf8(str, strlen(str)));
-+
-+		free(str);
-+	}
-+
-+	tester_test_passed();
-+}
-+
-+static void test_strtoutf8(const void *data)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
-+		const struct utf8_data *test = &utf8_tests[i];
-+		char *str;
-+
-+		/* strtoutf8() works in place, so it needs a writable copy */
-+		str = malloc(test->len + 1);
-+		assert(str);
-+		memcpy(str, test->input, test->len);
-+		str[test->len] = '\0';
-+
-+		assert(strtoutf8(str, test->len) == str);
-+
-+		if (strcmp(str, test->strtoutf8)) {
-+			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
-+							test->strtoutf8, str);
- 			free(str);
- 			tester_test_failed();
- 			return;
-@@ -178,6 +214,8 @@ int main(int argc, char *argv[])
- 			test_str2utf8, NULL);
- 	tester_add("/util/str2utf8_null", NULL, NULL,
- 			test_str2utf8_null, NULL);
-+	tester_add("/util/strtoutf8", NULL, NULL,
-+			test_strtoutf8, NULL);
- 
- 	return tester_run();
- }
--- 
-2.54.0
 
+Compare: https://github.com/bluez/bluez/compare/dcf17f0d657b%5E...d917c24=
+c7417
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
