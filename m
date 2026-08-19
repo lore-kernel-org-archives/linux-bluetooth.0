@@ -1,25 +1,25 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D023DEFE7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13E5427FB3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787130832; cv=none; b=ax4ZuoswYGSMzlbKvcYjfXIg5Dy1WOpcHFO2dRJ5brghGPSttQmVOR53Va8L8LiTCoolVRxIi6UEvbZwwD0rO/88kNAhqEwBYT7jO0h8xoao2vqg8x+A6+9SxXU1IU4+ydlQ60+s62tNDdFYUwvtfXmNl93hdOVPagMTEwhw5kw=
+	t=1787130839; cv=none; b=UG8/de6H5VgFnraAVgUZ+QdEErE5YK18sKlgH+l9MiY7CTid5u2uy9xIl8OKK4F/K3doFGy5p0J3/mGGXYQ6qmEeBIyw5LWV5o/JJLYEkch6DYBIXit+HJlkfGkWmqwar1Mi43V+hvqRPowGe8xRZZ7KOMlWFuKtrZprSu+Jmgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787130832; c=relaxed/simple;
-	bh=GipSGmhzhcQlkn7H59N0swF2ZR3oS9bffVaTF3ywMJo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ReMf8EY1RT0LJdmqDpzr6BS563J5KJvqSs+vdpV0qTD4E9SFpjm8AWqsvgRuf06Zpfvf+C4e0hzKcM0ZJRrlh2lgdfnqMpLFfKBvVGRkBovA/TuuM7CnfmKWUlegKLgL+kjvPn/VUgAlGPyLZfT7uTQsl9WLqMN616HB1Qe4ric=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+	s=arc-20240116; t=1787130839; c=relaxed/simple;
+	bh=xqVZpSeWDEJOXOdLGycsggrVnZLJpaa+5/GxEEUFjgU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XZ98fKG3WtOt08woeS4Cnh2onuZCmFJEdLb491nknMfOZLRk5eHTXFIw8uZmvPT/i9x38Jl63MlRCKS+tMPFnuy7nxf4F9tTrVPZMIoJp+c2HtxN4q8NprzLLQLXLFPPPAHhQQANKg50wfg6u3q8WYcnTKPmjWocQqstdrzXUZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 671F13EBA1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:42 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C0AC91F481
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 09:13:55 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ] doc: Fix typo in test-runner.rst
-Date: Wed, 19 Aug 2026 11:13:31 +0200
-Message-ID: <20260819091333.1203931-1-hadess@hadess.net>
+Subject: [BlueZ] test-runner: "-a" option also stands for "--all"
+Date: Wed, 19 Aug 2026 11:13:45 +0200
+Message-ID: <20260819091347.1204005-1-hadess@hadess.net>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -30,27 +30,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-Score: 0
-X-GND-Cause: dmFkZTG18iyAMEIQjh4veXWtQlH0Odvj9ozjZBJUum9zgChOm20FdzK9SMBkyMCI1MwSB8ZsrMDyzAQn7VFNEJnNGAty5q0MJq/QBw0KRNd8QCLUTrz46Ux4vyqEazuazvhw/BmaLZHCkEoTi3Ixz6bEQrXrhpaPtwJNxyOLlNGqv5TltXTHRWRkM3XMseRY/7rWBbULvKlr0OmYsB33fOEWg8SCw+ZCdUj7Ow2XqxC5xhCi/4fyCqR69aPWzcUp/dX92TYxGrzazYt8i7tsm2e5XvN62PwbZkNVhT62c1zU+qFv472FbcED9TdtqZ0qlwVRiNRevVQAjuz+F9DG3nfAx/ekoR9U/K0RptuAJB31ssSYWNsbVhIZI6K6RTMcW9kXl3IwHVwIFOz3MQXD0vIYEDfbtnBEL3lmiqToZXlX3xs53xBdrqybA7IL8/qG4xuG827/KiomplJfkRyGif6mp4ppICvcDTd0uoOROY+rKnwpSCvNmL12OleM5hb8Xv3uLN7VYonaUlHXMf8fLj0R/HziUoxL/kyINa69pgKoICTjIoi0kJ5GCxHb84/+YrE1yl92TAO5D7IqRUoCMc7wncQJSKBN8Ndhn5jryLCPf9zkNqYdtC4Oj3g8sEYcf8IJb0ude2+ogOfgI2p//G2n0k0Jrw1mFOGilsLsogDhQE1/ig
+X-GND-Cause: dmFkZTG18iyAMEIQjh4veXWtQlH0Odvj9ozjZBJUum9zgChOm20FdzK9SMBkyMCI1MwSB8ZsrMDyzAQn7VFNEJnNGAty5q0MJq/QBw0KRNd8QCLUTrz46Ux4vyqEazuazvhw/BmaLZHCkEoTi3Ixz6bEQrXrhpaPtwJNxyOLlNGqv5TltXTHRWRkM3XMseRY/7rWBbULvKlr0OmYsB33fOEWg8SCw+ZCdUj7Ow2XqxC5xhCi/4fyCqR69aPWzcUp/dX92TYxGrzazYt8i7tsm2e5XvN62PwbZkNVhT62c1zU+qFv472FbcED9TdtqZ0qlwVRiNRevVQAjuz+F9DG3nfAx/ekNiA5mDiq34A0AEMkXcmdNgZZf77zHJCDCxEy1iav+CzB/aEjeu8SK0LKIK3rOS3knP6cddGCwz0Z4/D/guPmYjvPzlkQ/BEOHZvLyCU5KxV+pDxA8Qr7aCEOPiyLhd14nxUFKRGv2WXPoihtIqJ0bwoGyp+0Pu2b0yyy8BQPKm+bF9cFgZiDFAruEKY4wd+qR3eWKK1z/BHGEccBeePIdCrbvJbO8j5hRinvvquRb78kDj8GEniK1HdXizYoP2ipQ44SkDgWCdfeunR0cVKCH6fSs4uY28Cu36f7zmZr5/eJVVpJKxAh1U8iMCAH6kqJyXWn4TOGW8PpKIWkwJ43jA
 X-GND-State: clean
 
-s/lunches/launches/
+In the options for most command-line tools, -a stands for --all, and so
+it does for test-runner. Add --all to the option description before
+--auto as it's a more common option.
 ---
- doc/test-runner.rst | 2 +-
+ tools/test-runner.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index ff2420ea84bf..a650c6fae571 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -8,7 +8,7 @@ DESCRIPTION
- ===========
- 
- **test-runner(1)** is used to test Kernel changes to the Bluetooth subsystem,
--it lunches a virtual machine using qemu(1) and mounts the local filesystem
-+it launches a virtual machine using qemu(1) and mounts the local filesystem
- using virtio (9p).
- 
- OPTIONS
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 0e3bfb8b71ec..9fecea4e7486 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -1216,7 +1216,7 @@ static void usage(void)
+ 		"Usage:\n");
+ 	printf("\ttest-runner [options] [--] <command> [args]\n");
+ 	printf("Options:\n"
+-		"\t-a, --auto             Find tests and run them\n"
++		"\t-a, --all,--auto       Find tests and run them\n"
+ 		"\t-b, --dbus             Start D-Bus system daemon\n"
+ 		"\t-s, --dbus-session     Start D-Bus session daemon\n"
+ 		"\t-d, --daemon           Start bluetoothd\n"
 -- 
 2.55.0
 
