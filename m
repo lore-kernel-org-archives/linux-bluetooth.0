@@ -1,70 +1,69 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2698B38AC8D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC8C2FE05C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787250662; cv=none; b=NTtJFBTxjB3pT8BWUmdsFV674T5V7ygHuk105ndUZLhzoyRmeOQqRNSpNIZF4md+t3yR/JYcCdTcUdKl7aRqfnzKU8MD4JJx6QQMX5AoKudvVbyEW3fJN63Nc0+sXt43qrBorHdn/b6lehobNO7goqlE06uaFp6y/GMN4mj7oBM=
+	t=1787250663; cv=none; b=RBx+cxF7fiIWK7pvqREb9qknjisGPuxyLPShhjbX9ne0TSb2AtnOuyvTXfaNkn9KEb6m1vGs26GlhsdKiXDkn7+zAuebOPBf7S01YSKwdlYRHzb0IzkaHZBBP4OdsCzXr98ZnHE94Z5SKGn7WGrGs5VichXjwu1OIDHSSPt1N/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787250662; c=relaxed/simple;
-	bh=knmNPlAl1Dc+y+/KkrMAsD5JQG04vD037uOMKVhl0Cw=;
+	s=arc-20240116; t=1787250663; c=relaxed/simple;
+	bh=UZexpsVgJWH+MSGm7ckXdN94jfxuvsoDQHlJCjHWRjU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z7838XBYUG+9UVpMIMvFxMJOQxTCewV2sHO9SyQFHhXGFJtIG/5Bi2zOzU8DyUO9hf2LNTFEzfPKmaSIAI/afmbkP2HsC07Tr//nmVufiVUPvRj+QkqMgoSYtpgLfPGP6xYsYxcxpwCex656z3uIw/3Nfouvjk0gOnHC58WQa1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJqnZ/Ja; arc=none smtp.client-ip=209.85.221.173
+	 MIME-Version; b=tJqiT2wtCKaOe254yV2ijDk2kGYcFk0dY3zLgJzyPeldHHvTnPSCxMSjzMs71rgXbg8LB/Nvwa8gRCSZ3zZj9GXWDDTq70kSCfyw2Best3zQa5GZDu9d/b7niBBSBxNI2/seI4BsivbLCB+q5lAX7d4KPMFiLoIgNDuZYZQo66g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jnNABfDK; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJqnZ/Ja"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5c276bd3692so214712e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:31:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnNABfDK"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5c30d9adfa7so128075e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:31:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787250660; x=1787855460; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=NTUayeYkRbypIxKbOd0z6glYy59VdUYKmdlMll8eeJg=;
-        b=TJqnZ/JaUCjf4CZJDq5gkZvrtvy5GxMERL0yd3LDm0e+W0r2ErN2as9MeRiFnrFIKw
-         5gp8vsvhR+N1z9sRWR7OQV1hswnK1Sl1bu9N3A4PmrQy2CVAydZFQLN1/dGO82SK2jnz
-         1h5YBMC79c9PeX/WB4FO4LQc0nUKDDswSefTPsbql7IcTPngUbAjCz6EK/jPw4E/lboZ
-         Ppv9UwGQTLVsZOeKNvOpFJ7/NhTbyjm/g43DoI+xA2y8IJFj1T/ca6sXAkinmXvbU3V5
-         uuereyyxQ01QNZsInBtUm86U2cPTf3x5UVmjf4LlDzB0QjLVLgRLXlu+J2IhvqL2uhFe
-         jo8g==
+        d=gmail.com; s=20251104; t=1787250661; x=1787855461; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=/Sk3Cim+mY+syRWvGmQcz+ZIKAoU0Mbr6TXZR+FTlUM=;
+        b=jnNABfDKmg9M5bd8MQdGA3ox7SUoBuK6ZkKlfrP1FRvkohUTKqMqrPn5ZAIyKUOAou
+         677Op+00fSqX9VHIWcIh5wjIQG9nQhJP6OH6xxvT9jPMqDiCJ7m/q87tOk/1xlpbHKEW
+         fOw+qTE9nTj3oP3Fk0N9fsbT4MoeN8BWtWQrQiu9du8/wjFC7PbRrgpY3IE7Nsq7Dz+c
+         tsjLou3jG3iUUCPGA9hAk+/HXtFQG01+3eqFB5J0D8TThy7LcOarsqWplefJB2fbD3x+
+         jRXqCXaSY+gkT6Yl+V8uqi+9A298jCBfMpLG2BoR6dFYQ9gBH3Y5iLYsrT8l3bMoEQb9
+         71Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787250660; x=1787855460;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NTUayeYkRbypIxKbOd0z6glYy59VdUYKmdlMll8eeJg=;
-        b=pJnC/hS4D6PrUj/vkIbneFlSTao8oCpauGd0v+S57nHw9aNj/ZBzvZoL17HEa/xPAW
-         DwzVZ3EwGJedssLE8Dd/voG2SOMdWN0K6UedMIc8qHvuKx9ByaKePOWwCA+Lih+f00a1
-         ImbBRcf+3AjERtYHvXnEVznDZWIZXi44OS6S7Bs4ujaMKnA/GQh9ELQTZFShbCMMocuw
-         JxCz/1q/nN38lUxbZ4r7o71mte6Yrd5qmxj1vBUwcKKMpPkQZWYuMkQEjTDa8cJx4IYx
-         aliaQHM4HOJBlXKR9IdgtKTU+O/BWlCllU4RyLfY9wAKHKJK1hk2z59jhmI5rXuD0DZ9
-         3dSA==
-X-Gm-Message-State: AFuF++nCyl9sHMMRF+ivcYkYvxqcD/f8JxhvTM+qHeVwio1k/5qKX+xI
-	lqCXxDCs3hS4dgWG7TDhvKYPt8shawaCOuCJVVrVi47UGf1QGHjQ30rvJLCKgey9
-X-Gm-Gg: AR+sD10T6KhxsrmCEOnX39JxQ1L/GaWjnEvWQldr5UGyyBaFGD7WDxwDZ9piE8u5AFE
-	N58qxoWHL/alOpd3k5PkTy4WZBAXbEM4QvmmMLEoFz84VBHG8+jMl3EcLzqFccce24sqS4e2Gm6
-	n+ue7eHlZI4//khmVc6HKfQn+PxU4/4ZiODl7bnTaTWepmSmXCBXUpOc427HQpEcTDoQvKn4hZT
-	ZMzSQ5dDfDWBQSiAZ2chamcF3QZxh78RAbwXqkl8MkADLAeJydANkuq90UXz9U8NCSb+NjF11Ge
-	ZCNMd8rM0HpkAVeOf6j/izMNWF+tJrC7OhP9jhsaCnvVcWbzYDyksqUHjfybjBrF+fkXCQdFCiH
-	ttiNXFbgjfxqcc4wl9RSHeVabXilohQA6mzMKzCBTH4VJSQBuw54SZsw2GzM1jfQui4jJRb9xm2
-	/bH5qIyy1EnjvbgKtf5gah3hqk6qIqJyksLOmaAABrSa/+okRK/zBI61f3eD8rR/sg67+jd21yl
-	vzX6kpj0Dz5yU5MSORdz/Q/MbIQzSBAWaX/Bmt7qjg627K74pu7Qeo=
-X-Received: by 2002:a05:6122:489a:b0:5c3:2f5c:55b3 with SMTP id 71dfb90a1353d-5c5ff7a68a2mr439094e0c.3.1787250659836;
-        Thu, 20 Aug 2026 11:30:59 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787250661; x=1787855461;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=/Sk3Cim+mY+syRWvGmQcz+ZIKAoU0Mbr6TXZR+FTlUM=;
+        b=RCqdJCh85peRcODS1e4HLHYi+as7zvOMBMsiTmjhXT2H76AaYX8WaSVT/PywNBDVUX
+         3EtEVl5+RWL8BEeVG4cb66QRIzGcKay+wBsQOp6xU1de3Ju6JFK7loLVem38Zhl1HB78
+         75cbHh76vt2cst1mggg/4iZDLTl2xVflN7iw76J43VIjapADZKq/c8H/mVlMj44IEuVP
+         qyNYGsexX7dW0Txk46X0wep7dEvfDDPc2k3HvyTmLe3enwzwbq9/t3w3PrDMAR6NdeuO
+         mMQgfNSzz4orw1G9f/hj3v3B0jCfBfhlNEysc6rY3pvSBB4gWBcZ097fAGV3n/nQNgiz
+         efAQ==
+X-Gm-Message-State: AFuF++kgk4k+PB8R9XswLIQ1PKAkRXIz8bsTM+aK1BsQ6dbbuCw9eCsO
+	M/vQZ/0hCzAq1Rwmy2Sds49ET0RaC/9fdtZeXPQhunCqjge9JemP+yWlbqHm76aL
+X-Gm-Gg: AR+sD11olBFKQjcOeBHXpzVcO7yna5O56E1mU/iG6XxzLrklCLFIxb+h7DsnobxOym7
+	L0HayZUPAnAv//Y1CmThrxsYj2EJgRkXpCrIDcQPENK9216Qe3FiMX5aDDITd2vqfJkF6r7ldEf
+	m7gWjWLkdNDB971HyK9f58yhX7l7R/cDIK8JKygfvJA7XAZKyts1nSSjW4t5sH036WAapynMxUi
+	76QssD5xrGkTPXgZ7jnG1crHJ7I+A3kkOjra3j8BjqaS4PDbWQaO4a8uyQXQruNIYFt2foHRwNp
+	mRbO1MYZ5GgE6RzwpDrGOnD6W+rIlJiZ4ZBRoIHgPnQwJM+R076wP9dhQZPWtHEHEgKgNnlFLIJ
+	v/CFI0iFaWp16wbgheTrlwMM/jto2V8Lu9UJeOZ5vETflY7c8eLja9nRwmmpVW7Xz8QwOr0B1gP
+	M1H27RjdbFVHZ9f1VDJKGWbSq/LhP6gmaZDgNLU055x36/voKlTlGCM7tzrKwjCKPTeE91HpxoL
+	UtxsnKKdkm/Ej94mB8SAt2SNqWfJq0F2m1vRnwGj57uipQ4H8YBeEok0trJ
+X-Received: by 2002:a05:6122:134e:b0:5c3:b805:1106 with SMTP id 71dfb90a1353d-5c5fef8d437mr455808e0c.0.1787250660836;
+        Thu, 20 Aug 2026 11:31:00 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.30.57
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.30.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 11:30:58 -0700 (PDT)
+        Thu, 20 Aug 2026 11:31:00 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 07/10] Replace the name2utf8 copies with str2utf8
-Date: Thu, 20 Aug 2026 14:30:34 -0400
-Message-ID: <20260820183037.2713973-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 08/10] device: Fix the name truncation splitting UTF-8 sequences
+Date: Thu, 20 Aug 2026 14:30:35 -0400
+Message-ID: <20260820183037.2713973-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
 References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
@@ -74,431 +73,62 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c and src/eir.c
-each carried their own name2utf8(), and src/shared/ad.c open coded the
-same thing in ad_replace_name(), with none of them agreeing.
+btd_device_device_set_name() copies the name with
 
-Use the shared helper instead, which drops around 120 lines and gives
-every caller the same behaviour.
+	strncpy(device->name, name, MAX_NAME_LENGTH);
 
-Two things change as a result. The monitor used to replace every
-non-ASCII byte with a space as soon as one bad byte appeared, mangling
-the valid part of the name, and now only the ill-formed sequences are
-replaced. Everything else used to truncate at the first ill-formed
-sequence, throwing away the rest of the name, and now keeps it.
+which cuts at 248 bytes without any regard for where the UTF-8
+characters start and end, so a longer name can be left with a partial
+sequence. The result is no longer valid UTF-8 and D-Bus rejects it when
+the Name property is emitted.
 
-The unit/test-eir expectations are updated accordingly, and they show
-the improvement: the name that used to be reported as "test परी" is now
-reported as "test परी<U+FFFD>्षा invalid".
+A name made of 249 U+FFFD characters is 747 bytes long and cutting it at
+248 leaves a trailing "ef bf", two thirds of a character.
 
-str2utf8() returns memory from malloc(), so the callers that used
-g_free() now use free().
+Truncate on a character boundary instead. The same name now ends up 246
+bytes long and stays valid.
+
+This also means a name that is not valid UTF-8 to begin with, as can be
+had from the neard and sixaxis plugins, is now cut at the first
+ill-formed sequence rather than passed on as is.
 
 Assisted-by: Claude:claude-opus-5
 ---
- monitor/att.c        | 66 ++++++++++++++------------------------------
- profiles/audio/mcp.c | 24 ++--------------
- profiles/gap/gas.c   | 20 ++------------
- src/eir.c            | 22 ++-------------
- src/shared/ad.c      | 20 ++++++--------
- unit/test-eir.c      | 11 +++++---
- 6 files changed, 42 insertions(+), 121 deletions(-)
+ src/device.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index 7506dc528e85..44965a2aaf3b 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -15,7 +15,6 @@
- #endif
+diff --git a/src/device.c b/src/device.c
+index 65d84be56ca5..df607f718be1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5103,12 +5103,22 @@ char *btd_device_get_storage_path(struct btd_device *device, const char *name)
  
- #define _GNU_SOURCE
--#include <ctype.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -2325,40 +2324,15 @@ static void vol_flag_notify(const struct l2cap_frame *frame)
- 	print_vcs_flag(frame);
- }
- 
--static char *name2utf8(const uint8_t *name, uint16_t len)
--{
--	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--	int i;
--
--	if (g_utf8_validate((const char *) name, len, NULL))
--		return g_strndup((char *) name, len);
--
--	len = MIN(len, sizeof(utf8_name) - 1);
--
--	memset(utf8_name, 0, sizeof(utf8_name));
--	strncpy(utf8_name, (char *) name, len);
--
--	/* Assume ASCII, and replace all non-ASCII with spaces */
--	for (i = 0; utf8_name[i] != '\0'; i++) {
--		if (!isascii(utf8_name[i]))
--			utf8_name[i] = ' ';
--	}
--
--	/* Remove leading and trailing whitespace characters */
--	g_strstrip(utf8_name);
--
--	return g_strdup(utf8_name);
--}
--
- static void print_mp_name(const struct l2cap_frame *frame)
+ void btd_device_device_set_name(struct btd_device *device, const char *name)
  {
- 	char *name;
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Media Player Name: %s", name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void mp_name_read(const struct l2cap_frame *frame)
-@@ -2385,11 +2359,11 @@ static void print_track_title(const struct l2cap_frame *frame)
- {
- 	char *name;
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Track Title: %s", name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void track_title_read(const struct l2cap_frame *frame)
-@@ -2520,11 +2494,11 @@ static void print_bearer_name(const struct l2cap_frame *frame)
- {
- 	char *name;
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Bearer Name: %s", name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void bearer_name_read(const struct l2cap_frame *frame)
-@@ -2541,11 +2515,11 @@ static void bearer_uci_read(const struct l2cap_frame *frame)
- {
- 	char *name;
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Bearer Uci Name: %s", name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void print_technology_name(const struct l2cap_frame *frame)
-@@ -2612,11 +2586,11 @@ static void print_uri_scheme_list(const struct l2cap_frame *frame)
- {
- 	char *name;
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Uri scheme Name: %s", name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
-@@ -2726,11 +2700,11 @@ static void print_call_list(const struct l2cap_frame *frame)
- 
- 	print_field("  call_flag: 0x%x", call_flag);
- 
--	call_uri = name2utf8((uint8_t *)frame->data, frame->size);
-+	call_uri = str2utf8(frame->data, frame->size);
- 
- 	print_field("  call_uri: %s", call_uri);
- 
--	g_free(call_uri);
-+	free(call_uri);
- 
- done:
- 	if (frame->size)
-@@ -2816,11 +2790,11 @@ static void print_target_uri(const struct l2cap_frame *frame)
- 
- 	print_field("  call_idx: %x", call_idx);
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Uri: %s", name);
- 
--	g_free(name);
-+	free(name);
- 
- done:
- 	if (frame->size)
-@@ -2928,9 +2902,9 @@ static void print_call_cp(const struct l2cap_frame *frame)
- 		break;
- 	case 0x04:
- 		str = "Originate";
--		name = name2utf8((uint8_t *)frame->data, frame->size);
-+		name = str2utf8(frame->data, frame->size);
- 		print_field("  Operation: %s  Uri: %s", str, name);
--		g_free(name);
-+		free(name);
- 		break;
- 	case 0x05:
- 		str = "Join";
-@@ -3124,11 +3098,11 @@ static void print_incom_call(const struct l2cap_frame *frame)
- 
- 	print_field("  Call Index: %u", call_id);
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  call_string: %s", name);
- 
--	g_free(name);
-+	free(name);
- 
- done:
- 	if (frame->size)
-@@ -3157,11 +3131,11 @@ static void print_call_friendly_name(const struct l2cap_frame *frame)
- 
- 	print_field("  Call Index: %u", call_id);
- 
--	name = name2utf8((uint8_t *)frame->data, frame->size);
-+	name = str2utf8(frame->data, frame->size);
- 
- 	print_field("  Friendly Name: %s", name);
- 
--	g_free(name);
-+	free(name);
- 
- done:
- 	if (frame->size)
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index 0c2e0de0b156..8adf814e8d73 100644
---- a/profiles/audio/mcp.c
-+++ b/profiles/audio/mcp.c
-@@ -73,26 +73,6 @@ struct remote_player {
- 	uint8_t playing_order;
- };
- 
--static char *name2utf8(const uint8_t *name, uint16_t len)
--{
--	char *utf8_name;
--
--	utf8_name = malloc(len + 1);
--	if (!utf8_name)
--		return NULL;
--
--	if (len)
--		memcpy(utf8_name, name, len);
--
--	utf8_name[len] = 0;
--	strtoutf8(utf8_name, len);
--
--	/* Remove leading and trailing whitespace characters */
--	g_strstrip(utf8_name);
--
--	return utf8_name;
--}
--
- static const char *mcp_status_val_to_string(uint8_t status)
- {
- 	switch (status) {
-@@ -118,7 +98,7 @@ static void remote_media_player_name(void *data, const uint8_t *value,
- 	struct remote_player *remote = data;
- 	char *name;
- 
--	name = name2utf8(value, length);
-+	name = str2utf8(value, length);
- 	if (!name)
++	size_t len;
++
+ 	if (strncmp(name, device->name, MAX_NAME_LENGTH) == 0)
  		return;
  
-@@ -145,7 +125,7 @@ static void remote_track_title(void *data, const uint8_t *value,
- 	char *name;
- 	uint16_t len;
+ 	DBG("%s %s", device->path, name);
  
--	name = name2utf8(value, length);
-+	name = str2utf8(value, length);
- 	if (!name)
- 		return;
+-	strncpy(device->name, name, MAX_NAME_LENGTH);
++	/*
++	 * Truncate on a character boundary, so that a name longer than
++	 * MAX_NAME_LENGTH does not end up with a partial sequence, which
++	 * would no longer be valid UTF-8 and would be rejected by D-Bus.
++	 */
++	len = strnlenutf8(name, MIN(strlen(name), (size_t) MAX_NAME_LENGTH));
++
++	memcpy(device->name, name, len);
++	device->name[len] = '\0';
  
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index 0f41c9e6c2a5..5184d74e8f07 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -66,22 +66,6 @@ static void gas_free(struct gas *gas)
- 	g_free(gas);
- }
+ 	store_device_info(device);
  
--static char *name2utf8(const uint8_t *name, uint16_t len)
--{
--	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--
--	len = MIN(len, sizeof(utf8_name) - 1);
--
--	memset(utf8_name, 0, sizeof(utf8_name));
--	strncpy(utf8_name, (char *) name, len);
--	strtoutf8(utf8_name, len);
--
--	/* Remove leading and trailing whitespace characters */
--	g_strstrip(utf8_name);
--
--	return g_strdup(utf8_name);
--}
--
- static void read_device_name_cb(bool success, uint8_t att_ecode,
- 					const uint8_t *value, uint16_t length,
- 					void *user_data)
-@@ -98,13 +82,13 @@ static void read_device_name_cb(bool success, uint8_t att_ecode,
- 	if (!length)
- 		return;
- 
--	name = name2utf8(value, length);
-+	name = str2utf8(value, length);
- 
- 	DBG("GAP Device Name: %s", name);
- 
- 	btd_device_device_set_name(gas->device, name);
- 
--	g_free(name);
-+	free(name);
- }
- 
- static void handle_device_name(struct gas *gas, uint16_t value_handle)
-diff --git a/src/eir.c b/src/eir.c
-index 4421b1662d65..5c9ebe2af3a3 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -60,7 +60,7 @@ void eir_data_free(struct eir_data *eir)
- {
- 	queue_destroy(eir->services, g_free);
- 	eir->services = NULL;
--	g_free(eir->name);
-+	free(eir->name);
- 	eir->name = NULL;
- 	free(eir->hash);
- 	eir->hash = NULL;
-@@ -133,22 +133,6 @@ static void eir_parse_uuid128(struct eir_data *eir, const uint8_t *data,
- 	}
- }
- 
--static char *name2utf8(const uint8_t *name, uint8_t len)
--{
--	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--
--	len = MIN(len, HCI_MAX_NAME_LENGTH);
--
--	memset(utf8_name, 0, sizeof(utf8_name));
--	strncpy(utf8_name, (char *) name, len);
--	strtoutf8(utf8_name, len);
--
--	/* Remove leading and trailing whitespace characters */
--	g_strstrip(utf8_name);
--
--	return g_strdup(utf8_name);
--}
--
- static void eir_parse_msd(struct eir_data *eir, const uint8_t *data,
- 								uint8_t len)
- {
-@@ -301,9 +285,9 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 			while (data_len > 0 && data[data_len - 1] == '\0')
- 				data_len--;
- 
--			g_free(eir->name);
-+			free(eir->name);
- 
--			eir->name = name2utf8(data, data_len);
-+			eir->name = str2utf8(data, data_len);
- 			eir->name_complete = eir_data[1] != EIR_NAME_SHORT;
- 			break;
- 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index ebee078500c6..236e719507e4 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -275,22 +275,18 @@ static bool ad_replace_uuid128(struct bt_ad *ad, struct iovec *iov)
- 
- static bool ad_replace_name(struct bt_ad *ad, struct iovec *iov)
- {
--	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--	size_t len = MIN(iov->iov_len, (size_t) HCI_MAX_NAME_LENGTH);
-+	char *utf8_name;
-+	bool ret;
- 
--	memset(utf8_name, 0, sizeof(utf8_name));
--	strncpy(utf8_name, (const char *)iov->iov_base, len);
-+	utf8_name = str2utf8(iov->iov_base, iov->iov_len);
-+	if (!utf8_name)
-+		return false;
- 
--	if (strisutf8(utf8_name, len))
--		goto done;
-+	ret = bt_ad_add_name(ad, utf8_name);
- 
--	strtoutf8(utf8_name, len);
-+	free(utf8_name);
- 
--	/* Remove leading and trailing whitespace characters */
--	strstrip(utf8_name);
--
--done:
--	return bt_ad_add_name(ad, utf8_name);
-+	return ret;
- }
- 
- static bool ad_replace_uuid16_data(struct bt_ad *ad, struct iovec *iov)
-diff --git a/unit/test-eir.c b/unit/test-eir.c
-index 326bc899e251..380fcba2f38e 100644
---- a/unit/test-eir.c
-+++ b/unit/test-eir.c
-@@ -407,7 +407,8 @@ static const unsigned char invalid_utf8_name_data[] = {
- static const struct test_data invalid_utf8_name_test = {
- 	.eir_data = invalid_utf8_name_data,
- 	.eir_size = sizeof(invalid_utf8_name_data),
--	.name = "test परी",
-+	/* The truncated sequence is replaced by U+FFFD, the rest is kept */
-+	.name = "test परी" "\xef\xbf\xbd" "्षा invalid",
- 	.name_complete = true,
- 	.tx_power = 127,
- };
-@@ -435,7 +436,9 @@ static const unsigned char iso_2022_jp_name_data[] = {
- static const struct test_data iso_2022_jp_name_test = {
- 	.eir_data = iso_2022_jp_name_data,
- 	.eir_size = sizeof(iso_2022_jp_name_data),
--	.name = "test \033$B",
-+	/* The 4 JIS bytes are replaced by U+FFFD, the escapes are ASCII */
-+	.name = "test \033$B" "\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"
-+								"\033(B OK",
- 	.name_complete = true,
- 	.tx_power = 127,
- };
-@@ -475,8 +478,8 @@ static void max_name_setup(const void *data)
- static unsigned char long_name_data[255];
- static char long_name[sizeof(long_name_data) - 2 + 1];
- 
--/* The name does not fit, so it comes back clamped to HCI_MAX_NAME_LENGTH */
--#define LONG_NAME_LEN	HCI_MAX_NAME_LENGTH
-+/* str2utf8() does not clamp, so the whole name is kept */
-+#define LONG_NAME_LEN	(sizeof(long_name_data) - 2)
- 
- static const struct test_data long_name_test = {
- 	.eir_data = long_name_data,
 -- 
 2.54.0
 
