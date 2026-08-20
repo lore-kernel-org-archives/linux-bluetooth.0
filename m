@@ -1,69 +1,69 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A94388390
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6A438D3FC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787250666; cv=none; b=ZkF0KkVM3OzpBdIK+jfDKog9TJC/L1rHeH8MJ/mptk0DUSRmVoFBFjshQe5vh3bex5tSuKExrdaFefQrLLb1/cccsHoNbBPQrKH+yC6U4QpTRvefc7h7qOTjEExEhIDZMPo1jUTCsWy3VeBij5rDbrMwHFWNQK2iJZrMN449NgE=
+	t=1787250668; cv=none; b=MBo8hVG3SBCu1sm7Np1sIRf2eLJ7OPr+wzdVWz+Fyr850gmJMJx2p/4Y+ValL3YJY+xhhdVEtbMj8v01K3yTSz3J0+912XM1VuE8k8oc/dtKenWnwi65x3gmROn9mqXt2l/ZWi0NYZ0snc6+OMLv7klYtzDfMkEBZHzc9eswDtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787250666; c=relaxed/simple;
-	bh=9hlHPMUSpZfSPV/kKGCmXt8+11ZbWbaMeWmI0IMSJ2k=;
+	s=arc-20240116; t=1787250668; c=relaxed/simple;
+	bh=GS8iWW3KOYyueC9Xc0634j24G6thBfU/TCzgmHWE6Wo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qz5gR8cvcHvV4Wv4kgxm9HFxU92gnYz1OcjPceDGvXK898tLZC0sZqGs8sSCe9EYmJreC8tjPmaaMiuqvr2Y+Wr0UkN3dtGs6eG5Dcgs9cPZMP0zmB156Dk6ywIr4bKkJ3A+s7lqsTNu63lDXKSjYH1x84ofQmPg6t2wBogtirU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTMkqVnP; arc=none smtp.client-ip=209.85.221.179
+	 MIME-Version; b=uj0EyEaojf0XSHh/BugMgtYGcj14yZmxYHRNcL/V6xHELXS0DsieDUEtiG78G4TifBwV7R2QiwZwsAuTD6PVpQNro8R/wK5IaqT9siJC+Lb5LgUUgHPMrv17QdlobWFCVAJZP0GbD2HPgPtBwhOjP5lcc4DpdLYh8bvEZNkPEyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s7bkV+aI; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTMkqVnP"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5bfa4c51c2aso125221e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:31:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s7bkV+aI"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5c2dbaf828eso143907e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787250663; x=1787855463; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787250662; x=1787855462; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=OeOSMeS6K++zfh8cn0//khtf3rsH7G0Jb/ibEHEW2CE=;
-        b=aTMkqVnPLMiwGvzyjluVQi1E1BDP5ykfGwswVODUgOALjkzULZcrCSqHOD6+xKnfXx
-         I3vaBSLEFXGwQaNEy85wdO6YWUmArWJz+rHn19w3fEPdtmhL6ShW9PstRyb/zsGeOHUW
-         jOSZVUS+I7f7KZfzCsa2pzp0n279mR06SMSCZjP/R4GKa9LKGRfWW2KcePuvPf/pFW3I
-         Bwi4KXAtixGIH+WqZPkM5Wgd7V1ebGRA1rehJVKO4os4ymKYJPxnjH7KqcUiqfQ4id+f
-         Pkk3p2btu5193vk9Kj29b/K9TJpIAbUpGI14ptccFGa4QZSdJte7tdi7qifv/mLlJzvw
-         Pcwg==
+        bh=hShyAifQW1rgKFq0/zPmgbqhpK87cC6GpMRd+F7QsSM=;
+        b=s7bkV+aIZe1b91ekqrjnAKHKQ4uibstSlRTxFGL1egkgqHm4AV3tLyAtFDELb7W1R7
+         LmRw/uIb26jdP3//nQ0euXXx4f0cVvgOjJYBIp484rREZY/Xompx+1Dhjm0Ujn9Ms7oy
+         rUxW9xtnLg72G9VRLzGR/b+Ml+ecTNB05q0eiNkHlBT+Pm6dGmSFTX98ddBzyNBX7sec
+         AK1MAw/OFd5360eFG+guoF2JkUwaC9I4QJMQ8YjnPsuNDc6ojKrOs0JSuJY5U9ija19o
+         0YA5kZ6+U5ez2wV8HcB6hTxSvpcKSKyKk4EbjOiIKor9XLlsjSgIUz3K5/vPfDTIWhWF
+         YFFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787250663; x=1787855463;
+        d=1e100.net; s=20251104; t=1787250662; x=1787855462;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=OeOSMeS6K++zfh8cn0//khtf3rsH7G0Jb/ibEHEW2CE=;
-        b=Mgx3X5huVZVefEj+DOSffwEv9zvPoEwtL/0qIGPwvmlHUVh2Yi8kS1qx2PUnxvvCJw
-         KIKoHWENgbyb1CcfOLtXq4ESiDkQxKkjDI4dIuXpOTawHRJNy4AhnT2anSaHQM3SHFFN
-         s26ssGk6JIqYSc4sdf5CU8jx2/uR/iRbxuA/dCju9251S60OiG9foaa3XKLnNXnqwiik
-         gSBT0ZeL2cBsb0KMmz79YxcycYE6zvrWniIDysKcBxhvQHtMZNTNWMgY1gSByi11LaZ1
-         08hnjb02HaHdS70/zEXCeOoqzNhnx+ktLQOTJ+A8BN6hyG/rEyNqw9NV0hjh0Ntj+Prl
-         uD+Q==
-X-Gm-Message-State: AFuF++mV5AQZFNnArguG+4LNye1+JlxoAorNTCLdk8WckBNnhy94hZpH
-	IsGXtG7iIIw1MuuD3T78cguRE7eremtuze5M8TKOMblWes1mrrmXulG14FLmEf82
-X-Gm-Gg: AR+sD10NrDDE6OzirFdhX7urJUTf/oGguJ0Rft5KGq0gIE8QeuzvMLd4fX10PmRKGHI
-	HDGsvCC043ecUSFreGYNLk3pslUBGbItIQK9D7W3MbmVtivIUxET3eKXUuk4pdvk5pXUFXqgjjt
-	MBhoUhhCjPfvFVsMi/75EZahUw+JPLXYIirrqlVnFWNNIpoVs2jPqkgdmevg0f3XhmvKk/B+UvZ
-	G5D+wl4cweJXai7lbBKI6ENqHIh1RZYpLno7FyIyStU3fBsgMjsIfd+vbHxLSBqQlW2DAmyL264
-	hQDyzHfn1NXCEySVA0DHsKKOTTzKxSf60UI4pc7Xz+7G9ndxaRWKusJO+f5kSkpX+KnsS0xIk1F
-	qyXGa9Eg1GTTOxG65uBbF3D4vppm0iMdfdm1censPkH9URXA014phULRpXnof3mir4S+fodrHeV
-	IHrqbQw03og3aVUl3cwrN1rCwa4Z85pstLhSZgz/wduIJM84FfstTpN/tffY+XQh7WoqyoHwFLp
-	WP8lnmJ+ufuKGOt/U3TKA5v99A4Uxi1Se3ouah/uNbQLeu3Fnbkb5E=
-X-Received: by 2002:a05:6122:c91:b0:5c3:61c2:9ec6 with SMTP id 71dfb90a1353d-5c5ff72d7d8mr352230e0c.7.1787250663236;
-        Thu, 20 Aug 2026 11:31:03 -0700 (PDT)
+        bh=hShyAifQW1rgKFq0/zPmgbqhpK87cC6GpMRd+F7QsSM=;
+        b=I4YG4bS3fJDe19B3qJagQqP4tAIjAcbDIJTYBlihU9D3WI03ZtfoEYvEt8qkjS64aS
+         jQPRDVMqRzpwFSCkw5z7wLDGKHRHtVWeU2S9iMT1hXTJZC0evEKPZbFqQbCUbiCBjs5f
+         uHPjgviJ/wFlQu/WcWF8tPHVTq0uK6unpq/vST9xtlSFf9fqJqXAbAAdUNHDU4r+fl9T
+         DVuQBWQJrBcUmstFXBkoY9dSgXlseqX6lNhJCl/AI7NkDuZ1UmoZu1Hfo7U5mPzqrHvd
+         GHbi3S7ZyReHhPiQcv2nS7QAUwpQRq62tPhuY4/CALhNGXMAu8nWFRoifnR0943cA12e
+         DQQw==
+X-Gm-Message-State: AFuF++lFpvEheTGyijp7u4+o9QQ8tW2hH5rYGZW047ZyvOtdngonCbMP
+	M3CUBSbqMcr8iJeckTridHJGm1tZXZOb+hSc4cDDURhZmErXc7+Plw9qMdpPj1UZ
+X-Gm-Gg: AR+sD13J9OwzMrZCEmTAGhGQUSnGRsQTeTJdi+nbVVAirw/hAag5FuSXBoEREj4OyzO
+	FVTaHKbi9v0fWK3oW2WB0OMfxAnnJdIs5Ja9il/ZeRObx+5UP16Dm0iuDCWpBIiWGD26PzkuALg
+	OZ2tEeLj3LJ0kAhFHNFyXGxrklurFP3UDvvj2LNR5A9cGdJwT4n5eQp6M46TT18sXYUY2yvdsYU
+	iqWbpH4gKZJUA9JJmYCt35WUoIoXFjhCBlV+4aqerFlgYzdIbSS1w+s66ODlIEGLug3gl1BKqiO
+	DZnJ0p2g7f8ZtXnAHlqubhAv3XGH8Cw3ZUtV2er5oRzCumqj70s87vCwHPTJfw+fvpnO+5vUOCc
+	nb8DTx2pU1flkxMOdZ+Lo+xBlFoM27ETw/OJV5bPizTcpneKe9T5BJxV6MWFfeDI2W2Fl85sDwf
+	JRomHEvFFfTfJoWXvGDj3CbN1HpTEPZQl7B8zGVwxfsawMyFmvqrJ/Y0N2rlzFxWoYEGDVwKFxx
+	8opaKdMrlpgrJ8yKVgswMaxi1HWlbGugoHdY28dN6t8Nr4UAjz2Dwg=
+X-Received: by 2002:a05:6122:17a8:b0:5bf:b5e1:f8e5 with SMTP id 71dfb90a1353d-5c5ff7128e6mr300620e0c.5.1787250662167;
+        Thu, 20 Aug 2026 11:31:02 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.31.02
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.31.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 11:31:02 -0700 (PDT)
+        Thu, 20 Aug 2026 11:31:01 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 10/10] unit/test-util: Cover strtoutf8 with the str2utf8 tests
-Date: Thu, 20 Aug 2026 14:30:37 -0400
-Message-ID: <20260820183037.2713973-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 09/10] device: Rename btd_device_device_set_name to btd_device_set_name
+Date: Thu, 20 Aug 2026 14:30:36 -0400
+Message-ID: <20260820183037.2713973-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
 References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
@@ -77,165 +77,105 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-strtoutf8() and str2utf8() are the two ways of dealing with a name that
-is not valid UTF-8, so run them over the same inputs and keep the two
-expected results side by side, which documents how they differ:
-strtoutf8() truncates at the first ill-formed sequence and leaves the
-whitespace alone, str2utf8() replaces the ill-formed sequences and
-strips.
-
-The expected results were checked against Python, taking the longest
-prefix that decodes as strict UTF-8, over every one, two and three byte
-sequence, 16646655 of them, with no mismatch.
+The "device" was in there twice.
 
 Assisted-by: Claude:claude-opus-5
 ---
- unit/test-util.c | 94 +++++++++++++++++++++++++++++++++---------------
- 1 file changed, 66 insertions(+), 28 deletions(-)
+ plugins/neard.c    | 2 +-
+ plugins/sixaxis.c  | 2 +-
+ profiles/gap/gas.c | 2 +-
+ src/adapter.c      | 4 ++--
+ src/device.c       | 2 +-
+ src/device.h       | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/unit/test-util.c b/unit/test-util.c
-index f0b1bb7994fb..e605d17b6b56 100644
---- a/unit/test-util.c
-+++ b/unit/test-util.c
-@@ -83,65 +83,101 @@ static void test_min_max(const void *data)
- 	tester_test_passed();
+diff --git a/plugins/neard.c b/plugins/neard.c
+index edfc115373ef..1633dd576747 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -629,7 +629,7 @@ static void store_params(struct btd_adapter *adapter, struct btd_device *device,
+ 
+ 	if (params->name) {
+ 		device_store_cached_name(device, params->name);
+-		btd_device_device_set_name(device, params->name);
++		btd_device_set_name(device, params->name);
+ 	}
+ 
+ 	if (params->services)
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index a04a76d394eb..fc2b2a9d0156 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -362,7 +362,7 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 
+ 	info("sixaxis: setting up new device");
+ 
+-	btd_device_device_set_name(device, cp->name);
++	btd_device_set_name(device, cp->name);
+ 	btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp->version);
+ 	btd_device_set_temporary(device, true);
+ 
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 5184d74e8f07..495799e641d9 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -86,7 +86,7 @@ static void read_device_name_cb(bool success, uint8_t att_ecode,
+ 
+ 	DBG("GAP Device Name: %s", name);
+ 
+-	btd_device_device_set_name(gas->device, name);
++	btd_device_set_name(gas->device, name);
+ 
+ 	free(name);
+ }
+diff --git a/src/adapter.c b/src/adapter.c
+index c21b3e7fbcc2..cf59db4aa5a9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7628,7 +7628,7 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 	name_known = device_name_known(dev);
+ 
+ 	if (eir_data.name && (eir_data.name_complete || !name_known))
+-		btd_device_device_set_name(dev, eir_data.name);
++		btd_device_set_name(dev, eir_data.name);
+ 
+ 	if (eir_data.class != 0)
+ 		device_set_class(dev, eir_data.class);
+@@ -9814,7 +9814,7 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 
+ 	if (eir_data.name && (eir_data.name_complete || !name_known)) {
+ 		device_store_cached_name(device, eir_data.name);
+-		btd_device_device_set_name(device, eir_data.name);
++		btd_device_set_name(device, eir_data.name);
+ 	}
+ 
+ 	if (eir_data.msd_list)
+diff --git a/src/device.c b/src/device.c
+index df607f718be1..9609a14f7883 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5101,7 +5101,7 @@ char *btd_device_get_storage_path(struct btd_device *device, const char *name)
+ 	return strdup(filename);
  }
  
--struct str2utf8_data {
-+struct utf8_data {
- 	const char *input;	/* Not NUL terminated, len bytes are used */
- 	size_t len;
--	const char *expected;
-+	const char *str2utf8;	/* Ill-formed sequences replaced, stripped */
-+	const char *strtoutf8;	/* Truncated at the first ill-formed one */
- };
- 
- #define FFFD "\xef\xbf\xbd"		/* U+FFFD REPLACEMENT CHARACTER */
- 
--static const struct str2utf8_data str2utf8_tests[] = {
-+static const struct utf8_data utf8_tests[] = {
- 	/* Nothing to do */
--	{ "", 0, "" },
--	{ "Pixel 7", 7, "Pixel 7" },
-+	{ "", 0, "", "" },
-+	{ "Pixel 7", 7, "Pixel 7", "Pixel 7" },
- 	/* Well-formed multi-byte sequences are kept as they are */
--	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5" },		/* U+20AC */
--	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a" },		/* U+1F50A */
-+	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5",		/* U+20AC */
-+						"\xe2\x82\xac 5" },
-+	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a",	/* U+1F50A */
-+						"\xf0\x9f\x94\x8a" },
- 	/* Leading and trailing whitespace is removed */
--	{ "  spaced  ", 10, "spaced" },
--	{ "\t\r\nname\n\r\t", 10, "name" },
--	{ "   ", 3, "" },
-+	{ "  spaced  ", 10, "spaced", "  spaced  " },
-+	{ "\t\r\nname\n\r\t", 10, "name", "\t\r\nname\n\r\t" },
-+	{ "   ", 3, "", "   " },
- 	/* The name is not NUL terminated, only len bytes are used */
--	{ "truncated", 4, "trun" },
-+	{ "truncated", 4, "trun", "trun" },
- 	/* A byte that can never appear in UTF-8 */
--	{ "ab\xff""cd", 5, "ab" FFFD "cd" },
-+	{ "ab\xff""cd", 5, "ab" FFFD "cd", "ab" },
- 	/* A continuation byte cannot start a sequence */
--	{ "ab\x80""cd", 5, "ab" FFFD "cd" },
-+	{ "ab\x80""cd", 5, "ab" FFFD "cd", "ab" },
- 	/* One U+FFFD per maximal subpart, not per byte */
--	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd" },
-+	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd", "ab" },
- 	/* A sequence cut short by len is still one maximal subpart */
--	{ "ab\xe2\x82\xac", 4, "ab" FFFD },
-+	{ "ab\xe2\x82\xac", 4, "ab" FFFD, "ab" },
- 	/* Latin-1 text is not valid UTF-8 */
--	{ "caf\xe9", 4, "caf" FFFD },
-+	{ "caf\xe9", 4, "caf" FFFD, "caf" },
- 	/* Overlong encodings are rejected, C0 and C1 are never valid */
--	{ "\xc0\x80", 2, FFFD FFFD },
--	{ "\xc0\xaf", 2, FFFD FFFD },
-+	{ "\xc0\x80", 2, FFFD FFFD, "" },
-+	{ "\xc0\xaf", 2, FFFD FFFD, "" },
- 	/* UTF-16 surrogates have no UTF-8 encoding */
--	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD },
-+	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD, "" },
- 	/* U+10FFFF is the last code point, F5 to FF are out of range */
--	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD },
--	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD },
-+	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
-+	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
- 	/* The last code point itself is fine */
--	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf" },
-+	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf",
-+						"\xf4\x8f\xbf\xbf" },
- 	/* Replacement and stripping combined */
--	{ " \xff ", 3, FFFD },
-+	{ " \xff ", 3, FFFD, " " },
- };
- 
- static void test_str2utf8(const void *data)
+-void btd_device_device_set_name(struct btd_device *device, const char *name)
++void btd_device_set_name(struct btd_device *device, const char *name)
  {
- 	size_t i;
+ 	size_t len;
  
--	for (i = 0; i < sizeof(str2utf8_tests) /
--				sizeof(str2utf8_tests[0]); i++) {
--		const struct str2utf8_data *test = &str2utf8_tests[i];
-+	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
-+		const struct utf8_data *test = &utf8_tests[i];
- 		char *str = str2utf8((const uint8_t *) test->input,
- 								test->len);
+diff --git a/src/device.h b/src/device.h
+index b890f23d4642..7683be82ee3f 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -23,7 +23,7 @@ char *btd_device_get_storage_path(struct btd_device *device,
+ 				const char *filename);
  
- 		assert(str);
--		if (strcmp(str, test->expected)) {
-+		if (strcmp(str, test->str2utf8)) {
- 			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
--							test->expected, str);
-+							test->str2utf8, str);
-+			free(str);
-+			tester_test_failed();
-+			return;
-+		}
-+
-+		/* The result is always well-formed UTF-8 */
-+		assert(strisutf8(str, strlen(str)));
-+
-+		free(str);
-+	}
-+
-+	tester_test_passed();
-+}
-+
-+static void test_strtoutf8(const void *data)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
-+		const struct utf8_data *test = &utf8_tests[i];
-+		char *str;
-+
-+		/* strtoutf8() works in place, so it needs a writable copy */
-+		str = malloc(test->len + 1);
-+		assert(str);
-+		memcpy(str, test->input, test->len);
-+		str[test->len] = '\0';
-+
-+		assert(strtoutf8(str, test->len) == str);
-+
-+		if (strcmp(str, test->strtoutf8)) {
-+			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
-+							test->strtoutf8, str);
- 			free(str);
- 			tester_test_failed();
- 			return;
-@@ -178,6 +214,8 @@ int main(int argc, char *argv[])
- 			test_str2utf8, NULL);
- 	tester_add("/util/str2utf8_null", NULL, NULL,
- 			test_str2utf8_null, NULL);
-+	tester_add("/util/strtoutf8", NULL, NULL,
-+			test_strtoutf8, NULL);
  
- 	return tester_run();
- }
+-void btd_device_device_set_name(struct btd_device *device, const char *name);
++void btd_device_set_name(struct btd_device *device, const char *name);
+ void device_store_cached_name(struct btd_device *dev, const char *name);
+ void device_get_name(struct btd_device *device, char *name, size_t len);
+ bool device_name_known(struct btd_device *device);
 -- 
 2.54.0
 
