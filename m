@@ -1,162 +1,208 @@
-Received: from out-7.smtp.github.com (out-7.smtp.github.com [192.30.252.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E2F3E3D95
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542B83E44F8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787223959; cv=none; b=XrX/zaOLt3s3n/3oQX5mZZWCuiTF+WnpGR8/A3UNNGzNU5MtAv7Us+mK8tB8cr6XW2rrSjehxDjWkfvL3rN2D8Z6gR8R0pEmvdGopNdfZV1/WtPYc1oT/w5AWX5SPSa5WD6kkFCFos+XrBMVDjeqLb/Rq9SL8TLJcVa8e2bI/6Y=
+	t=1787224135; cv=none; b=HQLFnTNw4GdUtZr6hU5q6CSOpJ/J6rSht28i2R9am0LB0wNSLoVK/tjjQe7F+9cdlooMYYE/3APjpHHYKQlik5TvPMYvh9OK/3B3CjQ+bvuM9jFdgR+691VYNJVFkK4j4UoLL5csdhK269ymGF1KFodk8SxXX3mbl9X7EzSOLiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787223959; c=relaxed/simple;
-	bh=gI4S9yNoJuQAtXtxsGvlL+cLqr8ruvVAlSFijrNOzHo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AiRmVImyyEZOQbPRJGzsU1fz5f837Q02upt/kbTVoUd5xW4j3kW7cR3Cdm+Ez+XCNYOekjVN9d1IGkUHUxT6q2T1wJE846E/L75PDKalAk794baxawndzv//l0V669ml0Ysy/29LY2zsrEgrRSKfsid0v27NHnB/Ti0lEKiihbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=X0zyBDy/; arc=none smtp.client-ip=192.30.252.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1787224135; c=relaxed/simple;
+	bh=vKEQebjVnYJ+64/SmAGZdWq387ESoOwSTp3HciGHTPA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fUbhjIbiQ3Ux0qnk29tnSVsxY1pMJezj28hp6TQXFKbEln6flW//LPIKLxZr9T4ZbJgfVIXUKa9sRxoHwsBAaHuNOHwWyd2gpcoj2Rvhl09Ddm9F6ezzuT5rnH2I+jjH1wPDwQkAkDLkFt3aF3ixDVxkDr8266qcLzDUI8/lLJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IDp+jgzd; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="X0zyBDy/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787223956;
-	bh=8vHmh0ZkTfMP076YoRSnIjD4dbRQD7McxA0gOqzgInU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=X0zyBDy/doVwf9KNFGieoqnu6pHUVDhG8qVfuRFLeY328bwU6e0RRGmK6W1iPBWWy
-	 KCiTBvkTm29+xBrThnO/26j/ORKZ/p2YsNBj3vmrjvOdhlDRiYTClPxDeoW6snE+9A
-	 9vkSAyMEJFKZ4206eb2cFYEPGK1+kOfSLn2OpxrI=
-Received: from github.com (hubbernetes-node-82e747f.va3-iad.github.net [10.48.65.75])
-	by smtp.github.com (Postfix) with ESMTPA id B72077811E1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 04:05:56 -0700 (PDT)
-Date: Thu, 20 Aug 2026 04:05:56 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1149033/000000-0e5f56@github.com>
-Subject: [bluez/bluez] 2cfa33: mgmt: Add Security Level Changed event
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDp+jgzd"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-38e69bdb0fcso1747068a91.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 04:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787224132; x=1787828932; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=vKEQebjVnYJ+64/SmAGZdWq387ESoOwSTp3HciGHTPA=;
+        b=IDp+jgzdfw7LjNYiSeq+P9yciHnxURNnTHonHJ3qPQe7wRmqgnBhu5jS+XeU/s98bn
+         rBk2G0HvW0pzwh+P0lJ1U2H4raK1/v/hqmAHD2/r2AMQhAOBfOMgVS349ZCA8vtX3aKa
+         KtRdJsZR8GD1c13T5s3pB2hQ/2M3La0oBpm9N+ALSWbB8/Tf4k+48oK9/+Ej5zEl05SC
+         bbe8Jc+CvwfoM2PKiJQnKwUI2JrUUZk9sxXt+Ezok5LpvkPGVxeKcv0QZJR0iFhdKE0N
+         XG9Vx57cchb3Q5G7vgPmzEIi0+KurgOu6GQzpnydhjcabhHWQUJPoA/f4X97e6dkGpV0
+         49Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787224132; x=1787828932;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=vKEQebjVnYJ+64/SmAGZdWq387ESoOwSTp3HciGHTPA=;
+        b=tY45CEWKu9s7lNkY3eO3DJwbiNqqMN0C035EMm3ex1CJVLQEpoQnBCbkvZkkSOavIX
+         6bcVwC/VukrBCGyNTt++TTGKTpjZvDvSM2WmnHFgB3CfaJetngk4V8TlftzzVCEieM1L
+         B/LZG/eETXTo1sZdwMQV6PKGfhpX7vlzgPh9NuQw+QcXD5ULTFq5NG0ZwuTsMxIMJ+oj
+         SDtFW98Ivmi3zbm8YpqhHDwZpaO9UfUhbLAMMlTrVGyVR0blFMUavJVZMoHj2rBiLAmU
+         VGIWdRAJQz9xqkdHW3r7O0DaSQDbwru3O/A/vkY8nC9mRU2wKGxtk3a8ZeGlCVQ8X3Qa
+         Og1w==
+X-Gm-Message-State: AFuF++n4Fp/f8Afz7zxgjjKFjMMwU9LgiW1seipAoaXeYmF7izTLfgHh
+	ai7Vf/TAESUQOAOUcbVaxLDvWqK5HIG/1smUsJ0nEJ1vJDqY/oxOBtpZJX98LnU5
+X-Gm-Gg: AR+sD119T7pIt9pdckWaSa783ZVPKlF/R18iFNIVoPZy8v4jzMpEmnMB6e2VHd4oHeJ
+	KDBG0/o8QOZ6rp4eFv6jxw2/5X5x9t9DivJbGToVAZoQdw6dXIlccq8V0DPFMHwrb99hAHBw7wo
+	i4Y6p1uxDg7e8rmmNjmOsPRl2CGyx/LVk60zOt1ir3iUXJwUwvaqWKVxUylghDTnKWRjBIB0WY8
+	VK6+4unzfaK4/dRl0Rtvfago/O28aAcSUPlex2FXtAbIEmixKisF1EMrGzmZY94wdtgl9lzGaSo
+	LUR3bumQcZiwpxOMenRpAh6wjPJ0Jo24OCL04Ek80x6cMi+VKgCi34LbTcVSDrId2erN/c3OlxH
+	aV5eTq0V2eahXkWqZ2vkz/icaxSxpcK3EzitYRkmjnHfwWN3nUYRa3TFGzZDxfauZ/q5kjOstpA
+	rgPSV+3Ik1+zEUc+74Rnp8V+VbChuI+8EYhY4U7aee+qyGg/3ciyz9QzzIPONXFHuwYzvE
+X-Received: by 2002:a17:90b:164c:b0:393:19a3:4e5 with SMTP id 98e67ed59e1d1-395812c6e07mr19262589a91.16.1787224132014;
+        Thu, 20 Aug 2026 04:08:52 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.227.195])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1416ae143edsm30464458c88.10.2026.08.20.04.08.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Aug 2026 04:08:51 -0700 (PDT)
+Message-ID: <6a86e043.d2cb4adc.2c4456.bb14@mx.google.com>
+Date: Thu, 20 Aug 2026 04:08:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0582841581371817860=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: mgmt/device: report link security level to D-Bus clients
+In-Reply-To: <20260820105235.1190318-2-frederic.danis@collabora.com>
+References: <20260820105235.1190318-2-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1149033
-  Home:   https://github.com/bluez/bluez
-  Commit: 2cfa331b41fb1488993b90e77f133be48f088f3a
-      https://github.com/bluez/bluez/commit/2cfa331b41fb1488993b90e77f133=
-be48f088f3a
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
+--===============0582841581371817860==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M doc/mgmt-protocol.rst
-    M lib/bluetooth/mgmt.h
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTE0OTAzMwoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgRkFJTCAgICAgIDEuODkgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+QVNTICAgICAgMS4yMyBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAyMC40NCBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICA4LjQzIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDcu
+NDcgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMzEuOTYg
+c2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgOC4yNyBzZWNv
+bmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA5LjUwIHNlY29uZHMK
+Ymx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgRkFJTCAgICAgIDkuNTAgc2Vjb25kcwpJbmNy
+ZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBGQUlMICAgICAgOC44MyBzZWNvbmRzClNjYW5CdWls
+ZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA5LjM1IHNlY29uZHMKCkRldGFpbHMKIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBGQUlMCkRlc2M6
+IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdApPdXRwdXQ6CltCbHVlWiwyLzZdIG1nbXQtdGVzdGVy
+OiBBZGQgU2VjdXJpdHkgTGV2ZWwgQ2hhbmdlZCBldmVudCB0ZXN0cwpXQVJOSU5HOkJBRF9TSUdO
+X09GRjogTm9uLXN0YW5kYXJkIHNpZ25hdHVyZTogQXNzaXN0ZWQtYnk6CiM3MzogCkFzc2lzdGVk
+LWJ5OiBHUFQ6R1BULTUuMy1Db2RleAoKRVJST1I6QkFEX1NJR05fT0ZGOiBVbnJlY29nbml6ZWQg
+ZW1haWwgYWRkcmVzczogJ0dQVDpHUFQtNS4zLUNvZGV4JwojNzM6IApBc3Npc3RlZC1ieTogR1BU
+OkdQVC01LjMtQ29kZXgKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1OTAxMi5wYXRj
+aCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE2MyBsaW5lcyBjaGVja2VkCgpOT1RFOiBG
+b3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0
+bwogICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAt
+LWZpeCBvciAtLWZpeC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU5
+MDEyLnBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9y
+ZWQgbWVzc2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJV
+Q1QgRklMRV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhf
+TElDRU5TRV9UQUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBv
+ZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJsdWV6TWFrZSAtIEZBSUwKRGVzYzog
+QnVpbGQgQmx1ZVoKT3V0cHV0OgoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvbWdt
+dC5jOjIxOgouL2xpYi9ibHVldG9vdGgvbWdtdC5oOjExNTA6MjE6IGVycm9yOiBleHBlY3RlZCDi
+gJg64oCZLCDigJgs4oCZLCDigJg74oCZLCDigJh94oCZIG9yIOKAmF9fYXR0cmlidXRlX1/igJkg
+YmVmb3JlIOKAmF9fY291bnRlZF9ieeKAmQogMTE1MCB8ICB1aW50OF90IHRsdl9kYXRhW10gX19j
+b3VudGVkX2J5KHRsdl9jb3VudCk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICBefn5+fn5+
+fn5+fn4KbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3NzA3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9t
+YWlubG9vcF9sYS1tZ210LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZp
+bmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDIxNTogYWxsXSBFcnJvciAyCiMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6
+IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBjbGll
+bnQvbWdtdC5jOjQwOgouL2xpYi9ibHVldG9vdGgvbWdtdC5oOjExNTA6MjE6IGVycm9yOiBleHBl
+Y3RlZCDigJg64oCZLCDigJgs4oCZLCDigJg74oCZLCDigJh94oCZIG9yIOKAmF9fYXR0cmlidXRl
+X1/igJkgYmVmb3JlIOKAmF9fY291bnRlZF9ieeKAmQogMTE1MCB8ICB1aW50OF90IHRsdl9kYXRh
+W10gX19jb3VudGVkX2J5KHRsdl9jb3VudCk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICBe
+fn5+fn5+fn5+fn4KbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3MTIzOiBjbGllbnQvbWdtdC5vXSBF
+cnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA5MzQ6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlzdGNoZWNrIC0gRkFJTApEZXNjOiBS
+dW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4u
+Ly4uL3NyYy9zaGFyZWQvbWdtdC5jOjIxOgouLi8uLi9saWIvYmx1ZXRvb3RoL21nbXQuaDoxMTUw
+OjIxOiBlcnJvcjogZXhwZWN0ZWQg4oCYOuKAmSwg4oCYLOKAmSwg4oCYO+KAmSwg4oCYfeKAmSBv
+ciDigJhfX2F0dHJpYnV0ZV9f4oCZIGJlZm9yZSDigJhfX2NvdW50ZWRfYnnigJkKIDExNTAgfCAg
+dWludDhfdCB0bHZfZGF0YVtdIF9fY291bnRlZF9ieSh0bHZfY291bnQpOwogICAgICB8ICAgICAg
+ICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+Cm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6NzcwNzog
+c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtbWdtdC5sb10gRXJyb3IgMQptYWtlWzJd
+OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFdOiAqKiogW01ha2Vm
+aWxlOjQyMTU6IGFsbF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEwODU1OiBkaXN0Y2hl
+Y2tdIEVycm9yIDEKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFs
+Z3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0
+cHV0OgoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvbWdtdC5jOjIxOgouL2xpYi9i
+bHVldG9vdGgvbWdtdC5oOjExNTA6MjE6IGVycm9yOiBleHBlY3RlZCDigJg64oCZLCDigJgs4oCZ
+LCDigJg74oCZLCDigJh94oCZIG9yIOKAmF9fYXR0cmlidXRlX1/igJkgYmVmb3JlIOKAmF9fY291
+bnRlZF9ieeKAmQogMTE1MCB8ICB1aW50OF90IHRsdl9kYXRhW10gX19jb3VudGVkX2J5KHRsdl9j
+b3VudCk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KbWFrZVsxXTog
+KioqIFtNYWtlZmlsZTo3NzA3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1tZ210
+LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA5MzQ6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NtYXRjaCAtIEZBSUwKRGVzYzogUnVuIHNtYXRj
+aCB0b29sIHdpdGggc291cmNlCk91dHB1dDoKCnNyYy9zaGFyZWQvbWdtdC5jOiBub3RlOiBpbiBp
+bmNsdWRlZCBmaWxlOgouL2xpYi9ibHVldG9vdGgvbWdtdC5oOjExNTA6Mjg6IGVycm9yOiBleHBl
+Y3RlZCA7IGF0IGVuZCBvZiBkZWNsYXJhdGlvbgouL2xpYi9ibHVldG9vdGgvbWdtdC5oOjExNTA6
+Mjg6IGVycm9yOiBFeHBlY3RlZCB9IGF0IGVuZCBvZiBzcGVjaWZpZXIKLi9saWIvYmx1ZXRvb3Ro
+L21nbXQuaDoxMTUwOjI4OiBlcnJvcjogZ290IF9fY291bnRlZF9ieQouL2xpYi9ibHVldG9vdGgv
+bWdtdC5oOjExNTE6MTogZXJyb3I6IEV4cGVjdGVkIDsgYXQgdGhlIGVuZCBvZiB0eXBlIGRlY2xh
+cmF0aW9uCi4vbGliL2JsdWV0b290aC9tZ210Lmg6MTE1MToxOiBlcnJvcjogZ290IH0Kc3JjL3No
+YXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1
+c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3Ro
+IGFycmF5IGlzIHVzZWQuCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL21nbXQuYzoy
+MToKLi9saWIvYmx1ZXRvb3RoL21nbXQuaDoxMTUwOjIxOiBlcnJvcjogZXhwZWN0ZWQg4oCYOuKA
+mSwg4oCYLOKAmSwg4oCYO+KAmSwg4oCYfeKAmSBvciDigJhfX2F0dHJpYnV0ZV9f4oCZIGJlZm9y
+ZSDigJhfX2NvdW50ZWRfYnnigJkKIDExNTAgfCAgdWludDhfdCB0bHZfZGF0YVtdIF9fY291bnRl
+ZF9ieSh0bHZfY291bnQpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzcwNzogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxv
+b3BfbGEtbWdtdC5sb10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hl
+ZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQyMTU6IGFsbF0gRXJyb3IgMgojIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogYmx1ZXptYWtlZXh0ZWxsIC0gRkFJTApEZXNj
+OiBCdWlsZCBCbHVleiB3aXRoIEV4dGVybmFsIEVMTApPdXRwdXQ6CgpJbiBmaWxlIGluY2x1ZGVk
+IGZyb20gc3JjL3NoYXJlZC9tZ210LmM6MjE6Ci4vbGliL2JsdWV0b290aC9tZ210Lmg6MTE1MDoy
+MTogZXJyb3I6IGV4cGVjdGVkIOKAmDrigJksIOKAmCzigJksIOKAmDvigJksIOKAmH3igJkgb3Ig
+4oCYX19hdHRyaWJ1dGVfX+KAmSBiZWZvcmUg4oCYX19jb3VudGVkX2J54oCZCiAxMTUwIHwgIHVp
+bnQ4X3QgdGx2X2RhdGFbXSBfX2NvdW50ZWRfYnkodGx2X2NvdW50KTsKICAgICAgfCAgICAgICAg
+ICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc3MDc6IHNy
+Yy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLW1nbXQubG9dIEVycm9yIDEKbWFrZVsxXTog
+KioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0
+MjE1OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IElu
+Y3JlbWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhlIHBh
+dGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6CgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3No
+YXJlZC9tZ210LmM6MjE6Ci4vbGliL2JsdWV0b290aC9tZ210Lmg6MTE1MDoyMTogZXJyb3I6IGV4
+cGVjdGVkIOKAmDrigJksIOKAmCzigJksIOKAmDvigJksIOKAmH3igJkgb3Ig4oCYX19hdHRyaWJ1
+dGVfX+KAmSBiZWZvcmUg4oCYX19jb3VudGVkX2J54oCZCiAxMTUwIHwgIHVpbnQ4X3QgdGx2X2Rh
+dGFbXSBfX2NvdW50ZWRfYnkodGx2X2NvdW50KTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+IF5+fn5+fn5+fn5+fgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc3MDc6IHNyYy9zaGFyZWQvbGli
+c2hhcmVkX21haW5sb29wX2xhLW1nbXQubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcg
+Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjE1OiBhbGxdIEVy
+cm9yIDIKW0JsdWVaLDEvNl0gbWdtdDogQWRkIFNlY3VyaXR5IExldmVsIENoYW5nZWQgZXZlbnQK
+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL21nbXQuYzoyMToKLi9saWIvYmx1ZXRv
+b3RoL21nbXQuaDoxMTUwOjIxOiBlcnJvcjogZXhwZWN0ZWQg4oCYOuKAmSwg4oCYLOKAmSwg4oCY
+O+KAmSwg4oCYfeKAmSBvciDigJhfX2F0dHJpYnV0ZV9f4oCZIGJlZm9yZSDigJhfX2NvdW50ZWRf
+YnnigJkKIDExNTAgfCAgdWludDhfdCB0bHZfZGF0YVtdIF9fY291bnRlZF9ieSh0bHZfY291bnQp
+OwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+Cm1ha2VbMV06ICoqKiBb
+TWFrZWZpbGU6NzcwNzogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtbWdtdC5sb10g
+RXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtl
+OiAqKiogW01ha2VmaWxlOjQyMTU6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMKVGVzdDogU2NhbkJ1aWxkIC0gRkFJTApEZXNjOiBSdW4gU2NhbiBCdWlsZApPdXRw
+dXQ6CgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJlZC9tZ210LmM6MjE6Ci4vbGliL2Js
+dWV0b290aC9tZ210Lmg6MTE1MDoyMTogZXJyb3I6IGV4cGVjdGVkIOKAmDrigJksIOKAmCzigJks
+IOKAmDvigJksIOKAmH3igJkgb3Ig4oCYX19hdHRyaWJ1dGVfX+KAmSBiZWZvcmUg4oCYX19jb3Vu
+dGVkX2J54oCZCiAxMTUwIHwgIHVpbnQ4X3QgdGx2X2RhdGFbXSBfX2NvdW50ZWRfYnkodGx2X2Nv
+dW50KTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgptYWtlWzFdOiAq
+KiogW01ha2VmaWxlOjc3MDc6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLW1nbXQu
+bG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
+bWFrZTogKioqIFtNYWtlZmlsZTo0MjE1OiBhbGxdIEVycm9yIDIKCgpodHRwczovL2dpdGh1Yi5j
+b20vYmx1ZXovYmx1ZXovcHVsbC8yNDE4CgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-  Log Message:
-  -----------
-  mgmt: Add Security Level Changed event
-
-This provides a TLV list of values related to the security level of
-the connection to a remote device.
-
-Currently Security Level and Encryption type are implemented.
-
-
-  Commit: 748645f56595e6d5ba65250bc305c38cd9f2147e
-      https://github.com/bluez/bluez/commit/748645f56595e6d5ba65250bc305c=
-38cd9f2147e
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
-
-  Changed paths:
-    M tools/mgmt-tester.c
-
-  Log Message:
-  -----------
-  mgmt-tester: Add Security Level Changed event tests
-
-Test that MGMT_EV_SECURITY_LEVEL_CHANGED is correctly received during
-BREDR and LE secured connection.
-
-Assisted-by: GPT:GPT-5.3-Codex
-
-
-  Commit: 30e6a91fad2e004b0c702fff88489ca0ec3278ed
-      https://github.com/bluez/bluez/commit/30e6a91fad2e004b0c702fff88489=
-ca0ec3278ed
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add support for Mgmt Security Level changed event
-
-@ MGMT Event: Security Level Changed (0x0034) plen 16
-        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
-        Count: 2
-        Security Level: No security (0x00000000)
-        Encryption Type: No encryption (0x00000000)
-
-
-  Commit: 4587e291ed8831f3789113d5e787a8bf517402e2
-      https://github.com/bluez/bluez/commit/4587e291ed8831f3789113d5e787a=
-8bf517402e2
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
-
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
-    M src/device.h
-
-  Log Message:
-  -----------
-  device: Add SecurityLevel properties to org.bluez.Device1
-
-This uses the new MGMT_EV_SECURITY_LEVEL_CHANGED event.
-
-It will be used by btpclient to reduce test time.
-
-
-  Commit: 7ecdc6def676ee1873db5e92d33a58730d409666
-      https://github.com/bluez/bluez/commit/7ecdc6def676ee1873db5e92d33a5=
-8730d409666
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
-
-  Changed paths:
-    M doc/org.bluez.Device.rst
-
-  Log Message:
-  -----------
-  org.bluez.Device: Add Security Level related properties
-
-This adds the SecurityLevel and EncryptionType properties which can be
-used by clients to get the security level and encryption type in use
-for a connection.
-
-
-  Commit: 0e5f562720b3be4d5e860c85416208c5bc1d8a28
-      https://github.com/bluez/bluez/commit/0e5f562720b3be4d5e860c8541620=
-8c5bc1d8a28
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-08-20 (Thu, 20 Aug 2026)
-
-  Changed paths:
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Display SecurityLevel in device info
-
-
-Compare: https://github.com/bluez/bluez/compare/2cfa331b41fb%5E...0e5f562=
-720b3
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============0582841581371817860==--
