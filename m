@@ -1,79 +1,120 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE08D1A262D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 05:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BC33876C1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 06:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787205029; cv=none; b=pF2fXIKakgqRWlZ9nSb5G4u/pXnsZMoe+V1OK884DZaWxcmzGL9jWcZspd87YawNLwECGdW+v1ztcXtld01wxcAQ/saeY2gH8LqbzRcqyLpsqxC80hETqAK3WPcGIDLLtpAswA7VeMkT/Gx2skxHaIbIzIwmRjhuM/ZmKVROF/A=
+	t=1787207309; cv=none; b=Fr1TkaDNKfSibybxO8lkW1xw5Mu6XQZRx6WRbU7HIdEjGrh539OSGFQOre5tobytkYNKKjFEJRqU2DTP+43DlTEjXhIesEgpY1nvOHCTsz+NYHKvzXjU5qV1MNDs7DtPEJWzd0EWSbOyTOGLYXhwAqdMEcSOkRUXaq85qmaIgL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787205029; c=relaxed/simple;
-	bh=SrDfhQld1gp+PyOx3kqShLivDVGdANLBp3+Gbxxt21w=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=QnMZoRBwdfzau8DTYJQLTWt9bof2oAsV+n7rjIjAS99MBx4XhmVrf0bzL/cV8CwyD9Tk4GcNUlTdDwi1VpX7EtQsRwUTPuvjIn7jintF13Y2rSrdsVpjEAEbtsLMMLC79ESSLZJ9s/W8uuwajSdhhVOEKGAxWiYByJHRqY9fv5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 05a43ea09c5b11f19a56ed5b684f684d-20260820
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:ef34b480-d21b-4a4f-b0a0-cf263be49577,IP:0,U
-	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:25
-X-CID-META: VersionHash:7db8b62,CLOUDID:f5d72bbae355e3a5c883c4f5d93f4c6c,BulkI
-	D:nil,BulkQuantity:0,SF:102|850|865|898,TC:nil,Content:0|15|50,EDM:5,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 05a43ea09c5b11f19a56ed5b684f684d-20260820
-X-User: lijun01@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lijun01@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1157139058; Thu, 20 Aug 2026 13:50:17 +0800
-From: Li Jun <lijun01@kylinos.cn>
-To: lijun01@kylinos.cn,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
-Date: Thu, 20 Aug 2026 13:50:03 +0800
-Message-Id: <20260820055003.1204188-1-lijun01@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1787207309; c=relaxed/simple;
+	bh=mIW7v9gDEhqJxRZLYltYPyztv8dvW/2Tqz1g3PnlmHc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=BukByVA3+6k+DDCLSFPxyX5ghHg9cVH9CVqzSEEI0vDo7RUuXApeXX+R80Cz/gMFFMnG+sUUsWcHgoYu3VzTVdtddUfDHDIk3EH9vjPJxcuskW1B5z/tVRhxYQmScB817+0GxUnlKoFjQEYu1zJq4qJRglqQB9UaDj8B1oNJSsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YfPA0YP1; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfPA0YP1"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cca0c5799eso15715425ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 23:28:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787207307; x=1787812107; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=4aqqRtduBTaqMeFcuuaAkaXxtsmd+aEbWq5R5ebNq9s=;
+        b=YfPA0YP1/UzGlIPgOn/oOsZ3orzY/lRbO+jNNpZxfRaWUY9t671EgT7jPrmA9JmeAK
+         GX9Pw7hdv5MwFRqx7nF1e6NTFksgsG/ZlTEJJmUkeN8tAyYDcZZu3zTEPzQq+kyBahSx
+         QzgoEAaZhD+6DVXAi66O6pdkwHc8AWcflvJsj4LvtOx3sbXnqRn/BYPEzJd448SN4lTv
+         aXzCk7+gzrw4kTUW5YGe/mUi6DI16N2qsPFA1Iw4e18LXDDekyfxSfXEL+J5R5FiXjD1
+         aOmPO/mRZ+iaBW0zTMsi2hpJ64QftwZzUgAmCbWt9caQiLDsguX3XUM5Xs5nyiqbLmIZ
+         wmZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787207307; x=1787812107;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4aqqRtduBTaqMeFcuuaAkaXxtsmd+aEbWq5R5ebNq9s=;
+        b=QoQWG5p4/hkKpVv6qzO0xAuR+Vax56R3RBAlfh/Br98lQTeGHa3XRO5Xb/RkkjWCHo
+         /1nNBV/qzDtoU7KC9ezSYVkhv5PMxn8x+5qOC/S0jAeF7RiH0uxeobZ6DtWH5AbQZPH8
+         8RY56ttwAf2WdUww6Xrfdd/s3KCziZauiUIGNXcVztntDIeCTigJCrhzQcpEEFt8FsVQ
+         Zqt8woIUH01k5RvtN6FfN1jKI4zpI3kgKngdVyvazM9a1Pzo3zhTjP5kCV8+AZM1FL25
+         5W1sSxitRaKV9HLtPl4uy0dFovQi4Xb1zRZ+6qXYxsAqs72O2Ttn0lO6E6X2zygnSkdZ
+         Y+sw==
+X-Gm-Message-State: AFuF++lwOjg63eMJimK/zEX6SsPQMDbrlCEdrFXUUhesACHRgClyxc3v
+	0mHxLcoHfglGoypI9WrVUcafaSSmdGaheM49PK01GBw1zWaUKzwtQ5vJGOtebw==
+X-Gm-Gg: AR+sD12LAwCbv1kUaJCAeJToGipaHFBNwtnIccU+EtSSDZsv3U6NTwGoEa5/Axg7clM
+	ybdVXI7VbfWxnebJuc6OBu/e/DVFWey3jHBbC8cWqIpFPG3zj4MXDYM7J7oGYvU27m5fhh03VkZ
+	+nubvTXv/E+som6/PW/ZTxqPIdvqsm9c6D5CZfohfu5Q6sv0gMHtENI+WKL/edm1Bhip6nnQFtz
+	dJ8r0h6wYwm+CbvhBUMRiBOpjeT8Xx+qSG5AbGECQfPej9Nwt84rhnrBOlBINpoVsxrFbGeQ74M
+	6HSfWIhn8KNlUiH3cs1LFyPDvqxKexfVzwIQ4yAdwLWpHoGEtkks0PTADq9safFdjdDS4bSFI1G
+	Es8DqCnY8YscLu3yRZZqWGw7PgY503cJWLrMFiDbNaqy3Ndu/+REuKA0wFMLASlA/PZ5SSLaS8q
+	Xey9b7FGQFJt61crCK3q83L2iwUBRK5TYNRTh7NPwi/mKitBECsYY8pf6ejgtJbe5oWA==
+X-Received: by 2002:a17:90b:55c6:b0:38e:5c6:4db9 with SMTP id 98e67ed59e1d1-395813f758amr20160261a91.11.1787207307247;
+        Wed, 19 Aug 2026 23:28:27 -0700 (PDT)
+Received: from [172.17.0.2] ([4.242.193.234])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327c3fc6675sm18616986eec.13.2026.08.19.23.28.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 23:28:26 -0700 (PDT)
+Message-ID: <6a869e8a.3865fcc3.3a8777.0dc5@mx.google.com>
+Date: Wed, 19 Aug 2026 23:28:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6798762950975646796=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lijun01@kylinos.cn
+Subject: RE: [v5] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
+In-Reply-To: <20260820055003.1204188-1-lijun01@kylinos.cn>
+References: <20260820055003.1204188-1-lijun01@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-use SIMPLE_DEV_PM_OPS for btmrvl_sdio_pm_ops, and add the value of
-'.freeze, .thaw, .poweroff, .restore'. if these address are null,
-may cause error in s4.
+--===============6798762950975646796==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Li Jun <lijun01@kylinos.cn>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148824
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.49 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.08 seconds
+GitLint                       PASS      0.21 seconds
+SubjectPrefix                 PASS      0.74 seconds
+BuildKernel                   PASS      20.38 seconds
+CheckAllWarning               PASS      22.64 seconds
+CheckSparse                   PASS      22.04 seconds
+BuildKernel32                 PASS      19.68 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      365.46 seconds
+IncrementalBuild              PASS      19.02 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/622
+
 ---
- drivers/bluetooth/btmrvl_sdio.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index b91fc63bc9fe..86c8a972abd8 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1726,10 +1726,7 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	return 0;
- }
- 
--static const struct dev_pm_ops btmrvl_sdio_pm_ops = {
--	.suspend	= btmrvl_sdio_suspend,
--	.resume		= btmrvl_sdio_resume,
--};
-+static SIMPLE_DEV_PM_OPS(btmrvl_sdio_pm_ops, btmrvl_sdio_suspend, btmrvl_sdio_resume);
- 
- static struct sdio_driver bt_mrvl_sdio = {
- 	.name		= "btmrvl_sdio",
--- 
-2.25.1
 
+--===============6798762950975646796==--
