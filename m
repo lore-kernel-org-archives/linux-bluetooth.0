@@ -1,186 +1,138 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C42547ECFB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8079847F77A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787248355; cv=pass; b=G9VciRrrr21hUe0bEd8ZxuCiOQOpdDVhL7UH54iu6BlfX1TFwCAlDFeTBjApbFK//4hf1/cCgoOyTjgsSB3OXCVDkciXkdufsZV+5K1+Cb+WEep6uQzImvWhSdUnHz0FNZIv2Of7imlc5vce4d6TNIizsG/CECYCY4OH1oDGtwQ=
+	t=1787248473; cv=pass; b=Ueuxc7jBpWZKARIuLnPiFynIcKt3Cjv52GGvmt2cKYA7rjdE+nB5895dHkkNRvC5O7K8DO+Otk+3KC3YXi0qSzYK9/Od82vsvIsxcg3al39cewEBWyf4kGrTgOctURZ8FAf/V/LOID0zBzxvoTF4aWJpbyrvm7Ga8wj0zp5hyPU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787248355; c=relaxed/simple;
-	bh=F+lriP63UGpT0RnCU0Bf5LtqnK68x2rsQLoxMjSXyGY=;
+	s=arc-20240116; t=1787248473; c=relaxed/simple;
+	bh=4C2AsDiHnUhkefLL9D//Fdv6uqoUR0A71Tlt7G/mBxY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T0Y3YRxvag9QDkVXgy3ZHqXr4u4iDDRR4kC8+8Z/TavEJpzG/hLmpUnKXRlye9xb1t96zc2JVmnTVZg7QVizuB+llBVhG9MjKQW08OSRZd8djBNNI6GhN3eCnDjnwTNvemp8EiTiiw3HKWaQlX3lsJc6/hhud3829LpxwijxVnQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=DoAqXxbl; arc=pass smtp.client-ip=209.85.128.176
+	 To:Cc:Content-Type; b=I0vsxgY+QsitioROym4cWuBOdOEAtbwwoQC7EeJMDUR2VCJ93Kj9zeNrl1qPagoASMrvzryioibnqnlSvjVYxgJYxLhVxQ0zQItxWkoK80SKUJRZM0F0L0Z8e7vDQ+ovJAEwhF66LPDXvGopH8BChV+yCmdUqtRO1nt5JSC9y+8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=MFDko0KX; arc=pass smtp.client-ip=74.125.224.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="DoAqXxbl"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-836cde02992so2297477b3.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:52:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787248352; cv=none;
+	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="MFDko0KX"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-66c7e3a2332so59738d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:54:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787248470; cv=none;
         d=google.com; s=arc-20260327;
-        b=T2PaL2in5Vlpwdq3lyWzcC3t9olAP0Pout5jRuTMTz3OzeCD2Lk6xVnRCa1lY9qsSC
-         SUZ39ZhoXY89oGA29CMTzSeXhBrrM9O0RWm9ettheXtoHU+r+8LgaTn978UsYQrdEpvu
-         Le2+/ivi+0pytyaoc/faN2Bpt/aOV4I59mbsWGCC80gMAv81kSJ8I2eFdPP/pufzgwid
-         uqqeEDJv1ypQGtXLOl1iAObLVnM9Odn28gnf9fLtl5Et5M93/vtoju0elP4rp4+H/BS1
-         F1adPw2mK3Zcm8W3pYFkgXzYt37gFjiMaPU4zKztgJ2z3sNXvbUkMmoLfEiKnzQmaU56
-         GKgA==
+        b=X17Ac/2KKLi1BowQLS+QjfEHhx9s8BtpUcb0KhjcN//mthO/YnKD3km8oHVWsqEBqM
+         gRzv9/yJcFzL2O7ADfF/ijQxRHYCaeO0zOkp6tABrL12QHN+8Y1u4HZP+eZEZWtzEjdC
+         SwU47Ev5ENkLz7fIX6DS5hyjjVs5bGDvAZu+/dYTMe61vBxbV+fGMQfnS0Hb4AWA87Ky
+         sgBpwtOW46S/2Zd/IUupPiAst+ZdT5EwFmme0m8Izy4+5Wfiwoz/yKUhpxMqDvki1KUw
+         8fGkdYelQaGzjN1pbrH7aqy1s2xalmSXt+nMPafBAKTOu46SkCaao02QULJtMufn+m+O
+         Z1uA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=VG98eHCypGPFRnDp4s+5BVnx7ftuu/kh9EWoKuRUhjk=;
-        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
-        b=PouaPLrHT89tOL5hjjAd+BZe/sniHOeYaEgMxsVWp/l2L11wXBToKav3iXYy5OEjK3
-         ZS/F3JJqvT5FxpHBK4+PDNxBnFBmHpyJHkX7yoYLPZd2zsH1AUaScxems6RxmrAodhIC
-         mRP7sE4XHo8wn43dYroH00P7r8kCHBU9SIBQy3bDQ6jXhUqWye3Cw8DiWg0bXGudmyNT
-         l0j9CJRFy9EDfB1jIUVec42YDIDy37WQtyUfNFIKajeoy0HAkhkgzf63cWCntNO9UmOn
-         k+QFlf0IklW1FsDrfwQ/HdGd6g4+RtA9DC0232qn6hoGio7hn2Z1++KvYzdAXJzF6uTF
-         t2CQ==;
+        bh=TTaF1U/A1JDPbV3gmZWZ1HzKd1kjG6qRrzl0W5o2QNU=;
+        fh=v4Z3N2Htbr8NtGqMLkQjkIE/EbeUcf6lhEWEAm07n3g=;
+        b=j7U5h3gc9ZJQiBoEiCyH+gp4GrC0tYPzVlFQdu/nROMn824KOh+fqxDBZvrpnsPeyS
+         LgnaSk9dRnLjGPOwPU2hKmZRGEukiAdFxZw4/gSpwdd9i1Bu7wVSXLwONievUDE4tgLG
+         sqLZEG91r8Lv+JdS2hWPc/1fDgkJ9uEL7PR2SlmefDkobSwrDpA52nPX2BMODgjC9OZj
+         1ty3rc3RLew+02GRDx6fBen4iKy/kvCCSvywIrw+GviNrlm/mhodqCylPBlYwk70RQrP
+         zRs83oxNraSvxxF7+jxro9SpHwYm8AbWASSVLCJi0+VFzcwWrfUkimGhRmsyFkJbLafe
+         pOlQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=irregular.at; s=google; t=1787248352; x=1787853152; darn=vger.kernel.org;
+        d=irregular.at; s=google; t=1787248470; x=1787853270; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=VG98eHCypGPFRnDp4s+5BVnx7ftuu/kh9EWoKuRUhjk=;
-        b=DoAqXxbl8DJw/ByAnwUEh67O247W4mP51M/YnuQmjzbfeJgs3x6aY6U0e8GGM5xpCl
-         iG3+kt3Ovuf2XnI3PkQcayaMAKVGw8HxPoMvuLfiK5UtHcBTWm5MtHFFIB/BPhKXtOn4
-         fwNEqJqdevTSkNmS0D6ehsegcYklauEWYCaNw=
+        bh=TTaF1U/A1JDPbV3gmZWZ1HzKd1kjG6qRrzl0W5o2QNU=;
+        b=MFDko0KXvKewEU5kliA3fHlsgn4xMkVi+2bOhcE4Zu2juohbzk4BwVB8oX/95TQ9w/
+         S07W+bSbOH5HYKjKEFR11TIBxXDbfAl7WK39YdLT91w7UAe4OwGEiWF8jV+ATKe/kdaQ
+         wYLz55+XmfeY9vXOVmX9AuovKhshU+SSFxrcw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787248352; x=1787853152;
+        d=1e100.net; s=20251104; t=1787248470; x=1787853270;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=VG98eHCypGPFRnDp4s+5BVnx7ftuu/kh9EWoKuRUhjk=;
-        b=Dr2uatJdzBtK2HMAPqy7/VFS4tLD2B9jq7TDeQvFwnkt0xMK6KFCTyvyk3vEUM6D8+
-         EX+WyslFF3LJAhY7dPp72H6SJHPEznfjy2XZeZnx3auolGsv4mzUcPPkMmD6Gr4czx7p
-         XHbPQVrev9H+Nq1IAEt6OoGl+2GRIUkDMohSEvQRxDhuXZwDERKKhP40V9kOSkFY+w/O
-         22dP0Vm1edBDpK0RaUPVJyPeFv3DL8tr0G+LmMEfEFTms0tOGYMSk3AGlteuciRiuZVW
-         xIBr3ZSB99GGOwJDm2qEn5+1SqZoDXYFp5jwQ7o+lm/SsRMYrgPKeQRlXZ1+0GTFkLUa
-         sRlA==
-X-Gm-Message-State: AFuF++mi9vyeVpIg97SaMczREdBs3Hgbsyydfp2s5G+5LiCcvqp7vGd/
-	upLiCLfOFl7qjcu9/7HGncTICynoUIFAkKVi8IRBLcZiPJD12zZZ2CHqctUdNYotSIMgV+ROdXp
-	8uPh7/IjNBhzUwgkQEfvjF3uPnGTBfq6JQ0cetdDQoA==
-X-Gm-Gg: AR+sD12smsx0vCVLxYsvNKLjjSFB9b58+B+DOtlEns8UpVrEvF6JQkGMRMaCfga/BW+
-	NfD0cNwaY5+lOU/u0vNePbl8l+L4ADKmnDVC/UlUBsp5lEkypPkJrIZwz51qHWzEZBhcA+fVfwP
-	KaJFAmo6Fp/uWMvD/9s0PamQWuwjNYrmQWf6kCMGo8kDVEOpQTZGCfnzGuBPmUVQNT/F87wVSAX
-	b7bK+Fs1Mdj4wRqcJkRqfZpAYlzn7L24EG4kY4W8Prtw7QEVWDRmQU318X5fqsbkE+a+ObkBZ2B
-	acmVVB50B0mVwqdQogg9Xtgg/qnYAhrrUjEeKjh8os7wpjbRpP3R1c8PhKhWiEOJ+tGhGNhwI+D
-	JoGqud+d9b0eZAR277VIAgeNM4dmqF3MjDtFaVJTSijp8KZ+/Cwzm5aPijKnnYHJf9aqykbUk4H
-	Q7F0o4CwjUjLvK4x9yw3XI
-X-Received: by 2002:a05:690c:e1d6:10b0:836:e0bf:e86e with SMTP id
- 00721157ae682-849f3dc1068mr437267b3.13.1787248352314; Thu, 20 Aug 2026
- 10:52:32 -0700 (PDT)
+        bh=TTaF1U/A1JDPbV3gmZWZ1HzKd1kjG6qRrzl0W5o2QNU=;
+        b=F76IK0ufE45boUIMytgrq/bM4yIgMP2gExeDSYP/3PpXsipr4MoCEHRn67qI1JDmfJ
+         Z50unbLz426lfoQQ5JB+ge4DWV3MAAyYb8xYNwb3yoG4Wp6R6UfN2+lLvrzm1Q+qb1mg
+         7gdI8L0j4wm5v1b0gh/zcTlbnVZHk/Qp92cYA9IhGVRuPP9iFGuuZKKa85C+aNUOO69U
+         V5bM6bFG7eNcGahYJsy/Q6jiuYYjH1w5IOAHVr1w0l0A5pYi/PS23OqRIwpE2TofW3an
+         ++EWWKGI8QXo6vd/BLS7WgBeC6sbuPqYTSA+mRfgcrrJgHO4gB9EZrOXLxg6zCQF6XSv
+         O+vA==
+X-Gm-Message-State: AFuF++kT9S0nOsnPhjl+zZNq3rQrr7BIzQol1429yuIaTaxk5/J+FeCv
+	sg5hNWPSMIvj8NGTVca6s+g9Rg2TJ1d4UF6cQr0uzSfH82lhyDNzzSi/g9Sk/ChRxgJxjjuTdz/
+	o9Y4n/TQYQcotSQTbjVId0V5JRHOvvZrSU1sYHF5uPQ==
+X-Gm-Gg: AR+sD11h266d//3j8OGJYyQY+XXzdv3HBGo/6kNHZwPblZPc7HXIwC6w5Wb4R0oOsA3
+	AtGiDk8qbo4u2WVroMNvHLlyf5loDLubCzFfjnW9quljmJkJr8d7ecKS5orLm4A6TSrRcRjiQ2F
+	2X5ccpCsWclETLwW0WXsq40VEeymZ1aYuQpZ9rXorwKKtyIzxzihWrCBemQ1DeH9JQVsShkGY6X
+	P/Q0FEgTnnuDJ+1jG3J2hiJD4MtkeYF90xZc43MCM+Wac+HaX1xluqYz84t4bhH/0ZYZ5PhuxgZ
+	x6n+eUuPqEtg+k2MXTVa89C/ZsOtVkzFB4vFP5VoaTceSAYP9fRKBrC69pxfcGOybaQw/KChR1l
+	tUDwNh+7cpozbMoo8JGBt28AethnzXc7bzZFiNlgXLUzkvvsqxotTzIKnE0KT9ACBBrw779yHzS
+	lXjlHlb7WYr/ToIn/CmQQ2
+X-Received: by 2002:a53:ec88:0:b0:66c:a828:abc3 with SMTP id
+ 956f58d0204a3-66ce49d30a6mr169365d50.8.1787248470349; Thu, 20 Aug 2026
+ 10:54:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260819223144.82045-1-m.kurz@irregular.at> <4131b2bc92a81467d11ce8bdf8748ace7e146514.camel@hadess.net>
-In-Reply-To: <4131b2bc92a81467d11ce8bdf8748ace7e146514.camel@hadess.net>
+References: <20260819223144.82045-1-m.kurz@irregular.at> <CABBYNZ+4uMBiTcmTa88xKPg-454gOQXqnhvgq49DbjGYM6f2zQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+4uMBiTcmTa88xKPg-454gOQXqnhvgq49DbjGYM6f2zQ@mail.gmail.com>
 From: Matthias Kurz <m.kurz@irregular.at>
-Date: Thu, 20 Aug 2026 19:52:20 +0200
-X-Gm-Features: AcwNN1UbgQbVY_dhW9JwVkZPofHB2iMUagdJNxTGRWiUW62YNK8vGt7bqlYc-l8
-Message-ID: <CAO=2mx4Vaj2E=Kzf7MY=SeOBvdApmggL9kEyudein2WeE1xMzg@mail.gmail.com>
+Date: Thu, 20 Aug 2026 19:54:18 +0200
+X-Gm-Features: AcwNN1XjOv4PcUHUR0L5u0iPIoW-k3kTQzqGZL6D4Zum-y-8jX9e5RoBqztCm-o
+Message-ID: <CAO=2mx7FTdWXtjxFCZSsx-nPTczgs6ifNqHr_w2+VG6XvvO_tQ@mail.gmail.com>
 Subject: Re: [PATCH BlueZ 0/4] Add component batteries and Fast Pair Message Stream
-To: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Bastien,
+Hi Luiz,
 
-Thanks for the review.
+Thanks for pointing this out. The cover letter did not make the
+transport and protocol sources sufficiently clear.
 
-Existing UPower releases continue to use org.bluez.Battery1 on the
-Device1 object path. This series does not change that aggregate object's
-API or behaviour. The component objects and their new properties are
-experimental.
+The general Fast Pair Message Stream specification defines two supported
+implementations:
 
-With experimental BlueZ enabled, current UPower does not understand the
-child Battery1 objects. It may log a coldplug warning because it expects
-Device1 on the same path, and then ignores that component. The existing
-aggregate battery remains available, so this does not regress the
-currently displayed value.
+* RFCOMM, using the fixed endpoint UUID
+  df21fe2c-2515-4fdb-8886-f12c4d67927c
+* L2CAP, using the GATT PSM characteristic
 
-I have working UPower support for the component objects here:
+https://developers.google.com/nearby/fast-pair/specifications/extensions/messagestream
 
-https://gitlab.freedesktop.org/mkurz/upower/-/commits/fastpair-multi-battery
+The PSM characteristic page you linked documents the L2CAP variant. This
+series currently implements only the RFCOMM variant. Pixel Buds Pro
+advertise the fixed UUID in their SDP records, from which the code obtains
+the RFCOMM channel. That transport was also verified against the real
+device.
 
-The branch is currently based on:
+The battery message itself is defined by the Device Information
+extension:
 
-https://gitlab.freedesktop.org/upower/upower/-/merge_requests/337
+https://developers.google.com/nearby/fast-pair/specifications/extensions/deviceinformation
 
-It creates one UPower device for every component, handles optional and
-invalidated Percentage and Charging properties, and falls back to the
-aggregate battery when no components are present. It extends UPower's
-python-dbusmock-based BlueZ integration tests. I have not opened an
-UPower MR yet while the BlueZ API is still under review.
+It defines message group 0x03, Battery updated code 0x03, and says that
+the three additional-data bytes are identical to bytes s+2, s+3 and s+4
+from Battery Notification. It also gives the complete example:
 
-The object layout observed with Pixel Buds Pro was, with the address
-anonymised:
+  0x0303000357417F
 
-  /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/battery_left
-  /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/battery_right
-  /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/battery_case
+The individual battery-byte encoding comes from:
 
-Each child implements org.bluez.Battery1. A GetAll snapshot was:
+https://developers.google.com/nearby/fast-pair/specifications/extensions/batterynotification
 
-  battery_left:
-    Percentage = 92
-    Source = "Fast Pair Message Stream"
-    Device = /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF
-    Identifier = "left"
-    Charging = false
+The TWS-specific unsupported-case value is documented here:
 
-  battery_right:
-    Percentage = 90
-    Source = "Fast Pair Message Stream"
-    Device = /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF
-    Identifier = "right"
-    Charging = false
+https://developers.google.com/nearby/fast-pair/specifications/devicefeaturerequirement/devicefeaturerequirement_hearables
 
-  battery_case:
-    Source = "Fast Pair Message Stream"
-    Device = /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF
-    Identifier = "case"
-    Charging = false
-
-Percentage was absent from the case object because its reported level was
-unknown. I will include this layout in the v2 cover letter so consumers
-can reproduce it with python-dbusmock.
-
-For v2 I have also moved the Message Stream layout, battery masks,
-sentinels and component indexes into the shared header used by the C
-unit test. The Python diagnostic tool uses corresponding named
-constants.
-
-unit/test-fastpair contains seven cases covering complete, fragmented,
-coalesced/partial, zero-length and maximum-length frames, invalid input,
-and the battery decoding rules. GCC/gcov reports 100% line coverage
-(55/55 lines) and 95.83% branch-direction coverage (46/48 outcomes) for
-profiles/fastpair/message-stream.c. I also added test-fastpair to
-doc/test-coverage.txt. The complete BlueZ make check suite passes all
-40 test programs.
-
-The daemon/profile lifecycle and D-Bus integration are not fully
-unit-covered, but were exercised under ASan with real Pixel Buds Pro
-hardware.
-
-I also tested the complete path through patched BlueZ, UPower, Solid,
-PowerDevil, BlueZQt and BlueDevil. KDE Plasma's Power & Battery applet
-displayed separate left, right and case batteries, including an unknown
-case level, and the Bluetooth applet displayed all three components.
-
-The related independent KDE changes are:
-
-https://invent.kde.org/frameworks/solid/-/merge_requests/264
-https://invent.kde.org/plasma/powerdevil/-/merge_requests/666
-
-The BlueZQt and BlueDevil component-display changes remain local while
-the BlueZ component API is under review.
+I will update the v2 cover letter and patch description to cite these
+sources explicitly and state that the profile currently implements the
+RFCOMM Message Stream transport. L2CAP Message Stream support would be
+separate follow-up work.
 
 Regards,
 Matthias
