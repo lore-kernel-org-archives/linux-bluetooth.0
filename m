@@ -1,141 +1,84 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FF34156E8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D496141837D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787221621; cv=none; b=YKxbAf4sK9go/TxgJRBiW+21UID5LkIXeXd/Rc9jE702GPoB1HWHBjukq98UgDNXb3XFXO8EpvYIkfjvE49uSUkG8Mti3KEerl6pl96a4TGWgCrgTqJKXWNnsjhXuQs0xbFFtgLBnCaCHtbHfLhyR39ajW34Xoph5qvU0TUGT8w=
+	t=1787223164; cv=none; b=uggHIF1aqRWqUygOi7cJEoStHTchpfdc+9RKGWVyvi08LDC4Rhei8e9wXNfg48+A9S0JiCWEMnLQ6F53Ss+QRyeSSxl9b5NZoQKzOhHsqiBvmJ5YYHuCTnhe5COJE1vn9PNMjc81K9uOZW+cWRgIs5mVGGqBpecKix2iUl9JhQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787221621; c=relaxed/simple;
-	bh=bNyYGhR+wnOyHEBYdPTqqvrByGmVg0nlMSXkhWVQDLc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MacV3nCN54vcGHzTA73z2+Wn9f7mvvi3sr5jHsx2kJBW2FoWvnGWRjyPyuzl5Tqvdd+Lo7uILdNGsjXQtVYSKU0OX+Pn/QpoizwXl97WFuKrh+xBQ6PR3Y41O4Tdimgbba2sn1nsbKNL7jyRieNjQbUZg51k0PhkZZ3ZPIgxOlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o1Uw8FgX; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787223164; c=relaxed/simple;
+	bh=IncphVL8OLyBbILDZPJ4oATIB4PygdJLOU86z/S+Z7Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=ZuV45a4UEBLJKmVqTaDl7laO1pRQoNRcLVLyxbIw5dWPZTyj+uo0eqxGGoE6egqrLCW2yi2GhhFyo5tZ/R7p1BSAhpfw9U2G93M7XBhc6wIWKH1WFLMwo76xreSXoXnab6fngjM7M+kdnT8A2ikEjG4UmBgS6+7suxXQp1XTPAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=cHsXrJ+B; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o1Uw8FgX"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4a46a53abc9so1438852b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 03:26:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787221615; x=1787826415; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=ePxA3ogHifGGrVfnMKJIQaucOpGsgrBS6CoJRy//US8=;
-        b=o1Uw8FgXWnNcQ0M2EKHI8ID4j4N/odP784t5JrHBm2C4xRaUfOkDPgihqgbigl6hMu
-         D+rFWUcwpJ8N5OLQsHI/Rgm2jZTUoCz+Xab1t0iVlJL89RlSAKWnR5wsXmstW7/Skzh4
-         lIj0389BtNVczS1la5ohGw4AfbcK8oLlYyMhp+9H+fs8GfCIJsn0qN+A3fvf11SM2DDa
-         gPLY7aRVX+l8XrUbLehf79CbiIjgp7xPXw3UjK/lJw0TESqUs8fBgBgvdAmsIf1buM2G
-         MaZJl8dHuEQnsqVFGvYVrVpdNcPrxMbObrvAQArcAiY5Ze9vPx+VqlA537rNLxtxbNxV
-         Z/ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787221615; x=1787826415;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ePxA3ogHifGGrVfnMKJIQaucOpGsgrBS6CoJRy//US8=;
-        b=EJspACYYR3D3B5pG2aqMWRQfbojJlVi6Quw4qVwyPtEtB2RkftpjcCLYYmOH+cXEg+
-         x6S0BGDehDx40ayb88XG2Do0fq/JvNgtBP6gtK6LJ//cdT7tj8Vh3GPq20JsZaadeZZQ
-         kxbFtQ0k8c+hLw7IWTQgTGbodKF4iWsm9zWYkTPcJwyST3rO/Y/w2PWHf7GP/A6B8vI6
-         0V7dBGEq+LNj2QE2V1TnNcLoUB9ASERsOHKvXziDW+a4Va94Snk2yBXShS7vjT97Poyq
-         pQRW3fZHvWTjd1CJpizBf5hbUmS5KdiLihiNOQOqtigVUtfsWow+7SembxOW0X3bVSi/
-         Yy7g==
-X-Gm-Message-State: AOJu0Yxd9lRdcX61xKFZIQGGxQ+kF1YPBhBNMR186Vk6eYrfm/ZXT86z
-	OwDPaEsLr2uBh+HwWsmKq2mziGeG3vUxKjYpQhTw60uc08uDQKw/OVE34XEl1kaz
-X-Gm-Gg: AR+sD10JMCONLtI3hrrJwj149w0VZ5jOy2jqE6lHsnPwdaicAA+Pzc3d58ojFE447Ii
-	SAQchsRlutQ51ncC1NDpJSafN5ST11f6JHwn9mz4NCRXsLq40FsGNoVGIjRJdDdq0Bcb/kBw25k
-	sLxEM38y0PDrAj4uklBFOzFrFK5buxcWdsnwSh4v6lfV+JohlY8tHLqXspWktU/vS0Fq0iCGWkk
-	INZ7/ye1jvZmFwbjhD7v/muLbP5T+ktFSfxuOvGwI5XYRiz0eSNEjN2AH5Q8WXF4KRgOgLLAhIL
-	AIkOSdi/EaQ9vrjLxsys+2WMyBWWsI455qgKBXAfAbIshH+ajzRmchgmeNlwmUAiD+LS6dQ8o47
-	G4eHS1/eVPQ85GEzcKja746udialL1izyZPxgtQ+1TPrWtXwJDkd76TfczoMENQ2sfsCk+oFtzs
-	8o5OBL8u7om0JpWvMFPvydTlsREMCYl5Q00BhV8o+AYV36G7nj6luQyos1v7Az9bEOVjIS+DlEN
-	cURRA==
-X-Received: by 2002:a4a:ee0b:0:b0:6b0:5bd1:4722 with SMTP id 006d021491bc7-6b13c37ec75mr10497280eaf.13.1787221614801;
-        Thu, 20 Aug 2026 03:26:54 -0700 (PDT)
-Received: from [172.17.0.2] ([172.171.7.122])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f43fe7029dsm4215155a34.2.2026.08.20.03.26.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 03:26:54 -0700 (PDT)
-Message-ID: <6a86d66e.b3d68efa.f5164.e4a3@mx.google.com>
-Date: Thu, 20 Aug 2026 03:26:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1652337916274982614=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="cHsXrJ+B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1787223161;
+	bh=IncphVL8OLyBbILDZPJ4oATIB4PygdJLOU86z/S+Z7Q=;
+	h=From:To:Subject:Date:From;
+	b=cHsXrJ+BdP9rsk9kWz+lQTBAoD7eNuR/F0lyYSHhf7uQzjlBdaF7pq3bTQSWge7As
+	 kKquzWxT01pOQdaqecyV3WZL759yLDwr/41sobHpgknoh8T57d6P8VEKqyrqcM3OLb
+	 BLv+eeAm1Wj4KoE3ITl6iS5Sr/ZGJNvZyvcbrhWVBHuwxxocOFlS3/JW5vfctqCgVW
+	 x2ydjIjUoi249NvWYygZWvth6HP9lH8mi1TUHt6g95hCtHUwHcxZEPPtft3ZYH+0WB
+	 kA1uZ4kh412grh74O9TS1ytM27Rn27HPuWzrVL//ogi6ImRFI0kTY3dpqv2rOSzL1t
+	 IxHL271XybT4g==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E849D17E085C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 12:52:40 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 0/6] mgmt/device: report link security level to D-Bus clients
+Date: Thu, 20 Aug 2026 12:52:28 +0200
+Message-ID: <20260820105235.1190318-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [BlueZ] bluetooth.service: Fix ConfigurationDirectory warning
-In-Reply-To: <20260820094503.1779779-1-hadess@hadess.net>
-References: <20260820094503.1779779-1-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============1652337916274982614==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series adds connection security-level reporting.
+The new MGMT_EV_SECURITY_LEVEL_CHANGED event [1] is documented and
+org.bluez.Device1 is updates with new experimental read-only properties
+SecurityLevel and EncryptionType.
+Those properties can be displayed using "bluetoothctl info".
 
-This is automated email and please do not reply to this email!
+This is intended to let clients (including test tooling such as btpclient)
+observe effective link security changes.
 
-Dear submitter,
+[1] https://lore.kernel.org/all/20260805132203.176213-1-frederic.danis@collabora.com/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148981
+Frédéric Danis (6):
+  mgmt: Add Security Level Changed event
+  mgmt-tester: Add Security Level Changed event tests
+  monitor: Add support for Mgmt Security Level changed event
+  device: Add SecurityLevel properties to org.bluez.Device1
+  org.bluez.Device: Add Security Level related properties
+  client: Display SecurityLevel in device info
 
----Test result---
+ client/main.c            |   2 +
+ doc/mgmt-protocol.rst    |  45 +++++++++++++
+ doc/org.bluez.Device.rst |  36 +++++++++++
+ lib/bluetooth/mgmt.h     |  15 +++++
+ monitor/packet.c         | 117 ++++++++++++++++++++++++++++++++++
+ src/adapter.c            |  33 ++++++++++
+ src/device.c             |  84 +++++++++++++++++++++++++
+ src/device.h             |   3 +
+ tools/mgmt-tester.c      | 133 +++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 468 insertions(+)
 
-Test Summary:
-CheckPatch                    FAIL      0.35 seconds
-GitLint                       FAIL      0.23 seconds
-BuildEll                      PASS      13.40 seconds
-BluezMake                     PASS      486.30 seconds
-CheckSmatch                   PASS      175.43 seconds
-bluezmakeextell               PASS      61.93 seconds
-IncrementalBuild              PASS      467.76 seconds
-ScanBuild                     PASS      546.90 seconds
+-- 
+2.43.0
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ] bluetooth.service: Fix ConfigurationDirectory warning
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#52: 
-systemd[8067]: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
-
-/github/workspace/src/patch/14758855.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14758855.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] bluetooth.service: Fix ConfigurationDirectory warning
-
-5: B1 Line exceeds max length (142>80): "systemd[8067]: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)"
-
-
-https://github.com/bluez/bluez/pull/2417
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1652337916274982614==--
