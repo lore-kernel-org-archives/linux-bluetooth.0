@@ -1,181 +1,110 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6A438D3FC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1429539B97F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787250668; cv=none; b=MBo8hVG3SBCu1sm7Np1sIRf2eLJ7OPr+wzdVWz+Fyr850gmJMJx2p/4Y+ValL3YJY+xhhdVEtbMj8v01K3yTSz3J0+912XM1VuE8k8oc/dtKenWnwi65x3gmROn9mqXt2l/ZWi0NYZ0snc6+OMLv7klYtzDfMkEBZHzc9eswDtU=
+	t=1787252240; cv=none; b=cpANt3AqLH1qOOHV4bZ35s3sicysxQmI42IqfngtrDlzVdZwMwJPZEG1Os1KsWXB5feFZgiXMXUzyQnLHZ2ZfsGSHLXtWhtfW7+YS5AqbTUHVv3bEfPQz39GxDp/kNYb869+wul8nFDtrZD2vh7Xx2U8D/vK+0paUMo27t4BQpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787250668; c=relaxed/simple;
-	bh=GS8iWW3KOYyueC9Xc0634j24G6thBfU/TCzgmHWE6Wo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uj0EyEaojf0XSHh/BugMgtYGcj14yZmxYHRNcL/V6xHELXS0DsieDUEtiG78G4TifBwV7R2QiwZwsAuTD6PVpQNro8R/wK5IaqT9siJC+Lb5LgUUgHPMrv17QdlobWFCVAJZP0GbD2HPgPtBwhOjP5lcc4DpdLYh8bvEZNkPEyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s7bkV+aI; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1787252240; c=relaxed/simple;
+	bh=2ooWq9yjg+xtQTD0Uk4qNycfYcJdITPAIBwYvQwsGmA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rATbO+BenYrtHhKW0N+kCZgX/2cHcj87RxdYy/p3bPj1JO5tKqsmS16RQgBPj8/1sbvMSofTa9FehxhCGvdyR8B2AXok2g8nwhiYJuMCHuLusf8ZoqK8HXshocfLBhf4XQxC/P+FtJWA5nQfe2AIW33/G1mkYwsryr8J5OnCBJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJ3ZHcvP; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s7bkV+aI"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5c2dbaf828eso143907e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:31:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJ3ZHcvP"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7eb63dbd229so77284a34.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:57:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787250662; x=1787855462; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1787252236; x=1787857036; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=hShyAifQW1rgKFq0/zPmgbqhpK87cC6GpMRd+F7QsSM=;
-        b=s7bkV+aIZe1b91ekqrjnAKHKQ4uibstSlRTxFGL1egkgqHm4AV3tLyAtFDELb7W1R7
-         LmRw/uIb26jdP3//nQ0euXXx4f0cVvgOjJYBIp484rREZY/Xompx+1Dhjm0Ujn9Ms7oy
-         rUxW9xtnLg72G9VRLzGR/b+Ml+ecTNB05q0eiNkHlBT+Pm6dGmSFTX98ddBzyNBX7sec
-         AK1MAw/OFd5360eFG+guoF2JkUwaC9I4QJMQ8YjnPsuNDc6ojKrOs0JSuJY5U9ija19o
-         0YA5kZ6+U5ez2wV8HcB6hTxSvpcKSKyKk4EbjOiIKor9XLlsjSgIUz3K5/vPfDTIWhWF
-         YFFw==
+        bh=xP4zX0mSR8oB6OTOUBIF7CRqxGARFl4sma/WgXPuyt0=;
+        b=YJ3ZHcvPRhSW/AkRAXgKugZT3NmJL8f9Af+GScwhLcOxe30/rTquLLeXwv5v7Orz/R
+         z14GkcU892KQWBdsBogLeNKtlwGATdp7P+Tbhw0/UUVYeGdh+p1Mm1MXA8TdK85aONqm
+         VNr6SMQihDKJ8hdljHV+m26L9dUE/d/jwvoQq6bzwRn+iMPIjEK9LC+fQHZh4zKEXxgv
+         q1KuFZf2pJTExeYLb++yzAeMYnlFxrbMpttcTHIQd/I6WfO/rZ869Ky7in5ZKNGKdVhx
+         WL/1tfSc1+wka2J3Y74I6kR4DXzbGEmI8VO5/yUucPquYoweKyh7D4Vf9jBeHXrtlzI1
+         qs5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787250662; x=1787855462;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=hShyAifQW1rgKFq0/zPmgbqhpK87cC6GpMRd+F7QsSM=;
-        b=I4YG4bS3fJDe19B3qJagQqP4tAIjAcbDIJTYBlihU9D3WI03ZtfoEYvEt8qkjS64aS
-         jQPRDVMqRzpwFSCkw5z7wLDGKHRHtVWeU2S9iMT1hXTJZC0evEKPZbFqQbCUbiCBjs5f
-         uHPjgviJ/wFlQu/WcWF8tPHVTq0uK6unpq/vST9xtlSFf9fqJqXAbAAdUNHDU4r+fl9T
-         DVuQBWQJrBcUmstFXBkoY9dSgXlseqX6lNhJCl/AI7NkDuZ1UmoZu1Hfo7U5mPzqrHvd
-         GHbi3S7ZyReHhPiQcv2nS7QAUwpQRq62tPhuY4/CALhNGXMAu8nWFRoifnR0943cA12e
-         DQQw==
-X-Gm-Message-State: AFuF++lFpvEheTGyijp7u4+o9QQ8tW2hH5rYGZW047ZyvOtdngonCbMP
-	M3CUBSbqMcr8iJeckTridHJGm1tZXZOb+hSc4cDDURhZmErXc7+Plw9qMdpPj1UZ
-X-Gm-Gg: AR+sD13J9OwzMrZCEmTAGhGQUSnGRsQTeTJdi+nbVVAirw/hAag5FuSXBoEREj4OyzO
-	FVTaHKbi9v0fWK3oW2WB0OMfxAnnJdIs5Ja9il/ZeRObx+5UP16Dm0iuDCWpBIiWGD26PzkuALg
-	OZ2tEeLj3LJ0kAhFHNFyXGxrklurFP3UDvvj2LNR5A9cGdJwT4n5eQp6M46TT18sXYUY2yvdsYU
-	iqWbpH4gKZJUA9JJmYCt35WUoIoXFjhCBlV+4aqerFlgYzdIbSS1w+s66ODlIEGLug3gl1BKqiO
-	DZnJ0p2g7f8ZtXnAHlqubhAv3XGH8Cw3ZUtV2er5oRzCumqj70s87vCwHPTJfw+fvpnO+5vUOCc
-	nb8DTx2pU1flkxMOdZ+Lo+xBlFoM27ETw/OJV5bPizTcpneKe9T5BJxV6MWFfeDI2W2Fl85sDwf
-	JRomHEvFFfTfJoWXvGDj3CbN1HpTEPZQl7B8zGVwxfsawMyFmvqrJ/Y0N2rlzFxWoYEGDVwKFxx
-	8opaKdMrlpgrJ8yKVgswMaxi1HWlbGugoHdY28dN6t8Nr4UAjz2Dwg=
-X-Received: by 2002:a05:6122:17a8:b0:5bf:b5e1:f8e5 with SMTP id 71dfb90a1353d-5c5ff7128e6mr300620e0c.5.1787250662167;
-        Thu, 20 Aug 2026 11:31:02 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.31.01
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1787252236; x=1787857036;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=xP4zX0mSR8oB6OTOUBIF7CRqxGARFl4sma/WgXPuyt0=;
+        b=BB8EnWvMG+fwJ9y2S5/004XO6EPqOwRU+QjyQXo6eJA3snUwg0TdwuDfPiqrCa73H9
+         kOnmZu097Resxc6hyr899du3VYF1uRl1NBGnd7V+YVXEfqeF7P1SyIBbAgQQWYzbBUma
+         KnlIWkVBrj+5noXZRHsZd9SS3YYibbR9vCDhq4aOLPl3ZDAWEVejTXZEazkjEeWm5vqQ
+         /As+TFbj8lO1hUQG1Ljwttz4uyKTjsBipBXViIyfg0Ok1I9D4VZUw+4Kn3YvhZ80twA4
+         Jc1jG5DR5aX39s4TGfGylR2rMpXzjp8O4K8Pyj8eBRI1DBHE7sl1e01Cyt4PKwMtnMii
+         OIjA==
+X-Gm-Message-State: AOJu0Yx7Q9wFRbxI6nNAOEGuye8WBDczUwjMoi4U2YtGwMfn2uOAEirG
+	LdYC2iV1rV53rsh9Q3GzzcxaOR8XpRpIxXUzMyhEvyWlbw2PSPfJELBPyPQSMy+F
+X-Gm-Gg: AR+sD11sJHCA9w2KteLKHTZLKpZr8yaUmqKklLJatrP66fNFmVddRCXeg0yeJK6jSR9
+	I7V2H7/ceBVqKEyK1X4he7E5nd4Fns0O82i6BdAQxjBR1YNraTIx5jGg2hUr6S1vfjfILv9J/JH
+	vBlqpSg1WnudvFcuCpf+zeqj9Gx7bJe8FUS/P9OLiIpusWC+3ZkMnxDt2WTfKVZW6cNfaZFQaBv
+	ZQDVFrmMf7Ojx4YvDMXzSC3Va+csBrw3IPujx0uaAPLwAiHOtsWuLopUSzuvZlU7Uv/Y0Ya9Qf2
+	eSfhJa/3jVn3mMC04eLtDmuVygc3A2eh9Bl5lHKa8MMGLvVhPQWkE5x3sR8b16lG9Co7CXgjnVd
+	2KQjcJ45qzQm/oJ1TJhWV5bFa13Rjx706FhNjjisRNCJpv9ZAQQ9ekfi8Kp2+ZZ3Omlb0wZqiwG
+	LQ4Qr7I/mzK6N15dtH/+NISjDIx/xM+aAr71PjLQdEHJvsXiXXxwD+Q37+efqJnkrLTUgr
+X-Received: by 2002:a05:6830:6758:b0:7e9:dd46:b9f8 with SMTP id 46e09a7af769-7f44c0e6e2amr8007662a34.15.1787252235971;
+        Thu, 20 Aug 2026 11:57:15 -0700 (PDT)
+Received: from [172.17.0.2] ([52.173.237.216])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f43fe7029dsm5214799a34.2.2026.08.20.11.57.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 11:31:01 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/10] device: Rename btd_device_device_set_name to btd_device_set_name
-Date: Thu, 20 Aug 2026 14:30:36 -0400
-Message-ID: <20260820183037.2713973-10-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
-References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
+        Thu, 20 Aug 2026 11:57:15 -0700 (PDT)
+Message-ID: <6a874e0b.b3d68efa.f5164.854b@mx.google.com>
+Date: Thu, 20 Aug 2026 11:57:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2631924909045544807=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: ranging: mode validation and
+In-Reply-To: <20260820174910.559116-2-naga.akella@oss.qualcomm.com>
+References: <20260820174910.559116-2-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2631924909045544807==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The "device" was in there twice.
+This is automated email and please do not reply to this email!
 
-Assisted-by: Claude:claude-opus-5
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1149256
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+GitLint                       PASS      0.55 seconds
+BuildEll                      PASS      20.52 seconds
+BluezMake                     PASS      564.82 seconds
+CheckSmatch                   PASS      299.95 seconds
+bluezmakeextell               PASS      96.83 seconds
+IncrementalBuild              PASS      552.85 seconds
+ScanBuild                     PASS      891.92 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2420
+
 ---
- plugins/neard.c    | 2 +-
- plugins/sixaxis.c  | 2 +-
- profiles/gap/gas.c | 2 +-
- src/adapter.c      | 4 ++--
- src/device.c       | 2 +-
- src/device.h       | 2 +-
- 6 files changed, 7 insertions(+), 7 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index edfc115373ef..1633dd576747 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -629,7 +629,7 @@ static void store_params(struct btd_adapter *adapter, struct btd_device *device,
- 
- 	if (params->name) {
- 		device_store_cached_name(device, params->name);
--		btd_device_device_set_name(device, params->name);
-+		btd_device_set_name(device, params->name);
- 	}
- 
- 	if (params->services)
-diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index a04a76d394eb..fc2b2a9d0156 100644
---- a/plugins/sixaxis.c
-+++ b/plugins/sixaxis.c
-@@ -362,7 +362,7 @@ static bool setup_device(int fd, const char *sysfs_path,
- 
- 	info("sixaxis: setting up new device");
- 
--	btd_device_device_set_name(device, cp->name);
-+	btd_device_set_name(device, cp->name);
- 	btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp->version);
- 	btd_device_set_temporary(device, true);
- 
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index 5184d74e8f07..495799e641d9 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -86,7 +86,7 @@ static void read_device_name_cb(bool success, uint8_t att_ecode,
- 
- 	DBG("GAP Device Name: %s", name);
- 
--	btd_device_device_set_name(gas->device, name);
-+	btd_device_set_name(gas->device, name);
- 
- 	free(name);
- }
-diff --git a/src/adapter.c b/src/adapter.c
-index c21b3e7fbcc2..cf59db4aa5a9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7628,7 +7628,7 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
- 	name_known = device_name_known(dev);
- 
- 	if (eir_data.name && (eir_data.name_complete || !name_known))
--		btd_device_device_set_name(dev, eir_data.name);
-+		btd_device_set_name(dev, eir_data.name);
- 
- 	if (eir_data.class != 0)
- 		device_set_class(dev, eir_data.class);
-@@ -9814,7 +9814,7 @@ static void connected_callback(uint16_t index, uint16_t length,
- 
- 	if (eir_data.name && (eir_data.name_complete || !name_known)) {
- 		device_store_cached_name(device, eir_data.name);
--		btd_device_device_set_name(device, eir_data.name);
-+		btd_device_set_name(device, eir_data.name);
- 	}
- 
- 	if (eir_data.msd_list)
-diff --git a/src/device.c b/src/device.c
-index df607f718be1..9609a14f7883 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5101,7 +5101,7 @@ char *btd_device_get_storage_path(struct btd_device *device, const char *name)
- 	return strdup(filename);
- }
- 
--void btd_device_device_set_name(struct btd_device *device, const char *name)
-+void btd_device_set_name(struct btd_device *device, const char *name)
- {
- 	size_t len;
- 
-diff --git a/src/device.h b/src/device.h
-index b890f23d4642..7683be82ee3f 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -23,7 +23,7 @@ char *btd_device_get_storage_path(struct btd_device *device,
- 				const char *filename);
- 
- 
--void btd_device_device_set_name(struct btd_device *device, const char *name);
-+void btd_device_set_name(struct btd_device *device, const char *name);
- void device_store_cached_name(struct btd_device *dev, const char *name);
- void device_get_name(struct btd_device *device, char *name, size_t len);
- bool device_name_known(struct btd_device *device);
--- 
-2.54.0
 
+--===============2631924909045544807==--
