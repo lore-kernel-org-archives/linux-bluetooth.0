@@ -1,187 +1,67 @@
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA861925BC;
-	Thu, 20 Aug 2026 09:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869243F3280
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 09:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787218169; cv=none; b=ah1MP0ip3+N1kAjGuL5FKfs/8hnXleG4qfneT2k/C5NvwF+a7fkC+9xFYpe6VS/8S70KkWyCylWBsKHHJ1sXIjrSdSrxDAwhNkIrrVfhKlf9eJ0JvnbxEF0MaHTtnnb/kjDKrezSNwEF5xNWkMW2gaYzkyep/SxM+vJX2gbz8M4=
+	t=1787219122; cv=none; b=J1g2HV6TgoST5GmMhsQTfCUDcCR5MzdYz/gEzBbPbQ+3PuYIJUQ/3AwDZcFWGNPWHERWaYufu8K05zofry21C4NRFWOnQbL2LTfdWpHr8ARAIO+9Aozkg2r1Xre1xmB/A4bZnozRAHxtpdfTkKc7BqINDPigEuPRHzHeQILM7EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787218169; c=relaxed/simple;
-	bh=5OAW/MbRyB26SkAepBYiDmXaKmDLVtpi1Ln9k9M5LW0=;
-	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
-	 Content-Type; b=EadnXYo7eGnqJ1ly1HntxhFNtQvuDaFrpuCphNsaQcNFTAuj74+vBXg9N1r8GZ+HdajH6ncUqE2uIb4R2Tf7XTvGZvgbb4sUPuHDEbj4cYsqmi6rwwtcTVewLVq0Mfhw+sWCq7r7cb/lRWi3CennzFFONvdR0vU4Jp0/MgLb71g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=io96U2Kl; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="io96U2Kl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1787218110;
-	bh=5OAW/MbRyB26SkAepBYiDmXaKmDLVtpi1Ln9k9M5LW0=;
-	h=Date:From:To:Subject:Mime-Version:Message-ID;
-	b=io96U2KlUJWAiZp9IJPQRh7+QF0isWQkLyKcniPJTYclWz4LG5VkyjEalScn5M6RQ
-	 xQ/U6b6+Bb3/+sFSFRpAqB+PJFufYl60CJpEUT2mZw5zae2i/3esezBJV/qaqQkq2H
-	 vX0tisVz5OGvbtMMztlG9+sKDlBtIcCZ7RUe8qn4=
-X-QQ-mid: esmtpgz13t1787218107t5a424835
-X-QQ-Originating-IP: jfYBfIQ48XcVAZBVd81tJqu67sbuRfDp7JFuvkTK7+E=
-Received: from PEN002676 ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 20 Aug 2026 17:28:24 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 14280824102998487296
-Date: Thu, 20 Aug 2026 17:28:25 +0800
-From: =?GB2312?B?1dS98MP3?= <zhaojinming@uniontech.com>
-To: pmenzel <pmenzel@molgen.mpg.de>
-Cc: marcel <marcel@holtmann.org>, 
-	luiz.dentz <luiz.dentz@gmail.com>, 
-	kiran.k <kiran.k@intel.com>, 
-	tedd.an <tedd.an@intel.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: btintel_pcie: Fix array bounds check bugs
-References: <460316663D6D34ED+20260813103734.222955-1-zhaojinming@uniontech.com>, 
-	<1217891c-bf57-4c1a-9963-27400f60a5cd@molgen.mpg.de>
-X-Priority: 3
-X-GUID: 42395EE0-4246-4707-8D55-7E8EC24CC274
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.375[cn]
+	s=arc-20240116; t=1787219122; c=relaxed/simple;
+	bh=6CtzskXSLgZrYujMP3AlnjS4NSk0BroRQJ9VxlyHlFM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gpVSiG/Eg72i45+hLd/vvoErFyfSfaQRKj4DHVvotUKcZ+t5lMKF8kiGtww264bb/xFhZxirf+Ej3N7tHBOxFyVNAy4hPwW7Jq17j06QznQ7/QPzut8Yc36HGPJLg9Sr84cfVBIY7bZnWyH0IRBI7nlEIlyHtTdRr9kKCp0pyAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8356E3EC5A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 09:45:11 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ] bluetooth.service: Fix ConfigurationDirectory warning
+Date: Thu, 20 Aug 2026 11:44:46 +0200
+Message-ID: <20260820094503.1779779-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <29284DB938598E03+202608201728246970323@uniontech.com>
-Content-Type: text/plain;
-	charset="GB2312"
-Content-Transfer-Encoding: base64
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: N7h1OCCDntujeM9umMLCj+pWJ9X+CqptgNofImr3oEjkVefNQACIz8AB
-	sgNbzjF488ior6O8o2KqNucDPapho7Ls8cexDvRfDpggKjFvy8143pf2VROILSMkT+tYFlZ
-	Bf2lCB/a2zbAk9ZQHE+5EK1eD7UOmeBtTaYjmP6PI9Gco4ffhd32wucRf01DCet4KSvQvMR
-	8jmZ3XlZsfkl4pinZnFSTbNvTaqQD03t2STagA4bxavr2OVOcJU22LZ2oB6XOuI4ATV4myx
-	LVrSMHxmX0OGMTO57hRWZ2Cttlb1gKpjEk+39m9CyANrGGrYXKL/UXG0e8H0839sPSdh8o2
-	EQTq6j8EkbZZRJP0+SWShXRb0VnkPcqv4iqC6uSbfbxpbauewyXp7vhXBKPT2jJWVY3GMBp
-	FVeVw+fArVuyaU8stZ0PYLq82gYpiqLIDlIA66yo5uQKBs6Zv3xJBCZZu6Mtkg3A/bAZ6Q+
-	Qc+f39w6FNgdhd6UUUd+uzy/jKOxlzHYoYhFbSDe0f9SIl0dWOVsnr2uKqTGTKezYLSwchb
-	x+LhL51y22XRJTyLpbUEO47D7f6SolkcTZoG6Ss5HLaFtvWqoeptpQHnwh3DorsKXO+a9QM
-	Nk7L7/h9bkdensyHvrr+AmOMTR7H5zvhPU3GawpGbC2CZjPJHRBeKs5dFBHQv8RogBD7dIM
-	eFfbKycfcCtYax2PrPsI3TbtFG+z4pLt60vhW02I8RpLa4rFE2D4s4+88Y1Hj3om4Jh0vAQ
-	Xpgx1arLv9V14V/JiX/hgADd0qQexOIaRr8m1E8Yo3MBqmGT+lcgdybyFVov/Rwe/b8HJSb
-	pWWKsvLJLupOkZxaxaEw8mfZSaTsjKLtKYA7xHAw/LeDBlwactxkryTNOR/VVik0gi6lGVF
-	Qxc4UiAkMKaofW63Z5n13ALlQkSyrSj9jRuKIh7FK4lJkaJh58fbzyloFjp0xADsYb3JbyB
-	+JVy+BERdXpOn5Yly7ygXGxjfoqz6dARqAuTL0eVQMVnWRFrUm4XnssYrUnnrcRyGLCNkd/
-	Quf0UYo08YHVt2PNOm/VKV/wpdeyKqTenD5Q5WxZzGcU7kiy8J
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: dmFkZTEL90ZtQsHMj6WU/2i9ci8dAEJiei4S1ZWQuek8IV10oakcXLRG7OH1u6pbhTxwvMhQ8/qBWgNMikCZPD92la1B45pBIjRxpNFL5tPgTy7adBCVF6cWD6RmPFhByYd6MWqgpMtg6rA/MBYv9helMsBYr+V/XqHY/vOIHPAs4qDKN1ooMFSDEb3bD90T4ChLXuQ23/JpNPIHPY7xs8RQB3mx/wrnQFFoJIwaXVU2Y3HuQIHVn+PHNilfOPoZChYMBnDw9mtWJQe+wJuT23mWpGpU7aSJTz/2qc2LIgUqLXjYHzOGuvpTaJy9AXoMWzpoSVjNYmO8/bsvqg4Yd+kHyNO1Tj7Ki/XpMA6FOoXYjSUU8IC0VUcQddFpJBO098BOwguboTFQqsplPDSbqRm/N2bBFtxJxJ5shHJavdXP/VuywvoRidk4AxPxjQdzxhnIikzoAmmE0AR0n41My90Q4OgT8g7PE8/kkv+mZJB3/F8TjFWkl/3oOMOrzrbH+8CMZptKK3tCieH9YXotx8+9Py5GQdLCZ0G0ioC4X9WtEiPMuS2jfGVnWELQBX0GK5Qyhd3hKhfwerHH0ORnZEb5KlM9xkU8GNFtGqbpJt/tULTrOoMOqx5B0Jnc8J5dBpkp8wNXD3AJRCcaGCEWwgkPD/LukgQXdGNb7p5q20iYXEZA0Q
+X-GND-State: clean
+X-GND-Score: 0
 
-VGhhbmsgeW91IGZvciB5b3VyIHJldmlldy4KCkkgc3BsaXQgdGhlIGZpeGVzIGludG8gMyBwYXRj
-aGVzIGluIGEgbmV3IHRocmVhZCBhcyBzdWdnZXN0ZWQuCkNoYW5nZXMgaW4gdjE6Ci0gRml4ZWQg
-b2ZmLWJ5LW9uZSBjb21wYXJpc29ucyBpbiB0aGUgc3luY2hyb25vdXMgcGF0aHMKLSBBZGRlZCBi
-b3VuZHMgY2hlY2tzIGZvciBjcl90aWEgYW5kIGRlc2NyaXB0b3IgZmllbGRzIGluIFRYL1JYIGhh
-bmRsZXJzCi0gVXNlZCBSRUFEX09OQ0UoKSBmb3IgRE1BLWNvaGVyZW50IGJpdGZpZWxkIHJlYWRz
-IHRvIGF2b2lkIFRPQ1RPVQotIENoYW5nZWQgcmV0dXJuIHRvIGJyZWFrIHRvIGF2b2lkIHJlcGVh
-dGVkIHByb2Nlc3Npbmcgb2YgY29ycnVwdGVkIGRlc2NyaXB0b3JzCgpodHRwczovL2xvcmUua2Vy
-bmVsLm9yZy9hbGwvMjAyNjA4MjAtYnRpbnRlbF9wY2llX2JvdW5kc19maXhlcy12MS0wLWM5ZGNk
-MWFjOGJmNkB1bmlvbnRlY2guY29tLwoKVGhhbmtzLApaaGFvIEppbm1pbmcKCgoKPkRlYXIgWmhh
-bywKCgoKPgoKCgo+CgoKCj5UaGFuayB5b3UgZm9yIHlvdXIgcGF0Y2guIEZvciB0aGUgc3VtbWFy
-eSBJoa9kIHVzZToKCgoKPgoKCgo+Qmx1ZXRvb3RoOiBidGludGVsX3BjaWU6IENoZWNrIGFycmF5
-IGJvdW5kcyBvZiBkZXYgY29udHJvbGxlZCBpbmRpY2VzCgoKCj4KCgoKPkFtIDEzLjA4LjI2IHVt
-IDEyOjM3IHNjaHJpZWIgWmhhb0ppbm1pbmc6CgoKCj4+IEZpeCBmb3VyIGFycmF5IGJvdW5kcyBp
-c3N1ZXMgaW4gdGhlIEludGVsIEJUIFBDSWUgZHJpdmVyOgoKCgo+PiAKCgoKPj4gMS4gYnRpbnRl
-bF9wY2llX3NlbmRfc3luYygpOiBib3VuZHMgY2hlY2sgZm9yIHRmZF9pbmRleCB1c2VzICc+JyBp
-bnN0ZWFkCgoKCj4+Pz8/PyBvZiAnPj0nLj8gV2hlbiB0ZmRfaW5kZXggPT0gdHhxLT5jb3VudCAo
-MzIpLCB0aGUgY2hlY2sgcGFzc2VzIGFuZAoKCgo+Pj8/Pz8gYnRpbnRlbF9wY2llX3ByZXBhcmVf
-dHgoKSB3cml0ZXMgcGFzdCB0aGUgZW5kIG9mIHR4cS0+dGZkc1tdIGFuZAoKCgo+Pj8/Pz8gdHhx
-LT5idWZzW10uCgoKCj4+IAoKCgo+PiAyLiBidGludGVsX3BjaWVfc3VibWl0X3J4KCk6IHNhbWUg
-b2ZmLWJ5LW9uZSBvbiBmcmJkX2luZGV4Lj8gV2hlbgoKCgo+Pj8/Pz8gZnJiZF9pbmRleCA9PSBy
-eHEtPmNvdW50ICg2NCksIHRoZSBjaGVjayBwYXNzZXMgYW5kCgoKCj4+Pz8/PyBidGludGVsX3Bj
-aWVfcHJlcGFyZV9yeCgpIHdyaXRlcyBwYXN0IHRoZSBlbmQgb2YgcnhxLT5mcmJkc1tdIGFuZAoK
-Cgo+Pj8/Pz8gcnhxLT5idWZzW10uCgoKCj4+IAoKCgo+PiAzLiBidGludGVsX3BjaWVfbXNpeF90
-eF9oYW5kbGUoKTogY3JfdGlhIChkZXZpY2UtY29udHJvbGxlZCwgZnJvbQoKCgo+Pj8/Pz8gc2hh
-cmVkIERNQSBtZW1vcnkpIGlzIHVzZWQgdG8gaW5kZXggdHhxLT51cmJkMHNbXSBiZWZvcmUgYW55
-IGJvdW5kcwoKCgo+Pj8/Pz8gY2hlY2ssIGFuZCB0aGUgdXJiZDAtPnRmZF9pbmRleCBjaGVjayB1
-c2VzICc+JyBpbnN0ZWFkIG9mICc+PScuCgoKCj4+IAoKCgo+PiA0LiBidGludGVsX3BjaWVfbXNp
-eF9yeF9oYW5kbGUoKTogY3JfdGlhIChkZXZpY2UtY29udHJvbGxlZCkgaW5kZXhlcwoKCgo+Pj8/
-Pz8gcnhxLT51cmJkMXNbXSB3aXRoIG5vIGJvdW5kcyBjaGVjay4/IHVyYmQxLT5mcmJkX3RhZyBp
-cyBhIDE2LWJpdAoKCgo+Pj8/Pz8gZGV2aWNlLWNvbnRyb2xsZWQgZmllbGQgKDAtNjU1MzUpIHVz
-ZWQgZGlyZWN0bHkgYXMgYW4gaW5kZXggaW50bwoKCgo+Pj8/Pz8gcnhxLT5idWZzW10gKDY0IGVs
-ZW1lbnRzKS4KCgoKPgoKCgo+RW51bWVyYXRpbmcgdGhpbmdzIGluIHRoZSBjb21taXQgbWVzc2Fn
-ZSwgaXMgYSBnb29kIGluZGljYXRvciB0byBzcGxpdCAKCgoKPnRoZSBjb21taXQgaW50byBzbWFs
-bGVyIG9uZXMuCgoKCj4KCgoKPj4gRml4IGFsbCBmb3VyIGJ5IGNvcnJlY3RpbmcgdGhlIGNvbXBh
-cmlzb24gb3BlcmF0b3JzIGFuZCBhZGRpbmcgZXhwbGljaXQKCgoKPj4gYm91bmRzIGNoZWNrcyBv
-biBkZXZpY2UtY29udHJvbGxlZCBpbmRpY2VzIGJlZm9yZSBhcnJheSBhY2Nlc3MuCgoKCj4+IAoK
-Cgo+PiBGaXhlczogYzJiNjM2YjNmNzg4ICgiQmx1ZXRvb3RoOiBidGludGVsX3BjaWU6IEFkZCBz
-dXBwb3J0IGZvciBQQ0llIHRyYW5zcG9ydCIpCgoKCj4+IFNpZ25lZC1vZmYtYnk6IFpoYW9KaW5t
-aW5nIDx6aGFvamlubWluZ0B1bmlvbnRlY2guY29tPgoKCgo+PiAtLS0KCgoKPj4/PyBkcml2ZXJz
-L2JsdWV0b290aC9idGludGVsX3BjaWUuYyB8IDIxICsrKysrKysrKysrKysrKysrKy0tLQoKCgo+
-Pj8/IDEgZmlsZSBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKCgo+
-PiAKCgoKPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jIGIv
-ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llLmMKCgoKPj4gaW5kZXggMmI3MjMxYmU1OTcz
-Li4zMmNmYTBmNWFmMWMgMTAwNjQ0CgoKCj4+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50
-ZWxfcGNpZS5jCgoKCj4+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jCgoK
-Cj4+IEBAIC00MDEsNyArNDAxLDcgQEAgc3RhdGljIGludCBidGludGVsX3BjaWVfc2VuZF9zeW5j
-KHN0cnVjdCBidGludGVsX3BjaWVfZGF0YSAqZGF0YSwKCgoKPj4/PyAKCgoKPj4/PyAJdGZkX2lu
-ZGV4ID0gZGF0YS0+aWEudHJfaGlhW0JUSU5URUxfUENJRV9UWFFfTlVNXTsKCgoKPj4/PyAKCgoK
-Pj4gLQlpZiAodGZkX2luZGV4ID4gdHhxLT5jb3VudCkKCgoKPj4gKwlpZiAodGZkX2luZGV4ID49
-IHR4cS0+Y291bnQpCgoKCj4+Pz8gCQlyZXR1cm4gLUVSQU5HRTsKCgoKPj4/PyAKCgoKPj4/PyAJ
-LyogRmlybXdhcmUgcmFpc2VzIGFsaXZlIGludGVycnVwdCBvbiBIQ0lfT1BfUkVTRVQgb3IKCgoK
-Pj4gQEAgLTUwMiw3ICs1MDIsNyBAQCBzdGF0aWMgaW50IGJ0aW50ZWxfcGNpZV9zdWJtaXRfcngo
-c3RydWN0IGJ0aW50ZWxfcGNpZV9kYXRhICpkYXRhKQoKCgo+Pj8/IAoKCgo+Pj8/IAlmcmJkX2lu
-ZGV4ID0gZGF0YS0+aWEudHJfaGlhW0JUSU5URUxfUENJRV9SWFFfTlVNXTsKCgoKPj4/PyAKCgoK
-Pj4gLQlpZiAoZnJiZF9pbmRleCA+IHJ4cS0+Y291bnQpCgoKCj4+ICsJaWYgKGZyYmRfaW5kZXgg
-Pj0gcnhxLT5jb3VudCkKCgoKPj4/PyAJCXJldHVybiAtRVJBTkdFOwoKCgo+Pj8/IAoKCgo+Pj8/
-IAkvKiBQcmVwYXJlIGZvciBSWCBzdWJtaXQuIEl0IHVwZGF0ZXMgdGhlIEZSQkQgd2l0aCB0aGUg
-YWRkcmVzcyBvZiBETUEKCgoKPj4gQEAgLTEwOTQsMTIgKzEwOTQsMTUgQEAgc3RhdGljIHZvaWQg
-YnRpbnRlbF9wY2llX21zaXhfdHhfaGFuZGxlKHN0cnVjdCBidGludGVsX3BjaWVfZGF0YSAqZGF0
-YSkKCgoKPj4/PyAJdHhxID0gJmRhdGEtPnR4cTsKCgoKPj4/PyAKCgoKPj4/PyAJd2hpbGUgKGNy
-X3RpYSAhPSBjcl9oaWEpIHsKCgoKPj4gKwkJaWYgKGNyX3RpYSA+PSB0eHEtPmNvdW50KQoKCgo+
-PiArCQkJcmV0dXJuOwoKCgo+PiArCgoKCj4+Pz8gCQlkYXRhLT50eF93YWl0X2RvbmUgPSB0cnVl
-OwoKCgo+Pj8/IAkJd2FrZV91cCgmZGF0YS0+dHhfd2FpdF9xKTsKCgoKPj4/PyAKCgoKPj4/PyAJ
-CXVyYmQwID0gJnR4cS0+dXJiZDBzW2NyX3RpYV07CgoKCj4+Pz8gCgoKCj4+IC0JCWlmICh1cmJk
-MC0+dGZkX2luZGV4ID4gdHhxLT5jb3VudCkKCgoKPj4gKwkJaWYgKHVyYmQwLT50ZmRfaW5kZXgg
-Pj0gdHhxLT5jb3VudCkKCgoKPj4/PyAJCQlyZXR1cm47CgoKCj4KCgoKPmdlbWluaS9nZW1pbmkt
-My4xLXByby1wcmV2aWV3IGNvbW1lbnRzIFsxXToKCgoKPgoKCgo+PiBJZiB1cmJkMC0+dGZkX2lu
-ZGV4IGlzIGludmFsaWQgYW5kIHdlIHJldHVybiBlYXJseSBoZXJlLCBkb2Vzbid0IHRoaXMgcGVy
-bWFuZW50bHkKCgoKPj4gc3RhbGwgdGhlIFRYIGNvbXBsZXRpb24gcXVldWU/CgoKCj4+IEJ5IHJl
-dHVybmluZyBlYXJseSwgY3JfdGlhIGlzIG5ldmVyIGFkdmFuY2VkLiBUaGUgbmV4dCBpbnRlcnJ1
-cHQgd2lsbCBwcm9jZXNzCgoKCj4+IHRoZSBleGFjdCBzYW1lIGNvcnJ1cHRlZCBkZXNjcmlwdG9y
-IGFuZCByZXR1cm4gZWFybHkgYWdhaW4uCgoKCj4KCgoKPgoKCgo+CgoKCj4+Pz8gCgoKCj4+Pz8g
-CQljcl90aWEgPSAoY3JfdGlhICsgMSkgJSB0eHEtPmNvdW50OwoKCgo+PiBAQCAtMTU4NCw5ICsx
-NTg3LDIxIEBAIHN0YXRpYyB2b2lkIGJ0aW50ZWxfcGNpZV9tc2l4X3J4X2hhbmRsZShzdHJ1Y3Qg
-YnRpbnRlbF9wY2llX2RhdGEgKmRhdGEpCgoKCj4+Pz8gCSAqIHByb2Nlc3MgYWxsIHJlY2VpdmVk
-IENEcyBpbiB0aGlzIGludGVycnVwdC4KCgoKPj4/PyAJICovCgoKCj4+Pz8gCXdoaWxlIChjcl90
-aWEgIT0gY3JfaGlhKSB7CgoKCj4+ICsJCWlmIChjcl90aWEgPj0gcnhxLT5jb3VudCkgewoKCgo+
-PiArCQkJYnRfZGV2X2VycihoZGV2LCAiUlhROiBpbnZhbGlkIGNyX3RpYSAldSAoY291bnQgJXUp
-IiwKCgoKPgoKCgo+TWF5YmU6IFJYUTogaW52YWxpZCBjcl90aWEgJXUgPj0gJXUsIGNvbnRhY3Qg
-ZGV2aWNlIHZlbmRvcgoKCgo+CgoKCj4+ICsJCQkJPz8gY3JfdGlhLCByeHEtPmNvdW50KTsKCgoK
-Pj4gKwkJCXJldHVybjsKCgoKPj4gKwkJfQoKCgo+PiArCgoKCj4+Pz8gCQl1cmJkMSA9ICZyeHEt
-PnVyYmQxc1tjcl90aWFdOwoKCgo+Pj8/IAkJaXBjX3ByaW50X3VyYmQxKGRhdGEtPmhkZXYsIHVy
-YmQxLCBjcl90aWEpOwoKCgo+Pj8/IAoKCgo+PiArCQlpZiAodXJiZDEtPmZyYmRfdGFnID49IHJ4
-cS0+Y291bnQpIHsKCgoKPj4gKwkJCWJ0X2Rldl9lcnIoaGRldiwgIlJYUTogaW52YWxpZCBmcmJk
-X3RhZyAldSAoY291bnQgJXUpIiwKCgoKPgoKCgo+RGl0dG8gcmVnYXJkaW5nIHRoZSBsb2cgbWVz
-c2FnZS4KCgoKPgoKCgo+PiArCQkJCT8/IHVyYmQxLT5mcmJkX3RhZywgcnhxLT5jb3VudCk7CgoK
-Cj4+ICsJCQlyZXR1cm47CgoKCj4+ICsJCX0KCgoKPj4gKwoKCgo+CgoKCj5nZW1pbmkvZ2VtaW5p
-LTMuMS1wcm8tcHJldmlldyBjb21tZW50cyBbMV06CgoKCj4KCgoKPj4gQnkgcmV0dXJuaW5nIGVh
-cmx5IHdoZW4gdXJiZDEtPmZyYmRfdGFnIGlzIGludmFsaWQsIHdlIGZhaWwgdG8gYWR2YW5jZSBj
-cl90aWEuCgoKCj4+IFdpbGwgdGhpcyBwZXJtYW5lbnRseSBzdGFsbCB0aGUgUlggY29tcGxldGlv
-biBxdWV1ZSBzaW5jZSB0aGUgbmV4dCBpbnRlcnJ1cHQKCgoKPj4gd2lsbCBwcm9jZXNzIHRoZSBz
-YW1lIGNvcnJ1cHRlZCBkZXNjcmlwdG9yPwoKCgo+CgoKCj4+Pz8gCQlidWYgPSAmcnhxLT5idWZz
-W3VyYmQxLT5mcmJkX3RhZ107CgoKCj4KCgoKPmdlbWluaS9nZW1pbmktMy4xLXByby1wcmV2aWV3
-IGNvbW1lbnRzIFsxXToKCgoKPgoKCgo+PiBEb2VzIHRoaXMgaW50cm9kdWNlIGEgVGltZS1vZi1D
-aGVjayB0byBUaW1lLW9mLVVzZSAoVE9DVE9VKSB2dWxuZXJhYmlsaXR5PwoKCgo+PiB1cmJkMS0+
-ZnJiZF90YWcgaXMgYSBiaXRmaWVsZCBpbnNpZGUgYSBETUEtY29oZXJlbnQgc3RydWN0dXJlLiBU
-aGUgY29kZSBhY2Nlc3NlcwoKCgo+PiBpdCBvbmNlIGZvciB0aGUgYm91bmRzIGNoZWNrIChhYm92
-ZSkgYW5kIGFnYWluIGhlcmUgdG8gaW5kZXggdGhlIGFycmF5LgoKCgo+PiBDYW4gdGhlIGNvbXBp
-bGVyIGVtaXQgdHdvIHNlcGFyYXRlIG1lbW9yeSByZWFkcywgYWxsb3dpbmcgdGhlIGRldmljZSB0
-byBhbHRlcgoKCgo+PiB0aGUgdmFsdWUgYWZ0ZXIgdGhlIGNoZWNrIHBhc3NlcyBidXQgYmVmb3Jl
-IHRoZSBhcnJheSBhY2Nlc3M/CgoKCj4KCgoKPj4/PyAJCWlmICghYnVmKSB7CgoKCj4+Pz8gCQkJ
-YnRfZGV2X2VycihoZGV2LCAiUlhROiBmYWlsZWQgdG8gZ2V0IHRoZSBETUEgYnVmZmVyIGZvciAl
-ZCIsCgoKCj4KCgoKPgoKCgo+S2luZCByZWdhcmRzLAoKCgo+CgoKCj5QYXVsCgoKCj4KCgoKPgoK
-Cgo+WzFdOiAKCgoKPmh0dHBzOi8vc2FzaGlrby5kZXYvIy9wYXRjaHNldC80NjAzMTY2NjNENkQz
-NEVEJTJCMjAyNjA4MTMxMDM3MzQuMjIyOTU1LTEtemhhb2ppbm1pbmclNDB1bmlvbnRlY2guY29t
-CgoKCj4KCgo=
+When running "systemctl start bluetooth.service" on some systems, this
+error would appear:
+systemd[8067]: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
+
+ConfigurationDirectoryMode was mistakenly thought to help sandbox the
+daemon, but the service configuration already sets ProtectSystem=strict
+but "If [ProtectSystem is] set to "strict" the entire file system
+hierarchy is mounted read-only", so bluetoothd can't write to
+/etc/bluetooth anyway.
+
+Fixes: 00cfb36e20e3 ("bluetooth.service: Set ConfigurationDirectoryMode")
+Closes: https://github.com/bluez/bluez/issues/414
+---
+ src/bluetooth.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+index 8dcbde2367fe..4d5ae568bee4 100644
+--- a/src/bluetooth.service.in
++++ b/src/bluetooth.service.in
+@@ -22,7 +22,7 @@ ProtectControlGroups=true
+ StateDirectory=bluetooth
+ StateDirectoryMode=0700
+ ConfigurationDirectory=bluetooth
+-ConfigurationDirectoryMode=0555
++ConfigurationDirectoryMode=0755
+ 
+ # Execute Mappings
+ MemoryDenyWriteExecute=true
+-- 
+2.55.0
 
