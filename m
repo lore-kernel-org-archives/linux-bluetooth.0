@@ -1,120 +1,102 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BC33876C1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 06:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2FE3246EC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 07:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787207309; cv=none; b=Fr1TkaDNKfSibybxO8lkW1xw5Mu6XQZRx6WRbU7HIdEjGrh539OSGFQOre5tobytkYNKKjFEJRqU2DTP+43DlTEjXhIesEgpY1nvOHCTsz+NYHKvzXjU5qV1MNDs7DtPEJWzd0EWSbOyTOGLYXhwAqdMEcSOkRUXaq85qmaIgL0=
+	t=1787211999; cv=none; b=Gt/RKQ2kAPo0t0uc6hi/gODATYZ+/u/ltjPHcoeUkcDQW5n0/aDN83VPFoAjvI5kNGw2P5iDT1S5ldNrNsQP99UV4R+qZZNnoZcZQO8s6KCogfYTmSYeDw7nSVvQ17IDx3M76+NZuE8N4MwtuQmW4C64elBJ/qDhVu9lUr4o/5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787207309; c=relaxed/simple;
-	bh=mIW7v9gDEhqJxRZLYltYPyztv8dvW/2Tqz1g3PnlmHc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=BukByVA3+6k+DDCLSFPxyX5ghHg9cVH9CVqzSEEI0vDo7RUuXApeXX+R80Cz/gMFFMnG+sUUsWcHgoYu3VzTVdtddUfDHDIk3EH9vjPJxcuskW1B5z/tVRhxYQmScB817+0GxUnlKoFjQEYu1zJq4qJRglqQB9UaDj8B1oNJSsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YfPA0YP1; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfPA0YP1"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cca0c5799eso15715425ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2026 23:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787207307; x=1787812107; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=4aqqRtduBTaqMeFcuuaAkaXxtsmd+aEbWq5R5ebNq9s=;
-        b=YfPA0YP1/UzGlIPgOn/oOsZ3orzY/lRbO+jNNpZxfRaWUY9t671EgT7jPrmA9JmeAK
-         GX9Pw7hdv5MwFRqx7nF1e6NTFksgsG/ZlTEJJmUkeN8tAyYDcZZu3zTEPzQq+kyBahSx
-         QzgoEAaZhD+6DVXAi66O6pdkwHc8AWcflvJsj4LvtOx3sbXnqRn/BYPEzJd448SN4lTv
-         aXzCk7+gzrw4kTUW5YGe/mUi6DI16N2qsPFA1Iw4e18LXDDekyfxSfXEL+J5R5FiXjD1
-         aOmPO/mRZ+iaBW0zTMsi2hpJ64QftwZzUgAmCbWt9caQiLDsguX3XUM5Xs5nyiqbLmIZ
-         wmZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787207307; x=1787812107;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=4aqqRtduBTaqMeFcuuaAkaXxtsmd+aEbWq5R5ebNq9s=;
-        b=QoQWG5p4/hkKpVv6qzO0xAuR+Vax56R3RBAlfh/Br98lQTeGHa3XRO5Xb/RkkjWCHo
-         /1nNBV/qzDtoU7KC9ezSYVkhv5PMxn8x+5qOC/S0jAeF7RiH0uxeobZ6DtWH5AbQZPH8
-         8RY56ttwAf2WdUww6Xrfdd/s3KCziZauiUIGNXcVztntDIeCTigJCrhzQcpEEFt8FsVQ
-         Zqt8woIUH01k5RvtN6FfN1jKI4zpI3kgKngdVyvazM9a1Pzo3zhTjP5kCV8+AZM1FL25
-         5W1sSxitRaKV9HLtPl4uy0dFovQi4Xb1zRZ+6qXYxsAqs72O2Ttn0lO6E6X2zygnSkdZ
-         Y+sw==
-X-Gm-Message-State: AFuF++lwOjg63eMJimK/zEX6SsPQMDbrlCEdrFXUUhesACHRgClyxc3v
-	0mHxLcoHfglGoypI9WrVUcafaSSmdGaheM49PK01GBw1zWaUKzwtQ5vJGOtebw==
-X-Gm-Gg: AR+sD12LAwCbv1kUaJCAeJToGipaHFBNwtnIccU+EtSSDZsv3U6NTwGoEa5/Axg7clM
-	ybdVXI7VbfWxnebJuc6OBu/e/DVFWey3jHBbC8cWqIpFPG3zj4MXDYM7J7oGYvU27m5fhh03VkZ
-	+nubvTXv/E+som6/PW/ZTxqPIdvqsm9c6D5CZfohfu5Q6sv0gMHtENI+WKL/edm1Bhip6nnQFtz
-	dJ8r0h6wYwm+CbvhBUMRiBOpjeT8Xx+qSG5AbGECQfPej9Nwt84rhnrBOlBINpoVsxrFbGeQ74M
-	6HSfWIhn8KNlUiH3cs1LFyPDvqxKexfVzwIQ4yAdwLWpHoGEtkks0PTADq9safFdjdDS4bSFI1G
-	Es8DqCnY8YscLu3yRZZqWGw7PgY503cJWLrMFiDbNaqy3Ndu/+REuKA0wFMLASlA/PZ5SSLaS8q
-	Xey9b7FGQFJt61crCK3q83L2iwUBRK5TYNRTh7NPwi/mKitBECsYY8pf6ejgtJbe5oWA==
-X-Received: by 2002:a17:90b:55c6:b0:38e:5c6:4db9 with SMTP id 98e67ed59e1d1-395813f758amr20160261a91.11.1787207307247;
-        Wed, 19 Aug 2026 23:28:27 -0700 (PDT)
-Received: from [172.17.0.2] ([4.242.193.234])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327c3fc6675sm18616986eec.13.2026.08.19.23.28.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2026 23:28:26 -0700 (PDT)
-Message-ID: <6a869e8a.3865fcc3.3a8777.0dc5@mx.google.com>
-Date: Wed, 19 Aug 2026 23:28:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6798762950975646796=="
+	s=arc-20240116; t=1787211999; c=relaxed/simple;
+	bh=tIVfQ1grGkY0lRStJrzzHWdRi8rM7chJOTl9BoFTlpw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mEqcX66g9Avaa+taAsMa2+3mpXjUhOo/5kf6z1bnSwWYK3AsVe+HU1WY/EHfRNDRY51MP/4+srzYYw3IQXmkWRLgPb9lP3XH7OinGiZOcWlltepmnmqLICD2NlgIs/lCEotFTRoy4f3WKFz6O9CMhfSs3VJiuR6oA7o4moqstdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AF59F3ED38;
+	Thu, 20 Aug 2026 07:46:34 +0000 (UTC)
+Message-ID: <9ae70f091f093a644bec0f6ebc030e36a1f7a853.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v1 1/8] eir: Fix stack buffer overflow when
+ parsing the remote name
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 20 Aug 2026 09:46:34 +0200
+In-Reply-To: <20260819204008.2292225-2-luiz.dentz@gmail.com>
+References: <20260819204008.2292225-1-luiz.dentz@gmail.com>
+	 <20260819204008.2292225-2-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, lijun01@kylinos.cn
-Subject: RE: [v5] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
-In-Reply-To: <20260820055003.1204188-1-lijun01@kylinos.cn>
-References: <20260820055003.1204188-1-lijun01@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGL6Gba5xPbHrUqI7Q8/XafXuQl2nUn9bnc6EY3GdRP3KE4kyjTMnplLyRhNtSRNR1G7lhKB3EpriEdwHM08xRPcMmc/aXmCR0e9uW7cwbFY8zIujz38/Pp55WzfBHmRimgsLaqs6eA8A9G+KgDGbeTxkCf82Ydn8F6VpC5J0YtKUjvr6/5Jk6JSz9Jxk/AqWb8imYKNmOXRd0dBhp/6sFfLp8DKPRk1GOGjAoLP07+p6+vxmxhzchDn42at674VQdKPMp8e9GAVQw9jDin3qZGbGMxZ/9iUGPrzsyt4qzLchVMZKdou8GtVNlX8zqchTD8DK1ZQTpq35cE4pI/MnHhGoJsXeqc6TsEDm5LToLkYRsJeb+V9C8AJ4Hwl8awzj4ebV2dzDyhREM/lCLos/YujC8Fx3ka40dhaAvyp4PqRqsa5Fw0EZFDx+gLD6VmKsz4AiJGhtpp7wAlpdG4TLbKNUbpvvx+uWCTucqOg8bBo003KwQp74InUcCfZPbyeUiuVn71UxAg9GIIOrYRkYr4Ynb08ECr8PL5KFWtBTZcqBjuxqf4Pth+L3XEjKXCGBxahlR2J6AUBNqD4hBIAJn/cy8pm4as8zQy8W3h+XEm88rECDn8AnS0+uSUvuAGniyurQEw2DCi+eamulAo/g2dZ5A2nwMK1NWTW4RGrfmmuw
+X-GND-State: clean
 
---===============6798762950975646796==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, 2026-08-19 at 16:40 -0400, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>=20
+> name2utf8() copies len bytes into a HCI_MAX_NAME_LENGTH + 2, so 250,
+> byte stack buffer without clamping len first.
+>=20
+> eir_parse() only rejects a field once it runs past the end of the EIR
+> data, and that data is up to 255 bytes, so field_len can be 254 and
+> the
+> data_len passed to name2utf8() can reach 253. strncpy() then writes
+> 253
+> bytes into the 250 byte buffer and leaves it unterminated, so the
+> following g_strstrip() and g_strdup() also read past the end.
+>=20
+> The EIR data comes from a remote device, either in an extended
+> inquiry
+> response or in an advertising report, so the length is attacker
+> controlled.
+>=20
+> Clamp len like the other name2utf8() copies already do. Parsing a 253
+> byte EIR_NAME_COMPLETE field returned a 253 byte name before this
+> change, and returns a 249 byte one after it.
 
-This is automated email and please do not reply to this email!
+This issue was embargoed, and this commit is the exact same one I sent
+privately to fix that issue.
 
-Dear submitter,
+It would be nice to have either the authored-by or co-authored by tag.
+Could you please also make sure to add:
+"
+Reported-by: @sprabhav7 (Prabhav S)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1148824
+See:
+https://github.com/bluez/bluez/security/advisories/GHSA-68h6-5qgp-3975
+"
 
----Test result---
+To the commit message. I'll work on the security advisory to get it
+published.
 
-Test Summary:
-CheckPatch                    PASS      0.49 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.21 seconds
-SubjectPrefix                 PASS      0.74 seconds
-BuildKernel                   PASS      20.38 seconds
-CheckAllWarning               PASS      22.64 seconds
-CheckSparse                   PASS      22.04 seconds
-BuildKernel32                 PASS      19.68 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      365.46 seconds
-IncrementalBuild              PASS      19.02 seconds
+Cheers
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/622
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6798762950975646796==--
+>=20
+> Assisted-by: Claude:claude-opus-5
+> ---
+> =C2=A0src/eir.c | 2 ++
+> =C2=A01 file changed, 2 insertions(+)
+>=20
+> diff --git a/src/eir.c b/src/eir.c
+> index 89c15995a546..95351d015323 100644
+> --- a/src/eir.c
+> +++ b/src/eir.c
+> @@ -137,6 +137,8 @@ static char *name2utf8(const uint8_t *name,
+> uint8_t len)
+> =C2=A0{
+> =C2=A0	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+> =C2=A0
+> +	len =3D MIN(len, sizeof(utf8_name) - 1);
+> +
+> =C2=A0	memset(utf8_name, 0, sizeof(utf8_name));
+> =C2=A0	strncpy(utf8_name, (char *) name, len);
+> =C2=A0	strtoutf8(utf8_name, len);
