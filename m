@@ -1,143 +1,116 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD003D9020
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 08:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9943E49C7;
+	Thu, 20 Aug 2026 09:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787213700; cv=none; b=dsvinGHVKQd8WBsavgkniCXCe5J1ds38MnVajCnM/WH/T6uwyTW7V+ReKjL+EcaRxwzVbHfT5LOm3XPm9wl/nXZIYz5QJOwmmOuKgOg+WqDgLaTCO+l4//9tu1YQtz/T9N7vN/2bl4ru86AjmP6Wh1TWj6zWOtDHkC9xl8Suffg=
+	t=1787217564; cv=none; b=Qtpq4k+4sV8T58/uBVSx9Ri6OzNlTvqGheDMPf8upkeJb/Uvu2/7EI49sgOnozXW5VnQcNn1Zi8jCe4pH/qVMNGR0DNHajmgdJDzJ4lnnmUhQzLUVTUpDqBJNse8TQB/xP8HlQCIlgLXdwLvA6b4D0dfEHirzYkZeebz/bQaRfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787213700; c=relaxed/simple;
-	bh=O9yMLsdSiKuVpk5qbLdKaJopjCO6KNih9voVJ8rIeK4=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NdrDLmvNq6EFhqWJO69R9fApnf3/SRDiU5B9vgPJydrx88yUxaUtFJdGcc42h5oAW7EMgBFjDfXaZz3c+0YdtPJdh8a205DGertDnYxmvMxIbiiSJDHW0+75hIuv564uNXwG5Gc9kZmTjqKWeteq6V3XDkhgC5/dM+ooLdVFOcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8A0703E9F5;
-	Thu, 20 Aug 2026 08:14:49 +0000 (UTC)
-Message-ID: <ba37fe7179e00e7c4e4a2c62af8b65dfec827f35.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v1 1/8] eir: Fix stack buffer overflow when
- parsing the remote name
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 20 Aug 2026 10:14:49 +0200
-In-Reply-To: <9ae70f091f093a644bec0f6ebc030e36a1f7a853.camel@hadess.net>
-References: <20260819204008.2292225-1-luiz.dentz@gmail.com>
-		 <20260819204008.2292225-2-luiz.dentz@gmail.com>
-	 <9ae70f091f093a644bec0f6ebc030e36a1f7a853.camel@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1787217564; c=relaxed/simple;
+	bh=mbW2BIMMfVGSsldSCbqG5lvosCYbDbmQRjQmZXfih54=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=DgiitC9Dgy204gLaMQM6J61W0Er+GbA4RrOEJnUIiJwazQqM09X8+qVy46T4vHIFzeJQQPPdV9L8gXU1+aetu8/X+WO95HsVtd3ABWkBrTa4v97T+nLisddqi/a1cIPSOZELDIs2KAi1qoOn1dsDq1UAwRLtt0DbeVW2K4MJGc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=VF3x00Za; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="VF3x00Za"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1787217526;
+	bh=3zpUkUlVsO35ZlDot63p91o0zUDXl0jQpg3ZCLVGlI8=;
+	h=From:Date:Subject:MIME-Version:Message-Id:To;
+	b=VF3x00ZaSVgKTskAXh6MWQKuP0Ff4/3Y/XoQF0RVUoqfHNuuJSaNqbfogz+zitoas
+	 AYqVcafu6nsBTuSiggT3c6BI0OSzJKIpy77JvV1ZcFl774qD1xjR7jDeQpdBun68l7
+	 /qwegoyLVbcRS2BOTtKy8k54HpwzO7GYMGnxZLx8=
+X-QQ-mid: zesmtpgz4t1787217520t1d6ae224
+X-QQ-Originating-IP: BAEvVQstqlpOZwMBF6qcoX2Opdj6hRo/Vjp7XeSXScQ=
+Received: from [10.10.7.64] ( [1.202.39.170])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 20 Aug 2026 17:18:39 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 7165249167432056427
+From: ZhaoJinming <zhaojinming@uniontech.com>
+Date: Thu, 20 Aug 2026 17:17:38 +0800
+Subject: [PATCH 1/3] Bluetooth: btintel_pcie: Fix off-by-one bounds checks
+ in synchronous paths
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTEFw2Ck6ca2nfyhO/ZppXrk730zW2qY6szT+glp9fj5h8tt5iZe2vPpbLAwVtIPECkrTFO3VBkwhi0qxWfJ7Fiq4/Z6o++tMjn0jbAt6UMeyeR3Iz1WCtlY7I8f+seOIeu9OOBEdOQY2zz8Qdvfjvhp6A+TUI5pZEAkaeZ8zjPP0QepRZJ7PNw0oruiHG8t6xSOPRb6gGERiHEXnojHcjieEiwGfWSyhQTrlAnyMzft0W+7tIZUUbNOlY1Q9ws6m3NCUejlCUtALrQLRpx9GokcFiWF9jyJJuIKWw/33gENDlbPrwmcLI71gSrsq7q5PCU4tVOEdG3iIq08THQMt6+2tKuzi2v35bYLYBjmE/6O5pjUrA9mmHXkglfe7xeVgFz6sRDk17CbZv1FbtsV2z5m6ZwRJS0wfOXInk5O2MBcvlIDHc3mSnfaBhrBy9MMnlF7I2hjH3XtRii+Yj9SMCg1zU5a9Rb0dabe4/nwtPebBwTfy/gGDls3cA1uku8mJ8Tej2lTi+4hae92aVxsl/VnMNbFvUQ+SH0K+9VYrZLIwYgsQw28xth/FAHx0MxzrKP6HM+ICg5Q/tJW8T33uTSI+UAkBKx4+hMlBNaHR8+5aDpbmd8GAuR2G6dHY2E0/kp4ID+g8EhWZRpgziSb/Hg5XjFo5xjyJ/RrL4VaMImWxQ
-X-GND-State: clean
-X-GND-Score: -100
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260820-btintel_pcie_bounds_fixes-v1-1-c9dcd1ac8bf6@uniontech.com>
+References: <20260820-btintel_pcie_bounds_fixes-v1-0-c9dcd1ac8bf6@uniontech.com>
+In-Reply-To: <20260820-btintel_pcie_bounds_fixes-v1-0-c9dcd1ac8bf6@uniontech.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: OCbhq8eaXCOaRGjSbYeD6ORsoIaYZ35rtU/emSJF5+KfHgxvZ2o4NiOE
+	nsqHT5CAWyQT3NnWJ//bl15zrMTrnFvE3M6rrie/A0XlwP6RjpoNbNaypcBUtJu6AdZl5Ak
+	+0IN6pYD3lfk4JtmQ72szwWlsKZwgGiUJuA7yXWDrA8nMHlXrFJoFu85AaQQBY5lJTjGm9G
+	ThF0KOlS3ztTpJ1GePP4qJvAUjhtJKSQsCuX1FgI1FXFra7LVcmBF4rSrc3QSCgIuk2fFzs
+	/nEB2YrNC0DM66FdKHFTaf7Wl/BMr01EzioGq13w3aqekVX8mrMznOgRztrrcGrXMsI8YZd
+	70kGMrwxMeirfT4We5PZDWILZDDNIG0EClJeIgxSmo7+igeGXsoMj513nvE9Ps0U6FL0OX6
+	SD8xVek/HKukvuMkacpxIfh6Rr1QVzJ5CDCDeW0+z0TkLnE9GxkKfc77BomtpVzQ+9OdBGa
+	4JU0gtsCC6rnsfqS76RBgJ6VfkeBlR0E/Gya0uhwawFaFcDrYgz6ogrQCFaWYrm389qZylF
+	EISdQ8c8sxa8Ott+qTt+4JVfHNneXi5p+erPT9xKYal3fF8qVh1E5JGAgBWdsXQkkXxZ1kY
+	JAUq8z5R8sQ8sPscTwv/9FoW1xPPUbT3nLunaptiuYLpAav9w0SuRgPIt3LAaP0OdR+OUxT
+	8loFvj8gDsy2KsgRSm+KElLj39J5T9djioMxmpEoO5nGxJfthuRCmIMqS4Ywrr/My8bCgyA
+	uS2L3IRiPXsT41kbbq4+QeLhLOZoJTiQ+QWqeOZtJc8CsaRRkhglJAVDWHDV0P4EGBuL1Im
+	7krz6L8iRgN15NtHKPxiXh0D5o6rM1IUML9xKCRJPZ2ejrQE765ZNeteA+usWCQ2OuJJ30q
+	4Uk/vdqm4QGYf8Wmc23bwhQyvx+PhLS9+ghiNK1Oe3vxsrzFQ4R6kg7RFtutTjp7q+1xLzD
+	WXaHmOghNXZSb7szcAfpFp49fHxTamMAHR+MEMmhBePzo4xQMJhz8bD2W5Wp+33Z6CEnQbe
+	ArWvu42PutMJnvKz3LGB31Li9dK+R1e08H8qBUQQ==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 
-On Thu, 2026-08-20 at 09:46 +0200, Bastien Nocera wrote:
-> On Wed, 2026-08-19 at 16:40 -0400, Luiz Augusto von Dentz wrote:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >=20
-> > name2utf8() copies len bytes into a HCI_MAX_NAME_LENGTH + 2, so
-> > 250,
-> > byte stack buffer without clamping len first.
-> >=20
-> > eir_parse() only rejects a field once it runs past the end of the
-> > EIR
-> > data, and that data is up to 255 bytes, so field_len can be 254 and
-> > the
-> > data_len passed to name2utf8() can reach 253. strncpy() then writes
-> > 253
-> > bytes into the 250 byte buffer and leaves it unterminated, so the
-> > following g_strstrip() and g_strdup() also read past the end.
-> >=20
-> > The EIR data comes from a remote device, either in an extended
-> > inquiry
-> > response or in an advertising report, so the length is attacker
-> > controlled.
-> >=20
-> > Clamp len like the other name2utf8() copies already do. Parsing a
-> > 253
-> > byte EIR_NAME_COMPLETE field returned a 253 byte name before this
-> > change, and returns a 249 byte one after it.
->=20
-> This issue was embargoed, and this commit is the exact same one I
-> sent
-> privately to fix that issue.
->=20
-> It would be nice to have either the authored-by or co-authored by
-> tag.
-> Could you please also make sure to add:
-> "
-> Reported-by: @sprabhav7 (Prabhav S)
->=20
-> See:
-> https://github.com/bluez/bluez/security/advisories/GHSA-68h6-5qgp-3975
-> "
->=20
-> To the commit message. I'll work on the security advisory to get it
-> published.
+Fix two off-by-one errors where '>' should have been '>=' when
+checking array indices against queue count:
 
-I've also attached below a test case for the issue at hand. It should
-probably be using name2utf8() first, then be adapted like the other
-users were in "Replace the name2utf8 copies with str2utf8".
+1. btintel_pcie_send_sync(): tfd_index from tr_hia is used to index
+   txq->tfds[] and txq->bufs[]. When tfd_index == txq->count (32),
+   btintel_pcie_prepare_tx() writes past the end of both arrays.
 
-From 6664a7b7ff9a1ae9045b64c834179895afe720bf Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Wed, 12 Aug 2026 11:55:33 +0200
-Subject: [PATCH] unit: Add name2utf8() test
+2. btintel_pcie_submit_rx(): frbd_index from tr_hia is used to index
+   rxq->frbds[] and rxq->bufs[]. When frbd_index == rxq->count (64),
+   btintel_pcie_prepare_rx() writes past the end of both arrays.
 
-Co-authored-by: @sprabhav7 (Prabhav S)
-
-See: https://github.com/bluez/bluez/security/advisories/GHSA-68h6-5qgp-3975
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
 ---
- unit/test-eir.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/bluetooth/btintel_pcie.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/unit/test-eir.c b/unit/test-eir.c
-index a4b6743e48b7..b51a5e1d65b0 100644
---- a/unit/test-eir.c
-+++ b/unit/test-eir.c
-@@ -701,6 +701,22 @@ static void test_parsing(gconstpointer data)
- 	tester_test_passed();
- }
-=20
-+#define TRUNCATED_NAME "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-+
-+static void test_name2utf8(const void *data)
-+{
-+	uint8_t name_len =3D 253;
-+	uint8_t malicious_name[name_len];
-+	char *ret =3D NULL;
-+
-+	memset(malicious_name, 'A', sizeof(malicious_name));
-+	ret =3D str2utf8(malicious_name, name_len);
-+	g_assert_cmpstr(ret, =3D=3D, TRUNCATED_NAME);
-+	g_free (ret);
-+
-+	tester_test_passed();
-+}
-+
- static const unsigned char gigaset_gtag_data[] =3D {
- 		0x02, 0x01, 0x06, 0x0d, 0xff, 0x80, 0x01, 0x02,
- 		0x15, 0x12, 0x34, 0x80, 0x91, 0xd0, 0xf2, 0xbb,
-@@ -743,6 +759,7 @@ int main(int argc, char *argv[])
- 	tester_init(&argc, &argv);
-=20
- 	tester_add("/eir/basic", NULL, NULL, test_basic, NULL);
-+	tester_add("/eir/name2utf8", NULL, NULL, test_name2utf8, NULL);
-=20
- 	tester_add("/eir/macbookair", &macbookair_test, NULL, test_parsing,
- 									NULL);
---=20
-2.55.0
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 2b7231be5973d399f7f2fde344032b2f3e394365..fe50c5699e12ef3819577e0f0bd1b79d4340bd9e 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -401,7 +401,7 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
+ 
+ 	tfd_index = data->ia.tr_hia[BTINTEL_PCIE_TXQ_NUM];
+ 
+-	if (tfd_index > txq->count)
++	if (tfd_index >= txq->count)
+ 		return -ERANGE;
+ 
+ 	/* Firmware raises alive interrupt on HCI_OP_RESET or
+@@ -502,7 +502,7 @@ static int btintel_pcie_submit_rx(struct btintel_pcie_data *data)
+ 
+ 	frbd_index = data->ia.tr_hia[BTINTEL_PCIE_RXQ_NUM];
+ 
+-	if (frbd_index > rxq->count)
++	if (frbd_index >= rxq->count)
+ 		return -ERANGE;
+ 
+ 	/* Prepare for RX submit. It updates the FRBD with the address of DMA
+
+-- 
+2.51.0
+
