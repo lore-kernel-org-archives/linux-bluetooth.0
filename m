@@ -1,71 +1,89 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D413481643
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF4F47F2C8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787248009; cv=none; b=jDu0FlC4DI9WlMdNyojE+w9IigBBYdZBbcDA6oA13f1Tpnxtee2Nb83dqTAz972o5VX0FOje/f6v/ARUDaPvyG9KOZLDq5CPOVBxKC2c6DCw2yutHBzbzpuRD2B1o6HZmKUs5XOzUbrdYsmf93bADXaJ1LyWoJBAN/1AB0ynsrg=
+	t=1787248161; cv=none; b=RJc/Hejy+deD8dJR3bLJvS8J9KeM5G2Wo5eBr75bkctMbIIBJFcXCJ8rjct3FAfDR5Ce7OOjdi5F3IDyhndLY+JSPW/DgO2Yn+FN3LBotp+QbjpyeidCLkoSoWj8rlS0UVgp7oNBOnSpa0zwvRwcjJj76c73gSZVOIDNRlnFMjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787248009; c=relaxed/simple;
-	bh=gprFRh2QaAtnq0hjOud0iB3tXFFYgeRSW5UO3hYoeJY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VQxmkF22sjcwP3FB70M8JnjC84gXKQ5DJjXGSquG5BFJfNsYZ/hCcmLMW3u+Ym0l2qVS+XejJmeJLRZyV2ho6ZIIWRPbyhSGLqviqKXFCjTDfjQUvg9Xf1uHaQN5nVTA+usaFNQc0WaUsM/XHqOz5jkGFfCw/2LwUfbzKFrtXQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/hlyFCb; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787248161; c=relaxed/simple;
+	bh=G+GUWZsP2SSvlFvryliQEFOSsZFWgOfWHLHp+0lc9fQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F2zsN7f+cyp99Q/k9nmQXLVbefvG0RWJAGCiWUV8jDS9+MpQCDXffzX2rVjTS9RUXggS+7X8fJII3AJWhlIa4yaR5vwfIe/CdY9kSnfQjByFDp4eljWOGFnTx/F784TlEvfE2PapRgJD7H19BXy597GO6l5isdHnyz7uxpJLmW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mxHbXLza; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EOg6Yo+S; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/hlyFCb"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-47de008b020so20680f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:46:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mxHbXLza";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="EOg6Yo+S"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67KG6pVY3415074
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:49:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=VheDXSGWAdEUyWfskzZJPclzNFlUteJiJta
+	XmDVdZPc=; b=mxHbXLzaHoTOwP+IA0wdl5EU+Omz1uRDBJdAr+DDcwkJowinZY7
+	gFB6T9Ayj6wGQYdBwb/DyLbnlShkKkrpNWQbQa8fp14xT6UnzuFZwmqF7PlDANZJ
+	WOS6/82gpdKcAYgMyUAjsyO/gDO/BNqezZOB94JKvdtinFk7L+YI+3f9/Z9XD48Q
+	TVSkfquyL/Mt5eAqjk691MvWgzxA5TBbSw/kc+BphVHG1jRgcbiM777zMdhd+WQ5
+	TzI7DACXgkbfxmdy2EZd0vITJWYwewPifhB1I2EMAUx01FCwoQ9icpkJG5LhkFrQ
+	ltZ0PF8kLWIgKuHPV4nBoaffyQH0X8bioeQ==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g5vh7tuuu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 17:49:18 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2cc73f47bdcso1574095ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 10:49:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787248006; x=1787852806; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1787248158; x=1787852958; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=F+tptNGvayj5XTQ2x+XRb0sPDFabjITPvsIlhbrE7IU=;
-        b=U/hlyFCbkdT8rlZfe/uVfV9QzYNBHEJFvTABIECXNx7dPrihZgxCXwMczUeMHcjDnT
-         nPONi8IK9UxyVxf2mfPoCNy2IVnIa24zlfcHGc1mSg0735DxBet2yvGKf5O6lkWAyhqi
-         WUuipd1sCjyM1vf6zE+Qxp9Q5fEKaFv5YhBmdFfRNmJZF6NRqrX1+2ndbWMSytKWJCTp
-         8OCKH1cBtxMohYiVtH7LU3vW8vnDFOARvtnteVFhCbRZt9htdGyxg7Df4WmfncsqeuVr
-         ZhKARoOspUeeOz7TSp6pqar2B19rAWX2tp411rxE9Gkq+n5EOn9XTpen06tBFc/jwluX
-         beJw==
+        bh=VheDXSGWAdEUyWfskzZJPclzNFlUteJiJtaXmDVdZPc=;
+        b=EOg6Yo+S1ta5m88RAWnishxLbXi9tK1+rW/+XFWVLWdTgP/ihV3Dg1Mb1CTcxzstwN
+         y2GxebhmSdABF7aOtzxI1Q709meCwbYk67IoyePd/8h+5LxGKKEjqEyivX05peeLjYoF
+         +lwP6yoRJiAzjRKj5LeRofYMkjGYlVWry04bxAqXcCwB/XEn3sC5Ub5ljwCvF9N6rpoG
+         ee8Fg3AwTKkWMi2lWiT1qELj/UEMYirI+MxPbiu4ErvXE8bktEeYmSwYYQZo3jGSIa/I
+         L7Rm2KXYdNfe721fNpssuS3rw8W1dLEdeKcUrnHdNwz0ZxIF6+VLXFseGPJmj1wH4mMr
+         2mIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787248006; x=1787852806;
+        d=1e100.net; s=20251104; t=1787248158; x=1787852958;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=F+tptNGvayj5XTQ2x+XRb0sPDFabjITPvsIlhbrE7IU=;
-        b=Wkef15GiAGAZ3FqPjJPCkjjlD67nhUCfbtM+dGRdufas7tBer/q8NWtiZFFEk3QdCT
-         X2Qd30qrsHZDiBmW3J4BJ22nzUKD66bAmHj0A0pvO2oYLpEqPTtLUhwRRoa7DI3KnVcM
-         lQgRgmaNM4C6Z5w/cEc0oSJTWN0WI9DSlDQvt9uS7BhFheSvnZvaiyPpuTP7FkayT6NB
-         yAPIk/KFRjEZdHEHn8i6et2KyKDiJ9LiriRSmmd8UycuLdNZDzhbKAZCGkBLV2ra8b6z
-         rbga06uuf3J31JdzVZrOE5lqjxUMHb55PkJ3Zj9Agu18/9cjILNo7+x1THWaFCOG4mun
-         Sddg==
-X-Gm-Message-State: AFuF++lAO4OBiiNQjdNsCw/fDlt187Yo1anUKLJPD4Tq+ARVM/cktZJD
-	h6AS6IIldzXhY0Hip2y++0I2lzxu5i4w2tGAkFytZHhbaVz4liz7hNIG
-X-Gm-Gg: AR+sD12pUxPEUzpgTS4LziQg9i8oExBhdgmBDAmbNcoi3R6UL45Ma5uGnvsDhlyoEqa
-	fMQ4zY2/amnXXr6x7T9kKWa9tIfKdC/AbTGMhKDvqU7ztEHldJimRynhlyvSEvq4N9rGiDwx+LT
-	nv4BGPNUnWR0d2OhKfJX3d1SIDsIS+ernaIivT4psWDkFodtpvGwl+GS4p4Vz1JR5EyjR5RRsLe
-	vJOpYhCdhNgl/Jh81embp9awqiZ8LmpVrSJUF86s/t0Uze8dIuU3FcPTDrcSro/4bjONIOkR+Su
-	WeQa3ya80Yol/G1wqTzq8JjESOb2DWAC7SL4g5xu+hn9hAE6hQwC4UfVVWyqvZfbCAtMzfIAWc4
-	2GZ3fS1eEEHTqwcZIBC3Iqg7Lwu3EJogYOAOAEHXxbS4edbg3TFBlGQyj0YeK0mgXiMhmTAMkXD
-	Ah4NgMmzIsIsSSpYXAOPxU5HoVSmoFzBeYSaAG9cKsqmDlgHqKIxjYJanhqFYvzp+8vv29Jtp27
-	f0J9byhhAcJ8CqaI9RCC7+yvGLkel3jXHhcFg==
-X-Received: by 2002:a05:6000:4289:b0:47f:8b0f:7172 with SMTP id ffacd0b85a97d-482b7812077mr15390179f8f.6.1787248006116;
-        Thu, 20 Aug 2026 10:46:46 -0700 (PDT)
-Received: from kali ([169.224.126.247])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482b1441748sm15021700f8f.8.2026.08.20.10.46.44
+        bh=VheDXSGWAdEUyWfskzZJPclzNFlUteJiJtaXmDVdZPc=;
+        b=ilYMV5FJ2ZOLbSriLxAD3RLLUnzXXtBvn7l1BWh0x5gpZF//iLh7GDY9uVcRYr7e95
+         9kvTYzefP8PsM+ugBYYufNaPOjZpOHEgbszFPFfVvhEqr6S+c3VuX4i2JOyW6KB/1G3H
+         oZs63QiFNe8lEavI4gezwuJtOSx09mIFxHKjofcKuIZsAUd9GBfFYc9mpdD8uDg5WzXN
+         jTcJ50g6wNRTewa0v+PJdgBuGvimog9K3gUD5ol26nXNRBpzdvVvAq7i+dYplLL/+V76
+         9r0uvte0wOGp61vRP+vBa1F90YhHsKeNaT5CwqduUPGL96hnpHHxA68sPa8Mlk/vlW6N
+         M66A==
+X-Gm-Message-State: AFuF++nnEoPONAK2f15ksClI5kFJIyR+X+1UlL5sn4ITVVtvM2DnI1KL
+	n2GBX3xfOxmzSwK4h7lICUK2h6+MnoWEudCYCwfJY5AbZ1uokyJr9EaNGQpIm/IoMH15+MOog8Z
+	AMEgAEIZIvk9swvyPucjE9smPb4jL5XyT8JnQePyETTnQ5Fxaa2iS9a+dhvpQnZHsBkNJzyYlnu
+	C7r6o=
+X-Gm-Gg: AR+sD11gYGTg3iFSJeqMnDXbVhkANKMdz5BXkEjIERBhJgkVH6xjMiilhYue2vZH9LB
+	k84xxyOFDhixi+QL8p17lIY2+zMtmuiECrz0vuLMbly4Ad1HbzwKQH7hKwskf3RfhZudWh2Avut
+	smkK7kak9lhtuaZ0G7RsG1alDBJNsQai/1WwwlaUXU+xFf+gZZmoWOKMKb4VjifStGiejCHKSsO
+	FAWd9KNK2pu7RjviIeXdkD0RBJS5SwD9UlnNlzB79tqMvqHviHD5rgKG4RK//iWlT3cYrHznIEe
+	fPnvMCbZ8kdA5rFgSB0sTz1rq50VVeZEU96R2TQ9s+keov+emvMmpholgF+x9q+askxfKBXu0sW
+	usb64MxrOMQilP42R8whx5W4sG9NBVw==
+X-Received: by 2002:a17:902:fd8c:b0:2cc:864b:539 with SMTP id d9443c01a7336-2d64addb782mr8157505ad.6.1787248158330;
+        Thu, 20 Aug 2026 10:49:18 -0700 (PDT)
+X-Received: by 2002:a17:902:fd8c:b0:2cc:864b:539 with SMTP id d9443c01a7336-2d64addb782mr8156425ad.6.1787248157793;
+        Thu, 20 Aug 2026 10:49:17 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327bf15ff5dsm18641072eec.25.2026.08.20.10.49.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 10:46:45 -0700 (PDT)
-From: Ali Firas <alishmery18@gmail.com>
-To: luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ali Firas <alishmery18@gmail.com>
-Subject: [PATCH] Bluetooth: SCO: avoid deadlock in sco_conn_free()
-Date: Thu, 20 Aug 2026 20:46:33 +0300
-Message-ID: <20260820174633.1570398-1-alishmery18@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Thu, 20 Aug 2026 10:49:17 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v1 0/2] ranging: mode validation and
+Date: Thu, 20 Aug 2026 23:19:08 +0530
+Message-Id: <20260820174910.559116-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,225 +91,55 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODIwMDEzNCBTYWx0ZWRfX7YCUH5EPEOBC
+ pS0KtUXs2Xt3MgbY6wIK8eUP/qsxmIgxw5ZQahvEwwkyD/ZTTQcVcgkzzgLyCNaZJhl3RqsvzlK
+ qaOde0EUjaTBf1TjujF17FihxtaUfT5xYueWnIOZb583tYu6oHtxrME0HwJRtEEpwfNJuLy1Lea
+ HnugXNxQG/uW1g3spo2mz9tJU3oEW+nucmdSybldBHHiHDsJuUEnoi7O5dyrvyh+v6RpJJdZYMS
+ 519Oy512/jEK5vEc+9GbIZi5YIGxRORTD1p1lmAvqanvC7KFX4pUtG4JvgQqSYln4tAsja/Ea8G
+ Z1OymmAuxo97lrIr1lYazVCRT9pt/KPOxIFfULVszGiMgP7HfLAN/M7jRLWVJqu9L5+KXREm0vG
+ gflgqV5OOK1qSg1feHbZ0Min5nne3BclOpO/1Z011rnAQGZHIIcMjUHcMROzK9G5ImAmT/iZtRK
+ bmW1+L4553M+8rgmk5A==
+X-Proofpoint-ORIG-GUID: 0owapqEAAjBsPiDCcev2wBbSon13vKyg
+X-Authority-Analysis: v=2.4 cv=Y7fIdBeN c=1 sm=1 tr=0 ts=6a873e1e cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=kXjM_ZC17K1YYUI2TMkA:9
+ a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODIwMDEzNCBTYWx0ZWRfXxc0cT2nm74Ru
+ yskrr7opk/WTggGl9xjqtD3xSXHhJEZl8SVkP3exorf7ILiJyItJgYltRLHv5SIHxD2+TFPYo8F
+ mfEEXT1W+5/jfljePnTJZe9tG25+vRg=
+X-Proofpoint-GUID: 0owapqEAAjBsPiDCcev2wBbSon13vKyg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-20_01,2026-08-20_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 phishscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608200134
 
-sco_conn_free() (the sco_conn kref release) synchronously cancels the
-connection timeout work with disable_delayed_work_sync() while the caller
-holds lock_sock(sk).  The timeout work, sco_sock_timeout(), itself takes
-lock_sock(sk).  When a teardown path drops the connection's last reference
-under the socket lock -- e.g. sco_connect_cfm() -> hci_conn_failed() on a
-failed link, or a Disconnection Complete via sco_conn_del() -- the ensuing
-sco_conn_free() waits for a sco_sock_timeout() that is blocked on the same
-socket lock: an AB/BA deadlock.
+This patch series introduces validation for Main Mode and Sub Mode
+combinations in Channel Sounding configuration and updates the
+MaxTxPower option documentation to reflect the supported value range.
 
-On a PROVE_LOCKING kernel, lockdep reports:
+Patch 1 adds validation to ensure that only specification compliant
+main_mode_type and sub_mode_type combinations are accepted. Invalid
+combinations are rejected, and the user is informed of the supported
+mode pairings.
 
-  WARNING: possible circular locking dependency detected
-  kworker/u9:1 is trying to acquire lock:
-   ((work_completion)(&(&conn->timeout_work)->work)), at: __flush_work
-  but task is already holding lock:
-   (sk_lock-AF_BLUETOOTH-BTPROTO_SCO), at: sco_conn_del
-  -> #1 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO):
-         lock_sock_nested ; sco_sock_timeout ; process_one_work
-  -> #0 ((work_completion)(&conn->timeout_work)):
-         __flush_work ; disable_delayed_work_sync ; sco_conn_put ;
-         sco_chan_del ; sco_conn_del ; sco_connect_cfm
+Patch 2 updates the MaxTxPower configuration option documentation to
+clarify that decimal values are supported within the range of
+-127 dBm to 20 dBm. The documentation also notes that the default
+value is 20 dBm, corresponding to the maximum transmit power.
 
-The bug is reachable by an unprivileged local process: opening an
-AF_BLUETOOTH/BTPROTO_SCO socket needs no capability, and a short
-SO_SNDTIMEO makes the timeout fire during connection setup/teardown.
-(syzbot logged the same chain in 2022, closed obsolete with no reproducer.)
 
-The identical problem in the ISO transport was fixed in commit 200fa1629c57
-("Bluetooth: ISO: avoid deadlocks in iso_sock_timeout") by moving the
-timeout work out of the refcounted, freed-under-lock iso_conn and into
-iso_pinfo, so its lifetime follows the socket, and by cancelling it outside
-lock_sock().  Do the same for SCO: move timeout_work into struct sco_pinfo,
-drop the sync cancel from sco_conn_free(), and add sco_sock_disable_timer()
--- which asserts the socket lock is NOT held -- on the teardown paths
-(sco_conn_del(), sco_sock_kill(), sco_sock_close()).
+Naga Bhavani Akella (2):
+  src: Modify MaxTxPower option documentation for ChannelSounding
+  client: Enforce Valid Main Mode and Sub Mode Combinations
 
-Note that merely making the cancel asynchronous is not sufficient: with
-disable_delayed_work() the work can still run against freed memory, which
-KASAN reports as a use-after-free in sco_conn_hold_unless_zero().  The
-timer's lifetime has to follow the socket, as it now does for ISO.
+ client/cs.c   | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ src/main.conf |  6 ++--
+ 2 files changed, 78 insertions(+), 4 deletions(-)
 
-Reproducer available on request.
-
-Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
-Assisted-by: Claude:claude-opus-4-6 [claude-code]
-Signed-off-by: Ali Firas <alishmery18@gmail.com>
----
- net/bluetooth/sco.c | 76 +++++++++++++++++----------------------------
- 1 file changed, 28 insertions(+), 48 deletions(-)
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 3d4362a09df4..c87ad72af783 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -46,8 +46,6 @@ struct sco_conn {
- 	spinlock_t	lock;
- 	struct sock	*sk;
- 
--	struct delayed_work	timeout_work;
--
- 	unsigned int    mtu;
- 	struct kref	ref;
- };
-@@ -69,6 +67,7 @@ struct sco_pinfo {
- 	__u16		setting;
- 	struct bt_codec codec;
- 	struct sco_conn	*conn;
-+	struct delayed_work	timeout_work;
- };
- 
- /* ---- SCO timers ---- */
-@@ -89,9 +88,6 @@ static void sco_conn_free(struct kref *ref)
- 		hci_conn_drop(conn->hcon);
- 	}
- 
--	/* Ensure no more work items will run since hci_conn has been dropped */
--	disable_delayed_work_sync(&conn->timeout_work);
--
- 	kfree(conn);
- }
- 
-@@ -138,53 +134,45 @@ static struct sock *sco_sock_hold(struct sco_conn *conn)
- 
- static void sco_sock_timeout(struct work_struct *work)
- {
--	struct sco_conn *conn = container_of(work, struct sco_conn,
--					     timeout_work.work);
--	struct sock *sk;
--
--	conn = sco_conn_hold_unless_zero(conn);
--	if (!conn)
--		return;
--
--	sco_conn_lock(conn);
--	if (!conn->hcon) {
--		sco_conn_unlock(conn);
--		sco_conn_put(conn);
--		return;
--	}
--	sk = sco_sock_hold(conn);
--	sco_conn_unlock(conn);
--	sco_conn_put(conn);
--
--	if (!sk)
--		return;
-+	struct sco_pinfo *pi = container_of(work, struct sco_pinfo,
-+					    timeout_work.work);
-+	struct sock *sk = &pi->bt.sk;
- 
- 	BT_DBG("sock %p state %d", sk, sk->sk_state);
- 
- 	lock_sock(sk);
--	sk->sk_err = ETIMEDOUT;
--	sk->sk_state_change(sk);
-+	if (!sock_flag(sk, SOCK_ZAPPED)) {
-+		sk->sk_err = ETIMEDOUT;
-+		sk->sk_state_change(sk);
-+	}
- 	release_sock(sk);
--	sock_put(sk);
- }
- 
- static void sco_sock_set_timer(struct sock *sk, long timeout)
- {
-+	lockdep_assert(lockdep_sock_is_held(sk));
-+
-+	cancel_delayed_work(&sco_pi(sk)->timeout_work);
-+
- 	if (!sco_pi(sk)->conn)
- 		return;
- 
- 	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
--	cancel_delayed_work(&sco_pi(sk)->conn->timeout_work);
--	schedule_delayed_work(&sco_pi(sk)->conn->timeout_work, timeout);
-+	schedule_delayed_work(&sco_pi(sk)->timeout_work, timeout);
- }
- 
- static void sco_sock_clear_timer(struct sock *sk)
- {
--	if (!sco_pi(sk)->conn)
--		return;
-+	BT_DBG("sock %p state %d", sk, sk->sk_state);
-+	cancel_delayed_work(&sco_pi(sk)->timeout_work);
-+}
-+
-+static void sco_sock_disable_timer(struct sock *sk)
-+{
-+	lockdep_assert(!lockdep_sock_is_held(sk));
- 
- 	BT_DBG("sock %p state %d", sk, sk->sk_state);
--	cancel_delayed_work(&sco_pi(sk)->conn->timeout_work);
-+	disable_delayed_work_sync(&sco_pi(sk)->timeout_work);
- }
- 
- /* ---- SCO connections ---- */
-@@ -214,7 +202,6 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
- 
- 	kref_init(&conn->ref);
- 	spin_lock_init(&conn->lock);
--	INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
- 
- 	hcon->sco_data = conn;
- 	conn->hcon = hcon;
-@@ -274,9 +261,10 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 	if (!sk)
- 		return;
- 
-+	sco_sock_disable_timer(sk);
-+
- 	/* Kill socket */
- 	lock_sock(sk);
--	sco_sock_clear_timer(sk);
- 	sco_chan_del(sk, err);
- 	release_sock(sk);
- 	sock_put(sk);
-@@ -532,6 +520,8 @@ static void sco_sock_kill(struct sock *sk)
- 
- 	BT_DBG("sk %p state %d", sk, sk->sk_state);
- 
-+	sco_sock_disable_timer(sk);
-+
- 	/* Sock is dead, so set conn->sk to NULL to avoid possible UAF */
- 	lock_sock(sk);
- 	if (sco_pi(sk)->conn) {
-@@ -574,23 +564,11 @@ static void __sco_sock_close(struct sock *sk)
- /* Must be called on unlocked socket. */
- static void sco_sock_close(struct sock *sk)
- {
--	struct sco_conn *conn;
--
--	lock_sock(sk);
--	conn = sco_pi(sk)->conn;
--	if (conn)
--		sco_conn_hold(conn);
--	release_sock(sk);
--
--	if (conn)
--		disable_delayed_work_sync(&conn->timeout_work);
-+	sco_sock_disable_timer(sk);
- 
- 	lock_sock(sk);
- 	__sco_sock_close(sk);
- 	release_sock(sk);
--
--	if (conn)
--		sco_conn_put(conn);
- }
- 
- static void sco_sock_init(struct sock *sk, struct sock *parent)
-@@ -622,6 +600,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
- 	sk->sk_destruct = sco_sock_destruct;
- 	sk->sk_sndtimeo = SCO_CONN_TIMEOUT;
- 
-+	INIT_DELAYED_WORK(&sco_pi(sk)->timeout_work, sco_sock_timeout);
-+
- 	sco_pi(sk)->setting = BT_VOICE_CVSD_16BIT;
- 	sco_pi(sk)->codec.id = BT_CODEC_CVSD;
- 	sco_pi(sk)->codec.cid = 0xffff;
 -- 
-2.53.0
 
