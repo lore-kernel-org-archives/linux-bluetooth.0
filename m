@@ -1,178 +1,187 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A92335836E;
-	Thu, 20 Aug 2026 09:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA861925BC;
+	Thu, 20 Aug 2026 09:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787217576; cv=none; b=fQYOxyaBWiLWW5mS2OGJmgNsFHQOFd0uX/vpGN7mEVzYknGP9iZoLbPhXHZKb9pE6CWkQLEmThu5/dK58nVOUR7dNYnPxNqI6ExW5DHhuUxTcv/OsLgq1dVGEZNEtkLSrXvoakxGPDEJKDdxUuTnO3ZQ0F3RKDuIRw/2Yqalh+A=
+	t=1787218169; cv=none; b=ah1MP0ip3+N1kAjGuL5FKfs/8hnXleG4qfneT2k/C5NvwF+a7fkC+9xFYpe6VS/8S70KkWyCylWBsKHHJ1sXIjrSdSrxDAwhNkIrrVfhKlf9eJ0JvnbxEF0MaHTtnnb/kjDKrezSNwEF5xNWkMW2gaYzkyep/SxM+vJX2gbz8M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787217576; c=relaxed/simple;
-	bh=nOtss0TxCtmWdavoL7v9pn+0B0ICzGQGg10gKsPVpVI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=a7zHtA2gHEnnpAUvGlk51jkkwVCNI6BmU5S/WLe3iwTLyLR6CtCokVdntBmlro6C2WW5GOs8SQaX1nZMw4lB8zXR3bwXbb8G5MG1w/niZ8pQTwjcCIh+oC1y0Fc9nAt+DMWXMZboWW0+UpBCTzuXDafm5cQyetwCmpNsk2hQCf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=RqF6TXdw; arc=none smtp.client-ip=54.207.22.56
+	s=arc-20240116; t=1787218169; c=relaxed/simple;
+	bh=5OAW/MbRyB26SkAepBYiDmXaKmDLVtpi1Ln9k9M5LW0=;
+	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
+	 Content-Type; b=EadnXYo7eGnqJ1ly1HntxhFNtQvuDaFrpuCphNsaQcNFTAuj74+vBXg9N1r8GZ+HdajH6ncUqE2uIb4R2Tf7XTvGZvgbb4sUPuHDEbj4cYsqmi6rwwtcTVewLVq0Mfhw+sWCq7r7cb/lRWi3CennzFFONvdR0vU4Jp0/MgLb71g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=io96U2Kl; arc=none smtp.client-ip=54.206.16.166
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="RqF6TXdw"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="io96U2Kl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1787217535;
-	bh=GoEKBmJAt8A3ik2//Pv/SnjBVCtMlg5xJdeBJ33wumM=;
-	h=From:Date:Subject:MIME-Version:Message-Id:To;
-	b=RqF6TXdwW4HPgmVA/Su6gENwOYS7vSsO7ODvb36H0FkgrmGR0goWPEGwbxz7/ABL6
-	 Hy00IIzedMWKdQZoKPWVrEoS481ds/kHW7Dkpa90lmfxoOM2JvKCnOTftAPcG8xmoW
-	 22KDo4Msbq9t6ReCCrtmEFGCKZXMbmSSf0rAIOGY=
-X-QQ-mid: zesmtpgz4t1787217527t383c08ee
-X-QQ-Originating-IP: yAWf75JrCXRBpkI+bEOJlyQKFVf9z7Y1+lPGW1bKpII=
-Received: from [10.10.7.64] ( [1.202.39.170])
+	s=onoh2408; t=1787218110;
+	bh=5OAW/MbRyB26SkAepBYiDmXaKmDLVtpi1Ln9k9M5LW0=;
+	h=Date:From:To:Subject:Mime-Version:Message-ID;
+	b=io96U2KlUJWAiZp9IJPQRh7+QF0isWQkLyKcniPJTYclWz4LG5VkyjEalScn5M6RQ
+	 xQ/U6b6+Bb3/+sFSFRpAqB+PJFufYl60CJpEUT2mZw5zae2i/3esezBJV/qaqQkq2H
+	 vX0tisVz5OGvbtMMztlG9+sKDlBtIcCZ7RUe8qn4=
+X-QQ-mid: esmtpgz13t1787218107t5a424835
+X-QQ-Originating-IP: jfYBfIQ48XcVAZBVd81tJqu67sbuRfDp7JFuvkTK7+E=
+Received: from PEN002676 ( [124.126.19.250])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 20 Aug 2026 17:18:46 +0800 (CST)
+	id ; Thu, 20 Aug 2026 17:28:24 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 1403180757750471603
-From: ZhaoJinming <zhaojinming@uniontech.com>
-Date: Thu, 20 Aug 2026 17:17:40 +0800
-Subject: [PATCH 3/3] Bluetooth: btintel_pcie: Fix bounds checks in RX
- completion handler
+X-BIZMAIL-ID: 14280824102998487296
+Date: Thu, 20 Aug 2026 17:28:25 +0800
+From: =?GB2312?B?1dS98MP3?= <zhaojinming@uniontech.com>
+To: pmenzel <pmenzel@molgen.mpg.de>
+Cc: marcel <marcel@holtmann.org>, 
+	luiz.dentz <luiz.dentz@gmail.com>, 
+	kiran.k <kiran.k@intel.com>, 
+	tedd.an <tedd.an@intel.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: btintel_pcie: Fix array bounds check bugs
+References: <460316663D6D34ED+20260813103734.222955-1-zhaojinming@uniontech.com>, 
+	<1217891c-bf57-4c1a-9963-27400f60a5cd@molgen.mpg.de>
+X-Priority: 3
+X-GUID: 42395EE0-4246-4707-8D55-7E8EC24CC274
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.375[cn]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260820-btintel_pcie_bounds_fixes-v1-3-c9dcd1ac8bf6@uniontech.com>
-References: <20260820-btintel_pcie_bounds_fixes-v1-0-c9dcd1ac8bf6@uniontech.com>
-In-Reply-To: <20260820-btintel_pcie_bounds_fixes-v1-0-c9dcd1ac8bf6@uniontech.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Marcel Holtmann <marcel@holtmann.org>, Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.14.2
+Mime-Version: 1.0
+Message-ID: <29284DB938598E03+202608201728246970323@uniontech.com>
+Content-Type: text/plain;
+	charset="GB2312"
+Content-Transfer-Encoding: base64
 X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: MdzdX6p4PZzklCHKoGpLZBbFi7kvlpQe8XtDNQkiiOv8o7YodMQJHV70
-	DUNxjC5iGkdpsuLgP4KSzgZQyJtXXwkdZ5TeN/Dn9wSC3HhgzrHg7rq0K7ldICNJYs4mNRq
-	VpmkdO7XvqQoF+g8D6/4WNFALCAfuD9TarvS+LXqAzycEyPtRRmu/fJspEaLnnIYNsCEw+R
-	38+rZy9gJjg2ToP5RLTcZnkl3SvNGno+DND6viiNv6bscus9WFPTnuKU7/IhB//8eeuocMn
-	NzSQvEjl/up+UKShr+Wj7wN/4bLPCjN0jN6PYsgOXnO6SVxdsMdnUNq/S8suw5DuXi60nlU
-	XSVgyX8+RYV733kkkNkk6WkQrAIw8f96VmPUstudU3in4zee4W12JsZy2HLfTmVjMJfTgr9
-	NWWVkW4xbAyx6UKcPxdpxC89iVdnBA0+aBy0bzW93AgP4RgIA0R6hnG8hZ0x0iYfyDncRuK
-	slt/+4wKdnzC5ohoowYmUUKdYGKt54ufpDPiIU2m2abmfRVG3CPFNLI45EJidFzMo3pYTxS
-	8hpEDh4/llJzdtnnzvWT7uaeJzZO6oQCM6tbiEOJlgCbd+Am44eWzYNCcQfaQ4QvYebdleL
-	0ml8o6n5KKmwwsckeROy4m5bx2VKKeSLYq5FloqOqqEQ05o/aLDH8sZ/JU3Gpqw/6rVmBbu
-	pQFKL7sxpyVPF857zYgE7MCr5emv60SRx1N2BUJbE8uSoQmSZHL8hBhrlHsK8Fz8RO6QsMJ
-	TK8PkxMU/AKPKs65X8lOrBKGB3uvhySYeVFh5XjfEG/WXxZgxE+5SEpvJthzPWAjDilUzU+
-	z7f3hS6vl966zCwzA0OGmUI2nv7r/mmZIqrqAXkE+s8VGXsYwgSu+VOq1iVbKl6qVu7HHRs
-	fjPQXm6Gp33iLEKduhf7F7UXZBIhu7kPRf/6TW/dRdmgDthHD4t7S+sUyr5lV23z+Sj4cd0
-	sQZ8p8n/TbME6kWNEPhT2rMMec8HsY4st+OpamcHn85Mo37JWy5YDAUE5rm5He6Y9nKXCRi
-	6o+Bdm/4EEH32PwLG9NQbZBydLTgWokJNdDAMlBteR7UkhxjQc
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: N7h1OCCDntujeM9umMLCj+pWJ9X+CqptgNofImr3oEjkVefNQACIz8AB
+	sgNbzjF488ior6O8o2KqNucDPapho7Ls8cexDvRfDpggKjFvy8143pf2VROILSMkT+tYFlZ
+	Bf2lCB/a2zbAk9ZQHE+5EK1eD7UOmeBtTaYjmP6PI9Gco4ffhd32wucRf01DCet4KSvQvMR
+	8jmZ3XlZsfkl4pinZnFSTbNvTaqQD03t2STagA4bxavr2OVOcJU22LZ2oB6XOuI4ATV4myx
+	LVrSMHxmX0OGMTO57hRWZ2Cttlb1gKpjEk+39m9CyANrGGrYXKL/UXG0e8H0839sPSdh8o2
+	EQTq6j8EkbZZRJP0+SWShXRb0VnkPcqv4iqC6uSbfbxpbauewyXp7vhXBKPT2jJWVY3GMBp
+	FVeVw+fArVuyaU8stZ0PYLq82gYpiqLIDlIA66yo5uQKBs6Zv3xJBCZZu6Mtkg3A/bAZ6Q+
+	Qc+f39w6FNgdhd6UUUd+uzy/jKOxlzHYoYhFbSDe0f9SIl0dWOVsnr2uKqTGTKezYLSwchb
+	x+LhL51y22XRJTyLpbUEO47D7f6SolkcTZoG6Ss5HLaFtvWqoeptpQHnwh3DorsKXO+a9QM
+	Nk7L7/h9bkdensyHvrr+AmOMTR7H5zvhPU3GawpGbC2CZjPJHRBeKs5dFBHQv8RogBD7dIM
+	eFfbKycfcCtYax2PrPsI3TbtFG+z4pLt60vhW02I8RpLa4rFE2D4s4+88Y1Hj3om4Jh0vAQ
+	Xpgx1arLv9V14V/JiX/hgADd0qQexOIaRr8m1E8Yo3MBqmGT+lcgdybyFVov/Rwe/b8HJSb
+	pWWKsvLJLupOkZxaxaEw8mfZSaTsjKLtKYA7xHAw/LeDBlwactxkryTNOR/VVik0gi6lGVF
+	Qxc4UiAkMKaofW63Z5n13ALlQkSyrSj9jRuKIh7FK4lJkaJh58fbzyloFjp0xADsYb3JbyB
+	+JVy+BERdXpOn5Yly7ygXGxjfoqz6dARqAuTL0eVQMVnWRFrUm4XnssYrUnnrcRyGLCNkd/
+	Quf0UYo08YHVt2PNOm/VKV/wpdeyKqTenD5Q5WxZzGcU7kiy8J
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
 X-QQ-RECHKSPAM: 0
 
-Fix three issues in btintel_pcie_msix_rx_handle():
-
-1. cr_tia is a device-controlled value from shared DMA memory
-   (data->ia.cr_tia[]) and is used to index rxq->urbd1s[] without
-   a bounds check. An out-of-range value could cause an out-of-bounds
-   access when indexing rxq->urbd1s[]. Add a bounds check before the
-   array access. When cr_tia is out of range, reset the ring consumer
-   pointer (data->ia.cr_tia[]) to cr_hia so the queue can recover on
-   the next interrupt.
-
-2. urbd1->frbd_tag is a 16-bit device-controlled field (0-65535)
-   used directly as an index into rxq->bufs[] (64 elements). Add a
-   bounds check. Read the field via READ_ONCE() to avoid a
-   Time-of-Check to Time-of-Use (TOCTOU) race, since the field is
-   in DMA-coherent memory and the compiler may emit two separate
-   reads.
-
-3. All error paths in the while loop use 'return', which exits the
-   handler without advancing cr_tia. This causes the RX completion
-   queue to stall, as the next interrupt would process the same
-   corrupted descriptor and exit again. Change to 'break' to exit
-   the loop without further processing.
-
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
- drivers/bluetooth/btintel_pcie.c | 44 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 38 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index c1fd5feb9f81bbd70fabd12b12eb4a1708f6a91f..1f5537df620972d937f65e754701f65566e4655a 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1586,7 +1586,7 @@ static int btintel_pcie_submit_rx_work(struct btintel_pcie_data *data, u8 status
- /* Handles the MSI-X interrupt for rx queue 1 which is for RX */
- static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
- {
--	u16 cr_hia, cr_tia;
-+	u16 cr_hia, cr_tia, frbd_tag;
- 	struct rxq *rxq;
- 	struct urbd1 *urbd1;
- 	struct data_buf *buf;
-@@ -1608,21 +1608,53 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
- 	 * process all received CDs in this interrupt.
- 	 */
- 	while (cr_tia != cr_hia) {
-+		if (cr_tia >= rxq->count) {
-+			bt_dev_err(hdev, "RXQ: invalid cr_tia %u >= %u, contact device vendor",
-+				   cr_tia, rxq->count);
-+			/* Reset consumer pointer so the ring can
-+			 * recover on the next interrupt.
-+			 */
-+			data->ia.cr_tia[BTINTEL_PCIE_RXQ_NUM] = cr_hia;
-+			break;
-+		}
-+
- 		urbd1 = &rxq->urbd1s[cr_tia];
- 		ipc_print_urbd1(data->hdev, urbd1, cr_tia);
- 
--		buf = &rxq->bufs[urbd1->frbd_tag];
-+		/* frbd_tag is a bitfield in DMA-coherent memory;
-+		 * read the full word once with READ_ONCE to avoid
-+		 * TOCTOU race with the device.
-+		 */
-+		frbd_tag = READ_ONCE(*(const u32 *)urbd1) & 0xffff;
-+
-+		if (frbd_tag >= rxq->count) {
-+			bt_dev_err(hdev, "RXQ: invalid frbd_tag %u >= %u, contact device vendor",
-+				   frbd_tag, rxq->count);
-+			/* Device provided invalid data. Leave cr_tia
-+			 * unchanged so the error remains detectable
-+			 * via repeated log messages, aiding debug.
-+			 */
-+			break;
-+		}
-+
-+		buf = &rxq->bufs[frbd_tag];
- 		if (!buf) {
--			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %d",
--				   urbd1->frbd_tag);
--			return;
-+			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %u",
-+				   frbd_tag);
-+			/* Unexpected NULL pointer; leave cr_tia
-+			 * unchanged to keep the error visible.
-+			 */
-+			break;
- 		}
- 
- 		ret = btintel_pcie_submit_rx_work(data, urbd1->status,
- 						  buf->data);
- 		if (ret) {
- 			bt_dev_err(hdev, "RXQ: failed to submit rx request");
--			return;
-+			/* Submission failed; leave cr_tia unchanged
-+			 * to keep the error detectable on retry.
-+			 */
-+			break;
- 		}
- 
- 		cr_tia = (cr_tia + 1) % rxq->count;
-
--- 
-2.51.0
+VGhhbmsgeW91IGZvciB5b3VyIHJldmlldy4KCkkgc3BsaXQgdGhlIGZpeGVzIGludG8gMyBwYXRj
+aGVzIGluIGEgbmV3IHRocmVhZCBhcyBzdWdnZXN0ZWQuCkNoYW5nZXMgaW4gdjE6Ci0gRml4ZWQg
+b2ZmLWJ5LW9uZSBjb21wYXJpc29ucyBpbiB0aGUgc3luY2hyb25vdXMgcGF0aHMKLSBBZGRlZCBi
+b3VuZHMgY2hlY2tzIGZvciBjcl90aWEgYW5kIGRlc2NyaXB0b3IgZmllbGRzIGluIFRYL1JYIGhh
+bmRsZXJzCi0gVXNlZCBSRUFEX09OQ0UoKSBmb3IgRE1BLWNvaGVyZW50IGJpdGZpZWxkIHJlYWRz
+IHRvIGF2b2lkIFRPQ1RPVQotIENoYW5nZWQgcmV0dXJuIHRvIGJyZWFrIHRvIGF2b2lkIHJlcGVh
+dGVkIHByb2Nlc3Npbmcgb2YgY29ycnVwdGVkIGRlc2NyaXB0b3JzCgpodHRwczovL2xvcmUua2Vy
+bmVsLm9yZy9hbGwvMjAyNjA4MjAtYnRpbnRlbF9wY2llX2JvdW5kc19maXhlcy12MS0wLWM5ZGNk
+MWFjOGJmNkB1bmlvbnRlY2guY29tLwoKVGhhbmtzLApaaGFvIEppbm1pbmcKCgoKPkRlYXIgWmhh
+bywKCgoKPgoKCgo+CgoKCj5UaGFuayB5b3UgZm9yIHlvdXIgcGF0Y2guIEZvciB0aGUgc3VtbWFy
+eSBJoa9kIHVzZToKCgoKPgoKCgo+Qmx1ZXRvb3RoOiBidGludGVsX3BjaWU6IENoZWNrIGFycmF5
+IGJvdW5kcyBvZiBkZXYgY29udHJvbGxlZCBpbmRpY2VzCgoKCj4KCgoKPkFtIDEzLjA4LjI2IHVt
+IDEyOjM3IHNjaHJpZWIgWmhhb0ppbm1pbmc6CgoKCj4+IEZpeCBmb3VyIGFycmF5IGJvdW5kcyBp
+c3N1ZXMgaW4gdGhlIEludGVsIEJUIFBDSWUgZHJpdmVyOgoKCgo+PiAKCgoKPj4gMS4gYnRpbnRl
+bF9wY2llX3NlbmRfc3luYygpOiBib3VuZHMgY2hlY2sgZm9yIHRmZF9pbmRleCB1c2VzICc+JyBp
+bnN0ZWFkCgoKCj4+Pz8/PyBvZiAnPj0nLj8gV2hlbiB0ZmRfaW5kZXggPT0gdHhxLT5jb3VudCAo
+MzIpLCB0aGUgY2hlY2sgcGFzc2VzIGFuZAoKCgo+Pj8/Pz8gYnRpbnRlbF9wY2llX3ByZXBhcmVf
+dHgoKSB3cml0ZXMgcGFzdCB0aGUgZW5kIG9mIHR4cS0+dGZkc1tdIGFuZAoKCgo+Pj8/Pz8gdHhx
+LT5idWZzW10uCgoKCj4+IAoKCgo+PiAyLiBidGludGVsX3BjaWVfc3VibWl0X3J4KCk6IHNhbWUg
+b2ZmLWJ5LW9uZSBvbiBmcmJkX2luZGV4Lj8gV2hlbgoKCgo+Pj8/Pz8gZnJiZF9pbmRleCA9PSBy
+eHEtPmNvdW50ICg2NCksIHRoZSBjaGVjayBwYXNzZXMgYW5kCgoKCj4+Pz8/PyBidGludGVsX3Bj
+aWVfcHJlcGFyZV9yeCgpIHdyaXRlcyBwYXN0IHRoZSBlbmQgb2YgcnhxLT5mcmJkc1tdIGFuZAoK
+Cgo+Pj8/Pz8gcnhxLT5idWZzW10uCgoKCj4+IAoKCgo+PiAzLiBidGludGVsX3BjaWVfbXNpeF90
+eF9oYW5kbGUoKTogY3JfdGlhIChkZXZpY2UtY29udHJvbGxlZCwgZnJvbQoKCgo+Pj8/Pz8gc2hh
+cmVkIERNQSBtZW1vcnkpIGlzIHVzZWQgdG8gaW5kZXggdHhxLT51cmJkMHNbXSBiZWZvcmUgYW55
+IGJvdW5kcwoKCgo+Pj8/Pz8gY2hlY2ssIGFuZCB0aGUgdXJiZDAtPnRmZF9pbmRleCBjaGVjayB1
+c2VzICc+JyBpbnN0ZWFkIG9mICc+PScuCgoKCj4+IAoKCgo+PiA0LiBidGludGVsX3BjaWVfbXNp
+eF9yeF9oYW5kbGUoKTogY3JfdGlhIChkZXZpY2UtY29udHJvbGxlZCkgaW5kZXhlcwoKCgo+Pj8/
+Pz8gcnhxLT51cmJkMXNbXSB3aXRoIG5vIGJvdW5kcyBjaGVjay4/IHVyYmQxLT5mcmJkX3RhZyBp
+cyBhIDE2LWJpdAoKCgo+Pj8/Pz8gZGV2aWNlLWNvbnRyb2xsZWQgZmllbGQgKDAtNjU1MzUpIHVz
+ZWQgZGlyZWN0bHkgYXMgYW4gaW5kZXggaW50bwoKCgo+Pj8/Pz8gcnhxLT5idWZzW10gKDY0IGVs
+ZW1lbnRzKS4KCgoKPgoKCgo+RW51bWVyYXRpbmcgdGhpbmdzIGluIHRoZSBjb21taXQgbWVzc2Fn
+ZSwgaXMgYSBnb29kIGluZGljYXRvciB0byBzcGxpdCAKCgoKPnRoZSBjb21taXQgaW50byBzbWFs
+bGVyIG9uZXMuCgoKCj4KCgoKPj4gRml4IGFsbCBmb3VyIGJ5IGNvcnJlY3RpbmcgdGhlIGNvbXBh
+cmlzb24gb3BlcmF0b3JzIGFuZCBhZGRpbmcgZXhwbGljaXQKCgoKPj4gYm91bmRzIGNoZWNrcyBv
+biBkZXZpY2UtY29udHJvbGxlZCBpbmRpY2VzIGJlZm9yZSBhcnJheSBhY2Nlc3MuCgoKCj4+IAoK
+Cgo+PiBGaXhlczogYzJiNjM2YjNmNzg4ICgiQmx1ZXRvb3RoOiBidGludGVsX3BjaWU6IEFkZCBz
+dXBwb3J0IGZvciBQQ0llIHRyYW5zcG9ydCIpCgoKCj4+IFNpZ25lZC1vZmYtYnk6IFpoYW9KaW5t
+aW5nIDx6aGFvamlubWluZ0B1bmlvbnRlY2guY29tPgoKCgo+PiAtLS0KCgoKPj4/PyBkcml2ZXJz
+L2JsdWV0b290aC9idGludGVsX3BjaWUuYyB8IDIxICsrKysrKysrKysrKysrKysrKy0tLQoKCgo+
+Pj8/IDEgZmlsZSBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKCgo+
+PiAKCgoKPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jIGIv
+ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llLmMKCgoKPj4gaW5kZXggMmI3MjMxYmU1OTcz
+Li4zMmNmYTBmNWFmMWMgMTAwNjQ0CgoKCj4+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50
+ZWxfcGNpZS5jCgoKCj4+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jCgoK
+Cj4+IEBAIC00MDEsNyArNDAxLDcgQEAgc3RhdGljIGludCBidGludGVsX3BjaWVfc2VuZF9zeW5j
+KHN0cnVjdCBidGludGVsX3BjaWVfZGF0YSAqZGF0YSwKCgoKPj4/PyAKCgoKPj4/PyAJdGZkX2lu
+ZGV4ID0gZGF0YS0+aWEudHJfaGlhW0JUSU5URUxfUENJRV9UWFFfTlVNXTsKCgoKPj4/PyAKCgoK
+Pj4gLQlpZiAodGZkX2luZGV4ID4gdHhxLT5jb3VudCkKCgoKPj4gKwlpZiAodGZkX2luZGV4ID49
+IHR4cS0+Y291bnQpCgoKCj4+Pz8gCQlyZXR1cm4gLUVSQU5HRTsKCgoKPj4/PyAKCgoKPj4/PyAJ
+LyogRmlybXdhcmUgcmFpc2VzIGFsaXZlIGludGVycnVwdCBvbiBIQ0lfT1BfUkVTRVQgb3IKCgoK
+Pj4gQEAgLTUwMiw3ICs1MDIsNyBAQCBzdGF0aWMgaW50IGJ0aW50ZWxfcGNpZV9zdWJtaXRfcngo
+c3RydWN0IGJ0aW50ZWxfcGNpZV9kYXRhICpkYXRhKQoKCgo+Pj8/IAoKCgo+Pj8/IAlmcmJkX2lu
+ZGV4ID0gZGF0YS0+aWEudHJfaGlhW0JUSU5URUxfUENJRV9SWFFfTlVNXTsKCgoKPj4/PyAKCgoK
+Pj4gLQlpZiAoZnJiZF9pbmRleCA+IHJ4cS0+Y291bnQpCgoKCj4+ICsJaWYgKGZyYmRfaW5kZXgg
+Pj0gcnhxLT5jb3VudCkKCgoKPj4/PyAJCXJldHVybiAtRVJBTkdFOwoKCgo+Pj8/IAoKCgo+Pj8/
+IAkvKiBQcmVwYXJlIGZvciBSWCBzdWJtaXQuIEl0IHVwZGF0ZXMgdGhlIEZSQkQgd2l0aCB0aGUg
+YWRkcmVzcyBvZiBETUEKCgoKPj4gQEAgLTEwOTQsMTIgKzEwOTQsMTUgQEAgc3RhdGljIHZvaWQg
+YnRpbnRlbF9wY2llX21zaXhfdHhfaGFuZGxlKHN0cnVjdCBidGludGVsX3BjaWVfZGF0YSAqZGF0
+YSkKCgoKPj4/PyAJdHhxID0gJmRhdGEtPnR4cTsKCgoKPj4/PyAKCgoKPj4/PyAJd2hpbGUgKGNy
+X3RpYSAhPSBjcl9oaWEpIHsKCgoKPj4gKwkJaWYgKGNyX3RpYSA+PSB0eHEtPmNvdW50KQoKCgo+
+PiArCQkJcmV0dXJuOwoKCgo+PiArCgoKCj4+Pz8gCQlkYXRhLT50eF93YWl0X2RvbmUgPSB0cnVl
+OwoKCgo+Pj8/IAkJd2FrZV91cCgmZGF0YS0+dHhfd2FpdF9xKTsKCgoKPj4/PyAKCgoKPj4/PyAJ
+CXVyYmQwID0gJnR4cS0+dXJiZDBzW2NyX3RpYV07CgoKCj4+Pz8gCgoKCj4+IC0JCWlmICh1cmJk
+MC0+dGZkX2luZGV4ID4gdHhxLT5jb3VudCkKCgoKPj4gKwkJaWYgKHVyYmQwLT50ZmRfaW5kZXgg
+Pj0gdHhxLT5jb3VudCkKCgoKPj4/PyAJCQlyZXR1cm47CgoKCj4KCgoKPmdlbWluaS9nZW1pbmkt
+My4xLXByby1wcmV2aWV3IGNvbW1lbnRzIFsxXToKCgoKPgoKCgo+PiBJZiB1cmJkMC0+dGZkX2lu
+ZGV4IGlzIGludmFsaWQgYW5kIHdlIHJldHVybiBlYXJseSBoZXJlLCBkb2Vzbid0IHRoaXMgcGVy
+bWFuZW50bHkKCgoKPj4gc3RhbGwgdGhlIFRYIGNvbXBsZXRpb24gcXVldWU/CgoKCj4+IEJ5IHJl
+dHVybmluZyBlYXJseSwgY3JfdGlhIGlzIG5ldmVyIGFkdmFuY2VkLiBUaGUgbmV4dCBpbnRlcnJ1
+cHQgd2lsbCBwcm9jZXNzCgoKCj4+IHRoZSBleGFjdCBzYW1lIGNvcnJ1cHRlZCBkZXNjcmlwdG9y
+IGFuZCByZXR1cm4gZWFybHkgYWdhaW4uCgoKCj4KCgoKPgoKCgo+CgoKCj4+Pz8gCgoKCj4+Pz8g
+CQljcl90aWEgPSAoY3JfdGlhICsgMSkgJSB0eHEtPmNvdW50OwoKCgo+PiBAQCAtMTU4NCw5ICsx
+NTg3LDIxIEBAIHN0YXRpYyB2b2lkIGJ0aW50ZWxfcGNpZV9tc2l4X3J4X2hhbmRsZShzdHJ1Y3Qg
+YnRpbnRlbF9wY2llX2RhdGEgKmRhdGEpCgoKCj4+Pz8gCSAqIHByb2Nlc3MgYWxsIHJlY2VpdmVk
+IENEcyBpbiB0aGlzIGludGVycnVwdC4KCgoKPj4/PyAJICovCgoKCj4+Pz8gCXdoaWxlIChjcl90
+aWEgIT0gY3JfaGlhKSB7CgoKCj4+ICsJCWlmIChjcl90aWEgPj0gcnhxLT5jb3VudCkgewoKCgo+
+PiArCQkJYnRfZGV2X2VycihoZGV2LCAiUlhROiBpbnZhbGlkIGNyX3RpYSAldSAoY291bnQgJXUp
+IiwKCgoKPgoKCgo+TWF5YmU6IFJYUTogaW52YWxpZCBjcl90aWEgJXUgPj0gJXUsIGNvbnRhY3Qg
+ZGV2aWNlIHZlbmRvcgoKCgo+CgoKCj4+ICsJCQkJPz8gY3JfdGlhLCByeHEtPmNvdW50KTsKCgoK
+Pj4gKwkJCXJldHVybjsKCgoKPj4gKwkJfQoKCgo+PiArCgoKCj4+Pz8gCQl1cmJkMSA9ICZyeHEt
+PnVyYmQxc1tjcl90aWFdOwoKCgo+Pj8/IAkJaXBjX3ByaW50X3VyYmQxKGRhdGEtPmhkZXYsIHVy
+YmQxLCBjcl90aWEpOwoKCgo+Pj8/IAoKCgo+PiArCQlpZiAodXJiZDEtPmZyYmRfdGFnID49IHJ4
+cS0+Y291bnQpIHsKCgoKPj4gKwkJCWJ0X2Rldl9lcnIoaGRldiwgIlJYUTogaW52YWxpZCBmcmJk
+X3RhZyAldSAoY291bnQgJXUpIiwKCgoKPgoKCgo+RGl0dG8gcmVnYXJkaW5nIHRoZSBsb2cgbWVz
+c2FnZS4KCgoKPgoKCgo+PiArCQkJCT8/IHVyYmQxLT5mcmJkX3RhZywgcnhxLT5jb3VudCk7CgoK
+Cj4+ICsJCQlyZXR1cm47CgoKCj4+ICsJCX0KCgoKPj4gKwoKCgo+CgoKCj5nZW1pbmkvZ2VtaW5p
+LTMuMS1wcm8tcHJldmlldyBjb21tZW50cyBbMV06CgoKCj4KCgoKPj4gQnkgcmV0dXJuaW5nIGVh
+cmx5IHdoZW4gdXJiZDEtPmZyYmRfdGFnIGlzIGludmFsaWQsIHdlIGZhaWwgdG8gYWR2YW5jZSBj
+cl90aWEuCgoKCj4+IFdpbGwgdGhpcyBwZXJtYW5lbnRseSBzdGFsbCB0aGUgUlggY29tcGxldGlv
+biBxdWV1ZSBzaW5jZSB0aGUgbmV4dCBpbnRlcnJ1cHQKCgoKPj4gd2lsbCBwcm9jZXNzIHRoZSBz
+YW1lIGNvcnJ1cHRlZCBkZXNjcmlwdG9yPwoKCgo+CgoKCj4+Pz8gCQlidWYgPSAmcnhxLT5idWZz
+W3VyYmQxLT5mcmJkX3RhZ107CgoKCj4KCgoKPmdlbWluaS9nZW1pbmktMy4xLXByby1wcmV2aWV3
+IGNvbW1lbnRzIFsxXToKCgoKPgoKCgo+PiBEb2VzIHRoaXMgaW50cm9kdWNlIGEgVGltZS1vZi1D
+aGVjayB0byBUaW1lLW9mLVVzZSAoVE9DVE9VKSB2dWxuZXJhYmlsaXR5PwoKCgo+PiB1cmJkMS0+
+ZnJiZF90YWcgaXMgYSBiaXRmaWVsZCBpbnNpZGUgYSBETUEtY29oZXJlbnQgc3RydWN0dXJlLiBU
+aGUgY29kZSBhY2Nlc3NlcwoKCgo+PiBpdCBvbmNlIGZvciB0aGUgYm91bmRzIGNoZWNrIChhYm92
+ZSkgYW5kIGFnYWluIGhlcmUgdG8gaW5kZXggdGhlIGFycmF5LgoKCgo+PiBDYW4gdGhlIGNvbXBp
+bGVyIGVtaXQgdHdvIHNlcGFyYXRlIG1lbW9yeSByZWFkcywgYWxsb3dpbmcgdGhlIGRldmljZSB0
+byBhbHRlcgoKCgo+PiB0aGUgdmFsdWUgYWZ0ZXIgdGhlIGNoZWNrIHBhc3NlcyBidXQgYmVmb3Jl
+IHRoZSBhcnJheSBhY2Nlc3M/CgoKCj4KCgoKPj4/PyAJCWlmICghYnVmKSB7CgoKCj4+Pz8gCQkJ
+YnRfZGV2X2VycihoZGV2LCAiUlhROiBmYWlsZWQgdG8gZ2V0IHRoZSBETUEgYnVmZmVyIGZvciAl
+ZCIsCgoKCj4KCgoKPgoKCgo+S2luZCByZWdhcmRzLAoKCgo+CgoKCj5QYXVsCgoKCj4KCgoKPgoK
+Cgo+WzFdOiAKCgoKPmh0dHBzOi8vc2FzaGlrby5kZXYvIy9wYXRjaHNldC80NjAzMTY2NjNENkQz
+NEVEJTJCMjAyNjA4MTMxMDM3MzQuMjIyOTU1LTEtemhhb2ppbm1pbmclNDB1bmlvbnRlY2guY29t
+CgoKCj4KCgo=
 
