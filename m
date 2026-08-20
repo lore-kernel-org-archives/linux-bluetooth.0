@@ -1,69 +1,69 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C16C33B6EF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD5B39060B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 18:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787250655; cv=none; b=h1++T6v6+/j6Sux4r1Ommr7ntSnZ5HU2iaB+K64U9UVPmOWmstaU2yyWWs4BGv6lcpPp4XpzSTZLwIcXGUrGWed9y8PbHRIjR2kkc8PTyx8Hk6gx5KTqlxysstgXoUFDJaMbcSFyB3QNRFhTkKqz99p2pI4yfZ/MAZSFE7fpt3E=
+	t=1787250657; cv=none; b=s9tTWSzra1Nh7aSYE+AZvZdr6jDj2FT19QV97aTFghMP8S53yWY0bfC1PKaH2SXo596/wCR8K2vMXlM4V4q+x/5z20uhejEgO8LHF4VlG1nK7b0RqpbdODxZkKgoVVSKKyITYbgczJZmiifu/GjnOO8EBe6yUixpwyzazL5yGt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787250655; c=relaxed/simple;
-	bh=h4dzsuSzjM9oneLefODgz0Sy3RRZBWcugjsQliVMsuA=;
+	s=arc-20240116; t=1787250657; c=relaxed/simple;
+	bh=ahObInvrva9aMMKIL/3vn0OQw4JG7dtPhgtBXawcSvU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PIKAHeh24i8tI/mJt9TU3wnHxY+uhsVN8Qbi1MU6YO6AdGfIqr/dNwhzrS80JS1DboM7I/EajbvVQVu/w1+r0GxJBfTqxBIpLeI+m0OdYOHgc/nCFauP8X7N2ipE2IdZHk4L0JVbh81FBLdLq/BgtVOHkO2g+zDJFGQVLkPbfcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrkvEmmf; arc=none smtp.client-ip=209.85.221.172
+	 MIME-Version; b=H4N8pWXgf6VVvLxt1mY3EnrDLRv2Yju3lEvMIhA7vgMf8d+NaO2UHXGB2dE+DEZJ0dYw6VBosaE4aI2F4bBLUvALdKtjrZwQ7tsMVK+Z1oaoKVZB4rQy/G9SyQ2R7i2G8An2Bh7GmycPGQ2e+bK8C5irOTmjX0WqM2HkzSPBJLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NDv9cTLN; arc=none smtp.client-ip=209.85.217.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrkvEmmf"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5bfc54558d5so106074e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:30:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDv9cTLN"
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-74ace427b29so83944137.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 11:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787250652; x=1787855452; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787250654; x=1787855454; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Gv7oHT/KUkxsypStyXBW4s44zwyerGbg+3rWB0c7b08=;
-        b=XrkvEmmf949pXtt+ox1O2+4rXDTPehm6VQ4yPba48+WNOk7hnXuJ3CMro+b9HewFxN
-         hsEriq3RUlFDyB9B2nOsy70KcRBapSRLcK3VESRxufQK1VGqD8Z1pRV9s6J6X/I2Diz+
-         sHWYZ5/ETHlRqSXIeUyIsw2PNOORWCliAqatDYAhKjCgbYFgawrzs+9hVESceFUgL6e3
-         UU1XgOIXjotqCSeA4GxPiB4jEe9iVz0HKvCQSUVZj+gc2AAilx9UZhZeaNtCJRhYOFKR
-         KlUWjNlyRkMYhqs1p0sgxQmSNAGRwTth2Bt3hrShFM0IxqAfC80FERmt1P9xoiC58Ke/
-         B5ZQ==
+        bh=cKomyK2HCvuHIER+qlAQRsPVwTMy1kS2PJaoFissxpc=;
+        b=NDv9cTLNdET/reEYEWt9uhWWnKAP4HZOo2gfcJ62+D1gsD+UbSLleYEE+Gp+qe6FJu
+         3H+MbEpTKepUwI/XgnSDMdsXygWR9lBTda1WNcTMW+np0hpXm5+KJ6XOO37QGFr4Exr4
+         FYpmbm0wkr6WJGZo+/hjpmMWROTh2hJHVjxBh+ZLfJ5dSx1hEA9t69y2QSMT1cGau0eN
+         ey/0ZcmxLDPukSX78nE75+tM1sVY56gUj5Gdh+7TBWAKdH5MfhwmBqOSVDQmRHxDvroY
+         ynrTnGlwmEknHVY+bKyUWBEa+IhOAHP5FVnx19Pi2obS+w66pPTsWkWK6YXX2/M4aePO
+         VmMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787250652; x=1787855452;
+        d=1e100.net; s=20251104; t=1787250654; x=1787855454;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Gv7oHT/KUkxsypStyXBW4s44zwyerGbg+3rWB0c7b08=;
-        b=awH8XhtxSGE75ouolO57bsTnVkBk4pKoy3dl89JyMmk1G7V0yc4b5mxNs0pr5zj+54
-         cHxaYXNvZUHqOKYjGUU9ia358b1StJI39dYQ3Mfq41HiO0irsfAsqdhklyHuRsD/6t4q
-         Ap9HqAkdhvItky8bH/RX+RpoNZ9Or6sK5gIoMdK22yfXKPelEMhOp3bG7V2SjS8ToD46
-         fyDR0DshVFg9Qg0ksbn8wH3MLHKHFoz6WZu6ck/3XtMDLCdZSR6hdTgtU1mHjoRA+xaj
-         cJrC8dgbwYrTS1+oCyKvGx9ZYFzxz+XhUW86w7cblnKlyrrgvOk1kWv5RNr05G5VrhL6
-         bDlw==
-X-Gm-Message-State: AFuF++kdOK+iVIj2jAUWfrzYHKbiinFXNmBvM6O0SDJSyxRrVsDmOsVv
-	+QnBMLapueE2gg6oaLoX9tVzUdrYCkfH3KK7JAAgYYkciOZd0eeixRsyOSjJpARZ
-X-Gm-Gg: AR+sD12wbvNE3E0qAMatRCefwuJRv2NFIyUQGgeWIDMsEl3pHhaXSPU72P64UvxUE5A
-	zKnm0Y2fXyG11iI6qlLjI/kON8J7aaskaQJ9ipk5RV4ddVlfOTtNul4P6F24Izl80blsN9B6bz3
-	Q9J8hapcNutqp5qCx0MdTSS0Dllm7oMe/zwEN8NzwGpj0w6N5RftUrOUDKPX/4UCtK/4TTD5OXe
-	y5uCTjaxiLsWXBmOe/++yzgwuzCjC3gSXSS3QEmewGA7GjZ/GJZe9gdehh+NVM0Tg8QcDCIlWGd
-	t5V9T915BbW5rJknc1bx3pb94BgENGPI78ECwlKRP9Y0Kou6mlhzbdf34xRjKRIkzzyx0GU5SNm
-	t2st67IdZlgWU8wVtZYlQ24A0uvHMnTy55TrhHEtaEM0kzPiJ0Wb5FFNFOBUZUnTBKBCZHAtL/N
-	71FVQYKdNDMIQnRWMQb16WNIrpudy7F97MBSEJrO2azLkPuTHC4UXZc5+rvyMS1gEjzxBIr/owg
-	v5iILuX7v2iIxaloM99NS91DCNNMDBBPadMQKKc5c8i4bP8YHKdJ5wm5Dxb2AqDnw==
-X-Received: by 2002:a05:6122:2c32:b0:5c5:924a:4616 with SMTP id 71dfb90a1353d-5c5eedf40b6mr1963390e0c.0.1787250652447;
-        Thu, 20 Aug 2026 11:30:52 -0700 (PDT)
+        bh=cKomyK2HCvuHIER+qlAQRsPVwTMy1kS2PJaoFissxpc=;
+        b=bz+BQv90qxzkqmDCRaX8XTfwfTfIBvu4DiaccofwXu3mJACEakRyCy45bDRZwNUEG/
+         TE3X1Wzg2Miijnd6FGtMn7RK5qf0D6YiYs5uU+EoEOA09Ru38FbDb5BYEjEE++opCSOA
+         9kQycft1dzxW85WbZMdl1dNp5jzGj0A5U93S+TwK7O2xnnbXbme9QaecuodIhNfRKUVO
+         xKwdGLKY8ofBpIwxDrEdaE2F/nQRlhyFDz3vYyNT3OCb40FmbbIw0rfjSEpgW55rR6Ak
+         0rhD4JjR8lHxFNj1bKymxD9ye31qHwRTVwcKoPQT5eBJER7qsKVwFU4PqoMeCLoEUhKV
+         K2Wg==
+X-Gm-Message-State: AFuF++kvWLOROdVZld4H6WIHK1JlsNuyyaC0WV6lC8t5ekY07RVDw9AN
+	pXdFHOclIJKwm/sIb0y+Gyva1+w/gdE5iRnW+f86Z7Jk+lundW4AkPCnhOpSk45X
+X-Gm-Gg: AR+sD13E3E4HUj2wYSlkmB2GSxAjFN4kLo4DtkF670eG/uKMByFyx9ulvTTkUfujo9u
+	kyMUAF8FGYOFQe+rlyYQndHv3GwGkaZGvBMqjrKFmZ05ktBwO/Zg5P19P7tS9Oy6M/4fyzlFBHH
+	ING7jX9jqJNTxu85fajxFeJPIj7ulyK+iuvEUia195HRUdAI0BU9TRU4Z5J+UPqeoYdefGjf9y3
+	G6FseYbKCx9qNQDWX8o48fjMey2uY9r0BUKhbhwTED4/nmt7+aL0HzkbLkATT8dqCaPkaGuqVRh
+	S7H7EGC4t4UunYtZXj8SrLix31nwGogkDhHAO+mNgIFba/Ksn8ei8XmWpqrxQ3OBNf0rJyjHfNb
+	m+h+UWmZH8tPCHBGKKLqVFyhCFpMrtUoEma3tZm4tmEeTL/MxF1xx2RZbxaYxVaaD1j1I63F9tk
+	H42o/fcfcaKzMI4GJl0vFbJyjRT4ofx35rqQEPRPaIXsLJv3t0hjbOHphIS0AVspn6t6abPyC+U
+	C0Yj8Tl/wQZoMtvyJrpgBbD3s9fEmYrgtlaeVOPzp3npsYZJMP6P0R3BFTm
+X-Received: by 2002:a05:6102:950:b0:76f:1eb7:9944 with SMTP id ada2fe7eead31-77a62634037mr405778137.3.1787250654137;
+        Thu, 20 Aug 2026 11:30:54 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.30.50
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c5e276d416sm6840662e0c.12.2026.08.20.11.30.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 11:30:51 -0700 (PDT)
+        Thu, 20 Aug 2026 11:30:52 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 03/10] unit/test-eir: Add tests for the longest local names
-Date: Thu, 20 Aug 2026 14:30:30 -0400
-Message-ID: <20260820183037.2713973-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 04/10] shared/util: Make strnlenutf8 reject ill-formed sequences
+Date: Thu, 20 Aug 2026 14:30:31 -0400
+Message-ID: <20260820183037.2713973-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
 References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
@@ -77,103 +77,143 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Nothing covered a name anywhere near the size of the buffer it is copied
-into, which is why the missing clamp went unnoticed.
+strnlenutf8() only checks the shape of the lead byte and that the
+following bytes are continuation bytes, so it accepts sequences that are
+not well-formed UTF-8:
 
-Add two tests. The first uses a name of HCI_MAX_NAME_LENGTH bytes, the
-longest one that fits, to pin the boundary down.
+  C0 80        overlong encoding of U+0000
+  C0 AF        overlong encoding of '/'
+  ED A0 80     UTF-16 surrogate U+D800
+  F5 80 80 80  past the U+10FFFF limit
 
-The second uses a name of 253 bytes, as large as eir_parse() can be
-handed given the EIR length is a single byte, and which does not fit.
-Run against the code before the previous patch, it dies with
+strisutf8() and strtoutf8() are built on it, so a remote name containing
+any of those is considered valid and passed on unchanged, for instance
+to D-Bus, which does validate UTF-8 strictly and rejects them.
 
-  *** buffer overflow detected ***: terminated
+Validate the sequences as defined by table 3-7 of the Unicode Standard
+instead, which constrains the range of the second byte for the E0, ED,
+F0 and F4 lead bytes and rejects the C0, C1 and F5 to FF ones outright.
+
+The decoding is split out into a helper that also reports the size of
+the maximal subpart of an ill-formed sequence, so that callers can skip
+over it, as recommended by section 3.9 of the Unicode Standard.
 
 Assisted-by: Claude:claude-opus-5
 ---
- unit/test-eir.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ src/shared/util.c | 90 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 62 insertions(+), 28 deletions(-)
 
-diff --git a/unit/test-eir.c b/unit/test-eir.c
-index 62164ca993f6..326bc899e251 100644
---- a/unit/test-eir.c
-+++ b/unit/test-eir.c
-@@ -440,6 +440,64 @@ static const struct test_data iso_2022_jp_name_test = {
- 	.tx_power = 127,
- };
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 62dd1369b70d..e946214edbb9 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -2211,44 +2211,78 @@ char *strstrip(char *str)
+ 	return str;
+ }
  
+-size_t strnlenutf8(const char *str, size_t len)
 +/*
-+ * A complete local name of HCI_MAX_NAME_LENGTH bytes, the longest one that
-+ * fits the buffer eir_parse() copies the name into.
++ * Decode the UTF-8 sequence at str, as defined by table 3-7 of the Unicode
++ * Standard, and return its size, or 0 if it is ill-formed.
++ *
++ * sublen is set to the size of the maximal subpart of the sequence, that is
++ * the number of leading bytes that could still have formed a well-formed
++ * sequence, which is what the caller needs to skip over.
 + */
-+static unsigned char max_name_data[HCI_MAX_NAME_LENGTH + 2];
-+static char max_name[HCI_MAX_NAME_LENGTH + 1];
-+
-+static const struct test_data max_name_test = {
-+	.eir_data = max_name_data,
-+	.eir_size = sizeof(max_name_data),
-+	.name = max_name,
-+	.name_complete = true,
-+	.tx_power = 127,
-+};
-+
-+static void max_name_setup(const void *data)
++static size_t utf8_seqlen(const unsigned char *str, size_t len, size_t *sublen)
 +{
-+	max_name_data[0] = sizeof(max_name_data) - 1;
-+	max_name_data[1] = EIR_NAME_COMPLETE;
-+	memset(max_name_data + 2, 'A', HCI_MAX_NAME_LENGTH);
++	unsigned char lo = 0x80, hi = 0xbf;
++	size_t size, i;
+ 
++	if (str[0] <= 0x7f) {
++		*sublen = 1;
++		return 1;
++	}
 +
-+	memset(max_name, 'A', HCI_MAX_NAME_LENGTH);
-+	max_name[HCI_MAX_NAME_LENGTH] = '\0';
++	if (str[0] >= 0xc2 && str[0] <= 0xdf) {
++		size = 2;
++	} else if (str[0] >= 0xe0 && str[0] <= 0xef) {
++		size = 3;
++		/* Reject the overlong encodings and the UTF-16 surrogates */
++		if (str[0] == 0xe0)
++			lo = 0xa0;
++		else if (str[0] == 0xed)
++			hi = 0x9f;
++	} else if (str[0] >= 0xf0 && str[0] <= 0xf4) {
++		size = 4;
++		/* Reject the overlong encodings and anything past U+10FFFF */
++		if (str[0] == 0xf0)
++			lo = 0x90;
++		else if (str[0] == 0xf4)
++			hi = 0x8f;
++	} else {
++		/* C0 and C1 are overlong, F5 to FF are out of range, and a
++		 * continuation byte cannot start a sequence.
++		 */
++		*sublen = 1;
++		return 0;
++	}
 +
-+	tester_setup_complete();
++	for (i = 1; i < size; i++) {
++		if (i >= len || str[i] < lo || str[i] > hi) {
++			*sublen = i;
++			return 0;
++		}
++
++		/* Only the second byte has a restricted range */
++		lo = 0x80;
++		hi = 0xbf;
++	}
++
++	*sublen = size;
++	return size;
 +}
 +
-+/*
-+ * The longest complete local name eir_parse() can be handed at all, which is
-+ * bounded by the EIR length being a single byte. That is 253 bytes, more than
-+ * the buffer it is copied into, so this used to overflow it.
-+ */
-+static unsigned char long_name_data[255];
-+static char long_name[sizeof(long_name_data) - 2 + 1];
-+
-+/* The name does not fit, so it comes back clamped to HCI_MAX_NAME_LENGTH */
-+#define LONG_NAME_LEN	HCI_MAX_NAME_LENGTH
-+
-+static const struct test_data long_name_test = {
-+	.eir_data = long_name_data,
-+	.eir_size = sizeof(long_name_data),
-+	.name = long_name,
-+	.name_complete = true,
-+	.tx_power = 127,
-+};
-+
-+static void long_name_setup(const void *data)
-+{
-+	long_name_data[0] = sizeof(long_name_data) - 1;
-+	long_name_data[1] = EIR_NAME_COMPLETE;
-+	memset(long_name_data + 2, 'B', sizeof(long_name_data) - 2);
-+
-+	memset(long_name, 'B', LONG_NAME_LEN);
-+	long_name[LONG_NAME_LEN] = '\0';
-+
-+	tester_setup_complete();
-+}
-+
- static const unsigned char bluesc_data[] = {
- 		0x02, 0x01, 0x06, 0x03, 0x02, 0x16, 0x18, 0x12,
- 		0x09, 0x57, 0x61, 0x68, 0x6f, 0x6f, 0x20, 0x42,
-@@ -756,6 +814,10 @@ int main(int argc, char *argv[])
- 									NULL);
- 	tester_add("/eir/iso-2022-jp-name", &iso_2022_jp_name_test, NULL,
- 							test_parsing, NULL);
-+	tester_add("/eir/max-name", &max_name_test, max_name_setup,
-+							test_parsing, NULL);
-+	tester_add("/eir/long-name", &long_name_test, long_name_setup,
-+							test_parsing, NULL);
- 	tester_add("/ad/bluesc", &bluesc_test, NULL, test_parsing, NULL);
- 	tester_add("/ad/wahooscale", &wahoo_scale_test, NULL, test_parsing,
- 									NULL);
++size_t strnlenutf8(const char *str, size_t len)
+ {
+ 	size_t i = 0;
+ 
+ 	while (i < len) {
+-		unsigned char c = str[i];
+-		size_t size = 0;
++		size_t sublen;
+ 
+-		/* Check the first byte to determine the number of bytes in the
+-		 * UTF-8 character.
+-		 */
+-		if ((c & 0x80) == 0x00)
+-			size = 1;
+-		else if ((c & 0xE0) == 0xC0)
+-			size = 2;
+-		else if ((c & 0xF0) == 0xE0)
+-			size = 3;
+-		else if ((c & 0xF8) == 0xF0)
+-			size = 4;
+-		else
+-			/* Invalid UTF-8 sequence */
+-			goto done;
+-
+-		/* Check the following bytes to ensure they have the correct
+-		 * format.
+-		 */
+-		for (size_t j = 1; j < size; ++j) {
+-			if (i + j >= len || (str[i + j] & 0xC0) != 0x80)
+-				/* Invalid UTF-8 sequence */
+-				goto done;
+-		}
++		if (!utf8_seqlen((const unsigned char *) str + i, len - i,
++								&sublen))
++			break;
+ 
+ 		/* Move to the next character */
+-		i += size;
++		i += sublen;
+ 	}
+ 
+-done:
+ 	return i;
+ }
+ 
 -- 
 2.54.0
 
