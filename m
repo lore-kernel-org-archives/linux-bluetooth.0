@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B0146D2B8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1CA44470A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787303381; cv=none; b=SDNjMQJ0ol3iX5Q6oTQsrOIgrvhwBF8GD0FLOA8+SGWcO4mFIaGfheyvvQFgX667mmk5gcBRy0uNYSQVaRK+9A7yl6EQeG4exFaj6IdV5Ja+MhRUWNq8Wsx1hjVU6CF4bbKT4GSLhyix6yqOI7JL0CjXTE5yKKCQBCpe8f23Xxs=
+	t=1787303381; cv=none; b=iOXi3ciTUasJlRCq0dX/aKVpropbudjyTg3698h1/zEHJ8wX3gQDltmZf/71mRgXqEKPdG88yUuk6/aJCCFxPPBzmkbvrSRqGfCAAEKFb6L5BogUNaShPMiHVBxjiXsC3iNbJ0blpdXbZhOt0baFKpe+febNwsMGRfgG0MNEPBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787303381; c=relaxed/simple;
-	bh=7jQHoixS2PxgKNA6FmPGB84xD9e+vMwJh03YMqYav10=;
+	bh=H4SOsTzLpj3fNzG+Vs2WIcJgn6hOGqZ/eGCE6nSQMiA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qN4UoUKFH4ilsHA1RKcYd22qc1u3ikelzVaCytaMhxsRMHNucHlDRNRuaseHzYdNLxdrf9S3SUYkdyfFF1ww98IH19mOVJUxndnO/fcrIpQHf5JgIKbjJ5z/ba2l/ibcADm7xO/gBFnH8P4+vGkoR1/MzbBV1gQqUbZVnNPnWlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=J99qtBe6; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=IPjAGG2C4AY5GnHddn1MLPlEVNlLUi4kgNOUaXcYQ9vE8O7Ggdh6fcuDB9UPJGOYGMQ6/16RAazV5QxavuGTHEkIKiD1skBxVdUSpEU21c7Wu8r64AMNoRQKGUkYcRdsQu7DV6gqQ8YbynqFZEHJ50DgTViYYLpeqIcRL+t2Py0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hgzR7Drj; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="J99qtBe6"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hgzR7Drj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1787303354;
-	bh=7jQHoixS2PxgKNA6FmPGB84xD9e+vMwJh03YMqYav10=;
+	s=mail; t=1787303353;
+	bh=H4SOsTzLpj3fNzG+Vs2WIcJgn6hOGqZ/eGCE6nSQMiA=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=J99qtBe6v5q+x4NQfqX5c+5B4rqA8+Oil1Dp7X9n6/xPoR2rvhWQa2m6zeCwzK0Os
-	 6WXuavh2ULR6rGJ6ZWKtiskMmvgxpE1yyVYbv1N4qI2MCYEM9lktwA9m0g26Pt6y3Y
-	 HyZrV3afB/UpjKpKAg/qDmvduPoweId3sQGe9R3dqIxQU27+GDLWxhUhnca7yPi0EB
-	 uk7CqFwE6vOPowhSNhdz3JKvi8UEVSFnmbpwbcENI0P1YPQk3ZzojVs/stLVwpKST0
-	 k87Kow4fBtdq3biYDVQN5prVrlfr9LDx3o1qp1dNzGphhbB9Ty4dCbFIxadFcHcJ62
-	 mubUT9KSNj8vw==
+	b=hgzR7Drj+cyxFDK6jqGt5yjOcZOKr9GYfHqYJe74wCC8gzL6ek7QAItTk3xUYEsPF
+	 w3mOpfiZyhrclAoeaT6EH9BxCHi+Y7w5uQtmHrtPHXJ7lLcSJ9gTGnlB2h/3wxdbJz
+	 4dOJgC5bR0QCochiBvCjp15lYSkCZS/PNJ0e4uGFU7nXIj49/OOLIxkyx0rPwAGExg
+	 fn5f/E8POJCsMI+fGihkjQU+aSoKrQ6X8F9z0i7a0L4mPjxw9dRn8eWBB6wu/HBu3O
+	 VQXW38z1EDAXCYyA+EIcWXR2dr1rdrWSBsn54L/yMS9NFM9Nw0F3MAEhN5LOGYItO5
+	 RjEtCOgUN9DSg==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0ECEA17E0D69
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 11:09:14 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 50A3317E0881
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 11:09:13 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/6] device: Add SecurityLevel properties to org.bluez.Device1
-Date: Fri, 21 Aug 2026 11:09:06 +0200
-Message-ID: <20260821090908.1546451-5-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 1/6] mgmt: Add Security Level Changed event
+Date: Fri, 21 Aug 2026 11:09:03 +0200
+Message-ID: <20260821090908.1546451-2-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260821090908.1546451-1-frederic.danis@collabora.com>
 References: <20260821090908.1546451-1-frederic.danis@collabora.com>
@@ -50,190 +50,105 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This uses the new MGMT_EV_SECURITY_LEVEL_CHANGED event.
+This provides a TLV list of values related to the security level of
+the connection to a remote device.
 
-It will be used by btpclient to reduce test time.
+Currently Security Level and Encryption type are implemented.
 ---
- src/adapter.c | 33 ++++++++++++++++++++
- src/device.c  | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |  3 ++
- 3 files changed, 120 insertions(+)
+v1->v2: Fix struct mgmt_ev_security_level_changed definition
+v2->v3: Re-work Security Level possible values in mgmt-protocol.rst to be in
+        with other *-protocol.rst files
 
-diff --git a/src/adapter.c b/src/adapter.c
-index c21b3e7fb..2fd5e005e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -10036,6 +10036,34 @@ static void unpaired_callback(uint16_t index, uint16_t length,
- 	device_set_unpaired(device, ev->addr.type);
- }
+ doc/mgmt-protocol.rst | 45 +++++++++++++++++++++++++++++++++++++++++++
+ lib/bluetooth/mgmt.h  | 15 +++++++++++++++
+ 2 files changed, 60 insertions(+)
+
+diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
+index f0564075f..983ffc3aa 100644
+--- a/doc/mgmt-protocol.rst
++++ b/doc/mgmt-protocol.rst
+@@ -5521,3 +5521,48 @@ The Supervision_Timeout parameter specifies the supervision timeout in units
+ of 10 ms.
  
-+static void device_sec_level_callback(uint16_t index, uint16_t length,
-+					  const void *param, void *user_data)
-+{
-+	const struct mgmt_ev_security_level_changed *ev = param;
-+	struct btd_adapter *adapter = user_data;
-+	struct btd_device *dev;
-+	char addr[18];
+ This event will be sent to all management sockets.
 +
-+	if (length < sizeof(*ev)) {
-+		btd_error(adapter->dev_id,
-+			  "Too small Device Security Level Changed event: %d",
-+			  length);
-+		return;
-+	}
++Security Level Changed
++``````````````````````
 +
-+	ba2str(&ev->addr.bdaddr, addr);
++:Event Code:		0x0034
++:Controller Index:	<controller_id>
++:Event Parameters:	Address (6 Octets)
++:...:			Address_Type (1 Octet)
++:...:			Count (1 Octet)
++:...:			TLV_List (variable)
 +
-+	dev = btd_adapter_find_device(adapter, &ev->addr.bdaddr, ev->addr.type);
-+	if (!dev) {
-+		btd_error(adapter->dev_id,
-+			"Device Security Level Changed for unknown device %s",
-+			addr);
-+		return;
-+	}
++This event indicates that the security level of a device has changed.
 +
-+	btd_device_sec_level_changed(dev, ev->tlv_data, length - 8);
-+}
++Possible values for the TLV type parameter:
 +
- static void clear_devices_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -10754,6 +10782,11 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 						controller_resume_callback,
- 						adapter, NULL);
++.. csv-table::
++	:header: "Type", "Description"
++	:widths: auto
++
++	0x0000, Security Level
++	0x0001, Encryption type
++
++Possible values for the Security Level type:
++
++.. csv-table::
++	:header: "Value", "Security Level", "Link Key Type", "Encryption"
++	:widths: auto
++
++	**BT_SECURITY_SDP**, 0 (SDP Only), None, Not required
++	**BT_SECURITY_LOW**, 1 (Low), Unauthenticated, Not required
++	**BT_SECURITY_MEDIUM**, 2 (Medium - default), Unauthenticated, Desired
++	**BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
++	**BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
++
++Possible values for the Encryption type:
++
++.. csv-table::
++	:header: "Value", "Description"
++	:widths: auto
++
++	0x00, No encryption
++	0x01, E0 encryption
++	0x02, AES-CCM encryption
++
++This event will be sent to all management sockets.
+diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
+index 9df0c1ba2..7b98ff8a9 100644
+--- a/lib/bluetooth/mgmt.h
++++ b/lib/bluetooth/mgmt.h
+@@ -1136,6 +1136,20 @@ struct mgmt_ev_conn_subrate {
+ 	uint16_t supv_timeout;
+ } __packed;
  
-+	mgmt_register(adapter->mgmt, MGMT_EV_SECURITY_LEVEL_CHANGED,
-+						adapter->dev_id,
-+						device_sec_level_callback,
-+						adapter, NULL);
++#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
++#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
++#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
 +
- 	set_dev_class(adapter);
- 
- 	set_name(adapter, btd_adapter_get_name(adapter));
-diff --git a/src/device.c b/src/device.c
-index 65d84be56..c6cb0aecf 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -306,6 +306,9 @@ struct btd_device {
- 
- 	uint32_t	auth_failures;
- 	guint		auth_retry_id;
++#define MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL	0x0000
++#define MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE	0x0001
 +
-+	uint8_t		sec_level;
-+	uint8_t		enc_type;
++#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0034
++struct mgmt_ev_security_level_changed {
++	struct mgmt_addr_info addr;
++	uint8_t	tlv_count;
++	uint8_t	tlv_data[];
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1285,6 +1299,7 @@ static const char *mgmt_ev[] = {
+ 	"Mesh Packet Found",
+ 	"Mesh Packet Complete",
+ 	"Connection Subrate",
++	"Security Level Changed",
  };
  
- static const uint16_t uuid_list[] = {
-@@ -3689,6 +3692,26 @@ dev_property_prefer_bearer_exists(const GDBusPropertyTable *property,
- 	return device_prefer_bearer_str(device) != NULL;
- }
- 
-+static gboolean dev_get_security_level(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *dev = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &dev->sec_level);
-+
-+	return TRUE;
-+}
-+
-+static gboolean dev_get_encryption_type(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *dev = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &dev->enc_type);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
- 	{ "AddressType", "s", property_get_address_type },
-@@ -3732,6 +3755,10 @@ static const GDBusPropertyTable device_properties[] = {
- 				dev_property_set_prefer_bearer,
- 				dev_property_prefer_bearer_exists,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "SecurityLevel", "y", dev_get_security_level, NULL, NULL,
-+				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "EncryptionType", "y", dev_get_encryption_type, NULL, NULL,
-+				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
- 
-@@ -8341,3 +8368,60 @@ next:
- 		l = next;
- 	}
- }
-+
-+static void parse_sec_level_tlv(void *data, void *user_data)
-+{
-+	struct btd_device *dev = user_data;
-+	const struct mgmt_tlv *entry = data;
-+	uint16_t type = get_le16(&entry->type);
-+	uint32_t value;
-+
-+	if (entry->length != 1 && entry->length != 2 && entry->length != 4) {
-+		warn("Invalid length %u for security level TLV type %u",
-+							entry->length, type);
-+		return;
-+	}
-+
-+	if (entry->length == 1)
-+		value = get_u8(entry->value);
-+	else if (entry->length == 2)
-+		value = get_le16(entry->value);
-+	else
-+		value = get_le32(entry->value);
-+
-+	switch (type) {
-+	case MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL:
-+		if (dev->sec_level != value) {
-+			dev->sec_level = value;
-+			g_dbus_emit_property_changed(dbus_conn, dev->path,
-+							DEVICE_INTERFACE,
-+							"SecurityLevel");
-+		}
-+		break;
-+	case MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE:
-+		if (dev->enc_type != value) {
-+			dev->enc_type = value;
-+			g_dbus_emit_property_changed(dbus_conn, dev->path,
-+							DEVICE_INTERFACE,
-+							"EncryptionType");
-+		}
-+		break;
-+	default:
-+		DBG("Unknown security level TLV type %u", type);
-+		break;
-+	}
-+}
-+
-+void btd_device_sec_level_changed(struct btd_device *dev, const uint8_t *data,
-+					uint16_t size)
-+{
-+	struct mgmt_tlv_list *tlv_list;
-+
-+	tlv_list = mgmt_tlv_list_load_from_buf(data, size);
-+	if (!tlv_list) {
-+		error("Failed to parse security level TLV list");
-+		return;
-+	}
-+	mgmt_tlv_list_foreach(tlv_list, parse_sec_level_tlv, dev);
-+	mgmt_tlv_list_free(tlv_list);
-+}
-diff --git a/src/device.h b/src/device.h
-index b890f23d4..3dff67eb0 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -245,3 +245,6 @@ void btd_device_foreach_service(struct btd_device *dev,
- 				void *user_data);
- void device_remove_pending_services(struct btd_device *dev,
- 					uint8_t bdaddr_type);
-+
-+void btd_device_sec_level_changed(struct btd_device *dev, const uint8_t *data,
-+					uint16_t size);
+ static const char *mgmt_status[] = {
 -- 
 2.43.0
 
