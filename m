@@ -1,44 +1,44 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3DB3F484D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9464D40D564
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787340925; cv=none; b=tu76GlkRQP/ky5MlI0Tl4cEglU5Zj5txw1bnkdDk12ZktQjNnyuhGqTrL1L7wpeAHqrgPrBOkEQC8H8kHIyZxMXmToQ4KvY8Xfvnezb4ZaAXtc35K7HqrfO5G0n3awweXL2Y+ve049RoQdgieVKvMRPEBysxI7qVrV916yiLsUs=
+	t=1787340926; cv=none; b=VCCFItHQJpjsOC+9TShV9zM/8tfej4072dLSYzrhhPuADRJdLcw5OixJbf6KyJHxnI/fPfACfIQWJDMgFSELAqePclf/SlTeH4jt5vnh6CHqSf8oOAiAWSj0Sw68yfumQhsOwAZ5c/DPtya5Ui2ZDa90lAA2r9+JOZtGJuCMx2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787340925; c=relaxed/simple;
-	bh=NXYEiI8J+P3wP6zhefS1Qj7SD+wPXGUjt3/8iJU8Tsc=;
+	s=arc-20240116; t=1787340926; c=relaxed/simple;
+	bh=mIUBb5fMcdnvrJKsvDBWl6dNcnj7SrVefNwkHmyYrj4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D8D6PDtfZuTKmzpA57npF3qcIRbxi3B6VnXbrihFbxYErLVQLQUOp11TxIgjx0392+qzLiuH7wrvegwTexlaPl5cCVWI4qMFEK6OYHlMc4Twc8fkpcRIVx7yfTcQuhBKchxfEyFtVza1K+IazQ1VMR1zeutBsQi+HFAsiSxrc5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=gpISe7tE; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=aZSZBt4qm7MIL0pOPccLbfChinSUuYo4tFQ9GNR7MHTo6yrx7NH8OyLDXHWzkTdpG8FiJ29JC68k1XqsEbJfAy6LyBJqVlGqrMjH3PIgvX906yp8U6reP4ahlKnx+wvf97qQiWZkqd7opn7Hh6V/eZS+KlmmFrpUTFzrlnyLy8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pSpTjdnF; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="gpISe7tE"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pSpTjdnF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1787340921;
-	bh=NXYEiI8J+P3wP6zhefS1Qj7SD+wPXGUjt3/8iJU8Tsc=;
+	s=mail; t=1787340922;
+	bh=mIUBb5fMcdnvrJKsvDBWl6dNcnj7SrVefNwkHmyYrj4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gpISe7tEGZX2fc/sFbhamstRgljbmqwdGV40djqrs1ZwzMSfONeQKAE/JN6odDNAE
-	 BybtTq5v0ELjNm2jaLNXnn9IEcSKK2Ub4WwrLG7TbWKkAEfDGoIlMwFHSv9KdaQ9C9
-	 EM+0EJGyUoq33xQ5XAKy0XHMc4BfHAE0Wyt8ENF8106cOxjduoEknH4BJH5+5CSPP4
-	 7Z2I5jPOJ1h/gU0FITS4j0+4dY4GLVDj5xrQn/jtEk7/UEPfXaTje61Svjq2vrdu9x
-	 Fo4BEiKP6D2CwWu+s9FgG55Qrl2s6aKA52RHqqLfp4BZY0OalnRQhbu7HD2Kz71l8l
-	 +vXXk5VF9Alqw==
+	b=pSpTjdnFH34vPiLrnZixjdFMD1VoXCe3hEVTb9z9PRpc9cLWCM9TjPhiYRQdCWhWW
+	 BBBWjJcU24YUQNyY09cqIZ1N3+43XEViEdn8OtwrcdXimG42S6ANd0El5zvML/nl4L
+	 4bR0TFvFqItOgWOpGKdE1Ta+8dLJ+92n38XxgRbn52DXDu6jWao7gwj4II8bkjTr84
+	 2fUzyIiFY2PNetVHJ1gtVPepwNMB1HscOJQzcin27GN+gKPRFjlR/GguwRNtLGUBny
+	 Gj4kdk5ZqDWvqsm4n4H/Q4oeYE+8A0AdCr7HKF99dYHTCu8Hz7YEPr3nFI/UvfZcC/
+	 ZPhK56qX5r3Lg==
 Received: from vninja (unknown [100.64.1.54])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: gkiagia)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6A9D317E0829;
-	Fri, 21 Aug 2026 21:35:21 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 73CB617E0967;
+	Fri, 21 Aug 2026 21:35:22 +0200 (CEST)
 From: George Kiagiadakis <george.kiagiadakis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: George Kiagiadakis <george.kiagiadakis@collabora.com>
-Subject: [PATCH BlueZ 1/5] player: Fix crash on MediaItem1.Play() without a browsing scope
-Date: Fri, 21 Aug 2026 22:34:45 +0300
-Message-ID: <20260821193449.1336263-2-george.kiagiadakis@collabora.com>
+Subject: [PATCH BlueZ 3/5] player: Fix NumberOfItems never being updated on SetBrowsedPlayer
+Date: Fri, 21 Aug 2026 22:34:47 +0300
+Message-ID: <20260821193449.1336263-4-george.kiagiadakis@collabora.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260821193449.1336263-1-george.kiagiadakis@collabora.com>
 References: <20260821193449.1336263-1-george.kiagiadakis@collabora.com>
@@ -50,321 +50,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-media_item_play() dereferenced mp->scope without checking it:
+media_player_total_items_complete() discarded the count reported by the
+player unless a D-Bus request happened to be pending:
 
-	struct media_folder *folder = mp->scope;
-	...
-	if (folder->msg)
+	if (folder == NULL || folder->msg == NULL)
+		return;
 
-mp->scope is only ever set by media_player_set_scope(), which is reached
-from media_player_set_folder() (SetBrowsedPlayer) and from
-media_player_set_folder_by_uid() (ChangeFolder). Both of those require
-the player to advertise the Browsing feature bit, since
-avrcp_player_parse_features() only creates /Filesystem when
-features[7] & 0x08 is set.
+Of the paths reaching it, only media_player_change_folder_complete()
+still holds a pending message. The count was therefore applied on
+ChangeFolder and dropped everywhere else, notably on
+media_player_set_folder(), which avrcp calls on SetBrowsedPlayer, that
+is precisely when the count is first learned.
 
-The /NowPlaying folder is gated on a different bit, features[8] & 0x02,
-and media_player_set_playlist_item() registers its items as playable
-MediaItem1 objects regardless of the scope. A player that reports
-NowPlaying but not Browsing therefore exports playable items while
-mp->scope is still NULL, and calling Play() on one of them crashes
-bluetoothd. msg sits at offset 40 in struct media_folder on LP64, which
-matches the reported "segfault at 28".
+The guard reads as copy-paste from the four *_complete() functions
+above it. Those need a pending message because they send a reply. This
+one only refreshes a property, so there is no request to correlate it
+with.
 
-A plain NULL check is not enough: the pending message has nowhere to be
-stored, so Play() would answer nothing at all and the caller would hang
-instead of crashing. Move the pending request from struct media_folder
-to struct media_player instead. Every user of folder->msg already stored
-into mp->scope->msg, so the slot was per player in all but name, and
-moving it keeps the existing mutual exclusion between ListItems, Search,
-ChangeFolder and Play intact.
+f17d3a2c3 replaced an unconditional emit in media_player_change_scope()
+with one deferred into this completion whenever the total_items
+callback is present, and the guard then swallowed it. The AVRCP
+controller always registers that callback, so NumberOfItems has not
+been refreshed on SetBrowsedPlayer since. That commit states the
+intent itself: "On response, emit PropertyChanged for 'NumberOfItems'
+property".
 
-Playing now works rather than merely not crashing: ct_play_item() picks
-the AVRCP scope from the path, so an item under /NowPlaying is played
-with the Now Playing scope (0x03).
+Note the count is still applied to whatever mp->scope is at completion
+time rather than to the folder it was requested for.
+media_player_change_scope() sets the scope before asking, so the common
+case is right, but a second scope change in flight misattributes it.
 
-Moving the message off the folder also fixes a lost reply. Each
-completion re-read mp->scope, so when avrcp moved the scope while a
-request was pending, for instance on SetBrowsedPlayer, the completion
-found a different folder with a NULL msg, returned early and left the
-D-Bus caller without an answer.
-
-Fixes: 43b0855abdf4 ("audio/player: Report PlayItem errors")
+Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
 
 Assisted-by: Claude:claude-opus-5 valgrind
 ---
- profiles/audio/player.c | 75 +++++++++++++++++++----------------------
- 1 file changed, 35 insertions(+), 40 deletions(-)
+ profiles/audio/player.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 3af9a1824..568c70770 100644
+index fa3810a7f..7c5ea5b62 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -66,7 +66,6 @@ struct media_folder {
- 	uint32_t		number_of_items;/* Number of items */
- 	GSList			*subfolders;
- 	GSList			*items;
--	DBusMessage		*msg;
- };
- 
- struct media_player {
-@@ -89,6 +88,7 @@ struct media_player {
- 	struct player_callback	*cb;
- 	GSList			*pending;
- 	GSList			*folders;
-+	DBusMessage		*msg;		/* Pending request */
- 	uint16_t		obex_port;
- };
- 
-@@ -662,19 +662,18 @@ static void parse_folder_list(gpointer data, gpointer user_data)
- void media_player_list_complete(struct media_player *mp, GSList *items,
- 								int err)
- {
--	struct media_folder *folder = mp->scope;
- 	DBusMessage *reply;
- 	DBusMessageIter iter, array;
- 
--	if (folder == NULL || folder->msg == NULL)
-+	if (mp->msg == NULL)
- 		return;
- 
- 	if (err < 0) {
--		reply = btd_error_failed(folder->msg, strerror(-err));
-+		reply = btd_error_failed(mp->msg, strerror(-err));
- 		goto done;
- 	}
- 
--	reply = dbus_message_new_method_return(folder->msg);
-+	reply = dbus_message_new_method_return(mp->msg);
- 
- 	dbus_message_iter_init_append(reply, &iter);
- 
-@@ -694,8 +693,8 @@ void media_player_list_complete(struct media_player *mp, GSList *items,
- 
- done:
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
--	dbus_message_unref(folder->msg);
--	folder->msg = NULL;
-+	dbus_message_unref(mp->msg);
-+	mp->msg = NULL;
- }
- 
- static struct media_item *
-@@ -719,15 +718,14 @@ media_player_create_subfolder(struct media_player *mp, const char *name,
- 
- void media_player_search_complete(struct media_player *mp, int ret)
- {
--	struct media_folder *folder = mp->scope;
- 	struct media_folder *search = mp->search;
- 	DBusMessage *reply;
- 
--	if (folder == NULL || folder->msg == NULL)
-+	if (mp->msg == NULL)
- 		return;
- 
- 	if (ret < 0) {
--		reply = btd_error_failed(folder->msg, strerror(-ret));
-+		reply = btd_error_failed(mp->msg, strerror(-ret));
- 		goto done;
- 	}
- 
-@@ -740,14 +738,14 @@ void media_player_search_complete(struct media_player *mp, int ret)
- 
- 	search->number_of_items = ret;
- 
--	reply = g_dbus_create_reply(folder->msg,
-+	reply = g_dbus_create_reply(mp->msg,
- 				DBUS_TYPE_OBJECT_PATH, &search->item->path,
- 				DBUS_TYPE_INVALID);
- 
- done:
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
--	dbus_message_unref(folder->msg);
--	folder->msg = NULL;
-+	dbus_message_unref(mp->msg);
-+	mp->msg = NULL;
- }
- 
- void media_player_total_items_complete(struct media_player *mp,
-@@ -755,7 +753,7 @@ void media_player_total_items_complete(struct media_player *mp,
+@@ -753,7 +753,7 @@ void media_player_total_items_complete(struct media_player *mp,
  {
  	struct media_folder *folder = mp->scope;
  
--	if (folder == NULL || folder->msg == NULL)
-+	if (folder == NULL || mp->msg == NULL)
+-	if (folder == NULL || mp->msg == NULL)
++	if (folder == NULL)
  		return;
  
  	if (folder->number_of_items != num_of_items) {
-@@ -827,14 +825,14 @@ static DBusMessage *media_folder_search(DBusConnection *conn, DBusMessage *msg,
- 	if (!mp->searchable || folder != mp->folder || !cb->cbs->search)
- 		return btd_error_not_supported(msg);
- 
--	if (folder->msg != NULL)
-+	if (mp->msg != NULL)
- 		return btd_error_failed(msg, strerror(EINVAL));
- 
- 	err = cb->cbs->search(mp, string, cb->user_data);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
--	folder->msg = dbus_message_ref(msg);
-+	mp->msg = dbus_message_ref(msg);
- 
- 	return NULL;
- }
-@@ -911,7 +909,7 @@ static DBusMessage *media_folder_list_items(DBusConnection *conn,
- 	if (cb->cbs->list_items == NULL)
- 		return btd_error_not_supported(msg);
- 
--	if (folder->msg != NULL)
-+	if (mp->msg != NULL)
- 		return btd_error_failed(msg, strerror(EBUSY));
- 
- 	err = cb->cbs->list_items(mp, folder->item->name, start, end,
-@@ -919,7 +917,7 @@ static DBusMessage *media_folder_list_items(DBusConnection *conn,
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
--	folder->msg = dbus_message_ref(msg);
-+	mp->msg = dbus_message_ref(msg);
- 
- 	return NULL;
- }
-@@ -953,9 +951,6 @@ static void media_folder_destroy(void *data)
- 	g_slist_free_full(folder->subfolders, media_folder_destroy);
- 	g_slist_free_full(folder->items, media_item_destroy);
- 
--	if (folder->msg != NULL)
--		dbus_message_unref(folder->msg);
--
- 	media_item_destroy(folder->item);
- 	g_free(folder);
- }
-@@ -1041,7 +1036,7 @@ static DBusMessage *media_folder_change_folder(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	struct media_player *mp = data;
--	struct media_folder *folder = mp->scope;
-+	struct media_folder *folder;
- 	struct player_callback *cb = mp->cb;
- 	const char *path;
- 	int err;
-@@ -1051,7 +1046,7 @@ static DBusMessage *media_folder_change_folder(DBusConnection *conn,
- 					DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	if (folder->msg != NULL)
-+	if (mp->msg != NULL)
- 		return btd_error_failed(msg, strerror(EBUSY));
- 
- 	folder = media_player_find_folder(mp, path);
-@@ -1083,7 +1078,7 @@ static DBusMessage *media_folder_change_folder(DBusConnection *conn,
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
--	mp->scope->msg = dbus_message_ref(msg);
-+	mp->msg = dbus_message_ref(msg);
- 
- 	return NULL;
- }
-@@ -1224,25 +1219,24 @@ void media_player_change_folder_complete(struct media_player *mp,
- 						const char *path, uint64_t uid,
- 						int ret)
- {
--	struct media_folder *folder = mp->scope;
- 	DBusMessage *reply;
- 
--	if (folder == NULL || folder->msg == NULL)
-+	if (mp->msg == NULL)
- 		return;
- 
- 	if (ret < 0) {
--		reply = btd_error_failed(folder->msg, strerror(-ret));
-+		reply = btd_error_failed(mp->msg, strerror(-ret));
- 		goto done;
- 	}
- 
- 	media_player_set_folder_by_uid(mp, uid, ret);
- 
--	reply = g_dbus_create_reply(folder->msg, DBUS_TYPE_INVALID);
-+	reply = g_dbus_create_reply(mp->msg, DBUS_TYPE_INVALID);
- 
- done:
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
--	dbus_message_unref(folder->msg);
--	folder->msg = NULL;
-+	dbus_message_unref(mp->msg);
-+	mp->msg = NULL;
- }
- 
- void media_player_destroy(struct media_player *mp)
-@@ -1263,6 +1257,9 @@ void media_player_destroy(struct media_player *mp)
- 						mp->path,
- 						MEDIA_FOLDER_INTERFACE);
- 
-+	if (mp->msg)
-+		dbus_message_unref(mp->msg);
-+
- 	g_slist_free_full(mp->pending, g_free);
- 	g_slist_free_full(mp->folders, media_folder_destroy);
- 
-@@ -1613,7 +1610,6 @@ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
- {
- 	struct media_item *item = data;
- 	struct media_player *mp = item->player;
--	struct media_folder *folder = mp->scope;
- 	struct player_callback *cb = mp->cb;
- 	const char *path;
- 	int err;
-@@ -1621,16 +1617,16 @@ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
- 	if (!item->playable || !cb->cbs->play_item)
- 		return btd_error_not_supported(msg);
- 
--	if (folder->msg)
-+	if (mp->msg)
- 		return btd_error_failed(msg, strerror(EBUSY));
- 
--	path = mp->search && folder == mp->search ? "/Search" : item->path;
-+	path = mp->search && mp->scope == mp->search ? "/Search" : item->path;
- 
- 	err = cb->cbs->play_item(mp, path, item->uid, cb->user_data);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
--	folder->msg = dbus_message_ref(msg);
-+	mp->msg = dbus_message_ref(msg);
- 
- 	return NULL;
- }
-@@ -1839,23 +1835,22 @@ static const GDBusPropertyTable media_item_properties[] = {
- 
- void media_player_play_item_complete(struct media_player *mp, int err)
- {
--	struct media_folder *folder = mp->scope;
- 	DBusMessage *reply;
- 
--	if (folder == NULL || folder->msg == NULL)
-+	if (mp->msg == NULL)
- 		return;
- 
- 	if (err < 0) {
--		reply = btd_error_failed(folder->msg, strerror(-err));
-+		reply = btd_error_failed(mp->msg, strerror(-err));
- 		goto done;
- 	}
- 
--	reply = g_dbus_create_reply(folder->msg, DBUS_TYPE_INVALID);
-+	reply = g_dbus_create_reply(mp->msg, DBUS_TYPE_INVALID);
- 
- done:
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
--	dbus_message_unref(folder->msg);
--	folder->msg = NULL;
-+	dbus_message_unref(mp->msg);
-+	mp->msg = NULL;
- }
- 
- void media_item_set_playable(struct media_item *item, bool value)
 -- 
 2.54.0 (Apple Git-157)
 
