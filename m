@@ -1,119 +1,169 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74B7440625
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 04:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1BE353A88;
+	Fri, 21 Aug 2026 06:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787287605; cv=none; b=VOWZeHaaWdSh5Z3ZnPqbr3AdUOUj93Q4/4AVKWPkKplXUhf+klS2kE6Ek6oGHj/YljOju3UYDI/g3VbUZymYPowP/lCMzl5x3WIB9LyF7qXXgIOM9ciH1s7zS/FJ35DGc5jFuXMGJbQFjKrgA/0NkvPzu4XAUNzWwjeZBzaFvPU=
+	t=1787293599; cv=none; b=QI6tr+ADpjR73UngsJqZxVfK8vxBP14xp0pQTBs6Ndg52HJRacFNz2avr3bQN/GisiSuQDGLoom61QjVxkCH9+tFl9RGv6Igb8jLb42RZO26ZWkpJ17xdGVf35fwwJo+54rygu7BLl3n+F73PZotUSjiy/83JnP3PNv7g3OaR6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787287605; c=relaxed/simple;
-	bh=15W6aNgIpRLYBcSMLh4xzdss16RejQYQDo52C71Jl/g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WpKsN0O3WKFzU6kRWCEv+4uUOgIgkOVoAJUp4ugtHT8w9Y4ufKRXnVF117A9I+sMEaMLJz+/OhBcjy+0ZYQSWIfL636+i/TamUXDg/7JZgZdVE5Dwh0lOXXA5YsGiiOejk8nO9YMbaVDV3Rw2Ep1jpZA5gUw7o6JvdICQ/dWGRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a+u4hmgE; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+u4hmgE"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7eb1dc6bd53so596256a34.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 21:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787287602; x=1787892402; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=TioCe14kMaIly6soEvUVwfXwpj6tdzyxVyTLq2ZeF6w=;
-        b=a+u4hmgEs5JEnrA8lBbhbzqLV7/a3n64lWIrT8+5X+Oeno2bFo7b1g4FuYFvmb5XAq
-         7k+JoIaItWL+WicPC29S9gm4rZXMYmdZO7fh0VzQdKXKtKrSiDcVvuBjoBni1Z3PN+mi
-         X9CTxIKCbabo5I9uOYKLlELwx+L8pfKPDN7kWeygX0NX/Uo9/YyP+FEY94oUn/Zu4Vr0
-         wDU1zMKKOzF1ZsR+Wfjmt13oToiq5XWCz8QuS1rsI5Wjf/03KK6CcOhVm0gs+j2cDAsv
-         PlaI0CSLKVIm5c+9bx3BbtZWexTgT+ShBUZPrlPfcjWEx0FXBc+3aPQIiUcAeytQYMQB
-         oL7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787287602; x=1787892402;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=TioCe14kMaIly6soEvUVwfXwpj6tdzyxVyTLq2ZeF6w=;
-        b=Mjg0+QW5PImu8XCS6hzG3QZn7i+tswdzmuP85r2MtqyTeLh9UeHNWTjMqXo/CSMpUn
-         THxoiyNhlTelN1uRX2OF7KWr71FSEyFSUXvZeb5NbXMipoAzdirXD4BFqhnuqfcx5E8N
-         sEodueFMiP3xDqP+MLmW4sFJqvhlYoEIwsN/f2ykqA74kUL13xLK97SdCP1xNLuNUm1B
-         Py7qxYxMbS6i2kP2FqXGew8ec2ZOcI25azQzPD8Pc52pImTiurJhhnsm5eTmZWEoR6xh
-         b23dd6wL/CbxjY58hOK3rIxphCBgjPI274zsvhRrUY2FN3IDDzL4yqomU859+4D1Tu7s
-         tikw==
-X-Gm-Message-State: AOJu0YwJT8VZbnKbLxDJPlqFDVhFz0va9/56yNDfZy3s+KFKyrotMUWT
-	621ZJn/F3FBO+5Mzd3TfSeVNVwLF5ca7FwX8c58A3dOzoSQxkgZPZqZXCzS4SA==
-X-Gm-Gg: AR+sD1340Sb9HnVKUuZoJWT7uuJmZIObSS6VCYn7qqEQXdYbohnLV5hCTGPWsvToZPl
-	ThlKgnouMHNag1jFQ5w6p+O99jLeRJkMV6k6mUDEXPIO/xclIgMpiPhwbCAclJ/Se6LLD/p+lcK
-	PP16+pJzuNVIf8ptYvJ/8uELAaMql5kOIpu5lfQriEThWkFagwrfL45tYzGjfclxUgbcQ91VLg0
-	wJMaJrq1VKBOF8F/3KOPQGoW+41OKdLnSDh0e6E6srtQrOaCwnGVlZv4Do5khH5hY75IJQXjeRZ
-	pTGCtK5LxEflOK8uNRPBse5Zx/1j7Fw3MiUuXJGYj1k/WOZ8ZiitKa6WXMuIzYGrtBhl43DCpcW
-	hA+Qp9A5YDyRDVyES96peDKWhJ63uF389Lr6COEpn37V64X0yEwx7KHxGm2j/fSXurUQE+jv8Km
-	Hl4tKb6DypdIHm04+o4SM250aEcTPnaTHMyR+j70cBwpAtywsB454IIU9RTk/EkWN8Xiaj
-X-Received: by 2002:a05:6820:4385:b0:6aa:2fbf:bf60 with SMTP id 006d021491bc7-6b159470ad9mr3879471eaf.34.1787287602452;
-        Thu, 20 Aug 2026 21:46:42 -0700 (PDT)
-Received: from [172.17.0.2] ([158.23.146.212])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b13cf498cfsm7300499eaf.15.2026.08.20.21.46.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 21:46:41 -0700 (PDT)
-Message-ID: <6a87d831.de89bd77.362314.3ace@mx.google.com>
-Date: Thu, 20 Aug 2026 21:46:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4993179355753639398=="
+	s=arc-20240116; t=1787293599; c=relaxed/simple;
+	bh=nJb1piPzYbqkiNmpDnr8yHiubGYhotaH48qKPmstykA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jg0c4PSNhEWp7ikn2SmS6iBzJQeTLdCWYt+Yte360BSkjJXvLUQxhBcNhv0YvL1c/7eP9s/+BtQV5VuBWB72YPPtPe3XLAGguq1nK38dIHjNOiRjJk5/kSnH5w642Ov9q0krAritJEf1Ic14IO9mPFI9dWONef1ztnIE+Sz/x0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 39b160789d2911f19a56ed5b684f684d-20260821
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:ffd5387b-5664-439d-96e2-ee90ef3099e4,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:7db8b62,CLOUDID:e8d79b2bec317e838dcede8c7e027a19,BulkI
+	D:nil,BulkQuantity:0,SF:102|136|865|898,TC:nil,Content:0|15|50,EDM:-3|-100
+	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 39b160789d2911f19a56ed5b684f684d-20260821
+X-User: liujiajia@kylinos.cn
+Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liujiajia@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 883801387; Fri, 21 Aug 2026 14:26:21 +0800
+From: Jiajia Liu <liujiajia@kylinos.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Ying Hsu <yinghsu@chromium.org>,
+	Archie Pusaka <apusaka@chromium.org>,
+	Abhishek Pandit-Subedi <abhishekpandit@google.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jing Cai <jing.cai@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Chris Lu <chris.lu@mediatek.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jiajia Liu <liujiajia@kylinos.cn>
+Subject: [PATCH v3 1/2] Bluetooth: btusb: mediatek: Fix leaked runtime PM reference in reset
+Date: Fri, 21 Aug 2026 14:26:05 +0800
+Message-ID: <290cf3c065ebee3d1dcaaa4e805e1875d0f999e8.1787292206.git.liujiajia@kylinos.cn>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zuohongsheng@kylinos.cn
-Subject: RE: [v2] gatt-server: Fix integer overflow
-In-Reply-To: <20260821033214.82863-1-zuohongsheng@kylinos.cn>
-References: <20260821033214.82863-1-zuohongsheng@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4993179355753639398==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+MT7925 on HP Pro Mini 260 sometimes timed out during reloading driver
+and reset usb device. btusb_suspend is not called again after closing
+bluetooth interface.
 
-This is automated email and please do not reply to this email!
+ usbcore: registered new interface driver btusb
+ Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260605184935
+ Bluetooth: hci0: Execution of wmt command timed out
+ Bluetooth: hci0: Failed to send wmt patch dwnld (-110)
+ Bluetooth: hci0: Failed to set up firmware (-110)
+ usb 3-10: reset high-speed USB device number 4 using xhci_hcd
+ Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260605184935
+ Bluetooth: hci0: Device setup in 1856545 usecs
+ Bluetooth: hci0: AOSP extensions version v1.00
+ Bluetooth: hci0: AOSP quality report is supported
+ Bluetooth: MGMT ver 1.23
 
-Dear submitter,
+btusb_mtk_reset calls usb_autopm_get_interface to resume the device
+before driving the hardware reset, but never calls the matching
+usb_autopm_put_interface. Every hardware reset therefore leaks a PM
+usage reference of the interface, preventing the device from being
+runtime suspended again until it is unbound.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1149440
+Add the BTUSB_RESET flag. It is set right after the PM reference
+is acquired (unless the reset goes through a GPIO) and is cleared in
+btusb_disconnect, which drops the reference as well. If the flag is
+already set when a new reset is requested, the previously queued reset
+has not finished yet, so drop the newly acquired reference and return.
 
----Test result---
+Also clear BTMTK_HW_RESET_ACTIVE if usb_autopm_get_interface fails,
+otherwise no further reset could ever be attempted.
 
-Test Summary:
-CheckPatch                    PASS      0.40 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      16.56 seconds
-BluezMake                     PASS      467.83 seconds
-MakeCheck                     PASS      0.87 seconds
-MakeDistcheck                 PASS      125.66 seconds
-CheckValgrind                 PASS      120.13 seconds
-CheckSmatch                   WARNING   234.02 seconds
-bluezmakeextell               PASS      76.32 seconds
-IncrementalBuild              PASS      495.77 seconds
-ScanBuild                     PASS      704.75 seconds
+Fixes: 25b6d7593a3a ("Bluetooth: btmtk: introduce btmtk reset work")
+Assisted-by: Claude:qwen3.8-max
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
+---
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.
+Changes in v3:
+- rename BTUSB_USB_RESET_ACTIVE to BTUSB_RESET (Luiz)
 
+- test_and_clear_bit BTUSB_RESET in btusb_disconnect (Luiz)
 
-https://github.com/bluez/bluez/pull/2422
+- handle multiple reset requests int btusb_mtk_reset (sashiko)
+  set BTUSB_RESET if no reset_gpio after usb_autopm_get_interface.
+  If the flag is already set, add log and drop newly acquired reference
+  and return.
+
+- clear BTMTK_HW_RESET_ACTIVE if usb_autopm_get_interface fails and add
+  error log. (sashiko)
+
+Changes in v2:
+- Fix the race window (sashiko)
+  Add and set BTUSB_USB_RESET_ACTIVE flag before usb_queue_reset_device.
+  Release PM reference in btusb_disconnect if this flag is set.
+
+Changes in v1:
+- add usb_autopm_put_interface after usb_queue_reset_device
 
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 184e95c1625e..360cec460ce7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -957,6 +957,7 @@ struct qca_dump_info {
+ #define BTUSB_USE_ALT3_FOR_WBS	15
+ #define BTUSB_ALT6_CONTINUOUS_TX	16
+ #define BTUSB_HW_SSR_ACTIVE	17
++#define BTUSB_RESET		18
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -2891,8 +2892,19 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+ 	}
+ 
+ 	err = usb_autopm_get_interface(data->intf);
+-	if (err < 0)
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
++		clear_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags);
+ 		return err;
++	}
++
++	if (!data->reset_gpio &&
++	    test_and_set_bit(BTUSB_RESET, &data->flags)) {
++		bt_dev_err(hdev, "last usb reset failed? Not resetting again");
++		clear_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags);
++		usb_autopm_put_interface_no_suspend(data->intf);
++		return -EBUSY;
++	}
+ 
+ 	/* Release MediaTek ISO data interface */
+ 	btusb_mtk_release_iso_intf(hdev);
+@@ -4497,6 +4509,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	if (data->reset_gpio)
+ 		gpiod_put(data->reset_gpio);
+ 
++	if (test_and_clear_bit(BTUSB_RESET, &data->flags))
++		usb_autopm_put_interface_no_suspend(data->intf);
++
+ 	if (intf == data->intf) {
+ 		if (data->isoc)
+ 			usb_driver_release_interface(&btusb_driver, data->isoc);
+-- 
+2.55.0
 
---===============4993179355753639398==--
