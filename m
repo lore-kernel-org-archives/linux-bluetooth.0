@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1CA44470A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F246346AECF
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787303381; cv=none; b=iOXi3ciTUasJlRCq0dX/aKVpropbudjyTg3698h1/zEHJ8wX3gQDltmZf/71mRgXqEKPdG88yUuk6/aJCCFxPPBzmkbvrSRqGfCAAEKFb6L5BogUNaShPMiHVBxjiXsC3iNbJ0blpdXbZhOt0baFKpe+febNwsMGRfgG0MNEPBI=
+	t=1787303381; cv=none; b=Vd8HUY+12sRKYv2pl0W+6lz+ao/k070BnLh/zr3lmIAJefKA8u3saNTBB7aaJSOQvyf4SEd3yhhulM/2PHybEO0QgQD76HfZkvB1wpDWnlS1jAxNbgYq/U+qtF5kDlvtm6v44mz/REXjIvHiBV/yeBBXkB4pqHWycvUU6doJRjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787303381; c=relaxed/simple;
-	bh=H4SOsTzLpj3fNzG+Vs2WIcJgn6hOGqZ/eGCE6nSQMiA=;
+	bh=6/qcLggBB0dkRlFyHz2dMAeRCm4AXzVADm3ZnQbF7a8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IPjAGG2C4AY5GnHddn1MLPlEVNlLUi4kgNOUaXcYQ9vE8O7Ggdh6fcuDB9UPJGOYGMQ6/16RAazV5QxavuGTHEkIKiD1skBxVdUSpEU21c7Wu8r64AMNoRQKGUkYcRdsQu7DV6gqQ8YbynqFZEHJ50DgTViYYLpeqIcRL+t2Py0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hgzR7Drj; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=u3I+RY+kr5vXlF0N0wXZTpXrh1cxFworcBvUeykUOVvg9ouD8Z3wKOLHaZAXKwhvyIVl+S3CEPMzwittfzvkDroC6kIQEvjARyBVxfvkrrBY5xY7KZHhshSyG1FVq7TZ8H3D2cX5dDEl9FjcL0DjH9dogz3dMvE00s1qt+qC6+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FcCCb63N; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hgzR7Drj"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FcCCb63N"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1787303353;
-	bh=H4SOsTzLpj3fNzG+Vs2WIcJgn6hOGqZ/eGCE6nSQMiA=;
+	bh=6/qcLggBB0dkRlFyHz2dMAeRCm4AXzVADm3ZnQbF7a8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hgzR7Drj+cyxFDK6jqGt5yjOcZOKr9GYfHqYJe74wCC8gzL6ek7QAItTk3xUYEsPF
-	 w3mOpfiZyhrclAoeaT6EH9BxCHi+Y7w5uQtmHrtPHXJ7lLcSJ9gTGnlB2h/3wxdbJz
-	 4dOJgC5bR0QCochiBvCjp15lYSkCZS/PNJ0e4uGFU7nXIj49/OOLIxkyx0rPwAGExg
-	 fn5f/E8POJCsMI+fGihkjQU+aSoKrQ6X8F9z0i7a0L4mPjxw9dRn8eWBB6wu/HBu3O
-	 VQXW38z1EDAXCYyA+EIcWXR2dr1rdrWSBsn54L/yMS9NFM9Nw0F3MAEhN5LOGYItO5
-	 RjEtCOgUN9DSg==
+	b=FcCCb63N9ObQ4ZBQoQ2zh8Z4v4KnZ9bgrBXcHiaF+zPvT0CMkiDehbRRFCsBh2KWb
+	 dT66t1x3rVlB87hdvpz+Y4txfdyiE3fGUdcQgQUkps/xNJ/cWtwHGMvP78WFB3rPL/
+	 JIKO3PJK2s/eRiOW3nDTHoGG6foftNAigZczQnibQChG5wN5lRW+o76zTAc5p2QBV4
+	 5SWkZvG/C52EfgJbOUTGryacLJPahvU28pHd0/WmENFlEbLE2kUOB9E19Y2OoRHQyP
+	 U4IEkvyDDuxgJ6aCpr6o3hyHN1/7gyuRibjIJi7gus+YDunlTJf8/J3n7r2B8kDFt2
+	 MJj31GiGL6G/w==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 50A3317E0881
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id C7C8A17E0C8D
 	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 11:09:13 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/6] mgmt: Add Security Level Changed event
-Date: Fri, 21 Aug 2026 11:09:03 +0200
-Message-ID: <20260821090908.1546451-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 3/6] monitor: Add support for Mgmt Security Level changed event
+Date: Fri, 21 Aug 2026 11:09:05 +0200
+Message-ID: <20260821090908.1546451-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260821090908.1546451-1-frederic.danis@collabora.com>
 References: <20260821090908.1546451-1-frederic.danis@collabora.com>
@@ -50,105 +50,150 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This provides a TLV list of values related to the security level of
-the connection to a remote device.
-
-Currently Security Level and Encryption type are implemented.
+@ MGMT Event: Security Level Changed (0x0034) plen 16
+        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
+        Count: 2
+        Security Level: No security (0x00000000)
+        Encryption Type: No encryption (0x00000000)
 ---
-v1->v2: Fix struct mgmt_ev_security_level_changed definition
-v2->v3: Re-work Security Level possible values in mgmt-protocol.rst to be in
-        with other *-protocol.rst files
+ monitor/packet.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 117 insertions(+)
 
- doc/mgmt-protocol.rst | 45 +++++++++++++++++++++++++++++++++++++++++++
- lib/bluetooth/mgmt.h  | 15 +++++++++++++++
- 2 files changed, 60 insertions(+)
-
-diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
-index f0564075f..983ffc3aa 100644
---- a/doc/mgmt-protocol.rst
-+++ b/doc/mgmt-protocol.rst
-@@ -5521,3 +5521,48 @@ The Supervision_Timeout parameter specifies the supervision timeout in units
- of 10 ms.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 0d3b23cc3..217fcdad1 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -17680,6 +17680,121 @@ static void mgmt_conn_subrate_evt(const void *data, uint16_t size)
+ 	print_field("Supervision timeout: %u", supv_timeout);
+ }
  
- This event will be sent to all management sockets.
++static void mgmt_print_security_level(const char *desc, uint32_t value)
++{
++	const char *level;
 +
-+Security Level Changed
-+``````````````````````
++	switch (value) {
++	case BT_SECURITY_SDP:
++		level = "No security";
++		break;
++	case BT_SECURITY_LOW:
++		level = "Unauthenticated pairing with encryption not required";
++		break;
++	case BT_SECURITY_MEDIUM:
++		level = "Unauthenticated pairing with encryption desired";
++		break;
++	case BT_SECURITY_HIGH:
++		level = "Authenticated pairing with encryption";
++		break;
++	case BT_SECURITY_FIPS:
++		level = "FIPS authenticated pairing with encryption";
++		break;
++	default:
++		level = "Reserved";
++		break;
++	}
 +
-+:Event Code:		0x0034
-+:Controller Index:	<controller_id>
-+:Event Parameters:	Address (6 Octets)
-+:...:			Address_Type (1 Octet)
-+:...:			Count (1 Octet)
-+:...:			TLV_List (variable)
++	print_field("%s: %s (0x%8.8x)", desc, level, value);
++}
 +
-+This event indicates that the security level of a device has changed.
++static void mgmt_print_encryption_type(const char *desc, uint32_t value)
++{
++	const char *type;
 +
-+Possible values for the TLV type parameter:
++	switch (value) {
++	case MGMT_CONN_SEC_ENCRYPT_NONE:
++		type = "No encryption";
++		break;
++	case MGMT_CONN_SEC_ENCRYPT_E0:
++		type = "E0";
++		break;
++	case MGMT_CONN_SEC_ENCRYPT_AES_CCM:
++		type = "AES-CCM";
++		break;
++	default:
++		type = "Reserved";
++		break;
++	}
 +
-+.. csv-table::
-+	:header: "Type", "Description"
-+	:widths: auto
++	print_field("%s: %s (0x%8.8x)", desc, type, value);
++}
 +
-+	0x0000, Security Level
-+	0x0001, Encryption type
++static void mgmt_print_sec_level_tlv(void *data, void *user_data)
++{
++	const struct mgmt_tlv *entry = data;
++	uint16_t type = get_le16(&entry->type);
++	const char *desc = default_system_config(type);
++	uint32_t value;
++	char buf[8];
 +
-+Possible values for the Security Level type:
++	switch (type) {
++	case MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL:
++		desc = "Security Level";
++		break;
++	case MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE:
++		desc = "Encryption Type";
++		break;
++	default:
++		snprintf(buf, sizeof(buf), "0x%4.4x", entry->type);
++		desc = buf;
++		break;
++	}
 +
-+.. csv-table::
-+	:header: "Value", "Security Level", "Link Key Type", "Encryption"
-+	:widths: auto
++	if (entry->length == 1 || entry->length == 2 || entry->length == 4) {
++		if (entry->length == 1)
++			value = get_u8(entry->value);
++		else if (entry->length == 2)
++			value = get_le16(entry->value);
++		else
++			value = get_le32(entry->value);
 +
-+	**BT_SECURITY_SDP**, 0 (SDP Only), None, Not required
-+	**BT_SECURITY_LOW**, 1 (Low), Unauthenticated, Not required
-+	**BT_SECURITY_MEDIUM**, 2 (Medium - default), Unauthenticated, Desired
-+	**BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
-+	**BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
++		switch (type) {
++		case MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL:
++			mgmt_print_security_level(desc, value);
++			break;
++		case MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE:
++			mgmt_print_encryption_type(desc, value);
++			break;
++		default:
++			print_field("%s: %u", desc, value);
++			break;
++		}
++	} else {
++		print_hex_field(desc, entry->value, entry->length);
++	}
++}
 +
-+Possible values for the Encryption type:
++static void mgmt_security_level_changed_evt(const void *data, uint16_t size)
++{
++	const uint8_t *addr = data;
++	uint8_t addr_type = get_u8(data + 6);
++	uint8_t count = get_u8(data + 7);
++	struct mgmt_tlv_list *tlv_list;
 +
-+.. csv-table::
-+	:header: "Value", "Description"
-+	:widths: auto
++	mgmt_print_address(addr, addr_type);
++	print_field("Count: %d", count);
 +
-+	0x00, No encryption
-+	0x01, E0 encryption
-+	0x02, AES-CCM encryption
++	tlv_list = mgmt_tlv_list_load_from_buf(data + 8, size - 8);
++	if (!tlv_list) {
++		print_text(COLOR_ERROR, "  Unable to parse security level "
++					"changed event");
++		return;
++	}
++	mgmt_tlv_list_foreach(tlv_list, mgmt_print_sec_level_tlv, NULL);
++	mgmt_tlv_list_free(tlv_list);
++}
 +
-+This event will be sent to all management sockets.
-diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
-index 9df0c1ba2..7b98ff8a9 100644
---- a/lib/bluetooth/mgmt.h
-+++ b/lib/bluetooth/mgmt.h
-@@ -1136,6 +1136,20 @@ struct mgmt_ev_conn_subrate {
- 	uint16_t supv_timeout;
- } __packed;
- 
-+#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
-+#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
-+#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
-+
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL	0x0000
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE	0x0001
-+
-+#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0034
-+struct mgmt_ev_security_level_changed {
-+	struct mgmt_addr_info addr;
-+	uint8_t	tlv_count;
-+	uint8_t	tlv_data[];
-+} __packed;
-+
- static const char *mgmt_op[] = {
- 	"<0x0000>",
- 	"Read Version",
-@@ -1285,6 +1299,7 @@ static const char *mgmt_ev[] = {
- 	"Mesh Packet Found",
- 	"Mesh Packet Complete",
- 	"Connection Subrate",
-+	"Security Level Changed",
+ static const struct mgmt_data mgmt_event_table[] = {
+ 	{ 0x0001, "Command Complete",
+ 			mgmt_command_complete_evt, 3, false },
+@@ -17779,6 +17894,8 @@ static const struct mgmt_data mgmt_event_table[] = {
+ 			mgmt_mesh_packet_cmplt_evt, 1, true },
+ 	{ 0x0033, "Connection Subrate",
+ 			mgmt_conn_subrate_evt, 18, true },
++	{ 0x0034, "Security Level Changed",
++			mgmt_security_level_changed_evt, 8, false },
+ 	{ }
  };
  
- static const char *mgmt_status[] = {
 -- 
 2.43.0
 
