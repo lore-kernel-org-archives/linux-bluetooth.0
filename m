@@ -1,255 +1,103 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D8038239D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2E140D599
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787341814; cv=none; b=E2e1qnVy1Nzw0btcrqCLKPflRfBWSRNfGOdjjQI6PipOVbo69x1VJbdtee7g+2PvqsgndfywUBCrf3arosWGeTEyrfJS1otoHfMuY2amjHiSL3tLs5JOxwRgSqbG+P/JKPI+y8k4OKW8OgBjahQhejtabl469qnms4dCimRNSRk=
+	t=1787341814; cv=none; b=NxwxHQxR6jsljfi1McsfxSSUXQD0bD/junNvLwC5/BUCJD/fVPVfxY9HBByzrzl7iVDNEU89m6iz47x3JMhTPQbs9R1BAu+1R3DnI8GjHXbOyNAC+nTvBad2CQfSNPJndYiVORjBTrXXN+PjBORWkjH1qaRa+Kz0urqZR2r21O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787341814; c=relaxed/simple;
-	bh=ht5niu6vfH2p6S6Ba0++7kumIjPPx9VWK8Yw0ZWMIrg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jYE5cuS71ADI+dx62QMc3n2wAdPCxyW4JvbjUgDBGZJL26GyVdV7sOqECiqBA1a2eOtc01vUKIvn0xUZsuhBIaJPWUR9n1ju3Vpne3ubJBxzA4HEKf2IxPR7KI6xBijeX5gfTr0Q/UNcvV8+ILEOCxHuQPnq56I6xwvXYLigtBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QV7Ql3Yc; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	bh=gskV1hJQCG80AV4sNz1PxU26bxcRffrp5JsfEjeOvlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pANU3zduti8DG0oJ9KC2I1NAGI5HP55RXmMa4kDzwcypLHQ5RhqxYDa8PboYDINBfWj12i+DTVH5ILdHdliXTM6MiieTd2VMI4jF3kI+1gwg4QnjtlADrciFc6OvAEIpU+joMXhxYEU3+M5738VFMK0bXLxS/V6Rcd4c44Lb3Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E+sE7W/R; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QV7Ql3Yc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787341808;
-	bh=6/oI1/Ur031snQFT+f8jkMRb48TCAXsqL1Uv+5UjGWM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=QV7Ql3YcNOarVw9zs5drEwutautz+4TEI9X0eLdmQUfNm8KDimjjTXcY+Bx+EPMJn
-	 5VmfhxWXAGK6wscdPzLZOTVIuACPIqGZS4y0YjB/Ur8KrysVpVjJKC0Sl0m/y2DrDA
-	 UMob9KieaGXAbdYeptKp3znksgOZQXlSroFAcK4M=
-Received: from github.com (hubbernetes-node-dd8b63b.ash1-iad.github.net [10.59.91.31])
-	by smtp.github.com (Postfix) with ESMTPA id 29EF5520A7D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 12:50:08 -0700 (PDT)
-Date: Fri, 21 Aug 2026 12:50:08 -0700
-From: George Kiagiadakis <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1149990/000000-b2d885@github.com>
-Subject: [bluez/bluez] ad8b76: player: Fix crash on MediaItem1.Play() without
- a b...
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E+sE7W/R"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787341810; x=1818877810;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gskV1hJQCG80AV4sNz1PxU26bxcRffrp5JsfEjeOvlI=;
+  b=E+sE7W/RrEoECdhy6ftdxKxI1wwsBnFGzwwNXZcCN13SKVS/iJ8Xwff0
+   vi4BapoYI9ZE1+SkpCw9zbIoFUYuKHo/c/oLL1yqZKtbj6lKui7ZBfRe4
+   CaM7X6cm8XncECV78xtBveAHI1u2aEmtXw6XviY+XD6Byu3a2Bxz/o845
+   ZMKL8v2h8gpeoITXFs2iGb969gxyXVvXCTSA4Q58dnnTw7+GNpi82M086
+   ZSVP0caDXWQYnCfXHvD9439Lu0EVoLy7HkDHp6q4JyckVxxF8mv0Yw2c7
+   7R5BCxrwMb091crwcNc/r2DmLPMKg8YjLgiWvxtSZkt7aiXi6dvakhxf9
+   g==;
+X-CSE-ConnectionGUID: D1CSJ6t0Q76zCmSMqGABlw==
+X-CSE-MsgGUID: /TwpxM/kREqzKu3X5kSAfA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11882"; a="98488868"
+X-IronPort-AV: E=Sophos;i="6.25,235,1779174000"; 
+   d="scan'208";a="98488868"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2026 12:50:07 -0700
+X-CSE-ConnectionGUID: xkIZl3E1Tz6OWRhR/OsIqQ==
+X-CSE-MsgGUID: fO2cT9PJQZqNZeZ/uqVhfQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,235,1779174000"; 
+   d="scan'208";a="270264721"
+Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 21 Aug 2026 12:50:06 -0700
+Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wxVFa-00000000qOr-298q;
+	Fri, 21 Aug 2026 19:50:02 +0000
+Date: Sat, 22 Aug 2026 03:49:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Li Jun <lijun01@kylinos.cn>, marcel@holtmann.org, luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH] bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
+Message-ID: <202608220346.df2N3qLw-lkp@intel.com>
+References: <20260819054525.2325031-1-lijun01@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260819054525.2325031-1-lijun01@kylinos.cn>
 
-  Branch: refs/heads/1149990
-  Home:   https://github.com/bluez/bluez
-  Commit: ad8b76c8f2ae7ef4704b4a24b69ee7f8e8f9d512
-      https://github.com/bluez/bluez/commit/ad8b76c8f2ae7ef4704b4a24b69ee7f8e8f9d512
-  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
-  Date:   2026-08-21 (Fri, 21 Aug 2026)
+Hi Li,
 
-  Changed paths:
-    M profiles/audio/player.c
+kernel test robot noticed the following build warnings:
 
-  Log Message:
-  -----------
-  player: Fix crash on MediaItem1.Play() without a browsing scope
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v7.2 next-20260820]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-media_item_play() dereferenced mp->scope without checking it:
+url:    https://github.com/intel-lab-lkp/linux/commits/Li-Jun/bluetooth-pm-use-SIMPLE_DEV_OPS-for-pm-struct/20260819-134525
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20260819054525.2325031-1-lijun01%40kylinos.cn
+patch subject: [PATCH] bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
+config: powerpc-randconfig-r123-20260821 (https://download.01.org/0day-ci/archive/20260822/202608220346.df2N3qLw-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 935bfc708590c60147a79c7df145bb6e68b1d388)
+sparse: v0.6.5-rc1
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260822/202608220346.df2N3qLw-lkp@intel.com/reproduce)
 
-	struct media_folder *folder = mp->scope;
-	...
-	if (folder->msg)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202608220346.df2N3qLw-lkp@intel.com/
 
-mp->scope is only ever set by media_player_set_scope(), which is reached
-from media_player_set_folder() (SetBrowsedPlayer) and from
-media_player_set_folder_by_uid() (ChangeFolder). Both of those require
-the player to advertise the Browsing feature bit, since
-avrcp_player_parse_features() only creates /Filesystem when
-features[7] & 0x08 is set.
+sparse warnings: (new ones prefixed by >>)
+>> drivers/bluetooth/btmrvl_sdio.c:1729:1: sparse: sparse: symbol 'btmrvl_sdio_pm_ops' was not declared. Should it be static?
 
-The /NowPlaying folder is gated on a different bit, features[8] & 0x02,
-and media_player_set_playlist_item() registers its items as playable
-MediaItem1 objects regardless of the scope. A player that reports
-NowPlaying but not Browsing therefore exports playable items while
-mp->scope is still NULL, and calling Play() on one of them crashes
-bluetoothd. msg sits at offset 40 in struct media_folder on LP64, which
-matches the reported "segfault at 28".
+vim +/btmrvl_sdio_pm_ops +1729 drivers/bluetooth/btmrvl_sdio.c
 
-A plain NULL check is not enough: the pending message has nowhere to be
-stored, so Play() would answer nothing at all and the caller would hang
-instead of crashing. Move the pending request from struct media_folder
-to struct media_player instead. Every user of folder->msg already stored
-into mp->scope->msg, so the slot was per player in all but name, and
-moving it keeps the existing mutual exclusion between ListItems, Search,
-ChangeFolder and Play intact.
+  1728	
+> 1729	SIMPLE_DEV_PM_OPS(btmrvl_sdio_pm_ops, btmrvl_sdio_suspend, btmrvl_sdio_resume);
+  1730	
 
-Playing now works rather than merely not crashing: ct_play_item() picks
-the AVRCP scope from the path, so an item under /NowPlaying is played
-with the Now Playing scope (0x03).
-
-Moving the message off the folder also fixes a lost reply. Each
-completion re-read mp->scope, so when avrcp moved the scope while a
-request was pending, for instance on SetBrowsedPlayer, the completion
-found a different folder with a NULL msg, returned early and left the
-D-Bus caller without an answer.
-
-Fixes: 43b0855abdf4 ("audio/player: Report PlayItem errors")
-
-Assisted-by: Claude:claude-opus-5 valgrind
-
-
-  Commit: 6d78bde51be5ea9bc9732f0ae67d64be77c6afb9
-      https://github.com/bluez/bluez/commit/6d78bde51be5ea9bc9732f0ae67d64be77c6afb9
-  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
-  Date:   2026-08-21 (Fri, 21 Aug 2026)
-
-  Changed paths:
-    M profiles/audio/player.c
-
-  Log Message:
-  -----------
-  player: Answer pending request when the player is destroyed
-
-media_player_destroy() dropped its reference to the pending request
-without answering it. A client with a ListItems(), Search(),
-ChangeFolder() or Play() in flight was therefore left waiting for its
-own D-Bus timeout to expire, 25s by default, whenever the player went
-away. That happens on every AVRCP disconnect, since avrcp destroys the
-controller player from its disconnect path.
-
-Reply with org.bluez.Error.Failed instead.
-
-Answering after the g_dbus_unregister_interface() calls above is fine,
-as replies are matched by serial rather than by object path, so the
-unref site does not need to move.
-
-Assisted-by: Claude:claude-opus-5 valgrind
-
-
-  Commit: 18863cc028d48e341520347945b46ddf3b280d44
-      https://github.com/bluez/bluez/commit/18863cc028d48e341520347945b46ddf3b280d44
-  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
-  Date:   2026-08-21 (Fri, 21 Aug 2026)
-
-  Changed paths:
-    M profiles/audio/player.c
-
-  Log Message:
-  -----------
-  player: Fix NumberOfItems never being updated on SetBrowsedPlayer
-
-media_player_total_items_complete() discarded the count reported by the
-player unless a D-Bus request happened to be pending:
-
-	if (folder == NULL || folder->msg == NULL)
-		return;
-
-Of the paths reaching it, only media_player_change_folder_complete()
-still holds a pending message. The count was therefore applied on
-ChangeFolder and dropped everywhere else, notably on
-media_player_set_folder(), which avrcp calls on SetBrowsedPlayer, that
-is precisely when the count is first learned.
-
-The guard reads as copy-paste from the four *_complete() functions
-above it. Those need a pending message because they send a reply. This
-one only refreshes a property, so there is no request to correlate it
-with.
-
-f17d3a2c3 replaced an unconditional emit in media_player_change_scope()
-with one deferred into this completion whenever the total_items
-callback is present, and the guard then swallowed it. The AVRCP
-controller always registers that callback, so NumberOfItems has not
-been refreshed on SetBrowsedPlayer since. That commit states the
-intent itself: "On response, emit PropertyChanged for 'NumberOfItems'
-property".
-
-Note the count is still applied to whatever mp->scope is at completion
-time rather than to the folder it was requested for.
-media_player_change_scope() sets the scope before asking, so the common
-case is right, but a second scope change in flight misattributes it.
-
-Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
-
-Assisted-by: Claude:claude-opus-5 valgrind
-
-
-  Commit: a5866844aebf287de1da5a32d37236de54485c1b
-      https://github.com/bluez/bluez/commit/a5866844aebf287de1da5a32d37236de54485c1b
-  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
-  Date:   2026-08-21 (Fri, 21 Aug 2026)
-
-  Changed paths:
-    M profiles/audio/player.c
-
-  Log Message:
-  -----------
-  player: Report EBUSY from a busy Search()
-
-media_folder_search() answered a request that arrived while another one
-was still pending with EINVAL, while media_folder_list_items(),
-media_folder_change_folder() and media_item_play() all answer EBUSY for
-the very same condition.
-
-The commit that added Search copied the error code from the argument
-check sitting directly above it, rather than from ChangeFolder, which
-had gained the identical busy check four days earlier and used EBUSY.
-
-Fixes: 0a232a434d4b ("audio/player: Add implementation of MediaFolder.Search")
-
-Assisted-by: Claude:claude-opus-5 valgrind
-
-
-  Commit: b2d88568c2bdde501b149bbdd8f4685676498d99
-      https://github.com/bluez/bluez/commit/b2d88568c2bdde501b149bbdd8f4685676498d99
-  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
-  Date:   2026-08-21 (Fri, 21 Aug 2026)
-
-  Changed paths:
-    M .gitignore
-    M Makefile.am
-    A unit/test-media-player.c
-
-  Log Message:
-  -----------
-  unit/test-media-player: Add media player tests
-
-Cover the D-Bus surface of profiles/audio/player.c that the AVRCP
-controller drives, using a private session bus.
-
-Nine tests:
-
-  play_item_without_scope        Play() on a /NowPlaying item of a
-                                 player that never set a scope
-  play_item_with_scope           the browsable case still works
-  play_item_busy                 a second overlapping Play() is refused
-  play_item_busy_with_list_items Play() during a pending ListItems() is
-                                 refused, pinning the mutual exclusion
-                                 between the two
-  list_items_scope_change        a pending ListItems() is still answered
-                                 when the scope moves meanwhile
-  no_folder_without_scope        MediaFolder1 is not registered without
-                                 a scope, which is why MediaItem1 was
-                                 the only entry point able to observe
-                                 an unset one
-  play_item_destroy_pending      destroying a player answers whatever
-                                 request is still in flight
-  total_items_scope_change       the count reported by the player is
-                                 applied when the scope moves
-  search_busy                    a busy Search() reports EBUSY
-
-Against the tree before this series play_item_without_scope,
-play_item_busy and play_item_destroy_pending crash, all three because
-they play a /NowPlaying item on a player with no scope,
-list_items_scope_change times out with NoReply, total_items_scope_change
-reads a stale count and search_busy reports the wrong error. The
-remaining three pass there as well and guard against regressions.
-
-Assisted-by: Claude:claude-opus-5 valgrind
-
-
-Compare: https://github.com/bluez/bluez/compare/ad8b76c8f2ae%5E...b2d88568c2bd
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
