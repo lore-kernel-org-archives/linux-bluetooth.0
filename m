@@ -1,70 +1,70 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012E8425CF0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 16:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C62360EC6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 16:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787328519; cv=none; b=nnydP1EyPUbJIKEMui/62jUMaVjqQ/26cNYPSvi9ByVrTo78CNHCGTkf7NMpmHiYZ8dtUve3fO5Ch6/IDRTKovYzd7PZ1Q4XQM5np8vpGTCAfG7Ucv4seCAXiA/cI5GlL1FQp9KmQ7UVD57Ov42gf2+FQwhu/XNCtbH+Y0nDEBo=
+	t=1787328519; cv=none; b=Muv4mS6lks3BrkJS3n3kPXPNhmO2unN7Z6IDG/iNFV01T7vS5CfQIEXwmHYNZo1pq57HQYY14d7U23LDaIsgRkZ5fGA3puL1fJlSAcng4D+EWfbyPSbdvlu7u2yhtPHF8/2D9+wg8coNjERNEuhfHmlO64INZA2+xq0YDB2IVBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787328519; c=relaxed/simple;
-	bh=fHa+Qh0tZuEBxQOujxQsVtCdcROzNffDDKhi8iy4DqQ=;
+	bh=MNKs1xisXjEzonv19oS/wKR2KfTrDPiizghW/eK4ir4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqjibPS1ot27fICyzfGnfaBu2r1PAkiiv+kww/b0goF4ROPSt2q8wv4YlJnYbmmSO1ag/KUx5PRFWnXyIfO/ROn7Em5WfNC+cNcUkb+F0OXbHDoOKwJTdn/q2mbCb0+wi8OaBPXiLeWD8WRKVK38qxzGNWItrBRy6oH1W5ilZzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=sUOL+jKE; arc=none smtp.client-ip=209.85.218.49
+	 MIME-Version; b=a8x/YmK6t2qn/Q6/0IXugDlcg5D5FcR8M64aUSkMy22EBkzUhLzaQCJriQfTn00gh0DvXwmFTW83e67687ckMqFYWgcwPgJjm1S3EIxn3/hVkXwsW5eq9T+R6uDw8d5yQ4ub5or/NIemIXpaF55b41Z0GmJ4qUstx8/ExY7pY7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=TAYU2pDe; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="sUOL+jKE"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c15c42a45adso376120466b.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:08:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="TAYU2pDe"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c15ba3a2b4bso174092966b.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 09:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=irregular.at; s=google; t=1787328516; x=1787933316; darn=vger.kernel.org;
+        d=irregular.at; s=google; t=1787328515; x=1787933315; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=iuMMHjbKJJyWMZllW2/YDxgqwLDnv65cDL/gLe0ScWk=;
-        b=sUOL+jKEkW75xmf4IN906YwE2NhinRrCtzS/Olq9o/a1rlPVPFLWDtLggNNUEdDlJE
-         9tLio6hiWlykrH4iPLF4HS5iJ3dhkR+mHmH8js19/+LtgmmH97S8+8YrWiR7UQYHmOuJ
-         UH1fK3yu5plNt6NE8eyjKXUklxx6FOAJY42pA=
+        bh=y6SZWEeWLMOXZ/wwcuhyEmdb+czAhKDDH+K8G1IjHeg=;
+        b=TAYU2pDeeW8o1700HvJADKbOgDT2QyOzp1/kKtCt9paeGGCucuwFMxCqlNR6iOxQ/m
+         heCFFTEEnYkRdIyFQao8JxLYCUcqGHItrKHyMgnZ1BLV3eWjbgJXB9wOm4g7/WIMLVKU
+         TC/74LZYoGA+9uqzfCcL7cmPtDvmJMFf8zs34=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787328516; x=1787933316;
+        d=1e100.net; s=20251104; t=1787328515; x=1787933315;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iuMMHjbKJJyWMZllW2/YDxgqwLDnv65cDL/gLe0ScWk=;
-        b=HAqUQU7gHKmIyQt47lytsoV5wmAAJocqXbwp4fEHkorjS6+u/9lvf/aExZxKNQncuP
-         /dPArt2CeI9ITBKrFJxeOWpgGUmbbqFwBM874ljGnPmXQ+FC6VN1UA+RYKcoAWKZTavU
-         PBIa/WZmFvu2STIGe1uhyiHAKT0oAZe/BBaXpvuk6tbqo1CY66oQ4OxyXbWpfNCEnY6i
-         DzkHFq1x2gLZBhKHUNgnQ5aAci5xTSxn/zgQ54N/VtwmPbIfiUg7DGSm5gu7l1etyUIf
-         kO4CA1EqCQVNGJt3SkTHUIVtc1mgi6lY9Gep+w0GBuBBfehjHyHH9kPJ0KQ9mbs+E8c5
-         +8hA==
-X-Gm-Message-State: AFuF++kTs9IG102fEC0w1/WPadQubv2g67+TpmCU9yU04Q+4CdW36B6/
-	gs41j3iXQbAKFCISpA5KCGVFjrO6hRIP/dkqtr4v1kKd78+3TZDnGZpTzeRJ4MeymeQgq14MNfZ
-	XEg/hwc0=
-X-Gm-Gg: AR+sD10dIcpUG38HUMRMKcxiVpKZyH/FCZB/ofoqVwqTh6NdOH2L5QBFTLiaiA1eEN3
-	MLI09baereDuPPcqW3Bby2ZDumOLynqQC63Nnv1aQ5TI22ZCpwNyi1WhNi6I/2sO/HM+IOrdhNI
-	zK6jVhENbEhIAyTMm02upsXrYntzAzhKSdw3YxPEIjBUAQZ3fRtV0D7EDRtx/enP6hF02xlLnr7
-	oaRlPzklOvbscVEjAmjglb9jw7wUV5htSxluEnDnIzLWVkqIAi2GEflcBS1xHatf58qf92XVrd8
-	eHu9CytCOkrAsmlv0GmkuvQWfssGj4mhTfNHixoKv8B+yMWOuKfuF7svKqJhGvA81G+iL5GyjJQ
-	Tc+mWNvqKoCPFlTmr3l2MiawSI1xvI1v0DB/5g/a+SPVQIBDmtle/NZo7xKKOMNm/4gWKAu15pJ
-	VlJ4wzEW1QQDZlH+7uYQXnQWNLNfx9Od7K2jtcG5nUYyft53zH47KDTkCMLtcLbHM8dvUlC9GiB
-	NN8uoeSWpeqPlortZSHSref8QqHEPHu9smElHWB+zK3o5CC5/SJJUralMfL/1y9CWiQ7eR48O10
-	oe6IZcdn2QTDiPlJoBqFZzMFYaEeAA6r2eJZ7LNPr5M01I4avpTdDaCPepET1W9+6wvILyGxHWs
-	h7armdPdR/ABItNIBeg7jbairh0RFqUbYNdeZ
-X-Received: by 2002:a17:907:c30f:b0:c20:367d:f8b8 with SMTP id a640c23a62f3a-c244d4f05efmr1284347966b.4.1787328515996;
-        Fri, 21 Aug 2026 09:08:35 -0700 (PDT)
+        bh=y6SZWEeWLMOXZ/wwcuhyEmdb+czAhKDDH+K8G1IjHeg=;
+        b=IDv2QIiz2vIqqoZcG9LAgNVgXxQWMoJeXeCu5fmEYzZN/DhrN/psRVPoFioa1nP9G2
+         MCwnHi2YVM4cZ4b/StQzSe84HRLpLANlKYIzbAgwJwrQ8yYvaD4iWkfGmAFK/Ldf2ko8
+         k+36JlQIkK2V0rrjbT7X1Cbckpv99+Xb5vnta2eckw7aoju1IXE+O/R0f3JRhg2QRgVu
+         Kb+/VXac3u+ikWx0WkGnWUwlY0Ky31ACyaDlhXa9aSnp/VBau0NDF933UXngqINfQlFR
+         Fy+VxA3KHTwyJkQ/GG2K5FLUiFT6uX/YQZMHocphwImRAxzHmN5wQH/RFSO0Ye1el6MP
+         lVTA==
+X-Gm-Message-State: AFuF++kC1qnDV7J8EtiSKuerX0rg2DD+MbfM3SSpp13ncHjXX10+bOmA
+	l6j7zfnCrDxcy4OkHy+QdvtbcaBzW5XmQgXM3EKS4bmAovUpQHmVCQmeQblolXxMWMKyzS0k3t8
+	V/oP4mxI=
+X-Gm-Gg: AR+sD11Hji/Kv8BvRw4UXRW7bDG3t0KN4oEDoOUL20DkGLDLnUHLRXxxX2zULIlS7TP
+	22RMZpLAFE3YXBGzEASuCKwx33J4QRYrCtdE4/uQa/SPmNjAYwP7TD0c/TasOELXNjn1EGj+HtO
+	bkkxJfUmEyYDgINvyxRIhElU8bk0ZUWYkrHXG0T7ug5n0r5/TBctV/RKWdJa+C6kA/sGEosYtCr
+	odG8Wb2vFhh8X3LdGZSRNVX20M8DRsq1I93RJqi3LnEKLHWiNj3tWkAD277bxlxBQcD2I6VitUa
+	olF2Fp3lxrcUBfBXH47tLeYQ4yKV4Eld2f7MWGFxzlFTAHetr3IzBMdjCQa8erCJ4g7ZR+DcxGI
+	+bA0mGVx+1jZuxlFxf/0J6JqrRp01G68GWzCQ66edxWHjx+lwhh9XPi8gEz8wlMZm9TpB/ARfac
+	rx1SXfqjcHpFsQUHBRSBTiblHa7Kp+p8r71hpBgLEGPo+Mn+w6byMyh3I0KU5Wpe4iF1bGjX8ea
+	ooXloi0TuQ02X9jPugoQXxoDY+yvdDFNbrpTsb+CAMpBKeHh2nm96rP6jg3WTaP3gl0MMr729AG
+	nt9KAsh+z2rXCPh/Zy1p5XswPf1ofALoNCluF3SqeOqDqdcnHVqg5mgohs+RKgAiBVkfBk7b9Ex
+	WbMDyesjTki2SoFGsLdCBfXtUSF4umqaJvUv7Eg==
+X-Received: by 2002:a17:907:3e16:b0:c16:3074:657f with SMTP id a640c23a62f3a-c246a4ce3b8mr763194566b.9.1787328514986;
+        Fri, 21 Aug 2026 09:08:34 -0700 (PDT)
 Received: from mkurz-macbook-pro.fritz.box (2a02-8388-82c0-2a80-5231-6791-f21f-fc93.cable.dynamic.v6.surfer.at. [2a02:8388:82c0:2a80:5231:6791:f21f:fc93])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c24591df29esm471299366b.47.2026.08.21.09.08.35
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c24591df29esm471299366b.47.2026.08.21.09.08.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2026 09:08:35 -0700 (PDT)
+        Fri, 21 Aug 2026 09:08:34 -0700 (PDT)
 From: Matthias Kurz <m.kurz@irregular.at>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH BlueZ v2 2/4] doc: Document component battery objects
-Date: Fri, 21 Aug 2026 18:08:01 +0200
-Message-ID: <fa01e7967b8952a64e28a4eddbc8b1b51b8b38ec.1787327795.git.m.kurz@irregular.at>
+Subject: [PATCH BlueZ v2 1/4] battery: Add component battery objects
+Date: Fri, 21 Aug 2026 18:08:00 +0200
+Message-ID: <629f0d030e62a80caef0265bd04f541cb8eb0693.1787327795.git.m.kurz@irregular.at>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1787327795.git.m.kurz@irregular.at>
 References: <cover.1787327795.git.m.kurz@irregular.at>
@@ -76,97 +76,621 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Describe the experimental component Battery1 properties, their opaque
-object paths, and how BatteryProvider1 implementations publish several
-batteries for one device.
+Allow one Bluetooth device to export multiple Battery1 objects while
+keeping the legacy aggregate object at the device path.
+
+Component objects expose their parent Device1 path, a stable identifier,
+an optional percentage, and an optional charging state. Extend
+BatteryProvider1 handling with the same semantics so external providers can
+publish multiple batteries too.
+
+Keep component objects and their new properties behind the experimental
+D-Bus flag while the API is being established.
 
 Assisted-by: Codex:gpt-5.6-sol
 ---
- doc/org.bluez.Battery.rst         | 35 +++++++++++++++++++++++++++++--
- doc/org.bluez.BatteryProvider.rst | 16 ++++++++++++++
- 2 files changed, 49 insertions(+), 2 deletions(-)
+ src/battery.c | 401 ++++++++++++++++++++++++++++++++++++++++++--------
+ src/battery.h |   4 +
+ 2 files changed, 347 insertions(+), 58 deletions(-)
 
-diff --git a/doc/org.bluez.Battery.rst b/doc/org.bluez.Battery.rst
-index 5f9c6e7c6..e68c5d260 100644
---- a/doc/org.bluez.Battery.rst
-+++ b/doc/org.bluez.Battery.rst
-@@ -17,15 +17,27 @@ Interface
- :Service:	org.bluez
- :Interface:	org.bluez.Battery1
- :Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}
-+		[/battery_{identifier}]
-+
-+Component battery objects are experimental. Their object paths are
-+implementation details and shall be treated as opaque. Clients shall use the
-+``Device`` and ``Identifier`` properties to associate a component with its
-+parent device and its stable identity.
-+
-+For diagnostic purposes, ASCII letters and digits in the identifier are kept
-+in the object path. Every other byte is encoded as an underscore followed by
-+two lowercase hexadecimal digits.
+diff --git a/src/battery.c b/src/battery.c
+index fa30fde47..181bf3846 100644
+--- a/src/battery.c
++++ b/src/battery.c
+@@ -35,11 +35,18 @@
  
- Properties
- ----------
+ #define BATTERY_MAX_PERCENTAGE 100
  
--byte Percentage [readonly]
--``````````````````````````
-+byte Percentage [readonly, optional]
-+````````````````````````````````````
++struct battery_provider;
++
+ struct btd_battery {
+ 	char *path; /* D-Bus object path */
++	char *device_path; /* Parent Device1 object path, if any */
++	char *identifier; /* Stable component identifier, if any */
+ 	uint8_t percentage; /* valid between 0 to 100 inclusively */
++	int charging; /* 0 or 1 when known, -1 otherwise */
+ 	char *source; /* Descriptive source of the battery info */
+ 	char *provider_path; /* The provider root path, if any */
++	char *provider_object_path; /* The provider battery object, if any */
++	struct battery_provider *provider; /* Does not own pointer */
+ 	struct bt_battery *filter;
+ };
  
- The percentage of battery left as an unsigned 8-bit integer.
+@@ -86,18 +93,29 @@ static bool match_path(const void *data, const void *user_data)
+ 	return g_strcmp0(battery->path, path) == 0;
+ }
  
-+The property is absent while the battery level is unknown.
-+
- string Source [readonly, optional]
- ``````````````````````````````````
+-static struct btd_battery *battery_new(const char *path, const char *source,
+-				       const char *provider_path)
++static struct btd_battery *battery_new(const char *path,
++				       const char *device_path,
++				       const char *identifier,
++				       const char *source,
++				       const char *provider_path,
++				       const char *provider_object_path,
++				       struct battery_provider *provider)
+ {
+ 	struct btd_battery *battery;
  
-@@ -36,3 +48,22 @@ This property is informational only and may be useful for debugging purposes.
- Providers from **org.bluez.BatteryProvider(5)** may make use of this property to
- indicate where the battery report comes from (e.g. "HFP 1.7", "HID", or the
- profile UUID).
-+
-+object Device [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````
-+
-+The object path of the device containing this battery.
-+
-+This property is present on component battery objects below the device object.
-+
-+string Identifier [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````
-+
-+A stable identifier for this battery within the device, such as ``left``,
-+``right``, or ``case``.
-+
-+boolean Charging [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````
-+
-+Indicates whether this battery is currently charging. The property is absent
-+while the charging state is unknown.
-diff --git a/doc/org.bluez.BatteryProvider.rst b/doc/org.bluez.BatteryProvider.rst
-index 2373cebf9..b79cbe6f5 100644
---- a/doc/org.bluez.BatteryProvider.rst
-+++ b/doc/org.bluez.BatteryProvider.rst
-@@ -30,3 +30,19 @@ object Device [readonly]
- ````````````````````````
+ 	battery = new0(struct btd_battery, 1);
+ 	battery->path = g_strdup(path);
++	battery->device_path = g_strdup(device_path);
++	battery->identifier = g_strdup(identifier);
+ 	battery->percentage = UINT8_MAX;
++	battery->charging = -1;
+ 	if (source)
+ 		battery->source = g_strdup(source);
+ 	if (provider_path)
+ 		battery->provider_path = g_strdup(provider_path);
++	if (provider_object_path)
++		battery->provider_object_path = g_strdup(provider_object_path);
++	battery->provider = provider;
+ 	battery->filter = bt_battery_new();
  
- The object path of the device that has this battery.
+ 	return battery;
+@@ -105,11 +123,12 @@ static struct btd_battery *battery_new(const char *path, const char *source,
+ 
+ static void battery_free(struct btd_battery *battery)
+ {
+-	if (battery->path)
+-		g_free(battery->path);
+-
+-	if (battery->source)
+-		g_free(battery->source);
++	g_free(battery->path);
++	g_free(battery->device_path);
++	g_free(battery->identifier);
++	g_free(battery->source);
++	g_free(battery->provider_path);
++	g_free(battery->provider_object_path);
+ 
+ 	if (battery->filter) {
+ 		bt_battery_free(battery->filter);
+@@ -157,15 +176,83 @@ static gboolean property_source_exists(const GDBusPropertyTable *property,
+ 	return battery->source != NULL;
+ }
+ 
++static gboolean property_device_get(const GDBusPropertyTable *property,
++				    DBusMessageIter *iter, void *data)
++{
++	struct btd_battery *battery = data;
 +
-+string Identifier [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
++				       &battery->device_path);
 +
-+A non-empty identifier that is unique among the batteries for this device.
-+Multiple batteries may refer to the same device when each provides a unique
-+identifier. They are reflected as component **org.bluez.Battery1** objects.
++	return TRUE;
++}
 +
-+A provider object without this property represents the legacy aggregate
-+battery and is reflected directly on the device object.
++static gboolean property_device_exists(const GDBusPropertyTable *property,
++				       void *data)
++{
++	struct btd_battery *battery = data;
 +
-+boolean Charging [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````
++	return battery->device_path != NULL;
++}
 +
-+Indicates whether this battery is currently charging. The property is absent
-+while the charging state is unknown.
++static gboolean property_identifier_get(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_battery *battery = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++				       &battery->identifier);
++
++	return TRUE;
++}
++
++static gboolean property_identifier_exists(const GDBusPropertyTable *property,
++					   void *data)
++{
++	struct btd_battery *battery = data;
++
++	return battery->identifier != NULL;
++}
++
++static gboolean property_charging_get(const GDBusPropertyTable *property,
++				      DBusMessageIter *iter, void *data)
++{
++	struct btd_battery *battery = data;
++	dbus_bool_t charging = battery->charging;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &charging);
++
++	return TRUE;
++}
++
++static gboolean property_charging_exists(const GDBusPropertyTable *property,
++					 void *data)
++{
++	struct btd_battery *battery = data;
++
++	return battery->charging >= 0;
++}
++
+ static const GDBusPropertyTable battery_properties[] = {
+ 	{ "Percentage", "y", property_percentage_get, NULL,
+ 	  property_percentage_exists },
+ 	{ "Source", "s", property_source_get, NULL, property_source_exists },
++	{ "Device", "o", property_device_get, NULL, property_device_exists,
++				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Identifier", "s", property_identifier_get, NULL,
++	  property_identifier_exists, G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Charging", "b", property_charging_get, NULL,
++	  property_charging_exists, G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{}
+ };
+ 
+-struct btd_battery *btd_battery_register(const char *path, const char *source,
+-					 const char *provider_path)
++static struct btd_battery *battery_register(const char *path,
++					    const char *device_path,
++					    const char *identifier,
++					    const char *source,
++					    const char *provider_path,
++					    const char *provider_object_path,
++					    struct battery_provider *provider)
+ {
+ 	struct btd_battery *battery;
+ 
+@@ -181,7 +268,8 @@ struct btd_battery *btd_battery_register(const char *path, const char *source,
+ 		return NULL;
+ 	}
+ 
+-	battery = battery_new(path, source, provider_path);
++	battery = battery_new(path, device_path, identifier, source,
++				provider_path, provider_object_path, provider);
+ 	battery_add(battery);
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(), battery->path,
+@@ -201,8 +289,78 @@ struct btd_battery *btd_battery_register(const char *path, const char *source,
+ 	return battery;
+ }
+ 
++struct btd_battery *btd_battery_register(const char *path, const char *source,
++					 const char *provider_path)
++{
++	return battery_register(path, NULL, NULL, source, provider_path, NULL,
++				NULL);
++}
++
++static char *battery_build_component_path(const char *device_path,
++					  const char *identifier)
++{
++	const unsigned char *str = (const unsigned char *) identifier;
++	GString *path;
++
++	if (!device_path || !identifier || !identifier[0])
++		return NULL;
++
++	path = g_string_new(device_path);
++	g_string_append(path, "/battery_");
++
++	for (; *str; str++) {
++		if (g_ascii_isalnum(*str))
++			g_string_append_c(path, *str);
++		else
++			g_string_append_printf(path, "_%02x", *str);
++	}
++
++	return g_string_free(path, FALSE);
++}
++
++static struct btd_battery *
++battery_register_component(const char *device_path, const char *identifier,
++				const char *source, const char *provider_path,
++				const char *provider_object_path,
++				struct battery_provider *provider)
++{
++	struct btd_battery *battery;
++	char *path;
++
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		DBG("component batteries require experimental interfaces");
++		return NULL;
++	}
++
++	path = battery_build_component_path(device_path, identifier);
++	if (!path) {
++		error("error registering battery: invalid component");
++		return NULL;
++	}
++
++	battery = battery_register(path, device_path, identifier, source,
++					provider_path, provider_object_path,
++					provider);
++	g_free(path);
++
++	return battery;
++}
++
++struct btd_battery *btd_battery_register_component(const char *device_path,
++					 const char *identifier,
++					 const char *source)
++{
++	return battery_register_component(device_path, identifier, source, NULL,
++					  NULL, NULL);
++}
++
+ bool btd_battery_unregister(struct btd_battery *battery)
+ {
++	if (!battery) {
++		error("error unregistering battery: battery is null");
++		return false;
++	}
++
+ 	DBG("path = %s", battery->path);
+ 
+ 	if (!queue_find(batteries, NULL, battery)) {
+@@ -227,6 +385,11 @@ bool btd_battery_unregister(struct btd_battery *battery)
+ 
+ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
+ {
++	if (!battery) {
++		error("error updating battery: battery is null");
++		return false;
++	}
++
+ 	DBG("path = %s", battery->path);
+ 
+ 	if (!queue_find(batteries, NULL, battery)) {
+@@ -234,7 +397,7 @@ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
+ 		return false;
+ 	}
+ 
+-	if (percentage > BATTERY_MAX_PERCENTAGE) {
++	if (percentage > BATTERY_MAX_PERCENTAGE && percentage != UINT8_MAX) {
+ 		error("error updating battery: percentage is not valid");
+ 		return false;
+ 	}
+@@ -242,16 +405,76 @@ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
+ 	if (battery->percentage == percentage)
+ 		return true;
+ 
+-	battery->percentage = bt_battery_charge(battery->filter, percentage);
++	if (percentage == UINT8_MAX) {
++		battery->percentage = percentage;
++		bt_battery_free(battery->filter);
++		free(battery->filter);
++		battery->filter = bt_battery_new();
++	} else {
++		battery->percentage = bt_battery_charge(battery->filter,
++							percentage);
++	}
++
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), battery->path,
+ 				     BATTERY_INTERFACE, "Percentage");
+ 
+ 	return true;
+ }
+ 
+-static struct btd_battery *find_battery_by_path(const char *path)
++bool btd_battery_update_charging(struct btd_battery *battery, int charging)
+ {
+-	return queue_find(batteries, match_path, path);
++	if (!battery) {
++		error("error updating battery: battery is null");
++		return false;
++	}
++
++	DBG("path = %s", battery->path);
++
++	if (!queue_find(batteries, NULL, battery)) {
++		error("error updating battery: battery is not registered");
++		return false;
++	}
++
++	if (charging < -1 || charging > 1) {
++		error("error updating battery: charging state is not valid");
++		return false;
++	}
++
++	if (battery->charging == charging)
++		return true;
++
++	battery->charging = charging;
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), battery->path,
++				     BATTERY_INTERFACE, "Charging");
++
++	return true;
++}
++
++struct provider_battery_match {
++	struct battery_provider *provider;
++	const char *object_path;
++};
++
++static bool match_provider_battery(const void *data, const void *user_data)
++{
++	const struct btd_battery *battery = data;
++	const struct provider_battery_match *match = user_data;
++
++	return battery->provider == match->provider &&
++		g_strcmp0(battery->provider_object_path,
++					match->object_path) == 0;
++}
++
++static struct btd_battery *find_provider_battery(
++					struct battery_provider *provider,
++					const char *object_path)
++{
++	struct provider_battery_match match = {
++		.provider = provider,
++		.object_path = object_path,
++	};
++
++	return queue_find(batteries, match_provider_battery, &match);
+ }
+ 
+ static void provided_battery_property_changed_cb(GDBusProxy *proxy,
+@@ -259,29 +482,51 @@ static void provided_battery_property_changed_cb(GDBusProxy *proxy,
+ 						 DBusMessageIter *iter,
+ 						 void *user_data)
+ {
+-	uint8_t percentage = 0;
+-	const char *export_path;
+-	DBusMessageIter dev_iter;
++	struct btd_battery *battery;
++	struct battery_provider *provider = user_data;
++	const char *path = g_dbus_proxy_get_path(proxy);
+ 
+-	if (g_dbus_proxy_get_property(proxy, "Device", &dev_iter) == FALSE)
++	battery = find_provider_battery(provider, path);
++	if (!battery)
+ 		return;
+ 
+-	dbus_message_iter_get_basic(&dev_iter, &export_path);
++	if (!strcmp(name, "Percentage")) {
++		uint8_t percentage = UINT8_MAX;
++
++		if (iter) {
++			if (dbus_message_iter_get_arg_type(iter) !=
++							DBUS_TYPE_BYTE)
++				return;
++
++			dbus_message_iter_get_basic(iter, &percentage);
++		}
+ 
+-	if (strcmp(name, "Percentage") != 0)
++		DBG("battery percentage changed on %s, percentage = %d", path,
++		    percentage);
++		btd_battery_update(battery, percentage);
+ 		return;
++	}
++
++	if (!strcmp(name, "Charging")) {
++		dbus_bool_t value;
++		int charging = -1;
+ 
+-	if (iter) {
+-		if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BYTE)
++		if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+ 			return;
+ 
+-		dbus_message_iter_get_basic(iter, &percentage);
+-	}
++		if (iter) {
++			if (dbus_message_iter_get_arg_type(iter) !=
++							DBUS_TYPE_BOOLEAN)
++				return;
+ 
+-	DBG("battery percentage changed on %s, percentage = %d",
+-	    g_dbus_proxy_get_path(proxy), percentage);
++			dbus_message_iter_get_basic(iter, &value);
++			charging = value;
++		}
+ 
+-	btd_battery_update(find_battery_by_path(export_path), percentage);
++		DBG("battery charging changed on %s, charging = %d", path,
++		    charging);
++		btd_battery_update_charging(battery, charging);
++	}
+ }
+ 
+ static void provided_battery_added_cb(GDBusProxy *proxy, void *user_data)
+@@ -290,10 +535,13 @@ static void provided_battery_added_cb(GDBusProxy *proxy, void *user_data)
+ 	struct btd_battery *battery;
+ 	struct btd_device *device;
+ 	const char *path = g_dbus_proxy_get_path(proxy);
+-	const char *export_path;
++	const char *device_path;
++	const char *identifier = NULL;
+ 	const char *source = NULL;
+ 	uint8_t percentage;
++	dbus_bool_t charging;
+ 	DBusMessageIter iter;
++	bool experimental;
+ 
+ 	if (strcmp(g_dbus_proxy_get_interface(proxy),
+ 		   BATTERY_PROVIDER_INTERFACE) != 0)
+@@ -304,68 +552,105 @@ static void provided_battery_added_cb(GDBusProxy *proxy, void *user_data)
+ 		return;
+ 	}
+ 
+-	dbus_message_iter_get_basic(&iter, &export_path);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH) {
++		warn("Battery object %s has an invalid device path", path);
++		return;
++	}
++
++	dbus_message_iter_get_basic(&iter, &device_path);
+ 
+ 	device = btd_adapter_find_device_by_path(provider->manager->adapter,
+-						 export_path);
++						 device_path);
+ 	if (!device || device_is_temporary(device)) {
+ 		warn("Ignoring non-existent device path for battery %s",
+-		     export_path);
++		     device_path);
+ 		return;
+ 	}
+ 
+-	if (find_battery_by_path(export_path)) {
+-		DBG("Battery for %s is already provided, ignoring the new one",
+-		    export_path);
++	experimental = g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
++
++	if (g_dbus_proxy_get_property(proxy, "Identifier", &iter) == TRUE) {
++		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING) {
++			warn("Battery object %s has an invalid identifier",
++			     path);
++			return;
++		}
++
++		dbus_message_iter_get_basic(&iter, &identifier);
++		if (!identifier[0]) {
++			warn("Battery object %s has an empty identifier", path);
++			return;
++		}
++
++		if (!experimental) {
++			warn("Ignoring experimental component battery %s",
++								path);
++			return;
++		}
++	}
++
++	if (g_dbus_proxy_get_property(proxy, "Source", &iter) == TRUE &&
++			dbus_message_iter_get_arg_type(&iter) ==
++							DBUS_TYPE_STRING)
++		dbus_message_iter_get_basic(&iter, &source);
++
++	if (identifier) {
++		battery = battery_register_component(device_path, identifier,
++						     source, provider->path,
++						     path, provider);
++	} else {
++		battery = battery_register(device_path, NULL, NULL, source,
++					   provider->path, path, provider);
++	}
++
++	if (!battery) {
++		warn("Unable to add battery object %s for %s", path,
++		     device_path);
+ 		return;
+ 	}
+ 
+ 	g_dbus_proxy_set_property_watch(
+ 		proxy, provided_battery_property_changed_cb, provider);
+ 
+-	if (g_dbus_proxy_get_property(proxy, "Source", &iter) == TRUE)
+-		dbus_message_iter_get_basic(&iter, &source);
+-
+-	battery = btd_battery_register(export_path, source, provider->path);
+-
+ 	DBG("provided battery added %s", path);
+ 
+ 	/* Percentage property may not be immediately available, that's okay
+ 	 * since we monitor changes to this property.
+ 	 */
+-	if (g_dbus_proxy_get_property(proxy, "Percentage", &iter) == FALSE)
+-		return;
+-
+-	dbus_message_iter_get_basic(&iter, &percentage);
++	if (g_dbus_proxy_get_property(proxy, "Percentage", &iter) == TRUE &&
++			dbus_message_iter_get_arg_type(&iter) ==
++							DBUS_TYPE_BYTE) {
++		dbus_message_iter_get_basic(&iter, &percentage);
++		btd_battery_update(battery, percentage);
++	}
+ 
+-	btd_battery_update(battery, percentage);
++	if (experimental) {
++		if (g_dbus_proxy_get_property(proxy, "Charging",
++				&iter) == TRUE &&
++				dbus_message_iter_get_arg_type(&iter) ==
++							DBUS_TYPE_BOOLEAN) {
++			dbus_message_iter_get_basic(&iter, &charging);
++			btd_battery_update_charging(battery, charging);
++		}
++	}
+ }
+ 
+ static void provided_battery_removed_cb(GDBusProxy *proxy, void *user_data)
+ {
+ 	struct battery_provider *provider = user_data;
+ 	struct btd_battery *battery;
+-	const char *export_path;
+-	DBusMessageIter iter;
++	const char *path = g_dbus_proxy_get_path(proxy);
+ 
+ 	if (strcmp(g_dbus_proxy_get_interface(proxy),
+ 		   BATTERY_PROVIDER_INTERFACE) != 0)
+ 		return;
+ 
+-	if (g_dbus_proxy_get_property(proxy, "Device", &iter) == FALSE)
+-		return;
++	DBG("provided battery removed %s", path);
+ 
+-	dbus_message_iter_get_basic(&iter, &export_path);
+-
+-	DBG("provided battery removed %s", g_dbus_proxy_get_path(proxy));
+-
+-	battery = find_battery_by_path(export_path);
++	battery = find_provider_battery(provider, path);
+ 	if (!battery)
+ 		return;
+ 
+-	if (g_strcmp0(battery->provider_path, provider->path) != 0)
+-		return;
+-
+ 	g_dbus_proxy_set_property_watch(proxy, NULL, NULL);
+ 
+ 	btd_battery_unregister(battery);
+@@ -384,7 +669,7 @@ static void unregister_if_path_has_prefix(void *data, void *user_data)
+ 	struct btd_battery *battery = data;
+ 	struct battery_provider *provider = user_data;
+ 
+-	if (g_strcmp0(battery->provider_path, provider->path) == 0)
++	if (battery->provider == provider)
+ 		btd_battery_unregister(battery);
+ }
+ 
+@@ -392,7 +677,7 @@ static void battery_provider_free(gpointer data)
+ {
+ 	struct battery_provider *provider = data;
+ 
+-	/* Unregister batteries under the root path of provider->path */
++	/* Unregister batteries registered by this provider. */
+ 	queue_foreach(batteries, unregister_if_path_has_prefix, provider);
+ 
+ 	if (provider->owner)
+diff --git a/src/battery.h b/src/battery.h
+index 271659474..2b459809c 100644
+--- a/src/battery.h
++++ b/src/battery.h
+@@ -14,8 +14,12 @@ struct btd_battery_provider_manager;
+ 
+ struct btd_battery *btd_battery_register(const char *path, const char *source,
+ 					 const char *provider_path);
++struct btd_battery *btd_battery_register_component(const char *device_path,
++					 const char *identifier,
++					 const char *source);
+ bool btd_battery_unregister(struct btd_battery *battery);
+ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage);
++bool btd_battery_update_charging(struct btd_battery *battery, int charging);
+ 
+ struct btd_battery_provider_manager *
+ btd_battery_provider_manager_create(struct btd_adapter *adapter);
 -- 
 2.55.0
 
