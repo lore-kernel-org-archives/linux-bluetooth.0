@@ -1,44 +1,44 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9464D40D564
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E0740B6E0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 19:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787340926; cv=none; b=VCCFItHQJpjsOC+9TShV9zM/8tfej4072dLSYzrhhPuADRJdLcw5OixJbf6KyJHxnI/fPfACfIQWJDMgFSELAqePclf/SlTeH4jt5vnh6CHqSf8oOAiAWSj0Sw68yfumQhsOwAZ5c/DPtya5Ui2ZDa90lAA2r9+JOZtGJuCMx2c=
+	t=1787340926; cv=none; b=d5DgySxFXBQSkCp4YO7RoBd4+2iBA9Z162ZvjTsMGmlZlOM+paqXMXxqaVRnZMyKcwR8KERKa2bGJQEX62BhLUhQKRqNikGaKzMKH6JwWqzR7PbAOqY9XHnYOU2tg13MvrldAuwdetB/+8E5qBu4h6LZLLnqH5oDlucNqbjWfyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787340926; c=relaxed/simple;
-	bh=mIUBb5fMcdnvrJKsvDBWl6dNcnj7SrVefNwkHmyYrj4=;
+	bh=kR26hFqWMwaI6KiVDXXU2mgAajlJ1aVlGWffigzyDMY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aZSZBt4qm7MIL0pOPccLbfChinSUuYo4tFQ9GNR7MHTo6yrx7NH8OyLDXHWzkTdpG8FiJ29JC68k1XqsEbJfAy6LyBJqVlGqrMjH3PIgvX906yp8U6reP4ahlKnx+wvf97qQiWZkqd7opn7Hh6V/eZS+KlmmFrpUTFzrlnyLy8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pSpTjdnF; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=JOigYe7pqF5l6UALc6N8fSIW+cmdunEnyI9jAy0fi1cG3pZifCiwwhryejILal5NMpl+O3nnJ+egWgid2e993AmuNC4v7UkHAlMWD/YBT2Az+GA0y1kBL8QzSBsdQ5w2ZpxOVlyN89JRNeGilx5DFe+gptwdhiu4YhnzfJqpNgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=btiHiVJQ; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pSpTjdnF"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="btiHiVJQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1787340922;
-	bh=mIUBb5fMcdnvrJKsvDBWl6dNcnj7SrVefNwkHmyYrj4=;
+	bh=kR26hFqWMwaI6KiVDXXU2mgAajlJ1aVlGWffigzyDMY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pSpTjdnFH34vPiLrnZixjdFMD1VoXCe3hEVTb9z9PRpc9cLWCM9TjPhiYRQdCWhWW
-	 BBBWjJcU24YUQNyY09cqIZ1N3+43XEViEdn8OtwrcdXimG42S6ANd0El5zvML/nl4L
-	 4bR0TFvFqItOgWOpGKdE1Ta+8dLJ+92n38XxgRbn52DXDu6jWao7gwj4II8bkjTr84
-	 2fUzyIiFY2PNetVHJ1gtVPepwNMB1HscOJQzcin27GN+gKPRFjlR/GguwRNtLGUBny
-	 Gj4kdk5ZqDWvqsm4n4H/Q4oeYE+8A0AdCr7HKF99dYHTCu8Hz7YEPr3nFI/UvfZcC/
-	 ZPhK56qX5r3Lg==
+	b=btiHiVJQFOez4Qq9O3T0DaWAxKsliipE4jXcUZX1LwRtorAT5OYVyf5Xq5b4YFqqM
+	 6V+GBCzsHSRJIgJzR+Pbjc5GCkoQx+EiGWpTFoIJTnq6TXpe+a2rS+TmN/f73dqk/M
+	 jZtCt9pv/ACFZ0cb82kmHPVkaJb9aFzlv31VLpyp40/Z3rzXLhrAk0S5ZjxvWEmXY5
+	 iUsyvElnAxrOx/sVPJHmP0Ma/dJ9aRYZGrb9E8gST5hoK2haOAzIEtcBwYI1+OVIjA
+	 AcBSYDENDr6iuZjxM/gnYmn0h3zGdqC9p/Iq8WsJT6Yqa0L7Oygus+vj0bEOk1QDbU
+	 wE6RcP2B1n94A==
 Received: from vninja (unknown [100.64.1.54])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: gkiagia)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 73CB617E0967;
-	Fri, 21 Aug 2026 21:35:22 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id EC87F17E0887;
+	Fri, 21 Aug 2026 21:35:21 +0200 (CEST)
 From: George Kiagiadakis <george.kiagiadakis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: George Kiagiadakis <george.kiagiadakis@collabora.com>
-Subject: [PATCH BlueZ 3/5] player: Fix NumberOfItems never being updated on SetBrowsedPlayer
-Date: Fri, 21 Aug 2026 22:34:47 +0300
-Message-ID: <20260821193449.1336263-4-george.kiagiadakis@collabora.com>
+Subject: [PATCH BlueZ 2/5] player: Answer pending request when the player is destroyed
+Date: Fri, 21 Aug 2026 22:34:46 +0300
+Message-ID: <20260821193449.1336263-3-george.kiagiadakis@collabora.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260821193449.1336263-1-george.kiagiadakis@collabora.com>
 References: <20260821193449.1336263-1-george.kiagiadakis@collabora.com>
@@ -50,56 +50,41 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-media_player_total_items_complete() discarded the count reported by the
-player unless a D-Bus request happened to be pending:
+media_player_destroy() dropped its reference to the pending request
+without answering it. A client with a ListItems(), Search(),
+ChangeFolder() or Play() in flight was therefore left waiting for its
+own D-Bus timeout to expire, 25s by default, whenever the player went
+away. That happens on every AVRCP disconnect, since avrcp destroys the
+controller player from its disconnect path.
 
-	if (folder == NULL || folder->msg == NULL)
-		return;
+Reply with org.bluez.Error.Failed instead.
 
-Of the paths reaching it, only media_player_change_folder_complete()
-still holds a pending message. The count was therefore applied on
-ChangeFolder and dropped everywhere else, notably on
-media_player_set_folder(), which avrcp calls on SetBrowsedPlayer, that
-is precisely when the count is first learned.
-
-The guard reads as copy-paste from the four *_complete() functions
-above it. Those need a pending message because they send a reply. This
-one only refreshes a property, so there is no request to correlate it
-with.
-
-f17d3a2c3 replaced an unconditional emit in media_player_change_scope()
-with one deferred into this completion whenever the total_items
-callback is present, and the guard then swallowed it. The AVRCP
-controller always registers that callback, so NumberOfItems has not
-been refreshed on SetBrowsedPlayer since. That commit states the
-intent itself: "On response, emit PropertyChanged for 'NumberOfItems'
-property".
-
-Note the count is still applied to whatever mp->scope is at completion
-time rather than to the folder it was requested for.
-media_player_change_scope() sets the scope before asking, so the common
-case is right, but a second scope change in flight misattributes it.
-
-Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
+Answering after the g_dbus_unregister_interface() calls above is fine,
+as replies are matched by serial rather than by object path, so the
+unref site does not need to move.
 
 Assisted-by: Claude:claude-opus-5 valgrind
 ---
- profiles/audio/player.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/audio/player.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index fa3810a7f..7c5ea5b62 100644
+index 568c70770..fa3810a7f 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -753,7 +753,7 @@ void media_player_total_items_complete(struct media_player *mp,
- {
- 	struct media_folder *folder = mp->scope;
+@@ -1257,8 +1257,11 @@ void media_player_destroy(struct media_player *mp)
+ 						mp->path,
+ 						MEDIA_FOLDER_INTERFACE);
  
--	if (folder == NULL || mp->msg == NULL)
-+	if (folder == NULL)
- 		return;
+-	if (mp->msg)
++	if (mp->msg) {
++		g_dbus_send_message(btd_get_dbus_connection(),
++				btd_error_failed(mp->msg, "Player removed"));
+ 		dbus_message_unref(mp->msg);
++	}
  
- 	if (folder->number_of_items != num_of_items) {
+ 	g_slist_free_full(mp->pending, g_free);
+ 	g_slist_free_full(mp->folders, media_folder_destroy);
 -- 
 2.54.0 (Apple Git-157)
 
