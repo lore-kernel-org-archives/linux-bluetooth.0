@@ -1,307 +1,255 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1072BEC4E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 20:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8985B25B09C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 02:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787256269; cv=none; b=k7jKlvm03CcGv4cmwS7FXmJI8mnWGJ+sNiBM3s3W1zSX21s+ITczylW7jDTkZsl+i+K4T+LEeVrd42+nlA5kv/C/SHlDViYNpyyfLWZXKiQ8csADbCuSTEMVMXn+gEPL6rUiC2ySGZHUGF115C5N3AMLfP+Lsh3N/t2ElbbUgnw=
+	t=1787278113; cv=none; b=Jol9d3xJCb4NhOVgRntet8x+MoW1Qf9noApYZ/ZgSzfjUxVBlMYynEN7XYn1Kecua/mtAo9d1FKF1nE0l2sRy0CyYDplUuzdU5YS4UbgM6YFwdpuBYj9BPEaLMggQ6eWbG+2tnpAMnV1kKjkYH07QZ+/Ey1dac0Q0FHdShQ2BK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787256269; c=relaxed/simple;
-	bh=TrOMaGC97VfQLp1y2fhvEStTbeigNlGyt3ciiPCOEG0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=U5990+h8Tyyf51UQ22FKwqTv2Or4W9fPTg5YKaRwRptTTYvmTzzVQIvYZj3C2BpPaisbGHo25jTLSB2VaVGXEVLD8LES4ge/v5l0juE+lccIxE1aD78RFPFDfX72W/D950JAP/2sWilkL4vYeWzpwmBaYOuiyA0S8Hh4aCoEmRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ESQQrdo5; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787278113; c=relaxed/simple;
+	bh=EY8f7mMl7Jb3WM+8SCHqjQIb4VW/E4r1B9aqM9zr8z0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GggQt0+59fS4gjyFazyMzxzKWPVBb3PqNwMHCOzSfppZsZDTATFYLdtvdWKDsvtQdjiNnzWbgaYNdwhUXdU6D/8PCRMD46kuPfn8dkpP8ygSIb61MtSwmxPIdMhhpijcJwXLMPgtzqqgt5HpCLhoK5z89XLrKz0fVI+kElIZSUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XITcvujg; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ESQQrdo5"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38dcbade417so202532a91.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2026 13:04:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787256267; x=1787861067; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=TrOMaGC97VfQLp1y2fhvEStTbeigNlGyt3ciiPCOEG0=;
-        b=ESQQrdo5OLwXw1IxDW3P+jDWv40k42T7EAGiXeNQmVq/d8ikukt5qM4VgBhbaIMuBa
-         lSDGQJBk9PmghKKtJRKOaUvKw6BmA/CcQPv+BXNOIDTtmVJuE1AZn9WbGo3xmA9uzS9P
-         dNRoCJyTsscV6VZfnh+aqsN+6tVMNfjSDN6nWVlnXcWUi2STWovgucScDPVx3vtnL/sY
-         UKl9XWA1ozRFAEZ2HLwiqK3GmTynlqyzlmILUCesNf8n2ubhH7AD1bP5btRWUKR41BTJ
-         b+c0bEZJ10pmjHyjigOCp13dIO5wPXFPBq3qKeQP1N5CLPcihGSOfQqXfYVyIG2Miefv
-         Pykw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787256267; x=1787861067;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=TrOMaGC97VfQLp1y2fhvEStTbeigNlGyt3ciiPCOEG0=;
-        b=RvWAw+F0S6YFUfdwwnTCZH+RZ4PJce9epKyrTqCV+VrAGmSBYMJMAanhqIu1elx90a
-         p9BD2dvHQZoDR13U1rSwOFgt5aPbjnip2TRPY+/gMFIrev2sYbbIOpHSxZ3z/mydJ0wk
-         CJgPEBQQf+fCX10AASiJw6iGQi0cLq1AQQdBnY4fs1paANsri3YehVjLCg7q144uazQr
-         4T0iDlhw0OfRRu37JHReBSPpTY5cXzy3mg06TW7BpvlEf/AbDNXTatJvGww/ukb7R28h
-         kPzB3QA4ZcQiZ+ZavaeEuBV7UDV6vfkWFgBYPl5z8Yy0xjAFWFOpMHVUj86ydcV7n4x9
-         7cPQ==
-X-Gm-Message-State: AFuF++ntktln9aEng6OQRRPCJdCJ8iaBSFz5MvKBYn2rINsC/dzgtxm5
-	GCHcgR1TEeQUmztsI9Uaoz/tuialZoqMA9z0Dj7ARQbVqDvjt2YAJXpzK3L5TONU
-X-Gm-Gg: AR+sD115hla9dqi62Xc8pFxaBVna+tsZxtJVw4KLpEkIWN2nmkYKh2klvUJyPAfXGsy
-	lQUppp+28g54npwcEWsen6kzYulaxKowlxdwmm+I3A2RYjf2UUDxVePyNDxC70nYUN+wZYE3olg
-	DlH/jIWqDK9IY5/+0FVFCeHNWPQufLBswYQs3G/hxzR+za9cIdddlmFE2ztmbrmkz0NbyixMP/R
-	oGsjCaEUXAlysBddoPCL24P/QaA5XTkUOvCfzKEH0DnDl+zo/5PXIkXCSRrPfLdSw76qO/DmFvh
-	z5G83l6ZKeIHqWK4N/Rihn2+jxwRC4LPX8TESXP1Ur/CPjGYtcL7vfafSS3pN9FKLXCqq0TScG4
-	yYpEnVZ5J8/QwmV+TFrgwTQe+MP96g5DCJdTkUzO6gAgGorWLZkn5uEIx5c5mxZY9wbSgX7eXYM
-	lxx2Hh4fcECQ7SWvOGlplMYmAOybFs3UpKNVESx08MOtHm6MqL0hpWEuwmkBygZe6h
-X-Received: by 2002:a17:90b:4484:b0:392:b509:b1a5 with SMTP id 98e67ed59e1d1-395c3552988mr1408832a91.14.1787256266898;
-        Thu, 20 Aug 2026 13:04:26 -0700 (PDT)
-Received: from [172.17.0.2] ([13.77.158.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-395c46ca8b6sm228876a91.8.2026.08.20.13.04.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 13:04:26 -0700 (PDT)
-Message-ID: <6a875dca.e59e62a9.8fc08.40b4@mx.google.com>
-Date: Thu, 20 Aug 2026 13:04:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4423752016152091658=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XITcvujg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787278111; x=1818814111;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EY8f7mMl7Jb3WM+8SCHqjQIb4VW/E4r1B9aqM9zr8z0=;
+  b=XITcvujgSC3ifTfAPQuWev2yxbDS2ItJ9Jk5Bie4AsQM1Hxz/E3MILqW
+   +Ls/Dtto5XXHFlcZohw244V6IoU/mn1PsEJ2Wk7UTOcqsRPwqsvr2DaVA
+   8sv0DAFacZtXQKVwnOrdY/HeN5hegU2WNh7Xr1qb/b/XkCyCBtn9KOsdY
+   OfFsUXSLD2pRXO6dXITNxGX92sqFKiAMqtcGkjyQZ+IeTg3W+fiANEznK
+   ilyYKcB0sK3aM1YFzrUNaSYSLWWzZAC1lLz+f7cJfIPTuE+sWhjAtmOuc
+   DNtohtBM+F6y6mVxPfOecQyjPlGf4OlMBo1xfTKJLtS/LvyLauVNEAByM
+   Q==;
+X-CSE-ConnectionGUID: 6xq3nQmsR2Sot//X7TjRag==
+X-CSE-MsgGUID: VODT5AeJQLOGr/0BkvxYjw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11881"; a="87738905"
+X-IronPort-AV: E=Sophos;i="6.25,234,1779174000"; 
+   d="scan'208";a="87738905"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2026 19:08:31 -0700
+X-CSE-ConnectionGUID: ipCF3s3WRZudb1I0MtLmkQ==
+X-CSE-MsgGUID: tAXbIGWvRcy+oWvlyg0w9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,234,1779174000"; 
+   d="scan'208";a="264904581"
+Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 20 Aug 2026 19:08:29 -0700
+Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wxEgE-00000000p1Z-2EDn;
+	Fri, 21 Aug 2026 02:08:26 +0000
+Date: Fri, 21 Aug 2026 10:08:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Marlin <dmarlin@redhat.com>, linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	David Marlin <dmarlin@redhat.com>,
+	Bastien Nocera <hadess@hadess.net>
+Subject: Re: [PATCH] Bluetooth: hci-core: fix "declaration does not declare
+ anything" error
+Message-ID: <202608211016.aKSwZC8Y-lkp@intel.com>
+References: <20260814051032.261320-1-dmarlin@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Replace the name2utf8 copies with str2utf8
-In-Reply-To: <20260820183037.2713973-2-luiz.dentz@gmail.com>
-References: <20260820183037.2713973-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260814051032.261320-1-dmarlin@redhat.com>
 
---===============4423752016152091658==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi David,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTE0OTI2NQoKLS0t
-VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
-ICAgRkFJTCAgICAgIDIuOTMgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBG
-QUlMICAgICAgMS45MiBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
-ICAgICAyMC45MSBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAg
-ICA2MzEuNDYgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
-MTkuNTAgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTY0
-LjI3IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDIzNS41
-NiBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzMjEuNDgg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTA0LjAxIHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDEzMDQuMTIgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTAyMC43NCBzZWNv
-bmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1Bh
-dGNoIC0gRkFJTApEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgpbQmx1ZVos
-djIsMDEvMTBdIGVpcjogRml4IHN0YWNrIGJ1ZmZlciBvdmVyZmxvdyB3aGVuIHBhcnNpbmcgdGhl
-IHJlbW90ZSBuYW1lCldBUk5JTkc6QkFEX1NJR05fT0ZGOiBOb24tc3RhbmRhcmQgc2lnbmF0dXJl
-OiBBc3Npc3RlZC1ieToKIzExOTogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoK
-RVJST1I6QkFEX1NJR05fT0ZGOiBVbnJlY29nbml6ZWQgZW1haWwgYWRkcmVzczogJ0NsYXVkZTpj
-bGF1ZGUtb3B1cy01JwojMTE5OiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01Cgov
-Z2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MjYucGF0Y2ggdG90YWw6IDEgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBv
-cnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxs
-eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
-Y2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MjYucGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBD
-T01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdF
-UyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9T
-VFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZh
-bHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMDIvMTBdIHNoYXJl
-ZC9hZDogRml4IHJlYWRpbmcgcGFzdCB0aGUgbmFtZSB0aGF0IHdhcyBjb3BpZWQKV0FSTklORzpC
-QURfU0lHTl9PRkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTEyOiAK
-QXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVu
-cmVjb2duaXplZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMTI6IApB
-c3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCi9naXRodWIvd29ya3NwYWNlL3NyYy9w
-YXRjaC8xNDc1OTcyNy5wYXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE5IGxpbmVz
-IGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3Bh
-dGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBp
-Y2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFj
-ZS9zcmMvcGF0Y2gvMTQ3NTk3MjcucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVY
-X01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBS
-RUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJU
-TwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNl
-IHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMDMvMTBdIHVuaXQvdGVzdC1laXI6IEFkZCB0ZXN0cyBm
-b3IgdGhlIGxvbmdlc3QgbG9jYWwgbmFtZXMKV0FSTklORzpCQURfU0lHTl9PRkY6IE5vbi1zdGFu
-ZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTE0OiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpj
-bGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2duaXplZCBlbWFpbCBhZGRy
-ZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMTQ6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNs
-YXVkZS1vcHVzLTUKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1OTcyOC5wYXRjaCB0
-b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDc0IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBz
-b21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAg
-ICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4
-IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3Mjgu
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBt
-ZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBG
-SUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNF
-TlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRo
-ZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVos
-djIsMDQvMTBdIHNoYXJlZC91dGlsOiBNYWtlIHN0cm5sZW51dGY4IHJlamVjdCBpbGwtZm9ybWVk
-IHNlcXVlbmNlcwpXQVJOSU5HOkJBRF9TSUdOX09GRjogTm9uLXN0YW5kYXJkIHNpZ25hdHVyZTog
-QXNzaXN0ZWQtYnk6CiMxMjM6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCkVS
-Uk9SOkJBRF9TSUdOX09GRjogVW5yZWNvZ25pemVkIGVtYWlsIGFkZHJlc3M6ICdDbGF1ZGU6Y2xh
-dWRlLW9wdXMtNScKIzEyMzogCkFzc2lzdGVkLWJ5OiBDbGF1ZGU6Y2xhdWRlLW9wdXMtNQoKL2dp
-dGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU5NzI5LnBhdGNoIHRvdGFsOiAxIGVycm9ycywg
-MSB3YXJuaW5ncywgMTA2IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBv
-cnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxs
-eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
-Y2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MjkucGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBD
-T01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdF
-UyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9T
-VFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZh
-bHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMDUvMTBdIHNoYXJl
-ZC91dGlsOiBBZGQgc3RyMnV0ZjgKV0FSTklORzpCQURfU0lHTl9PRkY6IE5vbi1zdGFuZGFyZCBz
-aWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTIxOiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUt
-b3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2duaXplZCBlbWFpbCBhZGRyZXNzOiAn
-Q2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMjE6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1v
-cHVzLTUKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1OTczMC5wYXRjaCB0b3RhbDog
-MSBlcnJvcnMsIDEgd2FybmluZ3MsIDYyIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9m
-IHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1l
-Y2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0t
-Zml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MzAucGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdl
-IHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BB
-VEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RB
-RyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJv
-cnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMDYv
-MTBdIHVuaXQvdGVzdC11dGlsOiBBZGQgc3RyMnV0ZjggdGVzdHMKV0FSTklORzpCQURfU0lHTl9P
-RkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTExOiAKQXNzaXN0ZWQt
-Ynk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2duaXpl
-ZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMTE6IApBc3Npc3RlZC1i
-eTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCldBUk5JTkc6VFlQT19TUEVMTElORzogJ3RydW4nIG1h
-eSBiZSBtaXNzcGVsbGVkIC0gcGVyaGFwcyAndHVybic/CiMxNDQ6IEZJTEU6IHVuaXQvdGVzdC11
-dGlsLmM6MTA2OgorCXsgInRydW5jYXRlZCIsIDQsICJ0cnVuIiB9LAogCSAgICAgICAgICAgICAg
-ICAgICBeXl5eCgpXQVJOSU5HOlNUUklOR19GUkFHTUVOVFM6IENvbnNlY3V0aXZlIHN0cmluZ3Mg
-YXJlIGdlbmVyYWxseSBiZXR0ZXIgYXMgYSBzaW5nbGUgc3RyaW5nCiMxNDY6IEZJTEU6IHVuaXQv
-dGVzdC11dGlsLmM6MTA4OgorCXsgImFiXHhmZiIiY2QiLCA1LCAiYWIiIEZGRkQgImNkIiB9LAoK
-V0FSTklORzpTVFJJTkdfRlJBR01FTlRTOiBDb25zZWN1dGl2ZSBzdHJpbmdzIGFyZSBnZW5lcmFs
-bHkgYmV0dGVyIGFzIGEgc2luZ2xlIHN0cmluZwojMTQ4OiBGSUxFOiB1bml0L3Rlc3QtdXRpbC5j
-OjExMDoKKwl7ICJhYlx4ODAiImNkIiwgNSwgImFiIiBGRkZEICJjZCIgfSwKCldBUk5JTkc6U1RS
-SU5HX0ZSQUdNRU5UUzogQ29uc2VjdXRpdmUgc3RyaW5ncyBhcmUgZ2VuZXJhbGx5IGJldHRlciBh
-cyBhIHNpbmdsZSBzdHJpbmcKIzE1MDogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxMTI6CisJeyAi
-YWJceGUyXHg4MiIiY2QiLCA2LCAiYWIiIEZGRkQgImNkIiB9LAoKL2dpdGh1Yi93b3Jrc3BhY2Uv
-c3JjL3BhdGNoLzE0NzU5NzMxLnBhdGNoIHRvdGFsOiAxIGVycm9ycywgNSB3YXJuaW5ncywgOTUg
-bGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNo
-ZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhl
-IHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRodWIvd29y
-a3NwYWNlL3NyYy9wYXRjaC8xNDc1OTczMS5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENP
-TVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9P
-RkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9f
-S1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBw
-bGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKCltCbHVlWix2MiwwNy8xMF0gUmVwbGFjZSB0aGUgbmFtZTJ1dGY4
-IGNvcGllcyB3aXRoIHN0cjJ1dGY4CldBUk5JTkc6Q09NTUlUX0xPR19MT05HX0xJTkU6IFBvc3Np
-YmxlIHVud3JhcHBlZCBjb21taXQgZGVzY3JpcHRpb24gKHByZWZlciBhIG1heGltdW0gNzUgY2hh
-cnMgcGVyIGxpbmUpCiMxMTY6IAp0aGUgaW1wcm92ZW1lbnQ6IHRoZSBuYW1lIHRoYXQgdXNlZCB0
-byBiZSByZXBvcnRlZCBhcyAidGVzdCDgpKrgpLDgpYAiIGlzIG5vdwoKV0FSTklORzpCQURfU0lH
-Tl9PRkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTIyOiAKQXNzaXN0
-ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2du
-aXplZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMjI6IApBc3Npc3Rl
-ZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCldBUk5JTkc6U1RSSU5HX0ZSQUdNRU5UUzogQ29u
-c2VjdXRpdmUgc3RyaW5ncyBhcmUgZ2VuZXJhbGx5IGJldHRlciBhcyBhIHNpbmdsZSBzdHJpbmcK
-IzQ5NjogRklMRTogdW5pdC90ZXN0LWVpci5jOjQxMToKKwkubmFtZSA9ICJ0ZXN0IOCkquCksOCl
-gCIgIlx4ZWZceGJmXHhiZCIgIuCljeCkt+CkviBpbnZhbGlkIiwKCldBUk5JTkc6U1RSSU5HX0ZS
-QUdNRU5UUzogQ29uc2VjdXRpdmUgc3RyaW5ncyBhcmUgZ2VuZXJhbGx5IGJldHRlciBhcyBhIHNp
-bmdsZSBzdHJpbmcKIzUwNjogRklMRTogdW5pdC90ZXN0LWVpci5jOjQ0MDoKKwkubmFtZSA9ICJ0
-ZXN0IFwwMzMkQiIgIlx4ZWZceGJmXHhiZFx4ZWZceGJmXHhiZFx4ZWZceGJmXHhiZFx4ZWZceGJm
-XHhiZCIKCi9naXRodWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1OTczMi5wYXRjaCB0b3RhbDog
-MSBlcnJvcnMsIDQgd2FybmluZ3MsIDM0MyBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBv
-ZiB0aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBt
-ZWNoYW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAt
-LWZpeC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NzU5NzMyLnBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2Fn
-ZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9Q
-QVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9U
-QUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJy
-b3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKW0JsdWVaLHYyLDA4
-LzEwXSBkZXZpY2U6IEZpeCB0aGUgbmFtZSB0cnVuY2F0aW9uIHNwbGl0dGluZyBVVEYtOCBzZXF1
-ZW5jZXMKV0FSTklORzpCQURfU0lHTl9PRkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lz
-dGVkLWJ5OgojMTIxOiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpC
-QURfU0lHTl9PRkY6IFVucmVjb2duaXplZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1v
-cHVzLTUnCiMxMjE6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCi9naXRodWIv
-d29ya3NwYWNlL3NyYy9wYXRjaC8xNDc1OTczMy5wYXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDIzIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBk
-ZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252
-ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgov
-Z2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MzMucGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRf
-TUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNT
-SU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcg
-U1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBv
-c2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUg
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMDkvMTBdIGRldmljZTogUmVu
-YW1lIGJ0ZF9kZXZpY2VfZGV2aWNlX3NldF9uYW1lIHRvIGJ0ZF9kZXZpY2Vfc2V0X25hbWUKV0FS
-TklORzpCQURfU0lHTl9PRkY6IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5Ogoj
-MTA0OiAKQXNzaXN0ZWQtYnk6IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9P
-RkY6IFVucmVjb2duaXplZCBlbWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMx
-MDQ6IApBc3Npc3RlZC1ieTogQ2xhdWRlOmNsYXVkZS1vcHVzLTUKCi9naXRodWIvd29ya3NwYWNl
-L3NyYy9wYXRjaC8xNDc1OTczNS5wYXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDU2
-IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBj
-aGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRo
-ZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dv
-cmtzcGFjZS9zcmMvcGF0Y2gvMTQ3NTk3MzUucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBD
-T01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05f
-T0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RP
-X0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywg
-cGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCgpbQmx1ZVosdjIsMTAvMTBdIHVuaXQvdGVzdC11dGlsOiBDb3Zl
-ciBzdHJ0b3V0Zjggd2l0aCB0aGUgc3RyMnV0ZjggdGVzdHMKV0FSTklORzpCQURfU0lHTl9PRkY6
-IE5vbi1zdGFuZGFyZCBzaWduYXR1cmU6IEFzc2lzdGVkLWJ5OgojMTEzOiAKQXNzaXN0ZWQtYnk6
-IENsYXVkZTpjbGF1ZGUtb3B1cy01CgpFUlJPUjpCQURfU0lHTl9PRkY6IFVucmVjb2duaXplZCBl
-bWFpbCBhZGRyZXNzOiAnQ2xhdWRlOmNsYXVkZS1vcHVzLTUnCiMxMTM6IApBc3Npc3RlZC1ieTog
-Q2xhdWRlOmNsYXVkZS1vcHVzLTUKCldBUk5JTkc6VFlQT19TUEVMTElORzogJ3RydW4nIG1heSBi
-ZSBtaXNzcGVsbGVkIC0gcGVyaGFwcyAndHVybic/CiMxNjA6IEZJTEU6IHVuaXQvdGVzdC11dGls
-LmM6MTA5OgorCXsgInRydW5jYXRlZCIsIDQsICJ0cnVuIiwgInRydW4iIH0sCiAJICAgICAgICAg
-ICAgICAgICAgIF5eXl4KCldBUk5JTkc6VFlQT19TUEVMTElORzogJ3RydW4nIG1heSBiZSBtaXNz
-cGVsbGVkIC0gcGVyaGFwcyAndHVybic/CiMxNjA6IEZJTEU6IHVuaXQvdGVzdC11dGlsLmM6MTA5
-OgorCXsgInRydW5jYXRlZCIsIDQsICJ0cnVuIiwgInRydW4iIH0sCiAJICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXl5eXgoKV0FSTklORzpTVFJJTkdfRlJBR01FTlRTOiBDb25zZWN1dGl2ZSBz
-dHJpbmdzIGFyZSBnZW5lcmFsbHkgYmV0dGVyIGFzIGEgc2luZ2xlIHN0cmluZwojMTYzOiBGSUxF
-OiB1bml0L3Rlc3QtdXRpbC5jOjExMToKKwl7ICJhYlx4ZmYiImNkIiwgNSwgImFiIiBGRkZEICJj
-ZCIsICJhYiIgfSwKCldBUk5JTkc6U1RSSU5HX0ZSQUdNRU5UUzogQ29uc2VjdXRpdmUgc3RyaW5n
-cyBhcmUgZ2VuZXJhbGx5IGJldHRlciBhcyBhIHNpbmdsZSBzdHJpbmcKIzE2NjogRklMRTogdW5p
-dC90ZXN0LXV0aWwuYzoxMTM6CisJeyAiYWJceDgwIiJjZCIsIDUsICJhYiIgRkZGRCAiY2QiLCAi
-YWIiIH0sCgpXQVJOSU5HOlNUUklOR19GUkFHTUVOVFM6IENvbnNlY3V0aXZlIHN0cmluZ3MgYXJl
-IGdlbmVyYWxseSBiZXR0ZXIgYXMgYSBzaW5nbGUgc3RyaW5nCiMxNjk6IEZJTEU6IHVuaXQvdGVz
-dC11dGlsLmM6MTE1OgorCXsgImFiXHhlMlx4ODIiImNkIiwgNiwgImFiIiBGRkZEICJjZCIsICJh
-YiIgfSwKCldBUk5JTkc6QVJSQVlfU0laRTogUHJlZmVyIEFSUkFZX1NJWkUodXRmOF90ZXN0cykK
-IzIwNTogRklMRTogdW5pdC90ZXN0LXV0aWwuYzoxMzk6CisJZm9yIChpID0gMDsgaSA8IHNpemVv
-Zih1dGY4X3Rlc3RzKSAvIHNpemVvZih1dGY4X3Rlc3RzWzBdKTsgaSsrKSB7CgpXQVJOSU5HOkFS
-UkFZX1NJWkU6IFByZWZlciBBUlJBWV9TSVpFKHV0ZjhfdGVzdHMpCiMyMzQ6IEZJTEU6IHVuaXQv
-dGVzdC11dGlsLmM6MTY2OgorCWZvciAoaSA9IDA7IGkgPCBzaXplb2YodXRmOF90ZXN0cykgLyBz
-aXplb2YodXRmOF90ZXN0c1swXSk7IGkrKykgewoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNo
-LzE0NzU5NzM0LnBhdGNoIHRvdGFsOiAxIGVycm9ycywgOCB3YXJuaW5ncywgMTM3IGxpbmVzIGNo
-ZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNo
-IG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2Fs
-IHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9z
-cmMvcGF0Y2gvMTQ3NTk3MzQucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01B
-Q1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZF
-Ul9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoK
-Tk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJl
-cG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAt
-IEZBSUwKRGVzYzogUnVuIGdpdGxpbnQKT3V0cHV0OgpbQmx1ZVosdjIsMDgvMTBdIGRldmljZTog
-Rml4IHRoZSBuYW1lIHRydW5jYXRpb24gc3BsaXR0aW5nIFVURi04IHNlcXVlbmNlcwoKNzogQjMg
-TGluZSBjb250YWlucyBoYXJkIHRhYiBjaGFyYWN0ZXJzIChcdCk6ICIJc3RybmNweShkZXZpY2Ut
-Pm5hbWUsIG5hbWUsIE1BWF9OQU1FX0xFTkdUSCk7IgpbQmx1ZVosdjIsMDkvMTBdIGRldmljZTog
-UmVuYW1lIGJ0ZF9kZXZpY2VfZGV2aWNlX3NldF9uYW1lIHRvIGJ0ZF9kZXZpY2Vfc2V0X25hbWUK
-CjE6IFQxIFRpdGxlIGV4Y2VlZHMgbWF4IGxlbmd0aCAoODE+ODApOiAiW0JsdWVaLHYyLDA5LzEw
-XSBkZXZpY2U6IFJlbmFtZSBidGRfZGV2aWNlX2RldmljZV9zZXRfbmFtZSB0byBidGRfZGV2aWNl
-X3NldF9uYW1lIgoKCmh0dHBzOi8vZ2l0aHViLmNvbS9ibHVlei9ibHVlei9wdWxsLzI0MjEKCi0t
-LQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+kernel test robot noticed the following build errors:
 
---===============4423752016152091658==--
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on bluetooth/master linus/master v7.2 next-20260819]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Marlin/Bluetooth-hci-core-fix-declaration-does-not-declare-anything-error/20260814-001012
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20260814051032.261320-1-dmarlin%40redhat.com
+patch subject: [PATCH] Bluetooth: hci-core: fix "declaration does not declare anything" error
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20260821/202608211016.aKSwZC8Y-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 935bfc708590c60147a79c7df145bb6e68b1d388)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260821/202608211016.aKSwZC8Y-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202608211016.aKSwZC8Y-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/bluetooth/hci_codec.c:151:17: error: operand of type 'struct hci_std_codecs_hdr' where arithmetic or pointer type is required
+     151 |         if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:419:24: note: expanded from macro 'flex_array_size'
+     419 |         __builtin_choose_expr(__is_constexpr(count),                    \
+         |                               ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:323:47: note: expanded from macro '__is_constexpr'
+     323 |         (sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8)))
+         |                                                      ^~~
+>> net/bluetooth/hci_codec.c:157:16: error: invalid operands to binary expression ('__u8' (aka 'unsigned char') and 'struct hci_std_codecs_hdr')
+     157 |         for (i = 0; i < std_codecs->num; i++) {
+         |                     ~ ^ ~~~~~~~~~~~~~~~
+   net/bluetooth/hci_codec.c:164:16: error: operand of type 'struct hci_std_codecs_hdr' where arithmetic or pointer type is required
+     164 |         skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
+         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:419:24: note: expanded from macro 'flex_array_size'
+     419 |         __builtin_choose_expr(__is_constexpr(count),                    \
+         |                               ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:323:47: note: expanded from macro '__is_constexpr'
+     323 |         (sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8)))
+         |                                                      ^~~
+>> net/bluetooth/hci_codec.c:220:17: error: operand of type 'struct hci_std_codecs_v2_hdr' where arithmetic or pointer type is required
+     220 |         if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:419:24: note: expanded from macro 'flex_array_size'
+     419 |         __builtin_choose_expr(__is_constexpr(count),                    \
+         |                               ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:323:47: note: expanded from macro '__is_constexpr'
+     323 |         (sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8)))
+         |                                                      ^~~
+>> net/bluetooth/hci_codec.c:226:16: error: invalid operands to binary expression ('__u8' (aka 'unsigned char') and 'struct hci_std_codecs_v2_hdr')
+     226 |         for (i = 0; i < std_codecs->num; i++) {
+         |                     ~ ^ ~~~~~~~~~~~~~~~
+   net/bluetooth/hci_codec.c:232:16: error: operand of type 'struct hci_std_codecs_v2_hdr' where arithmetic or pointer type is required
+     232 |         skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
+         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/overflow.h:419:24: note: expanded from macro 'flex_array_size'
+     419 |         __builtin_choose_expr(__is_constexpr(count),                    \
+         |                               ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:323:47: note: expanded from macro '__is_constexpr'
+     323 |         (sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8)))
+         |                                                      ^~~
+   6 errors generated.
+
+
+vim +151 net/bluetooth/hci_codec.c
+
+8961987f3f5fa2f Kiran K     2021-09-07  119  
+8961987f3f5fa2f Kiran K     2021-09-07  120  void hci_read_supported_codecs(struct hci_dev *hdev)
+8961987f3f5fa2f Kiran K     2021-09-07  121  {
+8961987f3f5fa2f Kiran K     2021-09-07  122  	struct sk_buff *skb;
+8961987f3f5fa2f Kiran K     2021-09-07  123  	struct hci_rp_read_local_supported_codecs *rp;
+8961987f3f5fa2f Kiran K     2021-09-07  124  	struct hci_std_codecs *std_codecs;
+8961987f3f5fa2f Kiran K     2021-09-07  125  	struct hci_vnd_codecs *vnd_codecs;
+8961987f3f5fa2f Kiran K     2021-09-07  126  	struct hci_op_read_local_codec_caps caps;
+8961987f3f5fa2f Kiran K     2021-09-07  127  	__u8 i;
+8961987f3f5fa2f Kiran K     2021-09-07  128  
+828cea2b71de501 Chethan T N 2022-11-22  129  	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
+828cea2b71de501 Chethan T N 2022-11-22  130  				0, HCI_CMD_TIMEOUT, NULL);
+8961987f3f5fa2f Kiran K     2021-09-07  131  
+8961987f3f5fa2f Kiran K     2021-09-07  132  	if (IS_ERR(skb)) {
+8961987f3f5fa2f Kiran K     2021-09-07  133  		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
+8961987f3f5fa2f Kiran K     2021-09-07  134  			   PTR_ERR(skb));
+8961987f3f5fa2f Kiran K     2021-09-07  135  		return;
+8961987f3f5fa2f Kiran K     2021-09-07  136  	}
+8961987f3f5fa2f Kiran K     2021-09-07  137  
+8961987f3f5fa2f Kiran K     2021-09-07  138  	if (skb->len < sizeof(*rp))
+8961987f3f5fa2f Kiran K     2021-09-07  139  		goto error;
+8961987f3f5fa2f Kiran K     2021-09-07  140  
+8961987f3f5fa2f Kiran K     2021-09-07  141  	rp = (void *)skb->data;
+8961987f3f5fa2f Kiran K     2021-09-07  142  
+8961987f3f5fa2f Kiran K     2021-09-07  143  	if (rp->status)
+8961987f3f5fa2f Kiran K     2021-09-07  144  		goto error;
+8961987f3f5fa2f Kiran K     2021-09-07  145  
+8961987f3f5fa2f Kiran K     2021-09-07  146  	skb_pull(skb, sizeof(rp->status));
+8961987f3f5fa2f Kiran K     2021-09-07  147  
+8961987f3f5fa2f Kiran K     2021-09-07  148  	std_codecs = (void *)skb->data;
+8961987f3f5fa2f Kiran K     2021-09-07  149  
+8961987f3f5fa2f Kiran K     2021-09-07  150  	/* validate codecs length before accessing */
+8961987f3f5fa2f Kiran K     2021-09-07 @151  	if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
+8961987f3f5fa2f Kiran K     2021-09-07  152  	    + sizeof(std_codecs->num))
+8961987f3f5fa2f Kiran K     2021-09-07  153  		goto error;
+8961987f3f5fa2f Kiran K     2021-09-07  154  
+8961987f3f5fa2f Kiran K     2021-09-07  155  	/* enumerate codec capabilities of standard codecs */
+8961987f3f5fa2f Kiran K     2021-09-07  156  	memset(&caps, 0, sizeof(caps));
+8961987f3f5fa2f Kiran K     2021-09-07 @157  	for (i = 0; i < std_codecs->num; i++) {
+8961987f3f5fa2f Kiran K     2021-09-07  158  		caps.id = std_codecs->codec[i];
+8961987f3f5fa2f Kiran K     2021-09-07  159  		caps.direction = 0x00;
+828cea2b71de501 Chethan T N 2022-11-22  160  		hci_read_codec_capabilities(hdev,
+828cea2b71de501 Chethan T N 2022-11-22  161  					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
+8961987f3f5fa2f Kiran K     2021-09-07  162  	}
+8961987f3f5fa2f Kiran K     2021-09-07  163  
+8961987f3f5fa2f Kiran K     2021-09-07  164  	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
+8961987f3f5fa2f Kiran K     2021-09-07  165  		 + sizeof(std_codecs->num));
+8961987f3f5fa2f Kiran K     2021-09-07  166  
+8961987f3f5fa2f Kiran K     2021-09-07  167  	vnd_codecs = (void *)skb->data;
+8961987f3f5fa2f Kiran K     2021-09-07  168  
+8961987f3f5fa2f Kiran K     2021-09-07  169  	/* validate vendor codecs length before accessing */
+8961987f3f5fa2f Kiran K     2021-09-07  170  	if (skb->len <
+8961987f3f5fa2f Kiran K     2021-09-07  171  	    flex_array_size(vnd_codecs, codec, vnd_codecs->num)
+8961987f3f5fa2f Kiran K     2021-09-07  172  	    + sizeof(vnd_codecs->num))
+8961987f3f5fa2f Kiran K     2021-09-07  173  		goto error;
+8961987f3f5fa2f Kiran K     2021-09-07  174  
+8961987f3f5fa2f Kiran K     2021-09-07  175  	/* enumerate vendor codec capabilities */
+8961987f3f5fa2f Kiran K     2021-09-07  176  	for (i = 0; i < vnd_codecs->num; i++) {
+8961987f3f5fa2f Kiran K     2021-09-07  177  		caps.id = 0xFF;
+8961987f3f5fa2f Kiran K     2021-09-07  178  		caps.cid = vnd_codecs->codec[i].cid;
+8961987f3f5fa2f Kiran K     2021-09-07  179  		caps.vid = vnd_codecs->codec[i].vid;
+8961987f3f5fa2f Kiran K     2021-09-07  180  		caps.direction = 0x00;
+828cea2b71de501 Chethan T N 2022-11-22  181  		hci_read_codec_capabilities(hdev,
+828cea2b71de501 Chethan T N 2022-11-22  182  					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
+8961987f3f5fa2f Kiran K     2021-09-07  183  	}
+8961987f3f5fa2f Kiran K     2021-09-07  184  
+8961987f3f5fa2f Kiran K     2021-09-07  185  error:
+8961987f3f5fa2f Kiran K     2021-09-07  186  	kfree_skb(skb);
+8961987f3f5fa2f Kiran K     2021-09-07  187  }
+9ae664028a9ea83 Kiran K     2021-09-07  188  
+9ae664028a9ea83 Kiran K     2021-09-07  189  void hci_read_supported_codecs_v2(struct hci_dev *hdev)
+9ae664028a9ea83 Kiran K     2021-09-07  190  {
+9ae664028a9ea83 Kiran K     2021-09-07  191  	struct sk_buff *skb;
+9ae664028a9ea83 Kiran K     2021-09-07  192  	struct hci_rp_read_local_supported_codecs_v2 *rp;
+9ae664028a9ea83 Kiran K     2021-09-07  193  	struct hci_std_codecs_v2 *std_codecs;
+9ae664028a9ea83 Kiran K     2021-09-07  194  	struct hci_vnd_codecs_v2 *vnd_codecs;
+9ae664028a9ea83 Kiran K     2021-09-07  195  	struct hci_op_read_local_codec_caps caps;
+9ae664028a9ea83 Kiran K     2021-09-07  196  	__u8 i;
+9ae664028a9ea83 Kiran K     2021-09-07  197  
+828cea2b71de501 Chethan T N 2022-11-22  198  	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
+828cea2b71de501 Chethan T N 2022-11-22  199  				0, HCI_CMD_TIMEOUT, NULL);
+9ae664028a9ea83 Kiran K     2021-09-07  200  
+9ae664028a9ea83 Kiran K     2021-09-07  201  	if (IS_ERR(skb)) {
+9ae664028a9ea83 Kiran K     2021-09-07  202  		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
+9ae664028a9ea83 Kiran K     2021-09-07  203  			   PTR_ERR(skb));
+9ae664028a9ea83 Kiran K     2021-09-07  204  		return;
+9ae664028a9ea83 Kiran K     2021-09-07  205  	}
+9ae664028a9ea83 Kiran K     2021-09-07  206  
+9ae664028a9ea83 Kiran K     2021-09-07  207  	if (skb->len < sizeof(*rp))
+9ae664028a9ea83 Kiran K     2021-09-07  208  		goto error;
+9ae664028a9ea83 Kiran K     2021-09-07  209  
+9ae664028a9ea83 Kiran K     2021-09-07  210  	rp = (void *)skb->data;
+9ae664028a9ea83 Kiran K     2021-09-07  211  
+9ae664028a9ea83 Kiran K     2021-09-07  212  	if (rp->status)
+9ae664028a9ea83 Kiran K     2021-09-07  213  		goto error;
+9ae664028a9ea83 Kiran K     2021-09-07  214  
+9ae664028a9ea83 Kiran K     2021-09-07  215  	skb_pull(skb, sizeof(rp->status));
+9ae664028a9ea83 Kiran K     2021-09-07  216  
+9ae664028a9ea83 Kiran K     2021-09-07  217  	std_codecs = (void *)skb->data;
+9ae664028a9ea83 Kiran K     2021-09-07  218  
+9ae664028a9ea83 Kiran K     2021-09-07  219  	/* check for payload data length before accessing */
+9ae664028a9ea83 Kiran K     2021-09-07 @220  	if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
+9ae664028a9ea83 Kiran K     2021-09-07  221  	    + sizeof(std_codecs->num))
+9ae664028a9ea83 Kiran K     2021-09-07  222  		goto error;
+9ae664028a9ea83 Kiran K     2021-09-07  223  
+9ae664028a9ea83 Kiran K     2021-09-07  224  	memset(&caps, 0, sizeof(caps));
+9ae664028a9ea83 Kiran K     2021-09-07  225  
+9ae664028a9ea83 Kiran K     2021-09-07 @226  	for (i = 0; i < std_codecs->num; i++) {
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
