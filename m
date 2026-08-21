@@ -1,140 +1,230 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5586A380FC5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 20:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40062435529;
+	Fri, 21 Aug 2026 23:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787344892; cv=none; b=r63Pk0L7RtNqehtplo7gIkOW5wJb/xeOn6P5curujzbYd+EnE9/K5BluU1lusWhnjAY7NundXVXwxoG7CfZjaZiGaRY+fvQjJ60d7G99P460HCQoATWbcOrU1NYjVfhq586SVscpz1OE5CBSl2mEyp+6vyM55dFNZsvbHfi7fdM=
+	t=1787355499; cv=none; b=rpE2tSy61e6SW1AtT7bWZ/EaZRw9UNLRPVPkdeiWHON9h91bltHDl+nA/jLgXEBetNC3uUsJTqMb+Dtj8QDSs1Aaf1YPjnkYgO4s8InQN5cI+JcLbmIE+LYHdbyEUOigKscMt3x6Rpe80mfB1h0/jXevtip7p1IW3gwOCRmBxxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787344892; c=relaxed/simple;
-	bh=CHse619ElJRfJ0oWzA9dQcAyufU0H8dfrluIlDm7GL0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LBjNlpYtX0HEsEdeo+cMUjmuPiTz06caoIHpew2MUWoqRLBWPJRwXL0V/KpOj+nD91OIPjfwg7FF7bNhS+XTELap3r7aJAkg85O5FRq2NSEJ7A+qw9xrVPHXDRsEsPZ1TX2CjmHIsymjh/w/z/bVIzt9n1Cv8RVIi7914wIWX38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DmK434Wl; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787355499; c=relaxed/simple;
+	bh=rlbSOuaEzyKo5jZHsV6n7SSdJDwWMAOutuR6tIJXPhI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:
+	 In-Reply-To:References:To:Cc; b=EWqznUHN+GOBXYyDvP3OU9S8Rf9qHyVmpFw2Z4yOMgfo/Ik80p5XlSGys7+d2/LrFWKg7AGmIGRXCsMQCU+Gwtmw+H4HwS9VsAbw2Imvd4n22N1Pzti+AAHYCqyJINZCvE8JuAtKM4s7117JF/KorHMU6HXWvhuGPjOXNZy1P4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUrG4kTV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DmK434Wl"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-5218927884fso14056071cf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 13:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787344890; x=1787949690; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=xabY0sT+VYcEp5S+hCTVoDv6MfON9RI8SG8fo/qM5WI=;
-        b=DmK434Wl7rQ6MrvYNnuW1+uncdvz3In+ijid2wVGBqY2uGz1QAv99Qet+Uug5O125P
-         dHsJIJJyJ/BXPKOYOEoWcmQ4wC3zlglornd8VMwX6MGmF5M5CHpNpxGf+BVzUi9ASHjG
-         OiPPlFvw1022gIY1GlRf3RPU5RmcHiXteHb9dqfD7yh8QLwFayjmxO5hO+HR6uzAmfIs
-         49Riy5zH2n33WWUnS+naJQqjXCDU2POP84+YTyZbbb8QW303i2D9uCYKuLQDmKhQPpLz
-         xoeL3jNfoleLLPGX4UF2/EApgk43mMt2AobgJKFK4B8KEO35pDHlqwsl83X2KdWAsSrD
-         cUNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787344890; x=1787949690;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=xabY0sT+VYcEp5S+hCTVoDv6MfON9RI8SG8fo/qM5WI=;
-        b=SQyD3zAqHM8V++iavsYBuWD2/k/q17SXRYjaYj85iPkcUUd0eFZCnxNrIXnx8JsvvY
-         6v7yY/rRlKUh/pdizIpTo4zR6OwXAKm35uAqLk6fpCRAYaCSZcui7/kR2nt8qebDsna9
-         GenOx1QlOgrmSVks7qV6mu71p6AEtrXQY0KSmt20yXE7H7B5t7zmEBvrkpewsL/9CWmN
-         ziQaMv3EFpXaKb7oqWpJNlwX1gIYWShwZY6VVC4sJk6OSCCipGcPdOpUFSwSJDpWcsds
-         ho3MFAXvetzDlogZCMYGexAmp52p8/GEm1bIG0GpcWGYxe+1oKkurkFm+rRRKWF3pkOd
-         luhg==
-X-Gm-Message-State: AFuF++kNtSontgConD2Z/T+5NuILF8BE5LDWrx6yob+Nbleiv1aqoy87
-	EYwR3JwDbmGyd4kUSLrAmrCaqfwmwO5VTAlj4v/zfFyTYLqYWqWKn6i0rc5zRUTu
-X-Gm-Gg: AR+sD119vtzf1KRm8VYQJHrzZolKYxr9Dd23B6w4QyDO55x4J6XvQM7Y7FVdKAwMGIk
-	setX84Gut09v68HSs0bwwnmJYVY9zo4CWReXDMJR0i2QPp6tL4PKoyotT2tOqMTEW2lW2/21bom
-	NDNBFHsBj7htoHEtkIkTvSJgejSnKko0lXOccoE6gqqioUMuWrQRvTwFbVpXWLH3RKjixggkEDr
-	tsjmbnD3YgcqH3A5hPCG/LIFa99l165kEiOYeITjm0IqssONyLAQmkHb1OT8vcON577bSK22de3
-	0HAoZWdXpi6/QHxJLZ2WwK11zxi/OX9MQK1+0Y1agS9EQ8aHbUJ6fa4vlfZwXTknnVk3tYRwLti
-	Vv1qlhltMDS/HbadrjnC62pLrDSFTcESnfo0GkQd2bqSHCpeJRvXgN8yNTdHt+8DIz78U7Kt4gp
-	i32bGKauKD02QhU0DohqhXywoeG5AooliRDchetO65eOVXp5RGvTlQPH2/lOIzCi6i
-X-Received: by 2002:a05:622a:c0a:b0:527:6d0b:b399 with SMTP id d75a77b69052e-52e09d0e42cmr9355641cf.39.1787344890170;
-        Fri, 21 Aug 2026 13:41:30 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.34.38])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52e09ae65c8sm2533681cf.24.2026.08.21.13.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2026 13:41:29 -0700 (PDT)
-Message-ID: <6a88b7f9.043ad0dd.bfc0a.85d7@mx.google.com>
-Date: Fri, 21 Aug 2026 13:41:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9181881989727587823=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUrG4kTV"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C3DECC2BCB3;
+	Fri, 21 Aug 2026 23:38:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1787355498;
+	bh=rlbSOuaEzyKo5jZHsV6n7SSdJDwWMAOutuR6tIJXPhI=;
+	h=From:Date:Subject:In-Reply-To:References:To:Cc:Reply-To:From;
+	b=FUrG4kTVRofbSX4GusS4dinoTUhR3Zlq5YLIqWfW9EFBdcKP2JZUtXoaN4nWQ/sYJ
+	 1+QutDQMnjOaO3bvwZlRcVa8bngeoYegBEq8wrepAYDieMCSoQFE8mRtl9mjuFLJG4
+	 fsqHOf7788o6Jpq1+Ta29JClM4hH9ow6hZsRLbT7GGi2HSSEvrBR6wWWC9rqRko7N6
+	 na9/5ZrxbVMqsJsDVjfWVc2Wcfh4glM0IYLdIIlVYlHHFTByheZF3Wr/46WlIK07jW
+	 w6dBh+r/ShK7J6MOwHDbV0MoBQNaEwK76WWeASuFyek5zelCeIhZAYwIxBbDAI0YXl
+	 xm3s3NnkZdTew==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B288C5DF8C;
+	Fri, 21 Aug 2026 23:38:18 +0000 (UTC)
+From: George Maraveyas via B4 Relay <devnull+george.0xfff.gmail.com@kernel.org>
+Date: Sat, 22 Aug 2026 01:37:33 +0200
+Subject: [PATCH RFC v2] Bluetooth: mt7925: trigger reset on WMT timeout
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, george.kiagiadakis@collabora.com
-Subject: RE: [BlueZ] build: Ignore the test-sdp-xml binary
-In-Reply-To: <20260821193120.1335629-1-george.kiagiadakis@collabora.com>
-References: <20260821193120.1335629-1-george.kiagiadakis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============9181881989727587823==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260822-mt7925-rfc-v2-1-c88e3bcf7eb8@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22QTW7DIBCFr2KxLhZgCBBVVaRKPUC3VRZjGCe0w
+ U7AsVpFvnsJzbLLNz/vezM3kjEFzGTb3EjCJeQwjUWIp4a4I4wHpMEXTQQTG2a4oXHWViiaBkf
+ R+07iwDruLSkL54RD+K5mH+T97ZXs/4r52n+im+82j7GEl2tBzY/ZiDlDRW2b50rSrNAY57rtt
+ JJKMcopODzB2H7BtHMwTmNwcGrdFF/upj1kpEXEMJf0xjMucOhlJ/RgnVZeIZMCtLMcLShZmmB
+ NDXgMeZ7ST/3Awmue/45dOGVUGOmN2oBTWuwOEUINQPbruv4Cg3ggnkoBAAA=
+X-Change-ID: 20260818-mt7925-rfc-edd34ef031d9
+In-Reply-To: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
+References: <20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com>
+To: Alan Stern <stern@rowland.harvard.edu>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Chia-Lin Kao <acelan.kao@canonical.com>, 
+ George Maraveyas <george.0xfff@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787355496; l=6566;
+ i=george.0xfff@gmail.com; s=20260818; h=from:subject:message-id;
+ bh=eD0xVzdZ+MLHOp0LYT7FNSr4T7TwQldMA7EKYnGOfwE=;
+ b=KzR8Sr3nxgfX34AVXTYV5vC9vEHxjKPdJwG4SnjP+eVVVNb4Lr3dDHZ9AHC9kLB0seaa6bQhE
+ xikvwO/kzEFCglAqfeeihvlm/BkmqyUPUoFtKYgTO0XaWAzFqK7PRDp
+X-Developer-Key: i=george.0xfff@gmail.com; a=ed25519;
+ pk=Jz8kMnumjUlo1GJvJ5kdfkF3ZP8DjPbYaYQR5J8IHMI=
+X-Endpoint-Received: by B4 Relay for george.0xfff@gmail.com/20260818 with
+ auth_id=960
+X-Original-From: George Maraveyas <george.0xfff@gmail.com>
+Reply-To: george.0xfff@gmail.com
 
-This is automated email and please do not reply to this email!
+From: George Maraveyas <george.0xfff@gmail.com>
 
-Dear submitter,
+The MT7925 Bluetooth USB function can enumerate successfully after a warm
+reboot while the WMT function-control command remains unresponsive.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1149989
+When that command times out, btmtk_usb_setup() currently returns
+-ETIMEDOUT without entering the existing MediaTek reset path. The existing
+USB reset and recovery machinery is therefore never reached.
 
----Test result---
+For MT7925, call btmtk_reset_sync() when the WMT function-control command
+times out. This enters the existing reset path in btusb_mtk_reset(), which
+performs the MediaTek subsystem reset and queues a USB device reset.
 
-Test Summary:
-CheckPatch                    FAIL      0.43 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      20.33 seconds
-BluezMake                     PASS      617.03 seconds
-MakeCheck                     PASS      18.91 seconds
-MakeDistcheck                 PASS      157.88 seconds
-CheckValgrind                 PASS      229.65 seconds
-CheckSmatch                   PASS      313.67 seconds
-bluezmakeextell               PASS      102.13 seconds
-IncrementalBuild              PASS      598.52 seconds
-ScanBuild                     PASS      978.37 seconds
+Runtime tracing on the affected hardware showed the resulting path through
+usb_queue_reset_device(), usb_reset_device() and
+usb_reset_and_verify_device(). When reset and verification could not
+restore the device, the USB core escalated to a logical disconnect and
+re-enumeration.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ] build: Ignore the test-sdp-xml binary
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#72: 
-Assisted-by: Claude:claude-opus-5
+Recovery succeeded in three controlled Windows-to-Linux tests. Runtime
+tracing showed the existing USB reset path escalating to logical disconnect
+and re-enumeration. In two of those tests, tracing continued through the
+subsequent enumeration failures and directly captured
+usb_acpi_port_prr_reset(), after which the MT7925 re-enumerated and
+Bluetooth recovered.
 
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Claude:claude-opus-5'
-#72: 
-Assisted-by: Claude:claude-opus-5
+These tests were performed on top of Chia-Lin Kao's ACPI _PRR hub patch,
+which remains a prerequisite for this patch.
 
-/github/workspace/src/patch/14762402.patch total: 1 errors, 1 warnings, 7 lines checked
+A fourth Windows-to-Linux test was then performed with the diagnostic btusb
+blacklist removed and btusb binding normally during boot. The WMT timeout
+reproduced and Bluetooth recovered automatically without manual
+intervention.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+Signed-off-by: George Maraveyas <george.0xfff@gmail.com>
+---
+Dear Alan,
 
-/github/workspace/src/patch/14762402.patch has style problems, please review.
+Thank you for taking the time to look into my patch and for pointing me
+towards the existing reset path. I have now traced the failure on the
+affected MT7925 hardware and tested the individual parts separately.
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+You were correct that a new USB re-enumeration helper is unnecessary.
+Once the MT7925 failure is made to enter the existing reset path, I can
+see:
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+  btmtk_reset_sync()
+    -> btmtk_usb_subsys_reset()
+    -> usb_queue_reset_device()
+    -> usb_reset_device()
+    -> usb_reset_and_verify_device()
 
+When reset and verification cannot restore the device,
+usb_reset_and_verify_device() eventually reaches:
 
+  hub_port_logical_disconnect()
 
+and normal hub re-enumeration follows. I have therefore dropped the
+proposed USB helper from v1.
 
-https://github.com/bluez/bluez/pull/2429
+The problem I found is earlier in the Bluetooth path. When MT7925 WMT
+FUNC_CTRL times out, btmtk_usb_setup() currently returns -ETIMEDOUT
+without entering the existing MediaTek reset machinery. The revised patch
+now consists only of the part of my original submission that makes this
+timeout enter the existing reset path:
+
+  if (dev_id == 0x7925 && err == -ETIMEDOUT)
+          btmtk_reset_sync(hdev);
+
+I tested this both with and without Chia-Lin Kao's _PRR hub patch. I want
+to stress that this v2 is based on and dependent on Kao's patch; that
+remains the configuration in which I have validated recovery.
+
+Kao's patch alone does not recover this failure because the WMT timeout
+never enters the reset path. With the WMT trigger but without Kao's patch,
+the reset/disconnect/re-enumeration sequence started, but the device did
+not recover in that test.
+
+With Kao's patch plus the WMT trigger, I reproduced and recovered the
+Windows-to-Linux failure in three controlled tests. Runtime tracing showed
+the existing reset path escalating through usb_queue_reset_device(),
+usb_reset_and_verify_device() and hub_port_logical_disconnect(). In two
+of those runs, tracing continued through the subsequent enumeration
+failures and directly captured:
+
+  usb_acpi_port_prr_reset() <- hub_event.cold
+
+The MT7925 subsequently re-enumerated and Bluetooth recovered.
+
+I then removed the diagnostic btusb blacklist and repeated the test as a
+normal Windows-to-Linux restart, allowing btusb to bind automatically.
+The WMT command again timed out with -110 and the adapter recovered
+without any manual module loading or other intervention.
+
+One behavioural difference is recovery time. The original RFC, which
+requested logical disconnect/re-enumeration directly after the MT7925
+subsystem reset timed out, recovered Bluetooth in about 71 seconds on
+average. Using the existing usb_queue_reset_device() path takes about
+133 seconds to complete Bluetooth setup in the current tests, with
+successful USB re-enumeration at about 114-115 seconds.
+
+The traces account for most of that difference:
+usb_reset_and_verify_device() spends roughly 65 seconds attempting reset
+and verification before escalating to hub_port_logical_disconnect(). In
+practice this was long enough that, during the first test of the reduced
+patch, I almost concluded that recovery had failed and rebooted to start
+the test again before the device eventually returned.
+
+I do not think that recovery-time difference justifies retaining the new
+USB API, but it seemed worth mentioning because it is a noticeable
+behavioural difference between v1 and the reduced approach.
+
+Changes in v2:
+- Drop the proposed USB re-enumeration helper.
+- Drop the direct MT7925 re-enumeration handling which depended on it.
+- Reduce the series from two patches to one Bluetooth patch.
+- Retain only the part of the original Bluetooth patch that enters the
+  existing reset path on an MT7925 WMT -ETIMEDOUT.
+- Keep Chia-Lin Kao's ACPI _PRR hub patch as a prerequisite.
+- Add the new runtime trace and recovery results.
+- Link to v1: https://patch.msgid.link/20260818-mt7925-rfc-v1-0-284d856ac572@gmail.com
+
+Thanks again for the review.
+
+Kind regards,
+George
+---
+ drivers/bluetooth/btmtk.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 66b346761..e8f02f1e3 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1413,6 +1413,10 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 		err = btmtk_usb_hci_wmt_sync(hdev, &wmt_params);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
++
++			if (dev_id == 0x7925 && err == -ETIMEDOUT)
++				btmtk_reset_sync(hdev);
++
+ 			return err;
+ 		}
+ 
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 28d012efb4327f9c75d5e042a7c91e9a542efa98
+change-id: 20260818-mt7925-rfc-edd34ef031d9
+prerequisite-message-id: <20260706080117.3754550-1-acelan.kao@canonical.com>
+prerequisite-patch-id: 47a2729fbc473534f8ba52052b00723c54a26c17
+
+Best regards,
+--  
+George Maraveyas <george.0xfff@gmail.com>
 
 
---===============9181881989727587823==--
