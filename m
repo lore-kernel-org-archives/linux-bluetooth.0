@@ -1,145 +1,217 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1848345A2B4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 10:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58987479897
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 10:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787307614; cv=none; b=kr/ToEZkWDDrwhLN/MKb00hWyWQNbFaKudBbmeofPbQhBSqJgkKArbY93hioAxSOEz+4CuJPwT8pxzjeR3d+vrdq59LYphSDqb+SieBPtr0NZy5xxbtfzZVS4LL+U+LKcTz0/zLPd0vppzBydMAxWrapLjC2rc7jkwHISCviUDk=
+	t=1787308956; cv=none; b=SgSVRlohUDYy4lNU2nBAG68ViGdQ3gACGntCbTJahnsr5vWp14Kk73khPi8X7ONS/sNcJji8Qk867Xo2gOO5NSWWefIQ8RkCVej0HfggWve8VoVEQ03K/0nEV/m/Udxmq+iy3fyS5P/5SHnMOTFt3KgCqil8ImwG/yMFFx3v8Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787307614; c=relaxed/simple;
-	bh=CkDRGwu+i6BWMxccw5+nrkY6JrUOehELB1K/7wE6HSI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tW0SO55xl0BJTKDY6BQiltertNa0w2GvnWjzDo2ZGqb6nPG5JKFOKKSpaDaWcNatwJgdt3crvPhFUUC+nkWJHjWHcHTVTfXhAAOmgfd4Iot3d5g/Sz0w1y7gLpgWohVX/nfiiBiaXZ0K8zKbSoDDgFP/f1ueDgafonzUzSWoLxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+w5iHfH; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+w5iHfH"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-45ed55cbbaaso433473fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2026 03:20:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787307607; x=1787912407; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=WuheTftfkcf58QVxXixKAd377N9Kb7XA8Q0EwkolDWQ=;
-        b=Q+w5iHfH6JnLnuD1k0RjVrvI8QkjhaOgDadT5rnPCCDU3FAohlZ3n219jtWx9u1fWo
-         0+vs8oQR76e1HDro/yWmCc2LN/h8L4G26c/mqaYPx4ydM4Eo5/OEr7Jhqm1FnG+v5/93
-         hhlw7GNfEToECO+kKwzLV8oJD6tUmeBAuS6oocrbEOXQait2SmVWnq+R0nIqrJC6APtM
-         mFQmM+87nnnpZNc7GcIZdSGNKxpPaEK2ZCcGv5U5h7myju8U1FWzGzJ/KweniJpbRUWI
-         W9PEyKPgDa24D9TCAr2ew7qASewSu97U7tmI0/XgTPt39alKyUsd1EYhCUo8d2849+x5
-         leuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787307607; x=1787912407;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=WuheTftfkcf58QVxXixKAd377N9Kb7XA8Q0EwkolDWQ=;
-        b=li6olXtLqJNLcuFIluS3N3lDHjtXxZsKnLjAJkTGdfEzb4BC2k/punrCp8QIfq35pl
-         CcO/W6vwm3I4++MwhzNMNVC0aEL58/aSQykSpsVFJs4JsTP+3S7/Q6lLSvxgGZD9sP9c
-         YDCy/35JMOlIQaGOekAArM6fMz6SYpgVuN1B7iwMxKEzikkPvCgm7s+DWscuX8I6WoTP
-         iqto3ZbBSpI2UpSiWQ2ttOLxOi0BkBLhaxX5QYg5wStRK1TgvPaAEyiPjy+GF2Y132tb
-         UHR6O/xqeCi43ADd0H/RppLbdh66qxt4F4ELvt80mjR3hC27PL4NAm3jGG6aLWaDFMYp
-         m/tQ==
-X-Gm-Message-State: AFuF++nGh89jMJ5HnbzTJH7v2vpvqXWZZk2z0t29JrccvjPmvN5mAq8S
-	KQI3UcGT/Dl1JxM56Z4vndd+fM50pEw4R/w09+x6A2/8N5NJPYgk71BvGfoi/z7Q
-X-Gm-Gg: AR+sD12LfstYlgrN+I47pW3wIAtNLMh55w6rZrxVHk5cKVtX7pAjaqV/IHRnEKlTIZn
-	qNm0x8VMQd8BoHxekGvfCZZOv5xLZFBJUtT4IxgLtqR1V+PhjF7amee5iy6Scd0tvAGjAaxOYo7
-	1wpYLYVZXjR8Rc0DpZUUvBG1vTHjk95yHpVKSvXgsczTe/udyGqTJilgfV3BHWhrJ3aTJs0w2SA
-	xR2h71eOl3d7Xm5IFdo4HANVmmLdqKTVfYdMveav7heohtRBHsUM4H+D0TAJernW+CV90jpnbka
-	fOqQI6QkuFNKyomEarWaCdeR2M+dwh5unZfWA0GW1vBrKwp3Du7MQSCP4uUI09X2nDWSi8ytZCB
-	MkCb8b20zBxDGSjofOPNdYrsq7LSbgTpcSfUJW+mW1QeIBY69fkfm6ygBMMEX72YSdMQrw3qs9u
-	WqZIa9cstjSRCaoXfwo0YafJEGvDR4LjsA0wBhfAGlu6hkY17CI60K5ZMoK8JB2mbQxg==
-X-Received: by 2002:a05:6871:b13:b0:45e:9b66:7175 with SMTP id 586e51a60fabf-4635141bdc5mr4376285fac.16.1787307606633;
-        Fri, 21 Aug 2026 03:20:06 -0700 (PDT)
-Received: from [172.17.0.2] ([20.29.37.162])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4632aa5180bsm3689662fac.16.2026.08.21.03.20.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2026 03:20:06 -0700 (PDT)
-Message-ID: <6a882656.5f95fffa.d69c4.a424@mx.google.com>
-Date: Fri, 21 Aug 2026 03:20:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6331950287990831511=="
+	s=arc-20240116; t=1787308956; c=relaxed/simple;
+	bh=EASfVLEgmABGoCERoIBAwPsZ8hrbe4pYHreZ47zyMkc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Hqj2a+2tmwIMbCTMJVx0HV3RWTDfHNtRooy7lYj1vnxlLerfIN9LqVVD7C3Miw9u17ywcLDFWzLMmqSnfA0VsNLVA8SGDXP4Tlt87IJ0kUdCPQi8DH3gRmVwgSbwZ7v6kx2z1xdXyNhYTHwUQZBm1p5eSD8lm6yeGOwbTZVHLEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: fb6437689d4c11f19a56ed5b684f684d-20260821
+X-CTIC-Tags:
+	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_EXISTED, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF
+	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:fd25157d-5043-43f7-b32f-2dedff335bf7,IP:20,
+	URL:0,TC:0,Content:-25,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:-25
+X-CID-INFO: VERSION:1.3.19,REQID:fd25157d-5043-43f7-b32f-2dedff335bf7,IP:20,UR
+	L:0,TC:0,Content:-25,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:EDM_GE969F26,ACT
+	ION:release,TS:-25
+X-CID-META: VersionHash:7db8b62,CLOUDID:1b314209f30de2a9c785703c0aa6ebb3,BulkI
+	D:260821153859O6M7T1XU,BulkQuantity:1,SF:17|19|66|78|81|82|102|127|850|865
+	|898,TC:nil,Content:0|15|50,EDM:1|-100,IP:-2,URL:0,File:nil,RT:nil,Bulk:40
+	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
+	0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_AEC
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: fb6437689d4c11f19a56ed5b684f684d-20260821
+X-User: zuohongsheng@kylinos.cn
+Received: from localhost.localdomain [(223.104.42.203)] by mailgw.kylinos.cn
+	(envelope-from <zuohongsheng@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 2028081684; Fri, 21 Aug 2026 18:42:18 +0800
+From: zuohsh <zuohongsheng@kylinos.cn>
+To: linux-bluetooth@vger.kernel.org
+Cc: zuohsh <zuohongsheng@kylinos.cn>
+Subject: [PATCH v3] gatt-server: Fix integer overflow and 3 CI VLA wanings
+Date: Fri, 21 Aug 2026 18:40:11 +0800
+Message-ID: <20260821104213.131920-1-zuohongsheng@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <6a880f7e.98ff5233.202ae9.c75f@mx.google.com>
+References: <6a880f7e.98ff5233.202ae9.c75f@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: mgmt/device: report link security level to D-Bus clients
-In-Reply-To: <20260821090908.1546451-2-frederic.danis@collabora.com>
-References: <20260821090908.1546451-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6331950287990831511==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+By using size_t for realloc len and rejecting allocations exceeding
+UINT16_MAX , to prevent truncation into the uint16_t field.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1149614
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.48 seconds
-GitLint                       PASS      1.55 seconds
-BuildEll                      PASS      17.17 seconds
-BluezMake                     PASS      474.06 seconds
-MakeCheck                     PASS      18.02 seconds
-MakeDistcheck                 PASS      129.68 seconds
-CheckValgrind                 PASS      188.14 seconds
-CheckSmatch                   WARNING   222.72 seconds
-bluezmakeextell               PASS      79.10 seconds
-IncrementalBuild              PASS      525.85 seconds
-ScanBuild                     PASS      715.40 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,2/6] mgmt-tester: Add Security Level Changed event tests
-WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
-#74: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-ERROR:BAD_SIGN_OFF: Unrecognized email address: 'GPT:GPT-5.3-Codex'
-#74: 
-Assisted-by: GPT:GPT-5.3-Codex
-
-/github/workspace/src/patch/14760938.patch total: 1 errors, 1 warnings, 163 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14760938.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2002:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structures
-
-
-https://github.com/bluez/bluez/pull/2424
-
+Fix CI warnings: Variable length array is used, use malloc/free instead.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-server.c | 42 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 36 insertions(+), 6 deletions(-)
 
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 709a8f94b..516fceb8e 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -268,7 +268,7 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 	uint16_t start, end;
+ 	bt_uuid_t type;
+ 	bt_uuid_t prim, snd;
+-	uint8_t rsp_pdu[mtu];
++	uint8_t *rsp_pdu = NULL;
+ 	uint16_t rsp_len;
+ 	uint8_t ecode = 0;
+ 	uint16_t ehandle = 0;
+@@ -319,6 +319,12 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 		goto error;
+ 	}
 
---===============6331950287990831511==--
++	rsp_pdu = malloc(mtu);
++	if (!rsp_pdu) {
++		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
++
+ 	if (!encode_read_by_grp_type_rsp(server->db, q, server->att, mtu,
+ 							rsp_pdu, &rsp_len)) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+@@ -330,11 +336,14 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 	bt_att_chan_send_rsp(chan, BT_ATT_OP_READ_BY_GRP_TYPE_RSP,
+ 						rsp_pdu, rsp_len);
+
++	free(rsp_pdu);
++
+ 	return;
+
+ error:
+ 	queue_destroy(q, NULL);
+ 	bt_att_chan_send_error_rsp(chan, opcode, ehandle, ecode);
++	free(rsp_pdu);
+ }
+
+ static void async_read_op_destroy(struct async_read_op *op)
+@@ -611,7 +620,7 @@ static void find_info_cb(struct bt_att_chan *chan, uint16_t mtu, uint8_t opcode,
+ {
+ 	struct bt_gatt_server *server = user_data;
+ 	uint16_t start, end;
+-	uint8_t rsp_pdu[mtu];
++	uint8_t *rsp_pdu = NULL;
+ 	uint16_t rsp_len;
+ 	uint8_t ecode = 0;
+ 	uint16_t ehandle = 0;
+@@ -648,6 +657,12 @@ static void find_info_cb(struct bt_att_chan *chan, uint16_t mtu, uint8_t opcode,
+ 		goto error;
+ 	}
+
++	rsp_pdu = malloc(mtu);
++	if (!rsp_pdu) {
++		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
++
+ 	if (!encode_find_info_rsp(server->db, q, mtu, rsp_pdu, &rsp_len)) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+ 		goto error;
+@@ -657,11 +672,14 @@ static void find_info_cb(struct bt_att_chan *chan, uint16_t mtu, uint8_t opcode,
+
+ 	queue_destroy(q, NULL);
+
++	free(rsp_pdu);
++
+ 	return;
+
+ error:
+ 	bt_att_chan_send_error_rsp(chan, opcode, ehandle, ecode);
+ 	queue_destroy(q, NULL);
++	free(rsp_pdu);
+
+ }
+
+@@ -709,7 +727,7 @@ static void find_by_type_val_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 	struct bt_gatt_server *server = user_data;
+ 	uint16_t start, end, uuid16;
+ 	struct find_by_type_val_data data;
+-	uint8_t rsp_pdu[mtu];
++	uint8_t *rsp_pdu = NULL;
+ 	uint16_t ehandle = 0;
+ 	bt_uuid_t uuid;
+
+@@ -718,6 +736,12 @@ static void find_by_type_val_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 		goto error;
+ 	}
+
++	rsp_pdu = malloc(mtu);
++	if (!rsp_pdu) {
++		data.ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
++
+ 	data.pdu = rsp_pdu;
+ 	data.len = 0;
+ 	data.mtu = mtu;
+@@ -752,10 +776,13 @@ static void find_by_type_val_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 	bt_att_chan_send_rsp(chan, BT_ATT_OP_FIND_BY_TYPE_RSP,
+ 					data.pdu, data.len);
+
++	free(rsp_pdu);
++
+ 	return;
+
+ error:
+ 	bt_att_chan_send_error_rsp(chan, opcode, ehandle, data.ecode);
++	free(rsp_pdu);
+ }
+
+ static void async_write_op_destroy(struct async_write_op *op)
+@@ -1174,12 +1201,12 @@ static bool append_prep_data(struct prep_write_data *prep_data, uint16_t handle,
+ 					uint16_t length, uint8_t *value)
+ {
+ 	uint8_t *val;
+-	uint16_t len;
++	size_t len;
+
+ 	if (!length)
+ 		return true;
+
+-	len = prep_data->length + length;
++	len = (size_t)prep_data->length + (size_t)length;
+
+ 	val = realloc(prep_data->value, len);
+ 	if (!val)
+@@ -1188,7 +1215,10 @@ static bool append_prep_data(struct prep_write_data *prep_data, uint16_t handle,
+ 	memcpy(val + prep_data->length, value, length);
+
+ 	prep_data->value = val;
+-	prep_data->length = len;
++
++	if (len > UINT16_MAX)
++		return false;
++	prep_data->length = (uint16_t)len;
+
+ 	return true;
+ }
+--
+2.43.0
+Add fixing for CI reported CheckSmatch wanings.
