@@ -1,148 +1,159 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D04813FEE
-	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Aug 2026 14:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCE32BEC5E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Aug 2026 15:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787410197; cv=none; b=XhBwKmoeUhAAFkS1IsVAWUOFACnPU9xPj8/JKUPooQmx9pC+92hPz731RJCU5CFSeD0Dp1fLVsp+q+YCK2twMGMeztfJGJWkbO1I/RQXQ7mx1cz5BTanlMpLXKpCmqhtaFG1N2OmunMqUPz2hzPdF83KqB0UD66bOqtD3dq4z20=
+	t=1787411198; cv=none; b=Hl7zYW6rMRKTgkDSzCLa7VTh1rYULZ4EZenIkgS+zqUnIY8xPJOd3VwozWdb0Pr26sIBgib/QAMyIMzuisImCie3MdCDQTyET8cQ24h8Cy58N3t2dyS3ViuUUbjWq59SSauOpellxDHTNCglFT1winz69XySQZWjfUtnYHywnTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787410197; c=relaxed/simple;
-	bh=gTj++Vk2QFHKmTyfrpumqgzHc432q6lZvjafOymV/FI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AvKeTcr1Z9A/IjKBAVWuw9MvLHdvVVe1zFO0ogLZ10UJE0IMkhZRRIGlprRLmtY7jpwZcVMj4QfMiQILo6Z3iFnLsapHcM20rzxqJh5CcrshiU7jFXJOJpTbWiDWtbqNIgDcHMdbpYaO0uNWqfjhI5QhefSriRCCmUQpT+yig3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jf6ApDsn; arc=none smtp.client-ip=209.85.216.48
+	s=arc-20240116; t=1787411198; c=relaxed/simple;
+	bh=E2rcnygBGLQMU35xmqHIb/1ttJ6wFKWjkzZt/LwA7O4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aIjVY+Tbk3/dZdimL5o2147u0BUzItI5L2jeRamcMGVZjedX3UftQ8I1heOrgnufN/2EFkMxOT6bH3ZE8R3SVv7SCWpKnOZNVoiRoco75DBJwNWo7I7oW4v9PSYEJaLdeqF3eUEx/KwBfh9+CH3wDwstBUDiWgkxzNOqaE+jd14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kL6NXqWC; arc=none smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jf6ApDsn"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-381c51fde6bso2213326a91.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Aug 2026 07:49:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kL6NXqWC"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-66c70effc23so229928d50.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Aug 2026 08:06:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787410196; x=1788014996; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=yLHcWxVtVFIz4XgvJpQQDbk+l5ZT9EL/WbK6kCBGBw8=;
-        b=jf6ApDsnTFfWPejeogC/kIlD+qrkY/6px6bZo9ASTYuUQL7uaLPCYs4FkR/hxWBhSG
-         alrv+sCLaDg+5vLoOUHbeJHbFdVXJnGolkiIQpSFs3rLisH5Y1x73JJJGzm/WgcwNONL
-         pbJbPV9Q1TI2luoaJgJPKJe03fKiVAj/lLy0zqrIWjBpD+JB9BLB2ZK+YpD4Spzcl8Wz
-         NMx9cbiHBilwIn/XI/HpFm9hg279HwyrArZmSVpsn9CMRqSXvedBNqmivfNNkrXOBu16
-         NeWfm4IkC7q2piQwmX20KSYANmhzUEfWksbrv1lIefJBJUCWDcgUOtbCGOFx2vPnwGDy
-         z9Eg==
+        d=gmail.com; s=20251104; t=1787411196; x=1788015996; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=rKgGlVcx92xJ7O+3f3QvGBGuWZWQmGRABTn/2Re+yLY=;
+        b=kL6NXqWCz08lC0NqH5iu2eHD3sfR5oqGRnSTTZ/NYYglUvuqkgiu1teN1IIOScfbkE
+         Jage4eGvykuX+hM59ujtJ3SxjOXRxJM7WmUg7WQUUORRUOA1Re5h6p8vvdommlsmC9bv
+         WlR9r/p4SltTsYyfOaYL+5tuT771uJ54DdTTP9z1O711LwOeB9l0uJr5JaSj+bmbSjWV
+         BXPjpe7ruOP6rXchVgbMfkKLh+3Zt3BgwjFlPY1BuozyZv/IwpDLRvaHklOcz2npZDXf
+         +xRNOPgXmSMv19SutXrczXXm8ZDNsVzJPSAcmVVoNgHvq4KhsfXelQJlBG96MAl2HPNo
+         4Crw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787410196; x=1788014996;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=yLHcWxVtVFIz4XgvJpQQDbk+l5ZT9EL/WbK6kCBGBw8=;
-        b=NyJ9q4mz01sG6N5sFBy8Gjxghy9oC71DgO+m6hnvImlLQNjMcS1eHQH8ZPY2GfaSnv
-         b8RtTq95mrtXQCxK7uTAja6we++WVd+/fxVrptWlEdbz6xWK/NH5D+VhAB2bpUa/t7nB
-         gtSsbBLjr8l9brWNmDmwRREFkCisgsB1XQ8DnQfXUmbxrUEaBcolW67wxCKTdZugbcHG
-         TqNvZc0CIjNREzYvXWqpIwCIiMMxMPgj/zw9IyFwwfJps7ALNHbfCrVrMkREL7Gsosuw
-         PQi2LxSlYYG0Xe6M2/oG+AQ2VWtWr77BmDMTyPYOmnkEpFeociCr90OeSmg15ljlOzgs
-         /qIA==
-X-Gm-Message-State: AFuF++kfG0yvFDKQoQ5E76TtyU7tbbhtY4AKIRKoEHMrx/ZOZ5ChNzRg
-	gSJlH2B9EymBLSESH9AnUrbufgbRHOD70CH4kMvC4VUTLIFNPlOMW1vyqYqN4A==
-X-Gm-Gg: AR+sD13jgv3DG+aAneZ7H3h7/8ZUDGjTtxsMuiH1bb/OfI9IZJFFXYAIJDzQuwQimGK
-	beqXBtc8HcMoI3bMWzDW1jDtPAYWbXeejQP/03dR3mNNCGJApnHJyvYvfAdwPmaDUWknb/ZP0MN
-	G9kODk3OQo7j+UsTOkMmXONA0zPN1fFjVmd5fVlggNVPrpnV6AqdDTPQxTfO92I+gzxG1ajEyLo
-	3Arwd4/miS1vrfTkz8tkLWuPUf8KpGlfxjO7Ykr7JQADlxFpiPws/70gew7txF5faf/Q5y9247p
-	HDNpiPcYsvXgtGIDXuht8tZmLn2s4dNMMzty1uJeixMWU4Thv8bgBMREtFnrlaB8pqn6Lx4GrrG
-	feEYmfyik7VTi+ivHOHAr+BPU99gaqH/GFBu5z7MkMSxeefbohv2u1fyAZ8LKHULG7hO9fqUDES
-	TJ/1FP/6/yGRmkEJ4/glUtQF4p9OnK8yN6zVptvwiuRSRSRZriQ4dv05fUdEVEqwF3FA==
-X-Received: by 2002:a17:90a:fc47:b0:380:105f:8ffd with SMTP id 98e67ed59e1d1-395df5e76b5mr11836191a91.16.1787410195745;
-        Sat, 22 Aug 2026 07:49:55 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.59.0])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327f925190fsm14894966eec.31.2026.08.22.07.49.54
+        d=1e100.net; s=20251104; t=1787411196; x=1788015996;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=rKgGlVcx92xJ7O+3f3QvGBGuWZWQmGRABTn/2Re+yLY=;
+        b=MVuAmnhpJGU1/mXVuPGN8mriaotDIRSeC6Kc8yC9ypfYv3A2/0CA2c3hOrPvymMMYD
+         UAgseIddyPzqK7DAIGqEf3eKPscVcGmJarwDvHSwiA9zUYAAgIpGZ9GGTLEPcpGZx6se
+         krWE0C9sdANOGXCIo3xcSuBvhfn7y97uJU9X3Fn7glaDPzosniWr+N/LPad9kbbWOb0Y
+         l2dqGl/zFTbjJr7VhFMH27YClzRcGw5bDiqO7MdGbyBgNCN1YkXDr3P+bhvMwx0RvFQn
+         sGDShBzMNGhJ/0LPnST18dq2UpL55dBf1bPoub0Wd+zu3Qc0rQ3d2bPmN6Vf32n4BSml
+         7jLw==
+X-Gm-Message-State: AFuF++kPw50LCi4m9hJ6/pQzCE39jVDgfhNhQhxV6eDFwCj72rMnQKeq
+	TLFhC3dA6vq+71Vnc0cUSeBuYTkjTdh0c4HnBkK81kp3T09WkolJmlRh
+X-Gm-Gg: AR+sD1227FeXAwGpi/bIezvFLiXLUK4++Fo0qpimYdM1VjW60TssRgqMHunPgSiwpuf
+	oF4Oczbz0nKEmziY8deTlIH+O9EUufQSP56yAl28dSoWe2yHqEVDy0eiP/Yf6JBMfBAvJuBy9vA
+	Mt6DHf7oiOFnJFe9Ta8v8MKN+qm5LXC1JuCjpvAxyE3oHSVlazMSeXgNHA7YgFOdqzEY8b13r58
+	jrSBg/kNAtxEF9sdpf9GeSqySTZRLq1QV0ZtRvk2imkybg9ZNGHJgzI2ZnKG2FrPZzrIrumggLg
+	HX2VOAu7SwCleQhkWH2RD7thORteEjRbVcCkf4Hd7wec4e2QFYQmtGkQoIZJ2vwGsYT7sA1W3yc
+	PE6dfPOo9P4binLvxlDRgzrqj8dCKkW/Yns6bhP6gXKQXH5bU2vwrDNcuD5IFE9Uks+5xBl/c9F
+	jZ38wEB/ZEIVr4cRruL3q/Xpt16OOl+23DLKNLrjoCiQkNRc2yzJ0Lz2RwZ6UhzCXVuvGV52xqj
+	s8Oh/Qj9i5rYZXj8TDi3Gy0cQWdv9shEMCJd+grBuzVNlHWClvujjI=
+X-Received: by 2002:a05:690c:b96:b0:81f:45f0:21b7 with SMTP id 00721157ae682-849ea4f7f47mr64125317b3.0.1787411195669;
+        Sat, 22 Aug 2026 08:06:35 -0700 (PDT)
+Received: from localhost.localdomain (45.78.65.84.16clouds.com. [45.78.65.84])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-84cacac521asm11239257b3.48.2026.08.22.08.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Aug 2026 07:49:55 -0700 (PDT)
-Message-ID: <6a89b713.633cb3bb.1b53a6.68fa@mx.google.com>
-Date: Sat, 22 Aug 2026 07:49:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6381874518675395676=="
+        Sat, 22 Aug 2026 08:06:35 -0700 (PDT)
+From: Chengfeng Ye <nicoyip.dev@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Chengfeng Ye <nicoyip.dev@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Pengpeng Hou <pengpeng@iscas.ac.cn>,
+	Jiale Yao <yaojiale02@163.com>,
+	SeungJu Cheon <suunj1331@gmail.com>,
+	Ali Ahmet Memis <ali@iusegentoo.com>,
+	Tim Bird <tim.bird@sony.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH v2] Bluetooth: RFCOMM: serialize session teardown
+Date: Sat, 22 Aug 2026 23:06:19 +0800
+Message-ID: <20260822150619.3684599-1-nicoyip.dev@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kserwus@gmail.com
-Subject: RE: Bluetooth: detect broken extended scan instead of guessing by chip id
-In-Reply-To: <20260822141115.58815-2-kserwus@gmail.com>
-References: <20260822141115.58815-2-kserwus@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6381874518675395676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+rfcomm_kill_listener() walks session_list and deletes every session
+without holding rfcomm_mutex, unlike the normal session processing and
+connect error paths.
 
-This is automated email and please do not reply to this email!
+Under normal operation, an open RFCOMM socket pins rfcomm.ko, so
+rfcomm_kill_listener() does not run concurrently with rfcomm_dlc_open().
+However, forced module unload via delete_module(O_TRUNC) can stop
+krfcommd while a failed connect is still unwinding.
 
-Dear submitter,
+  connect task                    forced unload / krfcommd
+  ------------                    ------------------------
+  rfcomm_lock()
+  rfcomm_session_add()
+                                  delete_module("rfcomm", O_TRUNC)
+                                  rfcomm_kill_listener()
+                                    fetch session from session_list
+  kernel_connect() fails
+  rfcomm_session_del()
+    remove and free session
+                                  rfcomm_session_del(session)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1150202
+The final call then reads the freed session and may corrupt the list.
 
----Test result---
+KASAN reported with mdelay() to enlarge critical window:
 
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.43 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      20.32 seconds
-CheckAllWarning               PASS      22.65 seconds
-CheckSparse                   PASS      21.49 seconds
-BuildKernel32                 PASS      19.81 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      362.13 seconds
-TestRunner_l2cap-tester       PASS      51.12 seconds
-TestRunner_iso-tester         PASS      65.77 seconds
-TestRunner_bnep-tester        PASS      14.77 seconds
-TestRunner_mgmt-tester        FAIL      176.89 seconds
-TestRunner_rfcomm-tester      PASS      19.67 seconds
-TestRunner_sco-tester         PASS      24.96 seconds
-TestRunner_ioctl-tester       PASS      20.31 seconds
-TestRunner_mesh-tester        FAIL      20.53 seconds
-TestRunner_smp-tester         PASS      18.07 seconds
-TestRunner_userchan-tester    PASS      15.48 seconds
-TestRunner_6lowpan-tester     PASS      17.80 seconds
-IncrementalBuild              PASS      21.42 seconds
+  BUG: KASAN: slab-use-after-free in rfcomm_run+0x3802/0x3f00 [rfcomm]
+  Read of size 8 at addr ffff888111058d40 by task krfcommd/79
+  Tainted: [R]=FORCED_RMMOD
+  Allocated by task 86:
+   rfcomm_session_add+0xa1/0x300 [rfcomm]
+   rfcomm_dlc_open+0x8b2/0xf30 [rfcomm]
+   rfcomm_sock_connect+0x34c/0x530 [rfcomm]
+  Freed by task 86:
+   kfree+0x121/0x3c0
+   rfcomm_dlc_open+0xab7/0xf30 [rfcomm]
+   rfcomm_sock_connect+0x34c/0x530 [rfcomm]
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+Hold rfcomm_mutex across the teardown traversal so every reachable
+session_list walk uses the same serialization.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.188 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.922 seconds
-Mesh - Send cancel - 2                               Timed out    1.988 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/634
-
+Reviewed-by: Ali Ahmet Memis <ali@iusegentoo.com>
+Tested-by: Ali Ahmet Memis <ali@iusegentoo.com>
+Reviewed-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+Changes in v2:
+- Rewrite the changelog to describe make clear trigger: forced module
+  unload with delete_module(O_TRUNC) and temporary delay widening.
+- Drop the Fixes tag.
+- Drop Cc: stable.
+- Add Ali Ahmet Memis's Reviewed-by and Tested-by tags.
+- Add Pauli Virtanen's Reviewed-by tag.
 
+Link: https://lkml.iu.edu/2608.2/10891.html [v1]
 
---===============6381874518675395676==--
+ net/bluetooth/rfcomm/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 9cdfea666a2c..5fe2758e8c47 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2178,8 +2178,10 @@ static void rfcomm_kill_listener(void)
+ 
+ 	BT_DBG("");
+ 
++	rfcomm_lock();
+ 	list_for_each_entry_safe(s, n, &session_list, list)
+ 		rfcomm_session_del(s);
++	rfcomm_unlock();
+ }
+ 
+ static int rfcomm_run(void *unused)
+-- 
+2.43.0
