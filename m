@@ -1,200 +1,242 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.61.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A359356A0D;
-	Sun, 23 Aug 2026 09:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.61.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E569366816
+	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Aug 2026 09:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787477999; cv=none; b=Suz/UjZL583RmY1hWh73aGMgPcFEiM7qpGptT2nAiG+A8K25T6eGGGPLAVvSKKkc3kKfAU2Zzs2iXbkkCpt6gCNTLz9fyg85TXVq9CkcsvY//OJYwaEHpzXX3WQif9/qcwnxe7SLIyx4g8wTF0Tn+NdRj3thaKYQiOIS82eIVtc=
+	t=1787478959; cv=none; b=dxBPEe8esHtm9U2iZ05RIc7GzO+T3C8zXDYNMzUgtehtVOT7aVtoDuHDbzSUUaGh9DQvsDJG0HKWN1DozRM033lqOhKo5mhRXv362ci39eyioQSix66R0ePzv9so3sWhZ3AdhJ4zbzl3xmbAZCiiT3g8+NE1g8H3RZj9DccnB88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787477999; c=relaxed/simple;
-	bh=ftx9u6xLsxE3noaPLhxxbCkOHccXa7Ry5dy3qW+WJpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TfZcrzsNFu3c/UVMG852fU4LfxD8YQl83ZCyekA4O8synQ2HeexKDl5yh8O6L+fEENmIW+5yHZZTyV6r+hP4xCJR9BGtSAJyFYeIcCVHuABBdcGpaHnNGXo929iLsmc3yW6srHoMea6NIFMCrWxhqxalIIao6lt0OnVR0hWH16U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=hrmimnUk; arc=none smtp.client-ip=188.68.61.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1787478959; c=relaxed/simple;
+	bh=XMMGhYP59luII3hmiCnrUic5QXcsTg2gH/IMDu3Tc4I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FbrYgg14gEcj6GtnfZ29PZK7KDa+NucME/e4Be4pFBNeTU3NzWDAC5vT9j3LrwJj6j9BymyirfJ50RvXWCKvtnKHgLQhkf78Dcd/PY9wAECrKSJo89hhO79pw4731PeQOZtRAkbBektLCvac1tk8umSchZan+LiMOVFBzUmTrNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IshQyjRc; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="hrmimnUk"
-Received: from mors-relay-8403.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4hSTXf4nVjz8JWk;
-	Sun, 23 Aug 2026 11:39:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1787477986;
-	bh=ftx9u6xLsxE3noaPLhxxbCkOHccXa7Ry5dy3qW+WJpU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hrmimnUkT6bfwgStjJK7YEv8bUiurUqDOcRa2pqDUmKJgao9ohcCG3/l2cHv0nRXy
-	 aCiPXjX+yyzdhMf/7cYl8sR7vK9TU9CdhZB8bX26rv6eLwjN5OJ3r0bpgoFYglw4WQ
-	 XEu8iJaYeYrOXJrBMHQ21CXmJovz5V3P+Fc7UI+zYyXmsEJe8mAwCZ0GKg2qauSEwy
-	 VCV0ilNTzSn7Pn+CvR4TuNKmVlgH1qQPyogHEfoPP3Gk+JQoNVDiH1ROSi10NW3mbB
-	 De/sLkn3KOqLlCcErRqeZbeJBgoM6OLQeCbBy/5soqo0TcTWXgD+KcfUJZSfvdh/Wl
-	 lPpK/iA0Pb2Gw==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4hSTXc2Wd2z8JWK;
-	Sun, 23 Aug 2026 11:39:44 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4hSTXb1r5Vz8sb9;
-	Sun, 23 Aug 2026 11:39:43 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 8D9CE5FAE4;
-	Sun, 23 Aug 2026 11:39:42 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <68dc7fba-ddda-4505-bdaf-4bb7af2df44e@leemhuis.info>
-Date: Sun, 23 Aug 2026 11:39:41 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IshQyjRc"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2cace91f112so27160745ad.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Aug 2026 02:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787478955; x=1788083755; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GYc/dM8G7XqLtprpN5SLNeRbkfYO7LaPYZyCfmqct0Q=;
+        b=IshQyjRcsdGEVZ9G7o+zb6914l3SXl+OekNgqH+enGCBTaGN4HwqMji+kVvDusM5A2
+         0Iaz/bd38YoF1ei3bDtmcpsbh/Jq6xaMFHZbLbUUwkmEE9ZXDfnzPEH7DXdJJDRjwmaH
+         YsjryZiG+JfAl4X/FC84lGRW9CNg3mPGTGxNsRWNL4DrjNSxD1fA4d02Mg68yH6iplTf
+         /EWBbJ/OQ+0xx9JKkmE1iy+HpVALojgQu0v22f7TSCFRaCXN7uKjLW0qsBe6pBHEm4vp
+         UFJMUewv7ynowJ/ixV/8o9oAcpNpsERixd63ZGyUx1uoh2ogdc7kWvbcMV7pzl4A/mwK
+         1PIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787478955; x=1788083755;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GYc/dM8G7XqLtprpN5SLNeRbkfYO7LaPYZyCfmqct0Q=;
+        b=SA3azU15tjnWKKWXe2FuNnx49lnD+iVRgfR3di3k/prNBs55fIUhBSG3EhpGvcdIXc
+         0M32K6siu4g7bu1BjefT8q7WFOSyRVEyvFlGRcJURYJ5cGiqtMzQyF+XQGaHUgyrRE3i
+         XxY1fad+YiayM3jtj3ZPRr5ufKmUSAjIrel6iJHllVShwc9NTy8lEH7La9kJYU4HoDnl
+         ZDg7wNBVPCj99uJaTtt3IOQQCs5OoH5acPatYN+vakN/bjOwg07qzjcLIEmFN0DlO2xg
+         XR7N8uUfzwUgZGHqcQFz9AQRkNh9sdRTCy+lNV7MNcY5TkfwWfiIXFtE0m/0s+V9Hin5
+         zBEA==
+X-Gm-Message-State: AFuF++kvp/oCxspWon0VaUBjuDnF7Y4HHwXTduU0GXoj+ruzzlcyx3Il
+	5oTaL8bJPGJdIhlOaJDo3XIhIHUDKwI2u764melh+nqkCeE0AI3EzrE=
+X-Gm-Gg: AR+sD11tlIlDbxfwywMX1FcyASWS9gejNwbqXh+fJsjcPKkzututdYEdeN7+nJVavSC
+	XxT/UITmpYIeMglMDdhDEFwGcal91jVSKumVAOp60nFCnHJ4KcJLDX86AW135UcyL2pN0iJX5h0
+	vprJzikzacGgMtEjFH+nc+gswBbaBqFA9xiCN0XwIQD2YRbjgObn5YMxi9r12hRhpF9imjoP5Z5
+	Kud5Pm56B1/Vdw12EaXQweeafq6Y+MdXZ8HObRwvxbspS9jt5ZxIqF0Di9KV6XFj+gcoAW/msbw
+	hIG+XidChV7tBEyRXiDT8WFN5nrbnMcR+5OYyMurdO8AF/MFMZ1dqTk01e0fkhdubQZS+Qx7SQs
+	5tVCnG5Jtd2VRy9jy1NWepcqJavmKk337ClkUkaOy788bZOzlUGti/JxrABVBeiSm2bFqVZieDf
+	tNgjRj//ZWVanYSFJkNRbWPMcXmGQcDBl9bWYi2zHrRr4ImeUUgxjegR50npZV1PbnQ3JkVDqNw
+	s/hADfBNjjvR49w3Vo3ljXgIDyNevD89RSZRviuNmLf7uNkAHwRJ4GX+mI8gVM4T29HRw==
+X-Received: by 2002:a17:902:f70b:b0:2d6:3c2f:6a4 with SMTP id d9443c01a7336-2d670d07a21mr195309555ad.13.1787478955162;
+        Sun, 23 Aug 2026 02:55:55 -0700 (PDT)
+Received: from codespaces-2db70c.m2fxbej512jepnsor2itp05j3d.ix.internal.cloudapp.net ([207.46.224.81])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d676895391sm8922535ad.45.2026.08.23.02.55.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Aug 2026 02:55:54 -0700 (PDT)
+From: Triet Hoang <triet.hoang.dev@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Triet Hoang <triet.hoang.dev@gmail.com>
+Subject: [PATCH] Bluetooth: Remove unnecessary braces
+Date: Sun, 23 Aug 2026 09:55:26 +0000
+Message-ID: <20260823095527.57473-1-triet.hoang.dev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/2] Bluetooth: detect broken extended scan instead of
- guessing by chip id
-To: Kamil Serwus <kserwus@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: Alexej Sidorenko <alexej@sidorenko.cz>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, regressions@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20260822141115.58815-1-kserwus@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <20260822141115.58815-1-kserwus@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: 
- <178747798296.2482991.13838159982066758837@mxe9fb.netcup.net>
-X-NC-CID: vO/itB60kEuuOyfmVl320RxER75AOQXY34as42vAZ5MzP95ftss=
+Content-Transfer-Encoding: 8bit
 
-Hi! Thx for the report.
+Removing unnecessary braces and splitting statements
+onto separate lines, with no functional change.
 
-On 8/22/26 16:11, Kamil Serwus wrote:
-> commit 5ead2063611ae5 ("Bluetooth: btrtl: fix RTL8761B/BU broken LE
-> extended scan"), which landed in v7.2,
+Signed-off-by: Triet Hoang <triet.hoang.dev@gmail.com>
+---
+ drivers/bluetooth/btusb.c         | 3 +--
+ drivers/bluetooth/hci_ldisc.c     | 3 ++-
+ drivers/bluetooth/hci_serdev.c    | 3 ++-
+ include/net/bluetooth/bluetooth.h | 3 +--
+ net/bluetooth/hci_conn.c          | 9 +++++----
+ net/bluetooth/hci_core.c          | 3 +--
+ net/bluetooth/l2cap_core.c        | 8 +++-----
+ net/bluetooth/mgmt.c              | 3 +--
+ 8 files changed, 16 insertions(+), 19 deletions(-)
 
-And a few days ago made it to 7.1.9 and 6.18.45. :-/
-
-> regresses a different RTL8761BU
-> dongle than the one it was written for. This series reports that and
-> proposes a way out that should not need a new patch per dongle.
-
-Not my area of expertise, so the bluetooth maintainers might disagree
-with me, but FWIW:
-
-Given the above and the fact that we are in the merge window right now
-I'd say the better approach would be to fix this fast by reverting the
-culprit in mainline (then stable can pick up the revert to fix the
-problem there) to buy time to work this out properly.
-
-Would you maybe be willing to submit a revert?
-
-Ciao, Thorsten
-> The regression
-> --------------
-> 
-> Hardware here is USB 0bda:8771, firmware 0xdfc6d922, ROM lmp_subver
-> 0x8761 - an RTL8761BU, so CHIP_ID_8761B, so it gets the new quirk, which
-> makes use_ext_scan() false and moves scanning from LE Set Extended Scan
-> Enable (0x2042) to the legacy LE Set Scan Enable (0x200c).
-> 
-> This dongle is the opposite of the one the quirk was written for:
-> extended scan works flawlessly, but the firmware stops answering the
-> legacy scan-disable command about ten seconds into any scan:
-> 
->   Bluetooth: hci0: command 0x200c tx timeout
->   Bluetooth: hci0: Opcode 0x200c failed: -110
->   Bluetooth: hci0: Unable to disable scanning: -110
->   Bluetooth: hci0: disable scanning failed: -110
->   Bluetooth: hci0: Resetting usb device.
->   Bluetooth: hci0: start background scanning failed: -110
->   usb 3-1: reset full-speed USB device number 2 using xhci_hcd
-> 
-> btusb resets the device, it re-enumerates (hci0 -> hci1 -> hci2 -> ...)
-> and every connected BLE device is dropped. With a Bluetooth keyboard and
-> trackball that leaves the machine with no input at all.
-> 
-> v7.1.7 drives the same dongle, with byte-identical linux-firmware and
-> identical CONFIG_BT_HCIBTUSB_*, for eleven hours and nine BLE HID
-> connects without a single scan error.
-> 
-> Why not just narrow the quirk
-> -----------------------------
-> 
-> Nothing available at setup time separates the two dongles:
-> 
->   - same project_id (CHIP_ID_8761B)
->   - same ic_id_table entry, IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB)
->   - same firmware file, rtl_bt/rtl8761bu_fw.bin
->   - both advertise the extended scan commands in commands[37]
-> 
-> They differ only by USB id, which btrtl_set_quirks() cannot see.
-> driver_info cannot carry it either: 0bda:a728 has no entry of its own, so
-> it falls to the generic Realtek entry in btusb's quirks_table -
-> USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01) - which precedes
-> the per-device entries. usb_match_id() takes the first match and
-> 0bda:8771 also presents e0/01/01, so the specific entry for it at
-> quirks_table:840 never applies.
-> 
-> What this series does instead
-> -----------------------------
-> 
-> The quirk is documented as being for controllers which "erroneously
-> claim to support extended scanning" - and one that claims support in
-> commands[37] and then answers Command Disallowed is saying so itself.
-> Patch 1 latches the quirk right where that command is issued; every
-> later scan uses the legacy commands. Patch 2 then drops the static
-> per-chip-id guess, which 0bda:a728 no longer needs. In this order the
-> series is bisectable: patch 1 alone changes nothing for anyone whose
-> quirk is already set at setup.
-> 
-> An affected controller pays one rejected scan round per power cycle
-> instead of a permanent stream of failures, and dongles nobody has owned
-> yet are handled without waiting for a patch.
-> 
-> The latch is sticky, as quirk_flags is never cleared, so it matters that
-> false positives are unlikely: hci_passive_scan_sync() always disables
-> scanning before starting it, so the controller is never asked to enable
-> a scan that is already running - the obvious legitimate source of
-> Command Disallowed.
-> 
-> Testing
-> -------
-> 
-> Built and running on v7.2 on the 0bda:8771 dongle. Extended scan is used,
-> the quirk is never set, no 0x200c and no controller resets, and a
-> keyboard plus a trackball stay connected across repeated LE scans - the
-> exact sequence that wedged the adapter within ten seconds before.
-> 
-> What I cannot test is the other half: I do not have a 0bda:a728, so the
-> err == -EBUSY path has never executed here. Alexej, does your dongle
-> still work with this series, and do you see the "extended scan rejected,
-> using legacy scan" warning once? Also, 0x2042 carries both the enable and
-> the disable, so I cannot tell from your report which call site returned
-> -EBUSY - knowing that would tell us whether a single rejected round is
-> really all it costs you.
-> 
-> Sending as RFC mainly because patch 1 sets the quirk at runtime, while
-> the existing comment says it is set before hci_register_dev or in
-> hdev->setup. I updated that comment, but if you would rather keep the
-> quirk strictly setup-time I am happy to respin as a USB-id match in
-> btusb.c instead - it just needs the quirks_table ordering sorted out
-> first.
-> 
-> #regzbot introduced: 5ead2063611ae56809b1b113ac44cef9547c81d7
-> 
-> Kamil Serwus (2):
->   Bluetooth: hci_sync: latch broken ext scan on Command Disallowed
->   Bluetooth: btrtl: drop the blanket RTL8761B extended scan quirk
-> 
->  drivers/bluetooth/btrtl.c   | 13 -------------
->  include/net/bluetooth/hci.h |  4 ++--
->  net/bluetooth/hci_sync.c    | 15 +++++++++++++--
->  3 files changed, 15 insertions(+), 17 deletions(-)
-> 
-> 
-> base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index be82bbbc1b5c..407daaa427f4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1076,9 +1076,8 @@ static void btusb_intel_reset(struct hci_dev *hdev)
+ 		/* If ACPI reset method fails, lets try with legacy GPIO
+ 		 * toggling
+ 		 */
+-		if (!intel_data->acpi_reset_method(hdev)) {
++		if (!intel_data->acpi_reset_method(hdev))
+ 			return;
+-		}
+ 	}
+ 
+ 	if (!reset_gpio) {
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 58f5504a336e..680f1939f0a3 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -248,7 +248,8 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ 	disable_work_sync(&hu->write_work);
+ 
+ 	if (hu->tx_skb) {
+-		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
++		kfree_skb(hu->tx_skb);
++		hu->tx_skb = NULL;
+ 	}
+ 
+ 	/* Flush any pending characters in the driver and discipline. */
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 593d9cefbbf9..5b0e0c6364cb 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -98,7 +98,8 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ 	BT_DBG("hdev %p serdev %p", hdev, hu->serdev);
+ 
+ 	if (hu->tx_skb) {
+-		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
++		kfree_skb(hu->tx_skb);
++		hu->tx_skb = NULL;
+ 	}
+ 
+ 	/* Flush any pending characters in the driver and discipline. */
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index b624da5026f5..4873e8c859f2 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -600,9 +600,8 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+ 		struct sk_buff *tmp;
+ 
+ 		tmp = bt_skb_sendmsg(sk, msg, len, mtu, headroom, tailroom);
+-		if (IS_ERR(tmp)) {
++		if (IS_ERR(tmp))
+ 			return skb;
+-		}
+ 
+ 		len -= tmp->len;
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 19b7629b1cc1..324c92bbb10b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1364,11 +1364,13 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, uint8_t src_type)
+ 			}
+ 
+ 			if (!bacmp(&id_addr, src) && id_addr_type == src_type) {
+-				hdev = d; break;
++				hdev = d;
++				break;
+ 			}
+ 		} else {
+ 			if (bacmp(&d->bdaddr, dst)) {
+-				hdev = d; break;
++				hdev = d;
++				break;
+ 			}
+ 		}
+ 	}
+@@ -1479,9 +1481,8 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	 * to connect.
+ 	 */
+ 	conn = hci_conn_hash_lookup_le(hdev, dst, dst_type);
+-	if (conn && !test_bit(HCI_CONN_SCANNING, &conn->flags)) {
++	if (conn && !test_bit(HCI_CONN_SCANNING, &conn->flags))
+ 		return ERR_PTR(-EBUSY);
+-	}
+ 
+ 	/* Check if the destination address has been resolved by the controller
+ 	 * since if it did then the identity address shall be used.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 509c820a693d..c9ee533bb8d1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2892,9 +2892,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	/* Check if the driver agree with packet type classification */
+ 	dev_pkt_type = hci_dev_classify_pkt_type(hdev, skb);
+-	if (hci_skb_pkt_type(skb) != dev_pkt_type) {
++	if (hci_skb_pkt_type(skb) != dev_pkt_type)
+ 		hci_skb_pkt_type(skb) = dev_pkt_type;
+-	}
+ 
+ 	switch (hci_skb_pkt_type(skb)) {
+ 	case HCI_EVENT_PKT:
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ee459dd411f5..975dd033991f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1431,11 +1431,10 @@ static void l2cap_le_start(struct l2cap_chan *chan)
+ 
+ static void l2cap_start_connection(struct l2cap_chan *chan)
+ {
+-	if (chan->conn->hcon->type == LE_LINK) {
++	if (chan->conn->hcon->type == LE_LINK)
+ 		l2cap_le_start(chan);
+-	} else {
++	else
+ 		l2cap_send_conn_req(chan);
+-	}
+ }
+ 
+ static void l2cap_request_info(struct l2cap_conn *conn)
+@@ -4618,9 +4617,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
+ 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
+ 
+ 	chan = l2cap_get_chan_by_scid(conn, scid);
+-	if (!chan) {
++	if (!chan)
+ 		return 0;
+-	}
+ 
+ 	if (chan->state != BT_DISCONN) {
+ 		l2cap_chan_unlock(chan);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 860c086011b7..9494ecf8d2f0 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -818,9 +818,8 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 		settings |= MGMT_SETTING_BREDR;
+ 		settings |= MGMT_SETTING_LINK_SECURITY;
+ 
+-		if (lmp_ssp_capable(hdev)) {
++		if (lmp_ssp_capable(hdev))
+ 			settings |= MGMT_SETTING_SSP;
+-		}
+ 
+ 		if (lmp_sc_capable(hdev))
+ 			settings |= MGMT_SETTING_SECURE_CONN;
+-- 
+2.53.0
 
