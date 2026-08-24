@@ -1,87 +1,156 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74163EC80B;
-	Mon, 24 Aug 2026 07:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92EF329391
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787555611; cv=none; b=BwFyaZuIuXKqNV6tGDX3ltFDoCNJfZpJnbIYzrj6tZm4IDy5F27UViMV8l5Brxnncv+oGKw5mN2/8Fr8rCKQGnkaC2TmOGDC2c4kvd+A4TODgg6Dy6OMXOBDV/P/XqnAWM1hg+FcAmElv8QqsAu0Q/gEenY05GjU0aPQ6tNbvUI=
+	t=1787558591; cv=none; b=W8GL22s/qrHbMqQXivufaJVuhU1DCBsf57aDmceuIMV8TTxtNKtPPYi7bJBUKFOnOxcgnxnFHBLsj3wd6RaIy11FpzquEswhmDAVlsz0zQoWZNlSN8P9p/taoRjtGjAJcbvbSNZ4gE8rI+EC+ea0BRjgN9HeNTecU/Z6EukHiFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787555611; c=relaxed/simple;
-	bh=KgYGyKzfgqxtIgzivSptqZf2glC4PPt5W3T0cYfJAWo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z9I+W3qjgLeUyvIsTTgONc4Bq/h8MDo0BBxFvOR2sbfIAdvrpKwH+yfqWF1Q7ncYUgEDeePMLY8U4dQeFK515w/aOuMKog0XPdE11h0eUjSgJXCkFrAJYEF1yU7n2WfH36lJvUlnpSiXt7SDT6po7EUGZplTD17401JPS1aSrI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fR40m1fi; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1787558591; c=relaxed/simple;
+	bh=6vU4mIPzwuDHCAEyLxfQ+W0XpGH8LYKV93FHF8433UA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qRxFmxbxj5yvEZJJrVfC0KfujTTJJVEI5cmaeOpvwWtXMp2wyyVy9nwnEIAxpafJ5teXkmyMDtdYgDVwN8cWNBBmGJOxpWRFxUODgv4XRwfNGiCnBrBNcE9R/WFixaTl6GdKlcnfmMr2FyNlE+2Kk509y0liSJr4DLu/tDOPRmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nTJ9tcz6; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fR40m1fi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=/N
-	4jKlEURceAiGz/EkfzfrY/RiKZUW+3+nM25WgHLjg=; b=fR40m1fiQycyrMh0ZZ
-	y14eha/QEAT+mB/lheEh/lCHT7YmCANWGtuNMxWAXn6qRgi30QH91fsifQerADzc
-	3Pp9M4Cwb+FYJbuTI9p+WBaqu5kzDGy4V6qtjTrM43NMtTZe+J3ld0aB0GgGYptq
-	t5U0okEFJYrCOJJSg2KBpw/RY=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wA31gL77otqUCtOQw--.27815S2;
-	Mon, 24 Aug 2026 15:13:00 +0800 (CST)
-From: Gongwei Li <13875017792@163.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gongwei Li <ligongwei@kylinos.cn>
-Subject: [PATCH] Bluetooth: hci_mrvl: Fix wrong return value check of wait_on_bit_timeout()
-Date: Mon, 24 Aug 2026 15:12:57 +0800
-Message-Id: <20260824071257.2791009-1-13875017792@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nTJ9tcz6"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-93738ebbffaso150000885a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 01:03:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787558589; x=1788163389; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=fB65jIyGIhMpvM04yhtSg9gJy26qRCc1IE5V92Bk/js=;
+        b=nTJ9tcz62rAHC4ni1icsRU0RrlVkByKgUI9WUSCxiMgZ59UFwjLS8Ptc7asyW+A6H3
+         hQ6Nky/kP1mBsXNQgLerHRwuFcM+uUdfE+ECfl2YUGFWEwpuVpxD8+dcFAU5hqSDgOfV
+         ewmh3uwvsqD+p6e30If9HJBNQDRdnU5Yog4CCft8gcB39ap2QdxhKbvxGIORa6YyrBBo
+         6wui8DIbK+lj3ANfc93mVCzeC6ithyjLAEwjUmCQcb/OLm30qHXPIE5jzJMK3tVxyDYL
+         0SqkEokPxKTz7OI/Vy3jT4VRGDUlBwAbQgZZyXaQ53xIFpd7qxNJCd6VDdRwV9yAN2IW
+         Go1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787558589; x=1788163389;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=fB65jIyGIhMpvM04yhtSg9gJy26qRCc1IE5V92Bk/js=;
+        b=sA00t3deFFkLgLcR8HTRj2vynX+X97AKat9ChED7I43jrfBc8FUR5XzNJspCvNF8SX
+         y8/fNEbvx2PgBqx0/iVwXoJ1EJxjguZM4A5Fy12+Qp64AixgHi1t1p/BX/wIcCMTb0Og
+         6QULSXzRH3RinPtOGUxOXX/d4ixdLJTcQK0sQlxLFAjHo5/NSxipw4nAU6la7GtBSHCF
+         LvjrPdMKDzchUgxfYKiHVl2REIQZFABdNrDTytt/tr+wTHQf1tSJuHhveAAPRVbBCvoi
+         rrhr74M9EUuXrV0g+SgJWw9gfQ/N0nmvqcQGzBk43wCqoY2VXO5UAesnqEwvpNnpCscU
+         QipQ==
+X-Gm-Message-State: AFuF++mDMtIezxeaPoi937Lr0LsvSC/NJR8GBa89f1iqS5QQ32gzYO/F
+	BXIHxK1RUNS4t1u0vVaBUIdNRyM5YKw/B3wqpoc/rjEpsbe8QSnSs76Hh4fCWA==
+X-Gm-Gg: AR+sD10KSKeg21gxcKd7X5gi3XzWpSaTekcyCbDIgC+XBemlvT2dSrjac+l1lbHIi8S
+	Dnk7+6svaknwTU8k1tbT/bzm+nlM390nDhvjn5KfDtAJS2S+KxTmuCdR/nLPTtV3kYwUn3EsT5I
+	JuzcBRlTXT7nJfsyz8Uby6lFbrRPWKau9QOk2eXAppLN0oRtwlUbwR1OGkW3JD/BzVH5Hd51rjE
+	Ms8BSbxtEx0tlxJYMIaGfOGlTdXIZ6MG3yB7Kf8Pjr4QQ+S63zOw6LcPKaUnVIjvHIPBs1wuXpJ
+	5IrQFkbsT5TNjHjKW3YemfAzzwH2y9g27G69WUGTpP5cRVkpg5ule8AFNqvsosU1h64oq8RP3rJ
+	HUNFrCPJMu7Zsi+DGasVSeS0pKkEIDnBA3M62boEUoFsdoC4Quts47fDzJu7JVVu1J93Lys3U39
+	fx8hePnRaoMbM9zYrOGMsI7zPzM+4CTO+LhpONRXc8p8NZADKLL/D+H/034rceVTDkuI2rGI/9r
+	0Q8arcL
+X-Received: by 2002:a05:620a:a90a:b0:92e:61f1:6b72 with SMTP id af79cd13be357-93739467daemr1930030285a.13.1787558588793;
+        Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
+Received: from [172.17.0.2] ([135.237.130.147])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93749d9544dsm448750185a.27.2026.08.24.01.03.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
+Message-ID: <6a8bfabc.e0a65cc7.2e1605.9af6@mx.google.com>
+Date: Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8886354999287210001=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wA31gL77otqUCtOQw--.27815S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Ww1fCw1kWr4fXFy3ur4Durg_yoW8GrW7pF
-	WYg3WqyFWDGrW3Xw1DAw4ruay5Zwn5XrWjkFn2k34fAr4YyFZ5Zry0yas8tFy3GrWrtw15
-	ZF95Xr4fA3WUAF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jnZ23UUUUU=
-X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/xtbC4Rx4M2qL7vythgAA3u
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 13875017792@163.com
+Subject: RE: Bluetooth: hci_mrvl: Fix wrong return value check of wait_on_bit_timeout()
+In-Reply-To: <20260824071257.2791009-1-13875017792@163.com>
+References: <20260824071257.2791009-1-13875017792@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Gongwei Li <ligongwei@kylinos.cn>
+--===============8886354999287210001==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-wait_on_bit_timeout() returns 0 if the bit was cleared, -EINTR if the
-process received a signal and the mode permitted wake up on that signal,
-or -EAGAIN if the timeout elapsed.  It never returns 1.
+This is automated email and please do not reply to this email!
 
-Hence the check "err == 1" in mrvl_load_firmware() is dead code: when
-the waiting task is interrupted by a signal (-EINTR), the code falls
-into the "else if (err)" branch and misreports it as "Firmware request
-timeout" with -ETIMEDOUT instead of propagating -EINTR.
+Dear submitter,
 
-Fix this by testing for -EINTR so that an interrupted firmware load is
-properly detected and reported.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1150676
 
-Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   31.89 seconds
+VerifyFixes                   PENDING   31.72 seconds
+VerifySignedoff               PENDING   31.73 seconds
+GitLint                       PENDING   32.84 seconds
+SubjectPrefix                 PENDING   31.80 seconds
+BuildKernel                   PASS      26.32 seconds
+CheckAllWarning               PASS      28.81 seconds
+CheckSparse                   PASS      27.40 seconds
+BuildKernel32                 PASS      25.23 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PENDING   496.43 seconds
+IncrementalBuild              PENDING   55.68 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: VerifyFixes - PENDING
+Desc: Verify Fixes tag format and validity
+Output:
+
+##############################
+Test: VerifySignedoff - PENDING
+Desc: Verify Signed-off-by chain
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - PENDING
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunnerSetup - PENDING
+Desc: Setup kernel and bluez for test-runner
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+https://github.com/bluez/bluetooth-next/pull/642
+
 ---
- drivers/bluetooth/hci_mrvl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-index 516b8f74c434..52badd1fe81a 100644
---- a/drivers/bluetooth/hci_mrvl.c
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -307,7 +307,7 @@ static int mrvl_load_firmware(struct hci_dev *hdev, const char *name)
- 		err = wait_on_bit_timeout(&mrvl->flags, STATE_FW_REQ_PENDING,
- 					  TASK_INTERRUPTIBLE,
- 					  msecs_to_jiffies(2000));
--		if (err == 1) {
-+		if (err == -EINTR) {
- 			bt_dev_err(hdev, "Firmware load interrupted");
- 			err = -EINTR;
- 			break;
--- 
-2.25.1
 
+--===============8886354999287210001==--
