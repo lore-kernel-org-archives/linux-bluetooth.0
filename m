@@ -1,217 +1,106 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF674248D9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 14:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787582152; cv=pass; b=YtoUR8rON/WZtyrF7yoPcW4lmH6aZ9oesB0JaZ14fIcKibDVhKKHeXiK1kTxpozqgTQV2f4Nb/g6JfDpdCtmyrDuUt8GjlZ493QoU6EFl5JEOvKodE+bzCh3+0Jor/fIRqMYVTPA5B+vubxO2lr7Qzp6w/S20+VxU1KfkOc+Je0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787582152; c=relaxed/simple;
-	bh=Y6V0kZp4BD8ZRN/0Gddqg9ImoedWspC2zyyA+T9P50E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jeGGKDo9fJqlgD/mw3e646OITS6oyC0uerMg8/8IsF1AYUUwq6WYkKIx64Hydh1Da4tF7hu/lK6GpQOzqf/qJXuhNQXputpW4kDxl4PNIxbu42fzvs78cJ0l6eimKqX3gkptmKqS6HXBfbN9SLYn2XEbyhgeb/mVEnDgFu0rrq8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqDrL1rn; arc=pass smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E26D363C5F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 14:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787582460; cv=none; b=CRhNU2gBKm7qXt8aUNMQwawYtx9XooshCwiujOfHBwYKPU+cwtLI18m5XeH6BIZ+DUS06P56TFRmVj5aSyVePKi7NkvDFHnLmHIJ7mQhUkefvQebHsB5qUbhdiUVLdRGfZEOZQv77OtuPhvTBajeboD84tZ8Gge9+GgDoQIzLIE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787582460; c=relaxed/simple;
+	bh=QvPRordQBEP+YJt89UXWlh9W5eenSZujQghB4DOd398=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XRAdTE0N4XJg/qYoT8YALHsy0TNTdSEBHKxcT13O9r4RONyF8Q2Pu88OhFxKbOAg+HHXgOg6erAtpz0N5GRwmw4vdR1oBduWyvj390/wTNOINiAm0SvHTvLGwHci63S4cb4V8DpS8yrESbE89SQgmgT/8XRkmPYtiS7reDQZm3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ju/BJszJ; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqDrL1rn"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-66c83e34212so4341970d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 07:35:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787582148; cv=none;
-        d=google.com; s=arc-20260327;
-        b=EsHQwBB8NI1GWtoCRjQz4hzRNS4/PEgm6WX2rEuKEeYvlIzLGA3lBh3BdRNWgYpX1A
-         cRQ0D5/REtNygMv6kAgGjyhReAenRKJ61pIAYQEyDnPc+DdXQdm40upO9J5n4Wa/Jx3m
-         FCC1GsNdk/7wYQvdFNb1pX4y7bRnAb1jvwye/bJsIvfjJIIv1p59NS/6LKruqVmIWLSP
-         u/dihvA0auUsZye60LIY+/0zwF8JEoOukhKvXLSRIiyYfe80YK/zYk68IKzSPcaWwAIL
-         ufclS/bcd8vN3R47m7BqO2DWyaKZVTLMA056f/oq5KoKmswarUnSeszab+AGHeQ1fJHl
-         GYtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
-        fh=0IIrL2vHaSckIk3+BullF3gqHfQOmvHORm3JUyU1vGw=;
-        b=bvvNZVhmprsWFRg2TSoKTMCzqvahDW0ZBZiBnNtQw6PEZuymxZYj9DQVMimp7/NCpA
-         CwdFcqtYHaIq2lpOM+QVHf3j3SKmTFtz7q2h49OYTlmUZVCZKwaiUBUFwnw7TG//6k2M
-         oouFnOS2fSs/4nddurB6EUR4YgiRI44qfuG7a7aVvA++tyiPrsapNuo4uG8Zw6Zll8V1
-         EYYMO5FTmXYLgQ8tyHoPKI8+mgZf22dzh/z4oNk4NNQHzkq5Ycyq5MRez2KCCCsdF/O3
-         YpTDDu4uxQT5hB2iEVNc//MDrDkGbSyg1dOH0nZEH43pGt8LeRZ0eyxax4UJYryT9kjt
-         67DA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ju/BJszJ"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-395ea741d07so1457044a91.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 07:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787582148; x=1788186948; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
-        b=eqDrL1rnHvKV1YDk80akVb3tMGHUcjEw50mgRdlIYfcyJVyBSusYMqFH8AOPoVJMfv
-         sYnE/52fkK/Xwv6TV+pmrGAJWyVj2X8mbtmXiSaBXZXzaJLMudLAI8thpadwFuHB9tqy
-         nYoy2zerO/EYnqY8yFnqYUvAD+aeb47Ztf/Ti/0tmYoCUcxqHDQSYbiK3rQp+ZPg8N9k
-         h062lPN7/2bWK7P7RB8KXdOOSnTbQzMRVe3GC5EkTMzC3hdomCOLEwNNsSlIgq6NbhL1
-         wdM+8bYln7ueXBkkVxew0iKPlntz6tSaN8ovkHnynC2VSeDE1Jsh6xtoXFnexEWlw6TI
-         uDHw==
+        d=gmail.com; s=20251104; t=1787582459; x=1788187259; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=x3IQRXITFMDe1ddVJj0V8oul9t4BpMVbA4OwUmQgnZA=;
+        b=ju/BJszJIEquI6Wet3upmIl/55np0IIcadGXDMhPC8rPBuWkiKidYfSzJGdIFck/CH
+         w6y/Hajd2iLR/oQirxosLDOYsjXABFJMMNKQgXNU0GF7VKyGoRAQBEx+alVYxrcxYjCb
+         Lk0J2Q2uVpIL2STQWQ6RO0lQT7LuS6Gkpl1W1RUhrnKDk7+voi/umSvuSj0w2y5IF/bo
+         lAEyQ7AMpV15YCaOiyIa/K2V3jQW9pHkLnytuVdJU3IZACyvuDQJf3lHwn7tL/+xlgNx
+         VRd0Z7clpedH7lNVqcbw6CtPO/0ZYsQH80OThDyj9bnXHWBBrLZYahHQNZPraUE1GV3Q
+         elVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787582148; x=1788186948;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
-        b=H5hoAMosHU1SHL6x6VLuygfCimM0g7opyakhH3fnCGcckQntMRNhQCnQlvokYJ0tYA
-         6rosvAodvNEEzQmOslwaSn8mkC5NWh848S+KkKKRYDcZt8+UGEBU4+9QgnvRP58FPS7v
-         aNYttbtzJi903ArbLQRqJTARUjel9ercf4rcwPdSOPN4aq3502QV4Ixb8mRdxXEPhErc
-         so/9OGlqk8/blLPr2UBIRfAu26oWNc+xa74qDChkpu9ccqIBN8bXJKDQEIDisq/ml7wX
-         /46Kc9ESGuZqzQIIxCN2psiVKJ+OZMZtRbzvHuts6FV1H9+ZIgOysamqcj4oI3SnTKHU
-         bs4Q==
-X-Forwarded-Encrypted: i=1; AHgh+RpsPTlIY/8cSVBr8SicxbhxJQ0n4IGS7KExSG9GK9FDeFRusnn18Jf1ONRyC0xUhe0Qz5okQbhWXzoJV8YSr2I=@vger.kernel.org
-X-Gm-Message-State: AFuF++k6SiUjmFJRRBZ2DQmMi/R5amH4CXQKGtDTSgFH3mjbzrqqQru4
-	7emBz5y05cqVVgKDOciyPkwyI3kdbuHkLRtWt4qVlfTswtmh7V0B/vqbKwLocfDr5LydlwmbAVy
-	HUFbOE+/X7kAAwEcb80HQNn69FLNsMjs=
-X-Gm-Gg: AR+sD12zTpXrFzKnOg6ynIRzJ5pTQEYYVjiXvumJ786vfhv2wwVNyXVBfEYA1auSa8T
-	qopkCZlJ8Ztrp03YNh8kkqrKmfgyFJiePtO5EAOnSfWrXmJmYjf2x3ZM09STpW3Dt+gPmmaa4Ly
-	rnHFkw7AEOnhwcLYR9L8ZkmvVZQLyaLOHIpyXOpUVVpPRNG35TsCf2j2x6whkvmNB34ReF5cnPL
-	SZ8DqHKHYtMZw/GN7xaiYAcaqUF5lgXPA7bSibbMEa1yfleLTsIpSXz8AlhqbkIEpgveoGYnaUm
-	jKfE+zfYwplmckopFOmS2waLms+vn/uKuTqRDcwfRnUY7FViwVNTguGcVvRNApffgaqql+zv9Px
-	iM/Z5dKAiT9d8q9gE4XWFY8X4BsVe
-X-Received: by 2002:a05:690e:25d0:b0:66c:e932:2592 with SMTP id
- 956f58d0204a3-66cf21deb78mr4733001d50.38.1787582148414; Mon, 24 Aug 2026
- 07:35:48 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787582459; x=1788187259;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=x3IQRXITFMDe1ddVJj0V8oul9t4BpMVbA4OwUmQgnZA=;
+        b=X8Mq/Ed5zH7xy2ni/4h5YoyQwupLRQDbzByUcKjlznXFhGHLY8gTkCLkjN1aGHX0RX
+         P412hbymYOQBohSjW3LAGE7cRAZFeDzBuRVhtLdTSU49XCwfjIbLf/tqiK+84TgfbpoW
+         yO6Elg8GVtxz1IKC8CYiPh8a9+4QB44eowIso7ZZa0SIyfndcvHXJuqJyJo17nIiHqk5
+         8VXta0TGVAIXOIZMLWf+57wheZwertHL0jTQbeYa+9B6jq4OubfBgSWvDiKvcRflnvds
+         rEw1afjVpJtuQsICsLkvUJTa+aVnHWRUoT7TqqkRQWZdGqhtjKLzDfPLSdZxc7UmfCXO
+         oXNA==
+X-Gm-Message-State: AFuF++mG5nNCVErGPOlry7udgLAKEEpIHwEwslYBoDxDTG820Pb0OvKC
+	nEKc9pvfpfj1EpBnJOTJVnBh1/03ayM9dXs2bncbKFEBT8kIdDMzH0qe
+X-Gm-Gg: AR+sD11HEqwYcJ5cNtk/YV29rmdCk6uhMgJ9FcWn6jX7iBlPDMcA1Udq5h5ezjYCt66
+	Kx3LUpDDjI/VIouODTJ5OaOotEvkTYij9aD1uQm0qel7zplEhc3liuPgZ2hhbq67797zEzwXKAL
+	TQcKZu405IX6kDgqAlC783v2ertTwlg4i+Bo6lg/mbNRCidxFRK8KcpnJWW2gcmC4QyVUlkLooa
+	AkvtWElWanfjNg+tqfbIS34PsnqTg4NeUkiNoOlljSTT1T3nT/Jl4OE5VbmYUDLquGk9B74g4qP
+	dF7MUwpFJqoxynYHy6EwDhyrsa+RZepOq5+jHHLg217uGiB4Mm0SG7bd/VP28KX84+ZrPInoIWi
+	yIGAW9EeVFx7Bn8qMzH1ZxwycD8nlyhxN/sFDLLJ34GqNKXBnu7RyN6SIy1bEm6mibt5KYAo6yA
+	aHtOH0QXd1UVjBPuDErFkA2RSpJB/k13fQH7LIgj27gxB1NNwzcUfZTMoHdC2jwc9u1oMdA8Hhh
+	LDx5DwvCiklQIlPPh+yR5thIZ/mje/K/1la7S8tzwcXhoao835usQKyB4g14HTFh1w3ycQqUWyJ
+	UTEIu+CC3PxtdKC7rkFyTAi5bYkOnCdo2ZjvHNSDnJl2IVNvMMnGttg/o8YUTu2Kj/mgHfgrL09
+	uMbVsbZTM29/PalXbcQhkSU0SGjs1YTvodHQjG/KWMxtuhdc=
+X-Received: by 2002:a17:90b:2f0c:b0:395:4de5:1054 with SMTP id 98e67ed59e1d1-395c3847e85mr49724324a91.16.1787582458723;
+        Mon, 24 Aug 2026 07:40:58 -0700 (PDT)
+Received: from localhost.localdomain ([101.251.7.10])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327f90c31a5sm27138656eec.11.2026.08.24.07.40.55
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 24 Aug 2026 07:40:58 -0700 (PDT)
+From: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_codec: validate vendor codec count length
+Date: Mon, 24 Aug 2026 20:25:51 +0545
+Message-ID: <20260824144051.50010-1-acharyalaxman8848@gmail.com>
+X-Mailer: git-send-email 2.51.2
+In-Reply-To: <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com>
+References: <20260823161638.32348-1-acharyalaxman8848@gmail.com> <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260824053227.317496-1-junjie.cao@intel.com> <77f94165-3d5f-41de-8969-c7318284fd6a@leemhuis.info>
-In-Reply-To: <77f94165-3d5f-41de-8969-c7318284fd6a@leemhuis.info>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Aug 2026 10:35:35 -0400
-X-Gm-Features: AcwNN1WxDxyNb27MNZYYLQ2YylskKFoLPXWU8dYFUVQ7iT_pAzgxPlP6dclf31Q
-Message-ID: <CABBYNZK9ax+iw7xKBtdZTSERsdhQ7t41Bg_1EnG88KOYj6kFHg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: limit RTL8761B BROKEN_EXT_SCAN quirk to 0bda:a728
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Junjie Cao <junjie.cao@intel.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexej Sidorenko <alexej@sidorenko.cz>, regressions@lists.linux.dev, 
-	Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org, 
-	Kamil Serwus <kserwus@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Kamil,
+Hi Luiz,
 
-On Mon, Aug 24, 2026 at 2:03=E2=80=AFAM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> On 8/24/26 07:32, Junjie Cao wrote:
-> > Commit 5ead2063611a ("Bluetooth: btrtl: fix RTL8761B/BU broken LE
-> > extended scan") set HCI_QUIRK_BROKEN_EXT_SCAN for every CHIP_ID_8761B
-> > device to cure repeated 0x2042 failures on an 0bda:a728 dongle. The
-> > brokenness is per-dongle, not per-chip: on a TP-Link UB500 (2357:0604,
-> > RTL8761BU, fw 0xdfc6d922) extended scan works, and the legacy scan
-> > path the quirk forces is what is broken -- LE Set Scan Enable (0x200c)
-> > times out with -110 about 30 s after firmware load, btusb resets the
-> > device, and the adapter re-enumerates in an endless loop (382 firmware
-> > reloads in one boot). 7.1.8, which predates the stable backport, runs
-> > clean on this unit; 7.1.9 loops.
-> >
-> > Move the quirk from btrtl's chip-wide switch to a btusb device-table
-> > flag on the USB id the original fix was verified against. Other 8761B
-> > dongles return to their earlier long-standing behaviour.
-> > > Link: https://bugzilla.redhat.com/show_bug.cgi?id=3D2521504
-> > Fixes: 5ead2063611a ("Bluetooth: btrtl: fix RTL8761B/BU broken LE exten=
-ded scan")
->
-> Thx. Just to make sure everyone is aware of it: Kamil (now CCed)
-> reported problems due to the commit yesterday and provided patches, too:
-> https://lore.kernel.org/all/20260822141115.58815-1-kserwus@gmail.com/
->
-> I suggested that a quick revert might be the best approach for now,
-> which Kamil submitted:
-> https://lore.kernel.org/all/20260823102959.100368-1-kserwus@gmail.com/
->
-> No comment yet from the BT folks yet.
->
-> Ciao, Thorsten
->
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Junjie Cao <junjie.cao@intel.com>
-> > ---
-> > #regzbot introduced: 5ead2063611a
-> > #regzbot link: https://bugzilla.redhat.com/show_bug.cgi?id=3D2521504
-> >
-> >  drivers/bluetooth/btrtl.c | 13 -------------
-> >  drivers/bluetooth/btusb.c |  8 ++++++++
-> >  2 files changed, 8 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> > index 7f54d2d2d13a..03fa9409e3ee 100644
-> > --- a/drivers/bluetooth/btrtl.c
-> > +++ b/drivers/bluetooth/btrtl.c
-> > @@ -1343,19 +1343,6 @@ void btrtl_set_quirks(struct hci_dev *hdev, stru=
-ct btrtl_device_info *btrtl_dev)
-> >       if (!btrtl_dev->ic_info)
-> >               return;
-> >
-> > -     switch (btrtl_dev->project_id) {
-> > -     case CHIP_ID_8761B:
-> > -             /* RTL8761B/BU reports HCI version 5.1 but does not suppo=
-rt
-> > -              * the LE Extended Scan commands (Opcode 0x2042), causing
-> > -              * repeated -EBUSY failures when BlueZ attempts extended
-> > -              * scanning while a connection is active.
-> > -              */
-> > -             hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_SCAN);
-> > -             break;
-> > -     default:
-> > -             break;
-> > -     }
-> > -
-> >       switch (btrtl_dev->ic_info->lmp_subver) {
-> >       case RTL_ROM_LMP_8703B:
-> >               /* 8723CS reports two pages for local ext features,
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 2bae85b0016c..84614e60d142 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -67,6 +67,7 @@ static struct usb_driver btusb_driver;
-> >  #define BTUSB_INTEL_NO_WBS_SUPPORT   BIT(26)
-> >  #define BTUSB_ACTIONS_SEMI           BIT(27)
-> >  #define BTUSB_BARROT                 BIT(28)
-> > +#define BTUSB_BROKEN_EXT_SCAN                BIT(29)
-> >
-> >  static const struct usb_device_id btusb_table[] =3D {
-> >       /* Generic Bluetooth USB device */
-> > @@ -619,6 +620,10 @@ static const struct usb_device_id quirks_table[] =
-=3D {
-> >       { USB_DEVICE(0x0489, 0xe130), .driver_info =3D BTUSB_REALTEK |
-> >                                                    BTUSB_WIDEBAND_SPEEC=
-H },
-> >
-> > +     /* Realtek 8761BU Bluetooth devices */
-> > +     { USB_DEVICE(0x0bda, 0xa728), .driver_info =3D BTUSB_REALTEK |
-> > +                                                  BTUSB_BROKEN_EXT_SCA=
-N },
-> > +
-> >       /* Realtek Bluetooth devices */
-> >       { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
-> >         .driver_info =3D BTUSB_REALTEK },
-> > @@ -4403,6 +4408,9 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >       if (id->driver_info & BTUSB_INVALID_LE_STATES)
-> >               hci_set_quirk(hdev, HCI_QUIRK_BROKEN_LE_STATES);
-> >
-> > +     if (id->driver_info & BTUSB_BROKEN_EXT_SCAN)
-> > +             hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_SCAN);
-> > +
-> >       if (id->driver_info & BTUSB_DIGIANSWER) {
-> >               data->cmdreq_type =3D USB_TYPE_VENDOR;
-> >               hci_set_quirk(hdev, HCI_QUIRK_RESET_ON_CLOSE);
+You are right that sizeof(*vnd_codecs) and
+sizeof(vnd_codecs->num) are both one byte here.  The issue is the order
+in which the existing check performs the access: vnd_codecs->num must
+be evaluated as the count argument to flex_array_size() before the
+result can be compared with skb->len.
 
-Any chance to test this change? It looks better since it does remove
-the original workaround for the specific USB ID while also fixing the
-regression.
+For example, consider a V1 reply containing exactly these three bytes:
 
---=20
-Luiz Augusto von Dentz
+	status = 0, std_codecs->num = 1, std_codecs->codec[0]
+
+It passes the initial sizeof(*rp) check.  After pulling the status byte,
+the standard codec length check also passes, and pulling that array
+leaves skb->len equal to zero.  The existing vendor length check then
+evaluates vnd_codecs->num with vnd_codecs pointing at the end of the
+skb data.
+
+The added check uses sizeof(), whose operand is not evaluated, to make
+sure the count byte is present before the following expression reads
+vnd_codecs->num.  The V2 parser has the same ordering issue.
+
+Thanks,
+Laxman
