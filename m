@@ -1,315 +1,298 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8711389E1A;
-	Mon, 24 Aug 2026 19:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787600340; cv=pass; b=G1+rqOIxXOmW3cQkkpGYkHGzQGX2fdbcr0Dx1fu/isd8W3GiRsJ++fcaW6SBAuFh8EjV4daYNYDr4NumZxV2PrSdLI3+1r2JXwHKq2YKfpUKcEOor/495CLClgmnG+JD1WXU+Pq16UVwaAJ6XcFCrkzV0cDTV21gLhc4mbIxYek=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787600340; c=relaxed/simple;
-	bh=zzC8oxef0Rad3VUGNVQApZrnjMMdjct48pTQxhspTJk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Hze4st7tUyTuWoxb4MpUd/whtClY2EJWmA5i8k6LI0aPXuACKAheY55gTHgnnyhOh9QgGfcZXaJtZVV2GbqPsIv52GXT2ZNM9LuhTH2yA/71LgQ/e9b/XaCBjaBWXj0stdAm4yW5ouLiTM1qU9D2ca9KhZrA8B3qNUWCBkhoQUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aAJSd/92; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7C0386C21;
+	Mon, 24 Aug 2026 19:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787601006; cv=none; b=qwpWfuJ5SLdzDcn6hrtevZVN/hGQYT5hc+lmp6INoxSzindhLEieDV3M3xOEGhUJf9hl/cZU6uEvlXf1OmrmmdtgUW8ue5hMt3tqCZVjlKZQtwVzS3YDgNEJsOIZ0XB6BFdg4eyOVT6fwVOKIbqijVT4jGRTe0fX3PwJ7CorNCI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787601006; c=relaxed/simple;
+	bh=ahlPqpkIPSw1IsjsmVM21wJnovl1SrnM6Dd9PQlIDbs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DcATdWvRqFX34IK4grdJRsIF1tLJ1TcTIMMEQY59a/LFkqftGoUlq82omvD+nak703o7VLFRXCqc+UcMRlnaB5Pf/py3NG/pxNtz95J8TzpeQbTPADqRMVKqSfzkxLynGM7ooxIrjQIiNbG2IirM0KxL1XGg6d1C/U4+CMlbeMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N60jQ1MX; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aAJSd/92"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:4:f011::d101])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hTLnG29LNz49PwS;
-	Mon, 24 Aug 2026 22:38:42 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1787600323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=52dnpwtEE19lOL9jeUDX35kTacMoZBiJyBPEYtV+t18=;
-	b=aAJSd/92mY2VhG9u5LvmnWKVmQXbcOTKyOAnjG5XgpdKzfYYANvLDgFBQKpa6aNruTSOCg
-	SbyoeDSS1N+5ylFmgRIOkAb3fbTPAm9UvrSiJjRThuG093Sg/5CLh84SbRX1zD8Cl3njN6
-	lmMmelu8FfsYfbVM2duZC8NsDGRacZpgj8fH/L/qBlEfKGNdFujq8gb3MaWyfKviVrx5PI
-	/F9W0GFUg/z7+jEefnH8JWI0mZHShUXUz4I7Ykx+w3tzKSjPOpmKmBvIEe1oaDtYlhpRiO
-	iuZAU2vMC0gWXChE7VUZuILjMhFDBVGSNAtIwEVGV8kKWbUG7mrJnzPeE2Qp8w==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1787600323;
-	b=UMApMQUKiFc+OSKfsKYrFnkRXjE8eAiTkgAINFfMGaJJ7F2AXngEbV5hXedoGcpU8X43XN
-	Vm4PP3gCAQq/mWgbZ6/OMXOazT/ZgkjYjf4bTvuRoTjrZRQIxRuzal/tlmE7vJfetPFMeW
-	RDG/IN0UWF7Q/uMWYgYtnXDdbUtXymTRmMQ1+HsG8YMuJoYlztLVUeg4NF02m8KossFPgU
-	J1G8JzHELWFVq+CzkjgGh2tekw6D9CaiwPYd2ZX3AS/XpJMlpFmuJwPAoYi6diUwQvKhc1
-	3QVAdhOfsqdIOi70O4B5iiPCD2s84l8EzstxfpkWiJrXneyouIU4bW4VooTWew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1787600323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=52dnpwtEE19lOL9jeUDX35kTacMoZBiJyBPEYtV+t18=;
-	b=fE+KmZ/UnZy4/20M8eCr7a+eAYIUMeRAM142gkF97CNfFCO2Emb8v8+an4mbpEdkrnfSiH
-	4A9Qz6Y3BnMrnk65PprgTYoQUqX2FMbgK34jRwKtmZwiuDez82JAUcU8zOxbdDPNXpU3fX
-	skkx5k/F9zvpvS6g0NCS8hYT2Y4ZlGYCowBIaykB5L2mD0+TOZYIMl/5nsgieMbskavF+m
-	3wBkOQ/ZkQPEEmRkpps3Slys6ZblhXKw+suoiJC2cnyCCBiXf2qqFyf90s0B4WRA/YdcZK
-	iH9BlKH4MZy+wSY4q5PL/TEentvvPI+B3400kVt34fsUv4St7y/Z2078lJWxrA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: RFCOMM: serialize security confirmation
- handling
-From: Pauli Virtanen <pav@iki.fi>
-To: patchwork-bot+bluetooth@kernel.org, Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Date: Mon, 24 Aug 2026 22:38:40 +0300
-In-Reply-To: <178759021163.3014491.6954824460297136867.git-patchwork-notify@kernel.org>
-References: <20260822164341.3750491-1-nicoyip.dev@gmail.com>
-	 <178759021163.3014491.6954824460297136867.git-patchwork-notify@kernel.org>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N60jQ1MX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787601004; x=1819137004;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ahlPqpkIPSw1IsjsmVM21wJnovl1SrnM6Dd9PQlIDbs=;
+  b=N60jQ1MXvZOM7W1gWsIR1FOSzTkD6SAbHNCUg8ZP6eTy7CSH5wpclYjH
+   VeWZsA3Hs5VNUWlaulXHGzBEcNOKPg8WHPEr3mTSwHyJcoWUJHZhMTINW
+   0aCdIOFg6ZOZ5z7AaqukuJTCoABjRHz5GWRxGSRbD7leszTSS3xojA8mP
+   yLlTGw18+ZjWGWWXuhKwN7gyj/emZ8nncE+pstWY0dLam0NdM7qNblCOq
+   yKEPm8i+wxqG1EJ+qEEQvE4Z9xdNNi5daBBp2rOHdNPUQIUETie9yNxZN
+   ZH+TKIslUMSwNcxFsSflfhDK8eKvZGsW8E5PFaVkZCCIOovNrb7zHjEJg
+   A==;
+X-CSE-ConnectionGUID: trtExo0pRHa7bGpBb3owOg==
+X-CSE-MsgGUID: oYgyxgtFSjuN0SlxrIJ8Cw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11885"; a="87921945"
+X-IronPort-AV: E=Sophos;i="6.25,241,1779174000"; 
+   d="scan'208";a="87921945"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2026 12:50:04 -0700
+X-CSE-ConnectionGUID: Dsag7avqSlurvZJXEL8gvQ==
+X-CSE-MsgGUID: Sv9RE7OFSz+avZGUJedHng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,241,1779174000"; 
+   d="scan'208";a="270557835"
+Received: from lkp-server01.sh.intel.com (HELO 3532383e6126) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 24 Aug 2026 12:50:02 -0700
+Received: from kbuild by 3532383e6126 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wyag4-000000003wF-0sfl;
+	Mon, 24 Aug 2026 19:49:55 +0000
+Date: Tue, 25 Aug 2026 03:48:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hang Nan <2122295973@qq.com>, linux-bluetooth@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	marcel@holtmann.org, luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, pav@iki.fi
+Subject: Re: [PATCH v3] Bluetooth: ISO: fix use-after-free of listener socket
+ in iso_conn_ready
+Message-ID: <202608250307.IiUVBpTP-lkp@intel.com>
+References: <tencent_1E12CBD7417A4019FF058EFD19B1DB930006@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_1E12CBD7417A4019FF058EFD19B1DB930006@qq.com>
 
-Hi,
+Hi Hang,
 
-ma, 2026-08-24 kello 16:50 +0000, patchwork-bot+bluetooth@kernel.org
-kirjoitti:
-> Hello:
->=20
-> This patch was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->=20
-> On Sun, 23 Aug 2026 00:43:41 +0800 you wrote:
-> > rfcomm_security_cfm() looks up a session on session_list and then walks
-> > its DLC list without holding rfcomm_mutex. Since RFCOMM session teardow=
-n
-> > uses rfcomm_mutex, krfcommd can close and free the same session and DLC=
-s
-> > concurrently:
-> >=20
-> >   hci_rx_work                    krfcommd
-> >=20
-> > [...]
->=20
-> Here is the summary with links:
->   - Bluetooth: RFCOMM: serialize security confirmation handling
->     https://git.kernel.org/bluetooth/bluetooth-next/c/40c621391de9
->=20
-> You are awesome, thank you!
+kernel test robot noticed the following build errors:
 
-I'm a bit too late now, but Sashiko report had some valid concerns
-about lock ordering in this one:
-https://sashiko.dev/#/patchset/20260822164341.3750491-1-nicoyip.dev%40gmail=
-.com
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on linus/master v7.2]
+[cannot apply to bluetooth-next/master next-20260821]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Running both BlueZ l2cap-tester and rfcomm-tester (so lockdep sees more
-paths) in same boot you get lockdep splat.
+url:    https://github.com/intel-lab-lkp/linux/commits/Hang-Nan/Bluetooth-ISO-fix-use-after-free-of-listener-socket-in-iso_conn_ready/20260818-193343
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/tencent_1E12CBD7417A4019FF058EFD19B1DB930006%40qq.com
+patch subject: [PATCH v3] Bluetooth: ISO: fix use-after-free of listener socket in iso_conn_ready
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20260825/202608250307.IiUVBpTP-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 935bfc708590c60147a79c7df145bb6e68b1d388)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260825/202608250307.IiUVBpTP-lkp@intel.com/reproduce)
 
-Not immediately clear that a real deadlock could be triggered, but
-lockdep thinks the ordering is now inconsistent.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202608250307.IiUVBpTP-lkp@intel.com/
 
+All error/warnings (new ones prefixed by >>):
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-WARNING: possible circular locking dependency detected
-7.2.0-rc6-01463-gfe3897b4ab57 #994 Not tainted
-------------------------------------------------------
-rfcomm-tester/364 is trying to acquire lock:
-ffff8880027d40b0 (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect (net/blu=
-etooth/l2cap_core.c:7271)
-
-but task is already holding lock:
-ffffffff99499f58 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_dlc_open (net/bluet=
-ooth/rfcomm/core.c:426)
-
-which lock already depends on the new lock.
+>> net/bluetooth/iso.c:2267:4: error: call to undeclared function 'release_sock_flagsock'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    2267 |                         release_sock_flagsock(parent);
+         |                         ^
+>> net/bluetooth/iso.c:2266:8: warning: left operand of comma operator has no effect [-Wunused-value]
+    2266 |                     (parent, SOCK_ZAPPED)) {
+         |                      ^~~~~~
+   1 warning and 1 error generated.
 
 
-the existing dependency chain (in reverse order) is:
+vim +/release_sock_flagsock +2267 net/bluetooth/iso.c
 
--> #2 (rfcomm_mutex){+.+.}-{4:4}:
-__mutex_lock (kernel/locking/mutex.c:646)
-rfcomm_security_cfm (net/bluetooth/rfcomm/core.c:2222)
-hci_auth_complete_evt (./include/net/bluetooth/hci_core.h:2246 net/bluetoot=
-h/hci_event.c:3554)
-hci_event_packet (net/bluetooth/hci_event.c:7887)
-hci_rx_work (net/bluetooth/hci_core.c:4041)
-process_scheduled_works (kernel/workqueue.c:3322)
-worker_thread (kernel/workqueue.c:3486)
-kthread (kernel/kthread.c:436)
-ret_from_fork (arch/x86/kernel/process.c:158)
-ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+  2156	
+  2157	static void iso_conn_ready(struct iso_conn *conn)
+  2158	{
+  2159		struct sock *parent = NULL;
+  2160		struct sock *sk;
+  2161		struct hci_ev_le_big_sync_established *ev = NULL;
+  2162		struct hci_ev_le_pa_sync_established *ev2 = NULL;
+  2163		struct hci_ev_le_per_adv_report *ev3 = NULL;
+  2164		struct hci_conn *hcon;
+  2165		struct hci_dev *hdev;
+  2166	
+  2167		BT_DBG("conn %p", conn);
+  2168	
+  2169		iso_conn_lock(conn);
+  2170		sk = iso_sock_hold(conn);
+  2171		iso_conn_unlock(conn);
+  2172	
+  2173		if (sk) {
+  2174			lock_sock(sk);
+  2175	
+  2176			/* conn->sk may have become NULL if racing with sk close, but
+  2177			 * due to held hdev->lock, it can't become different sk.
+  2178			 */
+  2179			if (!conn->sk) {
+  2180				release_sock(sk);
+  2181				sock_put(sk);
+  2182				return;
+  2183			}
+  2184	
+  2185			/* Attempt to update source address in case of BIS Sender if
+  2186			 * the advertisement is using a random address.
+  2187			 */
+  2188			if (conn->hcon->type == BIS_LINK &&
+  2189			    conn->hcon->role == HCI_ROLE_MASTER &&
+  2190			    !bacmp(&conn->hcon->dst, BDADDR_ANY)) {
+  2191				struct hci_conn *bis = conn->hcon;
+  2192				struct adv_info *adv;
+  2193	
+  2194				adv = hci_find_adv_instance(bis->hdev,
+  2195							    bis->iso_qos.bcast.bis);
+  2196				if (adv && bacmp(&adv->random_addr, BDADDR_ANY)) {
+  2197					iso_pi(sk)->src_type = BDADDR_LE_RANDOM;
+  2198					bacpy(&iso_pi(sk)->src, &adv->random_addr);
+  2199				}
+  2200			}
+  2201	
+  2202			iso_sock_ready(sk);
+  2203	
+  2204			release_sock(sk);
+  2205			sock_put(sk);
+  2206		} else {
+  2207			hcon = conn->hcon;
+  2208			if (!hcon)
+  2209				return;
+  2210	
+  2211			hdev = hcon->hdev;
+  2212	
+  2213			if (test_bit(HCI_CONN_BIG_SYNC, &hcon->flags)) {
+  2214				/* A BIS slave hcon is notified to the ISO layer
+  2215				 * after the Command Complete for the LE Setup
+  2216				 * ISO Data Path command is received. Get the
+  2217				 * parent socket that matches the hcon BIG handle.
+  2218				 */
+  2219				parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
+  2220						      BT_LISTEN, iso_match_big_hcon,
+  2221						      hcon);
+  2222			} else if (test_bit(HCI_CONN_BIG_SYNC_FAILED, &hcon->flags)) {
+  2223				ev = hci_recv_event_data(hcon->hdev,
+  2224							 HCI_EVT_LE_BIG_SYNC_ESTABLISHED);
+  2225	
+  2226				/* Get reference to PA sync parent socket, if it exists */
+  2227				parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
+  2228						      BT_LISTEN,
+  2229						      iso_match_pa_sync_flag,
+  2230						      NULL);
+  2231				if (!parent && ev)
+  2232					parent = iso_get_sock(hdev, &hcon->src,
+  2233							      &hcon->dst,
+  2234							      BT_LISTEN,
+  2235							      iso_match_big, ev);
+  2236			} else if (test_bit(HCI_CONN_PA_SYNC_FAILED, &hcon->flags)) {
+  2237				ev2 = hci_recv_event_data(hcon->hdev,
+  2238							  HCI_EV_LE_PA_SYNC_ESTABLISHED);
+  2239				if (ev2)
+  2240					parent = iso_get_sock(hdev, &hcon->src,
+  2241							      &hcon->dst,
+  2242							      BT_LISTEN,
+  2243							      iso_match_sid, ev2);
+  2244			} else if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
+  2245				ev3 = hci_recv_event_data(hcon->hdev,
+  2246							  HCI_EV_LE_PER_ADV_REPORT);
+  2247				if (ev3)
+  2248					parent = iso_get_sock(hdev, &hcon->src,
+  2249							      &hcon->dst,
+  2250							      BT_LISTEN,
+  2251							      iso_match_sync_handle_pa_report,
+  2252							      ev3);
+  2253			}
+  2254	
+  2255			if (!parent)
+  2256				parent = iso_get_sock(hdev, &hcon->src, BDADDR_ANY,
+  2257						      BT_LISTEN, iso_match_dst, BDADDR_ANY);
+  2258	
+  2259			if (!parent)
+  2260				return;
+  2261	
+  2262			lock_sock(parent);
+  2263	
+  2264			/* The listener may have been closed concurrently. */
+  2265			if (parent->sk_state != BT_LISTEN ||
+> 2266			    (parent, SOCK_ZAPPED)) {
+> 2267				release_sock_flagsock(parent);
+  2268				sock_put(parent);
+  2269				return;
+  2270			}
+  2271	
+  2272			sk = iso_sock_alloc(sock_net(parent), NULL,
+  2273					    BTPROTO_ISO, GFP_ATOMIC, 0);
+  2274			if (!sk) {
+  2275				release_sock(parent);
+  2276				return;
+  2277			}
+  2278	
+  2279			iso_sock_init(sk, parent);
+  2280	
+  2281			bacpy(&iso_pi(sk)->src, &hcon->src);
+  2282	
+  2283			/* Convert from HCI to three-value type */
+  2284			if (hcon->src_type == ADDR_LE_DEV_PUBLIC)
+  2285				iso_pi(sk)->src_type = BDADDR_LE_PUBLIC;
+  2286			else
+  2287				iso_pi(sk)->src_type = BDADDR_LE_RANDOM;
+  2288	
+  2289			/* If hcon has no destination address (BDADDR_ANY) it means it
+  2290			 * was created by HCI_EV_LE_BIG_SYNC_ESTABILISHED or
+  2291			 * HCI_EV_LE_PA_SYNC_ESTABLISHED so we need to initialize using
+  2292			 * the parent socket destination address.
+  2293			 */
+  2294			if (!bacmp(&hcon->dst, BDADDR_ANY)) {
+  2295				bacpy(&hcon->dst, &iso_pi(parent)->dst);
+  2296				hcon->dst_type = le_addr_type(iso_pi(parent)->dst_type);
+  2297			}
+  2298	
+  2299			if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
+  2300				iso_pi(sk)->qos = iso_pi(parent)->qos;
+  2301				hcon->iso_qos = iso_pi(sk)->qos;
+  2302				iso_pi(sk)->bc_sid = iso_pi(parent)->bc_sid;
+  2303				iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
+  2304				memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis,
+  2305				       ISO_MAX_NUM_BIS);
+  2306				set_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags);
+  2307			}
+  2308	
+  2309			bacpy(&iso_pi(sk)->dst, &hcon->dst);
+  2310	
+  2311			/* Convert from HCI to three-value type */
+  2312			if (hcon->dst_type == ADDR_LE_DEV_PUBLIC)
+  2313				iso_pi(sk)->dst_type = BDADDR_LE_PUBLIC;
+  2314			else
+  2315				iso_pi(sk)->dst_type = BDADDR_LE_RANDOM;
+  2316	
+  2317			iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
+  2318			memcpy(iso_pi(sk)->base, iso_pi(parent)->base, iso_pi(parent)->base_len);
+  2319			iso_pi(sk)->base_len = iso_pi(parent)->base_len;
+  2320	
+  2321			hci_conn_hold(hcon);
+  2322			iso_chan_add(conn, sk, parent);
+  2323	
+  2324			if ((ev && ((struct hci_evt_le_big_sync_established *)ev)->status) ||
+  2325			    (ev2 && ev2->status)) {
+  2326				/* Trigger error signal on child socket */
+  2327				sk->sk_err = ECONNREFUSED;
+  2328				sk->sk_error_report(sk);
+  2329			}
+  2330	
+  2331			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
+  2332				sk->sk_state = BT_CONNECT2;
+  2333			else
+  2334				sk->sk_state = BT_CONNECTED;
+  2335	
+  2336			/* Wake up parent */
+  2337			parent->sk_data_ready(parent);
+  2338	
+  2339			release_sock(parent);
+  2340			sock_put(parent);
+  2341		}
+  2342	}
+  2343	
 
--> #1 (hci_cb_list_lock){+.+.}-{4:4}:
-__mutex_lock (kernel/locking/mutex.c:646)
-hci_remote_ext_features_evt (./include/net/bluetooth/hci_core.h:2207 net/bl=
-uetooth/hci_event.c:5030)
-hci_event_packet (net/bluetooth/hci_event.c:7887)
-hci_rx_work (net/bluetooth/hci_core.c:4041)
-process_scheduled_works (kernel/workqueue.c:3322)
-worker_thread (kernel/workqueue.c:3486)
-kthread (kernel/kthread.c:436)
-ret_from_fork (arch/x86/kernel/process.c:158)
-ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-
--> #0 (&hdev->lock){+.+.}-{4:4}:
-__lock_acquire (kernel/locking/lockdep.c:3165)
-lock_acquire (kernel/locking/lockdep.c:5868)
-__mutex_lock (kernel/locking/mutex.c:646)
-l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-l2cap_sock_connect (net/bluetooth/l2cap_sock.c:255)
-kernel_connect (net/socket.c:3726)
-rfcomm_dlc_open (net/bluetooth/rfcomm/core.c:808)
-rfcomm_sock_connect (net/bluetooth/rfcomm/sock.c:421)
-__sys_connect (net/socket.c:2135)
-__x64_sys_connect (net/socket.c:2160 net/socket.c:2157 net/socket.c:2157)
-do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-other info that might help us debug this:
-
-Chain exists of:
-&hdev->lock --> hci_cb_list_lock --> rfcomm_mutex
-
-Possible unsafe locking scenario:
-
-CPU0                    CPU1
-----                    ----
-lock(rfcomm_mutex);
-                        lock(hci_cb_list_lock);
-                        lock(rfcomm_mutex);
-lock(&hdev->lock);
-
-*** DEADLOCK ***
-
-1 lock held by rfcomm-tester/364:
-#0: ffffffff99499f58 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_dlc_open (net/b=
-luetooth/rfcomm/core.c:426)
-
-stack backtrace:
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.17.0-10.fc44 06/=
-10/2025
-Call Trace:
-<TASK>
-print_circular_bug (kernel/locking/lockdep.c:2043)
-check_noncircular (kernel/locking/lockdep.c:2175)
-__lock_acquire (kernel/locking/lockdep.c:3165)
-? stack_trace_save (kernel/stacktrace.c:122)
-? add_lock_to_list (./include/linux/find.h:391 kernel/locking/lockdep.c:140=
-3 kernel/locking/lockdep.c:1434)
-? __lock_acquire (kernel/locking/lockdep.c:191 kernel/locking/lockdep.c:391=
-2 kernel/locking/lockdep.c:5237)
-lock_acquire (kernel/locking/lockdep.c:5868)
-? l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-__mutex_lock (kernel/locking/mutex.c:646)
-? l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-? lock_acquire (kernel/locking/lockdep.c:5868)
-? hci_get_route (net/bluetooth/hci_conn.c:1331)
-? lock_release (kernel/locking/lockdep.c:5350)
-? hci_get_route (net/bluetooth/hci_conn.c:1379)
-? l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-? l2cap_sock_connect (net/bluetooth/l2cap_sock.c:193)
-l2cap_sock_connect (net/bluetooth/l2cap_sock.c:255)
-kernel_connect (net/socket.c:3726)
-rfcomm_dlc_open (net/bluetooth/rfcomm/core.c:808)
-rfcomm_sock_connect (net/bluetooth/rfcomm/sock.c:421)
-? __pfx_rfcomm_sock_connect (net/bluetooth/rfcomm/sock.c:?)
-__sys_connect (net/socket.c:2135)
-__x64_sys_connect (net/socket.c:2160 net/socket.c:2157 net/socket.c:2157)
-do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-? entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-? trace_hardirqs_off (./include/trace/events/preemptirq.h:36)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-RIP: 0033:0x7f2b9c05854e
-Code: 4d 89 d8 e8 b4 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 =
-f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 8=
-3 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-   0:	4d 89 d8             	mov    %r11,%r8
-   3:	e8 b4 bd 00 00       	call   0xbdbc
-   8:	4c 8b 5d f8          	mov    -0x8(%rbp),%r11
-   c:	41 8b 93 08 03 00 00 	mov    0x308(%r11),%edx
-  13:	59                   	pop    %rcx
-  14:	5e                   	pop    %rsi
-  15:	48 83 f8 fc          	cmp    $0xfffffffffffffffc,%rax
-  19:	74 11                	je     0x2c
-  1b:	c9                   	leave
-  1c:	c3                   	ret
-  1d:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
-  24:	48 8b 45 10          	mov    0x10(%rbp),%rax
-  28:	0f 05                	syscall
-  2a:*	c9                   	leave		<-- trapping instruction
-  2b:	c3                   	ret
-  2c:	83 e2 39             	and    $0x39,%edx
-  2f:	83 fa 08             	cmp    $0x8,%edx
-  32:	75 e7                	jne    0x1b
-  34:	e8 03 ff ff ff       	call   0xffffffffffffff3c
-  39:	0f 1f 00             	nopl   (%rax)
-  3c:	f3 0f 1e fa          	endbr64
-
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0:	c9                   	leave
-   1:	c3                   	ret
-   2:	83 e2 39             	and    $0x39,%edx
-   5:	83 fa 08             	cmp    $0x8,%edx
-   8:	75 e7                	jne    0xfffffffffffffff1
-   a:	e8 03 ff ff ff       	call   0xffffffffffffff12
-   f:	0f 1f 00             	nopl   (%rax)
-  12:	f3 0f 1e fa          	endbr64
-RSP: 002b:00007fff41018e50 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00000000004fbee0 RCX: 00007f2b9c05854e
-RDX: 000000000000000a RSI: 00007b2b99ad7e60 RDI: 000000000000000d
-RBP: 00007fff41018e60 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007b2b99ad7e40
-R13: 00007b2b99ad7e60 R14: 000000000000000d R15: 00007b8b9ade0140
-</TASK>
-
-
---=20
-Pauli Virtanen
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
