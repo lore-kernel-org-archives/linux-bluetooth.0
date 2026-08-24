@@ -1,77 +1,35 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F27436A352
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A1936F434
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787584838; cv=none; b=clv/rSsFxb0QFe3JT8w8UKgrKs1OAjlDfNVqI9cR1H3yPqLZ27cQj5WNipaKsZi9RVVf1iqIxHsAwbj+ElnZbeGb0MCyEt9LdESENGoo4enDJ7oe+oskPx6ku59JPNEX7Y8ARXi2Hr2ncrdULO7IQfNWyhiaSIQBLBiL6gRuJ3A=
+	t=1787584862; cv=none; b=KGmqgP2sfzZZCRCYDpmMLGNNN7jiPmS8txVowXHl4NOrNykM+Ejoui54SJq25tjV2EPZ7OwuWuoWNzbwc/+H0OVSqY0wDvcReR/jaPPeMTYZ1irRagqaeiVLu2svMyIq0+hYB0WLcm4DmXxyIKkhMd/xUkeD0Ijjg/DqeEYolVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787584838; c=relaxed/simple;
-	bh=C+TelH3AlZcX47ivj645rZ84HzDP94p8X5F+vZbw0ms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZsgMoQq3PJGQrxHweReEwHR6ttZWNJHUkz79eSFIFD2dDIQijZhsODswPr1WqNgmG6bOUOU0mCd1H0Px0hAw6S8BqtmYN8EZS2JTV7ktQd8cqLA/f7m/A5SkefoSqJL+k970epSw2G74f/Y0bRbIa+rvwzc1nYZAWrIt1Bg5DTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdMsfuZq; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787584862; c=relaxed/simple;
+	bh=OrJ9hXBxFf1T64NYBJpGc5KQxcSRt0mFpHm1w+0w6VY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aR+8xO7jV28enXxPKxCaj2BM06BmkquRUZLdvHbct9jBUmOuJIki5movAIpZQ4ex2OfAnQIZwBt6G87xhEmmzqmO/lDr/A3//zgjYsKZDlCHDZ+5rOkY9aHh5s5vEAsnaNQNFAari0zKezv/cnK4UXi7o2lxGC0EOiVucqTndCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a3xo3YKg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdMsfuZq"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38dcbade417so4277129a91.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787584836; x=1788189636; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=frPrxefuhESfKlbGZEYzZ+IYOc/LSZSpcmZ15xxxNFY=;
-        b=HdMsfuZqpKAPUG8LpEs7kUs6fPzkOhaV2Wo6TAEpoL1SieyEm1o4wSgdtNDnZh3TNC
-         0mEW1XyXl4OAWDpe62niabGEq3jQYczHwB3g//N3uYVln7BKTWAsx2fYi3neTOsfeu9I
-         0/lBaNvXdiloHuTfiLNpiTINsmpLR55zAkagcpBD7/nAgf1rFryNGtyFR0kS+/GcpyjG
-         eTb83dEHWzcj3RO8BTXpflv2SvJJSzShkTqnC907OFDsjBsLLLFz8jj8WThqJKgMYNRv
-         BS5LEHTSrn6XQ5xuONwhj0PD0y0nEYIv0FmOXCHYQkv1Yym0g9bw++kiB7Kdnjc6mcME
-         pP8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787584836; x=1788189636;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=frPrxefuhESfKlbGZEYzZ+IYOc/LSZSpcmZ15xxxNFY=;
-        b=paVCWNoVYcABhDinp0xVhc/E+eX3HBqkcNtSqka13kQM+ndY0VEPVwGkpjVO+8mwyM
-         1k+r+E/ZC/j6d8tcMSRaauheBvWahj9WR5G8GIYFNqL1C7jMkE9A+hXqaKPtKYlnnc+9
-         bSqRLKc9jJRGEayc0C386l7Jp4DCB7xmPP1eqnhYwYvRz2ryISm/gOR51tWAS/jbgZZy
-         ma0L1prdPnDb70PZpJulJVGAg9NDEzqAw1L7+AbtScdzMhbOK5yeDME8pIsaGS13rcXT
-         Hla7nF0LrXc+LXPyWtLSVwQXacewoJx2GDvnUyFEw0VszUs1ZeBVD1dx2SnEv+Gg0yJC
-         jChQ==
-X-Gm-Message-State: AFuF++kaPUNEulaJ+9C7ZuPLA9YSdLBI3WfZEXlHWYUyZtFpvWaTz846
-	8S/GSsnu7l5yZzsSxIQZHGBAkKJbjYWEOtKYtyo7dAZKq3b7eehcWAmMHuoJBA==
-X-Gm-Gg: AR+sD12jbajeagGFf5hvTRlkQN6AiX4K7O6mzfCDfMWa9MftHl0e3vBkvXq3Sq0rGJN
-	5WMoQLfztsqtt/EHnO8qINEUqlsHqNmkzNP3/OawuiZ+JPyMmoYpHdwZqq9QqfC10lkjdfJYI2v
-	tgJg/1BOsUgWKLc2f5iEXT7d5nv6KS3/8Pi5UQPQuJ3Su2D2egxIQ/pzLdvX8zxryvD3y3p/rAG
-	sUp//USWApifok9eBdZIwZANQBj1tmw939nL1Swc0VZwLNvGfiSYbiSBxzFpYipw7HrklBVKMYP
-	lYQqnbWQ9mZIl7H6cIMID3zNb4VcuvJmADG5gXczth2HdU0ruch03Bgl11Lq3pkOchYPttofsQp
-	Jt19bGirf+Z9ao4UYrE/u+9A7mv77BcOCI365GGIJW2g2BLcdhAYT9MksjBhzvb3Q9proa2UMRY
-	sZOBS9HF/KWK6gx9t9XBOwW9uUKt6S5ePr1/D5XOd1hQCe2YJdsPsDhmyqhYAlbGB6cug0RxMIL
-	NKHEuWKieVLr5e9VAFRxiZ50vo7kvjMP9BEQOynJP5bYUfZo++r8d9EKofvTOemFzMI20foTbiC
-	gNlqLH9LHoPg1VtUvd3AWQaUvmrjq10D8BqdBurWI1C4P4ab5YQKRIJLLDZ4vhHeVnFkkw4aZf+
-	/gN+RMy/hI23AvC8o4tP5dSXXpfLtQBQd9UZdAr4BWoHXNJaF+vet9uP0bFk=
-X-Received: by 2002:a17:90b:1b04:b0:38d:dfd1:7c1 with SMTP id 98e67ed59e1d1-395c33406e0mr46004122a91.2.1787584836296;
-        Mon, 24 Aug 2026 08:20:36 -0700 (PDT)
-Received: from localhost.localdomain ([101.251.7.10])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-32814a06261sm11384329eec.21.2026.08.24.08.20.33
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 24 Aug 2026 08:20:35 -0700 (PDT)
-From: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_codec: validate vendor codec count length
-Date: Mon, 24 Aug 2026 21:05:29 +0545
-Message-ID: <20260824152029.51492-1-acharyalaxman8848@gmail.com>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
-References: <20260823161638.32348-1-acharyalaxman8848@gmail.com> <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com> <20260824144051.50010-1-acharyalaxman8848@gmail.com> <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a3xo3YKg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB0DE1F000E9;
+	Mon, 24 Aug 2026 15:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787584860;
+	bh=UDTGz5eq0Xw5/PPvtsYzdH+XYFmOxhZPrbU/UXWObS0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=a3xo3YKgA4u5Q69xVw3pjhLZlaRfysII6XmidwkCT8a3J4QkSFaJZ7OtzO1sSXlOX
+	 1sIhQA3+2zlxLR4vBFuFhghzYwEW3EkoRyTxE0xXwv/pODvduLSbDYF2s1oybjdrI+
+	 wZaAYG4th+cYnl5mAWsdNHrWkDoDntRvAvUPGUhrhMwI64FCG09zFdxTsRRKC0mVe0
+	 FuAkmYl1iKy2L2DSGYgZNzqFAV2mpdpH4EVxm/aJFoiNoDZzYo3RFQfLlhB093WySp
+	 zU4qL0g+aOKjB++lOhRzDdzIwHklZB0uKnl5OdC2SxEovdDDex6Nx5sm6/m/dhamnw
+	 135C7lkvnPyNw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9393A392445F;
+	Mon, 24 Aug 2026 15:20:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -79,35 +37,56 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 00/10] Replace the name2utf8 copies with str2utf8
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178758480814.2968570.14468593902711921.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Aug 2026 15:20:08 +0000
+References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello:
 
-Thanks for looking at this.  Sorry that my earlier wording was unclear.
-I agree that the uses of p inside sizeof() and __must_be_array() are
-unevaluated, and that sizeof(vnd_codecs->num) is a compile-time value of
-one.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-The runtime access comes from the third macro argument, count.  Here that
-argument is the expression vnd_codecs->num.  Since it is not a constant
-expression, __builtin_choose_expr() selects the size_mul() branch, which
-effectively evaluates:
+On Thu, 20 Aug 2026 14:30:27 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> There are five near copies of the same helper turning a remote name into
+> a UTF-8 string, in monitor/att.c, profiles/audio/mcp.c,
+> profiles/gap/gas.c, src/eir.c and src/shared/ad.c, and none of them
+> agree with each other.
+> 
+> [...]
 
-	size_mul(vnd_codecs->num, sizeof(*vnd_codecs->codec))
+Here is the summary with links:
+  - [BlueZ,v2,01/10] eir: Fix stack buffer overflow when parsing the remote name
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=381b5d0d2089
+  - [BlueZ,v2,02/10] shared/ad: Fix reading past the name that was copied
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=784203160e2f
+  - [BlueZ,v2,03/10] unit/test-eir: Add tests for the longest local names
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=debd432ef13c
+  - [BlueZ,v2,04/10] shared/util: Make strnlenutf8 reject ill-formed sequences
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3ad832a3c2a9
+  - [BlueZ,v2,05/10] shared/util: Add str2utf8
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=11081f60d95f
+  - [BlueZ,v2,06/10] unit/test-util: Add str2utf8 tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=74c56dff2aa5
+  - [BlueZ,v2,07/10] Replace the name2utf8 copies with str2utf8
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8c81ab108b09
+  - [BlueZ,v2,08/10] device: Fix the name truncation splitting UTF-8 sequences
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2bf8286c4ebe
+  - [BlueZ,v2,09/10] device: Rename btd_device_device_set_name to btd_device_set_name
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bef0faa312ee
+  - [BlueZ,v2,10/10] unit/test-util: Cover strtoutf8 with the str2utf8 tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f0e40c5b3e6a
 
-Evaluating the first argument reads vnd_codecs->num before the result is
-compared with skb->len.  Therefore, if no byte remains after the standard
-codec array, the read is already out of bounds.  The issue is this count
-load, rather than any evaluation of the sizeof() operands.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I also verified this with a minimal reproducer using the same macro
-expansion: the compiler emits a byte load from vnd_codecs, and ASan
-reports a one-byte out-of-bounds read when the pointer is at the end of
-the buffer.
 
-Changing the trailing sizeof(vnd_codecs->num) to sizeof(*vnd_codecs)
-would give the same size, but it would not prevent the earlier count
-load.  The added check ensures that the count byte is present before
-flex_array_size() uses it.
-
-Thanks,
-Laxman
