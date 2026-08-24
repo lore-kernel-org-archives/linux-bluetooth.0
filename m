@@ -1,138 +1,148 @@
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.78.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2095407CF6;
-	Mon, 24 Aug 2026 11:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.78.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FB40D576
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 11:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787569247; cv=none; b=VP8Ek+BhLBNwGPTafCJ8e85PlGfLMWNS2S8D6h1oeYJKr+Wv69JF2235ZSASb1J4HSP0puXoUvSRg6mPvU8zlpGkJSUtWPcU91vbrwU1trWsaX1WcnuTHwtBwW45SDk13oCCBVPLXe5e8KVfHQcg2t9XoZK5mOo0pYPNhnLH1k8=
+	t=1787572155; cv=none; b=J4p61AkltNYYPvv++oh028O/svRYZbXYp5LBJzsaGYtKdMVZY0Ep2GpT1ad8B5YXwCmuE3KFiTl3KFrcziygaVcSMQQOgzJ43F6Ep+q4rAwB6iegl5dyaEkH3KlWJu5e68e3x0p8YS/u9p76mzr8xIVuQhGydnxbyxlehYzY9iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787569247; c=relaxed/simple;
-	bh=hDZlmyB+TI5qWwXED7l5E02qmZp59Ezez4/kr+sg2ek=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nO0+cPEEwfEQBxV+Uv2USCcyVcp/jUlxPTOUNC3vnXX56CzgZ2DxfDs+/fx1K8d6aIa1/yXh9oeVJa9Whx5Db9kIKrjdI0AX4KKO59s6YWcub4QZd+ykOIbmfwlofQDUbPYUkxoYuMJPsbXws24Sd0PN9aE8Yena7smilTEa+Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=dSLaGTb8; arc=none smtp.client-ip=77.75.78.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+	s=arc-20240116; t=1787572155; c=relaxed/simple;
+	bh=GCmUz1H0CLAzNINaaMEw4ktu9MwYQG3tSB1QOtw5pu4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Qzn3HmJTaqAK7Scct7I5p0459qfk1P9+r2u7W0vFm4O5MWBTPFIFsAOiXJKfoWqybDzAIWckwHUNyOPG3iEdrHD1q4XtM/a+RHXPmDA9Ba60BYlWWyaxqh/keJrepNe4VojzrnZjBLvbYOBj1xy5jBPq67BghrP31aRAvVcCe7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5PHYgHA; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="dSLaGTb8"
-Received: from email.seznam.cz
-	by smtpc-mxb-846d86b87b-lnqkz
-	(smtpc-mxb-846d86b87b-lnqkz [2a02:598:64:8a00::1000:901])
-	id 4995070dffafaa144c1a1d45;
-	Mon, 24 Aug 2026 13:00:39 +0200 (CEST)
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=emailprofi.seznam.cz; s=szn1; t=1787569239;
-	bh=oSNPHyPIIsBboNk17musSQJu7c8EBTX5CR3p59Y783s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding;
-	b=dSLaGTb8/lKjHWU79bgTtl5lEJnxIr+hGg96ixl8X3pxKW7mktGzRUAk8yMDYZjYH
-	 41JeCgavs/250ru+sPXFeus2T07fUVbDaLzyMtbfDmVKsAINFXn/G+bbMijXhm0JHr
-	 rhloX/YtGPum+Kc2uEP9k6gBfACTV1yx5i+oVnw3TxNpv+ZoB2VKWzoj+3tXt3S7xr
-	 fNvqdVUGahgDT9Hm/yLl8Kj3NALvh7Zunb4C4vMrXo4H9B6SQdXs3mm5XszqSLZJkd
-	 ftQafJctSsaIkv//I/kYuXUmWNc23CHg/Trov0d2nQjO5DI3VGdxfB2CsfqZMP9z8w
-	 YnAvaRRVtl51A==
-Received: from localhost.localdomain ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
-	by smtpd-relay-86c88674d5-h5l2p (szn-email-smtpd/2.0.80) with ESMTPA
-	id a1d787bb-3cda-4e6a-99ae-dfdc70e4d886;
-	Mon, 24 Aug 2026 13:00:29 +0200
-From: Radek Podgorny <radek@podgorny.cz>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Radek Podgorny <radek@podgorny.cz>
-Subject: [PATCH v2] Bluetooth: do not leak an hci_conn when a second LE connect is rejected
-Date: Mon, 24 Aug 2026 13:00:20 +0200
-Message-ID: <20260824110020.5423-1-radek@podgorny.cz>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <8ff19217-3b4e-4081-88a8-4bd26c573f8f@podgorny.cz>
-References: <8ff19217-3b4e-4081-88a8-4bd26c573f8f@podgorny.cz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5PHYgHA"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7f0167e59a3so2363227a34.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 04:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787572153; x=1788176953; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=PBnc0l0zF8aJGPpR5IzeNXXHnsWUE0gQMe2KwJU02bE=;
+        b=e5PHYgHANwMP/nmWPNiI3gO9try6NrSpJn9iI7UM6D5Agdig8ViqfqKCiKMoBFD4EM
+         dz2SaGs/qsLACZbBKh6hrcMuv00QGHoQJkJ7CiT8Zix2Fed8aGxsCqnR3e7WUycfbtuQ
+         gBO6GDmd79j2g50zUhCD5L6cxDtHCOWJyGuf12FvSZgdB9+k43dqbdnXmmtRq1Cpmnhh
+         NSZj4c735meJHm2rTY5UB4Pueb0P4scGmUV86PDJqFG2phi3Liya2loQf8gSfkMLE9kj
+         eyYnqrcp1PX+Txiu58hwhY5SmaFOoVIwyEfPf8KHq+aHlHrjL+Bip8sGCZqBSRChBXUB
+         LIrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787572153; x=1788176953;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=PBnc0l0zF8aJGPpR5IzeNXXHnsWUE0gQMe2KwJU02bE=;
+        b=oO2ZPHi+mgk5CddAwGEXqtdN2yotW3N26maRc1B1dGkrEevYm7xwEyTHoSvnMh8IZD
+         NZfzFn8+SxIu2U1sJXULweiH24LmEt4VYKkdbs+rhmTxDyo1VUK2DvYQvZueIB9a3bQA
+         CVJPASGM3y5EWX3nlwnW6eYoHd6ohOs6kO/ZwuuB17ilgcIFWYYo5XDTnzI+AkkUC0Qx
+         h+Uy96mf2k0UMorotPpUwFYSaV/TOPjCfxFqNHKGBDdkvrJCGtONXuIBMqhX160xe15P
+         oSVPbJm6B9DpmHgzaiDl5JpHyv4V5iNtBPjHGqiv2AWtAVe1Mnm7M4DZ2z0djYbkkK0U
+         wFlA==
+X-Gm-Message-State: AFuF++nVRD2jSU+boBE/xC6bdSoaD5uRwtuON8WbQcvZ7NCpYdy64Oip
+	dWioe10f8OKi6GO19wFYSx8WnC9kbUx9Y2uVoY6g0/5euAKv3h/Dl0C7UQ9zyQ==
+X-Gm-Gg: AR+sD10Fy3wd4+p3I7VPQClHLTNHY4brBg8B0TxtcQ5ZfjoMfJcvDcwEPTB+GnpXt7v
+	KhNn0+XEsSzgvblJ9vx3PF9ou0Im+3ZKw2DxZwm5Dbh0F8KFI3ylS8Q+nO5lNNQa5sYSXcbPQYn
+	Enc7N0HBqapGzJRBr+CvBYSRl0HXENmt5zkN4rKFNUBI4Ikl6ezbRT8vFdVmrK14tYkRfI2hLnW
+	c+HtbTO8LkWoFuDGNjoH+V4qEGFjVcmner/Li3u73lCwJqqxa+F5XyxA3riozBMY3T1hFzo4myF
+	gNXmKXtGJ//NkEEaFZBDID2dL6QFzQWBRkLIXj+lQECm1nVyfIDuImpqD7XhWcsGPxQ8f+BM1GA
+	JwJ6At65ZvGRZr6jvZBoh8TLqKdDC/WZMZcH+T7/p9KWHpeuLp5/85k9MMmivc03RTBwUUJEe+m
+	9M3l21UPxJAmjA7FZj65XlhxnA3w6Jb22dQzU6QPzTd1GINp81SiYN+nqipRBWcSGN9ls=
+X-Received: by 2002:a05:6830:6af8:b0:7e9:df1f:6a19 with SMTP id 46e09a7af769-7f47644e037mr20550503a34.7.1787572152762;
+        Mon, 24 Aug 2026 04:49:12 -0700 (PDT)
+Received: from [172.17.0.2] ([52.176.32.169])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f48fc4e6e8sm3898215a34.18.2026.08.24.04.49.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 04:49:12 -0700 (PDT)
+Message-ID: <6a8c2fb8.a5ccebaf.1b2f1a.b1cf@mx.google.com>
+Date: Mon, 24 Aug 2026 04:49:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6643333293770851017=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, radek@podgorny.cz
+Subject: RE: [v2] Bluetooth: do not leak an hci_conn when a second LE connect is rejected
+In-Reply-To: <20260824110020.5423-1-radek@podgorny.cz>
+References: <20260824110020.5423-1-radek@podgorny.cz>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-create_le_conn_complete() decides whether the failed connection is
-still pending by comparing it against hci_lookup_le_connect(), which
-returns the first LE connection in BT_CONNECT. That is the same
-connection only while at most one is pending.
+--===============6643333293770851017==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Two can be pending. Connections created on the passive scan path sit
-in BT_CONNECT with HCI_CONN_SCANNING set and are invisible to
-hci_lookup_le_connect() until hci_le_create_conn_sync() clears the
-flag when their command is issued, so the -EBUSY guard in
-hci_connect_le() does not prevent a second connection from being
-queued while the first is still on the scan path. Whenever two
-connections are in BT_CONNECT at once, the lookup may return one
-connection while create_le_conn_complete() is reporting the failure
-of the other; the early exit then drops the error and hci_conn_failed()
-never runs on the connection that failed.
+This is automated email and please do not reply to this email!
 
-The controller also rejects a second HCI_OP_LE_CREATE_CONN issued
-while another connection creation is still outstanding, per Core Spec
-Vol 4, Part E. The spec calls for Command Disallowed there; the
-bcm43438 observed here answers with an LMP/LL error code instead,
-which bt_to_errno() maps to the -EPROTO (-71) in the log below.
+Dear submitter,
 
-The leaked connection stays in BT_CONNECT forever, and because
-hci_connect_le() refuses to dial while hci_lookup_le_connect() finds
-anything, every subsequent attempt to reach any peer fails with
--EBUSY and no command reaches the controller at all.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1150809
 
-Seen on a bcm43438 with two BLE peers polled on the same interval
-(state 5 is BT_CONNECT; both handles are UNSET ones, allocated from
-the ida above HCI_CONN_HANDLE_MAX):
+---Test result---
 
-  Bluetooth: hci1: Opcode 0x2013 failed: -71
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.16 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      5.56 seconds
+BuildKernel                   PASS      20.96 seconds
+CheckAllWarning               PASS      23.54 seconds
+CheckSparse                   PASS      22.26 seconds
+BuildKernel32                 PASS      20.13 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      369.28 seconds
+TestRunner_l2cap-tester       PASS      56.83 seconds
+TestRunner_iso-tester         PASS      71.09 seconds
+TestRunner_bnep-tester        PASS      15.61 seconds
+TestRunner_mgmt-tester        FAIL      198.21 seconds
+TestRunner_rfcomm-tester      PASS      21.10 seconds
+TestRunner_sco-tester         PASS      27.74 seconds
+TestRunner_ioctl-tester       PASS      22.17 seconds
+TestRunner_mesh-tester        FAIL      22.58 seconds
+TestRunner_smp-tester         PASS      19.29 seconds
+TestRunner_userchan-tester    PASS      16.47 seconds
+TestRunner_6lowpan-tester     PASS      18.98 seconds
+IncrementalBuild              PASS      20.07 seconds
 
-  # hcitool con
-          < LE 14:9C:EF:03:68:81 handle 3840 state 5 lm CENTRAL
-          < LE C4:D3:6A:8C:B5:38 handle 3841 state 5 lm CENTRAL
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
 
-A btmon capture across the next ten minutes of connect attempts
-contains no HCI_OP_LE_CREATE_CONN at all; outgoing LE connections
-do not recover until the adapter is reset. With this change the same
-scenario fails the rejected connection cleanly and further connects
-to both peers go through.
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.217 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
-Ask about the connection itself instead of about the device.
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.497 seconds
+Mesh - Send cancel - 2                               Timed out    1.993 seconds
 
-Fixes: c9f73a2178c1 ("Bluetooth: hci_conn: Fix hci_connect_le_sync")
-Signed-off-by: Radek Podgorny <radek@podgorny.cz>
+
+https://github.com/bluez/bluetooth-next/pull/643
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v2:
 
-- Resend with git send-email; both previous submissions were mangled
-  by the mail client and never applied. No change to the patch itself.
-
- net/bluetooth/hci_sync.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 7150037a864b..24eeb76f7207 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -7279,8 +7279,13 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
- 		goto unlock;
- 	}
- 
--	/* Check if connection is still pending */
--	if (conn != hci_lookup_le_connect(hdev))
-+	/* Check if this connection is still pending.
-+	 *
-+	 * hci_lookup_le_connect() returns only the first LE connection
-+	 * in BT_CONNECT, which is not necessarily this one when two are
-+	 * pending at once, so ask the connection itself.
-+	 */
-+	if (conn->state != BT_CONNECT)
- 		goto unlock;
- 
- 	/* Flush to make sure we send create conn cancel command if needed */
--- 
-2.47.3
-
+--===============6643333293770851017==--
