@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CA046C847;
-	Mon, 24 Aug 2026 16:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D3046C84A;
+	Mon, 24 Aug 2026 16:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787590264; cv=none; b=UoxQ2PYUvxHDVMt4BdcILStRwTrxXanzZGI/82pZNGN/8ZPCG/D9PHx4aukKViBiyCN8nH+pz8eOhwkp9HZDYBBX+otn/W5rZZaMsN03fKWSxrZXgffuFxLe4/WCj7BmqPWsAgDRQT8zdYZTH1oUnOZ/uOgSLU4dT+MQIIZ3lII=
+	t=1787590267; cv=none; b=YSHoOr9Wk5FJO/7Tq0iPsTbRo0Zi5YlQtXN0z2SILXlsQSMc/dGrj4WJipaCQfGs2x7VGp7f37JtfAfMQfOlqA0sJIMMhf+UXs9waSKb2eQjsmtart9muWSp9ETN6wbPWUscxLLs5ITFDCsfIdfG1DzPYjwdrfeekmgis1XkOa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787590264; c=relaxed/simple;
-	bh=SXsX/EIm3gnCBZwNm6uHPm8S2fRnNY3XmvWqWnfj3xM=;
+	s=arc-20240116; t=1787590267; c=relaxed/simple;
+	bh=VcPF6Zr2h7xLkPjZo5bOOb17YCnoUOZLbwOCyb6Cwpw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FugYWMIyi79lkHyXXmsx2q1IkNfMjUmhBB17kiBGxhTxYysC1yGfLDvH+N2tW3iUznHlEZ0G5p+2/VyOQtxT8NXiHYYs6p/Di2yUOwiNrR/Xf5YdsEm6o1ixEzMFvJEBiQg1END+urGiaOyyydkDkmabp0n1cu7u5QpSk8+4QNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i177Ruln; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=k1Rs43B7HSMiW6TadWwPIJ9ALamIFubVRDH0RlqnUg+l5a2Jsy2BK9fVFhrlZhkT4hcij77P7DXGy3DLpafWWpXSlH/5dOA5bcKPVxn9ITAhw2PjicfrlSi1LBm6fPc2Jtjx9gOlZWvpsxmy0wTzh2nOlc4sDyBCchXMmlW3Pgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+GqnKnM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i177Ruln"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51FEA1F00A3A;
-	Mon, 24 Aug 2026 16:51:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H+GqnKnM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C66B41F000E9;
+	Mon, 24 Aug 2026 16:51:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787590261;
-	bh=dcJ9eGwTufyPuZGfIoQs/6brY3popS9qR1vvr2CuF3I=;
+	s=k20260515; t=1787590262;
+	bh=rJStwZRbP99TYWbbAHbc3tE4EIKFHDtlxRh14wfhlS8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=i177Ruln1SVmgiBGBCI+6mMAQHsY2sK43iWwjfCXg2ZIakEe+c/fn+AhwWWMYMee3
-	 dTV94GcADDlwGUQrN1Ip9wCQvhvH76T/VzToNjL0KQXZtLeBNjAMPmXP3cRO9m8MHv
-	 g4OToweKDl1e2tGXuf8hPoHo+gYIVo65gHWpQw8oHhxwIrGKdZbH6uyCpGcaW7FAQr
-	 PYrast+V1hQLB+8sb2v7E7POriX19Q91/WR3ehq+SWs4XkhfVnFKGetDYWHLDVYsSW
-	 fioOAQansQRyAEAZRwUTktusssAvMlbKXr2t1wfDcpVCVsVP6CZ7THW9apjh5Tbp1c
-	 /PiFI740FkaBg==
+	b=H+GqnKnMnAv3ysTMHpNn665+7WpzLFHlI7xXFGmnpERFQF4lJ/UnhffVbbw9f12It
+	 YVFfti/NHFnJaAbPbdfP/auSA4fg2uLBHHpwM7/9IB8IkQj41rD3jz6V/5Y7qc/ZnS
+	 0Ce3lroCK/sU1G5YlA3+OG8pIn44p5zzP/23hRub6UXaUTxAlMyP4rCTap2nkmP23s
+	 yJ7cSl86ejVtGegflUJWs9ovhfnY72w202hjSQ5EuVsh95uUoC7cubAItHgbHbuwX0
+	 SJOtd6VFeCskmzGw+PH7d546iKsavpTIp4aX4Spo/D84h0NpOuTyLmUYKU16KLmW3t
+	 odkAVkomB9Gow==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198303924478;
-	Mon, 24 Aug 2026 16:50:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938F53924478;
+	Mon, 24 Aug 2026 16:50:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,42 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: limit RTL8761B BROKEN_EXT_SCAN quirk to
- 0bda:a728
+Subject: Re: [PATCH RFC v2] Bluetooth: mt7925: trigger reset on WMT timeout
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178759020863.3014491.13354284194463299863.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Aug 2026 16:50:08 +0000
-References: <20260824053227.317496-1-junjie.cao@intel.com>
-In-Reply-To: <20260824053227.317496-1-junjie.cao@intel.com>
-To: Junjie Cao <junjie.cao@intel.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ <178759021014.3014491.17750649359199343822.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Aug 2026 16:50:10 +0000
+References: <20260822-mt7925-rfc-v2-1-c88e3bcf7eb8@gmail.com>
+In-Reply-To: <20260822-mt7925-rfc-v2-1-c88e3bcf7eb8@gmail.com>
+To: George Maraveyas <george.0xfff@gmail.com>
+Cc: stern@rowland.harvard.edu, marcel@holtmann.org, luiz.dentz@gmail.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- alexej@sidorenko.cz, regressions@lists.linux.dev, sashal@kernel.org,
- stable@vger.kernel.org
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ acelan.kao@canonical.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 24 Aug 2026 13:32:27 +0800 you wrote:
-> Commit 5ead2063611a ("Bluetooth: btrtl: fix RTL8761B/BU broken LE
-> extended scan") set HCI_QUIRK_BROKEN_EXT_SCAN for every CHIP_ID_8761B
-> device to cure repeated 0x2042 failures on an 0bda:a728 dongle. The
-> brokenness is per-dongle, not per-chip: on a TP-Link UB500 (2357:0604,
-> RTL8761BU, fw 0xdfc6d922) extended scan works, and the legacy scan
-> path the quirk forces is what is broken -- LE Set Scan Enable (0x200c)
-> times out with -110 about 30 s after firmware load, btusb resets the
-> device, and the adapter re-enumerates in an endless loop (382 firmware
-> reloads in one boot). 7.1.8, which predates the stable backport, runs
-> clean on this unit; 7.1.9 loops.
+On Sat, 22 Aug 2026 01:37:33 +0200 you wrote:
+> From: George Maraveyas <george.0xfff@gmail.com>
+> 
+> The MT7925 Bluetooth USB function can enumerate successfully after a warm
+> reboot while the WMT function-control command remains unresponsive.
+> 
+> When that command times out, btmtk_usb_setup() currently returns
+> -ETIMEDOUT without entering the existing MediaTek reset path. The existing
+> USB reset and recovery machinery is therefore never reached.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btusb: limit RTL8761B BROKEN_EXT_SCAN quirk to 0bda:a728
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0c9d2588a514
+  - [RFC,v2] Bluetooth: mt7925: trigger reset on WMT timeout
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a6491451f8b8
 
 You are awesome, thank you!
 -- 
