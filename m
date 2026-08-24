@@ -1,298 +1,158 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7C0386C21;
-	Mon, 24 Aug 2026 19:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C980F38B14C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 20:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787601006; cv=none; b=qwpWfuJ5SLdzDcn6hrtevZVN/hGQYT5hc+lmp6INoxSzindhLEieDV3M3xOEGhUJf9hl/cZU6uEvlXf1OmrmmdtgUW8ue5hMt3tqCZVjlKZQtwVzS3YDgNEJsOIZ0XB6BFdg4eyOVT6fwVOKIbqijVT4jGRTe0fX3PwJ7CorNCI=
+	t=1787602100; cv=none; b=Yz7h1uknOOIQKoIZT6Gj6lqj334cYWivk4obWsLNYc27IZjgzGFEmcxgvOJ0hL+poJvUeL9NxXYpaT1Wrb9lGP2LGTT2ykQ52/F0SOzzw8u6hPNOvPP1lmT7XshDvKX9StvMmXFA2dE6Kh2HosdsHIhA7ScUahoA29oIobTtBHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787601006; c=relaxed/simple;
-	bh=ahlPqpkIPSw1IsjsmVM21wJnovl1SrnM6Dd9PQlIDbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DcATdWvRqFX34IK4grdJRsIF1tLJ1TcTIMMEQY59a/LFkqftGoUlq82omvD+nak703o7VLFRXCqc+UcMRlnaB5Pf/py3NG/pxNtz95J8TzpeQbTPADqRMVKqSfzkxLynGM7ooxIrjQIiNbG2IirM0KxL1XGg6d1C/U4+CMlbeMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N60jQ1MX; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1787602100; c=relaxed/simple;
+	bh=EemzPsHLG+84PhwYMfS9TmLQq91LFwPVdcg0coTGHjE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bx8jT/6zS+5+ftYJT/FzqoxZDKuED1zl9prwXyVjZtatKQ3pnjo0DHRlmMDR2n80zXUPoNqrwyO/CLufuAN9tSZrCGq0ApEZGeXiSL5A36kpK39unNjaObyiJ0bhbtIoYIw8wiyCMMMmTHhpKe7FTaUO0aBND+DDJAa8FfD12TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8q3TTRO; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N60jQ1MX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1787601004; x=1819137004;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ahlPqpkIPSw1IsjsmVM21wJnovl1SrnM6Dd9PQlIDbs=;
-  b=N60jQ1MXvZOM7W1gWsIR1FOSzTkD6SAbHNCUg8ZP6eTy7CSH5wpclYjH
-   VeWZsA3Hs5VNUWlaulXHGzBEcNOKPg8WHPEr3mTSwHyJcoWUJHZhMTINW
-   0aCdIOFg6ZOZ5z7AaqukuJTCoABjRHz5GWRxGSRbD7leszTSS3xojA8mP
-   yLlTGw18+ZjWGWWXuhKwN7gyj/emZ8nncE+pstWY0dLam0NdM7qNblCOq
-   yKEPm8i+wxqG1EJ+qEEQvE4Z9xdNNi5daBBp2rOHdNPUQIUETie9yNxZN
-   ZH+TKIslUMSwNcxFsSflfhDK8eKvZGsW8E5PFaVkZCCIOovNrb7zHjEJg
-   A==;
-X-CSE-ConnectionGUID: trtExo0pRHa7bGpBb3owOg==
-X-CSE-MsgGUID: oYgyxgtFSjuN0SlxrIJ8Cw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11885"; a="87921945"
-X-IronPort-AV: E=Sophos;i="6.25,241,1779174000"; 
-   d="scan'208";a="87921945"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2026 12:50:04 -0700
-X-CSE-ConnectionGUID: Dsag7avqSlurvZJXEL8gvQ==
-X-CSE-MsgGUID: Sv9RE7OFSz+avZGUJedHng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,241,1779174000"; 
-   d="scan'208";a="270557835"
-Received: from lkp-server01.sh.intel.com (HELO 3532383e6126) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 24 Aug 2026 12:50:02 -0700
-Received: from kbuild by 3532383e6126 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wyag4-000000003wF-0sfl;
-	Mon, 24 Aug 2026 19:49:55 +0000
-Date: Tue, 25 Aug 2026 03:48:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Hang Nan <2122295973@qq.com>, linux-bluetooth@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	marcel@holtmann.org, luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, pav@iki.fi
-Subject: Re: [PATCH v3] Bluetooth: ISO: fix use-after-free of listener socket
- in iso_conn_ready
-Message-ID: <202608250307.IiUVBpTP-lkp@intel.com>
-References: <tencent_1E12CBD7417A4019FF058EFD19B1DB930006@qq.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8q3TTRO"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4b190cdc9feso3456335b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 13:08:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787602098; x=1788206898; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=EemzPsHLG+84PhwYMfS9TmLQq91LFwPVdcg0coTGHjE=;
+        b=f8q3TTRORPLXCh1KoariLUvsXhafTS5ldKVYHFBuqwiWfMKRHOIbNAztEDVqKz4Dvf
+         seKOoCdKcHzA68NEQEAybhL046y5kRbCFYBp1Q2UP9w3n7QjpuMZEwKAQxEWfkx3Y+Xa
+         ogzoYRZXVfnrkSWhS8XY4NWrKX1rbYyN8ITR4C4hdYbiGlG3RTJdQ7pYyOCooUkHrRL9
+         l4uhCJXfUnHYSG6BNuLFKqv7nVKfEh5oFE9Jf4UCVrTI52zyKKNVJj1mQWorGlg4129Z
+         uGI0ZrGvvQljW8PmtCU1MSSLmyQc/dnKx9LWHxORN8g/BV+iXBOPulPhmkuHaujN0YY3
+         3UBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787602098; x=1788206898;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=EemzPsHLG+84PhwYMfS9TmLQq91LFwPVdcg0coTGHjE=;
+        b=isgyg3vq6cRoRJMbNsbDFQLvwXsrBRKYs3hbqtZjMXP+vJkl9dnm6j+fp45Hnr0DJi
+         pNmzD3iDW6JXBlqjcbLAGvoqeXgGDYD5mPrGFZgMAEgu0TGBJy7+zgAILQA1hPfViwqh
+         DBPei0wXBw+bqHHEATmwoe9FHjGGkbVJeUXFyfMkky/FWLPJTmC0WyInY6x/YKbXXg1p
+         K3DZnNAmPEOWm1tSU82Q4xIkf35lvMwlxgKxFehgyRmwlDwWm5SwFqMGYMyrMro+Lfe/
+         uU9oT64TNN1JkIfqq27/puJEfqkL4wUg6hsBqmDSMFGCMKqe5gPUAThPdAxGxk0ZrGWc
+         pU5g==
+X-Gm-Message-State: AFuF++m8SOGcxLpCx6nQrfDZdnB1tZwXl38nHTRW6myE/Jj2SwxjHrFY
+	S6KVH+WjzS6oy7844xgM7xCoSav1mUZH4r7Cu7NOk5xY3ogF3FUjm9XKAUT/nA==
+X-Gm-Gg: AR+sD11yEwrhFZXlewVGIlNOQ5XTUG4fZ09KcvAAM3wYij2w/NyqCh3WqH3YU1ZkhMK
+	OkCcmXYcjKcJEU3Zb1KoohYnZgDrY9yK+am7QZrnha/R0H1YovTVq8nR9HjYmqIxkhtoqMc8eSa
+	jFV4tUyJH8upotGzrfHTx+duaR/4kd67XXRTobOFTb0JGlc4goqeaEMgnb5fRvFseBoYcjCoCWn
+	VbneXYIGJdlYD6wfTekZG5Tcco+bHFUfPceKryqzPF5ri1Kna7TxTaKY2nLksM+nM0zNZgR0ZuO
+	NRqOWZYBcgfonStwxKbqHisfCwyt3bOQbiyWfJ1XRjto1TkUaGvN61qwuxz/CGU4oheffEcbGGl
+	XB0zrATL+e6kNom0qpmcFreAoX8DNJRPzemzbcXmb2P2O4pEOVEl7sxsGCDIQuObONY1OhdIF16
+	QoMIMQbZGES6DEtuxkv7xEccJm3DjZc4ortkGnup3SxFRIQ2MkiA7ZK90FbpAams0T
+X-Received: by 2002:a05:6808:c3e9:b0:489:352c:5153 with SMTP id 5614622812f47-4b2ef482faemr27788154b6e.21.1787602097499;
+        Mon, 24 Aug 2026 13:08:17 -0700 (PDT)
+Received: from [172.17.0.2] ([20.118.30.0])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b32c690a5asm4259007b6e.8.2026.08.24.13.08.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 13:08:17 -0700 (PDT)
+Message-ID: <6a8ca4b1.a96d76c3.16624d.1468@mx.google.com>
+Date: Mon, 24 Aug 2026 13:08:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4060491149959171901=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_1E12CBD7417A4019FF058EFD19B1DB930006@qq.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, uldixxion@gmail.com
+Subject: =?utf-8?q?RE=3A_MT7925_=280e8d=3A0717=29=3A_HFP_microphone_unusable_=E2=80=94_firmware_delivers_zero-filled_=28e=29SCO_frames_on_sentinel_handle_0x0E00?=
+In-Reply-To: <CAPCBbk7t6OKtOGynNhf6oGnxGrSEqkh-SfweO_Yfms5NXDSCZQ@mail.gmail.com>
+References: <CAPCBbk7t6OKtOGynNhf6oGnxGrSEqkh-SfweO_Yfms5NXDSCZQ@mail.gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Hang,
+--===============4060491149959171901==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-kernel test robot noticed the following build errors:
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTE1MTExOQoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgRkFJTCAgICAgIDAuNjAgc2Vjb25kcwpWZXJpZnlGaXhlcyAgICAgICAgICAgICAgICAgICBQ
+QVNTICAgICAgMC4xMCBzZWNvbmRzClZlcmlmeVNpZ25lZG9mZiAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAwLjEwIHNlY29uZHMKR2l0TGludCAgICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDAuMjYgc2Vjb25kcwpTdWJqZWN0UHJlZml4ICAgICAgICAgICAgICAgICBGQUlMICAgICAgMC4w
+OSBzZWNvbmRzCkJ1aWxkS2VybmVsICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMi40OSBz
+ZWNvbmRzCkNoZWNrQWxsV2FybmluZyAgICAgICAgICAgICAgIFBBU1MgICAgICAyNC41OCBzZWNv
+bmRzCkNoZWNrU3BhcnNlICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMi44OSBzZWNvbmRz
+CkJ1aWxkS2VybmVsMzIgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMS40MSBzZWNvbmRzCkNo
+ZWNrS2VybmVsTExWTSAgICAgICAgICAgICAgIFNLSVAgICAgICAwLjAwIHNlY29uZHMKVGVzdFJ1
+bm5lclNldHVwICAgICAgICAgICAgICAgUEFTUyAgICAgIDM4My4yNSBzZWNvbmRzCkluY3JlbWVu
+dGFsQnVpbGQgICAgICAgICAgICAgIFBBU1MgICAgICAyMS4wOCBzZWNvbmRzCgpEZXRhaWxzCiMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gRkFJTApEZXNj
+OiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgpNVDc5MjUgKDBlOGQ6MDcxNyk6IEhG
+UCBtaWNyb3Bob25lIHVudXNhYmxlIOKAlCBmaXJtd2FyZSBkZWxpdmVycyB6ZXJvLWZpbGxlZCAo
+ZSlTQ08gZnJhbWVzIG9uIHNlbnRpbmVsIGhhbmRsZSAweDBFMDAKRVJST1I6IEludmFsaWQgY29t
+bWl0IHNlcGFyYXRvciAtIHNvbWUgdG9vbHMgbWF5IGhhdmUgcHJvYmxlbXMgYXBwbHlpbmcgdGhp
+cwojMTIwOiAKLS0tLS0tLS0tLS0tLS0tLS0tLQoKRVJST1I6IEludmFsaWQgY29tbWl0IHNlcGFy
+YXRvciAtIHNvbWUgdG9vbHMgbWF5IGhhdmUgcHJvYmxlbXMgYXBwbHlpbmcgdGhpcwojMTM1OiAK
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKRVJST1I6IEludmFsaWQgY29tbWl0IHNlcGFyYXRvciAt
+IHNvbWUgdG9vbHMgbWF5IGhhdmUgcHJvYmxlbXMgYXBwbHlpbmcgdGhpcwojMTUwOiAKLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpFUlJPUjogSW52YWxpZCBjb21taXQgc2VwYXJh
+dG9yIC0gc29tZSB0b29scyBtYXkgaGF2ZSBwcm9ibGVtcyBhcHBseWluZyB0aGlzCiMxNzg6IAot
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCkVSUk9SOiBJbnZhbGlkIGNvbW1pdCBz
+ZXBhcmF0b3IgLSBzb21lIHRvb2xzIG1heSBoYXZlIHByb2JsZW1zIGFwcGx5aW5nIHRoaXMKIzIw
+ODogCi0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXQVJOSU5HOiBQcmVmZXIgYSBtYXhpbXVtIDc1IGNo
+YXJzIHBlciBsaW5lIChwb3NzaWJsZSB1bndyYXBwZWQgY29tbWl0IGRlc2NyaXB0aW9uPykKIzI2
+NDogCjA5OjAwLjAgTmV0d29yayBjb250cm9sbGVyIFswMjgwXTogTUVESUFURUsgQ29ycC4gTVQ3
+OTI1IChSWjcxNykgV2ktRmkgNyAxNjBNSHogWzE0YzM6MDcxN10KCkVSUk9SOiBBdm9pZCB1c2lu
+ZyBkaWZmIGNvbnRlbnQgaW4gdGhlIGNvbW1pdCBtZXNzYWdlIC0gcGF0Y2goMSkgbWlnaHQgbm90
+IHdvcmsKIzI3MTogCi0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMKCkVSUk9SOiBJbnZh
+bGlkIGNvbW1pdCBzZXBhcmF0b3IgLSBzb21lIHRvb2xzIG1heSBoYXZlIHByb2JsZW1zIGFwcGx5
+aW5nIHRoaXMKIzI3MTogCi0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMKCkVSUk9SOiBN
+aXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiA4IGVycm9ycywgMSB3YXJuaW5n
+cywgNDYgbGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVj
+dHMsIGNoZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQg
+dG8gdGhlIHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRo
+dWIvd29ya3NwYWNlL3NyYy9wYXRjaC8xNDc2NjAzMS5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IFVOS05PV05fQ09N
+TUlUX0lECgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBw
+bGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBH
+aXRMaW50IC0gRkFJTApEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6Ck1UNzkyNSAoMGU4ZDowNzE3
+KTogSEZQIG1pY3JvcGhvbmUgdW51c2FibGUg4oCUIGZpcm13YXJlIGRlbGl2ZXJzIHplcm8tZmls
+bGVkIChlKVNDTyBmcmFtZXMgb24gc2VudGluZWwgaGFuZGxlIDB4MEUwMAoKMTogQ0MxIEJvZHkg
+ZG9lcyBub3QgY29udGFpbiBhICdTaWduZWQtb2ZmLWJ5JyBsaW5lCjE6IFQxIFRpdGxlIGV4Y2Vl
+ZHMgbWF4IGxlbmd0aCAoMTE1PjgwKTogIk1UNzkyNSAoMGU4ZDowNzE3KTogSEZQIG1pY3JvcGhv
+bmUgdW51c2FibGUg4oCUIGZpcm13YXJlIGRlbGl2ZXJzIHplcm8tZmlsbGVkIChlKVNDTyBmcmFt
+ZXMgb24gc2VudGluZWwgaGFuZGxlIDB4MEUwMCIKMTE2OiBCMSBMaW5lIGV4Y2VlZHMgbWF4IGxl
+bmd0aCAoODU+ODApOiAiWyA0ODM3Ljg3NjA0OF0gQmx1ZXRvb3RoOiBoY2kwOiBIVy9TVyBWZXJz
+aW9uOiAweDAwMDAwMDAwLCBCdWlsZCBUaW1lOiAyMDI2MDYwNTE4NDkzNSIKMTE4OiBCMSBMaW5l
+IGV4Y2VlZHMgbWF4IGxlbmd0aCAoMTE1PjgwKTogIlsgNDgzOS43MDUzMjRdIEJsdWV0b290aDog
+aGNpMDogSENJIEVuaGFuY2VkIFNldHVwIFN5bmNocm9ub3VzIENvbm5lY3Rpb24gY29tbWFuZCBp
+cyBhZHZlcnRpc2VkLCBidXQgbm90IHN1cHBvcnRlZC4iCjE0MjogQjEgTGluZSBleGNlZWRzIG1h
+eCBsZW5ndGggKDEwMz44MCk6ICJMaW51eCB1bGRpeHhpb24gNy4yLjAtMS1jYWNoeW9zICMxIFNN
+UCBQUkVFTVBUX0RZTkFNSUMgVGh1LCAyMCBBdWcgMjAyNiAwNjowNjozMCArMDAwMCB4ODZfNjQg
+R05VL0xpbnV4IgoxNTU6IEIxIExpbmUgZXhjZWVkcyBtYXggbGVuZ3RoICg5MT44MCk6ICIwOTow
+MC4wIE5ldHdvcmsgY29udHJvbGxlciBbMDI4MF06IE1FRElBVEVLIENvcnAuIE1UNzkyNSAoUlo3
+MTcpIFdpLUZpIDcgMTYwTUh6IFsxNGMzOjA3MTddIgoxNTk6IEIxIExpbmUgZXhjZWVkcyBtYXgg
+bGVuZ3RoICgxMTA+ODApOiAi0LDQstCzIDI0IDE1OjQ4OjMwIHVsZGl4eGlvbiBrZXJuZWw6IG10
+NzkyNWUgMDAwMDowOTowMC4wOiBIVy9TVyBWZXJzaW9uOiAweDhhMTA4YTEwLCBCdWlsZCBUaW1l
+OiAyMDI2MDYwNTE4NDY1MWEiCjE2MDogQjEgTGluZSBleGNlZWRzIG1heCBsZW5ndGggKDExNT44
+MCk6ICLQsNCy0LMgMjQgMTU6NDg6MzAgdWxkaXh4aW9uIGtlcm5lbDogbXQ3OTI1ZSAwMDAwOjA5
+OjAwLjA6IFdNIEZpcm13YXJlIFZlcnNpb246IF9fX18wMDAwMDAsIEJ1aWxkIFRpbWU6IDIwMjYw
+NjA1MTg0ODA1IgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogU3ViamVjdFBy
+ZWZpeCAtIEZBSUwKRGVzYzogQ2hlY2sgc3ViamVjdCBjb250YWlucyAiQmx1ZXRvb3RoIiBwcmVm
+aXgKT3V0cHV0OgoiQmx1ZXRvb3RoOiAiIHByZWZpeCBpcyBub3Qgc3BlY2lmaWVkIGluIHRoZSBz
+dWJqZWN0CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja0tlcm5lbExM
+Vk0gLSBTS0lQCkRlc2M6IEJ1aWxkIGtlcm5lbCB3aXRoIExMVk0gKyBjb250ZXh0IGFuYWx5c2lz
+Ck91dHB1dDoKQ2xhbmcgbm90IGZvdW5kCgoKaHR0cHM6Ly9naXRodWIuY29tL2JsdWV6L2JsdWV0
+b290aC1uZXh0L3B1bGwvNjQ3CgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on linus/master v7.2]
-[cannot apply to bluetooth-next/master next-20260821]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Hang-Nan/Bluetooth-ISO-fix-use-after-free-of-listener-socket-in-iso_conn_ready/20260818-193343
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/tencent_1E12CBD7417A4019FF058EFD19B1DB930006%40qq.com
-patch subject: [PATCH v3] Bluetooth: ISO: fix use-after-free of listener socket in iso_conn_ready
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20260825/202608250307.IiUVBpTP-lkp@intel.com/config)
-compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 935bfc708590c60147a79c7df145bb6e68b1d388)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260825/202608250307.IiUVBpTP-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202608250307.IiUVBpTP-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
->> net/bluetooth/iso.c:2267:4: error: call to undeclared function 'release_sock_flagsock'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2267 |                         release_sock_flagsock(parent);
-         |                         ^
->> net/bluetooth/iso.c:2266:8: warning: left operand of comma operator has no effect [-Wunused-value]
-    2266 |                     (parent, SOCK_ZAPPED)) {
-         |                      ^~~~~~
-   1 warning and 1 error generated.
-
-
-vim +/release_sock_flagsock +2267 net/bluetooth/iso.c
-
-  2156	
-  2157	static void iso_conn_ready(struct iso_conn *conn)
-  2158	{
-  2159		struct sock *parent = NULL;
-  2160		struct sock *sk;
-  2161		struct hci_ev_le_big_sync_established *ev = NULL;
-  2162		struct hci_ev_le_pa_sync_established *ev2 = NULL;
-  2163		struct hci_ev_le_per_adv_report *ev3 = NULL;
-  2164		struct hci_conn *hcon;
-  2165		struct hci_dev *hdev;
-  2166	
-  2167		BT_DBG("conn %p", conn);
-  2168	
-  2169		iso_conn_lock(conn);
-  2170		sk = iso_sock_hold(conn);
-  2171		iso_conn_unlock(conn);
-  2172	
-  2173		if (sk) {
-  2174			lock_sock(sk);
-  2175	
-  2176			/* conn->sk may have become NULL if racing with sk close, but
-  2177			 * due to held hdev->lock, it can't become different sk.
-  2178			 */
-  2179			if (!conn->sk) {
-  2180				release_sock(sk);
-  2181				sock_put(sk);
-  2182				return;
-  2183			}
-  2184	
-  2185			/* Attempt to update source address in case of BIS Sender if
-  2186			 * the advertisement is using a random address.
-  2187			 */
-  2188			if (conn->hcon->type == BIS_LINK &&
-  2189			    conn->hcon->role == HCI_ROLE_MASTER &&
-  2190			    !bacmp(&conn->hcon->dst, BDADDR_ANY)) {
-  2191				struct hci_conn *bis = conn->hcon;
-  2192				struct adv_info *adv;
-  2193	
-  2194				adv = hci_find_adv_instance(bis->hdev,
-  2195							    bis->iso_qos.bcast.bis);
-  2196				if (adv && bacmp(&adv->random_addr, BDADDR_ANY)) {
-  2197					iso_pi(sk)->src_type = BDADDR_LE_RANDOM;
-  2198					bacpy(&iso_pi(sk)->src, &adv->random_addr);
-  2199				}
-  2200			}
-  2201	
-  2202			iso_sock_ready(sk);
-  2203	
-  2204			release_sock(sk);
-  2205			sock_put(sk);
-  2206		} else {
-  2207			hcon = conn->hcon;
-  2208			if (!hcon)
-  2209				return;
-  2210	
-  2211			hdev = hcon->hdev;
-  2212	
-  2213			if (test_bit(HCI_CONN_BIG_SYNC, &hcon->flags)) {
-  2214				/* A BIS slave hcon is notified to the ISO layer
-  2215				 * after the Command Complete for the LE Setup
-  2216				 * ISO Data Path command is received. Get the
-  2217				 * parent socket that matches the hcon BIG handle.
-  2218				 */
-  2219				parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
-  2220						      BT_LISTEN, iso_match_big_hcon,
-  2221						      hcon);
-  2222			} else if (test_bit(HCI_CONN_BIG_SYNC_FAILED, &hcon->flags)) {
-  2223				ev = hci_recv_event_data(hcon->hdev,
-  2224							 HCI_EVT_LE_BIG_SYNC_ESTABLISHED);
-  2225	
-  2226				/* Get reference to PA sync parent socket, if it exists */
-  2227				parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
-  2228						      BT_LISTEN,
-  2229						      iso_match_pa_sync_flag,
-  2230						      NULL);
-  2231				if (!parent && ev)
-  2232					parent = iso_get_sock(hdev, &hcon->src,
-  2233							      &hcon->dst,
-  2234							      BT_LISTEN,
-  2235							      iso_match_big, ev);
-  2236			} else if (test_bit(HCI_CONN_PA_SYNC_FAILED, &hcon->flags)) {
-  2237				ev2 = hci_recv_event_data(hcon->hdev,
-  2238							  HCI_EV_LE_PA_SYNC_ESTABLISHED);
-  2239				if (ev2)
-  2240					parent = iso_get_sock(hdev, &hcon->src,
-  2241							      &hcon->dst,
-  2242							      BT_LISTEN,
-  2243							      iso_match_sid, ev2);
-  2244			} else if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
-  2245				ev3 = hci_recv_event_data(hcon->hdev,
-  2246							  HCI_EV_LE_PER_ADV_REPORT);
-  2247				if (ev3)
-  2248					parent = iso_get_sock(hdev, &hcon->src,
-  2249							      &hcon->dst,
-  2250							      BT_LISTEN,
-  2251							      iso_match_sync_handle_pa_report,
-  2252							      ev3);
-  2253			}
-  2254	
-  2255			if (!parent)
-  2256				parent = iso_get_sock(hdev, &hcon->src, BDADDR_ANY,
-  2257						      BT_LISTEN, iso_match_dst, BDADDR_ANY);
-  2258	
-  2259			if (!parent)
-  2260				return;
-  2261	
-  2262			lock_sock(parent);
-  2263	
-  2264			/* The listener may have been closed concurrently. */
-  2265			if (parent->sk_state != BT_LISTEN ||
-> 2266			    (parent, SOCK_ZAPPED)) {
-> 2267				release_sock_flagsock(parent);
-  2268				sock_put(parent);
-  2269				return;
-  2270			}
-  2271	
-  2272			sk = iso_sock_alloc(sock_net(parent), NULL,
-  2273					    BTPROTO_ISO, GFP_ATOMIC, 0);
-  2274			if (!sk) {
-  2275				release_sock(parent);
-  2276				return;
-  2277			}
-  2278	
-  2279			iso_sock_init(sk, parent);
-  2280	
-  2281			bacpy(&iso_pi(sk)->src, &hcon->src);
-  2282	
-  2283			/* Convert from HCI to three-value type */
-  2284			if (hcon->src_type == ADDR_LE_DEV_PUBLIC)
-  2285				iso_pi(sk)->src_type = BDADDR_LE_PUBLIC;
-  2286			else
-  2287				iso_pi(sk)->src_type = BDADDR_LE_RANDOM;
-  2288	
-  2289			/* If hcon has no destination address (BDADDR_ANY) it means it
-  2290			 * was created by HCI_EV_LE_BIG_SYNC_ESTABILISHED or
-  2291			 * HCI_EV_LE_PA_SYNC_ESTABLISHED so we need to initialize using
-  2292			 * the parent socket destination address.
-  2293			 */
-  2294			if (!bacmp(&hcon->dst, BDADDR_ANY)) {
-  2295				bacpy(&hcon->dst, &iso_pi(parent)->dst);
-  2296				hcon->dst_type = le_addr_type(iso_pi(parent)->dst_type);
-  2297			}
-  2298	
-  2299			if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
-  2300				iso_pi(sk)->qos = iso_pi(parent)->qos;
-  2301				hcon->iso_qos = iso_pi(sk)->qos;
-  2302				iso_pi(sk)->bc_sid = iso_pi(parent)->bc_sid;
-  2303				iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
-  2304				memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis,
-  2305				       ISO_MAX_NUM_BIS);
-  2306				set_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags);
-  2307			}
-  2308	
-  2309			bacpy(&iso_pi(sk)->dst, &hcon->dst);
-  2310	
-  2311			/* Convert from HCI to three-value type */
-  2312			if (hcon->dst_type == ADDR_LE_DEV_PUBLIC)
-  2313				iso_pi(sk)->dst_type = BDADDR_LE_PUBLIC;
-  2314			else
-  2315				iso_pi(sk)->dst_type = BDADDR_LE_RANDOM;
-  2316	
-  2317			iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
-  2318			memcpy(iso_pi(sk)->base, iso_pi(parent)->base, iso_pi(parent)->base_len);
-  2319			iso_pi(sk)->base_len = iso_pi(parent)->base_len;
-  2320	
-  2321			hci_conn_hold(hcon);
-  2322			iso_chan_add(conn, sk, parent);
-  2323	
-  2324			if ((ev && ((struct hci_evt_le_big_sync_established *)ev)->status) ||
-  2325			    (ev2 && ev2->status)) {
-  2326				/* Trigger error signal on child socket */
-  2327				sk->sk_err = ECONNREFUSED;
-  2328				sk->sk_error_report(sk);
-  2329			}
-  2330	
-  2331			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
-  2332				sk->sk_state = BT_CONNECT2;
-  2333			else
-  2334				sk->sk_state = BT_CONNECTED;
-  2335	
-  2336			/* Wake up parent */
-  2337			parent->sk_data_ready(parent);
-  2338	
-  2339			release_sock(parent);
-  2340			sock_put(parent);
-  2341		}
-  2342	}
-  2343	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--===============4060491149959171901==--
