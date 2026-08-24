@@ -1,156 +1,131 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92EF329391
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D651B3F4116;
+	Mon, 24 Aug 2026 09:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.76.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787558591; cv=none; b=W8GL22s/qrHbMqQXivufaJVuhU1DCBsf57aDmceuIMV8TTxtNKtPPYi7bJBUKFOnOxcgnxnFHBLsj3wd6RaIy11FpzquEswhmDAVlsz0zQoWZNlSN8P9p/taoRjtGjAJcbvbSNZ4gE8rI+EC+ea0BRjgN9HeNTecU/Z6EukHiFM=
+	t=1787564104; cv=none; b=CKCAEJPkrIPiuqWZPjhbQvReH6UmqqP7UMxvzAMMcnFudppcWeveBJxwWPh6ZjmnCWy1XyTasjWs86FXGYeIvTMr52/1gokf8ntnMuMGz/QwfUkJWckdzX3DnmbT6kh03kooZbKtfVmU/3NhXwsXVsXPq0LjwZ3yfoL6y/hyoFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787558591; c=relaxed/simple;
-	bh=6vU4mIPzwuDHCAEyLxfQ+W0XpGH8LYKV93FHF8433UA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qRxFmxbxj5yvEZJJrVfC0KfujTTJJVEI5cmaeOpvwWtXMp2wyyVy9nwnEIAxpafJ5teXkmyMDtdYgDVwN8cWNBBmGJOxpWRFxUODgv4XRwfNGiCnBrBNcE9R/WFixaTl6GdKlcnfmMr2FyNlE+2Kk509y0liSJr4DLu/tDOPRmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nTJ9tcz6; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787564104; c=relaxed/simple;
+	bh=bxFGomsyJNo6zN1h4CJsYSqAgdKL+JHwl3jVsH0nzTw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=hPy0iYXWn5ianrswcW0qxC8cc6Sy5Q9InXQBSbyZoRCdNT+0sGsfN+/ei5f7RDFObj5Mw785frZdLhXSz3PhqIkU7Krq7bw+rV0fciD7VfC6c4aH1tkSup+b+OcvkgN8IUEAEdfdIU86PNf+Z/FrnS3iGQJoZQ4GuYYxeZb/FJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=byh+kjug; arc=none smtp.client-ip=77.75.76.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nTJ9tcz6"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-93738ebbffaso150000885a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 01:03:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787558589; x=1788163389; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=fB65jIyGIhMpvM04yhtSg9gJy26qRCc1IE5V92Bk/js=;
-        b=nTJ9tcz62rAHC4ni1icsRU0RrlVkByKgUI9WUSCxiMgZ59UFwjLS8Ptc7asyW+A6H3
-         hQ6Nky/kP1mBsXNQgLerHRwuFcM+uUdfE+ECfl2YUGFWEwpuVpxD8+dcFAU5hqSDgOfV
-         ewmh3uwvsqD+p6e30If9HJBNQDRdnU5Yog4CCft8gcB39ap2QdxhKbvxGIORa6YyrBBo
-         6wui8DIbK+lj3ANfc93mVCzeC6ithyjLAEwjUmCQcb/OLm30qHXPIE5jzJMK3tVxyDYL
-         0SqkEokPxKTz7OI/Vy3jT4VRGDUlBwAbQgZZyXaQ53xIFpd7qxNJCd6VDdRwV9yAN2IW
-         Go1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787558589; x=1788163389;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=fB65jIyGIhMpvM04yhtSg9gJy26qRCc1IE5V92Bk/js=;
-        b=sA00t3deFFkLgLcR8HTRj2vynX+X97AKat9ChED7I43jrfBc8FUR5XzNJspCvNF8SX
-         y8/fNEbvx2PgBqx0/iVwXoJ1EJxjguZM4A5Fy12+Qp64AixgHi1t1p/BX/wIcCMTb0Og
-         6QULSXzRH3RinPtOGUxOXX/d4ixdLJTcQK0sQlxLFAjHo5/NSxipw4nAU6la7GtBSHCF
-         LvjrPdMKDzchUgxfYKiHVl2REIQZFABdNrDTytt/tr+wTHQf1tSJuHhveAAPRVbBCvoi
-         rrhr74M9EUuXrV0g+SgJWw9gfQ/N0nmvqcQGzBk43wCqoY2VXO5UAesnqEwvpNnpCscU
-         QipQ==
-X-Gm-Message-State: AFuF++mDMtIezxeaPoi937Lr0LsvSC/NJR8GBa89f1iqS5QQ32gzYO/F
-	BXIHxK1RUNS4t1u0vVaBUIdNRyM5YKw/B3wqpoc/rjEpsbe8QSnSs76Hh4fCWA==
-X-Gm-Gg: AR+sD10KSKeg21gxcKd7X5gi3XzWpSaTekcyCbDIgC+XBemlvT2dSrjac+l1lbHIi8S
-	Dnk7+6svaknwTU8k1tbT/bzm+nlM390nDhvjn5KfDtAJS2S+KxTmuCdR/nLPTtV3kYwUn3EsT5I
-	JuzcBRlTXT7nJfsyz8Uby6lFbrRPWKau9QOk2eXAppLN0oRtwlUbwR1OGkW3JD/BzVH5Hd51rjE
-	Ms8BSbxtEx0tlxJYMIaGfOGlTdXIZ6MG3yB7Kf8Pjr4QQ+S63zOw6LcPKaUnVIjvHIPBs1wuXpJ
-	5IrQFkbsT5TNjHjKW3YemfAzzwH2y9g27G69WUGTpP5cRVkpg5ule8AFNqvsosU1h64oq8RP3rJ
-	HUNFrCPJMu7Zsi+DGasVSeS0pKkEIDnBA3M62boEUoFsdoC4Quts47fDzJu7JVVu1J93Lys3U39
-	fx8hePnRaoMbM9zYrOGMsI7zPzM+4CTO+LhpONRXc8p8NZADKLL/D+H/034rceVTDkuI2rGI/9r
-	0Q8arcL
-X-Received: by 2002:a05:620a:a90a:b0:92e:61f1:6b72 with SMTP id af79cd13be357-93739467daemr1930030285a.13.1787558588793;
-        Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
-Received: from [172.17.0.2] ([135.237.130.147])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93749d9544dsm448750185a.27.2026.08.24.01.03.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
-Message-ID: <6a8bfabc.e0a65cc7.2e1605.9af6@mx.google.com>
-Date: Mon, 24 Aug 2026 01:03:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8886354999287210001=="
+	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="byh+kjug"
+Received: from email.seznam.cz
+	by smtpc-mxb-846d86b87b-xjzvj
+	(smtpc-mxb-846d86b87b-xjzvj [2a02:598:96:8a00::1200:501])
+	id 54a89334e2923e2d5127897c;
+	Mon, 24 Aug 2026 11:34:54 +0200 (CEST)
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=emailprofi.seznam.cz; s=szn1; t=1787564094;
+	bh=civz/GAsNd1uxHWzyca2Ek4tBnllOfabbdDHx/vwIzI=;
+	h=Message-ID:Date:MIME-Version:User-Agent:From:Subject:To:Cc:
+	 Content-Language:Content-Type:Content-Transfer-Encoding;
+	b=byh+kjug/B3BibRgL7zId1cra6iyS9BTequzAsDX3RPfwf3t5y6jsxC64gnoMdMWZ
+	 N2U1q6ik9R//h0xVgeksxbZcI2CPlrzRcf7mgHbcMnUh/twJWfPea1NFuLMIwpT05s
+	 /4JhaU2t/njVhSPJ6Xae//GDgy+neqImkla6b4Dhkq715PPUOvCPF9nOO96RX3tKV9
+	 omSkYLFXYJ4NaS1qOmvk1+CSL7u2iO26VAMWekAe+znXLuF9XJhdRkJtlQaB1QMt9y
+	 lS3woy6cvkUWVUJudex5hSw/GzW9BBEL6sPcnNCRvQi/KKDY0awLhC0N0kOmVNeAv0
+	 bqoSSFo+7Qa6g==
+Received: from [IPV6:2a01:9422:904:1ee:272:eeff:feab:4ab4]
+	([2a01:9422:904:1ee:272:eeff:feab:4ab4])
+	by smtpd-relay-86c88674d5-v9m66 (szn-email-smtpd/2.0.80) with ESMTPA
+	id 3220d576-f224-47ff-bca5-535e8e2fd673;
+	Mon, 24 Aug 2026 11:32:19 +0200
+Message-ID: <483d88b5-138c-46a0-b377-a6ebb43609f2@podgorny.cz>
+Date: Mon, 24 Aug 2026 11:32:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 13875017792@163.com
-Subject: RE: Bluetooth: hci_mrvl: Fix wrong return value check of wait_on_bit_timeout()
-In-Reply-To: <20260824071257.2791009-1-13875017792@163.com>
-References: <20260824071257.2791009-1-13875017792@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8886354999287210001==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Betterbird (Linux)
+From: Radek Podgorny <radek@podgorny.cz>
+Subject: [PATCH] Bluetooth: do not leak an hci_conn when a second LE connect
+ is rejected
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+create_le_conn_complete() decides whether the failed connection is
+still pending by comparing it against hci_lookup_le_connect(), which
+returns the first LE connection in BT_CONNECT. That is the same
+connection only while at most one is pending.
 
-Dear submitter,
+Two can be pending. Connections created on the passive scan path sit
+in BT_CONNECT with HCI_CONN_SCANNING set and are invisible to
+hci_lookup_le_connect() until hci_le_create_conn_sync() clears the
+flag when their command is issued, so the -EBUSY guard in
+hci_connect_le() does not prevent a second connection from being
+queued while the first is still on the scan path. Whenever two
+connections are in BT_CONNECT at once, the lookup may return one
+connection while create_le_conn_complete() is reporting the failure
+of the other; the early exit then drops the error and hci_conn_failed()
+never runs on the connection that failed.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1150676
+The controller also rejects a second HCI_OP_LE_CREATE_CONN issued
+while another connection creation is still outstanding, per Core Spec
+Vol 4, Part E. The spec calls for Command Disallowed there; the
+bcm43438 observed here answers with an LMP/LL error code instead,
+which bt_to_errno() maps to the -EPROTO (-71) in the log below.
 
----Test result---
+The leaked connection stays in BT_CONNECT forever, and because
+hci_connect_le() refuses to dial while hci_lookup_le_connect() finds
+anything, every subsequent attempt to reach any peer fails with
+-EBUSY and no command reaches the controller at all.
 
-Test Summary:
-CheckPatch                    PENDING   31.89 seconds
-VerifyFixes                   PENDING   31.72 seconds
-VerifySignedoff               PENDING   31.73 seconds
-GitLint                       PENDING   32.84 seconds
-SubjectPrefix                 PENDING   31.80 seconds
-BuildKernel                   PASS      26.32 seconds
-CheckAllWarning               PASS      28.81 seconds
-CheckSparse                   PASS      27.40 seconds
-BuildKernel32                 PASS      25.23 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PENDING   496.43 seconds
-IncrementalBuild              PENDING   55.68 seconds
+Seen on a bcm43438 with two BLE peers polled on the same interval
+(state 5 is BT_CONNECT; both handles are UNSET ones, allocated from
+the ida above HCI_CONN_HANDLE_MAX):
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Bluetooth: hci1: Opcode 0x2013 failed: -71
 
-##############################
-Test: VerifyFixes - PENDING
-Desc: Verify Fixes tag format and validity
-Output:
+# hcitool con
+< LE 14:9C:EF:03:68:81 handle 3840 state 5 lm CENTRAL
+< LE C4:D3:6A:8C:B5:38 handle 3841 state 5 lm CENTRAL
 
-##############################
-Test: VerifySignedoff - PENDING
-Desc: Verify Signed-off-by chain
-Output:
+A btmon capture across the next ten minutes of connect attempts
+contains no HCI_OP_LE_CREATE_CONN at all; outgoing LE connections
+do not recover until the adapter is reset. With this change the same
+scenario fails the rejected connection cleanly and further connects
+to both peers go through.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Ask about the connection itself instead of about the device.
 
-##############################
-Test: SubjectPrefix - PENDING
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunnerSetup - PENDING
-Desc: Setup kernel and bluez for test-runner
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluetooth-next/pull/642
-
+Fixes: c9f73a2178c1 ("Bluetooth: hci_conn: Fix hci_connect_le_sync")
+Signed-off-by: Radek Podgorny <radek@podgorny.cz>
 ---
-Regards,
-Linux Bluetooth
+net/bluetooth/hci_sync.c | 9 +++++++--
+1 file changed, 7 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 7150037a864b..24eeb76f7207 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7279,8 +7279,13 @@ static void create_le_conn_complete(struct
+hci_dev *hdev, void *data, int err)
+goto unlock;
+}
+- /* Check if connection is still pending */
+- if (conn != hci_lookup_le_connect(hdev))
++ /* Check if this connection is still pending.
++ *
++ * hci_lookup_le_connect() returns only the first LE connection
++ * in BT_CONNECT, which is not necessarily this one when two are
++ * pending at once, so ask the connection itself.
++ */
++ if (conn->state != BT_CONNECT)
+goto unlock;
+/* Flush to make sure we send create conn cancel command if needed */
 
---===============8886354999287210001==--
+-- 
+2.47.3
+
