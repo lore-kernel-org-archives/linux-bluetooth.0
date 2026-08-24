@@ -1,48 +1,184 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABCD36194F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787584984; cv=none; b=dAl7tHna8+yJQbhnc+DWvOuFp8wlXiq8GXtEe+NTgap2clmw9ql7JFHR1R0UcI+Oa+fy2lQfP/VZgIkzNkeRCBEUuXM2nacjFwReuZdHgBINGbM3vdDH85OejJkyMRjeBPJ/iLR7oqBBrWfoy0I1q10RGCP60d732Dhp3Ia5juk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787584984; c=relaxed/simple;
-	bh=H5k/mYpK1v718rEju0k1SA413qhOZFHqmRFT7eMh/pc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=QITLlfZihB7mkvKENJtNhqmglUXen52Pu4x0k5FV9093xoo+vGBq0TmTqP5P4D6D7Y1jNY0w+95YGkU7aSJDMxprC5vFZBpQOqiNf89prkxkZDByGZLrrn00n6nk6dx1ZfNUDTkBKl7Yogchv3/l+b4hKJ3gUcVfKOL8ueoOgHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bZV/x4w7; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E5936B92F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787585518; cv=pass; b=MJ36pnfxekd83eF2TXR83RQuLQkVbBIWbSThg+Fnswm1f8UVdvnTMGFH78LE7b/Cmd7NX/6AP0rSvmmNtlB6ZhZR8SKbt6UYa6Kg+5FDr5dIljygNCy9TIw33JhUCoyXK5r1n7P+7x3DRj7iIcFiQTAQHBWNbU6tAJvmkk8dd8U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787585518; c=relaxed/simple;
+	bh=6cibgC5Kqhomu5ObIzPSmO5OQgWZgOkrevI2tgyQYGA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ljaHJFofolct9W+WNHNYrF8sQ8gbLWSerK9cj38sLmuHqdIHvypjkOuDaJFi2cNKg5SCWE7keK9posUvEZUdP/pWnuvSGVfqY73jLWq26J3nyK/Qf5WJ4aGnIvP5EH2JNtQnbYV3A01Dse4XsoOM78hEcyOOg71h7beNdfJKSeE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miuSdYTq; arc=pass smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bZV/x4w7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787584982;
-	bh=t+x2aojuS89O9zzHX2ynD/tpfPnp5wbdZKGOTHvfnLE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=bZV/x4w7GChWazkWkJmeDAZaspvgYHz6sPZ0CZctpNnMXo663BVZkF1ePlyQiQ649
-	 HMDO0opOQOpUug7dvmlmBhl6G6QptIy7iEb2TGkb60cszVhqu89fIXyb5cssUvKM3f
-	 zVNR6ywA6SpFhXfbKjBGQTD79OQtNVG7H//Pbti8=
-Received: from github.com (hubbernetes-node-238b0f9.ash1-iad.github.net [10.56.224.63])
-	by smtp.github.com (Postfix) with ESMTPA id AC422601217
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:23:02 -0700 (PDT)
-Date: Mon, 24 Aug 2026 08:23:02 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1149265/4ae582-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miuSdYTq"
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-66d07b7e704so1522878d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:31:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787585516; cv=none;
+        d=google.com; s=arc-20260327;
+        b=dS4RtEjShGIkAzXcJPOliMKdY4/PP64Ba8w3OlilGtINXx1uLL4xXW9fQ7O7U3bPmB
+         ZkmEdGUciCATAwPYZHYfH/goH5/QtfCXhzbsmGUG27Okb+8FIebKEB1PDEX457iLNVHq
+         gL/vF5Rn0tCchjQBQfU5sPpTt0au7rVklT93XixCjE5YUbHwE0mZClBgHzlC7gvmq5r/
+         xdGpuBE8pm9Ip0oJ+oLQ2UaYYygg2zzc0ZV7riJ9pZI0yTcbz2XT84TYZ1xbRycBazCC
+         xVObVIYEH+Ukw01tnS7c1X8McVpXPrwmonvNnKq4qhZrlG5YHCmN7r3uAzg+jLxpQIk0
+         i14g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cBlBG7m5w/OxgVHjTqJeo0x+CeFBP55NY7fQpbKTqZA=;
+        fh=Ihq42f0kMl9s0ceeGl3E/JgQh2K3IBhapAZ/zO/4CPk=;
+        b=HLoE6M+NNX9R96VWFGmJW5P2YPGKz7f9cH88DPMlUHdObqkMo3yJi0CkX5HvNRm/4F
+         62CpNIpyFnEN18QRqSknxMDJeFGlfWFoZOxbX4Rlb01VTUAHsgOjGLKItBeC/qauENdm
+         kXgbyrapjzjxBWr7z1W396QwOBQ4RsthyI5LjVCQ2+9/DT0gB8m3hl/4iuvI+ppz8As7
+         wJvO4CWphfkoT/qavBgdosu2iTvGAUluz6Et9as4IfTquzf+Y8FesRMBliPNPLdVjSYy
+         /GtXY78YCbQr7ggib+LEWOv7JWYUb4t3v5c4LpcvCJoG2sqAV3+t/77FW8pCZrTt+Y/b
+         lVpA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787585516; x=1788190316; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cBlBG7m5w/OxgVHjTqJeo0x+CeFBP55NY7fQpbKTqZA=;
+        b=miuSdYTqkxNCiwJuuAkoCyPamVG2LrSEImMIiuUobbMn6/IXEc9zkWai69jmn1BtqR
+         vSEw9CgM4Dn9a3qT80yVDcIgBma0d7jXEbOXdM9AJleM95Ce0ysLQfZLNM2Sc5UfOPqP
+         DdG0Qqw8P8QNOjwvkS3fCVUg5Cooj1bS6UoMWHegbChGAU+ZEtsyAOTiQ1/NPhoKc6Ia
+         /vgnyz9NVEsE8sNhrlsY5SoL/GkKGHt1y6qWiyMwJ2M099DwfU/DKNuWqlCtnNUzcwPM
+         vcWs2sg+x6D1eXD2j+7OyCxEE8F3A+G6Pcynx+sGwFAgSbZEtmOjk1iyLjLk9Xhe0Ekb
+         aGqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787585516; x=1788190316;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cBlBG7m5w/OxgVHjTqJeo0x+CeFBP55NY7fQpbKTqZA=;
+        b=eznkadsqHYZtT8TEVUl0hQsDmFx26qh7iTlkP9bBfKyiuX3CFzS7gFr7URiniEM6lc
+         y/tqHQ0yvYb0KuUsZC6iRyb63Atl2mUTVoR7dC/i0OwMpRWCcpj3hhrNOBrPzP8f7E1E
+         1CjG42tM5yJyIp8RJTCptFFRqIe+yFHIfQH3j91uodsY4lS5XXRMwPWJseivB9heqyYT
+         IP6zOKTea9MZjkxFzr3WpMI3ATja83XHxeT2ixpVJmrn7ijOdKeJ8sXNGiP3h7eYu60V
+         2UpNtMEetoidhsu11TzUJ98rppaiYUrjlEWkYYVpRgujTInyS8ba8bUCfUFJuehE2oRm
+         d/Fg==
+X-Gm-Message-State: AFuF++meIJ9C+bgmfKA+MAZLfqSaqqA3+K/mufG6rZkxsq2OJ+WGfXUA
+	XadILdPPOhAZwHx5PgPX9aaZPynbx8cL5ZgKQ2YKnJ2M7VyWarm4VUg5lUuuzFyBep1VuUmUVfZ
+	G/iZ8GVhX2fQE60eQofF5N2oXJZvMNPQ=
+X-Gm-Gg: AR+sD10b4U8MG2d2rYwDjIrqtu+Dnv9gFaiC/+IO1TnEon4KzhdqgUoOYtsz6dZpkcz
+	Thh5GOUi1IY+V2o05mme5E+cXS522Y3PYqN5dEAoQqHeR+UwLfch6FZzWIBAqOJWIxUgs2d2C72
+	RP0St/Dnxl3XuK97q2gzhBaEfTbxZpN0inJY4iUxXPumXsyhlv+6E/Mey+DHPV2iBay9pbdkRbP
+	NgJsihAwjD4OAVQ8WNzU2MiIs0onpRMVgW7BIZ8r1LiRih50/Z3JOAhcjdwFoHmU6m253huiEn0
+	z9s4ERP9bp8hZClIYaEWfNN9YwcDPfOUe6qlF8DTl71JB7pmQGAcL3NpQaYCJYOfxHv/sxBkYhb
+	6tfIpPR0qEsAtNZRJn3y0lggK67Iz4iE=
+X-Received: by 2002:a05:690e:4090:b0:66d:c8b:7a3f with SMTP id
+ 956f58d0204a3-66d0c8b7cc5mr1403347d50.10.1787585514807; Mon, 24 Aug 2026
+ 08:31:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20260823161638.32348-1-acharyalaxman8848@gmail.com>
+ <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com>
+ <20260824144051.50010-1-acharyalaxman8848@gmail.com> <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
+ <20260824152029.51492-1-acharyalaxman8848@gmail.com>
+In-Reply-To: <20260824152029.51492-1-acharyalaxman8848@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 24 Aug 2026 11:31:43 -0400
+X-Gm-Features: AcwNN1XczF39o0A7vrGeYMV1ixP8GZ98t523rpCKBGJOS0onrtI26gHpY_aCQks
+Message-ID: <CABBYNZJxXFt3N-hNQ-RPSe379uw9qfwvKL9yncQ4a034_9d6hQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_codec: validate vendor codec count length
+To: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/1149265
-  Home:   https://github.com/bluez/bluez
+Hi Laxman,
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+On Mon, Aug 24, 2026 at 11:20=E2=80=AFAM Laxman Acharya Padhya
+<acharyalaxman8848@gmail.com> wrote:
+>
+> Hi Luiz,
+>
+> Thanks for looking at this.  Sorry that my earlier wording was unclear.
+> I agree that the uses of p inside sizeof() and __must_be_array() are
+> unevaluated, and that sizeof(vnd_codecs->num) is a compile-time value of
+> one.
+>
+> The runtime access comes from the third macro argument, count.  Here that
+> argument is the expression vnd_codecs->num.  Since it is not a constant
+> expression, __builtin_choose_expr() selects the size_mul() branch, which
+> effectively evaluates:
+>
+>         size_mul(vnd_codecs->num, sizeof(*vnd_codecs->codec))
+
+Opps, yeah that indeed access the ->num.
+
+> Evaluating the first argument reads vnd_codecs->num before the result is
+> compared with skb->len.  Therefore, if no byte remains after the standard
+> codec array, the read is already out of bounds.  The issue is this count
+> load, rather than any evaluation of the sizeof() operands.
+>
+> I also verified this with a minimal reproducer using the same macro
+> expansion: the compiler emits a byte load from vnd_codecs, and ASan
+> reports a one-byte out-of-bounds read when the pointer is at the end of
+> the buffer.
+>
+> Changing the trailing sizeof(vnd_codecs->num) to sizeof(*vnd_codecs)
+> would give the same size, but it would not prevent the earlier count
+> load.  The added check ensures that the count byte is present before
+> flex_array_size() uses it.
+
+That said I rather use skb_pull_data then:
+
+diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+index 5bc5003c387c..fdc9652dad29 100644
+--- a/net/bluetooth/hci_codec.c
++++ b/net/bluetooth/hci_codec.c
+@@ -145,11 +145,12 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
+
+        skb_pull(skb, sizeof(rp->status));
+
+-       std_codecs =3D (void *)skb->data;
++       std_codecs =3D skb_pull_data(skb, sizeof(*std_codecs));
++       if (!std_codecs)
++               goto error;
+
+        /* validate codecs length before accessing */
+-       if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
+-           + sizeof(std_codecs->num))
++       if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num))
+                goto error;
+
+        /* enumerate codec capabilities of standard codecs */
+@@ -161,15 +162,14 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
+                                            LOCAL_CODEC_ACL_MASK |
+LOCAL_CODEC_SCO_MASK, &caps);
+        }
+
+-       skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
+-                + sizeof(std_codecs->num));
++       skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num));
+
+-       vnd_codecs =3D (void *)skb->data;
++       vnd_codecs =3D skb_pull_data(skb, sizeof(*vnd_codecs));
++       if (!vnd_codecs)
++               goto error;
+
+        /* validate vendor codecs length before accessing */
+-       if (skb->len <
+-           flex_array_size(vnd_codecs, codec, vnd_codecs->num)
+-           + sizeof(vnd_codecs->num))
++       if (skb->len < flex_array_size(vnd_codecs, codec, vnd_codecs->num))
+                goto error;
+
+        /* enumerate vendor codec capabilities */
+
+
+--=20
+Luiz Augusto von Dentz
