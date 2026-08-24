@@ -1,142 +1,113 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B97363C63
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787583729; cv=pass; b=m9O4SvJq3SM/1zJJSz06urAWuJd/6EmYF+AJAm4kWv/LvlY0dyGoHzBBmY7VejN4s0wM9Zr6c1aCpP/Ds3lKo0riG2Bb5CFLYrZM5yKOnJBAIqro9DCePgmrC7af9zhnO9RWEJbN6Ut9e5A8xYK1BpOL31p0atwVwpfxckJT5i8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787583729; c=relaxed/simple;
-	bh=8htVseq9wQKiK0UE4dDd9JnlLWJaYWLtXE9iyBFW9As=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OzO5BKEZprJED4OmbB5IGGt8Z/egBPKl5CmD3gRfS1n0It7dIy8Ocposqo5AhhPFGvxiiRGTT55gvGCwadxbn2ibhONqsz+uh2zaJ8IYzd6c/az2xQU4EXwySG4xwyOvS1KxuHQfKya9LHmm+DaG8KQIH/+a28aVjRRxkvWFrxU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqHDnuj1; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F27436A352
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787584838; cv=none; b=clv/rSsFxb0QFe3JT8w8UKgrKs1OAjlDfNVqI9cR1H3yPqLZ27cQj5WNipaKsZi9RVVf1iqIxHsAwbj+ElnZbeGb0MCyEt9LdESENGoo4enDJ7oe+oskPx6ku59JPNEX7Y8ARXi2Hr2ncrdULO7IQfNWyhiaSIQBLBiL6gRuJ3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787584838; c=relaxed/simple;
+	bh=C+TelH3AlZcX47ivj645rZ84HzDP94p8X5F+vZbw0ms=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZsgMoQq3PJGQrxHweReEwHR6ttZWNJHUkz79eSFIFD2dDIQijZhsODswPr1WqNgmG6bOUOU0mCd1H0Px0hAw6S8BqtmYN8EZS2JTV7ktQd8cqLA/f7m/A5SkefoSqJL+k970epSw2G74f/Y0bRbIa+rvwzc1nYZAWrIt1Bg5DTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdMsfuZq; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqHDnuj1"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-66c744a00edso2212720d50.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:02:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787583725; cv=none;
-        d=google.com; s=arc-20260327;
-        b=T7EQ71Vt06gOmLLelvB0NGSjtTQHEBE1Sgpphw75T1PiToC2eit9bcGJfKGHEBWXwd
-         tc+fnLBkaikLHO4yBA/tDTVSx5a9gkBthrg/O+JoEB48nU/QWc/p9vd7pO6MTVKjFxmT
-         LwBKvtBBGwnl8BkbOdc8TnAd2nZmVVek8YloLYX9i6OYFAlZBQZBAZhgHdPNhmQ66jxU
-         tPPsvklf/6Bp3GJyOE4uMbnftc1b5LVsnB3syW/+FAJ9QZJsUvs+rtiM6/XcrIRcNqG4
-         71OrpXmPWJwHCo6Zkl47i2SrbafAPXIv2R+mA4suYWiJxDws46jeLlAADNAws3qjzsMt
-         xWVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0FEMUJZQVmX93REvnJ4GsWEzwIniTrdgUugr/eES0z8=;
-        fh=Ihq42f0kMl9s0ceeGl3E/JgQh2K3IBhapAZ/zO/4CPk=;
-        b=SoFQgLSWVz3+8yYraFINQsunSNpg5JUV6soem3uq1o+6VGL3INj6Cz7wbl64s6S8h2
-         aj9pxgUo48zL/3ovTS2lul9VSoeF97UbTh1Nsdn3noLGghWispgRIuy71CZq3XHrQGsG
-         LTgwpgDpmBY+G3mxicFeHOD+sATV9i+CFfJcLLFEsQrdelv69Om+Vz4Ql7XOYM58Sdfg
-         IWtPu9UjJ9wsBXWMqQ8n0Mh3zI6qUTtAkmcW6VW0xqfWw2RsNRkPNKokPbiPedGTktUE
-         DJUt5P/hCRUPIdTVBWIPyLxbAQjHI3M4BC9VeINO15VvxV5Zcyb82420/fQCAdHDdv8S
-         /Eyg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdMsfuZq"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38dcbade417so4277129a91.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 08:20:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787583725; x=1788188525; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0FEMUJZQVmX93REvnJ4GsWEzwIniTrdgUugr/eES0z8=;
-        b=NqHDnuj1+lxh0iGUTQGJA9oo5OwqwV8EOiXupnKHSIx287Jyavh3kUuZeArCV5tXqi
-         nP9vfhoeIqQr2lGwF1mMBDkIGS7tbIggAFCthuJMtAqiYIIXGVZfhtm5LIgpKNb5/udZ
-         r4sd5PmCa5To+qIdLgSJb14tfEa6Jvp9bcxGBivYE3EBB8s7PeDMtPkzWmveRIGObbE8
-         8x+mhjAxPLPQ9B5zoZLfi2cLis2bXpPk9wfMqI2gXgYUw5ha3mYCD9fxw+HUNVSaKWTd
-         Uyw5aYtGUvRhZAtJa2yE7QA9Dhhb6k3kxb1gVexU0k7NfXvUVqEh6chzQSbK1tFSS/9U
-         jHbw==
+        d=gmail.com; s=20251104; t=1787584836; x=1788189636; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=frPrxefuhESfKlbGZEYzZ+IYOc/LSZSpcmZ15xxxNFY=;
+        b=HdMsfuZqpKAPUG8LpEs7kUs6fPzkOhaV2Wo6TAEpoL1SieyEm1o4wSgdtNDnZh3TNC
+         0mEW1XyXl4OAWDpe62niabGEq3jQYczHwB3g//N3uYVln7BKTWAsx2fYi3neTOsfeu9I
+         0/lBaNvXdiloHuTfiLNpiTINsmpLR55zAkagcpBD7/nAgf1rFryNGtyFR0kS+/GcpyjG
+         eTb83dEHWzcj3RO8BTXpflv2SvJJSzShkTqnC907OFDsjBsLLLFz8jj8WThqJKgMYNRv
+         BS5LEHTSrn6XQ5xuONwhj0PD0y0nEYIv0FmOXCHYQkv1Yym0g9bw++kiB7Kdnjc6mcME
+         pP8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787583725; x=1788188525;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0FEMUJZQVmX93REvnJ4GsWEzwIniTrdgUugr/eES0z8=;
-        b=SP6OuGD2DHVJro2kBqmo1Do354kSjJTS/fbjo4L5ulOxw1cePEjMzYHiKJOAu6zsZt
-         a+fBvMJb53BhSgjtjHF8Aekc2/5mdIqMRCuiSeGJy7iaNQOa634CYP5JyWxMN4qSX3NB
-         PL23bhQvhE9cZNwzZa4UMZUwIeghfbxefmT9B17KGwPNFRdd+yjKZFvm9cl3vh46TwAv
-         oX5OesvJeLsuktxLbuio8EAVcmAos+eS/g8GmrCIX356dgPgwD4LusCuOfcisIRD9l85
-         10TjMwZrxXIOCFNX8bvMeoImatC8CXUsMcnwGucSFNG3wSUQn7LPc01471Fvxz/5xBCH
-         2ONA==
-X-Gm-Message-State: AFuF++k6vLsviFmmX6oYdZ9UEfuaawORK2DJYM1t9cjjef8qMPPppt3T
-	ng2uod//HMj/cb4yWVVw0Fi5a37uyDShPvHnv9rk+QUXLCV5vEBTkzFO6Rby1Le525H3ufeAQyz
-	19q9i6XhQIdbunj9L03CO1XUB4j/rdfQ=
-X-Gm-Gg: AR+sD11PJ4yTS5tPiSR/V5ssknCMrZkKfZR/7+HMu8cTM6WWHkhuEMFuMvBqovaa/u4
-	g8v0lwl2+0sLqdsoH/HXFXBPpFjvLr5GYhCaFSuMCajkkUBLAfyacXyo9fPzkwmZbVd4u3ccHn4
-	gEUb4I9CR5/m3CMsIJKAoPuuXf2QO3oFOeJ1GB3ij8RlwuxnR+F+bYCAtyNx4UaRpDBFtL53HHJ
-	JvbFI2tdHEsOWDSPwhGDktFnBbuHs5lHrGaH0JuktbqxFHakBbGoa2dMgjRQ8Y2duRPAKytPtVw
-	ilyrrj4ZfXb3t5eYAtkc/Pz+aQXi/2Joo+AxSF9poMJA/g68j8WRNSbW0Dw7rSaN0js3Vh6Ro4d
-	3TGoECNQiAl9i9ruPmZX2y45nDIoH
-X-Received: by 2002:a05:690e:4086:b0:66d:bc2:8067 with SMTP id
- 956f58d0204a3-66d0bc28453mr1305222d50.42.1787583724407; Mon, 24 Aug 2026
- 08:02:04 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787584836; x=1788189636;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=frPrxefuhESfKlbGZEYzZ+IYOc/LSZSpcmZ15xxxNFY=;
+        b=paVCWNoVYcABhDinp0xVhc/E+eX3HBqkcNtSqka13kQM+ndY0VEPVwGkpjVO+8mwyM
+         1k+r+E/ZC/j6d8tcMSRaauheBvWahj9WR5G8GIYFNqL1C7jMkE9A+hXqaKPtKYlnnc+9
+         bSqRLKc9jJRGEayc0C386l7Jp4DCB7xmPP1eqnhYwYvRz2ryISm/gOR51tWAS/jbgZZy
+         ma0L1prdPnDb70PZpJulJVGAg9NDEzqAw1L7+AbtScdzMhbOK5yeDME8pIsaGS13rcXT
+         Hla7nF0LrXc+LXPyWtLSVwQXacewoJx2GDvnUyFEw0VszUs1ZeBVD1dx2SnEv+Gg0yJC
+         jChQ==
+X-Gm-Message-State: AFuF++kaPUNEulaJ+9C7ZuPLA9YSdLBI3WfZEXlHWYUyZtFpvWaTz846
+	8S/GSsnu7l5yZzsSxIQZHGBAkKJbjYWEOtKYtyo7dAZKq3b7eehcWAmMHuoJBA==
+X-Gm-Gg: AR+sD12jbajeagGFf5hvTRlkQN6AiX4K7O6mzfCDfMWa9MftHl0e3vBkvXq3Sq0rGJN
+	5WMoQLfztsqtt/EHnO8qINEUqlsHqNmkzNP3/OawuiZ+JPyMmoYpHdwZqq9QqfC10lkjdfJYI2v
+	tgJg/1BOsUgWKLc2f5iEXT7d5nv6KS3/8Pi5UQPQuJ3Su2D2egxIQ/pzLdvX8zxryvD3y3p/rAG
+	sUp//USWApifok9eBdZIwZANQBj1tmw939nL1Swc0VZwLNvGfiSYbiSBxzFpYipw7HrklBVKMYP
+	lYQqnbWQ9mZIl7H6cIMID3zNb4VcuvJmADG5gXczth2HdU0ruch03Bgl11Lq3pkOchYPttofsQp
+	Jt19bGirf+Z9ao4UYrE/u+9A7mv77BcOCI365GGIJW2g2BLcdhAYT9MksjBhzvb3Q9proa2UMRY
+	sZOBS9HF/KWK6gx9t9XBOwW9uUKt6S5ePr1/D5XOd1hQCe2YJdsPsDhmyqhYAlbGB6cug0RxMIL
+	NKHEuWKieVLr5e9VAFRxiZ50vo7kvjMP9BEQOynJP5bYUfZo++r8d9EKofvTOemFzMI20foTbiC
+	gNlqLH9LHoPg1VtUvd3AWQaUvmrjq10D8BqdBurWI1C4P4ab5YQKRIJLLDZ4vhHeVnFkkw4aZf+
+	/gN+RMy/hI23AvC8o4tP5dSXXpfLtQBQd9UZdAr4BWoHXNJaF+vet9uP0bFk=
+X-Received: by 2002:a17:90b:1b04:b0:38d:dfd1:7c1 with SMTP id 98e67ed59e1d1-395c33406e0mr46004122a91.2.1787584836296;
+        Mon, 24 Aug 2026 08:20:36 -0700 (PDT)
+Received: from localhost.localdomain ([101.251.7.10])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-32814a06261sm11384329eec.21.2026.08.24.08.20.33
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 24 Aug 2026 08:20:35 -0700 (PDT)
+From: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_codec: validate vendor codec count length
+Date: Mon, 24 Aug 2026 21:05:29 +0545
+Message-ID: <20260824152029.51492-1-acharyalaxman8848@gmail.com>
+X-Mailer: git-send-email 2.51.2
+In-Reply-To: <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
+References: <20260823161638.32348-1-acharyalaxman8848@gmail.com> <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com> <20260824144051.50010-1-acharyalaxman8848@gmail.com> <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260823161638.32348-1-acharyalaxman8848@gmail.com>
- <CABBYNZ+h-m9YQCim5Zm2_sgARZh+jM=POFYX_zTQ=xYUdxz-vw@mail.gmail.com> <20260824144051.50010-1-acharyalaxman8848@gmail.com>
-In-Reply-To: <20260824144051.50010-1-acharyalaxman8848@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Aug 2026 11:01:52 -0400
-X-Gm-Features: AcwNN1Wa_Sx4KTo6DQHVJ-mtw5XFv-5Ba7tmLh-coqhcOdt0jH_gninJBULA00A
-Message-ID: <CABBYNZKJ10anQiThzYturqWyRxhnKY-xOMKhKHF5ysx37VmHkQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_codec: validate vendor codec count length
-To: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Laxman,
+Hi Luiz,
 
-On Mon, Aug 24, 2026 at 10:40=E2=80=AFAM Laxman Acharya Padhya
-<acharyalaxman8848@gmail.com> wrote:
->
-> Hi Luiz,
->
-> You are right that sizeof(*vnd_codecs) and
-> sizeof(vnd_codecs->num) are both one byte here.  The issue is the order
-> in which the existing check performs the access: vnd_codecs->num must
-> be evaluated as the count argument to flex_array_size() before the
-> result can be compared with skb->len.
->
-> For example, consider a V1 reply containing exactly these three bytes:
->
->         status =3D 0, std_codecs->num =3D 1, std_codecs->codec[0]
->
-> It passes the initial sizeof(*rp) check.  After pulling the status byte,
-> the standard codec length check also passes, and pulling that array
-> leaves skb->len equal to zero.  The existing vendor length check then
-> evaluates vnd_codecs->num with vnd_codecs pointing at the end of the
-> skb data.
->
-> The added check uses sizeof(), whose operand is not evaluated, to make
-> sure the count byte is present before the following expression reads
-> vnd_codecs->num.  The V2 parser has the same ordering issue.
+Thanks for looking at this.  Sorry that my earlier wording was unclear.
+I agree that the uses of p inside sizeof() and __must_be_array() are
+unevaluated, and that sizeof(vnd_codecs->num) is a compile-time value of
+one.
 
-So you are saying flex_array_size being performed before size_of would
-matter? Afaike flex_array_size doesn't acuatually access the
-vnd_codecs pointer, it just calculate the array size based on the it
-size:
+The runtime access comes from the third macro argument, count.  Here that
+argument is the expression vnd_codecs->num.  Since it is not a constant
+expression, __builtin_choose_expr() selects the size_mul() branch, which
+effectively evaluates:
 
-#define flex_array_size(p, member, count) \
-__builtin_choose_expr(__is_constexpr(count), \
-(count) * sizeof(*(p)->member) + __must_be_array((p)->member), \
-size_mul(count, sizeof(*(p)->member) + __must_be_array((p)->member)))
+	size_mul(vnd_codecs->num, sizeof(*vnd_codecs->codec))
 
-Same thing as to sizeof(vnd_codecs->num) that would be evaluated to 1
-at build time, so it doesn't generate an access to vnd_codecs at
-runtime, maybe it would have been better to change it to
-sizeof(*vnd_codecs) if that causes less confusion.
+Evaluating the first argument reads vnd_codecs->num before the result is
+compared with skb->len.  Therefore, if no byte remains after the standard
+codec array, the read is already out of bounds.  The issue is this count
+load, rather than any evaluation of the sizeof() operands.
 
---=20
-Luiz Augusto von Dentz
+I also verified this with a minimal reproducer using the same macro
+expansion: the compiler emits a byte load from vnd_codecs, and ASan
+reports a one-byte out-of-bounds read when the pointer is at the end of
+the buffer.
+
+Changing the trailing sizeof(vnd_codecs->num) to sizeof(*vnd_codecs)
+would give the same size, but it would not prevent the earlier count
+load.  The added check ensures that the count byte is present before
+flex_array_size() uses it.
+
+Thanks,
+Laxman
