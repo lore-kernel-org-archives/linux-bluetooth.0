@@ -1,161 +1,217 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AE0439F68
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 14:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787582025; cv=none; b=sopIaPZGh8HXFVtlwpY8rGRTOBAj+9/ohCTBgb2+dglYVSkRjatilTffPDxCNcGydZ4Zre7fhU7uMTzN/YzohNFS48d69v3rQqJfHlXXEynArisyPVFe8mqamr0hF+kLmPvHliocyLfWP8q5/plSY/hiQNFmL7KvJg389xlIN0I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787582025; c=relaxed/simple;
-	bh=jH4HZF5GfmrIbKmbyAHIeBuUampA3NN3NVO0Ko0knTk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=P1P9NjqJsbfxRv2Nmr2rD1VI4CnQlGEkfZfssvsMO9NdcpzRrsa/xCIB3nSjo12vSgMvOq0wn9nX9njcCJEIzdeUhtb4M3SDWnLI1wtlY5fA5gOfpLYqW3RjRJ75szltWSVIUswyQOJxSBsdvW6SvsIbXgiWwMRv1FQzoib28n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BWwV9Vwy; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF674248D9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 14:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787582152; cv=pass; b=YtoUR8rON/WZtyrF7yoPcW4lmH6aZ9oesB0JaZ14fIcKibDVhKKHeXiK1kTxpozqgTQV2f4Nb/g6JfDpdCtmyrDuUt8GjlZ493QoU6EFl5JEOvKodE+bzCh3+0Jor/fIRqMYVTPA5B+vubxO2lr7Qzp6w/S20+VxU1KfkOc+Je0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787582152; c=relaxed/simple;
+	bh=Y6V0kZp4BD8ZRN/0Gddqg9ImoedWspC2zyyA+T9P50E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jeGGKDo9fJqlgD/mw3e646OITS6oyC0uerMg8/8IsF1AYUUwq6WYkKIx64Hydh1Da4tF7hu/lK6GpQOzqf/qJXuhNQXputpW4kDxl4PNIxbu42fzvs78cJ0l6eimKqX3gkptmKqS6HXBfbN9SLYn2XEbyhgeb/mVEnDgFu0rrq8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqDrL1rn; arc=pass smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BWwV9Vwy"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38759bcd877so4349901a91.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 07:33:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqDrL1rn"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-66c83e34212so4341970d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 07:35:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787582148; cv=none;
+        d=google.com; s=arc-20260327;
+        b=EsHQwBB8NI1GWtoCRjQz4hzRNS4/PEgm6WX2rEuKEeYvlIzLGA3lBh3BdRNWgYpX1A
+         cRQ0D5/REtNygMv6kAgGjyhReAenRKJ61pIAYQEyDnPc+DdXQdm40upO9J5n4Wa/Jx3m
+         FCC1GsNdk/7wYQvdFNb1pX4y7bRnAb1jvwye/bJsIvfjJIIv1p59NS/6LKruqVmIWLSP
+         u/dihvA0auUsZye60LIY+/0zwF8JEoOukhKvXLSRIiyYfe80YK/zYk68IKzSPcaWwAIL
+         ufclS/bcd8vN3R47m7BqO2DWyaKZVTLMA056f/oq5KoKmswarUnSeszab+AGHeQ1fJHl
+         GYtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
+        fh=0IIrL2vHaSckIk3+BullF3gqHfQOmvHORm3JUyU1vGw=;
+        b=bvvNZVhmprsWFRg2TSoKTMCzqvahDW0ZBZiBnNtQw6PEZuymxZYj9DQVMimp7/NCpA
+         CwdFcqtYHaIq2lpOM+QVHf3j3SKmTFtz7q2h49OYTlmUZVCZKwaiUBUFwnw7TG//6k2M
+         oouFnOS2fSs/4nddurB6EUR4YgiRI44qfuG7a7aVvA++tyiPrsapNuo4uG8Zw6Zll8V1
+         EYYMO5FTmXYLgQ8tyHoPKI8+mgZf22dzh/z4oNk4NNQHzkq5Ycyq5MRez2KCCCsdF/O3
+         YpTDDu4uxQT5hB2iEVNc//MDrDkGbSyg1dOH0nZEH43pGt8LeRZ0eyxax4UJYryT9kjt
+         67DA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787582023; x=1788186823; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=eUooFTowmFBj/AC51rrCXtAn3UMrPL5aMtRtMH5wOkM=;
-        b=BWwV9Vwy1GxDdD2xMS8R31DAwetrMthju9X7CjHc/fzz1xesnL9zLjwpRHfpPpYrqt
-         R5RXvEy86aRwoXSiFCDO3BBhjlTpaJs+2+kIjCeltxFMHMWLq6N4KjRq+e77meWREdzX
-         VY1yG/IsSF5WtZxCFvUQSbV4QZYhzYf/tyvcE1AGsmJscnnpihebSN3Nqp9DB5wMJ8nV
-         QNQF4SzICv+gJBDYWPKDLt2h7wCwNg9Uk+NpjO0jCgCGIWSkHQFgeC+LZbzcL0JfnWnJ
-         UdhjD0kd9U34zvesP9ou8fcnnSy2PZi3cDKKmS7nTH3KY30LYOq1NGWIzSBi4hRMCZS1
-         3GFg==
+        d=gmail.com; s=20251104; t=1787582148; x=1788186948; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
+        b=eqDrL1rnHvKV1YDk80akVb3tMGHUcjEw50mgRdlIYfcyJVyBSusYMqFH8AOPoVJMfv
+         sYnE/52fkK/Xwv6TV+pmrGAJWyVj2X8mbtmXiSaBXZXzaJLMudLAI8thpadwFuHB9tqy
+         nYoy2zerO/EYnqY8yFnqYUvAD+aeb47Ztf/Ti/0tmYoCUcxqHDQSYbiK3rQp+ZPg8N9k
+         h062lPN7/2bWK7P7RB8KXdOOSnTbQzMRVe3GC5EkTMzC3hdomCOLEwNNsSlIgq6NbhL1
+         wdM+8bYln7ueXBkkVxew0iKPlntz6tSaN8ovkHnynC2VSeDE1Jsh6xtoXFnexEWlw6TI
+         uDHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787582023; x=1788186823;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=eUooFTowmFBj/AC51rrCXtAn3UMrPL5aMtRtMH5wOkM=;
-        b=XpZUEqEbVJR8HX8AzDQ+Rzyonwq6DWEx96YWM8wt98D02bh+//TOp53cTcUf67Tw5U
-         k+A+pCPrjmGdylxcHUymLM/lxd8tINZWUal8rsJMA9JBjujNaajomyeK5RiBNgwzBjg7
-         eKY5Ks8sEksWvXFvphyelogfOVKZzM+nZtyrP1S8BtMf97amH+BbF6nnTErmoO1Sdf2R
-         Uc19l3vSNPF3alnMk1B22E6k6MQ3mi9eTxiQfR1H1E73JtkwluIRYjGBosiuOHFjfR8z
-         uGqwwn/3Y0t2XGt4pqPxNTS1CPJfFX6maJwSsZuAiIhk22YQzGdQH2AZtqmH65RXaLDm
-         Ieyg==
-X-Gm-Message-State: AFuF++k+CiIxFZIoZZOaxprfr+V539DaJSBJfST7bt5UEi18xoHGpgkz
-	xEmaOxk18HF89LDlAHjUQiqC6TygDKm94fp6pHPtHf7TY481WIi44eQdwZoTVw==
-X-Gm-Gg: AR+sD12e9QT/+kyYowHNgR/PYfnpT6bFIkidOsuwu8qpJKq9cvCE4Nls6B9oFNrAiHN
-	n/2xC53T5t1CNPCt4fdnbd2x7SQmvgNvZxlpRHTrNxgXJXFkq+ufBx8TSyibbXs7JtJLmZNdUp/
-	sU0qXHp2BixOuWoeqjjTVN7AnBqBF0iW6vLLlyT21R24lyu5oJRh/raMdGZAL6fEdhcRiBSdsgY
-	repSaOf2lPcyKsWE6uvaNPiQh36lHLd2duuzQ8zPDNyENo866iQfmUFnhcj2um1220H4MdZVF8d
-	PdfLa+pEa24xpMYjVo/B3epnlUPLvMOXOG1jQN9ajzLC3EnuIXGfg7KvYctBGHtR2lcKlpp3TA/
-	fH6VKxS5dc39VydhHgEwlOOCeioUiaBcEeOTdKYPTY7YSorgKSg2pD8qIEYLsaj8HQE4n04r0Ir
-	W7lfSMxeqO+fH9ZqvJij39MDnJ5GPBDeD9rRVFMI1MQl/o08fhJMEWG6aKe/YzouOg9mM3tLTCf
-	IDYXw==
-X-Received: by 2002:a17:90a:d44d:b0:38f:bbc:6a0f with SMTP id 98e67ed59e1d1-395dee7e2eamr35609234a91.1.1787582022566;
-        Mon, 24 Aug 2026 07:33:42 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.198.232])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-141860c6e6dsm23752254c88.1.2026.08.24.07.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 07:33:41 -0700 (PDT)
-Message-ID: <6a8c5645.3f2ee557.13dbd1.7444@mx.google.com>
-Date: Mon, 24 Aug 2026 07:33:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3908459283838197603=="
+        d=1e100.net; s=20251104; t=1787582148; x=1788186948;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DlEAhHb6rraj0pL5d9U0h/2riTkYg1T2t1YsFrpCceo=;
+        b=H5hoAMosHU1SHL6x6VLuygfCimM0g7opyakhH3fnCGcckQntMRNhQCnQlvokYJ0tYA
+         6rosvAodvNEEzQmOslwaSn8mkC5NWh848S+KkKKRYDcZt8+UGEBU4+9QgnvRP58FPS7v
+         aNYttbtzJi903ArbLQRqJTARUjel9ercf4rcwPdSOPN4aq3502QV4Ixb8mRdxXEPhErc
+         so/9OGlqk8/blLPr2UBIRfAu26oWNc+xa74qDChkpu9ccqIBN8bXJKDQEIDisq/ml7wX
+         /46Kc9ESGuZqzQIIxCN2psiVKJ+OZMZtRbzvHuts6FV1H9+ZIgOysamqcj4oI3SnTKHU
+         bs4Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpsPTlIY/8cSVBr8SicxbhxJQ0n4IGS7KExSG9GK9FDeFRusnn18Jf1ONRyC0xUhe0Qz5okQbhWXzoJV8YSr2I=@vger.kernel.org
+X-Gm-Message-State: AFuF++k6SiUjmFJRRBZ2DQmMi/R5amH4CXQKGtDTSgFH3mjbzrqqQru4
+	7emBz5y05cqVVgKDOciyPkwyI3kdbuHkLRtWt4qVlfTswtmh7V0B/vqbKwLocfDr5LydlwmbAVy
+	HUFbOE+/X7kAAwEcb80HQNn69FLNsMjs=
+X-Gm-Gg: AR+sD12zTpXrFzKnOg6ynIRzJ5pTQEYYVjiXvumJ786vfhv2wwVNyXVBfEYA1auSa8T
+	qopkCZlJ8Ztrp03YNh8kkqrKmfgyFJiePtO5EAOnSfWrXmJmYjf2x3ZM09STpW3Dt+gPmmaa4Ly
+	rnHFkw7AEOnhwcLYR9L8ZkmvVZQLyaLOHIpyXOpUVVpPRNG35TsCf2j2x6whkvmNB34ReF5cnPL
+	SZ8DqHKHYtMZw/GN7xaiYAcaqUF5lgXPA7bSibbMEa1yfleLTsIpSXz8AlhqbkIEpgveoGYnaUm
+	jKfE+zfYwplmckopFOmS2waLms+vn/uKuTqRDcwfRnUY7FViwVNTguGcVvRNApffgaqql+zv9Px
+	iM/Z5dKAiT9d8q9gE4XWFY8X4BsVe
+X-Received: by 2002:a05:690e:25d0:b0:66c:e932:2592 with SMTP id
+ 956f58d0204a3-66cf21deb78mr4733001d50.38.1787582148414; Mon, 24 Aug 2026
+ 07:35:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nicoyip.dev@gmail.com
-Subject: RE: [v5] Bluetooth: hci_sync: wait for directed advertising completion
-In-Reply-To: <20260824134149.212607-1-nicoyip.dev@gmail.com>
-References: <20260824134149.212607-1-nicoyip.dev@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260824053227.317496-1-junjie.cao@intel.com> <77f94165-3d5f-41de-8969-c7318284fd6a@leemhuis.info>
+In-Reply-To: <77f94165-3d5f-41de-8969-c7318284fd6a@leemhuis.info>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 24 Aug 2026 10:35:35 -0400
+X-Gm-Features: AcwNN1WxDxyNb27MNZYYLQ2YylskKFoLPXWU8dYFUVQ7iT_pAzgxPlP6dclf31Q
+Message-ID: <CABBYNZK9ax+iw7xKBtdZTSERsdhQ7t41Bg_1EnG88KOYj6kFHg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: limit RTL8761B BROKEN_EXT_SCAN quirk to 0bda:a728
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Junjie Cao <junjie.cao@intel.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexej Sidorenko <alexej@sidorenko.cz>, regressions@lists.linux.dev, 
+	Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org, 
+	Kamil Serwus <kserwus@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3908459283838197603==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Kamil,
 
-This is automated email and please do not reply to this email!
+On Mon, Aug 24, 2026 at 2:03=E2=80=AFAM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
+>
+> On 8/24/26 07:32, Junjie Cao wrote:
+> > Commit 5ead2063611a ("Bluetooth: btrtl: fix RTL8761B/BU broken LE
+> > extended scan") set HCI_QUIRK_BROKEN_EXT_SCAN for every CHIP_ID_8761B
+> > device to cure repeated 0x2042 failures on an 0bda:a728 dongle. The
+> > brokenness is per-dongle, not per-chip: on a TP-Link UB500 (2357:0604,
+> > RTL8761BU, fw 0xdfc6d922) extended scan works, and the legacy scan
+> > path the quirk forces is what is broken -- LE Set Scan Enable (0x200c)
+> > times out with -110 about 30 s after firmware load, btusb resets the
+> > device, and the adapter re-enumerates in an endless loop (382 firmware
+> > reloads in one boot). 7.1.8, which predates the stable backport, runs
+> > clean on this unit; 7.1.9 loops.
+> >
+> > Move the quirk from btrtl's chip-wide switch to a btusb device-table
+> > flag on the USB id the original fix was verified against. Other 8761B
+> > dongles return to their earlier long-standing behaviour.
+> > > Link: https://bugzilla.redhat.com/show_bug.cgi?id=3D2521504
+> > Fixes: 5ead2063611a ("Bluetooth: btrtl: fix RTL8761B/BU broken LE exten=
+ded scan")
+>
+> Thx. Just to make sure everyone is aware of it: Kamil (now CCed)
+> reported problems due to the commit yesterday and provided patches, too:
+> https://lore.kernel.org/all/20260822141115.58815-1-kserwus@gmail.com/
+>
+> I suggested that a quick revert might be the best approach for now,
+> which Kamil submitted:
+> https://lore.kernel.org/all/20260823102959.100368-1-kserwus@gmail.com/
+>
+> No comment yet from the BT folks yet.
+>
+> Ciao, Thorsten
+>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Junjie Cao <junjie.cao@intel.com>
+> > ---
+> > #regzbot introduced: 5ead2063611a
+> > #regzbot link: https://bugzilla.redhat.com/show_bug.cgi?id=3D2521504
+> >
+> >  drivers/bluetooth/btrtl.c | 13 -------------
+> >  drivers/bluetooth/btusb.c |  8 ++++++++
+> >  2 files changed, 8 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> > index 7f54d2d2d13a..03fa9409e3ee 100644
+> > --- a/drivers/bluetooth/btrtl.c
+> > +++ b/drivers/bluetooth/btrtl.c
+> > @@ -1343,19 +1343,6 @@ void btrtl_set_quirks(struct hci_dev *hdev, stru=
+ct btrtl_device_info *btrtl_dev)
+> >       if (!btrtl_dev->ic_info)
+> >               return;
+> >
+> > -     switch (btrtl_dev->project_id) {
+> > -     case CHIP_ID_8761B:
+> > -             /* RTL8761B/BU reports HCI version 5.1 but does not suppo=
+rt
+> > -              * the LE Extended Scan commands (Opcode 0x2042), causing
+> > -              * repeated -EBUSY failures when BlueZ attempts extended
+> > -              * scanning while a connection is active.
+> > -              */
+> > -             hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_SCAN);
+> > -             break;
+> > -     default:
+> > -             break;
+> > -     }
+> > -
+> >       switch (btrtl_dev->ic_info->lmp_subver) {
+> >       case RTL_ROM_LMP_8703B:
+> >               /* 8723CS reports two pages for local ext features,
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 2bae85b0016c..84614e60d142 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -67,6 +67,7 @@ static struct usb_driver btusb_driver;
+> >  #define BTUSB_INTEL_NO_WBS_SUPPORT   BIT(26)
+> >  #define BTUSB_ACTIONS_SEMI           BIT(27)
+> >  #define BTUSB_BARROT                 BIT(28)
+> > +#define BTUSB_BROKEN_EXT_SCAN                BIT(29)
+> >
+> >  static const struct usb_device_id btusb_table[] =3D {
+> >       /* Generic Bluetooth USB device */
+> > @@ -619,6 +620,10 @@ static const struct usb_device_id quirks_table[] =
+=3D {
+> >       { USB_DEVICE(0x0489, 0xe130), .driver_info =3D BTUSB_REALTEK |
+> >                                                    BTUSB_WIDEBAND_SPEEC=
+H },
+> >
+> > +     /* Realtek 8761BU Bluetooth devices */
+> > +     { USB_DEVICE(0x0bda, 0xa728), .driver_info =3D BTUSB_REALTEK |
+> > +                                                  BTUSB_BROKEN_EXT_SCA=
+N },
+> > +
+> >       /* Realtek Bluetooth devices */
+> >       { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+> >         .driver_info =3D BTUSB_REALTEK },
+> > @@ -4403,6 +4408,9 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >       if (id->driver_info & BTUSB_INVALID_LE_STATES)
+> >               hci_set_quirk(hdev, HCI_QUIRK_BROKEN_LE_STATES);
+> >
+> > +     if (id->driver_info & BTUSB_BROKEN_EXT_SCAN)
+> > +             hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_SCAN);
+> > +
+> >       if (id->driver_info & BTUSB_DIGIANSWER) {
+> >               data->cmdreq_type =3D USB_TYPE_VENDOR;
+> >               hci_set_quirk(hdev, HCI_QUIRK_RESET_ON_CLOSE);
 
-Dear submitter,
+Any chance to test this change? It looks better since it does remove
+the original workaround for the specific USB ID while also fixing the
+regression.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1150937
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.14 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.20 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      24.41 seconds
-CheckAllWarning               PASS      27.42 seconds
-CheckSparse                   PASS      24.44 seconds
-BuildKernel32                 PASS      28.23 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      427.64 seconds
-TestRunner_l2cap-tester       PASS      62.80 seconds
-TestRunner_iso-tester         FAIL      92.02 seconds
-TestRunner_bnep-tester        PASS      17.87 seconds
-TestRunner_mgmt-tester        FAIL      206.09 seconds
-TestRunner_rfcomm-tester      PASS      23.10 seconds
-TestRunner_sco-tester         PASS      27.28 seconds
-TestRunner_ioctl-tester       PASS      23.03 seconds
-TestRunner_mesh-tester        FAIL      23.68 seconds
-TestRunner_smp-tester         PASS      21.01 seconds
-TestRunner_userchan-tester    PASS      18.25 seconds
-TestRunner_6lowpan-tester     PASS      21.11 seconds
-IncrementalBuild              PASS      22.13 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 141, Passed: 136 (96.5%), Failed: 5, Not Run: 0
-
-Failed Test Cases
-ISO Broadcaster PAST Info - Success                  Timed out    2.680 seconds
-ISO Broadcaster PAST Info RPA - Success              Timed out    1.987 seconds
-ISO Broadcaster PAST Sender - Success                Timed out    2.006 seconds
-ISO Broadcaster PAST Receiver - Success              Timed out    2.811 seconds
-ISO Broadcaster PAST Receiver Sync Lost - Success    Timed out    2.525 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.236 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.545 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/644
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3908459283838197603==--
+--=20
+Luiz Augusto von Dentz
