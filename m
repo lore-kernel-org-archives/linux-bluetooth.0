@@ -1,233 +1,274 @@
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868A3386C3E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 20:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787603084; cv=pass; b=dwobESiVfq2DnJm8Cf8D6xWIBwIUEf4yp2D8TDmT/vkKGmXA0K4U8Uia4yyU30jKkcEsXOfN+geuPtYT0KFNhcBaYyUjKgdEd9Ou+j4DQbYk01rP+bR6Fty/ycj6DwkUm0thKF4z7AO5XpruHdsbuzoE7NimZQFgq3miqitZyjM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787603084; c=relaxed/simple;
-	bh=MdlGQ1YGPyo6q4fQ5CsW81kcKMXd9tZzx9TSaN4B5ic=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jOHSDnKmeSaEgsDGm0EeF/i5IafMmV7NIALLQtFn1Tt5a5zWtmbMWEtIbA5uJO3n72HTXc5rYM3zXupFfTKDKiPJIHqA+XmghrkEbXHd9FUYFs83rFJLswBvI8RWwpMg11AamGoxeePmJAA2PkBcSrgDL2ZWuDbr38eAFZouWUw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUFUNoOU; arc=pass smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32DA18DB01
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 20:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787603610; cv=none; b=Q3IXXNiKNGtfF4KStQOgd1xbS0uUIy9BoI7vWegBF5tTVOwj8FvunAV7Q4k2yTAr4dOh21LulK/9pZ0qx42Kja4x+JkdeXLYhUvc0w9dmbr7iVx76X1G06axTw3qxTKLCh6uBdkVBAUPydC4eOMvKUd7DSrSvk6NfXg6JX6REuw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787603610; c=relaxed/simple;
+	bh=wpbE5VvYeqMFefCgPPlX6W+QA8fl896nik/iElMIRnU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VBmf75PT658w5qYAZKkOm7JUhePK0j2/wBcN4nP9x+ZP106vOh5wS6kPIUujc5jHCfiYfC9T9xRlARzblXCpGSe6ET416ioerfu4eXhY8JpQPyEhet43VvpHTj78QW9j3NW+nG3RDFZ5nLUrjgqFu4gJtSEM0xjqWfQawWAH2NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KsFUCQnA; arc=none smtp.client-ip=192.30.252.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUFUNoOU"
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-66d07ddf077so2243848d50.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 13:24:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787603081; cv=none;
-        d=google.com; s=arc-20260327;
-        b=mekzto2euNzTXtmGnNSaPBX4Qg/MK8c1uOSz0m+m89jiuvLV2+2rQOGKx8FZbFbMd1
-         UnUBCYihSdOrmgLtK6P172fJ0XmvFwGAXtYKa3H5JY7sqbp0fxpvKv6nww5+tTttlHIy
-         H9VTQgp7QjvBGVVFlq1ZLXIyx7G8EL38qIuLvzDWigKQ5h/263E+BK9akPRg9NDnF0G5
-         JYgckaest6KAwinP4NMzroeYX/WrQjqoVXCXBygUFl8odWxJ2k8gPEpvFGNHLWl0ns0p
-         NJNV/uIHxjwwi02qKxCTW6+R7QgB/oIQsETt4o3RrVL2gKVp8p2zS33DcRegx3P5Ikhu
-         mxjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6arJFNIEtYO1N3cE88QFjylzkIER2l/NUQl8uPQTV3E=;
-        fh=m92f/JBDOVykAnRzQG53HSkkPsbRSAK8OuStiYDVQcA=;
-        b=A8XKqNJH0FoGF15OO651b+e1P+0P+1AR9NpuQNqMoRvCnNJjyRPYPjYV61+PbALRXf
-         P4zFgH6NoZQxIK8F/p0I4281qLPCHDV7RaxoTt+DXPoboMTYYMrnRdHOD0jpxe6jsBZs
-         3CCguBlDqpxvuSjjIU3NnTELiUrE8nuuDR2dMN6uVap1obIe6vK4LAIlCP2RFIG+mYDi
-         YKNOeNDjVqLrdDUAHCfNLJ2XbqpamIwEAeB86a7CJ9WThHbsMin1N67yJoMcdsR+y4qj
-         H2aj/MS/C7N0hswrH26Rk/TF+fo+TJZW9mTGtIyPrAhQNOhwTCtRy8ySdIGIwn/KMUkx
-         gTUg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787603081; x=1788207881; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=6arJFNIEtYO1N3cE88QFjylzkIER2l/NUQl8uPQTV3E=;
-        b=WUFUNoOUoTfpU7+O7eDe7WeUDQvJ2HlDqU9y72dK6NuEf/OmMYLfvFPfH9OKA9+w3D
-         hJ0e9DyTXe/HtOhKISUgHpvRb19tyYOtmj16Wk2UNiTBdaN564rrhgs9N9QxlEg1nSxI
-         V1BaCIApkbf1qjCllWq/FJ7sx5FPdu7nxsDg7HCo7hyl5x46cLT+lDTKtwj6QBzSGtsc
-         MFO3gxyIpbg+pFArcTxYyvzpGRi5VmZn5XVUz/zxfakk0nfxzYBBzOYBffs1wevDRxjO
-         pSJFfoSeUFHRg1R2rouHdisugLYaJWeOB4kwRQUEb0Yp1IlzY3XmrD2vZqhahvWWgF6G
-         jS/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787603081; x=1788207881;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6arJFNIEtYO1N3cE88QFjylzkIER2l/NUQl8uPQTV3E=;
-        b=tOvGsQL9K6Rw1GMwgbjHYn40YTzJe2VkSWGlJTnHlTEPNZL0SSp9ioGVS2NOEspSPl
-         CLvMVqfXOCL/fZbq7VD1r6tm1pBgtZ9mvNKZWjlgYQyQaPK3YcyvkpWq039f2lKzTApU
-         GwcR/NF9UD0ergfTJRRNfBUy53WZDMc+YatTYSL4Kj6FyN+1HYwQNfVPO7i4yib7Dpgx
-         jJV87S1k7JsHKDT5ocLlXwg41bFQiciSjQdTy091kSB1EM92XcY/2M4iT3D2SWRwQtap
-         Y5Z06iKtz1814/RmaMzjSVNyZ4DgK9pd39T5hXZzOEElaISA22F+9W4IjQ4STj2gGo16
-         kAjQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrPdCZPnYVgV0DpA0LcHCCT8C6cWHoxuUFZ3lcdNeOnWeiJuPYzG5p5sA9pLHjPl5FJ7p11Ji77DQVTb/OBGK4=@vger.kernel.org
-X-Gm-Message-State: AFuF++nj0G72YJoP/3iUdc340l+nHrOeS6bOIgY6nYMOYSW5NGL+96u0
-	MXpIUJzU8trrchum+2ZNLAtJdK830fWsBCFwVfwcyCec9P2NZCNIhhZUo6EAbm1UAo1GSSu64pu
-	QO4ELbqxMxN439rc7CFwEe/Ek+8O7ex8=
-X-Gm-Gg: AR+sD10PocDIkToGXvQ9MCd/Q0dmHt5MNJTMWdCEfNhv0TfgNpsDZAL9D9pVyR6z1qx
-	eeaNjy3/1iFOGifAdpfR04Z3Fb96lwOMtAbVi9BSgSVhd4ORh2gm1HU8irgAHI05p8nfEu6XHn9
-	uVXId+5yxgi0cpnIfJ/byWwwLy9w4JHiItJWtJD5KcWMh6C26z16H+rok6fM6BkpHhDwzFKp42b
-	F6gJg4WM/nfkV1MPBo+ek02Nyo87RiStAE3QpnJENLeU8GXHWTUuYwhFjS0VmxLCOX9/yhmV6Kl
-	jiVGFUxbhnRk2GdtDgkTZGGEjA57a52P+P4ys6eM23lAp6qMNpWutfvJw0xz8rTNBEWkc1FgUTH
-	e/hHl3jBnr2jc1PzbrS0vBSkG9hlzmiqPSqxws+6APg==
-X-Received: by 2002:a05:690e:4514:10b0:66c:c7f7:a074 with SMTP id
- 956f58d0204a3-66cf21346dfmr5071579d50.1.1787603081472; Mon, 24 Aug 2026
- 13:24:41 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KsFUCQnA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787603607;
+	bh=diyeU5JfCabAEOXIuac1pJRG8B/FOGzpu9O2YDY9Cm4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=KsFUCQnAGFqFt9duOY/WNNqyjLOiHt0CGoeBT0sG6HgeBPNuYi/Rb6B67qvGouAGQ
+	 5BbXHedzG1zbFPljHIvuT0t2cojv/+Gc/DpeihIeY5fJSffnkvB3YsAJQycxzTQsj1
+	 GlYvpl/Bc8SPeNE7SZiUSAkwEwkZZnvgIuxvaK/s=
+Received: from github.com (hubbernetes-node-2d47f23.ash1-iad.github.net [10.56.14.60])
+	by smtp.github.com (Postfix) with ESMTPA id E1324841333
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 13:33:27 -0700 (PDT)
+Date: Mon, 24 Aug 2026 13:33:27 -0700
+From: George Kiagiadakis <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/df8f08-9f5adb@github.com>
+Subject: [bluez/bluez] 3b3e05: build: Ignore the test-sdp-xml binary
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260822164341.3750491-1-nicoyip.dev@gmail.com>
- <178759021163.3014491.6954824460297136867.git-patchwork-notify@kernel.org> <5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi>
-In-Reply-To: <5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Aug 2026 16:24:30 -0400
-X-Gm-Features: AcwNN1XI0fwmwELQrp0LxTgNN5-Hwkf5JRdkao3DMgkKEJh4yKK7TGLZ-xyNW8Q
-Message-ID: <CABBYNZJotKc4k55jEEweD6aP6XEhYyKAgk4BamV5vfp8HHi0Tw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: RFCOMM: serialize security confirmation handling
-To: Pauli Virtanen <pav@iki.fi>
-Cc: patchwork-bot+bluetooth@kernel.org, Chengfeng Ye <nicoyip.dev@gmail.com>, 
-	marcel@holtmann.org, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Pauli,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 3b3e0589b1bbc94f89ee59e410160d6d847a1209
+      https://github.com/bluez/bluez/commit/3b3e0589b1bbc94f89ee59e410160d6d847a1209
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
 
-On Mon, Aug 24, 2026 at 3:38=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi,
->
-> ma, 2026-08-24 kello 16:50 +0000, patchwork-bot+bluetooth@kernel.org
-> kirjoitti:
-> > Hello:
-> >
-> > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >
-> > On Sun, 23 Aug 2026 00:43:41 +0800 you wrote:
-> > > rfcomm_security_cfm() looks up a session on session_list and then wal=
-ks
-> > > its DLC list without holding rfcomm_mutex. Since RFCOMM session teard=
-own
-> > > uses rfcomm_mutex, krfcommd can close and free the same session and D=
-LCs
-> > > concurrently:
-> > >
-> > >   hci_rx_work                    krfcommd
-> > >
-> > > [...]
-> >
-> > Here is the summary with links:
-> >   - Bluetooth: RFCOMM: serialize security confirmation handling
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/40c621391de9
-> >
-> > You are awesome, thank you!
->
-> I'm a bit too late now, but Sashiko report had some valid concerns
-> about lock ordering in this one:
-> https://sashiko.dev/#/patchset/20260822164341.3750491-1-nicoyip.dev%40gma=
-il.com
->
-> Running both BlueZ l2cap-tester and rfcomm-tester (so lockdep sees more
-> paths) in same boot you get lockdep splat.
+  Changed paths:
+    M .gitignore
 
-I didn't know about this trick, so I wonder if we should do something
-about it. Testing with just rfcomm-tester should show this, or perhaps
-we need to change the CI to run all tests under the same test-runner
-instance so lockdep learns about all the code paths.
+  Log Message:
+  -----------
+  build: Ignore the test-sdp-xml binary
 
-> Not immediately clear that a real deadlock could be triggered, but
-> lockdep thinks the ordering is now inconsistent.
->
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> WARNING: possible circular locking dependency detected
-> 7.2.0-rc6-01463-gfe3897b4ab57 #994 Not tainted
-> ------------------------------------------------------
-> rfcomm-tester/364 is trying to acquire lock:
-> ffff8880027d40b0 (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect (net/b=
-luetooth/l2cap_core.c:7271)
->
-> but task is already holding lock:
-> ffffffff99499f58 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_dlc_open (net/blu=
-etooth/rfcomm/core.c:426)
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #2 (rfcomm_mutex){+.+.}-{4:4}:
-> __mutex_lock (kernel/locking/mutex.c:646)
-> rfcomm_security_cfm (net/bluetooth/rfcomm/core.c:2222)
-> hci_auth_complete_evt (./include/net/bluetooth/hci_core.h:2246 net/blueto=
-oth/hci_event.c:3554)
-> hci_event_packet (net/bluetooth/hci_event.c:7887)
-> hci_rx_work (net/bluetooth/hci_core.c:4041)
-> process_scheduled_works (kernel/workqueue.c:3322)
-> worker_thread (kernel/workqueue.c:3486)
-> kthread (kernel/kthread.c:436)
-> ret_from_fork (arch/x86/kernel/process.c:158)
-> ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
->
-> -> #1 (hci_cb_list_lock){+.+.}-{4:4}:
-> __mutex_lock (kernel/locking/mutex.c:646)
-> hci_remote_ext_features_evt (./include/net/bluetooth/hci_core.h:2207 net/=
-bluetooth/hci_event.c:5030)
-> hci_event_packet (net/bluetooth/hci_event.c:7887)
-> hci_rx_work (net/bluetooth/hci_core.c:4041)
-> process_scheduled_works (kernel/workqueue.c:3322)
-> worker_thread (kernel/workqueue.c:3486)
-> kthread (kernel/kthread.c:436)
-> ret_from_fork (arch/x86/kernel/process.c:158)
-> ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
->
-> -> #0 (&hdev->lock){+.+.}-{4:4}:
-> __lock_acquire (kernel/locking/lockdep.c:3165)
-> lock_acquire (kernel/locking/lockdep.c:5868)
-> __mutex_lock (kernel/locking/mutex.c:646)
-> l2cap_chan_connect (net/bluetooth/l2cap_core.c:7271)
-> l2cap_sock_connect (net/bluetooth/l2cap_sock.c:255)
-> kernel_connect (net/socket.c:3726)
+unit/test-sdp-xml has been built by make check ever since the test was
+added, but was never added to .gitignore, so it shows up as untracked.
 
-Interesting, I though the kernel_connect would actually behave as a
-syscall and use it own thread so it wouldn't result into
-l2cap_chan_connect, in that case it is probably useless to use it in
-place of l2cap_chan_connect directly, so we may take the opportunity
-and clean this up.
+Fixes: e55ff8818f72 ("unit: Add test for sdp_xml_parse_record()")
 
-> rfcomm_dlc_open (net/bluetooth/rfcomm/core.c:808)
-> rfcomm_sock_connect (net/bluetooth/rfcomm/sock.c:421)
-> __sys_connect (net/socket.c:2135)
-> __x64_sys_connect (net/socket.c:2160 net/socket.c:2157 net/socket.c:2157)
-> do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
->
-> other info that might help us debug this:
->
-> Chain exists of:
-> &hdev->lock --> hci_cb_list_lock --> rfcomm_mutex
->
-> Possible unsafe locking scenario:
->
-> CPU0                    CPU1
-> ----                    ----
-> lock(rfcomm_mutex);
->                         lock(hci_cb_list_lock);
->                         lock(rfcomm_mutex);
-> lock(&hdev->lock);
->
-> *** DEADLOCK ***
->
-> 1 lock held by rfcomm-tester/364:
-> #0: ffffffff99499f58 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_dlc_open (net=
-/bluetooth/rfcomm/core.c:426)
+Assisted-by: Claude:claude-opus-5
+
+
+  Commit: a8d22214940dd370e26f03df4a880c14d4018202
+      https://github.com/bluez/bluez/commit/a8d22214940dd370e26f03df4a880c14d4018202
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  player: Fix crash on MediaItem1.Play() without a browsing scope
+
+media_item_play() dereferenced mp->scope without checking it:
+
+	struct media_folder *folder = mp->scope;
+	...
+	if (folder->msg)
+
+mp->scope is only ever set by media_player_set_scope(), which is reached
+from media_player_set_folder() (SetBrowsedPlayer) and from
+media_player_set_folder_by_uid() (ChangeFolder). Both of those require
+the player to advertise the Browsing feature bit, since
+avrcp_player_parse_features() only creates /Filesystem when
+features[7] & 0x08 is set.
+
+The /NowPlaying folder is gated on a different bit, features[8] & 0x02,
+and media_player_set_playlist_item() registers its items as playable
+MediaItem1 objects regardless of the scope. A player that reports
+NowPlaying but not Browsing therefore exports playable items while
+mp->scope is still NULL, and calling Play() on one of them crashes
+bluetoothd. msg sits at offset 40 in struct media_folder on LP64, which
+matches the reported "segfault at 28".
+
+A plain NULL check is not enough: the pending message has nowhere to be
+stored, so Play() would answer nothing at all and the caller would hang
+instead of crashing. Move the pending request from struct media_folder
+to struct media_player instead. Every user of folder->msg already stored
+into mp->scope->msg, so the slot was per player in all but name, and
+moving it keeps the existing mutual exclusion between ListItems, Search,
+ChangeFolder and Play intact.
+
+Playing now works rather than merely not crashing: ct_play_item() picks
+the AVRCP scope from the path, so an item under /NowPlaying is played
+with the Now Playing scope (0x03).
+
+Moving the message off the folder also fixes a lost reply. Each
+completion re-read mp->scope, so when avrcp moved the scope while a
+request was pending, for instance on SetBrowsedPlayer, the completion
+found a different folder with a NULL msg, returned early and left the
+D-Bus caller without an answer.
+
+Fixes: 43b0855abdf4 ("audio/player: Report PlayItem errors")
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+  Commit: ede23fb50e4133f2092a8b4b4ad8285b38de7795
+      https://github.com/bluez/bluez/commit/ede23fb50e4133f2092a8b4b4ad8285b38de7795
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  player: Answer pending request when the player is destroyed
+
+media_player_destroy() dropped its reference to the pending request
+without answering it. A client with a ListItems(), Search(),
+ChangeFolder() or Play() in flight was therefore left waiting for its
+own D-Bus timeout to expire, 25s by default, whenever the player went
+away. That happens on every AVRCP disconnect, since avrcp destroys the
+controller player from its disconnect path.
+
+Reply with org.bluez.Error.Failed instead.
+
+Answering after the g_dbus_unregister_interface() calls above is fine,
+as replies are matched by serial rather than by object path, so the
+unref site does not need to move.
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+  Commit: 3215010456f16765123b89575e18db96acbdf6f0
+      https://github.com/bluez/bluez/commit/3215010456f16765123b89575e18db96acbdf6f0
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  player: Fix NumberOfItems never being updated on SetBrowsedPlayer
+
+media_player_total_items_complete() discarded the count reported by the
+player unless a D-Bus request happened to be pending:
+
+	if (folder == NULL || folder->msg == NULL)
+		return;
+
+Of the paths reaching it, only media_player_change_folder_complete()
+still holds a pending message. The count was therefore applied on
+ChangeFolder and dropped everywhere else, notably on
+media_player_set_folder(), which avrcp calls on SetBrowsedPlayer, that
+is precisely when the count is first learned.
+
+The guard reads as copy-paste from the four *_complete() functions
+above it. Those need a pending message because they send a reply. This
+one only refreshes a property, so there is no request to correlate it
+with.
+
+f17d3a2c3 replaced an unconditional emit in media_player_change_scope()
+with one deferred into this completion whenever the total_items
+callback is present, and the guard then swallowed it. The AVRCP
+controller always registers that callback, so NumberOfItems has not
+been refreshed on SetBrowsedPlayer since. That commit states the
+intent itself: "On response, emit PropertyChanged for 'NumberOfItems'
+property".
+
+Note the count is still applied to whatever mp->scope is at completion
+time rather than to the folder it was requested for.
+media_player_change_scope() sets the scope before asking, so the common
+case is right, but a second scope change in flight misattributes it.
+
+Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+  Commit: a93047cd044fb17d687f43bef95289ec834876b2
+      https://github.com/bluez/bluez/commit/a93047cd044fb17d687f43bef95289ec834876b2
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  player: Report EBUSY from a busy Search()
+
+media_folder_search() answered a request that arrived while another one
+was still pending with EINVAL, while media_folder_list_items(),
+media_folder_change_folder() and media_item_play() all answer EBUSY for
+the very same condition.
+
+The commit that added Search copied the error code from the argument
+check sitting directly above it, rather than from ChangeFolder, which
+had gained the identical busy check four days earlier and used EBUSY.
+
+Fixes: 0a232a434d4b ("audio/player: Add implementation of MediaFolder.Search")
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+  Commit: 9f5adb00c7c1d3fcfa0afeaf53633eac90b5a927
+      https://github.com/bluez/bluez/commit/9f5adb00c7c1d3fcfa0afeaf53633eac90b5a927
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2026-08-24 (Mon, 24 Aug 2026)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    A unit/test-media-player.c
+
+  Log Message:
+  -----------
+  unit/test-media-player: Add media player tests
+
+Cover the D-Bus surface of profiles/audio/player.c that the AVRCP
+controller drives, using a private session bus.
+
+Nine tests:
+
+  play_item_without_scope        Play() on a /NowPlaying item of a
+                                 player that never set a scope
+  play_item_with_scope           the browsable case still works
+  play_item_busy                 a second overlapping Play() is refused
+  play_item_busy_with_list_items Play() during a pending ListItems() is
+                                 refused, pinning the mutual exclusion
+                                 between the two
+  list_items_scope_change        a pending ListItems() is still answered
+                                 when the scope moves meanwhile
+  no_folder_without_scope        MediaFolder1 is not registered without
+                                 a scope, which is why MediaItem1 was
+                                 the only entry point able to observe
+                                 an unset one
+  play_item_destroy_pending      destroying a player answers whatever
+                                 request is still in flight
+  total_items_scope_change       the count reported by the player is
+                                 applied when the scope moves
+  search_busy                    a busy Search() reports EBUSY
+
+Against the tree before this series play_item_without_scope,
+play_item_busy and play_item_destroy_pending crash, all three because
+they play a /NowPlaying item on a player with no scope,
+list_items_scope_change times out with NoReply, total_items_scope_change
+reads a stale count and search_busy reports the wrong error. The
+remaining three pass there as well and guard against regressions.
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+Compare: https://github.com/bluez/bluez/compare/df8f0873a16f...9f5adb00c7c1
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
