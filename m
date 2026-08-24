@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A1936F434
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DD136F908
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 15:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787584862; cv=none; b=KGmqgP2sfzZZCRCYDpmMLGNNN7jiPmS8txVowXHl4NOrNykM+Ejoui54SJq25tjV2EPZ7OwuWuoWNzbwc/+H0OVSqY0wDvcReR/jaPPeMTYZ1irRagqaeiVLu2svMyIq0+hYB0WLcm4DmXxyIKkhMd/xUkeD0Ijjg/DqeEYolVY=
+	t=1787584864; cv=none; b=NLFbRbb7ezMXfWY7S8/BbQJWH/qm994fU+rcAqfMpXn76IXo13qN4ezs6bjKoSbOnsgxfQTBMdvMjkpOfjGddUSe1IzTymyirogICkabll4loAs94FuhgvXmY7zD/Ol8iFHeCBz0li4VnkqytaLhs9KjirdULeT5UoMwB/H/uAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787584862; c=relaxed/simple;
-	bh=OrJ9hXBxFf1T64NYBJpGc5KQxcSRt0mFpHm1w+0w6VY=;
+	s=arc-20240116; t=1787584864; c=relaxed/simple;
+	bh=H4hFTT8JdH7OUh93OvdmBKN7O5bAztAaJiu+1T9ejoc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aR+8xO7jV28enXxPKxCaj2BM06BmkquRUZLdvHbct9jBUmOuJIki5movAIpZQ4ex2OfAnQIZwBt6G87xhEmmzqmO/lDr/A3//zgjYsKZDlCHDZ+5rOkY9aHh5s5vEAsnaNQNFAari0zKezv/cnK4UXi7o2lxGC0EOiVucqTndCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a3xo3YKg; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=prW06gN233Ge3Dauov8g0+jHOIL6kJT4aeYTz5SnZd9JApaq0zOOlwX9urJYAqOVNAP3f0QNmK8MiPcEO7Qqqr8Nx4YNx+Se9HGvpRtaugUHOl4pEauYR3J1oNi0WAmAUlqf8FtT0Rr57Rr17Ll+3uwiMFbtxns54CRY2szbMYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcTOuVuB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a3xo3YKg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB0DE1F000E9;
-	Mon, 24 Aug 2026 15:21:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcTOuVuB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B2D41F00A3A;
+	Mon, 24 Aug 2026 15:21:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787584860;
-	bh=UDTGz5eq0Xw5/PPvtsYzdH+XYFmOxhZPrbU/UXWObS0=;
+	s=k20260515; t=1787584862;
+	bh=F7tKjMnVis8fK5g/VGsFWZZzZF2tmtDdKBXGyBI27yA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=a3xo3YKgA4u5Q69xVw3pjhLZlaRfysII6XmidwkCT8a3J4QkSFaJZ7OtzO1sSXlOX
-	 1sIhQA3+2zlxLR4vBFuFhghzYwEW3EkoRyTxE0xXwv/pODvduLSbDYF2s1oybjdrI+
-	 wZaAYG4th+cYnl5mAWsdNHrWkDoDntRvAvUPGUhrhMwI64FCG09zFdxTsRRKC0mVe0
-	 FuAkmYl1iKy2L2DSGYgZNzqFAV2mpdpH4EVxm/aJFoiNoDZzYo3RFQfLlhB093WySp
-	 zU4qL0g+aOKjB++lOhRzDdzIwHklZB0uKnl5OdC2SxEovdDDex6Nx5sm6/m/dhamnw
-	 135C7lkvnPyNw==
+	b=lcTOuVuBEkfH0GJVGi5eVpUaB+2XXcWsgNSMLv1uoTNMOXlD0r6A5lVXY6Hc79xh/
+	 lHp9L2sT+AZe/2EREdRozCuz5M5ZIOGlSY9H9LQOOcRBqqNEYsnM3Kxqbkl3Jlw3P3
+	 eGcCLJetZhlm0uO5GfT7K2UvCg1Frth+Vyw6xPelpQpk5XJr8Sg5QZpPGWDz8ZwVCU
+	 znnc3OkL6wZhqQ9KhxUB4+/EHT6FXBu6Otv4shM9nMPUYbLdQcxfarUxWk1rXPeszp
+	 Zmol6G4Bq4CTEISRymS42UyooK6LbA9xGt/17rWvIzxLsRHRwUwCvymlM2kbcJNDzy
+	 qclAdmV5HqtvQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9393A392445F;
-	Mon, 24 Aug 2026 15:20:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0F7A1392445F;
+	Mon, 24 Aug 2026 15:20:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,52 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 00/10] Replace the name2utf8 copies with str2utf8
+Subject: Re: [PATCH BlueZ v2] tools/iso-tester: fix GIOChannel refcounting
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178758480814.2968570.14468593902711921.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Aug 2026 15:20:08 +0000
-References: <20260820183037.2713973-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260820183037.2713973-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <178758480996.2968570.1115538871246541426.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Aug 2026 15:20:09 +0000
+References: 
+ <a95c6273788e688e4034705305ec0c960739a9c5.1787481678.git.pav@iki.fi>
+In-Reply-To: 
+ <a95c6273788e688e4034705305ec0c960739a9c5.1787481678.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 20 Aug 2026 14:30:27 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Sun, 23 Aug 2026 13:41:30 +0300 you wrote:
+> iso_defer_accept_* consume the reference passed in.  g_io_add_watch gets
+> a reference.
 > 
-> There are five near copies of the same helper turning a remote name into
-> a UTF-8 string, in monitor/att.c, profiles/audio/mcp.c,
-> profiles/gap/gas.c, src/eir.c and src/shared/ad.c, and none of them
-> agree with each other.
+> Fix the refcounting accordingly. Also clear data->io_queue immediately
+> after the test, so the sockets get closed.
+> 
+> Not leaking references makes "ISO Connect Close - Success" to work
+> correctly again.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,01/10] eir: Fix stack buffer overflow when parsing the remote name
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=381b5d0d2089
-  - [BlueZ,v2,02/10] shared/ad: Fix reading past the name that was copied
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=784203160e2f
-  - [BlueZ,v2,03/10] unit/test-eir: Add tests for the longest local names
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=debd432ef13c
-  - [BlueZ,v2,04/10] shared/util: Make strnlenutf8 reject ill-formed sequences
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3ad832a3c2a9
-  - [BlueZ,v2,05/10] shared/util: Add str2utf8
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=11081f60d95f
-  - [BlueZ,v2,06/10] unit/test-util: Add str2utf8 tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=74c56dff2aa5
-  - [BlueZ,v2,07/10] Replace the name2utf8 copies with str2utf8
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8c81ab108b09
-  - [BlueZ,v2,08/10] device: Fix the name truncation splitting UTF-8 sequences
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2bf8286c4ebe
-  - [BlueZ,v2,09/10] device: Rename btd_device_device_set_name to btd_device_set_name
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bef0faa312ee
-  - [BlueZ,v2,10/10] unit/test-util: Cover strtoutf8 with the str2utf8 tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f0e40c5b3e6a
+  - [BlueZ,v2] tools/iso-tester: fix GIOChannel refcounting
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=df8f0873a16f
 
 You are awesome, thank you!
 -- 
