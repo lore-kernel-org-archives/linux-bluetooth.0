@@ -1,80 +1,168 @@
-Received: from sonic309-13.consmr.mail.bf2.yahoo.com (sonic309-13.consmr.mail.bf2.yahoo.com [74.6.129.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF03223328
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 12:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.129.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE183FF8B0;
+	Tue, 25 Aug 2026 12:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787661972; cv=none; b=hqEFgzPXDEOhtPirzyRl8z9CdRw+4+54EJsxeMEqqZx/WFBidDe6YV2suG0TBHTI6FfOYM7Y5tMoJ6EekCVw/EybDt1woG0C5HKYVnNz6uY76tBRfRf7BNqWrzi+QpQhIhZjuvsUg7FNwjH+jLlqiluVpicsOLkabIcRs7oPlmg=
+	t=1787662335; cv=none; b=D3BMIa0S+UZaI2I4jzjKMVQoQiv+0f/doztuDMJLNfivJtqSWN2ChRGJTSPyNp0imChgdKS6ufPSv57YoS5L465d5T+y7ywr/0rov0fmLvZj88F06+cPPSeA3mCnSbrsl2Z9o2jziH4YWNs2JikLdKhixOqA6jQBpl5fgsPMUkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787661972; c=relaxed/simple;
-	bh=l0sC6xfcv150w64sw7GFwTJHaQBAfSP2urmh5RHyABo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sX6cSv9gPM1YliUAPXW816jSZQGJWR3z82JHiyapBg7IhnGUkICQf+DqGblf+FAKMI58SnEkoCz+/i3BCLPVLgJFAjcZ+lR8sW2+Q8v4bI44R28WsPeksAqMvCOncyYv9MMI1F8Xaqz+nmeZRSSbczVhozUYy/cp33m+0yAE5Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Uxh6xrJn; arc=none smtp.client-ip=74.6.129.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1787662335; c=relaxed/simple;
+	bh=c/tgeOqNZmNBCpIpYagisF5S52+Z0rmfm7KP2mmvEOU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fR+1WIU76PnV/K4vL9z0whT58ocW4UNl/Js1kAAUdNuWpTKElXumIJAOzBzYAJjvPJPqWUSfumXW4eUwHtFvvQGBhy5JEOaxuopkmZBhHEMWDU8mr8sAJRdoJ+CKoHgHD0fYzBqPJVWKbc0cjenYSLYFCqH6IPAqHwLTqJzmTXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=aOrp2S9I; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Uxh6xrJn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787661969; bh=l0sC6xfcv150w64sw7GFwTJHaQBAfSP2urmh5RHyABo=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=Uxh6xrJnvpOI9D4FHmXo+bMGPJROBo3FcZiJYSj1rSvhc2sB/89OWnREAxIR2athpa3UWKyAtpTm3/JHVFt6eD1WQX5ktj3X4LSjGuZCml5vsl5JoPZQmZ1YvyrEvKmLADZHvXt4gFILG7M+xy2wuF6VTJsKIW+HO0eXKEg0g5LCWZ9aLPGxpOktNUljUmeUR0x8IjYjCJcsQRpkfFJtJclxjlvTiTtxe7tlEbRimOisuuEodKGNy+t+3qij3/rguAxnjqLObvhf0D3pDOzy8PJCTlCvz0emHUy0lR9ovamesE/atO1YTWYdETKYDz1kClFlvp6DD2i8OgVau5+nkg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787661969; bh=/yt14ZJZ1kyvJ2cfbPwUm6ZUcNrwDZ7FN/hgcze4EPo=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=SsWgfySDQmCSvlrod19ipMI3BywNzgUTObCJ4dOseINZQRuLUapVyU3U90YXunrFZaOvvHkwCbxjMxCAKYKFPGex3zBW/6ijg7NkybYPE71VYos5U6ODbOz2O1HBL0uEt4te+c8edQ4Vx/PRxHhI9vPZfPP5j1f68o20sZWcVL9HZ9OMcfuMHuEgfTwaCfm6fB5T1GygR4ZCNoeLM3qJ2ETIN4/DS7gzrdmGjIt85Eu2Bvba/9hhHXoF/jHcAZ6NV7n8WBOKKXs89CFcDVSo26CKybxF1Abvq6mYeoIOWY5+uReLQOGk756SeXemmeMago3qpx+VtG6IVuBbWO5V2g==
-X-YMail-OSG: kEPyH1AVM1niAQWyD.UAJVlWnVbnfGi8t6bJ5OWkmW.okThULURiqQTws_Oi8JJ
- amUdg4UwQ.w8QGwc9IDFbikkK99OhLWAQtB.hnjR.3Cw1qHi0uQRAWkTRC53nlP1eZTx2ThKayyb
- nMQh8GRJ883pCMnEvI6VUJ_DJtuFwhSJr1jL73RloeZeHhEP.645wy9cmlgZPCjS6v1woMsOtDWR
- r3J_rhZeNw52pprRbwYXvF97O2nBSTx52OHVPY6pPArfQiihMpixkjKNtzEyfSSJO61zKQQk1XQj
- gxCHgMH1UW5bDRK4vFQXcZZc9dEIQUQPPutN79rDCpP8NiXWbpxRR5ARJxJcqaM4T1kw_CxYVUs7
- Y9av1eM2.I1Q9G0kYnlG0gKo6zZb7eyxrWl.qtDZ1R9GtG0Fy.O7Qs5mXFOVagZj6Q0Nzb6bmvN0
- Ntr6w9jXSRMfTls8zYosgommOTmgZxoaHScHBC5IloOqj7ex.w21.z5YzIJJ4LtnhtG6lmLlpXWY
- IyOe6ofhBzpXhZuqlizjOo_ax3g9aIgTypcYAFtx8x2jfRdMC8QjfztIfZh8uHzWgpOGlPyw6UHV
- sx6UiUOOQn4Sntsank8U5SEvBn3e0M5M8D6zha4eOLulH0jEm_KdmruUrJ_O3e.1nT3XBYokXT4k
- 6B5wDuX4MSt8HfDVIlo1Gj9iCVI_OP4MQlH_od04oKLP0MJOhfAoouHE_D0ipLcAMTZ6Jg.N6R96
- J.FS6Fhg4FrZ30RHEYC1B.p6tQnxKE1YgTKPe_Lixl5hr1vxXUjMALeo9.qZne3bCbkHySHSqQRQ
- EhnzJPBHHaEOc9DvhM5hSBXBia3gcSTXRpFRJEsbE1f6bIAqRfFss3VKUKGJ9LZSam9ox47YzfQr
- EMe6bkVQQKsNddr1iY9gAMe_PZR6gPS5kuWsfJdKvVTlkYxnzT7J7I3.jDYKR0imN9zcxPpwZBGv
- Cn0VtE.jbuPvY.y24chOVGdtsjvN4J9_92qi7b5..6whAEHx0b0juBS3_qy9cGmk2d_9t9k_9cJR
- InRl7tBKMB1KnOHKQIyVfOJBzap7xvR.oP1BM9qOqzMcf5T5rfO0AM5EaW8aAFPSInbBnsPKd6Nt
- jpLsJThMse8J7JLgjJmgGUgUJGxpcEg4DgrDap.KVHCVPTUmpAq2DEsPEBl_qsDVLlIItpj7uFAQ
- QgWC4nY_EwSpmYstTr6EDczP4GWPWZlxgY.rDh4ejQkrKhJ1HFbMY8wXQ6Fktcpj2YR5lTvJYjAa
- oNTUpD0bqEYkENFM0zTE3eFd4e0kdrV5EEdE23YAyEp1hYM2IeyZNt0JgeaviNWC6J7._qGkAQPV
- PGeL49K5XZXSI.t95pR7ixUMBulAHOCWhUggSpI9Do_BuuHGxVMux_gRwFk875vErxC2o1dN09cG
- Wh8k7LLj1BcO_0ee0joqiQ6pUWRLyOhw7O4uWB9dLS.SUIbmkXuAgKmgTI8p6SuiqYMco8kGYCax
- BQPeaJuJ6u2y6H5kr7kuE5YXWBy0i0ooCPGu3z3GUSZq3.RImkiqf2lETzD8kXRuOvqYSpSxoXcK
- KXaGb2wdihGy1WyBCNDfeHEQL6zbfWW7hfL33yVkhxlbeijPm1HBSNG_3wjqfFHyBHxtTgQlE700
- ZkUdY4SQm5bOJqfAQKbzqkJYAF1kCQzZBFvrHyxlgRgv3RJw4fBwj2vYUia1vQQFAa0aYehNOQ9Z
- _kYu6CHe6Dc8WD8YHjkR0l3BROYH4UU1J8IFdA5nR8R9ia6zx6aa6A0XdRgG1UPABzrVqLkWoPOG
- 9K2ohfXuvyVrpHHvosTzIwkP0AsmEeug8eYAsG_uGqt.sdWjqdlXEn3ZPy4v5mnLDQIGOb9A6wHB
- xY897pj0aKzAgUvzQwMtwntlmgYXGONCByJX.noTv2D.U8iydpdai6uduW8qOfbaTmPXRqJM50Kx
- 4pGDYMVd.pEBWE0y85Wyn.T3QwyslBTzapGVo.rHwxFq31fuJbKV7XORN6sD4ZTlrJz5WLjQXtlm
- 5wM.864Wulfa9fyBLhlmcGRO_osCLjbhQMDUlTy.emTXZZQEnGlogOWzSJuQhwuDpkEVgT9.o64E
- UaD.amPYbJJE00gPG.x1CqCbPfSKzN8hNAe8jBIpKpFRy2nujqn.rxZNnJ50.MWAAma.TF43lM4K
- LTVvFbMQst.9DQfqHQ6gx3.g9BjFKqAGle0v99NwmR4fhkYfRgJolwxs33IHGGpqtEnt_v3yEcpZ
- cgyPChMp9e3bR6p7vTb7w38OLhI1R_smRaMhS
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: 457a8683-59e8-4119-b00e-8c883d222714
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.bf2.yahoo.com with HTTP; Tue, 25 Aug 2026 12:46:09 +0000
-Received: by hermes--production-bf1-54b5569bdc-bhmhz (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 586ef78cfdeefd5bd45817c59e6a7b27;
-          Tue, 25 Aug 2026 12:46:05 +0000 (UTC)
-From: Jeremy Dean <deaner92@yahoo.com>
-To: Triet Hoang <triet.hoang.dev@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove unnecessary braces
-Date: Tue, 25 Aug 2026 12:46:00 +0000
-Message-ID: <20260825124600.101932-1-deaner92@yahoo.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260823095527.57473-1-triet.hoang.dev@gmail.com>
-References: <20260823095527.57473-1-triet.hoang.dev@gmail.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="aOrp2S9I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1787662325; x=1788267125; i=markus.elfring@web.de;
+	bh=0A6+RJYgEoDGr2WxcoFBUybCUvprHwj6reMfDh19ATU=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=aOrp2S9I2S5Nomc4jTGmMP4Y3kl8Ndln6tse63Djx0QIUbgMdLryupXklM0YMOTd
+	 bNm0XMb0mNuy+DZgBuqUPbHN4mlmnDhpjt5Hny2ACY2OL0n7uizni1pR/BtRckONr
+	 UQJWietbbCCs2b1RKaZIL4BURN93suaYh+x0zWH8YpWJ5b+ijxDkSkwoHauiEHPmu
+	 ONR7iGuWi/lNPa7EPJEST5lc3KmImXwRmsQVnhnNg8Kv+YwezV1E9Z15FF6QeBbbn
+	 vtDOnWzPMzrZWjnY0rJCU3NAH1Y5Hzp50IVIqcJqpgH2x8VegdZ5Nok3cdcOfrtT6
+	 93XIdpEEOW1QJb4OVw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M7Nig-1wzx5l2mUe-00C4NL; Tue, 25
+ Aug 2026 14:52:05 +0200
+Message-ID: <04cdba23-c8f7-496e-890d-9e1dd6694e06@web.de>
+Date: Tue, 25 Aug 2026 14:52:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] Bluetooth: Fix code style error
+To: Jeremy Dean <deaner92@yahoo.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <20260825122207.101868-1-deaner92.ref@yahoo.com>
+ <20260825122207.101868-1-deaner92@yahoo.com>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260825122207.101868-1-deaner92@yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:C4kIZmuJj1YYVqGskzaZ0uUZAkMriuuGrnif1NT7EB4tt8EZv0I
+ 5NElDm8QZ1nYJKJmB3NZg2yTJ703mz5YIwM7D6bcOpVvFbiMmQEECAjlEKJE69wo9lLXhk3
+ TMdCQMlDc6JnQe4kZ6gCj+jtCTx/l2uk+LZyNL2q644tpFw/8a0KQBRgAyFRJH1g8YQ1vZ5
+ VBeT89kOjxVhRjjUSX5bA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:bxv/7nVW1K8=;gCgC+SNKVbGVXJAsC7YhD7hY1tg
+ Pn82/u2unV7Q7GM7sX5+Zzx+iYLDWXWun8jxM8kAaqOrNv8tpBkMwxv9CN6447xzUYpHa2Fss
+ XJ2dM3ltBPwTrIFII90dNFYXYIrOJht74Mm6/kioL/t9JTDQikZC8/MCDH6VA4xpj8MUYlwkL
+ BNw4OV3nECHsUVPkVykNDy10DFTm2oG69RDXrrZZN1fDV4/V7c7gppkUeNdzHJCLXsaSKPM98
+ eYB/7f2+HBdssyhNXwyEAN7S8K1KUzDG6ipR7cEqx2BrRXzyJlIXubWbTMWPgI8xDjkN6sH9l
+ /g/sFxBsDugp07exkKYdi/mlXrCm+/TohCWfqDk7h5IlLJZcFQyl0HFW77v4/ac4+w53jPaFi
+ EBARJO/L6aCXq8PClBSGXfWa803WYumznTOfPq89ol6UzuXaiBosNPq9m2fxNxYvYFGp81gy6
+ SrC40D26Rc2Bzr0XqeMsEUy+IZpSASrjRsJggsWv8ewsZvSj5ZD1FpALciXWeCD4/8IPV5guc
+ aJdk1xWBWDE6B6zVTFkf+TRwSiryXFe5USTuNBP4vbOwKH//UiC86sNcmWDcNK52es/WUYEhc
+ MMc6vDs0gp0nyKh138IoJkP+DQngUfUtS3mtMmocH5U5v+0bZtwoTQkVQowHpDY/tQk+T7H4H
+ iEh6mHEknwVGgHHKdtOizg6ejqe4ZOVMY4MLcPxAyDjft8aQTSIS4/IgGDscL0wL435DymxHH
+ rxB2hfcR/ZdgyYzi8e4hKX8E4EXUJFUwEEHRn/KWTWm06MVsyzhV5nmoEWJDdQQUSoGeY4Jq0
+ lsOLxCsKKA5zNVMCT8Y3cWOjI/rF8BYPSyJUgsZUPcAohIGaqSOCRe37bBQhxzLTgDjWAWuY1
+ d7+6zKG8s6n08Pu5Uz8ocW2EKHQucj0wVoTQXGY7DY55ixsTuymacR1VKlI8xaFFoxLZyWrVG
+ 0g4xAqrupDUH8g/Nrp7VpugQPaKo+yak2I6P0o7ROZrYxtmKVZ+XOisVCUOJpgtSDDolTIi9w
+ sgVlcHTNP0h80SqLlYWMzAvxhX4zqCVC7+WV5sl7gahVIWY/cYsjBO0oo5rGfMVcbSjg3KV2a
+ O3/HgcJugW3xbhHe5rp47lCHM7KzSsC9ddPLEw0ggU5pknWpPgxhPtyNJBciXtmV+YhrA3Nsi
+ dACZppYDwxa+bvqfhCl9QvcxwCd8UukWBgJ/fa29gzmfhHJWgmFdbymOKmkYrPvPDahZ7oLaA
+ V734DFdBi0eNx69RHV5fy6HLNWzSXT1btQlzD5fjk5NtT6wp5tcBSa9uO8oCEhJ+Cjv7C5hE7
+ lVrMMj/xhTC+SonT2Hyc7JgjahTRa3rGHXuB+KzJT/aIOoA+rZCIV/oY2xT/I0CPPDQFenpWP
+ A8Js/E6rKQK8jtlMpEN7NSDD8BNg5Jfrjq7LWkfrzffKjso3mYVaqIs5DFg38sW6wR2NVwfb6
+ VMKKUl6KxxcyI9TTG8PUZ2O6RHII3XKOhmI78BB1KuWDuG1eP/RDl35t93obpeRSDdcx4aXyp
+ p86QCFpenTpvNC1YF5VudSljR1ltrsGvTCkL/R+ovEEDqDr04WxATkw6qw+gOqohymoClE5+J
+ w7pCRs6ZSuitQ8fc2unrg6Jzhl/2cAaDO8hfGlFndl3WgqVF2puYqEbjK9NixniV9gGAZcpu+
+ Y424Oj4O9GJZ77G/EWXP5GogISsRWmPHODLZ6yKtpk6E8Fz4FCbsGlNsAXIAbX51gDakJRChs
+ YlDIt+RuhDxQcCnEFiVB9m4TK+FhxzbIMxexAMQRfEfx69MQeTlGfcuN62QRj+tF+yAEuFQNT
+ kMUrxheSquugeQ+u2ph5wwuCScegTHUKuNYPFQZKZxuhRaRX4QcU1RqZ2rwI3mWAzawLPzJfP
+ pCB0UTnT7vn1MTExwCPoUDGiFi2IK2FJxLiuf3REbZd0EUgEtbRjl//MJdHF6yGhL5ZaIaxiK
+ 642Hw4d2v62xNipNqtbH6GyXzODtErcK1GFCUT2/ZxDg2hdz+TgZfCx1u+z6qgRCH6BWnyH5f
+ OcOtT1n0WVZneIukhLbHoKAG9jk9ogLFou6HB3GPUrfQAy+SiKl7tWEZi2qu7q3Fx+D9wnkjp
+ kROPYGmm3agLaMUIEUKb8jIg8aduq72EztQWMzbQSXg+CRzEDDf68lJIL8PEytt39c49RaA3O
+ dfpmgRIL216WkNqHc1PJezIxHBdeFhZAvH6b+sJvH/pSvuJav0K+VP7wss8VpSdPiCoF5TaxJ
+ UgmM+Mpp8TCUFrsrA15OakauPAzhGLHaR5brS+LgkFfqMlXlxQLKU2HpJNF9l12oKB7ADDzsv
+ 6BnyfF8nbA7JN1eqoN90Uyf9CDenW/Rrq6jtr/fivc9Vc6bajLAlNibnDIPzpg6vsSh5Qxxtk
+ JZsdglwLH6NyVKV2TYaUUuaRUH/s9kyUMiJ0GGxcmshU2xiwE6MJLluUwUgcSTJ4aZO4oCj8w
+ L7fEv+a/MyLDMbDDHlYnqLtSDdsw+stF+DsKCJ2eLqVy/NS+H04O/XHd6D2R0wmyZBtlN24z8
+ 6MzDiXmRmz/OAeobXINA0JnYuEkdvFuk7Veq/SqXtchloDTTtZJGHmdxt3deneO9VPJPLYdIu
+ zeuPoYGGUs1CYFXR/bovSf+KXvPjvzxwyGrp/r+oU27wKcfzy2G9Een0nf/BKlCDy8kMXesjx
+ qFsXwNDSwiLpfHBJfAeUXhGBEmHkjRxp0VoJugUDfx2sfwI3X2F37+4JZwuQwJymH9IWrq0uX
+ 3MA2SizDrfHNm1EDl1bX/zZTbki8f9fBTkYx/OtEoDHtDdD2dUiIC/RTduITSqpz4pPVUMs7m
+ 4kG5KRdt+dsBXwtAp4YAEFiKkWBw5AK4/jBdha1zKV1xU/ByHTMy99GrFk8fU/yu3+5QLpGBb
+ 6pQPrrsTmckDDmbuZWLJuMmsl3O1+hHzJsAcgvlUxUu85zAF/r8DcIf1m+LGGOfJ1gXD1hGUe
+ wfC6/EQsdx0DkFueRIcl+kuAaGb9LmeEqK8g+iSydUr5xYSB/g/NtxkA7pnq+Mh939LIQMb01
+ RCXCXnsENcubtnAaTLUwB2htANR+3yDiHxtgtX1S+WTrzy2lQrpjSTSlKElZoIiO+SaUurjTo
+ hmsKeJm8UWGZrn5dPeAaUQo0vQTbKqISDeB9ZlFUprQucUWSWWhPiJblWfkP/XpSum+1YT7ez
+ 6iUA4qPhT/rDtaUesi+ys7/np6NrkKKQh7aViZig2Jk+FBzvNz0t3k1MQIGDTlW7Sb3qRiLhd
+ nQv4C/flufipSr7FzwSiDziht6KAqsrFs9G92qZANQYPsGzYuJJVLT/uWoERb57vYuxIFAJUv
+ uBwNTClInNUPybxs6sfmJOtBfuG2Bp6WH8Ku9IeLuEuncq+1ByGu0eHek3qNwCH0m2UIboPaz
+ Tqr8BTBzl7MVi+78APVfykRz5dsqRuhTJbDcl4fMHz+Ctp9LuNaI+XdI0EZ4fuyyytErWHWr3
+ cwccCR2041rsYbuqoRjmFI8cOlzp+JhiNZmI9mcvSMaWf/LGZ/c13aW0eb2R+4mC0BY4iJd0M
+ 2CumVt4NCePFk/lyO0Fzf1eSCEOwNBF3AsDAx89vyLs9OLmaZcO52eSSF5oT94BT2mltEu/f0
+ tSZG+bsN0eOR8E5jnVpyXEu2q2Z8ExzbgJ9fmHbv+6XFqXmK8uISbdeE9stDFjeznGU16Mw8K
+ R8uWGNaJ6ifkE1CMppe2Gs7VQA9pFG3Xv3pZiZt4uD+aP55otxREe71Y1VNv/TdTU81mqKPC2
+ T5xFPQfyU50bOVvboVLVuqRGO+jCLn27I8DJ8fZ9iPhMfINsXBNHBGs9IRXuuo1fU6IdNFQTn
+ jpHaDovLl0Fvf0iXcdZYnL2b9r72q/oC6KcyeP0iJqFbvbBJiJHikEgvvIyjSJafzGrvwdODW
+ FN6+MG+bId4tJTdWxtuuirYEsOfX3lsXYZG3EAVRIK4Zc8YK6VjcZRsEYpEdyMNwVZgfe6iKd
+ 5/YCteIZKDrvO2ja7yvBh15oTgSwTh8TSdjfNpmJRlAsH0nfLhgwlTa1Iszle+iL8FLH0xIIt
+ cozCtEOYewTwo4AJIBeyNuHefspkMJKTwp2N1Q4xARZCJjibm4g+RzHOdHZL7bvFF16xRBTTB
+ +2SRViR/g/+omXcumEd9XwQHr+7Rbm4MajpU4cvX/2L84nuKM2kHHkDPJ8mMEatAyq/dx1bjm
+ xmWOy2wKsN7XLb8zqEzntx7imPXAhMc+eIM+BYlZqPVyp9Cry+6R+uYImC63PRLqa2QK/z/ag
+ ilNqAMNY27JqOQqq+IZO3BNIgVrqfLNJfJ7wiEw52V1XE81k8Q+crVsqpNwW6bcOyKh1oYxdE
+ ICBHkCohHdMvgftYbiZGZQfmcvzy4zQiW5KsRKADiGNMZqM95N1pBplomtBXnpqLW+LuNV3IG
+ dsro3bT/YZYrkxfJsNrJiY25LtxU32OqSK/t2jTaJZonft4YW2i+Lhb0Jet5fLOVsqdrHmrUK
+ vzXg5FkPxzYEiUYLWOeH2Cdks4Hafu63goYabBI+cL9BxaoTVfVAeQETtobikY78mJdKCFWFf
+ Hu8ioLwdZq78SD51L2MrFM2Q8ZLCjdDmsO8fXB+Vd2EdvnXbDBcv0HVTY6jLTTBtvbFrujqhB
+ 4uOOWUJuD7tnQe3wTsq3RKNzLcOYNHh5Td5Oj90vxK5H/rvpZh2kWYO9WFnkmT4sKitFgM660
+ Vdk8volg/39Xb6qhAhzY/ZXQbmMiGchovTUgGPnqhVPLVi39M/Erx26cA+735siauzayVpdjj
+ 701v/UpMqW52YDhNoTVaRaN8pjsEgg5RqZvv1QlOOg7DsvWgj6+NBcR5HUKy4gWGq77t7Eoix
+ sbKBPE5GdqTCTO2+DHCnQt+wqpb3zzd1V3Yolyxvhze7AGgTt24iWFT8QskrcQOEnJw9ms1dI
+ dxpiahuhd1/sNd0f5l/obxHuh8UnvphxBbJW/B+bYB4WP11lTsC5shCuL20slvFNmMdF3//SG
+ 2AJu9lf4ASckvKXEGUXFDkvc5qFeeQVFRjQCRSw8PlApsadHq+Xe68JaWCETZRrEg/NICqTie
+ 9f6zl34XUHSPXegGoP0IEJ7rlUiIiHT7IFCZoA/UrnYGc9dVqNHrtBvPyulDNWt1fia5HxFM2
+ ptUULk+NZASLakyPCch2CotseplV8rSjIy+C/esjvF8M5D97IOdJIaAbezNw6WLZ7g0Om8Rce
+ aB2Zf97ZmT4awmEDaXUGUoK9GQdhh5M37MEh2zGmXCEVJLw+a1YoPRxWfQZLxTEm0oZS4rOvt
+ IpbsPbKDJL3WAEFAS+LBEI11wSwZPCE3+nHQBXPw4udSs0kgEu3OCsTPk+VxC3UUnlnRS14aF
+ 9KOL6GiR9FdHQbjDQt5FfoC5orQL1bG9VVfKhx7N6nNRekfvh8dEt8dIZfZQ0e7AwpqzkbSiJ
+ R+JHHK8KskD9oP+vpCq58nOZrqeswQr0mm8ReNnJq+I6/8mXTJLN1eEgm8HnRnSrrzlVVUVyT
+ lCjZhewB17Ee2cqOqHxL/yLJbDsLbusk0wdb6f3D1fhYtkuTN5LWLA9hIUY5LtrxdUa4i8Wnf
+ j0g3B9cs7HDi3iELIflrnTCG0wSzfHPLr0Wb3/VgZvjdPLXgP8Z00bs1ck9CKSLcw0PskckiJ
+ h8MtfHg6eGHkOHsIDYnNuoi0t4UmaM0HRbyp4JJoiWJ04gwLqO5IlB4Hm9pC57ukCzkmVIkro
+ VemFjXURPn9qe7tuwCsx+y4LlxbA9lyEqVCWsHzUueaSlWM0x0iZPhuLV0aMPZxuXX8PvJMXX
+ 4nQmQCvusk31FyenvrpUYtYTgirqMC46QXG7WMfntf6kLu+SR/HebHYmGpUKMmyph9h31mwOp
+ uGaym4BJwZQVwDKTGbbCz7+NelipmAjpPk2Ms6Gfh5RDCZ9O+eLM1PNDT7TKs9ASJ3YQPGaT2
+ f5vWuS3MqOCqzHkq88aEsI1bvmz1HIFIDI0MVgYS7duOK7P1GUxuI+jSqnBzP3+gbd9oi+0So
+ hXvLJP7wivF8g7ZMoCVfR4nOQzNZ8jYM0ZFYu/J2eSRdeqvikMlt4B/nkrkZU3aNmtOsqYLGU
+ 1Gb3/G7BnWHNmwWHE6OE9uZALte1HlElPzMYe92IYQVQ58vkAaIMGxNxGmgp3N/RkLnTa9X1k
+ 4cS1feeQ4eL60Ovt2FPe/m/pxDrkrehtPTemS9fnFJCmcHqnZrq+XHLl/w0Jawi4EZgjkjnEm
+ xaGqJGz0HopixxXX1v4hJclTDaXFRRhMxXvqS222lqlzPznQD3PoDT/n35uVEvdYTmmX4OHv5
+ X9oVsH4ujJMKQsF5+z2gl98F6+/EuKZd0TugGII1dVgpyPwFRRMrUBJWem36Y/3wHJw3fznmf
+ qKbN5okkSqm8+9V8zBxGIxTP3/XvLDVolcer/ONay598f09yjl8odWTkjzvzh0WdfYwQYHOXS
+ CtwjJq8kxtp19kSE/FF05WK/hnUH01fbDBA9bbHRPFYPzq2IBAByjSW9vHwNBNvPiywwOyxn5
+ 2obTa2GyNU0CvV9c6yeW2SnDpYzWFd4cx0YU7Z7cMbYCt42wBS8HCxAvB/6P5iYWlTY+flrss
+ uBnAllkfCIUTQGlXVLpy/R7PuSrxzbxN5jPRvzsy5ZaDpOqugb
 
-Hi Triet,
+=E2=80=A6
+> ---
+>  drivers/bluetooth/btusb.c | 4 ++--=E2=80=A6
 
-I think multiple lines are not to be submitted. If the patch can be broken down into separate patches, it should be.
+Some contributors would appreciate patch version descriptions.
+https://lore.kernel.org/all/?q=3D%22This+looks+like+a+new+version+of+a+pre=
+viously+submitted+patch%22
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv7.2-rc7#n310
 
-Thanks,
-Jeremy Dean
+Regards,
+Markus
