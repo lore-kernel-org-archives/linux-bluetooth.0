@@ -1,133 +1,137 @@
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6F73C8719
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 19:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02516392C2A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 22:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787685728; cv=pass; b=Qa3B2tUNmf3LmCh+U+ZP1u0VeHm2dXuo63uCwtnOe8c2Enq5mDaSYjBoK6viUjRFd3wNPOt8xRe6w9ZLxCv+WpdiXDFNlm57yv8H2Ae424cvgsm5YK70Ocaq69LfMowVJfxjeCt4qayVj6RaVsxv+y1OXqcmd1CBChRbBgyEC6w=
+	t=1787697288; cv=pass; b=Bt+TI5hPeUNkbzPTGw7MQVLQ/RnSP7UpwHT3hAn03oLdHxCHQCdLqf3KdpWBWMGBWyiEQWQL7R00m7epsxwf33IckLNDelf4rw1sf+AFEwGDnyEEvSrYFeb4xrlmO0as9zwY5AFFWZpWJr3wJ4UcWWpDqSn7EBnicDQ4E6ttoWM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787685728; c=relaxed/simple;
-	bh=L1X9kmnPKW88APV8KwDoTtyqLFwd84rxEU52MmNhWVI=;
+	s=arc-20240116; t=1787697288; c=relaxed/simple;
+	bh=uHwNMmSlKVOKOksOlOcpXVnUCxDFJchRpOP77Skivuw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mIu5VvERraxzm9y8ZezyxG45k0fxjBRwqrn5RGCrdL+5Rcjgng3law8w42PYRvw/uNcRS5yob461NsCjpT8kIPRSUoAj2iHDaORuCku6Ms7VFAwkpgLBo+ZbpsZpg5tQdTkoZ+qAcnyoR4zL7M/4mv5S9LhBH5LzTCDfAaWdKIA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAJ/FazR; arc=pass smtp.client-ip=74.125.224.52
+	 To:Cc:Content-Type; b=hMa8s7Qk37jZMqua0VkS1C/iPxJRLCQjGcV4y4aSya9CRgXHQwIEu65lXKUp48FC556ey/Obut4pFx2JvrXs6euzFNRlZZ59WCEKSFnsu3XvIvNFq2XXwK+q0qZ4aEnse1KPZ/iV6AtD1umu67fxKQOukc2D7sAEBysIObWGJls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0n5/KPS; arc=pass smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAJ/FazR"
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-66c4e9769bdso273735d50.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 12:22:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787685726; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0n5/KPS"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aeb2bc82ccso266876e87.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 15:34:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787697285; cv=none;
         d=google.com; s=arc-20260327;
-        b=rmUUO0Vv1maJLzD5OXpOdCERBZHXbtqqgeRQDoItsRz182V1z+5ZX5SRvW+ryPYo52
-         0w/l0JTEiJkp9wT6JtroJcOgUGuF6S3l1poQfq8Bwh3g0MEbVDwIf+OcH/zLsMPztR6M
-         0dVR5980LJLrgbmnLNk410u+io7jws8DNBcthOhH83yNhia0gNYGmVwgtbF7mpf/Tguq
-         YIhiZRXU3D7kWkYFMuF0SMWosWp0H6wD8CCWjjwjo8CjaUCkshRNmLJW6kSBIts4FF2M
-         RWPOEfmt9BoLugXdW5xUZRhkm14XWRx0T2ltKDd7VL9jEDijfdvmmtSveUU8KE0cqPUf
-         BfcA==
+        b=mk8lFBKN3AWeanEkIY5r+x2IQhLZvL2UB/U0x+FgLM6A4fUXfsT8OdoKAhV6BdRLYh
+         76fN1afJSP4XkwKqS5tkGngFHC+d/y1Thhz+N/Y9kmkdlxJCBWR/Yn6vBOTdisQK+REL
+         H9AUsxMAoO2bTcFaNzW2b6SqdKPPzkqyIYDzokrt3wrlOOuur1RaOl+lrFOkYGcM2hhF
+         48L0rYmNlPWWmpSFMVgIdhI4KZVxIgqttNayeclSpdiuFqXz0pUaSX0lsZGsIad0NUx6
+         Ss0XU6lQgbw6K2u1ROZtp5yQPuORGjmIvWXvkDPkZKWqy6uGwlAYIibRTaG33wrx4nnB
+         QJ1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=L1X9kmnPKW88APV8KwDoTtyqLFwd84rxEU52MmNhWVI=;
-        fh=O1z7egK/OyZCviDSaaBI9trasV5cvHKPh9yJ0XL8Xug=;
-        b=FLVELwETNF/pt71ddGVHVAqQrOk4gUKgkuvtfHUtKP4S1p2CJgS2EFcRn5ZNyWkDFq
-         fhxD01LbUlqAgDlKdO+FsmV11ZOYZbP7tlo02HRlnvqrRPrXmFWZsJWL4TboSF0neXVt
-         4H+P62OzgL7MmO7Kcw0zGEhlRf+q8nLFvlroal8HwT8YRwqfUIPQTc1rjcfRLKiZTojm
-         9SfG0tEO75FbI+58YlV064PbnsdxMSAnK8nXo+ZAmdloW1nFo9Wag5dxqhu3g/4Al5xy
-         PV587GcC/LcbYdojfwMDg/hNw8xf+B/s7rk/F5yJtC8i1OooQgejid+JpkX66nL9lEDo
-         gP5A==;
+        bh=fXwkt/yWHs7Hvlx6imrnaVKGrUmTwYMnYiutT7ypH+k=;
+        fh=XgM0kStpErf8VURMxJj+yXywDMoRy9An41J7g9hqrCw=;
+        b=Ok5ikx2DEQy6xFWWNVt9vvOkX6G4AzRDDQbA7++JIXgak8z1ELT3CDUnS8X25GayhJ
+         H4TKOS96f6s97OgGtJoVIHnUTw8a99/E/7osObpkHZP/dHK1oIqSMrT40wxbWjiErpmW
+         MzFvlkzBQukU7jO2KH2//85ePioLDrH0tCa05r3sFjaIyhNv5PA/G3gzq5i8Vg2hvfD3
+         JpbbJZ8870sqyGsihPSYWQ/bSI32vCyfdfqA/Kl7j0FpO1dknsb2EGXIPS/8cB8xt5d7
+         E64c6l8qAJ087LBWOjBxonvQpJXA4oCUYd7N1DNfuBkSQlX2InrACzEV4wg1OCpq0ul4
+         1b3A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787685726; x=1788290526; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787697285; x=1788302085; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=L1X9kmnPKW88APV8KwDoTtyqLFwd84rxEU52MmNhWVI=;
-        b=VAJ/FazR//Xknmuy/MjkyfEZ5iKuiKlhEapMtqSWi+O3s/VWL3Ugstp+zNB6xMx7QR
-         fFY0ZzeN9Uxcg+3KcySepPcPB8W78KYC1CzpIvUdKa3cQVFg9XzTA2qy+PGHa0ydUL/o
-         0DHRIsIH9K21UiVAKyl6+otjlTOq9LvcaTBcNy0RMIdsKsJGTd5qQkpiaLRZoONtQH7g
-         qKqjpJ6L+A1jDgXXsZDvVFKpFoI9L2Z4qaUwICLV/DgR1Cj2Sd9YSrL+hhhvildAnUFN
-         8NIkimSYexlzG76HQjpy4CixbO1VhoK2t6KcKPoxDuOsQ5BqUTe00uamwHu5ExiHChuv
-         tiTg==
+        bh=fXwkt/yWHs7Hvlx6imrnaVKGrUmTwYMnYiutT7ypH+k=;
+        b=C0n5/KPSATqr2FtC9u54LCBLeyfPGqKg2SBpadJ8DzNbI55uut44R7UsZlUmQd+d37
+         TrZ2r+UVbkBsxx5Z0gxlvJb50VlszB1Nkmh1DKtcBy3Wz7KO0ksTfAGR2+8oofXwsPXe
+         tAHxYqgQr7YO2phD1odmeXBbLyl/SOBoGcH4n7y9w32U5AgeGSDBIFzMGQ/LOx0FIOUt
+         VMeEnhAg0yKv2fWwdswvPAQHHR24NybahJuuA8FyiwnfUZR6sx2HoJ/CSEqQ02cDF/l+
+         Rg1I5hQ0pmfJRBcoilf7YKZt3+ro6nC9+JZ3e60CoG94LGHWgvMXWTLUd6+MCaWudMAA
+         6CFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787685726; x=1788290526;
+        d=1e100.net; s=20251104; t=1787697285; x=1788302085;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=L1X9kmnPKW88APV8KwDoTtyqLFwd84rxEU52MmNhWVI=;
-        b=TKm3xdZxNpDhD+6Auc1DwtCXYePxR1T9qN/6SJFU27FyKydLJk6oB+3T/yArYNJdyW
-         pjX1E6hAlsrGKWeLp2PlcdYDlqfbuHwNX8UEQMaVSCXeZVkGRqMbLay1iLeibeluKUGc
-         9XPK35Fq/3WPufjMVfYEvQOzoUjgKv3eeF8xN+JgllRFfx2s6waNGL0WEnU3T/oAglyn
-         tBzgoAuVT3GVfpkvl+b22v2/Voxe0m37yflimisoa8/cwVunyPl8VfOjEM3IsWp0UlyW
-         e3ubWTm79IL1yVrGNtbyixpsI4ojEutv3Qvjd+nX9+t5/FsE8t5/eC3Fsq/jIu7XZWE+
-         c3zg==
-X-Forwarded-Encrypted: i=1; AHgh+Rp3o9/ULSAS/MW8q/NVShfs6VA8hYEwLDBIwS/q6iwDmPW9jtJ15pXfGo+cs5UZLEjHd260Bi1eJteK2kV3NGk=@vger.kernel.org
-X-Gm-Message-State: AFuF++mxTEwOwcKUmluRfwMoQ7Z7eEjfGxr46ox6XeO3U4DASO38s0i/
-	lG+My/+Lw7P+ihH5uvBmPE9exnFjf89ciXrGPMhRlAreH+DfhRgHXG/9hoD7VxFtkev88bE4DcE
-	BAMSZbi6r6MqI7zInfyA54MdvhodG8Z8=
-X-Gm-Gg: AR+sD13dtzhFhvh18nLdCYVctQy+eOKjehvLRbdo9HIpbc+QWWsjZ+LO6DsgHmdA8g2
-	t2cgflxjmSAnkBrC+oIIMHSxRyjjWFTUGeHslOZHnmnXXABC9wdOuKdg84eWzPIaTQUQpdqUvLK
-	JdhUKP94Pv7NWZCL0p5tJA1iuk56iPGI0tkGZj6MXdB83bNufq/arco3ke+t76u2ffG+Me2De+s
-	zMwm6+hCsEJFZjxndgieBt5BukixRD7ORfx22fp78wh4J/Dj4UqA+/0VTGW/f18ybIbORjimAZr
-	1c83Ei87pfyV/RGYtetubc11dq7HNtpLMXXGQmqFat+GDQ6GU8QmSatOp0q+su/AgPQkYaz9cdn
-	FhtM7gh3ZAOWGKe3RhR5YhmTWUiNgwhM=
-X-Received: by 2002:a53:d80a:0:b0:66d:c8b:7a3f with SMTP id
- 956f58d0204a3-66d256574ddmr273824d50.10.1787685726474; Tue, 25 Aug 2026
- 12:22:06 -0700 (PDT)
+        bh=fXwkt/yWHs7Hvlx6imrnaVKGrUmTwYMnYiutT7ypH+k=;
+        b=J4T4Vqm3wa7QBdDfqQeFImn7rhjhwL54xyluXi7I8tNuW/1Euxvc1Y30PJV5aMwS/x
+         sBgJCUQS1TQlFPm7Hj8TdbGIlbvPpzD/2KH0cDS70Ht9zeVFLobe0fcdzVqOomHOA6rD
+         twsMAXUKSzNbU1Hj/JEqIQxLXGKfAkeo3WbwJmjmpYKZtPCSMNBjv2fn+K/kjBIhhmWv
+         b9dKaHSw9X7y27zG1D/WpdGB9yQ+hKspbIGaiKmPyNk3camDX1e7dVlheqMDmKEPAxgt
+         FDlAUygGQJ+mn9oan4USqOEk87bm6EuyN2ACxXCEGjzrwtqRmjl+Y+H+/Ubcx0tkx2WV
+         PC7w==
+X-Forwarded-Encrypted: i=1; AHgh+RrUfqLx5Jrx3snzOrnu9Bycp86CzB6reecBdDxjH/x+UYijdcHNBOju7NXxAMDuB+FsNvvceVxX1acjrn/2kK0=@vger.kernel.org
+X-Gm-Message-State: AFuF++mW7+C8sprMzV849FgT4FaDlxP5BmjoeLeVJo6sVo10ZX7xb10C
+	OYH/KCmJpkRC6jcQXu2JAH6uEQbUmeTin+dPnL1/43EdfDdSnQCbNm75XhdAiTVvNf6XEpcjQ/8
+	p1RUkt3nTI0yNQatOqbq3ncKA6JAbrwaMNTXl
+X-Gm-Gg: AR+sD10cWC5dRY+6qNOPfloMpPwqvJDHAD3LWUsRL/9KAXnb7jNKkq/WRiUSSahpsMk
+	rccWpe0CvJ91m3mVXNszT1ZmYTXPBNK2eZMtN5JSRqnyLo7DkIylWy9T5OBldhn2jNvPQdFK7eZ
+	rZLwax57rR6qUB8vgyji7Mz6MKL0Hxf89dSaAq2XWxQb2XTDeCWV0ynpKE6SVxCcuw4LW8lK7d1
+	QmMNi2whBlqdN5B/JxVCvHvMorimgbIAVAsi9Xzfx34N0E/zs3j33kQMOklws6mHL7EL7JyE7kU
+	3QOlSDdeqg9GGaqfuIoFN1FRdibfqij2ZBUViwDOhAcgd6cu63N3wmaoqG3kxnRinEesHWjC//Z
+	1Kh4iJssg66qqvchLVOw1LqDj862jPJtLEKuR7TCz
+X-Received: by 2002:a05:6512:1553:20b0:5b0:1ace:3bec with SMTP id
+ 2adb3069b0e04-5b4a9026cb0mr389552e87.10.1787697284756; Tue, 25 Aug 2026
+ 15:34:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260822164341.3750491-1-nicoyip.dev@gmail.com>
- <178759021163.3014491.6954824460297136867.git-patchwork-notify@kernel.org>
- <5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi> <CABBYNZJotKc4k55jEEweD6aP6XEhYyKAgk4BamV5vfp8HHi0Tw@mail.gmail.com>
- <CAAo+4rXEQ7DbjtB4ZTUAm5Yg3-jKRzmWbH+gTfUF510PU5caYQ@mail.gmail.com>
-In-Reply-To: <CAAo+4rXEQ7DbjtB4ZTUAm5Yg3-jKRzmWbH+gTfUF510PU5caYQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 25 Aug 2026 15:21:55 -0400
-X-Gm-Features: AcwNN1VM6jIc3YqbEmkUSp3YYTDAtgD7Zhgklb7Wnpwu0qVDhFV-hx-0ptxdH3c
-Message-ID: <CABBYNZ+0cbKR9ZAxLWK-8saOBR5u6cFEH8ohxP7hXGL2475rKQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: RFCOMM: serialize security confirmation handling
-To: Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>, patchwork-bot+bluetooth@kernel.org, marcel@holtmann.org, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260717-bcm4356a3-bt-v1-1-ffa2d5233360@gmail.com>
+In-Reply-To: <20260717-bcm4356a3-bt-v1-1-ffa2d5233360@gmail.com>
+From: Aaron Kling <webgeek1234@gmail.com>
+Date: Tue, 25 Aug 2026 17:34:32 -0500
+X-Gm-Features: AcwNN1VK7RMzNkBtg92tREfofFfPvpPoXK70Kb_n0azLYBDz6epHIa--hbSQeXo
+Message-ID: <CALHNRZ9ofDZ61YW-ZN07sf8sZ6gx4n-8SusSR_vop7R_vqbGFA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btbcm: Add entry for BCM4356A3 UART bluetooth
+To: webgeek1234@gmail.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chengfeng,
-
-On Tue, Aug 25, 2026 at 2:46=E2=80=AFPM Chengfeng Ye <nicoyip.dev@gmail.com=
-> wrote:
+On Fri, Jul 17, 2026 at 4:41=E2=80=AFPM Aaron Kling via B4 Relay
+<devnull+webgeek1234.gmail.com@kernel.org> wrote:
 >
-> Hi Luiz,
+> From: Aaron Kling <webgeek1234@gmail.com>
 >
-> On Tue, Aug 25, 2026 at 4:24=E2=80=AFAM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> > Interesting, I though the kernel_connect would actually behave as a
-> > syscall and use it own thread so it wouldn't result into
-> > l2cap_chan_connect, in that case it is probably useless to use it in
-> > place of l2cap_chan_connect directly, so we may take the opportunity
-> > and clean this up.
+> This patch adds the device ID for the bluetooth chip used in the
+> Nvidia specific Broadcom BCM4356 PCI-E WiFi / UART BT chip.
 >
-> Sorry for the negligence of the possible deadlock cycle. Could we
-> avoid the locking cycle by directly moving the session lookup and DLC
-> walk onto krfcommd so rfcomm_security_cfm() no longer takes
-> rfcomm_mutex from hci_rx_work? If we need a fix like this, should I
-> send a follow-up patch or send a v2?
-
-It is a possible solution, that said couldn't we do the walk using
-rcu_read_lock/list_for_each_entry_rcu/rcu_read_unlock?
-
+> Signed-off-by: Aaron Kling <webgeek1234@gmail.com>
+> ---
+>  drivers/bluetooth/btbcm.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 463d59890befe..14acea7325478 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -506,6 +506,7 @@ static const struct bcm_subver_table bcm_uart_subver_=
+table[] =3D {
+>         { 0x6606, "BCM4345C5"   },      /* 003.006.006 */
+>         { 0x230f, "BCM4356A2"   },      /* 001.003.015 */
+>         { 0x2310, "BCM4343A2"   },      /* 001.003.016 */
+> +       { 0x2409, "BCM4356A3"   },      /* 001.004.009 */
+>         { 0x220e, "BCM20702A1"  },      /* 001.002.014 */
+>         { 0x420d, "BCM4349B1"   },      /* 002.002.013 */
+>         { 0x420e, "BCM4349B1"   },      /* 002.002.014 */
+>
+> ---
+> base-commit: 49362394dad7df66c274c867a271394c10ca2bb8
+> change-id: 20260717-bcm4356a3-bt-cd78cc0f42e8
+>
 > Best regards,
-> Chengfeng
+> --
+> Aaron Kling <webgeek1234@gmail.com>
 
+Are there any thoughts on this change? If not, could it get picked up pleas=
+e?
 
-
---=20
-Luiz Augusto von Dentz
+Aaron
