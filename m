@@ -1,26 +1,26 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905827081E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905F230DEBA
 	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 08:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787648253; cv=none; b=VpNUtoN6pqdTMIAYEuHBDcxoxfHOuhVXsjFnIB/qVyYNH8zVMMYupeBw9RXPekg1RoENp3EH4+focXLHteIZ4Fyv4xsP89FhUUtJPkbKrzQeEoXqyuBaDFg0qBMovgGBQ612RYdgtG/yhgSFbh6UOo3hzw6FsWt7DkEo+x5wKgE=
+	t=1787648253; cv=none; b=stH2rJFN/G30A0f01O+Y1pGtczud9jqxhzDOPunZp2OhpcVVtHoeKuQMwaow6826GYGAd857GlwhePwIiqTKDbAPfN6rYe1DdIyH1unIg3mAuwSmHgYrBkPoOylg0PJHyF5JGQRImW/1oWG2sz1Vul0+s8K4JEUjkHMzmwvZd+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787648253; c=relaxed/simple;
-	bh=p2EQJlpOCxrfKKkGSq0cyU71UcvE7hKEPjSC279Kb28=;
+	bh=zr6FxhQVls3yQ3YNyV1vhpwx880dNIEwZf8ACghiPPI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P8To727aBdx7FT1NrdakPIFKI4ffOO58HiLmfKNXuW+RzrjyWNrIzJk7kYPjwznOMG41TmA18F/mekicMIckZDXyxVa2Y/2JrHciSCUdPjU7y89RKKceyJ8y/1JwaxxHafXvvLgrACnwKK4JHd/KjYgxX6NsFcEzIGIJRWiJEE4=
+	 MIME-Version; b=Gh+0n0vwJ1eeFAe2CZmIDx5JfYMXTVmd0Ye2j9HnVHY60LdH/7DmxoFl4r391YU/E2o7VyTjV6X+FJWacklXpYNG1hbGX0AEqvmPrLMJEL6m2bBavxgzYrznTb28EJJkjBmDKP5bLSRX6Fbc8F4/Gw8mLA25eUCW+MTwjjEWs1E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 678563EBFA
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 340F13EBED
 	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 08:57:23 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] doc: Remove obsolete security-bugs.rst
-Date: Tue, 25 Aug 2026 10:55:55 +0200
-Message-ID: <20260825085714.448937-3-hadess@hadess.net>
+Subject: [PATCH 1/2] SECURITY: Add top-level security doc
+Date: Tue, 25 Aug 2026 10:55:54 +0200
+Message-ID: <20260825085714.448937-2-hadess@hadess.net>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260825085714.448937-1-hadess@hadess.net>
 References: <20260825085714.448937-1-hadess@hadess.net>
@@ -32,110 +32,119 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTGwsbtXYGcCAUZEXkhT6tsmJSXRWG5czobgyOA4eX4DBiGhiOUX+Gv2e+U+27FJ2xE87R/z2O4wnQxtcfxAKP5fTBsAoKnPdvr+CcJzEb4EZr/VfM8V/xBofBwaVQ70fR8ftTqzIdEnHQ5RF2tY7wZFyIy+1rmceqGzL3K14HZGRsztTPQoIZhLUVAf7pxtlP/Sif5lR1cNkNw4PRJEahrZPr5tlP9CTAwjohR79IVglCsMm0HOQKHjx2H5E69XHGw4PXvgpCarbd5hIAP9AN54y6sNQRg3PnM5BCCZDM2xIJaSG4y623F2lDyTOFJ+ZIDpnDFxCTU10gJQFbIw2yTkNCIimimiIlfkptSKYqT/9k1il8PYcYXOSkuCJkHLW1MxivlWICx00Ur/Hl+bW3wNimn+avtNjbxWavYKXr0ZbmMg5oxcxhLHT5Ow5rPgrvWKeFvn4zYagfx7Rq5AyIT555CPK1kXfAxb+DlMSFPNM4vr4xhoBgT14l0jhxgrPqYSMokUCUlv0Uj3FcLQZLcTPBSpqn0oLE/ygpVSJTgoyykDwv4bVRiaFKcLEfZM9hSBPjdAYMuPhGBM7G1GMEPm85NvQjk3h42nwTL9ztaJPWYh0eeYlBOKI7Zu9L0Wj+H+hHeCg6EccrDBK0NxpEgWEqu24pxR4vKok0PFqWqwZg
+X-GND-Cause: dmFkZTGAabt3qcdE/Z+cp08o0tTlZvIJgos3QSIpJaVWLV03++iVL3tb2StBB0tv2uOaua0rQbXVmFovBXiUkgzKOaUuEbbmbE5X00Lglun4Xm3wSwVpvqZ1jfMKIDP+zq5uOQFnbmV5iISSswUJwM5oh0sLOKS4Pk/fpKCw3loT5/78Er+t0v/4W31GQ7yuW9P/YUOquDGg717lhgL3gUr1BSdKq10uDNvIalYqKZChQ/MVI15UbVVt2Sc9fSvNp5RJ9H8d9ocaQMn3RVpBB9rsnmeYGkTyj8rcMYDvuOJGQOYdRHq1UoWQOCJe+Nd7GGSHFMKQ29fJWowBWRBpBq5MqNjQYmbFq8h4wOOkCUTfwqDf++Mlnu/KUK2iE6Jd/jRrvqeUxMYqY3ExkcnehVxe6dKmM3xMYTu1maytJW+U4rpKJlsaqVhuK0PMhGDtU91SUUSJuicM2rH6NPaSLhqfW7J+q4CRFc+9WwfnbcjdGYeSwmsRpeeLQbVg2R1plcuZTbvXr18TTWUrELVoaCvBdoSa5FxmGf6B+m80l+y82wrM8ldBpjKKcotHc22jdLjzBW4w/HczlUMF1ZL8JzWiCyIA7/lptQGgavPP8XpS2HmccqsBDGFaQDZiybkk0j+uCqrqP5uDDvc9AKTJ0heuPj7JMoZHlWV6qFm8W7Nq6gjgxg
 X-GND-State: clean
 X-GND-Score: 0
 
----
- doc/security-bugs.rst | 89 -------------------------------------------
- 1 file changed, 89 deletions(-)
- delete mode 100644 doc/security-bugs.rst
+This will replace the existing documentation written 5 years ago to take
+into account the new tools and the new rules around dealing with
+security issues.
 
-diff --git a/doc/security-bugs.rst b/doc/security-bugs.rst
-deleted file mode 100644
-index 0dcacfbd9eac..000000000000
---- a/doc/security-bugs.rst
-+++ /dev/null
-@@ -1,89 +0,0 @@
--=============
--Security bugs
--=============
--
--BlueZ developers take security very seriously.  As such, we'd like to know
--when a security bug is found so that it can be fixed and disclosed as quickly
--as possible.  Please report security bugs to the BlueZ security team.
--
--
--Contact
---------
--
--The BlueZ security team can be contacted by email at <security@bluez.org>.
--This is a private list of security officers who will help verify the bug
--report and develop and release a fix.  If you already have a fix, please
--include it with your report, as that can speed up the process considerably.
--
--As it is with any bug, the more information provided the easier it will
--be to diagnose and fix.  Any exploit code is very helpful and will not
--be released without consent from the reporter unless it has already been
--made public.
--
--Please send plain text emails without attachments where possible.
--
--
--Disclosure and embargoed information
--------------------------------------
--
--The security list is not a disclosure channel.  For that, see Coordination
--below.
--
--Once a robust fix has been developed, the release process starts.  Fixes
--for publicly known bugs are released immediately.
--
--Although our preference is to release fixes for publicly undisclosed bugs
--as soon as they become available, this may be postponed at the request of
--the reporter or an affected party for up to 7 calendar days from the start
--of the release process, with an exceptional extension to 14 calendar days
--if it is agreed that the criticality of the bug requires more time.  The
--only valid reason for deferring the publication of a fix is to accommodate
--the logistics of QA and large scale rollouts which require release
--coordination.
--
--While embargoed information may be shared with trusted individuals in
--order to develop a fix, such information will not be published alongside
--the fix or on any other disclosure channel without the permission of the
--reporter.  This includes but is not limited to the original bug report
--and followup discussions (if any), exploits, CVE information or the
--identity of the reporter.
--
--In other words our only interest is in getting bugs fixed.  All other
--information submitted to the security list and any followup discussions
--of the report are treated confidentially even after the embargo has been
--lifted, in perpetuity.
--
--
--Coordination
--------------
--
--Fixes for sensitive bugs, such as those that might lead to privilege
--escalations, may need to be coordinated with the private
--<linux-distros@vs.openwall.org> mailing list so that distribution vendors
--are well prepared to issue a fixed package upon public disclosure of the
--upstream fix.  Distros will need some time to test the proposed patch and
--will generally request at least a few days of embargo, and vendor update
--publication prefers to happen Tuesday through Thursday. When appropriate,
--the security team can assist with this coordination, or the reporter can
--include linux-distros from the start.  In this case, remember to prefix
--the email Subject line with "[vs]" as described in the linux-distros wiki:
--<http://oss-security.openwall.org/wiki/mailing-lists/distros#how-to-use-the-lists>
--
--
--CVE assignment
----------------
--
--The security team does not normally assign CVEs, nor do we require them
--for reports or fixes, as this can needlessly complicate the process and
--may delay the bug handling. If a reporter wishes to have a CVE identifier
--assigned ahead of public disclosure, they will need to contact the private
--linux-distros list, described above. When such a CVE identifier is known
--before a patch is provided, it is desirable to mention it in the commit
--message if the reporter agrees.
--
--
--Non-disclosure agreements
---------------------------
--
--The BlueZ security team is not a formal body and therefore unable to enter
--any non-disclosure agreements.
+The new workflow replaces email-based reporting with the GitHub security
+advisory tools, explains the CVE ID assignment process, and places strict
+limits on the amount of work that can be demanded from BlueZ developers.
+
+It is customary in 2026 to have a top-level SECURITY.md file which
+explains the vulnerability workflow.
+---
+ SECURITY.md | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
+ create mode 100644 SECURITY.md
+
+diff --git a/SECURITY.md b/SECURITY.md
+new file mode 100644
+index 000000000000..b4b903de6a10
+--- /dev/null
++++ b/SECURITY.md
+@@ -0,0 +1,88 @@
++# Security Policy
++
++## How to Report a Potential Vulnerability?
++
++If you are reporting a not-yet released or urgent issue, please file a draft
++security advisory at
++[https://github.com/bluez/bluez/security/advisories](https://github.com/bluez/bluez/security/advisories),
++containing as many details as possible, including the version affected, and
++any ways to reproduce or fix the problem.
++
++## AI usage
++
++If the vulnerability was found using AI assistance the reporter needs to
++disclose that within the report, also needs to mention which AI was used
++during the processes.
++
++## Embargoed vulnerabilities
++
++All security advisories filed through GitHub will be embargoed until
++either a fix is available in the [main BlueZ repository](https://git.kernel.org/pub/scm/bluetooth/bluez.git/)
++([mirror](https://github.com/bluez/bluez/)), or it has been made public
++by a third-party.
++
++GitHub security advisories have discussion fields, and those discussion fields
++will stay private even after the advisory has been made public. Only trusted
++BlueZ developers will have access to those comments, and unpublished advisories.
++In exceptional circumstances, outside security developers might get access
++to advisories if BlueZ developers find it to be necessary for assessment,
++coordination or publication.
++
++## CVE number assignment
++
++All the vulnerabilities reported through GitHub's security advisories feature
++will be assigned a unique GHSA, which can be used to reference the issue
++externally.
++
++BlueZ maintainers will aim to work with either
++[GitHub](https://docs.github.com/en/code-security/concepts/vulnerability-reporting-and-management/repository-security-advisories#cve-identification-numbers)
++or [Red Hat](https://access.redhat.com/articles/red_hat_cve_program) as CNAs
++to get CVE IDs assigned, on a best effort basis.
++
++Vulnerabilities reported publicly through the linux-bluetooth mailing-list,
++or in any other manner, will not be assigned CVE IDs, and BlueZ maintainers
++will not be working with CNA to get a CVE ID assigned to that vulnerability.
++
++## Disclosure
++
++Once an issue has been discussed privately, accepted as a security issue by
++BlueZ developers, a fix created, and if the severity of the issue is
++high enough (usually only for critical/high), BlueZ developers will aim
++to have distributions forewarned about the issue through the private
++[linux-distros@vs.openwall.org](mailto:linux-distros@vs.openwall.org) mailing-list.
++
++Note that we recommend informing BlueZ developers and working on a fix first,
++before involving the `linux-distros`, as this list has a relatively short
++embargo period which might not allow for much time for the BlueZ developers
++to create and test robust fixes.
++
++We will not be applying any further embargo, or do any restricted disclosure
++for issues that are considered of low or moderate severity.
++
++## Severity assessment
++
++Some Bluetooth functionality is gated behind the `--enable-experimental`
++build option, and behind the `-E/--experimental` command-line option.
++
++When security issues exist in such gated functionality, the security
++level for the issue will be considered as `Low`. This will be done by
++setting the following CVSS fields:
++
++- *Privileges Required*: `High` (requires having an experimental build, and the daemon running as experimental)
++- *Confidentiality*, *Integrity* and *Availability*: `Low`
++
++Reports should take into account the systemd sandboxing features enabled
++in the configuration shipped by BlueZ upstream, if they are applicable
++to the vulnerable portion of the codebase. Issues that only manifest
++themselves when running unsandboxed will have their severity lowered
++as appropriate.
++
++Similarly, Denial-of-Service issues will only be considered as security
++issues if they can be triggered without human intervention, or set up
++on the BlueZ side, otherwise please report those problems as bugs
++using the normal process.
++
++## Non-disclosure agreements
++
++The BlueZ developers are not a formal body and therefore unable to enter
++any non-disclosure agreements.
 -- 
 2.55.0
 
