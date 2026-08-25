@@ -1,69 +1,63 @@
-Received: from sonic316-12.consmr.mail.bf2.yahoo.com (sonic316-12.consmr.mail.bf2.yahoo.com [74.6.130.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0739B4964F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 03:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.130.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9DF2EA732;
+	Tue, 25 Aug 2026 03:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787628288; cv=none; b=r4d0xOn/piGYmsx7CwavgxvWZjQ40JP0TsPJcWD9Omy79s9Zou7JNY4kE0A4apCE700BhidIHZbaMgJMn1txdfFHbcmzociNyoDMS1proFPtpf8vjennmY+cMWdH5q8qV/xUn9UUn0vGONOE2puVWvaktpg6xNF6rdyUUHBm4ME=
+	t=1787629005; cv=none; b=AdCuiM+CKGOv/bIDIzXRJ1O9d48U3Vl7FXsT2xZFjFav+EO3k4a2fUoTXyyJr7cOoxJ/vM931pYvdOxn+034EbLOZWWNn953X59VLbZ8hteq+s0tVxo/HbM0cEptZWjvPOTHYb+usi3XFOC0k7aPqu31yLAONVdoATrpyuR17lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787628288; c=relaxed/simple;
-	bh=gEqY542nWI7jaGdIH7s9eq22jA5v+80Q3+f584ZMhdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=YsubYnvKVeamDHcRcvKqGuMXKqpKKAtID/Qc0AaQ3AyqKEU1WxmN7c3ss5/xXLEIDUh4+dcfr2EPmfLwmh/j8tMGwWmW5LxnlAbdmMH1hnEfjulIrDSnQZIHP/5svhqK/p0+YvNZjx9OJh1BobfrHJOyAeLk+4aGKHJuRBJKgr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Fx1EjAxb; arc=none smtp.client-ip=74.6.130.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1787629005; c=relaxed/simple;
+	bh=VRW8EpEoQznUB5amel8wUXCuBuaVhFdTaer982hKk2U=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b2VCU0bDvmKOXoGqqOe/i+ZypdGDbZWZtEcS1S13bCZ5r4/JEbDkqSqPaIoXoPudBBii6IcAMVtNmJHHbq30OfgQuBoWR1sjjUU9/BIZk8G0f5n/zOPOyoeqNCTiL6pH+5Ky+WPaHmWNCZRj5w4bqMAqqz/pAvsX94zzntBMvbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=bNDXBo2I; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Fx1EjAxb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787628286; bh=Ht80eOL3J9fW/1ANz9+fII2GCQ1OruFFSHzUGOEyJ20=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=Fx1EjAxbuhKfb8y6CSRGMMGn8xfr4GbpoOUnAOClFidPeUH5FIcGLC6kt64M7MtYlGBX6ZAM0AwcuqLiDbpNZgL4wr5qrKeOe96iUDl1T7iA/2herWosEGNXwv8Z/OzbvaBKzH6jpZ+wPq7pZCz01ATzgSb7+VkRFqrs1hRkZ7emz8SEGheim8V0SVJ9X740nE8rPw0nZHBboUoRl/xeZVLS+x0ISBiJkGah4UryKuRvLu8NqTowETP6VAZNKwFwdGc29+un1L1dZNqfiy4unIN/lCSdiEc5GtnHe1Fu3cx6Cov/z5Ye/P3IBijXFmCPL5gybVksF6t2R/jSFVWRJA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787628286; bh=r4TMVSjMrkIVV+gGKLDwU8GoCgKQDmW+LZ6u98obzgc=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=LImNWPy2DTFwoBSY+MGEMdioGQA8rimOGAQHL0Dgy/5oHWXfPAkGW7Wu3mgJ1XDd7yGWXoekhbO/8bWnqUWdIuJIRsJKQ3h08TNVkpW1xdfuCd7E26KSbPGw+iTTCP3vl8oIuhNdV+ZRm+Xa+5KDHeQxhHdN7+hXpeI8YDNckM+iowZs5iLeEZ5QxIczRxMy+iBSG7h7VmNy/sstJQt8yoU3oZ7xZOwBSvzHvt5jnvaGbZsi/88j0iKw/qAIFm7Ky0riMNW2WfHkbF5MKENaFrllU4n+n/gs2kaoVOMChm72v4QagXNdxxGNCTdfC0HSxujaHcwdvoDWUWwIAOabrw==
-X-YMail-OSG: VNsXUkEVM1ku9D8NKzZQ5k.mK07G6DuVDfUfl0DbbN5v3obRIYt19m9yUvW7Q7u
- kUVFUMy8rymYr4g5bLXcSC0GKc5U2BvnEH1jJqgxIwecfoUjilVfozmF3GR4INKXacKC3Nzoc.3q
- YA9d0ULMLKFzLl_ApbRkOE5jmnzDhyfxXkCC9EzqA_G3tdwBvX8YHb_.MiGDMk2Aty4gvZJrefiE
- K09DE534G34GJLMJ6TmBg5e2QWOLsqsB86cxuhnSBe.XNcdcgr2qXfNpHyt29ySDHtS4IKXCINaL
- jQaNMdFoiQZR.6HLYWFxlX4qVH5prp1xDsaN8IbIeFiGxcNZW2OIUv7uX0hRF3GX6ToLh9nJSzU.
- POaLcaeERq5Ohg_bCmqFnEUAshQ3yPfOVGu2U6VvCBE0hUxgDMLUQLv_Kil6WTtm4sQWd9t6am0S
- kUz2T4OztN_1dA7_2wMta6vhAUX0aCym8zqLzAqdh0eAIIGT1VojgZTnWyo6I5WP0VcqP_AuQpFZ
- aZbPOB4qRkGP5oX6__4MwS6wnoJCuPVuec6k5HkXEo49Lc5wSo3EDGrGr5POVeiHdvzBOtBX05Qo
- jlKI6y_NHM2hv2i4cKJcCso6rdTRhaUWUm9dRvtBuENJSsQabQ9GahRg9YsXXLJ9PdlZ7jA7ee2T
- jdWDZpjNi2ZTa7OQKPo_cqJHe3.1qaO4HygQFmhZXzc3LUdLfyYO91uETNeF_NNfkdNekVoSFA2k
- g2oHwFfgQtozFOtdGGqBl2WsJx1ciz.rxrxtZ9c15Z3DGQ2le19ebXLgzdo7CEfasEho7CcbWjj9
- w1323QcScciiB.T_isx_1W8TKxRTp5_3UkdKrUt1kSTPTafBItRu1KjgW5sZaXcqB__rWWyIoJ2Y
- xfn2zBCyWTnRErXc1IL49jqAIxdNwzotoRDTCjEx5lvCBcjQ42BzOVcOTLHJd9.5PeDljCdC.k8X
- Sfqc11CMaF237cIbq_Ig0EgZ4L3nZnaLhu_krnKHc2T7TgQaPIihFwuqK5PRVQC4CSrOaNef5i.D
- Tbw0XMFDwDbeP4EYdNVK_sMAGv9V8gtQdcwjrsrOksVwgC93dy.g.wJMThkP0_nbnNBCqVCVa0Vg
- LrJlh6ZHccYZeUiOsZwcOtTWdTI1mo3oHyQhLJ4AtoHHWwT4PbCFs_NqV9VEJsqDGDXpPW8tSdp3
- 7qAodPx6ixN0C1C.ExBnJN2Ue3YGhvqGVGvP3F5rU6WJykHlmd0b98AspCOKQxB.Ij_eJ9W3kWzJ
- o3jVWKGBXj1qNjHAf.FD6iwQOXBtmGLruqsgnza9SYZ9jeBjE4YkVqfyzIMIGatBnl6VWbRnxkw3
- 76gW8D1oC6qEb6G72FSPMxkaiAvIXV7sNsnUgKxUOyZNwklfdAqRHX7cu2zna7ZgKvYB2YEDdjhW
- 40wEdh2jxrRiCcQWZRJNQNdR8ikjnh4HXM_g5.KxmQbmssQcEwF7QQOdgESusW.GPERiwEusEnmn
- a.m858WsksWcBXDyM_NJlA_BeISqO_3Ky8IR1poUQejF4gpmlEFy4PFT2Mi2ZfUl2.P2VgtyStb2
- laymmFBf5IGgxM2vGYRWcl4MvB0F15O8QfM0XMoNc31eaJEcoEaL89VjSk6R2Zi4mMwnV32hyxcH
- 8lb.Xovxa3HD5bGj09605hC6SWuhf0zS9o5jwXonmkhwU4fgwbm6_a9Ve56s7NeVu6JRWzCs1DD4
- J2gU7ABEbq.gVpkdPKJzG2JNLIBRCueQmgVaKojR8E8Q80WE9ZforHVAm_0QE7K56UI0_YeOj3P0
- 1eES8cjXeSEsohB13IcxquTcqQRgU3TAQ0Iq.FDEJ3W76cn2W6zZLuiilS.3eyZy6RYL_e3XXRam
- NpiMhKfkmYDGIskrRPprjRb4EYvdAnjggc3Qgj4fBhdXQZ_BjgW6TG.Gb_kXcgqz9pxMFGXaawwC
- iD6LUfZiO3gw3DuIESQAGVq8EZ13d38BTXP6nMzJRnWy2ZF_EpRQZbcepf6zTq4wC9yJBbknGga1
- Wqs0JwSwjlIO.dVV_GGRdGLhSRJa3l7yizPeflMdCi4ujPCdIDyqRV13o.7NJ0vLxj6vSwi5pXdM
- iJhYLaH2s1Fwv5AQxcgQRTNc1igwl1PyxX30Y_rR5cfUdor7Jx8KQjirzSNNsUZLZA1lGAm9fHW0
- XPdseW5tOK5V1e14NPbi9KL3jNIZRDikc4QyLHmmMxWrDfzEGhKW2dEZBbkKgaxOF3kUwKl8DRKp
- DcEBzyiWnWbwCckIsLntDAjzKDeh95FIfVnlwBw--
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: db997625-f6eb-433e-9764-633b6d2519e1
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.bf2.yahoo.com with HTTP; Tue, 25 Aug 2026 03:24:46 +0000
-Received: by hermes--production-bf1-54b5569bdc-6kxfq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 9d986a8971b5a1dd233f68e5f351685a;
-          Tue, 25 Aug 2026 02:42:11 +0000 (UTC)
-From: Jeremy Dean <deaner92@yahoo.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Jeremy Dean <deaner92@yahoo.com>
-Subject: [PATCH v2] Bluetooth: Fix code style error
-Date: Tue, 25 Aug 2026 02:41:48 +0000
-Message-ID: <20260825024148.101643-1-deaner92@yahoo.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="bNDXBo2I"
+X-UUID: 2d61bdc6a03611f1b1788b6acf885367-20260825
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=+8iN+sJuf9qZpCW4bDkdt8mpJpBz2Tzn+okDLJqUG/k=;
+	b=bNDXBo2IuO82VCk6OHPYNl89XgjQRMAcL88lNWgdXOoCWanTlfvsksLYP/osfEKESv8kKMnLGxc33i575OrdaYpjF0KdTDXO+c7aBAwbmrqTwXSqSvnGxcf5guP0bnDdqiYYQOkgDRNrm5jpnydjBCq1HpVybScScnfetqehQmE=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:5aa510c1-e3bd-484b-bc3c-b40ac3e1289e,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:7db8b62,CLOUDID:5631ddbf-c80f-4882-940d-2cf94d6b76c2,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,
+	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 2d61bdc6a03611f1b1788b6acf885367-20260825
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 763252493; Tue, 25 Aug 2026 11:36:37 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 25 Aug 2026 11:36:36 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Tue, 25 Aug 2026 11:36:36 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH 1/2] Bluetooth: btmtksdio: Remove redundant firmware filename override
+Date: Tue, 25 Aug 2026 11:36:33 +0800
+Message-ID: <20260825033634.499118-2-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260825033634.499118-1-chris.lu@mediatek.com>
+References: <20260825033634.499118-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,44 +65,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-References: <20260825024148.101643-1-deaner92.ref@yahoo.com>
+Content-Type: text/plain
 
-checkpatch.pl flags the zero-length array members in struct
-qca_dump_hdr:
+btmtksdio_setup() derives the firmware filename with
+btmtk_fw_get_filename() and then overwrites it with an snprintf() that
+open-codes that helper's fallback format. Commit 7f935b21bee4 ("Bluetooth:
+btmtk: apply the common btmtk_fw_get_filename") added the helper call
+without removing the snprintf() it was meant to replace.
 
-    ERROR: Use C99 flexible arrays - see https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-    #3110: FILE: drivers/bluetooth/btusb.c:3110:
-    + u8 data0[0];
+None of the device ids the helper special-cases can appear here: 0x6639,
+0x7925 and the flavored 0x7961 belong to parts with no SDIO interface, and
+btmtksdio_setup() passes a flavor of 0 accordingly. The helper always falls
+through to the snprintf()'s own format, so both produce the same string and
+removing it is a no-op.
 
-Replace them them with DECLARE_FLEX_ARRAY(), since C99 flexible array
-members are not permitted inside unions or as the sole member of
-a struct.
+Remove it anyway, since it silently defeats the helper for any device id
+the helper special-cases.
 
-The struct layout is unchanged, and everything compiles with the change.
-
-Link: https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-Signed-off-by: Jeremy Dean <deaner92@yahoo.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Assisted-by: Claude:claude-opus-5
 ---
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btmtksdio.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8f7ed469cac6..b78c4a0e75fd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3103,10 +3103,10 @@ struct qca_dump_hdr {
- 	__le16 seqno;
- 	u8 reserved;
- 	union {
--		u8 data[0];
-+		DECLARE_FLEX_ARRAY(u8, data);
- 		struct {
- 			__le32 ram_dump_size;
--			u8 data0[0];
-+			DECLARE_FLEX_ARRAY(u8, data0);
- 		} __packed;
- 	};
- } __packed;
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index b7f0be7fc42a..a5709cecd4b5 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -1162,9 +1162,6 @@ static int btmtksdio_setup(struct hci_dev *hdev)
+ 		btmtk_fw_get_filename(fwname, sizeof(fwname), dev_id,
+ 				      fw_version, 0);
+ 
+-		snprintf(fwname, sizeof(fwname),
+-			 "mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
+-			 dev_id & 0xffff, (fw_version & 0xff) + 1);
+ 		err = mt79xx_setup(hdev, fwname);
+ 		if (err < 0)
+ 			return err;
 -- 
-2.43.0
+2.45.2
 
