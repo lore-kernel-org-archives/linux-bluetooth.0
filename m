@@ -1,146 +1,99 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212AB34A78F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 04:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F0624A06D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 06:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787631219; cv=none; b=d/QJVd9kW/PreAcsSTBizAIdt2FWVhceo5HINLmIsM+xSSKruDedn10XT8ZNX6JTxQM+sOzKE2RE5gbO+dcrUqNMhUTw7O27XHdBjP+Oj4y199x7zF2Awhel2mj8G8UduYK9YOcgsGpr4PjCq7zV15XZ7FbXxJef+VAjJHGnP8o=
+	t=1787639648; cv=none; b=Cmw6rVE5VhNU876xR3xDDGaxBrbkCO8C7scrFC6YG4HHnf8DJOnd8xWuc6cjfEKgFNSaoisOvBUkzSJFs27syJ+cOuKrNqsN9vum3fDmxd2MrtXMO+L8nPZNOc8R5Re/yxNNX7Xj3KDgH7Cq3NuGQH21Rp94RFxTswrcG2e7SjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787631219; c=relaxed/simple;
-	bh=Mp43KPsHyv4kCXU/AaoauZ77mjSl4bDOAsYqer61UHg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VeQF5QVpYa3izVIbk30FDpz2VQQ8JCHIqseGPwjrB7FteePGDcp22Lcbl5DVlBhelA1CbXiZE8cnIMhBnbvVM0LhMpDjs6yDk1ENfp3+tb9EqdEet/gi+l1E4WsKL1tJn0M3wW/xD6px39KPdT2vdPq6+eFgInKKtEzmEVfQEEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fg4pm0ul; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787639648; c=relaxed/simple;
+	bh=sY9tVUyfsEu/GDXg5BiC0/pVJC8R8XZh1z5m5YnTX2Y=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hcKQbANtaFTMiCmgBeL7Z5XxcGHAZ8jqnMUUdhW2BbdUUpPaFKdYz80ndIBAbqunUyF+eA8bsmKCU8fl3ArZsdLyXNr4voJeumEO7YhsANnWECCOv9xV9xdlbj8CmU4uRFY0U2uZ+eN90tq2NcnBefSjy3BIF9LShpSV1oL+vN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=abeFBb1Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fg4pm0ul"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3964e76d0f4so366239a91.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2026 21:13:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787631217; x=1788236017; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=kMdCepn7BrMDCo/VRop5ONhnYLOGC98EI6OK5oqAPjk=;
-        b=fg4pm0ul2Ww4SJZ8x3p9xWHcW2x91tvlDB9HqMrYvsdhCXbXIB9iDo/ddtjuLz8Hfd
-         7t1sMbpZ4POuQi8Ewxk0rnvQ1yZLR0rNbO/l9QuqxuUFpvg3kVQIYza/sF4rg5lDi1HC
-         eMm5AqcIj68vfZjOW7eFVUCOkZ1bMUV9r2++QU0wM+rEEc0KNDE6OlTTS+8kOOZfKnl2
-         KOgMocuTXXYisxpkIbmtb+uyVwlDoh3KiieUNNq4zfXpAOdkRBWg245IBSuEQ87VYm42
-         jZrscv+7YWt8J6hXAMcWCPK+pkcKo0bzq0TEAq80TD/7mQmqYV02aAlVxdRcu0sQKc1p
-         ePzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787631217; x=1788236017;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=kMdCepn7BrMDCo/VRop5ONhnYLOGC98EI6OK5oqAPjk=;
-        b=E0mEUFBBWvboQ3Wt7lSWzFWEVQu4uy6T7GSPjqY44rFc8nkjlV16omKrAwXnLXBXo0
-         QM3gBgaPlms4GRWwSXSforK80EjzGFovjHbsiDPty5Sbk5rFLNVMiaaPn2lJe+EV4/89
-         HYpNvDWBpnkldkBcTWWMc/Xu4x0QI/i5EB/p2tZmX33QFTBBrcZ5tjvXQBj0fSHPBEWx
-         s3i855Y4fNoAf8Y0G5EQl33YjmRHxxrvCQBNqgJPovHkken3MrZnaaEj4+8zYSflGIsL
-         rP+l7ossS16YAK1vvlnViu43mj4b625TOLEpuyoHPxeh+iDxkhnELRmOa/goiGnhDkPJ
-         /K4w==
-X-Gm-Message-State: AFuF++nD24vfYDkWNORxYaneBvlOOyziKnIoGWmS1Tivu5tQIl7F0mWd
-	6m3UigowLbFOlUF4xR7FEg7oil5hDc031I0Ump9Ti+Ns0wtYTbE/7jQzC7hZDA==
-X-Gm-Gg: AR+sD112L0ZLDgBJdHjgYhKd74gPtMAMnVUhddK3UTyFJsNkY2GiuK9wTw1+GaaSm5b
-	I/wZ3ISua+PW7bkof6UgVk0SoyV3NBjv4pWx5WcLG9EEa6fW+qkFLZOFuQdqGBLjq5KEcICr6rZ
-	IkQ4SUGbynKzF6OPAE8f7o5VIJAGu/f6f+l3TQMYYOGnB8XKxCgiqGLU69o5lAKjbWTj6N9qzu0
-	2w/fxSj99ZB5mO4vG/37+2FevQl7yHaqPq3GgVP1K29jm1pzE+4URT/09dWKxE8pONXit2KQyyd
-	y/aHrq7W6nySPCWNbw0ZFtI9diF/asczY3ktrohMCPR0a1F11ZMxiO8EsojS8CmVIm7RCp8s6Hw
-	k93SimF770yCx3O80AnGXTOme5caDwqXBxdgA7ORxMmfZ+wlC4jRk0C/4Z0CYZk+yC1CEYgDbkI
-	kOPjcNG66yss+wJQASj++UIwJm9YLwQe1mXfEDxAMj5cKjVDgwOJM+ZAfLMjPwSTaFRGw3kA==
-X-Received: by 2002:a17:90b:1d50:b0:38f:dec8:f7e9 with SMTP id 98e67ed59e1d1-395df29b3c5mr48026705a91.12.1787631217441;
-        Mon, 24 Aug 2026 21:13:37 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.209.246])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-141860df25csm28759541c88.5.2026.08.24.21.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 21:13:36 -0700 (PDT)
-Message-ID: <6a8d1670.4987c784.28b677.6659@mx.google.com>
-Date: Mon, 24 Aug 2026 21:13:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0983082415048280444=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="abeFBb1Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 77039C2BCB8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 06:34:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1787639648;
+	bh=sY9tVUyfsEu/GDXg5BiC0/pVJC8R8XZh1z5m5YnTX2Y=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=abeFBb1QKoxh7XIKptpwEHBqgt7C8dDso99BsLnEUIr1WRUOVH6zv3nvzBp1j7oHR
+	 Vd78OcKASxnp2yhHqxDOHdUiCJixOVbGa37+Igi4xaKeH4Z//P6AGBHz3Zkd3r0dAk
+	 vl/gO5E2dWNmEv5e55Kob2zLK/W3sPnHLvko4FPAztr/3XxkHd7ZCtjKKXtQwBvkPD
+	 QmK/zSEgaVucgAG7re44Ogs04PfqRnEt5sTp4t3WSw0LGQNOY2XXpZrcdt3YfGzK8Y
+	 KhneRU64pYfby1Pvc48Wwv5RUSPlfuQgzXR48YibbnIU0q0npvDTHATYkz/oYNYBvi
+	 skL5uv/oY2+hg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 53E31C41613; Tue, 25 Aug 2026 06:34:08 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221878] MT7902 Bluetooth USB 0e8d:1ede firmware crashes during
+ use; reset fails and controller becomes unresponsive
+Date: Tue, 25 Aug 2026 06:34:08 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: maksheev777@mail.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221878-62941-ea3bNvkHiq@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221878-62941@https.bugzilla.kernel.org/>
+References: <bug-221878-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, deaner92@yahoo.com
-Subject: RE: [v2] Bluetooth: Fix code style error
-In-Reply-To: <20260825024148.101643-1-deaner92@yahoo.com>
-References: <20260825024148.101643-1-deaner92@yahoo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0983082415048280444==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221878
 
-This is automated email and please do not reply to this email!
+--- Comment #3 from maksheev777@mail.ru (maksheev777@mail.ru) ---
+I tested an older MT7902 Bluetooth firmware continuously for approximately =
+one
+week (2026-08-18 through 2026-08-25) under normal use, including my usual
+Bluetooth devices, without
+reproducing the firmware coredump, subsystem-reset failure, USB timeouts, or
+controller disappearance.
 
-Dear submitter,
+Working firmware:
+ - Build time/version: 20220107141051
+ - SHA-256: b720c3883aeaa926fe16930f3f4cddd29a3ecfd0a7c519f0a18efd42423b591e
+ - Source: historical community MT7902 firmware blob
+ - Current kernel: 7.1.9-arch1-2
+ - BlueZ: 5.87-2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1151226
+Failing official firmware:
+ - Build time/version: 20250826211444
+ - SHA-256: 4f53b5e02fbd933172e18caf952bda410a877eaad00561781528cb4aff58dc38
 
----Test result---
+The official blob is identical in Arch linux-firmware-mediatek releases
+20260309 through 20260810; older official packages do not contain MT7902
+Bluetooth firmware. With the official
+blob, failure typically occurred within minutes, whereas the 2022 blob has
+remained stable for about one week. This strongly suggests a regression or
+hardware-variant incompatibility in the
+current official MT7902 Bluetooth firmware rather than a general BlueZ fail=
+ure.
 
-Test Summary:
-CheckPatch                    FAIL      0.59 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      27.21 seconds
-CheckAllWarning               PASS      30.52 seconds
-CheckSparse                   PASS      28.82 seconds
-BuildKernel32                 PASS      26.40 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      501.38 seconds
-IncrementalBuild              PASS      26.29 seconds
+--=20
+You may reply to this email to add a comment.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: Fix code style error
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#103: 
-    ERROR: Use C99 flexible arrays - see https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-
-WARNING: Possible repeated word: 'them'
-#107: 
-Replace them them with DECLARE_FLEX_ARRAY(), since C99 flexible array
-
-total: 0 errors, 2 warnings, 12 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14766286.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/649
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0983082415048280444==--
+You are receiving this mail because:
+You are the assignee for the bug.=
