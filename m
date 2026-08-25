@@ -1,168 +1,116 @@
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic310-13.consmr.mail.bf2.yahoo.com (sonic310-13.consmr.mail.bf2.yahoo.com [74.6.135.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE183FF8B0;
-	Tue, 25 Aug 2026 12:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192C0470451
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2026 13:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.135.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787662335; cv=none; b=D3BMIa0S+UZaI2I4jzjKMVQoQiv+0f/doztuDMJLNfivJtqSWN2ChRGJTSPyNp0imChgdKS6ufPSv57YoS5L465d5T+y7ywr/0rov0fmLvZj88F06+cPPSeA3mCnSbrsl2Z9o2jziH4YWNs2JikLdKhixOqA6jQBpl5fgsPMUkI=
+	t=1787663825; cv=none; b=biSEUhOjrtPqVyZtDJogFHXub6ZhKOwmAGiQklcfy2vj5TCwKeGdC2atJNTvcyucJf5hkGZoLuEYaK+KfYSC4GFmoHa2iYiTd2dXuTptLABfjQP0ZGkKQeMnr3J0uftaKkGMX9vpvaeRgF352hvpzAeO6ic0uU1WYCOHrYlkF+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787662335; c=relaxed/simple;
-	bh=c/tgeOqNZmNBCpIpYagisF5S52+Z0rmfm7KP2mmvEOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fR+1WIU76PnV/K4vL9z0whT58ocW4UNl/Js1kAAUdNuWpTKElXumIJAOzBzYAJjvPJPqWUSfumXW4eUwHtFvvQGBhy5JEOaxuopkmZBhHEMWDU8mr8sAJRdoJ+CKoHgHD0fYzBqPJVWKbc0cjenYSLYFCqH6IPAqHwLTqJzmTXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=aOrp2S9I; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1787663825; c=relaxed/simple;
+	bh=5lvZEeePKXwKHZuxoO/Thx3xNNJOgu/CcwEwpOTY/Qg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=M4Rdqwd6aF5f0Zi+R3flwGIlncW65WFS+KSSPqBucQsCzDCloMP+vMP/eNY4UJ5FlD6amRTVPIHy65oVj2kFc7OliITFZYE2jcAfGsh+1JH8eE1XThrC4SM0dIZp+Yik8cBkCDcLhAT/v8fT39n0D3qRGlowcNsWuV9ZQOa9ETE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=tcNnqf37; arc=none smtp.client-ip=74.6.135.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="aOrp2S9I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1787662325; x=1788267125; i=markus.elfring@web.de;
-	bh=0A6+RJYgEoDGr2WxcoFBUybCUvprHwj6reMfDh19ATU=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=aOrp2S9I2S5Nomc4jTGmMP4Y3kl8Ndln6tse63Djx0QIUbgMdLryupXklM0YMOTd
-	 bNm0XMb0mNuy+DZgBuqUPbHN4mlmnDhpjt5Hny2ACY2OL0n7uizni1pR/BtRckONr
-	 UQJWietbbCCs2b1RKaZIL4BURN93suaYh+x0zWH8YpWJ5b+ijxDkSkwoHauiEHPmu
-	 ONR7iGuWi/lNPa7EPJEST5lc3KmImXwRmsQVnhnNg8Kv+YwezV1E9Z15FF6QeBbbn
-	 vtDOnWzPMzrZWjnY0rJCU3NAH1Y5Hzp50IVIqcJqpgH2x8VegdZ5Nok3cdcOfrtT6
-	 93XIdpEEOW1QJb4OVw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from client.hidden.invalid by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1M7Nig-1wzx5l2mUe-00C4NL; Tue, 25
- Aug 2026 14:52:05 +0200
-Message-ID: <04cdba23-c8f7-496e-890d-9e1dd6694e06@web.de>
-Date: Tue, 25 Aug 2026 14:52:03 +0200
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="tcNnqf37"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787663823; bh=umZdVvWx241cVezu8JBxBuYEdMvYR7wur4xPHDhW2gQ=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=tcNnqf37NsqDkChRIn2wua9al5rqqkXigfal95YE1ZmsiVmeAhkJRLaGMGf+3c5fDYzUqg0YPOSLcvIOsi2F5sVxVqUJA5w/GqQS1fipDdSdvtyWi6bMo0IU79+AW8Rw2i2+ac2wrsJwX3RVejAuaMwV03q/tphAs6we0P0+HgLRxLwViI/MViCMPtPey/Rro7YnqQBuUYPwnWX1cfx/C4NJaNVNZPLG5YqBqvTf9Vwgp0WuAO8FbsLazn2/WLsK9cWC0U7R1STbzdFFUFIsfD/zc2z8tlIdXjiWz47dhwXeR3T4+9mXpNQlOhZR83zi1W4Oe5BYgNe7aLymTl8kNw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1787663823; bh=xd9VXl8Z1vrsEwP/eD80ZyzaWXluPJt2z0YBQIPO//O=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=lkgrQ6UTKrDdYoY0XRp3mHWk/7cairLmsFTHIor1wq06jG7GyBIoXSAzGJfg238b8YA0NjFmywZHy2+F3pyUYGg2MMZgRVTTfdzeCKe6tvzVCarItgSXuCKM0B1EnqglVg5uQzuUmjPiN+xSGoXhM7fu1hSnrPyOZbdix21dJihlQbEYf9nthuAZcn/HrULBmjdoO+uXpc/CXSuhwLKrFHadWSaK5fSiPRSAcEKV5oAe9Bs+eL6TJ2ZVLaO10bQQgS7WVZcUnQ+WexvqXMnIA/kUzlMY7/MFxXX7ADpvc1idkW0A6UzRT+MoYp2o2spDimVF74eiLpIyGQqdmp6fEQ==
+X-YMail-OSG: hAPoh.EVM1mu4toK3C3q4iYcCYhSvE55_gfq7T0u_leffywuPo7PwJsFih1U0LN
+ cTaSMrObfwP7k3m2dqW2EntXRjRsCxCmC62PnYzjD3vFfWi.yafcdU2itSASIUU9eczmCNy87PL8
+ L4yGDPYYaEmvGK.wmB9DGCjRU78w77HEK.nkgh_p1i0drxtvI76HkWG6t8RzfMTKAx9xG6KyTsVA
+ v_uN9uQE06XlJsN.49ricMlQbybi4sZnbHd7WKKLylON2YKf2T0hoQogibYmqx8NrrTlVGkrD14g
+ Yfo_7gqQwtgKYfwCDssSJdKAOaxXOjildXbarD6Q9o6k9TLRzVLtYqxZJjxeftOdGHEL8Z6IcLgj
+ sdOqLvHqS8Z0rAmFKz0zJTMFe7ULoIAhrURZmw1D.R7eC5tZHd11jfLhJTmiC4oTMTc_Tjeaif_n
+ MYLN0lbW2L2SDz_piOmCdNtbHO36dejWJfn6PHw6PJabPnCyBEitc0BfKEydSgwCvvtyWqztiQJ7
+ CTK9Vp08sjGU3gbOEuoDxMkGAH7qm_mfw394dRQBAeLjwK4zktAUjBJAXZMOQvjvV.bABgl2hwU4
+ b1d6bihJAcfJ5FAQjhdUd6px7TocAMktTRQP8dMGS4O4fYy30iWELoWrc_aA0.a2oMQgRAHHn6.z
+ YYfALG4Gv75RZuUFn3tWyjrbqnLUle9VRTjUJeaC0QnSBymTqcTmrUs3cWgMYGX0U8LcIfm_HNCr
+ 7nZ9rMPrJYD4_Ilynnd8SbVn7CgI0Qns6pSzHM2aTHhBEAfeioPfl9CbSL1sZYhvbxqKGbV5KEG8
+ yAVmj5kqJY6marviMoHaP3C2PqfPxpOi09iaOclJCRruIbl4f3voPuKme9J2BGEBRwr0wBx_YCkN
+ zxgOOZew94QwxpI_0XSNZJQfh3LZni7Bht7g.gkUOHII2LAGkXLX9ThzXUEQtd4iCnSDJkoFLchv
+ nCd1qVFsHOTOiHoJPzbQQPpuHz2zc7gU1MCmHer7.rwipBC2ec2AVRn7UkFPpa4XxhNoIIdunakh
+ M23wkaw5lJ3NZw9YVkRhLDLtpaMg0n6ur12oAp5iqLDyfy414Xh.n77YXnvqFCvoOeJrP6tcAHCy
+ 3vthc2g0ZbvF3shjzUgU7eZy_IDL377gv2Z2WF8WZFNIJWBVmlhiAFpRBPL03vKzu.jSTVxRFZEJ
+ ZoLuMhjS.4U5sYTci05RRx.xRX3lDm4akfvd78Quj1rx0U6HoCcYwiWKTM7lD2kO_wxeIgT_Owtj
+ ODMDGCmCQJoVo.dLO73c7fUVm2gA4vycu1.u9klWql1A0WzsFi3aBEjYQs5GMq_q._XXWkVvm0Vl
+ mT2BD4oNUfZg1kPTmVW1YxaH4qUkfKxY_UlSGZ6S7jdQH7Kxhti88oM5m8os8_Rt9w98cA0XROcT
+ TNEI_ORpGLOM4kzeF.f.eySWyMHpltpy5Z9p_MKBcYwvO_gVw5R6V38JUy.JxUAHsbXGr_07_FxW
+ KBYkBonsPQBWP6iUd3MZlF6XCZvvEI0Cl4KLrpMuNyT0VdV..JR4jmRebxHfcuH.BnIDmIdd_aR7
+ 8UN5dk_eVcDxrnfRVAmGdoHbJCAZcYs.8U0Ug0LKabVTGGhcqGI10rGVH112rGv5txZS75IHCix6
+ 0Qb1_uutgT2LzUmgrwUUKrdWp9u8dUSiVqliJVm7Wx3_BJy9AC.CVMDPcjselXs6EHPxjl8ajLoN
+ KVWm7LVH4xO3geT3Vzgiv231pSCxRUyQKAC_IyCyqP5zc7m624gHNFyiWVmKFrQR0evYWT.8G1h6
+ IFYVNAjCa_.ImB61z5TM4xeiqwz614Eq8xzYr4cS1SrR7lXO3NpUhK_tus.PHOtg1R4Vebnx6JSa
+ YtB.dwXBIYz5hsXQt5MqvlGf_XcfEdg6XtuIHN5yA7_NM_tmZKVwmh7qs44RFriJCrFofsc52wOP
+ QI67ns2HZvMgY.wbNmeHa84RkCRbGfaPJqKXZJ2rsAoWBcH.YnGeZzj29JGNmwtNFT0VbTtxCjrR
+ .f1Wrl_Ts63DV2c6.13YVUGjyVtRs1jDMQSDWIqai2W1j2ho0fSU.HvQwjRJmoktIeyLzcdNERvV
+ kFzHszEU9pGqrP6aJAM_N0.P_0ZUBoFkoYGOQCPyf_Lj4R.W3C.YOGCsxe58pt__CtUVD9Pt04P2
+ C_lspQtK3WNb7p7B_3ZMggraPObD.ap.PEjJ807vtpFIIwEO8e5jm9AbYmo45PeeLaVGHxAUpZtg
+ BTHPvOxPTwK3xLqgCSmzWGJl6O2j.4p9nUrlklH7Cwnhx
+X-Sonic-MF: <deaner92@yahoo.com>
+X-Sonic-ID: dcf8469c-e44d-49a7-9d65-360637aec76f
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.bf2.yahoo.com with HTTP; Tue, 25 Aug 2026 13:17:03 +0000
+Received: by hermes--production-bf1-54b5569bdc-6kxfq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID bb20fdf1390791c517a7d411121feb0f;
+          Tue, 25 Aug 2026 12:22:18 +0000 (UTC)
+From: Jeremy Dean <deaner92@yahoo.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>,
+	Jeremy Dean <deaner92@yahoo.com>
+Subject: [PATCH v3] Bluetooth: Fix code style error
+Date: Tue, 25 Aug 2026 12:22:07 +0000
+Message-ID: <20260825122207.101868-1-deaner92@yahoo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: Fix code style error
-To: Jeremy Dean <deaner92@yahoo.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 References: <20260825122207.101868-1-deaner92.ref@yahoo.com>
- <20260825122207.101868-1-deaner92@yahoo.com>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20260825122207.101868-1-deaner92@yahoo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:C4kIZmuJj1YYVqGskzaZ0uUZAkMriuuGrnif1NT7EB4tt8EZv0I
- 5NElDm8QZ1nYJKJmB3NZg2yTJ703mz5YIwM7D6bcOpVvFbiMmQEECAjlEKJE69wo9lLXhk3
- TMdCQMlDc6JnQe4kZ6gCj+jtCTx/l2uk+LZyNL2q644tpFw/8a0KQBRgAyFRJH1g8YQ1vZ5
- VBeT89kOjxVhRjjUSX5bA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:bxv/7nVW1K8=;gCgC+SNKVbGVXJAsC7YhD7hY1tg
- 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
 
-=E2=80=A6
-> ---
->  drivers/bluetooth/btusb.c | 4 ++--=E2=80=A6
+checkpatch.pl flags the zero-length array members in struct
+qca_dump_hdr:
 
-Some contributors would appreciate patch version descriptions.
-https://lore.kernel.org/all/?q=3D%22This+looks+like+a+new+version+of+a+pre=
-viously+submitted+patch%22
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv7.2-rc7#n310
+    ERROR: Use C99 flexible arrays - see
+    https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+    #3110: FILE: drivers/bluetooth/btusb.c:3110:
+    + u8 data0[0];
 
-Regards,
-Markus
+Replace them with DECLARE_FLEX_ARRAY(), since C99 flexible array
+members are not permitted inside unions or as the sole member of
+a struct.
+
+The struct layout is unchanged, and everything compiles with the
+change.
+
+Link: https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+Signed-off-by: Jeremy Dean <deaner92@yahoo.com>
+---
+ drivers/bluetooth/btusb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8f7ed469cac6..b78c4a0e75fd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3103,10 +3103,10 @@ struct qca_dump_hdr {
+ 	__le16 seqno;
+ 	u8 reserved;
+ 	union {
+-		u8 data[0];
++		DECLARE_FLEX_ARRAY(u8, data);
+ 		struct {
+ 			__le32 ram_dump_size;
+-			u8 data0[0];
++			DECLARE_FLEX_ARRAY(u8, data0);
+ 		} __packed;
+ 	};
+ } __packed;
+-- 
+2.43.0
+
