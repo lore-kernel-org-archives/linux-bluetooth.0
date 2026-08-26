@@ -1,40 +1,60 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948C641F36F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 13:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C24429CE7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 13:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787750786; cv=none; b=qt+WyyPeGaGLfrrEqHvwRw9ORKUpxnCAlT78dT9vTi8uT32wrClb1yYjWOxtbIRocfI87ZpRfgEmj6ysHa2P2JcYAoWTGuNo1SpWwI8vWdhOC37jR6XEEUop7qYigAJmyBFqhGlKMDV2ICf2jJ00TNNBhtBvJTUc9Q2i8weBmWQ=
+	t=1787751664; cv=none; b=iXR0dIRPNLtHj0yGgIV7fSnmyTihZmSyP2I/WzqBYu/lxkj0zGzObvISo3ACrBuW+cp4QjjW16QuMPVCv69TaR2JBKF5ynYmTZXeaNHzMOACNnyS5qsz+plZ6wpgcxD7XBXwX9R4qvowpg6iXyE/WIS7M+W2Eim7aoeYd89lHsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787750786; c=relaxed/simple;
-	bh=cG5iyrECxWyS0D+3K6B4h1UZSR9luue5B2L+0DTBXEU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G6xCE7ZkkQDqMjrmDP2ohdLVLXwi4cLSukzGyPl5bdPwmlDiLakAdM1ra/8dAP6cYpADRtBuHtdhGz7g5zA7EthAgOgbkvL/NJci2FT6KUVY4qcj6/q+x33fIBz3SCr+z1zO5Jx+/Oz5bL18HtanW7D+9kEIMeYZ4NF0hgv4zpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0ADCD3ECF6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 13:26:20 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1787751664; c=relaxed/simple;
+	bh=4Y4lZg3++UyzRcctNGzaqjK+UPKO8gWQ48Afdpt2iMc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=D6RhmoUxUKGiUCaH3e3XXcHB8HFxf4uPUQ+4P8d/Xy3zsZNsGnmdas30vd0C9PyJ0q7eFa59PXloFTxap0F+O14Rey/WkGzLUFlcDUsQmK8JJfm80E7Xd6dVnqioL2jPCInaEy8jmaBRqIf4CKgDaBZvli1HxB9V8pRRdsjvJAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=htYZjNZm; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="htYZjNZm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787751662;
+	bh=y4ogHc9YY9vh0sCIvGZLfKeoB22XAC7HOiv6xF3IQEk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=htYZjNZmoQ0/LOMZWadJIUJd8eSxcaGEIEp7l/+XpJSKPHcHBcR3+MFjVQQ6uemH2
+	 2I8DlFtIKpEYQLULl1VSHZAtahswsx062H+ORUmN3VK4MCC4o/7Fbm3IOg35PzYng4
+	 pRC4ASJvTkjTnTEmA2Mm0hYinZ3O4KGl8kusWVn4=
+Received: from github.com (hubbernetes-node-9b9aefd.ash1-iad.github.net [10.56.79.34])
+	by smtp.github.com (Postfix) with ESMTPA id 16D4136055B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 06:41:02 -0700 (PDT)
+Date: Wed, 26 Aug 2026 06:41:02 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ, v2 1/2] SECURITY: Add top-level security doc
-Date: Wed, 26 Aug 2026 15:19:05 +0200
-Message-ID: <20260826132610.1021538-2-hadess@hadess.net>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260826132610.1021538-1-hadess@hadess.net>
-References: <20260826132610.1021538-1-hadess@hadess.net>
+Message-ID: <bluez/bluez/push/refs/heads/1152091/000000-c03654@github.com>
+Subject: [bluez/bluez] 962b82: SECURITY: Add top-level security doc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTEKT1vZfM6102xVnrqfNvyYTRm/ivnVIr9qwH0TkknC/pk02H7y70x5VzWaGQ5eNrtWl7xl/ZBiVtIX2kKaraCJCo0//vYiHHuiKiIrtGY5llTXdcln6Gwyj77p+6pvdufYpNx959gI6bEFFY6lLh2vO5Yu8k5JxezxHlMdmOj0kaWVZxsPNzjew16Fa9+YdXWd9NF8pQfrA8EgqGhuqEeMcZcHfp18B6VIvPwYOWqK6nMnuHTjz5zYzJUsaN/TVC7j/r5vEgNaIAqVDdCnVifdyzFTozSrjY20Rb+GTbI2eOnAlPeF1B6qFoAVgTHF4NpU4FcvmHrpgIeXwfLeAdT4oeth4mExa59s5S/Q2d7Fm6Y3VZzhChwWXj/axjQcaQLsasAi6zich5uvakSm1OoJXFwMkjte4cZuAylrM65D2SkXOIAr3LpU4EFhon9FDZJVG29cz5DA2087cYEIqScY1hWb/fk3nkJhjRu2wRvJmkmiPLePWESm0OT+wHngbhQSCp9hVFjCboIypymW8YAGSeg5gWB4aHj4o1+1xEtVIhSiU/7ZVO6UrJGyCO4vDDBFw1uA8rdsQz3sGeQ8sMiz5ekouXAyzOBlUfSPlIj5edsw3VPbcTG/DjdsxWV/MtIwsYd4ha125QVw3VxYJvGxb4qmiTplr6jyCPU21vzaew
-X-GND-State: clean
-X-GND-Score: 0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1152091
+  Home:   https://github.com/bluez/bluez
+  Commit: 962b822924d38541933664c740938f72aba02f86
+      https://github.com/bluez/bluez/commit/962b822924d38541933664c740938f72aba02f86
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-26 (Wed, 26 Aug 2026)
+
+  Changed paths:
+    A SECURITY.md
+
+  Log Message:
+  -----------
+  SECURITY: Add top-level security doc
 
 This will replace the existing documentation written 5 years ago to take
 into account the new tools and the new rules around dealing with
@@ -46,109 +66,21 @@ limits on the amount of work that can be demanded from BlueZ developers.
 
 It is customary in 2026 to have a top-level SECURITY.md file which
 explains the vulnerability workflow.
----
- SECURITY.md | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
- create mode 100644 SECURITY.md
 
-diff --git a/SECURITY.md b/SECURITY.md
-new file mode 100644
-index 000000000000..9a2c2daf5c01
---- /dev/null
-+++ b/SECURITY.md
-@@ -0,0 +1,92 @@
-+# Security Policy
-+
-+## How to Report a Potential Vulnerability?
-+
-+If you are reporting a not-yet released or urgent issue, please file a draft
-+security advisory at
-+[https://github.com/bluez/bluez/security/advisories](https://github.com/bluez/bluez/security/advisories),
-+containing as many details as possible, including the version affected, and
-+any ways to reproduce or fix the problem.
-+
-+## AI usage
-+
-+If the vulnerability was found using AI assistance the reporter needs to
-+disclose that within the report, also needs to mention which AI was used
-+during the processes.
-+
-+## Embargoed vulnerabilities
-+
-+All security advisories filed through GitHub will be embargoed until
-+either a fix is available in the [main BlueZ repository](https://git.kernel.org/pub/scm/bluetooth/bluez.git/)
-+([mirror](https://github.com/bluez/bluez/)), or it has been made public
-+by a third-party.
-+
-+GitHub security advisories have discussion fields, and those discussion fields
-+will stay private even after the advisory has been made public. Only trusted
-+BlueZ developers will have access to those comments, and unpublished advisories.
-+In exceptional circumstances, outside security developers might get access
-+to advisories if BlueZ developers find it to be necessary for assessment,
-+coordination or publication.
-+
-+## CVE number assignment
-+
-+All the vulnerabilities reported through GitHub's security advisories feature
-+will be assigned a unique GHSA, which can be used to reference the issue
-+externally.
-+
-+BlueZ maintainers will aim to work with either
-+[GitHub](https://docs.github.com/en/code-security/concepts/vulnerability-reporting-and-management/repository-security-advisories#cve-identification-numbers)
-+or [Red Hat](https://access.redhat.com/articles/red_hat_cve_program) as CNAs
-+to get CVE IDs assigned, on a best effort basis.
-+
-+Vulnerabilities reported publicly through the linux-bluetooth mailing-list,
-+or in any other manner, will not be assigned CVE IDs, and BlueZ maintainers
-+will not be working with CNA to get a CVE ID assigned to that vulnerability.
-+
-+## Disclosure
-+
-+Once an issue has been discussed privately, accepted as a security issue by
-+BlueZ developers, a fix created, and if the severity of the issue is
-+high enough (usually only for critical/high), BlueZ developers will aim
-+to have distributions forewarned about the issue through the private
-+[linux-distros@vs.openwall.org](mailto:linux-distros@vs.openwall.org) mailing-list.
-+
-+Note that we recommend informing BlueZ developers and working on a fix first,
-+before involving the `linux-distros`, as this list has a relatively short
-+embargo period which might not allow for much time for the BlueZ developers
-+to create and test robust fixes.
-+
-+We will not be applying any further embargo, or do any restricted disclosure
-+for issues that are considered of low or moderate severity.
-+
-+## Severity assessment
-+
-+Some Bluetooth functionality is gated behind the `--enable-experimental`
-+build option, and behind the `-E/--experimental` command-line option.
-+
-+When security issues exist in such gated functionality, the security
-+level for the issue will be considered as `Low`. This will be done by
-+setting the following CVSS fields:
-+
-+- *Privileges Required*: `High` (requires having an experimental build, and the daemon running as experimental)
-+- *Confidentiality*, *Integrity* and *Availability*: `Low`
-+
-+Reports should take into account the systemd sandboxing features enabled
-+in the configuration shipped by BlueZ upstream, if they are applicable
-+to the vulnerable portion of the codebase. Issues that only manifest
-+themselves when running unsandboxed will have their severity lowered
-+as appropriate.
-+
-+Similarly, Denial-of-Service issues will only be considered as security
-+issues if they can be triggered without human intervention, or set up
-+on the BlueZ side, otherwise please report those problems as bugs
-+using the normal process.
-+
-+Finally, security issues which are only possible using the root-requiring,
-+firmware-stack-and-radio-bypassing vHCI (virtual Bluetooth adapters usually
-+used for testing) will not be considered security issues either, just bugs.
-+
-+## Non-disclosure agreements
-+
-+The BlueZ developers are not a formal body and therefore unable to enter
-+any non-disclosure agreements.
--- 
-2.55.0
 
+  Commit: c036545fa7a17b3a3759d2c34b9ec168959b80db
+      https://github.com/bluez/bluez/commit/c036545fa7a17b3a3759d2c34b9ec168959b80db
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-26 (Wed, 26 Aug 2026)
+
+  Changed paths:
+    R doc/security-bugs.rst
+
+  Log Message:
+  -----------
+  doc: Remove obsolete security-bugs.rst
+
+
+Compare: https://github.com/bluez/bluez/compare/962b822924d3%5E...c036545fa7a1
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
