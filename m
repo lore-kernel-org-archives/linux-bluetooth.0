@@ -1,74 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E60F446830
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 14:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C9046F483
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 16:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787755283; cv=none; b=tUZG43aZWIFzC/z1gEolrqSIMmu415/E6VCPECKp25gl3DbGZEg++HkweRDKUpoQV/a+cIUVqUTZAxqwoyuIARA5owu+tMjIJacrZeHLxIf79prpJloAOVpcJBwKgQMQ6mx8bKE/LVM/ivbb35wF9tpfLfW6wrA/JGJEIX8QAmk=
+	t=1787762492; cv=none; b=JpCnqNWEscN8gIU8h/x8qVihDu7lJXWLGS9yitoXAA4q8k/Efw9UYu0C6anEjxsXq7o/Yy5NuTjWCwM8OeCi+jUpNiQwQcwMFSEdfRK9IpZp4JwHdDyzCgNC3kNVODhDcvhQSzjJn59sRGrOxnoqVPUlBpezxBbRbYUGaxzShik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787755283; c=relaxed/simple;
-	bh=38ulmt4xq+ksW8krj+T3oRElOAiMeGlxgJwWv/HNTLc=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OYGI+UOyzx7wJXyNnubClgnn/XBwLSnwEaVcIVMxxZQB1OeIKGfR09PIw1pNOT03fzQ9X8ZBNOfOGJ3cEVWTIUw/JDADDJ6vwRLAq+JBETXTTmF+mw15GkeWQ/8PUPyQq9hoyyVgCuFZhD5kvwiQc9yjp26SbTYV1jSz+HuJL+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UqVQAoDy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787762492; c=relaxed/simple;
+	bh=DmagMpMNU5UAy3anwEGmrpphNqniEsm8tu8+k/ySxwQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PQ71+YdxHxvDjGN/PAgimc1M9mLHxBxirOFTC7Ndbi8eBDskq167Z4eo+Y6MRZVCyssHn7pZgpRjK02mzos7cxg4htToTN1uDNF/9TFpPVMUnHvZ65qqptvffWwikrsvNTfDHZjVQP/0NoJ34CrUHK8xAsIckjFXDy5rID6ClBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=HU5G5JUF; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UqVQAoDy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8611F00A3E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 14:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787755277;
-	bh=38ulmt4xq+ksW8krj+T3oRElOAiMeGlxgJwWv/HNTLc=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=UqVQAoDyZDO8mI++mRG2xy3bcO8OgKqQ6s5of54FWfl5qoQCv5N3V3HVGfccKvXt8
-	 oU3o1X5BJueob9T/H1u+ZKVmdS6/X5GZZdNMbKjAI1ctZgTlOtc7hqPKpF0XwgIg2m
-	 0e/oH5HtCIZun28Z1v5CQ8661xNVjtZxH4CXliE4TJqQ25ZPGz3m03WnLodBj6DE49
-	 vZbb1OIrwBiAB+yC9N/U2LVuDQOoc/CWWYZnclc1n849igGhWNoBtlXjXz3XJegTBO
-	 n3S7r3RNLoJHUgmCjs+wop2Fzdezuhj+XxKRCsA+9HYyqBODehNbn7g2ouVW0EmwEp
-	 VSVdzKnVwMMdw==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5b00d083818so1976098e87.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 07:41:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrV0H47w4Ea6g/lEls2ShyP68CEnyoRbSOLdcQkLYFAjzg2DMaZzHXO1PdJqQFeXNN+0egyEW5vqpHHVJRHP4M=@vger.kernel.org
-X-Gm-Message-State: AFuF++mrtyCrSIHDFOKnGay7ZdQGCuZwMq49JW/TmhbXkgzey9qeRFlo
-	TWi2XKrsjPG9SHmZCz773CRk3t3XVqePd5ye0XaKcZkfdHyjLie1Sg2HzcH89gTigyMcPYjeyYL
-	uvNYj6UUgpbV44H80nNo6r19378KcMlHUnegAbIT5rg==
-X-Received: by 2002:a05:6512:65c9:20b0:5b4:9d3b:9188 with SMTP id
- 2adb3069b0e04-5b49d3b9499mr2279161e87.6.1787755276572; Wed, 26 Aug 2026
- 07:41:16 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 26 Aug 2026 07:41:15 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 26 Aug 2026 07:41:15 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260820044258.1954272-1-triet.hoang.dev@gmail.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="HU5G5JUF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1787762472;
+	bh=DmagMpMNU5UAy3anwEGmrpphNqniEsm8tu8+k/ySxwQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=HU5G5JUF5HlPxdT4ffPCIWBW1q0il7ceHO0HtaO5PlluTuUAxe3j+cphiyV5xkdpM
+	 WN4jUx3s7g+2UyykQ4kcj+fo0ISGLD3umtBfnwPvUVB8pA3Ly++yjr9Y9opxKILkZU
+	 Q0l5ccBeHoGC2pwmRlipU+BQvb+r5wusK6jyMt3l9s+7XIhLqJnnHKUzDaZMcvf0q6
+	 2cfwrKth0Dk+wkQZFOsOmiP+vix+S8b2IcPJuqv5Zqh/QhUT54hMIRT/bwH/S9gmrU
+	 kWYdPKeAkbXN5ZtQxcIyj+dBpPsygCyyyXgKG2mTHGD9rL2YytggfRmOKiHP1Z84i5
+	 hcfqkHvPOBAJw==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0DB0517E0BDC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 18:41:12 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] profiles/input: disable force-active for Nintendo Switch Pro v1
+Date: Wed, 26 Aug 2026 18:41:06 +0200
+Message-ID: <20260826164106.293951-3-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260826164106.293951-1-frederic.danis@collabora.com>
+References: <20260826164106.293951-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820044258.1954272-1-triet.hoang.dev@gmail.com>
-Date: Wed, 26 Aug 2026 07:41:15 -0700
-X-Gmail-Original-Message-ID: <CAMRc=McVLkVGQ6B_MF6GdV6EV4t3dVkuB2+Mnof41htRX8qdTg@mail.gmail.com>
-X-Gm-Features: AcwNN1Wy6AKMKqiYa_2rmxei9FhG5QhdaCCzKF5MhaantZDU0Z0UkKucl3vG4F8
-Message-ID: <CAMRc=McVLkVGQ6B_MF6GdV6EV4t3dVkuB2+Mnof41htRX8qdTg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_qca: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
-To: Triet Hoang <triet.hoang.dev@gmail.com>
-Cc: brgl@kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	marcel@holtmann.org, luiz.dentz@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Aug 2026 06:42:58 +0200, Triet Hoang
-<triet.hoang.dev@gmail.com> said:
-> Convert the deprecated SIMPLE_DEV_PM_OPS
-> to DEFINE_SIMPLE_DEV_PM_OPS and pm_sleep_ptr().
->
-> This lets us drop the __maybe_unused annotations from its suspend and
-> resume callbacks, and reduces kernel size in case CONFIG_PM or
-> CONFIG_PM_SLEEP is disabled.
->
-> Signed-off-by: Triet Hoang <triet.hoang.dev@gmail.com>
-> ---
+For Nintendo Switch Pro v1 controllers (VID:PID 057e:2009), set
+BT_IO_OPT_FORCE_ACTIVE to BT_POWER_FORCE_ACTIVE_OFF on the HID interrupt
+channel during connection setup.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+This avoids repeated host-triggered Exit Sniff requests and reduces
+Sniff/Exit Sniff churn linked to unexpected disconnects.
+---
+ profiles/input/device.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 5b1be2b16..c2abe2451 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -1065,6 +1065,9 @@ static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
+ 	return FALSE;
+ }
+ 
++#define NINTENDO_VENDOR_ID 0x057e
++#define NINTENDO_PRO_CONTROLLER_PID 0x2009
++
+ static int hidp_add_connection(struct input_device *idev)
+ {
+ 	struct hidp_connadd_req *req;
+@@ -1101,6 +1104,19 @@ static int hidp_add_connection(struct input_device *idev)
+ 		goto cleanup;
+ 	}
+ 
++	if ((req->vendor == NINTENDO_VENDOR_ID) &&
++		(req->product == NINTENDO_PRO_CONTROLLER_PID)) {
++		if (!bt_io_set(idev->intr_io, &gerr,
++					BT_IO_OPT_FORCE_ACTIVE,
++					BT_POWER_FORCE_ACTIVE_OFF,
++					BT_IO_OPT_INVALID)) {
++			error("btio: %s", gerr->message);
++			g_error_free(gerr);
++			err = -EFAULT;
++			goto cleanup;
++		}
++	}
++
+ 	/* Encryption is mandatory for keyboards */
+ 	/* Some platforms may choose to require encryption for all devices */
+ 	/* Note that this only matters for pre 2.1 devices as otherwise the */
+-- 
+2.43.0
+
