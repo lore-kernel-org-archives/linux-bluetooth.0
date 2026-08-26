@@ -1,138 +1,94 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-3.smtp.github.com (out-3.smtp.github.com [192.30.252.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13F1470425
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 16:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787763564; cv=pass; b=e3ut8DpkL9E/xxcbe7Y/19+EVVvLcc82x8JhuCISCXiA/Oc56hJ+b9kL5JX2NJPYmlFYHHIdAlbsq6+dcNVeacKm5jIpkc7wdztXJ9a0YlFiTwx0W15JT+hH5TlgWUWQpnEhF9A76osBnA3CT5l1OHONFzXBj8sW26+FuMJltzA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787763564; c=relaxed/simple;
-	bh=5dfDTXXG3e+OJ+eid+niI0Q9Vmj3/oDN3YztsyNfQlk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hwICGgNB0VAY9d4wpHFlE7fniVXkNqOMA/IFUyaAUmIcx5q/AZUuSXVlTf03qQ3nkOv4mgjuWMk4wp1hj2Hx1F6G6vcgHo6G7FPBS34kvI1L8RGNdfWMj1faja3YDz6lzdw1mY4QmoF2wCgcc9+i/q+pIHhvlBvsgFrmAVAPcMw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DdXEIlG/; arc=pass smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1850E409277
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 18:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787768495; cv=none; b=AiTFjYc+5TefjD4sLMGtSxCHIA7hLV9dkFO+H4mCMfuRCEvrIn1fqhZnpjOTbItyTA6+AJj7AoYzyJUJ8R0ssKXbgkHGaXrJ1Dfg7uLuidEc0cvFRyJWXj+MGSskfQcujDm8+dFpn+s9iSd7guBbeiTuLE7JFISA8BNCSOEwE2w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787768495; c=relaxed/simple;
+	bh=IgC8CWkX2sChYQDj6nqS9tP6ApZIbeqUHxdh0j0gtGc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZVZIOOJxtU2gBxEhVuMpvh3CDLjKtPNEdKTSAV0DuM+zFwQl7uEMbfoySzzjrsjAOteL2PkrzeN9KM52/St68EuSLdeocUIz+4fCdUSONjGUlbss7kWbHCac3+pYp5xE6bY/GkplqbiRS0Uf44YoXQ8DE7ml1N66oPzQprLHH9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=X+yYTOig; arc=none smtp.client-ip=192.30.252.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdXEIlG/"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-66d06b5f023so1787020d50.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 09:59:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787763548; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SUheqRFiI9cDEbLpJnXRsduj8jB3GIgj/wRd/FUWYtbETKLAUhBUDb3C/lvLwVL5um
-         2dGwCyL2doInWsLhvvKq4+eaCNim6ikR/0hdaRevS4r1Xn/5f78XoMjKLKC+ZFQNmxlN
-         uEWTWycRHpnaYsGosjnGUgdyX5jE0axdfCJHajMl5A5nsYalbWpuAzejeUgLXrLV+ONH
-         iSGeMzV8pG8QN769GJ1NgLT3mx5nfOPDGoWDbPyUHoK4wfUh4ADMcQtTwDWH9XwaUI0f
-         ssu3TeUhFDRtVLsPryXd9VBb9xsqBHV7NbtePl0mLStBDMUndmJjX7zNB384A3pnM612
-         nqNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=a9Wm9kOafuR+J6Syh9BDqfFdZeJCWOUMU6vOSLIvPtI=;
-        fh=ImHaVp9LKIGjD0tRyxgUyPXd5WNSYdKgZ1TGxuDzvzM=;
-        b=g6jjfcWl9fuqn0KpQMyiGc+WVV2PJEevSSs87r8UKwLPSm6gDojpqs2YdCvhhjfugn
-         A9Dkcw5LzZyNMEAFf5gqFpt9xhW/CUJqvjbVE6Dt5Goj2MVrp5rZoOhqVlb+IeRU2Cui
-         NGDdVekfsniif7rC0mXAelR55Welv3V095WbREMcwWo0EWeAj4W2NnT2iJYNqUEawm84
-         KyWz14iuN4npZfIKFSBhYsiibV4UzUk+4Zro8Pd1+qAMPejUmjiI3YQ+NUF48j9GUoh4
-         8/Sng2XZuBDHZQ3JTokG1sFaNQZmqQPqK1VUgnOF+eurOFZ8OaOcAjmx3dogeZbJtVcE
-         dNFQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787763548; x=1788368348; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=a9Wm9kOafuR+J6Syh9BDqfFdZeJCWOUMU6vOSLIvPtI=;
-        b=DdXEIlG/oABIfBsEoiDum8dnSZp8EbE1TZqIOU06OWLGe3/VJgFpaZFLgcL8CsMcD4
-         +tU+PB0gI1S9vLPuvpGrkKguAJ+8HtpllaZoYPHT4E37rdynzqZjf8i0Az98V1YNpq6C
-         bQ/++RxBOP/dxppqX/KBBubC6kM7tB20unoqpkhI7lDQvWSUpNrYUrY1i+JZUcABMeaU
-         BMlMFA5cKcOMCnztBGW05hv58bPBP0EP5fD5ybEaWG18hGYdlaX+7Q4gom546rgfCvDR
-         JNmRTRDfkdCsCCEk0VpFGdJv1xDCXUku5iTuU2OnBiqUkAubtHPaeNGu2BsLnjKzA4Yi
-         1giQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787763548; x=1788368348;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=a9Wm9kOafuR+J6Syh9BDqfFdZeJCWOUMU6vOSLIvPtI=;
-        b=E5gULdcZOcqjJ8JMmEK2rsJCJiroMUx6rHkNPtQAWLpWItqhQcNxwTUR1NrPlzmcCG
-         pPgCNiH4kspTJQb1lO6OtUVVx2nt7HmthbHDTc1w/FozPiFkXPvuoTB/XLAX2t45guee
-         6sFf/geRrZnabZBlC2jC2KqvAN6un34EiOLt73hO1tkjwsBSmKxPqDX2k7myMWlR5Lvo
-         b0iaz5+9IGdpvmLXqROqskiTK8+XruEc2KEiMLhN9Rqp1xqtWOnL7mOxkGL02F55JFQ8
-         aM4n7Un76qzMYxCidwwDrWyFYgEOS6yMLN7hR9gFIcuBYa0CcEmGxGva9KYJ/0o9FDlb
-         Dt2A==
-X-Gm-Message-State: AFuF++lZe19Fu/+Gq/wR3JoYz0ZFxPWjL7KJjD6bXiq0LelMWXvwzfPZ
-	L4ra4UBcI9Xz+hmGXSDoL3hxDHRC6tSgeONaAPVg2WBGhDfocGlFZz0AU5ToivSDSPCgDZDdNGF
-	ASmYxRpH6wg5/8Gv60M7bUpN2zu+DVaNDxaLM
-X-Gm-Gg: AR+sD10sGqWQBPMu+lkVOMQCElABuB/ROhcbOnoLZmfKwv3NCgeYtojWc4XMxOSQSsg
-	ryQlBT5ZITGzghRKuWE6/UOceQtopE8NcGvdikfQZsxS6pCDFj9Fg9WcebQ4Mxr210fr6KLM2PY
-	ihqWMuSyVuRu53z29Vwzeg1ZNqVOY2CdsWmz63o4/vZM6ShVhLTHYjMlxLd5j6LRii5wam9ViPG
-	oa5oonYsZ5Os+vbpn2pjdrYKBaHw1/x16ni1JPg5acrG2z6r9WDAHNTNlf1LcrldCuDnVQ6labZ
-	wLrbwIC3FBoNd4jYY4BkYmw572irBI289jR7Ra+bq/Xn7cRZOXv/qaC4QtYLVGb66yBkP7A0Tdw
-	FlJ+jpW9f71mlThXQLoiPFae8SWVCMX4=
-X-Received: by 2002:a53:c407:0:b0:667:e51a:118e with SMTP id
- 956f58d0204a3-66d2568e27dmr2109316d50.15.1787763548427; Wed, 26 Aug 2026
- 09:59:08 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="X+yYTOig"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787768487;
+	bh=hShvGxTe9SA/SUctnSsS2ts1r8pVVO2TfqVXHUhbgY0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=X+yYTOigywJd0A1O1Mo7OwAVUp4HePLvoW1OYwe83gZER85uXxOhXrLBAsznhWa6s
+	 DBKvhTArk18CI2V581UVYhdzDljAY3aZRHhu1SgNmB4CgOnCKzBNhjZGJKfCyeGS/f
+	 idI7GdOQ7LgwScEFXQfGAMHi5jSd+ZTaVzqCjouQ=
+Received: from github.com (hubbernetes-node-4512462.va3-iad.github.net [10.48.77.82])
+	by smtp.github.com (Postfix) with ESMTPA id 8B6433414A6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2026 11:21:27 -0700 (PDT)
+Date: Wed, 26 Aug 2026 11:21:27 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1152198/000000-e561a7@github.com>
+Subject: [bluez/bluez] 368446: btio: add BT_IO_OPT_FORCE_ACTIVE support for
+ L2CAP...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260826164106.293951-1-frederic.danis@collabora.com>
-In-Reply-To: <20260826164106.293951-1-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 26 Aug 2026 12:58:55 -0400
-X-Gm-Features: AcwNN1UheoX5_5Y9E63Z8PWMMq-0St1EcCWnq_WmxI3QRkDtJ_si5fxJl-gDOGI
-Message-ID: <CABBYNZJ+G4kN3phLG7RnS9EVcWLzBA7qCA-43qaafG9ppOt=cg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/2] input: avoid NSP1 disconnects caused by
- Sniff/Exit Sniff churn
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Fr=C3=A9d=C3=A9ric,
+  Branch: refs/heads/1152198
+  Home:   https://github.com/bluez/bluez
+  Commit: 36844661b7ea2ed80c2a2704c5d6429f006826be
+      https://github.com/bluez/bluez/commit/36844661b7ea2ed80c2a2704c5d64=
+29f006826be
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-08-26 (Wed, 26 Aug 2026)
 
-On Wed, Aug 26, 2026 at 12:52=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> We received reports of Bluetooth instability with Nintendo Switch Pro v1
-> (NSP1), including unexpected disconnects during use. HCI traces indicate
-> the controller repeatedly requests Sniff mode while BlueZ keeps forcing
-> Active mode, creating frequent Sniff/Exit Sniff transitions and increasin=
-g
-> the chance of LMP Sniff Response failures.
+  Changed paths:
+    M btio/btio.c
+    M btio/btio.h
 
-Interesting, but we should only exit sniff mode if we are going to
-transmit, right? Or do we exit upon receiving something? Maybe we
-should track who initiated sniff mode, if it was the remote initiated
-it, then we shouldn't exit it.
+  Log Message:
+  -----------
+  btio: add BT_IO_OPT_FORCE_ACTIVE support for L2CAP sockets
 
-> This series adds generic btio support to control force-active behavior fo=
-r
-> L2CAP sockets, then uses it in the input profile for NSP1 by disabling
-> force-active on the HID interrupt channel. With that, BlueZ stops
-> repeatedly issuing Exit Sniff requests for this device, improving
-> connection stability.
->
-> Fr=C3=A9d=C3=A9ric Danis (2):
->   btio: add BT_IO_OPT_FORCE_ACTIVE support for L2CAP sockets
->   profiles/input: disable force-active for Nintendo Switch Pro v1
->
->  btio/btio.c             | 35 +++++++++++++++++++++++++++++++----
->  btio/btio.h             |  1 +
->  profiles/input/device.c | 16 ++++++++++++++++
->  3 files changed, 48 insertions(+), 4 deletions(-)
->
-> --
-> 2.43.0
->
->
+Introduce BT_IO_OPT_FORCE_ACTIVE in btio and plumb it through option
+parsing and L2CAP setup.
+
+When set, btio now programs BT_POWER on the underlying socket, allowing
+callers to explicitly control force-active behavior.
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: e561a7c662a0495b1ae18e517c2db484c55aaeae
+      https://github.com/bluez/bluez/commit/e561a7c662a0495b1ae18e517c2db=
+484c55aaeae
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-08-26 (Wed, 26 Aug 2026)
+
+  Changed paths:
+    M profiles/input/device.c
+
+  Log Message:
+  -----------
+  profiles/input: disable force-active for Nintendo Switch Pro v1
+
+For Nintendo Switch Pro v1 controllers (VID:PID 057e:2009), set
+BT_IO_OPT_FORCE_ACTIVE to BT_POWER_FORCE_ACTIVE_OFF on the HID interrupt
+channel during connection setup.
+
+This avoids repeated host-triggered Exit Sniff requests and reduces
+Sniff/Exit Sniff churn linked to unexpected disconnects.
+
+
+Compare: https://github.com/bluez/bluez/compare/36844661b7ea%5E...e561a7c=
+662a0
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
