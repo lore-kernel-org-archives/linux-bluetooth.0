@@ -1,106 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616733DBD4E;
-	Thu, 27 Aug 2026 16:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA61530B53F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 16:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787848730; cv=none; b=d/b/BDKJHSgoxkQAhm4llEwkVIa0lZTZcl4txrRSVCCmUU/7tz1LlCtnD0lnVvl8KCXoL/VG2A5bDu//gKJASA/+y/RqL7VP9OcC26JZEc3Dga8ZDIhX09/aBLRc2DTAixqN0QGN2RU91QQAj6iV+eT+wVzvDBd9eaD0Zwwr8XQ=
+	t=1787849460; cv=none; b=k13HrSSpsROYxhkYkcHm81AfL9NqpwO62vEYGdrly2PxXa8cGqDJr99jeIVVyZCjTKuDlmmjtyv2GLPQum1I9XhZlydZPr6OewQTbBGONq/t4F+lKf7Zle5TFQryFaAXABdG0KgZJ7+jRv8Bvsk+FUEN7X3T6ckWlpiTEcUkQ40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787848730; c=relaxed/simple;
-	bh=CWMEii4KNwRSA9F3M/52qde0t+mUYY56PthDjHLLm1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oVaIRqNLxjcD5o3U44CuOKIYTHf4OBiOJuCZkfNSHzGKVt4bB6n6uLXFj7xAZYzNNjc97/5YVZUYfjnkz5mtqJfyxIUkjrsKNEMZrbGRLGpvau1B78lThxO/zbfvqPboZGJPw3seJ8/ELcV9vJaCPNWv48qZn8Qc67wJf7RnKjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAE0JYh9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787849460; c=relaxed/simple;
+	bh=H6Blt2hSgIMlyLsfQQkI6X9nQfjE3iQa3+GCshhqrf8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Pqyhv/Xt2WML7xAO7nnvGKCtia5r6ggvz9Q+raUSvZ3vHhwX6Vg4sdZLnhgnksAMv5WeFfIElb8DGQTDLLEL2cpx3UnpebZsd3cZ/JZ0jdmI8x3dWwwCRD/1eUJzvXk14zi84gsKui0zM8HyhPkaVrIltdsBA4yS3/nVWwi9KOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvSE01cg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAE0JYh9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C903B1F000E9;
-	Thu, 27 Aug 2026 16:38:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvSE01cg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90F011F000E9;
+	Thu, 27 Aug 2026 16:50:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787848728;
-	bh=0eRy1U6uAzwXpuiA3Gi1i5gbXJsW7piZ80NEeLngrgU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OAE0JYh9YtDZcRLeqEpRhsyWL/1nVegiSJYgkQ8ynY2+thU1fPncMa8nUDx5bG5/7
-	 UXpxuoo/z1iIACkW4MQGeSafznlZsO5kyvplk++1ntGdpG9jU8PJ64ZOaVns8Vjj9j
-	 wGMeKppjRpe9FYClZG1obtVk8SMR/xuiqxz3oscpxgARWfbzyDf89YlHLKr9t/istq
-	 LI1SO5RE7WXI+KZc/D/IKzOfj+jrJ4+6Pd4150skUdb5LWG1zpIYUeIdzEFz4kxADP
-	 b3ddUaC4H8iZAsxbLXnzHEAKir+FFI+WNk99SXwBcbToGaxgmuiIzbRp98VO48jK6I
-	 jJM8mtzxEUEjQ==
-Date: Thu, 27 Aug 2026 17:38:44 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Linus Walleij <linusw@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] Bluetooth: dt-bindings: net: bluetooth: add
- BCM4384
-Message-ID: <20260827-uncolored-onlooker-d62c44a3323b@spud>
-References: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
- <20260827110242.1203546-2-andy.chang@synaptics.corp-partner.google.com>
+	s=k20260515; t=1787849459;
+	bh=jEkV/WqtPK4g6YboEWHUzZzKsBrPSmnoQaHR7X3Gxzw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=BvSE01cgqjieZoD/iM44KElLi6m+PrO8uRZ85X5cV3z4MuIyWUtrrKmIXpLvlCqZG
+	 Mn/IqL2E1OU/fzUgr4vLAZhgBDE2+jZ4sJLx1/F/GkFqku95fKQAdEp1q1llxN7Cfn
+	 RyKLYUNcfzy5HiN+/H/OlToIwVvscqgFjCp/5iaD36R6PPIx0niGJ/HBm+1jeNsRRa
+	 I5nAiUbpfNucyAOWSOKyHcVQbzrbN/Aq3YGMrXYPs3cG+hlN3q59TnVQIaKcqiIBpe
+	 nDRJ4I0tbscW9uGE/2XRtLngMH0R3saDvPbM7ocFdaoFo8hu/j8RGZvSlTkpon4FMJ
+	 C0YnYV5amuF8Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5693F3809A88;
+	Thu, 27 Aug 2026 16:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Hs61HPrq2vr7zu4g"
-Content-Disposition: inline
-In-Reply-To: <20260827110242.1203546-2-andy.chang@synaptics.corp-partner.google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Clear automask on spurious
+ interrupts
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178784940516.1742962.8755153331785550697.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Aug 2026 16:50:05 +0000
+References: <20260825172300.150440-1-kiran.k@intel.com>
+In-Reply-To: <20260825172300.150440-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com
 
---Hs61HPrq2vr7zu4g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-On Thu, Aug 27, 2026 at 07:02:41PM +0800, Andy Chang wrote:
-> Add the brcm,bcm4384-bt compatible string to support the
-> Synaptics BCM4384 Bluetooth controller.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Please explain why a fallback compatible is not suitable here, or
-alternatively if it is, use one.
+On Tue, 25 Aug 2026 22:53:00 +0530 you wrote:
+> On spurious interrupt where the TX and RX causes are not set, driver was
+> not clearing the auto mask which can block all the interrupts. Driver
+> needs to clear the automask even if no causes are set.
+> 
+> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> 
+> [...]
 
-pw-bot: changes-requested
+Here is the summary with links:
+  - [v2] Bluetooth: btintel_pcie: Clear automask on spurious interrupts
+    https://git.kernel.org/bluetooth/bluetooth-next/c/bcb621272aa0
 
-Thanks,
-Conor.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
->=20
-> Signed-off-by: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
-> ---
->  .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml        | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetoo=
-th.yaml b/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.ya=
-ml
-> index 95501e858e6f..612d21123aaa 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml
-> @@ -31,6 +31,7 @@ properties:
->            - brcm,bcm43540-bt
->            - brcm,bcm4335a0
->            - brcm,bcm4349-bt
-> +          - brcm,bcm4384-bt
->            - cypress,cyw4373a0-bt
->            - infineon,cyw55572-bt
-> =20
-> --=20
-> 2.25.1
->=20
 
---Hs61HPrq2vr7zu4g
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCapBoFAAKCRB4tDGHoIJi
-0grOAP9aDla7+9QfThtcR5GTr5jApqex+m9o1Igz0LrJeZAhQgD8CdpasLtJ0w6k
-Ob9uJhX6oDYb8QJs65qJHzDEuHPbpg8=
-=06ZQ
------END PGP SIGNATURE-----
-
---Hs61HPrq2vr7zu4g--
