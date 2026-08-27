@@ -1,35 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BC84968EF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 17:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143251A238F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 18:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787851265; cv=none; b=mkip1V/JfvPFrv+bXN32h5oo3WmdJHlik1ZlHtEfui4vxqQ0j0FJRYNWUILURHyvmidZkiXKIpK/8CwHxFwJ3FmuktTF+DzMUKlgMfLGvqFn1yGwK41yAc98lKwQATRWCdKG1IfJORn38lmUM+o6uDvEw1JHZE2z0nXukFgNBes=
+	t=1787853722; cv=none; b=djSWiDUuH9djGCZPGZTmDFcNo2XH6tA8ikdaiu5KsxWtjogpIxldIgSfBMXMB+J2vC2lYP4Phz6PNU3XzAkwhIkZFF+5ythMcn1vUaTkIqOkN8l8IDedrdgqq0rfZD0kbzDGF4A3k8amK54GUNrqx9rlBsXe6v4nV8w6hUSAPVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787851265; c=relaxed/simple;
-	bh=cf2HPels8jvp1GakDEKVIjqv3P5+czSQs879zvBHFOI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OJv/mgJNSXuldRQoaeHB2ZnCPEP5crviCfEZ89VknLKHsD+FU8OlsH0fnL0ZFNIBSgCUPVd2An+OsAFR/YoZX4kp2gppLBHgdzw40ozX2x7dPV64j7cBaLb+TEtxdURMpY7PCAfcz+eMLVDd3fWDhu/Or5qY7sIZ3LJnGVI+2LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A37LOEpA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787853722; c=relaxed/simple;
+	bh=E1ETmbI3PJdIrAAdLmFArJU07Tu70pf4kty3lXSME30=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=GDlPvlnpAMXYV23opUGy1/xMlV0bMUhS9eeFvo9nR+nUmBPUgWoaslfiDzq4z4I17o2S8KhKxDyERyJSLHApOiVvXTO6OSPzk0GtY33MiI5xG/GHSAtdWvBCa+5qJJCTXcgFqSfNJ2uF0KvD3Obhavk5oEdKOoQdLyGfqWsygSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fyjb0kTU; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A37LOEpA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4751F000E9;
-	Thu, 27 Aug 2026 17:21:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787851261;
-	bh=w908Td4idgw/6os0lPNvuu9CZpAtz7zv2Mkeg6D5uWs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=A37LOEpA1+1WcvValAEys8AZq7hmWvON7IpliPk4Lal0JyuZ3XMBr52O9iNsyTGWB
-	 Vtn1UzcSvyGNJ0myEOOk1AClbdHzkM6z+Djx74HInlKnXmn+3MExIo2uZcprAH9qbz
-	 DZ+XvbOivygseLpNHjOdabuZ5I5PbNeti7lsSnSENEeUutMALD1Cg95xYxearjNM9A
-	 S+gdsKYNlRUCuDOS1MTHUdjtrMwQwInRTESeBEy9tuqP57SeafqZr775UG8qjUdrem
-	 rMZ7QTtG13LVF4jTKUqezbYiyZvcUbREmcRwjB+mWyVzhyn6dGu45F/8UdJSOdIAqH
-	 bBl40adfBwbKg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09923809A89;
-	Thu, 27 Aug 2026 17:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fyjb0kTU"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-73720e58dafso47923137.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 11:02:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787853720; x=1788458520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=s9ckicEow7TpFb7Fq5fjM1N/jZhBAKlOa03FFAdM0jw=;
+        b=Fyjb0kTUAmyr0vmVlDPVhRQqtfZoyPMiPA2dN3BKBsBqfKeMSBJNGQY2cZyl0NYKrS
+         +W+sR8w24GRNK/LiCG9xGmfA+E53VisLgK5FUaQNGY1Ivj/1gKsvf+QufGjq4pUJIkiN
+         j7rF9zs0vcJXatR8Jn5GQwcX++eih555KcjMwjsVpI4FchUg7/ezFToKXa0aOntzSisA
+         abu18f+tg+Re36JM1Hg79rWlDJZlI+UGaUgEdTNorooO8kNM40fFdo/OApR+9r/K1DQz
+         6sOECMi1zOQg7Yf3FQ1obfJr067nyvAliNCh3VfDVDEKqiwuc8qbJV/hS502zc91+rBL
+         jLPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787853720; x=1788458520;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=s9ckicEow7TpFb7Fq5fjM1N/jZhBAKlOa03FFAdM0jw=;
+        b=oGsYRKLrTKXXVZ4AkdkO3G6BiXfs9nhwm2QvNk5dIn7iVsuKhYwdkGxMEP6Bd2T/mJ
+         7jXn8L10TEdpS9add7Y17EKipAYJRGb/xKEL5MlcYCpMH74b1q+KxfBGkt8wzU4R47HP
+         akI6gwa5/KwNGyUjv1hUCkaoUSzsSrVtckdfNKTGMehdtcbV/97pKnZNR/dmPgpkC7Kg
+         AK2vVLK4y7Z52q3EC6o3i0ifatuRYvvjbSEUfMd15q4oVK9k6QubFnan22pW2nhWOHcB
+         5naeg62PxvBMQkzbnj5LJ8yK4/K+On+3HXTgk6J23h5dDyla1l72C8Fi1Vb8f5IMjK56
+         wl/g==
+X-Gm-Message-State: AFuF++lonDvkjdwl/FxbfAacDA6Z4RTMf7cRJ28PzWX7JTIi8mIGi6Al
+	4ZyAsFcU488DP1HZTuhhk4zo5q2rtbzxjLqwY/nPkK0Vq5/4BW8wBJP3hFRNy0eL
+X-Gm-Gg: AR+sD12AnO511IPF9diYjZUr5wPlgWQa8gQnnx+G42l1RpcqJQyHYK2O+fiyHZ7UscF
+	6RzlmNXSH6TLY/ep54FN8mDFYtBPMju0/RJNEAMPOb8DUo4nBHAIMdvgNBe29MaiEXqe1VyEhW/
+	nH+ZxNsEbk2kIxtwiaqaRKfXuSpObwicFdH6Q6lj0I2zKRRF/J2BDWLX78fc2P2V1NrgPFh9cmW
+	qKBp07kHfAFlU30qCS8e+8UG+pHW09yqjhPrMZFNfxSplMzIuetqL5vPq2pbdt74KaHA9AQGph/
+	dk5iyNdv7dctqxg5IrzlK+LHuQa2xlVN1h1BYDmzxNUGmvpRNkB6hx8yWa1imsY2+1SrYdx5d6Y
+	fGtS/oHQRkKlehazLSJewKq7VvuxI4tEEsZtuon8ZfdB3UoyJSJAYqnE+ynZF/MNDFfsq0jWTqf
+	X572Fa1IWsLp0LsNZeA2HULqHcqDoARH2KrNYK82HckOwBJsk5Hyg2UQRhnfFWyd13yHCPOsrLW
+	awYw12qCSZmQUcES21T2admpFnnCtqvZDR68AhgOhr8izhgfpwKs2o=
+X-Received: by 2002:a05:6102:149e:b0:785:5a17:739b with SMTP id ada2fe7eead31-785939481a8mr111652137.0.1787853719690;
+        Thu, 27 Aug 2026 11:01:59 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97ccc0f4963sm3695458241.12.2026.08.27.11.01.58
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2026 11:01:59 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1 1/2] Bluetooth: SCO: require CAP_NET_BIND_SERVICE to bind
+Date: Thu, 27 Aug 2026 14:01:48 -0400
+Message-ID: <20260827180149.415744-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,43 +70,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 0/2] ranging: mode validation and
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178785120639.1759916.8569344253023499673.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Aug 2026 17:20:06 +0000
-References: <20260820174910.559116-1-naga.akella@oss.qualcomm.com>
-In-Reply-To: <20260820174910.559116-1-naga.akella@oss.qualcomm.com>
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+SCO sockets have no PSM or port namespace: binding one simply reserves
+the ability to accept any incoming eSCO/SCO connection on the adapter.
+That is equivalent to listening on a well-known service, which L2CAP
+already restricts to CAP_NET_BIND_SERVICE in
+l2cap_validate_bredr_psm()/l2cap_validate_le_psm().
 
-On Thu, 20 Aug 2026 23:19:08 +0530 you wrote:
-> This patch series introduces validation for Main Mode and Sub Mode
-> combinations in Channel Sounding configuration and updates the
-> MaxTxPower option documentation to reflect the supported value range.
-> 
-> Patch 1 adds validation to ensure that only specification compliant
-> main_mode_type and sub_mode_type combinations are accepted. Invalid
-> combinations are rejected, and the user is informed of the supported
-> mode pairings.
-> 
-> [...]
+Apply the same restriction to sco_sock_bind() so unprivileged processes
+can no longer hijack incoming SCO links.
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] src: Modify MaxTxPower option documentation for ChannelSounding
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=06b1ba3343c5
-  - [BlueZ,v1,2/2] client: Enforce Valid Main Mode and Sub Mode Combinations
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=49592cbc1416
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/sco.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-You are awesome, thank you!
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 3d4362a09df4..e4c26551e513 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -667,6 +667,13 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr_unsized *addr,
+ 
+ 	BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
+ 
++	/* Binding a SCO socket reserves the ability to accept any incoming
++	 * eSCO/SCO connection on the adapter, so restrict it in the same way
++	 * L2CAP restricts well-known PSMs.
++	 */
++	if (!capable(CAP_NET_BIND_SERVICE))
++		return -EACCES;
++
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state != BT_OPEN) {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.54.0
 
