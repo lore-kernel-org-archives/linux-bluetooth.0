@@ -1,35 +1,35 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89E0175D53
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 15:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E626175D53
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 15:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787844465; cv=none; b=PuFSyqtm4pXK9aAEpTnQv0OCXIEC6/g5JOvD2v8MZdjzTLQkRMTs5ohOTKSzDTfvJVyVYMFhwgi451ejZkQCS+WpT39q4gOhWgv6os+2sgGkvop8X2sGHtgDRwNSI4cf9ixRB6IvstxWxN+CNdYmHfAAU7ODiKi2XH13HiRK7+I=
+	t=1787844467; cv=none; b=kW7KTR1xLFgrGDEM/gtI64VPmJ+Y/DOTtVN6WMSTY2Oo52uKPKg1YuxpIgHqVeM/uNYwWS8bo5pjt6EmCeictXL0x1iKRVkS0ciESDb/+4pE65RC+00XyXPje73VXd+/MPtXpN/oMQR8+DvXm1QA6SybjWA3XvwVv9CRA5CyEJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787844465; c=relaxed/simple;
-	bh=9NSkgirvLvKQeZe0YUug3u6vQgYvJo4WWD00xDCD6eM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PAm5VVR3wqlk9O7QlW/3swaduKj0/O7lOzxXCe+6ksdvcfy6NKTiVkpg7pxgaVRybIwjbWAzvgQd+CUxP24hNT5cTRfB8S2+xQfrXc1g+k1pcm+n/5wkz8DIs4Yguc1EnFx1o413ZSqN+Azg+MNg+fX5uvSUHrY4UbxOhicUzkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iO9Sjbx/; arc=none smtp.client-ip=192.30.252.210
+	s=arc-20240116; t=1787844467; c=relaxed/simple;
+	bh=2wHJBSyBWtIqVWPJUZgJI3c56QO0m8rXWfFJqrVeLRo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GiucspAT3Yazi20cqft8vra4TrNOI2F6m0gfoJns+whdSTiOMcGB8QqeRXGZhv2fxfNO1xDbmu45AkhjUFkDnyofUza5AGl1dZKXf1EEq9QnKcBQNUgxHqMkqTgeqvNkc6ec6WoT6+Jzu6nn1iaV2bm7PN+IC8fKXk7Lr4DsCoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NZeaBnXn; arc=none smtp.client-ip=192.30.252.203
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iO9Sjbx/"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NZeaBnXn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787844462;
-	bh=FR6kX+61RqUkg0Afg2rSgtfP8b11Ys9BhK0cerCNA+c=;
+	s=pf2023; t=1787844465;
+	bh=M7POaDjTcCbXnkya7pjDq41heVKTtomCMLDkPmI0VKo=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=iO9Sjbx/THkBb4EQRYyhZJJ66RmKZ6w9FPLKevLOGjjGxlwW47eU2m+B8Pu3/j2C1
-	 a8VvQO31donVgGgoRZRWL68k5qfzB39XOw7nmhLm8/esV20EZMnTn4lbknbKOrJjLQ
-	 pEU00GDYvFrC/ByCYd+C4zx+qH/o9YkzSj0NZbOk=
-Received: from github.com (hubbernetes-node-2d4d900.ash1-iad.github.net [10.56.128.62])
-	by smtp.github.com (Postfix) with ESMTPA id C18BE180BAB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:27:42 -0700 (PDT)
-Date: Thu, 27 Aug 2026 08:27:42 -0700
-From: Bhavani <noreply@github.com>
+	b=NZeaBnXnR3lKrdIAX8zYMlrSS/NLbW98WsiLTt1Out9QvAcfhXP2ZSBlQjvIEKW3T
+	 WBVzKfEmKxCW6xfIuyzgBR8ZrHCgoXF6Rn1CIZpuKYUPmpkPefD3ryx6FG/KRNU+Nd
+	 cU7mLecGUufz43DWEbPgHjJgPwBBXI8/1zCBgtYg=
+Received: from github.com (hubbernetes-node-31e80f5.va3-iad.github.net [10.48.81.64])
+	by smtp.github.com (Postfix) with ESMTPA id 9C408801176
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:27:45 -0700 (PDT)
+Date: Thu, 27 Aug 2026 08:27:45 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1152414/000000-2e92f8@github.com>
-Subject: [bluez/bluez] e8cdd5: doc: Add org.bluez.Ranging1 documentation
+Message-ID: <bluez/bluez/push/refs/heads/1152525/000000-a0f261@github.com>
+Subject: [bluez/bluez] a0f261: gobex: Fix ABORT response being discarded
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,155 +42,33 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1152414
+  Branch: refs/heads/1152525
   Home:   https://github.com/bluez/bluez
-  Commit: e8cdd5d30e733c53f420691dbb88fcd7fcee120c
-      https://github.com/bluez/bluez/commit/e8cdd5d30e733c53f420691dbb88fcd7fcee120c
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Commit: a0f26144ab32f4f10e0f1b9171e212e86f459f17
+      https://github.com/bluez/bluez/commit/a0f26144ab32f4f10e0f1b9171e212e86f459f17
+  Author: Jinwang Li <jinwang.li@oss.qualcomm.com>
   Date:   2026-08-27 (Thu, 27 Aug 2026)
 
   Changed paths:
-    M Makefile.am
-    A doc/org.bluez.Ranging1.rst
+    M gobex/gobex-transfer.c
 
   Log Message:
   -----------
-  doc: Add org.bluez.Ranging1 documentation
+  gobex: Fix ABORT response being discarded
 
-Document org.bluez.Ranging1 interface, which
-exposes the Distance estimate computed by an
-external ranging provider registered via
-RangingProviderManager.
+g_obex_drop_tx_queue() in transfer_complete() clears any pending tx,
+so the ABORT success response should be enqueued after transfer_complete().
 
-Add org.bluez.ChannelSounding1.rst to EXTRA_DIST
+Fixes the following PTS test cases:
+- OPP/SR/OPH/BV-27-I
+- FTP/SR/OTR/BV-02-C
+- PBAP/PSE/PDF/BV-06-I
+- PBAP/PSE/PBF/BV-03-I
 
-
-  Commit: ec7f3986933b40b89b9fcf6241649553143ea946
-      https://github.com/bluez/bluez/commit/ec7f3986933b40b89b9fcf6241649553143ea946
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.RangingProvider1.rst
-
-  Log Message:
-  -----------
-  doc: Add org.bluez.RangingProvider1 documentation
-
-Document org.bluez.RangingProvider1 interface,
-implemented by external clients to expose per-device Channel Sounding
-distance estimates that BlueZ reflects onto the corresponding device
-object.
+Fixes: 7a35c12a6ceb ("gobex: Fix segfault caused by interrupted transfer")
+Assisted-by: Claude:claude-sonnet-5
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
 
 
-  Commit: 63d6e092c6eb7c05413f223f474078c4e0f7db7e
-      https://github.com/bluez/bluez/commit/63d6e092c6eb7c05413f223f474078c4e0f7db7e
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.RangingProviderManager1.rst
-
-  Log Message:
-  -----------
-  doc: Add org.bluez.RangingProviderManager1 documentation
-
-Document org.bluez.RangingProviderManager1 interface,
-used by external clients to register and unregister
-themselves as Channel Sounding distance providers via
-RegisterRangingProvider/UnregisterRangingProvider
-
-
-  Commit: a27cde3ba9155a0b09fab860a15677ad2e032d13
-      https://github.com/bluez/bluez/commit/a27cde3ba9155a0b09fab860a15677ad2e032d13
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-cs.rst
-
-  Log Message:
-  -----------
-  doc: Modify bluetoothctl-cs documentation
-
-Add documentation for register-provider and
-unregister-provider cs menu options
-
-
-  Commit: 938bcfda7c8c3e6cca81de76148754fe1cd91794
-      https://github.com/bluez/bluez/commit/938bcfda7c8c3e6cca81de76148754fe1cd91794
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M Makefile.am
-    M src/adapter.c
-    A src/ranging.c
-    A src/ranging.h
-
-  Log Message:
-  -----------
-  src: Add Ranging provider D-Bus API
-
-Introduce org.bluez.Ranging1 and
-org.bluez.RangingProvider1/ RangingProviderManager1
-D-Bus interfaces
-
-External providers can register a root path
-via RegisterDistanceProvider and expose per-device
-RangingProvider objects; updates to their Distance
-property are mirrored onto exported Ranging objects via
-btd_ranging_update(), emitting a PropertiesChanged signal.
-
-The Ranging provider manager is wired into the adapter lifecycle,
-created on adapter setup and destroyed on adapter
-removal.
-
-
-  Commit: e48adbe73547d39bf4eb565525ab1a1b6f4e0c01
-      https://github.com/bluez/bluez/commit/e48adbe73547d39bf4eb565525ab1a1b6f4e0c01
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M client/cs.c
-    M client/cs.h
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add ranging distance display support to bluetoothctl
-
-Track org.bluez.Ranging proxies and append/remove them
-on InterfacesAdded/InterfacesRemoved.
-
-Print the Distance property on PropertiesChanged,
-and show it under info option alongside the existing
-Battery Percentage and CS Active properties.
-
-Add register-provider and unregister-provider options
-as reference implementation.
-
-
-  Commit: 2e92f87fdfc981cec6f8234e908356675fbb724d
-      https://github.com/bluez/bluez/commit/2e92f87fdfc981cec6f8234e908356675fbb724d
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M Makefile.tools
-    A test/example-ranging-provider
-
-  Log Message:
-  -----------
-  test: Add Python Ranging Provider example
-
-This patch introduces test/example-ranging-provider which implements
-a simple D-Bus client application for ranging profile.
-
-
-Compare: https://github.com/bluez/bluez/compare/e8cdd5d30e73%5E...2e92f87fdfc9
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
