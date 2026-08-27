@@ -1,149 +1,153 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from bg-bec.cloudflare-smtp.org (bg-bec.cloudflare-smtp.org [104.30.16.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3EC442378
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 11:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856C143F4C3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 12:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.30.16.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787828604; cv=none; b=b7ZhXph/swPOmDGWdyQg7YUQQN4f5Llkc4rmeh09AECIZ42zM19TDE4c2IuHQyUBzHRNaXKNFkR7jsY0jwshOHksMApUqYVxnlAvvTLiLK1MmGC5+qOql0eILA49gJ70O74iHZLwMwig9/ywvGKCCS4eT4sG5eJ70g2evjTK/Cg=
+	t=1787834634; cv=none; b=YSBo0DirZwrQKAaEoADtpzy//fqobuNKU46tkYQuzz3dLOkGhpbEKV1fzoZqD02SUK2RKlTsVHLkX7EZesQwUKAuTiOVbAhw8ujoRwyiI5nJxe70bWaCyZlH8jtuEs9mttnaS7WvVOjG0x0G8T4TgM1k9aKZTxsO3/6Slp1Crk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787828604; c=relaxed/simple;
-	bh=8urEIkOEgNg/W0WfryJCD+eWZUJUCTF8wpI/6h2nZwI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=URZ92ju/lQe69CxsvjwPT//SFdy/r+foK5wsHyLUQRbBzYx8LNJJDhXaPg8NXUiLdduPA8fINCu6LogeD4l3CYcRxwftW75LMsgaXVtqVsd/zRwwweJT5i5I4RD0FDvM3miiJYl+2jzzIgH5yjLLmb2ZC8TxNP31Aljh7dpeKNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com; dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b=NB2GU9cd; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com
+	s=arc-20240116; t=1787834634; c=relaxed/simple;
+	bh=0mmCmxuPxv4MBYZHRRzwx8zAxb7n90wce8rPJzFCfiI=;
+	h=From:Message-ID:Date:Subject:To:MIME-Version:Content-Type; b=je/4+rWgC7bOpsdX7HEoWHmUVLD+FALzS1O9OoQATyk/XmS3DDysAr+BRjma24iDvt/pO6Mc8lxgbUde75u05x+JI/ZbjIjahpuFsHjlGVrx1p+42asWZq23UM41NAywEZwrTgjFQXdbShzQi92tH47S4jJnuB7SJ39J4EL0G9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bugs.sh; spf=pass smtp.mailfrom=cf-bounce.bugs.sh; dkim=pass (2048-bit key) header.d=cloudflare-smtp.org header.i=@cloudflare-smtp.org header.b=DEAJTYbl; dkim=pass (2048-bit key) header.d=bugs.sh header.i=@bugs.sh header.b=AWjuhD8i; arc=none smtp.client-ip=104.30.16.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bugs.sh
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cf-bounce.bugs.sh
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b="NB2GU9cd"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2d6f55a7089so24833295ad.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 04:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=synaptics-corp-partner-google-com.20251104.gappssmtp.com; s=20251104; t=1787828601; x=1788433401; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Fj+fXTtu50ERwc8Uhij96oNyWIgOxu7AHbjsaE81Xyc=;
-        b=NB2GU9cdGqOurno5IEO8+wdLCK52SDYGmTwVmjFAd9O+6gTL8v9GxibsbPBXmdjTdN
-         qIPkVtdKxQynXVjbH203cfXvodknyipvgZlFUpGq+Tc74agcTFN/ibhMe+TbPIEwz2Na
-         zwp0RGZ0lwzrs8f0kB6NL7QfO0gXqqUkTEDHRCCw9qe3hXCvSnkrnblXFB0pkRljy3jY
-         Q0cuYdFQifiAOswl7YNd6cC3EOc6dcAfStTATXl1ENSZZYVxIgTma+P06jJ7h6kZmaeS
-         dvTUl5qmn5I2xurqcarfGmEh9sIxfHG0lBv6Rte4jahLhBSNqg30zoyu3H8zXaDFdZwv
-         8Qog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787828601; x=1788433401;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Fj+fXTtu50ERwc8Uhij96oNyWIgOxu7AHbjsaE81Xyc=;
-        b=QYyed5rvnCZatGib3oOIKMiWZoZf9eArsp/hG8cF1yV2NUT2INQerTzpIGlwutFVJf
-         wRXzITVHFvZi0MMhYhgYHuwVsuPd7Z6V9Cu94B6MQiUd0mXVE4B4cbrD4ioWLCTfAbdV
-         fd3ZHHnlcYgZlh5w4I/rgLWuS6Sav/tcf+bg6l/uy0xl5G6JnwC6CRAiUsowZ6Tbr083
-         TCC1jLuK6E6aojwU81aSEaembV6SAveK42hMfVJjCSG2OLE7QkeziH+CdtED2atsDITA
-         +XhzCiCRsRjVwQxSNmiemRevnLCII7hZ9OWuZBN7ST9Y+eKkT2Xld2X2kiKpeRbokeC3
-         44QA==
-X-Gm-Message-State: AFuF++lXCipAxts2YfsSwoRic1F1VPwRddYhIsop/sE+cJ0XSDw9PqnK
-	OiZfEF3oj/F/CrfIG8PG9F+wmwYgnr4xDHp/yq5QKrGmtZtTsnKQAxQNIJ4gg0dImLUfA+/pqjx
-	smXMW+RI=
-X-Gm-Gg: AR+sD11wXnfsPzlwoeyZCJvUa65S4Cqx6dr5Gc1alOT63CnIm8E3pSHmSvWJSU4Fg8J
-	EI2ScBh6oOZoWWbbGrOBL9RRJ7nH2cQdGcb+vZi5jiCHoOwEY3o8tAZ6PSBtypG8JpyAgQkaxFq
-	40z1Ary2zSHRZPXJPgwjOomzxCPt1GSchOb28k4L8/yoUf55Nza5OsXmSwmXUk2OV/XADxfddyV
-	6r41niBW1tW0GVumERxELak4m/ohbLbbkQJ9CX+qMowqvQx1ksu6yCfzKVGwutYsVjIvpvTp2bW
-	wF6k+GmW45wmcOsLM1fg8EEGNHaz5xkJUy+ZUu2zD/w/VcAWqD2B2K5i3oFgATCyMrqC8pRAXZh
-	lDdw/9RWZ0rAUaycrtduJ8A6u6iRDAsRVFaNV8NU130JieYS6XghzFJtyfBO/sjcSiC1VS7k7MC
-	47kxWH7NoGb27R+IHEMWzPH4LKz22x0XPbbbc4QXGtuWh8tkpY98cx/5iyO0lYK5qR5jwaYc8fu
-	nfIVKum8SbPD6Wq7xXAME0EsFWrYrJWxCit0SYUI7ECY4FIxyob9uSj6Kws/3/ncH/Cuc78BwEF
-	p77yi64=
-X-Received: by 2002:a17:903:1ae8:b0:2d6:f3f0:3e7a with SMTP id d9443c01a7336-2d707957143mr256210645ad.3.1787828601192;
-        Thu, 27 Aug 2026 04:03:21 -0700 (PDT)
-Received: from bt-tpe-server.synaptics-inc.local (59-124-75-166.hinet-ip.hinet.net. [59.124.75.166])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d704c4bea8sm15081585ad.82.2026.08.27.04.03.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Aug 2026 04:03:18 -0700 (PDT)
-From: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
-To: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	Linus Walleij <linusw@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Andy Chang <andy.chang@synaptics.corp-partner.google.com>
-Subject: [PATCH v1 2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
-Date: Thu, 27 Aug 2026 19:02:42 +0800
-Message-Id: <20260827110242.1203546-3-andy.chang@synaptics.corp-partner.google.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
-References: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
+	dkim=pass (2048-bit key) header.d=cloudflare-smtp.org header.i=@cloudflare-smtp.org header.b="DEAJTYbl";
+	dkim=pass (2048-bit key) header.d=bugs.sh header.i=@bugs.sh header.b="AWjuhD8i"
+DKIM-Signature: v=1; a=rsa-sha256; s=cf2024-1; d=cloudflare-smtp.org; c=relaxed/relaxed;
+	h=To:Subject:Date:From:Feedback-ID:from:reply-to:cc:resent-date
+	:resent-from:resent-to:resent-cc:in-reply-to:references:list-id:list-help
+	:list-unsubscribe:list-unsubscribe-post:list-subscribe:list-post
+	:list-owner:list-archive; t=1787834627; x=1788439427; bh=0w4U2TtwnRVMAzB7My
+	M3yx6r+kmkw280q29TxCD1fOE=; b=DEAJTYblUagXJ2iGumxPAE7ZoYipixr6ltuHn9GfUH7uV
+	9TemXN6qN0ZSXIUA2e1g5Xo+zqp+BNPH2xarXBL0dbvnTOgcwUQOtRTjDRKR4xLYN5diuVpVj2c
+	qZdKBu6MySuZPzQHDiKCeWfnktiv+lqrgH6QPn3W97cdxUlVLLcD+an/yYUy0KBFruqoQOuXiUa
+	XfKvqlgMG892C8igeiegwgKEh/dwAYEgPttQN5rUrGlghqHlmkJQPqYpv6qrIJ2cYuP6NDEBNxj
+	Tsf2BrzS6iv1HsyGw/6kLIwxwbv94qz4o6uBjRfKRylUv2bBrsgFq6BuvOD1WZv6D/323vvw==;
+DKIM-Signature: v=1; a=rsa-sha256; s=cf-bounce; d=bugs.sh; c=relaxed/relaxed;
+	h=To:Subject:Date:From:Feedback-ID:from:reply-to:cc:resent-date
+	:resent-from:resent-to:resent-cc:in-reply-to:references:list-id:list-help
+	:list-unsubscribe:list-unsubscribe-post:list-subscribe:list-post
+	:list-owner:list-archive; t=1787834627; x=1788439427; bh=0w4U2TtwnRVMAzB7My
+	M3yx6r+kmkw280q29TxCD1fOE=; b=AWjuhD8iuNAmAEAMcQnmYr0PREn1nYeTea7YjmDmCwcbO
+	peHjGTZ8IBA6o8PIQaZxfXZO1jZdT3L2JXpTPNchQJzf7QhbQ1t0PBcGqwEDnEZbbKy/QOZ6GdD
+	pWwz+DMDKxHvGCQRQE0icyz3SUn6eGqmo97tHBbHj6+0z+YGZKJU5ANKvS/i5X6DVsSox3r8CFf
+	iuXLPh7ndUqJYo4dCsOnj2gkDAq9OHKQqVWyP4c0ESZp8WR8kzRF7WVXjxfWa/wQwz5kZwx3/II
+	NHEEk5OM3DVA0QL9iqb3utnzKffycnhDvkrnww0f2NrMJ0+GTh4ijoHpL61OXeXNfCZMNC/A==;
+Feedback-ID: bugs.sh:5:6:Cloudflare
+From: co <co+ef32d1251d8555af@bugs.sh>
+Message-ID: <6RpR2fi4iS5th20EWMG6Wt0CzXK0hP6xdKdd@bugs.sh>
+Date: Thu, 27 Aug 2026 12:43:38 +0000
+Subject: [BUG] drivers/bluetooth: use-after-free
+To: linux-bluetooth@vger.kernel.org, "Marcel Holtmann" <marcel@holtmann.org>, "Luiz
+ Augusto von Dentz" <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Add support for the Synaptics 4384 Bluetooth controller
-by adding the corresponding chip IDs.
+We found a bug reachable in:
 
-Tested on the VIM3 platform. Verified that the controller initializes
-successfully and that firmware loading and basic Bluetooth operation
-work as expected.
+    path    drivers/bluetooth
+    crash   use-after-free
+    commit  7cbfb180945c ("net/sched: sch_cake: fix autorate reconfiguratio=
+n throttling")
 
-The VIM3 is a Khadas single-board computer that I used as the host
-platform for testing the BCM4384 Bluetooth controller.
+Config, environment, the sanitizer report and a C reproducer follow.
 
-Signed-off-by: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
+=3D=3D Notes =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+    If you patch the bug based on our artifacts, a tag would be
+    appreciated:
+
+Reported-by: co+ef32d1251d8555af@bugs.sh
+
+    Everything in this mail is validated by the reproducer below.
+
+    We also hold an LLM-generated root-cause analysis and a candidate
+    patch. The patch passes an A/B test: the same reproducer panics the
+    unpatched kernel and runs clean on the patched one. Neither has had
+    human review, so both still require validation before you send or
+    apply them. Available on:
+
+        patch.diff  https://bugs.sh/b/ef32d1251d8555af/patch.diff
+        report.md   https://bugs.sh/b/ef32d1251d8555af/report.md
+
+    This is an open science project. The code and the full set of PoCs
+    are not public at this moment, as we intend to disclose our findings
+    in an ethical way.
+
+    Happy to test patches. Complaints and suggestions about our work
+    are welcome at:
+
+        cedalion@bugs.sh
+
+=3D=3D Environment =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+    Reproduced on  7cbfb180945c ("net/sched: sch_cake: fix autorate reconfi=
+guration throttling")
+    VM setup       https://bugs.sh/b/ef32d1251d8555af/run.sh
+    config         https://bugs.sh/b/ef32d1251d8555af/config.gz
+    poc            https://bugs.sh/b/ef32d1251d8555af/repro.c
+
+=3D=3D Sanitizer Report =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+BUG: KASAN: slab-use-after-free in _raw_spin_lock_irqsave (include/linux/sp=
+inlock_api_smp.h:155 (discriminator 1) kernel/locking/spinlock.c:181 (discr=
+iminator 1))
+Read of size 1 at addr ffff88802ae9c1a8 by task kworker/0:0/9
+CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 7.2.0-07243-gf87cd64fed5=
+8 #63 PREEMPT(full)
+Workqueue: events btusb_rx_work
+Call Trace:
+dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
+print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
+kasan_report (mm/kasan/report.c:595)
+__kasan_check_byte (mm/kasan/common.c:574)
+lock_acquire (include/linux/kasan.h:402 (discriminator 1) kernel/locking/lo=
+ckdep.c:5860 (discriminator 1) kernel/locking/lockdep.c:5843 (discriminator=
+ 1))
+_raw_spin_lock_irqsave (include/linux/spinlock_api_smp.h:155 (discriminator=
+ 1) kernel/locking/spinlock.c:181 (discriminator 1))
+skb_dequeue (net/core/skbuff.c:3987 (discriminator 1))
+btusb_rx_work (drivers/bluetooth/btusb.c:2519)
+process_one_work (kernel/workqueue.c:3322)
+worker_thread (kernel/workqueue.c:3405 kernel/workqueue.c:3486)
+kthread (kernel/kthread.c:436)
+ret_from_fork (arch/x86/kernel/process.c:158)
+ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+Allocated by task 793:
+Freed by task 1234:
+Last potentially related work creation:
+The buggy address belongs to the object at ffff88802ae9c000
+which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 424 bytes inside of
+
+
 ---
- drivers/bluetooth/btbcm.c   | 6 +++++-
- drivers/bluetooth/hci_bcm.c | 1 +
- 2 files changed, 6 insertions(+), 1 deletion(-)
+The report format is based on syzbot bug report.
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 463d59890bef..63c4c788d9c4 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -31,6 +31,7 @@
- #define BDADDR_BCM4334B0 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb0, 0x34, 0x43}})
- #define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
- #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
-+#define BDADDR_BCM4384B0 (&(bdaddr_t) {{0x93, 0x76, 0x00, 0xb0, 0x84, 0x43}})
- 
- #define BCM_FW_NAME_LEN			64
- #define BCM_FW_NAME_COUNT_MAX		4
-@@ -130,7 +131,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A1) ||
--	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B) ||
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM4384B0)) {
- 		/* Try falling back to BDADDR EFI variable */
- 		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
- 			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
-@@ -514,6 +516,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
- 	{ 0x410c, "BCM43430B0"	},	/* 002.001.012 */
- 	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
-+	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
-+	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
- 	{ }
- };
- 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 9a103db7e355..e70b9f3fd968 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1593,6 +1593,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- 	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
- 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
- 	{ .compatible = "brcm,bcm4335a0" },
-+	{ .compatible = "brcm,bcm4384-bt" },
- 	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
- 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
- 	{ },
--- 
-2.25.1
+This report is generated by a bot. It may contain errors.
+See https://github.com/n132/cedalion for more information.
+
+For any issue with this report, reach out to cedalion@bugs.sh
+
+If the report is already addressed, let us know by replying with:
+#co fix: <commit hash>
+
+If the report is a duplicate of another one, reply with:
+#co dup: <lore link>
+
+If you want to undo deduplication, reply with:
+#co undup
+
 
