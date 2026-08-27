@@ -1,62 +1,78 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2D63EB0EF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA14F306775
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 11:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787819833; cv=none; b=JoK6yBc7IZW06bUg2QU+dgZ8EMLvLfMxlpLOV38GX412XHjE7Zx85RXg2XPANPgUQQGde3UEHyvyFVPSvsqe2L16emO4K9YmfK+BzDkpS06ayhChInahhEh8z23MbsQqntTlawNNJVSN9QBdxBW5w0o+gSudqojanY2KSe1vYpc=
+	t=1787828596; cv=none; b=TufBjjeslRFwyuSxJak9WvA5ncrsRP8qH0b2qPqVpn7lE/mE78j6YSs97VlbTC1SIMPCSilnr1TdbUVU6W7ljhwuPN7S5zW0IRg/pqcV2RDWyjFQmXYp6oHWasQybAS7NbNuoPndHCNbdrKrJLgPYIbFtI8ejVocLV4szQbtVFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787819833; c=relaxed/simple;
-	bh=7O6MbaId9Nb8b9j0WKr+vsl9Jx2BGX/0q90+hpo96iM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LCejEY+sHLp4VNNVzuPztstXWwBMCgzSoM0RjjmxBTUtklU4Z+aOLr30CKAc+YJ6thX5YdXctHWmTOy5VHgSQAGChRyYf0zc4GmaE2dXM86AqatdXb9+EaqgBm86AzW/bN7QvaDoNfCvQ+1esu4lx6dfx1CaD40gUikxQn4GeQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=b/dpgz6Q; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1787828596; c=relaxed/simple;
+	bh=xUcU4/ath3MB9X4umm3moMbocA/jtcRYF1kJ89FEfuM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KxixeASceDZbf4RGoqP8DUSHD1GRoU398ojfWfsMj8ucP0fCiTS/rN7ERiJOpRL4e4w0F6WTQOKWOLjarnl8ugPdy+g+0d2f08e2YpYJGiGH8ckMMuiPgKVh0ooz2zqxBKFi9nNs1skpg5xub9Q2HKIQx9Vh4BatUtDbuVilKHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com; dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b=iWjFxj8d; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="b/dpgz6Q"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67R76g9e3226533
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=ShcgQMBctIsn8TZEMCISgCsr983aptjCTwN
-	f435bejo=; b=b/dpgz6Qmg0K2RS2LjdhialOm5gTVvnAIwpVRkkwUnXXcCIQ4II
-	CU4B/1Dy0oulSQ2hSA8Fc2UrlJcKnqRiN4uISckxH8qQRm+Lz6cWMuITKmvDBrgI
-	L9xd+Fis+Xg+SIr7nEv6ZZEKgnJDALTms6Wz/I5a/nXbjYTuI/iiZ8iP2wioNc5v
-	0gEDv50a77z3jT94MpeRHLYc9gFeEKesGbCG+l2Hv4Vm79xCJA2ADFbhoFYOa41p
-	DwtgRp81y4ONd2B8tiybm0BLC8Xu2kLsHl91y8lVYxXvj8RhtFHCTT4EWaJsXeoH
-	XbGTJ+EH15NeuSBcRd4PTHq6df/5zgopLrA==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gagjfrbnt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:09 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 67R8Y0ut029399
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:06 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4g74ujdx81-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:06 +0000 (GMT)
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 67R8XrNM028811
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:37:06 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 67R8b65R000578
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Aug 2026 08:37:06 +0000 (GMT)
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 4453D22925; Thu, 27 Aug 2026 16:37:05 +0800 (CST)
-From: Jinwang Li <jinwang.li@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v1] gobex: Fix ABORT response being discarded
-Date: Thu, 27 Aug 2026 16:36:51 +0800
-Message-Id: <20260827083651.1355587-1-jinwang.li@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b="iWjFxj8d"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ceab75934dso24913025ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 04:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=synaptics-corp-partner-google-com.20251104.gappssmtp.com; s=20251104; t=1787828593; x=1788433393; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Z30Tt3xIoabTbn0/fF4p38d5mX0hzLF11O+CjT3QkYI=;
+        b=iWjFxj8dZ1jcL8ZJMZv1pSAz1/BNMjpgdPDiZsG4OVK7zaD8ArMT8Tb1w+HnTm1ZDr
+         alfI7uvtOVffIJadERkR1ulzNIBdgCajUoprQryVNivatxfgZy7479eBLUikb18QHkKW
+         pJCnZJoh8eLSz74lvJCteYhhniN4iETH7RCB1XIaaD0AqRKWeKLO4GUrooQrdwLC+GqP
+         vGGlWvCv9n/LzrppMi8e7tmd5M9jXqVciPy2vMJq6SP0C1J6ypGBFcT5YUV3UUiU/XWk
+         VjVliNtWlBCtONXIeDrEycZIvVNSbP68A6Ylt/bGeFNT7pBWQIc2snA53ZuYh6dMAs/G
+         oZIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787828593; x=1788433393;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Z30Tt3xIoabTbn0/fF4p38d5mX0hzLF11O+CjT3QkYI=;
+        b=jKoADNXNN6GaYN3QhGQ4b1D+73OKKt7um5ojPlWjiuVGrYbQSH/SHpY0u4Fs5D2KK1
+         gu+5PYm49+1hofVXmGkYvKXDbH5EY4bsdSI92JgZnOplEhN+ZbDOQw+VywgQeZVc3fQo
+         /VkSn61k1YqsgDrHrdM6Iqoef/FMDdCiBJgMs25ffQhTsBzT+9Y7OBbrLZhQhhUEs3kA
+         UXctSrpil2KIi8H/1bh+UBTWKRLW0JhXNJRnurPXerJ+AaWM0ArvzDgerx6/uPFIXDjE
+         HMtYYfS8yNFU34Ouzv9V4O7zpxeNEeZR/ss0bw2qg9rZMulfySlCVdbiNqEpq4JMme0n
+         DYlQ==
+X-Gm-Message-State: AFuF++lUWChiRGRiHK8pMwASN2XzPqIQiScz9fj4uMj3v1QNkOoPiqyp
+	pafd7+SYRCkKZEi/n8jkBtuG+GlNAWJVeZvQgrAlBef1IaKbS1dVnkdkyk3iZEIyS1G5Hfl0Sld
+	BeaKH1MlvMw==
+X-Gm-Gg: AR+sD12SW3qYmlsrLJ2PkKWy/9KGT8nvMppH5RmrgPxbgFaetCn3UXuq2vM/MzYPvK9
+	YQp7riQr/1AOno707q4+Dv1dTAWY+ekWLj0CozJ8fdQatiNAb6zMzyOFwgcWEX3dXScAWNvT5wY
+	54YbqqOdpqR8V8N+A1Xwrl5WwebwNKDS3eIsXZo91tdrgSpFwlLiIReXICZZAftWGX7JwPgRJZr
+	bdUIiyOSK4jglWf1ZG8Db51Rqb01Mj22r9BwceJtXkBic1vkyrS+/pR/dChFUvrrvDdjYkWVJAr
+	IGYSQtSfCNbH8oIv1zCjd2EEGnIjTpTBqmnv/+A9gtr1HSHq7Ds0MIOzfJ1Qh9WnzS8KbpO2tn2
+	+mt+m/TJRZwTrUfMrbGgFv8h+Mx8uZxD4fiGBzYJHilThXo8UKwJaIPNGMTLIHRdZ9e6wT4lX5s
+	faPzHuNV12ZFdm7+ia+GY9pebapFIORdZtGTxUdHuVwUnia9RoSqpeIzR8KHSnPvMS3iV/H7ZpM
+	6PfIMczDglxqSG7bIW3UNoWnd+IF+ZbLCfcv5LlG86sj8GaQQGiPTOJ+MLkMP+RydgDHP/RCbbW
+	LS58Cwg=
+X-Received: by 2002:a17:903:32c9:b0:2c9:df1b:e948 with SMTP id d9443c01a7336-2d7079eb7e9mr258015565ad.4.1787828593135;
+        Thu, 27 Aug 2026 04:03:13 -0700 (PDT)
+Received: from bt-tpe-server.synaptics-inc.local (59-124-75-166.hinet-ip.hinet.net. [59.124.75.166])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d704c4bea8sm15081585ad.82.2026.08.27.04.03.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2026 04:03:12 -0700 (PDT)
+From: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	Linus Walleij <linusw@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Andy Chang <andy.chang@synaptics.corp-partner.google.com>
+Subject: [PATCH v1 0/2] Add support for the Synaptics BCM4384 Bluetooth controller
+Date: Thu, 27 Aug 2026 19:02:40 +0800
+Message-Id: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -64,69 +80,21 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: Id1KnHadJ1_n-sVZeJIvyV2O-ygRAiTT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDA3MCBTYWx0ZWRfX8K4uGGLm4wwQ
- 5IgQJjLj4IvRPnsZSxW3szVIo2cKQNiezsRKKMGx9oT03GrvJBySbQY4D9eBU29WXNWNgsABAzu
- w+qptXMVMr/yMhbjIpLq+AGiz7zTRUqzgEdIoBx5AOVGL6EtVgJAudr1O0FOtLk6c7MWjzuaI/v
- qgSTTDur9rQQ1cyWUkLdGlUcDrRywMtjxiDh/Kp4RmH7ZeETBWxbOGkrD59w9wv+RqT4EsL8Un2
- GApVmTKfTe2kUtASUsb65maWJTrE3a2+UsnrpUoVYHxqtRqJw1cWbJTmMvbbzhpC0BfzhDhXWqj
- kru/EBeYR8B1es57ui3aJFgxWMhsvhIeMw33mirw+x50f7FOIPtsmCUkqWiHEgk7CiOT7fZ4wq7
- CTI6rkb5bA1r6qEOLJFuE2hpVqO6GDZFCwgtoXMQB6iUxKdYEdsFpgGBWjTESLDtkhmIvxDO3gN
- KPGFZ4ecCE/oZO/dEQA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDA3MCBTYWx0ZWRfX2ApPZ0d1ayIT
- JCoLJqDQ0rVvn+9nqqY0KjspRK7vDFMj6McEDjwWiAXXz1ts9YFfbZy0cRGArf9disuuPY8L4oi
- uoP6tEZA5ei+Ge6ZjfmgKSjEsqImn1k=
-X-Proofpoint-GUID: Id1KnHadJ1_n-sVZeJIvyV2O-ygRAiTT
-X-Authority-Analysis: v=2.4 cv=dd+wG3Xe c=1 sm=1 tr=0 ts=6a8ff735 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=rJkE3RaqiGZ5pbrm-msn:22 a=EUspDBNiAAAA:8 a=Ve9YV43bfDj327hqASQA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-27_03,2026-08-26_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0
- adultscore=0 suspectscore=0 impostorscore=0 malwarescore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608270070
 
-g_obex_drop_tx_queue() in transfer_complete() clears any pending tx,
-so the ABORT success response should be enqueued after transfer_complete().
+The first patch adds the BCM4384 Device Tree compatible string.
 
-Fixes the following PTS test cases:
-- OPP/SR/OPH/BV-27-I
-- FTP/SR/OTR/BV-02-C
-- PBAP/PSE/PDF/BV-06-I
-- PBAP/PSE/PBF/BV-03-I
+The second patch adds the controller support to the Broadcom
+Bluetooth driver
 
-Fixes: 7a35c12a6ceb ("gobex: Fix segfault caused by interrupted transfer")
-Assisted-by: Claude:claude-sonnet-5
-Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
----
- gobex/gobex-transfer.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Andy Chang (2):
+  Bluetooth: dt-bindings: net: bluetooth: add BCM4384
+  Bluetooth: btbcm: Add Synaptics 4384 chip support
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index c94d018b2..e4c7c557d 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -314,11 +314,12 @@ static void transfer_abort_req(GObex *obex, GObexPacket *req, gpointer user_data
- 
- 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
- 						"Request was aborted");
--	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
--	g_obex_send(obex, rsp, NULL);
- 
- 	transfer_complete(transfer, err);
- 	g_error_free(err);
-+
-+	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
-+	g_obex_send(obex, rsp, NULL);
- }
- 
- static guint8 put_get_bytes(struct transfer *transfer, GObexPacket *req)
+ .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml   | 1 +
+ drivers/bluetooth/btbcm.c                                   | 6 +++++-
+ drivers/bluetooth/hci_bcm.c                                 | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
 -- 
-2.34.1
+2.25.1
 
