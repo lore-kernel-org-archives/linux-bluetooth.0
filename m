@@ -1,25 +1,25 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA863C76A6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 14:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6A043E4A1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 14:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787842681; cv=none; b=Bz2LAJH8LB4Gz3u2h32yxqleTJWHE69oOIPH6dDaylhJqY4ZkNF9eILgo4bzmIfkCyShB+CLSTy46gLd4tH/GAAStUul77elRmI0pveDY8Y0tjnwscN/MPmmy+M8Ifv6lcLwh/nN4tczenQQN5zEcRkx8PLKUHheVuSzQJOavfs=
+	t=1787842705; cv=none; b=Eb5MCvVI4Hn61cYcswaFoN2Fdr2IR3zkZjvNnLLUzgOZZMPKRfKLZfBF6Skf9VtIt/UpyjP70C5fOZASyrceDGaE5YL6MiHuPzIsBie0e5LXaoIMBCAU87Vwq/JF/E+Ffu3nsxR+e2bhEzMNR/4D8DXTk8lMyg/VArMOSxBh5SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787842681; c=relaxed/simple;
-	bh=vssYs2cXPFzGirZhFnOtIfyltLL53GEB/HP8tE3vRJ4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=g4Dxv4AUU4+lgSNY6mEX1zHjvIcRyYdNgHEkaDJ/FTxWd/EZ0nlYlFaGUAdZkp7S6PaI8ZAJAG/LQ0ISghLKB4qY589xWAfHmTS2ttULNI1IzaiKZef238YdQcB56D+IooaE4XZQuNukdhB3MrQApDExvR/3JlORPXAw/D9J0yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+	s=arc-20240116; t=1787842705; c=relaxed/simple;
+	bh=AC1EfWTsOsaefEMPoMH0p5MkPXNJ3yg4n3ha6PlMOnc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=klOXwqy2foPJXPYtZx6S+JJfzMSbL/lpW3PEGGOER5kA7nj4w9KqbJJZE0dcJQUXqfU2DJbVv7OBNbzIRDVZju/WY5IJk6QxtjDAMXc4gaz6KiVacYSGnCQGtb50RGXIE2N9CpkQNaMKti1c/aYnoZUyowPXHbglZ3gpY2286pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CE0A83E98F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 14:57:50 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2CD203ECAA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 14:58:16 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] all: Fix typo in AVRCP_ATTRIBUTE_ILEGAL
-Date: Thu, 27 Aug 2026 16:57:38 +0200
-Message-ID: <20260827145742.1568129-1-hadess@hadess.net>
+Subject: [PATCH] bap: Fix stack buffer overflow in BlueZ LE Audio BASE parser
+Date: Thu, 27 Aug 2026 16:58:00 +0200
+Message-ID: <20260827145807.1568199-1-hadess@hadess.net>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -29,161 +29,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTE0+DRKOEJsvnh+ZUaP+Y29RQNBEDwZyeYuLFBNakSMBcg2EmpRRWIS73ooesbGng0y3HBSBFlpuLbs8PVwSochGp+vlcnwiyZ1+eqovq2azDwEPJwg45l9Vyn4INsBCeOlLvPV5Bzt99XOmsxvPhL+nsjadTjiynsjbPLGl69ZJ+IHs7xzuzykvKEtzDYhuPqBP3oa3NcLNoJ2yr0LuAg5Oq4SEivTr/iYKQKC5U48ge9XaQONexSixf3IRtnyijRyZwrF/hrwSO3rn5oGG8xa9lXl+mEPDj4bxeeuWXRsMdg3HS3dkMsOeG35suovKN70BeBo95X8uKMzDtVgeayDscoeNMpy998hU5iIKaqVye1j4ltc+3iVKMFVxbNKx/ziFsrN6TnL3TuBKx92cq9ufxSAeSxBQTcxEvTR3qIyfCbvYO6MKVeX3AA0MCdYRLsaSZ0X6+hs4XVnaKDOKeJx+YV2mScZbXmaq3ArpcHtxXv5u4T9L7b3Mt/qbA5A+ywXwxyJVdpArlBORPA66Ch8iloi9aDoXqmeHGE7KnUPkrm1ReyEcc3OjCk1aOdrvMZ+Js/eZqP3HXDWCjaSXERG6pbrYJQwNsTHhanFkPm6MadaG2fTqkI9PuAzQpSUUDd4L8lHBekXrXBcolZ6XTRTs8X7AbIRduaJLCVSwRzKfA
+X-GND-Cause: dmFkZTFaJDW2Uts6bpstXi2ABxShFfSJJIeUAfpuzroLYaMxR2WqFl1iQwaj6ZrEDV7Vq9DVy9cS1UuJxzz/tEmoc2+Vwo3s7YH2KGB32IZgE/iuUNeLteSc8Eerly5t8qxfpASnCBtmg9kAYEIUjZ73KOnoReuQaERtTGOdB3cHsChVr6aq5hVWHhgkOiaHbuZfwkTAEdQPh2vZb4YLGetS2z+a2HI6Y27lmCakFkEKMuT47gqXUKTPBTjNnC43hCKBm4HfdEZEiB9NgTmRjsi8WPAtDiycE461ERdbVdSJzfRvHZ/ZiCmAYZyi3/lvPSRFj2RO62EceoCAR35DU9C6rkYynOvIGCgFTB+yIxDLtpcPT6cLGm6Wfetiti3Y1d5LYYnawfQgdfQllK0KCWBpgWqIKEscII0D22hSYchKNADzZ04gVXUkgQ3ANj5NKjI7RSSGRcQo09k4UokxVyw5AHgW2/QCeZvEMJJmCV/D2MdAWpphQYgFibrsJi7raZBEck4dg2ogz5ixTOAlsb4RvdnyvDfL1dbUWZnEzcx38Z/aIW9JnYQqTu6VmguFefy2xT6SG1RGkfm8YVezXdp5wX+VJ2fva74Ymb4bm/vudeprNCQI4mJerN13hEdXrdovW8P5yXvoJetWScsibzItDyHlTwpGNFjpPdLDsMhafqjB8w
 X-GND-State: clean
 X-GND-Score: 0
 
-It's "illegal" not "ilegal".
----
- monitor/avctp.c        | 6 +++---
- profiles/audio/avrcp.c | 2 +-
- profiles/audio/avrcp.h | 2 +-
- tools/parser/avrcp.c   | 6 +++---
- unit/avrcp-lib.c       | 8 ++++----
- unit/avrcp-lib.h       | 2 +-
- 6 files changed, 13 insertions(+), 13 deletions(-)
+A stack buffer overflow (CWE-121) in bap_sink_match_allocation() in
+src/shared/bap.c allows an attacker within BLE range to write ~195
+attacker-controlled bytes past a 4-byte stack buffer in bluetoothd
+with no pairing, no connection, and no user interaction. The BAP
+profile auto-syncs to any device advertising the BCAAS UUID.
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 6309275f6efd..0db352f18ffd 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -141,7 +141,7 @@
- #define AVRCP_PACKET_TYPE_END		0x03
- 
- /* player attributes */
--#define AVRCP_ATTRIBUTE_ILEGAL		0x00
-+#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
- #define AVRCP_ATTRIBUTE_EQUALIZER	0x01
- #define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
- #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
-@@ -462,7 +462,7 @@ static const char *pt2str(uint8_t pt)
- static const char *attr2str(uint8_t attr)
+bap_sink_match_allocation() copies the value of an
+Audio_Channel_Allocation LTV (type 0x03) into a 4-byte uint32_t stack
+local using the LTV's attacker-controlled length byte as the memcpy
+size, with no upper bound check:
+	// src/shared/bap.c:7767
+	memcpy(&location32, v, l);  // l attacker-controlled, no upper bound
+
+A second identical instance exists in bap_sink_get_allocation() at line 2558.
+
+Per Bluetooth Assigned Numbers, Audio_Channel_Allocation is a fixed 4-octet
+bitfield; any other length is malformed.
+
+https://github.com/bluez/bluez/security/advisories/GHSA-9683-2chf-hfw9
+
+Co-Authored-by: @thaidn and @bronson-calif of Calif.io in collaboration with
+  Claude and Anthropic Research.
+Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration with
+  Claude and Anthropic Research.
+---
+ src/shared/bap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 1660b8b2c1cf..da3e265e2077 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2555,7 +2555,7 @@ static void bap_sink_get_allocation(size_t i, uint8_t l, uint8_t t,
  {
- 	switch (attr) {
--	case AVRCP_ATTRIBUTE_ILEGAL:
-+	case AVRCP_ATTRIBUTE_ILLEGAL:
- 		return "Illegal";
- 	case AVRCP_ATTRIBUTE_EQUALIZER:
- 		return "Equalizer ON/OFF Status";
-@@ -480,7 +480,7 @@ static const char *attr2str(uint8_t attr)
- static const char *value2str(uint8_t attr, uint8_t value)
- {
- 	switch (attr) {
--	case AVRCP_ATTRIBUTE_ILEGAL:
-+	case AVRCP_ATTRIBUTE_ILLEGAL:
- 		return "Illegal";
- 	case AVRCP_ATTRIBUTE_EQUALIZER:
- 		switch (value) {
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 028c1c254b82..3271b84782e8 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2413,7 +2413,7 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
+ 	uint32_t location32;
  
- 	for (i = 0; len > 0; len--, i++) {
- 		/* Don't query invalid attributes */
--		if (pdu->params[i + 1] == AVRCP_ATTRIBUTE_ILEGAL ||
-+		if (pdu->params[i + 1] == AVRCP_ATTRIBUTE_ILLEGAL ||
- 				pdu->params[i + 1] > AVRCP_ATTRIBUTE_LAST)
- 			continue;
+-	if (!v)
++	if (!v || l != sizeof(location32))
+ 		return;
  
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index b5381b4df234..21351a4bc422 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -10,7 +10,7 @@
-  */
+ 	memcpy(&location32, v, l);
+@@ -7764,7 +7764,7 @@ static void bap_sink_match_allocation(size_t i, uint8_t l, uint8_t t,
+ 	struct bt_ltv_match *data = user_data;
+ 	uint32_t location32;
  
- /* player attributes */
--#define AVRCP_ATTRIBUTE_ILEGAL		0x00
-+#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
- #define AVRCP_ATTRIBUTE_EQUALIZER	0x01
- #define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
- #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
-diff --git a/tools/parser/avrcp.c b/tools/parser/avrcp.c
-index 9f0c1596b4b9..7da9b0d07b3c 100644
---- a/tools/parser/avrcp.c
-+++ b/tools/parser/avrcp.c
-@@ -145,7 +145,7 @@
- #define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED		0x16
+-	if (!v)
++	if (!v || l != sizeof(location32))
+ 		return;
  
- /* player attributes */
--#define AVRCP_ATTRIBUTE_ILEGAL		0x00
-+#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
- #define AVRCP_ATTRIBUTE_EQUALIZER	0x01
- #define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
- #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
-@@ -471,7 +471,7 @@ static void avrcp_get_capabilities_dump(int level, struct frame *frm, uint16_t l
- static const char *attr2str(uint8_t attr)
- {
- 	switch (attr) {
--	case AVRCP_ATTRIBUTE_ILEGAL:
-+	case AVRCP_ATTRIBUTE_ILLEGAL:
- 		return "Illegal";
- 	case AVRCP_ATTRIBUTE_EQUALIZER:
- 		return "Equalizer ON/OFF Status";
-@@ -512,7 +512,7 @@ static void avrcp_list_player_attributes_dump(int level, struct frame *frm,
- static const char *value2str(uint8_t attr, uint8_t value)
- {
- 	switch (attr) {
--	case AVRCP_ATTRIBUTE_ILEGAL:
-+	case AVRCP_ATTRIBUTE_ILLEGAL:
- 		return "Illegal";
- 	case AVRCP_ATTRIBUTE_EQUALIZER:
- 		switch (value) {
-diff --git a/unit/avrcp-lib.c b/unit/avrcp-lib.c
-index 720775fd2603..1549f8145d5f 100644
---- a/unit/avrcp-lib.c
-+++ b/unit/avrcp-lib.c
-@@ -717,7 +717,7 @@ static bool check_attributes(uint8_t number, const uint8_t *attrs)
- 
- 	for (i = 0; i < number; i++) {
- 		if (attrs[i] > AVRCP_ATTRIBUTE_LAST ||
--					attrs[i] == AVRCP_ATTRIBUTE_ILEGAL)
-+					attrs[i] == AVRCP_ATTRIBUTE_ILLEGAL)
- 			return false;
- 	}
- 
-@@ -765,7 +765,7 @@ static ssize_t list_values(struct avrcp *session, uint8_t transaction,
- 
- 	req = (void *) params;
- 	if (req->attr > AVRCP_ATTRIBUTE_LAST ||
--					req->attr == AVRCP_ATTRIBUTE_ILEGAL)
-+					req->attr == AVRCP_ATTRIBUTE_ILLEGAL)
- 		return -EINVAL;
- 
- 	if (!player->ind || !player->ind->list_values)
-@@ -828,7 +828,7 @@ static ssize_t get_value_text(struct avrcp *session, uint8_t transaction,
- 		return -EINVAL;
- 
- 	if (req->number > AVRCP_ATTRIBUTE_LAST ||
--					req->number == AVRCP_ATTRIBUTE_ILEGAL)
-+					req->number == AVRCP_ATTRIBUTE_ILLEGAL)
- 		return -EINVAL;
- 
- 	if (!check_value(req->attr, req->number, req->values))
-@@ -3138,7 +3138,7 @@ int avrcp_get_player_attribute_text_rsp(struct avrcp *session,
- 		uint8_t len = 0;
- 
- 		if (attrs[i] > AVRCP_ATTRIBUTE_LAST ||
--					attrs[i] == AVRCP_ATTRIBUTE_ILEGAL)
-+					attrs[i] == AVRCP_ATTRIBUTE_ILLEGAL)
- 			return -EINVAL;
- 
- 		if (text[i])
-diff --git a/unit/avrcp-lib.h b/unit/avrcp-lib.h
-index 5adb321880e8..3979dcaa13a4 100644
---- a/unit/avrcp-lib.h
-+++ b/unit/avrcp-lib.h
-@@ -69,7 +69,7 @@
- #define CAP_EVENTS_SUPPORTED			0x03
- 
- /* Player Attributes */
--#define AVRCP_ATTRIBUTE_ILEGAL			0x00
-+#define AVRCP_ATTRIBUTE_ILLEGAL			0x00
- #define AVRCP_ATTRIBUTE_EQUALIZER		0x01
- #define AVRCP_ATTRIBUTE_REPEAT_MODE		0x02
- #define AVRCP_ATTRIBUTE_SHUFFLE			0x03
+ 	memcpy(&location32, v, l);
 -- 
 2.55.0
 
