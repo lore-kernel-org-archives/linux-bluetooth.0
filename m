@@ -1,68 +1,72 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCFC47013F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 16:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D3C41167E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 16:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787849616; cv=none; b=QenmSZeE796Ve3SLrwS2eXnMiLDPaqvHyYICfF31j/yzUazkRlnNag1L+k3//zJY21ry6m7FxN9asQ0/hXwOap2P8R3wft0qGnC1m2TkveitW6RnQN0NGxyLNj69eFTSvrmfY+0HpywIeb39vcqckh+U7k4740enjkmae7VHAMo=
+	t=1787849617; cv=none; b=UMQBdAgwO0eL9AOMkEimfulshzATbeKcRpkSqOl/ThZH9c7wi0HUEpKXbdFC9zZgeclJDTAb+6LDmC+SshoBR1ehIFB/5YNEeFPo24yHAeS/Qta9vQvM1kcrOy4mznoGuJMtV73o0XQet7rjNsmMJme++GgX1gmiaMHh8l89i1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787849616; c=relaxed/simple;
-	bh=iTV4xca70yfDU9vzLdwgEIM3u1tCsC1w2Xz5UWar3J4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=M/6hqdzUcdP5a+C0I2LVYFwR9mocmz1/h9l4Fkfa0vMjo+ZWJoDqYNUzoduivsEwEQ8CdI+Jb+3bGI2YKZDuM1ZkUD0SE554BuWWVbMjggLSooJuk3+SscooKQa3LE7MTZjWV1dAT9ovof+4hOcQ29XyBt01EfqabATeElNp8zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qtsHVv7e; arc=none smtp.client-ip=209.85.221.178
+	s=arc-20240116; t=1787849617; c=relaxed/simple;
+	bh=+51WsnDtmO1sHa8j5XH2djbvXqfmjUrONS4KdqT1o7k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ytvhn4ZTOL0DQJkXbwpc5QUv8nILncZ3dxWLVdH3rn17JoD4o97jBsL4wmG0NoMYRUw5+YfoYFecSJnOYP9YhjOKOhxXaAIy6PqXRU516eAUttW2T3ZMOnqu+pljVKMYHrOvqpCi/AcYy+ItxVip38dbzW6CGFXDRhB0TD5Cztk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Be1EOvh5; arc=none smtp.client-ip=209.85.221.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qtsHVv7e"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5bfaa014978so44209e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 09:53:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Be1EOvh5"
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5c2c46a428eso90524e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 09:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787849613; x=1788454413; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YiCnvhJz9tyQAOTuAqf4QzecYnE6UUOzKe5KpEzmhlM=;
-        b=qtsHVv7eKpeQabeXvsB28H3jeD2e6gksvvOYIfQd0pGroN2mIwa2kvy1PKiO83AX5G
-         l2FWl5urgl4/cVOwjVt3zS+WtY5i/uXtXklzU4aGUYhaxSCflZYX3pf2LZ2QX/qqZKWX
-         rG4ysTk2i/0s6FSzpZ+hlTUHClieexzEHlJaMA7b0BhteKu27oD3EmPt1x8njWiYOQoL
-         pgaCimgZPNq59eCrTFbNHxIR5nDg8kx8EaEW0enFduKKDxx7x8grefTZyYVKg9wBFHvW
-         dBMr4iDtQYWMRcKoWUhs7JZhMpcfJncGZol7PuXrRf+haL2ER4rOPtIGnWoDVQU1E1lp
-         qnKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787849613; x=1788454413;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1787849614; x=1788454414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=YiCnvhJz9tyQAOTuAqf4QzecYnE6UUOzKe5KpEzmhlM=;
-        b=JkkP0LQxShVYQyhk+vHiVd5OxIZmFgxOVR0ljDappPNyBUJjsTHm49e/KqoUQWlQck
-         DpSdUiocK3pYCc48yDxUxdu2u027Ud2i78ZfEWWfIJNZF7uYBye03SXVqKPPyQSYUpOl
-         dD6iqKTIFlO9BR6SdHnUBWfQ0TJjCc5Yw8Nhf5uEH6AbGsU1QKWG6miHEhG4I616FCTJ
-         k8Ni8eZBD1SkX4boarWCngL0bkTuQ1ehUlvMLqtaI8ZmtsW41RUS5DPEz9t8eEtT24xl
-         oxGpCMo8FKhZa8wqJV1+5hcGr74Qllt7WHDecWs4BngGmEVDC1pFmeBAwpmOgBpJ+N59
-         3M2Q==
-X-Gm-Message-State: AFuF++kuGpdaCTd7zhhHkPyPOyUW0VElN4v8dlraRHx3ufeRIrv2aEYl
-	MF9F7EDhKJYuDLCw6U53IvumjEusD1qs17b3b8wHwB6pYSCSSkWCNWgoRgpz+ap+
-X-Gm-Gg: AR+sD12BHVq4BXV694xrAy0WLg+VxPUQwBuiBk0FW6ot8pL4feNWesR78ya0RXSpnNo
-	eIvAxsRdnUev+kMDoyHOopywm7y7CsT4RHH1mpQfDJpIto7PzRQ+zzfniCbKYscOO+mau4WTCkj
-	4XmETmZNkbtO+XLzT2EBewdk81rhNkTQ0VO/ieKvMJLXurymJmkXZ6WLO3CsSM/OT+HC2Ikybpx
-	7ddW3hmPQ5z8ww0kuUxfJRDP+9JpcC5aLHcelswtZ/DfAEj48GYf+cou3la52PYALvYQcKycPBa
-	1NT34fA1PBL53DE/OYTKuF/R2bFYNRqOhuNgt8DGZ+vVMhp/N2Spgb1vSNaTwB5hHcedDzk6ZWs
-	p2tY75ELPEvM+Sy2gpfSh6EpZ2TJSbhoIEYDS7JU+TFVvX0cgyh3v2TUSWHx42BpYA88N5F7KbP
-	q5qaQNUbWRicoQEbx1IGtL6cmvvUQ3c1uxWksr/iFKEFD0V/2J98/vpN7dKYp6Zw0x50qcQbXOc
-	glm/aJ5NogravNS1tL3MFQ3Vbx3Q7o4vsTVFtiyrNc1K70DJSo1r8NFdnchMBfXnw==
-X-Received: by 2002:a05:6122:da5:b0:5bd:b2e1:e1f5 with SMTP id 71dfb90a1353d-5c680febed9mr169971e0c.2.1787849613156;
-        Thu, 27 Aug 2026 09:53:33 -0700 (PDT)
+        bh=1w80tISnmgMNs+VBIEkhaHKDKwS/eqcG4KqJLmG75Hk=;
+        b=Be1EOvh5RHi+FWl/y6quUY9y9kcsByjgoQi9f6uhU4C0hlxggrAThh7Sj3KrWFunWm
+         1JGK1vJbogd2dqLydzHhVWsfebviOAzvLPBSb+cZ+J1YCPdfAJZ2j2lwW5sdwba1tUJV
+         +liTIFpW2ZYnLzmSz4DSxQm00XFkAq3D0Q+3qbt5iq2//6UHMMPcMmlzjGHxncSALJVF
+         rMmI9ofgvWBOIx9cQhHCwe3Kre3y9TiczIWMYCyd9n0G1pdxGkCXLoa2zkBD3O1st8Yp
+         idW7wMLOF3UJtSJq8pKM+StzcN1hu9uDB04aTWW97G68LaodGCrnxOZAqAGhqnIvMgCx
+         yxKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787849614; x=1788454414;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=1w80tISnmgMNs+VBIEkhaHKDKwS/eqcG4KqJLmG75Hk=;
+        b=MnmMjTlE+DmXW5Uk4UkVhKnzLocvwfPaJJYbykyFsL71lgKQmJjOnR4xI0K3rSEmUD
+         8yjM0NcFKP2De2EoPWFZNf1hADqhFusUVW1W/RQ2qVUXnSJ+x+Rargdx7mwPey8TL4Xz
+         2kZ6BKB0GZ0VyGA5L2PNcgc9C/RGf5QM6wo2HDij+5iIyox5g6CY9qyL70gbbVmDX/C3
+         6JIFaJHsFkcVKrI4nJ2apBM81sbG7wj/bcpx9f4RWQ6mpAEIWCVR8XiK/iuO4HMGu0MP
+         luGyZRfl68mPiTUO1VFcAadodf5fFA/eNsuBCADyJp6bXbaY8SGYQfIkY4pOy0UPY+hv
+         6nxw==
+X-Gm-Message-State: AFuF++klMuDPR9BmFehjqJGtmFPwtN3d5ubHnJv1CMmVB6Nf0XUnrU96
+	51PrSgF51uyNwx5H94cuozxEl/v8vdW7jCjvtyOS4NCw9+SiBz8yPwxeQJ5cF97i
+X-Gm-Gg: AR+sD12T/+fbglHsibZaYNwj8gSd8L9kw8QZs/aTM9Vxv6cWQYby3XcVuRyMwcKgKgf
+	hBRqNnudi7MIKai5Shftijs6L4f9ON71JvA/f3HuX2m5rzK9JimpW2cfj+ioJyq+YN/YJvGQ06k
+	DWCCDAk5uyf/mUdJH5/C07o1TnUa0AXoV0HBdHQTIFOAzk24xjJdsEt6+w6ecbOGE3S87JyD1gn
+	n2hnHBTvgJvY2ws0OVda9YI+Ys7VM32JErdpXixxh05WjmYbxMgLKfna/RY71R6ikfGSojTMaKX
+	3/a7QkQBzRz43I2OZuO7rBUR9ieArS8l/baTKP/7i4+/p142Hx6Kzk8TWd/4K2d2y+o9gMfREVc
+	S2Xz8szrG8/HJeeEK8G749bs803F3h00zW5e31n+TwXxVsj234D8q53VRt00NtiudaI044VXwOU
+	JDKVgby+O/LrPPMCLWAN5QxdeyiAs+ZHlz9zQff/32iOA8T09tDXo7+B1vKTtRMy1oD46m5JJ7Q
+	DjSyA5B98v+uZ4J6V1ge/K7P9KErR3GRAp0d59mN4Ed77dtt9GlkdI=
+X-Received: by 2002:a05:6122:6c13:b0:5c2:cffc:2c55 with SMTP id 71dfb90a1353d-5c680eea11bmr244740e0c.0.1787849614375;
+        Thu, 27 Aug 2026 09:53:34 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c6600aeabcsm4155489e0c.17.2026.08.27.09.53.31
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c6600aeabcsm4155489e0c.17.2026.08.27.09.53.33
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Aug 2026 09:53:32 -0700 (PDT)
+        Thu, 27 Aug 2026 09:53:33 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ vRFC 1/4] test-runner: Add support for PCIe passthrough
-Date: Thu, 27 Aug 2026 12:53:23 -0400
-Message-ID: <20260827165326.350079-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ vRFC 2/4] monitor: Add latency standard deviation
+Date: Thu, 27 Aug 2026 12:53:24 -0400
+Message-ID: <20260827165326.350079-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260827165326.350079-1-luiz.dentz@gmail.com>
+References: <20260827165326.350079-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,497 +77,163 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add a -P/--pcie option which passes the given QEMU device arguments
-through to QEMU, in the same way -U/--usb does for USB devices, so a
-host controller can be handed to the guest:
+The latency range and moving average alone do not tell a link that is
+consistently slow apart from one that is unstable. A high average with a
+low deviation points at the scheduling or the interval configuration,
+while a low average with a high deviation points at interference,
+retransmissions or controller buffer stalls.
 
-  $ tools/test-runner -P "vfio-pci,host=0000:00:14.3" \
-        -d -k /pathto/bzImage -- /bin/bash
+Track the sample count along with the sum and the sum of the squares in
+struct packet_latency, and report the resulting standard deviation on
+the latency lines of both the live decoding and the analyze mode.
 
-The device does not have to be prepared by hand: the BDF is taken from
-the host= argument and bound to vfio-pci, and the driver it was bound to
-before is restored once the guest exits. As VFIO can only pass through a
-device if the rest of its IOMMU group is unbound or already handled by
-VFIO, the group is checked before the device is taken away from its
-driver, so a group that cannot be used is reported instead of leaving
-the device behind on vfio-pci.
+The samples are squared in usec and only scaled down to msec^2
+afterwards, so that the sub-msec resolution is not lost while the
+running sum stays clear of an overflow.
 
-Restoring the driver means QEMU can no longer simply replace this
-process, so with -P it is started as a child and SIGINT, SIGTERM and
-SIGHUP are forwarded to it, leaving this process to restore the driver
-once QEMU is reaped.
+The model derived the accumulator layout and the scaling, which the
+author reviewed and verified against an independently computed
+deviation.
 
-Since vfio-pci requires ACPI for device enumeration and an APIC for MSI
-delivery, the guest command line drops "acpi=off pci=noacpi noapic" when
--P is given. All other modes keep the previous command line and are
-still exec'ed directly.
-
-Tested by passing a PCIe card reader through to the guest, checking that
-it is bound to vfio-pci while the guest runs and bound back to its own
-driver afterwards.
-
-The model drafted the option handling, the vfio binding, the command
-line change and the documentation section; all of it was reviewed and
-tested by the author.
-
-Assisted-by: Claude:claude-opus-5
+Assisted-by: opencode:claude-opus-5
 ---
- doc/test-runner.rst |  28 ++++
- tools/test-runner.c | 317 ++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 337 insertions(+), 8 deletions(-)
+ Makefile.tools    |  2 +-
+ monitor/analyze.c |  6 ++++--
+ monitor/packet.c  | 41 +++++++++++++++++++++++++++++++++++++++--
+ monitor/packet.h  |  4 ++++
+ 4 files changed, 48 insertions(+), 5 deletions(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index a650c6fae571..6787507c3f40 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -23,6 +23,7 @@ OPTIONS
- :-A/-audio[=path]: Start audio server
- :-u/--unix[=path]: Provide serial device
- :-U/--usb=<qemu_args>: Provide USB device
-+:-P/--pcie=<qemu_args>: Provide PCIe device
- :-q/--qemu=<path>: QEMU binary
- :-k/--kernel=<image>: Kernel image (bzImage)
- :-h/--help: Show help options
-@@ -230,3 +231,30 @@ In addition the above kernel config option the following is required:
+diff --git a/Makefile.tools b/Makefile.tools
+index b3ef4ae1c3df..8f9ffe97cbf0 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -62,7 +62,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				src/settings.h src/settings.c
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-mainloop.la \
+-				$(GLIB_LIBS) $(UDEV_LIBS) -ldl
++				$(GLIB_LIBS) $(UDEV_LIBS) -ldl -lm
  
- 	$ tools/test-runner -U "usb-host,vendorid=<0xxxxx>,productid=<0xxxxx>" \
- 	-d -k /pathto/bzImage -- /bin/bash
-+
-+Running shell with host controller PCIe-passthrough
-+---------------------------------------------------
-+
-+In addition the above kernel config option the following is required:
-+
-+.. code-block::
-+
-+	CONFIG_PCI=y
-+	CONFIG_PCI_MSI=y
-+	CONFIG_ACPI=y
-+	CONFIG_BT_HCIBTINTEL_PCIE=y
-+
-+On the host, an IOMMU must be enabled in the firmware and on the host kernel
-+command line (``intel_iommu=on`` or ``amd_iommu=on``). The controller itself
-+does not need any manual preparation: test-runner unbinds it from its current
-+driver, binds it to vfio-pci, and restores the original driver once the guest
-+exits.
-+
-+.. code-block::
-+
-+	$ tools/test-runner -P "vfio-pci,host=0000:00:14.3" \
-+	-d -k /pathto/bzImage -- /bin/bash
-+
-+Note that unlike the other modes, PCIe-passthrough boots the guest with ACPI
-+and APIC enabled, as these are required for device enumeration and MSI
-+interrupt delivery.
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index a11dc01a9ee4..63fedece0023 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -23,6 +23,7 @@
- #include <string.h>
- #include <getopt.h>
- #include <poll.h>
-+#include <dirent.h>
+ if MANPAGES
+ man_MANS += doc/btmon.1
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index de9c23603a21..b349887716da 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -155,10 +155,12 @@ static void print_stats(struct hci_stats *stats, const char *label)
+ 		return;
+ 
+ 	print_field("%s packets: %zu/%zu", label, stats->num, stats->num_comp);
+-	print_field("%s Latency: %lld-%lld msec (~%lld msec)", label,
++	print_field("%s Latency: %lld-%lld msec (~%lld msec +/- %lld msec)",
++			label,
+ 			TV_MSEC(stats->latency.min),
+ 			TV_MSEC(stats->latency.max),
+-			TV_MSEC(stats->latency.med));
++			TV_MSEC(stats->latency.med),
++			packet_latency_stddev(&stats->latency));
+ 	print_field("%s size: %u-%u octets (~%zd octets)", label,
+ 			stats->min, stats->max, stats->bytes / stats->num);
+ 
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 0d3b23cc3fb7..174d844c05cb 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -27,6 +27,7 @@
+ #include <sys/time.h>
+ #include <sys/socket.h>
  #include <limits.h>
- #include <sys/wait.h>
- #include <sys/stat.h>
-@@ -60,6 +61,7 @@ static const char *qemu_binary = NULL;
- static const char *kernel_image = NULL;
- static char *audio_server;
- static char *usb_dev;
-+static char *pcie_dev;
- static char *extra_opts[EXTRA_OPT_MAX];
- static int num_extra_opts;
++#include <math.h>
  
-@@ -260,12 +262,257 @@ static void check_virtualization(void)
- #endif
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/uuid.h"
+@@ -11524,8 +11525,27 @@ static void role_change_evt(struct timeval *tv, uint16_t index,
+ 
+ void packet_latency_add(struct packet_latency *latency, struct timeval *delta)
+ {
++	uint64_t usec;
++
+ 	timeradd(&latency->total, delta, &latency->total);
+ 
++	/*
++	 * Negative deltas are the result of out of order timestamps and
++	 * would only skew the deviation, so leave them out.
++	 */
++	if (delta->tv_sec >= 0 && delta->tv_usec >= 0) {
++		usec = (uint64_t)delta->tv_sec * 1000000 + delta->tv_usec;
++
++		latency->count++;
++		latency->sum_usec += usec;
++		/*
++		 * Square first and scale down to msec^2 afterwards so the
++		 * sub-msec resolution is not lost, while keeping the running
++		 * sum well clear of an overflow.
++		 */
++		latency->sum_sq_msec += (usec * usec) / 1000000;
++	}
++
+ 	if ((!timerisset(&latency->min) || timercmp(delta, &latency->min, <))
+ 				&& delta->tv_sec >= 0 && delta->tv_usec >= 0)
+ 		latency->min = *delta;
+@@ -11553,6 +11573,21 @@ void packet_latency_add(struct packet_latency *latency, struct timeval *delta)
+ 		latency->med = *delta;
  }
  
--static void start_qemu(void)
-+#define PCI_DEVICES_PATH "/sys/bus/pci/devices"
-+
-+static char pcie_bdf[16];
-+static char pcie_driver[64];
-+
-+static bool sysfs_write(const char *path, const char *value)
++long long packet_latency_stddev(const struct packet_latency *latency)
 +{
-+	int fd;
-+	ssize_t len;
++	double mean, var;
 +
-+	fd = open(path, O_WRONLY);
-+	if (fd < 0) {
-+		perror(path);
-+		return false;
-+	}
++	if (latency->count < 2)
++		return 0;
 +
-+	len = write(fd, value, strlen(value));
-+	close(fd);
++	mean = (double)latency->sum_usec / latency->count / 1000;
++	var = (double)latency->sum_sq_msec / latency->count - mean * mean;
++	if (var <= 0)
++		return 0;
 +
-+	if (len < 0) {
-+		perror(path);
-+		return false;
-+	}
-+
-+	return true;
++	return (long long)sqrt(var);
 +}
 +
-+static bool pcie_parse_bdf(const char *opts, char *bdf, size_t size)
-+{
-+	unsigned int domain, bus, dev, func;
-+	const char *ptr;
-+	char addr[32];
-+	size_t len;
-+
-+	ptr = strstr(opts, "host=");
-+	if (!ptr)
-+		return false;
-+
-+	ptr += 5;
-+	len = strcspn(ptr, ",");
-+	if (!len || len >= sizeof(addr))
-+		return false;
-+
-+	memcpy(addr, ptr, len);
-+	addr[len] = '\0';
-+
-+	if (sscanf(addr, "%x:%x:%x.%x", &domain, &bus, &dev, &func) != 4) {
-+		domain = 0;
-+		if (sscanf(addr, "%x:%x.%x", &bus, &dev, &func) != 3) {
-+			fprintf(stderr, "Invalid PCI address %s\n", addr);
-+			return false;
-+		}
-+	}
-+
-+	snprintf(bdf, size, "%04x:%02x:%02x.%x", domain, bus, dev, func);
-+
-+	return true;
-+}
-+
-+static void load_module(const char *name)
-+{
-+	pid_t pid;
-+
-+	pid = fork();
-+	if (pid < 0)
-+		return;
-+
-+	if (pid == 0) {
-+		char *argv[3] = { "/sbin/modprobe", (char *) name, NULL };
-+
-+		execv(argv[0], argv);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	waitpid(pid, NULL, 0);
-+}
-+
-+/* Returns the name of the driver currently bound to the given device, or
-+ * NULL if the device is not bound to any driver.
-+ */
-+static const char *pcie_get_driver(const char *bdf, char *buf, size_t size)
-+{
-+	char path[PATH_MAX], link[PATH_MAX];
-+	const char *name;
-+	ssize_t len;
-+
-+	snprintf(path, sizeof(path), PCI_DEVICES_PATH "/%s/driver", bdf);
-+
-+	len = readlink(path, link, sizeof(link) - 1);
-+	if (len < 0)
-+		return NULL;
-+
-+	link[len] = '\0';
-+
-+	name = strrchr(link, '/');
-+	name = name ? name + 1 : link;
-+
-+	snprintf(buf, size, "%.*s", (int) size - 1, name);
-+
-+	return buf;
-+}
-+
-+static bool pcie_probe(const char *bdf)
-+{
-+	return sysfs_write("/sys/bus/pci/drivers_probe", bdf);
-+}
-+
-+/* VFIO can only pass through a device if every other device in its IOMMU
-+ * group is either unbound or already handled by VFIO, so check that before
-+ * taking the device away from its driver.
-+ */
-+static bool pcie_group_viable(const char *bdf)
-+{
-+	char path[PATH_MAX], driver[64];
-+	struct dirent *entry;
-+	bool viable = true;
-+	DIR *dir;
-+
-+	snprintf(path, sizeof(path),
-+			PCI_DEVICES_PATH "/%s/iommu_group/devices", bdf);
-+
-+	dir = opendir(path);
-+	if (!dir) {
-+		fprintf(stderr, "No IOMMU group for %s, "
-+				"is the IOMMU enabled?\n", bdf);
-+		return false;
-+	}
-+
-+	while ((entry = readdir(dir))) {
-+		const char *name = entry->d_name;
-+
-+		if (name[0] == '.' || !strcmp(name, bdf))
-+			continue;
-+
-+		if (!pcie_get_driver(name, driver, sizeof(driver)) ||
-+				!strcmp(driver, "vfio-pci") ||
-+				!strcmp(driver, "pci-stub"))
-+			continue;
-+
-+		fprintf(stderr, "Device %s in the same IOMMU group is bound "
-+				"to %s\n", name, driver);
-+		viable = false;
-+	}
-+
-+	closedir(dir);
-+
-+	if (!viable)
-+		fprintf(stderr, "IOMMU group of %s is not viable for "
-+				"passthrough\n", bdf);
-+
-+	return viable;
-+}
-+
-+/* Binds the device given with -P to vfio-pci so it can be handed to the
-+ * guest, remembering the driver it was bound to so it can be restored once
-+ * the guest is done with it.
-+ */
-+static void pcie_bind_vfio(void)
-+{
-+	char path[PATH_MAX];
-+	const char *driver;
-+	struct stat st;
-+
-+	if (!pcie_parse_bdf(pcie_dev, pcie_bdf, sizeof(pcie_bdf)))
-+		return;
-+
-+	snprintf(path, sizeof(path), PCI_DEVICES_PATH "/%s", pcie_bdf);
-+	if (stat(path, &st) < 0) {
-+		fprintf(stderr, "PCI device %s not found\n", pcie_bdf);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	load_module("vfio-pci");
-+
-+	driver = pcie_get_driver(pcie_bdf, pcie_driver, sizeof(pcie_driver));
-+	if (driver && !strcmp(driver, "vfio-pci")) {
-+		printf("Device %s already bound to vfio-pci\n", pcie_bdf);
-+		pcie_bdf[0] = '\0';
-+		return;
-+	}
-+
-+	if (!pcie_group_viable(pcie_bdf))
-+		exit(EXIT_FAILURE);
-+
-+	if (driver) {
-+		printf("Unbinding %s from %s\n", pcie_bdf, driver);
-+
-+		snprintf(path, sizeof(path),
-+				PCI_DEVICES_PATH "/%s/driver/unbind", pcie_bdf);
-+		if (!sysfs_write(path, pcie_bdf)) {
-+			fprintf(stderr, "Failed to unbind %s\n", pcie_bdf);
-+			exit(EXIT_FAILURE);
-+		}
-+	} else {
-+		pcie_driver[0] = '\0';
-+	}
-+
-+	printf("Binding %s to vfio-pci\n", pcie_bdf);
-+
-+	snprintf(path, sizeof(path),
-+			PCI_DEVICES_PATH "/%s/driver_override", pcie_bdf);
-+	if (!sysfs_write(path, "vfio-pci") || !pcie_probe(pcie_bdf)) {
-+		fprintf(stderr, "Failed to bind %s to vfio-pci\n", pcie_bdf);
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
-+/* Undoes pcie_bind_vfio() */
-+static void pcie_unbind_vfio(void)
-+{
-+	char path[PATH_MAX];
-+
-+	if (!pcie_bdf[0])
-+		return;
-+
-+	printf("Unbinding %s from vfio-pci\n", pcie_bdf);
-+
-+	snprintf(path, sizeof(path),
-+			PCI_DEVICES_PATH "/%s/driver/unbind", pcie_bdf);
-+	sysfs_write(path, pcie_bdf);
-+
-+	snprintf(path, sizeof(path),
-+			PCI_DEVICES_PATH "/%s/driver_override", pcie_bdf);
-+	sysfs_write(path, "\n");
-+
-+	if (!pcie_driver[0])
-+		return;
-+
-+	printf("Binding %s back to %s\n", pcie_bdf, pcie_driver);
-+
-+	pcie_probe(pcie_bdf);
-+}
-+
-+static pid_t qemu_pid;
-+
-+/* Forwards the signal to QEMU so it can shutdown, the host driver is then
-+ * restored once it is reaped.
-+ */
-+static void qemu_signal(int sig)
-+{
-+	if (qemu_pid > 0)
-+		kill(qemu_pid, sig);
-+}
-+
-+static int start_qemu(void)
+ static void packet_dequeue_tx(struct timeval *tv, uint16_t handle)
  {
- 	char cwd[PATH_MAX/2], initcmd[PATH_MAX], testargs[PATH_MAX];
- 	char cmdline[CMDLINE_MAX];
- 	char **argv;
--	int i, pos;
-+	int i, pos, status = 0;
-+	pid_t pid;
- 
- 	check_virtualization();
- 
-@@ -296,11 +543,15 @@ static void start_qemu(void)
- 				"console=hvc0 earlyprintk=serial "
- 				"no_hash_pointers=1 rootfstype=9p "
- 				"rootflags=trans=virtio,version=9p2000.u "
--				"acpi=off pci=noacpi noapic quiet ro init=%s "
-+				"%s quiet ro init=%s "
- 				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
- 				"TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
- 				"TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
- 				"TESTAUTO=%u TESTAUDIO='%s' TESTARGS=\'%s\'",
-+				/* PCIe passthrough requires ACPI and APIC for
-+				 * device enumeration and MSI interrupts.
-+				 */
-+				pcie_dev ? "" : "acpi=off pci=noacpi noapic",
- 				initcmd, cwd, start_dbus, start_daemon,
- 				start_dbus_session,
- 				start_monitor, num_emulator, num_devs,
-@@ -310,6 +561,7 @@ static void start_qemu(void)
- 	argv = alloca(sizeof(qemu_argv) +
- 			(sizeof(char *) * (8 + (num_devs * 4))) +
- 			(sizeof(char *) * (usb_dev ? 4 : 0)) +
-+			(sizeof(char *) * (pcie_dev ? 2 : 0)) +
- 			(sizeof(char *) * num_extra_opts));
- 	memcpy(argv, qemu_argv, sizeof(qemu_argv));
- 
-@@ -354,12 +606,58 @@ static void start_qemu(void)
- 		argv[pos++] = usb_dev;
+ 	struct packet_conn_data *conn;
+@@ -11585,10 +11620,12 @@ static void packet_dequeue_tx(struct timeval *tv, uint16_t handle)
+ 	if (TV_MSEC(delta)) {
+ 		print_field("#%zu: len %zu (%lld Kb/s)", frame->num, frame->len,
+ 				frame->len * 8 / TV_MSEC(delta));
+-		print_field("Latency: %lld msec (%lld-%lld msec ~%lld msec)",
++		print_field("Latency: %lld msec (%lld-%lld msec ~%lld msec "
++				"+/- %lld msec)",
+ 				TV_MSEC(delta), TV_MSEC(conn->tx_l.min),
+ 				TV_MSEC(conn->tx_l.max),
+-				TV_MSEC(conn->tx_l.med));
++				TV_MSEC(conn->tx_l.med),
++				packet_latency_stddev(&conn->tx_l));
  	}
  
-+	if (pcie_dev) {
-+		argv[pos++] = "-device";
-+		argv[pos++] = pcie_dev;
-+	}
-+
- 	for (i = 0; i < num_extra_opts; ++i)
- 		argv[pos++] = extra_opts[i];
+ 	l2cap_dequeue_frame(&delta, conn);
+diff --git a/monitor/packet.h b/monitor/packet.h
+index 73a86f64b242..6b792c0e420c 100644
+--- a/monitor/packet.h
++++ b/monitor/packet.h
+@@ -31,6 +31,9 @@ struct packet_latency {
+ 	struct timeval min;
+ 	struct timeval max;
+ 	struct timeval med;
++	uint64_t count;
++	uint64_t sum_usec;	/* Sum of samples, in usec */
++	uint64_t sum_sq_msec;	/* Sum of squared samples, in msec^2 */
+ };
  
- 	argv[pos] = NULL;
+ struct packet_frame {
+@@ -69,6 +72,7 @@ struct packet_conn_data {
  
--	execve(argv[0], argv, qemu_envp);
-+	if (!pcie_dev) {
-+		execve(argv[0], argv, qemu_envp);
-+		return EXIT_FAILURE;
-+	}
-+
-+	/* With a device passed through the host driver has to be restored
-+	 * once the guest is done with it, so QEMU cannot simply replace this
-+	 * process here.
-+	 */
-+	pcie_bind_vfio();
-+
-+	pid = fork();
-+	if (pid < 0) {
-+		perror("Failed to fork new process");
-+		pcie_unbind_vfio();
-+		return EXIT_FAILURE;
-+	}
-+
-+	if (pid == 0) {
-+		execve(argv[0], argv, qemu_envp);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	qemu_pid = pid;
-+
-+	/* Terminate QEMU rather than this process, so the host driver can be
-+	 * restored below.
-+	 */
-+	signal(SIGINT, qemu_signal);
-+	signal(SIGTERM, qemu_signal);
-+	signal(SIGHUP, qemu_signal);
-+
-+	while (waitpid(pid, &status, 0) < 0) {
-+		if (errno != EINTR)
-+			break;
-+	}
-+
-+	qemu_pid = -1;
-+
-+	pcie_unbind_vfio();
-+
-+	return WIFEXITED(status) ? WEXITSTATUS(status) : EXIT_FAILURE;
- }
+ struct packet_conn_data *packet_get_conn_data(uint16_t handle);
+ void packet_latency_add(struct packet_latency *latency, struct timeval *delta);
++long long packet_latency_stddev(const struct packet_latency *latency);
  
- static int open_serial(const char *path)
-@@ -1222,6 +1520,7 @@ static void usage(void)
- 		"\t-A, --audio[=path]     Start audio server\n"
- 		"\t-u, --unix[=path]      Provide serial device\n"
- 		"\t-U, --usb <qemu_args>  Provide USB device\n"
-+		"\t-P, --pcie <qemu_args> Provide PCIe device\n"
- 		"\t-q, --qemu <path>      QEMU binary\n"
- 		"\t-H, --qemu-host-cpu    Use host CPU (requires KVM support)\n"
- 		"\t-k, --kernel <image>   Kernel bzImage or source tree path\n"
-@@ -1243,6 +1542,7 @@ static const struct option main_options[] = {
- 	{ "kernel",  required_argument, NULL, 'k' },
- 	{ "audio",   optional_argument, NULL, 'A' },
- 	{ "usb",     required_argument, NULL, 'U' },
-+	{ "pcie",    required_argument, NULL, 'P' },
- 	{ "option",  required_argument, NULL, 'o' },
- 	{ "version", no_argument,       NULL, 'v' },
- 	{ "help",    no_argument,       NULL, 'h' },
-@@ -1265,7 +1565,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "au::bdsl::mq:Hk:A::U:o:vh",
-+		opt = getopt_long(argc, argv, "au::bdsl::mq:Hk:A::U:P:o:vh",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -1310,6 +1610,9 @@ int main(int argc, char *argv[])
- 		case 'U':
- 			usb_dev = optarg;
- 			break;
-+		case 'P':
-+			pcie_dev = optarg;
-+			break;
- 		case 'o':
- 			if (num_extra_opts >= EXTRA_OPT_MAX) {
- 				fprintf(stderr, "Too many -o\n");
-@@ -1362,7 +1665,5 @@ int main(int argc, char *argv[])
- 	printf("Using QEMU binary %s\n", qemu_binary);
- 	printf("Using kernel image %s\n", kernel_image);
- 
--	start_qemu();
--
--	return EXIT_SUCCESS;
-+	return start_qemu();
- }
+ bool packet_has_filter(unsigned long filter);
+ void packet_set_filter(unsigned long filter);
 -- 
 2.54.0
 
