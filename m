@@ -1,35 +1,36 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E626175D53
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 15:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F3A40A929
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 15:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787844467; cv=none; b=kW7KTR1xLFgrGDEM/gtI64VPmJ+Y/DOTtVN6WMSTY2Oo52uKPKg1YuxpIgHqVeM/uNYwWS8bo5pjt6EmCeictXL0x1iKRVkS0ciESDb/+4pE65RC+00XyXPje73VXd+/MPtXpN/oMQR8+DvXm1QA6SybjWA3XvwVv9CRA5CyEJ8=
+	t=1787844472; cv=none; b=edzkm0yUosx0rXlTQguSXitv349Ry413wkjWHSzbvPZpKdQ66Zu98abHlqiE2hNpp8KKIsQDy6z7U4Ko1j+XGOaWqd73A/WQHaacohtNoBezv+d9PlR9CI2I9XY6jjAnaXzaYWkW2hqsL82GGHJ7TSDPu391XBj7cHR5qrkgcpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787844467; c=relaxed/simple;
-	bh=2wHJBSyBWtIqVWPJUZgJI3c56QO0m8rXWfFJqrVeLRo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GiucspAT3Yazi20cqft8vra4TrNOI2F6m0gfoJns+whdSTiOMcGB8QqeRXGZhv2fxfNO1xDbmu45AkhjUFkDnyofUza5AGl1dZKXf1EEq9QnKcBQNUgxHqMkqTgeqvNkc6ec6WoT6+Jzu6nn1iaV2bm7PN+IC8fKXk7Lr4DsCoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NZeaBnXn; arc=none smtp.client-ip=192.30.252.203
+	s=arc-20240116; t=1787844472; c=relaxed/simple;
+	bh=RTMgzL98XkPIxGkleY+0KoK01mKXHK+bd05fgvBlEGE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=M6LhGA5H/BH1o7q/Lv9YKTig7gfb4zC+aRNa0IwZCfCG0XMbb7XKuqBLs8TG9r+v3T5s+W6bgB7bEqdqxc/c5mFTe2p7ZeF+raOq/DsMITy8sDqt2BNBP3rTtA0S52IFgcxXGVobeKS6vTHQ4/qc2wOTSidYjSDrj3aClrythn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CEyh6GPl; arc=none smtp.client-ip=192.30.252.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NZeaBnXn"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CEyh6GPl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787844465;
-	bh=M7POaDjTcCbXnkya7pjDq41heVKTtomCMLDkPmI0VKo=;
+	s=pf2023; t=1787844470;
+	bh=y8CxehnwXOy5VN9xwcCJjXGJhVTsMwFU8QSaJ+UranM=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NZeaBnXnR3lKrdIAX8zYMlrSS/NLbW98WsiLTt1Out9QvAcfhXP2ZSBlQjvIEKW3T
-	 WBVzKfEmKxCW6xfIuyzgBR8ZrHCgoXF6Rn1CIZpuKYUPmpkPefD3ryx6FG/KRNU+Nd
-	 cU7mLecGUufz43DWEbPgHjJgPwBBXI8/1zCBgtYg=
-Received: from github.com (hubbernetes-node-31e80f5.va3-iad.github.net [10.48.81.64])
-	by smtp.github.com (Postfix) with ESMTPA id 9C408801176
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:27:45 -0700 (PDT)
-Date: Thu, 27 Aug 2026 08:27:45 -0700
-From: "github-actions[bot]" <noreply@github.com>
+	b=CEyh6GPlkzXRAcS46zRGPZFCYV7NklTV7ja+LgYZnN1YdYt1FYKU7Z7VYJs1rxD4C
+	 FIM/GTc6fV5eGueDkCIc7nqkXXXiytZ1b709jvC8wIt30+NnnGRMf586+aBF5pZbei
+	 +uTOF73r0PMNSKDmR4eeANV9R3wKFVenva7n7PZ0=
+Received: from github.com (hubbernetes-node-63e25fe.ac4-iad.github.net [10.52.85.58])
+	by smtp.github.com (Postfix) with ESMTPA id 29DBA780980
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 08:27:50 -0700 (PDT)
+Date: Thu, 27 Aug 2026 08:27:50 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1152525/000000-a0f261@github.com>
-Subject: [bluez/bluez] a0f261: gobex: Fix ABORT response being discarded
+Message-ID: <bluez/bluez/push/refs/heads/1152688/000000-e829f2@github.com>
+Subject: [bluez/bluez] e829f2: bass: Fix heap buffer overflow allocating
+ subgroup...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,32 +43,36 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1152525
+  Branch: refs/heads/1152688
   Home:   https://github.com/bluez/bluez
-  Commit: a0f26144ab32f4f10e0f1b9171e212e86f459f17
-      https://github.com/bluez/bluez/commit/a0f26144ab32f4f10e0f1b9171e212e86f459f17
-  Author: Jinwang Li <jinwang.li@oss.qualcomm.com>
+  Commit: e829f2acc601a8b8ac917957c06c175d38b79c27
+      https://github.com/bluez/bluez/commit/e829f2acc601a8b8ac917957c06c175d38b79c27
+  Author: Bastien Nocera <hadess@hadess.net>
   Date:   2026-08-27 (Thu, 27 Aug 2026)
 
   Changed paths:
-    M gobex/gobex-transfer.c
+    M src/shared/bass.c
 
   Log Message:
   -----------
-  gobex: Fix ABORT response being discarded
+  bass: Fix heap buffer overflow allocating subgroup_data array
 
-g_obex_drop_tx_queue() in transfer_complete() clears any pending tx,
-so the ABORT success response should be enqueued after transfer_complete().
+bass_build_bcast_src() in src/shared/bass.c parses the Broadcast Receive State
+characteristic value received from a remote BASS server.
 
-Fixes the following PTS test cases:
-- OPP/SR/OPH/BV-27-I
-- FTP/SR/OTR/BV-02-C
-- PBAP/PSE/PDF/BV-06-I
-- PBAP/PSE/PBF/BV-03-I
+It reads an attacker-controlled num_subgroups byte (range 0-255) but always
+allocates a single bt_bass_subgroup_data entry (24 bytes):
+subgroup_data = new0(struct bt_bass_subgroup_data, 1);   // line 337: always 1
+for (int i = 0; i < num_subgroups; i++) {                // line 343: up to 255
+    subgroup_data[i].bis_sync = bis_sync_state;          // line 355: OOB write
 
-Fixes: 7a35c12a6ceb ("gobex: Fix segfault caused by interrupted transfer")
-Assisted-by: Claude:claude-sonnet-5
-Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration
+ with Claude and Anthropic Research
+Suggested-by: @trace37labs for the Fixes
+
+Fixes: 8980f4f1f7 ("shared/bass: Functions cleanup")
+
+See: https://github.com/bluez/bluez/security/advisories/GHSA-7wjj-8mrm-jhw4
 
 
 
