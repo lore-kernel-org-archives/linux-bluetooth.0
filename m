@@ -1,132 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBA73E1CED;
-	Fri, 28 Aug 2026 08:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3A53F8890
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 09:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787907311; cv=none; b=sTQGzu5osfeUrwsslD4NYq39pYPfyFzSdtMTbxNXQvFTJsmCg9Vqpdhvz74ZtaSRW4t1qYUtq+/b7yTDQS6RsUh3fgq/TBLgenOtQn2m9LC2JAYG/TVJ4LbWg1ovd/cWqx19uhtfL9qQSRWZufoo2a2SbQTyB2LhEg5ZgNzxMO8=
+	t=1787910602; cv=none; b=Lr7bBocTHqrL0ikS+sIv2NunBSm7kw8473CUcLVsKsYlygsVaQL4s1QesAZ+e7p/GH6XYfsExNOQ4Qhm9QcIvY6v89xXnzElPvdE+nE7Wsdz9QiDg88XiyI1nXJ3GkXVynnMCrbVTUUUS45bbyGfsUs3vmfSbEOQiMubricV+Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787907311; c=relaxed/simple;
-	bh=sNyIB/GT50g8rb6JAtiKZ2puJnLCBSlc8IgLMZWXwZg=;
-	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=FyG3Fdv/O3am529NSuz+pQnnfdYDz7rwJZqYIl4mOGqNqPn85F4cosEyWpIETpw9yhU98XyFV1F8wvmaBzjeskbgZKbw5m4LMmGBFpOiOMyHj7N3mQYp+nllN8TV/CjZxe18DYt1XnTDl64vM46p+9PhLfsjL0qTfb5VvMVpgRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLL3C5H9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787910602; c=relaxed/simple;
+	bh=EKZBCQRx3ly4Or5rU2nYL007IW1OdtVM5kiKGUqahqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kcEgroPOM6ue9Le/T1dFj5IGsam+bzfzxH5MC1WfmBtI5PTSGKjYxhlUbnCBuU7M+JSiDS8FAYENlN/U96zk+ChMdFvYl55nFNlNgW6cbG3ehHfuGqivL2ppDjnB2wq9RUGnsvMya4adIoyOH7+jL28i/edeYBIVFy14EOxHSDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ecXDaZv6; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLL3C5H9"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 180311F000E9;
-	Fri, 28 Aug 2026 08:55:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787907309;
-	bh=5BzL+9Md99aFW4pTj/6ay3UfAZXHl/2F0v7SSFjgOrA=;
-	h=From:To:Cc:Subject:Date;
-	b=mLL3C5H9RQ29Opb+VmilHMI1/BnLKoDKarw4wDdW5ECbykY48mVBux5S8ZYxNK22j
-	 QcA91g3qOO3eBLaGSYd5uBs0vPA/wHTq4VTqH2EjTIpoYR59XaPTfBMbHhYuxWxfjb
-	 9srq+Po3qKvTy7nPgFtTr15gpvcMujM7TPjwUi1vfCsgyyAjnjEC5H0oDjiqraBkMR
-	 t9cj9rvK19vNz100hnZQtwEoSLqoqz3d3lXZGjwxgu5mgk41x1mwaZAhW7J/vC7UVR
-	 un7AjwYDSgjvb2kuwUnq4L7Ve3Z1PLtWoOfqD5cmVIMOGzVSZAOND7bkYzMu/sH3Su
-	 2FE6HbgFDiRDg==
-From: "syzbot" <syzbot@kernel.org>
-To: syzkaller-bugs@googlegroups.com, Aleksandr Nogikh <nogikh@google.com>, <linux-bluetooth@vger.kernel.org>, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Marcel Holtmann" <marcel@holtmann.org>, "Hilda Wu" <hildawu@realtek.com>
-Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
-Subject: [PATCH] Bluetooth: hci_core: Fix race condition during device registration
-Message-ID: <7f282e86-b9fa-4a3d-8dea-208975771b35@mail.kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ecXDaZv6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787910596; x=1819446596;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EKZBCQRx3ly4Or5rU2nYL007IW1OdtVM5kiKGUqahqU=;
+  b=ecXDaZv6uhsugzCdsg+lcqbN+xJfXphB6A9QzDu7pt3puro7tJZ2EQhC
+   TCPGp5EsUD4njilitgMJSsxvJEhSdoWajGryz52a37ZkWDFx0zxkKnXoS
+   f5R4iIcHUmCyHV9BL1Xv+k69s8HcBHK03oYVdYWPPbcxdf0Q+owiE006M
+   mXeLs9uJAyadrSEEZ5OTYTHqJJhIyAUcnd2IrLbFGbsx7SZgpDpAy/CiE
+   rT3tGEsA9hxb7JMOSA57R+oUGPxa8lt+AjN4VHl00bEDLWjCXb93n5iW0
+   Iy90w8gITCB1GP8KxMWq+rxO44zzP/4jSwwkrcOBGRYMSh8tmwmbvsVP1
+   w==;
+X-CSE-ConnectionGUID: EE0mHGPHTCOpDzXFrngYeQ==
+X-CSE-MsgGUID: x//lVmILQdOjWzMLoM1KQQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11888"; a="75961068"
+X-IronPort-AV: E=Sophos;i="6.25,248,1779174000"; 
+   d="scan'208";a="75961068"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2026 02:49:52 -0700
+X-CSE-ConnectionGUID: gJ711ncMQ4OOF4osdITLuA==
+X-CSE-MsgGUID: 2myGrogrRE6ugtNa0F1+mQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,248,1779174000"; 
+   d="scan'208";a="306317986"
+Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
+  by orviesa001.jf.intel.com with ESMTP; 28 Aug 2026 02:49:50 -0700
+From: Ravindra <ravindra@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Ravindra <ravindra@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+Date: Fri, 28 Aug 2026 15:21:59 +0530
+Message-ID: <20260828095159.2370857-1-ravindra@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Date: Fri, 28 Aug 2026 08:55:09 +0000 (UTC)
 
-From: Aleksandr Nogikh <nogikh@google.com>
+Use pm_suspend_target_state to differentiate S0ix from S3/S4. Set the
+controller to D3_HOT for S0ix (PM_SUSPEND_TO_IDLE) and D3_COLD for S3/S4
+to prevent post-resume instability.
 
-In hci_register_dev(), the power_on work item is queued to
-hdev->req_workqueue before initializing hdev->adv_monitors_idr and
-registering the MSFT extension via msft_register(). For devices marked with
-quirks such as HCI_QUIRK_RAW_DEVICE, the HCI_UNCONFIGURED flag is set on
-the device. When the power_on work item runs concurrently on another CPU,
-hci_power_on() detects that the device is unconfigured and immediately
-invokes hci_dev_do_close(), which calls msft_do_close().
+Remove .freeze, .thaw, and .poweroff callbacks to avoid redundant D3
+handshakes that time out and abort hibernation. Add .restore to force
+FLR-based firmware recovery after S4 and S3 (PM_SUSPEND_MEM), as power
+is lost. S0ix resumes via a normal D0 transition.
 
-Concurrently, msft_register() allocates the msft structure and exposes it
-to hdev->msft_data prior to calling mutex_init(&msft->filter_lock). If
-msft_do_close() executes while hdev->msft_data is already assigned but the
-mutex has not yet been initialized, mutex_lock(&msft->filter_lock) operates
-on an uninitialized mutex, triggering a DEBUG_LOCKS warning:
-
-DEBUG_LOCKS_WARN_ON(lock->magic != lock)
-WARNING: kernel/locking/mutex.c:625 at __mutex_lock_common
-kernel/locking/mutex.c:625 [inline]
-WARNING: kernel/locking/mutex.c:625 at __mutex_lock+0x12d8/0x1550
-kernel/locking/mutex.c:821
-...
-Call Trace:
- <TASK>
- msft_do_close+0x308/0x7b0 net/bluetooth/msft.c:693
- hci_dev_close_sync+0x86b/0x10a0 net/bluetooth/hci_sync.c:5522
- hci_dev_do_close net/bluetooth/hci_core.c:499 [inline]
- hci_power_on+0x32c/0x750 net/bluetooth/hci_core.c:937
- process_one_work kernel/workqueue.c:3322 [inline]
- process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3405
- worker_thread+0x92d/0xe10 kernel/workqueue.c:3486
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Fix this by moving the queue_work() call in hci_register_dev() to after
-idr_init(&hdev->adv_monitors_idr) and msft_register(hdev) so that device
-structures and extensions are fully initialized before asynchronous tasks
-can access them. Additionally, assign hdev->msft_data in msft_register()
-only after mutex_init(&msft->filter_lock) has completed.
-
-Fixes: 9e14606d8f38 ("Bluetooth: msft: Extended monitor tracking by address filter")
-Assisted-by: Gemini:gemini-3.7-flash Gemini:gemini-3.1-pro-preview syzbot
-Reported-by: syzbot+14ce1b05b7d5a989abbe@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=14ce1b05b7d5a989abbe
-Link: https://syzkaller.appspot.com/ai_job?id=2bc9e8aa-ca6d-43e2-be2c-fd5d9f649d7e
-Signed-off-by: Aleksandr Nogikh <nogikh@google.com>
-
+Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
+Assisted-by: GitHub-Copilot:GPT5
+Signed-off-by: Ravindra <ravindra@intel.com>
 ---
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5ba9fe826..771b73c99 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2629,11 +2629,11 @@ int hci_register_dev(struct hci_dev *hdev)
- 	if (error)
- 		BT_WARN("register suspend notifier failed error:%d\n", error);
+ drivers/bluetooth/btintel_pcie.c | 63 ++++++++++++++++----------------
+ drivers/bluetooth/btintel_pcie.h |  2 -
+ 2 files changed, 32 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 005c77a4f5eb..ba5d16a3b3a5 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/acpi.h>
++#include <linux/suspend.h>
  
--	queue_work(hdev->req_workqueue, &hdev->power_on);
--
- 	idr_init(&hdev->adv_monitors_idr);
- 	msft_register(hdev);
+ #include <linux/unaligned.h>
+ #include <linux/devcoredump.h>
+@@ -3134,11 +3135,14 @@ static void btintel_pcie_coredump(struct device *dev)
  
-+	queue_work(hdev->req_workqueue, &hdev->power_on);
+ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ {
+-	int retry = 0, status;
++	int retry = 0;
++	long status;
+ 	u32 dx_intr_timeout_ms = 200;
+ 
++	/* Set outside the loop to avoid discarding late interrupts on retry. */
++	data->gp0_received = false;
 +
- 	return id;
+ 	do {
+-		data->gp0_received = false;
  
- err_wqueue:
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d7badce87..255163033 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -764,8 +764,8 @@ void msft_register(struct hci_dev *hdev)
+ 		btintel_pcie_wr_sleep_cntrl(data, dxstate);
  
- 	INIT_LIST_HEAD(&msft->handle_map);
- 	INIT_LIST_HEAD(&msft->address_filters);
--	hdev->msft_data = msft;
- 	mutex_init(&msft->filter_lock);
-+	hdev->msft_data = msft;
+@@ -3184,18 +3188,20 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 
+ 	data = pci_get_drvdata(pdev);
+ 
+-	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
++	/* Set D3_HOT for S0ix (s2idle) and D3_COLD for S3 (suspend-to-RAM). */
++	dxstate = (pm_suspend_target_state == PM_SUSPEND_TO_IDLE ?
+ 		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
+ 
+-	data->pm_sx_event = mesg.event;
+-
+ 	start = ktime_get();
+ 
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+-	if (err)
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
++			   dxstate, err);
+ 		return err;
++	}
+ 
+ 	bt_dev_dbg(data->hdev,
+ 		   "device entered into d3 state from d0 in %lld us",
+@@ -3208,17 +3214,7 @@ static int btintel_pcie_suspend(struct device *dev)
+ 	return btintel_pcie_suspend_late(dev, PMSG_SUSPEND);
  }
  
- void msft_release(struct hci_dev *hdev)
-
-
-base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+-static int btintel_pcie_hibernate(struct device *dev)
+-{
+-	return btintel_pcie_suspend_late(dev, PMSG_HIBERNATE);
+-}
+-
+-static int btintel_pcie_freeze(struct device *dev)
+-{
+-	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
+-}
+-
+-static int btintel_pcie_resume(struct device *dev)
++static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct btintel_pcie_data *data;
+@@ -3226,19 +3222,15 @@ static int btintel_pcie_resume(struct device *dev)
+ 	int err;
+ 
+ 	data = pci_get_drvdata(pdev);
+-	data->gp0_received = false;
+ 
+ 	start = ktime_get();
+ 
+-	/* When the system enters S4 (hibernate) mode, bluetooth device loses
+-	 * power, which results in the erasure of its loaded firmware.
+-	 * Consequently, function level reset (flr) is required on system
+-	 * resume to bring the controller back into an operational state by
+-	 * initiating a new firmware download.
++	/* S3 and S4 may cut power, erasing the firmware. Force FLR to recover
++	 * instead of a normal D0 transition.
+ 	 */
+-
+-	if (data->pm_sx_event == PM_EVENT_FREEZE ||
+-	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
++	if (mesg.event == PM_EVENT_RESTORE ||
++	    (mesg.event == PM_EVENT_RESUME &&
++	     pm_suspend_target_state == PM_SUSPEND_MEM)) {
+ 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
+ 		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
+ 		return 0;
+@@ -3247,7 +3239,9 @@ static int btintel_pcie_resume(struct device *dev)
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, BTINTEL_PCIE_STATE_D0);
+ 
+-	if (err == 0) {
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
++	} else {
+ 		bt_dev_dbg(data->hdev,
+ 			   "device entered into d0 state from d3 in %lld us",
+ 			   ktime_to_us(ktime_get() - start));
+@@ -3272,13 +3266,20 @@ static int btintel_pcie_resume(struct device *dev)
+ 	return err;
+ }
+ 
++static int btintel_pcie_resume(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESUME);
++}
++
++static int btintel_pcie_restore(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESTORE);
++}
++
+ static const struct dev_pm_ops btintel_pcie_pm_ops = {
+ 	.suspend = btintel_pcie_suspend,
+ 	.resume = btintel_pcie_resume,
+-	.freeze = btintel_pcie_freeze,
+-	.thaw = btintel_pcie_resume,
+-	.poweroff = btintel_pcie_hibernate,
+-	.restore = btintel_pcie_resume,
++	.restore = btintel_pcie_restore,
+ };
+ 
+ static struct pci_driver btintel_pcie_driver = {
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index 749369b24031..980eb62fdf8b 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -479,7 +479,6 @@ struct btintel_pcie_dump_header {
+  * @txq: TX Queue struct
+  * @rxq: RX Queue struct
+  * @alive_intr_ctxt: Alive interrupt context
+- * @pm_sx_event: PM event on which system got suspended
+  */
+ struct btintel_pcie_data {
+ 	struct pci_dev	*pdev;
+@@ -536,7 +535,6 @@ struct btintel_pcie_data {
+ 	enum btintel_pcie_reset_type	reset_type;
+ 	struct btintel_pcie_dbgc	dbgc;
+ 	struct btintel_pcie_dump_header dmp_hdr;
+-	u8	pm_sx_event;
+ 	u32	debug_evt_addr;
+ 	u32	debug_evt_size;
+ };
 -- 
-See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
-The person who has signed off on the patch is responsible for
-addressing comments.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+2.43.0
+
