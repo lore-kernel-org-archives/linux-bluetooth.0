@@ -1,122 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6DD25B08D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 20:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D283936196E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 21:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787950337; cv=none; b=ky+qjvjNhapa0RYqRw6e+a3ZvGeLqO6DpJb8GGBbqwnyawVFTolskSRLyzpsl368WGFr8T/Svg06Wy6ocgmKzRathFsfzNrqBiNlzVce1t0GnYLEdcVo15mJ7O8KkiDDDaJIFzZQvutlUB51O571l//LqUkoPC03BpJUIY5nyeY=
+	t=1787952602; cv=none; b=HLoTvsTyjNj/gkEH4ZJRgqj3VGlQG/aT2CjkTYdm6ERZ3XjPFAumV4ZJOhfquCeQS1oIGlD3TQNGhHdPSpEoZUh8v257p3g2+zUPkP7QPsAm7CYtb9dVVpztdAVwCRoVHG1MbCt/427VCf7iv0/w/Kn8kyyKiomP6rvKv4gq1ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787950337; c=relaxed/simple;
-	bh=H1Em40KD0hoUfZ8lA86QZnCIkU/uIMua4fSHBeNTC70=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To; b=dfhAE/BYb23WWWKvantyS52B/MVYq2CXQ9SP45dw+vfmW54SRpbYrr3IIGTix0fEOlJwdOXN2bhT7c+NRevbgDkejt/BNrFShNYgZmceBIeCc0jHKN2d1wEQDoJb4FjO2Kdg+F7Aiyqa/Ykcafilp/JgSYs5yIGIER6JvpcyoTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ukNw65Oy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1787952602; c=relaxed/simple;
+	bh=kIpJQvO1c4slEYdGqPPd+9KpY0LRAXB17RMwKxi+Cxc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oXzn4YPgS1OsspJK/PEIR01Lu4OKAcxfBLS4/9Hi0v1p1yHaMr8mMrm3k4c/QeQDEzy2NoxKdFVlS5lYN0HVgpGHvmkv+iNwn8p6gYpKMySAGDF3WV1/3TvqDR1LR1hhqKbOVyy9vOJy9rSxBLCVy/8klzfkYxpKx7vgQz3z0y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NVIBKT0B; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ukNw65Oy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B00DC19425
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 20:52:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1787950336;
-	bh=H1Em40KD0hoUfZ8lA86QZnCIkU/uIMua4fSHBeNTC70=;
-	h=From:Date:Subject:To:Reply-To:From;
-	b=ukNw65OytPHbBh2/sTLR8qW/OFz52TTtc3QeuecHr19Q8KnEbMIIKkuRB/lIANaiA
-	 Pl0Dsi07m8GWANwKYm6/6IWEsSw2JWH+ZzyNi5PRCBabuoB9E1BQsFriJx2qQnDQDr
-	 sgTXEqQfHnDi/jjQNTam7ZGRl7StkpA0HrGvrF52sLiBsEUCN5r3ZHDH7MeHcw/lo9
-	 Li+5O9uRGazKlYa7J+GdJlTuAf6hLQO+sy3EdFvgrN3/JLqsrFeY+zVGEtxrCsNpHP
-	 zevhp76ldlG4Hs2UKXvpY2oXQDgNscSwu8Y3XvnqUFkdwEqNDkqZ2elVoDpYJqefNe
-	 XS3HkypSeSw3g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0F7C61DB9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 20:52:16 +0000 (UTC)
-From: Tim Sweetman via B4 Relay <devnull+agenttimblog.gmail.com@kernel.org>
-Date: Fri, 28 Aug 2026 15:52:10 -0500
-Subject: [PATCH BlueZ] client: Handle system bus setup failure
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NVIBKT0B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1787952599;
+	bh=wS1MKd7JRi5iTH1QgE1hk26TQ5eFR/6qyutbpKgGyi8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=NVIBKT0BIrSa+m1CBNNJ1DO25VJ9nleEP57sstOWhWceHo0lIfKORA4YSprbEeaxk
+	 UNsMFE8FonIe0z1D2wTmBeA0m4jswRH1bCZ6UpZufqju8RgdN2JFHnaT5aNk2+WqAF
+	 zzeG4xhf/dYzHH2sDxJRTWc7tjk/RngWaBr9kYu4=
+Received: from github.com (hubbernetes-node-b990268.va3-iad.github.net [10.48.147.15])
+	by smtp.github.com (Postfix) with ESMTPA id 1300850072A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 14:29:59 -0700 (PDT)
+Date: Fri, 28 Aug 2026 14:29:59 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/49592c-e81413@github.com>
+Subject: [bluez/bluez] 79918b: SECURITY: Add top-level security doc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260828-master-v1-1-4810753bb693@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMQQ6CMBQFr0Le2ia1IdJ6FeOiwEO/UTT9QAiEu
- 1tlOZPJrFAmoeJcrEicROXdZzgeCjT32N9opM0MZ93JeufNK+rAZOgrGwJjWbqAHH8SO5n/owv
- q58gF113rWD/YDL8Jtu0LnhRwPHEAAAA=
-X-Change-ID: 20260828-master-e87099ea4429
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787950335; l=1695;
- i=agenttimblog@gmail.com; s=20260828; h=from:subject:message-id;
- bh=7y4abkrz48lLqW5SQLAirvn4+UMow52d5O4nL718atw=;
- b=aqp96l0FFhoUb32dl2O8Y1xZXdABV3B9TBk+ZAx+Cwfk8/WQku141/+tCPtUhg1cvchsnzJWU
- lix23FzYzTXCO4AUTi6PwagVuczrXT27GTG1Nk2aUqF1NucC46WeuBI
-X-Developer-Key: i=agenttimblog@gmail.com; a=ed25519;
- pk=NS/gYW7o9HkuX4A52JuRee/RWJwzgk9mNfy2J4gZag4=
-X-Endpoint-Received: by B4 Relay for agenttimblog@gmail.com/20260828 with
- auth_id=985
-X-Original-From: Tim Sweetman <agenttimblog@gmail.com>
-Reply-To: agenttimblog@gmail.com
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Tim Sweetman <agenttimblog@gmail.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 79918b87dccdb804c1fe338fe8fdfcb77a0e8293
+      https://github.com/bluez/bluez/commit/79918b87dccdb804c1fe338fe8fdfcb77a0e8293
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
 
-g_dbus_setup_bus() returns NULL when it cannot connect to the system
-bus. bluetoothctl currently passes that NULL connection to
-g_dbus_attach_object_manager(), causing libdbus to abort on its
-connection assertion.
+  Changed paths:
+    M Makefile.am
+    M README
+    A SECURITY.md
 
-Initialize a DBusError, report the connection failure, and exit cleanly
-before using the connection.
+  Log Message:
+  -----------
+  SECURITY: Add top-level security doc
 
-Fixes: https://github.com/bluez/bluez/issues/2446
----
-Tested with make check (34 tests).
----
- client/main.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+This will replace the existing documentation written 5 years ago to take
+into account the new tools and the new rules around dealing with
+security issues.
 
-diff --git a/client/main.c b/client/main.c
-index 069e20485..d7cecb118 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -4017,6 +4017,7 @@ static bool timeout_quit(void *user_data)
- int main(int argc, char *argv[])
- {
- 	GDBusClient *client;
-+	DBusError error;
- 	int status;
- 	int timeout;
- 	unsigned int timeout_id;
-@@ -4048,7 +4049,21 @@ int main(int argc, char *argv[])
- 	else
- 		auto_register_agent = g_strdup("");
- 
--	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	dbus_error_init(&error);
-+	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, &error);
-+	if (dbus_conn == NULL) {
-+		if (dbus_error_is_set(&error)) {
-+			fprintf(stderr, "Failed to connect to system bus: %s\n",
-+							error.message);
-+			dbus_error_free(&error);
-+		} else {
-+			fprintf(stderr, "Failed to connect to system bus\n");
-+		}
-+
-+		g_free(auto_register_agent);
-+		return EXIT_FAILURE;
-+	}
-+
- 	g_dbus_attach_object_manager(dbus_conn);
- 
- 	bt_shell_set_env("DBUS_CONNECTION", dbus_conn);
+The new workflow replaces email-based reporting with the GitHub security
+advisory tools, explains the CVE ID assignment process, and places strict
+limits on the amount of work that can be demanded from BlueZ developers.
 
----
-base-commit: e8141342284be2a52e16565b96b513ebe1297d84
-change-id: 20260828-master-e87099ea4429
-
-Best regards,
---  
-Tim Sweetman <agenttimblog@gmail.com>
+It is customary in 2026 to have a top-level SECURITY.md file which
+explains the vulnerability workflow.
 
 
+  Commit: e8141342284be2a52e16565b96b513ebe1297d84
+      https://github.com/bluez/bluez/commit/e8141342284be2a52e16565b96b513ebe1297d84
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
+
+  Changed paths:
+    R doc/security-bugs.rst
+
+  Log Message:
+  -----------
+  doc: Remove obsolete security-bugs.rst
+
+
+Compare: https://github.com/bluez/bluez/compare/49592cbc1416...e8141342284b
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
