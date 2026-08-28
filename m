@@ -1,35 +1,35 @@
-Received: from out-30.smtp.github.com (out-30.smtp.github.com [192.30.252.129])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5709F1940B0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 00:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8672D8DD0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 00:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787876906; cv=none; b=OD3y4fSF8Zk5/AIvQXYRSZhXlXWXDNxK152j13EPqDoGmZWa4E9HxgnOjmLFSIBI0vja7NHJB8IjAutIelY+KrAcHEX0wV0xYytyk+Slipl7Zo4WtBjV0Zv7DzKvtWyN2GWWs1G8wyjQ0RlVawH4DiVNbRvnbNvr/Gwb+WxJ5IU=
+	t=1787876985; cv=none; b=ax1XYgC/woD79jdXR34T/V06+mLK+w/nDjmLyzu/ztXf0+Idfn4U11UqBhJKY+Xe9t8X5WtfRM/A/pd0Y8tKdJLs4f3mquHGtOsdKsjWCFWw/Kwvj9dZzxKH08lWM33N6YMhwFPwTStY40+ekMBe6gn2N/EzW3ePzgJCqtjGkX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787876906; c=relaxed/simple;
-	bh=VDAKrYJK4QJ4vYgXIualP559uuhtHyRAh+EF7FUkTEk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ikn88iI/hqqJ3UBNfT0zbwhci/3DeQz7s1GVD1cQ28ZTNXGCxcOXCuvWE+3NbPgw2bbrfCLpxdOhys3ZTXDjEUT1PKdKrWuJWIVw75CQCMhh+ZIlSWhDhsK8bx85gRWB4vuR2dAPbS4x6csoiSyg4eqUdzj8QzLX+ywp7CaQyGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZnseoCNU; arc=none smtp.client-ip=192.30.252.129
+	s=arc-20240116; t=1787876985; c=relaxed/simple;
+	bh=11gYmwaA+ZCumefMkiyT97k5FEJgDGN2ErX9rr0zJ00=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fA/4rPL/ZxSOVZ1apH0LPznGRJcDWV6TxtUDcf1Fub86naG/6cswXzB8mfgmXedtjdCHQosTIx0JErqoyuKCg7fLjoSMTBeHjrG48uKl+bQRp2E9O121pSOSdFEYuwuZtqvRtuiaTnfsAfnvEfXdJKla/CxUIcHdjL5t3nKaDk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XCsa3MG6; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZnseoCNU"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XCsa3MG6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787876904;
-	bh=KpzMslVIOlkp3QHHnb6Z5ZKX7oSEqzsBXAzlHdNU3XM=;
+	s=pf2023; t=1787876982;
+	bh=RVJYKZo5svpL0m3fDn4zwSmn3Z/fKZPjmpjuIkrByeg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ZnseoCNUMxgyzdjKd33YNYi5gUSWVmVSvDLmqTC20GnklptD06qKCRPsyWvYsBOze
-	 /jR65jLrO6NaYx3qwl8sPfmzjTr/BwvT1+EIw5stUFGSMlmvyIvRMkQUY7FK8L9J0Q
-	 VG17l233zrU/z9LM+vrZP/i/tbwRZF6x71C4uM0M=
-Received: from github.com (hubbernetes-node-934bf96.ac4-iad.github.net [10.52.132.29])
-	by smtp.github.com (Postfix) with ESMTPA id 80FE93203BE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 17:28:24 -0700 (PDT)
-Date: Thu, 27 Aug 2026 17:28:24 -0700
-From: Bhavani <noreply@github.com>
+	b=XCsa3MG6KGiZsVLL8wIcqvvlBNcKJKqHXwN3HV93SzwbGhhysOlYcMxxfJ7kLRMok
+	 40VBRUyq9GxCB9luTz8jmtbcIhe4gE57QowvQuInN0hYdnYRv60Bfft2ngg4Ji0DR0
+	 tFIu3eCkqIqh+rVBUN/R6D4gpAaHVh/Gc3kvURZ0=
+Received: from github.com (hubbernetes-node-3f064fe.ac4-iad.github.net [10.52.172.46])
+	by smtp.github.com (Postfix) with ESMTPA id E397AA0733
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Aug 2026 17:29:42 -0700 (PDT)
+Date: Thu, 27 Aug 2026 17:29:42 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/9f5adb-49592c@github.com>
-Subject: [bluez/bluez] 73ccf6: all: Fix typo in AVRCP_ATTRIBUTE_ILEGAL
+Message-ID: <bluez/bluez/push/refs/heads/1152755/000000-8160c9@github.com>
+Subject: [bluez/bluez] d68a6d: test-runner: Add support for PCIe passthrough
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,158 +42,151 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1152755
   Home:   https://github.com/bluez/bluez
-  Commit: 73ccf6d83e6a1c65bd4971c6e35da16520f7d74e
-      https://github.com/bluez/bluez/commit/73ccf6d83e6a1c65bd4971c6e35da16520f7d74e
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
+  Commit: d68a6d4ad006914ffc8043ec7231fadb71a3fed2
+      https://github.com/bluez/bluez/commit/d68a6d4ad006914ffc8043ec7231fadb71a3fed2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    M monitor/avctp.c
-    M profiles/audio/avrcp.c
-    M profiles/audio/avrcp.h
-    M tools/parser/avrcp.c
-    M unit/avrcp-lib.c
-    M unit/avrcp-lib.h
+    M doc/test-runner.rst
+    M tools/test-runner.c
 
   Log Message:
   -----------
-  all: Fix typo in AVRCP_ATTRIBUTE_ILEGAL
+  test-runner: Add support for PCIe passthrough
 
-It's "illegal" not "ilegal".
+Add a -P/--pcie option which passes the given QEMU device arguments
+through to QEMU, in the same way -U/--usb does for USB devices, so a
+host controller can be handed to the guest:
+
+  $ tools/test-runner -P "vfio-pci,host=0000:00:14.3" \
+        -d -k /pathto/bzImage -- /bin/bash
+
+The device does not have to be prepared by hand: the BDF is taken from
+the host= argument and bound to vfio-pci, and the driver it was bound to
+before is restored once the guest exits. As VFIO can only pass through a
+device if the rest of its IOMMU group is unbound or already handled by
+VFIO, the group is checked before the device is taken away from its
+driver, so a group that cannot be used is reported instead of leaving
+the device behind on vfio-pci.
+
+Restoring the driver means QEMU can no longer simply replace this
+process, so with -P it is started as a child and SIGINT, SIGTERM and
+SIGHUP are forwarded to it, leaving this process to restore the driver
+once QEMU is reaped.
+
+Since vfio-pci requires ACPI for device enumeration and an APIC for MSI
+delivery, the guest command line drops "acpi=off pci=noacpi noapic" when
+-P is given. All other modes keep the previous command line and are
+still exec'ed directly.
+
+Tested by passing a PCIe card reader through to the guest, checking that
+it is bound to vfio-pci while the guest runs and bound back to its own
+driver afterwards.
+
+The model drafted the option handling, the vfio binding, the command
+line change and the documentation section; all of it was reviewed and
+tested by the author.
+
+Assisted-by: Claude:claude-opus-5
 
 
-  Commit: 627f9fae78959cb38d5e48a7cc3f008ad746f39c
-      https://github.com/bluez/bluez/commit/627f9fae78959cb38d5e48a7cc3f008ad746f39c
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
+  Commit: 19433df55528b9141302a0f7445f853e7b2bfe15
+      https://github.com/bluez/bluez/commit/19433df55528b9141302a0f7445f853e7b2bfe15
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    M src/shared/bap.c
+    M Makefile.tools
+    M monitor/analyze.c
+    M monitor/packet.c
+    M monitor/packet.h
 
   Log Message:
   -----------
-  bap: Fix stack buffer overflow in BlueZ LE Audio BASE parser
+  monitor: Add latency standard deviation
 
-A stack buffer overflow (CWE-121) in bap_sink_match_allocation() in
-src/shared/bap.c allows an attacker within BLE range to write ~195
-attacker-controlled bytes past a 4-byte stack buffer in bluetoothd
-with no pairing, no connection, and no user interaction. The BAP
-profile auto-syncs to any device advertising the BCAAS UUID.
+The latency range and moving average alone do not tell a link that is
+consistently slow apart from one that is unstable. A high average with a
+low deviation points at the scheduling or the interval configuration,
+while a low average with a high deviation points at interference,
+retransmissions or controller buffer stalls.
 
-bap_sink_match_allocation() copies the value of an
-Audio_Channel_Allocation LTV (type 0x03) into a 4-byte uint32_t stack
-local using the LTV's attacker-controlled length byte as the memcpy
-size, with no upper bound check:
-	// src/shared/bap.c:7767
-	memcpy(&location32, v, l);  // l attacker-controlled, no upper bound
+Track the sample count along with the sum and the sum of the squares in
+struct packet_latency, and report the resulting standard deviation on
+the latency lines of both the live decoding and the analyze mode.
 
-A second identical instance exists in bap_sink_get_allocation() at line 2558.
+The samples are squared in usec and only scaled down to msec^2
+afterwards, so that the sub-msec resolution is not lost while the
+running sum stays clear of an overflow.
 
-Per Bluetooth Assigned Numbers, Audio_Channel_Allocation is a fixed 4-octet
-bitfield; any other length is malformed.
+The model derived the accumulator layout and the scaling, which the
+author reviewed and verified against an independently computed
+deviation.
 
-https://github.com/bluez/bluez/security/advisories/GHSA-9683-2chf-hfw9
-
-Co-Authored-by: @thaidn and @bronson-calif of Calif.io in collaboration with
-  Claude and Anthropic Research.
-Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration with
-  Claude and Anthropic Research.
-Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration with
+Assisted-by: opencode:claude-opus-5
 
 
-  Commit: 3c18444ced8e40067a855560d6fc18cda21efaba
-      https://github.com/bluez/bluez/commit/3c18444ced8e40067a855560d6fc18cda21efaba
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
+  Commit: fbe18cc35805190667d9e880f15a2600eaad460d
+      https://github.com/bluez/bluez/commit/fbe18cc35805190667d9e880f15a2600eaad460d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    M src/shared/bass.c
+    M monitor/analyze.c
+    M monitor/packet.c
+    M monitor/packet.h
 
   Log Message:
   -----------
-  bass: Fix heap buffer overflow allocating subgroup_data array
+  monitor: Add ISO packet loss counters
 
-bass_build_bcast_src() in src/shared/bass.c parses the Broadcast Receive State
-characteristic value received from a remote BASS server.
+Isochronous streams are the one place where HCI hands the host enough
+information to tell whether data actually arrived: the ISO data packet
+header carries an SDU sequence number and a packet status flag.
 
-It reads an attacker-controlled num_subgroups byte (range 0-255) but always
-allocates a single bt_bass_subgroup_data entry (24 bytes):
-subgroup_data = new0(struct bt_bass_subgroup_data, 1);   // line 337: always 1
-for (int i = 0; i < num_subgroups; i++) {                // line 343: up to 255
-    subgroup_data[i].bis_sync = bis_sync_state;          // line 355: OOB write
+Track both per connection and report them during the live decoding and
+in the analyze mode. Gaps in the sequence number are counted as lost
+SDUs, a packet status flag of 2 is counted as dropped and a flag of 1 as
+possibly invalid. Duplicates and reordered sequence numbers are not
+counted as loss.
 
-Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration
- with Claude and Anthropic Research
-Suggested-by: @trace37labs for the Fixes
+During the live decoding the counters are only printed on the packet
+where a discontinuity is detected, so a clean stream produces no extra
+output.
 
-Fixes: 8980f4f1f7 ("shared/bass: Functions cleanup")
+The model wrote the sequence number accounting and the ISO header
+walking, which the author reviewed and verified against a trace with
+known gaps.
 
-See: https://github.com/bluez/bluez/security/advisories/GHSA-7wjj-8mrm-jhw4
-Reported-by: @thaidn and @bronson-calif of Calif.io in collaboration
+Assisted-by: opencode:claude-opus-5
 
 
-  Commit: d094be10ff0cc9d48714d35557e0fd297f36f907
-      https://github.com/bluez/bluez/commit/d094be10ff0cc9d48714d35557e0fd297f36f907
-  Author: Jinwang Li <jinwang.li@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
+  Commit: 8160c9b1b87e87c84de6885c5d24cde8b5b62cac
+      https://github.com/bluez/bluez/commit/8160c9b1b87e87c84de6885c5d24cde8b5b62cac
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    M gobex/gobex-transfer.c
+    M doc/btmon.rst
 
   Log Message:
   -----------
-  gobex: Fix ABORT response being discarded
+  doc/btmon: Document the deviation and loss counters
 
-g_obex_drop_tx_queue() in transfer_complete() clears any pending tx,
-so the ABORT success response should be enqueued after transfer_complete().
+Describe how to read the latency standard deviation and each of the ISO
+packet loss counters, and correct the description of the moving average,
+which was documented as a median even though it has always been computed
+as a moving average.
 
-Fixes the following PTS test cases:
-- OPP/SR/OPH/BV-27-I
-- FTP/SR/OTR/BV-02-C
-- PBAP/PSE/PDF/BV-06-I
-- PBAP/PSE/PBF/BV-03-I
+The model drafted the text, which the author reviewed against the actual
+output.
 
-Fixes: 7a35c12a6ceb ("gobex: Fix segfault caused by interrupted transfer")
-Assisted-by: Claude:claude-sonnet-5
+Assisted-by: opencode:claude-opus-5
 
 
-  Commit: 06b1ba3343c56ed71e9a45aa0439ebbaec9c0072
-      https://github.com/bluez/bluez/commit/06b1ba3343c56ed71e9a45aa0439ebbaec9c0072
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M src/main.conf
-
-  Log Message:
-  -----------
-  src: Modify MaxTxPower option documentation for ChannelSounding
-
-Modify MaxTxPower configuration option to take decimal values
-within the range of -127dBm to 20dBm
-Defaults to 20 (max power).
-
-
-  Commit: 49592cbc141675d15d13c83ea190ae438684bb09
-      https://github.com/bluez/bluez/commit/49592cbc141675d15d13c83ea190ae438684bb09
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-08-27 (Thu, 27 Aug 2026)
-
-  Changed paths:
-    M client/cs.c
-
-  Log Message:
-  -----------
-  client: Enforce Valid Main Mode and Sub Mode Combinations
-
-Introduce validation for main_mode_type and sub_mode_type combinations as
-specified in the protocol requirements.
-Reject invalid combinations and guide the user by displaying
-the acceptable mode pairings.
-
-
-Compare: https://github.com/bluez/bluez/compare/9f5adb00c7c1...49592cbc1416
+Compare: https://github.com/bluez/bluez/compare/d68a6d4ad006%5E...8160c9b1b87e
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
