@@ -1,208 +1,552 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EB636D9E0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 16:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787935579; cv=pass; b=oQV45dHRHM6XtXzfmM6IHOgJBVXrCCNUo+UO8lnHHHUeX6vGizKh9El5JuFZ2hJlwBAZtIdvCZ/xwW7Ca/JmLk2xJHOstxdl1fQ/FOM7pZ8uXBEtibkWQJgz9FnERDR/CfsCNjni7SwV/Pqzr3hunWtgVn/wQNkQtqKDkLU+98g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787935579; c=relaxed/simple;
-	bh=O7x0mx1drNffxPRyb+k+1eggUwnV9E3wC1hy7chCpds=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DEr+CRuHVNBQXn5XnwDxPn10L6Ox4qferXxl+5ZXUQuxKmFjAbeyXCrtc0JA4h/VMqDPJovi2bKI0neq4oFCrxBKNoMZTl+J+Fs0QrDvbw8iXqgJc8QtANrYDdwBdaeJDj6BRQYqEwghhyj5XpEfJg+jr80KA0iHAVpHO4gt/eM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOHV+bdC; arc=pass smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C41F3ABD8F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 20:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787948000; cv=none; b=bMWadpFHwIkSfOuv3qP2Qk/uBRz+9jfmJj16WqWmqUFvWMbYJ+Nw6bM8Fr3r8QJqsUxSLtTb/w4WK8DWxmlyIq85qATqww9gKEcj+GPFjDFuAk1Zwc352PrC33Whej/yWc/HtizW+2URpPF4JjacSzlvwO0e2DkacLKycWT9Ne0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787948000; c=relaxed/simple;
+	bh=fs45yQpZ4dz6NkieeXgXW2tSZDlUOjcYrLUpFPBtXt4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VIbBhvbruwVpKVkXy0moBp4GYi65JfTr/+yV6S5H4Si5MJ2EoXVANXIddMYMgcpd95CmN7/RRQqxhEH8iW+CMrofMR2Ez3GkSONyLLChDIzYuWqRUu3BYLbO1FWSJNJu4PuO9B4lhHVEXASy8J15Gs9bRcwhtTwyWQ20Mcr9VKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FHqoLy62; arc=none smtp.client-ip=209.85.222.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOHV+bdC"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-857ff9fef54so14531827b3.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 09:46:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787935577; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jyru6LwNghr7yPLbQbiO07B1f1Bly7685yo1pzIfgBLzroQoxM0fwaC2rK67nRPxt5
-         7RaHtS/N9Sbz6UVHuMXr91e4AMk79hWkB04i/q26PiBCeVP/QaYbKFoVSZ8qrmisqxFm
-         yDQIA/DGP0pLAHQnjc3hySQpcuYyyORhBgm8iiyo3bkdmSAKbABQFeaxr+ygXsJMt5jm
-         TD9fiG46rkuxYrDGbvRtTA7Dm4ogpQTnHiccAebdS5/0S0y3nCP1GheZM9NSPx/famgR
-         kozMBDbqc8y80WDqkpf+WEhuDeFvuxQ3+xNJdnfqwAPAfjRq4in5BOGE5g3R/tFJ9CsY
-         AEWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=L8Mo668Q3hVDs52vb8xrz6iOJ63EU+NZfS57YDh6lTA=;
-        fh=fAVvqa29TMCSLQ1BWo+IkeTh9vOt2h2EvlnFWIq0DOI=;
-        b=Mk10cmd3ovhtHDKp6tKgrLszQmG/GOOxuGgo+SfnaaP/HWIPADRgLAFjC90BPw5cqX
-         xUdtGcEHt7MyHA2seURSp14FgJ5LSzCQLSWP0k0FAwwvWyAHPY8CnWG8hSAGIXZi1u//
-         HX8+QC/KRueBOmpoTmk6n/DCamiuJJgI7UvH1liclC8TelST3r4Z+igrcDlX4ul1sNEm
-         XaZKQyjjqlUuoBc2dkjslfqfoLu7GLUZiI02hrQZyghweN06aedpRswGNdquN9pAhccI
-         NiflAijuOMjCjPFlzSDYR0PRryw9RaIxTNuqAC3THGm3K2Yv7M9617PEf+9Rq/o91haH
-         X2VQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FHqoLy62"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-966e7380109so1046740241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 13:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787935577; x=1788540377; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=L8Mo668Q3hVDs52vb8xrz6iOJ63EU+NZfS57YDh6lTA=;
-        b=GOHV+bdCaE0HdNxqI/HncPil8SDALsbjdu7sl6AkfjqX/1aqCkrNubtJTbMUN2bhs/
-         DuCsX8QZsKzdS5ksFg3c84ZlRoJ6lfj5cctSWiZ4PGuHVeSLyg0qAMwduqY7YHrvw6MO
-         cFNkVP7YgfRHCxXmhjekqLr1eqGPVDP9TAmQUw6YmM1qnzPXyFF9Hdq7QrUkhukimCjj
-         gnaweaLrxeWmYvvgvxh90DWxKmIVOWoSCtEeXSo1gAHcDADqIwhsssqr17ILHBPtSlCl
-         d4NsPcTnS/uNqtoUHA5J5EM9eB50+oQpzYujzBLJJWUUt1/xADrawjnTFDHbREdc4v4G
-         0tHQ==
+        d=gmail.com; s=20251104; t=1787947997; x=1788552797; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=p12s2PyCKB/SGw9dleGzLRT8/uh2Rw7VrrvkpbROw4A=;
+        b=FHqoLy62C7mD6k/UKHNWTv/YFo/ea/eF5oNmxJZwcXEvS5l9LJUa54ThpdhjUaS6Xf
+         hE16e4tx8ufRmU5p6/Wdm5wyq8R4ioii6iJZqGaeoLm8j9th7tomvLc5gBnSKLfHrMYw
+         /gO0WfqErRZXWsStbplEcIdGToxTZKudObSM7OFwP9ja4AKTx10DrZ85yHYQXclIBRrZ
+         cYFOiRiaIpXZcQed/edOnZVEVdsJzhddC/VuSP682qzHSPbRubc8wYgAJySes3FFUVLc
+         X8Rn32R7jCHBLV6hLpkiO/sfXOc43dnEpTtZfwCyPGGPLW2LAMCXAlZ8DWrva3jZMOrH
+         nFfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787935577; x=1788540377;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=L8Mo668Q3hVDs52vb8xrz6iOJ63EU+NZfS57YDh6lTA=;
-        b=bRErh48djLGpIixJkjDtHqUDHtTjO4ImwqanQO4GjFCtScUvWyOECIbGBVIp6g3YmC
-         wkfmcblLN40zTRlVsq1//llxyEFaU79jF/5A3ZyWe2Qw1roQ0Zsb12SSqJle71ifPeRi
-         cJIzWiBDpoZK/r5272lRsh1EnVWrq39AD7qH5CG+CfKIdfyu9QkYDQvxjp2Rx3eUa+/E
-         wu47e1c92P/RDCXTyzGGGIZc28KasDWIx0SZ9n9l+F0bZb13uUCzGqOwBiMCfXKZ9qYE
-         4nR6peNMKcfsPKijnOlv+DKE41gUtwn4BueFAjmLwWhncXHhzi2wqrbr3Kqh+Ee26gSy
-         Ly+Q==
-X-Gm-Message-State: AFuF++mBlRhaoG4YxPoyqq7gRBNS2utl+QrBT0qZeGD+tIgceJDjf8/o
-	MKNdEjWvvp64Xko4upYP2ZPGB3IDSRG04VxzjWM1hDMPOtP0GavGe4IdgKMcxcQJBKqvLj8f9rJ
-	O2WKwW9O4Dkn8VUKXPm8hKzVPnScH0ttvqJDqm/w=
-X-Gm-Gg: AYBFou0QcSqvTTd9SjDbYMoLT7E45VOxkJuUauZnKobnZRV4ES9mLp0RuTT9v/+ixFh
-	wfeM2zBIeJIfEm/KST0ImDqzgN2qtapGfRKjgVMMJqwG1gOFlRdd9Fu8lNDT1vxCHAyNdfJtTDW
-	p7lxGjFVUYiIFh/dnMWV7yixc1URV36k5EAZm/nPHl09+nOStsgo0kORRfQuoumnxr55xyt9x3y
-	qbt8S8ZCYq/edMZkzLTgykTp2zBou+LywKU1PWrVAIflrVS1ESyCKKayEscYg40mTQO0FZGYS8X
-	YOkXjv1sWs7NnvvZDEG/Yu7AdqviE92lQyeneScceDzbt8gXJ0Deu+JU9csR6qrGqop6Ud2e/+9
-	RiUYFyAQnedDp/Xit+TaeeMVj8bjZFTk=
-X-Received: by 2002:a05:690c:530e:b0:81e:5a57:b8ad with SMTP id
- 00721157ae682-85d6cfc2431mr27107927b3.21.1787935576947; Fri, 28 Aug 2026
- 09:46:16 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787947997; x=1788552797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=p12s2PyCKB/SGw9dleGzLRT8/uh2Rw7VrrvkpbROw4A=;
+        b=YrBO1SsHvzZAbb0J0AtM8q2vbNKGpiikZa19C2NRTuOpRjZzWn4UXhEYD9r3JR0uku
+         NY0Sf/BAk2Hyx0ZeAGe8Vm9A645B1A+/MdInMu0kija5/F0vaBU2+Ls3i47ibQdxNwKP
+         55MlOKlqdNvIQmaUjfTq+D4876pgOpnV77pRj6elpS9RWTiA5WipJaJegTN7I61p48W+
+         5yJLrZil7rS1frR0Jm+tDFVCqABNsDSO1BRRy/DX8D8ZQsvANrOYZrzvjaWE8UIfr1WU
+         sw8v6lDHcxrotGN2D4h+0P6RNYLDPtAGaRktdEIayiCjJmre4OFOvG+Uj/V4LlYwG0WW
+         gYcA==
+X-Gm-Message-State: AFuF++kmJUGPDCMlyGr3HhtM0X0wRvUr4gh8dzZmBph1mWn10Uh8SbKB
+	fhWHy/kh7wpGuKIAdmCIPJi3YQ20Kw34v1GNFRSZwDyhGus2P8yfPROoI7Jh/vwe1bo=
+X-Gm-Gg: AR+sD122OHpk4IBogSR8nnFl836wlv1j7gqHuJ281B7vQg/suh8xSbU97VPKX1ZulC0
+	DucslR5mF8+1U/40BKrpf21IShTK1716ouS9ytHChHpFRZuimNrU94uIDlx9eqRp5NGCOIKEByn
+	uzvHLF5Po2ds4TvqisjB3ksZtogxdAj5mO60ap/i9eBKvdbiRHQwPONqKttJ26MzrmC62j9UVes
+	gd6oEtqoynmA5dmubmWR3WUvUdPK57yXLYnRyCl12vKTznfWvYpj8v1LLNXWhh6MslsNlGLr+Yp
+	PjWNPyTOsmPp8DMZZ1HsEJE4nLtUgdV9pOpVjpNK6hEmrwRWzjvWukTza0EG1D7hBi3qxyziqeT
+	GNz+hVf/t97dGbz8f2J1EQOg3VRJUSaAhKUdUR4BdC+DtkI4KdI2HUCeRE3jLrPzCUI7lf6rciz
+	ZiAKNFJ1dyW84pzFCOw+Y+uuwPWxuzkbcui12AdQqkbczB8D/CnA335za5NMBzYr1Wm0CrYnmQF
+	PkaEU0TUSnMS1Kbx0qLg0/OEEf50ctrOAmotp+IVs2SH9zbB95awuQ=
+X-Received: by 2002:a05:6102:a48:b0:77b:ae7:1bba with SMTP id ada2fe7eead31-785972e5fa2mr3640462137.3.1787947997228;
+        Fri, 28 Aug 2026 13:13:17 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97e84b6d320sm2069350241.9.2026.08.28.13.13.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Aug 2026 13:13:16 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: Move H:4 reassembly into the Bluetooth core
+Date: Fri, 28 Aug 2026 16:13:05 -0400
+Message-ID: <20260828201306.593974-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260827180149.415744-1-luiz.dentz@gmail.com> <0186ef45e8d10fa469fe31f32d24b54c672157a3.camel@iki.fi>
- <CABBYNZ+qzL04d0cdKd==wFr_Gtz9gCa3_iNv0B9rE=R8pdpajg@mail.gmail.com> <78402f4521084b3f6d2cce7709cbba751d83836f.camel@iki.fi>
-In-Reply-To: <78402f4521084b3f6d2cce7709cbba751d83836f.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 28 Aug 2026 12:46:04 -0400
-X-Gm-Features: AcwNN1XYPkEKAkJhkjGzG1hO0siwR3enalv9nB0mcDd5GhOloeq3CyMJvmPB_HQ
-Message-ID: <CABBYNZK6R2GfeoJDLxW72BeYNcpEZvS7sdRac+Ka1E+e6idj3w@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Bluetooth: SCO: require CAP_NET_BIND_SERVICE to bind
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Pauli,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Aug 28, 2026 at 12:02=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi,
->
-> pe, 2026-08-28 kello 09:50 -0400, Luiz Augusto von Dentz kirjoitti:
-> > On Thu, Aug 27, 2026 at 7:41=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
-te:
-> > > to, 2026-08-27 kello 14:01 -0400, Luiz Augusto von Dentz kirjoitti:
-> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > >
-> > > > SCO sockets have no PSM or port namespace: binding one simply reser=
-ves
-> > > > the ability to accept any incoming eSCO/SCO connection on the adapt=
-er.
-> > > > That is equivalent to listening on a well-known service, which L2CA=
-P
-> > > > already restricts to CAP_NET_BIND_SERVICE in
-> > > > l2cap_validate_bredr_psm()/l2cap_validate_le_psm().
-> > >
-> > > In current Linux userspace, sound servers that do HFP listen on SCO
-> > > sockets, and I think often don't have CAP_NET_BIND_SERVICE.
-> > >
-> > > Do they continue working with this change?
-> >
-> > Good question, that said this is a part of security hardening
-> > otherwise any process could start listening to an SCO connection, and
-> > the sound server would stop working. Btw, does the sound server have
-> > any special capability to, let's say, open the sound card device so
-> > perhaps we can gate it on sound capability as well.
->
-> For ALSA, the sound hardware access is controlled by device file
-> permissions in /dev/snd/*  Not sure if that's usable here, or if
-> there's some other per-user controlled solution that could be used.
+h4_recv_buf() is currently implemented in hci_h4.c which is only built as
+part of the hci_uart module, and only when CONFIG_BT_HCIUART_H4 is
+enabled. That makes the H:4 reassembly logic unusable by drivers which do
+not depend on hci_uart, e.g. btusb which needs it to implement Bulk
+Serialization Mode.
 
-Ok, so you are saying anyone user with file access to /dev/snd/* can
-grab the hardware for itself, since pipewire is just a regular user it
-just works because it is the first one to open it?
+Move the transport agnostic part into the Bluetooth core as
+h4_recv_skb(), which takes a struct hci_dev instead of a struct hci_uart,
+along with struct h4_recv_pkt and the H4_RECV_* helpers, and keep
+h4_recv_buf() as a thin wrapper for the hci_uart protocols.
 
-> In most current distros sound server runs with user permissions without
-> special capabilities, and don't have CAP_NET_BIND_SERVICE, so I'd
-> expect this patch breaks userspace.
->
-> Giving this capability to them allows binding to low network ports, so
-> it probably makes the hardening issue worse and not better.
+Since every Bluetooth driver already depends on the bluetooth module this
+introduces no new module dependency and no new Kconfig symbol.
 
-You would grant it to a specific set of binaries, probably via a
-systemd file. This would block other users, which currently might just
-be testing tools like isotest, where you just use sudo instead, or an
-AI agent trying to fabricate vulnerabilities.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/hci_h4.c     | 123 ++-----------------------
+ drivers/bluetooth/hci_uart.h   |  39 +-------
+ include/net/bluetooth/hci_h4.h |  60 +++++++++++++
+ net/bluetooth/Makefile         |   2 +-
+ net/bluetooth/hci_h4.c         | 160 +++++++++++++++++++++++++++++++++
+ 5 files changed, 229 insertions(+), 155 deletions(-)
+ create mode 100644 include/net/bluetooth/hci_h4.h
+ create mode 100644 net/bluetooth/hci_h4.c
 
-> The next simplest is probably separate executable with setcap bit set,
-> which gives a SCO listen socket for those who can run it based on file
-> permissions.
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 767372707498..cbdf51458ec3 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -29,6 +29,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_h4.h>
+ 
+ #include "hci_uart.h"
+ 
+@@ -112,8 +113,9 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (!h4)
+ 		return -ENODEV;
+ 
+-	h4->rx_skb = h4_recv_buf(hu, h4->rx_skb, data, count,
+-				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
++	h4->rx_skb = h4_recv_skb(hu->hdev, &hu->alignment, &hu->padding,
++				 h4->rx_skb, data, count, h4_recv_pkts,
++				 ARRAY_SIZE(h4_recv_pkts));
+ 	if (IS_ERR(h4->rx_skb)) {
+ 		int err = PTR_ERR(h4->rx_skb);
+ 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
+@@ -155,120 +157,7 @@ struct sk_buff *h4_recv_buf(struct hci_uart *hu, struct sk_buff *skb,
+ 			    const unsigned char *buffer, int count,
+ 			    const struct h4_recv_pkt *pkts, int pkts_count)
+ {
+-	u8 alignment = hu->alignment ? hu->alignment : 1;
+-	struct hci_dev *hdev = hu->hdev;
+-
+-	/* Check for error from previous call */
+-	if (IS_ERR(skb))
+-		skb = NULL;
+-
+-	while (count) {
+-		int i, len;
+-
+-		/* remove padding bytes from buffer */
+-		for (; hu->padding && count > 0; hu->padding--) {
+-			count--;
+-			buffer++;
+-		}
+-		if (!count)
+-			break;
+-
+-		if (!skb) {
+-			for (i = 0; i < pkts_count; i++) {
+-				if (buffer[0] != (&pkts[i])->type)
+-					continue;
+-
+-				skb = bt_skb_alloc((&pkts[i])->maxlen,
+-						   GFP_ATOMIC);
+-				if (!skb)
+-					return ERR_PTR(-ENOMEM);
+-
+-				hci_skb_pkt_type(skb) = (&pkts[i])->type;
+-				hci_skb_expect(skb) = (&pkts[i])->hlen;
+-				break;
+-			}
+-
+-			/* Check for invalid packet type */
+-			if (!skb)
+-				return ERR_PTR(-EILSEQ);
+-
+-			count -= 1;
+-			buffer += 1;
+-		}
+-
+-		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
+-		skb_put_data(skb, buffer, len);
+-
+-		count -= len;
+-		buffer += len;
+-
+-		/* Check for partial packet */
+-		if (skb->len < hci_skb_expect(skb))
+-			continue;
+-
+-		for (i = 0; i < pkts_count; i++) {
+-			if (hci_skb_pkt_type(skb) == (&pkts[i])->type)
+-				break;
+-		}
+-
+-		if (i >= pkts_count) {
+-			kfree_skb(skb);
+-			return ERR_PTR(-EILSEQ);
+-		}
+-
+-		if (skb->len == (&pkts[i])->hlen) {
+-			u16 dlen;
+-
+-			switch ((&pkts[i])->lsize) {
+-			case 0:
+-				/* No variable data length */
+-				dlen = 0;
+-				break;
+-			case 1:
+-				/* Single octet variable length */
+-				dlen = skb->data[(&pkts[i])->loff];
+-				hci_skb_expect(skb) += dlen;
+-
+-				if (skb_tailroom(skb) < dlen) {
+-					kfree_skb(skb);
+-					return ERR_PTR(-EMSGSIZE);
+-				}
+-				break;
+-			case 2:
+-				/* Double octet variable length */
+-				dlen = get_unaligned_le16(skb->data +
+-							  (&pkts[i])->loff);
+-				hci_skb_expect(skb) += dlen;
+-
+-				if (skb_tailroom(skb) < dlen) {
+-					kfree_skb(skb);
+-					return ERR_PTR(-EMSGSIZE);
+-				}
+-				break;
+-			default:
+-				/* Unsupported variable length */
+-				kfree_skb(skb);
+-				return ERR_PTR(-EILSEQ);
+-			}
+-
+-			if (!dlen) {
+-				hu->padding = (skb->len + 1) % alignment;
+-				hu->padding = (alignment - hu->padding) % alignment;
+-
+-				/* No more data, complete frame */
+-				(&pkts[i])->recv(hdev, skb);
+-				skb = NULL;
+-			}
+-		} else {
+-			hu->padding = (skb->len + 1) % alignment;
+-			hu->padding = (alignment - hu->padding) % alignment;
+-
+-			/* Complete frame */
+-			(&pkts[i])->recv(hdev, skb);
+-			skb = NULL;
+-		}
+-	}
+-
+-	return skb;
++	return h4_recv_skb(hu->hdev, &hu->alignment, &hu->padding, skb, buffer,
++			   count, pkts, pkts_count);
+ }
+ EXPORT_SYMBOL_GPL(h4_recv_buf);
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 48ac7ca9334e..7fbe8dffab98 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -8,6 +8,8 @@
+  *  Copyright (C) 2004-2005  Marcel Holtmann <marcel@holtmann.org>
+  */
+ 
++#include <net/bluetooth/hci_h4.h>
++
+ #ifndef N_HCI
+ #define N_HCI	15
+ #endif
+@@ -121,43 +123,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+ 			 unsigned int oper_speed);
+ 
+-struct h4_recv_pkt {
+-	u8  type;	/* Packet type */
+-	u8  hlen;	/* Header length */
+-	u8  loff;	/* Data length offset in header */
+-	u8  lsize;	/* Data length field size */
+-	u16 maxlen;	/* Max overall packet length */
+-	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
+-};
+-
+-#define H4_RECV_ACL \
+-	.type = HCI_ACLDATA_PKT, \
+-	.hlen = HCI_ACL_HDR_SIZE, \
+-	.loff = 2, \
+-	.lsize = 2, \
+-	.maxlen = HCI_MAX_FRAME_SIZE \
+-
+-#define H4_RECV_SCO \
+-	.type = HCI_SCODATA_PKT, \
+-	.hlen = HCI_SCO_HDR_SIZE, \
+-	.loff = 2, \
+-	.lsize = 1, \
+-	.maxlen = HCI_MAX_SCO_SIZE
+-
+-#define H4_RECV_EVENT \
+-	.type = HCI_EVENT_PKT, \
+-	.hlen = HCI_EVENT_HDR_SIZE, \
+-	.loff = 1, \
+-	.lsize = 1, \
+-	.maxlen = HCI_MAX_EVENT_SIZE
+-
+-#define H4_RECV_ISO \
+-	.type = HCI_ISODATA_PKT, \
+-	.hlen = HCI_ISO_HDR_SIZE, \
+-	.loff = 2, \
+-	.lsize = 2, \
+-	.maxlen = HCI_MAX_FRAME_SIZE \
+-
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
+ int h4_deinit(void);
+diff --git a/include/net/bluetooth/hci_h4.h b/include/net/bluetooth/hci_h4.h
+new file mode 100644
+index 000000000000..a37e7df8c9ce
+--- /dev/null
++++ b/include/net/bluetooth/hci_h4.h
+@@ -0,0 +1,60 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *  Bluetooth HCI H:4 packet reassembly
++ *
++ *  Copyright (C) 2000-2001  Qualcomm Incorporated
++ *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
++ *  Copyright (C) 2004-2005  Marcel Holtmann <marcel@holtmann.org>
++ */
++
++#ifndef __HCI_H4_H
++#define __HCI_H4_H
++
++#include <linux/skbuff.h>
++#include <linux/types.h>
++
++struct hci_dev;
++
++struct h4_recv_pkt {
++	u8  type;	/* Packet type */
++	u8  hlen;	/* Header length */
++	u8  loff;	/* Data length offset in header */
++	u8  lsize;	/* Data length field size */
++	u16 maxlen;	/* Max overall packet length */
++	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
++};
++
++#define H4_RECV_ACL \
++	.type = HCI_ACLDATA_PKT, \
++	.hlen = HCI_ACL_HDR_SIZE, \
++	.loff = 2, \
++	.lsize = 2, \
++	.maxlen = HCI_MAX_FRAME_SIZE \
++
++#define H4_RECV_SCO \
++	.type = HCI_SCODATA_PKT, \
++	.hlen = HCI_SCO_HDR_SIZE, \
++	.loff = 2, \
++	.lsize = 1, \
++	.maxlen = HCI_MAX_SCO_SIZE
++
++#define H4_RECV_EVENT \
++	.type = HCI_EVENT_PKT, \
++	.hlen = HCI_EVENT_HDR_SIZE, \
++	.loff = 1, \
++	.lsize = 1, \
++	.maxlen = HCI_MAX_EVENT_SIZE
++
++#define H4_RECV_ISO \
++	.type = HCI_ISODATA_PKT, \
++	.hlen = HCI_ISO_HDR_SIZE, \
++	.loff = 2, \
++	.lsize = 2, \
++	.maxlen = HCI_MAX_FRAME_SIZE \
++
++struct sk_buff *h4_recv_skb(struct hci_dev *hdev, u8 *alignment, u8 *padding,
++			    struct sk_buff *skb, const unsigned char *buffer,
++			    int count, const struct h4_recv_pkt *pkts,
++			    int pkts_count);
++
++#endif /* __HCI_H4_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index ff466ea97436..b78ad98864d4 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+ 	ecdh_helper.o mgmt_util.o mgmt_config.o hci_codec.o eir.o hci_sync.o \
+-	hci_drv.o
++	hci_drv.o hci_h4.o
+ 
+ bluetooth-$(CONFIG_DEV_COREDUMP) += coredump.o
+ 
+diff --git a/net/bluetooth/hci_h4.c b/net/bluetooth/hci_h4.c
+new file mode 100644
+index 000000000000..86f809018062
+--- /dev/null
++++ b/net/bluetooth/hci_h4.c
+@@ -0,0 +1,160 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *  Bluetooth HCI H:4 packet reassembly
++ *
++ *  Copyright (C) 2000-2001  Qualcomm Incorporated
++ *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
++ *  Copyright (C) 2004-2005  Marcel Holtmann <marcel@holtmann.org>
++ */
++
++#include <linux/export.h>
++#include <linux/skbuff.h>
++#include <linux/unaligned.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_h4.h>
++
++/* h4_recv_skb - Reassemble H:4 framed packets
++ * @hdev: HCI device the packets are received on
++ * @alignment: optional packet alignment, NULL or 0 means no alignment
++ * @padding: optional padding state carried over between calls
++ * @skb: partially received packet from a previous call, may be NULL or an
++ *	 ERR_PTR returned by a previous call
++ * @buffer: buffer holding the received data
++ * @count: number of bytes in @buffer
++ * @pkts: table of supported packet types
++ * @pkts_count: number of entries in @pkts
++ *
++ * Returns the partially received packet to be passed to the next call, or an
++ * ERR_PTR on error. The returned value can be fed back into this function as
++ * is, but must be checked with IS_ERR() before being freed.
++ */
++struct sk_buff *h4_recv_skb(struct hci_dev *hdev, u8 *alignment, u8 *padding,
++			    struct sk_buff *skb, const unsigned char *buffer,
++			    int count, const struct h4_recv_pkt *pkts,
++			    int pkts_count)
++{
++	u8 align = alignment && *alignment ? *alignment : 1;
++
++	/* Check for error from previous call */
++	if (IS_ERR(skb))
++		skb = NULL;
++
++	while (count) {
++		int i, len;
++
++		/* remove padding bytes from buffer */
++		if (padding) {
++			for (; (*padding) && count > 0; (*padding)--) {
++				count--;
++				buffer++;
++			}
++		}
++
++		if (!count)
++			break;
++
++		if (!skb) {
++			for (i = 0; i < pkts_count; i++) {
++				if (buffer[0] != pkts[i].type)
++					continue;
++
++				skb = bt_skb_alloc(pkts[i].maxlen,
++						   GFP_ATOMIC);
++				if (!skb)
++					return ERR_PTR(-ENOMEM);
++
++				hci_skb_pkt_type(skb) = pkts[i].type;
++				hci_skb_expect(skb) = pkts[i].hlen;
++				break;
++			}
++
++			/* Check for invalid packet type */
++			if (!skb)
++				return ERR_PTR(-EILSEQ);
++
++			count -= 1;
++			buffer += 1;
++		}
++
++		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
++		skb_put_data(skb, buffer, len);
++
++		count -= len;
++		buffer += len;
++
++		/* Check for partial packet */
++		if (skb->len < hci_skb_expect(skb))
++			continue;
++
++		for (i = 0; i < pkts_count; i++) {
++			if (hci_skb_pkt_type(skb) == pkts[i].type)
++				break;
++		}
++
++		if (i >= pkts_count) {
++			kfree_skb(skb);
++			return ERR_PTR(-EILSEQ);
++		}
++
++		if (skb->len == pkts[i].hlen) {
++			u16 dlen;
++
++			switch (pkts[i].lsize) {
++			case 0:
++				/* No variable data length */
++				dlen = 0;
++				break;
++			case 1:
++				/* Single octet variable length */
++				dlen = skb->data[pkts[i].loff];
++				hci_skb_expect(skb) += dlen;
++
++				if (skb_tailroom(skb) < dlen) {
++					kfree_skb(skb);
++					return ERR_PTR(-EMSGSIZE);
++				}
++				break;
++			case 2:
++				/* Double octet variable length */
++				dlen = get_unaligned_le16(skb->data +
++							  pkts[i].loff);
++				hci_skb_expect(skb) += dlen;
++
++				if (skb_tailroom(skb) < dlen) {
++					kfree_skb(skb);
++					return ERR_PTR(-EMSGSIZE);
++				}
++				break;
++			default:
++				/* Unsupported variable length */
++				kfree_skb(skb);
++				return ERR_PTR(-EILSEQ);
++			}
++
++			if (!dlen) {
++				if (padding) {
++					*padding = (skb->len + 1) % align;
++					*padding = (align - *padding) % align;
++				}
++
++				/* No more data, complete frame */
++				pkts[i].recv(hdev, skb);
++				skb = NULL;
++			}
++		} else {
++			if (padding) {
++				*padding = (skb->len + 1) % align;
++				*padding = (align - *padding) % align;
++			}
++
++			/* Complete frame */
++			pkts[i].recv(hdev, skb);
++			skb = NULL;
++		}
++	}
++
++	return skb;
++}
++EXPORT_SYMBOL_GPL(h4_recv_skb);
+-- 
+2.54.0
 
-What file permission? Afaik a socket protocol doesn't have file
-permissions, or does it? The is no open just bind which is what we are
-trying to protect.
-
-> For ISO bluetoothd manages this (so can be gated with DBus/selinux
-> policies), and it could make sense for it to be made to work like that
-> for SCO too.
-
-Yeah, bluetoothd manages this for ISO and I wish we did this for SCO
-too, maybe via Profle interface which I guess PipeWire registers, but
-it just for RFCOMM/AT commands, right? Anyway this is too late because
-we cannot break support of older versions of pipewire/bluetoothd + new
-kernel, so we need a way to determine if SCO usage is allowed or not.
-
-> > > > Apply the same restriction to sco_sock_bind() so unprivileged proce=
-sses
-> > > > can no longer hijack incoming SCO links.
-> > > >
-> > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > ---
-> > > >  net/bluetooth/sco.c | 7 +++++++
-> > > >  1 file changed, 7 insertions(+)
-> > > >
-> > > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > > index 3d4362a09df4..e4c26551e513 100644
-> > > > --- a/net/bluetooth/sco.c
-> > > > +++ b/net/bluetooth/sco.c
-> > > > @@ -667,6 +667,13 @@ static int sco_sock_bind(struct socket *sock, =
-struct sockaddr_unsized *addr,
-> > > >
-> > > >       BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
-> > > >
-> > > > +     /* Binding a SCO socket reserves the ability to accept any in=
-coming
-> > > > +      * eSCO/SCO connection on the adapter, so restrict it in the =
-same way
-> > > > +      * L2CAP restricts well-known PSMs.
-> > > > +      */
-> > > > +     if (!capable(CAP_NET_BIND_SERVICE))
-> > > > +             return -EACCES;
-> > > > +
-> > > >       lock_sock(sk);
-> > > >
-> > > >       if (sk->sk_state !=3D BT_OPEN) {
-> > >
-> > > --
-> > > Pauli Virtanen
-> >
-> >
-
-
-
---=20
-Luiz Augusto von Dentz
