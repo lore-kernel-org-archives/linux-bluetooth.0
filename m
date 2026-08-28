@@ -1,35 +1,36 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D283936196E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 21:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C76B3F1059
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 21:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787952602; cv=none; b=HLoTvsTyjNj/gkEH4ZJRgqj3VGlQG/aT2CjkTYdm6ERZ3XjPFAumV4ZJOhfquCeQS1oIGlD3TQNGhHdPSpEoZUh8v257p3g2+zUPkP7QPsAm7CYtb9dVVpztdAVwCRoVHG1MbCt/427VCf7iv0/w/Kn8kyyKiomP6rvKv4gq1ns=
+	t=1787952651; cv=none; b=PrgJ28tZYeYCqzUt35o4bZ4f/2G6fcTlx+AEIfU90jD4w4NO9ez8Lgk8SQwQMi6YentOJIZtrSRqxvXgILj6cth+iQH2IpIgEZ4Bj4lY+LF8tNUOwQnI0+uUW79LcpcaIPROmdRmPPuLqu58/zTXxDFBnwJBYqTDnKOO9lBFMag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787952602; c=relaxed/simple;
-	bh=kIpJQvO1c4slEYdGqPPd+9KpY0LRAXB17RMwKxi+Cxc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oXzn4YPgS1OsspJK/PEIR01Lu4OKAcxfBLS4/9Hi0v1p1yHaMr8mMrm3k4c/QeQDEzy2NoxKdFVlS5lYN0HVgpGHvmkv+iNwn8p6gYpKMySAGDF3WV1/3TvqDR1LR1hhqKbOVyy9vOJy9rSxBLCVy/8klzfkYxpKx7vgQz3z0y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NVIBKT0B; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1787952651; c=relaxed/simple;
+	bh=Xkj9iQQiZUfgRjmWLJhNuZpesDFj1wHtz6GgR9+rg0Q=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lnVa0oec/9EoWKjfT3dcpTRXljRmihFkV/BRMPMAVWQqTgIcYVxbwXUSBJFY6SSUFjuDkst59t7ii7FmRLloqfvQ0ct2/5fYux2Yr1N1IR+HT2x8MZd4F3UgIm6rABHIqCjMrvfoa3QOR0Wg5Tn6RaIl2GW8MBF7mzq6TePf1U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=aNryI2u6; arc=none smtp.client-ip=192.30.252.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NVIBKT0B"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="aNryI2u6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1787952599;
-	bh=wS1MKd7JRi5iTH1QgE1hk26TQ5eFR/6qyutbpKgGyi8=;
+	s=pf2023; t=1787952649;
+	bh=e+z8ZnU2aEuxGnNMIbeTeVu05wXIpc1r8e36LRfXbew=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NVIBKT0BIrSa+m1CBNNJ1DO25VJ9nleEP57sstOWhWceHo0lIfKORA4YSprbEeaxk
-	 UNsMFE8FonIe0z1D2wTmBeA0m4jswRH1bCZ6UpZufqju8RgdN2JFHnaT5aNk2+WqAF
-	 zzeG4xhf/dYzHH2sDxJRTWc7tjk/RngWaBr9kYu4=
-Received: from github.com (hubbernetes-node-b990268.va3-iad.github.net [10.48.147.15])
-	by smtp.github.com (Postfix) with ESMTPA id 1300850072A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 14:29:59 -0700 (PDT)
-Date: Fri, 28 Aug 2026 14:29:59 -0700
-From: hadess <noreply@github.com>
+	b=aNryI2u6V+QbZp8o5Kkvu8Fu9mVfrNBeF5TCOlSzzhq7Hpbasy/jIL5fZ/p0zz1z4
+	 tzPRKyd8kyGwr11R5jSw2Qiwm+pmwm/flUAOyo0ClXq2lF/S3Wke3NZT0U02f4BIgL
+	 nbyfxMnt4eviMKANTY3skCXHeRLgtCJydmmvdIxU=
+Received: from github.com (hubbernetes-node-1812d54.va3-iad.github.net [10.48.67.49])
+	by smtp.github.com (Postfix) with ESMTPA id 1684928038A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 14:30:49 -0700 (PDT)
+Date: Fri, 28 Aug 2026 14:30:49 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/49592c-e81413@github.com>
-Subject: [bluez/bluez] 79918b: SECURITY: Add top-level security doc
+Message-ID: <bluez/bluez/push/refs/heads/1153367/000000-772bf5@github.com>
+Subject: [bluez/bluez] c070a1: avrcp: Fix out-of-bounds parsing of
+ ListPlayerAttr...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,47 +43,136 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1153367
   Home:   https://github.com/bluez/bluez
-  Commit: 79918b87dccdb804c1fe338fe8fdfcb77a0e8293
-      https://github.com/bluez/bluez/commit/79918b87dccdb804c1fe338fe8fdfcb77a0e8293
+  Commit: c070a1646ae7433456c27781d7f46070f38634e9
+      https://github.com/bluez/bluez/commit/c070a1646ae7433456c27781d7f46070f38634e9
   Author: Bastien Nocera <hadess@hadess.net>
   Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    M Makefile.am
-    M README
-    A SECURITY.md
+    M profiles/audio/avrcp.c
 
   Log Message:
   -----------
-  SECURITY: Add top-level security doc
+  avrcp: Fix out-of-bounds parsing of ListPlayerAttributes response
 
-This will replace the existing documentation written 5 years ago to take
-into account the new tools and the new rules around dealing with
-security issues.
+In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp() parsed the
+response using hand-computed offsets into the operands buffer, without
+accounting for the fact that operand_count spans the 7 byte AVRCP header
+as well as the parameters:
 
-The new workflow replaces email-based reporting with the GitHub security
-advisory tools, explains the CVE ID assignment process, and places strict
-limits on the amount of work that can be demanded from BlueZ developers.
+- attrs is a 4 byte array which could be written out-of-bounds if a
+  length greater than 4 was declared in the first parameter byte.
 
-It is customary in 2026 to have a top-level SECURITY.md file which
-explains the vulnerability workflow.
+- The attribute bytes were read with a bound derived from operand_count,
+  so a truncated response could be read past its end. As the receive
+  buffer is reused across packets, those stale bytes could be echoed
+  back to the peer in the following GetCurrentPlayerValue request.
+
+- params_len was compared against count, which was only ever 0 at that
+  point, so the length of the PDU was in practice never validated.
+
+Parse the response through a struct iovec using the util_iov_pull_*
+helpers instead, so that the header and each subsequent field are bounds
+checked as they are consumed and the remaining length is tracked for us.
+This lets params_len be validated against the actual number of parameter
+bytes received. The attribute count is still clamped to
+AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
+
+Reported-by: @ax-nnlabs
+Closes: https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
 
 
-  Commit: e8141342284be2a52e16565b96b513ebe1297d84
-      https://github.com/bluez/bluez/commit/e8141342284be2a52e16565b96b513ebe1297d84
-  Author: Bastien Nocera <hadess@hadess.net>
+  Commit: 617e4424880ac8a4342424dbb75d071970ef6d50
+      https://github.com/bluez/bluez/commit/617e4424880ac8a4342424dbb75d071970ef6d50
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-08-28 (Fri, 28 Aug 2026)
 
   Changed paths:
-    R doc/security-bugs.rst
+    M profiles/audio/avrcp.c
 
   Log Message:
   -----------
-  doc: Remove obsolete security-bugs.rst
+  avrcp: Fix out-of-bounds read parsing attribute lists
+
+avrcp_parse_attribute_list() received only a pointer and an attribute
+count, with no indication of how many bytes were actually available. For
+each attribute it read an 8 byte header followed by a 16 bit length and
+that many bytes of value, none of which was bounds checked.
+
+The callers only validated the fixed portion of each entry:
+
+    if (be16_to_cpu(pdu->params_len) - 1 < count * 8)
+
+which says nothing about the variable length values that follow, so a
+response declaring a single attribute with a value length of 0xFFFF
+would read far past the end of the receive buffer and pass the result to
+media_player_set_metadata().
+
+These are response callbacks, so they do not go through
+handle_vendordep_pdu() and params_len had itself never been checked
+against the number of bytes received. avrcp_get_element_attributes_rsp()
+also cast the operands to an AVRCP header without checking that a full
+header was present.
+
+parse_media_element() had a related off-by-one, reading the attribute
+count at operands[13 + namesize] when parse_media_name() only
+guaranteed that 13 + namesize bytes were present.
+
+Parse all of this through a struct iovec using the util_iov_pull_*
+helpers so the remaining length is tracked as each field is consumed,
+and validate params_len against the bytes actually received.
 
 
-Compare: https://github.com/bluez/bluez/compare/49592cbc1416...e8141342284b
+  Commit: 772bf5e33c8017cbfdb4df6372f72843836f6c37
+      https://github.com/bluez/bluez/commit/772bf5e33c8017cbfdb4df6372f72843836f6c37
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-08-28 (Fri, 28 Aug 2026)
+
+  Changed paths:
+    M profiles/audio/avrcp.c
+
+  Log Message:
+  -----------
+  avrcp: Use util_iov helpers to parse responses
+
+Every controller side response callback parsed the PDU with hand
+computed offsets into the operands buffer. None of them validated the
+declared parameters length against the number of bytes actually
+received: unlike commands, responses do not go through
+handle_vendordep_pdu(), so nothing did it on their behalf. Several read
+past the end of the receive buffer as a result, for example:
+
+- avrcp_get_capabilities_resp() read pdu->params[1 + count] for a count
+  taken from the response itself, with no length check at all, and then
+  shifted by the resulting event id without bounding it.
+
+- avrcp_player_value_rsp() bounded its loop with
+
+      if (pdu->params_len < count * 2)
+
+  comparing a big endian field without byte swapping it, so on little
+  endian the check passes for practically any value.
+
+- avrcp_get_play_status_rsp() only checked params_len, which is supplied
+  by the peer, and read nine bytes on the strength of it.
+
+- avrcp_set_browsed_player_rsp() indexed folder names relative to
+  pdu->params but bounded them against operand_count, which also spans
+  the browsing header.
+
+Add avrcp_pull_header() and avrcp_pull_browsing_header(), which pull the
+respective header out of a struct iovec and check that the length it
+declares matches what was received, and convert the response callbacks
+to pull their fields with the util_iov helpers so the remaining length
+is tracked as it is consumed.
+
+Since the receive buffer is reused between packets, the bytes read past
+the end of a short response were the contents of an earlier PDU, some of
+which were then reported over D-Bus or echoed back to the peer.
+
+
+Compare: https://github.com/bluez/bluez/compare/c070a1646ae7%5E...772bf5e33c80
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
