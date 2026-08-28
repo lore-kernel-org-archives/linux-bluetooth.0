@@ -1,161 +1,168 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9C137AA8B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 16:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787932978; cv=pass; b=mwq8XsJ1cUmZzw+eljrLFYt4tt/1DPk2i9nk8ipkfzIvurjrIbwair35K9zEe5iuaGS2VE1B2vTm0ZpgHr8PbazcN9lTnurkyCDY3Z9hOXzQWVANSwofBXMjx5iU8+5x0O7w2QIh6Cs4ycgnHQ8uk5QIoVEdoH5SemojMMco08E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787932978; c=relaxed/simple;
-	bh=esHDgAINVGdxGusqd/dTQnNfcJDy+WvlTDyBHC34xY4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=l0K3RM78kZt6JhuPSFSQG83t6zQ7jVK8Dj4t3LXh/s1SKriULl7vytynkAM42NjPcrFfr1uiw9HwPV624Z+6/G9vtHfS/q/0gye3kAoYGi7TTk/c2y00Qd95JpZe3dk1f/y+Ztk2XsyYO5Y5fLeOXrxADW7okrCL7igpY7bm5ZU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=DK5M1n4+; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FA327466A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 16:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787933833; cv=none; b=iKyCLTTdM2VexIlE+l6wTFn1sSS+QRpH0hb06OSvXr4oOOhfNOtQF0j+dbLhBtG3Y5qlaJ9d+Zvzm5LfLkj377OdU+V0+AiSNJXLtnR7vBYr4gwe+K4I861Nsg5cuFtgMsE+mR3De9rDAOiYgcHtJcZYAKIdhdNSWvn/Fcc04uY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787933833; c=relaxed/simple;
+	bh=s8vCrFexOS2KE/slAAZZzqxfqbpSWJKepHDJzpxD4o0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LC+j7msiN5bOBJngnPDN6apytODGKUlvvNhp1NdNocBV0dja10LaWHPlinBEmwYWF+TwsfQyX+1e3zgbXgFl7ApRP6iMhtZxwEeniivEEuemsvGC/deC76uAfizUtcpwSzGvhN29ElpqOpJm4VkL0NxMnDo9IpTFaHrWsXlVhNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NelHgWT9; arc=none smtp.client-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="DK5M1n4+"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hWjpH5HGBz49Pyc;
-	Fri, 28 Aug 2026 19:02:47 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1787932968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2FLkdXXOgFcQG6oCb7D5IXWplTWB3n/DOt2zphBtErE=;
-	b=DK5M1n4+g3X40gHKNOricy7DxC9YDEXZQa5s/dPUqr4V3MMtcQZhTJmwvw94B2NEfMOmUN
-	tSlA6RviNjIcyCgyeUx1T150D5dkPNQMrBzn+UrVP/AS/7CUo2BSjQsYpcitfyskiILgqy
-	V0yIZFxeNnWDRR1xtg20v5MsG3VJw83q7z0GjtRqZYQJ8WyfNy45dKapFlxbF3KJlLJe6x
-	sFwcEkxB6D5K3uSv2fAy2wrWOJLQbR5Sgw1FOs60Z9vjuTpv4amIO4zTk6gWaN98Reaejo
-	vrZELx4L/EQqugBuDN0BQdVJK2xIFVTP4tR33xEuLbXVZRcbtoYwQWEMsluOUQ==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1787932968;
-	b=jq6m+j+bJOGEo+9SHo0WRj4MA3FnRywKn6DZCa7AN83LeRJZ+Q5V41eNHVH2woLfgvEljM
-	5ZPRffoqkHPiOjJnQkuQxA7SW92/JBTL8y715SqU/o++CM2F2LIbxmzOde+gXP/XoMs5dQ
-	K4THZnzibtFoUK5niskpoN7xkjijkJthV1kRgE1u9mSIPRwLfiFmQwAXlGRNzGHfo0tzcJ
-	6i0Ua0DorjLhxKbFhF6PjalLBUaYTQixS6Op21X2m5gvBzMzLb0urY+eznI8AKF5XJV7mj
-	HcDAztfKtXyAxMg3Mep6zYpYD3sDy9o2i+XAiZWw4QSkT+nQSH4q0A0QolFjsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1787932968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2FLkdXXOgFcQG6oCb7D5IXWplTWB3n/DOt2zphBtErE=;
-	b=LovGkjVW5Qua3MxEngRNrfVxtobCWXl263DxE16X3PKLB/5jUpFhn7FIXI9IMtYzilCCZP
-	WpszOJvGIyJPORwkxn9/BnnsHYXWhGHZpDHzTPuT+UgEOL89VP3A5dn9LZz/2YhY2JOdSw
-	jzlxoq2d8Xen8EucSqhjC8yjMMCfiVt+0r61oV84dk4Rjtjq8xo58mzW3KMZL3Inc60E20
-	d8WHFebn/TMSKBLh8l8BAntti3lM2s7ALw3s6LZ3uV34P1tF0rCeAOIsGyur9fD5rLDYa6
-	Azd18TUHCxLLk3+bsQzk6qdCryrrOhvq51OwcQahoegvu8X4CtUcxFpD3yoJzQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <78402f4521084b3f6d2cce7709cbba751d83836f.camel@iki.fi>
-Subject: Re: [PATCH v1 1/2] Bluetooth: SCO: require CAP_NET_BIND_SERVICE to
- bind
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 28 Aug 2026 19:02:46 +0300
-In-Reply-To: <CABBYNZ+qzL04d0cdKd==wFr_Gtz9gCa3_iNv0B9rE=R8pdpajg@mail.gmail.com>
-References: <20260827180149.415744-1-luiz.dentz@gmail.com>
-	 <0186ef45e8d10fa469fe31f32d24b54c672157a3.camel@iki.fi>
-	 <CABBYNZ+qzL04d0cdKd==wFr_Gtz9gCa3_iNv0B9rE=R8pdpajg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NelHgWT9"
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-97bf910aa70so358146241.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2026 09:17:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787933830; x=1788538630; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KAPi1r0cWV1jTxnu5fkIUJbNKZ9UXFm72YLmBbwsawk=;
+        b=NelHgWT9HqRM4XG34zJhzTf6OsfaJtsjY5fa3zOOo/TN456ydNOEUpLD8ruc93havZ
+         LujyCRKdUxyCJ65AUw+ubQzSpFWJuLY+yjlnlmH3ALgfPAe23kvw9QOoGSkXWBgavIGu
+         +IisZAqMk2lt6J1rdpAXoJqzy6s6Qtz/lBwyp1I9qkqmQqvRvOxYDF6ZbWFGEIqrwEyE
+         iWWAvOQn1p0fmU509Ec6CWpp1QqNN05Il3egUMu1rraUb5zWAb72JFT3aQ9fmKDA5ih+
+         7aH/tJnQ7Yv1kQxHqzIOKA5zWKQX1p1mO102tMzeE9r95ULduWJkyZS9PkuNJ4lck1P1
+         ACaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787933830; x=1788538630;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=KAPi1r0cWV1jTxnu5fkIUJbNKZ9UXFm72YLmBbwsawk=;
+        b=GEsQdyb0p57j9k3XdIfaIRSKG7R+78Xa+Oqhg6f5lcoAnY9NWzqrlvF7dZqavZjlWf
+         jpqXxztLHLA898scCpB/BrJf3aE4SAWY5q5AYF/4e46P41AGmbbjsCV7VXgcv5tGAcOh
+         y+E2yulK7dZZRRAMtC/3ZoWCzsBhUjXqL8BK1qmcrkNkW95X9AE1VGLSEMMany88otDX
+         9MX9zJBETD4BUs/sv4g1H+8VMiysXKMB9tjoc/qHEnF+eC7zZ/YByMVyN4/1UbBOziau
+         8CpApfkXaNez0f361qKbQ/SYQGFrR2lj9Jb8ew9cbY7IEE/UpK2/iMfXoNM2ZB0z+Qzt
+         pKSA==
+X-Gm-Message-State: AFuF++kBNJOHWv3Q7Rfah1Lmk5x9gKI0Wt9kVbDShmOSGSV0bBHFGOWq
+	GQm9XTBmIzXlWGeG6g3RAZBWNeKsWJvjfmYX5kpOxIkHuiUXjUzsMjfGz/uSIf4BMtI=
+X-Gm-Gg: AR+sD13DXpu5TFD9k4O6RXHcpKdt99ATUkjz/sHAV7VUrAsiHPfSGDcdIEokcDLtq5e
+	DKJ9MNrJhcuLqxoBpxO4SxZ1zLLHfy1BYJNExaVDuGTDJJhO1gxkV70JVjjipW4/UiHdQn+XzcC
+	7TMOv+fi3WttTjOjlSWRzSQPzGYDNlGJEu7+b3dXNoGrKPWUYPVF/UZMTfQFQZMnp6y2RPuzcPN
+	rWXg+mQa73/b5Gbt6Uu12aLQrC5joZoSnwrv2TTCkL2LHiXNZJQ7F5eWcIdVv+tZs2iOifqvXPT
+	lcoeRiFTSqkup+7jjk7WEvP5BkLJWKD8CMwOys3jj0MNMUZErGz+yvZICQ69xlpnMRXKCtmlMdo
+	y2LJLDoJd/BdXRC67QMbtDlKFMhlkZf4aK3ow3fbR4Ouneyv74VQ5pVYZEfWNxoIjdFYeUd+b0b
+	8Ol4HH2MtgHECDOvgQdUgNB+/bIKQW/E5LUMUexPm36OuCybdYY9YWuhGjTEo7mbvlBYUr2RlBU
+	7UY2nVCXM27tTvS4cvbOsWp5ckid8aA3ifufa7dJWd/+aS4DT650RM=
+X-Received: by 2002:a05:6102:3f0e:b0:784:d83f:2a59 with SMTP id ada2fe7eead31-78599267a90mr2326919137.9.1787933830190;
+        Fri, 28 Aug 2026 09:17:10 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-785f532aa2fsm1431750137.2.2026.08.28.09.17.09
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Aug 2026 09:17:09 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/3] avrcp: Fix out-of-bounds parsing of ListPlayerAttributes response
+Date: Fri, 28 Aug 2026 12:17:00 -0400
+Message-ID: <20260828161702.519421-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Bastien Nocera <hadess@hadess.net>
 
-pe, 2026-08-28 kello 09:50 -0400, Luiz Augusto von Dentz kirjoitti:
-> On Thu, Aug 27, 2026 at 7:41=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> > to, 2026-08-27 kello 14:01 -0400, Luiz Augusto von Dentz kirjoitti:
-> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >=20
-> > > SCO sockets have no PSM or port namespace: binding one simply reserve=
-s
-> > > the ability to accept any incoming eSCO/SCO connection on the adapter=
-.
-> > > That is equivalent to listening on a well-known service, which L2CAP
-> > > already restricts to CAP_NET_BIND_SERVICE in
-> > > l2cap_validate_bredr_psm()/l2cap_validate_le_psm().
-> >=20
-> > In current Linux userspace, sound servers that do HFP listen on SCO
-> > sockets, and I think often don't have CAP_NET_BIND_SERVICE.
-> >=20
-> > Do they continue working with this change?
->=20
-> Good question, that said this is a part of security hardening
-> otherwise any process could start listening to an SCO connection, and
-> the sound server would stop working. Btw, does the sound server have
-> any special capability to, let's say, open the sound card device so
-> perhaps we can gate it on sound capability as well.
+In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp() parsed the
+response using hand-computed offsets into the operands buffer, without
+accounting for the fact that operand_count spans the 7 byte AVRCP header
+as well as the parameters:
 
-For ALSA, the sound hardware access is controlled by device file
-permissions in /dev/snd/*  Not sure if=C2=A0that's usable here, or if
-there's some other per-user controlled solution that could be used.
+- attrs is a 4 byte array which could be written out-of-bounds if a
+  length greater than 4 was declared in the first parameter byte.
 
-In most current distros sound server runs with user permissions without
-special capabilities, and don't have CAP_NET_BIND_SERVICE, so I'd
-expect this patch breaks userspace.
+- The attribute bytes were read with a bound derived from operand_count,
+  so a truncated response could be read past its end. As the receive
+  buffer is reused across packets, those stale bytes could be echoed
+  back to the peer in the following GetCurrentPlayerValue request.
 
-Giving this capability to them allows binding to low network ports, so
-it probably makes the hardening issue worse and not better.
+- params_len was compared against count, which was only ever 0 at that
+  point, so the length of the PDU was in practice never validated.
 
-The next simplest is probably separate executable with setcap bit set,
-which gives a SCO listen socket for those who can run it based on file
-permissions.
+Parse the response through a struct iovec using the util_iov_pull_*
+helpers instead, so that the header and each subsequent field are bounds
+checked as they are consumed and the remaining length is tracked for us.
+This lets params_len be validated against the actual number of parameter
+bytes received. The attribute count is still clamped to
+AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
 
-For ISO bluetoothd manages this (so can be gated with DBus/selinux
-policies),=C2=A0and it could make sense for it to be made to work like that
-for SCO too.
+Reported-by: @ax-nnlabs
+Closes: https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
+---
+ profiles/audio/avrcp.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
-> > > Apply the same restriction to sco_sock_bind() so unprivileged process=
-es
-> > > can no longer hijack incoming SCO links.
-> > >=20
-> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > ---
-> > >  net/bluetooth/sco.c | 7 +++++++
-> > >  1 file changed, 7 insertions(+)
-> > >=20
-> > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > index 3d4362a09df4..e4c26551e513 100644
-> > > --- a/net/bluetooth/sco.c
-> > > +++ b/net/bluetooth/sco.c
-> > > @@ -667,6 +667,13 @@ static int sco_sock_bind(struct socket *sock, st=
-ruct sockaddr_unsized *addr,
-> > >=20
-> > >       BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
-> > >=20
-> > > +     /* Binding a SCO socket reserves the ability to accept any inco=
-ming
-> > > +      * eSCO/SCO connection on the adapter, so restrict it in the sa=
-me way
-> > > +      * L2CAP restricts well-known PSMs.
-> > > +      */
-> > > +     if (!capable(CAP_NET_BIND_SERVICE))
-> > > +             return -EACCES;
-> > > +
-> > >       lock_sock(sk);
-> > >=20
-> > >       if (sk->sk_state !=3D BT_OPEN) {
-> >=20
-> > --
-> > Pauli Virtanen
->=20
->=20
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 3271b84782e8..906f93424872 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2395,31 +2395,49 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
+ 					uint8_t transaction, uint8_t *operands,
+ 					size_t operand_count, void *user_data)
+ {
++	struct iovec iov = { operands, operand_count };
+ 	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+ 	struct avrcp *session = user_data;
+-	struct avrcp_header *pdu = (void *) operands;
++	struct avrcp_header *pdu;
+ 	uint8_t len, count = 0;
+ 	int i;
+ 
+ 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
+ 		return FALSE;
+ 
+-	len = pdu->params[0];
++	pdu = util_iov_pull_mem(&iov, sizeof(*pdu));
++	if (!pdu) {
++		error("Invalid AVRCP header");
++		return FALSE;
++	}
+ 
+-	if (be16_to_cpu(pdu->params_len) < count) {
++	if (be16_to_cpu(pdu->params_len) != iov.iov_len) {
+ 		error("Invalid parameters");
+ 		return FALSE;
+ 	}
+ 
+-	for (i = 0; len > 0; len--, i++) {
++	if (!util_iov_pull_u8(&iov, &len))
++		return FALSE;
++
++	len = MIN(len, AVRCP_ATTRIBUTE_LAST);
++
++	for (i = 0; i < len; i++) {
++		uint8_t attr;
++
++		if (!util_iov_pull_u8(&iov, &attr))
++			break;
++
+ 		/* Don't query invalid attributes */
+-		if (pdu->params[i + 1] == AVRCP_ATTRIBUTE_ILLEGAL ||
+-				pdu->params[i + 1] > AVRCP_ATTRIBUTE_LAST)
++		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
++					attr > AVRCP_ATTRIBUTE_LAST)
+ 			continue;
+ 
+-		attrs[count++] = pdu->params[i + 1];
++		attrs[count++] = attr;
+ 	}
+ 
++	if (!count)
++		return FALSE;
++
+ 	avrcp_get_current_player_value(session, attrs, count);
+ 
+ 	return FALSE;
+-- 
+2.54.0
+
