@@ -1,67 +1,120 @@
-Received: from aposti.net (aposti.net [185.119.170.32])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD734125A0;
-	Sat, 29 Aug 2026 10:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.119.170.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44DA2E764D
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 10:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787997740; cv=none; b=V0z6jQq0iEkzuak4vvd3qcbP+ANffc5Ij7YWHT1kC04KE8ro5I1q5WM2KfVs6bShSy2qbKI1gB7tlNFZngdNfqP+8MzH81DWh0zi1Zc451O+4kaknrZfmml+E169oa2q1lNDrIQw1anqE1PltLBoTpsOZvNXzXd34e6XeS7nkNs=
+	t=1788000641; cv=none; b=U6H09WQg1q8KpNmI5RXfS5mCwo6h4TnxNdr6P94kSfhrHK98okLxb1bS3WvETX2D1mDg/eZYqWZqTkAfya3s7F0G3FypsiHDDKYb9wIZ2D31/HHaDCp6pbAzDFywHTvGSqNQpOkMgtsUB+Pa3fEh+F949+dIu/CBjNUlZqSn6Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787997740; c=relaxed/simple;
-	bh=yw4bGtMXtktOznhLEvuTvUohIiJWcpcA2OORlnJBvg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LqLZH3QRxb+UY5RvcajEE3YchppCcl1fBTUuKWhv9qtcsRIRUn9tgQ+/8CfFQKAs4MRup7dxdK8oXGx1UxRTJ8d5jD6hmD1ZGnL/XN/6pYpYQ46d6o8apyA1tAd4PTwXLioSW83XnrlalkeN5Tv21MKVvqxvIrJEZESi2HQqPss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=crapouillou.net; spf=pass smtp.mailfrom=crapouillou.net; dkim=pass (1024-bit key) header.d=crapouillou.net header.i=@crapouillou.net header.b=oT1V1rzW; arc=none smtp.client-ip=185.119.170.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=crapouillou.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crapouillou.net
+	s=arc-20240116; t=1788000641; c=relaxed/simple;
+	bh=b93YUtOXBFD1G5XeEOQHydBuN2hPmpryx12G709Zuf8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ORdlCM7bUrBCYRz+ul9Dmbk1KqbJzndudGi7nZn2Er5SQRPKz24ReTMtv/ZTWXQsRDlaiEA26DUenGlxQgOSdmeiPEj2BKFXKb3/kDEAAzjeDnW94m383jPJ/gWEfTgeVAZ6s7G/XMT5C79Jw7tUR4XSGuxpQxeMVo/wfK27WC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePY/DfqU; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=crapouillou.net header.i=@crapouillou.net header.b="oT1V1rzW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=crapouillou.net;
-	s=mail; t=1787997735;
-	bh=yw4bGtMXtktOznhLEvuTvUohIiJWcpcA2OORlnJBvg4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oT1V1rzWEJXMaZ0zm0A2tsKC/7wzZW2tfr2hRTY/xLb0+AuFIk8Vg1nl06I2aseSm
-	 HbPkMuSc6Oplw+Kk7Bqm3yFVbJOsdIOA7t72B1VNyAVhNIXT15ue6KQ5xzsTyja2gc
-	 DfMe8SS8P4s1l7CyJPaG8HrD3MkewxV+RiI9F9Pg=
-From: Paul Cercueil <paul@crapouillou.net>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paul Cercueil <paul@crapouillou.net>
-Subject: [PATCH] Bluetooth: hci_bcm: Default to 4 Mbps
-Date: Sat, 29 Aug 2026 12:02:05 +0200
-Message-ID: <20260829100205.113655-1-paul@crapouillou.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePY/DfqU"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-52f83889a93so18101541cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 03:50:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788000638; x=1788605438; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m9eZkVtBmWM12K3iXNaI4ZME+LzmSuhrzGoPIzGxzpI=;
+        b=ePY/DfqUqqXJd+nNkQyLOLww60MRbVyUrXrCFcqvNANiDU2SmpVgp3oAq3J7tji0tx
+         CBR2KzZFDcSGiJ4ERwGnuMJnAo5zZI3A1ORtyo0YWy/u5gPbJEOS+jkO1uBsdKrfbIku
+         ifgsvlERd5VpdoQzVapc9euQKKwHfcpm/w0edn8QkDwvI6YJdAofP89oVGo7prT73T/3
+         35e8XKk1IKS0fMRI5rfuS5kqBFaLfoosAgc5aIeiFOhLTpcMKppTbt/ln2Kstme9cs5b
+         3JJVJTzOTvNZNIHWDM4Qzh/XRosl/AhpUIwjSlsD7oyLK6M8IFg2wD2SixTm1j6YmMcp
+         rCQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788000638; x=1788605438;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=m9eZkVtBmWM12K3iXNaI4ZME+LzmSuhrzGoPIzGxzpI=;
+        b=tXq/ciHgQuP0RyXooDkGlbjDXXVYRoiUuhWdKac5on2dfjGIVfhQbCd5Fjarmwr7FD
+         qvSZ8CoKOVRMhFAssQkZo1sNhKPJnx1IaZOGx4aVi1kb1eH+nZYHYT690jEWJ9TVJzgL
+         lESVzCBx57kCcvsC5UrBTaI7nMmfvE5KTES5ZidDAG+K0upiwp63pymiVWhlBUdFlXR+
+         tQL6Fgqd/A/DVZS74sCbNviwIxIZWbPjNl3BBNiUCmLMz/G8nJ1bMcIYaKpjBVkwAdry
+         Jj0VZV+/Zxhi9fiovf5wiy8R3UqJFBORYADcVmn4gXDFWsl7DlAKhOwt0otRjH0efAbZ
+         LXkA==
+X-Gm-Message-State: AFuF++nyFxowevYQhimA3sVxn/r8ERJ5IDYccYpa/Y64GXtGKKeUG7my
+	4trhSXErbIbecyOqE0Hv9GC73FzdB0eeRrFW2ZJT8xQCNJTKKTmuB2GszmVDDg==
+X-Gm-Gg: AR+sD11wklim9OfIZpGkKYhlbI6GULgXNQYhowBzFwUtSZ1AMtaX5B/4qKvD7Bu5tNd
+	QBs7Yatt3SYEmw5ccAuAfv2UHhU6GOpRYY7o7sGRcQanyKf/Sxbx6rX2x/BkWApGxljQrjZm1Ft
+	NWGahCIYHg0t1AKlTd+nIVtYk9382mX6br+Bgr/9vZrpPbPeqO+49JgCkHyc/C5jPkIDdoUaC+X
+	AjWBEzeI95zn29MM51nakznqR/lrY5cvGV0XLdJaJFhPh2rutZccJINBkyeHt3RLwkK/QvCmYof
+	gtmmURWLiqPafNpikCNaRLMqpsDeeCj58tEOpfnwK3lRBTvCqNBUL2QbpkiUnR6drxC/RXnswFx
+	Em+3p5gDxSUOS2VG3upnPZeK8LXIH7uSMShDvc6d/1VGuJ5WP7dDWzITdtEiMLxmFCZ/iiLkMLy
+	LarC9P8se9nq8TkFsa+neyBzRxVNkm7eBKRSndJ4L8sF+m/hsaaDqFZEU7ocViQvOFZPA=
+X-Received: by 2002:a05:622a:58c9:b0:52e:8ef:5960 with SMTP id d75a77b69052e-52fb965cdf5mr179821401cf.33.1788000638563;
+        Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
+Received: from [172.17.0.2] ([145.132.99.99])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90ceaf94d8dsm21127996d6.1.2026.08.29.03.50.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
+Message-ID: <6a92b97e.9c49f9ea.26385.c448@mx.google.com>
+Date: Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4543706383621626115=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, paul@crapouillou.net
+Subject: RE: Bluetooth: hci_bcm: Default to 4 Mbps
+In-Reply-To: <20260829100205.113655-1-paul@crapouillou.net>
+References: <20260829100205.113655-1-paul@crapouillou.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The ACPI path already did default to 4000000 baud, while the OF path did
-not, for some reason. This meant that unless overridden with the
-'max-speed' OF property, the serial port would stay at the init speed of
-115200 bps, making it unsuitable with high-speed Bluetooth devices like
-audio equipment.
+--===============4543706383621626115==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Paul Cercueil <paul@crapouillou.net>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153580
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.98 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      0.45 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      25.20 seconds
+CheckAllWarning               PASS      28.30 seconds
+CheckSparse                   PASS      27.21 seconds
+BuildKernel32                 PASS      24.78 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      459.99 seconds
+IncrementalBuild              PASS      23.99 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/663
+
 ---
- drivers/bluetooth/hci_bcm.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 9a103db7e355..c44d552f9ad5 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1224,6 +1224,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 
- static int bcm_of_probe(struct bcm_device *bdev)
- {
-+	bdev->oper_speed = 4000000;
- 	bdev->use_autobaud_mode = device_property_read_bool(bdev->dev,
- 							    "brcm,requires-autobaud-mode");
- 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
--- 
-2.53.0
 
+--===============4543706383621626115==--
