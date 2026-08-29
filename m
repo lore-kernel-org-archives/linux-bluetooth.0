@@ -1,225 +1,297 @@
-Received: from mail-oi2-f11.google.com (mail-oi2-f11.google.com [74.125.231.203])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA53955C9
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 15:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1398C3B6C01
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 15:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788017374; cv=none; b=rh2Syqvcel8/dFkYCQY/vA+Z05UaFsIkekgzLmKXve5FU6bI7bhEx+WfwNZtsHYSieWs3ehIWOUAk8KniqFsHAsPYhPUoqjJo/d5sAc2NWjHEzNyxa7PlhJP8CSj4KllWRUXR4TOgCZROkIYeyHpriDkMZOe4zLFeN3G93bDchY=
+	t=1788018334; cv=none; b=XYnJqR3j7IqLvvJnZGaEKkmUYFbcz5nFXTxY0Y2z30zvx4q5MoKoivLWQNsjxpjvrRNvskWEbA+m/uSUmLUrI0xxqSLpUOT42ZlCTHAcnm47cH5+2QaCOwzX+tARLJsyDE9iTt64UbaWUWE5+Azn5J6w1VtbWZc1MBkFsR1CiB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788017374; c=relaxed/simple;
-	bh=CMjiRMXOFhOQJ3t7mMhYPWlT9GWHNsHC2vJnmo61tCk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tSNa/Jgu8b96kCCkwaMRI19ZhM2BCoWnPaw6wG69/1Mc97SfW/r2yMB8+N+6Sh11Cu0c87lT3llYY7zjDK+NMqlAyncDPOCNqOXXmrlojrG+andIiB+a2ua/D/09aXrZVizyJbZ5rQQXnTHl+4X8bzdSdwDpvjzqaL3lMlkJ1Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi2-f11.google.com with SMTP id 5614622812f47-4af7193adb7so684747b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 08:29:33 -0700 (PDT)
+	s=arc-20240116; t=1788018334; c=relaxed/simple;
+	bh=35Lvbnh9dWnsopeGnv/+uDgQIKaeUoM6CgNE3ESoZI8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=RgoLFa1WwIqRWqiXshBF3hNX31e0uw8QiRPSDQ0FWJ4L0DSpj2uEtpmXzouBONGSVPhlXaTN3DFJFAUKdwfLykYuNO50pHobENDTQQy0neOry5ROcqjt64RR/7S0nBTKuGMAj1EFbmEZl7t/kQgoQ0zSFyNpQmU5gHYNC2iPQm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IkY7I8S+; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkY7I8S+"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2d72ae08fa1so17064125ad.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 08:45:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788018331; x=1788623131; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Kqn2Dx/aicUuzf5QASjar1D8PolcXl6NlxdWFH1ZYT8=;
+        b=IkY7I8S+gJE3H17gqYP/qX1+FyJWhrvLGgCr47AEJ6xXuq1IvIXimd4eiWIIugsXlW
+         CNT4bGZ3ZKVn0r4Lx3SUoXvKqbccfi+VKhd+3Nmo2ZOLl43uzjWoG9qZ4YBlsVGoOfbb
+         vIdDXu7rSqZfjJAm1M/TGr3u450nwbj8+8xR1xeGipSOH8ajeQYxTH5DkhubsOvdVlZC
+         //dhrKUJ5PSZn5CHpPMpicipXvTgkP4YQaPcBcm19ylwNEjCDWJo+Yth+DnDInS4GRL9
+         inEgQzSoRdTzeubL8+fd9kH5g+LpusCTy39S3VazzRLomeUau+Z0plN5ruqVAuc/m6Hd
+         OuKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788017372; x=1788622172;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qzsG6loT0ZKDWeUwY7zsbCAw31VaYMQZw7KvYQB7hbk=;
-        b=JVScBK59UlNCkkC6QmS8sRKkAmr/UPYP2vzukz7vCPR5DPTrT2JSF257TvYD77KThG
-         2F0v3IU9QilxvDtxkMKRXueici3EpGbDWiEItF8DAhyHOuAvaGJ/McfL3iTtakT5jiEF
-         kB036yBrvUXJhy5xJUp1ZLpdWeSbs0qGbz/pD9NA2J9WAsakm3yWDyE33JhuwzKOrXgs
-         +KeVSEXshe0cXi5T8hbwPMMR3XqHVWBlOpBJjkkQ1BeS/hzFV9dTHDRsPsr1SrSA1Xwj
-         Iz23oH6WGKekr/fLQb1WQ/I4leaDOWDgmPIc3r4zPWAZwTZ9Dtmf0IYDysLXZXsfzhPu
-         HmHA==
-X-Gm-Message-State: AFuF++lnuDAznk0/qbxvpKjri4MdyQCRrE/xBUl3ggc3G9XKoP7FKkz+
-	NFDHM74M29Ifwsmf63osp366tSHvWs7VqYtoX3m0S0kebRLjDfNRSpYAH832Vq5U7SpvoBrrzHv
-	u5fwwRPYYSaH8tyAJxnDTtFoWl/tGj1InuE3W1eOXqa5/WXzRXUfctUXj3OQ6cg==
+        d=1e100.net; s=20251104; t=1788018331; x=1788623131;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Kqn2Dx/aicUuzf5QASjar1D8PolcXl6NlxdWFH1ZYT8=;
+        b=NUXhLsCD2dG1IzrGotc449m6AWcN9J7eEWRcTYrAoMMixjFhg6F7Vp9mOdSaR9H6aj
+         JvJVbNzGfea9rhzn5kO0NQGMTnj+COca8/WGwd+0CnjLkJ3nRaPdzP2Tr6GwHpUSZux7
+         7iW0abZxCv0+oKPZYORvnzi6dFKMtjQ1W5uv6lmoHmFTYkPS+J+bmj71VcizEU4l5Pmm
+         ST/2Enpe6g2j2e7h8o46CqkTIU5XBggvNVm5CJ8h5npVmcwlVG2jEJjzIMYNwsk9TZ+d
+         8HlpBS1/Iz4h9dKONeYmRLxQvhRf1cbqTUct9qMCkg+hU8ZM44efcaL96bdK9DpN8htf
+         eWfQ==
+X-Gm-Message-State: AFuF++mIuwdNKGlsN3lMJXqGNt1M09XgVhvbk5ukAtKMZ3yFsWnujo7E
+	IQH+UsjdjOfxYjEjlp/YSKShgphvqP7oewRUa/IgGsvJSud3nqh6V2aj6YgC+Q==
+X-Gm-Gg: AYBFou03Boz77P4DJ0fsKTubOZa9a7hCzvZCR8p1UyUBeAPi0oHcc0EkfNjV/2WKXeO
+	oLL8N0pKJHPvpQqeCPGMRFjiM270RCdYPOB/3HhoOQw+BU02jYyCjQnE3PFslSSuhR+KiHq+DYJ
+	LUCQPBijAtp+l/JX4ma7E8m49qh5tpkdm51pwV6NAMIbpo9VU6Bt3nLmAuERU4SwllNKh5tVl3s
+	FQVV2MGe5AKH16hmzt96pEbsB8h3C0P+0lMaulFljSd5YBJ8ZWhanNoYRtm2khPfagusvN3bmEN
+	0uPRc8zXs5MdlPlzqdkhMTw2s6pWmQcHm25TMiw0W5fYvzOD75htAVSYPaufrlnz5VLm9zX8+6W
+	Nta7MGLhEwRl1m7iscRslzJS6T8/khfBNvwz4zV+IHl71e1/E8jDLe9OlcsZUOZtgxig8ugQzdh
+	Ps8vaB3V83z0Jmmm3B3/Niu3gRZcx2rNJtPgMvbfVsFR7mFRmZqn0DbZxfV395bxXxkHI=
+X-Received: by 2002:a17:903:1590:b0:2d8:d4d3:da51 with SMTP id d9443c01a7336-2d8d4d3db89mr100738965ad.21.1788018330752;
+        Sat, 29 Aug 2026 08:45:30 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.253.38])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-32b4bc05416sm2724280eec.6.2026.08.29.08.45.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Aug 2026 08:45:30 -0700 (PDT)
+Message-ID: <6a92fe9a.244fc04b.a56c2.6f76@mx.google.com>
+Date: Sat, 29 Aug 2026 08:45:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0381408372663931423=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:2388:b0:4b3:1e40:640b with SMTP id
- 5614622812f47-4b39800d0ecmr15540866b6e.6.1788017372140; Sat, 29 Aug 2026
- 08:29:32 -0700 (PDT)
-Date: Sat, 29 Aug 2026 08:29:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a92fadc.08e933ee.dbf97.008f.GAE@google.com>
-Subject: [syzbot] [bluetooth?] possible deadlock in rfcomm_security_cfm
-From: syzbot <syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: L2CAP: fix and annotate l2cap_conn::chan_l locking
+In-Reply-To: <dbcbac89076e5aa3aa4f3ab22a82f85e051bb022.1788013041.git.pav@iki.fi>
+References: <dbcbac89076e5aa3aa4f3ab22a82f85e051bb022.1788013041.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============0381408372663931423==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    cf72cbb39da8 Merge tag 'io_uring-7.3-20260828' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b8ae25580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5c3949d762a91f
-dashboard link: https://syzkaller.appspot.com/bug?extid=74071deb72339c215b2e
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+Dear submitter,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153622
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7684a30c51dd/disk-cf72cbb3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4f401bdb1bb3/vmlinux-cf72cbb3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4379cea44543/bzImage-cf72cbb3.xz
+---Test result---
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
+Test Summary:
+CheckPatch                    FAIL      9.75 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       PASS      3.65 seconds
+SubjectPrefix                 PASS      1.36 seconds
+BuildKernel                   PASS      22.58 seconds
+CheckAllWarning               PASS      25.40 seconds
+CheckSparse                   PASS      24.17 seconds
+BuildKernel32                 PASS      22.14 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      379.29 seconds
+TestRunner_l2cap-tester       PASS      58.14 seconds
+TestRunner_6lowpan-tester     PASS      19.38 seconds
+IncrementalBuild              PASS      74.33 seconds
 
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-kworker/u9:2/5598 is trying to acquire lock:
-ffffffff90f7e040 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_security_cfm+0x3f/0x4b0 net/bluetooth/rfcomm/core.c:2222
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[02/16] Bluetooth: L2CAP: add l2cap_chan_close_unlocked() and locking helpers
+WARNING: The commit message has 'syzkaller', perhaps it also needs a 'Fixes:' tag?
 
-but task is already holding lock:
-ffffffff90f51500 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_encrypt_cfm+0x11b/0x740 include/net/bluetooth/hci_core.h:2239
+total: 0 errors, 1 warnings, 0 checks, 132 lines checked
 
-which lock already depends on the new lock.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14774767.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-the existing dependency chain (in reverse order) is:
+[03/16] Bluetooth: L2CAP: fix race condition in l2cap_sock_shutdown()
+WARNING: Reported-by: should be immediately followed by Closes: or Link: with a URL to the report
+#113: 
+Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+Reported-by: Jaeyoung Chung <jjy600901@snu.ac.kr>
 
--> #2 (hci_cb_list_lock){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5908 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5865
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
-       hci_connect_cfm include/net/bluetooth/hci_core.h:2163 [inline]
-       hci_remote_features_evt+0x485/0x9b0 net/bluetooth/hci_event.c:3786
-       hci_event_func net/bluetooth/hci_event.c:7887 [inline]
-       hci_event_packet+0x8e9/0xcd0 net/bluetooth/hci_event.c:7938
-       hci_rx_work+0x451/0xfc0 net/bluetooth/hci_core.c:4041
-       process_one_work+0xac7/0x1b10 kernel/workqueue.c:3387
-       process_scheduled_works kernel/workqueue.c:3470 [inline]
-       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3551
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+total: 0 errors, 1 warnings, 0 checks, 31 lines checked
 
--> #1 (&hdev->lock){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5908 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5865
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
-       l2cap_chan_connect+0xac/0x2050 net/bluetooth/l2cap_core.c:7266
-       l2cap_sock_connect+0x37a/0x770 net/bluetooth/l2cap_sock.c:255
-       kernel_connect+0x107/0x160 net/socket.c:3755
-       rfcomm_session_create net/bluetooth/rfcomm/core.c:808 [inline]
-       __rfcomm_dlc_open net/bluetooth/rfcomm/core.c:385 [inline]
-       rfcomm_dlc_open+0x838/0xac0 net/bluetooth/rfcomm/core.c:428
-       rfcomm_sock_connect+0x42c/0x690 net/bluetooth/rfcomm/sock.c:421
-       connect_socket net/socket.c:2141 [inline]
-       connect_socket net/socket.c:2131 [inline]
-       __sys_connect_file+0x146/0x1a0 net/socket.c:2166
-       __sys_connect+0x141/0x170 net/socket.c:2183
-       __do_sys_connect net/socket.c:2189 [inline]
-       __se_sys_connect net/socket.c:2186 [inline]
-       __x64_sys_connect+0x72/0xb0 net/socket.c:2186
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
--> #0 (rfcomm_mutex){+.+.}-{4:4}:
-       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
-       check_prevs_add kernel/locking/lockdep.c:3300 [inline]
-       validate_chain kernel/locking/lockdep.c:3924 [inline]
-       __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5254
-       lock_acquire kernel/locking/lockdep.c:5908 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5865
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
-       rfcomm_security_cfm+0x3f/0x4b0 net/bluetooth/rfcomm/core.c:2222
-       hci_encrypt_cfm+0x18e/0x740 include/net/bluetooth/hci_core.h:2242
-       hci_encrypt_change_evt+0x3e1/0xfb0 net/bluetooth/hci_event.c:3715
-       hci_event_func net/bluetooth/hci_event.c:7887 [inline]
-       hci_event_packet+0x8e9/0xcd0 net/bluetooth/hci_event.c:7938
-       hci_rx_work+0x451/0xfc0 net/bluetooth/hci_core.c:4041
-       process_one_work+0xac7/0x1b10 kernel/workqueue.c:3387
-       process_scheduled_works kernel/workqueue.c:3470 [inline]
-       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3551
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+/github/workspace/src/patch/14774781.patch has style problems, please review.
 
-other info that might help us debug this:
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
-Chain exists of:
-  rfcomm_mutex --> &hdev->lock --> hci_cb_list_lock
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
- Possible unsafe locking scenario:
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(hci_cb_list_lock);
-                               lock(&hdev->lock);
-                               lock(hci_cb_list_lock);
-  lock(rfcomm_mutex);
+[11/16] Bluetooth: L2CAP: hold chan in l2cap_ecred_conn_rsp()
+WARNING: Assisted-by expects 'AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]' format
+#104: 
+Assisted-by: deepseek-v4-flash
 
- *** DEADLOCK ***
+total: 0 errors, 1 warnings, 0 checks, 29 lines checked
 
-locks held by kworker/u9:2/5598: 4, last CPU#0:
- #0: ffff88802e39e940 ((wq_completion)hci3#2){+.+.}-{0:0}, at: process_one_work+0x1466/0x1b10 kernel/workqueue.c:3362
- #1: ffffc9000250fd08 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0xa2c/0x1b10 kernel/workqueue.c:3363
- #2: ffff88807d7b80b8 (&hdev->lock){+.+.}-{4:4}, at: hci_encrypt_change_evt+0x83/0xfb0 net/bluetooth/hci_event.c:3627
- #3: ffffffff90f51500 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_encrypt_cfm+0x11b/0x740 include/net/bluetooth/hci_core.h:2239
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-stack backtrace:
-CPU: 0 UID: 0 PID: 5598 Comm: kworker/u9:2 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/16/2026
-Workqueue: hci3 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2059
- check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2191
- check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3181
- check_prevs_add kernel/locking/lockdep.c:3300 [inline]
- validate_chain kernel/locking/lockdep.c:3924 [inline]
- __lock_acquire+0x1492/0x1ec0 kernel/locking/lockdep.c:5254
- lock_acquire kernel/locking/lockdep.c:5908 [inline]
- lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5865
- __mutex_lock_common kernel/locking/mutex.c:646 [inline]
- __mutex_lock+0x1a4/0x1bc0 kernel/locking/mutex.c:821
- rfcomm_security_cfm+0x3f/0x4b0 net/bluetooth/rfcomm/core.c:2222
- hci_encrypt_cfm+0x18e/0x740 include/net/bluetooth/hci_core.h:2242
- hci_encrypt_change_evt+0x3e1/0xfb0 net/bluetooth/hci_event.c:3715
- hci_event_func net/bluetooth/hci_event.c:7887 [inline]
- hci_event_packet+0x8e9/0xcd0 net/bluetooth/hci_event.c:7938
- hci_rx_work+0x451/0xfc0 net/bluetooth/hci_core.c:4041
- process_one_work+0xac7/0x1b10 kernel/workqueue.c:3387
- process_scheduled_works kernel/workqueue.c:3470 [inline]
- worker_thread+0x5ef/0xe50 kernel/workqueue.c:3551
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+/github/workspace/src/patch/14774789.patch has style problems, please review.
 
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[12/16] Bluetooth: L2CAP: annotate locking for l2cap_chan_del()
+ERROR: "foo * bar" should be "foo *bar"
+#156: FILE: include/net/bluetooth/l2cap.h:657:
++	int			(*recv) (struct l2cap_chan * chan,
+
+WARNING: Unnecessary space before function pointer arguments
+#156: FILE: include/net/bluetooth/l2cap.h:657:
++	int			(*recv) (struct l2cap_chan * chan,
+
+WARNING: Unnecessary space before function pointer arguments
+#158: FILE: include/net/bluetooth/l2cap.h:659:
++	void			(*teardown) (struct l2cap_chan *chan, int err)
+
+WARNING: Unnecessary space before function pointer arguments
+#160: FILE: include/net/bluetooth/l2cap.h:661:
++	void			(*close) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#161: FILE: include/net/bluetooth/l2cap.h:662:
++	void			(*state_change) (struct l2cap_chan *chan,
+
+WARNING: Unnecessary space before function pointer arguments
+#163: FILE: include/net/bluetooth/l2cap.h:664:
++	void			(*ready) (struct l2cap_chan *chan)
+
+WARNING: Unnecessary space before function pointer arguments
+#166: FILE: include/net/bluetooth/l2cap.h:667:
++	void			(*defer) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#167: FILE: include/net/bluetooth/l2cap.h:668:
++	void			(*resume) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#168: FILE: include/net/bluetooth/l2cap.h:669:
++	void			(*suspend) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#169: FILE: include/net/bluetooth/l2cap.h:670:
++	void			(*set_shutdown) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#170: FILE: include/net/bluetooth/l2cap.h:671:
++	long			(*get_sndtimeo) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#171: FILE: include/net/bluetooth/l2cap.h:672:
++	struct pid		*(*get_peer_pid) (struct l2cap_chan *chan);
+
+WARNING: Unnecessary space before function pointer arguments
+#172: FILE: include/net/bluetooth/l2cap.h:673:
++	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+
+ERROR: "foo * bar" should be "foo *bar"
+#175: FILE: include/net/bluetooth/l2cap.h:676:
++	int			(*filter) (struct l2cap_chan * chan,
+
+WARNING: Unnecessary space before function pointer arguments
+#175: FILE: include/net/bluetooth/l2cap.h:676:
++	int			(*filter) (struct l2cap_chan * chan,
+
+total: 2 errors, 13 warnings, 0 checks, 272 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14774790.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[13/16] Bluetooth: L2CAP: annotate locking for l2cap_ops callbacks
+WARNING: Unnecessary space before function pointer arguments
+#118: FILE: include/net/bluetooth/l2cap.h:663:
++	void			(*close) (struct l2cap_chan *chan)
+
+WARNING: Unnecessary space before function pointer arguments
+#127: FILE: include/net/bluetooth/l2cap.h:671:
++	void			(*resume) (struct l2cap_chan *chan)
+
+WARNING: Unnecessary space before function pointer arguments
+#131: FILE: include/net/bluetooth/l2cap.h:674:
++	void			(*set_shutdown) (struct l2cap_chan *chan)
+
+total: 0 errors, 3 warnings, 0 checks, 37 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14774791.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[16/16] Bluetooth: L2CAP: refuse __l2cap_chan_add if chan already has conn
+WARNING: Assisted-by expects 'AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]' format
+#121: 
+Assisted-by: deepseek-4-flash # finding the race condition
+
+total: 0 errors, 1 warnings, 0 checks, 33 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14774794.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/664
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--===============0381408372663931423==--
