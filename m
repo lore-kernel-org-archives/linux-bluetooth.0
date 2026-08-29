@@ -1,120 +1,142 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44DA2E764D
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 10:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788000641; cv=none; b=U6H09WQg1q8KpNmI5RXfS5mCwo6h4TnxNdr6P94kSfhrHK98okLxb1bS3WvETX2D1mDg/eZYqWZqTkAfya3s7F0G3FypsiHDDKYb9wIZ2D31/HHaDCp6pbAzDFywHTvGSqNQpOkMgtsUB+Pa3fEh+F949+dIu/CBjNUlZqSn6Ac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788000641; c=relaxed/simple;
-	bh=b93YUtOXBFD1G5XeEOQHydBuN2hPmpryx12G709Zuf8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ORdlCM7bUrBCYRz+ul9Dmbk1KqbJzndudGi7nZn2Er5SQRPKz24ReTMtv/ZTWXQsRDlaiEA26DUenGlxQgOSdmeiPEj2BKFXKb3/kDEAAzjeDnW94m383jPJ/gWEfTgeVAZ6s7G/XMT5C79Jw7tUR4XSGuxpQxeMVo/wfK27WC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePY/DfqU; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A09214812;
+	Sat, 29 Aug 2026 14:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788013256; cv=pass; b=ruOVprUo+p7kB+qbw6D6WZdGvoEfAph5yHc1o8emv3VWMRmQANWfXyVEg178yaz3GGL+KyQ1jqWekm73E7B23WQAPswohUc5FPBKZXN3ass785zHnokKd1BNe7o0omEAQzyCFO6Q6x9zUJvrvVjx3r2qx79sxP/rOcv4e9JDIHM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788013256; c=relaxed/simple;
+	bh=vfcO2HIVDpXsRGWJyk9fcRHKGyejb1nTdiagSFbANT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E05tLSp15cga9wFQcO8N+XDAI1tRCe2CDHeh/ZoMwk5kc3XD6yFS1X1pALgDt115uHO9vF+o2MiRXq9yNwarJmJ6sjW3x50fYJrT8muCnQm6zfp5Tn3t95zqRnQBgh6SosBIAercTF/isgcuM4nmi5Q8VoSRSRI59Mq3j/0Cgsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=eOHc0+fv; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePY/DfqU"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-52f83889a93so18101541cf.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 03:50:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788000638; x=1788605438; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=m9eZkVtBmWM12K3iXNaI4ZME+LzmSuhrzGoPIzGxzpI=;
-        b=ePY/DfqUqqXJd+nNkQyLOLww60MRbVyUrXrCFcqvNANiDU2SmpVgp3oAq3J7tji0tx
-         CBR2KzZFDcSGiJ4ERwGnuMJnAo5zZI3A1ORtyo0YWy/u5gPbJEOS+jkO1uBsdKrfbIku
-         ifgsvlERd5VpdoQzVapc9euQKKwHfcpm/w0edn8QkDwvI6YJdAofP89oVGo7prT73T/3
-         35e8XKk1IKS0fMRI5rfuS5kqBFaLfoosAgc5aIeiFOhLTpcMKppTbt/ln2Kstme9cs5b
-         3JJVJTzOTvNZNIHWDM4Qzh/XRosl/AhpUIwjSlsD7oyLK6M8IFg2wD2SixTm1j6YmMcp
-         rCQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788000638; x=1788605438;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=m9eZkVtBmWM12K3iXNaI4ZME+LzmSuhrzGoPIzGxzpI=;
-        b=tXq/ciHgQuP0RyXooDkGlbjDXXVYRoiUuhWdKac5on2dfjGIVfhQbCd5Fjarmwr7FD
-         qvSZ8CoKOVRMhFAssQkZo1sNhKPJnx1IaZOGx4aVi1kb1eH+nZYHYT690jEWJ9TVJzgL
-         lESVzCBx57kCcvsC5UrBTaI7nMmfvE5KTES5ZidDAG+K0upiwp63pymiVWhlBUdFlXR+
-         tQL6Fgqd/A/DVZS74sCbNviwIxIZWbPjNl3BBNiUCmLMz/G8nJ1bMcIYaKpjBVkwAdry
-         Jj0VZV+/Zxhi9fiovf5wiy8R3UqJFBORYADcVmn4gXDFWsl7DlAKhOwt0otRjH0efAbZ
-         LXkA==
-X-Gm-Message-State: AFuF++nyFxowevYQhimA3sVxn/r8ERJ5IDYccYpa/Y64GXtGKKeUG7my
-	4trhSXErbIbecyOqE0Hv9GC73FzdB0eeRrFW2ZJT8xQCNJTKKTmuB2GszmVDDg==
-X-Gm-Gg: AR+sD11wklim9OfIZpGkKYhlbI6GULgXNQYhowBzFwUtSZ1AMtaX5B/4qKvD7Bu5tNd
-	QBs7Yatt3SYEmw5ccAuAfv2UHhU6GOpRYY7o7sGRcQanyKf/Sxbx6rX2x/BkWApGxljQrjZm1Ft
-	NWGahCIYHg0t1AKlTd+nIVtYk9382mX6br+Bgr/9vZrpPbPeqO+49JgCkHyc/C5jPkIDdoUaC+X
-	AjWBEzeI95zn29MM51nakznqR/lrY5cvGV0XLdJaJFhPh2rutZccJINBkyeHt3RLwkK/QvCmYof
-	gtmmURWLiqPafNpikCNaRLMqpsDeeCj58tEOpfnwK3lRBTvCqNBUL2QbpkiUnR6drxC/RXnswFx
-	Em+3p5gDxSUOS2VG3upnPZeK8LXIH7uSMShDvc6d/1VGuJ5WP7dDWzITdtEiMLxmFCZ/iiLkMLy
-	LarC9P8se9nq8TkFsa+neyBzRxVNkm7eBKRSndJ4L8sF+m/hsaaDqFZEU7ocViQvOFZPA=
-X-Received: by 2002:a05:622a:58c9:b0:52e:8ef:5960 with SMTP id d75a77b69052e-52fb965cdf5mr179821401cf.33.1788000638563;
-        Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
-Received: from [172.17.0.2] ([145.132.99.99])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90ceaf94d8dsm21127996d6.1.2026.08.29.03.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
-Message-ID: <6a92b97e.9c49f9ea.26385.c448@mx.google.com>
-Date: Sat, 29 Aug 2026 03:50:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4543706383621626115=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="eOHc0+fv"
+Received: from monolith.lan (unknown [IPv6:2a03:1b20:1:e011::d701])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hXHTz1Jc7zyWl;
+	Sat, 29 Aug 2026 17:20:38 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1788013240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tQulovXJaLSdm6tYD7cO44sRjje+qD1MhZ55tnYtBFI=;
+	b=eOHc0+fvq1j0kMSRhNv1wfcnwfZ2Eek7GUWlnWVN/JNjt9rm+6peUFMZ3IBnutvcjSgYzB
+	8T0TTZcBKnUr7frS2gsi6Nka92sD/l+PTg0thAGfLhM5gSB6W/odTuW8Iygak7XQb5iJ/B
+	h8ceJnoOzbc3HcntopnahNLg4oamBLI=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788013240;
+	b=pEZMdvmzCmpOCzyY6zkvGwhItaHGKg2ITeCFjnUpfw9yFWy/2wqXAaMSXdh0ahZD6z6cxw
+	Xgf/16RyVLuplPlekV87e5Q1r/ch6F9VWd56wnPs0lI6JxUx9E/TkD3cqtnePYOo/+WUmv
+	299ZALOsAxIE6Z2RSaEkhlN58aFCHlw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1788013240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tQulovXJaLSdm6tYD7cO44sRjje+qD1MhZ55tnYtBFI=;
+	b=Zm31CWLFi+5d8TE9xp5Ej2fzzTp7AcVlOzvHDfwHGTrZhfPAwqYaCo7NZt+4fzMhKlEmdK
+	LXAs1rtUfw3ba9vruMcL8mKsc0/NIi+Ft7H7jfBYC/DojXi8mzEFXuTLVIG5DHYww1fxlE
+	7vrxMKw2gIjDtseOfD3ms4LKZdh+vWY=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	oss@fourdim.xyz,
+	error27@gmail.com,
+	elver@google.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/16] Bluetooth: L2CAP: fix and annotate l2cap_conn::chan_l locking
+Date: Sat, 29 Aug 2026 17:19:55 +0300
+Message-ID: <cover.1788013041.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, paul@crapouillou.net
-Subject: RE: Bluetooth: hci_bcm: Default to 4 Mbps
-In-Reply-To: <20260829100205.113655-1-paul@crapouillou.net>
-References: <20260829100205.113655-1-paul@crapouillou.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4543706383621626115==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The intent in current code is that:
 
-This is automated email and please do not reply to this email!
+- l2cap_conn::chan_l read/write is guarded by l2cap_conn::lock
 
-Dear submitter,
+- l2cap_chan_del called with held l2cap_chan::lock (l2cap_sock.c uses
+  this)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153580
+This is currently not done right in several code paths.
 
----Test result---
+This series fixes the locking vs. the above, and adds context analysis
+annotations to make more sure it is systematic.
 
-Test Summary:
-CheckPatch                    PASS      0.98 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.45 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      25.20 seconds
-CheckAllWarning               PASS      28.30 seconds
-CheckSparse                   PASS      27.21 seconds
-BuildKernel32                 PASS      24.78 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      459.99 seconds
-IncrementalBuild              PASS      23.99 seconds
+The last three patches fix some miscellaneous locking related issues.
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+Mostly straightforward, but two more complicated parts:
 
+- race condition in acquiring l2cap_conn::lock & l2cap_chan::lock
 
-https://github.com/bluez/bluetooth-next/pull/663
+- __l2cap_ecred_conn_rsp_defer(chan) may l2cap_chan_del other l2cap_chan
 
----
-Regards,
-Linux Bluetooth
+To deal with these, this series adds
 
+- l2cap_chan_lock_conn / l2cap_chan_unlock_conn
+- l2cap_chan_close_unlocked
+- l2cap_chan_try_sibling_lock-
+- new nesting rule for l2cap_conn::lock
 
---===============4543706383621626115==--
+The context analysis annotations for l2cap_chan_close() declare via
+context_unsafe() that __must_hold(&chan->conn->lock) even if chan->conn
+is NULL. This is OK for the current static locking analysis, doesn't
+affect code generation.  It could be cleaner by adding separate
+l2cap_chan_del() variant assuming chan->conn == NULL, but playing loose
+here avoids such duplication.
+
+LLM tools were used for patch review, catching some some corner cases
+before sending this series out. No code / commit messages are generated
+by them.
+
+Finding the bugs here is mostly based on adding the context analysis
+annotations which make it obvious where appropriate locks are missing.
+
+Assisted-by: gpt-5.6 deepseek-4-flash
+
+Pauli Virtanen (16):
+  Bluetooth: L2CAP: take chan->lock for l2cap_chan_add/ready/del
+  Bluetooth: L2CAP: add l2cap_chan_close_unlocked() and locking helpers
+  Bluetooth: L2CAP: fix race condition in l2cap_sock_shutdown()
+  Bluetooth: 6lowpan: use l2cap_chan_close_unlocked()
+  Bluetooth: L2CAP: remove unused l2cap_chan_close()
+  Bluetooth: 6lowpan: avoid concurrent peer_del() in
+    bt_6lowpan_disconnect
+  Bluetooth: L2CAP: hold conn->lock for __l2cap_ecred_conn_rsp_defer
+  Bluetooth: L2CAP: hold l2cap_conn::lock in l2cap_connect_cfm()
+  Bluetooth: L2CAP: add annotations for l2cap_chan list locking
+  Bluetooth: L2CAP: take lock for l2cap_chan_del in
+    l2cap_ecred_rsp_defer
+  Bluetooth: L2CAP: hold chan in l2cap_ecred_conn_rsp()
+  Bluetooth: L2CAP: annotate locking for l2cap_chan_del()
+  Bluetooth: L2CAP: annotate locking for l2cap_ops callbacks
+  Bluetooth: L2CAP: make concurrent l2cap_set_timer() refcounting safe
+  Bluetooth: L2CAP: remove conditional locking from l2cap_connect()
+  Bluetooth: L2CAP: refuse __l2cap_chan_add if chan already has conn
+
+ include/net/bluetooth/l2cap.h | 100 ++++++++-----
+ net/bluetooth/6lowpan.c       |  44 +++---
+ net/bluetooth/l2cap_core.c    | 257 +++++++++++++++++++++++++++++++---
+ net/bluetooth/l2cap_sock.c    |  95 +++++++------
+ 4 files changed, 384 insertions(+), 112 deletions(-)
+
+-- 
+2.55.0
+
