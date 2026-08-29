@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B805D3ACEE3;
-	Sat, 29 Aug 2026 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAA53ACEEA;
+	Sat, 29 Aug 2026 14:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788013392; cv=pass; b=od/2utLbCVf85h+0qyJWvqDoikRHjPkL0mpqr4ueCKUrgjuDMC+VWRyGnY28+NTAz3t/RUwVu+kz29lpJCxO3eTdGtrVv8hVzYmz/CIaIeSznpUc+VnxWpA6v4Qa+qmmUaWnZvald3iQOo7TtD/wV/nWNM+il+AMbk1RwcG18ck=
+	t=1788013397; cv=pass; b=oAhLjpWf5dZeqndPp2DQjSruLfvzxZsspy1HcQX/RJNBLa8TTuCBIH+BxpyU7qJOqx6Rjahut02oNlCC+mjYrYOCC+Em21u40BFvavNSrcWOL+HSWVWk89Yrw7CULLGVGz92C7Fsme30snpXeVi6KQjN0vGHMQ19OV1t14rHvB0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788013392; c=relaxed/simple;
-	bh=XgZgRJaCP8RbAxF2F6wwlCNm2i4NZfHfXxO5tbt+JDE=;
+	s=arc-20240116; t=1788013397; c=relaxed/simple;
+	bh=DglAwIBDAOZtI7fLjCYTm3hxn4xxQs2GY6xnNw09kqk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oukzFYZjYirqkm4fYzw6IieN+3IXPrRcUXHQVx7v+rhQmnEFDt9la+7hlWo4X6wrJdee8RSMk3NyDWj7KLSQeFPA2GKciqq53UDqyL7WSp76sVCWsuXmS+Zncgu1yKaIurao1QqupJ7H9KCOlosjt8EtX3JPun+Oy3y+a7Mw958=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=cs4pl9v5; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=HCWGwfDcR/xADcFxfI1WDbMU+R5QoFb5V541nN19PGbhsRM6ODaxwgt6+rWgkbNKTRw/rVNb/04O0EbjXDglSgnpWZ4AoTsiG8FW/PR/WzTvATNSCkQiUDf/UbTu92E8231Yo8z1P/rhrflspZusi18X8oMB4GFOEndVWU4ZmqU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=wEnbTAIu; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="cs4pl9v5"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="wEnbTAIu"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:1:e011::d701])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hXHXk3YQrzyhS;
-	Sat, 29 Aug 2026 17:23:02 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hXHXq6Sglzyvj;
+	Sat, 29 Aug 2026 17:23:07 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788013383;
+	t=1788013388;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qbD+jA3FjbPdP0383wROCsVf5CmDmabv7/udhP8xkLM=;
-	b=cs4pl9v5TgY5b0d2Q1jAeGjVHzY0gkFC0KmfCBq7aEXyLeqjOXHAqOWYbFmC4z+tEH8KMp
-	vhGpuuqqIvQKfzvD9ghfHqQqwg1LWpmQoSonAbB0KbJdbkucFp5oRsMed2zqra/T/PAjRc
-	xQ8lhtMqaRcnMFNEn400LVrWZFpKoLk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788013383;
-	b=qRueV036TwZB1hTlcmmH7QS94jRf7OoB0PXKmI4VL+xk9558bwEdd8285iyKDKJyMV06ga
-	e4Tzyo8z197DQYvRArf/OYw+xDeuyaqMTsnQpYkpFgl70siwzAvQKB7VLF5WnXgX86MNZ6
-	3oAaEOXmWNLr6ewL9QMF55n9NxBK8T8=
+	bh=EJOLdi5PhAwA5XQVJ1o6Hxg+qLS/nkP9SPXADUScm+s=;
+	b=wEnbTAIu9YZUg0V5gA7+y09Ik/FP7Y0HWZMLTBck+qlnLjCmfaU5RreBKNFd44IkwS5oEi
+	YIIQp9DgSDTzvFi+AxA9PGqHZGRnijYogUICqKsfH3IK1Y5ND5YJtHUtUicJzZbIlTCz6/
+	7hbYJPCav8HFuSinYxTbN5Sj69S8hsc=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788013388;
+	b=kw32CZ5FPGZ5f1pK6lbMIjfGDLehBEtEJnNTgr71WfM3ltWPXp9go7SpXHQ7+QnCxXPi7+
+	nPKKL9C5jRCkYWFCUaWx/gtxvfJ1aznV/XCsDUaVq+XJlfwTmURp9VsH64i46lfY6s6OV9
+	OEjFiFRbsJj4W3v5D6Smdm6NoS6PHts=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788013383;
+	s=meesny; t=1788013388;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qbD+jA3FjbPdP0383wROCsVf5CmDmabv7/udhP8xkLM=;
-	b=TNEGXl8Z7Zi95Re/Txs0rMpRB9aAh+VoLxHEN3Jz/H7qoLt3u1oeHS7DtLZrEE2VJJZ5BW
-	yAonZQwuLyINkW9IVCGqaCybEzluUbIz6HBjGtQSmQ6ocbjywwztWL6AqZ6dXsZpnyg71h
-	dT9JIplv0rhc2yUx6FTqpnGCopa9v8c=
+	bh=EJOLdi5PhAwA5XQVJ1o6Hxg+qLS/nkP9SPXADUScm+s=;
+	b=TB8vvLZ8AMNXBJOMSBewW4j5zfa19XK1Jbnv6PK0572dfvzgaD2zonqE9MTEEHCQ8xz7Yj
+	QpJTU5/r5seZZTbLqPb/dmwJK5NkNgireIX2GcoTC09+il4VfDZdyCsMr7qxhIIc8521CM
+	unP7832JXQf/PAw32JmmpUZ/oQgUDgM=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -59,9 +59,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	error27@gmail.com,
 	elver@google.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 14/16] Bluetooth: L2CAP: make concurrent l2cap_set_timer() refcounting safe
-Date: Sat, 29 Aug 2026 17:20:09 +0300
-Message-ID: <c7b6bea07c66171e17ead1faeec6a9b07d307e00.1788013041.git.pav@iki.fi>
+Subject: [PATCH 15/16] Bluetooth: L2CAP: remove conditional locking from l2cap_connect()
+Date: Sat, 29 Aug 2026 17:20:10 +0300
+Message-ID: <7d3474153c2b1f3f820c75ff98148ca5238706c3.1788013041.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788013041.git.pav@iki.fi>
 References: <cover.1788013041.git.pav@iki.fi>
@@ -73,42 +73,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since l2cap_set_timer() does not check return value of
-schedule_delayed_work(), two concurrent calls may result to l2cap_chan
-refcount leak.
+Context analysis does not understand conditional locking.
 
-Change the refcounting by using mod_delayed_work() and checking its
-return value.
-
-Code paths aside from l2cap_chan_busy() hold chan->lock, so this has
-little correctness impact.
+Restructure l2cap_connect() by removing conditional locking at the cost
+of some code duplication, so that static analysis can see its content.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- include/net/bluetooth/l2cap.h | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3d00ffb66cc9..efb9b7f422d1 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -859,12 +859,11 @@ static inline void l2cap_set_timer(struct l2cap_chan *chan,
- 	BT_DBG("chan %p state %s timeout %ld", chan,
- 	       state_to_string(chan->state), timeout);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ff9529f2eb15..a4299bc10c2f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4233,7 +4233,6 @@ static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *conn,
+ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 			  u8 *data, u8 rsp_code)
+ 	__must_hold(&conn->lock)
+-	__context_unsafe(/* conditional locking */)
+ {
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+@@ -4250,7 +4249,13 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 					 &conn->hcon->dst, ACL_LINK);
+ 	if (!pchan) {
+ 		result = L2CAP_CR_BAD_PSM;
+-		goto response;
++
++		rsp.scid   = cpu_to_le16(scid);
++		rsp.dcid   = cpu_to_le16(dcid);
++		rsp.result = cpu_to_le16(result);
++		rsp.status = cpu_to_le16(status);
++		l2cap_send_cmd(conn, cmd->ident, rsp_code, sizeof(rsp), &rsp);
++		return;
+ 	}
  
--	/* If delayed work cancelled do not hold(chan)
--	   since it is already done with previous set_timer */
--	if (!cancel_delayed_work(work))
--		l2cap_chan_hold(chan);
-+	l2cap_chan_hold(chan);
+ 	l2cap_chan_lock(pchan);
+@@ -4332,9 +4337,6 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 	rsp.status = cpu_to_le16(status);
+ 	l2cap_send_cmd(conn, cmd->ident, rsp_code, sizeof(rsp), &rsp);
  
--	schedule_delayed_work(work, timeout);
-+	/* put(chan) if timer was already queued so it already has a ref */
-+	if (mod_delayed_work(system_percpu_wq, work, timeout))
-+		l2cap_chan_put(chan);
- }
- 
- static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
+-	if (!pchan)
+-		return;
+-
+ 	if (result == L2CAP_CR_PEND && status == L2CAP_CS_NO_INFO) {
+ 		struct l2cap_info_req info;
+ 		info.type = cpu_to_le16(L2CAP_IT_FEAT_MASK);
 -- 
 2.55.0
 
