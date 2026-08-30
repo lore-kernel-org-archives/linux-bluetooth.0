@@ -1,123 +1,118 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD01A6828
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 19:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788116981; cv=none; b=FHZAmueDcBFmPf+bOjUucK8BbofpBMMh1BEFrmnHGLg7qs/5aFLaDARrXwrHnzxFoR/qvxsbZlWe9lL1/9gEQdBZS2yMsVOa4xryZDwzQlfA4g0fD6NYhg5hKKU4gp04/FJegvxSimc7MDmPen6PQU8cB/JqWyI2V6cIbiW/eKw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788116981; c=relaxed/simple;
-	bh=+Nt9dAaqaNaXF/Ci1oRUA+s8vdFoL/MVqkEPPN6pbe4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IGCy6yCGkHG555hlz5JYzxs6CfqbxwMP/4ZLVm/4QwdB7irGpSrktfPQdY6KEJoorYlm3JwgsTQnoPidaDEV0yLGpsN1ih3cnM0JlY3y7e4vkZiJUTM+EhlNJHB6phQnW5EhRrkCE4TJg6w0QrYxjoCTmsCLACOwM9fbVeqfJis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHlf8tlT; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E05A1F5821
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 19:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788119931; cv=pass; b=hrDqfO4vDFbFiiOpFdK+UUkOsU31z8otyynIo5entSzHs+GQkEtcta/BaWfSF7juqVwlOMIp+ZgHy0BF8bSsHqJ2UUH3bLonp7/Ybyo/tpAbw62ooZ8wDXS+booQTM77u+5rXATeQNVTZzkmeRYgz3yXCXj8oAWFaulsbcqljiU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788119931; c=relaxed/simple;
+	bh=5CbJwnx0CCfJRugRqyeb/2pYUjXFLpS0Wq9vjFQXthg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q9L+olOxvQTaDDQOp/kugPUPgngarF0qbq8fzIDI0urtEAdavNW4K0vBWX+JoamflK679aaku0ueKqNqghX0BYAlsr+tOhFeuZwfKQ2pZtCTFKsqodMbglQx06wuTwB7g62AVolPaZ20kj8Wu6dDy8yFHvdA+Ex1UieyIebqEbc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=pSb55cog; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHlf8tlT"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-52d7a3defe8so25273471cf.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 12:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788116978; x=1788721778; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=CrFmlJQ1A3m3uaQeLhnDsNrayD1++NqWPpB2JpLv860=;
-        b=iHlf8tlTuLS1XpXcHSmOF70nLlP2MrMolxQx4cbyKd5Cn+INMSccu77CdlyKssZTrv
-         Lq9LGs3sH/ayHVC/KQ1M/XBvi5kZlvR02b8UVg1ZyIcag/Yme8iruYdtBOAWolDPXjLF
-         z7tzvz3CwkfJYM4keA91onsjIynReeXhuQV/3OOntWIvmOB0fV5rY/mdHX02yuyARxyP
-         PAA93WyZU6YvUW2weg5LMdWywtL1i3JGDMIdLuCN8iQKyghF3hwaE+HUmKVGhZC4BEEo
-         WG6td/gGMCfRp/Wdn/SmDw+xdmK/uShf6bh0kJXgSRbT2sGvbJY2LloRLs/fVdrur8Ua
-         S1Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788116978; x=1788721778;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CrFmlJQ1A3m3uaQeLhnDsNrayD1++NqWPpB2JpLv860=;
-        b=bi0nFUSpP4fLzelMF7EFg6UEBttN4uXOpgNkUsH7uODAwu8W+dKFaJvIdLvHG50vpI
-         UhTEP6hv7x0f5bR+15hYHvqP+d7O4CJXmuZlcUATxe12ARJdVsCSeUSR/ZFKmvY8SRJ8
-         o6xhKfCOmqdf5vX/gfqFuC6hkjGRBEHuyiqyDHRSJovc7nYeYLEQeyK2e7DPyfe/yGP+
-         oYyAGHSKdmuQOebtHS+xvwJK4MVoAPQGcZivFDyA0GtHABKoKuYH2mghxSamVkC5te81
-         MyYc8hQFHAL++/Vv0Ol2dLu8Ulyinl1FtF4M2SrhB+jn8C7wftJEUQaa26G1wh+SgI/Z
-         TbUw==
-X-Gm-Message-State: AFuF++mCIQGd4r1SZu3rMmKbLLQWQQ9FUruSBSaYlQ4QO60ZA5rn/e8f
-	R5hnuk8nZAREVriElv1Wt9+t24IpJ/qK2hSa/QD2gzFoiN4dM7ZKWXLhu5+FsQ==
-X-Gm-Gg: AR+sD12+pLkyxgMm4eJUQNANvWxs0FQ6Ntx4UR2kD1NWu6pz0LnMQkrDsFMZ7+APdAm
-	hKwZfwFfHm8Q/12IGqYBLNg/JfAnmYWozV6GH18U8S9AWQYtn9vrxPzDUdebTSMJ/9fA9gZFZbL
-	mK6c4bRZKu0ODiF9D+RvYb+jKVejYoDt+CwBtRdGsPyQ5+0JWwXbZwEjpaz9FUMRz/LrDm8U1IT
-	ARKlPPhb1/PVKwmCVLQtXu1eW8nLsy/I61uDFRh4HAJah9CM4Sh0yzf7VnNkJ+QZvmsngUri0sI
-	aBb1tfXMfDhCuaf/sAUEbA12Zgy7Ee233ipAqMPx3AEabP82VKlZS4qHUM8cuTeQ7pnJrjecwoL
-	AuNFYQHhqwzHoYtqSsAleH80vYB0A6RwjPpr9HO4YjdhZXnTB3AWr/7oEOksFO2XHfPMg9UHrn4
-	K3GacaEeotoKgTcd/DczsCyEOxWe7OkB2Kfivs0G5pc4r4c4B5Wid7YymmbD0hZ28H9ulH
-X-Received: by 2002:a05:622a:1789:b0:51c:6b6:9d0b with SMTP id d75a77b69052e-52fb9459c8dmr271426421cf.2.1788116978421;
-        Sun, 30 Aug 2026 12:09:38 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.121.200])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52ff73ae220sm39662451cf.23.2026.08.30.12.09.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Aug 2026 12:09:37 -0700 (PDT)
-Message-ID: <6a947ff1.49dcfff9.1bf3ff.828a@mx.google.com>
-Date: Sun, 30 Aug 2026 12:09:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0077739601619905051=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="pSb55cog"
+Received: from monolith.lan (unknown [IPv6:2a02:6ea0:1508:6::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hY2xZ3CgCzyVm;
+	Sun, 30 Aug 2026 22:58:42 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1788119922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d5oa4dZUkC3HKCldBnEAdXLgTYHKmOlTqsTuE6yMuyY=;
+	b=pSb55cogpypTO+ztGqk7XOvqowzPMqiaYfTl3IIKZoFxBYKvfsxOl0HjgHdVUTZj0nVYhA
+	pLt+cFdbRvqNjvGQskaDNxQhopRNTKW0neMM25j6DS5Olyw0/V95hotCD6zq8kNEVtXVX8
+	o/O3Y0C54LwRDtBW5APX0fNENDr17bQ=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788119922;
+	b=qbj1B6zo4+OK26TJ/vmnuCQ2a0neEQV9+1DhQr8K2tzB9HkVrMVnlm2dxPPH8bZebdF9mH
+	RNBeLzS50jnpv1rsuEzLXZu54stDdxourtp5bJc3kdFAs2NIJ0tZdsqpu2ckAQ3DopICpd
+	j9YZCVj1KJOZs/nqeYP2yhp61iazJu8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1788119922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d5oa4dZUkC3HKCldBnEAdXLgTYHKmOlTqsTuE6yMuyY=;
+	b=uoOV3bFaa9ru08ZTBEMbERE868ob2t0XmUCwI/3j5l48T7f4mTwJZJ6gF/xCBMwxudRer+
+	YxOvD8BszEWd/PhIiipgx8sOB1P1V7Z1ZTbpmpRUZeJSsFW9e2rZnJ/Bm2gWAagtjazcLp
+	Jt8FEeWNkwBuIspBeNXtI0R4zhHSQrk=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/3] emulator: bthost: add function for sending raw L2CAP sig commands
+Date: Sun, 30 Aug 2026 22:57:22 +0300
+Message-ID: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/2] emulator: bthost: add function for sending raw L2CAP sig commands
-In-Reply-To: <66d2971217dc632b10049fef7a5e9e735715bca2.1788109841.git.pav@iki.fi>
-References: <66d2971217dc632b10049fef7a5e9e735715bca2.1788109841.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0077739601619905051==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153956
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.15 seconds
-GitLint                       FAIL      0.68 seconds
-BuildEll                      PASS      20.94 seconds
-BluezMake                     PASS      614.58 seconds
-CheckSmatch                   WARNING   323.01 seconds
-bluezmakeextell               PASS      103.32 seconds
-IncrementalBuild              PASS      616.45 seconds
-ScanBuild                     PASS      979.11 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,2/2] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
-
-1: T1 Title exceeds max length (83>80): "[BlueZ,2/2] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/bthost.c:703:28: warning: Variable length array is used.emulator/bthost.c:704:32: warning: Variable length array is used.emulator/bthost.c:957:28: warning: Variable length array is used.emulator/bthost.c:991:28: warning: Variable length array is used.emulator/bthost.c:992:32: warning: Variable length array is used.
-
-
-https://github.com/bluez/bluez/pull/2457
-
+Add bthost_l2cap_sig_raw() that tests can use to send raw L2CAP
+signaling commands.
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2:
+    - no changes
 
---===============0077739601619905051==--
+ emulator/bthost.c | 13 +++++++++++++
+ emulator/bthost.h |  4 ++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 46c6a52f5..b3d48ffb3 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -811,6 +811,19 @@ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+ 	return ident;
+ }
+ 
++uint8_t bthost_l2cap_sig_raw(struct bthost *bthost, uint16_t handle,
++					uint8_t code, uint8_t ident,
++					const void *data, uint16_t len)
++{
++	struct btconn *conn;
++
++	conn = bthost_find_conn(bthost, handle);
++	if (!conn)
++		return 0;
++
++	return l2cap_sig_send(bthost, conn, code, ident, data, len);
++}
++
+ void bthost_add_cid_hook(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 				bthost_cid_hook_func_t func, void *user_data)
+ {
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index e104e68af..ed924eb99 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -126,6 +126,10 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t req,
+ 				const void *data, uint16_t len,
+ 				bthost_l2cap_rsp_cb cb, void *user_data);
+ 
++uint8_t bthost_l2cap_sig_raw(struct bthost *bthost, uint16_t handle,
++						uint8_t req, uint8_t ident,
++						const void *data, uint16_t len);
++
+ void bthost_write_scan_enable(struct bthost *bthost, uint8_t scan);
+ 
+ void bthost_set_adv_data(struct bthost *bthost, const uint8_t *data,
+-- 
+2.55.0
+
