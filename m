@@ -1,86 +1,137 @@
-Received: from out-7.smtp.github.com (out-7.smtp.github.com [192.30.252.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926D3242910
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 18:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7A61A9FBC
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 18:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788114281; cv=none; b=AmF9rETSymJKICVCPNetQGzKtkxzkQaLjna2zJR/BBWS50iY3JPjhkasKquKo9+KiMyWMXePZIh5nol4VClneV7QbIVVFZg4eI2wTLTefRpSQCE1yVEmZVxp4wYFUROrGI342QXjlyuqlYGYhVLxqDx7WYZCohzEJR30o7Mzoq4=
+	t=1788116354; cv=none; b=eINnE4SRATxo5A+Z7t98RoxC/rWAhKB/sgbQo6OnDerayaPrEvUSYIRAMEOoCV/TEJJNR0IfYcNbmgdmTByA4/CDVM2PRAXag8wWdAQ+1ylNUjF6ByOTFJIcbJpMJvn5g0mcIRxuyb9bbDc1S4lYRC9tYDdBBwjyIA3W0ZFfy+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788114281; c=relaxed/simple;
-	bh=NMAORHlS3fIkeR9pycz4KTggrqyGZSNAbDvTeD4R2ok=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bBFbarGZJG/3BXYqfm3nkjLh161AvbjpaWXgYyhpoD1cDGGuuAfQksfO6hxwgCxspvaFmDp4yOs8EzEuOmr6VTqtNzwfDmuaT+ZOljbH7I+SapUKAm3rBOJLfPFmbKPZqQR1j1sQkrtW78gdSAEtq71y5T+VMNPP4eqRpB3lJLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kwBFjHI2; arc=none smtp.client-ip=192.30.252.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788116354; c=relaxed/simple;
+	bh=rpF9QhPmxwSjwweUXCtCdGvUp5dNeGzLmcNU6i8sw00=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VUPHrOoY9ZQ8zEXlNqAjsRqnMYcVKLNmMBWKS7cD46+JWbwOe6CDP/1yezkn7Y7GcYfH7YwZrG7LFj6QI8WD7wUkvMyXJFLpbo1OCYQCbCes+pz5S5bfQW8d93OInrlnP/0R125NjJT2UmmjPMdyG+NorEIx5Ic1TNsp9kJxBho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bqex5i3h; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kwBFjHI2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788114279;
-	bh=C2fSXmw3fmOgML0RBWfN450Vwxik/Uu3XPQ/rXvMjeU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kwBFjHI2auZVPjuQ7iOPfktHU8+mb46l8UwRgkK8RsvRKJe6HMEwGCcGoUBttYgSA
-	 XXoMjbceRkMU7BB55YE7Gz+EmUhnGOQeIW+Ich0z7si4NRWW7LaiWDVs7tBsxVtIqF
-	 MpK8DvTtPU5GIKqqQUtNCw62napSd7p7ezgWDKRw=
-Received: from github.com (hubbernetes-node-47f2c78.va3-iad.github.net [10.48.178.45])
-	by smtp.github.com (Postfix) with ESMTPA id A81487800E5
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 11:24:39 -0700 (PDT)
-Date: Sun, 30 Aug 2026 11:24:39 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1153956/000000-6f01a4@github.com>
-Subject: [bluez/bluez] ace43b: emulator: bthost: add function for sending raw
- L2C...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bqex5i3h"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-46ac75b44b2so144280fac.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 11:59:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788116352; x=1788721152; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=P3LMSI3xLnZyVHVfFnlMGe16RVQe/qMfJq+dk6tLbZo=;
+        b=bqex5i3hHkh11sIpxhtDMpfVubKrU/K37cjoYPjOU4zMWbwxqdnuxvel99efVoeHhN
+         62xaSi8Ni7IevZ3rv7cvVzEYzn4Kbzzbi/quRdFBdFT5Lb6Tfep5hLsfJc1wFIt/At0k
+         48cwwjuWZgYkMDhoI4ZTsC17Js5Oo9ayyUKgjAwfMPi7raI74TKApwl8wSYK2EbGHHIn
+         i+XWd2SU6T/9LPKaGCbUowv9VK8fXncoE2waGaocVmJmv36+zXdlP6vrRVmZ+6cK7TdR
+         B/3eS4SG08bSmoAPU8a8eu4PuL6TKhBPRMvih8FxeK5MO+QfAHQez96jvyzf8PEQEOzH
+         UDMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788116352; x=1788721152;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=P3LMSI3xLnZyVHVfFnlMGe16RVQe/qMfJq+dk6tLbZo=;
+        b=VL3dob8wxugi2GfhXWO/GxHp1ryP6ouIHfEtrK3GpXCsQZ2kD+kkR56FkEigKUEGUT
+         05VuJb1Rt+58s1SPrCC00bGaMYnfDSNNevIgi0k0/lFScF4WCkZciRKEAj2g/P2AeiHY
+         IgUArga07AZN0c6K3RjYNZF4jmejzGlUCdiQ/P7MEK/ApTS0O3QUXsIdwb36Pq6UBA1/
+         UqCa6kFSNvn9QDFWqOdhWfM3v9uNhzMsvmLo002HZ1PBxOx6bVsnZPGjO0qvLcNlZ/wf
+         kan7VOgibAkbdfgO5JhDk1SX9j2X6skAzyEBXYn9jZH+qNpCuHrgDrvuqXcCdDsJbPy7
+         BWIw==
+X-Gm-Message-State: AFuF++mRgt9gVpUbUTxI514gwD3AfGqGHX4XGbMWUq/N0Qyc4dyiKQLb
+	ch1Nsbv3RVsChtY9+8DWpJlK+c+B4hdHUtaBVmTjSu4CVotSEjDB3GNZseNRaA==
+X-Gm-Gg: AR+sD11L3QHa22ZAwNYr5vypcajbEAD3/8GQDPdbbk/1En5D4pQ3J5CLCQ4HLZeWaFU
+	1W4qGY4Tgx7llj1QJ2ieLPlxBwWaNE2aSMo3yxva/bKRSFBTdppO/EYCKBVQKo01cy4pdWIX3P3
+	DYLj1f8pJaoeJXdUlnM79YsqO3KtpXqFEkuy5ThWL0b7xMFDFU+FA70mb32NtomMI/ZoNkiiqWZ
+	QqMlaZCw13su+VB/QRq9H+OaPjedGTsE2m0pjsVCBuqVAG27CfNZjLR2ThZXGil/JjJCD4TiHz8
+	DRiMEvB4bbyYYO99u10CwglFj3uuZY1zpRbNab9DLxIK//FW3WgBwRS5vjVSLwoOdBnFWu+yqeh
+	ZDAx831AvAPN9op950fdFAjYYiouGK8RxuGiq24iPQgsCLbT3X1bFX0CvAfY0HStoXews1QPCs8
+	xLQ5XBkL74Qe3QgdBZd625RJo1UbFJuPDWZUtUx6Qv82EJMhmuT6N1gMdJKHKZwu2Pow==
+X-Received: by 2002:a05:6871:b1f:b0:456:ce37:7f7 with SMTP id 586e51a60fabf-46835a07726mr21266856fac.4.1788116351765;
+        Sun, 30 Aug 2026 11:59:11 -0700 (PDT)
+Received: from [172.17.0.2] ([20.80.86.193])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-46a4b7a9f82sm4452380fac.18.2026.08.30.11.59.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Aug 2026 11:59:11 -0700 (PDT)
+Message-ID: <6a947d7f.298d7a4b.21887a.d121@mx.google.com>
+Date: Sun, 30 Aug 2026 11:59:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7638970420934958030=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jhs730127@gmail.com
+Subject: RE: [BlueZ] gatt-database: Fix freeing wrong client notify IO
+In-Reply-To: <20260830154054.25086-1-jhs730127@gmail.com>
+References: <20260830154054.25086-1-jhs730127@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7638970420934958030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1153956
-  Home:   https://github.com/bluez/bluez
-  Commit: ace43bd022cd4fc18d065e06421f196f89afeaf3
-      https://github.com/bluez/bluez/commit/ace43bd022cd4fc18d065e06421f196f89afeaf3
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-08-30 (Sun, 30 Aug 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M emulator/bthost.c
-    M emulator/bthost.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  emulator: bthost: add function for sending raw L2CAP sig commands
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153941
 
-Add bthost_l2cap_sig_raw() that tests can use to send raw L2CAP
-signaling commands.
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.37 seconds
+GitLint                       PASS      0.26 seconds
+BuildEll                      PASS      15.01 seconds
+BluezMake                     PASS      575.97 seconds
+CheckSmatch                   PASS      190.71 seconds
+bluezmakeextell               PASS      68.34 seconds
+IncrementalBuild              PASS      565.92 seconds
+ScanBuild                     PASS      602.89 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] gatt-database: Fix freeing wrong client notify IO
+WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
+#122: 
+Assisted-by: Claude:claude-opus-5
+
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Claude:claude-opus-5'
+#122: 
+Assisted-by: Claude:claude-opus-5
+
+/github/workspace/src/patch/14775471.patch total: 1 errors, 1 warnings, 17 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14775471.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: 6f01a45f06cbce1e14bee0ab241358a10954da4e
-      https://github.com/bluez/bluez/commit/6f01a45f06cbce1e14bee0ab241358a10954da4e
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-08-30 (Sun, 30 Aug 2026)
-
-  Changed paths:
-    M tools/l2cap-tester.c
-
-  Log Message:
-  -----------
-  tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
-
-Add test that checks Ext-Flowctl server handles invalid connection
-requests with ident collisions. This triggers null-deref crash / hang on
-some kernel versions.
-
-L2CAP Ext-Flowctl Server - Nval Conn Req
 
 
-Compare: https://github.com/bluez/bluez/compare/ace43bd022cd%5E...6f01a45f06cb
+https://github.com/bluez/bluez/pull/2456
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7638970420934958030==--
