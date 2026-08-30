@@ -1,121 +1,132 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A5D3B3C1B;
-	Sun, 30 Aug 2026 12:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788091463; cv=pass; b=bu8dKP1aDJzoC5nwil4BXV4c9XU1mhn2ruYt2+Q+1yt2lNF+G9dj1SqE1+D/100NnsK+GXju1JqiPRtbWi4l4PVLTnPph8iE93FMjy7Zf54fnBoqYi/Rv9GSGtxalb+oBgyPn+V5+lpJuP4VX0y+f+Dsb+pkGxlR9fBaJQAa1yc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788091463; c=relaxed/simple;
-	bh=lLhZbbtiV8hEAQiF+bEbJUf2OM2pK3goNBCr2gqPLMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UsdTfqYV8wBCC6stZFgKH4zLK678c9tFuelZZGL0zFAaKhhqK1nHwFKNbPB7OzvMw9Y2zz8B08421lCUTOsWdqlGcmLezu1lJrpmm1iu9GiIRmFWmVZ9QDpk9E0Tp4Rom+0g56hk+2x8fOYj7dQEi19M1wFBUMVbvHuGTzgSCmE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=UAdQ85PC; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3741D19049B
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 13:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788094853; cv=none; b=uWGUMvy/VSpBg2z7672PfhI8Ktjxn2njOtwyqJ8jsEmJT4Sc2VRCDFcqjRLIr0s7KOdOTpZZDUeSqE/vc5J75XWCpvQsVKWRG7tvpdcf6rZ3SjHurIK9/kP8s2c37wGO5ooev5fK+Me5ETfA2V5gRMOqdrGiTwIK99eBZ6n92CM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788094853; c=relaxed/simple;
+	bh=CCk6xuD+TjRTYa5LGIaqBvb0l7jSZxhMMSVt6caLn0E=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lQBT2wLZ/5QEHiyTVa1QmhaFZgvIf5Ubh1kD+vebfy9bKxdF/NOMTS6+LhZoEKgWTtE2KYW0u5U7DAGivhYVFNNaFPn+bOLFXMfr2aPDbzwJ7LcP8uEdkJtOEI7Jxt/EM9vBfCFNp2YyGXcFJtyqEHi+/zBLDosFAqCbQkMxmoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxO/F59R; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="UAdQ85PC"
-Received: from monolith.lan (unknown [IPv6:2a02:6ea0:1508:6::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hXrQ71XdSzyhS;
-	Sun, 30 Aug 2026 15:04:15 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788091455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZoYiIAZuq1kr37Fh6E9rSxq6Tb5PuIoxwS+uHDUUfVk=;
-	b=UAdQ85PC5tBaUpNpKh7NqV8AVgI6/g4hBa5CiCgaZGIApH45ipzxbBjzxhXHCcX9TyJM3m
-	NwuZDOaWIiz9fWDGPF8gtl5KO7UhtI3BuNVN2x60yg4ULudPG5t/9rp68IPvk1KD4oJgqX
-	HYxJ57f5mcf95D9vEE7grz82Zcefiuk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788091455;
-	b=k4bm+aLQ4mCQTTyceWnCLUSWYS5BLuUMwOYUMJTJIyavihYx+umlX+x7C+h6eAo1w1CXVe
-	jWp0mIpOsRG3BFXn6uJ5y3n0Z6LcDOKKwA67IlBb+x3mabtT/7X2eSsD/FxC3sgZLVMPRd
-	ahvFbxSYcpLW/PGggDhssZMA/N/jfGA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788091455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZoYiIAZuq1kr37Fh6E9rSxq6Tb5PuIoxwS+uHDUUfVk=;
-	b=SGbZLuFiwq4g0ZqGsyrFygjiM933k0lsYUVyvTkaDgLaVswzdYSFAv6CNWoldN6od9l9nQ
-	XHX4+bGFKDVeyPBIR6mR+L/tRhFlfkotQOq3RmVxBq2l7IH810W/ktyQ9TClwJB3pwwDMC
-	AxAvXP+KH5iFZg2pIwzihJAk1dzUM/Q=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: L2CAP: clear FLAG_DEFER_SETUP only for same PID/PSM
-Date: Sun, 30 Aug 2026 15:04:02 +0300
-Message-ID: <a430306b2f97e3fa9639c9e28ece272d5f824475.1788091154.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
-References: <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxO/F59R"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-936e393176fso151977985a.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 06:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788094851; x=1788699651; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=LJhMXeB0JEkDk3Rtv82/C7YnGpToSwS4HESKLe015yM=;
+        b=mxO/F59RI5kXL56g6oCzffJvtBQvm2BUNfLOYWQ7PLQl0P8z1RfD8tbY+XK422mZw2
+         Z6bynu+ixeA5BZoYcdbfnYVViB4dvUHOPwZsllXObA9pUZafrU96lpKShWVEpwvsVa4O
+         IkMaqYWjYKUdOlIx6f0zkiHEHh/tD0v1ZVCJu+EIKjtQYeipKD2vDYBp0jPiaBrgLzcg
+         0pCywXUckPgG1xd0Vs4EydJH6HdTbkPZ4DRY1y2TafhAcEebjkgwX4oQcNojMmpUp6Yv
+         XSWAFrG5gTH5GsBBYt8fPDfeM7J0fidsgvt9oG1oLUrCNffT3XW2htjWAS9Yot1ZWwgH
+         rhWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788094851; x=1788699651;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=LJhMXeB0JEkDk3Rtv82/C7YnGpToSwS4HESKLe015yM=;
+        b=UdXHD5r2t1cyCYc1jNWfyY4AHgFWdvAkqyzZxMNeK5ZCXIp1Y+4tpD5B13iS0rlXTU
+         jbm4PakPvj9vcVWYHwr3H/PiVlqQjN0gWoBqDShorJXYDOJldl+wJlo5ez0nekF3zJiy
+         vDYwXJTGUkVoh33z9HghW1+h93osa+HHNx4izQ0G4MeycBooyxrdw4U9GnXlZUspB8RR
+         6BIIcp5Vh5XNAUn8CnTRty4+ZAi3uWZwXNJvzalv8OBuX8nCKi7C41i6xiF15b62xEgd
+         DG+3A3VWtv3xdSUt+05YsJ56/EWJ9e8pHnqhn1d3E2d3oLaEN4rJCDKQWpOPNlqVrjIy
+         yj8Q==
+X-Gm-Message-State: AFuF++kqxeIpu3mEdJnfJEK/1MeUtgyubFgyt/rRAf4GST7YL69cN+RN
+	Kff6VO3vF3kiDtMIGqw4LXde/xbkzK5kyqy4Vexw8LLqvbJO2RumyxUPpZ78Nw==
+X-Gm-Gg: AR+sD12j/B/LNtHpf11MnhW5SRTGEwY+ESsH5vnDFKaYoNz3357jmMUP5/XmJH4p1j9
+	tRoVEKpN6TrqmHW2IoUPdA5XlR4s4Ngg6TAH1X4eRRFlToVovA41+5qHZb1h2dlzSDZ86NfkZcE
+	BAU54ewQPi4U5Htonkxey8YM0Mx0hN4MgRUyU2/ucTEGbzwWNrVs1VY7IuuFjToVXofoI/Cis84
+	m97q0prQ9vdvpveWlRtTYShCJk7+PmDMeJx3YlRzY2DJ1jtTXPJPyuEk87VD2efW71G5WBwGcgu
+	AFGQ3ksTdGM6J/JSdhjy5KZb2paY1Gp8auSOIq5dEDR/lwhYvz7J/Ew283+6v6tiNao8PL8dfdA
+	+wx88BMM+W3yzXE6oCl4TcBtvj0df0e8U9RhLA8K+sjgoZY9BUSkubMG6ndmBis+/zglRT8Y+LP
+	PxXeoXhpC1ZxP3SvuNJijf0Ih6cT4JrzUnFRzVBvuJCLsVatXvPt16RKEbNpMClC+tEje24NAgT
+	+Vu7Q==
+X-Received: by 2002:a05:620a:8a16:b0:8ee:bae8:2bb8 with SMTP id af79cd13be357-9391396bbfcmr1510485785a.36.1788094850959;
+        Sun, 30 Aug 2026 06:00:50 -0700 (PDT)
+Received: from [172.17.0.2] ([74.235.142.19])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-939172604f3sm569888285a.21.2026.08.30.06.00.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Aug 2026 06:00:50 -0700 (PDT)
+Message-ID: <6a942982.35b683e3.3afc09.08da@mx.google.com>
+Date: Sun, 30 Aug 2026 06:00:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7211791168202509683=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [v2,1/2] Bluetooth: L2CAP: fix out-of-bounds write in l2cap_ecred_connect
+In-Reply-To: <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
+References: <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-l2cap_ecred_defer_connect() clears FLAG_DEFER_SETUP also for channels
-with different PID/PSM, which will not be added to the same
-ECRED_CONN_REQ in any case. Consequently, only one ECRED connection
-group can work at a time although it appears intended they would be
-separate for each PID/PSM combination.
+--===============7211791168202509683==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix by clearing FLAG_DEFER_SETUP only for the connections that could be
-added in the request. Retain test_bit(FLAG_DEFER_SETUP) before calling
-get_peer_pid as it may be NULL otherwise.
+This is automated email and please do not reply to this email!
 
-Fixes: da49b602f7f7 ("Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153829
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.96 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       FAIL      0.67 seconds
+SubjectPrefix                 PASS      0.26 seconds
+BuildKernel                   PASS      27.91 seconds
+CheckAllWarning               PASS      30.37 seconds
+CheckSparse                   PASS      29.43 seconds
+BuildKernel32                 PASS      26.83 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      507.47 seconds
+TestRunner_l2cap-tester       PASS      64.99 seconds
+IncrementalBuild              PASS      29.26 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,1/2] Bluetooth: L2CAP: fix out-of-bounds write in l2cap_ecred_connect
+
+28: B2 Line has trailing whitespace: "    "
+[v2,2/2] Bluetooth: L2CAP: clear FLAG_DEFER_SETUP only for same PID/PSM
+
+18: B2 Line has trailing whitespace: "    "
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/667
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    Another sashiko.dev pre-existing issue
-    
-    v2:
-    - new commit in series
 
- net/bluetooth/l2cap_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1b612b9beaa8..e3d955d7d4fa 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1344,7 +1344,7 @@ static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
- 	if (chan == conn->chan)
- 		return;
- 
--	if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-+	if (!test_bit(FLAG_DEFER_SETUP, &chan->flags))
- 		return;
- 
- 	pid = chan->ops->get_peer_pid(chan);
-@@ -1354,6 +1354,9 @@ static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
- 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
- 		return;
- 
-+	if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		return;
-+
- 	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
- 		return;
- 
--- 
-2.55.0
-
+--===============7211791168202509683==--
