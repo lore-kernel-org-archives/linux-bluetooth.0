@@ -1,126 +1,210 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18F228B4FA
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 21:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8D7184540
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 22:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788127197; cv=none; b=J76kRfH41/CkWWR+VwnBiUTmHBVahgPsF/YBVLlJrLmpMIsQfFb6DHClKgof+ofODIwABE6CKupMc96X+kJErkvYcO9/LU/huyhbLmj7fe5Swo5Sizc3dL4QOZ1qcsRFRbCDlPNlgK4HyuvNhFWAzAH7/QwOxC/uetXiVe8KxMU=
+	t=1788127736; cv=none; b=TqRkhzUA7iRcwZbbx8ithXZ1NBTlGYvNnQ286dELk1+sBp9eibvH/R5jtI3M7CSrcekXbOvnmUS4xkqRn0+thTWD4TUQBPTbWdWL/L3xzzUHFPsd8FG0YggMk+7EcXPyncB951jJnIBmP2ILTXm3dUwDczVWxoIS7Z3bA/e12nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788127197; c=relaxed/simple;
-	bh=epqPfXJbA3tuCMDVJlhav4w1qOR3g30UBEMZVB7biPI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bdX5DJxZ+0oOU25FGYoaN8kFmSpSJZxgQFbyH1FuEwWXiyJEH50e9sWnXS4+hr9hZPM80Z5afpPa++QkIXNM6LwDo1qHw6xECXGs3UbQFiXYvBVVxzTAwB/1kje/jo3VBSvRiYnrI4F7pxo8dhjE87QsGeBM1GUj9bkW3NCeA04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZhrBkcO; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1788127736; c=relaxed/simple;
+	bh=g2j2IeNJMHer59oMOyYclwy/ipajJKHP0i7mhbRiyR0=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=rbL7wwLX00mcm5sVWi1Xs3AFvs/VwkWPuYnuOJ3dX8F1gG+tHKaMb/WQDst6NOTnAOCQ8FzpGIWWtFjHnokjACxhQWb3gQtFJXgSUuynUCDVwiHy2Md+HW2hm/87lk8OqbT8EQr05Z+1HbukbUM7lgrysLJZx/uglAvN9gm+vzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NMHU1fso; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZhrBkcO"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-936623c6dd3so311696985a.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 14:59:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMHU1fso"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-49954b88fffso19297285e9.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 15:08:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788127195; x=1788731995; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=dC28vVStGcJiu08+o8+WVfL4HeJ9+X8E5iJ2hNRPQDA=;
-        b=DZhrBkcO82X93tEpUAeOdfm+bx2b6JgkYcOncW7k44ndafNFEmwd4vIGAyfCPn6jBX
-         HyyoEZic0tvAfI5E6FbyJarlpNQReSbkgdoDkOM7vy6YzO4eTwoWFsH9qzMUYMLNP0Jh
-         LLUKAOMykcVLl2TuaNDtSUDUXUWeSM8S5R70IUfr04Dt3Bsc8Q6li0gY3mXRa491m/7g
-         71RzOoVode9qwRrgAdNVPp564zTBh/0K5IAHbaqVw3FLvNksL8g40zBsdiwtmdFnuIIB
-         ZxJ2Dp6M97Iy4oDLX2EwdXZ1QAmZ77Nm3QFaybtyQ9wENh1DzK8omNh0RJm+a30CEZxM
-         lGDg==
+        d=gmail.com; s=20251104; t=1788127733; x=1788732533; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:subject:from
+         :content-language:to:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=bkEvr74vBzbiXy0alwmTTIUWhfdGz3Dq/F8qxJ4w52A=;
+        b=NMHU1fsogQgPNN/Hw2FcifBLwqPGM7/+vpJTqHNCUqd9mfOIiZLD2iYv7YKUM5ryJK
+         C4H532O5Qa/dgRMnn6ZZAl+GEZ4A476yxiao9EY0O2NaKkiJMe4cpq/rd56kRNA8plc/
+         xbgQf9hG7A95xtppmhKWWqVjIF2K6T64i6k2wGoh3XET1oiVQ1thRpYPhh9pkSTufke7
+         BFPysVJg5m0sLT8HHHd8tlLtdoFfcYZuI1dzzxl3oCem0kYa9q9NNOK+T4RefxNXhdkN
+         zn6veeja1CNcU8FhrfH1+E9TB+frw2fUS2YJVDAZQA+CriHYtc84ofpYrDdba/B6yKzY
+         1Vhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788127195; x=1788731995;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=dC28vVStGcJiu08+o8+WVfL4HeJ9+X8E5iJ2hNRPQDA=;
-        b=OfzGbL+DUvHg40MSEAqmorg0PnTIbDYRUdlU2t8Xwtbgi15etzGGWq+vZVc89k5wcR
-         nlZa3KZ5iBKA8kIZqwSECo2zBtaTzd2vt4NOcHr//0Dibzoj0qvjEMGk+JMpRap9lQKD
-         Xr4CHU4p7N7BmwWqjmhvEMUjUSJPa5I9YHl1WbpH1IuTE0T9ltGC9coekJmiZxigCaBr
-         H1vCz5XeSet5XrBLjAURqtO/VZH4WRbhDmLuyS2wMsTrmGNsjGH0fNZf8btEFiXSUzby
-         4mCFh2h0P7AuHj9Ra5SFsJ5/1yfQeNRX9KAFeVVRHG6LnXrkJ59EpUAsf7RdYmpIvCtr
-         vs9A==
-X-Gm-Message-State: AFuF++keVg4r9atovohqcgpeXU52yf69pErmXqf+IU6S+v0LFg7ZMRe+
-	cBAZdSH1d7MdpXTFzWqCFLjUrE54wHlrI1D3waimiA97zjSgGnXew+mnACOsng==
-X-Gm-Gg: AR+sD114bhjQQVGITtp7/xNiiPYqwAerItA7l+Z/XdUlEabXB8nvaE/hCIxU6QWPYvd
-	L8II2s6KGE0vE+j2+ymFoY+wDTX2hfUo2lPAK4ARLVVPdpVy6bf4sL/QBkWva/5lomEis2AsBuT
-	ZjYC6A0mOjjgGGjscOXY/f8cnUB3did5T6bmMjYM9ECQ3t7nNuz/SZ4btHSi7xPRGBRBTmcLIvv
-	nTPz5xagSlFN0/NdBYN2d+qlDTMVe7F3m5X3G0MgvihDgLVANAneP44txKWzsogzlw50f/7cWRe
-	63bzgnBONxVwee8/yUyu84He9jfobg19Ml6s3zx2dFOeeLTd+TnwVlgheenKUBEXP3E/tLG+6sa
-	PnnLgeeYj3kEDD6FbVW8/xql1QluV1cHWu5PQ71wj1o1HN04ozf0iCYLiBIEvOCIhoviAirk7p2
-	vDVEwAO9PmmtD/2V5dca+AySVq0Nu+X2Mva/LSeiPF6O0jvc7eRd6KksJlfrmjX3upc6k=
-X-Received: by 2002:a05:620a:4441:b0:933:ade:2daf with SMTP id af79cd13be357-93936d05ca2mr420496885a.18.1788127194730;
-        Sun, 30 Aug 2026 14:59:54 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.46.150])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90ce444e6b4sm69730556d6.9.2026.08.30.14.59.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Aug 2026 14:59:54 -0700 (PDT)
-Message-ID: <6a94a7da.36695ec4.1fb870.48d6@mx.google.com>
-Date: Sun, 30 Aug 2026 14:59:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3813434732432349105=="
+        d=1e100.net; s=20251104; t=1788127733; x=1788732533;
+        h=content-transfer-encoding:content-type:subject:from
+         :content-language:to:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=bkEvr74vBzbiXy0alwmTTIUWhfdGz3Dq/F8qxJ4w52A=;
+        b=aYckx2wVikF4PChwI+PSZoqcsfF4XI5orI2fvepDixYRRD9xLI02b4ynjsu/EagMfO
+         lIBQW5V/ZfDqAYJlRDYQ5rOTepygrRpinVZJGLEm3/k3rRWIBzcQWEd7kXi1EGfDGBY1
+         w04AN0YCJ7TMNnbz5u24TGXdbGHzGVkJPfqE0rrcX+FfJaKkJf5hepLfXeXqtI+oziUV
+         TjuUJLPQJLr/yH6tNHZiWs7fQQ/C3ClMDScpIJuewqK51ZFhAC49/ysVTjSKkObSKysM
+         aRekSDIxlo9p6syLwyJt5t311M/hZTqz/AR2k/1Dq7XY5c10OGzc71uODY74ACIZo6WL
+         AvWg==
+X-Gm-Message-State: AFuF++l+jLnILmo+GFzjokPnoC8SjtT8CPlWOFTMd1rs/a8uUctMurdG
+	uL0s4fwVF9DmumPfISHML5qEIXe3TFXYGxbNAOtyz6CWlRIgmFOfL9h57gIj6A==
+X-Gm-Gg: AR+sD1126oLKOvPkaDwFyHwqrYfy0PZbPLULD2guMGLkkwz57DcePpLzyCLfwLSI+hX
+	kpKpK/UpVqT9v/gvuXcQuqmrozxXP60rr2OAB2oE5kzugaU2J1/KmLn3egr4mcmssnyRjjmRbgM
+	N1vVf3uSCV5pUP6M9N2aU5+jcEnr1bOUpcRrfPYN4KeEP5/AiJCJUD9X24fBSszipxbTiBlC70q
+	JarpspadZtJJNrxAKdHspDmsvHC4gZAg8Ur6LNYNPTtoLumslvRjoKVfe7rQitpzNLu/xn5pFbw
+	40YAsgaGL06K0bn5mJVbTL8m53VqbNVB1XbdosNl3fXMYnCmcFwFUtO+qr03m6dyIk7kxgyPAfF
+	FN9Tnrgs9Gf+Xdt/4TPlcnZLu3S89Uidy4wGX37amGV6/JL02IA8VliVvrcHKUu9YetmVMZA7mi
+	HKw9F25uOF1/NysdxpF4b/fztY1HJQIJ1R38OPqwTOGw+ueSLTTJzZNIjOOL/ZdgOYCHv4vE4X1
+	Ki+PUkLqw==
+X-Received: by 2002:a05:600c:4443:b0:499:d63b:a6da with SMTP id 5b1f17b1804b1-49b91c17149mr309786465e9.2.1788127733019;
+        Sun, 30 Aug 2026 15:08:53 -0700 (PDT)
+Received: from ?IPV6:2a02:8071:5383:42a0::1012? ([2a02:8071:5383:42a0::1012])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ccea6b814sm128132785e9.0.2026.08.30.15.08.52
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Aug 2026 15:08:52 -0700 (PDT)
+Message-ID: <7d7d0ef5-1ac1-45f8-8e95-0a94435b17bc@gmail.com>
+Date: Mon, 31 Aug 2026 00:08:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2,1/3] emulator: bthost: add function for sending raw L2CAP sig commands
-In-Reply-To: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
-References: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: =?UTF-8?Q?Marvin_G=C3=B6pfert?= <marvin.goepfert@gmail.com>
+Subject: btintel_pcie: -EBUSY from PM callbacks aborts system-wide
+ hibernate/suspend
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============3813434732432349105==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+# btintel_pcie: -EBUSY from PM callbacks aborts system-wide 
+hibernate/suspend
 
-This is automated email and please do not reply to this email!
+## Summary
 
-Dear submitter,
+On an Intel BE201 (`8086:a876`, PCI `0000:00:14.7`) the `btintel_pcie` 
+driver
+intermittently returns `-EBUSY` from its PM callbacks. Because the callback
+fails, the kernel aborts the *entire* sleep transition and rolls back — 
+after
+the hibernation image has already been written. The machine silently stays
+powered on. For a laptop this is a real hazard: closing the lid appears 
+to do
+nothing and the machine keeps running in a bag.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153985
+The proximate cause is visible in the log: the driver times out three times
+waiting for the "alive interrupt" for D3 entry, then gives up.
 
----Test result---
+## Hardware / software
 
-Test Summary:
-CheckPatch                    PASS      1.61 seconds
-GitLint                       FAIL      0.97 seconds
-BuildEll                      PASS      20.15 seconds
-BluezMake                     PASS      593.18 seconds
-CheckSmatch                   WARNING   312.74 seconds
-bluezmakeextell               PASS      102.11 seconds
-IncrementalBuild              PASS      595.19 seconds
-ScanBuild                     PASS      972.72 seconds
+| | |
+|---|---|
+| Device | Intel Corporation `8086:a876` (rev 10), subsystem `8086:000e` |
+| PCI slot | `0000:00:14.7` |
+| Driver | `btintel_pcie` |
+| Firmware | `intel/ibt-0190-0291-pci.sfi`, Firmware Version 107-8.26 |
+| firmware pkg | `linux-firmware-intel-wireless 
+20260319.git217ca6e4-0ubuntu2.1` |
+| Kernel | `7.0.0-1011-oem` (Ubuntu 26.04.1 LTS) |
+| Machine | Dell Pro 14 Plus PB14250, BIOS 2.16.0 (2026-08-03) |
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,2/3] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
+## Steps to reproduce
 
-1: T1 Title exceeds max length (86>80): "[BlueZ,v2,2/3] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server"
-[BlueZ,v2,3/3] tools/l2cap-tester: test closing sockets with ECRED defer
+1. Boot with Bluetooth enabled and the controller in use.
+2. `systemctl hibernate` (also reproducible via `systemctl suspend`).
+3. Observe that the hibernation image is written completely, then the
+    transition is rolled back and the system returns to a running state.
 
-13: B2 Line has trailing whitespace: "    "
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/bthost.c:703:28: warning: Variable length array is used.emulator/bthost.c:704:32: warning: Variable length array is used.emulator/bthost.c:957:28: warning: Variable length array is used.emulator/bthost.c:991:28: warning: Variable length array is used.emulator/bthost.c:992:32: warning: Variable length array is used.
+Not deterministic: the same kernel and firmware succeed on many attempts. It
+correlates with the controller already having logged `Controller in error
+state`, which on this machine happens frequently at driver init.
 
+## Actual behaviour
 
-https://github.com/bluez/bluez/pull/2458
+```
+kernel: PM: Image saving done
+kernel: Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D3 
+entry, retry count 0
+kernel: Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D3 
+entry, retry count 1
+kernel: Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D3 
+entry, retry count 2
+kernel: btintel_pcie 0000:00:14.7: PM: pci_pm_poweroff(): 
+btintel_pcie_hibernate [btintel_pcie] returns -16
+kernel: btintel_pcie 0000:00:14.7: PM: dpm_run_callback(): 
+pci_pm_poweroff returns -16
+kernel: btintel_pcie 0000:00:14.7: PM: failed to hibernate async: error -16
+kernel: PM: hibernation: Wakeup event detected during hibernation, 
+rolling back.
+kernel: PM: hibernation: hibernation exit
+```
 
----
-Regards,
-Linux Bluetooth
+The same `-EBUSY` was also observed from `pci_pm_suspend()`
+(`btintel_pcie_suspend`) and `pci_pm_freeze()` (`btintel_pcie_freeze`) on
+2026-08-23, i.e. plain suspend is affected in the same way. Those journal
+entries have since rotated out; the hibernate case above is from 2026-08-30.
 
+## Expected behaviour
 
---===============3813434732432349105==--
+A Bluetooth controller that cannot reach D3 should not veto a system-wide
+sleep transition. Either the driver should recover the controller (it 
+already
+has a reset path) or force it down and return success, so the transition can
+proceed.
+
+## Additional observation: rfkill makes it worse
+
+Soft-blocking the controller before sleep (`rfkill block bluetooth`) as a
+gentler alternative to unloading the module does **not** help — and 
+appears to
+trigger the failure. Immediately after the block, and immediately before the
+`-EBUSY`:
+
+```
+kernel: btintel_pcie 0000:00:14.7: reset done
+kernel: Bluetooth: hci0: Controller in error state
+kernel: Bluetooth: hci0: Intel Soft Reset failed (-62)
+kernel: Bluetooth: hci0: Controller in error state
+kernel: Bluetooth: hci0: Intel Soft Reset failed (-62)
+kernel: btintel_pcie 0000:00:14.7: PM: pci_pm_poweroff(): 
+btintel_pcie_hibernate returns -16
+```
+
+So the rfkill-induced reset is one way to put the controller into the error
+state that then blocks the PM transition.
+
+## Related instability at init
+
+The controller frequently fails to come up at boot on this machine, 
+requiring
+one to three `modprobe -r btintel_pcie && modprobe btintel_pcie` cycles:
+
+```
+kernel: Bluetooth: hci0: Firmware loaded in 776747 usecs
+kernel: Bluetooth: hci0: Controller in error state
+kernel: Bluetooth: hci0: Timeout (3000 ms) on alive interrupt, alive 
+context: intel_reset1
+kernel: Bluetooth: hci0: Failed to send frame (-62)
+kernel: Bluetooth: hci0: Intel Soft Reset failed (-62)
+```
+
+Firmware load time correlates with the outcome: successful inits load in
+50–110 ms, failing ones in 540–780 ms. Occasionally no number of module
+reloads recovers it and a full power-cycle (AC removed, power button held
+~20 s) is required. This may or may not share a root cause with the PM 
+issue,
+but it is the state in which the PM failure occurs.
+
+## Workaround in use
+
+Unload the module before sleeping and reload afterwards, via
+`/usr/lib/systemd/system-sleep/`:
+
+```sh
+case "$1" in
+     pre)  modprobe -r btintel_pcie ;;
+     post) modprobe btintel_pcie ;;
+esac
+```
+
+This is reliable, but forces a firmware re-download on every sleep cycle,
+which in turn is the main opportunity for the init failure described above.
