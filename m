@@ -1,121 +1,93 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-4.smtp.github.com (out-4.smtp.github.com [192.30.252.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C312E1A6828
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 23:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603411D86FF
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 00:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788047778; cv=none; b=cEDUyocY8nt2VA5e2UEvAJhsvcL2iUrsKZOYcM+k1hEtCv/UGkHdTRSkU51hbgT2E7C9GaKTPpwRw1JEYZ9fDwWBmHf4RJcgWoYqAf/ExPFgvc0x82gbu+ra6k6zImRbjKa2G1hqihg+DD5EGllMJaS+Ah3PGoRFqglLyDQpTYI=
+	t=1788050845; cv=none; b=JFR/4QgUqpoBaGEDQa9GbWQ+LoKOVIkPLtfj12Yg3Uju2ajsjVnPGhaHT0Gvm30aPm9DoGwKTkp+mjrXmBcWFPw7wpwCWKaA+nR7FXU9ODpwz/b1MxW1zBXBwKr1H2bunw+QTqol/GSalQ30iOT4iTYbiUyCK/PjFTiktYi93As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788047778; c=relaxed/simple;
-	bh=q8PirDXMVcQF4ivD5TGXmFWvuSd7IGFbqoasIb+JGTs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=dyzFAXJ+BZmAq+ePzBxhSLO9zeumcYvfiCFtK5gTMrFq8Z1PhMBLnW1R8nVbF+CT1PKQQYe0BsqaCxbvqK9QXxOt7gHc+B5sAhLmi7127bKnyCWPRXAbdprRs8q6ResYdKI/IWB5cjWXnTDTU4Y6Zb+ElJ26I0C0kM1KPBfCZgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzxIJL+b; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788050845; c=relaxed/simple;
+	bh=ZjowJL90shhLhwCvUblqpkXylzAxN4mwAM+Zq4ODyMs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=B9sohNOCR9fGTo1pNiY+xZpVe3FnjHT9M3uQNHMYimer0UaX+5W9101wCmk0w9Z7ObZPldEEPAG2l5o7ZxuuXAHh3hSXh2o/zHZR/DYOvq8TY+YZBaEWxd3HVjnsq37stE6dJNACGIUJ9CtW7Qim6GyxpkvzwJgD6IpzUZsJlx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bdUVFd0Q; arc=none smtp.client-ip=192.30.252.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzxIJL+b"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-ca7c1176317so1932735a12.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 16:56:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788047776; x=1788652576; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=1vdsaNklpiry+/TUJQRtKiCCy4AvIQ9yne0ongmh9p8=;
-        b=jzxIJL+bpVqS+y1mfQBJaijxf42IyFWBonM6T+2q0spFqTk7GsLRhK390FzRBzQW79
-         Jw5/qNLGPDBvY/T3NkRPt7b5S2y7VyR5OouCJJutnGhJB1grnzSaWr8Yf7OPvVSK5Shm
-         N0yYBFJqX4Z6HlgSNPmr/WJC88xpouqk4BTa06yBj/eq7kiyEcToJ7IiIHugTKpUdOD9
-         BUi2AExaSIH6Cv1CpBO1jRLqETg6ICPnpFPG1wcivR/YKi2qWYsOdMeybI/CsQRNhzUF
-         7GtxCJxjcH3c4xPuPYn9cQ0L1AVenh7A2J/jrWt2yutF2/wN8aU7apsjTuwFveo2S43Q
-         uAEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788047776; x=1788652576;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=1vdsaNklpiry+/TUJQRtKiCCy4AvIQ9yne0ongmh9p8=;
-        b=Q+zEgOE/1ajU94vuZMsP+ZJuRFScQNwqwVU9qkobszoA36P33hK1pt0GIDUMg9lAXi
-         iec6uA8Dv3SXDvgG7zlMA429jsgcGKk7aLO4t3abRp0ptrAWQ5Dj7Pojhc8UiQjEO/3c
-         HJ7HysVe70lypoekysHngBXXNAG5KmHXkc8F/xBq8hIKAYGoUJuRV1JGM/QUbksU4ady
-         cnqyBZUjAZqNW7bavmzZjDUYHEeg/S+JbL0+Pyk5slmoADR1It094fCq6N0Q/F5Jko4l
-         6EAZFTUNWtjjsXcQBTxT0/WLoHqLmqGyo6+aJxkf2RMFmMedXhR50JaWaRqfT6oGp4dj
-         H4rA==
-X-Gm-Message-State: AFuF++kqLOiqcY00o0DzKS28XpyRxGaShnFdL/mHPdQ7rEpXTPLrp7Yh
-	WtggYxihtxgtlqVTngmUKHG+z3tgsA7XYFdzOdSkn7m5gwy3TPIp5XrS0MCoXA==
-X-Gm-Gg: AR+sD13GNn2yKvg7ywu9Z194Wc/yEzSS/9WOdJCtW/MetL+a6Zsn12zLcG2uexyFkav
-	6zQ1lvIoge7Y18SymzywE3CMAW7keCWAInBiuOpIER8dV1MCa7qFn5gWwZ3AGBwOS4W/BD/+t0y
-	rKEE0cLhz28pyrEWDcPydvdBkBQlDJqRzHltQN+pE6QDtOJ7byywrlSX/I9buU3U1DKCkFgD4r/
-	ShxttXHHC9jmC6D9vVTr/atZBorJsM4eVA76wqkxc0DVhNfGnevHLKqHokDCWc23JSpl27WLYIg
-	TxCbCGJvYsXw/BisRJ9pjI8NotWZlO8OfDcPvRFxrV7JV6m6Ycb7YI4l7YrylSTOaDUZaJOMSbQ
-	Et2QboZGba4FM/qQ394O5k4ivdTf4JHg3hu0V49YOWY7kjxjVxYJrcmJRejE9y65WulTTHDelpM
-	Pbq9PSXJto5Udl9cX8dfc5MU6n3G2w8N/Z0L0FsThBidJpnv9jGLGc3fRi3QDNFdgK+A==
-X-Received: by 2002:a05:6a20:ae2f:b0:3c3:875d:c52f with SMTP id adf61e73a8af0-3d267a6b517mr32053817637.10.1788047775994;
-        Sat, 29 Aug 2026 16:56:15 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.217.49])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f959575sm18652697eec.15.2026.08.29.16.56.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 16:56:15 -0700 (PDT)
-Message-ID: <6a93719f.92d2873c.3b6c2b.1f75@mx.google.com>
-Date: Sat, 29 Aug 2026 16:56:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7011358680918359827=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bdUVFd0Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788050843;
+	bh=oYA8D0m+lDewSIPnnNXEQAsao4aKZl/4N7L5bwJY8dM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=bdUVFd0QURP5ugPAoYtfn0FWtm+Ck2Qi7iQaCGcIZA6Wpbx9JFu3HJ8U8Ofix0P0T
+	 4jYdPY5Fb8JBQ816XkGXc/Fdd1xQp0AqZ+fmfl7Axt84deEF9326QiYzOAgI/PvZ2A
+	 Qr9VyPVSgX+Z5ErD79O/9UnwagtU3Z0Gr57jhKwc=
+Received: from github.com (hubbernetes-node-32e1ab1.va3-iad.github.net [10.48.77.77])
+	by smtp.github.com (Postfix) with ESMTPA id 20CDC341026
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Aug 2026 17:47:23 -0700 (PDT)
+Date: Sat, 29 Aug 2026 17:47:23 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1153725/000000-80ad2f@github.com>
+Subject: [bluez/bluez] 7d9c6f: emulator: bthost: don't crash on ecred_conn_req
+ wi...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: L2CAP: fix out-of-bounds write in l2cap_ecred_connect
-In-Reply-To: <42d4d3cd947746c677c00f2c8aae0a0c2189f1c6.1788043687.git.pav@iki.fi>
-References: <42d4d3cd947746c677c00f2c8aae0a0c2189f1c6.1788043687.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============7011358680918359827==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/1153725
+  Home:   https://github.com/bluez/bluez
+  Commit: 7d9c6f97282b702a2bf19cff70668183139f159b
+      https://github.com/bluez/bluez/commit/7d9c6f97282b702a2bf19cff70668=
+183139f159b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-08-30 (Sun, 30 Aug 2026)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M emulator/bthost.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  emulator: bthost: don't crash on ecred_conn_req with too many scid
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1153726
+l2cap_ecred_conn_req() crashes if the request contains more SCID than
+specification allows (5).
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.21 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      28.81 seconds
-CheckAllWarning               PASS      30.29 seconds
-CheckSparse                   PASS      29.61 seconds
-BuildKernel32                 PASS      26.43 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      502.96 seconds
-TestRunner_l2cap-tester       PASS      64.99 seconds
-IncrementalBuild              PASS      26.38 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+Respond 0x000C - All connections refused =E2=80=93 invalid parameters to =
+such
+invalid requests.
 
 
-https://github.com/bluez/bluetooth-next/pull/666
+  Commit: 80ad2f628f4b568b8167fe763f9721f2f3c26587
+      https://github.com/bluez/bluez/commit/80ad2f628f4b568b8167fe763f972=
+1f2f3c26587
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-08-30 (Sun, 30 Aug 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M tools/l2cap-tester.c
+
+  Log Message:
+  -----------
+  tools/l2cap-tester: add test for too many ECRED deferred sockets
+
+Add test tries to trigger connection with 5+1 ECRED channels, and
+require the last connect() shall fail with -EPROTO.  On some kernels
+this causes invalid ECRED REQ be sent with 6 SCID, and stack overwrite.
+
+L2CAP Ext-Flowctl Client - Defer limit
 
 
---===============7011358680918359827==--
+Compare: https://github.com/bluez/bluez/compare/7d9c6f97282b%5E...80ad2f6=
+28f4b
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
