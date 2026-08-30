@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E05A1F5821
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 19:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162E52EB856
+	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2026 19:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788119931; cv=pass; b=hrDqfO4vDFbFiiOpFdK+UUkOsU31z8otyynIo5entSzHs+GQkEtcta/BaWfSF7juqVwlOMIp+ZgHy0BF8bSsHqJ2UUH3bLonp7/Ybyo/tpAbw62ooZ8wDXS+booQTM77u+5rXATeQNVTZzkmeRYgz3yXCXj8oAWFaulsbcqljiU=
+	t=1788119934; cv=pass; b=Y5maqhNCmJ2VAI/y072oyeevVHYB9cgU4+SeL3lK4nbabc1WSVjxdH3pXpgHYyw7a93MTyzDV5Cxekr16vMOnM5/s0Qu5Cz7xwZMtohNL1Xdn9D1jtHmLfmFxyT1kcI3HgWAi/X+DrahiPpBbmXXCvhmOwrbmfQC2rKefLMA4yM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788119931; c=relaxed/simple;
-	bh=5CbJwnx0CCfJRugRqyeb/2pYUjXFLpS0Wq9vjFQXthg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q9L+olOxvQTaDDQOp/kugPUPgngarF0qbq8fzIDI0urtEAdavNW4K0vBWX+JoamflK679aaku0ueKqNqghX0BYAlsr+tOhFeuZwfKQ2pZtCTFKsqodMbglQx06wuTwB7g62AVolPaZ20kj8Wu6dDy8yFHvdA+Ex1UieyIebqEbc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=pSb55cog; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1788119934; c=relaxed/simple;
+	bh=CejqxXZv/c1E7sUmFLb3JNUqtiprzHf4K8u6qazBqs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qx3Xie9De3GEYWT00le61J+nPuMZGKcwTRqGU3Rl3mLAx2etHH8msY2NivoW+hvoYuVxeFBkk5FstVOgL8mEHZZpWnnVhjw7f7lP8yhI6GO+wDhzpC8AvrY6raOXFkxNqa5MrmUFCyVgnSOgKu8vROT5JvsLb88tA7UUC1c4QRU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=OgTPdKJl; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="pSb55cog"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="OgTPdKJl"
 Received: from monolith.lan (unknown [IPv6:2a02:6ea0:1508:6::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hY2xZ3CgCzyVm;
-	Sun, 30 Aug 2026 22:58:42 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hY2xf6TxWzyZF;
+	Sun, 30 Aug 2026 22:58:46 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788119922;
+	t=1788119927;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d5oa4dZUkC3HKCldBnEAdXLgTYHKmOlTqsTuE6yMuyY=;
-	b=pSb55cogpypTO+ztGqk7XOvqowzPMqiaYfTl3IIKZoFxBYKvfsxOl0HjgHdVUTZj0nVYhA
-	pLt+cFdbRvqNjvGQskaDNxQhopRNTKW0neMM25j6DS5Olyw0/V95hotCD6zq8kNEVtXVX8
-	o/O3Y0C54LwRDtBW5APX0fNENDr17bQ=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788119922;
-	b=qbj1B6zo4+OK26TJ/vmnuCQ2a0neEQV9+1DhQr8K2tzB9HkVrMVnlm2dxPPH8bZebdF9mH
-	RNBeLzS50jnpv1rsuEzLXZu54stDdxourtp5bJc3kdFAs2NIJ0tZdsqpu2ckAQ3DopICpd
-	j9YZCVj1KJOZs/nqeYP2yhp61iazJu8=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rduLaW8RgwLmQlhjhJl35H7TtOa9xAW23A8DKIm5OMk=;
+	b=OgTPdKJllNemqhhNYKYvWq4acSy8xkxPMdyWfGc/AEvoup6ha86auKCnm8zmByaqMN1xkd
+	+yFNm/Q+5Ozcp5+0S2LlOwwJZWghi+22HvRWH37NEyEmDuJNOEOZby9aS6xPoxoZKgA+sH
+	5+DKZ+y/kIOCJ2QhNDx745Di6DkC7iE=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788119927;
+	b=MP7kqOfN72g8hF0mA32a5IKV1bqfBGfOZIcHGgjrvd2MwEKnLoctINhZWJ40MgNfAVsfhf
+	fCPC0oyvPZkG5/v5hu18tjsTvsI+n+EST/j97hPnA5iDyrJCeBm6gFPA6ttn+PZ9LJBHR9
+	yGhjkKwmSFVl7C0Qgch8zBwsnC8HCSw=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788119922;
+	s=meesny; t=1788119927;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d5oa4dZUkC3HKCldBnEAdXLgTYHKmOlTqsTuE6yMuyY=;
-	b=uoOV3bFaa9ru08ZTBEMbERE868ob2t0XmUCwI/3j5l48T7f4mTwJZJ6gF/xCBMwxudRer+
-	YxOvD8BszEWd/PhIiipgx8sOB1P1V7Z1ZTbpmpRUZeJSsFW9e2rZnJ/Bm2gWAagtjazcLp
-	Jt8FEeWNkwBuIspBeNXtI0R4zhHSQrk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rduLaW8RgwLmQlhjhJl35H7TtOa9xAW23A8DKIm5OMk=;
+	b=BlfQhxx12Cbc6zZ+ceNPHaDDgcBerf2wbrIBNphwvRxe4yC6nJ8MBHSgdQNt0K1CPyTORK
+	1R7RkGvVQYpPYTwon27x8pn2ABNdyAjxRnTs51NuF6Sa8GYuOSqtHG15JABd/JBxfJG+8v
+	vhOB4hcv6CIFO5LFA2qo2paXaCYCEAM=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 1/3] emulator: bthost: add function for sending raw L2CAP sig commands
-Date: Sun, 30 Aug 2026 22:57:22 +0300
-Message-ID: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 2/3] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
+Date: Sun, 30 Aug 2026 22:57:23 +0300
+Message-ID: <3cc24b76e142e90a2c1fb320ae0685a04a7d65eb.1788119838.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
+References: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,57 +67,308 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add bthost_l2cap_sig_raw() that tests can use to send raw L2CAP
-signaling commands.
+Add test that checks Ext-Flowctl server handles invalid connection
+requests with ident collisions. This triggers null-deref crash / hang on
+some kernel versions.
+
+L2CAP Ext-Flowctl Server - Nval Conn Req
 ---
 
 Notes:
     v2:
     - no changes
 
- emulator/bthost.c | 13 +++++++++++++
- emulator/bthost.h |  4 ++++
- 2 files changed, 17 insertions(+)
+ tools/l2cap-tester.c | 169 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 160 insertions(+), 9 deletions(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 46c6a52f5..b3d48ffb3 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -811,6 +811,19 @@ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
- 	return ident;
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 69c529aa8..efff5c2d8 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -30,6 +30,7 @@
+ 
+ #include "src/shared/tester.h"
+ #include "src/shared/mgmt.h"
++#include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ 
+ #include "tester.h"
+@@ -51,6 +52,7 @@ struct test_data {
+ 	int sk2;
+ 	bool host_disconnected;
+ 	int step;
++	struct queue *io_channels;
+ 	struct tx_tstamp_data tx_ts;
+ };
+ 
+@@ -267,6 +269,11 @@ static void test_pre_setup(const void *test_data)
+ 					read_index_list_callback, NULL, NULL);
  }
  
-+uint8_t bthost_l2cap_sig_raw(struct bthost *bthost, uint16_t handle,
-+					uint8_t code, uint8_t ident,
-+					const void *data, uint16_t len)
++static void io_channel_unref(void *data)
 +{
-+	struct btconn *conn;
-+
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn)
-+		return 0;
-+
-+	return l2cap_sig_send(bthost, conn, code, ident, data, len);
++	g_io_channel_unref(data);
 +}
 +
- void bthost_add_cid_hook(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 				bthost_cid_hook_func_t func, void *user_data)
+ static void test_post_teardown(const void *test_data)
  {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index e104e68af..ed924eb99 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -126,6 +126,10 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t req,
- 				const void *data, uint16_t len,
- 				bthost_l2cap_rsp_cb cb, void *user_data);
+ 	struct test_data *data = tester_get_data();
+@@ -281,6 +288,9 @@ static void test_post_teardown(const void *test_data)
+ 		data->err_io_id = 0;
+ 	}
  
-+uint8_t bthost_l2cap_sig_raw(struct bthost *bthost, uint16_t handle,
-+						uint8_t req, uint8_t ident,
-+						const void *data, uint16_t len);
++	queue_destroy(data->io_channels, io_channel_unref);
++	data->io_channels = NULL;
 +
- void bthost_write_scan_enable(struct bthost *bthost, uint8_t scan);
+ 	hciemu_unref(data->hciemu);
+ 	data->hciemu = NULL;
+ }
+@@ -1137,6 +1147,12 @@ static const struct l2cap_data ext_flowctl_server_nval_scid_test = {
+ 	.expect_cmd_len = sizeof(nval_ecred_connect_rsp),
+ };
  
- void bthost_set_adv_data(struct bthost *bthost, const uint8_t *data,
++static const struct l2cap_data ext_flowctl_server_nval_conn_req_test = {
++	.server_psm = 0x0080,
++	.defer = true,
++	.mode = BT_MODE_EXT_FLOWCTL,
++};
++
+ static const struct l2cap_data ext_flowctl_server_phy_test = {
+ 	.server_psm = 0x0080,
+ 	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
+@@ -2897,6 +2913,8 @@ static gboolean l2cap_accept_cb(GIOChannel *io, GIOCondition cond,
+ 	const struct l2cap_data *l2data = data->test_data;
+ 	int sk, err;
+ 
++	data->io_id = 0;
++
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+ 	if (!check_mtu(data, sk)) {
+@@ -2929,7 +2947,8 @@ static gboolean l2cap_accept_cb(GIOChannel *io, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
+-static bool defer_accept(struct test_data *data, GIOChannel *io)
++static bool defer_accept(struct test_data *data, GIOChannel *io,
++							GIOFunc accept_cb)
+ {
+ 	int sk;
+ 	char c;
+@@ -2953,11 +2972,12 @@ static bool defer_accept(struct test_data *data, GIOChannel *io)
+ 		}
+ 	}
+ 
+-	data->io_id = g_io_add_watch(io, G_IO_OUT, l2cap_accept_cb, NULL);
++	if (accept_cb)
++		data->io_id = g_io_add_watch(io, G_IO_OUT, accept_cb, NULL);
+ 
+ 	g_io_channel_unref(io);
+ 
+-	tester_print("Accept deferred setup");
++	tester_print("Accept deferred setup sk = %d", sk);
+ 
+ 	return true;
+ }
+@@ -2980,6 +3000,8 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
++	tester_print("Accept sk = %d", new_sk);
++
+ 	io = g_io_channel_unix_new(new_sk);
+ 	g_io_channel_set_close_on_unref(io, TRUE);
+ 
+@@ -2989,7 +3011,7 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 			return FALSE;
+ 		}
+ 
+-		if (!defer_accept(data, io)) {
++		if (!defer_accept(data, io, l2cap_accept_cb)) {
+ 			tester_warn("Unable to accept deferred setup");
+ 			tester_test_failed();
+ 		}
+@@ -3098,7 +3120,8 @@ static void send_req_new_conn(uint16_t handle, void *user_data)
+ 	}
+ }
+ 
+-static void test_server(const void *test_data)
++static void start_test_server(const void *test_data, bthost_new_conn_cb conn_cb,
++							GIOFunc listen_cb)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const struct l2cap_data *l2data = data->test_data;
+@@ -3128,7 +3151,7 @@ static void test_server(const void *test_data)
+ 			return;
+ 		}
+ 
+-		if (listen(sk, 5) < 0) {
++		if (listen(sk, 32) < 0) {
+ 			tester_warn("listening on socket failed: %s (%u)",
+ 					strerror(errno), errno);
+ 			tester_test_failed();
+@@ -3139,8 +3162,7 @@ static void test_server(const void *test_data)
+ 		io = g_io_channel_unix_new(sk);
+ 		g_io_channel_set_close_on_unref(io, TRUE);
+ 
+-		data->io_id = g_io_add_watch(io, G_IO_IN, l2cap_listen_cb,
+-									NULL);
++		data->io_id = g_io_add_watch(io, G_IO_IN, listen_cb, NULL);
+ 		g_io_channel_unref(io);
+ 
+ 		tester_print("Listening for connections");
+@@ -3154,7 +3176,7 @@ static void test_server(const void *test_data)
+ 	}
+ 
+ 	bthost = hciemu_client_get_host(data->hciemu);
+-	bthost_set_connect_cb(bthost, send_req_new_conn, data);
++	bthost_set_connect_cb(bthost, conn_cb, data);
+ 
+ 	if (data->hciemu_type == HCIEMU_TYPE_BREDR)
+ 		addr_type = BDADDR_BREDR;
+@@ -3164,6 +3186,130 @@ static void test_server(const void *test_data)
+ 	bthost_hci_connect(bthost, central_bdaddr, addr_type);
+ }
+ 
++static void test_server(const void *test_data)
++{
++	start_test_server(test_data, send_req_new_conn, l2cap_listen_cb);
++}
++
++static gboolean ext_flowctl_nval_conn_req_ready_cb(gpointer ptr)
++{
++	struct test_data *data = tester_get_data();
++	const struct queue_entry *entry;
++	GIOFunc cb = l2cap_accept_cb;
++
++	if (data->io_id) {
++		g_source_remove(data->io_id);
++		data->io_id = 0;
++	}
++
++	data->err_io_id = 0;
++	data->step = 0;
++
++	tester_print("Accepting %d deferred", queue_length(data->io_channels));
++
++	entry = queue_get_entries(data->io_channels);
++	for (; entry; entry = entry->next) {
++		GIOChannel *io = entry->data;
++
++		if (!defer_accept(data, g_io_channel_ref(io), cb)) {
++			g_io_channel_unref(io);
++			tester_warn("Unable to accept deferred setup");
++			tester_test_failed();
++			break;
++		}
++
++		/* Require only the first to connect */
++		cb = NULL;
++	}
++
++	return FALSE;
++}
++
++static gboolean ext_flowctl_nval_conn_req_listen_cb(GIOChannel *io,
++					GIOCondition cond, gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	int sk, new_sk;
++	GIOChannel *new_io;
++
++	if (!data->step)
++		return FALSE;
++
++	sk = g_io_channel_unix_get_fd(io);
++
++	new_sk = accept(sk, NULL, NULL);
++	if (new_sk < 0) {
++		tester_warn("accept failed: %s (%u)", strerror(errno), errno);
++		tester_test_failed();
++		return FALSE;
++	}
++
++	tester_print("Accept sk = %d", new_sk);
++
++	new_io = g_io_channel_unix_new(new_sk);
++	g_io_channel_set_close_on_unref(new_io, TRUE);
++
++	if (!data->io_channels)
++		data->io_channels = queue_new();
++	queue_push_tail(data->io_channels, new_io);
++
++	if (data->err_io_id) {
++		g_source_remove(data->err_io_id);
++		data->err_io_id = 0;
++	}
++
++	/* Accept all deferred connections at once, or until timeout */
++	data->step--;
++	if (!data->step) {
++		data->io_id = 0;
++		ext_flowctl_nval_conn_req_ready_cb(NULL);
++		return FALSE;
++	}
++
++	data->err_io_id = g_timeout_add(1000,
++				ext_flowctl_nval_conn_req_ready_cb, NULL);
++
++	return TRUE;
++}
++
++static void ext_flowctl_nval_conn_req_conn_cb(uint16_t handle, void *user_data)
++{
++	struct test_data *data = user_data;
++	struct bthost *bthost;
++	int i;
++
++	tester_print("New client connection with handle 0x%04x", handle);
++
++	bthost = hciemu_client_get_host(data->hciemu);
++
++	tester_print("Sending %d L2CAP_LE_CONN_REQ", data->step);
++
++	/* All L2CAP_LE_CONN_REQ (0x14) use the same PSM, same ident, different
++	 * SCID.  Receiver may reject some of these due to ident collision,
++	 * but at least it should not hang/crash.
++	 */
++	for (i = 0; i < data->step; ++i) {
++		uint8_t cmd[] = {
++			/* PSM(2), SCID(2), MTU(2), MPS(2), Crd(2) */
++			0x80, 0x00, 0x40 + i, 0x00,
++			0x40, 0x00, 0x40, 0x00,
++			0x05, 0x00
++		};
++
++		bthost_l2cap_sig_raw(bthost, handle, 0x14, 0x9f,
++							cmd, ARRAY_SIZE(cmd));
++	}
++}
++
++static void test_ext_flowctl_server_nval_conn_req(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->step = 32;
++	start_test_server(test_data, ext_flowctl_nval_conn_req_conn_cb,
++					ext_flowctl_nval_conn_req_listen_cb);
++}
++
+ static void test_getpeername_not_connected(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -3550,6 +3696,11 @@ int main(int argc, char *argv[])
+ 				&ext_flowctl_server_set_phy_coded_test,
+ 				setup_powered_server, test_server);
+ 
++	test_l2cap_le_52("L2CAP Ext-Flowctl Server - Nval Conn Req",
++				&ext_flowctl_server_nval_conn_req_test,
++				setup_powered_server,
++				test_ext_flowctl_server_nval_conn_req);
++
+ 	test_l2cap_le("L2CAP LE ATT Client - Success",
+ 				&le_att_client_connect_success_test_1,
+ 				setup_powered_client, test_connect);
 -- 
 2.55.0
 
