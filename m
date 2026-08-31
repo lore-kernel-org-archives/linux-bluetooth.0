@@ -1,101 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC322514770;
-	Mon, 31 Aug 2026 15:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCC2463B92
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 15:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788188561; cv=none; b=COC5THfjlk3roUogIMVrIAXLL6JqBkORJxxzkPU2hvHO0jieLy9NbKpfMHY4aNRA92c/ceQRaQNNjviKa0l+/x1c/vHjZwcj8QGFA/tv0uH9vdqljnjSrRuVF49n4KZDZ7BGajoGPnAWkygJPXDrN/Cjsu2YQlZDH1o9x9kDHX4=
+	t=1788188678; cv=none; b=LaJDC6xQxH81zlWOPcZOeQPeMw2FyJ3o7KLhVOtFY2PLNK1PRGU05aMr4WGg8UwuP6wReG80Zkz3cTpMpjKLj7yfQJf5DmZ0yM8JOB3k96qMKappqpvBgW2rBWruVx5YtjgGnxbQSbzf4IyDJou8lu5PAVGFIVmPfFr7Ksc9eSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788188561; c=relaxed/simple;
-	bh=C+pCREtFQwkT20iqaLyc0Hd0RC9syYGE2DcfobTAwNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTXeyi0+BJ0F1b73yCYo9TF9f8qfxXGEabqLyVZ81RG1od6bJLeN/xdawytMRNk1rKjKWNT9nMSL29YO8bnti3A/gSkQc2Z3RAStmZ1iJ2kpG4puzyuBlzAfHeZt/By9dFVDPudg3hb7GIN6OxkOuYfOenOmrKjZwfjI9j3NKC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EaUqloqy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788188678; c=relaxed/simple;
+	bh=pjktXLl38EPkIB/g8yY5N1a3JbRKfGfng34ItlfQm/k=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hEeIiMYzYWrn64whP7yABakW8DjTO1OFswnrjMrcbJ3lZ7TiztdLBnj0mPV1BpOgOBVlnYRqDO9p+aNVOoqr6E9KNkxULffV4VX7TcsqEx/AXK8412LDajCMg6QWi7hqEaxY5Bdx4A961r2fqjKKkFQyDNBaYwtyb85Risdq+zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Soaj++4u; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EaUqloqy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1AF31F000E9;
-	Mon, 31 Aug 2026 15:02:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788188559;
-	bh=C+pCREtFQwkT20iqaLyc0Hd0RC9syYGE2DcfobTAwNA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EaUqloqyuxlnfCqUSsbqAKqeud1q7C80WWI7C0AJMCTQpUQMkACHqRaMznwDc3A5U
-	 aHvX7v1NfltZMKUMZLgu/MNnhqOZPG4Uj+hf5hwge3wgnejSxrK0+TqwImRLr4fq9D
-	 a0v5xDhkAoPwEhANqCtNVNEHFi2MYfZ0NDf9LZzVczP9hGodi+X+Tf3LjxABkIn3h2
-	 NPgE7ONlnn6C7Re95i6fMQd1HwIyQga8UPP1hQkTSWfOToBwRofMfcY1JtO2Cnxb5I
-	 ZKmVJpuGrEbkfr3/HSW7Ojhr/iOJlcVRn3EJvc4iPS3vn9j3vGODl5uwz4I64QU/X4
-	 67EvLVs/dKY6A==
-Date: Mon, 31 Aug 2026 16:02:35 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Linus Walleij <linusw@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] Bluetooth: dt-bindings: net: bluetooth: add
- BCM4384
-Message-ID: <20260831-cosmic-crawling-cf0532d4d3c0@spud>
-References: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
- <20260827110242.1203546-2-andy.chang@synaptics.corp-partner.google.com>
- <20260827-uncolored-onlooker-d62c44a3323b@spud>
- <CAF8VQdEA7=LRpHaVOVZxRi73kRf=0pK_etJOJ5oeULtgw4k5Bg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Soaj++4u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788188676;
+	bh=0dp+cO9WSnpG676xntaMUp+g9/7ANS36PP3f6vXe7Ng=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Soaj++4u10S8iML9yUBVoZxWI8Iv2U4zbshqJVpl0nrCm/FV5azt8NxlKGjRSxTNS
+	 inLEOIwo3Cg6gXvhyfUFPB5XdamAaXytHSka3Z2uEMeXx/Mphk89wgBLS/LIVPwjyT
+	 hWvozBtp4/AmblsrgRtHuXnw4/zS1DMA6YfN8kDA=
+Received: from github.com (hubbernetes-node-cdbba5f.va3-iad.github.net [10.48.170.52])
+	by smtp.github.com (Postfix) with ESMTPA id 64FF7800111
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 08:04:36 -0700 (PDT)
+Date: Mon, 31 Aug 2026 08:04:36 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1154582/000000-85f3cd@github.com>
+Subject: [bluez/bluez] 85f3cd: shared/bap: Fix use-after-free in bt_bap_detach
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Be5C8Jw/A1Wehthf"
-Content-Disposition: inline
-In-Reply-To: <CAF8VQdEA7=LRpHaVOVZxRi73kRf=0pK_etJOJ5oeULtgw4k5Bg@mail.gmail.com>
-
---Be5C8Jw/A1Wehthf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Mon, Aug 31, 2026 at 05:34:23PM +0800, Andy Chang wrote:
-> On Fri, Aug 28, 2026 at 12:38=E2=80=AFAM Conor Dooley <conor@kernel.org> =
-wrote:
-> >
-> > On Thu, Aug 27, 2026 at 07:02:41PM +0800, Andy Chang wrote:
-> > > Add the brcm,bcm4384-bt compatible string to support the
-> > > Synaptics BCM4384 Bluetooth controller.
-> >
-> > Please explain why a fallback compatible is not suitable here, or
-> > alternatively if it is, use one.
-> >
-> > pw-bot: changes-requested
-> >
-> > Thanks,
-> > Conor.
-> Hi Conor,
-> A fallback compatible is not suitable here because the BCM4384
-> controller requires a dedicated firmware patch file (.hcd) matching
-> its specific hardware ID and revision.
-> Falling back to an existing compatible would cause the driver to
-> request the wrong firmware binary and fail the controller
-> initialization.
-> Therefore, it requires a distinct compatible string.
+  Branch: refs/heads/1154582
+  Home:   https://github.com/bluez/bluez
+  Commit: 85f3cda412302a1454580994f5529c0dcb2d5dc5
+      https://github.com/bluez/bluez/commit/85f3cda412302a1454580994f5529=
+c0dcb2d5dc5
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-08-31 (Mon, 31 Aug 2026)
 
-Cool, please put this info in the commit message.
+  Changed paths:
+    M src/shared/bap.c
 
-Thanks,
-Conor.
+  Log Message:
+  -----------
+  shared/bap: Fix use-after-free in bt_bap_detach
 
---Be5C8Jw/A1Wehthf
-Content-Type: application/pgp-signature; name=signature.asc
+bt_bap_detach() invoked the pending request's completion callback via
+bap_req_detach(bap->req) before clearing bap->req. Since the completion
+callback (req->func) can trigger synchronous cleanup that re-enters
+bt_bap_stream_cancel() for the same stream, and bt_bap_stream_cancel()
+frees bap->req whenever it still matches the request being canceled,
+the request could be freed while bap_req_complete() was still executing
+on it, causing bap_req_complete() to dereference the now-freed request
+once the callback returned.
 
------BEGIN PGP SIGNATURE-----
+Clear bap->req before invoking the completion callback, matching the
+pattern already used by bap_abort_stream_req(), the ASE IDLE state
+handler and bap_cp_notify(), so a reentrant cancel no longer finds a
+stale bap->req to free.
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCapWXiwAKCRB4tDGHoIJi
-0p4iAQCVA3m20ajQj2k9zBtN097mymUdLDsp1JMWDndTMrhANAD/Tytgo8aekMkc
-GfSxtdR9XDIIfvNCOseqR7jiWCDqEwg=
-=zh7V
------END PGP SIGNATURE-----
+Assisted-by: Claude:claude-sonnet-5
 
---Be5C8Jw/A1Wehthf--
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
