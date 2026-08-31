@@ -1,129 +1,157 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECAA3CB574
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 08:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC953B0588
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 08:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788163518; cv=none; b=AVABgz8+KtWF/DkSn1m//1EqnWfIyiZf3sct4JIrIFFOFFL4yAbwdz1ukVhsSMEQYJn03DORdaMqsJia5taCi3G7y+xotpOOC2UG10vzPhJ1sonTWX6mvyeZcngcMNmMrZwgPnREvO3V1RITaBssxesWodq0H96htne575k61Ck=
+	t=1788165847; cv=none; b=Nsk7pvACsRY2K85Jzys21PkZ0/5nMSilhmltAp1vpb+ReDDNMa+RZqd4LVb0j5R8e3RVr9qcsaJo/8byV77/RdL1/ww+kiNam9Y5kErhklb/87SqJPoqo8y8+eYM210IDcO2zO7XUoigRIV/RXDFtAVnl8QgcAEbdaw2O816DyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788163518; c=relaxed/simple;
-	bh=0j6NzGaE9JQVIfSUS1ZVpPxiu/v55+T+D8gzebmGdXY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jeL+e7hfwsobuQ4tcV9VmZHVGBypkcQ48SuKSXxhqw2rq7ngxXcw0+X0YL0aZANu/uN+VTrzf3VnsEXU8GCli/1jaVupG/ycZHV1oZWVsvAHG92pmRn2uf08gQo9CgyzKNMUFZJgGYuSsdxxMJFkgXqWT1Rl6pDRsy8cT9qhMTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPDO0Ghx; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788165847; c=relaxed/simple;
+	bh=Bp30F1/SB6kVARtPOg2I7rVp9M/mkWlYhMd8lCNJpOg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F7cBIV7Xke0H1FN9vGQi0UpuiclnWYq4TT0kivtlBtBD8kJ4pL59mceflbcAAoDcDRdc+4aV32iccJmid8mitWSUvKQ4CVydEUNkj/BCbhB7kgPz8yRibyEdwq7xYMMFwAnWkCjt0DLhOHYvFh252RP9hdoPHich45kaKZC9B+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=cueYahl2; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPDO0Ghx"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-97ca74bd6e0so925346241.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 01:05:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788163515; x=1788768315; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=0LhY7OJ6y3CegKIrl71V9h0SqVAb4M3zwXibwj9CUIY=;
-        b=aPDO0GhxCyQCdb/a/bTrQQLSGumwYA61lSrQDKf4AXe+hhVT+Zu4X56IZSDVhz9CCX
-         HrR7gWHpOjANqGHU0+zJNJBip9dh1UI/H7E9bR08STP8B84+HD0FlUSvNCIRd/tLE5YR
-         vWPh1Eoh+npXAen7I25OFYB1AqXnLQRKKa8wV8L6Wy55fy8AUHh8PvN6bBG3rg7IayCz
-         AVpdujAbvImIppol+Mm+1Rsf5+GAsX3QvY5eQiy3TqOYc4zzGQUzTNKG1zzZKSaNK8jS
-         XStjZuPXlNgbystDLz2CNnFihXZuDzJIAx6eI+ifiY0oSTgbxRn52RXjw5ldCZuF6H9K
-         FWjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788163515; x=1788768315;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=0LhY7OJ6y3CegKIrl71V9h0SqVAb4M3zwXibwj9CUIY=;
-        b=IU/TtU1hWA7uRBYZLeWSRu7WbRPT3TwjdF24Y8MhqoqpNsL3lNmDfyfD7nEK/t/yjh
-         xyL90H6tDSWOUdnadDTIMXAtANxSsgnwUUsFF4dmfNhI9GVfr/XyO5kYsnEVIPVVSZno
-         oeGa1zIfDSPs2GtUtcDpRfNz/lpt47Kejv3M8FYl1gkSad6RgB15QNztP5bc09zpzw/e
-         hkRltJ0P7KVX3WO1lZEISBuCvxfo8Yw9I0VO9wWvB2tuFchIIJGmhcLmFGZTIgPTsqJe
-         TzbiO4NcM0DhnBq8+PYE2SJJ30IcTuhK/EMYRMV66SEDQm7vII3eiclGgxSRW+BKK+EP
-         UmxQ==
-X-Gm-Message-State: AFuF++ldbDwROmrJwQHwWn2KGWCTHcG2nCK+lKlD0CUpfUaJmk2wbFdH
-	5wMOKK2EFWhOo+qbNBz0KGd1kjq+Cq/K0n+QNZcOpUxW4MYwRnYDLkNN5nbBP0i3
-X-Gm-Gg: AR+sD12LoW7+LYiSnuKdfYTmhXjFNNVKR1JeUCt+vslbkJsPHvIXGBzBNq/4EFp7ETm
-	jXC2A3dqn1TdYB4rPd6PoLdnZqeKD2xu9KA8tfEcD33kMGQUcs7cn4B0F5ckvL2eGVYX1LYq+qB
-	bFag+QCwEU6KxbaKwJJjMtkW7D8IL9ISsMTqPO14fKuADggrIWv/89NwAHO+LYnB1FyGjZW+3lk
-	pakfFBPzTaeWvpovNRjQ2tr6G6LcPUsanmwu7IEanXvJcZz/mOXx+OEWz6os5SJ6kDRiFHLxwyQ
-	79wv6Pwk67pJQ2tJuLYrxjSyywmJftktvJO3AAecuxVBL3Z9P+bEGPc5F+r/WwEdQxqLXny6O5f
-	UQ82s25hpqc/b7ozOW89USb8mZaIHUqb8rD3DrSlCMx3eXy+wrkKLfD3H5TNo0c7DbmFCHXD85v
-	HVUc4blYYqi9fFQVg6gWhgTLmz18GHz5tssT+9tz+XpJThXjFRdoEOqMq1neJ/XJOdK7A=
-X-Received: by 2002:a05:6102:c52:b0:784:4d38:ef58 with SMTP id ada2fe7eead31-78593d543admr6636503137.0.1788163515232;
-        Mon, 31 Aug 2026 01:05:15 -0700 (PDT)
-Received: from [172.17.0.2] ([68.211.146.17])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-97e84c0e3e4sm7241004241.12.2026.08.31.01.05.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2026 01:05:14 -0700 (PDT)
-Message-ID: <6a9535ba.7988b9f0.18ac4b.89b1@mx.google.com>
-Date: Mon, 31 Aug 2026 01:05:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3376568860136214797=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="cueYahl2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=GE
+	ujmdh/oRxptyyTqSYMqeer8UL5Fo7k6zOTuxsKygk=; b=cueYahl2F4wKf3oQR6
+	Yq8w+3AKceZF0yCLjwl1SoZScGgzVJty1AMmanPQ3gy1AYSo8OawuPQO7FL2FlsM
+	CpCVvhA4ZJVYa7UASgSAZEjAI/FoRl3kuURp3s+gKeuCVwMzQdn7p54IOMal7FQ0
+	aiWEJVNtfxQCiu1q4NhRf4GPc=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp4 (Coremail) with SMTP id PygvCgCHHCGzPpVqlPitPA--.24552S2;
+	Mon, 31 Aug 2026 16:43:33 +0800 (CST)
+From: zhangchen200426@163.com
+To: luiz.von.dentz@intel.com,
+	pav@iki.fi
+Cc: linux-bluetooth@vger.kernel.org,
+	Chen Zhang <zhangchen01@kylinos.cn>
+Subject: [PATCH] Bluetooth: Reject controller operations while powering down
+Date: Mon, 31 Aug 2026 16:43:29 +0800
+Message-Id: <20260831084329.3141802-1-zhangchen200426@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
-Subject: RE: BlueZ: Support vendor HCI packets
-In-Reply-To: <20260830-vendor_hci-v2-1-9903760957ab@oss.qualcomm.com>
-References: <20260830-vendor_hci-v2-1-9903760957ab@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PygvCgCHHCGzPpVqlPitPA--.24552S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXF1fKrWUWF17ZrW8Kw1fXrb_yoWrXrWfpF
+	Z5AF1YyrWkJF13XF1ftayxAFWYyFn2v3yjkF12q345Aws0q3yUtw10yFyUK3y5CrZ5tr1r
+	ZFyq9rn3ur47GrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jbCztUUUUU=
+X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbCvxW8WWqVPrXd3wAA35
 
---===============3376568860136214797==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Chen Zhang <zhangchen01@kylinos.cn>
 
-This is automated email and please do not reply to this email!
+When an adapter is powered off with devices still connected (e.g. a
+Bluetooth keyboard or mouse), the shutdown sequence issues an HCI reset
+which returns Command Complete while the controller firmware is still
+rebooting. A concurrent command sent through a raw socket during this
+window (e.g. periodic hciconfig queries triggered by the Bluetooth
+status change) can leave the firmware in a stuck state where it stops
+answering any HCI command. The subsequent power on then fails with
+'Bluetooth: hci0: Opcode 0x0c03 failed: -110' and the adapter is lost
+until reboot or re-enumeration.
 
-Dear submitter,
+Reject controller operations while HCI_POWERING_DOWN is set at the
+public entry points in hci_core.c, which covers the ioctl (HCIDEVUP,
+HCIDEVDOWN, HCIDEVRESET) and raw socket bind paths:
+- hci_dev_open(): return -EBUSY
+- hci_dev_close(): return -EBUSY
+- hci_dev_reset(): return -EBUSY
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1154126
+In addition reject raw command transmission from an already bound
+socket during the power down sequence in hci_sock_sendmsg()
+(-ENETDOWN), and fail early in hci_sock_bind() (-EBUSY) to avoid
+toggling HCI_USER_CHANNEL while powering down.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.55 seconds
-GitLint                       FAIL      2.95 seconds
-BuildEll                      PASS      20.61 seconds
-BluezMake                     PASS      590.58 seconds
-MakeCheck                     PASS      19.55 seconds
-MakeDistcheck                 PASS      167.40 seconds
-CheckValgrind                 PASS      249.65 seconds
-CheckSmatch                   WARNING   336.70 seconds
-bluezmakeextell               PASS      102.99 seconds
-IncrementalBuild              PASS      626.78 seconds
-ScanBuild                     PASS      970.59 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,1/3] doc/hci-protocol: Fix missing & on mtu argument in BT_RCVMTU example
-
-1: T1 Title exceeds max length (83>80): "[BlueZ,v2,1/3] doc/hci-protocol: Fix missing & on mtu argument in BT_RCVMTU example"
-[BlueZ,v2,2/3] doc/hci-protocol: Add BT_RECV_VENDOR_PKT socket option for HCI_CHANNEL_USER
-
-1: T1 Title exceeds max length (90>80): "[BlueZ,v2,2/3] doc/hci-protocol: Add BT_RECV_VENDOR_PKT socket option for HCI_CHANNEL_USER"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2003:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structures
-
-
-https://github.com/bluez/bluez/pull/2459
-
+Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 28 ++++++++++++++++++++++++++++
+ net/bluetooth/hci_sock.c |  4 +++-
+ 2 files changed, 31 insertions(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d1e78ae7728e..a0533f260471 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -445,6 +445,16 @@ int hci_dev_open(__u16 dev)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
++	/* Reject opening the controller while it is being powered down:
++	 * the firmware is rebooting after the shutdown reset and any
++	 * concurrent command sent during this window can leave it in a
++	 * stuck state where it stops answering HCI commands.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_POWERING_DOWN)) {
++		err = -EBUSY;
++		goto done;
++	}
++
+ 	/* Devices that are marked as unconfigured can only be powered
+ 	 * up as user channel. Trying to bring them up as normal devices
+ 	 * will result into a failure. Only user channel operation is
+@@ -515,6 +525,14 @@ int hci_dev_close(__u16 dev)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
++	/* Reject closing the controller while the power off sequence
++	 * is already in progress (see hci_dev_open for details).
++	 */
++	if (hci_dev_test_flag(hdev, HCI_POWERING_DOWN)) {
++		err = -EBUSY;
++		goto done;
++	}
++
+ 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+ 		err = -EBUSY;
+ 		goto done;
+@@ -556,6 +574,16 @@ int hci_dev_reset(__u16 dev)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
++	/* Reject resetting the controller while the power off sequence
++	 * is in progress: the shutdown routine already issues its own
++	 * HCI reset and a concurrent one would hit the firmware while
++	 * it is rebooting (see hci_dev_open for details).
++	 */
++	if (hci_dev_test_flag(hdev, HCI_POWERING_DOWN)) {
++		err = -EBUSY;
++		goto done;
++	}
++
+ 	if (!test_bit(HCI_UP, &hdev->flags)) {
+ 		err = -ENETDOWN;
+ 		goto done;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 070ca388f9ac..897596614939 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1296,6 +1296,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr_unsized *addr,
+ 		if (test_bit(HCI_INIT, &hdev->flags) ||
+ 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
+ 		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
++		    hci_dev_test_flag(hdev, HCI_POWERING_DOWN) ||
+ 		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
+ 		     test_bit(HCI_UP, &hdev->flags))) {
+ 			err = -EBUSY;
+@@ -1850,7 +1851,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		goto drop;
+ 	}
+ 
+-	if (!test_bit(HCI_UP, &hdev->flags)) {
++	if (!test_bit(HCI_UP, &hdev->flags) ||
++	    hci_dev_test_flag(hdev, HCI_POWERING_DOWN)) {
+ 		err = -ENETDOWN;
+ 		goto drop;
+ 	}
+-- 
+2.25.1
 
---===============3376568860136214797==--
