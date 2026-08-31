@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E824A8FD5;
-	Mon, 31 Aug 2026 17:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CD84A8FC2;
+	Mon, 31 Aug 2026 17:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788196872; cv=none; b=ApM4ClesD1SfdIOlv8IeewNx0FQKpMWp2AD4kuPcujJgXvFinX0q/3HIu5V9R+pQx53avIBlHQZOHVWzj15tuzmiRgHDIW/azgH7rVkwh7KV+No17PZ6tt8M8+wjX/TN4CZlM2T5NLHPJ6Axkf1iLHqt84gd1NSSxC+BAqYtets=
+	t=1788196873; cv=none; b=fzhi8fqvMX3grdUPq8uR0kKz2e5pJmMsTFgDvUfG+ycK9sjpjJZWDc4NdUOkdn3sYUyQ10svvx5PGICQW0z/XgU1Y/MNdnqqIkQ5crAtgrloI4ZMtmE4rDF40d53EgtVt46LL7woPdW89XYMuPndGkHVe6HxDY3jVzfVmIvkXnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788196872; c=relaxed/simple;
-	bh=wZXZ5tyz4+iqVA+E5VAZx32f8VLfUHUDkbezeZSr4F4=;
+	s=arc-20240116; t=1788196873; c=relaxed/simple;
+	bh=ZznoMgw5FzaBigfEh7mPQF3MLzvGrFnBSyTkA4zdttw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o1qtX/Y5CKYu6/m8Cji1vtuJ0kVU/TRAN4n5GuXmf0Vjsi8GljQzRINuCtvrrZfXOTVCVrIiSZ0mgLPer7hzO43gu0XLzPdp5Ueu8vfYRWAXYps0nDVvxKhnRYAPpUtTZkAnbEmAuibQGQmfy/pMtmD4tCjCz16lJ0MLY18qFtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWm4rMQK; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=ZErEq4L1rvke2ZG7p7CQgOFNnA0yP4DzoYHS8KnoUAZ6eloP0T2aY+GXgHMZL36AffxcCy22o2jCG7XmAH16TP6KyFRNrYS5ozUrqxiJ9gj1F5sopYlIXRxCmJRi2R7IMlWnnxw+upZhP3tE4IuP73caOeW95UYuFcahxAYe6Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h67fx0R3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWm4rMQK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9AAF1F00A3D;
-	Mon, 31 Aug 2026 17:21:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h67fx0R3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E3851F000E9;
+	Mon, 31 Aug 2026 17:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788196870;
-	bh=uQMG6tqpS3eUFyH0Z2UMLCZ02wO+PQDSMxz+lvNFvxc=;
+	s=k20260515; t=1788196872;
+	bh=RPhtSXEccKcvJfqTXmznjSx8Sg6iQuyhmNkfEzW1Uyo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=oWm4rMQK5SrwTeKKk6U5OA9klhaGjVmVNrDq5fjgJ9NUCjmoMsZlAez0lxtWjbSxx
-	 tXblPQeFnzekMeKTeao7hUvqEUdR7fWLI5t1YBpGMqiOskpcXXGue0rnfC+0QsXC6i
-	 7yWvFojl14qXJk4ofowYIh5g3M+rrYXSQmDPH2X45Bdh0DsVNyl981AptnnuiQhBhc
-	 /nt4Pyir7qKrTBOig1Arqe38K4NtI7S7AU5lmY+uVw5QImpXwY2x10lr05U+NzYTjg
-	 W7UgYuWTuqV5w5F3m/fvRNJaKk6FlYsps3VDd5tFU3tsYRhetSC+ZLlu4Kj15jIJk0
-	 781uiJAnE+MLQ==
+	b=h67fx0R31v63H6uFQan6+M+oSVzT+3pKEO81oWeU57mNae34BnyX3moKIX2ipgPJo
+	 3GuQhrEnrzTdPb7NLLZ0R1VQwY77BVbPhH5QbKtJvq+ncHGD8fN8Gknune6UFhPESM
+	 nGlENHNVZLsDzYTGB2g4k3Yolaehsh7ej3oqsCwbc5wRBz2bxJyH+Xi88qm2fgJOEX
+	 HV+KHxlNC4jAvHZr4ynNPCOSmx7+jiC8/U/Fxt7qKwQv/4P9S5x71z9BeB3dwbI3Sy
+	 kscp1ZdEU/NKLRfXGjdOpKq4Cmuc9g96tWZjk0GAct9PsaCz6Wd/XYEGL0ZUsansUj
+	 yRoHjhzxiemWg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1972F3924458;
-	Mon, 31 Aug 2026 17:20:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939183924458;
+	Mon, 31 Aug 2026 17:20:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/3] Bluetooth: btintel: harden version TLV parsing
+Subject: Re: [PATCH v2 1/2] Bluetooth: L2CAP: fix out-of-bounds write in
+ l2cap_ecred_connect
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178819681363.671757.16024867125795377604.git-patchwork-notify@kernel.org>
-Date: Mon, 31 Aug 2026 17:20:13 +0000
-References: <20260831095923.18830-1-acharyalaxman8848@gmail.com>
-In-Reply-To: <20260831095923.18830-1-acharyalaxman8848@gmail.com>
-To: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+ <178819681514.671757.16912316502936298927.git-patchwork-notify@kernel.org>
+Date: Mon, 31 Aug 2026 17:20:15 +0000
+References: 
+ <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
+In-Reply-To: 
+ <2b863abeea0ada6e990b07a7f3182e261ecd8e09.1788091154.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org, ali@iusegentoo.com,
- kiraank@gmail.com, kiran.k@intel.com, ravishankar.srivatsa@intel.com,
- amit.k.bag@intel.com
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 31 Aug 2026 15:44:20 +0545 you wrote:
-> Malformed Intel version TLVs can make btintel_parse_version_tlv() read
-> beyond the received response. Validate the minimum value length for each
-> known fixed-size TLV and bound the firmware ID conversion by the TLV's
-> advertised length. Propagate parser failures to the setup path in a
-> separate patch.
+On Sun, 30 Aug 2026 15:04:01 +0300 you wrote:
+> l2cap_chan_connect() tries to ensure there are no more than
+> L2CAP_ECRED_CONN_SCID_MAX pending ECRED channels, so they fit in the
+> same L2CAP_ECRED_CONN_REQ that l2cap_ecred_connect() constructs.
 > 
-> The two bounds fixes are kept separate because they were introduced by
-> different commits and apply to different stable trees. The parser error
-> propagation is also separate because it changes setup behavior.
+> However, the check only counts deferred channels.  If 6 L2CAP sockets
+> are connected at the same time in order DDDDND (D=deferred,
+> N=non-deferred), the last can bump the total to max+1.  It results to
+> one __le16 written out of bounds of the scid array, and an invalid
+> ECRED_CONN_REQ being sent.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/3] Bluetooth: btintel: validate version TLV value lengths
-    https://git.kernel.org/bluetooth/bluetooth-next/c/eb656c5bb754
-  - [v3,2/3] Bluetooth: btintel: bound firmware ID by TLV length
-    https://git.kernel.org/bluetooth/bluetooth-next/c/58c6f5ec1d22
-  - [v3,3/3] Bluetooth: btintel: propagate version TLV parsing errors
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f8c8fa407aa0
+  - [v2,1/2] Bluetooth: L2CAP: fix out-of-bounds write in l2cap_ecred_connect
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ddaccd985bb0
+  - [v2,2/2] Bluetooth: L2CAP: clear FLAG_DEFER_SETUP only for same PID/PSM
+    https://git.kernel.org/bluetooth/bluetooth-next/c/af04b0e3176e
 
 You are awesome, thank you!
 -- 
