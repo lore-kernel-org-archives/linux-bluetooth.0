@@ -1,220 +1,149 @@
-Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405EA3BE15E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 09:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788167002; cv=none; b=ZrOyGbPfLtMUFk9hXey5poF/F/V+Itpppa61TpXFhwIocjaG6754EqOXnc4BWyencYf3tdWhhVIwJpcvHNsyB65VQfh9y3+uKdA0va/9hUMNBSh3hqNJCltHU8d7owydhfkNmZ09sRrhTzbeVJl4Jw763vvZJENbpUG29+8877U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788167002; c=relaxed/simple;
-	bh=WDPVoqDu5sgqGFzGVVr3SKyG9fWrWvmMgllNy7RqRLg=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=I8h39wIWVe2RkE+Shb5Q4JqKVDD6vXaqD11R2V0DjWmfmCQjKrxRUGotXYmioQvDSXfki1JmYHaBkTmkrLvVO9bY1sQar4OejcxNX7WPwoonBDBth+KneUmPedo985vyUJhaZntMGoDNZaRVVcyHPSNdKsKmybxIyKKB7hntaco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=z96MjZpJ; arc=none smtp.client-ip=46.14.118.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812AB3D810C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 09:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788168878; cv=pass; b=L45TLrSnlQ7sZ4r33qRugLEzsioEDtvyObZm4ecC5Vr6cGaR5iHJBoyoajlXSb5Dkhtcy9Y+KcqSaYFvzIXe4cbK4mHojfiPx89yakO/jwnBvTAPIIJpuhNYCgRfkTry9jYY8NQ33KHRQbc210+PvY1Sil4YMtEACtUK/fT1xfc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788168878; c=relaxed/simple;
+	bh=q10VzBkB2pq4QNp2zfHKGr6Ca+oT+tEYjX/lb793kOE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JCd3lqIqFgLTcO3kJnwGwgVeOimwj8Kfe09A5+qqrKmmM7PQ+9iW6owAMRpBUIKgQrNpLVJjO8YEO9tX1yI493MgASaD7FgzTrZNlOp+zTS3DMRQWw/uTwrmwU5Ihhz4UI+T8b1lmv/FouRWwAlaWC6S9P4MRBg6f3VanczXjm4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJitIXpz; arc=pass smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="z96MjZpJ"
-Received: from [192.168.16.44] (port=33631 helo=remote.fiveco.ch)
-	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <valentin.kindschi@fiveco.ch>)
-	id 1x0xul-000000002HK-15Yr;
-	Mon, 31 Aug 2026 11:02:51 +0200
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
-	t=1788166971; h=from:subject:to:date:message-id;
-	bh=WDPVoqDu5sgqGFzGVVr3SKyG9fWrWvmMgllNy7RqRLg=;
-	b=z96MjZpJpKCrfR1WKnPAMt9AXz6nfUhSHWg8lfzjlFY2NachAy4RyDUML8usD31nYamIYEGYYOy
-	mWxVfpO+tBFPagXqIHQpSuBmPRg/OvumWdPPBGuBZgx+xM+QvKz2HHc/ns8fHhg2HcjTq66oM8EwL
-	jYmptrpR3bR+cHJokZI=
-Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
- FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 31 Aug 2026 11:02:50 +0200
-From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-	<linux-kernel@vger.kernel.org>, Valentin Kindschi
-	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
-Subject: [PATCH v3] Bluetooth: hci_sync: pause advertising for the scan address update
-Date: Mon, 31 Aug 2026 11:02:32 +0200
-Message-ID: <20260831090232.1726063-1-valentin.kindschi@fiveco.ch>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJitIXpz"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c2544ff970dso500312866b.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 02:34:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788168875; cv=none;
+        d=google.com; s=arc-20260327;
+        b=W5qDTviaISwheO9DqZk2jiP3GnGfxp4+xmnqPm0m4rf4QSMpyTZBbAwhl6NIEp+iev
+         m3Hx3wqv6OCA+VZCEJSuMu9MmncCKgKCIoQs3adDVp20O2KiGYXPhJxHPPs5yATgDwC1
+         Y/yxOB1L0WEUlfvroygTX0BnCC7tca3rvuTSNJpppGhhkNMEdsSZjTJ+jy0SEzIAQY6l
+         vcqiB5PKqFKb/LK9C4WkvmiQPZVSwMY1SQb2Nlx41rtOlsd/OFB2KUnblmaLurc7oiOP
+         lJvUQ9ORjt0vHIRyDJJShA++YHpYkDJHyN8XkKTm9jkcmdYOs+zzH9aaRgIPyZSKpM8H
+         N5qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UsNW+bOUezawPMhJi0LdgKQenUPI6J7374ic34WfjWw=;
+        fh=/Mfk1GDUTIXbbVs/g5jn0MST3hWyNKcvPlL+vo0UG1c=;
+        b=CkpyXnDeOMZMFA5awPWYG0ynUs8JkS53flAqwCjZNX/ew6WdZJfZhOEP20Oz4bqbtY
+         yDp+yvNzj/c4+TpRs/kOylXjHrn967hyjdUw0r0Y/m785+z445UCYQju5LZ8YTW6qXsV
+         OkVB8eukn7dODTWz3deQuuidMiApERl9CCQOWC2Hk6y3fworlyHYYWcMDwH51sVwXQ/J
+         uX0MEc5I0LMKMhHEzM14CT/3+XeOOzfAgiZCFQICd6eyNjBw6sWtoXqiGgF5Nj59bB5t
+         0FZEbrm+/C/QdQzUFK3PcU7DaQP4B/CgQ3bfrzsJzj5VjXhxEDBoxF4Wr2tT6jJeonRz
+         nNbw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788168875; x=1788773675; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=UsNW+bOUezawPMhJi0LdgKQenUPI6J7374ic34WfjWw=;
+        b=jJitIXpzL0asfeBrCuen2QTrVbcX0buEncJyF+In6HPREGiHMoXMH32ftopXuAiNhD
+         3IACRB3ITc11yaTFIxRp3f3dGOlyfd8VGxh2pblq0a5g3hhp0HMnmnCESF5hXMkmHyy9
+         mfI3P1hLcgfxnnyXRdYyCsLRSCNeotd4fuJIcv2A9QHmaJM1coiNNjBJhwPYbEmAQzjU
+         6OiwHfdfa/vDtcD0rf2Me7J6FyNoAuLcJbKo0WdRVjCC5E7x185ZAlqQVKoSD78yWro1
+         nRXRorv/Z2lEbz0OMuEwW4EhQi/kukq2yCMdTp8xeFhujOBJD1etYJyQR5Zj6btbagOq
+         GyUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788168875; x=1788773675;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UsNW+bOUezawPMhJi0LdgKQenUPI6J7374ic34WfjWw=;
+        b=Fglga3cRil2fZ9G6Ktj2oZAWoffGQ9EcY2m3CVfwkLc/EkpBNJAtT/C9vqAFahJoLO
+         f02CW1ycVe5NnBIRbs5YD2Ty9fWVaYtrhLUhLVNNdDtm5LajJHGt1BABzj8dOYDlIZZz
+         4H4R8UL9LqhG7e/6QDiqgH79tNpCE6aeQgId1iury+WS18gRzNiJ7a32s+CYRBdkVLa5
+         K7UuEb4NuL9RsImjdOIXqLtne828Wo2vNQYCot+UMsiJmmiVq4O4g8IL57uZxkADLCl6
+         l3WOpkamqFUq/yxbvWzvWxRGT7C2Oxlc7C3nDEmNCm3YaHg4Ct9H97TotHnfj9rh2EYv
+         ToTA==
+X-Gm-Message-State: AFuF++mDOKenHrOHM5dyGHG/I4mRBUH2LvslohZYbxywOvL0/oh9PUNe
+	6vDNgX3jbijvtggBKD+bRa/USIdt5DA6ApKowrIQsOut1D0vjJs3SKHGvo7ddgHotuKS5BZRLpd
+	FRIoYj5/Vqq6rvUlobw9g+eaO8gJieC/9SSckcy506g==
+X-Gm-Gg: AR+sD13ZkCpXBGUOfJF2Q+elKp9Qe169fvMUX3IFK6QOPKDYq0+TBjXDo/O4PSOctz8
+	DR+FELouD4za6cKXVtJ89ruEKlXVjyZm+8/YVH6SIaEzy2yhY3phEL8iwnh1rsHba/WRjeBiGoj
+	7WT9fzGLWQCqpGrJDwQ5WKXLxCHwq/56O5waQXJVYWSe4Qzn7OinKnX5omaeITn5ighRuf6iozX
+	WlZ2w9YkrKWolTR5Jp5gMvKosrCbhQZv6uKRytbT+la9DJXDA6X2sIvb/71d7bsYmV+Oc7+8K07
+	PtHYF/qG0SjawhKxfr8AATbj8uN3tMziVbtkKSsVp14l
+X-Received: by 2002:a17:906:7947:b0:c25:4ba1:5953 with SMTP id
+ a640c23a62f3a-c255702dfb5mr1639734466b.11.1788168874731; Mon, 31 Aug 2026
+ 02:34:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
- FIVECO-MX01.fiveco.local (192.168.16.44)
-X-Sophos-OBS: success
-X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.8.31.82719
-X-SASI-RCODE: 200
-X-SASI-SpamProbability: 8%
-X-SASI-Hits: BODY_SIZE_6000_6999 0.000000, BODY_SIZE_7000_LESS 0.000000,
- CTE_8BIT 0.000000, DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000,
- HTML_00_01 0.050000, HTML_00_10 0.050000, MULTIPLE_RCPTS 0.100000,
- NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000,
- OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, SENDER_NO_AUTH 0.000000,
- WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000, WEBMAIL_X_IP_HDR 0.000000,
- __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000, __BULK_NEGATE 0.000000,
- __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
- __CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
- __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
- __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
- __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
- __HAS_MSGID 0.000000, __HAS_XOIP 0.000000, __HAS_X_MAILER 0.000000,
- __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
- __MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
- __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
- __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
- __PHISH_SPEAR_SUBJ_PREDICATE 0.000000, __RCVD_CTE 0.000000,
- __RCVD_EXIM_4_96_AES_128 0.000000, __RCVD_FROM_HOMEUSER 0.000000,
- __SANE_MSGID 0.000000, __SHIPPING_ACTION 0.000000, __SL_HEAVY 0.000000,
- __SUBJ_ALPHA_END 0.000000, __SUBJ_STARTS_S_BRACKETS 0.000000,
- __TO_MALFORMED_2 0.000000, __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000,
- __URI_NO_WWW 0.000000, __URI_NS 0.000000
+References: <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
+ <20260827110242.1203546-2-andy.chang@synaptics.corp-partner.google.com> <20260827-uncolored-onlooker-d62c44a3323b@spud>
+In-Reply-To: <20260827-uncolored-onlooker-d62c44a3323b@spud>
+From: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
+Date: Mon, 31 Aug 2026 17:34:23 +0800
+X-Gm-Features: AcwNN1VP0Yfh6sec6kZE6kJacWoF9mvzSerldBb-9Msqti5cyfrQxgnjl9Rv4AY
+Message-ID: <CAF8VQdEA7=LRpHaVOVZxRi73kRf=0pK_etJOJ5oeULtgw4k5Bg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: dt-bindings: net: bluetooth: add BCM4384
+To: Conor Dooley <conor@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, 
+	Linus Walleij <linusw@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-hci_active_scan_sync() calls hci_update_random_address_sync() with
-require_privacy set on every active scan start, which generates a
-non-resolvable private address and programs it with LE Set Random
-Address.
+On Fri, Aug 28, 2026 at 12:38=E2=80=AFAM Conor Dooley <conor@kernel.org> wr=
+ote:
+>
+> On Thu, Aug 27, 2026 at 07:02:41PM +0800, Andy Chang wrote:
+> > Add the brcm,bcm4384-bt compatible string to support the
+> > Synaptics BCM4384 Bluetooth controller.
+>
+> Please explain why a fallback compatible is not suitable here, or
+> alternatively if it is, use one.
+>
+> pw-bot: changes-requested
+>
+> Thanks,
+> Conor.
+Hi Conor,
+A fallback compatible is not suitable here because the BCM4384
+controller requires a dedicated firmware patch file (.hcd) matching
+its specific hardware ID and revision.
+Falling back to an existing compatible would cause the driver to
+request the wrong firmware binary and fail the controller
+initialization.
+Therefore, it requires a distinct compatible string.
 
-BLUETOOTH CORE SPECIFICATION Vol 4, Part E, 7.8.4 states the controller
-shall return Command Disallowed (0x0C) for LE Set Random Address while
-legacy advertising or scanning is enabled.
-
-Advertising is only stopped beforehand when LL privacy is in use.
-hci_pause_addr_resolution(), called just above, returns early when
-!use_ll_privacy(hdev), so its hci_pause_advertising_sync() never runs.
-On a device that advertises while active scanning - a peripheral that is
-also a central - every scan start therefore issues a
-command the host can already know will be rejected:
-
-  Bluetooth: hci0: Opcode 0x2005 failed: -16
-
-The address write is not retried either: hci_set_random_addr_sync()
-defers only when hdev->random_addr is already set, and it never becomes
-set because the write keeps failing, so HCI_RPA_EXPIRED is not used here.
-
-Observed on a BCM43455 with Privacy=off, one advertising instance and
-continuous active discovery, at the scan restart period (~10 s):
-
-  < LE Set Random Address  Address: 02:16:91:90:F1:D4 (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-  < LE Set Random Address  Address: 26:90:57:96:9A:3E (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-  < LE Set Random Address  Address: 16:32:01:BC:B5:CE (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-
-Pause advertising for the address update regardless of privacy, and
-resume it on every exit path. Previously the resume was guarded by
-use_ll_privacy() and only reached on the error path, which matched the
-pause being privacy-only.
-
-One caveat this widens: when HCI_ADVERTISING is set,
-hci_pause_advertising_sync() also clears HCI_DISCOVERABLE and zeroes
-discov_timeout, and hci_resume_advertising_sync() restores only
-HCI_ADVERTISING. That side effect previously happened only with LL
-privacy; it is now reachable on every active scan start, so a device made
-discoverable through mgmt while repeatedly running active discovery would
-lose discoverability. Restoring it belongs in the pause/resume pair rather
-than here, but it is worth flagging.
-
-With the patch, the same scan restart on the same hardware:
-
-  < LE Set Advertising Enable                            Success
-  < LE Set Random Address                                Success
-  < LE Set Scan Parameters                               Success
-  < LE Set Scan Enable                                   Success
-  < LE Set Advertising Parameters                        Success
-  < LE Set Advertising Enable                            Success
-
-Over 35425 records / ~4 min of btmon with continuous active discovery and
-advertising enabled there were no Command Disallowed responses of any
-kind, against one per scan restart before. A central could still connect
-to the device, confirming advertising is restored after the pause.
-
-A second capture on the same device, 221 s with an out-of-range peer
-causing two cancelled outgoing connections, shows the same result under a
-different mix of traffic: 2 LE Set Random Address, both Success, and no
-Command Disallowed of any opcode.
-
-Tooling disclosure (Documentation/process/generated-content.rst): an AI
-coding assistant was used to investigate this and to draft the change;
-the patch text and code are its output, reviewed by me. Inputs were btmon
-captures and kernel logs from the affected device, with the request to
-identify what re-issues LE Set Random Address every ~10 s and to fix it.
-Three earlier explanations it proposed were discarded after being checked
-against the captures: bluetoothd restarting service discovery; RPA
-rotation (excluded, Privacy=off); and the static-address branch of
-hci_update_random_address_sync() (excluded, both random_address and
-static_address read 00:00:00:00:00:00). The cause was only established
-after decoding the command payloads, which showed a freshly generated
-non-resolvable address per attempt. Testing is as described above, on the
-device, using btmon and a second device to confirm connectability.
-
-Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-5 btmon
-Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
----
-Changes in v3:
-- Resend, no code change; v2 had no reply. Rechecked that it still applies
-  to bluetooth-next.
-- Added the second capture described above, taken with the two patches from
-  the "endless adv params retry" series applied, since in bluetooth-next,
-  confirming the fix holds with cancelled outgoing connections in the mix.
-
-Changes in v2:
-- Rebased onto bluetooth-next: mainline renamed use_ll_privacy() to
-  ll_privacy_capable(). No functional change.
- net/bluetooth/hci_sync.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6244,6 +6244,14 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 	if (err)
- 		goto failed;
- 
-+	/* LE Set Random Address is disallowed while advertising is enabled, so
-+	 * pause it for the address update. hci_pause_addr_resolution() above
-+	 * only does this when LL privacy is in use.
-+	 */
-+	err = hci_pause_advertising_sync(hdev);
-+	if (err)
-+		goto failed;
-+
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
- 	 * private address.
-@@ -6272,13 +6280,18 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 	err = hci_start_scan_sync(hdev, LE_SCAN_ACTIVE, interval,
- 				  hdev->le_scan_window_discovery,
- 				  own_addr_type, filter_policy, filter_dup);
--	if (!err)
-+	if (!err) {
-+		/* Advertising was paused for the address update above. */
-+		hci_resume_advertising_sync(hdev);
- 		return err;
-+	}
- 
- failed:
--	/* Resume advertising if it was paused */
--	if (ll_privacy_capable(hdev))
--		hci_resume_advertising_sync(hdev);
-+	/* Resume advertising if it was paused. hci_resume_advertising_sync()
-+	 * is a no-op when hdev->advertising_paused is not set, so this covers
-+	 * both the privacy and the address-update pause.
-+	 */
-+	hci_resume_advertising_sync(hdev);
- 
- 	/* Resume passive scanning */
- 	hci_update_passive_scan_sync(hdev);
---
-2.34.1
+>
+> >
+> > Signed-off-by: Andy Chang <andy.chang@synaptics.corp-partner.google.com=
+>
+> > ---
+> >  .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml        | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/bluetooth/brcm,bluet=
+ooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.=
+yaml
+> > index 95501e858e6f..612d21123aaa 100644
+> > --- a/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.ya=
+ml
+> > +++ b/Documentation/devicetree/bindings/net/bluetooth/brcm,bluetooth.ya=
+ml
+> > @@ -31,6 +31,7 @@ properties:
+> >            - brcm,bcm43540-bt
+> >            - brcm,bcm4335a0
+> >            - brcm,bcm4349-bt
+> > +          - brcm,bcm4384-bt
+> >            - cypress,cyw4373a0-bt
+> >            - infineon,cyw55572-bt
+> >
+> > --
+> > 2.25.1
+> >
