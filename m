@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD9F44A701;
-	Mon, 31 Aug 2026 13:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B4C515756;
+	Mon, 31 Aug 2026 13:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183671; cv=none; b=FmKbqE4/I6/RFjCJNAKvI1X7eDOtAm9KhbVHp1zK+2m8gV6duTWWQBdZ/mpunu1EnoMIJfMDyl/PYST2zkTaFjwAug5lVmhRTELYMQTnp9APFTMLqz0ZFjfAeFjTGmerWCQKIAXzXjCrYDUyqEFykw7GJa6bL6LLC844C1Lsf90=
+	t=1788183802; cv=none; b=n5FYZpyNpRzY+JRpipt9ggq093ReQaRXrZlfFSBtwSKUGCW3Hbp4SdK/yZpFeuz4FwsvMP0bfJPOn9gZa4mQeKr40MOTDWatuIlIQK1BtSarX47BI+Zs5azi4IQwBbMAUBsfVFETDB3KWDqKhNc4d7fHsff19hEuoKIVUhPhTLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183671; c=relaxed/simple;
-	bh=pBN4fcc1fiA7+GCxC11i+L4p6P9qGCHbI4x1U8Pms0I=;
+	s=arc-20240116; t=1788183802; c=relaxed/simple;
+	bh=/l9ANvFiBZ+91fI8kVmsZk9vxKthGQasnovzW7+7bbM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qJjecfyfhn7eiPr4qNMmretEX4HCeUdmBdT+W+2DUm/zXm1uYGl7/nHbH6dsWQrZ/YWMTNC3hscK0LJ+geCG+XFP6kGu6tzWJ1PEtitLSVROFhzZBysLXlteK+zCgMX6b/lluwdgyB4K3QA78n4SH+URb/0yskcaUP7c0P+xAQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4d7VK3h; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=K+5RON9W+cWnPmXESAMkFJPbJK1ds46ZGM6CK1+rYfagbw8QQCNLbD7Z84gvjl9x7rT072YJdnoZrvrXs40e03VQKJw7y150wRjIKZ1co2+uctFWn5sfgocyqBM4EvpVB28AHwF07oARkW5UYqQam6caGHPm6PRV4k4EL0W2BpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eN7clqFq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4d7VK3h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA6D81F00A3E;
-	Mon, 31 Aug 2026 13:41:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eN7clqFq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1671F00A3E;
+	Mon, 31 Aug 2026 13:43:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183668;
-	bh=Ojh/9B4EbSkNtTqvQ/mgtwjhwV817bk1bE98Z2tgAvU=;
+	s=k20260515; t=1788183797;
+	bh=5zKhH/B3scEFaWqE/jcAFyTLzjaQjd3nA7jH+wHplKs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Z4d7VK3hKyz3tzs7R6MFGeW1XipdZYHdnattQ3itnQzFhsq1Ttv+9pWuFwX6iVgk1
-	 YGwHSUFyW/KYPP3S/wG/ERGkimNgRZKg2nwqXOSPKhf7JiPpPiVEqhBYAzGMJ+UUC4
-	 I7JvetrW/34x/tBRNuY+jF+bC5F9xAMegdJwQufmIM79YNODHwarVGLKfmzYiJWP2r
-	 TDG2af/FdVmo0oTtHPNYHilzfX6bF5jdKPVHjDPtyfTzeH0huRCCEs5g1MV7jb4PyP
-	 O9iW6YKLmO85QAc8R/vdn0+ShABr43/X9m+qRXJWUph3U6Y8QAp4MDot6b65Is7oQw
-	 gM6d5BspvD4Hg==
+	b=eN7clqFqHsLMCZ/gJiN7dAvCIZiWCIJlw8mAw5707eeODVlicCfJhnWbsFJ9c6fUn
+	 fo5QOFaV1JZ/AJqN7xP+HtzY41GGyXHnGDx8eNOBtaKuNuuPJ5myt1Rx3sN4yaBsj+
+	 QPLrpvcwcyCqav5EFj+aFoainPdvQ1FFJfM7+an+DpEexYZIbFpFHxR6P81a/eztmc
+	 6dNm/RKBwZC4QJuWmJV8bOlI+rui5/Bta4Z+TcoKPMeO3PS4Om4HGAAU7tB7wxQgcl
+	 lRAoGSRib7OykTpvQ2SIAX6abc5s3uCGMbnDaA4RKH0UkRVQ4dpZIAnra1o4BhOyUM
+	 vLNXPJUT03izA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Hrvoje Nuic <hrvoje.nuic@gmail.com>,
+Cc: "luke-yj.chen" <luke-yj.chen@mediatek.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.1] Bluetooth: btusb: Add Mercusys MA530 for Realtek RTL8761BUV
-Date: Mon, 31 Aug 2026 09:24:21 -0400
-Message-ID: <20260831133314.4125787-233-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] Bluetooth: btusb: MT7925: Add VID/PID 13d3/3609
+Date: Mon, 31 Aug 2026 09:25:38 -0400
+Message-ID: <20260831133314.4125787-310-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -54,392 +54,363 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Hrvoje Nuic <hrvoje.nuic@gmail.com>
+From: "luke-yj.chen" <luke-yj.chen@mediatek.com>
 
-[ Upstream commit ce21a5cf3d1fd92b84ea9ad2b7c7240aff2162d2 ]
+[ Upstream commit a55ef87b61b26097373fe8cbd2ead36582a8df4f ]
 
-Add the USB ID for the Mercusys MA530 Bluetooth adapter. The device uses
-a Realtek RTL8761BUV controller and works with the existing Realtek setup
-path.
+Add VID 13d3 & PID 3609 for MediaTek MT7925 USB Bluetooth chip.
 
-The device reports vendor ID 0x2c4e and product ID 0x0115, and loads the
-rtl_bt/rtl8761bu_fw.bin firmware successfully with this quirk.
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Signed-off-by: Hrvoje Nuic <hrvoje.nuic@gmail.com>
+T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3609 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+
+Signed-off-by: luke-yj.chen <luke-yj.chen@mediatek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-# Stable Backport Analysis: Bluetooth: btusb: Add Mercusys MA530 for
-Realtek RTL8761BUV
+Connection lost, reconnecting to https://agentn.us.api5.cursor.sh
+(attempt 1)...
+Retry attempt 1...
+Connection lost, reconnecting to https://agentn.us.api5.cursor.sh
+(attempt 2)...
+Retry attempt 2...
+Connection lost, reconnecting to https://agentn.us.api5.cursor.sh
+(attempt 3)...
+Retry attempt 3...
+## Phase 1: Commit Message Forensics
 
-**Local tree:** `v6.18.44-1-g2736c32da98b9` (kernel 6.18.44)
+**Step 1.1 — Subject line**
+Record: `[Bluetooth: btusb: MT7925] [add] Add VID/PID 13d3/3609 for
+MediaTek MT7925 USB Bluetooth chip`
 
----
+**Step 1.2 — Tags**
+Record:
+- `Signed-off-by: luke-yj.chen <luke-yj.chen@mediatek.com>` (author,
+  MediaTek)
+- `Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>`
+  (Bluetooth maintainer committer)
+- No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
+  by:`, `Cc: stable@vger.kernel.org`, or `Link:` tags
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
+**Step 1.3 — Body**
+Record: Adds USB VID 0x13d3 / PID 0x3609 for a MediaTek MT7925 combo
+Bluetooth interface. Includes `/sys/kernel/debug/usb/devices` output
+showing a standard 3-interface wireless controller
+(`Manufacturer=MediaTek Inc.`, `Product=Wireless_Device`, `Driver=btusb`
+on HCI interfaces). Symptom without the ID: device may bind generically
+but lacks MediaTek-specific quirk flags, so Bluetooth does not work
+correctly on this hardware variant.
 
-### Step 1.1: Parse the subject line
-**Record:** `[Bluetooth: btusb] [Add] Mercusys MA530 USB ID for Realtek
-RTL8761BUV controller`
-
-### Step 1.2: Parse all commit message tags
-**Record:**
-- **Fixes:** — not present (expected for manual review)
-- **Reported-by:** — not present
-- **Tested-by:** — not present (author describes successful firmware
-  load in body)
-- **Reviewed-by:** — not present
-- **Acked-by:** — not present
-- **Link:** — not present
-- **Cc: stable@vger.kernel.org** — not present
-- **Signed-off-by:** Hrvoje Nuic \<hrvoje.nuic@gmail.com\> (author)
-- **Signed-off-by:** Luiz Augusto von Dentz \<luiz.von.dentz@intel.com\>
-  (Bluetooth maintainer merge)
-
-Notable: Maintainer Signed-off-by from Luiz von Dentz indicates
-subsystem maintainer acceptance. No syzbot or multi-reporter tags.
-
-### Step 1.3: Analyze commit body
-**Record:**
-- **Bug description:** Mercusys MA530 Bluetooth adapter (USB 2c4e:0115,
-  Realtek RTL8761BUV) is not in `quirks_table`, so it does not get
-  Realtek-specific driver setup.
-- **Symptom:** Bluetooth non-functional — device may enumerate as USB
-  but no working HCI controller (confirmed by user reports on Manjaro
-  6.16.8 and Fedora 6.18.3).
-- **Version info:** None in commit message.
-- **Root cause:** Missing USB ID entry with `BTUSB_REALTEK |
-  BTUSB_WIDEBAND_SPEECH` flags needed for Realtek firmware loading and
-  wideband speech support.
-
-### Step 1.4: Detect hidden bug fixes
-**Record:** Not a hidden bug fix — this is an explicit hardware
-enablement patch (new USB device ID). Functionally equivalent to fixing
-broken hardware support for Mercusys MA530 owners.
+**Step 1.4 — Hidden bug fix?**
+Record: Not disguised as cleanup — it is an explicit hardware-enablement
+ID addition. Functionally it fixes non-working Bluetooth on
+laptops/modules using this USB ID.
 
 ---
 
-## PHASE 2: DIFF ANALYSIS
+## Phase 2: Diff Analysis
 
-### Step 2.1: Inventory the changes
-**Record:**
-- **Files:** `drivers/bluetooth/btusb.c` (+2 lines, 0 removed)
-- **Functions modified:** `quirks_table[]` static data only (no function
-  body changes)
-- **Scope:** Single-file, surgical device ID addition
+**Step 2.1 — Inventory**
+Record:
+- Files: `drivers/bluetooth/btusb.c` (+2 lines)
+- Function/table: `quirks_table[]`
+- Scope: single-file, surgical, 2-line addition
 
-### Step 2.2: Code flow change
-**Record:**
-- **Before:** Device 2c4e:0115 matches generic `btusb_table` entry
-  (Bluetooth class 0xe0/0x01/0x01) with `driver_info = 0`. Probe falls
-  through to `usb_match_id(intf, quirks_table)` at line 4021, finds no
-  match, and proceeds without `BTUSB_REALTEK` or
-  `BTUSB_WIDEBAND_SPEECH`.
-- **After:** Same device matches new `quirks_table` entry → gets
-  `BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH` → Realtek setup path
-  (`btusb_setup_realtek`, firmware load via btrtl) and wideband speech
-  quirk are enabled.
+**Step 2.2 — Code flow**
+Record:
+- **Before:** `0x13d3:0x3609` not in `quirks_table[]`; probe falls
+  through generic `btusb_table` match without `BTUSB_MEDIATEK |
+  BTUSB_WIDEBAND_SPEECH`.
+- **After:** Device gets `BTUSB_MEDIATEK | BTUSB_WIDEBAND_SPEECH` via
+  `quirks_table` lookup during `btusb_probe()`.
+- Affected path: USB device enumeration / driver probe for this
+  hardware.
 
-### Step 2.3: Bug mechanism
-**Record:**
-- **Category:** Hardware workarounds / device ID addition
-- **Mechanism:** Without explicit ID + Realtek quirk flags, the
-  RTL8761BUV controller never receives Realtek-specific probe handling
-  despite binding to btusb generically. Firmware is not loaded
-  correctly; no HCI device appears.
+**Step 2.3 — Bug mechanism**
+Record: **Hardware quirk / device ID** — missing USB ID entry. Without
+it, `btusb_probe()` at lines 4018–4024 does not upgrade the match from
+generic Bluetooth to MediaTek-specific handling, so `BTUSB_MEDIATEK`
+setup (btmtk paths, firmware, WBS) is never applied.
 
-### Step 2.4: Fix quality assessment
-**Record:**
-- **Quality:** Obviously correct — identical pattern to existing 8761BUV
-  entries (e.g., 0x2357:0x0604, 0x2b89:0x8761) and sibling Mercusys
-  entry 0x2c4e:0x0128 already in this tree.
-- **Regression risk:** Very low — adds one table row; no logic changes.
-- **Red flags:** None.
+**Step 2.4 — Fix quality**
+Record: Obviously correct — identical pattern to neighboring entries
+(`0x3608`, `0x3613`, etc.). Minimal risk; no API/locking changes.
 
 ---
 
-## PHASE 3: GIT HISTORY INVESTIGATION
+## Phase 3: Git History Investigation
 
-### Step 3.1: Blame changed lines
-**Record:** Insertion point is the `/* Additional Realtek 8761BUV
-Bluetooth devices */` section (blame shows entries from 2021–2025). The
-missing ID is not a regression from a specific commit — it was never
-added. Realtek 8761BUV support has existed since ~2021.
+**Step 3.1 — Blame**
+Record: Insertion point is between commits adding `0x3608`
+(`cb45396f96f96`, Sep 2024) and `0x3613` (`bbf56029322c0`, May 2025).
+Gap at `0x3609` is an omission, not a post-branch regression.
 
-### Step 3.2: Follow Fixes: tag
-**Record:** N/A — no Fixes: tag.
+**Step 3.2 — Fixes: tag**
+Record: N/A — no `Fixes:` tag.
 
-### Step 3.3: Related file history
-**Record:**
-- `79f9e221dddec` — Add USB ID 2c4e:0128 for Mercusys MA60XNB (same
-  vendor 0x2c4e, backported to stable 6.6.x with `Cc:
-  stable@vger.kernel.org`)
-- `112a000505b88` — Add 2b89:6275 for RTL8761BUV
-- `ea3f3de49cb69` — Add device ID for Realtek RTL8761BU
-- **Prerequisites:** None — standalone one-line ID addition.
-- **Series:** Standalone patch (not part of a multi-patch series).
+**Step 3.3 — Related changes**
+Record: Multiple sibling MT7925 ID commits already in
+`stable/linux-6.18.y`: `bbf56029322c0` (13d3/3613), `576952cf981b7`
+(13d3/3627), `5bd5c716f7ec3` (13d3/3630), `f63f401130e5c` (13d3/3628),
+etc. Standalone 1/1 patch.
 
-### Step 3.4: Author's other commits
-**Record:** Hrvoje Nuic has no other commits in this 6.18.y tree. Luiz
-von Dentz is Bluetooth subsystem maintainer (merged the patch upstream
-per patchwork-bot notification).
+**Step 3.4 — Author context**
+Record: Author is MediaTek (`luke-yj.chen@mediatek.com`). Committed by
+Bluetooth maintainer Luiz Augusto von Dentz. Same pattern as other
+MediaTek ID submissions.
 
-### Step 3.5: Dependencies
-**Record:** No dependencies. Requires only infrastructure already
-present in 6.18.y:
-- `BTUSB_REALTEK` and `BTUSB_WIDEBAND_SPEECH` defines
-- Realtek probe path in `btusb_probe()`
-- `rtl8761bu` firmware support in `btrtl.c`
+**Step 3.5 — Dependencies**
+Record: None. Requires only existing `BTUSB_MEDIATEK`,
+`BTUSB_WIDEBAND_SPEECH`, and `btmtk` support — all present in this tree.
 
 ---
 
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+## Phase 4: Mailing List and External Research
 
-### Step 4.1: Original patch discussion
-**Record:**
-- Upstream commit: `0105c3e2a97e` (bluetooth-next, per patchwork-bot)
-- Lore thread: `https://lore.kernel.org/linux-
-  bluetooth/20260422212647.62497-1-hrvoje.nuic@gmail.com/T/` (bot-
-  protected; could not fetch full thread)
-- Applied by Luiz von Dentz on 2026-04-23
-- **b4 dig -c 0105c3e2a97e:** FAILED — commit not present in local tree
-- Prior community submissions exist (Santiago CR, Jan 2026; lespink, Oct
-  2025) describing same device and same fix
+**Step 4.1 — Original discussion**
+Record:
+- Commit: `a55ef87b61b26097373fe8cbd2ead36582a8df4f`
+- `b4 dig -c a55ef87b61b26`:
+  https://patch.msgid.link/20260512060318.3288273-1-luke-
+  yj.chen@mediatek.com
+- `b4 dig -a`: v1 (2026-05-12) and v2 (2026-05-12); committed version
+  matches v2
+- No stable nomination or NAK found in thread mbox
 
-### Step 4.2: Reviewers
-**Record:** CC'd to marcel@, luiz.dentz@, linux-bluetooth@, linux-
-kernel@ per web search. Maintainer merged without reported NAKs.
+**Step 4.2 — Reviewers**
+Record: `b4 dig -w` CC'd Marcel Holtmann, Johan Hedberg, Luiz Von Dentz,
+Sean Wang, linux-bluetooth, linux-mediatek.
 
-### Step 4.3: Bug reports
-**Record:**
-- Manjaro forum: MA530 (2c4e:0115) detected, firmware present, but no
-  HCI device on kernel 6.16.8
-- Prior patch submission tested on Fedora 43 / kernel 6.18.3 — device
-  non-functional without ID
-- **Severity:** Device completely unusable for Bluetooth on affected
-  kernels
+**Step 4.3 — Bug report**
+Record: N/A — hardware ID submission with USB descriptor evidence; no
+syzbot/bugzilla.
 
-### Step 4.4: Related patches
-**Record:** Multiple independent submissions for same USB ID confirm
-real-world demand. Only Hrvoje Nuic's version (placed in 8761BUV
-section) was merged upstream.
+**Step 4.4 — Series context**
+Record: Standalone single-patch series (v1→v2).
 
-### Step 4.5: Stable mailing list history
-**Record:** No stable-list discussion found for MA530 specifically.
-Precedent: sibling Mercusys 2c4e:0128 explicitly nominated `Cc:
-stable@vger.kernel.org # 6.6.x`.
+**Step 4.5 — Stable list**
+Record: Lore fetch blocked by bot protection for manual stable-list
+search; no stable discussion found in downloaded mbox.
 
 ---
 
-## PHASE 5: CODE SEMANTIC ANALYSIS
+## Phase 5: Code Semantic Analysis
 
-### Step 5.1: Key functions
-**Record:** No functions modified. Data table `quirks_table[]` consumed
-by `btusb_probe()`.
+**Step 5.1 — Key functions**
+Record: `quirks_table[]` (data), consumed in `btusb_probe()`.
 
-### Step 5.2: Callers
-**Record:** `btusb_probe()` called during USB device enumeration
-(hotplug). Every USB Bluetooth dongle insertion passes through this
-path.
+**Step 5.2 — Callers**
+Record: `btusb_probe()` called from USB core on device plug/enumeration
+— standard hotplug path.
 
-### Step 5.3: Callees
-**Record:** When `BTUSB_REALTEK` is set, probe configures:
-- `btusb_setup_realtek` / `btrtl_shutdown_realtek` / `btusb_rtl_reset`
-- `BTUSB_USE_ALT3_FOR_WBS` flag
-- When `BTUSB_WIDEBAND_SPEECH` is set:
-  `HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED`
+**Step 5.3 — Callees / effects**
+Record: When `BTUSB_MEDIATEK` is set, probe configures
+`btusb_mtk_setup`, `btmtk` send/recv, suspend/resume, and firmware
+loading. When `BTUSB_WIDEBAND_SPEECH` is set,
+`HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED` is enabled (line 4314).
 
-### Step 5.4: Call chain / reachability
-**Record:** User plugs in Mercusys MA530 → USB core enumerates → btusb
-binds (generic or quirk match) → probe applies Realtek setup only if
-quirk matched → firmware loaded from `rtl_bt/rtl8761bu_fw.bin` → HCI
-device created. **Reachable from normal user hardware insertion.**
+**Step 5.4 — Reachability**
+Record: Triggered by plugging in or booting with hardware using
+`13d3:3609`. Common laptop WiFi+BT combo path.
 
-### Step 5.5: Similar patterns
-**Record:** Identical pattern for 10+ RTL8761BUV devices in same table
-section; Mercusys 0x2c4e:0x0128 already present at line 534–535 in this
-tree.
+**Step 5.5 — Similar patterns**
+Record: ~15+ other `13d3:36xx` MT7925 entries in the same table section;
+this fills a gap between `0x3608` and `0x3613`.
 
 ---
 
-## PHASE 6: CROSS-REFERENCING AGAINST LOCAL TREE (6.18.y)
+## Phase 6: Cross-Reference Against Local Tree
 
-### Step 6.1: Does the buggy code exist?
-**Record:** **YES.** Device ID 0x2c4e:0x0115 is absent from
-`quirks_table[]`. The 8761BUV section exists at lines 788–804. All
-Realtek infrastructure is present. Bug affects any Mercusys MA530 user
-on 6.18.y.
+**Step 6.1 — Buggy code exists?**
+Record:
+- Local tree: **linux-6.18.y**, `6.18.44` (`v6.18.44-1-g2736c32da98b9`)
+- `0x13d3:0x3609` **absent** — confirmed gap at lines 754–756 between
+  `0x3608` and `0x3613`
+- Commit `a55ef87b61b26` **not** an ancestor of HEAD (`git merge-base
+  --is-ancestor` exit 1)
+- MT7925 infrastructure present: `btmtk.c` handles `0x7925`,
+  `FIRMWARE_MT7925` defined, `CONFIG_BT_HCIBTUSB_MTK` in Kconfig
 
-### Step 6.2: Backport complications
-**Record:** **Clean apply expected.** Patch inserts 2 lines before `{
-USB_DEVICE(0x2357, 0x0604)...` in the 8761BUV section — exact match with
-current tree layout. No conflicting changes.
+**Step 6.2 — Backport complications**
+Record: `git apply --check` succeeds cleanly on current `btusb.c`.
+Expected: trivial apply.
 
-### Step 6.3: Related fixes already present?
-**Record:** 0x2c4e:0x0128 (Mercusys MA60XNB) present; 0x2c4e:0x0115
-(MA530) **not** present. No duplicate fix.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-### Step 7.1: Subsystem criticality
-**Record:** **IMPORTANT** — `drivers/bluetooth/btusb.c`, common USB
-Bluetooth driver used by many desktop/laptop users and USB dongles.
-
-### Step 7.2: Subsystem activity
-**Record:** Actively maintained — recent btusb commits in this tree
-include Realtek ID additions, UAF fixes, and Mercusys 2c4e:0128 (May
-2026).
+**Step 6.3 — Related fixes already present?**
+Record: Sibling MT7925 IDs already in stable; `0x3609` specifically is
+missing.
 
 ---
 
-## PHASE 8: IMPACT AND RISK ASSESSMENT
+## Phase 7: Subsystem Context
 
-### Step 8.1: Who is affected
-**Record:** **Driver-specific** — owners of Mercusys MA530 USB Bluetooth
-adapter (2c4e:0115). Not universal, but completely blocks Bluetooth for
-those users.
+**Step 7.1 — Subsystem**
+Record: `drivers/bluetooth/btusb.c` — Bluetooth USB HCI driver.
+Criticality: **IMPORTANT** (peripheral driver, but affects real laptop
+hardware).
 
-### Step 8.2: Trigger conditions
-**Record:** Plug in Mercusys MA530 USB dongle. Common, deterministic
-trigger for device owners. Unprivileged user can trigger by inserting
-USB device.
-
-### Step 8.3: Failure mode severity
-**Record:** Bluetooth completely non-functional — no HCI controller
-created. **Severity: MEDIUM** (hardware unusable, not a kernel
-crash/security issue).
-
-### Step 8.4: Risk-benefit ratio
-**Record:**
-- **Benefit:** Enables Mercusys MA530 on 6.18.y; matches established
-  stable practice for Realtek USB ID additions
-- **Risk:** Very low — 2-line table entry, no code path changes
-- **Ratio:** Strongly favorable
+**Step 7.2 — Activity**
+Record: Active — multiple MT7925 ID additions through 2025–2026 already
+landed in this stable series.
 
 ---
 
-## PHASE 9: FINAL SYNTHESIS
+## Phase 8: Impact and Risk Assessment
 
-### Step 9.1: Evidence summary
+**Step 8.1 — Who is affected**
+Record: Users with MediaTek MT7925 USB Bluetooth at `13d3:3609` (likely
+recent laptops with IMC/ASUS-style combo modules).
 
-**FOR backporting:**
-- Explicit stable exception: new USB device ID to existing driver
-- All prerequisites present in 6.18.y (btusb, Realtek path, rtl8761bu
-  firmware, WIDEBAND_SPEECH)
-- Real user impact — device completely non-functional without ID
-- Trivial 2-line change, obviously correct pattern
-- Maintainer Signed-off-by (Luiz von Dentz)
-- Precedent: sibling Mercusys 2c4e:0128 backported to stable 6.6.x
-- Clean apply to current tree
+**Step 8.2 — Trigger**
+Record: Device enumeration at boot or hotplug. Unprivileged user cannot
+directly trigger, but any system with this hardware hits it
+automatically.
 
-**AGAINST backporting:**
-- Not a crash/security/data-corruption fix (hardware enablement only)
-- Affects narrow user population (MA530 owners only)
-- No explicit Cc: stable tag (not a negative signal per instructions)
+**Step 8.3 — Failure mode**
+Record: Bluetooth non-functional or severely broken (wrong driver path,
+no mtk setup/firmware, no WBS). Severity: **MEDIUM** for affected users
+(complete feature loss, not kernel crash).
 
-**UNRESOLVED:**
-- b4 dig could not run (commit not in local tree)
-- Full lore thread inaccessible (bot protection)
+**Step 8.4 — Risk vs benefit**
+Record:
+- Benefit: **HIGH** for affected hardware (restores Bluetooth)
+- Risk: **VERY LOW** (2-line ID table entry, identical to proven
+  siblings)
+- Ratio: strongly favors backport
 
-Neither unresolved item affects the decision.
+---
 
-### Step 9.2: Stable rules checklist
-1. Obviously correct and tested? **PASS** — standard ID pattern; author
-   verified firmware loads; maintainer merged
-2. Fixes a real bug affecting users? **PASS** — device non-functional
-   without entry (hardware enablement)
-3. Important issue? **PASS** (moderate) — complete loss of Bluetooth
-   functionality for affected hardware
-4. Small and contained? **PASS** — 2 lines, one file
-5. No new features or APIs? **PASS** — device ID only
-6. Can apply to local tree? **PASS** — clean apply to existing 8761BUV
-   section
+## Phase 9: Final Synthesis
 
-### Step 9.3: Exception category
-**Record:** **NEW DEVICE IDs** — adding USB ID 0x2c4e:0x0115 to existing
-btusb Realtek driver. Explicitly allowed for stable.
+**Evidence FOR:**
+- Classic stable exception: new USB device ID for existing driver
+- MT7925/btusb/btmtk support already in 6.18.y
+- Sibling IDs (3613, 3627, 3628, 3630) already backported to this tree
+- Patch applies cleanly
+- Committed by Bluetooth maintainer
+- Real hardware with documented USB descriptors
 
-### Step 9.4: Decision rationale
+**Evidence AGAINST:**
+- None significant; not a new driver, API, or refactor
 
-For kernel **6.18.y**, this commit should be backported. The Mercusys
-MA530 is a commercially available USB Bluetooth dongle that is
-completely non-functional on 6.18.y without this two-line ID entry. The
-btusb Realtek driver, RTL8761BUV support, and rtl8761bu firmware
-infrastructure all exist in this tree; only the device ID is missing.
-This matches the well-established stable pattern for Realtek USB
-Bluetooth ID additions, and follows the same approach already taken for
-the sibling Mercusys MA60XNB (2c4e:0128) in this very tree.
+**Stable rules checklist:**
+1. Obviously correct and tested? **PASS** — pattern matches ~15 existing
+   entries; maintainer committed
+2. Fixes real bug affecting users? **PASS** — Bluetooth broken without
+   ID
+3. Important issue? **PASS** — complete Bluetooth failure on affected
+   hardware (MEDIUM severity)
+4. Small and contained? **PASS** — 2 lines, 1 file
+5. No new features/APIs? **PASS** — device ID only
+6. Can apply to local tree? **PASS** — verified with `git apply --check`
+
+**Exception category:** NEW DEVICE ID (USB VID/PID for existing `btusb`
++ `btmtk` MT7925 support)
 
 ---
 
 ## Verification
 
-- **[Phase 1]** Parsed subject, tags, body; no Fixes/Reported-by/Cc:
-  stable tags; maintainer SOB present
-- **[Phase 2]** Diff: +2 lines in `quirks_table[]`; no function changes;
-  hardware ID category
-- **[Phase 3]** `git describe HEAD`: v6.18.44; `git blame -L 788,804`:
-  8761BUV section present since 2021–2025
-- **[Phase 3]** `git log --grep="Mercusys"`: found 79f9e221dddec
-  (2c4e:0128, Cc: stable 6.6.x)
-- **[Phase 3]** `grep 0x0115 drivers/bluetooth/btusb.c`: no matches — ID
-  absent
-- **[Phase 3]** `grep 0x2c4e drivers/bluetooth/btusb.c`: only 0x0128
-  present, not 0x0115
-- **[Phase 4]** Web search: upstream commit 0105c3e2a97e; patchwork-bot
-  confirms maintainer merge
-- **[Phase 4]** b4 dig -c 0105c3e2a97e: FAILED (commit not in local
-  tree)
-- **[Phase 4]** lore.kernel.org fetch: FAILED (bot protection 503)
-- **[Phase 4]** Manjaro forum + prior patch submissions: confirm non-
-  functional behavior without ID
-- **[Phase 5]** Read `btusb_probe()` lines 4018–4024: quirks_table
-  lookup when driver_info=0
-- **[Phase 5]** Read Realtek setup at lines 4279–4290 and
-  WIDEBAND_SPEECH at 4314–4315
-- **[Phase 5]** `btrtl.c` lines 225–231: rtl8761bu firmware support
-  confirmed
-- **[Phase 6]** Tree is 6.18.44; patch applies before 0x2357:0x0604 at
-  line 789 — layout matches diff
-- **[Phase 6]** No existing fix for 0x2c4e:0x0115 in tree
-- **[Phase 8]** Failure mode: no HCI device, Bluetooth unusable;
-  severity MEDIUM; risk very low
+- [Phase 1] Parsed tags: only Signed-off-by from author and Luiz von
+  Dentz
+- [Phase 2] Diff: +2 lines in `quirks_table[]` between `0x3608` and
+  `0x3613`
+- [Phase 3] `git describe HEAD`: v6.18.44; `make kernelversion`: 6.18.44
+- [Phase 3] `git blame` lines 748–756: gap at 3609 between cb45396 and
+  bbf56029
+- [Phase 3] Sibling commits in stable: bbf56029, 576952cf, 5bd5c716,
+  f63f4011
+- [Phase 3] Commit hash: `a55ef87b61b26097373fe8cbd2ead36582a8df4f`; not
+  in HEAD
+- [Phase 4] `b4 dig -c a55ef87b61b26`: lore URL found
+- [Phase 4] `b4 dig -a`: v1 and v2 revisions
+- [Phase 4] `b4 dig -w`: Marcel Holtmann, Luiz von Dentz CC'd
+- [Phase 4] Mbox: no stable nomination, no NAKs
+- [Phase 5] `btusb_probe()` quirks lookup at lines 4018–4024 verified
+- [Phase 5] `BTUSB_MEDIATEK` handling at lines 4113–4116, 4214–4228
+  verified
+- [Phase 5] `BTUSB_WIDEBAND_SPEECH` at line 4314 verified
+- [Phase 6] `grep 0x3609` in btusb.c: no match (missing)
+- [Phase 6] `git apply --check`: patch applies cleanly
+- [Phase 6] `btmtk.c` MT7925 support and `FIRMWARE_MT7925` confirmed
+- [Phase 6] `CONFIG_BT_HCIBTUSB_MTK` in Kconfig confirmed
+- [Phase 8] Failure mode: Bluetooth non-functional without quirk flags
 
-**YES**The background searches finished and match what we already
-concluded:
+This is a textbook stable backport: a missing USB ID for hardware whose
+driver stack already exists in linux-6.18.y, matching numerous sibling
+MT7925 ID commits already present in this tree.
 
-- **MA530 commit search:** No `MA530` / `Mercusys MA530` commit in this
-  tree. `git log --grep="0x0115"` only turned up unrelated `0x0115` IDs
-  in other drivers — the Mercusys `2c4e:0115` entry is still missing
-  from `btusb.c`.
-- **Author search:** Hrvoje Nuic has no other commits in this 6.18.y
-  checkout.
+**YES**The background searches finished and matched what the full
+analysis used:
 
-That supports the earlier **YES** for stable backport: it’s a small
-device-ID addition, all Realtek/8761BUV support is already here, and
-only the MA530 ID is absent.
+- **btusb history:** Recent changes are mostly MT7925 VID/PID additions
+  and unrelated fixes; `13d3/3609` was not in the stable tree.
+- **Author/subject search:** Found nearby MT7925 IDs (`3604`, `3608`)
+  but not `3609` on the checked-out `6.18.44` branch.
+- **Branch search:** Located the commit as `a55ef87b61b26` on `all-
+  next`/`master`/`net-next`, not in current stable HEAD.
+
+**Verdict remains YES** — it’s a 2-line USB ID addition for existing
+MT7925/btusb support, applies cleanly, and fills a gap between `0x3608`
+and `0x3613` already present in `linux-6.18.y`.
 
  drivers/bluetooth/btusb.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6d4c5d75cfc61..66df9192df20a 100644
+index 66df9192df20a..5974aa2e94d48 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -791,6 +791,8 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x2ff8, 0xb011), .driver_info = BTUSB_REALTEK },
- 
- 	/* Additional Realtek 8761BUV Bluetooth devices */
-+	{ USB_DEVICE(0x2c4e, 0x0115), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
+@@ -758,6 +758,8 @@ static const struct usb_device_id quirks_table[] = {
  						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+ 	{ USB_DEVICE(0x13d3, 0x3608), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3609), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3613), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3627), .driver_info = BTUSB_MEDIATEK |
 -- 
 2.53.0
 
