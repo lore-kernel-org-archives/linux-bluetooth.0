@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009C64A92D3;
-	Mon, 31 Aug 2026 17:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4A04A92EB;
+	Mon, 31 Aug 2026 17:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788196875; cv=none; b=cyheF9JZmfUSNfLyAE5v1Qg9G6xj3nA0A7Cbv+l4LEAcSc2qhtFkTUtBtKb3YDhTuQSiPu2+9tEpABe7lczJVTkWxKyj7Rgp2OQA41bNlZGESIf2wvCC86RLEKqk5f2DqHQbF5hluFoUlVbZv1IcFMXXDT++InuY2p73EbC8t3Q=
+	t=1788196876; cv=none; b=BhxQmhRApYIihsZAXxMHcNN+m5FJa3JBATYf8wIO9DfjMQRPcydS+zLxkrZjMK5adPV1ZKmClSBkkiLvZ6xSL+MQZ6gov68bLnQPDgQn1BgYwHe2yp1vdIuRbodtPwRno433t3+6J7uapBEgjfw6cADuMj2PgmqnHEWmxLOhcqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788196875; c=relaxed/simple;
-	bh=A2Fb2BJLLa8WywQNEhyRAqurBRM0sIyaNi+/eNOKGRY=;
+	s=arc-20240116; t=1788196876; c=relaxed/simple;
+	bh=o0AaucND5dKxKQues7jTePkCugVLQfcud3FjtWELaEA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=it70C3Je86zN+xoYH1GTfOb5UUOnvdWYAjITduTkpKPNXHJ5HpQf6nRh0OGFjqfywvQJpe5FqtTim+6Gvyx6CQyTsPuCFo8nJveu1WK7WO+RLuUL1VmvjA/1+mAUwg+KcJ1MxnVK/FdUJrNWBErPnhdaKeqO2p/QC375Cr2x+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJdwDrhG; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=bnGSJ6hOII6l5fTwXouSPeXU6k4lep33n69rzAo/QueN8KNhRxFMVJhS6IpQ+C0FvTSOL/cIZLvjf8KduAyXLExaySY2Cec4aPVhspjm/GiHgEHBa9lkPzWADd7aPcmnzvJMNTuE4ahMQCwSNjBAX2Q2N3hVc5HtzWAwAMolRwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BnjPHfY7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJdwDrhG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A074F1F000E9;
-	Mon, 31 Aug 2026 17:21:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BnjPHfY7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110981F00A3E;
+	Mon, 31 Aug 2026 17:21:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788196873;
-	bh=dqs07UrmJC4WYoGrW53i6oe+pcaROH6TcoP+t5hJ+Rk=;
+	s=k20260515; t=1788196875;
+	bh=E67/Marflg89qdIQWFJ7mjFh7XGHMoAUaEe++PoDxyE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TJdwDrhGZD957gGbOXRtLLUKoT4d+TsWs49Zfp3ZQU1fpxRCncfycPS6E0N2mbKOd
-	 V3v2ZfjBphJhxPHsg9AL6qX4MhpmiOKi5LABCFkyRp2VZh6/n9knsMowkya0jApmaf
-	 TZEOn9flM5RQLF8poWI1YFi0HnE7YMk1jUvFCwNS86/bbErFLWnd2PWGiS0b9NmiY9
-	 RUbGk4jN8Qr8UB9sUHJ7vWe+1tyDyfkQA17LJoEMdn80cpAtnmtH/EXqh+YwF/nE9s
-	 OMt6yPhzIXjUtFZL2fok4nx7rgIhX2iaVVdRIpcLUIosGLWh7fc3kzPwjb4uCfTkCL
-	 ZmdcZj65dCtdg==
+	b=BnjPHfY74W3aIT5qodKXsoSHns1s6+VdgsMF5a/pV+RGOcTqkVB2MHECMUbeAebdj
+	 ZQ4iem3hICpwxPccMgG4XhBsXp5JJEraAtQEqrqHELQLZldC1lrQ40mhfQPjNY7nib
+	 hy3/KtsCeZULgNPLuYbv/0aIFLGUCAAqj/++OqyebDi6csD6GWmzs3qiXq9480hyVn
+	 gqETp9BDQ7zwg9aX2azRzUlPhoNrelBRYfVyn+/PDrgHVj5ii7he9hGDC7Lf3yMdmZ
+	 rJ2F0tUd0iKQmv3Ery7JHqOJnGHyrBfLnJP75Fr78kIgqjDht0UWB9El9Mt25iE/gc
+	 6rt/Ga+MdFxEg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 01A693924458;
-	Mon, 31 Aug 2026 17:20:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 64A423924458;
+	Mon, 31 Aug 2026 17:20:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_core: Fix race condition during device
- registration
+Subject: Re: [PATCH] Bluetooth: L2CAP: fix chan mode for LE_CONN_REQ +
+ EXT_FLOWCTL
+ pchan
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178819681664.671757.11271710951105188207.git-patchwork-notify@kernel.org>
-Date: Mon, 31 Aug 2026 17:20:16 +0000
-References: <7f282e86-b9fa-4a3d-8dea-208975771b35@mail.kernel.org>
-In-Reply-To: <7f282e86-b9fa-4a3d-8dea-208975771b35@mail.kernel.org>
-To: syzbot <syzbot@kernel.org>
-Cc: syzkaller-bugs@googlegroups.com, nogikh@google.com,
- linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org,
- hildawu@realtek.com, linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
+ <178819681823.671757.5365717532248944864.git-patchwork-notify@kernel.org>
+Date: Mon, 31 Aug 2026 17:20:18 +0000
+References: 
+ <b30626af1ee0165d56dbfc15e5d16ae6efbd726b.1788109840.git.pav@iki.fi>
+In-Reply-To: 
+ <b30626af1ee0165d56dbfc15e5d16ae6efbd726b.1788109840.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 28 Aug 2026 08:55:09 +0000 (UTC) you wrote:
-> From: Aleksandr Nogikh <nogikh@google.com>
+On Sun, 30 Aug 2026 20:11:36 +0300 you wrote:
+> l2cap_new_connection() sets default value of channel mode to match the
+> parent channel.  l2cap_le_connect_req() left this at the default, and
+> created L2CAP_MODE_EXT_FLOWCTL channels if listening pchan has that
+> mode.  This causes FLAG_DEFER_SETUP channels to reply to
+> L2CAP_LE_CONN_REQ with L2CAP_ECRED_CONN_RSP, which is incorrect.
 > 
-> In hci_register_dev(), the power_on work item is queued to
-> hdev->req_workqueue before initializing hdev->adv_monitors_idr and
-> registering the MSFT extension via msft_register(). For devices marked with
-> quirks such as HCI_QUIRK_RAW_DEVICE, the HCI_UNCONFIGURED flag is set on
-> the device. When the power_on work item runs concurrently on another CPU,
-> hci_power_on() detects that the device is unconfigured and immediately
-> invokes hci_dev_do_close(), which calls msft_do_close().
+> It can also result to stack OOB write (of l2cap_alloc_cid determined
+> values) in l2cap_ecred_rsp_defer(), as l2cap_le_connect_req() does not
+> limit maximum number of deferred channels or check for duplicate ident.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_core: Fix race condition during device registration
-    https://git.kernel.org/bluetooth/bluetooth-next/c/78f08df9649c
+  - Bluetooth: L2CAP: fix chan mode for LE_CONN_REQ + EXT_FLOWCTL pchan
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b1f1766ef769
 
 You are awesome, thank you!
 -- 
