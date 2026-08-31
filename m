@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1761D339370
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 17:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3794749D1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2026 17:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788197465; cv=none; b=cq8Q1//PWXPZZSTXIw26ugjZHzFBDFfRwTmwhPTjlBT8htyiX9OgaPewLlIFVL4SIbNJY6DukCXJZRmELG5wSXxcp3OdlLvFumeZfSppb34ffOSbDXxP45n9Zm1lFGiDwKRb7XuPgyVGH7xGSGEo/Yiip7gxCTb2NAx3aklp068=
+	t=1788197466; cv=none; b=V9AU5Q5ON1mB+TgKdYlvZNPTvgY5JpsJUihjUju5ufas7ArFpIIi2c99pffHejFFBIuNRPmfNM7JzOiIKjD71HaBHAh8jGAj5V0qlYj5v9ktSz3nlNSnGh93BxGNl12BEVbPfqUxyhODNq9R9e4Gsa70nl70erFkL5wSmGZIQVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788197465; c=relaxed/simple;
-	bh=X021/TUXVRrcu8rNeVZhiHkK5sGSPvz/z320n88kgGk=;
+	s=arc-20240116; t=1788197466; c=relaxed/simple;
+	bh=EvgamTSQb5g7GVjBpmUbAon6IV0/zm+RLA3Ghs38vaA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YQkdg8tTmThWxV9N7k90262c/bdBZzyvWNCOCc5ET3bVpe7UHztwQgQTCAokowlA/BvYAa9Ev+zE7EZ0g1MqY+YrAD5amuN+n4nyP7R2TUHlrs9sH6MlQMfpoYo0uToeLY90dwvcdmDyQ0Hsg3xAAzkR0qSMnWOHMvDbk2zdhR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6A1VZeA; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=elKQIpZwxHkKlA8JD1eRfO0AYL8VMaJl4gDJffg/UUJaKZTtHq5v4a9tgU6hN65RFkD6qQBZmrGGvAPzsDtXmgtN+Ba3dB1sXg2G1gqn/b4WnKiol2On8xaH9/OvqlGSXe3dueQcOScqtMfdXF4NEHvt2bC/QT6/0znij9tAilw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cv6/mPpX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6A1VZeA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7BC91F000E9;
-	Mon, 31 Aug 2026 17:31:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cv6/mPpX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCFB1F000E9;
+	Mon, 31 Aug 2026 17:31:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788197463;
-	bh=F7gXMOiXPzAs2nLSFZal5OYud1hbMd+O8wkBHEOCYyc=;
+	s=k20260515; t=1788197465;
+	bh=KiQ9InI0jiWsVThduKxpOEOyTwl03V6Yx6dba9WAhxo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=E6A1VZeAh3Xu+iLCxHHeRpRhFje3Vp/ihBgGT60px99z8qjME/oxvOJ0zTOS7+Bo6
-	 wYPMKH6oP2x1XCHjdn8CcArQIUuUcLaYcR0+1ZLmKX1GlAahShvfvH/gpxXFApi5Yp
-	 eXTzk0uSYTX7nR2Gw2FPqdw5p0+BjPJgpd3uZevZ5koCToPxV4U0iPcAoSXkhl/rzN
-	 hPNr0lE5YeU//kAp7Pjn4zrKx53e53Xod9+L3SH59s1eLfAHjRPvTsxH5z/S7A0+dz
-	 eCnnqkdpAj21tb4n625dkAszJrunsXD9AhbjY0GjtReAPDKE0s53J4bFoBOQtII2fl
-	 HWAUTms/nUx0w==
+	b=Cv6/mPpXz431YeICLj8xHpJFg6pCIownnyEka/e+1bFGN6RpH9V35YewXVx7oWB9q
+	 BcJAuTclskt7ZA4X49f4nkWcdbzmpiNjfZWyvITrZcxnsVm1FbnJtC3ybItlp1zHYI
+	 w2/76y9v/hDfLhIknUQJus1IigyeH0+RJnq/l3esq1oEL6MFlVlEfNXOiqSo5olivV
+	 CJNieWLyofeI6uWlZ5xby3HdIT+h1yml/bmJNGSajymkxcV+IudtQRSLHgPyelBlSS
+	 OIhmoSsxY1kHR6aujXMNhfQJpOh52qbfyuu6rd6Kf9o7NF7WqiCqrO0+rNKd9YRWKn
+	 Jm9/UlT94nnSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197AD3924458;
-	Mon, 31 Aug 2026 17:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B353924458;
+	Mon, 31 Aug 2026 17:30:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,16 +37,17 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/2] emulator: bthost: don't crash on ecred_conn_req
- with too many scid
+Subject: Re: [PATCH BlueZ v2 1/3] emulator: bthost: add function for sending
+ raw
+ L2CAP sig commands
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178819740690.676143.15400942592099081045.git-patchwork-notify@kernel.org>
-Date: Mon, 31 Aug 2026 17:30:06 +0000
+ <178819740813.676143.7012117251766286263.git-patchwork-notify@kernel.org>
+Date: Mon, 31 Aug 2026 17:30:08 +0000
 References: 
- <fab8ccab695b50d726bdc00423d8ca915edcf11e.1788043574.git.pav@iki.fi>
+ <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
 In-Reply-To: 
- <fab8ccab695b50d726bdc00423d8ca915edcf11e.1788043574.git.pav@iki.fi>
+ <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
 To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -55,21 +56,24 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 30 Aug 2026 01:47:58 +0300 you wrote:
-> l2cap_ecred_conn_req() crashes if the request contains more SCID than
-> specification allows (5).
-> 
-> Respond 0x000C - All connections refused – invalid parameters to such
-> invalid requests.
+On Sun, 30 Aug 2026 22:57:22 +0300 you wrote:
+> Add bthost_l2cap_sig_raw() that tests can use to send raw L2CAP
+> signaling commands.
 > ---
->  emulator/bthost.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+> 
+> Notes:
+>     v2:
+>     - no changes
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,1/2] emulator: bthost: don't crash on ecred_conn_req with too many scid
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c53a16afa33d
-  - [BlueZ,2/2] tools/l2cap-tester: add test for too many ECRED deferred sockets
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0b66bd5335d0
+  - [BlueZ,v2,1/3] emulator: bthost: add function for sending raw L2CAP sig commands
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d52d9a173a5f
+  - [BlueZ,v2,2/3] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3a2d543c4c21
+  - [BlueZ,v2,3/3] tools/l2cap-tester: test closing sockets with ECRED defer
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
