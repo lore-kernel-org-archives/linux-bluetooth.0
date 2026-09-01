@@ -1,102 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076D430649C;
-	Tue,  1 Sep 2026 15:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788277492; cv=none; b=Bd/n5hrnW/5WPqvCYHg+QdxVq3RCoBqmx+SjtBvfbLnloXhntC8mZYtao6nfUv3RKoV9R7z3fTBRUbnXdh0oQb6bMtNTBt79CJ3awYvb1I0jaBeviRgzvLHv/+nJnCB6uKWcNJT2MRDS0X4+VsveEs2GVDd08qXW+AQYUQ62sDo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788277492; c=relaxed/simple;
-	bh=zkeUpvHYxowjGSjJIdJQCsPLMVgQMKK9RMuE+rzCm4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gP5p6Hkg2WvSWJ+fm7x9WitfLUEnxW9nZZfUgep1JChUF6aHIk9lM8uAuOxAXY5vskciV/rWeiai4BJhJmf7fXzbUgg0L5GillqUCfHCzVfhNRcleAheNzo1W6oWmoERuwi3mbyz20M0XXZYbBndSXCQK+lG4wdrEw01TpSGJSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UeXEXa4j; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FD4480DF0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 16:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788280461; cv=pass; b=lca73HvYJWPDhbyRPJSN89pfszeLBWVJeC6hBsyRVkLqLAy/lYlUyMXN6bBfTdAp/zIl+f7Ag4cZb14BsK/rk9MXTJgbKQM/si0U9rD4lWBN9lvdVI+4Cd3N0Tt4dd7Ud4QaIAKNwhL2vx5cDNrwG4cBXdn5i6PcxnAjpGLIjkk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788280461; c=relaxed/simple;
+	bh=iTpIe/h3ytNDgDKrNfMJi9YcEvscMgguwwTlaEUSED0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oenuzn3Fncb/PxtGypBFjEkp5d0ChqZsb5Yqrn/SinYcVM1J5l+0GRsVB9iwI4ZSWgAI0K5Jd9DOxkfJjfdZ1PhA+3vnEozh7D5KZkmtk8636TsQLfLEPt54PomJIfLxM7p3Fn5I9/Jkxz2NFqTSWgw+dcjTBQnYQ825bZF7cyA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=eWRsH0mr; arc=pass smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UeXEXa4j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480F31F000E9;
-	Tue,  1 Sep 2026 15:44:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788277490;
-	bh=1tch/WQKM55fDJLl/Qo+nJxh09lQVygvGYpF+71lhlw=;
-	h=From:To:Cc:Subject:Date;
-	b=UeXEXa4jC7igD1Axs0IJzp801xgE+3oTQH86Nq7UqVTjqDZbmHUfTadTWU3okLdAy
-	 RwqmD5XL4+uTBbqC42K91S/UulW6cwf7Vb7xpvvizCGHmTIZHoXNHpxSBnpUDbC+Le
-	 apXAdjBtqPM+6LXeJoUenF1oDSFi1zemsPBsfOnVNAMwmBAJ4tFl0oCqX3828sVs2U
-	 ULagZTVagynduPPNYt52wXZaW3LSofmyqofpSQ3bY98hJYCF3izxvu5byeak2WZQuF
-	 Ub+fOWLIthFiZ+I3KHwn+9OFOi5VHQAC6PM2pJSuc/mvfnCm/In2yQRhO3tlJho5hq
-	 2kq/Dpy7PJiSQ==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Brian Gix <brian.gix@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [PATCH v2 1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries on cancel
-Date: Tue,  1 Sep 2026 15:44:26 +0000
-Message-ID: <20260901154427.3991920-1-lee@kernel.org>
-X-Mailer: git-send-email 2.55.0.897.gb25b4bd76c-goog
+	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="eWRsH0mr"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-66f79f58123so79814d50.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 09:34:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788280457; cv=none;
+        d=google.com; s=arc-20260327;
+        b=RiEG2/qeRde2JGuCqybhiAAi2qYbX3d2b0/hmelcBc5SQ3nOJ6ToQKZfyJq+079uUN
+         guU0czGOYnMO0e7yZacLUCM2wXaswAqLyHBUlcaU+5ZxcjRMOrXp8/rij5KxhfbsfzOT
+         XewkOCNs5pE2LqKUSmKwoqRcaTYW3JuhtTwZzewUOVDjy90OCTvK5IiARc91Di0WL9KF
+         Zg/uHSdC5KvLnCmv4Xr6BVQLQGg7R4GipSOvss1t8IULaz0pTd2yGRTgj305A1hGGC8o
+         Lavs5zl5as4OwC58t3jDTPuB7m+Rx199Phv+AYcvV0R7xX2mzifac1WKL1QDW9ELQMGB
+         n7uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=iTpIe/h3ytNDgDKrNfMJi9YcEvscMgguwwTlaEUSED0=;
+        fh=gM34EDS60QVgaEHrDJCaIeDThyF/pNEydYN1nsvi5g4=;
+        b=aKcSozhgshO4suSjzqvgS/P2rSBpJYiuxKb4+pduef6x8rkH+5XzqNZvdEKBl4kZzn
+         1X7mplMg1B9fYCNOtAfGk2v+B2R/h2FaEH43lNOxxnHMdgy/XPpJM3bRSFwEenB1S99w
+         GDYkKDk0fVWGO7ULg3oZXEy8+Spof1aMZ58CZFjSx9nt6wZLvNPALRSOzQV7tFxvSeaO
+         ItNjvWwckhwsndyaFtvpLK+6ZknPOz5oPaL00q9m9uMuJwikcO7jja/jLMagoxtDxIpS
+         z3QUwG7NZ8IhoTEXD6N38c4BsVi2C6nv7TYxvwzKLkn18IuKTcnUsWFXKd/J+STle4hs
+         DYxQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=irregular.at; s=google; t=1788280457; x=1788885257; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iTpIe/h3ytNDgDKrNfMJi9YcEvscMgguwwTlaEUSED0=;
+        b=eWRsH0mrq9ya4q8SUIb5hURRRPDu04rDk8zo/R/vxvB0AWJqi3+fGwJ2w4JGmi9oWO
+         XCmYBrhx6BNlohQ5lcNncegByUgpkWpDwgMsmZNfOvJDbIiedKlQmB0Pif4w0mtRAyhg
+         dmvQlZWUgOu9ImuhOmNb7xI9/EUHSy8Lwsozk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788280457; x=1788885257;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=iTpIe/h3ytNDgDKrNfMJi9YcEvscMgguwwTlaEUSED0=;
+        b=X+jiz/w3IIevZN8y2SAo6nR/zNUjPQkJ2s0TOZLS7UNOjtwZsJN6G6WsLCo4WDwkp6
+         aT6cqOA4H/H7v9qzlHzLGKrqvjSBEajWJykGw3WVm0W2M6CZ7JHgBwjaKU/gaXmI4oZA
+         skc+2pz4cAnu3BSrTTWd6V9megZMpkxEg9AN6h42j9Ge691C9s1E9eVAFvNR5CeLCQ4O
+         OilOLx7VY+tZxHCcLTnXS5L+Bzz+HkezxNDxLCX/t7sHGi0xGZNSJhxVRlqBJ0OuqXFD
+         UVknN73Q6KqqKgAu2DNW/qqFpSRAIXxQpd7OjJylEdo58hV/QHDDmr0T3KwCCXv9f2tx
+         5Tlg==
+X-Gm-Message-State: AFuF++kKWxNVp3NphytsjHWGqQZ1eCj0LyHPS/i+OapEwRlzYqetObLU
+	ZQsjalFDqult1bp8KDATveDSpZ/Loo/8pZSUQVF4RVuxRAIq5wlPzFuAk96x7qyWAsZ5h0izcag
+	kca7uBb4GtLmUJeMih+sfxU/B/kXA8XzcQT8wTt/yeWtm6J5A3yyqjc/Vzg==
+X-Gm-Gg: AYBFou3UurFJz+KmK+hq3rvKSkEOEllA3zOvwDdsxTY47zwIzLSokG0SHQiX2FTBdCC
+	hXJY9Io1yiLiNdjPx3x52udVlFGxzeTi4HjEhcDqHEsGeGo6yMR/EcN0QRgT1IMxEWJOmHHCw03
+	eR95yQ3AzkEt5Bxs3oU0X9LNrU/33P0W9utEKSQN5btBBGjYyvfD8m9bWE2AHpiMOB89W+9pXEs
+	46K1vZZMDsL7L6v4wbBCliVe7rDv2wClep3I6stnFMPWpue86mavDXTsSD2021t8z3pnSBJXCMP
+	RFt3EpWDnXlb4PuZMKuLADe87JGNiCmohWOb9ls9nC70Jj3VpDookB04Bu5VPBTDXlHUCCLN2gg
+	YWisG0l05kbx0DoSiUuq99n41P3ghLU5uTuzLMlC9LQLW9VQrnciic19HmNLY/4Y=
+X-Received: by 2002:a53:de05:0:b0:668:9d0f:ab70 with SMTP id
+ 956f58d0204a3-66f874acc04mr2588006d50.18.1788280457446; Tue, 01 Sep 2026
+ 09:34:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1787327795.git.m.kurz@irregular.at>
+In-Reply-To: <cover.1787327795.git.m.kurz@irregular.at>
+From: Matthias Kurz <m.kurz@irregular.at>
+Date: Tue, 1 Sep 2026 18:34:06 +0200
+X-Gm-Features: AcwNN1WiPhMmu9iwZ3HPS-XfT4FbDhE03InxpgvtOkfDvPFFww_0JqMCYUpf3jA
+Message-ID: <CAO=2mx7zXHmahddsPMaDAZ=2zOdonYOE2nvJB__S6ORU_by3-A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/4] Add component batteries and Fast Pair
+ Message Stream
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-In send_cancel(), pending mesh_tx objects are removed from the
-hdev->mesh_pending list and freed via mesh_send_complete(). However, if
-a mesh transmission was already queued onto hdev->cmd_sync_work_list
-via mesh_next(), the queued entry retains a raw pointer to mesh_tx.
+Hi,
 
-When hci_cmd_sync_work later processes the entry, it attempts to
-execute mesh_send_sync and its destroy callback mesh_send_start_complete
-using the already freed mesh_tx pointer, leading to a use-after-free.
+A gentle ping on this v2 series. It addresses the feedback on v1 and
+was tested end-to-end with Pixel Buds Pro through UPower and KDE Plasma.
 
-Fix this by invoking hci_cmd_sync_dequeue() for mesh_send_sync on the
-target mesh_tx before completing it. If the entry is found and dequeued,
-its destroy callback will complete and free the object; otherwise,
-mesh_send_complete() is called directly.
+Would you have time to take another look? Please let me know if I should
+change or split anything to make the series easier to review.
 
-Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-Signed-off-by: Lee Jones <lee@kernel.org>
----
-
-v1 => v2: Email address switch - no functional change
-
- net/bluetooth/mgmt.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fd045460e236..f10cf64fb79e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2427,14 +2427,20 @@ static int send_cancel(struct hci_dev *hdev, void *data)
- 		do {
- 			mesh_tx = mgmt_mesh_next(hdev, cmd->sk);
- 
--			if (mesh_tx)
--				mesh_send_complete(hdev, mesh_tx, false);
-+			if (mesh_tx) {
-+				if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
-+							  mesh_tx, NULL))
-+					mesh_send_complete(hdev, mesh_tx, false);
-+			}
- 		} while (mesh_tx);
- 	} else {
- 		mesh_tx = mgmt_mesh_find(hdev, cancel->handle);
- 
--		if (mesh_tx && mesh_tx->sk == cmd->sk)
--			mesh_send_complete(hdev, mesh_tx, false);
-+		if (mesh_tx && mesh_tx->sk == cmd->sk) {
-+			if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
-+						  mesh_tx, NULL))
-+				mesh_send_complete(hdev, mesh_tx, false);
-+		}
- 	}
- 
- 	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_MESH_SEND_CANCEL,
--- 
-2.55.0.897.gb25b4bd76c-goog
-
+Regards,
+Matthias
