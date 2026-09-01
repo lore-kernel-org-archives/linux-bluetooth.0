@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E7C391E52;
-	Tue,  1 Sep 2026 21:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27F93ABD80;
+	Tue,  1 Sep 2026 21:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788296698; cv=pass; b=F8zffNPVm/hg/ZvK5/+r69JEjO2U2BCtZHWO3NUCk6A41FnowtR8KBUrZmFsFQZENm7zMLAyg8N3RyUIC3QyPsxhWtIGQhkeVKfcJVQ6HRfrXilEw1tcX325DwQpXPi2/4gm1us8wiG/F71NK0+uAXgZ9d+0OdbqMeSMW7fspQc=
+	t=1788296699; cv=pass; b=i49Vo/9CAcZtbYGvql7ZSl1HcXkB8lbXTSZifqiOOPc2tcKgPueZFlZMNEWQ/s2epOH8lV3WSik/V5SIq3CGbh9nM7QcPxMcWxo2GfR+d5EGYnsN2YRkQI+XWrPH7iKeerewhu3K/fsWDXBswiVUxvPvNUcnOlZ1a813FujNJt8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788296698; c=relaxed/simple;
-	bh=5zibq57D/j/jK/mPVGQ1sOwhhWnQ3QcU0GgC7ICYfeg=;
+	s=arc-20240116; t=1788296699; c=relaxed/simple;
+	bh=3s9ZPhc55/duEREoxPchCpuMYgIEAWBsjxd0ONqCIlw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mSBXgGfsA5lqBO8bkeSWbvGmgV3fX8az2ORqqGyy7b8JjV3qUTvCG7RpOMH92jTxsv86Bfqc6WCqIMfU2In6SpgUW1DrV/UrF8l0rTo4BLQd0mbbrivZLeZvCFyUZc7rTxJhImFaPcPROW9eSOxpE/CmLboOME63PTT80AcGoHM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=DVmD5dnX; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=dQqHqxOTsm+0JurdnQqr/jtZVSYhUGFMUfrqQastbV53nyTAS7oGn3G+F+K/4zQqb6NEDKsLAsp5N8dmImoHJel9LIpfiwWIqmCnLL2ZBoKfBab2FgNiyV4O/6Z0SNNs7nDBlinWReTt2u+giLmmRUohtUao2Y8h9x3DYvzQpZc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=azUd0b7f; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="DVmD5dnX"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="azUd0b7f"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:4:f011::dd01])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hZJJy2k5LzywJ;
-	Wed, 02 Sep 2026 00:04:50 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hZJJs75WvzyfV;
+	Wed, 02 Sep 2026 00:04:45 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788296690;
+	t=1788296686;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sPvEKoTtP7yiNM3rOQJTmK+baCfbSTa8KD7bYAKS+Ig=;
-	b=DVmD5dnXajWshfGatGIZMvjG7duMOeKhGxUZ7rRaJE2Kh9ElMcJOjr93X6QGTBRLmhDUG8
-	aoU6RMQVLDpeay3uweBgjIhnSzTPGOqt/iqmFTXkHUzdpdY4Z34RgW3Q+C+uvU0tcbL9Nb
-	2W9PqbrOjeCAFSmoU2a7jv7xJSATv2E=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788296690;
-	b=LRrtCzbAZVD5KINExUZpl0hJ1Kk4G+kKpiFx93FFwxz3ryDTYPCIQW3Dnq1Xap8MSahBP7
-	hA7LYlZVD/avOypcDw4WITyddh6RQaVdux68Sp8kU/HdE/OQy5bHrsVLxaHgkBmlTH/bs6
-	1MmZjDNlELrC/6/VG7yVPO926614PXM=
+	bh=VKCj5gbsSO9eIn0e0ZDUMGMEaXRZhNCzZmvhhpmDLHU=;
+	b=azUd0b7fJNupUPolcxrpWnK9GGH2Q8leOYPrTjATnFjshnnd4uLn8fpyMuIXjn9H3km1sC
+	mGV18IJ+xTQz7dcpYLRmDFSx34UNXn2+ow+UkA9u/+KHhJl9wr/iBLHRTzFXIlSUqzOD+y
+	lqIcxzLLP7faXhyH28ExFT2rZQVKb28=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788296686;
+	b=I6Kis1eVuRn+/wPscm+Ohsa28fW19MBQPLyygfK1MHyI/qzWfKdvMca9UYo3u1CRaem3Yy
+	yvNOWMfapV9vsaukXLVYt+ibfoIia8crklM3Hiy9NseIkCFjKXF799q7ABhV3HBEK0JTzp
+	Hc/9MTocGKm9+qjhJ5vXYAiWOmnE8GE=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788296690;
+	s=meesny; t=1788296686;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sPvEKoTtP7yiNM3rOQJTmK+baCfbSTa8KD7bYAKS+Ig=;
-	b=kwSA+JU8ABWJrcV29dHFBU6yfydfFgnqMOijuTYZsNhn841uWoc0Ghhq46jSkIiMYMKqDw
-	YwCW3apYfaRonTqMiIBolXmiM5lueyqo9pdN/tOxnVKo4IqiAvGcNAZ/5clrsi8GvxhiVJ
-	5jovkRzIcBJVZ61hO3QMi/pT/9qP88U=
+	bh=VKCj5gbsSO9eIn0e0ZDUMGMEaXRZhNCzZmvhhpmDLHU=;
+	b=mppzkUBCkSEUcT7Nrklsn+WGkMemwqGPDlZc8zky4KgFI7DIzslZq/qHd55ZMWAeCvs1ll
+	CYsu0XAUBvwQ8rPX+2a5ztGMwGiVhq7a0rSHiO0RSEA8BZ3D0n+LILIAVlT+0fK9y2rfzz
+	fH2lHGy5OmRrFlXagVot2oV4hY019RM=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -57,9 +57,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	luiz.dentz@gmail.com,
 	elver@google.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: L2CAP: annotate locking for l2cap_chan_del()
-Date: Wed,  2 Sep 2026 00:04:34 +0300
-Message-ID: <16a30a04f28b2b93023b6e32b361543384af499b.1788296635.git.pav@iki.fi>
+Subject: [PATCH 1/4] Bluetooth: L2CAP: take lock for l2cap_chan_del in l2cap_ecred_rsp_defer
+Date: Wed,  2 Sep 2026 00:04:33 +0300
+Message-ID: <24ff07854c80a2813fe7050d1dbb40586391b162.1788296635.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788296635.git.pav@iki.fi>
 References: <cover.1788296635.git.pav@iki.fi>
@@ -71,336 +71,160 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add context analysis annotations for chan->lock and chan->conn->lock
-involving l2cap_chan_del() usage.
+l2cap_ecred_rsp_defer() calls l2cap_chan_del without holding chan->lock,
+which ends up calling ops->teardown() with wrong lock context.
 
-Add necessary annotations and related lockdep_assert_held to callers.
+Fix by taking chan->lock in l2cap_ecred_rsp_defer().  AB-BA deadlocks
+between sibling l2cap_chan are avoided here via requiring l2cap_conn::lock
+to serialize all nested l2cap_chan locking on same nesting level.
 
-Move struct l2cap_ops definition after struct l2cap_conn, so that the
-callbacks can be annotated.
+In current code, there is no nested l2cap_chan locking on same nesting
+level, so we can add this new requirement.
 
-In l2cap_chan_close_unlocked() we consider chan->conn->lock as locked
-even if chan->conn == NULL, to avoid needing to define separate
-__l2cap_chan_close/del for this NULL case.
+Also return early from  __l2cap_ecred_conn_rsp_defer() if chan did not
+have FLAG_DEFER_SETUP, as then no RSP shall be sent for it, to make sure
+SMP channels are excluded.
+
+Also hold chan reference over l2cap_chan_del(), in case chan_l reference
+was the last.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- include/net/bluetooth/l2cap.h | 56 +++++++++++++++++++----------------
- net/bluetooth/6lowpan.c       |  2 ++
- net/bluetooth/l2cap_core.c    | 49 +++++++++++++++++++++++++-----
- 3 files changed, 74 insertions(+), 33 deletions(-)
+ include/net/bluetooth/l2cap.h |  4 +++
+ net/bluetooth/l2cap_core.c    | 60 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c7e642abe404..3e1e2b36d7b6 100644
+index 2315a3993c7b..c7e642abe404 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -614,31 +614,6 @@ struct l2cap_chan {
- 	struct mutex		lock;
- };
- 
--struct l2cap_ops {
--	char			*name;
--
--	int			(*new_connection)(struct l2cap_chan *chan,
--						  struct l2cap_chan *new_chan);
--	int			(*recv) (struct l2cap_chan * chan,
--					 struct sk_buff *skb);
--	void			(*teardown) (struct l2cap_chan *chan, int err);
--	void			(*close) (struct l2cap_chan *chan);
--	void			(*state_change) (struct l2cap_chan *chan,
--						 int state, int err);
--	void			(*ready) (struct l2cap_chan *chan);
--	void			(*defer) (struct l2cap_chan *chan);
--	void			(*resume) (struct l2cap_chan *chan);
--	void			(*suspend) (struct l2cap_chan *chan);
--	void			(*set_shutdown) (struct l2cap_chan *chan);
--	long			(*get_sndtimeo) (struct l2cap_chan *chan);
--	struct pid		*(*get_peer_pid) (struct l2cap_chan *chan);
--	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
--					       unsigned long hdr_len,
--					       unsigned long len, int nb);
--	int			(*filter) (struct l2cap_chan * chan,
--					   struct sk_buff *skb);
--};
--
- struct l2cap_conn {
- 	struct hci_conn		*hcon;
- 	struct hci_chan		*hchan;
-@@ -674,6 +649,34 @@ struct l2cap_conn {
- 	struct list_head	users;
- };
- 
-+struct l2cap_ops {
-+	char			*name;
-+
-+	int			(*new_connection)(struct l2cap_chan *chan,
-+						  struct l2cap_chan *new_chan);
-+	int			(*recv) (struct l2cap_chan * chan,
-+					 struct sk_buff *skb);
-+	void			(*teardown) (struct l2cap_chan *chan, int err)
-+					__must_hold(&chan->lock);
-+	void			(*close) (struct l2cap_chan *chan);
-+	void			(*state_change) (struct l2cap_chan *chan,
-+						 int state, int err);
-+	void			(*ready) (struct l2cap_chan *chan)
-+					__must_hold(&chan->lock)
-+					__must_hold(&chan->conn->lock);
-+	void			(*defer) (struct l2cap_chan *chan);
-+	void			(*resume) (struct l2cap_chan *chan);
-+	void			(*suspend) (struct l2cap_chan *chan);
-+	void			(*set_shutdown) (struct l2cap_chan *chan);
-+	long			(*get_sndtimeo) (struct l2cap_chan *chan);
-+	struct pid		*(*get_peer_pid) (struct l2cap_chan *chan);
-+	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
-+					       unsigned long hdr_len,
-+					       unsigned long len, int nb);
-+	int			(*filter) (struct l2cap_chan * chan,
-+					   struct sk_buff *skb);
-+};
-+
- struct l2cap_user {
- 	struct list_head list;
- 	int (*probe) (struct l2cap_conn *conn, struct l2cap_user *user);
-@@ -983,7 +986,8 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data);
- void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
- 		     void *data);
--void l2cap_chan_del(struct l2cap_chan *chan, int err);
-+void l2cap_chan_del(struct l2cap_chan *chan, int err)
-+	__must_hold(&chan->lock) __must_hold(&chan->conn->lock);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
- 
- struct l2cap_conn *l2cap_conn_get(struct l2cap_conn *conn);
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index ddcdd2aff91f..836add41f5d1 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -722,6 +722,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
- }
- 
- static inline void chan_ready_cb(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
-+	__must_hold(&chan->conn->lock)
- {
- 	struct lowpan_btle_dev *dev;
- 	bool new_netdev = false;
+@@ -758,6 +758,10 @@ enum {
+  * otherwise considers all channels equal and will e.g. complain about a
+  * connection oriented channel triggering SMP procedures or a listening
+  * channel creating and locking a child channel.
++ *
++ * Lock nesting of channels at the same nesting level is allowed if the channels
++ * have the same l2cap_chan::conn and l2cap_chan::conn.lock is taken before the
++ * nested locks. l2cap_chan_try_sibling_lock() must be used.
+  */
+ enum {
+ 	L2CAP_NESTING_SMP,
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 805623a48bae..219d92431be0 100644
+index 9da689f0a50a..805623a48bae 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -59,7 +59,8 @@ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- static void l2cap_retrans_timeout(struct work_struct *work);
- static void l2cap_monitor_timeout(struct work_struct *work);
- static void l2cap_ack_timeout(struct work_struct *work);
--static void __l2cap_chan_close(struct l2cap_chan *chan, int reason);
-+static void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
-+	__must_hold(&chan->lock) __must_hold(&chan->conn->lock);
- 
- static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
- {
-@@ -681,6 +682,8 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- void l2cap_chan_del(struct l2cap_chan *chan, int err)
- {
-+	lockdep_assert(!chan->conn || lockdep_is_held(&chan->conn->lock));
-+
- 	__clear_chan_timer(chan);
- 
- 	BT_DBG("chan %p, err %d, state %s", chan, err,
-@@ -812,12 +815,11 @@ static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
- }
- 
- static void l2cap_chan_ecred_connect_reject(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
-+	__must_hold(&chan->conn->lock)
- {
- 	l2cap_state_change(chan, BT_DISCONN);
- 
--	lockdep_assert_held(&chan->lock);
--	lockdep_assert_held(&chan->conn->lock);
--
- 	__l2cap_ecred_conn_rsp_defer(chan);
- }
- 
-@@ -848,8 +850,6 @@ static void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
+@@ -848,6 +848,8 @@ static void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
  
  	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
  
--	lockdep_assert_held(&chan->lock);
--
++	lockdep_assert_held(&chan->lock);
++
  	switch (chan->state) {
  	case BT_LISTEN:
  		chan->ops->teardown(chan, 0);
-@@ -934,7 +934,10 @@ void l2cap_chan_close_unlocked(struct l2cap_chan *chan, int reason)
- 	bool have_conn;
- 
- 	have_conn = l2cap_chan_lock_conn(chan);
--	__l2cap_chan_close(chan, reason);
-+
-+	/* Context analysis: consider chan->conn->lock held also if conn NULL */
-+	context_unsafe(__l2cap_chan_close(chan, reason));
-+
- 	l2cap_chan_unlock_conn(chan, have_conn);
- }
- EXPORT_SYMBOL(l2cap_chan_close_unlocked);
-@@ -1336,6 +1339,8 @@ void l2cap_send_conn_req(struct l2cap_chan *chan)
+@@ -3950,6 +3952,7 @@ static void l2cap_ecred_list_defer(struct l2cap_chan *chan, void *data)
  }
  
- static void l2cap_chan_ready(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
-+	__must_hold(&chan->conn->lock)
+ struct l2cap_ecred_rsp_data {
++	struct l2cap_chan *locked_chan;
+ 	struct {
+ 		struct l2cap_ecred_conn_rsp_hdr rsp;
+ 		__le16 scid[L2CAP_ECRED_MAX_CID];
+@@ -3957,11 +3960,42 @@ struct l2cap_ecred_rsp_data {
+ 	int count;
+ };
+ 
++/* Lock @chan if it is not @locked_chan, and has same or lower nesting level.
++ *
++ * They must have the same chan->conn, and conn->lock must be held.
++ *
++ * Caller must ensure @chan has lock nesting level <= that of @locked_chan, as
++ * nested locking of l2cap_chan of different levels is allowed also without
++ * holding conn->lock.
++ *
++ * See l2cap.h for the global l2cap_chan locking rules.
++ */
++static bool l2cap_chan_try_sibling_lock(struct l2cap_chan *chan,
++					struct l2cap_chan *locked_chan)
++	__must_hold(&locked_chan->lock)
++	__must_hold(&locked_chan->conn->lock)
++	__cond_acquires(true, &chan->lock)
++{
++	if (chan == locked_chan)
++		return false;
++
++	if (WARN_ON_ONCE(locked_chan->conn != chan->conn))
++		return false;
++
++	if (WARN_ON_ONCE(atomic_read(&locked_chan->nesting)
++			 < atomic_read(&chan->nesting)))
++		return false;
++
++	mutex_lock_nest_lock(&chan->lock, &locked_chan->conn->lock);
++	return true;
++}
++
+ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
  {
- 	/* The channel may have already been flagged as connected in
- 	 * case of receiving data before the L2CAP info req/rsp
-@@ -1471,6 +1476,7 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
- }
+ 	struct l2cap_ecred_rsp_data *rsp = data;
+ 	struct l2cap_ecred_conn_rsp *rsp_flex =
+ 		container_of(&rsp->pdu.rsp, struct l2cap_ecred_conn_rsp, hdr);
++	bool locked;
  
- static void l2cap_le_start(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
- 	__must_hold(&chan->conn->lock)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1492,6 +1498,7 @@ static void l2cap_le_start(struct l2cap_chan *chan)
- }
+ 	if (chan->mode != L2CAP_MODE_EXT_FLOWCTL)
+ 		return;
+@@ -3973,6 +4007,22 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
+ 	    !test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
+ 		return;
  
- static void l2cap_start_connection(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
- 	__must_hold(&chan->conn->lock)
- {
- 	if (chan->conn->hcon->type == LE_LINK) {
-@@ -1542,6 +1549,7 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon,
- }
- 
- static void l2cap_do_start(struct l2cap_chan *chan)
-+	__must_hold(&chan->lock)
- 	__must_hold(&chan->conn->lock)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1893,6 +1901,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 		l2cap_chan_hold(chan);
- 		l2cap_chan_lock(chan);
- 
-+		lockdep_assert_held(&chan->conn->lock);
++	lockdep_assert_held(&rsp->locked_chan->lock);
++	lockdep_assert_held(&rsp->locked_chan->conn->lock);
 +
- 		l2cap_chan_del(chan, err);
- 
- 		chan->ops->close(chan);
-@@ -4218,6 +4228,8 @@ static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *conn,
- 
- 	__l2cap_chan_add(conn, chan);
- 
++	l2cap_chan_hold(chan);
++
++	locked = l2cap_chan_try_sibling_lock(chan, rsp->locked_chan);
++
++	/* Cannot occur: PARENT channels do not appear in chan_l, and SMP
++	 * channels never have FLAG_DEFER_SETUP.
++	 */
++	if (context_unsafe(!locked && chan != rsp->locked_chan))
++		goto done;
++
++	lockdep_assert_held(&chan->lock);
 +	lockdep_assert_held(&chan->conn->lock);
 +
- 	if (pchan->ops->new_connection &&
- 	    pchan->ops->new_connection(pchan, chan) < 0) {
- 		l2cap_chan_del(chan, 0);
-@@ -4419,6 +4431,8 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+ 	/* Reset ident so only one response is sent */
+ 	chan->ident = 0;
  
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
- 		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
-@@ -4520,6 +4534,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
- 	    chan->state != BT_CONNECTED) {
- 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
-@@ -4634,6 +4650,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
-@@ -4743,6 +4761,8 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	rsp.dcid = cpu_to_le16(chan->scid);
- 	rsp.scid = cpu_to_le16(chan->dcid);
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_DISCONN_RSP, sizeof(rsp), &rsp);
-@@ -4783,6 +4803,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	if (chan->state != BT_DISCONN) {
- 		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
-@@ -4995,6 +5017,8 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	switch (result) {
- 	case L2CAP_CR_LE_SUCCESS:
- 		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
-@@ -5213,6 +5237,8 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
-+
- 	bacpy(&chan->src, &conn->hcon->src);
- 	bacpy(&chan->dst, &conn->hcon->dst);
- 	chan->src_type = bdaddr_src_type(conn->hcon);
-@@ -5444,6 +5470,8 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
- 
- 		l2cap_chan_lock(chan);
- 
-+		lockdep_assert_held(&chan->conn->lock);
-+
- 		bacpy(&chan->src, &conn->hcon->src);
- 		bacpy(&chan->dst, &conn->hcon->dst);
- 		chan->src_type = bdaddr_src_type(conn->hcon);
-@@ -5533,6 +5561,8 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
- 		l2cap_chan_hold(chan);
- 		l2cap_chan_lock(chan);
- 
-+		lockdep_assert_held(&chan->conn->lock);
-+
- 		/* Check that there is a dcid for each pending channel */
- 		if (cmd_len < sizeof(dcid)) {
- 			l2cap_chan_del(chan, ECONNREFUSED);
-@@ -5760,6 +5790,8 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
- 			continue;
- 		l2cap_chan_lock(chan);
- 
-+		lockdep_assert_held(&chan->conn->lock);
-+
+@@ -3985,6 +4035,12 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
+ 		rsp_flex->dcid[rsp->count++] = cpu_to_le16(chan->scid);
+ 	else
  		l2cap_chan_del(chan, ECONNRESET);
- 
- 		l2cap_chan_unlock(chan);
-@@ -5789,6 +5821,7 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
- 		goto done;
- 
- 	l2cap_chan_lock(chan);
-+	lockdep_assert_held(&chan->conn->lock);
- 	l2cap_chan_del(chan, ECONNREFUSED);
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
-@@ -7176,6 +7209,8 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
- 
- 	l2cap_chan_lock(chan);
- 
-+	lockdep_assert_held(&chan->conn->lock);
 +
- 	BT_DBG("chan %p, len %d", chan, skb->len);
++done:
++	if (locked)
++		l2cap_chan_unlock(chan);
++
++	l2cap_chan_put(chan);
+ }
  
- 	/* If we receive data on a fixed channel before the info req/rsp
+ void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan)
+@@ -3996,11 +4052,15 @@ void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan)
+ 
+ 	if (!id)
+ 		return;
++	if (!test_bit(FLAG_DEFER_SETUP, &chan->flags))
++		return;
+ 
+ 	BT_DBG("chan %p id %d", chan, id);
+ 
+ 	memset(&data, 0, sizeof(data));
+ 
++	data.locked_chan = chan;
++
+ 	data.pdu.rsp.mtu     = cpu_to_le16(chan->imtu);
+ 	data.pdu.rsp.mps     = cpu_to_le16(chan->mps);
+ 	data.pdu.rsp.credits = cpu_to_le16(chan->rx_credits);
 -- 
 2.55.0
 
