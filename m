@@ -1,127 +1,272 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E3545FFAE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 20:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032546AEF4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 20:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788293401; cv=none; b=cOxk932rV5WuoLNx5FI4cZTbIPkSaBEykFmtY+smw2/g2aORz4R/3ZRTKT6C8ZIvjC6GQicgwbqMhtWGoVw2apbHnZXS8sFGt+qzOXl4FmxxjrDOI2sUspHsduJG21IEHLmOUVqceKBwkA/BBRV56pWD2mtwSMwkh44+UOi00ec=
+	t=1788293474; cv=none; b=lKsGgJ3z8yxx4EcXaivyoKisEXW6Pl0LjXk8SwpDFe9thdeOvkE4oFqitnLMf0B3XLD1d579DSyxFVXVHnN1u8y5nPGbzMRHlo0MS2uRHD0Hp51UGCwA2/d5xMGcLWNrltltRKFfryvPq+69DUDww5bnpdp8LktrystuAu4WzpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788293401; c=relaxed/simple;
-	bh=3hvmRmJSVu59D7dPFGOOhVl1YqcMQ2YY9rLQb0vNmtg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cc7z5nhN2zYD+1A6ezun/EC9Iu65e4aCvUORs4P2iP+gMP2TzFlsRNUY5WCqErOnR5ZvZq3Nvub44krEeZHlUTZrHVUD0fSTGyVPRgJpz77cO15IeUid8yOENFqwZDfpRnbe+Oikwl2YB/vdgZ1M4hjw30KR6F+BDrlnkurGujk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oKCClMhH; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788293474; c=relaxed/simple;
+	bh=MLLd5cIEJMX83JCO3OFN/1B8phX0yNqW/K9q4DLqOoA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=azqXlwxiNWuPBMWcuk90krj2xOV9/fFRGhUCpfmjcj78VgQ3q2SJbdKkSgS5SrX7IKeEtY5hU3qYX0No7Tw5c4LhInLk5pukI+mJOW87WPn1g+c6rX7fdkuDyP798zy0iGIwhjuQo8LObHTF5VqZwph6qkm9tKmRH1j+Z9Y6rHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=A39RiJh0; arc=none smtp.client-ip=192.30.252.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oKCClMhH"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-92e55b62640so29089185a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 13:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788293396; x=1788898196; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Y4ZZsjHr6YcmyfH9QFDFfp3Q7Y6lQtp2VZjxy8udIso=;
-        b=oKCClMhH0+5S2pr6rKlRT3t7MBpzacvtKUsSWU7Bby0YZxLvVtqQEPQ/5q1EBoCFj1
-         uJ6fbGRu0+Yg8YHF8IklUR6GlWJkZh9HTAX9NIZy4295GfG+SwBHIBdyqlkLHs/R4X1+
-         N+Amre+NhzIrHp9VzlLiJDMNw4aYos2a0VQKZ9+VsGCSuljQF6GtgUuJegAYuWof6LAN
-         9bYThURWnXCw9TJn+rqXbKK37Zm5dxNdigZfhmqKatdDmdHDh3hsf8dBRzEMuW+Z1gra
-         jCH88WE1kz1Mcdr09G+x76YdwgXd1N4uFLgAIZO5cTVx9vBss+T/lD0DY5f4n3WU0T+n
-         wRMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788293396; x=1788898196;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Y4ZZsjHr6YcmyfH9QFDFfp3Q7Y6lQtp2VZjxy8udIso=;
-        b=cWIjlfxJmfJr0bk4b42oe+TeOQYMrgsYlkwxbhIeg7xEvBdlusXzqiO62DMf6fpTsz
-         W+WgZZtuHH5ATsnWkYBCgjgVMXljHvUJl6tiPmHzPNEV8QFgdal++ruzCuKXaQaGWcMw
-         MHQiq5D/1qj5mrHnUpvHmcpslQB/8DnsqczZco73qkftO2OPAi5bArt29bRSZYtig6PN
-         wagP0O+UkR6JPuijSlZBGXFiV6YfTqIe6s8FSBkXkVqsnGhuqt1Hvwo9U0bW0TSJD5l0
-         NvhE1tUn6yxzWbJ/HNaQmi7grVGBsJM/4m1Wgh18h6vME9HnuidwGF/Ti+BwXyvExqR2
-         V+rg==
-X-Gm-Message-State: AFuF++lldM0K14eSy3KxNByn6N0zrFLnaWIJ/YzoFFybrMTZr6uM9nch
-	SROIVnjf5HSY+9QMpb5MRquPIzTAGY2O1t+vgSWtrz4rIpnPgVQr6YWh3qqRSw==
-X-Gm-Gg: AR+sD13jnWKXHMTR/cuN1puVl6dchWAvCdjNJvGDkbCSBVZDedxmtYqRRdwLGPCLgAF
-	W5tVf0Oy9099334NWtu82czYZY1zO26uKPR3+KtykYmTC7BTQpwSb3Od4EjzU9t3AqGYVqBOqmJ
-	0wQnQ2fI+6YKcFQ0qr6KM6hwHg7sGKFF1T5Rl/m5G9YnMCXMWVMAZJcuPHufnCTWH547i64wDrr
-	tM/5EfyjLWDBZp1nuOF3I91YHpwprQaW88wkHA9oZrSeEDZfEnz4WxF30F9NVyysBXVApZ5Xjih
-	AYljkZlwgEtrYE78bHtkElu2Pviz3u+cg2LeCVzwk7VgKHGzPFdWvKkBZa0iujgtTskTNxbbovd
-	o3S/hJWdq7O/WgffCoTkEKGPsUhKpURwSkFVUxMl7jEJvfp2lgjBrTOEKg+M1WYupOPks+de9dA
-	Wn2bFwIp2rcU9opunExIDqzk3uir5FMpthKPTx1LSo0AuZYZ8p8imSUKwTTg35qlMQjnxlGw==
-X-Received: by 2002:a05:620a:6e1c:b0:939:990:c943 with SMTP id af79cd13be357-9395ebe7a8cmr125370485a.32.1788293395791;
-        Tue, 01 Sep 2026 13:09:55 -0700 (PDT)
-Received: from [172.17.0.2] ([145.132.101.199])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9395f1876f1sm24617285a.14.2026.09.01.13.09.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2026 13:09:55 -0700 (PDT)
-Message-ID: <6a973113.f0689485.10c6d1.4c12@mx.google.com>
-Date: Tue, 01 Sep 2026 13:09:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5045037245298755536=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="A39RiJh0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788293467;
+	bh=lNLy7ETtXj194M0mb4Ue5XP0tBgqFeT0ZlVarHvmS4o=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=A39RiJh0Ilzjg9wXKt/gu1pOQ47DMMNHqKhAss8KJjB2QlSiyT21wO+m0MKfQjH9Q
+	 36km4FQfrjD5xP3dDnZdeddkqrLFpW5Iaej40dgZrLxmFPXJdMGffJ0T7aipkqu/83
+	 jRBOso4XJnPLSy627DSoe96I8t8c+qPYeso0T1XI=
+Received: from github.com (hubbernetes-node-c2173a7.ac4-iad.github.net [10.52.125.64])
+	by smtp.github.com (Postfix) with ESMTPA id 60D193202F1
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 13:11:07 -0700 (PDT)
+Date: Tue, 01 Sep 2026 13:11:07 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1155564/000000-162444@github.com>
+Subject: [bluez/bluez] b0c9e9: avrcp: Fix out-of-bounds parsing of
+ ListPlayerAttr...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, i@rong.moe
-Subject: RE: [v3] Bluetooth: Properly disable remote wakeup for MT7922/MT7925 on Ryzen platform
-In-Reply-To: <20260902-btmtk-ryzen-remote-wakeup-v3-1-8a733d0edd7c@rong.moe>
-References: <20260902-btmtk-ryzen-remote-wakeup-v3-1-8a733d0edd7c@rong.moe>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5045037245298755536==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1155564
+  Home:   https://github.com/bluez/bluez
+  Commit: b0c9e9fe265cb6f1711ae035abbb7e4f5595e2a9
+      https://github.com/bluez/bluez/commit/b0c9e9fe265cb6f1711ae035abbb7e4f5595e2a9
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-09-01 (Tue, 01 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    M profiles/audio/avrcp.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1155578
+  Log Message:
+  -----------
+  avrcp: Fix out-of-bounds parsing of ListPlayerAttributes response
 
----Test result---
+In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp() parsed the
+response using hand-computed offsets into the operands buffer, without
+accounting for the fact that operand_count spans the 7 byte AVRCP header
+as well as the parameters:
 
-Test Summary:
-CheckPatch                    PASS      1.03 seconds
-VerifyFixes                   PASS      0.58 seconds
-VerifySignedoff               PASS      0.13 seconds
-GitLint                       FAIL      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      27.28 seconds
-CheckAllWarning               PASS      30.10 seconds
-CheckSparse                   PASS      28.72 seconds
-BuildKernel32                 PASS      26.31 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      479.32 seconds
-IncrementalBuild              PASS      26.71 seconds
+- attrs is a 4 byte array which could be written out-of-bounds if a
+  length greater than 4 was declared in the first parameter byte.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v3] Bluetooth: Properly disable remote wakeup for MT7922/MT7925 on Ryzen platform
+- The attribute bytes were read with a bound derived from operand_count,
+  so a truncated response could be read past its end. As the receive
+  buffer is reused across packets, those stale bytes could be echoed
+  back to the peer in the following GetCurrentPlayerValue request.
 
-1: T1 Title exceeds max length (82>80): "[v3] Bluetooth: Properly disable remote wakeup for MT7922/MT7925 on Ryzen platform"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+- params_len was compared against count, which was only ever 0 at that
+  point, so the length of the PDU was in practice never validated.
 
+Parse the response through a struct iovec using the util_iov_pull_*
+helpers instead, so that the header and each subsequent field are bounds
+checked as they are consumed and the remaining length is tracked for us.
+This lets params_len be validated against the actual number of parameter
+bytes received. The attribute count is still clamped to
+AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
 
-https://github.com/bluez/bluetooth-next/pull/682
-
----
-Regards,
-Linux Bluetooth
+Reported-by: @ax-nnlabs
+Closes: https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
 
 
---===============5045037245298755536==--
+  Commit: 2eaf3e6b25241cbbd83e7b10945d4cbbb41bbe7a
+      https://github.com/bluez/bluez/commit/2eaf3e6b25241cbbd83e7b10945d4cbbb41bbe7a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-01 (Tue, 01 Sep 2026)
+
+  Changed paths:
+    M profiles/audio/avrcp.c
+
+  Log Message:
+  -----------
+  avrcp: Fix out-of-bounds read parsing attribute lists
+
+avrcp_parse_attribute_list() received only a pointer and an attribute
+count, with no indication of how many bytes were actually available. For
+each attribute it read an 8 byte header followed by a 16 bit length and
+that many bytes of value, none of which was bounds checked.
+
+The callers only validated the fixed portion of each entry:
+
+    if (be16_to_cpu(pdu->params_len) - 1 < count * 8)
+
+which says nothing about the variable length values that follow, so a
+response declaring a single attribute with a value length of 0xFFFF
+would read far past the end of the receive buffer and pass the result to
+media_player_set_metadata().
+
+These are response callbacks, so they do not go through
+handle_vendordep_pdu() and params_len had itself never been checked
+against the number of bytes received. avrcp_get_element_attributes_rsp()
+also cast the operands to an AVRCP header without checking that a full
+header was present.
+
+parse_media_element() had a related off-by-one, reading the attribute
+count at operands[13 + namesize] when parse_media_name() only
+guaranteed that 13 + namesize bytes were present.
+
+Parse all of this through a struct iovec using the util_iov_pull_*
+helpers so the remaining length is tracked as each field is consumed,
+and validate params_len against the bytes actually received.
+
+
+  Commit: 64ff1336995d76fda6baa71560ceddaa7dfdad7e
+      https://github.com/bluez/bluez/commit/64ff1336995d76fda6baa71560ceddaa7dfdad7e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-01 (Tue, 01 Sep 2026)
+
+  Changed paths:
+    M profiles/audio/avrcp.c
+
+  Log Message:
+  -----------
+  avrcp: Use util_iov helpers to parse responses
+
+Every controller side response callback parsed the PDU with hand
+computed offsets into the operands buffer. None of them validated the
+declared parameters length against the number of bytes actually
+received: unlike commands, responses do not go through
+handle_vendordep_pdu(), so nothing did it on their behalf. Several read
+past the end of the receive buffer as a result, for example:
+
+- avrcp_get_capabilities_resp() read pdu->params[1 + count] for a count
+  taken from the response itself, with no length check at all, and then
+  shifted by the resulting event id without bounding it.
+
+- avrcp_player_value_rsp() bounded its loop with
+
+      if (pdu->params_len < count * 2)
+
+  comparing a big endian field without byte swapping it, so on little
+  endian the check passes for practically any value.
+
+- avrcp_get_play_status_rsp() only checked params_len, which is supplied
+  by the peer, and read nine bytes on the strength of it.
+
+- avrcp_set_browsed_player_rsp() indexed folder names relative to
+  pdu->params but bounded them against operand_count, which also spans
+  the browsing header.
+
+Add avrcp_pull_header() and avrcp_pull_browsing_header(), which pull the
+respective header out of a struct iovec and check that the length it
+declares matches what was received, and convert the response callbacks
+to pull their fields with the util_iov helpers so the remaining length
+is tracked as it is consumed.
+
+Since the receive buffer is reused between packets, the bytes read past
+the end of a short response were the contents of an earlier PDU, some of
+which were then reported over D-Bus or echoed back to the peer.
+
+
+  Commit: 2cbe3dd36da8f8de0ffa18afc4ec19302323129c
+      https://github.com/bluez/bluez/commit/2cbe3dd36da8f8de0ffa18afc4ec19302323129c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-01 (Tue, 01 Sep 2026)
+
+  Changed paths:
+    M Makefile.plugins
+    A profiles/audio/avrcp-parse.c
+    A profiles/audio/avrcp-parse.h
+    M profiles/audio/avrcp.c
+    M profiles/audio/avrcp.h
+
+  Log Message:
+  -----------
+  avrcp: Move response parsers to avrcp-parse.c
+
+The parsing of controller side responses lives in the middle of
+avrcp.c, interleaved with the media_player and D-Bus glue that consumes
+its results. That makes it unreachable from the unit tests: none of it
+can be called without an adapter, a device, a service and a session.
+
+The three preceding fixes were all in this code, and none of them could
+be covered by a regression test as a result.
+
+Move the parsing proper to a new avrcp-parse.c, which depends on
+nothing but util_iov and log.h:
+
+- avrcp_pull_header() and avrcp_pull_browsing_header()
+- avrcp_parse_player_attributes(), which now takes the bound on the
+  attribute array from its caller
+- avrcp_parse_attribute_list(), which reports each attribute through a
+  callback rather than calling media_player_set_metadata() itself
+- avrcp_parse_media_name(), avrcp_parse_media_element() and
+  avrcp_parse_media_folder(), which fill a plain struct rather than
+  creating media items
+
+struct avrcp_header, struct avrcp_browsing_header, NAME_MAX_LEN and the
+player attribute ids move to the new header, which avrcp.h now includes
+so that its users are unaffected.
+
+The logic is unchanged; avrcp.c keeps the glue as thin wrappers.
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+  Commit: 162444ac72084c5841f278c1749ed5e83c88056c
+      https://github.com/bluez/bluez/commit/162444ac72084c5841f278c1749ed5e83c88056c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-01 (Tue, 01 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    M unit/test-avrcp.c
+
+  Log Message:
+  -----------
+  unit/test-avrcp: Add robustness tests for response parsing
+
+The existing tests drive avrcp-lib.c through the AVCTP harness and all
+feed it well formed PDUs. Nothing covered what happens when a peer
+sends a response that lies about its own length, which is what the
+three preceding fixes were about.
+
+Add tests under /robustness that call the parsers in avrcp-parse.c
+directly, since a response is entirely peer controlled and the parser
+is what has to survive it:
+
+- headers that are short, that declare more parameter bytes than were
+  received, and that declare fewer
+
+- a ListPlayerApplicationSettingAttributes response declaring 255
+  attributes, which used to be written into a four byte array, and one
+  declaring more attributes than it carries
+
+- attribute lists declaring a 0xFFFF byte value with none of it
+  present, a truncated value, a truncated attribute header, and more
+  attributes than were received
+
+- media elements missing the attribute count that follows the name,
+  carrying a name longer than NAME_MAX_LEN, or declaring a name that is
+  not there, and the equivalent for media folders
+
+Each PDU is copied into a buffer of exactly its size, so that reading
+past the end of it is an out-of-bounds access rather than a read of
+whatever the receive buffer happened to hold beforehand, and the
+attribute array is surrounded by a guard so that a write past its end
+is caught without a sanitizer.
+
+Reverting the three fixes fails ten of these outright and trips
+valgrind on six more.
+
+Assisted-by: Claude:claude-opus-5 valgrind
+
+
+Compare: https://github.com/bluez/bluez/compare/b0c9e9fe265c%5E...162444ac7208
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
