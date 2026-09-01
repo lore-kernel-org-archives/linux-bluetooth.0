@@ -1,48 +1,124 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D42647D448
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 09:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8070747ACE8
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 10:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788255544; cv=none; b=QVHyp04lZqFeouN0yaTW5fWhEIj+a5BOcMGDtfY43fK3QWnAXua9k4dD0iBiWbFoNzguhhJO3sWUQUVPg8EjIzZZVokB4GnYLSvDEdbNu1RUJMYTuoqE7Mx0k3sRl9v52Gl+wp6NDwqKT5FF1K+XrP1YWV9ScrwggUpwJGXNSXA=
+	t=1788257947; cv=none; b=HqLeNzqBZG0F3t4kybO5SbadK4Rj8nHGmP4yVwfdlHk/R1NiljOuvgZ2HYvMlriM30JM/D4GJ/GInNPKiiLkPUqQ7hHcoUJ9kUQ4xdzsfQckqBdCKsjBEmNWirAjFJbzF1cYFzN7/OXEqFLKJyY6q54jMK76g+2FVWM+Y+ESdlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788255544; c=relaxed/simple;
-	bh=2runs3vXASA4s5GzjHFLiO86c4nlQpzaWscmITLgHOo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tPQcP5zOL54zR05jcHJF+aiSbJP2tFDyjeiwjklNXpf2h+8er8gI9s735O3jsaITJcqK/x401zhqyBqWmwF2rHdtGdVnSuMlqLVRNUunlMISz9OBorcfanvIMoBKHHKq9ADBGRoYzAd5xJVUrNJJ+2Psxe3VuCbUX4fDj1k5V4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PSxO4uyf; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788257947; c=relaxed/simple;
+	bh=EIrNvUHDstHHjeFO3U3xOZlTlAPgkrzoxREHv2U3uN0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=OeiZOpqb5tflTk1kVwaF0RPG9F32gImUbZbsZNRujcr+HDb75hs49m3/vUAcEmHohwH6PqJVk7EsFyMSCkbHTaUAvsLEvAk7y2+RXlzykcJOY9iD4M1vznVoxBNuZPzYQvYx7ROVGgvENCQln9S9kLec8VoZKOSFzrbwVPfBRa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=frvFdlTO; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PSxO4uyf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788255534;
-	bh=vJw1J/x9GGuHfCYY0w9HOgJ6u5A1M90BLuzPNvaEDwg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PSxO4uyfEH/W2QYnbsSe/a08ZiR34SzUr9F9CKQGhKK6aKDjQ2dGFxDEMP2cTXUcm
-	 1vQEPmslYYhJNFtY8kITck7jOHR2NuhE+q3588EWOLlV1qTgqDpvYuwOpvNJWYMe6O
-	 C0O1RGj6JbnNzzOZYDx/iCO3LPYUr6IdW5+UZnBg=
-Received: from github.com (hubbernetes-node-3311d00.ac4-iad.github.net [10.52.147.14])
-	by smtp.github.com (Postfix) with ESMTPA id 662F8A114B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 02:38:54 -0700 (PDT)
-Date: Tue, 01 Sep 2026 02:38:54 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1138845/51e23f-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="frvFdlTO"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c2569aa5116so138822566b.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 03:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1788257943; x=1788862743; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=/R2B4UIn9uyXdoZMfmtsPZpaGxOVNwVD5ZuxHGzJeSs=;
+        b=frvFdlTOqgkCeW2YCZUfPilvQBCXd3N7umri5bdQa722FT9DT5tia80QY2a26O2crW
+         Hdn4WstmCXvtJXAKql6MNWiUf+eRBL1c6tC0PrvTGHa3LgrM/dneD22FvH4G6VCQdTep
+         ZgJTksz5hkMwn9KqttobQtKCsS7lVGvpduqid1wIiWTeqcvIpKEdEXtyDEo+xjfD68/Q
+         bQAofkA+GQPvSE6Eb7Jhi+GB+NNEe7BUPXOCrR4ByvoHeNeVi775Z+jX9N13SxTjwoIo
+         GTby0LiVgwKkIHvBgvrEHeSP34V/krX/plCXpkjgSjTlykVRtOmybrXoALO8y0NLIikr
+         Ecbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788257943; x=1788862743;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/R2B4UIn9uyXdoZMfmtsPZpaGxOVNwVD5ZuxHGzJeSs=;
+        b=OXf99gK7IUKhlimLvoTxF7jsThlzYSlVMbOc3g1gWlIqplZviv8/S2Z1ekFT5QMAoZ
+         1zcfMNU+oWRSS78FntXm23s3fyiQXIy8YXaVFZsu6Agg5eAkJLJnDIl4p7JYQDth4Kwf
+         rl9idaQWSjCNSafWMKPJjnjerMkV++oD9ceNT55sWKSFfHVjGV/4de/dZV3++V0G4CnZ
+         luGftBdd00IFZi/q3RqHz93N9jM4qhPYLg3DUsPj1nkoqvkKkeoh4DobzCHFCyHVILtn
+         WlBrJjSsrCCkM1Yp6LLvUN6VRauL53Kh+73UrGWYWqsccWxHJST0n1v5S3vbjfSQPWcY
+         uAUA==
+X-Forwarded-Encrypted: i=1; AHgh+RqDjjpvXBGLan5lj15mmDzN627D5XQCpAbYsWwXFUJN3UianhuCLzJHglRjpBVKaIU2ROOKf21qJ679o4Ztopo=@vger.kernel.org
+X-Gm-Message-State: AFuF++lj0VuPf0X6wVq/GxZPL+sCjOCt1gWcU64wU+QBn8g+dQhj0dY5
+	OSJWq6uJw43OkAFDO//kzyGv7p88H6Ahct2C4W/zw48LnxmVE62XKuvsvWggd1hwjAU=
+X-Gm-Gg: AR+sD12KhZ4PBqgPnolBQAPgeoHa7qfP5kdVJeLdbxELkOx7TCrl/9cU3zf5dSXruid
+	4BBKm3RF3iUhX/yZ1VGmb9oqc/OD4ut+tBcX7F0tSexmbM1HZ0xvhVvLlpnCnpQGQMj9Wl2r2oc
+	B56qa3T3P+cHb0WakYNgsxdaGnMOHiGZ66G9NPS+g4IWc1ke7V1h3dOXl8kZ5WWJKMbhT3TwJYB
+	7uOSvZF1588GbqfxxCnbb2Ixkg4/lKMUY1M2jJRtekEVkJlIy+DE/f8g/PziaCsMmKcQtaRALtG
+	SkCfLR4Vl7ri+EUuYhyu5cr3iY1n09Cnkk9VZFj717XzmTV2K+KJamlNirNsu7S5QkGK6VYfVsx
+	jtQwDMtt5wt/iXxfH+RGMeIDPjwuJaFvC4uVtO40RVpf1KKgQdU13zB2NKU2+Wa+nXxgVRmcB3l
+	D1a1ZlV6tvEpxy/0EGcc8I2gWtdaJ25QwJ1MTGobqNhO1pgrORCo9Qi9QqmFxDHXlErpiBabdC/
+	qyNX5GFgQt0Sw/1NOKK8j6Vydv4ZbZ/bQ==
+X-Received: by 2002:a17:907:3cc4:b0:c16:6dac:a008 with SMTP id a640c23a62f3a-c25b919fe0emr274723666b.8.1788257942589;
+        Tue, 01 Sep 2026 03:19:02 -0700 (PDT)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c255ee0b388sm549393466b.5.2026.09.01.03.19.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Sep 2026 03:19:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 01 Sep 2026 12:19:01 +0200
+Message-Id: <DL3WJ9AX6P5Y.QS2RPHUIJWVL@fairphone.com>
+Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+ <linux-wireless@vger.kernel.org>, <ath11k@lists.infradead.org>, "Dmitry
+ Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v2 0/7] Enable Bluetooth and WiFi on Fairphone
+ (Gen. 6)
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Bjorn Andersson" <andersson@kernel.org>, "Konrad Dybcio"
+ <konradybcio@kernel.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Alexander Koskovich" <AKoskovich@pm.me>, "Liam Girdwood"
+ <lgirdwood@gmail.com>, "Mark Brown" <broonie@kernel.org>, "Bartosz
+ Golaszewski" <brgl@kernel.org>, "Marcel Holtmann" <marcel@holtmann.org>,
+ "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Balakrishna Godavarthi"
+ <quic_bgodavar@quicinc.com>, "Rocky Liao" <quic_rjliao@quicinc.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>, "Jeff Johnson"
+ <jjohnson@kernel.org>, "Luca Weiss" <luca.weiss@fairphone.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
+ <178820768635.1699313.4119708799289566517.b4-ty@kernel.org>
+In-Reply-To: <178820768635.1699313.4119708799289566517.b4-ty@kernel.org>
 
-  Branch: refs/heads/1138845
-  Home:   https://github.com/bluez/bluez
+Hi Bjorn,
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+On Mon Aug 31, 2026 at 10:21 PM CEST, Bjorn Andersson wrote:
+>
+> On Fri, 03 Apr 2026 15:52:46 +0200, Luca Weiss wrote:
+>> Add the required bits to enable Bluetooth and WiFi on the Milos
+>> SoC-based Fairphone (Gen. 6) smartphone.
+>>=20
+>>=20
+>
+> Applied, thanks!
+>
+> [3/7] dt-bindings: net: wireless: ath11k: Document WCN6755 WiFi
+>       commit: e506d34e57236c41cebacc43e50f35f5b52dc675
+
+Mostly checking in, are you planning to pick up the rest of the patches
+from this series as well? PATCH 1/7 (PMU dt-bindings) have been picked
+up already, and the bluetooth dt-bindings patch has an Acked-by since
+June sou you can also pick that up as far as I understand it. Then only
+dts is remaining which still appears to apply fine on latest -next.
+
+Shall I resend, or can you pick them up from this v2?
+
+Regards
+Luca
+
+>
+> Best regards,
+
