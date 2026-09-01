@@ -1,69 +1,69 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48D848CD61
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB261488213
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788285211; cv=none; b=XYQCk+32mVfOeU2mIa+E2wwGkao9RUDHN8tg+cljCbBXTx27Qvhk/yX37mg//LSmyjduE9oftKtHUM8U7dJO6K2YTnq4qS7io8AFmhn7U1X4b27MVmeMyYeiblPglsuHYUGDaMkcdm+8nxFC/t69Oo9s2Rg2AJIOh2jjaYsfNPY=
+	t=1788285212; cv=none; b=TFey2DP4xvh8FGl1G6fZoh9rR0wt36H7XslRoZPUPFVZlhbLRKcLHJzB0qZqBRP5Cp4z0MoO4gpkv5GF60UoF1NS3pUE+v0w5B9Qq9n3vQ673wMvW2TPU/OhFon/FQ2w1U7/R6hVJLGezHpOi6h10/L3FycXuQyDt37UHN5PKbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788285211; c=relaxed/simple;
-	bh=M9734yGdUzgSkwKOB5vF5O/qAYexI5eKp4wnH0vut1o=;
+	s=arc-20240116; t=1788285212; c=relaxed/simple;
+	bh=NAJIqcmkGUc3mtiWs61eByeIBiAz24RQAouuMIQDVLM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xf3M8pIptBCpWcKz7uZ9iaCLQUtETDZJEZUty6znrqe42h/JL/HelEWUizsQyuBrQ+IRcL5M/bCaVpmmWEaLcO4jGB0H3YZE6+llTs7IqGps5zbOkQGWAk92VXBpbwrZWYxbAFeQWOhjLQtpnTA3Jy0i1QQi9jcaJcJ6sUo1q1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egkRiTKf; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=s9KmgDMDVuBTOem+XiCkxTbOTeUkBI4fpaNziPC7VlCnuoYUL7ZsrzC2HYycKIFKmUws3Buto2WalWw4mVJ/Wk0QMomnP9HqPd4F/7nIRSEppWIf6TAAp7guOk4X03FOYuyxpZ9arNVlU14e5CDYdCB7j3q1JSM3h7HcwfoM0Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlgwYx59; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egkRiTKf"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5c671456e25so96741e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:53:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlgwYx59"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5c79c9f7b54so104039e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1788285209; x=1788890009; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=oUDeBylrGpOCkMt0eNat73mEqw6uTyWKQozDid23cI4=;
-        b=egkRiTKfotF/ZtCWpJ+5LjvzTIoqRAD+dYEVMhf4wwashqv4NTVyCFN6+RGXDSJ83F
-         wmeHBN952uysLvRnBEcMNRu+n6C/4CDGZUp7naspizS+/GWtCnZxekTb9QDjm5QgAD7z
-         ZzHsy4mZb/sdXYWUFn6UpJDTvv3WCoWTP72Wn4PAFS/nsVDeGHJl79b+WyHnJnkk3ZcM
-         agGWJ6E5ZG1WjRA+b0nvh/YPwf5HJrTLN3n4Mwt/Q4LZriG/zyEFVo4Y1d9KkCt71dAX
-         bxhnqUmLdmN+Svn6ALSeG2XiDQwmhNkfxv6vf0opS+/DJkMsyvTyqdEpX0tZ2IJXaPee
-         VQIQ==
+        bh=pS+Mfnjcg1IbQN9RYjwRE8/ttL7aE0IrrST4UoLLaW8=;
+        b=YlgwYx596YO1h7Saq9AbLm8/1pv4Tg6Rf/sHlpJ67DknUtJrXjJgEE6aFhzN6/6Dru
+         Yys6j28hZJlhCptflk3EdSNb1tF0DPdR6Zu9VRnlYOHQnnnzd4BXIoarzfThAByYZSji
+         T+0JvP2/ZE23v7esflrjwtsw1pL7A6vV01kMaiC8l7RxwafBwGF4cWzOni3VKLehjCk0
+         Pfo0Xq2yox93LDy5hRxDUu5jTUTc1AXymfqGwTA1jS/EZgW5y0dFtvRd0XPmX+e7P8/R
+         4c7cTxOQlVOLQ5M0Iu2BJ/ax6DqbKmw8hd0nbTXdFdxyGa4gK5JwRvZNRB72nN0sxL7o
+         636g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1788285209; x=1788890009;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=oUDeBylrGpOCkMt0eNat73mEqw6uTyWKQozDid23cI4=;
-        b=D+QtGox8auNnpuj22gCGVwZ2PpExELW7WcidYe0HL6HhYKQv7Adj5bKvgyi96qqzcs
-         fi5bAoWb9yaCA1PoRi53dt3q9FbcnSujBRwRGPyt9VrsqFKFV7ht/lnWlWoy5P1jl+WE
-         WPtCBJdy53ZS/we6J2sErQOH6oiC4vefhoDl5JPcnub7/o+fI0FOwajy3oxMndPmYg69
-         7biFs6U8kkb4VPgZjTKl5FYZlF/468JxMvj8ai0b0AxjwBlpNlNsmymtx7PmMKVNMqY/
-         T4IrS+dmf68aw86x2gsiva0iBq36qbo+tXGTUdqxc6u17uNCuAc7XgDNOPWQiAFQpqCh
-         Jj7A==
-X-Gm-Message-State: AFuF++lBPVjK5Bn+9ZJcKpS4WQNlB+ZYhzRRjSrYTbBqfMvaqynsmDfe
-	gKcA6BEF3z7YfDM6RPPKq7iSiv0XHySVJ5E0qNAY7CZGjELBauuzxbsAsDmD4jZQ
-X-Gm-Gg: AR+sD12BdZJyHYMUBVwwku6zoLH0cCeDYXmqng8i/zTeEJxywRUOZhxmp1LiilOJap3
-	xmM9IXhN8pHQZ4bb/Q/84cnEkPoDL8w876kxRgTIxgOvcJJakEeF68Y2ZKOvkfPvOOHf8WsQRBs
-	J7WZ5prdq3oX26YpCip/0lx2fx7TrhKei1jiazESSR1cEd+wB5TpGaAdcjcv5820lcRkauz1Nty
-	X9NmeNaILyXaU450ir60kRoxpwXP8bjmoEQBlYdkjKK+OvrYLybFgxPcHiTTyNK2Tk9lkiPIYv1
-	ItdbyzwRkX2NLouS2jRDi1CU+G1ANXHh7xcl8ssfEVtGu4uqfwd96KL0k9wh2FB/rikvCivWl03
-	e4JEpsAZu5zuFX8R2T9CXK5m15QEOs2wh++WTjsGX+ydMtgwusCkk7wt41n51XYJ14XcWIYZtzM
-	cSoBIgtblmxn8gUrXVplwT7Do1iquTaH8HHmQZDKTzcELrtjQvX0P2a2tUP59LaZBn7HJRkGk8U
-	dz7LfrhKgv+wMehTUl1U52/r/U8QMKV6NgCjB/oHX1LjBOeqKRhd68Ck+pTYG+BmA==
-X-Received: by 2002:a05:6122:3a19:b0:5c4:4ec2:971c with SMTP id 71dfb90a1353d-5c7c1e74d93mr2111550e0c.10.1788285208483;
-        Tue, 01 Sep 2026 10:53:28 -0700 (PDT)
+        bh=pS+Mfnjcg1IbQN9RYjwRE8/ttL7aE0IrrST4UoLLaW8=;
+        b=GVe0cFxGlFAKy7pclEhHJBofkHMJBQ3DZFhG9c/WuqBLKDhO23ApfA1ye2ci4Y4pJL
+         slvjHfubkEZhsZxdgiHdUBaAjPQFl27vOwJKOL22EaRQxJgU5Uj4g6MRsUycXFcwb1yI
+         Bryt1XYuS4ut4AwpyQeR2ro+TurR1FwWkxXC9exprtdSt78nNMeZijsAmH4Yvt3qkrqW
+         y9LsxiZbIy2hAVKqUEP+42gowT6hot5KRk06+zDIOtlPH0Kw6CS/Qo/RPI4wFxyHhpbA
+         0Re4DGdl/3Swi2fAgJXpHSaENxdZtNzRFtO9OMWzmXhg+szVkJH27otVs6/StbwH4zvk
+         0aOQ==
+X-Gm-Message-State: AFuF++lMpZfgrrKx2GFy8xNDwh4eO3+fIZO+oSPksCzcAwZpx/0kqUls
+	2cRhW5lNJgmQ8DiXVGyWFbnh5I9wwF7TVa/O3cVBICJL7l4EXcwRpYLJDdv7AN3D
+X-Gm-Gg: AYBFou3Hmfk0ZdkIG2eP5Cen64UczrJeggPNR2eNv5gBTyenumkspodBKnXnh/cpOWF
+	ED76uNftwdmocOby89K/nAEkHmfHuILxbm5awBcCpoSK8JiwpZUwLXRSVWQTHVok7RsRMOAxrgf
+	F/fCjcpGTZkpomCU/nGljxYOHOk0z2kwangbCrnGB4723YF3g/jrRAhEYwmVVRnserV0KqBvVpm
+	wc8pCXKY/CtoV+A3BzZV4qyYTbVjEQne+pFTsiUK1Bhy4m6MY8X3KtJ2dVzQp7oDjG/Ohr91HeH
+	5kvCgQoWt6jvTCSsOKbk6XCyzLtNKJp3mE0k9BHVkJuFFMVe2LUk1VdmKnLP5ipGcHqdGG+fWiH
+	038iisoS1+q1dqMQlD2XBQX229Fkyu5qmB9Xz2v8XKswZBaDZoB/CLhK1IGpcGkIP1zhUO5PdRI
+	apMf8vrBLQja+uA0sgAwh0VK7lbzmw0/HhnktKYAG7YWGcUcZxsPNTxZoRsFO3wJ7CivkeeFLAk
+	QPjx5aLisW093bd/iCpEaRnoDYIExx1mcnnq22jfGX200dftjLGvNw=
+X-Received: by 2002:a05:6122:660f:b0:5c5:ac11:9731 with SMTP id 71dfb90a1353d-5c7cf4693b1mr65972e0c.8.1788285209286;
+        Tue, 01 Sep 2026 10:53:29 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c7cd94646csm254265e0c.18.2026.09.01.10.53.27
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c7cd94646csm254265e0c.18.2026.09.01.10.53.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 01 Sep 2026 10:53:28 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/5] avrcp: Move response parsers to avrcp-parse.c
-Date: Tue,  1 Sep 2026 13:53:14 -0400
-Message-ID: <20260901175315.1348621-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 5/5] unit/test-avrcp: Add robustness tests for response parsing
+Date: Tue,  1 Sep 2026 13:53:15 -0400
+Message-ID: <20260901175315.1348621-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260901175315.1348621-1-luiz.dentz@gmail.com>
 References: <20260901175315.1348621-1-luiz.dentz@gmail.com>
@@ -77,688 +77,479 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The parsing of controller side responses lives in the middle of
-avrcp.c, interleaved with the media_player and D-Bus glue that consumes
-its results. That makes it unreachable from the unit tests: none of it
-can be called without an adapter, a device, a service and a session.
+The existing tests drive avrcp-lib.c through the AVCTP harness and all
+feed it well formed PDUs. Nothing covered what happens when a peer
+sends a response that lies about its own length, which is what the
+three preceding fixes were about.
 
-The three preceding fixes were all in this code, and none of them could
-be covered by a regression test as a result.
+Add tests under /robustness that call the parsers in avrcp-parse.c
+directly, since a response is entirely peer controlled and the parser
+is what has to survive it:
 
-Move the parsing proper to a new avrcp-parse.c, which depends on
-nothing but util_iov and log.h:
+- headers that are short, that declare more parameter bytes than were
+  received, and that declare fewer
 
-- avrcp_pull_header() and avrcp_pull_browsing_header()
-- avrcp_parse_player_attributes(), which now takes the bound on the
-  attribute array from its caller
-- avrcp_parse_attribute_list(), which reports each attribute through a
-  callback rather than calling media_player_set_metadata() itself
-- avrcp_parse_media_name(), avrcp_parse_media_element() and
-  avrcp_parse_media_folder(), which fill a plain struct rather than
-  creating media items
+- a ListPlayerApplicationSettingAttributes response declaring 255
+  attributes, which used to be written into a four byte array, and one
+  declaring more attributes than it carries
 
-struct avrcp_header, struct avrcp_browsing_header, NAME_MAX_LEN and the
-player attribute ids move to the new header, which avrcp.h now includes
-so that its users are unaffected.
+- attribute lists declaring a 0xFFFF byte value with none of it
+  present, a truncated value, a truncated attribute header, and more
+  attributes than were received
 
-The logic is unchanged; avrcp.c keeps the glue as thin wrappers.
+- media elements missing the attribute count that follows the name,
+  carrying a name longer than NAME_MAX_LEN, or declaring a name that is
+  not there, and the equivalent for media folders
+
+Each PDU is copied into a buffer of exactly its size, so that reading
+past the end of it is an out-of-bounds access rather than a read of
+whatever the receive buffer happened to hold beforehand, and the
+attribute array is surrounded by a guard so that a write past its end
+is caught without a sanitizer.
+
+Reverting the three fixes fails ten of these outright and trips
+valgrind on six more.
 
 Assisted-by: Claude:claude-opus-5 valgrind
 ---
- Makefile.plugins             |   2 +
- profiles/audio/avrcp-parse.c | 174 +++++++++++++++++++++++++++
- profiles/audio/avrcp-parse.h | 102 ++++++++++++++++
- profiles/audio/avrcp.c       | 221 +++++++----------------------------
- profiles/audio/avrcp.h       |   8 +-
- 5 files changed, 322 insertions(+), 185 deletions(-)
- create mode 100644 profiles/audio/avrcp-parse.c
- create mode 100644 profiles/audio/avrcp-parse.h
+ Makefile.am       |   4 +-
+ unit/test-avrcp.c | 395 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 398 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index ac667beda847..a73569e555fe 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -37,6 +37,8 @@ builtin_modules += avrcp
- builtin_sources += profiles/audio/control.h profiles/audio/control.c \
- 			profiles/audio/avctp.h profiles/audio/avctp.c \
- 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
-+			profiles/audio/avrcp-parse.h \
-+			profiles/audio/avrcp-parse.c \
- 			profiles/audio/avrcp-player.c
- endif
+diff --git a/Makefile.am b/Makefile.am
+index 475a344c713d..f0028cfb39f8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -674,7 +674,9 @@ unit_tests += unit/test-avrcp
+ unit_test_avrcp_SOURCES = unit/test-avrcp.c \
+ 				src/log.h src/log.c \
+ 				unit/avctp.c unit/avctp.h \
+-				unit/avrcp-lib.c unit/avrcp-lib.h
++				unit/avrcp-lib.c unit/avrcp-lib.h \
++				profiles/audio/avrcp-parse.h \
++				profiles/audio/avrcp-parse.c
+ unit_test_avrcp_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
  
-diff --git a/profiles/audio/avrcp-parse.c b/profiles/audio/avrcp-parse.c
-new file mode 100644
-index 000000000000..e0c73ec9b03a
---- /dev/null
-+++ b/profiles/audio/avrcp-parse.c
-@@ -0,0 +1,174 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 7bed8fbaf74a..e0c8971514ba 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -30,6 +30,7 @@
+ 
+ #include "unit/avctp.h"
+ #include "unit/avrcp-lib.h"
++#include "profiles/audio/avrcp-parse.h"
+ 
+ struct test_pdu {
+ 	bool valid;
+@@ -986,6 +987,398 @@ static void test_client(gconstpointer data)
+ 		avrcp_send_passthrough(context->session, 0, AVC_FAST_FORWARD);
+ }
+ 
 +/*
++ * Robustness tests for the controller side response parsers.
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Intel Corporation
-+ *
-+ *
++ * These call the parsers directly rather than going through the AVCTP
++ * harness, since responses are what the peer controls and the parsers are
++ * what has to survive them. Each PDU is copied into a buffer of exactly its
++ * size, so that reading past the end of it is an out-of-bounds access rather
++ * than a read of whatever the receive buffer happened to hold before.
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++struct robustness_test {
++	char *test_name;
++	uint8_t *data;
++	size_t size;
++	/* Expected result, or -1 if the PDU must be rejected */
++	int expected;
++};
 +
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <sys/uio.h>
++#define define_robustness_test(name, function, exp, args...)		\
++	do {								\
++		static struct robustness_test rt;			\
++		rt.test_name = g_strdup(name);				\
++		rt.data = util_memdup(data(args), sizeof(data(args)));	\
++		rt.size = sizeof(data(args));				\
++		rt.expected = exp;					\
++		tester_add(name, &rt, NULL, function, NULL);		\
++	} while (0)
 +
-+#include "src/log.h"
-+#include "src/shared/util.h"
++/* AVRCP header: BT SIG company id, pdu id, packet type, parameters length */
++#define AVRCP_HDR(pdu_id, len)						\
++	0x00, 0x19, 0x58, pdu_id, 0x00, ((len) >> 8) & 0xff, (len) & 0xff
 +
-+#include "avrcp-parse.h"
++#define X4	'x', 'x', 'x', 'x'
++#define X16	X4, X4, X4, X4
++#define X64	X16, X16, X16, X16
++#define X256	X64, X64, X64, X64
++#define LONG_NAME_260	X256, X4
 +
-+/*
-+ * Pull the AVRCP header out of iov and validate that the parameters length
-+ * it declares matches the number of bytes actually received, leaving iov
-+ * pointing at the parameters.
-+ */
-+struct avrcp_header *avrcp_pull_header(struct iovec *iov)
++static void robustness_result(struct robustness_test *rt, void *buf,
++								int result)
 +{
-+	struct avrcp_header *pdu;
++	free(buf);
 +
-+	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
-+	if (!pdu) {
-+		error("Invalid AVRCP header");
-+		return NULL;
++	if (result != rt->expected) {
++		tester_warn("%s: expected %d, got %d", rt->test_name,
++							rt->expected, result);
++		tester_test_failed();
++		return;
 +	}
 +
-+	if (be16_to_cpu(pdu->params_len) != iov->iov_len) {
-+		error("Invalid parameters");
-+		return NULL;
++	tester_test_passed();
++}
++
++static void *robustness_iov(const struct robustness_test *rt,
++							struct iovec *iov)
++{
++	iov->iov_base = util_memdup(rt->data, rt->size);
++	iov->iov_len = rt->size;
++
++	return iov->iov_base;
++}
++
++/* Expected is the number of parameter bytes left, or -1 if rejected */
++static void test_pull_header(gconstpointer data)
++{
++	struct robustness_test *rt = (void *) data;
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
++
++	if (!avrcp_pull_header(&iov)) {
++		robustness_result(rt, buf, -1);
++		return;
 +	}
 +
-+	return pdu;
++	robustness_result(rt, buf, iov.iov_len);
++}
++
++static void test_pull_browsing_header(gconstpointer data)
++{
++	struct robustness_test *rt = (void *) data;
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
++
++	if (!avrcp_pull_browsing_header(&iov)) {
++		robustness_result(rt, buf, -1);
++		return;
++	}
++
++	robustness_result(rt, buf, iov.iov_len);
 +}
 +
 +/*
-+ * Same as avrcp_pull_header() but for the browsing channel, which uses a
-+ * different header layout.
++ * The attribute count declared by the peer is what bounds the write into
++ * attrs, so surround it with a guard and check that nothing was written
++ * past its end. Expected is the number of attributes accepted.
 + */
-+struct avrcp_browsing_header *avrcp_pull_browsing_header(struct iovec *iov)
++#define ATTRS_GUARD 8
++
++static void test_player_attributes(gconstpointer data)
 +{
-+	struct avrcp_browsing_header *pdu;
-+
-+	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
-+	if (!pdu) {
-+		error("Invalid AVRCP browsing header");
-+		return NULL;
-+	}
-+
-+	if (be16_to_cpu(pdu->param_len) != iov->iov_len) {
-+		error("Invalid parameters");
-+		return NULL;
-+	}
-+
-+	return pdu;
-+}
-+
-+/*
-+ * Pull a ListPlayerApplicationSettingAttributes response body out of iov,
-+ * skipping the attributes that cannot be queried. At most max attributes are
-+ * written to attrs, which is what bounds the write.
-+ */
-+uint8_t avrcp_parse_player_attributes(struct iovec *iov, uint8_t *attrs,
-+							uint8_t max)
-+{
-+	uint8_t len, count = 0;
++	struct robustness_test *rt = (void *) data;
++	uint8_t attrs[AVRCP_ATTRIBUTE_LAST + ATTRS_GUARD];
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
++	uint8_t count;
 +	int i;
 +
-+	if (!util_iov_pull_u8(iov, &len))
-+		return 0;
++	memset(attrs, 0xaa, sizeof(attrs));
 +
-+	len = MIN(len, max);
++	if (!avrcp_pull_header(&iov)) {
++		robustness_result(rt, buf, -1);
++		return;
++	}
 +
-+	for (i = 0; i < len; i++) {
-+		uint8_t attr;
++	count = avrcp_parse_player_attributes(&iov, attrs,
++						AVRCP_ATTRIBUTE_LAST);
 +
-+		if (!util_iov_pull_u8(iov, &attr))
-+			break;
-+
-+		/* Don't query invalid attributes */
-+		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
-+					attr > AVRCP_ATTRIBUTE_LAST)
++	for (i = 0; i < ATTRS_GUARD; i++) {
++		if (attrs[AVRCP_ATTRIBUTE_LAST + i] == 0xaa)
 +			continue;
 +
-+		attrs[count++] = attr;
++		tester_warn("%s: wrote %u bytes past the end of attrs",
++					rt->test_name, ATTRS_GUARD - i);
++		free(buf);
++		tester_test_failed();
++		return;
 +	}
 +
-+	return count;
++	robustness_result(rt, buf, count);
 +}
 +
-+void avrcp_parse_attribute_list(struct iovec *iov, uint8_t count,
-+					avrcp_attribute_func_t func,
-+					void *user_data)
-+{
-+	for (; count > 0; count--) {
-+		struct avrcp_attribute attr;
-+
-+		if (!util_iov_pull_be32(iov, &attr.id) ||
-+				!util_iov_pull_be16(iov, &attr.charset) ||
-+				!util_iov_pull_be16(iov, &attr.len))
-+			return;
-+
-+		attr.value = util_iov_pull_mem(iov, attr.len);
-+		if (!attr.value)
-+			return;
-+
-+		func(&attr, user_data);
-+	}
-+}
-+
-+bool avrcp_parse_media_name(struct iovec *iov, char *name)
-+{
-+	uint16_t namelen;
-+	uint8_t *namebuf;
-+
-+	if (!util_iov_pull_be16(iov, &namelen))
-+		return false;
-+
-+	namebuf = util_iov_pull_mem(iov, namelen);
-+	if (!namebuf)
-+		return false;
-+
-+	namelen = MIN(namelen, NAME_MAX_LEN - 1);
-+
-+	memset(name, 0, NAME_MAX_LEN);
-+	memcpy(name, namebuf, namelen);
-+	strtoutf8(name, namelen);
-+
-+	return true;
-+}
-+
-+bool avrcp_parse_media_element(struct iovec *iov,
-+					struct avrcp_media_element *element)
-+{
-+	/* Skip the media type and character set */
-+	if (!util_iov_pull_be64(iov, &element->uid) || !util_iov_pull(iov, 3))
-+		return false;
-+
-+	if (!avrcp_parse_media_name(iov, element->name))
-+		return false;
-+
-+	if (!util_iov_pull_u8(iov, &element->count))
-+		return false;
-+
-+	return true;
-+}
-+
-+bool avrcp_parse_media_folder(struct iovec *iov,
-+					struct avrcp_media_folder *folder)
-+{
-+	/* Skip the character set */
-+	if (!util_iov_pull_be64(iov, &folder->uid) ||
-+			!util_iov_pull_u8(iov, &folder->type) ||
-+			!util_iov_pull_u8(iov, &folder->playable) ||
-+			!util_iov_pull(iov, 2))
-+		return false;
-+
-+	if (!avrcp_parse_media_name(iov, folder->name))
-+		return false;
-+
-+	return true;
-+}
-diff --git a/profiles/audio/avrcp-parse.h b/profiles/audio/avrcp-parse.h
-new file mode 100644
-index 000000000000..1a27c0684b32
---- /dev/null
-+++ b/profiles/audio/avrcp-parse.h
-@@ -0,0 +1,102 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Intel Corporation
-+ *
-+ *
-+ */
-+
-+#ifndef __AVRCP_PARSE_H
-+#define __AVRCP_PARSE_H
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <sys/uio.h>
-+
-+#define NAME_MAX_LEN 255
-+
-+/* player attributes */
-+#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
-+#define AVRCP_ATTRIBUTE_EQUALIZER	0x01
-+#define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
-+#define AVRCP_ATTRIBUTE_SHUFFLE		0x03
-+#define AVRCP_ATTRIBUTE_SCAN		0x04
-+#define AVRCP_ATTRIBUTE_LAST		AVRCP_ATTRIBUTE_SCAN
-+
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
-+
-+struct avrcp_header {
-+	uint8_t company_id[3];
-+	uint8_t pdu_id;
-+	uint8_t packet_type:2;
-+	uint8_t rsvd:6;
-+	uint16_t params_len;
-+	uint8_t params[0];
-+} __attribute__ ((packed));
-+
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+
-+struct avrcp_header {
-+	uint8_t company_id[3];
-+	uint8_t pdu_id;
-+	uint8_t rsvd:6;
-+	uint8_t packet_type:2;
-+	uint16_t params_len;
-+	uint8_t params[0];
-+} __attribute__ ((packed));
-+
-+#else
-+#error "Unknown byte order"
-+#endif
-+
-+#define AVRCP_HEADER_LENGTH 7
-+
-+struct avrcp_browsing_header {
-+	uint8_t pdu_id;
-+	uint16_t param_len;
-+	uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_BROWSING_HEADER_LENGTH 3
-+
-+struct avrcp_attribute {
-+	uint32_t id;
-+	uint16_t charset;
-+	uint16_t len;
-+	uint8_t *value;
-+};
-+
-+struct avrcp_media_element {
-+	uint64_t uid;
-+	char name[NAME_MAX_LEN];
-+	uint8_t count;
-+};
-+
-+struct avrcp_media_folder {
-+	uint64_t uid;
-+	uint8_t type;
-+	uint8_t playable;
-+	char name[NAME_MAX_LEN];
-+};
-+
-+typedef void (*avrcp_attribute_func_t)(const struct avrcp_attribute *attr,
-+							void *user_data);
-+
-+struct avrcp_header *avrcp_pull_header(struct iovec *iov);
-+struct avrcp_browsing_header *avrcp_pull_browsing_header(struct iovec *iov);
-+
-+uint8_t avrcp_parse_player_attributes(struct iovec *iov, uint8_t *attrs,
-+							uint8_t max);
-+
-+void avrcp_parse_attribute_list(struct iovec *iov, uint8_t count,
-+					avrcp_attribute_func_t func,
-+					void *user_data);
-+
-+bool avrcp_parse_media_name(struct iovec *iov, char *name);
-+bool avrcp_parse_media_element(struct iovec *iov,
-+					struct avrcp_media_element *element);
-+bool avrcp_parse_media_folder(struct iovec *iov,
-+					struct avrcp_media_folder *folder);
-+
-+#endif /* __AVRCP_PARSE_H */
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index aff3b5ce21a2..df5f97eafc88 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -52,6 +52,7 @@
- 
- #include "avctp.h"
- #include "avrcp.h"
-+#include "avrcp-parse.h"
- #include "control.h"
- #include "media.h"
- #include "player.h"
-@@ -145,46 +146,9 @@
- #define AVRCP_SCOPE_SEARCH				0x02
- #define AVRCP_SCOPE_NOW_PLAYING			0x03
- 
--#define NAME_MAX_LEN 255
--
--#if __BYTE_ORDER == __LITTLE_ENDIAN
--
--struct avrcp_header {
--	uint8_t company_id[3];
--	uint8_t pdu_id;
--	uint8_t packet_type:2;
--	uint8_t rsvd:6;
--	uint16_t params_len;
--	uint8_t params[0];
--} __attribute__ ((packed));
--#define AVRCP_HEADER_LENGTH 7
--
--#elif __BYTE_ORDER == __BIG_ENDIAN
--
--struct avrcp_header {
--	uint8_t company_id[3];
--	uint8_t pdu_id;
--	uint8_t rsvd:6;
--	uint8_t packet_type:2;
--	uint16_t params_len;
--	uint8_t params[0];
--} __attribute__ ((packed));
--#define AVRCP_HEADER_LENGTH 7
--
--#else
--#error "Unknown byte order"
--#endif
--
- #define AVRCP_MTU	(AVC_MTU - AVC_HEADER_LENGTH)
- #define AVRCP_PDU_MTU	(AVRCP_MTU - AVRCP_HEADER_LENGTH)
- 
--struct avrcp_browsing_header {
--	uint8_t pdu_id;
--	uint16_t param_len;
--	uint8_t params[0];
--} __attribute__ ((packed));
--#define AVRCP_BROWSING_HEADER_LENGTH 3
--
- struct get_folder_items_rsp {
- 	uint8_t status;
- 	uint16_t uid_counter;
-@@ -2260,52 +2224,6 @@ static const char *status_to_string(uint8_t status)
- 	}
- }
- 
--/*
-- * Pull the AVRCP header out of iov and validate that the parameters length
-- * it declares matches the number of bytes actually received, leaving iov
-- * pointing at the parameters.
-- */
--static struct avrcp_header *avrcp_pull_header(struct iovec *iov)
--{
--	struct avrcp_header *pdu;
--
--	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
--	if (!pdu) {
--		error("Invalid AVRCP header");
--		return NULL;
--	}
--
--	if (be16_to_cpu(pdu->params_len) != iov->iov_len) {
--		error("Invalid parameters");
--		return NULL;
--	}
--
--	return pdu;
--}
--
--/*
-- * Same as avrcp_pull_header() but for the browsing channel, which uses a
-- * different header layout.
-- */
--static struct avrcp_browsing_header *avrcp_pull_browsing_header(
--							struct iovec *iov)
--{
--	struct avrcp_browsing_header *pdu;
--
--	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
--	if (!pdu) {
--		error("Invalid AVRCP browsing header");
--		return NULL;
--	}
--
--	if (be16_to_cpu(pdu->param_len) != iov->iov_len) {
--		error("Invalid parameters");
--		return NULL;
--	}
--
--	return pdu;
--}
--
- static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
-@@ -2452,8 +2370,7 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
- 	struct iovec iov = { operands, operand_count };
- 	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
- 	struct avrcp *session = user_data;
--	uint8_t len, count = 0;
--	int i;
-+	uint8_t count;
- 
- 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
- 		return FALSE;
-@@ -2461,25 +2378,7 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
- 	if (!avrcp_pull_header(&iov))
- 		return FALSE;
- 
--	if (!util_iov_pull_u8(&iov, &len))
--		return FALSE;
--
--	len = MIN(len, AVRCP_ATTRIBUTE_LAST);
--
--	for (i = 0; i < len; i++) {
--		uint8_t attr;
--
--		if (!util_iov_pull_u8(&iov, &attr))
--			break;
--
--		/* Don't query invalid attributes */
--		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
--					attr > AVRCP_ATTRIBUTE_LAST)
--			continue;
--
--		attrs[count++] = attr;
--	}
--
-+	count = avrcp_parse_player_attributes(&iov, attrs, sizeof(attrs));
- 	if (!count)
- 		return FALSE;
- 
-@@ -2505,34 +2404,38 @@ static void avrcp_list_player_attributes(struct avrcp *session)
- 					session);
- }
- 
--static void avrcp_parse_attribute_list(struct avrcp_player *player,
-+struct parse_attribute_data {
-+	struct media_player *mp;
-+	struct media_item *item;
-+};
-+
-+static void parse_attribute(const struct avrcp_attribute *attr,
++static void count_attribute(const struct avrcp_attribute *attr,
 +							void *user_data)
 +{
-+	struct parse_attribute_data *data = user_data;
-+	const char *key;
++	unsigned int *count = user_data;
++	unsigned int sum = 0;
++	uint16_t i;
 +
-+	if (attr->charset != 106)
-+		return;
++	/* Read the whole value so that a bogus length is caught */
++	for (i = 0; i < attr->len; i++)
++		sum += attr->value[i];
 +
-+	key = metadata_to_str(attr->id);
-+	if (key == NULL)
-+		return;
++	(void) sum;
 +
-+	media_player_set_metadata(data->mp, data->item, key, attr->value,
-+								attr->len);
++	(*count)++;
 +}
 +
-+static void avrcp_player_parse_attributes(struct avrcp_player *player,
- 					struct media_item *item,
- 					struct iovec *iov, uint8_t count)
- {
--	struct media_player *mp = player->user_data;
-+	struct parse_attribute_data data = {
-+		.mp = player->user_data,
-+		.item = item,
-+	};
- 
--	for (; count > 0; count--) {
--		uint32_t id;
--		uint16_t charset, len;
--		uint8_t *value;
--
--		if (!util_iov_pull_be32(iov, &id) ||
--				!util_iov_pull_be16(iov, &charset) ||
--				!util_iov_pull_be16(iov, &len))
--			return;
--
--		value = util_iov_pull_mem(iov, len);
--		if (!value)
--			return;
--
--		if (charset == 106) {
--			const char *key = metadata_to_str(id);
--
--			if (key != NULL)
--				media_player_set_metadata(mp, item, key,
--								value, len);
--		}
--	}
-+	avrcp_parse_attribute_list(iov, count, parse_attribute, &data);
- }
- 
- static void avrcp_abort_continuing(struct avrcp *session, uint8_t pdu_id)
-@@ -2589,7 +2492,7 @@ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
- 
- 	item = media_player_set_playlist_item(mp, player->uid);
- 
--	avrcp_parse_attribute_list(player, item, &iov, count);
-+	avrcp_player_parse_attributes(player, item, &iov, count);
- 
- 	media_player_metadata_changed(mp);
- 
-@@ -2671,57 +2574,28 @@ static const char *subtype_to_string(uint32_t subtype)
- 	return "None";
- }
- 
--static gboolean parse_media_name(struct iovec *iov, char *name)
--{
--	uint16_t namelen;
--	uint8_t *namebuf;
--
--	if (!util_iov_pull_be16(iov, &namelen))
--		return FALSE;
--
--	namebuf = util_iov_pull_mem(iov, namelen);
--	if (!namebuf)
--		return FALSE;
--
--	namelen = MIN(namelen, NAME_MAX_LEN - 1);
--
--	memset(name, 0, NAME_MAX_LEN);
--	memcpy(name, namebuf, namelen);
--	strtoutf8(name, namelen);
--
--	return TRUE;
--}
--
- static struct media_item *parse_media_element(struct avrcp *session,
- 							struct iovec *iov)
- {
- 	struct avrcp_player *player;
- 	struct media_player *mp;
- 	struct media_item *item;
--	char name[NAME_MAX_LEN];
--	uint64_t uid;
--	uint8_t count;
++/* Expected is the number of attributes reported */
++static void test_attribute_list(gconstpointer data)
++{
++	struct robustness_test *rt = (void *) data;
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
++	unsigned int count = 0;
++	uint8_t number;
++
++	if (!avrcp_pull_header(&iov) || !util_iov_pull_u8(&iov, &number)) {
++		robustness_result(rt, buf, -1);
++		return;
++	}
++
++	avrcp_parse_attribute_list(&iov, number, count_attribute, &count);
++
++	robustness_result(rt, buf, count);
++}
++
++/* Expected is the declared attribute count, or -1 if rejected */
++static void test_media_element(gconstpointer data)
++{
++	struct robustness_test *rt = (void *) data;
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
 +	struct avrcp_media_element element;
- 
--	/* Skip the media type and character set */
--	if (!util_iov_pull_be64(iov, &uid) || !util_iov_pull(iov, 3))
--		return NULL;
--
--	if (!parse_media_name(iov, name))
--		return NULL;
--
--	if (!util_iov_pull_u8(iov, &count))
-+	if (!avrcp_parse_media_element(iov, &element))
- 		return NULL;
- 
- 	player = session->controller->player;
- 	mp = player->user_data;
- 
--	item = media_player_create_item(mp, name, PLAYER_ITEM_TYPE_AUDIO, uid);
-+	item = media_player_create_item(mp, element.name,
-+					PLAYER_ITEM_TYPE_AUDIO, element.uid);
- 	if (item == NULL)
- 		return NULL;
- 
- 	media_item_set_playable(item, true);
- 
--	avrcp_parse_attribute_list(player, item, iov, count);
-+	avrcp_player_parse_attributes(player, item, iov, element.count);
- 
- 	return item;
- }
-@@ -2732,26 +2606,17 @@ static struct media_item *parse_media_folder(struct avrcp *session,
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
- 	struct media_item *item;
--	char name[NAME_MAX_LEN];
--	uint64_t uid;
--	uint8_t type;
--	uint8_t playable;
++
++	if (!avrcp_parse_media_element(&iov, &element)) {
++		robustness_result(rt, buf, -1);
++		return;
++	}
++
++	/* The name must always be truncated to fit */
++	if (strlen(element.name) >= NAME_MAX_LEN) {
++		tester_warn("%s: name not truncated", rt->test_name);
++		free(buf);
++		tester_test_failed();
++		return;
++	}
++
++	robustness_result(rt, buf, element.count);
++}
++
++/* Expected is the playable flag, or -1 if rejected */
++static void test_media_folder(gconstpointer data)
++{
++	struct robustness_test *rt = (void *) data;
++	struct iovec iov;
++	void *buf = robustness_iov(rt, &iov);
 +	struct avrcp_media_folder folder;
++
++	if (!avrcp_parse_media_folder(&iov, &folder)) {
++		robustness_result(rt, buf, -1);
++		return;
++	}
++
++	if (strlen(folder.name) >= NAME_MAX_LEN) {
++		tester_warn("%s: name not truncated", rt->test_name);
++		free(buf);
++		tester_test_failed();
++		return;
++	}
++
++	robustness_result(rt, buf, folder.playable);
++}
++
++static void define_robustness_tests(void)
++{
++	/*
++	 * Responses do not go through handle_vendordep_pdu(), so nothing
++	 * validated the declared parameters length against the number of
++	 * bytes actually received.
++	 */
++
++	/* One byte short of a complete header */
++	define_robustness_test("/robustness/header/short",
++			test_pull_header, -1,
++			0x00, 0x19, 0x58, 0x10, 0x00, 0x00);
++
++	/* Declares 16 parameter bytes but carries one */
++	define_robustness_test("/robustness/header/truncated",
++			test_pull_header, -1,
++			AVRCP_HDR(0x10, 16), 0x04);
++
++	/* Declares fewer parameter bytes than were received */
++	define_robustness_test("/robustness/header/overlong",
++			test_pull_header, -1,
++			AVRCP_HDR(0x10, 1), 0x04, 0x01, 0x02);
++
++	define_robustness_test("/robustness/header/valid",
++			test_pull_header, 2,
++			AVRCP_HDR(0x10, 2), 0x01, 0x04);
++
++	define_robustness_test("/robustness/browsing-header/short",
++			test_pull_browsing_header, -1,
++			0x71, 0x00);
++
++	/* Declares 32 parameter bytes but carries one */
++	define_robustness_test("/robustness/browsing-header/truncated",
++			test_pull_browsing_header, -1,
++			0x71, 0x00, 0x20, 0x04);
++
++	define_robustness_test("/robustness/browsing-header/valid",
++			test_pull_browsing_header, 2,
++			0x71, 0x00, 0x02, 0x04, 0x01);
++
++	/*
++	 * ListPlayerApplicationSettingAttributes response, see
++	 * GHSA-m2vx-pw5f-rc8v. The declared count is what bounds the write
++	 * into a four byte array.
++	 */
++
++	/* Declares and carries 255 valid attributes */
++	define_robustness_test("/robustness/player-attributes/overflow",
++			test_player_attributes, AVRCP_ATTRIBUTE_LAST,
++			AVRCP_HDR(0x11, 21), 0xff,
++			0x01, 0x02, 0x03, 0x04, 0x01, 0x02, 0x03, 0x04,
++			0x01, 0x02, 0x03, 0x04, 0x01, 0x02, 0x03, 0x04,
++			0x01, 0x02, 0x03, 0x04);
++
++	/* Declares four attributes but carries two */
++	define_robustness_test("/robustness/player-attributes/truncated",
++			test_player_attributes, 2,
++			AVRCP_HDR(0x11, 3), 0x04, 0x01, 0x02);
++
++	/* Declares one attribute but carries none */
++	define_robustness_test("/robustness/player-attributes/empty",
++			test_player_attributes, 0,
++			AVRCP_HDR(0x11, 1), 0x01);
++
++	/* Illegal and out of range attributes must be skipped */
++	define_robustness_test("/robustness/player-attributes/illegal",
++			test_player_attributes, 1,
++			AVRCP_HDR(0x11, 5), 0x04,
++			AVRCP_ATTRIBUTE_ILLEGAL, 0x7f,
++			AVRCP_ATTRIBUTE_SHUFFLE, 0xff);
++
++	/*
++	 * GetElementAttributes and GetItemAttributes carry variable length
++	 * attribute values which were never bounds checked.
++	 */
++
++	/* Declares a 0xFFFF byte value with none of it present */
++	define_robustness_test("/robustness/attribute-list/huge-len",
++			test_attribute_list, 0,
++			AVRCP_HDR(0x20, 9), 0x01,
++			0x00, 0x00, 0x00, 0x01,		/* Title */
++			0x00, 0x6a,			/* UTF-8 */
++			0xff, 0xff);			/* value length */
++
++	/* Declares a four byte value but carries two */
++	define_robustness_test("/robustness/attribute-list/truncated-value",
++			test_attribute_list, 0,
++			AVRCP_HDR(0x20, 11), 0x01,
++			0x00, 0x00, 0x00, 0x01,
++			0x00, 0x6a,
++			0x00, 0x04,
++			'a', 'b');
++
++	/* Declares one attribute but carries a partial header for it */
++	define_robustness_test("/robustness/attribute-list/truncated-header",
++			test_attribute_list, 0,
++			AVRCP_HDR(0x20, 4), 0x01,
++			0x00, 0x00, 0x00);
++
++	/* Declares 255 attributes but carries one */
++	define_robustness_test("/robustness/attribute-list/count-overrun",
++			test_attribute_list, 1,
++			AVRCP_HDR(0x20, 12), 0xff,
++			0x00, 0x00, 0x00, 0x01,
++			0x00, 0x6a,
++			0x00, 0x03,
++			'a', 'b', 'c');
++
++	define_robustness_test("/robustness/attribute-list/valid",
++			test_attribute_list, 2,
++			AVRCP_HDR(0x20, 18), 0x02,
++			0x00, 0x00, 0x00, 0x01,
++			0x00, 0x6a,
++			0x00, 0x01, 'a',
++			0x00, 0x00, 0x00, 0x02,
++			0x00, 0x6a,
++			0x00, 0x00);
++
++	/* Media element and folder entries of a GetFolderItems response */
++
++	/* UID, media type and character set only, no name length */
++	define_robustness_test("/robustness/media-element/truncated",
++			test_media_element, -1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x02, 0x00, 0x6a);
++
++	/* Declares a 0xFFFF byte name with none of it present */
++	define_robustness_test("/robustness/media-element/huge-name",
++			test_media_element, -1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x02, 0x00, 0x6a,
++			0xff, 0xff);
++
++	/*
++	 * The name is complete but the attribute count byte that follows it
++	 * is not present. This is the off-by-one that used to read
++	 * operands[13 + namesize].
++	 */
++	define_robustness_test("/robustness/media-element/no-count",
++			test_media_element, -1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x02, 0x00, 0x6a,
++			0x00, 0x03, 'a', 'b', 'c');
++
++	/* A name longer than NAME_MAX_LEN must be truncated, not overflow */
++	define_robustness_test("/robustness/media-element/long-name",
++			test_media_element, 0,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x02, 0x00, 0x6a,
++			0x01, 0x04,	/* 260 byte name */
++			LONG_NAME_260,
++			0x00);
++
++	define_robustness_test("/robustness/media-element/valid",
++			test_media_element, 1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2a,
++			0x02, 0x00, 0x6a,
++			0x00, 0x03, 'a', 'b', 'c',
++			0x01);
++
++	/* UID, folder type and playable flag only */
++	define_robustness_test("/robustness/media-folder/truncated",
++			test_media_folder, -1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x01, 0x01);
++
++	define_robustness_test("/robustness/media-folder/huge-name",
++			test_media_folder, -1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++			0x01, 0x01, 0x00, 0x6a,
++			0xff, 0xff, 'a');
++
++	define_robustness_test("/robustness/media-folder/valid",
++			test_media_folder, 1,
++			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
++			0x01, 0x01, 0x00, 0x6a,
++			0x00, 0x03, 'a', 'b', 'c');
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+@@ -2080,5 +2473,7 @@ int main(int argc, char *argv[])
+ 				0x00, 0x19, 0x58, AVRCP_ABORT_CONTINUING,
+ 				0x00, 0x00, 0x00));
  
--	/* Skip the character set */
--	if (!util_iov_pull_be64(iov, &uid) ||
--			!util_iov_pull_u8(iov, &type) ||
--			!util_iov_pull_u8(iov, &playable) ||
--			!util_iov_pull(iov, 2))
-+	if (!avrcp_parse_media_folder(iov, &folder))
- 		return NULL;
- 
--	if (!parse_media_name(iov, name))
--		return NULL;
--
--	item = media_player_create_folder(mp, name, type, uid);
-+	item = media_player_create_folder(mp, folder.name, folder.type,
-+								folder.uid);
- 	if (!item)
- 		return NULL;
- 
--	media_item_set_playable(item, playable & 0x01);
-+	media_item_set_playable(item, folder.playable & 0x01);
- 
- 	return item;
++	define_robustness_tests();
++
+ 	return tester_run();
  }
-@@ -3043,7 +2908,7 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
- 
- 	item = media_player_set_playlist_item(mp, player->uid);
- 
--	avrcp_parse_attribute_list(player, item, &iov, count);
-+	avrcp_player_parse_attributes(player, item, &iov, count);
- 
- 	media_player_metadata_changed(mp);
- 
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index 21351a4bc422..9f72c2ed4413 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -9,13 +9,7 @@
-  *
-  */
- 
--/* player attributes */
--#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
--#define AVRCP_ATTRIBUTE_EQUALIZER	0x01
--#define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
--#define AVRCP_ATTRIBUTE_SHUFFLE		0x03
--#define AVRCP_ATTRIBUTE_SCAN		0x04
--#define AVRCP_ATTRIBUTE_LAST		AVRCP_ATTRIBUTE_SCAN
-+#include "avrcp-parse.h"
- 
- /* equalizer values */
- #define AVRCP_EQUALIZER_OFF		0x01
 -- 
 2.54.0
 
