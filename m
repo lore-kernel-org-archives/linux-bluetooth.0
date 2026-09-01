@@ -1,124 +1,129 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8070747ACE8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 10:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3FB47A0C7
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 11:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788257947; cv=none; b=HqLeNzqBZG0F3t4kybO5SbadK4Rj8nHGmP4yVwfdlHk/R1NiljOuvgZ2HYvMlriM30JM/D4GJ/GInNPKiiLkPUqQ7hHcoUJ9kUQ4xdzsfQckqBdCKsjBEmNWirAjFJbzF1cYFzN7/OXEqFLKJyY6q54jMK76g+2FVWM+Y+ESdlA=
+	t=1788260452; cv=none; b=DIjsyvh+V5pycqB5JijIlrFsv0TX+KAL/mOuvrSP49X47sSXz+IwQWdOsfXNNZX2TIIZJ+Dkv/amMH8FwD9SDFqxcmEHe6NfNG5i7bM1vLj+bkcUH5X7jBO5dIIk53il0Bno5DrmcrSdz3MiwV50BZyw/rSxoUx7m9j+Nil5ItI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788257947; c=relaxed/simple;
-	bh=EIrNvUHDstHHjeFO3U3xOZlTlAPgkrzoxREHv2U3uN0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=OeiZOpqb5tflTk1kVwaF0RPG9F32gImUbZbsZNRujcr+HDb75hs49m3/vUAcEmHohwH6PqJVk7EsFyMSCkbHTaUAvsLEvAk7y2+RXlzykcJOY9iD4M1vznVoxBNuZPzYQvYx7ROVGgvENCQln9S9kLec8VoZKOSFzrbwVPfBRa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=frvFdlTO; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1788260452; c=relaxed/simple;
+	bh=ZSNtgLnqj7yCZ9IVfEDOtv57ABA5afUyh+BQ2GbE+j8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZxjBmtZuaOkXtr+4QBDSpyppoNRV3weA1yF+5c5fQkxYQk6jbnak5PTk8GcYmFSYTd2ZctfdferssFyZZ/+dfYtg46z/YPfuWKAWwTuNQ+ZSEPd80/HBKHd2vSaJlqtWAvbBlIh0jVDrK+1bYYW/lT0XcpPOpVfn4venvZH0P9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=H3CyCZzC; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="frvFdlTO"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c2569aa5116so138822566b.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 03:19:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="H3CyCZzC"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-395cf2535acso1036396a91.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 04:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1788257943; x=1788862743; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=/R2B4UIn9uyXdoZMfmtsPZpaGxOVNwVD5ZuxHGzJeSs=;
-        b=frvFdlTOqgkCeW2YCZUfPilvQBCXd3N7umri5bdQa722FT9DT5tia80QY2a26O2crW
-         Hdn4WstmCXvtJXAKql6MNWiUf+eRBL1c6tC0PrvTGHa3LgrM/dneD22FvH4G6VCQdTep
-         ZgJTksz5hkMwn9KqttobQtKCsS7lVGvpduqid1wIiWTeqcvIpKEdEXtyDEo+xjfD68/Q
-         bQAofkA+GQPvSE6Eb7Jhi+GB+NNEe7BUPXOCrR4ByvoHeNeVi775Z+jX9N13SxTjwoIo
-         GTby0LiVgwKkIHvBgvrEHeSP34V/krX/plCXpkjgSjTlykVRtOmybrXoALO8y0NLIikr
-         Ecbw==
+        d=nebusec.ai; s=google; t=1788260450; x=1788865250; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=7H+0enYBY2wXPZSc/uyeVXByB0vOHBLdS6OdHDM8C4Y=;
+        b=H3CyCZzCcCm02AQfSxkdxQf3rVg9UNen+DISU3m9Nz98ixRb2CAQJtRvvPubspPbVF
+         IaoSYYOwK4kDjW6Es8f5iDJzkKdRwHKx7CqAyivzQOV9Wg3fp4QeI3Hmvtjk5VhqZv9w
+         OCiV+7lr8B2+AvmjvwUCAH60O7bfRRY2NCYZ7tJo2svORtRgD70mj0/1gzkKqwFmBG5b
+         4PMq0fNnS/6nNx+zl6eca9FBj5vWkiNsw2IwK3/2S3CMuNowi4VlddohzjSUaracOWvm
+         rF1s7oXkeuyds7cp7K/hzMQH6npyZG8hsEWsx3i2+kD/Ngh4qyxy4rwEYyGDNtC+yg+x
+         6a/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788257943; x=1788862743;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/R2B4UIn9uyXdoZMfmtsPZpaGxOVNwVD5ZuxHGzJeSs=;
-        b=OXf99gK7IUKhlimLvoTxF7jsThlzYSlVMbOc3g1gWlIqplZviv8/S2Z1ekFT5QMAoZ
-         1zcfMNU+oWRSS78FntXm23s3fyiQXIy8YXaVFZsu6Agg5eAkJLJnDIl4p7JYQDth4Kwf
-         rl9idaQWSjCNSafWMKPJjnjerMkV++oD9ceNT55sWKSFfHVjGV/4de/dZV3++V0G4CnZ
-         luGftBdd00IFZi/q3RqHz93N9jM4qhPYLg3DUsPj1nkoqvkKkeoh4DobzCHFCyHVILtn
-         WlBrJjSsrCCkM1Yp6LLvUN6VRauL53Kh+73UrGWYWqsccWxHJST0n1v5S3vbjfSQPWcY
-         uAUA==
-X-Forwarded-Encrypted: i=1; AHgh+RqDjjpvXBGLan5lj15mmDzN627D5XQCpAbYsWwXFUJN3UianhuCLzJHglRjpBVKaIU2ROOKf21qJ679o4Ztopo=@vger.kernel.org
-X-Gm-Message-State: AFuF++lj0VuPf0X6wVq/GxZPL+sCjOCt1gWcU64wU+QBn8g+dQhj0dY5
-	OSJWq6uJw43OkAFDO//kzyGv7p88H6Ahct2C4W/zw48LnxmVE62XKuvsvWggd1hwjAU=
-X-Gm-Gg: AR+sD12KhZ4PBqgPnolBQAPgeoHa7qfP5kdVJeLdbxELkOx7TCrl/9cU3zf5dSXruid
-	4BBKm3RF3iUhX/yZ1VGmb9oqc/OD4ut+tBcX7F0tSexmbM1HZ0xvhVvLlpnCnpQGQMj9Wl2r2oc
-	B56qa3T3P+cHb0WakYNgsxdaGnMOHiGZ66G9NPS+g4IWc1ke7V1h3dOXl8kZ5WWJKMbhT3TwJYB
-	7uOSvZF1588GbqfxxCnbb2Ixkg4/lKMUY1M2jJRtekEVkJlIy+DE/f8g/PziaCsMmKcQtaRALtG
-	SkCfLR4Vl7ri+EUuYhyu5cr3iY1n09Cnkk9VZFj717XzmTV2K+KJamlNirNsu7S5QkGK6VYfVsx
-	jtQwDMtt5wt/iXxfH+RGMeIDPjwuJaFvC4uVtO40RVpf1KKgQdU13zB2NKU2+Wa+nXxgVRmcB3l
-	D1a1ZlV6tvEpxy/0EGcc8I2gWtdaJ25QwJ1MTGobqNhO1pgrORCo9Qi9QqmFxDHXlErpiBabdC/
-	qyNX5GFgQt0Sw/1NOKK8j6Vydv4ZbZ/bQ==
-X-Received: by 2002:a17:907:3cc4:b0:c16:6dac:a008 with SMTP id a640c23a62f3a-c25b919fe0emr274723666b.8.1788257942589;
-        Tue, 01 Sep 2026 03:19:02 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c255ee0b388sm549393466b.5.2026.09.01.03.19.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Sep 2026 03:19:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788260450; x=1788865250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=7H+0enYBY2wXPZSc/uyeVXByB0vOHBLdS6OdHDM8C4Y=;
+        b=rGMaVMi4RZR8TA1ecfD9YiXi4W50qFrahR+UcAdjZlgIWxEuJJ1gi+NuK1BM5S/f6C
+         EycHrZhhJ4paJ/QCFQIrN2v7Vct8aRaHM/bGOHekSpasnXN4s3odexSmdtP9sTtieHCj
+         hMerj+EOK8vvDlMxEWwFE+RFX7HTrvVg80vd1RZDEzaSzedGXCldCHMv4ZHr+QH9tIoD
+         AQGUPvcMwmVTR+F4t7C/k36qolmzK5cO+rHrQjiHpecyD7Lw+dkNu0jRQyaya9ipnzrl
+         uFHFW9sknfTkSHSOUniN78fOoQzg4DsBsPJRxnWFuV+PhbWHe24zl1KL9BfUvq1qmYXy
+         9cAw==
+X-Gm-Message-State: AFuF++kkL492juzwCPW+I0U49o7GbfmNd3K1wk+veCFf2d2o2tT3DHEj
+	wR13QbDrqoFimaskaopE2nr/8dcsIxI4/R1lPJwGgy2H7nQ6zTQkuIfXF3OA+8KqwlXmGDnnbmo
+	HWSHB8A==
+X-Gm-Gg: AYBFou0/dBFaUt77C/kSC0jHepYmomdq8nY/ZnjiAx1ugP2l39OKRSudEL/ypgZXTSV
+	9Ic9lxXGdUlScaB5SKnf2eR0AMZNHxeO+adCgrrGtKMuMON0CMp2aXhUqxk0hal894uVzSJmBEB
+	5XynrVO1vYwOE63cDa1i74i5VMW1ikvddhIY0a9o5iZIwcm1K0PKjFVY/B4zWYIamwxSx3LvkRB
+	/fUO1MPhPiwsovhepMqL5su9FHNuO6VqoFp590xfRsdUo+gkfKL0keTxcwftQoHPfLTsmsdXb8l
+	oYpc+aGX+yfks/dldyVyYG/8/Ce6g7pmL8gHkyySgkVXW64Zq8HdTYmWrZyRsZhT+y+K0u34LzN
+	MtVdXbthCm3Rr1kn4QJbS7yF9Ad5KMDKHRTBLLF6xUvXtqBJd5ze5eOLFHvjfAMLUrly2nSX9fj
+	J+tEykMVBXwsfKVybhDAmm8aQ47qTHtViht0QsutpFLxv2JQ8iA3mogd8Rxq/P9BvFiGHUMAQ=
+X-Received: by 2002:a17:90b:1d02:b0:398:9bd3:d6d1 with SMTP id 98e67ed59e1d1-3990f835cd7mr3679962a91.11.1788260450049;
+        Tue, 01 Sep 2026 04:00:50 -0700 (PDT)
+Received: from enjou-Legion-Y7000P-2019 ([167.71.204.91])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3990d75fc49sm5472245a91.12.2026.09.01.04.00.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 04:00:49 -0700 (PDT)
+From: Ren Wei <weir@nebusec.ai>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	mcchou@chromium.org,
+	mmandlik@google.com,
+	alainm@chromium.org,
+	abhishekpandit@chromium.org,
+	edragain@163.com,
+	weir@nebusec.ai
+Subject: [PATCH v3 0/1] Bluetooth: msft: fix vendor event use-after-free during open
+Date: Tue,  1 Sep 2026 19:00:38 +0800
+Message-ID: <20260901110039.2399040-1-weir@nebusec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 01 Sep 2026 12:19:01 +0200
-Message-Id: <DL3WJ9AX6P5Y.QS2RPHUIJWVL@fairphone.com>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
- <linux-wireless@vger.kernel.org>, <ath11k@lists.infradead.org>, "Dmitry
- Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v2 0/7] Enable Bluetooth and WiFi on Fairphone
- (Gen. 6)
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Bjorn Andersson" <andersson@kernel.org>, "Konrad Dybcio"
- <konradybcio@kernel.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Alexander Koskovich" <AKoskovich@pm.me>, "Liam Girdwood"
- <lgirdwood@gmail.com>, "Mark Brown" <broonie@kernel.org>, "Bartosz
- Golaszewski" <brgl@kernel.org>, "Marcel Holtmann" <marcel@holtmann.org>,
- "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Balakrishna Godavarthi"
- <quic_bgodavar@quicinc.com>, "Rocky Liao" <quic_rjliao@quicinc.com>,
- "Johannes Berg" <johannes@sipsolutions.net>, "Jeff Johnson"
- <jjohnson@kernel.org>, "Luca Weiss" <luca.weiss@fairphone.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
- <178820768635.1699313.4119708799289566517.b4-ty@kernel.org>
-In-Reply-To: <178820768635.1699313.4119708799289566517.b4-ty@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Bjorn,
+From: Yong Wang <edragain@163.com>
 
-On Mon Aug 31, 2026 at 10:21 PM CEST, Bjorn Andersson wrote:
->
-> On Fri, 03 Apr 2026 15:52:46 +0200, Luca Weiss wrote:
->> Add the required bits to enable Bluetooth and WiFi on the Milos
->> SoC-based Fairphone (Gen. 6) smartphone.
->>=20
->>=20
->
-> Applied, thanks!
->
-> [3/7] dt-bindings: net: wireless: ath11k: Document WCN6755 WiFi
->       commit: e506d34e57236c41cebacc43e50f35f5b52dc675
+Hi Linux maintainers,
 
-Mostly checking in, are you planning to pick up the rest of the patches
-from this series as well? PATCH 1/7 (PMU dt-bindings) have been picked
-up already, and the bluetooth dt-bindings patch has an Acked-by since
-June sou you can also pick that up as far as I understand it. Then only
-dts is remaining which still appears to apply fine on latest -next.
+This patch fixes a race between `msft_do_open()` and `msft_vendor_evt()`.
 
-Shall I resend, or can you pick them up from this v2?
+Commit 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a
+hci_dev's life cycle") changed the open path to reuse the live
+`hdev->msft_data` object across power cycles. As a result,
+`msft_do_open()` may replace `msft->evt_prefix` while vendor events are
+still being processed during device initialization.
 
-Regards
-Luca
+At the same time, `msft_vendor_evt()` reads `hdev->msft_data` and checks
+the event prefix before taking `hci_dev_lock()`. This can race with the
+open path and lead to a use-after-free on the prefix buffer, and on the
+failure path it can also observe stale `msft_data` state.
 
->
-> Best regards,
+Fix this by reading the supported feature data into temporary storage
+first and only publishing the updated MSFT state while holding
+`hci_dev_lock()`. Also make `msft_vendor_evt()` take `hci_dev_lock()`
+before inspecting the published MSFT state.
 
+We tested the fix and verified that the crash no longer occurs. We also
+verified that the existing MSFT monitor functionality still works.
+
+Thanks,
+Yong
+
+Changes in v2:
+- Rework the cover letter to present this as a race/UAF fix rather than
+  a security issue.
+- Trim reproducer details that are not needed for patch review.
+- No functional code changes.
+v1 Link: https://lore.kernel.org/all/ea4efa51cc3be16d3eb7726fe5486f0be6c47907.1786092373.git.edragain@163.com/
+
+Changes in v3:
+- Rebase onto the current net tree after 0079e1a94463
+  ("Bluetooth: MSFT: validate evt_prefix_len against the response length")
+- No functional code changes
+v2 Link: https://lore.kernel.org/all/cover.1787048594.git.edragain@163.com/
+
+Yong Wang (1):
+  Bluetooth: msft: fix vendor event use-after-free during open
+
+ net/bluetooth/msft.c | 70 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 43 insertions(+), 27 deletions(-)
+
+-- 
+2.53.0
