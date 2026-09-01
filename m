@@ -1,153 +1,168 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50132395D8B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788285113; cv=pass; b=fhD9ZGrmeec7eOALFxuoNljZBH9rP0oevr54yv5EmDFuKsJjVdizH72AsovTmt0T2jP/j52Spj/oEzZEciw5swlinANZx4VIW+aGPEAQd9DsviMDuFBe/JK4nbFyq/y1nV5crJxTvmt78MpS8uJ2DHf1XK0hlhKqlyaW7HwM8ho=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788285113; c=relaxed/simple;
-	bh=kvFnBJeULaVm/uVhGyNWBySi4ORvM+a1Vtn+FFnLVmU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LvgHtZ1HxgPdEUOpLBhZVxkyZW+kDWazjUrBrbaAm1xqmv2q9q81OZxTbcysM+XFZJ1EXPPGrT1p1MNi/Pz4u8+3KVlSL/kcDMmqMCOzv6PQfZ/hj39OTf/ENtOgzWMgzD/QsjqaeQr/wgKNARsDoKO0WV4BcT5ars5WOV2/D3A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=UZN+x6Ws; arc=pass smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D481448CD77
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788285208; cv=none; b=cklMqDygTf3cex2s/7f++uIMhM7nlLJivY8LdLakmaRhlKWjoOy9lgfTy6ttnvHng6IJ483z0SUNp2V+GKsC6YkUuDUMRMH66G8q+iPW75yEnUHvlSGkPPgn8Wt7vkt2me+g5/uXlcO4jryIwBMfDLYuVK9UXWwKut6SFxW/y1Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788285208; c=relaxed/simple;
+	bh=s8vCrFexOS2KE/slAAZZzqxfqbpSWJKepHDJzpxD4o0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dyANT+nf6arWynPIst7Ro2I+yHYyBR5gfR3GiIeOJ632bhJJ7MdZkxqhZElW/kQB0OW7oQMwimD/bopB/AaP5UhNtn/a0h2i9XvlsmuGn2bXZrR5u1irv1P/OC/5dUTJzGMmLWiGtQc7cL/0Ta6sAh/aT2s4zOjDmqKutb01jmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TWgqfQhK; arc=none smtp.client-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="UZN+x6Ws"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-46f415ce6deso31711fac.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:51:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788285110; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jGOjaGaUDi89H7rxDx/Mp5byUB9J10cKVzGq6VcvHZdy0accLNWSlrahSDSVTt/VJs
-         BxYaQm+hFrblx4tbUKgtWaHOWDH0E7tzR+7AObB5jU1ZXcK9qr7P7pgvp9/C1X+FdIO5
-         eNo7i/6gL3EOqPJGp/uzuLo0zbxOMNK5x6f5qXYFTpNt10cn4WFcLYKk45qm8PcM0jrd
-         Pu8VNFZiW2zu4aSjRmal15quRJqz2I0VIgRimTAmpn1psaeTrNTQN1ZpV3gqA3WvBGz0
-         WLFc4nwYUNO2kuGHDbJm4SFPKfraiYUjxspw43z/osG27OgD8nEDyB9ikWfzQZQqWYq5
-         /kxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=sU9oGXUSflDX61aLIimJd+BpAxgwuYS61cFuI/ULLFE=;
-        fh=E1Z79MlpcxsOhsl5ZdiRRAvpoRvJ7yrNR+SNAwfUVxc=;
-        b=GO/yMer0EwQcsgHB/rgm36vQH6q+F+tSmKU9cBLaXp4F7KKj2rEaOzImcGKCVvQHP3
-         S5T96ZQmbAqTmOawVWo89m5jYNyD8xXc5/o0ptfuthEi4fc9XSmfCAoI6s2+FohgF9YP
-         c0ZITPTwrBsQidxf5bRSjWPI9rOJOG5L770tUhIJ6w9XOKmn0WToI+E6GCNEdNO0EVKc
-         S5UNjkU8Zq+bmp3e+p4ZKa5xLsh1uZau8jvrCPin1e6vzXb6xCyMXRIDk9a02Hqnmbg6
-         RPStiecV9boOO5wlo4Jy1p3xFNqJbnNpG8OlxbifaGIn+Emm5bQ3IbWVTtmcGSdKTLEt
-         I/IA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TWgqfQhK"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5c65d654c23so87988e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:53:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=irregular.at; s=google; t=1788285110; x=1788889910; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sU9oGXUSflDX61aLIimJd+BpAxgwuYS61cFuI/ULLFE=;
-        b=UZN+x6WsDZcNYDB4WX4938gF20ZF3eS8pKGhr+Y5hUhpy0QHe6u+TmApEStPZv81s1
-         Umia9DMxwpT4/2IffoSOZ+wBXpNzjHFZIRWkwBMcuyQtaXgxuXU+3gCBhQ8B2kW0GUWF
-         u94Pr4B696LsYbBHq9E2qcwL0L8M7ExcKX6Qc=
+        d=gmail.com; s=20251104; t=1788285206; x=1788890006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KAPi1r0cWV1jTxnu5fkIUJbNKZ9UXFm72YLmBbwsawk=;
+        b=TWgqfQhKwB9Nd+EOysDgzkgLBNO/wmsLXhJ/UvndDbAPxN+bvH/5npI2mdC+TaDRcp
+         VIjblIkBEBQ0mBVZPFIAVDni0ncSkWSC+UtVihbJpANzlb+5W51lmmedPh0PLbl1z1C2
+         BK5EPe7ukwwxj04sDJ+iuoLSyTahQzAMAa0HAxCt19GCYsfhVAU7F73NjynuGhfJhOI2
+         8DpTtkSt4zRt00bb/+NNpo6S/ABLzNl5mro39ooqoYz86Xdv2QycJtBibuP+En1Zjq5M
+         OeqfENtDikp0HAezGpm8/LWQTv9M2OPOXD2+jgNSHM7x8+ryaYfJccsur0Dq5W8PiZ2F
+         n7HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788285110; x=1788889910;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=sU9oGXUSflDX61aLIimJd+BpAxgwuYS61cFuI/ULLFE=;
-        b=AljO11LDTyHnJT2mxUCCsjcGKU4Pd38C26CQcjFVtX/grLXe87fpWf+2lRyOmXcULz
-         r75PYECRUX7GH+PXxQo+3Sa5AUWfeiqwEA7DY0n4/4zTT/20IiGEZ1pqbGapqTMQDayI
-         O0uUfpgc+k1O81m0uY2nDpLW0Iln+iI/7v8Emvo+HSgmfvyQGohcUwspw/mOgS+tEkQc
-         PK7x7NBnzCv1gDD/rkuCf+offAbCewLnV7CloA4muHHEGuJdCd0A0VQawIeVHze5KFMj
-         5VWUvM5+40otZG0Ya1FTmdgiwgkKuEXmOpuZOBagfmTD+XX0ZMOrDVlDrz8b5NwN5kbx
-         73Fg==
-X-Gm-Message-State: AFuF++nO4FRRsqqOF58Zn/g6sL6XYPiZ7VputkM0VRuxYhEeVIq/5QqR
-	+JeZf2Tr2e4w99XvRoZ9DyORxweKnn3W6dRL+F/tZVnWVXa7862N/NqBPdbipCVNmNPdyYa81F8
-	feH2nXjUiHPJSQZJ8JpRUiUSbzrCeL1FKGZ+zyhRvU1p3ZeN6j9nvxX5uRQ==
-X-Gm-Gg: AR+sD13fySA+n36tWCtGm+7as9w3TdLzC6Vk3P/4gXOLjJoh9JRX30ZRfL5xPAUS87b
-	NxRoNJKB8uB8Wmui5L5R1mrJdh0X2Ypm3RDS5y1wDwloJqm6kzX6xkSbd1WXkWZ08oulgPSWiDQ
-	tGcNzfNesKHQl6QwP/E7eZII7ZWiuQjNa4mfE2tDyPzzMisE6kE5Ya9CLbIWBLMROotk8qZhxPK
-	2cA8ywFS3ryvkqSGwCKp53Bvd3PtMvAMpw/0ABolJMcyolsB0Dxx37ttt+UmiTJyG6gU6mMp12j
-	6Lr7/6mOnAsR4uaXSYBxfhLQw6OCn6Rnu6ETYYpeRC/UYJdbnlWmln3Y3vbe1O0qlay5GI1bxpj
-	ZAzmVPfa3wH1NYwPU1WXnA14BfiwRJDpHVmau7oDmhzFSE8r5PviBkM5SvPNTab4=
-X-Received: by 2002:a05:6871:89d9:20b0:469:fb51:b351 with SMTP id
- 586e51a60fabf-469fb51d5b7mr16447432fac.17.1788285110029; Tue, 01 Sep 2026
- 10:51:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788285206; x=1788890006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=KAPi1r0cWV1jTxnu5fkIUJbNKZ9UXFm72YLmBbwsawk=;
+        b=GLWHeAJQCCn8WrrveFRLYhC4UXvVlk/GY1qkMpGwqZgXkhBQAYTSxCqYBDvqTG7rdv
+         kfQzgNCjTrjFBstlPuua6tbmnx30jHlhsUr7xrKTz5hz8izWiJDObiSdh0/BWJdn/28R
+         NHuIk/ovNkH+Ja3yfbhiBtF1lPc+k2pHnGksaur4ZAGz7AC5Kyksk0iP1g2Hu2SxPIyU
+         +dZkBpPOcqy6eDhDofZBg1IssI7EAziwHdGhkJnTI7sl8hBP07zD9WigCHozeJHf7VBT
+         RXZYLau4Yidv4F/AU032EfdQ0T/IdiceSpxQw5lgPnVx0ZlYB3a43XqaAa8sBC6V1EbG
+         xTRg==
+X-Gm-Message-State: AFuF++lY5d1NMv5KB9YbDYnuhg0OnKaXjri7qAqY/7ILggLtT1cx3pq+
+	ji2OzfsOmFP6OjVqnJa0t5wJ7Byg3RZR5mOHDVkoKtpz05XsMQ8G3+/jW9w+SquE
+X-Gm-Gg: AYBFou3/cYUtS2mNw3pq/mnj4m/pjp0nEefAup7omk9bUDsnY8uKgpmL7+RmdoDcZHj
+	zZYvlUluO7SP6fyPsy1CfA9jgQ6N1FHbwdFb+QuISFm4iK2oR/OPMYra89v39ePJ9WNOO5IH7yT
+	p77fLQd5ZgT1z55ddmGDJH/vh6Y/LbtiWbv2Wp/tYAb/yBk5tZm8kmOzPrvUE6pgiJZ7ML3l9YY
+	ElsGrvcqAIpPYgFF7RefC3H5yfr+Dn9k3xFwJDmicP1izp6rfAA9H2imfM2NJzi8hKg8VgUFGlM
+	SMNaM10tDZFKCB7PueRaoNg/z4veNQ3HZL+c1HMB477xRPQoVSTIAyjv802vJR08Mpud8giFN12
+	c3LJfZNfFco0xERiJAdzjvNjsDA3q5R3GMwPGQaw8/k9HU+4YNtqP8E5qqzBRgINKdat9LYgV7m
+	EBiK26sWUE+02yl2AXqd8SbjkqFfgEeLZvnhU0Ud/Ezxm96X885TZyTdDuWZ2YOc+yGIOJpJOyK
+	zNy2zq80RT6kVkkKX7t326kA2RPHxEbnphczw/RYbB3yDOC8jii5k4=
+X-Received: by 2002:a05:6122:660d:b0:56f:6cc0:681e with SMTP id 71dfb90a1353d-5c7bdea38c9mr5361628e0c.1.1788285205558;
+        Tue, 01 Sep 2026 10:53:25 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c7cd94646csm254265e0c.18.2026.09.01.10.53.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 10:53:25 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/5] avrcp: Fix out-of-bounds parsing of ListPlayerAttributes response
+Date: Tue,  1 Sep 2026 13:53:11 -0400
+Message-ID: <20260901175315.1348621-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1787327795.git.m.kurz@irregular.at> <CAO=2mx7zXHmahddsPMaDAZ=2zOdonYOE2nvJB__S6ORU_by3-A@mail.gmail.com>
- <CABBYNZLBvSo+gM5tjRL052tuhj+Ki+Zb7KucAWqs=2nszreoAA@mail.gmail.com>
-In-Reply-To: <CABBYNZLBvSo+gM5tjRL052tuhj+Ki+Zb7KucAWqs=2nszreoAA@mail.gmail.com>
-From: Matthias Kurz <m.kurz@irregular.at>
-Date: Tue, 1 Sep 2026 19:51:35 +0200
-X-Gm-Features: AcwNN1XPuB28OYYA-LBQwMa7h8wg8GUof0WZ1vVGIiivO47ssSU73Pouo8PajJ8
-Message-ID: <CAO=2mx6PV0B5i289kEz24mqhvdm2rhUttPqVEJRHYxkYgK5m8g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/4] Add component batteries and Fast Pair
- Message Stream
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+From: Bastien Nocera <hadess@hadess.net>
 
-Thanks for taking a look.
+In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp() parsed the
+response using hand-computed offsets into the operands buffer, without
+accounting for the fact that operand_count spans the 7 byte AVRCP header
+as well as the parameters:
 
-I captured the HFP negotiation with the Pixel Buds Pro. The session
-negotiates the standard HF Indicator 2 (Battery Level), and the buds
-send:
+- attrs is a 4 byte array which could be written out-of-bounds if a
+  length greater than 4 was declared in the first parameter byte.
 
-    AT+BIEV=2,93
+- The attribute bytes were read with a bound derived from operand_count,
+  so a truncated response could be read past its end. As the receive
+  buffer is reused across packets, those stale bytes could be echoed
+  back to the peer in the following GetCurrentPlayerValue request.
 
-The existing stack publishes this through a single Battery1 interface
-on the Device1 path. The standard HFP battery indicator has no component
-identifier, so it cannot distinguish the left bud, right bud, and case.
-The Fast Pair Device Information message is the only source I have
-observed for those three separate values.
+- params_len was compared against count, which was only ever 0 at that
+  point, so the length of the PDU was in practice never validated.
 
-Although Fast Pair is Google-specific, the relevant Message Stream and
-battery wire formats are publicly documented. The battery path works
-after ordinary Bluetooth pairing; it does not use Google's account-based
-pairing flow or a cloud service.
+Parse the response through a struct iovec using the util_iov_pull_*
+helpers instead, so that the header and each subsequent field are bounds
+checked as they are consumed and the remaining length is tracked for us.
+This lets params_len be validated against the actual number of parameter
+bytes received. The attribute count is still clamped to
+AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
 
-I am willing to maintain the Fast Pair code long-term and follow up on
-bugs, review feedback, and protocol changes.
+Reported-by: @ax-nnlabs
+Closes: https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
+---
+ profiles/audio/avrcp.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
-If the Fast Pair plugin remains in BlueZ, I will move the unit-testable
-parser to src/shared/fastpair.{c,h} as a separate commit. Google
-publishes wire-format examples and certification guidance containing
-applicable battery scenarios, but I have not found a public
-protocol-level parser-vector suite. I can mirror the published examples
-and applicable certification cases in the unit tests.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 3271b84782e8..906f93424872 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2395,31 +2395,49 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
+ 					uint8_t transaction, uint8_t *operands,
+ 					size_t operand_count, void *user_data)
+ {
++	struct iovec iov = { operands, operand_count };
+ 	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+ 	struct avrcp *session = user_data;
+-	struct avrcp_header *pdu = (void *) operands;
++	struct avrcp_header *pdu;
+ 	uint8_t len, count = 0;
+ 	int i;
+ 
+ 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
+ 		return FALSE;
+ 
+-	len = pdu->params[0];
++	pdu = util_iov_pull_mem(&iov, sizeof(*pdu));
++	if (!pdu) {
++		error("Invalid AVRCP header");
++		return FALSE;
++	}
+ 
+-	if (be16_to_cpu(pdu->params_len) < count) {
++	if (be16_to_cpu(pdu->params_len) != iov.iov_len) {
+ 		error("Invalid parameters");
+ 		return FALSE;
+ 	}
+ 
+-	for (i = 0; len > 0; len--, i++) {
++	if (!util_iov_pull_u8(&iov, &len))
++		return FALSE;
++
++	len = MIN(len, AVRCP_ATTRIBUTE_LAST);
++
++	for (i = 0; i < len; i++) {
++		uint8_t attr;
++
++		if (!util_iov_pull_u8(&iov, &attr))
++			break;
++
+ 		/* Don't query invalid attributes */
+-		if (pdu->params[i + 1] == AVRCP_ATTRIBUTE_ILLEGAL ||
+-				pdu->params[i + 1] > AVRCP_ATTRIBUTE_LAST)
++		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
++					attr > AVRCP_ATTRIBUTE_LAST)
+ 			continue;
+ 
+-		attrs[count++] = pdu->params[i + 1];
++		attrs[count++] = attr;
+ 	}
+ 
++	if (!count)
++		return FALSE;
++
+ 	avrcp_get_current_player_value(session, attrs, count);
+ 
+ 	return FALSE;
+-- 
+2.54.0
 
-The complete path has been tested with real Pixel Buds Pro through
-BlueZ, UPower, and KDE Plasma. The related downstream work is here:
-
-UPower:
-https://gitlab.freedesktop.org/mkurz/upower/-/commits/fastpair-multi-battery
-
-Solid:
-https://invent.kde.org/frameworks/solid/-/merge_requests/264
-
-PowerDevil:
-https://invent.kde.org/plasma/powerdevil/-/merge_requests/666
-
-To reduce the review size, I can split the next revision into a core
-multiple-battery Battery1/BatteryProvider1 series and a separate Fast
-Pair RFC while we decide where the latter belongs.
-
-If Fast Pair should live outside BlueZ, is there an existing component
-you have in mind? PipeWire's BlueZ backend already uses the external
-Profile1 and BatteryProvider1 interfaces, but a vendor-specific,
-non-audio battery protocol may also be outside its scope. Otherwise,
-would you expect this to become a new standalone daemon?
-
-The external architecture is viable: test/test-fastpair already
-demonstrates using RegisterProfile together with BatteryProvider1.
-
-Would that split be your preferred direction?
-
-Regards,
-Matthias
