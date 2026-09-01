@@ -1,69 +1,69 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2081748F824
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48D848CD61
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2026 17:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788285211; cv=none; b=WL2+ijm4mNlyUtUxZ7L4LV1Y2V05nJyDQinZAu8rTqix/mYcmiM6tSbMq2uvO90nPLhs7uVDZazO01n8hg56i752Hk+DS+Lr+XpVbTqcu9FlUzOQ8NB934t7mdzQGTwjmf/P9MDSRHqLhTUcF+MYPKkJHJMlIKJkAz53oHjuC7o=
+	t=1788285211; cv=none; b=XYQCk+32mVfOeU2mIa+E2wwGkao9RUDHN8tg+cljCbBXTx27Qvhk/yX37mg//LSmyjduE9oftKtHUM8U7dJO6K2YTnq4qS7io8AFmhn7U1X4b27MVmeMyYeiblPglsuHYUGDaMkcdm+8nxFC/t69Oo9s2Rg2AJIOh2jjaYsfNPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788285211; c=relaxed/simple;
-	bh=xhKG5kfILqqIblKIClGBCcjzVoL8DkL3BfICKBHwDFo=;
+	bh=M9734yGdUzgSkwKOB5vF5O/qAYexI5eKp4wnH0vut1o=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sNkIfOs6NtwG/o3x05jlTVkA57NZhBdHkNQ4soQBU0LnDr86JuyE5seM+HK3UhzxhHvfhS/975UWaMXuk55cScjrURi/fS7qXl7ctTVAh9DODX3j4zwFNbh4mAZ1B1Pmgb4x35vyfa9PVuuReJT2zkQx6E9vGVvEmINZyFOm+7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NsRAjgxc; arc=none smtp.client-ip=209.85.221.181
+	 MIME-Version; b=Xf3M8pIptBCpWcKz7uZ9iaCLQUtETDZJEZUty6znrqe42h/JL/HelEWUizsQyuBrQ+IRcL5M/bCaVpmmWEaLcO4jGB0H3YZE6+llTs7IqGps5zbOkQGWAk92VXBpbwrZWYxbAFeQWOhjLQtpnTA3Jy0i1QQi9jcaJcJ6sUo1q1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egkRiTKf; arc=none smtp.client-ip=209.85.221.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NsRAjgxc"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5bfa6766cf6so115868e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:53:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egkRiTKf"
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5c671456e25so96741e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 10:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788285208; x=1788890008; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788285209; x=1788890009; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=4Gyf653BbXeFlJzvSXIOGn0SSetT4VhMkDfH+lUfnys=;
-        b=NsRAjgxclQBR/YXl6wk1vmYbVEglpZb2P9BN70zc9+tzkiY1O4DRiOZVs+wI1lV627
-         tuzJ1hjL1VzW3pzuposLNCKwrY7/GrtXWrk4YwF+BUme1Pio6zzk/coAakfUUO+B5snO
-         FZVcTJLfRbLt+/ZaeFf85mG8Y/UZdC/5/KjJ96MYvkA+q9nkmPEBepyDDssIS/9uXggA
-         sQ+d1c+DtgnI6iqqPK3ntUnewGYDrEmdIH31cSa/dXdRvbKTBmRnETABZUpsz3ry+PNN
-         GcXYFPySVW77nrT912sQ2OmmXKTTYTEVy2+IrV4adDpVgcgd9VBUZtR6mDsDigEREvks
-         R0Rg==
+        bh=oUDeBylrGpOCkMt0eNat73mEqw6uTyWKQozDid23cI4=;
+        b=egkRiTKfotF/ZtCWpJ+5LjvzTIoqRAD+dYEVMhf4wwashqv4NTVyCFN6+RGXDSJ83F
+         wmeHBN952uysLvRnBEcMNRu+n6C/4CDGZUp7naspizS+/GWtCnZxekTb9QDjm5QgAD7z
+         ZzHsy4mZb/sdXYWUFn6UpJDTvv3WCoWTP72Wn4PAFS/nsVDeGHJl79b+WyHnJnkk3ZcM
+         agGWJ6E5ZG1WjRA+b0nvh/YPwf5HJrTLN3n4Mwt/Q4LZriG/zyEFVo4Y1d9KkCt71dAX
+         bxhnqUmLdmN+Svn6ALSeG2XiDQwmhNkfxv6vf0opS+/DJkMsyvTyqdEpX0tZ2IJXaPee
+         VQIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788285208; x=1788890008;
+        d=1e100.net; s=20251104; t=1788285209; x=1788890009;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=4Gyf653BbXeFlJzvSXIOGn0SSetT4VhMkDfH+lUfnys=;
-        b=q2UpbGlvkEwYLaFEt05u0CPlJr3gh4Kxbfa8Rc20hngcvPLYbC/b0ckolT5tB0qeVF
-         jfumBZujKHfyKjynK8fTLgObrwZ6QNqaY6v+wDCGYUyNkT8+YbG1FoZwcbtniVwVFKfW
-         Ls2aJa8rtABRC/wmWkI2EenJYV2RM8tGdgOacLUiQG9R+QreMZi/ixh3IgG5GEPPwZxA
-         dnfyIYN+UzSUu2OFscEFzZHP3thcYhsvKfF6KJx9JjPSiBz1c5GEhRsP3dwh+3GZlRYx
-         gTBZjFXbyO3HR3rzXxuXSUMyJ9Re35wR6A4pIaxo6s/OXzbJbbAfxWtx9NDYzVuuuW0X
-         GSMg==
-X-Gm-Message-State: AFuF++l9s0VTQ4OvV9pL9BFuIbzV5lc1r+OOpL596rtNCjHZcuOLdMyD
-	Tp1aXKa9wPlc5q9ygzySvsSuQbONrxbVfqgFt6af9XOM02RDcdLmgauk7Qj8hNBN
-X-Gm-Gg: AR+sD12/ZSOK30uwX9viAVLhRm9X9nfOKTgr0OsbkJFbXEEWqkOEsOjtEtpgct/KdBz
-	oUqlKCD+Hny2C8y+KTZk2wuzLkp5cFWoOt0wp1G6IuRWRtGAmAp3BNdncPLhBU6KnBmjnFzmXq9
-	xxoJ8DLXKPmr0MoeRE7nCyks32OHHnv8NIteaUesjO5+H6+YSbJZSZjSLmzguFa/ftXPz3HJzbr
-	1Zqfes/OGL+u+ID+yrzxfRNzFO7dXKxSKQygpG8bUh9SqZ3PGe6ynRCqXUTOl22hzIQMRpK/mfy
-	Q4mjvw1IN3dsBRPIbwTqtRVC/d19HPrKO0iZRF5Di88MNixpA6yIBH7isJvdYsCL3OS5nAm93GV
-	XRYrkKoUgerXCaPpOpTAUphoGb84+AuBWCgYtYt/sJXbD86m58UIacFFFKellFAYy7+Achl+fqe
-	3rLsCkbTJxICsUTqoAVr/ffsJ+t4NEy/9FPPe2rzGqRqKWMukeh7CJ9lBE8WV81ywS0pYXbgpsY
-	aAGWG47QFWofEeztdESWaAVhCQbw9KNDlkvKuMczNB6jR7ZRKhGrPM=
-X-Received: by 2002:a05:6122:32d6:b0:5c6:6da6:7ce with SMTP id 71dfb90a1353d-5c7cf34eef3mr73304e0c.3.1788285207740;
-        Tue, 01 Sep 2026 10:53:27 -0700 (PDT)
+        bh=oUDeBylrGpOCkMt0eNat73mEqw6uTyWKQozDid23cI4=;
+        b=D+QtGox8auNnpuj22gCGVwZ2PpExELW7WcidYe0HL6HhYKQv7Adj5bKvgyi96qqzcs
+         fi5bAoWb9yaCA1PoRi53dt3q9FbcnSujBRwRGPyt9VrsqFKFV7ht/lnWlWoy5P1jl+WE
+         WPtCBJdy53ZS/we6J2sErQOH6oiC4vefhoDl5JPcnub7/o+fI0FOwajy3oxMndPmYg69
+         7biFs6U8kkb4VPgZjTKl5FYZlF/468JxMvj8ai0b0AxjwBlpNlNsmymtx7PmMKVNMqY/
+         T4IrS+dmf68aw86x2gsiva0iBq36qbo+tXGTUdqxc6u17uNCuAc7XgDNOPWQiAFQpqCh
+         Jj7A==
+X-Gm-Message-State: AFuF++lBPVjK5Bn+9ZJcKpS4WQNlB+ZYhzRRjSrYTbBqfMvaqynsmDfe
+	gKcA6BEF3z7YfDM6RPPKq7iSiv0XHySVJ5E0qNAY7CZGjELBauuzxbsAsDmD4jZQ
+X-Gm-Gg: AR+sD12BdZJyHYMUBVwwku6zoLH0cCeDYXmqng8i/zTeEJxywRUOZhxmp1LiilOJap3
+	xmM9IXhN8pHQZ4bb/Q/84cnEkPoDL8w876kxRgTIxgOvcJJakEeF68Y2ZKOvkfPvOOHf8WsQRBs
+	J7WZ5prdq3oX26YpCip/0lx2fx7TrhKei1jiazESSR1cEd+wB5TpGaAdcjcv5820lcRkauz1Nty
+	X9NmeNaILyXaU450ir60kRoxpwXP8bjmoEQBlYdkjKK+OvrYLybFgxPcHiTTyNK2Tk9lkiPIYv1
+	ItdbyzwRkX2NLouS2jRDi1CU+G1ANXHh7xcl8ssfEVtGu4uqfwd96KL0k9wh2FB/rikvCivWl03
+	e4JEpsAZu5zuFX8R2T9CXK5m15QEOs2wh++WTjsGX+ydMtgwusCkk7wt41n51XYJ14XcWIYZtzM
+	cSoBIgtblmxn8gUrXVplwT7Do1iquTaH8HHmQZDKTzcELrtjQvX0P2a2tUP59LaZBn7HJRkGk8U
+	dz7LfrhKgv+wMehTUl1U52/r/U8QMKV6NgCjB/oHX1LjBOeqKRhd68Ck+pTYG+BmA==
+X-Received: by 2002:a05:6122:3a19:b0:5c4:4ec2:971c with SMTP id 71dfb90a1353d-5c7c1e74d93mr2111550e0c.10.1788285208483;
+        Tue, 01 Sep 2026 10:53:28 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c7cd94646csm254265e0c.18.2026.09.01.10.53.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2026 10:53:27 -0700 (PDT)
+        Tue, 01 Sep 2026 10:53:28 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/5] avrcp: Use util_iov helpers to parse responses
-Date: Tue,  1 Sep 2026 13:53:13 -0400
-Message-ID: <20260901175315.1348621-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/5] avrcp: Move response parsers to avrcp-parse.c
+Date: Tue,  1 Sep 2026 13:53:14 -0400
+Message-ID: <20260901175315.1348621-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260901175315.1348621-1-luiz.dentz@gmail.com>
 References: <20260901175315.1348621-1-luiz.dentz@gmail.com>
@@ -77,58 +77,92 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Every controller side response callback parsed the PDU with hand
-computed offsets into the operands buffer. None of them validated the
-declared parameters length against the number of bytes actually
-received: unlike commands, responses do not go through
-handle_vendordep_pdu(), so nothing did it on their behalf. Several read
-past the end of the receive buffer as a result, for example:
+The parsing of controller side responses lives in the middle of
+avrcp.c, interleaved with the media_player and D-Bus glue that consumes
+its results. That makes it unreachable from the unit tests: none of it
+can be called without an adapter, a device, a service and a session.
 
-- avrcp_get_capabilities_resp() read pdu->params[1 + count] for a count
-  taken from the response itself, with no length check at all, and then
-  shifted by the resulting event id without bounding it.
+The three preceding fixes were all in this code, and none of them could
+be covered by a regression test as a result.
 
-- avrcp_player_value_rsp() bounded its loop with
+Move the parsing proper to a new avrcp-parse.c, which depends on
+nothing but util_iov and log.h:
 
-      if (pdu->params_len < count * 2)
+- avrcp_pull_header() and avrcp_pull_browsing_header()
+- avrcp_parse_player_attributes(), which now takes the bound on the
+  attribute array from its caller
+- avrcp_parse_attribute_list(), which reports each attribute through a
+  callback rather than calling media_player_set_metadata() itself
+- avrcp_parse_media_name(), avrcp_parse_media_element() and
+  avrcp_parse_media_folder(), which fill a plain struct rather than
+  creating media items
 
-  comparing a big endian field without byte swapping it, so on little
-  endian the check passes for practically any value.
+struct avrcp_header, struct avrcp_browsing_header, NAME_MAX_LEN and the
+player attribute ids move to the new header, which avrcp.h now includes
+so that its users are unaffected.
 
-- avrcp_get_play_status_rsp() only checked params_len, which is supplied
-  by the peer, and read nine bytes on the strength of it.
+The logic is unchanged; avrcp.c keeps the glue as thin wrappers.
 
-- avrcp_set_browsed_player_rsp() indexed folder names relative to
-  pdu->params but bounded them against operand_count, which also spans
-  the browsing header.
-
-Add avrcp_pull_header() and avrcp_pull_browsing_header(), which pull the
-respective header out of a struct iovec and check that the length it
-declares matches what was received, and convert the response callbacks
-to pull their fields with the util_iov helpers so the remaining length
-is tracked as it is consumed.
-
-Since the receive buffer is reused between packets, the bytes read past
-the end of a short response were the contents of an earlier PDU, some of
-which were then reported over D-Bus or echoed back to the peer.
+Assisted-by: Claude:claude-opus-5 valgrind
 ---
- profiles/audio/avrcp.c | 329 ++++++++++++++++++++++++++---------------
- 1 file changed, 207 insertions(+), 122 deletions(-)
+ Makefile.plugins             |   2 +
+ profiles/audio/avrcp-parse.c | 174 +++++++++++++++++++++++++++
+ profiles/audio/avrcp-parse.h | 102 ++++++++++++++++
+ profiles/audio/avrcp.c       | 221 +++++++----------------------------
+ profiles/audio/avrcp.h       |   8 +-
+ 5 files changed, 322 insertions(+), 185 deletions(-)
+ create mode 100644 profiles/audio/avrcp-parse.c
+ create mode 100644 profiles/audio/avrcp-parse.h
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index f9d0841ef2d5..aff3b5ce21a2 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2260,6 +2260,52 @@ static const char *status_to_string(uint8_t status)
- 	}
- }
+diff --git a/Makefile.plugins b/Makefile.plugins
+index ac667beda847..a73569e555fe 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -37,6 +37,8 @@ builtin_modules += avrcp
+ builtin_sources += profiles/audio/control.h profiles/audio/control.c \
+ 			profiles/audio/avctp.h profiles/audio/avctp.c \
+ 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
++			profiles/audio/avrcp-parse.h \
++			profiles/audio/avrcp-parse.c \
+ 			profiles/audio/avrcp-player.c
+ endif
  
+diff --git a/profiles/audio/avrcp-parse.c b/profiles/audio/avrcp-parse.c
+new file mode 100644
+index 000000000000..e0c73ec9b03a
+--- /dev/null
++++ b/profiles/audio/avrcp-parse.c
+@@ -0,0 +1,174 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <string.h>
++#include <sys/uio.h>
++
++#include "src/log.h"
++#include "src/shared/util.h"
++
++#include "avrcp-parse.h"
++
 +/*
 + * Pull the AVRCP header out of iov and validate that the parameters length
 + * it declares matches the number of bytes actually received, leaving iov
 + * pointing at the parameters.
 + */
-+static struct avrcp_header *avrcp_pull_header(struct iovec *iov)
++struct avrcp_header *avrcp_pull_header(struct iovec *iov)
 +{
 +	struct avrcp_header *pdu;
 +
@@ -150,8 +184,7 @@ index f9d0841ef2d5..aff3b5ce21a2 100644
 + * Same as avrcp_pull_header() but for the browsing channel, which uses a
 + * different header layout.
 + */
-+static struct avrcp_browsing_header *avrcp_pull_browsing_header(
-+							struct iovec *iov)
++struct avrcp_browsing_header *avrcp_pull_browsing_header(struct iovec *iov)
 +{
 +	struct avrcp_browsing_header *pdu;
 +
@@ -169,556 +202,563 @@ index f9d0841ef2d5..aff3b5ce21a2 100644
 +	return pdu;
 +}
 +
++/*
++ * Pull a ListPlayerApplicationSettingAttributes response body out of iov,
++ * skipping the attributes that cannot be queried. At most max attributes are
++ * written to attrs, which is what bounds the write.
++ */
++uint8_t avrcp_parse_player_attributes(struct iovec *iov, uint8_t *attrs,
++							uint8_t max)
++{
++	uint8_t len, count = 0;
++	int i;
++
++	if (!util_iov_pull_u8(iov, &len))
++		return 0;
++
++	len = MIN(len, max);
++
++	for (i = 0; i < len; i++) {
++		uint8_t attr;
++
++		if (!util_iov_pull_u8(iov, &attr))
++			break;
++
++		/* Don't query invalid attributes */
++		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
++					attr > AVRCP_ATTRIBUTE_LAST)
++			continue;
++
++		attrs[count++] = attr;
++	}
++
++	return count;
++}
++
++void avrcp_parse_attribute_list(struct iovec *iov, uint8_t count,
++					avrcp_attribute_func_t func,
++					void *user_data)
++{
++	for (; count > 0; count--) {
++		struct avrcp_attribute attr;
++
++		if (!util_iov_pull_be32(iov, &attr.id) ||
++				!util_iov_pull_be16(iov, &attr.charset) ||
++				!util_iov_pull_be16(iov, &attr.len))
++			return;
++
++		attr.value = util_iov_pull_mem(iov, attr.len);
++		if (!attr.value)
++			return;
++
++		func(&attr, user_data);
++	}
++}
++
++bool avrcp_parse_media_name(struct iovec *iov, char *name)
++{
++	uint16_t namelen;
++	uint8_t *namebuf;
++
++	if (!util_iov_pull_be16(iov, &namelen))
++		return false;
++
++	namebuf = util_iov_pull_mem(iov, namelen);
++	if (!namebuf)
++		return false;
++
++	namelen = MIN(namelen, NAME_MAX_LEN - 1);
++
++	memset(name, 0, NAME_MAX_LEN);
++	memcpy(name, namebuf, namelen);
++	strtoutf8(name, namelen);
++
++	return true;
++}
++
++bool avrcp_parse_media_element(struct iovec *iov,
++					struct avrcp_media_element *element)
++{
++	/* Skip the media type and character set */
++	if (!util_iov_pull_be64(iov, &element->uid) || !util_iov_pull(iov, 3))
++		return false;
++
++	if (!avrcp_parse_media_name(iov, element->name))
++		return false;
++
++	if (!util_iov_pull_u8(iov, &element->count))
++		return false;
++
++	return true;
++}
++
++bool avrcp_parse_media_folder(struct iovec *iov,
++					struct avrcp_media_folder *folder)
++{
++	/* Skip the character set */
++	if (!util_iov_pull_be64(iov, &folder->uid) ||
++			!util_iov_pull_u8(iov, &folder->type) ||
++			!util_iov_pull_u8(iov, &folder->playable) ||
++			!util_iov_pull(iov, 2))
++		return false;
++
++	if (!avrcp_parse_media_name(iov, folder->name))
++		return false;
++
++	return true;
++}
+diff --git a/profiles/audio/avrcp-parse.h b/profiles/audio/avrcp-parse.h
+new file mode 100644
+index 000000000000..1a27c0684b32
+--- /dev/null
++++ b/profiles/audio/avrcp-parse.h
+@@ -0,0 +1,102 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation
++ *
++ *
++ */
++
++#ifndef __AVRCP_PARSE_H
++#define __AVRCP_PARSE_H
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <sys/uio.h>
++
++#define NAME_MAX_LEN 255
++
++/* player attributes */
++#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
++#define AVRCP_ATTRIBUTE_EQUALIZER	0x01
++#define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
++#define AVRCP_ATTRIBUTE_SHUFFLE		0x03
++#define AVRCP_ATTRIBUTE_SCAN		0x04
++#define AVRCP_ATTRIBUTE_LAST		AVRCP_ATTRIBUTE_SCAN
++
++#if __BYTE_ORDER == __LITTLE_ENDIAN
++
++struct avrcp_header {
++	uint8_t company_id[3];
++	uint8_t pdu_id;
++	uint8_t packet_type:2;
++	uint8_t rsvd:6;
++	uint16_t params_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++
++#elif __BYTE_ORDER == __BIG_ENDIAN
++
++struct avrcp_header {
++	uint8_t company_id[3];
++	uint8_t pdu_id;
++	uint8_t rsvd:6;
++	uint8_t packet_type:2;
++	uint16_t params_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++
++#else
++#error "Unknown byte order"
++#endif
++
++#define AVRCP_HEADER_LENGTH 7
++
++struct avrcp_browsing_header {
++	uint8_t pdu_id;
++	uint16_t param_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++#define AVRCP_BROWSING_HEADER_LENGTH 3
++
++struct avrcp_attribute {
++	uint32_t id;
++	uint16_t charset;
++	uint16_t len;
++	uint8_t *value;
++};
++
++struct avrcp_media_element {
++	uint64_t uid;
++	char name[NAME_MAX_LEN];
++	uint8_t count;
++};
++
++struct avrcp_media_folder {
++	uint64_t uid;
++	uint8_t type;
++	uint8_t playable;
++	char name[NAME_MAX_LEN];
++};
++
++typedef void (*avrcp_attribute_func_t)(const struct avrcp_attribute *attr,
++							void *user_data);
++
++struct avrcp_header *avrcp_pull_header(struct iovec *iov);
++struct avrcp_browsing_header *avrcp_pull_browsing_header(struct iovec *iov);
++
++uint8_t avrcp_parse_player_attributes(struct iovec *iov, uint8_t *attrs,
++							uint8_t max);
++
++void avrcp_parse_attribute_list(struct iovec *iov, uint8_t count,
++					avrcp_attribute_func_t func,
++					void *user_data);
++
++bool avrcp_parse_media_name(struct iovec *iov, char *name);
++bool avrcp_parse_media_element(struct iovec *iov,
++					struct avrcp_media_element *element);
++bool avrcp_parse_media_folder(struct iovec *iov,
++					struct avrcp_media_folder *folder);
++
++#endif /* __AVRCP_PARSE_H */
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index aff3b5ce21a2..df5f97eafc88 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -52,6 +52,7 @@
+ 
+ #include "avctp.h"
+ #include "avrcp.h"
++#include "avrcp-parse.h"
+ #include "control.h"
+ #include "media.h"
+ #include "player.h"
+@@ -145,46 +146,9 @@
+ #define AVRCP_SCOPE_SEARCH				0x02
+ #define AVRCP_SCOPE_NOW_PLAYING			0x03
+ 
+-#define NAME_MAX_LEN 255
+-
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
+-
+-struct avrcp_header {
+-	uint8_t company_id[3];
+-	uint8_t pdu_id;
+-	uint8_t packet_type:2;
+-	uint8_t rsvd:6;
+-	uint16_t params_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_HEADER_LENGTH 7
+-
+-#elif __BYTE_ORDER == __BIG_ENDIAN
+-
+-struct avrcp_header {
+-	uint8_t company_id[3];
+-	uint8_t pdu_id;
+-	uint8_t rsvd:6;
+-	uint8_t packet_type:2;
+-	uint16_t params_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_HEADER_LENGTH 7
+-
+-#else
+-#error "Unknown byte order"
+-#endif
+-
+ #define AVRCP_MTU	(AVC_MTU - AVC_HEADER_LENGTH)
+ #define AVRCP_PDU_MTU	(AVRCP_MTU - AVRCP_HEADER_LENGTH)
+ 
+-struct avrcp_browsing_header {
+-	uint8_t pdu_id;
+-	uint16_t param_len;
+-	uint8_t params[0];
+-} __attribute__ ((packed));
+-#define AVRCP_BROWSING_HEADER_LENGTH 3
+-
+ struct get_folder_items_rsp {
+ 	uint8_t status;
+ 	uint16_t uid_counter;
+@@ -2260,52 +2224,6 @@ static const char *status_to_string(uint8_t status)
+ 	}
+ }
+ 
+-/*
+- * Pull the AVRCP header out of iov and validate that the parameters length
+- * it declares matches the number of bytes actually received, leaving iov
+- * pointing at the parameters.
+- */
+-static struct avrcp_header *avrcp_pull_header(struct iovec *iov)
+-{
+-	struct avrcp_header *pdu;
+-
+-	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
+-	if (!pdu) {
+-		error("Invalid AVRCP header");
+-		return NULL;
+-	}
+-
+-	if (be16_to_cpu(pdu->params_len) != iov->iov_len) {
+-		error("Invalid parameters");
+-		return NULL;
+-	}
+-
+-	return pdu;
+-}
+-
+-/*
+- * Same as avrcp_pull_header() but for the browsing channel, which uses a
+- * different header layout.
+- */
+-static struct avrcp_browsing_header *avrcp_pull_browsing_header(
+-							struct iovec *iov)
+-{
+-	struct avrcp_browsing_header *pdu;
+-
+-	pdu = util_iov_pull_mem(iov, sizeof(*pdu));
+-	if (!pdu) {
+-		error("Invalid AVRCP browsing header");
+-		return NULL;
+-	}
+-
+-	if (be16_to_cpu(pdu->param_len) != iov->iov_len) {
+-		error("Invalid parameters");
+-		return NULL;
+-	}
+-
+-	return pdu;
+-}
+-
  static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
  					uint8_t subunit, uint8_t transaction,
  					uint8_t *operands, size_t operand_count,
-@@ -2268,22 +2314,24 @@ static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	uint32_t duration;
- 	uint32_t position;
- 	uint8_t status;
- 
--	if (pdu == NULL || code == AVC_CTYPE_REJECTED ||
--					be16_to_cpu(pdu->params_len) != 9)
-+	if (operands == NULL || code == AVC_CTYPE_REJECTED)
-+		return FALSE;
-+
-+	if (!avrcp_pull_header(&iov))
-+		return FALSE;
-+
-+	if (!util_iov_pull_be32(&iov, &duration) ||
-+			!util_iov_pull_be32(&iov, &position) ||
-+			!util_iov_pull_u8(&iov, &status))
- 		return FALSE;
- 
--	duration = get_be32(pdu->params);
- 	media_player_set_duration(mp, duration);
--
--	position = get_be32(pdu->params + 4);
- 	media_player_set_position(mp, position);
--
--	status = get_u8(pdu->params + 8);
- 	media_player_set_status(mp, status_to_string(status));
- 
- 	return FALSE;
-@@ -2330,35 +2378,41 @@ static gboolean avrcp_player_value_rsp(struct avctp *conn, uint8_t code,
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
--	struct avrcp_header *pdu = (void *) operands;
--	uint8_t count;
--	int i;
-+	struct iovec iov = { operands, operand_count };
-+	uint8_t count, status;
- 
--	if (pdu == NULL) {
-+	if (operands == NULL) {
- 		media_player_set_setting(mp, "Error", "Timeout");
- 		return FALSE;
- 	}
- 
-+	if (!avrcp_pull_header(&iov))
-+		return FALSE;
-+
- 	if (code == AVC_CTYPE_REJECTED) {
--		media_player_set_setting(mp, "Error",
--					status_to_str(pdu->params[0]));
-+		if (util_iov_pull_u8(&iov, &status))
-+			media_player_set_setting(mp, "Error",
-+						status_to_str(status));
- 		return FALSE;
- 	}
- 
--	count = pdu->params[0];
--
--	if (pdu->params_len < count * 2)
-+	if (!util_iov_pull_u8(&iov, &count))
- 		return FALSE;
- 
--	for (i = 1; count > 0; count--, i += 2) {
-+	for (; count > 0; count--) {
- 		const char *key;
- 		const char *value;
-+		uint8_t attr, val;
- 
--		key = attr_to_str(pdu->params[i]);
-+		if (!util_iov_pull_u8(&iov, &attr) ||
-+				!util_iov_pull_u8(&iov, &val))
-+			break;
-+
-+		key = attr_to_str(attr);
- 		if (key == NULL)
- 			continue;
- 
--		value = attrval_to_str(pdu->params[i], pdu->params[i + 1]);
-+		value = attrval_to_str(attr, val);
- 		if (value == NULL)
- 			continue;
- 
-@@ -2398,23 +2452,14 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
+@@ -2452,8 +2370,7 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
  	struct iovec iov = { operands, operand_count };
  	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
  	struct avrcp *session = user_data;
--	struct avrcp_header *pdu;
- 	uint8_t len, count = 0;
- 	int i;
+-	uint8_t len, count = 0;
+-	int i;
++	uint8_t count;
  
  	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED)
  		return FALSE;
- 
--	pdu = util_iov_pull_mem(&iov, sizeof(*pdu));
--	if (!pdu) {
--		error("Invalid AVRCP header");
-+	if (!avrcp_pull_header(&iov))
+@@ -2461,25 +2378,7 @@ static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
+ 	if (!avrcp_pull_header(&iov))
  		return FALSE;
+ 
+-	if (!util_iov_pull_u8(&iov, &len))
+-		return FALSE;
+-
+-	len = MIN(len, AVRCP_ATTRIBUTE_LAST);
+-
+-	for (i = 0; i < len; i++) {
+-		uint8_t attr;
+-
+-		if (!util_iov_pull_u8(&iov, &attr))
+-			break;
+-
+-		/* Don't query invalid attributes */
+-		if (attr == AVRCP_ATTRIBUTE_ILLEGAL ||
+-					attr > AVRCP_ATTRIBUTE_LAST)
+-			continue;
+-
+-		attrs[count++] = attr;
 -	}
 -
--	if (be16_to_cpu(pdu->params_len) != iov.iov_len) {
--		error("Invalid parameters");
--		return FALSE;
--	}
- 
- 	if (!util_iov_pull_u8(&iov, &len))
- 		return FALSE;
-@@ -2526,11 +2571,9 @@ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
- 	if (code == AVC_CTYPE_REJECTED)
++	count = avrcp_parse_player_attributes(&iov, attrs, sizeof(attrs));
+ 	if (!count)
  		return FALSE;
  
--	pdu = util_iov_pull_mem(&iov, sizeof(*pdu));
--	if (!pdu) {
--		error("Invalid AVRCP header");
-+	pdu = avrcp_pull_header(&iov);
-+	if (!pdu)
- 		return FALSE;
--	}
+@@ -2505,34 +2404,38 @@ static void avrcp_list_player_attributes(struct avrcp *session)
+ 					session);
+ }
  
- 	/* Abort fragmented responses as reassembly is not supported */
- 	if (pdu->packet_type == AVRCP_PACKET_TYPE_START ||
-@@ -2539,11 +2582,6 @@ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
- 		return FALSE;
- 	}
- 
--	if (be16_to_cpu(pdu->params_len) != iov.iov_len) {
--		error("Invalid parameters");
--		return FALSE;
--	}
--
- 	if (!util_iov_pull_u8(&iov, &count))
- 		return FALSE;
- 
-@@ -2856,23 +2894,28 @@ static gboolean avrcp_change_path_rsp(struct avctp *conn,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
+-static void avrcp_parse_attribute_list(struct avrcp_player *player,
++struct parse_attribute_data {
++	struct media_player *mp;
++	struct media_item *item;
++};
++
++static void parse_attribute(const struct avrcp_attribute *attr,
++							void *user_data)
++{
++	struct parse_attribute_data *data = user_data;
++	const char *key;
++
++	if (attr->charset != 106)
++		return;
++
++	key = metadata_to_str(attr->id);
++	if (key == NULL)
++		return;
++
++	media_player_set_metadata(data->mp, data->item, key, attr->value,
++								attr->len);
++}
++
++static void avrcp_player_parse_attributes(struct avrcp_player *player,
+ 					struct media_item *item,
+ 					struct iovec *iov, uint8_t count)
  {
--	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
-+	uint32_t items;
-+	uint8_t status;
- 	int ret;
+-	struct media_player *mp = player->user_data;
++	struct parse_attribute_data data = {
++		.mp = player->user_data,
++		.item = item,
++	};
  
--	if (pdu == NULL) {
-+	if (operands == NULL) {
- 		ret = -ETIMEDOUT;
- 		goto done;
- 	}
- 
--	if (pdu->params[0] != AVRCP_STATUS_SUCCESS) {
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status) ||
-+			status != AVRCP_STATUS_SUCCESS ||
-+			!util_iov_pull_be32(&iov, &items)) {
- 		ret = -EINVAL;
- 		goto done;
- 	}
- 
--	ret = get_be32(&pdu->params[1]);
-+	ret = items;
- 
- done:
- 	if (ret < 0) {
-@@ -2900,41 +2943,47 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
--	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	uint32_t items;
- 	char **folders;
--	uint8_t depth, count;
--	size_t i;
-+	uint16_t uid_counter, charset;
-+	uint8_t status, depth, count;
- 
--	if (pdu == NULL || pdu->params[0] != AVRCP_STATUS_SUCCESS ||
--							operand_count < 13)
-+	if (operands == NULL)
- 		return FALSE;
- 
--	player->uid_counter = get_be16(&pdu->params[1]);
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status) ||
-+			status != AVRCP_STATUS_SUCCESS ||
-+			!util_iov_pull_be16(&iov, &uid_counter) ||
-+			!util_iov_pull_be32(&iov, &items) ||
-+			!util_iov_pull_be16(&iov, &charset) ||
-+			!util_iov_pull_u8(&iov, &depth))
-+		return FALSE;
-+
-+	player->uid_counter = uid_counter;
- 	player->browsed = true;
- 
--	items = get_be32(&pdu->params[3]);
+-	for (; count > 0; count--) {
+-		uint32_t id;
+-		uint16_t charset, len;
+-		uint8_t *value;
 -
--	depth = pdu->params[9];
+-		if (!util_iov_pull_be32(iov, &id) ||
+-				!util_iov_pull_be16(iov, &charset) ||
+-				!util_iov_pull_be16(iov, &len))
+-			return;
 -
- 	folders = g_new0(char *, depth + 2);
- 	folders[0] = g_strdup("/Filesystem");
+-		value = util_iov_pull_mem(iov, len);
+-		if (!value)
+-			return;
+-
+-		if (charset == 106) {
+-			const char *key = metadata_to_str(id);
+-
+-			if (key != NULL)
+-				media_player_set_metadata(mp, item, key,
+-								value, len);
+-		}
+-	}
++	avrcp_parse_attribute_list(iov, count, parse_attribute, &data);
+ }
  
--	for (i = 10, count = 1; count - 1 < depth && i < operand_count;
--								count++) {
-+	for (count = 1; count - 1 < depth; count++) {
- 		uint8_t len;
-+		void *name;
-+
-+		if (!util_iov_pull_u8(&iov, &len))
-+			break;
+ static void avrcp_abort_continuing(struct avrcp *session, uint8_t pdu_id)
+@@ -2589,7 +2492,7 @@ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
  
--		len = pdu->params[i++];
- 		if (!len)
- 			continue;
+ 	item = media_player_set_playlist_item(mp, player->uid);
  
--		if (i + len > operand_count) {
-+		name = util_iov_pull_mem(&iov, len);
-+		if (!name) {
- 			error("Invalid folder length");
- 			break;
- 		}
+-	avrcp_parse_attribute_list(player, item, &iov, count);
++	avrcp_player_parse_attributes(player, item, &iov, count);
  
--		folders[count] = util_memdup(&pdu->params[i], len);
--		i += len;
-+		folders[count] = util_memdup(name, len);
- 	}
+ 	media_player_metadata_changed(mp);
  
- 	player->path = g_build_pathv("/", folders);
-@@ -2971,7 +3020,6 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
- 	struct avrcp *session = user_data;
+@@ -2671,57 +2574,28 @@ static const char *subtype_to_string(uint32_t subtype)
+ 	return "None";
+ }
+ 
+-static gboolean parse_media_name(struct iovec *iov, char *name)
+-{
+-	uint16_t namelen;
+-	uint8_t *namebuf;
+-
+-	if (!util_iov_pull_be16(iov, &namelen))
+-		return FALSE;
+-
+-	namebuf = util_iov_pull_mem(iov, namelen);
+-	if (!namebuf)
+-		return FALSE;
+-
+-	namelen = MIN(namelen, NAME_MAX_LEN - 1);
+-
+-	memset(name, 0, NAME_MAX_LEN);
+-	memcpy(name, namebuf, namelen);
+-	strtoutf8(name, namelen);
+-
+-	return TRUE;
+-}
+-
+ static struct media_item *parse_media_element(struct avrcp *session,
+ 							struct iovec *iov)
+ {
+ 	struct avrcp_player *player;
+ 	struct media_player *mp;
+ 	struct media_item *item;
+-	char name[NAME_MAX_LEN];
+-	uint64_t uid;
+-	uint8_t count;
++	struct avrcp_media_element element;
+ 
+-	/* Skip the media type and character set */
+-	if (!util_iov_pull_be64(iov, &uid) || !util_iov_pull(iov, 3))
+-		return NULL;
+-
+-	if (!parse_media_name(iov, name))
+-		return NULL;
+-
+-	if (!util_iov_pull_u8(iov, &count))
++	if (!avrcp_parse_media_element(iov, &element))
+ 		return NULL;
+ 
+ 	player = session->controller->player;
+ 	mp = player->user_data;
+ 
+-	item = media_player_create_item(mp, name, PLAYER_ITEM_TYPE_AUDIO, uid);
++	item = media_player_create_item(mp, element.name,
++					PLAYER_ITEM_TYPE_AUDIO, element.uid);
+ 	if (item == NULL)
+ 		return NULL;
+ 
+ 	media_item_set_playable(item, true);
+ 
+-	avrcp_parse_attribute_list(player, item, iov, count);
++	avrcp_player_parse_attributes(player, item, iov, element.count);
+ 
+ 	return item;
+ }
+@@ -2732,26 +2606,17 @@ static struct media_item *parse_media_folder(struct avrcp *session,
  	struct avrcp_player *player = session->controller->player;
- 	struct iovec iov = { operands, operand_count };
--	struct avrcp_browsing_header *pdu;
  	struct media_player *mp = player->user_data;
  	struct media_item *item;
- 	uint8_t status, count;
-@@ -2981,23 +3029,13 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
- 		return FALSE;
- 	}
+-	char name[NAME_MAX_LEN];
+-	uint64_t uid;
+-	uint8_t type;
+-	uint8_t playable;
++	struct avrcp_media_folder folder;
  
--	pdu = util_iov_pull_mem(&iov, sizeof(*pdu));
--	if (!pdu) {
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status) ||
-+			status != AVRCP_STATUS_SUCCESS) {
- 		avrcp_get_element_attributes(session);
- 		return FALSE;
- 	}
+-	/* Skip the character set */
+-	if (!util_iov_pull_be64(iov, &uid) ||
+-			!util_iov_pull_u8(iov, &type) ||
+-			!util_iov_pull_u8(iov, &playable) ||
+-			!util_iov_pull(iov, 2))
++	if (!avrcp_parse_media_folder(iov, &folder))
+ 		return NULL;
  
--	if (!util_iov_pull_u8(&iov, &status) ||
--					status != AVRCP_STATUS_SUCCESS) {
--		avrcp_get_element_attributes(session);
--		return FALSE;
--	}
+-	if (!parse_media_name(iov, name))
+-		return NULL;
 -
--	if (be16_to_cpu(pdu->param_len) != operand_count - sizeof(*pdu)) {
--		error("Invalid parameters");
--		return FALSE;
--	}
--
- 	if (!util_iov_pull_u8(&iov, &count))
- 		return FALSE;
+-	item = media_player_create_folder(mp, name, type, uid);
++	item = media_player_create_folder(mp, folder.name, folder.type,
++								folder.uid);
+ 	if (!item)
+ 		return NULL;
  
-@@ -3086,9 +3124,12 @@ static gboolean avrcp_set_addressed_player_rsp(struct avctp *conn, uint8_t code,
- {
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
+-	media_item_set_playable(item, playable & 0x01);
++	media_item_set_playable(item, folder.playable & 0x01);
  
--	if (!pdu || code != AVC_CTYPE_ACCEPTED)
-+	if (!operands || code != AVC_CTYPE_ACCEPTED)
-+		return FALSE;
-+
-+	if (!avrcp_pull_header(&iov))
- 		return FALSE;
+ 	return item;
+ }
+@@ -3043,7 +2908,7 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
  
- 	player->addressed = true;
-@@ -3372,24 +3413,31 @@ static int ct_change_folder(struct media_player *mp, const char *path,
- static gboolean avrcp_search_rsp(struct avctp *conn, uint8_t *operands,
- 					size_t operand_count, void *user_data)
- {
--	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	struct avrcp *session = (void *) user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
-+	uint32_t items;
-+	uint16_t uid_counter;
-+	uint8_t status;
- 	int ret;
+ 	item = media_player_set_playlist_item(mp, player->uid);
  
--	if (pdu == NULL) {
-+	if (operands == NULL) {
- 		ret = -ETIMEDOUT;
- 		goto done;
- 	}
+-	avrcp_parse_attribute_list(player, item, &iov, count);
++	avrcp_player_parse_attributes(player, item, &iov, count);
  
--	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7) {
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status) ||
-+			status != AVRCP_STATUS_SUCCESS ||
-+			!util_iov_pull_be16(&iov, &uid_counter) ||
-+			!util_iov_pull_be32(&iov, &items)) {
- 		ret = -EINVAL;
- 		goto done;
- 	}
+ 	media_player_metadata_changed(mp);
  
--	player->uid_counter = get_be16(&pdu->params[1]);
--	ret = get_be32(&pdu->params[3]);
-+	player->uid_counter = uid_counter;
-+	ret = items;
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 21351a4bc422..9f72c2ed4413 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -9,13 +9,7 @@
+  *
+  */
  
- done:
- 	media_player_search_complete(mp, ret);
-@@ -3437,19 +3485,25 @@ static gboolean avrcp_play_item_rsp(struct avctp *conn, uint8_t code,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	struct avrcp *session = (void *) user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
-+	uint8_t status;
- 	int ret = 0;
+-/* player attributes */
+-#define AVRCP_ATTRIBUTE_ILLEGAL		0x00
+-#define AVRCP_ATTRIBUTE_EQUALIZER	0x01
+-#define AVRCP_ATTRIBUTE_REPEAT_MODE	0x02
+-#define AVRCP_ATTRIBUTE_SHUFFLE		0x03
+-#define AVRCP_ATTRIBUTE_SCAN		0x04
+-#define AVRCP_ATTRIBUTE_LAST		AVRCP_ATTRIBUTE_SCAN
++#include "avrcp-parse.h"
  
--	if (pdu == NULL) {
-+	if (operands == NULL) {
- 		ret = -ETIMEDOUT;
- 		goto done;
- 	}
- 
--	if (pdu->params[0] != AVRCP_STATUS_SUCCESS) {
--		switch (pdu->params[0]) {
-+	if (!avrcp_pull_header(&iov) || !util_iov_pull_u8(&iov, &status)) {
-+		ret = -EINVAL;
-+		goto done;
-+	}
-+
-+	if (status != AVRCP_STATUS_SUCCESS) {
-+		switch (status) {
- 		case AVRCP_STATUS_UID_CHANGED:
- 		case AVRCP_STATUS_DOES_NOT_EXIST:
- 			ret = -ENOENT;
-@@ -3567,23 +3621,32 @@ static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
--	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	struct avrcp *session = user_data;
- 	struct avrcp_player *player = session->controller->player;
- 	struct media_player *mp = player->user_data;
- 	uint32_t num_of_items = 0;
-+	uint16_t uid_counter;
-+	uint8_t status;
- 
--	if (pdu == NULL)
-+	if (operands == NULL)
- 		return -ETIMEDOUT;
- 
--	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7)
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status))
- 		return -EINVAL;
- 
--	if (pdu->params[0] == AVRCP_STATUS_OUT_OF_BOUNDS)
-+	if (status == AVRCP_STATUS_OUT_OF_BOUNDS)
- 		goto done;
- 
--	player->uid_counter = get_be16(&pdu->params[1]);
--	num_of_items = get_be32(&pdu->params[3]);
-+	if (status != AVRCP_STATUS_SUCCESS)
-+		return -EINVAL;
-+
-+	if (!util_iov_pull_be16(&iov, &uid_counter) ||
-+			!util_iov_pull_be32(&iov, &num_of_items))
-+		return -EINVAL;
-+
-+	player->uid_counter = uid_counter;
- 
- 	if (!num_of_items)
- 		return -EINVAL;
-@@ -3812,44 +3875,46 @@ static gboolean avrcp_get_media_player_list_rsp(struct avctp *conn,
- 						size_t operand_count,
- 						void *user_data)
- {
--	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	struct avrcp *session = user_data;
--	uint16_t count;
--	size_t i;
-+	uint16_t uid_counter, count;
-+	uint8_t status;
- 	GSList *removed;
- 
--	if (pdu == NULL || pdu->params[0] != AVRCP_STATUS_SUCCESS ||
--							operand_count < 5)
-+	if (operands == NULL)
-+		return FALSE;
-+
-+	if (!avrcp_pull_browsing_header(&iov) ||
-+			!util_iov_pull_u8(&iov, &status) ||
-+			status != AVRCP_STATUS_SUCCESS ||
-+			!util_iov_pull_be16(&iov, &uid_counter) ||
-+			!util_iov_pull_be16(&iov, &count))
- 		return FALSE;
- 
- 	removed = g_slist_copy(session->controller->players);
--	count = get_be16(&operands[6]);
- 
--	for (i = 8; count && i < operand_count; count--) {
-+	for (; count > 0; count--) {
- 		struct avrcp_player *player;
- 		uint8_t type;
- 		uint16_t len;
-+		void *data;
- 
--		type = operands[i++];
--		len = get_be16(&operands[i]);
--		i += 2;
-+		if (!util_iov_pull_u8(&iov, &type) ||
-+				!util_iov_pull_be16(&iov, &len))
-+			break;
- 
--		if (type != 0x01) {
--			i += len;
--			continue;
--		}
--
--		if (i + len > operand_count) {
-+		data = util_iov_pull_mem(&iov, len);
-+		if (!data) {
- 			error("Invalid player item length");
--			return FALSE;
-+			break;
- 		}
- 
--		player = avrcp_parse_media_player_item(session, &operands[i],
--									len);
-+		if (type != 0x01)
-+			continue;
-+
-+		player = avrcp_parse_media_player_item(session, data, len);
- 		if (player)
- 			removed = g_slist_remove(removed, player);
--
--		i += len;
- 	}
- 
- 	g_slist_free_full(removed, player_remove);
-@@ -4025,15 +4090,20 @@ static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
- {
- 	struct avrcp *session = user_data;
- 	struct avrcp_data *controller = session->controller;
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
-+	struct avrcp_header *pdu;
- 	uint8_t event;
- 
--	if (!pdu)
-+	if (!operands)
- 		return FALSE;
- 
- 	if (!controller)
- 		return FALSE;
- 
-+	pdu = avrcp_pull_header(&iov);
-+	if (!pdu || !iov.iov_len)
-+		return FALSE;
-+
- 	if ((code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)) {
- 		if (pdu->params[0] == AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED &&
- 				code == AVC_CTYPE_REJECTED) {
-@@ -4140,12 +4210,18 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 					void *user_data)
- {
- 	struct avrcp *session = user_data;
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
- 	uint16_t events = 0;
--	uint8_t count;
-+	uint8_t count, cap;
- 
- 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED ||
--			pdu == NULL || pdu->params[0] != CAP_EVENTS_SUPPORTED)
-+							operands == NULL)
-+		return FALSE;
-+
-+	if (!avrcp_pull_header(&iov))
-+		return FALSE;
-+
-+	if (!util_iov_pull_u8(&iov, &cap) || cap != CAP_EVENTS_SUPPORTED)
- 		return FALSE;
- 
- 	/* Connect browsing if pending */
-@@ -4155,12 +4231,17 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 		avctp_connect_browsing(session->conn);
- 	}
- 
--	count = pdu->params[1];
-+	if (!util_iov_pull_u8(&iov, &count))
-+		return FALSE;
- 
- 	for (; count > 0; count--) {
--		uint8_t event = pdu->params[1 + count];
-+		uint8_t event;
- 
--		events |= (1 << event);
-+		if (!util_iov_pull_u8(&iov, &event))
-+			break;
-+
-+		if (event < sizeof(events) * 8)
-+			events |= (1 << event);
- 
- 		switch (event) {
- 		case AVRCP_EVENT_STATUS_CHANGED:
-@@ -4728,14 +4809,18 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
- 					void *user_data)
- {
- 	struct avrcp *session = user_data;
--	struct avrcp_header *pdu = (void *) operands;
-+	struct iovec iov = { operands, operand_count };
-+	uint8_t value;
- 	int8_t volume;
- 
- 	if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED ||
--								pdu == NULL)
-+							operands == NULL)
- 		return FALSE;
- 
--	volume = pdu->params[0] & 0x7F;
-+	if (!avrcp_pull_header(&iov) || !util_iov_pull_u8(&iov, &value))
-+		return FALSE;
-+
-+	volume = value & 0x7F;
- 
- 	/* Always attempt to update the transport volume */
- 	media_transport_set_a2dp_volume(session->dev, volume);
+ /* equalizer values */
+ #define AVRCP_EQUALIZER_OFF		0x01
 -- 
 2.54.0
 
