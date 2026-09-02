@@ -1,163 +1,99 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05F8247280
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 14:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788357664; cv=pass; b=dv7ru2OkPagpDtHF3wV+e58PxDM0cU+FpfRHei23mLHgLaetlIP+G4lrHPwSOTYnpKd00jfwQqa5SfyIMoIsL8njdZM78zdSYAVCM4he4C7WetRyqNRxBIcv4zLzZputD7lV4yj6V05vvAVbRyqjsz/GlZZgyxGpAVeI2fXB/fk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788357664; c=relaxed/simple;
-	bh=13eXiadm3DRzQBlWqIFmfnknITG5D9T6dF/zFRkb9KU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=o08WX/UttKU/LqBIbHDvG53xHbfCPJcbzUx3QS+6p6DxCTfZId8T3VI0ZSdlj2a2bspY61Ke5FQUTfWLtiaTurfciFQ5oFqffVmZXbdE0cqrKWQF+tI9Gus/R6umTouQrwNJjR/I8hvk5tfJXpR57b2MakW6KIzuNPHywYwttis=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/gX84hz; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5843B2FFF9D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 14:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788358859; cv=none; b=G7iD1vlwVh9jLggmp2uKBnYuYJQIbbe+tIcwpWQwv91fy8WjwL8LwJBd0qtQxCaTjg6XY3zxsHgGECzsreclwxghXgl1B3cKa7RkFZ5InfiwwSs/07YnEHQyDQNP1WcvOKzcr5t8v+H8T69O1AHDqxOkPmms+YfhR72s5lKqujQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788358859; c=relaxed/simple;
+	bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cgkua4uhwrWxyM2qHh0HhE7wjZeTZBVssPZaAHIPgufRJ6ED+fSjVhDio6KcGA9m87FxDqaaGh8F8o2MmFU4XJN3ZUkFAT5zUvMW21uBLSalM6KavqmIyti6UdLv1U+LxBPwMC3PsEkwflvLKXqesfG3FT7OC1xbjfOLoYr719M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pQek0EbR; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/gX84hz"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-66f883abfdcso1221800d50.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 07:01:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788357661; cv=none;
-        d=google.com; s=arc-20260327;
-        b=YIH9U/Gdzgz9AQhpp0PV+LlQz0qJV6dUpjKacSKb21zwNJv+UXz09/cV5N/dXle/lx
-         vWODvG69LPnzYM9pF+o4m8d1nlbCWO1qVeLLogsOsQljHnVB3wEnuv/53S/cSqEQVzxH
-         1EtjdINmLPwF2braA9jKA+kczt+TAQkKnxXj1+p81CJXU5sY8NdaVMPOcwmJv6NfdOU0
-         y3YaRB25cRRwLHMB9SsiLDlfH+KICLP/z6z4RNf3pUZTNaB8lLRDSGGXCDNrNfF2cmrY
-         iiZ+HkPDuwRau2mz3brABqzzP0tyaOGdN9AztLBkYeUhyLAo4V3dS0ok4b9FmzU18G4j
-         TgNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
-        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
-        b=SI4CAWr1LG6/HChrspXsika5HzcxsRZz4tpExXCu0KzILMP7aDYx+J19IztmG6ooJV
-         WZmLPw0KA2FqmzFAXKI2j77fdFKP2lSgP7RQXd/uvrNAIDsbRHoe8duW4TKdkIeIQ5mk
-         KFVtDMEGfoDK3+hcR2cFvOZgwVGYVpi38wXuInHa3JRKjoGwzdnIXbIVVLo71v+I56WF
-         eZ1QIiee4KrmC+JQd47j4D7b2slrbuzUnxsCnTKf+MqPZ0R1PNbm50vZykYU+f3bvRwc
-         v9iCUA6fw6fu2xtreaSwNNh0zIN47Q+04jvnDC/6B1cq7GUyuBcFfmnQkAgmcCQ8r3N0
-         wUJQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQek0EbR"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6b3671a1b20so741662eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 07:20:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788357661; x=1788962461; darn=vger.kernel.org;
-        h=content-type:to:subject:message-id:date:from:mime-version:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
-        b=G/gX84hz3vZru7/yfudQn6JmdVLBx93j2TxZMdwE9zm+EUAbA3HQDnkcOztXbeWqfg
-         2u62MwqUcYch1vs0hqsq5LqYyXTcG2YNxG8p4aYHVWcNmMbOjV2O3Lrkidcmu43N7QVM
-         6Ms+5XDhcIg4Y0/qRYCTqfIUagw8o49qleWw6w1HV3vybQS88RjgcnI14QMCB9NwjX7Q
-         cyfE5pEefumHNp9ThELk3uVoaitrm5dorjpTWUbGHTGVh8WGlLK8NcM8k/4LmaMuNVCv
-         pTR/xYY/YSsql8YwAT5eVJa9vD2ldxgEgdtpO2Yojat+AP/fQj2JsI86do+qb3dku+VN
-         sBGw==
+        d=gmail.com; s=20251104; t=1788358857; x=1788963657; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
+        b=pQek0EbRZsFlOfv7YNqczbgGGfiafpxRvObT8CVg3DXMVAeFtx7TCwHLjCIAcjGZXt
+         boBZN8QG272ETc6hOprIvOl5dyOJBbmntfBVVnT6O1sfQIoIAT9hlaEBbKIHon93kmkX
+         7EUp7rXdMh/Jc3nFPjzR1OS3zoLHTKLBn6u8yQ4759aIPOg6oUkyGaPY+npH5uWJ2y0B
+         Qi83tSKjIfLH3zTS2AzGBqzYAh7ydLXvQ40qglPwQ0eJ6sVI2Y9NShvZw8qlX99q03rA
+         wb1/XyhUBp/7+GxvDFdGXpnnnc0fcyKN2fdnhGwIbcwZKN/h1b1Y/Btr3rzIIIkKf/5f
+         D55Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788357661; x=1788962461;
-        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
-        b=TUKQ2LleuutIe15GwQ9R3eFuS2k6rjzzfMobgVShd3FF8VSZJpMkGjRsNQmU+w5aEE
-         7n5KERGdIzsi0S3Npj74K2kd0k7+8qbCRmIhVCQS2U3P/dsBz8E66Ew14wZt+JqNdVxW
-         chZQTM6e1SUylcxTiktkJMpmq36D3EPytRGId6zB/Uq9Vkr3KJu1qxn5PW14RccMo244
-         lGvZW+dQuBYLupQocUgtabCiCpKw0lQ/fr4FLdFYQc6E7aGCrAsw4cuwMNQ54YLlLWjU
-         Xbd4DdjutRBzp81vOEVGHk3Q5j043pUQrITaOsXx8oBHASo0sO/eZsV7fXG7VKwcf6xZ
-         pLaQ==
-X-Gm-Message-State: AFuF++lMB//YDWhKbHbZm1p3aK+VG/KB/jA9SRUdRg07pQenxipvQmZb
-	HlvsPr/5oQUk/GhezccN1oPy4PetAp0RhD8ooBFAMUt6nADmAyua1KAvxqdPlE9OiMTUYylPm13
-	Fmc+4EfikB+pQhIIrhAqMBVWgT25r00Mq9TdptMM=
-X-Gm-Gg: AYBFou0leitNxVwkO1nxqAe0KAVvEEAQNPCHthVSU04lmgUiIP25SMqWgWvEJBcgQqP
-	MlQCBl17mT/ZOpxTKOIXfRGBemEbKGa7ufn4QE8U5f/nar0DioZJMFLzSyjczZuxT7TUhKMzTDL
-	qCQF1FZaqRmmELlmiMlg7fPElnySqdPTxzv6kMgQWKt183LEeYOElCe3L9H3TH0Z8EdXa54Mzth
-	mcadhR+YBlgKh5eaKHBFM89ocWYnnwZBy4/ELSR9eemaoPKQP8ggBaLPxdZWDGUKtWjG8UtYGyv
-	QUlyn/maUeZ2xj05MGcgZaQclSQ3RFdgoZZxY7S+Bmln3ntVOWWo9R3C+NFw8mqzrgSR+QHqXpx
-	IfnpUv9pP5POHwa0cAjXSpNE4rHrEn2nY6Tc=
-X-Received: by 2002:a53:b710:0:b0:66e:3d51:1e86 with SMTP id
- 956f58d0204a3-66f9bba355emr1277280d50.14.1788357660594; Wed, 02 Sep 2026
- 07:01:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788358857; x=1788963657;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
+        b=N7P0NS9Cn9Y7tV9+8xDoUEpxZXT8cnHAr+fvmEMj4gLp0mB8Zx0FdjpXJ9bYMQOhP6
+         Tl/QMc3lP9+/Gcr064tp7+MMzGQVlc7q/Pu1FQx9wE+gXse7/Of//jmrzWl6aXPGjk/j
+         zht/cymtCpafrs4W3kAKNVq8crv6QQk7+cxgYsDQjelKgiQwfXus6gUBVCe6wzcWA25G
+         aon/HS4mlkAlCdsIVw8QWAq4xlfJllBIamWVSzqjd9Dez5URmlML7Yx2tc80WsSEco2v
+         ttfbYxSIuo4cQwe1ASSbmay42S/mZcY2RpIuOEZMEsdMjDi6XdseyoUWt4l3VoViM5C9
+         qkyg==
+X-Gm-Message-State: AFuF++k35H2o0uvE7R6n5qKOARamrGBLdJLTDX00koMNWAqIMR8PMyC2
+	KlXpBM5ZN2s2UeN987BoPnJDl1uG6mrDEyHcV3502NKTPUo1ObL2fs2gfc6Yv5XdOBc=
+X-Gm-Gg: AR+sD126uTCANg7ttoRoDRc5g8BDkKD4nSuhsdYMEMUSoq04mdVaBjYejxpMdzqR8jw
+	Cd8T0DIjyn3X0XW3bWKa4ptlxmWT19QdEvJEirSjjU3gnO++NUoiJHEuWn3RRfBv6MKytm5N9CM
+	jn61x33J6R7bG6kV5qo2q5Dezj+4qbZRI39dgqWuBsShPlaJIQU5Ma974GiZiTXK00k/v9IdFHw
+	nB8P1jEegtJqozxVFdJUTX6Dj9TSWjcyvhMZXhi2SkvcGwkkxM4LNBN0PxIxw8fC4szaTz04Ycd
+	WaDAlYIn7HOnbzGG1oAvVMJ1isEw2AZap5TNSkPvEFD3XV2hlmoJ6EZXiYh8PZGQB5TuKxA3t2J
+	Grnxe3GlVIGDuVJFQMMZk9mouNqJmtO6UOsLldlJP1BZjhTjRakCCF0kAM9fKqqovz9wI1Bm9Ac
+	v+h+ucxvwFEuapj5B2EyE+vWTVBntUi8HP5yPZyv7c3Ye5X57/NaJDrGn0SHYZUTBrp4hPCamu/
+	yng4g==
+X-Received: by 2002:a05:6820:210:b0:6b4:63bc:5249 with SMTP id 006d021491bc7-6b48153e1a3mr3735995eaf.23.1788358857171;
+        Wed, 02 Sep 2026 07:20:57 -0700 (PDT)
+Received: from aditya.tail9b10c1.ts.net ([2409:40c1:4c:f2c:672f:3d11:f7e:5e19])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-46f30baa0d4sm3804836fac.6.2026.09.02.07.20.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2026 07:20:56 -0700 (PDT)
+From: Aditya Pratap Singh <adipras1407@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+98baa83c342e86a836d7@syzkaller.appspotmail.com
+Subject: Re: [syzbot] [kernel?] WARNING: refcount bug in bnep_session (2)
+Date: Wed,  2 Sep 2026 19:50:38 +0530
+Message-ID: <20260902142038.345734-1-adipras1407@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <6a86bb5c.4d75e56a.c9a88.0039.GAE@google.com>
+References: <6a86bb5c.4d75e56a.c9a88.0039.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Nicolas Thibert <nithibert@gmail.com>
-Date: Wed, 2 Sep 2026 16:00:48 +0200
-X-Gm-Features: AcwNN1XGKoiCKR4Lep-ccQhwCvBUz3cWff_B_G9oGF7m76rET2Z-_za4RgZAVSg
-Message-ID: <CAKA8V_8QC7u4OsP+f4_h2UfPQ0uAMy9ESzvuNULo1cFkmxyjow@mail.gmail.com>
-Subject: [PATCH BlueZ] adapter/advertising: fix mgmt endian bug
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Several places in adapter.c and advertising.c write a native-endian
-value directly into a __le16/__le32 field of an mgmt command struct,
-skipping the htobs()/htobl() conversion used everywhere else in this
-codebase for the same purpose. This is a no-op on little-endian hosts
-(where htobs()/htobl() are themselves no-ops), which is why it has
-gone unnoticed, but corrupts the value on big-endian hosts.
+Hello,
 
-Confirmed live on MIPS big-endian (OpenWrt/ath79): set_blocked_keys()
-sends key_count=2 (2 blocked keys), which the kernel's
-__le16_to_cpu() correctly interprets as 512 (0x0002 byte-swapped is
-0x0200) since the wire bytes were never actually swapped to little-
-endian on the way out -- producing "expected 8706 bytes, got 36
-bytes" / "Failed to set blocked keys: Invalid Parameters" errors in
-dmesg/bluetoothd logs.
+I would like to investigate this syzbot report:
 
-add_advertising()'s cp->duration and refresh_extended_adv()'s
-cp.duration/cp.min_interval/cp.max_interval have the identical bug. It
-is inert with bluetoothctl's default (0) duration/interval values (0
-byte-swapped is still 0), but A/B tested live (patch removed vs.
-applied, bluetoothctl's advertise submenu "interval 100 100" set
-explicitly) confirms this is not just a theoretical correctness fix:
-with the bug present, the device stops being discoverable by a real
-BLE scanner the moment a non-default interval is requested, and
-becomes discoverable again immediately once patched. Any application
-that sets an explicit advertising interval or duration hits this.
----
-src/adapter.c     |  5 +++--
-src/advertising.c |  6 +++---
-2 files changed, 6 insertions(+), 5 deletions(-)
+https://syzkaller.appspot.com/bug?extid=98baa83c342e86a836d7
 
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -9938,10 +9938,11 @@ static bool set_blocked_keys(struct btd_
-sizeof(blocked_keys)] = { 0 };
-struct mgmt_cp_set_blocked_keys *cp =
-(struct mgmt_cp_set_blocked_keys *)buffer;
-+     const uint16_t key_count = ARRAY_SIZE(blocked_keys);
-int i;
+I checked the dashboard and mailing-list archives on September 2, 2026,
+and did not find a proposed patch or human response.
 
--     cp->key_count = ARRAY_SIZE(blocked_keys);
--     for (i = 0; i < cp->key_count; ++i) {
-+     cp->key_count = htobs(key_count);
-+     for (i = 0; i < key_count; ++i) {
-cp->keys[i].type = blocked_keys[i].type;
-memcpy(cp->keys[i].val, blocked_keys[i].val,
-sizeof(cp->keys[i].val));
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -995,7 +995,7 @@ static int refresh_legacy_adv(struct btd
+Is anyone already working on this issue? If not, I plan to reproduce it
+on current mainline using the provided C reproducer and investigate
+whether concurrent BNEPCONNDEL and HCI disconnection cause the reported
+BNEP device lifetime and refcount failure.
 
-cp->flags = htobl(flags);
-cp->instance = client->instance;
--     cp->duration = client->duration;
-+     cp->duration = htobs(client->duration);
-cp->adv_data_len = adv_data_len;
-cp->scan_rsp_len = scan_rsp_len;
-memcpy(cp->data, adv_data, adv_data_len);
-@@ -1046,13 +1046,13 @@ static int refresh_extended_adv(struct b
-*/
-if (client->duration) {
--             cp.duration = client->duration;
-+             cp.duration = htobs(client->duration);
-flags |= MGMT_ADV_PARAM_DURATION;
-}
+Please let me know if there is related work I should review.
 
-if (client->min_interval && client->max_interval) {
--             cp.min_interval = client->min_interval;
--             cp.max_interval = client->max_interval;
-+             cp.min_interval = htobl(client->min_interval);
-+             cp.max_interval = htobl(client->max_interval);
-flags |= MGMT_ADV_PARAM_INTERVALS;
-}
-
---
-2.34.1
+Thanks,
+Aditya Pratap Singh
