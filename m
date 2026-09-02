@@ -1,108 +1,102 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5E87080D;
-	Wed,  2 Sep 2026 05:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D07243956
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 06:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788327342; cv=none; b=uOBB2besqVzi5WqVGcfUjf9B8kYhqWXESHo6+3l9M7ZJFxPWcCDbLh+r+efA07t1tzMUQaJhy5dd4F6jK7LbmMXZ8yATwO/ZunhdsxY0vXbbH4JKSmdxtdU97PyQ2V820HQuAbO/G0RPGtKfNw7DbO6gcQ6GJZrZxzMn2NSl11c=
+	t=1788330127; cv=none; b=KRmvh24PhcrQzZgk91J88ArrXyZhzr0wQXSwJ3KGiO5mNWTJSidJSsKEf8iSW8g4ozZl1WHYc8cVqc7q+Y/9C2gxEjIAyjawZRzcBHByr9271IyXOW2SWaL1s9m6hdYPe4Wq6dvO0GNOBlvrm0oliykXN4G+9XWMADz5NvQwPe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788327342; c=relaxed/simple;
-	bh=4+fGFZO7R/SZ/oplryGl0/EYOfdyqwfnq8RkseYQiCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aKs06N6ODUzXaFmJdjMKRjCOB/10PRRVNjYnXAFE2naRS3uhD9yyhtT0zBiRnFyOHknyrIJlOrZfNYNGL5kVi1UdyzXG5vcZVq/pAVWievVV0xd1xlN+E/4FBBt9/4ArWrHibTrQy3F8Zy79jvQteK5YkFuuYsB/PxadX++N8J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.14.124] (v124.vpnx.molgen.mpg.de [141.14.14.124])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 395AB4C2C37D61;
-	Wed, 02 Sep 2026 07:35:05 +0200 (CEST)
-Message-ID: <d633b7ee-0afa-4fa1-8340-3d7616f429d2@molgen.mpg.de>
-Date: Wed, 2 Sep 2026 07:35:02 +0200
+	s=arc-20240116; t=1788330127; c=relaxed/simple;
+	bh=+6+bz1tvUsWYdYxCzUdocnVmn4165aqatk0m/3raTZo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Z7X/9eL7ehf/BxXMkvGhmGMKfTO4OBejX39NRviKKf6miI5R7jV5aD+T+g9TR+mMDDrBtXARyhfYdGS1WCisJoKkT2Gi6cGVRLpnMLnCl9HCmxz4PBclkvBGgKbNE0NdIHHAWUuX9pF6jvNE2F/AEmbh6fFEdEQGOpwYFHLiP/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQ+3z2E9; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQ+3z2E9"
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-46fdd5884d0so28333fac.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 23:22:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788330125; x=1788934925; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=+6+bz1tvUsWYdYxCzUdocnVmn4165aqatk0m/3raTZo=;
+        b=NQ+3z2E9UgDCgSbl4zttqTeZbLYNNclez30QlOKbZq8Da1TY+ukRA1yt7bhmp6FQGg
+         jxqmkhYFF/G2eq/xXgf36ip+tHuSH5/XlBQRVYaiFP/dVyHCbI0G6nNbKSnzyHXk1Cef
+         NJBhs0GLoib/kezxzCgIHGFRtl+DfX0Cz3nZSa4V91c+jTZuOuGzh3tlPdBT9ABlgxrK
+         GwL8rpWgqULRzoGMOM5fO3NmVYBn+RPHCkMFU5rdTrfmI/rSmwxR/7M4/ca9XiN7tOpR
+         GniZJtn3hKKk3bi6riwfMnqQDmnWT4ovr09VckOvCsvqteH3BKi6hx5np+/8KSr4vOYw
+         iFZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788330125; x=1788934925;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=+6+bz1tvUsWYdYxCzUdocnVmn4165aqatk0m/3raTZo=;
+        b=dYEEeM45/yIXsxjwfFLdOFBw1vI4zIVK1PaUUrjaWrBG7N81bkisvNCPl5etwo+W2U
+         ekYJxUNeEObWCRB0c+yHnTUTea/V6M7tFsG9n6PRSJOrFLc/362AriL3ND4zX04JBeDE
+         nCPWHOuCK57Ugt059FCgN4lG2Ke/feCZHa/dJlsjXbS1DP0XZ0KYD8Y7PO6/4Qs+xV3t
+         aIDagH5CJxmzzyFNfaTMtVrvcxpqtYgAV99jZSf79VuG+MHuXm7KR3A1qviQOnf3dq1H
+         MlPyBTcEKWWrJmUX8HnWte/IZX70E3RorXDMAPQeEBYul7iP1fPYbAd5lxrn0h9XYjyM
+         L8xw==
+X-Gm-Message-State: AFuF++nVkrcOeTricPVwnu+hDKQk7gX6tg5bM+zEGRA0oH0HHjwmWsxr
+	0yiqTNErzPG2xXySqADWWXoZJjWFg4mXLFOko7pcCUV0FiHx8I6W8oyeVOnjxw==
+X-Gm-Gg: AYBFou3cDuAdGgXxWWZuawh5A6gECnyTEU/mfsLd8VaLUoH5xuwV1wMtUP13+1dXlFV
+	Jmk2WL886fEqdLauFrotDIfI9Er0Fm45JcgebOj6MeTlLw9L9k4C4k773Irq1BwwgNeylecCC9F
+	/N30P0JG8ywH3akkiAAZIlfPaULrEefCEMdOVbuu9alanaQUCF9xNy7ddq0BktwOq3lOP7u3qNP
+	nqYPl2es4LMVS2Y/NuXsq5KI8LuJ891gGuKUYEFaToQO1wd2TdBXy+dooYysw5zH9BD/0Brd6Qb
+	UGL9QJ1YEkUaXQBmbgqDcs3+WhCInKZ8IPWzUCvmVYtxI3/ZS9AgDLPn6hjRmxtsGZrhalS7aYw
+	g0sCMRNS1+cu0vZtioLwfNN5AqrYW0pJqT1lGi74nibtJBDkb1FKRhDnUf4I5YycLcdwWt1pbte
+	VSoMGOe8LJg1tHyuYRwDP+v/AXp6D8/sByDMFYW198FBAtfhHy1paqV6wOHs5WjI3cRFi/jkkTL
+	clZpA==
+X-Received: by 2002:a05:6870:e184:b0:447:4fc:1da1 with SMTP id 586e51a60fabf-46f8a42bb89mr2113904fac.12.1788330124727;
+        Tue, 01 Sep 2026 23:22:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.98.141.167])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-46f3046b139sm2936092fac.3.2026.09.01.23.22.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 23:22:04 -0700 (PDT)
+Message-ID: <6a97c08c.0c3a67b7.20af77.ec29@mx.google.com>
+Date: Tue, 01 Sep 2026 23:22:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0889101856047179798=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btintel_pcie: fix stale cache in set_dxstate
- fallback check
-To: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sergey Lebedev <lsa.uz@pm.me>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Kiran K <kiran.k@intel.com>
-References: <20260507203426.128975-1-vladimirkondratyev2@gmail.com>
- <20260901203818.112189-2-vladimirkondratyev2@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260901203818.112189-2-vladimirkondratyev2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, usupergate@gmail.com
+Subject: RE: [BUG] Bluetooth: ISO: listener sock leaked when iso_sock_alloc() fails
+In-Reply-To: <CAPBHdanvQs_e29KUYjBn41fA-WBqLxDxUDb4Tv9Efh5pTm=8cw@mail.gmail.com>
+References: <CAPBHdanvQs_e29KUYjBn41fA-WBqLxDxUDb4Tv9Efh5pTm=8cw@mail.gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0889101856047179798==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-[Cc: +Chandrashekar, +Kiran]
+This is an automated email and please do not reply to this email.
 
-Dear Vladimir,
+Dear Submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Thank you for your patch.
+----- Output -----
 
-Am 01.09.26 um 22:37 schrieb Vladimir V. Kondratyev:
-> btintel_pcie_set_dxstate() falls back to checking the controller state via
-> btintel_pcie_in_d3/d0() when the alive interrupt is missed. However, these
-> helpers read boot_stage_cache, which is only updated by the interrupt
-> handler. As such, if the interrupt was missed, the cache is stale and the
-> fallback check always fails, exhausting all retries and returning -EBUSY,
-> causing suspend to abort.
+error: corrupt patch at line 12
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Can you reproduce this on real hardware?
-
-> The fix involves re-reading the hardware register before the fallback state
-> check, consistent with btintel_pcie_resume().
-> 
-> Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
-> 
-> Signed-off-by: Vladimir V. Kondratyev <vladimirkondratyev2@gmail.com>
-> Tested-by: Sergey Lebedev <lsa.uz@pm.me>
-> ---
->   drivers/bluetooth/btintel_pcie.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index fda474406003..7fca8eea6e01 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -2778,9 +2778,13 @@ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
->   					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
->   
->   		/* A hardware bug may cause the alive interrupt to be missed.
-> -		 * Check if the controller reached the expected state and retry
-> -		 * the operation only if it hasn't.
-> +		 * Refresh boot_stage_cache from hardware since it is only
-> +		 * updated by the interrupt handler, then check if the
-> +		 * controller reached the expected state and retry the
-> +		 * operation only if it hasn't.
-
-Re-flow for less lines?
-
->   		 */
-> +		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
-> +							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
-
-To me it sounds strange, that a register name *boot stage* should change 
-after the boot. ;-)
-
->   		if (dxstate == BTINTEL_PCIE_STATE_D0) {
->   			if (btintel_pcie_in_d0(data))
->   				return 0;
+Please resolve the issue and submit the patches again.
 
 
-Kind regards,
+---
+Regards,
+Linux Bluetooth
 
-Paul
+
+--===============0889101856047179798==--
