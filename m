@@ -1,144 +1,123 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mail-106120.protonmail.ch (mail-106120.protonmail.ch [79.135.106.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEA13EC812;
-	Wed,  2 Sep 2026 08:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFA73EC808
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 09:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788338340; cv=none; b=AkziPatJ4ktbQe2ucetkLkkzympdBVn5U2EwagFns8Jdk6jdtDCX6wl963PdWEcoNWaIMC6DAuTgoGWCCaCzd7K73BcFqmCPnWyGlt8fUaOv1gXixmQJMFUfqQ7oV3XMVwyUAb5K0vjfNBvA1TtZ/Oz7ETzc9Y/GK1PgjqR7D+c=
+	t=1788340247; cv=none; b=isdY+r3c2DAj+BSe1Wy7KfdIZij/2p51c9I5K1dpDlVZ4zIpGCWLiq4VPPPM8CIneGkcnYnEOTmGwUSH910t8GRfMCRUcvnbEh6ji2GizazmIth8EO9T1xnnUkP5mW/bLjn1ZZiC5RJ2xH2GrF1aBUeSMgCYJBnDZbw+ekaQBOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788338340; c=relaxed/simple;
-	bh=WfxBg7Bf+HiTB6ngMWEXZD7Yr7SeHQb+UIJiTi0yjnE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i82AMTQRR9DdQlr/QNXdeEwzehvVlsBqk71x1pte4soWRZfbFjpyNPQektFIZKjGucWN3E34FKdQGSIk49VRCUk1OSDXAEgugDJ3/WsWbzqcRRg70cJuXrlQbebozDnKfKo/fAaRDgMRZem26BFljjSqRrvwm19vcmu39q1ImVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.44.42] (unknown [185.238.219.109])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 776B34C2C37D64;
-	Wed, 02 Sep 2026 10:38:27 +0200 (CEST)
-Message-ID: <369afb50-3582-483b-89ea-f9b1a7259a4f@molgen.mpg.de>
-Date: Wed, 2 Sep 2026 10:38:23 +0200
+	s=arc-20240116; t=1788340247; c=relaxed/simple;
+	bh=LS7Fibgj6tHzCKLmNlN3CTMp/1S+Tjji9If21tIKkF8=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pEv18MXwcJYMwnCFA1NXaYyaBsPeL0lDPplPzujPq6bf6QLy7cLWD2Ap5zEiVgpkboEAdJCLB099vjZ43vb5QCbbmEPMoM7pf8e2F7oDiETp1WbJ5XQnax3BiT35OVfPPLYfB2I93/SuVaqmH/Q/+m2iSlfs37Ywbi2celF1SVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=TQ27+2jK; arc=none smtp.client-ip=79.135.106.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="TQ27+2jK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1788340233; x=1788599433;
+	bh=5iO1AtMI7nXpQM206CvTQOAiourbmDEKaegIHg4Pb9Q=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=TQ27+2jK+16IGN4ViULXC0SqeP39M3/Fi3invsgu7dgQdLxFwWHDLTt9vLLuxaag2
+	 9AqRGTf+nQc8BYoEBjm5fYDiRa0ckYwcqYNpMjllOhi1D8R1E7HnTsZyAQX5HGb1DE
+	 /uoM3f6NMQl32LP3zg3lMYUThNAMUZJ/boYwjJg6cY8vHGrmiYvJFAwoww18oXidB6
+	 Jon0ObzHzqMKiGsEo6uRyuAJBFb2esFG3yymLn5UACED+blU418TklCUZhJyNSiZw6
+	 SVFn5bEcMItH9ijdcFAyfjHTdHM/DMXZqTpyQzAMYM0kROySnK5rbb8doGn38rduRE
+	 2mJkDSLZuI6Dg==
+Date: Wed, 02 Sep 2026 09:10:29 +0000
+To: Ravindra <ravindra@intel.com>
+From: Sergey Lebedev <lsa.uz@pm.me>
+Cc: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>, Kiran K <kiran.k@intel.com>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>, Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+Message-ID: <20260902091021.20160-1-lsa.uz@pm.me>
+Feedback-ID: 113843758:user:proton
+X-Pm-Message-ID: 1474c3297393a7f28e4cf14b8b1ad9c9268e1f9e
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btintel_pcie: fix stale cache in set_dxstate
- fallback check
-To: Sergey Lebedev <lsa.uz@pm.me>
-Cc: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260507203426.128975-1-vladimirkondratyev2@gmail.com>
- <20260901203818.112189-2-vladimirkondratyev2@gmail.com>
- <d633b7ee-0afa-4fa1-8340-3d7616f429d2@molgen.mpg.de>
- <20260902072417.30260-1-lsa.uz@pm.me>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260902072417.30260-1-lsa.uz@pm.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Dear Sergey,
+Ravindra,
 
+Paul Menzel pointed me at this patch from the thread on Vladimir
+Kondratyev's stale-cache fix, since both change
+btintel_pcie_set_dxstate(). They overlap textually and, more usefully,
+they fix different halves of the same failure. I have the hardware and a
+fixture for one of those halves, so here is what I can add.
 
-Thank you for your immediate response.
+Your change moves the flag out of the retry loop:
 
-Am 02.09.26 um 09:24 schrieb Sergey Lebedev:
+  +    data->gp0_received =3D false;
+  +
+       do {
+  -        data->gp0_received =3D false;
 
-> Two of your three points I can answer from the hardware, since the
-> Tested-by on this patch is mine.
-> 
->> Can you reproduce this on real hardware?
-> 
-> Yes. Surface Pro 11 (Intel, Lunar Lake), Intel BE201, 8086:a876 rev 10.
-> It first appeared in ordinary use, not in a test:
-> 
->    Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0
->    Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1
->    Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2
->    btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend returns -16
->    PM: Some devices failed to suspend, or early wake event detected
-> 
-> One device returning -EBUSY aborts the whole system suspend, so the
-> machine does not sleep at all.
-> 
-> I have to be honest about the rate rather than useful: it failed on 2 of
-> the 3 suspends I attempted before installing a workaround, and later, on
-> a newer kernel with the workaround removed, it succeeded 7 times out of 7
-> with no btintel_pcie change in between. So the spontaneous failure is not
-> something I can produce on demand.
-> 
-> What I could do was exercise the exact path deterministically. I built
-> the driver out of tree with one debug-only parameter that returns from
-> btintel_pcie_msix_gp0_handler() before the boot_stage_cache refresh, and
-> only while alive_intr_ctxt is BTINTEL_PCIE_D0. That leaves the cache
-> stale and gp0_received false — precisely the state a genuinely missed
-> alive interrupt leaves behind — while the controller still reaches D3.
-> 
-> Without the patch, that reproduces the production failure exactly: three
-> timeouts, -EBUSY, suspend aborted. With the patch and nothing else
-> changed: one timeout, the re-read observes D3, set_dxstate() returns 0,
-> and the system suspends and resumes normally.
-> 
-> Full method and logs are in my earlier message on this thread,
-> Message-ID <20260830151550.44687-1-lsa.uz@pm.me>.
+That recovers the case where the alive interrupt is merely *late* =E2=80=
+=94 it
+arrives while a later retry is waiting, and previously the per-iteration
+reset threw it away. The comment you added states the invariant well.
 
-It’d be great if the thread could be referenced via Link: tag, and also 
-the problem summarized in the commit message including the log messages.
+What it does not cover is the interrupt being missed outright. When that
+happens gp0_received never becomes true, the loop falls through to
 
->> To me it sounds strange, that a register name *boot stage* should
->> change after the boot. ;-)
-> 
-> It is a fair reaction to the name, but the register genuinely carries
-> live power state. From the driver's own header:
-> 
->    #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY  (BIT(24))
-> 
-> and both helpers test that one bit and nothing else:
-> 
->    static bool btintel_pcie_in_d3(struct btintel_pcie_data *data)
->    {
->        return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY;
->    }
-> 
->    static bool btintel_pcie_in_d0(struct btintel_pcie_data *data)
->    {
->        return !(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY);
->    }
-> 
-> So bit 24 is updated by the controller on every D-state transition, long
-> after boot. The name describes the register's original purpose rather
-> than everything Intel later put in it. btintel_pcie_resume() already
-> re-reads it for exactly this reason, which is what makes the patch's
-> change consistent rather than novel.
+      if (dxstate =3D=3D BTINTEL_PCIE_STATE_D0) {
+          if (btintel_pcie_in_d0(data))
 
-Maybe a comment could be added above the macro definition.
+and those helpers read data->boot_stage_cache, which only the interrupt
+handler ever writes. No interrupt, no refresh: the fallback is asked to
+decide using the value from before the transition, so it reports the old
+state, every retry is exhausted, and -EBUSY aborts the suspend. Vladimir's
+patch re-reads BTINTEL_PCIE_CSR_BOOT_STAGE_REG immediately before that
+check, which is what btintel_pcie_resume() already does.
 
-> The re-flow is Vladimir's call and I have no opinion on it. If a v3 comes
-> out of this, I still have the hardware and the test fixture and will
-> re-run both halves against it.
+So the two are complementary rather than competing: yours makes a late
+interrupt count, his makes a missing one survivable.
 
-Awesome.
+I can be concrete about the second half because I reproduced it
+deliberately. Surface Pro 11 (Intel, Lunar Lake), Intel BE201, 8086:a876
+rev 10. The driver was built out of tree with one debug-only parameter
+that returns from btintel_pcie_msix_gp0_handler() before the
+boot_stage_cache refresh, and only while alive_intr_ctxt is
+BTINTEL_PCIE_D0 =E2=80=94 the exact state a genuinely missed alive interrup=
+t
+leaves behind, with the controller still reaching D3.
 
-Also note, gemini/gemini-3.1-pro-preview found the same issue in a 
-different review [1].
+Under that fixture, moving the flag out of the loop does not help: there
+is no late interrupt to catch, and the cache stays stale. Three timeouts,
+-EBUSY, suspend aborted. With the re-read, one timeout and the system
+suspends. Method and logs are in
+Message-ID <20260830151550.44687-1-lsa.uz@pm.me>.
 
+The failure is not theoretical here. Before any workaround it aborted 2 of
+the 3 suspends I attempted, and one device returning -EBUSY stops the
+whole system from sleeping.
 
-Kind regards,
+Whichever of the two lands first, the other will need a rebase =E2=80=94 th=
+e
+hunks touch adjacent lines. If it helps, I am happy to test them applied
+together against my fixture and on ordinary suspend cycles, and to report
+per-patch rather than as a combined result.
 
-Paul
+If you and Vladimir would prefer these as one series rather than two
+independent patches, I am happy to do the assembly work =E2=80=94 rebased, =
+with
+both of you as the authors of your respective halves and the Fixes: tags
+kept separate, since they are separate bugs with separate reverts. I did
+not want to send that uninvited over two patches that are already on the
+list; say the word and it is a short job.
 
+One question on your patch, from someone who does not have S4 on this
+machine to check: .thaw now takes the normal D0 path, while .restore
+forces FLR. After PM_EVENT_FREEZE the controller was put into D3_COLD by
+btintel_pcie_suspend_late(). Is D3_COLD guaranteed to preserve firmware
+across a freeze/thaw on this part, or does thaw also need the FLR path?
 
-[1]: 
-https://sashiko.dev/#/patchset/20260902042840.2432862-1-ravindra%40intel.com
+Thanks,
+Sergey
+
