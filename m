@@ -1,98 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086C4480335;
-	Wed,  2 Sep 2026 13:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788356948; cv=none; b=J2BkyZ7NdwvSmEFhS93aJbdTOCOV0EiKBZU6Xkr7edlcrw4UesBQmt6mttkhGu2BQ1aBhA19XGEtnh5JWo96DibqiG5ES7aNGGTggsiUUMgiFIPm+OppMNFUUkxzPCmM5IXbSTUI/1TH5lSQJW5qZ+dpYadRApe4nKBu324Ffz8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788356948; c=relaxed/simple;
-	bh=I6IPjF4e2ZPveqeks4j7gpOuxT65brG3HWGvJFD/df8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=riOslM8NYCAZSM1iIEH641Uk6z9canR9USmMZqLGD7U9Z5jjykNqNqiAUglFo89EM0uelqtQzqMlw7VwpNf+/mVXkkfnm6IPpqeTsD6pMDgyj1F3W8b6xqm9Ks9PXrBxJ2HQe5XJa/wzX7dkVFAwWmLFVbL5R8HMnN8iOvhdz8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxxJkDqs; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05F8247280
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 14:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788357664; cv=pass; b=dv7ru2OkPagpDtHF3wV+e58PxDM0cU+FpfRHei23mLHgLaetlIP+G4lrHPwSOTYnpKd00jfwQqa5SfyIMoIsL8njdZM78zdSYAVCM4he4C7WetRyqNRxBIcv4zLzZputD7lV4yj6V05vvAVbRyqjsz/GlZZgyxGpAVeI2fXB/fk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788357664; c=relaxed/simple;
+	bh=13eXiadm3DRzQBlWqIFmfnknITG5D9T6dF/zFRkb9KU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=o08WX/UttKU/LqBIbHDvG53xHbfCPJcbzUx3QS+6p6DxCTfZId8T3VI0ZSdlj2a2bspY61Ke5FQUTfWLtiaTurfciFQ5oFqffVmZXbdE0cqrKWQF+tI9Gus/R6umTouQrwNJjR/I8hvk5tfJXpR57b2MakW6KIzuNPHywYwttis=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/gX84hz; arc=pass smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxxJkDqs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F161F000E9;
-	Wed,  2 Sep 2026 13:49:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788356946;
-	bh=qREgg7CzsHv/1gfKebzVg0o4tvByFnZpDQA0xB1Irxs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kxxJkDqsVkIS+ZEqmrxRxC4jGCVYhGWgb7+cJQz6s1zMjW2d9t7Wthr8R+7NCOCud
-	 1UyiwVqjlKTwT0HkaUCaLQtv0VanCWQOBlYpN/j5a6Gc8dB6npMnqdEkIITZPjGlRA
-	 ikGjV0fmwEe/LQ0UUnTzoRGbkisiUlpbmleteHqXX8mvLG2yuwUX5TexQ9OnwQjj6e
-	 sK1iYYYaJTzj9Eyu77oK87RzXVfZlzH0omP4DfV0Ti9Vve7oo9lhDTJxGZyzcN0o4K
-	 LRSjcPP/v7oYxL44nNfrQ6QSQPkLHEddA7TgVdx3p9pKRmlyfgQ01CAiaALrUF4/vg
-	 HCkeCYCcBVz6g==
-Date: Wed, 2 Sep 2026 15:48:51 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Wei Deng <wei.deng@oss.qualcomm.com>
-Cc: konrad.dybcio@oss.qualcomm.com, loic.poulain@oss.qualcomm.com, 
-	andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, quic_chezhou@quicinc.com, 
-	cheng.jiang@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com, jinwang.li@oss.qualcomm.com, 
-	xiuzhuo.shang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: monaco-evk: Describe the PCIe M.2
- Key E connector
-Message-ID: <isbrpaztfrgwfcleujrn4w26cshbi2mgn57tbh5bubvsegn6lc@jh3ab6htvd24>
-References: <0303224f-4c2c-46ec-9866-5ea1fd0fb4a3@oss.qualcomm.com>
- <20260825092715.5794-1-wei.deng@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/gX84hz"
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-66f883abfdcso1221800d50.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 07:01:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788357661; cv=none;
+        d=google.com; s=arc-20260327;
+        b=YIH9U/Gdzgz9AQhpp0PV+LlQz0qJV6dUpjKacSKb21zwNJv+UXz09/cV5N/dXle/lx
+         vWODvG69LPnzYM9pF+o4m8d1nlbCWO1qVeLLogsOsQljHnVB3wEnuv/53S/cSqEQVzxH
+         1EtjdINmLPwF2braA9jKA+kczt+TAQkKnxXj1+p81CJXU5sY8NdaVMPOcwmJv6NfdOU0
+         y3YaRB25cRRwLHMB9SsiLDlfH+KICLP/z6z4RNf3pUZTNaB8lLRDSGGXCDNrNfF2cmrY
+         iiZ+HkPDuwRau2mz3brABqzzP0tyaOGdN9AztLBkYeUhyLAo4V3dS0ok4b9FmzU18G4j
+         TgNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
+        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
+        b=SI4CAWr1LG6/HChrspXsika5HzcxsRZz4tpExXCu0KzILMP7aDYx+J19IztmG6ooJV
+         WZmLPw0KA2FqmzFAXKI2j77fdFKP2lSgP7RQXd/uvrNAIDsbRHoe8duW4TKdkIeIQ5mk
+         KFVtDMEGfoDK3+hcR2cFvOZgwVGYVpi38wXuInHa3JRKjoGwzdnIXbIVVLo71v+I56WF
+         eZ1QIiee4KrmC+JQd47j4D7b2slrbuzUnxsCnTKf+MqPZ0R1PNbm50vZykYU+f3bvRwc
+         v9iCUA6fw6fu2xtreaSwNNh0zIN47Q+04jvnDC/6B1cq7GUyuBcFfmnQkAgmcCQ8r3N0
+         wUJQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788357661; x=1788962461; darn=vger.kernel.org;
+        h=content-type:to:subject:message-id:date:from:mime-version:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
+        b=G/gX84hz3vZru7/yfudQn6JmdVLBx93j2TxZMdwE9zm+EUAbA3HQDnkcOztXbeWqfg
+         2u62MwqUcYch1vs0hqsq5LqYyXTcG2YNxG8p4aYHVWcNmMbOjV2O3Lrkidcmu43N7QVM
+         6Ms+5XDhcIg4Y0/qRYCTqfIUagw8o49qleWw6w1HV3vybQS88RjgcnI14QMCB9NwjX7Q
+         cyfE5pEefumHNp9ThELk3uVoaitrm5dorjpTWUbGHTGVh8WGlLK8NcM8k/4LmaMuNVCv
+         pTR/xYY/YSsql8YwAT5eVJa9vD2ldxgEgdtpO2Yojat+AP/fQj2JsI86do+qb3dku+VN
+         sBGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788357661; x=1788962461;
+        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=45ceB+KqJ1OusQIjk9MQr4WAjodYbVVY9fXljaQUNU4=;
+        b=TUKQ2LleuutIe15GwQ9R3eFuS2k6rjzzfMobgVShd3FF8VSZJpMkGjRsNQmU+w5aEE
+         7n5KERGdIzsi0S3Npj74K2kd0k7+8qbCRmIhVCQS2U3P/dsBz8E66Ew14wZt+JqNdVxW
+         chZQTM6e1SUylcxTiktkJMpmq36D3EPytRGId6zB/Uq9Vkr3KJu1qxn5PW14RccMo244
+         lGvZW+dQuBYLupQocUgtabCiCpKw0lQ/fr4FLdFYQc6E7aGCrAsw4cuwMNQ54YLlLWjU
+         Xbd4DdjutRBzp81vOEVGHk3Q5j043pUQrITaOsXx8oBHASo0sO/eZsV7fXG7VKwcf6xZ
+         pLaQ==
+X-Gm-Message-State: AFuF++lMB//YDWhKbHbZm1p3aK+VG/KB/jA9SRUdRg07pQenxipvQmZb
+	HlvsPr/5oQUk/GhezccN1oPy4PetAp0RhD8ooBFAMUt6nADmAyua1KAvxqdPlE9OiMTUYylPm13
+	Fmc+4EfikB+pQhIIrhAqMBVWgT25r00Mq9TdptMM=
+X-Gm-Gg: AYBFou0leitNxVwkO1nxqAe0KAVvEEAQNPCHthVSU04lmgUiIP25SMqWgWvEJBcgQqP
+	MlQCBl17mT/ZOpxTKOIXfRGBemEbKGa7ufn4QE8U5f/nar0DioZJMFLzSyjczZuxT7TUhKMzTDL
+	qCQF1FZaqRmmELlmiMlg7fPElnySqdPTxzv6kMgQWKt183LEeYOElCe3L9H3TH0Z8EdXa54Mzth
+	mcadhR+YBlgKh5eaKHBFM89ocWYnnwZBy4/ELSR9eemaoPKQP8ggBaLPxdZWDGUKtWjG8UtYGyv
+	QUlyn/maUeZ2xj05MGcgZaQclSQ3RFdgoZZxY7S+Bmln3ntVOWWo9R3C+NFw8mqzrgSR+QHqXpx
+	IfnpUv9pP5POHwa0cAjXSpNE4rHrEn2nY6Tc=
+X-Received: by 2002:a53:b710:0:b0:66e:3d51:1e86 with SMTP id
+ 956f58d0204a3-66f9bba355emr1277280d50.14.1788357660594; Wed, 02 Sep 2026
+ 07:01:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260825092715.5794-1-wei.deng@oss.qualcomm.com>
+From: Nicolas Thibert <nithibert@gmail.com>
+Date: Wed, 2 Sep 2026 16:00:48 +0200
+X-Gm-Features: AcwNN1XGKoiCKR4Lep-ccQhwCvBUz3cWff_B_G9oGF7m76rET2Z-_za4RgZAVSg
+Message-ID: <CAKA8V_8QC7u4OsP+f4_h2UfPQ0uAMy9ESzvuNULo1cFkmxyjow@mail.gmail.com>
+Subject: [PATCH BlueZ] adapter/advertising: fix mgmt endian bug
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 25, 2026 at 02:57:15PM +0530, Wei Deng wrote:
-> Hi Konrad,
-> 
-> On Wed, 19 Aug 2026 16:24:35 +0200, Konrad Dybcio wrote:
-> > On 8/19/26 4:13 PM, Wei Deng wrote:
-> > > On Wed, 29 Jul 2026 08:06:54 +0530, Wei Deng wrote:
-> > >> Fair point. I will move the port/endpoint anchors to monaco.dtsi in v2.
-> > > 
-> > > After testing v2 on qcs8300-ride-sx, BT init broke. qcs8300-ride-sx has a
-> > > soldered WCN6855 and no M.2 Key E connector, but the pending series [1]
-> > > uses of_graph_is_present() to detect whether an M.2 connector is present.
-> > > Since of_graph_is_present() only checks for a 'port' child node, the empty
-> > > anchors in monaco.dtsi caused hci_qca to incorrectly enter the M.2 pwrseq
-> > > path on all monaco boards.
-> > > 
-> > > v3 moves the port/endpoint nodes back to monaco-evk.dts. Please review.
-> > > 
-> > > [1] https://lore.kernel.org/all/20260720-monza-wireless-v5-1-69ec6743543c@oss.qualcomm.com/
-> > 
-> > The series should test of_graph_get_remote_endpoint() instead
-> > 
-> > Konrad
-> 
-> Hi Konrad,
-> 
-> Tested: replacing of_graph_is_present() with of_graph_get_remote_endpoint()
-> in hci_qca.c works correctly. The M.2 pwrseq path is only entered when a
-> remote-endpoint is actually populated, so boards like qcs8300-ride (soldered
-> WCN6855, no M.2 connector) are no longer affected.
-> 
-> Hi Mani, Loic,
-> 
-> We are adding M.2 Key E connector support for monaco-evk [2]. Konrad
-> suggested moving the port/endpoint anchor nodes to the SoC DTSI
-> (monaco.dtsi) for clean DTS layering, so that board files only need to
-> fill in remote-endpoint for boards that actually have an M.2 connector.
-> 
+Several places in adapter.c and advertising.c write a native-endian
+value directly into a __le16/__le32 field of an mgmt command struct,
+skipping the htobs()/htobl() conversion used everywhere else in this
+codebase for the same purpose. This is a no-op on little-endian hosts
+(where htobs()/htobl() are themselves no-ops), which is why it has
+gone unnoticed, but corrupts the value on big-endian hosts.
 
-This means, the dummy port/endpoint node will always be present even when the
-M.2 connector is not used. I don't see a compelling reason to do so.
+Confirmed live on MIPS big-endian (OpenWrt/ath79): set_blocked_keys()
+sends key_count=2 (2 blocked keys), which the kernel's
+__le16_to_cpu() correctly interprets as 512 (0x0002 byte-swapped is
+0x0200) since the wire bytes were never actually swapped to little-
+endian on the way out -- producing "expected 8706 bytes, got 36
+bytes" / "Failed to set blocked keys: Invalid Parameters" errors in
+dmesg/bluetoothd logs.
 
-- Mani
+add_advertising()'s cp->duration and refresh_extended_adv()'s
+cp.duration/cp.min_interval/cp.max_interval have the identical bug. It
+is inert with bluetoothctl's default (0) duration/interval values (0
+byte-swapped is still 0), but A/B tested live (patch removed vs.
+applied, bluetoothctl's advertise submenu "interval 100 100" set
+explicitly) confirms this is not just a theoretical correctness fix:
+with the bug present, the device stops being discoverable by a real
+BLE scanner the moment a non-default interval is requested, and
+becomes discoverable again immediately once patched. Any application
+that sets an explicit advertising interval or duration hits this.
+---
+src/adapter.c     |  5 +++--
+src/advertising.c |  6 +++---
+2 files changed, 6 insertions(+), 5 deletions(-)
 
--- 
-மணிவண்ணன் சதாசிவம்
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -9938,10 +9938,11 @@ static bool set_blocked_keys(struct btd_
+sizeof(blocked_keys)] = { 0 };
+struct mgmt_cp_set_blocked_keys *cp =
+(struct mgmt_cp_set_blocked_keys *)buffer;
++     const uint16_t key_count = ARRAY_SIZE(blocked_keys);
+int i;
+
+-     cp->key_count = ARRAY_SIZE(blocked_keys);
+-     for (i = 0; i < cp->key_count; ++i) {
++     cp->key_count = htobs(key_count);
++     for (i = 0; i < key_count; ++i) {
+cp->keys[i].type = blocked_keys[i].type;
+memcpy(cp->keys[i].val, blocked_keys[i].val,
+sizeof(cp->keys[i].val));
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -995,7 +995,7 @@ static int refresh_legacy_adv(struct btd
+
+cp->flags = htobl(flags);
+cp->instance = client->instance;
+-     cp->duration = client->duration;
++     cp->duration = htobs(client->duration);
+cp->adv_data_len = adv_data_len;
+cp->scan_rsp_len = scan_rsp_len;
+memcpy(cp->data, adv_data, adv_data_len);
+@@ -1046,13 +1046,13 @@ static int refresh_extended_adv(struct b
+*/
+if (client->duration) {
+-             cp.duration = client->duration;
++             cp.duration = htobs(client->duration);
+flags |= MGMT_ADV_PARAM_DURATION;
+}
+
+if (client->min_interval && client->max_interval) {
+-             cp.min_interval = client->min_interval;
+-             cp.max_interval = client->max_interval;
++             cp.min_interval = htobl(client->min_interval);
++             cp.max_interval = htobl(client->max_interval);
+flags |= MGMT_ADV_PARAM_INTERVALS;
+}
+
+--
+2.34.1
