@@ -1,99 +1,184 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5843B2FFF9D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 14:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788358859; cv=none; b=G7iD1vlwVh9jLggmp2uKBnYuYJQIbbe+tIcwpWQwv91fy8WjwL8LwJBd0qtQxCaTjg6XY3zxsHgGECzsreclwxghXgl1B3cKa7RkFZ5InfiwwSs/07YnEHQyDQNP1WcvOKzcr5t8v+H8T69O1AHDqxOkPmms+YfhR72s5lKqujQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788358859; c=relaxed/simple;
-	bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cgkua4uhwrWxyM2qHh0HhE7wjZeTZBVssPZaAHIPgufRJ6ED+fSjVhDio6KcGA9m87FxDqaaGh8F8o2MmFU4XJN3ZUkFAT5zUvMW21uBLSalM6KavqmIyti6UdLv1U+LxBPwMC3PsEkwflvLKXqesfG3FT7OC1xbjfOLoYr719M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pQek0EbR; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF8F3546FA
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 14:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788358889; cv=pass; b=Yhp4W3EsCcmTo2szSvI+4Jit/8PqM86qG+EYAI8wLuizDvDe8VeDwgn8aOJHsKOP78ZYEBLNxkmQ0CywxOOp5CfBiP7YE7RSS2yrtWhXKPFaSOgO02fl5iNf9uVJJ72ebtcJfiS1cgeCgcuKgFZLPI6lCVCDua5Zaxs05STkt4w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788358889; c=relaxed/simple;
+	bh=2r+lnupSC/nWHH505iCw7eA1T/6MsKjnYNMGjdByAKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MpDLkPy20BXD9jw2qY2LLzBcOsWIkMFc9qZYs5Ou6Yii+h6k/hsrPItGR9yfEmpx2d1AaZjEeVH6uiKnzobwVb+35Bk7RIOYyPoGGnbJYFkr+Qb6Kppo0MVf5PjODkTQ0DX6V/v21Rf+ZZ6Tt/rpsKXuuScYGx37YI2kRNurceE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NC+XM2Dt; arc=pass smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQek0EbR"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6b3671a1b20so741662eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 07:20:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NC+XM2Dt"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-86d43cdee51so6239997b3.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 07:21:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788358887; cv=none;
+        d=google.com; s=arc-20260327;
+        b=IbTxRhWvyBR2FAAS7VQ46ESC4e9wzdKzBZfSxwZ9SGHoBmwwgfde0RzIINJvIWASSJ
+         6m4M5ioRBfkoIAyym29uHTXoDxg5EguMoAcZhfR2asb4sdwZByG4SUpDuFqgiJnar1jc
+         3FIJEEoFL2OWoeVwp1YN/2gauYrbYn6USg0btS4cOEgbnPEGEU39q926EgXHhaeZtJ1D
+         ZyWeaWo961GkuPk6nMVdhC7Nu+bIVHzxE/2pHHuzMzy2aHgmxLEpcHppPXbTY7WkiywO
+         ouTFedW8y7nYxqRb967aQL2UuBr3NuR2tlBokcu6a5ti68I+WKqhCGtq0I6HjhHUHih0
+         W+YQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UnkzoBG21gsH02CPC4qJUhlha7Hb69/kJ7Y993hDOQY=;
+        fh=kc5TcPwbtmAgYy0p6cYNmdWRet3Mr/mvpcm07F+9fs8=;
+        b=lgljYQ8jX5s3qzWKT9igXm4Sk1ypB1HaM0HIUPwhMeeS9buK6zwla5M845DTCufGeg
+         fixgW9xisrQybHfl/n321KW1BPZOUXDU/Y3JeIfGKU1tyd6w3PsBEIr1ZRH/hyOCA8gh
+         +zNYowF/7XPIkfXzYBNwC1EfZ2WHDf78nmDG5uhnzfrF4AEGEvD/Ova10Q1LzvWFBOtG
+         yZnwivIjhzuubKu8HnkAGeKXgjJXiejdmuePWO/RgJPFsAVSpj/rzi++9WjrBkanKYfk
+         hqJaOWa00rKN+ShB7ser0w9RTojAz8kAp/22ihl4dmaFOZsjpP8bqp50ffY547Kzklnx
+         G9zw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788358857; x=1788963657; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
-        b=pQek0EbRZsFlOfv7YNqczbgGGfiafpxRvObT8CVg3DXMVAeFtx7TCwHLjCIAcjGZXt
-         boBZN8QG272ETc6hOprIvOl5dyOJBbmntfBVVnT6O1sfQIoIAT9hlaEBbKIHon93kmkX
-         7EUp7rXdMh/Jc3nFPjzR1OS3zoLHTKLBn6u8yQ4759aIPOg6oUkyGaPY+npH5uWJ2y0B
-         Qi83tSKjIfLH3zTS2AzGBqzYAh7ydLXvQ40qglPwQ0eJ6sVI2Y9NShvZw8qlX99q03rA
-         wb1/XyhUBp/7+GxvDFdGXpnnnc0fcyKN2fdnhGwIbcwZKN/h1b1Y/Btr3rzIIIkKf/5f
-         D55Q==
+        d=gmail.com; s=20251104; t=1788358887; x=1788963687; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=UnkzoBG21gsH02CPC4qJUhlha7Hb69/kJ7Y993hDOQY=;
+        b=NC+XM2DtlgPgKpLzr6WH4pw+KBwjbyUa0WGf3gbJR4TbJoB2pKTXKNWTcQCeq58Ydi
+         GLa4hINrBsdks4nE1hoPislskuYq8uF8Abr5st1LxlfIMmgIlXHcbZ3+xfHFMeFUiErr
+         bFHxLENIfRbimS01j1G295RNPYiL/WzKk2y/PWofvmvvdxBdGYh4giphBydwqZSzO+8c
+         /5/FL3p/lZpPmOIBASbtoF7HfKSxVMmipYCWj/2ncsHFaxlsHRhUmEjfwH1rDOtjO+DA
+         baxg0H+XXiQHPFXdctsDEUN6vfMWKSoQNue6NyxhnteHv/qG+bSvw2MXZLWHnRlSsiBR
+         ov7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788358857; x=1788963657;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aMgQ83kOVKtOT//8a3YxSzKyOhDVLUMuIP5zhTCpo9U=;
-        b=N7P0NS9Cn9Y7tV9+8xDoUEpxZXT8cnHAr+fvmEMj4gLp0mB8Zx0FdjpXJ9bYMQOhP6
-         Tl/QMc3lP9+/Gcr064tp7+MMzGQVlc7q/Pu1FQx9wE+gXse7/Of//jmrzWl6aXPGjk/j
-         zht/cymtCpafrs4W3kAKNVq8crv6QQk7+cxgYsDQjelKgiQwfXus6gUBVCe6wzcWA25G
-         aon/HS4mlkAlCdsIVw8QWAq4xlfJllBIamWVSzqjd9Dez5URmlML7Yx2tc80WsSEco2v
-         ttfbYxSIuo4cQwe1ASSbmay42S/mZcY2RpIuOEZMEsdMjDi6XdseyoUWt4l3VoViM5C9
-         qkyg==
-X-Gm-Message-State: AFuF++k35H2o0uvE7R6n5qKOARamrGBLdJLTDX00koMNWAqIMR8PMyC2
-	KlXpBM5ZN2s2UeN987BoPnJDl1uG6mrDEyHcV3502NKTPUo1ObL2fs2gfc6Yv5XdOBc=
-X-Gm-Gg: AR+sD126uTCANg7ttoRoDRc5g8BDkKD4nSuhsdYMEMUSoq04mdVaBjYejxpMdzqR8jw
-	Cd8T0DIjyn3X0XW3bWKa4ptlxmWT19QdEvJEirSjjU3gnO++NUoiJHEuWn3RRfBv6MKytm5N9CM
-	jn61x33J6R7bG6kV5qo2q5Dezj+4qbZRI39dgqWuBsShPlaJIQU5Ma974GiZiTXK00k/v9IdFHw
-	nB8P1jEegtJqozxVFdJUTX6Dj9TSWjcyvhMZXhi2SkvcGwkkxM4LNBN0PxIxw8fC4szaTz04Ycd
-	WaDAlYIn7HOnbzGG1oAvVMJ1isEw2AZap5TNSkPvEFD3XV2hlmoJ6EZXiYh8PZGQB5TuKxA3t2J
-	Grnxe3GlVIGDuVJFQMMZk9mouNqJmtO6UOsLldlJP1BZjhTjRakCCF0kAM9fKqqovz9wI1Bm9Ac
-	v+h+ucxvwFEuapj5B2EyE+vWTVBntUi8HP5yPZyv7c3Ye5X57/NaJDrGn0SHYZUTBrp4hPCamu/
-	yng4g==
-X-Received: by 2002:a05:6820:210:b0:6b4:63bc:5249 with SMTP id 006d021491bc7-6b48153e1a3mr3735995eaf.23.1788358857171;
-        Wed, 02 Sep 2026 07:20:57 -0700 (PDT)
-Received: from aditya.tail9b10c1.ts.net ([2409:40c1:4c:f2c:672f:3d11:f7e:5e19])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-46f30baa0d4sm3804836fac.6.2026.09.02.07.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 07:20:56 -0700 (PDT)
-From: Aditya Pratap Singh <adipras1407@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+98baa83c342e86a836d7@syzkaller.appspotmail.com
-Subject: Re: [syzbot] [kernel?] WARNING: refcount bug in bnep_session (2)
-Date: Wed,  2 Sep 2026 19:50:38 +0530
-Message-ID: <20260902142038.345734-1-adipras1407@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <6a86bb5c.4d75e56a.c9a88.0039.GAE@google.com>
-References: <6a86bb5c.4d75e56a.c9a88.0039.GAE@google.com>
+        d=1e100.net; s=20251104; t=1788358887; x=1788963687;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UnkzoBG21gsH02CPC4qJUhlha7Hb69/kJ7Y993hDOQY=;
+        b=qEgy6yaa1C6ZpyWeBJsJ581c00dGa0Ce9ffZBb6K0heZhUac420KGtGWP4lSBYzyd6
+         J5mrpoexzfa7B9VKpyfE2G5gu8ilArRLOSUD7Ul3A1GZYEfza1Z1coluAuQ7jamw5wUO
+         zj+h2KlBFnoQCmQo6wytPvfo/2qa7w/G0lZurXzsRWfz4wp7NQU5mk5SVLnPwtlBqVkG
+         fnkDIdEQT+r5F+wN+Eqz8iUJBPxA9sZzt6mYNqwb114Xv0XxLKiC3xB4kdUAj/a2bxEQ
+         TrPidZ3giyzpJSu2qTxlvL2+n+ybGmsAf9GHENp4smPAiMPbwYwPXVGhL07w/9zPzBN4
+         Xbtg==
+X-Gm-Message-State: AFuF++nQJ+luEvfMHgybFCaFA/qfqXjr95+QhZ9zzgM0O0MFImQHXS4B
+	nxZOqPI+OqHnth7X82FEdEqfTGAbtMxaSs/iHduIhFOM/Ty9/hi8zkADvMvbxUBSPml7KRBSFce
+	e2l2qBj8aIgn/yqQIHSfGLBQzhk9E8yRHNHkCsIEwvg==
+X-Gm-Gg: AYBFou3w430ZO9WlKlivePuwKfSwNdS2DlqDPyrf4vPdOZjnHPM/TpDws9/uzHTF8lk
+	pR5txn3Ai3g0QdTIMi0KNGpfWU5ApCFSb9Hc57tU7NcTK0WdmElmFGk2GtunRZtvsqHbcyfehXv
+	ULUt8dBxIlFXmGUV81eJ8anKeaMr8lxcfIyshkqjdKyytXbWmbwg+UBiPfMC/TDxq6sH2qvcXKk
+	sqage+UjMhbuWdTlYsaH+ZY4oQF+dONb4whbWmkJ8Rik9eX6/JI5bRr2hKhhuAUaACSburPqqdN
+	ciunnW67gRcsmENXdv6cJ1gaNN9PnWROgOSe94mROH2+IVl5wFLGm43oRv88Z+5NIW6XspJU9pi
+	9Eqqscc3Y07gbenqjLbz1aqPQlQLL
+X-Received: by 2002:a05:690c:85:b0:866:4769:d59a with SMTP id
+ 00721157ae682-86c4e018b82mr26149557b3.2.1788358886262; Wed, 02 Sep 2026
+ 07:21:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAKA8V_8QC7u4OsP+f4_h2UfPQ0uAMy9ESzvuNULo1cFkmxyjow@mail.gmail.com>
+In-Reply-To: <CAKA8V_8QC7u4OsP+f4_h2UfPQ0uAMy9ESzvuNULo1cFkmxyjow@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 2 Sep 2026 10:21:14 -0400
+X-Gm-Features: AcwNN1XHKuSVoaGOdqfsn7a1FCZ0FKFlIqiDURkkEFfP6zM_adEma3AxMhOawCk
+Message-ID: <CABBYNZJTMW_Dg5bpZ9PPitgCOZJ5uKWM_ru9MT1utUcz4uxDaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter/advertising: fix mgmt endian bug
+To: Nicolas Thibert <nithibert@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Nicolas,
 
-I would like to investigate this syzbot report:
+On Wed, Sep 2, 2026 at 10:19=E2=80=AFAM Nicolas Thibert <nithibert@gmail.co=
+m> wrote:
+>
+> Several places in adapter.c and advertising.c write a native-endian
+> value directly into a __le16/__le32 field of an mgmt command struct,
+> skipping the htobs()/htobl() conversion used everywhere else in this
+> codebase for the same purpose. This is a no-op on little-endian hosts
+> (where htobs()/htobl() are themselves no-ops), which is why it has
+> gone unnoticed, but corrupts the value on big-endian hosts.
+>
+> Confirmed live on MIPS big-endian (OpenWrt/ath79): set_blocked_keys()
+> sends key_count=3D2 (2 blocked keys), which the kernel's
+> __le16_to_cpu() correctly interprets as 512 (0x0002 byte-swapped is
+> 0x0200) since the wire bytes were never actually swapped to little-
+> endian on the way out -- producing "expected 8706 bytes, got 36
+> bytes" / "Failed to set blocked keys: Invalid Parameters" errors in
+> dmesg/bluetoothd logs.
+>
+> add_advertising()'s cp->duration and refresh_extended_adv()'s
+> cp.duration/cp.min_interval/cp.max_interval have the identical bug. It
+> is inert with bluetoothctl's default (0) duration/interval values (0
+> byte-swapped is still 0), but A/B tested live (patch removed vs.
+> applied, bluetoothctl's advertise submenu "interval 100 100" set
+> explicitly) confirms this is not just a theoretical correctness fix:
+> with the bug present, the device stops being discoverable by a real
+> BLE scanner the moment a non-default interval is requested, and
+> becomes discoverable again immediately once patched. Any application
+> that sets an explicit advertising interval or duration hits this.
+> ---
+> src/adapter.c     |  5 +++--
+> src/advertising.c |  6 +++---
+> 2 files changed, 6 insertions(+), 5 deletions(-)
+>
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -9938,10 +9938,11 @@ static bool set_blocked_keys(struct btd_
+> sizeof(blocked_keys)] =3D { 0 };
+> struct mgmt_cp_set_blocked_keys *cp =3D
+> (struct mgmt_cp_set_blocked_keys *)buffer;
+> +     const uint16_t key_count =3D ARRAY_SIZE(blocked_keys);
+> int i;
+>
+> -     cp->key_count =3D ARRAY_SIZE(blocked_keys);
+> -     for (i =3D 0; i < cp->key_count; ++i) {
+> +     cp->key_count =3D htobs(key_count);
+> +     for (i =3D 0; i < key_count; ++i) {
+> cp->keys[i].type =3D blocked_keys[i].type;
+> memcpy(cp->keys[i].val, blocked_keys[i].val,
+> sizeof(cp->keys[i].val));
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -995,7 +995,7 @@ static int refresh_legacy_adv(struct btd
+>
+> cp->flags =3D htobl(flags);
+> cp->instance =3D client->instance;
+> -     cp->duration =3D client->duration;
+> +     cp->duration =3D htobs(client->duration);
+> cp->adv_data_len =3D adv_data_len;
+> cp->scan_rsp_len =3D scan_rsp_len;
+> memcpy(cp->data, adv_data, adv_data_len);
+> @@ -1046,13 +1046,13 @@ static int refresh_extended_adv(struct b
+> */
+> if (client->duration) {
+> -             cp.duration =3D client->duration;
+> +             cp.duration =3D htobs(client->duration);
+> flags |=3D MGMT_ADV_PARAM_DURATION;
+> }
+>
+> if (client->min_interval && client->max_interval) {
+> -             cp.min_interval =3D client->min_interval;
+> -             cp.max_interval =3D client->max_interval;
+> +             cp.min_interval =3D htobl(client->min_interval);
+> +             cp.max_interval =3D htobl(client->max_interval);
 
-https://syzkaller.appspot.com/bug?extid=98baa83c342e86a836d7
+Use cpu_to_le** instead of htobl.
 
-I checked the dashboard and mailing-list archives on September 2, 2026,
-and did not find a proposed patch or human response.
+> flags |=3D MGMT_ADV_PARAM_INTERVALS;
+> }
+>
+> --
+> 2.34.1
+>
 
-Is anyone already working on this issue? If not, I plan to reproduce it
-on current mainline using the provided C reproducer and investigate
-whether concurrent BNEPCONNDEL and HCI disconnection cause the reported
-BNEP device lifetime and refcount failure.
 
-Please let me know if there is related work I should review.
-
-Thanks,
-Aditya Pratap Singh
+--=20
+Luiz Augusto von Dentz
