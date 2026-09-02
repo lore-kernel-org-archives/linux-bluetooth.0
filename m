@@ -1,161 +1,240 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5D934B1AD
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 02:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788315065; cv=pass; b=i63XraIpLYiijK22uNz1Xke0Q2A3CtQW45saMWx4niHiQXcOYLvWlh+pVGFFjNgFam1sGnto+e4IK6tUlrvICpJ4n/ReIvfoBNQL2QsgVKBnHuFESkfRyDA6PArlv2zd5CRP6mkGMSfVBWW1rrL7bLfDxp0bn2BnLRybgBjDOn0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788315065; c=relaxed/simple;
-	bh=Wqi9+7wd5NnLZOWTg5e1HxhEYKd1pgkTsh1j+yGEUio=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IrkReUyoEv4jjrQsTRh9z8Qo8G0EF3x9gNcx4itowfPB57O2KnRgqhnZcSExdbXNjTXS4f3D5GoU6akhFOVt1Wl4P/jDAYeQHkMOKsZciGmKdF1SgHm1Pz7zGwgYzufwACup+ZAnsbBGiaRWxPYmrPETLltge8V3BqDDPzZlGjc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nEKtSy+6; arc=pass smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F89C244667
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 04:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788323191; cv=none; b=dtNVC9pfFuha13QEJdFWoYK7tME6C6oBsweIqHYjcuEcCAjKowv9VOfM7ZZ8UbVilDu7VSCHsVJtkShf/IKd+LHAUCkSvI4O5m+iWvPwWXdInR8SuLpYSoLid29+LJy7vkGsLezMBMsSL1Tg1u7WMaM9EuDRPzjFtGFl62b4JjU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788323191; c=relaxed/simple;
+	bh=lyaSlJLhoxnZtwUP3vnt5X8qUd0c7ipOmD1u009eeJo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YmeQaDZGpB/9Y7EXnAmHyivL2bAjnaMA2mUumOjsqAtso4PW6Lzf6psCcgu2/4i1RgbXmsig5MYKg3cWYN9/yUiQ4GUjF1thZeqo/u2iUrEn4sT+aRYz2XMpbsLsj4PEC09PgeB1CYDlqVP5UHa85Gk/FCb0WOBR5IACm9hyJ5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KU96JXYC; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nEKtSy+6"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49ccfae359fso3348375e9.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2026 19:11:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788315057; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ai04nfOGVn7TLPRKdE7sBuYd7+LtdZ4b3mSAtN4V+OhsPtD7fV/BThh9+4Y7j8OOLX
-         JgPx4hkPdPF6uvIOM4DvuJsbz+ZD2eindj6sOxMSsweCk0LDhp2MwfUSVPQDYBuaPwmj
-         b2uVMQ2gP8CYu4vnbEUMqvbB3xw0TnHagm2NBqhBC4r8fvSnuIf+DbBDHE2TMepLq3cP
-         F+HCyodkmN4gMh90K18oNmXG5gIX0lgHo0/2JNrdh3NgXSvLcVy2YRCnngpBz6yiAeEh
-         RGymu5JE3s0Zj1l5jNBb7d4F07k4DzzrvE7uGzq61IjdvY/Bl1iDH/o/cRyOlxqS96C5
-         CtqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=miRWNlrgJnkfFijXetq532ldKdfjhWdGeVzZOadUgfM=;
-        fh=Ym7YLtscl/gkr8SJIPrMfBraFgWSnnIUx9nPuBfk5fA=;
-        b=ploPcPZcbHRJmfKTMoAtRdMvVeSAdQ8E8snuzdD0d1j+Jk7Ifn4FVGBQR+XTzfJhl/
-         foiuqahXeRyhjn62+naYmiNkcFjFjaX36Y1MmUd6rjYcqzOXQ9OjQH7aZM5fdIQ52kJ2
-         A02nxXKMKlGVc0xngDQmRhz6tVO+WzNvUjL0gtPlq/Q1FJj1zMXvKXqDwRX0iNc96/xN
-         62d0IG/WwRgPR3ZUl6wa/sD3wMjE2enV5SPy2G5kAG/PneVBOxue1A0Px+z4FBVzHzAs
-         3+JWPAwpWeE49mD5qSIZ8YnZNK7k5Xbapu7CNVH5RdMVEU1tVVjTENkKZy01In5yL4NT
-         2FAA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788315057; x=1788919857; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=miRWNlrgJnkfFijXetq532ldKdfjhWdGeVzZOadUgfM=;
-        b=nEKtSy+6LpmCdTyNs3tkNaHCU95DoaR5d1RLIDhBanxfRE6hdxNMrX5wkA3Q9satGe
-         uZ1VmNgab/vKswXnM79zFI3lvaayb5Z+gfUfhBk0y5RXwSkOQo6AY3Ysw6Nm949F+CS4
-         WTmulsdsOrRlE8TSUNrh7pZg2eyPTUqVuf3GY7fiTT6RwSKbL9AiaDI75mAQsslCnNmA
-         OiaVAwQ39SaFwnmTP7DGPNGvgFqOWlVQ29rogh/MId6wla5SFotctQQdixwO7RGQP/e8
-         J8qh46nCD4tG6I6fOqc+TmZ0fvOqc1/jX7vqFCDcAfYjRSxK3LPGoA+cvOB8fB76WK4g
-         uroQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788315057; x=1788919857;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=miRWNlrgJnkfFijXetq532ldKdfjhWdGeVzZOadUgfM=;
-        b=jv9KGyM8Bzvx26gaDvGwEMzDU3wJJPg6WWQRgCKeSspdZCJKoRJYIaSlE/O3lCHjRg
-         IrpistH070JzXbRd172d1ZROpDTnJFn1GLrAjvyAoLuRCMLrGuugGh5YBQ8RUrXSUADR
-         Aogwqq9XJEwe3K3kCYfcnp95SUoNe4Ias0d35pE3GOyfpCEVyfZ18QVEcm+TbOImkeYV
-         itAH+1hq1vf+0W02MYmktote+DBAb1o6qG5LqggPrrCq91PAlecb+rLitUK8zi0k3o/W
-         x4ooeZosaIDYf+0P4NCsKa/TjmGHhP9Ak0EsD1atcPM2fVRwwokzbm/B1kBuTDJdyj9L
-         lIZA==
-X-Gm-Message-State: AFuF++lFIHA82AgQ0ljlOIFxpVjLh37KHKO63XR2DrDGcXlxBRjuogUX
-	iabbizhS8f0HwexpDsqwm0Jo63EV6Ud8zFDEOTV+YzDG96uN7WB7rf5O7/AMhQ7yDXjqJf/fIrw
-	LgXilsZvZVz+bCcfG9YvWoXmFl2+5syicwuVu7JUIlylcO08BeA==
-X-Gm-Gg: AR+sD11Yeg9r+ShmICtGBCBLaY2+e5qZcIJmbTbWlrrMB4fgE/2NJt6QvmhlrpjiN2P
-	9S2pyruWoJaNSl/Ig6YFH4qFdBGtOtU6vm/2/sy6ae7T4DmdiCJi7mBV7e9GD03LXEUXWqFEGTM
-	0b4sBe3tEDF9e4h1w/PJsocu+Yp79G9KMTvsiHiafwa+ajJ5Bsu9PDN2rmDkFgHtz0fgM8Lg6qq
-	RZ3c3s+HV7ARhAhxzBkMxsZQHMXNSYBh0rW78hbO92LH/FfQo5S5/MKL+gS9n9iw//JoAECzP2d
-	ffqU2Owh4uEpHxEpFuk9r6y1oNWnWr2HTHFIE/IYM3Y=
-X-Received: by 2002:a05:600c:354b:b0:499:51f0:a9b2 with SMTP id
- 5b1f17b1804b1-49ce55f051dmr21559675e9.1.1788315057139; Tue, 01 Sep 2026
- 19:10:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KU96JXYC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1788323189; x=1819859189;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lyaSlJLhoxnZtwUP3vnt5X8qUd0c7ipOmD1u009eeJo=;
+  b=KU96JXYCShBRFYpOv8MP9t7OdFKS89kwk6zKooT1dq1s9RRwZGCTvsre
+   NSmrJuxJKsqEpoODG56c+QkcP69XYTRY0JDk6SaL6pS257969oUGXgxBR
+   4FYEBu5SRKbGP8PXyWleKkmKUukIG6c3GBd8tc+oUYy4rQ4lTEC5hjIn3
+   fTH7U823ixXo99EpTRJvBP+DlMjKyI0+b8xmzYd3QQTklGQYCAvEpvi4Z
+   qvIRjfbZqQPlwrusLLnLEaikCsuHVAPiaDN+lMZnKDP+hrrMckn9fVjbn
+   HMRkm2V8ClvjXsm4M9B25IwHklEkrtMdAwu26S5V4gYulYUYYDP0GZIvA
+   Q==;
+X-CSE-ConnectionGUID: aejLyNt3TeGoL+58HeQQLw==
+X-CSE-MsgGUID: BplyUyonSwSzyuDMjlJexA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11893"; a="92588742"
+X-IronPort-AV: E=Sophos;i="6.25,257,1779174000"; 
+   d="scan'208";a="92588742"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2026 21:26:28 -0700
+X-CSE-ConnectionGUID: eFgnuSAoSZWpJv++pMKf4A==
+X-CSE-MsgGUID: p0QXiIRYT0C9wGSPoTRstA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,257,1779174000"; 
+   d="scan'208";a="268755559"
+Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
+  by orviesa008.jf.intel.com with ESMTP; 01 Sep 2026 21:26:27 -0700
+From: Ravindra <ravindra@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Ravindra <ravindra@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+Date: Wed,  2 Sep 2026 09:58:40 +0530
+Message-ID: <20260902042840.2432862-1-ravindra@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Qingyu Zhang <usupergate@gmail.com>
-Date: Wed, 2 Sep 2026 10:10:45 +0800
-X-Gm-Features: AcwNN1VZJvtFR2-aP1IaZVpF82vVv6SRFFNrJZSVY7OUOlEnX_AFIkDT1G5csAM
-Message-ID: <CAPBHdanvQs_e29KUYjBn41fA-WBqLxDxUDb4Tv9Efh5pTm=8cw@mail.gmail.com>
-Subject: [BUG] Bluetooth: ISO: listener sock leaked when iso_sock_alloc() fails
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Use pm_suspend_target_state to differentiate S0ix from S3/S4. Set the
+controller to D3_HOT for S0ix (PM_SUSPEND_TO_IDLE) and D3_COLD for
+S3/S4, freeze and hibernate to prevent post-resume instability.
 
-iso_conn_ready() leaks a reference on the ISO listening socket when
-child allocation fails. A patch is attached.
+Register .freeze, .thaw, .poweroff and .restore callbacks for proper
+hibernation support. The freeze and poweroff (hibernate) paths set
+D3_COLD via btintel_pcie_suspend_late. The thaw path resumes with a
+normal D0 transition, while .restore forces FLR-based firmware recovery
+after S4 since power is lost. S3 (PM_SUSPEND_MEM) resume also triggers
+FLR. S0ix resumes via a normal D0 transition.
 
-Type: memory leak (sock reference)
+Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
+Assisted-by: GitHub-Copilot:GPT5
+Signed-off-by: Ravindra <ravindra@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 64 ++++++++++++++++++++++----------
+ drivers/bluetooth/btintel_pcie.h |  2 -
+ 2 files changed, 44 insertions(+), 22 deletions(-)
 
-* Summary
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 30923eaabed7..90d4a3596f80 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/acpi.h>
++#include <linux/suspend.h>
+ 
+ #include <linux/unaligned.h>
+ #include <linux/devcoredump.h>
+@@ -3515,11 +3516,16 @@ static void btintel_pcie_coredump(struct device *dev)
+ 
+ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ {
+-	int retry = 0, status;
++	int retry = 0;
++	long status;
+ 	u32 dx_intr_timeout_ms = 200;
+ 
++	/* Not reset per retry: dxstate is unchanged, so a late interrupt from
++	 * an earlier attempt still confirms the target state.
++	 */
++	data->gp0_received = false;
++
+ 	do {
+-		data->gp0_received = false;
+ 
+ 		btintel_pcie_wr_sleep_cntrl(data, dxstate);
+ 
+@@ -3565,18 +3571,23 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 
+ 	data = pci_get_drvdata(pdev);
+ 
+-	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
+-		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
+-
+-	data->pm_sx_event = mesg.event;
++	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
++	if (mesg.event == PM_EVENT_SUSPEND &&
++	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
++		dxstate = BTINTEL_PCIE_STATE_D3_HOT;
++	else
++		dxstate = BTINTEL_PCIE_STATE_D3_COLD;
+ 
+ 	start = ktime_get();
+ 
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+-	if (err)
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
++			   dxstate, err);
+ 		return err;
++	}
+ 
+ 	bt_dev_dbg(data->hdev,
+ 		   "device entered into d3 state from d0 in %lld us",
+@@ -3599,7 +3610,7 @@ static int btintel_pcie_freeze(struct device *dev)
+ 	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
+ }
+ 
+-static int btintel_pcie_resume(struct device *dev)
++static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct btintel_pcie_data *data;
+@@ -3607,19 +3618,15 @@ static int btintel_pcie_resume(struct device *dev)
+ 	int err;
+ 
+ 	data = pci_get_drvdata(pdev);
+-	data->gp0_received = false;
+ 
+ 	start = ktime_get();
+ 
+-	/* When the system enters S4 (hibernate) mode, bluetooth device loses
+-	 * power, which results in the erasure of its loaded firmware.
+-	 * Consequently, function level reset (flr) is required on system
+-	 * resume to bring the controller back into an operational state by
+-	 * initiating a new firmware download.
++	/* S3 and S4 may cut power, erasing the firmware. Force FLR to recover
++	 * instead of a normal D0 transition.
+ 	 */
+-
+-	if (data->pm_sx_event == PM_EVENT_FREEZE ||
+-	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
++	if (mesg.event == PM_EVENT_RESTORE ||
++	    (mesg.event == PM_EVENT_RESUME &&
++	     pm_suspend_target_state == PM_SUSPEND_MEM)) {
+ 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
+ 		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
+ 		return 0;
+@@ -3628,7 +3635,9 @@ static int btintel_pcie_resume(struct device *dev)
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, BTINTEL_PCIE_STATE_D0);
+ 
+-	if (err == 0) {
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
++	} else {
+ 		bt_dev_dbg(data->hdev,
+ 			   "device entered into d0 state from d3 in %lld us",
+ 			   ktime_to_us(ktime_get() - start));
+@@ -3653,13 +3662,28 @@ static int btintel_pcie_resume(struct device *dev)
+ 	return err;
+ }
+ 
++static int btintel_pcie_resume(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESUME);
++}
++
++static int btintel_pcie_restore(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESTORE);
++}
++
++static int btintel_pcie_thaw(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_THAW);
++}
++
+ static const struct dev_pm_ops btintel_pcie_pm_ops = {
+ 	.suspend = btintel_pcie_suspend,
+ 	.resume = btintel_pcie_resume,
+ 	.freeze = btintel_pcie_freeze,
+-	.thaw = btintel_pcie_resume,
++	.thaw = btintel_pcie_thaw,
+ 	.poweroff = btintel_pcie_hibernate,
+-	.restore = btintel_pcie_resume,
++	.restore = btintel_pcie_restore,
+ };
+ 
+ static struct pci_driver btintel_pcie_driver = {
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index 9baa214d9bbe..290679f45652 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -541,7 +541,6 @@ struct btintel_pcie_dump_header {
+  * @txq: TX Queue struct
+  * @rxq: RX Queue struct
+  * @alive_intr_ctxt: Alive interrupt context
+- * @pm_sx_event: PM event on which system got suspended
+  */
+ struct btintel_pcie_data {
+ 	struct pci_dev	*pdev;
+@@ -600,7 +599,6 @@ struct btintel_pcie_data {
+ 	enum btintel_pcie_reset_type	reset_type;
+ 	struct btintel_pcie_dbgc	dbgc;
+ 	struct btintel_pcie_dump_header dmp_hdr;
+-	u8	pm_sx_event;
+ 	u32	debug_evt_addr;
+ 	u32	debug_evt_size;
+ 	dma_addr_t	debug_table_addr;
+-- 
+2.43.0
 
-iso_get_sock() does sock_hold(parent). iso_conn_ready() then:
-
-       lock_sock(parent);
-       sk = iso_sock_alloc(..., GFP_ATOMIC, 0);
-       if (!sk) {
-               release_sock(parent);
-               return;          /* missing sock_put(parent) */
-       }
-
-The success path and the "listener closed concurrently" path (after
-560bef609fa5) both sock_put(parent). This failure path does not.
-
-* Affected
-
-Introduced with BTPROTO_ISO (ccf74f2390d6). Still present on
-08dbfad3f504. Needs CONFIG_BT=m, CONFIG_BT_ISO, HCI_VHCI, kmemleak
-and (for a reliable trigger) CONFIG_FAILSLAB.
-
-* Reproduction
-
-1. Boot with kmemleak=on and failslab.
-2. Bring up a virtual controller (hci_vhci).
-3. ISO socket: bind + BT_DEFER_SETUP + listen.
-4. Inject HCI LE Enhanced Connection Complete, then LE CIS Request
-  (subevent 0x1a) while failslab is armed for GFP_ATOMIC
-  (ignore-gfp-wait=Y, probability=100, times=-1) so iso_sock_alloc()
-  returns NULL.
-5. close() the listen fd, then:
-
-       echo scan > /sys/kernel/debug/kmemleak
-
-kmemleak shows the listen sock (size 2048, iso_sock_create ->
-iso_sock_alloc). rmmod bluetooth then fails with EBUSY.
-
-PoC: poc/vhci_iso.c (the "#47 failslab GFP_ATOMIC window around
-CIS_REQ" section). Full QEMU recipe is in poc/run.sh.
-
-* Expected
-
-iso_sock_alloc() failure drops the iso_get_sock() reference, same as
-the other return paths in iso_conn_ready().
-
-* Actual
-
-sk_refcnt stays elevated. The listen sock is never freed.
-
-Please consider the suggested patch.
-
-Thanks.
-
-Suggested patch:
-```
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 75bfd5938b2e..4de332b8901f 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2289,6 +2289,7 @@ static void iso_conn_ready(struct iso_conn *conn)
-                    BTPROTO_ISO, GFP_ATOMIC, 0);
-        if (!sk) {
-            release_sock(parent);
-+            sock_put(parent);
-            return;
-        }
-```
