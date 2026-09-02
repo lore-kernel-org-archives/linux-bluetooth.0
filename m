@@ -1,113 +1,149 @@
-Received: from sender6-op-o15.zoho.com (sender6-op-o15.zoho.com [165.173.180.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C0E38B135;
-	Wed,  2 Sep 2026 19:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=165.173.180.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788376803; cv=pass; b=Rgp7rIsGFCpYiev7x+0jRZ+jIRjrQv/TZCgVkNy4Ka972T1zEd3Es1j+pezZvUS5S9O3Y0D6wnYhop6hjdkoTL7vyr2e3arpcVsiTbS8E52VsWi6IPbdUU9Psr5J2gg0889jMS7a8sfE2EEE5sphpeuOQS+NZiqqV/T8ewN4gxE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788376803; c=relaxed/simple;
-	bh=qslwtQeUUaTQzvPKju50nUmCLIw2Z5Yl7UxgaSsqaG0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Bpnhp+NM6QyKh7SUwu31fb6XSG4gz2VPXjypxbNG375fCXb2LRKQtXgYcVhiCWGSufaILu/adqLpQEFQeda9V2LYBu/75x5L33nc9GgwCUZ/CD7TnXQEqrTGANm6X0aeBVFhyVBO9gFFOk/dCOpQvz8Z3x2tlA8R49Fjg0wakrg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=VgB4OwTj; arc=pass smtp.client-ip=165.173.180.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238A53AA4E0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 19:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788377384; cv=none; b=NDfowR+5dB75zk/NhlId+WEWlFEQ8zRCCr/mlGEuvP0SGN4dnWi8EQL/N4vrykK4TTldCi8ZEBc7eLRbxOqy4IVSNmHU8/KhOk8K8onvZRjiOY79ok/tRlYDDC5/rgacr4fFiXHZUBSdHQ1qtsuERI6bUi+VRMOEHZeu3QTtmVg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788377384; c=relaxed/simple;
+	bh=/DI2KLM9txkaYzQdHpdeN8ohte1K6k5EHSuqxwLcLrk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=SukyCAo9XoRCH8bl9BmMQn/MGEkPl6utC2mJYT1YJUmAoP9iIFGLdGbFqA85lbRl+eQeLE63KSO3g+fJQAknZOgNsYxSVGghIYuAw4Ug3RHxeLXA0G0s2+weSKP9cHJ17fGvQJkBWnxIIScwa5sFhVTJrYKmc0EhgWfl/pIHoVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbFtX1Wl; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="VgB4OwTj"
-ARC-Seal: i=1; a=rsa-sha256; t=1788376792; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Auc4NwNnwNXT0bwwNezyKkbt5uVQrgc62phXv9RFWr27oAmitf1ZxvE+Ae/lKuqhCDkJinaMpqWnXhJO79Opn/VnSEgBjDi6ibho2jg6n1cZ+ZBtuFHQ+O9aN2Q9sWjt0fUPD2PqFoKOpermP6DS9t+ZjyA5lXJEJY7EHNADJrs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1788376792; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=A4TN0EGlAixn51ctK1pBKOTifz23t1iEOGpO04/pP0Y=; 
-	b=i/KevU9mzFcK3C5mhDKMur/OPjdt1B9MhqLP6Kw2wFGaW9OzaX88RBFo8afsmJrWzzDDjbPPr50qjeL0ksKKzuptZ0qjW+R1haukONZolPIyDIWnyPvKo7q9E1NWA1HK2/ENrx6F1A3NA/Yw8IwHSeRlTaaIEWY5piaAqZ7QpNs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1788376792;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:To:To:Cc:Cc:Reply-To;
-	bh=A4TN0EGlAixn51ctK1pBKOTifz23t1iEOGpO04/pP0Y=;
-	b=VgB4OwTj/aCNRtXe4b143D1gFt0WP0kZ+Zb1M/g2bQD6fjRigxcykELXHnquOLsZ
-	CkXMYIleq0ASzSAwd/H3ATNjozuYRVr+6uUBHLRqEbKwwcaZ+LvT/V9uOXPRW3nvBAx
-	vSAtHPLY7DhHQz0hDvKq5ejyTbs7tn3PhwDNcBY+Q83rDAbr+pkN2kDG2C5FV9NXOqA
-	72AFBp8h3WmI4Gni5whBqMf0NmbK+TJp0+C/cwDCjiQwNYJnE1epiPE+eX8Z/6O2DQe
-	IZtJETzEF8Fm0sQcYw03XbLQcMjZRpma/4v4wSan2MW2v4/BdBesT3RJXww4blsIutC
-	THwb6Or5lg==
-Received: by mx.zohomail.com with SMTPS id 1788376788790480.32971094536117;
-	Wed, 2 Sep 2026 12:19:48 -0700 (PDT)
-From: Rong Zhang <i@rong.moe>
-Date: Thu, 03 Sep 2026 03:18:59 +0800
-Subject: [PATCH] Bluetooth: btrtl: Don't leak return code when parsing
- firmware format v2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbFtX1Wl"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51bfad59921so15295831cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 12:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788377368; x=1788982168; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=XIPbkhG6kmVoSwt7U4aaho9kktYDRkUtUtLjqxqjnNo=;
+        b=NbFtX1WladlWtvTyT6Bdtxg0WnOJm6v2w1qsUfoqbrNNpmUjV9ORBTz4Ri1a2YV2F6
+         ppUw3sCz7Yb7pEkdDiE7u5a/9XnEnKzmxHsRrRDeDdFFZEMHkz6ZpNX5elUKskqbhytB
+         9CEqovY+v5hWJS1v64014AnHKfwODgYLy+3sclE28haXVHVARKXy6+gCc1lqrJ2rZkFt
+         SmfgFq4IaxcjKQ34eqd7+zOjGnI+hsbSh/sKEd5mthDAH+xvEMbOU+QBwo/Taa8QBabs
+         YadGdiX/6EGy81CY+g+BVDEi1Vkr7/baDWdYo9RdP/AzS4QiYcsawHh4PlW7BGlteHTy
+         JQhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788377368; x=1788982168;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=XIPbkhG6kmVoSwt7U4aaho9kktYDRkUtUtLjqxqjnNo=;
+        b=XV8YyUjxin9KN2F/6funoKKKZqROY10yW8UYy/xBouwarm6dkoXcX14CIWjII0inu+
+         7UHEd9siBt9N0yXitfGBkq4gCTmInI2j0y545mOCnAW0KK9l7chtMopmswqhah4ku5ef
+         kDZX69TX+TdOZ1MD056rk0aW/iu9Yc71jmL42XOd/Ju2P7ksw+QuJ/OYFd4wUVgRMOGn
+         vIRmsxTQCPAf54KxXchA6i4Ntp1h3VlVGPcRduT6sg5ZzaQ7KMtQUApPvWSQkasqfqtX
+         0v1DMppmBwVCVH8X//SR9Jeydr4GJGqapfBrLZOpGrmohl/r0ueLQi/gmWg8lFKrH7By
+         Lt+A==
+X-Gm-Message-State: AFuF++nVeCZOLx6aNTydYsvdqCZBrb25vl2DBPp2vRyYeLVXpk6geeyC
+	FgHsTm1PQACYikN69iag/KYTZeGrEti4s909EwiiNO4ClPzOIFXBcCCx4/hWNg==
+X-Gm-Gg: AYBFou03cNppXdej6Sz//73UA9QXeUdHrSrE6I8q9Pneeqja/PsOauV7NdgVlgVnC5+
+	jcPwwYFhumMke9wqGIHgc9eeU8skboxeIPBHIpGOAFA2v4iFTKhkIDvLVThrBgJWWGcZ9wwZWtj
+	+x42+q7V7t5XHorfDZEPtpU+6Ybxjhs8Rd7dC4mMcI6PtrbX+1RuFi4YvBS13k1jz4iDatGifmL
+	wzlS2Wv/6M2Jrd42Lcslopr+9oQEivsptfiXTKJDOGLeVMQxureN4gpUxYTgafO/3nlS8Iqgean
+	oDwIvliTVCumEwbUcZqvLMBRE0Ka3nmBIbGvjvjQAhNrwBcLU/1dQcwoJGsMsrJVJ9THc31uG7s
+	hK+dHOdeSeiaIGXmVs8wz5Akh7gjkiTuVqJB7ieDWekLEH9YpXS7aLUwMtb0xRPHMvJVK3KmoU7
+	8rE2hNeqjf7WGsKf1tR7m4kU/IyGBZwh6foczx3t1rKZk1Z5V3z/pG6/+lAV0DN9iZXA0=
+X-Received: by 2002:ac8:5f10:0:b0:530:4310:5398 with SMTP id d75a77b69052e-53043105660mr17552421cf.48.1788377367667;
+        Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.95.161])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53033226cdbsm25639671cf.24.2026.09.02.12.29.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
+Message-ID: <6a987917.043ad0dd.1178cc.9da2@mx.google.com>
+Date: Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7916647139816403883=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_sync: Fix not setting CE length properly
+In-Reply-To: <20260902171626.1711932-1-luiz.dentz@gmail.com>
+References: <20260902171626.1711932-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7916647139816403883==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260903-btrtl-fix-patch-sec-header-rc-leak-v1-1-0ce37e2149bd@rong.moe>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXNwQrCMBCE4Vcpe3bB2HrQVxEPm83UREstm1SE0
- ndvrMcPhn8WyrCETNdmIcMn5fQeK9yhIY0yPsApVNMR6i5BPPtiZeA+fXmSopEzlCMkwNiUB8i
- LXXtuOz0F6fpANTQZ6n4/ud3/zrN/QsuvTOu6Aeeu8bKGAAAA
-X-Change-ID: 0ec19dab-btrtl-fix-patch-sec-header-rc-leak-13534c2da4fd
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Alex Lu <alex_lu@realsil.com.cn>, Max Chou <max.chou@realtek.com>, 
- Allen Chen <allen_chen@realsil.com.cn>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Rong Zhang <i@rong.moe>
-X-Mailer: b4 0.17-dev-1f2f7
-X-ZohoMailClient: External
 
-When key_id from chip is zero, rtlbt_parse_firmware_v2() intentionally
-ignores all security headers. However, the implementation simply breaks
-from a switch statement and leaks uninitialized return code `rc' (if the
-first section is a security one) or the previous section's `rc'.
+This is automated email and please do not reply to this email!
 
-Fix it by really skipping a loop with `continue'. For consistency and
-readability, also do the same for the default case.
+Dear submitter,
 
-Fixes: 9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Rong Zhang <i@rong.moe>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1156356
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.69 seconds
+CheckAllWarning               PASS      29.26 seconds
+CheckSparse                   PASS      28.22 seconds
+BuildKernel32                 PASS      25.81 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      473.35 seconds
+TestRunner_l2cap-tester       PASS      65.29 seconds
+TestRunner_iso-tester         PASS      102.49 seconds
+TestRunner_bnep-tester        PASS      19.82 seconds
+TestRunner_mgmt-tester        FAIL      216.48 seconds
+TestRunner_rfcomm-tester      PASS      25.93 seconds
+TestRunner_sco-tester         PASS      31.80 seconds
+TestRunner_ioctl-tester       PASS      26.30 seconds
+TestRunner_mesh-tester        FAIL      26.35 seconds
+TestRunner_smp-tester         PASS      23.61 seconds
+TestRunner_userchan-tester    PASS      20.21 seconds
+TestRunner_6lowpan-tester     PASS      23.98 seconds
+IncrementalBuild              PASS      24.79 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.240 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.452 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.556 seconds
+Mesh - Send cancel - 2                               Timed out    1.992 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/690
+
 ---
- drivers/bluetooth/btrtl.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 03fa9409e3ee..d29813331603 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -591,7 +591,7 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
- 			 * headers.
- 			 */
- 			if (!key_id)
--				break;
-+				continue;
- 			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
- 						 ptr, section_len);
- 			break;
-@@ -600,8 +600,7 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
- 						 ptr, section_len);
- 			break;
- 		default:
--			rc = 0;
--			break;
-+			continue;
- 		}
- 		if (rc < 0) {
- 			rtl_dev_err(hdev, "RTL: Parse section (%u) err %d",
 
----
-base-commit: 786262be6048deab760f68c8acc2c85607165894
-change-id: 0ec19dab-btrtl-fix-patch-sec-header-rc-leak-13534c2da4fd
-
-Thanks,
-Rong
-
+--===============7916647139816403883==--
