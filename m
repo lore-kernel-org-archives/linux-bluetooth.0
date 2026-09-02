@@ -1,177 +1,282 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8D22765E2
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 15:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1967E4A441D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 15:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788362269; cv=pass; b=QqAx8NDkFN50TxVHOaFXorn5wD8BQP7uxq6eDbQKUKWT8WU/REZFnIIYwozlw+aDQ7FcTlUoGXftMGUdC0icFDSvw3Alz5BGmBSkFgLKnzQTQ66s65uMZPW/22o3eqt8qKrLe0Xpl+BUE5CL3o4rCR+kqZEK9Djt+HFxgQMitYo=
+	t=1788363088; cv=pass; b=YCxIPFJKRr81FhuWhCa+RnPz5bnKalt45Tw9nssPsj/r07jv0VD/exewq9tcYWwVB7MwEtBwfMtGLGZH2m0mCzV9NWqFVEhbNom820M44mfWZr7lJatoJkvhAtyOspG1CMhvIFLlJitubMdD0Q0r85WG+fp38OpVY0MD/KeIf70=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788362269; c=relaxed/simple;
-	bh=bZfs3GmlmJp+9UVl015Wa8TGidJ9KDc+UwsCi87NnRw=;
+	s=arc-20240116; t=1788363088; c=relaxed/simple;
+	bh=V1zoxzMr40aJ0JifNDone3xzXr4/JLC5xage46s6uc8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cooV3Ft6FVX7aBX6BGNFcxHs9ov7nmGZyWywQldY5fUO5czbvGyz4DCd0KuH2tuSDXejaa0fk36M5Az9OXnMXQU7q+XuDGIc8sN11JBoMXBcpi1XnC3wnF4w44oZnSn1C/7CN8k9KB2xP7ecj8BMNXmfv3/wbqM3Zy2PsHAHGtw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y43RX8Rx; arc=pass smtp.client-ip=209.85.128.178
+	 To:Cc:Content-Type; b=Vpep8un4v5SYpWuaYGAJa3hXxJdnxSg8QDWkepcnXvdfW4YoKUWBQhipNTiThOTna7RCO+IXXW/8EReU6YCwzbe1i97JCjSR0gHIhop9yv3RbR4QGWLqBOcdjpoAat/IjqnDTFs7aviQy3OL/xa3uELBOB8PGlTXwLrGDLzE1S4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QU9nsD+/; arc=pass smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y43RX8Rx"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-8623b1e7cb2so16316377b3.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 08:17:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788362266; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QU9nsD+/"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-86c0e4dd49cso12555807b3.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 08:31:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788363086; cv=none;
         d=google.com; s=arc-20260327;
-        b=seqrhujzp2YL9UrucIMwVpTv6eH6Ko1ZaOP4LyaPq6tNnbwPjymVdkiyDtVvPDJhtl
-         2KezGxfOXkMc/zOMcmu0Dd1pJBr4/0kj/5HgoWUrS7nbi47xZ0ADy+qoraOebwAi0zW7
-         nJ8GDgTWxXi5qV4pBKTFy0TySfy6RaW3C93uwmVUUppqisfiO2d40C4hshBedq9cfWAX
-         Zl9hJqQv39Nmnjmvrqke6qsf800hFEsahKFACkDmlyqD7yBQrHLZjatpeKWDMDShHxqa
-         nqTCJf4bzdbkjB3YvseWXn+q/tcZOOXyr991pDTQgQ5vuufLO2NS6T6oe83/YeKl5dlE
-         mJFA==
+        b=ZB0KVaY6LO/lQzMPFBsCh9Gf3VLP4Ye95TK9xGFD6nY+Q7e7IoCw8iIasReN+SD7zb
+         YSDzFYQCrHJTdQGy7ChQN1TkqPiUhUnTkUQhsVIAsU90wKEtgfWTRUccjVQ2Y1BjjElC
+         8TRYpksKGSBKSxJxnhP/LGSzyJ1wHScmCufW9Co9erPUTF2rc62mHGSfDbCzwZFMzWRe
+         9pdl2B9cxQiEhsze1PXfhpsAe5Nyg3mJAL69y0yAeKrgK83fwiLANeQLsKdrq3d/IZKs
+         UlV46MAZNqNIeRLXEOBKKXDLNDrpCK1UnKbk1Cp6YPAvoR5xvFZwHOn65A+yPDfKyu9x
+         0GqQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
-        fh=XsI51gXOqgBMeCZJVNUlILxi9Hl202u0h+LR9AW7l4w=;
-        b=h3IJA6pxeYGua1RBTWePtvF6e647ceKftij2ged65K9oA2UFFT7G/Qf5l8fvEh0hjw
-         GiqcbW3gV6LJzBnEq6lG3/SSy4kqk1YKTl5A2ZZ5DB8LHftd4bRxTP3iscsShvxeo+vC
-         kjNiuZ+HX42e4CiEUII14Mf+A4j9vVrbdfX6mdbhrIYlSjhQjZGL0Bl/tLMsJXF8OHEs
-         qNt/nhYT7Tatp+OOoN3JvITTh177CnAwSnx0McmsyMre4d9jE5f38zd14Gu0Y+wRWw2C
-         0ZP2GMR/yrPLHlHXAb1d4P3JWi44jVhFwzAmah6C073cE0rs0djzL2aaSBNs0Hjsyz73
-         SqYg==;
+        bh=8jlUQS4KLS5Vv1uPa9lTGI6SqgHo4zN7CkVrrTyMB3Q=;
+        fh=ZFlyP5+YKgJkmoBW5+QP1miOu0vNYasz89rr0yCZ/+4=;
+        b=KofnxMcOG5eyjmSAkvwTWNG0Cfn+WM7yyTrC6zcdMs5+LwiUCz4c6ATVUQ0QiJ93SP
+         pxXcubUGo7eRcqg0pqME06X4AGnArCd9vy4zVlVDtTJR8Zaf3CbC35Xz66JGJY7zghgH
+         HGZgq9DhsRwP66BhYKMXv8EXqpKjKYNkkqyHaFUpN8U9a7vnjFeDafjaNKll4OFMF17v
+         CrY/o8kIIuajzSicLBnygisj+zxwmvAeb4oAPNa6V+Hxz7U6a4AJOtvOLeczY3Tfo/Zj
+         Enye0xTQZZPMD0ozJCrNwpqtd0SFvZ2VedGQ6cm+C001D248C8X8BfiFQ5yCxVJH6d2L
+         nBJQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788362266; x=1788967066; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788363086; x=1788967886; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
-        b=Y43RX8RxMyLTdAgxNvHY4Zc5LK7jkM+ZJDkSQK/D+9kPVRnrsiE9+GmVcv3S57sPsl
-         xXKbFXithxxGdPEHvecWwaUTAmIt8kzkcwxmWQdDh3AvMvaKIKMwqsnHDxuqL0EwO5u3
-         CJa5jKvIoF6teAxDHj0enltYibsXVnAm8YPjNWcDi26Aci3IbDdK8OsHUL8xZO9D88hc
-         KYJAzWtJdSp82uGj84PP2OagqEJLQW6qs8u/2G0sU+gOGvrJCQc2e6niJv+Pbsep++ut
-         uvUDYqjeEbSYmtvDVkYsEtg81klr3XmFZSAPjZZL3Tgk6wiOp5WPRkGH3Hk3xSLHb8VL
-         lpQQ==
+        bh=8jlUQS4KLS5Vv1uPa9lTGI6SqgHo4zN7CkVrrTyMB3Q=;
+        b=QU9nsD+/KSOUOeCI1xMvG78S95L5RdnxfTwlRxyQZ7sxoqlq7zr25llyoN0OYsoZMV
+         jVDWbOlvoLcZrkjC9BJXkr6rgVhv981F+W9p2NpjbBBILy+ywGyq9fLpcFQ/slcNewFb
+         j1yXzXWqgvzYB2PY9I5nmqNkfeda3zl9Y7e2er38hFS808uEhndBTB4Owr8wbiBvY+Va
+         jejZJyb1UDGVP3afBWOscLsRwD6xcVO5BtvtyVMX9d9dT/6VbA9SvCH5Hfvf9UUboFaR
+         2RmnxfH6IXXKvO5NIfuiD1VnJogM8ilM6GmDGu0IwAa0+8p8PeRHuKusOnYMyqne2qSg
+         Y3zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788362266; x=1788967066;
+        d=1e100.net; s=20251104; t=1788363086; x=1788967886;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
-        b=RWktfW8awIAfTiUPtQ9VQtiJ8ZLnj49qFWgS3u/Axwymw4BwMPbnRwyrkIesPSkfzx
-         cWuotlkFf3REcBtld1YHfFsypIZE4i3t+OoQSJU+yjWgL0K7Mot1n3Nn4ag6oi3xnVsw
-         CLVfXlg/npL1A/jd3O9WClp9QR6ObhXQV48vWn8a/rpURWVgNZccafypILvJUDbRHhKa
-         fXqqk67SNSrAo2NHxWOUbNyqjX/15WBYwqu4wprVFLNG8Eu2N4uSILSpHajm9auSmi1x
-         v/Nm466QUbbylZl8hi9CK5ovEt8Bhre0/XgOMjuGnJ2Is/RHxx4cB6x0QOy/XzK2gEho
-         SExA==
-X-Forwarded-Encrypted: i=1; AKwUvBwmRCyhUnVzgwrZbu8WnNjrQs7z+elzNDgK5GFfwpM5SG3ArpsHlBYPQ9ZykSvobZEIRby/pK00iF8RhA8hea4=@vger.kernel.org
-X-Gm-Message-State: AFuF++lGLnferQybLQQ4pVXHhpDJn+zrVyl2PcpedZcLu6Gn4uiosX7L
-	i9a88X0tpbKMhKXrU/awjW19mqOOLZs7Sjkg2GQPIvDLjC1OBd8e0qtxy7DpfEgtJ61YOMPvx7E
-	2jyMfBXlng/2GIa2JGHEo6ekiYBk3ekM=
-X-Gm-Gg: AYBFou1NevG43N6iiNANnD3yrYWPKFHSrzZ31fJEW/qRJ4HW/ZijsPF1l6C2BGUoPpy
-	P6a1FjPwr0zbkod5UxLneitlbyDKUP6JOvgPUWa6nPTeXlSxfyHVSILtpOrlYazaP7IWJic06YV
-	l+mwXLjToiCI8LvXjBur+h1Vx7wdgm4vjRupuS46/s75gzSoMbw+G7+cDrPC5HixUs76SfTgiiN
-	eJWrallNePsVLWLZGHcBT/zFNO8n8ccmwmd4Z5wdtJ2NQNiwCz/uJmikTLwsSjIUfuRVI8D0K4O
-	RXSu/mkPr5sM7QMuNAw9Lw87UjV9hxIcVUa99qMle8Xqw6rhRYjo6sqHXTl8HS2CUlrpSIHzq/D
-	KmdsidIK2nc2bfz4NdqBNMi3EJHmS8Qt3Cp4op4FcNg==
-X-Received: by 2002:a05:690c:c50f:b0:85c:79d2:91a4 with SMTP id
- 00721157ae682-86c52217cfamr26209717b3.17.1788362266227; Wed, 02 Sep 2026
- 08:17:46 -0700 (PDT)
+        bh=8jlUQS4KLS5Vv1uPa9lTGI6SqgHo4zN7CkVrrTyMB3Q=;
+        b=arLN8kpSqmw/TYXeUDvJsgQMNMV03pDHwwUy2uxQMCFsCjxckuxuqr4NOlDvtl+Bm0
+         CZlaNQA0jDkOe9/zUaaFoTqk0GFDMkJ2zCU6NynDq7QYdC51RIVYQXu1xtBm6UI//wIn
+         edHKkvCM7RwKOSn/nBLep/tSz6Q3F25vLIc3aAbBpU79ImODSQ/a3Jrc+a6KVqewXVsL
+         HNSZL6nmHLGWFgNucfM2Ddz+1VazLzFw4Wwr4rOLxTefu6QIa0GsQRweaPg4QlxINfrk
+         +mKDZrCb4uILIrlblrLayR/M2A6m5Vxs+drRObiqhJ64oAlH6YIV4903Kj8hD5S9/WVH
+         0LiQ==
+X-Gm-Message-State: AFuF++kyrb2t2nMl6ThvAt2JwMC9ZBmQ313mD2NG3jEfI8NmyuTjwwKs
+	Nb1nwtsDrXh5LVGQjh2Ap4iazq0g2Rx8T12X9Bv6t5wXnWEaw+500YvxtMk2TyvguZm1QtQWsVn
+	WKLgtU0DlSOLx8K/S9MOFpccTTr/zCDJFM90qEgNiwg==
+X-Gm-Gg: AYBFou0f3hHsgo3yaRDGAhcA0HkSwyRWj5VK/FNZud4cjlf5yb1mzTn3vnkYVeXArJi
+	CMZtxJloIzZzbo+XGco0PFX+vElRLYbu85lke9WLvMKAXX/rGNLyB9MrkRNKBEBHmUZAcP4XQrQ
+	Z8oyD6HeckxcrzIrlwtq3gV1Gu5YFqtAIioFDRQrY4rapT9nCS9ZJ/56QYFTD/s8wf7tanI6PUY
+	7swtAVrOKEHbb0ZKX2ef88FPfYABOj2vL7ydBENeEix0bioxNRXQbVxSp91tqBNSk6P3vI7ofOW
+	+TzqBO/doU6WicIwtRKE1Z8zZwBSQjeMGWWrPHtkxJAmNqdvIMpSTRna6/0d9mga3VU5RCloH9p
+	J8+8CP3qn7o8mazl0KNP3vTmNp2Ul5w6iGpcIFVl0nA==
+X-Received: by 2002:a05:690c:93:b0:80c:5ce9:8f29 with SMTP id
+ 00721157ae682-86c5221a98emr31871037b3.22.1788363085777; Wed, 02 Sep 2026
+ 08:31:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260902160407.257899-1-catherine.l@intel.com> <c02e3bfb-dd46-4c58-96e4-8f8bb5ca3508@molgen.mpg.de>
-In-Reply-To: <c02e3bfb-dd46-4c58-96e4-8f8bb5ca3508@molgen.mpg.de>
+References: <20260831061144.7767-1-raghavendra.rao@collabora.com> <20260831061144.7767-2-raghavendra.rao@collabora.com>
+In-Reply-To: <20260831061144.7767-2-raghavendra.rao@collabora.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 2 Sep 2026 11:17:33 -0400
-X-Gm-Features: AcwNN1Vye-PDzuBaoECK0IHWQJQC-7zg2wTIVZgfc-5uCEXCtPHb8qUQSdBRg70
-Message-ID: <CABBYNZKWeag1cAgedSbqizoDee_FmujnWQ+v9hbLAB9oRgBs4w@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: btusb: Add support for Intel Otter Peak2 (OrP2)
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Catherine L <catherine.l@intel.com>, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kiran.k@intel.com, L@web.codeaurora.org
+Date: Wed, 2 Sep 2026 11:31:14 -0400
+X-Gm-Features: AcwNN1UGxUDgr4rKFCtL4e01EzZPg5D0TelEvEEeQJE6l2IYCVd1zIy1ZFfD02U
+Message-ID: <CABBYNZ+Y2=+MhptF_tdd2DhDP308LA+F4UJjCzeEnZdc5LKTKw@mail.gmail.com>
+Subject: Re: [BlueZ PATCH 1/3] profiles/audio: Support MCS fast seeking
+To: raghu447 <raghavendra.rao@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paul,
+Hi Raghu,
 
-On Wed, Sep 2, 2026 at 7:07=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de> =
-wrote:
+On Mon, Aug 31, 2026 at 2:12=E2=80=AFAM raghu447 <raghavendra.rao@collabora=
+.com> wrote:
 >
-> Dear Catherine,
+> From: raghavendra <raghavendra.rao@collabora.com>
 >
+> ---
+>  profiles/audio/mcp.c   | 43 ++++++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/media.c | 27 ++++++++++++++++++++++++++
+>  profiles/audio/media.h |  1 +
+>  3 files changed, 71 insertions(+)
 >
-> Thank you for your patch.
+> diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+> index 8adf814e8..4df388a22 100644
+> --- a/profiles/audio/mcp.c
+> +++ b/profiles/audio/mcp.c
+> @@ -60,6 +60,7 @@
 >
-> Am 02.09.26 um 18:04 schrieb Catherine L:
-> > From: "L, Catherine" <catherine.l@intel.com>
->
-> Please use the format without comma: Catherine L.
->
-> > $ lsusb
-> > Bus 003 Device 003: ID 8087:0043 Intel Corp.
-> >
-> > $ cat /sys/kernel/debug/usb/devices
-> > T:  Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D09 Cnt=3D02 Dev#=3D  3 Spd=3D12 =
-  MxCh=3D 0
-> > D:  Ver=3D 2.01 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  =
-1
-> > P:  Vendor=3D8087 ProdID=3D0043 Rev=3D 0.00
-> > C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-> > I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
-> > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D1ms
-> > E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-> > E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-> > I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
-> > E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-> > E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-> >
-> > Signed-off-by: L, Catherine <catherine.l@intel.com>
->
-> Ditto.
->
-> > ---
-> >   drivers/bluetooth/btusb.c | 2 ++
-> >   1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 03039ceaa77d..a4fdf6549127 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -488,6 +488,8 @@ static const struct usb_device_id quirks_table[] =
-=3D {
-> >       { USB_DEVICE(0x8087, 0x0037), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED },
-> >       { USB_DEVICE(0x8087, 0x0038), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED },
-> >       { USB_DEVICE(0x8087, 0x0039), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED },
-> > +     /* Otter Peak2, Wildcat Lake */
-> > +     { USB_DEVICE(0x8087, 0x0043), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED },
->
-> Please sort and put the comment on the same line as below.
+>  #define MCS_UUID_STR   "00001848-0000-1000-8000-00805f9b34fb"
+>  #define GMCS_UUID_STR  "00001849-0000-1000-8000-00805f9b34fb"
+> +#define MCS_SEEK_OFFSET        (10 * 1000 * 1000)
 
-That's not a good idea, we still have the 80-column limit for the
-Bluetooth subsystem.
+Okay, what is this for? Why it is not the final number and where it comes f=
+rom?
 
-> >       { USB_DEVICE(0x8087, 0x0040), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED }, /* Lizard Peak 2 */
-> >       { USB_DEVICE(0x8087, 0x07da), .driver_info =3D BTUSB_CSR },
-> >       { USB_DEVICE(0x8087, 0x07dc), .driver_info =3D BTUSB_INTEL_COMBIN=
-ED |
 >
 >
-> Kind regards,
+>  /*
+> @@ -440,6 +441,7 @@ struct mcs_instance {
+>         struct bt_mcs *mcs;
+>         struct queue *player_links;
+>         bool at_start;
+> +       int8_t seeking_speed;
 >
-> Paul
+>         /* GMCS-specific */
+>         struct bt_uinput *uinput;
+> @@ -494,6 +496,11 @@ static void mcs_update_media_state(struct mcs_instan=
+ce *mcs)
+>                 state =3D BT_MCS_STATE_INACTIVE;
+>         }
+>
+> +       if (state !=3D BT_MCS_STATE_SEEKING && mcs->seeking_speed) {
+> +               mcs->seeking_speed =3D 0;
+> +               bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
+> +       }
+> +
+>         bt_mcs_set_media_state(mcs->mcs, state);
+>         bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
+>  }
+> @@ -656,6 +663,32 @@ static bool mcs_pause(void *data)
+>         return mcs_command(mcs, BT_MCS_CMD_PAUSE);
+>  }
+>
+> +static bool mcs_fast_rewind(void *data)
+> +{
+> +       struct mcs_instance *mcs =3D data;
+> +       struct player_link *p =3D mcs_get_active(mcs);
+> +
+> +       if (!p || !local_player_seek(p->lp, -MCS_SEEK_OFFSET))
+> +               return false;
 
+Should we seek back to 0? I don't get why you need to seek negatively like =
+this.
+
+> +
+> +       mcs->seeking_speed =3D -1;
+> +       bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
+> +       return true;
+> +}
+> +
+> +static bool mcs_fast_forward(void *data)
+> +{
+> +       struct mcs_instance *mcs =3D data;
+> +       struct player_link *p =3D mcs_get_active(mcs);
+> +
+> +       if (!p || !local_player_seek(p->lp, MCS_SEEK_OFFSET))
+> +               return false;
+> +
+> +       mcs->seeking_speed =3D 1;
+> +       bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
+> +       return true;
+> +}
+> +
+>  static bool mcs_stop(void *data)
+>  {
+>         struct mcs_instance *mcs =3D data;
+> @@ -752,6 +785,13 @@ static int32_t mcs_track_position(void *data)
+>         return local_player_get_position(p->lp) / 10;
+>  }
+>
+> +static int8_t mcs_seeking_speed(void *data)
+> +{
+> +       struct mcs_instance *mcs =3D data;
+> +
+> +       return mcs->seeking_speed;
+> +}
+> +
+>  static uint8_t mcs_playing_order(void *data)
+>  {
+>         struct mcs_instance *mcs =3D data;
+> @@ -858,12 +898,15 @@ static const struct bt_mcs_callback gmcs_cb =3D {
+>         .track_title =3D mcs_track_title,
+>         .track_duration =3D mcs_track_duration,
+>         .track_position =3D mcs_track_position,
+> +       .seeking_speed =3D mcs_seeking_speed,
+>         .playing_order =3D mcs_playing_order,
+>         .playing_order_supported =3D mcs_playing_order_supported,
+>         .set_track_position =3D mcs_set_track_position,
+>         .set_playing_order =3D mcs_set_playing_order,
+>         .play =3D mcs_play,
+>         .pause =3D mcs_pause,
+> +       .fast_rewind =3D mcs_fast_rewind,
+> +       .fast_forward =3D mcs_fast_forward,
+>         .stop =3D mcs_stop,
+>         .next_track =3D mcs_next_track,
+>         .previous_track =3D mcs_previous_track,
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 95f9580b0..aeb6226da 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -157,6 +157,7 @@ struct local_player {
+>         GTimer                  *timer;
+>         bool                    play;
+>         bool                    pause;
+> +       bool                    seek;
+>         bool                    next;
+>         bool                    previous;
+>         bool                    control;
+> @@ -2296,6 +2297,29 @@ bool local_player_pause(struct local_player *mp)
+>         return local_player_send(mp, "Pause");
+>  }
+>
+> +bool local_player_seek(struct local_player *mp, int64_t offset)
+> +{
+> +       DBusMessage *msg;
+> +
+> +       DBG("");
+> +
+> +       if (!mp->seek || !mp->control)
+> +               return false;
+> +
+> +       msg =3D dbus_message_new_method_call(mp->sender, mp->path,
+> +                                       MEDIA_PLAYER_INTERFACE, "Seek");
+> +       if (msg =3D=3D NULL) {
+> +               error("Couldn't allocate D-Bus message");
+> +               return false;
+> +       }
+> +
+> +       dbus_message_append_args(msg, DBUS_TYPE_INT64, &offset,
+> +                                       DBUS_TYPE_INVALID);
+> +       g_dbus_send_message(btd_get_dbus_connection(), msg);
+> +
+> +       return true;
+> +}
+> +
+>  bool local_player_next(struct local_player *mp)
+>  {
+>         DBG("");
+> @@ -2673,6 +2697,9 @@ static gboolean set_player_property(struct local_pl=
+ayer *mp, const char *key,
+>         if (strcasecmp(key, "CanPause") =3D=3D 0)
+>                 return set_flag(mp, &var, &mp->pause);
+>
+> +       if (strcasecmp(key, "CanSeek") =3D=3D 0)
+> +               return set_flag(mp, &var, &mp->seek);
+> +
+>         if (strcasecmp(key, "CanGoNext") =3D=3D 0)
+>                 return set_flag(mp, &var, &mp->next);
+>
+> diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+> index 1c43075ba..a89466657 100644
+> --- a/profiles/audio/media.h
+> +++ b/profiles/audio/media.h
+> @@ -73,6 +73,7 @@ bool local_player_have_track(struct local_player *lp);
+>  bool local_player_play(struct local_player *lp);
+>  bool local_player_stop(struct local_player *lp);
+>  bool local_player_pause(struct local_player *lp);
+> +bool local_player_seek(struct local_player *lp, int64_t offset);
+>  bool local_player_next(struct local_player *lp);
+>  bool local_player_previous(struct local_player *lp);
+>
+>
 
 
 --=20
