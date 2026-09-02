@@ -1,149 +1,108 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238A53AA4E0
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 19:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EA52D739C;
+	Wed,  2 Sep 2026 21:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788377384; cv=none; b=NDfowR+5dB75zk/NhlId+WEWlFEQ8zRCCr/mlGEuvP0SGN4dnWi8EQL/N4vrykK4TTldCi8ZEBc7eLRbxOqy4IVSNmHU8/KhOk8K8onvZRjiOY79ok/tRlYDDC5/rgacr4fFiXHZUBSdHQ1qtsuERI6bUi+VRMOEHZeu3QTtmVg=
+	t=1788384672; cv=none; b=XfrdNw9fQ8Egt/chRTwWVIar25WLGRwSV4zIvhgN1F3f0ESkwNsB8cB41r8sjFtJwnhWLhPJGiyz8p3JXuUSPW2W1AiWcYNW2cVEcBSwMrQFWJMkpRMENsWBEar8G2Bs3jS3A90VjqyurTxGDGkD9hkxJ88nVLueeVsqfwJhBQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788377384; c=relaxed/simple;
-	bh=/DI2KLM9txkaYzQdHpdeN8ohte1K6k5EHSuqxwLcLrk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SukyCAo9XoRCH8bl9BmMQn/MGEkPl6utC2mJYT1YJUmAoP9iIFGLdGbFqA85lbRl+eQeLE63KSO3g+fJQAknZOgNsYxSVGghIYuAw4Ug3RHxeLXA0G0s2+weSKP9cHJ17fGvQJkBWnxIIScwa5sFhVTJrYKmc0EhgWfl/pIHoVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbFtX1Wl; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788384672; c=relaxed/simple;
+	bh=Kj3bxi0flrkSvFaicvTf9BYfe+jbliuQQR/jhW2MpJY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jYWb6/FITpOXwX8naX+xwckqCVQk0aHaZRG5st2xSaEuPaTNMXpUjAZNn4cBI9WiN6y3tPfk/jbXOmiFhJ+Yp33BwxhbeHd+eD4ugZMx5XJSiJIm4FPVXe6PF6mYV/ON6cYp/vOWiYvg7/FA1nXXvdxljNJkNdVjtPnknowN5SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnAXhnO+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbFtX1Wl"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51bfad59921so15295831cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 12:29:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788377368; x=1788982168; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=XIPbkhG6kmVoSwt7U4aaho9kktYDRkUtUtLjqxqjnNo=;
-        b=NbFtX1WladlWtvTyT6Bdtxg0WnOJm6v2w1qsUfoqbrNNpmUjV9ORBTz4Ri1a2YV2F6
-         ppUw3sCz7Yb7pEkdDiE7u5a/9XnEnKzmxHsRrRDeDdFFZEMHkz6ZpNX5elUKskqbhytB
-         9CEqovY+v5hWJS1v64014AnHKfwODgYLy+3sclE28haXVHVARKXy6+gCc1lqrJ2rZkFt
-         SmfgFq4IaxcjKQ34eqd7+zOjGnI+hsbSh/sKEd5mthDAH+xvEMbOU+QBwo/Taa8QBabs
-         YadGdiX/6EGy81CY+g+BVDEi1Vkr7/baDWdYo9RdP/AzS4QiYcsawHh4PlW7BGlteHTy
-         JQhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788377368; x=1788982168;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=XIPbkhG6kmVoSwt7U4aaho9kktYDRkUtUtLjqxqjnNo=;
-        b=XV8YyUjxin9KN2F/6funoKKKZqROY10yW8UYy/xBouwarm6dkoXcX14CIWjII0inu+
-         7UHEd9siBt9N0yXitfGBkq4gCTmInI2j0y545mOCnAW0KK9l7chtMopmswqhah4ku5ef
-         kDZX69TX+TdOZ1MD056rk0aW/iu9Yc71jmL42XOd/Ju2P7ksw+QuJ/OYFd4wUVgRMOGn
-         vIRmsxTQCPAf54KxXchA6i4Ntp1h3VlVGPcRduT6sg5ZzaQ7KMtQUApPvWSQkasqfqtX
-         0v1DMppmBwVCVH8X//SR9Jeydr4GJGqapfBrLZOpGrmohl/r0ueLQi/gmWg8lFKrH7By
-         Lt+A==
-X-Gm-Message-State: AFuF++nVeCZOLx6aNTydYsvdqCZBrb25vl2DBPp2vRyYeLVXpk6geeyC
-	FgHsTm1PQACYikN69iag/KYTZeGrEti4s909EwiiNO4ClPzOIFXBcCCx4/hWNg==
-X-Gm-Gg: AYBFou03cNppXdej6Sz//73UA9QXeUdHrSrE6I8q9Pneeqja/PsOauV7NdgVlgVnC5+
-	jcPwwYFhumMke9wqGIHgc9eeU8skboxeIPBHIpGOAFA2v4iFTKhkIDvLVThrBgJWWGcZ9wwZWtj
-	+x42+q7V7t5XHorfDZEPtpU+6Ybxjhs8Rd7dC4mMcI6PtrbX+1RuFi4YvBS13k1jz4iDatGifmL
-	wzlS2Wv/6M2Jrd42Lcslopr+9oQEivsptfiXTKJDOGLeVMQxureN4gpUxYTgafO/3nlS8Iqgean
-	oDwIvliTVCumEwbUcZqvLMBRE0Ka3nmBIbGvjvjQAhNrwBcLU/1dQcwoJGsMsrJVJ9THc31uG7s
-	hK+dHOdeSeiaIGXmVs8wz5Akh7gjkiTuVqJB7ieDWekLEH9YpXS7aLUwMtb0xRPHMvJVK3KmoU7
-	8rE2hNeqjf7WGsKf1tR7m4kU/IyGBZwh6foczx3t1rKZk1Z5V3z/pG6/+lAV0DN9iZXA0=
-X-Received: by 2002:ac8:5f10:0:b0:530:4310:5398 with SMTP id d75a77b69052e-53043105660mr17552421cf.48.1788377367667;
-        Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.95.161])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53033226cdbsm25639671cf.24.2026.09.02.12.29.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
-Message-ID: <6a987917.043ad0dd.1178cc.9da2@mx.google.com>
-Date: Wed, 02 Sep 2026 12:29:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7916647139816403883=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnAXhnO+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D591F000E9;
+	Wed,  2 Sep 2026 21:31:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788384665;
+	bh=+p+BmNLmT1SKv1gqG4ZuXT/+T0FkUScI040XPAxNxHg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ZnAXhnO+O5ihgOaWvXRLsTByLrSjybFUgjLhioqn6eDWZ8pbelL3hlE4SqKTWIWXc
+	 WP3d7Dg4HUCQNjnAhLH6I98TMxookj2jcGmzfOdRKVDcmltfJPZOOAL95B/a4ODVJ6
+	 G4Xgady+xcoa6rC/dZ49C/fOXNFnftPZnO1hLvQpUQEVOE5xXCWMGxDFJbOyCyVjpq
+	 lfi6PaVgZap5MlIvWT3t/ptTAhXUlsxim6ahVLVAzZpnSrfvMNuOaFC6Zgd89IcJA4
+	 +8RGIBmLIf4zgDLsH5eoVvg+yv2pisQafeZF5qf3ExTxjiLVwwusNwYz6Jf9T15ymQ
+	 HrrLrOwn9qRew==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B4E3927045;
+	Wed,  2 Sep 2026 21:30:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: hci_sync: Fix not setting CE length properly
-In-Reply-To: <20260902171626.1711932-1-luiz.dentz@gmail.com>
-References: <20260902171626.1711932-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 00/16] Bluetooth: L2CAP: fix and annotate
+ l2cap_conn::chan_l
+ locking
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178838460764.2957558.9167588069983760163.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Sep 2026 21:30:07 +0000
+References: <cover.1788013041.git.pav@iki.fi>
+In-Reply-To: <cover.1788013041.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, oss@fourdim.xyz, error27@gmail.com, elver@google.com,
+ linux-kernel@vger.kernel.org
 
---===============7916647139816403883==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Sat, 29 Aug 2026 17:19:55 +0300 you wrote:
+> The intent in current code is that:
+> 
+> - l2cap_conn::chan_l read/write is guarded by l2cap_conn::lock
+> 
+> - l2cap_chan_del called with held l2cap_chan::lock (l2cap_sock.c uses
+>   this)
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1156356
+Here is the summary with links:
+  - [01/16] Bluetooth: L2CAP: take chan->lock for l2cap_chan_add/ready/del
+    (no matching commit)
+  - [02/16] Bluetooth: L2CAP: add l2cap_chan_close_unlocked() and locking helpers
+    (no matching commit)
+  - [03/16] Bluetooth: L2CAP: fix race condition in l2cap_sock_shutdown()
+    (no matching commit)
+  - [04/16] Bluetooth: 6lowpan: use l2cap_chan_close_unlocked()
+    (no matching commit)
+  - [05/16] Bluetooth: L2CAP: remove unused l2cap_chan_close()
+    (no matching commit)
+  - [06/16] Bluetooth: 6lowpan: avoid concurrent peer_del() in bt_6lowpan_disconnect
+    (no matching commit)
+  - [07/16] Bluetooth: L2CAP: hold conn->lock for __l2cap_ecred_conn_rsp_defer
+    (no matching commit)
+  - [08/16] Bluetooth: L2CAP: hold l2cap_conn::lock in l2cap_connect_cfm()
+    (no matching commit)
+  - [09/16] Bluetooth: L2CAP: add annotations for l2cap_chan list locking
+    (no matching commit)
+  - [10/16] Bluetooth: L2CAP: take lock for l2cap_chan_del in l2cap_ecred_rsp_defer
+    (no matching commit)
+  - [11/16] Bluetooth: L2CAP: hold chan in l2cap_ecred_conn_rsp()
+    (no matching commit)
+  - [12/16] Bluetooth: L2CAP: annotate locking for l2cap_chan_del()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6873eb51dcdd
+  - [13/16] Bluetooth: L2CAP: annotate locking for l2cap_ops callbacks
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4149ba2a806c
+  - [14/16] Bluetooth: L2CAP: make concurrent l2cap_set_timer() refcounting safe
+    (no matching commit)
+  - [15/16] Bluetooth: L2CAP: remove conditional locking from l2cap_connect()
+    (no matching commit)
+  - [16/16] Bluetooth: L2CAP: refuse __l2cap_chan_add if chan already has conn
+    (no matching commit)
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.77 seconds
-VerifyFixes                   PASS      0.14 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      26.69 seconds
-CheckAllWarning               PASS      29.26 seconds
-CheckSparse                   PASS      28.22 seconds
-BuildKernel32                 PASS      25.81 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      473.35 seconds
-TestRunner_l2cap-tester       PASS      65.29 seconds
-TestRunner_iso-tester         PASS      102.49 seconds
-TestRunner_bnep-tester        PASS      19.82 seconds
-TestRunner_mgmt-tester        FAIL      216.48 seconds
-TestRunner_rfcomm-tester      PASS      25.93 seconds
-TestRunner_sco-tester         PASS      31.80 seconds
-TestRunner_ioctl-tester       PASS      26.30 seconds
-TestRunner_mesh-tester        FAIL      26.35 seconds
-TestRunner_smp-tester         PASS      23.61 seconds
-TestRunner_userchan-tester    PASS      20.21 seconds
-TestRunner_6lowpan-tester     PASS      23.98 seconds
-IncrementalBuild              PASS      24.79 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.240 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.452 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.556 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-https://github.com/bluez/bluetooth-next/pull/690
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7916647139816403883==--
