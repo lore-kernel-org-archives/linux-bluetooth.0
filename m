@@ -1,109 +1,178 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF00736494F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 15:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788361853; cv=none; b=OKBkeIx+ih0cyS6hiQlRoYNDOox3xhhRNg+okMIkkYrJpgsLDfPcAx3DK/VYQvFv5kqRg9PvnQbC7br21tBG3bhJ80ZE66j2Hcv3ecGZ/dtxpLvXEwVgw6K6ygF8C7KRsxFGz+vvRQ4lOJ9WSlI2aqsJqQIEZxpcjuKvyAGbbUk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788361853; c=relaxed/simple;
-	bh=xI11dgfqqzrHDY01o4bvdkAofYrHWyVxbY/cuV0BN0M=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ghbEIm58EYIkFWDKFUBUn3kZvvb4Rdtzmi0wwllP+2NgPQl5UY+paHXN0BOSRCW5vXWLXNaN3X3UxMpRTKYhduK7lnxOySDZHim8a+qD52N29ChUFeQdDaZY21f6rR669UHcOyN5iCG/Ug1spuNXjYM8NrdjKEMK1VIXd3ouGw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iNp60ttx; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8D22765E2
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 15:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788362269; cv=pass; b=QqAx8NDkFN50TxVHOaFXorn5wD8BQP7uxq6eDbQKUKWT8WU/REZFnIIYwozlw+aDQ7FcTlUoGXftMGUdC0icFDSvw3Alz5BGmBSkFgLKnzQTQ66s65uMZPW/22o3eqt8qKrLe0Xpl+BUE5CL3o4rCR+kqZEK9Djt+HFxgQMitYo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788362269; c=relaxed/simple;
+	bh=bZfs3GmlmJp+9UVl015Wa8TGidJ9KDc+UwsCi87NnRw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cooV3Ft6FVX7aBX6BGNFcxHs9ov7nmGZyWywQldY5fUO5czbvGyz4DCd0KuH2tuSDXejaa0fk36M5Az9OXnMXQU7q+XuDGIc8sN11JBoMXBcpi1XnC3wnF4w44oZnSn1C/7CN8k9KB2xP7ecj8BMNXmfv3/wbqM3Zy2PsHAHGtw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y43RX8Rx; arc=pass smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNp60ttx"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-97ccaa61510so316778241.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 08:10:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y43RX8Rx"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-8623b1e7cb2so16316377b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 08:17:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788362266; cv=none;
+        d=google.com; s=arc-20260327;
+        b=seqrhujzp2YL9UrucIMwVpTv6eH6Ko1ZaOP4LyaPq6tNnbwPjymVdkiyDtVvPDJhtl
+         2KezGxfOXkMc/zOMcmu0Dd1pJBr4/0kj/5HgoWUrS7nbi47xZ0ADy+qoraOebwAi0zW7
+         nJ8GDgTWxXi5qV4pBKTFy0TySfy6RaW3C93uwmVUUppqisfiO2d40C4hshBedq9cfWAX
+         Zl9hJqQv39Nmnjmvrqke6qsf800hFEsahKFACkDmlyqD7yBQrHLZjatpeKWDMDShHxqa
+         nqTCJf4bzdbkjB3YvseWXn+q/tcZOOXyr991pDTQgQ5vuufLO2NS6T6oe83/YeKl5dlE
+         mJFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
+        fh=XsI51gXOqgBMeCZJVNUlILxi9Hl202u0h+LR9AW7l4w=;
+        b=h3IJA6pxeYGua1RBTWePtvF6e647ceKftij2ged65K9oA2UFFT7G/Qf5l8fvEh0hjw
+         GiqcbW3gV6LJzBnEq6lG3/SSy4kqk1YKTl5A2ZZ5DB8LHftd4bRxTP3iscsShvxeo+vC
+         kjNiuZ+HX42e4CiEUII14Mf+A4j9vVrbdfX6mdbhrIYlSjhQjZGL0Bl/tLMsJXF8OHEs
+         qNt/nhYT7Tatp+OOoN3JvITTh177CnAwSnx0McmsyMre4d9jE5f38zd14Gu0Y+wRWw2C
+         0ZP2GMR/yrPLHlHXAb1d4P3JWi44jVhFwzAmah6C073cE0rs0djzL2aaSBNs0Hjsyz73
+         SqYg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788361849; x=1788966649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=soHDOb/lqvgb8NX6QgWHKUWd67efo3peVslnmBaKkso=;
-        b=iNp60ttxbbCOCwibmedJRPsRQxrv+eHT9jNSG/3DZG2x9qEdB1dMaewdgE+ehQfkDg
-         RQjp1uTH1s+cDnhL3vKjZuNMY9rniYq/GfwwvT4D1VPNDwoqAJPjTGKRSz/jnW9DQnDp
-         j9Gny/hjNzF2o8hLF6skfQFljgbgsop+NBVB32kkKXtNco9zBC6sPKn2BmSa90QEw3sy
-         kaE/7AU2OpyiHZFQEosfynFjwwjap2yJ86Dc3PEZjF95HbP15tdcVgqUUH3jozvMSNf5
-         jeKZ3iPHCjqKbn6ZTEtSoOxGKHDnxkITCfGnyutycvNMUHD4W7a3EdMhlWlxu4cFfJV0
-         qweA==
+        d=gmail.com; s=20251104; t=1788362266; x=1788967066; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
+        b=Y43RX8RxMyLTdAgxNvHY4Zc5LK7jkM+ZJDkSQK/D+9kPVRnrsiE9+GmVcv3S57sPsl
+         xXKbFXithxxGdPEHvecWwaUTAmIt8kzkcwxmWQdDh3AvMvaKIKMwqsnHDxuqL0EwO5u3
+         CJa5jKvIoF6teAxDHj0enltYibsXVnAm8YPjNWcDi26Aci3IbDdK8OsHUL8xZO9D88hc
+         KYJAzWtJdSp82uGj84PP2OagqEJLQW6qs8u/2G0sU+gOGvrJCQc2e6niJv+Pbsep++ut
+         uvUDYqjeEbSYmtvDVkYsEtg81klr3XmFZSAPjZZL3Tgk6wiOp5WPRkGH3Hk3xSLHb8VL
+         lpQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788361849; x=1788966649;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=soHDOb/lqvgb8NX6QgWHKUWd67efo3peVslnmBaKkso=;
-        b=B3BuR+1jnsPygLkSoylfMLTODpxBkTs6omF9hD4aW4cdDRoea0DUY6WMYDyHzoMc1v
-         gsEfinq1RXlxP8Y/JfQ+J12s8GXWLnevPvnov5Gl1VhCSu//zu37rQoNxuTnqW3xhYMG
-         qbS4mFAizz+rtapt7QPeqTTzkGS+YhMylN2gz6d/JOnXN4ln0CVM3qTQwqQeWSYL/Bev
-         7sxcEXtl2ZoWm6xBwgkKJAFBKfFkOreUTxijWjysZ8xsGxdhR8YIWagiwMKo3KS/CdMY
-         09ngWMp6A4y4cui5zg5USHW3Sa2yn3yjP38IEn2KbI46qjuleJy9OAkJkXhW+TEp+PZR
-         O5+Q==
-X-Gm-Message-State: AFuF++kRqyAg4Ws1WmgK05Q5IFluyOl5maRewo3wBLiNE+G6E/NY+Ijg
-	PtLWStwbEoBOEvsc04OJbvBRz49KQMAAaMjnKva1m9GzHlaucjW/2+VeMsmlorLVdBd8Dw==
-X-Gm-Gg: AYBFou3sDcsW1K4hBljwfl2eIqRgpSJAF0Ks+A/+I+pqc5B/xsNHsITAUKRIGYRIEjI
-	4WzwWAie8oyeIUMHiyyGyIaOF6ftLib1cIOhzR84vwF2II7qUBtXmWyAPXjdvtJiXse6pLDBhlz
-	5oi1LXLYj3eY5+el3hKmkmyelpvv7TF3f/xaaSW8MA8WNKdzIQ1SMYQaQrWX/Ovj1VjsKnOpAIz
-	XX/DRSlE/WISaHZq/PHjumyPQe51R0uiRbFX6KqPPideflDAkJ5IWwTJ5zGcFgKRF0prRN2Vvpb
-	TtbPULG766NDnRmZRTG1pOrEkTQj2DkzYDGoXbEdKuPFr/WLisnkMZIXnPEB+RGv7rL+KNI80dP
-	Q7E5TDR1loCe18beTr21tLKIW2mCnHb4cnP97IfWuWxgU0omR19sCkMPlUXjAOe5ATsmprma6Ac
-	YGN9mjfeN2Dgv9xHkKOS7YG72cKE+sS7IzoTxdI1OvyHMoOU+7lIGtrYOOrqBj/esM6VNBs3xL+
-	vSoMDAVLhKaap4woOx0RL40le7xPQGMiaHrKYuaH/NaDZRbjTY1P4g=
-X-Received: by 2002:a05:6102:1589:b0:786:77e2:d8fa with SMTP id ada2fe7eead31-78a1f1f11a5mr1703002137.5.1788361849376;
-        Wed, 02 Sep 2026 08:10:49 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9807764dec9sm462410241.12.2026.09.02.08.10.48
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 08:10:48 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_sync: Fix not setting CE length on LE Set Default Rate
-Date: Wed,  2 Sep 2026 11:10:39 -0400
-Message-ID: <20260902151039.1583493-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1788362266; x=1788967066;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=dThpWTlOJfitRUpKBKjgJW/n37x+Th1lB39VNPifol0=;
+        b=RWktfW8awIAfTiUPtQ9VQtiJ8ZLnj49qFWgS3u/Axwymw4BwMPbnRwyrkIesPSkfzx
+         cWuotlkFf3REcBtld1YHfFsypIZE4i3t+OoQSJU+yjWgL0K7Mot1n3Nn4ag6oi3xnVsw
+         CLVfXlg/npL1A/jd3O9WClp9QR6ObhXQV48vWn8a/rpURWVgNZccafypILvJUDbRHhKa
+         fXqqk67SNSrAo2NHxWOUbNyqjX/15WBYwqu4wprVFLNG8Eu2N4uSILSpHajm9auSmi1x
+         v/Nm466QUbbylZl8hi9CK5ovEt8Bhre0/XgOMjuGnJ2Is/RHxx4cB6x0QOy/XzK2gEho
+         SExA==
+X-Forwarded-Encrypted: i=1; AKwUvBwmRCyhUnVzgwrZbu8WnNjrQs7z+elzNDgK5GFfwpM5SG3ArpsHlBYPQ9ZykSvobZEIRby/pK00iF8RhA8hea4=@vger.kernel.org
+X-Gm-Message-State: AFuF++lGLnferQybLQQ4pVXHhpDJn+zrVyl2PcpedZcLu6Gn4uiosX7L
+	i9a88X0tpbKMhKXrU/awjW19mqOOLZs7Sjkg2GQPIvDLjC1OBd8e0qtxy7DpfEgtJ61YOMPvx7E
+	2jyMfBXlng/2GIa2JGHEo6ekiYBk3ekM=
+X-Gm-Gg: AYBFou1NevG43N6iiNANnD3yrYWPKFHSrzZ31fJEW/qRJ4HW/ZijsPF1l6C2BGUoPpy
+	P6a1FjPwr0zbkod5UxLneitlbyDKUP6JOvgPUWa6nPTeXlSxfyHVSILtpOrlYazaP7IWJic06YV
+	l+mwXLjToiCI8LvXjBur+h1Vx7wdgm4vjRupuS46/s75gzSoMbw+G7+cDrPC5HixUs76SfTgiiN
+	eJWrallNePsVLWLZGHcBT/zFNO8n8ccmwmd4Z5wdtJ2NQNiwCz/uJmikTLwsSjIUfuRVI8D0K4O
+	RXSu/mkPr5sM7QMuNAw9Lw87UjV9hxIcVUa99qMle8Xqw6rhRYjo6sqHXTl8HS2CUlrpSIHzq/D
+	KmdsidIK2nc2bfz4NdqBNMi3EJHmS8Qt3Cp4op4FcNg==
+X-Received: by 2002:a05:690c:c50f:b0:85c:79d2:91a4 with SMTP id
+ 00721157ae682-86c52217cfamr26209717b3.17.1788362266227; Wed, 02 Sep 2026
+ 08:17:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260902160407.257899-1-catherine.l@intel.com> <c02e3bfb-dd46-4c58-96e4-8f8bb5ca3508@molgen.mpg.de>
+In-Reply-To: <c02e3bfb-dd46-4c58-96e4-8f8bb5ca3508@molgen.mpg.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 2 Sep 2026 11:17:33 -0400
+X-Gm-Features: AcwNN1Vye-PDzuBaoECK0IHWQJQC-7zg2wTIVZgfc-5uCEXCtPHb8qUQSdBRg70
+Message-ID: <CABBYNZKWeag1cAgedSbqizoDee_FmujnWQ+v9hbLAB9oRgBs4w@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btusb: Add support for Intel Otter Peak2 (OrP2)
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Catherine L <catherine.l@intel.com>, marcel@holtmann.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kiran.k@intel.com, L@web.codeaurora.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Paul,
 
-hci_le_set_def_rate_sync() left min_ce_len and max_ce_len zeroed by the
-memset, but the connection event length recommended in requests by a
-Peripheral has a valid range of 0x0001 to 0x7CFF (Time = N * 125 us,
-Time Range: 0.125 ms to 3.999875 s), so 0x0000 is invalid.
+On Wed, Sep 2, 2026 at 7:07=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de> =
+wrote:
+>
+> Dear Catherine,
+>
+>
+> Thank you for your patch.
+>
+> Am 02.09.26 um 18:04 schrieb Catherine L:
+> > From: "L, Catherine" <catherine.l@intel.com>
+>
+> Please use the format without comma: Catherine L.
+>
+> > $ lsusb
+> > Bus 003 Device 003: ID 8087:0043 Intel Corp.
+> >
+> > $ cat /sys/kernel/debug/usb/devices
+> > T:  Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D09 Cnt=3D02 Dev#=3D  3 Spd=3D12 =
+  MxCh=3D 0
+> > D:  Ver=3D 2.01 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  =
+1
+> > P:  Vendor=3D8087 ProdID=3D0043 Rev=3D 0.00
+> > C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> > I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
+er=3Dbtusb
+> > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D1ms
+> > E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+> > E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+> > I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
+er=3Dbtusb
+> > E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> > E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> >
+> > Signed-off-by: L, Catherine <catherine.l@intel.com>
+>
+> Ditto.
+>
+> > ---
+> >   drivers/bluetooth/btusb.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 03039ceaa77d..a4fdf6549127 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -488,6 +488,8 @@ static const struct usb_device_id quirks_table[] =
+=3D {
+> >       { USB_DEVICE(0x8087, 0x0037), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED },
+> >       { USB_DEVICE(0x8087, 0x0038), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED },
+> >       { USB_DEVICE(0x8087, 0x0039), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED },
+> > +     /* Otter Peak2, Wildcat Lake */
+> > +     { USB_DEVICE(0x8087, 0x0043), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED },
+>
+> Please sort and put the comment on the same line as below.
 
-Set both to the minimum valid value.
+That's not a good idea, we still have the 80-column limit for the
+Bluetooth subsystem.
 
-Fixes: 2f8784cfe8a9 ("Bluetooth: Add support for Shorter Connection Interval (SCI) feature")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> >       { USB_DEVICE(0x8087, 0x0040), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED }, /* Lizard Peak 2 */
+> >       { USB_DEVICE(0x8087, 0x07da), .driver_info =3D BTUSB_CSR },
+> >       { USB_DEVICE(0x8087, 0x07dc), .driver_info =3D BTUSB_INTEL_COMBIN=
+ED |
+>
+>
+> Kind regards,
+>
+> Paul
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 24eeb76f7207..334e5ebb26ee 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4797,6 +4797,13 @@ static int hci_le_set_def_rate_sync(struct hci_dev *hdev)
- 	cp.cont_num = cpu_to_le16(0x0001);
- 	cp.supv_timeout = cpu_to_le16(0x000c);	/* 120 ms */
- 
-+	/* The connection event length recommended in requests by a Peripheral
-+	 * uses units of 125 us with a valid range of 0x0001 to 0x7CFF
-+	 * (0.125 ms to 3.999875 s), so use the minimum as the default.
-+	 */
-+	cp.min_ce_len = cpu_to_le16(0x0001);
-+	cp.max_ce_len = cpu_to_le16(0x0001);
-+
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEF_RATE,
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- }
--- 
-2.54.0
 
+
+--=20
+Luiz Augusto von Dentz
