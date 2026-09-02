@@ -1,123 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856F2440A1D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 10:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D668730C60D;
+	Wed,  2 Sep 2026 10:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788344657; cv=none; b=nCJLB+gw9XUeUpOcLOq+2JhbMnMLsH/9AXROYc7f4JQaJ8VhqTxNNUKblWOquWgTyK1Gr7IUiw8jbujhw+xPOhvKBNfD3jITHvgcmviNkiA14lzrRRNYkJ+O3O3Gk18KGfS9n4aXXgxzERQ9O1FSsxNgc3oS9yJ8QwHcz0XfYkk=
+	t=1788345275; cv=none; b=b34MjjdWuOTqgpF/QnZ9xmdF9j1fWNdoF6UUVfSRQMmqKPBHk/2xnA8YDk4Lpc9g0+O3VcAKLhLo0uFCeNFi/79saTrQ1VBkUXwpOE7yf98BwJCzSN+fay1Cl6mD58awf37UZhiSau7UGD4pqZZ3IUQ7XvEPkoslg+WjgyXWUik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788344657; c=relaxed/simple;
-	bh=fGwE0+L/r7nVv+aIgD2DhmE3V46r9gTiSlOdE5h3IUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hb0nleLNfxFNpzC8cG3RSVbQoOcPUc8Wq+XDXa8hnPGAVx6bBAapPMcSHsKZTlzh+IEyyW26PyntaeHD/aApd3ilvh03xtOiQxAEFdpir7yKdCmBARA4Ntl+zspN4w/34JDeWRp3IWj7BEeYRZW2pcbX/Dd36bX3fccepJOW9s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PxeIQBj1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788345275; c=relaxed/simple;
+	bh=18oZQmR/kmMaRRFOCosOyH7qtLoXrvrtb8xSru2qBdI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XDqVYKyYLmggaFiMoYcBU47cRfJA5L09Ku+rLV/bVvbcKPsOhfIhluVH+64jZVDZIZmyAA7SzsDteM1MvqbL++lj6MX5OjnZeOsFuwkCiaQLOGi/+iRagd151wz/ruztI4ITXOt6i27ms0na9Q8Ssuag4PKR6TDT96tck8bvXh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ESFyo3j+; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxeIQBj1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 427351F000E9;
-	Wed,  2 Sep 2026 10:24:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788344651;
-	bh=gs50LArPGNJtsLo9n73doEI4gPIgO1EFMN1dseKbfmw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PxeIQBj1Wicv8oTIdxPyDv8jQm7OVZLb1MTKPeM0YQWMyW6Yfo2xPu3Xm7O7fJbAj
-	 JBI64RGRzvJKhv+K+aHVMGmrUfcp4nYLRdYmVzLwxMB5UTh5Neys3WoKbrQoyAP32f
-	 ru5ec4fVM6TsLmvjEzG30qPAn2svw7aJB1aMXk2HBifrmJTEO+WFRQXH9KKiis/c6/
-	 8bkXI8kE+BQcy2nB9g6OaMvf3la4IDWNHlXe1IPC7ihBMT3h4iuUZTlH90n0l85u5p
-	 LKcfhkevTvfaro9qc7rtZvZ2O2WkxiKzJ35BLaesz6loazFIclQFhmxHvS+ZIa1yjY
-	 q3MSE8odkhKtw==
-Date: Wed, 2 Sep 2026 11:24:08 +0100
-From: Lee Jones <lee@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [v2,1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries
- on cancel
-Message-ID: <20260902102408.GP2943942@google.com>
-References: <20260901154427.3991920-1-lee@kernel.org>
- <6a970648.557772ff.f1661.edb2@mx.google.com>
- <CABBYNZK8yPR=abu6xmnfL-XQA+3CRYH22TJZOScG=1MEZpJH4g@mail.gmail.com>
- <CABBYNZJ9PLqVhDKUtGEpsfgK9WOeKynVR6EFmen3s97+J-OWxA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ESFyo3j+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1788345274; x=1819881274;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=18oZQmR/kmMaRRFOCosOyH7qtLoXrvrtb8xSru2qBdI=;
+  b=ESFyo3j+oWopRAjD4uf4uFLBfmsKspubvZF6t1y/e+zFg7+56CjnGQ3L
+   u0WV29zqtbyFo2IUibJmQ07dIPA09mDoXxs8QF0seOqri2TO9nlRariZV
+   GfGSD97Vnv/Jza8WVSOOalZqvkex+KZNg02uaQcCBNZV3huj9Vzl+ebZy
+   4QdKpB71+nklt5JKCE7PRhvi6dq4kpo1X6vV7z7RgY5DFZmsaCthdxBOH
+   M42m1BUiKyWhErOEf+crEv2lwuv4loKFE9nDxhSrsRtU+rIU6+zhIE2g9
+   ZlS3rGv+jDQVobWVoST2P4TCn0UHLzh3sfkJJkb1g2+u3AMwQ8Ycwt52L
+   g==;
+X-CSE-ConnectionGUID: 7gnyp+i1S5C51028qlVu6w==
+X-CSE-MsgGUID: LLWVV5llSciIoQJvV8z8EA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11893"; a="106168260"
+X-IronPort-AV: E=Sophos;i="6.25,257,1779174000"; 
+   d="scan'208";a="106168260"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2026 03:34:33 -0700
+X-CSE-ConnectionGUID: hrB+eZ1GRyqVwJmNK+5MeQ==
+X-CSE-MsgGUID: 6h3W4BXgTuix8lvxmZgHow==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,257,1779174000"; 
+   d="scan'208";a="267610627"
+Received: from unknown (HELO WEBAPTLH152.iind.intel.com) ([10.66.230.227])
+  by orviesa006.jf.intel.com with ESMTP; 02 Sep 2026 03:34:31 -0700
+From: Catherine L <catherine.l@intel.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: kiran.k@intel.com,
+	"L, Catherine" <catherine.l@intel.com>,
+	L
+Subject: [PATCH v1] Bluetooth: btusb: Add support for Intel Otter Peak2 (OrP2)
+Date: Wed,  2 Sep 2026 16:04:06 +0000
+Message-ID: <20260902160407.257899-1-catherine.l@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJ9PLqVhDKUtGEpsfgK9WOeKynVR6EFmen3s97+J-OWxA@mail.gmail.com>
 
-On Tue, 01 Sep 2026, Luiz Augusto von Dentz wrote:
+From: "L, Catherine" <catherine.l@intel.com>
 
-> Hi Lee,
-> 
-> On Tue, Sep 1, 2026 at 1:10 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Lee,
-> >
-> > On Tue, Sep 1, 2026 at 1:07 PM <bluez.test.bot@gmail.com> wrote:
-> > >
-> > > This is automated email and please do not reply to this email!
-> > >
-> > > Dear submitter,
-> > >
-> > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > This is a CI test results with your patch series:
-> > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1155482
-> > >
-> > > ---Test result---
-> > >
-> > > Test Summary:
-> > > CheckPatch                    PASS      0.75 seconds
-> > > VerifyFixes                   PASS      0.10 seconds
-> > > VerifySignedoff               PASS      0.08 seconds
-> > > GitLint                       PASS      0.22 seconds
-> > > SubjectPrefix                 PASS      0.07 seconds
-> > > BuildKernel                   PASS      28.57 seconds
-> > > CheckAllWarning               PASS      31.59 seconds
-> > > CheckSparse                   PASS      29.62 seconds
-> > > BuildKernel32                 PASS      27.44 seconds
-> > > CheckKernelLLVM               SKIP      0.00 seconds
-> > > TestRunnerSetup               PASS      510.88 seconds
-> > > TestRunner_mgmt-tester        FAIL      233.06 seconds
-> > > TestRunner_mesh-tester        FAIL      26.88 seconds
-> > > IncrementalBuild              PASS      26.40 seconds
-> > >
-> > > Details
-> > > ##############################
-> > > Test: CheckKernelLLVM - SKIP
-> > > Desc: Build kernel with LLVM + context analysis
-> > > Output:
-> > > Clang not found
-> > > ##############################
-> > > Test: TestRunner_mgmt-tester - FAIL
-> > > Desc: Run mgmt-tester with test-runner
-> > > Output:
-> > > Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-> > >
-> > > Failed Test Cases
-> > > Read Exp Feature - Success                           Failed       0.262 seconds
-> > > ##############################
-> > > Test: TestRunner_mesh-tester - FAIL
-> > > Desc: Run mesh-tester with test-runner
-> > > Output:
-> > > Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-> > >
-> > > Failed Test Cases
-> > > Mesh - Send cancel - 1                               Timed out    2.732 seconds
-> > > Mesh - Send cancel - 2                               Timed out    1.986 seconds
-> >
-> > These are preexisting errorrs but I was hoping your changes would address them.
-> 
-> Looks like there are more problems:
-> 
-> https://sashiko.dev/#/patchset/20260901154427.3991920-1-lee%40kernel.org
+$ lsusb
+Bus 003 Device 003: ID 8087:0043 Intel Corp.
 
-That's annoying!  I ran Sashiko on this locally before pushing.
+$ cat /sys/kernel/debug/usb/devices
+T:  Bus=03 Lev=01 Prnt=01 Port=09 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0043 Rev= 0.00
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
 
-Looking now.
+Signed-off-by: L, Catherine <catherine.l@intel.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 03039ceaa77d..a4fdf6549127 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -488,6 +488,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0037), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0038), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0039), .driver_info = BTUSB_INTEL_COMBINED },
++	/* Otter Peak2, Wildcat Lake */
++	{ USB_DEVICE(0x8087, 0x0043), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0040), .driver_info = BTUSB_INTEL_COMBINED }, /* Lizard Peak 2 */
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
 -- 
-Lee Jones
+2.43.0
+
