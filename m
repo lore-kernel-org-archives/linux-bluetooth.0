@@ -1,311 +1,157 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016C33603E0
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 17:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918C047F786
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 17:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788369360; cv=none; b=SduarUV/mHK/W8BsfCqwviOKlaNzyE23acaHBBuenhjYbPbATZdIn2Rg4/7yWFrueUM8dxmTajFDxN28MpT0qzG0tH5USZPs+dqK5o2V3VSyJUpAQV1EbGwgHJ8krt6y6fIo/jDi+BkpxTUV2Rph3bZkFW8cT0YpROkzNmaPnh4=
+	t=1788369399; cv=none; b=P37Iw260HjALsWmcvGHH8n1/PP2+ADJcPA30ljYpWFz8pYMxWCt19fSvTSJL5kTnugqQbXEfr708xdmUszOYspRWiIlZofQomhU+3uqA4CH6YPPjjkp/XJ/fhGLrus+FasvNRR4PC/1me0jy7h1Lp3rqpkZEdang1aVqbEfQwKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788369360; c=relaxed/simple;
-	bh=OtKZ/nkcK14nbzb9tInWKscP/4L77iH2p4IUkIvJDZA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AoXGLgP1pjy6gnKcCk44YaGU4AaevKCRz9t+yTr1AjqtPAhrgwiSsI3ajx9ydc9hRTGrH9L1DIquRIxQi1D3JSQ6BaiBVKuibznJiluw9cPvJCGD4joxF34CqeCuftKkMjuaz2FyWa4TL9m5RYzyvaRjd9fD4wvfsF1e60PtEMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RH62cjMg; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788369399; c=relaxed/simple;
+	bh=XoQw8ZsaL+d4yTUkHlfEB+Z3aVMrRCiqVCbXXpNfX3Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ub++p/TVsvdsfKxaP5hFxr9H3Om2iIGWbfXsrZ7709HTjY8VS01TpIasJFL2aflawqQL0MlJ3rXqk4cWXBQ73pPs8kcgKSC5CnL8yPoMYo1cLz8EipNSEdDIqKUHTLwAyGtjS6L8FyknX0NahWF5bl1iDgCMZdmvwXiK8prsa4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYYSrCRB; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RH62cjMg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788369357;
-	bh=Y9ESXi1r27fcpOPiOPZmmWlvg9z/nbe84JbJ/onKOk8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RH62cjMgHs+eh41hPn6yX7ijAKw+yv3r8F4X8D5Bauuksmo2pCQhJSugZePkx7OUi
-	 CdI7nj1sLogt+dJbLuzELVjZw+5J5iUJeqfge7qwTxGdK6rY8sp0nKRmtakoOaoIKR
-	 Om0/BUKSZuEhSDU03/lmZ9VzlfnJUgHH715zO+So=
-Received: from github.com (hubbernetes-node-60413e9.ash1-iad.github.net [10.56.184.34])
-	by smtp.github.com (Postfix) with ESMTPA id C16406015F6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 10:15:57 -0700 (PDT)
-Date: Wed, 02 Sep 2026 10:15:57 -0700
-From: Bhavani <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYYSrCRB"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5c663437fe5so676901e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 10:16:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788369396; x=1788974196; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=biyyUcaCkShav7WDsA30wL0jUdEIw/+kwUjPOM6Wqns=;
+        b=LYYSrCRB5yNxaKxyGr3Sgpyc6U3bumuIwb+jqIVyMnHNws/xV3U8hIXF6EfwC0rPm/
+         o544EZa9kZ9Nm7O7obwreKTe1DV/kLDEDg9ZlECRFyX45Hzy4/mYRD39vT9HEJCh3tXc
+         eP9l7NgQE/Cso7Jv+fQSLf2gXBzuaaTO+O3WH46jchaSSoIUszXgIM3qXmVtmi+vR1DL
+         pXBokcPFUvHexe9obwUBBxHHWk5qcan1K6g5ohB+67afyQQE2in8yRkcOUtEApKUuUVP
+         NB++34q5N6B3jfu/1rzlHnPdWMEDbUP1kxyryXHADYAclrlDEUK5s8bURb0p2BH8Nxyo
+         AbyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788369396; x=1788974196;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=biyyUcaCkShav7WDsA30wL0jUdEIw/+kwUjPOM6Wqns=;
+        b=Qf9LQ0GrM3TECAzi8vGYIMmlX5HWzxbawi8c4Ir8N3MBgQBhN/4QXcpiCZpeUR7F25
+         8levIDk/sc9aGZXxYjbZ3xuaKBRfr1vf2fEGRuDtD8Z/HgJxJSOtyUsqzVGORzFjVMfk
+         GG733ts9BOQ7rEh7rjQDROxGF8OR4p927phmINShwrd7ZCozi4oCrHGKZ9gWGY70Pmzg
+         nRsa0H5ddBWSJnPvEu48J47a0rhJXQpbo2JeCGmli6XgVNnA1asFyBNetErxFlRw1KkG
+         UVbCoud0MmXfR+PnuGY7TqZOqCQpHIJ9PyNamHpTysHLduZnujG/2scc1lGkELNeQv3Q
+         deNA==
+X-Gm-Message-State: AFuF++llYRORrUb+gEV6kJTnACYxMvbUnOnQi0xRiLZxlVOaClGYowpg
+	a/DdqhTicYprWUDQ+Rd8Oo1eLn2Eky+mp+h3MrptPWaEQV+E4UIv8iqita+lDzXbpi82yA==
+X-Gm-Gg: AYBFou3v8GnAv8xatC1pi+kP3d9JzM2vO+lyaWohQX21dmlbz4kZN3VWKu/FkJLPgab
+	SdE84dtxSC3gNqhO5PNxBxgM5yseLYOfy3lSYmbcjTLbklw8qcUfUb7Gs14UUI81pBUim35oGBQ
+	SbUedrfyT1RtH8pIk1TjvtZQSk65dwuSKkq4dsf/WrtS3cEKco7+zDeSWudnvXjQJwy2D19oCNe
+	uxbairT9XGo5UeshUMfw0jS+WQvSbqafLGwXifidURznTfqZk3RMhwbzBGTKGmWxbMplCf5h9rk
+	QnCh8zHZKMj0NjQxjl09/Ogy3FrpkDoFQwdlHTzalwFJ8VS/eX3Z+dS4Q5fyU48g8CPg8bABHAq
+	bdwIJ6FP1sUSaX0Ez6DP+nx3wgZA3u2039i9suJPZ/og42mhfoWkHMOkZpxGRv+3aAFEDjpc31s
+	0l0SW34l+O2BfFOK/JnY9upA2OcMIfHH2StBX+j+yO2zE2JcrIeuZYeHJr/rp+37UMwfXM6/jHv
+	BKfq6m5UD9Ac3dVj6umOz3fibXQbDwS5AHocQ6YSx1eOw0EE6FiiSI=
+X-Received: by 2002:a05:6102:fa0:b0:789:100e:3d1c with SMTP id ada2fe7eead31-78a1f26c9b1mr2071503137.5.1788369396285;
+        Wed, 02 Sep 2026 10:16:36 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-78a1a510ca3sm2686413137.11.2026.09.02.10.16.35
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2026 10:16:35 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/3a2d54-ed3d4c@github.com>
-Subject: [bluez/bluez] a909d5: shared/bap: Fix use-after-free in bt_bap_detach
+Subject: [PATCH v2] Bluetooth: hci_sync: Fix not setting CE length properly
+Date: Wed,  2 Sep 2026 13:16:26 -0400
+Message-ID: <20260902171626.1711932-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Both hci_le_set_def_rate_sync() and hci_le_conn_rate_request_sync() were
+leaving Min_CE_Length and Max_CE_Length set to 0x0000, but the connection
+event length recommended in requests by a Peripheral has a valid range of
+0x0001 to 0x7CFF (Time = N * 125 us, Time Range: 0.125 ms to 3.999875 s),
+so 0x0000 cannot be used.
+
+Set both to the minimum valid value, which is safe since the Controller
+is not required to use these values:
+
+BLUETOOTH CORE SPECIFICATION Version 6.2 | Vol 4, Part E
+7.8.157. LE Connection Rate Request command
+7.8.158. LE Set Default Rate Parameters command
+
+The Min_CE_Length and Max_CE_Length parameters provide the Controller
+with the expected minimum and maximum length of the connection events.
+The Controller is not required to use these values.
+
+Fixes: 2f8784cfe8a9 ("Bluetooth: Add support for Shorter Connection Interval (SCI) feature")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_sync.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 24eeb76f7207..5376ade2cdc1 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4797,6 +4797,24 @@ static int hci_le_set_def_rate_sync(struct hci_dev *hdev)
+ 	cp.cont_num = cpu_to_le16(0x0001);
+ 	cp.supv_timeout = cpu_to_le16(0x000c);	/* 120 ms */
+ 
++	/* The connection event length recommended in requests by a Peripheral
++	 * uses units of 125 us with a valid range of 0x0001 to 0x7CFF
++	 * (0.125 ms to 3.999875 s), so 0x0000 cannot be used. Also note that
++	 * the Controller is not required to use these values:
++	 *
++	 * BLUETOOTH CORE SPECIFICATION Version 6.2 | Vol 4, Part E
++	 * 7.8.158. LE Set Default Rate Parameters command
++	 *
++	 * The Min_CE_Length and Max_CE_Length parameters provide the
++	 * Controller with the expected minimum and maximum length of the
++	 * connection events. The Controller is not required to use these
++	 * values.
++	 *
++	 * So it is safe to just use the minimum.
++	 */
++	cp.min_ce_len = cpu_to_le16(0x0001);
++	cp.max_ce_len = cpu_to_le16(0x0001);
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEF_RATE,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+@@ -7457,8 +7475,24 @@ static int hci_le_conn_rate_request_sync(struct hci_dev *hdev, void *data)
+ 	cp.max_latency	= cpu_to_le16(params->max_latency);
+ 	cp.cont_num	= cpu_to_le16(params->cont_num);
+ 	cp.supv_timeout	= cpu_to_le16(params->rate_supv_timeout);
+-	cp.min_ce_len	= cpu_to_le16(0x0000);
+-	cp.max_ce_len	= cpu_to_le16(0x0000);
++
++	/* The connection event length recommended in requests by a Peripheral
++	 * uses units of 125 us with a valid range of 0x0001 to 0x7CFF
++	 * (0.125 ms to 3.999875 s), so 0x0000 cannot be used. Also note that
++	 * the Controller is not required to use these values:
++	 *
++	 * BLUETOOTH CORE SPECIFICATION Version 6.2 | Vol 4, Part E
++	 * 7.8.157. LE Connection Rate Request command
++	 *
++	 * The Min_CE_Length and Max_CE_Length parameters provide the
++	 * Controller with the expected minimum and maximum length of the
++	 * connection events. The Controller is not required to use these
++	 * values.
++	 *
++	 * So it is safe to just use the minimum.
++	 */
++	cp.min_ce_len	= cpu_to_le16(0x0001);
++	cp.max_ce_len	= cpu_to_le16(0x0001);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+2.54.0
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a909d5d303cb1c656c2e85150070796317f0cc8c
-      https://github.com/bluez/bluez/commit/a909d5d303cb1c656c2e851500707=
-96317f0cc8c
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Fix use-after-free in bt_bap_detach
-
-bt_bap_detach() invoked the pending request's completion callback via
-bap_req_detach(bap->req) before clearing bap->req. Since the completion
-callback (req->func) can trigger synchronous cleanup that re-enters
-bt_bap_stream_cancel() for the same stream, and bt_bap_stream_cancel()
-frees bap->req whenever it still matches the request being canceled,
-the request could be freed while bap_req_complete() was still executing
-on it, causing bap_req_complete() to dereference the now-freed request
-once the callback returned.
-
-Clear bap->req before invoking the completion callback, matching the
-pattern already used by bap_abort_stream_req(), the ASE IDLE state
-handler and bap_cp_notify(), so a reentrant cancel no longer finds a
-stale bap->req to free.
-
-Assisted-by: Claude:claude-sonnet-5
-
-
-  Commit: a03665b6dd20e3b62501867c0dcc7ca6f74d7ae9
-      https://github.com/bluez/bluez/commit/a03665b6dd20e3b62501867c0dcc7=
-ca6f74d7ae9
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Fix use-after-free when replacing a linked transport's owner=
-
-
-linked_transport_set_owner() unconditionally overwrote a linked
-transport's owner pointer. If that transport already had a different
-owner assigned (e.g. its own Acquire request was still pending when the
-paired transport's owner was set), the previous media_owner was
-orphaned: its D-Bus disconnect watch stayed registered and its
-->transport back-pointer kept pointing at the transport. Once the
-transport was later destroyed, the still-registered watch would
-eventually fire media_owner_exit() and dereference the freed transport.
-
-Tear down any pre-existing, different owner via
-media_transport_remove_owner() before assigning the new one, so its
-pending request is replied to, its watch is removed and the owner is
-freed instead of leaked. Since media_transport_remove_owner() itself
-recurses into linked_transport_remove_owner() for linked streams, also
-guard linked_transport_remove_owner() so it only clears a transport's
-owner when it still matches the owner being removed, preventing it
-from clobbering an owner that was already reassigned during that
-recursion.
-
-Assisted-by: Claude:claude-sonnet-5
-
-
-  Commit: a8d453d26ea4d513d5edf68d30287bcbfc411a60
-      https://github.com/bluez/bluez/commit/a8d453d26ea4d513d5edf68d30287=
-bcbfc411a60
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-
-  Log Message:
-  -----------
-  build: Add org.bluez.ChannelSounding1.rst to EXTRA_DIST
-
-The Channel Sounding documentation added doc/org.bluez.ChannelSounding1.5=
-
-to man_MANS and manual_pages, but never added the doc/org.bluez.*.rst
-source it is generated from to EXTRA_DIST.
-
-As a result the .rst is missing from the distribution tarball, and
-building the man page from an unpacked tarball fails.
-
-Add it alongside the other doc/org.bluez.*.rst entries.
-
-
-  Commit: cd3afe6bdf355f36b5ce00db14f832bd0880c09c
-      https://github.com/bluez/bluez/commit/cd3afe6bdf355f36b5ce00db14f83=
-2bd0880c09c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.Ranging1.rst
-
-  Log Message:
-  -----------
-  doc: Add org.bluez.Ranging1 documentation
-
-Document org.bluez.Ranging1 interface, which
-exposes the Distance estimate computed by an
-external ranging provider registered via
-RangingProviderManager.
-
-
-  Commit: 0654aa95ce0849edaf41cffedd6ca309df1ff951
-      https://github.com/bluez/bluez/commit/0654aa95ce0849edaf41cffedd6ca=
-309df1ff951
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.RangingProvider1.rst
-
-  Log Message:
-  -----------
-  doc: Add org.bluez.RangingProvider1 documentation
-
-Document org.bluez.RangingProvider1 interface,
-implemented by external clients to expose per-device Channel Sounding
-distance estimates that BlueZ reflects onto the corresponding device
-object.
-
-
-  Commit: da77259717e4f5f2ce0bf3b5693871130c313015
-      https://github.com/bluez/bluez/commit/da77259717e4f5f2ce0bf3b569387=
-1130c313015
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.RangingProviderManager1.rst
-
-  Log Message:
-  -----------
-  doc: Add org.bluez.RangingProviderManager1 documentation
-
-Document org.bluez.RangingProviderManager1 interface,
-used by external clients to register and unregister
-themselves as Channel Sounding distance providers via
-RegisterRangingProvider/UnregisterRangingProvider
-
-
-  Commit: 8b294de8067370055ca4fabedb49b8cdcd926da0
-      https://github.com/bluez/bluez/commit/8b294de8067370055ca4fabedb49b=
-8cdcd926da0
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-cs.rst
-
-  Log Message:
-  -----------
-  doc: Modify bluetoothctl-cs documentation
-
-Add documentation for the register_provider and
-unregister_provider cs menu options.
-
-
-  Commit: 03d93165d9e180e7bf7e87892b04c7e7d16f8d94
-      https://github.com/bluez/bluez/commit/03d93165d9e180e7bf7e87892b04c=
-7e7d16f8d94
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-    M src/adapter.c
-    A src/ranging.c
-    A src/ranging.h
-
-  Log Message:
-  -----------
-  src: Add Ranging provider D-Bus API
-
-Introduce org.bluez.Ranging1 and
-org.bluez.RangingProvider1/RangingProviderManager1
-D-Bus interfaces.
-
-External providers can register a root path
-via RegisterRangingProvider and expose per-device
-RangingProvider objects; updates to their Distance
-property are mirrored onto exported Ranging objects,
-emitting a PropertiesChanged signal.
-
-A provider invalidating Distance leaves the last estimate in place
-rather than reporting 0 mm, and objects exposed outside the
-registered root path are rejected on an exact path boundary so that
-a provider rooted at /org/example cannot claim /org/example_other.
-
-The Ranging provider manager is wired into the adapter lifecycle,
-created on adapter setup and destroyed on adapter removal. Removing
-a device also drops any Ranging interface exported for it, so the
-device object path does not linger on the bus with only Ranging
-left on it.
-
-
-  Commit: 71cd7d370f7cd61d9f6ddfc048e8da495ec881ab
-      https://github.com/bluez/bluez/commit/71cd7d370f7cd61d9f6ddfc048e8d=
-a495ec881ab
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M client/cs.c
-    M client/cs.h
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add ranging distance display support to bluetoothctl
-
-Track org.bluez.Ranging1 proxies and append/remove them
-on InterfacesAdded/InterfacesRemoved.
-
-Print the Distance property on PropertiesChanged, and show it
-under the info option alongside the Battery Percentage and the
-newly added CS Session Active property.
-
-Add register_provider and unregister_provider options as a
-reference implementation. The estimate is derived only from Mode 1
-and Mode 3 RTT samples; procedures without any such step report no
-distance rather than a made up one.
-
-The RangingProviderManager1 of the default controller is resolved
-from a tracked proxy list, so it is picked up regardless of the
-order the adapter and manager proxies arrive in and follows a later
-"select".
-
-
-  Commit: ed3d4c3f91b2a1a73ff8b8ffc6a1e83d34488dfd
-      https://github.com/bluez/bluez/commit/ed3d4c3f91b2a1a73ff8b8ffc6a1e=
-83d34488dfd
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-09-02 (Wed, 02 Sep 2026)
-
-  Changed paths:
-    M Makefile.tools
-    A test/example-ranging-provider
-
-  Log Message:
-  -----------
-  test: Add Python Ranging Provider example
-
-This patch introduces test/example-ranging-provider which implements
-a simple D-Bus client application for the ranging profile.
-
-It is a wiring skeleton rather than a ranging implementation: it
-registers as a provider, exports a RangingProvider object per device
-seen on ChannelSounding1 and reports a fixed placeholder distance.
-
-
-Compare: https://github.com/bluez/bluez/compare/3a2d543c4c21...ed3d4c3f91=
-b2
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
