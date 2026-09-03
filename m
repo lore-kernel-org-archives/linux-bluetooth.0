@@ -1,104 +1,90 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B552F3769FC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 22:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF34390CAA
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 23:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788474005; cv=none; b=ml6aehUj2Shvqea26KqbLTWZITW/Si4J6xPvj+r8S6GKjgxvxuXDVNssP/2V6kCrBLTpvseRAYiPkiz541SI/vMJ8xfl+DDHj4VDpMN7rWt/5BjNJA4utuX0eEuYBmNDVLdWVJ9Tzw9+xPaelzwpdvbkb4fbFxFrVsWoXk3Tmio=
+	t=1788477211; cv=none; b=neqXwhSP5KFiIW0Gkq35m6t+oxFgoA9HXFNG/QOoO3X9+OtNOOnZSYIwNVu0T2jOIxlOkr70nJxEsOiaktTsYXSa5GQrvH4RoEKmBLob/di9LOz/+7XsfAIG55Uk0mPpd6Nc79L6g+FapIVmaeaTmEx/ye7dLSvThN8nbnP5ZZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788474005; c=relaxed/simple;
-	bh=1Nk5prkP3AGMsiZhherBA5myua4FCirAk7URQgeQ9sM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UvEw3PrEnXLH8Esj4xvaFe9yKSWMZ21hszAA3ETUTbsuN1JvLJy9NhJIH/vslts+EHOH8AqNs9/OQkulIDiwzsNINqbTCshUVrJen+m3GBnlPcd+SxmNE+ofoanN245UHtQuSj1Dzy2COinueLQd6vVBB58SjJyYvAI7+eGSxCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=embeddedts.com; spf=pass smtp.mailfrom=embeddedts.com; dkim=pass (1024-bit key) header.d=embeddedts.com header.i=@embeddedts.com header.b=MCJvSj3t; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=embeddedts.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedts.com
+	s=arc-20240116; t=1788477211; c=relaxed/simple;
+	bh=HNKbxE+4VPXTbNfgY72NVokT/L4X/x5HBEL3ppahaik=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SedVCCJwGOMpZQExSwym9TW34bpOjvmLXuNuDssT0pzPKvsDer2/STIMbJpJ++L8qFEFLeq1c6rJmAtUhvx0lxH/4SZ2kNvQ4zOUplI47ymFJmeJVOnTM0zCmvmwXBNUUvMU615aaRDs7Kgp+bc5h+q5rgyaPC0LUSZPJShUa+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iT6px+yi; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=embeddedts.com header.i=@embeddedts.com header.b="MCJvSj3t"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-38759bcd877so341846a91.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 15:20:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=embeddedts.com; s=google; t=1788474003; x=1789078803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RUEnSEWhNJ/Xzg76GKZXnJeNGJEYpzyXZg9ldoBo21U=;
-        b=MCJvSj3tDXy332RwrO+iNENKj3EHdoUnrDsIASbRuVLUabtmj5wdqbh3Lx9iozYlO2
-         bvfDlckmrmpH33Z7pHJfZc4lm/97r+FRXF0MEW1uxCUrpZSwFDvw0Rhj9HPfFDu4Ceas
-         FLTHIxntanXa/zqOAxsxOv9Rp12u1SSnbLfFg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788474003; x=1789078803;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=RUEnSEWhNJ/Xzg76GKZXnJeNGJEYpzyXZg9ldoBo21U=;
-        b=CQN3B45/7w4aRGpZyx8tU97kvepuDZOg87uN09MUEYrZel5sN/TWg1ZwKw8nNUaUzd
-         dNv2ytTV2ZFZnnej6ZeUpdPkYFAp9m4zhcy+/gCbeoszOPI4yqcQSb1WrwV70TQpbn1u
-         ZH6YcWLLSxhnmxqx62EXxHrcDTJ9iutAsvuASvMrZah2bk2FdrYKkUp5cUO3DNXTiHDJ
-         pcW//hY5GD0CD41YaUZ41O4+CYV5g1hqIwXQqOqOfDij4jzJkCUYMefZCsyghM6LFyjk
-         3JToecHZZDBooSSaTZFvgUsmAUMqTY1wX0YzPScvMCFA/AWI2/XhDMIAS1F5AKbNa6oi
-         aZug==
-X-Gm-Message-State: AFuF++lABehZ5MtmmxlvlNQCgyYXlAy2Exi5mRxfaXmsBBiXbGfqLYKw
-	+WLtRNM3TEcFn9+6/a96j97NuinG5NrYLU4UNqoH27Cr1vWszBGpCaFuFbNZBVg9xIGGfXXKKZG
-	TTYsf
-X-Gm-Gg: AYBFou3v28TpAlKa4aCYOTVw1BOWE+Fe4sThTHU6TijdNBre/G0JONaeQdrw2DAyPQC
-	DouksF7FYSM2jh0ici+QK3C7B1+JJdg8A0TfNShFB2/zN6y5QCaFhXfZOVKbVm1C9+a31UIbxMl
-	19tJ1E5KvNbWLlalUvgfhvf8BDuxaiO0QiANwZMO+TnMNSMSp0JV0ZAvgyuu7dFIWbNrp5Vcuaa
-	W94VaB4piLYtd0V15HQmCDhSGUA7MbCxZFrEyV9a8RLODmM5XjFJiIi+5lkjNGxC0jReOnLsTza
-	rdLbibdgApXTdoVNH2LPtouPhzGdpCwCUFNxPssppeS+v7M/vN2Y3Cq1bJF5BuMxm+d/fCjiwh2
-	c2C8fYS7XlGUFhgw/CjzE8mQGUIWvnYrPMc2rAWhzbII7ZoZ+IQlVLUI27Hfga7ktRjZj7n6zDs
-	lJQm0dYp2MxC0MCj9/RpOorZbJvQffBJcitY2ffZ07x9EhtbLs5s/JUnCVBrPgO2OF5w81P+UDd
-	NPwOUNwr/VoTgH+N7aC3BfHdPNSQZxTVl94DfJE
-X-Received: by 2002:a17:90b:580e:b0:385:393e:7124 with SMTP id 98e67ed59e1d1-39b261cfd97mr2495511a91.14.1788474002847;
-        Thu, 03 Sep 2026 15:20:02 -0700 (PDT)
-Received: from aaron-desktop.ts-local.net (wsip-70-191-90-18.ph.ph.cox.net. [70.191.90.18])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-143240d86c3sm2040193c88.0.2026.09.03.15.20.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 15:20:02 -0700 (PDT)
-From: Aaron Brice <aaron@embeddedts.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iT6px+yi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788477208;
+	bh=i8LnsEu2WYbkPe3vnD1Ym5iFgqbHdiUV3ZVJXdaVVjg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=iT6px+yig4zw+WB1IP3dUBMEJ5e4KyiIeRXNWv8sv4QB5fFtmiZjBpz3XnITQWmI8
+	 YoPM+FiyMRCXHRJ83+Euh8WXiAbnMaBxWL+KMnG7ejGd/5ggzneWywt2+FneFv17Bp
+	 00u9gHHVCEnt+oH4+tvxOyffGX0wYwG7FGN/RGqw=
+Received: from github.com (hubbernetes-node-ee4f0e2.ash1-iad.github.net [10.56.207.112])
+	by smtp.github.com (Postfix) with ESMTPA id 82FFC36101E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 16:13:28 -0700 (PDT)
+Date: Thu, 03 Sep 2026 16:13:28 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Aaron Brice <aaron@embeddedts.com>
-Subject: [PATCH BlueZ v2] btattach: Update for glibc 2.42 compatibility
-Date: Thu,  3 Sep 2026 15:20:05 -0700
-Message-ID: <20260903222005.482058-1-aaron@embeddedts.com>
-X-Mailer: git-send-email 2.53.0
+Message-ID: <bluez/bluez/push/refs/heads/1157432/000000-37b825@github.com>
+Subject: [bluez/bluez] 37b825: adapter: clear discovery_found list before
+ discove...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-btattach is not setting the baud rate correctly on systems with newer
-glibc such as Ubuntu 26.04. In glibc 2.42 the baud rate termios.h
-constants changed value, B115200 was 0x1002 which was the struct
-termios c_cflag enum bits, but in 2.42 they changed cfsetspeed() to
-accept arbitrary rates and not just the baud enum values, and B115200
-was changed to the value 115200. This means you can no longer set the
-speed with c_cflag |= B115200 and should use cfsetspeed() to be
-compatible with both versions.
----
- tools/btattach.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+  Branch: refs/heads/1157432
+  Home:   https://github.com/bluez/bluez
+  Commit: 37b825c7d0206b7662f3d1663245660f2493bd85
+      https://github.com/bluez/bluez/commit/37b825c7d0206b7662f3d1663245660f2493bd85
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-03 (Thu, 03 Sep 2026)
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index 5f7d19093..cdd7b125b 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -64,7 +64,12 @@ static int open_serial(const char *path, unsigned int speed, bool flowctl)
- 	memset(&ti, 0, sizeof(ti));
- 	cfmakeraw(&ti);
- 
--	ti.c_cflag |= (speed | CLOCAL | CREAD);
-+	ti.c_cflag |= (CLOCAL | CREAD);
-+	if (cfsetspeed(&ti, speed) < 0) {
-+		perror("Failed to set serial port speed");
-+		close(fd);
-+		return -1;
-+	}
- 
- 	if (flowctl) {
- 		/* Set flow control */
--- 
-2.53.0
+  Changed paths:
+    M src/adapter.c
 
+  Log Message:
+  -----------
+  adapter: clear discovery_found list before discovery_cleanup()
+
+discovery_cleanup() tries to reset RSSI of devices in
+adapter->discovery_found list.  When called from adapter_remove(), the
+list contains only stale pointers as devices have been already freed,
+leading to UAF.
+
+Fix by freeing the discovery_found list in adapter_remove().
+
+Fixes AddressSanitizer: heap-use-after-free
+READ of size 1 at 0x7d5b585e033d thread T0
+    #0 0x000000772b1a in device_set_rssi_with_delta src/device.c:7121
+    #1 0x000000772daa in device_set_rssi src/device.c:7150
+    #2 0x0000006aa808 in invalidate_rssi_and_tx_power src/adapter.c:1732
+    #3 0x7feb5a35557f in g_slist_foreach (/lib64/libglib-2.0.so.0+0x6257f)
+    #4 0x7feb5a355b56 in g_slist_free_full (/lib64/libglib-2.0.so.0+0x62b56)
+    #5 0x0000006f67d2 in discovery_cleanup src/adapter.c:1747
+    #6 0x0000006f904f in adapter_remove src/adapter.c:7219
+    #7 0x0000006f9de2 in adapter_cleanup src/adapter.c:11165
+    #8 0x000000418ca9 in main src/main.c:1719
+
+freed by thread T0 here:
+    #0 0x7feb5a5434cf in free.part.0 (/lib64/libasan.so.8+0xee4cf)
+    #1 0x7feb5a337bb4 in g_free (/lib64/libglib-2.0.so.0+0x44bb4)
+    #2 0x0000007519d7 in device_free src/device.c:963
+
+previously allocated by thread T0 here:
+    #0 0x7feb5a54424f in calloc (/lib64/libasan.so.8+0xef24f)
+    #1 0x000000751fee in device_new src/device.c:4963
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
