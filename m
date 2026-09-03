@@ -1,154 +1,94 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7068E4A8FDF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 13:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5CE4AF68B;
+	Thu,  3 Sep 2026 13:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788440565; cv=none; b=V/bdnFTDXmvJkf20IOmgXkgL8LXT3pYcOkPscoP5kIfZBiOrcfjPZmBHQO8SjU4vum1DQ1Yd3kSKC1i7J7mvTkhrgGfm81hQG4tJpxwOMoJeNByP6zLVtDazlbYKf5Hop22U4ytKeyiqcVXbcgpy0/N6OtxUeHyUT9O5ek2r/Hk=
+	t=1788442100; cv=none; b=uTPaufRsUpr/Ek4ovK1Z2g6QQjZY2W8NhMQ+iArgG3oFVyHtN4E/C1P/VGHppGzdHUU8VjiHQBul4Dy1jCaDCywSs3drR0W4z3q6OZJh6Bd+xTeYr1LxkuUX9J7ekU3tqkQQ+J1i2PtOC1AcywMDMboLpP1pPXxnnaRFUMMKS5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788440565; c=relaxed/simple;
-	bh=Ahw9+/yNKnwEW6WUF0mpMYeome17rOMqY6slSSgAHCg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nHbo87M4qL1iz7SfsMUK6aq/QMN2KfKuU3Kwg1z98h7Zr9SHTaquB0GfuRjQYbsJHGgGDsZWdzEoXExZRxq9p/nZyUDI2AK87xfeIuMyBeb4Jh8k9j4yllNtsXXm0Isca3He/3PkB8pueDfLL4ivUMIE3DXcTK7tD2kQW+M2YgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1AFF33ECE5;
-	Thu,  3 Sep 2026 13:02:28 +0000 (UTC)
-Message-ID: <7446da9c8c5bf3615a148d463f9b590fd32adbb7.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v1 1/5] avrcp: Fix out-of-bounds parsing of
- ListPlayerAttributes response
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 03 Sep 2026 15:02:27 +0200
-In-Reply-To: <20260901175315.1348621-1-luiz.dentz@gmail.com>
-References: <20260901175315.1348621-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1788442100; c=relaxed/simple;
+	bh=622354WABGNaY2oxin56jyAGnIVPXlrs8EJdcZ/XPb8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YzPuOQQNEcyi5Zb1A30ZruXkZiY673cu7TSLZU2yqIBvsgvg2D56/PHVdIetMGI87AN8VvNSxFS99JUvWmYZ1m7wp0VZIIl98e5AWlV3lKdZjbMVcOa3g1ILDpQuJ8zllbOe6ad1B4UqFOufqGWCKcjRiMZZBTP36joIQVHwVw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=WH8d83Wf; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="WH8d83Wf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1788442041;
+	bh=622354WABGNaY2oxin56jyAGnIVPXlrs8EJdcZ/XPb8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=WH8d83WfzZMAcXKQvcTcWWsQ1XV2XALSk+k0BWVsdSKmf0QPeoU2zHc/eVRrIoLlB
+	 ANudpD+8jcZXdLavaAC4lfsWHLFpK0DhShR9SjPF1exeydQZByqkMwKJqcoHYK+b1b
+	 6XUBJBZCwGiB7pfG8IgqskXxe27KtwRTITKJBcdE=
+X-QQ-mid: zesmtpsz9t1788442037t43b2ded6
+X-QQ-Originating-IP: WhcYITip3DCLK5RQh/B4KeKpFk5IXY7lBXQuayl7DhI=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 03 Sep 2026 21:27:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 17184470730467376045
+EX-QQ-RecipientCnt: 9
+From: raoxu <raoxu@uniontech.com>
+To: dmitry.baryshkov@oss.qualcomm.com
+Cc: brgl@kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	raoxu@uniontech.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: destroy RPMsg endpoints before freeing hci_dev
+Date: Thu,  3 Sep 2026 21:27:14 +0800
+Message-ID: <A4C1EAB3A67613DC+20260903132714.2538118-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <5be7vkmpzmizgmvqxyefubgi3epnlo2uf7mabcgsapvia4ckpm@ixwfppk5z5e5>
+References: <5be7vkmpzmizgmvqxyefubgi3epnlo2uf7mabcgsapvia4ckpm@ixwfppk5z5e5>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTGAm5iqiKMwaa1AdpV7XtWpeC++2tHucM8Nvzp57WkUD48Odri9s/DMYdGHKSQO/3SP3sONYaMvJ0CMj4+3sOiTDHXXdUnlIR958NHfjPRN5RPbEzxvuXHGj6qehX5upVAcPqDMdAkMAl/mGPpiApa53DE2hEcvXMGiA66rfybK4IogBYFngQFzLxjlXjw0Q8VfrlEzVVW7Vw4TaKAE8dSZk163iLncDycnG+EA9PFLhfjGGvcDlSiFBc4NaTstiFHB2lQLwdaEoi5qC5ErFnhPG5SG4lOoScIbSqclffyA9v9LGCApLND8VP2rULuKkaxRTzupfaLKYkYzBzRdqNiYOqJX8v/oh4TQ+T6W0HBVvVWgrh4XNmVK4xTB9R/ZDJdVctdyPNCS+PW/lCSlRd5ezUJvMFgZHXOzbfRFWuc9lGDihJ5l1TiUdmhTS67aUFSXOAazjaj+saMGlKAMn+Uea0Prl3zh+I4TIpfszvduPrxea+85PU3U2jhwl4IJWt7Qj4SZmPhoJtXNoJo/WE5nO0m7t1JoBTGH5EEo5JZVaOkpzkV+P/aBVJZI+0bPTra4W+SfxwMW6G3eVvLyXnoviNLIZKPcKypKP0zSkd0Vo8VLwwBzHl/9OQO45yYijWlAdpvdtuDdNYqOfRUZ9xc3nqRxq9ojzM3l1a5QnwaiVw
-X-GND-State: clean
-X-GND-Score: -100
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NDtUtlvFer7v25TZOtRhfmrdiQuAal4mQn9WxzY+55LZOZ/mjMyaLQw4
+	eRZAiOQI3Hz5V+VCg8qt1yLKyv5ijfqqvyo4qdFbYfeBtRIrmKu5WNjPlakmOD9a675Ad49
+	blJjE2s6Nc3UOllDAmFeqUkc7xVVn9SJbXhyhrT88NQeEFhbEnmgGVjf1OSWX0xBKRb9hll
+	lfXSN/k/LOvhdv57q2BXYsa4ZXOxyvPXMywH4OeG1F5B0sGCP/05kDtdGGsDfl28jIt5b3Y
+	lisSUhl5xRsPZ6T2oa/iiA1DMOYrrRiGtPYB7shcepm0glApkv8deW2BR7L6sFr3GyBfsz0
+	LKCsr4usf42ZV33zx7tH9oDRxxeLK0hf82NpNByas10P4Ay5DsNvQ4KAHivBrjN6UgO6S1F
+	BjZVi83b1RWl/xUbLXgHrjpsO89uKDTUyvDcCcWlq2UBQLGaAm1Q4reGVvARIP76Q1w9+BC
+	Fo/L/gO5tF1r+VQbJy1kFma7yKTI/qtTN5EJ+dTHtpSWR/7x9mcVtZfBvVsCUGmQNmmuwfW
+	WY/XfPmvUkKTMDb0Okz1XyXAodKe7SbTEQ/goa1N+BdZBoVGghrnaEcSL7LWsB6EArDmm6V
+	oF39OB7s8iTOVy+uwiTcDhYHH33p4VpunUUuLtf6WooZfDRHF3fOOg4UkfXMAxzpV5zxtsw
+	9IiiWwd7cRYBdRIvJU8LbLkynrbw/snTELhbMfsZLObhVCL47lNreO+vfrSdpHNrTgwFhZ7
+	q3O+YmyU0iTTbGcKfR05f6mhnRIYQVlaALQkyG5J5XBzgC0hnYdzGF+hqNUxuwAYiUZqxYE
+	lenoVEqHCJYHnKhlQN5ly8apPwy5YYh/eYvRgMQJBfuKWINiCwdTEuQ5+Rw5M/Gw7oLB5KY
+	eetDLsVbEB1/roQf/YXRG2blHSvvXo73iTM/pKn6DuXXuZskd0RHKKvmS+eCijrSBCypsE/
+	s/HVGfktmkojkXJs2coLmqwEpn5KgOELOWyizCZzPMxnWWOeqteD7gFod9zXWX9AIDl/cfY
+	Z+0MGak5eBwC3Sv+CTqvfWwJLtQjiPSL5Z0lXswC4AjZ8Yaez+
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
 
-On Tue, 2026-09-01 at 13:53 -0400, Luiz Augusto von Dentz wrote:
-> From: Bastien Nocera <hadess@hadess.net>
+Hi Luiz, Marcel,
 
-The patch has substantially changed from the version I posted
-privately, so you can remove my authorship.
+A gentle ping on this fix.
 
-> In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp() parsed
-> the
-> response using hand-computed offsets into the operands buffer,
-> without
-> accounting for the fact that operand_count spans the 7 byte AVRCP
-> header
-> as well as the parameters:
->=20
-> - attrs is a 4 byte array which could be written out-of-bounds if a
-> =C2=A0 length greater than 4 was declared in the first parameter byte.
->=20
-> - The attribute bytes were read with a bound derived from
-> operand_count,
-> =C2=A0 so a truncated response could be read past its end. As the receive
-> =C2=A0 buffer is reused across packets, those stale bytes could be echoed
-> =C2=A0 back to the peer in the following GetCurrentPlayerValue request.
->=20
-> - params_len was compared against count, which was only ever 0 at
-> that
-> =C2=A0 point, so the length of the PDU was in practice never validated.
->=20
-> Parse the response through a struct iovec using the util_iov_pull_*
-> helpers instead, so that the header and each subsequent field are
-> bounds
-> checked as they are consumed and the remaining length is tracked for
-> us.
-> This lets params_len be validated against the actual number of
-> parameter
-> bytes received. The attribute count is still clamped to
-> AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
->=20
-> Reported-by: @ax-nnlabs
-> Closes:
-> https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
+It has already received:
 
-It was embargoed, and it's now been made public.
+Reviewed-by: Dmitry Baryshkov
+Acked-by: Bartosz Golaszewski
 
-> ---
-> =C2=A0profiles/audio/avrcp.c | 32 +++++++++++++++++++++++++-------
-> =C2=A01 file changed, 25 insertions(+), 7 deletions(-)
->=20
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 3271b84782e8..906f93424872 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -2395,31 +2395,49 @@ static gboolean
-> avrcp_list_player_attributes_rsp(struct avctp *conn,
-> =C2=A0					uint8_t transaction, uint8_t
-> *operands,
-> =C2=A0					size_t operand_count, void
-> *user_data)
-> =C2=A0{
-> +	struct iovec iov =3D { operands, operand_count };
-> =C2=A0	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
-> =C2=A0	struct avrcp *session =3D user_data;
-> -	struct avrcp_header *pdu =3D (void *) operands;
-> +	struct avrcp_header *pdu;
-> =C2=A0	uint8_t len, count =3D 0;
-> =C2=A0	int i;
-> =C2=A0
-> =C2=A0	if (code =3D=3D AVC_CTYPE_REJECTED || code =3D=3D
-> AVC_CTYPE_NOT_IMPLEMENTED)
-> =C2=A0		return FALSE;
-> =C2=A0
-> -	len =3D pdu->params[0];
-> +	pdu =3D util_iov_pull_mem(&iov, sizeof(*pdu));
-> +	if (!pdu) {
-> +		error("Invalid AVRCP header");
-> +		return FALSE;
-> +	}
-> =C2=A0
-> -	if (be16_to_cpu(pdu->params_len) < count) {
-> +	if (be16_to_cpu(pdu->params_len) !=3D iov.iov_len) {
-> =C2=A0		error("Invalid parameters");
-> =C2=A0		return FALSE;
-> =C2=A0	}
-> =C2=A0
-> -	for (i =3D 0; len > 0; len--, i++) {
-> +	if (!util_iov_pull_u8(&iov, &len))
-> +		return FALSE;
-> +
-> +	len =3D MIN(len, AVRCP_ATTRIBUTE_LAST);
-> +
-> +	for (i =3D 0; i < len; i++) {
-> +		uint8_t attr;
-> +
-> +		if (!util_iov_pull_u8(&iov, &attr))
-> +			break;
-> +
-> =C2=A0		/* Don't query invalid attributes */
-> -		if (pdu->params[i + 1] =3D=3D AVRCP_ATTRIBUTE_ILLEGAL ||
-> -				pdu->params[i + 1] >
-> AVRCP_ATTRIBUTE_LAST)
-> +		if (attr =3D=3D AVRCP_ATTRIBUTE_ILLEGAL ||
-> +					attr > AVRCP_ATTRIBUTE_LAST)
-> =C2=A0			continue;
-> =C2=A0
-> -		attrs[count++] =3D pdu->params[i + 1];
-> +		attrs[count++] =3D attr;
-> =C2=A0	}
-> =C2=A0
-> +	if (!count)
-> +		return FALSE;
-> +
-> =C2=A0	avrcp_get_current_player_value(session, attrs, count);
-> =C2=A0
-> =C2=A0	return FALSE;
+and the Bluetooth CI passed. The original teardown ordering is still
+present in the current Bluetooth tree.
+
+Please let me know if any further changes or testing are needed.
+
+Thanks,
+Xu
