@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2B846EF64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8098A46EF8D
 	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 08:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788425861; cv=none; b=F1juloD5Vry5ltrWFEuWaaJ+6yXwlqLiFw9GF+Kkb7oXAKyrV6CX4ZAAWNrJzTyfu+lNJTA3NxaZIgIKDb34p1YuhfdauELxkEhTiCsS1/1ta4PsrgqAHIiTUBB224l/Ay7wDyx39NoBA4QSpRvaDFvouWiQJd7didnVOMu3vyg=
+	t=1788425864; cv=none; b=tX9N+vljyISxZ/Qqm+dZUQSQfm3jn0+HnQBeqWIpcrnJX/ZnK2VUNIxFf16ex88OaRSmyXhx1z/t0aR/83gUrXfTdLZKIG8gmPej/wsLVhcGWpAd6Mc2etjM3a8oFGzMnO13i52NANlsbGxBdTY4UaqbvYuDPN8n0017VT9ceoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788425861; c=relaxed/simple;
-	bh=pgeOFzcupLGGiDstzVSfkTksDu/jLNTjQAQ91cq1pNE=;
+	s=arc-20240116; t=1788425864; c=relaxed/simple;
+	bh=TwTUdR0oJNh4ifOQ81bzxLWTcI2pMssivdM/Z6a1QZ8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dV9q88FetZ+3zW+ZM/DUjxu7lG78i8GA4ku8+4EVyjjrL/yys2eZT23P6x+L+0qjCA6EIYD76x+KZ525qLZm+bmys/lAvAXjLk1iBuoe6peNjQYpMnygxxx2U+P6epg+waCCqr/jUe1JLPASMO4xQsATGV4YCYlFgMeL7wHCcBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qtasPrsI; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=I3eqsFKis9pFfpoJ0Mxc2q27npiiP+E5x7OlEAYfbP0jqUIgynBm6CeagQhtGAjBipcLVMfs5XQyLK1fKyjGEUPBKV7AKOARaI5GTh0PNVNjkHmcCx33krk39Bx+EcRKpUl0KX167Lw1xVNrr28ytOuSO9u+mKKpmtr/LYvDbrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=QQfwg4mX; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qtasPrsI"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="QQfwg4mX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1788425855;
-	bh=pgeOFzcupLGGiDstzVSfkTksDu/jLNTjQAQ91cq1pNE=;
+	bh=TwTUdR0oJNh4ifOQ81bzxLWTcI2pMssivdM/Z6a1QZ8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qtasPrsIJQV3gowA22po+CseoWQ2qm1OUpJxcnaS49biJhWt5hJm1eA5q3+Fa+xAg
-	 cgSLh0i4zyTWjkHTpmi8G9jSPF88g3uYTpCOxULjbxNNGPsXN5OpYGzv2t2zlhqTv2
-	 OuptNbnWzzxOzYV1cR3YRs5sMQ3S7HZbDXMwIwtxzeh2spNxJCgTnr+PWwkhQRgJ5w
-	 4/l4WCdP7vLEAA/7posXI0dNsBMg/uCM+QSBBGw23ksFtvesVs7q52g4wid/YX9zyp
-	 uWl7L/9k7W0Lzpecr6Z9waZ+kmUmNS+D+FsQFzD/oKSYP4qdE3JUb/QgTGF9gJBtiq
-	 shWYHkOaUs2fA==
+	b=QQfwg4mXsD72lJ2LVjST2Z9To/LjQ581eM0/zXRyzl17vYRfYopSE3jBv4RgVh1bL
+	 fxcN3OerEPHqHsElWkl9+1+RLrdcwssdwBk2wai7a9Ds282IG5LaZldaoqkgufyCRF
+	 MOfsjbJ6z904w3r4B5rViPp6mMi9znafKPNw2JAhXY7qfTEZll6Zhy0z7HEnBeQDe7
+	 1IPRRpXMvU78iPTUCEeZsQm5AagY0Vm2NYN4aOl4KiIzMQ/frQFP7Bm+a1jMKb7DpN
+	 oNtW70RtYW0qQEBHDI3H29nqE84VgsMuLxAIGYvvzn2dw+O0lAiVjHY8umiAMpGaOO
+	 JFKHZUoFeU3lQ==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4DA2317E07DB
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8C5B517E0914
 	for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 10:57:35 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] doc/qualification: Add BAP/UCL tests
-Date: Thu,  3 Sep 2026 10:57:15 +0200
-Message-ID: <20260903085716.741578-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 3/3] doc/qualification: Add BAP/USR tests
+Date: Thu,  3 Sep 2026 10:57:16 +0200
+Message-ID: <20260903085716.741578-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260903085716.741578-1-frederic.danis@collabora.com>
 References: <20260903085716.741578-1-frederic.danis@collabora.com>
@@ -53,878 +53,2009 @@ Content-Transfer-Encoding: 8bit
 From: Raghavendra Rao Sidlagatta <raghavendra.rao@collabora.com>
 
 ---
- doc/qualification/bap-pts.rst | 778 ++++++++++++++++++++++++++++++----
- 1 file changed, 694 insertions(+), 84 deletions(-)
+ doc/qualification/bap-pts.rst | 1992 +++++++++++++++++++++++++++++++++
+ 1 file changed, 1992 insertions(+)
 
 diff --git a/doc/qualification/bap-pts.rst b/doc/qualification/bap-pts.rst
-index e85c35ed4..2f81e2ad5 100644
+index 2f81e2ad5..53a627dbc 100644
 --- a/doc/qualification/bap-pts.rst
 +++ b/doc/qualification/bap-pts.rst
-@@ -361,6 +361,60 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/SCC/BV-016-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.presets /local/endpoint/ep1 48_6_1              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - accept the pairing request.                                           |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Post-condition:                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove local endpoints:                                               |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Restart Wireplumber                                                   |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
- | BAP/UCL/SCC/BV-019-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
-@@ -585,6 +639,60 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove the rule in 'wireplumber.conf.d/bluetooth.conf'                |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/SCC/BV-050-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.presets /local/endpoint/ep1 48_6_1              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - accept the pairing request.                                           |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Post-condition:                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove local endpoints:                                               |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Restart Wireplumber                                                   |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
- | BAP/UCL/SCC/BV-054-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
-@@ -745,6 +853,60 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove the rule in 'wireplumber.conf.d/bluetooth.conf'                |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/SCC/BV-082-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.presets /local/endpoint/ep1 48_6_2              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - accept the pairing request.                                           |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Post-condition:                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove local endpoints:                                               |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Restart Wireplumber                                                   |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
- | BAP/UCL/SCC/BV-093-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
-@@ -809,7 +971,7 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove the rule in 'wireplumber.conf.d/bluetooth.conf'                |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
--| BAP/UCL/STR/BV-535-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+| BAP/UCL/STR/BV-523-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
- |                              |          |        |       |                                                                         |
-@@ -825,48 +987,40 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
--|                              |          |        |       | is set to the PTS device.                                               |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | and audio input are set to the PTS device.                              |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
--| BAP/UCL/STR/BV-543-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | - Remove PTS device:                                                    |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+| BAP/UCL/STR/BV-526-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - WirePlumber is stopped                                                |
-+| BAP/UCL/STR/BV-526-C_LT2     |          |        |       | - Remove PTS devices:                                                   |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - Create data file:                                                     |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr1>                                     |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr2>                                     |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       |   - dd if=/dev/zero of=/tmp/bap.data bs=512 count=1                     |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       | - Two PTS applications are running and connected 2 dongles              |
- |                              |          |        |       +-------------------------------------------------------------------------+
- |                              |          |        |       | Run 'bluetoothctl':                                                     |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
--|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       | On demand:                                                              |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
--|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
--|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
--|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
--|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
--|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
--|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr1>                                      |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr2>                                      |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
--|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | and audio input are set to the PTS devices.                             |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-527-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
--|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
--|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
--|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
--|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
--|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
--|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# scan on                                                  |
- |                              |          |        |       |                                                                         |
-@@ -874,81 +1028,250 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | After transport Desynchronized properties are displayed:                |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | - [PTS-BAP-FE56]> transport.desync \                                    |
--|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0 on                        |
--|                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
--|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0                           |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-528-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | After transport has been acquired:                                      |
-+| BAP/UCL/STR/BV-528-C_LT2     |          |        |       | - Remove PTS devices:                                                   |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
--|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_source0/fd1                         |
--|                              |          |        |       | - [PTS-BAP-FE56]> transport.send \                                      |
--|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0 /tmp/bap.data             |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr1>                                     |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr2>                                     |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | Click OK on "After processed audio stream data, please click OK"        |
--|                              |          |        |       | request.                                                                |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       | - Two PTS applications are running and connected to 2 dongles           |
- |                              |          |        |       +-------------------------------------------------------------------------+
--|                              |          |        |       | Post-condition:                                                         |
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - Remove local endpoints:                                               |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
--|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
-+|                              |          |        |       | On demand:                                                              |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - Restart Wireplumber                                                   |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr1>                                      |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr2>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
--| BAP/UCL/STR/BV-546-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
-+| BAP/UCL/STR/BV-529-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - WirePlumber is stopped                                                |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | - Create data file:                                                     |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       |   - dd if=/dev/zero of=/tmp/bap.data bs=512 count=1                     |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
- |                              |          |        |       +-------------------------------------------------------------------------+
- |                              |          |        |       | Run 'bluetoothctl':                                                     |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
--|                              |          |        |       |   0x06                                                                  |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | .. code-block::                                                         |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
--|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
--|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
--|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
--|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
--|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
--|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
--|                              |          |        |       |   0x06                                                                  |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | .. code-block::                                                         |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
--|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
--|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
--|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
--|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
--|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
--|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
--|                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# scan on                                                  |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | On demand:                                                              |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
- |                              |          |        |       |                                                                         |
--|                              |          |        |       | After transport Desynchronized properties are displayed:                |
--|                              |          |        |       |                                                                         |
--|                              |          |        |       | - [PTS-BAP-FE56]> transport.desync \                                    |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-530-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+| BAP/UCL/STR/BV-530-C_LT2     |          |        |       | - Remove PTS devices:                                                   |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr1>                                     |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr2>                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       | - Two PTS applications are running and connected to 2 dongles           |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr1>                                      |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr2>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-535-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-537-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-538-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-543-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Create data file:                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - dd if=/dev/zero of=/tmp/bap.data bs=512 count=1                     |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | After transport Desynchronized properties are displayed:                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.desync \                                    |
-+|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0 on                        |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
-+|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0                           |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | After transport has been acquired:                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
-+|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_source0/fd1                         |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.send \                                      |
-+|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_sink0/fd0 /tmp/bap.data             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | Click OK on "After processed audio stream data, please click OK"        |
-+|                              |          |        |       | request.                                                                |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Post-condition:                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove local endpoints:                                               |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Restart Wireplumber                                                   |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-546-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Create data file:                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - dd if=/dev/zero of=/tmp/bap.data bs=512 count=1                     |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | After transport Desynchronized properties are displayed:                |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.desync \                                    |
- |                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_source0/fd1 on                      |
- |                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
- |                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_source0/fd1                         |
-@@ -972,6 +1295,158 @@ for which we know the test passed.
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Restart Wireplumber                                                   |
- +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-552-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-553-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-554-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-555-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-556-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-557-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-558-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-559-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove PTS device:                                                    |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
-+|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
-+|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
-++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
- | BAP/UCL/STR/BV-568-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
- |                              |          |        |       |                                                                         |
- |                              |          |        |       | - Remove PTS device:                                                    |
-@@ -1010,3 +1485,138 @@ for which we know the test passed.
- |                              |          |        |       | If nothing occurs after connection and pairing, check that audio input  |
+@@ -1620,3 +1620,1995 @@ for which we know the test passed.
+ |                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
  |                              |          |        |       | is set to the PTS device.                                               |
  +------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-570-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++| BAP/USR/ADV/BV-01-C          | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - WirePlumber is stopped                                                |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
 +|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep0] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep0] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep0] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep0] CIS (auto/value): 0                             |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb \ |
-+|                              |          |        |       |   0x06                                                                  |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/ADV/BV-04-C          | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | .. code-block::                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Auto Accept (yes/no): y                         |
-+|                              |          |        |       |   [/local/endpoint/ep1] Max Transports (auto/value): a                  |
-+|                              |          |        |       |   [/local/endpoint/ep1] Locations: 1                                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Supported Context (value): 3                    |
-+|                              |          |        |       |   [/local/endpoint/ep1] Context (value): 3                              |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIG (auto/value): 0                             |
-+|                              |          |        |       |   [/local/endpoint/ep1] CIS (auto/value): 0                             |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
++|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
++|                              |          |        |       | - Add rule to force Targeted Announcement in 'monitor.bluez.rules' of   |
++|                              |          |        |       |   'wireplumber.conf.d/announcement.conf'::                              |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | After transport properties are displayed:                               |
++|                              |          |        |       |     monitor.bluez.properties = {                                        |
++|                              |          |        |       |       bluez5.bap-server.ascs-announcement = "targeted"                  |
++|                              |          |        |       |     }                                                                   |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [PTS-BAP-FE56]> transport.acquire \                                   |
-+|                              |          |        |       |   /org/bluez/hci0/dev_<BD_ADDR>/pac_source0/fd0                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | Click OK on "After processed audio stream data, please click OK"        |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/DISC/BV-01-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/DISC/BV-02-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/DISC/BV-05-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/DISC/BV-06-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/DISC/BV-07-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-003-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-004-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-006-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-007-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-008-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-011-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-012-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-013-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-014-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-015-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-016-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-019-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-020-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-023-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-024-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-071-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-072-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-075-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-076-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-079-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-080-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-081-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-082-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-083-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-084-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-087-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-088-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-091-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-092-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-104-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-106-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-111-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-112-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-113-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-114-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-115-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-116-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-135-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-136-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-137-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-138-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-139-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-143-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-144-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-145-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-146-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-147-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-148-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-149-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-150-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-161-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-162-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-163-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-167-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SCC/BV-168-C         | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SPE/BI-01-C          | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SPE/BI-02-C          | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SPE/BI-03-C          | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SPE/BI-04-C          | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/SPE/BI-05-C          | PASS     | 6.14   | 5.87  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/STR/BV-360-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
 +|                              |          |        |       | request.                                                                |
 +|                              |          |        |       +-------------------------------------------------------------------------+
 +|                              |          |        |       | Post-condition:                                                         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Remove local endpoints:                                               |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep0                |
-+|                              |          |        |       |   - [bluetooth]# endpoint.unregister /local/endpoint/ep1                |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - Restart Wireplumber                                                   |
 ++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-575-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++| BAP/USR/STR/BV-362-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
 +|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
++|                              |          |        |       | On demand accept the pairing request.                                   |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
++|                              |          |        |       | request.                                                                |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
 ++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-577-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++| BAP/USR/STR/BV-367-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
 +|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
++|                              |          |        |       | On demand accept the pairing request.                                   |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
 ++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-578-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++| BAP/USR/STR/BV-369-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
 +|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
++|                              |          |        |       | On demand accept the pairing request.                                   |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
 ++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
-+| BAP/UCL/STR/BV-579-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++| BAP/USR/STR/BV-375-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       | - Remove PTS device:                                                    |
 +|                              |          |        |       |                                                                         |
 +|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - PipeWire And WirePlumber are running                                  |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
 +|                              |          |        |       +-------------------------------------------------------------------------+
-+|                              |          |        |       | Run 'bluetoothctl':                                                     |
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# scan on                                                  |
++|                              |          |        |       | On demand accept the pairing request.                                   |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | On demand:                                                              |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | - [bluetooth]# connect <pts_addr>                                       |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
 +|                              |          |        |       |                                                                         |
-+|                              |          |        |       | If nothing occurs after connection and pairing, check that audio output |
-+|                              |          |        |       | is set to the PTS device.                                               |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
++|                              |          |        |       | request.                                                                |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
 ++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/STR/BV-377-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
++|                              |          |        |       | request.                                                                |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/STR/BV-378-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
++|                              |          |        |       | request.                                                                |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++| BAP/USR/STR/BV-380-C         | PASS     | 6.14   | 5.85  | Pre-condition:                                                          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Force PTS to perform pairing:                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'TRUE' in IXIT Tool window of PTS          |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Remove PTS device:                                                    |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - bluetoothctl remove <pts_addr>                                      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Add rule to force automatic linking of Bluetooth input and Bluetooth  |
++|                              |          |        |       |   output ensuring both are opened using                                 |
++|                              |          |        |       |   'wireplumber.conf.d/auto-bluez.conf'::                                |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |     wireplumber.components = [ {                                        |
++|                              |          |        |       |       name = /path/to/.config/wireplumber/scripts/                      |
++|                              |          |        |       |              link-bt-microphone-with-speakers.lua,                      |
++|                              |          |        |       |       type = script/lua,                                                |
++|                              |          |        |       |       requires = [ si.standard-link, si.audio-adapter ]                 |
++|                              |          |        |       |     }                                                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   Refer Scripts section for 'link-bt-microphone-with-speakers.lua'      |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Restart PipeWire And WirePlumber                                      |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Run 'bluetoothctl'.                                                     |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | On demand accept the pairing request.                                   |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please confirm received streaming data..." request.       |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click OK on "Please send valid streaming data" request.                 |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | Click YES on "Please click yes when IUT has verified audio stream data" |
++|                              |          |        |       | request.                                                                |
++|                              |          |        |       +-------------------------------------------------------------------------+
++|                              |          |        |       | Post-condition:                                                         |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       | - Reset PTS to previous configuration:                                  |
++|                              |          |        |       |                                                                         |
++|                              |          |        |       |   - Set 'TSPX_delete_ltk' to 'FALSE' in IXIT Tool window of PTS         |
++|                              |          |        |       |                                                                         |
+++------------------------------+----------+--------+-------+-------------------------------------------------------------------------+
++
++Scripts
++========
++
++The script below is useful to automate the linking of Bluetooth input and
++Bluetooth output, ensuring both are opened.
++
++link-bt-microphone-with-speakers.lua::
++
++    #!/usr/bin/wpexec
++
++    log = Log.open_topic('auto-bluez')
++
++    function parseBool (var)
++      return var and (var:lower () == "true" or var == "1")
++    end
++
++    function createLink (si, target)
++      local si_props = si.properties
++      local target_props = target.properties
++      local out_item = nil
++      local in_item = nil
++      local si_link = nil
++
++      if si_props["item.node.direction"] == "output" then
++        -- playback
++        out_item = si
++        in_item = target
++      else
++        -- capture
++        in_item = si
++        out_item = target
++      end
++
++      log:info (si,
++        string.format ("link %s <-> %s",
++          tostring (si_props ["node.name"]),
++          tostring (target_props ["node.name"])))
++
++      -- create and configure link
++      si_link = SessionItem ("si-standard-link")
++      if not si_link:configure {
++        ["out.item"] = out_item,
++        ["in.item"] = in_item,
++        ["passthrough"] = false,
++        ["exclusive"] = parseBool (si_props ["node.exclusive"]),
++        ["out.item.port.context"] = "output",
++        ["in.item.port.context"] = "input",
++        ["media.role"] = si_props["media.role"],
++        ["target.media.class"] = target_props["media.class"],
++        ["policy.role-based.priority"] = target_props["policy.role-based.priority"],
++        ["policy.role-based.action.same-priority"] = target_props["policy.role-based.action.same-priority"],
++        ["policy.role-based.action.lower-priority"] = target_props["policy.role-based.action.lower-priority"],
++        ["is.role.policy.link"] = nil,
++        ["main.item.id"] = si.id,
++        ["target.item.id"] = target.id,
++      } then
++        log:info (si, "Error configuring link")
++        return
++      end
++
++      -- Register
++      si_link:register ()
++
++      -- Activate
++      si_link:activate (Feature.SessionItem.ACTIVE, function (l, e)
++        if e then
++          log:info (si, "Error activating link")
++          l:remove ()
++        else
++          -- Success activating link
++          log:info (si, "Link activated")
++        end
++      end)
++    end
++
++    linkables_om = ObjectManager {
++      Interest { type = "SiLinkable" }
++    }
++
++    links_om = ObjectManager {
++      Interest { type = "Link" }
++    }
++
++    linkables_om:connect("objects-changed", function (om)
++      -- Find the BT microphone linkable
++      local bt_microphone = om:lookup {
++        type = "SiLinkable",
++        Constraint { "node.name", "matches", "bluez_input*"},
++      }
++
++      -- Find the speakers linkable
++      local speakers = om:lookup {
++        type = "SiLinkable",
++        Constraint { "node.name", "matches", "alsa_loopback_device*.alsa_output*Speaker*" },
++      }
++
++      if bt_microphone ~= nil and speakers ~= nil then
++        local link = links_om:lookup {
++          Constraint { "link.output.node", "=", bt_microphone.properties["object.id"] },
++          Constraint { "link.input.node", "=", speakers.properties["object.id"] }
++        }
++        if link == nil then
++          createLink (bt_microphone, speakers)
++        end
++      end
++    end)
++
++    linkables_om:activate()
++    links_om:activate()
 -- 
 2.43.0
 
