@@ -1,70 +1,110 @@
-Received: from out-1.smtp.github.com (out-1.smtp.github.com [192.30.252.192])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A41639F184
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 23:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92E3284B4F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 23:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788477214; cv=none; b=L20wf8YpKKKJHQDiZmGoXrahBTq2opVg3v2h6ksn8U2COCgHO8A1qlUJnLMw7NX7xyeku2HBXyDHRziGgmNZke6R424L23jsP0faWgnQWHTR2HQh5anm6srlyRmrHrs64oaqFvszkOlUhk0QoK48nnpcCdQQSfDVV6O3I48kR4s=
+	t=1788479248; cv=none; b=SX9WKsc62XhHFj25JQIBxQcHc3jQVDozZjFZYYepyjkKVa20VlugFZFkXH+ZoDAESyJb8544CH6CmAaWu1PQjyt0HZjXP+bRNiIdw0PVD4uEfwcMxUy9KQ2SyR3qi2taa3S9biGE2s+S518vQLlfTDrqD+cfhlMVrrHp+FKq+b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788477214; c=relaxed/simple;
-	bh=WYCHju0fokymIeI/liINw3LCH6rQlSf53q9OgyWE4m8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hyVSLvTetzmf6Y5zqC+4XB2y/KiuZzwHS3Hp06V4rvmLjZSmhhC2KIHxy+xANbBZvGXYrtJBMSNqsSIR52gOcZQXLvfQUrkCVcyUoi2mjt7kNxZ9+dRQUrpelRam8GLT0unhhhuzMelBhdfswHRajsvK5AMu02nUm6rmlorQXSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WDyx99ZY; arc=none smtp.client-ip=192.30.252.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788479248; c=relaxed/simple;
+	bh=FKhNPWiJbrZdN+qIyxovUhrqwMg20twW4VFgWrIPSsg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=he0EZlMzNsyEPc1MDF8wPUgjOjVOzLmdwCnmQqPMdV5AvmPiROOXWc9fgcPoXGfOh8DgD87uWty/xyElazS8AY8KrRdfZdzA1rYVBIbow3VbVQjC0ZeM2Za3sUsKJacnZ0LuJs3EbxAWH2p+D6H9I2nPoaBK+AMQeqQBbgmdHKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2v1fNtK; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WDyx99ZY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788477210;
-	bh=Tn+2qSKsqre7y4pfa3O2O5rB7U6TyLrijIV/pO+25wU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WDyx99ZYGU2AfBnHPL4e0Trv59z+foDqQlWWg4Xqdcy93uJftVJQYc7h6+RF4PCfc
-	 9Mt/eviTW5bEJGX8nJLlA5C48RgLLssha0FKUVpJjqymZkc1RyNWxr+DLdBvDdYOfW
-	 HDFnKf4kFn5TW9ONbWbGv8X1qCFYeIXmTJEcWhBY=
-Received: from github.com (hubbernetes-node-154b116.va3-iad.github.net [10.48.75.95])
-	by smtp.github.com (Postfix) with ESMTPA id 6AC0B340624
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 16:13:30 -0700 (PDT)
-Date: Thu, 03 Sep 2026 16:13:30 -0700
-From: Aaron Brice <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1157441/000000-897d4c@github.com>
-Subject: [bluez/bluez] 897d4c: btattach: Update for glibc 2.42 compatibility
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2v1fNtK"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92ed19f4d60so41904685a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 16:47:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788479246; x=1789084046; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=31+fBwgXWPif1z/ufuh0wrPzCQVeoRzR1V9rWtvW1rQ=;
+        b=T2v1fNtKe+78g3OsSOFSXOU1Uy5QzG+RlRgrGTSaYV2psF9/sggJ5mVkCo/FaMnBA3
+         4h9/ujXMwcyi6gJjdyJvirJCcxlt9wIb0b4tvTC6tAupqGwa4x+iMKrzcxT6hiCoTM9h
+         fYcWO+aR+vLLGszTlSS5XeoSM7HnBeFMyl8/7ASgtHsKhzl6f57Ubxg1jIhWETYZfqJn
+         dJdT3nP4YRgZQEDtOShB1p8asFvm3cJ5JzFfMSe1Fyxv7HxIlUEud5OQMKnjQvMFdbMA
+         ycW5TmbaAhfhOo1+es/4VrcuyunaO5r0rZ02hXI/VInuLAWKjwBaKJ1j0nCKwegbfAid
+         V7IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788479246; x=1789084046;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=31+fBwgXWPif1z/ufuh0wrPzCQVeoRzR1V9rWtvW1rQ=;
+        b=UfqVDC2ldEqFVRpYPKYrbWXLNbKEG4HtyNv1BFg68KrKHb/3x/42ukFeNhKaR69vcq
+         /GVbcjFKuQuktiNbHGL1Qr1N9zgb37aL02qEJ7xRUn8CS0FipYgbl8NKqzmyBnf12bGK
+         RK3oXf350i0knMfuA38Y6ET/pHCtNQbuh3IT/SaMa/fK7EzbyPD7CxVGVg1S3lkZK8l5
+         5/EVcTNWYOTuE9s260OBHYr9NthbXgwBrkJb0y2vkqfcxvQGnhUk+UBkdvWLW7XjemZY
+         I0Grlj2R5LJfjLFoWbt8hO7uI4fdio600CoGAs5Fp/1kYT8awA1Hj4QfO+fEx7E6buh/
+         5urQ==
+X-Gm-Message-State: AFuF++kyg6kR2ioGgMwRS8V5fDZJiN6gm2MOL4vKiSfZNKkZLVQuc5N6
+	omvbWEpr/y8gN7d2YuGJtR2S4k5V06dHhTxr8ZPas6ZJB4DHqVIs0NHgFcmRUQ==
+X-Gm-Gg: AYBFou25voZqdVz7SqUcRPDI6zRHfR9Tpo5mXmeVnoKFD9r7o/LBCcSHhRG5I4GcWaF
+	SDHQpLOW9eG6ENicU17kvJ3iisYcEP0kIWcFnjQcx5qST4ftH+3CjJexDW3dO74K1y2g5YMf+8Z
+	86Qe3SwuTX4qcd/8sIlPe4T7+i0HzY9J3NJ0l1jSO1SqJfzi3lv3fKRGhEZp3esJ86jj42JkQPq
+	LoRmh6m0cWj8BxeX4eaz8Tf62Swud4ydbI1A+/uZ6dI96wdNTwpYyk1BcO09dLB27iQDF2sIzQV
+	ClOYdpqN0Vsm5Qirg0tUheuENaqEZ+w7gFj8UyldnoNrV4L36NINfkAyBDPM1R/1VHdPoKAQXSk
+	VR8oq+B/GLyEq787uR08s8z7udz2KzrWoknfwpobRwB9VQQ3mIYBR8nyAjJwc7p4IGDGJigJHsE
+	+MORNpKJL6Rt+/rANVyPFHMROSsTcA0eYfq2u2+ptI4e59fuf9PBQFfPasjO8oTLreOgA=
+X-Received: by 2002:a05:620a:2b90:b0:939:79b0:e68 with SMTP id af79cd13be357-93981429145mr112805285a.4.1788479245734;
+        Thu, 03 Sep 2026 16:47:25 -0700 (PDT)
+Received: from [172.17.0.2] ([172.214.102.8])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fbf7c78sm80427685a.47.2026.09.03.16.47.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2026 16:47:25 -0700 (PDT)
+Message-ID: <6a9a070d.feb7f338.220a9e.2709@mx.google.com>
+Date: Thu, 03 Sep 2026 16:47:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9173870436194470254=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, aaron@embeddedts.com
+Subject: RE: [BlueZ,v2] btattach: Update for glibc 2.42 compatibility
+In-Reply-To: <20260903222005.482058-1-aaron@embeddedts.com>
+References: <20260903222005.482058-1-aaron@embeddedts.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============9173870436194470254==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1157441
-  Home:   https://github.com/bluez/bluez
-  Commit: 897d4c2f6221c1bc284a8a57ea06085a4d85d088
-      https://github.com/bluez/bluez/commit/897d4c2f6221c1bc284a8a57ea06085a4d85d088
-  Author: Aaron Brice <aaron@embeddedts.com>
-  Date:   2026-09-03 (Thu, 03 Sep 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M tools/btattach.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  btattach: Update for glibc 2.42 compatibility
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1157441
 
-btattach is not setting the baud rate correctly on systems with newer
-glibc such as Ubuntu 26.04. In glibc 2.42 the baud rate termios.h
-constants changed value, B115200 was 0x1002 which was the struct
-termios c_cflag enum bits, but in 2.42 they changed cfsetspeed() to
-accept arbitrary rates and not just the baud enum values, and B115200
-was changed to the value 115200. This means you can no longer set the
-speed with c_cflag |= B115200 and should use cfsetspeed() to be
-compatible with both versions.
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      15.85 seconds
+BluezMake                     PASS      494.98 seconds
+CheckSmatch                   PASS      231.22 seconds
+bluezmakeextell               PASS      74.44 seconds
+IncrementalBuild              PASS      453.86 seconds
+ScanBuild                     PASS      718.81 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2490
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============9173870436194470254==--
