@@ -1,81 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEDB503BF0
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 20:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DED314B63
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 20:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788465693; cv=none; b=CWPrH2qsbTJ+Dbdmi1w8Sj/qKLB9NiaQ6xcuYC+oxffOvgdaRIAxeu7d+04FV67bpHanlpdf9WeoEcXtsyymWtCQm1B+2xY+pnfl/fVGrSuysMb2HRSbLjQu4AIm4Q6JBGOxkXg0hG/zy7c6GvMCqBhWrJjCJjvRBtTHgf+Tvd0=
+	t=1788466800; cv=none; b=jPcN0kuVz7gQFa5/b/1D33DLVKW0tGPwJHUzKeknW9z6kLfA0BcmMzY7EqI0fluotA9NP07wFmd7XwVudweLq3XlfxJExmONDeXBPVHSSmOqig9fU3YaMSaa1q3FFMKkMT0A3q3AKvuBO8+wacLIhq3kDN7MBSmzwjpSXfe0Opk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788465693; c=relaxed/simple;
-	bh=4hfZTpLPfM5c0LX4dQC4OUsDleo6Ubw3j+iHXI7ZWbg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c+lDf99r+shPLBsDOUqxGykFioQ6QsGgql27DerS9TvLsMiqnoJzMRAq/tCfBKHgxnrsUvx4pV1Xx4+pfN/fDmglIguh++679JQQTJ0nUAr1x96rZTAcmXz6fRSeemog5E/cbA4856jEbnuCzPZliXooBUr8Gmh0rId1AjLdswc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vqz68Dj5; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vqz68Dj5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EBC41F00ADB;
-	Thu,  3 Sep 2026 20:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788465676;
-	bh=pCKbocqKC/2iymjZ+Tcmx/XHmHEATUIgKK2qFi4MHrM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Vqz68Dj5c2L1yU2WPRqeQo29xmUpPrXZmROdnCEWQHNyJkrPjUIGRb5nV4/uPbURP
-	 DKQwUgRZRLo9J9Svb6/Fop8Ovj/3ORxwlv15YblKlJgp0J3l5VdFxTpgjT/HNuLkvx
-	 vETzl4PxVP7r+JKwNfOhyR3hQuaK6RH9FTu1orQofwlXhN7Bd3L7P3+Q/++0mZjNp1
-	 i5IINN53RhDM9PgulA+8WQKyg11DrS7d81lu20k80VD2j3wZlM4uT9I0U8o8mdBDut
-	 vvlIO46v3pAefZppXwstu5Vg7SkgpAn930w7NuwgKqTyP+5YYJU4CfalemNmQXk7uh
-	 FQ6IvzJHyRmpQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7F85138119DE;
-	Thu,  3 Sep 2026 20:00:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1788466800; c=relaxed/simple;
+	bh=vrgANoOZP4uxpzFUg0+vAi2/oa2qxS2L6S2v3Gz4KuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=g2F0dHPt+uvCqiuy3N+SalxTDLr6TDbRASZmGNkqNqMYhMgemJeCywsVi+2sPEqNiJHcqD2b/3Q6eLuDA/1hO+W7zS8i2D9rEk+sas6txvXU+OY53GRIpXTP2X1Cp0Y4R+VvNrEjzoNazLiQ1Oiflc1qpAOnRGyZHk/ra820lVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.230] (p5dc5557e.dip0.t-ipconnect.de [93.197.85.126])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 953B84C2C37D7E;
+	Thu, 03 Sep 2026 22:19:33 +0200 (CEST)
+Message-ID: <c820f791-2edb-49f4-a39e-801965fc86ed@molgen.mpg.de>
+Date: Thu, 3 Sep 2026 22:19:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v3] Bluetooth: btintel_pcie: fix stale cache in set_dxstate
+ fallback check
+To: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
+References: <20260903153521.130258-2-vladimirkondratyev2@gmail.com>
+ <6a99bf19.a40fb949.f1a41.3b57@mx.google.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, Sergey Lebedev <lsa.uz@pm.me>
+In-Reply-To: <6a99bf19.a40fb949.f1a41.3b57@mx.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 1/3] Bluetooth: btusb: Fix UAF of btusb_data by rx_work
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178846561713.3994681.3764342442710024768.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Sep 2026 20:00:17 +0000
-References: <20260902214620.44041-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260902214620.44041-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  2 Sep 2026 17:46:18 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Am 03.09.26 um 20:40 schrieb bluez.test.bot@gmail.com:
+> This is automated email and please do not reply to this email!
 > 
-> btusb_close() and btusb_flush() cancel data->rx_work with the
-> asynchronous cancel_delayed_work(), so if btusb_rx_work() is already
-> running on another CPU it keeps running after the cancel returns.
+> Dear submitter,
 > 
-> btusb_disconnect() calls hci_unregister_dev(), which invokes
-> btusb_close(), and then frees the btusb_data. A still running
-> btusb_rx_work() then dereferences the freed data:
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1157226
 > 
-> [...]
+> ---Test result---
+> 
+> Test Summary:
+> CheckPatch                    FAIL      0.97 seconds
+> VerifyFixes                   PASS      0.13 seconds
+> VerifySignedoff               PASS      0.13 seconds
+> GitLint                       FAIL      0.34 seconds
+> SubjectPrefix                 PASS      0.13 seconds
+> BuildKernel                   PASS      26.99 seconds
+> CheckAllWarning               PASS      29.40 seconds
+> CheckSparse                   PASS      28.36 seconds
+> BuildKernel32                 PASS      25.69 seconds
+> CheckKernelLLVM               SKIP      0.00 seconds
+> TestRunnerSetup               PASS      474.96 seconds
+> IncrementalBuild              PASS      24.73 seconds
+> 
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script
+> Output:
+> [v3] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+> WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+> #113:
+> operation to abort on Intel Lunar Lake hardware. The system immediately resumes
 
-Here is the summary with links:
-  - [v3,1/3] Bluetooth: btusb: Fix UAF of btusb_data by rx_work
-    https://git.kernel.org/bluetooth/bluetooth-next/c/83a1797b2020
-  - [v3,2/3] Bluetooth: Move H:4 reassembly into the Bluetooth core
-    https://git.kernel.org/bluetooth/bluetooth-next/c/37521ec2f55f
-  - [v3,3/3] Bluetooth: btusb: Add support for Bulk Serialization Mode
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ee16dd607ff4
+`scripts/checkpatch.pl` ignores lines that start with the “timestamp”.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+```
+# Check for line lengths > 75 in commit log, warn once
+                 if ($in_commit_log && !$commit_log_long_line &&
+                     length($line) > 75 &&
+                     !($line =~ /^\s*[a-zA-Z0-9_\/\.]+\s+\|\s+\d+/ ||
+                                         # file delta changes
+                       $line =~ /^\s*(?:[\w\.\-\+]*\/)++[\w\.\-\+]+:/ ||
+                                         # filename then :
+                       $line =~ 
+/^\s*(?:Fixes:|https?:|$link_tags_search|$signature_tags)/i ||
+                                         # A Fixes:, link or signature 
+tag line
+                       $commit_log_possible_stack_dump)) {
+                         WARN("COMMIT_LOG_LONG_LINE",
+                              "Prefer a maximum 75 chars per line 
+(possible unwrapped commit description?)\n" . $herecurr);
+                         $commit_log_long_line = 1;
+                 }
+```
+
+[…]
+
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint
+> Output:
+> [v3] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+> 
+> 6: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0"
+> 7: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1"
+> 8: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2"
+> 9: B1 Line exceeds max length (98>80): "  btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend [btintel_pcie] returns -16"
+
+I believe the configuration in the BlueZ git archive [1] is used. No 
+idea, how other commits with pasted lines entered the tree.
 
 
+Kind regards,
+
+Paul
+
+
+[1]: https://github.com/bluez/bluez/blob/master/.gitlint
