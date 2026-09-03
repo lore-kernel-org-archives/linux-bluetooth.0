@@ -1,75 +1,89 @@
-Received: from mail-10628.protonmail.ch (mail-10628.protonmail.ch [79.135.106.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275B84F6482
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 17:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB82B44CF4A
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 18:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788456045; cv=none; b=fRjDzYyJK/R4uSqlhRUNUtzZvBvbNFRO3wS325JjypdGXIrdNF/mUB1DNLsR9uPc/Jw6BbOIh4uN6qKcLrwvgV22O6aK8YHJLzDYmIsU9B5MfS09DvrQ4EtZWZmeFf0jpAg+oWHOmJTE45JrurBG8+N33tL15DPfPdY7gNJCjpE=
+	t=1788460087; cv=none; b=VarTPuuUcjfvcjTz2cWIbdfINZOfbyXms28AHCwY/jKfLw+fJ2MAi5g1dPODBEeFkSJE6srEbIio1rXTBsU0HqO0+ANVhaOx3RiJBT3kpBb4iw2MVthVrWW+yvpWLXJe8M79qEM8mA5mkfY6yg1jJLB3YOfHKwFeI/w1B+H+JHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788456045; c=relaxed/simple;
-	bh=6QBoq/pfbjK8hNJHvcynYsRCEv5M/wG0+h6tSZ9YVa4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k1HAqryl8O0uSOhbRbESs0tbul9iR6G3ug+ahTjJ1+LQ1paKhvC9XTvRWxOH8Vl/aqGgPeh60sfyItUqZIXWyrP0PYsddthsryxikP5YDeLDUDkL+71+qhyLKptUocSyvZdqveahC16jVgx0OhdoW6m/UfXMxeVLX0lmV7N/IlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=IxAtYKL3; arc=none smtp.client-ip=79.135.106.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1788460087; c=relaxed/simple;
+	bh=Pliy9e9NV2UzGA5hTsun37uxe2agoCrlfEtG2ApmquI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tq4uS7XC/sU6b1NsRj8D9I5CFkoSmYnCY0h03Cw0t6IjwGXgpmtYYTJFJEVHinCA1w0JnVqO1OvhdfxlSDgToJnpmZDg4rYF4MizNZbYN3XMiCFqLbBgF7ZK37/tpsOHkgVEejVkd7VBcz2Ft2F+iXCDbWdUi/enlEVqpEJihyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=embeddedts.com; spf=pass smtp.mailfrom=embeddedts.com; dkim=pass (1024-bit key) header.d=embeddedts.com header.i=@embeddedts.com header.b=EARd6uye; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=embeddedts.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedts.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="IxAtYKL3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1788456038; x=1788715238;
-	bh=6QBoq/pfbjK8hNJHvcynYsRCEv5M/wG0+h6tSZ9YVa4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=IxAtYKL3ZoeM13GMOnzw4+soq7pJ0g8OpCcENLgE85TAlyInNpaXE+WpkSJyZD9XT
-	 K2qIGNBrgrP53eV9fg1AnYUwWQnLdvNrXcmlUN6Z6gpYZP0jd4QT6uaSxd32PzNp5r
-	 5Ig0n4BnLLtzNB7y/5VMUD/q8N/WeK//CGZra5vnRuhvddWu4go4btqRTQMVJT69mI
-	 PoCIiTJW3LgiRitoA+QA4pZqLn2MOuEIs+03T7jC3YHaw5zJLOMniheihASDP4nXFE
-	 DGVDsHW2ttamNWoc/RLE/q+3L9H+aj2JbmTH0itkgbpP/+sVX85P7loMtAhMxmBAiX
-	 H6Loz2XpvZejA==
-Date: Thu, 03 Sep 2026 17:20:31 +0000
-To: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>
-From: Sergey Lebedev <lsa.uz@pm.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Kiran K <kiran.k@intel.com>, Arnd Bergmann <arnd@arndb.de>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
-Message-ID: <20260903172021.98799-1-lsa.uz@pm.me>
-In-Reply-To: <20260903153521.130258-2-vladimirkondratyev2@gmail.com>
-References: <20260507203426.128975-1-vladimirkondratyev2@gmail.com> <20260903153521.130258-2-vladimirkondratyev2@gmail.com>
-Feedback-ID: 113843758:user:proton
-X-Pm-Message-ID: f6ba5ccdc55df8cb7517f421eca9736a0b22bf9f
+	dkim=pass (1024-bit key) header.d=embeddedts.com header.i=@embeddedts.com header.b="EARd6uye"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-84f3ab8750cso101750b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 11:28:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=embeddedts.com; s=google; t=1788460082; x=1789064882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NO7zF0z1j5Off+KF7vCbJD8N1UI7rxLz/ZpHd8I61yA=;
+        b=EARd6uyeOI/cVvxKL+enJ2o2PO8Wa20za0mQdxvjjM4c0O0HaO0vYTs+LPrxoLEBj/
+         MbzyGrhorDctlL89yLY+MGIM0WauBwlStq/csZO8auFHne5jfXPGWsZDSRQSyEyux5aX
+         JE/fYued+LpQ9pwoZzfAfzvYszeBGW9fQlS+Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788460082; x=1789064882;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NO7zF0z1j5Off+KF7vCbJD8N1UI7rxLz/ZpHd8I61yA=;
+        b=sE0E2lnQ8aym9E9Yh6tXMBhwBdYY+0qtXAGrrsODveW44W+jl6y94XbuzDnCCSHYL8
+         wnuvnVFfLQ34nM44KNxGtcYatOEZE0lxNHk63Cjn2qMyqTVuqQBiiSWmbc30XLDUaVUj
+         hiKCmn3w4Ulx71IyKUWRr9Pk8OK/wgjITLzhE8Thz1Z0Br167wi57Qw3qv3paQUIexW+
+         +m3YHy7bd4Uhr6+FCRaNkczE6pAvSS3EdMqQEEQPC10iDMSG9JPv1VZrrMhmtXFZFe+y
+         +h64UJmjhOgOpABqBFtzaBDcUbGm/ivmWu9nubiX8EXtDN96JwietVIa/A2G76VGDO3U
+         Vw0g==
+X-Gm-Message-State: AFuF++njxfeY0Z6nOHypBbGF5lN/el6Co4T5wesW5uAgbnnPcmnLj439
+	gOMXMyQNbJj8/XnWI8gKjZm4DGAp2T2HDYnuQsU1E8idNfv0ZkDFglVCkAsX+XS98Oix4e4I6Bn
+	h/wgT
+X-Gm-Gg: AYBFou3TiZ/M3uk8l3Oafz/duXA2br4zaNMRUFMYoXAsgrHfrU/KjzdmjC6at09tQgG
+	0r2pETj0ilH8VuGqNSyrWEq1/NcVXJEL5Yo5jMGFjQjnSPnJaPGVgk2L8Pirqb++6VOi72yDxnz
+	zTP4rcIYXWgQHLknopuvkJu12EODXHDcsZ+5lAZghPUwl04AY+1oaW06yx8jSFot77rlDE1+5dO
+	ZFBHYT60GAPlPPbTt09Fc16HUNfzjXnB72CD0zd2DYzWEnACx+3hhdZ+dLTLxdtSAMcZPMGbbzz
+	hRwIdL5E9CLID3uMBQYbcSn9Zc+FAg/AxMl0MvRxQmA954zl8GnE07oJlSbglt4YsNwmhBEXgEl
+	TaRcTMUthSnP6duNX134YMXrbwW8sGF1ZmDJyzz0n1FEw9Awt48kdEH/GzinQuC8+k4mrEypV2P
+	00lPSvbQq1GWMISlhrNfJmgDxBFnh0uMWZiu+33g8jx2FMCvrjQa+hHt9/Y1jJA7LecdflW8Qt/
+	h6QSxxEY5oP7k2FqBT1rI+Qog8+Xk00oukXD9PK
+X-Received: by 2002:a17:90b:1c07:b0:399:149a:3f27 with SMTP id 98e67ed59e1d1-39b2617ed8bmr542364a91.9.1788460081721;
+        Thu, 03 Sep 2026 11:28:01 -0700 (PDT)
+Received: from aaron-desktop.ts-local.net (wsip-70-191-90-18.ph.ph.cox.net. [70.191.90.18])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-143243f780csm1150630c88.13.2026.09.03.11.28.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2026 11:28:01 -0700 (PDT)
+From: Aaron Brice <aaron@embeddedts.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Aaron Brice <aaron@embeddedts.com>
+Subject: [PATCH BlueZ 0/1] btattach: Update for glibc 2.42 compatability
+Date: Thu,  3 Sep 2026 11:27:08 -0700
+Message-ID: <20260903182709.473976-1-aaron@embeddedts.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Vladimir, Paul,
+btattach is not setting the baud rate correctly on systems with newer
+glibc such as Ubuntu 26.04. In glibc 2.42 the baud rate termios.h
+constants changed value, B115200 was 0x1002 which was the struct
+termios c_cflag enum bits, but in 2.42 they changed cfsetspeed() to
+accept arbitrary rates and not just the baud enum values, and B115200
+was changed to the value 115200. This means you can no longer set the
+speed with c_cflag |= B115200 and should use cfsetspeed() to be
+compatible with both versions.
 
-Thank you for the quick turnaround, and for putting the D-state note in the
-header =E2=80=94 it says in one line what took me a paragraph.
+Aaron Brice (1):
+  btattach: Update for glibc 2.42 compatability
 
-Two things about v3, since my Tested-by rides on it.
+ tools/btattach.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-The tag still holds for this revision, and not only by inspection. Between
-the revision I tested and v3, the only changes are the comment wording in
-btintel_pcie.c and the new comment in btintel_pcie.h. Built out of tree
-from the same 7.0.0 driver, both revisions produce a .text section of
-21048 bytes with the same MD5, and btintel_pcie_set_dxstate disassembles
-to the same 116 instructions; only debug sections differ, by 8 bytes, from
-the shifted line numbers. So the object code I exercised on the hardware
-is the object code v3 produces.
-
-The CI failure in this thread is against the 14:29 posting, whose header
-hunk was cut at line 53. The 15:35 resend applies cleanly to
-bluetooth-next at 6696072ffe07 =E2=80=94 checked with git apply, and it pro=
-duces
-the diffstat the patch declares. As of 17:15 UTC the resend has had no CI
-reply, where the earlier posting had one within eighteen minutes, so it
-may be worth confirming it was picked up as a new revision.
-
-Sergey
+-- 
+2.53.0
 
