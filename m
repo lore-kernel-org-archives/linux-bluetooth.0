@@ -1,370 +1,178 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0989543CE65
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2026 23:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8299C26AC5
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 00:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788393100; cv=none; b=i9GemoL38jqItX1wKPcKyoCAwQWfPUyJ62VdvQNEacl001AMon3WCGIt71UHocLbyRdcFpYXN2T4iuaZY/Qyuee0Zo+mVYVlWa09VJX0l0Qiidf+CXYFJ0ei0oHBbLEfwAZv6LlR/YzQec5b1yJErRoI2n71yoeHIhum3sup8Ac=
+	t=1788394066; cv=none; b=lsnmVL4xMwYPTmR9y6piJ+kBdLM02FR5BOMEsn1s6yZ2nF13GsjTEkeA6+thC/EfncZlckhU9i0+JBf3hvyAfu2C+blosQdtrtkHj83plZoK0tTpFKF3YFFPhotieBOjQKMewU4zUF7D4u+BpTq5AGH3fUIPJIgYduDY/IupLVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788393100; c=relaxed/simple;
-	bh=eU/uuLi+YQs2Rn97dRNDHCdEe+FCw/ffG1yyOjwjsOg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nNxOeGQMx3evzJry7Y1r+ODoONQiLd0HX2OXYuCP29szh8doezVLjBnbaNORcs9Zbe1Wx56UNkBKrp3RGpfUzB7YgNV7yEwQdI7oNKHO8Wx2uqt+Ollvzhj2MaGoPgZe+10AlVOQ4pEQcknfsw6IzLhggw4hX5YAjJiucsd6Wb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqGvWXt6; arc=none smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1788394066; c=relaxed/simple;
+	bh=TG/pXqC7AD0N2u2bca97x6eqsIWmbUnM1jjGw6UXKto=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dgJJcv4UiUdc7apGUIRwkGo4LDOj54EXQXF627hhIgfbl/4F0BC9XIEb17BFWQtnCCjt+3nIbuUoJsaMgpPpwR839gdCWFJnpIGIRGFoqwUu8cler7wnk7h1k5Of6ogho5A/QS4VFAeZHLB055JtHQ261QFj8EHWWgYCSlLD1b8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p4zRTtbj; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqGvWXt6"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c20e70a0962so216290166b.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 16:51:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4zRTtbj"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-93900ed2925so166438685a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2026 17:07:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788393097; x=1788997897; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jYXtLBALPx9e/T0GAHUCf/DAFQqv12WcNJ3RrRvs8YQ=;
-        b=mqGvWXt6nZX+7GObf4XVaBBoad9n8onbUMqfqVlq1S+pIjm+7qLTCMbvp+DAjKxOZx
-         DciB/0LiKdHVfPwm8+v5/8b2Tsjb03nHTDDlthabQbgtr8xiOZpVvW8NqMX3wNyBCD8o
-         DFWCDhg8zaPUhZ7h1dKK0HhgbUVeqVuxGHVMAxH0lMn94VT5QQ55JGemCk9Mlx52KFBA
-         WdGGKwKgCxLtpzIPLdDtGRrN1sQ0FCMVfUrZHwoYJVQBbEFoR2NL7daSoxxHLDzmCgOn
-         YYZGBqIBlM4HdLvDdvXV6n97Un4DXe+x19TvwHpXBxaN5GqL9vCajfhb3V+bdWoYjcNa
-         akQQ==
+        d=gmail.com; s=20251104; t=1788394063; x=1788998863; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=hUfQIz5YdiJEhDXzYMKAIMltixkNbgPu0QUyH+fBxrk=;
+        b=p4zRTtbjd+tCQgdpubT7Bm3yXVruswNfLcTLbdGyLVDcUl3HvaSO0SyZoPWYOHGhZk
+         IMr3qWCpIBcCml6rcAdJt0PkK8Yf7JqzW/YBF7RLKI8rq5bPplht2nvN74CwwpzAEpBW
+         pjFjTfy4ByRODZTAq6aX67X756r2cDve8nHrLe6Cf8WTMT8juOdfTXBV67XNV1uWK7hq
+         VQS6zONngPsoMj7yWzz4XJ288zk+A1Tps3gGcRljyHCdMnBfy3aEtVjdCB3KigKnlLEK
+         b0AP5GtlhZNvkHb9NVUOtKP4lq7IXY94g4T9EmcCd5agS2uKfiHcn3BnxuixW9oOGulK
+         u6yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788393097; x=1788997897;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=jYXtLBALPx9e/T0GAHUCf/DAFQqv12WcNJ3RrRvs8YQ=;
-        b=QQzd8MD6fQh3v/HNwsMAnmrQmyeIJwKSu8JGQntvCmhrq9BTTe2gx9clYqL0YYbcmg
-         FgtVA47rGTKX7PMVBCM7hS8kXo3YNLKrBt3Sx4+/a94EGWmwVlhy1KSrqnntx3g/z/IW
-         eGgcl3/r2ipM6/hRrnI3W+X1inHJyma5gs6Z2Ol1dNkQZlX+gUQxAYv/ucyWTVz4Vqma
-         wKyJMPTSZ9rIuc1XI5NhHZL8J0R4JQY9UjAuPVzs4FyMOBPPsdNdfFeDVfyVi+vepBZM
-         DVmvx9ysj7Rzu+5/+ZkiB4888nbw3GI2Moqn3iKp+9XCrvC7XxHGuvYQvXPfb/xEA4KD
-         o65A==
-X-Forwarded-Encrypted: i=1; AKwUvBx8o0Ob6ladBRNbe5znQo8OU+EgfYyTW4GZ0HqvOoz6tAhtsKel3emtTfPSl/GqYKTiBhio2RqtuVrEwt9svuI=@vger.kernel.org
-X-Gm-Message-State: AFuF++kWthi+/2iuuRvSXFqS1iBzpO9g1Tvw/kpaG2KBzKEUUoL7dFlH
-	LKhHQc1diavWbftRPpe5yu+gaujKYiKh7Y4PFxeFhc059sRz7+f8FtFo
-X-Gm-Gg: AYBFou2qFCrNKvqmplwzm3oWbPpXnu5uGQlC+8+YZSrzRV5140LuzofPG9TY9U2xKx9
-	dLsKfPlKeMZV3jVMM5QZAEW/CmxLxD5aa3SX/AheTbM0+vVP8ebfbm3BYyjKFDcY2B3aJop2V82
-	QKf5C8vRegjJDZxgYdEvdYNQm/tCPmNYwimytJ5M31Nprtb1f1fA0EY0NoL6mCs29U0M4+E1qyL
-	iMBil6IX7NuNb/GJECopi7kZVUBO6FRTLhTRaRuW/7YsxaoEGAKiuotUfclTwV4e88hKfPX+vJ5
-	+zFi0Lh+fmgFaWIfQnkZGHGMjxXCS2DKmdg7Ja1erDopx/cmHKkE83YnVi3qM30Ryvmf96zYGvn
-	zxppj2lEMNaelwNseuuMK9vS7ThMFArUCXTIHskWnoQGX8qXJBgzAOm4dbmEb6Y+P0iKboYb8yD
-	fi/3/hV1LzQrNgSmGHNQsUDKE7qpQWqgT+VMlshcSz3nbWDfF95kV7Tky2BfBvF9iXSAldRIvHm
-	eaFWP/HMfLyH4oFa1YkQICv0+nUiD83vgXHfaef8CDRm121NZDWTb6y52jb
-X-Received: by 2002:a17:907:944c:b0:c20:1bc5:7002 with SMTP id a640c23a62f3a-c25d53bd46amr521088466b.3.1788393097047;
-        Wed, 02 Sep 2026 16:51:37 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c25f4230f80sm22077666b.51.2026.09.02.16.51.34
+        d=1e100.net; s=20251104; t=1788394063; x=1788998863;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=hUfQIz5YdiJEhDXzYMKAIMltixkNbgPu0QUyH+fBxrk=;
+        b=YhLyqICJsTfzi3W3teTBxgvRdimKysdm2wt7RQpU+BzyCLYTnwIB2xeeKVU6SUnxJR
+         KhpOnVJkgf5FrVaGe8Eqg7xkV0tsuE83onijm0r15GpHvGP1MAODVZ0mrALlsXflyQ/u
+         8ETbimJAtwbK2RAVgAWI4vd0gUNeh5bFNBuhUVad16rTKdIrFCnlh1abzgpoygaEcmSt
+         rJ0xdssl+UjYjWe9A2KctVANn5+1rBOG1GerL3BX1Jyx3Kx1Riwk3CTMQpYUBNxF9LmY
+         E6jTe/N9cInPd6VccMtTLaR7AehXu4y83m4G8moYCJOb7+I0EIadsPlwXd47QveQSJyc
+         gVWA==
+X-Gm-Message-State: AFuF++neUpO55Wi5rFHNMSK2bdnWKrvqeR820F/xBiaFHMUN3/CRJPti
+	6CaJGLZFT40Nd/RwZ6PXtBpI/71+Q8NCLAYlGk3vyuLt/b3vw8ALfaaUBGRbqA==
+X-Gm-Gg: AYBFou3yOfI5Q9VfYuiql4Vrdq7GYR7OXJTVRi9iIV0ndrFI/YFXEJkmU2HS1H+ZM5s
+	ZffuyGBg6/zF2jCgeosEDqwFKFgWyBS2654B6WyVVOxfHqssYlWY6KhHS6Bka7PQqr1vzAMgwJG
+	baAbM9hMdVQIFTfigdtJ+1Qve0arPJd0Cy/LE4554MxLNQ1kUQHBdcL1Ud1RRgi4hhoWEo24W7B
+	x56PA2yECqzlOBQIOyIFuhxYLsR6PcjqUt2bRCpbrit7aAdJuvbOEoD1Z1grALP/CtLTzVzgNeR
+	noJ6co5Nq/wxR5qZ1pPX3j3G+Ts/XjnGf9vUB9OVEs54F5XkSUI5KibPQd85otJttcdDYFTRxq7
+	NIesZEgoLKXSEVb0wNkCtAx3ttv+fEBOc3WVVlgm0bSyIGjdQWdztklzf9eryb//dA4VZO0sIn7
+	j1aw3ETgi2FTuXxZHrtSwfV/2bDLEIooI2WUMBNrfIfW5L3wJhaUkZX89HPzkqRE9hMtw=
+X-Received: by 2002:a05:620a:4442:b0:939:6de6:951a with SMTP id af79cd13be357-9396de69720mr368739785a.49.1788394063187;
+        Wed, 02 Sep 2026 17:07:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.95.147])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9395f157807sm345699385a.9.2026.09.02.17.07.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 16:51:35 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: nicoyip.dev@gmail.com,
-	pav@iki.fi,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-	syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: RFCOMM: defer security confirmation to krfcommd
-Date: Thu,  3 Sep 2026 04:51:32 +0500
-Message-ID: <20260902235132.453044-1-mikhail.v.gavrilov@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        Wed, 02 Sep 2026 17:07:42 -0700 (PDT)
+Message-ID: <6a98ba4e.c394364f.104264.47f7@mx.google.com>
+Date: Wed, 02 Sep 2026 17:07:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8312432479605784158=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3,1/3] Bluetooth: btusb: Fix UAF of btusb_data by rx_work
+In-Reply-To: <20260902214620.44041-1-luiz.dentz@gmail.com>
+References: <20260902214620.44041-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-An RFCOMM connect() issued while a BR/EDR link is being authenticated
-makes lockdep report a circular dependency, and the reported cycle is a
-real AB/BA between rfcomm_mutex and hdev->lock.
+--===============8312432479605784158==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-rfcomm_security_cfm() is called from the HCI event path, which already
-holds hdev->lock:
+This is automated email and please do not reply to this email!
 
-  hci_rx_work()
-    hci_event_packet()
-      hci_cc_read_enc_key_size()   [hdev->lock]
-        hci_encrypt_cfm()          [hci_cb_list_lock]
-          rfcomm_security_cfm()    [rfcomm_mutex]
+Dear submitter,
 
-while an RFCOMM connect() from userspace takes the same two locks the
-other way round:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1156528
 
-  rfcomm_sock_connect()
-    rfcomm_dlc_open()              [rfcomm_mutex]
-      __rfcomm_dlc_open()
-        rfcomm_session_create()
-          kernel_connect()
-            l2cap_sock_connect()
-              l2cap_chan_connect() [hdev->lock]
+---Test result---
 
-  WARNING: possible circular locking dependency detected
-  kworker/u131:1/1128 is trying to acquire lock:
-  rfcomm_mutex, at: rfcomm_security_cfm+0x31/0x3e0 [rfcomm]
-  but task is already holding lock:
-  hci_cb_list_lock, at: hci_cc_read_enc_key_size+0x1d2/0xcc0
-  Chain exists of:
-    rfcomm_mutex --> &hdev->lock --> hci_cb_list_lock
+Test Summary:
+CheckPatch                    FAIL      3.24 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       FAIL      1.00 seconds
+SubjectPrefix                 PASS      0.40 seconds
+BuildKernel                   PASS      24.49 seconds
+CheckAllWarning               PASS      26.76 seconds
+CheckSparse                   PASS      22.29 seconds
+BuildKernel32                 PASS      20.20 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      408.63 seconds
+TestRunner_l2cap-tester       PASS      68.52 seconds
+TestRunner_iso-tester         PASS      103.83 seconds
+TestRunner_bnep-tester        PASS      14.86 seconds
+TestRunner_mgmt-tester        FAIL      223.65 seconds
+TestRunner_rfcomm-tester      PASS      19.83 seconds
+TestRunner_sco-tester         PASS      25.26 seconds
+TestRunner_ioctl-tester       PASS      20.69 seconds
+TestRunner_mesh-tester        FAIL      20.57 seconds
+TestRunner_smp-tester         PASS      18.37 seconds
+TestRunner_userchan-tester    PASS      15.47 seconds
+TestRunner_6lowpan-tester     PASS      17.96 seconds
+IncrementalBuild              PASS      26.43 seconds
 
-hci_auth_complete_evt() and hci_encrypt_change_evt() reach the callback
-the same way.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v3,2/3] Bluetooth: Move H:4 reassembly into the Bluetooth core
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#331: 
+new file mode 100644
 
-Both orders have to be seen in the same boot, which is why a BR/EDR
-connection alone is not enough to show it: a session set up by the
-remote side is created by rfcomm_accept_connection() in krfcommd, which
-calls kernel_accept() and never takes hdev->lock under rfcomm_mutex.
-Connecting a device that authenticates and encrypts the link and then
-calling connect() on an RFCOMM socket towards any address - the connect
-does not have to succeed, the order is recorded before the page timeout
-- reports it every time.
+total: 0 errors, 1 warnings, 0 checks, 419 lines checked
 
-The callback does not have to run in the HCI event context at all: it
-only updates DLC flags and timers that krfcommd consumes in
-rfcomm_process_dlcs(), and it already ends with rfcomm_schedule().  So
-queue the confirmation instead of taking rfcomm_mutex from the HCI
-event path, and let krfcommd apply it under rfcomm_mutex on its next
-pass, ahead of session processing.  The queued entry carries the local
-address and a reference on the connection, so the session lookup and
-hci_conn_check_secure() stay valid without hdev->lock.  A confirmation
-that cannot be allocated is dropped and the DLC closes on its auth
-timeout.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Fixes: 759c185d0bbd ("Bluetooth: RFCOMM: serialize security confirmation handling")
-Reported-by: Pauli Virtanen <pav@iki.fi>
-Closes: https://lore.kernel.org/linux-bluetooth/5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi/
-Reported-by: syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/linux-bluetooth/6a92fadc.08e933ee.dbf97.008f.GAE@google.com/
-Cc: stable@vger.kernel.org
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+/github/workspace/src/patch/14785931.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3,1/3] Bluetooth: btusb: Fix UAF of btusb_data by rx_work
+
+13: B3 Line contains hard tab characters (\t): "	while ((skb = skb_dequeue(&data->acl_q)))"
+14: B3 Line contains hard tab characters (\t): "		data->recv_acl(data->hdev, skb);"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.267 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.856 seconds
+Mesh - Send cancel - 2                               Timed out    1.990 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/692
+
 ---
+Regards,
+Linux Bluetooth
 
-The commit this fixes is in v7.3-rc1 and is marked for stable, so this
-probably wants the bluetooth fixes tree rather than -next.
 
-Tested on 7.3.0-rc1 with an MTK MT7921 controller (btusb) and a JBL
-Tour Pro 3 headset.  Without this patch the steps above report the
-inversion on every run.  With it applied the reproducer leaves the
-validator armed and silent (debug_locks: 1), and a 5.5 hour session
-with four headset connects, HFP/SCO audio and AVRCP produced no
-lockdep report either.
-
-The connect() side used for testing, so that it does not depend on which
-end sets up the HFP session:
-
-  #include <stdint.h>
-  #include <string.h>
-  #include <unistd.h>
-  #include <sys/socket.h>
-
-  #define BTPROTO_RFCOMM 3
-
-  struct sockaddr_rc {
-	unsigned short	rc_family;
-	uint8_t		rc_bdaddr[6];	/* little endian */
-	uint8_t		rc_channel;
-  };
-
-  int main(void)
-  {
-	struct sockaddr_rc addr = { .rc_family = AF_BLUETOOTH,
-				    .rc_channel = 1 };
-	int fd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-	memcpy(addr.rc_bdaddr, "\x55\x44\x33\x22\x11\x00", 6);
-	connect(fd, (struct sockaddr *)&addr, sizeof(addr));
-	close(fd);
-	return 0;
-  }
-
- net/bluetooth/rfcomm/core.c | 139 ++++++++++++++++++++++++++----------
- 1 file changed, 100 insertions(+), 39 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index f7463f092283..728a6bd2986b 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -49,6 +49,18 @@ static DEFINE_MUTEX(rfcomm_mutex);
- 
- static LIST_HEAD(session_list);
- 
-+/* Security confirmations handed over from the HCI event handler to krfcommd */
-+struct rfcomm_sec_cfm {
-+	struct list_head	list;
-+	struct hci_conn		*conn;
-+	bdaddr_t		src;
-+	u8			status;
-+	u8			encrypt;
-+};
-+
-+static LIST_HEAD(security_cfm_list);
-+static DEFINE_SPINLOCK(security_cfm_lock);
-+
- static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
- static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
- static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
-@@ -2122,6 +2134,73 @@ static void rfcomm_process_sessions(void)
- 	rfcomm_unlock();
- }
- 
-+/* Must be called with rfcomm_mutex held */
-+static void __rfcomm_security_cfm(struct rfcomm_sec_cfm *cfm)
-+{
-+	struct rfcomm_session *s;
-+	struct rfcomm_dlc *d, *n;
-+
-+	s = rfcomm_session_get(&cfm->src, &cfm->conn->dst);
-+	if (!s)
-+		return;
-+
-+	list_for_each_entry_safe(d, n, &s->dlcs, list) {
-+		if (test_and_clear_bit(RFCOMM_SEC_PENDING, &d->flags)) {
-+			rfcomm_dlc_clear_timer(d);
-+			if (cfm->status || cfm->encrypt == 0x00) {
-+				set_bit(RFCOMM_ENC_DROP, &d->flags);
-+				continue;
-+			}
-+		}
-+
-+		if (d->state == BT_CONNECTED && !cfm->status &&
-+		    cfm->encrypt == 0x00) {
-+			if (d->sec_level == BT_SECURITY_MEDIUM) {
-+				set_bit(RFCOMM_SEC_PENDING, &d->flags);
-+				rfcomm_dlc_set_timer(d, RFCOMM_AUTH_TIMEOUT);
-+				continue;
-+			} else if (d->sec_level == BT_SECURITY_HIGH ||
-+				   d->sec_level == BT_SECURITY_FIPS) {
-+				set_bit(RFCOMM_ENC_DROP, &d->flags);
-+				continue;
-+			}
-+		}
-+
-+		if (!test_and_clear_bit(RFCOMM_AUTH_PENDING, &d->flags))
-+			continue;
-+
-+		if (!cfm->status && hci_conn_check_secure(cfm->conn,
-+							  d->sec_level))
-+			set_bit(RFCOMM_AUTH_ACCEPT, &d->flags);
-+		else
-+			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
-+	}
-+}
-+
-+static void rfcomm_process_security_cfm(void)
-+{
-+	struct rfcomm_sec_cfm *cfm, *n;
-+	LIST_HEAD(cfm_list);
-+
-+	spin_lock(&security_cfm_lock);
-+	list_splice_init(&security_cfm_list, &cfm_list);
-+	spin_unlock(&security_cfm_lock);
-+
-+	if (list_empty(&cfm_list))
-+		return;
-+
-+	rfcomm_lock();
-+
-+	list_for_each_entry_safe(cfm, n, &cfm_list, list) {
-+		__rfcomm_security_cfm(cfm);
-+		list_del(&cfm->list);
-+		hci_conn_put(cfm->conn);
-+		kfree(cfm);
-+	}
-+
-+	rfcomm_unlock();
-+}
-+
- static int rfcomm_add_listener(bdaddr_t *ba)
- {
- 	struct sockaddr_l2 addr;
-@@ -2201,12 +2280,18 @@ static int rfcomm_run(void *unused)
- 	while (!kthread_should_stop()) {
- 
- 		/* Process stuff */
-+		rfcomm_process_security_cfm();
- 		rfcomm_process_sessions();
- 
- 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
- 	remove_wait_queue(&rfcomm_wq, &wait);
- 
-+	/* rfcomm_exit() unregisters the HCI callback before stopping this
-+	 * thread, so no further confirmation can be queued here.
-+	 */
-+	rfcomm_process_security_cfm();
-+
- 	rfcomm_kill_listener();
- 
- 	return 0;
-@@ -2214,50 +2299,26 @@ static int rfcomm_run(void *unused)
- 
- static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
- {
--	struct rfcomm_session *s;
--	struct rfcomm_dlc *d, *n;
-+	struct rfcomm_sec_cfm *cfm;
- 
- 	BT_DBG("conn %p status 0x%02x encrypt 0x%02x", conn, status, encrypt);
- 
--	rfcomm_lock();
--
--	s = rfcomm_session_get(&conn->hdev->bdaddr, &conn->dst);
--	if (!s) {
--		rfcomm_unlock();
-+	cfm = kmalloc_obj(*cfm);
-+	if (!cfm)
- 		return;
--	}
--
--	list_for_each_entry_safe(d, n, &s->dlcs, list) {
--		if (test_and_clear_bit(RFCOMM_SEC_PENDING, &d->flags)) {
--			rfcomm_dlc_clear_timer(d);
--			if (status || encrypt == 0x00) {
--				set_bit(RFCOMM_ENC_DROP, &d->flags);
--				continue;
--			}
--		}
- 
--		if (d->state == BT_CONNECTED && !status && encrypt == 0x00) {
--			if (d->sec_level == BT_SECURITY_MEDIUM) {
--				set_bit(RFCOMM_SEC_PENDING, &d->flags);
--				rfcomm_dlc_set_timer(d, RFCOMM_AUTH_TIMEOUT);
--				continue;
--			} else if (d->sec_level == BT_SECURITY_HIGH ||
--				   d->sec_level == BT_SECURITY_FIPS) {
--				set_bit(RFCOMM_ENC_DROP, &d->flags);
--				continue;
--			}
--		}
--
--		if (!test_and_clear_bit(RFCOMM_AUTH_PENDING, &d->flags))
--			continue;
--
--		if (!status && hci_conn_check_secure(conn, d->sec_level))
--			set_bit(RFCOMM_AUTH_ACCEPT, &d->flags);
--		else
--			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
--	}
--
--	rfcomm_unlock();
-+	/* The connection is pinned for hci_conn_check_secure(), but it drops
-+	 * its reference on hdev once it is deleted, so take a copy of the
-+	 * local address needed for the session lookup.
-+	 */
-+	cfm->conn = hci_conn_get(conn);
-+	bacpy(&cfm->src, &conn->hdev->bdaddr);
-+	cfm->status = status;
-+	cfm->encrypt = encrypt;
-+
-+	spin_lock(&security_cfm_lock);
-+	list_add_tail(&cfm->list, &security_cfm_list);
-+	spin_unlock(&security_cfm_lock);
- 
- 	rfcomm_schedule();
- }
--- 
-2.55.0
-
+--===============8312432479605784158==--
