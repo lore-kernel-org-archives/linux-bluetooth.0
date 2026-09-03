@@ -1,35 +1,36 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from out-44.smtp.github.com (out-44.smtp.github.com [192.30.252.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE27343E487
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 11:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CF74399C6
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 11:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788433997; cv=none; b=iQsEGztUcXJH9bCBSPrtTT1qxWtPzIWyCaMhNnhBJefOER9YQxLcsrPE18Vq2Cu6hhfgj/pmvHTROhrTmjJ5E5mNKyJZPzatvGReP70VJNTF8nhGQsYLkiccDaupHlprKQKO1GR3CIO+TtkfSJoJ8XiqfHK+t7J7J9g6kEqStHA=
+	t=1788434000; cv=none; b=gjOIJTX6NmCyrE2WINasGHKtDl4MgVvp2VcqXX/IoAoj8OSrzcGLfg+qGtUxqByt2WwH3tk6utqgo73/aoI+KDlulm/zyDt0Vk+MFDE318BFk15nTjt2av/lpZ58EMT/bGiP92nx9HiIP+ViWiuGWsUyf7N9Jwo8nX03VNb3CNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788433997; c=relaxed/simple;
-	bh=NpNr3R4j9ld+AhZYo46Mbess49k0Aotlc5zr4QKrzIs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=uSbfe83QfpJ0PDVDm1jgE6gE/wkoIlTGBSbhVurLVNOAJLp3vf1TVRN9IDw4nFxyQZNmDttXTpLSGUDCGRxK7xCqSx1kdJ5uiG1Vx0+65M/TBW+7xaBkQVY6syHlaUiz0xgI2sYP/9WNQqkmJe/umJCo92QLD403J7lKmLG9Vts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XfoYgskz; arc=none smtp.client-ip=192.30.252.202
+	s=arc-20240116; t=1788434000; c=relaxed/simple;
+	bh=XNyWQXlP9fGBE7hUu8nc3iXRXWYWcef7Br9NBRoty60=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MGIasv2F67tkqnURwDR3/HmLoFHcHMjDMxUDUmAT63MUQalmuAW80od1hzI8WcC8zl+Ei71kecSdtI0e+Rvg7DE1sr8OtGaKC6DXKxG0uZd8cnicZ0RDESrjrfDIhSjcUfROHB7AGFUgsa6CV+5Q+M2qdcw+iJwXn2gIFGuUbS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QBO0Z4xL; arc=none smtp.client-ip=192.30.252.143
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XfoYgskz"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QBO0Z4xL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788433993;
-	bh=MrSpHix8nVkLA7I4Mu9ZTT9Y9s8P6Yy1j9mbcyrU9vM=;
+	s=pf2023; t=1788433997;
+	bh=iSmQO8RbLgWm8ihiqdy+abGxRCYV4Ha5aFrD4B9RL8U=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=XfoYgskzEiWes8QrftMxs9RH3rnbfQ0s8Ri7Lr6iYQo8HQ68cAEjHJZVCEns/gTVB
-	 vTkpT/tlfxT+XZb7l5DGSUqTtL5bLCiFVQXfrC2z+JkeP7cOG2qjejF9yQJPSku0F6
-	 CGlrzJAjEGoKYyIRuS49iOAf0SkMi8z3mcpUmcRQ=
-Received: from github.com (hubbernetes-node-f1e3c89.va3-iad.github.net [10.48.67.85])
-	by smtp.github.com (Postfix) with ESMTPA id ECDB42813F1
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 04:13:13 -0700 (PDT)
-Date: Thu, 03 Sep 2026 04:13:13 -0700
+	b=QBO0Z4xLvJM3SxB/1dyM4VL9jw8UmzI0C4bk+DpWKvaS94eh5jYmPsXoszZYokDXF
+	 gREHUhdTuPh05YbXCBBJOSwAvVRCqw5gELtW+u3WeBTlYfnaPEdthS5cgUY1JeU8cQ
+	 Ic/YK+ZahG0y90iO5QzPL0uNFUU2J1fEzzwUS8Zg=
+Received: from github.com (hubbernetes-node-a6e7b9c.ash1-iad.github.net [10.56.144.37])
+	by smtp.github.com (Postfix) with ESMTPA id 5416B84155C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 04:13:17 -0700 (PDT)
+Date: Thu, 03 Sep 2026 04:13:17 -0700
 From: raghava447 <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1156754/000000-2d91fc@github.com>
-Subject: [bluez/bluez] 7b6fda: doc/qualification: Add ASCS PICS file
+Message-ID: <bluez/bluez/push/refs/heads/1156893/000000-f9929a@github.com>
+Subject: [bluez/bluez] 98bd20: doc/qualification: Add PICS and howto for the
+ BAP ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,38 +43,53 @@ Content-Transfer-Encoding: quoted-printable
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1156754
+  Branch: refs/heads/1156893
   Home:   https://github.com/bluez/bluez
-  Commit: 7b6fda2d119c621ee6c18970c808be3c066c6f70
-      https://github.com/bluez/bluez/commit/7b6fda2d119c621ee6c18970c808b=
-e3c066c6f70
+  Commit: 98bd20a52922c93ad5671db772a51873c3ef5c30
+      https://github.com/bluez/bluez/commit/98bd20a52922c93ad5671db772a51=
+873c3ef5c30
   Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
   Date:   2026-09-03 (Thu, 03 Sep 2026)
 
   Changed paths:
-    A doc/qualification/ascs-pics.rst
+    A doc/qualification/bap-pics.rst
+    A doc/qualification/bap-pts.rst
 
   Log Message:
   -----------
-  doc/qualification: Add ASCS PICS file
+  doc/qualification: Add PICS and howto for the BAP qualification
 
 
-  Commit: 2d91fce1871af858c2d93516b534cfde5410c5a5
-      https://github.com/bluez/bluez/commit/2d91fce1871af858c2d93516b534c=
-fde5410c5a5
-  Author: raghavendra <raghavendra.rao@collabora.com>
+  Commit: 57c45ae936fb948f8fc9c721437fa7dd936a5d41
+      https://github.com/bluez/bluez/commit/57c45ae936fb948f8fc9c721437fa=
+7dd936a5d41
+  Author: Raghavendra Rao Sidlagatta <raghavendra.rao@collabora.com>
   Date:   2026-09-03 (Thu, 03 Sep 2026)
 
   Changed paths:
-    A doc/qualification/ascs-pts.rst
+    M doc/qualification/bap-pts.rst
 
   Log Message:
   -----------
-  doc/qualification: add ASCS PTS tests documentation
+  doc/qualification: Add BAP/UCL tests
 
 
-Compare: https://github.com/bluez/bluez/compare/7b6fda2d119c%5E...2d91fce=
-1871a
+  Commit: f9929a8e6ef6ece2551a93e64c3c2083ecf6ced9
+      https://github.com/bluez/bluez/commit/f9929a8e6ef6ece2551a93e64c3c2=
+083ecf6ced9
+  Author: Raghavendra Rao Sidlagatta <raghavendra.rao@collabora.com>
+  Date:   2026-09-03 (Thu, 03 Sep 2026)
+
+  Changed paths:
+    M doc/qualification/bap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: Add BAP/USR tests
+
+
+Compare: https://github.com/bluez/bluez/compare/98bd20a52922%5E...f9929a8=
+e6ef6
 
 To unsubscribe from these emails, change your notification settings at ht=
 tps://github.com/bluez/bluez/settings/notifications
