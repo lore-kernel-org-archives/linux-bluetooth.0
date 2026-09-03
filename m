@@ -1,113 +1,80 @@
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57250511209;
-	Thu,  3 Sep 2026 19:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578E9503BC8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 20:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788465247; cv=none; b=DczM0etnP8XsPxXPRFfIXHL2rT+8RU8V9mQzKKvTiH5vHT7dOcuo5MTWtc6kL0CCnch16Kb5ukCtDqqKspnRl2aIUXlFfdjjfK7AJ8Dd2gTXj19KUOgZGK8SffNYYkVH6bV3OLAhZ707hTiNoS2acPABWhaaI3QNzxMTv9r43RI=
+	t=1788465676; cv=none; b=m6bEUHmVhVK8qFCBfg6q08hv1z/0Tup5K0+M2r1AnAlxg+kCZ/ibTmK+a8k9Gro3YR9JFE/MdgAPqedzUrYPpuL/xReaNbwZb/EVeBhkWS8/lh54vFdCqNi7TRtJOakqQ84RmitNFwu3FAZ/ScKxIPjHT5gEGkhKKX/33TU8rwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788465247; c=relaxed/simple;
-	bh=fIMHLyyG4vTq+ZqLREyakOLkmH+dwv5+f8WX6EukCm0=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pbqDbNAWSOP1ic+/oQ1NlxN/MoLAMuGBoE9tH3b8IdGT/xKVCOKprrIuXFKReYShZHeQjpmPDWxYe5Mgezh88BRy5oLjk50qxuNIdBoi22+gkKRvKGlO8RHtcm0eEtZm+62h9mMJbcfnrmGQzsOTPc0y0lAFZs04txLPYRd4J3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=fX6ERHuA; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1788465676; c=relaxed/simple;
+	bh=A9SfJvieCkU1SlD51YXIqKi3OEw3BkJ4D535bkq14OE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=j+segQuIHHMYKbt+33J4BPklxw/Q2+SUIrpWfXM1orneYMvcltZ9oKL79Pp4Ceuqks5lmiIGxVNAZxFXggW0GQOmuNrGru++IQfi54ZZ3IZwEGFuGnL759J8LfWYM9ipnrMl4KEObvIzW3AQKzt4fQLwhMfwin1MiNAyI9QAKgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BHP6uGYM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="fX6ERHuA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1788465232; x=1788724432;
-	bh=1QgznbOgvUg459L5zM9/psIURXxCsT4oTnvwjIkAZso=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=fX6ERHuAvrxEDWxySTjwbOx9DympMRedmxaMyIsnYYaXWcgFVVBgkhsx4OUeVM8f0
-	 LfC8S7RIAMwYUxyOL4RNYJAI+d8pKQ/LnGsNIrtIf5fD70bGVwk7v3xjt5/uU7z6WJ
-	 pwwKKMqhwsfB9Jcp3Ny5IS6YfOoH8gpCsaL5PwFS1XWmg36jcY3qzYBzA6d29yJIKU
-	 apO72ro72Ksfa82k82WlBE3fgJP2pHsz2VqmFUf+zFcdtXU7iVLUbp9r431n/58ITV
-	 M2M0hhxdsdVDWyzPFa8MrchoKyUf8TNU6x4LNt4hQGL7LuyBYBxJjf5Ki6sfjg6kTZ
-	 Sv1f+7owbi/7Q==
-Date: Thu, 03 Sep 2026 19:53:48 +0000
-To: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>
-From: Sergey Lebedev <lsa.uz@pm.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Kiran K <kiran.k@intel.com>, Arnd Bergmann <arnd@arndb.de>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
-Message-ID: <20260903195342.78248-1-lsa.uz@pm.me>
-In-Reply-To: <20260903192245.135310-2-vladimirkondratyev2@gmail.com>
-References: <20260507203426.128975-1-vladimirkondratyev2@gmail.com> <20260903192245.135310-2-vladimirkondratyev2@gmail.com>
-Feedback-ID: 113843758:user:proton
-X-Pm-Message-ID: d87253f2add65cfeb4bb2841280d3a074352681a
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BHP6uGYM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C96B1F00A3D;
+	Thu,  3 Sep 2026 20:01:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788465670;
+	bh=zruMG89aLfsO+oGm9T2lySHRDO+39NRjXL/dUvFJ3eU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=BHP6uGYMAKjIY3RWyW0ly0AsQc1Ytqe9XnlqwXaRRyU6bnyM2HGe03bDMtZzoX2Vc
+	 usm1OyW5Vt38H8GjNfP0Kav9Yxo2JZBE7wvQrb/WNtAex+QB/+KSDiL1Zw/VDbaR12
+	 TNWk4KuNvgVnvEUGhohpIqDoZ2S2GseRtlA/J0VeXy2dxA/Li9F9xRhgPpdg9HB3a8
+	 tKxT8HpVvukl4EZ697k1SGmv/tNLSxA3DCTKOYwlodtdENsmW/m81QtG3MQIDYcGs9
+	 xcMqHuE5JjUw5GKte+5hLHV2UHc1f4OHrwVLXOTmM0rV2AEJZvla5Z+CghfbLfBVvX
+	 AvGj5fiGGoS9w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9386B38119DE;
+	Thu,  3 Sep 2026 20:00:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] Bluetooth: btintel_pcie: validate packet_len
+ before
+ skb_put_data
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178846561113.3994681.3604409237210142858.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Sep 2026 20:00:11 +0000
+References: <20260903145102.54675-1-kiran.k@intel.com>
+In-Reply-To: <20260903145102.54675-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
 
-Vladimir, Paul, Chandrashekar, Kiran,
+Hello:
 
-Nothing here asks for a change to v4 =E2=80=94 it is right and my Tested-by=
- stands. This
-is the measurement behind a question I put to the list on 2026-09-02 and co=
-uld
-not support with numbers at the time.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-The question was whether BTINTEL_PCIE_CSR_BOOT_STAGE_REG should be polled f=
-or the
-target D-state, with the alive interrupt demoted to an early exit, rather t=
-han the
-other way round. So I timed both against the same zero =E2=80=94 the write =
-in
-btintel_pcie_wr_sleep_cntrl() =E2=80=94 on Surface Pro 11 (Lunar Lake), Int=
-el BE201,
-8086:a876 rev 10, kernel 7.0.0-30, s2idle. A measurement build polls the re=
-gister
-every 100 us and records when bit 24 reaches the target and when gp0_receiv=
-ed
-becomes true. Four suspend/resume cycles, eight transitions:
+On Thu,  3 Sep 2026 20:21:01 +0530 you wrote:
+> btintel_pcie_submit_rx_work() reads packet_len from rfh_hdr without
+> checking if it exceeds the RX buffer size. An oversized packet_len
+> can lead to an out-of-bounds read in skb_put_data().
+> 
+> Validate packet_len to ensure it is non-zero and does not exceed
+> BTINTEL_PCIE_BUFFER_SIZE - sizeof(*rfh_hdr), logging an error when
+> invalid.
+> 
+> [...]
 
-  dxstate  register (us)              interrupt (us)
-  D3       1517  1027  1085  1111     1670  1171  1085  1112
-  D0       1630  1521  1676  1701     1630  1646  1676  1701
+Here is the summary with links:
+  - [v2,1/2] Bluetooth: btintel_pcie: validate packet_len before skb_put_data
+    https://git.kernel.org/bluetooth/bluetooth-next/c/de8d29ede6f3
+  - [v2,2/2] Bluetooth: btintel_pcie: fix tx_handle bounds off-by-one
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a8bfcece8b49
 
-The register reaches the target state in **1.0 to 1.7 ms** and is **never l=
-ater
-than the interrupt**. In four of the eight it is the same 100 us sample; in=
- two
-it leads by 125 and 153 us. Against that, the current path budgets 200 ms p=
-er
-attempt and three attempts =E2=80=94 up to 600 ms per transition, twice per=
- suspend cycle.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-That is the whole of my case, and its limits are worth stating plainly. One
-machine, one controller, one firmware. The poll itself is PCIe traffic and =
-could
-be perturbing what it measures, though it would have to be perturbing it in=
- the
-direction that flatters the register. And a settle time is not a guarantee:=
- an
-interrupt exists partly so the driver need not assume a bound.
-
-But if the bound holds on Intel's own hardware, polling would delete the
-stale-cache class of bug rather than catch it, and POLL_INTERVAL_US is alre=
-ady
-declared in btintel_pcie.h and unused.
-
-I have not written that patch, because it is your subsystem and my coverage=
- is
-one machine. What I do have is the hardware, a fixture that drops the alive
-interrupt on demand, and the per-hunk method already used in this thread. S=
-o if
-an RFC would be useful rather than noise, I will write one and report it th=
-e same
-way =E2=80=94 measured per hunk, with the failure injected and with it disa=
-bled. If you
-would rather it came from someone with the full range of controllers, that =
-is a
-perfectly good answer and I will leave it here.
-
-Sergey
 
