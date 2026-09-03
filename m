@@ -1,81 +1,57 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1842349CC4
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 14:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810304A8FE1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 14:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788445835; cv=none; b=nhM7TBggA9jNskXBduHYt+9/od1jFAEyq7DYTqtkSFJVQT6hLhjRC4mD0vY0JhzJKU8BoPdd7Zb1WA2bGuSmfJxvYKGHmXlWBJB5km5RJ4CGx/xeTW4L5tGFSrrG3+Hh6nVfYnHsHpuh4sRuoLL+eA5XC24RuPv2uoRmqOxm/vg=
+	t=1788445878; cv=none; b=a3nGUmuikGdV74olaUzvnsvcIQCulrsCk8GOnIFvNqXz//Cggb4vY8Gn5OgOru8qf65fdy9E7opCzNVttcRuAy2Apmcn483OB1HpUKHPNkxULUJnWwH7C51ik8BGdzHRkjXjd47p99e5wSutfGD7YBN7xXRDSxtqhH/FRZ21u/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788445835; c=relaxed/simple;
-	bh=vVqU8NJTRxh+VGEkeGhK8rxWKQs9YWWnbRoEi/l2GDY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mD0aKONGhq5bEkX3YeQEogrFFN7bUmqjp/QCt+nqJbqMEoswqZnJtvE422M54WA1uexssKLHs9JELJWBRGaSOhZ2XgtMp4fbJjCStOlD7x/9ZXo/STlS2jPMdxRSp9yYjCkODTpMbODWw+13PJGjiAK9G9P4cmuEDMy56Tt7SF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msBViy5s; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788445878; c=relaxed/simple;
+	bh=zPTeEmfYXKrwFm2QQig7yOIaGZXKBk6j+DNOZFRIM1I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C/z+Z6L1fvHBEEDaeMyn+NIYtrPMoPuc+Ljy5tCS06/tMH3WVVIkQpQrj4RX6JNPMk+G59xOusllSh0W5okV00nyq31bCOBTk/6Si0UteNtdRuHNuJqCy7u7aRlhnt0djXUOYV2itOIO0k5ZHirdtxO/3jH4adcHqIQThLKtqak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZqdG7K+j; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msBViy5s"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-482ea739de2so1363132f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 07:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788445817; x=1789050617; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mYhl2eFp8EfMt+iovCQKUWiL4an5eim8e/EO9APbOWA=;
-        b=msBViy5sxIIQg33EgcNCg7KqSu5n5Oq3BH7N911+Oy+hx4RvAV1pfGJe3ZV4H8PTmU
-         L+CGwdgnMTHU36sl7wTCYrY8CXGjD/AL8cogsMhre+2xopr9/rxxl8fBZk7iMMyMQN0w
-         eZNDZTVjAXaVPWVSYfxTuHXVvzrsPkeLU7MUWsg0II0etDZuV4dx1VicudAx37n5HsYV
-         hNMRe08aIAbRqkUE5txUEOpKHfiGJMeuQusvY/3/RUDaQxZ8wHQVLRMbSHHOcHz9IQPk
-         MQxzPJ+KbIcgwSdMfp9nizPajZLHGSZdZ4sN3PgmoCU22EAeMLEoTkAVRTPNNVviDFhI
-         ZdYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788445817; x=1789050617;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mYhl2eFp8EfMt+iovCQKUWiL4an5eim8e/EO9APbOWA=;
-        b=PsdDCwBCiLAq3rIajQJRImWtAs+lbSzinfFnPs2va3qe3CD16qJQu0sIygLVlKszpn
-         Id1+hpWh0UB1KTlS0WaH+PTdZon5IDvCGKSZbzgoER0V5cAG7s/ciHswMOCM0soxJ7B9
-         UovIhktzmMFK8zuGpX7g8RrBKZEc53vNu/QIftzAMBWxLA/0Gxw6tRaV/9ckap2L4OQe
-         JTPhTRnmiMRKnlUx7Kfh+/6jmWs1f5W2zdzkS9CMAUfFrop5EuHeKPhZrP9p/ES2acW0
-         ptsXBuCJMRrMw3gYNp76ADcVretBdhYqC9eUIb0FQfO2HbXzEV5eukQmJ0kPplQp0d44
-         9zNQ==
-X-Forwarded-Encrypted: i=1; AKwUvBx2keu6Tn2xzWa0y5je4gwnbFOn5iMJExAaOiouxNxLTZnh95/EoetW6FNnqBHqP4ciqBvh6e3SFAEzcCT0aSw=@vger.kernel.org
-X-Gm-Message-State: AFuF++lX8j+Xt2hW421MzIRgkHJgJzbP1ZS4i60uTyz8brXwcPHByQgV
-	+YdPLuRhwdLe8bpHtJh574C8s0AI0ZH7b39QXpLpQNKBbpna1Ge51NIC
-X-Gm-Gg: AYBFou20SvXl2R2E1DHLjDBQi8YFbbjQnunCHOvB/CPJZMvDa9rO/DLEe5uM8vprhU3
-	maWl/CuYeIcZX0u0lWAoErpLumUghwNE7PxN27qAQtExUWc9AERdg7ksAimIdqSfOoSnJBJMWQG
-	l9W2RobSRRksBRxsLc7wHv2Gh1knEI5kQvKRUqCLCv/9kdzrxlPjQOl/IjoV5WzGGmm8Eh7K3vc
-	6kz6NvEDeUNVUomeLIujWiBJrvYjq9VViCKWjze6XRgFxceAiFNq8wV5p9ulxA8slvY1AZPTD9Q
-	waRYBhF9ZeVZkUXtK3h8in7JTJeAPNsvsXu2lJ6fokc7j0V19wo4+jUuPcAR1k/+CJAaaXGOZev
-	n65wBeeOcpPqGriZRTG4evuw0EcPnhTmSrPj+OoWmTwPE3OcVt0Y56gayxYKXFeLkYWG5QUb6xS
-	Qlmms69rj7pM0J4DUkPmUql8m0EHJ8OCJMBzDScZkgWBUP3nuCWGkDqvu916KfyLlnt5MxTGwwR
-	1jThX8gg91sI4G5UB+A/7inhw0Wk6uIKrMH8IfQ9JUT7hcdUfbEBXIf4gL+PXDLofwUjL4=
-X-Received: by 2002:a05:600c:1c13:b0:499:da8b:1476 with SMTP id 5b1f17b1804b1-49cf5c08c06mr4934245e9.14.1788445816752;
-        Thu, 03 Sep 2026 07:30:16 -0700 (PDT)
-Received: from cdev ([2a02:8071:68c3:bd00::8998])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cee7febb4sm80476235e9.14.2026.09.03.07.30.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 07:30:15 -0700 (PDT)
-From: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	pmenzel@molgen.mpg.de,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZqdG7K+j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1788445864; x=1819981864;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zPTeEmfYXKrwFm2QQig7yOIaGZXKBk6j+DNOZFRIM1I=;
+  b=ZqdG7K+jGJvAeZ848xzgbcQD3v8g7li06OhDu93pdxWxYqiFZ2ZvFLSO
+   i0s6kXNyQLRvOKRbkgbHPeJaXTCnBMvu6Cf2e8reZYZI4sKy8rRBUqZHf
+   VmeHygAvxMIF2AmNB2j5KcdaPxag0pDonxYWolTFRP7e4Zr2BhGO7IZab
+   trKRo7u3+4e1ARysr+L6nRmjoDBof/4RbIAT/uX41uzwdpVHh9eGszGgn
+   EEuTSIv6JDNnGNW10h/xCsX7GGNC0n2viSS64hYkHbyfghWxqA7O2gJkw
+   Yog9qEqEU42i/1ctD5r3XGnnKleUcE7W9f9FTlm/YW9WVaXoKXmGl+d22
+   A==;
+X-CSE-ConnectionGUID: mbFycu+mTu6DX0PJzymBVg==
+X-CSE-MsgGUID: UTzrOSjBTQSYS+iLhAWNmA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11895"; a="91439993"
+X-IronPort-AV: E=Sophos;i="6.25,260,1779174000"; 
+   d="scan'208";a="91439993"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2026 07:30:59 -0700
+X-CSE-ConnectionGUID: QshMuhytRWK8JYa2xPaRdw==
+X-CSE-MsgGUID: ZLOPokN/T2+3I+D0XCt9/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,260,1779174000"; 
+   d="scan'208";a="294617136"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa001.fm.intel.com with ESMTP; 03 Sep 2026 07:30:58 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
 	chandrashekar.devegowda@intel.com,
-	arnd@arndb.de,
-	kiran.k@intel.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lsa.uz@pm.me
-Cc: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
-Subject: [PATCH v3] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
-Date: Thu,  3 Sep 2026 16:29:00 +0200
-Message-ID: <20260903142911.125301-2-vladimirkondratyev2@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260507203426.128975-1-vladimirkondratyev2@gmail.com>
-References: <20260507203426.128975-1-vladimirkondratyev2@gmail.com>
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2 1/2] Bluetooth: btintel_pcie: validate packet_len before skb_put_data
+Date: Thu,  3 Sep 2026 20:21:01 +0530
+Message-ID: <20260903145102.54675-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -84,69 +60,44 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-btintel_pcie returns -16 (EBUSY) during suspend, causing the entire suspend
-operation to abort on Intel Lunar Lake hardware. The system immediately resumes
-after every suspend attempt:
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2
-  btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend [btintel_pcie] returns -16
-  btintel_pcie 0000:00:14.7: PM: dpm_run_callback(): pci_pm_suspend returns -16
-  btintel_pcie 0000:00:14.7: PM: failed to suspend async: error -16
-  PM: Some devices failed to suspend, or early wake event detected
+btintel_pcie_submit_rx_work() reads packet_len from rfh_hdr without
+checking if it exceeds the RX buffer size. An oversized packet_len
+can lead to an out-of-bounds read in skb_put_data().
 
-btintel_pcie_set_dxstate() falls back to checking the controller state via
-btintel_pcie_in_d3/d0() when the alive interrupt is missed. However, these
-helpers read boot_stage_cache, which is only updated by the interrupt
-handler. As such, if the interrupt was missed, the cache is stale and the
-fallback check always fails, exhausting all retries and returning -EBUSY,
-causing suspend to abort.
+Validate packet_len to ensure it is non-zero and does not exceed
+BTINTEL_PCIE_BUFFER_SIZE - sizeof(*rfh_hdr), logging an error when
+invalid.
 
-The fix involves re-reading the hardware register before the fallback state
-check, consistent with btintel_pcie_resume().
+This issue was reported by Claude Mythos. It can be simulated either by
+using customized firmware configured to return an invalid packet_len or
+by modifying rfh_hdr->packet_len in the driver before calling
+btintel_pcie_submit_rx_work().
 
-Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221481
-Link: https://lore.kernel.org/linux-bluetooth/20260830151550.44687-1-lsa.uz@pm.me/
-Signed-off-by: Vladimir V. Kondratyev <vladimirkondratyev2@gmail.com>
-Tested-by: Sergey Lebedev <lsa.uz@pm.me>
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- drivers/bluetooth/btintel_pcie.c | 8 +++++---
- drivers/bluetooth/btintel_pcie.h | 1 +
- 2 files changed, 6 insertions(+), 3 deletions(-)
+changes in v2:
+- Update commit message
+- Add more debug information in error message
+
+ drivers/bluetooth/btintel_pcie.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index fda474406003..e13631e94214 100644
+index 30923eaabed7..281dc5261c74 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2777,10 +2777,12 @@ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
- 					  BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
- 					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
+@@ -1954,7 +1954,9 @@ static int btintel_pcie_submit_rx_work(struct btintel_pcie_data *data, u8 status
+ 	rfh_hdr = buf;
  
--		/* A hardware bug may cause the alive interrupt to be missed.
--		 * Check if the controller reached the expected state and retry
--		 * the operation only if it hasn't.
-+		/* A hardware bug may cause the alive interrupt to be missed. Refresh
-+		 * boot_stage_cache from hardware, since only the interrupt handler
-+		 * updates it. Finally retry only if the state check still fails.
- 		 */
-+		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
-+							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
- 		if (dxstate == BTINTEL_PCIE_STATE_D0) {
- 			if (btintel_pcie_in_d0(data))
- 				return 0;
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 2db85f71b2f8..f287d1ff8e27 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -53,6 +53,7 @@
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_HALTED	(BIT(14))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
-+/* Reflects live D-state. Updated by hardware on every D-state transition. */
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
- 
- /* Registers for MSI-X */
+ 	len = rfh_hdr->packet_len;
+-	if (len <= 0) {
++	if (len == 0 || len > BTINTEL_PCIE_BUFFER_SIZE - sizeof(*rfh_hdr)) {
++		bt_dev_err(data->hdev, "Invalid packet_len %d (max %zu)", len,
++			   BTINTEL_PCIE_BUFFER_SIZE - sizeof(*rfh_hdr));
+ 		ret = -EINVAL;
+ 		goto resubmit;
+ 	}
 -- 
-2.55.0
+2.54.0
 
