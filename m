@@ -1,134 +1,112 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6C517A2FC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 21:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788472177; cv=none; b=Clv4HzCZpwcjz1kU+XPQE01gOqjqAc6qhYdrn998BoxXm3OitD38OwnTmqNsCq78USdPxbe05xlhYV0JqiJmypS+Y0w8Ija3FwFDOOV+SUkSAvhkIetwZ2JI+IZR+m2k+qJED+bwaby8JjiZrcvBDwo/TKHf5YbTVqs6H9yHQ9A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788472177; c=relaxed/simple;
-	bh=SuR5YoZhS0qJsr7jyqmf0eRADMaT1TZ/RDAEhAnJV0A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IdKLO5ScC2nC37AzkRZ3DBOKnTKB+BvxoXAmWwWQmz1EVWvNOTjnJ/MG15CTw+LqnDEQDy7M8u5A3dtIH/upX1M5zZmwepRBhUDbxVQ/Xd02f4A7BBzUPx08R5kVbcmTslHafmQNc/tusrpnCTHd1UACcz/VU/s8d70JCDz6bTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qcf7EGdb; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF3368D47
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 21:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788472245; cv=pass; b=KvZ5jkfxr6PAxaAEKky2x718WAVQUmXdD/hBMsSDdZoq2kExCm9WaZ5b36V3sx4y0CwgKoe9g+jr/K6GoThGdlw3wLqyEgSFNjl5vdNqGA4iKQ0PcF7xjmeNJIg1aaTixjVJiVfIPzp9eKqKdclhB+sypKgjaVd7qIojDVGjGl0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788472245; c=relaxed/simple;
+	bh=RRzqdnjxC56kk6bzaNLnL5uvwkXB7iaxIhBq/1yYrZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wk9B9J2Fx5QvN1xvOGsPL5gxehfb2BvRg2SDM1Bln1R5tBtyhCjzOhzI4RnoQdidj2Fo3GiuRok3t4Jah7Brsed455lNX8ShsquYXMx6VLvbgQfqVoHMrh4bZ7IPRY002jXSJ9kcE2VrfuyW35+b1UqT0GLGbQwEY8WAQcidoZY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=dsXR2GPy; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qcf7EGdb"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2cf452def93so14447805ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 14:49:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788472176; x=1789076976; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=VLMl18om9dONfVtx7yfhL09QdNhcgX5+9Ne7gGEbIFA=;
-        b=Qcf7EGdbXtae9sBDvgizXZqMgtC1lH2ALGgqE/WnMrDMWf8vjajE4TOB/5Wu0tHegn
-         3Wx9OGNhNScEtaV94C8qPzPvQ5sTGpwICuK6d3ZcyEx/ixJqntqRsxz2vIx3CVoFPKhV
-         xT8Nt9ZMYmfXUBURSdqR3v6fI+ZwX9DNdvU+nHhEbLXJpEPOuZpvEZwNB33iDKSigz4s
-         D07Ss6wQ6+ZbjhmAwaj3oZU2Pwxen27Vfzf0BIc52kyrGI/4OXyyrvjGiKr9VPhV0AYh
-         Jk44fSbLA2Gu5GQdsffBDNB3bivlZAEFv54Z8MHbUHWEt8o7lz2MmQLURLIa5lwkblxg
-         kBiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788472176; x=1789076976;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=VLMl18om9dONfVtx7yfhL09QdNhcgX5+9Ne7gGEbIFA=;
-        b=EwDO9LgpCFjdW+7d0U6Iy88skDulrmEPNpfANS9yg8ibQK5SXFoLgKfjCv7WECAM7G
-         IlrMUN4Ag20QLcCm2UMMKdX8RWVQ+C0EQYOQf6kCRQ7Eh2MENZL28eK2KQ1HiSyxNmV6
-         9uUH3U1lo8u4q7TehQWz3oe9g+WeXiA7zvvCyMkNQzAl8QK2MztLA6COax30JFomcNGd
-         2DBu/trz5YMSSTwrhhUs3GexJZEB9Rn0zVHkT3/hPh0hIH81RJLp4qklLfNgOcYNxHNG
-         jDMKIc1QKv5TMFESbkxYAzkbEkmmrtmpDpKL6XDJanteRJMshduet6SKaQrmB9toz9A2
-         3M4g==
-X-Gm-Message-State: AFuF++kFrGO82h6GJ3JZSXkny2h5VdDdwOwbIdJZ2BTF9TcHJrfJuJng
-	LsahUaSo0S5DPcPemX/zMh50TlQe23ZZG64mdTEkfBbHUg2mkRuxqghwKmPHzw==
-X-Gm-Gg: AYBFou3jj+DhxM50hNyVj8WLCg67reg+N6sNyMzuA1a1cX+MtglS6MQ1zKE+WOS6zIR
-	/kE+yRVfEAWkLpMZKq3J0tq/1O16eaaQeLNlfuGruLpyF4a+CipZPBg42E80qytWglzBesHFXdM
-	bgM1f0KUg1hyDOpdS29mPQPjAT0vCO3Wni3RXA/PcaDEmdovZlAW1EK6jZHo0Q+mLUeXTPS4g4I
-	b3pgZn2+WXjYIObfZJy8Pms5yu5uc3fRkADfXCdhcgkJqoUafPT6aITIK9LXhw1r5FCy8VcF59Z
-	GOsBjyn3moCsai4OJ3tgLE5uf4sbLl49/BBLlKMcAuAJXuIIz19AX5iR6gCWgqY0yiDJM1A46R0
-	HvvtWYw/EREwIPF9oqQjf5zTQAg9dX6Bq9L4txp0IXrFCRU0Tm3z5w9f/TAAJE9L6bjU4IWBkiF
-	r7Tc5EebIcEVWvITBeU3h/kVfi0i1ncBoMBSxAkg7IIjiPUb9zR9yFLFi035Gjmh99Z8Qn
-X-Received: by 2002:a17:90b:1e41:b0:398:9beb:a2b9 with SMTP id 98e67ed59e1d1-39b087f4d0emr9389935a91.27.1788472175868;
-        Thu, 03 Sep 2026 14:49:35 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.226.247])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339aa31b24sm1553481eec.13.2026.09.03.14.49.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 14:49:35 -0700 (PDT)
-Message-ID: <6a99eb6f.3865fcc3.16a676.e9ca@mx.google.com>
-Date: Thu, 03 Sep 2026 14:49:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4438155360951108014=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="dsXR2GPy"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hbYDq6061zyQZ;
+	Fri, 04 Sep 2026 00:50:35 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1788472236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LRek2QpO/WhMxhLwLhubMJHpDDMM77FOhzRpXn973Vs=;
+	b=dsXR2GPySIezAxADcOhy5pfDRobSwjTiEBLbJPnH01iY5waBoMI/abtD10FmHTYwugc5TS
+	4G0seJZhU6CGM7eIjS7GvabmJ00LjMeQlprItiDLdwRLWanYWUIeTH84YqMuAy0n+/xPH8
+	57eCKVSNgKG3NTBYsmz+icMNbAkUC5s=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788472236;
+	b=OCRuF7zYmuf2aHgbSiIA3Qt7G+DJtx8fLJdGGNzpZZY73aprW/O/AM2CfLyu3dSusukUx0
+	kzbKfoYGhsElhVyNu9mQaHyOXUt5AXVejQiarXg9TPlymmTAJZ4O18qp8XSKILqHA5lUCW
+	byjYWJoClYaW2a0PBQbLtkPIntJffXc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1788472236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LRek2QpO/WhMxhLwLhubMJHpDDMM77FOhzRpXn973Vs=;
+	b=tHFpAasxPWV/AYFYur9uMSpIQ6sS0K8te62RjoMzx/e3q2KToPe4pXV63FgifHiwbRcKYF
+	kPm4hAuvBJnLJv14aeIjg4ZDFgUhSiu4O6Yj3hpH7/fT7wuG6A4dCsNmIXW/msOm2wgxVR
+	c+vwzl+JLGq2O/q7sN5clnX4bBmIBUg=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] adapter: clear discovery_found list before discovery_cleanup()
+Date: Fri,  4 Sep 2026 00:50:33 +0300
+Message-ID: <3a496bd2c05e7e7f9f8285d155837208485b7a0b.1788471489.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, aaron@embeddedts.com
-Subject: RE: btattach: Update for glibc 2.42 compatability
-In-Reply-To: <20260903182709.473976-2-aaron@embeddedts.com>
-References: <20260903182709.473976-2-aaron@embeddedts.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4438155360951108014==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+discovery_cleanup() tries to reset RSSI of devices in
+adapter->discovery_found list.  When called from adapter_remove(), the
+list contains only stale pointers as devices have been already freed,
+leading to UAF.
 
-This is automated email and please do not reply to this email!
+Fix by freeing the discovery_found list in adapter_remove().
 
-Dear submitter,
+Fixes AddressSanitizer: heap-use-after-free
+READ of size 1 at 0x7d5b585e033d thread T0
+    #0 0x000000772b1a in device_set_rssi_with_delta src/device.c:7121
+    #1 0x000000772daa in device_set_rssi src/device.c:7150
+    #2 0x0000006aa808 in invalidate_rssi_and_tx_power src/adapter.c:1732
+    #3 0x7feb5a35557f in g_slist_foreach (/lib64/libglib-2.0.so.0+0x6257f)
+    #4 0x7feb5a355b56 in g_slist_free_full (/lib64/libglib-2.0.so.0+0x62b56)
+    #5 0x0000006f67d2 in discovery_cleanup src/adapter.c:1747
+    #6 0x0000006f904f in adapter_remove src/adapter.c:7219
+    #7 0x0000006f9de2 in adapter_cleanup src/adapter.c:11165
+    #8 0x000000418ca9 in main src/main.c:1719
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1157334
+freed by thread T0 here:
+    #0 0x7feb5a5434cf in free.part.0 (/lib64/libasan.so.8+0xee4cf)
+    #1 0x7feb5a337bb4 in g_free (/lib64/libglib-2.0.so.0+0x44bb4)
+    #2 0x0000007519d7 in device_free src/device.c:963
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.30 seconds
-GitLint                       PASS      0.21 seconds
-BuildEll                      PASS      20.51 seconds
-BluezMake                     PASS      607.12 seconds
-CheckSmatch                   PASS      313.35 seconds
-bluezmakeextell               PASS      102.40 seconds
-IncrementalBuild              PASS      605.31 seconds
-ScanBuild                     PASS      984.67 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/1] btattach: Update for glibc 2.42 compatability
-WARNING:TYPO_SPELLING: 'compatability' may be misspelled - perhaps 'compatibility'?
-#85: 
-Subject: [PATCH BlueZ 1/1] btattach: Update for glibc 2.42 compatability
-                                                           ^^^^^^^^^^^^^
-
-/github/workspace/src/patch/14788391.patch total: 0 errors, 1 warnings, 13 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14788391.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluez/pull/2487
-
+previously allocated by thread T0 here:
+    #0 0x7feb5a54424f in calloc (/lib64/libasan.so.8+0xef24f)
+    #1 0x000000751fee in device_new src/device.c:4963
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 7390ceeee..d6eaa814b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7216,6 +7216,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->devices);
+ 	adapter->devices = NULL;
+ 
++	g_slist_free(adapter->discovery_found);
++	adapter->discovery_found = NULL;
++
+ 	discovery_cleanup(adapter, 0);
+ 
+ 	unload_drivers(adapter);
+-- 
+2.55.0
 
---===============4438155360951108014==--
