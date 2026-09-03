@@ -1,96 +1,166 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662D74B66FC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 14:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B916A4BAA15
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 14:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788445885; cv=none; b=oPqqVydqlgS1WmzOZaS2FOIvI1pMm19HUHmRDwzU0LhYNrWCqJoCaiAIP8kb80RSsDjeMtDDqN/IcKbB4o1SaN8soKnax9JB11L/FWX9tgGb0ojPBJLL0pECybetwU+EI7veKlTGScTIaLLOLBF1Lmuub6VuRfdWKx0v84jqxoM=
+	t=1788445970; cv=none; b=e/VilNDRWbrXCmzqLOEyunz5fnJlGt73sY4dMhEPzFf5W+hTiNIcRi5zMufgE9ONRr83U/Q2oaHZ/32FXhzW9x4SAj49KZZ45SATyLEBP7Wc6Xp3WeIroS+0rfnUF9GDy3xHdXBy54EvUGCmRt0QU/l+envXZb1jWOuhDlGmzI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788445885; c=relaxed/simple;
-	bh=ezox7jC2UJNC6ZNGrBn0pMaiso+SSF6/WJSYMJ+ZS7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dv4vJq3dV66+U1EaxMSr7HqQlTkZTeBlOrfadU9TqdZKNvtfB6I9yMpyAHDsEbiTzYPziCHdUaTSsidknPV5Ry11u0EnDLZ+wfduswGXnILszFdDJLQ/bUyFB3vOzDwZbmygR0paQZZ4FL8ix5Aj2ewk/L0C3bwthDCDlYS55eU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aR3/yrew; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aR3/yrew"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1788445880; x=1819981880;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ezox7jC2UJNC6ZNGrBn0pMaiso+SSF6/WJSYMJ+ZS7w=;
-  b=aR3/yrewCEwLPPf12dvEV6eY0NaHMT5yReM4xwsiq9GnS5X+r/CRobFl
-   ieiiwwTo9m++5nWhKTBb4GTnzHq4R7ANpIeeiNXIGT48BVxzmRzVbeVQj
-   XgBmaV+ZNqgFKJqQi40yKx5JvKOfeUOr5p9PDNflOWZ5d2PMbsJwOlLWd
-   RonHetk8FzN73IeUBzScfQqXlyOBLDMEalPch4HYdFqRamETbTPxJF2+h
-   qdgHBQNwG6et41F5UZLsgJV9mYq1J0y3rK3vZNCOOmRJEaW+iuCp5i6vw
-   /a1CX2UxASGpCTgVb1/c2aJujky/ZAcqYnsu8Ja44cWAXWc/IhFLghT7X
-   w==;
-X-CSE-ConnectionGUID: MPGOGVTmSUC6YDWmG3d/MA==
-X-CSE-MsgGUID: CTA/1NAKSS+hg5Fh4iczQw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11895"; a="91439996"
-X-IronPort-AV: E=Sophos;i="6.25,260,1779174000"; 
-   d="scan'208";a="91439996"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2026 07:31:01 -0700
-X-CSE-ConnectionGUID: Wipviq2rS+GTD0hhMTHCbg==
-X-CSE-MsgGUID: 5bQpPj8YRei843wOzJr8mQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,260,1779174000"; 
-   d="scan'208";a="294617140"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa001.fm.intel.com with ESMTP; 03 Sep 2026 07:31:00 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/2] Bluetooth: btintel_pcie: fix tx_handle bounds off-by-one
-Date: Thu,  3 Sep 2026 20:21:02 +0530
-Message-ID: <20260903145102.54675-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260903145102.54675-1-kiran.k@intel.com>
-References: <20260903145102.54675-1-kiran.k@intel.com>
+	s=arc-20240116; t=1788445970; c=relaxed/simple;
+	bh=778igekglPT3hmf40saRabqUOPQthPYPVwFHCyCCRR4=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aHSF1slA0YuIddMYTyRpG6F//0plAz4qQek+MSiMBD1l6M/oWzmRXnTdwAtYxuQtfyEi9o94m1C53tcgVdbd3CBJ0BGW5oG3piNJOtC/QP2wIltHDl7fFeTnfNUL8vxCp3M9ttGoCPLnooi1xFH6H8ig62y4TdRMR1oVMaX6mHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 82A953F541;
+	Thu,  3 Sep 2026 14:32:28 +0000 (UTC)
+Message-ID: <623958ca416132264a96dbf207a3bf9e51658435.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v1 1/5] avrcp: Fix out-of-bounds parsing of
+ ListPlayerAttributes response
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 03 Sep 2026 16:32:27 +0200
+In-Reply-To: <7446da9c8c5bf3615a148d463f9b590fd32adbb7.camel@hadess.net>
+References: <20260901175315.1348621-1-luiz.dentz@gmail.com>
+	 <7446da9c8c5bf3615a148d463f9b590fd32adbb7.camel@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGm0qQvVveOxhZgySao49dpIcHgffMMKiiIeAyJaSxU/yhokAMe8rBA7oeMDbT0Xf2LPfPt6E+gw15bHmcU4fDNtW7DdICe0NitLbkxoJToQfA9uZhtywSGO2TRsUZ8UnlbCv08HFiqmEs9mOl/C7NxLAsagRgQGRfbEqd2TkXNW5/Y//LJIj0urV7zKgzPsjdzd5qcpMZaFKU1pKqwYrUHKgB8ymT+axlIx7e8u3xV9cOMqaBKHfi//47SDn96Bu/YVuMZwK73dwg+UQ4xyS8hLiOcgMPOeLoSyEJeCIsCIgvIMzkFfAWGnARhJ6VotAYvIzptEnQaNOQh0r4dLiKvtP+ONtQ1i7wrNSusynKlVBO6VxcMzhBEyEaFalSXJEOlqWNQc7Ss8Y5k5vWAfCSJ4gunxBzI593cUaczFHg4rIm9zvrYlJ3hBEPByVHeKUIJlZol+EYCbuCYhm7VVSzfiXFW9BYcblYcYgwWD856n8jVEUAj6SeOI4mLghGIv8oLxKxKvuyVZN2bFSr4jYzBr61o+cmeEGwRDkFv2kcuhk94rEQTyhTAR6M4JBpCipXTSxxrqvLktZ50h6joN9tSB1k4HZ/e/Yg4ZjYw8IyAocgmwVWmFtqg4tFuP0LzOUhnxve6C3DWN9wYFuIQnjdHH6G2uMvNaHY/SVwYFLVthA
 
-Valid indices into txq->urbd0s/tfds/bufs are 0..txq->count-1, so
-tfd_index == txq->count is already out of range. Change the guard in
-btintel_pcie_msix_tx_handle() from '> txq->count' to '>= txq->count'.
+On Thu, 2026-09-03 at 15:02 +0200, Bastien Nocera wrote:
+> On Tue, 2026-09-01 at 13:53 -0400, Luiz Augusto von Dentz wrote:
+> > From: Bastien Nocera <hadess@hadess.net>
+>=20
+> The patch has substantially changed from the version I posted
+> privately, so you can remove my authorship.
+>=20
+> > In profiles/audio/avrcp.c, avrcp_list_player_attributes_rsp()
+> > parsed
+> > the
+> > response using hand-computed offsets into the operands buffer,
+> > without
+> > accounting for the fact that operand_count spans the 7 byte AVRCP
+> > header
+> > as well as the parameters:
+> >=20
+> > - attrs is a 4 byte array which could be written out-of-bounds if a
+> > =C2=A0 length greater than 4 was declared in the first parameter byte.
+> >=20
+> > - The attribute bytes were read with a bound derived from
+> > operand_count,
+> > =C2=A0 so a truncated response could be read past its end. As the
+> > receive
+> > =C2=A0 buffer is reused across packets, those stale bytes could be
+> > echoed
+> > =C2=A0 back to the peer in the following GetCurrentPlayerValue request.
+> >=20
+> > - params_len was compared against count, which was only ever 0 at
+> > that
+> > =C2=A0 point, so the length of the PDU was in practice never validated.
+> >=20
+> > Parse the response through a struct iovec using the util_iov_pull_*
+> > helpers instead, so that the header and each subsequent field are
+> > bounds
+> > checked as they are consumed and the remaining length is tracked
+> > for
+> > us.
+> > This lets params_len be validated against the actual number of
+> > parameter
+> > bytes received. The attribute count is still clamped to
+> > AVRCP_ATTRIBUTE_LAST, which is what bounds the write into attrs.
+> >=20
+> > Reported-by: @ax-nnlabs
+> > Closes:
+> > https://github.com/bluez/bluez/security/advisories/GHSA-m2vx-pw5f-rc8v
+>=20
+> It was embargoed, and it's now been made public.
 
-This issue was reported by Claude Mythos.
+You can reference CVE-2026-85218 for this one, thanks!
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
-changes in v2:
-- Update commit message
-
- drivers/bluetooth/btintel_pcie.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 281dc5261c74..e02f8ae8d8d9 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1423,7 +1423,7 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
- 
- 		urbd0 = &txq->urbd0s[cr_tia];
- 
--		if (urbd0->tfd_index > txq->count)
-+		if (urbd0->tfd_index >= txq->count)
- 			return;
- 
- 		cr_tia = (cr_tia + 1) % txq->count;
--- 
-2.54.0
-
+>=20
+> > ---
+> > =C2=A0profiles/audio/avrcp.c | 32 +++++++++++++++++++++++++-------
+> > =C2=A01 file changed, 25 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index 3271b84782e8..906f93424872 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -2395,31 +2395,49 @@ static gboolean
+> > avrcp_list_player_attributes_rsp(struct avctp *conn,
+> > =C2=A0					uint8_t transaction,
+> > uint8_t
+> > *operands,
+> > =C2=A0					size_t operand_count, void
+> > *user_data)
+> > =C2=A0{
+> > +	struct iovec iov =3D { operands, operand_count };
+> > =C2=A0	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
+> > =C2=A0	struct avrcp *session =3D user_data;
+> > -	struct avrcp_header *pdu =3D (void *) operands;
+> > +	struct avrcp_header *pdu;
+> > =C2=A0	uint8_t len, count =3D 0;
+> > =C2=A0	int i;
+> > =C2=A0
+> > =C2=A0	if (code =3D=3D AVC_CTYPE_REJECTED || code =3D=3D
+> > AVC_CTYPE_NOT_IMPLEMENTED)
+> > =C2=A0		return FALSE;
+> > =C2=A0
+> > -	len =3D pdu->params[0];
+> > +	pdu =3D util_iov_pull_mem(&iov, sizeof(*pdu));
+> > +	if (!pdu) {
+> > +		error("Invalid AVRCP header");
+> > +		return FALSE;
+> > +	}
+> > =C2=A0
+> > -	if (be16_to_cpu(pdu->params_len) < count) {
+> > +	if (be16_to_cpu(pdu->params_len) !=3D iov.iov_len) {
+> > =C2=A0		error("Invalid parameters");
+> > =C2=A0		return FALSE;
+> > =C2=A0	}
+> > =C2=A0
+> > -	for (i =3D 0; len > 0; len--, i++) {
+> > +	if (!util_iov_pull_u8(&iov, &len))
+> > +		return FALSE;
+> > +
+> > +	len =3D MIN(len, AVRCP_ATTRIBUTE_LAST);
+> > +
+> > +	for (i =3D 0; i < len; i++) {
+> > +		uint8_t attr;
+> > +
+> > +		if (!util_iov_pull_u8(&iov, &attr))
+> > +			break;
+> > +
+> > =C2=A0		/* Don't query invalid attributes */
+> > -		if (pdu->params[i + 1] =3D=3D AVRCP_ATTRIBUTE_ILLEGAL
+> > ||
+> > -				pdu->params[i + 1] >
+> > AVRCP_ATTRIBUTE_LAST)
+> > +		if (attr =3D=3D AVRCP_ATTRIBUTE_ILLEGAL ||
+> > +					attr >
+> > AVRCP_ATTRIBUTE_LAST)
+> > =C2=A0			continue;
+> > =C2=A0
+> > -		attrs[count++] =3D pdu->params[i + 1];
+> > +		attrs[count++] =3D attr;
+> > =C2=A0	}
+> > =C2=A0
+> > +	if (!count)
+> > +		return FALSE;
+> > +
+> > =C2=A0	avrcp_get_current_player_value(session, attrs, count);
+> > =C2=A0
+> > =C2=A0	return FALSE;
