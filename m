@@ -1,107 +1,64 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D283B95F9
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 20:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788466900; cv=pass; b=Dz+B/nGwdeHvQtDtep6ymqfDC6Ajo43LfGYGEmYG02fbJ2mMq+0j20r7YF1EXJ4LmPeBT/o054JPTg0vXIxTP7dwnb2bGNVxXhkRtRc9YsMA0qjOSX7p5wbd0DFcgs7Yl5bmHr58d9Ed/pJdyNGOeKX+YANfNCdu4jsZlNiAJkc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788466900; c=relaxed/simple;
-	bh=Lf/AbGaGGUHsOyfzesdz/Ipd9kgcwblQEMlBn6c1NPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cf0nwVz731b+I7/gRRzA+WqJ2OdsLc6Zou3OmXvd3ejyE1npnMH402E8bQ/ol/78XJqVTco+nPA1bKXsQIo52Drbdon42Nr68UlscPKMWLCpeJxb41qkDKUG2nsFVNIK+/Za/mYs3g2juHiYztYdQyIP7+xjXLRNVaXk+8+fBOQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rafP27/x; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BC8339363
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 21:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788469502; cv=none; b=dnux2+gdjYR9BqKcEoho7Vs2bZFqdbObdG57RxP0QFRx7uB3iKPvqyG78OR0zV6DUaecCX7tdACpONiWTNbN2G6SUkVyrRWbU3CB+Ir1CeXpLaZBT2Il9/tWXAuZS/4MMZb2IKWRPcLsLFk0xp19HvPMWZCQukWM4ZQD4k1tFFA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788469502; c=relaxed/simple;
+	bh=a9hr4re+zyvK+368W6zNi/c1U+x/K+5iGg6EFyNGCSA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=F/g2jfFNJ9z5V70ftEc5greDH02u28cqkaxtR9vz4P3i4bvGiUjFYmfV3m/5WpgCkpnJBUCZzwXwSgY+kj4MTNq88dJvD6CVdVhsGitnMVJkVol7mQeqJIPJKmca9NVE6fgAWFyRPR2K6nOJV3DQkwlljtLWHcKdDeH53pcf8Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=R98h0+bH; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rafP27/x"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hbWFq4VbfzyQZ;
-	Thu, 03 Sep 2026 23:21:19 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788466879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fyYq4EQAUMljtc9tlCagPDnqnhK/J81qzsJWcMjmZl0=;
-	b=rafP27/x3lxrM77CoKM347Z1OUirlkmXAC2DpzMfrNMNs8LcH+0We+bNeYcqhtX82kL3oM
-	SfJ8p3bSu49TJVtaPNjPuhC8TrHruTTsB12W7taLVXbw5/LfbNd0ODJXKNpeZPHCwLf/L7
-	suoAmLHjMDxgID3GfIPm0XFSdj2QEMM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788466879;
-	b=BYkO+kaQk/jFSJ/Cs9C2Zrxl49U8CYdPVPCRRxI3dq4e32ddRQtQ5niJaKhOgX2Kd90LOH
-	wfN33MnK46VKCxGCWvifadSmBxmUueNLI/heWA4PrxUivz1NnpWtgXq9WkhVM8n7rgmXrs
-	XqFPDx78NeoexHGauiRqU98ZUKTyI5M=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788466879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fyYq4EQAUMljtc9tlCagPDnqnhK/J81qzsJWcMjmZl0=;
-	b=OEAb3T42qih10aaWqfYQCQz5ceuLRc8DudBvu5AREXImMOmthDu7QhXcPNTI89ILQcAL7y
-	rBn6vUqdPEvCYV7clFMkw0fcO+8VAaUPE2jH4BIehGkaNS5vJHoyR4nPijj/e9RasdX4Yr
-	IL9I5z8l14REiizgjdADyJz4Kyv4H6I=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="R98h0+bH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788469497;
+	bh=0lbT7ioobibtjgQk4axbsMRCerpoTSZV1q0LPB6OVvU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=R98h0+bH5YNRKNSfPnRo5CPRnj+rBaL+W84Woj5TnPp21zLZ6hbHlFwRppjx6K6WI
+	 NjN+aewoenUVa9bBKkNf0oIbYRgY5eldayA7aW0uLbRrrb0Ub/CYRgrcg7sL+w2Mo0
+	 8zdgsXRfMKRPq6SyfkjLA+aa2YI+PorZF7Ur0Vmo=
+Received: from github.com (hubbernetes-node-499e777.ac4-iad.github.net [10.52.161.22])
+	by smtp.github.com (Postfix) with ESMTPA id A2785780588
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Sep 2026 14:04:57 -0700 (PDT)
+Date: Thu, 03 Sep 2026 14:04:57 -0700
+From: Aaron Brice <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] emulator: btdev: fix inquiry_timeout() inquiry destroy
-Date: Thu,  3 Sep 2026 23:21:17 +0300
-Message-ID: <835710b340044363cabea364ab73d98ef409b6bf.1788466641.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
+Message-ID: <bluez/bluez/push/refs/heads/1157334/000000-c32d5b@github.com>
+Subject: [bluez/bluez] c32d5b: btattach: Update for glibc 2.42 compatability
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-inquiry_timeout() removes inquiry_id callback, whose destroy removes
-inquiry_timeout_id callback. Doing this from the callback itself frees
-timeout-mainloop.c timeout data under it, leading to crash.
+  Branch: refs/heads/1157334
+  Home:   https://github.com/bluez/bluez
+  Commit: c32d5b29b1bd8dbb7b6c049afe614ddb941c82b9
+      https://github.com/bluez/bluez/commit/c32d5b29b1bd8dbb7b6c049afe614ddb941c82b9
+  Author: Aaron Brice <aaron@embeddedts.com>
+  Date:   2026-09-03 (Thu, 03 Sep 2026)
 
-Fix by setting btdev->inquiry_timeout_id = 0 first to avoid the early
-free.
+  Changed paths:
+    M tools/btattach.c
 
-Fixes ERROR: AddressSanitizer: heap-use-after-free
-READ of size 4 at 0x7b9d9cfe0310 thread T0
-    #0 0x00000049ebbe in timeout_callback src/shared/timeout-mainloop.c:33
-    #1 0x00000049f270 in timeout_callback src/shared/mainloop.c:245
-    #2 0x00000049fbbb in mainloop_run src/shared/mainloop.c:104
-    #3 0x0000004a286f in mainloop_run_with_signal src/shared/mainloop-notify.c:196
-    #4 0x000000402a66 in main emulator/main.c:261
+  Log Message:
+  -----------
+  btattach: Update for glibc 2.42 compatability
 
-freed by thread T0 here:
-    #0 0x7f7a5e6ee4cf in free.part.0 (/lib64/libasan.so.8+0xee4cf)
-    #1 0x00000049f591 in timeout_destroy src/shared/mainloop.c:226
+glibc 2.42 baud rate constants changed, use cfsetspeed to be compatible
+with newer glibc.
 
-previously allocated by thread T0 here:
-    #0 0x7f7a5e6ef41f in malloc (/lib64/libasan.so.8+0xef41f)
-    #1 0x00000049158a in util_malloc src/shared/util.c:46
----
- emulator/btdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index a53bd8252..bb4d55e74 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1104,8 +1104,8 @@ static bool inquiry_timeout(void *user_data)
- 	struct btdev *btdev = data->btdev;
- 	struct bt_hci_evt_inquiry_complete ic;
- 
--	timeout_remove(btdev->inquiry_id);
- 	btdev->inquiry_timeout_id = 0;
-+	timeout_remove(btdev->inquiry_id);
- 
- 	/* Inquiry is stopped, send Inquiry complete event. */
- 	ic.status = BT_HCI_ERR_SUCCESS;
--- 
-2.55.0
 
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
