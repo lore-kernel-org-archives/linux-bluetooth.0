@@ -1,135 +1,241 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67E23CDBD3;
-	Fri,  4 Sep 2026 08:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788509055; cv=none; b=s6oT/AfhDaS6Bn6jH6kVbRE3TVeSz8Mmh/gnEFIsuNLVRGtpvMUGzf2sWBGK7c6Khph10ORQEa6OGQHZHvMZb/1mahEYE85ZzDoSZKYzZ6TEfpMwq5k2BM4trJjm2PEb6CB87oimeO/r/xaCoYUMl73k3FYgC85NEWJUN3DBypE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788509055; c=relaxed/simple;
-	bh=beFA5+gjPUFymYS2OLCpnTKrdeF9fHr5I2syXNjl5r4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lz4mzHMFFeIH9isb5ZudF5u6Vp45hsUXyQMFv5NMsX2UMaXdLmr6bKjViHqZ/skIm1bFFNyNqTIj4kuIQ5VbXrz38POY0xVFgnA2ROYnxhfxtJ+fMN/pFZcaZjfc0LHRn2KKufJlQnoGr9CbDK3UHDBRWQNQfuedDHq1Iroe/HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 32f62390a83711f19a56ed5b684f684d-20260904
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:3ef42949-9642-4051-8fa6-6c3a7de7a48a,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:7db8b62,CLOUDID:09d8b407c0411b75a6c74998d47c51e5,BulkI
-	D:nil,BulkQuantity:0,SF:81|82|102|136|865|898,TC:nil,Content:0|15|50|99,ED
-	M:-3|-100,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0
-	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 32f62390a83711f19a56ed5b684f684d-20260904
-X-User: liujiajia@kylinos.cn
-Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <liujiajia@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1591112501; Fri, 04 Sep 2026 16:04:05 +0800
-From: Jiajia Liu <liujiajia@kylinos.cn>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Ying Hsu <yinghsu@chromium.org>,
-	Archie Pusaka <apusaka@chromium.org>,
-	Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jing Cai <jing.cai@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Chris Lu <chris.lu@mediatek.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Jiajia Liu <liujiajia@kylinos.cn>
-Subject: [PATCH v5 2/2] Bluetooth: btusb: Fix leaked runtime PM reference in btusb_reset
-Date: Fri,  4 Sep 2026 16:03:51 +0800
-Message-ID: <dae8ba2edf89e35c44748912aa466f3b9c8df75b.1788507854.git.liujiajia@kylinos.cn>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <dac8ddf07cb1bb79c70d5a516f0ff7baf41eb462.1788507854.git.liujiajia@kylinos.cn>
-References: <dac8ddf07cb1bb79c70d5a516f0ff7baf41eb462.1788507854.git.liujiajia@kylinos.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B131E840
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 08:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.168.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788511757; cv=pass; b=GnkYVHV+s+M/Q1IRrLGbjj2UA/91WlHTnWzf1g3xswJh/V3Qa6JrfkzIEXOpKeZBpoHY63WSblPwe8lDLBJlwMqg8NqA6c4QCi8O4s+RfRXkZZrJ4VXs83FbbNp2Ur3vT1ShvGli4f7b62kx07VD+yJkRjcT4w6ODduZYGSrpAE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788511757; c=relaxed/simple;
+	bh=3ydj7XBZQ9qjFikBAdVfbnM6S28yhAGg+f/PA2X9pwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ml1z+IlFX5VJASmTa34ppZWwhTjGvUfJp4pCoMRERpfS2OMYrbFotveNv1yoAqxtGP9GxRZXlV3s1WdXsmMqR3q4VZnk2vVD/IrvqC/Shh/a8RZl6slZ89AXN3R1oEsVUYgS35oFh/78Lo0BCC13Stw71R4fjAUGhGCHmB2GksY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=LLLWgy7x; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AyLJFVfn; arc=pass smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="LLLWgy7x";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AyLJFVfn"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6847n5Dw2977012
+	for <linux-bluetooth@vger.kernel.org>; Fri, 4 Sep 2026 08:49:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	OrXIcuGfiLa9DF8zcyadO4YQ6mRqklnE1QeIxy+wnqc=; b=LLLWgy7x5kHSkJEf
+	cKUpXSkYGkLubmh33Qp1ekl3zR4KPpk8MrHnMN0GSSstVS5gLOMsisTCzd/08KgB
+	+w7EE0lYZBQID94Ka80EKQSn4C7KMZH6iivHtoVjKTxEXgTZNCHq6lKuQfvI5rSB
+	Mkqip1Hfrq2rKNSkjV19duUZkHXbKiqub50XxgcfzoUdl4JuPBK5cZUx8mCpyjQp
+	HG+SQAgl/fdh/g/H9Eo/baAdCSHZ8jekrCA31dMZb4RwFkLik1E793hGiuMwCZd3
+	e/TR77OzaVLgdZhwzy6ouWFeVJanyqRop2MboGj2L9Fit1v6dapoEftLimQsn5Q1
+	3HNWVA==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gfdyxjsk6-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 08:49:14 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cc1c1cc5206so1100807a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 01:49:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788511754; cv=none;
+        d=google.com; s=arc-20260327;
+        b=YT35x00y27wD59CUmTKc/hhyIDBbzNqcAGpZRtudrUG+svWE8BUcNWeOsZtCfETzet
+         pzIcdz04CskOZlV1mCaWU0emx25inpdaKI12xk8IRjkt2ktfQmHfWoD3uCLJaj9gi/VN
+         6MtIaYo9pt8nJjWaa80HHQ6Wmw4fWrurKn9UoJAsAysk6n5l9iXMavsuJ+vpVZks6k9E
+         q08sUvCQxjRsfJxczOWRoWQ2V1WB8i7BBwW7OBMzEqHs6dlFbRwyC/Chm3mtfb5Yze9j
+         NhRLBsR4jgrm5qKiTCexVfETd2k//ej/ftTsDQPJVhFVf4RmHsHXMOYw4y+HpGBjuLPJ
+         1OPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OrXIcuGfiLa9DF8zcyadO4YQ6mRqklnE1QeIxy+wnqc=;
+        fh=4D2OFzcqJT6BoYRYPwNTcWdu4Pr6CmcudQf/Pf4EbJY=;
+        b=n3Pe9GQEJi0OcdACUEJS2dhqWtrZXT9tsSukxE7b7OB3SjF6Zy0ZthqcSOi8LplhEw
+         u1Oe1PIN3FO/wDjXHTVnolZg8TKwMAR1CkH8poBoZPbogkED+k69z/YhFNoeqDHg8UDu
+         +THDKT5oNJpdk2xlWrj7YXGs7zZETh+3AfnH9oag6QxzVJzVwl+CxhI6xxyYh22pVLjK
+         5zc6l5fXvEEaealp6f/t3m1/XVIx9ufRR3HyBAm/qqTG+58+b+cTRWie6udl0jtYZuLK
+         pPuioqle6xTr8/cZKQ9S6x2+EwwZpHPkEhexBU9zsaYfqr9rQ6G8VjhcTKAj/3anfheR
+         M2Zg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1788511754; x=1789116554; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=OrXIcuGfiLa9DF8zcyadO4YQ6mRqklnE1QeIxy+wnqc=;
+        b=AyLJFVfnSOsJPnVa2eMP9v1XYmaKZaaO171Y28gEiS7/8RvG7aasmY9GKHTgFudz0L
+         LhRDYYExx0/Px2Wu6unChdED87q3wrKB3AoeQMpE9RuU0I/EUqv5EMz4na3OXdCvMu9t
+         mhbQYA54zhRuuZI+9dDOlnO0FJEedi5zsAIOhmlY9PYNRhfVg3d0A9BzOgeCsa+nEZYn
+         ojOn8eBE4VAX6ADmXJt649dUeiBj1IE2vezoFVhw2wD9TR3I0t2yYAEjhuB2TByUJb3C
+         WXj3NS/v8ErKBoBbDDP/fTgUil+5jTa9PfCXcEJqZoInkfs0wq640zTNn6r787FbJBAi
+         V/Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788511754; x=1789116554;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=OrXIcuGfiLa9DF8zcyadO4YQ6mRqklnE1QeIxy+wnqc=;
+        b=RnrGOkIV1mKlMZ+IVOCqmfQAwNfiDGJV17syxYvLVdZmxsqzqyZw/tIjTGAaYKZ3/q
+         iGWu9uqemLQiTDe4+Q2CHcA+cLPhK3Bg3OqvtbbKiw72PsNuaqLnyWjj4RuMoUdN4UHj
+         2MYLKG119CVjTxVw85si/dIF0XR+jQglFNJ8NyP/Peg1RM/M6123NFi2hq6Nz0LlLmaN
+         Zyx2wR8FGeY7OsSHY7NloqEWJaMTLS0OiSqz3DYEpafFmT3ew1BeWTN3iG5emOLOq953
+         noLFXxEnEr9n+MYBC3D1534LjMb558AWPieaDChMnfVsA1DH96fpuRorJKZGo+Fdd1mH
+         TIhA==
+X-Forwarded-Encrypted: i=1; AKwUvBzOG9BRwZgXyTjsvz4/Et5WyEN1iftOp2dBHKxxkRKGmBmjRWC5//BfM6UIk4rebxQ0fR+NaTE6b4ZThFPmfJU=@vger.kernel.org
+X-Gm-Message-State: AFuF++ncGTd5+1mjneEzbRl1N3HH1AhJ+PIsnXZjFzCa76VT+JdQxKaT
+	iqFC1MPiqTJQr7UI45j3Mkar6VX5cyIhO2XpW9DxpfvsEulsdQKjyApXn7EbpLA1xboHrzk82YC
+	IAuZlBWtlD75b0yjV25DCSSt/fBusnocCsnaGCTmEJQo9Ui7fDe6QFtcSyUqRZEekn74NjvTlGb
+	8DWlbrR/ZdvZpJMEktARRuE5NX7/1rRxmPe1SzSHJ2fsw0mw==
+X-Gm-Gg: AYBFou06s0l1H5uPMPA4cXMGKdHZBnfMwuy5Z1/3d4kboHLdqhUIY6r44V7CCd1eFsT
+	vmNcjU8XDDzKY/KIBS+4HCqSO2y+aBmnYR4V/prrNOw0oVI6TneHqbRjXEj08YNjYB6DaKxZ2sB
+	RCapoam5Hjyw/SWY3wpm1zFoUvbIOjWWq+ViP9+H2gv2tQpRMCZ45a/piWWA==
+X-Received: by 2002:a05:6a20:b418:b0:3d3:adbf:7777 with SMTP id adf61e73a8af0-3da3a066ef5mr7202829637.19.1788511753687;
+        Fri, 04 Sep 2026 01:49:13 -0700 (PDT)
+X-Received: by 2002:a05:6a20:b418:b0:3d3:adbf:7777 with SMTP id
+ adf61e73a8af0-3da3a066ef5mr7202771637.19.1788511753245; Fri, 04 Sep 2026
+ 01:49:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260806-block-as-nvmem-v10-0-be598b2a5606@oss.qualcomm.com> <20260806-block-as-nvmem-v10-1-be598b2a5606@oss.qualcomm.com>
+In-Reply-To: <20260806-block-as-nvmem-v10-1-be598b2a5606@oss.qualcomm.com>
+From: Ulf Hansson <ulf.hansson@oss.qualcomm.com>
+Date: Fri, 4 Sep 2026 10:49:01 +0200
+X-Gm-Features: AcwNN1Uv_B6HKhzdhsS9aNd75U_pKuJYfQt9a9aPW0x1SCz-kw1mAB0yNJHs0Mo
+Message-ID: <CAPx+jO90ut8ZPh51BPyJLpTT5u1i9HTWKyNUWRsFdH+mD1uqgQ@mail.gmail.com>
+Subject: Re: [PATCH v10 01/10] dt-bindings: mmc: Document fixed-layout NVMEM
+ provider support
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>,
+        Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        daniel@makrotopia.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: mHOaAfceHIZUX9O0IF9BISIDe0Ns5_Jr
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA0MDA4MCBTYWx0ZWRfXyIvn0Bbdv/wz
+ bPohlzYplUHTAdt9qqs1gFzCkuXONIUU5YNSo8VIS8/EjaI2imRrdG8mqqFde5P7tlsj3AgH6Om
+ 7kRI+xrv79SZbDhx/RJ8yx/p1ooZ59w=
+X-Proofpoint-GUID: mHOaAfceHIZUX9O0IF9BISIDe0Ns5_Jr
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA0MDA4MCBTYWx0ZWRfX4SwFnoPgzLBR
+ rcopjXWYZ2WzHT16UT74psNSZ0ef39XKBfHiTOa6VCcitpQxH4AxlC5qahtOONCNuhleEoBbJc0
+ vlmsMHpl8zbgQUYrKf3ycoYKvStEMPX/ghF/k6BsrONnuHnEcErH4adet/swpwEBAR3KPks8Hlw
+ HQRImxIwhR0MEvgSADoniMe/GuipMV363gHEJd7QBItklSPi7bO7AvzbNhRb6rrofU5VQsWKhZ3
+ pTaR79lqWkAPuKmgEcTGc8prZHqUC/V8BST3y2F/NMATjwc2WXJ/6d7iauREkRI2v5Wc1/jUXjm
+ 1NOx096umDv0fYR4g2GMTSArby5gpSxCoV7La4NkKhK4ylw1caHP1EMtuCw90KWEZsDBe+TIufi
+ ITW1tLYFrcHCrSzVjBA+aT/iCnsWVV+rbomwnYNFOEGklmp28CkiKSLtgNZSkGqLZUSaT4gPPea
+ WRjfCPvkvuZkBph9buQ==
+X-Authority-Analysis: v=2.4 cv=X9Zi7mTe c=1 sm=1 tr=0 ts=6a9a860a cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=yOCtJkima9RkubShWh1s:22 a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8
+ a=_Mn6x9y97Zr2TNExHCMA:9 a=QEXdDO2ut3YA:10 a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-04_02,2026-09-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 malwarescore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ impostorscore=0 suspectscore=0 priorityscore=1501 spamscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609040080
 
-btusb_reset calls usb_autopm_get_interface to resume the device
-before queuing a reset of it, but never calls the matching
-usb_autopm_put_interface.
+On Thu, Aug 6, 2026 at 4:38=E2=80=AFPM Loic Poulain
+<loic.poulain@oss.qualcomm.com> wrote:
+>
+> Allow an eMMC hardware partition node to describe an NVMEM layout so the
+> partition can be exposed as an NVMEM provider. This lets a partition
+> (e.g. an eMMC boot partition) store device-specific information such as a
+> WiFi MAC address or a Bluetooth BD address and reference it through NVMEM
+> cells.
+>
+> Accept "fixed-layout" as the partition node compatible, in addition to
+> "fixed-partitions", so the layout can be described directly on the
+> partition node.
+>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 
-usb_queue_reset_device ends up in usb_reset_device(), and since
-btusb provides no pre_reset/post_reset callbacks the interface is
-merely unbound and rebound: the interface device object survives
-this cycle, and so does its PM usage count, which is not cleared
-when the driver is unbound.
+FYI, this one is already in v7.3-rc1.
 
-As a result every reset permanently leaks a PM usage reference,
-preventing the interface from being runtime suspended again until
-it is unbound.
+Kind regards
+Uffe
 
-Set BTUSB_RESET flag before usb_queue_reset_device so that
-btusb_disconnect drops the reference. If the flag is already set,
-drop one reference.
-
-Fixes: c9209b269afd ("Bluetooth: btusb: Introduce generic USB reset")
-Assisted-by: Claude:qwen3.8-max
-Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
----
-
-Changes in v5:
-- no change
-
-Changes in v4:
-- do not return if BTUSB_RESET is set in case the first reset failed.
-  (sashiko)
-
-Changes in v3:
-- handle multiple reset requests int btusb_reset (sashiko)
-  set BTUSB_RESET after usb_autopm_get_interface. If the flag is
-  already set, drop newly acquired reference and return.
-
-Changes in v2:
-- Fix the race window (sashiko)
-  set BTUSB_USB_RESET_ACTIVE flag before usb_queue_reset_device.
-
-Changes in v1:
-- add usb_autopm_put_interface after usb_queue_reset_device
-
----
- drivers/bluetooth/btusb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6f7946709266..61c18402911a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1068,13 +1068,15 @@ static void btusb_reset(struct hci_dev *hdev)
- 	int err;
- 
- 	data = hci_get_drvdata(hdev);
--	/* This is not an unbalanced PM reference since the device will reset */
- 	err = usb_autopm_get_interface(data->intf);
- 	if (err) {
- 		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
- 		return;
- 	}
- 
-+	if (test_and_set_bit(BTUSB_RESET, &data->flags))
-+		usb_autopm_put_interface_no_suspend(data->intf);
-+
- 	bt_dev_err(hdev, "Resetting usb device.");
- 	usb_queue_reset_device(data->intf);
- }
--- 
-2.55.0
-
+> ---
+>  .../devicetree/bindings/mmc/mmc-card.yaml          | 23 ++++++++++++++++=
++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Docume=
+ntation/devicetree/bindings/mmc/mmc-card.yaml
+> index a61d6c96df759102f9c1fbfd548b026a77921cae..0422894508478c8d0ca68292b=
+58a5fdbee218358 100644
+> --- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+> +++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+> @@ -38,7 +38,9 @@ patternProperties:
+>      properties:
+>        compatible:
+>          contains:
+> -          const: fixed-partitions
+> +          enum:
+> +            - fixed-partitions
+> +            - fixed-layout
+>
+>  required:
+>    - compatible
+> @@ -86,6 +88,25 @@ examples:
+>                      read-only;
+>                  };
+>              };
+> +
+> +            partitions-boot2 {
+> +                compatible =3D "fixed-layout";
+> +
+> +                #address-cells =3D <1>;
+> +                #size-cells =3D <1>;
+> +
+> +                mac-addr@4400 {
+> +                    compatible =3D "mac-base";
+> +                    reg =3D <0x4400 0x6>;
+> +                    #nvmem-cell-cells =3D <1>;
+> +                };
+> +
+> +                bd-addr@5400 {
+> +                    compatible =3D "mac-base";
+> +                    reg =3D <0x5400 0x6>;
+> +                    #nvmem-cell-cells =3D <1>;
+> +                };
+> +            };
+>          };
+>      };
+>
+>
+> --
+> 2.34.1
+>
