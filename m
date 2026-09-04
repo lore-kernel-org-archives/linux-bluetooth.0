@@ -1,44 +1,44 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C57E511187
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 16:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0E5511187
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 16:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788540833; cv=none; b=gL6IowzimqEWXMho17XxhouvGAyGyPGj/67eKyArbHyNifJLKKVAd/oTKGe2hfIPYucoFqf9fSIdbBv7yLHWjPrbtyNJdkG+DswaQiQpvTArE+IydqxXGQ/Nlh0Zyv+iy5Xv+DyPm3GrJ9GctPspzAevfpjkscnIzMnQX0PM/Z4=
+	t=1788540836; cv=none; b=K/fJzQ+LzW0J7/GkXMpsFUsxHps44J/hRWdsTtnqdanrV3TFbmnFGjzcPGLbdmHoH+TwPK2mgZCfaseEKMUyLIZ72ZBEpwyAcjgOJ39EWBs8NoVWrpP82kuG0vT/iyDlWlFKYUKSr62fiKErGXnEVqjEV0BPIFuU5qSKr2GPyTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788540833; c=relaxed/simple;
-	bh=QRcFqxQk3jGN1bWvroUDWajbIVASOPg+HzU7G8sowLs=;
+	s=arc-20240116; t=1788540836; c=relaxed/simple;
+	bh=0lgahP1GnoRDDVZPljamVUfymQdxMmryrUj0Ock1nX8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GYY1n3LFbKT042Vwh4lBj7aS4LZvWkeP8Z23eB0Ok7Va86C0b/vckVObzw6X+Oap3zHUjVZmI8UmE2yNv3GHfaxfGq58aDQ8TdpGGuNeAvnzl+bHfh18RhoOuLUqJwMV+wO/vtoiPl2us0P1U4Ide+rn9miBeHaPDUbT16Q8ZQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ZpCd6ZoD; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=ere7fTAR9N21vP9G4o7kWulrzzD2FX/0sn2UQ0yZTtgfhPiWqQHH0wDxkqEN3lvxtSoRwzw2CXMk7D0uiLT9SomOtdCis1BNcMbgYdNrz0z6ajfVKOds5m9+h1XDdQhuLVaYfpBMvP9aoDFnYzreHkSMauaVb1JFn5Oyi6QVtTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=NJDrCkRu; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ZpCd6ZoD"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="NJDrCkRu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1788540830;
-	bh=QRcFqxQk3jGN1bWvroUDWajbIVASOPg+HzU7G8sowLs=;
+	s=mail; t=1788540833;
+	bh=0lgahP1GnoRDDVZPljamVUfymQdxMmryrUj0Ock1nX8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZpCd6ZoDAgW1Q9/w+FP8V+y5LEYE4fX3/queXE4aSVwjwk+ttxStgMDMrjZ5F86r1
-	 Gl0bpjdWmB4cDysutJZwvbB+VXAwCwAPXIfcAiorNW1jzkN4VPiw6hx+mQM+EXixtw
-	 vRYKjeQYUTn97GPZC+VBsLb8QjeqkFzDRh4dBXK+odVc3Xe9S4qbaix5E3W75WiNBs
-	 FL1Qq97z9T9jhHegIdUmcktSb7u6bLDYDhmtReJd+uQD4yqJUsJjwv0OVB0IKzQjqM
-	 K0NUpudnU73FMRd9gTyw3BCEn/aVDvGkvlGP98xo5gMYMxhXF33sSQYjt1Pod/HBV4
-	 sh6QIV1xS3y+w==
+	b=NJDrCkRuT3oL3Xs0GhFMjYjlpthdWa0m9Q4R1g136+iqe9lWcsdgmPWbqi7hb61Qs
+	 hTslw+OMVMHa5vKdq8Z29xHOKHF6qJ1Mq6lLRCZGec2ckP1CMY3fKKkmYkAi4/1/rS
+	 MUXHyInDJBco/2qjcYxDWXM83r7j6ThXjjLIv0Rf7UYYaER+dt7R/RVyXJfL9c+yt0
+	 DQ23eY/UjJpWceHVPLABh/wABsRDcQR511IXGmupaUNM5xQroWMtFX++qVgZJDlFIH
+	 7RgBGwxQxGLgE8pCo3v65ITWOtLccJmkDQGIkV4IY0WuVVB6aBbFnzESH5SZFv4Ryf
+	 Sxl091+1EWTbg==
 Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: raghavendra)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7DA0B17E092F;
-	Fri, 04 Sep 2026 18:53:49 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 886AE17E092E;
+	Fri, 04 Sep 2026 18:53:52 +0200 (CEST)
 From: raghu447 <raghavendra.rao@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: raghavendra <raghavendra.rao@collabora.com>
-Subject: [PATCH 1/4] profiles/audio: Support MCS track position writes
-Date: Fri,  4 Sep 2026 22:23:29 +0530
-Message-ID: <20260904165332.42046-2-raghavendra.rao@collabora.com>
+Subject: [PATCH 2/4] profiles/audio: Support MCS fast seeking
+Date: Fri,  4 Sep 2026 22:23:30 +0530
+Message-ID: <20260904165332.42046-3-raghavendra.rao@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260904165332.42046-1-raghavendra.rao@collabora.com>
 References: <1654183666f442926c1301e1733567216b307981.camel@hadess.net>
@@ -53,124 +53,124 @@ Content-Transfer-Encoding: 8bit
 
 From: raghavendra <raghavendra.rao@collabora.com>
 
-Use MPRIS Seek to handle MCS Track Position writes.
+Map Fast Rewind and Fast Forward to relative MPRIS Seek calls.
 
-This is required by PTS GMCS/SR/SP/BV-02-C test.
+Report direction through Seeking Speed until Seeked restores player
+state.
+
+This is required by PTS tests GMCS/SR/MCP/BV-05-C to BV-08-C.
 ---
- profiles/audio/mcp.c   | 22 ++++++++++++++++++++--
- profiles/audio/media.c | 32 ++++++++++++++++++++++++++++++++
- profiles/audio/media.h |  1 +
- 3 files changed, 53 insertions(+), 2 deletions(-)
+ profiles/audio/mcp.c | 49 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
 diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index 8adf814e8..2d239ac4b 100644
+index 2d239ac4b..314bce243 100644
 --- a/profiles/audio/mcp.c
 +++ b/profiles/audio/mcp.c
-@@ -795,8 +795,26 @@ static uint16_t mcs_playing_order_supported(void *data)
+@@ -60,6 +60,7 @@
  
- static bool mcs_set_track_position(void *data, int32_t value)
- {
--	/* TODO: add support to setting position in org.bluez.MediaPlayer */
--	return false;
+ #define MCS_UUID_STR	"00001848-0000-1000-8000-00805f9b34fb"
+ #define GMCS_UUID_STR	"00001849-0000-1000-8000-00805f9b34fb"
++#define MCS_SEEK_OFFSET_USEC	(10 * G_USEC_PER_SEC)
+ 
+ 
+ /*
+@@ -440,6 +441,7 @@ struct mcs_instance {
+ 	struct bt_mcs *mcs;
+ 	struct queue *player_links;
+ 	bool at_start;
++	int8_t seeking_speed;
+ 
+ 	/* GMCS-specific */
+ 	struct bt_uinput *uinput;
+@@ -494,6 +496,11 @@ static void mcs_update_media_state(struct mcs_instance *mcs)
+ 		state = BT_MCS_STATE_INACTIVE;
+ 	}
+ 
++	if (state != BT_MCS_STATE_SEEKING && mcs->seeking_speed) {
++		mcs->seeking_speed = 0;
++		bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
++	}
++
+ 	bt_mcs_set_media_state(mcs->mcs, state);
+ 	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
+ }
+@@ -557,6 +564,11 @@ static void lp_track_position(uint32_t old_ms, uint32_t new_ms, void *user_data)
+ 	if (!player_link_is_active(p))
+ 		return;
+ 
++	if (mcs->seeking_speed) {
++		mcs_update_media_state(mcs);
++		return;
++	}
++
+ 	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
+ }
+ 
+@@ -656,6 +668,33 @@ static bool mcs_pause(void *data)
+ 	return mcs_command(mcs, BT_MCS_CMD_PAUSE);
+ }
+ 
++/* MPRIS Seek uses signed offsets: negative rewinds, positive advances. */
++static bool mcs_fast_rewind(void *data)
++{
 +	struct mcs_instance *mcs = data;
 +	struct player_link *p = mcs_get_active(mcs);
-+	int64_t position_centisec = value;
 +
-+	if (!p)
++	if (!p || !local_player_seek(p->lp, -MCS_SEEK_OFFSET_USEC))
 +		return false;
 +
-+	if (value < 0) {
-+		int32_t duration_centisec = mcs_track_duration(mcs);
-+
-+		if (duration_centisec == BT_MCS_DURATION_UNAVAILABLE)
-+			return false;
-+
-+		position_centisec += duration_centisec;
-+	}
-+
-+	/* Convert MCS centiseconds to a relative MPRIS microsecond offset. */
-+	return local_player_seek(p->lp, (position_centisec * 10 -
-+				local_player_get_position(p->lp)) *
-+				G_TIME_SPAN_MILLISECOND);
- }
- 
- static bool mcs_set_playing_order(void *data, uint8_t value)
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 95f9580b0..82117a2ed 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -157,6 +157,7 @@ struct local_player {
- 	GTimer			*timer;
- 	bool			play;
- 	bool			pause;
-+	bool			seek;
- 	bool			next;
- 	bool			previous;
- 	bool			control;
-@@ -2296,6 +2297,29 @@ bool local_player_pause(struct local_player *mp)
- 	return local_player_send(mp, "Pause");
- }
- 
-+bool local_player_seek(struct local_player *mp, int64_t offset_usec)
-+{
-+	DBusMessage *msg;
-+
-+	DBG("");
-+
-+	if (!mp->seek || !mp->control)
-+		return false;
-+
-+	msg = dbus_message_new_method_call(mp->sender, mp->path,
-+					MEDIA_PLAYER_INTERFACE, "Seek");
-+	if (msg == NULL) {
-+		error("Couldn't allocate D-Bus message");
-+		return false;
-+	}
-+
-+	dbus_message_append_args(msg, DBUS_TYPE_INT64, &offset_usec,
-+					DBUS_TYPE_INVALID);
-+	g_dbus_send_message(btd_get_dbus_connection(), msg);
-+
++	mcs->seeking_speed = -1;
++	bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
 +	return true;
 +}
 +
- bool local_player_next(struct local_player *mp)
++static bool mcs_fast_forward(void *data)
++{
++	struct mcs_instance *mcs = data;
++	struct player_link *p = mcs_get_active(mcs);
++
++	if (!p || !local_player_seek(p->lp, MCS_SEEK_OFFSET_USEC))
++		return false;
++
++	mcs->seeking_speed = 1;
++	bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
++	return true;
++}
++
+ static bool mcs_stop(void *data)
  {
- 	DBG("");
-@@ -2673,6 +2697,9 @@ static gboolean set_player_property(struct local_player *mp, const char *key,
- 	if (strcasecmp(key, "CanPause") == 0)
- 		return set_flag(mp, &var, &mp->pause);
+ 	struct mcs_instance *mcs = data;
+@@ -752,6 +791,13 @@ static int32_t mcs_track_position(void *data)
+ 	return local_player_get_position(p->lp) / 10;
+ }
  
-+	if (strcasecmp(key, "CanSeek") == 0)
-+		return set_flag(mp, &var, &mp->seek);
++static int8_t mcs_seeking_speed(void *data)
++{
++	struct mcs_instance *mcs = data;
 +
- 	if (strcasecmp(key, "CanGoNext") == 0)
- 		return set_flag(mp, &var, &mp->next);
- 
-@@ -3247,6 +3274,11 @@ static void app_register_player(void *data, void *user_data)
- 			goto fail;
- 	}
- 
-+	if (g_dbus_proxy_get_property(proxy, "CanSeek", &iter)) {
-+		if (!set_flag(player, &iter, &player->seek))
-+			goto fail;
-+	}
++	return mcs->seeking_speed;
++}
 +
- 	if (g_dbus_proxy_get_property(proxy, "CanGoNext", &iter)) {
- 		if (!set_flag(player, &iter, &player->next))
- 			goto fail;
-diff --git a/profiles/audio/media.h b/profiles/audio/media.h
-index 1c43075ba..43a85b1d6 100644
---- a/profiles/audio/media.h
-+++ b/profiles/audio/media.h
-@@ -73,6 +73,7 @@ bool local_player_have_track(struct local_player *lp);
- bool local_player_play(struct local_player *lp);
- bool local_player_stop(struct local_player *lp);
- bool local_player_pause(struct local_player *lp);
-+bool local_player_seek(struct local_player *lp, int64_t offset_usec);
- bool local_player_next(struct local_player *lp);
- bool local_player_previous(struct local_player *lp);
- 
+ static uint8_t mcs_playing_order(void *data)
+ {
+ 	struct mcs_instance *mcs = data;
+@@ -876,12 +922,15 @@ static const struct bt_mcs_callback gmcs_cb = {
+ 	.track_title = mcs_track_title,
+ 	.track_duration = mcs_track_duration,
+ 	.track_position = mcs_track_position,
++	.seeking_speed = mcs_seeking_speed,
+ 	.playing_order = mcs_playing_order,
+ 	.playing_order_supported = mcs_playing_order_supported,
+ 	.set_track_position = mcs_set_track_position,
+ 	.set_playing_order = mcs_set_playing_order,
+ 	.play = mcs_play,
+ 	.pause = mcs_pause,
++	.fast_rewind = mcs_fast_rewind,
++	.fast_forward = mcs_fast_forward,
+ 	.stop = mcs_stop,
+ 	.next_track = mcs_next_track,
+ 	.previous_track = mcs_previous_track,
 -- 
 2.43.0
 
