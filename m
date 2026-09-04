@@ -1,143 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51E644AB94;
-	Fri,  4 Sep 2026 12:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAAA432BE4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 12:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788524664; cv=none; b=IUkPb22lIdoHNbpuUjit9BDKKbODFgjmoWxswVgHKzKTPXJ95TXP1bP9+czp5PnxLtPrinLk0BhQ0hcx/y7Qfb3yv2BkWg0PNZURl2OisBU+gYsgSbKTRn66TodLpMbboi6dVfDs0kjQowJl7jRv4h4KB0Ne0x8tVi9SvhMkQ1w=
+	t=1788525211; cv=none; b=SOP3APmLqOifKmyqA86F2F0pWgy4xFv1GGbUzBlImmgqQ41Qpp3LRyiJMRImctiPNKTrDUB3FjLXo5TEVlXY7x0udzGzOiqzDFzDZoRV+4C3D/Yg5kU/5uoLLhUhfaQuTj4yrSVqRC23UhFkoUc4rT7cVj39bw9WXXcsyNTVO70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788524664; c=relaxed/simple;
-	bh=DvAvTw52vuzZFyP/uyq9o/hENAIlvcZrXJfVWLeVCRE=;
-	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=k9n1ljPgYxgeGezUIK4Q+mAUmb+kCNa6ZGGTNz3btBtcBV4UPQ5suPQ+rMg+2+/izBXrqnuUMf7Io5PBXZ+H8jOsydnZVx9+QsI2ycHHvf0lO132UpCRiBWqdSFUjWxXZi+5ty9mAjH+LrEF6rXJWM912kV9pE3PlxlU5RfjWDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e58QxgrK; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e58QxgrK"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id EBC531F00A3D;
-	Fri,  4 Sep 2026 12:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788524663;
-	bh=JP3cmXMuLbeG7onVtl0q1r5cNTl2riebgD9aREchz8I=;
-	h=From:To:Cc:Subject:Date;
-	b=e58QxgrK469hrcKRpJsBP4VArHzV7DbpXS5D+OK0XdNTw5JNJqmqbKfO1jvUDudGp
-	 XF+Tbt2hx+bkwx02gm8rWGQtOtSHsTwuq0NcI1JwJHZOJ5BIs94MsIgDPLPJQTApZz
-	 zWEYaq2n3ntt6k/+2PpTfHGcIkxJAN9RG8z4trxrNZPF3TNd/VRUn6hk4UUob3OxiH
-	 36fGwWXLnyOQ81fN2FjAlUy5G4GWvUq9FszJSfOze+qEDG9pVgdpimVej0rY0/btiK
-	 QyO0plM2Gah2D5+++V3M9sfqor96MLTkTKhVcOokAlOLI/FjDhsXLPVSOZc4dQL05Z
-	 4ymA/hx0wVcfw==
-From: "syzbot" <syzbot@kernel.org>
-To: syzkaller-bugs@googlegroups.com, Krystian Kaniewski <krystianmkaniewski@gmail.com>, <linux-bluetooth@vger.kernel.org>, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Marcel Holtmann" <marcel@holtmann.org>, "Dmitry Antipov" <dmantipov@yandex.ru>
-Cc: linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
-Subject: [PATCH] Bluetooth: hci_sysfs: Fix NULL pointer dereference in device_del()
-Message-ID: <388cbac3-b865-4843-bd65-c74059a5a459@mail.kernel.org>
+	s=arc-20240116; t=1788525211; c=relaxed/simple;
+	bh=NBVirhb0SL42QOwJElnmD9fRBSdfW/OD70HSlLvV2ME=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=upl5X1YG92AdF6GOQL9jngvBWjROK70Y1WSGg9a+2YyFrFpYObQTn1md5DNr5lTwX7k6ofNY62TItQm6slPLNKLYZlu6wokG4n3Za1bYWT9d4SArq+daYA7p9Jy2iIdnz+g9kBG+aB68YHzZbx/ZfzR16WhMpqZa/gIF5JeVcsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7e9fc6dc091so910902a34.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 05:33:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788525208; x=1789130008;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=o7oOdj2qZ+5JD70IABcjfJnmxAKde2HwU/wgYhYPXAE=;
+        b=XEE0jY6IisFT2sFdSx2jjoLxdh6wt4edUVWLgx89rsFkqR7iII1UkpVEnjms0FJLjw
+         NcEs5oaKCyvVOvY1HrvHExTGRePoxrKWPPbSucWia0+Kygy/m3EiuDVYdjgUIOg43bOt
+         GagM4+e1v6BgRJrv070xA5OaGoEuezIFcasgnQ7Qnd2WqkAx8ChMvMgg7DKESJrhcBBU
+         Iblexk8QRMHUUtzSVCPh+l7YMVD70fXVpZBOjZ14eA6P+1hyOKeIPqBv+vKJ8EYxOwDs
+         g17MdeLLmKjaj1bQrIRZAu8Y+OCg85c6mcVUDqlbK81w98ScDQ0L8oE5qMa/sznAfMKN
+         b1+A==
+X-Gm-Message-State: AFuF++nGz8T/ilQvZRQ9npAH7Rm9Yv/nHFfz615A/NnirCfd1ll7hxp1
+	Nsm4MgjsK10ix5L/5j8u6N/sd852se1FrRQW2KoW/lZYZ2vS987VxVkFEtVJALfLbyR0Te/li1S
+	3fvleYsGu0CJdVQS8e7Plw2Hnh0SILo85F/DezLkAZVyUH9LU0aK8ONkwPPQ=
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Date: Fri,  4 Sep 2026 12:24:22 +0000 (UTC)
+X-Received: by 2002:a4a:e847:0:b0:6b7:46e9:9700 with SMTP id
+ 006d021491bc7-6b746e9a360mr2235866eaf.48.1788525208507; Fri, 04 Sep 2026
+ 05:33:28 -0700 (PDT)
+Date: Fri, 04 Sep 2026 05:33:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a9aba98.efa90033.8a9e.0000.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Sep 2026)
+From: syzbot <syzbot+list2fd463303e674a91d50c@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+Hello bluetooth maintainers/developers,
 
-A NULL pointer dereference in klist_put() occurs when a child device (such
-as a BNEP network device in bnep_session) is concurrently being
-unregistered while hci_conn_del_sysfs() reparents child devices.
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-This is caused by a race condition between hci_conn_del_sysfs() and
-concurrent child device unregistration (e.g. bnep_session calling
-unregister_netdev()). During device unregistration, device_del() snapshots
-a non-NULL parent pointer. Concurrently, hci_conn_del_sysfs() finds the
-child device using device_find_any_child() and calls device_move() to
-reparent it to NULL, which removes the node from its parent's klist and
-clears knode_parent. Subsequently, device_del() calls
-klist_del(&dev->p->knode_parent) using the stale parent snapshot, causing
-klist_put() to dereference knode_klist(n)->put on an already removed node,
-resulting in a NULL pointer dereference.
+During the period, 3 new issues were detected and 4 were fixed.
+In total, 20 issues are still open and 110 have already been fixed.
+There are also 6 low-priority issues.
 
-This race was introduced by commit 27aabf27fd01 ("Bluetooth: fix
-use-after-free in device_for_each_child()"), which replaced
-device_find_child(..., __match_tty) with device_find_any_child() in
-hci_conn_del_sysfs(). That change was intended to avoid a use-after-free
-where conn->dev outlived its parent hdev->dev when child devices held
-references to conn->dev, because conn->dev only held a reference to
-hdev->dev while registered in sysfs.
+Some of the still happening issues:
 
-Fix the issue properly by taking an explicit reference to the parent device
-with get_device(&hdev->dev) in hci_conn_init_sysfs() and dropping it with
-put_device(parent) in bt_link_release() when the conn device is freed. This
-ensures that hdev->dev remains valid for the entire lifecycle of conn->dev,
-resolving the underlying use-after-free. With the parent reference held
-properly, restore the __match_tty filter in hci_conn_del_sysfs() so that
-device_move() is only invoked on persistent RFCOMM TTY devices as
-originally intended, eliminating the race condition with unregistering
-network devices.
-
-Fixes: 27aabf27fd01 ("Bluetooth: fix use-after-free in device_for_each_child()")
-Assisted-by: Gemini:gemini-3.7-flash syzbot
-Reported-by: syzbot+6df45dd3d03e1a9aca96@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6df45dd3d03e1a9aca96
-Link: https://syzkaller.appspot.com/ai_job?id=f1c0e740-db21-40af-a9ff-84db0fd8b8bd
-Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+Ref Crashes Repro Title
+<1> 9720    Yes   WARNING in call_timer_fn
+                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<2> 598     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
+                  https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+<3> 391     No    WARNING in l2cap_chan_del
+                  https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<4> 62      Yes   WARNING in l2cap_chan_send
+                  https://syzkaller.appspot.com/bug?extid=b6919040d9958e2fc1ae
+<5> 7       No    WARNING in hci_send_cmd (4)
+                  https://syzkaller.appspot.com/bug?extid=00f5a866124dc44cce14
+<6> 250     Yes   KASAN: slab-use-after-free Read in bt_accept_unlink
+                  https://syzkaller.appspot.com/bug?extid=a1595e656a83ea5b78eb
 
 ---
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 8957ce7c2..c2065abf7 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -13,7 +13,10 @@ static const struct class bt_class = {
- static void bt_link_release(struct device *dev)
- {
- 	struct hci_conn *conn = to_hci_conn(dev);
-+	struct device *parent = dev->parent;
-+
- 	kfree(conn);
-+	put_device(parent);
- }
- 
- static const struct device_type bt_link = {
-@@ -21,6 +24,16 @@ static const struct device_type bt_link = {
- 	.release = bt_link_release,
- };
- 
-+/*
-+ * The rfcomm tty device will possibly retain even when conn
-+ * is down, and sysfs doesn't support move zombie device,
-+ * so we should move the device before conn device is destroyed.
-+ */
-+static int __match_tty(struct device *dev, const void *data)
-+{
-+	return !strncmp(dev_name(dev), "rfcomm", 6);
-+}
-+
- void hci_conn_init_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -29,7 +42,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
- 
- 	conn->dev.type = &bt_link;
- 	conn->dev.class = &bt_class;
--	conn->dev.parent = &hdev->dev;
-+	conn->dev.parent = get_device(&hdev->dev);
- 
- 	device_initialize(&conn->dev);
- }
-@@ -69,7 +82,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- 	while (1) {
- 		struct device *dev;
- 
--		dev = device_find_any_child(&conn->dev);
-+		dev = device_find_child(&conn->dev, NULL, __match_tty);
- 		if (!dev)
- 			break;
- 		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
-
-
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
--- 
-See https://goo.gle/syzbot-ai-patches for information about AI-generated patches.
-The person who has signed off on the patch is responsible for
-addressing comments.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
 syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
