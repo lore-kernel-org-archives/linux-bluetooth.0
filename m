@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2304C39184C
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 20:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D604938887E
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 20:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788553273; cv=none; b=bdUXxF8zofiZb6/sSofiFQnM/wr8BaDvb9KgSuYxtV4IwKqY/1i2TxW4g5pekvKvoWKkzEaIB+I3l+2vJxvHByheUxzJtXhI9QT0GnPjlP6Y9uhUXHr97jz6myW2eFJfApEIVNGBlUnQHEYb9Jt0DozeUiIYBhPHGnrbz0gPCro=
+	t=1788553274; cv=none; b=gdlFBd1ErQROiTgtDfn0oGE5fG7ImBzR1ABnRVAsDn7CQpO+nemInk8NPRWUA09GSme4P3GKAFQNb1OU4DaPQLsFG1GSqh5m9eSOsYDWvmfkWX6nWgNL7+CPrbPl3oRLPTRAIlXyKpIxOj8Q6fceuaeHu3pOy0gKWNyVgGgpCVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788553273; c=relaxed/simple;
-	bh=2nmRHb028uXtF7NGcTEsurresH/aJ98CQj04BkaG1zU=;
+	s=arc-20240116; t=1788553274; c=relaxed/simple;
+	bh=y1z++vBkbgblawGu3JL8htaABhBoyLJHDMqiKGFFixE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jiQtNebDSnjVWgySrTD79omCBRoaZZmjeg1xsSiWmNZU4640SFg9g4/PPTpEQF5s0AWU+VnAvFR73osYZaCWnqP5WuEFTibsTIX3pI1Cp1Hf1pn0+HwJpg+YoULnjRIumuBb7uBO2z3mvo0ek8Esii3bPPHBlxyBk/OhdPxdczA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcgSIbq8; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=sXV6ox63WAWmWwJzUcpjaI66b9n3TSiz018PXLOpMjAYcds4ScrSCfsX2KM5MFnozTU00JMWoyn6xz70+PqeKRcMt0oqZ8Az34+cEYYZnx+HuAJvMF3u2z7Q2YoVL86Sef0GOj6+D11X2xmkyw52vH+iNz+Sk/VhRTc1HaP5gjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc35LOi0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcgSIbq8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2D11F00A3E;
-	Fri,  4 Sep 2026 20:21:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc35LOi0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA40F1F00A3F;
+	Fri,  4 Sep 2026 20:21:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788553269;
-	bh=Ca/GAGRYtPOvSVNeRe3nMDSdxfAc8qlfG+7+0zOyKsw=;
+	s=k20260515; t=1788553270;
+	bh=JvsThgKHwDzEI1q4vBcNuLwZdib587NIe/Cuc9wM8hE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=bcgSIbq81Rja30R/hIdL9pbpr7firycZn2dBafLdTEaESEjQmW7QMj9MJqdmX0yDl
-	 7W1+yos9eFf+0FdjOGkx8X/vu/sLC/98tQax5kaqqWdlcBW7OWpu4Di5x+Hba8phe6
-	 pcpIxnHwntWMUeAmMhiQhdZJqxDQNu6kMB6xs+aXIDAukpCyjwhxJmYdsLyOLhNnRR
-	 STBIF7pDCYdAjb4kRl2FT6nWREbvluwDbBPqY2OTir79fMd5WgJebCBhvHHUAXa938
-	 yYTr0noWeYBCRYDXfjTiG4H6jfxzq0429tzNTivfuJwN1KLQcsk+w8uPL28wysbOlt
-	 MrTQdDrUJDpBA==
+	b=Tc35LOi0INscTd6lpOvJElMCNZy4H2R0MekAWjDnzhw5YF/ISZvVaa51ekJIuD7iX
+	 o4kmJsTbzGkwTpdZVtJl/5NqwI5UhR4ObY20w07vIDi+RorWACA4Oi8vcFj1bWIaZW
+	 QC6M7HLaTEEuVfjXC1ETnIfhIOlnEKoT9vZWZwRcWBsYHN4+I8o+H9IHvoIolL/NZk
+	 jJXY0RXy42qsdwUKxp9ku+Gsk/q0z7FNnRR/+cLFsPfZZxSMpOofNzKv4youTlLHSA
+	 D65Z1XKkIvSzbT4OMJegL8er8uFoaMkaYMGDrJC83wtpUAanICvOBxeXyjxq78Ju5B
+	 AVJwViRPwukLA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19A193924A6E;
-	Fri,  4 Sep 2026 20:20:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939633924A6E;
+	Fri,  4 Sep 2026 20:20:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,17 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] adapter: clear discovery_found list before
- discovery_cleanup()
+Subject: Re: [PATCH BlueZ 0/1] btattach: Update for glibc 2.42 compatability
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178855320963.954520.13487698152670558162.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Sep 2026 20:20:09 +0000
-References: 
- <3a496bd2c05e7e7f9f8285d155837208485b7a0b.1788471489.git.pav@iki.fi>
-In-Reply-To: 
- <3a496bd2c05e7e7f9f8285d155837208485b7a0b.1788471489.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
+ <178855321113.954520.8179000280190568931.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Sep 2026 20:20:11 +0000
+References: <20260903182709.473976-1-aaron@embeddedts.com>
+In-Reply-To: <20260903182709.473976-1-aaron@embeddedts.com>
+To: Aaron Brice <aaron@embeddedts.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -55,19 +52,21 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  4 Sep 2026 00:50:33 +0300 you wrote:
-> discovery_cleanup() tries to reset RSSI of devices in
-> adapter->discovery_found list.  When called from adapter_remove(), the
-> list contains only stale pointers as devices have been already freed,
-> leading to UAF.
-> 
-> Fix by freeing the discovery_found list in adapter_remove().
+On Thu,  3 Sep 2026 11:27:08 -0700 you wrote:
+> btattach is not setting the baud rate correctly on systems with newer
+> glibc such as Ubuntu 26.04. In glibc 2.42 the baud rate termios.h
+> constants changed value, B115200 was 0x1002 which was the struct
+> termios c_cflag enum bits, but in 2.42 they changed cfsetspeed() to
+> accept arbitrary rates and not just the baud enum values, and B115200
+> was changed to the value 115200. This means you can no longer set the
+> speed with c_cflag |= B115200 and should use cfsetspeed() to be
+> compatible with both versions.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] adapter: clear discovery_found list before discovery_cleanup()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7e3212fa233e
+  - [BlueZ,1/1] btattach: Update for glibc 2.42 compatability
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=12f5eb726c6e
 
 You are awesome, thank you!
 -- 
