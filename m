@@ -1,48 +1,35 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CBB50EBED
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 16:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD4650AC3E;
+	Fri,  4 Sep 2026 16:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788540842; cv=none; b=rttoeRx/bT2jZtbc8x7UDqIHbQUGvsPSltMELsGPkjoScIJxCZ5V6sgNO23K4BDqnoQR69viAkjU2qXSzegNueWN2z3aHoq8M8LD1wRzJtq9VGT8BaK1HvmJBiuIvbq0cJA8kD7degHvPGbyfWm78XHJBSoA47qQuPrjFWlT9OU=
+	t=1788541030; cv=none; b=H7Z+ueuXpBZGoUiivt3kvEJwAVLVcR/xYM6i/IDLfo8N6bL4y29fJ8MvPE/jR2UJPLRq+CSGgaiSIaHtgkrH5nSvdGzYjoJ06Gelh2Hv/gX9u/vaUl2lVVD3gJYpKYp9iX8Om9jF2LMVDIZK1RQZ8AExK+8fiuqnTlFC8NtqqsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788540842; c=relaxed/simple;
-	bh=W+rNoaYzssrQZOEw9qVUnJWErByLuHW1tO6rbCtD26Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Slc4WJwQlLqZq1G5+d245EnQ9KczJkl8r9Pi01tJXgWZnQSUmAhble4QjHlqQSl3twB66l7pTdCPCXhX0nFinhP/FItRIfUFolfTQumVw6Y2tH5XU/gZzwyRSNIOxs52hSXwbY80m+qX0ziL561jHFEHWeL7xpCGUHcfA2SUWkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=V1gDmwXJ; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1788541030; c=relaxed/simple;
+	bh=N/Ez1PS7YZ0kmdDQrrg63+3U/GnnKx1VXCodi2n8J20=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eKhcZGCZ5VagicN9fmqSiHu+5rJ0crKiSbZVq4MtC0ArPJGflRCx02LpQw6BIZMqdBplWbA9Mm8CzFWa598+J7cILNTqxqLkU+8igxKzlest684/y++uZVAy/wY7rL0SrrzUkkgkWObog1HdNlDxKQHgBD9jQobyMBObEGIPUTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJvz1p64; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="V1gDmwXJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1788540839;
-	bh=W+rNoaYzssrQZOEw9qVUnJWErByLuHW1tO6rbCtD26Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=V1gDmwXJIl9PnSUo9aYxBT4ihvC75r9cHwEoiSzhmAzH3Q/jaSfxY/cPDCGRluSpw
-	 zyOzIvJSpZsyOSUI+4sjhkZkJqr0FImC9XP90l9ZZEhXFxfbMFrJ+tm2CWl84CqZ20
-	 oIzKFS3LZaRZ5JUn+px+jyKWlpEnTurKBS9IHoAHm7Y5ypEfO0r6RvbjDgysHJMPG/
-	 MwltGd45dB5iqCd7uXUxpNQFZraE4MEDkPLYkd9+yCYP9Y4GxVqpY49B7qjSiWCXeL
-	 M3Va/xj29K22PSsYUv/JH9ENhn/6xFomkV73uMh5c7z891o9S+ZBQd9j3V1k/RGI1I
-	 addMS07Nqg2EQ==
-Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: raghavendra)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9E1D417E092E;
-	Fri, 04 Sep 2026 18:53:58 +0200 (CEST)
-From: raghu447 <raghavendra.rao@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: raghavendra <raghavendra.rao@collabora.com>
-Subject: [PATCH 4/4] unit/test-mcp: Test unsupported RFU opcode
-Date: Fri,  4 Sep 2026 22:23:32 +0530
-Message-ID: <20260904165332.42046-5-raghavendra.rao@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260904165332.42046-1-raghavendra.rao@collabora.com>
-References: <1654183666f442926c1301e1733567216b307981.camel@hadess.net>
- <20260904165332.42046-1-raghavendra.rao@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJvz1p64"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5C61F00A3D;
+	Fri,  4 Sep 2026 16:57:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788541028;
+	bh=FynJtHXnHr/s/9tnayXAtyCjmExWB3RfiHJOkbSqKLw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=NJvz1p64YnzVTzHnT4SA6FwHEt1fsdBX5VZF+FT6kLvtXX8oSyOit5cM1U3NJ14Qp
+	 70Lkwl1+bJ9KnxEIX2HCActvPMYRzQRf/1YOs9w6gODpz6xnocu2YnfDqJcx74u6CS
+	 8JqnZZgZXrTa0EmLSNpQ6XBhLVxjycwKtXSXeFGJ4ETTQVGHcxDnbW1cabbwaLAQMC
+	 ueEv3hp0zBtL2puzxpbegtvVhAS7ejmV2ceRWu0xXadx7oho09xiBtKnyXPcrvk2Ks
+	 SJ0wZqOaKwukWJTNGLqUxz4STksMNaJ7AZaYVnQz8d02AA2/GWlfMid/ftB7ZSNnuW
+	 14FVGcHAMP6Sg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19BD43924A50;
+	Fri,  4 Sep 2026 16:56:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,47 +37,57 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v5 1/2] Bluetooth: btusb: mediatek: Fix leaked runtime PM
+ reference in reset
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178854096871.344939.9581829532701269317.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Sep 2026 16:56:08 +0000
+References: 
+ <dac8ddf07cb1bb79c70d5a516f0ff7baf41eb462.1788507854.git.liujiajia@kylinos.cn>
+In-Reply-To: 
+ <dac8ddf07cb1bb79c70d5a516f0ff7baf41eb462.1788507854.git.liujiajia@kylinos.cn>
+To: Jiajia Liu <liujiajia@kylinos.cn>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, yinghsu@chromium.org,
+ apusaka@chromium.org, abhishekpandit@google.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, jing.cai@mediatek.com,
+ sean.wang@mediatek.com, chris.lu@mediatek.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-From: raghavendra <raghavendra.rao@collabora.com>
+Hello:
 
-Verify that GMCS/SR/SPE/BI-01-C opcode 0x00 produces an Operation Not
-Supported notification.
----
- unit/test-mcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/unit/test-mcp.c b/unit/test-mcp.c
-index 6331c6c99..21997915d 100644
---- a/unit/test-mcp.c
-+++ b/unit/test-mcp.c
-@@ -2057,6 +2057,19 @@ static void testgroup_sr_mcp(void)
- }
- 
- 
-+#define GMCS_SR_SPE_BI_01_C \
-+	WRITE_NORESP_CHRC(CP, 0x00), \
-+	NOTIFY_CHRC(CP, 0x00, 0x02 /* not supp */)
-+
-+static void testgroup_sr_spe(void)
-+{
-+	define_test("GMCS/SR/SPE/BI-01-C [Media Control Point - Opcode not "
-+							"Supported]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, GMCS_SR_SPE_BI_01_C);
-+}
-+
-+
- static void sr_spn_value(struct test_data *data, struct iovec *buf, size_t size,
- 								uint16_t uuid)
- {
-@@ -2132,6 +2145,7 @@ int main(int argc, char *argv[])
- 	testgroup_cl_extra();
- 	testgroup_sr_sggit();
- 	testgroup_sr_mcp();
-+	testgroup_sr_spe();
- 	testgroup_sr_spn();
- 
- 	return tester_run();
+On Fri,  4 Sep 2026 16:03:50 +0800 you wrote:
+> MT7925 on HP Pro Mini 260 sometimes timed out during reloading driver
+> and reset usb device. btusb_suspend is not called again after closing
+> bluetooth interface.
+> 
+>  usbcore: registered new interface driver btusb
+>  Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260605184935
+>  Bluetooth: hci0: Execution of wmt command timed out
+>  Bluetooth: hci0: Failed to send wmt patch dwnld (-110)
+>  Bluetooth: hci0: Failed to set up firmware (-110)
+>  usb 3-10: reset high-speed USB device number 4 using xhci_hcd
+>  Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260605184935
+>  Bluetooth: hci0: Device setup in 1856545 usecs
+>  Bluetooth: hci0: AOSP extensions version v1.00
+>  Bluetooth: hci0: AOSP quality report is supported
+>  Bluetooth: MGMT ver 1.23
+> 
+> [...]
+
+Here is the summary with links:
+  - [v5,1/2] Bluetooth: btusb: mediatek: Fix leaked runtime PM reference in reset
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a78f54e23804
+  - [v5,2/2] Bluetooth: btusb: Fix leaked runtime PM reference in btusb_reset
+    https://git.kernel.org/bluetooth/bluetooth-next/c/71729d60938f
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
