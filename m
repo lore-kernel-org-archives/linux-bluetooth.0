@@ -1,51 +1,88 @@
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDB237F75D;
-	Fri,  4 Sep 2026 02:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46A41684D
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 05:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788490549; cv=none; b=gSk988m6/l44X6Lw7y652qPggg9NnG5wtWRQar1MTWyA5gAhEHrEqC0dg0KyXEPlSrhJABtNU906cc1XkopPXjgXKZmb5R68TR0WaUsTNVrQXb8xo0Y0+0iWMzJ1mB3pxT4wkbZ50x4dWSbIZvo4QLgDUiDNCUjgUAivIT8Iwkw=
+	t=1788499817; cv=none; b=CtMzBrU74baFLeZ7GEt2pfXf0mUP/s9RYYkEoqGQjCiVnJafQtLLDNVI39PIeFyxZ/Alp1EXQ2IMUNz7rO2e8mAIIVmW0GUlON3AS7eM5XSdrwiDdAQNCzZpJaNY53EFVH6kJ5NHzReRDQddmGg3CNXEcsndYN/OUtkFBZbC0to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788490549; c=relaxed/simple;
-	bh=ayJK+HZz42MN9d+6Jv+414RKqVEQUF61wxmTPGFP8GY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XWzSEVnpzoI3TYb0Jh7tA/iyOMSO6mq9BX0D7ciLMlQC29xGpxDHDDij5PvfFXd5lYY6MrQxj2ytkmtfQXji/HmsJ4WVLFwJLv1KbBLSS9Bxit7kwqHiD5+JzmJhbzkAR9wKStUKf69BaZgge4Cp5Td2KAs7MoWwjGxAXa5TzkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=nKuAQAEJ; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1788499817; c=relaxed/simple;
+	bh=ImOh168kxeA1zuaF/xS9s+Ai/+OKoAZCi8OLGG3Sztw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BBUBViyHKuuPo/lz2ZNd4UhjXr0hqIPaxPs2vRrurVhXPxAGZPm0yjGRYi1ONk3O3wvyrpoLOEdo+UmBuANOHjiWosj/VGG3ctQK1L5dSNhC8lnLSjdQQUL1UjzWqZywNinfE/v/wuDmGyqWK7dS4bMq3sybABIQW7BoSMTOdmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=kPoyCHgr; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="nKuAQAEJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1788490506;
-	bh=vNJNcmINo8z0o+qLjxXN5uDfE3solxvp/+KUbiVp1HA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=nKuAQAEJyn+2r7UCBrrL5k18wbNX2FpTlxduV2yv7jm0HR2ENEZLmG60sfE1yexlv
-	 2JB07XSeQc8nH2Fn7DLVAZHYtK/swfs4cl4Xf5q3w91hY4f4ptedxNJkMYIJ43E2oV
-	 oxUF/lOM8qWlcI+R42hCocArvDmkLydh/+BPBXVo=
-X-QQ-mid: zesmtpgz9t1788490501t82984c02
-X-QQ-Originating-IP: PNHvcRxiT/yvDV9slVVTV8ms5SAzjho/q2+6CCMqSBw=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 04 Sep 2026 10:54:59 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6873530075859553180
-EX-QQ-RecipientCnt: 10
-From: raoxu <raoxu@uniontech.com>
-To: brgl@kernel.org
-Cc: marcel@holtmann.org,
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="kPoyCHgr"
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 9CA5242943
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 05:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1788499812;
+	bh=s9VeM2Hj9d1CYutblv9K9gniHtTbYGqC7kevoULcpcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=kPoyCHgruozjzrQzIrWZpv6LdfuNlNZSU0XUzk4pBYZgBcPqw8UC+CBAe4PLY9qMD
+	 EkTMyLWpXDsYCZhTzISiV6e8GzXoows5Zm87tKGAAxAH1WaYPmTRjr/KMe7aU6XRmj
+	 6qhdj1lB2CQ8yTy26DoAL7i+M0o2Y8r3Tt5qJLZ/qsWW88MGs6UwznWNkZqHGUP5ma
+	 Asezl2BmluU2GoOIP4EDliBZfB0b3Gn/hz2ulqHEB5+YQJr73u4HTHUIwQrEJBxuFm
+	 ONF58gjhY+mX8TSjDZDOkcf2CZCYdB0w6x3dSe765AarVG3WcD9TZKu2/QLO34r/ZK
+	 bJBDUKxxKxm8hFq8JErjemUKSFj6bV9T9+BaFKwvgLQ+K91agXVAnSsIE2xC7e6jHJ
+	 FEIHT1AwaP9CyO8j0psaaUeSrgkshdzBx2Dh+FEejpB+jHrjL025/0ukVFujva9H2b
+	 ByH76eXIVZNJovbt3HXTKEdwrDCyfGelItY9MQELhu84N2MpvEa4ZhOeZk6QZyWa2C
+	 b6FV+oB2LRMI+/2gI2dJ5GAhBk126zOErPy/xBR5faSGJIVFoF6MffUubsMtP8yMJ0
+	 Clovb7GzJPdurot6TYn4ap60DprVjFKeGXytNmNuMm6HoVHKy/JWpMA4P5TSkWYzGW
+	 a9J6jo+sYSlcSfNQwNz2so+g=
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-85722fc5a21so831954b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Sep 2026 22:30:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788499811; x=1789104611;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=s9VeM2Hj9d1CYutblv9K9gniHtTbYGqC7kevoULcpcA=;
+        b=j6P4zrLMozwRVLzsqo9dlmugbGtFfSIoFuZ+rNRmccY8p+f+AozTlt9Z5elh+GqfIC
+         6VhhCqiiWxuuHPGiGuwLfEn6fPtxmlMRNTRVst/oKrpACZurDGsRIcKPWjdgq4x4SchC
+         vCe4oH7zVYnqUeCdCzcmwCerN0fKSepJxUoKFDApBUsKX9rdL6HkRwtQGgmcGPLNMgqJ
+         m9GZznszSEOUxhrwUCiKHsDJZdwgBD85ljndsV6u0XTsUhf84S+e146exiemGAfzWjR+
+         4JEN8MWFnk3nhNXqPBnfweyaJbouUg0a3nMUEBJueBsgyVl8XfCc+hf74/D46tCSguZb
+         Rigw==
+X-Forwarded-Encrypted: i=1; AKwUvByK8htVSV8d6fWB9zJWFv/fAUIFrSk7DEapmwQHqt4I+yQlRTy7IVCiRLlvV/SuX2v309Wj20vbF611DbeOJxc=@vger.kernel.org
+X-Gm-Message-State: AFuF++nk+B1Do1oGgDiltzyMluSJJgkjdsLRGa7q4enWWu8j+aDdFek+
+	kqj8OuTAWulGTXANNSdY23i4b3iBLVMYZQzhMrMkHssFV/8uzcNXT4rv1i3fmKaSd+B0NWfd1Hl
+	6VMpUa2Nt71WIZluY2H6Ufj9YPVt6GIcW86V2DV/wAmBIhBeHTMFeoDSRcZ631RNmUsSCFmKhaj
+	37mlpbD5Etjw==
+X-Gm-Gg: AYBFou0DWEwq2+6a4eckcqmhOCrNROxNrSg5JYKjkVmeYPL6E/jZC6fnMQOuj0SB7Vb
+	JzLaL8znycqo3UuJBjUQhskiQQ7yn02x2j6GCVngPEJUaXNff+pvsPpDz7wbgP35poAtRClg1y2
+	IXKsJ2sly0H2SofZHrVVuEeLuQ+a6iiySuxMhdD5VbB1RgmDjMHRsvrS7YeUNYRU7tSVhl99H08
+	frWbTBpKqwEKFujyADt7hW6OoM5BDW2zIDGIU4Oe/gVjtQHokD5PliKbMotQLAEkMY5OgP4o7hZ
+	lDrYxe4Cxwli2E+IcB8u2mpXZ9Olpcq/CP09MZVgPfa4YorwLPB8U5ixbiSAibJFPp4OSjaW14z
+	3oI6WJNzHf3uH2wMqrI0cWzofDDxIiMpv1unSrPQh
+X-Received: by 2002:a05:6a00:8d8d:b0:855:eb7b:5804 with SMTP id d2e1a72fcca58-861662d4c0fmr5800141b3a.4.1788499811001;
+        Thu, 03 Sep 2026 22:30:11 -0700 (PDT)
+X-Received: by 2002:a05:6a00:8d8d:b0:855:eb7b:5804 with SMTP id d2e1a72fcca58-861662d4c0fmr5800075b3a.4.1788499810579;
+        Thu, 03 Sep 2026 22:30:10 -0700 (PDT)
+Received: from canonical.com (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-86152d29654sm711385b3a.33.2026.09.03.22.30.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2026 22:30:10 -0700 (PDT)
+From: Ivan Hu <ivan.hu@canonical.com>
+To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	linux-arm-msm@vger.kernel.org,
+	peter.tsao@mediatek.com
+Cc: matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	raoxu@uniontech.com,
-	stable@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Subject: [PATCH v2] Bluetooth: btqcomsmd: destroy RPMsg endpoints before freeing hci_dev
-Date: Fri,  4 Sep 2026 10:54:57 +0800
-Message-ID: <049D60B81C44FFA9+20260904025457.3523467-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH] Bluetooth: btmtk: Declare MT7920 (MT7961 1a) Bluetooth firmware
+Date: Fri,  4 Sep 2026 13:30:07 +0800
+Message-ID: <20260904053007.667472-1-ivan.hu@canonical.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -53,95 +90,48 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MkYdL7H1i+/EVbNJ6Qni/ZIs8lgbVIiHQXwwvHBwUKHO7w37/NEyKaWr
-	80Ofl+3lMHBHFEoJTUJGGieNj+X5ZTjLN8JZ6L5sBkMkpLc+JCBihfm20yJIS2x/91B3ZYI
-	wQOhR5SYhwu1PSqSe6Xa3odJS4wj5YIf5hvhzdqPH43v7dk8A+/pf4bXL9dIl90J2wXgNWO
-	zYMG2ljDHxx3LjdAOH2GBV022ccQ7PnLXWajmWcoEZXtfvMN058liuHy8jxnd/5yMuIflfy
-	XLvyO7WMmGHK/AAbd/lF9E1p14QrmmhNWYdGpYxD+9EtpImQjnmmcQrjK6Tm6OLgsM4dGUC
-	3EC9HESzSfL1DqtQfCQzgrh7lzpmEHM7/gk7+Q7uGohaaAt8AkRa01F7J5eAOigMcE7Pa2c
-	oLvr+J17bfSMfQuFE4KA4gJeWScO0GT+OmvXtTuiQudQx0Ge37xVMOX3mCaqOb5LKYnkyHf
-	xWKnQnqvHTkNeHyzlqie59+p5Z71f+IQ/Qp3G+hvt/WyLmVA8nSNpKQ8HGTfuoiO/h6Su7l
-	uZAgKDo3GBkEBmZEtOvopzzKgewKbAv/xlFCM8Y6sfPt94H+Ga3QspADTHUGpniLOMxT8f3
-	X3e0BAVxu3oHbfkwdZOlDexa0+qfEVgYwaod5m9PjnsuNL6C5i58zo8zb7QfcdWZLn/nrlk
-	bf5gVwJqeW1CQAszuDC+HMl+RIL1OA032dM4DcBSH5bz/WMdF2LiNO1IHWeuxSwVEQ6nVhB
-	lmNPKG4csuINhNYqf9B5AXYwk/UxpHkIvIEom/HvjICBMbIMc96l0k4I590HQedZtF/I6rG
-	SM2ak18xgvVO2Q7kwqnjLG51p3Tqm+9uC7+W5mrgmg38zEsGUQuWngcZFpgcgY0wCFI1yuP
-	hJCUQcx5VBGsC8uAmFbrfuGguSKeWohQTWLiAao1nPyEDYMThmvFlxFY9fmUgNcsaKUZ1/9
-	YlpoUuFi2kMfh3k/GfFGfyQXfbkd5dxaoMPfaSuPvXU+kAiGyB56uZWonkNwf0urNV6s5Pi
-	Nn1Rjh7hTlEUkA+9KUurQjoH+rY5ly6wfwyFzJkYubxv7Mzk5w91x8IeUROKYHCkkgYjDM3
-	n5LjdblA7Zh
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-X-QQ-RECHKSPAM: 0
 
-From: Xu Rao <raoxu@uniontech.com>
+btmtk_fw_get_filename() constructs the firmware name at runtime, so for
+the MT7920 variant (dev_id 0x7961 with fw_flavor set) it requests
+"mediatek/BT_RAM_CODE_MT7961_1a_2_hdr.bin" without ever declaring it via
+MODULE_FIRMWARE(). Tools that select firmware from module metadata (e.g.
+"modinfo -F firmware") therefore omit this blob, so request_firmware()
+fails and Bluetooth does not initialise on MT7920, even though the file
+is present in linux-firmware.
 
-The command and ACL RPMsg endpoints store struct btqcomsmd as their
-callback private data. The receive callbacks dereference btq->hdev
-without taking an hci_dev reference.
+Declare it with MODULE_FIRMWARE(), as the mt76 driver already does for
+the corresponding MT7920 wifi firmware.
 
-The current teardown order frees the hci_dev before destroying the RPMsg
-endpoints in both the hci_register_dev() error path and the driver remove
-path. If WCNSS delivers data in that window, the endpoint callback can
-run with an already freed hci_dev and pass it to the Bluetooth core.
-
-For qcom_smd endpoints, rpmsg_destroy_ept() closes the channel and clears
-the callback under the channel recv_lock. The receive path holds the same
-lock while invoking the callback, so destroying the endpoints first both
-prevents new callbacks and serializes with any callback already running.
-
-Destroy the command and ACL endpoints before hci_free_dev(). Keep
-hci_unregister_dev() first during remove so the HCI core stops issuing
-operations before the transport endpoints are shut down. In the full
-registration-error cleanup path, return directly after freeing the hci_dev
-to avoid falling through to the partial-construction labels and destroying
-the endpoints twice.
-
-Fixes: 5052de8deff5 ("soc: qcom: smd: Transition client drivers from smd to rpmsg")
-Fixes: 9a39a927be01 ("Bluetooth: btqcomsmd: Fix a resource leak in error handling paths in the probe function")
-Cc: stable@vger.kernel.org
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
+Fixes: 1cb63d80fff6 ("Bluetooth: btusb: Add support Mediatek MT7920")
+Signed-off-by: Ivan Hu <ivan.hu@canonical.com>
 ---
-v2:
-- Add Acked-by from Bartosz Golaszewski and Reviewed-by from Dmitry
-  Baryshkov.
-- Resend as requested by Luiz Augusto von Dentz.
+ drivers/bluetooth/btmtk.c | 1 +
+ drivers/bluetooth/btmtk.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-Link: https://lore.kernel.org/linux-bluetooth/0CB2D8D715AB9933%2B20260713072543.3348755-1-raoxu@uniontech.com/
-
- drivers/bluetooth/btqcomsmd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index d2e13fcb6bab..d669ea4eb3eb 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -188,7 +188,10 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	return 0;
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index ea0c320f9827..911aba5c134e 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1581,5 +1581,6 @@ MODULE_FIRMWARE(FIRMWARE_MT7663);
+ MODULE_FIRMWARE(FIRMWARE_MT7668);
+ MODULE_FIRMWARE(FIRMWARE_MT7922);
+ MODULE_FIRMWARE(FIRMWARE_MT7961);
++MODULE_FIRMWARE(FIRMWARE_MT7920);
+ MODULE_FIRMWARE(FIRMWARE_MT7925);
+ MODULE_FIRMWARE(FIRMWARE_MT7927);
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index c83c24897c95..bc26148ec544 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -7,6 +7,7 @@
+ #define FIRMWARE_MT7922		"mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
+ #define FIRMWARE_MT7902		"mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin"
+ #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
++#define FIRMWARE_MT7920		"mediatek/BT_RAM_CODE_MT7961_1a_2_hdr.bin"
+ #define FIRMWARE_MT7925		"mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin"
+ #define FIRMWARE_MT7927		"mediatek/mt7927/BT_RAM_CODE_MT6639_2_1_hdr.bin"
  
- hci_free_dev:
-+	rpmsg_destroy_ept(btq->cmd_channel);
-+	rpmsg_destroy_ept(btq->acl_channel);
- 	hci_free_dev(hdev);
-+	return ret;
- destroy_cmd_channel:
- 	rpmsg_destroy_ept(btq->cmd_channel);
- destroy_acl_channel:
-@@ -202,10 +205,11 @@ static void btqcomsmd_remove(struct platform_device *pdev)
- 	struct btqcomsmd *btq = platform_get_drvdata(pdev);
- 
- 	hci_unregister_dev(btq->hdev);
--	hci_free_dev(btq->hdev);
- 
- 	rpmsg_destroy_ept(btq->cmd_channel);
- 	rpmsg_destroy_ept(btq->acl_channel);
-+
-+	hci_free_dev(btq->hdev);
- }
- 
- static const struct of_device_id btqcomsmd_of_match[] = {
 -- 
-2.50.1
+2.53.0
+
