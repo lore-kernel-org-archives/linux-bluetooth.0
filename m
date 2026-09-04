@@ -1,89 +1,112 @@
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAAA432BE4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 12:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04D249B1F5
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 13:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788525211; cv=none; b=SOP3APmLqOifKmyqA86F2F0pWgy4xFv1GGbUzBlImmgqQ41Qpp3LRyiJMRImctiPNKTrDUB3FjLXo5TEVlXY7x0udzGzOiqzDFzDZoRV+4C3D/Yg5kU/5uoLLhUhfaQuTj4yrSVqRC23UhFkoUc4rT7cVj39bw9WXXcsyNTVO70=
+	t=1788529898; cv=none; b=kkjQcI9fn1cZAgx52yuYE9Njh2CL/daQgu9STwhphbaYL+RJGtTYuLiyFxqpE1NUCAiIybmzTBUWWuozxxOa8I/oM0AAxLBFiUpeVoenrJ+tSwRod9IK26AN5kxkzeOmmOd02kwGS09dsb8BGeiw4KAxXdMAva3BNtNeHdMRj3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788525211; c=relaxed/simple;
-	bh=NBVirhb0SL42QOwJElnmD9fRBSdfW/OD70HSlLvV2ME=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=upl5X1YG92AdF6GOQL9jngvBWjROK70Y1WSGg9a+2YyFrFpYObQTn1md5DNr5lTwX7k6ofNY62TItQm6slPLNKLYZlu6wokG4n3Za1bYWT9d4SArq+daYA7p9Jy2iIdnz+g9kBG+aB68YHzZbx/ZfzR16WhMpqZa/gIF5JeVcsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7e9fc6dc091so910902a34.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 05:33:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788525208; x=1789130008;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=o7oOdj2qZ+5JD70IABcjfJnmxAKde2HwU/wgYhYPXAE=;
-        b=XEE0jY6IisFT2sFdSx2jjoLxdh6wt4edUVWLgx89rsFkqR7iII1UkpVEnjms0FJLjw
-         NcEs5oaKCyvVOvY1HrvHExTGRePoxrKWPPbSucWia0+Kygy/m3EiuDVYdjgUIOg43bOt
-         GagM4+e1v6BgRJrv070xA5OaGoEuezIFcasgnQ7Qnd2WqkAx8ChMvMgg7DKESJrhcBBU
-         Iblexk8QRMHUUtzSVCPh+l7YMVD70fXVpZBOjZ14eA6P+1hyOKeIPqBv+vKJ8EYxOwDs
-         g17MdeLLmKjaj1bQrIRZAu8Y+OCg85c6mcVUDqlbK81w98ScDQ0L8oE5qMa/sznAfMKN
-         b1+A==
-X-Gm-Message-State: AFuF++nGz8T/ilQvZRQ9npAH7Rm9Yv/nHFfz615A/NnirCfd1ll7hxp1
-	Nsm4MgjsK10ix5L/5j8u6N/sd852se1FrRQW2KoW/lZYZ2vS987VxVkFEtVJALfLbyR0Te/li1S
-	3fvleYsGu0CJdVQS8e7Plw2Hnh0SILo85F/DezLkAZVyUH9LU0aK8ONkwPPQ=
+	s=arc-20240116; t=1788529898; c=relaxed/simple;
+	bh=tARfdK1TuboEsIqxuNd6ACC0JY0HdqZF+wd86g2QH8k=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=CxLvo2vNAqzUptoSDO0Z/Nue7ccQC/UMaDKe6sO2DsSj0e2trZ5xfypHZoh/ML4jNvhT42XQSck4VQuwUWJNV68ikhVwP6TiIweLnqAlY6PtEmnxY+vbeKe52wNC+wJFNOKlCYb0fUIaVSHF5++RCo00mmcdu/orztNE9CLsy+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=CXecMfv5; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="CXecMfv5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1788529889;
+	bh=tARfdK1TuboEsIqxuNd6ACC0JY0HdqZF+wd86g2QH8k=;
+	h=From:To:Subject:Date:From;
+	b=CXecMfv5vFSyALi4r26si/USnEHNwYfyrPuaOyy6qGG+03QSSAQ6obYCTfoPfuYKy
+	 TvH0RcdoOsCzywRq2LR1DeC86D1sdT8lD30JNP7Qzge5O17WgRBlm4FTbMUUAVJ16V
+	 0uiV88nl37XZPfv7bjqcZ1FvO4h2BE7YjFrGw8k/dlfK9BVZWVMUzrbAoIBjUUThUG
+	 9g4/d1LIp+LvXyOarBzJtSAeql5j/W//nMfrJjgQKJHqsW4uZ6L5wsVS+AhG83wzuI
+	 7zqafK0rNgZBrjy5Ki2ExGt93dND8hkFEX47vgnnv70+NUKrzJZfh228jWjOHJEYn2
+	 ctPlUtb+3maSg==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5E0C317E080A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 15:51:29 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 0/8] client/btpclient: Add BAP/ASCS/PACS support for auto-pts BAP tests
+Date: Fri,  4 Sep 2026 15:51:16 +0200
+Message-ID: <20260904135124.981346-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e847:0:b0:6b7:46e9:9700 with SMTP id
- 006d021491bc7-6b746e9a360mr2235866eaf.48.1788525208507; Fri, 04 Sep 2026
- 05:33:28 -0700 (PDT)
-Date: Fri, 04 Sep 2026 05:33:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a9aba98.efa90033.8a9e.0000.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Sep 2026)
-From: syzbot <syzbot+list2fd463303e674a91d50c@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hello bluetooth maintainers/developers,
+This series extends btpclient with support for the BAP, ASCS, and PACS
+BTP services required to pass the auto-pts Basic Audio Profile test
+suites (BAP/UCL/*, BAP/USR/*).
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+- Patch 1 adds BTP_EV_BAP_ASE_FOUND, needed by BAP/UCL/SCC/BV-004-C
+  and BAP/UCL/SCC/BV-019-C.
+- Patch 2 fetches Codec capabilities when replying to an ASE.
+- Patch 3 introduces ASCS BTP support: audio endpoints are registered
+  via the VENDOR service's ASCS setup command, and the
+  SelectProperties() D-Bus reply is postponed until auto-pts has
+  requested the ASE and PACS characteristic values, allowing
+  BAP/UCL/SCC/* tests to pass.
+- Patch 4 adds BTP_OP_PACS_SET_LOCATION support to store the expected
+  location for a local endpoint.
+- Patch 5 adds BTP_OP_BAP_SEND support.
+- Patch 6 extends ASCS support to cover the BAP/UCL/STR/* tests.
+- Patch 7 fixes CIG/CIS id assignment to be deferred and based on the
+  Unicast Client/Server role, matching what auto-pts expects (0/0 for
+  Client tests, 1/1 for Server tests) instead of eagerly assigning
+  CIG 0 to every discovered ASE.
+- Patch 8 adds automatic stream acquisition and data sending for the
+  BAP/USR/STR/* tests.
 
-During the period, 3 new issues were detected and 4 were fixed.
-In total, 20 issues are still open and 110 have already been fixed.
-There are also 6 low-priority issues.
+Together these patches allow btpclient to pass the BAP/UCL and
+BAP/USR auto-pts test suites.
 
-Some of the still happening issues:
+Frédéric Danis (8):
+  client/btpclient: Add BTP_EV_BAP_ASE_FOUND support
+  client/btpclient: Get Codec capabilities on ASE reply
+  client/btpclient: Add ASCS BTP support
+  client/btpclient: Add BTP_OP_PACS_SET_LOCATION support
+  client/btpclient: Add BTP_OP_BAP_SEND support
+  client/btpclient: Add ASCS support for BAP/UCL/STR/* tests
+  client/btpclient: Defer CIG/CIS assignment based on Client/Server role
+  client/btpclient: Add stream auto acquire for BAP/USR/STR/* tests
 
-Ref Crashes Repro Title
-<1> 9720    Yes   WARNING in call_timer_fn
-                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<2> 598     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                  https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<3> 391     No    WARNING in l2cap_chan_del
-                  https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<4> 62      Yes   WARNING in l2cap_chan_send
-                  https://syzkaller.appspot.com/bug?extid=b6919040d9958e2fc1ae
-<5> 7       No    WARNING in hci_send_cmd (4)
-                  https://syzkaller.appspot.com/bug?extid=00f5a866124dc44cce14
-<6> 250     Yes   KASAN: slab-use-after-free Read in bt_accept_unlink
-                  https://syzkaller.appspot.com/bug?extid=a1595e656a83ea5b78eb
+ Makefile.tools               |    7 +-
+ client/btpclient/ascs.c      | 1641 ++++++++++++++++++++++++++++++++++
+ client/btpclient/ascs.h      |   21 +
+ client/btpclient/bap.c       |  381 ++++++++
+ client/btpclient/bap.h       |    4 +
+ client/btpclient/btpclient.c |  194 +++-
+ client/btpclient/btpclient.h |   36 +
+ client/btpclient/core.c      |   75 +-
+ client/btpclient/gap.c       |    3 -
+ client/btpclient/pacs.c      |  107 +++
+ client/btpclient/pacs.h      |   13 +
+ client/btpclient/vendor.c    |  103 +++
+ client/btpclient/vendor.h    |   13 +
+ src/shared/btp.h             |  156 ++++
+ 14 files changed, 2744 insertions(+), 10 deletions(-)
+ create mode 100644 client/btpclient/ascs.c
+ create mode 100644 client/btpclient/ascs.h
+ create mode 100644 client/btpclient/pacs.c
+ create mode 100644 client/btpclient/pacs.h
+ create mode 100644 client/btpclient/vendor.c
+ create mode 100644 client/btpclient/vendor.h
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.43.0
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
