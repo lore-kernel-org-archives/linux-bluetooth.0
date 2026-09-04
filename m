@@ -1,184 +1,130 @@
-Received: from out-8.smtp.github.com (out-8.smtp.github.com [192.30.252.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0603BBFC2
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 23:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78654388E6F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 23:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788563723; cv=none; b=cUnPp3gnzt6iXRa3wMMkdN0ZfkQXjfe4UoQuwh4dFYZ6v92zYqereCpu+tq0xVFxMGQmiDPZOeqGY14lqRnBRP3PN/h7UtnKrma8z3fiYJpI1TK88r/j4VQa50YX3VgbuOsTCa+bMuy8tLv1b5Ltna7Lt58szak5RhfWqa2GeO0=
+	t=1788565672; cv=none; b=DpILMScwHcqfBR7j/faEb1pAlvZ5WQVHMYZX3vdGXO/xPLshjKpiCM9pYKZU1kgk1ifQiaGORUl8ef3qPoeRMBgRvv6XaMTLFzTLEDGXTFBXnOB0genaUSwVRbltOhnZDbXG8fn2B3Yyntu0CIws+Zh73XxsHMe+LBTDN/aKg3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788563723; c=relaxed/simple;
-	bh=mfG/ZVUG+cY9DiFmK+1iMi42Y9hAeds0b1Lcvc5xzVM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WEUL4KwM6xSDR/LiTbtNbL189s+pDSEpa1LJgJfsJrTMy0xa3gL6CAAryERcmyclRdMUXmJU+9L/5RNxgM9T26GFeDOHW61ROapOMMy1KUGbk1X09QwHC6WWhnkBMOVqwlHU+RgPorotZCgxkGHPg6MyuzxVY302cQUcY+EIKVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=e3lNdrtA; arc=none smtp.client-ip=192.30.252.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788565672; c=relaxed/simple;
+	bh=8BKFBCBE8jaUj6H0QDSJzWHnhvI/FjLWE/b6kRT+jGE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bdKHwHgf21oQUiqMJxqqhvSsHNbysyw5aHunWRBDEd4gzLIcwG/a8+p9GON7lG7uyMrd0tzIl2mfZmsweU7PAouzy5k43wY7e4E/tooNaRY62ZhKzfgrIU9BZ6OJYE3AWck7SSyzJ5Gp40nN9nVDUCvLcN3YHj90LMCWaz2WTdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2LAlQ6V; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="e3lNdrtA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788563720;
-	bh=oCpOTlG041B1ThIGkZWvv9cFWgB0ZsVj68b2PP986qA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=e3lNdrtAye6thSIuRMzJK4y57F4e8apuS2HbY0zA0oAcl1nYFHwpoWme52jzHn6jE
-	 l93A8ElZrrgADHbpr4GAWZAxzFIq9ztSlxM5p2sQaUPkVmhPk3cxtfN0Ara/tLY0Bu
-	 /iNNvkyTNp6pHMTGhktZoxR5f/MOVwD76P77OE2w=
-Received: from github.com (hubbernetes-node-c128fa5.va3-iad.github.net [10.48.139.43])
-	by smtp.github.com (Postfix) with ESMTPA id AA5C57803F3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 16:15:20 -0700 (PDT)
-Date: Fri, 04 Sep 2026 16:15:20 -0700
-From: Proxy Alt <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1158378/000000-063d77@github.com>
-Subject: [bluez/bluez] a678fa: shared/gatt-client: verify a synthesized CCC
- befor...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2LAlQ6V"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7eb29ed2bbdso1033279a34.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 16:47:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788565670; x=1789170470; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8BKFBCBE8jaUj6H0QDSJzWHnhvI/FjLWE/b6kRT+jGE=;
+        b=U2LAlQ6VSQucXtfFdxt9kmnkTznbSdBTuuF41ZOTfe3LFZ9fcjVLLZos+jePNjCEnd
+         SaF5i74oyWqcESavXU9CKm6TytlRvtiUP7cVqAAR1oiA5w5OwDvG3NXSY5LuNEzTJ1EX
+         0fsxq1/7RBo2bZX+Cw0yoCArjxRJR5SBSvPsKnrMdVyDyO04DxNFoPQBmcKNCLkwArye
+         Irmul8IYPPzCFhVGLweVYvKFV4M4wQgO6vRkS6T1vHGjR2okDJ8ZiJ+/rPsAKHZXAgIZ
+         137INRgYN8CnDZ2kp0g06GSKJ7+8y3r88ftz5VzYw4PfsHfJ3o601qERkgbDawHNegfb
+         +pcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788565670; x=1789170470;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=8BKFBCBE8jaUj6H0QDSJzWHnhvI/FjLWE/b6kRT+jGE=;
+        b=Aokk+OjHUdLk1Nxf8C1GYGreGL4nvaZF1R5BPUoTxtEm+EtajVMDd097pydtvaPaUN
+         t8h4RC5nxrDqj4jGHj74lotKQXjNFnlKsYDRImEyBqzmzMTejwBV9IpU8+qONVrSYLBX
+         Ol/HUHOb4jormf0X3bvi//ncXyZhGwHYHnGBW22ucZ20/AzX3RgXH+TOhP9l158V9n5w
+         TfCIpUUM7JZhvYKQHnFSr8n8LJp6Sf+K53n1RQ5kipV+O7tQkQvYcINGyKBtoFBoQLs0
+         zGIt0g2B39FqT1Z1Eya6ZndPf+1gZZCfAuXwqC63MVz6hBKA11Nodlj+lIRVcOq1nAa3
+         Iizw==
+X-Gm-Message-State: AFuF++kiSg9Wr8ig0HcA3Z/cWuRopKPsimZG+aH/xXMD+NLgthz9QNc4
+	aXpx5VgM9q1QRcY9rnL0mrdZ6CSfL1pVkFyKf98IGDmgvM+r8B5UiOLHfykpHw==
+X-Gm-Gg: AYBFou33G+AcmmWWULrhp5xmqbUkHQN1+0T0lj/ziVNMwgsm9oOVYlUbnAul7lBMTux
+	vyVxKDpbLxXvHDs6AKBOAMToBF/8Zh+UQdTXdxjbIzCJmARtH4wATE0iOaxhPtxhzeqdex676rA
+	Aa/+6XU4l6bxVaXJthsGLr596aedQpmuAZb8/HGZUIVvjoQIBvI3zHNxKNGgh/D26WBbcZi7162
+	adbc25toAO7/vclrUAITuuYCLDOBrGtkqC0mXBAbesYcOo7HQuA8gNUyBug/6cyMTJFZbgsBOsH
+	lIj3W8e/SjbFzYt+JLt6l2x5Ry759SXR27tYT+SpiLqtnuQBnLjwMP0kshsZsH6MIY+i1IXl5QZ
+	0syQ6vTY0AcEgcwTItFFNTo07NK+8WmmKHeS+jzvgGNCH5bWUs+vwGfA678+xPF027JRsgpgmgZ
+	rf8oPgMLjtZO2jW+Wd89PGoiZWneKm0R4IJSWJtGJxywQZGibcKyjR0ckz8p9W54sozEdo
+X-Received: by 2002:a05:6830:81f8:b0:7e6:d384:459e with SMTP id 46e09a7af769-7fa1e1b7625mr10772693a34.3.1788565670176;
+        Fri, 04 Sep 2026 16:47:50 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.180.163])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f9f470a34fsm4690237a34.3.2026.09.04.16.47.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Sep 2026 16:47:49 -0700 (PDT)
+Message-ID: <6a9b58a5.1059eef8.20e04.a017@mx.google.com>
+Date: Fri, 04 Sep 2026 16:47:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2874976647475378640=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, proxy-alt@proxy-alt.dev
+Subject: RE: [BlueZ,v3,1/2] shared/gatt-client: verify a synthesized CCC before writing
+In-Reply-To: <20260904213642.68792-1-proxy-alt@proxy-alt.dev>
+References: <20260904213642.68792-1-proxy-alt@proxy-alt.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1158378
-  Home:   https://github.com/bluez/bluez
-  Commit: a678fa2d00fa989b073d882a87149a65907df8b7
-      https://github.com/bluez/bluez/commit/a678fa2d00fa989b073d882a87149a65907df8b7
-  Author: Proxy <proxy-alt@proxy-alt.dev>
-  Date:   2026-09-04 (Fri, 04 Sep 2026)
+--===============2874976647475378640==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M src/shared/gatt-client.c
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTE1ODM3OAoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEFTUyAgICAgIDAuODAgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+QVNTICAgICAgMC41MCBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAxMy4yNyBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAg
+ICA0MjguOTAgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+Ni45MiBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIEZBSUwgICAgICA4NS41
+MiBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMTcuMzEg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTc3LjE4IHNl
+Y29uZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgUEFTUyAgICAgIDYzLjM2IHNlY29u
+ZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDQzOS4yMCBzZWNvbmRz
+ClNjYW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA1NTkuMDUgc2Vjb25kcwoK
+RGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZUNoZWNrIC0g
+RkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6CgouL3Rlc3QtZHJpdmVyOiBs
+aW5lIDEwNzogMzE3MjAgQWJvcnRlZCAgICAgICAgICAgICAgICAgKGNvcmUgZHVtcGVkKSAiJEAi
+ID4gJGxvZ19maWxlIDI+JjEKLi90ZXN0LWRyaXZlcjogbGluZSAxMDc6IDMxNzc5IEFib3J0ZWQg
+ICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgIiRAIiA+ICRsb2dfZmlsZSAyPiYxCm1ha2Vb
+M106ICoqKiBbTWFrZWZpbGU6MTA0MTM6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06
+ICoqKiBbTWFrZWZpbGU6MTA1MjE6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBb
+TWFrZWZpbGU6MTEwMDY6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEw
+MDg6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBN
+YWtlRGlzdGNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0
+OgoKLi4vLi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA1MzYyOCBBYm9ydGVkICAgICAgICAgICAg
+ICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQouLi8uLi90ZXN0LWRyaXZl
+cjogbGluZSAxMDc6IDUzOTA4IEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkg
+IiRAIiA+ICRsb2dfZmlsZSAyPiYxCm1ha2VbNF06ICoqKiBbTWFrZWZpbGU6MTA0MTM6IHRlc3Qt
+c3VpdGUubG9nXSBFcnJvciAxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTA1MjE6IGNoZWNrLVRF
+U1RTXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTEwMDY6IGNoZWNrLWFtXSBFcnJv
+ciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTEwMDg6IGNoZWNrXSBFcnJvciAyCm1ha2U6ICoq
+KiBbTWFrZWZpbGU6MTA5Mjk6IGRpc3RjaGVja10gRXJyb3IgMQojIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1h
+a2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBm
+dW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEzMTMxOjU6IG5vdGU6IHZh
+cmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2lu
+Zy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMzEzMSB8IGludCBtYWluKGludCBh
+cmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KLi90ZXN0LWRyaXZlcjogbGluZSAx
+MDc6IDczMTc3IEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgIiRAIiA+ICRs
+b2dfZmlsZSAyPiYxCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA3MzIzMSBBYm9ydGVkICAgICAg
+ICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNdOiAq
+KiogW01ha2VmaWxlOjEwNDEzOiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAqKiog
+W01ha2VmaWxlOjEwNTIxOiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2Vm
+aWxlOjExMDA2OiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjExMDA4OiBj
+aGVja10gRXJyb3IgMgoKCmh0dHBzOi8vZ2l0aHViLmNvbS9ibHVlei9ibHVlei9wdWxsLzI0OTUK
+Ci0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
-  Log Message:
-  -----------
-  shared/gatt-client: verify a synthesized CCC before writing
-
-discover_descs() still synthesizes a 0x2902 for a notify/indicate
-characteristic's lone descriptor without ever asking the peer - that
-part is unchanged, since always discovering costs a round trip on
-every characteristic for the sake of devices that violate Vol 3, Part
-G 3.3.1.1. What changes is register_notify(): before it writes to a
-handle discover_descs() only guessed at, it now issues one
-single-handle FIND_INFORMATION to let the peer answer for itself, and
-only after that answer confirms a real 0x2902 does the CCC write
-happen at all.
-
-If the peer's answer is anything else - a different UUID, or no
-answer - chrc->ccc_handle is cleared instead of written to.
-register_notify() already handles a characteristic with no CCC
-correctly (gatt_db_attribute_get_ccc() returning NULL takes the same
-path), so this reaches that existing, correct behaviour instead of
-writing 0x0100 into an attribute the peer never claimed was a CCC.
-
-v3 fixes two real bugs v2 had, both found by actually running it
-against real hardware and then a real unit test rather than trusting
-that it read correctly:
-
-1. unverified_ccc lived on struct bt_gatt_client, but discover_descs()
-   only ever runs on the root client, while register_notify() is
-   commonly called through a clone (bt_gatt_client_clone(), used by
-   src/gatt-client.c per D-Bus consumer / by profile implementations
-   like bt_micp) - whose own copy of that queue is always empty. The
-   verify step silently never triggered. Fixed with root_client(), a
-   two-line walk up ->parent, used at both call sites instead of
-   client->unverified_ccc directly.
-
-2. Once (1) was fixed and verify genuinely ran, two more bugs showed
-   up together under unit/test-micp: the CCC write could get skipped
-   entirely, and requests the client issued after it could go out on
-   the wire ahead of the (still in-flight) verify - reordering ATT
-   traffic relative to what every existing caller of register_notify()
-   was written to expect from a synchronous write.
-
-   Root cause: bt_gatt_discover_descriptors(), which the verify step
-   uses, is not tracked in client->pending_requests the way
-   bt_gatt_client_write_value()/read are. notify_client_idle() only
-   watches pending_requests, so it considered the client idle - and
-   fired every registered idle callback, letting application code run
-   - while the verify FIND_INFORMATION was still genuinely outstanding
-   on the wire. That is what let a later application write jump ahead
-   of the CCC write register_notify() had not had a chance to send
-   yet. Separately, resume_after_ccc_verify() used the same
-   "notify_count > 1 means someone already wrote it" check
-   register_notify() itself uses - correct there, but not after an
-   async gap, since other callers for the same characteristic can
-   (correctly) queue up behind chrc->ccc_verify_req and bump
-   notify_count before verification even resolves, with nobody having
-   written anything yet.
-
-   Fixed both: notify_client_idle() now also checks whether any
-   notify_chrc on the client still has a CCC verify outstanding before
-   firing idle callbacks, chrc_has_pending_ccc_verify() added for that;
-   resume_after_ccc_verify() no longer rechecks notify_count, since by
-   construction this is the first and only place that can write once a
-   characteristic was ccc_unverified; and verify_ccc_cb() calls
-   notify_client_idle() itself once verification concludes without a
-   write, since nothing else naturally rechecks idle for a request
-   this codebase's idle-tracking never had to account for before now.
-
-Also fixes a real leak (3 struct bt_gatt_result plus their backing
-allocations, confirmed via LeakSanitizer against the same test):
-verify_ccc_cb() never released the reference
-bt_gatt_discover_descriptors() returns, unlike every other discovery
-completion in this file (see discovery_req_clear()). Fixed with the
-same bt_gatt_request_unref() pattern.
-
-unit/test-micp.c is updated to match: three subtests
-(MICP/CL/CGGIT/SER/BV-01-C, MICP/CL/CGGIT/CHA/BV-01-C, MICP/CL/SPE/BI-01-C)
-drive a real notify-enable through a synthesized CCC and now expect the
-FIND_INFORMATION exchange this patch adds before the CCC write. With
-v2 (before the fixes above), this test reproduced the original bug
-exactly as reported: a WRITE_REQ to the synthesized handle that got no
-response and would have hung until the 30s ATT timeout in a real
-session. With v3, ./unit/test-micp passes 7/7 with zero leaks under
-LeakSanitizer.
-
-unit/test-mcp.c and unit/test-bap.c hit the same class of pre-existing
-mock-script gap (their own CCC-enable sequences need the equivalent
-FIND_INFORMATION step added) but I have not finished updating those
-yet - flagging rather than shipping a partial fix for them silently.
-
-Cost: one extra FIND_INFORMATION per notify/indicate characteristic
-whose sole descriptor was synthesized, the first time register_notify()
-is called for it.
-
-Fixes: https://github.com/bluez/bluez/issues/2383
-Signed-off-by: Proxy <proxy-alt@proxy-alt.dev>
-
-
-  Commit: 063d77929b6c5e39516f066399c8edc1c1041bc2
-      https://github.com/bluez/bluez/commit/063d77929b6c5e39516f066399c8edc1c1041bc2
-  Author: Proxy <proxy-alt@proxy-alt.dev>
-  Date:   2026-09-04 (Fri, 04 Sep 2026)
-
-  Changed paths:
-    M unit/test-micp.c
-
-  Log Message:
-  -----------
-  unit/test-micp: expect the FIND_INFORMATION the CCC fix adds
-
-Companion to the shared/gatt-client.c fix (bluez/bluez#2383): the
-lazy-verify patch adds one FIND_INFORMATION exchange before the first
-CCC write to a characteristic whose descriptor discover_descs()
-synthesized. MICS_MUTE's CCC (handle 0x0004) is exactly that case, so
-the three client subtests that drive it now need that exchange in
-their scripted ATT sequence, right where register_notify() actually
-issues it (after the value read, before the CCC-enable write).
-
-Verified: ./unit/test-micp passes 7/7 with zero leaks under
-LeakSanitizer, against the corresponding shared/gatt-client.c fix.
-
-unit/test-mcp.c and unit/test-bap.c need the equivalent update for
-their own synthesized-CCC subtests; not included here.
-
-Signed-off-by: Proxy <proxy-alt@proxy-alt.dev>
-
-
-Compare: https://github.com/bluez/bluez/compare/a678fa2d00fa%5E...063d77929b6c
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============2874976647475378640==--
