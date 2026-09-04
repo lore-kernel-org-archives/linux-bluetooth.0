@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF8751121B;
-	Fri,  4 Sep 2026 16:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEEF511E7F;
+	Fri,  4 Sep 2026 16:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788541039; cv=none; b=oG4oVrOIUT/yKoRnVssshMCqWZMXXhgwoLUyXZH96O7fwelKye/Ge9ZPMChNdmkMC0F6idmWysr51nEnqhXBT2p1YEERr/YDmqQ+SrTZXbVETz8xKk3PzAHLKNqQXhFyyRJd5So2uCLmEN7eUVSUL5ljB69Y4Mj1C+aNzBiK1SY=
+	t=1788541041; cv=none; b=L1v4bi6/lMys0cwB48iErITfb8hGQ/eoW5TQ8w6HTACAomiF/XNJy9vzFsgK5AjIUMWZkhDFNHvTexwCWmlLtfnUOqeupHeua7D7IDweqgVRjSBJi67A6jNgWYFC2/LX3bs6EPWKja2gY5UrWCRs9ox2EIEYtJUJQlMFzpiAlow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788541039; c=relaxed/simple;
-	bh=mK8pRrJArtX19qbW1x26Dqf7t3/Mp61mHURIBFIf304=;
+	s=arc-20240116; t=1788541041; c=relaxed/simple;
+	bh=Qus+JmGlcvoJwK5/AnSYdqGuOmsql+mG2SP+G8rPLwY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ayy1WWWNv+jDZrf49LeWZWKuvfnp/xtJtaSrt2bNhzDOR8dCx2rx87g71fhfnudZ5zgqVAms9nlHCD4tHA2xGooVygqneaJ9bbw5U6NyEARdz31fOsXh5kDnrsryabmmA0ovGka41Dn4vvESVXpYrvlDMBmV/QcE/GoNeKfTpng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJXKnU9K; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=N3cPx1E0SNW0jH9UslxwMSrpbuZ76kXi+cihbi7xNvlqXSl9xQajXtqGJ8xshhphee1RW+imMhC/QtgdaYuHFD57CjXdVlqjLfblzkfmuf2jsVmtkrpv3kvhIMkaQfU/wTtVbiq04ZfXFRlkS/U5kvCLIXnjzunEa96RbEXK2dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LBWz95SB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJXKnU9K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 965771F00A3E;
-	Fri,  4 Sep 2026 16:57:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LBWz95SB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0721F00A3D;
+	Fri,  4 Sep 2026 16:57:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788541038;
-	bh=JpG5ySY4n5XRSJOOwe1C2xgJUbZHwLIQBGksimbBp4U=;
+	s=k20260515; t=1788541040;
+	bh=OL7LK/TnUmBl/3+mH0jmltTFZQIeDGCR7ykjWvnQ8UY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=aJXKnU9KSxV6WE0r2El0l/qs+yiuev58AICPzYmwmrwHQjXXxn3Gsis740B/0IccD
-	 uMqWWd/+UWaVBVghAtb0cGyDcISD3Gp8P8YGf8ylseSBWwUOipHxf59nZ23ohNFjO2
-	 s7WRMtyNQZHiTuJ3xAgIwswAoMIBkgx6tDCfqNvrU+YIX1GR/Ebmz0qbP6zfyDUN9S
-	 +fwyUwXiR69QMNMMZ5ZsJ/0nmdbmIkHhdr49BW66s057JmChOu1lM/wac3aTFUHnqC
-	 4V6TOYP/p8CB4+pEY75hWWju1anch+qlsNLIQiIAKfppxaKld9ImpfoE0sa6Es8ZYP
-	 HPL/Fzx/XtprA==
+	b=LBWz95SBQ82yTTf0sCIG2Xiq/lRZtlyxW3bSDR4fBszbUr+d/jpngw5EqpJcPqbNN
+	 hUYIA2y/MoWWdWwmNXb1su42U49tdUcZXZFLbpeHeRIONhRfD+kj9hgFcuyk1RyqqZ
+	 3D0qbF7HgNbWvhbbQg7bTCEA0W0O/pQUaXQiBoTmocncg3HOhuSPA/LCIlyiyOY2An
+	 x8DGpqrnuNVzlNewN313leP58MogPEjkz9ui4ESh/Q52uoZgdaZsYZUyNrS9cljaFs
+	 QDVqvu4ctWq4v2o6gdt38WOdS3FkN78etf9xfLdI8VQFO2aXkMCSdXO5kAmEQQZJPf
+	 fcCiedwMGbN4w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939C63924A50;
-	Fri,  4 Sep 2026 16:56:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197A03924A50;
+	Fri,  4 Sep 2026 16:56:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,16 +37,16 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 0/2] Add support for the Synaptics BCM4384 Bluetooth
- controller
+Subject: Re: [PATCH v3 1/2] Bluetooth: dt-bindings: net: bluetooth: add
+ BCM4384
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178854097913.344939.12691423613883743517.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Sep 2026 16:56:19 +0000
+ <178854098064.344939.6446334555255761501.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Sep 2026 16:56:20 +0000
 References: 
- <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
+ <20260901085702.1515378-2-andy.chang@synaptics.corp-partner.google.com>
 In-Reply-To: 
- <20260827110242.1203546-1-andy.chang@synaptics.corp-partner.google.com>
+ <20260901085702.1515378-2-andy.chang@synaptics.corp-partner.google.com>
 To: Andy Chang <andy.chang@synaptics.corp-partner.google.com>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
  luiz.dentz@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
@@ -58,22 +58,20 @@ Hello:
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 27 Aug 2026 19:02:40 +0800 you wrote:
-> The first patch adds the BCM4384 Device Tree compatible string.
+On Tue,  1 Sep 2026 16:57:01 +0800 you wrote:
+> Add the brcm,bcm4384-bt compatible string to support the
+> Synaptics BCM4384 Bluetooth controller.
 > 
-> The second patch adds the controller support to the Broadcom
-> Bluetooth driver
-> 
-> Andy Chang (2):
->   Bluetooth: dt-bindings: net: bluetooth: add BCM4384
->   Bluetooth: btbcm: Add Synaptics 4384 chip support
+> A fallback compatible is not suitable here because the BCM4384
+> controller requires a dedicated firmware patch file (.hcd) matching
+> its specific hardware ID and revision.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,1/2] Bluetooth: dt-bindings: net: bluetooth: add BCM4384
+  - [v3,1/2] Bluetooth: dt-bindings: net: bluetooth: add BCM4384
     https://git.kernel.org/bluetooth/bluetooth-next/c/29d82dcf7273
-  - [v1,2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
+  - [v3,2/2] Bluetooth: btbcm: Add Synaptics 4384 chip support
     https://git.kernel.org/bluetooth/bluetooth-next/c/9aa9447804c7
 
 You are awesome, thank you!
