@@ -1,133 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2580E381AEC;
-	Sat,  5 Sep 2026 12:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811D336F42D
+	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Sep 2026 13:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788609913; cv=none; b=raOiDdJ028hxpj3c8A1msBe8c1D6k8FA5pwtR2JjW3EKIeGFrpSxCmNQaN7fXjMtrtFhdOL5MYCEUQofOQZ9WgqVJq2QHQhjR9GOnYzhHjdEkgkqDfQa6i1y7jo6s8pFaatMA619tyBVYuEeI+Mw8YFcFUjk+ZFJKwYTdZq23E4=
+	t=1788615025; cv=none; b=T09BeE10rznVYyzIpyizJcKa6M1LxuOeQJHDfXwY069HFcOlc7Vhy+L3cOUV4I+NHe06txL8t9+D55ASDZHbMQ0uQfrEOD2aypEsBvOgHSScMavIrol/zhxrtTGbIaDcLI530eLsK5hHT/ycgaYQxGWJISxX0N1lEBk6N5A+lHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788609913; c=relaxed/simple;
-	bh=K6MbrBQlIeiFcBEDt6UWI0HR0lk3Q+lvtJD3LHvHCkg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lrj27za7WgGTXtePU3gdUvs5lEiqzafMKOs8Bsfu0EzuIMzKCxvNEeylaYFNwS0iaG06irepqxVXtrjSPFdUwLa5habNxExwWJDHpOlSGzaByf2wgeBuiO3lrUvqHA1v4icBNqSlymBKmu2U1oiHtj2laSPMHAd4dpeq3cXNdpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khNbDBMZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1788615025; c=relaxed/simple;
+	bh=7cEp0uMVEdqkEQZnc/7kZUIDN3UxMPTkDeG22YHWPd4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XfxFpxAHG8sKWV3OrUHj7DJALIR96Im2h3iJzICPP0+89d1iGsVs1XMSMjSIEB0s8zm98iF5SO2gf/x7mCVKS8wizE8bfrOWQANN/ZQqmtTqWk/UfUPDGfaYpetgGt6XXEb4F12QOjG6JmQGcWPTL3X3knXjoad9kiPVXAZyfrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HwiCW57w; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khNbDBMZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 98250C2BCB3;
-	Sat,  5 Sep 2026 12:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1788609912;
-	bh=K6MbrBQlIeiFcBEDt6UWI0HR0lk3Q+lvtJD3LHvHCkg=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=khNbDBMZrw5bPU+uQO+VeAyB9KL1HMtzUV6cI5XwnF6t5XMtT7xqYA+SS4Sa/MFhx
-	 QKwyxPr6ApK3njE6QB/+RV8u6BbeahNAvxE5NqKKqHgq/Qb8IFh74BmMjNPqWJQop1
-	 uD0laK/flyrdKyDqrcRwQofNZqwzsXT0njuP7xYBUdQK2ngk5VElBi3y2/ae9aCHFT
-	 DvNcoeZWMIQeAdbo+WYK880TkTJpXE7cD1PGU9WetboNJMIK3gQFW1JP+KEbm4/Mcj
-	 gkP4rTfbmvqqCoPxBwLRr03S8himVIJzkaIV1S44B5Eg9+XvH3TsIUIFR59JK+U8HV
-	 oTJZhgEaqp69w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DAD6C624DB;
-	Sat,  5 Sep 2026 12:05:12 +0000 (UTC)
-From: =?utf-8?q?Nikolaj_Klitlund_B=C3=B8rty_via_B4_Relay?= <devnull+nbn.sj.dk@kernel.org>
-Date: Sat, 05 Sep 2026 14:05:12 +0200
-Subject: [PATCH] Bluetooth: btusb: Add device ID for Realtek RTL8761BUE
- (StarTech AV53C1)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HwiCW57w"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2d5cad1a6baso18134035ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Sep 2026 06:30:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788615017; x=1789219817; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=zFj5LiBng6NudOmHVa2J2/iUPR7lg23dpPXHe6TGeRs=;
+        b=HwiCW57wc3ou3x61WkM71umVAJQn3kLQIg59FO0BLEBm+GNIyrwUhTHM/TrgqUX4Qc
+         JD99rxu3lY37uOZdYxfQ0PQtm+Z08p1A2E9Xl8MTZhVFzwZA7eNEshb4LxQRKs3fMrQL
+         9uGStpuZRW/gGWBiXrc1H9ozvBn9Moq2tY7ub3SMsmK3Iy+ZajvhI7HoxEDQhFHni/J6
+         F0NulspJ4GAZc7d4GTUw/MhQ2KY1HxRIwQIcJBO8XTTjj+UmdSjWiFkUyBoVTwhUEA12
+         9kU35Fu25ImwJz0/GicZnAVBipdX+UIfbgxI4+tVtBmz9zbazuPrph5tj7SJEbHEOcSa
+         fPfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788615017; x=1789219817;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=zFj5LiBng6NudOmHVa2J2/iUPR7lg23dpPXHe6TGeRs=;
+        b=ivlMWvotg1KyZaFywKzMshrRKqxOHqVFndwXC96LHWF8qBfdj61NsilmwLE7bs5sDM
+         +TGISE2TS+aS4ZDhd7RBkLn14B4N2n/ZSQcbTT1BvhenJjUVB1HbvLGYE7RhtqgaF52p
+         KRKJNX3QLptN4qj7YS7oa5L/H1YUZ0A3sf0fpEjhUnG/mLY9Dn9TOTAnqEOEwWxPPsWE
+         EVopCF5XbPuIM+gMI3LPffANw6sA85TJXWAM2XPSyxoitHk08y4SzwZHbdFBfTkg6w00
+         MbFZxjLV5G1DXoT5GlyMNmKI32KqGO6F181eEVlZ49t3Bp+ipk4F2jMfeWV9dAA3kPa2
+         6taA==
+X-Gm-Message-State: AFuF++lK58rruAcvY7xiBz85La9Hsgh4p3XdKIou9nuVdd5NWj2iqNgi
+	STlVvapJZJbHhLB3uFms+M3nIHDgm4FbFLC87+4VWoo5ENMaxSk+A6DJMzHeXw==
+X-Gm-Gg: AYBFou1NUpXK7MS7FVK2K1xBZClpUET6Wcvobh3nnQswu5Sphn3Rmo/fMgt2gKuXmst
+	EdG+uWyVtntL6//xYob+MNLP5++gWzg/xNy0AdzY80goqsnm1bwPoFxegFDoXQOT2pP8U7nwxut
+	AhYoevk2XWVd5f8QX+ihW3PSNlKZMeCclrauxIR1e3byYnc7PyW3M1JWb0DgUzp/4mFwnx///u9
+	W3UQm4lhzDs6KV45OEbm8v2YMxgIdGLlJVW1nINbE88A7oMvy8ltTjdxVGoebDxBpDk5MtCujSZ
+	qdB2utAriUUqcX/VLmD3XbfsYXM+0JH3+9/gXon2vZbgFpBXEA/K960nBNI0sQlKvXQdmFJmlI4
+	QSSkqV1mhiuEj9+Wkvy8OrHId0S+EUubE5J53425GyhqzrjeOiSj4Dow6VOBeu80iT6RTA78e6b
+	Om2CW7VivM0GfA0P0qhhGGsasfpKzIQ/jMtmViBwsa6Op0jKnr9aZM5G4xoVr5s3hMkA==
+X-Received: by 2002:a17:90b:4b0c:b0:37f:fdc8:71b4 with SMTP id 98e67ed59e1d1-39b26121f6cmr19018108a91.2.1788615017406;
+        Sat, 05 Sep 2026 06:30:17 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.217.52])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1432441f5f2sm15771908c88.15.2026.09.05.06.30.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Sep 2026 06:30:16 -0700 (PDT)
+Message-ID: <6a9c1968.7d702ed2.4490f.6da0@mx.google.com>
+Date: Sat, 05 Sep 2026 06:30:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2187530179048072032=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260905-startech-av53c1-v1-1-3385f9bb220c@sj.dk>
-X-B4-Tracking: v=1; b=H4sIAHcFnGoC/x3MQQqAIBBA0avIrBPUsqirRAubxppNhYoE0t2Tl
- m/xf4FIgSnCJAoEyhz5Oit0IwAPd+4keasGo0yvRmVlTC4kwkO6bFvUUq8d2dYbq3GAWt2BPD/
- /cV7e9wNlCZg3YQAAAA==
-X-Change-ID: 20260905-startech-av53c1-1b4e53f251c7
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, =?utf-8?q?Nikolaj_Klitlund_B=C3=B8rty?= <nbn@sj.dk>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1788609911; l=2680;
- i=nbn@sj.dk; s=20260905; h=from:subject:message-id;
- bh=qikB7+kXC0YvR5kdQ4345D7/gSWOZ6njl78gr4Q01Mc=;
- b=KvlU26Ro04cGwNSf5bWuo5LvGwBncPF0PXfBHwsjW6ROazoTYySahibtxhOFiV3/0PuoK3dqP
- L/xMQdFIWkzDD18eU1CaGm6EAv6HszIS9+xbLfUElaHsJBhPP7Vrk57
-X-Developer-Key: i=nbn@sj.dk; a=ed25519;
- pk=gSabhnk9EeLlA58h6ZHttMKWKQwb5LGja3BORiZv9gQ=
-X-Endpoint-Received: by B4 Relay for nbn@sj.dk/20260905 with auth_id=1005
-X-Original-From: =?utf-8?q?Nikolaj_Klitlund_B=C3=B8rty?= <nbn@sj.dk>
-Reply-To: nbn@sj.dk
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nbn@sj.dk
+Subject: RE: Bluetooth: btusb: Add device ID for Realtek RTL8761BUE (StarTech AV53C1)
+In-Reply-To: <20260905-startech-av53c1-v1-1-3385f9bb220c@sj.dk>
+References: <20260905-startech-av53c1-v1-1-3385f9bb220c@sj.dk>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Nikolaj Klitlund Børty <nbn@sj.dk>
+--===============2187530179048072032==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add the USB ID 0x14b0:0x047a for the StarTech AV53C1-USB-BLUETOOTH
-adapter, a Realtek RTL8761BUE based Bluetooth 5.3 dongle.
+This is automated email and please do not reply to this email!
 
-Without this entry btusb treats the device as a generic Bluetooth
-adapter and never loads the Realtek firmware, leaving the controller on
-its ROM firmware. In that state it advertises and scans actively, but
-never reports advertisements during passive scanning. LE connections
-initiated by the kernel wait for a passive-scan report before issuing
-LE Create Connection, so connecting and pairing from BlueZ time out
-without any error from the controller.
+Dear submitter,
 
-The same product is also sold with the ID 0x2c0a:0x8761, which is
-already supported.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1158610
 
-lsusb -v output for the device:
+---Test result---
 
-Bus 001 Device 010: ID 14b0:047a StarTech.com Ltd. Bluetooth Radio
-Device Descriptor:
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  idVendor           0x14b0 StarTech.com Ltd.
-  idProduct          0x047a
-  bcdDevice            2.00
-  iManufacturer           1 Realtek
-  iProduct                2 Bluetooth Radio
-  iSerial                 3 00E04C239987
-  bNumInterfaces          2
-    Interface Descriptor:
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
+Test Summary:
+CheckPatch                    FAIL      0.57 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.08 seconds
+GitLint                       PASS      0.21 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      28.62 seconds
+CheckAllWarning               PASS      31.60 seconds
+CheckSparse                   PASS      30.19 seconds
+BuildKernel32                 PASS      28.04 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      517.14 seconds
+IncrementalBuild              PASS      27.27 seconds
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Nikolaj Klitlund Børty <nbn@sj.dk>
----
-Tested on Home Assistant OS 18.2 (kernel 6.18.39): without this entry the
-adapter enumerates and scans, but btusb never loads rtl_bt/rtl8761bu_fw.bin,
-and LE connections from BlueZ never complete because the controller reports
-no advertisements during passive scanning. Details in the commit message.
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: btusb: Add device ID for Realtek RTL8761BUE (StarTech AV53C1)
+WARNING: The commit message has 'stable@', perhaps it also needs a 'Fixes:' tag?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d70a3e7a13f5d18c75bc1c9fbc1ac5706e832f61..c3c581a5adbb09f7118a3932cdda210d68d2336d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -860,6 +860,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x37ad, 0x0600), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x14b0, 0x047a), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Additional Realtek 8761CU Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x1bef), .driver_info = BTUSB_REALTEK |
+total: 0 errors, 1 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14793004.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/708
 
 ---
-base-commit: 4d7d9486c04d917265f64c55bd23b2cc4fe7749c
-change-id: 20260905-startech-av53c1-1b4e53f251c7
-
-Best regards,
--- 
-Nikolaj Klitlund Børty <nbn@sj.dk>
+Regards,
+Linux Bluetooth
 
 
+--===============2187530179048072032==--
