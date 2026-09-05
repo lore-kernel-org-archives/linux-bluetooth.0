@@ -1,128 +1,141 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE95839CD00
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2026 23:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788566214; cv=none; b=aSbBsqOTuwcdTHafj6bkNpTHVHhOX7+IgHD0ypR6VWR0wLOpgsNz/Zk+Zk5WCrsw7eswXWoAhHzKwZZfKA488Z3WqBySTsSqcRHkGPG3KaRZxhNTMe3KEfApszuYJW8LzCIn+NSLsDNeKjPEaHu/20FXiYiKCYSWOwEjcoV0N9I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788566214; c=relaxed/simple;
-	bh=U1B1NhrRBlZ2Kva9glRqzXaAdFuQ4vtL09kR/ZeisAM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=j++qU1W6rbP3QdAVI6XkC7+n0sJTRhcP93IXXTP0ZbOSi8UhXHKqYiluRK1Lsp5Z+k61Uy4j2H+UG9eMlihytQp8B0fsGKBfcPq8lVpTOjDSD2LDrkzNkUyPsdogxZAx8Gtx6ii35x/tvBGyL2RyUtCCt2M35QW9vhxJRb9eh0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LT9CdmDt; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D57931716D
+	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Sep 2026 09:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788601067; cv=pass; b=nuBm2ouEzFhduVw/1e/cgpJi9g5dwgfxMo/Nt/exMsgVhuG4F+R8iv7mcy2ln1gYMEQCKmy2TlCIeO1/aT1Fam6Wf9Q9FELG6/928QayZdQ822tSGcLaIgYtJLp/om3QHQ//SwfSjIPeKHMtzVy6X9Y0J9+OvQHaeTMgqrd6Oqg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788601067; c=relaxed/simple;
+	bh=viOlLAejjQ5Jf9qpy8TFTmuwLYIhYmdeFPvIw1AhBdk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=LOLZNbgQnl+E5cdBI3Ub7rnlbauqB5aaoM5SyMHpeRsLkgxpk/5voxZ5xtzPrnEARFi+y+Q6qaVaw9gKXw9k2lgpiN1k9uTYgOnLJywyb0D7KUt5yIWHdNU1nVWlp6EZJfS1C1c9eNeBUU8IfweJdhXp4FMaihYKIXNHW7vA710=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eDEotBwd; arc=pass smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LT9CdmDt"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-4a483a552efso783604b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2026 16:56:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eDEotBwd"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b6188a2c0eso1332321e87.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Sep 2026 02:37:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788601064; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Rr8lzmuAC3Ct9CIgelm5PFzt6xG+KDrN6K/mcYZikO8dYvHFoowCx2JlxkO2GM/0qM
+         JXUfDKzzDogQs2kGBhbGnYy8Ubo1puU0pmQ1A9nSdSmeTI79NyxOUl2b/7WomB3gGZjO
+         AY93VAFUJFiYV+oIssFucNfiYioYsxDOyc0M7oWoJJ/BNZzbdoLspGYrRo9ZwOGA2hUF
+         p5LjG8K6VKd/wDbnkFyhs8tM0uW5H3L9yjtdF0pbxmzdjUzz8+/Txga275FogMZpf9XZ
+         NldzQJDJ5XN2YmZhk4xFp8i4uRODah1mGlJHuBksCaM40uF7/vFp0zybQcQfrlAknrcX
+         zvmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=T5gONqD7BOM2oqOrs3fJTQUsN2XiTa2sHV4w1kNrsGE=;
+        fh=57qyEZNdGrDPmxvVGEykGBW4sEu+txlrN6w+N80qi4o=;
+        b=kFsNQ/ZZT+IEDjyMy79AgWcVuxplHVM1COTPISiiFyh1QysS1WvAoJa8SEEXD1WjeV
+         lG6PR4Lqc+jYyosBmiKnFxOq+7hjEs3GXw2mI1EMLhqGoWW273H5cC6mM0ZUSGDBMMk2
+         Jhp1jqtBHxwbRD8xT8KDkLjDYAyLfgiaiB0lsHH7ihdcPTjm4o1CzubGXZlnkSpaYRsI
+         g2+/j9AiNBLbu1/ud1jGPigmE3n0y61U+EEpuhgbOAhbe817Ar4w+rdSoMWnLEXMTX9/
+         vXW9dLBfnitl++P78DEPE81zTW78G0Knp0uJ0JVmpR+fjx4XdrwZ4F8ys88sqksehDm6
+         TGtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788566212; x=1789171012; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5Up3kemmGb02ixFDgsO0683FakJ5o1iR8DW7t+qHz4E=;
-        b=LT9CdmDtTPn98/YToR9FRQ0z2sKhy63gr2lSh4dU+a1bbpsbEUHkKc/gU76mW/d8u+
-         J/3gBYMu3FtAIuIZZl+d87jbKRNAN19H0MCP25xxCClnWOsQnC3H5bB/zR9Szip9AzMB
-         eWvwGiBpXv5tgwPh4QZ0NWvkb5mU38nFuPmfmf5XWPKLc1Dk5aTXaabb3gqbJ1NJtHJD
-         e5re06RTq+eGgiVxW28v+ZtJb+x+8YCKVRu90mvT07bbrK7g9pLdcXcMCW3xPc+uBB0Q
-         HXvIuKQQu2yG4fRtzDydoj0Ce96c6n4iYWFD3K5L3Vjl9qFlkZeWOqXxz8PpYaO7SCos
-         e9fg==
+        d=gmail.com; s=20251104; t=1788601064; x=1789205864; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=T5gONqD7BOM2oqOrs3fJTQUsN2XiTa2sHV4w1kNrsGE=;
+        b=eDEotBwdrFPgVSBchFDZUNDw4zFyRS+JBiuhlmXabrKflR/4PyboiWG6MEqYOJKeZM
+         gl4//3cYX8CQMWxXRuLBVjbKy0zQnPx1yVMOOYXuMFN1FhZoz29XwO4F0K7PP0iunnlu
+         HaONr/FRl2pjTj1HEma2uIHPzOCtgDyekiIhb2bcPzDs5xRAK0CjttO9P7V2bzR763hf
+         PzpdCWYNY6rc4ybHUMG35jWdhKkXDKXU+rk2cjII7WWneAWo4l6s80/7GQfXhtahh0pD
+         70T7Ijc0xnJ5d8shWrR0zlGUK6TeAZO9VSeiQFmhXGIZlh0sH2lcM5bpBIUVUklD4WJh
+         b6Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788566212; x=1789171012;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=5Up3kemmGb02ixFDgsO0683FakJ5o1iR8DW7t+qHz4E=;
-        b=lQmDQCljged/Lezb/fLgqyIZUZWoZxK01iYRFGtr83Tm5PpDlXA2kok9nqT8Y0/p0K
-         OjfAYiV19za2quCa/bQSyO2kKMGgYYLEH/9FhmXbH0Porjgks+99BfPsUvZjzL+9XEae
-         Ha3qQbDcrKIOgxDuBtxqOT5xyXoId8EB+kQFMpKsBgJ90G04iNfmAuhnnWRUiI4cRq21
-         +3dj0vtbB5gFQIOk9ei3IhPq+aPQGPddGpDoNSy7ebNAfnknFNf+dIzAV87NQtFClzSn
-         TQqXz0PP/Ut00eE1XqGopmT9QlbSULQ30Tb8hn3T2XG3320uyHEO8PgGFMhherkdy8LE
-         8I+A==
-X-Gm-Message-State: AFuF++loC2xtFIZOjnqx4gy3LRc+8gmj903bo3EmBO8iNxAmUdzkuMKT
-	aee/nHVs4mZUJ73uV077S8W9xps/CQTMu8ICJhfNG691kCKzqEgKproEzqx8Sg==
-X-Gm-Gg: AYBFou0wB4J+Boi4bsmdAcZQuPmaqi3GfoEyFaWb+1i644dEsy0BQZ+7EBoQ6QRpcNh
-	W4t+B3jl3w5IgjM5otf1dgYSj2TPCd1bGI843ZiPkpsOVDIKr6Y3thhSNz99bEmnReaasUF15dW
-	fw+mRlG01/4MrsiMv9W9ik9Nql5VmFkiC93zj7ygKIVOBcJ/xGMprF1JqCnbVymFZoSGsy/DaDZ
-	3nkhHcLa1AMQia7LuNnZp75HkYpkaNhn6ATTDOmdAvfTsVWBtcW+ZjRVWDJptJLKPjQcdvho3D4
-	u1pzr978j6HTowM1BYXIItN/wrAP5hGNIcCRHMWwHmp78+uJDb0edvYf2Shj8KiojNkndANlUDP
-	1iYwXDMAUFqyPW/FLqpeOjZVyEDq44w3/6zQYQlCBWsXqRAbUISGghhUuZNiz5fPkkdY6HiNgxi
-	jHG0dQrazxEPVueH/HXSb0paxdepySjDpgKa86guJBk8HNCk7uiasNvIf8P319+tFxhpYgLJrZW
-	Hcfzw==
-X-Received: by 2002:a05:6808:f06:b0:4a4:c12:49d9 with SMTP id 5614622812f47-4b964523f8fmr6903512b6e.3.1788566211665;
-        Fri, 04 Sep 2026 16:56:51 -0700 (PDT)
-Received: from [172.17.0.2] ([20.98.142.52])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b970d1cf26sm3963997b6e.4.2026.09.04.16.56.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Sep 2026 16:56:51 -0700 (PDT)
-Message-ID: <6a9b5ac3.9911d07a.2de7df.3fc4@mx.google.com>
-Date: Fri, 04 Sep 2026 16:56:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3424605589827078746=="
+        d=1e100.net; s=20251104; t=1788601064; x=1789205864;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=T5gONqD7BOM2oqOrs3fJTQUsN2XiTa2sHV4w1kNrsGE=;
+        b=fwz51CgF9enwVOToMtfK23RbT+VbJdSx2uavm07ZF2mapcyBcY+zFwUXeAN/k+GEBP
+         LTO+Dy7CLax+6jhMWDrsEL6w/B28xVidJA45sVOpGZbV/j2OXMoJDATv5n93wCfypiUr
+         WJgzjQKlpDe1kB0OEaClTa/eOlwh7qUAwnk0k5gcQt/ONdpKjRgLZD7TVTqd9im8UbvS
+         rE/xO6NAofzPURMcwSK2vImD+qlsge+T/66nKWzu87tAxR/sStgOFNsCeOvVAsKSdX3H
+         nmJmZuxtrR5ERkar2vS6Okc9CGDEhFKyRoq+xFI6N3N+a+WtFxj1DQR8Cx8nJOrFOghy
+         kxXA==
+X-Gm-Message-State: AFuF++ny2UhKDBGfzzZGGEYjxxiBb6MplJchsqtaYCDurkoSCZOn+So/
+	lAuyumFGbJY87MtN4cVutYVxXRSgj67j30rcpwske3C8FHszFeXBY8V5AJTu09+ummKTbGxagEI
+	JqTOWhOx/an7DgYi3RZv3Ua+8LFG5ES6yHt3fOCI=
+X-Gm-Gg: AYBFou0bZns6JPXLlZUHukTkdvVa3uJ80LaP5G/lnM/uwNzF+XVDw6GpFH1hWSHUYW6
+	AHyJttz1fGaYGJmU1rl251SeP/P+0gZdVGfoWWsQ+ftnU65qZFoouAkuiGnSLvk6qMyn1A+WsP/
+	05DKE6q3k4jxd1t2CpMBb6u9JxVCMLLkLl27eOpIbLrzxrs/KKHzg6If49nBp1Bs9wzEAD9mNMA
+	/VqBNg316yx6SWhOfXUwZzoq9XY/DbNtiuy8+/CpTMVHFVo4ysVp1TPeSK4cQh8LphHCj0sl/rF
+	bJWj/QwSRvGb2s2fjg1YaKax2e81uzhC7zk297z/TjOzxdc=
+X-Received: by 2002:a05:6512:3b0f:b0:5b6:1a7c:fd7f with SMTP id
+ 2adb3069b0e04-5b61a7cfef6mr1820143e87.37.1788601063533; Sat, 05 Sep 2026
+ 02:37:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, johann.fischer@nordicsemi.no
-Subject: RE: Bluetooth: btusb: do not probe non-HCI interfaces
-In-Reply-To: <20260905-btusb-skip-non-hci-ifaces-v1-1-32dda494122f@nordicsemi.no>
-References: <20260905-btusb-skip-non-hci-ifaces-v1-1-32dda494122f@nordicsemi.no>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: Sandip Makhal <makhal.sandip1999l@gmail.com>
+Date: Sat, 5 Sep 2026 15:07:16 +0530
+X-Gm-Features: AcwNN1UpLcnfyjkeyljsYD08j5UFQkzBNoO_KEunJQJKkGXlFEkXbxhfQPXYRXQ
+Message-ID: <CAENgahUHbkA-TX7JbjnBHRasvf_UuLE2U1kKdXC1D5P2GW-R5w@mail.gmail.com>
+Subject: [RFC] Architecture & BlueZ API interaction for vendor-specific
+ headphone daemon (ANC, wear detection)
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
---===============3424605589827078746==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi all,
 
-This is automated email and please do not reply to this email!
+I'm Sandip Makhal. Over the past few years, I've been researching a
+standard way to bring advanced Bluetooth headphone controls (hardware
+ANC, transparency levels, wear detection, custom EQ) to the Linux
+desktop.
 
-Dear submitter,
+Right now, standard audio streaming (A2DP, HFP) is handled reliably by
+BlueZ and PipeWire, but ancillary features remain scattered across
+one-off reverse-engineered tools (for Sony, Bose, Nothing, Samsung,
+etc.).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1158397
+To fix this, I am drafting a vendor-neutral userspace daemon (aiming
+for an org.freedesktop.* D-Bus interface) to serve as a translation
+bridge between desktop environments (GNOME/KDE) and these devices.
 
----Test result---
+To be clear: this daemon lives completely in userspace downstream of
+BlueZ; the intent is explicitly NOT to put vendor-specific byte
+protocols or parsing into bluetoothd.
 
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-VerifyFixes                   PASS      0.11 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       FAIL      0.26 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      22.46 seconds
-CheckAllWarning               PASS      24.88 seconds
-CheckSparse                   PASS      25.86 seconds
-BuildKernel32                 PASS      21.71 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      396.34 seconds
-IncrementalBuild              PASS      21.55 seconds
+Before moving from design into an upstream implementation, I would
+appreciate feedback on the following integration points with BlueZ:
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btusb: do not probe non-HCI interfaces
+1. External Profile & Socket Handling
+   Modern headsets send accessory payloads either over Classic
+RFCOMM/SPP or BLE custom GATT characteristics.
+   - For RFCOMM/SPP, is registering via org.bluez.ProfileManager1 with
+an external fd the recommended mechanism for an external helper daemon
+running alongside an active A2DP/HFP session?
+   - For BLE GATT, is acquiring file descriptors via
+AcquireWrite/AcquireNotify on org.bluez.GattCharacteristic1 robust
+enough for concurrent telemetry (e.g., continuous battery/wear
+events), or are there known race conditions during profile reconnects?
 
-21: B2 Line has trailing whitespace: "--  "
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+2. Device Discovery & Probing
+   Some headsets only enable their proprietary control service after
+specific handshake packets or SDP queries.
+   - What is the canonical BlueZ pattern for detecting device
+capabilities without disrupting PipeWire's default A2DP/HFP profile
+switching?
 
+3. Scope Demarcation
+   Has the BlueZ project previously considered any generalized
+"accessory" or sideband data channel interface, or does the team
+firmly view this orchestration as the responsibility of an independent
+external daemon?
 
-https://github.com/bluez/bluetooth-next/pull/707
+Any advice, pitfalls to avoid, or pointers to existing reference
+patterns in the tree would be greatly appreciated.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3424605589827078746==--
+Thanks,
+Sandip Makhal
