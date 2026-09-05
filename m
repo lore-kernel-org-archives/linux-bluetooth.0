@@ -1,163 +1,121 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117F936403A
-	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Sep 2026 20:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0AB302146
+	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Sep 2026 22:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788641784; cv=none; b=YPyQ2pkJE814a8sjpk6oA+P6NTri1EWH7i/ebvAi5HJTgvhXlLqAGuVvHwklLMuxPAFVtOBIF6mQBsGZGyKGAwPs3/MUGnkcCp6l3gyxPNOnsUsR81R3gLQ5fiM3siO4Pu58hZ6jSMOFi6SenqiBAzfl2QC5lMxil5THCtGz/zk=
+	t=1788646120; cv=none; b=H9hGCNn9tgG1m+Io/epAB6zrUrYb8SJj+qs6+7T5HOihl9KLFnYO/uTKaEfkMwNeIYtMDsRj/E/cX/+p/46KT949Y9VyGVgI1cjMHir/hAFGd5Uxs7zeqinl7BTCII3gQqOg+PcNOMZHE1wxm8UXqttbXgWm1KF8SlHJJxplFlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788641784; c=relaxed/simple;
-	bh=UdhsdI7QoIR46KU3cOKbYBI+5MnwDo0BiW+VrCUc4M8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Ccm8oZuDnGB3wQXwRa9e/ST24q8JiMvBYghuP58r7UdqSQu8RpQNN19nlnspaYlwcb1NIQKdpXEe3ZomFIjaIF33seC9sfSrWm1fhE/BNJyKxb9E0seb47i+bHBSpgZlj/+FXo7vZZArkR+9N4LT6h0BSTcWwETA7k/Gmmee2vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=SqLCc/kZ; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1788646120; c=relaxed/simple;
+	bh=3PeMOM0G4DYeLRmDs/0RGIIb/zi48sU0Ix3a5yNFIT8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YC8fCz1nna7noairE0HJaaxJBnPxVTKwJr2w+vP+Lt1eOjars8GKGWR3VDicPRVCjDM5yDOuA4tvZWwy0et6RWqSV+B+24UVsPPf0rFjJADxT+bgLyIEHX2JgseSJBxHeJg1WZHC13XD4pbr18UpWUY12N8rX3sNAAVa6wYVfgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYzPFUIz; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="SqLCc/kZ"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4hclxH1G01zKvff;
-	Sat, 05 Sep 2026 22:56:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1788641779;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PTLL2XvKuCw5eSeHezW8kB36G5YR0ID4o9TiGFewKas=;
-	b=SqLCc/kZsuGHU8X/mQqFZyfHpRqCQ1xplGS6jxM5Xgn7UV/G6OlMPBNqwaAsZhz1k/7bDh
-	t2HPSkeJbLoBvubhMWDnT6+tdZWnlJgj1oAHpdlxzfdrS2xGRALNIDtEx8YWZaTzpANmTa
-	8Jkzo86hYz3m6ze8tfwPTVRhvbrnW4FkFWKreMd/N+/qDxdd16+PNXEiPjFlPIusI8vXKJ
-	MvAvSkT/amqSO4iNOE+yAoe20iLLgeAWZD19wEaZvAGDvUTq6y1DizevccRXgWgdD8euTl
-	1eHvCXpb9CEbRLgklcljXMA1ufxhgf5LqKOzdTsGXqfp3vnMpYZUX+zKPrVqwQ==
-Message-ID: <72098331-fa7c-443c-8b56-7671f9d711f2@mailbox.org>
-Date: Sat, 5 Sep 2026 22:56:16 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYzPFUIz"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8558c0b26a8so1465082b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Sep 2026 15:08:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788646118; x=1789250918; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=x6kXO77JdR/mkVSBvhFvc5mZT/2FJ9QOX4k3k1QHKh8=;
+        b=aYzPFUIzN9QTEFZMfhBNQexlGB/8yGey1lV+1cJY754GoTK8DKkCczL4Ld6WxzoKI1
+         82KxCY74mTo9sGsiqM3KtdycgIKk8yMk5fruD9girOkoKknIcwHKR4IfmTY4g13LXN2t
+         V7JFKJiCRHeX33GkULdokQyHCWXd8ex2v8c5k0/vxDfH40Fp8oRlpJDKsisEPAt6HPAX
+         WoIAkupoCpAUanXImeE6lbPGM+GDBTvqLFb3vtFKyUwbJ8lqGHgNVRgkniRQCt0MJvZ6
+         M9OI8dhOlr/VoNUdUiz2r6EE5wkgUQA5+D4GCg7OyHMphh/kO63MAZ6OthXPnEmyp4tB
+         f5PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788646118; x=1789250918;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=x6kXO77JdR/mkVSBvhFvc5mZT/2FJ9QOX4k3k1QHKh8=;
+        b=mYK1hbLCkrf2a3Odz1jDDtvlxJQcA1dblvsAk0e5n/9Sg5mk8CambEBjbSGcgBY3wV
+         KRHsWuRuGDW3wI2VkiN8kqhrR0jX2raL9hjdRXcyJkX+eFqBCQz+YFA2tBVvubIM+j3/
+         8kRXWDsWsKo3UtyGIxdyc7ELnPeuLcWUBpSXxM6cQOuY63WMETBolh/S+IJ0x6gPVTox
+         LyRQjzF69AksKJ7V2wxqj1hn1xwjMD1gp2oV/54Wuznr96gr894Fn7OlD+mUJ0jDJrLA
+         auebSDQOEMHdIvuq1kedk/9M4rb3eH2y5hbPV8LeFLWLA63liuNI34L9gf57PXpmZSZ8
+         yk+g==
+X-Gm-Message-State: AFuF++mRbtG9l0jor548fSxGArEf+ASOrpSqmEvTIstNkQn2LmfAOknd
+	YKV/P4+Uk19uBKSitR+mIyrPysYTz3E34UyIU0JoMFAjS5g8oT+WkW6QVGQh6g==
+X-Gm-Gg: AYBFou1RaSmEBplvd57dlRG8joiXwelhtQnBWceKDDD8KUqnwtyt2w71ZMV2Qm9HtVw
+	vt9i4g9wHgxfbpAns1wRZRm4rONDpWUnH2v2y5dSzo3IFSFE1Akk3h52YD4Bg+uSXuF3I1MZhl9
+	M+9lGfMyEL1oSjNScEl/bcGDZzQGGE5vTGlV0dHvkw0HHWVuKY6fznQ+P0fVJl/ml7SDq8i0vst
+	7JK2EG81lP6Bj8eX9B8TMePYR0sTUTIDkyeEP11w6zzpZvosYqSGpOMNUqfMAxlJkKeFliNVkmf
+	4DKgnqgc8GLEmkme3RoRy5B8PCBSXTdsC1vhyuzE5Sgn7ZiU9pza92GjqI8Rim5lWcRpayzyd92
+	/JCkq6KbLUaiwF5TJ7mxBqFbOvXi8d2/nMPbwf2g63idPbbsmWwExV/J740PKEdtpWgKJYZ55ws
+	jMuZlCBVTvatNkRYBS5ovlOEp8Zq8MRIE3bFiZ2xIbmCmssVlKbfUACtlju1zcdJn9
+X-Received: by 2002:a05:6a20:cfa2:b0:3d1:c0e2:936b with SMTP id adf61e73a8af0-3da39d0cfd9mr24511033637.7.1788646118145;
+        Sat, 05 Sep 2026 15:08:38 -0700 (PDT)
+Received: from [172.17.0.2] ([20.169.93.33])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339befe870sm18126773eec.30.2026.09.05.15.08.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Sep 2026 15:08:37 -0700 (PDT)
+Message-ID: <6a9c92e5.fb0efb2a.d02d6.62bd@mx.google.com>
+Date: Sat, 05 Sep 2026 15:08:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2862278287395036779=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Mark Gerlach <fedora-bugs@mailbox.org>
-Subject: [BUG] btintel_pcie: Intel BE211 8086:a876 requests unavailable
- ibt-0190-01a1 firmware
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com
-Content-Language: en-US, de-DE
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, adrianox@gmail.com
+Subject: RE: Bluetooth: bnep: linearize skb before sending
+In-Reply-To: <20260905194725.284347-1-adrianox@gmail.com>
+References: <20260905194725.284347-1-adrianox@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2862278287395036779==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: nw99nr5sz4gqnjzopccyxgta8qbj66mi
-X-MBO-RS-ID: bd87b13f6b477912eae
 
-Hello,
+This is automated email and please do not reply to this email!
 
-i am seeing a Bluetooth initialization failure with an Intel BE211
-on a Lenovo ThinkPad E14 Gen 7 with Intel Lunar Lake
-(Core Ultra 7 258V).
+Dear submitter,
 
-The PCI device is detected and btintel_pcie binds to it:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1158824
 
-00:14.7 Bluetooth [0d11]: Intel Corporation Device [8086] (rev 10)
-Subsystem: Intel Corporation Device [8086:0011]
-Kernel driver in use: btintel_pcie
-Kernel modules: btintel_pcie
+---Test result---
 
-During initialization, the driver requests:
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       PASS      0.23 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      21.65 seconds
+CheckAllWarning               PASS      24.94 seconds
+CheckSparse                   PASS      24.10 seconds
+BuildKernel32                 PASS      22.12 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      381.87 seconds
+TestRunner_bnep-tester        PASS      15.70 seconds
+IncrementalBuild              PASS      20.20 seconds
 
-intel/ibt-0190-01a1-iml.sfi
-
-Loading the firmware then fails with ENOENT (-2):
-
-Bluetooth: hci0: Failed to load Intel firmware file
-intel/ibt-0190-01a1-iml.sfi (-2)
-
-As a result, the controller does not complete initialization and
-
-bluetoothctl list
-
-shows no controller.
-
-The issue is reproducible with:
-
-Fedora 44 x86_64
-kernel 7.1.9-200.fc44.x86_64
-kernel 7.1.12-200.fc44.x86_64
-linux-firmware-20260810-1.fc44.noarch
-
-Hardware details:
-
-Laptop: Lenovo ThinkPad E14 Gen 7
-CPU: Intel Core Ultra 7 258V (Lunar Lake)
-WLAN/BT: Intel BE211
-PCI ID: 8086rev 10
-Subsystem ID: 8086:0011
-
-Wi-Fi on the same BE211 works correctly.
-
-The installed linux-firmware package contains related Intel Bluetooth
-firmware variants, including:
-
-ibt-0190-0291-*
-ibt-1190-01a1-*
-ibt-00a0-01a1-*
-
-but no:
-
-ibt-0190-01a1-*
-
-For diagnostic purposes, I temporarily created aliases from the
-existing ibt-0190-0291 firmware files to the requested 0190-01a1
-filenames.
-
-With these aliases, the firmware files were found and downloaded, but
-initialization then failed later with:
-
-Bluetooth: hci0: Timeout (3000 ms) on alive interrupt,
-alive context: intel_reset1
-Bluetooth: hci0: Failed to send Intel Reset command
-Bluetooth: hci0: Intel Soft Reset failed (-62)
-
-I removed the aliases afterwards.
-
-This suggests that the existing 0190-0291 firmware cannot simply be
-used for this controller.
-
-The same BE211 hardware works correctly under Windows using the HP OEM
-driver package rather than Intel's generic driver package.
-
-I initially reported this to Fedora to determine whether this might be
-a Fedora packaging issue or an incorrect firmware selection by
-btintel_pcie.
-
-The Fedora developer has now confirmed that the issue is missing
-firmware upstream and replied:
-
-"The issue is missing firmware, we consume what ever the vendor pushes
-upstream, it's not yet upstream, there's not much we can do about that
-until the vendor bothers to send it upstream."
-
-This therefore appears to require the corresponding Intel firmware to
-be published upstream.
-
-Could you please confirm that ibt-0190-01a1 is the expected firmware
-variant for this BE211 / 8086/ subsystem 8086:0011 controller?
-
-If so, could this be forwarded to the appropriate Intel firmware
-maintainer, or is there an Intel contact or issue tracker where the
-missing ibt-0190-01a1 firmware should be requested?
-
-The Fedora bug report contains the full journal and lspci output:
-
-https://bugzilla.redhat.com/show_bug.cgi?id=2527721 
-<https://bugzilla.redhat.com/show_bug.cgi?id=2527721>
-
-There is also kernel Bug 221481 concerning btintel_pcie on Lunar Lake.
-That report concerns a separate suspend issue. I previously added
-information there about this controller's firmware loading failure.
-
-Thanks,
-Mark
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
+https://github.com/bluez/bluetooth-next/pull/709
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2862278287395036779==--
