@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C753B637E
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 16:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BDC3515D7
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 16:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788713436; cv=pass; b=ZboBIK741uoF2XwRdVD/pSv/tkfjyYop7WF6sRj/0GSHBgii8b3ppuPD8r8gilkc/G1u7ZWtVK9hf7XaBdgqaJb5SW94Yr13VOArrGlO5WU0ZI9nTEG5m18k3C/HQUfLP+Z36YVKjySZ8gYw4T5M3TP+KNzq7pNvtBG632654rk=
+	t=1788713440; cv=pass; b=O9Jc61VoE0Z5nnmZsDX8N8bMtgB6U4ngCvTGWN4rMPI5nsmxFyQPvP8m3QS3EjDKlMHjmOceJNvPBCqT6lC4p/HX16X+mW8Bg3i1sUu0Xqm4ANGoTQU1INmgSduCQBBG0+bF9y4L9jfuQ/e139B026ltgWQrcwsyk5AT6Hx4Xg4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788713436; c=relaxed/simple;
-	bh=Y/Ur25g45iX7sLDIxYBD73HfO3xrzyo1cZCHmxT5f/Q=;
+	s=arc-20240116; t=1788713440; c=relaxed/simple;
+	bh=C2Yij+CQ9qCSWuENxIt6n39fAKC+fKVm+Kv9NhxL6Mo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QXvGLBhhAnjLTqxut4NewoEocBorb79q/C77HrdNU9b+OjHRscsqGHLLjcWxwniwBCSmgLSonD84L7aZy3TzIrZ+es0yvLMHXVhz4dnnHRiV0UivZxWT19s0HXJc88UzOgLeCb8Ptq3G0ejORQUWf2wOGjw4fh8y3yRfBv30M0E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=vZ2okgax; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=uIl2uutkfluv9wavJSw3X2+dT9DU0bmY/gXJ8cYrCPlBA0lPieMnfhjv+2sPqNovRY+MS8bV8gJyf0RuvN4yVzoslw0SgcD9zviziTBOAQnzn/JW0g99TFhgL2Lbms5nf65yFYGsvPqqrG1YVLGnkVcXH3XaOMh6Pb42hUfw0i4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=oMuy26/L; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="vZ2okgax"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="oMuy26/L"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:2::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hdGR41XJfz10Sn;
-	Sun, 06 Sep 2026 19:50:24 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hdGR902SRzyYR;
+	Sun, 06 Sep 2026 19:50:28 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788713424;
+	t=1788713429;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z/GaygpmhuUfaNjfwsnRlOl/8k/6atFeBHKD1whYfpE=;
-	b=vZ2okgaxK6Xzn0xoeqRTlStPYxQAdxLrZhyD4KACZHghEj2Rhjog8P4C5+C1vcGbdcJsaq
-	fvmb9Nwxbm7l92MGaW3reuTG03jwZZ8OvL5LUWtG95s8caMTztmOCIPl7nxWAWigTrpnXx
-	oKE9rU6vsNQF1G5dLP0YScuiwUW72FM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788713424;
-	b=pURWyMm96SQRzA/mIJzBpLb2EhTZCmIbSJzQ798kI9xcQJX5rA5WL5wX1bBOEGxTUiH2LJ
-	iB59SY3RbnSCqmYEXixKbEWCKvnsQyOxcpUgiLR721+892NqxQaOdNUG+N2TiBzlRgSdvV
-	HM8ywbgQe1d53iMKqIhRGnVKMsLAFak=
+	bh=JAEQH7XPeDe03mxHawZya0P87UNcw8kQ7wdyYLL8Q3s=;
+	b=oMuy26/La/ipEu606FVJaP+FSsryd+W4qu8HOWr0BjJxVEo27/Q/oOCwfPgMyBODkQSlWj
+	Ixj4YQP81bFN88NsIhcpJDwAOuhhavhd7bpYFZPN9Y8n48TSecBBJSnLRo4D1JQqqVF9ux
+	v5RW+g40bgcd5/oB5cHyGEFfS2kMNB8=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788713429;
+	b=L/+T7mgKmHCG5Emyp1mfMxzdmqlRQtEfsiqB9jW3w9G41eJIQWj207tFtVPprPiqRtzeij
+	+H+E7VUdfC814auGrDmqs1CIWZZwH92K3EcVg5v2hzY+ffDgvn9Nm5rYJnRsF/vc3UjD7I
+	oVVj0pUSFEov5tdjBeImqAvDaLEyEyg=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788713424;
+	s=meesny; t=1788713429;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z/GaygpmhuUfaNjfwsnRlOl/8k/6atFeBHKD1whYfpE=;
-	b=yOicsa414UO9PmrCo7u5M1o1GfFP8gDLIKZAC141ArmzZJN9Xe2N881wU9yVlu1+p8ukPU
-	tccThqCc5ghukOiFwEcwiqbmtoGNlTt6NTdUBl9lpJULtEWgF9y+Xh94zUbW2bYnaXfHcO
-	BIbyQ29Sd1XN3xm1M8RwfFPVMOebv4A=
+	bh=JAEQH7XPeDe03mxHawZya0P87UNcw8kQ7wdyYLL8Q3s=;
+	b=SmJTZmegEAcEhDhOMMgsBcq72lsvI0q2BGbuLAyD6AtmPNz3mZH9w+GWWz65jkD7RjFS3n
+	hA4+AcWUDuv+QTWr/mtfAf8LdJiEy8vhD+YNyjoSPFsyGTKcW7BJbWY04FmTRkDd6nr5I1
+	8bcL1To9XHfIIhiOIah1uS5b0wF1s+Y=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v7 6/9] test: functional: add basic obex file transfer tests
-Date: Sun,  6 Sep 2026 19:49:48 +0300
-Message-ID: <1f97f1bdf961feaaa86b28cede4a1752e193b2d1.1788712996.git.pav@iki.fi>
+Subject: [PATCH BlueZ v7 7/9] test: functional: add tests running the various kernel testers
+Date: Sun,  6 Sep 2026 19:49:49 +0300
+Message-ID: <8d645995156954770244ef4350875431e06e92b4.1788712996.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1788712996.git.pav@iki.fi>
 References: <cover.1788712996.git.pav@iki.fi>
@@ -67,308 +67,209 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests for Obex DBus API and obexctl
-
-test/functional/test_obex.py::test_obex_ftp_get
-test/functional/test_obex.py::test_obex_ftp_list
-test/functional/test_obex.py::test_obexctl_list
+It's more convenient to have simple local test runner for these.
 ---
- test/functional/test_obex.py | 286 +++++++++++++++++++++++++++++++++++
- 1 file changed, 286 insertions(+)
- create mode 100644 test/functional/test_obex.py
+ test/functional/test_kernel_testers.py | 178 +++++++++++++++++++++++++
+ test/pytest.ini                        |   1 +
+ 2 files changed, 179 insertions(+)
+ create mode 100644 test/functional/test_kernel_testers.py
 
-diff --git a/test/functional/test_obex.py b/test/functional/test_obex.py
+diff --git a/test/functional/test_kernel_testers.py b/test/functional/test_kernel_testers.py
 new file mode 100644
-index 000000000..345b61326
+index 000000000..bfdfb03e7
 --- /dev/null
-+++ b/test/functional/test_obex.py
-@@ -0,0 +1,286 @@
++++ b/test/functional/test_kernel_testers.py
+@@ -0,0 +1,178 @@
 +# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: LGPL-2.1-or-later
++# SPDX-License-Identifier: GPL-2.0-or-later
 +"""
-+Tests for Obex
++Tests for the test suite itself
 +"""
 +
-+import sys
-+import os
 +import re
-+import pytest
++import sys
 +import subprocess
-+import tempfile
-+import time
-+import logging
-+import json
-+import dbus
-+import threading
++import warnings
 +from pathlib import Path
 +
 +import pytest
 +
-+from pytest_bluezenv import (
-+    HostPlugin,
-+    Agent,
-+    host_config,
-+    find_exe,
-+    Bluetoothd,
-+    Bluetoothctl,
-+    Obexd,
-+    LogStream,
-+    wait_until,
-+    mainloop_wrap,
-+    mainloop_assert,
-+    Event,
-+    EventPluginMixin,
-+    dbus_service_event_method,
-+    Pexpect,
-+    utils,
-+)
++from pytest_bluezenv import find_exe, host_config, run
++from pytest_bluezenv.utils import DEFAULT_TIMEOUT
 +
-+pytestmark = [pytest.mark.vm]
++# Testers that can reuse the VM instance
++TESTERS = [
++    "mgmt-tester",
++    "smp-tester",
++    "l2cap-tester",
++    "rfcomm-tester",
++    "sco-tester",
++    "iso-tester",
++    "mesh-tester",
++    "ioctl-tester",
++    "bnep-tester",
++    "userchan-tester",
++    "6lowpan-tester",
++]
 +
-+log = logging.getLogger(__name__)
++XFAIL = {
++    "mesh-tester": {
++        # Always fail:
++        "Mesh - Send cancel - 1",
++        "Mesh - Send cancel - 2",
++    },
++    "mgmt-tester": {
++        # Always fail:
++        "Read Exp Feature - Success",
++        # Flaky, randomly fail:
++        "LL Privacy - Add Device 1 (Add to AL)",
++        "LL Privacy - Add Device 2 (2 Devices to AL)",
++        "LL Privacy - Add Device 3 (AL is full)",
++        "LL Privacy - Set Device Flag 1 (Device Privacy)",
++        "LL Privacy - Set Flags 1 (Add to RL)",
++        "LL Privacy - Set Flags 2 (Enable RL)",
++        "LL Privacy - Set Flags 3 (2 Devices to RL)",
++        "LL Privacy - Set Flags 4 (RL is full)",
++        "LL Privacy - Set Flags 5 (Multi Adv)",
++        "LL Privacy - Set Flags 6 (Multi Dev and Multi Adv)",
++        "LL Privacy - Start Discovery 2 (Disable RL)",
++    },
++}
 +
-+
-+BUS_NAME = "org.bluez.obex"
-+PATH = "/org/bluez/obex"
-+AGENT_MANAGER_INTERFACE = "org.bluez.obex.AgentManager1"
-+AGENT_INTERFACE = "org.bluez.obex.Agent1"
-+CLIENT_INTERFACE = "org.bluez.obex.Client1"
-+SESSION_INTERFACE = "org.bluez.obex.Session1"
-+FILE_TRANSFER_INTERFACE = "org.bluez.obex.FileTransfer1"
-+TRANSFER_INTERFACE = "org.bluez.obex.Transfer1"
-+
-+FTP_UUID = "00001106-0000-1000-8000-00805f9b34fb"
-+
-+
-+class ObexAgent(HostPlugin, EventPluginMixin):
-+    depends = [Bluetoothd()]
-+    name = "obex_agent"
-+
-+    def __init__(self, path="/obexagent"):
-+        self.path = path
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.bus = dbus.SessionBus()
-+        self.bus.set_exit_on_disconnect(False)
-+
-+        self.agent = ObexAgentObject(self.bus, self.path, self.events)
-+
-+        bluez = self.bus.get_object(BUS_NAME, PATH)
-+        self.manager = dbus.Interface(bluez, AGENT_MANAGER_INTERFACE)
-+        self.manager.RegisterAgent(self.path)
-+
-+        log.info("Obex agent registered")
-+
-+    def cleanup(self):
-+        path = Path("/run/obex")
-+        for f in path.iterdir():
-+            f.unlink()
++host_setup = host_config([], controller=False, reuse=True)
 +
 +
-+def agent_method(*a, **kw):
-+    return dbus_service_event_method(AGENT_INTERFACE, *a, **kw)
++def run_tester(hosts, tester):
++    (host,) = hosts
++    xfails = set(XFAIL.get(tester, ()))
++
++    tester = find_exe("tools", tester)
++    res = host.call(
++        run,
++        [tester],
++        stdout=subprocess.PIPE,
++        timeout=2 * DEFAULT_TIMEOUT + 60,
++        encoding="utf-8",
++        errors="surrogateescape",
++    )
++
++    passed, failed, not_run = _parse_tester_output(res.stdout)
++    xfailed = []
++
++    for name in list(failed):
++        if name in xfails:
++            failed.remove(name)
++            xfailed.append(name)
++            xfails.remove(name)
++
++    assert failed == [], failed
++
++    if xfails:
++        warnings.warn("XPASS: " + ", ".join(xfails))
++
++    if xfailed:
++        pytest.xfail(reason=", ".join(xfailed))
 +
 +
-+class ObexAgentObject(dbus.service.Object):
-+    @mainloop_assert
-+    def __init__(self, bus, path, events):
-+        self.events = events
-+        super().__init__(bus, path)
-+
-+    AuthorizePush = agent_method("AuthorizePush", ("path",), "o", "s", sync=False)
-+    Cancel = agent_method("Cancel")
++@pytest.mark.tester
++@pytest.mark.parametrize("tester", TESTERS)
++@host_setup
++def test_kernel_tester(hosts, tester):
++    run_tester(hosts, tester)
 +
 +
-+def write_obex_file(name, content):
-+    with open(f"/run/obex/{name}", "w") as f:
-+        f.write(content)
++@host_setup
++def test_kernel_selftest(hosts):
++    (host,) = hosts
++
++    tester = find_exe("tools", "check-selftest")
++    res = host.call(
++        run,
++        [tester],
++        stdout=subprocess.PIPE,
++        timeout=2 * DEFAULT_TIMEOUT + 60,
++        encoding="utf-8",
++        errors="surrogateescape",
++    )
++    assert res.returncode == 0
++
++    if not res.stdout.strip():
++        pytest.skip("CONFIG_BT_SELFTEST not enabled")
++
++    assert "PASS" in res.stdout, res.stdout
++    assert "FAIL" not in res.stdout, res.stdout
 +
 +
-+def read_file(name):
-+    with open(name, "r") as f:
-+        return f.read()
++def _parse_tester_output(output):
++    total_count = 0
++    passed_count = 0
++    failed_count = 0
++    not_run_count = 0
 +
++    passed = []
++    failed = []
++    not_run = []
 +
-+#
-+# Direct Obex Python client API tests
-+#
++    in_summary = False
++    for line in output.splitlines():
++        line = line.strip()
 +
++        if "Test Summary" in line:
++            in_summary = True
++            continue
++        if not in_summary:
++            continue
++        if "----" in line or "Overall execution time" in line or not line:
++            continue
 +
-+class ObexClient(HostPlugin, EventPluginMixin):
-+    name = "obex"
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.transferred = 0
-+        self.transfer_path = None
-+        self.transfer_size = 0
-+
-+        self.bus = dbus.SessionBus()
-+        self.bus.set_exit_on_disconnect(False)
-+        self.log = logging.getLogger(self.name)
-+        self.client = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, PATH), CLIENT_INTERFACE
++        m = re.search(
++            r"Total: (\d+).*Passed: (\d+).*Failed: (\d+).*Not Run: (\d+)", line
 +        )
++        if m:
++            total_count += int(m.group(1))
++            passed_count += int(m.group(2))
++            failed_count += int(m.group(3))
++            not_run_count += int(m.group(4))
++            continue
 +
-+        self.bus.add_signal_receiver(
-+            self.properties_changed,
-+            dbus_interface="org.freedesktop.DBus.Properties",
-+            signal_name="PropertiesChanged",
-+            path_keyword="path",
-+        )
++        m = re.match(r"^([\x20-\xff]+)\s+.*(Passed|Failed|Not Run|Timed out)", line)
++        assert m, line
 +
-+    @mainloop_wrap
-+    def connect(self, bdaddr):
-+        def reply(path):
-+            obj = self.bus.get_object(BUS_NAME, path)
-+            self.session = dbus.Interface(obj, SESSION_INTERFACE)
-+            self.ftp = dbus.Interface(obj, FILE_TRANSFER_INTERFACE)
++        name = m.group(1).strip()
++        verdict = m.group(2).strip().lower()
 +
-+        self._object_method(
-+            self.client, "CreateSession", bdaddr, {"Target": "ftp"}, reply_handler=reply
-+        )
++        if verdict == "passed":
++            passed.append(name)
++        elif verdict in ("failed", "timed out"):
++            failed.append(name)
++        elif verdict == "not run":
++            not_run.append(name)
++        else:
++            raise ValueError("Unknown {verdict=!r}")
 +
-+    @mainloop_assert
-+    def properties_changed(self, interface, properties, invalidated, path):
-+        if path != self.transfer_path:
-+            return
++    # Check we parsed everything
++    if len(passed) != passed_count:
++        raise ValueError(f"Invalid {passed_count=}, {passed=}")
++    if len(failed) != failed_count:
++        raise ValueError(f"Invalid {failed_count=}, {failed=}")
++    if len(not_run) != not_run_count:
++        raise ValueError(f"Invalid {not_run_count=}, {not_run=}")
++    if total_count == 0:
++        raise RuntimeError(f"No tests ran")
 +
-+        if "Status" in properties and (
-+            properties["Status"] == "complete" or properties["Status"] == "error"
-+        ):
-+            self.events.put(
-+                Event(
-+                    f"{FILE_TRANSFER_INTERFACE}:{properties['Status']}",
-+                    properties=properties,
-+                )
-+            )
-+            self.log.debug(f"Transfer {properties['Status']}")
-+
-+        if "Transferred" not in properties:
-+            return
-+
-+        value = properties["Transferred"]
-+        speed = (value - self.transferred) / 1000
-+        self.log.debug(
-+            f"Transfer progress {value}/{self.transfer_size} at {speed} kBps"
-+        )
-+        self.transferred = value
-+
-+    @mainloop_wrap
-+    def ftp_list_folder(self):
-+        return self.ftp.ListFolder()
-+
-+    @mainloop_wrap
-+    def ftp_get_file(self, dst, src):
-+        path, properties = self.ftp.GetFile(dst, src)
-+        self.transfer_path = path
-+        self.transfer_size = properties["Size"]
-+        return properties["Filename"]
-+
-+
-+@pytest.fixture
-+def paired_hosts(hosts):
-+    from .test_agent import test_agent_pair_bredr
-+
-+    if hosts[0].agent.has_device(hosts[1].bdaddr):
-+        return hosts
-+
-+    test_agent_pair_bredr(hosts, True)
-+    return hosts
-+
-+
-+obex_host_config = host_config(
-+    [Agent(), Obexd(), ObexClient(), Pexpect()],
-+    [Agent(), Obexd(), ObexAgent()],
-+    reuse=True,
-+)
-+
-+
-+@pytest.fixture
-+def obex_hosts(paired_hosts):
-+    host0, host1 = paired_hosts
-+
-+    if hasattr(host0, "session"):
-+        return paired_hosts
-+
-+    host0.obex.connect(host1.bdaddr)
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    host0.obex.expect("org.bluez.obex.Client1.CreateSession:reply")
-+
-+    yield paired_hosts
-+
-+    host1.obex_agent.cleanup()
-+
-+
-+@obex_host_config
-+def test_obex_ftp_list(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    (item,) = host0.obex.ftp_list_folder()
-+    assert item["Type"] == "file"
-+    assert item["Name"] == "test"
-+    assert item["Size"] == 4
-+
-+
-+@obex_host_config
-+def test_obex_ftp_get(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    filename = host0.obex.ftp_get_file("", "test")
-+    host0.obex.expect("org.bluez.obex.FileTransfer1:complete")
-+    assert host0.call(read_file, filename) == "1234"
-+
-+
-+#
-+# obexctl tests
-+#
-+
-+
-+@pytest.fixture
-+def obexctl(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    exe = find_exe("tools", "obexctl")
-+    obexctl = host0.pexpect.spawn([exe])
-+
-+    obexctl.expect("Client /org/bluez/obex")
-+    obexctl.send(f"connect {host1.bdaddr} {FTP_UUID}\n")
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    obexctl.expect("Connection successful")
-+    obexctl.send(f"select /org/bluez/obex/client/session1\n")
-+
-+    yield obexctl
-+
-+    obexctl.close()
-+
-+
-+@obex_host_config
-+def test_obexctl_list(obex_hosts, obexctl):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    obexctl.send(f"ls\n")
-+    obexctl.expect(f"Type: file")
-+    obexctl.expect(f"Name: test")
-+    obexctl.expect(f"Size: 4")
++    return passed, failed, not_run
+diff --git a/test/pytest.ini b/test/pytest.ini
+index 92820e819..6b97c6525 100644
+--- a/test/pytest.ini
++++ b/test/pytest.ini
+@@ -5,6 +5,7 @@ log_level = 0
+ log_file = test-functional.log
+ markers =
+     vm: tests requiring VM image
++    tester: kernel testers
+ 
+ addopts =
+     -p pytest_bluezenv
 -- 
 2.55.0
 
