@@ -1,242 +1,176 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FBA36E477
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 16:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788713450; cv=pass; b=ci/DHg4OdeQRpbbZ0VrhafT8janVjJKZkvAw9eZUdPyHqZuLeVnY0WLhT1B17qcAodLdrLXKs/frAYGyK/rSjlS6m4zMBawbTTFQ9zf9lQjzpTYm0HX+wVGnU3RdK3TP+Q9L5S5zcgDPYljHzLcy8/TNaaASbgww+IzlIffnTeE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788713450; c=relaxed/simple;
-	bh=o8myYuH7bstmkdwKaEFzAHfEdJbukcoiskLvzSYH6mE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hyhyr5RATMgFc2miuQscci+woiJC4m41PcgRgO58HfpHyA+1qfT8mcffiLA9cjwtFeCxiR7n9ECtkjcuUvT6Pq8HRK1K6Uklisw65HFXu5CgG0GpLyDY6UAvCExrLN85tFHE+C/XP3v53OqnRNi35jJEsC92XHijby5FM2xSbdM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=AvqmKt88; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5622B8472
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 17:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788714144; cv=none; b=Tob+wHJP6UzsOrjFTzHXqqfMTvMHEbL9lC5o1G/JnmUeSv/EXzexgdDO54s3CaaMUydg+XDxLynC5+N+ogqObJOPt59FepoS4CC1eYPVhhIj/zHtFeJZy91IQ1saeTsmoTsZEL9Hftr9BK+CVKWsXkEPhDXDLuHxgf2I0gq69tw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788714144; c=relaxed/simple;
+	bh=9Yg2oXlgy9KuAiFWHIdleQCwLf9T7UpSBmIJT/LL5ds=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Ji8/A7tNiPcSjdpa4sCivirhSBdxLhjh3I3G4fOeKR5pzsDIS+pwwQ7VxPj3pPQkcNlgn/oxU/2gUn20GKk3wim8eQ+gO66ivqSjBeR6uW+31pcHjH2EdErW0497JTMN5o5PIP1MMMDGKLBvUiGPzzpviwWL62bRukFM8kt0O8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akxF47rz; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="AvqmKt88"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:2::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hdGRF5j0kzyPr;
-	Sun, 06 Sep 2026 19:50:33 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1788713434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F8/JXIdvW+x/BMWiXozOnq9t6n7VNq4hV5vCWTpsx64=;
-	b=AvqmKt88uSUcvkbcR0wI2VyrAHLJiCY0Ql32JW1dHRgIJYD4+tAhsRiQUmKImFwPF+574t
-	m34EDlAjxwxzXawQFBVQF3uBMllEkGRsEvL6852vmsheoIoOQOYGbzh8OX8l7+UvqR93vR
-	MXZLwt3fMO0AYzzaE65X1z+rW7PA4Ug=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788713434;
-	b=k8jNvf6Fo2mVri5auLS36KSHgKoVS1qx8T2C/V4bQKZJHf9/ZOmfp0vaYZtSHHi/wJ+C7F
-	W6F/BS60BCsPsAhgAhAsx9n+c/JLIl6aF3ZjFkcZAYbuc5KGT5rHTmyf5ty5RIfGS1OJm6
-	cicGh2ASD9LoAYOiGm5KbBba1TXZOvM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1788713434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F8/JXIdvW+x/BMWiXozOnq9t6n7VNq4hV5vCWTpsx64=;
-	b=pMMAYYnJ+jYckvvv4IxxGQXwkCabO6zwFG48hzl8mRIrpAGc6hpAaaVSeXlKqv8+DxbMdr
-	7Z3t2WwhyUzzSdvqY/RER+dOudJZR6TbK6cZj88eAN8TU6b4gH85e24Vx/0uDH2Pw5BpBh
-	Sf93XwAt/wPtbBwy5weMZ9LR/mpVbW8=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v7 8/9] test: functional: add test for adv_monitor crash
-Date: Sun,  6 Sep 2026 19:49:50 +0300
-Message-ID: <13f949e145a25f23408ca84023d079dfd9a19ad6.1788712996.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1788712996.git.pav@iki.fi>
-References: <cover.1788712996.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akxF47rz"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-66fc2844f0eso2610437d50.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Sep 2026 10:02:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788714142; x=1789318942; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Pq22zrNCIPqdi5sxSqDeIHLLk3NfbxN/5T2dhSYb3yQ=;
+        b=akxF47rzWqhAs5g2hNjWaeY+ZEfjekr7d+tw+cxSgXn2yYtR/yvq+FGihd37l7hYE1
+         79/NvC/IsO9PAOiWaNXWk2lmJr/XW63hD2C5pwwj3tNNyAWxSugHytD4HDtonT0NFN0h
+         LClswQTpfo6+gvV56qG98akJNXwgTBSho3GAuLFJnmHaKtxaj3nI0/CmuD6o6dBWWiS8
+         c/Gj5B6vjoqem69LcVs2Qh13RRd648nmNV3Z4PaKexzRQAIHqved7hIxiSnqeWkp6A4W
+         q1y7ilVq3oqOCxaEPosa8HChzK/b2PxFIsIpRN/83e5biJxrevxewmrgS6hBhzUtB5+P
+         XVNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788714142; x=1789318942;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Pq22zrNCIPqdi5sxSqDeIHLLk3NfbxN/5T2dhSYb3yQ=;
+        b=HP9lMCj8rgRJfPKyOl35M20+nnkctRwD/DOfi1ukkPTWnRvMOdVOOuHZcD2/PuLNiW
+         ntyMnddc4/pyiYmLccRYOjRLCXrob7KlBCiuwdXzKBM94qoKqFOsfT+VUv/pz1cHXwEU
+         mIsE5TvLyLiu9bNJ9p+0zWpTcKqf3j6Cmyk6xRw10VQ2QWv0Npo/CLSBhsfCfDp1VX5e
+         psktf2xNJEnHC8YvLPYY213QiDl2UgW2AmZbxjToSAuY2vTO2enMI+5fVZwP17kdATA2
+         ysn8gHudKQ1WROm9qrYba474wBbAYn/+nFLguvWH4HL1hGVa1Z7PTRHY4fBoH6CHGS2Y
+         JjkQ==
+X-Gm-Message-State: AFuF++k9EK4rQf8/GdNzcBwzUa2bXGjTn0L+hGb/fuPKwqUzWn30dGk9
+	DKdxXqgmJ6oUgK5D7r6S8YUlF2/QkEdJdxuMCWohiVeLhVA0yEnwxclb0vuJnQ==
+X-Gm-Gg: AYBFou0pp9n4NB8uHFOsN7RcMLX+0fKEdEFPFZyHN9wQSyBWDP5b3r7TZAXYypztR1Y
+	ikAmTPBBp98vHpz5Lk62OtEVnX8oGiS+SSXFmE6SEHkDZEUBrTDnBsEjkVl7TSsz/LFsatWidRD
+	j3+Lf6HEU6xpmiDhclsjbyQ6BlvGvjcIpJNutxuR/v91pTqUKhONW7obyUxqdUnHIhpHZ0n3Rer
+	G9wm3fG+e/7PlTWzTNLy8scY3/C2APuyf09jH6XAVHWn0l3Ku7srDzaE6Y+/xBQussATEg0CrKA
+	MQs/7ZY1i6tCITWeRogdrDuRJUSCBSLPrQxvkKhy+4X3zWXYQhmIkIdCtRWtrxvSvSpyOffW2nx
+	Is4NAFXwY3pD8j5W0JiycPa4/R7WzTr1BwQD+Be7sIw1jeqYIT8sfqOXJc9o99y1M9z4iJgW5W6
+	I2S5IPltnd3KpAK9B9Ezk8C81dR4GawNkRLAH8Y3p/NmhyQ3K5cKsIBMmXqmxq9p0vj1F+fKz90
+	MVU3Q==
+X-Received: by 2002:a05:690e:1207:b0:66e:564b:c4e9 with SMTP id 956f58d0204a3-66fb591ec36mr5379985d50.6.1788714142161;
+        Sun, 06 Sep 2026 10:02:22 -0700 (PDT)
+Received: from [172.17.0.2] ([4.227.169.197])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91040595f81sm72360576d6.2.2026.09.06.10.02.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Sep 2026 10:02:21 -0700 (PDT)
+Message-ID: <6a9d9c9d.f8a8063e.18a22.cf37@mx.google.com>
+Date: Sun, 06 Sep 2026 10:02:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3281254743340712671=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, bestswngs@gmail.com
+Subject: RE: [v3] Bluetooth: coredump: Quiesce dump work on unregister
+In-Reply-To: <20260906154332.763402-1-bestswngs@gmail.com>
+References: <20260906154332.763402-1-bestswngs@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add test checking adv_monitor overflow crash.
-From PoC provided by Alexandro Calo' (Nozomi Networks Labs)
+--===============3281254743340712671==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1159097
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.23 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      28.18 seconds
+CheckAllWarning               PASS      30.72 seconds
+CheckSparse                   PASS      29.40 seconds
+BuildKernel32                 PASS      26.96 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      506.11 seconds
+TestRunner_l2cap-tester       PASS      65.94 seconds
+TestRunner_iso-tester         PASS      105.72 seconds
+TestRunner_bnep-tester        PASS      19.19 seconds
+TestRunner_mgmt-tester        FAIL      223.27 seconds
+TestRunner_rfcomm-tester      PASS      25.81 seconds
+TestRunner_sco-tester         PASS      32.26 seconds
+TestRunner_ioctl-tester       PASS      26.88 seconds
+TestRunner_mesh-tester        FAIL      25.95 seconds
+TestRunner_smp-tester         PASS      23.57 seconds
+TestRunner_userchan-tester    PASS      19.89 seconds
+TestRunner_6lowpan-tester     PASS      23.18 seconds
+IncrementalBuild              PASS      26.22 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v3] Bluetooth: coredump: Quiesce dump work on unregister
+WARNING: Reported-by: should be immediately followed by Closes: or Link: with a URL to the report
+#130: 
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: OpenAI Codex:gpt-5
+
+WARNING: Assisted-by expects 'AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]' format
+#131: 
+Assisted-by: OpenAI Codex:gpt-5
+
+total: 0 errors, 2 warnings, 0 checks, 128 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14794291.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.249 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.249 seconds
+Mesh - Send cancel - 2                               Timed out    1.986 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/712
+
 ---
- test/functional/conftest.py         |   6 ++
- test/functional/test_adv_monitor.py | 123 ++++++++++++++++++++++++++++
- test/pytest.ini                     |   1 +
- 3 files changed, 130 insertions(+)
- create mode 100644 test/functional/test_adv_monitor.py
+Regards,
+Linux Bluetooth
 
-diff --git a/test/functional/conftest.py b/test/functional/conftest.py
-index bd26b7e4f..9e3f6c50d 100644
---- a/test/functional/conftest.py
-+++ b/test/functional/conftest.py
-@@ -50,9 +50,15 @@ def pytest_collection_finish(session):
- 
- @pytest.hookimpl()
- def pytest_collection_modifyitems(session, config, items):
-+    sa_re = re.compile(r"_GHSA_...._...._....")
-+
-     for item in items:
-         callspec = getattr(item, "callspec", None)
- 
-         # Add vm mark to VM-using tests
-         if callspec is not None and callspec.params.get("vm_setup", None) is not None:
-             item.add_marker(pytest.mark.vm)
-+
-+        # Add security advisory marks based on test name
-+        if sa_re.search(item.name):
-+            item.add_marker(pytest.mark.sa)
-diff --git a/test/functional/test_adv_monitor.py b/test/functional/test_adv_monitor.py
-new file mode 100644
-index 000000000..e7f109314
---- /dev/null
-+++ b/test/functional/test_adv_monitor.py
-@@ -0,0 +1,123 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: LGPL-2.1-or-later
-+import dbus
-+import dbus.service
-+import pytest
-+
-+from pytest_bluezenv import host_config, Bluetoothd, wait_until, mainloop_wrap, get_dbus
-+
-+
-+@host_config([Bluetoothd(conf="[General]\nExperimental = true")])
-+def test_adv_monitor_GHSA_hhgc_hfgf_8m4x(hosts):
-+    assert hosts[0].call(check_adv_monitor_GHSA_hhgc_hfgf_8m4x)
-+
-+
-+def check_adv_monitor_GHSA_hhgc_hfgf_8m4x(adapter="/org/bluez/hci0"):
-+    """NN-2026-0142 - Heap overflow via uint8 cp_len truncation in
-+    adv_monitor pattern registration (src/adv_monitor.c:1113-1125).
-+    """
-+
-+    NUM_PATTERNS = 8
-+    PATTERN_SIZE = 34
-+    OBSERVE_SECS = 5.0
-+    APP_ROOT = "/NN20260142"
-+
-+    def make_patterns():
-+        return dbus.Array(
-+            [
-+                dbus.Struct(
-+                    (
-+                        dbus.Byte(0),
-+                        dbus.Byte(0xFF),
-+                        dbus.Array([dbus.Byte(0x41)] * 31, signature="y"),
-+                    ),
-+                    signature="yyay",
-+                )
-+                for _ in range(NUM_PATTERNS)
-+            ],
-+            signature="(yyay)",
-+        )
-+
-+    class Monitor(dbus.service.Object):
-+        def __init__(self, bus, path, patterns):
-+            super().__init__(bus, path)
-+            self.patterns = patterns
-+
-+        @dbus.service.method(
-+            "org.freedesktop.DBus.Properties", in_signature="s", out_signature="a{sv}"
-+        )
-+        def GetAll(self, iface):
-+            return {
-+                "Type": dbus.String("or_patterns"),
-+                "Patterns": self.patterns,
-+            }
-+
-+        @dbus.service.method("org.bluez.AdvertisementMonitor1")
-+        def Release(self):
-+            print("[*] monitor released")
-+
-+        @dbus.service.method("org.bluez.AdvertisementMonitor1")
-+        def Activate(self):
-+            print(
-+                "[+] monitor activated (overflow already happened in "
-+                "the ADD_ADV_PATTERNS_MONITOR mgmt call)"
-+            )
-+
-+    class App(dbus.service.Object):
-+        def __init__(self, bus, path, patterns):
-+            super().__init__(bus, path)
-+            self.monitor_path = dbus.ObjectPath(path + "/monitor0")
-+            self.monitor = Monitor(bus, self.monitor_path, patterns)
-+
-+        @dbus.service.method(
-+            "org.freedesktop.DBus.ObjectManager", out_signature="a{oa{sa{sv}}}"
-+        )
-+        def GetManagedObjects(self):
-+            return {
-+                self.monitor_path: {
-+                    "org.bluez.AdvertisementMonitor1": self.monitor.GetAll(
-+                        "org.bluez.AdvertisementMonitor1"
-+                    )
-+                }
-+            }
-+
-+    success = None
-+
-+    def register_ok():
-+        nonlocal success
-+        print("[+] RegisterMonitor returned", flush=True)
-+        success = True
-+
-+    def register_err(exc):
-+        nonlocal success
-+        print("[*] RegisterMonitor error:", exc, flush=True)
-+        success = False
-+
-+    @mainloop_wrap
-+    def start_register():
-+        bus = get_dbus()
-+
-+        app = App(bus, APP_ROOT, make_patterns())
-+        mgr = dbus.Interface(
-+            bus.get_object("org.bluez", adapter),
-+            "org.bluez.AdvertisementMonitorManager1",
-+        )
-+
-+        cp_len = (1 + NUM_PATTERNS * PATTERN_SIZE) & 0xFF
-+        total_len = 1 + NUM_PATTERNS * PATTERN_SIZE
-+        print(
-+            "[*] RegisterMonitor with %d patterns: cp_len=%d total=%d"
-+            % (NUM_PATTERNS, cp_len, total_len),
-+            flush=True,
-+        )
-+        mgr.RegisterMonitor(
-+            dbus.ObjectPath(APP_ROOT),
-+            reply_handler=register_ok,
-+            error_handler=register_err,
-+        )
-+
-+    start_register()
-+
-+    wait_until(lambda: success is not None, timeout=OBSERVE_SECS)
-+
-+    return success
-diff --git a/test/pytest.ini b/test/pytest.ini
-index 6b97c6525..8e4c109bb 100644
---- a/test/pytest.ini
-+++ b/test/pytest.ini
-@@ -5,6 +5,7 @@ log_level = 0
- log_file = test-functional.log
- markers =
-     vm: tests requiring VM image
-+    sa: security advisory regression tests
-     tester: kernel testers
- 
- addopts =
--- 
-2.55.0
 
+--===============3281254743340712671==--
