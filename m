@@ -1,138 +1,175 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazolkn19010003.outbound.protection.outlook.com [52.103.33.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113843370EC
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 18:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788719352; cv=none; b=lyCbRpxdxubnlCcHL9hDx0wFKl/GjOZgtKLNZh7RX14NfRcCEPc8n/RSdSY4lQzg9LKcCi2W90wItuZ8mwVBX1Gc9b0MYfchmDFdy6nRJaaRjd0J3LVVS/ffrBWqyi28dhOwHete7lSuet1Dti79Dx9HboVls+HbnAuB/jov5/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788719352; c=relaxed/simple;
-	bh=Yn0wz0Cb6xeVjj3qMxX9lYvYMwYjtzWMuKpYo3NIhos=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=diVEfJpcHLEQVN6czSHaWPmOOhqiBLmcIT8YVk0pkfjQ5mhoEK1fSrDnfrD48seXEDwFK7E4FkClgM8vlBfsZFY0rtl6dr7/SXzOZ3aifIpUHEP+oGr0rtmAMuWIwtAbR5wKaLKNKFZWY7gaB+rU7klnVqXTZnbtks2O27txOjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGAiL4rM; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1E13BED38;
+	Sun,  6 Sep 2026 23:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.33.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788737871; cv=fail; b=eTLa5ANZWj2nCUo41OFVMJjnLzxvbhnqdZqps+/0kEYYDyL0fASMAoOZEAoehpIXDjHdV2qEHODQ1Ho5v6A3IteG8Hcr/VuS90QbkP7iDhxlpJHm9UfIBi9/UB/iddvtBqPPDQkmVUhD2UPLTRdywPnut+SyrcX91bTLNTc7Su8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788737871; c=relaxed/simple;
+	bh=hE9m2QMjY55YuZlMvWIkPkd+HbTqVKppXkH+NccpJ2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=C8PKZcrP2vtfM0fgI57wBvBBtH8BagkCKO2NqwGEM9aNSv46lx8xAwPfS5y64ansrwDrrjYuaETj8MeQDA7BbSW3PkTwYqwZaZk3BkF7GRKXS5VwdFAp9ucSCk1AjCfZbnW+uEU0rq1mnD6fCkELvldFkTh/w1lyDn0DO/EyVW4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.co.uk; spf=pass smtp.mailfrom=hotmail.co.uk; dkim=pass (2048-bit key) header.d=HOTMAIL.CO.UK header.i=@HOTMAIL.CO.UK header.b=ErI8+p5d; arc=fail smtp.client-ip=52.103.33.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGAiL4rM"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-9397e2994dcso248812685a.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Sep 2026 11:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788719350; x=1789324150; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=l5j0lx5xiMwmUhcfqaPtV5Xn252Dafc00VwIyuDKhcY=;
-        b=jGAiL4rMT5+4eEUoAfSObN2DtBsEZYb6sdcmcVAUSU+VvGHk+lNyyNR1QCvMAXOsmm
-         y1eMwiPFns76RaoNHZ/SxOl3Pt6nxuvu5jiUenl47GSSmSKmboN/0lpLtI5mlPKyJDfM
-         YXwPAnU802Uol8HodIxu5Wx8AonJzxUtRn5P9krGzKIN7rVLMN2dssoK/YBUpHcILocJ
-         6FMqlc6wsL0IoT8/w9sap8pK36pQ7I7q3Xhb4uys/EEla0WBpu9WWBEx5BHRnpUsgp0G
-         JckmDd9t78+1hcKePhO7IWm0R1IKfaS9pYuMUjXczUshilP0wFBbirMKbl2t5jS2a/YI
-         v+6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788719350; x=1789324150;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=l5j0lx5xiMwmUhcfqaPtV5Xn252Dafc00VwIyuDKhcY=;
-        b=JAxI7O/VcDambEeKVZg9Cx3sc833ywdJyWDpIplUNeMQ8cnJe3HHgZapbuBSLzdpxj
-         Yi8y5FIRI3esJhIwqXLd1Yz4JFWyfSObeE20zT2p3+OGJ51ypPL5DpN45zA+DfeEwCRQ
-         NjSNK3tCJwIlgyaGXWTJU/0CrgvCqjDZJnIs2SOp5/HD7WGkomUXZn3HaRQQ3U8GP7Tv
-         9/xu8STqKMXUzwNpkFFl9I83Dvftbr1O1Ma9omTDGgS0e6NLaXeppv+Rv2aWSlmZDdF8
-         80QjQXzDFUuBPj7q1EiXNjjXZVPQUEw2y2q149RNasQWCfPBL3/gaNM/yY7KI9I9iFtR
-         majw==
-X-Gm-Message-State: AFuF++mnQT8WIisuGjvclXISmn+um47XwUeyXdJgcl1pxiX4asOe33xS
-	8y2uMATsCVeGrcPuSsdcWeTLP8jLMMQTJ+g45WED7j2E+TnXK/EL/Ob9W4XShA==
-X-Gm-Gg: AYBFou29ZFyssin+Zy0pqLbWQaJ2aTiBDqCPwq1HJQ5ZLKgf/wQrmYdiR2Ae0FxhXpN
-	r7qmDj4BBlKFT0Ep45GSpgINkwfY52Cm2SoK0G5D1EYEjq37S3PeO+SE/JC7JpDQfCw/mkR/Xdb
-	/RMwATJDYAY/C8lGTORqSXhTWB9xNafHZKJbSjVWSN9uSxKXLYsmkK7ZLF9KIoVHikmw/T1Iccv
-	Y/U6ofaHxpSfNPB0ga7CNsurB8vkmPFTUtyMJDG1unM81+Sjt7IR43ztpaRwa74H8ugXsvgvBZ/
-	9xEdkjaDkGnxAvJjlX1Dg3QoOl227txtKQC0H3vDuqOoff+IE8U1991vfpQtvAr//KE/OmdT8/V
-	daWc0GkdXdKEFIFLfMm7iMHOGGjTWDgoLArSZkgEtP1xdNYIXuSWmn2BEKEVdqiYtenlJv7G1yq
-	p63xxqCc6zdtxOfLwpxNLorNZFrJ3wTX+U6knOcvhckArYRfQ/aWPoBuJBf047eYF7eso=
-X-Received: by 2002:a05:620a:2715:b0:939:8a03:f7e3 with SMTP id af79cd13be357-9398a03ff25mr1485337385a.6.1788719349808;
-        Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
-Received: from [172.17.0.2] ([68.154.117.32])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fb2fd82sm700942785a.17.2026.09.06.11.29.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
-Message-ID: <6a9db0f5.7ff333e8.3955c2.8cfd@mx.google.com>
-Date: Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4420721202464633996=="
+	dkim=pass (2048-bit key) header.d=HOTMAIL.CO.UK header.i=@HOTMAIL.CO.UK header.b="ErI8+p5d"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cO6wawMP4pnylHF8Vtb+Lx+xoS9wWKatdEB0nh8sUhW03gx7Q+Nk5K1BeRKJppuY9Yir6OwuZW5YQb7JoZviSlcMSvLx537kW4LGLaHeTDh72YHb2bsIEatsN2UuRz3QWb/gL4G5TwuoR8DJi67vV1df5CANfn0xYfSDLslloKia1QMUEQJj+yi6afWo9tjLC6pF/PK3LeqlzOxWJ0PhpMrFznOLImUyoQbU7VUYuBugCj91YtKepF5Sge1TF2wjFQ9W+BfbhQFzGVr7WZx207ABfwzeoPp3PnyP+fRL8XVpgPHvcVAO5tzInSnq0DSdl+Xq2eP5vg35YVGF/VAX7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JCf2zFSQIc6H5nvZZC6lURgwCMF24U9JiBKPGSnlBvM=;
+ b=DOGNeMm4YtVVQI8ro4g/903kpwSchOI0ST9DZcb4pXlYs/VLJkhColEs1yXGFKkTpuVR1zlKu+NpNgxIcwh+Dbnl6OpP9t6g2/R8akl4qcIu9jlRqvRCcGLp5UyJDxSU9v8qRxwgQ7G/b3HW5b/dXVhol4SFoxrA0oKvfRpSJBSOgX1NAx/yWOYwgXYakW1s7qdskF5TbCJItOcCVFPC4DbsnMTdAcEYCselYSTugpSXyVxy6KjqZSuHWj50pPhakou08NemQozZyrO10Al/ZAynfxxynlCR5IA8AhJUYY4jAnp+iSPhX6+kSNIUMN+fVALVUWSIaPsCL83LtHz+jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=HOTMAIL.CO.UK;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JCf2zFSQIc6H5nvZZC6lURgwCMF24U9JiBKPGSnlBvM=;
+ b=ErI8+p5dHOPIlfQAWfiav/X5hI+ng59/4bdUFDC7DArWfVyWXgjtAjPfGx+xmWGMEq7qt97pXQRQtUgQt3ocozzfYhxaMKr2UICtWojkHjfYSwELBRMKbhWxQjxiZQc1IDCOc0KTj60yOLtV15UG+aPapZpibEG4lC9mgXo22fbHC7BkhtUC5Qbb1BqVUAk5OvuzjEeZHOn1zigu4I9xLAQsiUymSFUjPjtfL8qO2pyzseBxMCKsYCFMFjJsI9EyRNT7jEGwVQSN6PBA7nDJOKs5jRodRWIieF/bzF5AHM/+twT8zV+j/8Qol326BhO5+yjHTK8DUphEPDCnf9dx4w==
+Received: from AS8P251MB0001.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:344::22)
+ by PAXP251MB0113.EURP251.PROD.OUTLOOK.COM (2603:10a6:102:200::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.15; Sun, 6 Sep
+ 2026 23:37:47 +0000
+Received: from AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
+ ([fe80::2952:d4d0:4ba:8352]) by AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
+ ([fe80::2952:d4d0:4ba:8352%6]) with mapi id 15.21.0382.014; Sun, 6 Sep 2026
+ 23:37:47 +0000
+From: Aamir Ahmed <elb12345@hotmail.co.uk>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: eir: validate service data length before reading UUID
+Date: Mon,  7 Sep 2026 00:37:43 +0100
+Message-ID:
+ <AS8P251MB00013029B476B1D2E05DF190C8B32@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.53.0.windows.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO6P123CA0010.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:338::14) To AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:344::22)
+X-Microsoft-Original-Message-ID:
+ <20260906233743.87762-1-elb12345@hotmail.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Functional/integration testing
-In-Reply-To: <f5138d545e2edb8cbc0116acdb7c0384ef09f2a8.1788712996.git.pav@iki.fi>
-References: <f5138d545e2edb8cbc0116acdb7c0384ef09f2a8.1788712996.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8P251MB0001:EE_|PAXP251MB0113:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c7d607d-cf67-48bd-f4aa-08df0c6fdb22
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|24021099003|55001999006|5062599005|5072599009|4140399003|15080799012|25010399006|23021999003|25031999004|37011999003|19110799012|8060799015|12121999013|440099028|3412199025|26104999009|52005399003|40105399003|2607281247196008;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/UN/orwN7KQvW3TtE69BpmIb9JJl7yaA0mzGk4f0DcDC1XvfgLX5NOoilID8?=
+ =?us-ascii?Q?IRvRMCryEimf/AIajyabizb7UP5QI+IUqIldwB0ZfDzcc6CDU/j/k0XeKdXI?=
+ =?us-ascii?Q?Y3+v9KHbRiDi+CnXKsm0F4zwA0pwFMOGmxQ0bszYS00ubEyabvyjmQNOIHQd?=
+ =?us-ascii?Q?NCAg5svgx/fcQEs1Mm/MnTfgXj7V10vEYucghQEYAt71dFXX0yK4OtYO+eU1?=
+ =?us-ascii?Q?2yaSKxjoZVdC5YaqqPrsT4Hyz6mXdRA0+dhDWUU7roNW8653aM6sUgEMwHoJ?=
+ =?us-ascii?Q?1Fj3C2X3yKkHheyRH2piNAawx2ef+h1C6AmCAWwGCUk6bTDADX6SJ/PGxDLT?=
+ =?us-ascii?Q?E5hT+GsDpdDM3F33MGe9KowlJK41R4CSpyKdUczlhHt6bEkN78MrzhYBy8AQ?=
+ =?us-ascii?Q?gdZ/APJgyPfVpxzSy3gcbKb/jt+ScQnoEsOYYarLK6a16fLIN7FqnBMYovfz?=
+ =?us-ascii?Q?ifq7/BRNfmQsyBaBWGzq2a7HhcfdJ7cZl8Hq3w7ROyI1OMRqe0u70jB15SmO?=
+ =?us-ascii?Q?RwfY68gftTdfcayLJuaj3FRXk+JjzlJ0lgmB275SoNz0s69B/Nr6b2XwMC4U?=
+ =?us-ascii?Q?+evnPBcTBbuZxgdDE8Tae/QEXpJOgAtPxRPG4bYdFQRv2hFElkVavGFKI5In?=
+ =?us-ascii?Q?YwKtyP9cNonOK+24eFWCV/BHsEFEpybiZaS3l4DKiew901uZq85xQVzNrGiw?=
+ =?us-ascii?Q?lWsa5cF50Ms/FvhMzL7szvQXqSKmB1q+36lxPvkEp1InWYdtN8g5zqhXkh2B?=
+ =?us-ascii?Q?6qZDoUO8bcVpRQLZ/+lCJ0kkNSvH+5XLmWMaD8za9kT5zDKqzJzlYefMgAyw?=
+ =?us-ascii?Q?Kf1/IrYKydG8HSdGjT9sQy/E8sig5gi9/kVGQHNb05pTNBEHifZoeVVAFY/F?=
+ =?us-ascii?Q?OKVC3DDhdtDPJBIg9rBrddYFfLZh2OtuARGJvyIJTZniX/Nz0/j9j0InTML6?=
+ =?us-ascii?Q?TVzOG4utZrSCXFNAF5H7uYOnOg2BjQ7OeqNmBfTL+Dyb8QYR+uQYLphr5hx1?=
+ =?us-ascii?Q?hf3O1bgjri8MHZA2+CGs3P4E77k3MlZjlkdhrzUQhep4F737t2UyGGkpoOyz?=
+ =?us-ascii?Q?TTIZ1n1P3PKkJCKYfF2a+lU0Y80UzbUXXd8CtU4h/glkOAylJxU=3D?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?K7GvoohbltinpRq89pe+1op2cWnOzf1HY2HXJ/0sqfWDDGDDnhkfOvYE2yGp?=
+ =?us-ascii?Q?k1jbVIypuPRgFH1UjVFGOQWGhJbTc9QQQK5u9Tr4DaG2RlnMWmekZpe1A3vj?=
+ =?us-ascii?Q?nNv67j+T1gGL728CrF26KyRY65ymv+6m2LMBnD0iLXYnv74sc28PCswwgvXT?=
+ =?us-ascii?Q?UuCgh1yiSZb/ZkiEjNyc6TZZ0YXOQAzx0TRc2txMOcPCDlCJvj4tFVh9MdWr?=
+ =?us-ascii?Q?P5SvmO2HBCFm2QauoLvERjAt3goaSZx8AJGP8BdZASOdXWgxPDPOo6Y6zI2E?=
+ =?us-ascii?Q?rNg7IK+CrcYxll42TlpTQFEnVCSkHa2mnI05rTSF5QL28x1RIIiuSyG6LVd/?=
+ =?us-ascii?Q?fCvwyudXmFdFRpBtB9sn5e3gVr2RLDo3GA1lKx/eKGZU09xfx5Ivrx2cgFb3?=
+ =?us-ascii?Q?10Q5KKfsQ2t1q5KkLu30+LdcA4xX5Wlvw/1ibLRV24dXMdNO2baVt3P932Yy?=
+ =?us-ascii?Q?7JyF1UZG0Ddz7xSw8EeP9hBXbYNysfjDnk9rU4ZcjxOrfR/ff1BtA9zlYcZ1?=
+ =?us-ascii?Q?BVE8x3Bau7DHcNysDrOT+PrlVVTGurzRY27uBWLZy5uBt+s/ex0CI6Lo9U3E?=
+ =?us-ascii?Q?s9whPvPbNOko+u6XHj3l++/5qA6lM1/U8fWPRFlztUfawAyeHHNjtZDXttqi?=
+ =?us-ascii?Q?dtxBDR5qvjkqdZYbQpJWp4mOn68LYqCa1vl2NMFdB0KixL3CXU9quTuWqqXf?=
+ =?us-ascii?Q?dJMaapW6N/nWnpNHUuUuCkI8Zp9WbtuvoGXgIAiW0pqbkhCJseQNo8PDYgBx?=
+ =?us-ascii?Q?DpKRXOMaZANwlvk+ehv2X8aN69qjr0SvollGFHB0FADGLjfwIGn/9rgJN3pR?=
+ =?us-ascii?Q?oo2lEIw8vcZ5sg5lUPGq1OjgYzftslQKXtXKGrYuH9JCquIsIqxgW2KOBG+d?=
+ =?us-ascii?Q?hh4TT5S0Ce3nHHJxzqHbRmGJlEqY0BvTIDDvkJFSbx20wLqYXs3xWgRBY6HX?=
+ =?us-ascii?Q?iFsZ6Tx1xstMBKHdIclR7P9a+rOm2lxTok2G6Y+UJsLxk0kqza0ZeABzW0yc?=
+ =?us-ascii?Q?zEIoyVX4pzUihcslx/4qpsILvX0z+s8UbR7KCKmvzXkW9TXmFetjPzBnC8iW?=
+ =?us-ascii?Q?G/OCZuDMv2iaI72tenI5IWv+z0MsLwaWOJg8W6xClF4ZbVDSARRWSXSOvVNQ?=
+ =?us-ascii?Q?ykzQVS7iH558kaW42IsdsY9Y2QRmpp5LuApA2f+MxtwwIQtKupM2gP41ElJ6?=
+ =?us-ascii?Q?Oq7KE+Wa88+/adiW+k7Iqa3KKkEhRnbDd6Ku9T5Jtmw7gJX3O/OtrOw1S71R?=
+ =?us-ascii?Q?J9OiKBxvfiGxGwvufZokNwbyrD3Y/SsIuBxeWD5Nf2eU8P9/PsrOxvH1s4LN?=
+ =?us-ascii?Q?iyjBDXM+TyUx1QwPMqOsc0VWIs0ZFIe4BRqmIRMW+1tIRslocHDsQBeH+Bly?=
+ =?us-ascii?Q?Kb1wfU8s9wAxS2YMMQoGfp7b0CGBOgg2N4iRVBpbdKRBbflu2M++W9RtN94Y?=
+ =?us-ascii?Q?Pb3seEqn85af0O8xrXJGMUDtL2BFJsVm?=
+X-OriginatorOrg: sct-15-20-9412-3-msonline-outlook-fe3f5.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c7d607d-cf67-48bd-f4aa-08df0c6fdb22
+X-MS-Exchange-CrossTenant-AuthSource: AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2026 23:37:47.0007
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP251MB0113
 
---===============4420721202464633996==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+eir_get_service_data() reads a 16-bit UUID from the service data using
+get_unaligned_le16() without first checking that the data is long enough
+to hold a UUID16 (2 bytes). If a malformed EIR entry has a service data
+field with only 1 byte of payload (field_len=2), eir_get_data() returns
+dlen=1. The subsequent get_unaligned_le16() then reads 1 byte past the
+field boundary.
 
-This is automated email and please do not reply to this email!
+Additionally, if the corrupted UUID happens to match, the length
+calculation "dlen - 2" underflows to SIZE_MAX since dlen is size_t.
+Current callers either pass NULL for the length parameter or bounds-check
+the returned length, but future callers may not.
 
-Dear submitter,
+Add a check that dlen >= sizeof(u16) and skip fields that are too short
+to contain a valid UUID16.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1159124
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      4.40 seconds
-GitLint                       PASS      3.00 seconds
-BuildEll                      PASS      20.48 seconds
-BluezMake                     PASS      561.12 seconds
-MakeCheck                     PASS      19.92 seconds
-MakeDistcheck                 PASS      154.78 seconds
-CheckValgrind                 PASS      223.37 seconds
-CheckSmatch                   PASS      299.24 seconds
-bluezmakeextell               PASS      98.04 seconds
-IncrementalBuild              PASS      593.09 seconds
-ScanBuild                     PASS      874.61 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v7,2/9] test: add functional/integration testing framework
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#451: FILE: test/test-functional
-
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#478: FILE: test/test-functional-attach
-
-/github/workspace/src/patch/14794355.patch total: 2 errors, 0 warnings, 308 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14794355.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluez/pull/2498
-
+Fixes: 8f9ae5b3ae80 ("Bluetooth: eir: Add helpers for managing service data")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aamir Ahmed <elb12345@hotmail.co.uk>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/eir.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index a55696820b22..ee0136bfae40 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -373,7 +373,15 @@ void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
+ 	size_t dlen;
+ 
+ 	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, &dlen))) {
+-		u16 value = get_unaligned_le16(eir);
++		u16 value;
++
++		if (dlen < sizeof(value)) {
++			eir += dlen;
++			eir_len = eir_end - eir;
++			continue;
++		}
++
++		value = get_unaligned_le16(eir);
+ 
+ 		if (uuid == value) {
+ 			if (len)
+-- 
+2.43.0
 
---===============4420721202464633996==--
