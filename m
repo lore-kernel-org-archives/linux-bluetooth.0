@@ -1,149 +1,240 @@
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC0A8472
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 17:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F259126C02
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 17:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788714168; cv=none; b=XZRSD3gZYRcCcqq2US+U/8Z6leyP6+qtpLjbnkwqu4JYGcaxVJF6n3hLDfu567R0ezzYW++2LOgqmdybsaVAUPdfoCxGnWDF/0I2SGcA9m7wVFqTV3juntNT7LTl5EILTWXx/x3Dm8H7IcEGwOB338BBl9QrBNNUpLbgqJ/cRas=
+	t=1788716454; cv=none; b=TqSN6S8PHfepJpM9tlQ21c5GSoxJbsVLKnkT4T7dp4Ya6cOyYVCjfe8VALaMv2HZ5EmPVMdeg+Ibe0147GuU5n6rM0nfsKUHAX60UR2Uf4YRAuFvUsG4sueXdZWsnTICY/CvjSQXsFnolHEBM3mNYFZC+N7dL/L2J+TNHT0LZHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788714168; c=relaxed/simple;
-	bh=ByHnwneSIJPZDY8XmVjWhDcSXgK0JzBkMW3TFABcIQE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jvgRdqeuzw3DrRsJ+QcY3pK1xJQjoI/DyzYPz1EnW1jkxIp2Dbn4Yt7hH6lBQjwTzdYjKEG1aO2qb+Xm13Nb4zXmro0civKjTuABtBn3PTFQc1Y7ZD5P2HEVtzmYa1UhDXcgSfLAY6IEYc/D7OMBTS8zU0M7WiD1lfp86JTJ190=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQ3yR4+z; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788716454; c=relaxed/simple;
+	bh=NwxRmdJpzLVY7MQjvb6MFE+XkVKVnpDBlb4zy75bDhM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=J57/u90k55q4f94+SdJ6uihUBJvmTupmppK4iz7ffQO7ZMsY1dcIkta9QkmFymHGRVLy4KHwGFMxyHyJe+bJW/neE4QEH9mVMuUo/Qj73w5yXjENyMQ7zctwY3zCv4XRYQpeIIHUyxrs2O6GsqI1yMDOxmrR5aADIs2SWyqkOEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=IS/aMW6Y; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQ3yR4+z"
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-66dbce0b639so1697077d50.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Sep 2026 10:02:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788714166; x=1789318966; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=S43pA8GtcR4XDj/eKycYXWBqMWFJScqyRjxBzFXjBhk=;
-        b=eQ3yR4+zykDoUhKPwMsGygxN0TS0Ds5OtA8YNoU6JDu76xlHM30b89g+QiGU0EqvJJ
-         wiIUMh+G4/S6Xkk1iH/oJYedqyaFY454YcK895kHF6f/wO0BYjtzF60a7ekjaJjGczpT
-         pvmXZlZ0kya8/ND05pjadSkNwPTLVQods3bMD+ZGFfmA4PlCvWUhLFXTGl5zM/UTbo9Y
-         n2TNJXcPZM/D/HV2UEDu2K/rj8PSUEBsgFnww8lBgS3IxxEnswqbksD/BhhxgZ0lh7++
-         bz6eubPOK+qNrwD1gttP302d7+aAC4/ZqqnRC7Inpjy+nmjjxklqYgNWZm2ksF85xDGk
-         OC2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788714166; x=1789318966;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=S43pA8GtcR4XDj/eKycYXWBqMWFJScqyRjxBzFXjBhk=;
-        b=ge+7OzjY3l0Vkfis0JTJK5zrNtzg5QcJ+SEaNTZxhdcbB8CtxR/0l906eBcu0FQ9ER
-         buX1XjlimOSUdKZ7txN8PVkRSHcj0HRi0vRnZkmgIO9lhefYo3FpFNDUsM6vWuZKZFBy
-         lq6Jj77JmJs4x0miXF5pTql9xpCjsjdm+1MHwImUZN9MIMzzYHH6yVR/dm2E0B+NvGEz
-         a8f7tYeGNghlN/6ulx+V1pHU89GPEW059MlyhmTDWjrVbF5NAk6ba7jTB9kqgQLkyHYF
-         yr3/g48fVjyNraE+64un3bRwlQZHCGRv4AkTXpnNhihMs/7miOP2D1G3D9Wbbm5dFC+p
-         A64A==
-X-Gm-Message-State: AFuF++k4XMMxnkABMXdxICmJeg0qpJLybsNF8kMOFWIaVaYQZX90Z6S0
-	wHC+jcPBAgn7gibf3cn2PGBiL4s7vQc7uBbcXa+DpGEbwN383ovNqXINb8AMxQ==
-X-Gm-Gg: AYBFou0gOOZ0MdjjdkQvj8aIhvbc7BAejYtHOLsTu2zKzDePQ/GuWIl+eWcienuxNBD
-	0klBZe32cGmCbvfo0FajiiybXUcoPxvWXFj0z2HGDz+7140uRUEDhZZ03okbHZrOSK4LoOsPhU1
-	uX9GNQzCh3tjebndgWTMFdM7uJsXn2oOhhLPOvWNqQDClWxpod6XMT4CTY0BralCzfxKrN51s7w
-	0EbkyE19/2lqanBgjruBqIOGHBVzYWxx4aT+UzS6RK9yTIjg4LWeF9s/ZTXIx/1fLFEAnlOVzQ+
-	MmBRnpNuvFdpUlu7KWjkJWv81CpW4lCBKPHJlEjik7rLiEzAtrxArNIkXsYuF1327G8wbV7EKrE
-	eT8ShDZQym9/mDzl16oXw3Abaq56oPFv/1pyD8/wm8e7wI1PaXI30htRObvkw1Hx2PlMamEWPb0
-	DOIcKFPcNrVOPTi6nOMWWjDp0kjMIyr6xXU9wyfQmiilhx5c8wvI+AVEwvMJ26TR6oHNFCj+wRb
-	Wk31Z0=
-X-Received: by 2002:a05:690e:4c6:b0:66f:c1bc:4087 with SMTP id 956f58d0204a3-66fc1bc476fmr2480159d50.74.1788714166273;
-        Sun, 06 Sep 2026 10:02:46 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.201.40])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91058416847sm4597426d6.4.2026.09.06.10.02.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Sep 2026 10:02:45 -0700 (PDT)
-Message-ID: <6a9d9cb5.a0644158.3ce550.914b@mx.google.com>
-Date: Sun, 06 Sep 2026 10:02:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4859073053921423338=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="IS/aMW6Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788716451;
+	bh=FfPYY/UegYQFoBGwsixqNovWmeD5IPIEY6WjPBr9510=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=IS/aMW6YDAEn4safAzDNQYSLAh7HKybQ33Phr0O0zFjtDRA1Mq7L/vj8oedL1sOlb
+	 FFG1pj5T8FN1G4l6nby9Vf9WZCwca7e0aRXHhVRSOeAxFa6OmJ4+bwAUwNWV1PPMbW
+	 Pg40dhusttvV7xDao95I80mdnWMKSTvKLy65ubaU=
+Received: from github.com (hubbernetes-node-25c220c.ash1-iad.github.net [10.56.180.42])
+	by smtp.github.com (Postfix) with ESMTPA id 8E2A21811B1
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 10:40:51 -0700 (PDT)
+Date: Sun, 06 Sep 2026 10:40:51 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1159124/000000-bb3619@github.com>
+Subject: [bluez/bluez] 080b15: doc: add functional/integration testing
+ documentation
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ngocthang2710.1999@gmail.com
-Subject: RE: Bluetooth: hci_core: Fix queuing tx_work after workqueue is drained
-In-Reply-To: <20260906152127.90734-1-ngocthang2710.1999@gmail.com>
-References: <20260906152127.90734-1-ngocthang2710.1999@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4859073053921423338==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1159124
+  Home:   https://github.com/bluez/bluez
+  Commit: 080b158a91ec7fe4a151028045554f0c3483f956
+      https://github.com/bluez/bluez/commit/080b158a91ec7fe4a151028045554f0c3483f956
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    A doc/test-functional.rst
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1159088
+  Log Message:
+  -----------
+  doc: add functional/integration testing documentation
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.03 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.46 seconds
-CheckAllWarning               PASS      30.93 seconds
-CheckSparse                   PASS      29.82 seconds
-BuildKernel32                 PASS      27.39 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      517.56 seconds
-TestRunner_l2cap-tester       PASS      66.45 seconds
-TestRunner_iso-tester         PASS      113.75 seconds
-TestRunner_bnep-tester        PASS      19.69 seconds
-TestRunner_mgmt-tester        FAIL      228.20 seconds
-TestRunner_rfcomm-tester      PASS      26.65 seconds
-TestRunner_sco-tester         PASS      33.12 seconds
-TestRunner_ioctl-tester       PASS      27.29 seconds
-TestRunner_mesh-tester        FAIL      27.60 seconds
-TestRunner_smp-tester         PASS      23.95 seconds
-TestRunner_userchan-tester    PASS      20.56 seconds
-TestRunner_6lowpan-tester     PASS      23.93 seconds
-IncrementalBuild              PASS      26.98 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.253 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.622 seconds
-Mesh - Send cancel - 2                               Timed out    1.947 seconds
+Add documentation for functional/integration test suite.
 
 
-https://github.com/bluez/bluetooth-next/pull/711
+  Commit: 5a38bde90745101e446620ecbf9d77235d0a50eb
+      https://github.com/bluez/bluez/commit/5a38bde90745101e446620ecbf9d77235d0a50eb
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    A test/functional/__init__.py
+    A test/functional/conftest.py
+    A test/functional/requirements.txt
+    A test/functional/test_bluetoothctl.py
+    A test/functional/test_btmgmt.py
+    A test/pytest.ini
+    A test/test-functional
+    A test/test-functional-attach
+
+  Log Message:
+  -----------
+  test: add functional/integration testing framework
+
+Add framework for writing tests simulating "real" environments where
+BlueZ and other parts of the stack run on different virtual machine
+hosts that communicate with each other.
+
+Add some smoke tests for bluetoothctl and btmgmt.
+
+The implementation for the VM setup is maintained separately in the
+pytest-bluezenv plugin, https://pypi.org/project/pytest-bluezenv
+
+Implements:
+
+- RPC communication with tester instances running each of the VM hosts,
+  so that tests can be written on the parent host which coordinates the
+  execution.
+
+- Extensible way to add stateful test-specific code inside the VM
+  instances
+
+- Logging control: output from different processes running inside the VM
+  are separated and can be filtered.
+
+- Test runner framework with Pytest, factored into a pytest plugin
+
+- Grouping tests to minimize VM reboots
+
+- Redirecting USB controllers to use for testing
+
+There is no requirement that the tests spawn VM instances.
 
 
---===============4859073053921423338==--
+  Commit: 41486cf21e7f0b8237e4217d197be18eb34e6c41
+      https://github.com/bluez/bluez/commit/41486cf21e7f0b8237e4217d197be18eb34e6c41
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    M configure.ac
+
+  Log Message:
+  -----------
+  build: add functional testing target
+
+This adds check-functional: target that runs the functional test suite.
+
+Also add a --enable-functional-testing=<kernel-image> argument for
+configure that can be used to include it in the check: make target,
+possibly with a predefined kernel image.
+
+
+  Commit: 792f6821e352c6225a8fde458bcba7025b8e070d
+      https://github.com/bluez/bluez/commit/792f6821e352c6225a8fde458bcba7025b8e070d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    M test/functional/requirements.txt
+    A test/functional/test_tests.py
+
+  Log Message:
+  -----------
+  test: functional: impose Python code formatting
+
+Check Python code formatting of the functional test suite.
+
+
+  Commit: 9fe6efaa31a1a4d6dc2d5e101d32a42437461bab
+      https://github.com/bluez/bluez/commit/9fe6efaa31a1a4d6dc2d5e101d32a42437461bab
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    A test/functional/test_agent.py
+
+  Log Message:
+  -----------
+  test: functional: add some Agent1 interface tests
+
+Add test
+
+test/functional/test_agent.py::test_agent_pair_bredr
+
+
+  Commit: 9b003551aadf51d4a17c1df56e39226d75e58009
+      https://github.com/bluez/bluez/commit/9b003551aadf51d4a17c1df56e39226d75e58009
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    A test/functional/test_obex.py
+
+  Log Message:
+  -----------
+  test: functional: add basic obex file transfer tests
+
+Add tests for Obex DBus API and obexctl
+
+test/functional/test_obex.py::test_obex_ftp_get
+test/functional/test_obex.py::test_obex_ftp_list
+test/functional/test_obex.py::test_obexctl_list
+
+
+  Commit: a6e4a90cfc9af51c28447641ca324d0d375402e1
+      https://github.com/bluez/bluez/commit/a6e4a90cfc9af51c28447641ca324d0d375402e1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    A test/functional/test_kernel_testers.py
+    M test/pytest.ini
+
+  Log Message:
+  -----------
+  test: functional: add tests running the various kernel testers
+
+It's more convenient to have simple local test runner for these.
+
+
+  Commit: 44d984fbcbb2b9318dcd3ebc550d9a7f1224f6e4
+      https://github.com/bluez/bluez/commit/44d984fbcbb2b9318dcd3ebc550d9a7f1224f6e4
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    M test/functional/conftest.py
+    A test/functional/test_adv_monitor.py
+    M test/pytest.ini
+
+  Log Message:
+  -----------
+  test: functional: add test for adv_monitor crash
+
+Add test checking adv_monitor overflow crash.
+From PoC provided by Alexandro Calo' (Nozomi Networks Labs)
+
+
+  Commit: bb3619f0e8cd67d61b362134b38856d74eb210b9
+      https://github.com/bluez/bluez/commit/bb3619f0e8cd67d61b362134b38856d74eb210b9
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-06 (Sun, 06 Sep 2026)
+
+  Changed paths:
+    M test/functional/conftest.py
+    A test/functional/test_avrcp.py
+    M test/functional/test_obex.py
+
+  Log Message:
+  -----------
+  test: functional: add test for AVRCP crash
+
+Add test checking AVRCP ListPlayerAttributes crash.
+From PoC provided by Alexandro Calo' (Nozomi Networks Labs)
+
+Refactor test_obex.paired_hosts fixture to global fixture.
+
+
+Compare: https://github.com/bluez/bluez/compare/080b158a91ec%5E...bb3619f0e8cd
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
