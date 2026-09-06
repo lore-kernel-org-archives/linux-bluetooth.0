@@ -1,240 +1,138 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F259126C02
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 17:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113843370EC
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 18:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788716454; cv=none; b=TqSN6S8PHfepJpM9tlQ21c5GSoxJbsVLKnkT4T7dp4Ya6cOyYVCjfe8VALaMv2HZ5EmPVMdeg+Ibe0147GuU5n6rM0nfsKUHAX60UR2Uf4YRAuFvUsG4sueXdZWsnTICY/CvjSQXsFnolHEBM3mNYFZC+N7dL/L2J+TNHT0LZHU=
+	t=1788719352; cv=none; b=lyCbRpxdxubnlCcHL9hDx0wFKl/GjOZgtKLNZh7RX14NfRcCEPc8n/RSdSY4lQzg9LKcCi2W90wItuZ8mwVBX1Gc9b0MYfchmDFdy6nRJaaRjd0J3LVVS/ffrBWqyi28dhOwHete7lSuet1Dti79Dx9HboVls+HbnAuB/jov5/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788716454; c=relaxed/simple;
-	bh=NwxRmdJpzLVY7MQjvb6MFE+XkVKVnpDBlb4zy75bDhM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=J57/u90k55q4f94+SdJ6uihUBJvmTupmppK4iz7ffQO7ZMsY1dcIkta9QkmFymHGRVLy4KHwGFMxyHyJe+bJW/neE4QEH9mVMuUo/Qj73w5yXjENyMQ7zctwY3zCv4XRYQpeIIHUyxrs2O6GsqI1yMDOxmrR5aADIs2SWyqkOEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=IS/aMW6Y; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1788719352; c=relaxed/simple;
+	bh=Yn0wz0Cb6xeVjj3qMxX9lYvYMwYjtzWMuKpYo3NIhos=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=diVEfJpcHLEQVN6czSHaWPmOOhqiBLmcIT8YVk0pkfjQ5mhoEK1fSrDnfrD48seXEDwFK7E4FkClgM8vlBfsZFY0rtl6dr7/SXzOZ3aifIpUHEP+oGr0rtmAMuWIwtAbR5wKaLKNKFZWY7gaB+rU7klnVqXTZnbtks2O27txOjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGAiL4rM; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="IS/aMW6Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1788716451;
-	bh=FfPYY/UegYQFoBGwsixqNovWmeD5IPIEY6WjPBr9510=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=IS/aMW6YDAEn4safAzDNQYSLAh7HKybQ33Phr0O0zFjtDRA1Mq7L/vj8oedL1sOlb
-	 FFG1pj5T8FN1G4l6nby9Vf9WZCwca7e0aRXHhVRSOeAxFa6OmJ4+bwAUwNWV1PPMbW
-	 Pg40dhusttvV7xDao95I80mdnWMKSTvKLy65ubaU=
-Received: from github.com (hubbernetes-node-25c220c.ash1-iad.github.net [10.56.180.42])
-	by smtp.github.com (Postfix) with ESMTPA id 8E2A21811B1
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 10:40:51 -0700 (PDT)
-Date: Sun, 06 Sep 2026 10:40:51 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1159124/000000-bb3619@github.com>
-Subject: [bluez/bluez] 080b15: doc: add functional/integration testing
- documentation
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGAiL4rM"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-9397e2994dcso248812685a.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Sep 2026 11:29:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788719350; x=1789324150; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=l5j0lx5xiMwmUhcfqaPtV5Xn252Dafc00VwIyuDKhcY=;
+        b=jGAiL4rMT5+4eEUoAfSObN2DtBsEZYb6sdcmcVAUSU+VvGHk+lNyyNR1QCvMAXOsmm
+         y1eMwiPFns76RaoNHZ/SxOl3Pt6nxuvu5jiUenl47GSSmSKmboN/0lpLtI5mlPKyJDfM
+         YXwPAnU802Uol8HodIxu5Wx8AonJzxUtRn5P9krGzKIN7rVLMN2dssoK/YBUpHcILocJ
+         6FMqlc6wsL0IoT8/w9sap8pK36pQ7I7q3Xhb4uys/EEla0WBpu9WWBEx5BHRnpUsgp0G
+         JckmDd9t78+1hcKePhO7IWm0R1IKfaS9pYuMUjXczUshilP0wFBbirMKbl2t5jS2a/YI
+         v+6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788719350; x=1789324150;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=l5j0lx5xiMwmUhcfqaPtV5Xn252Dafc00VwIyuDKhcY=;
+        b=JAxI7O/VcDambEeKVZg9Cx3sc833ywdJyWDpIplUNeMQ8cnJe3HHgZapbuBSLzdpxj
+         Yi8y5FIRI3esJhIwqXLd1Yz4JFWyfSObeE20zT2p3+OGJ51ypPL5DpN45zA+DfeEwCRQ
+         NjSNK3tCJwIlgyaGXWTJU/0CrgvCqjDZJnIs2SOp5/HD7WGkomUXZn3HaRQQ3U8GP7Tv
+         9/xu8STqKMXUzwNpkFFl9I83Dvftbr1O1Ma9omTDGgS0e6NLaXeppv+Rv2aWSlmZDdF8
+         80QjQXzDFUuBPj7q1EiXNjjXZVPQUEw2y2q149RNasQWCfPBL3/gaNM/yY7KI9I9iFtR
+         majw==
+X-Gm-Message-State: AFuF++mnQT8WIisuGjvclXISmn+um47XwUeyXdJgcl1pxiX4asOe33xS
+	8y2uMATsCVeGrcPuSsdcWeTLP8jLMMQTJ+g45WED7j2E+TnXK/EL/Ob9W4XShA==
+X-Gm-Gg: AYBFou29ZFyssin+Zy0pqLbWQaJ2aTiBDqCPwq1HJQ5ZLKgf/wQrmYdiR2Ae0FxhXpN
+	r7qmDj4BBlKFT0Ep45GSpgINkwfY52Cm2SoK0G5D1EYEjq37S3PeO+SE/JC7JpDQfCw/mkR/Xdb
+	/RMwATJDYAY/C8lGTORqSXhTWB9xNafHZKJbSjVWSN9uSxKXLYsmkK7ZLF9KIoVHikmw/T1Iccv
+	Y/U6ofaHxpSfNPB0ga7CNsurB8vkmPFTUtyMJDG1unM81+Sjt7IR43ztpaRwa74H8ugXsvgvBZ/
+	9xEdkjaDkGnxAvJjlX1Dg3QoOl227txtKQC0H3vDuqOoff+IE8U1991vfpQtvAr//KE/OmdT8/V
+	daWc0GkdXdKEFIFLfMm7iMHOGGjTWDgoLArSZkgEtP1xdNYIXuSWmn2BEKEVdqiYtenlJv7G1yq
+	p63xxqCc6zdtxOfLwpxNLorNZFrJ3wTX+U6knOcvhckArYRfQ/aWPoBuJBf047eYF7eso=
+X-Received: by 2002:a05:620a:2715:b0:939:8a03:f7e3 with SMTP id af79cd13be357-9398a03ff25mr1485337385a.6.1788719349808;
+        Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.117.32])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fb2fd82sm700942785a.17.2026.09.06.11.29.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
+Message-ID: <6a9db0f5.7ff333e8.3955c2.8cfd@mx.google.com>
+Date: Sun, 06 Sep 2026 11:29:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4420721202464633996=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Functional/integration testing
+In-Reply-To: <f5138d545e2edb8cbc0116acdb7c0384ef09f2a8.1788712996.git.pav@iki.fi>
+References: <f5138d545e2edb8cbc0116acdb7c0384ef09f2a8.1788712996.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4420721202464633996==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1159124
-  Home:   https://github.com/bluez/bluez
-  Commit: 080b158a91ec7fe4a151028045554f0c3483f956
-      https://github.com/bluez/bluez/commit/080b158a91ec7fe4a151028045554f0c3483f956
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    A doc/test-functional.rst
+Dear submitter,
 
-  Log Message:
-  -----------
-  doc: add functional/integration testing documentation
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1159124
 
-Add documentation for functional/integration test suite.
+---Test result---
 
+Test Summary:
+CheckPatch                    FAIL      4.40 seconds
+GitLint                       PASS      3.00 seconds
+BuildEll                      PASS      20.48 seconds
+BluezMake                     PASS      561.12 seconds
+MakeCheck                     PASS      19.92 seconds
+MakeDistcheck                 PASS      154.78 seconds
+CheckValgrind                 PASS      223.37 seconds
+CheckSmatch                   PASS      299.24 seconds
+bluezmakeextell               PASS      98.04 seconds
+IncrementalBuild              PASS      593.09 seconds
+ScanBuild                     PASS      874.61 seconds
 
-  Commit: 5a38bde90745101e446620ecbf9d77235d0a50eb
-      https://github.com/bluez/bluez/commit/5a38bde90745101e446620ecbf9d77235d0a50eb
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v7,2/9] test: add functional/integration testing framework
+ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
+#451: FILE: test/test-functional
 
-  Changed paths:
-    A test/functional/__init__.py
-    A test/functional/conftest.py
-    A test/functional/requirements.txt
-    A test/functional/test_bluetoothctl.py
-    A test/functional/test_btmgmt.py
-    A test/pytest.ini
-    A test/test-functional
-    A test/test-functional-attach
+ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
+#478: FILE: test/test-functional-attach
 
-  Log Message:
-  -----------
-  test: add functional/integration testing framework
+/github/workspace/src/patch/14794355.patch total: 2 errors, 0 warnings, 308 lines checked
 
-Add framework for writing tests simulating "real" environments where
-BlueZ and other parts of the stack run on different virtual machine
-hosts that communicate with each other.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Add some smoke tests for bluetoothctl and btmgmt.
+/github/workspace/src/patch/14794355.patch has style problems, please review.
 
-The implementation for the VM setup is maintained separately in the
-pytest-bluezenv plugin, https://pypi.org/project/pytest-bluezenv
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-Implements:
-
-- RPC communication with tester instances running each of the VM hosts,
-  so that tests can be written on the parent host which coordinates the
-  execution.
-
-- Extensible way to add stateful test-specific code inside the VM
-  instances
-
-- Logging control: output from different processes running inside the VM
-  are separated and can be filtered.
-
-- Test runner framework with Pytest, factored into a pytest plugin
-
-- Grouping tests to minimize VM reboots
-
-- Redirecting USB controllers to use for testing
-
-There is no requirement that the tests spawn VM instances.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: 41486cf21e7f0b8237e4217d197be18eb34e6c41
-      https://github.com/bluez/bluez/commit/41486cf21e7f0b8237e4217d197be18eb34e6c41
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    M Makefile.am
-    M configure.ac
-
-  Log Message:
-  -----------
-  build: add functional testing target
-
-This adds check-functional: target that runs the functional test suite.
-
-Also add a --enable-functional-testing=<kernel-image> argument for
-configure that can be used to include it in the check: make target,
-possibly with a predefined kernel image.
 
 
-  Commit: 792f6821e352c6225a8fde458bcba7025b8e070d
-      https://github.com/bluez/bluez/commit/792f6821e352c6225a8fde458bcba7025b8e070d
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
+https://github.com/bluez/bluez/pull/2498
 
-  Changed paths:
-    M test/functional/requirements.txt
-    A test/functional/test_tests.py
-
-  Log Message:
-  -----------
-  test: functional: impose Python code formatting
-
-Check Python code formatting of the functional test suite.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 9fe6efaa31a1a4d6dc2d5e101d32a42437461bab
-      https://github.com/bluez/bluez/commit/9fe6efaa31a1a4d6dc2d5e101d32a42437461bab
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    A test/functional/test_agent.py
-
-  Log Message:
-  -----------
-  test: functional: add some Agent1 interface tests
-
-Add test
-
-test/functional/test_agent.py::test_agent_pair_bredr
-
-
-  Commit: 9b003551aadf51d4a17c1df56e39226d75e58009
-      https://github.com/bluez/bluez/commit/9b003551aadf51d4a17c1df56e39226d75e58009
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    A test/functional/test_obex.py
-
-  Log Message:
-  -----------
-  test: functional: add basic obex file transfer tests
-
-Add tests for Obex DBus API and obexctl
-
-test/functional/test_obex.py::test_obex_ftp_get
-test/functional/test_obex.py::test_obex_ftp_list
-test/functional/test_obex.py::test_obexctl_list
-
-
-  Commit: a6e4a90cfc9af51c28447641ca324d0d375402e1
-      https://github.com/bluez/bluez/commit/a6e4a90cfc9af51c28447641ca324d0d375402e1
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    A test/functional/test_kernel_testers.py
-    M test/pytest.ini
-
-  Log Message:
-  -----------
-  test: functional: add tests running the various kernel testers
-
-It's more convenient to have simple local test runner for these.
-
-
-  Commit: 44d984fbcbb2b9318dcd3ebc550d9a7f1224f6e4
-      https://github.com/bluez/bluez/commit/44d984fbcbb2b9318dcd3ebc550d9a7f1224f6e4
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    M test/functional/conftest.py
-    A test/functional/test_adv_monitor.py
-    M test/pytest.ini
-
-  Log Message:
-  -----------
-  test: functional: add test for adv_monitor crash
-
-Add test checking adv_monitor overflow crash.
-From PoC provided by Alexandro Calo' (Nozomi Networks Labs)
-
-
-  Commit: bb3619f0e8cd67d61b362134b38856d74eb210b9
-      https://github.com/bluez/bluez/commit/bb3619f0e8cd67d61b362134b38856d74eb210b9
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-06 (Sun, 06 Sep 2026)
-
-  Changed paths:
-    M test/functional/conftest.py
-    A test/functional/test_avrcp.py
-    M test/functional/test_obex.py
-
-  Log Message:
-  -----------
-  test: functional: add test for AVRCP crash
-
-Add test checking AVRCP ListPlayerAttributes crash.
-From PoC provided by Alexandro Calo' (Nozomi Networks Labs)
-
-Refactor test_obex.paired_hosts fixture to global fixture.
-
-
-Compare: https://github.com/bluez/bluez/compare/080b158a91ec%5E...bb3619f0e8cd
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============4420721202464633996==--
