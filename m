@@ -1,82 +1,58 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D6D2F6586
-	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 15:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788709424; cv=none; b=UM1qugh9189gqdKXHx63vBotXvQuRocwkG3YXN2XRb6uCbc4Xu5VkmwkKkmM5sD6DESmWF8fmEcgyKelAi7tOypb9Slc9KguBtEOQ9ITq2nfltsNyCAI+W6vqH0ko8gyAhrnHEmV1ZSBakDRAYqNx15rmBzaFV1LvBPDetcy1ZE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788709424; c=relaxed/simple;
-	bh=VIhohHcx0SkBUGBuyu+li/MstEWPK62/31/grkhVZe8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y+QYeqDedkwqiSV2lexMhrvQ0khi18OaBC0RjDL1cWRU81zGPLvLC45p9yKyaUcg5sgjdPxHys6ME1Yg86Q+yC7cRU/IdyVKHzp2AcKqPXSD1+Bvm3kKxtz/mjOdGCbN7DGvdh/8j2y2E9o56lL+nYbL6KLR6GnhK8OclIUDyGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PaYhfvml; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44525265621
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Sep 2026 16:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788713409; cv=pass; b=TImkXAw8BaNDBvGHs1N2VOSdRau3F2ZZPSG3OFfgDkPRSzTsL6o8VeiP8S94b9WNnA/SJGG4L62zixqZz6cwEmuabwlQksxRoEjdkvwTUlvPxZ4Ako2bN1TP71VMJE+pyX7fvDVkN3gwgHvQ+BFVLplihW8q+AmbgMwGljSFGRc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788713409; c=relaxed/simple;
+	bh=RgaPDXIuhpn5JtIGpXZRmaDHf2hazYTRd/L5tuHArHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mo5oeCsME1P5SBYQN5PSdhu0tehPhyh6oX3XvrSUoqPNc3zMWVnXvLGWzJ+M9RFxikrt8Sgm0JMXjP3iL/D442koEIPQ58fJAfMwwCBD5j2qIYGkspn4jRkI3qtTnt51MNshMCmjAyuOAMCDlB7/CWds0DarWj329Yr/0ZY+duw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=DD3zPbwn; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PaYhfvml"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-ca12086c06eso2167015a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Sep 2026 08:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788709422; x=1789314222; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DQ5Zk4J+hLvsdimx8KJiE0DP9iSw9BVVCAqpnMEf3Qc=;
-        b=PaYhfvmlLeHSSClcoPMnp4n2CwH3QSRCr8aNivW8WklY3lzlSOr48pqbI4fUjA0wyK
-         v1boSs51UZiwdelXM2MbQLfwVbBVvNWSuUtI5UQf0FfmBq1BvY6WJ/NYgZtfl4ZpDrHQ
-         gAil7ti9kaAfnnWUSkcI5ZtkpISohQwm4Egijkb6DgwAG+45cLMMxuOkiyPJszKyXimB
-         sERG9cCvM5X8YrRRE27gdD+6I81CiU6lAWTA19Kjycy1l1zyOkKmD16Ku3jjsgRxG5NZ
-         vidoAT0ZWEMF63qXK3WpZ5YeGmDfnqv30NYcLBcGc4OOp9I1kFGoKRMf7G+RlXnqppXy
-         9zFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788709422; x=1789314222;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DQ5Zk4J+hLvsdimx8KJiE0DP9iSw9BVVCAqpnMEf3Qc=;
-        b=by7E9dmnvL/1owBEwO6230qMJ0aa5gnsrg5JKPSDj9txXxFirdcUSwLVdu/OsAfkfE
-         mZOwI4RVJCu33QanK5XOEt74HM8gzbBB30zRS3pG2kqUlsBonOm1jhUCcoAAY+7mWl5y
-         A9VMfl0YREXrE4ozWJDdo2htSWCeBOWG4VazSWQnWu++OlFUQngJ8pbEb7+pnQgxkOF3
-         14ijwiail3y+KnHC0RZy37NxgRhqgYJV0IVVgYB+TD7xaxb2zAqqXRfhKwtp/JUw7fap
-         FlKj/mmAMIPCbpA268j5kQCLQEPmGVJ8FVzeAQcsh95f3dxmWLD9zQ4KWMrYj71TBc1m
-         XXEg==
-X-Gm-Message-State: AFuF++m1zMmd0/G8k6hTLKpIN+R7t16XmGMWHjdrWkY3PJhh4+TzoaKF
-	H/ZMIO3jaobTmi2ruTIhKRerhd0E+gQkZeK5ibu/rYqUx6/uGZMgPUe3
-X-Gm-Gg: AYBFou1RYl2Xp/xXkESIDxl8Zg3TmJ92sIMkJrXlKq4n+g4wMID1DuIkL5pBz5rVBzX
-	evZrCaVBAts+ZFufB5FdIgdbn2COE66v2UHHDcPoXzv/JTNTRv3RWbJiCNWhEOpqpz48KztlMbQ
-	2PJlJMxBdItv2TSLuAyvNI9bl6Z71xmS6nlrJCjZ3H6kCLnz9YqbxbqY5KGYuMFJfA6sWOODY1b
-	4Z+dqnNanWVZqX1pwsnz47Ed9wu5dbJXd+/vgPTzrBBJRZObMHq904VaWGg0y4ysmlehxvH1cy5
-	DqyLdk8kcmLFAng6OD26t2UfhETapm6vIHy197/1//i9W+Zq+QYYleolLepYs2YjlS548DPfpk9
-	55YcqSvM+yeLNhwdTmI+vFNC32KwRs5UxEa8uJ7XU9KzhKelYEjT3iFvVu8+UOaeYCwWFUFg2om
-	FSIKfnWsfo1Ef01jycS7FqwOhxbRhjwRpE76zlRwxdn4tiNdDpHwUhooO+YycZ5IakPDMIjmBPz
-	i9D+jeqcNUNYxsNIEZzsgNLXdJrfLkO/ObZ4c9w6/0C
-X-Received: by 2002:a17:90b:17c2:b0:38e:659b:f366 with SMTP id 98e67ed59e1d1-39b25f1c5bdmr25690589a91.0.1788709422195;
-        Sun, 06 Sep 2026 08:43:42 -0700 (PDT)
-Received: from localhost.localdomain ([198.176.50.208])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339a62be87sm18930617eec.6.2026.09.06.08.43.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Sep 2026 08:43:41 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-	Manish Mandlik <mmandlik@google.com>,
-	syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com,
-	Aby Sam Ross <abysamross@gmail.com>,
-	Tristan Madani <tristan@talencesecurity.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH v3 bluetooth] Bluetooth: coredump: Quiesce dump work on unregister
-Date: Sun,  6 Sep 2026 23:43:32 +0800
-Message-ID: <20260906154332.763402-1-bestswngs@gmail.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="DD3zPbwn"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:2::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hdGQV6FT2zyPr;
+	Sun, 06 Sep 2026 19:49:54 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1788713395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hVqLUES6kmu514yEuhaH5geZ4eNx0rMEcfYUq2vKwUk=;
+	b=DD3zPbwnV/ju8eeUhmquf2E6luA+Ji/mI3FbQyQaM4K4ZveloNlLu7go2PZuamErxUEWwr
+	tql2irWqdEYeCPxWgyWH35Rpjxuum0l6pv1E2SvvR3PGnZoDAylECG1BQ33+0EY0QhfQk4
+	05CpA+QUUvdA+ziklv8wZuSP3CtIkR8=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1788713395;
+	b=gyjuYdaCA8Xu64+BbXw15tOe6RpzcW9iBlTUiafLZ26e2rW1Ea0j3wpnXptbH1oj9Ax3ih
+	BTu+OVSnsStKiufSD30fWF7NAb1iAY8zoL0U010oCmaCpseSxOPuiEJbTeglc8Q2GAh1Ie
+	q3Edhx1w6VvLMWe6vDyWK/yCEFJjt+I=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1788713395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hVqLUES6kmu514yEuhaH5geZ4eNx0rMEcfYUq2vKwUk=;
+	b=QBdR9WvhpUp0lFJ5dDQLyQ586idNBjrSyE1X3GBdHDjtnizhZTM8tkVg2FnI8lKzyrLMZZ
+	9Ztn42WYT5eRu8V/dnTeY5T3QjS4Xe/n+krHXNGQ5YbuYSpyEx00sW41jFjx2mefrxVXxb
+	Y5NbdiX1aAwxg+seH2SkOHuQLFz1Cow=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v7 0/9] Functional/integration testing
+Date: Sun,  6 Sep 2026 19:49:42 +0300
+Message-ID: <cover.1788712996.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -86,191 +62,241 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_devcd_handle_pkt_init() arms dump_timeout and coredump producers
-queue dump_rx without holding an hdev reference. Unregister leaves both
-works live, so disconnecting during an active dump lets them access hdev
-after hci_release_dev() frees it.
+Add framework for writing tests simulating "real" environments where
+BlueZ and other parts of the stack run on different virtual machine
+hosts that communicate with each other.
 
-Shut down coredump processing during unregister. Close the producer gate
-under dump_q.lock before disabling both works, then free the active buffer
-and queued packets under hci_dev_lock. Serializing the gate with enqueue
-prevents controller-specific workers from adding packets after the final
-purge.
+*** v7 ***
 
-Fixes: 9695ef876fd1 ("Bluetooth: Add support for hci devcoredump")
-Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-Reported-by: Aby Sam Ross <abysamross@gmail.com>
-Link: https://lore.kernel.org/r/20260322210849.68743-1-abysamross@gmail.com
-Suggested-by: Aby Sam Ross <abysamross@gmail.com>
-Reported-by: Tristan Madani <tristan@talencesecurity.com>
-Link: https://lore.kernel.org/r/20260814231248.3096377-1-tristmd@gmail.com
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: OpenAI Codex:gpt-5
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-Changes in v3:
-- Serialize coredump enqueue with the terminal shutdown gate.
-- Reject and free packets submitted after shutdown begins.
-- Disable dump_rx and dump_timeout, then free the buffered dump state.
-- Add links and credits for the two earlier attempts.
+* Bump to pytest-bluezenv==0.1.9 (better core dump / oops reporting)
 
- include/net/bluetooth/coredump.h |  2 +
- net/bluetooth/coredump.c         | 65 +++++++++++++++++++++-----------
- net/bluetooth/hci_core.c         |  1 +
- 3 files changed, 47 insertions(+), 21 deletions(-)
+* Add test/functional/test_adv_monitor.py (one crash POC test)
 
-diff --git a/include/net/bluetooth/coredump.h b/include/net/bluetooth/coredump.h
-index 1f071ab554163..acc1849f66c0f 100644
---- a/include/net/bluetooth/coredump.h
-+++ b/include/net/bluetooth/coredump.h
-@@ -70,6 +70,7 @@ struct hci_devcoredump {
- const char *hci_devcd_state_name(enum devcoredump_state state);
- 
- void hci_devcd_reset(struct hci_dev *hdev);
-+void hci_devcd_shutdown(struct hci_dev *hdev);
- void hci_devcd_rx(struct work_struct *work);
- void hci_devcd_timeout(struct work_struct *work);
- 
-@@ -89,6 +90,7 @@ static inline const char *hci_devcd_state_name(enum devcoredump_state state)
- }
- 
- static inline void hci_devcd_reset(struct hci_dev *hdev) {}
-+static inline void hci_devcd_shutdown(struct hci_dev *hdev) {}
- static inline void hci_devcd_rx(struct work_struct *work) {}
- static inline void hci_devcd_timeout(struct work_struct *work) {}
- 
-diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
-index 5bee863bd6d2c..71fc8dab40047 100644
---- a/net/bluetooth/coredump.c
-+++ b/net/bluetooth/coredump.c
-@@ -104,6 +104,22 @@ static void hci_devcd_free(struct hci_dev *hdev)
- 	hci_devcd_reset(hdev);
- }
- 
-+void hci_devcd_shutdown(struct hci_dev *hdev)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&hdev->dump.dump_q.lock, flags);
-+	hdev->dump.supported = false;
-+	spin_unlock_irqrestore(&hdev->dump.dump_q.lock, flags);
-+
-+	disable_work_sync(&hdev->dump.dump_rx);
-+	disable_delayed_work_sync(&hdev->dump.dump_timeout);
-+
-+	hci_dev_lock(hdev);
-+	hci_devcd_free(hdev);
-+	hci_dev_unlock(hdev);
-+}
-+
- /* Call with hci_dev_lock only. */
- static int hci_devcd_alloc(struct hci_dev *hdev, u32 size)
- {
-@@ -442,7 +458,29 @@ EXPORT_SYMBOL(hci_devcd_register);
- 
- static inline bool hci_devcd_enabled(struct hci_dev *hdev)
- {
--	return hdev->dump.supported;
-+	return READ_ONCE(hdev->dump.supported);
-+}
-+
-+static int hci_devcd_queue(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	unsigned long flags;
-+	int err = 0;
-+
-+	spin_lock_irqsave(&hdev->dump.dump_q.lock, flags);
-+	if (!hdev->dump.supported)
-+		err = -EOPNOTSUPP;
-+	else
-+		__skb_queue_tail(&hdev->dump.dump_q, skb);
-+	spin_unlock_irqrestore(&hdev->dump.dump_q.lock, flags);
-+
-+	if (err) {
-+		kfree_skb(skb);
-+		return err;
-+	}
-+
-+	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
-+
-+	return 0;
- }
- 
- int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
-@@ -459,10 +497,7 @@ int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
- 	hci_dmp_cb(skb)->pkt_type = HCI_DEVCOREDUMP_PKT_INIT;
- 	put_unaligned_le32(dump_size, skb_put(skb, 4));
- 
--	skb_queue_tail(&hdev->dump.dump_q, skb);
--	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
--
--	return 0;
-+	return hci_devcd_queue(hdev, skb);
- }
- EXPORT_SYMBOL(hci_devcd_init);
- 
-@@ -478,10 +513,7 @@ int hci_devcd_append(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dmp_cb(skb)->pkt_type = HCI_DEVCOREDUMP_PKT_SKB;
- 
--	skb_queue_tail(&hdev->dump.dump_q, skb);
--	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
--
--	return 0;
-+	return hci_devcd_queue(hdev, skb);
- }
- EXPORT_SYMBOL(hci_devcd_append);
- 
-@@ -503,10 +535,7 @@ int hci_devcd_append_pattern(struct hci_dev *hdev, u8 pattern, u32 len)
- 	hci_dmp_cb(skb)->pkt_type = HCI_DEVCOREDUMP_PKT_PATTERN;
- 	skb_put_data(skb, &p, sizeof(p));
- 
--	skb_queue_tail(&hdev->dump.dump_q, skb);
--	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
--
--	return 0;
-+	return hci_devcd_queue(hdev, skb);
- }
- EXPORT_SYMBOL(hci_devcd_append_pattern);
- 
-@@ -523,10 +552,7 @@ int hci_devcd_complete(struct hci_dev *hdev)
- 
- 	hci_dmp_cb(skb)->pkt_type = HCI_DEVCOREDUMP_PKT_COMPLETE;
- 
--	skb_queue_tail(&hdev->dump.dump_q, skb);
--	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
--
--	return 0;
-+	return hci_devcd_queue(hdev, skb);
- }
- EXPORT_SYMBOL(hci_devcd_complete);
- 
-@@ -543,10 +569,7 @@ int hci_devcd_abort(struct hci_dev *hdev)
- 
- 	hci_dmp_cb(skb)->pkt_type = HCI_DEVCOREDUMP_PKT_ABORT;
- 
--	skb_queue_tail(&hdev->dump.dump_q, skb);
--	queue_work(hdev->workqueue, &hdev->dump.dump_rx);
--
--	return 0;
-+	return hci_devcd_queue(hdev, skb);
- }
- EXPORT_SYMBOL(hci_devcd_abort);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d7355c73f93e8..a3338bc8a4ed7 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2673,6 +2673,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	disable_work_sync(&hdev->error_reset);
- 	disable_delayed_work_sync(&hdev->cmd_timer);
- 	disable_delayed_work_sync(&hdev->ncmd_timer);
-+	hci_devcd_shutdown(hdev);
- 
- 	hci_cmd_sync_clear(hdev);
- 
+* Add test/functional/test_avrcp.py (one crash POC test)
 
-base-commit: 2deb76c21b81e42b3282224f7dd2046fe73fd1e0
+  Note that current bluez master branch does not pass this one,
+  it is fixed by
+  https://patchwork.kernel.org/project/bluetooth/patch/20260901175315.1348621-1-luiz.dentz@gmail.com/
+
+* Add test/functional/test_kernel_testers.py (runs tools/*-tester)
+
+* Bump VMs to 400M memory, ASAN builds on Ubuntu need it
+
+* Make tests fail on core dump / kernel bug
+
+*** v6 ***
+
+* Fix minor issues in documentation and shellcheck warnings.
+
+* Bump to latest pytest-bluezenv==0.1.6
+
+* NOTE: hci_uart is partly broken in current bluetooth-next / 7.1 kernel,
+  which causes some of the tests here fail sporadically. Needs the following patch:
+
+  https://lore.kernel.org/linux-bluetooth/6888691461070a011d31632e6dcbfd73016dcc6e.1781364475.git.pav@iki.fi/
+
+*** v5 ***
+
+https://github.com/pv/bluez/compare/func-test-v4-r..func-test-v5
+
+* Factor out the pytest-bluezenv plugin, to be maintained separately.
+  https://pypi.org/project/pytest-bluezenv/
+
+  It could in principle be moved under the BlueZ organization, but
+  there's no particular reason why it should be in bluez repository.
+
+  Generally, it's better to have the pytest plugin separate so it's
+  easier to reuse and can have its own version cycle.
+
+* Pipewire tests are moved to pipewire repository where they probably
+  belong to.
+
+  They can be run easily vs. given BlueZ build dir.
+
+  We are currently running them in Pipewire CI, but at frozen
+  kernel/BlueZ version, so it is not testing BlueZ/kernel upstream
+  development.
+
+* No changes in the emulator/test-runner patches since v4
+
+  They are stand-alone bug fixes / improvements, and make sense
+  also separately from the rest.
+
+*** v4 ***
+
+https://github.com/pv/bluez/compare/func-test-v3-r..func-test-v4
+
+* Use virtconsole for simpler HCI forwarding to the vm
+
+* Fix typoed vm_module -> vm_once
+
+* Skip tests for some pipewire versions
+
+*** v3 ***
+
+https://github.com/pv/bluez/compare/func-test-v2-r..func-test-v3
+
+* fix configure.ac openpty() detection to match TOOLS conditional,
+  to fix make distcheck
+
+* properly retry virtio RPC connection if it fails initially
+
+* properly restart VM if previous test hangs
+
+* allow custom parent host side proxy objects, use them for pexpect
+
+* improve --list with out-of-tree test files
+
+* fix missing bus.set_exit_on_disconnect(False) for obex tests
+
+* have --vm-timeout etc. change values also on VM host side
+
+* use larger-memory VM instances for Pipewire, in case ASAN enabled
+
+* set reasonable inside-VM ASAN_OPTION default values
+
+* don't run btvirt under stdbuf, since not compatible with ASAN
+
+*** v2 ***
+
+https://github.com/pv/bluez/compare/func-test-v1-r..func-test-v2
+
+* move unit/func_test -> test/functional & test/pytest_bluez
+
+  The pytest_bluez plugin is in principle reusable for other projects,
+  so we can eg. have more complete Pipewire integration tests that can
+  live in Pipewire repository.
+
+* openpty() is in -lutil on some platforms, detect this in autoconf
+
+* more emulator adjustments:
+
+  - fix SCO data packet support in btvirt
+  - more complete Reset command
+
+* improve logging: get timestamps from kernel, and reorder logs
+  to timestamp order, so that lines from different hosts, btmon,
+  and parent tester appear in right order regardless of whether
+  VM console / btmon is lagging
+
+  - this requires accurate clock sync in the VM, so enable KVM PTP in
+    config and run chronyd inside the VMs
+  - use virtio port instead of qemu console to export logs, since the
+    console has fixed baud rate and is too slow
+
+* add --btmon & export btsnoop dumps from VM hosts
+
+* fix compatibility with older Python versions
+
+* add parametrized_host_config()
+
+* split Pipewire test to A2DP/BAP/HFP and really stream audio.
+  These catch the 5.86 regression fixed in 066a164a524e498 and
+  the 5.84 one in 6b0a08776a
+
+* add support for tests that reuse tester environment, so they can run
+  faster without needing Bluetoothd teardown/setup in between
+
+* add HostPlugin.presetup (mainly for test skipping)
+
+* deal with RPC virtio port buffer possibly containing unflushed
+  commands from previous failed test
+
+* add some Agent1 interface tests
+
+* add basic Obex file transfer tests
+
+* add support for logging in to a running test instance (for gdb etc)
+
+* export any core dumps out from test environ
+
+Some bells & whistles:
+
+* add --kernel-build for kernel image build
+
+* test suite Python code formatting checks
+
+***
+
+Implements:
+
+- RPC communication with tester instances running each of the VM hosts.
+  Tests run on parent host, which instructs VM hosts what to do.
+
+- Extensible way to add stateful test-specific code inside the VM
+  instances
+
+- Logging control: output from different processes running inside the VM
+  are separated and can be filtered.
+
+- Test runner framework with Pytest (more convenient than Python/unittest)
+
+- Automatic grouping of tests to minimize VM reboots
+
+- Redirecting USB controllers to use for testing in addition to btvirt
+
+- Fairly straightforward, ~1600 sloc for the framework
+
+There is no requirement that the tests spawn VM instances, the test
+runner can be used for any tests written in Python.
+
+See doc/test-functional.rst for various examples.
+
+Also test/functional/test_bluetoothctl_vm.py has some simple cases, and
+test/functional/test_pipewire.py for a more complicated setup
+
+    host0(qemu): Pipewire <-> BlueZ <-> kernel
+    <-> btvirt
+    host1(qemu): kernel <-> BlueZ <-> Pipewire
+
+The framework allows easily passing any data and code between the parent
+and VM hosts, so writing tests is straightforward.
+
+Pauli Virtanen (9):
+  doc: add functional/integration testing documentation
+  test: add functional/integration testing framework
+  build: add functional testing target
+  test: functional: impose Python code formatting
+  test: functional: add some Agent1 interface tests
+  test: functional: add basic obex file transfer tests
+  test: functional: add tests running the various kernel testers
+  test: functional: add test for adv_monitor crash
+  test: functional: add test for AVRCP crash
+
+ Makefile.am                            |  10 +
+ configure.ac                           |  22 ++
+ doc/test-functional.rst                | 331 +++++++++++++++++++++++++
+ test/functional/__init__.py            |   2 +
+ test/functional/conftest.py            |  76 ++++++
+ test/functional/requirements.txt       |   3 +
+ test/functional/test_adv_monitor.py    | 123 +++++++++
+ test/functional/test_agent.py          |  47 ++++
+ test/functional/test_avrcp.py          | 281 +++++++++++++++++++++
+ test/functional/test_bluetoothctl.py   | 161 ++++++++++++
+ test/functional/test_btmgmt.py         |  34 +++
+ test/functional/test_kernel_testers.py | 178 +++++++++++++
+ test/functional/test_obex.py           | 275 ++++++++++++++++++++
+ test/functional/test_tests.py          |  24 ++
+ test/pytest.ini                        |  25 ++
+ test/test-functional                   |  21 ++
+ test/test-functional-attach            |   7 +
+ 17 files changed, 1620 insertions(+)
+ create mode 100644 doc/test-functional.rst
+ create mode 100644 test/functional/__init__.py
+ create mode 100644 test/functional/conftest.py
+ create mode 100644 test/functional/requirements.txt
+ create mode 100644 test/functional/test_adv_monitor.py
+ create mode 100644 test/functional/test_agent.py
+ create mode 100644 test/functional/test_avrcp.py
+ create mode 100644 test/functional/test_bluetoothctl.py
+ create mode 100644 test/functional/test_btmgmt.py
+ create mode 100644 test/functional/test_kernel_testers.py
+ create mode 100644 test/functional/test_obex.py
+ create mode 100644 test/functional/test_tests.py
+ create mode 100644 test/pytest.ini
+ create mode 100755 test/test-functional
+ create mode 100755 test/test-functional-attach
+
 -- 
 2.55.0
+
