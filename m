@@ -1,105 +1,210 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188C44432F2
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Sep 2026 08:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D744248BB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Sep 2026 08:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788770430; cv=none; b=nqBQcTj5/sAL4/5oUvmG6c2eU6AirYMONOOFsyrFkIpVdxeXdqSM0/DkoZbFYURLC99WJ2JF9/EP5GRKaRp8ctdXvyllv9G2tlQpsepSGvQyaW/wFJYm5xNuLN3MNZeJJEAIeXxFuk3WAGspLbjOm+zHueG7f4+VQKG8qKsnmvo=
+	t=1788770758; cv=none; b=CyEOD4K+aFlp3KgZuOFcbCgtMEHj7yPwC6fxZYuoFxcCFuorwu5jqUbAOb3XyAuElOUt9eFojyJv+y1ilASnRF2PKDgIyIRDRdP9FmQx6Y/CulzrN1nKDYlX7a6GlE779tQSfmwzHz4yQ3R/2CWSShe8AbV3ZMDLkmbisC5EY+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788770430; c=relaxed/simple;
-	bh=h1ANNBcQmbPctwjnrps5dgnvbB39XaPakmaRrntLq0U=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=XWJ9tW994xdhuKo2DPFtPUkiFqnuFN4iH0uUuUzKa44nxFAfXqZtg0WJhmXtltRRZ9vKtlK9dkhJtN50mQ6YJHympMMn0wn/Dol90g/BgoOLaeQl3Qt9pywGdcq5V+5Vg5W359cY60cxYvVTFyP1FlLZKnx323Pgo4BCKOBYk3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=mJnc2lGc; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	s=arc-20240116; t=1788770758; c=relaxed/simple;
+	bh=1YVuQIRYSqkNtX77g8NT7j+E7lFkBcy3hwqxZOroS0A=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RHVz5MzoYsfgbvhWe4qvbo9fQOgFSafSkl3ap4k+2vaQj3JTtqwUvieH7LJ3tP2Xmnw4oBLX0OnpNatbhFxb1y3SgQbdYBBwnbgBnZbwnpC4pxDAxfzAzB3+MbayCA9FzBaetq0QDGtZNPwMM7VKHxH1eV1cC35yUQiOzWF2LWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kTe8eMD/; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jMZAP5Jj; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="mJnc2lGc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:Content-Type
-	:Subject:From:To:MIME-Version:Date:Message-ID:Reply-To:Cc:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=7jR1os2hhFmOhMH91YJkBbFxcfzJvaKHrLBf3t0O02k=; b=mJnc2lGcRZYT/sK9ciSG7bY3mF
-	TD4SWLz5cgy/E93SVBDONCiNjn9QklrdjBrikuaiL1eDKK08osb+1CY/sP1EYDRunKEh51i/oOF05
-	3s+o1Vt49uE3VqocMwvGaq+ytzoY1BcBd8BJOkTAgEfaws2UCi+bOyD+PFELlMQhrAfYgy1jPla4g
-	JdASMokAihyQzMTi0fzaw/z21vbD6b4mkIkOJkZk+Xz803KB1WXatv7a06hbSJHZk489KptlT1Eob
-	m3WFBJwFo6Spfbtj8QbUMwbb9psOqXj7pP5JgwtuuF2gcjTQajnakgUhsKrV/tiUR3UuJg0aHWTeo
-	s6gTlfhQ==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	(Exim 4.96)
-	(envelope-from <bigon@debian.org>)
-	id 1x3Uto-001Noq-2c
-	for linux-bluetooth@vger.kernel.org;
-	Mon, 07 Sep 2026 08:40:20 +0000
-Message-ID: <44081c21-4d08-4cde-8efe-2f9943b0a90f@debian.org>
-Date: Mon, 7 Sep 2026 10:40:19 +0200
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kTe8eMD/";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jMZAP5Jj"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68777fgC2146300
+	for <linux-bluetooth@vger.kernel.org>; Mon, 7 Sep 2026 08:45:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=NzkvIz4E8Bn94zq8Ipxaeb
+	3rY0VkEU4sbNM/KCYhWbw=; b=kTe8eMD/VwQniEkZyPEVf3PxaSUvVj7+v/mJHW
+	VTjfq+13qU3IIFTUGmCSiPsNWLmwHaCPU5J4KpHU1vzbOWkpsdyJhKDckUsOxIQ4
+	Lp75wd7x66qLcPMSW99XxSVZj9fSxlMfFFT8Tmcvlmzc+3qSofpwEgk1PRA7xlc+
+	agJGfnd121ZvnNUEJQzgJKRyf2Fg0dvngOa4+RPyxEg2OCEFS0EO3GeIYa7fe6O1
+	jsNb5koSoWRjw+p3x+stGRCFHgFMrY0eT7UQVFvQJ8QIq9Hbz4X7Dh49f44Y7O5F
+	iH5FLPmWqQTdT3U1vCSvgt3usZDy9YA7SmLIqwwYT6bdu8rg==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ggc8jdwsm-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 08:45:56 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-39924189378so1094967a91.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 01:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1788770755; x=1789375555; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=NzkvIz4E8Bn94zq8Ipxaeb3rY0VkEU4sbNM/KCYhWbw=;
+        b=jMZAP5JjzD3clZd6euRVlweINPMf3qCSmf4OeNB0Bl9Xh3HaMGyNr0E0OQWPPmYrOB
+         CRVlmcp4SkdvEit4orL2j0K5sC3olIFJkx7Mj46UiEr67F19re/ytbWsorCkABExXLBR
+         p6sTv3xtK5CPpnNKAR18sfC5RL3GaHTqr3NzUmV4xcteTZ1AXMyi5D+DL7sWkX5fHvWK
+         51fxZgN/FoymCjWs/gu6HTScGu2uuA0CTQhQXTKSZgQu+Cdzi3LBSsRHMQvOeUUz9DO3
+         Afp4tGkwxJ6LWyA5rkGRcBWrPxBUPDnEZ6RIb3MMGRz/U0u1P22lut0sfK4YKV3VlRxF
+         /Sfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788770755; x=1789375555;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=NzkvIz4E8Bn94zq8Ipxaeb3rY0VkEU4sbNM/KCYhWbw=;
+        b=oxu5dVVNSoqzFFCt2LoM8XHzFE7VWTaRoL1ZIfTacAiDp7fxCO1YmWuKXiwQ+a7DzX
+         QBtX3yhyqYOspOqGZsTffPQVFKrlcJzohDAEmq9HKDovqhDXMNT2n5yLgbEIbfGhnHhC
+         C539GUHjQv06MOefKZVZY2aA1mllWPBQopeFX53U9MwJnMfDKBPVHXgKD+P7Tps6STMU
+         1WaCHNJn6aiv8isz8znL2tghGG4ErLaQLplEykMEPy/RPwvGk1gEIuXQcdypuECSizc1
+         d3r+LsjOwK7A+HjWZUAH3blgfC4dmQGENew06LmxB9pNlk9hSt2nD738nLgfBQVhze66
+         RbGg==
+X-Forwarded-Encrypted: i=1; AKwUvByhODA3AQCljLQ6XF/vbZxPDlvihWmqGnWfEA0ucKtuuBadjBo1cPYL32Iqkzj9zjbt8A87NCjMMNNfipj8S+I=@vger.kernel.org
+X-Gm-Message-State: AFuF++mjFZK/XuLKidr0RGNUf48GA9r8jcHbZrpXoNPk/5eESA1ScyVf
+	pB9yAbbE1BPbe/B9VyUqAyIYmFFkUqzTZns69Pq80FCRn5H3+l5ocUEwJHnPYyt0Qz+tKgyMRK1
+	SSpwVTNvKikRA0OgJY5+0Y+mJ8djWXK8Taosa6wFIgo/B+2+M2xS2B9F+2493U0iFcvI9OvmJPy
+	fDLiM=
+X-Gm-Gg: AYBFou0oq97fS2wVPCIGhg+ch6Ux374it5gvGeo+c7Gc1bAMJxMu/afMPmMSh7uAhsY
+	bcSaIzEv0/tANWrGehVYMJywNA+HaDO7Wuz6E/+YsZOMCRmubnSbWuuwUsXLACdfn6JeMkU2q/p
+	b1emvDAUYqrdmtrQMxDFEWGEbPjyEt3+seBam+sd8i0xTR7jkX8Pa5XT0sTpoxUGbssfSnkWw1n
+	9VqMSd7BddS/ouCG4l85DubGbz7SgelToQNfkXbr8oP+38sjhI4g0h1Tv9QAb/XnRLs6yy1Lpaj
+	tFbPA2pGy4l8v9k/1Lj53Sh6p9ZH/lcsR2c4dP68DIR+RxNx0q+/8sBIdB/gabR8Y7RiZmIdIVO
+	o0ar7blVfXkxpBx1oY3ZdaDrr7fhGLBE0MvCJPahWC2SoB/w=
+X-Received: by 2002:a17:90b:17c5:b0:396:d28e:b52 with SMTP id 98e67ed59e1d1-39b3d7595b4mr14416456a91.3.1788770755219;
+        Mon, 07 Sep 2026 01:45:55 -0700 (PDT)
+X-Received: by 2002:a17:90b:17c5:b0:396:d28e:b52 with SMTP id 98e67ed59e1d1-39b3d7595b4mr14416414a91.3.1788770754682;
+        Mon, 07 Sep 2026 01:45:54 -0700 (PDT)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-143243f780csm23622117c88.13.2026.09.07.01.45.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Sep 2026 01:45:54 -0700 (PDT)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Subject: [PATCH v3 0/4] Bluetooth: btusb: Support Qualcomm multi-subsystem
+ QCC2072
+Date: Mon, 07 Sep 2026 01:45:37 -0700
+Message-Id: <20260907-btusb_qcc2072-v3-0-1f65350b03b8@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-bluetooth@vger.kernel.org
-Content-Language: en-US, fr-BE, fr
-From: Laurent Bigonville <bigon@debian.org>
-Autocrypt: addr=bigon@debian.org; keydata=
- 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
- wQOeCC+SiVSdSv0zm8D5
-Subject: Disparity in Secureboot reported state by btintel driver
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Debian-User: bigon
+X-B4-Tracking: v=1; b=H4sIALF5nmoC/2WOyw6CMBBFf4V0bcl0QARX/ochpi+kRkBaaDSEf
+ 7eg0UQ3k9zcmTNnIk5box3ZRxOx2htnujaEZBMRWfP2rKlRIRMEzCDHlIphdOLUS4mwQ8qFKFj
+ ORYoIJNzcrK7MfeUdy1d2o7hoOSyQZaOyXUOH2mr+5e5Y8uGG1jPKaFJILiQolQE7dM7F/civo
+ W3iMBZQbdzQ2cdq7nF5+JZM4EfSIwW6laBBFkoVufjnlfM8PwHBd6nXDAEAAA==
+X-Change-ID: 20260824-btusb_qcc2072-abb918ab4220
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-GUID: 5PSX4LMWsqV7Qz2pMLIOSto4N6ajuKyE
+X-Proofpoint-ORIG-GUID: 5PSX4LMWsqV7Qz2pMLIOSto4N6ajuKyE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA3MDA5NCBTYWx0ZWRfX+txSbNUEe4OV
+ 1CDkbjbwSViAv7QA8yJ9o4Ci63zWVSwvWmRyJ76grIAcn+WgHqTVNeC1p/sQwOR0yH38qTeqzbd
+ sv6h8qCFcr8UIkXPiZ9YD4lUPFVqFauXcVdu3TqvksQz2/VvNs4WL9oDJp/FY+LIFPzsJcMpfMS
+ wlC39GqyN5qBE6nzZrCqN3QtlY7H71NQDVDw2gwJLwWEm1Uh3qDZTZOhngCKjueJx8cp/1D4LwM
+ AQTfnLdE+UJhSN4hdx4Yv1dB5lWTWMyGjfxqG6BkZaqfsK2fqmyOcxrvS4KFdb5iurlHjsFccXo
+ jAq/DpF9jl5yCJSB7T1vk6huVFbB1J4AuPxhZb8Hc+SZ61gUg7qXR2A1Et1L9qiTMdnHVObHYfk
+ /GgXqH3yImXkz4jDHxbhovqFdtvIsjjmnFCaBt8A8s2UVPYA64wU0wnRvCOTolB8aLeq8wKsPR8
+ dvQEgX2HJcMtZoQ0DLg==
+X-Authority-Analysis: v=2.4 cv=DYgnbPtW c=1 sm=1 tr=0 ts=6a9e79c4 cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=wiGumk0A3tkkXcSz67AA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=mQ_c8vxmzFEMiUWkPHU9:22 a=FO4_E8m0qiDe52t0p3_H:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA3MDA5NCBTYWx0ZWRfX85rFrjPrmaMi
+ kz3bwSFU2vVr8qBERrQPgjd4TjaBeU3XGiTUylonjKpVXw9hKkHauBaNFuVZ3Xk54auOBulgAt9
+ HlcXzKk99vkqtv25dWoOW9uYQQUUIM0=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-07_02,2026-09-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1015 bulkscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2609070094
 
-Hello,
+Hi Luiz,
 
-When debugging some secureboot issue on my laptop, I saw the following 
-disparity in dmesg when SB was disabled in the UEFI parameters:
+This revision addresses issues reported by Sashiko. Fixes are listed in
+the changelog below; false positives are addressed as Q&A further down.
 
-> sep 06 14:44:00 eriador kernel: secureboot: Secure boot disabled
-> sep 06 14:44:02 eriador kernel: Bluetooth: hci0: Secure boot is enabled
-This is coming from drivers/bluetooth/btintel.c
+Could you take a look at this new revision when you get a chance, and let
+me know if you have any further comments?
 
-I don't know if it's just cosmetic or not, but I wanted to report this.
+False positives (no code change):
 
-Kind regards,
+Q: Does this explicit padding with null bytes break userspace crash dump
+analysis for btqcom_submit_memdump()?
 
-Laurent Bigonville
+A: No — this header is internal and appended as dump data. Its fixed
+512-byte size is enough to delimit it from the dump data, so it doesn't
+need the text end marking like the external file header.
+
+Q: Does mixing goto statements with guard() declarations in
+qperi_try_wakeup() violate the scope-based cleanup guidelines?
+
+A: No — all the gotos happen after guard(spinlock)() is taken, at
+function scope. Since every goto stays inside that same scope, it
+doesn't violate cleanup.h's guidance.
+
+Q: Could this cause a kernel panic if a zero-length packet is received
+for btqcom_recv_vendor_pkt()?
+
+A: No — not reachable from a socket write, recv_vendor_pkt() only runs
+on the RX side. And skb->len can't be 0 anyway: btusb_upward_frame()
+pushes 1 byte onto the skb right before tagging it HCI_VENDOR_PKT.
+
+Q: Can this lead to a null pointer dereference on the transmit path
+for btusb_qcom_send_frame()?
+
+A: No — skb->len can't be 0 here. Both producers of a HCI_VENDOR_PKT
+skb already reject zero length before reaching hdev->send():
+hci_sock_sendmsg's "len < 4" check for userspace writes, and
+hci_send_vendor_frame's own "!len" check for kernel-internal senders.
+
+This patch series supports Qualcomm multi-subsystem QCC2072. The first
+3 commits are simple dependencies of the last one.
+
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+---
+Changes in v3:
+- Remove socket option BT_RECV_VENDOR_PKT
+- Fix heap overflow in hci_send_vendor_frame()
+- Fix a stray NUL byte in the memdump file header
+- Fix PM reference leak in btusb_do_reset_work()
+- Don't mix goto with scoped_guard() in __qperi_tx_sync_evt()
+- Don't mix goto with scoped_guard() in qperi_handle_evt()
+- Prepare btusb_qcom for bulk serialization mode support.
+- Link to v2: https://patch.msgid.link/20260830-btusb_qcc2072-v2-0-5c0e0c9dd98b@oss.qualcomm.com
+
+---
+Zijun Hu (4):
+      Bluetooth: btusb: Add recv_intr() hook to btusb_data
+      Bluetooth: Add generic support for vendor packets
+      Bluetooth: btusb: Build the driver from multiple source files
+      Bluetooth: btusb: Add support for Qualcomm multi-subsystem QCC2072
+
+ drivers/bluetooth/Kconfig                   |   14 +
+ drivers/bluetooth/Makefile                  |    3 +
+ drivers/bluetooth/{btusb.c => btusb_main.c} |  126 +-
+ drivers/bluetooth/btusb_qcom.c              | 4514 +++++++++++++++++++++++++++
+ drivers/bluetooth/btusb_qcom.h              |   99 +
+ include/net/bluetooth/hci_core.h            |    5 +
+ include/net/bluetooth/hci_mon.h             |    2 +
+ net/bluetooth/hci_core.c                    |   45 +
+ net/bluetooth/hci_sock.c                    |    8 +
+ 9 files changed, 4814 insertions(+), 2 deletions(-)
+---
+base-commit: 755cf7adf8dd2d12627cb7de223d35b12228e2f5
+change-id: 20260824-btusb_qcc2072-abb918ab4220
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
