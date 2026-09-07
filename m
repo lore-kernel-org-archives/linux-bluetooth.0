@@ -1,99 +1,115 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595B2339366
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 04:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F210334374;
+	Tue,  8 Sep 2026 06:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788841955; cv=none; b=tiB0F7K8WRqCbx+n9nL4M/Rt+q6bzjx1JGBHopPJ9feoy5FA7R/lXQHDmDC+cFj6v1d8k/ujTRhp6q0XC3BqQBC3g7Qnl93xhIiooxF1EJZB1hPSc87FNcUYeJfg0AZklPshynH6Rfnv7YdcR4yGMoJ3oMydsGNWblKnAW0lEzQ=
+	t=1788847502; cv=none; b=raHlHnhsCj/mmQQDTrnVuICCM96GItC60tbhZAw2JqT0xTEMcP1BK7hj82v/1sY8FB3rxVq+US3EJ0k4luJNHeYArB13/idvxK3s9Z2SIgCp3teE+Gd9C9Ihx/8xYQPcykngBONI1izeP0cPFtePXOUY5+2eVbh3poWNdRF8zMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788841955; c=relaxed/simple;
-	bh=YMVfWdeDEXpIo4fP4OwHSvH0akAHSzLjdeX6CUpwUuI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=iPzFdlfeffbp1J5DWIGGe9kbefYMrfJxZchuN19/ZCeMfVtwf2sW91ZfVYeaeV7UlR8wJw8LDQc1jjro3kzTTv0xeNCYq22FTS2JlazBFzW6FkLjostIdZFerXL1XoDVU5lRAGVCzOwIiuay2NqEGYiXZSnbHV4wkDUFmINsRRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+bui9BK; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+bui9BK"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-84830c774a0so3928055b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 21:32:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788841954; x=1789446754; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=YMVfWdeDEXpIo4fP4OwHSvH0akAHSzLjdeX6CUpwUuI=;
-        b=h+bui9BKZ1zH949vLp9fv6MGz86lcTe4JlgPujta09XONQrz2hY4Y8rEKcQlLn5cXM
-         jf2yn58dL2GiyJie26LERjmmJ4AlCymlmEh4PyxdAipnnwSd9mWO9qkg2oNpdLLk/CRC
-         LxzBzRwjFBwslfIkQ6EweiwhimVbOiCtxBpKt8EefgAScEQMXWyTJ4xfCUyMQdFVj2iI
-         6G2XCwSRCXDbF+DTy9KQU6x4kUtut92fh4dZLTLIDqmuhVxPusLkWGiOy2moS0CoHtvj
-         RLbQd00RuHnYNLXW6j2mOQKsoEI3+P+PXHagnlY2OVPZwS42/0EWCcKAhdw+eG+t3HGm
-         nqCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788841954; x=1789446754;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=YMVfWdeDEXpIo4fP4OwHSvH0akAHSzLjdeX6CUpwUuI=;
-        b=WuqXBy/xs7H2szhwmgGJaXtubw1YnA9sj145Pef3GbcPlI16vayzSHWVUxkqPLz3sI
-         zGIudOuLHIZTknbg2GX1tX7lecA6ja5BVg8OcZlOukrpdENLPuhOcBSeBdRals7FWc0o
-         hxwFNn1BAKrjnkl9739KAIUbMRQDhXbD91WtkD0UiNLECyBMdMTl/QPbkXtq/0gCUbHE
-         Fz24qeACCW3nCToPH1v92ngZckfrYBHveGNq96f4k3snRdK2HyP8/kNIv71CXFDQlJmp
-         hAdiEinF+s2OL2G8g/PeHz82/05Rk5CHsEDhPzOoA1U7SKtbntX7/Xpg9HYPTJmUy7jM
-         Cstw==
-X-Gm-Message-State: AFuF++lhL7Qzz6pHL2f4cYmoK8Qt2Tc6RzxZqDF4eUi/8XkCt1IMRqAq
-	wI01wYXtz7yAb4A2FMOAYfUSS/5aRtRpCsZnu4MB33F5pPM3vb1HT7MZlqkJzg==
-X-Gm-Gg: AYBFou2VZMGH5Xgvk0/p+ppfY8rxH02NsSBuM21dkoE2i3xotIA7c+I/bTR2BUUIW0y
-	xiuZYjbHZ4ZQKtj646zeL1n1wIjNNVLdv9x51DoDr8F6bX87qNaZF8HsaxuLPsPNEHclA+nPXwM
-	QIp4GZSGFFZJDtEylnvmB8BFm9kvSxR9uFCF9fYI8CP5S/qxurHN6IVJLB7tRNSNU1mR7tvo1G5
-	ZkUdWdSi0/o7KSsdc6DT+UCtfiaS2BMfedtzd89hkkqfCGJHcvj1SEbgXBSNrgCxa0wfm9JLzl7
-	hAnDXi80ZwlK9TrXP9wJCDImKqAS8TwZnqeQGVtBVJNfdSbQcapOc3X3hehAde7Pr9q9fitI+vC
-	TJQT4M+N2QMyEmTWZF9eavnLaSueo7CKs23KgZfD0+CHP3194nWfSAuEz0Z7QPRCF8WNXD4URWH
-	wqcFwfP1ytgLXLwpEOxEbUDeVJawvuAskOrXQ2W44nNSDYU8d7srOA6a3MUHE4fIVmpmNuKw==
-X-Received: by 2002:a05:6a20:9389:b0:3d7:eb3e:1c58 with SMTP id adf61e73a8af0-3da39d13c08mr44658764637.8.1788841953633;
-        Mon, 07 Sep 2026 21:32:33 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.216.211])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b608409sm36717549eec.21.2026.09.07.21.32.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 21:32:32 -0700 (PDT)
-Message-ID: <6a9f8fe0.ac292227.3c9bee.339f@mx.google.com>
-Date: Mon, 07 Sep 2026 21:32:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2611181593547205765=="
+	s=arc-20240116; t=1788847502; c=relaxed/simple;
+	bh=N6GsYlm4R02HlFRKiSJAP8dubdpupRSeDp/flGHeCaM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UtlNDTdWR/5bh9q/v/vKbJkar+ZiJxEkOjd75i6AzKAR5+azFRSHrALEwcR6rGlz+/LOaFEr6VZVZyozJsW7FKC71a03ne13QkRUZiwBlYNjoY7MIft9S3QOWYmkxKaFpu3kRGovdolLirdDlSxVUXSs+hoGFqkKg8JUgRQIVuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinsec.com.cn; spf=pass smtp.mailfrom=kylinsec.com.cn; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinsec.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinsec.com.cn
+X-QQ-mid: zesmtpsz6t1788847468tfaa76b0a
+X-QQ-Originating-IP: bpNdYVvuBaGb0FRVWxYnF25oOD3XLv5BFzCRmSAWrEY=
+Received: from localhost.localdomain ( [39.144.190.97])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 08 Sep 2026 14:04:26 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 1778941879433745811
+EX-QQ-RecipientCnt: 5
+From: Xuhua Zhang <zhangxuhua@kylinsec.com.cn>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xuhua Zhang <zhangxuhua@kylinsec.com.cn>
+Subject: [PATCH] Bluetooth: hci_h5: Avoid clearing the escape bit for ordinary bytes
+Date: Mon,  7 Sep 2026 23:08:08 +0800
+Message-ID: <8B4A9BA701BE6DED+20260907150808.13442-1-zhangxuhua@kylinsec.com.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
-Subject: RE: RAS: Add support for on-demand ranging data
-In-Reply-To: <20260908042727.1677501-2-naga.akella@oss.qualcomm.com>
-References: <20260908042727.1677501-2-naga.akella@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:kylinsec.com.cn:qybglogicsvrgz:qybglogicsvrgz3a-0
+X-QQ-XMAILINFO: MAn/YGr3W4JHHXD+oRNLWsVTk3Nj9PXOcGWtOosW5SFK8jxlp8ZOH7vP
+	iuDjyyb2vQNdPMqQv94TB3EXqoyp8G8L9zDet+1h1PsCGD/fMIrsXolZyRP1xIJhgdqgOwF
+	na3bK3UqdiD/tc1lvBu4BpaDfFKBA/hrxZAqBNvzgknlydv5XCRXSLM9aEWfSM80UuX37iX
+	S9z7JyaPWIeHudYgDag8dxKmjb5yT4MFRkU43+i6VgyjTGvMrj0MTvg0jHAHNoyJmPfIur2
+	BfSuSqrb6bSEMUsEmKceLmnEg2obhpZndWaK8VMm9VcNxJZ5txvHyKt0xI2ZgKMckkPa+ns
+	gMo5gFRd6TY+6Rfxn2uOAihuGfKtEWMgV+m2hjmrJ8UJeoCF8UOzmy6x6AqgRYSv5d/riGX
+	Rv/tP4I+guZSHcG0+rbWH/vYAtBsyrtO92gIuvyAC7fcqAhPEG6xNZH+YgXY1FFwkJbvOS4
+	RGphlgiydnhbZbd77bJOczHHpZJar/VPLbRHJ8MIYC7Txg+eaSEEfCFsoFVCZFAzYVctewc
+	pveUSV8mMHxa78W+GxYfERoBcDS1ULLZOfN1Wd+xM9KaO/HbRBu3M7WCEI5K03pD79qnYYZ
+	ZUzdeA91WrYsUpus7rMWqlI6ylOBO8dL+Yu1lDEFogLhXqwabiGEEuOJh+KI9tsf8E7NKYj
+	mcGcqlCSk0+UWbD2A59QrYXeL3Q/Ob29UZ47ZhebvpRmUeUYvz71U0DVgbObQ2aLEstueds
+	9z+c+2VhIkMfFAhgX+htYtVnMfLjY0pNAJg5K0U8PljzBEnqGXpqvfqC7gliNOXRKsQXKpu
+	cjRmQMe+9wmhXWiIKCtloIRoCsg6kpEr3ju0MnNkqpZD9G0WEdLx8JzAJSQdCHrSb00ppgr
+	lr1fPMwccnNFWfdDnQn00qPNi4E40jH/3EdcHVu+BE1kNC4PImOEKVO1UMyS3OAkefHMcVB
+	8lzKn1BybEe9vdj2Hban/7vZTWqSpks6wID7I4Aanr3tL2lNmwxMLk/CgnL07324SN/W+Od
+	oJtdsZeZ9Zz1rlY0xT4AtrLRh2H65F3xL4lhOG93VYFPewfoYdY0JleYDIrMY=
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
 
---===============2611181593547205765==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+h5_unslip_one_byte() calls test_and_clear_bit() for every byte other than
+an initial SLIP escape byte, even when H5_RX_ESC is already clear. This
+performs an unnecessary atomic read-modify-write on the ordinary-byte
+receive path. On x86, it emits a locked btr instruction for each such
+byte.
 
-This is an automated email and please do not reply to this email.
+Test H5_RX_ESC first and clear it only when consuming an escaped byte.
+Handle an initial SLIP escape byte in the alternative branch. The HCI
+UART receive callbacks are serialized by the TTY layer, and H5_RX_ESC
+is only changed by receive processing and initialization, so there is
+no need to atomically test and clear it in one operation.
 
-Dear Submitter,
+Keep set_bit() and clear_bit() atomic because other bits in h5->flags
+can be updated by the transmit path concurrently. Escape decoding and
+invalid-escape recovery remain unchanged.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Xuhua Zhang <zhangxuhua@kylinsec.com.cn>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_h5.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index b1999e14aade..37f4d9327e72 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -543,12 +543,8 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
+ 	const u8 delim = SLIP_DELIMITER, esc = SLIP_ESC;
+ 	const u8 *byte = &c;
+ 
+-	if (!test_bit(H5_RX_ESC, &h5->flags) && c == SLIP_ESC) {
+-		set_bit(H5_RX_ESC, &h5->flags);
+-		return;
+-	}
+-
+-	if (test_and_clear_bit(H5_RX_ESC, &h5->flags)) {
++	if (test_bit(H5_RX_ESC, &h5->flags)) {
++		clear_bit(H5_RX_ESC, &h5->flags);
+ 		switch (c) {
+ 		case SLIP_ESC_DELIM:
+ 			byte = &delim;
+@@ -561,6 +557,9 @@ static void h5_unslip_one_byte(struct h5 *h5, unsigned char c)
+ 			h5_reset_rx(h5);
+ 			return;
+ 		}
++	} else if (c == SLIP_ESC) {
++		set_bit(H5_RX_ESC, &h5->flags);
++		return;
+ 	}
+ 
+ 	skb_put_data(h5->rx_skb, byte, 1);
+-- 
+2.43.0
 
---===============2611181593547205765==--
