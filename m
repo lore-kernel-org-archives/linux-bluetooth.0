@@ -1,147 +1,100 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219643A4F33
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Sep 2026 14:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D5F42E413
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Sep 2026 15:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788791194; cv=none; b=n+fOA/N5FTDd6GY6Vv7DBjwsH7dZBDNB2R0PiXeQcgghau61gFkCkswWdUgZPMG82zmffCSLxPDDZpmvvvpc+EXktao7mt9JKiUQY+7Zi5GqxF/ZH25u6hE1tXd+KApi2FB+ZZI8Z91hmzOzRigL8O97MlI6Dbq9PBIXWxcj26Q=
+	t=1788796176; cv=none; b=ZftMu26NqXwH1Hs27FWWANd86OlIxsNUpOqdRlr+xQ2fRQlt4hhwxQ4OoRxWdcy6vizSls8AtVNJreiS1LaiHOlC5FTaPdSrDxHPrzXlo+OkTwUqK1v4hFBm4LlIGnuUiI+ifYmfO3T65y0+f7s2LMWY43BCvTnHjInePCGWNV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788791194; c=relaxed/simple;
-	bh=6M6BqSu+AARyDk9/i3i6nT6PArwCznAtKG+pD5PVZUk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=agaXVS0QoZKoaHLSim0FO2xrPLbOom52+3UY+Ge59exPf0mNLFOgUqvVk6Eujr9y+i3JN0FPG+pBVUSu0On6Ymc84bnCHgMM/B+pnQrNmxT3M0075ZDIaRCkeveBCIjD8Bl2z6lGUJWkZDolDEArMIGsprH4nxTkgC54wT8KpeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q6Dr4i0W; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1788796176; c=relaxed/simple;
+	bh=TRFvm879Cvt0TUc7FFuRGNHfqNEI0ZAaGzFnco3gbfw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jOXpbhkZ1b9hxaCmzH6kOoM+N6NHIyou3rJXrAWLHIk0cZZLkN4tHrL9O6KU0ofm8KfGw0ZVHMfl6XZKDmsH4M/0R/X88YItSyrqsqXSwKir7S3mi6CuDGKD+DaPERO2T9C1UnBIMfPhvVnxQwcTpOwTv3BFKzP83V9QVYiVdu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BOyQOKWd; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q6Dr4i0W"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-49b9320423cso41040155e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 07:26:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BOyQOKWd"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-381b831d535so5913428a91.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 08:49:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788791190; x=1789395990; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=4f0/64qaNZYvJEcWhejwJa+PLE1/Em7ct5SbUix/fW8=;
-        b=q6Dr4i0WkAjuFmycVhSSQRnVTczqfUrTQaeORur6Hd2bVgq9VoAdE6Wwx+qQABHvcH
-         yacqumiHa9NTfk2p6UIHl9ZhgciVNMQLYg6fwIkh1iAcLsdn4nEP2JV0f4rzLfEZxNAf
-         OM1sN0qTqoopKC7E7ab2G3lsoYl2oqr/v/l2GB0mfB5wOk/p/2YZlg9yKs+ZqrZJ0ogS
-         XmFEUg/33CGHFA5vSfZ4BQ7Er5wDZNJt12yYr/Hzd0bw5a3lcMZdIKiNZBLTkxaZSuoN
-         bbu1rjcC39MFGDDAIhtcPhoj4/iokqFcrXyLzhhKm97rTq99Hd8H9nW+bLRa77OyLgaY
-         OcQQ==
+        d=gmail.com; s=20251104; t=1788796174; x=1789400974; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=TRFvm879Cvt0TUc7FFuRGNHfqNEI0ZAaGzFnco3gbfw=;
+        b=BOyQOKWdHcCXfuScxsRgXt9WFJ96NHjwjr7k36zLK2m9VGRHv4vRJ4MWaCskTEw+xj
+         J5CnTsGmb8HTZVfgEsa6kLfLRsopbWoeFKEzowzpxFv29YirISmmGQ11FrZCYxwXqdcE
+         HAo+vSQSLQD0fLjUFIicZtFAivxml27EZqZJ2s5FeVU806c5jZApKn8gG5uTRasU7uDR
+         y+A/Mg62+n8Wqzhmbh+OQ7/nqKibQZjgiUiY0wui0rj5iWPAP1H/m/xVGckO9gGHfVnP
+         dNOq72M2z/EZF6r9gudXohD7cCTUmdrukB1frK6zcXeLZzLWQUoEo0B/yudbSVkdLWP8
+         d/LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788791190; x=1789395990;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4f0/64qaNZYvJEcWhejwJa+PLE1/Em7ct5SbUix/fW8=;
-        b=GfEGCs3ukU2L0QoHXmoAyy+2zdVThDyD83Vxlj2X1okAx4VlHoazjNB18Q8xzjQQvS
-         5hoxwiDVOXXkqMpWdUbKhtP1PmZsYeAiFRj3npDyCfeTK269g9cQ4zaauMTmIfGD9FaB
-         2jXfRwbc/oSY6rgJrzE5TeaqfjTUnUxXKmFub2NsdXW4bUflsITlx1KvGYX50UMCpC1E
-         UoGHI/oBEPWqQnkNXlA2eU1JCq8tsGoPsQskQcGguoLghqzyl3Y7rDDMC1HIjf7FryJ+
-         2dFY7NHmCp0riV0yOEvqhQ1LH9RCsJb6+OUJ4sAsZCeGLik+jfs5LaDvzw93n8Fl/qJP
-         GKmQ==
-X-Gm-Message-State: AFuF++n/WXQTfPzD6GiwFlbsJX/KAwk/3h66ddwGPw/mdtUwLmJme6Fr
-	vO5i0W6TQKQkrH+BXUinjmNHrWPdN4/fgPXucwjHmqUVW3C0+SdGoXVF
-X-Gm-Gg: AYBFou2OLbpYFAKunwxWMi2/5owmSBL8buyEqOz6joK8UC2BVOyzZg3EXqE7NdElYZe
-	09+QzUiGn3kczD9coWN4TOC/fChTTjZ940Q6RDUoo8uADoDymP0ckTrpwEdOenbVvAfzF5lkwUK
-	IMwmGTzLh2rSyPwrZxdPYICHRDD4YfN8SFQ7EPLUhELe0q/OeWVQ9RXKO4esSfJhQAVAQfs4Vv5
-	L2aVTRcYvc+siCAnNjI3y6aAcKr6t5NzzTFCm5gZtXt0CRB1h2IRU/2XCmK2e8q3NWVQaQNxqDk
-	Vu5nKkFuxuzzwvW/PSojWbAa0gOVYElzCQ4WsVa0hgy+F5Jrf/e+4WTauQu7jx+Sn9+WgQ4XV+J
-	Bh25Hqt0g7WfaVe1vZvpxwfOkFD5kVRQWrL4ZbOoHpr4p7+1TQZoLFvpaCY5fJ/pqkn5oAJsoPV
-	7233XnkqGORIHtjc3TmqfTVecA5D5QRxgisFDOO36FRFbQMe6BxNgrAggIk7yLxyRZ1sFZJe/y2
-	G8k0f6g6hoTPdCFzVqoV7B3kjkQZYJVKjA/hvN4r0bAlVs0yuW4Q0nMyjb0ut6pOKxCMgNeEM7r
-	/ZOInXZgU0Ls4UrcsEOABXaEQw==
-X-Received: by 2002:a05:600c:3b01:b0:49b:4d64:bbc4 with SMTP id 5b1f17b1804b1-49cf81f1592mr393945895e9.8.1788791190141;
-        Mon, 07 Sep 2026 07:26:30 -0700 (PDT)
-Received: from MYL150-3871.localdomain (80.151.89.79.rev.sfr.net. [79.89.151.80])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cee6024a8sm414605655e9.6.2026.09.07.07.26.29
+        d=1e100.net; s=20251104; t=1788796174; x=1789400974;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=TRFvm879Cvt0TUc7FFuRGNHfqNEI0ZAaGzFnco3gbfw=;
+        b=bZsEplv/gV0EtimGvtNX6WVv2g8K6jloLCE4+brYDVyHGy+Nq3Q6+jDuWOlmAMLyuj
+         NCMT2Fh89q3FqkyX9fZxtUSb9WmpH8TjJ0lrH8utHQDXzzGhHnQN8FVNxd1RGc/ejv2l
+         v2sFW+/KbI5+9ciEkJK0c2zy7xsrP6tG97HDcW1F2csZdTX8Ppz2cWt4kXH6Tg91d9j3
+         KEoNllmapt2vllbYtf7piP5BVzSDuZCQwbhTFhGI4v7g7Xw+B+eZ3sEnegPyD7fuTPgB
+         ik7vmzrZD+bGr0eHhbMWfO9o4ikqaaekC3tDCDdU7YbVfPFqU1o7x9C9iDZ1IfZvXssW
+         Tvnw==
+X-Gm-Message-State: AFuF++nJSd7oBsB1z7HiGKFn6pkVxeMzBTT8NCoWVijyvRL3zHWlnJoy
+	pwJAB4+EpsResHKA85+MpGb12LEPRb77UvZ9IIFYVlYbBOf3ONHu6T/Nxa4JTg==
+X-Gm-Gg: AYBFou2NXUaTuN+JfuxZG8N0Qd1gVKBijtqrqyIsYLzBytgOi5EBrRkYYZaEAY7AHps
+	h2uXh5vfmtvKThCa++8oN9707eg0NSRfnAgEpHC20k4vKDZwrAKulXgMtBOzmLgQCVFjpNK3WfC
+	1l6pVtFq65Q7GcJeoKTWHCQnHj/HTRSEUGAjX3tFmDccQy/EtYCfqSonHHT51rRm93qE25c1T0c
+	mj06ZJUyFK7hOjsDOfItX8Hs/y71Icgn+cSz3jxCNuKRFBAXrTNIwl9IS/yhJmiwJpFYstrlnBw
+	XQ68i/wHlHekpNKtEHwxIlk0gk369mrCdBg9h+zuiOb/x+3UTiaLI7GBR6yTzQuaa8hjjqwJB2B
+	SOaeIc53NeUfIONcPY0+vM0qkbD6JrlF2XzP3ZHVePZSfUO3Rcs5VTKMM74Y9uAad9kWJ5WwBUh
+	vs2YpQ/z8ibrjtPUTfiOcGMq3XF8bTlgUAuqHALeFdkkWRm1sNWjsH0NNdX7IZzc5iqlbVPsJnF
+	TF8LQ==
+X-Received: by 2002:a17:90b:274e:b0:398:b1eb:136c with SMTP id 98e67ed59e1d1-39b2610fe62mr36003823a91.9.1788796174407;
+        Mon, 07 Sep 2026 08:49:34 -0700 (PDT)
+Received: from [172.17.0.2] ([52.161.51.145])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b314cfcsm29348081eec.19.2026.09.07.08.49.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 07:26:29 -0700 (PDT)
-From: Nicolas Thibert <nithibert@gmail.com>
-X-Google-Original-From: Nicolas Thibert <n.thibert@ext.mylight150.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nicolas Thibert <nithibert@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: fix NXP IW610 composite device handling
-Date: Mon,  7 Sep 2026 16:26:04 +0200
-Message-Id: <20260907142604.1080571-1-n.thibert@ext.mylight150.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 07 Sep 2026 08:49:33 -0700 (PDT)
+Message-ID: <6a9edd0d.de43c058.24771f.d4e9@mx.google.com>
+Date: Mon, 07 Sep 2026 08:49:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3310701578693105221=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: RAS: Add support for on-demand ranging data
+In-Reply-To: <20260907135606.824752-2-naga.akella@oss.qualcomm.com>
+References: <20260907135606.824752-2-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Nicolas Thibert <nithibert@gmail.com>
+--===============3310701578693105221==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The NXP IW610 module exposes itself as a composite USB device
-(0471:0215) with three interfaces: two real Bluetooth HCI interfaces
-(class 0xe0) and one vendor-specific WiFi interface (class 0xff) used
-by mwifiex-nxp.
+This is an automated email and please do not reply to this email.
 
-The composite device's whole USB descriptor reports class 0xe0/01/01
-(Bluetooth), so btusb_table's generic USB_DEVICE_INFO(0xe0, 0x01, 0x01)
-entry matches every interface, not just the two real HCI ones -- btusb
-ends up binding the WiFi interface too, and mwifiex-nxp never gets it.
+Dear Submitter,
 
-Fix:
-1. In btusb_table (the table the USB core actually matches against),
-   explicitly ignore the WiFi interface via BTUSB_IGNORE, ahead of the
-   generic entry.
-2. In quirks_table, scope the existing BTUSB_MARVELL entry to the BT
-   interface class instead of matching the whole device by VID/PID
-   (harmless either way since quirks_table isn't consulted for initial
-   binding, but keep it correct).
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Not upstream anywhere: checked NXP's own i.MX kernel fork
-(nxp-imx/linux-imx), no IW610 references in btusb.c on any branch --
-their reference designs wire this chip differently (WiFi over SDIO
-per their release notes), so they never hit this.
+----- Output -----
 
-Signed-off-by: Nicolas Thibert <nithibert@gmail.com>
-Cc: stable@vger.kernel.org
-Assisted-by: LLM (Claude Sonnet 5, Anthropic)
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btusb.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Regards,
+Linux Bluetooth
 
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -71,6 +71,15 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BROKEN_EXT_SCAN		BIT(29)
- 
- static const struct usb_device_id btusb_table[] = {
-+	/*
-+	 * NXP IW610 (0471:0215): the composite device reports Bluetooth
-+	 * class at the whole-device level, so the generic entry below
-+	 * would also match this WiFi vendor interface. Ignore it here
-+	 * first so mwifiex-nxp can bind it instead.
-+	 */
-+	{ USB_DEVICE_AND_INTERFACE_INFO(0x0471, 0x0215, 0xff, 0xff, 0xff),
-+	  .driver_info = BTUSB_IGNORE },
-+
- 	/* Generic Bluetooth USB device */
- 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
- 
-@@ -477,6 +486,14 @@ static const struct usb_device_id quirks
- 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
- 	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
- 
-+	/*
-+	 * NXP IW610 BT interfaces (Marvell-lineage silicon, same quirk as
-+	 * the 0x1286 entries above). Scoped to the BT interface class,
-+	 * not just VID/PID -- see the btusb_table entry above.
-+	 */
-+	{ USB_DEVICE_AND_INTERFACE_INFO(0x0471, 0x0215, 0xe0, 0x01, 0x01),
-+	  .driver_info = BTUSB_MARVELL },
-+
- 	/* Intel Bluetooth devices */
- 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_COMBINED },
---
-2.34.1
+
+--===============3310701578693105221==--
