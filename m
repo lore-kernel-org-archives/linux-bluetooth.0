@@ -1,44 +1,45 @@
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.78.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3175908A7;
-	Tue,  8 Sep 2026 22:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.76.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855B038239A;
+	Tue,  8 Sep 2026 22:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.78.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788906586; cv=none; b=KGg9DtZdnvooV0Q4UxyqrR0zAYyXbjVk7RnrCqrkD5uJaY04RUqprjHhYBiy3xVxbNWi4ld3L6im0hLZancScQWS+GPOCCpWv3Iguam5cugE1cVcnsVFue1V/7McKvyv8eigwkzmWOLWF48geR5DWzhrEgKOUi/FQmD0oAzFbHM=
+	t=1788906611; cv=none; b=T4C4+JYFlTZ1xW4epXFDVCa6BkYDjoYhK2QekxJycE+adTIaqW+o+pI1Y5NAsd2y4vzlDp3luimVPkcQaRtOEwNx0UmkxrZT8davmu8KY9Eqscp0/HCX5bj+2b7h6IhPszysyzST7iYTDCN7sohHkIs35sryh2rmz89eiJsfZ0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788906586; c=relaxed/simple;
-	bh=34hTmnCR0N9guRDXxlyaOmYbh5vZfhydP4hwYqrWJjE=;
-	h=From:Date:Message-ID:MIME-Version:Content-Type:To:Cc:Subject:
-	 In-Reply-To:References; b=o6Zj/mLepawLjkZFyohFNNZxIrcxfDOdVL2h2UtAQ3tvOeo/4Y1Z6RhbcV7kZSyD1rhtwjcby/j2IERgqwmybQxsfluulwLHGPHR/LoMNHCoQIMw7ygHX52xAeEqXNfvW/3f9YvcKkOdweKBMeMaemGPRCynQA+FUGJQ06WDWRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=pDwE8d+8; arc=none smtp.client-ip=77.75.76.89
+	s=arc-20240116; t=1788906611; c=relaxed/simple;
+	bh=YlbLFj1jubsTAblV9KkgFQYYIwxSXgA9K2+99tuQ61w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=r1DwwimutiN8tC7d4BZz1X6u24O77VTaZxnpTqF9ovpPm82eCJ4nhdPcX7yO75/nXERBmNt6G0O3Pwz1MbBh55VkbMSyA+PT6/qVB9L6Ke6n6SZVVS4sCncML9mIG5xQzN99qLtDypXYGWFtbbeuLp66Vx8ERWe6XjEAYB09UiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=B+XUlRae; arc=none smtp.client-ip=77.75.78.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="pDwE8d+8"
+	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="B+XUlRae"
 Received: from email.seznam.cz
-	by smtpc-mxb-7db765f675-9qx89
-	(smtpc-mxb-7db765f675-9qx89 [2a02:598:128:8a00::1000:909])
-	id 5656cb1be06c660253d9d153;
-	Wed, 09 Sep 2026 00:29:27 +0200 (CEST)
+	by smtpc-mxb-7db765f675-fgg8f
+	(smtpc-mxb-7db765f675-fgg8f [2a02:598:64:8a00::1000:90d])
+	id 62648af1d45e27e867eb90b9;
+	Wed, 09 Sep 2026 00:29:57 +0200 (CEST)
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=emailprofi.seznam.cz; s=szn1; t=1788906567;
-	bh=iPpGEL8j4HQ/8vdnw58WGEmPElhHmAPA/EwT4tmUFxM=;
-	h=From:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:To:Cc:Subject;
-	b=pDwE8d+8/wBAPrj/mj5GQm6VLANIJklvpA/ObbuShdP7eF+F6DJAjb5sJR9kbJlFV
-	 Y0gIBflw5AONo5rtIMPXCu3X91F1k+E66OEtKaiL+ULF0/inoi1Ih53qIr9JAZbNhS
-	 +jMtgVZt5qX8mDUf5EMFoO2hkubA/08h+c+pwEavT6zbnLFhGjuRruUlph+fhgbG92
-	 nBGE+fXDdsIKxILbf61ePBOduYB0D6PfEYnwi96wAL16Ohnd7KVvyAFdZU8NPwPbmZ
-	 LE8Z+8w8P7h92Pl3H7fbWwkt4toHbNqIS7hsLhC4rW5ZJLhBBllb2s3+VZUo1wDZ3v
-	 TcOHNDgDtJs0g==
+	d=emailprofi.seznam.cz; s=szn1; t=1788906597;
+	bh=7QOOJZhlQlG9owCJI+3WV6mxQgey+fVxd8O+Sbk7sqU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:To:Cc;
+	b=B+XUlRaeM3Gcxp1n467xEK0mHyOv2Nuz22uMsi1FMyrRcP8i1ZsYcEAudj6y10Dms
+	 yh6jk4DX6w9O7rzznQPTkLr2TMRnTDUmlMtC5B05Aty9C1cv6S2FU5UvHuVh5Cx6W4
+	 p+TBNyTyPOT2Wl/lSWjFt5B3NYXdGZh+f1g+P/PsEQLqeMIg9b6a7niHQShm6Usya+
+	 km36dV2MheUM3C2E/GcTz4i83wo/OlOxn1yV7xWpezIrNRV4jSH5znnJZOQRNkBAR+
+	 ssPobw/dwUHZ3sQpaMUHkXyEvtJld8FMtFSxvBptidCya8rKBeomQ2BDd+5GzpSRDR
+	 7K/jNEuaLRD5A==
 Received: from [192.168.31.57] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
-	by smtpd-relay-57659868b8-gtrjk (szn-email-smtpd/2.0.82) with ESMTPA
-	id 211559bf-2787-4ddd-8474-ea7f5f505cf2;
-	Wed, 09 Sep 2026 00:28:30 +0200
+	by smtpd-relay-6ffbffc97b-l7tfj (szn-email-smtpd/2.0.82) with ESMTPA
+	id 72f5e36e-961a-4285-ab70-462fe6c4e235;
+	Wed, 09 Sep 2026 00:29:37 +0200
 From: Radek Podgorny <radek@podgorny.cz>
-Date: Wed, 09 Sep 2026 00:28:29 +0200
-Message-ID: <178890650942.186465.6960417770020253183@podgorny.cz>
+Date: Wed, 09 Sep 2026 00:29:36 +0200
+Subject: [PATCH v3 1/2] Bluetooth: forget a peer's RPA once it advertises
+ its identity address
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -46,77 +47,69 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-    Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-    linux-bluetooth@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: put the peer's on-air address on air when we cannot resolve
-In-Reply-To: <CABBYNZ+5zV8xzhHZKTUQYT4tLHaZAO7iiKOEsKuT8aA+YNLjPQ@mail.gmail.com>
-References: <20260908012048.3681904-2-radek@podgorny.cz> <20260908012048.3681904-4-radek@podgorny.cz> <CABBYNZ+nWb0m=qMvxADM2HvuLhopxG7L+io2JTmGXQM51YOYhA@mail.gmail.com> <178890003160.100543.8134592214245196581@podgorny.cz> <CABBYNZ+5zV8xzhHZKTUQYT4tLHaZAO7iiKOEsKuT8aA+YNLjPQ@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260909-for-upstream-le-connect-on-air-addr-v3-1-0e49c4e7abc2@podgorny.cz>
+References: <20260909-for-upstream-le-connect-on-air-addr-v3-0-0e49c4e7abc2@podgorny.cz>
+In-Reply-To: <20260909-for-upstream-le-connect-on-air-addr-v3-0-0e49c4e7abc2@podgorny.cz>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ Radek Podgorny <radek@podgorny.cz>
+X-Mailer: b4 0.15.2
 
-Hi Luiz,
+hci_connect_le() dials the RPA cached in the peer's IRK whenever one is
+set, on the assumption that a peer holding an IRK is on air with a
+resolvable private address. A peer that stops using privacy breaks that
+assumption: it advertises its identity address, the cached RPA keeps the
+value it had before the change, and the host aims at an address the peer
+has abandoned.
 
-On Tue, Sep 8, 2026 at 10:59 PM Luiz Augusto von Dentz wrote:
+Nothing clears the cache. hci_find_irk_by_rpa() refreshes irk->rpa each
+time an advertisement resolves, so it tracks rotation, but a peer that
+stops sending RPAs stops producing the reports that would update it, and
+the stale address then survives until the adapter is powered off.
 
-> > One cost worth naming: with the RPA in conn->dst from creation,
-> > hci_conn_params_lookup() in hci_le_create_conn_sync() misses the
-> > identity-keyed conn params [...]
->
-> That probably worth fixing, but yes it can be done on top.
+On the path that creates the connection object this is currently masked:
+__hci_conn_add() resolves the cached RPA back to the identity address, so
+that is what goes on air. It is not masked on the reuse branch, which
+copies the swapped address straight into an existing conn->dst, and the
+next patch removes the conversion for the case where the controller
+cannot translate an identity address, so the stale RPA would be dialled
+there too.
 
-Ack, I will send that separately. For the record it is only the lookup in
-hci_le_create_conn_sync(): the other conn->dst-keyed lookups run on an
-established link, by which point le_conn_complete_evt() has already put the
-identity address back, so they never see an RPA.
+Clear the cached RPA when the peer is seen on its identity address.
+hci_find_irk_by_addr() only matches public and static random addresses,
+so an unresolved RPA belonging to some other device cannot reach this
+path.
 
-> But if it advertises using the identity, we should connect using the
-> identity as well; there's no reason to use the stale RPA if the peer
-> somehow disabled its privacy.
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Radek Podgorny <radek@podgorny.cz>
+---
+ net/bluetooth/hci_event.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-You are right, and my apologies for missing it: v2 as sent does not just
-leave that corner unhandled, it makes it worse than what it replaced. I had
-the freshness window fixed in my head as the answer to the stale RPA, so
-when the timestamp went away I dismissed the case along with it instead of
-looking at what the case actually needed. It needed invalidation, which the
-timestamp was only approximating badly.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2f5e21ff9752..03b805207ab0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6311,6 +6311,15 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	if (irk) {
+ 		bdaddr = &irk->bdaddr;
+ 		bdaddr_type = irk->addr_type;
++	} else {
++		/* The peer is on air with its identity address, so whatever
++		 * RPA is cached for it has been abandoned. Drop it, or
++		 * hci_connect_le() would swap it back in and dial an address
++		 * the peer no longer answers.
++		 */
++		irk = hci_find_irk_by_addr(hdev, bdaddr, bdaddr_type);
++		if (irk)
++			bacpy(&irk->rpa, BDADDR_ANY);
+ 	}
+ 
+ 	bdaddr_type = ev_bdaddr_type(hdev, bdaddr_type, &bdaddr_resolved);
 
-Concretely: nothing ever clears irk->rpa, and v2 removes the conversion in
-__hci_conn_add() that was papering over that. The peer advertises its
-identity, hci_connect_le() swaps the dead RPA back in, and every attempt
-from then on is dialled at an address the peer has abandoned - a permanent
-failure where the code v2 replaces would have connected.
+-- 
+2.55.0
 
-So v3 adds the missing half of the cache maintenance ahead of the address
-change. hci_find_irk_by_rpa() already refreshes irk->rpa when a report
-resolves; nothing invalidates it when the peer stops using RPAs. In
-process_adv_report(), in the else branch of the block you quoted first time
-round:
-
-  irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
-  if (irk) {
-          bdaddr = &irk->bdaddr;
-          bdaddr_type = irk->addr_type;
-  } else {
-          irk = hci_find_irk_by_addr(hdev, bdaddr, bdaddr_type);
-          if (irk)
-                  bacpy(&irk->rpa, BDADDR_ANY);
-  }
-
-hci_find_irk_by_addr() matches only public and static random addresses, so
-an unresolved RPA belonging to some other device cannot reach it. The cache
-then means "the last address the peer was seen on is an RPA", which is what
-the swap in hci_connect_le() has always assumed it meant.
-
-That patch comes first in the series, so no commit in between leaves the
-tree dialling a stale RPA. I did not tag it Fixes:: with __hci_conn_add()
-still converting, the stale address is only reachable today through the
-reuse branch of hci_connect_le(), and a stable backport on its own does not
-seem warranted.
-
-The address selection itself is unchanged from v2.
-
-v3 follows.
-
-Radek
