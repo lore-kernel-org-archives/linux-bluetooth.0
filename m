@@ -1,156 +1,122 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EA13B8D40
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 22:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3175908A7;
+	Tue,  8 Sep 2026 22:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.76.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788905972; cv=none; b=rcDmCojAOi36lnxQaCZwePIlHYnWDPd/MaIqndp3C8zYVN5Kaqjyt6qARajOx7w4qAnXMvCNSOEI+4qLNMFBFW/3xECa7HcpIEB6cNA4lfZCWN01yJX+l+Sncq1yecG40FNgOQOh7/VteqXB+yk8t7/39yaP4SmvQo1KzcAduxw=
+	t=1788906586; cv=none; b=KGg9DtZdnvooV0Q4UxyqrR0zAYyXbjVk7RnrCqrkD5uJaY04RUqprjHhYBiy3xVxbNWi4ld3L6im0hLZancScQWS+GPOCCpWv3Iguam5cugE1cVcnsVFue1V/7McKvyv8eigwkzmWOLWF48geR5DWzhrEgKOUi/FQmD0oAzFbHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788905972; c=relaxed/simple;
-	bh=dOXPxe368eMTGuB7Fmw3UzXLgtkGhFxr/aq6v8I/Bxw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cM5CQM16Vv02AZ+tKrRRo73pv+o/bX2SU95/MshkH644pB3jtqStBXig74Fz41a/UfbUHZzrfFp8LggS5mJD9WOgEKXDKB1cemclpKQTW150Lhb/oc4H5RCKnC818SyMzetKch2uaWlURoyG5BqWOOSHYw404JMSFCLxxzz/PKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qOkgcIWA; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788906586; c=relaxed/simple;
+	bh=34hTmnCR0N9guRDXxlyaOmYbh5vZfhydP4hwYqrWJjE=;
+	h=From:Date:Message-ID:MIME-Version:Content-Type:To:Cc:Subject:
+	 In-Reply-To:References; b=o6Zj/mLepawLjkZFyohFNNZxIrcxfDOdVL2h2UtAQ3tvOeo/4Y1Z6RhbcV7kZSyD1rhtwjcby/j2IERgqwmybQxsfluulwLHGPHR/LoMNHCoQIMw7ygHX52xAeEqXNfvW/3f9YvcKkOdweKBMeMaemGPRCynQA+FUGJQ06WDWRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=pDwE8d+8; arc=none smtp.client-ip=77.75.76.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qOkgcIWA"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7f0167e59a3so3793556a34.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2026 15:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788905970; x=1789510770; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=r9ZjTMXX7VLviaHR27Q4b+69D+Cnl/mziz9fV4vYtqc=;
-        b=qOkgcIWA+V9bBNGsK3pu4Ycl/fwRkRYT12lkdp+Gr/dbsOhHaQiXZk1/eizg9htFnr
-         hbvNRmnDcMO17E/JZsCX2LI/inFrY/8I8ummjg97rlN2jC6/V03NTew39MTbftmvU1lB
-         BQJHD+5uj8C4FGGLpffCzWoZS1z/pe+Z3BEritg3Yr4fWqU93bguyv3mYcDa1rd1ZXCo
-         a3jUoCasXMSmbGZ8ToTYBZLOWTls29cyvquxIFpu1hRsAZ6ljLC4AGhiSh1TiNfNSJII
-         wDBDhSe+ofuElPl2tpc1v8Ux5uEuqk+1CRamFrpb14Q9N66b+tmgayxncIYrOKlLRyDb
-         BKyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788905970; x=1789510770;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=r9ZjTMXX7VLviaHR27Q4b+69D+Cnl/mziz9fV4vYtqc=;
-        b=L46Pf5OA1gWYFi/lkbzXhYx23E6YkwFUdba+BxGh1V90DjhWNeZU2ck/1xMRWrdWXN
-         xu9nyRteCOfVteNi10whVElUAFvhHAchte/MYjvfj+co1pf4OOmVeubWdhVOBkzQ8aKD
-         oF7IyoWdN3ZfdY67E5qKZ3qsgKS5srOauHP3avWQJERZN7x4yIJZh4f/Is1HDBc35PvX
-         XY/SXEVKhZIT4xtqI177fszqKmJY50OdpgmDEoNtGXB/dq1OAxGtpxQAVeWJuV+tRoQm
-         lbCwDFB49JKAbbuzFudQ7m+RLQUEwU9k2FXMJi08KDleeooA29riDSgwAPd9Usybs8Bm
-         zMiA==
-X-Gm-Message-State: AFuF++mdMjw7YOIAum1gZOpbDscCmLP4hEmP4SCNvy9sb90NouaeGDav
-	bXlhzBXvo+aDy3C9n0QUsebIKY182LFgPL9DRI5Ros2BMEJo9u2T7Fxt/YPwbl/d
-X-Gm-Gg: AYBFou27xZ5EAvIIu44Llxj/KzajndvgapKuVGzWGExu4OIdS2BSa1hnKgSVR1/JqCc
-	fBleogerF0OcTpSBGYFFh3mstYylDpx0S7/jQN1FqXrDmSKzQCU2K8y5YdWVOsROpsm81ewbbNf
-	iRJ8WaG0XS6oqSJ035Pp9aT/tDV4HSCsQ8N1W7DlB0xxrlCltI5x3F1sgw282+mEhLy3pusqnCu
-	6DpzALrJ7ErCBE7RQIxksKWYX77T25pOfdgKcSjGTzE4HNvrkzXThF5NiFUZsYRmm4KZlJXtrXH
-	bs0ZlpwMhaB8JeWb82nhbPidccsyaYT1RfryEIOAzEMaY5dg7EcBJAoMy7GurFMiRMxr+Kjdd8J
-	7Bl5WKOiCTeJ4j64o9KZfPuQ2hVP6s+ddqVpfcBNpo/+aUN6apBD5Kr2FIC2ZbeGdXVag1Uq3GS
-	o4XbyOX3Is38q3wT4mPSkaIS/UsrGitx1Z3RcUB0Nwg/blU8CvZEppb5PXoMSYU3wNooY=
-X-Received: by 2002:a05:6830:2641:b0:7fa:ab72:9e01 with SMTP id 46e09a7af769-7faab72a85fmr17555883a34.25.1788905969988;
-        Tue, 08 Sep 2026 15:19:29 -0700 (PDT)
-Received: from [172.17.0.2] ([20.40.214.133])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f9f7aef680sm16203049a34.26.2026.09.08.15.19.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Sep 2026 15:19:29 -0700 (PDT)
-Message-ID: <6aa089f1.6b931ad5.8783.c687@mx.google.com>
-Date: Tue, 08 Sep 2026 15:19:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4787442392283579959=="
+	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="pDwE8d+8"
+Received: from email.seznam.cz
+	by smtpc-mxb-7db765f675-9qx89
+	(smtpc-mxb-7db765f675-9qx89 [2a02:598:128:8a00::1000:909])
+	id 5656cb1be06c660253d9d153;
+	Wed, 09 Sep 2026 00:29:27 +0200 (CEST)
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=emailprofi.seznam.cz; s=szn1; t=1788906567;
+	bh=iPpGEL8j4HQ/8vdnw58WGEmPElhHmAPA/EwT4tmUFxM=;
+	h=From:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:To:Cc:Subject;
+	b=pDwE8d+8/wBAPrj/mj5GQm6VLANIJklvpA/ObbuShdP7eF+F6DJAjb5sJR9kbJlFV
+	 Y0gIBflw5AONo5rtIMPXCu3X91F1k+E66OEtKaiL+ULF0/inoi1Ih53qIr9JAZbNhS
+	 +jMtgVZt5qX8mDUf5EMFoO2hkubA/08h+c+pwEavT6zbnLFhGjuRruUlph+fhgbG92
+	 nBGE+fXDdsIKxILbf61ePBOduYB0D6PfEYnwi96wAL16Ohnd7KVvyAFdZU8NPwPbmZ
+	 LE8Z+8w8P7h92Pl3H7fbWwkt4toHbNqIS7hsLhC4rW5ZJLhBBllb2s3+VZUo1wDZ3v
+	 TcOHNDgDtJs0g==
+Received: from [192.168.31.57] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
+	by smtpd-relay-57659868b8-gtrjk (szn-email-smtpd/2.0.82) with ESMTPA
+	id 211559bf-2787-4ddd-8474-ea7f5f505cf2;
+	Wed, 09 Sep 2026 00:28:30 +0200
+From: Radek Podgorny <radek@podgorny.cz>
+Date: Wed, 09 Sep 2026 00:28:29 +0200
+Message-ID: <178890650942.186465.6960417770020253183@podgorny.cz>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, radek@podgorny.cz
-Subject: RE: [v2] Bluetooth: put the peer's on-air address on air when we cannot resolve
-In-Reply-To: <20260908-for-upstream-le-connect-on-air-addr-v2-1-2ae9fa066ec8@podgorny.cz>
-References: <20260908-for-upstream-le-connect-on-air-addr-v2-1-2ae9fa066ec8@podgorny.cz>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+    Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+    linux-bluetooth@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: put the peer's on-air address on air when we cannot resolve
+In-Reply-To: <CABBYNZ+5zV8xzhHZKTUQYT4tLHaZAO7iiKOEsKuT8aA+YNLjPQ@mail.gmail.com>
+References: <20260908012048.3681904-2-radek@podgorny.cz> <20260908012048.3681904-4-radek@podgorny.cz> <CABBYNZ+nWb0m=qMvxADM2HvuLhopxG7L+io2JTmGXQM51YOYhA@mail.gmail.com> <178890003160.100543.8134592214245196581@podgorny.cz> <CABBYNZ+5zV8xzhHZKTUQYT4tLHaZAO7iiKOEsKuT8aA+YNLjPQ@mail.gmail.com>
 
---===============4787442392283579959==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Tue, Sep 8, 2026 at 10:59 PM Luiz Augusto von Dentz wrote:
 
-Dear submitter,
+> > One cost worth naming: with the RPA in conn->dst from creation,
+> > hci_conn_params_lookup() in hci_le_create_conn_sync() misses the
+> > identity-keyed conn params [...]
+>
+> That probably worth fixing, but yes it can be done on top.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1160841/
+Ack, I will send that separately. For the record it is only the lookup in
+hci_le_create_conn_sync(): the other conn->dst-keyed lookups run on an
+established link, by which point le_conn_complete_evt() has already put the
+identity address back, so they never see an RPA.
 
----Test result---
+> But if it advertises using the identity, we should connect using the
+> identity as well; there's no reason to use the stale RPA if the peer
+> somehow disabled its privacy.
 
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-VerifyFixes                   PASS      0.10 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       FAIL      0.47 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      27.01 seconds
-CheckAllWarning               PASS      29.77 seconds
-CheckSparse                   PASS      28.69 seconds
-BuildKernel32                 PASS      26.31 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      479.16 seconds
-TestRunner_l2cap-tester       PASS      78.58 seconds
-TestRunner_iso-tester         PASS      108.18 seconds
-TestRunner_bnep-tester        PASS      19.36 seconds
-TestRunner_mgmt-tester        FAIL      220.30 seconds
-TestRunner_rfcomm-tester      PASS      25.94 seconds
-TestRunner_sco-tester         PASS      32.05 seconds
-TestRunner_ioctl-tester       PASS      27.56 seconds
-TestRunner_mesh-tester        FAIL      26.23 seconds
-TestRunner_smp-tester         PASS      24.35 seconds
-TestRunner_userchan-tester    PASS      20.78 seconds
-TestRunner_6lowpan-tester     PASS      24.68 seconds
-IncrementalBuild              PASS      32.91 seconds
+You are right, and my apologies for missing it: v2 as sent does not just
+leave that corner unhandled, it makes it worse than what it replaced. I had
+the freshness window fixed in my head as the answer to the stale RPA, so
+when the timestamp went away I dismissed the case along with it instead of
+looking at what the case actually needed. It needed invalidation, which the
+timestamp was only approximating badly.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: put the peer's on-air address on air when we cannot resolve
+Concretely: nothing ever clears irk->rpa, and v2 removes the conversion in
+__hci_conn_add() that was papering over that. The peer advertises its
+identity, hci_connect_le() swaps the dead RPA back in, and every attempt
+from then on is dialled at an address the peer has abandoned - a permanent
+failure where the code v2 replaces would have connected.
 
-98: B2 Line has trailing whitespace: "--  "
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 495 (98.8%), Failed: 2, Not Run: 4
+So v3 adds the missing half of the cache maintenance ahead of the address
+change. hci_find_irk_by_rpa() already refreshes irk->rpa when a report
+resolves; nothing invalidates it when the peer stops using RPAs. In
+process_adv_report(), in the else branch of the block you quoted first time
+round:
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.240 seconds
-LL Privacy - Add Device 3 (AL is full)               Failed       0.488 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+  irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
+  if (irk) {
+          bdaddr = &irk->bdaddr;
+          bdaddr_type = irk->addr_type;
+  } else {
+          irk = hci_find_irk_by_addr(hdev, bdaddr, bdaddr_type);
+          if (irk)
+                  bacpy(&irk->rpa, BDADDR_ANY);
+  }
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.984 seconds
-Mesh - Send cancel - 2                               Timed out    1.984 seconds
+hci_find_irk_by_addr() matches only public and static random addresses, so
+an unresolved RPA belonging to some other device cannot reach it. The cache
+then means "the last address the peer was seen on is an RPA", which is what
+the swap in hci_connect_le() has always assumed it meant.
 
+That patch comes first in the series, so no commit in between leaves the
+tree dialling a stale RPA. I did not tag it Fixes:: with __hci_conn_add()
+still converting, the stale address is only reachable today through the
+reuse branch of hci_connect_le(), and a stable backport on its own does not
+seem warranted.
 
-https://github.com/bluez/bluetooth-next/pull/725
+The address selection itself is unchanged from v2.
 
----
-Regards,
-Linux Bluetooth
+v3 follows.
 
-
---===============4787442392283579959==--
+Radek
