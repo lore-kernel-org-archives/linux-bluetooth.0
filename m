@@ -1,457 +1,121 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D8B57268F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 17:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788889749; cv=pass; b=Gt/ZxwFewZJ+dbe4zDwK+FKwmFZkmKkEZXB3837NR2EKDoMr07EUbDofC/+rzTZycEgLj2RBweHb8MCeEqzTOpU+OryFPM70B+8y3dVaer2CCNl2D8YLlSWqBEvO1lZtOKlf+N03CFWW6eGBodY+W2D4wxXwpK/IOCQC3X4ijEY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788889749; c=relaxed/simple;
-	bh=QvKcsJZMfzdiqp6rREAMJtehN3Dy1bxClR1B7gs9wIg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nOxAmg9sWjDg3oc1BE2Zh6xjwWVJZBa3jdxdE6ofYqKg5IpctNAX7t89irvXD/pxUPFdTjXO9E8De0tEO0z8pu5VCRn/IBEoRmOSAeEVCWh6nBhjKR46bSIthpLBwlAJMTlx40a8fS2YqRMebtY7dtQh31XyFeKLlKCTaQG/+lM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LC1U2vlj; arc=pass smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0353599A26
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 17:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788890366; cv=none; b=OPwxIsoJzYv85ktqUX9hXD+sJ5cWsvTe6civEZYeK7uRBcOg7SGMDTIvUxGyXZi9yY9v8w+pnWqaweO8d5eEcK2C47yMo4ym87njyemK2qW3PGFkVJai2TWceZiv4v+nzofw0HlTehLACgD2ZP91FF6ZV0aLP3A2mVCo0s2cv+c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788890366; c=relaxed/simple;
+	bh=R2HGKzdukHl36h1c+zIwe4gR7aYbrP4nEazO3YYj7HY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aoip0EBnvUftBfntFMADaYY9nQTZM85xijtH6EdSkLe/PMeG/036UoXFcE0zL2fPQziPey8cN1f4s8bjU/EhEGGB2aj4TFQ9wo/VNb6pCb5hUj4dKZaE9gqqrmcLzGvLt0hmdrgytWdLouXYGuFnyJW8L6ixAkt9egxyWxpahp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qnz5e55R; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LC1U2vlj"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-855c26cf490so35907017b3.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2026 10:49:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788889746; cv=none;
-        d=google.com; s=arc-20260327;
-        b=c9EOkZYSNC7uyFvcKak5zBqKQgEfWIXlifyoGsY1txD9bt5wShGYUSaEvYOOYo2DU1
-         k14TvPvDYLw3JmkvxLvxHlf/tm16CSdlrX2uOANH5Pn6O7Sx5ST9IVvn9V7cMTz3YAT5
-         4QC6Ugh3p1TIovvtcXd7M6GVAyNnqIRmlgn4m8rsZs+IEHoH0rX+FPLsLeoqcqyxW32h
-         T45wCehaatn7kZciaq/8jdUj0j5NKDi1Beb8mKK0GBYKghVzxX1txl3rUsg2L3VhmHI6
-         g/p6d68AM7LhfC3XxHQW5Rgm1aScxqkJr6lfjWB4GlSMvqGSFbYtekMJw7xX8Wx/J33q
-         TU7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Gjh+fudtnf3ic4pfKHp0I+Dx7mXz9NWOnEWBh++w5rk=;
-        fh=fAVvqa29TMCSLQ1BWo+IkeTh9vOt2h2EvlnFWIq0DOI=;
-        b=HitUUYwrZ8Wk6ik2j05DQ5pNIkJZkFsnis2JWHr9HeJKdrk8fh0f2YJ7gb2fRF1aGM
-         1uXiVN9ELMS++IxZQqKG9VFrp0h6m6ycNjCc6ZpftLcMBc646WsnyuFI8PwYfeNzYHq6
-         oFYJuwatMhTXMmXwmEWsrXuvVliCwsnKqezkdShhzlVc6geiCms7FWWxpSL5m/bF9GZw
-         RUQZ6XZBuMzLIORxRdBmttLlQtuuIBeh7uqGezPaogjaDL0LfO/eNo3tlNWJDtcAD5SJ
-         leWMm3t55H2wPgf9wLa5bh8UeRlrbx2TutqAHK3YMGGNDUNjFmq6IMNQQzHjFuS4z7LJ
-         a+zg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qnz5e55R"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-939adff838bso158109385a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2026 10:59:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788889746; x=1789494546; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Gjh+fudtnf3ic4pfKHp0I+Dx7mXz9NWOnEWBh++w5rk=;
-        b=LC1U2vljEKJrokqd41eaifgyG8AGQX6MKdWUwzw/CYyNf7PDXKI6FrihOACnHrnDdY
-         UnVKf3c7FJf74/JD8P3R71UKmmvUi063qNYEZXCdWPkFPhmL1kblF10b7Xm2DU6mWKji
-         gM3QjyEs90BYqEIZrqZJaoUOZ7PiCX9AVkQEyfaTO30MCuqRTKWDDTa96H7UWIaUH46c
-         X0qdoXz2DfUMC9N44UudIbyZBOOIge4g/8DS77EpYu3d70iFLsX0k/CFNdUiHcHlxIDx
-         uJRHHGvVCH0XfxAqy8lFLqZP3+bnHeN0ZK9zINeeanyAiROqvJ9ooqQn4kIJWBppa+yR
-         EhGw==
+        d=gmail.com; s=20251104; t=1788890363; x=1789495163; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Gw/goLXsZpEeap7V81kl4+x5WfgV5oqJpK0Tlvxy9nE=;
+        b=qnz5e55RhHbRf4Trv7Qe5CaqNAtRQs5b1Kx2LqeYy0egGwPX3/ZrnveODbaMPSEJUL
+         JHz4Ud7VFW2qkllMxnEy2DA+j3KvQSU3/2L0VO0ZaaHwtf6GcqPw2rBWdVDFF/LEr40z
+         iV5PIK2PBROPXMVSHWafQXNmL7PcFyTopPvQVPYf8uHt50oxiXrYeXu6N14ptr7G3zN5
+         qCg3sUfmnCWKlFVoYmB5h6+VcCUq3+FraznFI97+fK+GTZN+/H2Xx7Hsas3/EiFmRQwY
+         JE1s1S5H+Wne5qkuMbT2Gt3HkBqPsxh/0gdGs3NFo/5On+iUZDDKK5UDggGYLwB9xWKN
+         9QwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788889746; x=1789494546;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Gjh+fudtnf3ic4pfKHp0I+Dx7mXz9NWOnEWBh++w5rk=;
-        b=W2gUwPx4/oLR7nn1+HlwdJuASTV8tYQ057YWBG/69Q2xT13DAVyolXuv56BSHZFCrt
-         UihDiuEKhUmtZER4oail7BmekBZHkvfTgjUAmaUFmW/bQLHj5/1wntS+iABgeD2Oaivl
-         fChnX+svj4yCEN1Gex8K//NQ2hDT2NVwFbXGqX5Q4egDPztWMy9OrmktcPi4rzN5Ms4D
-         7ZFcSkabSXU1M0ceLougfoFwtk8UgbpeAopLKutYfBwPxeYTLw9rji3F/NEoYlcIg5IA
-         CzvnDz2G/ND4aUsS3ZcWvqVQn8HE3PT94CqbWJx8UtP11OTFJKZ7tVb57DYgH4x5pc/r
-         4ePw==
-X-Gm-Message-State: AFuF++nTZZphmDlyWwUa1HFVcJuUJL+qgsH0+im8wgPCWd5QQ8umv+FD
-	HYAekLStT1DmlMK3NjcUqApRGRTMn2DrfkPLN/FVQQcc3kbZS9eDSYw5MDif/YNFCFI3QEo2oO+
-	KnhJBcURvxIgk54ZqpMYW9R5qOaUAiAeiNNpzvIywJg==
-X-Gm-Gg: AYBFou1sO3PqKUcAQf10yyjTNihdHCTSq1bCBmdJ694Jf7GPLi2Ous/2ugaUOmQIvbk
-	NSyRxERU5WN9J/iUgGrhunnGup9IH46VPKwBxQYGA069pymiiHWHjgUx2FdiewDu8Sf/DFJQc6J
-	QbK+f/UtxOls7nSgFF67oa4npBXTDDpXhvR1ZNWDlRnthxFawSIa8fISrU1XwxzzNISkm4PTTVg
-	bIDabCHP13ts/kZuwmgVjJ01lN4tHc9AIjK0JuPeUnM8p2llyr5mTp3vEOCqzeJFuoqMv6nQp7/
-	Gw8zt3zq3dsw876uXKYEeQUcjmNMTdiS3/prCLtG4L2cqCOyaY7GriMFAlNk7A8X7zRMA7XtYPg
-	ZbYOj//wGRhoYEwrpF2d6xp7+Ch1j5+0=
-X-Received: by 2002:a05:690c:d8a:b0:81e:fe1c:2de8 with SMTP id
- 00721157ae682-8712259efb1mr128529567b3.3.1788889745929; Tue, 08 Sep 2026
- 10:49:05 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1788890363; x=1789495163;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Gw/goLXsZpEeap7V81kl4+x5WfgV5oqJpK0Tlvxy9nE=;
+        b=sQaIw/0v6Eh9QvTp/tTsQW//rYCj9+wz/QbkV8ER/lL1RRHJ9vtXXQHWAcJDC+QZjo
+         L4CKvKz5aHqPJ9ri+vbx4AzcnORFFDC/eFWEg2UsJsc+TTYwOxOjCPFxaOLJeMdrRIFR
+         3pOUJ9dvnD9Bvc7OyUP+pbeVJAsqPuuGCf41BIPmFjKJ0+xHaQC7hWH0t2BCJV21rqEZ
+         Y9pQw0IZtoDAMi9DUAnZH9uVJg0hmfSCKXo+S8qicd7wXrSzGce13fADygx7JuUqrL0n
+         n70ea9j78u86c88zAxNv1dg8lPW66Cpz/ju0EY6cDirlJKzWgXSECKXiVCiEf5+7KLmf
+         9TRw==
+X-Gm-Message-State: AFuF++nc6EhX4jJw8ib3wk9yOXFWFFL6Y4T+qdShljVvsdqTBRZh6QZ5
+	G143RL7a+XmEhDcnRnw4SVwAPYzGCu75kbSo5DbFK9jF9lkfncShQn8ahgufGw==
+X-Gm-Gg: AYBFou0E6HkOhpOYYwHbTjzoNRWSsqNrHLIHFitClUz5MEZFuAzRlGoN2/uV1sApOkk
+	p1R+NyKg8HkcgfT4Tt5dMoqR3tLAbkKFlGR2+MuCkUw2LfPtbViMbOPYsXR+fPny6c6txhVs5ru
+	+anUCziExiPtRgPu02paAUm/VAwOIcMXovE0NA4K6ElUZYTYA+K8/yrv4MIDpBGk/O44nbqTsOU
+	rx0ojYWCcNP1I9UxGSmHmwYs6Z8a2S7J7eT2uoPQhaRSQ1Tm/eIGHVl99kh4CsqxbYm/3bRHUGv
+	+rIa6CbyFnNfSQC17GFtr1lq6ymRmFq5TyW9S0Usmgk885goeLNwv2kqpOsnR9fZkLiXYLJ2ds0
+	yB+/XyNMSNUCfFVtktuwJzYf/I7X8pd6QMjNumzOObW/jQZdNt3LO3oVA7/dhmPkaxiwaAJt64T
+	SSrGpE7B2TMedb4Sf7fExMa4gr8NkQ2luh3RXYzlzxm/r/ixiSJIrSe/M/D8O3XGK3SQ==
+X-Received: by 2002:a05:620a:8083:b0:939:6dea:374c with SMTP id af79cd13be357-939804f9df0mr142825285a.48.1788890363332;
+        Tue, 08 Sep 2026 10:59:23 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.199.48])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-939b0aa9a29sm450208185a.7.2026.09.08.10.59.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2026 10:59:22 -0700 (PDT)
+Message-ID: <6aa04cfa.fc99aab0.997d8.0d4f@mx.google.com>
+Date: Tue, 08 Sep 2026 10:59:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9185308937744531567=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1788712996.git.pav@iki.fi>
-In-Reply-To: <cover.1788712996.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 8 Sep 2026 13:48:54 -0400
-X-Gm-Features: AcwNN1UtODTar-a3eWw6OlvRSvZyKgFs8TmE_7j3gsFcGFLMm4v6-5DOATAIiMQ
-Message-ID: <CABBYNZLjfcz1SYo=0gAn6jz8hhOa2AKUs-OtTsUAz1YB=CbO-Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v7 0/9] Functional/integration testing
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: client/btpclient: Add BAP/ASCS/PACS support for auto-pts BAP tests
+In-Reply-To: <20260908170633.510244-2-frederic.danis@collabora.com>
+References: <20260908170633.510244-2-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============9185308937744531567==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 6, 2026 at 12:50=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Add framework for writing tests simulating "real" environments where
-> BlueZ and other parts of the stack run on different virtual machine
-> hosts that communicate with each other.
->
-> *** v7 ***
->
-> * Bump to pytest-bluezenv=3D=3D0.1.9 (better core dump / oops reporting)
->
-> * Add test/functional/test_adv_monitor.py (one crash POC test)
->
-> * Add test/functional/test_avrcp.py (one crash POC test)
->
->   Note that current bluez master branch does not pass this one,
->   it is fixed by
->   https://patchwork.kernel.org/project/bluetooth/patch/20260901175315.134=
-8621-1-luiz.dentz@gmail.com/
->
-> * Add test/functional/test_kernel_testers.py (runs tools/*-tester)
->
-> * Bump VMs to 400M memory, ASAN builds on Ubuntu need it
->
-> * Make tests fail on core dump / kernel bug
->
-> *** v6 ***
->
-> * Fix minor issues in documentation and shellcheck warnings.
->
-> * Bump to latest pytest-bluezenv=3D=3D0.1.6
->
-> * NOTE: hci_uart is partly broken in current bluetooth-next / 7.1 kernel,
->   which causes some of the tests here fail sporadically. Needs the follow=
-ing patch:
->
->   https://lore.kernel.org/linux-bluetooth/6888691461070a011d31632e6dcbfd7=
-3016dcc6e.1781364475.git.pav@iki.fi/
->
-> *** v5 ***
->
-> https://github.com/pv/bluez/compare/func-test-v4-r..func-test-v5
->
-> * Factor out the pytest-bluezenv plugin, to be maintained separately.
->   https://pypi.org/project/pytest-bluezenv/
->
->   It could in principle be moved under the BlueZ organization, but
->   there's no particular reason why it should be in bluez repository.
->
->   Generally, it's better to have the pytest plugin separate so it's
->   easier to reuse and can have its own version cycle.
->
-> * Pipewire tests are moved to pipewire repository where they probably
->   belong to.
->
->   They can be run easily vs. given BlueZ build dir.
->
->   We are currently running them in Pipewire CI, but at frozen
->   kernel/BlueZ version, so it is not testing BlueZ/kernel upstream
->   development.
->
-> * No changes in the emulator/test-runner patches since v4
->
->   They are stand-alone bug fixes / improvements, and make sense
->   also separately from the rest.
->
-> *** v4 ***
->
-> https://github.com/pv/bluez/compare/func-test-v3-r..func-test-v4
->
-> * Use virtconsole for simpler HCI forwarding to the vm
->
-> * Fix typoed vm_module -> vm_once
->
-> * Skip tests for some pipewire versions
->
-> *** v3 ***
->
-> https://github.com/pv/bluez/compare/func-test-v2-r..func-test-v3
->
-> * fix configure.ac openpty() detection to match TOOLS conditional,
->   to fix make distcheck
->
-> * properly retry virtio RPC connection if it fails initially
->
-> * properly restart VM if previous test hangs
->
-> * allow custom parent host side proxy objects, use them for pexpect
->
-> * improve --list with out-of-tree test files
->
-> * fix missing bus.set_exit_on_disconnect(False) for obex tests
->
-> * have --vm-timeout etc. change values also on VM host side
->
-> * use larger-memory VM instances for Pipewire, in case ASAN enabled
->
-> * set reasonable inside-VM ASAN_OPTION default values
->
-> * don't run btvirt under stdbuf, since not compatible with ASAN
->
-> *** v2 ***
->
-> https://github.com/pv/bluez/compare/func-test-v1-r..func-test-v2
->
-> * move unit/func_test -> test/functional & test/pytest_bluez
->
->   The pytest_bluez plugin is in principle reusable for other projects,
->   so we can eg. have more complete Pipewire integration tests that can
->   live in Pipewire repository.
->
-> * openpty() is in -lutil on some platforms, detect this in autoconf
->
-> * more emulator adjustments:
->
->   - fix SCO data packet support in btvirt
->   - more complete Reset command
->
-> * improve logging: get timestamps from kernel, and reorder logs
->   to timestamp order, so that lines from different hosts, btmon,
->   and parent tester appear in right order regardless of whether
->   VM console / btmon is lagging
->
->   - this requires accurate clock sync in the VM, so enable KVM PTP in
->     config and run chronyd inside the VMs
->   - use virtio port instead of qemu console to export logs, since the
->     console has fixed baud rate and is too slow
->
-> * add --btmon & export btsnoop dumps from VM hosts
->
-> * fix compatibility with older Python versions
->
-> * add parametrized_host_config()
->
-> * split Pipewire test to A2DP/BAP/HFP and really stream audio.
->   These catch the 5.86 regression fixed in 066a164a524e498 and
->   the 5.84 one in 6b0a08776a
->
-> * add support for tests that reuse tester environment, so they can run
->   faster without needing Bluetoothd teardown/setup in between
->
-> * add HostPlugin.presetup (mainly for test skipping)
->
-> * deal with RPC virtio port buffer possibly containing unflushed
->   commands from previous failed test
->
-> * add some Agent1 interface tests
->
-> * add basic Obex file transfer tests
->
-> * add support for logging in to a running test instance (for gdb etc)
->
-> * export any core dumps out from test environ
->
-> Some bells & whistles:
->
-> * add --kernel-build for kernel image build
->
-> * test suite Python code formatting checks
->
-> ***
->
-> Implements:
->
-> - RPC communication with tester instances running each of the VM hosts.
->   Tests run on parent host, which instructs VM hosts what to do.
->
-> - Extensible way to add stateful test-specific code inside the VM
->   instances
->
-> - Logging control: output from different processes running inside the VM
->   are separated and can be filtered.
->
-> - Test runner framework with Pytest (more convenient than Python/unittest=
-)
->
-> - Automatic grouping of tests to minimize VM reboots
->
-> - Redirecting USB controllers to use for testing in addition to btvirt
->
-> - Fairly straightforward, ~1600 sloc for the framework
->
-> There is no requirement that the tests spawn VM instances, the test
-> runner can be used for any tests written in Python.
->
-> See doc/test-functional.rst for various examples.
->
-> Also test/functional/test_bluetoothctl_vm.py has some simple cases, and
-> test/functional/test_pipewire.py for a more complicated setup
->
->     host0(qemu): Pipewire <-> BlueZ <-> kernel
->     <-> btvirt
->     host1(qemu): kernel <-> BlueZ <-> Pipewire
->
-> The framework allows easily passing any data and code between the parent
-> and VM hosts, so writing tests is straightforward.
->
-> Pauli Virtanen (9):
->   doc: add functional/integration testing documentation
->   test: add functional/integration testing framework
->   build: add functional testing target
->   test: functional: impose Python code formatting
->   test: functional: add some Agent1 interface tests
->   test: functional: add basic obex file transfer tests
->   test: functional: add tests running the various kernel testers
->   test: functional: add test for adv_monitor crash
->   test: functional: add test for AVRCP crash
->
->  Makefile.am                            |  10 +
->  configure.ac                           |  22 ++
->  doc/test-functional.rst                | 331 +++++++++++++++++++++++++
->  test/functional/__init__.py            |   2 +
->  test/functional/conftest.py            |  76 ++++++
->  test/functional/requirements.txt       |   3 +
->  test/functional/test_adv_monitor.py    | 123 +++++++++
->  test/functional/test_agent.py          |  47 ++++
->  test/functional/test_avrcp.py          | 281 +++++++++++++++++++++
->  test/functional/test_bluetoothctl.py   | 161 ++++++++++++
->  test/functional/test_btmgmt.py         |  34 +++
->  test/functional/test_kernel_testers.py | 178 +++++++++++++
->  test/functional/test_obex.py           | 275 ++++++++++++++++++++
->  test/functional/test_tests.py          |  24 ++
->  test/pytest.ini                        |  25 ++
->  test/test-functional                   |  21 ++
->  test/test-functional-attach            |   7 +
->  17 files changed, 1620 insertions(+)
->  create mode 100644 doc/test-functional.rst
->  create mode 100644 test/functional/__init__.py
->  create mode 100644 test/functional/conftest.py
->  create mode 100644 test/functional/requirements.txt
->  create mode 100644 test/functional/test_adv_monitor.py
->  create mode 100644 test/functional/test_agent.py
->  create mode 100644 test/functional/test_avrcp.py
->  create mode 100644 test/functional/test_bluetoothctl.py
->  create mode 100644 test/functional/test_btmgmt.py
->  create mode 100644 test/functional/test_kernel_testers.py
->  create mode 100644 test/functional/test_obex.py
->  create mode 100644 test/functional/test_tests.py
->  create mode 100644 test/pytest.ini
->  create mode 100755 test/test-functional
->  create mode 100755 test/test-functional-attach
->
-> --
-> 2.55.0
+This is automated email and please do not reply to this email!
 
-It took me some time to figure out how to pass the kernel to
-bootstrap-configure/configure, perhaps we should update the
-documentation regarding make check-functional and make check:
+Dear submitter,
 
- > bootstrap-configure --enable-functional-testing=3D/pathto/bzImage
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1160712/
 
-After this, there still seem to be some errors, I guess the kernel
-testers we should consider the tests unstable until we fix them all or
-perhaps we should skip them for make check[-functional] because they
-are really kernel testers not bluetoothd, but it also fails with the
-new AVRCP test:
+---Test result---
 
-test/functional/test_tests.py::test_formatting PASSED
+Test Summary:
+CheckPatch                    PASS      4.98 seconds
+GitLint                       FAIL      2.46 seconds
+BuildEll                      PASS      16.42 seconds
+BluezMake                     PASS      490.48 seconds
+MakeCheck                     PASS      19.26 seconds
+MakeDistcheck                 PASS      126.54 seconds
+CheckValgrind                 PASS      179.69 seconds
+CheckSmatch                   PASS      235.94 seconds
+bluezmakeextell               PASS      75.90 seconds
+IncrementalBuild              PASS      548.21 seconds
+ScanBuild                     PASS      714.43 seconds
 
-          [  3%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-m=
-gmt-tester]
-XFAIL (Read Exp Feature - Success)                               [
-7%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-s=
-mp-tester]
-PASSED                                                            [
-11%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-l=
-2cap-tester]
-PASSED                                                          [ 14%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-r=
-fcomm-tester]
-PASSED                                                         [ 18%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-r=
-fcomm-tester]
-ERROR                                                          [ 18%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-s=
-co-tester]
-PASSED                                                            [
-22%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-i=
-so-tester]
-PASSED                                                            [
-25%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-m=
-esh-tester]
-XFAIL (Mesh - Send cancel - 1, Mesh - Send cancel - 2)           [
-29%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-i=
-octl-tester]
-PASSED                                                          [ 33%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-b=
-nep-tester]
-PASSED                                                           [
-37%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-u=
-serchan-tester]
-PASSED                                                       [ 40%]
-test/functional/test_kernel_testers.py::test_kernel_tester[hosts7-vm1-noc-6=
-lowpan-tester]
-FAILED                                                        [ 44%]
-test/functional/test_kernel_testers.py::test_kernel_selftest[hosts7-vm1-noc=
-]
-SKIPPED (CONFIG_BT_SELFTEST not enabled)
-    [ 48%]
-test/functional/test_adv_monitor.py::test_adv_monitor_GHSA_hhgc_hfgf_8m4x[h=
-osts0-vm1]
-PASSED                                                            [
-51%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_show[hosts3-vm1]
-PASSED
-        [ 55%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_list[hosts3-vm1]
-PASSED
-        [ 59%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_script_show[hosts3-=
-vm1]
-PASSED
- [ 62%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_script_list[hosts3-=
-vm1]
-PASSED
- [ 66%]
-test/functional/test_btmgmt.py::test_btmgmt_info[hosts6-vm1] PASSED
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,7/8] client/btpclient: Defer CIG/CIS assignment based on Client/Server role
 
-          [ 70%]
-test/functional/test_agent.py::test_agent_pair_bredr[accept-hosts1-vm2]
-PASSED
-         [ 74%]
-test/functional/test_agent.py::test_agent_pair_bredr[reject-hosts1-vm2]
-PASSED
-         [ 77%]
-test/functional/test_avrcp.py::test_avrcp_GHSA_m2vx_pw5f_rc8v[hosts2-vm2]
-FAILED
-       [ 81%]
-test/functional/test_avrcp.py::test_avrcp_GHSA_m2vx_pw5f_rc8v[hosts2-vm2]
-ERROR
-       [ 81%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_pair_bredr[hosts4-v=
-m2]
-PASSED
-  [ 85%]
-test/functional/test_bluetoothctl.py::test_bluetoothctl_pair_le[hosts5-vm2]
-PASSED
-     [ 88%]
-test/functional/test_obex.py::test_obex_ftp_list[hosts8-vm2] PASSED
-
-          [ 92%]
-test/functional/test_obex.py::test_obex_ftp_get[hosts8-vm2] PASSED
-
-          [ 96%]
-test/functional/test_obex.py::test_obexctl_list[hosts8-vm2] PASSED
-
-          [100%]
+1: T1 Title exceeds max length (85>80): "[BlueZ,v2,7/8] client/btpclient: Defer CIG/CIS assignment based on Client/Server role"
 
 
+https://github.com/bluez/bluez/pull/2502
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============9185308937744531567==--
