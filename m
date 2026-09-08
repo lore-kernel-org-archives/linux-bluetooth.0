@@ -1,125 +1,99 @@
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.78.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9094836F91B;
-	Mon,  7 Sep 2026 23:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.78.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDB44A32
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 00:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788823499; cv=none; b=kbw+0EuKlOi16BDoKY+mxiFX0IHK3q9yT6gXaR4wqpEoPSIzXTuZSoZQD3ArLt2pMytU5/KePG8UtZ2rWkeox1z5eOkeXehR1aBugowZYjMdBzN/+GOWz7p0PzBcvh5Vs0pwjogX7I1OdVwraA/lfz4IvmRqO8YZUGDWzOdBmzg=
+	t=1788825826; cv=none; b=KuLvv/c6vd4luFkC7ts2fLOXUxVXRXgDtHOUhKrbNim4WEqaJ1asw8GXjzgsm7YQzh1vSh+P74nVbcmmHUFyxig8aNKh3/YlTCRQ6zbl0iaEh1DAXZ9OU4GqSpyxYwjfJIATTVurUEST2i2dUtLh3HO20Ww8WsYD3WEOkwOom/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788823499; c=relaxed/simple;
-	bh=OhIW2M7BxV6zinvDvuXBBuN1jSBlx14delyvj5Ry7f8=;
-	h=From:Subject:To:Cc:Date:Message-ID:MIME-Version; b=bt8oJAZnoYPo/6MkB4VeAcMkFXxivgJkHQkJHYwqYt/LycRElTGOSD3MJqwX5s7DQuAV4m+T8LuNNwGr6UF5t8aI7AZwhzRaFSybg+K2/ZjxXj2+IvR+hfMLnIaT8Kfw6A6ws2HWh6yQqi+yWtlnKdM+1P+d4rnCUjeLDdVLOMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=RSwwM66I; arc=none smtp.client-ip=77.75.78.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+	s=arc-20240116; t=1788825826; c=relaxed/simple;
+	bh=PxbWAOfpmXyJs2qWNLJ+mtPcwsJ2Lgc0lFivejUqLvg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=vETjSyfdG3XjVRTpRc0Ig8SjL1+50u9CxiRzjL5k+1AXpuPpioA90BM/f6pU4A7czgxHNXqdqPYNvE6BtSY+NWTLoiZKcZtyXmHgphZTHXymqmUlY8IEmBYPx4fQp5hDU5UqhdrQbK2AC4WuirohLFD6iFbsRe2y8jUK9k5+VDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBxxOgI4; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="RSwwM66I"
-Received: from email.seznam.cz
-	by smtpc-mxb-7db765f675-zvm85
-	(smtpc-mxb-7db765f675-zvm85 [2a02:598:64:8a00::1000:90b])
-	id 3b6855668d52f87f3ee74f2e;
-	Tue, 08 Sep 2026 01:24:55 +0200 (CEST)
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=emailprofi.seznam.cz; s=szn1; t=1788823495;
-	bh=+VV3LiVXiqw5UBzA1dLk15tFV+rmus5FsHiDdTH2bik=;
-	h=From:Subject:To:Cc:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding;
-	b=RSwwM66IiEoG0t9edn3Hajeyleb1sVAMmEhNaFQehAv+jYb5ENJV3wb2gfqitfuU+
-	 EunPCv47A9POF1oVHmJG4Gpuoyjc/y0t1RQNwd4NRMbe9IQP9yBOILoRkwgEZuvtMn
-	 qWlah9+70IYPuG9YgM75PJKakyUhLfP5W6wwoKo7e9rLkORQNCAkxue+WfE8UYK4D5
-	 UdsqI6+fRp9xzZlpSsmCBuv5yzCritMxS0DOwsxuQAZ6RHWWOITvTZaIdZIrEzE7tW
-	 mhAJhhENlfuumywgWW3NLUe/IEVjNc8OHjeVo7Wf0SSmioMzNtv4EtFaeKLPEJz9y0
-	 tAEPhpYIuwp2g==
-Received: from [192.168.31.57] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
-	by smtpd-relay-57659868b8-2vb45 (szn-email-smtpd/2.0.82) with ESMTPA
-	id b9c6903e-bfbc-4d52-8210-1f3b09b5ad19;
-	Tue, 08 Sep 2026 01:20:50 +0200
-From: Radek Podgorny <radek@podgorny.cz>
-Subject: [PATCH 0/2] Bluetooth: dial the peer's on-air address when we cannot resolve
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Radek Podgorny <radek@podgorny.cz>
-Date: Tue, 08 Sep 2026 01:20:48 +0200
-Message-ID: <20260908012048.3681904-2-radek@podgorny.cz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBxxOgI4"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-9399daa3c8eso165683685a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Sep 2026 17:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788825824; x=1789430624; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=PxbWAOfpmXyJs2qWNLJ+mtPcwsJ2Lgc0lFivejUqLvg=;
+        b=UBxxOgI4Sgd94wFqWAiHMeeJLnhA0AnuiHaEouL+CxoQKqo1zVoRELpYWiHRHFl+wk
+         OgXVeB7VOW/mfwSkqbb8Of46PnCRW3x6SwFDJcxa+dfyoIs3XvSJ4Txr5CuvPtBXGkB4
+         tQPaH8XMRgjuSIAfXywNk4b7rCxImIf+B56dhrrFn9jd4fV7kwRT/ckFn5SNNIXJx2eg
+         KUwVNpXP57cQgq8trL4LIoddk01DYanZTdMxqP6C/ojhTZHbsW2oqcj5YISpS0Ta3Y1m
+         5WAVyLi/1Gm4RMnT0W4eaa1ylMtfJEZRF06NME+zntfVes9R/YrEABYji4Eoz18sE2X8
+         SpBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788825824; x=1789430624;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=PxbWAOfpmXyJs2qWNLJ+mtPcwsJ2Lgc0lFivejUqLvg=;
+        b=gstG9IRI5H6DgqZKde3k5ogV3OWMcHc813C4ksAltLfatrZoEUkaViJ/MYKed+Rl4e
+         R7Z1dv8UYcBkgeSeDW79czMc8oL/P4ZXQ/HHDoay5KqO/nxWTscnV70zAOxy5eCevnzt
+         1b8jGAoJ/NKAJVAAC/plm7ynQYoYNK/od7hJNRihjuWPy2vj8zS64eQDkcGXG3m18Lqm
+         IUPH8r5r8ZkwiIUidMK0H4xXMfnJIylOh+d326k0EjCKSFMhHLPFWkE6n/8w4RPL2nHU
+         1V5UVwDQx9T/gY5DZYcnJd+OVAQVVdyZC7NnJZ8GMz/qRviwY1DAmyQwT65p1oWe/a4O
+         Agnw==
+X-Gm-Message-State: AFuF++nPiPzurzBk/iwNXCOyDT4Zo2koIwnjx9+/CfALvwzWIh7N8ECi
+	rV9+GqzfJdBjuWKLzSNFeNctLXPDjX7Lmwl1DzjaybfDS3aWX5UhWeP7oFvxMw==
+X-Gm-Gg: AYBFou2etLYdJCeJc0KdEWpzcTIn/Yi313aY+3s9cTAG0Jl40aj+/+h1mwWbHWpZotT
+	Agmy0b42o8SULnO1dSwIe8Vsz1PmjN390kWAOeZReMSNjHxR7+OfsqMfioRrh4McokE7z1BSxpa
+	HYxhDjzFggjGenXJLcTUkxe/w32dMS6xTE+/7MLxoFMLfopZ2qgjw4rsVcc2QiSfjTSgk3PTWqk
+	7AIu76vpVvxRniOgrSgvhmLv0ht5TEfO4hEtVpPeRm+Ob9Kv3XElkk03fDZqm+3MgHSFz/1eZhp
+	3U63nm569VPM+jf2vyHqC/phSz2RV/Knke7x04RfVh3rEVOYShCBJP8ygfJvfkaU/80cLYMaAiE
+	Rj5j7gpltdCbCr2yMCyEBI/rNKKseLNVEpduraX3lwJ6C7C7tmoBj/IFSvt/gDyW2VBsFHhOGeB
+	42eYw8mAPz9HcemDEb/ADh9jppRs6Dgm85rt6tmgNtKjIea+PcHUHw2GzzbJNul8R4miPu
+X-Received: by 2002:a05:620a:8083:b0:939:6dea:374c with SMTP id af79cd13be357-939804f9defmr2701879185a.48.1788825824213;
+        Mon, 07 Sep 2026 17:03:44 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.133.195])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9397fb6e95csm990469985a.31.2026.09.07.17.03.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Sep 2026 17:03:43 -0700 (PDT)
+Message-ID: <6a9f50df.6f91ca5b.2182e6.fef9@mx.google.com>
+Date: Mon, 07 Sep 2026 17:03:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7663596685888399565=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Mailer: python-smtplib (git format-patch body verbatim)
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, radek@podgorny.cz
+Subject: RE: Bluetooth: dial the peer's on-air address when we cannot resolve
+In-Reply-To: <20260908012048.3681904-4-radek@podgorny.cz>
+References: <20260908012048.3681904-4-radek@podgorny.cz>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On a controller that cannot resolve private addresses, an outgoing LE
-connection to a peer that is advertising an RPA goes out on the peer's
-identity address and cannot succeed. It burns a full create-connection
-timeout, and because such a controller also has no extended scanning it
-cannot scan while it is initiating, so the adapter goes deaf to every other
-device for the duration.
+--===============7663596685888399565==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Patch 2 picks the address to put on air instead of assuming conn->dst.
-Patch 1 is its prerequisite: choosing a cached RPA is only safe while that
-RPA is still current, and nothing recorded when one was last seen.
+This is an automated email and please do not reply to this email.
 
-Measured on a Raspberry Pi with two controllers, a CYW43438 as the central
-and a Realtek dongle as the peer, Arch Linux ARM 7.2, BlueZ 5.87. The peer
-advertises an RPA generated from a fixed IRK that is also loaded into the
-central, so advertisements resolve and the conditions the patches care about
-hold. Numbers are in patch 2.
+Dear Submitter,
 
-Neither of those adapters reports LL Privacy, so the branch that defers to a
-controller's resolving list was measured separately, on an Intel controller
-that does. With the peer programmed into that controller's resolving list the
-host puts the identity address into LE Extended Create Connection, and the
-controller resolves it and connects:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-    LE Enhanced Connection Complete (0x0a)
-            Status: Success (0x00)
-            Peer address type: Resolved Public (0x02)
-            Peer address: 3C:78:95:78:37:C3
-            Peer resolvable private address: 6D:CA:DB:24:14:E9 (Resolvable)
-
-Before the peer is in the resolving list, the same setup dials the peer's RPA
-instead. So both directions of that branch are covered: the host defers when
-the controller can translate, and substitutes when it cannot.
-
-What this series does not establish:
-
-  - Patch 1 has no independent observable. It ships as patch 2's
-    prerequisite and its effect is only visible through patch 2's behaviour.
-
-  - Three controllers, one peer, two kernel versions. The fallback branches
-    were exercised on a CYW43438, the resolving-list branch on one Intel
-    controller. The peer is a Linux host running BlueZ rather than an
-    embedded peripheral, so nothing here speaks to other stacks.
-
-Two further patches were carried in earlier revisions of this work and
-dropped after each was built and measured on its own; neither turned out to
-have a reachable effect. An earlier form of one of them also corrupted
-Secure Connections pairing. They are not in this series.
-
-Tooling: written with Claude (claude-opus-5) assisting, per
-Documentation/process/coding-assistants.rst, hence the Assisted-by tags.
-The session covered reading the existing address handling, drafting the
-patches, and analysing the btmon captures. Every hypothesis that could be
-tested on hardware was tested there, and the ones that failed were dropped
-rather than argued. All patches are checkpatch --strict clean and build
-without new warnings.
-
-Radek Podgorny (2):
-  Bluetooth: record when an IRK's RPA was last seen
-  Bluetooth: put the peer's on-air address on air when we cannot resolve
-
- include/net/bluetooth/hci_core.h |  4 ++
- net/bluetooth/hci_core.c         |  4 ++
- net/bluetooth/hci_sync.c         | 82 +++++++++++++++++++++++++++++---
- 3 files changed, 83 insertions(+), 7 deletions(-)
+----- Output -----
 
 
-base-commit: 755cf7adf8dd2d12627cb7de223d35b12228e2f5
--- 
-2.55.0
+Please resolve the issue and submit the patches again.
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7663596685888399565==--
