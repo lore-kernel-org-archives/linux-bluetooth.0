@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262B756E057
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2026 16:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3711584950;
+	Tue,  8 Sep 2026 16:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788885093; cv=none; b=qYEDpdJoaIS9e9rqvvEe76C6VUShqVfIECvGZVNSBAak75+1SMGA4wnQWpFIl6vSfjhxyNORx4a2o3UNaulCQza9RbUeIxnI13X8sPI4/7p6ewfneyCbELaa63F7V3784W5xdY3vCNl2nZXdeN3dXtNRyCsUfxniJ2rOpbSWJL0=
+	t=1788885095; cv=none; b=uifZ5iLjPO5pDYa2fY6yixnUD5X+hO5neM76SkE7m0neZXgGNKIa/5BolaecnxxnOdDAQ1CXZEn/k5BEJYi1yVME45cJaFiciFvDWKaUCc1CJCRKkccGYuxbV8AGC+aOoK1RgGA3fy49Zf2rAyuPIQ/FFV2YtUXN9ulrEi5yE3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788885093; c=relaxed/simple;
-	bh=j/zvVx4+9ksW0xv6BZloOoS6voLGtHMCJse1VO216s8=;
+	s=arc-20240116; t=1788885095; c=relaxed/simple;
+	bh=6YdikH69pDVCDQRGZNlif1fc6llKfnOJnag9WU+oYw0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bWbGDJtNedtry5I21+ZKi8l0a85k443jwQdm4Hz18yrhCxNdl7/4QtrcQBFBe0BvvWlpt+ZfvVyyMzNVAH5zmMFD1WFwv7W//oKFohoqXfAKxvi3P8+X1pLOxNrYIm4Eag0LX27o3GrVYzyeUonTlo0YyOm/3uaQ/6l8COB2yF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxl5OaaJ; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=vGhYYn5H4lcRrhfso+AKMHW8/qfEcBC6/hhoZtEXYpCv4vYZ+jkqGyoAztS6pdo9itgXTAoTJz2B9Zqhowoo8FPrQzYAOuvVGn+NV1e3oDqKZt2M4owbcPUHj41tiScIYn+YKa0stCxUG0aGC4YFMHBBWRvRa28txrr8irk5Wyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbEWVLZo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxl5OaaJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576D1F00A3A;
-	Tue,  8 Sep 2026 16:31:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbEWVLZo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDD421F00A3D;
+	Tue,  8 Sep 2026 16:31:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788885091;
-	bh=vQLW6v8zZh4R1+zsm7p5N3XyW8u1rNotN2vUmCt3Gv0=;
+	s=k20260515; t=1788885092;
+	bh=L6ETMy1hFkoiR6zVprxkJPZ8mYcnoca35fwVV/7h1ro=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=oxl5OaaJYDc3ug9PQW7W9c8TKjmoEPEKsNW9ileG8hqj6syul6ON9smwGEGQjkcrj
-	 o428OI6m0GUapCKF3noHJK+yTS+NTd1yrSRryY3puslhsnz8smU+BqwCvZfPj6GeLr
-	 f6gEivUiH+UvC11slIxYdybFqafUa6tbqylJ3OG32MSMWWYG2FEd04alYPDhpBdX+b
-	 ZP18/Kig2iK3+H32UjwpGKzBkQ+4rh9fh5BlZtd5tKclLiFvt3z+eQ18i/KWmYciAl
-	 5lJtJqCkKFJ2Da2hVaZaY2IOTPlWK+RSOGy/IIbt0vokxp7GsGDrQuNMZuNrk2BmLh
-	 Ipft3bOv5w7Pw==
+	b=IbEWVLZovFidHQqTocXFv1qY4a93AEk5lCbHtQp8W80mxy0tmuICXupoFif9TC9fs
+	 6PgqdOoHaqO4EI0ln6qT9stH37Ne3YwoSaY6/qmCjHcgD9W4oqPUW1lA0kbtQiDZP8
+	 5nucvMZtJ/lmbAY9Cp0ulnvK//6y5ipQb9TPOitf2rqHLZwRgLsnf2m5lKf5RZj1Dd
+	 5jM1Ax9H4ngFO7UC/6lpjdesICJUJaFWlGBci2yRlW/3w5IC3C+6yq76n9Vx5jD+AW
+	 cm+FEHnWzrpVHg0nIcei8fPe6MPx0vyB66yHgvimzhzyqGqB3o206QdSPwh4JLhx5h
+	 OYHm8BIyDCt2A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1999F39EAF6D;
-	Tue,  8 Sep 2026 16:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939AF39EAF6D;
+	Tue,  8 Sep 2026 16:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: cap device debug regions at 1
- MB
+Subject: Re: [PATCH] Bluetooth: btusb: fix NXP IW610 composite device handling
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178888502963.3627954.4649873667262966331.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Sep 2026 16:30:29 +0000
-References: <20260908133421.163043-1-kiran.k@intel.com>
-In-Reply-To: <20260908133421.163043-1-kiran.k@intel.com>
-To: K@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org,
-	Kiran <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
+ <178888503113.3627954.15907243154963861505.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Sep 2026 16:30:31 +0000
+References: <20260908080108.1260799-1-nithibert@gmail.com>
+In-Reply-To: <20260908080108.1260799-1-nithibert@gmail.com>
+To: Nicolas Thibert <nithibert@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  8 Sep 2026 19:04:21 +0530 you wrote:
-> Validate device-supplied debug-region boundaries during mailbox TLV
-> parsing and convert start/end values to a validated region size. Cap
-> debug-region sizes to 1 MB to prevent out-of-bounds reads if firmware
-> reports oversized memory ranges. Skip invalid or oversized regions
-> prior to coredump capture.
+On Tue,  8 Sep 2026 10:01:08 +0200 you wrote:
+> The NXP IW610 module exposes itself as a composite USB device
+> (0471:0215) with three interfaces: two real Bluetooth HCI interfaces
+> (class 0xe0) and one vendor-specific WiFi interface (class 0xff) used
+> by mwifiex-nxp.
 > 
-> This issue was reported by Claude Mythos.
+> The composite device's whole USB descriptor reports class 0xe0/01/01
+> (Bluetooth), so btusb_table's generic USB_DEVICE_INFO(0xe0, 0x01, 0x01)
+> entry matches every interface, not just the two real HCI ones -- btusb
+> ends up binding the WiFi interface too, and mwifiex-nxp never gets it.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: btintel_pcie: cap device debug regions at 1 MB
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ea6d8993c910
+  - Bluetooth: btusb: fix NXP IW610 composite device handling
+    https://git.kernel.org/bluetooth/bluetooth-next/c/bd5e3aa5d35a
 
 You are awesome, thank you!
 -- 
