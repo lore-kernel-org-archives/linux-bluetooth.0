@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F4D3B059F;
-	Wed,  9 Sep 2026 20:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371323A7D73;
+	Wed,  9 Sep 2026 20:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788984069; cv=none; b=AVDj68mSs9weboeMmX/+8cX2dvlbgC7M1gTxTaGw/pXtsn2hMDWLtRm0nHFoH4++oTBbcpsv2huGsghYsCOb3yZ0eCGu3gsHZialpatHPwsiGUylre5IwfHyzBoeRpn0mQLMyP4ZTGm73kZBY63nqC552lkQdFQ4yy5yHjbOHkM=
+	t=1788984073; cv=none; b=EvF47PPE/5+eCGb9Lq82GTtpPe/eJbBON6JQWkjjBhA2xYiambGiO0XUT3gjtAEWm+TtFFavkkXvTQxWOxvmc41iw7tupVgHY+JzCuTVURJibOUBJOKzQdCoBgCZKeWTkqC3cWLBPIumPNvVEZfXCTyy0umCqPHueypri2yYtQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788984069; c=relaxed/simple;
-	bh=X4O+lTU61F0JQOLgGAycaO9X0LJP/ZSP3MEnoKzBZjI=;
+	s=arc-20240116; t=1788984073; c=relaxed/simple;
+	bh=MgD8IUvjAyNLLzUP4FV0FPGqVKoOSoWalFsNEThTgnM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BH8iP/vJssz+/sFfZCZTEFinIe5mmBx1v5ELSLOHZvXfr2PjBIbo9qtZICUmdnHJnK9WI/SN3eKoE729Og4qCFtqINoft8cUgtiimDm0plAIeZ+sUUGC8Kg+R5EhUCBnHGvgtinh1HZJV6VyVuHMkO3GMOql8phsZ3CwB3ZzIoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEAKzrbK; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=A4ZXQHjVZjnzfa0AX8Gpt/JbAS48q2EGr1rUVqA87AKWRCN3bU1Cjhbng1MDdvfYAfDpwjPFw0qhDG45oS/KRL8lBjYSmX/Ix5135HttzK2xCjlCswid4UyumJxgngadq5e+fvWXKkrQgH7T174hkHOX8fOca0/7/oWY8HtNaOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4UeDj1B; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEAKzrbK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9DF91F000FF;
-	Wed,  9 Sep 2026 20:01:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4UeDj1B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69C261F000FF;
+	Wed,  9 Sep 2026 20:01:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788984066;
-	bh=3Lki2zKjYM+qNV6KC9xTZ6rVRofIMGvc4jF56clPzCU=;
+	s=k20260515; t=1788984070;
+	bh=bVBsQziOCe6FlhZ7FOhLXPVigWP9VPum8a09dM9B1yA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=WEAKzrbKzWQwAR5wCzrPuZSJ6r2WDK8LNobPcoIfcxEpL7iMfxoqd3TN4Dnr9OBNl
-	 6796E1udklCJadLFQDQ+Tye12frCxA7GbQqLQfPv95wJU/T0zRu2Acx8Qey9bUWnQn
-	 vIjYjSVqagu6twS11jdfZ+L3PvGEui7InJ2kuj5MpHAmIGH38/iyNloU1KwwqOatYZ
-	 q4NIUR7ey+/0AFtLVAxcwOUuPPtKapzTU4G5RTx6LV8fWmWl7JrnU2/5Yvzhn59KFG
-	 yc2CBh+3natE5KYqLHvs+5YYN6LoqKaEF8/hAeeWQDc3IEN4PvR61UlanHNiWjfxWv
-	 SwxGeer0ac11w==
+	b=m4UeDj1B7G91HQS0eZdqF49gYa9L23JR9ZXcVGtJVNjYN5Jp8aMWME3NaiErkVxNz
+	 um73vM1eQ8sDJHozb1LYD8YkxZTYl860ydUN0kJIFvNb42bkH/QFsPbZJehhvDvy6d
+	 t4LK5bfl15QXBfya92kjm4YBgc9g3gzKf4xGdac5FxoNaB1B1PWLrv+FNm4yVED3+D
+	 VPB2mK1jn3E37fLJf86/SfPCfqrrRMR7LGc+kM6LCCBWcUMlpH7MTGjtDvaeamEP9O
+	 lO5RQ0SfSJOfrCYDle7I/dMU4KHoBFGgM1dQ+zrZW/yzX+y/rVzbKx3Dlm39DiwnZs
+	 Wo40p4VPhO7LQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0E9E2380AA74;
-	Wed,  9 Sep 2026 20:00:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B39380AA74;
+	Wed,  9 Sep 2026 20:00:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,50 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-09-08
-From: patchwork-bot+netdevbpf@kernel.org
+Subject: Re: [PATCH 0/3] Bluetooth: btmtk: Harden firmware parsing and improve
+ logging
+From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178898400463.1032931.8145913840198303606.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Sep 2026 20:00:04 +0000
-References: <20260908212127.1022197-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260908212127.1022197-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <178898400812.1032931.449738913453021907.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Sep 2026 20:00:08 +0000
+References: <20260909120011.1198001-1-chris.lu@mediatek.com>
+In-Reply-To: <20260909120011.1198001-1-chris.lu@mediatek.com>
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, will-cy.Lee@mediatek.com, ss.wu@mediatek.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  8 Sep 2026 17:21:27 -0400 you wrote:
-> The following changes since commit 38b6be101006d3e7af972999f45d4f1e8250587a:
+On Wed, 9 Sep 2026 20:00:08 +0800 you wrote:
+> Three changes to the shared btmtk firmware download path, all in
+> preparation for MT7928 support but useful on their own.
 > 
->   net: macb: fix NULL pointer dereference on unbind with fixed-link (2026-09-05 13:58:52 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-09-08
+> Patch 1 bounds-checks the firmware image before the section map walk in
+> btmtk_setup_firmware_79xx(). Today the section count, the section map
+> array and each section's offset/length come straight out of the file and
+> are never compared against fw->size, so a truncated or corrupted file
+> makes the driver read past the end of request_firmware()'s buffer. The
+> section count is a __le32 from the file, so on 32-bit builds multiplying
+> it by the 64-byte map size wraps a size_t and a bound computed without an
+> overflow check would come out small enough to accept the file; both
+> helpers order their arithmetic so nothing can wrap. A section count of
+> zero is rejected too, since it passes every size check but would leave
+> the download loop with nothing to do and still report success.
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-09-08
-    https://git.kernel.org/netdev/net/c/bbee0759d363
+  - [1/3] Bluetooth: btmtk: Validate the firmware layout before parsing it
+    https://git.kernel.org/bluetooth/bluetooth-next/c/71147d59cb23
+  - [2/3] Bluetooth: btmtk: Improve BT firmware logging
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4a7b93f08d13
+  - [3/3] Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1b737f2ef168
 
 You are awesome, thank you!
 -- 
