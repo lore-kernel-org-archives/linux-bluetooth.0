@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DFA39D6C8
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B4D39D6D9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788978535; cv=none; b=X3831tRwT0T1z9zADq2jypUVrsai8v/6SdjJrZIwNGgMsOBQHaeynUGweN1HPYXr9rtqOyW/I9leRLYxTD75WpsyZ43ZaPoSBcEqwa+xLvGqEnQ+KOKoRcKKWKWOTmTU7eUoPtWvDNRZmjGr8+bCFGxR+WTfisTZlxwDKNhdGrc=
+	t=1788978537; cv=none; b=pViMKpYhTr/mqIUQqWcGf62N3sfVhYqJywA9yrnAtXGnSCeIMFzDJFyJEFQy2jZiJ7rnVsV/tRGBEY0afsyTP8seQztrcy512kAjEIcw7smrpx3GKIHTA7oH3wvzC/bsIQsW4Qthl8aYi0uprOH5dffeDgtQDjt6B1SpwfsjG/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788978535; c=relaxed/simple;
-	bh=voamRdGe5zBb6ihef6zBif/MHrrTmUJ1oVQQYxkmuNU=;
+	s=arc-20240116; t=1788978537; c=relaxed/simple;
+	bh=eXHQc3M+XObfHxATecCgTllzr3B1Qyn052kLxCTDmog=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btEd2Po5cuWEhl5b9y+xnCsAaj2wVC7fjoOpStHwuqXjKKDViF6UPRQ4Yke15/gLTYpmSDzodNqfoDMj5trqk1Om/EmbERDHvJ6MFSiLZTSzQLz5y1bJ9nT2DkuLDSpfpuBkcusX+4dqgUzfZvtvD1tvcTLXa415UIAYqeNDEho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ao3XUmJc; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=ZSqoUZsjUywpvK4zCvICwiZAVwEAsuneoeBy8/SVBeFlbqvMJnq/xlE3pdkDPWutVMKGNRJhmta2vb+uA2mUu8/XjmpDj94hnmRjmc2qVik2cvHqlwtYpc6zwSSMq/jnuC+5KOOBvLa4QGo8i37XsXkHboHl2QEsUDdF/nMMEPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cs6GnGud; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ao3XUmJc"
-Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e5292fdso507444e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 11:28:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cs6GnGud"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5c65093556aso4806975e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 11:28:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788978533; x=1789583333; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788978534; x=1789583334; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=7GYxkPCu0FUFHaN9n/82WODo2QVFNeGzJe8Zb/Sxr8U=;
-        b=ao3XUmJc0trjxPkQOt9KiZrdHMwqqk65oHYeUCDVmc9m6E/G+Iae3WN3s5835HDUWm
-         Q0Aqwb0mpPNJg75lpOHjhpLSUPK6rIrotMHgi+X3z7lsQDOp/qsxGoFUSet/XO6vskqW
-         cyANlyfhVgsMTVxjYZEynP31DQIQJzDpSCJvguv3BTj/+i0ILh4QZw1tCzHODMnqSsgY
-         Tsrw7bcMD3i0MROgbhPtfkBQAXPW4KJfutTNJEKsKR7oB6xy/4E9aWNXGHYAALqYAMhx
-         jYoKKqn+sMnCACWvSTTeN5Be+JfaCqYRa+GC2W3kzTOEyqAr4B2U0D9dN5gEvzmnNmoZ
-         KiBg==
+        bh=yh5Umdc7dh+unO1G5lMOsi/W9X96PnUgs3IfTsMp1K0=;
+        b=cs6GnGudfUAUwlkwmvzE9KckGUjfdhn/YqzrOhaPdCiHFc1ziEKDHcjLHcakwu+I8O
+         JQBuZPQjnQeTbJepoWnBxMF0dC8xlX8b9+5eU0oM6MsBFPC/WPhllnVF3XwRvQA7LRhP
+         q4wqNn6CSbLDIjs/W4riqNarprhtZZxeTi3g/sA/wJfEINLH43FKbY1MlGYc1CMyNq/O
+         /hUhjLOO7+2mLxLly6lXuPJE10Vg8yiilp/+c4e8Kc3RU4E6lbNehiG4nsTV6mAG8zTH
+         Sc0IJoPABrMt/ODF7/IPEYIJIa4XvqFQQklqkv6S7KTeS6uR0z8gTdxiTS9h8+YScRHS
+         RpUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788978533; x=1789583333;
+        d=1e100.net; s=20251104; t=1788978534; x=1789583334;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=7GYxkPCu0FUFHaN9n/82WODo2QVFNeGzJe8Zb/Sxr8U=;
-        b=KTcyxgOVvEH1RKEKAQE1ZEzuznywGGBudhktQlzVgfYoAxlB4mOjeEnQSgvqzmS5Y+
-         Vve6lh8JFenmX17SLDWXnAI32cDOjjCCe/gdxocxVaGKHj5OMO97z22buW2yrXHEEvgc
-         FvqGud/FoYAFd2xvdDZXYndG8jq29mLR6/vclVGWDUjpXT53q3HeUslKh1HBmukfFV4S
-         rSHg0g0SQRFLcZwckQBXnXFMWv4DVoHvLfE5OqZ5E+i3Unoci/PBmkfSIQTFKOt7pVBe
-         bWnQcEDz/M3/FQkOYnaylUHI3mO0R8So4zg7xLN0nVulbV24kNXWs7ZGrWfErqum1d2V
-         cUMA==
-X-Gm-Message-State: AFuF++kBx6vguDWZpDDWMiGndDPlhtEEn1EKr7C8dvKpi5ctTMCjCK4R
-	A8/K1kggL+Y+74CgHBAiJDVYztg2/Ytj26N6Iq+VwfDB271JxWE2R1ToEYYMi5IX
-X-Gm-Gg: AYBFou0aqoe1/APF5ruTBoKQ6ff3jG/pKKqHIFCCVCJUUm/R0IVcOrzd+yQqdPUoA6B
-	W7RAqZMg+17TAkBINEWhn0hvjqpOYrsACXO+Hu3/vO+aWV5VRLXGWQS6FfrNYn+3NmqUrpFG9A5
-	7kBDjiJIw+3vlplgCK1B4os5IPfwcbJknrkHFZB7LVxv2zmFFEsaOYTWvF6Lcufpd2tKyalfoTR
-	sRG1mRk34VFzRjDFNAOe6G7lWRbvpYv1hXhNHnccuEiMrxfv8Hr6V1z1WDx6zPbpaViKex0WDk5
-	42rzJvH/FHKcxpxs76vmplDa/u5qsx6vYqSEWL5InaW/bV0vpNr+cEf0KaTcrPmxVwOfcAybyOO
-	sZbipjq1ShKJRn5kOzM6zvDvaxsdB90qsUceAimBuxNV1JrVCYV4lFAKyqxO78UD+31Hos3QIaV
-	I88T/6hPr8jYraKl1zRPNuyrf/woni7uxApUpwRZuhPUYBXRuCbWJw5hirQbvifbBy4DFu7njd4
-	Fyn2OVGS4XCCmBN1nByhvmDhxgrbVCpl4lvDNkb1bEhSMqQopG3QI9dScvHV2ccehE=
-X-Received: by 2002:a05:6122:178a:b0:5c7:ab80:2922 with SMTP id 71dfb90a1353d-5c8287e72c7mr3908467e0c.6.1788978532706;
-        Wed, 09 Sep 2026 11:28:52 -0700 (PDT)
+        bh=yh5Umdc7dh+unO1G5lMOsi/W9X96PnUgs3IfTsMp1K0=;
+        b=KnUTbnUqf8Eoxd7YsPRI7TbbpXj2Sygv7PYqU0d+tLXv23FCKaJx2S3n4ltvmsoBbj
+         SB4srtQjylmicpVEcsgd/UuE5T/nGMfH5dXolaCUjVSpv+WCiQUf6t5vrBvgaX6Dok1F
+         1Q4n0qwB1Pw+xrHWYEDj14E3fTezFj6Mz1EcuhjZjgHFzf15afySRAUVu3zwDXIMYhY5
+         06591vGjjmkNUN229UE2zYgS00WugZTi0pkdBuDv4d2ydI/14HQR0yMJ/Dsg31XZqyea
+         yT3mLJY6EHQ2KyJf7iWdcxRyTg66LaF0seMSAMPzPbs9cRtiZq29/QGpegvSmHkaLDbe
+         S2Zg==
+X-Gm-Message-State: AFuF++ldHG0OJknbmXyGQU5E4mi6hHHP+SGD6pN9vsldzIVGlzKZ/Kvj
+	dNATNAGblXxtHm9YjTaw69e/Mj3xGljpkswkzoey3KkoLRW3uT+L5L9Jg+Q7NKoM
+X-Gm-Gg: AYBFou1ACKmsQpsnOlMD5/YeB4W1hjs4TjkBT3l1EyEKyXIzcnkIwgUHpwgHgSerM/c
+	Gf563ONOypzTQf8M8rD8Jgg9NMzwilNhEVqy4IZWSDTDXLRHb6wBfj7Y0LZ5Yf630LRMCDx90Vu
+	TlWWkpr2QAyrVEa6DFyMlIRhbVCBFYNipXWXzB6/YAFWs2kFc0MkmLgRtBYICbmb0Her1KRrGMs
+	yXCmYXKdcVD9BWlsNPMTRpz5Yj7xPsnoFILc+/0PxMMnPWPFpiKAY7B3IyMCnIwStl62PzfG1Mq
+	uuo34iUop/3OQh7v3Ef8eLOByk0D3wMRU1IKRPOuGK5jHfLdFCTyR5zt0v3V+3bJK/Ou7LFEZWt
+	uPnuOindcHVqhV5vGpJs8Xdxf8P63NYsAG5T+Z7BKVUiV24NDPhmdeD25m/WDkzztanRBrN3NlE
+	DNcXFCFW9O43rd1XneMv4yxb3wOzk2sKWTcsLxhINoWXQDxJq9ArgGDJ55CRjYBm8XZOOjpq9SE
+	q9LbmGIxc+4pXlRZeCI3XRem3V7u9XHx7AiPtRIhWWxL9eUTRwHu59gQMmikv6dJQ==
+X-Received: by 2002:a05:6122:d90:b0:5c8:2c83:9cb with SMTP id 71dfb90a1353d-5c82c830f80mr4113695e0c.2.1788978534221;
+        Wed, 09 Sep 2026 11:28:54 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c81c506f31sm5399388e0c.11.2026.09.09.11.28.52
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c81c506f31sm5399388e0c.11.2026.09.09.11.28.53
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 11:28:52 -0700 (PDT)
+        Wed, 09 Sep 2026 11:28:53 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 02/10] doc/btmon: Document the request reference on command responses
-Date: Wed,  9 Sep 2026 14:28:32 -0400
-Message-ID: <20260909182840.1289776-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 04/10] doc/btmon: Document the deferred command references
+Date: Wed,  9 Sep 2026 14:28:34 -0400
+Message-ID: <20260909182840.1289776-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260909182840.1289776-1-luiz.dentz@gmail.com>
 References: <20260909182840.1289776-1-luiz.dentz@gmail.com>
@@ -77,46 +77,47 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Extend the Command Complete example to show the request frame number and
-the response time, and describe how the reference is resolved and when it
-is omitted.
+Describe the Request field shown on events that complete a command which
+was only acknowledged by a Command Status, and how those are matched.
 
 The model drafted the text, which the author reviewed against the actual
 output.
 
 Assisted-by: opencode:claude-opus-5
 ---
- doc/btmon.rst | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ doc/btmon.rst | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index adb2c9881f97..99d6c8ae2760 100644
+index 99d6c8ae2760..c8611ab2e9e7 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -232,14 +232,26 @@ input going into the controller, ``>`` is output coming from it.
+@@ -252,6 +252,29 @@ when the request was not captured, which is normal for the first commands
+ seen when attaching to a system that is already running. ``Command Status``
+ events carry the same reference.
  
- **HCI event responses** reference the command they complete::
- 
-+    < HCI Command: Reset (0x03|0x0003) plen 0             #5 [hci0] 12:35:01.843185
-     > HCI Event: Command Complete (0x0e) plen 4           #6 [hci0] 12:35:01.864922
--          Reset (0x03|0x0003) ncmd 2
-+          Reset (0x03|0x0003) ncmd 2 #5 (21.737 msec)
-             Status: Success (0x00)
- 
- Here ``ncmd 2`` indicates the controller can accept 2 more commands
- (HCI flow control). The indented body shows the command this event
- completes and the result status.
- 
-+The trailing ``#5 (21.737 msec)`` is the frame number of the command that
-+this event responds to, and how long the controller took to respond. It
-+saves scrolling back through the trace to find the request, and makes a
-+slow command obvious at the point where it completes.
++Some commands are only acknowledged by a ``Command Status`` and complete
++much later through a separate event. Those events carry the reference as a
++``Request`` field instead::
 +
-+Several commands may be outstanding at once and they need not complete in
-+order, so the reference is resolved by opcode, oldest first. It is omitted
-+when the request was not captured, which is normal for the first commands
-+seen when attaching to a system that is already running. ``Command Status``
-+events carry the same reference.
++    < HCI Command: Create Connection (0x01|0x0005) plen 13    #12 [hci0] 3.175055
++            Address: 00:11:22:33:44:55 (CIMSYS Inc)
++    > HCI Event: Command Status (0x0f) plen 4                 #13 [hci0] 3.176055
++          Create Connection (0x01|0x0005) ncmd 1 #12 (1.000 msec)
++    > HCI Event: Connect Complete (0x03) plen 11              #27 [hci0] 6.178055
++            Request: #12 (3003.000 msec)
++            Status: Success (0x00)
++
++This is where the reference is most useful, since the delay between the
++command and its completing event is often seconds and is otherwise only
++visible by comparing timestamps by hand. Page timeouts, slow authentication
++and slow encryption setup all show up directly.
++
++Commands of this kind are matched to their event by connection handle or by
++remote address, so several may be outstanding towards different devices at
++once and still resolve correctly. A ``Command Status`` reporting an error
++means the completing event will never arrive, and the command is dropped
++rather than left to match a later unrelated event.
 +
  **LE Meta Events** contain a subevent type::
  
