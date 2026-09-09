@@ -1,69 +1,69 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF183DC4BD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3F64EBAF6
 	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 19:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788981808; cv=none; b=gAIQePHXY/Ynm/TevqaqNVBFuPaCFiZUImodip5TV3Ifu5+MCN0NpTl9qlOUcznuiOg6FvdiCijwsqZ/RxTEBWMoft3U0774R9WBCvDQXGIQBpk3LOvYxKhn3Fdv56zMe1Vs8YP6eJW58u2eRpvYrkwvB14NESD+2McGMfmwpiw=
+	t=1788981810; cv=none; b=hYfZugqxiEpu4q95fZH57HOHOVqFpDLTATgzlbcjEdXuVThExYYJYGOcl3dPcj7gMzTd8/HeC1Fdh3MWYY3oQw+abx5SY/TZ1OpmaiLcPlDzr2mtnz9El2AjCIGcI8IkW0h927zwC/90Pf/SayxdlGXikYGNl/fIQWeA/GsSCXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788981808; c=relaxed/simple;
-	bh=Sx9wWpzB73jIkBqguWJx5IXkcz+y5tZTYK8Jf0dZQTs=;
+	s=arc-20240116; t=1788981810; c=relaxed/simple;
+	bh=3fjDFDoLJ1LOe1PzWKjz+mzKIVniJ5UssNXzMLhj2y4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZI7bRvccI4Oe9avlTYrr8z1Gqyz75ecWd6TBzSxfzOFpG21q48DS+V7+6PtpIIh6PUmOxKgd6giOU6KbN2ilREzUQyqorNehF3zl5RPKxBww7c76aUPOGn4VJdXdQUuHuDuVAXLJ85cae2q27/hAsP+SBqxzye3wkhRqrtSshbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ngq6yWQw; arc=none smtp.client-ip=209.85.221.175
+	 MIME-Version; b=nUtxATl18E3PpfsyhGXNLbWCD8jPchWcUHO4996pDWmE59nPERIEU+3qDKn6YM9XMqzry8V7F3mstsbpJPiR/lGigx8jo5eZ2psqZJ6yhde/fLr0I4P2xfAjzL4TdrgTufgFBsvWIaWFkzaHgCJPhTA3sBUSMJme7v2vgVTq1k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7UvzACP; arc=none smtp.client-ip=209.85.217.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ngq6yWQw"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5c82d057971so893643e0c.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7UvzACP"
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-78fe51a2dbeso716945137.1
         for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 12:23:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788981805; x=1789586605; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788981806; x=1789586606; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=AZrRySdqS01bhY44wjnKUvbz89nm5+9QP44FWm2cmZI=;
-        b=Ngq6yWQwRRRQY7FL8cVKHnD0bAAbxSrA6YNeHS032w5hqwnWzXkXtkIrl0hZo1BhN2
-         CiV8inPIIZwrn8xvfDUncR72maaWEET7cpGf1a29pbgWDFVjS6uX+IfLCc8WwUr8b1tN
-         VQr4IcqFHDTqV0qyaAqh73xYGqPKxObWvfT0mJNPqxk5q/wV33xhP9kSUDoejRi2zWCU
-         O/OFprnnXrPLSHGglhqKmF577/P8/dGZ/8m9CFuM9/pdpQiJcI2HgCIrXC/h1TlwXS4o
-         iezsT5wY+T8FN1Ts2mZBuV1CGhCJBXuorT9ubh8k06B+XgKgNWGDLPaDxgM1fJUYfW6q
-         2usA==
+        bh=nirYpbVIMypASRXSLTU9WwN++i4RfUWyLKUlwkoWZaE=;
+        b=k7UvzACPaAxBsUN5muB7mP5zeC9mbK4N7B5USAojp09HQMN6IsUWHKqHr0Vkooa+wN
+         n0+uAVxGg4O+wiCZ3XaptyZ/dbCZ8fXvJJFdHu+2/7e7m4c4hQXh5cLWiSyjW9JYk8sw
+         1iAd54hPj+gPLECRAm25soqFqznSLv8CUDWDjwSG7OOPlP5/e8C09tJi+afYTKZJJD6/
+         HtATMretccOtWYa/bH5Uywd/f18abQv+cBYG2feI4jNrvFFKmTFfj8nyj57PFM4dFOWz
+         2dInfP1pFvn3Bm/cHUQztrsAys4ldp+uD7rXqxTYVRrNMBmxo7GUFx/eLdirwNw4yFtY
+         K/Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788981805; x=1789586605;
+        d=1e100.net; s=20251104; t=1788981806; x=1789586606;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=AZrRySdqS01bhY44wjnKUvbz89nm5+9QP44FWm2cmZI=;
-        b=G0ac7+d4XErVO7fRVZ1dV4aY5VzNxhof+2WTuN4swrW21kWzrv3aYaExi5hZdJnm0n
-         zTHYvNQjTpxrp+EvxK/Oo4TkReEOSp+vUt0cdunTrsCJ1KCgsvCJPRhhvHxdBLBUxrG/
-         m6gvUOEDFqJkz5xpEx+GK92688bbytaDvqJ5/n99h0HE7uhq0EVDE45Cf9WumJr5PAOV
-         nhHtKbexyYxIyidhZ3280AQ+bvnmU8gEUD8DZ8WI2CjbnVny3wUfsRpVrkzsD29P9zRY
-         /gjoGm3PLMaNJhbwHkjRf30cafVjDhE8xx2elGgE9HDE0F0+ERl+MXKwmgj12TfLeRpX
-         m31Q==
-X-Gm-Message-State: AFuF++l9jcj9gcRDI+Kz9Ym2anGOazRBSNlK9V+911UA1ye277GE1ZKb
-	tDs9JalDv0hhpm+wkzV+GSbe+U9VXHXLYsf/1Qgeal7+zA09DVky8sx1LZ2WaCFg
-X-Gm-Gg: AYBFou2pcns01eiSGGCU16r8wDyuIHsnTMs+BIod6mWYGeUj53KF29vTqMX+CukXjZE
-	jwedbwr73GOp/RBdBwU2kpnsPh2wIYq4N8etNNwzw7IA5Y0dxHoy5mVrR3AaufecxvEghm1YVJt
-	R4ig2J0Q3rJeUR53GWI4KWDfyMk5wFqynlsopgjC7iWjtiSWRE+f7WZ+f3dszuoqsh6QZ7lYbWB
-	n2bDyBm/NrUh5C+YhXwpoDmf38vZpyFkkkRcj/9lixdDvveBnnggYwiGnOhXMh4tNlaN2WjkHfH
-	FL0CAMuUjBQvrGDsP1f24uP/xqjh6MO3769ee7BPZUrqrUJgFvFQkwN+lNLorn75WICtmE+8nV9
-	Ioa1eug/KApX/rD+g7Pb0J315KDBgvE2Z2UczdZ6tLQaTVVLPUxp9LG+5aQLT99FbkFHzZC0WxU
-	PnV0UFL1eX1/iRjs+ZHW6HBE8qW5qz57a6pVJcU3KEbdZw59QE3qa1ge9PJ7H/7PqzohvR7Fcz6
-	OGd+0h/Ysz//ojSP0yJ9gPWkOumILHkbaCyJ9+i5LhXW1248XhameTy6XSFpHReXg==
-X-Received: by 2002:a05:6122:488b:b0:5c6:8480:35c8 with SMTP id 71dfb90a1353d-5c7ed933392mr23176402e0c.8.1788981805532;
-        Wed, 09 Sep 2026 12:23:25 -0700 (PDT)
+        bh=nirYpbVIMypASRXSLTU9WwN++i4RfUWyLKUlwkoWZaE=;
+        b=eZEAQA5Vhbroq/ifkePaWNS0GogbGcGrTyrM5/a1AkP0HDv3wFsJ0LMK0cP3ZjrGr3
+         Pfn9UK4s+hvwA5hfnMHMcA30rmnnrP8QDW4eyVAfGzQiwBQcvCxnRejPwb+zHiIz27+j
+         xnQ4tHU48OrxWoJ/RD65Xbm8F5/4nmQDD7n7XSJQVC3Zu0GV+DB7SyKScUXVsZOGP9F8
+         si6GEKIS8ylqnWPcu82HrpOtmbEKP1xbJCRcq+12/KA8wCvgxBDYV1FZVl/ZKXaK5fr1
+         NcPTT/WVEryAUueRJdF3S8wWAf2jrFayufOxbMiXrOnzU5CXVTHQHT4Gu/oSQ9neuj6s
+         EgCQ==
+X-Gm-Message-State: AFuF++n36+CuLCf45DHzCQcm7sLgb5B/MIY7Ue24y7B+eCBQeuH8GZul
+	+kHZR6SeoY62K5tO4+XI1c1bsJxnCQG2s6ebUAI9BCV4+O2qw09DVk6Lkp4U8flH
+X-Gm-Gg: AYBFou3IsT6U+Q4JG4hNHNMUBZtxvUC37s4WRx+PG8DMw9f/ahXY2iCYaxMo5BjOCRG
+	qi/Xut+h6LBDRP+2aoW5HP9mXeiBeeyceqOr6TgpYr2aBH6hZmZ8MIYzEU0sw6YBqGcL0Z7LBmz
+	+JdYga3TIy7ylgpIZamvGTuO/OltJ2AoK+RKpaaV8Wb/VBbI8ZUWMUSxlXro1s85MWzEnGIVQdz
+	RIciilKhSr22OOZcKgt0CVZqs0Fy3gyo/CjtJ5XOyfZcGbsmFqqZ9hNE/jqY2hIeFAcIBV0bpB/
+	dkrtdcuYi6B4gcIHAmy84ApZYz7pyAQzP6DWXthTkA+tInQAxFxqZNbh6BpUZdK0vwMHk0/6/K4
+	USViTqCEIjoC4C5xt0sNfMcCltb6xYfNKlZoLK6XDOM1drPFJ289WhEuoKLfa+sIkCvtpyo1uhv
+	CQZ6k/4TVIJUNop9BBdO1Ft3ceLG9/Ibr/k/g8Wjas+3RFCNkZMasT4D1C8J++jl9/vLjTcOJAq
+	I1tMKOuDzHYl8gNV+/YeL9yzpBijZ44i9ADYzMjfuu9g6tfdlUrupGAo50wwANKxHk=
+X-Received: by 2002:a05:6102:80a3:b0:77d:9fe9:1716 with SMTP id ada2fe7eead31-78a4a6e83e9mr22419865137.2.1788981800997;
+        Wed, 09 Sep 2026 12:23:20 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9808ee8039csm13162744241.11.2026.09.09.12.23.24
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9808ee8039csm13162744241.11.2026.09.09.12.23.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 12:23:25 -0700 (PDT)
+        Wed, 09 Sep 2026 12:23:20 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 08/12] doc: bluetoothctl: document init script option and scripts
-Date: Wed,  9 Sep 2026 15:23:04 -0400
-Message-ID: <20260909192308.1306567-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 03/12] client: do not prompt for LE Audio settings on A2DP endpoints
+Date: Wed,  9 Sep 2026 15:22:59 -0400
+Message-ID: <20260909192308.1306567-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260909192308.1306567-1-luiz.dentz@gmail.com>
 References: <20260909192308.1306567-1-luiz.dentz@gmail.com>
@@ -77,137 +77,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The --init-script option was not documented. Document it, along with
-the scripts shipped in client/scripts and the roles they set up.
+Registering an A2DP endpoint prompted for Locations, Supported
+Context, Context, CIG and CIS, which are LE Audio/ISO specific and
+have no meaning for A2DP. Worse, answering Locations with a single
+location pushes an LC3_CHAN_COUNT LTV into the capabilities, which
+corrupts the SBC capabilities.
+
+Register A2DP endpoints right after Max Transports instead, and use
+the same helper in endpoint_init_defaults(), which compared against
+A2DP_SOURCE_UUID twice and therefore left A2DP Sink endpoints with
+ISO and broadcast defaults.
 
 Assisted-by: opencode:claude-opus-5
 ---
- doc/bluetoothctl.rst | 105 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ client/player.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/doc/bluetoothctl.rst b/doc/bluetoothctl.rst
-index 0c55092b880f..ed4cd0703281 100644
---- a/doc/bluetoothctl.rst
-+++ b/doc/bluetoothctl.rst
-@@ -38,6 +38,7 @@ OPTIONS
- -a capability, --agent capability        Register agent handler: <capability>
- -e, --endpoints                  Register Media endpoints
- -m, --monitor                    Enable monitor output
-+-s file, --init-script file      Run the commands in the given script file
- -t seconds, --timeout seconds    Timeout in seconds for non-interactive mode
- -v, --version       Display version
- -h, --help          Display help
-@@ -589,6 +590,110 @@ Using Here Docs to show information about the Bluetooth controller.
-    show
-    EOF
+diff --git a/client/player.c b/client/player.c
+index c5e4beef0ed3..6cd5aeb4a175 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -3506,6 +3506,12 @@ static void endpoint_locations(const char *input, void *user_data)
+ 				endpoint_supported_context, ep);
+ }
  
-+Commands can also be read from a file with the **--init-script** option.
-+The tool stays interactive after the script has been executed, which is
-+useful to set up a role and then drive it by hand:
++static bool endpoint_is_a2dp(struct endpoint *ep)
++{
++	return !strcasecmp(ep->uuid, A2DP_SOURCE_UUID) ||
++			!strcasecmp(ep->uuid, A2DP_SINK_UUID);
++}
 +
-+.. code::
-+
-+   bluetoothctl --init-script client/scripts/power-on.bt
-+
-+Lines starting with **#** are comments, and lines are also used to answer
-+the prompts of the commands, in the order the prompts appear.
-+
-+SCRIPTS
-+=======
-+
-+The scripts shipped in **client/scripts** set up common roles. Scripts
-+registering a media endpoint are named
-+*<profile>-<role>-<codec>[-<preset>].bt*, where the preset is only part
-+of the name if the script also configures the stream.
-+
-+Controller setup
-+----------------
-+
-+``power-on.bt``, ``power-on-off.bt``
-+	Power the controller on, or power it off and on again.
-+
-+``scan-on.bt``, ``scan-on-off.bt``, ``scan-le.bt``, ``scan-bredr.bt``
-+	Start discovery, optionally restricted to a transport.
-+
-+``advertise-on.bt``, ``advertise-peripheral.bt``, ``advertise-broadcast.bt``, ``advertise-rsi.bt``
-+	Start advertising with the given type.
-+
-+A2DP
-+----
-+
-+``a2dp-source-sbc.bt``
-+	Register a local A2DP Source endpoint (``0000110a-...``) with SBC,
-+	i.e. act as the device sending audio, such as a phone.
-+
-+``a2dp-sink-sbc.bt``
-+	Register a local A2DP Sink endpoint (``0000110b-...``) with SBC,
-+	i.e. act as the device receiving audio, such as a speaker.
-+
-+Once connected, the stream is configured automatically and a transport
-+is created, which can be acquired with **transport.acquire**.
-+
-+BAP unicast
-+-----------
-+
-+``bap-source-lc3.bt``
-+	Register a local PAC Source endpoint (``00002bcb-...``) with LC3,
-+	i.e. act as the initiator sending audio.
-+
-+``bap-sink-lc3.bt``
-+	Register a local PAC Sink endpoint (``00002bc9-...``) with LC3,
-+	i.e. act as the acceptor receiving audio.
-+
-+The initiator configures a remote endpoint with **endpoint.config**,
-+choosing a preset, which creates the transport:
-+
-+.. code::
-+
-+   endpoint.config /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/pac_snk0 \
-+	   /local/endpoint/ep0 16_2_1
-+
-+``preset-custom.bt``
-+	Add a custom LC3 preset, instead of using one of the presets
-+	defined by the specification.
-+
-+BAP broadcast
-+-------------
-+
-+``broadcast-source.bt``, ``broadcast-source-2bis.bt``, ``broadcast-source-pbp.bt``
-+	Register a Broadcast Source endpoint (``00001852-...``) with LC3,
-+	configure it with the 16_2_1 preset and acquire the transport,
-+	which starts the broadcast. The variants set up two BISes and the
-+	Public Broadcast Profile respectively.
-+
-+``broadcast-sink.bt``
-+	Register a Broadcast Sink endpoint (``00001851-...``) with LC3 and
-+	scan, to sync to a Broadcast Source without the help of a
-+	Broadcast Assistant.
-+
-+``scan-delegator.bt``, ``broadcast-delegator.bt``
-+	Register a Broadcast Sink endpoint and advertise, to be used as
-+	Scan Delegator by a Broadcast Assistant. The stream is then synced
-+	using PAST, and the transport moved to broadcasting with
-+	**transport.select** before it is acquired.
-+
-+``broadcast-assistant.bt``
-+	Scan, to discover a Scan Delegator to connect to and Broadcast
-+	Sources to offer it with **assistant.push**.
-+
-+Channel Sounding
-+----------------
-+
-+``cs-initiator.bt``, ``cs-reflector.bt``
-+	Set up the two sides of a Channel Sounding procedure.
-+
-+GATT
-+----
-+
-+``gatt-batt.bt``
-+	Register a Battery Service with a notifiable Battery Level
-+	characteristic.
+ static void endpoint_max_transports(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+@@ -3525,6 +3531,12 @@ static void endpoint_max_transports(const char *input, void *user_data)
+ 		ep->max_transports = value;
+ 	}
  
- RESOURCES
- =========
++	/* Locations, contexts and ISO settings only apply to LE Audio */
++	if (endpoint_is_a2dp(ep)) {
++		endpoint_register(ep);
++		return;
++	}
++
+ 	bt_shell_prompt_input(ep->path, "Locations:", endpoint_locations, ep);
+ }
+ 
+@@ -4629,8 +4641,7 @@ static void endpoint_init_defaults(struct endpoint *ep)
+ 	ep->max_transports = UINT8_MAX;
+ 	ep->auto_accept = true;
+ 
+-	if (!strcmp(ep->uuid, A2DP_SOURCE_UUID) ||
+-			!strcmp(ep->uuid, A2DP_SOURCE_UUID))
++	if (endpoint_is_a2dp(ep))
+ 		return;
+ 
+ 	ep->iso_group = BT_ISO_QOS_GROUP_UNSET;
 -- 
 2.55.0
 
