@@ -1,163 +1,84 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209F7348C63
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 17:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B2E37AA86
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 17:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788973556; cv=none; b=g70z39yBbMT739+VJrldYcqccjoZXEJyRPMFQQCVv1eiFVUt3I9X9QVIcG29/mpGbcLUZD9UbOh4lmM1Fpr+Wf5oQNyprRZqgkmbJYTZkjzb0qsKC4I/J03uDsLK6aQV4Q51NZ4JoKFj50kA++O/65QV9AqrkUa7WzA/9PAi0uY=
+	t=1788976172; cv=none; b=WfEqw0Af1DjthAXAEW0ChjDQYIFUuC8NS0hKWaMo6tzp8iTvcltEy97VojxUwclGLW5U/O3Foi/cxTlu0srPzrcODHWN7ohx/Tf8dMfdatjZ03Y9ss2tYQlXVw0wGbaFqQBSSajltRIhwigghSuE0lvJEGGtHh8Ktzi8nMosz6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788973556; c=relaxed/simple;
-	bh=2vJcrfmtONiiZ6qszfDi4QNl+g1tcAIj9jSLqmWRXdI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u5bkCjLjWYJ15OyGLpt3SXSicX82MH9ddpcHsszJD7XojPHz406jkDxxsGIOljEaFXYVLuogcKLzHPZTc0Sf5KUzTNP4WwUcFh1o3bLW5UEZzwh7Lu85xOyF9ndtuK2D+Y6tU1wrTK3i9GKoc/4bFa0iuhh365buzHtua4V/pv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HH9SGjV8; arc=none smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788976172; c=relaxed/simple;
+	bh=mwOUy/NMXGEZKrthCr1tWMYmYOVvRt7x/OO1rMpAKBY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ed4j1rNT5rTfX+MTl0PecKSUFGarIk6JLcZLGMXjmeCdiR6bivRJzJ65Ll+FbmUJiZXB/4LrCH88cCb70DbQXPYQk+8ALBDHY2RE9GPr2PjcwEkGcMwk5qzUgVik7/K7sVoLWeK4MlUcYhONE6m5BF0iZUYS+O4JggEoKp302oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=Wsdgh/E7; arc=none smtp.client-ip=79.135.106.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HH9SGjV8"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5c7d1512dbfso4887285e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 10:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788973553; x=1789578353; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MtFmR3vRVuttZHqItlxYn1u428pMEb9u5utjpJKK+hY=;
-        b=HH9SGjV8eX89EVfKfIJD27xxHfN+BRR9O1SQfR1YrkSPYpAlzqZxrrL+nTz+oPb9wU
-         3xMJJZ8HDtnhEvHSOYZCaq7waWLWtYLJOpvC1xkxE0UQNxmG1RrEWrUvbDPP2YeGqW58
-         7rVDqpge/6ZpsPMi6s+o/BMUgavgDbhUThUHDdIvSyPsmkALfnn142tHF2M5XgOzXW/Y
-         RS8k2hld6L4LlJBVvqHinQCJop1enOEO8YB1z0xut9sFKwF598ob7dv4A1MVjb0/kf5H
-         b2+ViMfigaszBSUW+vmzAqoPiJNX/xkcICTZbi8fvZIzK4nAPYu2LWWc9D/EjqtVMHYQ
-         NG8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788973553; x=1789578353;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MtFmR3vRVuttZHqItlxYn1u428pMEb9u5utjpJKK+hY=;
-        b=j1dvlUr/M4lZAsBaM2Pwk0NnPlmA/oMMVXawZ/rKDqdI3bmi9YiqHDWX8LqVx6t5eC
-         KAjXATsvVZAZqvqYLJiizvhs6yQ2KzXnhLIW0TwJHnhMVXYs+GGpbCJXG8LrWu5QQb7y
-         FEtytKcSqnPaRiguqyQxvdXynMvg0UmmfJZqjeUUynCikxhHf5iTiHQNkx1z8EG33eHD
-         B0ltYMelz3AgSnIDCc/2E6RvdifGsPjRjGEOeTvynSRcaT7n1/mn4TkGWrE8IASaBfYC
-         Jk9uaGhTdqO2yfrT5dL9CjvOoI+ygN7JvFsYtpQiIUQiLRQ+vQ7v07ayj7tiOPaJCcLO
-         mV1A==
-X-Gm-Message-State: AFuF++lldSgzcnkdrET4RqvpPMLhO/vKK5vmngobZLYxeoDgpbMpQyhx
-	kOLizdYVJR3stC5MuDFyN6BqZG8SCrPLRiYscwz0/4euTYPMmYTIhV8HCWWhbpvo
-X-Gm-Gg: AYBFou3mjtRW0/w4ig4q7OCcsOBQW52z6P3N/BGTG4ziUjdrT9KxJ9fgalJzrdX5v6E
-	osNbslg8lhd+eKcK71lhUiVG+l1Y68+zqLvEcKrF4Aqj1MJSfgIuoKDzFegA3MYKwFCY3BSFDBH
-	qF/EApcdkIpXQBMBPB43MmVAceGZsGZDuMHOgeT68wrBy9LSgla+FEZhtaNJAesIANQFDUL2nVO
-	vM1lR7CY963myKif08aTmWRILWDCuCbDePU2DnDQTYVmv9dang/73yfrMrxTS/Ro+BmFSZ3MLhP
-	w0LCVjfBWgCPdAEfoYLQ4yw8wMVbdf3NMHtiUuCVK6l1UbONjClXnSdTrALqfU/GIYkN/qcqxGn
-	gmLeWuapY6gddGQPc7oBpmgoBCSx6J4b0ADzWvCR94tkzWNwYVMg7gtO68YGwpgOCzp9ijY9dXi
-	I/fRyvso0fIgeAiEu3L5PtFF2OujTpkg+ZwVeP+SoGBS8Ek5oKyzg63CuGgYjYXaWfkAI9UXnZf
-	9nLyXPC5CJQlCKibF3BiMoOHnUQKDyMiXd3AlUs8RqGdSUymUIOw/SpHIRf9cZRFQ==
-X-Received: by 2002:a05:6122:8b11:b0:5c7:a844:493 with SMTP id 71dfb90a1353d-5c7ed2f89e5mr23477960e0c.0.1788973551255;
-        Wed, 09 Sep 2026 10:05:51 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9808ee8039csm12766307241.11.2026.09.09.10.05.50
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 10:05:50 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: ISO: set BT_LISTEN before requesting a BIG sync
-Date: Wed,  9 Sep 2026 13:05:41 -0400
-Message-ID: <20260909170541.1245942-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="Wsdgh/E7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1788976169; x=1789235369;
+	bh=DYSLfUzxzl91CMjEBiNmSBOqF1O75zu+M37AftAOG90=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Wsdgh/E7Fb8lJOUaSOrp8FJeCUewMWyGFNOUcFBOsbzQA+CKjJKntlQwjMboCq/5r
+	 rIXY91mLQiu9LIK0K3Kokf6ys5Ga2mShhHmqzqbbevktfzV5kzwcW8Jh/FERkDAteu
+	 aLjH8IDcbJI0Apl1YIpTRUuii3ZGbRbPTTENkXyAgWXPt0C2E41l7fSqCbelhzEeOQ
+	 NutIcdyA2dsdkIDesRxfAYSYi6tOvrRNn5dU0f47ekb3c5zvjjYvXz+50Gp74w7lCJ
+	 BQgfIzs91DL3ElEvP/hKHt/XOaxjUnp/nN+a06pNFicuft/1G3Loh7HQ/YeCQw7+3I
+	 E149Uw8QCo8+Q==
+Date: Wed, 09 Sep 2026 17:49:24 +0000
+To: Ferenc Lengyel <dev@lengyelf.eu>
+From: Sergey Lebedev <lsa.uz@pm.me>
+Cc: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>, Ravindra <ravindra@intel.com>, Kiran K <kiran.k@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+Message-ID: <20260909174918.80317-1-lsa.uz@pm.me>
+In-Reply-To: <df180a89-b214-41b4-b8ce-c6ed6b12372f@lengyelf.eu>
+References: <20260908174316.11795-1-lsa.uz@pm.me> <df180a89-b214-41b4-b8ce-c6ed6b12372f@lengyelf.eu>
+Feedback-ID: 113843758:user:proton
+X-Pm-Message-ID: 0b368a98a5f1c9cd290daea0e9b859cfb6169ad0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Ferenc,
 
-A BIS connection is matched to its parent socket by looking for a
-socket in BT_LISTEN state with the same BIG handle:
+I owe you a plain acknowledgement: I told you my guess was that v4 alone wo=
+uld
+fix your hibernation, and it did not. You checked instead of taking my word=
+ for
+it, then instrumented the re-read and found the actual second fault - .thaw
+running an FLR that leaves the controller in ROM when .poweroff asks it for=
+ D3
+nine seconds later. That is the mechanism, and it is not one I would have g=
+ot
+to from this machine, where the failure is on s2idle and looks nothing like=
+ it.
 
-  iso_conn_ready()
-    if (test_bit(HCI_CONN_BIG_SYNC, &hcon->flags))
-            parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
-                                  BT_LISTEN, iso_match_big_hcon, hcon);
+The series went out yesterday with both patches:
 
-The socket was only moved to BT_LISTEN after iso_conn_big_sync()
-returned, while the LE BIG Create Sync command has already been queued
-by then. If the BIG sync is established before the state is updated,
-which is easy to hit with an emulated controller as the command may
-complete in a few hundred microseconds, no parent is found and the BIS
-connections are never notified to the listening socket.
+  https://lore.kernel.org/linux-bluetooth/20260909123416.71919-1-lsa.uz@pm.=
+me/
 
-The user space is then left waiting for connections that never arrive,
-e.g. bluetoothd never completes a MediaTransport1.Acquire of a
-Broadcast Sink transport.
+Your Tested-by is on 2/2 and deliberately not on 1/2, which is how you aske=
+d
+for it: a tag on patch N means the tree with 1..N applied, so 2/2 is the on=
+e
+that carries "the pair, tested". Your Assisted-by went with it, in your ord=
+er.
+Your own caveat about ten cycles against a one-in-three rate - Fisher p ~ 0=
+.06 -
+is quoted in the cover letter in your words rather than summarised away.
 
-Move the socket to BT_LISTEN before requesting the BIG sync, so the
-state is visible by the time the command is queued, and restore the
-previous state if the request could not be started.
+Nothing needed from you. If the maintainers ask for more cycles I will say =
+so
+here rather than assume you are available.
 
-Fixes: fbdc4bc47268 ("Bluetooth: ISO: Use defer setup to separate PA sync and BIG sync")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/iso.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
-
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 75bfd5938b2e..dd4e1b9a7fdb 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1737,6 +1737,13 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 		switch (sk->sk_state) {
- 		case BT_CONNECT2:
- 			if (test_bit(BT_SK_PA_SYNC, &pi->flags)) {
-+				/* Move to BT_LISTEN before requesting the BIG
-+				 * sync: the BIS connections are matched to a
-+				 * parent socket in BT_LISTEN state, and they
-+				 * may be notified before the request returns.
-+				 */
-+				sk->sk_state = BT_LISTEN;
-+
- 				release_sock(sk);
- 				err = iso_conn_big_sync(sk);
- 				lock_sock(sk);
-@@ -1745,12 +1752,12 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 				 * connection may have been torn down
- 				 * meanwhile and iso_chan_del() may have
- 				 * already moved the socket to BT_CLOSED.
--				 * Only move on to BT_LISTEN if the BIG sync
--				 * was actually started and nothing else has
--				 * changed the state.
-+				 * Only move back if the BIG sync could not be
-+				 * started and nothing else has changed the
-+				 * state.
- 				 */
--				if (!err && sk->sk_state == BT_CONNECT2)
--					sk->sk_state = BT_LISTEN;
-+				if (err && sk->sk_state == BT_LISTEN)
-+					sk->sk_state = BT_CONNECT2;
- 			} else {
- 				iso_conn_defer_accept(pi->conn->hcon);
- 				sk->sk_state = BT_CONFIG;
-@@ -1760,12 +1767,17 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 			break;
- 		case BT_CONNECTED:
- 			if (test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
-+				/* As above, the BIS connections may be
-+				 * notified before the request returns.
-+				 */
-+				sk->sk_state = BT_LISTEN;
-+
- 				release_sock(sk);
- 				err = iso_conn_big_sync(sk);
- 				lock_sock(sk);
- 
--				if (!err && sk->sk_state == BT_CONNECTED)
--					sk->sk_state = BT_LISTEN;
-+				if (err && sk->sk_state == BT_LISTEN)
-+					sk->sk_state = BT_CONNECTED;
- 				early_ret = true;
- 			}
- 
--- 
-2.55.0
+Sergey
 
