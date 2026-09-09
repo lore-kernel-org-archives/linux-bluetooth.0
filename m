@@ -1,102 +1,130 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-30.smtp.github.com (out-30.smtp.github.com [192.30.252.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E614F39CCEB
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B095592EC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788978814; cv=none; b=ooMCvRVUzVxzkuMhM7GCElkEpgCgWeaTx54JgEZdU9pOS+NnRoZ8jpoazOQhkufyCzQQxjjNL8Rc0cSAJR3ISquIZRZk9sDgMyB55xY8NPDKZrTov97orj0w9vA5zczF84tg84O7hQlQgNaBasPM26ODc/s8EDmEOrA+zWoOApM=
+	t=1788980084; cv=none; b=sBSfEPBB4+Hpq4QuckZzB/xTajZXIR9T3eKlDJ2rCzXflzDOjLVYspJgG+soOO2pKeSfwzGoFWyXZMf+PM8xK67UotjbFUfw7NYHZGE6rtv+Y0kB0Mj2zdz8fYi/JwHfDi4pgq/mdQdnLx+RdRBfFGUQFo0+0MJAGV8T39AsvlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788978814; c=relaxed/simple;
-	bh=peV0QDmOv2RpylKNsqiOQ0PlLLqXwh9h6AojzDr/wKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PYxv1gCDJVxfMDIrn20D64ooi7PCPcpSSmvsg/zUxdNVX59sO5G3+QJmMzCwzJKM7SInu4I/qglyQGjriWBlx0ydKSTnD2SwgKEoxA8scn+DpBBH0lp90oewXh2M+dNO+cQ59fSAsoL4eQl3jVtCWgLqJ9oRotl2YZPhmAX268o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esoV/yEN; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788980084; c=relaxed/simple;
+	bh=BNvvoc+UYOjWcKx5U0vd21gNBUVcHLNDtzOoqfPwtAo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=QYxcGHpCsC27ICL9jKC+RpjseS3KRdMp74ZwV8ZESRshMzPx0c84+7/21Jfoar6qnQW4+JRaqRg0eep5pwox4hto4NCax8CSVmmp4HR1i1tDtYeUJTwKOaSaatWL3hcWS1u0/yA5DHYWI0Q5JHk8yYMqVmNfH/KNB5fHCAAGSbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AOvBMno8; arc=none smtp.client-ip=192.30.252.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esoV/yEN"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-4843c2790ccso911953f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 11:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788978811; x=1789583611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=peV0QDmOv2RpylKNsqiOQ0PlLLqXwh9h6AojzDr/wKQ=;
-        b=esoV/yENBNtN1UrvqGVE0kwhqKEqRRRE2iuH1G81A6TbMmhLUI/ec9NaIs+OpmaMdP
-         ZmD7VVxG7GNk9zsD1dnNat5u5VnaC3fhw2GnZviyPobyIz9GP7QCnmVyJez+6t1TGQd3
-         BAAIX1g57dQ3kOELqfxemrJORENKTdf37qJ+C+4XnH1jmxrRvBZioKxJgNdvNAzLbWzX
-         9xe+la6ESQGrwqwJO4olhW5xYRl+YPCur93lEcsCqujXpEjEgWPhc3q+fOHKiBPQk2oN
-         F5MzdhzsJ1xkahcgryRy90VI9yk+mnfu9/0T+lOnHRKGTkbb1et4ggteHCVbUBlu/W4A
-         PLvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788978811; x=1789583611;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=peV0QDmOv2RpylKNsqiOQ0PlLLqXwh9h6AojzDr/wKQ=;
-        b=AAUmEloVk9PHxD0UdIKTtHGX/DHhboHTKfKQ8AW9lWXseKIs6BhJXiy2r1ZzQZi15j
-         xr6+feXxywOY7tQdri7XcaaFdg53F6VAtiMHYtYIhn+CAPed4cqBy7KaZp0ElMohmv88
-         FXF93l5CniNB2WY326j6gjF3Qei5f1NWPONUaYm9VemR2ihlZg+ky3JHQKcx6c7syJ+W
-         YQ68Btqs7cgmjwchmZMYaf/ljWgSkxwokVT7KynnOHtPeua1zK0mQVcMJP6qg/7AmRKv
-         4/QhykNviWK7m9TI1oOpgDX0Nms1fQt9/DIFsberoF5/JgCvH9D4kktg7OLrA9wTohiv
-         RhtA==
-X-Forwarded-Encrypted: i=1; AKwUvBwiqmaJJS/vM3RW2FTWp771sxDvIaafzlfXJnSCAAigTX9QFxMcXCP0d2/fr4x92HHYcnjAh9sKkKJNvzmrACk=@vger.kernel.org
-X-Gm-Message-State: AFuF++m9ddLvmrj1kkCUW/VK5/FQRgn0VApVBUhdZfjihq884jgJ79vM
-	IQ9W//5zIxXj4kP272JLEKRtYgFgmK95W7RZCxQbMINDLBwSnzPAul7f
-X-Gm-Gg: AYBFou1vwTJtUL/oathyeQeBbekZfjfYYYg2UhXDVSHWHA+9x8ggZDK5v3N/znwNU4V
-	HuL78jMlg51ZhQq+A+wmH7YNftJFMzx+4GO9pVJTUaFzD6Caq4KBHqClbFWGT+Mn+fss6KrjVjf
-	4pkRyfwQwMt4Ygrn8tpln7s7OlrmLfDSG/skHT89og85cPPKFAZHHYryaoRRFbfPeL/c88mWERc
-	yz9PLWI0rQn1WetOp2pqaUc6bIt5u7QHtLQ3e7dWgQbpn6WnR8Q6gcUMcm09NC09vHMM5h4VLuW
-	+ee8tOsZMpmcKfvu27maVrjsZ4Yhj2dDzj+6tITTe0+swUWc4Gu9jFnCV2+ePbNlDpDu7l+Kaom
-	mXgHWj3xJe9LywWIcIjKVIdAE6NKe9haz4dmXmCo8r8SAGzoxtaAjGaoL9kltC4b/gLEmxmV7vi
-	ocCgczlbPrphoJHiMqAQPAmI2Uh971Lqxz8l591Ip9a26AkRipn/7VJWW+BLSYkA/hH6OzbdNcg
-	XK5TN47c4M56cbC3lLlYWzGN2VzGC6+Gq2PHX7GDH0N489xeASicwljk9xG+lLeACOSg9TkYd73
-	mYzWwQ+DWY2eOtYrtujAO00GNA==
-X-Received: by 2002:a5d:64e8:0:b0:485:b169:54fd with SMTP id ffacd0b85a97d-485b169576emr7617081f8f.4.1788978808281;
-        Wed, 09 Sep 2026 11:33:28 -0700 (PDT)
-Received: from cdev ([2a02:8071:68c3:bd00::8998])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-485885b1320sm44363262f8f.27.2026.09.09.11.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 11:33:27 -0700 (PDT)
-From: yCduIhFgkD <vladimirkondratyev2@gmail.com>
-X-Google-Original-From: yCduIhFgkD <83831960+yCduIhFgkD@users.noreply.github.com>
-To: lsa.uz@pm.me
-Cc: arnd@arndb.de,
-	chandrashekar.devegowda@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	dev@lengyelf.eu,
-	kiran.k@intel.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	mahalingeshwara.chambarakatta@intel.com,
-	marcel@holtmann.org,
-	pmenzel@molgen.mpg.de,
-	ravindra@intel.com,
-	ravishankar.srivatsa@intel.com,
-	vladimirkondratyev2@gmail.com
-Subject: Consent for Assembly
-Date: Wed,  9 Sep 2026 20:33:25 +0200
-Message-ID: <20260909183325.20971-1-83831960+yCduIhFgkD@users.noreply.github.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260909123416.71919-1-lsa.uz@pm.me>
-References: <20260909123416.71919-1-lsa.uz@pm.me>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AOvBMno8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1788980080;
+	bh=4sYq56qjbEKdgxne0Qw9LdLPnAPWNWU88t7kIwPrV0M=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=AOvBMno8ufjoSBVp1iXR5gRk+JDvclmSNN4uT4ufB8LGEbJQZDtPGVlRETv3Gdl1o
+	 V7oqiHNU0LUWp0TKfBlVsISQCwusSdj8wwBiWKsQjObFf8ZH8NisEbVlFJDYj1DebV
+	 hFL3/+sy8NAnbH6R8OE1UuwcX2L6BSNMfH4VHVs8=
+Received: from github.com (hubbernetes-node-4045bf4.ac4-iad.github.net [10.52.208.87])
+	by smtp.github.com (Postfix) with ESMTPA id D7F1032016F
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 11:54:40 -0700 (PDT)
+Date: Wed, 09 Sep 2026 11:54:40 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/action-ci/push/refs/heads/main/1e08fd-9693b1@github.com>
+Subject: [bluez/action-ci] c01507: Use AddressSanitizer instead of Valgrind
+ for testers
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Sergey,
+  Branch: refs/heads/main
+  Home:   https://github.com/bluez/action-ci
+  Commit: c01507fbe25ba02f0274de077dae262d9d0c96da
+      https://github.com/bluez/action-ci/commit/c01507fbe25ba02f0274de077dae262d9d0c96da
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-09 (Wed, 09 Sep 2026)
 
-Sorry for the late response.
+  Changed paths:
+    M ci/testrunner.py
+    M ci/testrunnersetup.py
 
-I consent to the assembling the series.
-Also thanks for the extensive testing! You're really rad!
+  Log Message:
+  -----------
+  Use AddressSanitizer instead of Valgrind for testers
 
-Regards,
-Vladimir
+On blueztestbot/bluez-build:latest (d5484a10bde6) from 2022-12-20,
+testers ran with valgrind work, but they fail with timeouts when using
+image rebuilt from https://github.com/BluezTestBot/docker-bluez-build
+(89186b243e08) that should correspond to the source of the original
+image.
+
+As we cannot stay with unreproducible CI image, this should be fixed.
+
+As the cause of the issue is unclear, switch to using ASan instead of
+valgrind.
+
+Example (with intentional crasher added in iso-tester)
+------------------------------------------------------
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Sanitizer errors:
+==33==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7bab5fd7f2e2 at pc 0x55d17f8a90d6 bp 0x7fff0e52b3c0 sp 0x7fff0e52b3b0
+WRITE of size 1 at 0x7bab5fd7f2e2 thread T0
+    #0 0x55d17f8a90d5 in test_connect_close tools/iso-tester.c:3714
+    #1 0x55d17f9737c9 in run_callback src/shared/tester.c:512
+    #2 0x7fab627fbb9a  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x60b9a) (BuildId: 2426ee6f828a10bf4da963a4c474752c33742359)
+    #3 0x7fab627fd1d6  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x621d6) (BuildId: 2426ee6f828a10bf4da963a4c474752c33742359)
+    #4 0x7fab627fd576 in g_main_loop_run (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x62576) (BuildId: 2426ee6f828a10bf4da963a4c474752c33742359)
+    #5 0x55d17f977c08 in mainloop_run src/shared/mainloop-glib.c:65
+    #6 0x55d17f97853a in mainloop_run_with_signal src/shared/mainloop-notify.c:196
+    #7 0x55d17f9766fb in tester_run src/shared/tester.c:1085
+    #8 0x55d17f8a3951 in main tools/iso-tester.c:4402
+    #9 0x7fab61f87600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
+    #10 0x7fab61f87717 in __libc_start_main_impl ../csu/libc-start.c:360
+    #11 0x55d17f8a8ef4 in _start (/work/base/bluez/tools/iso-tester+0x16bef4) (BuildId: c55e00a4de821cd607408898c962c16c12e2322c)
+
+Address 0x7bab5fd7f2e2 is located in stack of thread T0 at offset 34 in frame
+    #0 0x55d17f8a8fcf in test_connect_close tools/iso-tester.c:3706
+
+  This frame has 1 object(s):
+    [32, 34) 'buf' (line 3710) <== Memory access at offset 34 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow tools/iso-tester.c:3714 in test_connect_close
+No test result found
+
+
+  Commit: 9693b14748368889034e742eae601c1a6fa7c8b7
+      https://github.com/bluez/action-ci/commit/9693b14748368889034e742eae601c1a6fa7c8b7
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-09 (Wed, 09 Sep 2026)
+
+  Changed paths:
+    M Dockerfile
+
+  Log Message:
+  -----------
+  Use CI image in Github container registry
+
+Use image from Github container registry, built via Github actions so
+that it is easier to manage, without needing dockerhub or any other
+additional secrets.
+
+This image includes LLVM 23 prerelease from kernel.org.
+
+NOTE: The image is currently built from my personal account,
+https://github.com/pv/bluez-ci-image/pkgs/container/bluez-ci-image but
+probably the repository should be copied in the organization and the
+image name changed accordingly.
+
+
+Compare: https://github.com/bluez/action-ci/compare/1e08fd655d42...9693b1474836
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/action-ci/settings/notifications
