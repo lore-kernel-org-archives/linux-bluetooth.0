@@ -1,170 +1,129 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04802D2394;
-	Wed,  9 Sep 2026 06:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387B253444A;
+	Wed,  9 Sep 2026 11:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788936588; cv=none; b=stZAYkRBwv4ahHUO8b16FbUchv1/4AOwzi0AL1UjioumhrZpGCRYmLHa68i+gRsJb3xPBw+EUxqUUfVu5FGrApbVyi6Vp+6l5AERZMDfMlRPEIw53DjolsrdzwsPiJwkG2wvsaZvhCqOFcO5vYjtBUFHV2LL05KYQGdyNOL/Zic=
+	t=1788952231; cv=none; b=pHTq43FPPopGr9KrV5IqJoxUYIjyCN4mm9UejrPkSpm++cCRsLfiTPsYS4HAcTZSTjKVNyrSaY9frtJt+D6cSCIHtu9S/La4k0MZBFS/ZKgubIqE/Mwd8WZlPOdNwrAVSTRy1SLSifhG9qKQ2TeOmgfPnzJN0EcUceFgqpWaL5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788936588; c=relaxed/simple;
-	bh=XBnhsi6xvd4e0jQm3n+/womrD2HTzZRCWmLgKfzumUY=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=H/Qe6uvykrNtzACunUNr9CdCwECyuqAwVcFO/nYvSPqiPyB4W8cIE0s/FKdSEZSrTizLTxQ+Y2VTq3l2npV3yDWUcp9WUy6B7usYRo6MklUYhBPJ4OaxhoiRqlML3MHhhWjbacCgGB92lcTs9pRCkmD2lPtxHwXNq6E5GTt7EcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dr33Oncq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788952231; c=relaxed/simple;
+	bh=wfAjG3xc4WD+14QS2bjYrzcPuHZ1rp3d4zj4V0Qov5A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VvcAEVLKr3m1DD9S1FJ3vnNPXtVqsot/8rtjyOUf8gYifhXOK73vjLo7bDLeGN2sW9JHQeUMM6nONbqdhUBTPFYWpoKVCGOhTRCKGZ5V1b4ZvMTtTdiBdx+GiXqboJvzEHJCYzv9qsEQSK4c5F7DR5tgTXxZJtsZ900l+WgHvnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyHPLpzh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dr33Oncq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 097701F00A3A;
-	Wed,  9 Sep 2026 06:49:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyHPLpzh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBF31F00A3D;
+	Wed,  9 Sep 2026 11:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788936586;
-	bh=kKazGw5+atcf0ULky7HaRXouWtqNdBEt7UPDBRT986Q=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=dr33OncqDBFbFP0lBx8VgSPNAVtFNI0WyeYLAVUD2xAgJjZQnZt5h3njQ+KQcPZon
-	 O95u0acudgbsHa1xmlZlG6TCivLf5XPp8SVoaVjkzSBKv/Z3LzSlioRG405Ign4Gu3
-	 sJHz1Oy+Q+idOmcEiuvqQO1iP85QX7qdBW/Id6MO7WgfmmNdKMNQjpff5RTah+uL/V
-	 YEDVbcClRjPEqrIVjiyO+3OmZE/J9HGltD/nD2XW8OZT6CMNq1vsNscBelvU+b0gPa
-	 ukscqMCQA5YKAnGTNgPHPv2HjvgQHT0wA60csavZbmth/w1Csld28/Qz03y1dCobta
-	 mvnvtKb6gwhOw==
-Subject: Re: [PATCH] Bluetooth: bnep: linearize skb before sending
-From: netdev-bot+sashiko@kernel.org
-To: adrianox@gmail.com
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
-Date: Wed, 09 Sep 2026 06:49:45 +0000
-Message-ID: <178893658555.219967.8683671441014742630@kernel.org>
-In-Reply-To: <20260905194725.284347-1-adrianox@gmail.com>
-References: <20260905194725.284347-1-adrianox@gmail.com>
-X-sashiko-severity: High
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20260515; t=1788952229;
+	bh=MuTYkpEO+OAvSgW8nQ1UXafGJKttePgWaVsiZWUwXB4=;
+	h=From:To:Subject:Date;
+	b=OyHPLpzhoo38GcvuV/StwErnULHiW2qKE52YRx2k4YavF2dcFhKhCmCTb7TsBeKrd
+	 aNiL249qXYr154FK8FfdZCisbnGDhTmAc/XJG6WRLCfUmmuS6SOQkvaSNRqILT+IJU
+	 R5jNDD2yjTDmMk7Yybp8Z6qYaZEwyrUGf5jjNOcdcrXGnmXVAdSTAm3AcLX/SP5EIR
+	 ++Q5/NzbHDXhHNpCf83RXxbMOCrLeEM3n+Py5pi2AFY6HjqNF+AhCUcXZtvCQLs771
+	 caA39Hty6189lj3PRa9oklYzR0HmtPLzfBMywzeNpOySKOFfldpJNr3JC/9WTCZBUC
+	 pUydRNWTMe1fA==
+From: Lee Jones <lee@kernel.org>
+To: lee@kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Brian Gix <brian.gix@intel.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries on cancel
+Date: Wed,  9 Sep 2026 11:10:20 +0000
+Message-ID: <20260909111021.2322753-1-lee@kernel.org>
+X-Mailer: git-send-email 2.55.0.1007.g17ff1f9808-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue(s) to consider:
+In send_cancel(), pending mesh_tx objects are removed from the
+hdev->mesh_pending list and freed via mesh_send_complete().  However, if
+a mesh transmission was already queued onto hdev->cmd_sync_work_list via
+mesh_next(), the queued entry retains a raw pointer to mesh_tx.
 
-Critical: 0 · High: 1 · Medium: 0 · Low: 0
+When hci_cmd_sync_work later processes the entry, it attempts to execute
+mesh_send_sync and its destroy callback mesh_send_start_complete using
+the already freed mesh_tx pointer, leading to a use-after-free.
 
-- [High] net/bluetooth/bnep/core.c:bnep_tx_frame() — the newly added
-  skb_linearize() is placed at the `send:` label (line 480), i.e. AFTER…
+Fix this by invoking hci_cmd_sync_dequeue() for mesh_send_sync on the
+target mesh_tx before completing it.  If the entry is found and dequeued,
+its destroy callback will complete and free the object; otherwise,
+mesh_send_complete() is called directly.
 
---
+Additionally, ensure the transmission queue advances after cancellation
+or errors.  In mesh_send_start_complete(), call mesh_next() on error
+unless err is -ECANCELED, because hci_cmd_sync_dequeue() holds
+hdev->cmd_sync_work_lock and calling mesh_next() synchronously would
+deadlock.  Instead, advance the queue in send_cancel() once the lock is
+released and if no transmission is in progress.
 
-Bluetooth: bnep: linearize skb before sending
+Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+Signed-off-by: Lee Jones <lee@kernel.org>
+---
 
-This replaces the FIXME comment and its dead block in bnep_tx_frame()
-with an skb_linearize() call at the send: label, freeing the skb and
-returning -ENOMEM on failure.  The commit describes the change as
-defensive since the stack should already have linearized the skb.
+v1 -> v2:
+  - Advance mesh queue in send_cancel() once cmd_sync_work_lock is released
+  - Advance mesh queue on error in mesh_send_start_complete(), skipping -ECANCELED to avoid self-deadlock
 
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index f7d88c33e23e4..e9bbd4b0dff17 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -477,13 +477,15 @@ static int bnep_tx_frame(struct bnep_session *s, struct sk_buff *skb)
->  	}
->  
->  send:
-> +	if (skb_linearize(skb)) {
-> +		kfree_skb(skb);
-> +		return -ENOMEM;
-> +	}
-> +
+ net/bluetooth/mgmt.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-[Severity: High]
-Is this placement of skb_linearize() too late?  The commit message says
-"Check the skb is linear before building its kvec", but at the send:
-label part of the kvec array has already been built from pointers into
-the old skb head.
-
-bnep_tx_frame() captures eh at entry:
-
-	struct ethhdr *eh = (void *) skb->data;
-
-and for the compressed cases it stores eh-derived bases into iv[]:
-
-	case BNEP_COMPRESSED_SRC_ONLY:
-		iv[il++] = (struct kvec) { eh->h_source, ETH_ALEN };
-		len += ETH_ALEN;
-		break;
-
-	case BNEP_COMPRESSED_DST_ONLY:
-		iv[il++] = (struct kvec) { eh->h_dest, ETH_ALEN };
-		len += ETH_ALEN;
-		break;
-
-skb_linearize() -> __skb_linearize() -> __pskb_pull_tail() can reallocate
-the head:
-
-net/core/skbuff.c:__pskb_pull_tail() {
-	...
-	if (eat > 0 || skb_cloned(skb)) {
-		if (pskb_expand_head(skb, 0, eat > 0 ? eat + 128 : 0,
-				     GFP_ATOMIC))
-			return NULL;
-	}
-	...
-}
-
-pskb_expand_head() allocates a new head, copies the data over and frees
-the old buffer, which is why its kerneldoc says all pointers into the skb
-header must be reloaded after the call.  eh is never reloaded here, so
-does iv[1] end up pointing at the freed head?
-
-> @@ ... (continued)
->  	iv[il++] = (struct kvec) { skb->data, skb->len };
->  	len += skb->len;
->  
-> -	/* FIXME: linearize skb */
-> -	{
-> -		len = kernel_sendmsg(sock, &s->msg, iv, il, len);
-> -	}
-> +	len = kernel_sendmsg(sock, &s->msg, iv, il, len);
->  	kfree_skb(skb);
->  
->  	if (len > 0) {
-
-[Severity: High]
-Can this kernel_sendmsg() then read six bytes of freed slab memory and
-transmit them to the remote BNEP peer, along with a corrupted MAC header
-in the frame?
-
-There is also a self-consistency question about the change: when the skb
-is already linear, skb_linearize() is a no-op and the patch has no
-effect.  The only case where the new call does anything is the nonlinear
-case, which is exactly the case where it can invalidate iv[1].  Would
-moving the linearization to function entry, before eh is dereferenced and
-before the skb_pull(skb, ETH_ALEN * 2), or reloading eh after a
-successful linearize, match what the commit message describes?
-
-For reference, the RX side in the same file already linearizes before any
-header is touched:
-
-net/bluetooth/bnep/core.c:bnep_session() {
-	...
-		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
-			skb_orphan(skb);
-			if (!skb_linearize(skb))
-				bnep_rx_frame(s, skb);
-			else
-				kfree_skb(skb);
-		}
-	...
-}
-
-On reachability of the dangling pointer today: bnep_net_setup() in
-net/bluetooth/bnep/netdev.c only calls ether_setup() and never advertises
-NETIF_F_SG or NETIF_F_FRAGLIST, and netif_skb_features() can only reduce
-dev->features, so validate_xmit_skb()/skb_needs_linearize() should
-already have linearized before ndo_start_xmit, and skb_gso_segment() with
-!NETIF_F_SG produces linear segments.  So the freed-memory read may not
-be demonstrably reachable in-tree, but the ordering the commit message
-claims to establish is not the ordering the code implements.
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0b2d130e492c..55ccf9b714af 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2290,6 +2290,8 @@ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err)
+ 		hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
+ 		/* Send Complete Error Code for handle */
+ 		mesh_send_complete(hdev, mesh_tx, false);
++		if (err != -ECANCELED)
++			mesh_next(hdev, NULL, 0);
+ 		return;
+ 	}
+ 
+@@ -2399,20 +2401,29 @@ static int send_cancel(struct hci_dev *hdev, void *data)
+ 		do {
+ 			mesh_tx = mgmt_mesh_next(hdev, cmd->sk);
+ 
+-			if (mesh_tx)
+-				mesh_send_complete(hdev, mesh_tx, false);
++			if (mesh_tx) {
++				if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
++							  mesh_tx, NULL))
++					mesh_send_complete(hdev, mesh_tx, false);
++			}
+ 		} while (mesh_tx);
+ 	} else {
+ 		mesh_tx = mgmt_mesh_find(hdev, cancel->handle);
+ 
+-		if (mesh_tx && mesh_tx->sk == cmd->sk)
+-			mesh_send_complete(hdev, mesh_tx, false);
++		if (mesh_tx && mesh_tx->sk == cmd->sk) {
++			if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
++						  mesh_tx, NULL))
++				mesh_send_complete(hdev, mesh_tx, false);
++		}
+ 	}
+ 
+ 	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_MESH_SEND_CANCEL,
+ 			  0, NULL, 0);
+ 	mgmt_pending_free(cmd);
+ 
++	if (!hci_dev_test_flag(hdev, HCI_MESH_SENDING))
++		mesh_next(hdev, NULL, 0);
++
+ 	return 0;
+ }
+ 
 -- 
-Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260905194725.284347-1-adrianox%40gmail.com
+2.55.0.1007.g17ff1f9808-goog
+
