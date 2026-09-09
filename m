@@ -1,120 +1,207 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106119.protonmail.ch (mail-106119.protonmail.ch [79.135.106.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA445867DE
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 20:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788986550; cv=pass; b=OWG3/IzmCXLfuqWlvl0cwSwF1d5HisBozKYgTXX/td8CU3ypZqJ6DTIl2iNReJygjgQJsdA6I2bfEB5JSq7JrmDJJSdWnOJy1iLvm25BcYYVxPUzJ/m71VqHSgJL9fMrTBkL71BoVldhx72ACHX/PQWPewVVh5Gfz+wqHm8Hs1Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788986550; c=relaxed/simple;
-	bh=dfa7Q8dbxI96kvAtn8ple5MMEN1SKMhEfZltbZERr28=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rn4EbStJkK8dYTL+2t2xdEd1oskGxff3tOFuszsdYcxJRZiEl4AC6tasQ7AEYRg2NQtDBzhl5mWA4sKCuCSPlTuiOwghVb5mAJi0bgGF5RIW+KCyBbTPMOY2vDEivuSOfPp9C8iO27A9PsCgJLR8ULf27V41cD7zReKqogMb1ec=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=WOuS/jyr; arc=pass smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6A53D47DA
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 20:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.119
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788986845; cv=none; b=nHGTfk1lzU//4WKN07CAikLJsb9fEx1y+4dl9vnlgaq0VFvQerBmyJIVJ/PxVbIIdLY1MLCRu7O3ZI+XKdSITVlDzNLhKiSlUcuVQfNvDKRLnKbnDa1CTJx3dRnMkVecyOlRQXMe9o31I4QlgZ9cKOlTcVfz/gMklv5Xw7hlLMc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788986845; c=relaxed/simple;
+	bh=ZU8YTTlzkNKsk+YFMVAdXTY9Z7QXxSJjAl1Q33+ioAk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kfo86HmEQetNzLTIVf4JfxUO2RbDQGh/3G7aWoOWm051Z1MGFO2Q5hwD2ziwP+svkzEut6CTvwwG1NRyM+5hRfJFZOhclCsB+OI4bbRLm5qw6oWP4grhdEEi+gJswoink526rt9StvFN1IR09PL+jujhVg+aYHow+JtvOQg53NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=Q9/51Ve2; arc=none smtp.client-ip=79.135.106.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="WOuS/jyr"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-86d43cdee51so81383657b3.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 13:42:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788986529; cv=none;
-        d=google.com; s=arc-20260327;
-        b=shB87KZtAK8gBgK9qz16lay03lXF5X2xChKowGZsdbOO+PqmblozaraxF8ehrnjXB0
-         nQ3OWDcpdxW+hRe20Hj3/i083P0vK3PiNJL+65pIT1yaJlHdr2uo2l8kHWF3DiSX5x5l
-         hPVUeMX2UY39Ezt3rDHt91g4h+SvECxVvXElpVGyxe8xrJiL1BL/oHNPuu+X5fxUqjzp
-         EyILbbReIfyNGLUDvMt0ohIp/dNijscDIq6lw0X/mhz1tBMn3dxjmEo11PtB+3/myf4O
-         NhAXC51e1Uty4CNgvlFgQQfN92VwJZEeiZMxr70QvR/lkta+dqTYvSrPckYQISK6er2A
-         OnYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=dfa7Q8dbxI96kvAtn8ple5MMEN1SKMhEfZltbZERr28=;
-        fh=E1Z79MlpcxsOhsl5ZdiRRAvpoRvJ7yrNR+SNAwfUVxc=;
-        b=TaRfD1/Yv/oD1CnJYxOOBqT1mJ2gkS+7uLp41Ba26/kgVdelzBv5ic9JMGE0FxFD/s
-         +G/aXqbqL1zaDGPrNILo2233zZaw+RR5o4d3K6nHd+jIVqKkF8fXZNYXeCLYRkkn9rhv
-         Sm1Qvqz8besbWMYU0usTZdcP7VtvnRFNAMuBze1VtpJrs5oq/u8ryboC8mp89zEoq7M4
-         CoUut0fdepZL3w3OgZXamtAd4nOHj46F5eThZMXQ2cHSRoyk21L4h2EhSr9KKzbWodVW
-         LliZuWECz7gK/90nOzkBuLftbMuJZHXlFN6bByDR8dvf0KWRH+yxfNZgmmROftmw9PzA
-         F1TA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=irregular.at; s=google; t=1788986529; x=1789591329; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dfa7Q8dbxI96kvAtn8ple5MMEN1SKMhEfZltbZERr28=;
-        b=WOuS/jyrvbrNxupQuFu0ylEzjjHsT+mJKuCEtRAniyXjFI6tqRPlaiKadzGf5oGxNz
-         hk5akwTqGbdEuo+hWz/g1WFhdvQIQrm0gIbIv/2xHOz7EgEryQqmoA/qc14i0brouTGQ
-         hGuf/0vh54mZEAPZHq540omDkPhdpZtNlS/bM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788986529; x=1789591329;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=dfa7Q8dbxI96kvAtn8ple5MMEN1SKMhEfZltbZERr28=;
-        b=WGUNsC/pBrdIrkvDdX5FyN2qhUe0VSCTZ7SNNjJPrdn4ACy8nRf3ZDGYgMYwsF6lV5
-         LsSujvg+oiE+voWErkeke4R4DHUxeGpx+RgL9gudJUNAfvGEvTAtud+WSZFHi8TlSjLJ
-         lmpIORETlmplIKNQiwUb9mhSp7x8g6tXBL4HX2Z8x0s0cf6E6bWpdz94PtGSzhFoje8Q
-         oqlaVSUIvhyLh/923XQ7YvTv//CgJ1tRHWzRZahKk4qq3UTiBR0fzCPTxyfAi2UH4mTu
-         +CMyEFTxFNfQRicOHuF3qPZS6nmzbL5INCFA+/RnEM5Innbr7vAhswLjoVkezpZ5eH1a
-         XVow==
-X-Gm-Message-State: AFuF++m/5LFOYjUZTJo3o1Gfi+5hy34mhmm4b2P8RmuQVouNmeNQzT5R
-	B2oHFoH8D5Vhdjdg9U9z9QRbrLB/erAy+G0RYlbKaHZYPM6CSGE3nWZFx0Zgtl+OUheCDsYc4ci
-	q/shZM5+0j6IdhJokaXQy01U7I4aBgxnl5RovCv2UWBsIEGx05uepNssaFw==
-X-Gm-Gg: AYBFou0oFHaCAG8wv0rrsGkQghIKq5blWpmLjE97ezINOZi2s8mZMopcq30CAEQXCgu
-	enwB2GMP2cBDCKMHCTaItCmx5iokzlszN4gOtnu8QaiwkX9PB/ciWceV2WbhyM1K7WknXGHW16w
-	K6W4DQZi8ao0s7o13zN0WV9K4xmc6sS3cfatbu4agbM4Y+bOqdk0s/6EMYChXqyT+xhqHbJAkaY
-	m0c8BN4JS8axkI0fFyuLia7c69jXcEAwvgmk0fE6Gio8L2LJv76XChXBmmkC6w80lzUzjPT3wKE
-	FSydUHW5vbqR6IHabF0/EBmMI5YXLcKlE+XP8Oazz4VK9CQuHcn48XGci42ENwHSixBaaS7xP5h
-	KQ4mts1nVmIb+G+3/yFHGUhtjgiatE9C3TYYCHUhF5ntxHputw1gp42aQtg5gnhu6zMIfmwEcaw
-	E77gacjaCsyRVp72Rk2CqWW6HASRtc+Dg=
-X-Received: by 2002:a05:690c:7685:b0:873:5bb2:6c3b with SMTP id
- 00721157ae682-8735bb26fbdmr99000937b3.66.1788986529195; Wed, 09 Sep 2026
- 13:42:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="Q9/51Ve2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1788986830; x=1789246030;
+	bh=lABxs6VEi+8CS6nFugnKUAy5WADKPTGxiYP0lOC9JLI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Q9/51Ve27fIwlYItLOfztKFg1+MvKQN6KrdZovFBD5sp6ZVmmMFQDsFaYC7GBnuAP
+	 h482L8BHuh/KxE+bN/1LbtiSLTIfDbwIEsDXZacI6tKH3NbLCU+vtK4KMr+8w/HuG3
+	 3Tl7JHoAZIeFWCdcl9BygBt/cCfPNSX9M2kIpzfEH6Heftmt2nlkE+3IQfdvsDu2Jt
+	 eKRfjdJR7NWNiskVdPtmt/z/XNS2JTrWJJGJxThag+vUEUVOdHHRE77PoNJSo06NGs
+	 Qjxr5tfudJuZjAEM+dqH0sdgsCRHykOYidTgOYBUUITSi9DgDXKdWqhKTXHf0qazcu
+	 GeF3h8Q8ub1nA==
+Date: Wed, 09 Sep 2026 20:47:04 +0000
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+From: Sergey Lebedev <lsa.uz@pm.me>
+Cc: "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>, Ravindra <ravindra@intel.com>, Ferenc Lengyel <dev@lengyelf.eu>, Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>, Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>, Kiran K <kiran.k@intel.com>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Mahalingeshwara Chambarakatta <mahalingeshwara.chambarakatta@intel.com>, Arnd Bergmann <arnd@arndb.de>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+Message-ID: <20260909204654.91282-1-lsa.uz@pm.me>
+In-Reply-To: <CABBYNZJfH4F1-Hy1eiOrzuU1nzTbMbue3EqMT5gfHs60wFw9QA@mail.gmail.com>
+References: <20260909123416.71919-1-lsa.uz@pm.me> <20260909123416.71919-3-lsa.uz@pm.me> <CABBYNZJfH4F1-Hy1eiOrzuU1nzTbMbue3EqMT5gfHs60wFw9QA@mail.gmail.com>
+Feedback-ID: 113843758:user:proton
+X-Pm-Message-ID: 7bba8913a876a238097641328487cca3ecdf0597
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1787327795.git.m.kurz@irregular.at> <CAO=2mx7zXHmahddsPMaDAZ=2zOdonYOE2nvJB__S6ORU_by3-A@mail.gmail.com>
- <CABBYNZLBvSo+gM5tjRL052tuhj+Ki+Zb7KucAWqs=2nszreoAA@mail.gmail.com> <CAO=2mx6PV0B5i289kEz24mqhvdm2rhUttPqVEJRHYxkYgK5m8g@mail.gmail.com>
-In-Reply-To: <CAO=2mx6PV0B5i289kEz24mqhvdm2rhUttPqVEJRHYxkYgK5m8g@mail.gmail.com>
-From: Matthias Kurz <m.kurz@irregular.at>
-Date: Wed, 9 Sep 2026 22:41:58 +0200
-X-Gm-Features: AcwNN1Xzk893f5Ewl4Y0JtBsanRhM4mMA19F2tylf293_QzKOhHNHiXsrUmI0kI
-Message-ID: <CAO=2mx5Kgo7EdiOX3asZez_faf9K6U7Apqn1tCvHnYDmEe7o_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/4] Add component batteries and Fast Pair
- Message Stream
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz, hi Bastien,
+Thank you for the pointer. That review reached no list at all: not
+linux-bluetooth, not devicetree, and not sashiko's own sashiko-reviews list=
+,
+which I checked over 31 August to 9 September. It exists only on the site, =
+so
+without you going to look we would not have known it was there.
 
-A short update on the downstream support: the UPower implementation is
-now available for review as a Draft MR:
+One of its three findings is real, reproducible, and worse than it claims. =
+I
+have measured it rather than argued about it, and the fix is below. The oth=
+er
+two are at the end, more briefly.
 
-https://gitlab.freedesktop.org/upower/upower/-/merge_requests/344
+A missed alive interrupt now costs the controller, not just the suspend
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-It consumes the proposed component Battery1 API, independently of whether
-the component data comes from a built-in profile or an external battery
-provider. It remains Draft while the BlueZ API is under review, and
-retains support for ordinary single-battery reporting from unmodified
-BlueZ.
+1/2 makes set_dxstate() return success when the register says the target st=
+ate
+was reached but the interrupt never arrived. That is correct about the
+hardware and silent about data->alive_intr_ctxt, which only the interrupt
+handler ever moves. So the tracker is left saying D0 after a suspend that
+actually reached D3.
 
-I also retested the current branches today with real Pixel Buds Pro,
-checking BlueZ and UPower readings alongside KDE Plasma's battery and
-Bluetooth widgets. This covered a real case percentage, its transition
-to Unknown, earbud charging-state changes, remote disconnect cleanup,
-and reconnect at the same object paths without duplicate entries.
+On resume the handler then runs with a stale D0 context while the hardware =
+is
+already heading to D0, takes neither branch, and sets neither signal_waitq =
+nor
+submit_rx. btintel_pcie_reset_ia() and btintel_pcie_start_rx() are the only
+things that re-arm the RX rings, and nothing else on the resume path calls
+them.
 
-The MR includes integration tests and details of the compatibility
-behavior and hardware validation. Hopefully this provides useful
-downstream context for reviewing the generic component-battery API
-while the placement of the Fast Pair implementation is still discussed.
+Measured with the same fixture as my 2 September matrix - one alive interru=
+pt
+dropped inside the handler, before it touches anything, which is the state =
+a
+genuinely missed one leaves:
 
-Regards,
-Matthias
+  no injection      SP11RX: ctxt d3 -> d0, submit_rx=3D1     device unchang=
+ed
+  interrupt dropped SP11RX: ctxt d0 -> d0, submit_rx=3D0     ...then:
+
+    Bluetooth: hci0: Received hw exception interrupt
+    Bluetooth: hci0: command 0x0c01 tx timeout
+    Bluetooth: hci0: Opcode 0x0c1a failed: -110
+    btintel_pcie 0000:00:14.7: resetting
+
+and the controller comes back as a new hci index. So it is not only that RX
+stops: the firmware throws an exception, two HCI commands time out, the dri=
+ver
+FLRs it, and every paired device is gone until something re-pairs.
+
+The fix
+=3D=3D=3D=3D=3D=3D=3D
+
+Do in the fallback what the handler's branch would have done. It mirrors th=
+e
+handler's own call site, which also ignores start_rx()'s return:
+
+@@ -4204,11 +4204,25 @@ static int btintel_pcie_set_dxstate(struct btintel_=
+pcie_data *data, u32 dxstate)
+ =09=09if (dxstate =3D=3D BTINTEL_PCIE_STATE_D0) {
+-=09=09=09if (btintel_pcie_in_d0(data))
++=09=09=09if (btintel_pcie_in_d0(data)) {
++=09=09=09=09data->alive_intr_ctxt =3D BTINTEL_PCIE_D0;
++=09=09=09=09btintel_pcie_reset_ia(data);
++=09=09=09=09btintel_pcie_start_rx(data);
+ =09=09=09=09return 0;
++=09=09=09}
+ =09=09} else {
+-=09=09=09if (btintel_pcie_in_d3(data))
++=09=09=09if (btintel_pcie_in_d3(data)) {
++=09=09=09=09data->alive_intr_ctxt =3D BTINTEL_PCIE_D3;
+ =09=09=09=09return 0;
++=09=09=09}
+ =09=09}
+
+Both halves are needed, and I only know that because setting the context al=
+one
+looked like a complete fix until I dropped the interrupt on the way up
+instead:
+
+  build                     drop on D3 entry        drop on D0 entry
+  as posted                 wedged, FLR, new hci    -
+  context only              clean                   wedged, FLR, new hci
+  context + RX re-arm       clean, 3 of 3           clean, 3 of 3
+
+Three cycles of each plus three controls: no "hw exception" and no "resetti=
+ng"
+in any of the nine, and the hci index never moved. One caveat about my own
+instrument: I also counted HCI events during a scan after each resume, and =
+one
+*control* run returned zero with the device plainly healthy, so that counte=
+r is
+not trustworthy on its own. The exception and reset lines are what never
+misfired.
+
+What I propose to do
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Fold it into 1/2 and send the series as v2. My reasoning is that a fix for =
+an
+unmerged patch in the same series belongs inside it rather than on top, but=
+ I
+hold that loosely and a separate patch is just as easy if you prefer it for
+review.
+
+It changes Vladimir's logic rather than adding to it, so: Vladimir, say if =
+you
+would rather carry it yourself and I will hold. Otherwise I will send v2 in=
+ a
+day or two, unless Luiz would rather see it sooner.
+
+The second finding, which I could not measure
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Moving data->gp0_received =3D false out of the retry loop means a late inte=
+rrupt
+from attempt N can satisfy wait_event_timeout() at the top of attempt N+1, =
+and
+"if (status) return 0;" has no hardware check behind it - the register re-r=
+ead
+1/2 adds sits on the timeout path only. So the function can report success
+having just written wr_sleep_cntrl() and waited for nothing, right after th=
+e
+previous iteration read the hardware and found it *not* in the target state=
+.
+
+Real by reading, but unmeasured: my fixture drops interrupts and does not d=
+elay
+them, so I cannot produce a late one. Saying so rather than implying I test=
+ed
+it.
+
+The third, which is pre-existing and not this series'
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+set_dxstate() clears the GP0 cause with btintel_pcie_clr_reg_bits(), which =
+is
+a read-modify-write. BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES looks
+write-1-to-clear: the interrupt handler acknowledges it by writing back exa=
+ctly
+what it read. If so the call does the opposite of both halves of its job - =
+it
+writes 0 to GP0, which clears nothing, and 1 to whatever else was pending i=
+n
+that register, retiring HWEXP, GP1 or FWTRIG unserviced.
+
+Neither patch touches that line, so it is not this series' business, but
+someone at Intel may want it.
+
+Thanks,
+Sergey
+
