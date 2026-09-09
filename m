@@ -1,135 +1,161 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5822533593;
-	Wed,  9 Sep 2026 12:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0973492522
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 12:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788955242; cv=none; b=pndPHCf3fsKTzl9EDp4EhIF8fB0sElZziIuB/7erxDYT/FJv/cuwKBYVXuoEvofCkENhYq/6EJx4DyRE2XnmGiS8/R2aS6vLyyVAMrJdTuLe3w4jcWeWkW219e4+8N/qTT5w+PS+Jkr2bvPPEbNMwDFl1U7mooX08tOLe72qfj8=
+	t=1788957274; cv=none; b=m2VN++w6A7IiRXcbZaj4FI16Qt450cqrIz1+FTwIccFH/+xn3qtiPODUUJNNoJhsc69zSzzskuUg22D3Llibd6qbIoT0nvIF9B8yOIkx+KyyemDXgY0r+lsds0C/e0CR/MNAJkKJWeAi7HmkND0jUczoPrRaXajX0FfmqT34DK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788955242; c=relaxed/simple;
-	bh=6ytdDyu+z2dx/LqddlafJ7bKpVfM51+v6bsQCEmLQmk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MrraUZK+0Pp7k5F1Y3gnPzh7ZI+QCTRVy90dj/aZvlRZnQ2BBrA8lLhMqQf44SS1TyxaODtVBWAxMT4GAP3NHfXunyctsStc4FzOoyBcNeMOkNbOZwlR4anaUBbmaUGL+qYqJ5JCOqwIIVAg3SEdVMS2NrZMeGmKwfT5k5+63u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=VpxHxoLA; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1788957274; c=relaxed/simple;
+	bh=Z7+vjnGGeVwv0RSVOFrLDFGxzP6Nx6JPFZsXRRpQTck=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=O4pjL2euVNoEOfUyF8spv7gDc/J1kgy4l0tShk2zlsf+7AUEkUsZPiMQnQj/jxvKAd0Z7y4T2WHJyezvLIR01/OHdtQ3jl1XMnCCccxgsfBsvL1SqKm8kITJjK4lwm0ppEmmPzi4ZcXHvb0t54ADJCt6tOdSscRzx0aVY4C3tFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=kJcIGIRC; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="VpxHxoLA"
-X-UUID: 0b304350ac4611f18dc8c9802ae25ab1-20260909
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=C9QctYEqiTsdwLGcp7AZwfH3/JIDtpuPyDKHZOFDwwk=;
-	b=VpxHxoLAM9Ez62LPhx/C49JI9EtFnWvQwIpxt+YDCZWGj5cC4Yk+qZU/APU0zeFp0uG1rk25f00OG2/IG8yXD88ZWqkNZhFxfRPPvh7ZtZeFx8f6X5pmJmX99l+maiKRAfmsJdMvauBsU5YqluXwwZ5o6p0QIQmn3A+kWAmIicY=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:690bc7db-724f-4ae4-9614-9cdb180969dd,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:7db8b62,CLOUDID:63a191dc-e2a3-4c41-83fa-4adacd638ae3,B
-	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50|99,E
-	DM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 0b304350ac4611f18dc8c9802ae25ab1-20260909
-Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1960534395; Wed, 09 Sep 2026 20:00:26 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 9 Sep 2026 20:00:14 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Wed, 9 Sep 2026 20:00:14 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH 0/3] Bluetooth: btmtk: Harden firmware parsing and improve logging
-Date: Wed, 9 Sep 2026 20:00:08 +0800
-Message-ID: <20260909120011.1198001-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="kJcIGIRC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1788957270; x=1789216470;
+	bh=6mEqcbB1stbfq33PpXl/N5pk5+NTONG711JCj8/6s6E=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=kJcIGIRC7QNodCGFjA4CAA/d+aSAPXlfpSSH0xjMYUngC+GXOy5HCexMKpmDqipt5
+	 FN7ReNaqYLpgrvcSAYQ663JrZzdvqus5JYmKYkcfrCPaRWsCgw7IQlJLcV+NavtcUN
+	 gVa5XQONpINo2AZnmZYJBuEAIEIgz+37mhgh6r+BwolGcS90smMQa643Tq45GwemIt
+	 8GlRo+k0pJE3CVabFbOZN98tSGpxVGH3dLcH7cL8Cb2gxTwVk58K4urXO+QADd3AJI
+	 lvWwV18GnBpxTyAJZ64PSlPoYcu+qn4+31ueejZqs3n8vnpmbi4j862lHBDKpWmymv
+	 j45WAFdRONkXQ==
+Date: Wed, 09 Sep 2026 12:34:25 +0000
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>, Ravindra <ravindra@intel.com>
+From: Sergey Lebedev <lsa.uz@pm.me>
+Cc: Ferenc Lengyel <dev@lengyelf.eu>, Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>, Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>, Kiran K <kiran.k@intel.com>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Mahalingeshwara Chambarakatta <mahalingeshwara.chambarakatta@intel.com>, Arnd Bergmann <arnd@arndb.de>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] Bluetooth: btintel_pcie: two PM fixes, assembled as one series
+Message-ID: <20260909123416.71919-1-lsa.uz@pm.me>
+Feedback-ID: 113843758:user:proton
+X-Pm-Message-ID: f01ad771e84e472a10af2134e05262c398876408
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Three changes to the shared btmtk firmware download path, all in
-preparation for MT7928 support but useful on their own.
+Two patches already on this list fix different halves of the same fault, an=
+d
+each leaves a real failure behind when applied alone. This assembles them i=
+nto
+one series. I am the submitter only - authorship, Fixes: tags and existing
+trailers are unchanged.
 
-Patch 1 bounds-checks the firmware image before the section map walk in
-btmtk_setup_firmware_79xx(). Today the section count, the section map
-array and each section's offset/length come straight out of the file and
-are never compared against fw->size, so a truncated or corrupted file
-makes the driver read past the end of request_firmware()'s buffer. The
-section count is a __le32 from the file, so on 32-bit builds multiplying
-it by the 64-byte map size wraps a size_t and a bound computed without an
-overflow check would come out small enough to accept the file; both
-helpers order their arithmetic so nothing can wrap. A section count of
-zero is rejected too, since it passes every size check but would leave
-the download loop with nothing to do and still report success.
+  1/2  Vladimir V. Kondratyev  - re-read BOOT_STAGE_REG before the fallback
+                                 check, so a missed alive interrupt is
+                                 survivable
+  2/2  Ravindra (Intel)        - fix the PM flow for S0ix, S3 and S4, which
+                                 among other things stops .thaw running an =
+FLR
 
-The checks live in two helpers rather than inline because the MT7928
-CBMCU download path added later needs exactly the same arithmetic and
-should not carry a second copy of it. Bounding dlsize by fw->size also
-removes an existing hazard in the download loop: dlen is computed as
-min_t(int, 250, dl_size) from an otherwise unbounded __le32, so a large
-enough value turned dlen negative and "dl_size -= dlen" then grew
-dl_size instead of shrinking it.
+Both carry Fixes: e57362f4911b.
 
-Patch 2 makes the log line more useful: it never said which file was
-requested, it reported the firmware's own hwver field as the HW version
-rather than the device id the driver read from the chip, and it printed
-the 16-byte datetime array with %s even though the array need not be
-NUL-terminated. Both callers pass a real device id - btmtksdio reads it
-from register 0x70010200 and btusb switches on it before getting here.
+How this came about, so nobody has to take my word for it. Ravindra agreed =
+to
+the assembly on 2026-09-08, on the condition that authorship and the Fixes:
+tags be preserved and that his patch be rebased on top of Vladimir's; both =
+are
+done:
 
-Patch 3 replaces the bare 1/2/3 sequence flags on BTMTK_WMT_PATCH_DWNLD
-packets with a named enum. No functional change. The other bare flag
-values in the driver belong to other WMT opcodes, where the field means
-something different, and are left alone. Paul Menzel reviewed this change
-in an earlier MT7928 series; the enum values are unchanged here, the only
-difference being a comment added above it.
+  https://lore.kernel.org/linux-bluetooth/IA1PR11MB786922E0DBE2CDC8FB00C5B6=
+DAB12@IA1PR11MB7869.namprd11.prod.outlook.com/
 
-Testing
-=======
+Vladimir has not replied to the message that said this would go out unless =
+he
+objected, and I am not treating that silence as agreement. Vladimir - it is
+your patch. If you would rather post the series yourself, or not at all, sa=
+y
+so and I will drop this:
 
-Compile-tested with CONFIG_BT_MTK, CONFIG_BT_HCIBTUSB and
-CONFIG_BT_MTKSDIO as modules, each patch applied individually, no new
-warnings.
+  https://lore.kernel.org/linux-bluetooth/20260908102758.72135-1-lsa.uz@pm.=
+me/
 
-Runtime-tested on MT7922 (USB 0e8d:223c) over repeated unplug/replug and
-Bluetooth on/off cycles; it comes up every time and the firmware download
-is unchanged:
+Why one series
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-  [  365.233785] usb 1-2: New USB device found, idVendor=0e8d, idProduct=223c
-  [  365.245951] Bluetooth: hci0: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
-  [  365.245956] Bluetooth: hci0: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260605203811
-  [  367.542038] Bluetooth: hci0: Device setup in 2244536 usecs
-  [  367.601570] Bluetooth: hci0: AOSP extensions version v1.00
-  [  367.601581] Bluetooth: hci0: AOSP quality report is supported
+They were posted separately and read as alternatives. They are not. The
+evidence now comes from two machines, two controller generations, and two
+distinct faults:
 
-Chris Lu (3):
-  Bluetooth: btmtk: Validate the firmware layout before parsing it
-  Bluetooth: btmtk: Improve BT firmware logging
-  Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
+Surface Pro 11, Lunar Lake, BE201 8086:a876, s2idle. With a fixture that
+drops the alive interrupt on demand, Ravindra's change alone leaves the
+missed-interrupt case failing exactly as unpatched; Vladimir's re-read fixe=
+s
+it; together they do not interfere. The same failure was also caught
+spontaneously with injection disabled, one run in six.
 
- drivers/bluetooth/btmtk.c | 92 +++++++++++++++++++++++++++++++++++-----
- drivers/bluetooth/btmtk.h |  9 ++++
- 2 files changed, 90 insertions(+), 11 deletions(-)
+  https://lore.kernel.org/linux-bluetooth/20260902133836.11786-1-lsa.uz@pm.=
+me/
 
+ThinkPad X9-15p, Panther Lake 8086:e476, hibernation. Ferenc Lengyel report=
+ed
+hibernation aborting with -EBUSY after the image was already written, and
+tested both patches:
 
-base-commit: 701ca71884b3d101fd25b7adbf972355056ef352
---
-2.45.2
+  stock                    3 aborts in 10 cycles
+  1/2 alone                2 aborts in 5
+  1/2 + 2/2                0 aborts in 10
+
+He then instrumented 1/2's re-read and found why 1/2 alone is not enough on
+his machine: the register honestly reports the controller is not in D3,
+because .thaw has just run an FLR that dropped it to ROM, and firmware has
+not reloaded by the time .poweroff asks for D3 some nine seconds later. 2/2
+removes that FLR from .thaw and keeps it on .restore. His own caveat, which
+he states himself: ten clean cycles against a roughly one-in-three prior
+failure rate is Fisher p ~ 0.06 - consistent and matching the mechanism,
+not a large sample.
+
+  https://lore.kernel.org/linux-bluetooth/df180a89-b214-41b4-b8ce-c6ed6b123=
+72f@lengyelf.eu/
+
+What the rebase changed
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Nothing but context. 2/2 needed one hand adjustment: its header hunk remove=
+s
+u8 pm_sx_event from struct btintel_pcie_data, and bluetooth-next has since
+gained struct btintel_pcie_mdbgc mdbgc between dbgc and dmp_hdr, so the
+three-line context no longer matched. The resulting diffstat is identical t=
+o
+Ravindra's posting - 64 lines in the .c, 2 in the .h, 44 insertions and 22
+deletions - and no reference to pm_sx_event is left anywhere in
+drivers/bluetooth.
+
+Built against bluetooth-next at 701ca7188 with W=3D1: no warnings from eith=
+er
+file. The code is otherwise byte-for-byte what was tested on both machines.
+
+One thing for Paul: you gave a Reviewed-by on v3 of 1/2 at 14:36 UTC on
+2026-09-03 and v4 went out at 19:22 without carrying it. I have not added i=
+t
+back, since it is not mine to move, but you may want to re-give it here.
+
+Originals:
+  1/2  https://lore.kernel.org/linux-bluetooth/20260903192245.135310-2-vlad=
+imirkondratyev2@gmail.com/
+  2/2  https://lore.kernel.org/linux-bluetooth/20260902042840.2432862-1-rav=
+indra@intel.com/
+
+Ravindra (1):
+  Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+
+Vladimir V. Kondratyev (1):
+  Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+
+ drivers/bluetooth/btintel_pcie.c | 72 ++++++++++++++++++++++----------
+ drivers/bluetooth/btintel_pcie.h |  3 +-
+ 2 files changed, 50 insertions(+), 25 deletions(-)
+
+--=20
+2.50.1 (Apple Git-155)
+
 
