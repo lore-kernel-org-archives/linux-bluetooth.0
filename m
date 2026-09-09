@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF7D3C9EE7;
-	Wed,  9 Sep 2026 19:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F4D3B059F;
+	Wed,  9 Sep 2026 20:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788982871; cv=none; b=kbUdYrkYaQiWgM6xGe+xWa//Fa39AATkT9D8mASyUqGGZ8kgicX1l13acXpQ4DeZ29ouGzuYBqm2M7L9AMp+Q5+m3kXGexYWWH03lVQymZLlKjERGSu4G/dgb/RFQa9urPMy56r2XroaTDeRDnjueOMFxI/KyhF45Fgoa1XP8Uo=
+	t=1788984069; cv=none; b=AVDj68mSs9weboeMmX/+8cX2dvlbgC7M1gTxTaGw/pXtsn2hMDWLtRm0nHFoH4++oTBbcpsv2huGsghYsCOb3yZ0eCGu3gsHZialpatHPwsiGUylre5IwfHyzBoeRpn0mQLMyP4ZTGm73kZBY63nqC552lkQdFQ4yy5yHjbOHkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788982871; c=relaxed/simple;
-	bh=pB6uWTgXYvFBOzgJQPFHb5FbBOCzm5zvmX2gm3Sgnqg=;
+	s=arc-20240116; t=1788984069; c=relaxed/simple;
+	bh=X4O+lTU61F0JQOLgGAycaO9X0LJP/ZSP3MEnoKzBZjI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mSwMlnwUhEh5jKfE+dXTWlrIL4dmR7xSiPqiJdZRQsDyM3BkbHxdkD/82elySQmqifpmXmjVioO93//ZH7LfnATFlp8x5mICM9ykD0Vzt3jJrBJHfL3IdVvroj8rrm3AXO0Y8FtTPdObGjNNNe5aE07qNJw/vf5GthwOVOdW0ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBlKvUfz; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=BH8iP/vJssz+/sFfZCZTEFinIe5mmBx1v5ELSLOHZvXfr2PjBIbo9qtZICUmdnHJnK9WI/SN3eKoE729Og4qCFtqINoft8cUgtiimDm0plAIeZ+sUUGC8Kg+R5EhUCBnHGvgtinh1HZJV6VyVuHMkO3GMOql8phsZ3CwB3ZzIoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEAKzrbK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBlKvUfz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A44B71F000FF;
-	Wed,  9 Sep 2026 19:41:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEAKzrbK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9DF91F000FF;
+	Wed,  9 Sep 2026 20:01:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788982869;
-	bh=7OqridpPwR5w6CLSHdMSNOqIY91sbOrBlxIPkhdnnFo=;
+	s=k20260515; t=1788984066;
+	bh=3Lki2zKjYM+qNV6KC9xTZ6rVRofIMGvc4jF56clPzCU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=JBlKvUfzvjdjbo7JshAFc4lgxTlJ5Glx9vcoUuAixohR2wb9GHax027B6OzvVNJm+
-	 xD0wi3anCuVM8U6uzOInFDyE/FQxGSxkXTzsHCqGdKVbVAu3I0HvLsJaVjk3GZiMwD
-	 LWmGM6uQZ9yJKAxo3dMp1B6jUo+QltXAQ/NWymVHoCeOWmkT+KJp29RAAgiB6TO7N8
-	 lanNUlk0BUo0u6lSpvbL9JAFLVpEry7Z+DgQ402FGgzcS/quk6jWr+UKEec5Fu3K6D
-	 4UDaNgbjyYVrovJgPeuOcCBWrau1On6XBDG0I7GaYeTvMG2RXVtW2asyoA+xWIORyf
-	 ogd6i+meVtV4A==
+	b=WEAKzrbKzWQwAR5wCzrPuZSJ6r2WDK8LNobPcoIfcxEpL7iMfxoqd3TN4Dnr9OBNl
+	 6796E1udklCJadLFQDQ+Tye12frCxA7GbQqLQfPv95wJU/T0zRu2Acx8Qey9bUWnQn
+	 vIjYjSVqagu6twS11jdfZ+L3PvGEui7InJ2kuj5MpHAmIGH38/iyNloU1KwwqOatYZ
+	 q4NIUR7ey+/0AFtLVAxcwOUuPPtKapzTU4G5RTx6LV8fWmWl7JrnU2/5Yvzhn59KFG
+	 yc2CBh+3natE5KYqLHvs+5YYN6LoqKaEF8/hAeeWQDc3IEN4PvR61UlanHNiWjfxWv
+	 SwxGeer0ac11w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0859380AA63;
-	Wed,  9 Sep 2026 19:40:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0E9E2380AA74;
+	Wed,  9 Sep 2026 20:00:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,43 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: put the peer's on-air address on air when
- we
- cannot resolve
-From: patchwork-bot+bluetooth@kernel.org
+Subject: Re: [GIT PULL] bluetooth 2026-09-08
+From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178898280763.1023805.2181772004585809678.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Sep 2026 19:40:07 +0000
-References: 
- <20260908-for-upstream-le-connect-on-air-addr-v2-1-2ae9fa066ec8@podgorny.cz>
-In-Reply-To: 
- <20260908-for-upstream-le-connect-on-air-addr-v2-1-2ae9fa066ec8@podgorny.cz>
-To: Radek Podgorny <radek@podgorny.cz>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <178898400463.1032931.8145913840198303606.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Sep 2026 20:00:04 +0000
+References: <20260908212127.1022197-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260908212127.1022197-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 08 Sep 2026 22:41:38 +0200 you wrote:
-> An identity address only reaches a peer that is advertising an RPA if the
-> controller resolves it on our behalf. Where it cannot, the host has to put
-> the peer's on-air address on air itself.
+On Tue,  8 Sep 2026 17:21:27 -0400 you wrote:
+> The following changes since commit 38b6be101006d3e7af972999f45d4f1e8250587a:
 > 
-> hci_connect_le() still swaps the caller's identity address for the peer's
-> cached RPA before creating the connection, but __hci_conn_add() resolves
-> the RPA back to the identity address when it stores it, so the identity is
-> what goes out. Storing the identity is right when the controller
-> translates it on the way to the radio; without LL Privacy, or with this
-> peer absent from the resolving list, nothing does.
+>   net: macb: fix NULL pointer dereference on unbind with fixed-link (2026-09-05 13:58:52 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-09-08
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: put the peer's on-air address on air when we cannot resolve
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e35544d23359
+  - [GIT,PULL] bluetooth 2026-09-08
+    https://git.kernel.org/netdev/net/c/bbee0759d363
 
 You are awesome, thank you!
 -- 
