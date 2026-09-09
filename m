@@ -1,69 +1,69 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD8B3A254D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E8E39DBD0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2026 18:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788978542; cv=none; b=mvg27ZWjNs5iwOBTiIZDkImgQOOknmgl18DX1f+qbcIq8MSjBmqsC4iwTGl1usGjTMAJhJn4gAL8dcpHJr5XkBRGEAfqfB8KNFOysug8g0mtq5sPzw5aUfXJ9MWIsPgtKqNwiBkr7nPZuCuMczCnBDY3ngWOL5+gf6xfmCDPRzk=
+	t=1788978543; cv=none; b=ofMwLf0TskoOeY04/UsHND2ytf1pnfLRQ6c+urbN38cQ7XoZnoh882QW5CCs1bYWwh4hNHtXLRCoAkm8mb9qE5Fd0B9uZoNMFcnyOYGQBTPJ7xeBQ/cjSDB8tkcxXVgPguGPjVldQSbXbZnfjjPVnj0Sc9EwDUf8FpO70+DzuYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788978542; c=relaxed/simple;
-	bh=R6+fnUIxG5qk8aVJxIdgEMU8HpvwuaYlnZIGCmERI8c=;
+	s=arc-20240116; t=1788978543; c=relaxed/simple;
+	bh=VI7epsAa9xe69MpL6uXg5tr/6RZpfCP0rADdtfB3m/Y=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BDGwgNdCEBwVTQbK8qawpBQ3oFf7u8TeeaM5ZxG+a9mKfF41MUVSb0hqJ5eLMOh5s+0sRKDT0kbtW9i+H8ONrnTIvORjh+3LScmJdDvGd6OlQ6DEwe5PEgpPWl82rlarKnzp09NeDuGkchFxRoyuKU/zwMtFIDIp6QD+Tb1glXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kUH4guU4; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=mlTXrDCcGF+cA94mh3jtK1pXch55C5hdHyvWdCsIX1eXFGtceQZ026jfdFxdDe0+NTU+bB11rjz0TmLvgGpNQkFJiDuy/dLbWyr3CpdujuN6iGhRLl0BJ59q8k1zjow/ijWx0SO9JgCeGa8p95s8NCzrWGfvUBaBRt0VDjabrpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIY0ekC4; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kUH4guU4"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5bf959b820cso5419064e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 11:28:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIY0ekC4"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5c7c25d9f6fso5706562e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2026 11:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788978538; x=1789583338; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788978540; x=1789583340; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=5iSv8dLUeSA9kyJR90sREiSfPv9vhHgW6nYeqt96Zug=;
-        b=kUH4guU4DHSkyulnYzb5RVLaD36TDllPVv/DhuoMPacKl05Q0Go7tgqD+an77CE4al
-         ZwXJdPlgZFC62YmuL2X/J1MTwFSFfKIT0oukPOWe6AfdVV9wHeZU0cqa/dBpm9B8T6fk
-         Y0uMLml+nHveVtNmfHc/7S+ZwNGMaZup2MeA/Zt1Po927gn06IpnXe+46j/dB3WwduqY
-         moJHV4MZ9R7aoK4dUJGaXIbxtAVqswuHJu2Y7rQRuNjksBNT6mbrFKFWLr2TVOv895SC
-         yjqxNIeQFdL3sf8ZXyQ4XuFao0BgUBznxn1K4lReAFQ/0xx099vcQuH4jyhrkIQZmD/Y
-         gilA==
+        bh=i0lK+rKfqiX0IwieNkuhvGY6zp/zz6aDCaykWpH84D4=;
+        b=gIY0ekC4BcvCmlUCQ1acxiLGXNzGLqvuMjgkY424KjwFRsnJPVem4oPEYgqNMos6IU
+         Mw6rWLHZxhlQ6bEoU45+jCV4RRP7olwtGaah9+npsTz8tTYrp5DnYUfHCNaFPT8M4AyU
+         Qj0+76DfiXyZESPHQo+kd7eBwpswsxl/D53OmqAzBDf5L4z3ZXJtVNkOfE6iSxU5QuJh
+         pMD1KY9xrLrVSrgga0opYP9ppi7RtKXOjEFTUpEB9TJ6U/9wrdJJit0Ev6GDrETNRCLK
+         298I0V5mtZb1hxt5ysxEakz9Z0ZV81DBnV3mPMiBZqDG0Fx3ntGZIak5TREeGlwRTa2/
+         bDWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788978538; x=1789583338;
+        d=1e100.net; s=20251104; t=1788978540; x=1789583340;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=5iSv8dLUeSA9kyJR90sREiSfPv9vhHgW6nYeqt96Zug=;
-        b=X+v8KXcFGBbcqoDoz5L4EN/Yqgb+7FNAClM+Pxt6fTHIKbXYB0mZmDirUAYZGHrUS2
-         VVUEkY2tvkitduqsVIlry5COnnuzDYxkHkJei4ZVkyqm1RFQ1O/br8On6DQ9lDVElBnr
-         y9WI4D4c/Zuz99TRxOEIqnYzIBOdnoc4ISQdjV1muPt7xE7GwEoyYwNJsUX2754l/odz
-         RGvKBK2qv9WFg46LTlgkGCvZC7mCXvunXaFF6OXkOLorkWj//KnHlfiq6qIjX+3anAAc
-         F50kYW00J8op89Ptwvf6RakRk67SkBpzZD33/ttxHLDf2ZVoZFdN0DvRslaLgAciyJfT
-         u1Cg==
-X-Gm-Message-State: AFuF++kqll44uIiHTlBivmjRaqz9rTkII0We67oKLvuDYF6/qDFOKB+q
-	oPxN2Vg0XEBjQF8BUGFeMHI9wUlHLoNAdPJAUf2n1wA2NF5y1nxuvZeybKu2Yj/p
-X-Gm-Gg: AYBFou1iKxVL8Ibsnk37eVr+h/32GKJiTI2bI7k7Cm73pdKPGwyJLrtvHUGD4o3Zl6C
-	N8A0gC5Yhiyo9teCzBYujGFlmKjF+AbCXEvfwC8i4TMYyRpU0lCTIvR+dYcOYZwvwt8UNe15Gy0
-	tCms8d1eYxHOMyBb5c5qQ26Kfx7ZzbukQjtHc0bprREpMNm/hQ0eerPl3sFmhAQrwZVc8EycI9D
-	aTHPLR7hXbSCypnaOgDNKKDQd8IWdKI+4LdLB2zb7bFDzsE/zCXS9ER0oN065PDpAZrDai8KOLG
-	L5V8TWq04xtBd/F6dGhfQaozSfbuXzhC0Rg34eH2i9zQvfyCiBJ8bKXi16HSlmzwSoINtczvc1D
-	ctpvVrtVYdhZGq8IcAQUTvJ3J1giix3CGNVmkktsZdtBOWGqTloiAp7g7ozBI1SdMJ8Z/JDQvWL
-	ho1VC3IPmFhyIouZv0+MIEGF7XUwCmWtatP+5UyfHYZE8snnmujjXk/HKcclKY3qmsnQDiuxqvU
-	RB2NTd/Ho5e/Ek4O9f/FudeCSc0Ghpl9L4Wy9zNOYv4v8nv/ZMBS9lgIC6zsyT/a0o=
-X-Received: by 2002:a05:6122:4fa5:b0:5c7:d204:db7b with SMTP id 71dfb90a1353d-5c7ed604813mr24085963e0c.3.1788978538396;
-        Wed, 09 Sep 2026 11:28:58 -0700 (PDT)
+        bh=i0lK+rKfqiX0IwieNkuhvGY6zp/zz6aDCaykWpH84D4=;
+        b=b+tjC2knjiHD3+tJa7gIUWdLq48z1xsH6UdDHefv7HZOAnjI/J6AStxC0YNf/szwau
+         DaOE6K9aDEi1bLNo55qq1EEIt59hm5/yUnPON8bSPMr7XZljGsREB1UqZfzn76d1PIqP
+         q4hkamQnScFNxrraaHg+IvHejUU4W3TGB8QtUBL/uxcjISmR10DzqZTQPUBTOcBUd/Vg
+         iajtvhXMPUJ6nFqorOmbUUfphYvIwZszKyd7s5gvbKgdTfFfRX9gyECjUUdYv2lDZqvj
+         NcPRdils2H+niw0OgsrHDNdM4n3GXnVyYu+vbO9b5PhQKDyd7a04qBDdpDVNvIQyuwi5
+         kcsg==
+X-Gm-Message-State: AFuF++mr8zlupQ8ZgZ1yEJ5kPzWddjznYBCC9MSqyK2RMW2VV6MIBB1X
+	g7/s8xIzjXHmL2YJjSb50M2Pi+jTcPvuwcC8RHKIcz5/B19qzxQOdk4dzML8kBC2
+X-Gm-Gg: AYBFou2BhQIf6+tp+9mYloDEixSfwbPWdWP4f0gjt0Kvisn5xTTS3ya0a7YJ+v2R8Lh
+	LnusIBg2HUpmetC0oGX5QWpqQG3OfNzcIfB518PI2G1gADBluF1B6HiCmfTZiD7XKeT1mfEJZ1Y
+	aEme0vq/2Mh8J9gCVQxBcAtgbHjQfkusgsCYoU9Z8okogIoFwuORXT18Na6GJ4BDgtsFXuNVXh0
+	j2/f4H7hTuQ64XHZ98CFF11t/DovsU6C6TB+1kCCxIfsO6nWxEZxmMGz0CRck48S8bNMRd3EGxD
+	tjCnjr9pYQ4WFc2jsqAuzZWT/NobwsXH0cxi3U5quUM5/1HkG0ZjJrYjgeDfsoAN3YiMkOH4GBn
+	xCFmElZJN4wcNcJN2kZ7cGw+ACStxilFP4WIrpVMxF6QyY+xykpznEgt9AYWA4ON3tlkswIhK9I
+	wYfqVgVzPKEREg2Ne3BSEvCV3vyjd2RzVyA1DpcVPyVRcFI9b2TbnKc27aa4yggPorQP7mbTSPG
+	0Xtr7uXUsrfp8a9/Bx8Dkb+BpEhNB1z/qxYR6a4Id1l3YJ72uDYywr6l/6J8B2se5H/DAMnbP3l
+X-Received: by 2002:a05:6122:e189:b0:5bb:eebe:7ffd with SMTP id 71dfb90a1353d-5c7ed846723mr22547705e0c.8.1788978539468;
+        Wed, 09 Sep 2026 11:28:59 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c81c506f31sm5399388e0c.11.2026.09.09.11.28.57
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c81c506f31sm5399388e0c.11.2026.09.09.11.28.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 11:28:57 -0700 (PDT)
+        Wed, 09 Sep 2026 11:28:58 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 09/10] monitor: Reference the request frame on SDP, AVDTP and AVCTP responses
-Date: Wed,  9 Sep 2026 14:28:39 -0400
-Message-ID: <20260909182840.1289776-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 10/10] doc/btmon: Document the protocol request references
+Date: Wed,  9 Sep 2026 14:28:40 -0400
+Message-ID: <20260909182840.1289776-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260909182840.1289776-1-luiz.dentz@gmail.com>
 References: <20260909182840.1289776-1-luiz.dentz@gmail.com>
@@ -77,159 +77,75 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-SDP pairs a request with its response through the transaction identifier,
-and responses use the request PDU plus one with an Error Response able to
-answer any request. AVDTP and AVCTP both pair a command with its response
-through the transaction label:
+Describe the request references shown on L2CAP, ATT, SDP, AVDTP and AVCTP
+responses, and what pairs the two halves of a transaction in each of them.
 
-  SDP: Service Search Request (0x02) tid 5 len 8
-  SDP: Service Search Response (0x03) tid 5 len 5 #8 (12.400 msec)
-  AVCTP Control: Command: type 0x00 label 7 PID 0x110e
-  AVCTP Control: Response: type 0x00 label 7 PID 0x110e #12 (23.100 msec)
-
-These all run on dynamically allocated channels, which is what the channel
-keyed matching was needed for.
-
-The model wrote the matching, which the author reviewed and verified
-against a trace carrying all three over separate channels.
+The model drafted the text, which the author reviewed against the actual
+output.
 
 Assisted-by: opencode:claude-opus-5
 ---
- monitor/avctp.c | 24 ++++++++++++++++++++++--
- monitor/avdtp.c | 24 ++++++++++++++++++++++--
- monitor/sdp.c   | 21 ++++++++++++++++++++-
- 3 files changed, 64 insertions(+), 5 deletions(-)
+ doc/btmon.rst | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 0db352f18ffd..75afaca8342f 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -2512,6 +2512,8 @@ void avctp_packet(const struct l2cap_frame *frame)
- 	struct l2cap_frame *l2cap_frame;
- 	struct avctp_frame avctp_frame;
- 	const char *pdu_color;
-+	char req_str[32];
-+	uint16_t key;
+diff --git a/doc/btmon.rst b/doc/btmon.rst
+index 80c8a8947caf..a08a6afa43f4 100644
+--- a/doc/btmon.rst
++++ b/doc/btmon.rst
+@@ -275,6 +275,53 @@ once and still resolve correctly. A ``Command Status`` reporting an error
+ means the completing event will never arrive, and the command is dropped
+ rather than left to match a later unrelated event.
  
- 	l2cap_frame_pull(&avctp_frame.l2cap_frame, frame, 0);
- 
-@@ -2529,12 +2531,30 @@ void avctp_packet(const struct l2cap_frame *frame)
- 	else
- 		pdu_color = COLOR_BLUE;
- 
-+	/*
-+	 * A command is answered by a response carrying the same transaction
-+	 * label, which is what pairs the two.
-+	 */
-+	key = l2cap_chan_key(frame->index, frame->in, frame->handle,
-+								frame->cid);
-+	req_str[0] = '\0';
-+	if (avctp_frame.hdr & 0x02)
-+		packet_req_str(frame->handle, key, PACKET_PROTO_AVCTP,
-+				avctp_frame.hdr >> 4,
-+				(struct timeval *)&frame->tv,
-+				req_str, sizeof(req_str));
-+	else
-+		packet_req_add(frame->handle, key, PACKET_PROTO_AVCTP,
-+				avctp_frame.hdr >> 4,
-+				(struct timeval *)&frame->tv, frame->num);
++Protocols Above HCI
++-------------------
 +
- 	print_indent(6, pdu_color, "AVCTP", "", COLOR_OFF,
--				" %s: %s: type 0x%02x label %d PID 0x%04x",
-+				" %s: %s: type 0x%02x label %d PID 0x%04x%s%s",
- 				frame->psm == 23 ? "Control" : "Browsing",
- 				avctp_frame.hdr & 0x02 ? "Response" : "Command",
- 				avctp_frame.hdr & 0x0c, avctp_frame.hdr >> 4,
--				avctp_frame.pid);
-+				avctp_frame.pid,
-+				req_str[0] ? " " : "", req_str);
- 
- 	if (avctp_frame.pid == 0x110e || avctp_frame.pid == 0x110c)
- 		avrcp_packet(&avctp_frame);
-diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index d1eb15356602..9d0016d6bc56 100644
---- a/monitor/avdtp.c
-+++ b/monitor/avdtp.c
-@@ -667,6 +667,8 @@ static bool avdtp_delayreport(struct avdtp_frame *avdtp_frame)
- 
- static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- {
-+	char req_str[32];
-+	uint16_t key;
- 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
- 	const char *pdu_color;
- 	uint8_t hdr;
-@@ -703,10 +705,28 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- 
- 	avdtp_frame->sig_id = sig_id;
- 
-+	/*
-+	 * A command is answered by a response accept or reject carrying the
-+	 * same transaction label, which is what pairs the two.
-+	 */
-+	key = l2cap_chan_key(frame->index, frame->in, frame->handle,
-+								frame->cid);
-+	req_str[0] = '\0';
-+	if ((hdr & 0x03) == 0x00)
-+		packet_req_add(frame->handle, key, PACKET_PROTO_AVDTP,
-+				hdr >> 4, (struct timeval *)&frame->tv,
-+				frame->num);
-+	else
-+		packet_req_str(frame->handle, key, PACKET_PROTO_AVDTP,
-+				hdr >> 4, (struct timeval *)&frame->tv,
-+				req_str, sizeof(req_str));
++The protocols carried over ACL pair their requests and responses through an
++identifier of their own, and their responses carry the same reference::
 +
- 	print_indent(6, pdu_color, "AVDTP: ", sigid2str(sig_id), COLOR_OFF,
--			" (0x%02x) %s (0x%02x) type 0x%02x label %d nosp %d",
-+			" (0x%02x) %s (0x%02x) type 0x%02x label %d nosp %d"
-+			"%s%s",
- 			sig_id, msgtype2str(hdr & 0x03), hdr & 0x03,
--			hdr & 0x0c, hdr >> 4, nosp);
-+			hdr & 0x0c, hdr >> 4, nosp,
-+			req_str[0] ? " " : "", req_str);
- 
- 	/* Start Packet */
- 	if ((hdr & 0x0c) == 0x04) {
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index 9f97ba4bbea0..ce06b73ec59f 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -713,6 +713,8 @@ static const struct sdp_data sdp_table[] = {
- 
- void sdp_packet(const struct l2cap_frame *frame)
- {
-+	char req_str[32];
-+	uint16_t key;
- 	uint8_t pdu;
- 	uint16_t tid, plen;
- 	struct l2cap_frame sdp_frame;
-@@ -758,8 +760,25 @@ void sdp_packet(const struct l2cap_frame *frame)
- 		pdu_str = "Unknown";
- 	}
- 
-+	/*
-+	 * SDP responses use the request PDU plus one, and an Error Response
-+	 * may answer any request. The transaction identifier pairs them.
-+	 */
-+	key = l2cap_chan_key(frame->index, frame->in, frame->handle,
-+								frame->cid);
-+	req_str[0] = '\0';
-+	if (pdu == 0x02 || pdu == 0x04 || pdu == 0x06)
-+		packet_req_add(frame->handle, key, PACKET_PROTO_SDP,
-+					tid, (struct timeval *)&frame->tv,
-+					frame->num);
-+	else if (pdu == 0x01 || pdu == 0x03 || pdu == 0x05 || pdu == 0x07)
-+		packet_req_str(frame->handle, key, PACKET_PROTO_SDP,
-+					tid, (struct timeval *)&frame->tv,
-+					req_str, sizeof(req_str));
++    L2CAP: Connection Request (0x02) ident 1 len 4
++    L2CAP: Connection Response (0x03) ident 1 len 8 #2 (1.000 msec)
++    ATT: Read By Group Type Request (0x10) len 6
++    ATT: Error Response (0x01) len 4 #6 (45.500 msec)
++    SDP: Service Search Request (0x02) tid 5 len 8
++    SDP: Service Search Response (0x03) tid 5 len 5 #8 (12.400 msec)
++    AVCTP Control: Command: type 0x00 label 7 PID 0x110e
++    AVCTP Control: Response: type 0x00 label 7 PID 0x110e #12 (23.100 msec)
 +
- 	print_indent(6, pdu_color, "SDP: ", pdu_str, COLOR_OFF,
--				" (0x%2.2x) tid %d len %d", pdu, tid, plen);
-+				" (0x%2.2x) tid %d len %d%s%s", pdu, tid, plen,
-+				req_str[0] ? " " : "", req_str);
++What pairs the two halves differs by protocol:
++
++.. list-table::
++   :header-rows: 1
++   :widths: 15 20 65
++
++   * - Protocol
++     - Paired by
++     - Notes
++   * - L2CAP
++     - ``ident``
++     - Responses are the request code plus one. A Command Reject
++       may answer any request.
++   * - ATT
++     - Opcode
++     - Responses are the request opcode plus one. Only one request
++       may be outstanding on a bearer. An Error Response names the
++       request it rejects. An indication is paired with its
++       confirmation.
++   * - SDP
++     - ``tid``
++     - Responses are the request PDU plus one. An Error Response
++       may answer any request.
++   * - AVDTP
++     - ``label``
++     - A command is answered by a response accept or reject.
++   * - AVCTP
++     - ``label``
++     - A command is answered by a response.
++
++SMP is not tracked, as its exchange has no transaction identifier.
++
+ **LE Meta Events** contain a subevent type::
  
- 	tid_info = get_tid(tid, frame->chan);
- 
+     > HCI Event: LE Meta Event (0x3e) plen 31           #487 [hci0] 12:36:18.974201
 -- 
 2.55.0
 
