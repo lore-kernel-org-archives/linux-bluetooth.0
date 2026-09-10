@@ -1,126 +1,100 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB272369D7A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DEA38E11A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789065814; cv=none; b=Dcu2TnF8e8KDvpHPWPIRHqpYzLWdITgg4LBOVLlmmu1IIU+Qi4D0C7laThyVDMJgROUcujozxhzTwoCECI1fQ6SAONquVjJXbD8DdL6s5/cIMGjyPNQgJzlIAvjUTJwtd3kiIg3IkRx7hfenCpO6Yc6nSWJCVrxADeqmIQDKRsI=
+	t=1789065839; cv=none; b=JgB74P5TuFDkJcH2Gtr+7zccT+fvrtMa3TGVJtDlhGrDYz1A79ZorATwpDmIyaj1xpIBh5NTnrzOp88LtA3QgeZ8x3R5EbeP0xK2eU7apnOE8Xn+zd5NMU+4Q3IY+j2wTC2mdzUgdtqRFmFutXxdXzcSudEhZh23Sv2Hs4xIiTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789065814; c=relaxed/simple;
-	bh=/ea/q5mkEWtz1Ke2gErlacYJHz2fzt2XDrswHknWRuE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=a+Pb1G+8nsn9xFZCVosamfy9C4UzNOprt+XeDY4uAknCY2Pc7hxOJ3Ldqq5PP1HTMNna6eVtKxv2vEAPa0KO8GMFtDFeJ7Snj/HMGbIeLjwsdCktxutv076XKc2KrjYuki3eyd3eduSmQU6VHQXJ64bLJETJrWOV9Vhl1aHHwCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kt3L1V+H; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789065839; c=relaxed/simple;
+	bh=TLG7udnvYve1NP8acUdwEQ6x8yaj2lJ3JnVT28mHgy8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=IDlDvIRGnLa9FyRM9ac+sRkPfMuUQ17tMPRbGWOmAcfkRy6aoBWdMhiaOjGMKOYPrYojZwLT9V6wRNm5rgCP6jXiSBkRWK8TVha6fyPM49bT9KZK0RXCuIWXCy1qjnUinBgpuCM2dkhKJguogkqwrbUqYTTytaRratNZh66O6Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Gfm/PcX6; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kt3L1V+H"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-9106f4c3a4dso196656d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789065811; x=1789670611; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Ax6Z48Jdam8Cr84wrp5S0SFfR7N8mF46AXXlfyeN2JQ=;
-        b=kt3L1V+HIq/sQQor9h7NSri4RJE1moS1vE7E8F3DsvEfdm9gYlR0TsCpaQ0rag/bs2
-         feMUDbCmYWErafUUnqxibfeekUcyju8m39PJJ9Cde5BLLR3PLLjE9Xh+rorp9LERXQOE
-         3/OENw0T4d7Pi+iOQSO9FTWkVE3lHhGv8uE+eTaDsLSZF6LLptGxh02kD4j6N/GJuByB
-         O1gzLLZou4REgwxgs5lwYzGkH0RPGIaK1NWnjjHIa8lg4TjzqRswns5oSlqHUAS//avk
-         xOQ76/18hxZTzjGbgjzp6jJZtg262hu1c+y1UVMFRQcuApHazZ/pUS0M+Ln+aa2JQZ04
-         iFnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789065811; x=1789670611;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Ax6Z48Jdam8Cr84wrp5S0SFfR7N8mF46AXXlfyeN2JQ=;
-        b=SIv5ioz10kIxUf4ec3tDC+k1iNlYRpmLf2b2YjvwaFS2XQDbdZN2ZVd0t3be9rPNKh
-         M/Hhx8OqiwewFG9p0hhwJTocG55zD8gtqfJAL7GiIY0mxLhRNnqEto6jSuJAj8Gphewz
-         5BVJbqooFMAYdKeJY6OFt1Z/cj3hxWp2uGk/RQ3pzTgmK396jc+IPy1FbDhLnYanrxpF
-         dfz63KZppXt1IDWCXW0qX61dMAQShEVhfFZb+qQHGe3XkXnSCCHsjaleFWwHWQehLudl
-         GB30RvcUdewuZsRccpOzHxaMAgqvEC8XJ5mVZcW5AdsNaspM36b8Ts3brmGNFPHY7rgH
-         kQhA==
-X-Gm-Message-State: AFuF++nTFDCUBJQs9xcDY1Oj70AT66vn+XTZHy6O5YW4wLXVOZKCZO+0
-	humlo74KFmDPUZRp67H+G0J+c0i1/D9ZJzusw3+kssU5eHwwC4fiNATXNntVDA==
-X-Gm-Gg: AYBFou08TBlwXH3Xe+CoF63fAEO0kYTJEHkYcz62eUUqRIReS1m48rqT2LglUH/FD8L
-	RVE/sGOx3Lu680RzFjCpRMjS1LFnWFhEcOwJmvaZVvWwWF8XYKDcESxhJNqDnXokHD/XjMSRl8Q
-	tkQabhUyt3xfdpHzrybG5Qx/Tra5DLJnhkZt7JKY/28WOOcWsWqSCqxAAafsYXGawDqArMzhbxP
-	UglOEKZY1WDbAgFy7UvZ/sVKyQ7Op0b/f9NW6l0Bnvtb5cD/nCTneBntZLEVihL1yDpwgRbhj6S
-	ANAcJXwQG7iVImiN3AiJxQgq37wVYZtxggTiVeyH66f1zvdLgYp6QEpnnZ/Fwl1fP0Kjser/7ee
-	mS+TEubuhHpn6U6q83n4MjLwbDIAapmoIje3Jyqf0wIfmDCNKAgtF5gZ66ymZ2jiQrEmB67uZ2t
-	9ay/RMwxWIUCsj8sGIk4a7GcSDcpFxcqz905Ks7AXNfXoZ6IGDPHQxCIR0bwvbHL8fzqBRKBtc8
-	58=
-X-Received: by 2002:ad4:5e8e:0:b0:910:345c:b7e6 with SMTP id 6a1803df08f44-9121211dae5mr201746d6.37.1789065811514;
-        Thu, 10 Sep 2026 11:43:31 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.34.38])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f5e880csm2237936d6.49.2026.09.10.11.43.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 11:43:30 -0700 (PDT)
-Message-ID: <6aa2fa52.8bd82347.209d6f.0935@mx.google.com>
-Date: Thu, 10 Sep 2026 11:43:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7281893046293598647=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Gfm/PcX6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789065837;
+	bh=JPcHchPp7vKviePyOoy2aOs3/a+1zPzv+jaxV8XoJQU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Gfm/PcX6GCsKUxtWAvK2xiO+9PcOnkcWH741OrdgtLMAEfOSmDUTGAyrzw3WQ5xMF
+	 JjHECn8n0xHchVb0AHdhAJw6EM1ebkOhwPp4oiLu9mGBNJ+dXrjB1rvU69Qk7F7i57
+	 WYEHU3yMha3UELWhLuZ5tDulIE+/YIDU2iEiz2Ms=
+Received: from github.com (hubbernetes-node-9625a07.ash1-iad.github.net [10.59.92.28])
+	by smtp.github.com (Postfix) with ESMTPA id 935A43605A8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:43:57 -0700 (PDT)
+Date: Thu, 10 Sep 2026 11:43:57 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1162236/000000-86f64a@github.com>
+Subject: [bluez/bluez] 11a082: doc: enable virtio-fs in tester kernel configs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, lijun01@kylinos.cn
-Subject: RE: [v2] bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
-In-Reply-To: <20260819062334.2410737-1-lijun01@kylinos.cn>
-References: <20260819062334.2410737-1-lijun01@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7281893046293598647==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1162236
+  Home:   https://github.com/bluez/bluez
+  Commit: 11a082740637d5116451964b54ceb6077fbb2ece
+      https://github.com/bluez/bluez/commit/11a082740637d5116451964b54ceb6077fbb2ece
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    M doc/ci.config
+    M doc/tester.config
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1148228/
+  Log Message:
+  -----------
+  doc: enable virtio-fs in tester kernel configs
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 FAIL      11.63 seconds
-BuildKernel                   PASS      29.60 seconds
-CheckAllWarning               PASS      32.97 seconds
-CheckSparse                   WARNING   35.30 seconds
-BuildKernel32                 PASS      28.86 seconds
-CheckKernelLLVM               PASS      42.05 seconds
-TestRunnerSetup               PASS      791.50 seconds
-IncrementalBuild              PASS      27.07 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btmrvl_sdio.c:1729:1: warning: symbol 'btmrvl_sdio_pm_ops' was not declared. Should it be static?
+Add support for virtio-fs in tester configs.
 
 
-https://github.com/bluez/bluetooth-next/pull/733
+  Commit: 86f64a2e96dd1f6a571bf21c2fb0d2d766a22a56
+      https://github.com/bluez/bluez/commit/86f64a2e96dd1f6a571bf21c2fb0d2d766a22a56
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M doc/test-runner.rst
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  tools: test-runner: use virtiofsd for filesystem passthrough
+
+The 9p mount passthrough I/O is fairly CPU hungry and slow. This matters
+for e.g. running Python in test-runner, since it has to read some amount
+of files for startup.
+
+Add support for virtio-fs, which is significantly less CPU intensive.
+
+Enable it by default if /usr/libexec/virtiofsd is available, fall back
+to 9p if virtiofsd not usable.
+
+Before:
+$ time make check-functional
+real	2m9,736s
+user	1m29,570s
+sys	0m32,715s
+
+After:
+$ time make check-functional
+real	1m35,703s
+user	0m28,938s
+sys	0m7,453s
 
 
---===============7281893046293598647==--
+Compare: https://github.com/bluez/bluez/compare/11a082740637%5E...86f64a2e96dd
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
