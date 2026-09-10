@@ -1,69 +1,69 @@
 Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0BA4AB1A0
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D935435C693
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789065753; cv=none; b=AWQYrawIYMggD+KMWQ0ltgqnKl82Znh/d4HyZnG+Mnf6Pf0g6sZWTE47/gF3QBSVpsZPa2ar+38/zoHEg1U7U5y/mody1Y0UCSsrr1S2c4WR34dtfNezlKE4QmJOvdVvDthz3kV4rUH+bbE0fwQmWKW9yg1nxHxMHSW96XFv18A=
+	t=1789065753; cv=none; b=KCBVQExLTtn/TwMMDmAoSMsgxbXIYy6lETVdXCCWrbexPWmITccOcsziLJ14vK3QaMYEX5v/e4Y+b/dDugV1HmM28P5GYFuYgs4XB+GLW8TCU5yt+OTZJORVIYWpc76oiFscE0tiM17lfORJ8bKX3IIbVnxFXq+kF8/LFIYWrhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789065753; c=relaxed/simple;
-	bh=0qoObVxomy11sGG6ZnsFvHi5zQBfJ2xlKuAwRPJLFis=;
+	bh=PON1pscLKJ4JW2IeHs/P6UNzFtK9jlaLapGXoxeo2vU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VjWF+NG1iWz/x2PSXndkBAnjWb8ynAzSWEiNdxz5YGNenfeUD55QGj62dv7XMiCm8RlZwLNnuFXrn+mRwnCiPT2fOr7ICMI+f4pB/w8eLBmqtPYt0tUQe1lXS8i/BKrrstMHCJoLWuS1iXJIPBpu4RbYQ+Nt76WsGm5Lo3f3Ekc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HKHwvylv; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=Lbb35xipZl38QCJjZik1/inD3Dx2ZjHMexAHaCgzXwoUN6to44iAPFQUkZFADjBa6ZaA8///Mkbn8bvhSjNO1OwR0BAquNjQj3FFhrZRIqUkmj9sR61adF+r2CAvCsjVUmBAdhtMRXUmoJYpJBNI0b4yxsG0JCsRUFMEl5qIMtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvmxYUWw; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKHwvylv"
-Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c7bd056863so99380e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:42:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvmxYUWw"
+Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e4d9197so150945e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:42:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1789065749; x=1789670549; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=6j4giQ10S90p6Bt9mZ0WRoGPm4O2C/4wzn6we4vbb+w=;
-        b=HKHwvylvkUA2r+m5F/K/bQAHQFcnlPCP6KlPYqQdwChC5FDy2Jvm6bFAA4i5Gv93as
-         WWJ+YmITcbXkCjoaj1vFsDDUMZ2QfuG5BA0WYlogdZWh5P+U5hLrzK3bODUA0HFQqHNO
-         gJB5OykUerowQBsZ8TOPdbvTHwP3i7e+DRujzMxJHFugfZA/nIqcJujrPBUL7WO1sCh8
-         Hz42cPD2RInswbM/UujNOGmPL/OwX3cPDvj7S4Ma3UnS0qoU4idc8ha0lVgFfr31Pwv3
-         BBMdtB+UZlTXQPuExB2mxIYj0YpKhGnBhywsngkxz7fX8lEqE1f+ZHnTKXmeGOfgHKH4
-         rg/Q==
+        bh=vvud6rVWlBreblggXpzGDwFOmcJ79IuVOiu/pyFMAs0=;
+        b=jvmxYUWwxvoFkOmqQHngmJqMkOA71X3AdkhxCz4MnF8LAJFPyuLICzDIdRtbfXNJGH
+         1rU7yzs1gA1D/IPJbtOAwfpw9rLLM23Q/tDHG4Nbb/07gOBx5xoJT6zPbHET6Mjyzs8c
+         dkDWqcX82JpUpQq6Vljr7k7yIfbx6WBuWtgQsnmWe1jRUPUZCM3ZBQ79+JzpzDZRzKgo
+         lhBIj28JSiTMSgkuadKYmhyDm9MjLCYohZeiztrtxp9+PHJeAZwCt3rU6KUMNJemEHnp
+         2wioLA/EhrZr7Sq3aoG5VKm+tUcEr25XEmfoaj42HZE2YmJZVhZsy4qB6MNJo62hPqUp
+         8h4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1789065749; x=1789670549;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=6j4giQ10S90p6Bt9mZ0WRoGPm4O2C/4wzn6we4vbb+w=;
-        b=l9rX2Ym7sbit5nhozxCSnM/vSQvB/xu+pt5vj88C42OQQQ618Thy7Lk4gmAtEYdEUL
-         BoI+rJTREi/z3Gf7jYqg20/XsdRmxpvVrmYHu+hmRmiG6Vu/U5k+75s8t6OAyruKX3Fo
-         FtBs6J0P1pAZqqUwQuIKvoWBt7D5v9SgXlmzo7lWoWVZ/LbleloaHpQJsGlS1bV6oJzw
-         8VjdgrwmxZN5NQTbB8gPP+c1P3235VyMYrm7GZmfSgx2dkTUevD5XJgXm7pF5oDIMxis
-         ZR5lbzsSuC6k+N+gp6evJzTTt32uRAAZnqtAJcH32aGkYkh4Ezx0tyI5ZmoaNrrJ8lnC
-         zdAw==
-X-Gm-Message-State: AFuF++mLpMez7KhQh5Ccn10FY8pP6qjSPGnqE2SYJ6O+zaZtyDlOJwDH
-	ahtSxV+W5a78C569BMBkvKxhJ5t6Gk9jfDMyXLft5GPKKw8qScr1ecB3zMsPbtyZ
-X-Gm-Gg: AYBFou0KcnPft7jJlPWblVNm4PPlrLgnqK6MVaGGmeOmZPPAfEV052fqAIgH6RulnjR
-	LXP6JrMkgysxYQKqJyKBr+Sz4f6//zT14CrdfPSgbTR4KI/foIWz9oCYdG0aGYk+3OLMeYCWhXe
-	7oIVGK80cSenESB4jTwgs4R18ydKWk11v9xRrXQhXIa8RIfAN2aXqcHum7NP2L80tQ/clFi7EJw
-	tl5LVIWHrH5vdgP6MusisFMxwfvZqQLAO6G3IR5sYX+mQRng2r511ec/oMaG9/F8DLBf8Y1XrWz
-	IQmE7WLpyXYauAGX1HkbogIRPrUSTjLRdhWLEujpY//TI6aD22XMDFePZ+dWsP23XOJZO+aiRja
-	IzfkvJB8gvEiICM7P+wiBZqO8AuevjsYDgC/BQ6wZcZ8oG2DNujlv4d8e03e2Jt7va1KJ86W2Jo
-	2hVb12c93qTrH/fZPWLwGq1pGQshOEllZTLcHBCW+1GkZ4jhREYW084d98/webnvK4FzWET95kz
-	ba8V+RgJsZqsa12E6cMXCEAtegGgNphhBAqaT74FXXgGd858ale1zLwls0zabmx2Q==
-X-Received: by 2002:a05:6122:da0:b0:5bf:889f:e7da with SMTP id 71dfb90a1353d-5c846284248mr682259e0c.2.1789065749574;
-        Thu, 10 Sep 2026 11:42:29 -0700 (PDT)
+        bh=vvud6rVWlBreblggXpzGDwFOmcJ79IuVOiu/pyFMAs0=;
+        b=mKPy+rMpGK2P/qqB3tljGdtfMgtAFAhFYgZq+HSNnHLcMB2NglGMysrfyZvjlGr9Za
+         5LPoFxlbSxW9pfeEcPCbYVJfzDBUP50eLGlWDLyW1Ps6eGuugEDevi/sfCtWkCqlT5ha
+         957ygVZdU43inwmZez/xOyFEceCqLDmjcmIIrU7mGe/fGc/uU6zFy8WLBggzxQAhgQ6F
+         9EOrqnCYiRYPlcEQOHFzM0aRZrPupjqTIm8pczHh6vjkLwTXKaUB/1HWpevx674a1eq9
+         AHRlC7IOPOjN3JwQWCkbui+bV3djJ2IhiW2wQFmbItwWxYw17weGMQC+XD+k+2rMLl1k
+         0gXw==
+X-Gm-Message-State: AFuF++kW37un5nCEMOKzRK0wPz1exz7MGqKsXiiW9VvBRArUPkXWlRWd
+	yadjSNA30EQFkt00XYhUoZnu6PRipRvKgzCnLJzc+VGjZq9GE5GRaWXkpO4hs0h9
+X-Gm-Gg: AYBFou2idloIfPO5XfPWW1l8BzFWTmQGX7yQOi3LrF9Mda1Nv9liXGyjr7Qmi0jdVSc
+	9NcFHHtTI3D7XQHe4ogZbvAPhLcFr8yFr1eZqVUE1erWHW8jTtRyKzA7G62inCKT8B0uAU7IKuX
+	5AFc0rLz7IZ0TlMaR5zVx8E82BN2x83DB+njMCh632s00bpVrdDDeG/xMbXv97gVFUToLBdQUsl
+	0ADycmnXs07x0domrorLCPC5u3JwIzh0a99ruMcpXPam4rX48SVY/kLmcu89iVl+9NH1gaj35yV
+	lrcZ6Ga1/OQJDbvRjZGTyCmuNL5pioKGuPVW+yULBFGakdiRUz6tVxLuoLp6fVmk1BWMw3R3KUV
+	78Bdw9t3fQMmO/jsXohVLGE7+JkG1lPkcyYmPRsBDb6SSOumtFW30BSfGlWsW12GVumrOsf8Lxn
+	1IDs/QK7pH5mucnYWsWPBBqqt0S37og8WHpdFscBZe4l4HL16nM5pfuaMlKIM71VJuIbyPCKQbo
+	KBt/HoM9yUvtcZOoLC7JLhrC0kHWe2FWCWKjTmiS/wERAiBOY+wQNO1/SLWruxKvnlwZyNW1zXz
+X-Received: by 2002:a05:6122:4894:b0:5c8:c5f:e8fa with SMTP id 71dfb90a1353d-5c846256c9emr643574e0c.4.1789065748772;
+        Thu, 10 Sep 2026 11:42:28 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c8470ae7dcsm222256e0c.4.2026.09.10.11.42.28
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c8470ae7dcsm222256e0c.4.2026.09.10.11.42.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 11:42:29 -0700 (PDT)
+        Thu, 10 Sep 2026 11:42:28 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/4] battery: Document the unknown sentinels and fix a stale name
-Date: Thu, 10 Sep 2026 14:42:15 -0400
-Message-ID: <20260910184216.1601639-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/4] adapter: Unify the A2DP admin allowlist UUID mapping
+Date: Thu, 10 Sep 2026 14:42:14 -0400
+Message-ID: <20260910184216.1601639-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260910184216.1601639-1-luiz.dentz@gmail.com>
 References: <20260910184216.1601639-1-luiz.dentz@gmail.com>
@@ -77,62 +77,212 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-btd_battery_update() treats UINT8_MAX and btd_battery_update_charging()
-treats -1 as "unknown", invalidating the D-Bus property rather than
-setting it. Neither was documented at the prototypes.
+The allowlist enforcement added across the adapter, device and A2DP
+layers ended up using three different UUIDs for the same two profiles:
+adapter.c mapped both a2dp-source and a2dp-sink to ADVANCED_AUDIO_UUID
+(0x110d), while device.c and a2dp.c mapped them to the local role UUIDs
+0x110a and 0x110b. An allowlist containing only 0x110a therefore blocked
+the a2dp-sink adapter probe outright, so the finer grained SEP checks in
+a2dp.c never ran.
 
-Also rename unregister_if_path_has_prefix() to
-unregister_if_provider_matches(); it no longer compares path prefixes,
-it compares the owning provider.
+Add btd_profile_get_policy_uuid() as the single place resolving a
+profile to the UUID of the local service it provides. btd_profile names
+and remote_uuid describe the remote role, so the A2DP profiles are
+inverted there: "a2dp-source" registers the local Sink server and
+"a2dp-sink" registers the local Source server. This matches what
+device.c and a2dp.c already do.
+
+Note that allowlisting 0x110d alone no longer enables A2DP; the local
+role UUIDs 0x110a and/or 0x110b have to be listed.
+
+This also drops the hardcoded profile name table in adapter.c. Every
+entry but the two A2DP ones just returned profile->remote_uuid, and any
+profile without a local_uuid that was missing from the table resolved to
+NULL, i.e. was allowed unconditionally regardless of the allowlist.
 
 Assisted-by: opencode:claude-opus-5
 ---
- src/battery.c | 4 ++--
- src/battery.h | 8 ++++++++
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ src/adapter.c | 49 +------------------------------------------------
+ src/device.c  | 25 ++-----------------------
+ src/profile.c | 24 ++++++++++++++++++++++++
+ src/profile.h |  7 +++++++
+ 4 files changed, 34 insertions(+), 71 deletions(-)
 
-diff --git a/src/battery.c b/src/battery.c
-index 181bf3846d52..dbfe56881259 100644
---- a/src/battery.c
-+++ b/src/battery.c
-@@ -664,7 +664,7 @@ static bool match_provider_path(const void *data, const void *user_data)
- 	return strcmp(provider->path, path) == 0;
+diff --git a/src/adapter.c b/src/adapter.c
+index 157d7392d32c..fc734424be07 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5353,59 +5353,12 @@ static void load_drivers(struct btd_adapter *adapter)
+ 		probe_driver(adapter, l->data);
  }
  
--static void unregister_if_path_has_prefix(void *data, void *user_data)
-+static void unregister_if_provider_matches(void *data, void *user_data)
+-struct profile_allowlist_map {
+-	const char *name;
+-	const char *uuid;
+-	bool use_remote_uuid;
+-};
+-
+-/*
+- * Adapter server policy UUID defaults to local_uuid when available.
+- * Profiles listed below are exceptions.
+- *
+- * A2DP profiles map to ADVANCED_AUDIO_UUID so profile probe gating matches
+- * the A2DP profile class (0x110d), while adapter service registration/removal
+- * still filters specific Source/Sink records by their own UUIDs.
+- */
+-static const struct profile_allowlist_map profile_allowlist_map[] = {
+-	{ "a2dp-source", ADVANCED_AUDIO_UUID, false },
+-	{ "a2dp-sink", ADVANCED_AUDIO_UUID, false },
+-	{ "audio-avrcp-target", NULL, true },
+-	{ "avrcp-controller", NULL, true },
+-	{ "vcp", NULL, true },
+-	{ "micp", NULL, true },
+-	{ "ccp", NULL, true },
+-	{ "gmap", NULL, true },
+-	{ "tmap", NULL, true },
+-	{ "bass", NULL, true },
+-	{ "bap", NULL, true },
+-	{ "mcp-gmcs", NULL, true },
+-};
+-
+ static const char *profile_allowlist_uuid(const struct btd_profile *profile)
  {
- 	struct btd_battery *battery = data;
- 	struct battery_provider *provider = user_data;
-@@ -678,7 +678,7 @@ static void battery_provider_free(gpointer data)
- 	struct battery_provider *provider = data;
+-	size_t i;
+-
+ 	if (profile->local_uuid)
+ 		return profile->local_uuid;
  
- 	/* Unregister batteries registered by this provider. */
--	queue_foreach(batteries, unregister_if_path_has_prefix, provider);
-+	queue_foreach(batteries, unregister_if_provider_matches, provider);
+-	if (!profile->name)
+-		return NULL;
+-
+-	for (i = 0; i < ARRAY_SIZE(profile_allowlist_map); i++) {
+-		const struct profile_allowlist_map *entry =
+-						&profile_allowlist_map[i];
+-
+-		if (strcmp(profile->name, entry->name))
+-			continue;
+-
+-		if (entry->use_remote_uuid)
+-			return profile->remote_uuid;
+-
+-		return entry->uuid;
+-	}
+-
+-	return NULL;
++	return btd_profile_get_policy_uuid(profile);
+ }
  
- 	if (provider->owner)
- 		g_free(provider->owner);
-diff --git a/src/battery.h b/src/battery.h
-index 2b459809cba6..5990c8e0b87f 100644
---- a/src/battery.h
-+++ b/src/battery.h
-@@ -18,7 +18,15 @@ struct btd_battery *btd_battery_register_component(const char *device_path,
- 					 const char *identifier,
- 					 const char *source);
- bool btd_battery_unregister(struct btd_battery *battery);
+ bool btd_adapter_is_profile_allowed(struct btd_adapter *adapter,
+diff --git a/src/device.c b/src/device.c
+index 8da576ec5932..ec74c44ac4aa 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2547,27 +2547,6 @@ static struct btd_service *find_connectable_service(struct btd_device *dev,
+ 	return NULL;
+ }
+ 
+-static const char *service_policy_uuid(const struct btd_profile *profile)
+-{
+-	if (!profile)
+-		return NULL;
+-
+-	/*
+-	 * For A2DP device services, apply admin policy by local role UUID:
+-	 * - a2dp-sink profile is local source role  (110a)
+-	 * - a2dp-source profile is local sink role  (110b)
+-	 */
+-	if (profile->name) {
+-		if (!strcmp(profile->name, "a2dp-sink"))
+-			return A2DP_SOURCE_UUID;
+-
+-		if (!strcmp(profile->name, "a2dp-source"))
+-			return A2DP_SINK_UUID;
+-	}
+-
+-	return profile->remote_uuid;
+-}
+-
+ bool btd_device_all_services_allowed(struct btd_device *dev)
+ {
+ 	GSList *l;
+@@ -2579,7 +2558,7 @@ bool btd_device_all_services_allowed(struct btd_device *dev)
+ 	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
+ 		service = l->data;
+ 		profile = btd_service_get_profile(service);
+-		uuid = service_policy_uuid(profile);
++		uuid = btd_profile_get_policy_uuid(profile);
+ 
+ 		if (!profile || !profile->auto_connect || !uuid)
+ 			continue;
+@@ -2614,7 +2593,7 @@ void btd_device_update_allowed_services(struct btd_device *dev)
+ 	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
+ 		service = l->data;
+ 		profile = btd_service_get_profile(service);
+-		uuid = service_policy_uuid(profile);
++		uuid = btd_profile_get_policy_uuid(profile);
+ 
+ 		if (!profile || !uuid)
+ 			continue;
+diff --git a/src/profile.c b/src/profile.c
+index 97fffe9b4d5c..e5b1cdfc5d33 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -16,6 +16,7 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <errno.h>
+ 
+ #include <glib.h>
+@@ -753,6 +754,29 @@ void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
+ 	}
+ }
+ 
++const char *btd_profile_get_policy_uuid(const struct btd_profile *profile)
++{
++	if (!profile)
++		return NULL;
 +
-+/* Pass UINT8_MAX as percentage to mark the level as unknown, which
-+ * invalidates the Percentage property instead of setting it.
-+ */
- bool btd_battery_update(struct btd_battery *battery, uint8_t percentage);
++	/*
++	 * The admin allowlist is expressed in terms of the services the local
++	 * adapter exposes, while btd_profile names and remote_uuid describe
++	 * the remote role. The A2DP profiles therefore have to be inverted:
++	 * the "a2dp-source" profile drives the local Sink server and the
++	 * "a2dp-sink" profile drives the local Source server.
++	 */
++	if (profile->name) {
++		if (!strcmp(profile->name, "a2dp-source"))
++			return A2DP_SINK_UUID;
 +
-+/* charging is 0 or 1 when known, or -1 to mark the state as unknown, which
-+ * invalidates the Charging property instead of setting it.
-+ */
- bool btd_battery_update_charging(struct btd_battery *battery, int charging);
++		if (!strcmp(profile->name, "a2dp-sink"))
++			return A2DP_SOURCE_UUID;
++	}
++
++	return profile->remote_uuid;
++}
++
+ static struct btd_profile *btd_profile_find_uuid(const char *uuid)
+ {
+ 	GSList *l, *next;
+diff --git a/src/profile.h b/src/profile.h
+index 04a99528b4be..270f09ea2b96 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -84,6 +84,13 @@ struct btd_profile {
+ void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
+ 								void *data);
  
- struct btd_battery_provider_manager *
++/*
++ * Return the UUID of the local service a profile provides, for use by the
++ * admin policy allowlist. Returns NULL when the profile has no service to
++ * match against.
++ */
++const char *btd_profile_get_policy_uuid(const struct btd_profile *profile);
++
+ int btd_profile_register(struct btd_profile *profile);
+ void btd_profile_unregister(struct btd_profile *profile);
+ 
 -- 
 2.55.0
 
