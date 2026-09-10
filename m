@@ -1,149 +1,165 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F8958B6A7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EE758FD10
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789067757; cv=none; b=D7+KgBQNT0JmyF5zOrE9wK523cdcW7oYk/jdqh6Vfz5Zs3+LHpp3yKO0Iy99HrDhdWmWfQzqUDzfUHzkS9p4HHXberyBPILvb+1/JX1iEGUFLFJtbgIcq/c5Bq6UsO18kjIecKklT6QxMVCITVoyP8fN18ENoOIdZBJBQtuDSL0=
+	t=1789067970; cv=none; b=kpiQFqO9WLsXUJlOQzYjKZ2OGKFrFpdZX6e2BWLP7OuEC4Abr0Q1rBlXrGwcLFMQ73X1bLHKKb9MYoiIscKsr2T+uuLmRWyJbAMYK4xd8ZUoAP+D8r5I6pxY+zHClWbhqbjmdvuJL7kTRP9cTwpqy7esJubStNMsFaRoYZvIMII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789067757; c=relaxed/simple;
-	bh=u05WNvxjAV0K6VsjaAa2RdFxO7IDB38U8hkYcg70Wg0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DKeE4yCKkXpqNoY+CSEdJvHHdxM/rMAWfBSPyJkV82TmTrsfEgzc0RjpZ32z7lb9EMqijDdDEs5I/LJvR4izfQMjAtELh3dv+733sdrqbc3OFCG/y+IxShM9Xo/bT6qlMaZpwWsZqr72cxPRNbpqxptETLLDGkk3UuLWoVGJEdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T4W3f7JO; arc=none smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789067970; c=relaxed/simple;
+	bh=vYuadRF0dpSqUJwJ83yCy0NkqcGeftVG+lFtP5r9ux8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CXeX5mPcMV1AdmmCnyuuIqJajdxU1KR1OLFX7DIZA1Zb9XqPOl0FsqoSARrxp0RkhTJc9tNdpLBjTT798b3+RnPq3WU3/VUfPW8lgIxAtMzafpDOM63D9SMT1cS9XAwpQf1FUg35gFoz2iKcZ74IJlnPMoLdiZO0JNEqbkZpDww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=g6oTNe0w; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4W3f7JO"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-6711a939a8bso81502d50.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 12:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789067755; x=1789672555; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=vcBjbtrb/A9KPVhtBeOv6CXcAwOewchzeBmMqb2px08=;
-        b=T4W3f7JO4qWSrYBX7LtsdCTsN2d1CX8CbigvXh6xobzpNgIcmfwoFWeebxU9mhDspm
-         Fyjhun5YDh4xTKwRfXrGGMEqVQ2swYF8uR0MSMJ0X6Svk8x4kn9uUcufJ1LWlZrz7TGu
-         Pxdd6tqZRhXxeJpHAK1CLlJHCdwDB5pnhcdGlWYNXpsNo8nrRK2+puuVgW2OZ5JfrzEl
-         mZG3zFjhMANpqjjbTElvx7SI/hKnWVonBnHZPvI6HrGYk1xnpwgxfuwErl3yr9Emjw4M
-         kPBsrvW6adjWtqjvtpHBvvCzG86tY/i4risqDQye/+JWXMufqb75+mofJaa3IY+LRE5n
-         LqLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789067755; x=1789672555;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=vcBjbtrb/A9KPVhtBeOv6CXcAwOewchzeBmMqb2px08=;
-        b=mvbv9QfzgaSEChIvaoeRUidTR8cnMXjPtZIKKr9DX3hCjk3g+CLK9N111fSSdlmzbR
-         dj74o+TniqmxjQaCUEU+/18abVJXCESNvg4Q537GTr80Z9IdFSgjidGw3CB2EqgMViPI
-         gAE7lCOT3lTmKWeo3SNZc8klSABn0PkA2ru0VrLTCbhm5s34IYY2BXlltX7HqgjtXScb
-         lXmZe7KO2KFKGFRFaPF/f53+3/XKV8Kgax9azJXmLDRkER/X5PQXDMXyb1XY/EFbnajv
-         n2uJ44Sr8QekWoOOdB0U1hzQtehJquZLFh4QBxSwWF4gZ+Qewx/L9bCW3T86ss9z+Wpo
-         mfJA==
-X-Gm-Message-State: AFuF++kbxkPY/0GJijUOwXHqJNAj7p9zmos3oQkN5aCklvE9dbaVRoHp
-	/IwUT6GGSdxNILhH/cJaaBnqSYL1xKaU9fUOzsH6eKdHWkVH65zSdDn2d2s4Zg==
-X-Gm-Gg: AYBFou1yO1XSi6QqVtAWueyg5cEnDR70X0yJ0SYlMnoUV8KpUzKD3S4a92sRjgFUncK
-	7nuTMzHjXIGLYEuDeNDJz85fuzSWlLqogYGUukcKW7/U/QOSHVx9VED200XSAgm1KSatvXWt5D/
-	6ksQUUrr71bRBvvGGtGoL8ZOwZS1xU9J5HcT5Tcj0AaSPxuehe8xE1ImkMZFVNwihQ2EawSd4bI
-	eZYCkrPZBYngzVgAcc88jZF8d3CmCI8d5DpauAjvHmeuMo7zhabd2P/b7gAra8P5ZLXiGoo22BB
-	1D9Xg6HreLuFbUFw985tPDcZJDyjJo/lIizq4Hio06Bbp9whpyqEYoKT7lwu0RCHwg8D8TIiepJ
-	nozEoTgYyO9BGYtNS+kCu2Bc25a4B0MDm34K5ewJ85w1hiOvrPmRYTdM84vF9cr7g+vgk03ZWH2
-	K0CyGBwMGTKWIlucNHlmXkZ5kyPsvOVpJKxX8w+oWjfJoyLHn3DQdp5BdryUjN572AwN+DGXtfA
-	oIe
-X-Received: by 2002:a05:690e:c4c:b0:66f:79dd:19b4 with SMTP id 956f58d0204a3-6712464da9amr536623d50.33.1789067755038;
-        Thu, 10 Sep 2026 12:15:55 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.95.50])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f494620sm2893906d6.28.2026.09.10.12.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 12:15:54 -0700 (PDT)
-Message-ID: <6aa301ea.c404bc25.2eb48f.ec4c@mx.google.com>
-Date: Thu, 10 Sep 2026 12:15:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2276012069938985056=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="g6oTNe0w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789067965;
+	bh=7VNklaflaKRiKjSl6i5jG4BMdDViwvtw2pnGK0dc1UQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=g6oTNe0wSHTWj2hUXLfjrGhfqzu26XJBLk/+SQEXLRjaVseFd2Rzm1p1WreXCqik2
+	 /gj977Dak2LL0YzHsUeM+qaypODLtjMWV4Z58G0RJkurTbI2MofPnCv+dzamCdAodW
+	 8C3mCmK+E8OzXl4KKcQlIQLAujpkDMjDSA10wc5U=
+Received: from github.com (hubbernetes-node-e4b5015.va3-iad.github.net [10.48.72.98])
+	by smtp.github.com (Postfix) with ESMTPA id 2C98A501353
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 12:19:25 -0700 (PDT)
+Date: Thu, 10 Sep 2026 12:19:25 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1162311/000000-9ddfe4@github.com>
+Subject: [bluez/bluez] 6df617: gatt-server: Check prepare write length before
+ rea...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, acharyalaxman8848@gmail.com
-Subject: RE: [v2] Bluetooth: hci_codec: validate vendor codec count length
-In-Reply-To: <20260824155736.54542-1-acharyalaxman8848@gmail.com>
-References: <20260824155736.54542-1-acharyalaxman8848@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2276012069938985056==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1162311
+  Home:   https://github.com/bluez/bluez
+  Commit: 6df6172376328d933971ea97888ac49a3207b205
+      https://github.com/bluez/bluez/commit/6df6172376328d933971ea97888ac49a3207b205
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    M src/shared/gatt-server.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1151041/
+  Log Message:
+  -----------
+  gatt-server: Check prepare write length before reallocating
 
----Test result---
+append_prep_data() grew the buffer and copied the new fragment into it
+before rejecting a total length above UINT16_MAX. On overflow the
+allocation had already been enlarged and written while prep_data->length
+was left at its previous value, desynchronising the buffer from its
+tracked size.
 
-Test Summary:
-CheckPatch                    PASS      0.76 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.47 seconds
-BuildKernel                   PASS      29.66 seconds
-CheckAllWarning               PASS      35.44 seconds
-CheckSparse                   WARNING   36.90 seconds
-BuildKernel32                 PASS      29.11 seconds
-CheckKernelLLVM               PASS      35.62 seconds
-TestRunnerSetup               PASS      789.33 seconds
-TestRunner_l2cap-tester       PASS      43.14 seconds
-TestRunner_iso-tester         PASS      121.86 seconds
-TestRunner_bnep-tester        PASS      13.25 seconds
-TestRunner_mgmt-tester        FAIL      150.14 seconds
-TestRunner_rfcomm-tester      PASS      16.86 seconds
-TestRunner_sco-tester         PASS      22.11 seconds
-TestRunner_ioctl-tester       PASS      18.02 seconds
-TestRunner_mesh-tester        FAIL      19.27 seconds
-TestRunner_smp-tester         PASS      15.71 seconds
-TestRunner_userchan-tester    PASS      13.48 seconds
-TestRunner_6lowpan-tester     PASS      16.69 seconds
-IncrementalBuild              PASS      28.17 seconds
+Move the bound check ahead of the realloc() so an oversized prepare
+write queue is rejected without touching the buffer.
 
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_codec.c: note: in included file:./include/net/bluetooth/hci_core.h:150:35: warning: array of flexible structures
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.146 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.660 seconds
-Mesh - Send cancel - 2                               Timed out    2.000 seconds
+Assisted-by: opencode:claude-opus-5
 
 
-https://github.com/bluez/bluetooth-next/pull/743
+  Commit: 7c30470f5f5ade0156edfc1093b2a938c9367efc
+      https://github.com/bluez/bluez/commit/7c30470f5f5ade0156edfc1093b2a938c9367efc
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M src/adapter.c
+    M src/device.c
+    M src/profile.c
+    M src/profile.h
+
+  Log Message:
+  -----------
+  adapter: Unify the A2DP admin allowlist UUID mapping
+
+The allowlist enforcement added across the adapter, device and A2DP
+layers ended up using three different UUIDs for the same two profiles:
+adapter.c mapped both a2dp-source and a2dp-sink to ADVANCED_AUDIO_UUID
+(0x110d), while device.c and a2dp.c mapped them to the local role UUIDs
+0x110a and 0x110b. An allowlist containing only 0x110a therefore blocked
+the a2dp-sink adapter probe outright, so the finer grained SEP checks in
+a2dp.c never ran.
+
+Add btd_profile_get_policy_uuid() as the single place resolving a
+profile to the UUID of the local service it provides. btd_profile names
+and remote_uuid describe the remote role, so the A2DP profiles are
+inverted there: "a2dp-source" registers the local Sink server and
+"a2dp-sink" registers the local Source server. This matches what
+device.c and a2dp.c already do.
+
+Note that allowlisting 0x110d alone no longer enables A2DP; the local
+role UUIDs 0x110a and/or 0x110b have to be listed.
+
+This also drops the hardcoded profile name table in adapter.c. Every
+entry but the two A2DP ones just returned profile->remote_uuid, and any
+profile without a local_uuid that was missing from the table resolved to
+NULL, i.e. was allowed unconditionally regardless of the allowlist.
+
+Assisted-by: opencode:claude-opus-5
 
 
---===============2276012069938985056==--
+  Commit: f92e323272d0df5870d9fbec86e6ce0d25f76dc9
+      https://github.com/bluez/bluez/commit/f92e323272d0df5870d9fbec86e6ce0d25f76dc9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
+
+  Changed paths:
+    M src/battery.c
+    M src/battery.h
+
+  Log Message:
+  -----------
+  battery: Document the unknown sentinels and fix a stale name
+
+btd_battery_update() treats UINT8_MAX and btd_battery_update_charging()
+treats -1 as "unknown", invalidating the D-Bus property rather than
+setting it. Neither was documented at the prototypes.
+
+Also rename unregister_if_path_has_prefix() to
+unregister_if_provider_matches(); it no longer compares path prefixes,
+it compares the owning provider.
+
+Assisted-by: opencode:claude-opus-5
+
+
+  Commit: 9ddfe4d82a4fc4354f02ac6dcd578eb9016a1158
+      https://github.com/bluez/bluez/commit/9ddfe4d82a4fc4354f02ac6dcd578eb9016a1158
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
+
+  Changed paths:
+    M Makefile.tools
+    M client/admin.c
+    M client/admin.h
+    M client/main.c
+    A client/main.h
+
+  Log Message:
+  -----------
+  client/bluetoothctl: Declare the controller helper in its own header
+
+bluetoothctl_get_default_controller() is implemented in main.c but was
+declared in admin.h, the header of one of the submenus that consumes it.
+Move the declaration to a new client/main.h so main.c also sees it.
+
+While at it, drop the bluetooth/bluetooth.h include added to admin.c,
+which is unused.
+
+Assisted-by: opencode:claude-opus-5
+
+
+Compare: https://github.com/bluez/bluez/compare/6df617237632%5E...9ddfe4d82a4f
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
