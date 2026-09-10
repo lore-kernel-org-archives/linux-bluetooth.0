@@ -1,66 +1,66 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337DF577E4B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5985111B6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789062172; cv=none; b=aQiV6PLfDI0wdaBheEDyUZDNe7iA31EKPFXpeYpvuB5PTOdily/QVFLMMI/D2zGeAd56iZfHMhDWDO2a0uPfGBQTzem8aAirxNb1TQDJKeQA57JjTWtC+VD5+pYr/90kPcQpwISA/hPi+HKIYnxm47ajfsgpAQuC9avjE85HrB4=
+	t=1789062175; cv=none; b=IZKia9CTu34kUZSQeetiKJf6g2Sg/hLWk5dl/D83YO0jTnwn9kuhnEAJzY/RD2uVqHZrWwxJinMtXNbaRYf/+famN2ngaFtAbbUjZCwY5DZwKrYKlz417TSUpZZQGfEklZTYpl+wUdekH9b1PrGuSAetXvzVOaHalIsDeBzCIIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789062172; c=relaxed/simple;
-	bh=iUsdu7hlMTOdkW/S5TLwwWc/e2DSnR7a2CMreYkJWMo=;
+	s=arc-20240116; t=1789062175; c=relaxed/simple;
+	bh=HaeEm+5wY8ixElFuIQpjXuyMdzlllvFyDuKES+Siby8=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Dfy7cwIWFHT5d5g3H54GGyA3cIgIGm//ma8eHpyuPSYjGP/+7zH7uoCHav/8Q5NGFaRgU3V7IixtAL5mh/SaR/6VlBREL3mFZPHcK0mIpyxmP8Ifq1PV75s4vz3oCYMF87Iw5nO6kKtu6hpcNe2zK2kAANNdo91o+UbRsl9Zcyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sYe6GRFm; arc=none smtp.client-ip=209.85.215.182
+	 In-Reply-To:References; b=sQfd1r4PACn0K6Lmb6Sba2DPFFAfd1eKNhEIOPf9GRNSXj2fBD5ntaSVsQzwe8Ow7jI/MNoTZbg81w1gzVfK+Zl9o3SKi4wAi5RzSAicQnJa7tMV9ZdQFUKdVUhG5ic/bd//S+HR13Udd6Q+AkMauaFOlUDkSunJ0WoH/ADBLWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQMWLWSM; arc=none smtp.client-ip=74.125.227.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sYe6GRFm"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc1c73645a1so108346a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:42:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQMWLWSM"
+Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396ccafb752so2668888a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789062158; x=1789666958; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789062155; x=1789666955; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=7ubjC1JTeylAH/I77DS0dkt+xeEXd1ObINSsBjaXgiI=;
-        b=sYe6GRFmlS9nxV06iGuHiQfLXDkztxZFwrZWhCbDGiEdpfZ30LEVR6EqdPTq5gKDU9
-         hFhSjgAH3pKxfTT1DfyOfuq2E0jFKibIxQjvbx6jWsb7tuB05xL5VmE5/RGePG2JyTPq
-         x3TV+fFWyv2obmCuk/X8EemsJSaoLVajX9XTzf9M0dQCdh7mYNLhi0YYBddGmgOISaMc
-         oW/Atu2at/r0ihxReF/P4qDsqZ/mrKcSt2t1DEwTxQOBy5IBc8iZdTd9+ZBPTs3/HFCf
-         R/MVvZlSg60uHjZbU5f8iNVGmKLyYHgHlQGCNGVaEE41vp2y2hzMyIoAwHv0zkDeZgd2
-         SGWA==
+        bh=g/DcN8xyHQyEyPNouj5V+VCQirBflS5p7i5teLQTUI0=;
+        b=NQMWLWSM6cnAywM2OFr5XrTT35chmCixaPcJcm4Nv72EmLe8r5nPsavQSYPFSAw7jt
+         4VVwYYt0a3UBWHve0xxJVZec3S/919U0tI+ukGo34ynVTKPsG7uY2bbEUQek0oZQ1BAs
+         QoEbCtj2ukTCl61tDek2I0HzQ6g74Jrr2pQ8AIl3/oVjxfgIxEgacpHf1Nhj4NQUzPjD
+         LCSU31g8/5ZRZVJJw0oFULOWxaqORS659HiM1ErVP9bOIywZCF3fmR29k4BXm3beEQhM
+         uRhduiqY2D+duIOUyVwM8B6sk+7yhX+Kn2qAj/pcuI3Se6soos+QAnKv8xFznl8UYM2u
+         5q/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789062158; x=1789666958;
+        d=1e100.net; s=20251104; t=1789062155; x=1789666955;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=7ubjC1JTeylAH/I77DS0dkt+xeEXd1ObINSsBjaXgiI=;
-        b=gVY1Vjs/Tr2dhLuaeW3oIwPYkdA6RdebhWiWOoWc6bUG+Xl/zUSmXnGktfY8wMSCVo
-         o4a1lcfquFTYC/hkGhUoPBaprhjjqcXhVxXziXj4Lk61Yc3iuhzGSsHyqfkZG6kKmeCr
-         GgBdIBk2wgenlggv0G5xRMhHjzsCGiccOqKU3xsscCr16ptDQ3FxHCZ5nc0I3Fn5uhPL
-         RhWOvuOrpiqnGKfmGeU2Nct2MlOx8KD70y2JRVmxKr2kJk5hmkZvnbv+oZ7ks0jn6uNV
-         TwlFFee3kP9LAAS+7Fb++KiUzbiJgYF5AGKOeFQQUtEJNg201NoJtUoBXwmQI+aPQQHI
-         bR0w==
-X-Gm-Message-State: AFuF++lqjlvkdBfHoJg1TddFftTp+W4Lf4Z0qPgSeZoFwR8H0uHN+mQl
-	faxicGqXsbtjHCy+/hqiGapHRHh/aAL0tTpg2eU409qH530IRObazjR35kTw7g==
-X-Gm-Gg: AYBFou1shwxB9KXN2f17HvGPfrZ2E2Lc0sUQkmAwyaWxbPo8YVaE70d4mN/6S839x11
-	+WvLhdxDsbSl5TYSkewCRATGn9eccmuGCYhLDD8BuHkSolYos1gm+7eNds59stf+fD84aludiF4
-	qQCaP9/a30+aubh+LjPTywxOSfac40j5KxOrPG9Diq+m8sKZgjjTZeLTOyYpzUDBSLB/At/J7UX
-	pjIrr6WbmyslXCXZm0BDqXGIgC8mnJB5+h5kNpliGrMhEnae+1td0Gjp0jOXNN4OGfbn+QPniNr
-	v6jZTH041adrnQxySIeDpVPJG0Y8wcHw3LqpxgDSrvHIWuates4NNAJu3usihXvyZ/zMkXL32u7
-	JgxJirBKyiIZyuOG5bRKaADrAyi7D+GHVeERAakX+HOgJSCuGQHq9oNlYV5ipXptHG1f6EGt+uw
-	V30HPlxrFrYNglkXbYqUJ6Eo/ndXRiLmK7K3LPH6+ewpim+jqrWH3+V18wziOphEjIv6jhQehN/
-	+IYsA==
-X-Received: by 2002:a05:6a21:38c:b0:3d3:ae1f:d7f8 with SMTP id adf61e73a8af0-3da3a0cc91cmr68450342637.24.1789062158138;
-        Thu, 10 Sep 2026 10:42:38 -0700 (PDT)
+        bh=g/DcN8xyHQyEyPNouj5V+VCQirBflS5p7i5teLQTUI0=;
+        b=K71+Ev3GH9cAya/uNWhwRUZ0/h/kg7h8RHV8JMRsFnTUR5QjA9XZqKCisziH7MIYxm
+         DZB3hQal4tFFbz8vWjtA+Pvdq37I97wCcJQxdsjZty5IXqM7h39TvFWSH+B30GmXh3Mh
+         SF0X9Fd5Bqa3y3bO8ah4F2s2IQtYEZ6h2FAlmjLhUsR+RX8p9+hLm59DVi3zh7aMKz0j
+         E9AydvBgQ950LLG7dYnlFz1/1D7KpTnp2MHdSXiKO9PQB6xV2HOapaGx2/79+ZA8d1kM
+         LVK8jxFjju4DuERQZyBZR4khKj/8AGrsRgl7oNFcyjBNtNLTe68tmwibH6LLsOwt/vik
+         0YTg==
+X-Gm-Message-State: AFuF++l45Cnz7ijCV/5npCq4aMM9qSM+lX5qcKIqL76mKYNSm1ocAW5O
+	i/g2VfDXLNXGABUy0d0NpmqgDHhWGdRVHCMKqw/3ksG8htkLUquuJr1sRcxqJQ==
+X-Gm-Gg: AYBFou1/ukcyJWDqo/xLpgHHoiX0AJfo122eQzYiUwOLROrqn4azEPxTFPV8HVKxOEA
+	UUlzkq2M2JsmP172cFBFFpOj0DuGdkYJGMrvfKPzhn0Ltj5wdFK0iqWfp8o0Se0Dje9096kvk8t
+	3XHKgnew5uI3be0nbanXWwf7oIRDFzuquMJl440oxQWi6JilNB09IEUqwrbnJhP9159kygtld/2
+	jRZoVyNySYAgsQl/dkyVjprrPd53rgXfN7/cQSMjXSKancIYOxeqqD8fTL0HoqIqbJPvF9LA9zU
+	26tLJkK6oBvudnoh3Cl4Fo09mT2bf48Ww09117vZX13iecRMZ3fHgvqovKAurOnFRB0w6XZSx6l
+	BHRzz7sNERNWlOz948BSxEkTOAf6sjZjTgVd5J0mN2bo+9xL9Qi2db+/itPuD9V+iG6mc+HPHTd
+	CRH/WfzuE7Meuje+OBjj7jPCR4iQWtel4/ABYyfHWO4Iq3xfC3PFc4UVlYvBD0+KCZc3X7BB0ZU
+	nIvb+vQMqe2y7Yn
+X-Received: by 2002:a17:90b:3d89:b0:398:dcfe:968e with SMTP id 98e67ed59e1d1-39bac3f9063mr22298627a91.20.1789062154290;
+        Thu, 10 Sep 2026 10:42:34 -0700 (PDT)
 Received: from [172.17.0.2] ([128.24.161.17])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14365b5e1edsm237619c88.6.2026.09.10.10.42.36
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33987ccf483sm14584945eec.20.2026.09.10.10.42.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 10:42:36 -0700 (PDT)
-Message-ID: <6aa2ec0c.abe55a58.39b5eb.6130@mx.google.com>
-Date: Thu, 10 Sep 2026 10:42:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8962727341330373360=="
+        Thu, 10 Sep 2026 10:42:31 -0700 (PDT)
+Message-ID: <6aa2ec07.daefcc87.14b7e1.8dcd@mx.google.com>
+Date: Thu, 10 Sep 2026 10:42:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3725961078391331200=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,13 +68,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: 3 SDP XML security fixes
-In-Reply-To: <20260812080410.2116906-2-hadess@hadess.net>
-References: <20260812080410.2116906-2-hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: Add CS distance provider implementation
+In-Reply-To: <20260812100345.2956271-2-naga.akella@oss.qualcomm.com>
+References: <20260812100345.2956271-2-naga.akella@oss.qualcomm.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8962727341330373360==
+--===============3725961078391331200==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -87,9 +87,9 @@ This series was picked up by the CI more than 2 weeks ago and the pull
 request created for it is still open, which means the series was never
 applied to the tree.
 
-   Series:       3 SDP XML security fixes
-   Pull Request: https://github.com/bluez/bluez/pull/2396
-   Created:      2026-08-12 08:52:51+00:00
+   Series:       Add CS distance provider implementation
+   Pull Request: https://github.com/bluez/bluez/pull/2397
+   Created:      2026-08-12 10:44:46+00:00
 
 The pull request has been closed and no further action is taken on this
 series.
@@ -102,4 +102,4 @@ picked up again.
 Regards,
 Linux Bluetooth
 
---===============8962727341330373360==--
+--===============3725961078391331200==--
