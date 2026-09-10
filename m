@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D153C3F58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F177B37AA64
 	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 08:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789030170; cv=none; b=YLs63g5mT9+5hHLH1leowIxh8bQZbzzmc77IR+ogMxEn8l6UikOtsie2Jvq0lXKiYwNlOYJOxcrHL7eZoPDcrfmDH3pRsgoyf4bNCiBQMJjSByAgjvMSBBTSwlIqY9HN0nGI2OBU4iJbe7f08/WlLY/CqAYdKa4pMGPV/fuyjx4=
+	t=1789030171; cv=none; b=C2G6otZKiVAd3RbOz7MPblyouBO6tfwf/VHXlFmP1U77oZkIpd+eta9z1ikScloe1c7YDkhaHic8DwgwzrilryWJg8rrjAaSrXLrjw+nx6+kRgtykj1Tgh6hwpRvw5wACWhM/HcsZtI6wYGzXlOBdzLlFgyLtyAXtHPT9BFpXKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789030170; c=relaxed/simple;
-	bh=hdDa02uD5uIvTKCf+pKmqwybaSAnZlERFDM9S7rfb0A=;
+	s=arc-20240116; t=1789030171; c=relaxed/simple;
+	bh=ptGdvL7fExvdXOs8jU6Tw4eP3cZhdWorcAirlvFadG0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XerZVSJkgCa0H8mGD1gmhSQR4jn1EI1q8D4Tx6tdv1FhVUXdrYOMUEmFTyNUSR58eduXYZdimTnVmSSUAJWFXMEIKICKQLZWnQdIEgY0fAmHz///tAf01Q/43vkxwd50kWl9BWoqmLbjAx9B5WhMI/Kuos+es2DCVAI7pm5/cOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qcJge9F2; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=nYV+bfCHTorvgg/d2sO/F9UjKHM78zq6QpYF/0x6P43jAGzxXI+FMFlZTFTW3DWuCLxlAEvaIO9U2aZXxLw9QFvIbEe5B8tSDCnAMwzDJ9EHp/a7Y0GjC+IM0TMyaMJsfVcYi5Nw2bjwA3aj5S7lXvIz3FtAOCFUgKsUs5fjV6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=TqpLsHBq; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qcJge9F2"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="TqpLsHBq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1789030164;
-	bh=hdDa02uD5uIvTKCf+pKmqwybaSAnZlERFDM9S7rfb0A=;
+	bh=ptGdvL7fExvdXOs8jU6Tw4eP3cZhdWorcAirlvFadG0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qcJge9F2Q4XyWi26yIq5wgl1ucoqFe29V838nWIuBZ7JR595jLZ8dCw5RjjYpNxBW
-	 XLd5OD00BAP0wBRHE0Tk7npZUdLTFa46EBJaZ0W6wKtxprrgIfAlMX1hrmGkoxJHMg
-	 +OHL8rnLhZEz48nuHE7UxCoE5Bz9ufh+J/C496xhEsVBHxVKmEwkUk8mIfM0CRS5IA
-	 VSyjGwTOWyDP3Ujs+dbgQa7dczj+xVPcErlJ0xvgBC6JAh1R6LXRw3OlMmpLSEqkAg
-	 7yxhP3szVdS1JrXfPlM9u6Ch/XZhBwukq5r09SV89KW3bYnSzIH+82uTX3sUcWRz7H
-	 FNiDahOcz3wsA==
+	b=TqpLsHBqZawSmHSCrUGvtgOq+gCMsugwO6QaijV6yxypgRmL9+B/hbwZRhtWnFG10
+	 3BsxUT0VpnoBPk/JQrv6EurpxSWajfOMwNJ8xCq0TLVDupZleT/PtemjKpoFjR0IPB
+	 3eibJarknRHV1DTNa+3Cx4vjHfusOgAQFrQjS1xq/6yuYXmD3P+SfiLwVwX+MlITxK
+	 gtIANaWVQEU18FJLg4rIdvjXPyLqS7z8zCVEY+v3RQz6GOXXDayOUKRohlACKYigDM
+	 wsnEI3Nssk+SuKE5g/AF5B/FQ95wfTUrbi8esbV9BSDxCwNX3BrQ3CLDmvbAKNu313
+	 Bh5+6FV2w8mtw==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4B7D417E0D7F
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id C877317E0DA4
 	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:49:24 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/8] client/btpclient: Add BTP_OP_BAP_SEND support
-Date: Thu, 10 Sep 2026 10:49:14 +0200
-Message-ID: <20260910084917.23512-6-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 7/8] client/btpclient: CIG/CIS assignment based on Client/Server role
+Date: Thu, 10 Sep 2026 10:49:16 +0200
+Message-ID: <20260910084917.23512-8-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260910084917.23512-1-frederic.danis@collabora.com>
 References: <20260910084917.23512-1-frederic.danis@collabora.com>
@@ -50,126 +50,314 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+Previously, CIG/CIS ids were eagerly assigned to each ASE as soon as
+it was discovered (CIG 0, next available CIS), regardless of whether
+the btpclient was acting as the Unicast Client or Server for that ASE.
+This did not match how CIG/CIS ids are actually negotiated, nor what
+auto-pts expects: unicast client tests expect CIG/CIS to start at 0/0,
+while unicast server tests expect them to start at 1/1.
+
+- As Unicast Client, the CIG/CIS ids are chosen locally when building
+  the QoS properties returned from SelectProperties(), starting at 0.
+- As Unicast Server, the CIG/CIS ids are only known once the transport
+  reports them; if not yet available, all of the device's ASEs should
+  share a common CIG (1) with CIS ids starting at 1 as well.
+
+Move get_next_cis() from bap.c to ascs.c and extend it to take a base
+CIS value, so it can be reused both for the Client and Server code
+paths (base 0 and base 1 respectively) and skips ASEs whose CIS id is
+still unset. Leave ase->cig_id and ase->cis_id unset
+(BT_ISO_QOS_CIG_UNSET/BT_ISO_QOS_CIS_UNSET) at ASE discovery time, and
+resolve them lazily:
+
+- In get_properties_reply(), assign CIG 0 and the next CIS starting at
+  0 when building the QoS reply for SelectProperties() (Client role).
+- In ascs_proxy_added(), when the transport does not yet report a
+  CIG/CIS, assign CIG 1 to all of the device's ASEs and derive CIS ids
+  starting at 1 via the new set_cig_cis()/set_cig_cis_data helpers
+  (Server role).
 ---
-v1->v2: Fix incremental build
+ client/btpclient/ascs.c | 144 ++++++++++++++++++++++++++++++++++------
+ client/btpclient/bap.c  |  74 ++-------------------
+ 2 files changed, 127 insertions(+), 91 deletions(-)
 
- client/btpclient/bap.c       | 49 ++++++++++++++++++++++++++++++++++++
- client/btpclient/btpclient.h |  3 +++
- src/shared/btp.h             | 13 ++++++++++
- 3 files changed, 65 insertions(+)
-
-diff --git a/client/btpclient/bap.c b/client/btpclient/bap.c
-index d30d931f1..548b5e8ed 100644
---- a/client/btpclient/bap.c
-+++ b/client/btpclient/bap.c
-@@ -31,6 +31,7 @@ static void btp_bap_read_commands(uint8_t index, const void *param,
- 	const uint8_t supported_commands[] = {
- 		BTP_OP_BAP_READ_SUPPORTED_COMMANDS,
- 		BTP_OP_BAP_DISCOVER,
-+		BTP_OP_BAP_SEND,
- 	};
- 	uint8_t *commands = NULL;
- 	size_t commands_len = 0;
-@@ -104,6 +105,51 @@ failed:
- 	btp_send_error(btp, BTP_BAP_SERVICE, index, status);
+diff --git a/client/btpclient/ascs.c b/client/btpclient/ascs.c
+index 85f6f171a..6b6154614 100644
+--- a/client/btpclient/ascs.c
++++ b/client/btpclient/ascs.c
+@@ -918,6 +918,76 @@ static void ltv_find(size_t i, uint8_t l, uint8_t t, uint8_t *v,
+ 	*found = true;
  }
  
-+static bool match_ase(const void *entry, const void *data)
++static uint8_t get_next_cis(struct btp_device *device, uint8_t dir,
++							uint8_t base)
 +{
-+	const struct btp_ase *ase = entry;
-+	uint8_t id = L_PTR_TO_UINT(data);
++	const struct l_queue_entry *adapter_entry;
++	const struct l_queue_entry *ase_entry;
++	uint8_t cis = base;
++	bool found = false;
 +
-+	return ase->ase_id == id;
-+}
++	/* For the same device, reuse the opposite cis_id if there is no ASE
++	 * in the requested direction already using that same cis_id
++	 */
++	for (ase_entry = l_queue_get_entries(device->ases); ase_entry;
++					ase_entry = ase_entry->next) {
++		struct btp_ase *ase = ase_entry->data;
++		const struct l_queue_entry *entry;
++		bool has_same_dir = false;
 +
-+static void btp_bap_send(uint8_t index, const void *param, uint16_t length,
-+								void *user_data)
-+{
-+	const struct btp_bap_send_cp *cp = param;
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct btp_device *dev;
-+	struct btp_ase *ase;
-+	ssize_t bytes_written;
-+	struct btp_bap_send_rp rp;
++		if (ase->dir == dir)
++			continue;
 +
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
++		for (entry = l_queue_get_entries(device->ases); entry;
++					entry = entry->next) {
++			struct btp_ase *peer = entry->data;
++
++			if (peer->dir == dir && peer->cis_id == ase->cis_id) {
++				has_same_dir = true;
++				break;
++			}
++		}
++
++		if (!has_same_dir)
++			return ase->cis_id;
 +	}
 +
-+	dev = find_device_by_address(adapter, &cp->address, cp->address_type);
-+	ase = l_queue_find(dev->ases, match_ase, L_UINT_TO_PTR(cp->ase_id));
-+	if (!ase || !ase->io)
-+		goto failed;
++	/* Else returns the global highest cis_id + 1 across all ASEs of all
++	 * devices, or 'base' if none has already been assigned
++	 */
++	for (adapter_entry = l_queue_get_entries(get_adapters_list());
++					adapter_entry;
++					adapter_entry = adapter_entry->next) {
++		struct btp_adapter *adapter = adapter_entry->data;
++		const struct l_queue_entry *device_entry;
 +
-+	bytes_written = write(l_io_get_fd(ase->io), cp->data,
-+		cp->data_len <= ase->tx_mtu ? cp->data_len : ase->tx_mtu);
-+	if (bytes_written < 0) {
-+		l_error("Failed to write (%d)", errno);
-+		goto failed;
++		for (device_entry = l_queue_get_entries(adapter->devices);
++					device_entry;
++					device_entry = device_entry->next) {
++			struct btp_device *dev = device_entry->data;
++
++			for (ase_entry = l_queue_get_entries(dev->ases);
++						ase_entry;
++						ase_entry = ase_entry->next) {
++				struct btp_ase *ase = ase_entry->data;
++
++				if (ase->cis_id == BT_ISO_QOS_CIS_UNSET)
++					continue;
++
++				if (!found || ase->cis_id > cis)
++					cis = ase->cis_id;
++
++				found = true;
++			}
++		}
 +	}
-+	rp.data_len = bytes_written;
 +
-+	btp_send(btp, BTP_BAP_SERVICE, BTP_OP_BAP_SEND, index, sizeof(rp), &rp);
++	if (!found)
++		return cis;
 +
-+	return;
-+
-+failed:
-+	btp_send_error(btp, BTP_BAP_SERVICE, index, status);
++	return cis + 1;
 +}
 +
- static void bap_charac_read_setup(struct l_dbus_message *message,
- 							void *user_data)
- {
-@@ -304,6 +350,9 @@ bool bap_register_service(struct btp *btp_, struct l_dbus *dbus_,
- 	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_DISCOVER,
- 					btp_bap_discover, NULL, NULL);
+ static struct l_dbus_message *get_properties_reply(
+ 						struct l_dbus_message *message,
+ 						struct btp_adapter *adapter,
+@@ -1019,27 +1089,31 @@ static struct l_dbus_message *get_properties_reply(
+ 	l_dbus_message_builder_enter_variant(builder, "a{sv}");
+ 	l_dbus_message_builder_enter_array(builder, "{sv}");
  
-+	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_SEND,
-+					btp_bap_send, NULL, NULL);
+-	if (ase->cig_id != BT_ISO_QOS_CIG_UNSET) {
+-		l_dbus_message_builder_enter_dict(builder, "sv");
+-		l_dbus_message_builder_append_basic(builder, 's',
+-						"CIG");
+-		l_dbus_message_builder_enter_variant(builder, "y");
+-		l_dbus_message_builder_append_basic(builder, 'y',
+-						&ase->cig_id);
+-		l_dbus_message_builder_leave_variant(builder);
+-		l_dbus_message_builder_leave_dict(builder);
+-	}
++	/* SelectProperties() is only invoked when acting as the Unicast Client,
++	 * so assign CIG 0 here and pick the next available CIS for this ASE.
++	 */
++	if (ase->cig_id == BT_ISO_QOS_CIG_UNSET)
++		ase->cig_id = 0;
++	if (ase->cis_id == BT_ISO_QOS_CIS_UNSET)
++		ase->cis_id = get_next_cis(ase->device, ase->dir, 0);
+ 
+-	if (ase->cis_id != BT_ISO_QOS_CIS_UNSET) {
+-		l_dbus_message_builder_enter_dict(builder, "sv");
+-		l_dbus_message_builder_append_basic(builder, 's',
+-						"CIS");
+-		l_dbus_message_builder_enter_variant(builder, "y");
+-		l_dbus_message_builder_append_basic(builder, 'y',
+-						&ase->cis_id);
+-		l_dbus_message_builder_leave_variant(builder);
+-		l_dbus_message_builder_leave_dict(builder);
+-	}
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's',
++					"CIG");
++	l_dbus_message_builder_enter_variant(builder, "y");
++	l_dbus_message_builder_append_basic(builder, 'y',
++					&ase->cig_id);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
 +
- 	bap_service_registered = true;
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's',
++					"CIS");
++	l_dbus_message_builder_enter_variant(builder, "y");
++	l_dbus_message_builder_append_basic(builder, 'y',
++					&ase->cis_id);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
  
+ 	l_dbus_message_builder_enter_dict(builder, "sv");
+ 	l_dbus_message_builder_append_basic(builder, 's',
+@@ -1283,6 +1357,24 @@ static bool transport_get_cig_cis(struct l_dbus_proxy *proxy, uint8_t *cig,
  	return true;
-diff --git a/client/btpclient/btpclient.h b/client/btpclient/btpclient.h
-index 2ba612ade..9996df506 100644
---- a/client/btpclient/btpclient.h
-+++ b/client/btpclient/btpclient.h
-@@ -42,6 +42,9 @@ struct btp_ase {
- 	uint8_t dir;
- 	uint8_t ase_id;
- 	struct l_dbus_proxy *ep_proxy;
-+	struct l_io *io;
-+	uint16_t rx_mtu;
-+	uint16_t tx_mtu;
- };
+ }
  
- struct btp_agent {
-diff --git a/src/shared/btp.h b/src/shared/btp.h
-index 8ad57f48f..fe93158aa 100644
---- a/src/shared/btp.h
-+++ b/src/shared/btp.h
-@@ -481,6 +481,19 @@ struct btp_bap_discover_cp {
- 	bdaddr_t address;
- } __packed;
++struct set_cig_cis_data {
++	struct btp_device *device;
++	uint8_t cig;
++};
++
++static void set_cig_cis(void *data, void *user_data)
++{
++	struct btp_ase *ase = data;
++	struct set_cig_cis_data *param = user_data;
++	uint8_t cis = get_next_cis(param->device, ase->dir, 1);
++
++	if (ase->cig_id != BT_ISO_QOS_CIG_UNSET)
++		return;
++
++	ase->cig_id = param->cig;
++	ase->cis_id = cis;
++}
++
+ void ascs_proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ {
+ 	char *str, *state;
+@@ -1307,8 +1399,18 @@ void ascs_proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 	else
+ 		dir = BTP_BAP_DIR_SINK;
  
-+#define BTP_OP_BAP_SEND				0x03
-+struct btp_bap_send_cp {
-+	uint8_t address_type;
-+	bdaddr_t address;
-+	uint8_t ase_id;
-+	uint8_t data_len;
-+	uint8_t data[];
-+} __packed;
+-	if (!transport_get_cig_cis(proxy, &cig, &cis))
++	if (!transport_get_cig_cis(proxy, &cig, &cis)) {
++		struct set_cig_cis_data data;
 +
-+struct btp_bap_send_rp {
-+	uint8_t data_len;
-+} __packed;
-+
- #define BTP_EV_BAP_DISCOVERY_COMPLETED		0x80
- struct btp_bap_discovery_completed_ev {
- 	uint8_t address_type;
++		/* No CIG/CIS reported on the transport yet, meaning this ASE
++		 * is acting as the Unicast Server: assign CIG 1 to all of the
++		 * device's ASEs and let set_cig_cis() derive their CIS ids.
++		 */
++		data.device = device;
++		data.cig = 1;
++		l_queue_foreach(device->ases, set_cig_cis, &data);
+ 		return;
++	}
+ 
+ 	ase = find_ase(device, cig, cis, dir);
+ 	if (!ase)
+diff --git a/client/btpclient/bap.c b/client/btpclient/bap.c
+index b1d70a50d..edb220f54 100644
+--- a/client/btpclient/bap.c
++++ b/client/btpclient/bap.c
+@@ -317,72 +317,6 @@ failed:
+ 	btp_send_error(btp, BTP_BAP_SERVICE, adapter->index, BTP_ERROR_FAIL);
+ }
+ 
+-static uint8_t get_next_cis(struct btp_device *device, uint8_t dir)
+-{
+-	const struct l_queue_entry *adapter_entry;
+-	const struct l_queue_entry *ase_entry;
+-	uint8_t cis = 0;
+-	bool found = false;
+-
+-	/* For the same device, reuse the opposite cis_id if there is no ASE
+-	 * in the requested direction already using that same cis_id
+-	 */
+-	for (ase_entry = l_queue_get_entries(device->ases); ase_entry;
+-					ase_entry = ase_entry->next) {
+-		struct btp_ase *ase = ase_entry->data;
+-		const struct l_queue_entry *entry;
+-		bool has_same_dir = false;
+-
+-		if (ase->dir == dir)
+-			continue;
+-
+-		for (entry = l_queue_get_entries(device->ases); entry;
+-					entry = entry->next) {
+-			struct btp_ase *peer = entry->data;
+-
+-			if (peer->dir == dir && peer->cis_id == ase->cis_id) {
+-				has_same_dir = true;
+-				break;
+-			}
+-		}
+-
+-		if (!has_same_dir)
+-			return ase->cis_id;
+-	}
+-
+-	/* Else returns the global highest cis_id + 1 across all ASEs of all
+-	 * devices, or 0 if no ASE exists
+-	 */
+-	for (adapter_entry = l_queue_get_entries(get_adapters_list());
+-					adapter_entry;
+-					adapter_entry = adapter_entry->next) {
+-		struct btp_adapter *adapter = adapter_entry->data;
+-		const struct l_queue_entry *device_entry;
+-
+-		for (device_entry = l_queue_get_entries(adapter->devices);
+-					device_entry;
+-					device_entry = device_entry->next) {
+-			struct btp_device *dev = device_entry->data;
+-
+-			for (ase_entry = l_queue_get_entries(dev->ases);
+-						ase_entry;
+-						ase_entry = ase_entry->next) {
+-				struct btp_ase *ase = ase_entry->data;
+-
+-				if (!found || ase->cis_id > cis)
+-					cis = ase->cis_id;
+-
+-				found = true;
+-			}
+-		}
+-	}
+-
+-	if (!found)
+-		return 0;
+-
+-	return cis + 1;
+-}
+-
+ void bap_proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ {
+ 	struct btp_device *device = user_data;
+@@ -403,8 +337,8 @@ void bap_proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 			ase->device = device;
+ 			ase->dir = BTP_BAP_DIR_SINK;
+ 			ase->uuid = uuid;
+-			ase->cig_id = 0;
+-			ase->cis_id = get_next_cis(device, ase->dir);
++			ase->cig_id = BT_ISO_QOS_CIG_UNSET;
++			ase->cis_id = BT_ISO_QOS_CIS_UNSET;
+ 			l_queue_push_tail(device->ases, ase);
+ 
+ 			l_dbus_proxy_method_call(proxy, "ReadValue",
+@@ -420,8 +354,8 @@ void bap_proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 			ase->device = device;
+ 			ase->dir = BTP_BAP_DIR_SOURCE;
+ 			ase->uuid = uuid;
+-			ase->cig_id = 0;
+-			ase->cis_id = get_next_cis(device, ase->dir);
++			ase->cig_id = BT_ISO_QOS_CIG_UNSET;
++			ase->cis_id = BT_ISO_QOS_CIS_UNSET;
+ 			l_queue_push_tail(device->ases, ase);
+ 
+ 			l_dbus_proxy_method_call(proxy, "ReadValue",
 -- 
 2.43.0
 
