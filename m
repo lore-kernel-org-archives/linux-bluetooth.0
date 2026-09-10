@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941393C0A18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0888137AA64
 	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 08:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789030167; cv=none; b=VUXsslJaDNv4HcR/0ZLOeWrRZMRtt16coVmK/kXiX1t/GSp282zjB2sSaxOLehgUvnyCHnkLrE2Z5GRKPcowDISc+uSoULa25TTJwSroA1L8YImto1SxsndUDomDCZs7uZSu0madardMw4TsWSFC+6Ywz8Pwb4aQM/qcoz+SHxc=
+	t=1789030167; cv=none; b=BDD8HL/FeKf+FlmNhXS5DA3aIWeu7+qoSr3cBlcvGXUdDndcBX4NBUa3g3WENf7y6mVgiQeYylWqU6c4bdwxqXWZZG4ePkDI+gWEpC/7WfHrVtUQo11atsx9zhYfQZsiWEHXGjSF728qIfY6ZPP1WLS72JSMTUYML9HrcrueDjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789030167; c=relaxed/simple;
-	bh=fSfjSI5Hyj7SfrjfU6Ar6Kqq9tpQ2ZcBeTJSKvrkY8g=;
+	bh=EmOZeIpTGe9bqLFie4pqhEZkoHAhapU9uBiIZgLCzoQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fglxuu+9zNMXj8xTCESH2YUl/jMBW5qv4xfe3dxBdgasGF0Yyp1ZyLYog6cSps12e2CQiWp1+futlfbxjnwih6yz9aHD3YQ7wa4/dEVhmugIufAduc6QY8dXFCNyGENz6m9kXPhb+VX0ux8AfaasKq1hwBiZRCL27iMCQvwvuB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=dFUVBKgW; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=TGeuzyyuPFgCBo6YzusVWvlDhaVOG0jlyrJM3YiCkpb+2+gBD8Yxkiy21E02XNXwAJq/C+W3Tm0+NmbG/3CI9MfY5DZBcYYEP+QrL2osvgOtqtgMOo/A493XYfKmFp5iCSYvx4dKTapO8mJwmLXxmH8euVmipqNc+4l3BL6KrI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EPXEsBQ7; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dFUVBKgW"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="EPXEsBQ7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1789030163;
-	bh=fSfjSI5Hyj7SfrjfU6Ar6Kqq9tpQ2ZcBeTJSKvrkY8g=;
+	s=mail; t=1789030164;
+	bh=EmOZeIpTGe9bqLFie4pqhEZkoHAhapU9uBiIZgLCzoQ=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=dFUVBKgWmT/t4rzkbYSgsdYt1tyFePe4cvkUpP6KDb6+MO9R71Ir3Oo1OQ0svFYlm
-	 /QRIBklwNkyT2Q8H5498ORflFe61Es92FPI+zZiIn15vRmfxpl6EPCD6mHbwGMKGPW
-	 CVNqZgAK1gmNnv/JqmGaN1Zx1vGOVZu0S5g4TUilwSmPuHJ+aSeR15VqzzTtmanVR8
-	 D8HxUEsHzKkIR2peU6jVQkEBHyRYtKmjbRlQOKayxFaQTf2d3E9QkgBxfZmztbYBmi
-	 pZbZVQyAFk8lgH2feYLN1UgJIPx4+3RZCBQAr9UWIhcvM6Ms7mEMPghRR1Km6udHyD
-	 t2Yf8fQPZq+/A==
+	b=EPXEsBQ7J0iX2/okLbgWl3wchSQAHlfj+XMBXUDtc5LGJqnuV0gEzfCIIw+WaEIrQ
+	 fAA+wQH1S/DaRUJWb36Gti33rGSyFrm52u2y8INp5uwbQKe0GMVcc10mTfHA+oNKmy
+	 CCCWb7kaW4raIMGpTD2qUtpRd1DLB+P49cYUWZRYRYtVui/iHSkICH4XmJVwClS61n
+	 JZhpuGITtwa/Bzc/isPC2/lNM7uFgmRHo0e5k8WQtXnV7ssvTo2hesVl+9z+A4Zfa7
+	 sebGeWZKQXcvApZUdxHTAunKVoTmFRZ+ikmcoZVFAvAtUcgT+OLcJLPNPqYpsy1nXV
+	 WdH+mCAaQLKBw==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8330017E080A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:49:23 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0FD8B17E0CBE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:49:24 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/8] client/btpclient: Get Codec capabilities on ASE reply
-Date: Thu, 10 Sep 2026 10:49:11 +0200
-Message-ID: <20260910084917.23512-3-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 4/8] client/btpclient: Add BTP_OP_PACS_SET_LOCATION support
+Date: Thu, 10 Sep 2026 10:49:13 +0200
+Message-ID: <20260910084917.23512-5-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260910084917.23512-1-frederic.danis@collabora.com>
 References: <20260910084917.23512-1-frederic.danis@collabora.com>
@@ -50,189 +50,251 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+This allows to store the expected location for a local endpoint.
 ---
- Makefile.tools         |  2 +-
- client/btpclient/bap.c | 94 ++++++++++++++++++++++++++++++++++++++++--
- src/shared/btp.h       | 12 ++++++
- 3 files changed, 104 insertions(+), 4 deletions(-)
+ Makefile.tools               |   1 +
+ client/btpclient/btpclient.h |   3 +
+ client/btpclient/core.c      |  16 ++++++
+ client/btpclient/pacs.c      | 107 +++++++++++++++++++++++++++++++++++
+ client/btpclient/pacs.h      |  13 +++++
+ src/shared/btp.h             |   9 +++
+ 6 files changed, 149 insertions(+)
+ create mode 100644 client/btpclient/pacs.c
+ create mode 100644 client/btpclient/pacs.h
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 4c97d990a..41473d63f 100644
+index 5c1130bff..0ca80a293 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -567,7 +567,7 @@ noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
- 
- client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
- 				client/btpclient/btpclient.h \
--				src/shared/btp.c src/shared/btp.h \
-+				src/shared/btp.c src/shared/btp.h src/shared/bap-defs.h \
- 				client/btpclient/bap.c client/btpclient/bap.h \
+@@ -573,6 +573,7 @@ client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
  				client/btpclient/core.c client/btpclient/core.h \
  				client/btpclient/gap.c client/btpclient/gap.h \
-diff --git a/client/btpclient/bap.c b/client/btpclient/bap.c
-index cdbae4ac2..d30d931f1 100644
---- a/client/btpclient/bap.c
-+++ b/client/btpclient/bap.c
-@@ -17,6 +17,7 @@
+ 				client/btpclient/gatt.c client/btpclient/gatt.h \
++				client/btpclient/pacs.c client/btpclient/pacs.h \
+ 				client/btpclient/vendor.c client/btpclient/vendor.h
+ client_btpclient_btpclient_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-ell.la $(ell_ldadd)
+diff --git a/client/btpclient/btpclient.h b/client/btpclient/btpclient.h
+index 0d81405d3..2ba612ade 100644
+--- a/client/btpclient/btpclient.h
++++ b/client/btpclient/btpclient.h
+@@ -19,6 +19,9 @@ struct btp_adapter {
+ 	uint32_t default_settings;
+ 	struct l_queue *devices;
  
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/uuid.h"
-+#include "src/shared/bap-defs.h"
- #include "src/shared/btp.h"
- #include "btpclient.h"
- #include "bap.h"
-@@ -59,6 +60,13 @@ failed:
- 	btp_send_error(btp, BTP_BAP_SERVICE, index, BTP_ERROR_FAIL);
- }
- 
-+static bool match_attribute_uuid(const void *attr, const void *uuid)
-+{
-+	const struct gatt_attribute *attribute = attr;
++	uint32_t sink_locations;
++	uint32_t source_locations;
 +
-+	return !bt_uuid_cmp(&attribute->uuid, uuid);
-+}
-+
- static void btp_bap_discover(uint8_t index, const void *param, uint16_t length,
- 								void *user_data)
- {
-@@ -110,17 +118,17 @@ static void bap_charac_read_setup(struct l_dbus_message *message,
- 	l_dbus_message_builder_destroy(builder);
- }
+ 	uint8_t target_latency;
+ };
  
--static void bap_read_ase_reply(struct l_dbus_proxy *proxy,
-+static void bap_read_pac_reply(struct l_dbus_proxy *proxy,
- 						struct l_dbus_message *result,
- 						void *user_data)
- {
- 	struct btp_ase *ase = user_data;
- 	struct btp_device *device = ase->device;
- 	struct btp_adapter *adapter = find_adapter_by_device(device);
--	struct btp_bap_ase_found_ev *rp;
-+	struct btp_bap_codec_cap_found_ev *rp;
- 	struct l_dbus_message_iter iter;
- 	uint8_t *data;
--	uint32_t n;
-+	uint32_t n, i, capa_length;
+diff --git a/client/btpclient/core.c b/client/btpclient/core.c
+index 8ab3f3e34..bbbc7edfd 100644
+--- a/client/btpclient/core.c
++++ b/client/btpclient/core.c
+@@ -18,6 +18,7 @@
+ #include "core.h"
+ #include "gap.h"
+ #include "gatt.h"
++#include "pacs.h"
+ #include "vendor.h"
  
- 	if (l_dbus_message_is_error(result)) {
- 		const char *name, *desc;
-@@ -141,6 +149,73 @@ static void bap_read_ase_reply(struct l_dbus_proxy *proxy,
- 		goto failed;
- 	}
+ static struct btp *btp;
+@@ -67,6 +68,7 @@ static void btp_core_read_services(uint8_t index, const void *param,
+ 		BTP_CORE_SERVICE,
+ 		BTP_GAP_SERVICE,
+ 		BTP_GATT_SERVICE,
++		BTP_PACS_SERVICE,
+ 		BTP_ASCS_SERVICE,
+ 		BTP_BAP_SERVICE,
+ 		BTP_VENDOR_SERVICE,
+@@ -130,6 +132,14 @@ static void btp_core_register(uint8_t index, const void *param,
+ 		if (!gatt_register_service(btp, dbus, client))
+ 			goto failed;
  
-+	rp = l_new(struct btp_bap_codec_cap_found_ev, 1);
-+	rp->address_type = device->address_type;
-+	rp->address = device->address;
-+	rp->dir = ase->dir;
-+	rp->coding_format = data[1];
-+	capa_length = data[6];
-+	i = 0;
-+	while (i < capa_length) {
-+		struct bt_ltv *ltv = (struct bt_ltv *)(data + i + 7);
-+
-+		if ((i + ltv->len >= capa_length) || (!ltv->len))
++		break;
++	case BTP_PACS_SERVICE:
++		if (pacs_is_service_registered())
 +			goto failed;
 +
-+		if (ltv->type == 0x01)
-+			rp->frequencies = bt_get_le16(ltv->value);
-+		else if (ltv->type == 0x02)
-+			rp->frame_durations = ltv->value[0];
-+		else if (ltv->type == 0x03)
-+			rp->channel_counts = ltv->value[0];
-+		else if (ltv->type == 0x04)
-+			rp->octets_per_frame = bt_get_le32(ltv->value);
++		if (!pacs_register_service(btp, dbus, client))
++			goto failed;
 +
-+		i += ltv->len + 1;
+ 		break;
+ 	case BTP_ASCS_SERVICE:
+ 		if (ascs_is_service_registered())
+@@ -197,6 +207,12 @@ static void btp_core_unregister(uint8_t index, const void *param,
+ 
+ 		gatt_unregister_service(btp);
+ 		break;
++	case BTP_PACS_SERVICE:
++		if (!pacs_is_service_registered())
++			goto failed;
++
++		ascs_unregister_service(btp);
++		break;
+ 	case BTP_ASCS_SERVICE:
+ 		if (!ascs_is_service_registered())
+ 			goto failed;
+diff --git a/client/btpclient/pacs.c b/client/btpclient/pacs.c
+new file mode 100644
+index 000000000..6277812a0
+--- /dev/null
++++ b/client/btpclient/pacs.c
+@@ -0,0 +1,107 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Collabora Ltd.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <ell/ell.h>
++
++#include "bluetooth/bluetooth.h"
++#include "bluetooth/uuid.h"
++#include "src/shared/btp.h"
++#include "btpclient.h"
++#include "pacs.h"
++
++static struct btp *btp;
++static bool pacs_service_registered;
++
++static void btp_pacs_read_commands(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	const uint8_t supported_commands[] = {
++		BTP_OP_PACS_READ_SUPPORTED_COMMANDS,
++		BTP_OP_PACS_SET_LOCATION,
++	};
++	uint8_t *commands = NULL;
++	size_t commands_len = 0;
++	size_t i;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_PACS_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
 +	}
 +
-+	btp_send(btp, BTP_BAP_SERVICE, BTP_BAP_EV_CODEC_CAP_FOUND,
-+		adapter->index, sizeof(struct btp_bap_codec_cap_found_ev), rp);
++	for (i = 0; i < L_ARRAY_SIZE(supported_commands); i++) {
++		if (!add_supported_command(&commands, &commands_len,
++						supported_commands[i]))
++			goto failed;
++	}
 +
-+	free(rp);
++	btp_send(btp, BTP_PACS_SERVICE, BTP_OP_PACS_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, commands_len, commands);
++
++	l_free(commands);
 +
 +	return;
 +
 +failed:
-+	btp_send_error(btp, BTP_BAP_SERVICE, adapter->index, BTP_ERROR_FAIL);
++	l_free(commands);
++	btp_send_error(btp, BTP_PACS_SERVICE, index, BTP_ERROR_FAIL);
 +}
 +
-+static void bap_read_ase_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
++static void btp_pacs_set_location(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
 +{
-+	struct btp_ase *ase = user_data;
-+	struct btp_device *device = ase->device;
-+	struct btp_adapter *adapter = find_adapter_by_device(device);
-+	struct btp_bap_ase_found_ev *rp;
-+	struct l_dbus_message_iter iter;
-+	uint8_t *data;
-+	uint32_t n;
-+	bt_uuid_t uuid;
-+	struct gatt_attribute *attribute;
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_pacs_set_location_cp *cp = param;
 +
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to read value (%s), %s", name, desc);
-+
-+		goto failed;
++	switch (cp->dir) {
++	case BTP_BAP_DIR_SINK:
++		adapter->sink_locations = cp->location;
++		break;
++	case BTP_BAP_DIR_SOURCE:
++		adapter->source_locations = cp->location;
++		break;
++	default:
++		btp_send_error(btp, BTP_PACS_SERVICE, index, BTP_ERROR_FAIL);
++		return;
 +	}
 +
-+	if (!l_dbus_message_get_arguments(result, "ay", &iter))
-+		goto failed;
++	btp_send(btp, BTP_PACS_SERVICE, BTP_OP_PACS_SET_LOCATION, index, 0,
++									NULL);
++}
 +
-+	if (!l_dbus_message_iter_get_fixed_array(&iter, &data, &n)) {
-+		l_debug("Cannot read value");
-+		goto failed;
-+	}
++bool pacs_register_service(struct btp *btp_, struct l_dbus *dbus_,
++					struct l_dbus_client *client)
++{
++	btp = btp_;
 +
- 	ase->ase_id = data[0];
- 
- 	rp = l_new(struct btp_bap_ase_found_ev, 1);
-@@ -154,6 +229,19 @@ static void bap_read_ase_reply(struct l_dbus_proxy *proxy,
- 
- 	free(rp);
- 
-+	if (bt_uuid16_cmp(&ase->uuid, ASE_SINK_UUID))
-+		bt_uuid16_create(&uuid, PAC_SINK_CHRC_UUID);
-+	else
-+		bt_uuid16_create(&uuid, PAC_SOURCE_CHRC_UUID);
-+	attribute = l_queue_find(device->characteristics,
-+						match_attribute_uuid, &uuid);
-+	if (!attribute)
-+		goto failed;
++	btp_register(btp, BTP_PACS_SERVICE, BTP_OP_PACS_READ_SUPPORTED_COMMANDS,
++					btp_pacs_read_commands, NULL, NULL);
 +
-+	l_dbus_proxy_method_call(attribute->proxy, "ReadValue",
-+				bap_charac_read_setup, bap_read_pac_reply,
-+				ase, NULL);
++	btp_register(btp, BTP_PACS_SERVICE, BTP_OP_PACS_SET_LOCATION,
++					btp_pacs_set_location, NULL, NULL);
 +
- 	return;
- 
- failed:
++	pacs_service_registered = true;
++
++	return true;
++}
++
++void pacs_unregister_service(struct btp *btp)
++{
++	btp_unregister_service(btp, BTP_PACS_SERVICE);
++	pacs_service_registered = false;
++}
++
++bool pacs_is_service_registered(void)
++{
++	return pacs_service_registered;
++}
+diff --git a/client/btpclient/pacs.h b/client/btpclient/pacs.h
+new file mode 100644
+index 000000000..a1579a8d6
+--- /dev/null
++++ b/client/btpclient/pacs.h
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Collabora Ltd.
++ *
++ */
++
++bool pacs_register_service(struct btp *btp_, struct l_dbus *dbus_,
++					struct l_dbus_client *client);
++void pacs_unregister_service(struct btp *btp);
++bool pacs_is_service_registered(void);
 diff --git a/src/shared/btp.h b/src/shared/btp.h
-index 9757301f2..100308de1 100644
+index 65a8c8b6a..8ad57f48f 100644
 --- a/src/shared/btp.h
 +++ b/src/shared/btp.h
-@@ -443,6 +443,18 @@ struct btp_bap_discovery_completed_ev {
- 	uint8_t status;
+@@ -26,6 +26,7 @@
+ #define BTP_GATT_SERVICE	2
+ #define BTP_L2CAP_SERVICE	3
+ #define BTP_MESH_NODE_SERVICE	4
++#define BTP_PACS_SERVICE	12
+ #define BTP_ASCS_SERVICE	13
+ #define BTP_BAP_SERVICE		14
+ #define BTP_VENDOR_SERVICE	255
+@@ -427,6 +428,14 @@ struct btp_gatt_write_rp {
+ 	uint8_t att_response;
  } __packed;
  
-+#define BTP_BAP_EV_CODEC_CAP_FOUND		0x81
-+struct btp_bap_codec_cap_found_ev {
-+	uint8_t address_type;
-+	bdaddr_t address;
++#define BTP_OP_PACS_READ_SUPPORTED_COMMANDS	0x01
++
++#define BTP_OP_PACS_SET_LOCATION		0x03
++struct btp_pacs_set_location_cp {
 +	uint8_t dir;
-+	uint8_t coding_format;
-+	uint16_t frequencies;
-+	uint8_t frame_durations;
-+	uint32_t octets_per_frame;
-+	uint8_t channel_counts;
++	uint32_t location;
 +} __packed;
 +
- #define BTP_EV_BAP_ASE_FOUND			0x82
- struct btp_bap_ase_found_ev {
- 	uint8_t address_type;
+ #define BTP_OP_ASCS_READ_SUPPORTED_COMMANDS	0x01
+ 
+ #define BTP_OP_ASCS_CONFIGURE_CODEC		0x02
 -- 
 2.43.0
 
