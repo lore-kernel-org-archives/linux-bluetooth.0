@@ -1,76 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5418C5476C1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67FF503BF7
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789061479; cv=none; b=KKZVsqlGJ/h287fqbWCJYAL20xummKS8eRcTDg+MWnSZEeKgw7G4YKxk+IFuKnScMZgnP0vRRCkb4iN6tFdzH18SN6J7uBIaiWyos7mLB+S6A3JaU8UINIKAvGAdFYzD6xgqns7qmUP96nsYXPVHqXsi0eN3iAMxc/UjuxAmIi0=
+	t=1789061576; cv=none; b=lPHHy3q9RlHxy1vLREl07CvpxiC3Gtai13h7uID6Vl2Vt8ob5owkd2mSgcjDdLVMMrYoBgB4g6gMlqf4IidVkHduC97FgbBCqOoll4i01FoInZ4zAXoNm04vuw9fopQoGqDLTnELNMXrTQcU82Gf/1EpjGXucD5LcRQAASuRpfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789061479; c=relaxed/simple;
-	bh=iXpY9k7oFiv9C3SuHMPgUN4N51xxdNbHhnWJyLhkoCk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qM2PRdGFo31cu7EpwHjxZC++2Ow2pX6/ptg0pnjZMJyFDnVCxUmoaaWR7ZyN2BrsS2AHXU3uhgSEBrKusEXHJDiEnOWzu8ZwiGSqSXn8/DTs3jq5hqV68uiOia/xCtCXLEenm5UnfcQZHmsFEleW/QSfBioVqxHchphHwPthhC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXla0CoW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789061576; c=relaxed/simple;
+	bh=qHT5ypm27g0l8TPUvm9PMHjJqLPQVeu+uvcA9m4JibU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=c6PW5bJzqUPPlrasNBkv0+BXQ2i2Sz1zC/zyMDxnxqgcu7PZ6OplskX1AkxV9sJlZsgY4ord4RtfDpx2OLdFyWHk7IHVe26MUA4U91dBNJmIIsIGRNzBg2h15NrPLw8FeFAdZNIL79RsDZmoNvLc0TBQ2qoe49cFhlQ77WX+twM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZAIVe5Ws; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXla0CoW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB18A1F00893;
-	Thu, 10 Sep 2026 17:31:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789061469;
-	bh=FcAc7oFuzXftjKkjOaDOFiQlfNB9sa8UFJUURUQPZKo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=kXla0CoWcGYHJhXMIR7f2PPsZd3XySNaLjUIAOj6w7MX9A5cThiXfNA1M8hS8rr97
-	 SNz892Z+ag58sY5j/Re2scButZY1gmYH9Bdl+M3+c9cjW0d9gp6QD/LNfjoDoIkLBG
-	 D9IMHdsChpZE+sPVbbLv95aS1oWqS8YeZ9NBhZvG17eZ5Yem4RRafCFK0kQfdZEZ9R
-	 V8Bv5U1dSDqAp8vjEeSH6jRSlzIsHBRnXRCa+H0I3f0eX33c55WuVSlYuxuI0Ohcnb
-	 o6VZZA8havxAfcV9EKPXKMzbteiNFqC0k5801YWa958M6xj9Diz2ZdN0wHab9T/xbg
-	 SnBeq4oTyIweA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93BC4380DBD4;
-	Thu, 10 Sep 2026 17:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZAIVe5Ws"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789061568;
+	bh=tf8aPBsXx2ol7GbTxFBEYUn27uS6gvi0sConxjFYXbQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZAIVe5WsbgtRNnRj88wa/97tSs//bLRYlHIfUve2vHLh0NM8myTfJvuEdLOaBQgiQ
+	 asEw9vufnUvxi7t6GknrxCD80wFNoOiANGsfKNrwCXsRH4mjQlkWDmdMgPq09ZONh4
+	 saFkPDNi+U0K5rJNRLhe/wYR2VTKIjrb8PpLOAbk=
+Received: from github.com (hubbernetes-node-1e6175f.va3-iad.github.net [10.48.85.32])
+	by smtp.github.com (Postfix) with ESMTPA id 83178800AF8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:32:48 -0700 (PDT)
+Date: Thu, 10 Sep 2026 10:32:48 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/action-ci/push/refs/heads/main/720a43-c4559c@github.com>
+Subject: [bluez/action-ci] c4559c: githubtool: fix create_pr with the current
+ PyGithub
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] workflows: allow the sync workflow to be
- triggered
- manually
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178906140613.1999514.17268461793181455665.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Sep 2026 17:30:06 +0000
-References: <20260910172104.1502721-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260910172104.1502721-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/main
+  Home:   https://github.com/bluez/action-ci
+  Commit: c4559c5dfe40fa36feadc59a1fbeb158ed25233e
+      https://github.com/bluez/action-ci/commit/c4559c5dfe40fa36feadc59a1fbeb158ed25233e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M libs/githubtool.py
 
-On Thu, 10 Sep 2026 13:21:04 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> The scheduled trigger is heavily throttled by Github and the run can be
-> delayed for hours, which makes it hard to verify a change or to recover
-> from a failed run. Add workflow_dispatch so the workflow can be started
-> on demand.
-> 
-> [...]
+  Log Message:
+  -----------
+  githubtool: fix create_pr with the current PyGithub
 
-Here is the summary with links:
-  - [BlueZ,v1] workflows: allow the sync workflow to be triggered manually
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=51d1b7924e55
+Repository.create_pull() only takes 'base' and 'head' positionally now and
+everything else must be passed by keyword, so creating a pull request for a
+new patchwork series fails with:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  TypeError: Repository.create_pull() takes 3 positional arguments but 6 were given
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/action-ci/settings/notifications
