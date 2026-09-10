@@ -1,36 +1,36 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67FF503BF7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A64E55D86A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 17:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789061576; cv=none; b=lPHHy3q9RlHxy1vLREl07CvpxiC3Gtai13h7uID6Vl2Vt8ob5owkd2mSgcjDdLVMMrYoBgB4g6gMlqf4IidVkHduC97FgbBCqOoll4i01FoInZ4zAXoNm04vuw9fopQoGqDLTnELNMXrTQcU82Gf/1EpjGXucD5LcRQAASuRpfM=
+	t=1789061609; cv=none; b=DiNaSrRHj1Mc6kpDmZnk4s40sauVKg2unpaJGk0rSXnt/CDQatyZwnDSIowInKTtTyqZr9H/sF5gAquagighmii8vz+5GpD+64x1quzKToe2V9RFhD8LAFK0T29okYthfZhAHNYAPyOQZRRs7PFPz4mJHSuvTNTUdWRium3BI9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789061576; c=relaxed/simple;
-	bh=qHT5ypm27g0l8TPUvm9PMHjJqLPQVeu+uvcA9m4JibU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=c6PW5bJzqUPPlrasNBkv0+BXQ2i2Sz1zC/zyMDxnxqgcu7PZ6OplskX1AkxV9sJlZsgY4ord4RtfDpx2OLdFyWHk7IHVe26MUA4U91dBNJmIIsIGRNzBg2h15NrPLw8FeFAdZNIL79RsDZmoNvLc0TBQ2qoe49cFhlQ77WX+twM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZAIVe5Ws; arc=none smtp.client-ip=192.30.252.203
+	s=arc-20240116; t=1789061609; c=relaxed/simple;
+	bh=oiLINQrDSVJuM/CJgA1N8+noAD5348Ucp3IOuyXSEDM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Q3AY6AHtWE17DixdA0f/cAb0aYXppFqd8CO3UliMfNJ2xvnMoWD9Q8ldCynvpMLMFeRu2YS6GnY0hczD10gcnVywY0oaRGwjBadPIkojerljybElEuUD3AdGoK4opFNeUhIveLkLOnFJIJnZVVqqOs7RNsijnDigKWByNG9BkK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hDAVIXEV; arc=none smtp.client-ip=192.30.252.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZAIVe5Ws"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hDAVIXEV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1789061568;
-	bh=tf8aPBsXx2ol7GbTxFBEYUn27uS6gvi0sConxjFYXbQ=;
+	s=pf2023; t=1789061602;
+	bh=/bJKmdLf0XWxZc8l+8PLGZr6zzk8GZWTIyUzvUrq6bU=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ZAIVe5WsbgtRNnRj88wa/97tSs//bLRYlHIfUve2vHLh0NM8myTfJvuEdLOaBQgiQ
-	 asEw9vufnUvxi7t6GknrxCD80wFNoOiANGsfKNrwCXsRH4mjQlkWDmdMgPq09ZONh4
-	 saFkPDNi+U0K5rJNRLhe/wYR2VTKIjrb8PpLOAbk=
-Received: from github.com (hubbernetes-node-1e6175f.va3-iad.github.net [10.48.85.32])
-	by smtp.github.com (Postfix) with ESMTPA id 83178800AF8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:32:48 -0700 (PDT)
-Date: Thu, 10 Sep 2026 10:32:48 -0700
+	b=hDAVIXEVpGZveNm7UQZ8Z6fuF0n+9BaSnn2+zGKbxj7noB8t7u1NIdGuLTlCPAKAM
+	 0K1Phduqx42FyhuAt6k9zo5I+g/byQFGhPsltdFH31fduXyrZ0VqM6NWLZ3wBV/qxp
+	 v3yPGKVTaZHAtxnkCukWnS0lXNRSPF4pgbeiGqqQ=
+Received: from github.com (hubbernetes-node-7b6ea2e.ash1-iad.github.net [10.56.191.34])
+	by smtp.github.com (Postfix) with ESMTPA id A667C92135E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 10:33:22 -0700 (PDT)
+Date: Thu, 10 Sep 2026 10:33:22 -0700
 From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/action-ci/push/refs/heads/main/720a43-c4559c@github.com>
-Subject: [bluez/action-ci] c4559c: githubtool: fix create_pr with the current
- PyGithub
+Message-ID: <bluez/action-ci/push/refs/heads/main/c4559c-2857bb@github.com>
+Subject: [bluez/action-ci] 2857bb: cleanup_pr: read the PR list before closing
+ any of...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,23 +45,24 @@ X-Auto-Response-Suppress: All
 
   Branch: refs/heads/main
   Home:   https://github.com/bluez/action-ci
-  Commit: c4559c5dfe40fa36feadc59a1fbeb158ed25233e
-      https://github.com/bluez/action-ci/commit/c4559c5dfe40fa36feadc59a1fbeb158ed25233e
+  Commit: 2857bb3d326d5b772120c830aa50030de53e7f01
+      https://github.com/bluez/action-ci/commit/2857bb3d326d5b772120c830aa50030de53e7f01
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-09-10 (Thu, 10 Sep 2026)
 
   Changed paths:
-    M libs/githubtool.py
+    M cleanup_pr.py
 
   Log Message:
   -----------
-  githubtool: fix create_pr with the current PyGithub
+  cleanup_pr: read the PR list before closing any of them
 
-Repository.create_pull() only takes 'base' and 'head' positionally now and
-everything else must be passed by keyword, so creating a pull request for a
-new patchwork series fails with:
+The PRs are closed while iterating over the paginated list of the open
+PRs. Closing one removes it from that list, so the offsets of the pages
+that are not fetched yet shift and the entries are silently skipped: out
+of the 14 stale PRs only 8 were handled in a single run.
 
-  TypeError: Repository.create_pull() takes 3 positional arguments but 6 were given
+Read the whole list first so the iteration is not affected.
 
 
 
