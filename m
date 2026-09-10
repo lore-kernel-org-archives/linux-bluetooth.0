@@ -1,141 +1,80 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE304582BAF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D3A57D20A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789069217; cv=none; b=AqO/ur+8eZTSjoefjYU04czsUc1yX5SgboF2kz7QkesJhW1GePQcP6xqBVrTL/B7b4UBbvu5NYd9w8JEKBj/zBCTOHdK2dqF69BDsbNQ5HeDXk2Ywuo4QVBSiNNBrCwZaLuvo7B9JROkqt07EFoICBjcAKoeTOHtoxx9IoMj1xQ=
+	t=1789069516; cv=none; b=nX+EVSZhBN2gCMlGh5EMeThYwMCaHzpItY0GxQRjdgy4ca5rFKQHro2XBq4r1ypBb6ogfSlQh/My6t/EM+HWWR0I7IY9tOQWUPFKfLB8JWTgsfak34JI2pzQ6p50aKVCGJQXWZSJ3URWayX35fljpwVSaGj7D4uhbIDRfDl8if0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789069217; c=relaxed/simple;
-	bh=7BVNj7Db5p0JLjkG36r/6CwJQuFCLOFzGnuRXCZTSmA=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=f17oZLYbZ8buvvk9+eW9cNcjbZce+8CsIK7OpGS6UasvJBzQzZ/twWtXs9oNkSAifE5HpZ3nbyN92IAvjFzSXqkk205q2TSsK1wV+7spelk9qp8i2htCUrFlFBAYUPk5CbnSUkdpptcTP8eB/cbV1qXvGz6QkBG6x9Ji4nUsydY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PyaLfIvy; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789069516; c=relaxed/simple;
+	bh=pcl9co03PjPMPui11+PXxcAwjN8GuiAZbdRg6qUTlqw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=uQ/4bjT/vr5O9vjn+1S376n91QSILLbzvsamqHRFMYsDyf1MMtya7hi7itVAw0QSUabaFcdcmOpqznRgnCjo6jpHK5DZOl8yZ0ag0msHn4QeW0fN4ffsSuhMksZQ+9PDUVn85i6B0OSeqFbhFu9J1kcVlRHaqqk2d5Pg0LoW6Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZX801oGb; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PyaLfIvy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789069216; x=1820605216;
-  h=date:from:to:cc:subject:message-id;
-  bh=7BVNj7Db5p0JLjkG36r/6CwJQuFCLOFzGnuRXCZTSmA=;
-  b=PyaLfIvyLG6Z34SRDZuHFY+dTs7VxkRBVpz8q1Vfk4v1WRCWkJAd3Wh7
-   Lzs8RJTIVt8guKt7TcAKH61H/ACJAR3Q71sfKTJv+Eu+bpXuZhFxpuXaI
-   v+sU1ueE+hC7yROBGn9aL1O5ubhj/hfukryiN83m7Q2cuoHmpEYjJ3uPe
-   UkesxwBUzG0f9WgfIcUZtIpHQCiBWKwrPzZ1VLU2dUvlO6TSVRfb4tvSQ
-   BzUyRp9Yw1DW9Vf08WRa5xR+YzlLAFDZJ1bgFZwyfU8sYnixAOFkbOU68
-   fbRzuBxbjZ1L0dNlokhv/YlX/3QtO3ivUXPX26kxOO8VMU47emL6lsJV7
-   g==;
-X-CSE-ConnectionGUID: tVEiWzBvSOKwZQ4WuTse1Q==
-X-CSE-MsgGUID: GbmiyoM+RuyDmCL6m8DFAQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11901"; a="89402272"
-X-IronPort-AV: E=Sophos;i="6.27,95,1787036400"; 
-   d="scan'208";a="89402272"
-Received: from fmviesa011.fm.intel.com ([10.60.135.151])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2026 12:40:15 -0700
-X-CSE-ConnectionGUID: W1SLepJpTreZJSNVj+PwRg==
-X-CSE-MsgGUID: rAptZySjT1ue1UwN+MP4Pg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,95,1787036400"; 
-   d="scan'208";a="60161"
-Received: from lkp-server02.sh.intel.com (HELO 0a3643a6ed9d) ([10.239.97.151])
-  by fmviesa011.fm.intel.com with ESMTP; 10 Sep 2026 12:40:14 -0700
-Received: from kbuild by 0a3643a6ed9d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1x4kd2-000000000U9-0CZT;
-	Thu, 10 Sep 2026 19:40:12 +0000
-Date: Fri, 11 Sep 2026 03:39:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1b737f2ef1686d0e5a7661eaeb097aad53ea7040
-Message-ID: <202609110302.lJlsRbX8-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZX801oGb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789069514;
+	bh=wl1P3In6S0lb/jvLrhZ6Pdd+OTtjJ6VYkbJRoZxd9Ks=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZX801oGbjZJoQl9S/Vw+afEhpopfHdthCATjs5FZiOkkIA21mO7gGXQXvOU87o0Ew
+	 q6to/Pm4Mgu61BsTIw1J+I6QZ/ncskbTe02FmBnCTBohn9LntqBunMv02UJ7Bq1DnD
+	 wtZodbwzy2pAzBM/rr/OPvEb2H/YqcHlPcyGtePw=
+Received: from github.com (hubbernetes-node-4434f7c.ac4-iad.github.net [10.52.201.19])
+	by smtp.github.com (Postfix) with ESMTPA id 7A3D9A0B8B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 12:45:14 -0700 (PDT)
+Date: Thu, 10 Sep 2026 12:45:14 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/action-ci/push/refs/heads/main/08efb9-fa1938@github.com>
+Subject: [bluez/action-ci] fa1938: sync_patchwork: don't recreate a PR that
+ was alrea...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1b737f2ef1686d0e5a7661eaeb097aad53ea7040  Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
+  Branch: refs/heads/main
+  Home:   https://github.com/bluez/action-ci
+  Commit: fa19384d4c70f1cfd7e432aab9a2f731dadb7091
+      https://github.com/bluez/action-ci/commit/fa19384d4c70f1cfd7e432aab9a2f731dadb7091
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-10 (Thu, 10 Sep 2026)
 
-elapsed time: 1404m
+  Changed paths:
+    M libs/githubtool.py
+    M sync_patchwork.py
 
-configs tested: 64
-configs skipped: 0
+  Log Message:
+  -----------
+  sync_patchwork: don't recreate a PR that was already closed
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+The series to process are picked from the patchwork state, and the only
+thing that kept a series from being processed again was an open pull
+request with its id in the title. Closing a stale pull request removed
+that marker, so the next run recreated the pull request, ran the CI again
+and sent a second result summary to the same thread:
 
-tested configs:
-alpha         allnoconfig    gcc-16.1.0
-alpha        allyesconfig    gcc-16.1.0
-arc          allmodconfig    clang-24
-arc           allnoconfig    gcc-16.1.0
-arc          allyesconfig    clang-24
-arc          allyesconfig    gcc-16.1.0
-arm           allnoconfig    gcc-16.1.0
-arm          allyesconfig    clang-24
-arm64        allmodconfig    clang-24
-arm64         allnoconfig    gcc-16.1.0
-csky         allmodconfig    gcc-16.1.0
-csky          allnoconfig    gcc-16.1.0
-hexagon      allmodconfig    clang-24
-hexagon      allmodconfig    gcc-16.1.0
-hexagon       allnoconfig    gcc-16.1.0
-i386         allmodconfig    clang-22
-i386         allmodconfig    gcc-14
-i386          allnoconfig    gcc-16.1.0
-i386         allyesconfig    clang-22
-i386         allyesconfig    gcc-14
-loongarch    allmodconfig    clang-19
-loongarch    allmodconfig    clang-24
-loongarch     allnoconfig    gcc-16.1.0
-m68k         allmodconfig    gcc-16.1.0
-m68k          allnoconfig    gcc-16.1.0
-m68k         allyesconfig    clang-24
-microblaze    allnoconfig    gcc-16.1.0
-microblaze   allyesconfig    gcc-16.1.0
-mips         allmodconfig    gcc-16.1.0
-mips          allnoconfig    gcc-16.1.0
-mips         allyesconfig    gcc-16.1.0
-nios2        allmodconfig    clang-20
-nios2         allnoconfig    clang-24
-openrisc     allmodconfig    clang-20
-openrisc      allnoconfig    clang-24
-parisc       allmodconfig    gcc-16.1.0
-parisc        allnoconfig    clang-24
-parisc       allyesconfig    clang-17
-parisc       allyesconfig    gcc-16.1.0
-powerpc      allmodconfig    gcc-16.1.0
-powerpc       allnoconfig    clang-24
-riscv        allmodconfig    clang-24
-riscv         allnoconfig    clang-24
-riscv        allyesconfig    clang-24
-s390         allmodconfig    clang-17
-s390         allmodconfig    clang-24
-s390          allnoconfig    clang-24
-s390         allyesconfig    gcc-16.1.0
-sh           allmodconfig    gcc-16.1.0
-sh            allnoconfig    clang-24
-sh           allyesconfig    clang-17
-sh           allyesconfig    gcc-16.1.0
-sparc         allnoconfig    clang-24
-sparc64      allmodconfig    clang-20
-um           allmodconfig    clang-17
-um            allnoconfig    clang-24
-um           allyesconfig    gcc-14
-um           allyesconfig    gcc-16.1.0
-x86_64       allmodconfig    clang-22
-x86_64        allnoconfig    clang-24
-x86_64       allyesconfig    clang-22
-x86_64      rhel-9.4-rust    clang-22
-xtensa        allnoconfig    clang-24
-xtensa       allyesconfig    clang-20
+  #652 [PW_SID:1151528] ... created 2026-08-25, closed 2026-09-10 18:05
+  #746 [PW_SID:1151528] ... created 2026-09-10 18:11
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Look the closed pull requests up as well so a series is handled only once.
+A resent series always gets a new series id from patchwork and is still
+picked up.
+
+The series id is now matched exactly too. The old substring match made,
+for example, PW_SID:115152 match a pull request for PW_SID:1151528 and the
+series was silently never tested.
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/action-ci/settings/notifications
