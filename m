@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE93C3947B5;
-	Thu, 10 Sep 2026 20:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743AE3C10A3;
+	Thu, 10 Sep 2026 20:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789073470; cv=none; b=E9PKY5G1HY32V8WAqmKUYPT9mxtmaNRnaOFc1p655ZGdtNzMRiUoeJc8bekEvt/BGEUQBxZP4XOlQ3zKKdYYRbk5qT8zRyU2YtyxGZykO/4dZmAV7ksIQPDadC1qa2z5q8WX/cmGLQ/mPmtIvedCZkHjabbvW8PzDXoYGWbUJyE=
+	t=1789073472; cv=none; b=ZP+OKsJlNpjP+ItlZ3sxokhSZN5dlDPuV4i5SRhlt3E29/pnJ4csScrjPc7nLHH+xyXuiBGbedXSzA1jvyw9Ii2wpqKKlMux23bj6c6KU99PMV2sS/zmSodFJlaPUvrUmbjhxHhM1qeWd+IykZdvcPZb9Av5Cpcg1BXigblKgwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789073470; c=relaxed/simple;
-	bh=GOV8pi3ng1uTcCCKLvtrz44ygl1qWYv6aUlLbwfZM14=;
+	s=arc-20240116; t=1789073472; c=relaxed/simple;
+	bh=LfJlwhLJhS3nA3C0C6ijsPj0sUen1IaqXxD5DqBuil8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=teSaSdUjQL9Wz4LLoeb/zqq6uwxx/q/006EAIxqUn94sg8NAoM8PTrnfwuI3eSrcwsi9zxMDzAZYgL4EGxcHUVWPdn05UxriYt3x++Y6t57BIB8TQgJtTbBJvgokjgf6vE8u8hrQ5cIeIkV5xgATRS0aRvEq5nykL4iaEdmO1gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRfBSYSo; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=mpQJYs0peD6+A529RARxK7hRv4DHHkgADfmYAQ3nVWyf5k/7OrIEJ/6/C1lfKIlqHu91xk/IeM1jkjckMJbwAQ/nD4a6Rbe//t5oBtMC/ODBimYLoklHiVaCr69GS9xG6MX9jKj/XGOwnRTg7lQcMNVoiCXDQhFzacYvWPZqxC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZdqDVOc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRfBSYSo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8800F1F00893;
-	Thu, 10 Sep 2026 20:51:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZdqDVOc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE871F000FF;
+	Thu, 10 Sep 2026 20:51:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789073469;
-	bh=LIggGXtr+dSA/WuJLno7RJor+Nn51IigS4DV2OURrZE=;
+	s=k20260515; t=1789073471;
+	bh=0XGOLbepuWdRrCppwS7Mqf2t8tDlDTO4Yc/5dw//KAk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=QRfBSYSoNCkJ+KjQGn7IomlbueGTYhTaNolvIXdoyUoHY5IQcDtCza+QtoEBBXlpW
-	 Zxy+FxRmDhEMTXNAa0sHg1Yi31XJVQKtd1P+FMoZlsw4FRu3dJn1W1timzaKbcLOsF
-	 pK7kE0TyGwzWrHbZ2sgvlCWadXhVERsSsrcptP1kQXXDe0HsqfW2e/caq7PFctN6o/
-	 h5SzCg0JCoxfITQD08/WME5gqOStslFoteapvjtxP9SgLVHO2lYMEWOtv/jWv/xV4E
-	 CIOb4nZBCn3gLuSBzixF+u+fm9BgcJok20zup6kCZQ5EDHopIlgZsZn3SoUkQTiXeQ
-	 fEXsD7JgoB11w==
+	b=jZdqDVOcG3RulGMVO0v3y5bOKRZLksHd13mxs3dFq8univbbr9oECUONKmVbLIl87
+	 mySXAEpIMiSGX2Q5cY6zoVkmzXgOjbGXzMXCCOrLdAm0RT6c6LEFUh1+eYV9Wa8P/r
+	 5OEmiezAuUfUFnNn76nBwAPEPC/TKPs3gLc8RqTPL9VqROtPYDLaBdBfZHmr+u3AaZ
+	 nN1Fjd2o3cRdS8j6ooBp4BVsU5AcnrFByQ/Wqr1JYZpnQzJN5yUAS+fAehquoCOSb8
+	 tIh2nTDBOPn/mYSEs9SBKB5Csj25pCnBbPa8JY8qAow8EmuhkxCHgScvsFaUTQqhBx
+	 xm+u/toPY3tJA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198B2380DBDC;
-	Thu, 10 Sep 2026 20:50:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B5E380DBDC;
+	Thu, 10 Sep 2026 20:50:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_qca: Do not write to the serial port after
- it
- is closed
+Subject: Re: [PATCH] Bluetooth: hci_sync: Serialize local codec list cleanup
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178907340663.2075844.14300677494257499736.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Sep 2026 20:50:06 +0000
-References: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com>
-In-Reply-To: <20260819125425.192316-1-johannes.goede@oss.qualcomm.com>
-To: Hans de Goede <johannes.goede@oss.qualcomm.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- iabdelka@qti.qualcomm.com, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
+ <178907340813.2075844.8834816914605472412.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Sep 2026 20:50:08 +0000
+References: <20260821174350.3034506-1-nicoyip.dev@gmail.com>
+In-Reply-To: <20260821174350.3034506-1-nicoyip.dev@gmail.com>
+To: Chengfeng Ye <nicoyip.dev@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 19 Aug 2026 14:54:25 +0200 you wrote:
-> From: Ibrahim Abdelkader <iabdelka@qti.qualcomm.com>
+On Sat, 22 Aug 2026 01:43:50 +0800 you wrote:
+> hci_dev_close_sync() clears hdev->local_codecs after releasing hdev->lock.
+> Codec list additions and both traversals in sco_sock_getsockopt() use that
+> lock, but the close path does not. A close and BT_CODEC query can therefore
+> interleave as follows:
 > 
-> hci_uart_close() closes the serdev port if HCI_QUIRK_NON_PERSISTENT_SETUP
-> is set (for example, for the WCN399x family). A failed hci_dev_open_sync()
-> following a successful qca_setup() calls hdev->close() but not
-> hdev->shutdown(), so the port is closed while power->vregs_on is left true.
-> qca_serdev_remove() then passes its power->vregs_on test and calls
-> qca_power_off(), which writes to the closed port unconditionally.
+>   hci_dev_close_sync()          sco_sock_getsockopt()
+>                                 hci_dev_lock()
+>                                 fetch codec entry
+>   hci_codec_list_clear()
+>     kfree(entry)
+>                                 read entry->id
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_qca: Do not write to the serial port after it is closed
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6691666bb4b2
+  - Bluetooth: hci_sync: Serialize local codec list cleanup
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ee0662ba1e0a
 
 You are awesome, thank you!
 -- 
