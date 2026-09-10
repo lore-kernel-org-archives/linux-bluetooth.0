@@ -1,167 +1,115 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4D458599E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6938A38E11A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789065758; cv=none; b=MV2MetGAK3i812qGSXy7fWc3eQEtmbzQQG3cLQgBlnXRC3x5cp+759kYoIZsoMdeo3TV4sIIzC5LwdI8oPAsPTRLFaW+TZlg0u6qb7W5p4lRWTJmrjZl3ZxNsS/slU4rRr+6TderZdR6A+8n61RccUkVymfEdnHagK+qFLn/Bvs=
+	t=1789065764; cv=none; b=tZu1ExFs45i1s/Tckd3e5PqorjmDOHerbq5u2ZpTeOqwWc1jzCfs2qA38tIgsQqKpYWKen4y5f4kBI1iqoCFcPaEtDHIK3UD3xnTHXlZYuWeBG7SOmlkSADqx92TGJGYSf00NSKlQgMLEwcgISDvAgpn/DDtTFAjX8mRv/85hxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789065758; c=relaxed/simple;
-	bh=n5AS2BVldLrF2N82Hr+C/tVEMXt1Ei8alwO7LDR/qPw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uLZ8nk4jElj3CuSNHl9WvaDy3duLO/KcVgmJZ6MCdWeOFcebIOrdOV0lUahV0qnChxCu/R3wol6b29iyAD/RaiyQKGr/lMeze3cYSA/7UelakmZPM8aKOL38hTWxWTxPUyHa7tTux68wAZkHE5Ygo/IEneJnyIRwPykLlfs/UoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khCAhZut; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1789065764; c=relaxed/simple;
+	bh=UzXmgI+gZZmVe+CfPr9F4YoTwyALdwVWhZrVmcFXaBY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jnZB1XN4OdE5uXzfLUnrk+2gJVoAytAsIxT1tyTRFsdes/MLok0+6FzYBoviFLfq0HCplEdRJ5y4D8p30lLqKRGBrtgdwif+McakyR/4REIjR6lhypjpo6QBy74CSXY+MY948dRfJonTIYr1bSUa7jnnZxv9rtykJqv30HPFhBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gXOgrNNF; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khCAhZut"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5c83fbd23a5so552055e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:42:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gXOgrNNF"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc4be0e5351so137850a12.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 11:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789065755; x=1789670555; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1789065761; x=1789670561; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=CMdMMR7ySNFK702jv/OFOCV+WQ2E1Y+KE1TEPPlwnKo=;
-        b=khCAhZut3994XvUnc7UfDrvb1prh2dT/535HL/ivXBmIxCPivp99eN4V8/XMlE8/of
-         Kbl8t+Xk9xfrpclTqaokU1B/s9DzICo4W9z+oHbL/svmk34+//r5Kmcfeln1CathzOSO
-         BMlIgq9gXv0Ku+Vf0OZAQcPrcKtSff7ZpaY0pQYHRGPIkLkgB5dcwtpGvdphAlPXYg0j
-         1lQIxoCy/upiWfKrd5QKZzIVJFL283wo40gFbP96gnG7G0OYiiIhZn4OjbznFEPxqWbJ
-         7HzFcdFxpC8FTXiWaDjNWUnHpHQVPscJg7WbqDyEZAYhe96Cxb+u8pXW7tI6kUnl3Ksq
-         /P1g==
+        bh=4b0qCOl1oJUZDjlH3eBgaQ7fe4ODotDZxKJxAElCuew=;
+        b=gXOgrNNFPbsdHisJNbw9/IkVU1rtSt9u3rIaQLP+P1C/4L0Q0n4CvwnxGUSGfZ7xx5
+         BWrgc9UBQvpIzMMsIuCUKsbat3jqCQZzyV74JJP6Xy/dB9EITAAhttiEYC5ilczMA86E
+         OdI2on3hRHmyrCYPDlr6eG57ZfmMGIm1Ha3J9l/5r72pk/Ur5QHiLfru446oT9Otsu9h
+         193sCPNS+xwkcUQukh3rnmEH2eQSoGKWQCUAyghh0d2A/vxkRK8Yac+vQx/c9LSCOWi3
+         tnxicxTphuQeMxx33ps17TMdjR/NJr8PAQpndr0fshQjRHZweYnEQuR0yb0hgG+V6uyG
+         Ng9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789065755; x=1789670555;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=CMdMMR7ySNFK702jv/OFOCV+WQ2E1Y+KE1TEPPlwnKo=;
-        b=lLoHmZEf2QqOU395OaA9fY2UzspD7K5kp464BIXOzzGquN29T/x34GUtnhplaBdiWg
-         9RPKOWYTzOpGlI1g5i00qA1MhDdCP3CenLU6cNfyYTiK5VN9Hdl/Gk3vR7gjwiaT8Dy8
-         krmf9cu375NxWi64nSo2sJ30+i7uagb1Ny+j8bjE0fiUosiwij1CWrftM2LVMNZcA/qT
-         EevPO3Unm7z+4n0FYfIEwrbxnsYE0vWbvRdBLCoTtachpsqr70aOhU0ZjT8sDRcMDDsy
-         KrlK92AK3N+5unnckf7wQ5WgDLV8cW7Ly/j565yJy2InPIJvax9rAadZs4WZaGaZLzj4
-         gfvQ==
-X-Gm-Message-State: AFuF++kmFHnYV+cASHUMnv0o4MpVhBqeGo+sKl4XePdSq03j8C803wz5
-	zQJH5MsjUkZssjCzbU6z2Xf+NzzZpHNJkgBEqpehleR5hxkdLn9oZJsKShMXX/Jj
-X-Gm-Gg: AYBFou0c7s5k3UeBiSt83lgSCnhNDvBO4Q7iIdYRILdHTshtwcWwdtOsbJUMHY/IU+N
-	DPfY14cj2PHEb6QU9EVwNmebkrb8N8pMtOtZxAc68ph+mYOcZ3hiKxq7WNA+6Imexerm5UW0JHf
-	QIh7O1C4dJBeEXYRh0dTMZueOpmRAd0df8gQk9FnbS2GOzA/p80LxBfwri2wm7LnOHGf6Qo+gKq
-	RsMqMpVqaOpuGJKx7avI9qUYLbyOuuvwYzyRIuILvLFzl1PcvXXEh8xd0fiMUsHhtJdf6Q6UT73
-	uiuFuo9jbR8ANIXqz1ueA8YZmBvOJrujSPHC61siHONYduuo9DvOwWBsuzAQOz55jIiD60aesKH
-	v720WYO5b2SJNkwAWiHH8TnLzcjqezXCRkN2gFpsMArvAIR6H+8Qrf4qfbYBug337VXEXHJDqoE
-	WkxZMD2jpGa+G6sjYmTi9de+Lr7OwqNnNfc+4GC51eHaRqKNnX09TolVl+Q9BzkK8xnhnTbZtTT
-	6cKHQ2/jpHGWQORQXf66ndLSsbXk46Bu53myi4K4LXn2TSZ8G9/ZtypZ6xbU+gN+A==
-X-Received: by 2002:a05:6122:6b8a:10b0:5c8:3dfd:68f2 with SMTP id 71dfb90a1353d-5c83dfd70b7mr2100488e0c.6.1789065750685;
-        Thu, 10 Sep 2026 11:42:30 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c8470ae7dcsm222256e0c.4.2026.09.10.11.42.30
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1789065761; x=1789670561;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4b0qCOl1oJUZDjlH3eBgaQ7fe4ODotDZxKJxAElCuew=;
+        b=ED/rcOsFsVMC49xMUd1YSNT6BID/ZLP19nucGaptT5PpxF1h601b6JF337hBloSITS
+         rprAGKVtII/dcav2PMF6cZdiQIcd0drFx9cPRrxDnpP8SxNPL4/UZbAQGaOdXmExB1gj
+         q2/if8pDcTKssuP6/EQP16wg7YRMAQI2L2gEknTAxS/5F0duTBW6Qw2sqFzTOUDi9aip
+         0+t4uzSdnsu13N3mlAxLtWkpXQZBdHjdMKquqT+t9E1cGsdCst5gBO0Ywcwel10rsPJi
+         Yj4KofKiMC/I68BGyQFHV99ZG138gB9OXpy/WjzLynB4F11y4WAUa8mekC0dyqBuh+kV
+         qlsA==
+X-Gm-Message-State: AFuF++l+3Ud3E6hwuuDLfkJFr51GLmt4NzckarZ8CK7FNkiVajZl/l6l
+	/HX79WmqqzpVa5nBaixH/lqce2CnZ+W1O42ey9pCNC/QXPhZ7nQFinAFkjVFOA==
+X-Gm-Gg: AYBFou12O1HPg8DjRN3jYeavy1oydZO2RBW8KFoAKWCVcyz7alpc00CdC1EuR17To8N
+	hpMj+wFY93zdAOsRHhTXenJkSBw70PRFgGuRgtRAa/N7sNGkbFX7U1E/WHAeYHebNFttW2XZFHC
+	DASE7Ybfx0jorx3JtYUbdFj1lSZHaE/fk/q8Gd1Zf6lBr+K8+wMFg+zh/y7zQmjlfiU89GEW+5h
+	KS4cMfLAW38KYfJVVeT6dezYeTzQk2ZM84ZjD/BYqHbReeeLk+VbfIFzRO7J6812qRpIoCnghaB
+	YODQuDs17jU/XMWqmhLrmsxcP5PomtnFbyZsuhkabHR7PRMYXz3cerK8jDOdxlTIGe6Fqp8VsCk
+	xdufByPGj7c18Bqrtx6GBSin/jPMXM1vYnJYerVm3qOaK/VK19Y9duE7bsT69ZIzQq9D+6y/8xf
+	5bGSupZAmQXs1YidOKmdJ8cc7G47rc+RZ5bF4rf9BJaceGBKNebSqX58a3ex0lDmCUoyL9RLgfs
+	sKnmiQ=
+X-Received: by 2002:a05:6a20:be8f:b0:3d3:af85:eb98 with SMTP id adf61e73a8af0-3daed424d01mr424188637.26.1789065761447;
+        Thu, 10 Sep 2026 11:42:41 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.225.132])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14365a59b18sm535557c88.2.2026.09.10.11.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 11:42:30 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/4] client/bluetoothctl: Declare the controller helper in its own header
-Date: Thu, 10 Sep 2026 14:42:16 -0400
-Message-ID: <20260910184216.1601639-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260910184216.1601639-1-luiz.dentz@gmail.com>
-References: <20260910184216.1601639-1-luiz.dentz@gmail.com>
+        Thu, 10 Sep 2026 11:42:40 -0700 (PDT)
+Message-ID: <6aa2fa20.8e75e0cb.126d4f.8780@mx.google.com>
+Date: Thu, 10 Sep 2026 11:42:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3629121842131535860=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lijun01@kylinos.cn
+Subject: RE: [v5] Bluetooth: pm: use SIMPLE_DEV_OPS for pm struct
+In-Reply-To: <20260820055003.1204188-1-lijun01@kylinos.cn>
+References: <20260820055003.1204188-1-lijun01@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3629121842131535860==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-bluetoothctl_get_default_controller() is implemented in main.c but was
-declared in admin.h, the header of one of the submenus that consumes it.
-Move the declaration to a new client/main.h so main.c also sees it.
+This is automated email and please do not reply to this email!
 
-While at it, drop the bluetooth/bluetooth.h include added to admin.c,
-which is unused.
+Dear submitter,
 
-Assisted-by: opencode:claude-opus-5
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1148824/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.58 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      29.16 seconds
+CheckAllWarning               PASS      33.28 seconds
+CheckSparse                   PASS      36.30 seconds
+BuildKernel32                 PASS      29.53 seconds
+CheckKernelLLVM               PASS      32.84 seconds
+TestRunnerSetup               PASS      806.92 seconds
+IncrementalBuild              PASS      27.05 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/737
+
 ---
- Makefile.tools |  1 +
- client/admin.c |  2 +-
- client/admin.h |  2 --
- client/main.c  |  1 +
- client/main.h  | 11 +++++++++++
- 5 files changed, 14 insertions(+), 3 deletions(-)
- create mode 100644 client/main.h
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.tools b/Makefile.tools
-index cb113f96161e..6844a52ac739 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -12,6 +12,7 @@ client_bluetoothctl_SOURCES = client/main.c \
- 					client/adv_monitor.c \
- 					client/gatt.h client/gatt.c \
- 					client/admin.h client/admin.c \
-+					client/main.h \
- 					client/player.h client/player.c \
- 					client/mgmt.h client/mgmt.c \
- 					client/assistant.h client/assistant.c \
-diff --git a/client/admin.c b/client/admin.c
-index a6fba2f1ce1d..98276f56c652 100644
---- a/client/admin.c
-+++ b/client/admin.c
-@@ -16,11 +16,11 @@
- #include <string.h>
- #include <stdlib.h>
- 
--#include "bluetooth/bluetooth.h"
- #include "gdbus/gdbus.h"
- #include "src/shared/shell.h"
- 
- #include "admin.h"
-+#include "main.h"
- #define _GNU_SOURCE
- 
- static DBusConnection *dbus_conn;
-diff --git a/client/admin.h b/client/admin.h
-index 00423d9d35cb..0047770dc737 100644
---- a/client/admin.h
-+++ b/client/admin.h
-@@ -10,5 +10,3 @@
- 
- void admin_add_submenu(void);
- void admin_remove_submenu(void);
--
--GDBusProxy *bluetoothctl_get_default_controller(void);
-diff --git a/client/main.c b/client/main.c
-index d8d2e32d9556..8f7a7c4135ca 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -28,6 +28,7 @@
- #include "src/shared/util.h"
- #include "src/shared/ad.h"
- #include "gdbus/gdbus.h"
-+#include "main.h"
- #include "print.h"
- #include "agent.h"
- #include "gatt.h"
-diff --git a/client/main.h b/client/main.h
-new file mode 100644
-index 000000000000..0d2af5c5014c
---- /dev/null
-+++ b/client/main.h
-@@ -0,0 +1,11 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Collabora Ltd.
-+ *
-+ *
-+ */
-+
-+GDBusProxy *bluetoothctl_get_default_controller(void);
--- 
-2.55.0
 
+--===============3629121842131535860==--
