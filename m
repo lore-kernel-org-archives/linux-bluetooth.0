@@ -1,159 +1,116 @@
-Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918D435F163
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 14:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F36D49EC54
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 16:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789137242; cv=pass; b=uFC0Lrcl+gMShtdB6JaInONSZCyCPph4qfPcnYZ4lpXNtwaN1c4cSsvtUekKjSU2gUTQkOtjZGsI4FEnf/+KjiZvIfFqc9BSWnOwoYThh1IdUo1qRbIO/iFPtuoBj/dcvEBDrta6WO+QmL+drwX0uyIx7RJ8BpyzkyMMgfaVD98=
+	t=1789142949; cv=pass; b=rQXou86xpIC8l1dQCT2UQcwgDuQLvtDMDPJ2b6ZWTnK9GFL0M2PLqy51wwDqki0g1s2CRQTG1AIHPzJQilBIw99Ye76bOagsewlRv4qfeUDlLnodTe97Qt35SWjueRtfFoaWxRMw0Bb+oRI9z6i3rYSSNHcVb4SmhKkEbIPxdvo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789137242; c=relaxed/simple;
-	bh=Lq85WXNE3B6YdVcdVzLIUHNyP68RoDDuzGsNkOKe6D8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ok8oU3CERhCjBUYQ70RqEHxcNOIWFlz2sM7br5v5Fwch4hoSpPYC5B/pEh7xqNnQxl3T4MkjxjbkWk+q4QUXLGBSfubKJ2dcwMiB60VTOd9owGpovcgDYlE3P/9rVy/tD9yJWo+jeuJ2afJY8/HuxQ9PQ9B+v3anxvtDThUg1Xo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rjHv0euU; arc=pass smtp.client-ip=74.125.224.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789142949; c=relaxed/simple;
+	bh=NoN1MVab1tJYLotpBfWAO5k2PGtFrXkg1OQCxGFBIGY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hdiZ+dgZbq35aRmvgWMSzWPmNq9t1BSY9Ls6xraU+8xp91PGqIrlRK8Eov+MRs0aYmVMNnHvwsMQWGP55KFY9suhQV9nBWbdwSkIys8a1h/Y8uoAS5eYdCJaCAGuTLauLC9HPysYWJgbdEGr35zvoEasJEvSGmZU6FBcA4SgiHQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=FVE4/hAt; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rjHv0euU"
-Received: by mail-yx2-f12.google.com with SMTP id 00721157ae682-85d46e4cdcbso161507b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 07:34:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789137239; cv=none;
-        d=google.com; s=arc-20260327;
-        b=F7JpoO0hlgqrbnkgPtbVviSMIwzEIeIdWnTXDPv7qljx5E4djeRi2ztdzKiyt1yZz8
-         /xa0IGq5kfNjJ3g0uIfnz5L6fStkQogExlMy7pNAp1EIjmkLmatueslDuzjdWhSIhlET
-         yRVr3FQdAB0Ld896DCOo0nhwbDdlAOvY8bSLixI6hFuB2ZkMGgEXk8KuGP/lhzWdQJEE
-         3oE1EMQFLSvmSy06uhdNnCtL5dZ7iBeeXW1Ic73JGCt+DhHP/RoC/C6FPNInGPU158Ij
-         mC27m+D/+PaqimmTN0ICdMOepg8lcXMrHmrCSJgZueVCg/UszbHcCR1LhQQDP4nF/JR/
-         VTAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=253PUwIF2lUbExbnq4pn03NFxabLUx1bSqL243QpTlU=;
-        fh=bJ/lPg3NQBED/e/zHKSyr73I9Iyir3vfw9d3mVpgf4k=;
-        b=Et9dOhsrs+od8BPQWNwhVaNoJd4bkkgWXBmV0dKm3n3qF6xd6DBObIPzUFAxA3I7MM
-         VLe2XS0E09o4ZJAD8g7K7SYfN1wXUwNoaet9rDCMav226Laa0LcwZ90Q+td/5Ay5yeyx
-         IHS85NIB1bHPqISTRee4FzOZwE4tqkMmMmOLN+0rcimVaAQZsVVT+2UYfCAZhxQ/DrIV
-         /1UK3E4JMpK8JC7rBgY3RM6sVc1MNgIErWva0gmj+wfzOpCPnCuVdJJfaQX4MH2sOvph
-         s5YQsKe+iw/5ebk423hQfj4eqD2Njx7r0ws+kqVIaAyPB0I8G7iLkic3zrYY3y5qAxZu
-         E1Ow==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789137239; x=1789742039; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=253PUwIF2lUbExbnq4pn03NFxabLUx1bSqL243QpTlU=;
-        b=rjHv0euU+pcmVHL+V6UqxQi2WYPJD2pJH9lQxY/FIHlQEswSsGWtgrV3ByyD+1Amuk
-         WWkk1D4K9W8bLOVknbefu6dMM01T5UhKvepV5WK7gGHazGPqfVkD2706uFn0ccRijPK3
-         sJzn6JReReo19mM4kwu0d4/2IjVsNHn1JDZi6jYWzHRdcBgm4+frWyDJhm8joLmOQWjD
-         4MnozQab1ROzb1rn558JXRMeP/kDdPIVOLhlgQ8P6QPSUe+42zeJkN5m7G1RPi/y1IL3
-         n8kGFGMdpZlia+AD1FpH1dcYGfdBW2bk2IYPJdlYBNQpHdsRatd9MacjS/t+f6mwijLC
-         c4qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789137239; x=1789742039;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=253PUwIF2lUbExbnq4pn03NFxabLUx1bSqL243QpTlU=;
-        b=UbwGli8zX+JRvucVyuCN7eqAsOYN6EQpGUDQkthhJJmhxz16OzFK2XwqjrkMMEFGfH
-         0jOmaVxr4Wi0pKTMB4+EmoGmJ1H+JHgfHnxvfFsz39sYdfPnzbaWsAM4FXZzOlz99xfl
-         YP4p6JMiab9OpjxXewiwSeRu4Y2vgOkB30qtBHy4aCTSYNNo799JU1hg+h9HE4HEFc2i
-         sgtXpGTAnLqGmIykkcDQ7yFEgkzG8dT2iJgYZZHJudSCnkhvfGXlMlim3KUiHPf8qgeO
-         MN4m5yt8DsKj+O4DUUbrTOkLzHx2Oku7/PUXsKXmWzHf295uO5O5uqKvY6UXmJ4KhaxP
-         XhRg==
-X-Forwarded-Encrypted: i=1; AKwUvBwS14kiD0R2O+UqOUdY2FCgfC/CrruKrnKeHz21HtEtAf4snjRPggERoub/yJm7F4ZIN5IT1Cpcf4OylNQYji0=@vger.kernel.org
-X-Gm-Message-State: AFuF++n2U0Z+E9oy7JtE1KY0hPeci0aIC929rrGkrg1Rjh/tGw3/b1OW
-	25qjLgVIjPjisDYu7FauIuSNz/9mBcT0kHxadufqtSzD0XLt1vixxXXV3dhGL9jqhhvor+osRkU
-	HKJkPqbBDp4a85dOw1Go0SGthHAdsTJ0=
-X-Gm-Gg: AYBFou1+wmDv772Yv9jYNCcZDJWJL17MzCK2P440jXAF/djaA1ihZX+FlITOa07+dxT
-	p+BUAb5KMpNkt/KCjWeqlEVOat99sDjHHkkrsNjF4kpGtPiEaBbPt8eBb9Dyy1ya+yOHyJFi8hY
-	eV9JGEAAemTzC5CHSwaY8g7521vCr9PfEMabKtPzoks1M5VDd+98DDpLMErmDIZklRamn8wjyKI
-	0gFUS4McbTzNmB7lgwTdvVY5Ac8SvDuLqouhanHyxSB6kIXAvEi4Zr7tJIzuTTlplWj0wPZ/1+w
-	7jf8q/HaJaYdp5FsdIxYW9MMdolKkFcB8WyLi7MDr7vrX5MY/uL6IpeVhwpYN6E/6FyPXDGAu5Q
-	SsAFnxlyu4wzV6p2Z6oSodT2q5M21QEYJCMHBMAQ=
-X-Received: by 2002:a05:690c:d94:b0:854:27c3:5cd8 with SMTP id
- 00721157ae682-884b387a6ecmr19566477b3.27.1789137239315; Fri, 11 Sep 2026
- 07:33:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="FVE4/hAt"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:6ea0:1508:9::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hhKGs55bjz49Pyc;
+	Fri, 11 Sep 2026 19:08:53 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1789142934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NoN1MVab1tJYLotpBfWAO5k2PGtFrXkg1OQCxGFBIGY=;
+	b=FVE4/hAtAOvYc9jvioYzaUWZmZnnsoKY3fpUcJwZqEdct+PQUOKw338aizRQ8RG2fGcp+u
+	KDUSMpUKqbm1x7HW4J96os3deGFbUOcqxl1Y02J8KNfxD0dZD1TR2x4TBKqkd/wlxYrE9+
+	0kOvYiN4lknRI68LDaDl1XvT6HacSQKbxmJbnC/rqfpwP+ckDYN3BNYbMTtNlVoic+Ich5
+	sDWmlUc+8f18ijWR/GVRzQHcXmUzdpVfN5YecR9MvnZB5V1lZlxt01Y6dB4712+zB/JB8Q
+	stZqz8o/lV/a/WikIQqYCh7psnwzp6/MSZSk8HMi/rl2QXgZDDDK/DMcN1Zi8w==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1789142934;
+	b=GPV5LLNTZNARvYQ0yTN0Azl2FoG2D9uqwBtXA9RcrdOYM1qDuUjC3cryosk7S9q36ARCue
+	xo4CaCRxVlg0KapTtLAF1i8+KeVyuA4LO6v618o3hnFQ/s1+z/jOPu0L0XECJl6xRQTnpx
+	+WEHvMvJQeUVZLHwFDI0zBhDubDzPzmE+EwhH+BQO6GlpQGWqEmA3iFzt8HCE6PvhLOWpt
+	MKntUGSxEA6mevLw6/n5t7zFW1WJE6uDfspOE9HG3Lz+5DyNExw11sXhgGCSHMhf/BfQqn
+	9Y2pYQKjZVOZVuHLP0Sol/IzN5J/i2bP4dt02atDJCdYz/Zr1CtVZblKWgyeNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1789142934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NoN1MVab1tJYLotpBfWAO5k2PGtFrXkg1OQCxGFBIGY=;
+	b=vahao/MvTBgQG/CEE+1XOcMBZjCakq6qtanCbI9n+66kKHUBd268VFc5MTw/b7lZZZwgA7
+	TPrODdQsQP3TddmQP9otdKplKICMJECKsqsmJqQWp/Y8fa2beF74RZBPTuXCoHGzPtG+4y
+	v/A68ytED/l/EuGLf5Z/iXLdONRopF69lNGKzHJwPEH4RVtwKuvttu3BjCu1ZnByQMDUj2
+	DVQSbdP4cHCBo9SlQ8QFcKrfOkbhKKhl/V03B1UkYvCqkxf2hlE6p4sdK6lVDgap+wm2VJ
+	17v7nLrTYJysUXceqN/TQzZf+gyrr8nlIghdcq9R+rOvjkl1UqL8dcIN3Cd1cw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <32f2cdeea1561dce8a974196bebbdd1b688e4542.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v7 0/9] Functional/integration testing
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bastien Nocera
+	 <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 11 Sep 2026 19:08:52 +0300
+In-Reply-To: <CABBYNZKW=W8_Q+KXmGmn9gt7hN74H_EO0mSd2vOzqM64yoGWmg@mail.gmail.com>
+References: <cover.1788712996.git.pav@iki.fi>
+	 <178889520963.3704993.9911217550470009790.git-patchwork-notify@kernel.org>
+	 <CABBYNZJmYqh6ZJ2wAjauP5mkK5gxgyRY8-EnKZ6v3tPNe5=6Ww@mail.gmail.com>
+	 <CABBYNZKW=W8_Q+KXmGmn9gt7hN74H_EO0mSd2vOzqM64yoGWmg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260911104234.2276126-1-chris.lu@mediatek.com>
-In-Reply-To: <20260911104234.2276126-1-chris.lu@mediatek.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 11 Sep 2026 10:33:48 -0400
-X-Gm-Features: AcwNN1VOio-kJ1e73tLJ7cg4_i84qUwIWDri4lPL6COQQRrdpvIJBVG3J4WPA50
-Message-ID: <CABBYNZ+SD=KAyMwGf_cBZARONqXhjTg2O-r5FHTqUyMrsprZMQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Bluetooth: btmtk: firmware debug event routing and
- WMT FUNC_CTRL status fixes
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
-	SS Wu <ss.wu@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
+Hi,
 
-On Fri, Sep 11, 2026 at 6:42=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
-ote:
->
-> This series bundles three independent MediaTek Bluetooth driver fixes:
->
-> Patch 1 is a resend of a fix submitted on 25 Aug 2026
-> ("Bluetooth: btmtk: Route firmware debug event to the diag channel")
-> that received no review feedback. There are no code changes since
-> that submission; resending it alongside the two related fixes below.
->
-> Patches 2-3 fix how btmtk_usb_hci_wmt_sync() (and its btmtksdio.c /
-> btmtkuart.c counterparts) interpret a WMT FUNC_CTRL event that carries
-> only the WMT header and no trailing 2-byte status word. Such an event
-> is a normal firmware ack for a plain enable/disable request, with the
-> result carried in the header's own flag byte, not a failure as the
-> current code assumes:
->
->   - Patch 2 fixes this for btmtk.c, where a bounds check already
->     existed (added by e3ac0d9f1a20) but defaulted to the wrong
->     result.
->   - Patch 3 applies the same fix to btmtksdio.c and btmtkuart.c, which
->     never had a bounds check for this event at all and read 2 bytes
->     past the end of the received SKB whenever firmware sent the short
->     form. While there, it also adds the missing base WMT header length
->     check that btmtk.c already has (skb_pull_data() before touching
->     wmt_evt->whdr.op), since these two files were unconditionally
->     dereferencing that field with no length validation at all.
->
-> Chris Lu (3):
->   Bluetooth: btmtk: Route firmware debug event to the diag channel
->   Bluetooth: btmtk: fix wrong status for short WMT FUNC_CTRL events
->   Bluetooth: btmtksdio, btmtkuart: validate WMT event length before
->     struct access
->
->  drivers/bluetooth/btmtk.c     |  8 +++++++-
->  drivers/bluetooth/btmtksdio.c | 20 +++++++++++++++++++-
->  drivers/bluetooth/btmtkuart.c | 19 ++++++++++++++++++-
->  3 files changed, 44 insertions(+), 3 deletions(-)
->
-> --
-> 2.45.2
+to, 2026-09-10 kello 13:47 -0400, Luiz Augusto von Dentz kirjoitti:
+[clip]
+> While chatting with @Bastien Nocera he suggested moving
+> https://github.com/pv/bluez-ci-image/ under bluez organization to make
+> it easier to manage. Perhaps the same should happen for
+> https://github.com/pv/pytest-bluezenv.
+>=20
+> There is some documentation on how to do it, if you agree, on:
+> https://docs.github.com/en/repositories/creating-and-managing-repositorie=
+s/transferring-a-repository
 
-Sashiko flagged a problem regarding the usage of ACL connection handle
-without masking the PB field:
+The plan was that bluez-ci-image would be moved under bluez org. Image
+name needs to be updated in the workflow scripts for the image and
+action-ci, see
+https://github.com/bluez/action-ci/pull/7#issue-4699895038
 
-https://sashiko.dev/#/patchset/20260911104234.2276126-1-chris.lu%40mediatek=
-.com
+> There is some documentation on how to do it, if you agree, on:
+>
+https://docs.github.com/en/repositories/creating-and-managing-repositories/=
+transferring-a-repository
 
-If the HCI fragmentation doesn't apply to these handles, please add a
-comment regarding it; otherwise, users like Sashiko will keep flagging
-it going forward.
+This appears to require I'm member of the bluez org, as it complains I
+don't have permissions to create public repositories there.
 
+***
+
+pytest-bluezenv would need BlueZ organization account on pypi.org so
+releases can be done,
+
+https://packaging.python.org/en/latest/guides/publishing-package-distributi=
+on-releases-using-github-actions-ci-cd-workflows/#trusted-publishing
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
