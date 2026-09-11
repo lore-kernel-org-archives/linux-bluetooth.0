@@ -1,215 +1,172 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB0949E129
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 10:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B569411A00;
+	Fri, 11 Sep 2026 10:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789121852; cv=none; b=h1CIPMQtJZ4wOVaN6qnMu12Jvg5xL2EwOjtqvwB8w2kQ/PeEmHlta4AFK3EyaNQEE4lXs/khDwkaiLg3lBfvQhQpxbUDKKNYg/MPbJDPs7U/uinIbuVbCRn5Mc+ObJOZW96StstUG0MLhjsR9Oewl8KlFS3FppPa2ZL4Fa4Z08E=
+	t=1789123370; cv=none; b=AdVTgtlPHeX/dwjMv0FWD65l6ukA8ko9dflaVgj0e7hbDHBZAnm4n1ysYKWgtKMXO4LTynbZmsPNn/+BTeJHzAl6a5V46xN8RY7rwUg6MqJsPRZsXaipXkN4QpRX7DMwLncg7lvhjGTjKH5MEvjfx55Qps0BJmeOQE6JOrWdo5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789121852; c=relaxed/simple;
-	bh=vxGdw4RpqCbxbUT2P46tZgZWvO9ULvrMuhsJMt1jtT8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jgeni61yQelNy17K8kE3IyY0eBdPqt5oPKPsAuPfDStAdRlPsj9S/cQSsmLJOtEceO4ERUjpg2q3jyYUQlzvKcuXtaAVoczM6dNajD9uOhDebGFjtpDMVjTE1cm/CNjX6eYHOLFkyMD1fG7hlwAW+VNnJA4jpeDtMxn0sr7p4j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=irPk3bgG; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789123370; c=relaxed/simple;
+	bh=q/lVAk7JZlfzR5zP+kvhDsqByrrvyU+Qfh6rN2qBcm8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=adizhMA1/l7OGf9QX59AlZTgjgnfc/yYWjEdSQ4LBVtKngB/PfTx+vWgJWS/KiPdaaJFSQ7mrIsJwn+diiNFWGhdsNCsyLtOM7YvapjbDeyNQrSNR+vNRPXcTkPg597gbX5k+hrm7HKZRtoI7phY0mcEstbNg/S7/ckqP4chCv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=rqZdzF2Y; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="irPk3bgG"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-90cc372d6b2so8355976d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 03:17:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789121850; x=1789726650; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=YsrCwouCjtTxysbXhgdzINif0mpm3l4Q+APZU0gh9jY=;
-        b=irPk3bgGkBVDGlvs/gTta2SvjSc8tvxeAUHmwbZyBzVLfwTDX6IREG5outRCHNdcob
-         rJ3x5P7/jKffhIzqnwrjP2Szs9U7hYudlv9IrOFif4rxV3wmirq6XnNLoOgOJfzHcthS
-         uNXpMdmKQrLXdTASLofkvhHCpWrtGc/Z6pvbOBarRA0QQ1MtgH0d60Pb8QdwV/XqX572
-         JP9FWEn0h7w6x8OuzmMKBl9qHPmHxOsZLqY4gJw+MYp7sQdvZKoAg3f3J8Kpm8xFQPIq
-         U6Qjpt+h5c5U5xUYoZRjzwtJaX242A5XiS9HJRFJ5xL+QhbNJRjyDTjuVx07fivHag8A
-         40Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789121850; x=1789726650;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=YsrCwouCjtTxysbXhgdzINif0mpm3l4Q+APZU0gh9jY=;
-        b=HqIgVD10FDXo8Lk4Ue2g0WIR3BJJ6MW6Ria9wxjHiwLXwEwIYqEwxwLYqY34wVgpLB
-         yWpvFbbQciJKWyMGn0kIj/qp9M2uiWRDjHyozqfLJ0NjfLTkaLM81m3XZLHnPekeus/l
-         nQEjNXXbELcf9gxoeh4cvf52Sc/azwO3ctB9eoW6YdDmgxq1dS3/6s5pkpzo4L3vYkL2
-         eaj9c4Y7Xk1bDzdz+qFY38tWMCeM6dY/ysocuFOxfnD+ux/dhZ7jtSYXSvjQr1erolj7
-         PzMEJjF8CPx963vPSiakUNao7O9jd3P9Xrlf0YCsqSa0fZ2dhgrKoJxd3ikFDBm2R0Hm
-         eBTQ==
-X-Gm-Message-State: AFuF++mneve1nswksNQLpH8HPhlfnKtoBtmKGWJpTsWxIhZ84wYtyC8u
-	7WND/LFv6ii4IhOMEyej+4WRMKT1YNP6aP1TJoVLmLGrwnTRWU/wnQwMx4faIA==
-X-Gm-Gg: AYBFou37MEVl85M42ky2alw+WiN1PO8f+C42OiZcU18/5AjBEx8AbYO1Pday3X26VGq
-	Y2E4aEYtjpG5bZGzZsG1I+q/zgJEvOwU3qAwsMRJxtXaB59n4VbQGMaBznDrpMSiW9Bq2bp792K
-	P7/OsO0T5bwAAwT4BNrIw2sBtt9jiYDOz4uMvsHo+c3Ww1aPNJ/fmi6lPK11CZ74As18Vky4FT7
-	1iskS0na6XR+DVXz/sL0WADMHj5Qe4fzspHxL+BhmTdyF8GpVV6xb3xK40m/MklwaPjpgU0jDVu
-	RKDsQs60HHHPzyWl2lrXAcWSpsDRH0bKNBfnciEV+0R26tSNkyjss5cF5Q72YE/aplXT/Gwpf0j
-	GSK8WG5ojZ1WTCKnpx+cJEOLwJeBo62apo0FOmVn1U97mAwZ1Ixt3CvpQFtBtVtKgRSkL3Lefuq
-	Do1YtP5BkJSOL4GXt1KN15omvdumfzx69crMPOXLvEyyN0P9A06kH/QlPV21S6whHV4xk/S+PYJ
-	81UhYeeon9YnNs=
-X-Received: by 2002:a05:622a:1341:b0:530:dae4:81d with SMTP id d75a77b69052e-530dae4376amr8445441cf.27.1789121849465;
-        Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.199.50])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530ca4b9c54sm16120281cf.20.2026.09.11.03.17.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
-Message-ID: <6aa3d539.a52e8b4c.3b0378.9b60@mx.google.com>
-Date: Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0622025560658290119=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="rqZdzF2Y"
+X-UUID: 81d78062adcd11f1b1788b6acf885367-20260911
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=nGFTkEwYB6tHniCOU10/jNmsJ6sUyQiWxjI5epJSI60=;
+	b=rqZdzF2Y5Uj5NlmNphAVmQrqESrKGOazZFyQ02x6uYArpst/tdixlc5Mb43gmqrzhlyQKLpIoikyqKDMIwk6KWtF7AQ14bo0ydj4uPWM3tuSy0HDizwUH8NgfNHv2lPf2DYtXtMIFYC8aZyPrGT8Lq1NYLZdRqNQ+QwMsNddTWQ=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:f49ff773-4fcf-4ece-89a6-0a5236ad4c26,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:7db8b62,CLOUDID:7d5964e3-ea51-4dda-a022-9ba6608a11d1,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,
+	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 81d78062adcd11f1b1788b6acf885367-20260911
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 337214274; Fri, 11 Sep 2026 18:42:38 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 11 Sep 2026 18:42:37 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Fri, 11 Sep 2026 18:42:37 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH 3/3] Bluetooth: btmtksdio, btmtkuart: validate WMT event length before struct access
+Date: Fri, 11 Sep 2026 18:42:34 +0800
+Message-ID: <20260911104234.2276126-4-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260911104234.2276126-1-chris.lu@mediatek.com>
+References: <20260911104234.2276126-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
-Subject: RE: Bluetooth: btusb: Support Qualcomm multi-subsystem QCC2072
-In-Reply-To: <20260911-btusb_qcc2072-v5-1-422754f4e938@oss.qualcomm.com>
-References: <20260911-btusb_qcc2072-v5-1-422754f4e938@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
---===============0622025560658290119==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+btmtksdio.c and btmtkuart.c cast a received WMT event straight to
+struct btmtk_hci_wmt_evt and read its op/flag fields without checking
+the event is long enough to contain them, unlike btmtk.c. The
+FUNC_CTRL case then further casts to struct btmtk_hci_wmt_evt_funcc
+and reads its 2-byte status field, again without a length check.
+Firmware that sends a short or malformed WMT event makes both drivers
+read past the end of the received SKB.
 
-This is automated email and please do not reply to this email!
+Mirror btmtk.c: validate the base WMT header with skb_pull_data()
+before touching any of its fields, and when a FUNC_CTRL event turns
+out to be the short, header-only form (a plain enable/disable ack
+with no status word), decode the result from the header's own flag
+byte instead (0 = success, otherwise failure).
 
-Dear submitter,
+Verified setup on MT7920, MT7921, MT7922 and MT7925: no regression.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1162689/
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      6.79 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       FAIL      1.21 seconds
-SubjectPrefix                 PASS      9.73 seconds
-BuildKernel                   PASS      22.86 seconds
-CheckAllWarning               PASS      26.27 seconds
-CheckSparse                   PASS      28.56 seconds
-BuildKernel32                 PASS      23.28 seconds
-CheckKernelLLVM               FAIL      22.05 seconds
-TestRunnerSetup               PASS      584.99 seconds
-TestRunner_l2cap-tester       PASS      34.85 seconds
-TestRunner_iso-tester         PASS      81.12 seconds
-TestRunner_bnep-tester        PASS      9.69 seconds
-TestRunner_mgmt-tester        FAIL      118.27 seconds
-TestRunner_rfcomm-tester      PASS      12.93 seconds
-TestRunner_sco-tester         PASS      18.08 seconds
-TestRunner_ioctl-tester       PASS      13.81 seconds
-TestRunner_mesh-tester        FAIL      15.99 seconds
-TestRunner_smp-tester         PASS      12.08 seconds
-TestRunner_userchan-tester    PASS      10.04 seconds
-TestRunner_6lowpan-tester     PASS      12.35 seconds
-IncrementalBuild              PASS      44.84 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v5,3/4] Bluetooth: btusb: Build the driver from multiple source files
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#167: 
- drivers/bluetooth/{btusb.c => btusb_main.c} | 0
-
-total: 0 errors, 1 warnings, 11 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14807477.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[v5,4/4] Bluetooth: btusb: Add support for Qualcomm multi-subsystem QCC2072
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#522: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 4929 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14807478.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5,4/4] Bluetooth: btusb: Add support for Qualcomm multi-subsystem QCC2072
-
-8: B3 Line contains hard tab characters (\t): "       USB I/F	|	   internal link	|"
-9: B3 Line contains hard tab characters (\t): "BTHOST --------	|---- PERI -------------- BT	|"
-10: B3 Line contains hard tab characters (\t): "		|_______________________________|"
-##############################
-Test: CheckKernelLLVM - FAIL
-Desc: Build kernel with LLVM + context analysis
-Output:
-
-drivers/bluetooth/btusb_qcom.c:4269:6: error: mutex 'btusb_qcom_xport_data(hdev).tx_mutex' is not held on every path through here [-Werror,-Wthread-safety-analysis]
- 4269 |         if (is_vendor)
-      |             ^
-drivers/bluetooth/btusb_qcom.c:4267:3: note: mutex acquired here
- 4267 |                 mutex_lock(&xport_data->tx_mutex);
-      |                 ^
-drivers/bluetooth/btusb_qcom.c:4275:3: error: releasing mutex 'btusb_qcom_xport_data(hdev).tx_mutex' that was not held [-Werror,-Wthread-safety-analysis]
- 4275 |                 mutex_unlock(&xport_data->tx_mutex);
-      |                 ^
-2 errors generated.
-make[4]: *** [scripts/Makefile.build:289: drivers/bluetooth/btusb_qcom.o] Error 1
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:549: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:549: drivers] Error 2
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/github/workspace/src/src/Makefile:2187: .] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.103 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.363 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/752
-
+Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
+Fixes: e0b67035a90b ("Bluetooth: mediatek: update the common setup between MT7622 and other devices")
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtksdio.c | 20 +++++++++++++++++++-
+ drivers/bluetooth/btmtkuart.c | 20 +++++++++++++++++++-
+ 2 files changed, 38 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index fe4ca9395aa3..a8ebcd0c005c 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -217,7 +217,14 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 	}
 
---===============0622025560658290119==--
+ 	/* Parse and handle the return WMT event */
+-	wmt_evt = (struct btmtk_hci_wmt_evt *)bdev->evt_skb->data;
++	wmt_evt = skb_pull_data(bdev->evt_skb, sizeof(*wmt_evt));
++	if (!wmt_evt) {
++		bt_dev_err(hdev, "WMT event too short (%u bytes)",
++			   bdev->evt_skb->len);
++		err = -EINVAL;
++		goto err_free_skb;
++	}
++
+ 	if (wmt_evt->whdr.op != hdr->op) {
+ 		bt_dev_err(hdev, "Wrong op received %d expected %d",
+ 			   wmt_evt->whdr.op, hdr->op);
+@@ -233,6 +240,17 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 			status = BTMTK_WMT_PATCH_DONE;
+ 		break;
+ 	case BTMTK_WMT_FUNC_CTRL:
++		if (!skb_pull_data(bdev->evt_skb,
++				   sizeof(wmt_evt_funcc->status))) {
++			/* A plain enable/disable request is acked with just
++			 * the WMT header and no trailing status word; the
++			 * result is carried in the header's own flag byte.
++			 */
++			status = wmt_evt->whdr.flag ? BTMTK_WMT_ON_UNDONE :
++						       BTMTK_WMT_ON_DONE;
++			break;
++		}
++
+ 		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
+ 		if (be16_to_cpu(wmt_evt_funcc->status) == 0x404)
+ 			status = BTMTK_WMT_ON_DONE;
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index 27aa48ff3ac2..4af6fbbbd302 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -151,7 +151,14 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 	}
+
+ 	/* Parse and handle the return WMT event */
+-	wmt_evt = (struct btmtk_hci_wmt_evt *)bdev->evt_skb->data;
++	wmt_evt = skb_pull_data(bdev->evt_skb, sizeof(*wmt_evt));
++	if (!wmt_evt) {
++		bt_dev_err(hdev, "WMT event too short (%u bytes)",
++			   bdev->evt_skb->len);
++		err = -EINVAL;
++		goto err_free_wc;
++	}
++
+ 	if (wmt_evt->whdr.op != hdr->op) {
+ 		bt_dev_err(hdev, "Wrong op received %d expected %d",
+ 			   wmt_evt->whdr.op, hdr->op);
+@@ -167,6 +174,17 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 			status = BTMTK_WMT_PATCH_DONE;
+ 		break;
+ 	case BTMTK_WMT_FUNC_CTRL:
++		if (!skb_pull_data(bdev->evt_skb,
++				   sizeof(wmt_evt_funcc->status))) {
++			/* A plain enable/disable request is acked with just
++			 * the WMT header and no trailing status word; the
++			 * result is carried in the header's own flag byte.
++			 */
++			status = wmt_evt->whdr.flag ? BTMTK_WMT_ON_UNDONE :
++						       BTMTK_WMT_ON_DONE;
++			break;
++		}
++
+ 		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
+ 		if (be16_to_cpu(wmt_evt_funcc->status) == 0x404)
+ 			status = BTMTK_WMT_ON_DONE;
+--
+2.45.2
