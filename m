@@ -1,106 +1,160 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-qk2-f12.google.com (mail-qk2-f12.google.com [74.125.230.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A9A65192
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 22:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789080482; cv=none; b=FBQeRHyyVVwK7KCE/9Mmd0oSdkOxQsbiV1oA0ztLzXg767l1+s2WwKl2dh8s7wfu2pp8ouOwnVnhWCJxvRj9xkgJ9GWWBrD2J7GjRZxl1P9OnVzOsKREizElPRLMSwdFouC/1oO/ArZUGo2jtl+9cTCFUc0iSfv6wiexjmKMec4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789080482; c=relaxed/simple;
-	bh=XEvPTIdodaD5FMUS0B/Z0PUNrQV5gZ6pt3mU4b48ho0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gi8S7c7nzIVKxJE4Mhnla4m8ZoNE91HA94/+HzMl0LhQPyk1LGdzx/47y6oMzsrFhS8WeMfXc6WpDSdugMQrzEwbhgVlcpiFZnW7f88Jw4b2PwORQB7+xT+ghwO7RRyWa6wQOKLcZw+oun9NFYgZ/MD1HywBuBM+Zva2Bt9yqp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BsGaVqIP; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA442F7EE0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 01:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.204
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789089427; cv=pass; b=MD4rRbKB7KuvcOKvCkfRM3mhYcdZ99iQaiGOMmYnq+dWHLX9+Ur0Yk4x/GTimHpKSSAn23VSa11Ml8kl88PZqCJi8gU5hNZPfUgiEkMxX1b91B2fjPIrVy9KsJJEYLTNj0dg+ken64pEm5BAU2MEuqvAiiZSWIrIE6rfUCjXdUo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789089427; c=relaxed/simple;
+	bh=5q+iL/R4cDrY1TpT6uISBmPsAgAumboJPqFJbP2vER4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PrevwsB+FMMdngQymduP5dJVPxxuSRslKTfB1m4OJw6+gUGttR52OcWM0VKArXKGEelVg7uICDejccc8wAMEeOzIACbc0B2yvKDqoZKzz1Abm9aBKGnbOTC95nIre+qzX7Ypt2dvy6GG6mh8Xa8gcxHWkQzevqa+8y34PQwY64c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HijGppF3; arc=pass smtp.client-ip=74.125.230.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsGaVqIP"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-cc4c1210748so295283a12.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 15:48:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HijGppF3"
+Received: by mail-qk2-f12.google.com with SMTP id d75a77b69052e-52fb766bfd3so5516201cf.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 18:17:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789089424; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jfxipRoSj5glpKeR0GIPBFXKIDDf2e3wsgvya/BhmUuQ3cBuP2D8ArFuveg3KcF5Gq
+         q0TJdyOVtOvA5Hr4EmoHnY5KYxXjhCXqT+HG4dkbKQXkX0do3f+u6mU7abOCbvfGAHam
+         tw0jjBTiSWLvjBww/q6h1UhyPkpteQL60GqMBr3NmYkOaihGs7qh3UnE9L+OSBHSPPke
+         TacQo/be9sqX55hjShYfC/NSyZBp5F9bELf2RVP5jHWqXTs7Dlq/7kLqUP0soP91FZTS
+         cN4mLIR4bY/zlt+rmD1I/dmr7D8mTOTZMBH2Hc2saNeeSwdayO3yWM54+7D9SUNPKPSL
+         kqEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        fh=F7E9fTj73Ng0QpnQM2eqiAlsKftULa+b2eloOEugHLw=;
+        b=Mf5Tk4ziSdVqLoAVjS1AbWXvr1cb3ATcH+MK8eWln1k4v1fWwaGE+rwbn6g48DRzKv
+         eAPSv9BIdb30y7wAISW5C0f9HURrGHsoHCOOZY/DzgpnlC6ACYkb2n0iy/RJ3gBiNz1u
+         0vODpUpmRTl9y6rQdKdhkQxSXXl2x/1yBFn5+UaLJxC/D3QP0Ic8sbyl8d1TcFz3uxC9
+         WzhE/cP6pnYpGgTLV9TLJr6FTAymyMo+rWk2hwGrueo4JDqTwA0MEOHSt7kD3u9H3A3a
+         982SNDWHYjFgRCmky9rCXVvRguhQsPfrc8jG0rMnb77KUZTceTideroBsauxJY1+sfRg
+         JDvg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789080481; x=1789685281; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=XEvPTIdodaD5FMUS0B/Z0PUNrQV5gZ6pt3mU4b48ho0=;
-        b=BsGaVqIPkrY0z3n1xXlTbMSHTubEs+oj7vjakOQYbvraREcOrs9aOyF/T5cUhn1Ogr
-         wirDHTPf01/Koy/xeqdjB7O+ILSkufZ8CpS9relhgCQ1/UrJOccsYzKaos+M2W2PsLIo
-         1Sj59EFR5IBUHaJs2CF1SLN+pkNTKQL9cNQmA/el3sElqZAv25hPh459RHpq/nYE/MsT
-         qdLDVEI8KJD+lU7SAkcIPrg0kBtW0XDlWuwEm2vwP+h3CPC8fluQkV+NQKQB7nxfwY5K
-         t5RGTLDRpY/FIsPOUkcu+NahRi2J6nhKwCutURYlAQF2jDGpfaNPsSniZ9Sd/wN/Mqin
-         Uqbg==
+        d=google.com; s=20251104; t=1789089424; x=1789694224; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        b=HijGppF3YqI7mjQm+WRnchhbkLIGAn7xuY3LCkZo8iMrhJ1aQ4elSuEjtahnX4xhaZ
+         1o4PGE3JPPQNog2RSzhnr0ZeP+TeGRBy0b8igJr+EByUjDl1S5u5jMiNK/07KSEAYWJ0
+         A3W+cGhtl42Z54+D0OEYIvUPwO5VGMTWxyDkC4JasInYOJPE8gJy1TyFw+z8KWkBc2Xr
+         gmfEWAG4rDDUKOCGHafU8aql42Fqx+lZ6w50GGKHOD285WXr/mOVPJ0XKWG2AHhSHoXv
+         2id6kA0htS1/G1IfTxmv2m3LlCDlhSHd9eeRfJq2YzbXV2TRPYvaGE4MJyZaPMChHPsL
+         OWkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789080481; x=1789685281;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=XEvPTIdodaD5FMUS0B/Z0PUNrQV5gZ6pt3mU4b48ho0=;
-        b=XZWyZiYmRrobJ3rT88yxCAtVesU7GuMmy7Qgn30v/WyZW9HCUhMoJJ5ptm5zhqnnJR
-         YHY/nbIR33uYDAWT5jkLg0Ah03WmDWX4Sqs0xnHqHQI0lV6mEfZJkCS2A6aBylEyoWfr
-         rSMG1E2N8lY4qW0rWrifxzCpDM+6gyIDc+6j4RZXqoEPIiHRUux1oOwn9f+9dgTZkhJo
-         ibCJi3c0zDYd7b1kRLjrB8t4w8go8kM+z13BksEXhe+l4Thk7cLwm74dQ9NHkh5L2rVv
-         /ZDuVkGh4eP2txNuzbiXw4jJwHjk/kJxRMgmM3kZefskQ0A+KC/6s7bd195GL2dmdkn/
-         s+6Q==
-X-Gm-Message-State: AFuF++lxuVvtfCl8rNM0j4djaBUIkgp+Zv5fOdg02FksiFAXIXD0AzRe
-	lYwdBtTSTdNmnA8MBeZofU4pP0xY/y7zOygwH9moJhv2Wallxd9UdxeaNNpVIA==
-X-Gm-Gg: AYBFou1OCPx/mcI6IJ0+rv6MBfMpMW/lX3t8jZP3sGxviGRGnCZX8EDx5B0qcSiCi9f
-	tU2LA/CLygKZIF35G2+T2V3xocTo/SU8EVaO0TMz0SW2MwEYrQNBPn3Zp8u8rBgh/kfmKrnmWAH
-	ELaf1y8msADqvHOIJP7+YXPFWiqtD7p8jbhN688vaQgz1nF09/UKRvC9Zy2qX9QLQQuslX92RgN
-	ryR5sqkN6KZ4VGGpDs2Er0aRocB3Ig8krjIpuuSJwRAib9pwJTgACZsYNmxaboMY6OiMH1rz6he
-	whX1qgUwmxiTWnkl7ju+lrm/E6FIlVjxdRALmx3Vi8bMukBCFgURyJ5sYmWRVHBJPVge0o0drD6
-	dEowItZ3QopJuD3OENtZO1ku76Vg6oSYkCuHe4SAFPml7o9VROiACSZi65TFiuFDXKnV8KGIipC
-	aEPAVTVmJeKTeffYBiY6fLundQL2q1aYjYjuV/0xGAzZbbkeJ/K2YP/l9k35iGkTrRXiaW2BsUt
-	aWe+g==
-X-Received: by 2002:a05:6a20:7d86:b0:3bf:a543:e7f5 with SMTP id adf61e73a8af0-3daecffe187mr2139406637.3.1789080480911;
-        Thu, 10 Sep 2026 15:48:00 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.236.200])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33ba4fb3ddasm996808eec.30.2026.09.10.15.47.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 15:48:00 -0700 (PDT)
-Message-ID: <6aa333a0.fb0efb2a.1b8054.f77a@mx.google.com>
-Date: Thu, 10 Sep 2026 15:48:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0961579472353444922=="
+        d=1e100.net; s=20251104; t=1789089424; x=1789694224;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        b=LCnE1i4bz/qgSPu8DPb+xrmTQqt693ZFvaawRk8hYHivy69sF45QZW7MQSZmpmTo10
+         bQtVsNnEjaE3PT4Y7M+kiLx6U8H4x0gPdDCdqHL7ti6GzlMWHB8BYcQhqVhDKDXqbbxx
+         w8utG2Lu1J7b00XCtxqTnf1X3BNKae5JtMF2mxX4PNavu7vJcC5eyF9zJt5BMIiLpXtm
+         ao6V/7oTD1Sa0QGOd9hTeVBzdaBzCvTqzuF+Z/2Ck8NlDgieHrrFc9qJ7+m6v0x8BwdQ
+         fCW9cUHlpfHvakdFkBc/bAlhkKlG9OUNeN8c47XtwHlT1q2jMiML3aFaGuQWyjFdRtQG
+         AnCw==
+X-Forwarded-Encrypted: i=1; AKwUvBwQjt4KyD3yOq6Rqe0kzMxaijlf/tsVKiAbPyBKrmz9+ENjAYyWnFC5V0cPMQ/n/rQhv6CpS+QG04k6MVpaFPY=@vger.kernel.org
+X-Gm-Message-State: AFuF++l2HWRaMpCguiVyCideB4/hGbRIXUeI8d/3jL9NcRAw4N4vQ+C5
+	C+Yhn+T/l56AuqR4Rvs/CJqfaM2cG1n3ppZqsPTYDny/P6vENY2APICXR91qarOZMqyi2mPQQkg
+	1DEQqdeh4HFSeHUv/vNg8PaWFdituCfqDIgx3jf42
+X-Gm-Gg: AYBFou37BzIo+Z9SXgPe5qI1n75BcixvPImQLCWQuoAXaJfdK5EMGO0E6lFBg0c697N
+	x3wJE2hCqhoWmlkT3Sw4rXzXxAKQaoeowbjoE48xtHp8JqNIYLmzRwIsuTFrotYRYreqLED6tT1
+	5Hd9F5pyfWVLv52Beat6Mnj1WfExfx0Y9EcblxOMtUT6oATvItcl0TVMOiLqYadPnLskBZo0QgI
+	VeNejF2mmiKmUvnjQB6sbI74a2uaPXECqa+PdtzzOnaL6/6Ct+uiW347SmjQ8FrGIU4pBvB3Ob3
+	8ICYLlvkZL2AViCVMDWZFzD/Chzxfx/6Ys0pXiK1WfTSrlG4bRxqQ+aD+WaN4bJQZ3GHdozOTqY
+	wlpJW+kf/9YOIB0WT1v6qHrV8bLY+jS6FehQ1lcJBVfTdpyNyFcrOJ+Dq7FYKk1HvLkApAPGip0
+	pALM4A4Ma+UMXvd5CnDXM93N0o5P+TBQ==
+X-Received: by 2002:ac8:6f11:0:b0:52f:64c4:8094 with SMTP id
+ d75a77b69052e-530c87226a9mr49908141cf.39.1789089423282; Thu, 10 Sep 2026
+ 18:17:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, farhad.alemi@berkeley.edu
-Subject: RE: 6lowpan: do not compress headers that are not fully present
-In-Reply-To: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
 References: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 10 Sep 2026 18:16:52 -0700
+X-Gm-Features: AcwNN1VGil1vFMyCvGxTO0Uen3SBrfMM4J1yekoBWYuH_50vYwcqY9LxSE-7cx4
+Message-ID: <CANn89iJg-10Xy_N_h3Et3wTasS_7RMkwxsz3XKmzYc7mLhKa-Q@mail.gmail.com>
+Subject: Re: [PATCH] 6lowpan: do not compress headers that are not fully present
+To: Farhad Alemi <farhad.alemi@berkeley.edu>
+Cc: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, falemi@asu.edu, 
+	Simon Horman <horms@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0961579472353444922==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Sep 10, 2026 at 1:31=E2=80=AFPM Farhad Alemi <farhad.alemi@berkeley=
+.edu> wrote:
+>
+> lowpan_header_compress() pays for the IPHC header it pushes by first
+> calling skb_pull(skb, sizeof(struct ipv6hdr)), but that pull is a no-op
+> when skb->len is shorter than an IPv6 header, so the unpaid skb_push() ca=
+n
+> drive skb->data below skb->head and into skb_under_panic().
+> lowpan_nhc_check_compression() has the same missing length check,
+> committing to the next-header compression path without requiring the
+> nhc->nexthdrlen transport bytes that nhc->compress() reads and
+> lowpan_nhc_do_compression() then pulls.  Return -EINVAL from
+> lowpan_header_compress() when pskb_may_pull() cannot produce a full IPv6
+> header, and return -ENOENT from lowpan_nhc_check_compression() unless the
+> IPv6 header plus nhc->nexthdrlen bytes are present, so that the nexthdr
+> falls back to its inline encoding.
+>
+> Closes: https://lore.kernel.org/all/CA+0ovCjTsygN76s2o=3DTZqPqW8v2gBhmRnz=
++q6G-NaB3Cq-YPqQ@mail.gmail.com/
+> Signed-off-by: Farhad Alemi <farhad.alemi@berkeley.edu>
 
-This is an automated email and please do not reply to this email.
+Notes in a semi random order.
 
-Dear Submitter,
+1) You forgot to tag the net tree in your patch.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+2) You forgot the Fixes: tag
 
------ Output -----
+Please look at Documentation/process/maintainer-netdev.rst for more details=
+.
 
-error: corrupt patch at line 4
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+3) In net/6lowpan/nhc.c, calling pskb_may_pull() inside
+lowpan_nhc_check_compression() can reallocate skb->head (via
+pskb_expand_head()).
+When this happens, the 'hdr' pointer in lowpan_header_compress()
+becomes dangling. lowpan_header_compress() continues to dereference
+hdr throughout the rest of the function (hdr->nexthdr, hdr->hop_limit,
+hdr->saddr, hdr->daddr), leading to a use-after-free.
 
-Please resolve the issue and submit the patches again.
+4) Callers of lowpan_header_compress() do not check its return value.
+In net/bluetooth/6lowpan.c (setup_header()) and
+net/ieee802154/6lowpan/tx.c (lowpan_header()), the return code of
+lowpan_header_compress() is completely ignored. If it returns -EINVAL,
+they proceed to transmit the malformed/uncompressed skb anyway.
 
+5) In net/bluetooth/6lowpan.c:setup_header(), there is already an
+out-of-bounds read before lowpan_header_compress() is even called:
+hdr =3D ipv6_hdr(skb);
+...
+memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
 
----
-Regards,
-Linux Bluetooth
+If skb->len is less than sizeof(struct ipv6hdr), reading hdr->daddr
+is already out of bounds. The driver's transmit path (bt_xmit /
+setup_header) needs to validate skb length / pskb_may_pull before
+touching the IPv6 header, and must check the return value of
+lowpan_header_compress().
 
-
---===============0961579472353444922==--
+Thanks.
