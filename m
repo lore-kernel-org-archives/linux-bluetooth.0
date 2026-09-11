@@ -1,238 +1,191 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DAE55D875
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 19:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADBA582B98;
+	Fri, 11 Sep 2026 19:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789156026; cv=pass; b=Frg2TcoNcyc6KsASi/5937uXALu41FJL/g0aDDjnCola1Ugp2SnjAgr2edIB1qMpf+51Z0GprCtn259GC0b7k1/l+YnTjsI7MmCYA3duaMpdf1iUQULXqVWpz7qcZTS+DyNOrsjatBbuhZSZca+n+CGOGQFlFD5SCpNdnZLSqp4=
+	t=1789156605; cv=pass; b=gKCqJYzk2mQWJvdFW+ZuW9ZJZe0COvL8sc19q6C8M5am2BUJ3oRVmDEf2Ej4tA/Y6YZuyAEQ112q145zNw/viDKL3Y4NRQYazLOnre0SOH+wuai6ak5WRe36VZYPUoKoFcC2w6uju94wnBbnr3RaRM4cQ57NMnPmneiaZp2CbnA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789156026; c=relaxed/simple;
-	bh=4Pgq/kKZ1fIZC/UxU29VuN7OwdaNT49Enb+1FZshsLY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UDY7Y72E8nJXCg6KkG0Is/vwOkhRmCMW6DnBSswF8Qdiy2VSY/ogWNN5Etd6V5LkHLfHCSBaVFmNaSV0Thsmw3J7jtxYeu3TAPCYQFBzuI7hLr7DuC3E/WALxpcEke1a+9ZoVJ+M7bJESeuBHTby89U4ikbrpKpbdzUC/4M41ZI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C8/kbSM/; arc=pass smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789156605; c=relaxed/simple;
+	bh=UIdudTzdNH4gipP1faAe+Hnlz/Hi7ayLLCa9/fXfE84=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=sObP59YepN0ktvH/pVlksSUK9T8GZ1SX3UzizbNnBXCYaks3h1WIxjcvXO38PuRrHRC7peSU5UlvI+2VMz73rBMLXufXP/PYewkvz2SA9EbvIHxcPkikDA0q2yw5gjo1VkilDs89LqS+e17cRAjCFUNAFd0Ri2uv1nCOy8+Hu2g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=kUu1r14N; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8/kbSM/"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-85a50f6a7f7so16718657b3.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 12:47:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789156019; cv=none;
-        d=google.com; s=arc-20260327;
-        b=kvqwf0y73F6T1EdeARxo/hZkjgzK9Lzup6J5qXxpg19y4v7ydQDbneXZuD/GB85Gvd
-         zwU7H0MiWVOTXypvzid43sDu1l9tvPlT+CoK75v7Iih9kzUKuUE5gS6YseQoBRbAG8Si
-         TmdOOiDhGt3Opi168M3n26CGB2CCMMxZqBYLjkurlqhE2aEksZfBWGdWmD6bL0ycfmNa
-         sLqMeZaHRKjucc2BiNWdSTMF+yuIJ5Iqf21dMS0ACOzYIyauFGkJ1E4lFAXtx3/by+6P
-         OuaraYrrDJ1C0+6yBsGmQHUYvmZF0OPamB3WgCzQA1ctuiGX8Cm0KXO6vp9V8APgSNZc
-         DtZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vEFK8So0/pZqx68P/OtJ4GhuYFvhNn4CI49Oqkonlgo=;
-        fh=wljju4BJ1TLs2hFG/KqOLK2j9MG8c/Ttf+SGHPQfrgU=;
-        b=Rk35gKPkpzNemUBA7EyrdQqLe/8hKUCJPl15bU7rNzDl21cunjU35eCwzHbfIjItK+
-         8pbhN4spjAn8I2Mjv4mxq4BQAKqd/MaJq1evrpK624DbQcoh2DzRyoUmdf07mFTCNRz/
-         LKVpT+VQAv/YQK86mQmJ6igRJbrbx1F8L70o82kJeVwopY8rCfZefVRecRPqfU6JwFuy
-         XchtA3aXGCgS4J0sgQl/4QcUbSyJ7sapidL6GchmZqdub+1t2m0/eHS21t2Cikryklr7
-         8mPP10HHoIBhLkKC3N9VcMjcmqO2ZyOGgEKD/t/kuMuDIqzgrmxJ35rdogIhQp1hWmu+
-         GeGA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789156019; x=1789760819; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vEFK8So0/pZqx68P/OtJ4GhuYFvhNn4CI49Oqkonlgo=;
-        b=C8/kbSM/n1uC53MyHe5YJ1txoHvwzlR++afZQuNPzbm9OzpW0e9LxPXXlfysRY4rv0
-         OSlFbYd7F4tgJ+r6tPbas49KBy7rmS5uscwgSUVA40GyOkYpdF6lOMsaVd8WNQ6HektJ
-         756bc7eYzM/GsHEr/E5I/pc1zt8aC0XndgnrzmYJuEyKOAsLzCP1s917U/BZWdVO+INM
-         7JqqrFBkUs3Hh9neO98MKlvUq9ro2cmdy56+IIiy3HTDUlBCrGeoSXGkyFI8VqB5cJaa
-         w4H+LjQZsRw9RQmYlWNDMj3Tz63t3UG6AnYBJbwMuT06/PaNa79qjl+Uhtd6KpR/XO1q
-         XXFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789156019; x=1789760819;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vEFK8So0/pZqx68P/OtJ4GhuYFvhNn4CI49Oqkonlgo=;
-        b=JqBZfHqZRvbI6GHe6I8q2TCU/zlRdX7T5UhU/+Mp4ExTp9TSyeR4JbDYn8lucXWVUg
-         7kb/WTHp8uYRS3faUyP0Ar1qvlJ+CJb95HpZCPpB06Mi6OZWKUCtjFkyGYoS3umL8Ma5
-         Q+Lr/UnRhRrrRWxwOs4k7BVq2SB4SDTTWevksZNfBIGelacO9XTAbIQw2Kt5CrfKMKD1
-         6+bCP79rXnUnNZJqlAehsrddcyWVvBAeInjisRLIfXmvqNM1k/55QDXxNvJBi4uy/8hk
-         jrjxgTfj8XpRw8FIRVxkbkpR5LQ+pdOG4TDIbrqJkKpO9NsG7Pn1DOrLP5IfRuHkpgWn
-         AC8Q==
-X-Gm-Message-State: AFuF++msaoLjbGLfawClUhVa/+E4NHKPO+lBx7AEDMdyCF9S6bFvNE05
-	6m8HHsoB5DJdQLsi1d7XHOOEuxFYgMfhOnG2+45NLQCq/DmzY7oEkzTlfETt2de89oSp2ZdPt6A
-	sLDMAvyW/2LQaSiK/KJj247fKHJ0BIs3tq2Yl
-X-Gm-Gg: AYBFou0ItDPk2g9h5AGl/ghcjjQPjWuxwQrDM6yIYD1NNngZkYkQQkR7Db+5/tM/32K
-	mT+OU2OGaKWKtdCvMeMXTFaxpiURhnEytVd9I5CaJPi91JYuzlV+gu2m6hV4+TxPbBfxVceYmig
-	Rd9YMZ3gcQHuEP7kjlnxeY0dQQZDtgz58AOv53EejsLiwmQOzkV7111fK2j3q+vgDtJOEM7VSUe
-	MuIwu7NU2DpkN8eTIMHSl7cXQ5nkRXQP8U5VlAAU0H6HUgY1+Rgg8D8/CkyFK8bqdRdcEoMM7GH
-	dfNghRo1VXLZytoGC0z5ZKIRp2CuaH7CD2mwIvLMzT9aLUi2tYRFqaQIYlA4Z3MACWGtc72wix6
-	0OPsVnIRUQ1quAJU6rfAVP/Ps9zC6PqNY0i86Xoc=
-X-Received: by 2002:a05:690e:4386:b0:66e:587a:5ce2 with SMTP id
- 956f58d0204a3-6712456b8fdmr1535595d50.27.1789156019308; Fri, 11 Sep 2026
- 12:46:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="kUu1r14N"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:6ea0:1508:9::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hhQKD4JH8z49Q6x;
+	Fri, 11 Sep 2026 22:56:16 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1789156577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=x0MV3Gx0q4t6grnOE1aiY7WQIUKmmgDhyNhU3Q0wrZI=;
+	b=kUu1r14NHPTBsd5ckVhGOKkmsR2IlDdTVfECjS+NXjj0dUsdS1XIjIxmoG3y6ezDIxshsF
+	hY9ChQzdaHejyEKHvDoCxWFhLZOhVDFj6dLuwyT7imORcDrvnFRRLynANHkBDfzoL7kV1a
+	FwMkVL8HJyhILcZDz9SeN1a7ZHkWY95CumK5z+38eNsrvgdEBkgQMFImUPhzmam7kIFQhH
+	1vT00GfSC829zvPPeYxk2mjaCEiXXbcl92dIzX04oXDWuIUlnTiqAJFowjjoF02rqaoRDg
+	SUOMYAk+TZpHgjiwxLSclSNQDXOv4qFiuxFjFP0qLuG3CiLID/4ZkOBL3nWcgw==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1789156577;
+	b=nMGMqgv1u0Cdpfx/7f/p3qhj/yIoI/sNCzzI29TC81z8k5VQypwAuHto0vWvt0zsNqTDEJ
+	06d9e41FHxk78kZlKShv6ZDiHxsUqd5hIGhPKIgN5HcndzjMcOk8YI+qOXZ7FugUWtrNk+
+	Pqs+YUTvFeEcYPZBq8t89uzg6markwkvL0Rg3/miyr6KlqfIo5+9PFK1m8vuJ2261HUcKr
+	8mp8v5CASYkMA+2VQLq2Cxhyxkp8CycDech8rk1GcHgYGgtrBj9QrHLySIBHcGEFXMTnMJ
+	7jMcfaLh1iIE1WTQBgkIn6ElpekAAja69ghRQHYNSO4uAIDQtEuZpBsAwge/2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1789156577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=x0MV3Gx0q4t6grnOE1aiY7WQIUKmmgDhyNhU3Q0wrZI=;
+	b=J2pz6OnCrDmvJa5duFBOaBFB9wQmOd28K9D74/dcu1z/WN2/awI/t3JWs6H6/6tJM39Zfu
+	phpjy3YpqejtgQLfsXLduTARNMq70VlaKj7YCBiUyNyX6eSk4nwiy4tOPXq++INPq1LWjV
+	6nTfF2zAXAX7per6pE86ETJ63OJD9EgX5/MimxZnDKnX/m9cWR27jAueP+GtrLQ7psREel
+	KJcBkOnxrr5W0lhuq/YawtlB1s4YjDFRZvSX5qurJvIBw6S2Q9tMkCEEdwksrkOIVn4RHv
+	3B0JpUQbgRbJ7IApV96xKzOyx8mxhwdalKUMmqIVLf7egkFtF1Hmw11nmdaDNw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <7bfc5ec0438b830386ae2899756bb9a7c4b9e123.camel@iki.fi>
+Subject: Re: [PATCH v5 4/4] Bluetooth: btusb: Add support for Qualcomm
+ multi-subsystem QCC2072
+From: Pauli Virtanen <pav@iki.fi>
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>, Marcel Holtmann
+ <marcel@holtmann.org>,  Luiz Augusto von Dentz	 <luiz.dentz@gmail.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Fri, 11 Sep 2026 22:56:14 +0300
+In-Reply-To: <20260911-btusb_qcc2072-v5-4-422754f4e938@oss.qualcomm.com>
+References: <20260911-btusb_qcc2072-v5-0-422754f4e938@oss.qualcomm.com>
+	 <20260911-btusb_qcc2072-v5-4-422754f4e938@oss.qualcomm.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <DLCQ0KQND9EO.2NFOQQ5PCPL9B@pm.me>
-In-Reply-To: <DLCQ0KQND9EO.2NFOQQ5PCPL9B@pm.me>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 11 Sep 2026 15:46:47 -0400
-X-Gm-Features: AcwNN1VlbQijeWY-EBEOKVI7W_STTxJH8pD4ko-LDVQtCnXbY_jkEGJC5IDrkJM
-Message-ID: <CABBYNZ+dzfCRyrLNBFnkaGVs2nkz+y_Eqav6Q_2XN3Axxf59Kg@mail.gmail.com>
-Subject: Re: Bluetooth: eSCO re-setup after HFP profile switch gets no
- Sync_Conn_Complete (Intel AX201/AX211, handle 257)
-To: Caleb White <cdwhite3@pm.me>
-Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Caleb,
+Hi,
 
-On Fri, Sep 11, 2026 at 3:12=E2=80=AFPM Caleb White <cdwhite3@pm.me> wrote:
->
-> Hello!
->
-> After updating to both WirePlumber 0.5.17 and Linux 7.2.3, I started
-> experiencing a weird issue with my Bose headset. I could reproduce the
-> problem on two different laptops, so I had Grok dig into it and the
-> following is the result:
->
-> # Analysis
->
-> After A2DP =E2=86=94 HFP profile switching, the controller keeps using eS=
-CO handle
-> 257 without sending HCI_Synchronous_Connection_Complete on the 2nd+ setup=
-.
-> The host then logs "SCO packet for unknown connection handle 257" and
-> HFP capture dies after ~0.5s.
->
-> This is not the sco_conn lifetime UAF. Patch "Bluetooth: SCO: serialise
-> sco_conn lifetime against sco_recv_scodata()" does not fix it.
->
-> ## Hardware
->
-> Two System76 laptops, same Bose headset:
->
-> 1. Intel AX201 USB 8087:0026, firmware intel/ibt-0040-4150.sfi 202-5.26
-> 2. Intel AX211 USB 8087:0033, firmware intel/ibt-0180-0041.sfi 42-20.25
->
-> Headset: Bose QC Ultra 2 HP, modalias bluetooth:v009Ep4082d082F, address =
-68:F2:1F:03:3F:C9
->
-> ## Software
->
-> - Linux 7.1.9.arch1-2: good
-> - Linux 7.2.3.arch1-3: bad when combined with WirePlumber 0.5.17
-> - BlueZ 5.87-2 (unchanged)
-> - PipeWire 1:1.6.8-1 (unchanged)
-> - WirePlumber 0.5.15: good on both kernels
-> - WirePlumber 0.5.17: good on 7.1.9, bad on 7.2.3
->
-> Same-machine matrix (AX201):
->
-> | kernel | WirePlumber | 12=C3=97 A2DP=E2=86=92HFP 4s pw-record    |
-> |--------|-------------|------------------------------|
-> | 7.1.9  | 0.5.15      | 12/12 pass                   |
-> | 7.1.9  | 0.5.17      | 12/12 pass                   |
-> | 7.2.3  | 0.5.15      | 12/12 pass                   |
-> | 7.2.3  | 0.5.17      | 1/12 pass (first cycle only) |
->
-> Failure only reproduces after a cold boot (or equivalent). Reloading
-> btusb/bluetooth without reboot often "heals" it until the next reboot.
-> Parked on HFP with no profile switch: capture is fine.
->
-> Userspace trigger: WirePlumber 0.5.17 BlueZ monitor rewrite (cb92ef98 /
-> issue #1013). Autoswitch Lua timeouts are unchanged vs 0.5.15.
->
-> ## Reproducer
->
->     card=3Dbluez_card.<addr>
->     src=3Dbluez_input.<addr>
->
->     for i in $(seq 1 12); do
->       pactl set-card-profile "$card" a2dp-sink
->       sleep 1
->       pactl set-card-profile "$card" headset-head-unit
->       sleep 1
->       timeout 4 pw-record --target "$src" /tmp/cap$i.wav
->       ffprobe -v error -show_entries format=3Dduration -of csv=3Dp=3D0 /t=
-mp/cap$i.wav
->     done
->
-> Pass: duration =E2=89=A5 3s. Fail: ~0.04=E2=80=930.6s, then spa.bluez5 tr=
-ansport error.
->
-> ## HCI (btmon)
->
-> First HFP open:
->
-> - Enhanced Setup Synchronous Connection =E2=86=92 Command Status Success
-> - Synchronous Connect Complete handle 257, eSCO, transparent, 60-byte pac=
-kets
-> - Capture succeeds (~4s)
->
-> Tear-down (back to A2DP):
->
-> - RFCOMM AT+CIEV: 2,0
-> - HCI Disconnect handle 257 (reason 0x13)
-> - Disconnect Complete (reason 0x16 Terminated By Local Host)
-> - Kernel: hci_disconn_complete_evt =E2=86=92 hci_conn_del
->   deleting SCO type 2 (ESCO) state 9 (BT_CLOSED) handle 257
->
-> Later HFP opens:
->
-> - Enhanced Setup Synchronous Connection =E2=86=92 Command Status Success
-> - **No Synchronous Connect Complete**
-> - BR-ESCO data still arrives on handle 257
-> - Kernel: "SCO packet for unknown connection handle 257"
-> - Host still issues Disconnect 257 when switching back to A2DP
->
-> One failing trace: 5 Enhanced Setup commands, 1 Sync_Conn_Complete.
+pe, 2026-09-11 kello 01:00 -0700, Zijun Hu kirjoitti:
+> QCC2072 has a Peripheral (PERI) subsystem to support the BT function
+> unit, the transport wire is owned by PERI and carries both BT-HCI and
+> PERI-HCI frames, as shown below:
+>=20
+>                  _______________________________
+>        USB I/F	|	   internal link	|
+> BTHOST --------	|---- PERI -------------- BT	|
+> 		|_______________________________|
+>                 (other on-chip subsystems omitted)
+>=20
+> PERI has its own command/event/ACL traffic, memdump, and firmware
+> (PATCH and NVM), all different from BT's own, and BTHOST needs to
+> interact with PERI directly.
+>=20
+> To support multi-subsystem controllers, add btusb_qcom.c/.h as a new
+> transport-specific design:
+>=20
+> - Multi-subsystem memdump collection.
+> - Generic PERI event handling, and sending a PERI frame then
+>   syncing an event sequence.
+> - Downloading PERI firmware (rampatch and NVM).
+> - Recovery on command timeout or hardware error event.
+[clip]
+>=20
+> +/*
+> + * btusb_qcom_send_frame - send a frame for BT or PERI
+> + * @hdev: the HCI device
+> + * @skb: the frame to send
+> + *
+> + * Implements hdev->send().
+> + *
+> + * Return: 0 on success, or a negative errno on failure.
+> + */
+> +int btusb_qcom_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
 
-This looks like a firmware bug, in my opinion. Even if the firmware
-believes the connection is still active, it should have refused the
-new connection attempt, so something is definitely off here. Btw, is
-the same firmware being used across the different setups? It would be
-really weird if it were some timing issue related to WirePlumber.
+This one should have __context_unsafe(/* conditional locking */)
+annotation, or no if (need_lock), to avoid warnings on LLVM 23.
 
-> Debug dump at miss time (conn hash): only ACL handle 256 (Bose) and LE
-> handle 2048. **No SCO/eSCO hci_conn.** Firmware is still transmitting 257
-> after the host deleted the object.
->
-> ## What we tried
->
-> - Binding unknown-handle SCO data to a pending BT_CONNECT SCO conn: never
->   fired; there is no pending SCO object when the packets arrive.
-> - sco_conn lifetime serialisation patch: no change.
-
-You tested the same version working with one version of WirePlumber
-but failing with another which suggests the kernel shouldn't be the
-culprit.
-
-> ## Ask
->
-> After Disconnect Complete on eSCO 257, the Intel controller reuses 257
-> without Sync_Conn_Complete. Should the host:
->
-> 1. refuse a new Enhanced Setup until 257 is really gone, or
-> 2. treat incoming eSCO 257 as completing the pending setup even without t=
-he event?
->
-> I can attach the .btsnoop and reproduce on either laptop.
->
-> WirePlumber report (userspace trigger):
-> https://gitlab.freedesktop.org/pipewire/wireplumber/-/work_items/1013
-
-
+> +{
+> +	struct btusb_qcom *xport_data =3D btusb_qcom_xport_data(hdev);
+> +	struct btqcom_data *qbt_data =3D hci_get_priv(hdev);
+> +	bool is_vendor;
+> +	bool need_lock;
+> +	u8 pkt_type;
+> +	int ret;
+> +
+> +	if (qbt_data->category !=3D QBTC_CAT_MSUBSYS)
+> +		return xport_data->send_bt_frame(hdev, skb);
+> +
+> +	pkt_type =3D hci_skb_pkt_type(skb);
+> +	is_vendor =3D pkt_type =3D=3D HCI_VENDOR_PKT;
+> +	/* an empty vendor packet has no path to reach here */
+> +	if (is_vendor)
+> +		hci_skb_pkt_type(skb) =3D *(const u8 *)skb_pull_data(skb, 1);
+> +
+> +	pkt_type =3D hci_skb_pkt_type(skb);
+> +	need_lock =3D pkt_type =3D=3D HCI_COMMAND_PKT ||
+> +		    pkt_type =3D=3D QPERI_COMMAND_PKT;
+> +
+> +	if (need_lock)
+> +		mutex_lock(&xport_data->tx_mutex);
+> +
+> +	if (is_vendor)
+> +		ret =3D xport_data->send_vendor_frame(hdev, skb);
+> +	else
+> +		ret =3D xport_data->send_bt_frame(hdev, skb);
+> +
+> +	if (need_lock)
+> +		mutex_unlock(&xport_data->tx_mutex);
+> +
+> +	return ret;
+> +}
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
