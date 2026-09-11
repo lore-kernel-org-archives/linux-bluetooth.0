@@ -1,136 +1,215 @@
-Received: from mail-244122.protonmail.ch (mail-244122.protonmail.ch [109.224.244.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914E83BED44
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 09:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB0949E129
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 10:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789119569; cv=none; b=p/58iOvrDsbPG4u8LInPSwPGTrTY5uxY5njrqTtuQGtkYyA46PRdhi5jEH2+futSeLBrSXGL7JtwwuuPfvWXjzFSPG9ZcjmAWZZEGKpCLdM3oWQn1zdSud0bP4FatmdRiU6ueppR781X7Jm0DEuZ18LKso749xSrASDt0Z9q/vM=
+	t=1789121852; cv=none; b=h1CIPMQtJZ4wOVaN6qnMu12Jvg5xL2EwOjtqvwB8w2kQ/PeEmHlta4AFK3EyaNQEE4lXs/khDwkaiLg3lBfvQhQpxbUDKKNYg/MPbJDPs7U/uinIbuVbCRn5Mc+ObJOZW96StstUG0MLhjsR9Oewl8KlFS3FppPa2ZL4Fa4Z08E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789119569; c=relaxed/simple;
-	bh=wLKGCzBY4sX9VCaGpVxjuejmnyUu4j0g5ad0GPZGqW0=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dhCxyH8rdoULE82h0A4RlGTLbti+517vThwqRqLyoRnAm1NHUGuVp3QrFmQ/bAepUjqmHe0n17eHXkdxkGGgMljjs+5ferruzw8+AFyTIZFo9mtxkvDvdIpStKFZ+m4gLYMXu0axouACZ0xJcisEfHCvYQd8JrNEMI3wLp3K1+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=MTnw08GI; arc=none smtp.client-ip=109.224.244.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1789121852; c=relaxed/simple;
+	bh=vxGdw4RpqCbxbUT2P46tZgZWvO9ULvrMuhsJMt1jtT8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jgeni61yQelNy17K8kE3IyY0eBdPqt5oPKPsAuPfDStAdRlPsj9S/cQSsmLJOtEceO4ERUjpg2q3jyYUQlzvKcuXtaAVoczM6dNajD9uOhDebGFjtpDMVjTE1cm/CNjX6eYHOLFkyMD1fG7hlwAW+VNnJA4jpeDtMxn0sr7p4j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=irPk3bgG; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="MTnw08GI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1789119559; x=1789378759;
-	bh=y13xzxjeBXVdL02ezmce+5eyTzocO9iLF6PPN/+5D5E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=MTnw08GIwQCydCToq6gmIAlHLGseivvb9uJfbiT5oZxO3l3oDgIU54fq1BESmZ9Az
-	 Uj1V/lwTWBb2t9gZ/m4XesytDHVxRsf5K790rCX0azWXNqodMUiN9ZLxYxeOJFovgg
-	 dbWY066rMfAnfb1mCnUNSYjKvQ9j+OPhzJqt3yrooVFkRrl2EvSRss5LYZfjd7mTw2
-	 YLPszRjtfvQnKKhTHJ9BFboxIbp5T0UYDV5jXo477g0xFI3FDFKGOyVRVi1Z1xmFd6
-	 TugpgBQ1NT35+eeGaPOY2GSAxSv8Q1R7dVkKcCnW3Im8ZD4O9LNV9uj7ciFn8mJ4Y6
-	 qWaqNybkzbxzw==
-Date: Fri, 11 Sep 2026 09:39:15 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Sergey Lebedev <lsa.uz@pm.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Kiran K <kiran.k@intel.com>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Ravindra <ravindra@intel.com>, "Vladimir V . Kondratyev" <vladimirkondratyev2@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: btintel_pcie: controller left dead after a boot-stage error, 1 in 12 warm reboots
-Message-ID: <20260911093904.68667-1-lsa.uz@pm.me>
-In-Reply-To: <20260831124952.87484-1-lsa.uz@pm.me>
-References: <20260831124952.87484-1-lsa.uz@pm.me>
-Feedback-ID: 113843758:user:proton
-X-Pm-Message-ID: b7d9a7961c90f8ddf1cf1d98eb2189b824f357a5
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="irPk3bgG"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-90cc372d6b2so8355976d6.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 03:17:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789121850; x=1789726650; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=YsrCwouCjtTxysbXhgdzINif0mpm3l4Q+APZU0gh9jY=;
+        b=irPk3bgGkBVDGlvs/gTta2SvjSc8tvxeAUHmwbZyBzVLfwTDX6IREG5outRCHNdcob
+         rJ3x5P7/jKffhIzqnwrjP2Szs9U7hYudlv9IrOFif4rxV3wmirq6XnNLoOgOJfzHcthS
+         uNXpMdmKQrLXdTASLofkvhHCpWrtGc/Z6pvbOBarRA0QQ1MtgH0d60Pb8QdwV/XqX572
+         JP9FWEn0h7w6x8OuzmMKBl9qHPmHxOsZLqY4gJw+MYp7sQdvZKoAg3f3J8Kpm8xFQPIq
+         U6Qjpt+h5c5U5xUYoZRjzwtJaX242A5XiS9HJRFJ5xL+QhbNJRjyDTjuVx07fivHag8A
+         40Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789121850; x=1789726650;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=YsrCwouCjtTxysbXhgdzINif0mpm3l4Q+APZU0gh9jY=;
+        b=HqIgVD10FDXo8Lk4Ue2g0WIR3BJJ6MW6Ria9wxjHiwLXwEwIYqEwxwLYqY34wVgpLB
+         yWpvFbbQciJKWyMGn0kIj/qp9M2uiWRDjHyozqfLJ0NjfLTkaLM81m3XZLHnPekeus/l
+         nQEjNXXbELcf9gxoeh4cvf52Sc/azwO3ctB9eoW6YdDmgxq1dS3/6s5pkpzo4L3vYkL2
+         eaj9c4Y7Xk1bDzdz+qFY38tWMCeM6dY/ysocuFOxfnD+ux/dhZ7jtSYXSvjQr1erolj7
+         PzMEJjF8CPx963vPSiakUNao7O9jd3P9Xrlf0YCsqSa0fZ2dhgrKoJxd3ikFDBm2R0Hm
+         eBTQ==
+X-Gm-Message-State: AFuF++mneve1nswksNQLpH8HPhlfnKtoBtmKGWJpTsWxIhZ84wYtyC8u
+	7WND/LFv6ii4IhOMEyej+4WRMKT1YNP6aP1TJoVLmLGrwnTRWU/wnQwMx4faIA==
+X-Gm-Gg: AYBFou37MEVl85M42ky2alw+WiN1PO8f+C42OiZcU18/5AjBEx8AbYO1Pday3X26VGq
+	Y2E4aEYtjpG5bZGzZsG1I+q/zgJEvOwU3qAwsMRJxtXaB59n4VbQGMaBznDrpMSiW9Bq2bp792K
+	P7/OsO0T5bwAAwT4BNrIw2sBtt9jiYDOz4uMvsHo+c3Ww1aPNJ/fmi6lPK11CZ74As18Vky4FT7
+	1iskS0na6XR+DVXz/sL0WADMHj5Qe4fzspHxL+BhmTdyF8GpVV6xb3xK40m/MklwaPjpgU0jDVu
+	RKDsQs60HHHPzyWl2lrXAcWSpsDRH0bKNBfnciEV+0R26tSNkyjss5cF5Q72YE/aplXT/Gwpf0j
+	GSK8WG5ojZ1WTCKnpx+cJEOLwJeBo62apo0FOmVn1U97mAwZ1Ixt3CvpQFtBtVtKgRSkL3Lefuq
+	Do1YtP5BkJSOL4GXt1KN15omvdumfzx69crMPOXLvEyyN0P9A06kH/QlPV21S6whHV4xk/S+PYJ
+	81UhYeeon9YnNs=
+X-Received: by 2002:a05:622a:1341:b0:530:dae4:81d with SMTP id d75a77b69052e-530dae4376amr8445441cf.27.1789121849465;
+        Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.199.50])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530ca4b9c54sm16120281cf.20.2026.09.11.03.17.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
+Message-ID: <6aa3d539.a52e8b4c.3b0378.9b60@mx.google.com>
+Date: Fri, 11 Sep 2026 03:17:29 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0622025560658290119=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: Bluetooth: btusb: Support Qualcomm multi-subsystem QCC2072
+In-Reply-To: <20260911-btusb_qcc2072-v5-1-422754f4e938@oss.qualcomm.com>
+References: <20260911-btusb_qcc2072-v5-1-422754f4e938@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Following up my own report of 31 August with the measurement it was missing=
-.
-That one gave a rate from a mixed sample and could not say whether the fail=
-ure
-needs a previous boot to have happened. It does not, but it very nearly doe=
-s.
+--===============0622025560658290119==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Same machine, same kernel (7.0.0-30-generic), same firmware, one day:
+This is automated email and please do not reply to this email!
 
-  warm reboots, gap >=3D 200 s     4 of 10 failed
-  cold boots, full power cycle   1 of 11 failed
+Dear submitter,
 
-Cold boots were ~270 s apart, so they are compared against warm reboots at =
-a
-similar cadence rather than against the whole warm sample. That matters: th=
-e
-raw figures are 16 of 30 warm against 1 of 11 cold, but most of those warm
-reboots were 60 s apart and quick reboots fail more often on their own - 61=
- %
-under 120 s against 40 % over 200 s. Against the matched 40 %, one failure =
-in
-eleven gives p =3D 0.03; against the unmatched 53 % it would look three tim=
-es
-stronger than it is.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1162689/
 
-The cold boots were automated: rtcwake arms an alarm, the machine powers do=
-wn
-fully, the firmware wakes it, a boot service records whether the driver pro=
-bed.
-Eleven cycles, no hands.
+---Test result---
 
-Where it stops, unchanged from the earlier report:
+Test Summary:
+CheckPatch                    FAIL      6.79 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      1.21 seconds
+SubjectPrefix                 PASS      9.73 seconds
+BuildKernel                   PASS      22.86 seconds
+CheckAllWarning               PASS      26.27 seconds
+CheckSparse                   PASS      28.56 seconds
+BuildKernel32                 PASS      23.28 seconds
+CheckKernelLLVM               FAIL      22.05 seconds
+TestRunnerSetup               PASS      584.99 seconds
+TestRunner_l2cap-tester       PASS      34.85 seconds
+TestRunner_iso-tester         PASS      81.12 seconds
+TestRunner_bnep-tester        PASS      9.69 seconds
+TestRunner_mgmt-tester        FAIL      118.27 seconds
+TestRunner_rfcomm-tester      PASS      12.93 seconds
+TestRunner_sco-tester         PASS      18.08 seconds
+TestRunner_ioctl-tester       PASS      13.81 seconds
+TestRunner_mesh-tester        FAIL      15.99 seconds
+TestRunner_smp-tester         PASS      12.08 seconds
+TestRunner_userchan-tester    PASS      10.04 seconds
+TestRunner_6lowpan-tester     PASS      12.35 seconds
+IncrementalBuild              PASS      44.84 seconds
 
-  Bluetooth: hci0: Firmware loaded in 75464 usecs
-  Bluetooth: hci0: Device booted in 3338 usecs
-  Bluetooth: hci0: Waiting for device transition to d0
-      Timeout (3000 ms) on alive interrupt, alive context: intel_reset1
-      Intel Soft Reset failed (-62)
-      Controller in error state
-  btintel_pcie 0000:00:14.7: probe with driver btintel_pcie failed with err=
-or -62
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v5,3/4] Bluetooth: btusb: Build the driver from multiple source files
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#167: 
+ drivers/bluetooth/{btusb.c => btusb_main.c} | 0
 
-btintel_boot_wait_d0() waits on INTEL_WAIT_FOR_D0 and, when the notificatio=
-n
-does not arrive, returns -ETIMEDOUT. There is no second question asked of t=
-he
-hardware. btintel_pcie_set_dxstate() waits for the same class of notificati=
-on
-and then reads the boot-stage register to see whether the controller got th=
-ere
-anyway; that fallback is why the suspend path survives a dropped interrupt =
-and
-this one does not.
+total: 0 errors, 1 warnings, 11 lines checked
 
-What the cold figures add is which of those two stories is true. A full pow=
-er
-cycle clears everything the previous boot left behind, and the rate falls f=
-rom
-40 % to 9 % - but not to zero. So the dropped notification is not an artefa=
-ct
-of re-initialising a controller that was already up: it happens on a cold
-controller too, just far less often. Leftover state makes it much more like=
-ly;
-it is not the cause.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Recovery is unchanged and total: modprobe -r btintel_pcie && modprobe
-btintel_pcie brings the controller up every time, from the same state that
-killed the probe. The hardware is fine; only this wait gives up on it.
+/github/workspace/src/patch/14807477.patch has style problems, please review.
 
-So the question I am asking, and it is a question rather than a patch: shou=
-ld
-btintel_boot_wait_d0() get the same backstop - read the boot-stage register
-before returning -ETIMEDOUT? I have not sent one because the D0 state is
-reported through an hdev flag rather than the register that set_dxstate()
-consults, and I do not know from outside whether the two are meant to be
-equivalent on this generation. If they are, the fix is small and I am happy=
- to
-write and test it here. If they are not, that is the answer and I will stop=
-.
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
-Hardware: Intel BE201, 8086:a876, on a Microsoft Surface Pro 11 for Busines=
-s
-(Lunar Lake). Firmware 2026.8 build 113003, SHA1 0x08f159a0 - unchanged
-throughout, so nothing here is a firmware regression.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Sergey
 
+[v5,4/4] Bluetooth: btusb: Add support for Qualcomm multi-subsystem QCC2072
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#522: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 4929 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14807478.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v5,4/4] Bluetooth: btusb: Add support for Qualcomm multi-subsystem QCC2072
+
+8: B3 Line contains hard tab characters (\t): "       USB I/F	|	   internal link	|"
+9: B3 Line contains hard tab characters (\t): "BTHOST --------	|---- PERI -------------- BT	|"
+10: B3 Line contains hard tab characters (\t): "		|_______________________________|"
+##############################
+Test: CheckKernelLLVM - FAIL
+Desc: Build kernel with LLVM + context analysis
+Output:
+
+drivers/bluetooth/btusb_qcom.c:4269:6: error: mutex 'btusb_qcom_xport_data(hdev).tx_mutex' is not held on every path through here [-Werror,-Wthread-safety-analysis]
+ 4269 |         if (is_vendor)
+      |             ^
+drivers/bluetooth/btusb_qcom.c:4267:3: note: mutex acquired here
+ 4267 |                 mutex_lock(&xport_data->tx_mutex);
+      |                 ^
+drivers/bluetooth/btusb_qcom.c:4275:3: error: releasing mutex 'btusb_qcom_xport_data(hdev).tx_mutex' that was not held [-Werror,-Wthread-safety-analysis]
+ 4275 |                 mutex_unlock(&xport_data->tx_mutex);
+      |                 ^
+2 errors generated.
+make[4]: *** [scripts/Makefile.build:289: drivers/bluetooth/btusb_qcom.o] Error 1
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:549: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:549: drivers] Error 2
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/github/workspace/src/src/Makefile:2187: .] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.103 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.363 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/752
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0622025560658290119==--
