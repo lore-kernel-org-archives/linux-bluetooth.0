@@ -1,152 +1,153 @@
-Received: from mail-qk2-f12.google.com (mail-qk2-f12.google.com [74.125.230.204])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066C53E557D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 02:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789094490; cv=none; b=Q4t/fDN3IiO/yVCoxqU2m+ikb+xIzi8a+NZ5AEM4XGUyL+1QBBeOrYr8538JGNw/e3PMlna2Uki+JcLpc+Mr33dt3bFgCsllLFdG9J5fwXWnL8R6B609iIPI0MdUShXTm/tfU3hdOn+TiIYdF67HJQi5w9sKOV40PTGqoPymGXE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789094490; c=relaxed/simple;
-	bh=sjESdcS2EM2vEsLu6P8HDo2aEZEHCuRQIE8x3kwLsDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N8wvi4Yns9vEhsk/+JLYz3xYaY5EdNHkLj0vywmAY0lGIGpJFNI9aJMxdwi6Ug54cqhCHAQvWdYyIPJ/fdSPmFTw/OrQwkkeCYJJsdD+Ps9pO42HFKhIT3xBbil8SwDX1PEWRpFEcYr3YEM+0e+wQm88FY4f8zez1lW51tvKZv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SabW6JuD; arc=none smtp.client-ip=74.125.230.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185373DD526
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2026 02:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789095424; cv=pass; b=TcThIoiJrczcnifnDkRjPs0yKjcb5fwKoiiymapGdslPI4GTFSx5CGI/oSoAqr4hBPQWajoIiqhvx5mD9WZXyjPCz0EgR/wFVRSp2j+KaB2WdjhjGrWifMRxwkbe0pRssefKrr74WG9COxAedOb4y2LP4eBX/YQKbBf1VNgSF48=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789095424; c=relaxed/simple;
+	bh=cjFVbWr0n2PHwZEZYXTrr8FI/1Tll+OCkxuLUvZ3xws=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LJfGDzY22oLhhmtbK43zmN2FRwcpA6EiWFn9oyQbjeNSJlCmMGSyx6ANiZI0YGJmPpUvOAxzBqpbWopeLnMvH9GKaycPIPkb4Ur0lFbDsuw+Z/KfDMCbGvpiNXSwEBHQSuli39vzbWQbrroTt9/tkZ8DagsuzPJgwNThny2JeqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OjN1hGJx; arc=pass smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SabW6JuD"
-Received: by mail-qk2-f12.google.com with SMTP id d75a77b69052e-52fb766bfd6so6467471cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:41:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjN1hGJx"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5b568dae0e8so450766e87.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2026 19:57:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789095420; cv=none;
+        d=google.com; s=arc-20260327;
+        b=iiTCv3Yj712TeFBBKGEt7msusEiq0BHOAzN7ZM75/eL61n5UMHQlvoub7D31plSENu
+         SkoxFou/Y2siMIXM7VEaiQQucPXAkVoQUUiUIy07ytakwCEDziBQpJNRWoRATuHv5xag
+         prKiQHZqg0kOyFCxPy7YZd22Vfo5EIJt3HjvUiq8cb4gXN1YpE0y4GvqPUeh3tKAruU8
+         E1sTQAyGdFk6LXWTeY5/AlGr6x1Lu2mFegY63Wlbbt2PO/Gj9CTt52cOstY37686Dqgm
+         S/StnehREh4jtGlhUj9k+Q14SeMDYY5pw1If3hMEzCdeLChyEhSzg/B1m4eEu2KP9pcI
+         xAOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yO3bAnLYqUUnMiJVzUh/kgUvHixuF89y5iw3GDpzNnU=;
+        fh=b+vYqsvc1k4Z5hjAPm2K4bZJasGvbb0pj1ZeSx+i5wk=;
+        b=q4zUeXheo49msR7LVMCY7kxa62oesE2sY5NhVR6qO0CJnz1BdXR7ftQgjT415np5qF
+         AhG8JGFqae50iYJKz2fc2p9QWzO6L2r3M9FSordthuFEc+D3sYfgGdESaPTXbTHCmYDl
+         wqK96B5uEUofp7MWtp+VZkOTG+MZqV3IjzfjsrXkzMKlmHxGbr62+BEw7DjZtTYwaf1h
+         YaiULKfzOwYq1Y4p/FfAPTt2lygxhwfs8eILZXJDGSZkmzE1dmNrHOl2u8KyvNU92U5G
+         nzxWdNhPGrims18YKEMstS5OLZVQAOyAK311XS5fnBjA2haqAJeT/uFSElScYcp66qxg
+         zNlg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789094488; x=1789699288; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=n4Dzp3Tnbb5RWA/Zbp2U4elxI7yc4utkRSfWOSPNhYE=;
-        b=SabW6JuDlLPKDN/Xt74mRP4jkxEufO3CnqlqZAipa2FOJX26/jxgAYMrVlG1bzm9hh
-         QWujq8GnP8VCQJ2IaA4euzIDezx4d8CyRtbWdWPInuluYGBe8NrU6WovzM6+RQ47lxXa
-         OGu1LTYtqUF4dQmroCCktPVlMsVqnQIA0hrHIIQnFva5lH5LrPQVek6PMfTcFtnTTRxQ
-         Pio0Qf3wj++uZ0XejeL4lutw43NdmBxCHMUt6qk1qMBiT0luiP+GVc4uuXWZJ2/A04lF
-         Wlivq5FgDfhrN1DnNUDZDKkMFwZ4+13zCG2/OPWTvbBHgGuqYUil+s4b5hzthl2vPtpk
-         uuHQ==
+        d=gmail.com; s=20251104; t=1789095420; x=1789700220; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=yO3bAnLYqUUnMiJVzUh/kgUvHixuF89y5iw3GDpzNnU=;
+        b=OjN1hGJxa1eV0wS1zsAxDaK9Cv4e1UWYfPQm4+dK8vsDP5h+f8zLvfnmNQPVrEgt6i
+         NuuTruMJlmVtGmpnppBZuBFisqJuxtgyE/KlCSkKsS1IA6NH8j0n/LVC6/VGQ7g3V5W3
+         NDTNQ7rV4k9U+RGLtNf7WkpjrLSf/szw0WWXkGCXYctyfT8yPfNQt5khQ9crkAlVHgfn
+         bRANcA4m6yjVYWvhhqH2dhj6cKhfL60h4blWo8OKfgVwNa5PNufe+ZRQqmf+Xp3qrj5X
+         fz0VHFFHoAihPXhMq/eNzkyhp6kuC6hCLoPBmNTi2du55QZoj2OyooO/KOnKbbdNhf1Y
+         Zbbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789094488; x=1789699288;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=n4Dzp3Tnbb5RWA/Zbp2U4elxI7yc4utkRSfWOSPNhYE=;
-        b=LzorzrOeEcQbZWt8rYwGmWyF/5WMBEOr1R85cKxY/nraB8oCMNQPs5Mk2kRjFos7PY
-         ox6H6srW/ATVtSVIssIoBNbxLgfi4lMWYIPHhzT02msVA/mUpQvRXuSu9QiBFZqs9UyS
-         Q9WKrLIjAas0zx+vS5ipkOfjXhT7PujIJzroAYeb/ZFNtuXzDJVmufZRB2A9v6BFgEZ9
-         ofRGSFKWbsDX57243Qu7n6e45ys1kLarA4wvb/4KOIsDef6svChL/2o0/8cViey79rvK
-         sHFaj9BmWVrMxh9m+Z5B39FLwmzbocfWdCh656TPAkguY9JVm0ju8DHwp6eGrPSKUf4U
-         Mg9Q==
-X-Gm-Message-State: AFuF++kLnqXdlwzdur5k37QXnLcJ9XsGIKXNmpkO/IGuTAI2bemPPNAj
-	LayzVZ1YFcFI0RQaZy+4qQxr7ErQJrUfZFuGpaS0EhVnpeEGFMx38qbQ
-X-Gm-Gg: AYBFou1Zkt+UaXnqU4+wM2glRfHh0oM+qvyY+my8GU8+2nbJ1SQ8UMq3T8zSWJ2UFEF
-	TaOqgecyc4KGCbHUSbLw3DdzcatjFF4zE10xcQZjDM0+/EqpPo9w3I6A1TbnY+sMyFOqWq7HKJZ
-	UuMbndNt/Iq9RvLDdt7s5d/wjennEVafR0TiY9XCegeP3tYc4nAJ9FExAjNNrRjHZ6LWEMSX81V
-	QSzcxWcK7CDRoNpRLUiJUa471hQg0zVVb5oIGocZ9jLDjdC1pTCtFGpmlqFPj5AIWUg1agw9gvK
-	+gAfuTo9ekl7SmfIXMO5UJfkQjjHxQf+26Qnx5pdN+TQhpayYowveb+rwQA2kwaE065720xXR6e
-	cMmlBoy2CB48vArtFePrY29+pw+fvWJrneTC/I67gpefBJwjavBKXGp3ewlg6seIj61WY1pRUz7
-	hocCyYL0cukf+6fw+RYbkC1zaJFLViXcNIHyVrhf0wEmU8GGVCsbmsOypCN5VIbDWgIglgg8pFv
-	GXK/TPrxNsMkxvnLQ==
-X-Received: by 2002:a05:622a:5cf:b0:530:9ad1:2f75 with SMTP id d75a77b69052e-530c876eb9bmr36932711cf.42.1789094487939;
-        Thu, 10 Sep 2026 19:41:27 -0700 (PDT)
-Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f4d89f9sm10651196d6.47.2026.09.10.19.41.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 19:41:27 -0700 (PDT)
-From: Yuho Choi <oss.patchbox@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuho Choi <oss.patchbox@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: virtio_bt: Fix probe error cleanup
-Date: Thu, 10 Sep 2026 22:41:24 -0400
-Message-ID: <20260911024124.1527637-1-oss.patchbox@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1789095420; x=1789700220;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yO3bAnLYqUUnMiJVzUh/kgUvHixuF89y5iw3GDpzNnU=;
+        b=NMasD4ITKvUagwueUBFL8hQiqneM9+W5dmMZ5I3wPeTCWg1K+3Sb2OrcrfhWBMxuaH
+         lcyb5z2mtqfluML3ZvfgRE8Fx82kMSybUS885slBY65GHWoLNtxW0vcKxykivdbeIQkF
+         imhgkGT1X+D9byWM+/8wnFJtfmLrKRCQ8AMDQr4wb9JxrvV6OvCCTYP3nbDpKQgGgSMq
+         ISc95fe0xy6fad9R4m6n7PfVndQ3AEe+esKDiVAIczQdoSzZxDhcvw5mAzTODqp/n5fW
+         AwrgTeEO3JzJFwdf+mtJG/D+Lr0uORCu5fjiDrulaDYcOq1de1ccGuIMRUvEaobxF67y
+         JJXg==
+X-Forwarded-Encrypted: i=1; AKwUvBzgA0Qqrb2m/XLOX8TluYiNgtuIDkOf2ZdXyY+K/9y0IrgCCY3zrgeb405EdcUAVCcFUgiqb2RnO9vaeMaEXFs=@vger.kernel.org
+X-Gm-Message-State: AFuF++le5GvNK05rXEhrKqswzdwVNtJajt4cINTJyO5NypWjx7pPlL3v
+	yNuil7thHihYzc7j6rAcWZahRwZKZVmlZ6GvQ4Xur1d9UzW70lKH73A2zG4Ei/btVFvu/xpDlKV
+	BCDvIUZsepI0ApTqacI3385gQ2JQgkyI=
+X-Gm-Gg: AYBFou0T3PTqYJwJ8QC/NrVl+gH2rsOyTb6PkevFYNvDgq+GKPDlevywVz5Q0IZfxsL
+	jIp1QRUaeQzamv8Cixxit2D0Ds1lJ/z3McBGlNIe18FVe0E0FcNKUP46gMmzIqM+d5TaKQAd94e
+	6V8//eRfMdXt8+yemyjTheztK0V5gemwb4HlFpv/dsWhejPxyf16lYAAe3kdM/5YaQhy+bk6+Wj
+	EKY7XZySgl2NCSul4YdV0gIVP3WhxAIFk4RaByoRjp8W8qEB8nIj5mUybqKfhMMRaXv6ROqTOmU
+	zelG36rClh9GhtB05vFZgwOR5eEyjCPbFsCqyuh1OQZxjjSGh/5o9yUbNk676qRKC9Duhhd+VhU
+	ypLUmzlbFYqoU4ggV3aDfhtpIZTc71IULPsKICJ3AxHQ=
+X-Received: by 2002:a05:6512:a8d:b0:5b6:1a7c:fd96 with SMTP id
+ 2adb3069b0e04-5b8a0341041mr462708e87.60.1789095420245; Thu, 10 Sep 2026
+ 19:57:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260717-bcm4356a3-bt-v1-1-ffa2d5233360@gmail.com>
+ <CALHNRZ9ofDZ61YW-ZN07sf8sZ6gx4n-8SusSR_vop7R_vqbGFA@mail.gmail.com> <CALHNRZ-D1Yz1bgp5hJjwBW32Lhd4Lbt0dQj=3wq-xWqp6uSC7g@mail.gmail.com>
+In-Reply-To: <CALHNRZ-D1Yz1bgp5hJjwBW32Lhd4Lbt0dQj=3wq-xWqp6uSC7g@mail.gmail.com>
+From: Aaron Kling <webgeek1234@gmail.com>
+Date: Thu, 10 Sep 2026 21:56:48 -0500
+X-Gm-Features: AcwNN1Uzag0xYPXA-kXRdUNQgxzuc2IOdjhNleIZ3o4xeQ4SLLPf_0AlDlCQ3sw
+Message-ID: <CALHNRZ80CF9Rp0SaDzfgSPSBMWMG+QQ-7FphLAYadt=dRv+qGA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btbcm: Add entry for BCM4356A3 UART bluetooth
+To: webgeek1234@gmail.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Once hci_register_dev() succeeds, the HCI device is published, a
-registration reference is held, and power-on work is queued. If
-virtbt_open_vdev() fails, the error path only drops the caller's
-reference before deleting the virtqueues.
+On Tue, Sep 8, 2026 at 1:16=E2=80=AFAM Aaron Kling <webgeek1234@gmail.com> =
+wrote:
+>
+> On Tue, Aug 25, 2026 at 5:34=E2=80=AFPM Aaron Kling <webgeek1234@gmail.co=
+m> wrote:
+> >
+> > On Fri, Jul 17, 2026 at 4:41=E2=80=AFPM Aaron Kling via B4 Relay
+> > <devnull+webgeek1234.gmail.com@kernel.org> wrote:
+> > >
+> > > From: Aaron Kling <webgeek1234@gmail.com>
+> > >
+> > > This patch adds the device ID for the bluetooth chip used in the
+> > > Nvidia specific Broadcom BCM4356 PCI-E WiFi / UART BT chip.
+> > >
+> > > Signed-off-by: Aaron Kling <webgeek1234@gmail.com>
+> > > ---
+> > >  drivers/bluetooth/btbcm.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> > > index 463d59890befe..14acea7325478 100644
+> > > --- a/drivers/bluetooth/btbcm.c
+> > > +++ b/drivers/bluetooth/btbcm.c
+> > > @@ -506,6 +506,7 @@ static const struct bcm_subver_table bcm_uart_sub=
+ver_table[] =3D {
+> > >         { 0x6606, "BCM4345C5"   },      /* 003.006.006 */
+> > >         { 0x230f, "BCM4356A2"   },      /* 001.003.015 */
+> > >         { 0x2310, "BCM4343A2"   },      /* 001.003.016 */
+> > > +       { 0x2409, "BCM4356A3"   },      /* 001.004.009 */
+> > >         { 0x220e, "BCM20702A1"  },      /* 001.002.014 */
+> > >         { 0x420d, "BCM4349B1"   },      /* 002.002.013 */
+> > >         { 0x420e, "BCM4349B1"   },      /* 002.002.014 */
+> > >
+> > > ---
+> > > base-commit: 49362394dad7df66c274c867a271394c10ca2bb8
+> > > change-id: 20260717-bcm4356a3-bt-cd78cc0f42e8
+> > >
+> > > Best regards,
+> > > --
+> > > Aaron Kling <webgeek1234@gmail.com>
+> >
+> > Are there any thoughts on this change? If not, could it get picked up p=
+lease?
+>
+> I see other changes were picked up a few days ago. Is there a reason
+> this one hasn't been picked up yet?
 
-The registration reference keeps the HCI device and its callbacks alive.
-Therefore, a later HCI send can dereference a freed virtqueue through
-vbt->vqs.
+Something appears to have gone very wrong with the automation related
+to this change. Patchwork reports the id as archived. The
+auto-generated github pr shows as closed with unmerged changes, and
+appears to have been pushed over with completely unrelated changes.
+Can someone please take a look at this?
 
-Unregister the HCI device to withdraw it and drain its work before
-resetting the virtio device, reclaiming queued buffers, and deleting the
-virtqueues. Also, free vbt on every probe error path.
-
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
-Cc: stable@vger.kernel.org # 6.2+
-Signed-off-by: Yuho Choi <oss.patchbox@gmail.com>
----
- drivers/bluetooth/virtio_bt.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index c20d54088c8c..8c55b538deef 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -315,12 +315,12 @@ static int virtbt_probe(struct virtio_device *vdev)
- 
- 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
- 	if (err)
--		return err;
-+		goto err_free_vbt;
- 
- 	hdev = hci_alloc_dev();
- 	if (!hdev) {
- 		err = -ENOMEM;
--		goto failed;
-+		goto err_del_vqs;
- 	}
- 
- 	vbt->hdev = hdev;
-@@ -390,20 +390,25 @@ static int virtbt_probe(struct virtio_device *vdev)
- 	if (hci_register_dev(hdev) < 0) {
- 		hci_free_dev(hdev);
- 		err = -EBUSY;
--		goto failed;
-+		goto err_del_vqs;
- 	}
- 
- 	virtio_device_ready(vdev);
- 	err = virtbt_open_vdev(vbt);
--	if (err)
--		goto open_failed;
-+	if (err) {
-+		hci_unregister_dev(hdev);
-+		virtio_reset_device(vdev);
-+		virtbt_close_vdev(vbt);
-+		hci_free_dev(hdev);
-+		goto err_del_vqs;
-+	}
- 
- 	return 0;
- 
--open_failed:
--	hci_free_dev(hdev);
--failed:
-+err_del_vqs:
- 	vdev->config->del_vqs(vdev);
-+err_free_vbt:
-+	kfree(vbt);
- 	return err;
- }
- 
--- 
-2.43.0
-
+Aaron
