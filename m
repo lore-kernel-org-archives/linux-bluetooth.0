@@ -1,157 +1,144 @@
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C7F33BBAF;
-	Sun, 13 Sep 2026 20:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.76.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE838655B
+	for <linux-bluetooth@vger.kernel.org>; Sun, 13 Sep 2026 21:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789331314; cv=none; b=AA4QtFxeMzij/msA+zDr7Q58Ve1OuJBOIDbHFeqRA/Txj958tFGSZRGLCuTSN84HUnO6Q2fPWspbC+0KBh9PvRCKwto2ECpRVPoNRPqSxXSki6MI+va2NII3H2SF4Advo4Cv6tgbSwj2+SMwnv7M05mg1hb8vHYtZVAZ2GdN+a0=
+	t=1789335689; cv=none; b=IprOF2O0OyGiyhjjavsTXgP8milTbyQV+DZWKdheEU7xpzSd5JTIuM9l7un2op83mj4iUi/XV9ko/HxZiquSlLOtXl99/VJO88XU3fLFOAMHTzi3kGw5/dH5WAehvv7XrgwoT6yoHCkc5To3yblkVl7j8lpZF/isMuz7rt8Tgck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789331314; c=relaxed/simple;
-	bh=bw7og3oUzy8UHTf3vFmCgYQlEDF78JSx4jQrcmwEZQI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=B616KfWkLcyEGsZQ39S7H7sCfUzlaDtKHOAOMbirImqA1rIXT2s6WX1Mzk3uzMznstNRSL/Vln8/f1YBF13RJl6OrAsNuFk/+yW2xMS8A+OnZ7pCwYNL33nAIfF25ar7qEcLuFBGxfMz+q9SrFwvoDk3YNvTECTM1hIrt+k/ACA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=LA5L07vX; arc=none smtp.client-ip=77.75.76.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+	s=arc-20240116; t=1789335689; c=relaxed/simple;
+	bh=MbCzdLsEjQnKwHx6kTgKlWCWfvEgvpEdE5aVPYHov/o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rNlndL1s0C90c74MEk76kJNZHmybQQeK15KZT2oLDAbwbeUC2bKZcT0aiw5I4bl1m2cuJAyihuXCcbfkyiGw6QE9flsGCI8/BrPWGe2cXcQyX5BoWTYBnJ5YfnIuRxFnFqo2n+ECd77B9budBeZuaoGyiWlDYKdwmetOT++sRRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/ZRB1dq; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="LA5L07vX"
-Received: from email.seznam.cz
-	by smtpc-mxb-7c4f5d49cf-t2kxx
-	(smtpc-mxb-7c4f5d49cf-t2kxx [2a02:598:128:8a00::1000:90d])
-	id 35f69b2583cc363c3079816d;
-	Sun, 13 Sep 2026 22:28:09 +0200 (CEST)
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=emailprofi.seznam.cz; s=szn1; t=1789331289;
-	bh=1pKsv0RnQ3KYdaC4eeqV4HCeBs4zRaYdQNenxWAwM7o=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc;
-	b=LA5L07vXbvDzJbvVNf4tqEf75Yyq6D6/RyEJxgj2/4sqXV/Eos9ye/ll4rIRIe39k
-	 pRdAfdBu3ERThB9j/9jZYyZSQecUrAoTJ3dgZ7v+FYB2VEgyUdGsCFY/Blkj+vclSw
-	 8QtvJwS46vqJBl26lYtIAMGV5OhFHx2p/Uii8498pDNvSqCs58etAR5ZRr4pE43mc9
-	 mQrkoFLjPYTaeGlMpRd38MFJteLb/xOTrbWcFk4L43clyLMrkvSFvEpXDZ1Axb+BDv
-	 EJGXjaMhd67pfz74HfftgRHjS1v5gNDPAswqqAbndNIP3QhzV8Yy4A9mcUZGbTTSzq
-	 OkhEbaPBohcPA==
-Received: from [192.168.31.51] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
-	by smtpd-relay-5d885666ff-tvljn (szn-email-smtpd/2.0.83) with ESMTPA
-	id 7fa8645d-c269-4122-87d2-b863a06ea0d1;
-	Sun, 13 Sep 2026 22:28:03 +0200
-From: Radek Podgorny <radek@podgorny.cz>
-Date: Sun, 13 Sep 2026 22:28:02 +0200
-Subject: [PATCH v2] Bluetooth: keep dst_type with dst when reusing an LE
- connection
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/ZRB1dq"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-530f04a0cc6so9364821cf.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Sep 2026 14:41:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789335684; x=1789940484; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Oq0bdICuOSN/bHg+FsjlIb5PxdJv1r1IrVNVLTma8b4=;
+        b=P/ZRB1dqSwUwFjbXigWBnV2tHAulxbfzF/9qnuKriv8XJbWpS5Z/wbO++C+Lr27Zh1
+         w0WSdRJzP9JIPIf3bd/rgl678UnC6k3c/zRX3nQcvEeakBSQxEDtFnaRuLdgPadA9fm8
+         AlGVIlaoO95sJt6bI9KHLcxJb3iJHTTKLmTpO+5PE83iM12rqoxcPiPj/qFrWIfCc+NN
+         3O0bvE81RmRVeDkYB6bK/A3e3/FCeqs7ULcbcCmMo2dvzzGnsxN5jfR5hyGJpcVkP3p5
+         uem1Tu8/pfpQrWy73D0UHrT335kvXX2Bu4Sr/VgcMeDbuCqBsPRXIcV6+BcrgSFP11C4
+         osZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789335684; x=1789940484;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Oq0bdICuOSN/bHg+FsjlIb5PxdJv1r1IrVNVLTma8b4=;
+        b=PmEpN9kV3v0QaqTkRDwZvtZp/6vbI/+BzBTbSn1jzyB5DmExRcRPQggb2Y+v1TUaYW
+         9e1Nc+8PMy/QSRy0sxPNSz5a/gi3/fXUlSDDZeR1SgJo/FEXHtKCoU31GMIh8DLjXkqA
+         FS7r1GW1QXZxigCLLz14oYuOFu/pwbF9yecEFELmy+rcqDrYWjawQy8Cm/wun1BjD6Vm
+         XHmm6X3svQ0W+AWEvXMf9LE4ryyMipSC+RqLjEWOMdW37kRnKoc9QWSmQCfmPff7rHFs
+         ZduHdR7zLMVn82goCu1Rzq7zYTOYPuiDJ7vcarGWzlMC1l0n1WrYYh9u3l3qMLD7gCfj
+         Dgtg==
+X-Gm-Message-State: AFuF++n5ThovFwMe7g0kofzn6Lt0rdwlfJyoOB4+l018TdXf4pn2JLgr
+	MYHZWPc0qSTQNu/NoB+4Ksrpd87G+nPKHD0Avaiw6x/aiYa7bbqrebbA/yFdwA==
+X-Gm-Gg: AYBFou2a63l33zmRSYjIFfSL8/ipLJetEwazC0xWb923FI12Fi5R57fxwIT1lDWUqfl
+	0hH/IwIj5IOBd7JVx4tg/AbQWBALjGlQpmpLdizfm0Fnvbf0xJaZlrinu8P+QhoICi3ccXvGzMq
+	9srhTgtIyqInrjw9ltvtB6fHPGJXN9OEyLy6EP/6P91+69oAuMEOTYlwdNw4Hd0Eyj9TQMX6Kl9
+	wu5czjppVbONx5+8yKORRCykGdJDLcnQ1LRpT9wZ8MjG7CotnPTc51KpsdJ6OZ6LDZYVlFw2QE8
+	zdnW2gcDs+hJPpJOBwJLW+ao3lNcB0nHA+ID3fvE308ARhf4bgeYZSzCN/z+F9x0y7hL4BC/5P3
+	8AOoO5C6IwZVVWatTBYuceI02hTwshIFHY0PcdVFsYdNq22EvncAUKvWAYrRWf/YE1LvLMQFl1x
+	dUlVfCYGi/M5gv+NfIpYmvwbRO8fMoKJ3yhM23trdK2ocmIgB3hdLQR2fIjYVGDl1qTMGkFHEhV
+	DpKhg==
+X-Received: by 2002:a05:622a:1316:b0:530:b2e4:91be with SMTP id d75a77b69052e-530c87a5865mr222287101cf.55.1789335683844;
+        Sun, 13 Sep 2026 14:41:23 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.213.192])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530fa03dc30sm26776331cf.15.2026.09.13.14.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Sep 2026 14:41:23 -0700 (PDT)
+Message-ID: <6aa71883.67d903fa.13fe1d.42c9@mx.google.com>
+Date: Sun, 13 Sep 2026 14:41:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6669361094325302593=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, radek@podgorny.cz
+Subject: RE: [v2] Bluetooth: keep dst_type with dst when reusing an LE connection
+In-Reply-To: <20260913-for-upstream-le-conn-reuse-dst-type-v2-1-ed1d5dd4ae37@podgorny.cz>
+References: <20260913-for-upstream-le-conn-reuse-dst-type-v2-1-ed1d5dd4ae37@podgorny.cz>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6669361094325302593==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260913-for-upstream-le-conn-reuse-dst-type-v2-1-ed1d5dd4ae37@podgorny.cz>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWNSw6CQBBEr0J6bUcYEwJexbiYTyNjZCDdPQZDu
- LuDLl+l6tUGQhxJ4FptwPSOEudUwJwq8KNND8IYCoOpTVv3TYPDzJgXUSY74YvQzykhUxbCIIr
- 6WQiHi+ubNnS+6wMU08I0xPX3crv/WbJ7ktdDfTScLXvHNvnxiJxiolXPkxUlhn3/AjCVwzmoA
- AAA
-X-Change-ID: 20260911-for-upstream-le-conn-reuse-dst-type-f3b916d8c89d
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Radek Podgorny <radek@podgorny.cz>
-X-Mailer: b4 0.15.2
 
-hci_connect_le() swaps the caller's identity address for the peer's
-cached RPA when one is known, and stamps the matching
-ADDR_LE_DEV_RANDOM on the local dst_type. On the conn-reuse path only
-the address is copied into the connection:
+This is automated email and please do not reply to this email!
 
-  if (conn) {
-          bacpy(&conn->dst, dst);
+Dear submitter,
 
-so conn->dst ends up holding an RPA while conn->dst_type still names the
-identity it was resolved from, and hci_le_create_conn_sync() puts that
-pair on air unchanged. An RPA declared as a public address is not
-something any peer can answer.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1163972/
 
-Measured on a CYW43438 against a peer advertising an RPA the host holds
-the IRK for, connecting to the identity address over a raw L2CAP socket.
-The first attempt creates the connection, the second takes the reuse
-path:
+---Test result---
 
-  LE Create Connection  3C:78:95:78:37:C3  type public
-  LE Create Connection  5B:75:A2:26:D6:18  type public
-  LE Connection Complete: Unknown Connection Identifier (0x02)
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      6.25 seconds
+BuildKernel                   PASS      28.71 seconds
+CheckAllWarning               PASS      32.20 seconds
+CheckSparse                   PASS      34.54 seconds
+BuildKernel32                 PASS      27.86 seconds
+CheckKernelLLVM               PASS      33.63 seconds
+TestRunnerSetup               PASS      778.92 seconds
+TestRunner_l2cap-tester       PASS      44.25 seconds
+TestRunner_iso-tester         PASS      83.62 seconds
+TestRunner_bnep-tester        PASS      12.97 seconds
+TestRunner_mgmt-tester        FAIL      143.33 seconds
+TestRunner_rfcomm-tester      PASS      16.58 seconds
+TestRunner_sco-tester         PASS      21.83 seconds
+TestRunner_ioctl-tester       PASS      18.24 seconds
+TestRunner_mesh-tester        FAIL      18.82 seconds
+TestRunner_smp-tester         PASS      15.69 seconds
+TestRunner_userchan-tester    PASS      13.63 seconds
+TestRunner_6lowpan-tester     PASS      15.98 seconds
+IncrementalBuild              PASS      26.61 seconds
 
-The second address is the peer's RPA. btmon annotates it with an OUI
-lookup rather than "(Resolvable)" precisely because the command declares
-it public; the same bit pattern annotates as resolvable once the type is
-right.
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
 
-The mistyped pair is also why nothing downstream repairs it.
-hci_bdaddr_is_rpa() tests the type before the address, so an RPA carrying
-a public type is not recognised as one, and hci_find_irk_by_addr() then
-searches for an identity address that does not match it either.
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.143 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
-Copy the type along with the address.
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.271 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
 
-The assignment used to be unconditional just below this block and covered
-both paths; it moved into hci_conn_add_unset(), which the reuse path does
-not go through.
 
-Cc: stable@vger.kernel.org
-Fixes: 14b06c3a88f7 ("Bluetooth: HCI: Always use the identity address when initializing a connection")
-Assisted-by: Claude:claude-opus-5
-Signed-off-by: Radek Podgorny <radek@podgorny.cz>
----
-Changes in v2:
- - no functional change: the diff is byte for byte the one sent in v1
- - reindent the two quoted lines of code in the commit message with
-   spaces instead of tabs, so gitlint stops failing the patch on B3
-   (hard tab characters). That was the only red check on v1 that was
-   not one of the two known flaky testers
- - rebase onto bt-next/master, which now carries the "dial the address
-   the peer is actually on air with" series. That series changed which
-   address __hci_conn_add() stores for a new connection; it did not
-   touch the reuse path in hci_connect_le(), which still copies
-   conn->dst without conn->dst_type, so this fix is still needed and
-   applies unchanged
- - per Documentation/process/generated-content.rst: developed with the
-   Claude coding assistant (model as in the Assisted-by trailer). The
-   prompts described the misdirected create-connection and the btmon
-   captures taken before and after, and asked where dst_type is set on
-   each of the two paths through hci_connect_le(). The measurement on
-   real hardware, the analysis and the review are the human author's
-
-v1: https://lore.kernel.org/linux-bluetooth/20260908012048.3681904-1-radek@podgorny.cz/
----
- net/bluetooth/hci_conn.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c9466cb2c7c0..fa72cf8aaa7a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1518,7 +1518,15 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	}
- 
- 	if (conn) {
-+		/* dst may just have been swapped for the peer's RPA above, and
-+		 * dst_type describes dst -- it has to travel with it. Leaving
-+		 * the identity type behind makes the pair describe a peer that
-+		 * does not exist, and nothing downstream repairs it:
-+		 * hci_bdaddr_is_rpa() tests the type before the address, so
-+		 * the RPA is never treated as one.
-+		 */
- 		bacpy(&conn->dst, dst);
-+		conn->dst_type = dst_type;
- 	} else {
- 		conn = hci_conn_add_unset(hdev, LE_LINK, dst, dst_type, role);
- 		if (IS_ERR(conn))
+https://github.com/bluez/bluetooth-next/pull/760
 
 ---
-base-commit: e40edfa049b967f0b9379bf549c59431302ad181
-change-id: 20260911-for-upstream-le-conn-reuse-dst-type-f3b916d8c89d
+Regards,
+Linux Bluetooth
 
--- 
-Radek Podgorny <radek@podgorny.cz>
 
+--===============6669361094325302593==--
