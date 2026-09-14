@@ -1,96 +1,95 @@
-Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1925947C0F7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 13:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1BD475346
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 14:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789394261; cv=pass; b=eBCT4XoNlIuG5d9/rYPcV1yUVcIgjFSAEfE0T426xlvCtGqYs5LGkQpeDjf6VtX/EGPu7Yx69wGaWSBFrUxFtDUxwrvH6v5zsvHsNid5K+Nk/0wEigisbLj10rNpemqMJRD2KkB8GCXfWgEPe8bt/4ylg7O+xZFTgFhNDtbi9DM=
+	t=1789394763; cv=pass; b=Q/m8OsYOTXbqKufe7+8t1mqiKdLifvOrIIN+ctnRe4ne2lQK6vrV5wlaudjUQzUFQxlTOR9DfVbQ5IzlKxHIVSVXDXgfKqif8PINRoL1rcJQ6d1wCP3ZnBSDC50pjqv4JyW59c8uTatlk1JTfFvG21uS8o1GCCCFTiDAgMxxGns=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789394261; c=relaxed/simple;
-	bh=lJVGF2MrIGJ6/Msnkutl7Ct5nsmA8aoi6v75pv+4DMM=;
+	s=arc-20240116; t=1789394763; c=relaxed/simple;
+	bh=Hmk0hio/+v9Sq6QCGLY1Vj7O+t7pbTMdbPT8rsUVCRM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lnq06ciYlcwuyLzvjPcAHIaA2FI5yQpZ14gtLdcgxyl/lZN/8c4hdv2WuBjUOt2wl2HN0EHtoahS2swKORWSPoLdCho4EoQFECXf22kKqRxkrXG+qgmFaXS4RShC9iy8RSBPRz8XBZJN3M8lxx1I0DIa7hwTkkWH6DJi2fKJE4g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GR5DFjcL; arc=pass smtp.client-ip=74.125.224.140
+	 To:Cc:Content-Type; b=SC4oSlYBMBZx1sN/Cqp6nx7PsX1GOR0XVZcvbUBeE5zxr3J8XJobUumAlOzbw0u+t/nmWXXSewZZIEQHxPT9QHdt9eoTjBHx/zaca89YtrVxkwqIDGyUS13g/cqdmbNmE1KeuIhhsCSx5vR/NaRigRW+lub77/gR+JUhPytR2nQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBN05uFD; arc=pass smtp.client-ip=74.125.224.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GR5DFjcL"
-Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e50968489so1512873d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 06:57:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789394259; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBN05uFD"
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-67124ad7615so3236011d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 07:05:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789394757; cv=none;
         d=google.com; s=arc-20260327;
-        b=j2OXcg2GfVSOwmXIFpB6mzr/+s2m6+CjqFhD/KvA5+SXwju/44fkPdHDCKLjT9od5c
-         zPTSAWOoy8oxpS+51MpeXZ3eLpKjBHtBonADqak4kl/mJ4wtNSwFzeaucii40Is0Wus9
-         O1Ek6y9GgdRC2KODU1L9iPX1trOKrC2m0c0wUSpHMoJaNd/Gj4Zw8BrDc+4gVjeYvkoX
-         3EJMOMrN2oSnR7r9x8fSf2qejxX4/1E5vdzLjRZ8kjRCCfIn0G8eIj0doGxFbzASpl0j
-         y4ryp4RATflri7TWdkkxIZqg0+6184ilA3q5ydupSO8kRfLGmPXGpYbVDSV0ZygMiOiW
-         Di/g==
+        b=nBpR76Wu/z3uitkl+bTrMsiBqqRggZ52ORiNeVdzkEHQ3mc+iexGq5HcSb7VHbex3t
+         Jtee9MEFrfH5tHjyZjgXjVwrOHD4wlc6CCGFFSnpNBOUX/Z6UYf0T/+eWYxVPHk9TnAq
+         wC1lO+iKkPExCK4iZ9JREL3LnQzcQ3HvT/QhHdp/Fd7E6awL8MAvyz+tVwkfDWwe51oX
+         cB8Dl76jCl35dQKygghrU5Od+m7crwp/RrcukcDzUDYV4X4enzrATs8IhziOEGtCFY4u
+         /pzhi2mXU31BkXjL9XFHg255Go9lyiAvdgdZ6fWkaELeuatrUo+XwNIH/giQ7HnUbiw9
+         Eftw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
-        fh=wwjAA4ZEyVEj8lfObod3tAyJEJGkh82OBneQOnQXRKQ=;
-        b=dpal3HnyARWB6IKSCEUO5cmwGBNyQCCCJDhp074c91OuBI49P+Nd5YQYZ4STDPXXk7
-         VeqQSLp6p3eie9t9+Dm+BeO2SK1lqRnuQraGXBAvWYz01Ny6LAur0M5tZiqhQgZxWWT0
-         bA6NEeKvutnP/zIhWdXWTIbYwMeZokiYDm0BKwj/FvMh5Qrfrpgfd+DIa89yILVUEpgg
-         gSNZMn1SUbd9jpmG404SQYS6KwLjvp2iHaXeVv0VRygUSufbDR5WzI9ts9AI+ZRMGsAk
-         U24GQn6fniL3c9JzolhgVX1/DqsbHdd3gFCKSVgiYwqpAdNQ5cpqvisUj1mBEgGc0MoI
-         ZPQA==;
+        bh=ptvwdsSJglQVzgKp+FYr9aouOwiPCbztkA+vkBu9aAw=;
+        fh=cYNTM5zCH1bt3SKpplINqS9i5wB6Yc9ZEG4Xy1gDHDM=;
+        b=hYe2bfXFJn8tmEbjAjO3S0xmSRAQUAIkOSIM6ATrPJ2tF5GJiKAGwfpxyaF9Hf5/Xy
+         cPjwtTBEjrC9M+vZv2PbHGF7XrSHPZCdFey+ZRpZFGLeVpsmH/nf4nhUGRcxN64YO9KM
+         44Yu3wkBCKFsTACQlbNAPpifF71dwMJ3VjaWCgFigQ8n/wiLOVcmdIFG81brxEga/sEN
+         vz5y7BPPbNbo9hd2cqVT8qAyTpbqspaDUmL9FJzrK4hgwAPk9uS5raWFjhuyMsZOc2cl
+         4TDpwF/8hd5pCyVxKJbbRaLp4QEwcVfR8phZCpE5uwdyhLm/OrjWACn3kPiZ4Xg31BP6
+         sU5g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789394259; x=1789999059; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789394757; x=1789999557; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
-        b=GR5DFjcLwn+Z2Y3Yx4nSLtFkwK5akafc1wS5yfDLCq9YHk8Ze5AUVZGy34hMfoKrhy
-         exjw0Fpu2LIkEDHEfcSQZVir79wjexW5HexNaJiHqDYyD8hcW+zO/0/9gwUr430v10zZ
-         3i+G/8b3Zt8WF31PYUPrS4LLcg6u5uKVBkGQriB9FqIeRE9Lnp69YiqGMvOLgkXRzGwg
-         sFxutF9ku2F1iHAA8aCowTI8ExVCYGGuVYulhvNBF4/Dg+mamia6vnPeVHwd89b5X3A3
-         C/EiHdBBrq4FBpr3r9O82xY8XMDs5dGItC0fNPxWVbou9EBsuBHFcH6rv34FjUs+aKwT
-         Tudw==
+        bh=ptvwdsSJglQVzgKp+FYr9aouOwiPCbztkA+vkBu9aAw=;
+        b=QBN05uFDIn0aCXfDOptPcLLBREyrx1YM8BeLmtx9FnuD6FALkqnRsq4PXGINSdxHjI
+         6bTCpo885oWOdoMhKOaTEUTjv1oE8vEkYYUBhwKP1mOBlxguF9ARmNcX4RXMPqlccrlH
+         QyLtdLFV8pTtrLaFZ6WOLTrtsR7NBYO2ZRjnaqqruDEuXd1X1SUlBLLeUlF22XQUkqSd
+         OUuZ3Wf3mu32Q0Rh1XRf7q17XRAXXOkehD52UZLBaTQKcKkFYLnSTkcFHvntOSadmpWh
+         sWpdx9fURPsumyV104BF/Ce1uH+/OJVIdvKZQbrw/RJKBQsTxhbqukJScCBu7ElgRaSh
+         xiEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789394259; x=1789999059;
+        d=1e100.net; s=20251104; t=1789394757; x=1789999557;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
-        b=SZTn2tKzdDp8o4dnfHmkIRDvtV67bUJo0/At8LSWTHtDqfeyo1vd35AkkSRDvNT9yV
-         rju8siqu+O3s44t7EeTdsFRmXlg9E8W3OihJbj1Ld8Hhbn4gbSshg8db+ItQqNk45U8T
-         YmyrmOtDKwmbATV9F8CP9333hbZghiuavzCU/f2RnbiUqdz2ZmavroivLdnGTcwld5pc
-         HAwBngy9fEjfisrA7LKk/TPnZJ4GuNnkxRtUVt9htVLePuwAuqoCVFjLFluMqe91B1/i
-         Q8CR/QYK+hwnJGbgSF23zOe0hP8NzMr8smVWJN/oZ9E9IPVihqYQc390lFbXeaMERW9t
-         12dQ==
-X-Forwarded-Encrypted: i=1; AKwUvByfL1xb4AYxEzKgZrD5GsCa3rKZfCtQZR9ZV4e9PlUxu4bIKfAPQ9CRZG1y/sXdy4NQhlbKQNveoRJZvspxNK4=@vger.kernel.org
-X-Gm-Message-State: AFuF++lPd5wqjkkIPhFIH0+C5Kx6zhWPqFqSqAlDXuYz5G4S6McVZSM+
-	/B08FAJivuZ9Lv+PnfspCF/+UJH7h5EK4vEOiZfpNFvtu7PD+dp17vUwtqzXPIHM52LDPAqQDM+
-	5F+7L1wkETVE7X74mm07n2/yzsM8RUqvxKa4dK1A=
-X-Gm-Gg: AYBFou2Y5WrqbiQoaBlUW0swu3zj1/saM+M3RJfVvXYiUPGLoFugcLOZKXQtYRXxnja
-	DtbjSy3patKTDdV7GmtWUsVbqhuH3pH3ABlei/nzyQN++i4lW7fZFzfjwlrxw/JtA2cX/zTgfBD
-	4MY3DORdArio63VkCr9YhXO0UxaW6CrXN8DjoPQhkJ21PeFiUFAtScGBqk64MduQ/LuyTdmbCrM
-	82/ZOi2190UFW6aP4+GeFi2aaQsQjBa4lQz8LpdJ6KDRNPkyf766GwMlimyxEPcNF12RhUOvD0t
-	baf4n9bonSu+iRTqI0dMXTxZU0SSn9pY39ZDdV12cAls27KLW1rWpxPSycLhn2iO/rEZ1XIGky9
-	EQSNbLQek7Kfg+XcGi/j+xE76DBBvqpIB5DuJBhbUlAFGXzE0xr43
-X-Received: by 2002:a05:690e:1183:b0:671:61a:eafc with SMTP id
- 956f58d0204a3-6714dfc990amr984009d50.2.1789394259157; Mon, 14 Sep 2026
- 06:57:39 -0700 (PDT)
+        bh=ptvwdsSJglQVzgKp+FYr9aouOwiPCbztkA+vkBu9aAw=;
+        b=iZhh8S0bXeHvsGnWKbf2HUrkVmLG10OVG4IZjUz+MKoYJ+MriuDYZs89rTNTXP4Xgh
+         IagHk1/Wd7+fwjStuxBj6bnApSGnRgSSDNQ0Q7OaUj6plDSEDixU/XmDr/zKcijncqhg
+         GMvudAynDvAJs1hxom4CPeKX2SNa6JAPz/WCyS0uwq7tv+5KwmEqpWaDMMZ2Q0AC/zlx
+         JiOk+jODbIUVqCXLtFI9J75+WezrX5q7xCAuUy/EN2SBvBIk7EQb3uAdsmYzCvmtnV7m
+         gGmSvwv4EqMg1J0W67G616T2G8GtJTsqapoHY8B3lZm17cgSZvbGVGgovRsnKAQkj1iu
+         eaAw==
+X-Forwarded-Encrypted: i=1; AKwUvBw4sLvEkydBJGSlDeaa7ZJyWXN9eTxHAeuzPw62LmkMjpLOUYAKUjRmycM9GhMVLyDyEsLOBULZLYXT7ZILBic=@vger.kernel.org
+X-Gm-Message-State: AFuF++l/FB7JCJcLHRLYgEc3oWZbAqg6mNq6Eo1lJZdnqr+1dpVwvoE0
+	5G+QlEUloYIkNm2uCUdQSnXwhBS4g7eReIIv3IYVww2cKM1vz/CmyEk+aG7GFHepCGbdjr0Dv16
+	oy3tsJdvYtXBAfEWREN0jqY82pORTV3Q=
+X-Gm-Gg: AYBFou0ATtocSx+aVQ9lbF3ND5cmK532zxOQSalBmy2LUNaPE0y2/sdvRqu+QEPjFGf
+	PU0avjRUMftJI8U15DCdPD4ZQp9D8HzbqtGaR9jR+/yluAQ8gidlH+Av4bwIu7+G3QmEBIKgN+s
+	E4iHI5N+odW4yg6FHNljGAufvR1W7DJPnYrg78M4Vv3LHrLnaGXv8d0apLd73QALa2YnFUNSCzn
+	LymcBwA8+/AJc3cXNZAbDLn0qNen8Hu45dBdV2En/FrmKK1nRoHObe4MTT5l+oAZw0CYpW9TUek
+	HG7EXETMyyu+DtThMUnJlc5Ew/69bUySM8yABVjAvAxi2dI5tPoZO6DqlaY4ByipQgprZ9Qjhlu
+	ZsKisf/Xikt4atKL2l7POC6SbhbZyRtbv0QG0dz9RWQ==
+X-Received: by 2002:a05:690e:d8a:b0:671:1880:17ba with SMTP id
+ 956f58d0204a3-6714e1a228dmr572822d50.90.1789394756676; Mon, 14 Sep 2026
+ 07:05:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260913-misc_fix-v1-0-558c1e4028b9@oss.qualcomm.com> <20260913-misc_fix-v1-1-558c1e4028b9@oss.qualcomm.com>
-In-Reply-To: <20260913-misc_fix-v1-1-558c1e4028b9@oss.qualcomm.com>
+References: <20260913-misc_fix-v1-0-558c1e4028b9@oss.qualcomm.com> <20260913-misc_fix-v1-2-558c1e4028b9@oss.qualcomm.com>
+In-Reply-To: <20260913-misc_fix-v1-2-558c1e4028b9@oss.qualcomm.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 14 Sep 2026 09:57:28 -0400
-X-Gm-Features: AcwNN1UlvJrqDr-FHzd6LRUOZnDSIpfdPmPIufIaHT4FMUT4Dsw_TxMkpXL_CEM
-Message-ID: <CABBYNZ+ZUXkSO6ybT03vRCE_1Mwzm1hkbHqrndm2qL0mTLh0dg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: coredump: Fix skb leak in
- hci_devcd_append() stub
+Date: Mon, 14 Sep 2026 10:05:45 -0400
+X-Gm-Features: AcwNN1X4x2Jn_HQuWP1CvY-sUU6PZRXZ8e3BCnElDU8YY8MEUBdC6jcAj5uupHA
+Message-ID: <CABBYNZJpwkbFB8E4uHu4AcHjtR8R0CKnhj0Zesf1umoLyiqecQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Bluetooth: coredump: Fix btmon heap-buffer-overflow
 To: Zijun Hu <zijun.hu@oss.qualcomm.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>, 
 	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>, Manish Mandlik <mmandlik@google.com>, 
@@ -104,66 +103,122 @@ Hi Zijun,
 On Sun, Sep 13, 2026 at 11:43=E2=80=AFPM Zijun Hu <zijun.hu@oss.qualcomm.co=
 m> wrote:
 >
-> For hci_devcd_append(hdev, skb):
-> it consumes the skb when CONFIG_DEV_COREDUMP=3Dy, but its stub does not f=
-ree
-> the skb. this inconsistency causes skb leak when CONFIG_DEV_COREDUMP=3Dn.
+> The collected coredump data can exceed btmon's maximum packet size of
+> 1490 bytes, But hci_devcd_dump() forwards the entire coredump data as an
+> HCI_DIAG_PKT without checking its size, causing below issue in btmon.
 >
-> NXP btuart device driver encounters this leak:
+> Why ?
 >
-> btnxpuart.c:
-> nxp_process_fw_dump(hdev, skb)
-> {
->         ...
->         // the skb_clone() is leaked.
->         err =3D hci_devcd_append(hdev, skb_clone(skb, GFP_ATOMIC));
->         if (err < 0)
->                 goto free_skb;
->         ...
-> free_skb:
->         kfree_skb(skb);         /* frees the original, not the clone */
->         return 0;
-> }
+> For a monitor packet, its payload length @len in header may exceed
+> BTSNOOP_MAX_PACKET_SIZE, btmon uses it to access payload in @buf.
+> so cause heap-buffer-overflow.
 >
-> Fix by freeing the skb in the stub to keep consistent behavior.
+> Kernel:
+> include/net/bluetooth/hci_mon.h
+> struct hci_mon_hdr {
+>         __le16  opcode;
+>         __le16  index;
+>         __le16  len;
+> } __packed;
 >
-> Fixes: 9695ef876fd1 ("Bluetooth: Add support for hci devcoredump")
+> BlueZ:
+> src/shared/btsnoop.h
+> monitor/control.c
+> struct control_data {
+>         uint16_t channel;
+>         int fd;
+>         unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
+>         uint16_t offset;
+> };
+>
+> Issue:
+> ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51b00000065c a=
+t pc 0x7f50b987a029 bp 0x7ffde88dc8d0 sp 0x7ffde88dc088
+> READ of size 17916 at 0x51b00000065c thread T0
+>     #0 0x7f50b987a028 in write ../../../../src/libsanitizer/sanitizer_com=
+mon/sanitizer_common_interceptors.inc:1096
+>     #1 0x5b4f3443ae3a in btsnoop_write ../src/shared/btsnoop.c:289
+>     #2 0x5b4f3429cbf0 in data_callback ../monitor/control.c:969
+>     #3 0x5b4f3444fa9d in mainloop_run ../src/shared/mainloop.c:104
+>     #4 0x5b4f34451da6 in mainloop_run_with_signal ../src/shared/mainloop-=
+notify.c:196
+>     #5 0x5b4f342953fc in main ../monitor/main.c:303
+>     #6 0x7f50b8c2a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_star=
+t_call_main.h:58
+>     #7 0x7f50b8c2a28a in __libc_start_main_impl ../csu/libc-start.c:360
+>     #8 0x5b4f34295ed4 in _start (/usr/bin/btmon+0x29fed4) (BuildId: b41ca=
+afb24db693946c283eaea48112186863d2d)
+
+This probably needs to be fixed in btmon if it attempts to read past
+the buffer size. Also, since it now supports vendor packets that may
+not be limited by HCI packet size, perhaps we should allocate based on
+the channel MTU which probably needs per-vendor configuration to allow
+collecting its vendor packets.
+
+> Fix by forwarding the collected dump data as an HCI_DIAG_PKT only when
+> its size <=3D 1490.
+>
+> Fixes: b257e02ecc46 ("HCI: coredump: Log devcd dumps into the monitor")
 > Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
 > ---
->  include/net/bluetooth/coredump.h | 1 +
->  1 file changed, 1 insertion(+)
+>  net/bluetooth/coredump.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
 >
-> diff --git a/include/net/bluetooth/coredump.h b/include/net/bluetooth/cor=
-edump.h
-> index acc1849f66c0..07940a1d5dd4 100644
-> --- a/include/net/bluetooth/coredump.h
-> +++ b/include/net/bluetooth/coredump.h
-> @@ -103,16 +103,17 @@ static inline int hci_devcd_register(struct hci_dev=
- *hdev, coredump_t coredump,
+> diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
+> index 71fc8dab4004..61b45ba58a65 100644
+> --- a/net/bluetooth/coredump.c
+> +++ b/net/bluetooth/coredump.c
+> @@ -250,36 +250,43 @@ static void hci_devcd_handle_pkt_pattern(struct hci=
+_dev *hdev,
+>         }
 >
->  static inline int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
->  {
->         return -EOPNOTSUPP;
+>         pattern =3D skb_pull_data(skb, sizeof(*pattern));
+>
+>         if (!hci_devcd_memset(hdev, pattern->pattern, pattern->len))
+>                 bt_dev_dbg(hdev, "Failed to set pattern");
 >  }
 >
->  static inline int hci_devcd_append(struct hci_dev *hdev, struct sk_buff =
-*skb)
+> +/* Align with BlueZ's BTSNOOP_MAX_PACKET_SIZE. */
+> +#define HCI_DEVCD_DIAG_MAX_SIZE (1486 + 4)
+> +
+>  static void hci_devcd_dump(struct hci_dev *hdev)
 >  {
-> +       kfree_skb(skb);
-
-I don't think freeing it here is a good idea; in fact I think the bug
-must be fixed in the caller so it properly frees all clones, etc,
-actually it may need to check if hci_devcd_init fails and stops
-cloning and calling hci_devcd_append as a result.
-
->         return -EOPNOTSUPP;
+>         struct sk_buff *skb;
+>         u32 size;
+>
+>         bt_dev_dbg(hdev, "state %s", hci_devcd_state_name(hdev->dump.stat=
+e));
+>
+>         size =3D hdev->dump.tail - hdev->dump.head;
+>
+> -       /* Send a copy to monitor as a diagnostic packet */
+> -       skb =3D bt_skb_alloc(size, GFP_ATOMIC);
+> -       if (skb) {
+> -               skb_put_data(skb, hdev->dump.head, size);
+> -               hci_recv_diag(hdev, skb);
+> +       if (size <=3D HCI_DEVCD_DIAG_MAX_SIZE) {
+> +               /* Send a copy to monitor as a diagnostic packet */
+> +               skb =3D bt_skb_alloc(size, GFP_ATOMIC);
+> +               if (skb) {
+> +                       skb_put_data(skb, hdev->dump.head, size);
+> +                       hci_recv_diag(hdev, skb);
+> +               }
+>         }
+>
+>         /* Emit a devcoredump with the available data */
+>         dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
 >  }
 >
->  static inline int hci_devcd_append_pattern(struct hci_dev *hdev,
->                                            u8 pattern, u32 len)
+> +#undef HCI_DEVCD_DIAG_MAX_SIZE
+> +
+>  static void hci_devcd_handle_pkt_complete(struct hci_dev *hdev,
+>                                           struct sk_buff *skb)
 >  {
->         return -EOPNOTSUPP;
->  }
+>         u32 dump_size;
+>
+>         if (hdev->dump.state !=3D HCI_DEVCOREDUMP_ACTIVE) {
+>                 DBG_UNEXPECTED_STATE();
+>                 return;
 >
 > --
 > 2.34.1
