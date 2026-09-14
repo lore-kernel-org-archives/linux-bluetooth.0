@@ -1,88 +1,89 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3E2328B71
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F4130FF1D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789354064; cv=none; b=Wkyr/bVGOOqxUneYUMnm1fokmMlVLReX3XkyX+1Y3C8dk9MmSutLnMKT1WoAaRMS2ShKImonDx/wn1tUCzfQsaiu8233sww2Eu1rj4nkv+CBTkYe9/V9CID1g6/8DrOL9DtFcS3j9A3KpiKYJeDtn6pbO6vZgJ2waap1GmVjNUU=
+	t=1789354065; cv=none; b=c/iZk6eGVXEwqqjrGHuNp0dvAp5SpEen1hHYySr98G2WdvJrIJaIn/jnVNQFU4KiQnfrcyjy/GRCEwwzRdO2Aogqgmp0zICpLuoEdZw7YKii8VdoBYpzTCvZ9M608Mw8uvPU7Ap1iuu27I6vOinAq+FUkIkZEtCGptNl40QHP9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789354064; c=relaxed/simple;
-	bh=FeX+5SSAOfbaQ58usKljVzvtDRwIa0YCMI07fyqDuvo=;
+	s=arc-20240116; t=1789354065; c=relaxed/simple;
+	bh=3QuQQakF3Zi22G3iYl7aYfWmFHhSS6FeB684lImThr8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GYdcekPpDvDon14JExVy2Mjoq8XCnBNJAyBTFSrV+5M9fzKw7VhpC9iogJ45EUXxoUZQRuVNWsZ8cac2WvDlCmyGvuo2v/dqLce6xlK7xPrds1OeZAXanun48mxKEfHWJwFCmHdpsP90HM+UBP+AfAYEjit6f2HWPz5BfxVQbVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dyrhaJJQ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SrrZl/HJ; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:Cc; b=IXUZkp7h9XMhsVtwyskoYG9RIRZD2ecFRAmwyhJ6NiLLITFXc5jSla+uAD02gWrNqq4UuWSJpHJXM5K3HJuFX9deBUhWmdsFR27L31o3vwdefZaOohz01CvvN6zq2OThAhshsHY4KrcMLURxtnTEhO4JTcTiyrhPmKxsqiDqSHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ilELR7Qo; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EVRu/BKV; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dyrhaJJQ";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SrrZl/HJ"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ilELR7Qo";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="EVRu/BKV"
 Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68E2egrp3671440
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:41 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68E2eNJm3670973
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	I39ywH5jWkYs6V2okSMHwL6YcA82wKWv6kdA/H5Q9QQ=; b=dyrhaJJQZ99mTDYw
-	XX4Xa0Sj6NKrCWxo4kKNIUAbC1IxTF2HcDTXFPahImeFuZtubpVrxtC1c4ZqBgGv
-	IVNkeTPowg4qYxC6NYqp7Pbva3LY7rFmXZGLU6tb46dOH4mCByz5WYaaGzRfwfmm
-	sKPxaeEO/xCt673+0FrshYOb1dqJow1TCS1qRn5M1UjwUZpmFtfzZ9eyBzCwb1ja
-	yH186sUSmizR3MrGZd7nNFHNQIolb7iNTRIcrwzlb/O4PDsCt5rJcAr2XUBi6ZhK
-	IL5CDRc/Ha4TSKBVEpOODqPlMLsDLskq9vkMQ06jE8BCM1BD4AJAsc7zb2QG9ALt
-	yb0gSQ==
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gp3hsrjx2-1
+	+Brs4thZkb+ADUJ9KGOCW0Dja/RM97Wj6zvjTE185qk=; b=ilELR7QoBtWmhACI
+	z+k4LYQ7h+N3oD/TRwLnOTDOhTtrnwm9qlhRqnjO02jr4dNZZWWn2T1fkJFcXx5A
+	7itXooZXVpoaKUJHpyiwtZ4PctluAfISd7i1XU+zCN31le5fiqeEh6qb06fwta8n
+	3Pp9eIuw1eXdB6k4nEFdZHWqazn01/yjPjViJGx5u6LLzarJWPEC3B7c/QNwDv89
+	C0/amaa6Cyc2H8tX8QklzcyJ/1X2p3nruQqhDTA6+t2ZIYMlqH8JNv8OkzOujLyM
+	kEdOWGxHzrPexbwcUGeukszsAI2vPVPADpklL00ENLcCr+90Kvxe9zUbsdY3qmyZ
+	6n4tdg==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gp3hsrjx4-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:41 +0000 (GMT)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cc1cb9b67bcso99120a12.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Sep 2026 19:47:40 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 02:47:42 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-39af306c795so729219a91.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Sep 2026 19:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1789354060; x=1789958860; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1789354062; x=1789958862; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=I39ywH5jWkYs6V2okSMHwL6YcA82wKWv6kdA/H5Q9QQ=;
-        b=SrrZl/HJ1naUDbRoYM5+YYs1crID8CHNSx2nxHNQSbpDTkfClM8swmklQa85gE3YxN
-         T+Y1d5d0IXE0CGxB3SU/0Clsq6eUWau+px7XM+D7Et1BVq3KK7s5w9ZWMxkMXUCgY4my
-         qKnFU2kQHwk7d3EtnDU9B1lEqNTgQp11l9BSLDz6R8MfB4vLaOiGZNsbHHlLTVIKnqA/
-         UUajmWxbtkzHmkVfxcZD9qscioeQgiHUXagjbWUffRegY08NfY9nWI8SOv17o2DljrA+
-         BK+3SI/4pG74rOLYECdLmHyXAKELehndIAd/XSUB21hQGq/niGq1k/Gfa71U+5/xle5r
-         T2Lw==
+        bh=+Brs4thZkb+ADUJ9KGOCW0Dja/RM97Wj6zvjTE185qk=;
+        b=EVRu/BKVZQrCdhCFI90Bmhr5BdzouuMwPExSgexS7uctG0D8SI8BlcceZoDyDVd8Kf
+         /7Q16vZOwt4I+b2u02bKOMzxFs9ycXP/MqDAgR8AClvOg3udBsDutm87sTeu6ZC4d6Ru
+         lMzm1+0o8IZm22863dbiKevwPhVmHRTyoUjwkckA4CnCkN7VSoHu+c8Qo3ZzrJGc5wrh
+         WLxT6f7NuM9XzsW7vuoC5rX8C+1CJzYDsQrQbcfaVnKPZRkomobP99k/c4Zl4D6TnYqK
+         irkwTEzvMmgFc5kBEtGO/lVJGY8iTbkD+MakqGDRxNVq+9THXVj53JyV8pDhiqDwVLFo
+         6vVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789354060; x=1789958860;
+        d=1e100.net; s=20251104; t=1789354062; x=1789958862;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=I39ywH5jWkYs6V2okSMHwL6YcA82wKWv6kdA/H5Q9QQ=;
-        b=CVKWSDlif0WxgzAIvg+SI7nZdTW05rK5CvquoOxzSD23EGnDivOa70k+T2R4NPQaap
-         4FuHOnt1j+Cf8zO1RzEsnc8xzKV09dAx7zoit2EkbBMTB3xlQ1/2qWsXLqLXrEf2bpwu
-         Aa/DWNqwHg0zbdSjGP1RUv9qx5xojx2hcfxUQ3afIsbcS2IkHPWAOI1aeArZ8k4ZTp8j
-         H7bSfgqUSMYANMlivM5iw8lVLxMP6TssADS0dzqNyAWZ7o614xU9wzRfvkODcFJxAR7U
-         Nw/QzSW1Xn4It7bs/Ryh3N6JA8zytbgA9NYYExefJJ8EEFqS0cf49m+3WHxeePud6yxC
-         5yNA==
-X-Forwarded-Encrypted: i=1; AKwUvBwZMiRIm/CRg2CyS8KyAhmUkO/pC/VDVWQMYhG0QJxm4s14Qk48zHtVYLEo4oYBzjpH091T3NvCNY4cfr+IifY=@vger.kernel.org
-X-Gm-Message-State: AFuF++mGHL8wIKk1LiGbNNE5Cg77jwTNOqdWxcL/nuYCTyXbSezMSHZe
-	SKXqspTlELpAq4+lkfnQBywNhCbzng713fPIhmlhvDbli51jSzOA0s16hwOM8+q2TtABxmXDtS3
-	LioSA12N4s9xTHAtXzsyXAvz7VA0TK7In4LaQOw4MoqG8oihUX/Zz5u01zvEclKQclbhFFTg=
-X-Gm-Gg: AYBFou10ZQlqdM6qZJa3h2HyMXzUdw3e4p9tyeyT5etE3HfkgPHxcDX2dEJ4A5uH9WE
-	V1d2c2nPnvQqlJnq4BT8SN5Ao0lKUb3i25odPOhLidbvmNWXY97tkDH2Np9XraegxJIQhOeVlkC
-	0FfkJv4Ww4gfDKcLutSMbisJ2TgF/2BMyXVLhlS6x8cXD9FGoNsVsIoPyl6gbWnjrSlBJSgJnO8
-	TeC/xMFtPWRVYT8UL2FocRyhzEgdPbWSV9wAqRMYZ6wJ1lfTlU7uxAF48xN3twA8JTx0QHJ7Hq6
-	p3MX3C9JWYdRr5erU/4Q1NLjDn+gz96ib1ghTqiebut7c03yQmIfZw/rUAInNqrW/tKBUUSJKPl
-	pJkZNdOGuzWIDTz+okIaYc1P5qQUU3foNxeQ8HoSpUYFHhYY=
-X-Received: by 2002:a17:90b:2688:b0:39d:e1cf:db40 with SMTP id 98e67ed59e1d1-39dec15a5damr950726a91.5.1789354059912;
-        Sun, 13 Sep 2026 19:47:39 -0700 (PDT)
-X-Received: by 2002:a17:90b:2688:b0:39d:e1cf:db40 with SMTP id 98e67ed59e1d1-39dec15a5damr950695a91.5.1789354059455;
-        Sun, 13 Sep 2026 19:47:39 -0700 (PDT)
+        bh=+Brs4thZkb+ADUJ9KGOCW0Dja/RM97Wj6zvjTE185qk=;
+        b=USimHM5r8/V+YYbyOlqfCoRdqIEKkEfzSJ1GA2WY6V8UQDUhboXQsyx0xvc+1HR4Mv
+         K4DSYUgModpGETKwCVabLxBIGn613mrRJy6vIfolM0FFaaUEVsgDWRdLI5SkBUFnv4c3
+         GPhF8aflLHKFLNmg7enJzuiYLV1ZiYdhZxIQzwszNos+VO30UBwI/VMHIv2zPPAaqLb8
+         yFXbly+V/oE0BYz7hgEIY2SSDPg/KlVTdSPV3uaLoub78xLSJeVaHwT83fSQF9JxyoAT
+         9/gticAfgW4krW5pxVS0IqRixgsisN56cTcW+5OIvBH9UrAWd+8ToMSALlwpt1VY2ITq
+         mKUA==
+X-Forwarded-Encrypted: i=1; AKwUvByxBbmVDatWeWuvHS39eAJuEiWKzPo5OlVek7sRBwUs7X07gxgsMovLmgH9OIpnroTIFkcYVyLlw0orIb/2Zn0=@vger.kernel.org
+X-Gm-Message-State: AFuF++m9OJRB0vIsIXMXkj32IRUxriVwc3E0DZBYq2pmxIS60wM5YFky
+	Q4dtGxPHDIIkTdUYGspXSA8W91m1Ru5lYV0UyrH6oRDksUMPU6UEVZhs9/bsVLePiESGHpLLsnu
+	3aJAUi1WTuxt90CoV9LJ9EgegkE64e2FPjBo5fFUi2MqOsOMwpKoME58LyHaqESLIyyKQz3LYHM
+	ISlpM=
+X-Gm-Gg: AYBFou2khBCEvfjBV1jurOwqLm2/LhuOHGKsV+7Y6eRyydhAOdGIfPZk3F7hy+MYinP
+	NJJSypnIOF61KSj2ZIBH7An0syJg6KYq0yI86e+jdsif1Hll1lh0F3tAFDlcamjC3YYbix8baxL
+	7LqqUANnFcL+vRj9rmmFSoxbymQ+sAE3CDkhNYI/1Rh9af0C27jAXnkDQzzsSs9d98GxqoO6Ar4
+	M+lvf+kwT+4gHxHYdERGp4vdO/JoJ5xDvIZaADp8EPeYTenK6axtZ35cwayw7kbM1mcOy9/e9y1
+	laXQUtcEg+ZVg+JAde8cOjMhCNWqlUle5LXeRKqp06+VpjrOdivqfJoPuROEQGbGZKRzNl95uzQ
+	FFRtenw6P8BEjtnMVTGBJ4vbhFyIpm+4BCTjLDY28KVD8NEs=
+X-Received: by 2002:a17:90b:2885:b0:39d:e75d:97ee with SMTP id 98e67ed59e1d1-39dec20812bmr943301a91.5.1789354061731;
+        Sun, 13 Sep 2026 19:47:41 -0700 (PDT)
+X-Received: by 2002:a17:90b:2885:b0:39d:e75d:97ee with SMTP id 98e67ed59e1d1-39dec20812bmr943262a91.5.1789354061241;
+        Sun, 13 Sep 2026 19:47:41 -0700 (PDT)
 Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33ba4ed295esm25945014eec.15.2026.09.13.19.47.38
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33ba4ed295esm25945014eec.15.2026.09.13.19.47.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 19:47:38 -0700 (PDT)
+        Sun, 13 Sep 2026 19:47:40 -0700 (PDT)
 From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Sun, 13 Sep 2026 19:46:43 -0700
-Subject: [PATCH v6 1/4] Bluetooth: btusb: Add recv_intr() hook to
- btusb_data
+Date: Sun, 13 Sep 2026 19:46:45 -0700
+Subject: [PATCH v6 3/4] Bluetooth: btusb: Build the driver from multiple
+ source files
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,7 +92,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260913-btusb_qcc2072-v6-1-137898715844@oss.qualcomm.com>
+Message-Id: <20260913-btusb_qcc2072-v6-3-137898715844@oss.qualcomm.com>
 References: <20260913-btusb_qcc2072-v6-0-137898715844@oss.qualcomm.com>
 In-Reply-To: <20260913-btusb_qcc2072-v6-0-137898715844@oss.qualcomm.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
@@ -100,25 +101,25 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
 X-Mailer: b4 0.15.2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE0MDAzNSBTYWx0ZWRfX+7h2OfQf+xLd
- YERp+9PJVLObvXwcuz8xTcfnkrQ+GnB0Jt0c9VuuBe9jvkKnfF0ljxx4hJCIU2IcPHEw6PsTgOI
- 3p6MBdLcWq0jRJxwOhq3uBEXfUsQImrIFEKaTEyxU5yVoYIzGE7DVIHk9ldzsF0oNjCabfHRssd
- swsUGIMcjUKS1WFhGdbh9xqdL9I0Kh13DaLS+rgi0kCfwgwCIwmJmJpsfTT8K1YUOAFgogL/7NM
- R/z7njWmVD/iT9p4qeqJIpFn9HTzCs8P2Galv+2WuLnydf1GK7/oq+yu0cRt45limqzvaYJEER2
- 56uNDLh92ohujiXSyGsXVMVfWAReGJU+2bk8D2iHHMBhcHPfHoVG/bxiEBsKK3gHqffDophxFTx
- LCZFhlaRo2ciCwVubPkWBHR04GmSx1diq675HskburK7Fh7DtTuO4rR2XrJm6zdudVG/5bsoL0b
- TdDGTLMXk8vSO0WZQdg==
-X-Authority-Analysis: v=2.4 cv=IZwSymqa c=1 sm=1 tr=0 ts=6aa7604d cx=c_pps
- a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE0MDAzNSBTYWx0ZWRfXxp+K4tyMx7mh
+ BZQbYdmx6SbzBkDvositOrlQSdiMjzbJRa08kabSsdI3fCY69YpYIZGsz45BQJw9n8ZgH1xD6p6
+ 3OwLwEBuYXTRQuk5X9PNl8hFmNdH9MPnX4m22/hnl2pi4k4nLL1npLXbgaY0utUBtJASXMdTnrr
+ 6KWk8uY84SbL23DKUn8Nl+zOeFQ3cSigwKtBbUEw8Dp8FN3+b9IdmUAj62Ra+WTidj1cTCKp0SO
+ kQwQO5KhhPxrFVmQC09+BsQfkDyva3obeia4EhY10T89owc6ntpndspgYoQgU0DGEHXWx1PNs55
+ 7HR2iTAFbSkhY94IsqkXQsI5IYK+kYqOs6hmdeAryOiS2T01ESNMRBu7Fqf9b7o5uUpdkXLS/5N
+ Uj9yoTIGvISTrAOJqjQY2B4R0gO01rvzz2L2b6kgBH8koyU3Nq3fvvDGEj2+PxgPZ+yYLxGVv3K
+ taCRQEHet7Znsitao6A==
+X-Authority-Analysis: v=2.4 cv=IZwSymqa c=1 sm=1 tr=0 ts=6aa7604e cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
  a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
  a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=EUspDBNiAAAA:8 a=I7BhAMs4-vxSTl9LnVYA:9 a=QEXdDO2ut3YA:10
- a=3WC7DwWrALyhR5TkjVHa:22
-X-Proofpoint-GUID: MgtHXXZkmmwyPVW2VOjecUPik8GWQ6Sm
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE0MDAzNSBTYWx0ZWRfX1FLq05OMcx1N
- 2t0zjAeUye+xsqV7CUaW6J2s08eyaOlc47cOsQlAc85xwJm9sPPLJNj+dTkJ0efNeJ4YcU/MOzO
- mZO8B6GLE7E1B4U9fcqjosnk8C0KnaI=
-X-Proofpoint-ORIG-GUID: MgtHXXZkmmwyPVW2VOjecUPik8GWQ6Sm
+ a=EUspDBNiAAAA:8 a=4J4qWk0Wo-fRNhQ-KTgA:9 a=QEXdDO2ut3YA:10
+ a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-GUID: _FAXXBMLNL5AGtlNG7xMTujXmClT43Xz
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE0MDAzNSBTYWx0ZWRfX0d5rqCPHc9n/
+ NSr8ayXbm+DVwwss4YO7ghbLwA0CYsrdoZizZ5ru0kTstJBHX5XIMSaxjHrrBIQXMHSehdn5ud9
+ YFS2aR91UqVYMAmIem+wkQmsO20WREQ=
+X-Proofpoint-ORIG-GUID: _FAXXBMLNL5AGtlNG7xMTujXmClT43Xz
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-14_01,2026-09-13_01,2025-10-01_01
@@ -128,94 +129,38 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609140035
 
-To allow a vendor driver to assemble and handle its non-BT frames
-from the interrupt endpoint.
+Allow the driver to include vendor USB-transport-specific source files by:
+- renaming btusb.c to btusb_main.c
+- making btusb.o a composite object
 
 Used by Qualcomm QCC2072 support.
 
 Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
 ---
- drivers/bluetooth/btusb.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/bluetooth/Makefile                  | 2 ++
+ drivers/bluetooth/{btusb.c => btusb_main.c} | 0
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 83d122de5d7d..5efcf31e432b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1067,16 +1067,17 @@ struct btusb_data {
- 	unsigned int air_mode;
- 	bool usb_alt6_packet_flow;
- 	int isoc_altsetting;
- 	int suspend_count;
- 	const struct usb_device_id *match_id;
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index e6b1c1180d1d..8b436c6de8b7 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -46,9 +46,11 @@ hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+ hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
+ hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
+ hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
+ hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
+ hci_uart-$(CONFIG_BT_HCIUART_AML)	+= hci_aml.o
+ hci_uart-objs				:= $(hci_uart-y)
  
- 	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
- 	int (*recv_acl)(struct hci_dev *hdev, struct sk_buff *skb);
-+	int (*recv_intr)(struct btusb_data *data, void *buffer, int count);
- 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
- 
- 	int (*setup_on_usb)(struct hci_dev *hdev);
- 
- 	int (*suspend)(struct hci_dev *hdev);
- 	int (*resume)(struct hci_dev *hdev);
- 	int (*disconnect)(struct hci_dev *hdev);
- 
-@@ -1577,17 +1578,17 @@ static void btusb_intr_complete(struct urb *urb)
- 	       urb->actual_length);
- 
- 	if (!test_bit(HCI_RUNNING, &hdev->flags))
- 		return;
- 
- 	if (urb->status == 0) {
- 		hdev->stat.byte_rx += urb->actual_length;
- 
--		if (btusb_recv_intr(data, urb->transfer_buffer,
-+		if (data->recv_intr(data, urb->transfer_buffer,
- 				    urb->actual_length) < 0) {
- 			bt_dev_err(hdev, "corrupted event packet");
- 			hdev->stat.err_rx++;
- 		}
- 	} else if (urb->status == -ENOENT) {
- 		/* Avoid suspend failed when usb_kill_urb */
- 		return;
- 	}
-@@ -2846,17 +2847,17 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
- 	 * same way as the ones received from the interrupt endpoint.
- 	 *
- 	 * In H:4 mode there is no interrupt endpoint and every frame on the
- 	 * bulk endpoint carries an H:4 header, including the ones sent by the
- 	 * bootloader, so the regular decoding applies.
- 	 */
- 	if (data->proto == BTUSB_PROTO_LEGACY &&
- 	    btintel_test_flag(hdev, INTEL_BOOTLOADER))
--		return btusb_recv_intr(data, buffer, count);
-+		return data->recv_intr(data, buffer, count);
- 
- 	return btusb_recv_bulk(data, buffer, count);
- }
- 
- static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct urb *urb;
- 
-@@ -4387,16 +4388,17 @@ static int btusb_probe(struct usb_interface *intf,
- 	init_usb_anchor(&data->intr_anchor);
- 	init_usb_anchor(&data->bulk_anchor);
- 	init_usb_anchor(&data->isoc_anchor);
- 	init_usb_anchor(&data->diag_anchor);
- 	init_usb_anchor(&data->ctrl_anchor);
- 	spin_lock_init(&data->rxlock);
- 
- 	data->recv_event = hci_recv_frame;
-+	data->recv_intr = btusb_recv_intr;
- 	data->recv_bulk = btusb_recv_bulk;
- 
- 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
- 		/* Allocate extra space for Intel device */
- 		priv_size += sizeof(struct btintel_data);
- 
- 		/* Override the rx handlers */
- 		data->recv_event = btintel_recv_event;
++btusb-y				:= btusb_main.o
++
+ CONTEXT_ANALYSIS := y
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb_main.c
+similarity index 100%
+rename from drivers/bluetooth/btusb.c
+rename to drivers/bluetooth/btusb_main.c
 
 -- 
 2.34.1
