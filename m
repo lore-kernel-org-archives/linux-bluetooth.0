@@ -1,88 +1,174 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C1E43F8AE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 13:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789394242; cv=none; b=rAlqJcnKmYTuMSC7bL4iLcx4YJVqJWJGEs+PoNxsrxSrACgh1ag/1+obQQs4WOKZ90SopXwsLyformC8yUUlQQ8zYHvjQBBx7b1pAVu65rfSBTYqd6f0mcH0T5e7keBiSVY2mX6DjDgb9/hHcstcAbJqDzojMd6R7LzGPHU1/fg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789394242; c=relaxed/simple;
-	bh=92SKzTJwmRkrBP7sXDC6C6x+S98sJmgVbEFdz8c5cFk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=h2gOs04rlRdzyjkUy7rtiBFC/ajIx+IYzKXJoUs3KPI7s3dvx5LYbN3q5CdSe9JbiZ7KzZnWTIwASlculKmo9I4uhjITbKiv7MlORXn3zCk3kVizGG08S5Qm4mEdDXhacqdcHrrz530vV2xPatlHRY6gp9SykKO4UW76+GSIuGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hrxO9tdG; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1925947C0F7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 13:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789394261; cv=pass; b=eBCT4XoNlIuG5d9/rYPcV1yUVcIgjFSAEfE0T426xlvCtGqYs5LGkQpeDjf6VtX/EGPu7Yx69wGaWSBFrUxFtDUxwrvH6v5zsvHsNid5K+Nk/0wEigisbLj10rNpemqMJRD2KkB8GCXfWgEPe8bt/4ylg7O+xZFTgFhNDtbi9DM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789394261; c=relaxed/simple;
+	bh=lJVGF2MrIGJ6/Msnkutl7Ct5nsmA8aoi6v75pv+4DMM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lnq06ciYlcwuyLzvjPcAHIaA2FI5yQpZ14gtLdcgxyl/lZN/8c4hdv2WuBjUOt2wl2HN0EHtoahS2swKORWSPoLdCho4EoQFECXf22kKqRxkrXG+qgmFaXS4RShC9iy8RSBPRz8XBZJN3M8lxx1I0DIa7hwTkkWH6DJi2fKJE4g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GR5DFjcL; arc=pass smtp.client-ip=74.125.224.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hrxO9tdG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1789394238;
-	bh=RPECuoX691mFpDjBPsemn7a2QUGAgDcxBAc5Rnus4pc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hrxO9tdGvmjOTzwKxdMTC/dd2+O4rHKB9WefpXhy7IsG6RJhO6oXL5xbhRwUg4+OG
-	 spWKv9pCKND2fV4aYtvfmW1tFU+xRFdHTzH/WtdmSWSZj/RrA0p3cSojfGLXYOXDk4
-	 3jY0MElG+781Jp9g1EIprsLbG4W34WR8gmRBo3XQ=
-Received: from github.com (hubbernetes-node-c8253cd.va3-iad.github.net [10.48.175.43])
-	by smtp.github.com (Postfix) with ESMTPA id EADAB501045
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 06:57:18 -0700 (PDT)
-Date: Mon, 14 Sep 2026 06:57:18 -0700
-From: =?UTF-8?B?QXVyw6lsaWVuIFJpdmV0?= <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1164346/000000-13999b@github.com>
-Subject: [bluez/bluez] 13999b: mesh: Fix Command Disallowed on random address
- cha...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GR5DFjcL"
+Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e50968489so1512873d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 06:57:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789394259; cv=none;
+        d=google.com; s=arc-20260327;
+        b=j2OXcg2GfVSOwmXIFpB6mzr/+s2m6+CjqFhD/KvA5+SXwju/44fkPdHDCKLjT9od5c
+         zPTSAWOoy8oxpS+51MpeXZ3eLpKjBHtBonADqak4kl/mJ4wtNSwFzeaucii40Is0Wus9
+         O1Ek6y9GgdRC2KODU1L9iPX1trOKrC2m0c0wUSpHMoJaNd/Gj4Zw8BrDc+4gVjeYvkoX
+         3EJMOMrN2oSnR7r9x8fSf2qejxX4/1E5vdzLjRZ8kjRCCfIn0G8eIj0doGxFbzASpl0j
+         y4ryp4RATflri7TWdkkxIZqg0+6184ilA3q5ydupSO8kRfLGmPXGpYbVDSV0ZygMiOiW
+         Di/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
+        fh=wwjAA4ZEyVEj8lfObod3tAyJEJGkh82OBneQOnQXRKQ=;
+        b=dpal3HnyARWB6IKSCEUO5cmwGBNyQCCCJDhp074c91OuBI49P+Nd5YQYZ4STDPXXk7
+         VeqQSLp6p3eie9t9+Dm+BeO2SK1lqRnuQraGXBAvWYz01Ny6LAur0M5tZiqhQgZxWWT0
+         bA6NEeKvutnP/zIhWdXWTIbYwMeZokiYDm0BKwj/FvMh5Qrfrpgfd+DIa89yILVUEpgg
+         gSNZMn1SUbd9jpmG404SQYS6KwLjvp2iHaXeVv0VRygUSufbDR5WzI9ts9AI+ZRMGsAk
+         U24GQn6fniL3c9JzolhgVX1/DqsbHdd3gFCKSVgiYwqpAdNQ5cpqvisUj1mBEgGc0MoI
+         ZPQA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789394259; x=1789999059; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
+        b=GR5DFjcLwn+Z2Y3Yx4nSLtFkwK5akafc1wS5yfDLCq9YHk8Ze5AUVZGy34hMfoKrhy
+         exjw0Fpu2LIkEDHEfcSQZVir79wjexW5HexNaJiHqDYyD8hcW+zO/0/9gwUr430v10zZ
+         3i+G/8b3Zt8WF31PYUPrS4LLcg6u5uKVBkGQriB9FqIeRE9Lnp69YiqGMvOLgkXRzGwg
+         sFxutF9ku2F1iHAA8aCowTI8ExVCYGGuVYulhvNBF4/Dg+mamia6vnPeVHwd89b5X3A3
+         C/EiHdBBrq4FBpr3r9O82xY8XMDs5dGItC0fNPxWVbou9EBsuBHFcH6rv34FjUs+aKwT
+         Tudw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789394259; x=1789999059;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Ngouuzk5nO0PMiFaSO3Ww6fwWjCxaG/P3WaLVlqRSMY=;
+        b=SZTn2tKzdDp8o4dnfHmkIRDvtV67bUJo0/At8LSWTHtDqfeyo1vd35AkkSRDvNT9yV
+         rju8siqu+O3s44t7EeTdsFRmXlg9E8W3OihJbj1Ld8Hhbn4gbSshg8db+ItQqNk45U8T
+         YmyrmOtDKwmbATV9F8CP9333hbZghiuavzCU/f2RnbiUqdz2ZmavroivLdnGTcwld5pc
+         HAwBngy9fEjfisrA7LKk/TPnZJ4GuNnkxRtUVt9htVLePuwAuqoCVFjLFluMqe91B1/i
+         Q8CR/QYK+hwnJGbgSF23zOe0hP8NzMr8smVWJN/oZ9E9IPVihqYQc390lFbXeaMERW9t
+         12dQ==
+X-Forwarded-Encrypted: i=1; AKwUvByfL1xb4AYxEzKgZrD5GsCa3rKZfCtQZR9ZV4e9PlUxu4bIKfAPQ9CRZG1y/sXdy4NQhlbKQNveoRJZvspxNK4=@vger.kernel.org
+X-Gm-Message-State: AFuF++lPd5wqjkkIPhFIH0+C5Kx6zhWPqFqSqAlDXuYz5G4S6McVZSM+
+	/B08FAJivuZ9Lv+PnfspCF/+UJH7h5EK4vEOiZfpNFvtu7PD+dp17vUwtqzXPIHM52LDPAqQDM+
+	5F+7L1wkETVE7X74mm07n2/yzsM8RUqvxKa4dK1A=
+X-Gm-Gg: AYBFou2Y5WrqbiQoaBlUW0swu3zj1/saM+M3RJfVvXYiUPGLoFugcLOZKXQtYRXxnja
+	DtbjSy3patKTDdV7GmtWUsVbqhuH3pH3ABlei/nzyQN++i4lW7fZFzfjwlrxw/JtA2cX/zTgfBD
+	4MY3DORdArio63VkCr9YhXO0UxaW6CrXN8DjoPQhkJ21PeFiUFAtScGBqk64MduQ/LuyTdmbCrM
+	82/ZOi2190UFW6aP4+GeFi2aaQsQjBa4lQz8LpdJ6KDRNPkyf766GwMlimyxEPcNF12RhUOvD0t
+	baf4n9bonSu+iRTqI0dMXTxZU0SSn9pY39ZDdV12cAls27KLW1rWpxPSycLhn2iO/rEZ1XIGky9
+	EQSNbLQek7Kfg+XcGi/j+xE76DBBvqpIB5DuJBhbUlAFGXzE0xr43
+X-Received: by 2002:a05:690e:1183:b0:671:61a:eafc with SMTP id
+ 956f58d0204a3-6714dfc990amr984009d50.2.1789394259157; Mon, 14 Sep 2026
+ 06:57:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+References: <20260913-misc_fix-v1-0-558c1e4028b9@oss.qualcomm.com> <20260913-misc_fix-v1-1-558c1e4028b9@oss.qualcomm.com>
+In-Reply-To: <20260913-misc_fix-v1-1-558c1e4028b9@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 14 Sep 2026 09:57:28 -0400
+X-Gm-Features: AcwNN1UlvJrqDr-FHzd6LRUOZnDSIpfdPmPIufIaHT4FMUT4Dsw_TxMkpXL_CEM
+Message-ID: <CABBYNZ+ZUXkSO6ybT03vRCE_1Mwzm1hkbHqrndm2qL0mTLh0dg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: coredump: Fix skb leak in
+ hci_devcd_append() stub
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>, Manish Mandlik <mmandlik@google.com>, 
+	Zijun Hu <zijun_hu@icloud.com>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1164346
-  Home:   https://github.com/bluez/bluez
-  Commit: 13999b132abcab9103aaac9fd90b69152c968049
-      https://github.com/bluez/bluez/commit/13999b132abcab9103aaac9fd90b6=
-9152c968049
-  Author: Aur=C3=A9lien Rivet <aurelienrivet@hotmail.fr>
-  Date:   2026-09-14 (Mon, 14 Sep 2026)
+Hi Zijun,
 
-  Changed paths:
-    M mesh/mesh-io-generic.c
+On Sun, Sep 13, 2026 at 11:43=E2=80=AFPM Zijun Hu <zijun.hu@oss.qualcomm.co=
+m> wrote:
+>
+> For hci_devcd_append(hdev, skb):
+> it consumes the skb when CONFIG_DEV_COREDUMP=3Dy, but its stub does not f=
+ree
+> the skb. this inconsistency causes skb leak when CONFIG_DEV_COREDUMP=3Dn.
+>
+> NXP btuart device driver encounters this leak:
+>
+> btnxpuart.c:
+> nxp_process_fw_dump(hdev, skb)
+> {
+>         ...
+>         // the skb_clone() is leaked.
+>         err =3D hci_devcd_append(hdev, skb_clone(skb, GFP_ATOMIC));
+>         if (err < 0)
+>                 goto free_skb;
+>         ...
+> free_skb:
+>         kfree_skb(skb);         /* frees the original, not the clone */
+>         return 0;
+> }
+>
+> Fix by freeing the skb in the stub to keep consistent behavior.
+>
+> Fixes: 9695ef876fd1 ("Bluetooth: Add support for hci devcoredump")
+> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+> ---
+>  include/net/bluetooth/coredump.h | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/include/net/bluetooth/coredump.h b/include/net/bluetooth/cor=
+edump.h
+> index acc1849f66c0..07940a1d5dd4 100644
+> --- a/include/net/bluetooth/coredump.h
+> +++ b/include/net/bluetooth/coredump.h
+> @@ -103,16 +103,17 @@ static inline int hci_devcd_register(struct hci_dev=
+ *hdev, coredump_t coredump,
+>
+>  static inline int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
+>  {
+>         return -EOPNOTSUPP;
+>  }
+>
+>  static inline int hci_devcd_append(struct hci_dev *hdev, struct sk_buff =
+*skb)
+>  {
+> +       kfree_skb(skb);
 
-  Log Message:
-  -----------
-  mesh: Fix Command Disallowed on random address change in generic IO
+I don't think freeing it here is a good idea; in fact I think the bug
+must be fixed in the caller so it properly frees all clones, etc,
+actually it may need to check if hci_devcd_init fails and stops
+cloning and calling hci_devcd_append as a result.
 
-send_cancel_done() issues LE Set Random Address at the end of every
-burst of ADVs. The controller rejects that command with Command
-Disallowed (0x0c) while scanning is enabled, per Core Spec, Vol 4,
-Part E, Section 7.8.4, so the address never rotates as long as any
-scan is registered, such as a provisioner discovering unprovisioned
-devices.
-
-Pause scanning around the address change and resume it afterwards,
-mirroring the disable/re-enable sequence restart_scan() already uses.
-When no scan is registered there is nothing to pause, so the address
-change is issued directly.
-
-Confirmed with btmon on a Raspberry Pi built-in controller: over a
-60 s capture, 12 rotations about 5 s apart, each one LE Set Scan
-Enable(disable) -> LE Set Random Address -> LE Set Scan
-Enable(enable), every command completing with Success and every
-rotation programming a distinct address. No Command Disallowed
-anywhere in the capture, where the address change previously failed
-on every attempt. Scanning is suspended for 1.2 ms to 2.6 ms per
-rotation, which mesh retransmissions absorb.
-
-Assisted-by: Claude:claude-sonnet-5
-Assisted-by: Claude:claude-opus-5
+>         return -EOPNOTSUPP;
+>  }
+>
+>  static inline int hci_devcd_append_pattern(struct hci_dev *hdev,
+>                                            u8 pattern, u32 len)
+>  {
+>         return -EOPNOTSUPP;
+>  }
+>
+> --
+> 2.34.1
+>
 
 
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
