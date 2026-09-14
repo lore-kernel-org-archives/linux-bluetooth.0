@@ -1,69 +1,73 @@
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+Received: from mail-ua2-f12.google.com (mail-ua2-f12.google.com [74.125.226.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B852146D573
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 17:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0361351C13
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 17:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789408306; cv=none; b=fujplvXmGP8yHNcU5LA8+UyFJ2z+b3xqDV9luZAPUVbkYKzn82L+vkE0/WI6PQHUvrs0gDzU/8NXvp6lX3nLnWPMWuGAPlQCf2H42cCfb4W2jPfxRvD2EC93yAJPjRdQx0wc2A3JyYcinAcqtL/UfqfLOwkb5hG4NsdCazOzpZk=
+	t=1789408307; cv=none; b=LE43nqhJQQ2kyClDBtJ1zaG0s7fJCfSVZwSJsLRmySJTaeEBf3Qv2TVAjihcDb9xf0gFQOG4g0n7hJrXCjUCTuH8o5QyI8bvn/1nYClUbthv6kJEwTl/FZshios6gbJw3YGUJQmGUHDABEIO98I8FR8mvum4Iypi51ZE41eGeEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789408306; c=relaxed/simple;
-	bh=gQbCRWn8jk+pKFd6VFXk9UDNeWIC9a6VDiEhXPZb9pE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=esO3daQpmW2oFYWE7pHpRNwOWEm2teV7WN2ooy0dqHsAmpfVnaxCrBiy0NgAiXBfxprOO2bx22DA192xU4fxC4hpYOG4tHygBgoTF30Xp13aE0jMYK85Pj7i6r1XZlAzpCPQa+531a+Ihyu/Fsxe6Jtr+iby0JLD1TiasCNvVmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OcZ9bcxC; arc=none smtp.client-ip=209.85.222.53
+	s=arc-20240116; t=1789408307; c=relaxed/simple;
+	bh=kXQg7fScnN5CSbZVAm3FmH9CtaiT0uWyy43YRDJRWDU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GqchnWZaYh7lFSsT5J+UDajchLBzsEA+L/5zjeHmjV2jTerhQpQoy4ecUsboxt+pSpgas7vFl4G912JOT6qzkeODt8vy74mI+7FKGET6HoMWarTpGsd+mC6GGUk7c4zO8oBdhNP+JedSl6eTd/JUva5q39hz2b0bKtiefzw3cVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvhFSd0p; arc=none smtp.client-ip=74.125.226.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcZ9bcxC"
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-9828b5b20eeso2181387241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 10:51:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvhFSd0p"
+Received: by mail-ua2-f12.google.com with SMTP id a1e0cc1a2514c-97e96a8ba8cso2007390241.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 10:51:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789408303; x=1790013103; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GjUIFmzDVKVLEgXOmh142GlgmNaVh+Dc96+5p/iohSo=;
-        b=OcZ9bcxCkiGNICDHwusBXyaa8W0jpUvg1Lrr0VRTQvi8DAd84KDNKFF1pvwnvnQQIL
-         6qyri4YTJlTQsMlJ6oCK9PcjVjhQofYRUGNY6ADV2w9UP4PZsBm07sfrFiT128Th7Zfa
-         KcLninhLJpg91/UvC8L8SYwIFx4781eD8wSXRsERLum6E6oKysbi8I9S8Ou9ogSGRMUS
-         xA4/UwGbhgjqJWCE3sRLxMxURE0+wJNbwMN5yZv/OHtWqueiqIOdsfy6twMn8KAuttEC
-         pqnjwTWqPgeQ2r8KfrEdFylG5Pr9167bsUIXJFyF4EX5GFRYSVYJv326weD7HuBnZkJq
-         qIDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789408303; x=1790013103;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1789408304; x=1790013104; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GjUIFmzDVKVLEgXOmh142GlgmNaVh+Dc96+5p/iohSo=;
-        b=fWhDB1AuWkhPlvyyqOsgQCZtYL9HHPQrYIZK1qwY8QK5zU6B4qr15QOXCeXvbGW/D6
-         s7+33fRPIzav1RmNZqlywuEjKGq7R5zrJSVa1WV2bpLWssZuqF3M/TSqfP/SneJMlvfc
-         DDuO+gLA8K4Hdw0JadS0x+4gGg0i7BwD2+faEIP5v3O2QBfJJaDFYwfagr3TVy13hq8v
-         tpv6b8jUARfnCBDD/SEzo3pAUlGti+UPAKrBBM6U2yIxSS6jjTSQJX80cHTpK0T4roNk
-         Ny8QiXCDeHahvRo2dQo4WiTzhCg0srqs+P1YLn6Ixosf5eiF+wtueiXyj6LJk9NxPetY
-         BnnA==
-X-Gm-Message-State: AFuF++lYGaGLKBq9dHWPD1WZ5uJFRlam/5bsBTMCfPskjg1Ncfu852ju
-	fUoqGrqUpMKy5lmvZRjEvppcI6glEy+HE8n1rlN3tX+xmRWz1tqQaxAr5jsUqQOw
-X-Gm-Gg: AYBFou1BFkC5GBmdcgvscmimDlyhOMzJfxQrzv6b3yWiQm8nkin7VsMTPXgVyKBfvpi
-	lGdbAwSD492Wvq/pPgMkTSbvGR8Bqc70lyYt55KShJuYk5NWBWY11XHn8mNsnHkTG2GVjcHCfUV
-	O3MARE4LdOohpQF9fmgHU4Bbtztyhw0MQEcUZy/lVbjSkwc3plC07nG3b0dNxnQ4+oOmWBKzSkA
-	RaI4epI7DpWtj0OXJqq4MBl4NZI6I7mzsy245mW4R6xksd4bhaNu/xZAJhZSXSG3oOv8Uqm7sTt
-	uPWN4w3PNdlHDYpAZ558UE24FDXvBxv6f4cwH02NgDIGsyaUKoQ6ay+6RXBFOO4bGXW+NHJk9Ex
-	jg3M9OV2vEBb4kMXGEQ9mbs2jrkdTaAYMGn/UtL7aX1jZM0epjcHIxBgakGN2ut4RxmgljO3Vwl
-	we1pxheHLwNLuLqk4RCCpxN3QJotKMXqW2WH9ntxn+QYzJEgTKWN/y6LSwu7xZxU9e1a7jteqh1
-	I657uvUDxsm1o4SI83iLVk/CbhltaKjvruqHYykVSmnbDLOERFh0SWLS5rfypHnqw==
-X-Received: by 2002:a05:6102:370b:b0:79c:476a:aae8 with SMTP id ada2fe7eead31-79c476af184mr3750561137.10.1789408303178;
-        Mon, 14 Sep 2026 10:51:43 -0700 (PDT)
+        bh=OdL9Iy/IFPcIg0cK+E2j1iCFNw/VyL99vZL+0tP5k6c=;
+        b=IvhFSd0plUe6f734N0Kc5bkIdH0ZhHcR6knMTfPi+0/fP48MJW1COpk3TtaMkCl1+V
+         GxoYtAM6mT+gbHoNLSgPsCu9fqqhMQw+5gUztFFu6wThAwnMy72/JcYA7jVfVJEjSQl5
+         BpkS67UILKS1PSTsBOvv2/I0AJQaBrkpDNzly06HvG4Uh5Uj85PvqLHAXW068rX7al5d
+         T/WEO/Ph2UQtp9ji5BlfTDY741jqX8hF2ROIH6SUfGsrhT2DVSkDPJE7S7jI5pvbfrK8
+         6aGqV9Jg4ESRFb2e9O0pJghwMgLjRoQVMn6A07ytTWKZCJwnaV4yxbq0B+pDGMqCg50j
+         wGZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789408304; x=1790013104;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=OdL9Iy/IFPcIg0cK+E2j1iCFNw/VyL99vZL+0tP5k6c=;
+        b=hImYl1lnz1nH3BwVTX4wK0UF39Nd5MNOVqpcfBpmoi2xCx8vyHbLyrKJPAV4eirm6R
+         hl9YqDTtNgGANFmjr4sr3xb654rv8P+wDOLn3u+pum9zsrnyfU8BT8FyqHf31c3vjr3t
+         S37Ezq4GnjJufVY9hKqAoPnlYnhMxO9X4CdD+82sde1Zs3HP9DdTR3Q/DWxP5EaJ27AR
+         g+AuMuV6lwP56mAt/JFRMGBzT8CXeYN+aYPmHEjwXJpkw6+jXlgWqThYXI0evU4nhSPD
+         PNb9mhoMn4Fpbc3Nd47+F9z1/RZGJj20VzxrA5lnOf/qikET5PzAoImGIYPOweybMMGL
+         r2VQ==
+X-Gm-Message-State: AFuF++kGOrYDi6IKCX86YjrTeJJtlfCQjDYJq2ztMUiWdxD7N7xhWiVW
+	Z5x41Tr+EyECg240ptb9bOzrwJ/1SXnH90KWalUAjPVSWvPy5SSCUM0phXsXEb9/
+X-Gm-Gg: AYBFou0lOhSahGFiL8RIOwgYU1q4qSIvDUMJiTDInFgLydIy1yUacjjsTymTbmQunIU
+	75vI24sGvMfOqoYNAPpcQdMgjS0hVCr0bz8+FdxHD5Pa8Q9gBFz6hhnZ5kyD60cUwW5ZfskUIBs
+	T1id4oAMCG3pa3GhK+026w1fIGwwlt13k36U8LbwmAXNu2WtFvUKdMwZwmY+A+n4Uthc4NNOmJD
+	pW9cEZUsr36g1FcoI0nT/w0/4RWnXKwDFqo6UX+XBMsos+opmFh/+/cVSmehjDpsseSH+rdEQ2b
+	2UPBPeWCQSLWaaG4Hdcvc7thpinvmCvnU1/SFy+VyD2kG9CC7WqM+ew6ZdDh8Jt63Sol9ZeMuvS
+	TBdfkpZOs5XZ+vckfGNcA9Sr1eRqozzBxWc2MQdbd20/8kuK01Rfj8ICIGZNf6qjfyMSREpQ5+b
+	lPR2z5YaV6jWlYaUvjLiaEGNRQo4aTdptBueD1uify4CSLUPqZ7svK9q4RiJquVpv/+0WAy9ypl
+	UcFie2X/u0Xw/ahPR1EzgA061fjjtGMwyj8tOBRpzK620u4hhAQGbNvNFwa3OtHzQ==
+X-Received: by 2002:a05:6102:8097:b0:790:235e:4209 with SMTP id ada2fe7eead31-79b5c028e07mr2269134137.12.1789408304334;
+        Mon, 14 Sep 2026 10:51:44 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7927ed7d0absm10957654137.9.2026.09.14.10.51.42
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7927ed7d0absm10957654137.9.2026.09.14.10.51.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2026 10:51:42 -0700 (PDT)
+        Mon, 14 Sep 2026 10:51:43 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] doc: test-runner: document the virtual machine architecture
-Date: Mon, 14 Sep 2026 13:51:33 -0400
-Message-ID: <20260914175136.613532-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] doc: test-functional: document the test environment architecture
+Date: Mon, 14 Sep 2026 13:51:34 -0400
+Message-ID: <20260914175136.613532-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260914175136.613532-1-luiz.dentz@gmail.com>
+References: <20260914175136.613532-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,147 +79,136 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add an ARCHITECTURE section describing how the virtual machine instance
-is created and how it communicates with the launcher.
+Add an ARCHITECTURE section describing the split between the Pytest
+upper tester, which runs on the developer machine and drives the test,
+and the VM hosts started via test-runner, which run the BlueZ and kernel
+instances under test.
 
-Document that the tool is both the launcher and the guest init, that
-there is no disk image and the launcher root filesystem is shared
-read-only over 9p, the TEST* variables passed on the kernel command
-line, the sandbox mounts and the writable overlays needed on top of the
-read-only root.
+Document the control, log, tty and shared channels set up on top of
+test-runner and how they relate to the existing options, and the btvirt
+and USB controller topologies. Details of the virtual machine setup
+itself are left to test-runner, and writing VM-side test code to the
+pytest-bluezenv documentation.
 
-Also document the console and controller attachment: the guest console
-is /dev/hvc0, and '-u' attaches the given socket as a second virtio
-console, /dev/hvc1, on which the N_HCI line discipline is set so the
-transport is HCI H:4 to the hci_uart driver. Mention '-o' as the way
-additional channels are added, as done by test-functional.
-
-While at it, add the missing '-H' and '-o' entries to OPTIONS.
+Also fix the temporary directory paths, which are named after
+pytest-bluezenv rather than bluez-func-test.
 
 Assisted-by: opencode:claude-opus-5
 ---
- doc/test-runner.rst | 105 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ doc/test-functional.rst | 92 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 90 insertions(+), 2 deletions(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index 12f80df04964..6429e80fc75b 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -25,10 +25,115 @@ OPTIONS
- :-U/--usb=<qemu_args>: Provide USB device
- :-P/--pcie=<qemu_args>: Provide PCIe device
- :-q/--qemu=<path>: QEMU binary
-+:-H/--qemu-host-cpu: Use host CPU (requires KVM support)
- :-k/--kernel=<image>: Kernel image (bzImage)
- :-F/--virtiofs[=<path>]: Path to virtiofsd, or no to disable virtio-fs
-+:-o/--option=<opt>: Additional argument passed to QEMU
- :-h/--help: Show help options
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+index f45867f2dbe3..4a784e7850a3 100644
+--- a/doc/test-functional.rst
++++ b/doc/test-functional.rst
+@@ -143,9 +143,97 @@ Tests that require kernel image or USB controllers are skipped if none
+ are available. Normally, tests use `btvirt`.
+ 
+ VM instances share a directory ``/run/shared`` with host machine,
+-located on host usually in ``/tmp/bluez-func-test-*/shared-*``.  Core
++located on host usually in ``/tmp/pytest-bluezenv-*/shared-*``.  Core
+ dumps etc. are copied out from it before test instance is shut down.
  
 +ARCHITECTURE
 +============
 +
-+**test-runner(1)** is both the launcher and the guest ``init``.  When run
-+normally it builds a QEMU command line and starts QEMU, replacing itself
-+with it unless it has to stay around to clean up after a ``virtiofsd`` or
-+a passed-through PCIe device.  The same binary is re-executed inside the
-+guest as PID 1, where it sets up the sandbox and runs the requested
-+command::
++A test run consists of the Pytest process (the *upper tester*, running on
++the developer machine) and one or more *VM hosts*.  Each VM host is a
++separate **test-runner(1)** instance, i.e. a QEMU virtual machine booting
++the given kernel image with the developer machine's root filesystem passed
++through read-only.  The VM hosts are wired together by a Bluetooth
++controller: either the emulated **btvirt(1)** controller, or a real USB
++controller passed through to the VM::
 +
-+    ┌────────────────────────────────────────────────────────┐
-+    │ test-runner (launcher)                                 │
-+    │   ├ virtiofsd (optional)  ←─── vhost-user ───┐         │
-+    │   └ qemu                                     │         │
-+    │      ┌──── guest ─────────────────────────────┴─────┐  │
-+    │      │ kernel (bzImage), init=test-runner           │  │
-+    │      │   ├ prepare_sandbox()                        │  │
-+    │      │   ├ attach controller (optional)             │  │
-+    │      │   ├ start dbus / bluetoothd / btmon / btvirt │  │
-+    │      │   ├ fork+exec <command>                      │  │
-+    │      │   └ reboot() when it exits                   │  │
-+    │      └──────────────────────────────────────────────┘  │
-+    └────────────────────────────────────────────────────────┘
++    developer machine (upper tester)            VM hosts (lower testers)
++    ┌──────────────────────────────┐           ┌────────────────────────┐
++    │ pytest                       │  control  │ test-runner / qemu #0  │
++    │  ├ host #0 ──────────────────┼───────────┤  └ bluetoothd, obexd,  │
++    │  ├ host #1 ─────────┐        │    log    │    bluetoothctl, ...   │
++    │  │                  │        │           └───────────┬────────────┘
++    │  └ btvirt ──────────┼────────┼── HCI ────────────────┘
++    │                     │        │           ┌────────────────────────┐
++    └─────────────────────┼────────┘           │ test-runner / qemu #1  │
++                          └────────── control ─┤  (same as above)       │
++                                     log, HCI  └────────────────────────┘
 +
-+There is no disk image.  The launcher's root filesystem is passed through
-+read-only and used as the guest root, so the guest runs the very same
-+BlueZ build tree that was just compiled.
++The upper tester never runs Bluetooth code itself; it only drives the VM
++hosts.  Test code executes inside the VMs, which is what makes it possible
++to test two independent BlueZ and kernel instances talking to each other.
 +
-+Two passthrough implementations are supported.  When ``virtiofsd`` is
-+available, a ``virtiofsd`` process is started alongside QEMU and exports
-+``/`` over a vhost-user socket::
++VM hosts are started lazily and reused between tests where possible, since
++booting is the expensive part of a run.
 +
-+    virtiofsd --socket-path <tmpdir>/virtiofs --shared-dir / --readonly
-+              --tag /dev/root ...
-+    -chardev socket,id=virtiofs0,path=<tmpdir>/virtiofs
-+    -device  vhost-user-fs-pci,queue-size=1024,chardev=virtiofs0,tag=/dev/root
-+    -object  memory-backend-memfd,id=mem0,size=<mem>,share=on
-+    -numa    node,memdev=mem0
-+    -append  "... rootfstype=virtiofs root=/dev/root ..."
++Channels
++--------
 +
-+Since vhost-user requires the guest memory to be shareable, the machine
-+memory is backed by a memfd object.  Otherwise, the fallback is 9p::
++Each VM host is started by ``test-runner`` with additional QEMU devices
++(``-o``), providing the following channels between the upper tester and
++the VM:
 +
-+    -fsdev local,id=fsdev-root,path=/,readonly=on,security_model=none
-+    -device virtio-9p-pci,fsdev=fsdev-root,mount_tag=/dev/root
-+    -append "... rootfstype=9p rootflags=trans=virtio,version=9p2000.u ..."
++control
++	Virtio-serial port used for the RPC connection over which the
++	upper tester drives the VM: starting daemons, running commands,
++	collecting results and exceptions.
 +
-+9p passthrough is noticeably more CPU intensive, so virtio-fs is used by
-+default whenever possible.
++log
++	Virtio-serial port carrying the log records produced inside the
++	VM, with their timestamps.  This is what ``--log-filter`` and
++	``--no-log-reorder`` operate on, and why accurate guest time
++	(``chronyd`` plus the KVM PTP clock) matters.
 +
-+Either way the kernel command line also carries the launcher settings::
++tty
++	A serial port with a root shell on it, used by
++	``test/test-functional-attach``.  The socket path is printed at
++	startup as a ``socat`` command line.
 +
-+    -append "... init=<test-runner> TESTHOME=<cwd> TESTARGS='<command>' ..."
++shared
++	Writable shared directory, ``/run/shared`` in the VM and
++	``/tmp/pytest-bluezenv-*/shared-*`` on the developer machine.
++	Core dumps and ``btmon`` captures are written there and collected
++	before the VM is shut down.
 +
-+The ``TEST*`` variables carry the options given to the launcher over to
-+the guest instance.
++The ``test-runner`` console (``/dev/hvc0``) additionally carries kernel
++messages and is captured as the host log.
 +
-+As PID 1, ``prepare_sandbox()`` mounts ``sysfs``, ``proc``, ``devtmpfs``,
-+``devpts``, ``debugfs`` and ``tmpfs`` on ``/dev/shm``, ``/run`` and
-+``/tmp``.  Since the root is read-only, writable ``tmpfs`` instances are
-+also overlaid on ``/var/lib/bluetooth``, ``/etc/bluetooth``,
-+``/etc/dbus-1`` and ``/usr/share/dbus-1``.
++Controllers
++-----------
 +
-+Console and controller
-+----------------------
++By default a single ``btvirt`` process runs on the developer machine and
++provides an emulated BR/EDR/LE controller to every VM host over a UNIX
++socket, also bridging the air interface between them::
 +
-+The guest console is a virtio console, ``/dev/hvc0``, multiplexed onto the
-+launcher's stdio, so kernel messages and the command output appear on the
-+terminal that started test-runner.
++    VM host #0                 developer machine              VM host #1
++    ┌────────────┐            ┌─────────────────┐            ┌────────────┐
++    │ bluetoothd │            │     btvirt      │            │ bluetoothd │
++    │  hci0      ├─ HCI H:4 ──┤ (emulated air   ├── HCI H:4 ─┤  hci0      │
++    └────────────┘            │      link)      │            └────────────┘
++                              └─────────────────┘
 +
-+With ``-u``, the given UNIX socket (typically a **btproxy(1)** or
-+**btvirt(1)** server socket) is attached as a second virtio console::
++See **test-runner(1)** for how the socket is attached to the VM.
 +
-+    -chardev socket,path=<socket>,id=bt0
-+    -device  virtconsole,chardev=bt0,name=bt.0
++With ``--usb`` the ``btvirt`` process is not started; each VM host gets a
++real USB controller passed through instead, and the VMs talk over the
++actual radio.  Tests still prefer ``btvirt`` unless ``--force-usb`` is
++given.
 +
-+In the guest this is ``/dev/hvc1``.  test-runner sets the ``N_HCI`` line
-+discipline with the H:4 protocol on it, so the kernel ``hci_uart`` driver
-+registers an ``hciX`` device.  The transport is therefore plain HCI H:4
-+carried over a virtio console to a UNIX socket on the launcher side::
++Writing test code that runs in the VM, and the available VM-side
++facilities, are documented by `pytest-bluezenv
++<https://pypi.org/project/pytest-bluezenv/>`__.
 +
-+    guest                                             launcher
-+    ┌───────────────────────────┐                 ┌──────────────────┐
-+    │ bluetoothd                │                 │ btvirt/btproxy   │
-+    │   ↕ mgmt / HCI sockets    │                 │                  │
-+    │ hci_uart  hci0            │   virtconsole   │                  │
-+    │   ↕ H:4                   │     bt.0        │                  │
-+    │ /dev/hvc1  ───────────────┼─────────────────┤  AF_UNIX socket  │
-+    └───────────────────────────┘                 └──────────────────┘
 +
-+With ``-U`` a host USB controller is passed through instead (a
-+``qemu-xhci`` controller plus the given ``usb-host`` device), and with
-+``-P`` a PCIe controller is passed through via vfio-pci.  In both cases
-+the guest uses the normal ``btusb``/``btintel_pcie`` drivers.
-+
-+Extra QEMU devices
-+------------------
-+
-+``-o`` appends raw arguments to the QEMU command line.  This is how
-+additional channels between the launcher and the guest are added, for
-+example by **test-functional(1)**, which attaches its own virtio-serial
-+ports and a writable shared directory this way.
-+
- Kernel
- ======
+ REQUIREMENTS
+ ============
+ 
+@@ -357,7 +445,7 @@ e.g. by running with ``--trace`` option.
+ 
+ To do it manually, when starting the tester will log a line like::
+ 
+-	TTY: socat /tmp/bluez-func-test-q658swgi/bluez-func-test-tty-0 STDIO,rawer
++	TTY: socat /tmp/pytest-bluezenv-q658swgi/pytest-bluezenv-tty-0 STDIO,rawer
+ 
+ with the location of the socket where the serial is connected to.
  
 -- 
 2.55.0
