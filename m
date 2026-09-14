@@ -1,114 +1,122 @@
-Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5B446BEF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 14:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2D73F12D8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 14:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789396503; cv=none; b=XrxQcF5Sk4P43P9gZ6OxLGLOINP4/g1ovtCzaIpXIcSla71rH2y0A/Xaog66TlzHn4Jd9FWfvM5LAxZTiGMckUHk16LGKq8qNceB2fswOhe4QeAEK39WmaHK2isaTElBZ2GW7/Uz61SqJAEFTFaP86mCMVHRkfodU2S5xqxr/mw=
+	t=1789397065; cv=none; b=iqrHPEIa0gK3BoulKD99E/gyIFAwLq/aMS1Fba3XV5m/PTaTeDtuuWBanjeDT8GWijyyYoxWKuyUiOhf5RKrFd39PZCwvtmW+yT2HeNq7MzuABOVWG2Vi6oPZQkUZIlFGlFBPTtXBxt4uvTu7WD/jmhBNM/N7zbCxayOrIsmn+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789396503; c=relaxed/simple;
-	bh=nCIP0DdBCQBOGhJwVPQXme04JG/aGdw3DpmmzCc5DCs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eS5zSmkdQXhgBmJzerk6JPUhDEfUTwrpwsGqOY0rusX8cMFTs7HSJgcDZ7DqX4Ew01jna+PgOaMZijo4QyhJiWzFbpTMF8LVaQi4aeH3osajFKTGtKbR0peZzYY8nsLBQ8sB1Hj1fvTUfEawxlfTsYhM0V952hTGklC3DOVWYNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTuRJDLc; arc=none smtp.client-ip=74.125.230.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789397065; c=relaxed/simple;
+	bh=C5ZxQIpzDWIc7RI/lH8BmiFp+3mp3meiR1JAZS/P328=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fY821b2IgQhiVokMowv2VqiMXuCrG9EspzpLe0fW3YkS2bco2oC4oiMofojua79+UHToU5BvaIxCJRwZxuESrolZ6sNHDGMlJ2BOaG6ruczVgIZ0EZN5/mXLK8w1ZbPj/6joAao+KsMTJvZn/FjQzAUlNPp80nTkZqlM5rckY7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QkPqxqXd; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTuRJDLc"
-Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-52fb76c9deeso34731051cf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 07:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789396501; x=1790001301; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=CAUzAH/ly30jW+Zci9RoLpipgs9k9+kqA1dW+JCYuIA=;
-        b=jTuRJDLcYl+eIkuLDxz+iEiN5l6llc9MDBMBN3X3GODHnnq+W5L+EEMJb+v3xvhoY7
-         s3oRLqQCPV4iT+8lPKLYqozoezWv5ZfPZHj/7RCqdTkUSeCgQLKdyvMA1kcv4mUnF0Ob
-         +tx40XvgG5m98fft881R9dok1RQv3xnrl3YgM55Dv/3ueWA1eaiJq5mvjh6lNi/BJUdr
-         EYl2K7t/VPj96psFqkJnJf2UC9H23VoODLJczM/GtJT1eAiwlAM8WpOoSfCIeXPfcZ3y
-         04O+ujWp4Q6ibMw3e2AEzw1llyFy4FL1tngWXeFgiKZNwL6xcZEvZLx2rkLi3juMSy4i
-         +ZyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789396501; x=1790001301;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CAUzAH/ly30jW+Zci9RoLpipgs9k9+kqA1dW+JCYuIA=;
-        b=gu5aw5vRroHZJHQkdw66pt1HR58kmkllosmQ5EPlphJzT0ET4DvpA+lf25X0+OInzo
-         hK81mQE2qQMD2iUs5jpfUwMbL8XHhuslLINadzd6WpQ71oSiFT43QSXlKaQOPQuQJmmo
-         mqSNeb4vlgOQ/rJ7yDYq5oZPCTwckmLC67xD2PkYo+hQQ1BGhIOagazvc2MSRWo7Hs3G
-         vMO32ugFjGdA0z3QGK4UfZ5BckcnVybY5te0GDQbZbhx5ZWIZPkQSOQ1FeFOfjxMKKQE
-         BjI+S5bFmIhZR4BBk2jjtthvZ3RhpHtbPTnL4SOrE5bAWUOxfpjynd5hELqS8+q0CDM2
-         ZGAw==
-X-Gm-Message-State: AFuF++k0j+cRXduLGFuLwbsnII4lnTD3vThwVzIhhNsU+PZAbYtKA14C
-	SNFhTZagNVMXLGItsZV4Lpl39B9oK+uxdRfFFj/F8bAAC4klHJl0usYsRQZpxA==
-X-Gm-Gg: AYBFou02PMOE/NzO4FFilx+SjCRiWzyW0W3Wbw/Y68Ju89dAs9eVYZsKrXTiUKJzjYh
-	dxn+RcH6HiykZYW0iGOguHhPNQdJ8Bh7XDJK8trkS8/aU2rytQS/TdEisANqaR4aXO/K+oygwSf
-	r4YmcxZW+2f/ggcQWLJRlqGmIIL0ROCAgRU+AXiZ745qj3S6cWSHUHJ4P1yEWOGUwhJrHkUIfRd
-	RnsiKvCsUd9budT/q2KB0AzxmUdJ/DUcmlmTcIsyhsGggvagYcdWyRp2nOCp6OgtZSyxILofKZ1
-	pM9bWb5LqUMIF50+KONBFnHTbzNGfc416F8Ot2HuMGgPmTxqML8z5ZQdQh8xD1vYKaFtAlCPALO
-	EtRralz478FqoS+J46N5f8ng9lS/yRWtwoNFH27P2W5v4lkmAqeRUJt7yC3vFq5+Di8DVef2wfz
-	SHN4g4P76AQt44VcVk/ODfQgfaZ9H7OgCSG1d7L/c/2dUUNsBCxbUCrt25+oUHgQquNCqD0YoMy
-	EtKX5HA
-X-Received: by 2002:a05:622a:48d:b0:530:aae3:2421 with SMTP id d75a77b69052e-5310cf173femr41270201cf.1.1789396500987;
-        Mon, 14 Sep 2026 07:35:00 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.133.245])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-530ca3098easm100531941cf.3.2026.09.14.07.35.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2026 07:35:00 -0700 (PDT)
-Message-ID: <6aa80614.0298835c.1b2797.1d5c@mx.google.com>
-Date: Mon, 14 Sep 2026 07:35:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8521005342738342154=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QkPqxqXd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789397063;
+	bh=E85a0ZYxDepabZ6r4aS0yIC1YJxVHhUbGf4+vTllx5E=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=QkPqxqXd8xylPKbjUft7bXLOQGdpVG0JIIJFQmroO5mtlhOprzzTHgbhckIUIZFqB
+	 EOJMSD2bjIGxVqn0kHB/oyqY0KdV9HCNL1Td4hmhVJKXKU7pHL555Q+dr+gSoiOKVd
+	 ovXKUeUJqS4M8kLN59XCryRE51doaulO/JE8wVOU=
+Received: from github.com (hubbernetes-node-6302fbf.ac4-iad.github.net [10.52.178.35])
+	by smtp.github.com (Postfix) with ESMTPA id 9B00BA01B8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 07:44:23 -0700 (PDT)
+Date: Mon, 14 Sep 2026 07:44:23 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/action-ci/push/refs/heads/main/fa1938-e0b8a6@github.com>
+Subject: [bluez/action-ci] b6dd0b: Add instructions for localci usage
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, aurelienrivet@hotmail.fr
-Subject: RE: mesh: Fix Command Disallowed on random address change in generic IO
-In-Reply-To: <PAXP250MB0544B307EB9802855B711F71CBBB2@PAXP250MB0544.EURP250.PROD.OUTLOOK.COM>
-References: <PAXP250MB0544B307EB9802855B711F71CBBB2@PAXP250MB0544.EURP250.PROD.OUTLOOK.COM>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8521005342738342154==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/main
+  Home:   https://github.com/bluez/action-ci
+  Commit: b6dd0b29c7e56b829b62f33377e321298a0c8358
+      https://github.com/bluez/action-ci/commit/b6dd0b29c7e56b829b62f33377e321298a0c8358
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    M README.md
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1164346/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.46 seconds
-GitLint                       PASS      0.30 seconds
-BuildEll                      PASS      18.17 seconds
-BluezMake                     PASS      311.80 seconds
-MakeCheck                     PASS      0.88 seconds
-MakeDistcheck                 PASS      134.21 seconds
-CheckValgrind                 PASS      137.30 seconds
-CheckSmatch                   PASS      233.12 seconds
-bluezmakeextell               PASS      88.27 seconds
-IncrementalBuild              PASS      312.79 seconds
-ScanBuild                     PASS      927.70 seconds
+  Log Message:
+  -----------
+  Add instructions for localci usage
 
 
+  Commit: f0821a6828397be6a7062910be3d6071ddcb5e29
+      https://github.com/bluez/action-ci/commit/f0821a6828397be6a7062910be3d6071ddcb5e29
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
 
-https://github.com/bluez/bluez/pull/2527
+  Changed paths:
+    M entrypoint.sh
 
----
-Regards,
-Linux Bluetooth
+  Log Message:
+  -----------
+  entrypoint: adjust expected bluez source dir for localci
+
+For the localci local dry run mode of entrypoint.sh, make bluez source
+dir the same in kernel and user modes.
 
 
---===============8521005342738342154==--
+  Commit: ba88cf65ea0ff1d48662e6b960cf163550291778
+      https://github.com/bluez/action-ci/commit/ba88cf65ea0ff1d48662e6b960cf163550291778
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
+
+  Changed paths:
+    M ci.py
+
+  Log Message:
+  -----------
+  Log full errors in test runner
+
+Make debugging the CI runners easier by logging any exceptions raised.
+
+
+  Commit: 3bbb6fe6c03d1bc467d230d2114f47c5c1b19697
+      https://github.com/bluez/action-ci/commit/3bbb6fe6c03d1bc467d230d2114f47c5c1b19697
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
+
+  Changed paths:
+    M ci/__init__.py
+    A ci/testfunctional.py
+
+  Log Message:
+  -----------
+  Add hook for running test/test-functional tester
+
+
+  Commit: e0b8a65c986560e21d609b5d75792e214d72b8fa
+      https://github.com/bluez/action-ci/commit/e0b8a65c986560e21d609b5d75792e214d72b8fa
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
+
+  Changed paths:
+    M ci.py
+
+  Log Message:
+  -----------
+  ci.py: add TestFunctional to user tests
+
+Add TestFunctional to user tests. This includes kernel build.
+
+
+Compare: https://github.com/bluez/action-ci/compare/fa19384d4c70...e0b8a65c9865
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/action-ci/settings/notifications
