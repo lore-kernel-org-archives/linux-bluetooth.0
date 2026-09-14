@@ -1,105 +1,111 @@
-Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-6.smtp.github.com (out-6.smtp.github.com [192.30.252.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B57B479860
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 22:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4008479860
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 22:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789424799; cv=none; b=gABRLAD68n0gDYh7fQl2lrMy+3OcpXp3wY86E9kVTmdoIEgoUom64zanhFi5zhUMe9jA/+kedNYo2K4lccKUx1dGuVo2tSD3nEkeoBMSEfFPkZoIeyzTH2qmBtcoLnNkd03JzFQ52y8ZGFPquvAF0difWGdQz6ASkhpox6+TkK4=
+	t=1789424841; cv=none; b=uXKhwm++dt+LDU7qaaj9t1Sbeik7zcfX7FhY/m1R6Z6voYX0dpVtLN95gD0vpEvfIgvKoOsO67G2a5bLggh4a7VHzzI3VBTCSgqHwZaLeYb5CKz1h26ePZKfK0FkAXnf3GE23OR4eA+rdNlAVd3gewCEjV080HSI6iTwbABP5L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789424799; c=relaxed/simple;
-	bh=gxjHwooAIRp3m/xtMm4pg/VR1qXewcSLAGfwreNN1Kk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ujwkqCM64v3qK5q6iZB31o71y6rjhLHrNcQ6a3WR1kKQLoTIaqUqnk/kwp2UVPAaReBRmvujtudYtysFPzM2bNW+f5jDMP2/kcP8kPRMypQseWXx4VMqrSfNqkAoYtlnCBdl1CUN9yLT6FN9XWekD+cZO1BT0UJ1khkujj1j6Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tjri0Fhi; arc=none smtp.client-ip=74.125.230.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789424841; c=relaxed/simple;
+	bh=7J5LszGhBRLR1hj/KDoJJoyK1PrLEDqF7XiPqLiPJbc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JHBrc1mnbGZWtkvWNZW/cxeZtgLY+CTLvVJ+oUAubKaD3I61CLJlZbmkriXKSaoawSKwUSoeLmA/soDtmEHccREWsAoWIFLau0HRBOytTQ1n3hq10UgFM4iYxhrkRn0GU12oLbhQ43Poj4/45S6xyk5DfF4E9TexhKBZtg/jrBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XNy3y8ez; arc=none smtp.client-ip=192.30.252.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tjri0Fhi"
-Received: by mail-qk2-f13.google.com with SMTP id af79cd13be357-93910c9fe21so45836385a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 15:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789424797; x=1790029597; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=pVtdiTQLCGZpjhaUz315yh+/HlnocentIWbIIAeGHrc=;
-        b=Tjri0FhizALZCNVqkUU2jnOWEFgsRPk9FfKWJQRayRyM8RGhFhrqsEBCprYYtc1OJy
-         Rr6F+bBTMXH0u6CLsTleCUS1U/Nn12b2KRU+d6atrlXreuY+nJz7yzf6qMSej13hbJZo
-         9Xl4E1UGVAVJDIFgrWnNuozugvcu4ZYf7nWsvKJ2UHIBcQ5OZJQQ5LpIDrHGI9xPrAy0
-         POoJNmvpRaQQ1oLsbFWRknvUMH5j7MKTrOxfjmZEDxpp3taFwF1unaZUA/dGVBJAF1vO
-         LkM5bWJy3uGEb991b163E4N6pQkyB0LlQvwHvgWgdWQTTJ/+PTead6HNWNnej1MmoGmt
-         wRJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789424797; x=1790029597;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=pVtdiTQLCGZpjhaUz315yh+/HlnocentIWbIIAeGHrc=;
-        b=io0J8/gN3p2+wBb5ehpU/JDE76IRKQU+V/T1Uh6a77DDdw1+TrhDEwyOvq2fqS1MiH
-         eBRlhlXHQIPIndBVPOmjU4hL8Cv70N/O+5VWZgc0c96tfKQNswJZIwm+/SbnnLtzrx5x
-         6RIDyw5Hq0CyBXgnRe90dgQv/xK7y09Tn1DqhOxQZflOWXsBFbpHI0I+8pHN6ZY4EAPk
-         CrsymBOK7v/IZlEsXbE0Xy35lXhqyx19tPOaLLgRnMqnFgHwziBhrBA/isNmGKKzG6J7
-         4xMeH+aORgfxKmybcX7CU7eX8x5h+K5gAQurJOQ2UlxovSd6ZWO9d+4atQ8Kpcoujh/S
-         Dhkg==
-X-Gm-Message-State: AFuF++m4XKeNjDKE+egJI2jQUMFQ81IcPJMuRnG5SQQnwKFuONWaX5dZ
-	aag6Okqnuxyzx3yfpGDCeZvwg2mUUD4+rRa/NapWIdP/o1jJKxFTJluCsWFILQ==
-X-Gm-Gg: AYBFou3kNJuLk4UCIOeiY/8GEnGuTu8tYX5nEiwFI+D+qaIcQYqDdaX2xEAecatPtuo
-	N59KiiEf3Oy+3AMwVLOVW7dm1goqoimL5XEf/W9e2i9a6BA42t32GiozFm+rueAauhZPEqZKlUB
-	ZqO5Za+6ovRSleh6Sz2ANX0IwHSkoMetq/sjRBktLH4ubPvZidug2nsKOoxX2hdjO7+uBJbQoHh
-	glnrJ6pWpmwE000sMjnG91H3VKNC2puK/yVNDJflDGROA6SP9TPKNCLNwlwzW7Y+JrGLneKkSy8
-	IuXTJQMZ8Zq5Aom0Do89hyCvAr1PEizQZt8ZrAYXLu5LrHnMvwDeLnc3d9rShCQJcwTgN6Nmf6o
-	PIg0/b7Wvl4bSLau6mIdvH4Zt/kXWuLMVfHNuan+WzmV/EZ0qbBcPq65+CUAexOH7FJLVOryBC0
-	IeaVFpMBraHITCjKxPVmyA8I19SQ88qkxskkTnysuO10xXOy7w6YHHbiFASx6vwD8NN04iu87vJ
-	3oCzA==
-X-Received: by 2002:a05:620a:84c5:b0:939:fb9b:2b4b with SMTP id af79cd13be357-93a3457486dmr191305985a.5.1789424792515;
-        Mon, 14 Sep 2026 15:26:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.28.181])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-939e80462ccsm1098757785a.21.2026.09.14.15.26.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2026 15:26:31 -0700 (PDT)
-Message-ID: <6aa87497.35b683e3.5ae4f.95c0@mx.google.com>
-Date: Mon, 14 Sep 2026 15:26:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0333676173396945354=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XNy3y8ez"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789424839;
+	bh=kcXU00t5g3xh9SQKdeyOKniCewZ2ARmvNN9v1sJHh6Y=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=XNy3y8ez/a9EVj+Qt5S542A+6qOop68PHX/+HO/Ni6TKdx/c+zGZQe/I20kv4DRmH
+	 CkkifuWRrxusIDRLN0/vRgx2mUgdz9J26c7hyTWibWA965mgZVCfUeIQ1lvNGY9o6d
+	 EuUvrLL5XhqwXW1Gl0rd6DoaBIVaJ1aGt3dcxxew=
+Received: from github.com (hubbernetes-node-5ff46b6.va3-iad.github.net [10.48.164.54])
+	by smtp.github.com (Postfix) with ESMTPA id A194878034B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 15:27:19 -0700 (PDT)
+Date: Mon, 14 Sep 2026 15:27:19 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1164802/000000-fa99a4@github.com>
+Subject: [bluez/bluez] 35fb23: doc: test-runner: document the virtual machine
+ arc...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2,1/3] emulator: bthost: add function for sending raw L2CAP sig commands
-In-Reply-To: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
-References: <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0333676173396945354==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is an automated email and please do not reply to this email.
+  Branch: refs/heads/1164802
+  Home:   https://github.com/bluez/bluez
+  Commit: 35fb236ce03cdfefd14c27cb63132ece2bd46f66
+      https://github.com/bluez/bluez/commit/35fb236ce03cdfefd14c27cb63132ece2bd46f66
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
 
-Dear Submitter,
+  Changed paths:
+    M doc/test-runner.rst
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+  Log Message:
+  -----------
+  doc: test-runner: document the virtual machine architecture
 
-   Series:       [BlueZ,v2,1/3] emulator: bthost: add function for sending raw L2CAP sig commands
-   Pull Request: https://github.com/bluez/bluez/pull/2458
-   Created:      2026-08-30 21:15:36+00:00
+Add an ARCHITECTURE section describing how the virtual machine instance
+is created and how it communicates with the launcher.
 
-The pull request has been closed and no further action is taken on this
-series.
+Document that the tool is both the launcher and the guest init, that
+there is no disk image and the launcher root filesystem is shared
+read-only over 9p, the TEST* variables passed on the kernel command
+line, the sandbox mounts and the writable overlays needed on top of the
+read-only root.
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
+Also document the console and controller attachment: the guest console
+is /dev/hvc0, and '-u' attaches the given socket as a second virtio
+console, /dev/hvc1, on which the N_HCI line discipline is set so the
+transport is HCI H:4 to the hci_uart driver. Mention '-o' as the way
+additional channels are added, as done by test-functional.
 
----
-Regards,
-Linux Bluetooth
+While at it, add the missing '-H' and '-o' entries to OPTIONS.
 
---===============0333676173396945354==--
+Assisted-by: opencode:claude-opus-5
+
+
+  Commit: fa99a412ac66e8f7a9a24df19c856b95df272b79
+      https://github.com/bluez/bluez/commit/fa99a412ac66e8f7a9a24df19c856b95df272b79
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-14 (Mon, 14 Sep 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+
+  Log Message:
+  -----------
+  doc: test-functional: document the test environment architecture
+
+Add an ARCHITECTURE section describing the split between the Pytest
+upper tester, which runs on the developer machine and drives the test,
+and the VM hosts started via test-runner, which run the BlueZ and kernel
+instances under test.
+
+Document the control, log, tty and shared channels set up on top of
+test-runner and how they relate to the existing options, and the btvirt
+and USB controller topologies. Details of the virtual machine setup
+itself are left to test-runner, and writing VM-side test code to the
+pytest-bluezenv documentation.
+
+Also fix the temporary directory paths, which are named after
+pytest-bluezenv rather than bluez-func-test.
+
+Assisted-by: opencode:claude-opus-5
+
+
+Compare: https://github.com/bluez/bluez/compare/35fb236ce03c%5E...fa99a412ac66
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
