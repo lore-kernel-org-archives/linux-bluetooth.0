@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20221481FAA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 14:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9946A4825A3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 14:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789396278; cv=none; b=cVgVhqQZIonAZLzsa9eAAzRwPpURIB7TWg7xhDdf//mle82hHCsct8YlIYLGkpUbKR0aSMQBSJxplgCx4nhmcqEre4UkJykagl0nPcYKHI5+X+ZNxbKA2dsl/zKN7mMpy3gmQgzKAkiCqVnLFShg47dH4x2vW6QJ0qjfwHvZCOY=
+	t=1789396280; cv=none; b=R22QldlNRZFk3++hHhequBYas+QjgVwWl9lTL/QbzhL570vkMvI50jQdsiygNDeSX76/aHKeoKed+IT6Fnh+wCyiQMDWI8MITyg2nWvqm0j5mjRJ8Zo+9m55Pa3ofBs/sDkICj/Ry3gm5vlDVXdj/iRcsJ+lH4onNRfIaMwRGFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789396278; c=relaxed/simple;
-	bh=IIsezy742XqTVKhz/kb8Cxy1iKLuxDWDSyOdjXKYolA=;
+	s=arc-20240116; t=1789396280; c=relaxed/simple;
+	bh=rncAZ2IhvS/TlpdCogDtxcK1DyWujaq8fdMJKzaF4Ew=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a08E+05CgZuIdyNv6fzQVpzKAQNd38sUBs4m8XW7wU4hhEW4N+ER4CQXGwkp3Iq27m19THTlTStL4w5H9A8rJ3wzUk+c/nh6mXp7yjrkVRzVKUfniTPtOltb+DFopJtDe2vasHEj62q7vnTa0YehUaGJMtWK6t+5mYzAPPckCro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IG+QMU2C; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=iRY0VRGPUFqybwQHG28zMaVxRV+i+8O4gXfaTXWtGrDRu8mH2vumpQiYVbpQ3RNePUSBVHDgbgYY5vzAVz/DRbhL4CRBggm3HbuIHA0Gt8wbkrzsV5G6o/3K7BX2kXYRI0icx0xNfPBcYEAg1cEZluh7d6rGd9JzXMJfnLOpGVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cYrFO3n7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IG+QMU2C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4CEA1F000FF;
-	Mon, 14 Sep 2026 14:31:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cYrFO3n7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3921F00893;
+	Mon, 14 Sep 2026 14:31:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789396276;
-	bh=yXX1LPF/g8Uz0tQf207BXCsPXB4z+TMib+l/wjCU0gw=;
+	s=k20260515; t=1789396278;
+	bh=xeCsWo8F3orJ0ieGw49tIM4F5BOOi06wgwZg9gR0ofM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=IG+QMU2CliefseJu7aiiJMLnQCF4ggAnKAbI9T7P3F6zbmlYEQ9keUsxg180Ap/Ew
-	 xs8Ay9yaLJ3fbIOARTTo/bnZtaA6auxBjd+U52AMgRm16bZjui/Thtpj4U1dtf0Xm5
-	 1VuUWxGZt7QafBeN/1KDry/TCuC+d108i/QGo6+WHLZtbNOnwCLYg1/HJ9ec0FOo1g
-	 QB8srct2kFDqnwe0XGsvWy3OBuPsueJ4egOrQC/JNBFZiHqEbwz7jOyAAyiU/n3HVm
-	 k/kSaVQ4eioCPesfZ+nR2CGTxQuVf2ZL2gEfvIZ60eFb975cm+EvkOouPSgKIcneLZ
-	 o5nQT1dQSvVbw==
+	b=cYrFO3n7NreFNMJRbn4OfWVTxwuabkjxF689enaS4Fvu0VKh55KR4me2M08ouM9eP
+	 9gXw/8JnAWu9Yenr0KqeKb4wzhq6ChsDXU5S2oTOhCkEMeMRsprv5qv68QxeDwyxAX
+	 qjbrjy1e4sZaMLViB3ZVFij2+axjZDEjizdgeqzdZiAewEuUDgQTYn4W90VLF/FUk1
+	 3K9kkCNrGUegQvebkKsAkD9Af6i3EL5lVONc28bhSMcsAgdiMX9jvvOEXXSdIECCrP
+	 CDBDhgnzGtfkAd3LJPf4qVH9tI48k3TbJtgWqopgKDGsnKTZ3QaBV2GRhi+s2jackP
+	 FhKNUuLskoDVQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569BA3924A67;
-	Mon, 14 Sep 2026 14:30:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A563924A67;
+	Mon, 14 Sep 2026 14:30:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,37 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: fix off-by-one bounds check
- in RX
- submit
+Subject: Re: [PATCH v2 1/2] Bluetooth: ISO: Fix parent socket leak in
+ iso_conn_ready()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178939621187.604238.18155595324453750865.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Sep 2026 14:30:11 +0000
-References: <20260911115222.7651-1-aluvala.sai.teja@intel.com>
-In-Reply-To: <20260911115222.7651-1-aluvala.sai.teja@intel.com>
-To: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com,
- chethan.tumkur.narayan@intel.com
+ <178939621337.604238.10918376880914591840.git-patchwork-notify@kernel.org>
+Date: Mon, 14 Sep 2026 14:30:13 +0000
+References: <20260910181206.1558734-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260910181206.1558734-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 11 Sep 2026 17:22:22 +0530 you wrote:
-> btintel_pcie_submit_rx() used frbd_index > rxq->count to guard the
-> FRBD array access, allowing frbd_index == rxq->count to pass through
-> and index one element past the end of the array. Change the check to
-> >= rxq->count so every out-of-range index is rejected.
+On Thu, 10 Sep 2026 14:12:05 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This issue was reported by Claude Mythos.
+> iso_get_sock() returns the parent socket with a reference held, which is
+> dropped by sock_put() once the child socket has been set up. The error
+> path taken when iso_sock_alloc() fails only calls release_sock() and
+> returns, leaking the reference and thus the parent socket itself.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: btintel_pcie: fix off-by-one bounds check in RX submit
-    https://git.kernel.org/bluetooth/bluetooth-next/c/dc9f6261721d
+  - [v2,1/2] Bluetooth: ISO: Fix parent socket leak in iso_conn_ready()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/dc9dac316171
+  - [v2,2/2] Bluetooth: ISO: set BT_LISTEN before requesting a BIG sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/21db869e228f
 
 You are awesome, thank you!
 -- 
