@@ -1,175 +1,151 @@
-Received: from mail-ua2-f12.google.com (mail-ua2-f12.google.com [74.125.226.204])
+Received: from mail-yx2-f43.google.com (mail-yx2-f43.google.com [74.125.224.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787894CE671
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 19:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789500296; cv=none; b=H3U9PmtUonCrj8uyz2mRFp6JTLVWV4QbTnlTMsG+CZxeu7uboW9w2qX6HFPpsHehZOn5W+8egQ+03mhYmXFrxGuDntIIJ6MkYMg0HAV8vuYwpNIEt/SGdurXb2DW504JBoCRvxuNB69beg3JbzSfdfZY286oQvyzdYQ8hHstLTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789500296; c=relaxed/simple;
-	bh=9bHaq52+LNuWMhtyY2yvMcwuGO77VgXguJIzqI3vybI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M0P5r4xuAyh1xehw7ED5tw6kXE/7SbWHl3rv0HGXdnt8mOkwlOE0XRwxKWLxq0EhOzoSkEKPlwqgbFUi0Yg+42kbbimdNZxaJt8CH2jWITm+sJ1aPNDw9Kb8j9QuSb0u7K7HZr5RRiDo2lrf4Ssqf/nVUkr9URPpRMy9hYtBCNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CsbQEKYK; arc=none smtp.client-ip=74.125.226.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18614499BB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 19:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789501024; cv=pass; b=cmO0vQpjcDG6wjzBF0sAQurQdsK0jVWJUbDeN0H8js+IWoxzozIaK9G/h5qlrohw4ttchtHhiXf9xmYwIj8B8a2gPTLzwOVntrUDYUa2DxXOUJS6+gs4/V8/pdM514xn3xWP/SPCeD+60T4WgTDc6/w1OPxleBereTsqq/KqmxQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789501024; c=relaxed/simple;
+	bh=Z2f4FQ8va33TGvYyGtCEXC3YdwZgKCv0QJI6Otw6I1U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JLmG8qWttRLMnKItKgcRyJJD1Ec/4wF2Higl0JKsCcAOzfLGXHXmMarRfuUAm9NL3uc53G07XzXqFvs7NyAQFnf9p7E+Pu5qEhTbRs2CC82+Pan9P5L+rWquLcK6NtRsD7HDUuukbLz+XhyGBbeaCYGKM1Mls73XXFPbjcKkVOA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fKn2G4wd; arc=pass smtp.client-ip=74.125.224.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsbQEKYK"
-Received: by mail-ua2-f12.google.com with SMTP id a1e0cc1a2514c-980b6159d30so38456241.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 12:24:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fKn2G4wd"
+Received: by mail-yx2-f43.google.com with SMTP id 00721157ae682-85d46e4cdcbso581967b3.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 12:37:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789501021; cv=none;
+        d=google.com; s=arc-20260327;
+        b=K3zrYPOWVBeLhrbe1McmLasykb1KuYG9d6eYpzguitd0VcvqIF0D+75MGDseqxkV07
+         Gkhnj4jxTCYgi/tmPchOJKGqAkQAgZMAfyzU5+iMXDqk2VQ047iemHbYLyMSNTKIzlWK
+         7MXjq+9AWoxVne0as313gcQGLKcY4xEMcEkTjmD9knORNTVXIy6XouAOwZhqEoybQ18l
+         d2sdZeEi3FQAUOlPkXyzsJyPFNVUfD6TMr+cwOpyVMl9W0nQNZbMQKUDfRjQFnZcRRxo
+         FDVYZ6Zi+Ho1cggD2nX5UxGO3Son4I8cyaO5eP/BDMVdxQHyQ75eaiLIQ8Lqlq9t3M+h
+         RfFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=NR8RlaqooEVk50qaakjuofXzFH4w/MxQZ1es9fZiI7M=;
+        fh=zFl9by+mCxIXDc9cKDwTj11iC1Wd38grwlONRLT1ClQ=;
+        b=gOIEg79HOwo570cxRxKbmeVRNg3frosAdBXjKaSUh737wMDwpOQ39uVHtL3RnS05t1
+         888SlqnwzUgYDd5LwiWrWbkLgfzfP9mDTCd/F6H0JIfPUMvAS5Oiaf42kXtJOqxX7cy0
+         VMd9Gfff5u9+BI3Xi+Rfs/b8Pm2efB47fpvnNADR9KvH1MEg08qw1AnCAte7iPPUCKed
+         mKmMGYdFDgoKTsnD4B410cSaoJCB20Rj8MLOubYnk9s+xQ5+YMeeDo1gRN5zFaFCFFOX
+         FaGx1TWDR6GcVCz0oErOE81a+WE9+YnmNLTMPWXGtM/vWhaXhvZmWJQEByg66vdyv6TY
+         zq/w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789500291; x=1790105091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Hq+Kkm/TimJDkxPPQ14NOEWXj4ICc2WmuYGKUmYgsP8=;
-        b=CsbQEKYK8ig+fCQWYGr4iU84KmWqbVVb+m8eAE0Nu0773ZW6wwf5KHb8upgd3T+FyC
-         hFXd5Mool0Fjl8NA/8xMdC17QfDwG+N5vXiv5HNRbQM6537ULSviDCHiXyr4DjbMVOZ8
-         kPFSa7iYcukJpvU0tFng1AGtCdzNiINOnEbVJ9mSD6IkZ1Cp+R93HHsU4+u6HmxZRtgU
-         kPu8qUkZsLMucQpUcjqzisJGxyrippojq2IMoCxgwt81UBdTFrbavhJ8agy7Z6UWMzAx
-         Lzph4xy3BzUOuOiLUMWVyD++HcdzJ1EvFBW1ei8PR0exN8o9maIVj+ue6+Gjwo85CSiZ
-         Q3pQ==
+        d=gmail.com; s=20251104; t=1789501021; x=1790105821; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=NR8RlaqooEVk50qaakjuofXzFH4w/MxQZ1es9fZiI7M=;
+        b=fKn2G4wd5oOdkktuabzRYBZDbglA+QrMTqjNscZoR/nO0hwyZDokFwRKLr1u5vEAVM
+         VwVyxJ8Nfp0fvRVjtlfaZ004r2sfDffWNvoYN/CKNnfmDW/k/o9ghDGLWCSo3+dz4dNQ
+         +vQ67dZdUwzvM38DEoliQNIgAFo+LMaN/wSCuUkzyEYdooAaFM41OaLlLmuNxXMQOZhY
+         W17DBNuA9wDVrcRW5RTXx0V/VAZaRiSmG3532wCjfFh1VUqU27Lw0HSIK0lOuDMX75Lw
+         5aMADngVIQA9WAZ7A7jY1zVQmpHSO8JatfArZUyh6FHgT12S0sAb0TK0iWuG68wuzczl
+         IVdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789500291; x=1790105091;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Hq+Kkm/TimJDkxPPQ14NOEWXj4ICc2WmuYGKUmYgsP8=;
-        b=oTD56gLHEfrsPTSpwHnnPRi8NTujqPEBezzmyF4grMd4f7Fp/6B1AXm7pd7Eovf+14
-         Q8Pem9/QCHQZfaGjsZDPQEPuMlssV8rTAMfTgbC2KKOobUZZkok9eZDbZGVE+zRrQH48
-         NzcA2FnQerH9lf5gdrdhfUFxCt67V8UCipa6/v7eIoBKCqYPtBIIJ5FXWUU503DiIQqy
-         EnqNID+ztoHumBCbgCrNaBp2UcccW/IDC5hu3ZpQCY3ZcKq5qFEVWkb6wjRgOjsWBbif
-         LWrQpS27O3nNGgs5NIwNLhfqgkiiitWHeGtnknkr6YD/jYwAwiABdN0B54VIfiuDT+Ga
-         SO2A==
-X-Gm-Message-State: AFuF++lc6XAspqkOCTUqfZHX2VFr6xu00P1vzIbwX93Nv2LlmohlE+s0
-	xI7ZOfTaUbSV9SYoLDGA1VhfQ0N+dTSabqJj+da66MYSpmc+kX37vMFX
-X-Gm-Gg: AYBFou2TuyZo4I41JleMIBVyjWUoInS+aY8s/dZmckS0lr4vh99f86vKPAVDYfnjstE
-	kVNXT90AIoG/A0+k9KKK7ePAH0DbMEK3PdtRN8V2EVWo3wu0UVVijWVB3isXJ2jCALArjb/Hee1
-	qw0S4iZeuLOrYCoxGCqQHvRmjLFc6n80XkP6WjCiBc+k5/qAVnCuGMqq1pYHy5Erj+BCDxAt+B6
-	37W2Px/C3FxQ0O1QZuN2WZYnxrR+rO12DKxoEcRF/e9htjjAUp+bhZ5Bei3uJ8bUhY+sspcezFb
-	SEIdcmmkivfh2KSiPTJtpfbV2IpvbHE53saIo8o1cMPm47AdMxAN5uyLTPeyvIHSQfDMgJClHfW
-	BHWrX8dWd0zqeBqI4VQrLzlRGEzGrS66AZJUGLzHifJClZUGnx5iQza1Ebz+Q4FGmOnjR3Z+Xhy
-	8BCCZSsDcQmWdpKrGHJVYjI4f3bQ51T+xCvPfXg2LXykDs70InO0ldtV2YC+5T2d3iDKKWoZZzP
-	MM/fCkceWvoTrEVXVR2S0oyspewHz2eklP4HO8cYnYHgcZDtjrvI809CMBDoc4nMQ==
-X-Received: by 2002:a05:6102:510b:b0:789:100e:3d1b with SMTP id ada2fe7eead31-79b51c82460mr3594256137.0.1789500290673;
-        Tue, 15 Sep 2026 12:24:50 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9831526cf4fsm409743241.11.2026.09.15.12.24.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 12:24:50 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-09-15
-Date: Tue, 15 Sep 2026 15:24:41 -0400
-Message-ID: <20260915192441.1130583-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        d=1e100.net; s=20260707; t=1789501021; x=1790105821;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NR8RlaqooEVk50qaakjuofXzFH4w/MxQZ1es9fZiI7M=;
+        b=GoOHXNjHe4L9vMtkYKV6AlJUi1cs5AKbGJRt3O7rVMRcDNTdeaXLs1LQTMaaRFtiS6
+         rewSy9NPaPTw93Iw6fwxU9Vls1f/TD0L0YqCOmyHnYl9q5VoaXcSAAHQpM57P3XLMbLe
+         rxYUhIkOBrrBOvs+eYYw/544y9qQX+YWDzpPfCbTagHBjlo44eFmZaISm/2XUtAyWZ+a
+         Pfke+MoSfDqXsntViMJb1xcxIeM2czDxectYy4j/QpRMZB/szwsaF/JDYIr4cc3ZkV6Z
+         Ii6b2Z3x9gcZIAAeA5Bx/KvgnGVqlMscjZYjRTFW/vWMRU8seT0bZK5btCBkdvp6pDXO
+         XXsA==
+X-Forwarded-Encrypted: i=1; AKwUvByUCMtFR0mjxRrxiYZWYIWfS2Pkjv0xjKdF74I/JenbstNO/mFhpoRzRAjZPh9hJiUx79b6PJxHS4UZBJLnE6A=@vger.kernel.org
+X-Gm-Message-State: AFuF++mwmyIX/ttzrUix8CYZ5NKO+zCiIsiThZqzE1JvFHJ2VK6gRGDA
+	DWaItOujSjNhygEQHE4qjiHM4u+F2XIYYFMXtWGLXEAv3anK00HA3u1Snjc4KxUTyCGlOfM9FxD
+	O4P9IDWnKRYpD08yJHTbiXqkIABtA7tYQn/nx
+X-Gm-Gg: AYBFou1Mjzc92DPgz9HqhsdLTb0yStLJCVmdZSJdkg/8xEWlhUyQ0pbxOt5HOknmVQ+
+	WI5fPUApJyiZjHLCvUHgAsX9EWWqm6xKRds4rlyTtmGWBq3tawDD2PtgkR3jW6VuRoo5FDuvfoc
+	+3kxewmW2fcR05+u1hd5QM8bwA6VQ3wZeE55l7cfgcTw9DtHwYyva7wg7uAD4OTpYM+/KvEpZAR
+	cxK34Wwr/DAvYjedQEMRLqHMUQJFrw612/LeI0TBGELi50IXgwZ36uAHKPWqusI/YLl6R6R15aJ
+	83Cil0f3pkf5oBAGlWxd/BZG65GajcR4JWnDZ4Qy0rSLLyUrq5RZmeATgs3y7PxtG6UK/Gh1xwW
+	TwQnHlcoN8vwP/1I2lLbOu7bRPxUOljkVKoZpOTaMUg==
+X-Received: by 2002:a05:690e:1685:b0:671:158a:ef96 with SMTP id
+ 956f58d0204a3-6714dfc87fbmr3560203d50.11.1789501021567; Tue, 15 Sep 2026
+ 12:37:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260907172648.457103-1-luiz.dentz@gmail.com> <20260908135708.552fcead@kernel.org>
+ <a0e8bc1e-c237-41fb-b448-9594bd484cfe@sirena.org.uk> <CABBYNZKrSve8b=Acj2qu0YBuEZ9u9xHJe-ffRb+78x5KPY8Ntw@mail.gmail.com>
+ <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk> <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
+ <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
+In-Reply-To: <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 15 Sep 2026 15:36:50 -0400
+X-Gm-Features: AcwNN1WZSrhgKQi-A-4IUp8r81RK4e1x4QppNN_W4nJerIvw3znNgB3XikJm0fQ
+Message-ID: <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2026-09-07
+To: Mark Brown <broonie@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit 83a945a529d6e002dd7339c532288a931f463dba:
+Hi Mark,
 
-  tcp: do not let tcp_rmem be set below 4096 (2026-09-15 15:21:17 +0200)
+On Tue, Sep 15, 2026 at 3:24=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Tue, Sep 15, 2026 at 03:16:21PM -0400, Luiz Augusto von Dentz wrote:
+> > On Tue, Sep 15, 2026 at 2:26=E2=80=AFPM Mark Brown <broonie@kernel.org>=
+ wrote:
+>
+> > > Given the issues caused by the unusual workflow for the tree I do sen=
+d a
+> > > lot of reports of issues in bluetooth.
+>
+> > Are you referring to the unusual workflow where fixes are merged to
+> > bluetooth-next first, then to bluetooth (which changes its ID), and
+> > finally merge to net? Changing the order to have Bluetooth first and
+> > then bluetooth-next would require reworking the CI so it could
+> > determine that it is a fix and then use Bluetooth as a base just to
+> > avoid ID changes.
+>
+> Yes, the routine cherry picking is certainly part of it - it's not so
+> much the fact that things get moved between branches as the fact that
+> when you have the same commit is in multiple branches and then build on
+> top of one or both of them this creates extra conflicts, often harder to
+> understand, when the branches are merged.  The more normal thing would
+> be to apply once to the right place, or the standard fallback from that
+> would be to drop the commit from branch A at the time it is moved to
+> branch B.
 
-are available in the Git repository at:
+If I merge to bluetooth, then bluetooth-next won't contain the fixes
+meant for stable/rc, so I will need to merge them back to
+bluetooth-next immediately it order for our CI to stay current with
+the fixes.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-09-15
+> You do seem to end up removing the cherry picked commits from their
+> original branches at some point as part of your workflow (since there
+> are hardly any duplicate bluetooth commits in mainline) so they do wind
+> up being moves AFAICT but the duplicates get left sitting there for
+> quite a while.
 
-for you to fetch changes up to 801fb950cae7048eb7d83b18857d1ca37b8cd5a4:
+Yep, once before sending the pull request for net-next, bluetooth-next
+is rebased on top of net-next which brings all the fixes already
+merged back to bluetooth-next. Git is absolutely fine with that, I
+don't think I ever run into a conflict doing this. Git detects the
+fixes already present in net-next as duplicates and eliminates them,
+so it really surprises me when you say you are finding conflicts, not
+just duplicates.
 
-  Bluetooth: RFCOMM: avoid socket lock inversion in listener cleanup (2026-09-15 14:55:41 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
-Core:
-
- - hci: put the peer's on-air address on air when we cannot resolve
- - hci: keep dst_type with dst when reusing an LE connection
- - hci_core: Fix queuing tx_work after workqueue is drained
- - hci_sync: Serialize local codec list cleanup
- - hci_codec: validate vendor codec count length
- - eir: validate service data length before reading UUID
- - RFCOMM: avoid socket lock inversion in listener cleanup
- - ISO: Fix parent socket leak in iso_conn_ready()
- - ISO: set BT_LISTEN before requesting a BIG sync
- - coredump: Quiesce dump work on unregister
-
-Drivers:
-
- - btintel_pcie: validate TX skb length in send_sync
- - btmtk: fix wrong status for short WMT FUNC_CTRL events
- - btmtksdio, btmtkuart: validate WMT event length before struct access
- - hci_qca: Do not write to the serial port after it is closed
- - btusb: fix NXP IW610 composite device handling
- - btintel_pcie: fix off-by-one bounds check in RX submit
- - btmtksdio: Fix PM runtime reference leak in shutdown
-
-----------------------------------------------------------------
-Aamir Ahmed (1):
-      Bluetooth: eir: validate service data length before reading UUID
-
-Chandrashekar Devegowda (1):
-      Bluetooth: btintel_pcie: validate TX skb length in send_sync
-
-Chengfeng Ye (1):
-      Bluetooth: hci_sync: Serialize local codec list cleanup
-
-Chris Lu (2):
-      Bluetooth: btmtk: fix wrong status for short WMT FUNC_CTRL events
-      Bluetooth: btmtksdio, btmtkuart: validate WMT event length before struct access
-
-Ibrahim Abdelkader (1):
-      Bluetooth: hci_qca: Do not write to the serial port after it is closed
-
-Juan Perdomo (1):
-      Bluetooth: RFCOMM: avoid socket lock inversion in listener cleanup
-
-Laxman Acharya Padhya (1):
-      Bluetooth: hci_codec: validate vendor codec count length
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: ISO: Fix parent socket leak in iso_conn_ready()
-      Bluetooth: ISO: set BT_LISTEN before requesting a BIG sync
-
-Nicolas Thibert (1):
-      Bluetooth: btusb: fix NXP IW610 composite device handling
-
-Radek Podgorny (2):
-      Bluetooth: put the peer's on-air address on air when we cannot resolve
-      Bluetooth: keep dst_type with dst when reusing an LE connection
-
-Sai Teja Aluvala (1):
-      Bluetooth: btintel_pcie: fix off-by-one bounds check in RX submit
-
-ThangNN99 (1):
-      Bluetooth: hci_core: Fix queuing tx_work after workqueue is drained
-
-Tzung-Bi Shih (1):
-      Bluetooth: btmtksdio: Fix PM runtime reference leak in shutdown
-
-Weiming Shi (1):
-      Bluetooth: coredump: Quiesce dump work on unregister
-
- drivers/bluetooth/btintel_pcie.c |  8 ++++-
- drivers/bluetooth/btmtk.c        |  7 ++++-
- drivers/bluetooth/btmtksdio.c    | 24 ++++++++++++---
- drivers/bluetooth/btmtkuart.c    | 20 ++++++++++++-
- drivers/bluetooth/btusb.c        | 17 +++++++++++
- drivers/bluetooth/hci_qca.c      | 14 ++++++---
- include/net/bluetooth/coredump.h |  2 ++
- net/bluetooth/coredump.c         | 65 +++++++++++++++++++++++++++-------------
- net/bluetooth/eir.c              | 10 ++++++-
- net/bluetooth/hci_codec.c        | 36 +++++++++++-----------
- net/bluetooth/hci_conn.c         | 21 +++++++++++++
- net/bluetooth/hci_core.c         | 18 +++++++++--
- net/bluetooth/hci_sync.c         |  2 ++
- net/bluetooth/iso.c              | 53 +++++++++++++++++++++++++-------
- net/bluetooth/rfcomm/sock.c      | 13 ++++++--
- 15 files changed, 242 insertions(+), 68 deletions(-)
+--=20
+Luiz Augusto von Dentz
