@@ -1,107 +1,197 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C2C4BA1F4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 15:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789487656; cv=none; b=Vx8516sPnYC5hT5d/NqKnfCY/jKt/5d35yWG5cPCcEcNedQRZyGZsDs6ppJ6AjTYMV+G7Pjl7LvJ1hbrumA9eijrVbASVwNostjoi39PdIo3FBA8H1ZgOFkTDTHP6CWzY2KkaE5GZXYSDgrmDRJp/MyNpZvcvmSFwsMT4oJJzAo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789487656; c=relaxed/simple;
-	bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=osBxwW8+IWKKcjsUbw2GGSLipInS+d955FytLGxQdSyyFD1v2oPIjbcZKmHydxIkfUg70ttI/UKOBuQYGAv3fXczMc7gCcjYG28dehWzL0I5RVBxNWkpERYZkfO5MpuQ/rW3IqVLHuFBQbsCW2xFJhxaGsJtA0NiyeqN4W+f3zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LP4UWICh; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E333CEB99
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 15:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789487830; cv=pass; b=fmKhFSri8PigZa6wKXRPYXYukaQYyD++5sQEusM8Js7NfbUY4SHdcmF1p9qN/TngOkK1AL11SltWZfdqOoMNpQLsB9PaDAzIQHKMpeCHzZHWQzqFo1CP2ryV2mJk190n0Mi7Bx3PWsfrCYwoLxZtq/Zo+Xje6EdfvwCkOrSreVI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789487830; c=relaxed/simple;
+	bh=1ESeKpIkIM8B9mnRrUIKCy5g9dt3vx8X5QQfUZ18PT4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=Ao7ZU2U0VSAisFHgXj8LeSyVsG6dyLBSP8BVBL+RvlAUJcrTUJZMMWbKHBqNDDM6UHSn4vscT7B9iTBUBKR1I+KephmoMOsOOW8NfY1TKeeMao1p7AXF7QLf9Y/LRsK9d3YyAIf5Fn+mtWnoXlsSL+/kvWNpGNI6xTpo+acz2Bo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHBbgSbl; arc=pass smtp.client-ip=74.125.224.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LP4UWICh"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc4cacd3409so395051a12.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 08:54:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHBbgSbl"
+Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e50968489so2740247d50.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 08:57:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789487828; cv=none;
+        d=google.com; s=arc-20260327;
+        b=RDbgiU9zYrVafLHGtfZIB0qRcLwm4+OB370rk/X8ZGQYY7Pk0BzWmG/9HX4wi1OG0l
+         C5/w+2c2EAUrUX9JIt8v6MYw7+mw1zvC8gazOKG+SHpwr8HQg+svYoLO1iSZwUers/bC
+         1vYtKEsXBdHD4BjhCAqsf0+vzzkNw6SZj1PJ3iqNapXFnPC8SZhD4gTpPQfUPJjFkCo4
+         gX8Ns27yWvzY2Us/1LAk8tr2pkkZ711f3qGAhV6x/895K8FLWxXqUYEnu1w2kV9+hId5
+         /mqW/AP7uOONTA9Um1HKed+u7I/t0BddaUxs19Uwh5R1zW4pD9kdfF+JocuLcmlZUFtd
+         Ji+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Q/M5+Mrl6BmcM3qf582riaCj978rf9FN2OyJe/3kSyU=;
+        fh=UeUzDNEl7a5VMucsQdf0ffDI/PHd6R4+v7SDClo34+Y=;
+        b=GbYyUwNRIoPgTZ+Wi8+vTY7P86RM7RyTmDQR3pqT4JJrA7VvRLNT/bGe5nOU5mMyY3
+         PmkelklnNdHQ/6d6XktVmcXyK1dT42nH2bR9uBmghtXp+ejFJ5NLk8VXkKDK6hcJVdiS
+         Si36tnUhxhToxHU7oQa0H0QOIfeyxHdzaTQoHvVYkOCBbP771uJIXzXcS6odiPodCTko
+         D7WkznK126kneku3S7ZBAzJA6bR2VzE6I+s7F9E1KkebYVNSfi7/GTDWIat9t5Cn5+7E
+         68yjlq/4ThPm/rRA2iiStVtQrilTR4PfIHWOWpNkWHiCvPolkLuhkMv2Yd1lZ2kCYLvE
+         ZSiA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789487653; x=1790092453; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
-        b=LP4UWIChu3Aw58AeZLJcsAWjCJWB5juhvCA7uZeXjAqx8cT5uoHB3LDLrEYohL3pHK
-         jOJdkStYie7Vm7U4r38s30BaSAeSqFJEGFwYc+WNrZ4papZ3yge9eyI2U2EdkjTkKKo3
-         VmSXPqiVUEnXauA0EkdawUbvNNygFk6m/TLQvdo4xSHdTDfMYTWr/hgBJxYcgnnjRUHW
-         JoGnXSqm4SRLXzfaAQBqaWRtGW0OyQAvG26cP6DNKhMrdN15Wn1ZqFvCsgSYLWIC3gG4
-         IpOdq5+rvsQQ+R572kzT7guNyYGO9iDmrqOKl64c8JReAoa9DtJEkOXMltClyqirnMUM
-         NuPQ==
+        d=gmail.com; s=20251104; t=1789487828; x=1790092628; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:to:subject:message-id:date
+         :from:in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Q/M5+Mrl6BmcM3qf582riaCj978rf9FN2OyJe/3kSyU=;
+        b=WHBbgSblE8Z1whhpbjIL9Umf0q2//fK3xAnflAKBUE0CbKm8FrbTUo0aBKoREZaP1v
+         7HW94RhB0uDCIcwNNoBUTc5PS0t9vSkfuHFwQUNvPSeiiJlOPudG5dOW/R+QhCrKVU2n
+         +eNnYLNybTZDlYSKGRVYucYNikCscpKmuo+GtVGyWw7ePAwjqDrCJOmapNMaaMP9Suja
+         TE/EfG15H15HhXI/eX0Tp1woNB8CtjJGb1gW9MDE11L9jW+gqCEAYk3cHXmeALr8z9hp
+         RxtHg2s/5cvbIsTO4TaUjZ/sEwzconn5zSpJgZ38rFZIQzdRdqI/yleNubhthT2VyGeI
+         KJiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789487653; x=1790092453;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
-        b=zsnOS8jak39YAV1x5iM3LHAcjAm+yMeNWUFnXoWegmFUYxIuMV8BuJX/KoDo7j4hSO
-         ghlmiOKhql52Pfr4IQ/QW1S4zmhRg4tICZXpItSDX1jD3Avcp/9KFf1UEe3A/+D//3TF
-         ZYCZ7y8Bxovygc2xKYCEeRfkDBogxWiC8BY5IUD/5MOVnyeDAONLVRLGH+HwRcsJPcxP
-         wWjZGlvgfCeOpUdoWSqzzKNhBzYxpy0Fg6nko5hGoLK94vQZzN0o8prrc04EQBSyU/t/
-         0ZCBVi/C65X2pyLKxx1pVvE5pCDHru9eLM3a76nll3mmVrzriZrGKEIiDJr3oicDzNf7
-         XJXA==
-X-Forwarded-Encrypted: i=1; AKwUvBzL3K9e7Z+vaKWtilKzY5l7S46RjCUrtq/LQcBsNlPQtg+12dItKIbmcCq3sV/uv0ugIBDB72ejChxi/rLgfcY=@vger.kernel.org
-X-Gm-Message-State: AFuF++lTOGv+9HCJAuFowfx9Yb94xUBXWydmD7kNTM+4xDNzbwEG64pz
-	7kYu1HMDrkeN/3LZKNF7eAZlKmj1XV7NwbQmRBvzDpoXUD1df0XVAWac
-X-Gm-Gg: AYBFou2hTodr0cIY5gvavT/2GfqUdVyOE5diTgYkSHg0mXXEnPlgCt8QtOWGXtX1m2c
-	Cd7F4IuG5Ot2+Fe1Ph8MjWvpEWZjM6DAdJf0EF9GXlaeAxIA+gTQKmimNMeEO6rwwklIfqbjQb+
-	ZgwX2kkvC8riv/Bz5msBw75Dhq8SGwcHp97IFBd4nXcHhfsVFyAVZtNV+b6FeQ6E+7LPeLHAyQ8
-	f9l2fPOgcBHlJbpIqTYiulTPEs1vHkwg5iUi+Y94E7XADDvzqsRg2BNUQ488XSw1jbc7BHhyAMi
-	SHT+i41XrhBO/3eH6Yucllrg7tzX3LexuwY8A4cYjfZbcjktY26S4dMLvnx73DtF+109MWTSA4W
-	7cOQbmtJwGTHnw2oNtggGo9dZTRGT40N5Yj3Zoi1DeTFRbfEe5Sp8KYnntlJgjTMmgp8iKKFnzj
-	l3J36EEuKsk/T/W3FF9MzscMxnt9gf4nkhtc3dSG55YnGVqIhJ/eeHAjZWUnkftg9SKxlW/uJ7U
-	37++T4/LCdNGPcDBw955FrO2g==
-X-Received: by 2002:a17:90b:4a8f:b0:39d:f254:4173 with SMTP id 98e67ed59e1d1-39e110dc85cmr2590678a91.21.1789487653470;
-        Tue, 15 Sep 2026 08:54:13 -0700 (PDT)
-Received: from localhost ([13.93.150.60])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39dfdaccc0fsm6012249a91.15.2026.09.15.08.54.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Sep 2026 08:54:13 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1789487828; x=1790092628;
+        h=content-transfer-encoding:content-type:to:subject:message-id:date
+         :from:in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Q/M5+Mrl6BmcM3qf582riaCj978rf9FN2OyJe/3kSyU=;
+        b=rPJCYhbfl5ZT3kcP5M2pyM0UcClHtPhJp9KxxX815vQcQnFJI0aq2HCj5rudxECWM7
+         ph/Nsxc8Okl0UjQMQPju6ZO9af9fdkwlRE38SG9Ru987GQ4FRKIpMGq/3/N6CUnBanPq
+         A0cxU6kReKcTTHLKvMGLYf9HB2f7xHVNLAD0ucyCv/hbVrIaZ/ac/4SP19oenp4pIpaf
+         hRq9AD19yHGA235eQ2oRE8QAkMPAvY74jI2de/RU5U4I9Me7/o4MMu/2CGztTT425UJi
+         qCHJVPAP1YF/YbwDgFQAZPJ40vOLycxYCI8gjvhIsI0Q4ebfMWyMtK/lKoUWYDThMmbc
+         2nFg==
+X-Gm-Message-State: AFuF++mQymPGJDLEAGwM6u9E3Jxz3tpavxaYQePC7mXw2HAjZWRO1lYJ
+	VlwUOa/tzvS6tugmhP+KBxJJxQeYRpe+l9U0ty0EEyDUVmy6im81FeYRQakTRyd7mwwINdo7IBo
+	cnHNBMTt1lLiaQFrJe351+L8CzZmxYb8pJfp7
+X-Gm-Gg: AYBFou0hRFJbULZxfqpU+SjJS1AOJEj2472jLxX4lEQnuOOL8kTqoqoSh6VYg6Fgsk6
+	SQ5JEHOYOY1wv0gv8Kx8w+Qz+gLo/Vp6OBcVl/MLzKBuB4LJ0t01DQg//xpiLfjHIEBQMXGFWkY
+	gcfFUXDBRnHHK5A2Pl1T1idl+L4zUQrJcU0B++ylgyzghLq4aXjCzfrwn08ZLBbHJU5x0HIxW4R
+	rMsRH8Nbo6Vr5BllygReG8D85UUDJwZmhMW8MYHXqMB38dAx0NaeV4L6qDYNvHghkPIO4P6UUzA
+	pJF8rcbPPvDzh04NuMvGP6/9Xwbox2hf6gmTkgpGENL4vJq1V2OKdooeRc89jOIFv+Mvp6LIpkT
+	a2ZCRMe2+Awq/kwwMg45EaVNS4xFkDyvulRh5QEs=
+X-Received: by 2002:a05:690e:454f:10b0:66f:c6c6:aab8 with SMTP id
+ 956f58d0204a3-6714dfdd135mr2257843d50.15.1789487827886; Tue, 15 Sep 2026
+ 08:57:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260914175136.613532-1-luiz.dentz@gmail.com> <6aa883ab.1ce3d5fb.ae9c9.b59a@mx.google.com>
+In-Reply-To: <6aa883ab.1ce3d5fb.ae9c9.b59a@mx.google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 15 Sep 2026 11:56:56 -0400
+X-Gm-Features: AcwNN1XOTrRuR28LtBMejek1Sl7fIePR_lJmEJQy2O1G4lEiY8bTR6zfh2m9yGg
+Message-ID: <CABBYNZKN656TzoAKcv9V6UfQiJBYDHWf8QjvQzPLhgc5b0vVJg@mail.gmail.com>
+Subject: Re: [BlueZ,v1,1/2] doc: test-runner: document the virtual machine architecture
+To: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 15 Sep 2026 15:54:11 +0000
-Message-Id: <DLG0FI0V6C4U.8PPNEKEU8LBU@gmail.com>
-To: "Randy Dunlap" <rdunlap@infradead.org>, "David Ahern"
- <dsahern@kernel.org>, "Ido Schimmel" <idosch@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>
-Cc: "Simon Horman" <horms@kernel.org>, <netdev@vger.kernel.org>, "Arun Ajith
- S" <aajith@arista.com>, "Roopa Prabhu" <roopa@nvidia.com>, "Jaehee Park"
- <jhpark1013@gmail.com>, "Jonathan Corbet" <corbet@lwn.net>, "Shuah Khan"
- <skhan@linuxfoundation.org>, "Shuah Khan" <shuah@kernel.org>,
- <linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Alexander Aring" <alex.aring@gmail.com>,
- <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 0/2] ipv6: update NUD_FAILED neighbors from
- NA messages
-From: "Lawrence Lee" <lfqlee314@gmail.com>
-X-Mailer: aerc 0.17.0
-References: <cover.1789448374.git.lfqlee314@gmail.com>
- <4169629e-74c1-4a21-a187-6c65d70502fa@infradead.org>
-In-Reply-To: <4169629e-74c1-4a21-a187-6c65d70502fa@infradead.org>
 
-On Tue Sep 15, 2026 at 5:26 AM UTC, Randy Dunlap wrote:
->
->
-> On 9/14/26 10:01 PM, Lawrence Lee wrote:
-> > Testing:
-> > - x86_64 current-config and allyesconfig builds with W=3D1
->
-> What does current-config mean?
->
-Accidentally forgot to reply-all when responding to Randy before,=20
-copying my original reply here:
+Hi Pauli,
 
-That's referring to my local .config build options. It's essentially=20
-just the defconfig target but with VETH and Overlay FS enabled. Sorry=20
-for the confusion.
+On Mon, Sep 14, 2026 at 7:30=E2=80=AFPM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/series/1164802/
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.52 seconds
+> GitLint                       PASS      0.41 seconds
+> BuildEll                      PASS      19.42 seconds
+> BluezMake                     PASS      371.20 seconds
+> MakeCheck                     PASS      14.23 seconds
+> MakeDistcheck                 PASS      139.01 seconds
+> CheckValgrind                 PASS      232.65 seconds
+> CheckSmatch                   PASS      290.59 seconds
+> bluezmakeextell               PASS      95.03 seconds
+> TestFunctional                FAIL      1057.13 seconds
+> IncrementalBuild              PASS      389.26 seconds
+> ScanBuild                     PASS      1125.63 seconds
+>
+> Details
+> ##############################
+> Test: TestFunctional - FAIL
+> Desc: Run test-functional
+> Output:
+> FAIL functional.test_kernel_testers::test_kernel_selftest[hosts11-vm1-noc=
+]: failed on setup with "ConnectionResetError: [Errno 104] Connection reset=
+ by peer"
+> FAIL functional.test_adv_monitor::test_adv_monitor_GHSA_hhgc_hfgf_8m4x[ho=
+sts1-vm1]: failed on setup with "ConnectionResetError: [Errno 104] Connecti=
+on reset by peer"
+> FAIL functional.test_btmgmt::test_btmgmt_info[hosts10-vm1]: failed on set=
+up with "pytest_bluezenv.rpc.RemoteTimeoutError: Failed to establish connec=
+tion"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_show[hosts7-vm1]: fa=
+iled on setup with "ConnectionResetError: [Errno 104] Connection reset by p=
+eer"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_list[hosts7-vm1]: fa=
+iled on setup with "pytest_bluezenv.rpc.RemoteTimeoutError: Failed to estab=
+lish connection"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_script_show[hosts7-v=
+m1]: failed on setup with "ConnectionResetError: [Errno 104] Connection res=
+et by peer"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_script_list[hosts7-v=
+m1]: failed on setup with "pytest_bluezenv.rpc.RemoteTimeoutError: Failed t=
+o establish connection"
+> FAIL functional.test_a2dp::test_a2dp_transport_created[hosts0-vm2]: faile=
+d on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_a2dp::test_a2dp_transport_acquire[hosts0-vm2]: faile=
+d on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_obex::test_obex_ftp_list[hosts12-vm2]: failed on set=
+up with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_obex::test_obex_ftp_get[hosts12-vm2]: failed on setu=
+p with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_obex::test_obexctl_list[hosts12-vm2]: failed on setu=
+p with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_agent::test_agent_pair_bredr[accept-hosts2-vm2]: fai=
+led on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_agent::test_agent_pair_bredr[reject-hosts2-vm2]: fai=
+led on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_avrcp::test_avrcp_GHSA_m2vx_pw5f_rc8v[hosts3-vm2]: f=
+ailed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_unicast_transport_created[hosts4-vm2]:=
+ failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_unicast_transport_acquire[hosts4-vm2]:=
+ failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_broadcast_transport_created[lc3-hosts5=
+-vm2]: failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_broadcast_transport_created[pbp-hosts5=
+-vm2]: failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_broadcast_transport_acquire[lc3-hosts5=
+-vm2]: failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bap_broadcast_transport_acquire[pbp-hosts5=
+-vm2]: failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bap::test_bass_past_transport_acquire[hosts6-vm2]: f=
+ailed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_bredr[hosts8-vm=
+2]: failed on setup with "RuntimeError: Process exited unexpectedly"
+> FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_le[hosts9-vm2]:=
+ failed on setup with "RuntimeError: Process exited unexpectedly"
+>
+>
+> https://github.com/bluez/bluez/pull/2528
 
+Any idea how to fix the errors above? Locally they seem to work just
+fine, so perhaps this is something related to the CI environment.
+
+> ---
+> Regards,
+> Linux Bluetooth
+>
+
+
+--=20
+Luiz Augusto von Dentz
