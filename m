@@ -1,36 +1,36 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from out-44.smtp.github.com (out-44.smtp.github.com [192.30.252.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D02D3AFAE4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0C33AFAE4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789509544; cv=none; b=XT6Sl8YjQvb1mIWy1BqnoAjU8EneBieKo96mTdg1jDVkxJkT7A4TNKZKvgy/fkIX63Tq2cTTYiOHNBy3Zhtr2Uecc3460oqLmh2PGIadgbfDpMqeEk7w70oDzzqRYoMcwXzbXH3gHH+I6NqDtAllsbWAm41CFlKxrzkDEDNAGek=
+	t=1789509547; cv=none; b=lthX9Mzz5rCVtT+boGuWaIvi8E3hHWC5OsYOdCtPkartOVItTBF5nGI2A0Of4dQgwXPPrDZ9h+2cy6KBGylZM9HTtHE2ygLgr8hpV/wMeY2er+BYp6rPOXNohzbPQhhqNvcUoqSeGj7BCTOx3FtvYk2dWmOq2hmbLoH9nAgVU+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789509544; c=relaxed/simple;
-	bh=r3A05xd2MuFYLwhfZUKBJ+0KAwSmU8EvMNg8+wrlFKU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AG0PAhqA5drFeSNXm3KlcRweM3TT3yY+uRjsqR/VAXCFkYMwsDCk9TUY7J3QWdbXUEftMZVVqyrZ/j6AntB1yM7rNfshS4i9L73Czk0zIrohgTDSdnB0LjAYG1MoX6bVQhu0C5uXE+0pny1/yGx70VPFYwVVEuv9S8RCNmdBd4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Rnk+hPpK; arc=none smtp.client-ip=192.30.252.204
+	s=arc-20240116; t=1789509547; c=relaxed/simple;
+	bh=NPMe5hF74vK4AosGX8hIXFo640UOGBsd4omqINxuBfE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=c/357P4r1T+OkOf80eou3oTLmVtlEFTjgyryt1b21vNA27nQn4to5rSC/mrE5H7ZgkS9SDLSkJNX/Diu5FPNEGnCyFaRtOne3OEMg6HeYMJfMCII9eLgCA6iM/xZlvHqeN6RgWg1itSfIqmpB8jq/qXBYjKxbE3Z7YyAWP2NIZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lc+gqeLB; arc=none smtp.client-ip=192.30.252.143
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Rnk+hPpK"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lc+gqeLB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1789509542;
-	bh=/c+FWwWTmVjpDzcfsvAYDPxwMn0LJNydaE8DoEfsO9g=;
+	s=pf2023; t=1789509545;
+	bh=a21YhSw3N7i2tU2e5OlXX8+dm13Ufzz+0VoN/rBGHN4=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Rnk+hPpKFlTUC3Ja0SsD4El5d3H2jxI0TR5Oq3Jl57RX6IMl7LMlffOUTMy829vvt
-	 Q1TlEjK4b3/w0DXtjnjF9CPNCQVcowh7zbbNLbwL5tM3+B7iMNrNpwk50/7d6s3G5q
-	 75YNrtHJFq35TyOsPj6AvEJ4gMeRdcpkIJI4XxyE=
-Received: from github.com (hubbernetes-node-44c98f4.ac4-iad.github.net [10.52.145.25])
-	by smtp.github.com (Postfix) with ESMTPA id C02617804C0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:59:02 -0700 (PDT)
-Date: Tue, 15 Sep 2026 14:59:02 -0700
+	b=lc+gqeLBoMr7JsD2BBcHjpsVy+Bo2F9ru/70QoO9ZTINi+iUS84UVv/KNiRWtaSe6
+	 RzslVZHinnDu2MvEZiBIA0At5sQT1x7KpYtv5NEiFzRGYBG1z12cN/pTRD4ru7MVnC
+	 hVNY1sxhaH+SNaltGznwRQhJj1hlmpObFzTJK2VM=
+Received: from github.com (hubbernetes-node-4b04ac8.ash1-iad.github.net [10.56.170.10])
+	by smtp.github.com (Postfix) with ESMTPA id 6E7828403A7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:59:05 -0700 (PDT)
+Date: Tue, 15 Sep 2026 14:59:05 -0700
 From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1165938/000000-d6364a@github.com>
-Subject: [bluez/bluez] d6364a: test-runner: Enable interrupt remapping for
- PCIe p...
+Message-ID: <bluez/bluez/push/refs/heads/1165941/000000-ccee9e@github.com>
+Subject: [bluez/bluez] ccee9e: doc/test-functional: Document PCIe controller
+ pass...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,37 +43,30 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1165938
+  Branch: refs/heads/1165941
   Home:   https://github.com/bluez/bluez
-  Commit: d6364a067cb841d8efee11bc1044c5f7643c32e5
-      https://github.com/bluez/bluez/commit/d6364a067cb841d8efee11bc1044c5f7643c32e5
+  Commit: ccee9e2e0c9684f2c8699a3d875cd16ca236558f
+      https://github.com/bluez/bluez/commit/ccee9e2e0c9684f2c8699a3d875cd16ca236558f
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-09-15 (Tue, 15 Sep 2026)
 
   Changed paths:
-    M doc/test-runner.rst
-    M tools/test-runner.c
+    M doc/test-functional.rst
 
   Log Message:
   -----------
-  test-runner: Enable interrupt remapping for PCIe passthrough
+  doc/test-functional: Document PCIe controller passthrough
 
-A device passed through with -P fails to allocate its MSI-X vectors
-(-ENOSPC) as the guest has no way to remap interrupts, so give it a
-virtual IOMMU with interrupt remapping enabled, which in turn requires
-the irqchip to be split.
+The tests needing a real controller can now use a PCIe one with --pcie
+and --force-pcie, in the same way --usb and --force-usb use an USB one.
 
-Without this the guest is not presented with a DMAR table at all, so
-enabling CONFIG_INTEL_IOMMU and CONFIG_IRQ_REMAP on the test kernel has
-no effect, and both are now documented as required.
+Unlike an USB controller, which only needs its device node to be
+readable, a PCIe controller is bound to vfio-pci while a VM host uses
+it, so the tests have to be run as root and the controller has to be
+alone in its IOMMU group.
 
-The machine type is moved out of the static argument list as it now
-depends on whether -P is used, the resulting command line is otherwise
-unchanged.
-
-The model wrote the change and confirmed the guest is only presented
-with a DMAR table once the virtual IOMMU is added; it was reviewed and
-tested by the author.
+The model wrote the option handling in pytest-bluezenv and this section;
+it was reviewed and tested by the author.
 
 Assisted-by: Claude:claude-opus-5
 
