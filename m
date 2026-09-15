@@ -1,122 +1,143 @@
-Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3192395AD1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47004372B57;
+	Tue, 15 Sep 2026 13:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789477054; cv=none; b=L0R7AMXFLbYH+aFPXKyIfP9ycWqNHlvrSaYpeaF799s0Lryo0C8whtj3lHUmtLxiaZNcNvFjDdzv9Zk7GF07Dnwre8FXOWCnOQyORGBQGqoGqPOM9HcMEy3i25Vf1HKgBYZd6oKMKazyXxt8VPAogGSrDONk60XdRV6Qk1hPgpg=
+	t=1789480780; cv=none; b=liodNQusgmi3i6LYObY/apuAjum068jznq45o/qil3v8jq2KGK7x60BLEBng8Q+FnuNmPbsIjHV+a7v9wQSvOimI7bkdVRytD0FP8eLbxXbqY9nnEi7q620qW7ku8NZNG9I69X9JnRYMG30Ky0XNwlP3pOnEn8yVJ4S+ELm81kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789477054; c=relaxed/simple;
-	bh=3QZEPoVca/rLzB1K3aSZCFejfDRS7/a4GLzN/Qd9Kbw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=S5mYooWG9YOX5gNHvoWtAC81oT+0XVP8U3WNteMkwBzKFIJstKntj7ToQRMw2oZ3yxArYJtwkjm74TW3lUJ2JAoSnbOcUjCnyYooBBEilx6J+NP6sbMuc5mRwAqUFl6b81pXvSnvXXP5Z/X1OHpxfYZOt1UsQtCycaIKEBYHf0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fVLtfchL; arc=none smtp.client-ip=74.125.230.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVLtfchL"
-Received: by mail-qk2-f13.google.com with SMTP id af79cd13be357-939109fafd6so337078285a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 05:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789477052; x=1790081852; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=QZXkNwsMIIK/vxZZYkXZjkLGqh78LoEcTCMvoFEwYBU=;
-        b=fVLtfchLgeZQT6NYG2nW01oxUaAo49fulUa/9ymXepPcBx+kJ4YEUAqogDIXN1g7sF
-         N5IASXkqGaLCYb9vlPTknPkbwDsuO1/JNrBDEQ0kU7brLODHdp7LpstwExSGEyObgzYc
-         ae/iol6DL+oL18m8UJtgulmtyilUztadi5CEhXkKYQ70ZkaWVOMXHClGsBR22ZmjNzDB
-         +9N+t/qhfqkuUpTKno65XhYys2AjGv9+/Ri4pWV+25ffLAaaLxAaZJObnvC3tBloEkTk
-         ISnD70MkuFm0LC25WM4B3SCq2PkyCgcTYCavPhP2E783GqhGyyFrTbDluneq2MogXYFR
-         2NUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789477052; x=1790081852;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=QZXkNwsMIIK/vxZZYkXZjkLGqh78LoEcTCMvoFEwYBU=;
-        b=P9AizaIwu7lPsJS0/bf86VStzUKXBZUvtp9B6/jk9YIre8/RKiVjUDbOZwRMvgwWY1
-         tygoG5macPPnEk4hcl+OlirGvRy5c8FIeIeLIaQIMBEzKr0LihtbjdcKDaC+05pYcIQa
-         5286jj6G4B98MxiFv4sBwZy8YjBnQemADt63LXKXt+NU4nSRNO/vC3GJfcs89VM5uFj2
-         8zxufW3C4eW+k0lgzUxRyaQXPMpcXsb834R9YFOcjEOQuj1MyZN9IQTW3OEsJsOamrzk
-         oG3siQP2kVNWDKZIwjoenXzKUqD/tu9bcXaXppMxKvV2oQiZMXpy5az250cHVepYG7bm
-         IGjQ==
-X-Gm-Message-State: AFuF++mZMys/Xzo5Ksw0VbvwYT4GJio/tYOwaH6x4hyN5muC7ZzNxG7z
-	nLbHQIkaV/ZQQGpcTMAGeoDkTVsZTr0mEDFIPWMoBynpyevgnU+TmV7bxm/TwA==
-X-Gm-Gg: AYBFou3xBf4gjEA7birGzYLlNBOKAosF/hmOt2fFQqwQpmGPAhgwxUGB3ZHDDX0Tjj+
-	p7FyRqyjCY7L+JYplWtPL1rbzrOItFshxCK0Q4fPf8XGEUTJVPq+KI7ea0iCGbQ1BNEiG/ukbFE
-	SD5ZDKX4x5ZKkIjOcbQCR5YBrh+Q2O+KvbsmOWl2NrdXBWZaIHTBTnyqgUtvKEHlp8cAkVPJ48i
-	vpj8iNILt0ARlPRxnsvRLg/u1PanaWcBTmIVGQNc0Vd5Zo4FiT3B5aQlfDjLu5zn7IqVydAbMS5
-	M2Wl+nZ2Mt3y8WY2qYvd+zkyDcihQuvsCL6opwRrIbg+iTzgOEm9GhsOcPpBbhsyK/MXuc3MczK
-	zUvrS9FqfdNM1kVP2P8RfwHySMX88j6Fzgt4GM/u5+gkSTlgQaZKfRT4Jcdb9KB+ovv95ak/qtx
-	Q4nMT/7emYyFoszHDYY+rcKSZmSZIAGrEW5DZ0WRiXH4Md3KUZFVZFBY8RbcPwJFZGLZOe4+hlR
-	Me2gSg=
-X-Received: by 2002:a05:620a:4620:b0:93a:1101:a21c with SMTP id af79cd13be357-93a299f084bmr1061083185a.25.1789477051788;
-        Tue, 15 Sep 2026 05:57:31 -0700 (PDT)
-Received: from [172.17.0.2] ([172.214.44.148])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-939ebda519bsm1223721385a.26.2026.09.15.05.57.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 05:57:31 -0700 (PDT)
-Message-ID: <6aa940bb.7f16daeb.bd778.303f@mx.google.com>
-Date: Tue, 15 Sep 2026 05:57:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8797965701362135438=="
+	s=arc-20240116; t=1789480780; c=relaxed/simple;
+	bh=MPNwDySajHBTgQoxxPTy4tz7FJNKza+ZVwhy6UjvdYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVu+3KroDA7+yQTKFycOsn0PHrCXLr5rqv2np3nyOtxPWnhJqu9dUqzK3jiLIxPgEgEiuMBkE/A0oKVTQQ9DsmjgvB1wjho7TStShILIySu+WrUcWQ+wLQIF/aU1QIcO7+XHlA6Op0cGRU+UPhh8KKUVc4F9LoKbVL04epw0iW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256:X25519MLKEM768)
+	 (Exim 4.100)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1x6Th5-000000000fl-1rZv;
+	Tue, 15 Sep 2026 13:59:31 +0000
+Date: Tue, 15 Sep 2026 14:59:27 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Hans de Goede <johannes.goede@oss.qualcomm.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	driver-core@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	linux-wireless@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC PATCH 0/4] device_schedule_reprobe(): core helper and
+ conversions
+Message-ID: <aqlPPyblTK8c6-zZ@makrotopia.org>
+References: <anpxFdwNxk0XwPjQ@makrotopia.org>
+ <2026081139-strenuous-greasily-f4e5@gregkh>
+ <cb0d42dd-4755-49a8-8a05-297e4283914e@oss.qualcomm.com>
+ <2026081133-crazy-enquirer-97ce@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, skokovmaksimevg@gmail.com
-Subject: RE: [v2] Bluetooth: RFCOMM: free the skb when the DLC has no owner
-In-Reply-To: <20260915070119.45143-1-skokovmaksimevg@gmail.com>
-References: <20260915070119.45143-1-skokovmaksimevg@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2026081133-crazy-enquirer-97ce@gregkh>
 
---===============8797965701362135438==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Aug 11, 2026 at 05:07:47PM +0900, Greg Kroah-Hartman wrote:
+> That feels a bit better, as long as this code really is "safe" :)
+>
+> So, how can this be tested and fixed up so it isn't an RFC anymore?
 
-This is automated email and please do not reply to this email!
+The helper went out as v2 [1] and v3 [2] on its own, and it now travels
+as patch 3 of the mxl862xx devlink flash series [3], whose driver is
+its first user: that driver reflashes a DSA switch over MDIO and has no
+in-place path back, so it reinitialises through a deferred detach and
+re-probe. Patch 4 of that series does not link without the helper and
+the series cannot be split around it, so what it needs from the driver
+core is an ack on that patch.
 
-Dear submitter,
+On testing. Every firmware flash and every recovery in that series ends
+in device_schedule_reprobe(), so the helper is on the path of all of
+the following, run on an MxL86252C switch of the BananaPi R4 Pro 8X: an
+upgrade through fwupd; a reboot issued while a flash was running, which
+waits for the transfer to finish; a host crash in the middle of a
+transfer, whose wedged download the driver drains in the background
+before re-probing; and a power cut in the middle of a transfer, after
+which the bootloader came up ready and fwupd flashed the switch back to
+a released firmware. That kernel was built with PROVE_LOCKING,
+PROVE_RCU, DEBUG_LOCK_ALLOC, DEBUG_MUTEXES, DEBUG_SPINLOCK,
+DEBUG_RT_MUTEXES, DEBUG_WW_MUTEX_SLOWPATH, DEBUG_ATOMIC_SLEEP, KASAN
+(generic), UBSAN, DETECT_HUNG_TASK and SOFTLOCKUP_DETECTOR, on PREEMPT,
+and the logs were clean.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1165161/
+On the fixing up, since the version in this thread:
 
----Test result---
+The helper adds no state to the driver core. That version grew a
+shutdown_done bit in struct device_private, set from device_shutdown();
+the work now tests defer_all_probes instead, which device_shutdown()
+and dpm_prepare() both set before they touch any device. base.h and
+core.c are untouched, so the patch is dd.c and device.h only.
 
-Test Summary:
-CheckPatch                    PASS      1.02 seconds
-VerifyFixes                   PASS      6.17 seconds
-VerifySignedoff               PASS      0.49 seconds
-GitLint                       PASS      0.42 seconds
-SubjectPrefix                 PASS      0.21 seconds
-BuildKernel                   PASS      30.36 seconds
-CheckAllWarning               PASS      35.00 seconds
-CheckSparse                   PASS      37.29 seconds
-BuildKernel32                 PASS      30.42 seconds
-CheckKernelLLVM               PASS      36.83 seconds
-TestRunnerSetup               PASS      811.83 seconds
-TestRunner_rfcomm-tester      FAIL      9.06 seconds
-IncrementalBuild              PASS      28.49 seconds
+Nothing is locked in the caller's context, and the parent is neither
+pinned nor locked. Recording dev->parent and taking
+__device_driver_lock() meant the device lock was taken where the caller
+stands, which inverted against the devlink instance lock that a devlink
+flash holds across the call, and a pinned parent can be replaced by
+device_move() without any device lock held. The work now takes
+device_lock(dev) alone, and a bus that sets need_parent_lock is refused
+with -EINVAL when the re-probe is scheduled. usb_bus_type is the only
+such bus in the tree, and the three conversions re-probe PCI and serdev
+devices, so none of them is refused.
 
-Details
-##############################
-Test: TestRunner_rfcomm-tester - FAIL
-Desc: Run rfcomm-tester with test-runner
-Output:
-No test result found
+__device_release_driver() reports whether it released the driver, and
+takes an abort_if_blocked flag. It drops the device lock while busy
+consumer links are unbound; on re-acquisition it re-checks
+defer_all_probes and abandons the release, which closes the window
+where a ->remove() could follow a ->shutdown() on the same device. Only
+the deferred re-probe passes true, since an administrative unbind has
+to complete and driver_detach() would spin on a device it never
+released. Because the work learns whether it was the call that released
+the driver, an unbind winning that race is no longer undone by the
+re-attach.
+
+The work runs on system_freezable_wq rather than the unbound queue
+Marco commented on, so a re-probe pending across system suspend runs
+once the system has resumed, instead of detaching a suspended device or
+racing its late suspend callbacks.
+
+-EPROBE_DEFER is kept out of the re-probe error path, where
+dev_err_probe() would have recorded it as the device's deferred probe
+reason. The kernel-doc no longer promises that an administrative unbind
+is never undone, which unbind_store() does not guarantee, and it now
+states the calling context and the freezable behaviour.
+
+The conversions of the open-coded users in iwlwifi, hci_h5 and
+btintel_pcie follow once the helper is merged, which is the part that
+removes the module_get(THIS_MODULE) you objected to. Hans reviewed and
+tested the helper and the hci_h5 conversion on RTL8723BS hardware
+[4][5]; the helper has changed materially since, so I have not carried
+those tags over.
+
+[1] https://lore.kernel.org/all/cover.1787185594.git.daniel@makrotopia.org/
+[2] https://lore.kernel.org/all/cover.1787281239.git.daniel@makrotopia.org/
+[3] https://lore.kernel.org/all/cover.1789175618.git.daniel@makrotopia.org/
+[4] https://lore.kernel.org/all/c461462f-de0b-43e8-ac9e-541013f5f8da@oss.qualcomm.com/
+[5] https://lore.kernel.org/all/7ffe0c2e-0742-488a-ab6c-1dc2fabc049c@oss.qualcomm.com/
+
+Thanks,
 
 
-https://github.com/bluez/bluetooth-next/pull/771
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8797965701362135438==--
+Daniel
