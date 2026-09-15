@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-ua2-f43.google.com (mail-ua2-f43.google.com [74.125.226.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10D34A4408
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCC54A4EE2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506945; cv=none; b=d5fka5SHkQZP7jK4fv647PhEtdWFI/a3V3+jCEIxtpKpwAnnqCkCo+yLMWOyt1bLtEQXaGXZh/01m8pg43DBvcpgLtgxE5+UxMfwip/wck8dOhwV9ju5J3TrpW/zJszaXXH5pG/9wf9qQWlzpKq9e8GWl+VyM4INIPxYWnvCIBk=
+	t=1789506947; cv=none; b=lD8o5t09GFYqXZQG3GHVzHW1/DIYD7gkuwkVpnip8pqQSJdnSQTC4Pv7Ay52VI5ZhZb7qFMbqVefwy6/ohknMeY8cu5p/K8vp7LcOIUMSTcKJwe0eSPPtlvdV3oCc5zJFEeTjIcMtOzH7fdzJdgIOzOWwS6K/xLfXZn7sHst7W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506945; c=relaxed/simple;
-	bh=fcmZga7aSNzH8u/Bredl9Z8ZbrKgCAuBXR4lRdthQBE=;
+	s=arc-20240116; t=1789506947; c=relaxed/simple;
+	bh=FGaflZglzqxxDR8XkxdmCXciKLkCp5tv8og5090fvUw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F1N6goSc4v3cmgzAfmIw+baRXrkwKfc6vxvewdiqbWxo8V1b+etMlwoksjoELO7tqn0lJmecqU5nGdJdm7/S77bg5LlLytYkYOkRzLNLWl4IRsmsfkTcuyOkOp7j3IPF6ke00u2yW6P5pNvCt8HPLGYQZeztAE7ECnBagoFQfPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BIj/uagh; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=eHyekL6/RF0ugbjJWerOGpUi4K2VaFk17bvJq1l3YCkFgpXrf0iR6rscAKPEKReQqDwjNxjBNzry5UQL52UhfT6zppLBZXOG7nLom/VA5Yf+zZAHE6nfNdXDz7hTY37GUExiRM8XvlojHminGitQLzvGeumjCcOyzmZvkAO5DTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RO6OpBmG; arc=none smtp.client-ip=74.125.226.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BIj/uagh"
-Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-790ec94be85so73810137.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RO6OpBmG"
+Received: by mail-ua2-f43.google.com with SMTP id a1e0cc1a2514c-97ea1a712deso84002241.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506943; x=1790111743; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789506944; x=1790111744; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=L9bxwFQLq7dLKXtIqXczossTLMTtMuPa8dy3hDo/ozU=;
-        b=BIj/uaghGzKKQSF3nFrfP9wEI3EyXkIzURY/UJMSnmDaKC+cS0CKt9CwTXy/NX0Zxs
-         mD7xq7hdb0+nAgboFhAvIySid6TGz/x0Td5qTWU3BTUr0dDcD9ngh0AxklX/xs2uoQKY
-         PSDajwDWxbReaRlZbp3J0cGmuEvTSnmzaVU/HYr4SatWAN8IAzs453X2/EX5Wyrf6Y8e
-         kgmzFyZjxIdHgA3gWOXhZ14rUw7UMBOTArfVqRvnEttWgMRlNprzgokdO2ixCapvEViH
-         aFg3EKbEvqTdW+PoA8apoRcLZkItKfLlu+gUItGw11Ak3QFmI8SwMiyYS7jmhoy1qx52
-         xYxg==
+        bh=WRV+nWZ3Cn0PR1EpIiemRWv2OlVIZ1pm553TXuF6vXA=;
+        b=RO6OpBmGDdx92qWR7J0kLsBq4YgYmPMnm2tnYvsbXvDr8shDtwYqEktADlNx1ZCZhV
+         lj16KkP6ez+y7ryeyosFUkYoyUluwljQfULJqDpOnGbta9nd3A2eTltFrnQ2qQ30tN2L
+         PWDqUn7eQxWExTVWIfORdG0uJxf9XlXn8x6dfNHqMpNjHCuAJCoh5x8rFpYCpMPkVmuu
+         qE1OjtygAodQLx3fEwifrUZqVYHm/wQSGwbFC6Qy4Hx5oaVHmFRy9ezjfxjtwRO0KWQn
+         yawFV93OY117gEeauRIkU2GUpzajSzGGBRlQ+zuCEMj/RAIGUgYyHYjBzuvN7aXqm75m
+         rn0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506943; x=1790111743;
+        d=1e100.net; s=20260707; t=1789506944; x=1790111744;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=L9bxwFQLq7dLKXtIqXczossTLMTtMuPa8dy3hDo/ozU=;
-        b=LQbODJ9VTXnBPrNtSo6VbTyfQ/S7c/XPWagBl+OgNszYVbbJOJaorN2q2PH9OECvdb
-         slT8Ya6P+Ha4DPzK1GjA5BobPpsJvRonLpoHEay/lz9W0wbb1lMPbSOCUCrKMj4yIJl6
-         qrNM7h+8s8XWTi/7jTjJSzcnJR+jyhW7K6GCwh0zrDb9APAS4J93P+8eAi5l/41id234
-         XB2oG+GYpy2n6r1uo0h8XzvUEh3O8SEqWWAGaiVmz/VcDbtUZ2wuCHYYq7tEZtjMypsh
-         LnlZtXqSGxedmAbXoJenIv1U4ZX+cBD9in58c2555Zp8iwRUXBN5SYh5m4vCVrT1PgPr
-         uPBQ==
-X-Gm-Message-State: AFuF++nLpDZow3mNPAmX+rUwh4AeymSMtX/QVgjW79dLntZYrTDZ6LVo
-	n/38WFt0ot9rBOY5pUigoucNN/d/wbJWArsBFgsbYoyM0DKrMVlFxMepwG49zRY5
-X-Gm-Gg: AYBFou2m71KXrSOwudkqih7EaGoc8vvq4XfMssc1qTMaTeZm1nJOk5/eHcloBSch1iB
-	e/hPY269wdmcmCfxWSMdPGVzp4WxkoAB+O7cH0XaLi0k5/Gr6Ra640ZXmvvodSnQSPLpBLX5H1e
-	OfoAj8taErd/7vB7OsmAaubRYQlf1oPELhCEM/BzJkOXCNXkBJ+VvAbsQXJUqGQjsbmuCMRR14O
-	Nqxbn2p0nhJ3lofdAQy9FLm/StU0M92LnYEmcK30Zr8kTcV58S1X8nv5NXIkrz/xtaQNLldMsIA
-	DaXTUNcMVnUB07SC6d393hkQCyHkBPDvKzvxyrejzWmao8ECN6Eo1srHoyJv0aRMAIMOVsek5s8
-	IdyGh1nnVPWyoAmc62hupFALOYAbnqr67FNM1QrmQm49vJmtSHLPEC1txwbnQegttiAxy7P8Vqi
-	Zo3+XyMFOFM4IZFjZwMu2kSkAvgxXkigiOYRy6/mqT/poYkjjbWI9P6WjIkn05qPDyDtLTwhD+w
-	Ce//lDhY14mtmhHNM6MmfLc7FGGDZpUml6XGb9ZHHHW30mczbvvQZ4nOrib0PPE7A==
-X-Received: by 2002:a05:6102:f8f:b0:79a:7895:c36a with SMTP id ada2fe7eead31-7a029f1425amr461086137.13.1789506942699;
-        Tue, 15 Sep 2026 14:15:42 -0700 (PDT)
+        bh=WRV+nWZ3Cn0PR1EpIiemRWv2OlVIZ1pm553TXuF6vXA=;
+        b=m5wQacclO74gDASQWj2/5hPBLXXFKTPDCk3y5utiMVHXTE4ljLG7tUj6jAUdmirG8H
+         iCYMMxSkFMeEVw93jZlhwh1859REfSTcfiHLf26ev2KDoewMu4fEyEkK9DuSTJ3Fhng8
+         Qd5W7msNxUia3pMBd6decNB9Z4VCmjihTGq+uwX5SDqlap9pHH5uA79hvj7M6BBMa42i
+         fQpXc5WZRgdleELe0KBVjoIhtJBnXIMWThdAkGmPHDwH3mth2rcdYJ+dHOiAVpMQgry9
+         /h/UMga9ht2ksuLolqVE+1Z66zXUpiKb3Wxy3a5ajQl/QD6VTwepJGSrVgJl4Bk0EcxC
+         W1nA==
+X-Gm-Message-State: AFuF++mng5AsgkAP1Q7HF11m3bL33WWe1zp6raXy1vTKafp2byPXU6L4
+	Ke2j/F+Dbkkopk50L2mk8cTMOoTppcX9JrwIqmxoTg/OF73emA196tXR2NDtnUtC
+X-Gm-Gg: AYBFou3B88JBV4fTkjXTVyuaEb1W0zBbGsDvMYdB/dkfDvzMqxVxD8h2rpoUsmpwgYo
+	jkFFUiu4nOwG7FgrOhXW1cz+ovvJpAEGyWGcr00aXEK9BApA8kbMNyMPBdIG2PDbTB9m4yzOLez
+	T45/rTgfF00IdVoGbVvW9Y98tgAkeZI9XSkIbJOC7xu/Ws6Y+GWstLgL4e8ecZz4kxLhU8KuBgz
+	ZysTaKX1JW3y46Lm+00tvMTL+5vjijpm+Em4WEKSWxMV+Wq8WXpWz4L//KSlJ5cUzIkJyPdnUxh
+	J2qJoCBWlmgRyRTWBgdWynb8OjsBhHsLAS4THbSoE62RMolkdm9QqVN4otDS/rkpot77ZdqCaZj
+	93p6eUiv8OdxxRV19Xk1rXPvCt9YHIQ961SSt8EHstwd11T/p20bpZDwPi7A03WVs3kDfR/GpA5
+	T5TVksEb1FWW0BB90hN0n1h9HtusgaizmRLr8Grw7HzA9Hi2/VMfaJCvn9AgWvgUxeK/SNtyeyY
+	oZ2HnwMaot//Ie9WcYBGIRSRyhstUxSqGrbOPKuN38qLdM/mUTGTJJRMIlDGJAK1Q==
+X-Received: by 2002:a05:6102:6445:b0:78d:31e7:e02 with SMTP id ada2fe7eead31-7a026372b28mr473508137.4.1789506943967;
+        Tue, 15 Sep 2026 14:15:43 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.41
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:42 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:43 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 05/11] doc: describe the BAP coordinated set test cases
-Date: Tue, 15 Sep 2026 17:15:22 -0400
-Message-ID: <20260915211528.1223784-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 06/11] emulator: use the handle of the receiving side
+Date: Tue, 15 Sep 2026 17:15:23 -0400
+Message-ID: <20260915211528.1223784-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260915211528.1223784-1-luiz.dentz@gmail.com>
 References: <20260915211528.1223784-1-luiz.dentz@gmail.com>
@@ -77,120 +77,237 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Every device assigns its own connection handles, so the two sides of a
+link do not necessarily know it by the same handle: conn_link() picks
+the lowest one free on each device, which differ as soon as a device
+has more than one connection.
+
+The events and the data delivered to the peer carried the handle of the
+sender though, so the receiving side got a handle it knows nothing
+about and dropped what it received: with three devices the second link
+of the initiator is handle 2 on it and handle 1 on the peer, so neither
+the ACL data nor the CIS requests reached their destination.
+
+Give the receiving side its own handle, as the disconnection already
+does, for the data as well as for the events reporting a connection, a
+key request, a connection update and the CIS of a CIG.
+
+This changes nothing for two devices, as both sides then assign the
+same handles.
+
 Assisted-by: opencode:claude-opus-5
 ---
- doc/functional-bap.rst | 101 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+ emulator/btdev.c | 84 ++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 64 insertions(+), 20 deletions(-)
 
-diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-index f9392bd2dbce..78411f4dd47d 100644
---- a/doc/functional-bap.rst
-+++ b/doc/functional-bap.rst
-@@ -288,3 +288,104 @@ test_bass_past_transport_acquire
- 	The stream is verified on the delegator rather than through the
- 	state of the MediaAssistant object, as an object created for a
- 	local stream stays in the ``local`` state.
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index fcc516f4947c..e29e050fad59 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -1589,9 +1589,14 @@ static int cmd_add_sco_conn(struct btdev *dev, const void *data, uint8_t len)
+ done:
+ 	send_event(dev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
+ 
+-	if (conn)
++	if (conn) {
++		/* Each device assigns its own handles, so the event of
++		 * the receiving side carries its handle.
++		 */
++		cc.handle = cpu_to_le16(conn->link->handle);
+ 		send_event(conn->link->dev, BT_HCI_EVT_CONN_COMPLETE,
+ 							&cc, sizeof(cc));
++	}
+ 
+ 	return 0;
+ }
+@@ -4196,12 +4201,17 @@ static void le_conn_complete(struct btdev *btdev,
+ 			memcpy(cc.peer_addr, btdev->bdaddr, 6);
+ 
+ 		cc.role = 0x01;
+-		cc.handle = cpu_to_le16(conn->handle);
++		/* Each device assigns its own handles, so the event of
++		 * the receiving side carries its handle.
++		 */
++		cc.handle = cpu_to_le16(conn->link->handle);
+ 		cc.interval = lecc->max_interval;
+ 		cc.latency = lecc->latency;
+ 		cc.supv_timeout = lecc->supv_timeout;
+ 		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CONN_COMPLETE,
+ 					&cc, sizeof(cc));
 +
-+COORDINATED SET
-+===============
++		cc.handle = cpu_to_le16(conn->handle);
+ 	}
+ 
+ 	cc.status = status;
+@@ -4709,10 +4719,12 @@ static void le_conn_update(struct btdev *btdev, uint16_t handle,
+ 	le_meta_event(btdev, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &ev,
+ 					sizeof(ev));
+ 
+-	if (conn)
++	if (conn) {
++		ev.handle = cpu_to_le16(conn->link->handle);
+ 		le_meta_event(conn->link->dev,
+ 					BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE,
+ 					&ev, sizeof(ev));
++	}
+ }
+ 
+ static void le_conn_param_req(struct btdev *btdev, uint16_t handle,
+@@ -4729,7 +4741,7 @@ static void le_conn_param_req(struct btdev *btdev, uint16_t handle,
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	ev.handle = cpu_to_le16(handle);
++	ev.handle = cpu_to_le16(conn->link->handle);
+ 	ev.min_interval = cpu_to_le16(min_interval);
+ 	ev.max_interval = cpu_to_le16(max_interval);
+ 	ev.latency = cpu_to_le16(latency);
+@@ -4845,7 +4857,7 @@ static int cmd_start_encrypt(struct btdev *dev, const void *data, uint8_t len)
+ 
+ 	memcpy(dev->le_ltk, cmd->ltk, 16);
+ 
+-	ev.handle = cpu_to_le16(conn->handle);
++	ev.handle = cpu_to_le16(conn->link->handle);
+ 	ev.ediv = cmd->ediv;
+ 	ev.rand = cmd->rand;
+ 
+@@ -5003,7 +5015,7 @@ static int cmd_conn_param_neg_reply_complete(struct btdev *dev,
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	ev.handle = cpu_to_le16(cmd->handle);
++	ev.handle = cpu_to_le16(conn->link->handle);
+ 	ev.status = cpu_to_le16(cmd->reason);
+ 
+ 	le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &ev,
+@@ -6190,7 +6202,10 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 			memcpy(ev.peer_addr, btdev->bdaddr, 6);
+ 
+ 		ev.role = 0x01;
+-		ev.handle = cpu_to_le16(conn->handle);
++		/* Each device assigns its own handles, so the event of
++		 * the receiving side carries its handle.
++		 */
++		ev.handle = cpu_to_le16(conn->link->handle);
+ 		ev.interval = lecc->max_interval;
+ 		ev.latency = lecc->latency;
+ 		ev.supv_timeout = lecc->supv_timeout;
+@@ -6205,7 +6220,10 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 				sizeof(ev));
+ 
+ 		/* Disable EXT ADV */
+-		queue_foreach(conn->link->dev->le_ext_adv, ext_adv_term, conn);
++		queue_foreach(conn->link->dev->le_ext_adv, ext_adv_term,
++								conn->link);
 +
-+Three hosts, with the two acceptors forming a coordinated set, one for
-+each side, so the initiator has to discover both before it can stream:
++		ev.handle = cpu_to_le16(conn->handle);
+ 	}
+ 
+ 	ev.status = status;
+@@ -7063,9 +7081,11 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
+ 
+ 	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
+ 
+-	if (conn)
++	if (conn) {
++		evt.conn_handle = cpu_to_le16(conn->link->handle);
+ 		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CIS_ESTABLISHED,
+ 						&evt, sizeof(evt));
++	}
+ }
+ 
+ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
+@@ -7110,8 +7130,11 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
+ 			}
+ 		}
+ 
+-		evt.acl_handle = cpu_to_le16(acl->handle);
+-		evt.cis_handle = cpu_to_le16(iso->handle);
++		/* Each device assigns its own handles, so the event of
++		 * the receiving side carries its handles.
++		 */
++		evt.acl_handle = cpu_to_le16(acl->link->handle);
++		evt.cis_handle = cpu_to_le16(iso->link->handle);
+ 		evt.cig_id = le_cig->params.cig_id;
+ 		evt.cis_id = le_cig->cis[cis_idx].cis_id;
+ 
+@@ -8737,6 +8760,7 @@ static void send_acl(struct btdev *dev, const void *data, uint16_t len)
+ 	struct iovec iov[3];
+ 	struct btdev_conn *conn;
+ 	uint8_t pkt_type = BT_H4_ACL_PKT;
++	uint8_t flags;
+ 
+ 	/* Packet type */
+ 	iov[0].iov_base = &pkt_type;
+@@ -8751,11 +8775,18 @@ static void send_acl(struct btdev *dev, const void *data, uint16_t len)
+ 
+ 	num_completed_packets(dev, conn);
+ 
++	flags = acl_flags(hdr.handle);
 +
-+.. code-block::
+ 	/* ACL_START_NO_FLUSH is only allowed from host to controller.
+ 	 * From controller to host this should be converted to ACL_START.
+ 	 */
+-	if (acl_flags(hdr.handle) == ACL_START_NO_FLUSH)
+-		hdr.handle = acl_handle_pack(conn->handle, ACL_START);
++	if (flags == ACL_START_NO_FLUSH)
++		flags = ACL_START;
 +
-+	+------------------------+                 +------------------------+
-+	| host1                  |      LE ACL     | host0                  |
-+	| acceptor, left         | <-------------- | initiator (central)    |
-+	| bluetoothctl -a auto   |                 | bluetoothctl -a auto   |
-+	| bap-sink-lc3-left.bt   |  CIS 0x00 (LC3) | bap-source-lc3.bt      |
-+	| PAC Sink, Front Left   | <============== | PAC Source endpoint    |
-+	+------------------------+                 |                        |
-+	                                           |                        |
-+	+------------------------+      LE ACL     |                        |
-+	| host2                  | <-------------- |                        |
-+	| acceptor, right        |                 |                        |
-+	| bluetoothctl -a auto   |  CIS 0x01 (LC3) |                        |
-+	| bap-sink-lc3-right.bt  | <============== |                        |
-+	| PAC Sink, Front Right  |                 |                        |
-+	+------------------------+                 +------------------------+
++	/* Each device assigns its own handles, so the one of the
++	 * receiving side has to be used.
++	 */
++	hdr.handle = acl_handle_pack(conn->link->handle, flags);
+ 
+ 	iov[1].iov_base = &hdr;
+ 	iov[1].iov_len = sizeof(hdr);
+@@ -8794,8 +8825,8 @@ static void send_sco(struct btdev *dev, const void *data, uint16_t len)
+ 
+ static void send_iso(struct btdev *dev, const void *data, uint16_t len)
+ {
+-	struct bt_hci_acl_hdr *hdr;
+-	struct iovec iov[2];
++	struct bt_hci_acl_hdr hdr;
++	struct iovec iov[3];
+ 	struct btdev_conn *conn;
+ 	uint8_t pkt_type = BT_H4_ISO_PKT;
+ 
+@@ -8803,18 +8834,31 @@ static void send_iso(struct btdev *dev, const void *data, uint16_t len)
+ 	iov[0].iov_base = &pkt_type;
+ 	iov[0].iov_len = sizeof(pkt_type);
+ 
+-	iov[1].iov_base = hdr = (void *) (data);
+-	iov[1].iov_len = len;
++	memcpy(&hdr, data, sizeof(hdr));
+ 
+ 	conn = queue_find(dev->conns, match_handle,
+-					UINT_TO_PTR(acl_handle(hdr->handle)));
++					UINT_TO_PTR(acl_handle(hdr.handle)));
+ 	if (!conn)
+ 		return;
+ 
+ 	num_completed_packets(dev, conn);
+ 
+-	if (conn->link)
+-		send_packet(conn->link->dev, iov, 2);
++	if (!conn->link)
++		return;
 +
-+	both acceptors share the same SIRK, so they are resolved into a
-+	single set, and one CIS per member carries its channel
++	/* Each device assigns its own handles, so the one of the
++	 * receiving side has to be used.
++	 */
++	hdr.handle = acl_handle_pack(conn->link->handle,
++						acl_flags(hdr.handle));
 +
-+	--> connection is initiated by      ==> audio flows towards
++	iov[1].iov_base = &hdr;
++	iov[1].iov_len = sizeof(hdr);
 +
-+The acceptors run `bluetoothd` with the same SIRK, so the initiator
-+resolves them into one set:
++	iov[2].iov_base = (void *) (data + sizeof(hdr));
++	iov[2].iov_len = len - sizeof(hdr);
 +
-+.. code-block::
-+
-+	[CSIS]
-+	SIRK = 861FAE703ED681F0C50B34155B6434FB
-+	Size = 2
-+	Rank = 1
-+
-+``Rank`` differs per member, 1 for the left and 2 for the right one,
-+while ``SIRK`` and ``Size`` are the same, as they describe the set.
-+
-+Each acceptor also has to include the RSI in its advertising, with
-+``advertise.rsi on``, otherwise the initiator cannot tell the two are
-+members of the same set, and the resolved set does not appear as a
-+**org.bluez.DeviceSet(5)** object.
-+
-+``client/scripts/bap-sink-lc3-left.bt`` on host1
-+	Registers a local PAC Sink endpoint
-+	(``00002bc9-0000-1000-8000-00805f9b34fb``) with LC3 and Front Left
-+	as its only location, and advertises with the RSI.
-+
-+``client/scripts/bap-sink-lc3-right.bt`` on host2
-+	As above, with Front Right as its only location.
-+
-+Each acceptor takes a single channel, unlike the stereo unicast case
-+where one acceptor takes both: registering exactly one location makes
-+`bluetoothctl` add the channel count to the capabilities, so a member
-+is only ever configured for its own channel.
-+
-+test_bap_unicast_set_transport_created
-+--------------------------------------
-+
-+:Setup: As above.
-+
-+:Steps:
-+	1. Start `bluetoothctl` with the scripts on the three hosts.
-+	2. Pair the initiator with each acceptor over LE.
-+	3. Initiator: ``endpoint.config <remote endpoint>
-+	   /local/endpoint/ep0 16_2_1``, for the remote PAC Sink endpoint
-+	   of each member.
-+
-+:Expected:
-+	1. ``Endpoint /local/endpoint/ep0 registered`` on the three hosts.
-+	2. ``Pairing successful`` for both, and the members are resolved
-+	   into a single set, reported as
-+	   ``[NEW] DeviceSet /org/bluez/hci0/set_<sirk>`` listing both
-+	   devices.
-+	3. A transport is created for each member, one per channel, i.e.
-+	   one for the Front Left endpoint and one for the Front Right
-+	   one.
-+
-+:Notes: Without the same SIRK, or without the RSI in the advertising,
-+	the members are not resolved into a set and each is streamed to
-+	on its own, which is not what this test covers.
-+
-+test_bap_unicast_set_transport_acquire
-+--------------------------------------
-+
-+:Setup: As above, with the transports already created.
-+
-+:Steps: Initiator: ``transport.acquire <left> <right>``, for the
-+	transports of both members.
-+
-+:Expected: ``Acquire successful: fd <fd> MTU <read>:<write>`` for each
-+	transport, and both move to ``State: active``.
-+
-+:Notes: As for a stereo stream to a single acceptor, the CIS are only
-+	created once every CIS of the CIG is ready, so the transports of
-+	both members have to be acquired.
++	send_packet(conn->link->dev, iov, 3);
+ }
+ 
+ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
 -- 
 2.55.0
 
