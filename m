@@ -1,127 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv2-f38.google.com (mail-qv2-f38.google.com [74.125.230.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7993D457E47;
-	Tue, 15 Sep 2026 22:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAAF47F2F8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 22:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789512893; cv=none; b=UBFxPCcmNBKV5uWdLS5aEE+Zlz5PJyzhvqoJ3rB77pS42BL+ROroizIhGdhG5qmzU3ScgVLBSSt7sKdEUeyfqyNPj11RDKYeNMoh7y+StVnUeSrxgZF3vQ0sKRQJYBux7tunulqUroAi+WWCek2nSW2FvnydDMg7EuBRaBjZPOo=
+	t=1789513138; cv=none; b=axf3kM0uvmtibFrvp3FehczpBqeB2TbQLbKkJAZ7RljvXxv4TT6YcL6s8OjIIgx+1t16UFwCUTONDK9enYCnZb1Vp57hNv9q4rtQoPMOzAcARBTUuB148EtLab8Ni2aUQLKwiXsMH1utbD9J6BM5TQj5sfX2aWx93xsrijg1+ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789512893; c=relaxed/simple;
-	bh=sTKIyEOuI7a6+JT8x9pGnRFmytyYd7oHP2DvC/z48WU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BsE33f8YpMunB/bEzl4+BYZUWkDc8F0rBh10YyNRf+xMbkS8ISl+ML3LD7I+JzWJvwc5upzBuw87A+8Q09qDv3YAiy7lmkN6RRrTpAKj3JztoeKNu58bBsIYflTgHdXi+7b8JkAMtMEqS4+ISH7ewXwfvf0n9LueWu4IB37z4xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehIeqD3s; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789513138; c=relaxed/simple;
+	bh=iTvunSER0866eqdVvzkCMCxxLMSbkut236Ol3kG/M20=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Eb/r44/ZRKj8wXdUQK3pI8QlQvBnxI3bxf8gfXIJzX0iSSII6yBbiktKiB6XmN1GIWPcWLqLX8HZW+aUJjuUdR7SRIWc9zQ4AbRlafuhn5QNCZx5Rq7vkXTUhLyCZv2SlJg9rc3gqg+V+/wcU43CUmE808zJBU/EgqJ+By/0+Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bwvjr2AO; arc=none smtp.client-ip=74.125.230.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehIeqD3s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A9F1F000FF;
-	Tue, 15 Sep 2026 22:54:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789512892;
-	bh=wZ7jyYz4cf7dJrpAQtSCKqzLWmYVq9M5SWkOAft6ND4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ehIeqD3sbGDXh2otiyRGE+WwqM1IDxvQ8Y2RCIvF2/0EngBtMxmJIR2Eyjbq3zsdY
-	 sRwIe6oYQCp7yL+cjO6wa1ni63ZVdRZUNNvX6Iufcx6fYgDv55F/wAINne6CHAjVTa
-	 UustT8JBYR+nNXNmONXdNC8PU9clMdwB94AMLNKOYYBbaPB1p4I8kuHG3kv/8RB9KF
-	 Rwqo+xyOfXLrZzVPYpBO89TO5ifN79zWtlyvn+/R1LvonyYNuOyRPJHN1r8aAJbduz
-	 nZsIb3PGiJj6kyt+yO+nFFko4mg0NDDm7NVmlBbfqz5xp9bUooO+Zji1kpTZrlLCWE
-	 RmGIkbWwrJr1w==
-Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
-	id 4393B1011727; Tue, 15 Sep 2026 23:54:49 +0100 (BST)
-Date: Tue, 15 Sep 2026 23:54:49 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [GIT PULL] bluetooth 2026-09-07
-Message-ID: <aqnMueXiCztLUn-w@sirena.org.uk>
-References: <20260907172648.457103-1-luiz.dentz@gmail.com>
- <20260908135708.552fcead@kernel.org>
- <a0e8bc1e-c237-41fb-b448-9594bd484cfe@sirena.org.uk>
- <CABBYNZKrSve8b=Acj2qu0YBuEZ9u9xHJe-ffRb+78x5KPY8Ntw@mail.gmail.com>
- <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk>
- <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
- <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
- <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bwvjr2AO"
+Received: by mail-qv2-f38.google.com with SMTP id 6a1803df08f44-9107051ba26so2224206d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 15:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789513136; x=1790117936; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=F+T8GnyEEfotqrjywCvOm+U1HqnhENhKBoREN4SqYhY=;
+        b=Bwvjr2AO86O2fydNCIFuMT9VKg7GyDBQK5KKpfWV/CGviD0FNopyUEo1iVPfPb3o5s
+         +OhA/cVfZfOjJdbjXAjwjCDZRKZ0jf8kGCYvsBr8PdSpgwx1zCCwOZ39SGXHA4q8zb7C
+         P2yqWJHNrdAUqJkN7XCj2aoIR4oqkwL2N34zAhxq4bh6YNxaJmziHx9HkrDLySJT26x0
+         N9Sjt2FHxpoICmp2dDjkjByl8K4OxOclspcCqMb0o2KzLuJPGjbvSDFqvmudQm4jytKQ
+         OJakg13iKQKG/+Uf9gXquuq/hhaeoL7x6Hjd8a6ZhksCnIvDuqrgxXR6s+WnzFAfuDmh
+         D79w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789513136; x=1790117936;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=F+T8GnyEEfotqrjywCvOm+U1HqnhENhKBoREN4SqYhY=;
+        b=Ra9B4RU2HQw7Ay5i/cStIlK94NDWGx25giNAOjPPsMvJjx6KmtMjqvBEmUVgtSxydi
+         OoRu1i54jO0X41GiFYJzBTgo7oNAPhm+HIO12rFNsmUFqJ/faImqFV41m+K/iMg/aHp+
+         hKLGJjZI0f1D59YVFvQfEu6ZsD+q0ekKeb/+7M44eJYqK3c5I6iUfq8UJ4qmm7vBD2uV
+         Fd5po1TVsb81bkulVbRQXNO03S51LyP3ZDWhmiiDih9NwHpL6cagtQ/+Y2OyON1e3JvJ
+         GoWwxKYfMuiYcTIvJ8Y7R2tqUGDpWxGx9snScPaTDs311/tdgvY5Q097KT2i1zIksqij
+         N90Q==
+X-Gm-Message-State: AFuF++ltUDCZbNGelM3470RNevtId95V0uZdXx3bQ+Ho2j2bwTMeww3w
+	VdgeKeylriL0OP/dhvorjRwuQZL4HCk0bfFt2Fujon697FMGBpBa6NpjCnQ/tg==
+X-Gm-Gg: AYBFou2/2BF8nJOMugw1n6Vu4cInfggXRNPL/eebOXfk75CLtr2kYBRLo7LVe6h4q8Y
+	1I70DlSxCQtABcYNkBl7TfpyDg656sM/hkRGjG13tkVv7z6E2UFA6s8taYhIAzKU/ym5O0+pcef
+	fINDCAGKWDXRkw43JpHA5arUoVA/6m2CwcCdDZwInRAka4GLM5K8yOnQh1K3aEjd2bS1F2dgRs6
+	wyHMT7ZRneQEJ2mHCy4iQCMhtK4gXqjpZ68ARVQPt9do9DYLGc7F2kss0PLDcH7L3kKRLRMWppY
+	jdYnTkS4ML1MsJDazRWh6FjavpCiyn4fkiGUxaKyR2BRgFrpE0/goFIcwy8r6RccdYPVJBrqqHM
+	LmsUcdS/uqVJLQoOs209A1sjmSkyKCKRjwmGO0N+jVjK7SfTTHcuKTk4cSZGBL88JchIrJFSCGp
+	zm3enMB7tXcK2Hg9kdMU+T7YPWqSJeyNcjvDkeIX5sHaS84Faxc2TTzS31EBMjC6FxyjrL2oITz
+	NdJL+4=
+X-Received: by 2002:a05:622a:5143:b0:530:5ece:fcfe with SMTP id d75a77b69052e-5327ed7f4b5mr8189011cf.3.1789513135702;
+        Tue, 15 Sep 2026 15:58:55 -0700 (PDT)
+Received: from [172.17.0.2] ([172.172.87.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9123be7dc59sm10029576d6.24.2026.09.15.15.58.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 15:58:55 -0700 (PDT)
+Message-ID: <6aa9cdaf.a4ae4f1a.d047.b0c6@mx.google.com>
+Date: Tue, 15 Sep 2026 15:58:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2719726556731889645=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WdyblAnYvhvORoTh"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
-X-Cookie: Orders subject to approval.
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] test-runner: Enable interrupt remapping for PCIe passthrough
+In-Reply-To: <20260915213723.1242672-1-luiz.dentz@gmail.com>
+References: <20260915213723.1242672-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2719726556731889645==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1165938/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      23.08 seconds
+BluezMake                     PASS      376.76 seconds
+MakeCheck                     PASS      14.60 seconds
+MakeDistcheck                 PASS      141.22 seconds
+CheckValgrind                 PASS      228.17 seconds
+CheckSmatch                   PASS      287.52 seconds
+bluezmakeextell               PASS      90.17 seconds
+TestFunctional                PASS      1006.00 seconds
+IncrementalBuild              PASS      350.20 seconds
+ScanBuild                     PASS      1011.61 seconds
 
 
---WdyblAnYvhvORoTh
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 15, 2026 at 03:36:50PM -0400, Luiz Augusto von Dentz wrote:
-> On Tue, Sep 15, 2026 at 3:24=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
-rote:
-> > On Tue, Sep 15, 2026 at 03:16:21PM -0400, Luiz Augusto von Dentz wrote:
+https://github.com/bluez/bluez/pull/2531
 
-> > Yes, the routine cherry picking is certainly part of it - it's not so
-> > much the fact that things get moved between branches as the fact that
-> > when you have the same commit is in multiple branches and then build on
-> > top of one or both of them this creates extra conflicts, often harder to
-> > understand, when the branches are merged.  The more normal thing would
-> > be to apply once to the right place, or the standard fallback from that
-> > would be to drop the commit from branch A at the time it is moved to
-> > branch B.
+---
+Regards,
+Linux Bluetooth
 
-> If I merge to bluetooth, then bluetooth-next won't contain the fixes
-> meant for stable/rc, so I will need to merge them back to
-> bluetooth-next immediately it order for our CI to stay current with
-> the fixes.
 
-Or have your CI merge the branches and run on that (that's a fairly
-widely deployed approach).
-
-> > You do seem to end up removing the cherry picked commits from their
-> > original branches at some point as part of your workflow (since there
-> > are hardly any duplicate bluetooth commits in mainline) so they do wind
-> > up being moves AFAICT but the duplicates get left sitting there for
-> > quite a while.
-
-> Yep, once before sending the pull request for net-next, bluetooth-next
-> is rebased on top of net-next which brings all the fixes already
-> merged back to bluetooth-next. Git is absolutely fine with that, I
-> don't think I ever run into a conflict doing this. Git detects the
-> fixes already present in net-next as duplicates and eliminates them,
-> so it really surprises me when you say you are finding conflicts, not
-> just duplicates.
-
-The issue is not your rebase working, the issue is that until you get
-round to doing that rebase anyone that merges both bluetooth and the net
-trees (ot Linus' tree for that matter, often the conflicts are with his
-tree) sees the duplicated commits and that routinely generates
-conflicts.  This obviously comes up an awful lot with -next, I am not
-rebasing the trees but rather merging them, but do I gather from some
-conversations that other people are seeing this as part of their
-workflows.
-
-Anyway, to return to my prior question: should you be a contact for the
-bluetooth tree?
-
---WdyblAnYvhvORoTh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqpzLMACgkQJNaLcl1U
-h9DbOgf/VLj5E3S8H/Irnn6oxArruRBuijp2VDhtUMpTH3RXwRjzxgPk0f+zt6zh
-oxevTuZw4S/Au3wE8u7VEStmhl+cz52ZSCZ1NIJlVGYwazsoolJE5dQCY5d9p8d0
-8m9cOTA+2PpjLTMQ2ewRV6fvwBovoaMVwiNN9WVknRsyKSJkMdl072fFYVSJLyJJ
-1aYckqXCx48r+x+nrwir+aeNyJeCvO4ADOze63YcbFkLWJQj9muQmNzAi37MmUF5
-zOSK19r87j1Gw4fJlcFzm3bJ8ZzrmuA+KEwpIvV3qCyueuoSERKEWQFatyBRtsiF
-VuUuGQjstInHtMYo0QIMPPYHeRlsCA==
-=Bty8
------END PGP SIGNATURE-----
-
---WdyblAnYvhvORoTh--
+--===============2719726556731889645==--
