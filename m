@@ -1,200 +1,171 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2B13EB0F0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE10C357D07
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789463630; cv=none; b=SfHSMMW7927HVCMwmBsC/pXZIeWgJIhM4SgV6Pv3Y6zYRYBDo2UTHx+2sMzHg8xlZWIcjWc0QXBgX+oTr2YbZuz2jwn/DNkMePMuO87hFMX07rogmYIpzqqxHvp/dC2E4QtHFsbXxb9/uTbFDDuEohSJrB+c7M9hTurTRuhieOU=
+	t=1789465582; cv=none; b=pciRx/wc9cSHiz3QZftY8atn2T+LQjTRzzV1YIa00W6Q6sT7RKVheRiIak8NROaShtvlErJU9cR9wgA9hOvMcvp9ukPDIgjITG699lvEmcGucAxhb/ma/8PiiN+0PoDhGjIvbn+JCFd/QLbnppLOVDbSkO3quiisMhy8l18uPl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789463630; c=relaxed/simple;
-	bh=Qj9TPK3mLqzLv4V48K3tEe+VRiKIEI6rimcodIOp2NU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BgA/5J64TAw9AJx7fZ505GnsJUGurGxQiuz87lJa7gLdaaB4XzjQkiGYXC5k8KVZ1KzNmZKG7GH/o3QKYvpwK9aa9aLYSF9LqM4w6Ntk/rUlYnqc6hcI1altP+s0h5sZ+dGmLm+tS6S2so6+Q0F2LTqYdOlMwM/U27ExMQq5dGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=DBqSB5Nm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SnVfS2U0; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1789465582; c=relaxed/simple;
+	bh=a2AoiY1PAOg4j7SNUX8UPo4K1WnAkOtVyQI5V3rYvrk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CV5vIWPo3EIoBuUTybLUseAEy70ZKMOqAliJfl/7ghBEOOdCIf23McVhEztRYhIoptJ19XZfigB/2YoZ57fQz5tiZOxSw0Ifqc2RS6FkgeBvu2jdmgkkifnTSL8AYtOqUkcf3xMBYtsEYJNolu0logX3FlO54tfnz+Vt2YwPLC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=PBVRueHZ; arc=none smtp.client-ip=188.68.63.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="DBqSB5Nm";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SnVfS2U0"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68F8uqDR3111388
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:13:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	cPK6TxwwqV0GZRDfZrEX+CmKiAJus2OaYwz7BZNVt/E=; b=DBqSB5NmQk9QeUrL
-	tRbc0WYXZwVPSkXunpx/J2Wy7qdLYDxQrs5jo7dmCSztE6Q7jnx5/ebhqEQjmAmX
-	DKxfLQ3laMNE8MzRRg1bCEm2mTe7P5bRHElOeKvYIp8iodVLjzpBsbjpaChzFKg4
-	QND93/bdIWXFawXyDa68os7MEVqhHMvYU3uX+xSGn7i0RQnMLz7LRgqRM7SPDQjL
-	tgBu6Ue18JKKMEuX4Lijn+V6uRLHGBpH14z5u1XFmUV0TyAXf1RZzrtKB+kyftUO
-	bmQSFq29CXGyclomz/GO/05lZMIdurqk4GenDxKKl+VXw2AltbNV0FHQ/4WO2T+B
-	izT7xQ==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gq2y2g2qa-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:13:46 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-39af306c795so1033644a91.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 02:13:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1789463625; x=1790068425; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cPK6TxwwqV0GZRDfZrEX+CmKiAJus2OaYwz7BZNVt/E=;
-        b=SnVfS2U0H6bIhz4WSwm3+8qxGH+/fi8l3qOXr/gMo0orh9CssNcTKQ1VNwBY0RXZvn
-         szSj/iDz2GwkNQ633vSdaCP3q1B0Rg0Jtw8L/X41KD+nAHYRIsMImnWT7k73EfI8GO2g
-         XttnJlBZ0PfNqlJIAPZI9R/E74AvXLElvJBH1L1C3sZJ7wNpGrhUsilGxPfByTdJERfv
-         Vw1FYtRq9ZyPzktXAzrezBjlK5J1XArhtzIsyS8kbNvjfllZfbAO6dYSgGzlKjauYGoU
-         WbwAqyXvUSvTz2VfcoIWwJuhJDRwOPfdjJjR3R+O2E+a3opY2hHKMwWRwdVuvmsGJPur
-         hckg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789463625; x=1790068425;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cPK6TxwwqV0GZRDfZrEX+CmKiAJus2OaYwz7BZNVt/E=;
-        b=MvblvsvQJuxcWSPih/YwR6d+sNTy4Vst36+3Ysh4r7hzS7ZkawCn4LS9NduvXyVZyp
-         yxGk+Y3AJXL5YFNcWNo/J6Y5upjEBmKfAkc9BSw2UkH0rdB0WjewrPfxdhMr8Z2oswCY
-         FFBIMsqe0bZYbBOqUlMFRwurMhW9+6hEVquYfrYG+oTp+rMJN9fm6paDYbASN2Io9zgS
-         L2wk7YFoYhOLXG3yQRcGCRAt/zfbtqjTCYjsSAp+vsu+ClS1braQ7dKly+ikD3PD9Y13
-         PPTMPDykuoU3d6wX1ismceVvutKPasa/gpjP+9B+QHUrLJ6nITxotgN3nS2pbPyiDPoF
-         VMmg==
-X-Gm-Message-State: AFuF++lt/iFj+bZ4lrqqWebATKEJ/Yo2YwUv0T1khpgF+ckQf60yJGHX
-	qUndJR/p9DbJGKyzRLMyNErrMA2XIpuE9EDUPeVCEV4r7YIKCIsWfyCF+92GYYQsZCgJpG3HxS1
-	Z8huiRw+yH2oAClRfea2B4ENNcxF0BfsFoP+8jB4ebfW6mKMnN6+iBONF8b8SqWK8fURMKfI=
-X-Gm-Gg: AYBFou39CEpAKv/BcA3RZqfODcoPySEZsnKClITuN5SgQpkH6pZazwvGIF2jQd7VFFs
-	y2BvA7PPXV3XR54FPS9Y7w3uvwQuk+yzuLYkMGcQ57IwXwdr0V+tvtB/VyeCuVLsGVkRAa2UnpN
-	/5MD471PAhzyGaSBS550Rf1kt3oJNFYzHC5Rn0bW4DNrCQn7BHDlCmHq3MLKR+KvRKayLPihs8F
-	omDutKasj3OGhqxKzgWIKMGCXr/r88q0e5E0zSiMIcnpKqUZNQXEQRGH9bhyrtrhMKXiHaEV0aA
-	8gwOD7apSyW/z4vToebHXfFmK510Buh59/L34H9XukqOpsMcc6bnfz3NZtLaVmckQhsINTkFXS1
-	g1cR3Djtc21L8xvYJFtS0UolRClQQpvqiLGKijkYtG/9/beY=
-X-Received: by 2002:a17:90b:2709:b0:39d:fcef:e241 with SMTP id 98e67ed59e1d1-39dfcefe940mr4913882a91.2.1789463625067;
-        Tue, 15 Sep 2026 02:13:45 -0700 (PDT)
-X-Received: by 2002:a17:90b:2709:b0:39d:fcef:e241 with SMTP id 98e67ed59e1d1-39dfcefe940mr4913854a91.2.1789463624639;
-        Tue, 15 Sep 2026 02:13:44 -0700 (PDT)
-Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14390c0be29sm3493044c88.9.2026.09.15.02.13.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 02:13:44 -0700 (PDT)
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Tue, 15 Sep 2026 02:13:20 -0700
-Subject: [PATCH BlueZ 1/2] monitor: Fix btmon heap-buffer-overflow
- triggered by HCI devcoredump
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="PBVRueHZ"
+Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4hkcZP2KSrz6G5n;
+	Tue, 15 Sep 2026 11:45:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1789465517;
+	bh=a2AoiY1PAOg4j7SNUX8UPo4K1WnAkOtVyQI5V3rYvrk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PBVRueHZBNAWf5ime1+ZsSNRgcGDcY9ZilqTK0/HV8oVyh1Oj0ZWeRfg4qfW90qPf
+	 9NOFKIMpgAFsAg4dP8LvbD9rUP5hrlLS6rZ56dF++mUyDEJRMUD0djwVy7qUlpiQYx
+	 L7dUAWgu+6eV2Cod+i4zwpMV0VqoBUXXvd8QV/tuFIS07hNfWhXey4O11mw2VOr91l
+	 zmJbZLqreNACqmGuL58wOAc9EyCRtRPafCBqKRgLS+sNOtqHM/gzJPllc66a6ZIPaW
+	 8O+Z/kRBpZP56YyKtHdlfspOlSu5eEwJDVjHpkPIW3b9qUzO0v7/8xyNsJrLBNn+cc
+	 s2DR5DwF+kfGQ==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4hkcXs4FnJz501j;
+	Tue, 15 Sep 2026 11:43:57 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.901
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4hkcXr5QPpz8tch;
+	Tue, 15 Sep 2026 11:43:56 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id F2DD75F93E;
+	Tue, 15 Sep 2026 11:43:47 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <67749e24-a652-4b6b-b4f4-a891e65e72da@leemhuis.info>
+Date: Tue, 15 Sep 2026 11:43:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260915-fix_heap_overflow-v1-1-8fc39dbcb303@oss.qualcomm.com>
-References: <20260915-fix_heap_overflow-v1-0-8fc39dbcb303@oss.qualcomm.com>
-In-Reply-To: <20260915-fix_heap_overflow-v1-0-8fc39dbcb303@oss.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Zijun Hu <zijun_hu@icloud.com>
-X-Mailer: b4 0.15.2
-X-Proofpoint-ORIG-GUID: VL98XGebGbM6Bvfxa1YLqN7YH6lCeQf2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE1MDEzMSBTYWx0ZWRfXyuxWFVB6El9j
- O5+kC5EUNiFa6esV5SFJLlDaBdx25FbpwvP14/cDjSfxhh8oov8M+3NQbnC/z4X+Sg6stpcopMQ
- AwR/CxEZYDkr2sdm/sgNMEuMFJgcKyWUIY4jVA3SnpIvbffiKk7+o06Rd7z2rJ59q2lvvNtUi/A
- 47KLu/HymKbE31pXrIBQkEyfQ6ZECUMQyAFIXKm0siWsPCJPc9v1MOs6OVbZjPMQJH/yxbJO1rD
- dEHWPC10wv5Nvcf9CFqDyi9XkLsK59ePfTMqliBvPvRS5m8xgGBBBgjPvjTb4zogXkw9abEFwkS
- baKRWMk8b/hNB16ClKrkO9utGk58y2Nxq+cn2pYZekV0RA0UV08S6FTm+Gl7MUN7AYoaSstuWDO
- PvpWbq2s9Hj+hRcUyDHpQiZWvhR9uRirFRlz30dcM6CMekn3vphlnopeQUAjAtdy2xLGDd+8E/6
- 1PsYfEpPORTgIH170ow==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE1MDEzMSBTYWx0ZWRfX1C+ExSjnj4N4
- hgfvatqj5slRZanYQcXXd7xieQlOrXwxiKJE/0UY4I8bU9dGB3Q6JrMKo2mIidq4dJvoOueXtYp
- Ir7/pruHI5rRo74BMQ/Vwek4heA0gBY=
-X-Proofpoint-GUID: VL98XGebGbM6Bvfxa1YLqN7YH6lCeQf2
-X-Authority-Analysis: v=2.4 cv=IcISymqa c=1 sm=1 tr=0 ts=6aa90c4a cx=c_pps
- a=0uOsjrqzRL749jD1oC5vDA==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=cGIbaRgtdj3G7wcnDWwA:9 a=QEXdDO2ut3YA:10 a=mQ_c8vxmzFEMiUWkPHU9:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-15_02,2026-09-14_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 clxscore=1015 malwarescore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609150131
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] 7.2: restore from hibernation hangs while btusb
+ boots Intel AX210 (8087:0032); 7.1 and 6.18 fine
+To: David Lomas <david.s.lomas@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, johan.hedberg@gmail.com,
+ regressions@lists.linux.dev
+References: 
+ <CALjEBWRoqHa=833_dpDxaWpj-tAiAhLuLZBfRQkOkSGgGF5gQA@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: 
+ <CALjEBWRoqHa=833_dpDxaWpj-tAiAhLuLZBfRQkOkSGgGF5gQA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <178946542834.1252613.7405697413254351868@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: F2DD75F93E
+X-NC-CID: ngNhoSTvAE9w+Eb3MFz2M2vQSXnrEBGDYdEZcgnK7K4d4hV1jK0=
 
-Kernel HCI devcoredump can accumulate a large amount of dump data from MANY
-packets, then send it as a SINGLE DIAG packet to the monitor channel, so
-cause payload length @len in the header exceed BTSNOOP_MAX_PACKET_SIZE, but
-btmon uses @len to access the payload in @buf without validating that
-@len fits within @buf, causing a heap-buffer-overflow.
+Hi! Thx for the report.
 
-Kernel:
-include/net/bluetooth/hci_mon.h
-struct hci_mon_hdr {
-	__le16  opcode;
-	__le16  index;
-	__le16  len;
-} __packed;
+On 9/10/26 21:37, David Lomas wrote:
+> 
+> My first message here, hope this meets expectations—I had a bit of
+> help from you know who...
 
-BlueZ:
-src/shared/btsnoop.h
-#define BTSNOOP_MAX_PACKET_SIZE            (1486 + 4)
-monitor/control.c
-struct control_data {
-	uint16_t channel;
-	int fd;
-	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-	uint16_t offset;
-};
+Well, no developer answered yet, which often means: they have no idea
+what might cause this. You might want to wait another day or two for a
+helpful reply, but if none is forthcoming, you most likely will have to
+run a git bisection to identify which change causes this:
+https://docs.kernel.org/admin-guide/verify-bugs-and-bisect-regressions.html
+https://docs.kernel.org/admin-guide/bug-bisect.html
 
-The heap-buffer-overflow Issue:
-ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51b00000065c at pc 0x7f50b987a029 bp 0x7ffde88dc8d0 sp 0x7ffde88dc088
-READ of size 17916 at 0x51b00000065c thread T0
-    #0 0x7f50b987a028 in write ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:1096
-    #1 0x5b4f3443ae3a in btsnoop_write ../src/shared/btsnoop.c:289
-    #2 0x5b4f3429cbf0 in data_callback ../monitor/control.c:969
-    #3 0x5b4f3444fa9d in mainloop_run ../src/shared/mainloop.c:104
-    #4 0x5b4f34451da6 in mainloop_run_with_signal ../src/shared/mainloop-notify.c:196
-    #5 0x5b4f342953fc in main ../monitor/main.c:303
-    #6 0x7f50b8c2a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
-    #7 0x7f50b8c2a28a in __libc_start_main_impl ../csu/libc-start.c:360
-    #8 0x5b4f34295ed4 in _start (/usr/bin/btmon+0x29fed4) (BuildId: b41caafb24db693946c283eaea48112186863d2d)
+Ciao, Thorsten
 
-Fix by clamping @len to the amount of data received before accessing
-@buf.
----
- monitor/control.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/monitor/control.c b/monitor/control.c
-index 83347d5dbc3e..1eab9c4fe0bd 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -961,16 +961,19 @@ static void data_callback(int fd, uint32_t events, void *user_data)
- 		pktlen = le16_to_cpu(hdr.len);
- 
- 		switch (data->channel) {
- 		case HCI_CHANNEL_CONTROL:
- 			packet_control(tv, cred, index, opcode,
- 							data->buf, pktlen);
- 			break;
- 		case HCI_CHANNEL_MONITOR:
-+			if (pktlen > (len - MGMT_HDR_SIZE))
-+				pktlen = (len - MGMT_HDR_SIZE);
-+
- 			btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0,
- 							data->buf, pktlen);
- 			ellisys_inject_hci(tv, index, opcode,
- 							data->buf, pktlen);
- 			packet_monitor(tv, cred, index, opcode,
- 							data->buf, pktlen);
- 			break;
- 		}
-
--- 
-2.34.1
+> Since 7.2 my laptop hangs hard while resuming from hibernation, and
+> the hang goes away if btusb is not bound to the Bluetooth controller.
+> 
+> #regzbot introduced: v7.1..v7.2
+> #regzbot title: restore from hibernation hangs while btusb boots Intel
+> AX210 (8087:0032)
+> 
+> Hardware
+>   Dell XPS 13 9360 (BIOS 2.21.0, 2022-06-02), Kaby Lake, xHCI
+> 8086:9d2f (Sunrise Point-LP).
+>   Wi-Fi/BT card is an Intel AX210
+>   Bluetooth controller is USB 8087:0032 on bus 1 port 3, driven by
+> btusb + btintel, firmware intel/ibt-0041-0041.sfi ("Firmware Version:
+> 202-5.26", linux-firmware 20260810).
+> 
+> System
+>   systemd 261.2
+>   No BlueZ is installed: the controller is only ever set up by the
+> kernel's own HCI_AUTO_OFF path.
+>   Root on LUKS + btrfs, swapfile with resume_offset,
+> HibernateMode=platform, mkinitcpio busybox initramfs with the resume
+> hook (systemd-hibernate-resume is present in the initramfs).
+> 
+> Kernels (Arch Linux packages, unpatched apart from Arch's config)
+>   bad:  7.2.2.arch1-1, 7.2.4.arch1-2
+>   good: 7.1.4 to 7.1.10 (weeks of daily use), linux-lts 6.18.49 (12/12
+> cycles under the reproduction below)
+> 
+> Reproduction
+>   systemctl suspend-then-hibernate with HibernateDelaySec=2min, lid
+> open. After the timer wakes the machine from S3 it hibernates; power
+> on, unlock LUKS, the boot kernel loads the image and hands over. On
+> 7.2.x the restored kernel then stops within a couple of seconds,
+> within the first three hibernate/restore cycles of a cold boot (it
+> happened on the first cycle twice, the second four times, the third
+> once, out of seven tests). Screen is black, backlight off, no
+> response. Nothing is written to the journal. With efi_pstore +
+> hung_task_panic=1 + softlockup_panic=1 + hardlockup_panic=1 armed and
+> a three-minute wait, no detector fires and nothing ends up in pstore.
+> 
+>   With no_console_suspend, a good cycle shows these lines on the console:
+> 
+>     [ 2043.009649] atkbd serio0: Failed to deactivate keyboard on isa0060/serio0
+>     [ 2044.588080] Bluetooth: hci0: No support for _PRR ACPI method
+>     [ 2050.400042] Bluetooth: hci0: HCI reset during shutdown failed
+> 
+>   and eventually the desktop appears. On a bad cycle, I see these 2 lines:
+> 
+>     [ 2750.173700] atkbd serio0: Failed to deactivate keyboard on isa0060/serio0
+>     [ 2750.959900] Bluetooth: hci0: No support for _PRR ACPI method
+> 
+>   and then a solid lockup.
+> 
+> Other info
+>   - /sys/power/disk = test_resume (write the image, read it back and
+> restore in-kernel, no power-off), each preceded by an S3 cycle: 8/8
+> successful on 7.2.4.
+>   - Fresh boot, `modprobe -r btusb` before the first cycle: 4/4 clean
+> restore. `modprobe btusb` again in the same boot: hang on the 2nd
+> cycle.
+>   - A systemd unit that unbinds the two btusb interfaces before
+> sleep.target and rebinds them after the thaw: 4/4 clean, Bluetooth
+> otherwise usable. This is my workaround for now.
+>   - Thermal-zone state (7.2 moved thermal zone resume earlier) was
+> tested and does not appear to be involved.
+>   - At every S3 wake on this machine btintel re-downloads the firmware
+> (~1.4 s); in suspend-then-hibernate the hibernate starts while that
+> download is still in progress.
+>   - Plain `systemctl hibernate` (no S3 first) has not hung in the few
+> tries I gave it.
+> 
+> Happy to provide full dmesg of a good cycle, try patches, or collect
+> anything else that helps.
+> 
+> Thanks,
+> 
+> David Lomas
 
