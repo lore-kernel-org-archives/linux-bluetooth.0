@@ -1,158 +1,127 @@
-Received: from mail-oo2-f16.google.com (mail-oo2-f16.google.com [74.125.231.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5913B0592
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 22:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7993D457E47;
+	Tue, 15 Sep 2026 22:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789512568; cv=none; b=BFYNKRhWVfyg9VgpfWPbofSIj8ecMoQHUsADkNVkh7oChpi+lVZKcgiIumoMs3Cuh15ZIPOaazCMYxlesDecEmjksNYHaow7ZUu6PWjGfDNxNFpv3urKy9trpE+QrkzCWiSEVp5HwIu4v+U4QMnN5Iu93/dFYPHVFUPA71zN/gE=
+	t=1789512893; cv=none; b=UBFxPCcmNBKV5uWdLS5aEE+Zlz5PJyzhvqoJ3rB77pS42BL+ROroizIhGdhG5qmzU3ScgVLBSSt7sKdEUeyfqyNPj11RDKYeNMoh7y+StVnUeSrxgZF3vQ0sKRQJYBux7tunulqUroAi+WWCek2nSW2FvnydDMg7EuBRaBjZPOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789512568; c=relaxed/simple;
-	bh=nvTy8tlHQj2+ErlRcH+rOxQlAyYM2Ts5cgM6XVAQF20=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IbLJFyyz3AU/3UqZKg/QO4b+vFx5Ir3UOZXrscPyAK43TS8fKKkNtSdejhTfJVenVuNRBFBaQOV2QZkx3iZPUdzghgzygrK6s1DVHt1OZV0BjW/YjOwTisiz89tmIlouAIapS/0GuqaiViWTSp37vh4Smh/S/RG7e/XnEdV5CAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OFs8Ht5w; arc=none smtp.client-ip=74.125.231.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789512893; c=relaxed/simple;
+	bh=sTKIyEOuI7a6+JT8x9pGnRFmytyYd7oHP2DvC/z48WU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsE33f8YpMunB/bEzl4+BYZUWkDc8F0rBh10YyNRf+xMbkS8ISl+ML3LD7I+JzWJvwc5upzBuw87A+8Q09qDv3YAiy7lmkN6RRrTpAKj3JztoeKNu58bBsIYflTgHdXi+7b8JkAMtMEqS4+ISH7ewXwfvf0n9LueWu4IB37z4xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehIeqD3s; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFs8Ht5w"
-Received: by mail-oo2-f16.google.com with SMTP id 46e09a7af769-805bf8c2661so186359a34.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 15:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789512565; x=1790117365; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=2AxZZ4JLuYWEEwIQmkuTSjXpn0s6/YbwSOigBz4xQRQ=;
-        b=OFs8Ht5wT4aKuuwTF5LF+CQvNbPstbTDxT/K3lfHKRuU9RiX/SP4LpjpZpcWa6+JGX
-         3l40bAQcRtbZhRAZDhZbhOI1wquxbOrUgqkT4PxDvbG7uGt7+wpy2TOv7ig89Vc+/VFd
-         zNsWHYhpSY8hNxL7USwa+9X1BsditeTm3d8MSgKViPkjcYpcyG3SUT7XJi815W02pOoE
-         djPNWtZXIbpMt2Bzu36A3WhOTmaK5yagWoEFhLt3K0yL5aCf/kQNE7OonOzLF/kyXWxM
-         ifrDU+KaNH+cD431HOLj7lt5kUlxRnFiUaSKYuN3NMLpaXtvYuBDZFgU355B0/7fBEyy
-         9rqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789512565; x=1790117365;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=2AxZZ4JLuYWEEwIQmkuTSjXpn0s6/YbwSOigBz4xQRQ=;
-        b=qIMMe3C0FYgOR3FZCSwmdwr10gbDpHy/lt/eiuOKZfSeICShKvvqoKXfmRYMNEIAY3
-         gxW6g9Te0GIXWalvSCIADpOFTHn+l4eycKkvoHA4MPr+CZwFpigSehXuyHnE6xs2crK/
-         ylOEcz7pgWjlDJLMmQ04Xqot9YTOsoABPaKCA4v1jTD5ZSmDFQtXXBihFg1phkxIbwgF
-         bt6TKTggCQXmrSiie8M6j78uvvHZssndLmcJY/Cm34vn9Hy5tQOAkiCtJHymhnroNfMO
-         WTWrfW7qNuIrCw0Hnf4fDgMlNh8PIdwUghN5AdtSq3eoxXhXfV2SnOR42eSiSud7KhqS
-         WBag==
-X-Gm-Message-State: AFuF++maa0/8P9480jRWK4HETw9/URSeSdO4besAMCxt+sPz0vEAxXmh
-	fCezqVLJdbcNsoIBrP9rgbb7lWbScOAEGTva49cJjqtJFsmVSFuLgdqCD+Ns3Q==
-X-Gm-Gg: AYBFou2Z+tkfTu6rvVItbZNeg1dvhE2+3YTRC0sDU11CtTwfcihuae0PfXA+EvvmMJM
-	sdBJikTHvV6WipyoMPxwTlApkhgNgFC2OJJuhhgFPt/bD2PRqbNld53Cve9xtVZcbJfaz0+hD1w
-	/LtJDMUOMnHwml9y53gUr34SeGXlmwkuMTPnnxavkiMJ7rXeTNKz7PsKRUogwn22Kem+kN/ncGU
-	Cjz6gqNDrKUCQaMnaLReGl6nXBrzDkvavIacl8FFASFCPicGFKbhbuOVwoOpRUG2kAlPmt/XaiF
-	ZKoXRL93iRlUn6OWruodvTuInmZVjBmoeDvDn4p9/HKHaIjHkb9dJ8nBuMZg6DNKEbNnjsd9C17
-	zaEuxE5tmINHQVhQNcmIpxxhJOTx5MMSG0Trd7K2QRswEPBJwU5oyMY34ZA3GH0iZ5STIR9pAAi
-	XkG6e2dLtJxYEA/dxIhHeuaSHRJy5rq5IYoHPJ/MStgb9zrC8jsGTji+iwQbIHS4c5mpJfmGuSi
-	G+rgBc0GFxoEhAmbg==
-X-Received: by 2002:a4a:e917:0:b0:6b7:46fa:169d with SMTP id 006d021491bc7-6c7d45e2badmr520702eaf.50.1789512565373;
-        Tue, 15 Sep 2026 15:49:25 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.219.202])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6c7a677b3bdsm1152192eaf.6.2026.09.15.15.49.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 15:49:24 -0700 (PDT)
-Message-ID: <6aa9cb74.42bc1fc1.52aa0.7b6c@mx.google.com>
-Date: Tue, 15 Sep 2026 15:49:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6812006555005220452=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehIeqD3s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A9F1F000FF;
+	Tue, 15 Sep 2026 22:54:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789512892;
+	bh=wZ7jyYz4cf7dJrpAQtSCKqzLWmYVq9M5SWkOAft6ND4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ehIeqD3sbGDXh2otiyRGE+WwqM1IDxvQ8Y2RCIvF2/0EngBtMxmJIR2Eyjbq3zsdY
+	 sRwIe6oYQCp7yL+cjO6wa1ni63ZVdRZUNNvX6Iufcx6fYgDv55F/wAINne6CHAjVTa
+	 UustT8JBYR+nNXNmONXdNC8PU9clMdwB94AMLNKOYYBbaPB1p4I8kuHG3kv/8RB9KF
+	 Rwqo+xyOfXLrZzVPYpBO89TO5ifN79zWtlyvn+/R1LvonyYNuOyRPJHN1r8aAJbduz
+	 nZsIb3PGiJj6kyt+yO+nFFko4mg0NDDm7NVmlBbfqz5xp9bUooO+Zji1kpTZrlLCWE
+	 RmGIkbWwrJr1w==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id 4393B1011727; Tue, 15 Sep 2026 23:54:49 +0100 (BST)
+Date: Tue, 15 Sep 2026 23:54:49 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bluetooth 2026-09-07
+Message-ID: <aqnMueXiCztLUn-w@sirena.org.uk>
+References: <20260907172648.457103-1-luiz.dentz@gmail.com>
+ <20260908135708.552fcead@kernel.org>
+ <a0e8bc1e-c237-41fb-b448-9594bd484cfe@sirena.org.uk>
+ <CABBYNZKrSve8b=Acj2qu0YBuEZ9u9xHJe-ffRb+78x5KPY8Ntw@mail.gmail.com>
+ <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk>
+ <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
+ <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
+ <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] doc/test-functional: Document PCIe controller passthrough
-In-Reply-To: <20260915214410.1250646-1-luiz.dentz@gmail.com>
-References: <20260915214410.1250646-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6812006555005220452==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1165941/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.32 seconds
-GitLint                       PASS      0.25 seconds
-BuildEll                      PASS      15.84 seconds
-BluezMake                     PASS      276.90 seconds
-MakeCheck                     PASS      13.46 seconds
-MakeDistcheck                 PASS      118.63 seconds
-CheckValgrind                 PASS      197.52 seconds
-CheckSmatch                   PASS      209.66 seconds
-bluezmakeextell               PASS      78.72 seconds
-TestFunctional                FAIL      940.94 seconds
-IncrementalBuild              PASS      283.90 seconds
-ScanBuild                     PASS      812.82 seconds
-
-Details
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bap::test_bass_past_transport_acquire[hosts6-vm2]: pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7fdddfacea50>
-    searcher: searcher_re:
-        0: re.compile(b'Acquire successful: fd \\d+ MTU \\d+:\\d+')
-        1: re.compile(b'Transport /org/bluez/hci0/dev_00_AA_01_00_00_42/bis1/fd0 State: active')
-    <pexpect.popen_spawn.PopenSpawn object at 0x7fdddfacea50>
-    searcher: searcher_re:
-        0: re.compile(b'Acquire successful: fd \\d+ MTU \\d+:\\d+')
-        1: re.compile(b'Transport /org/bluez/hci0/dev_00_AA_01_00_00_42/bis1/fd0 State: active')
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
-            return getattr(self.plugins[name], method)(*a, **kw)
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 441, in expect
-            ret = ctl.expect(*a, **kw)
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
-            return self.expect_list(compiled_pattern_list,
-                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-                    timeout, searchwindowsize, async_)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
-            return exp.expect_loop(timeout)
-                   ~~~~~~~~~~~~~~~^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
-            return self.timeout(e)
-                   ~~~~~~~~~~~~^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
-            raise exc
-        pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7fdddfacea50>
-        searcher: searcher_re:
-            0: re.compile(b'Acquire successful: fd \\d+ MTU \\d+:\\d+')
-            1: re.compile(b'Transport /org/bluez/hci0/dev_00_AA_01_00_00_42/bis1/fd0 State: active')
-        <pexpect.popen_spawn.PopenSpawn object at 0x7fdddfacea50>
-        searcher: searcher_re:
-            0: re.compile(b'Acquire successful: fd \\d+ MTU \\d+:\\d+')
-            1: re.compile(b'Transport /org/bluez/hci0/dev_00_AA_01_00_00_42/bis1/fd0 State: active')
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="WdyblAnYvhvORoTh"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
+X-Cookie: Orders subject to approval.
 
 
-https://github.com/bluez/bluez/pull/2532
+--WdyblAnYvhvORoTh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
-Regards,
-Linux Bluetooth
+On Tue, Sep 15, 2026 at 03:36:50PM -0400, Luiz Augusto von Dentz wrote:
+> On Tue, Sep 15, 2026 at 3:24=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
+rote:
+> > On Tue, Sep 15, 2026 at 03:16:21PM -0400, Luiz Augusto von Dentz wrote:
 
+> > Yes, the routine cherry picking is certainly part of it - it's not so
+> > much the fact that things get moved between branches as the fact that
+> > when you have the same commit is in multiple branches and then build on
+> > top of one or both of them this creates extra conflicts, often harder to
+> > understand, when the branches are merged.  The more normal thing would
+> > be to apply once to the right place, or the standard fallback from that
+> > would be to drop the commit from branch A at the time it is moved to
+> > branch B.
 
---===============6812006555005220452==--
+> If I merge to bluetooth, then bluetooth-next won't contain the fixes
+> meant for stable/rc, so I will need to merge them back to
+> bluetooth-next immediately it order for our CI to stay current with
+> the fixes.
+
+Or have your CI merge the branches and run on that (that's a fairly
+widely deployed approach).
+
+> > You do seem to end up removing the cherry picked commits from their
+> > original branches at some point as part of your workflow (since there
+> > are hardly any duplicate bluetooth commits in mainline) so they do wind
+> > up being moves AFAICT but the duplicates get left sitting there for
+> > quite a while.
+
+> Yep, once before sending the pull request for net-next, bluetooth-next
+> is rebased on top of net-next which brings all the fixes already
+> merged back to bluetooth-next. Git is absolutely fine with that, I
+> don't think I ever run into a conflict doing this. Git detects the
+> fixes already present in net-next as duplicates and eliminates them,
+> so it really surprises me when you say you are finding conflicts, not
+> just duplicates.
+
+The issue is not your rebase working, the issue is that until you get
+round to doing that rebase anyone that merges both bluetooth and the net
+trees (ot Linus' tree for that matter, often the conflicts are with his
+tree) sees the duplicated commits and that routinely generates
+conflicts.  This obviously comes up an awful lot with -next, I am not
+rebasing the trees but rather merging them, but do I gather from some
+conversations that other people are seeing this as part of their
+workflows.
+
+Anyway, to return to my prior question: should you be a contact for the
+bluetooth tree?
+
+--WdyblAnYvhvORoTh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqpzLMACgkQJNaLcl1U
+h9DbOgf/VLj5E3S8H/Irnn6oxArruRBuijp2VDhtUMpTH3RXwRjzxgPk0f+zt6zh
+oxevTuZw4S/Au3wE8u7VEStmhl+cz52ZSCZ1NIJlVGYwazsoolJE5dQCY5d9p8d0
+8m9cOTA+2PpjLTMQ2ewRV6fvwBovoaMVwiNN9WVknRsyKSJkMdl072fFYVSJLyJJ
+1aYckqXCx48r+x+nrwir+aeNyJeCvO4ADOze63YcbFkLWJQj9muQmNzAi37MmUF5
+zOSK19r87j1Gw4fJlcFzm3bJ8ZzrmuA+KEwpIvV3qCyueuoSERKEWQFatyBRtsiF
+VuUuGQjstInHtMYo0QIMPPYHeRlsCA==
+=Bty8
+-----END PGP SIGNATURE-----
+
+--WdyblAnYvhvORoTh--
