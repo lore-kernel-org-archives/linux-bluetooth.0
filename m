@@ -1,195 +1,107 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5A4A5C33;
-	Tue, 15 Sep 2026 14:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C2C4BA1F4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 15:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789483869; cv=none; b=DpgqEIPpKzqZ7cDovdlO2wx4y0taRnZPORaMUbUbietddv+OPEp4egJnOonrpstv0Exr1f6HR15zdyNL9xfBMzpb0LWYZiW7jtjBNIndwofDZqzs6L4rkpRfguiRZy59BHNXj0r+sO4vVMovbxyWArGVOMhv4Fr4m3buGDdXtNc=
+	t=1789487656; cv=none; b=Vx8516sPnYC5hT5d/NqKnfCY/jKt/5d35yWG5cPCcEcNedQRZyGZsDs6ppJ6AjTYMV+G7Pjl7LvJ1hbrumA9eijrVbASVwNostjoi39PdIo3FBA8H1ZgOFkTDTHP6CWzY2KkaE5GZXYSDgrmDRJp/MyNpZvcvmSFwsMT4oJJzAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789483869; c=relaxed/simple;
-	bh=P5iYy/QSYWpIBpgNKRP7nBK+8mbBN5jaovZEL295pX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tcDTKq5C+SElw+y117NQAMCCxOkhlmBkBZ6vHXC+uabRJ94ttiXLNgZ8jpWV/27xtqMlboT3HB7Bpb8hRmcUxlKsQB5K9GSgtJua/gIZes7eO1WMkzXElMbCyPf+zmbxMg5+l03CKElgNwCvhvWYG9iFTSL09x3EpoVJTwwMLqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NKG4ADbx; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1789487656; c=relaxed/simple;
+	bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=osBxwW8+IWKKcjsUbw2GGSLipInS+d955FytLGxQdSyyFD1v2oPIjbcZKmHydxIkfUg70ttI/UKOBuQYGAv3fXczMc7gCcjYG28dehWzL0I5RVBxNWkpERYZkfO5MpuQ/rW3IqVLHuFBQbsCW2xFJhxaGsJtA0NiyeqN4W+f3zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LP4UWICh; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NKG4ADbx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789483867; x=1821019867;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=P5iYy/QSYWpIBpgNKRP7nBK+8mbBN5jaovZEL295pX4=;
-  b=NKG4ADbxya7fF+3RfHk4VPEfYgWX/pUpuTei1Hy7txdRNgw2/iPFsYav
-   9EYSA0vCB/8OWxKWp8d1BrbaUCWyHOFS5EgVXAJo9SguigIpdXRfizein
-   PintOYQILj4MkzkfFJtoAspoY1P0VJN1jhMfRVrYvsOUn/A9qk05haUTO
-   xS3ns3rwJQWqdB2fvRPch9FWcYpU9jf7qIdAE9rjwkgXs6+1vTO5lMv1W
-   o63z5cZsrfBDFYk1Nx2EfyZNt6EZ7oOymeev3WH3qg7v6i7NDbS9F/oki
-   q+C5bb1TlYe9pdCHIf2KFc+9ZUghm6hO3pY6TenCMfITRCKOY4nOcif8A
-   Q==;
-X-CSE-ConnectionGUID: RZPmtIYbQJeJT5VDdVQQ7g==
-X-CSE-MsgGUID: wmGuwELvRPS4bdQQxLnCOg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="88983364"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="88983364"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 07:51:06 -0700
-X-CSE-ConnectionGUID: Ol/cDn8bTau4gdkva6ZjQQ==
-X-CSE-MsgGUID: Vlsrmi9NRxeS/5OiZL/mRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="269352551"
-Received: from conormcd-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.244.57])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 07:51:02 -0700
-Date: Tue, 15 Sep 2026 17:51:00 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Rahul Samana <rahul.samana@oss.qualcomm.com>,
-	Wei Deng <wei.deng@oss.qualcomm.com>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>
-Subject: Re: [PATCH 2/5] Bluetooth: btnxpuart: Add auxiliary driver for PCIe
- M.2 modules
-Message-ID: <aqlbVNjTUHXlObgy@ashevche-desk.local>
-References: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
- <20260915-pci-m2-bt-rework-v1-2-3c7d9cf9c010@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LP4UWICh"
+Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc4cacd3409so395051a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 08:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789487653; x=1790092453; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-type:content-transfer-encoding:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
+        b=LP4UWIChu3Aw58AeZLJcsAWjCJWB5juhvCA7uZeXjAqx8cT5uoHB3LDLrEYohL3pHK
+         jOJdkStYie7Vm7U4r38s30BaSAeSqFJEGFwYc+WNrZ4papZ3yge9eyI2U2EdkjTkKKo3
+         VmSXPqiVUEnXauA0EkdawUbvNNygFk6m/TLQvdo4xSHdTDfMYTWr/hgBJxYcgnnjRUHW
+         JoGnXSqm4SRLXzfaAQBqaWRtGW0OyQAvG26cP6DNKhMrdN15Wn1ZqFvCsgSYLWIC3gG4
+         IpOdq5+rvsQQ+R572kzT7guNyYGO9iDmrqOKl64c8JReAoa9DtJEkOXMltClyqirnMUM
+         NuPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789487653; x=1790092453;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-type:content-transfer-encoding:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mJnhaZcB5kMb3f5fzObUYGBa4/RGju3f+hxU/7+kYsU=;
+        b=zsnOS8jak39YAV1x5iM3LHAcjAm+yMeNWUFnXoWegmFUYxIuMV8BuJX/KoDo7j4hSO
+         ghlmiOKhql52Pfr4IQ/QW1S4zmhRg4tICZXpItSDX1jD3Avcp/9KFf1UEe3A/+D//3TF
+         ZYCZ7y8Bxovygc2xKYCEeRfkDBogxWiC8BY5IUD/5MOVnyeDAONLVRLGH+HwRcsJPcxP
+         wWjZGlvgfCeOpUdoWSqzzKNhBzYxpy0Fg6nko5hGoLK94vQZzN0o8prrc04EQBSyU/t/
+         0ZCBVi/C65X2pyLKxx1pVvE5pCDHru9eLM3a76nll3mmVrzriZrGKEIiDJr3oicDzNf7
+         XJXA==
+X-Forwarded-Encrypted: i=1; AKwUvBzL3K9e7Z+vaKWtilKzY5l7S46RjCUrtq/LQcBsNlPQtg+12dItKIbmcCq3sV/uv0ugIBDB72ejChxi/rLgfcY=@vger.kernel.org
+X-Gm-Message-State: AFuF++lTOGv+9HCJAuFowfx9Yb94xUBXWydmD7kNTM+4xDNzbwEG64pz
+	7kYu1HMDrkeN/3LZKNF7eAZlKmj1XV7NwbQmRBvzDpoXUD1df0XVAWac
+X-Gm-Gg: AYBFou2hTodr0cIY5gvavT/2GfqUdVyOE5diTgYkSHg0mXXEnPlgCt8QtOWGXtX1m2c
+	Cd7F4IuG5Ot2+Fe1Ph8MjWvpEWZjM6DAdJf0EF9GXlaeAxIA+gTQKmimNMeEO6rwwklIfqbjQb+
+	ZgwX2kkvC8riv/Bz5msBw75Dhq8SGwcHp97IFBd4nXcHhfsVFyAVZtNV+b6FeQ6E+7LPeLHAyQ8
+	f9l2fPOgcBHlJbpIqTYiulTPEs1vHkwg5iUi+Y94E7XADDvzqsRg2BNUQ488XSw1jbc7BHhyAMi
+	SHT+i41XrhBO/3eH6Yucllrg7tzX3LexuwY8A4cYjfZbcjktY26S4dMLvnx73DtF+109MWTSA4W
+	7cOQbmtJwGTHnw2oNtggGo9dZTRGT40N5Yj3Zoi1DeTFRbfEe5Sp8KYnntlJgjTMmgp8iKKFnzj
+	l3J36EEuKsk/T/W3FF9MzscMxnt9gf4nkhtc3dSG55YnGVqIhJ/eeHAjZWUnkftg9SKxlW/uJ7U
+	37++T4/LCdNGPcDBw955FrO2g==
+X-Received: by 2002:a17:90b:4a8f:b0:39d:f254:4173 with SMTP id 98e67ed59e1d1-39e110dc85cmr2590678a91.21.1789487653470;
+        Tue, 15 Sep 2026 08:54:13 -0700 (PDT)
+Received: from localhost ([13.93.150.60])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39dfdaccc0fsm6012249a91.15.2026.09.15.08.54.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Sep 2026 08:54:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260915-pci-m2-bt-rework-v1-2-3c7d9cf9c010@oss.qualcomm.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 15 Sep 2026 15:54:11 +0000
+Message-Id: <DLG0FI0V6C4U.8PPNEKEU8LBU@gmail.com>
+To: "Randy Dunlap" <rdunlap@infradead.org>, "David Ahern"
+ <dsahern@kernel.org>, "Ido Schimmel" <idosch@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>
+Cc: "Simon Horman" <horms@kernel.org>, <netdev@vger.kernel.org>, "Arun Ajith
+ S" <aajith@arista.com>, "Roopa Prabhu" <roopa@nvidia.com>, "Jaehee Park"
+ <jhpark1013@gmail.com>, "Jonathan Corbet" <corbet@lwn.net>, "Shuah Khan"
+ <skhan@linuxfoundation.org>, "Shuah Khan" <shuah@kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Alexander Aring" <alex.aring@gmail.com>,
+ <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 0/2] ipv6: update NUD_FAILED neighbors from
+ NA messages
+From: "Lawrence Lee" <lfqlee314@gmail.com>
+X-Mailer: aerc 0.17.0
+References: <cover.1789448374.git.lfqlee314@gmail.com>
+ <4169629e-74c1-4a21-a187-6c65d70502fa@infradead.org>
+In-Reply-To: <4169629e-74c1-4a21-a187-6c65d70502fa@infradead.org>
 
-On Tue, Sep 15, 2026 at 04:24:03PM +0200, Manivannan Sadhasivam via B4 Relay wrote:
+On Tue Sep 15, 2026 at 5:26 AM UTC, Randy Dunlap wrote:
+>
+>
+> On 9/14/26 10:01 PM, Lawrence Lee wrote:
+> > Testing:
+> > - x86_64 current-config and allyesconfig builds with W=3D1
+>
+> What does current-config mean?
+>
+Accidentally forgot to reply-all when responding to Randy before,=20
+copying my original reply here:
 
-> The 88W8987 combo module exposes Bluetooth over UART. Since this module is
-> attached over PCIe, it is not described in firmware like devicetree. So it
-> is discovered at runtime over PCIe by the power sequencing driver, which
-> allocates the UART serdev and creates an auxiliary device carrying that
-> transport and the power sequencing target to power up the Bluetooth
-> function.
-> 
-> Add an auxiliary driver that binds to this device. It reuses the serdev
-> provided by the producer, brings up the controller through the existing
-> UART transport with nxp_register_dev() and drives power through the
-> sequencer obtained with pwrseq_get().
-> 
-> Factor the HCI device setup and teardown shared with the serdev probe into
-> helpers so both paths register the same controller.
-
-...
-
-> -static int nxp_serdev_probe(struct serdev_device *serdev)
-> +static int nxp_register_dev(struct btnxpuart_dev *nxpdev)
->  {
-> +	struct serdev_device *serdev = nxpdev->serdev;
-
-Why not also
-
-	struct device *dev = &serdev->dev;
-
-and use it to make lines even shorter?
-
-...
-
-> -	device_property_read_u32(&nxpdev->serdev->dev, "max-speed",
-> +	device_property_read_u32(&serdev->dev, "max-speed",
->  				 &nxpdev->secondary_baudrate);
-
-	device_property_read_u32(dev, "max-speed", &nxpdev->secondary_baudrate);
-
-Now exactly a single line (out of 80 characters).
-
-...
-
-> -	device_property_read_u8_array(&nxpdev->serdev->dev,
-> +	device_property_read_u8_array(&serdev->dev,
->  				      "local-bd-address",
->  				      (u8 *)&ba, sizeof(ba));
-
-	device_property_read_u8_array(dev, "local-bd-address",
-				      (u8 *)&ba, sizeof(ba));
-
-Now two lines instead of three. But ideally this casting should gone and
-instead something like ether_addr_copy() to be used. (The latter is out
-of scope here, of course.)
-
-...
-
-> +static int nxp_serdev_probe(struct serdev_device *serdev)
-> +{
-> +	struct btnxpuart_dev *nxpdev;
-> +	int err;
-> +
-> +	nxpdev = devm_kzalloc(&serdev->dev, sizeof(*nxpdev), GFP_KERNEL);
-> +	if (!nxpdev)
-> +		return -ENOMEM;
-
-> +	nxpdev->nxp_data = (struct btnxpuart_data *)device_get_match_data(&serdev->dev);
-
-This is bad. The const qualifier is for a reason. Make sure it's kept.
-On top the same suggestion as per above, use local 'dev' pointer.
-
-Also Sashiko found a nice issue with the driver data, id est driver_override
-mechanism that in some cases may lead to NULL dereferencing. Please, double
-check if it's not the case, otherwise check for NULL and return -ENODATA.
-
-> +	nxpdev->serdev = serdev;
-> +
-> +	nxpdev->pdn = devm_reset_control_get_optional_shared(&serdev->dev, NULL);
-> +	if (IS_ERR(nxpdev->pdn))
-> +		return PTR_ERR(nxpdev->pdn);
-> +
-> +	err = devm_regulator_get_enable(&serdev->dev, "vcc");
-> +	if (err) {
-> +		dev_err(&serdev->dev, "Failed to enable vcc regulator\n");
-> +		return err;
-> +	}
-> +
-> +	if (nxp_m2_connector_is_available(&serdev->ctrl->dev)) {
-> +		struct pwrseq_desc *pwrseq;
-> +
-> +		pwrseq = pwrseq_get(&serdev->ctrl->dev, "uart");
-> +		if (IS_ERR(pwrseq))
-> +			return dev_err_probe(&serdev->dev, PTR_ERR(pwrseq),
-> +					     "failed to get pwrseq\n");
-> +
-> +		nxpdev->pwrseq = pwrseq;
-> +		err = pwrseq_enable(pwrseq);
-> +		if (err)
-> +			goto err_pwrseq_put;
-> +	}
-> +
-> +	err = nxp_register_dev(nxpdev);
-> +	if (err)
-> +		goto err_pwrseq_put;
-> +
-> +	return 0;
-> +
->  err_pwrseq_put:
->  	if (nxpdev->pwrseq)
->  		pwrseq_put(nxpdev->pwrseq);
->  	return err;
->  }
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+That's referring to my local .config build options. It's essentially=20
+just the defconfig target but with VETH and Overlay FS enabled. Sorry=20
+for the confusion.
 
