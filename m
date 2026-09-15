@@ -1,107 +1,161 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668801F5821
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 06:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5508442B0F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 07:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789455503; cv=none; b=fIxO7lNsV+0G96Y4WI6xbFQu3+phiJ3bSMsfhIynbJqPhYLNqRAdNUWIFWjcA1oy3EznFx3z8wEqCastU6yposHLhW9xfT4ob4J+nZQXPDKL7XWd3JdMVh75Pehy6h8Z6GzgrXv/pZexC4PeXTkc7DPKsk4waFmRoQZOEu2gvfs=
+	t=1789455723; cv=none; b=Ty51mvbIJhTSh28Xi8Zi45VPg4ulHvXbsGeP2T/gtZ9n2yvI8KlL82z2cx8Kr6fiFKqQandzaHseU1TqiUBRkwo5UPYWX3Oo+jpk90735Ns2HOFuDW3dwn/h0Sh6mrqwffrp4PPk8ygBV4axbLLe6GP4yAd2MCmrB/+sJxjz5YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789455503; c=relaxed/simple;
-	bh=RYpnY0jxBHDfqrwKsr7gIkaJHFnKIlPaTA2hFEQ2XhQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NJpFpWzVKMjc17jZ1e3oU1WG+wv1gYhdRSfcjDYak4MY2ojiSyxDX95RL91BTpV9GThrXeRTsQovQoAARSuH6sWG+2ZL5H7dIzQpuJAC5jJZ8ftN8PALDJHp3+YmlxyiHwJ6149ukWqNO7JZOwmFS67Jik2aoPMUQXGDVV+4a+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXO3wdr4; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1789455723; c=relaxed/simple;
+	bh=PnZPTWSMbJFLqmzZylh0ufIhiLD7YCit/Z6WxmZ2+3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pV4wXH0Tj8DOkKb6GS22fFaNwmqcNetx+ZV0uf/2BMusMekNUs81PcD6xY4pmOGPclHFTtC+sJa6/ziyIqdJ7YJB+17Avb0ytV/eufW30G+sBKbS/eXfE0krIfmgBRlNnV6wYOQt8q+z1QOXufJUSWqi2WUhdo3y7804ZR51xns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ftHLJydL; arc=none smtp.client-ip=74.125.229.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXO3wdr4"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-38a0c7e841fso6039535a91.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 23:58:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ftHLJydL"
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f1801fso3671456e87.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 00:02:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789455502; x=1790060302; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=RYpnY0jxBHDfqrwKsr7gIkaJHFnKIlPaTA2hFEQ2XhQ=;
-        b=mXO3wdr4e7ADX7jLZFPMV3laQb4cvCVH9dQYBjBwNd+3hXBGjOo2CNFnvDkrRebBel
-         CWzVY0uxLtfbqIDVyMx7IzpY7zF05MITnr0cGjZA75bwjCUesmfZqoxqt99ZkK45baYR
-         tu0UnU4yVHmwf4rxoXku/C4Po/NUVs8yX/TNd+aGDFZynqMss/zh7a4PUmlrGO+Hq6w7
-         MymqEaif481wTDq4UpzPfNCqcgO1l0AtKq7DPqq1hXvIT88cpUHO9JaYl0OIqKQlAqMZ
-         IUKbRuL1TGcmnxh2uM7Hhc50bgN6QTOBtxy0dDAWYpBHEfcabutiUf3AFZwcjjRY05pF
-         P1Ng==
+        d=gmail.com; s=20251104; t=1789455720; x=1790060520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=sjuyMICCrYkUM++5c14PtDJ8fduutsgs593zdKpvwvY=;
+        b=ftHLJydLHKbqIoMI8ODGmcr4U4Y7tBey25YH0zCDeKAINYSlqqSegzs8/cX1pFtCGB
+         dNwcZJ8cMXUaUwDIm3hzR/qd9EAxonFgqiXgcCp7cFOGznlkQQCD7HOKszIFuiD2bZ/K
+         KpVq/XlZXU3mI1XfCwYM820vydEOZ0D0RhB5L1crZhG2ZQ6rgqqqYfjQV4DXPofIFK5N
+         PheSyuR5faFna6FySJn9opEKNmnIW8TCSU5NuxBB+uEZcGYAsV7t6Mm2DrBTKB5gRHHa
+         Kj2NgwMbHZZnGUbsgZJU3pUm/2PjM95AKZB0wLyX7xRqJPnyVtx4bJryuQCO7c+KJd3m
+         +RaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789455502; x=1790060302;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=RYpnY0jxBHDfqrwKsr7gIkaJHFnKIlPaTA2hFEQ2XhQ=;
-        b=mJ3LRCPEs2wMDAMCx6ICYb9qY5sC1jZBOE7k+40bJpFCrym+cEYEkvrskQRDuE3MH6
-         y6rdjkmKtVaKQbtZklM6Auy/7YIe/JvjufRDUjzhYN2gqHystcY2BbZ87pIP55fUZHxf
-         ZLj2sjCQoE0/YqZ3zfjJ6wbQKtqoSfyL+sNhk7bI5fa2A8WYSXnyURQV47Nr81kDvkyL
-         SsHtXlQRL0rsWlCcdFs0SCscYQ/H6Jyo8zySOQjnLHd4jhBxzvey/PsQVK8LAAwEAGG3
-         9/tMmrExb8LLM+I0Hg/1iyzEL/NJLEq9gpcX+P6KtzW02oUEYxl35o3qJpU22A+VYd5g
-         EUag==
-X-Gm-Message-State: AFuF++mEsw0xQ0jpE9n7WUB9iwwNcdx4XQaAF+ZBCmmN5N9+b1xxUWLX
-	GgQOLk0I5sXnV3Lkanc3GUS1lqjqXA3jrXwMrCnmuRogc+Akd/WKro3jWZfdVQ==
-X-Gm-Gg: AYBFou0Krd+Hl5wkez48PwY+M8pRKjiyIDfQlKe5vrre4CTuZV1A39Bkd4Iyg8CGhJ/
-	9egzEUodc0mw+U57mgGtkD0pTsHLyDrOxPrSU6+QDMVMYntaOfoTxJaKGCLTdMw2LA5AD+4StuR
-	0xAjP08UmRLT/vJG6cVVjAYanB0bJakxRYGRMaDkyUT9JEhZ4+X0JXRr0B6TmmNjLWCUdiGN7hu
-	fOs0IeVMo6piFI5AoqkJzF/ApXZBKYEaJlzCfwIjqgkx2CVSFczrw86P2g0tlJKnFvf2bKppCTN
-	uFyUpsdF7vHlUYz/7he1lQOR2o1CsDTo74wNLS/8Mynvw/BkZw///yOJZXeTYiB7FndqNXGb95J
-	CsufAR53QSHIBR15eJO13SCSSLr4U3ceV6Y1yClnSQS3UMAPgsVqg6vIvdQV/pKl0Wngl3RcVHZ
-	lyiOukaaEDdZaurFgCdX/baxOD+j/iUYyvK9AmmnMpA7ISKyegXSmAu5hxl37AX/peusj+4FzHf
-	QtiLg==
-X-Received: by 2002:a17:90b:578f:b0:39e:ad:d31b with SMTP id 98e67ed59e1d1-39e00addccamr4719113a91.6.1789455501525;
-        Mon, 14 Sep 2026 23:58:21 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.178.35])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bc03778c7sm21906945eec.9.2026.09.14.23.58.20
+        d=1e100.net; s=20260707; t=1789455720; x=1790060520;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sjuyMICCrYkUM++5c14PtDJ8fduutsgs593zdKpvwvY=;
+        b=bjNEY3HtB405CXcPZ9IG47sFuXh5biLEWYN4i6Mnn1idIKDsXoLySDLcSXkMRrukpr
+         v12cnK272JuW/Xyrv3TYZgUqd1ShREOXZcO3gswq/A5O1l+Tzx80q2Gg/nctxkWYxqbV
+         aoAEN3RZfs3RgsWDciv64tMrQHhzCE8/4PubK7mFzYMMUEfd4jpNQ0varGsc4GF+5fZC
+         m4LIZD0MoDJVlyCWn7lHYB8lypM8/zlw2FtC8rQtq7v6JtxzsVWe+SiRRB4DDTXDhi+t
+         9hzd7FnQ4p49GwGa1g1wuA3l+2FxPyMsf42LdC+i19YCeI0E9EACHS2Okg/WNcvAVb/a
+         MV5w==
+X-Gm-Message-State: AFuF++mtAg0+RhnqEGShp+9R0IcbhDpuuP5smR8lxL2/e1/C+nrsrsT3
+	yiNa1qaPn9qQ3awPDQYTe5RzDnW5vxQBHp/FgsTJPss16R9Zq6k8YN+X
+X-Gm-Gg: AYBFou3tFEwChW7AeFl92ste3w8ZRBdijdZCJ3iu7J9MjpQXIGQsBKNTXJDikClu/bx
+	UwQH3/WndOurmes1fDbtAi6Q9LeNPp3FQq8EmbF6DNmjRh6PJkYOjGNHLzVJso9n92YezlvaK/v
+	uvqXiOTDOsT9R9seeLYMDni77SlYEFCJ05/AseBOQNUgcslW0D1QhU5BMo1Hw4mii9PKwYZ5cG1
+	To0ARE8n/W8F8Z3AAgLnuDGWLW8UfmrgLcxmQoRQM/TQ4nXjB7S5EYUQq9MUaAqHc++T0PCEeCt
+	2SMrUEdqg3VOale9zVbv7JurB6qBag4lGJbcSFm03RX5KJPUPSpXvzoEOgpMyT6t74fMVzYXUe2
+	yDAqLwfofUUsojGIftcmKYkcPETyBfGC7Bk35MbaDTs7wjKZSE8jMwYWjK5kHlQ4NayHl3Ki9St
+	iSTu8Rv5jnwvRr15bV1SHr/yEngMAlSLVRbma7sYWrLVEmV1BEqIEIAWPLO5eQS/q3WLMc9+Jf2
+	It0pqzoDV9banw=
+X-Received: by 2002:a05:6512:32c6:b0:5b6:183b:d218 with SMTP id 2adb3069b0e04-5b8ae6a7786mr1558561e87.63.1789455719335;
+        Tue, 15 Sep 2026 00:01:59 -0700 (PDT)
+Received: from localhost.localdomain ([80.66.93.72])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b8a03a88a5sm3002566e87.8.2026.09.15.00.01.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2026 23:58:20 -0700 (PDT)
-Message-ID: <6aa8ec8c.b86837c0.3d122e.c0e5@mx.google.com>
-Date: Mon, 14 Sep 2026 23:58:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8520428410411604947=="
+        Tue, 15 Sep 2026 00:01:58 -0700 (PDT)
+From: Maxim Skokov <skokovmaksimevg@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mikhail.v.gavrilov@gmail.com,
+	Maxim Skokov <skokovmaksimevg@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: RFCOMM: free the skb when the DLC has no owner
+Date: Tue, 15 Sep 2026 10:00:46 +0300
+Message-ID: <20260915070119.45143-1-skokovmaksimevg@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, lfqlee314@gmail.com
-Subject: RE: ipv6: update NUD_FAILED neighbors from NA messages
-In-Reply-To: <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com>
-References: <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8520428410411604947==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+rfcomm_recv_data() hands the skb to d->data_ready() and returns 0
+without freeing it, so the callback owns the skb from that point on.
+The tty implementation frees it when the DLC has been detached from its
+device:
 
-This is an automated email and please do not reply to this email.
+  static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc,
+                                    struct sk_buff *skb)
+  {
+          struct rfcomm_dev *dev = dlc->owner;
 
-Dear Submitter,
+          if (!dev) {
+                  kfree_skb(skb);
+                  return;
+          }
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+The socket implementation returns without freeing it, and the skb is
+leaked.
 
------ Output -----
+A connected DLC can have no owner: rfcomm_sock_destruct() clears
+d->owner, while the DLC itself stays on the session until it is closed.
+Data frames that arrive in that window still find d->state ==
+BT_CONNECTED in rfcomm_recv_data() and are handed to the callback, one
+leaked skb each.
 
-error: patch failed: net/ipv6/ndisc.c:1001
-error: net/ipv6/ndisc.c: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+The leak does not stop on its own either.  The remote runs out of
+credits only once RFCOMM_RX_THROTTLED is set, and for a socket the only
+place that sets it is rfcomm_sk_data_ready() itself, below the return.
+rfcomm_process_dlcs() keeps granting credits, so the remote keeps
+sending and the leak keeps growing.
 
-Please resolve the issue and submit the patches again.
+Free the skb, as the tty side does.
 
-
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Closes: https://lore.kernel.org/linux-bluetooth/CABXGCsPe5wykd8Aj-hm+SJ7SGQyb8yoGNnx3XDpPmBathj+EGg@mail.gmail.com/
+Cc: stable@vger.kernel.org
+Signed-off-by: Maxim Skokov <skokovmaksimevg@gmail.com>
+Assisted-by: Claude:claude-opus-5
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    Noticed in the v3 thread of "Bluetooth: RFCOMM: connect the session
+    socket without rfcomm_mutex", where the same leak is described.
 
---===============8520428410411604947==--
+    Found by inspection.  I did not manage to produce an orphaned connected
+    DLC on hardware: it needs the socket to be destroyed while the remote is
+    still sending on the DLC.  A kprobe on rfcomm_sk_data_ready() over an
+    HFP session (RTL8851BE, btusb) counted 31 frames delivered to a live
+    socket and one rfcomm_sock_destruct(), so the window does open in normal
+    use; no frame happened to arrive inside it.
+
+    Built and loaded on 7.3.0-rc1 with KASAN, UBSAN, PROVE_LOCKING and
+    DEBUG_OBJECTS; HFP and A2DP sessions behave as before, and none of the
+    sanitizers reported anything on the RFCOMM paths.
+
+    v2: no code change.  Removed the trailing whitespace on the blank lines of
+    this section, which git format-patch --notes adds and gitlint rejected.
+
+    v1: https://lore.kernel.org/linux-bluetooth/20260914173044.5249-1-skokovmaksimevg@gmail.com/
+
+ net/bluetooth/rfcomm/sock.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 958081adb9..82aa38715c 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -48,8 +48,11 @@ static void rfcomm_sock_kill(struct sock *sk);
+ static void rfcomm_sk_data_ready(struct rfcomm_dlc *d, struct sk_buff *skb)
+ {
+ 	struct sock *sk = d->owner;
+-	if (!sk)
++
++	if (!sk) {
++		kfree_skb(skb);
+ 		return;
++	}
+ 
+ 	atomic_add(skb->len, &sk->sk_rmem_alloc);
+ 	skb_queue_tail(&sk->sk_receive_queue, skb);
+-- 
+2.47.3
+
