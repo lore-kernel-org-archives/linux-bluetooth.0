@@ -1,126 +1,107 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3B3474274
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E095644C51C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789509464; cv=none; b=jenjiFj1FCINREdYrVm3oeLoIStgpfRdylCvh89SXNYn1LJRJzZYDzjfiPENNy7J0A4SKjrd/DBTmOLfxztxqbXe6zlBc2dUB9WQGk8XLqPNYiGJNlqmnGd9C/q/cv7EliMt3hz6Cq5J1oaDzzr9W/8nJPFGSxpIHO7eNp7/AHY=
+	t=1789509521; cv=none; b=qnGghIwktdqEL5ZxM1Yl4h97LTOXq8UlW52e2PFaPrnaDen8gsCtnmOnqF5fni17L4iOKdQp8+EPKAZQa35XhdAXYKueJlMaKvG0ID4AGkWwNQyxNYA9plhaa5n9iizf7UAxlCrnlmlbVfNNplSitOu4JmR/0xa2G7/C3GpmwLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789509464; c=relaxed/simple;
-	bh=v2lAZIMRj4zu/cLS6110VCOq7KFGA5rkN0eqCjqxQJw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=G8CWt/biZ0Gh61XlG23+0y7979yh1iDiP1eJNpMRgYugg/aAI1TKf/2Qu/G+9J1T8AEhbqLCnmv/awIAyo3njxuL60e6YqQwV5yfaYMaF594xu0p4RoDfil0XaOfzOxZ9lHAqpju0STHV4B89SS+B5J3WU4+XLkKFUum3k9om28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Yz5XSIjJ; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1789509521; c=relaxed/simple;
+	bh=J0yp82B6q5fj5Bk1g5H5fXWjGYTnFbHcbxQ0kyjf8Q8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hlDgrhZISGRJkPKCGs8Qy+VL8hx9ew3wxwEJ7z9ljdkmzcV1TeP8boJMufMid5Udbj4snYanAa0KOxFCOqMavaJk2+R1f7s4tVIbDVg2SBeso59QQGW2chDV7CwKK/mscUCcDrsZ9AxsUJkoBLd9YH/v2BKvpaq3xPme87eB9OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fwqnk/gg; arc=none smtp.client-ip=74.125.228.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Yz5XSIjJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1789509462;
-	bh=U9sfGGuJKaaN4RlNAUd+W4iBurkRk03wtwtsktG7b0c=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Yz5XSIjJ4iMKtmppQuHbrQ6b4rQDDA/VtXFTC5pnxyd9YVQuRaAj1iDhBc/QC5q4l
-	 KwnAaCStWerANOUj+IFtyRfqvhWeYjMbHYyll975H31M7abUq3I7epkyABoU4TLvY5
-	 XWvnCqqiiW1ReQXnLNITlSdBq1GBQ9LpuoJoDTdk=
-Received: from github.com (hubbernetes-node-9c2bfaa.ash1-iad.github.net [10.56.159.57])
-	by smtp.github.com (Postfix) with ESMTPA id 4753C60088D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:57:42 -0700 (PDT)
-Date: Tue, 15 Sep 2026 14:57:42 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/6dc064-e2ec68@github.com>
-Subject: [bluez/bluez] 3e7fb4: test: functional: add mpris-proxy BR/EDR test
- cases
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fwqnk/gg"
+Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-86b90133ae8so166348b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:58:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789509519; x=1790114319; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=J0yp82B6q5fj5Bk1g5H5fXWjGYTnFbHcbxQ0kyjf8Q8=;
+        b=Fwqnk/ggm/uFUBhtvKmMXjcqzf/G3+asGFcWcUTgfg9oufXJPesqUzdWp9rtOG/h5D
+         yHDDSHkmGFt432ByeDQ0Wul6Z+ueyXtwJa9VvfQUuSkM2XOSXVYF3EmNczHRQCsoecAO
+         sQEJ29bRqBjmCBwvvMITSRzTYciPBm817fjwvBOadg+WqhO6zsrbh8/MdDMJhtWC4K6b
+         9CmUR6LxN4jDhS+V/+uEd49lma55zaPsQsAkumepcEfNqXMJGfX8ApbM118ncXZ4+9/P
+         zmdt5iwXzrRp54kp95kxF9pGxcI+rvSdeDFIB3c0YU7KMn3T8TyuRFdRJw8IhaQDk7wF
+         C/9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789509519; x=1790114319;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=J0yp82B6q5fj5Bk1g5H5fXWjGYTnFbHcbxQ0kyjf8Q8=;
+        b=QY3jIRIvLdogDGfeGJlRpNN86jTyk3VncSzzbTgITchjwr/ZBQxJAMWxVzq8iBhwxl
+         LrpIIGJkY9l4YBKQmX/7WDvqte+o62uxPKFRnxqq9LlJ21TiQhoL1W819HU7sP3u5zQ1
+         z3tZqHC3JdPotJsyuPLrZAnNbo1UaJD/N2klNrZQ/jipJ3IKJ/pFDdiAtKU3RJvEnK+I
+         /UdryCuqPeaNQSLtBs1PFc3dSYf/lhFCWEIUsJYDNJR1NJtCyuAne/6ZPfuOu9Gvsfx6
+         rpvLQB8GoL5eww/Z178fH7ycEimOYkb0z7G9Ko05wBBjmQ98/6x4BnAz3vh0tWyuHB4D
+         YZLA==
+X-Gm-Message-State: AFuF++lZ4dnlKS4AAAnLEZilujRUVDULJgaaBU9/R8wzk1VJMLtA7BR3
+	DyQK1n2ZEOMj81eyW+efbvBhg2N/A3QDjgTT9AORudx/t9ZhcaRdJOkvx/0p3Q==
+X-Gm-Gg: AYBFou2N3Toc/4pDwWVfarPqKvdcInAppFvvJD1+tVUvt6TevRzaV0JTp3dDm5zgiJH
+	ii9cceZdsEAYN0uxmdCMrfXvSbvfR8OI+tNMKJm0CSQZiQ1lqq3ENel+yRDXhzitcsrdWhLnkAE
+	JCvwnxjK2a7LAW5LSYFbaOfB/qzJkNOR35CAuZeWH91+C2h5SUEpEGDfnHI9EZVD+/JwRodya4O
+	1njN237ykT7CPbDv36Nh/AkkHFQDy7oywxI3pxAoBpW00XiFA8bvxCk+PW5w/o4uqH2JoGwnlUR
+	ydVlCtPUrf4kvt2Z3do8v/h+yXQ59eW4RrVNfdjC5ojHXaAkGhONE9nd+Y8gQaGwcAPa1b0O/S1
+	fd52sjFfsNFFqBkYTd5lh0X/mekLbdhFBypt2wfoS1bOknAY9ei8wrCKRiw6nVHlWb08MhLyl6I
+	Qob7TeJ/XYYtNZWgB/YzjGSFRNW6nBHUMtMQVfiq6zddBrf11OMP1D3OHBrrV7GPgrhKkhpUaN5
+	RGF59BKu74Y1A==
+X-Received: by 2002:a05:6a20:7f8a:b0:3da:e7db:5afe with SMTP id adf61e73a8af0-3dd5f5d85aamr538698637.14.1789509519219;
+        Tue, 15 Sep 2026 14:58:39 -0700 (PDT)
+Received: from [172.17.0.2] ([68.220.61.8])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bf5b030aesm1747701eec.26.2026.09.15.14.58.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 14:58:38 -0700 (PDT)
+Message-ID: <6aa9bf8e.ec46f90a.1acc6.8f24@mx.google.com>
+Date: Tue, 15 Sep 2026 14:58:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1146207113008522480=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Cover a BAP stream to a coordinated set
+In-Reply-To: <20260915211528.1223784-2-luiz.dentz@gmail.com>
+References: <20260915211528.1223784-2-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1146207113008522480==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 3e7fb4ac2e28a13eb44293c0e4de4281c65ab1ed
-      https://github.com/bluez/bluez/commit/3e7fb4ac2e28a13eb44293c0e4de4281c65ab1ed
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-15 (Tue, 15 Sep 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M Makefile.am
-    A doc/functional-mpris-proxy.rst
-    M doc/functional-testing.rst
-    A test/functional/test_mpris_proxy.py
+Dear Submitter,
 
-  Log Message:
-  -----------
-  test: functional: add mpris-proxy BR/EDR test cases
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Add functional tests for mpris-proxy over BR/EDR: a dummy MPRIS player
-on the server is bridged by mpris-proxy to an AVRCP Target, and a
-second mpris-proxy on the client, run with --export, exports the
-remote player back to the client session bus as an MPRIS player, which
-the tests control as MPRIS clients.
+----- Output -----
 
-test/functional/test_mpris_proxy.py::test_mpris_proxy_playback_control
-test/functional/test_mpris_proxy.py::test_mpris_proxy_track_control
+error: patch failed: test/functional/conftest.py:2
+error: test/functional/conftest.py: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
 
-Assisted-by: opencode:qwen3.8-flash-next
+Please resolve the issue and submit the patches again.
 
 
-  Commit: acab65d06795292031f93aeecb455c6e9a1b72d7
-      https://github.com/bluez/bluez/commit/acab65d06795292031f93aeecb455c6e9a1b72d7
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-15 (Tue, 15 Sep 2026)
-
-  Changed paths:
-    M doc/functional-testing.rst
-    M test/functional/conftest.py
-    A test/functional/le_utils.py
-    M test/functional/test_avrcp.py
-    M test/functional/test_mpris_proxy.py
-    M test/functional/test_obex.py
-
-  Log Message:
-  -----------
-  test: functional: deduce pairing bearer in shared fixtures
-
-Make paired_hosts deduce the pairing bearer from the host
-configuration instead of using BR/EDR only, with the LE pairing helper
-pair_le in le_utils. No behavior change.
-
-Assisted-by: opencode:qwen3.8-flash-next
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: e2ec6827f7bed94912c23288a34f868e7002e847
-      https://github.com/bluez/bluez/commit/e2ec6827f7bed94912c23288a34f868e7002e847
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-15 (Tue, 15 Sep 2026)
-
-  Changed paths:
-    M doc/functional-mpris-proxy.rst
-    M test/functional/le_utils.py
-    M test/functional/test_mpris_proxy.py
-
-  Log Message:
-  -----------
-  test: functional: run mpris-proxy tests over LE via MCP
-
-Also run the mpris-proxy tests over LE, where the player is exposed via
-MCS instead of AVRCP.
-
-Add an LE advertisement helper for connecting the service.
-
-test/functional/test_mpris_proxy.py::test_mpris_proxy_playback_control[le-vm2]
-test/functional/test_mpris_proxy.py::test_mpris_proxy_track_control[le-vm2]
-
-Assisted-by: opencode:qwen3.8-flash-next
-
-
-Compare: https://github.com/bluez/bluez/compare/6dc064623c57...e2ec6827f7be
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============1146207113008522480==--
