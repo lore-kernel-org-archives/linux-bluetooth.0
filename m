@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vs2-f41.google.com (mail-vs2-f41.google.com [74.125.227.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21464B1276
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266D04BA9FD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506951; cv=none; b=DiU8zursTKn+QgRKd+vyW3d1L6irk1jVmroikreEIFWLJZ4p2Gk175ozGsqOL6tPe58vaDCDJESbYVWtsygto+5gPjQ4j3G4UnoCllOAd8/GXuQi89LZ0l/Bl0/D0lgh5xgkDeqjAky2JYj52vsu2rpIktXSgq18z8TcLr/dge8=
+	t=1789506952; cv=none; b=PhGO9CJubW9pOouDRLgO6Sxlh5GUCIL8elGoZ4GMEHIdRtO76+KUNdgWg0Zj28RfWUlRBDTIOhT0M1HiyUzIuIZ7weuhAKHDHXE1CiWu65DdsC5AB4S2nr2GyfsaRpBFz6TRBEEQ5FNGX94Y+3KB5b73KSmWdOmXdghqtYR3rj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506951; c=relaxed/simple;
-	bh=8CZ4MwC4DoowuYARcDpi9Ch1/KOXvXe220mL5ViuxcU=;
+	s=arc-20240116; t=1789506952; c=relaxed/simple;
+	bh=HZrHgsRMLRCIdvIQRZv3Sb1HqLA1pL5bePzGe6q/JVw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BsK/EuijHNq2rZ81RRtkXNYrOQhu7xHs0Tg+MCJkT6nN6Zy/fdqtZml3XuEDmNK8a8YstYN4GNteb/QaeGvtk8I6WWXL3AhBKLdQQhOaOPiQ7GVPtOZzlioLLZnqczzyXirGEKwnhc+zpsmNBXHz5JMz0tmCpbkoB8s7LSEhKN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GHfueDVA; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=BdIMEenhMP83SbAQvetS0H+Gmfh2ea1e42k2hm0In+EgjPbSbgnImRJpTIDhASPwQUc2FEHy75tXYfeUVLZZfflnU3F0hB6mtTnAhh0LJp3JLEOFRBuLSTA99gIkFeld/M72v7MRBdrFoQzCkYeY5dINZBASeTja9/MfviQfjM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D7Mbdoxp; arc=none smtp.client-ip=74.125.227.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHfueDVA"
-Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-78a6c77d255so62249137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D7Mbdoxp"
+Received: by mail-vs2-f41.google.com with SMTP id ada2fe7eead31-78a7003f9f5so100269137.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506948; x=1790111748; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789506950; x=1790111750; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=eJOMFGraK4vGToxt+AQS7vWPiIsy91K9taoUUfOPmy0=;
-        b=GHfueDVA5rJUCREfrGFwp7SN/gjcz1qsHjbPYDz0zej+FClUtakxekPHUysz+Q/eXz
-         qTdYWazpUB50KbNcyH0JqyEhDnENb14z96IpIbq96ZRxkHR8Ot+P4TXLTBXv4jdxFitb
-         WbqIBXRX6ZIpuUEB3C5ggjogRzrZJm72M8LejD8w8v6bVgNMx41LFXDYAO/TovutWiNI
-         alv7s/9a5pat6JqUDCDV2/P2YVXR7OmStPYSehzHCYvG+wuvpTHTcXcwKGmIjT+zl0vh
-         ofr+zAdIh/U4cIvysnEilBue+PPE0Yu1xHPAB/aEw0LwfylYj7eepD/2EwzQfgBqjAA+
-         GTSQ==
+        bh=jaVcSYaVbNTHp9wnSNd8VF5S6AtlBTJmeg9IbkdKku4=;
+        b=D7MbdoxpLLN2IFZhfWO7rIGZH/kuDVbNF9SefX/tzH/6ElkBoKJtTbZNJpDNqNux4L
+         xj99jcJmF3XH3cTK3KeTCyZSeXjfIHPV4S7pBq6gyD3GU8ShIejp4YqKoAIyZqhSsPFX
+         +dlciuDpfTPjVV70BCF4EA4N8fUcdf7pgvKtdWqEIgGlorf13vTfRQqV5aM0AMDPKx6H
+         RY+FpDY+1rJFoUf7PbXykYpq3Vu4kQUcJ6G4cttVexj0nDiNUBaIX/TLgW95bl2uolGB
+         nOMf4YnNf0+RDJ/mBt17HdAMR8AddmTsKfrLhMEaIt5YvV/SjarXPKfmrWGdsVglGnpe
+         fgYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506948; x=1790111748;
+        d=1e100.net; s=20260707; t=1789506950; x=1790111750;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=eJOMFGraK4vGToxt+AQS7vWPiIsy91K9taoUUfOPmy0=;
-        b=PRxaOi3/5xjY+CMg35yqnERbTzkGugvLktEqUMioH/4W8CAij0gZ4zc2P62rJo1+jL
-         WYTorWOmjVwQ/mn/4ojAeSJg2FJXD2NpIKdM8PKCYGjD35BZht4/8tTrgjytvO1k0mqP
-         aK+ICQ/6joyHdmSyT7WfydwFnfCUaIxjykLWyrR3dXaHkQCEG+kjvJaw9QiksDCiHR1+
-         kDogc2sn+nW0r6UQm+My8E/o8lvpRSdPVCL8TMVwapA79K4QjUv2/73UcWY0ywmoZClC
-         PRrdfs6fneO8Rp1UhDF60vwc1kW2ByNW+aaTXK4Hj6fRu/q6MvKCHmm6o95Y+ewNevfB
-         3ZjQ==
-X-Gm-Message-State: AFuF++n8skb2SpfnwV4Nuifc84OjdySNJVxoDRDBWzs/xN+zEnVveX78
-	ErVALyiH+7/utpWpBwDlLgdF7HfByZCwtW5LMucAr8RJ3Cj1jp/zcdddHow0ZGF9
-X-Gm-Gg: AYBFou1cYgMXNcb/r62K/lzxdkcP5p9h942CjP4MlY2VwgIZFBRXppTDUcLuvMxrNhm
-	U29dVR2A6QVeuctjwmM5D2gPNjRR8rmGD2r+W+lLQykvpUPBvrfTTrfeSZH8Rx5oALGHiEmDn1E
-	/PY2PXZx51s5mpsHGFUaNxOl6SkS6152mGhe2x7rjiAXPjoGMEfCVzjCsFrjfy5EN14s0ldi5cT
-	qmFApQ/x/e7mdt4rBmocvd8i0+WpL/lvJTKTnm4pqXsiw/RtPJOcjn79+ATmswgrVYf3UgX04DJ
-	tcitGy+a/B8ec/lph07VdYuFsPp2L25sFwfh3SyvtdTv9/TUoSwVxuABvlwBWRdzgm0niJ8d/8d
-	JK14EbOZQ283F/P6sjQrVcUtTPZc4LciWToTJ0MF/gwX3LRBKM/TBpkErV5HK03r7dJniTK+BPS
-	kwow/hgglmtc7uRcAV+CLKolDi7YA3360pin58YeoHDXppiyTZRwXKc25uqMLOpXWLc5NgbRNRg
-	EGonmgdBE6PtwsaPpU6VROEv0+V9qdVXrRwat8mmuHC9ZU+3XUkyElyBrZijTE2Qg==
-X-Received: by 2002:a05:6102:358d:b0:79c:6276:4cdb with SMTP id ada2fe7eead31-7a0257aea0amr158871137.4.1789506948420;
-        Tue, 15 Sep 2026 14:15:48 -0700 (PDT)
+        bh=jaVcSYaVbNTHp9wnSNd8VF5S6AtlBTJmeg9IbkdKku4=;
+        b=KpMi7VpbKjSZZg5kDQva9yjQ2EiUm15F9uDYeN0v2C7y+Ew4cNgikpgAzHEajzX1sO
+         pR1FIGOhg6C4Toc10SAHho3Tp/Ctuw4OxhBMNKSFDwggo0+AZXWCHiE3qIBjZ3zn/SFh
+         /CrvqdqX8AXGhkNVZkSMKksK0UxBoj7V1wjGgWm2avMi5VyM2c8NPcs1ZZx3bZblbsjc
+         8komhEkjJMu1laqi4HiUvcFeQ8+yHYlhewQ2AOmOUGRw18zrar5lGjUTkgHTP8ruHv7C
+         mN7Y2ZAF82FaFR+Sf3Nuo9ricyev9wQ6NEnrjtJJvYds4QOBphPpnpg/XF/MXgSzmDG4
+         Zkiw==
+X-Gm-Message-State: AFuF++n5X3jS6zKFXdcgHbTIitPbTqhotMXWPByMjwYVrrufGcGAfhef
+	kaMEGap6RcUxjZZcPeVT1IPmsfjwGOwkrz21sl/+5/YJAYGdRdZjCsj7F1kHkKkP
+X-Gm-Gg: AYBFou10uIyb1OccLgUf+KYv0XXrmoz9FDK0rkFMPrBpd9hMt2R5BC3SvE4U+FvhZAg
+	bRJ/dLEsmoZN7Rskd4FK/CaZ4COrHanHnv7iH1rk39wgTP5xNevRJEKQaUFCnJUueKpnIg0Whj9
+	H5MzVBSlj0BLGVtVxFbPZggY+i4fmtX0zqoL9dMksbQvvw2fsPk4jPJIfrCFa1vyALUpdiLt5HC
+	dvr2xwkGct680SX7lvspvy6bj3/FByUaqjz80BHwcVlzGpW6acwMpctujc6/VswsEDuHG2CdtQX
+	5ajZuQSdwrIDcjidYfT4D/6VyplqyhiKEMU4C6mFJxx0LzavlpFmlnCC7GIMHA4DzUVP8cn5pPR
+	t2MRHNua7kIIN43M/Cy/tNhfbbB5I7uGC02iGprfGnCg3C4URm5JVIeJu3fJBpz3+hkapDInq0+
+	TX9Y49cZ1Xn/iyGvhUFrDiUM0iAQzf7j2rGWOqVfrhQZXKE5smlkT4AqOMmYx3TAGAddJnYPa8N
+	ag8TxNZDORL95nCy0auMhq+evDuOC6vy9wPiA+J1lygr6g1/LgvIddq8gf4OP9KLA==
+X-Received: by 2002:a05:6102:390a:b0:79d:62a1:1c73 with SMTP id ada2fe7eead31-7a02b2a0ba7mr172702137.12.1789506949910;
+        Tue, 15 Sep 2026 14:15:49 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.47
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.48
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:47 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:49 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 09/11] client: allow a capability with the auto agent
-Date: Tue, 15 Sep 2026 17:15:26 -0400
-Message-ID: <20260915211528.1223784-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 10/11] test: functional: fail as soon as an operation fails
+Date: Tue, 15 Sep 2026 17:15:27 -0400
+Message-ID: <20260915211528.1223784-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260915211528.1223784-1-luiz.dentz@gmail.com>
 References: <20260915211528.1223784-1-luiz.dentz@gmail.com>
@@ -77,108 +77,72 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The auto agent registers with no capability, which is KeyboardDisplay,
-so a peer pairing with it may well choose the entry of a passkey. That
-is a method the auto agent cannot answer: it only replies by itself to
-the confirmation and the authorization requests, and the passkey entry
-is left to the user, who is not there to answer it in a test.
+A test waiting for what an operation reports on success only learns
+that it failed when the wait times out, 20 seconds later, and what it
+reports then is the pattern it was waiting for, not the error.
 
-The pairing then only completes once the request times out, 30 seconds
-later, and it completes as a failure.
-
-Accept a capability after the name, e.g. auto:NoInputNoOutput, to let
-the capability be the one pairing Just Works, which requires no answer
-at all. Plain auto keeps registering as before.
+Watch for the failures alongside it, so a test fails right away and
+tells what went wrong, e.g. "Failed to pair:
+org.bluez.Error.AlreadyExists".
 
 Assisted-by: opencode:claude-opus-5
 ---
- client/agent.c       | 14 ++++++++++++--
- client/main.c        | 14 +++++++++++---
- doc/bluetoothctl.rst |  6 +++++-
- 3 files changed, 28 insertions(+), 6 deletions(-)
+ test/functional/test_bap.py | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/client/agent.c b/client/agent.c
-index ff5e57ff27a5..a678d5f785a9 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -403,11 +403,21 @@ void agent_register(DBusConnection *conn, GDBusProxy *manager,
+diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
+index bc9bcfb83ad8..6ffbf0371e0e 100644
+--- a/test/functional/test_bap.py
++++ b/test/functional/test_bap.py
+@@ -32,16 +32,32 @@ def dev_addr(host):
+     return host.bdaddr.upper().replace(":", "_")
  
- 	agent_capability = capability;
  
--	if (!strcasecmp(agent_capability, "auto")) {
-+	if (!strncasecmp(agent_capability, "auto", 4) &&
-+			(!agent_capability[4] || agent_capability[4] == ':')) {
- 		bt_shell_printf("Warning: setting auto response is not secure, "
- 				"it bypass user confirmation/authorization, it "
- 				"shall only be used for test automation.\n");
--		agent_capability = "";
-+		/* The capability to register with can be given after a
-+		 * colon, e.g. auto:NoInputNoOutput, so the pairing does
-+		 * not choose a method the auto response cannot answer,
-+		 * like the entry of a passkey.
-+		 */
-+		if (agent_capability[4])
-+			agent_capability += 5;
-+		else
-+			agent_capability = "";
+-def expect_all(ctl, patterns):
++# Reported when an operation cannot complete, so a test does not have to
++# wait for its timeout to know it is not going to
++FAILURES = [
++    r"(Failed to \w+[^\r\n]*)",
++    r"(Device \S+ not available)",
++]
 +
- 		methods = auto_methods;
- 	}
++
++def expect_all(ctl, patterns, failures=FAILURES):
+     """
+     Expect all the given patterns, in any order, returning the groups
+     each of them matched.
++
++    Fail as soon as one of the failures shows up, e.g. a request that
++    was rejected, instead of waiting for the timeout.
+     """
+     pending = list(enumerate(patterns))
+     groups = [None] * len(patterns)
  
-diff --git a/client/main.c b/client/main.c
-index d8d2e32d9556..4d13fa1b1e1a 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1416,9 +1416,17 @@ static void cmd_agent(int argc, char *argv[])
- 	dbus_bool_t enable;
- 	const char *capability;
+     while pending:
+-        idx, m = ctl.expect([pattern for _, pattern in pending])
++        idx, m = ctl.expect(list(failures) + [pattern for _, pattern in pending])
++
++        if idx < len(failures):
++            raise AssertionError(m[0].decode("utf-8") if m else "failed")
++
++        idx -= len(failures)
+         groups[pending[idx][0]] = m
+         pending.pop(idx)
  
--	if (!parse_argument(argc, argv, agent_arguments, "capability",
--						&enable, &capability))
-+	/* The capability of the auto response is given after a colon,
-+	 * e.g. auto:NoInputNoOutput, so it cannot be looked up in the
-+	 * list of arguments.
-+	 */
-+	if (argc > 1 && !strncasecmp(argv[1], "auto:", 5)) {
-+		enable = TRUE;
-+		capability = argv[1];
-+	} else if (!parse_argument(argc, argv, agent_arguments, "capability",
-+						&enable, &capability)) {
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
+@@ -88,7 +104,12 @@ def pair_le(host0, ctl0, host1, ctl1, advertise=True, services=False):
+     legacy = r"\[agent\].*Passkey:.*m(\d+)"
  
- 	if (enable == TRUE) {
- 		g_free(auto_register_agent);
-@@ -4034,7 +4042,7 @@ static const struct bt_shell_menu main_menu = {
- 							NULL },
- 	{ "discoverable-timeout", "[value]", cmd_discoverable_timeout,
- 					"Set discoverable timeout", NULL },
--	{ "agent",        "<on/off/auto/capability>", cmd_agent,
-+	{ "agent",        "<on/off/auto[:capability]/capability>", cmd_agent,
- 				"Enable/disable agent with given capability",
- 							capability_generator},
- 	{ "default-agent",NULL,       cmd_default_agent,
-diff --git a/doc/bluetoothctl.rst b/doc/bluetoothctl.rst
-index ed4cd0703281..cc58e1f5be19 100644
---- a/doc/bluetoothctl.rst
-+++ b/doc/bluetoothctl.rst
-@@ -301,11 +301,15 @@ for pairing and allows you to choose the IO capabilities of the controller.
- The valid agent capabilities are: DisplayOnly, DisplayYesNo, KeyboardDisplay,
- KeyboardOnly, NoInputNoOutput.
+     while pending:
+-        idx, m = ctl0.expect([legacy] + pending)
++        idx, m = ctl0.expect(FAILURES + [legacy] + pending)
++
++        if idx < len(FAILURES):
++            raise AssertionError(m[0].decode("utf-8") if m else "failed")
++
++        idx -= len(FAILURES)
  
--:Usage: **> agent <on/off/auto/capability>**
-+:Usage: **> agent <on/off/auto[:capability]/capability>**
- :Uses: **org.bluez.AgentManager(5)** method **RegisterAgent**
- :<on/off/auto/capability>: Agent mode - "on", "off", "auto", or capability type (DisplayOnly, DisplayYesNo, KeyboardDisplay, KeyboardOnly, NoInputNoOutput) (required)
- :Example Enable agent with default capability:
- 	| **> agent on**
-+:Example Enable agent answering automatically, only for test automation:
-+	| **> agent auto**
-+:Example Enable agent answering automatically with the given capability:
-+	| **> agent auto:NoInputNoOutput**
- :Example Disable agent:
- 	| **> agent off**
- :Example Enable agent that can only display pairing codes:
+         if idx == 0:
+             warnings.warn(
 -- 
 2.55.0
 
