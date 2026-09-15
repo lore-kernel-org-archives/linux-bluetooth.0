@@ -1,161 +1,375 @@
-Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBF736BCE8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789481577; cv=pass; b=A3UJbehYuYHmsubXZp95lkzm02CU3oQIu4ErD9i2+FRgPwTa5QaY06igNzCA4QWNwACLIBnfKQJAENGyyAW0BxgJCDiQQrznxFKqF/u94tMNXpC92IWWZdk6KoceISL6fuO2wpZG5Pi8Im3TbNCvljoMcl8RtzOjH5Dap9SXiSk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789481577; c=relaxed/simple;
-	bh=GOIj/wh8TpMzTX5lAHQylDSLT6REWsoLA66TfJssIhY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aR3HKainGk9Kro1Lo2oG9j4DLvBUrFHnplXe1u1fLFUhOVAeY935SMXH2EAMfDAYZGvj2tfxMa2KZos9ZNnVTmh9RqRkU8hcesWKqp90hbvsb55GcdO/XsWU89Mi835sy6QRO5i4xP+8wv//T+M+ajxdN7Q0PhK5G2FwpHgpeD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBMVMD/b; arc=pass smtp.client-ip=74.125.224.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB7E3B38B1;
+	Tue, 15 Sep 2026 14:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789482262; cv=none; b=fCJmp3q+8yIr4XQS3BmmK406Gz/USic5pJt8Ueh8XCHORg2GaVv3FfR3b0eez2Jsad3tEhip7PRod4dVRJRW1RFQwWvEXnZj6kR35AR73//4cpzEK942bbX1wBXCEGMRyrtf4tKMFHs9XnVH/Lw/4z3ggPNCkDHlqT0RLnXu3iA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789482262; c=relaxed/simple;
+	bh=Hnopdr7WA9U8EE7N/nJoCFi8vbeDzNHxhN6zZO8yiBg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ohBGSDpkOIs7akGLHBRgqUJHlr+5Uu1cZwhJ9aP41D8c8FXMBT4UgRc3ujDjGuSkbfTaPMXuVVGfKrWGfa7D9htF5S/fPidhks3TYhnnqK29WXTsMKOtGGLJ8yWPzvpg6abspEWss3RS7HlebYklDAvI3AQU6Y2Yi+HmhLWLWxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/8ta70r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBMVMD/b"
-Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e4ab22370so358362d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 07:12:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789481575; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JlubIlbMlT6bnL2iLcteGx9TFYcNHIH/RNHfAixRBCImC/HcV+ojP+USUAise9izXc
-         WWZwLL3QdljULY9C3TuarkYhxGvTL2RTHZln21diRRgucW+RKvqrXHfhKsvhdQuogVq+
-         aPhXtJn71ocIX1aezVO3TN25SNjJcSFn2zj3t5U97QmFwKroksCL9lfR/iMSp3oDg5oY
-         9VNJYYXjQuqHh3rerBzgQvtA/nMAtKkLPlvbEL/ydAwXPMqo+64MmPRAWHYt7068huGI
-         v69EH+EK/Ri2Iknqlak5pGkJCxYGD2CJoPKG1pbffPPWseLIDVyE5/7wfksCrMbboaxz
-         zR5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1NYnDGtx4S3hUcN9F7tPg8j9ZhqHNHLvb5FEYUCdHzQ=;
-        fh=ivpO4PhIkrh3sEqXHPn70/6Ih9P7TT4ugGxFfFNhu8w=;
-        b=ejqG9yycP2HmFWpPrGuHhe2LLOTR6XPez30KI32VN+zuTd2cpyaxUoBlc8ZV727H9A
-         kUnMRNsmfSArpcrPuRTHdmzwLjHJZx/ah2DHx4LHmRpr1VcFV6ERQG0HV7sYmMHeGeU1
-         IpBELE/MirqMwBdVxaDssrtXd7ZXep1WYQWOPMb2vYwdy0dRmQStEMtS7ywbqUWfkSDQ
-         L5DLdRMSK6qxCuZDY9lIrC5L9fGIttwpVF4QwMgdoCP2hDZ7pnHBKCmX48wqVhcfd/vj
-         EhWOoEocCuju39z6ZEwXOJoz5QY9TeVjXTH3RG48pdi12vrDDEh8EBIGg5sPbTiynEeg
-         Hxbw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789481575; x=1790086375; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1NYnDGtx4S3hUcN9F7tPg8j9ZhqHNHLvb5FEYUCdHzQ=;
-        b=gBMVMD/b90KDsg8N9ReLfQCx0nDTs4pkhe0acKIyCzfzujZGt4TVJ5AJnG948sKeyG
-         Y5MzPBl3CvSqEJMuTp/Ragb4zCerGiMEnBTVcyQjQrfvMnAKvUiwqwfuvSY/keHLETh2
-         W+sGxw3tIYqMFvqCSPH0IqX02/UoRYnVjE+nO8RbCntLs4yQalxPaNwgg5O0nTkFKPdj
-         TqzSjc+9rNSmFzXelsxJLGa8+MwwR8yEj2IUUJ8lqurNE6QSJD/SHGLmWkPCsVPE1BN2
-         rbHGhaJFVbE5LfsmX+F46tjtfnx7OxZS47k4+DCloEdjiRaJ2b95MqzDlki77L8ekh5+
-         hcpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789481575; x=1790086375;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1NYnDGtx4S3hUcN9F7tPg8j9ZhqHNHLvb5FEYUCdHzQ=;
-        b=p4y5YabYEcndgVAKyDhdpXNkYf9JlSL+vzRHfberBp8HaM9wxScv11ReN5UwoOV1lD
-         P2Gy5/jt43pHhA7RDPDvQVfMTec08NV3YwwFK8P2XUH0YtMjipXSxbrww9/dd0/xDfrS
-         rmCOU/F0oRHuBLYPWkHt6wdAU9vtfVfd/BAGK5lxii2jmtkTK7lCn7s1ipildftChTtO
-         zNoAzkWtr0qgjFcS2oqJhCHjTw9bxGUbSuxtYiBJ2QaM/UIKWaKxJiMxMtWJaBgcNcfB
-         4r7kJUUypcth1A3oMTSOAG6wT60pkWUYLoSeupT+A2k4BGrPmZUTXUWlHfeySuduHSrM
-         QwEw==
-X-Forwarded-Encrypted: i=1; AKwUvBwxJK7q9p4Qt44lvEGCFmnQ9bu0Cbw8Ec0RRvVYCZC8xTg4wOM2pg7oPsRZzwsvEryiuKnVlbyF09fwiilAVfs=@vger.kernel.org
-X-Gm-Message-State: AFuF++kPgwYTVouHkhNJ/VFB//fpHqK0mxN4m0Xw7txQvRbRN0dV1kbD
-	XIsfipN3JlQF8e/LNEkYMF2BmeYqokIbymShwg4kSNRz+HmjbrbpqMIMdeujnoZ3iBimVBamFNp
-	Of/JBrIxHGwLmItOYWVYVRYa67b7OR70=
-X-Gm-Gg: AYBFou0n0YD/THSKO68r3dRTijtWVLr8blWjwfew4OFEs5/GY+MLyb4KXGoSiz0DA+n
-	0a0a04fOIP7VdphRARXbDHS901ik8+ViI7qyu8lHBPSQpbhu78RCmGnrXVR3z5Eu6rrge8DdqTE
-	pgAXrTiwaQrL9VHy2xSsdGwXEjjvN2rEKiLzhj8LvM9aj+Pn3usKHLjObk9K21hWnUZZQq7Kq6K
-	Oo35d7DFhTyYXVTpyOOemREQ9BkXPAXl7sc370lbliT2cKvU76RRavlOsTsDUUSBJpfmLeP0yog
-	7HJmFVYzAmVFnP9gsqHGtHLf+WGznD8ob0NNgXLkgSvO0Ai8UvLkq9NNv7oZ0XaoagBGdkgsBwp
-	HuGFXBow7zbnmT9DY1iw9wZPv3huq+dF9Nu8lOOPfjQ==
-X-Received: by 2002:a05:690e:4594:20b0:66b:163f:57c3 with SMTP id
- 956f58d0204a3-6715cb260c5mr368015d50.42.1789481574586; Tue, 15 Sep 2026
- 07:12:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/8ta70r"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D946C2BCFC;
+	Tue, 15 Sep 2026 14:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1789482262;
+	bh=Hnopdr7WA9U8EE7N/nJoCFi8vbeDzNHxhN6zZO8yiBg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=Y/8ta70rcaO6avZlbT9MuJYT5Ejjg0NwfsrKXOB7zZQud8lBvoEHKyj5PdhD+nVHb
+	 wklF9T+4rpiezAC5m8mVbCm+Wxmdv6jzYkK2cvPcCQfBZSCBgDC71CjAG3IFUIBgQC
+	 B9QgIlr0D/o7QVIkWGCt09AwHTXG2Z3PBlDnQHhJgY9xF0NsymcQbwg/d8z51GPcw7
+	 WsMA3oW8/wTDPKkMZBmGs9x7jG/upNnVZJjP1K2NWWnI99q2PXNFrYha1JRU/amRQk
+	 3v9dq7oXCOxUGBdJ+ISpbj76SgvK3VCrgcB2qqK11b/MWwHGCLLtrs0A2rfwlieCgh
+	 mCQk9fLM1wPVg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B527C88E53;
+	Tue, 15 Sep 2026 14:24:22 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Tue, 15 Sep 2026 16:24:04 +0200
+Subject: [PATCH 3/5] power: sequencing: pcie-m2: Create auxiliary device
+ for the M.2 BT interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260914-misc_fix-v2-0-6178d838c946@oss.qualcomm.com> <20260914-misc_fix-v2-2-6178d838c946@oss.qualcomm.com>
-In-Reply-To: <20260914-misc_fix-v2-2-6178d838c946@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 15 Sep 2026 10:12:42 -0400
-X-Gm-Features: AcwNN1WOQ6YdQ_AZPzyODQbHVSLQS9HgiYHVZizdb_BYFTX2VeFJBY8ma8WFpkY
-Message-ID: <CABBYNZLMbWgi=tizwOsNwAUjJA0AzpMa6XNrQWkJBGL+PwOWeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Bluetooth: btnxpuart: Fix skb leak in nxp_process_fw_dump()
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Amitkumar Karwar <amitkumar.karwar@nxp.com>, Neeraj Kale <neeraj.sanjaykale@nxp.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260915-pci-m2-bt-rework-v1-3-3c7d9cf9c010@oss.qualcomm.com>
+References: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
+In-Reply-To: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@kernel.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Amitkumar Karwar <amitkumar.karwar@nxp.com>, 
+ Neeraj Kale <neeraj.sanjaykale@nxp.com>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, 
+ linux-pm@vger.kernel.org, Rahul Samana <rahul.samana@oss.qualcomm.com>, 
+ Wei Deng <wei.deng@oss.qualcomm.com>, 
+ Loic Poulain <loic.poulain@oss.qualcomm.com>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9879;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=ysdYQzQTS6vV5RimaY4+yjdKUGeSc5gOn2WXxQ/9ltg=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBqqVUSc4FVnWW9dvtIIVeOclToM1k8bzAypjESU
+ i2EyBGGkQ6JATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaqlVEgAKCRBVnxHm/pHO
+ 9Q5GB/wNCfs5K5guix1U95aAVoWht4Lu1gHZBDY3WjE5+zxFf9nOqf578hPwLgJtKGy0BjYTi3b
+ Jmfg8Kcx8nzV7E0GZdbTvynVtw/PQtv9lTyzWYNBT0zPtg3+SDRYmy6GgPn/Zee90SX04SaJYRr
+ MGrEtN1q7oYKLQ8O7nW5mphnUcyEet5/KXygAQYVOQUtJukxtIw9bYpoq+P/WUnXmoCp9FHe2yf
+ SPI16DfUgHVosjZeF6OVH8sZoYpBKvrJxB6Zd/VAdM1mrbVqAqZt1S/Sv4jpgsgnBpX13nDXWTT
+ MubVjkOVSatWDHA8Fi3wLNPn8wUI59WH36EQy5BPgS8x0tej
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-Hi Zijun,
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-On Tue, Sep 15, 2026 at 1:41=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com=
-> wrote:
->
-> When CONFIG_DEV_COREDUMP=3Dn, hci_devcd_append() returns -EOPNOTSUPP
-> without freeing its skb argument. This leaks the cloned skb and also
-> prevents nxp_set_ind_reset() from being called to perform recovery.
->
-> Fix by guarding hci_devcd_append(hdev, skb_clone(skb, GFP_ATOMIC)) with
-> CONFIG_DEV_COREDUMP.
->
-> Fixes: 998e447f443f ("Bluetooth: btnxpuart: Add support for HCI coredump =
-feature")
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> ---
->  drivers/bluetooth/btnxpuart.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
-c
-> index 69e897444112..a0b64fdcbcc1 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -1383,19 +1383,21 @@ static int nxp_process_fw_dump(struct hci_dev *hd=
-ev, struct sk_buff *skb)
->                 err =3D hci_devcd_init(hdev, NXP_FW_DUMP_SIZE);
->                 if (err < 0)
->                         goto free_skb;
->
->                 schedule_delayed_work(&hdev->dump.dump_timeout,
->                                       msecs_to_jiffies(20000));
->         }
->
-> +#ifdef CONFIG_DEV_COREDUMP
->         err =3D hci_devcd_append(hdev, skb_clone(skb, GFP_ATOMIC));
->         if (err < 0)
->                 goto free_skb;
-> +#endif
+Currently, the driver instantiates the BT interface of the WCN6855 and
+WCN7850 combo modules by creating a devicetree node at runtime using an
+of_changeset, with the compatible passed through the PCI ID table. But this
+method of creating a devicetree node just for matching with the driver is
+not recommended.
 
-I guess IS_ENABLED is preferable here so the code is still compiled in
-leaving it up to the compiler to remove it in case it is considered
-dead code.
+So create an auxiliary device for the BT interface instead. The serdev
+transport is still allocated here and handed over to the Bluetooth driver
+through the auxiliary device, along with the power sequencing target used
+to power up the controller. Also extend the provider match so that the
+auxiliary device created for this connector is matched as its power
+sequencing consumer.
 
->
->         if (buf_len =3D=3D 0) {
->                 bt_dev_warn(hdev, "=3D=3D=3D=3D FW dump complete =3D=3D=
-=3D");
->                 hci_devcd_complete(hdev);
->                 nxp_set_ind_reset(hdev, NULL);
->         }
->
->  free_skb:
->
-> --
-> 2.34.1
->
+Since the runtime node creation is now gone, select AUXILIARY_BUS in
+place of OF_DYNAMIC.
+
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+ drivers/power/sequencing/Kconfig          |   2 +-
+ drivers/power/sequencing/pwrseq-pcie-m2.c | 137 ++++++++++++++++--------------
+ 2 files changed, 75 insertions(+), 64 deletions(-)
+
+diff --git a/drivers/power/sequencing/Kconfig b/drivers/power/sequencing/Kconfig
+index 1c5f5820f5b7..2943af5db135 100644
+--- a/drivers/power/sequencing/Kconfig
++++ b/drivers/power/sequencing/Kconfig
+@@ -40,7 +40,7 @@ config POWER_SEQUENCING_PCIE_M2
+ 	depends on OF
+ 	depends on PCI
+ 	depends on SERIAL_DEV_BUS
+-	select OF_DYNAMIC
++	select AUXILIARY_BUS
+ 	help
+ 	  Say Y here to enable the power sequencing driver for PCIe M.2
+ 	  connectors. This driver handles the power sequencing for the M.2
+diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
+index bee1aa0e077d..9e485641695c 100644
+--- a/drivers/power/sequencing/pwrseq-pcie-m2.c
++++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
+@@ -4,16 +4,18 @@
+  * Author: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+  */
+ 
++#include <linux/auxiliary_bus.h>
+ #include <linux/device.h>
+ #include <linux/delay.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/idr.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/of_graph.h>
+-#include <linux/of_platform.h>
+ #include <linux/pci.h>
+ #include <linux/platform_device.h>
++#include <linux/pwrseq/pcie-m2-bt.h>
+ #include <linux/pwrseq/provider.h>
+ #include <linux/regulator/consumer.h>
+ #include <linux/serdev.h>
+@@ -21,7 +23,7 @@
+ 
+ struct pwrseq_pci_dev {
+ 	struct serdev_device *serdev;
+-	struct of_changeset *ocs;
++	struct pcie_m2_bt_auxdev *bt;
+ 	struct pci_dev *pdev;
+ 	struct list_head list;
+ };
+@@ -196,6 +198,14 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
+ 	struct pwrseq_pcie_m2_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
+ 	struct device_node *endpoint __free(device_node) = NULL;
+ 
++	/*
++	 * The Bluetooth function is represented by an auxiliary device created
++	 * by this driver. It has no OF node, so match it by verifying that it
++	 * is a child of this connector.
++	 */
++	if (dev_is_auxiliary(dev) && dev->parent == ctx->dev)
++		return PWRSEQ_MATCH_OK;
++
+ 	/*
+ 	 * Traverse the 'remote-endpoint' nodes and check if the remote node's
+ 	 * parent matches the OF node of 'dev'.
+@@ -210,78 +220,86 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
+ 	return PWRSEQ_NO_MATCH;
+ }
+ 
++/*
++ * The Bluetooth interface of a supported module is exposed as an auxiliary
++ * device. Its name (combined with this driver's module name) is matched by
++ * the Bluetooth driver. Store that name as the PCI ID driver data.
++ */
+ static const struct pci_device_id pwrseq_m2_pci_ids[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL_EXT, 0x2b43),
+-	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
++	  .driver_data = (kernel_ulong_t)"88w8987-bt" },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_PHILIPS, 0x3003),
+-	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
++	  .driver_data = (kernel_ulong_t)"88w8987-bt" },
+ 	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x1103, PCI_VENDOR_ID_QCOM, 0x0108),
+-	  .driver_data = (kernel_ulong_t)"qcom,qca2066-bt" },
++	  .driver_data = (kernel_ulong_t)"qca2066-bt" },
+ 	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x1103, PCI_VENDOR_ID_FOXCONN, 0xe105),
+-	  .driver_data = (kernel_ulong_t)"qcom,wcn6855-bt" },
++	  .driver_data = (kernel_ulong_t)"wcn6855-bt" },
+ 	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x1103, PCI_VENDOR_ID_QCOM, 0x337e),
+-	  .driver_data = (kernel_ulong_t)"qcom,wcn6855-bt" },
++	  .driver_data = (kernel_ulong_t)"wcn6855-bt" },
+ 	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_QCOM, 0x1107, PCI_VENDOR_ID_QCOM, 0x337c),
+-	  .driver_data = (kernel_ulong_t)"qcom,wcn7850-bt" },
++	  .driver_data = (kernel_ulong_t)"wcn7850-bt" },
+ 	{ } /* Sentinel */
+ };
+ 
+-static int pwrseq_pcie_m2_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
++static DEFINE_IDA(pwrseq_pcie_m2_bt_ida);
++
++static void pwrseq_pcie_m2_bt_release(struct device *dev)
++{
++	struct pcie_m2_bt_auxdev *bt =
++		to_pcie_m2_bt_auxdev(to_auxiliary_dev(dev));
++
++	ida_free(&pwrseq_pcie_m2_bt_ida, bt->adev.id);
++	kfree(bt);
++}
++
++static int pwrseq_pcie_m2_create_bt_aux(struct pwrseq_pcie_m2_ctx *ctx,
+ 					struct pwrseq_pci_dev *pci_dev,
+-					struct device_node *parent,
+ 					struct pci_dev *pdev)
+ {
+ 	const struct pci_device_id *id;
+ 	struct device *dev = ctx->dev;
+-	const char *compatible;
+-	struct device_node *np;
++	struct pcie_m2_bt_auxdev *bt;
+ 	int ret;
+ 
+ 	id = pci_match_id(pwrseq_m2_pci_ids, pdev);
+ 	if (WARN_ON_ONCE(!id)) /* Shouldn't happen */
+ 		return -ENODEV;
+ 
+-	compatible = (const char *)id->driver_data;
+-
+-	pci_dev->ocs = kzalloc_obj(*pci_dev->ocs);
+-	if (!pci_dev->ocs)
++	bt = kzalloc_obj(*bt);
++	if (!bt)
+ 		return -ENOMEM;
+ 
+-	of_changeset_init(pci_dev->ocs);
++	ret = ida_alloc(&pwrseq_pcie_m2_bt_ida, GFP_KERNEL);
++	if (ret < 0)
++		goto err_free_bt;
+ 
+-	np = of_changeset_create_node(pci_dev->ocs, parent, "bluetooth");
+-	if (!np) {
+-		dev_err(dev, "Failed to create bluetooth node\n");
+-		ret = -ENODEV;
+-		goto err_destroy_changeset;
+-	}
++	bt->serdev = pci_dev->serdev;
++	bt->pwrseq_target = "uart";
++	bt->adev.id = ret;
++	bt->adev.name = (const char *)id->driver_data;
++	bt->adev.dev.parent = dev;
++	bt->adev.dev.release = pwrseq_pcie_m2_bt_release;
+ 
+-	ret = of_changeset_add_prop_string(pci_dev->ocs, np, "compatible", compatible);
+-	if (ret) {
+-		dev_err(dev, "Failed to add bluetooth compatible: %d\n", ret);
+-		goto err_destroy_changeset;
+-	}
++	ret = auxiliary_device_init(&bt->adev);
++	if (ret)
++		goto err_free_ida;
+ 
+-	ret = of_changeset_apply(pci_dev->ocs);
++	ret = auxiliary_device_add(&bt->adev);
+ 	if (ret) {
+-		dev_err(dev, "Failed to apply changeset: %d\n", ret);
+-		goto err_destroy_changeset;
++		dev_err(dev, "Failed to add bluetooth auxiliary device: %d\n",
++			ret);
++		auxiliary_device_uninit(&bt->adev);
++		return ret;
+ 	}
+ 
+-	ret = device_add_of_node(&pci_dev->serdev->dev, np);
+-	if (ret) {
+-		dev_err(dev, "Failed to add OF node: %d\n", ret);
+-		goto err_revert_changeset;
+-	}
++	pci_dev->bt = bt;
+ 
+ 	return 0;
+ 
+-err_revert_changeset:
+-	of_changeset_revert(pci_dev->ocs);
+-err_destroy_changeset:
+-	of_changeset_destroy(pci_dev->ocs);
+-	kfree(pci_dev->ocs);
+-	pci_dev->ocs = NULL;
++err_free_ida:
++	ida_free(&pwrseq_pcie_m2_bt_ida, bt->adev.id);
++err_free_bt:
++	kfree(bt);
+ 
+ 	return ret;
+ }
+@@ -329,17 +347,17 @@ static int pwrseq_pcie_m2_create_serdev_one(struct pwrseq_pcie_m2_ctx *ctx,
+ 		goto err_free_pci_dev;
+ 	}
+ 
+-	ret = pwrseq_pcie_m2_create_bt_node(ctx, pci_dev, serdev_parent, pdev);
+-	if (ret)
+-		goto err_free_serdev;
+-
+ 	ret = serdev_device_add(pci_dev->serdev);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to add serdev for PCI device (%s): %d\n",
+ 			pci_name(pdev), ret);
+-		goto err_free_dt_node;
++		goto err_free_serdev;
+ 	}
+ 
++	ret = pwrseq_pcie_m2_create_bt_aux(ctx, pci_dev, pdev);
++	if (ret)
++		goto err_remove_serdev;
++
+ 	serdev_controller_put(serdev_ctrl);
+ 
+ 	pci_dev->pdev = pci_dev_get(pdev);
+@@ -350,15 +368,11 @@ static int pwrseq_pcie_m2_create_serdev_one(struct pwrseq_pcie_m2_ctx *ctx,
+ 
+ 	return 0;
+ 
+-err_free_dt_node:
+-	device_remove_of_node(&pci_dev->serdev->dev);
+-	of_changeset_revert(pci_dev->ocs);
+-	of_changeset_destroy(pci_dev->ocs);
+-	kfree(pci_dev->ocs);
+-	pci_dev->ocs = NULL;
++err_remove_serdev:
++	serdev_device_remove(pci_dev->serdev);
++	goto err_free_pci_dev;
+ err_free_serdev:
+ 	serdev_device_put(pci_dev->serdev);
+-	pci_dev->serdev = NULL;
+ err_free_pci_dev:
+ 	kfree(pci_dev);
+ err_put_ctrl:
+@@ -370,16 +384,13 @@ static int pwrseq_pcie_m2_create_serdev_one(struct pwrseq_pcie_m2_ctx *ctx,
+ static void __pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx,
+ 					   struct pwrseq_pci_dev *pci_dev)
+ {
+-	if (pci_dev->serdev) {
+-		device_remove_of_node(&pci_dev->serdev->dev);
+-		serdev_device_remove(pci_dev->serdev);
++	if (pci_dev->bt) {
++		auxiliary_device_delete(&pci_dev->bt->adev);
++		auxiliary_device_uninit(&pci_dev->bt->adev);
+ 	}
+ 
+-	if (pci_dev->ocs) {
+-		of_changeset_revert(pci_dev->ocs);
+-		of_changeset_destroy(pci_dev->ocs);
+-		kfree(pci_dev->ocs);
+-	}
++	if (pci_dev->serdev)
++		serdev_device_remove(pci_dev->serdev);
+ 
+ 	pci_dev_put(pci_dev->pdev);
+ 	list_del(&pci_dev->list);
+@@ -526,6 +537,7 @@ static int pwrseq_pcie_m2_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	platform_set_drvdata(pdev, ctx);
++	ctx->dev = dev;
+ 	ctx->of_node = dev_of_node(dev);
+ 	ctx->pdata = device_get_match_data(dev);
+ 	if (!ctx->pdata)
+@@ -573,7 +585,6 @@ static int pwrseq_pcie_m2_probe(struct platform_device *pdev)
+ 
+ 	mutex_init(&ctx->list_lock);
+ 	INIT_LIST_HEAD(&ctx->pci_devices);
+-	ctx->dev = dev;
+ 
+ 	/* Create serdev for available PCI devices (if required) */
+ 	ret = pwrseq_pcie_m2_create_serdev(ctx);
+
+-- 
+2.43.0
 
 
---=20
-Luiz Augusto von Dentz
