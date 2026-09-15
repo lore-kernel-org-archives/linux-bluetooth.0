@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vs2-f41.google.com (mail-vs2-f41.google.com [74.125.227.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B674A3F1A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7BE4A4EE2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506943; cv=none; b=eqD9WzOvDYk7yTUosO/m16xIDTuniK+YCI2zpr9NER4kyMAzLwaSGtsLGFcXOAYyC+mPgvq3xzXQyB2TyaUU4Nkpz+/mKOQDEBLUEz5GMzEp1OpQvx4PVcaqo3upSgUkozHT1rWjSGDqokCsW3XZb4hGTehBqfyNkxUdWmsTm0s=
+	t=1789506944; cv=none; b=Ge5aKUqKqgK65zlF1C0W/dqkXu3QamuPPIZ6MWYS7fmehUZYcFd/ZiofdD0QkjVDWlT28JA5oDvFRNBDcltyXJzWbPcutlrO6/L3ZjJs47trE9dr3Z+ulGFrmAq3U4hnX+h7zUADR4CFzUTaUHnCeUPdoCOb6cmQAGZ9Go2Pcj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506943; c=relaxed/simple;
-	bh=zlW+XRl+AYVqvlq0mdcdUWuS1TWT6VyeWpaKiRczB1g=;
+	s=arc-20240116; t=1789506944; c=relaxed/simple;
+	bh=ZuGhiAytHycMa++qYNaPTdqI3QYvmu31YULopbcIPkM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cCwQ//7wywThAKfO0tqbqPQ2QRRDISKQORDofzrjiNyGHYMgFJJQh8ycrpZA8akJLSl1uDSJ6zywoQ6Lc4Da9xvVE7UG8lcZ3nkHg1z2jqdWywo3EyC/loE85fHwicMdT2rKICS+t08KAkmKAFDg9lW7C2fZGpyN2kKklsvgkh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mM4S2eQm; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=Qz//me3REKonhGVV/8E+vo0QKEMvJ8Ng9eL9fl6anTSTtACfsSOEO+jSHiewcH2vRoJaN3lgYbIApboEWatnRh135K1Um2nlfHSYNoaxNKfRJ75IafyQTq3w2ypUMoPlNgMoB3ag+dhOtOwMGZ6/5f7TIjWJAZasbjiLx/E0lMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V/PUdX4w; arc=none smtp.client-ip=74.125.227.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mM4S2eQm"
-Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-79028ca9371so70124137.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V/PUdX4w"
+Received: by mail-vs2-f41.google.com with SMTP id ada2fe7eead31-78564319a92so63901137.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506940; x=1790111740; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789506941; x=1790111741; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=i5wLl5edHCUxi+Fo+xKoCx9sBanZy8+ppk8KiIZyNCE=;
-        b=mM4S2eQmh5HU0MDJtGHNDzMdUBEQ2deFT3Bhb3Y/JeaQuDZqptB/NtCCe/GLmHo0nk
-         nYEBxcX9qsG22KRDzKuyPMRN7kOwE6N54H80DzrRXD9IB8sJ3HUQ2z3Y/syj1GXmmm7O
-         kuzCL2UkDOjuT/9mDc/EUjFAY+MNfuOdL/vtmjdys3hzapPDRRGcM6SBoasyKIfZEdws
-         IZ9vBEq4YtQS7EE2hXWExgbUGT0SpK28j/cbvbkuVPVoSx3yvm2M4ZkNk/WaPQInVB7J
-         rVQFRR8ZZVdvR1mHSvaEvfZtXASU8H6HRqMp/k//ajOqDj1228N3Q2cmwIRddF7mzPWg
-         D30A==
+        bh=P0w/94cSyG9sgIkFkG56EtF53YBl2X3wnRflfpaD64E=;
+        b=V/PUdX4wXTm1DhvgPwcEiv8hVr0uj6v/s9jgrysqb8ydIvjhHe/EV9OrEbVBDhvJRk
+         bbdnfn9GQ+vQY/+/XEQdhIFaR9Vn0QAl6Xmhl9wW5VrjC4+Z9E8GMopgKvNC5tUn2mLy
+         6eZjsQdrDOfg5q/qiIPEKkeNMoy32c4Dg89iRlPmAe+/BO111iElg5j/4V9EIlNLAUJM
+         bWQoTm5+McjLmQWAQrzovZ51d0xQCwU3Y3No/C0eB+GytQGDfaPnxSwTwEX11BeWC3p1
+         gUn5TL22xJ+bTYZPoyz3YCuPWkA4nbkvnJvawhCLmhWZ1X9LNZgO1Vj2r6vnvc9KqZUF
+         NKSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506940; x=1790111740;
+        d=1e100.net; s=20260707; t=1789506941; x=1790111741;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=i5wLl5edHCUxi+Fo+xKoCx9sBanZy8+ppk8KiIZyNCE=;
-        b=aB8iFNHwILZjH5wm3IT8gIEQvcaSoixLgsq8eF56EPSCgcr5Qe6Vkj01TIJyrVxKL8
-         WGCC0yEkwsuUZyV0ZjH0vF2TXtcGM/7aPnwWPu03cBULEu4CtnaRtkZ+6nrerXoRMG1n
-         pMt8PlhLvwCXd2KVSsAjShWCQgWT0EQ1vcHyW/i1rDCvY48a3ovZYgks6PfgSc0nHHlp
-         P0PT5/+kdmIX/XuxX9V/Nmy9aOwYuf48sw5ivFC7baRXX/E6bPgMChO6DCYbFs1+SAEh
-         uDchSkBWAz9+UQhTDEUPqu0XsW+CmudXazNo91JPG0ZFSH9sstX2AH0k2iau0hxvAefM
-         CRVA==
-X-Gm-Message-State: AFuF++mvn8yaxLFDqeW1NectL0y+2mtYh5z7zGdDq7qtTvop6uAzj4Gv
-	ZmXN7+zy+uFLGwm/sguPxe/+ACSb+QoHIdbC1SwEbYWXZzs8/jSVTquDfHxkGa5o
-X-Gm-Gg: AYBFou1AB2ern0eKuxgdYvDm3j6uYeb3dPdeYQxiTsGhYoRLHfKcjAU9FpZAchgxVgY
-	oTwPGMzptvVFo6SMSfiutix6KK+4xN1NbIjMpJ3gnYzXPDF6wA+EbrIQNN+2GryTsGwj8ISTZ3m
-	l/d7FDf71SVFIi1nJjX8KmUJCxpI2s9r0CzqEYU0q6+4l+5P2DbY2gir9jTcfnIOtj0e/2fVJIK
-	HFkK3jt2lGcONMCsOcMHFES2rda5rmZDC/sKx2y+x/YG7tyej32gTq7UF3BHiJeHfyrl42IP7yj
-	A7tIA6cH4FD0LzEVpNc1kFKZ+UL6Wvx8XummhpF73jYftAr3WrIpK7SST5PeKHsPTKb/RQa2WlG
-	zV3kqhmc4PF0wlwjErcylRBZPOFEWA4CWZklj0NWL3mZisfvZkB+hxyZillJL8GMkiiUPtMmYTh
-	DDZ8SxqjsHC/sufKpdwcnF6HTLhAVKFmWWjiYz7dm4CColKCoSQnY0CKRE9EvwQxY3Gx2aZ3nJ+
-	a39n0FRNfKAWWY29V4SNqoLZMtarud7fuIWq1HR61OG0NwFUrTBu4tVVTsKAR7Dvs64WF19tMJc
-X-Received: by 2002:a05:6102:c49:b0:79f:7e2e:c64d with SMTP id ada2fe7eead31-7a027701bf0mr442822137.7.1789506940027;
+        bh=P0w/94cSyG9sgIkFkG56EtF53YBl2X3wnRflfpaD64E=;
+        b=sDSbuYOVGDocCQ7OFLIEwhwR0h6Af5I3Be2yaNog+RocR2vtf5eKwga01nESblnpxe
+         T3XHB3hwgEzOxh0TxiwA98aeSB6aK7RVp40DuRAP6DYdfbvU6FksHhBehl3aZ25LfSwi
+         xeCGLobvjd7lEhQPlvUwEq/3chtCZy8aJUkz5dkyy1tOqgVCNTifjv29EP8YTd4QwjmT
+         HF/5tsEpQi0RHQgRVsF8j1oR0C6OxjQ87Y94bomdood8FY7us7NVhUJPpt9f95tCCc86
+         dj1vivQX5YRZt14lPQGQnqQ25J4h0cEMpyop4sPed347BnCKYpn+S1HAC/jbokZd/Igr
+         v/dg==
+X-Gm-Message-State: AFuF++ni3p49eQ7say5+diRLZl359+shP8eK25AjvhDkTjjdG3FiIAky
+	7XMinGmG0WoGzOoe4vpscqwzOPltfH+J3V0/p/vK0YBOQ/6hVP3Vtd9dXllvKvnb
+X-Gm-Gg: AYBFou0d2AiQe/r8ruVUXtGQnsOW8JvpGjoP/HcDOniJLKbnGrTv/1OTI+79VQxOPfB
+	nQvt4SqMftaaGU1NylQrk7CNY6yRoRLftWKMow2pS0GncSXvZMj2RYGPiPZzKk5NeypVEiBIlvM
+	ClTlKO8pfoMBGLGXZTKH4mFGxOyexaKnngOCfaJsiIQUQ0/lsHdk7tHyTk8IJqppyd7KED78oA9
+	xkw5jT3wHHXiyBSowGmHf8cbUvkLo4npat30l1s/sHqr5F8vPcEhrbr7W6eJEzG5/2BTRVy/8DH
+	wcs2plj2V9MT7V+4L2ExiwKfemNqM+9Vv42XupBJ7Pj0WiJ2v+Ko65A0YpoIxIJlWmuMSebz/FZ
+	6oZ0hiEd135H5vo7Tzm4QXcnsejYiI3lafMxH82Tqlie12RX/DpRA2zyUTteoMytlgqXrnXPaJB
+	EDoSVIRwikDPtiWH+kI429bEI/tN9d6vDG15p+m0phggdj2ZxZqjt1/MgZZR9xackJ7uwh/zDhr
+	p//g7Y+MGUKIH0enjCjoIc300N/LgTXC2C5hT+hjQGD/Ak4g9UWJEAld/dE0LYycE9T3TtCOAeN
+X-Received: by 2002:a05:6102:5493:b0:789:5f54:2367 with SMTP id ada2fe7eead31-7a026088a71mr427988137.4.1789506940831;
         Tue, 15 Sep 2026 14:15:40 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.39
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:39 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:40 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 02/11] bass: wait for the session to be ready before pushing a source
-Date: Tue, 15 Sep 2026 17:15:19 -0400
-Message-ID: <20260915211528.1223784-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 03/11] test: functional: report what a test is waiting for
+Date: Tue, 15 Sep 2026 17:15:20 -0400
+Message-ID: <20260915211528.1223784-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260915211528.1223784-1-luiz.dentz@gmail.com>
 References: <20260915211528.1223784-1-luiz.dentz@gmail.com>
@@ -77,224 +77,257 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-A Broadcast Assistant could write to the Broadcast Audio Scan Control
-Point of a Scan Delegator before its own session had enabled the
-Broadcast Receive State notifications, as the connection was completed
-as soon as the session was attached.
+A test that is stuck gives no clue about what it is waiting for until it
+times out, which makes it hard to tell a slow test from a hung one.
 
-When that happens the delegator handles the Add Source, sets the state
-to request the sync info to be transferred, and notifies it, but the
-notification is dropped since the assistant has not subscribed yet. The
-assistant never learns it has to transfer the sync info, so PAST never
-happens, and the delegator is left waiting for it until the kernel
-gives up, which takes 20 seconds, and falls back to creating the sync
-itself.
+Report the calls that take too long, along with how much of their
+timeout is left. When the terminal can be updated in place the report is
+refreshed as it goes and erased once the call completes, so only the
+waits that are actually slow are visible. The workers of pytest-xdist
+share the terminal, and none of them can update a line of its own, so
+they report whole lines instead, prefixed with the worker they come
+from.
 
-Complete the connection only once the session is ready, and queue any
-push received in the meantime, replaying it afterwards, so it is not
-rejected just because the user was quick.
-
-With this the sync info is transferred right after the Add Source, and
-test_bass_past_transport_acquire consistently takes around 11 seconds
-instead of intermittently taking over 40 seconds when the transfer was
-missed.
+The report goes to the terminal directly, as pytest captures the output
+at file descriptor level, and is disabled when there is none, e.g. under
+CI, or with --progress=no.
 
 Assisted-by: opencode:claude-opus-5
 ---
- profiles/audio/bass.c | 124 +++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 109 insertions(+), 15 deletions(-)
+ test/functional/conftest.py | 201 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 201 insertions(+)
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 533d45babfeb..c9a9111e010f 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -94,6 +94,14 @@ struct bass_data {
- 	unsigned int cp_id;
- 	unsigned int bis_id;
- 	unsigned int state_id;
-+	unsigned int ready_id;
-+	bool ready;
-+	struct queue *pushes;
-+};
-+
-+struct bass_push {
-+	struct bass_assistant *assistant;
-+	DBusMessage *msg;
- };
+diff --git a/test/functional/conftest.py b/test/functional/conftest.py
+index ce6301319031..4e0bda882de3 100644
+--- a/test/functional/conftest.py
++++ b/test/functional/conftest.py
+@@ -2,9 +2,14 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ import os
+ import re
++import sys
++import threading
++import time
+ from pathlib import Path
+ import pytest
  
- struct bass_assistant {
-@@ -1218,10 +1226,31 @@ static DBusMessage *push_add_src(struct bass_assistant *assistant,
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
++from pytest_bluezenv import rpc, utils
++
+ from .le_utils import host_setup_is_le, pair_le
  
-+static DBusMessage *push_src(struct bass_assistant *assistant,
-+							DBusMessage *msg)
-+{
-+	if (assistant->state == ASSISTANT_STATE_ACTIVE) {
-+		return push_mod_src(assistant, msg);
-+	} else if (assistant->state == ASSISTANT_STATE_LOCAL) {
-+		struct bass_src *src;
-+
-+		src = queue_find(assistant->srcs, match_src_data,
-+						assistant->data->bass);
-+		if (src) {
-+			assistant->src_id = src->src_id;
-+			return push_mod_src(assistant, msg);
-+		}
-+	}
-+
-+	return push_add_src(assistant, msg);
-+}
-+
- static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
- 							  void *user_data)
- {
- 	struct bass_assistant *assistant = user_data;
-+	struct bass_data *data;
-+	struct bass_push *push;
- 	DBusMessageIter props, dict;
  
- 	DBG("");
-@@ -1240,20 +1269,25 @@ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_invalid_args(msg);
- 	}
+@@ -15,15 +20,211 @@ def pytest_addoption(parser):
+         default=None,
+         help=("List tests"),
+     )
++    parser.addoption(
++        "--progress",
++        action="store",
++        default=None,
++        choices=["yes", "no"],
++        help=("Show what a test is waiting for (default: yes on a tty)"),
++    )
++
++
++# Wait for this long before reporting what a call is waiting for, so the
++# calls that complete right away do not produce any output
++PROGRESS_DELAY = 1.0
++PROGRESS_INTERVAL = 0.25
++
++# When the line cannot be updated in place the report is repeated at this
++# interval instead, and only once the call is taking clearly too long
++PROGRESS_LINE_DELAY = 5.0
++PROGRESS_LINE_INTERVAL = 10.0
++
++PROGRESS_STREAM = None
++
++
++class Status:
++    """
++    Status line telling what a test is waiting for, updated in place by
++    the terminal reporter of pytest so the report it writes itself is
++    left alone.
++    """
++
++    def __init__(self, reporter):
++        self.reporter = reporter
++        self.shown = False
++
++    def show(self, text):
++        # Leave the line pytest is on, so what it reports there is not
++        # overwritten by the status. Nothing is written when the line
++        # is already one of ours.
++        if not self.shown:
++            self.reporter.ensure_newline()
++            self.shown = True
++
++        self.reporter.rewrite(text, erase=True, light=True)
++
++    def clear(self):
++        if not self.shown:
++            return
++
++        self.reporter.rewrite("", erase=True)
++        self.shown = False
++
++
++def _progress_desc(name, method, a):
++    """
++    Describe what a call is waiting for, e.g.
++
++        host.0.1: pexpect.expect 'Pairing successful'
++    """
++    if method == "call_plugin" and len(a) > 1:
++        plugin, func, args = a[0], a[1], a[2:]
++
++        # Drop the identifier of the spawned process, if any
++        if args and isinstance(args[0], int):
++            args = args[1:]
++
++        desc = f"{plugin}.{func}"
++    else:
++        desc, args = str(method), a
++
++    if args:
++        arg = args[0]
++        # Calls running something on a host pass the function itself
++        arg = getattr(arg, "__name__", None) or str(arg)
++        if len(arg) > 60:
++            arg = arg[:57] + "..."
++        desc = f"{desc} {arg!r}"
++
++    return f"{name}: {desc}" if name else desc
++
++
++def _progress_status(elapsed, timeout):
++    if timeout:
++        left = max(0.0, timeout - elapsed)
++        return f"{elapsed:.0f}s, {left:.0f}s left"
++
++    return f"{elapsed:.0f}s"
++
++
++def _progress_run(status, desc, timeout, done, stream=None, prefix=""):
++    start = time.monotonic()
++    next_line = PROGRESS_LINE_DELAY
++
++    while not done.wait(PROGRESS_INTERVAL if status else 0.5):
++        elapsed = time.monotonic() - start
++
++        if status:
++            if elapsed < PROGRESS_DELAY:
++                continue
++
++            status.show(f"waiting {desc} [{_progress_status(elapsed, timeout)}]")
++            continue
++
++        # The line cannot be updated in place, so report it as it goes
++        if elapsed < next_line:
++            continue
++
++        next_line = elapsed + PROGRESS_LINE_INTERVAL
++        stream.write(
++            f"{prefix}waiting {desc}" f" [{_progress_status(elapsed, timeout)}]\n"
++        )
++        stream.flush()
++
++    if status:
++        status.clear()
++
++
++def _progress_call(orig, status=None, stream=None, prefix=""):
++    def call(self, method, *a, **kw):
++        # The timeout of the calls waiting for something on a host is the
++        # one used by the plugin serving them
++        timeout = kw.get("timeout")
++        if not timeout and method == "call_plugin" and "expect" in a[:2]:
++            timeout = utils.DEFAULT_TIMEOUT
++
++        name = getattr(self.log, "name", "")
++        name = name[len("rpc.") :] if name.startswith("rpc.") else ""
++
++        done = threading.Event()
++        progress = threading.Thread(
++            target=_progress_run,
++            args=(status, _progress_desc(name, method, a), timeout, done),
++            kwargs={"stream": stream, "prefix": prefix},
++            daemon=True,
++        )
++        progress.start()
++
++        try:
++            return orig(self, method, *a, **kw)
++        finally:
++            done.set()
++            progress.join()
++
++    return call
++
++
++def _setup_progress(config):
++    """
++    Report what a test is waiting for, so it is possible to tell when one
++    is taking longer than it should.
++    """
++    global PROGRESS_STREAM
++
++    if config.option.progress == "no":
++        return
++
++    # The workers of pytest-xdist run in their own process and share the
++    # terminal with each other and with the controller reporting the
++    # results, so none of them can update a line of its own: report the
++    # calls taking too long as whole lines instead
++    worker = getattr(config, "workerinput", None)
++
++    if not worker:
++        reporter = config.pluginmanager.get_plugin("terminalreporter")
++
++        # No markup means no terminal to update a line on, e.g. when the
++        # output is redirected or under CI
++        if not reporter or not reporter.hasmarkup:
++            return
++
++        rpc.Connection.call = _progress_call(
++            rpc.Connection.call, status=Status(reporter)
++        )
++        return
++
++    # The output of a worker is captured at file descriptor level and
++    # forwarded to the controller, so it goes to the terminal directly
++    try:
++        PROGRESS_STREAM = open("/dev/tty", "w", buffering=1)
++    except OSError:
++        # Not running from a terminal, e.g. under CI
++        return
++
++    rpc.Connection.call = _progress_call(
++        rpc.Connection.call,
++        stream=PROGRESS_STREAM,
++        prefix=f"[{worker['workerid']}] ",
++    )
  
--	if (assistant->state == ASSISTANT_STATE_ACTIVE) {
--		return push_mod_src(assistant, msg);
--	} else if (assistant->state == ASSISTANT_STATE_LOCAL) {
--		struct bass_src *src;
-+	/* Wait for the session to be ready before writing to the control
-+	 * point, otherwise the Broadcast Receive State notifications may not
-+	 * be enabled yet and the state changes it triggers, e.g. a request to
-+	 * transfer the sync info, would be missed.
-+	 */
-+	data = queue_find(sessions, match_bass, assistant->data->bass);
-+	if (data && !data->ready) {
-+		DBG("Session not ready, queueing request");
  
--		src = queue_find(assistant->srcs, match_src_data,
--						assistant->data->bass);
--		if (src) {
--			assistant->src_id = src->src_id;
--			return push_mod_src(assistant, msg);
--		}
-+		push = new0(struct bass_push, 1);
-+		push->assistant = assistant;
-+		push->msg = dbus_message_ref(msg);
+ def pytest_configure(config):
++    _setup_progress(config)
 +
-+		queue_push_tail(data->pushes, push);
-+
-+		return NULL;
- 	}
+     if config.option.list:
+         config.option.reportchars = "A"
+         config.option.no_header = True
+         config.option.verbose = -2
  
--	return push_add_src(assistant, msg);
-+	return push_src(assistant, msg);
- }
  
- static const GDBusMethodTable assistant_methods[] = {
-@@ -1754,6 +1788,7 @@ static struct bass_data *bass_data_new(struct btd_adapter *adapter,
- 	data = new0(struct bass_data, 1);
- 	data->adapter = adapter;
- 	data->device = device;
-+	data->pushes = queue_new();
++def pytest_unconfigure(config):
++    global PROGRESS_STREAM
++
++    if PROGRESS_STREAM:
++        PROGRESS_STREAM.close()
++        PROGRESS_STREAM = None
++
++
+ COLLECT_ERRORS = []
  
- 	return data;
- }
-@@ -1788,6 +1823,19 @@ static void bass_data_add(struct bass_data *data)
- 		device_set_past_support(data->device, true);
- }
  
-+static void bass_push_free(void *user_data)
-+{
-+	struct bass_push *push = user_data;
-+	DBusMessage *reply;
-+
-+	reply = btd_error_failed(push->msg, "Session removed");
-+	if (reply)
-+		g_dbus_send_message(btd_get_dbus_connection(), reply);
-+
-+	dbus_message_unref(push->msg);
-+	free(push);
-+}
-+
- static void bass_data_free(struct bass_data *data)
- {
- 	if (data->service) {
-@@ -1798,6 +1846,11 @@ static void bass_data_free(struct bass_data *data)
- 	bt_bass_src_unregister(data->bass, data->src_id);
- 	bt_bass_cp_handler_unregister(data->bass, data->cp_id);
- 
-+	if (data->ready_id)
-+		bt_bass_ready_unregister(data->bass, data->ready_id);
-+
-+	queue_destroy(data->pushes, bass_push_free);
-+
- 	bt_bass_unref(data->bass);
- 
- 	queue_remove_all(assistants, assistant_match_data,
-@@ -2365,6 +2418,35 @@ static void bass_remove(struct btd_service *service)
- 	bass_data_remove(data);
- }
- 
-+static void bass_ready(struct bt_bass *bass, void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bass_data *data = btd_service_get_user_data(service);
-+	struct bass_push *push;
-+
-+	DBG("bass %p", bass);
-+
-+	/* The callback is unregistered with the session, not here, as it is
-+	 * called while the ready callbacks are being iterated.
-+	 */
-+	btd_service_connecting_complete(service, 0);
-+
-+	if (!data)
-+		return;
-+
-+	data->ready = true;
-+
-+	while ((push = queue_pop_head(data->pushes))) {
-+		DBusMessage *reply = push_src(push->assistant, push->msg);
-+
-+		if (reply)
-+			g_dbus_send_message(btd_get_dbus_connection(), reply);
-+
-+		dbus_message_unref(push->msg);
-+		free(push);
-+	}
-+}
-+
- static int bass_accept(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -2383,10 +2465,22 @@ static int bass_accept(struct btd_service *service)
- 	/* Only attach client if initiator of the connection otherwise act as
- 	 * delegator.
- 	 */
--	if (btd_service_is_initiator(service) &&
--			!bt_bass_attach(data->bass, client)) {
--		error("BASS unable to attach");
--		return -EINVAL;
-+	if (btd_service_is_initiator(service)) {
-+		/* Complete the connection once the session is ready, so no
-+		 * operation is attempted before the Broadcast Receive State
-+		 * notifications are enabled, otherwise the state changes they
-+		 * trigger, e.g. a request to transfer the sync info, would be
-+		 * missed.
-+		 */
-+		data->ready_id = bt_bass_ready_register(data->bass, bass_ready,
-+							service, NULL);
-+
-+		if (!bt_bass_attach(data->bass, client)) {
-+			error("BASS unable to attach");
-+			return -EINVAL;
-+		}
-+
-+		return 0;
- 	}
- 
- 	btd_service_connecting_complete(service, 0);
 -- 
 2.55.0
 
