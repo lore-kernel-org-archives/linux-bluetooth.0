@@ -1,128 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421B04BFE92;
-	Tue, 15 Sep 2026 12:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62E93C7DEB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 12:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789474112; cv=none; b=HQLFFQWadSq5qqi07ZDIVmOq4wmqfjSZICK3fuCl6pRoIjLp6eRmgk0P8AQxEl0NmCVqr+MxG5/y6KqmdX6DW1dhLIHm7PSpBalp0ZCbKVHrmT/SWe8cslfw5MVGWgM7VBqlzJWpmSsOqdFruPtwf7urzGNxF8/V4VHNtJWFf2g=
+	t=1789476981; cv=none; b=IPGUhihbZ4RDTvPX/vB59E8KPntdCJXKawLEb/EQylvl4qYykkv+HYdgNOW3iwyFuMvu3SOmdZmiKPy9EwCVqGPurTbcNLAsNEIymhgIBJ6Xo33sqRRlGHwrVz3V5D1V90Uz7SiZqd4k/gBYwxNUxQOgvB6xbPYFGaFba22bEeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789474112; c=relaxed/simple;
-	bh=Mt3xwPNa6dbedd2vs9TRp1/QS49fucJafqiwOn0pFdM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WKOmoBDGxVXsP1IFghuHMdNMk+WV1diyWSX1dblDGaplDeO4wl+7aRI2ZO5SkTp7JQjHeaAi11CEhKpCqT9GQLpW3gK3I9rqt6HUHFcn59nJfnaleIsCRRZvRByV/XrUvxjahp8x+zokOiE0E9AWqmuLY1I8aLMV1MorpzRahFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHecZu42; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789476981; c=relaxed/simple;
+	bh=RMGU95jJS1Lu5Pc/iQG1PHgTa6p9Zemml3j3gGtPdt0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=B8rYND0v/5SbHP+StYYXQHCYQ4wzEkck0Gfs1MBIgu1SXZaXQmNp8mIHiGbCfZJX8UoSQE/ZZcuglKTSb2vyt0t5xsQDrs9QtpC7sxYmuHqSSnVniHny0Og+MwnYMndZCeSOaphdnEOiQ9DeCYZ/qFYIeDABeb5ZhRDOGDQdruU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJ1mR44v; arc=none smtp.client-ip=74.125.230.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHecZu42"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF2CD1F000FF;
-	Tue, 15 Sep 2026 12:08:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789474110;
-	bh=TZB5HB0TZcEj8cV376kCpobeudedWrWAE5qUo2jHSIs=;
-	h=From:To:Subject:Date;
-	b=eHecZu42oIgHPfx9YqbGH4NJXPLYnJPMFrxUcw17Jdf8PAFuVmpZfQYm3o3bb1UhV
-	 GeE2/yCIojafWMmIZq3EV5EadQnn05h+xGhRmRpL896fiA+AbbLsL2A9n+HJw+iX0U
-	 6maiKgXLVwVcuB/p+QOjMQeupZIVHycj83C6Wr+ck/dkwo0LqaRXzfKjoom+tWCg2H
-	 8EWCDcAs7mubbidKgL8Lsarh6wKD40rHvF8ay8xL3NS1+tGssZk7l/iNDeg9YSGAIT
-	 dzouC0uFuXs90oyYtJ9feTXt8+Xvzad1+qIIlstaBO6fPuaBKgVWif6b/+SEMdJ5tN
-	 XGyX1MUJNwRyw==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Brian Gix <brian.gix@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries on cancel
-Date: Tue, 15 Sep 2026 12:08:22 +0000
-Message-ID: <20260915120823.3460208-1-lee@kernel.org>
-X-Mailer: git-send-email 2.55.0.1032.g73a4cd73de-goog
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJ1mR44v"
+Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-91205165f71so1243026d6.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 05:56:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789476979; x=1790081779; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=puNEFVYpD4edoSMtUYI05tIO+c4+sUgFuaK1beWPbio=;
+        b=aJ1mR44vzePUB5hvcT2qCrivpHpUriXZ6I4MhGzpQAikaiE5TI2TuXZj1Kx8vxjabs
+         q2zcYzb71VinZIwq9BsovAQMP+LiCAwWR9u45z3vAGChQVChc9x6/PRfTZscZC2OqZh+
+         3xgj/mmNcYo4edVSEMkniukXkRzUFbQ5AZ/ODZlpNOvcQ2zsU0zaWrEDjS70J+MyEKfk
+         LsrgNKkCxImdyyOS3G3wxboEdLnC23seFHuYnhVgy71GqWCFQPy7TIWYwMDWIYAl3NIS
+         qGEXyEcEUQNOs9BTU0FriSSdvToWJomoKnMoKcbIQxWlC89MQvyGjRcJPVSN25Ry1R9U
+         2eug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789476979; x=1790081779;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=puNEFVYpD4edoSMtUYI05tIO+c4+sUgFuaK1beWPbio=;
+        b=ylV3pPx7awGMMozhB7kU4uMWZWujCxwiZGWL9t8/g/Pi/BklliOq9Stf2//RYiPJcc
+         hzy2709JOSUR7p//d3korpmTQPYed5sMGBJ/S228JCTDZVJCY2O/hJtIAvolWT9ZABvg
+         /rH5/oFUdIHcUEAwr76GTruWrkkqTXT4wPUXjolKdh1u9y3cmt6gNn1KOWE20sxQ4usW
+         X2ddpec0oPb7GA/o/b/ZDV5JkgXFty4f2bDtKIV8VTwVrRZgrhRp61nRJoB71nkt97eA
+         b3KwntWQ14Ef96+rCxR+AMXFNlpxeWFssNKNqE68RM2KAgZUwq8kzHZ9wdxYNhQyQhLD
+         oxLg==
+X-Gm-Message-State: AFuF++mjM3Xu/+27PcaVvleHHi+XP9Q/5dvhARcKUMzO8ZbNKTUGOwGp
+	QtnSfpH2t9OrAF6rIgA3kFhvljI5kVijs2mEnTNzQ8yljEDNbCzGnXCGdgZTCg==
+X-Gm-Gg: AYBFou2gtvZE9CNH7n56d2NENROTjHBg3HIVFBOvfgqnexX3btmxvNlJN/w+wzGmrCn
+	Mj1ByyEC/zwcjTgFsm0saroGW9DEgrEouetghzcvxcKvao2NkNV5L6NUhyajVTv+4bq/VxwTnWc
+	V9vvwlQo/Fuip2Vu3ZlYVigw1W54Tz50CJlylAgYogkP7fD/54XGZCOdfY7O0VMUNN0viKionUn
+	hcBmOgi1jIRv2szprpAYHCCxeyuXRnR4d3wD4zVnWlz0Ef9POwHRqnJBXR5KPkO1J/MRYS8kpMd
+	/teEJmOiT37qznA5UhLZs/fFNlKePdkhXbD20OmmiHdQSazJEBu0nY1L/s+dlNjSRPlYCnupVYY
+	fdPpn76nMycH5k+Vhw0jggrxezJ9Bo17ND+5ydLiCEAf/QxbX01QcUAkaU/Zu5xy17lEeRJt+i2
+	lzTAmbTWoTN+mp765SWsUoRUERaRlFm09zhfCxI+BJPJRjYQpMiRWnlGZW4pJlOVf5xlsN5UEms
+	qdWHQ==
+X-Received: by 2002:a05:6214:226a:b0:912:33c8:80a6 with SMTP id 6a1803df08f44-9123a533885mr13222016d6.37.1789476978729;
+        Tue, 15 Sep 2026 05:56:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.223.183])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91224b74247sm72628246d6.39.2026.09.15.05.56.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 05:56:18 -0700 (PDT)
+Message-ID: <6aa94072.2842b724.2f298f.7f4a@mx.google.com>
+Date: Tue, 15 Sep 2026 05:56:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3816965018958150897=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lee@kernel.org
+Subject: RE: [v3,1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries on cancel
+In-Reply-To: <20260915120823.3460208-1-lee@kernel.org>
+References: <20260915120823.3460208-1-lee@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In send_cancel(), pending mesh_tx objects are removed from the
-hdev->mesh_pending list and freed via mesh_send_complete().  However, if
-a mesh transmission was already queued onto hdev->cmd_sync_work_list via
-mesh_next(), the queued entry retains a raw pointer to mesh_tx.
+--===============3816965018958150897==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When hci_cmd_sync_work later processes the entry, it attempts to execute
-mesh_send_sync and its destroy callback mesh_send_start_complete using
-the already freed mesh_tx pointer, leading to a use-after-free.
+This is automated email and please do not reply to this email!
 
-Fix this by invoking hci_cmd_sync_dequeue() for mesh_send_sync on the
-target mesh_tx before completing it.  If the entry is found and dequeued,
-its destroy callback will complete and free the object; otherwise,
-mesh_send_complete() is called directly.
+Dear submitter,
 
-Additionally, ensure the transmission queue advances after cancellation
-or errors.  In mesh_send_start_complete(), call mesh_next() on error
-unless err is -ECANCELED, because hci_cmd_sync_dequeue() holds
-hdev->cmd_sync_work_lock and calling mesh_next() synchronously would
-deadlock.  Instead, advance the queue in send_cancel() once the lock is
-released and if no transmission is in progress.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1165484/
 
-Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-Signed-off-by: Lee Jones <lee@kernel.org>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      0.41 seconds
+SubjectPrefix                 PASS      5.05 seconds
+BuildKernel                   PASS      28.89 seconds
+CheckAllWarning               PASS      33.54 seconds
+CheckSparse                   PASS      36.17 seconds
+BuildKernel32                 PASS      29.54 seconds
+CheckKernelLLVM               PASS      34.56 seconds
+TestRunnerSetup               PASS      745.28 seconds
+TestRunner_mgmt-tester        FAIL      9.35 seconds
+TestRunner_mesh-tester        FAIL      8.15 seconds
+IncrementalBuild              PASS      27.99 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3,1/1] Bluetooth: mgmt: Dequeue pending mesh_send_sync entries on cancel
+
+30: B1 Line exceeds max length (105>80): "  - Advance mesh queue on error in mesh_send_start_complete(), skipping -ECANCELED to avoid self-deadlock"
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+No test result found
+
+
+https://github.com/bluez/bluetooth-next/pull/772
+
 ---
+Regards,
+Linux Bluetooth
 
-v1 => v2: Email address switch - no functional change
-v2 -> v3:
-  - Advance mesh queue in send_cancel() once cmd_sync_work_lock is released
-  - Advance mesh queue on error in mesh_send_start_complete(), skipping -ECANCELED to avoid self-deadlock
 
- net/bluetooth/mgmt.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fd045460e236..c2cce242958b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2318,6 +2318,8 @@ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err)
- 		hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
- 		/* Send Complete Error Code for handle */
- 		mesh_send_complete(hdev, mesh_tx, false);
-+		if (err != -ECANCELED)
-+			mesh_next(hdev, NULL, 0);
- 		return;
- 	}
- 
-@@ -2427,19 +2429,28 @@ static int send_cancel(struct hci_dev *hdev, void *data)
- 		do {
- 			mesh_tx = mgmt_mesh_next(hdev, cmd->sk);
- 
--			if (mesh_tx)
--				mesh_send_complete(hdev, mesh_tx, false);
-+			if (mesh_tx) {
-+				if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
-+							  mesh_tx, NULL))
-+					mesh_send_complete(hdev, mesh_tx, false);
-+			}
- 		} while (mesh_tx);
- 	} else {
- 		mesh_tx = mgmt_mesh_find(hdev, cancel->handle);
- 
--		if (mesh_tx && mesh_tx->sk == cmd->sk)
--			mesh_send_complete(hdev, mesh_tx, false);
-+		if (mesh_tx && mesh_tx->sk == cmd->sk) {
-+			if (!hci_cmd_sync_dequeue(hdev, mesh_send_sync,
-+						  mesh_tx, NULL))
-+				mesh_send_complete(hdev, mesh_tx, false);
-+		}
- 	}
- 
- 	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_MESH_SEND_CANCEL,
- 			  0, NULL, 0);
- 
-+	if (!hci_dev_test_flag(hdev, HCI_MESH_SENDING))
-+		mesh_next(hdev, NULL, 0);
-+
- 	return 0;
- }
- 
--- 
-2.55.0.1032.g73a4cd73de-goog
-
+--===============3816965018958150897==--
