@@ -1,38 +1,89 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A497842C50D;
-	Tue, 15 Sep 2026 03:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD15542E404
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 05:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789444447; cv=none; b=TbLmxpqfPxme5YGDrQShD7SwH9g2gPQqSAqIv+Y7fwHNo6JpiB3Nf3bCDsfOsjoCt2Z5XLOF3+/NDl4ZVSrtat6SwZuWfmJ0YSeLwTFW5mkcM7vvHbCBM5rhzhTmVsS6R37/Z/essjpGa5NvhKHPhF2zShghFW4PL6CGRdNESTg=
+	t=1789448498; cv=none; b=hYyt5FwOTXh21ZQD404qdNouUuGqotZpOFN5pHMwxf04CW0N+LVgJt3MFav8fk9CpB3m/cix22hWMPOLTVmyXQEPE6sPkPLU9JhVhzJdqIY2B0JwXwRhLdSayJFr2YP9NpGZPu0wM3Qc+oiA4vbw+bUo13aWW3V+POR+qhlEwII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789444447; c=relaxed/simple;
-	bh=KxMd2BgOUpvDskd7nO+1egbt1DNAfpZvRON98Wwv0ow=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lmkWscqN0YFks0rJ9Esof0RB/Au+HpwzMv6PTQX5XdUYuq+K/dbpB2Xx/0J5IxVtsfv4vnbpLhl6kxLiRAPt2mQftXEntgWFB8XK2/lcqOOOVh6eDHJcttXlbQ7unNLpM7+JmsHsXnheLQfjTv5IL5M93SeXVLbcvIqfOjXAPmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-01 (Coremail) with SMTP id qwCowABXLvJSwahqw9QHCA--.5267S2;
-	Tue, 15 Sep 2026 11:53:54 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: angelogioacchino.delregno@collabora.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org,
+	s=arc-20240116; t=1789448498; c=relaxed/simple;
+	bh=WvJDz0SMer3VBOphKTbusnWx9vBwOwyigPUnd+wAAiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AB97BGpUaJkimuI1Iz/25GiJa+CkRHzLJoadNFrwayrU3timh7yuX6LTHWm+GwhrnaddMtITVgtn/ys43so7E8zTbhPlnLl77EcKWLYR9alOlryq6OsP1ncBEtry36QuV5jfXf570qk3QSS+vgx50iCptLm48tWZvOHosWUsjEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CESLyb8q; arc=none smtp.client-ip=74.125.227.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CESLyb8q"
+Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396ccafb74fso2818699a91.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2026 22:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789448495; x=1790053295; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ptBV0v6Gt6jAGsqstGkmrulpyxyqgfaikKMDt/h5aaw=;
+        b=CESLyb8qb9mC71opDonoVuBQSmNLGkr0FyokxmGTXBXKnoGBaohfQtCFhF9iYDfSZX
+         OfGYYFOzGxa4dsd6j/zDtS3Cj4a3AGa5Jgfo/pd75wLuIaRmJ60D350O2I53HL0JbM7Y
+         SE4OMaXtERlI24QAe/wrufjpOkVXCuFppv5+fe5PKlShsccsf0EP2nRdjP+6sMye1e1i
+         brCrnikbGHwPIZF0H5foqV7lrJ0oGAEgNgHtTVhR7uTwHOOmREhZUCnimhLJMchiBk6G
+         w0hU0HuoY3ONKkoG5l27rBui5zgFaPh48lKsfBqYcAqTFfo24Z938eEoWWXxi/ZA7q8W
+         EBpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789448495; x=1790053295;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ptBV0v6Gt6jAGsqstGkmrulpyxyqgfaikKMDt/h5aaw=;
+        b=QqYEjYso9nMlodMKFmzqKXnzh8wLkMCF4tvA3gnpUXaNMmUiF6ZrqvnepVFRkV30dX
+         +s33rMQieea+q8WGfLTdJhmzhZvBxX9TIZ5YHJ4x+rH+uzCPhvMLsDFbOTJtNLpg25Oj
+         G6JaOdnUWJjEbbz3kNUaYzI7sJs9wiyJJRV2gaFOvHUjzE/fQzzOJaQz6v3J746l1JZ9
+         qMp4IdG2TH7gA+ae6DW0u79t0HwE/xXSxg/1ncjfzhtUmh8KDaKgjJjaWCfUqndFTrIn
+         s5Y5mgILSR0xTSGEv6zaiAzExHy9+H54BMkadXgeA7gwDK/ethq+jFBEf4keAEUv5Ouu
+         NVKA==
+X-Forwarded-Encrypted: i=1; AKwUvBy2dBvAyKAX5YCskGbb9EFQnovERu2ATPvnPc0jXJfWp2zCVv+p5NCvTKYTd6jDOXMLc+mrQ1GyyAtUrkT8XIM=@vger.kernel.org
+X-Gm-Message-State: AFuF++kTOudpCXiZQQAWliq1XwvobaVvG0e46Os6cEZ0bDHUBMUuLZ9J
+	iRw+yxjJSbcrVo/f5x6g6VfSFoWD+QOJRVzNs19AFmPLiKnZ1G9BDwesm9OweAiD
+X-Gm-Gg: AYBFou1+SLNrUS14RVn3r0sATsWVtvsuVSvhDMCqPYWrPfl0fmLgcUyNnklwc6CUK1a
+	KSLMYtJhpPLRNW2C+ZCBxNtCCE78hJHu60o3wJSkvJzh8KdRGHoCtXS7Tj669iXR+MfY47/xXbU
+	twFvL9jY5mhUfEQaMW1cEH9qDq1werM5J6wswsvGOXoZz5OlU+q7RS/G+dcv6V0iv2p8Kl/ZHJB
+	620xHmODOfeyYxhYT/2MEx9o9mu0o8ydgPuQwsAkEKXwBODwq0QJ+kyEmcNr076PUaSzx68elxL
+	cOuakO9MVKrPbnUUN7BGPD20G/q/jmohAxL7skTd2cTwYl7PdPOqUCNHFzlWk8kx/Vlm3TqB80s
+	96riMpaGc0Owq0YbBQP3bxheisoZTaYoQXLRj3oChw991uOPuTXUXaerbmzOcOxo7bvlgDQfxWl
+	Z8hOJHSRmo/6Ka7CeiNsPeiuxKNCt9v0tf/l04b4ADJCFojAH0vU8T2VtcM8qp7rXT4AVhQMaNU
+	PMektIR0U81WxPTEO1BanRFySFcZmUndMK0dO/hDgdnpkxcwYhH6EGhPXfEbRHj7To8eTjjCOrA
+	Ub7L8GMILNWN5BBb7qHv
+X-Received: by 2002:a17:90b:57cb:b0:39d:f130:f8fd with SMTP id 98e67ed59e1d1-39df13108cdmr11368757a91.11.1789448494978;
+        Mon, 14 Sep 2026 22:01:34 -0700 (PDT)
+Received: from lawlee-vm0.d4y3nv5wwgfelhhopdxv1tqjld.dx.internal.cloudapp.net ([13.93.150.60])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33ba4e51449sm26872358eec.5.2026.09.14.22.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Sep 2026 22:01:34 -0700 (PDT)
+From: Lawrence Lee <lfqlee314@gmail.com>
+To: David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	netdev@vger.kernel.org,
+	Arun Ajith S <aajith@arista.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Jaehee Park <jhpark1013@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	matthias.bgg@gmail.com,
-	sean.wang@mediatek.com,
-	lkml@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: btmtksdio: Fix runtime PM leak in btmtksdio_shutdown()
-Date: Tue, 15 Sep 2026 03:53:25 +0000
-Message-Id: <20260915035325.1724227-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	Alexander Aring <alex.aring@gmail.com>,
+	linux-wpan@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH net-next v2 0/2] ipv6: update NUD_FAILED neighbors from NA messages
+Date: Tue, 15 Sep 2026 05:01:30 +0000
+Message-ID: <cover.1789448374.git.lfqlee314@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,54 +91,60 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowABXLvJSwahqw9QHCA--.5267S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7GFW3JFy5CF13Kw47Jr4ktFb_yoW8Jryfpr
-	Wq9FyayFZavw42yFn7JanaqFWYv34YqrW8Kry0934rur4rJayIyF15tryYq3WSkrWkCw45
-	A3Z2qFWfGFnFkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
-	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
-	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
-	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VU19Xo7UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAMLA2qoi9j4JwAAsJ
 
-btmtksdio_shutdown() takes a runtime PM reference with
-pm_runtime_get_sync(bdev->dev), which leaves the device's usage
-count incremented even when it fails.  If the WMT func-ctrl command
-fails to send, mtk_hci_wmt_sync() returns a negative error and the
-function returns immediately, skipping the pm_runtime_put_noidle()
-at the ignore_wmt_cmd label, so the reference is leaked.
+Neighbor Advertisements for existing NUD_FAILED entries are currently
+ignored. This can leave a first-hop router with an unusable neighbor after
+the host becomes reachable and announces itself, particularly when
+forwarding is offloaded away from the kernel and traffic destined to the
+FAILED neighbor is unable to trigger the kernel's normal neighbor
+resolution process.
+Allowing neighbor entries to be updated from NAs already received by the
+kernel is preferable since it creates less work compared to periodically
+probing FAILED neighbors (e.g. using NTF_EXT_MANAGED).
 
-Drop the reference with pm_runtime_put_noidle() before returning
-the error to keep the usage count balanced.
+Extend accept_untracked_na to treat FAILED entries like absent entries.
+Require a target link-layer address, IPv6 forwarding, and acceptance by the
+sysctl, including its source-prefix check in mode 2. Recover the entry only
+to STALE, including for solicited NAs, to maintain parity with handling of
+non-existent neighbor cache entries.
 
-Fixes: 7f3c563c575e ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+Patch #1 implements the behavior and updates RFC 9131-related comments and
+accept_untracked_na documentation.
+
+Patch #2 extends ndisc_unsolicited_na_test.sh to cover FAILED-entry
+recovery and each acceptance gate, including in-prefix and out-of-prefix
+mode 2.
+
+Thanks to Ido Schimmel for feedback on the original RFC.
+
 ---
- drivers/bluetooth/btmtksdio.c | 1 +
- 1 file changed, 1 insertion(+)
+v2:
+- Full implementation of logic to update FAILED entries to STALE.
+- Update the RFC 9131-related comments and sysctl documentation.
+- Add selftests to verify state changes only when the accept_untracked_na
+  setting is enabled.
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 243215a81fa7..dfb61653a878 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1231,6 +1231,7 @@ static int btmtksdio_shutdown(struct hci_dev *hdev)
- 	err = mtk_hci_wmt_sync(hdev, &wmt_params);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
-+		pm_runtime_put_noidle(bdev->dev);
- 		return err;
- 	}
- 
+v1 (RFC):
+https://lore.kernel.org/r/20260813233344.445265-1-lfqlee314@gmail.com
+
+Testing:
+- x86_64 current-config and allyesconfig builds with W=1
+- tools/testing/selftests/net/ndisc_unsolicited_na_test.sh: 14 passed
+- Local NIPA checks: all substantive checks passed
+- Sashiko local review completed
+
+Lawrence Lee (2):
+  ipv6: update NUD_FAILED neighbors from NA messages
+  selftests: net: test untracked NA recovery of FAILED neighbors
+
+ Documentation/networking/ip-sysctl.rst        |  28 ++--
+ include/net/ndisc.h                           |  15 ++-
+ net/6lowpan/ndisc.c                           |  15 ++-
+ net/ipv6/ndisc.c                              |  94 ++++++++-----
+ .../net/ndisc_unsolicited_na_test.sh          | 124 +++++++++++++++---
+ 5 files changed, 201 insertions(+), 75 deletions(-)
+
+
+base-commit: 272a65db243bfa34b9277632830e0e06d7e3518e
 -- 
-2.34.1
-
+2.43.0
