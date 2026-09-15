@@ -1,67 +1,67 @@
-Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934A43624C5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEC53876A4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789508255; cv=none; b=atEcl9dnf8LTbNQ3gDGJHu4z8Fi+dI5tWS352CQsUbgPuikMUtfh0DPjJ/O+xcgeT+o8hjgsRN4hVAVytTUtyUU75kLhWv3voZIz8wnXJgoFeIElSXBlBGPtBxj1dm3j/CWG7+uh0kfkvb4z6YDshRK3CIuC83vVct/DxqCFgzk=
+	t=1789508662; cv=none; b=J9BN9YAiOulvLvrlwNK5FtN0uP3UTuwrtJatciVDreY4OQHb/A5r9aBLIEp2d4wbZ2ZByLRmr4AdwCXJn4YrEce6vBQJS0VMefuVv/CyUy5sRxFPnpMBJ5ldvcLYJN4hxGTyQdYMkd+4s3mJ6jublihuNXwedNt1bLxPSrEd0V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789508255; c=relaxed/simple;
-	bh=sUAVO4rlIo9qgk8V5PuyuoFgehQLNZgn38wN9bkKeOk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ffgpS6RGYUU59cl1o1mY7Q+O0JAw60zO6Rb6o4rZYDai29Ki+GNjN/h76ty4PhkHfzAaBA7R2ki6YaP/355B+2ixY4oUrHvGefenuyn9ayRGuGeHLdafo2z1OBlHgb30veZMZl5sDvNf6BtIOUjhEk4kziegapzFND9U/DCXDhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dBBEyDyT; arc=none smtp.client-ip=74.125.227.43
+	s=arc-20240116; t=1789508662; c=relaxed/simple;
+	bh=4JoyzscH0FB5NzENebDQ1tU1/vuzVawuVtpvu1nrfUw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N9TyUu14gknoZqhmg3T8MHWNXIxQpRU+H2mQ882jssVxR8RJLfucAfSV/HBNekyjX+zpQ0q6RUwo2EAAzaxsYSDtHE5P9NdlYZ77GOgLe9yhIsR2JOeDB1Vc7sWXARRsX5cOaSTei/c26XvnvrBa33rKlaDZVSnE7QSkHpUvTF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+N3U/+D; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dBBEyDyT"
-Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-785692e59a4so110700137.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:37:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+N3U/+D"
+Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-785692e5907so130417137.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:44:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789508252; x=1790113052; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789508660; x=1790113460; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=4zPN9kvOKt5/MDDTnmyPIOOTK1URNPCH/j8Phr5SriE=;
-        b=dBBEyDyT+smA8XnNBUT6waAI69Pf04nVq6R+H88YWCELV3oI+roldHgh+JcF9ve7QL
-         h3yJTiX13ltO+13cktRNsX3hLzlAjOs1fQvHp7caY8Fn7dKTid6VGtUXP0ACH8WWgJ7Z
-         h8DLrkZzat/6rSAXLjfo5Ku45SMAGJYn+uM/sRlOQ4+VFZO6shs/oG9ERu9Qjj2Hf7gq
-         mpFYIVziySe6ircqk/isHX4g4882vltxUe4pwAc441ckzUiuepzvib3miGI+OK3QyTyJ
-         xoG8xz9uWaV+qhnmA8CRIS+pDWc/nf2pbZaYRLMaZlBSUB3TMag/7RIp7zSQWDo16hj8
-         y7oQ==
+        bh=RISvfu9brbu8BRgdXNW7I+5aM7d3ATfZ1btBBRNs8jo=;
+        b=S+N3U/+DnlJtuC9ImUQlVAC7XEjODwvDD1mHhnS+bID8GZVv7n0QactWNF2ILduRfm
+         633jkWm9oGC2mjeZSzBxYDUpo3xiiZLY13BOLsQm86gmVAo+4AZtJ4NSOP6Ahz6liHMJ
+         giGBda6i5uy72dovSQXT1Xrki5o3rhaAujLwQKgrcSe1uR2FbU4V7FgUop0oax6QIsW4
+         NFP6So4obpUhRAOIbOVgy4Q5hfdM4vfPtc0QxYavmyMpzr8zVt3b9VfXhM/A3gme7BgE
+         T/7iLQ8iZPKC1tby5dVZhJ/Pp9juorOjvTu5o50Jvci4hCCMxFLHKYamdaO4UDV5+QHn
+         ev6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789508252; x=1790113052;
+        d=1e100.net; s=20260707; t=1789508660; x=1790113460;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=4zPN9kvOKt5/MDDTnmyPIOOTK1URNPCH/j8Phr5SriE=;
-        b=m9i55dhe18p3Zd9PjQF3zFexQ/MotZZZt4z6R28cNJTgYGNfudtvGtxWd8XLnF86W1
-         39S/i5TI4FcvH5Rdajq7CorJJ0e2+uSn7DN8IaNfY+JEbJgbjwgSHJ3jjfBhzxxg3rrl
-         QcaauaFRNwD+PD+Xl+y/GSIXyHglM9FfOH8BYFsS+kGh5G31JY5xV14WoKZGdJdzfqFK
-         olG/5gL1aLBYWuxOokFh+/wHqtmshIls3VCA8bqe3VrMOD/XJ1wEdlqGAaWXBIAln7UY
-         n9GZK5jHNx/cWKUwg+HTW3AIaRCBif9Nh47AQLJt+ub95zHKaCq3ZMbZtXE4N8KOjxTG
-         gp6A==
-X-Gm-Message-State: AFuF++mYyZuTu3O4+XzTJNGr+giSMYjUR7j7jputt5OIUvyxbwxW8Msp
-	TnkhUQ4VKxuge0yMEvQYRc9/9qf0x+PTubuNtmybg8cgcVMag16HV3k+O+MfRfSk
-X-Gm-Gg: AYBFou0ECciWEWgeaydGB3BkI8sxNO5FWlw6twlY2dNY2YXGHVT8nFc1cmhMay/BV4y
-	dpt++DKluSEfs4IwUT9DDDkkMagzTRIJfHw9xdGQGZ2EimOgxOtl1PlpbvCqQWRMuhbMn/RO0JX
-	mJ6ANNbHJUdWOWOAIRRqCaYbgqvBWWVHCP4fAY73QtE7cM97l3T6r9VWtjiDrqX/BvH30rO5KwB
-	q8oveZVwIyOdyWGVM3zl3VVf1V3s2yyiKp2MWGeGaDsa3kl8PugV7N9OHJzhnHDd6k5jiWkoncG
-	U3Y4aRqhOoaPXCmxYcvNvQu8d1WFg0KnTnNpCfFpYyWtP+Q/UHI88mQsPoFOT29Tr+lxuRrpHtF
-	HiHSUmCprBTjGaPIUb3quDd79mjdmDquW4MX0wQOUxAL/16/J7sCEYigsIP5HU2eZ2gsdtHlEra
-	iu53zR7t/7AAp/GeB/xxUoMxVv871aJeDN5K41InE/7SB/3mu7/diNCHW29UZeMTLfmkG5lATLM
-	SqpnzqJbTNd0XFJ4L6E3DKlnZ7Sy4ZTziDHe8/fHK6W1ql6l2bQI5sHYRQv7zrsEA==
-X-Received: by 2002:a05:6102:3c9f:b0:79e:2d57:6225 with SMTP id ada2fe7eead31-7a029741056mr565428137.2.1789508252383;
-        Tue, 15 Sep 2026 14:37:32 -0700 (PDT)
+        bh=RISvfu9brbu8BRgdXNW7I+5aM7d3ATfZ1btBBRNs8jo=;
+        b=eDtQfoFEot/5cFSRuG/u249S/qJ/9CftJKe5lzbEV90iw6YEHDKOhyBw+cRvxXFHp0
+         IukZ7ojV/iN/J2F3dzp++icncGEPAGV43jKI7Ir4bJFbFypR8x2BX3+zJ4u7Xi8FQ+Mn
+         ISY3cPQC4zq0TqlAlo8MebXlY8NXdJvCeRe7Oy+alI4SDJohSIfyQjUcmeGERnuVVUT5
+         XxlVvIj8XmaxEZ6Tp/ofREnnDhy8+ZdeKaCjrYGR+EU761g6rfpkherq/uqcWF8/nZcS
+         Y0tFo20a9kUtZd6CV8+D5hxdg8eEMkjX8mJzfD3YalkC7eYfEKBSH8oYVKAq9EQkGYD5
+         bSQw==
+X-Gm-Message-State: AFuF++m70g0D1nnl4daMpB2D+PqPU4iZ1QGIDmg8dMMlEilmp+d9uMtP
+	CN0KD/pGsxRa+57tRB8mnLUBesfAiPYPAeWKeOA/auiDHyehFg+VyN4x9ZEfgN7r
+X-Gm-Gg: AYBFou2p91VBUc6be75sKHO/DPg+GO75YUEd5m3a0qvoIOKJYZ43Si9+kC93C9nQsH3
+	ZdVSP3FX5FyuKhM5nuIsuidXuQarPsUxJqfdH91Z2wDEOC0Y/ZdtgtbAI6b4M+bJk4S2EkYgpmm
+	uX36BD4cY9o6gNSrXify2TmiKpo70wr72e+VHLL10waKSl51RdktPJ2I3fa5yzndd/owyiYFQM+
+	Z/d8jGsUInTgcUHrzeErgqTpwiC+Awx01CQkud7ehEVTSQ8+F6S4h1Va9Zdi8vYyGr9sAguD37Q
+	KQ9v5tDyK1ZklU0AMhL6erWV/2A9Vzeee3scrrTzAqq1RxkwMoJcSloZSmkG6ubf5yLFoECzwqv
+	nZdFERHaFrH5wNFkRrpXcQuvd+V085qxLeaw7O8L8r1aUWpHlIDNhle4X5ehIwvn+wuoIiOfOqV
+	Ep1SaqblnZ12mBS/4jtEFGYT3Kf+IjqsXGjqvaBG3GIGCAb/Mf8qAjKj3wAPIpOMAECL/fA1O9q
+	xUIqFdmQRYJuPLRPnCirEAF0pkb5jViiWNY/ZTntD+0S2NkpAog28QzqHQUHBBOxg==
+X-Received: by 2002:a05:6102:5089:b0:79c:d125:9bfb with SMTP id ada2fe7eead31-7a02dada529mr561953137.10.1789508659822;
+        Tue, 15 Sep 2026 14:44:19 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-79fb193720fsm1098247137.6.2026.09.15.14.37.31
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-79fb2ce4f3fsm1036389137.11.2026.09.15.14.44.18
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:37:31 -0700 (PDT)
+        Tue, 15 Sep 2026 14:44:19 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] test-runner: Enable interrupt remapping for PCIe passthrough
-Date: Tue, 15 Sep 2026 17:37:23 -0400
-Message-ID: <20260915213723.1242672-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1] doc/test-functional: Document PCIe controller passthrough
+Date: Tue, 15 Sep 2026 17:44:10 -0400
+Message-ID: <20260915214410.1250646-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,86 +73,112 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-A device passed through with -P fails to allocate its MSI-X vectors
-(-ENOSPC) as the guest has no way to remap interrupts, so give it a
-virtual IOMMU with interrupt remapping enabled, which in turn requires
-the irqchip to be split.
+The tests needing a real controller can now use a PCIe one with --pcie
+and --force-pcie, in the same way --usb and --force-usb use an USB one.
 
-Without this the guest is not presented with a DMAR table at all, so
-enabling CONFIG_INTEL_IOMMU and CONFIG_IRQ_REMAP on the test kernel has
-no effect, and both are now documented as required.
+Unlike an USB controller, which only needs its device node to be
+readable, a PCIe controller is bound to vfio-pci while a VM host uses
+it, so the tests have to be run as root and the controller has to be
+alone in its IOMMU group.
 
-The machine type is moved out of the static argument list as it now
-depends on whether -P is used, the resulting command line is otherwise
-unchanged.
-
-The model wrote the change and confirmed the guest is only presented
-with a DMAR table once the virtual IOMMU is added; it was reviewed and
-tested by the author.
+The model wrote the option handling in pytest-bluezenv and this section;
+it was reviewed and tested by the author.
 
 Assisted-by: Claude:claude-opus-5
 ---
- doc/test-runner.rst | 11 +++++++++++
- tools/test-runner.c | 10 +++++++++-
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ doc/test-functional.rst | 51 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index 6429e80fc75b..dc1e51305c51 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -355,6 +355,17 @@ In addition the above kernel config option the following is required:
- 	CONFIG_ACPI=y
- 	CONFIG_BT_HCIBTINTEL_PCIE=y
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+index 4a784e7850a3..3ffcbf6dec5c 100644
+--- a/doc/test-functional.rst
++++ b/doc/test-functional.rst
+@@ -107,6 +107,20 @@ The following additional options apply:
+ ``--force-usb``
+         Force tests to use USB controllers instead of `btvirt`.
  
-+IOMMU and interrupt remapping, without which vfio-pci fails to allocate
-+MSI-X vectors (-ENOSPC):
++``--pcie=hci0,hci1``
++        PCIe controllers to use in tests that require use of
++	real controllers.
++
++	If not provided, value from `FUNCTIONAL_TESTING_CONTROLLERS`
++	environment variable is used. If none, all PCIe controllers
++	are considered.
++
++	Passing a PCIe controller through binds it to vfio-pci for
++	the time a VM host uses it, which requires running as root.
++
++``--force-pcie``
++        Force tests to use PCIe controllers instead of `btvirt`.
++
+ ``--bluez-build-dir=<path>``
+         Path to build directory where to search for BlueZ
+         executables.
+@@ -139,7 +153,7 @@ The following additional options apply:
+         Git branch to build from.
+ 
+ 
+-Tests that require kernel image or USB controllers are skipped if none
++Tests that require kernel image or real controllers are skipped if none
+ are available. Normally, tests use `btvirt`.
+ 
+ VM instances share a directory ``/run/shared`` with host machine,
+@@ -224,10 +238,10 @@ socket, also bridging the air interface between them::
+ 
+ See **test-runner(1)** for how the socket is attached to the VM.
+ 
+-With ``--usb`` the ``btvirt`` process is not started; each VM host gets a
+-real USB controller passed through instead, and the VMs talk over the
+-actual radio.  Tests still prefer ``btvirt`` unless ``--force-usb`` is
+-given.
++With ``--usb`` or ``--pcie`` the ``btvirt`` process is not started; each
++VM host gets a real USB or PCIe controller passed through instead, and the
++VMs talk over the actual radio.  Tests still prefer ``btvirt`` unless
++``--force-usb`` or ``--force-pcie`` is given.
+ 
+ Writing test code that runs in the VM, and the available VM-side
+ facilities, are documented by `pytest-bluezenv
+@@ -306,6 +320,17 @@ USB
+ 
+ Some tests may require a hardware controller instead of the virtual `btvirt` one.
+ 
++PCIe
++----
++
++A PCIe controller may be used instead of a USB one. It is bound to
++vfio-pci for the time a VM host uses it, and bound back to its own
++driver afterwards, which requires running the tests as root.
++
++The IOMMU has to be enabled on the host, and the controller has to be
++alone in its IOMMU group. See **test-runner(1)** for the kernel config
++the passed through controller needs.
++
+ EXAMPLES
+ ========
+ 
+@@ -422,6 +447,22 @@ possible.  To force all tests use the USB controllers:
+ 
+ 	$ test/test-functional --usb=hci0,hci1 --force-usb
+ 
++Redirect PCIe devices
++---------------------
 +
 +.. code-block::
 +
-+	CONFIG_INTEL_IOMMU=y
-+	CONFIG_INTEL_IOMMU_DEFAULT_ON=y
-+	CONFIG_INTEL_IOMMU_SVM=y
-+	CONFIG_IRQ_REMAP=y
-+	CONFIG_AMD_IOMMU=y
++	$ sudo test/test-functional --pcie=hci0,hci1
 +
- On the host, an IOMMU must be enabled in the firmware and on the host kernel
- command line (``intel_iommu=on`` or ``amd_iommu=on``). The controller itself
- does not need any manual preparation: test-runner unbinds it from its current
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 2de05e26dcf3..338e5b9da544 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -293,7 +293,6 @@ static const char *const qemu_argv[] = {
- 	"-no-user-config",
- 	"-monitor", "none",
- 	"-display", "none",
--	"-machine", "type=q35,accel=kvm:tcg",
- 	"-m", "256M",
- 	"-net", "none",
- 	"-no-reboot",
-@@ -810,6 +809,13 @@ static int start_qemu(void)
- 	strv_append(&argv, "%s", qemu_binary);
- 	strv_concat(&argv, qemu_argv);
- 
-+	/* Interrupt remapping is required to pass through a device using
-+	 * MSI-X, which in turn needs the split irqchip.
-+	 */
-+	strv_append(&argv, "-machine");
-+	strv_append(&argv, "type=q35,accel=kvm:tcg%s",
-+			pcie_dev ? ",kernel-irqchip=split" : "");
++Unlike USB controllers, this requires running as root, as the controller
++is bound to vfio-pci while a VM host uses it.
 +
- 	if (qemu_host_cpu) {
- 		strv_append(&argv, "-cpu");
- 		strv_append(&argv, "host");
-@@ -835,6 +841,8 @@ static int start_qemu(void)
- 	}
++To force all tests use the PCIe controllers:
++
++.. code-block::
++
++	$ sudo test/test-functional --pcie=hci0,hci1 --force-pcie
++
+ Run tests in parallel
+ ---------------------
  
- 	if (pcie_dev) {
-+		strv_append(&argv, "-device");
-+		strv_append(&argv, "intel-iommu,intremap=on");
- 		strv_append(&argv, "-device");
- 		strv_append(&argv, "%s", pcie_dev);
- 	}
 -- 
 2.55.0
 
