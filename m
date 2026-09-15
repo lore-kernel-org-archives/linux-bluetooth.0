@@ -1,68 +1,72 @@
-Received: from mail-ua2-f29.google.com (mail-ua2-f29.google.com [74.125.226.221])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BEA346AC2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B674A3F1A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 21:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506942; cv=none; b=j07LooZ+r6G3Nar4fGh/n1A7A7baaa3dsKbfM1dA2VSDxxnBlhmb8DnyFWTsuDDkE9YVrj4iXtLsYcrkOKy7fkXkPA04WyE4OWIxRVgav22qiLTwpYupgaS6n3IS1GwTbaC4EfO8osR1xW0kEaaY5e0qG21u1A39Hg/HFQP3Fsc=
+	t=1789506943; cv=none; b=eqD9WzOvDYk7yTUosO/m16xIDTuniK+YCI2zpr9NER4kyMAzLwaSGtsLGFcXOAYyC+mPgvq3xzXQyB2TyaUU4Nkpz+/mKOQDEBLUEz5GMzEp1OpQvx4PVcaqo3upSgUkozHT1rWjSGDqokCsW3XZb4hGTehBqfyNkxUdWmsTm0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506942; c=relaxed/simple;
-	bh=UDFMVqMUi0paBtH/+eS8HOI2tFDo6jUiPqHJlhRjQjw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u3Gd0pKcmTSuQeKG3VZ2JeRamJkBiBFExZ0ULuc64PMwzksZHOv0PjFiUcud2Z+EDtSrjD8c4ZkFxjBnAsoOsSjKJEBwulacYWKDsQL1ETkOToqPOuL2XHGmqcM9DGPFBCMFUZiSw14+IZvrFaQ5U9SgunDcMUvJw169cIMdquc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WdpHcuIW; arc=none smtp.client-ip=74.125.226.221
+	s=arc-20240116; t=1789506943; c=relaxed/simple;
+	bh=zlW+XRl+AYVqvlq0mdcdUWuS1TWT6VyeWpaKiRczB1g=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cCwQ//7wywThAKfO0tqbqPQ2QRRDISKQORDofzrjiNyGHYMgFJJQh8ycrpZA8akJLSl1uDSJ6zywoQ6Lc4Da9xvVE7UG8lcZ3nkHg1z2jqdWywo3EyC/loE85fHwicMdT2rKICS+t08KAkmKAFDg9lW7C2fZGpyN2kKklsvgkh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mM4S2eQm; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WdpHcuIW"
-Received: by mail-ua2-f29.google.com with SMTP id a1e0cc1a2514c-97e80579b7dso57185241.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mM4S2eQm"
+Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-79028ca9371so70124137.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 14:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506939; x=1790111739; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/oQ9CueVfQNINj+Z3spXf/YSFoL6leUt+0q2mpqKM6I=;
-        b=WdpHcuIW4QmKabxpzNW6Vd0BvnBK3tftITe2FW5KZ7jqaxTXPg3yWTTEDxuvv1BFHr
-         y+XaKSKVfs0SKcUjC7aOdBh6rWmiuIYas5AaCGIPniEHfXUz4zvqGYqampPTt/Wdq2ap
-         I2i1rCzsC/7EWtRb3lhOzVaDg7DtZFYyKqaJph+0L07RYy3y3UnkC3pA/XQM3fh6NqGo
-         Z0+1CeZGqpxDwEAsdg4eLdoDl04C3ynJX5aCuSog6aQL3fdbD9yT3jyq7DB3BX7HBU6j
-         hECNzKgvKMbf548I9PHhF78VPU84k/djF25up2nJ3Qu1IsNRQwOVo3kEX9Mc4GMZ0CtK
-         xVYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506939; x=1790111739;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1789506940; x=1790111740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=/oQ9CueVfQNINj+Z3spXf/YSFoL6leUt+0q2mpqKM6I=;
-        b=G5EwN5hRO2sepalcEnj57WqYSjjOWCYO4bprQ5y72Yu0Q1+uUTBg8b7OF+Drci/Ryg
-         oeZkS36KGqpjMq0cVAVcZ5SHkSwf8HieuEooSYJjCJ6Ho1CvdsY56IAtmAXFfNG6Vv5m
-         +10crjDwMYnn9p1kh3Tz2/1MF6A/0qmvQamPG9TgqI5e4iV3MNAX2Xzolu1hHV/82eMY
-         f97eRNN66Jf+Gxo9e488uZEkz8SZb0ZnA1LsbG0V+d45lN+8v4l6L1mIJOnPGLelj0SS
-         9fpmzKJn7ys/RXq9InM8vsNX2+yqxHauSeOXMAoQifB8xBuOWyyLyuBuJnrOQf8T15c6
-         Eldg==
-X-Gm-Message-State: AFuF++nbBtgdZCN/1C2Ab6MNojMBzBNQec6lu/0/kWqhWDx03HDzkVxl
-	yfwNZigJWVVaRwSg6l/aSPv2uzHsGSVyF0mtZqk4CBaYn9ncYcjdgcyGf8BrOsCq
-X-Gm-Gg: AYBFou2PN4Ue6MNfJC/OQn8ae6k3/fC9naE/lJBTBTcHZS8UIwKRiio3em95PYQEnJb
-	BcekIA+rJ310SSz9zQSCOoxzepWR+LxUYZwupgu3paPISURZQPSFLwPJun5Yc1J2uRk/V/82MDq
-	jXwAQ5RbA3an5l/beWzNHggFmIxmmqV15ryz4dPn3gyDQghLiPNaOGdpMR/1cuU0wgsw9u29R1q
-	eGJky91gHSRopHKC9P1uxhL0u8JVVJs05eBixZWpc1MiP5dGQ/TEgxNcKQ96Ut+WHP9HevE2NgH
-	MReVMSeJx1Y6PbJ5TTImfq0vVaMXKT6Q2NkJ7ojcMCvX3KCqxe7mm01oIyt2PTNAQS4zD1Tv8p7
-	45Qvir9k5Zxef7k40XpodUhwE/rrY0vGnByzM31cOmT9/5UBrJBZjjGQ1MZXnA1kSpAG+3UJxfi
-	2l5I7KdJt30agifekFhpFWK5Ae/kRaLp9SckO6OJyPU93DNTE0Fa3St6IS8sqExBfmbuLkc0Ayx
-	H8FmVe2yT7219uJxAOR7DqwZVbSFmh04nhhDusiNouGNqKt7PmQ7zkHGo+9aOMcgA==
-X-Received: by 2002:a05:6102:c4a:b0:79e:3401:3f72 with SMTP id ada2fe7eead31-7a02905618dmr127088137.8.1789506937483;
-        Tue, 15 Sep 2026 14:15:37 -0700 (PDT)
+        bh=i5wLl5edHCUxi+Fo+xKoCx9sBanZy8+ppk8KiIZyNCE=;
+        b=mM4S2eQmh5HU0MDJtGHNDzMdUBEQ2deFT3Bhb3Y/JeaQuDZqptB/NtCCe/GLmHo0nk
+         nYEBxcX9qsG22KRDzKuyPMRN7kOwE6N54H80DzrRXD9IB8sJ3HUQ2z3Y/syj1GXmmm7O
+         kuzCL2UkDOjuT/9mDc/EUjFAY+MNfuOdL/vtmjdys3hzapPDRRGcM6SBoasyKIfZEdws
+         IZ9vBEq4YtQS7EE2hXWExgbUGT0SpK28j/cbvbkuVPVoSx3yvm2M4ZkNk/WaPQInVB7J
+         rVQFRR8ZZVdvR1mHSvaEvfZtXASU8H6HRqMp/k//ajOqDj1228N3Q2cmwIRddF7mzPWg
+         D30A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789506940; x=1790111740;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=i5wLl5edHCUxi+Fo+xKoCx9sBanZy8+ppk8KiIZyNCE=;
+        b=aB8iFNHwILZjH5wm3IT8gIEQvcaSoixLgsq8eF56EPSCgcr5Qe6Vkj01TIJyrVxKL8
+         WGCC0yEkwsuUZyV0ZjH0vF2TXtcGM/7aPnwWPu03cBULEu4CtnaRtkZ+6nrerXoRMG1n
+         pMt8PlhLvwCXd2KVSsAjShWCQgWT0EQ1vcHyW/i1rDCvY48a3ovZYgks6PfgSc0nHHlp
+         P0PT5/+kdmIX/XuxX9V/Nmy9aOwYuf48sw5ivFC7baRXX/E6bPgMChO6DCYbFs1+SAEh
+         uDchSkBWAz9+UQhTDEUPqu0XsW+CmudXazNo91JPG0ZFSH9sstX2AH0k2iau0hxvAefM
+         CRVA==
+X-Gm-Message-State: AFuF++mvn8yaxLFDqeW1NectL0y+2mtYh5z7zGdDq7qtTvop6uAzj4Gv
+	ZmXN7+zy+uFLGwm/sguPxe/+ACSb+QoHIdbC1SwEbYWXZzs8/jSVTquDfHxkGa5o
+X-Gm-Gg: AYBFou1AB2ern0eKuxgdYvDm3j6uYeb3dPdeYQxiTsGhYoRLHfKcjAU9FpZAchgxVgY
+	oTwPGMzptvVFo6SMSfiutix6KK+4xN1NbIjMpJ3gnYzXPDF6wA+EbrIQNN+2GryTsGwj8ISTZ3m
+	l/d7FDf71SVFIi1nJjX8KmUJCxpI2s9r0CzqEYU0q6+4l+5P2DbY2gir9jTcfnIOtj0e/2fVJIK
+	HFkK3jt2lGcONMCsOcMHFES2rda5rmZDC/sKx2y+x/YG7tyej32gTq7UF3BHiJeHfyrl42IP7yj
+	A7tIA6cH4FD0LzEVpNc1kFKZ+UL6Wvx8XummhpF73jYftAr3WrIpK7SST5PeKHsPTKb/RQa2WlG
+	zV3kqhmc4PF0wlwjErcylRBZPOFEWA4CWZklj0NWL3mZisfvZkB+hxyZillJL8GMkiiUPtMmYTh
+	DDZ8SxqjsHC/sufKpdwcnF6HTLhAVKFmWWjiYz7dm4CColKCoSQnY0CKRE9EvwQxY3Gx2aZ3nJ+
+	a39n0FRNfKAWWY29V4SNqoLZMtarud7fuIWq1HR61OG0NwFUrTBu4tVVTsKAR7Dvs64WF19tMJc
+X-Received: by 2002:a05:6102:c49:b0:79f:7e2e:c64d with SMTP id ada2fe7eead31-7a027701bf0mr442822137.7.1789506940027;
+        Tue, 15 Sep 2026 14:15:40 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.36
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98314dd7ceasm746860241.1.2026.09.15.14.15.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:15:36 -0700 (PDT)
+        Tue, 15 Sep 2026 14:15:39 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 00/11] Cover a BAP stream to a coordinated set
-Date: Tue, 15 Sep 2026 17:15:17 -0400
-Message-ID: <20260915211528.1223784-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 02/11] bass: wait for the session to be ready before pushing a source
+Date: Tue, 15 Sep 2026 17:15:19 -0400
+Message-ID: <20260915211528.1223784-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260915211528.1223784-1-luiz.dentz@gmail.com>
+References: <20260915211528.1223784-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,73 +77,224 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-These add the functional test cases for a BAP unicast stereo stream to
-a coordinated set of two acceptors, one taking the left channel and one
-the right, which is what a pair of earbuds does, together with the
-fixes they turned out to need.
+A Broadcast Assistant could write to the Broadcast Audio Scan Control
+Point of a Scan Delegator before its own session had enabled the
+Broadcast Receive State notifications, as the connection was completed
+as soon as the session was attached.
 
-Covering a set takes three hosts talking to each other, which the
-emulator does not get right: every device assigns its own connection
-handles, but the events and the data delivered to the peer carried the
-handle of the sender, so everything beyond the first link referred to a
-handle the receiving side knows nothing about and was dropped. It is
-invisible with two devices, as both sides then assign the same handles,
-and it is what kept the second member of the set from exchanging
-anything at all. A CIG was also limited to three CIS, one less than a
-stereo stream to a set of two needs.
+When that happens the delegator handles the Add Source, sets the state
+to request the sync info to be transferred, and notifies it, but the
+notification is dropped since the assistant has not subscribed yet. The
+assistant never learns it has to transfer the sync info, so PAST never
+happens, and the delegator is left waiting for it until the kernel
+gives up, which takes 20 seconds, and falls back to creating the sync
+itself.
 
-Encrypting the SIRK gave a value the initiator was unable to decrypt,
-so the set was resolved under a SIRK that is not the one the members
-were configured with: LE legacy pairing distributes one long term key
-per role, and only the last one to arrive was kept, so the two sides
-did not necessarily encrypt and decrypt with the same key.
+Complete the connection only once the session is ready, and queue any
+push received in the meantime, replaying it afterwards, so it is not
+rejected just because the user was quick.
 
-The auto agent registers with no capability, which is KeyboardDisplay,
-so a peer may well choose the entry of a passkey, a method the auto
-agent has no answer for: the pairing then only completes once the
-request times out, as a failure. A capability can now be given after
-the name, e.g. auto:NoInputNoOutput, to pair Just Works instead.
+With this the sync info is transferred right after the Add Source, and
+test_bass_past_transport_acquire consistently takes around 11 seconds
+instead of intermittently taking over 40 seconds when the transfer was
+missed.
 
-The first two patches are a fix of their own, for a source pushed to a
-BASS session before it is ready, and the rest of the test changes make
-a failure easier to tell: a test now fails as soon as an operation
-does, instead of waiting for its timeout, and reports what it is
-waiting for while it waits.
+Assisted-by: opencode:claude-opus-5
+---
+ profiles/audio/bass.c | 124 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 109 insertions(+), 15 deletions(-)
 
-The tests pass with "make check-functional", on their own as well as
-alongside the others.
-
-Luiz Augusto von Dentz (11):
-  shared/bass: add a ready callback
-  bass: wait for the session to be ready before pushing a source
-  test: functional: report what a test is waiting for
-  test: functional: answer the notification registered by the victim
-  doc: describe the BAP coordinated set test cases
-  emulator: use the handle of the receiving side
-  emulator: allow the maximum number of CIS of a CIG
-  device: keep the long term key of both roles
-  client: allow a capability with the auto agent
-  test: functional: fail as soon as an operation fails
-  test: functional: add the BAP coordinated set tests
-
- client/agent.c                       |  14 +-
- client/main.c                        |  14 +-
- client/scripts/bap-sink-lc3-left.bt  |  30 ++++
- client/scripts/bap-sink-lc3-right.bt |  30 ++++
- doc/bluetoothctl.rst                 |   6 +-
- doc/functional-bap.rst               | 111 ++++++++++++
- emulator/btdev.c                     |  89 +++++++---
- profiles/audio/bass.c                | 124 +++++++++++--
- src/device.c                         |  45 +++--
- src/shared/bass.c                    | 107 +++++++++++
- src/shared/bass.h                    |   6 +
- test/functional/conftest.py          | 201 +++++++++++++++++++++
- test/functional/test_avrcp.py        |  13 ++
- test/functional/test_bap.py          | 256 ++++++++++++++++++++++++++-
- 14 files changed, 987 insertions(+), 59 deletions(-)
- create mode 100644 client/scripts/bap-sink-lc3-left.bt
- create mode 100644 client/scripts/bap-sink-lc3-right.bt
-
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 533d45babfeb..c9a9111e010f 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -94,6 +94,14 @@ struct bass_data {
+ 	unsigned int cp_id;
+ 	unsigned int bis_id;
+ 	unsigned int state_id;
++	unsigned int ready_id;
++	bool ready;
++	struct queue *pushes;
++};
++
++struct bass_push {
++	struct bass_assistant *assistant;
++	DBusMessage *msg;
+ };
+ 
+ struct bass_assistant {
+@@ -1218,10 +1226,31 @@ static DBusMessage *push_add_src(struct bass_assistant *assistant,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static DBusMessage *push_src(struct bass_assistant *assistant,
++							DBusMessage *msg)
++{
++	if (assistant->state == ASSISTANT_STATE_ACTIVE) {
++		return push_mod_src(assistant, msg);
++	} else if (assistant->state == ASSISTANT_STATE_LOCAL) {
++		struct bass_src *src;
++
++		src = queue_find(assistant->srcs, match_src_data,
++						assistant->data->bass);
++		if (src) {
++			assistant->src_id = src->src_id;
++			return push_mod_src(assistant, msg);
++		}
++	}
++
++	return push_add_src(assistant, msg);
++}
++
+ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+ 							  void *user_data)
+ {
+ 	struct bass_assistant *assistant = user_data;
++	struct bass_data *data;
++	struct bass_push *push;
+ 	DBusMessageIter props, dict;
+ 
+ 	DBG("");
+@@ -1240,20 +1269,25 @@ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+ 		return btd_error_invalid_args(msg);
+ 	}
+ 
+-	if (assistant->state == ASSISTANT_STATE_ACTIVE) {
+-		return push_mod_src(assistant, msg);
+-	} else if (assistant->state == ASSISTANT_STATE_LOCAL) {
+-		struct bass_src *src;
++	/* Wait for the session to be ready before writing to the control
++	 * point, otherwise the Broadcast Receive State notifications may not
++	 * be enabled yet and the state changes it triggers, e.g. a request to
++	 * transfer the sync info, would be missed.
++	 */
++	data = queue_find(sessions, match_bass, assistant->data->bass);
++	if (data && !data->ready) {
++		DBG("Session not ready, queueing request");
+ 
+-		src = queue_find(assistant->srcs, match_src_data,
+-						assistant->data->bass);
+-		if (src) {
+-			assistant->src_id = src->src_id;
+-			return push_mod_src(assistant, msg);
+-		}
++		push = new0(struct bass_push, 1);
++		push->assistant = assistant;
++		push->msg = dbus_message_ref(msg);
++
++		queue_push_tail(data->pushes, push);
++
++		return NULL;
+ 	}
+ 
+-	return push_add_src(assistant, msg);
++	return push_src(assistant, msg);
+ }
+ 
+ static const GDBusMethodTable assistant_methods[] = {
+@@ -1754,6 +1788,7 @@ static struct bass_data *bass_data_new(struct btd_adapter *adapter,
+ 	data = new0(struct bass_data, 1);
+ 	data->adapter = adapter;
+ 	data->device = device;
++	data->pushes = queue_new();
+ 
+ 	return data;
+ }
+@@ -1788,6 +1823,19 @@ static void bass_data_add(struct bass_data *data)
+ 		device_set_past_support(data->device, true);
+ }
+ 
++static void bass_push_free(void *user_data)
++{
++	struct bass_push *push = user_data;
++	DBusMessage *reply;
++
++	reply = btd_error_failed(push->msg, "Session removed");
++	if (reply)
++		g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++	dbus_message_unref(push->msg);
++	free(push);
++}
++
+ static void bass_data_free(struct bass_data *data)
+ {
+ 	if (data->service) {
+@@ -1798,6 +1846,11 @@ static void bass_data_free(struct bass_data *data)
+ 	bt_bass_src_unregister(data->bass, data->src_id);
+ 	bt_bass_cp_handler_unregister(data->bass, data->cp_id);
+ 
++	if (data->ready_id)
++		bt_bass_ready_unregister(data->bass, data->ready_id);
++
++	queue_destroy(data->pushes, bass_push_free);
++
+ 	bt_bass_unref(data->bass);
+ 
+ 	queue_remove_all(assistants, assistant_match_data,
+@@ -2365,6 +2418,35 @@ static void bass_remove(struct btd_service *service)
+ 	bass_data_remove(data);
+ }
+ 
++static void bass_ready(struct bt_bass *bass, void *user_data)
++{
++	struct btd_service *service = user_data;
++	struct bass_data *data = btd_service_get_user_data(service);
++	struct bass_push *push;
++
++	DBG("bass %p", bass);
++
++	/* The callback is unregistered with the session, not here, as it is
++	 * called while the ready callbacks are being iterated.
++	 */
++	btd_service_connecting_complete(service, 0);
++
++	if (!data)
++		return;
++
++	data->ready = true;
++
++	while ((push = queue_pop_head(data->pushes))) {
++		DBusMessage *reply = push_src(push->assistant, push->msg);
++
++		if (reply)
++			g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++		dbus_message_unref(push->msg);
++		free(push);
++	}
++}
++
+ static int bass_accept(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+@@ -2383,10 +2465,22 @@ static int bass_accept(struct btd_service *service)
+ 	/* Only attach client if initiator of the connection otherwise act as
+ 	 * delegator.
+ 	 */
+-	if (btd_service_is_initiator(service) &&
+-			!bt_bass_attach(data->bass, client)) {
+-		error("BASS unable to attach");
+-		return -EINVAL;
++	if (btd_service_is_initiator(service)) {
++		/* Complete the connection once the session is ready, so no
++		 * operation is attempted before the Broadcast Receive State
++		 * notifications are enabled, otherwise the state changes they
++		 * trigger, e.g. a request to transfer the sync info, would be
++		 * missed.
++		 */
++		data->ready_id = bt_bass_ready_register(data->bass, bass_ready,
++							service, NULL);
++
++		if (!bt_bass_attach(data->bass, client)) {
++			error("BASS unable to attach");
++			return -EINVAL;
++		}
++
++		return 0;
+ 	}
+ 
+ 	btd_service_connecting_complete(service, 0);
 -- 
 2.55.0
 
