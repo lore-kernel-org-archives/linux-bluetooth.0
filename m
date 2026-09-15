@@ -1,69 +1,69 @@
-Received: from mail-vs2-f24.google.com (mail-vs2-f24.google.com [74.125.227.24])
+Received: from mail-ua2-f12.google.com (mail-ua2-f12.google.com [74.125.226.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407FA37B01F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 16:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756C2420898
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 16:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789488015; cv=none; b=YyKZjI6+2cMLwvjWj9f/Zb+env9SAd3AwOT9XmFOL+7fHnnimTZCotonwVGalFA++Pis2LyhyQo35ZLrXvTKscRbtXgWbEsDQELVkHO7QCjRPUo1KRqHF5SOqaTyZV9CRBOLqSJqClQoVVEbFh+vacektq4jX0RBJitJAAOllTU=
+	t=1789488176; cv=none; b=LjRqF6gvXN51LIFZm8H+LUx0jhA7DJ7hxtDRADoXvgr51+EAldxtL3suyOwOoSPpuym6SA8OObNNOomGG1qwN22sEn8j3ADYOMGBwvf4txscIAjZ8srQZwYtMqF7vwyHlAjkqhCA/kvvezsR4LHs+wSfr4K6kQHjaujymj2UQk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789488015; c=relaxed/simple;
-	bh=c5rcdDdlE0FtYLAQf6VE6WbsbI2ilBQWR013Nj2HKGA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AhROajDKe372tVf/UNFjysqAW8PAgQVrNls8ubkhbF1zdjCZNbu1cWLdU1bWPZwRuP+CkQTuAkYpr0IO1xdvTeNrfLnnHIvfz/zAzcA3+wR+8bb7HFAMM2NXcxsOTjwDofspW3R1Lq96DzGcA68O42kAUXHSHv5qPsO6to/Rh3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BBeaedNa; arc=none smtp.client-ip=74.125.227.24
+	s=arc-20240116; t=1789488176; c=relaxed/simple;
+	bh=9UwYC4oAOD0QyUOBHTahfXva8dPMW5L+Y0G4I2GbhK8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AVPo6u1xuDV+0Poh1s0pBeJ/sSZTfPvmf4C5mF/1sPsNNINF2KgLm9G8QysB5NqetH3pL/t/s+6/j9Ei7CFjgvJiTDBwPsLYFOad/Q9bAcYj/ZlYx+hFo5/6NjxL0sz5X24NhPdtYlXppnTkfCsVWpuip7Q5se41VXU7G83uWb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lunoOwBz; arc=none smtp.client-ip=74.125.226.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BBeaedNa"
-Received: by mail-vs2-f24.google.com with SMTP id 71dfb90a1353d-5c97b28165bso415104e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:00:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lunoOwBz"
+Received: by mail-ua2-f12.google.com with SMTP id a1e0cc1a2514c-97e7c8d040aso257651241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 09:02:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789488009; x=1790092809; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789488172; x=1790092972; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jBwXWyCEkSTnm4vqQrbw6NCM+Mqq0U3bxGvHWqgfP9c=;
-        b=BBeaedNaTksirHZrxy24M/hSXLmU9eCYHTAGP7qx6jeZMdbGHh9LTP4HCCMGbdlb0R
-         AnGuJChstU+nUoHxNaLlg4y32rDHGMquRNT4hqb+wIUDDXvpO24UQwQjTY+jknIj90G8
-         HPD+MkG2aoO0ukvV+GiCz71MukfDhxzINdXtZXkvwSDOBL4OrRu4eijvZtOZcoILMblM
-         RzYo51DOSZLiIdtSkipIO+/Hu9YzLtwBVT1MUikgKUFMY8A53dFDzBcuajPK6w2/ufk6
-         nEeLP9+Fdpm9EFC5H+2+SiwJBVHOUgRrs+s3NKmHKtrU0xttCy41zTNWaqvm3mYRt4nF
-         Bnbw==
+        bh=G2OyX4TBZ7Y1HQ2aZjbOcGyMSBVmU4uZJiE97DYV0Rw=;
+        b=lunoOwBzgY2LcIWA3JpVQLZ49XKm3odL0hFDJ454Iqf3vnGbCOgklpIeTl4gJvPjel
+         OJzx0Kk6CfE5Z6SplGUXnrDngkDgHjgpeJw+CPTIcdNzZCmYxdPM+HKp+LmRbG02M8C8
+         zXJVMtRHed50mwAZjOL4qWbk/CImNvCqZcf4QBVapV8uXdi44JOtS+reZyOXu4BS3i+L
+         CdhAOgQ5JNEr7xFc2u5AwVhjC4rfPfUU01sVCUr5qBGrotTX6SvxijmxOiQdKUkRytTw
+         qlWXq+z2S2Jb+P7ajktbOCUTnWG2Z3RMuL+q5rkz70o3HZUExw7t6tEpuTVILALjG0UD
+         2Aog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789488009; x=1790092809;
+        d=1e100.net; s=20260707; t=1789488172; x=1790092972;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=jBwXWyCEkSTnm4vqQrbw6NCM+Mqq0U3bxGvHWqgfP9c=;
-        b=gK/DBgwVUANr4w5nffvOsAK9f2v0IrfeE6k0l3j0Pie1W+IABvn+XXCUZ52GNtLblb
-         6eetaeJYNSdYnF5g+fCdfxykXNMDqGq98Jqefosl4DN8hiCojbzUeKhULvkXryW3XNdy
-         e4iBttlGGbF7HH+MZiE0ljLD/FwbgzNBwfpxCRFmcFHYgFeLTWiQy6jUgBdNcjpQ0aIl
-         80e4ouZboa/txQqN7wMcQI9ci226uVgIlr4Vco9aS4iDrw7YZ7AwpF+/n5q2DzVwM4hV
-         3+VHlGhytykf2MT+KFz83jG7OhU4TvgwYgwo806TLp27g74pbT22/7saG6R+T6eXJ1cH
-         NyOg==
-X-Gm-Message-State: AFuF++mEYXi+CClH8OGTpsYHR9/ppQc3eUCS3ThPiLF/MKpZdSThxTNc
-	cO2jbTQEZDTynomUttyIfLSk0WmIWxvqy+vfFa8JWQpkEWvo29U8/2DU
-X-Gm-Gg: AYBFou3GTbqd+BOOP4xxEAdacvgw6G/EQ9FcGLk3o+sTzvFlRpoMPAwpKmUmH1AMRhX
-	VS3V66CCj56f8cn8JVoN5aClSsCyNFPQPvOuXQMH7nontO2Kkeg76mGJE0v6kFdekZC5dGlM47T
-	4c4NqjGV8I4V1UrcL8i3c5SJwSnAdCwokPkn0etc001KCpUcV7PlS3Mg8vFWdpjjUDFVgMtB0Kq
-	5pSnrH98F6DVozGj/3WQPZnW/W7fZJtaOoSnERzQQsmtDS7SrLoIU5p7OR3Z7+9efY13wnvpVyE
-	xvd/6GDYr3aEwtG5Hc5kCYOka0EnxliD5zUwZS+HxSzkCJ6+dGwsgIBNfzIBFq5i5QpU6RvDxHv
-	btuUK/fggrv2xkLkScyavaGntPAfHIYvvjHjo1ihSQghdMgKOZEKPXYbjmXs7lqiMaK3SUvBJ7/
-	6zQVjEfINKFZUxt3WlcbSybx5dYw2A5/mssh3/lK0UvEIeSg/smhGLsh43hcwj1KEdhg==
-X-Received: by 2002:a05:6122:f8b:b0:5c8:2852:36cc with SMTP id 71dfb90a1353d-5c993c0c8c3mr3364356e0c.4.1789488009295;
-        Tue, 15 Sep 2026 09:00:09 -0700 (PDT)
+        bh=G2OyX4TBZ7Y1HQ2aZjbOcGyMSBVmU4uZJiE97DYV0Rw=;
+        b=A5LuoeNmSXa0XRZ6ERorFAo78BpGCI0172zOKF8JVgcRbxSmeWQORHKjs+/BhA36fo
+         OIovL3SlNzTy+NVqQFCmA6wA02HgDtbkY+/T5aneLwAWI16zgL9bXj8s2JVaWRtLSFoZ
+         LzDDwGTPENXbg/Xws4ADNp1mpCw5hIoLpSqTMfD1S6DgRSHaDzN8jEiChgJowE3+mDZk
+         YHw+tqi8aankVBbP3iM30T04TTyWk9LdePHDVfWUOyyVT35/ug4haikDyr7KQMeqobS3
+         /9w28l2+taC0rIJs/m/EOdh0MFMv0QHslTA49IavLOo91OPLJY7AG5eU3/rf/1TAj892
+         BKbA==
+X-Gm-Message-State: AFuF++lRqzcWeGPnAPvLNtMfNreRjEGLW7PacXr3XarPqiwxL5N0vF1v
+	plsrOBZm4P1AAar2DctFOC+aAx+3O8Rv/mQos56qRl/9LTqjjSbXTMas
+X-Gm-Gg: AYBFou3EgxWyfogWqitWXnOd9YxaUp6LoyhJT79oLmtwIv2/61uX9L4UzZbt9wI7dC2
+	S+YpdT/RIC8M8/szynOks8nLwjUlKtr3ZYk5PGfm6wLaMKjv2jjybnerK9QiwT83YUw6C/sruii
+	LiUaoZCOAeejknewBK45tQpQwLgjpXdzVJDe/v2CkdE8G7h1TOIddJkwPzRwZ2Ku4blBi2su/zy
+	3QK/UePJU+mfyKptvmzBiSIRSiO0R0K4EJ9PQ3uaUsHHFGnju1v1gpVpqq+1j2d1gVX4joM2smd
+	n05wQEQP8Mhaq8c/MzAgiSnJe/MCFy+E14bgyIaKHwyZFQAt+1+lD5b+DdEVa0B0XylBERDtAhW
+	RYxhTBYZXqXdGTCDMdVn/iIkhEM+eWrpRSmOnC3XgtlHgk7G2G0eVOIn6DLagijWHxz4XlWwVnb
+	LbKztwWka2EE6fbB+ptnk9xcIHhuCprcoYc1ReCTxve+f4NxzCQEy9rZ8Un/b35LrW
+X-Received: by 2002:a05:6102:38c6:b0:79e:373e:8216 with SMTP id ada2fe7eead31-79ecdbfe5f3mr3192373137.0.1789488171648;
+        Tue, 15 Sep 2026 09:02:51 -0700 (PDT)
 Received: from beelink.. ([187.13.206.89])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c99149d764sm1485543e0c.3.2026.09.15.09.00.07
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-79fb193e849sm78576137.8.2026.09.15.09.02.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 09:00:08 -0700 (PDT)
+        Tue, 15 Sep 2026 09:02:51 -0700 (PDT)
 From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org,
 	Aldo Ariel Panzardo <qwe.aldo@gmail.com>
-Subject: [PATCH v2] Bluetooth: mgmt: fix race in read_unconf_index_list()
-Date: Tue, 15 Sep 2026 12:59:52 -0300
-Message-ID: <20260915155952.3104711-1-qwe.aldo@gmail.com>
+Subject: [PATCH] Bluetooth: L2CAP: validate frame length before control and FCS access
+Date: Tue, 15 Sep 2026 13:02:39 -0300
+Message-ID: <20260915160239.3106697-1-qwe.aldo@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,47 +73,50 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-read_unconf_index_list() counts unconfigured controllers before allocating
-its response, then checks the device flags again while filling it.
+l2cap_data_rcv() unpacks either a two-byte or four-byte control field
+without first ensuring that it is present. A short ERTM or streaming-mode
+frame can therefore cause an out-of-bounds read.
 
-hci_dev_list_lock stabilizes list membership, but it does not serialize the
-per-device flags. During asynchronous controller setup, the worker can set
-HCI_UNCONFIGURED and clear HCI_SETUP between the two passes. A controller
-omitted from the allocation count can then become eligible for the fill
-pass, causing an out-of-bounds write to rp->index[].
+There is a second short-frame case when CRC16 is enabled. After the
+control field is pulled, l2cap_check_fcs() subtracts two from skb->len
+without checking it. If fewer than two bytes remain, the subtraction
+wraps; skb_trim() leaves the buffer unchanged and the subsequent FCS
+load reads past the logical end of the frame.
 
-Allocate space for every device on hci_dev_list. Since list membership
-cannot change while hci_dev_list_lock is held, the response remains large
-enough regardless of flag transitions. The reported count and response
-length still include only eligible unconfigured controllers.
+Validate that the frame contains both its control field and, when
+enabled, its FCS before either field is accessed.
 
-Fixes: 73d1df2a7a10 ("Bluetooth: Add support for Read Unconfigured Index List command")
+Fixes: 1c2acffb76d4 ("Bluetooth: Add initial support for ERTM packets transfers")
+Fixes: fcc203c30d72 ("Bluetooth: Add support for FCS option to L2CAP")
 Cc: stable@vger.kernel.org
 Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
 ---
- net/bluetooth/mgmt.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 167d75e34..1f6691278 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -496,13 +496,9 @@ static int read_unconf_index_list(struct sock *sk, struct hci_dev *hdev,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1156aba4e..40ebabe34 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6683,9 +6683,17 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+ 	struct l2cap_ctrl *control = &bt_cb(skb)->l2cap;
+-	u16 len;
++	u16 len, min_len;
+ 	u8 event;
  
- 	read_lock(&hci_dev_list_lock);
++	min_len = test_bit(FLAG_EXT_CTRL, &chan->flags) ?
++		  L2CAP_EXT_CTRL_SIZE : L2CAP_ENH_CTRL_SIZE;
++	if (chan->fcs == L2CAP_FCS_CRC16)
++		min_len += L2CAP_FCS_SIZE;
++
++	if (skb->len < min_len)
++		goto drop;
++
+ 	__unpack_control(chan, skb);
  
--	count = 0;
--	list_for_each_entry(d, &hci_dev_list, list) {
--		if (hci_dev_test_flag(d, HCI_UNCONFIGURED))
--			count++;
--	}
-+	count = list_count_nodes(&hci_dev_list);
- 
--	rp_len = sizeof(*rp) + (2 * count);
-+	rp_len = sizeof(*rp) + (sizeof(__le16) * count);
- 	rp = kmalloc(rp_len, GFP_ATOMIC);
- 	if (!rp) {
- 		read_unlock(&hci_dev_list_lock);
+ 	len = skb->len;
 -- 
 2.43.0
 
