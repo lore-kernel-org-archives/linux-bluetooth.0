@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FC937C0FD;
-	Tue, 15 Sep 2026 20:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7CC3F44CE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 20:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789502481; cv=none; b=AQvcF2W7iqKWdi42ynAzBCMx+UqXowqLSlmldLpmhUp0guhc25UBFX5rOj/04Ni+2bmiepav7IRjendIij9s5PTVS52+aBWcBe7RyaitVCmGthmH72M2DddFSfpnmsWfZXxeBflg7Nio8ETP+ztCC+MsUbbIVV6hqEoz/VWP17k=
+	t=1789505473; cv=none; b=Nshoj7nUhGyIeAs00RtZo18SJsaJzZ6DZmsdGF7mgCs/M0kUyUKO+IfWRwSmCrOFgJpOaxVcVhbjUc2J3TVbl8f1k+YWYwhfwC9Yz4mxUb221uWic56TgrkbsqmHCgOwQfSDbxpCC1RjnLyrtFMIAHZBT9ShryaBfFfmYf+sqFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789502481; c=relaxed/simple;
-	bh=6oJ62CEgj/ODiNF7VRl0QftVoMnL9Cbrnv+Km3iUADg=;
+	s=arc-20240116; t=1789505473; c=relaxed/simple;
+	bh=YXasDVmQPbFf83RQGPrIWJ07CLrQailSXcevL0SRQ6c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J8fl40jIARR+Z40vLJ4zsASveFX5KLCLXJqN3vmCnIrQGwtZMiu4WeBNi7Lf6mcy8NYLQK+HjoDVwALDf9ppht+f4wtd3LiuefDfcYPjBxIQ2gArMoIec4HwYHyQDEzOCb/ipRsMOSs46SswGcNUjMjSQUdn0BX5shbvcGs8/fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mm610+ca; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=ociNUq9aNQiQklPURLxI1QAZi4EbjSIhnvpJIr/jjtljfsCO1Yfee5dEmkD88uekZeO4TuVboZkvv3IK8DdFw2uQy85IZlHyTmn5vJ/9yBqPpG+OJ/iiLaUoz3R37OvrkJgMBccaXMK65X6WwwtSG8OLViyxHOLBR8ODFD7zVIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXnDBtYL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mm610+ca"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA251F000FF;
-	Tue, 15 Sep 2026 20:01:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXnDBtYL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279A41F000FF;
+	Tue, 15 Sep 2026 20:51:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789502479;
-	bh=tgBs0QSoGRbOfzpW91bJ73IDZjsFZj8r3Xef42jcmEQ=;
+	s=k20260515; t=1789505470;
+	bh=qwg3/koiuZI6xfB8OjAoQiuNa6kSCX9t9Vcxn3Zsskg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Mm610+caItDvmzKd9Kl9dQX4aDdBEp1b/UiaGLRXMp1+p2CZ9pcXVJPcPc7MfJOro
-	 Q/g0MhyHznXg6yYPt5Atz56bR1JWyDvLJTVlbiLlw8Zx5s4Tw75SSuZroUEPNm0IQ0
-	 9sYUWWKLcOPjWSps9lPFYkvlZ2ZGrsnboH+BdcV65WtyI9QjDPmni6OtGTzUU2UEJ+
-	 BHWLQu6+CimAUqRYta3V3wyifTFbGrJlcEQX/EJIZSg5T5ohTRdx1Y/+Uws5l3oC6Q
-	 Y2NkDteJ39N5uVttbqnovoY9iOMLqI4aEL/DabDZ82U6IkNJivao5uorc3046KEgjR
-	 v9sA6nFvRWr+Q==
+	b=XXnDBtYL9S7YLYfvtcoNfEERKuvziiISGumw+JvJkF9ty+7OlIMlMYl2us8kAmydC
+	 oT8d2UvjvDcAx9+mN84OcvIQ5gSHaMu0cijV17UeO6MMde/ZTZ0lZDECgy6+SNc68/
+	 UlPdjAiMxGXoFIdKKxjR/PMUSIBH+y+x5M3U44xq99SIy4yXAKhY+ip60w0+lYEl7U
+	 jy0kfcaoCw0byMElq4uM/ec3ajEZejxTNScpe/i9JDY+SSPn9ctTMlQfrrgmpA8Fbr
+	 U5J3i8hVJgYM6a2x2yoi8n+K7mKZkv6ukHMvI4AN2TGPA6tzAmut2i6uLWVWVnlGV4
+	 9aFCU4IHIIVxw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56CB8392705B;
-	Tue, 15 Sep 2026 20:00:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0995392705F;
+	Tue, 15 Sep 2026 20:50:05 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: virtio_bt: Fix probe error cleanup
+Subject: Re: [PATCH BlueZ 0/3] test: functional: add mpris-proxy end-to-end
+ tests
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178950241387.2253397.3488916674710358417.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Sep 2026 20:00:13 +0000
-References: <20260911024124.1527637-1-oss.patchbox@gmail.com>
-In-Reply-To: <20260911024124.1527637-1-oss.patchbox@gmail.com>
-To: Yuho Choi <oss.patchbox@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <178950540463.2270046.15143718818647294828.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Sep 2026 20:50:04 +0000
+References: <cover.1789430529.git.pav@iki.fi>
+In-Reply-To: <cover.1789430529.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 10 Sep 2026 22:41:24 -0400 you wrote:
-> Once hci_register_dev() succeeds, the HCI device is published, a
-> registration reference is held, and power-on work is queued. If
-> virtbt_open_vdev() fails, the error path only drops the caller's
-> reference before deleting the virtqueues.
+On Tue, 15 Sep 2026 03:07:17 +0300 you wrote:
+> Add tests for:
 > 
-> The registration reference keeps the HCI device and its callbacks alive.
-> Therefore, a later HCI send can dereference a freed virtqueue through
-> vbt->vqs.
+> MPRIS -> local player -> AVRCP / MCP -> remote player -> MPRIS
+> 
+> Connection and basic operations are tested on smoketest level.
+> 
+> The code is LLM-assisted, with manual design and details input. I
+> reviewed and tested the result.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: virtio_bt: Fix probe error cleanup
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8ec80e64922f
+  - [BlueZ,1/3] test: functional: add mpris-proxy BR/EDR test cases
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3e7fb4ac2e28
+  - [BlueZ,2/3] test: functional: deduce pairing bearer in shared fixtures
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=acab65d06795
+  - [BlueZ,3/3] test: functional: run mpris-proxy tests over LE via MCP
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e2ec6827f7be
 
 You are awesome, thank you!
 -- 
