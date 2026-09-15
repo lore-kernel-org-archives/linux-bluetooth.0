@@ -1,129 +1,77 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F7B377ABE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2026 05:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191BF3911D5;
+	Tue, 15 Sep 2026 05:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789448993; cv=none; b=jNZtSTVcrhoBMkcanetAkJkQ6WRMvT/jJ2NukmY2dbfATtE/vNoLYGdDeWNzvue1KpLhAaIMZQev4ldE5Gpvr634AnAKnKbAlMReY1Obg/yBf2PlDiogfT5LLVHsmvLDHWf3WAQ3hKDM5R8Rk6wYK/+CR8QtbpresmVmMX+663M=
+	t=1789449989; cv=none; b=QH7VgbtvaZQ+h7pdjzh5iDfLuPiM1NZBr7KpNqLgzHRWSDwtFEus4HbwWDcStZvLANCwQ/UiFdhrfqEIdyHOPeDWZd9tSdKrFHFEC6T3sP6FbmXuLnGZA50UCj6hQ2jPwTagoPWbS0Iqesa98T9OfLSvGPTuQiqKpDX63C5+cC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789448993; c=relaxed/simple;
-	bh=p46ww9nqNp2YP0orOeAvu2G1R8g3ZWCwlA4FT1c8q20=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fq6rdGfCwHGpOZdLKkIPFLIojEN/7bwPHfih/L9ahLkAV9NfTZQXtvQo5FlKJ9Wpaa00d19Kpb5dK4HB4Xax1UwhS6S0Tczb/KD9Xtu+VPVQZpCRofi5OZ+X+ETgtcpCQIgGpVkLtNWWEOHbYCzkiZ8dV8K/iDNA4FSupw1Qwng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cWgnf4Xt; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789449989; c=relaxed/simple;
+	bh=aP00zB2vwTB3f8YJgoYb84OWuA0nhfnOSanrcoTEzV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJs9KetVL2cUFOQsO6wM8y/BpdSXjT23YHae8G1QLNcQs0mGFVnq0ig0K16U4jhAKsC66/ilB2AibZhAxEtrRLYhwpeAECe5ZuE1nCkmKaW6gUsDbCDuLvc8J26NmJRZfU48tq5mbsc9jSuhfaZ1omCGfY09UZO0WsemLeYs/bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ILyBTldE; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cWgnf4Xt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789448991; x=1820984991;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=p46ww9nqNp2YP0orOeAvu2G1R8g3ZWCwlA4FT1c8q20=;
-  b=cWgnf4XtClxM7DmhsT40mvaqUiwS9BFnnql9HNNHWsYuUJ9+NlDqaruA
-   QrpDRJydxDval7ZdqqveTBd/rI6yqeXruPBXzGKqbqOOQRsF1uNRY+Z6P
-   lyWVOSZbfcHEoKL55JbVU9GLd3Ee0O6VZGDpTpvnHE5yvVYIzRN4b6FWR
-   sL3nTrXzp7m/T7fZ1LEECT6kKBrsPtKr6bHohPw7V8hh9safd4r+hfGE/
-   4T7M7l2G7v1hn/52nXEXtGjIHxxHdK+e26H9dELYTs1H4Ze0n9VpP8JQj
-   JuB8X1e+KTBnK0+z0R3ymCQ3/S8OvmR+Hcj//NvhFfDcQV2y0YqSY5uXb
-   A==;
-X-CSE-ConnectionGUID: awUt5C3WTha2/D3rJMzgtQ==
-X-CSE-MsgGUID: b4MW+TqARNeDHO13kctA6w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="115339600"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="115339600"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2026 22:09:50 -0700
-X-CSE-ConnectionGUID: uy+2k/ILTuW7i2CVdmu3mA==
-X-CSE-MsgGUID: hyfGDPtqQYqnhVx0o7Z+4Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="270213697"
-Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
-  by fmviesa008.fm.intel.com with ESMTP; 14 Sep 2026 22:09:49 -0700
-From: Ravindra <ravindra@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	Ravindra <ravindra@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: validate device-supplied DMA indices
-Date: Tue, 15 Sep 2026 10:42:15 +0530
-Message-ID: <20260915051215.2691851-1-ravindra@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ILyBTldE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=1c5mzcm+uSJH/DtWgavu8DM7f9DCOGPDOW8edkuJv3o=; b=ILyBTldE/3fvwiQvczW6GZNgXS
+	T3LpZ3NJGXxj9F1An1TrTZNKWD0lZHNsV2AuTJHxoHWCr8hJFr5afzFrt5Q9u1DCdI+qOJluLTwZE
+	xy9tuNnAIOyn5froN9s3iY9wERMiqCqEAcBQUTB7vLYgg2ZN4OGtL350VDB4L8PDcVSS353p/5QQR
+	jA6dm8HYS7F2MdOi10Z4tQ07ncPMurEjuLtEHWfVGzgr8b5+FW/3J0BF9Jyb7+8+LNCwi9Da2it8Z
+	wHgWYtLk99tcWxDFOxA1hz2Xne3Vma+lulgZEDrDTtqcFG71mC00yhCN/EzDzUjWWZDyHe9pSD4ZT
+	WRt2K5Og==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x6LgU-00000005F2l-3sGI;
+	Tue, 15 Sep 2026 05:26:22 +0000
+Message-ID: <4169629e-74c1-4a21-a187-6c65d70502fa@infradead.org>
+Date: Mon, 14 Sep 2026 22:26:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/2] ipv6: update NUD_FAILED neighbors from NA
+ messages
+To: Lawrence Lee <lfqlee314@gmail.com>, David Ahern <dsahern@kernel.org>,
+ Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ Arun Ajith S <aajith@arista.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Jaehee Park <jhpark1013@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+References: <cover.1789448374.git.lfqlee314@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <cover.1789448374.git.lfqlee314@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In btintel_pcie_msix_rx_handle(), the driver processes RX completion
-descriptors (urbd1) written by the PCIe device into DMA-coherent memory.
-urbd1->frbd_tag (a 16-bit field fully controlled by the device firmware
-via DMA) is used directly as an array index into rxq->bufs[] without any
-bounds check. rxq->bufs[] has only BTINTEL_PCIE_RX_DESCS_COUNT (64)
-entries, while frbd_tag can be any value 0-65535. A malicious or
-malfunctioning device can write an out-of-range frbd_tag, causing the
-driver to dereference an out-of-bounds data_buf pointer.
 
-Additionally, cr_hia is read from a DMA-shared index array also writable
-by the device; if the device sets cr_hia >= rxq->count, the while-loop
-never terminates because cr_tia is wrapped via modulo rxq->count and can
-never equal an out-of-range cr_hia.
 
-Add bounds validation for cr_hia and frbd_tag in the RX path, and cr_hia
-in the TX path. Log invalid values with bt_dev_err before returning.
+On 9/14/26 10:01 PM, Lawrence Lee wrote:
+> Testing:
+> - x86_64 current-config and allyesconfig builds with W=1
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: Ravindra <ravindra@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+What does current-config mean?
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 4807361a58a7..444cc50174fb 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2065,6 +2065,11 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
- 
- 	txq = &data->txq;
- 
-+	if (cr_hia >= txq->count) {
-+		bt_dev_err(data->hdev, "TXQ: invalid cr_hia %u", cr_hia);
-+		return;
-+	}
-+
- 	while (cr_tia != cr_hia) {
- 		data->tx_wait_done = true;
- 		wake_up(&data->tx_wait_q);
-@@ -2644,6 +2649,11 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
- 
- 	rxq = &data->rxq;
- 
-+	if (cr_hia >= rxq->count) {
-+		bt_dev_err(hdev, "RXQ: invalid cr_hia %u", cr_hia);
-+		return;
-+	}
-+
- 	/* The firmware sends multiple CD in a single MSI-X and it needs to
- 	 * process all received CDs in this interrupt.
- 	 */
-@@ -2651,6 +2661,12 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
- 		urbd1 = &rxq->urbd1s[cr_tia];
- 		ipc_print_urbd1(data->hdev, urbd1, cr_tia);
- 
-+		if (urbd1->frbd_tag >= rxq->count) {
-+			bt_dev_err(hdev, "RXQ: invalid frbd_tag %u",
-+				   urbd1->frbd_tag);
-+			return;
-+		}
-+
- 		buf = &rxq->bufs[urbd1->frbd_tag];
- 		if (!buf) {
- 			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %d",
+> - tools/testing/selftests/net/ndisc_unsolicited_na_test.sh: 14 passed
+> - Local NIPA checks: all substantive checks passed
+> - Sashiko local review completed
+
+thanks.
 -- 
-2.43.0
+~Randy
 
