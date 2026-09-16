@@ -1,105 +1,102 @@
-Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-3.smtp.github.com (out-3.smtp.github.com [192.30.252.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E751F503BF4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 14:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BD74FC8D5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 14:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789568511; cv=none; b=OGxvn+nBZtKXn6kcddD5GRMaLrssTjXO39LhW+ziC6v10L3mtix4OZaBd0P4S2huDK/xc+1ikDZDA/96PIl0JGhaHMXI4AJCzJyVVVZKaRxIDqjyy6AdMPn59m0l+kXP8HdDMLM1ZtJlsTqDnQrWaCdZGzr06McOTuK4h4sag8s=
+	t=1789568551; cv=none; b=JuECtXv7F5tMfpmxT08+jyHQJ4daiZGH7LsnVVWEz0lJ70V2I1J0wvh4lv5rGgrjHvQtLgXGMQS12p2hvNWGazupwgcCyAio0UdSE/fSvrzVp7xcNQNVAEuR5WyYjk8v/9IYSBiP8+gURxPWeebo1pgdcaS6/u5D3fblAsIn5Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789568511; c=relaxed/simple;
-	bh=8mnCsZl+oibrzXIZLai9CrdFb32ytB89cxl6fzBueOo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lgZg8s9oGwl8aGkAQ/FH5WTptD3Fs6zMSC9lCL1NSpnr4FC1PEzkyiJTl0+sa7d1M6LmvtnTyafbKeuH9cU7Op89o5ZXngKhrpU0GYgZMc4kQfnpnP4joEHVRiwA/HWge43CmfpI1HoYEOabGolmA2Bw+n0jNkW7fWQ8F9mqoZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AK0E8b9/; arc=none smtp.client-ip=74.125.228.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789568551; c=relaxed/simple;
+	bh=cih0RUv1CwodrrjIvVD2QVQ5NEKrncDsgYV0+wM1nk4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eaNZOi5UusH/qxDMxQAQ9QiPHSh42Vqp1gymvfzQeg78Ymf6WVhxeMRNmQ1UDSGb1BVvnINXfeGxRwHUbcntBhRa+k00/b49Zu78sP0mlIlj7d12UcXYTngoRCBttYp1yU//LfIxBt2mPPWJIci9VSWJUjyJns1q1eQ26ca0tj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ecu/uUgk; arc=none smtp.client-ip=192.30.252.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AK0E8b9/"
-Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-8692a856865so835343b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 07:21:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789568509; x=1790173309; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=dT+/T0BUfQDZxNKjWkr1SYl6XlDIz9NKWzrsvYbuZk4=;
-        b=AK0E8b9/bsbHcgVv4dVidCblI/kUBER889Ew5aDUji59d8Itm5ZlUFblshxa8nXpfm
-         t09OStsx0zZF3HFEeNk6rNLASmGzfu2AKY7Q7oOBRExOEGsg1hYoMz9rbmv6WsdT2nLh
-         Y8jzNMfpoRdOcIP5n3bKVCDuzbIXTPxgTtA+6k18yXgNsU0qV8v+E5ul0W8m2Z/phKBk
-         S30pZQ4/ZSYKiaFVzNGHayo5fgl4RwFuO9gblGBAiiG/q6ThgASnmDETscqyZYThLC+f
-         T8kC2WDrs4DIaeugpV4NsZIoSjV1w1FN2p0UHxMB3P36raZwybuEd8QtuoTgjDMDLGEi
-         2zdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789568509; x=1790173309;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=dT+/T0BUfQDZxNKjWkr1SYl6XlDIz9NKWzrsvYbuZk4=;
-        b=Y1hKZ1ZANi84p3QbBSdbUHVGM8z6zTGcVpIhQbuSThMiaBBeOglKLHlcz0/T6zYLyQ
-         Nic2RQEl41NolPnANJIg0ajQ/nEL33mtThDBVHBvQvNJwG0h+XgCw7FehLUbIr0oJPoM
-         xzhkckpdCDcWeHP4Xo1gl3clV71Oro8fLOHg9i2xrAM4MsZNl0OE/722BCHc4kLAcmUd
-         CLMYRoyU2T6g8xblgJ9M0FipE7gmM3bKycyPCZJaZJySg/Yp4HQ7Ls8QusM1CR644AN6
-         WLfw4UbBbZGJtCmPWLtcOG56xS+fCC5E9sCe5fLr+2GcHRn8RXmUoVrA7N3/TNkvLEcB
-         zS+w==
-X-Gm-Message-State: AFuF++kXW2J2I0tv0Vey/GyxqPKKsk8/XE7jW/LF+uYNxYq0M39+iEks
-	KQwZowYlNrgtHEdMnyTWup3vAcDHoozeRlsy248UHUCOYX3ZWxRM/w9R4JTPtSh/
-X-Gm-Gg: AYBFou1cgo84MeLmyFTMDfGiU7Huil3ZoeuouXluNmlq2YGScugb3Ge7ZxLbzVT+XXm
-	g8tayb93nZ126dz1HdTpX03oI4DuM/n4T5C95TOMDU0CrNbdPPttwk9KFBWJbMQ2Gudu3h173Bp
-	yz0hGUp72SC9WsQtSq8aRG8Xr3k0Wa6ngywqpdPsHq9+wT6+3UM+8ZpziN/C1tnbz8gBK/ukfob
-	LkI7UPDciQkTWlRs5oGebFu4oprlUidWUNEdKp7h/JiKCGOCNozVQXjEqUexJl5AnpQUCCVD55W
-	DUG+PQ3TOwbdd/OaoHn5hkCzgrn5XgGjvtUGqxR1G9x/R3qydlLQj7CgC6uivhvE5Ej2cStCuSj
-	+G5mNECGSPOoTgxVUT5tdzoxuxLNMm34nhz6EURDkw9tNZbluxUViJpZjEObRQhaJGJH3qkgQRK
-	PjskkAxhha7SLg+vXPkmIC5e2QQRzgKiI+22uy3y3v0RM30aPUPFU0f8sMsnEIH8ZQ9X2AQSLsJ
-	BfO/g==
-X-Received: by 2002:a05:6a00:ab0f:b0:86c:79f5:281 with SMTP id d2e1a72fcca58-87238d832f5mr6983232b3a.13.1789568509198;
-        Wed, 16 Sep 2026 07:21:49 -0700 (PDT)
-Received: from [172.17.0.2] ([4.246.127.133])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-872024e6a2bsm1331740b3a.55.2026.09.16.07.21.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 07:21:48 -0700 (PDT)
-Message-ID: <6aaaa5fc.1b3fddab.1172be.89c7@mx.google.com>
-Date: Wed, 16 Sep 2026 07:21:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8309102018219903240=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ecu/uUgk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789568549;
+	bh=g9TTl2geAXyojFXfrhfNqe0Xvo2v8xtLp0hHSmT4YLM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Ecu/uUgkACdUUofxYrDEw3ewm3NeW9gDdYn1SeDzQTUFC7UhR7h1VMvbtvGSv1kZW
+	 E7Gkae8CNHWJg0AVOwKkLsRBvRdVXhqf4Wl/ELehhwG/FrnEA4v7vGgsy4GOoDwp6N
+	 X/5xaeSX4bHXLro5uNdZO5NuLZFM8U9RnQors8XQ=
+Received: from github.com (hubbernetes-node-75ebdff.va3-iad.github.net [10.48.73.61])
+	by smtp.github.com (Postfix) with ESMTPA id 55E40340606
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 07:22:29 -0700 (PDT)
+Date: Wed, 16 Sep 2026 07:22:29 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1166364/000000-c66e9b@github.com>
+Subject: [bluez/bluez] 070cb5: shared/bap: Skip local metadata Config
+ callbacks
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] client/btpclient: Improve GATT read
-In-Reply-To: <20260901125440.355578-1-frederic.danis@collabora.com>
-References: <20260901125440.355578-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8309102018219903240==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is an automated email and please do not reply to this email.
+  Branch: refs/heads/1166364
+  Home:   https://github.com/bluez/bluez
+  Commit: 070cb5cb03e8eef46835813b23c601bd8e6b21e8
+      https://github.com/bluez/bluez/commit/070cb5cb03e8eef46835813b23c601bd8e6b21e8
+  Author: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
+  Date:   2026-09-16 (Wed, 16 Sep 2026)
 
-Dear Submitter,
+  Changed paths:
+    M src/shared/bap.c
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+  Log Message:
+  -----------
+  shared/bap: Skip local metadata Config callbacks
 
-   Series:       [BlueZ] client/btpclient: Improve GATT read
-   Pull Request: https://github.com/bluez/bluez/pull/2465
-   Created:      2026-09-01 14:17:22+00:00
+When reconfiguring a client stream that is already Codec Configured,
+setup_config() queues Codec Configuration and then caches metadata.
+stream_metadata() emits a same-state CONFIG notification for that local
+update. The profile callback treats it as the peer's configuration
+completion and clears config_pending before the peer has responded.
 
-The pull request has been closed and no further action is taken on this
-series.
+If the control point response precedes the ASE state notification, QoS
+setup can run while need_reconfig is still set and fail locally.
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
+Cache client metadata in CONFIG without emitting a state notification.
+Keep genuine peer CONFIG notifications and server metadata handling
+unchanged.
 
----
-Regards,
-Linux Bluetooth
 
---===============8309102018219903240==--
+  Commit: c66e9ba6278610c52074e44ebc033c5b03f95f3f
+      https://github.com/bluez/bluez/commit/c66e9ba6278610c52074e44ebc033c5b03f95f3f
+  Author: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
+  Date:   2026-09-16 (Wed, 16 Sep 2026)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  unit: Test metadata during BAP client reconfig
+
+Add client tests for both remote Sink and Source ASEs. Reuse an actual
+configured stream, start a second Codec Configuration, and cache local
+metadata before the peer responds.
+
+Check metadata retention and absence of an extra local CONFIG callback.
+Require QoS to remain blocked after reuse and after the successful
+control point response. Only the fresh peer CONFIG notification may
+make the stream ready for a nonzero QoS request and the subsequent
+exchange.
+
+Without the shared/bap fix, the premature local CONFIG callback attempts
+QoS before the stream is ready and both tests fail at that assertion.
+
+
+Compare: https://github.com/bluez/bluez/compare/070cb5cb03e8%5E...c66e9ba62786
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
