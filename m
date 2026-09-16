@@ -1,105 +1,107 @@
-Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
+Received: from va-2-47.ptr.blmpb.com (va-2-47.ptr.blmpb.com [209.127.231.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4FC4A5C25
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 23:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2878337DEAB
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 02:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789602193; cv=none; b=hmdIPfZiP8tO8zDyKCHoBndOjKkrIaAuR+XebZB1ldGOmkqLYwkSkX6ia8KzC9Zyz1ixOpjtm0/eUdlT5htL9ob7vFX3SufYKnLtaoiA1dFiD/LNo0QzrF7744RmdBjHNumqRjlrosbeQ3pX0Yzv/e4Jd97s9zGy++9Y0bzxm0s=
+	t=1789611631; cv=none; b=TNKB9YeGnmY4XENver0fv5b/VxrhTP1+mFtzpck3rrf70+O5Z4uP12jFj789auFyUgKz7YSInt7Lm7BpWGg6TSKvr/zqH5TUsOsol9OBZnG+sy2FmWFZvv9ESAtlVZLdrJ0/Q7TsQPq7qnkFsAYZndfef8dIARwOfbp4c1gvTf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789602193; c=relaxed/simple;
-	bh=ME2d8sIvyVJEas2r7UU88DDs+giJ3/nHXR2Kj2bTQkE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ht9qJuKDJbWdyS7fOYspNE8/A8z5Yjjd1K6ge6HAeLFakdcVIQkcUGa6hO/s2+QT2SOxBLoYHMPtimjSY7ZLdALOC8DUW1iAbxI2GZNbNWAnh9OzB18StfUBejem0h2f8jV/RjwkFqBitNAMKsaNLmwwlFfjUzJleIqZbIyBnQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGjojkLq; arc=none smtp.client-ip=74.125.230.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789611631; c=relaxed/simple;
+	bh=YGqD+IFDIEdV8dvU4ixpK9NRMwtXwxwTm7PUXqf0dWA=;
+	h=Date:Mime-Version:To:Cc:Message-Id:Content-Type:From:Subject; b=Bu2V8gZ5jyGv2ga1ETK/5UwbrOXd3Q3QliMAlSGwl3hfn08/Pn3vrDZ4hoM0Fg24qjyZvlt1VK1fMlkKdgcsJuN9arkOAiWr/9/LYKMuJDoI43DStFPrdAjlUXtvL8QDqISB7UZh8Zmg6Py57QEDqLdexOxb+oabzTwKcvXBxJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bedmex.com; spf=none smtp.mailfrom=bedmex.com; dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b=PQ1r6Lgm; arc=none smtp.client-ip=209.127.231.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bedmex.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bedmex.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGjojkLq"
-Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-9104e54b1abso2522736d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 16:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789602191; x=1790206991; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=lS1yw16PzgxXtKWL/Egx5FMHNI5WHtSD9AEyao+SwUg=;
-        b=UGjojkLqS6qUOgBLTsfKNHlSAKhkNfVzyeiJMULDL8eJBHVrrnUprqkj7kcq/vaDJl
-         HyVzHoyy5YjwP/nHbR50lJ/SLPsM4N3/2nSQxoqR6dEC4gfT110NaAiaPuMqkIKvp2D4
-         l9+ykJOMHsGjU7Lu8czazUJqdF0CJh05/HbqBZUjpsDYr2r3btphbQlnCYtRw+hv54ps
-         FIZ0ogw7waQ67uWxDkbu4BKjkiTX1epoWl06zIJtfb6zfzc9FGj1oNxoZ4E035/dGdXU
-         97MprDzH2daRxE2AvaNsd7lcUy6NiOLaIJAzk+jZ41K4esHe5IPQL5Zeo6WaYW+Iaj1n
-         +exg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789602191; x=1790206991;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=lS1yw16PzgxXtKWL/Egx5FMHNI5WHtSD9AEyao+SwUg=;
-        b=doyLAq/P2TxYq/cmULK9+hcdTILZ1q8NNy80gtEcE+9LbQmtvW1es4J0kraK6jRdVc
-         mZ0+cOZHA6M4JN206X+gIESSXslyC1URKg1GnpC1beiC5wBsMs85LI0DqFSrlU1AYnQX
-         P8U+FD1Y/KLOdkghCbyz+TZJHrM2Ps5BqdO/wyNRo4+63llna6qrd8yobUQo/L+305Xe
-         DF8vbZxbHRuqe16gTQKVqtYJPKHQoc0cy3DV8mdGCQZN2xq9zRJJ6bYuEQvsHoUnfYTg
-         z7+oOSEZBruzJYdJ5brLAbMboB4dumzq05DPU/5p4wQoZltRyd9LsmGe26tKVGopAJaD
-         28gw==
-X-Gm-Message-State: AFuF++mvOG/pw0ZlSZtQ/oyf5VEHgQPhQZOyR3LtogZ11HdIpH3FiDCl
-	qJOTFYXwiqEpr2tZCUhJdnIEBR2bLuAaJ95G3D65GghWeakSZcJEdqd3BfrxcA==
-X-Gm-Gg: AYBFou3glHpw0ct8Oia5t/w7zvU0ey9OofopUO2xre7gXShE4eRGiTESbAk/4oyKlr3
-	mhfbxD2LAk7wD9DGs5nE+VZnaouVogTv8TL9bc7Cv7mmjhsxJefY8zjaQDflxj5Nyz4q851Mmwu
-	lFSYwWmqfOrBrFYJtmulemLPLRPr608OlIpJRdR0SFpNcwKAkj9Jf47sLMqdi6gvbe+x1WG2Ll4
-	SHEf5MxefIgZ0SHFHNdQSPnk2GRR7t1AD3+ON+tMQHzQVelly2E401jd+0lzEMq2n/0FSpx0UCX
-	ir9ve3aZ5IZ/VeTQBeeiHApPQfslTrTrpvaSjh0q1Ud+rzyEU/M/se/fDArrZ5B8CnhiHP80W7p
-	MtFtWt1fIxsZDFVJV9fcQrvx0LBe3hMoHTwfW/pIn7yfXbGnjI+f4Dx1TGPhtEL60sAI/Y4pn85
-	UQKBlkk3Y3zzJkg4baaYPXnDI9r22fBtrwvMwSRfufw1GQFq/ACPrvX/As33mOQ/T94LW5bNo7D
-	+cl
-X-Received: by 2002:a05:6214:406:b0:90c:4422:84d1 with SMTP id 6a1803df08f44-9123d7bf293mr83496926d6.30.1789602191430;
-        Wed, 16 Sep 2026 16:43:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.60.20])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9123be946f0sm37029226d6.27.2026.09.16.16.43.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 16:43:10 -0700 (PDT)
-Message-ID: <6aab298e.8cf43864.22624b.6e93@mx.google.com>
-Date: Wed, 16 Sep 2026 16:43:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5096823433279539349=="
+	dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b="PQ1r6Lgm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=bedmex-com.20200927.dkim.feishu.cn; t=1789611619;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=oHh/5s3M6pXOjbNy0GxQxoiOTw0NvL602oW8qlAiArM=;
+ b=PQ1r6LgmbCgk4NHY8GtS4l3nJ77m4MXwpi6q+e7Yi+l4VCCkBRZwPRXF5mI14hcTDbL+Ol
+ 04WGOdIc0Qi7hUDKkpHvR4zgG8sa5ri1dEzprlDXSy6DcU2RTS9l+ugZXaoT/rdXtwdZ5h
+ /UNwZQU7G08KVUvTJUct73oWRMHaB2HdB/+qR3Roay3DeHsBkXzomi7aqNxQQiJOPlqVQb
+ syrwkb+xAedY16xBdPJ9dQfnEM3ZsqRkcjPers8Cvya+hfY+ESXPb3dgj7TgGWphCZDxyh
+ jXvcJrzl7TwqaX6o9Qe0G/QL4ztXpSVk1OP+AucJJogvWOM/akhTaWY1azxfiw==
+Date: Wed, 16 Sep 2026 16:12:38 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v3] tools/l2cap-tester: test closing sockets with ECRED defer
-In-Reply-To: <eb21dbe69ad000c457f63d0de3caf2aa68dbebd8.1788296637.git.pav@iki.fi>
-References: <eb21dbe69ad000c457f63d0de3caf2aa68dbebd8.1788296637.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5096823433279539349==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Received: from [127.0.1.1] ([36.141.79.164]) by smtp.feishu.cn with ESMTPS; Thu, 17 Sep 2026 10:20:16 +0800
+X-Original-From: Yanli Yang <yanli.yang@bedmex.com>
+X-Lms-Return-Path: <lba+26aab4e61+cb756a+vger.kernel.org+yanli.yang@bedmex.com>
 Content-Transfer-Encoding: 7bit
+To: <linux-bluetooth@vger.kernel.org>
+Cc: <marcel@holtmann.org>, <luiz.dentz@gmail.com>, 
+	<devicetree@vger.kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>, 
+	<conor+dt@kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<zhirunliu@aicsemi.com>, <dijiaxu@aicsemi.com>, <chunqiuliu@aicsemi.com>, 
+	<liheng.wei@bedmex.com>, <yanli.yang@bedmex.com>
+Message-Id: <cover.1789546358.git.yanli.yang@bedmex.com>
+Content-Type: text/plain; charset=UTF-8
+From: "Yanli Yang" <yanli.yang@bedmex.com>
+Subject: [RFC PATCH bluetooth-next 0/3] Bluetooth: Add AIC8800D80 SDIO firmware loader and UART HCI
 
-This is an automated email and please do not reply to this email.
+Hi,
 
-Dear Submitter,
+This RFC series adds initial Bluetooth support for the AIC8800D80.
+SDIO function 1 loads the Bluetooth firmware; HCI traffic uses a separate
+UART interface with H4 framing at 1500000 baud and hardware flow control.
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+The series adds the AIC vendor prefix, Device Tree bindings for the two
+interfaces, and the btaic driver with build and maintainer integration.
+The UART node references its SDIO firmware provider through the
+aic,firmware-sdio property.
 
-   Series:       [BlueZ,v3] tools/l2cap-tester: test closing sockets with ECRED defer
-   Pull Request: https://github.com/bluez/bluez/pull/2468
-   Created:      2026-09-01 22:34:21+00:00
+Validation status:
+- The vendor has confirmed that SDIO firmware loading works.
+- UART HCI communication, controller initialization, scanning, pairing,
+  connections and data transfer have not yet been validated.
+- Suspend/resume and Wi-Fi/Bluetooth coexistence have not been validated.
+- No hardware functionality beyond firmware loading is claimed.
 
-The pull request has been closed and no further action is taken on this
-series.
+This is an RFC for implementation and binding review, not a request for
+merging at this stage. Feedback is particularly welcome on the SDIO/UART
+split, the firmware-provider association and the device lifetime handling.
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
+The driver requests the following external firmware files:
+  aic/aic8800d80/fw_adid_8800d80_u02.bin
+  aic/aic8800d80/fw_patch_8800d80_u02.bin
+  aic/aic8800d80/fw_patch_table_8800d80_u02.bin
+Firmware binaries are not included in this kernel patch series.
 
----
-Regards,
-Linux Bluetooth
+This copy is sent to my own mailbox for private review.
 
---===============5096823433279539349==--
+Thanks,
+Yanli
+
+Yanli Yang (3):
+  dt-bindings: vendor-prefixes: Add AIC Semiconductor
+  dt-bindings: net: bluetooth: Add AIC8800D80
+  Bluetooth: btaic: Add AIC8800D80 SDIO loader and UART transport
+
+ .../net/bluetooth/aic,aic8800d80-bt.yaml      |  87 ++
+ .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
+ MAINTAINERS                                   |  11 +
+ drivers/bluetooth/Kconfig                     |  16 +
+ drivers/bluetooth/Makefile                    |   3 +
+ drivers/bluetooth/btaic.h                     |  26 +
+ drivers/bluetooth/btaic_core.c                | 180 ++++
+ drivers/bluetooth/btaic_sdio.c                | 886 ++++++++++++++++++
+ drivers/bluetooth/btaic_uart.c                | 331 +++++++
+ 9 files changed, 1542 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/aic,aic8800d80-bt.yaml
+ create mode 100644 drivers/bluetooth/btaic.h
+ create mode 100644 drivers/bluetooth/btaic_core.c
+ create mode 100644 drivers/bluetooth/btaic_sdio.c
+ create mode 100644 drivers/bluetooth/btaic_uart.c
+
+
+base-commit: 6696072ffe07205255cf83621a95a1aa2f9f6e62
+-- 
+2.34.1
