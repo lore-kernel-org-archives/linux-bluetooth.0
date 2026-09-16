@@ -1,93 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD234BD0EF;
-	Wed, 16 Sep 2026 18:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789582526; cv=none; b=g5jSghTs4ZLJ+CtcjVF8090pKOYNWOTglwA3QD7mS8qk2NBQSrWbk4KuAoaLH46TI5jVIsfdQDQ7qh27y1Mq5nQMGYNJJM3oabEL2nkbmOSR+ubGIKzvassbbn7CcGzH1CvsqtPgAlmHq+BDNbwxU43sWKP8KPsrQhLKdsEptsk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789582526; c=relaxed/simple;
-	bh=SC8FD7pbNy8s4h4Npy0h6viekTFgPMiB+9syXa5QoNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPCrxZZ0o8oQQ8WD5eoCd/DDquGH4aP4twYHluVdqT8oL+VREl2HPpYwlSkx6dQJsLKhf9Zm9fC8EkEkZ6cmpun979EFtvYB3FYydlwct3RPpGjEHyqekj+NX3y8eR58cGyqm7vFpgxATUERLLNRwoVZ43Fx2z90OgOqZNoU2hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzWkTQug; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9374D39023D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 18:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789582676; cv=pass; b=I28AfYFmpiDVDMYzKnua0oHJitp4cPPFJrl+y/H7rBqbRBoDB5SqKAlonAQQGIEDjE1RcYxqi0Xj2BUCaF6JSZgC/WUUE752LfMDBQerldTORZE5hBTKYXNwgcqUimSbPnKxp6b3hcFd8pKhg348QqssTZwCzeg6l2Hf6n3agRc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789582676; c=relaxed/simple;
+	bh=71+ixLMzVQbSx7KArl73IkOHZ2xr9fuvCFcSSySVUiQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sesNDvGpQE93g0agnutwqR54Bib2D0Txac4hrlSp+BcCO+O+dGHzBOy9s50E07qfYcWHaLUbHTogpMRbXKc760/0eqX5q5+eQxy2S/GAUz5pj6RZ6rqq4mM5LjcxE1Xbc6jtJKJD7h61wP6jPPHlqsGjmDaC1jng+K1CPZy/nds=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8GG0cQr; arc=pass smtp.client-ip=74.125.224.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzWkTQug"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CA191F00898;
-	Wed, 16 Sep 2026 18:15:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789582510;
-	bh=SC8FD7pbNy8s4h4Npy0h6viekTFgPMiB+9syXa5QoNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=fzWkTQugYxSTSWiGZVpaBvvpTm1KiuubzIgLlbtogl+cuV12R4UTfdkwqElGA+GVg
-	 /GBP+nRCTRbnRZdLQ8oyac3lRBcMACm+oQsSkulRX/ApKPwrKlYXc3qIN4P28SQu4/
-	 zRIYQGZISiAPIv5zm7xJ4LjU6O6vXHTbDTCYxQ4Ig0M3We8jbR9851IaTadQmu4Klj
-	 4H67XIHksusEDBpDuKzOP8nOF1siVoLQZoaRGqhQT3egG6t8YzpdcOI3s2X18qnGpm
-	 hHNXaShVhg1E1ZlRa2ueHnuXyoWySgW3CaM4K64wLmUoE5laa9QNVmV0du/Gct9D1I
-	 VGEjClcOZjYMQ==
-Date: Wed, 16 Sep 2026 19:15:05 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [GIT PULL] bluetooth 2026-09-07
-Message-ID: <6ce3c671-12e3-4057-9610-23efe14832cf@sirena.org.uk>
-References: <20260907172648.457103-1-luiz.dentz@gmail.com>
- <20260908135708.552fcead@kernel.org>
- <a0e8bc1e-c237-41fb-b448-9594bd484cfe@sirena.org.uk>
- <CABBYNZKrSve8b=Acj2qu0YBuEZ9u9xHJe-ffRb+78x5KPY8Ntw@mail.gmail.com>
- <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk>
- <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
- <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
- <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
- <aqnMueXiCztLUn-w@sirena.org.uk>
- <CABBYNZ+A+bNZ0THj0EZ4KfMj6wPMhD6hvbt5FP-exZnqxb4E-Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8GG0cQr"
+Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e4ab22370so1165091d50.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 11:17:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789582666; cv=none;
+        d=google.com; s=arc-20260327;
+        b=raNjjtBKMxykWcqeYdKzaHCv/ERCCYmPlf8n0y5Vt18PW64danp4lXOk65YzdCBsV8
+         aboIKGGGhqUUdYQQp6A5AnFSggSStdRB1PEz+hsmmF/v/9Sh9+pfb7QpRdMH+ozI7BZA
+         pTPdvfofCZsMYNALWkPrVo/8rYP5nF0dS98wbqnjMC9KQEL0phWrMc0XQ2vx3zyU9Ewu
+         NP7APk+tzbIpZkyznKuvs91hE6aWpeYKC0VNRzgbfrTpWeSjjLA6bdG+bUD29zJfklDe
+         hW9GJwc3kr0eRS3jIzR9cD7AXAmTGQeYxPFMNiOGBXO1VE0EVMiDN44lzniO+g0iMA5P
+         j1Ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=71+ixLMzVQbSx7KArl73IkOHZ2xr9fuvCFcSSySVUiQ=;
+        fh=wVUpkwdEsO0mQ2CrMGRxmt8yp5kGK86gsbEB91I1ogs=;
+        b=mi3ReoJmGo7ybcoSp5zs0Lf4mH2/VwPGx8YtBDVzD8iRsBDouC5eCnJ1dWUretlB3x
+         JLgje6VXi1Uqclm0tmqYPjCoZA4CgpnWpgqPJVrTY2AadMeABUQz7l5zrrvM/vgVWgS/
+         h1kPbSMxLi1dsJpqaXMTFVPt+mZGp8DbrvP/bdXqK0souSstSCm5VqseHnYalxkIg3fv
+         P3T4D5VngErh8+2hygxUlRwYFDtf/CvCHPL9CWuSGSN4xg+hEmtve1Ugv9HRZXYW9ryS
+         H9/mXJ2mD4ARp4TduOAfRbj3l4oa0QcZgF5SbZMKp2ayNlYxM7hUtunQwyj9nWu7hdSL
+         FCHg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789582666; x=1790187466; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=71+ixLMzVQbSx7KArl73IkOHZ2xr9fuvCFcSSySVUiQ=;
+        b=D8GG0cQrXjfdKRm9wNQEsJEWU9oYGeRiTkHhjdpJAYiULFxjgSDjqcLxAojrxz/t3q
+         SnQJNKAEML6dAS3xd0evlCPigWfQHo4PmIh9f7+IncDtt/ZD+O+oQBJdyA8iFB6S6C6+
+         nOqlqS4Gt1tz7xNY0EkaKkmQTGyglcrcLm9+Da/Y/5e6E7dD8no7EPTtsWvAN6aDErkP
+         XQTcwMl3Vn4Akx7nHZ4tv8x7kktx2+E8jDySytkt4cI9WcSxIXf6p9NYjSGsOcJD31j3
+         VZKoMmAZfoRSu1lVTw8+7qe0VHdwBBXkgrtoPJMCOE0eZs/p+AnbRI9CNnU8vQha4dlP
+         c+2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789582666; x=1790187466;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=71+ixLMzVQbSx7KArl73IkOHZ2xr9fuvCFcSSySVUiQ=;
+        b=Kyk3Fp9fT2c3MJrPXNv1fh3Gfmo/nZ14jPENoDJJzx9qsL2zHjVRMrrWMBlnKLB8qm
+         Y16c1JddkfJPuOZMDrYCOoVa/nA/9Rwg1AQzA0nXFXlroDiOI2zm9q7UkSuxXHWjTd86
+         qAvN93YnswOgzmMMNFfJEF+QIIi8FiaQ+YCfwu45Xb7ZV9M78R2pP37TOu82PB/0PN8u
+         QdaoNL8rDYdB8gg3XJDgZx+/UzRZtwqHZ02ZVEEbxtnWJHnK1ztgAB4uGLZEgXked0i+
+         BPymTqQwy6w0Yd05kDZzxM859vYLjyAfnby2HMVLC0UgNW+PjTtOFhQldJLCa4OGs3Sn
+         +u3w==
+X-Forwarded-Encrypted: i=1; AKwUvBwHsKw8MAiJGGO1IxyH3z8Lrlw71WbjFmqkmShlrPHo7gPWjycsBZmEH2mZeVblWor+Y8vvH6ILH7zbNLypyQ8=@vger.kernel.org
+X-Gm-Message-State: AFuF++k5uuhmaN9buEUpM4fuNSURIBjRGyLnOPi5w5PQoyVQ1rOiA+53
+	eOt45gctzk2khsjI15CYt171YELk2OdA0b3etatsNMUEeCO+QxVkea4p4IulfQ5dkvH1UcRUMRR
+	cS+mqXgVGajfJyJ6usiqa95aCgeRumIU=
+X-Gm-Gg: AYBFou2CabsAiE5JccVMhqgVLdrlc/R1kS1JClzQSwwbzMp4cjytJhh1nCnvjsOyY34
+	bFEzIWAjQwSKcUGmd/s4veGkeX5lmgD1dZk8wBkZeW3zdmeT97bKvjeQGDTcRxCSERIA2IUDTX+
+	KhrcLp9QZaSecKM/aQu6N3LElpHwZ3CjcVtZQdtyx96/nvrYKZLNcYMxeBZKcu9RQNVEKwpEr07
+	SHqb9o3QAa61FcLbnNOVgSHjt3WPudNyPA8jIhGG2ByjRNA4s0Hl/AWpys51tDpGW8RbtPrOhBG
+	ndPPq/IMQjYGauqK14XzQep/i/yUXZwza1ZTjSVyuSp/bto9fZhLAbitRg6vZ1tSvzWgYXdeVqX
+	aOZA9gN/iRzs7/q74c8ERttGDGQ6zaMymJwKs55UMBBp0hcMx5nvC
+X-Received: by 2002:a05:690e:138c:b0:66f:c1be:315d with SMTP id
+ 956f58d0204a3-67163291a67mr1457852d50.52.1789582666426; Wed, 16 Sep 2026
+ 11:17:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tLuHTkbR9QT/mTSI"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZ+A+bNZ0THj0EZ4KfMj6wPMhD6hvbt5FP-exZnqxb4E-Q@mail.gmail.com>
-X-Cookie: Double!
+References: <20260907172648.457103-1-luiz.dentz@gmail.com> <20260908135708.552fcead@kernel.org>
+ <a0e8bc1e-c237-41fb-b448-9594bd484cfe@sirena.org.uk> <CABBYNZKrSve8b=Acj2qu0YBuEZ9u9xHJe-ffRb+78x5KPY8Ntw@mail.gmail.com>
+ <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk> <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
+ <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk> <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
+ <aqnMueXiCztLUn-w@sirena.org.uk> <CABBYNZ+A+bNZ0THj0EZ4KfMj6wPMhD6hvbt5FP-exZnqxb4E-Q@mail.gmail.com>
+ <6ce3c671-12e3-4057-9610-23efe14832cf@sirena.org.uk>
+In-Reply-To: <6ce3c671-12e3-4057-9610-23efe14832cf@sirena.org.uk>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 16 Sep 2026 14:17:35 -0400
+X-Gm-Features: AcwNN1W_n_JWDmPObAQFwyQQcqcRS0ohE6q1zHG-qJ_cbD4eagEDvwjzvohFxRo
+Message-ID: <CABBYNZKiy+t_GC9dL6nraiH26m+2U=kuAF8NMAPNW-BhtOSovA@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2026-09-07
+To: Mark Brown <broonie@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Mark,
 
---tLuHTkbR9QT/mTSI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Wed, Sep 16, 2026 at 2:15=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Wed, Sep 16, 2026 at 02:12:28PM -0400, Luiz Augusto von Dentz wrote:
+>
+> > I incorporate the merge back into my workflow:
+>
+> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
+t.git/commit/?id=3D967788508ba263e22d856f971c9118dc1a73f6ff
+>
+> > Hopefully this should stop showing conflicting/duplicate IDs at your en=
+d.
+>
+> Thanks!
+>
+> > Yep, you can add me as a contact person for both the bluetooth and
+> > bluetooth-next trees.
+>
+> With your luiz.dentz@gmail.com address?
 
-On Wed, Sep 16, 2026 at 02:12:28PM -0400, Luiz Augusto von Dentz wrote:
+Yes.
 
-> I incorporate the merge back into my workflow:
-
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=967788508ba263e22d856f971c9118dc1a73f6ff
-
-> Hopefully this should stop showing conflicting/duplicate IDs at your end.
-
-Thanks!
-
-> Yep, you can add me as a contact person for both the bluetooth and
-> bluetooth-next trees.
-
-With your luiz.dentz@gmail.com address?
-
---tLuHTkbR9QT/mTSI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqq3KgACgkQJNaLcl1U
-h9Cg8Af/QPVk3idwMHi6oYby90/tjeGrwhxApm4Cnp7SCHOyO6d1XYEqeICBK+lm
-9TVZYXshzHvxUip/Sp1FAJdpwgHIah3wzUK7ayDIu1roWDGfvgUfQYTiM4aYJakY
-YM3/cjYbPwXz48DgMhTzlCsYUVWUiP32vZPo1rN2Zr9RjzFLEw803sZtUOqMtdrl
-HoodE0GOXmRGlPx6RI86wWghh054YLkzTCW+UTG4P/qWmXAYSeFeyNVgUGI7V7cy
-8kblJmVMNc+CZQd8lug2SmPn5nrNx29/APkJyvtfcMvDmNC4k1llxI23YAgYXlab
-LkTn2D17okt4FzE6Ycz7lKwb+nIXyQ==
-=Pl/w
------END PGP SIGNATURE-----
-
---tLuHTkbR9QT/mTSI--
+--=20
+Luiz Augusto von Dentz
