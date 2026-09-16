@@ -1,42 +1,39 @@
-Received: from mail-10699.protonmail.ch (mail-10699.protonmail.ch [79.135.106.99])
+Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44A74EC65C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 10:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54F24F647A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 10:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789554737; cv=none; b=EoS1yi+jnpNeZoRfOEak1emQd7uhUHH/ZvaGIqpqRN5q+kjW7r47VRfiJbyTLBwaUXFISsAj3T6hpPK/iEYBB7tWZI1cSmvdPYCCoepalYRtdtoJMcNCwV/tdR65gXNVjIt+0gOiPH5J9aBUAVCEE6xilXxWQMugRat7d14AQyc=
+	t=1789554881; cv=none; b=jxchm7P5jy/XC2u3uTLqgWPBLwWZnrh4c6cm+cEwPpvzL2Z2yVsuVzWF2MO3+JcFgOWmfJJSeznitFDZ+c9PksmjjzP2uTMlZimdQ92HwktamjQFHEtyDX6nyFuctjgE8l6IQ6j2XFyjm/A6gF4GoihWgVI7w22OF5GcBIvmIdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789554737; c=relaxed/simple;
-	bh=yb9QIPnkRxDuvGtCQecAlF/iMXetvsR3mEZt27uS+UA=;
-	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ipMI5kp5o+JHdOG4WWeAvRumLarWtqPnjikGTdOqmoXLBX77x5klnf7doYQsd0yffrwJPti1BM193wkn2HqPCT0HYmbecxIP4hSAyP4tYe9QDDW3NQKa7n8uJ6Nw5NuF/EgTUVtLj80DwFbET/GnEkk4tYeXRIEAS5NY2YgeQc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=LAjEGBlV; arc=none smtp.client-ip=79.135.106.99
+	s=arc-20240116; t=1789554881; c=relaxed/simple;
+	bh=sezVlt2hqPgn7x5dNeWxKBV0PHXS3WnhlVSntpgctho=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=eknTej3pYNcRUxIX/8a20scm3LgvRC52lq1XVzMe1+bk2sfSDd0ZkVpmp8wNR+n0YYLDvOPpU35wgaAecUm0pFnlKg60tTvkVAkig5KHk1sBCyI6sQ2jzejm87KUnxFVMkVvbDw/AhPlK5uH77yVCG4tvMrthcsg8Hv1Jw3oqfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=gOeQCXup; arc=none smtp.client-ip=185.70.43.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="LAjEGBlV"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="gOeQCXup"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1789554700; x=1789813900;
-	bh=NYYfMfcygdRl2u/CncW5zSswH5zpomJ77aB/EFhxN1U=;
-	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=LAjEGBlVyEWpjYPFA8+eajajwyPtI0Fdh7KGYlPfdaFypuhmslos/KA1T+gEYJq+Q
-	 kQw4rvrKZw047VAGeUAf7o5SEyJVSTMq9r1faeusBhRwn5djV+V+MGOpKPam9hrdBj
-	 sXlMCwQm5Kdc2guZE3FVgtyfmK2AldmBLHZVwvqDZDE50RtaLdQz8ta3SSpg92i/qb
-	 VMdcse3G9mnRLz+Xs80lBcsKyY4Srfgiz3t8s180/i39Y88ZmaP0nH+rXvlPUqGkwy
-	 iWzxp7+cHqcIKQeoOlfzJd0WLDPUv0tpZO416j1Ic7+MKBFIDpqxpbuBbEOhutpRmE
-	 4Wkr5HvMYFUKg==
-Date: Wed, 16 Sep 2026 10:31:35 +0000
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+	s=protonmail; t=1789554859; x=1789814059;
+	bh=sezVlt2hqPgn7x5dNeWxKBV0PHXS3WnhlVSntpgctho=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=gOeQCXupxI5KN0qDr08WFHijdRsOtRb6EmkIV4eFhj1e5SAOCKpHr6+2imoXtt1lo
+	 f1Njr75ygHSTgMnf1OM3DAqN6LvLbGhOcJrYlsjcyvW9t64BeD1vbPRv4pDsgJZai5
+	 j8NMpwVkl0H4onKhqwJN7WQyAP6qH3CRmia9bsanVUfeul8UTelKWOIJWeYlD6d92L
+	 M3xBXrC3TXMjInsFyjtqSigfMk5SgLAffGUgoRMP5q7j8WRyISDITKCSBBKAvqpv6y
+	 d/PkZxPhct1/J4iNNnBn1D7iBL+VYb546hE9183iieBhqCp+9EOQkVDqHVxOJyCknQ
+	 HLPrI7xXUwQRg==
+Date: Wed, 16 Sep 2026 10:34:14 +0000
+To: "pav@iki.fi" <pav@iki.fi>
 From: dt <derektern@proton.me>
-Subject: [PATCH BlueZ 2/2] unit: Test metadata during BAP client reconfig
-Message-ID: <pEIogdpm1KrQokz6n7Vp2rMm4FqyjlQ2X2YtxXFBhhWy_IaqXXNp8K7EwDeohmT6yelHFNOy7IuYYi7ooLtT2zeODVf8LPoBiOTrs7ua3O4=@proton.me>
-In-Reply-To: <IGuo_ED6hoZcdNfKi5TCkYNNfYCJKn1CUSYS4a4ZNZ9WjaZCMI3rmBzLoslV22TvEjShB4iyBBAec3nrM4mMGI_r8dHKBUfAGLjZxXmgfIE=@proton.me>
-References: <IGuo_ED6hoZcdNfKi5TCkYNNfYCJKn1CUSYS4a4ZNZ9WjaZCMI3rmBzLoslV22TvEjShB4iyBBAec3nrM4mMGI_r8dHKBUfAGLjZxXmgfIE=@proton.me>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>
+Subject: Re: [PATCH v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
+Message-ID: <fp1LLpMjte31CZfdRymzNx8DeLqozYHgFf2TAKxtIiHEkPcykA5jgtuDuZYcJTb5vPGpPkgB8GoVoX5_821oWe9NvenZdL4kwrxyCuanlw8=@proton.me>
 Feedback-ID: 213585229:user:proton
-X-Pm-Message-ID: d1b94250ff604b996846e1f2f992a12c44b32781
+X-Pm-Message-ID: 3c7e295f24b45de5e806b0314f3684397af67a90
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -46,187 +43,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
+Hi Pauli,
 
-Add client tests for both remote Sink and Source ASEs. Reuse an actual
-configured stream, start a second Codec Configuration, and cache local
-metadata before the peer responds.
+Following up on your v2 proposal:
+https://www.spinics.net/lists/linux-bluetooth/msg129361.html
 
-Check metadata retention and absence of an extra local CONFIG callback.
-Require QoS to remain blocked after reuse and after the successful
-control point response. Only the fresh peer CONFIG notification may
-make the stream ready for a nonzero QoS request and the subsequent
-exchange.
+Additional evidence for the MT7925 padding issue, from an MT7925 using
+LE Audio on kernel 7.2.4-3-cachyos:
 
-Without the shared/bap fix, the premature local CONFIG callback attempts
-QoS before the stream is ready and both tests fail at that assertion.
----
- unit/test-bap.c | 134 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 134 insertions(+)
+Before filtering, a capture contained 206,325 spurious handle-zero ISO
+packets. The count matches interpreting the zero remainder of 264-byte
+transfers as four-byte headers: 3,633 genuine 60-byte SDUs and 507 empty
+SDUs give 3633 * 48 + 507 * 63 =3D 206325. USB URB boundaries were not
+captured, so this is byte-accounting evidence for the padding explanation.
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 4e89ba6af..5fcf0262d 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -82,6 +82,11 @@ struct test_data {
- =09size_t iovcnt;
- =09struct iovec *iov;
- =09int fds[8][2];
-+=09unsigned int metadata_config_count;
-+=09struct bt_bap_stream *metadata_stream;
-+=09bool metadata_reused;
-+=09bool metadata_config_replied;
-+=09unsigned int metadata_qos_id;
- };
-=20
- struct notify {
-@@ -4215,6 +4220,129 @@ static void test_scc_release(void)
- =09test_usr_scc_release();
- }
-=20
-+static bool metadata_reuse_pac(struct bt_bap_pac *lpac,
-+=09=09=09=09struct bt_bap_pac *rpac, void *user_data)
-+{
-+=09struct test_data *data =3D user_data;
-+=09struct bt_bap_stream *stream;
-+
-+=09stream =3D bt_bap_stream_new(data->bap, lpac, rpac, &data->cfg->qos,
-+=09=09=09=09=09=09=09&data->cfg->cc);
-+=09g_assert(stream =3D=3D data->metadata_stream);
-+=09data->metadata_reused =3D true;
-+
-+=09return false;
-+}
-+
-+static void metadata_config_response(struct bt_bap_stream *stream,
-+=09=09=09=09=09uint8_t code, uint8_t reason,
-+=09=09=09=09=09void *user_data)
-+{
-+=09struct test_data *data =3D user_data;
-+=09unsigned int id;
-+
-+=09g_assert_cmpuint(code, =3D=3D, 0);
-+=09g_assert_cmpuint(reason, =3D=3D, 0);
-+=09g_assert_cmpuint(data->metadata_config_count, =3D=3D, 1);
-+
-+=09/* A successful CP response has not confirmed the new ASE status. */
-+=09id =3D bt_bap_stream_qos(stream, &data->cfg->qos, bap_qos, data);
-+=09g_assert_cmpuint(id, =3D=3D, 0);
-+=09data->metadata_config_replied =3D true;
-+}
-+
-+/* Local metadata must not replace the peer's Codec Configured notificatio=
-n. */
-+static void state_cc_metadata(struct bt_bap_stream *stream,
-+=09=09=09=09=09uint8_t old_state, uint8_t new_state,
-+=09=09=09=09=09void *user_data)
-+{
-+=09struct test_data *data =3D user_data;
-+=09uint8_t value[] =3D { 0x03, 0x02, 0x02, 0x00 };
-+=09struct iovec metadata =3D {
-+=09=09.iov_base =3D value,
-+=09=09.iov_len =3D sizeof(value),
-+=09};
-+=09struct iovec *cached;
-+=09unsigned int id;
-+
-+=09if (new_state =3D=3D BT_BAP_STREAM_STATE_QOS) {
-+=09=09g_assert_cmpuint(data->metadata_config_count, =3D=3D, 2);
-+=09=09g_assert(data->metadata_config_replied);
-+=09=09g_assert(data->metadata_qos_id);
-+=09=09id =3D bt_bap_stream_release(stream, bap_release, data);
-+=09=09g_assert(id);
-+=09=09return;
-+=09}
-+
-+=09if (new_state !=3D BT_BAP_STREAM_STATE_CONFIG)
-+=09=09return;
-+
-+=09data->metadata_config_count++;
-+
-+=09if (data->metadata_config_count =3D=3D 2) {
-+=09=09/* The peer notification makes the reused stream QoS-ready. */
-+=09=09g_assert_cmpuint(old_state, =3D=3D, BT_BAP_STREAM_STATE_CONFIG);
-+=09=09id =3D bt_bap_stream_qos(stream, &data->cfg->qos, bap_qos, data);
-+=09=09g_assert(id);
-+=09=09g_assert(data->metadata_config_replied);
-+=09=09data->metadata_qos_id =3D id;
-+=09=09return;
-+=09}
-+
-+=09g_assert_cmpuint(data->metadata_config_count, =3D=3D, 1);
-+
-+=09/* Reuse the actual configured ASE, setting internal need_reconfig. */
-+=09data->metadata_stream =3D stream;
-+=09bt_bap_foreach_pac(data->bap, bt_bap_stream_get_dir(stream),
-+=09=09=09=09=09=09metadata_reuse_pac, data);
-+=09g_assert(data->metadata_reused);
-+=09id =3D bt_bap_stream_qos(stream, &data->cfg->qos, bap_qos, data);
-+=09g_assert_cmpuint(id, =3D=3D, 0);
-+
-+=09id =3D bt_bap_stream_config(stream, &data->cfg->qos, &data->cfg->cc,
-+=09=09=09=09=09=09metadata_config_response, data);
-+=09g_assert(id);
-+
-+=09id =3D bt_bap_stream_metadata(stream, &metadata, NULL, NULL);
-+=09g_assert_cmpuint(id, =3D=3D, 0);
-+=09g_assert_cmpuint(data->metadata_config_count, =3D=3D, 1);
-+
-+=09cached =3D bt_bap_stream_get_metadata(stream);
-+=09g_assert(cached);
-+=09g_assert_cmpuint(cached->iov_len, =3D=3D, metadata.iov_len);
-+=09g_assert(!memcmp(cached->iov_base, value, sizeof(value)));
-+}
-+
-+static struct test_config cfg_snk_cc_metadata =3D {
-+=09.cc =3D LC3_CONFIG_16_2,
-+=09.qos =3D LC3_QOS_16_2_1,
-+=09.snk =3D true,
-+=09.state_func =3D state_cc_metadata,
-+};
-+
-+static struct test_config cfg_src_cc_metadata =3D {
-+=09.cc =3D LC3_CONFIG_16_2,
-+=09.qos =3D LC3_QOS_16_2_1,
-+=09.src =3D true,
-+=09.state_func =3D state_cc_metadata,
-+};
-+
-+#define SCC_SNK_CC_METADATA \
-+=09SCC_SNK_16_2, \
-+=09SCC_SNK(LC3_CODEC_ID_DATA, 0x0a, 0x02, 0x01, 0x03, 0x02, 0x02, \
-+=09=09=090x01, 0x03, 0x04, 0x28, 0x00), \
-+=09QOS_SNK(0x10, 0x27, 0x00, 0x00, 0x02, 0x28, 0x00, 0x02, 0x0a, 0x00, \
-+=09=090x40, 0x9c, 0x00), \
-+=09ASE_SNK_RELEASE
-+
-+#define SCC_SRC_CC_METADATA \
-+=09SCC_SRC_16_2, \
-+=09SCC_SRC(LC3_CODEC_ID_DATA, 0x0a, 0x02, 0x01, 0x03, 0x02, 0x02, \
-+=09=09=090x01, 0x03, 0x04, 0x28, 0x00), \
-+=09QOS_SRC(0x10, 0x27, 0x00, 0x00, 0x02, 0x28, 0x00, 0x02, 0x0a, 0x00, \
-+=09=090x40, 0x9c, 0x00), \
-+=09ASE_SRC_RELEASE
-+
- static void bap_metadata(struct bt_bap_stream *stream,
- =09=09=09=09=09uint8_t code, uint8_t reason,
- =09=09=09=09=09void *user_data)
-@@ -4341,6 +4469,12 @@ static struct test_config cfg_src_metadata_streaming=
- =3D {
-  */
- static void test_ucl_scc_metadata(void)
- {
-+=09define_test("BAP/UCL/SCC/Metadata-Configured-Sink",
-+=09=09=09test_setup, test_client, &cfg_snk_cc_metadata,
-+=09=09=09SCC_SNK_CC_METADATA);
-+=09define_test("BAP/UCL/SCC/Metadata-Configured-Source",
-+=09=09=09test_setup, test_client, &cfg_src_cc_metadata,
-+=09=09=09SCC_SRC_CC_METADATA);
- =09define_test("BAP/UCL/SCC/BV-115-C [UCL SNK Update Metadata in Enabling =
-"
- =09=09=09"State]",
- =09=09=09test_setup, test_client, &cfg_src_metadata,
---=20
-2.55.0
+A local adaptation of this proposal eliminates the phantom packets in
+two subsequent capture summaries, which contain only the real ISO handles
+and no short or truncated ISO headers.
 
+The tested variant differs from this v2: it uses the existing dev_id to
+restrict filtering to MT7925, leaves btmtk.h unchanged, and omits the
+once-per-device warning. It retains the original 264-byte transfer check
+and discards an all-zero remainder only after consuming some data and
+reaching a new packet boundary. The original v2 itself was not tested.
+
+The complete local setup has also passed reboot, reconnect and duplex
+profile-switch testing. Separate PipeWire, WirePlumber and BlueZ fixes
+were involved, so the specific result attributable to this filter is the
+removal of the bogus padding packets.
+
+As of 2026-09-16, the receive loops in bluetooth-next at 2e63b55654e0
+and Linux at 9b87fdc9af2f still lack a trailing-padding check. Would a
+refresh of this proposal be useful? Has MediaTek confirmed whether the
+fixed-size zero padding is intentional, which would inform retaining or
+removing the warning?
 
