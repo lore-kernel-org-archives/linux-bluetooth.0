@@ -1,34 +1,45 @@
-Received: from va-2-55.ptr.blmpb.com (va-2-55.ptr.blmpb.com [209.127.231.55])
+Received: from va-2-42.ptr.blmpb.com (va-2-42.ptr.blmpb.com [209.127.231.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC6D37F742
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 02:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29FC3890F6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 02:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789611966; cv=none; b=Y+ez9y5UXeotlkth/Uwh8p74KNoKSe14PveaaIzdjphn+BX467pQ7eKV5cik0aRNAVH/KwLLceN8T7BlXndqX0tNfp2WYlfNG/FqRtjbb0h+W7jzEv7t9MCKbnWni2GkNBE3uS2d/n5NEtlV6mOkdPXKXTxl33JaoKAFePColAo=
+	t=1789611974; cv=none; b=kNNvzO9jJ7y4yk6CHiG6Ww4T3uJZDAYkSnE6e365AaJUzBiculKHkeGIqUq+scfmSRETVKjhauHWDpGwEDuh0A6tCIJ/rXdsVh5vcqUKPn6YXx106SyVPfG/ygWEjkpWKyUIw4tzmALn8we0TzERZytBaRbWyv323R6GrcIOics=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789611966; c=relaxed/simple;
-	bh=r2vkKfuGogED/FVa+F4aRO9Fs20LMU7kBHebZ75J9iU=;
-	h=Subject:Date:Content-Type:Cc:From:Message-Id:Mime-Version:To; b=n7gGp8Yk01L9ClD7RbcQ3oYd22C4FUHn/Wfy4Ad5XFnKSffBCUk48yVAykJw9RYzZOAeTOR9QCxVgvEj9SWSPOpJElO06gkhD8kge4eYH7olP9uF7wyIJOkKkozP3nHQsdOD8wWovCXQkb7e2qkK1eS+el20f+SL9hS+cXDDV40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bedmex.com; spf=none smtp.mailfrom=bedmex.com; dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b=FLglCmWm; arc=none smtp.client-ip=209.127.231.55
+	s=arc-20240116; t=1789611974; c=relaxed/simple;
+	bh=zDUZFrgLuHh9/3Xf59lwrfsMCBB76YQ7LBx1rTiBQvI=;
+	h=To:Subject:Date:Message-Id:References:Mime-Version:Content-Type:
+	 Cc:From:In-Reply-To; b=P94pPbN7YqXUUif0pmKWeBci7VIili2OWVCpI3gAnCbkiA67LzSFLy1eFezRz/fjpnC97JgnelqleoRGV1Fi8HLJl2e3bUpn5+FYY3Ru3QJ41U7OQdwRUrQwIxVQwrI+dWGKX4Q3YyzIKRL6XKLC5xeZrJdDKuir814GlI07jrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bedmex.com; spf=none smtp.mailfrom=bedmex.com; dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b=E5AmyymR; arc=none smtp.client-ip=209.127.231.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bedmex.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bedmex.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b="FLglCmWm"
+	dkim=pass (2048-bit key) header.d=bedmex-com.20200927.dkim.feishu.cn header.i=@bedmex-com.20200927.dkim.feishu.cn header.b="E5AmyymR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=bedmex-com.20200927.dkim.feishu.cn; t=1789611958;
+ s=s1; d=bedmex-com.20200927.dkim.feishu.cn; t=1789611961;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=eWaAESNMzsoOoTdpS5OvMuubfk9TTP0c1hBQ9qvYmE8=;
- b=FLglCmWmvoNm2CpHMeWf100HX/0/r7GjUOLZTvi/U8s9yAYZ3gr+B26i0axe18IxVavxu/
- OUt2OnoNkWcTH3U2jU7nPEyw2xg4qo5dKTomcOcQkBY6Q38rEt1vAKSKGR5sbX7Q6s0lG4
- 9htmLLV752cw9ZfXDtlT5ravfggLMml4HfGhm/eGLY0xarpNip0kZArOfLft+LY6ufzWmS
- Gg1mBdQtpgfu0fe29MiH2QEgZHoR+4i4XjTWu1Tc9EK9iuiyBZ36/Z/SRNy8ZtDIig4D82
- 7gteQDD4ZNHoIQprqsBqxUSozNzhJvSqdCtVr8qaNW2TxCi53SA9ONUPZUZvcA==
-Subject: [RFC PATCH bluetooth-next 0/3] Bluetooth: Add AIC8800D80 SDIO firmware loader and UART HCI
-Date: Wed, 16 Sep 2026 16:35:37 +0800
+ bh=OVoaH48sl0PaCsa57Dt8gMRXpE35SdnCUjpKOqA1aLg=;
+ b=E5AmyymReM6f8KJOfJkDoocWNzUUO0CzkgCHvbEhkAB5URFUHqxBQHW/PMc6+y95YfmgLN
+ w80/FdSGOPZGBog8FrBVYsXDhKXqnbmBwLXfjLaQ4L0QTxTWuW+BgU7cznGRnYUhsYmUql
+ g5dNClqBKYO9hsrA3aEiXtpa+boJB0CiqkNjw47SUsDeRSsolf5Vmsqx4Fo194qFdxnWAI
+ tF1tij4jgjxYbFnNfjKKcEqTK820T/Ay3wA+J+diQfenRJ54BpFUmrlHl1Z1zEt8gBKDmd
+ qT2dE9kDo53Dl4fC2COG30euimoR/75xCzBqDgpY6bathJ+xCRC7O2JuLDxBcA==
+X-Lms-Return-Path: <lba+26aab4fb7+1565d6+vger.kernel.org+yanli.yang@bedmex.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: [RFC PATCH bluetooth-next 1/3] dt-bindings: vendor-prefixes: Add AIC Semiconductor
+Date: Wed, 16 Sep 2026 16:35:38 +0800
+Message-Id: <178954773705.2.9860089868793386321@bedmex.com>
+Received: from [127.0.1.1] ([36.141.79.164]) by smtp.feishu.cn with ESMTPS; Thu, 17 Sep 2026 10:25:58 +0800
+References: <178954773705.2.3446471521233620446@bedmex.com>
 X-Original-From: Yanli Yang <yanli.yang@bedmex.com>
-X-Lms-Return-Path: <lba+26aab4fb5+82f9e8+vger.kernel.org+yanli.yang@bedmex.com>
+Precedence: bulk
+X-Mailing-List: linux-bluetooth@vger.kernel.org
+List-Id: <linux-bluetooth.vger.kernel.org>
+List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: <marcel@holtmann.org>, <luiz.dentz@gmail.com>, 
 	<devicetree@vger.kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>, 
@@ -36,70 +47,33 @@ Cc: <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
 	<zhirunliu@aicsemi.com>, <dijiaxu@aicsemi.com>, <chunqiuliu@aicsemi.com>, 
 	<liheng.wei@bedmex.com>, <yanli.yang@bedmex.com>
 From: "Yanli Yang" <yanli.yang@bedmex.com>
-Message-Id: <178954773705.2.3446471521233620446@bedmex.com>
-Precedence: bulk
-X-Mailing-List: linux-bluetooth@vger.kernel.org
-List-Id: <linux-bluetooth.vger.kernel.org>
-List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [127.0.1.1] ([36.141.79.164]) by smtp.feishu.cn with ESMTPS; Thu, 17 Sep 2026 10:25:56 +0800
+In-Reply-To: <178954773705.2.3446471521233620446@bedmex.com>
 Content-Transfer-Encoding: 7bit
-To: <linux-bluetooth@vger.kernel.org>
 
-Hi,
+Add the vendor prefix for AIC Semiconductor (Shanghai) Co., Ltd.,
+used by the AIC8800D80 Bluetooth bindings.
 
-This RFC series adds initial Bluetooth support for the AIC8800D80.
-SDIO function 1 loads the Bluetooth firmware; HCI traffic uses a separate
-UART interface with H4 framing at 1500000 baud and hardware flow control.
+Signed-off-by: Zhirun Liu <zhirunliu@aicsemi.com>
+Signed-off-by: Dijia Xu <dijiaxu@aicsemi.com>
+Signed-off-by: Chunqiu Liu <chunqiuliu@aicsemi.com>
+Signed-off-by: Liheng Wei <liheng.wei@bedmex.com>
+Signed-off-by: Yanli Yang <yanli.yang@bedmex.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The series adds the AIC vendor prefix, Device Tree bindings for the two
-interfaces, and the btaic driver with build and maintainer integration.
-The UART node references its SDIO firmware provider through the
-aic,firmware-sdio property.
-
-Validation status:
-- The vendor has confirmed that SDIO firmware loading works.
-- UART HCI communication, controller initialization, scanning, pairing,
-  connections and data transfer have not yet been validated.
-- Suspend/resume and Wi-Fi/Bluetooth coexistence have not been validated.
-- No hardware functionality beyond firmware loading is claimed.
-
-This is an RFC for implementation and binding review, not a request for
-merging at this stage. Feedback is particularly welcome on the SDIO/UART
-split, the firmware-provider association and the device lifetime handling.
-
-The driver requests the following external firmware files:
-  aic/aic8800d80/fw_adid_8800d80_u02.bin
-  aic/aic8800d80/fw_patch_8800d80_u02.bin
-  aic/aic8800d80/fw_patch_table_8800d80_u02.bin
-Firmware binaries are not included in this kernel patch series.
-
-Thanks,
-Yanli
-
-Yanli Yang (3):
-  dt-bindings: vendor-prefixes: Add AIC Semiconductor
-  dt-bindings: net: bluetooth: Add AIC8800D80
-  Bluetooth: btaic: Add AIC8800D80 SDIO loader and UART transport
-
- .../net/bluetooth/aic,aic8800d80-bt.yaml      |  87 ++
- .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
- MAINTAINERS                                   |  11 +
- drivers/bluetooth/Kconfig                     |  16 +
- drivers/bluetooth/Makefile                    |   3 +
- drivers/bluetooth/btaic.h                     |  26 +
- drivers/bluetooth/btaic_core.c                | 180 ++++
- drivers/bluetooth/btaic_sdio.c                | 886 ++++++++++++++++++
- drivers/bluetooth/btaic_uart.c                | 331 +++++++
- 9 files changed, 1542 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/aic,aic8800d80-bt.yaml
- create mode 100644 drivers/bluetooth/btaic.h
- create mode 100644 drivers/bluetooth/btaic_core.c
- create mode 100644 drivers/bluetooth/btaic_sdio.c
- create mode 100644 drivers/bluetooth/btaic_uart.c
-
-
-base-commit: 6696072ffe07205255cf83621a95a1aa2f9f6e62
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+index 396044f368e7..a55d0d974cab 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
++++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+@@ -76,6 +76,8 @@ patternProperties:
+     description: Aeroflex Gaisler AB
+   "^aesop,.*":
+     description: AESOP Embedded Forum
++  "^aic,.*":
++    description: AIC Semiconductor (Shanghai) Co., Ltd.
+   "^airoha,.*":
+     description: Airoha
+   "^al,.*":
 -- 
 2.34.1
