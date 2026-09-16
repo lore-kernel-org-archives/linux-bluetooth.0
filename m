@@ -1,94 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762014B0E30
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 18:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9AA3ACEE0;
+	Wed, 16 Sep 2026 18:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789583526; cv=none; b=XzKeFXzO+m59ae6pIGQCGzopB6mp0SZWq0GCTW6McrIi4DCgzhq2AHZf0DBYBsrTTGJlxuvd3mL+KFO2pqov3PlAE322pukotnxc9dsMzIRWVtEq0723QlgDANoJ5QiAZLZTS2/6NuWClUO2ByPxBMdw7R143pP1HcAtCPt2W1Q=
+	t=1789583606; cv=none; b=DrvRrSCecUWn8vpgbv4mzr9TD4zRjAwPxjXEXA5ghtF6g6FtEz4ZPK1Ls08NYFGBtUfGk/OSeRgMUsGsNd5f2bcJDgWf5u+EQ2ugTvIqZyaSc2nOyAvTCqmKIzhDiV1f2xdx2TD9W5MHrDT8oTVRwzykxauWDAN1ABd1dNa8DF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789583526; c=relaxed/simple;
-	bh=8mGfhfE81/bje3UEmZa7LrQdqn+3wezoArROfGNU75U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Fl+uhlq+yzP6fIjx6diNSsS1a4uW0o1Lm1tybUYrE19w0D1eQuc7KRoXaChW3cF11eAb/zXQU2DWufPNPW+czRQQULN3bgXre87JgZ0e+orTdby4AUo22BtOnUv1kfhXKhKDXTrGKj1h3DeI1hMyMvGtNRYL93vZlenYoFNrUdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhw3YXSq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789583606; c=relaxed/simple;
+	bh=XT0jJrySMVbRwELXjvHsH7ZPSgl2osg69Jo5LaW1E2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jPA/5Xae4OJhUjb3thkbGUFS7blWTFNF6PQX5mRowoPhO0DPk5R9BpMKRtm1SMSDsSGNuEr8PQaaXszteg86jwIcE8MWD0uWRPgIsA2Ce10B9ABklfHK7txg650g/LGpZ1epsNIypEI7n4L2X6m+NS2JCYIMMLYMqq56vwTLssA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CD0DFfKk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhw3YXSq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506D01F0089B;
-	Wed, 16 Sep 2026 18:31:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CD0DFfKk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AACFB1F0089C;
+	Wed, 16 Sep 2026 18:33:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789583474;
-	bh=uGEVCii3BYxk8D+QV547v8bS6Y6V+EsK1ZCdD4nEOn0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fhw3YXSqEP1e7SdRH1joRSLIv24Lc1z69mo4hhCvCwX4dFvUCznM+KPV6EC8IQpoO
-	 iu8HXlmxTZOYFroCP05o/SzRUEI6qtv36OmmedIxBKIsYBvSEvZXvpG3Bmgkpy+6QE
-	 xL2TufK+4zzjk16UEk4rb51M88mKs2cbNmeilzhKDR74vgEtW0azW25bFmc/8m2ahL
-	 7SzTNRh3OzHo8KOCpydf10CNbrmsPlvd4RA4W423sQh57dHrzB27SiNL/vRcNTnRuj
-	 lFeKf11l6Myd8QA95knu1ZsPc4nLscgx35mheh7FDKcBltK7Bkc26v882VuAoSAbCp
-	 ghy+nPrRs5r3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93BDC39E8A52;
-	Wed, 16 Sep 2026 18:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1789583589;
+	bh=n8hj9CA+wXBbNJr2YXNJ6pr/sjRbRY5kxxZHC+d9bVs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=CD0DFfKkVhBFGuJtZF7BMM2gAYGN01q3wnBUSGPiyrHFoAXIGEJ2QZOoGLPdcW5JS
+	 eHEEApN18b8oPk3aZa8kV5MHxvm42O6m8gN5OqeFOURvcyCMZATGiOi0Z14l2E3zkz
+	 UAsZ2WYdtAyU4HFA/NE9WBg8wdcqqFhx4vp7MZRBjHdz1TWi4ow+QBt6E5Vs8EhZcK
+	 iJQm/KzJO8LfgKVrAPgsiNZKGmTb26jS1+kydJkS1fSKYH0IrgONTV68OVbyAhuyPd
+	 DrA0nxRUjHzSue7PuimiUdz7P4WS+feTpWnRipXRFOITXXJDtAv1K9FtZ/UWOPVxfu
+	 Yx9P9XR+j5I7Q==
+Date: Wed, 16 Sep 2026 19:33:04 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bluetooth 2026-09-07
+Message-ID: <6b74cabb-daa9-4598-b118-6874f7993dd7@sirena.org.uk>
+References: <d5676b70-f60b-4ce6-b6e6-de564d5c0a29@sirena.org.uk>
+ <CABBYNZLKnQsypBR8Kbx4QFL9KfnVXRhO9_d5BHYQCabVZSY34g@mail.gmail.com>
+ <064ec40d-66bb-4f69-ae1c-65cfed3581b4@sirena.org.uk>
+ <CABBYNZJWcrvkx=6DekHxZzcrGjHwiqmSuwXqzHNV1=7BctThGA@mail.gmail.com>
+ <aqnMueXiCztLUn-w@sirena.org.uk>
+ <CABBYNZ+A+bNZ0THj0EZ4KfMj6wPMhD6hvbt5FP-exZnqxb4E-Q@mail.gmail.com>
+ <6ce3c671-12e3-4057-9610-23efe14832cf@sirena.org.uk>
+ <CABBYNZKiy+t_GC9dL6nraiH26m+2U=kuAF8NMAPNW-BhtOSovA@mail.gmail.com>
+ <1add998c-b408-45cf-9442-0fda2674fe32@sirena.org.uk>
+ <CABBYNZJn-ZYkX1DrOg9QWQHLWP_Pzh62M__X_jd0eXrKQx-K_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 00/11] Cover a BAP stream to a coordinated set
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178958340812.3229304.13270316680740973228.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Sep 2026 18:30:08 +0000
-References: <20260915211528.1223784-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260915211528.1223784-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-
-Hello:
-
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Tue, 15 Sep 2026 17:15:17 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> These add the functional test cases for a BAP unicast stereo stream to
-> a coordinated set of two acceptors, one taking the left channel and one
-> the right, which is what a pair of earbuds does, together with the
-> fixes they turned out to need.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v1,01/11] shared/bass: add a ready callback
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=825c98da2a69
-  - [BlueZ,v1,02/11] bass: wait for the session to be ready before pushing a source
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6eb23703b473
-  - [BlueZ,v1,03/11] test: functional: report what a test is waiting for
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=915926f516bc
-  - [BlueZ,v1,04/11] test: functional: answer the notification registered by the victim
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d1130406008a
-  - [BlueZ,v1,05/11] doc: describe the BAP coordinated set test cases
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8da79557195a
-  - [BlueZ,v1,06/11] emulator: use the handle of the receiving side
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4ff7deaf8c90
-  - [BlueZ,v1,07/11] emulator: allow the maximum number of CIS of a CIG
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=526befeb949c
-  - [BlueZ,v1,08/11] device: keep the long term key of both roles
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9251e630efdd
-  - [BlueZ,v1,09/11] client: allow a capability with the auto agent
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2f9cb900d471
-  - [BlueZ,v1,10/11] test: functional: fail as soon as an operation fails
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=12b85dddb26e
-  - [BlueZ,v1,11/11] test: functional: add the BAP coordinated set tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e1566fd5568b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gDlfHHBCP0tD3N+L"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJn-ZYkX1DrOg9QWQHLWP_Pzh62M__X_jd0eXrKQx-K_Q@mail.gmail.com>
+X-Cookie: Double!
 
 
+--gDlfHHBCP0tD3N+L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Sep 16, 2026 at 02:30:30PM -0400, Luiz Augusto von Dentz wrote:
+
+> Fixes tree is in:
+
+> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
+
+The master branch?  There's also a for-upstream branch, though I see
+it's very old.
+
+--gDlfHHBCP0tD3N+L
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqq4N8ACgkQJNaLcl1U
+h9CNHwf7BIfAgpei9j/FbS8KX5Zbbnx9cR8VbeymsludvOKoToUFBQba1neG1tvr
+fzr7r/Uox0a7KEFgKtggy1F2Db/CvjEgd1zpcKciG87/GfHdN96Q4f5QdUzx92Mr
+fJViNvQ5vcxeDSBLYE4zK3XNPf6MAqHIDAtcJzS83q883EHRloectEE8esw9HOOd
+sYM3w3B2lZqc1T+YY+ghefslGhNdz3FQVmU+i0gwVgA8xfvKGvYIdNVJwrugZ+5l
+GK/Wrt7/O6wLZOXtCyIGAtJMwl/bGcQNdFPibrvIARiaWjNwUIUP6DGEtmHVCl2D
+QLV3oNVi1QXdwUwTRF7CIsx1YK+Kyw==
+=JayT
+-----END PGP SIGNATURE-----
+
+--gDlfHHBCP0tD3N+L--
