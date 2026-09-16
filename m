@@ -1,164 +1,269 @@
-Received: from mail-pz2-f41.google.com (mail-pz2-f41.google.com [74.125.228.41])
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAAC3FDC05
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 19:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8E2432E8D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 19:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789586492; cv=none; b=XVmKE647/z8rPUILoKZuv316IU+bOFrjnqrJv6mWnGSM8sTZdi/dJ4xO7AOy9WfdFd4EZ476Sujb+1rJvsTKJEUkTK9eG72bPmqPAxcDTCTAzFiS8PIbArRCrd+Fi92aCFDygAlKa1UMBd+JCsIWzQReudtgA94UN1hfacfrRYs=
+	t=1789587325; cv=none; b=ijZpj5oy9CDn64RbrU+tcExYnR+v+0RjvEFIqal7SQ8llrOUzqZ9hMG1ALqasD3tAwT4GAa6fp+xWPuhvwpZWLKjwg8gV/QJCIHQqp2M5Enmw20GxFAfyzYabOscAKbYLOybY9BJf1PbcVdwg4I2108lnqUb229zKVEt0gAfChg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789586492; c=relaxed/simple;
-	bh=JMFwBVLQR96Po3vbLXDpc+8jfbxxhUtPkv/auoBggrE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=son6Q7JPKzbHDvX6s6TJ/MJG3DkjqEPlV56em0b8eV0pztVLOJU7dOncFyWmrW1+PuzRnZ+rWsBXWbn8a3cjd2d9m4mXKfo94NswHZ481LIXSbcaa/0FD9iN6ieDn+9EGNz8XhR6nJosEa6ZgiPGzBqlWSTmmvZ034KPQLEshH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rsnHvgAc; arc=none smtp.client-ip=74.125.228.41
+	s=arc-20240116; t=1789587325; c=relaxed/simple;
+	bh=37mrbgiKj2yMEYJvYaqXJn4UZXI1sNe0ef9mvGAtKg4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=pvV7r654Pg6Z8w589FlGEoIYky4Vyz8XncDILpvCppzhjOGAtK5Vxutn0+Xs+9YzmGsJ6Bh12NKx2pBRFqDd0vSVKDi5AbmjBPejVzTokNnWKO3MNRNNs+KAplFAXyHhXll4BDCc4aCDbBSqTS6hUCOHoM3vWXZFIXGrUQCxcaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Imrncc03; arc=none smtp.client-ip=74.125.225.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rsnHvgAc"
-Received: by mail-pz2-f41.google.com with SMTP id d2e1a72fcca58-868a9c48f9eso40125b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 12:21:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Imrncc03"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6b885ef8so577265e9.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 12:35:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789586475; x=1790191275; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Zm4J9dYzJGKFWSNc5KoDYu8lYlnLOpeb1w+l6QF/KaM=;
-        b=rsnHvgAclwB1QSF9VlQlgmr81Ky8dsal9tLcV4LzHHWshYQnRW4gmg0WtCvVD5/2Sd
-         f3PPWppe0QU2Lb7jeulN5zUjg9P+2y1vgbUB7ynuimzuNh2GP3SgYhBZiNESmjAUjFbt
-         T5lwm3j9RkTSthCiJB8ldPivJJg07F7IE8+lOBbJVxg/ZrXqwEnrZWNtTfm4IUUQ2RaW
-         j4CE2oxzj6UZWulwGcdNaVwpL0gHn9LetlCvTlrDLVeyjr34vHrKFeVlFbuMUXGq8+tV
-         0umOY5vXzK7tTJf8DTMlHXkabV+qFRbr5NQbhtssnusOeQ4ouwoEyTwY7Dn5WYtFTufn
-         f+XQ==
+        d=gmail.com; s=20251104; t=1789587312; x=1790192112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=713Rnd8tXfX5v2C5/tcwaMUXoXj1OqEgNCWH9P2bUyg=;
+        b=Imrncc0329czpyqr4TvUHme6UIf+AkGGV97e8rqkezAHC12n3V9ZuC3IF+UrGEfLAU
+         Xd+8qL1bqsG0AXYgfcofro6Schh/WZco+B4TgF/+FqHWZP+J7XGJ/+cZVCNv10UrXvWG
+         pYmy6lECGzMjhAsDPHvVpA6UCz72kjjGolj1+I1Zbmtn5BFmi9KllofD+LYCAPYm+BKY
+         2Z5LUZmToNhRcjrWCPK0kkCqw6j+7S7vlhf9iPtVzA3zl4uUfT91bZhLxessca4UYTIY
+         Dh/aUdOAlxh+GGBgcizqkWi3Hoz70VClkKhqxQsZEdTowvKzN0Jo7D46UKMlwL/CfQ/k
+         NIkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789586475; x=1790191275;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Zm4J9dYzJGKFWSNc5KoDYu8lYlnLOpeb1w+l6QF/KaM=;
-        b=wKHE9Z+Obo3nJURxbGS8+e1GSCIjpxJqDoYWJQsyLJI4WW5vrpEimgk6HGt3cNDbN2
-         RCy1S89eZE6SVXFUNtBzlxXADehJAgHfryjHJR5NRVRbEXYUAksSlB1IGm8Wtx60jPmk
-         S/3GmtHZYpTrKuXzS34OZEcAxGYbIfd7zdidDGAz9jqJGcnZn48yo9L5V9U80wNDu1HB
-         ywLgTSapX2cZl843h5RrL0HDyTta/Rf/wu36jETuXKlkbVOoNE70ly7DYw3SUWSLlXvv
-         SKERzqf+sHqtQBKbuQBILHUoEI3EgSlKNxT4oKBiFHiHgP9ck6iNTzi0yL9YpcmoGE6d
-         jzGQ==
-X-Gm-Message-State: AFuF++k2vtC174mqBYE4tWoDdZVHA4k5GEoQon0rC53sKCgKoXrPF4RV
-	znbaEaik/lU3YFAY3uqqzayDSemj683ad1ThBn9STG8EpTouYSvTNCUqi2e1Ag==
-X-Gm-Gg: AYBFou1hSbLL544pItUYKPvd8wIOEwBQkSZ6FDeCzjxDizEG+QM9HETIbjK1uX/aDAe
-	1rV5npUahtxJzkf5zHuDVc6KnS6z11zQoy8slpe4S5gUAz1JQSLd2pMgeQVOp7/gb9yvaC5kWfO
-	7s4ZAw6/pxendFp6nDzvWGJ4nYT+gHejzAw94gbd64fIrrBtZUoXlW3Yk3KrD2yelGA4Hvb7vcf
-	VJrPfJROFMj8lzs2hThoaTRZ286lvvnEqZzIPtRPR0S69VCDIabL/9Fd0/Mgu3WoronvCyAa61y
-	vQr7gYSwmWpSHo0hkdLV5NryLuF3g8c6vrWssOF5H4JnRJreMFRxUtbfQIVD3y5oK8Cb89rVtnf
-	55nAJlakJdpprMkKs6Mw9q9YoyoLn3Jo+G5krvdzDhyQKsMO7Ok63qDCtoJdLplCN/fjyN6Xikg
-	WWEV9TYyGuDHyDI5QiB4/VnXtTCeNWmq6fZ1WFQcw0CNcLTElL2YVd9a7NttZPg+vkFRJy3PS98
-	6lT4MxjbXXBSDi/fA==
-X-Received: by 2002:a05:6a20:6a03:b0:3d3:ae50:97c8 with SMTP id adf61e73a8af0-3dd5f7a9bf4mr9140264637.21.1789586474816;
-        Wed, 16 Sep 2026 12:21:14 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.128.205])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bf5b2753csm18879398eec.31.2026.09.16.12.21.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 12:21:14 -0700 (PDT)
-Message-ID: <6aaaec2a.c21e2895.a2dd1.a494@mx.google.com>
-Date: Wed, 16 Sep 2026 12:21:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0274290463873802421=="
+        d=1e100.net; s=20260707; t=1789587312; x=1790192112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=713Rnd8tXfX5v2C5/tcwaMUXoXj1OqEgNCWH9P2bUyg=;
+        b=ZQTe92c31QFJVLppZpwCm2WSCmaPiN4SkbqLzcYb1JPOn9IVCEeYqJ2bKXnkQPvd4y
+         cwjQKlKLaV3k8OvWoDXywAKNsQXFm9qF5af1tTbnNT4JxmzFOXE1zBTFSEbzZqRXqWSn
+         uIF/Fi5yJg5Aj+ydJBx7yAgQmvb9e3RujtQ76KxEl2xQhUy/aIEI8vtp5gzZiDlA8m5O
+         EYKPeMu0Gw6VpAr+KU9NppLSBxAOBfDenh/WEme+H7c4DHt5jwQSIlreBRhEhkYn0vTU
+         t+U1feMVPkVpjqdZ+4TDTt7A3GnBmfrXNQiXayQ15YXaEvyCKkImIi1GYjzqPzM7QVLQ
+         I6vg==
+X-Forwarded-Encrypted: i=1; AKwUvBwFVoIuO+3xjS3gKvpUp8xocn5SaPYWt9aywTqw+ipJeYdZaXFPnNzdKjTT3vix0YbB8JOSWhRrt3ylk5yib6o=@vger.kernel.org
+X-Gm-Message-State: AFuF++n7GsaOp7uzrReUAeu1j3rXBOSnCQJYCW8j2jwrwMJ0W/moUgDi
+	ie0JVnUHUP0srW3SCecZtTC8UW8losyivUj7kNTLo/S7ekWdFKhFpAZM
+X-Gm-Gg: AYBFou3FRa+TnHprxSFDxiLejhUHWNrUgoXsLHXZnU2BWwMF7GnvC01WlPGwoZW0P1q
+	Igc3STNK6qMl4JFZeHoni81RVfD04LSvVhLhKw2Q9xTSDbydtb2xFSm4v929T93AdAfDSg03cMT
+	Blufb2EB9MvjedHGQHj55IDBayedFQUTzC0AlVSEKHtZL59M+ujnyeIsLws8jgZnw17bg7QkfNa
+	FidmhM7PCxoUyUcmxFcX+z70LK+P8RN6OOJFLT82JSNxNM1A/czFbWskg81/pymp8hFLpf+Lyx5
+	J9cFp6BuRilk8y6RtXkQo4bHiPR+dw1yPLp0MwphZ7dBJCYyq+aYCmF0vZkndgsXyoQfDgKuYXp
+	h/H1LW138Rdvxq6NfPln9TYrjY0LEEV6Qi26NUBVL7b1JeovHBf3xT+upXX2pmlZcneGhzHqwO6
+	mvL/a+04J3V0/VUjRl1VUH4rT0svEJLIA2LoG196VCJpB2ofizbt7FDa+kdmfM5An3/6VAjR5VF
+	3CEpfu+UZqGXYhiA0/gX0QHZYktPoWL6+aoZaJM9aXW1BpjOUitdAEPPowAIsDHivfvPKigkU0P
+	FhD8LKY0wx6HKM6AsfGWn7+qJeHoM0Z/RuT8sjLw0sj/eYRVCsucW06PDnSzCHqkBD+d4iPoy7z
+	Ood8V/yUAwmRDm6C4
+X-Received: by 2002:a05:600c:46d1:b0:49c:c0d4:53d9 with SMTP id 5b1f17b1804b1-49eb72fbf26mr45934875e9.14.1789587311636;
+        Wed, 16 Sep 2026 12:35:11 -0700 (PDT)
+Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-adf7-5a01-5cac-d7ee-c105-a566.310.pool.telefonica.de. [2a02:3100:adf7:5a01:5cac:d7ee:c105:a566])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e847fcbdfsm60879335e9.4.2026.09.16.12.35.09
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 16 Sep 2026 12:35:10 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: stable@vger.kernel.org
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	luiz.dentz@gmail.com,
+	luiz.von.dentz@intel.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	eadavis@qq.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev,
+	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
+Subject: [PATCH 5.10.y] Bluetooth: L2CAP: Fix deadlock
+Date: Wed, 16 Sep 2026 21:34:54 +0200
+Message-Id: <20260916193454.9996-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <aqoaFdvSsDiiLb5I@gmail.com>
+References: <2026091453-unwary-delete-b272@gregkh> <daily-reply-20260915-0012-re-l2cap-recv-cb-5-10-revert@kernel.org> <aqoaFdvSsDiiLb5I@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ngocthang2710.1999@gmail.com
-Subject: RE: Bluetooth: af_bluetooth: hold a reference on parent in accept_q
-In-Reply-To: <20260916153818.24916-1-ngocthang2710.1999@gmail.com>
-References: <20260916153818.24916-1-ngocthang2710.1999@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0274290463873802421==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit f1a8f402f13f94263cf349216c257b2985100927 ]
 
-Dear submitter,
+This fixes the following deadlock introduced by 39a92a55be13
+("bluetooth/l2cap: sync sock recv cb and release")
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1166624/
+============================================
+WARNING: possible recursive locking detected
+6.10.0-rc3-g4029dba6b6f1 #6823 Not tainted
+--------------------------------------------
+kworker/u5:0/35 is trying to acquire lock:
+ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+l2cap_sock_recv_cb+0x44/0x1e0
 
----Test result---
+but task is already holding lock:
+ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+l2cap_get_chan_by_scid+0xaf/0xd0
 
-Test Summary:
-CheckPatch                    FAIL      0.59 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      27.59 seconds
-CheckAllWarning               PASS      31.90 seconds
-CheckSparse                   PASS      34.81 seconds
-BuildKernel32                 PASS      27.84 seconds
-CheckKernelLLVM               PASS      32.91 seconds
-TestRunnerSetup               PASS      791.67 seconds
-TestRunner_l2cap-tester       PASS      16.44 seconds
-TestRunner_iso-tester         PASS      26.73 seconds
-TestRunner_bnep-tester        PASS      3.10 seconds
-TestRunner_mgmt-tester        FAIL      60.50 seconds
-TestRunner_rfcomm-tester      PASS      10.18 seconds
-TestRunner_sco-tester         PASS      7.60 seconds
-TestRunner_ioctl-tester       PASS      4.89 seconds
-TestRunner_mesh-tester        FAIL      7.80 seconds
-TestRunner_smp-tester         PASS      4.39 seconds
-TestRunner_userchan-tester    PASS      3.26 seconds
-TestRunner_6lowpan-tester     PASS      4.46 seconds
-IncrementalBuild              PASS      28.78 seconds
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: af_bluetooth: hold a reference on parent in accept_q
-WARNING: The commit message has 'syzkaller', perhaps it also needs a 'Fixes:' tag?
+       CPU0
+       ----
+  lock(&chan->lock#2/1);
+  lock(&chan->lock#2/1);
 
-total: 0 errors, 1 warnings, 0 checks, 17 lines checked
+ *** DEADLOCK ***
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+ May be due to missing lock nesting notation
 
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14822720.patch has style problems, please review.
+3 locks held by kworker/u5:0/35:
+ #0: ffff888002b8a940 ((wq_completion)hci0#2){+.+.}-{0:0}, at:
+process_one_work+0x750/0x930
+ #1: ffff888002c67dd0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0},
+at: process_one_work+0x44e/0x930
+ #2: ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+l2cap_get_chan_by_scid+0xaf/0xd0
 
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+To fix the original problem this introduces l2cap_chan_lock at
+l2cap_conless_channel to ensure that l2cap_sock_recv_cb is called with
+chan->lock held.
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Fixes: 89e856e124f9 ("bluetooth/l2cap: sync sock recv cb and release")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ Karl Mehltretter: only the l2cap_core.c and l2cap_sock.c hunks apply
+  to this tree. hci_sync.c and hci_sync.h do not exist here, and the
+  hci_core.c change is an unrelated conversion of hci_dev_cmd() off
+  the old hci_request API. The changes to both L2CAP files apply
+  unmodified.
 
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.019 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.448 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/783
-
+  The lock this adds to l2cap_conless_channel() is also the one that
+  commit c531e63871c0 ("Bluetooth: l2cap: always unlock channel in
+  l2cap_conless_channel()") was backported without, so it additionally
+  pairs the l2cap_chan_unlock() that function currently calls on a
+  mutex it never acquired. ]
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    This is intended to replace the queued revert of
+    commit 2243127db6ba ("bluetooth/l2cap: sync sock recv cb and release"),
+    rather than to be applied on top of it.
+    
+    The revert fixes the deadlock but removes the NULL guard from
+    l2cap_sock_recv_cb(), while l2cap_sock_destruct() still sets chan->data to
+    NULL.  Under KASAN, closing receiving sockets while L2CAP data is inbound
+    then gives a fatal NULL dereference in hci_rx_work, reproduced 3/3 on
+    v5.10.270 with the queued revert applied.  This patch keeps the guard and
+    fixes the deadlock in one step, and uses the two applicable upstream
+    L2CAP hunks unmodified.
+    
+    Tested in QEMU with two virtual BR/EDR controllers, PROVE_LOCKING,
+    DEBUG_MUTEXES and KASAN:
+    
+      v5.10.270 as released         recursive chan->lock deadlock
+      v5.10.270 + the queued revert fatal NULL deref, 3/3
+      v5.10.270 + this patch        clean 3/3, 300 close cycles each
+    
+    BlueZ's own l2cap-tester also deadlocks hci_rx_work on v5.10.270 and never
+    completes.  With this patch all six tester suites run to completion.
+    
+    Also on a Raspberry Pi 400 (BCM2711, onboard CYW43455) with a second board
+    as the L2CAP peer, each test from its own boot so lockdep was armed for
+    each:
+    
+      v5.10.270 as released, connectionless   bad unlock balance
+      v5.10.270 as released, connected        possible recursive locking
+      v5.10.270 + this patch, connectionless  clean, debug_locks still 1
+      v5.10.270 + this patch, connected       clean, debug_locks still 1
+    
+    The same board with an A2DP speaker shows the user-visible effect.  On
+    v5.10.270 as released, connecting to the speaker deadlocks hci_rx_work and
+    playback cannot start at all:
+    
+      bluetoothd: a2dp-source profile connect failed: Device or resource busy
+    
+      task:kworker/u9:0 state:D
+      Workqueue: hci0 hci_rx_work [bluetooth]
+        __mutex_lock
+        l2cap_sock_recv_cb
+        l2cap_recv_frame
+        l2cap_recv_acldata
+        hci_rx_work
+    
+    With this patch the same speaker connects and plays the full track with no
+    kernel warning and debug_locks still 1.
+    
+    If the queued revert is kept instead, the same end state is reachable with
+    two patches on top of it, which I can send.
 
---===============0274290463873802421==--
+ net/bluetooth/l2cap_core.c |  3 +++
+ net/bluetooth/l2cap_sock.c | 13 +------------
+ 2 files changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1122566c4b50..7de512843f06 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -8044,6 +8044,8 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
++	l2cap_chan_lock(chan);
++
+ 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
+ 		goto drop;
+ 
+@@ -8061,6 +8063,7 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	}
+ 
+ drop:
++	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
+ free_skb:
+ 	kfree_skb(skb);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 9d834f225462..018b5a0c87ce 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1548,18 +1548,9 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	struct l2cap_pinfo *pi;
+ 	int err;
+ 
+-	/* To avoid race with sock_release, a chan lock needs to be added here
+-	 * to synchronize the sock.
+-	 */
+-	l2cap_chan_hold(chan);
+-	l2cap_chan_lock(chan);
+ 	sk = chan->data;
+-
+-	if (!sk) {
+-		l2cap_chan_unlock(chan);
+-		l2cap_chan_put(chan);
++	if (!sk)
+ 		return -ENXIO;
+-	}
+ 
+ 	pi = l2cap_pi(sk);
+ 	lock_sock(sk);
+@@ -1611,8 +1602,6 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 
+ done:
+ 	release_sock(sk);
+-	l2cap_chan_unlock(chan);
+-	l2cap_chan_put(chan);
+ 
+ 	return err;
+ }
+
+base-commit: 1797d8bf8d0c2e74defad605d14e3553d43a3caf
+-- 
+2.53.0
+
