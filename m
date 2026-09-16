@@ -1,269 +1,107 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server1021.dmsolutionsonline.de (server1021.dmsolutionsonline.de [23.88.69.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8E2432E8D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 19:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28FC4E06CC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 20:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.69.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789587325; cv=none; b=ijZpj5oy9CDn64RbrU+tcExYnR+v+0RjvEFIqal7SQ8llrOUzqZ9hMG1ALqasD3tAwT4GAa6fp+xWPuhvwpZWLKjwg8gV/QJCIHQqp2M5Enmw20GxFAfyzYabOscAKbYLOybY9BJf1PbcVdwg4I2108lnqUb229zKVEt0gAfChg=
+	t=1789592232; cv=none; b=EHTTPXjLiM5Um2Iv4flGmjk5Re7eamu55TVCMZ2NiHw0FXnfTdKXmmldYB8f3rWHjYugfy2Wa5PVDRykJOaF85eDrxRXAqTbZ3wg7n8ktF4HkumrmOcfZgGEHuXOPOq4TuFIa8Yh+VcZJlLCi52CCo3G+sXZVCW+FM4qN4RCYTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789587325; c=relaxed/simple;
-	bh=37mrbgiKj2yMEYJvYaqXJn4UZXI1sNe0ef9mvGAtKg4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pvV7r654Pg6Z8w589FlGEoIYky4Vyz8XncDILpvCppzhjOGAtK5Vxutn0+Xs+9YzmGsJ6Bh12NKx2pBRFqDd0vSVKDi5AbmjBPejVzTokNnWKO3MNRNNs+KAplFAXyHhXll4BDCc4aCDbBSqTS6hUCOHoM3vWXZFIXGrUQCxcaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Imrncc03; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Imrncc03"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e6b885ef8so577265e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 12:35:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789587312; x=1790192112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=713Rnd8tXfX5v2C5/tcwaMUXoXj1OqEgNCWH9P2bUyg=;
-        b=Imrncc0329czpyqr4TvUHme6UIf+AkGGV97e8rqkezAHC12n3V9ZuC3IF+UrGEfLAU
-         Xd+8qL1bqsG0AXYgfcofro6Schh/WZco+B4TgF/+FqHWZP+J7XGJ/+cZVCNv10UrXvWG
-         pYmy6lECGzMjhAsDPHvVpA6UCz72kjjGolj1+I1Zbmtn5BFmi9KllofD+LYCAPYm+BKY
-         2Z5LUZmToNhRcjrWCPK0kkCqw6j+7S7vlhf9iPtVzA3zl4uUfT91bZhLxessca4UYTIY
-         Dh/aUdOAlxh+GGBgcizqkWi3Hoz70VClkKhqxQsZEdTowvKzN0Jo7D46UKMlwL/CfQ/k
-         NIkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789587312; x=1790192112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=713Rnd8tXfX5v2C5/tcwaMUXoXj1OqEgNCWH9P2bUyg=;
-        b=ZQTe92c31QFJVLppZpwCm2WSCmaPiN4SkbqLzcYb1JPOn9IVCEeYqJ2bKXnkQPvd4y
-         cwjQKlKLaV3k8OvWoDXywAKNsQXFm9qF5af1tTbnNT4JxmzFOXE1zBTFSEbzZqRXqWSn
-         uIF/Fi5yJg5Aj+ydJBx7yAgQmvb9e3RujtQ76KxEl2xQhUy/aIEI8vtp5gzZiDlA8m5O
-         EYKPeMu0Gw6VpAr+KU9NppLSBxAOBfDenh/WEme+H7c4DHt5jwQSIlreBRhEhkYn0vTU
-         t+U1feMVPkVpjqdZ+4TDTt7A3GnBmfrXNQiXayQ15YXaEvyCKkImIi1GYjzqPzM7QVLQ
-         I6vg==
-X-Forwarded-Encrypted: i=1; AKwUvBwFVoIuO+3xjS3gKvpUp8xocn5SaPYWt9aywTqw+ipJeYdZaXFPnNzdKjTT3vix0YbB8JOSWhRrt3ylk5yib6o=@vger.kernel.org
-X-Gm-Message-State: AFuF++n7GsaOp7uzrReUAeu1j3rXBOSnCQJYCW8j2jwrwMJ0W/moUgDi
-	ie0JVnUHUP0srW3SCecZtTC8UW8losyivUj7kNTLo/S7ekWdFKhFpAZM
-X-Gm-Gg: AYBFou3FRa+TnHprxSFDxiLejhUHWNrUgoXsLHXZnU2BWwMF7GnvC01WlPGwoZW0P1q
-	Igc3STNK6qMl4JFZeHoni81RVfD04LSvVhLhKw2Q9xTSDbydtb2xFSm4v929T93AdAfDSg03cMT
-	Blufb2EB9MvjedHGQHj55IDBayedFQUTzC0AlVSEKHtZL59M+ujnyeIsLws8jgZnw17bg7QkfNa
-	FidmhM7PCxoUyUcmxFcX+z70LK+P8RN6OOJFLT82JSNxNM1A/czFbWskg81/pymp8hFLpf+Lyx5
-	J9cFp6BuRilk8y6RtXkQo4bHiPR+dw1yPLp0MwphZ7dBJCYyq+aYCmF0vZkndgsXyoQfDgKuYXp
-	h/H1LW138Rdvxq6NfPln9TYrjY0LEEV6Qi26NUBVL7b1JeovHBf3xT+upXX2pmlZcneGhzHqwO6
-	mvL/a+04J3V0/VUjRl1VUH4rT0svEJLIA2LoG196VCJpB2ofizbt7FDa+kdmfM5An3/6VAjR5VF
-	3CEpfu+UZqGXYhiA0/gX0QHZYktPoWL6+aoZaJM9aXW1BpjOUitdAEPPowAIsDHivfvPKigkU0P
-	FhD8LKY0wx6HKM6AsfGWn7+qJeHoM0Z/RuT8sjLw0sj/eYRVCsucW06PDnSzCHqkBD+d4iPoy7z
-	Ood8V/yUAwmRDm6C4
-X-Received: by 2002:a05:600c:46d1:b0:49c:c0d4:53d9 with SMTP id 5b1f17b1804b1-49eb72fbf26mr45934875e9.14.1789587311636;
-        Wed, 16 Sep 2026 12:35:11 -0700 (PDT)
-Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-adf7-5a01-5cac-d7ee-c105-a566.310.pool.telefonica.de. [2a02:3100:adf7:5a01:5cac:d7ee:c105:a566])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e847fcbdfsm60879335e9.4.2026.09.16.12.35.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 16 Sep 2026 12:35:10 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: stable@vger.kernel.org
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
-	gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	eadavis@qq.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev,
-	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Subject: [PATCH 5.10.y] Bluetooth: L2CAP: Fix deadlock
-Date: Wed, 16 Sep 2026 21:34:54 +0200
-Message-Id: <20260916193454.9996-1-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <aqoaFdvSsDiiLb5I@gmail.com>
-References: <2026091453-unwary-delete-b272@gregkh> <daily-reply-20260915-0012-re-l2cap-recv-cb-5-10-revert@kernel.org> <aqoaFdvSsDiiLb5I@gmail.com>
+	s=arc-20240116; t=1789592232; c=relaxed/simple;
+	bh=ayEEXsmb51woO/uP+sCE7h4No2Q4jOfDkGU/rMJfbzM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=M6o998wTgM6gkREl2RQpaxwic42G2dWlZWNRixAFPoTDieQhytR/HIDYBDXMAkOSug17vrqEhRqBCzQnbBrb5CQ4sIgKxh3NFjvRXRMv7ikmbQ1wBRUf+10/qA5G+SV3NrcpbabQ/62OZjCEcq7YUsHX63cnzROt24tfAptzpZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=noblesound.at; spf=pass smtp.mailfrom=noblesound.at; arc=none smtp.client-ip=23.88.69.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=noblesound.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=noblesound.at
+Received: from [192.168.178.65] (77.119.29.226.wireless.dyn.drei.com [77.119.29.226])
+	by server1021.dmsolutionsonline.de (Mailservice) with ESMTPSA id 91B304DC2272;
+	Wed, 16 Sep 2026 22:57:01 +0200 (CEST)
+Authentication-Results: server1021;
+        spf=pass (sender IP is 77.119.29.226) smtp.mailfrom=peter.lemken@noblesound.at smtp.helo=[192.168.178.65]
+Received-SPF: pass (server1021: connection is authenticated)
+Message-ID: <8ba2bb7b-181e-4a11-bfef-268e1ff99276@noblesound.at>
+Date: Wed, 16 Sep 2026 22:57:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com
+From: Peter Lemken <peter.lemken@noblesound.at>
+Subject: Bonded LE HID device cannot reconnect while any process holds a
+ discovery session
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.9 at server1021
+X-Virus-Status: Clean
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-[ Upstream commit f1a8f402f13f94263cf349216c257b2985100927 ]
+A bonded BLE mouse becomes unreachable for as long as any userspace
+process keeps a discovery session open on the adapter. In my case the
+process was Google Chrome, which holds a Web Bluetooth discovery session
+indefinitely, but the kernel/BlueZ behaviour is the part that turns a
+badly behaved client into "every paired mouse and keyboard stops working
+with nothing logged".
 
-This fixes the following deadlock introduced by 39a92a55be13
-("bluetooth/l2cap: sync sock recv cb and release")
+Environment
+   Fedora 44, kernel 7.2.4-200.fc44.x86_64
+   bluez 5.87+1.git8750129efca8
+   Intel controller, firmware ibt-0040-0041 (202-5.26)
+   Two Lenovo Bluetooth Mice, USB ID 17EF:60EF (LE HOG, bonded, trusted,
+   WakeAllowed, static random address regenerated on each pairing)
 
-============================================
-WARNING: possible recursive locking detected
-6.10.0-rc3-g4029dba6b6f1 #6823 Not tainted
---------------------------------------------
-kworker/u5:0/35 is trying to acquire lock:
-ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
-l2cap_sock_recv_cb+0x44/0x1e0
+Symptom
+   Mouse goes to its normal idle sleep. Moving it never reconnects.
+   bluetoothctl connect <addr> fails with le-connection-abort-by-local.
+   Re-pairing (new address) is the only thing that restores input.
+   Restarting bluetoothd, power off/on, rfkill and reloading btusb do not
+   help, because the client re-arms discovery each time.
 
-but task is already holding lock:
-ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
-l2cap_get_chan_by_scid+0xaf/0xd0
+What btmon shows during 20 s of moving the dead mouse
+   - Active discovery in progress the whole time (SCAN_RSP reports, MGMT
+     Device Found events, Start Service Discovery re-issued every ~10 s).
+   - Zero packets from the bonded address, zero LE Create Connection.
+   - 168 connectable advertisements from other devices, all undirected.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+Who holds the scan (dbus-monitor across a bluetoothd restart)
+   Only caller of SetDiscoveryFilter/StartDiscovery: Comm=chrome,
+   /opt/google/chrome/chrome. Killing it -> Discovering: no -> the mouse
+   reconnects within seconds. Starting it again -> problem returns.
 
-       CPU0
-       ----
-  lock(&chan->lock#2/1);
-  lock(&chan->lock#2/1);
+Analysis
+   hci_passive_scan_sync() deliberately uses the identity address so that
+   directed advertising to us is reported by the controller. While a
+   discovery session exists, hci_update_passive_scan_sync() returns early
+   ("If discovery is active don't interfere with it") and the active scan
+   runs under a non-resolvable private address, so ADV_DIRECT_IND aimed at
+   the identity address is dropped by the controller before the host sees
+   it. A bonded HID device that reconnects via directed advertising is
+   therefore invisible for the entire lifetime of the discovery session,
+   and explicit connects from BlueZ fail for the same reason.
 
- *** DEADLOCK ***
+Expected
+   A device in the auto-connect list should remain reachable during
+   discovery, e.g. by keeping the accept-list passive scan or the identity
+   address in effect for auto-connect candidates, or by interleaving. At
+   minimum, log when an auto-connect candidate is being starved by an
+   active scan; today there is no trace in dmesg or bluetoothd.
 
- May be due to missing lock nesting notation
+Reproduce
+   1. Pair a BLE HID mouse (bonded, trusted).
+   2. Start a long-lived discovery from any client, e.g. open
+      chrome://bluetooth-internals in Chrome, or `bluetoothctl scan on`.
+   3. Let the mouse sleep, then move it: it never reconnects.
+   4. Stop the discovery: it reconnects immediately.
 
-3 locks held by kworker/u5:0/35:
- #0: ffff888002b8a940 ((wq_completion)hci0#2){+.+.}-{0:0}, at:
-process_one_work+0x750/0x930
- #1: ffff888002c67dd0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0},
-at: process_one_work+0x44e/0x930
- #2: ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
-l2cap_get_chan_by_scid+0xaf/0xd0
+I can provide the btsnoop captures (dead state, and dead state during an
+explicit connect attempt) on request.
 
-To fix the original problem this introduces l2cap_chan_lock at
-l2cap_conless_channel to ensure that l2cap_sock_recv_cb is called with
-chan->lock held.
-
-Fixes: 89e856e124f9 ("bluetooth/l2cap: sync sock recv cb and release")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-[ Karl Mehltretter: only the l2cap_core.c and l2cap_sock.c hunks apply
-  to this tree. hci_sync.c and hci_sync.h do not exist here, and the
-  hci_core.c change is an unrelated conversion of hci_dev_cmd() off
-  the old hci_request API. The changes to both L2CAP files apply
-  unmodified.
-
-  The lock this adds to l2cap_conless_channel() is also the one that
-  commit c531e63871c0 ("Bluetooth: l2cap: always unlock channel in
-  l2cap_conless_channel()") was backported without, so it additionally
-  pairs the l2cap_chan_unlock() that function currently calls on a
-  mutex it never acquired. ]
-Assisted-by: LLM
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
----
-
-Notes:
-    This is intended to replace the queued revert of
-    commit 2243127db6ba ("bluetooth/l2cap: sync sock recv cb and release"),
-    rather than to be applied on top of it.
-    
-    The revert fixes the deadlock but removes the NULL guard from
-    l2cap_sock_recv_cb(), while l2cap_sock_destruct() still sets chan->data to
-    NULL.  Under KASAN, closing receiving sockets while L2CAP data is inbound
-    then gives a fatal NULL dereference in hci_rx_work, reproduced 3/3 on
-    v5.10.270 with the queued revert applied.  This patch keeps the guard and
-    fixes the deadlock in one step, and uses the two applicable upstream
-    L2CAP hunks unmodified.
-    
-    Tested in QEMU with two virtual BR/EDR controllers, PROVE_LOCKING,
-    DEBUG_MUTEXES and KASAN:
-    
-      v5.10.270 as released         recursive chan->lock deadlock
-      v5.10.270 + the queued revert fatal NULL deref, 3/3
-      v5.10.270 + this patch        clean 3/3, 300 close cycles each
-    
-    BlueZ's own l2cap-tester also deadlocks hci_rx_work on v5.10.270 and never
-    completes.  With this patch all six tester suites run to completion.
-    
-    Also on a Raspberry Pi 400 (BCM2711, onboard CYW43455) with a second board
-    as the L2CAP peer, each test from its own boot so lockdep was armed for
-    each:
-    
-      v5.10.270 as released, connectionless   bad unlock balance
-      v5.10.270 as released, connected        possible recursive locking
-      v5.10.270 + this patch, connectionless  clean, debug_locks still 1
-      v5.10.270 + this patch, connected       clean, debug_locks still 1
-    
-    The same board with an A2DP speaker shows the user-visible effect.  On
-    v5.10.270 as released, connecting to the speaker deadlocks hci_rx_work and
-    playback cannot start at all:
-    
-      bluetoothd: a2dp-source profile connect failed: Device or resource busy
-    
-      task:kworker/u9:0 state:D
-      Workqueue: hci0 hci_rx_work [bluetooth]
-        __mutex_lock
-        l2cap_sock_recv_cb
-        l2cap_recv_frame
-        l2cap_recv_acldata
-        hci_rx_work
-    
-    With this patch the same speaker connects and plays the full track with no
-    kernel warning and debug_locks still 1.
-    
-    If the queued revert is kept instead, the same end state is reachable with
-    two patches on top of it, which I can send.
-
- net/bluetooth/l2cap_core.c |  3 +++
- net/bluetooth/l2cap_sock.c | 13 +------------
- 2 files changed, 4 insertions(+), 12 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1122566c4b50..7de512843f06 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -8044,6 +8044,8 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
-+	l2cap_chan_lock(chan);
-+
- 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
- 		goto drop;
- 
-@@ -8061,6 +8063,7 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 	}
- 
- drop:
-+	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
- free_skb:
- 	kfree_skb(skb);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 9d834f225462..018b5a0c87ce 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1548,18 +1548,9 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 	struct l2cap_pinfo *pi;
- 	int err;
- 
--	/* To avoid race with sock_release, a chan lock needs to be added here
--	 * to synchronize the sock.
--	 */
--	l2cap_chan_hold(chan);
--	l2cap_chan_lock(chan);
- 	sk = chan->data;
--
--	if (!sk) {
--		l2cap_chan_unlock(chan);
--		l2cap_chan_put(chan);
-+	if (!sk)
- 		return -ENXIO;
--	}
- 
- 	pi = l2cap_pi(sk);
- 	lock_sock(sk);
-@@ -1611,8 +1602,6 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 
- done:
- 	release_sock(sk);
--	l2cap_chan_unlock(chan);
--	l2cap_chan_put(chan);
- 
- 	return err;
- }
-
-base-commit: 1797d8bf8d0c2e74defad605d14e3553d43a3caf
 -- 
-2.53.0
+Best, Peter
+
 
