@@ -1,172 +1,166 @@
-Received: from mail-yx2-f43.google.com (mail-yx2-f43.google.com [74.125.224.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C884A7C82
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 17:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7EF4A7C92;
+	Wed, 16 Sep 2026 17:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789578077; cv=pass; b=C4QiOAYM7LoUSlwN+PDm6x2LyJhHEIXGimKqDi7i9R5G0DYNTOl0XBXrM5SfwesN0Ra3aJY8/gHlu7R8Jp02efnfJWNEvR9bJVLF4lV16FoKeYUSH17bKNhPomUM8MGgXOEQl9593v0PQgjN6YJ9eqJkQBwMzKRbty6DYRklUQk=
+	t=1789578696; cv=pass; b=FUnOE/C3hCm0wu09Rc4oqoLhzSmp/iTb1XofAd+Hx496u9aLf2zIXS8d/+UdVD+eef7hgJBzdaq/R6a0GO/A3tp4XEAme/5QW88fXHIwbyqxcJGM6GIZx74an9eo+0ZVsG92h4hEG575Dn818YT3jp3MvVq/WX63sb3/jsoVzVI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789578077; c=relaxed/simple;
-	bh=PAAvapCtGiSE1WDDWarXGQyi7MXj7LEUFFeI9iSboqg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o/Qib2Aqbqiolqc1afptD0f1xPy9sjSlcHQ3vzKLoICHtuEhT2PIvJSklfgRwfFxxNQCpwAOV8feS1p6b6muxECkPoLKVFexoqDU6RKOE9b75o3jIHeLEQLY9ZFRS936hycpMoPJfCRPCijiZ4rAEHGQQgf0+tyOVgqv8Gj4y6E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4HSFDsj; arc=pass smtp.client-ip=74.125.224.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789578696; c=relaxed/simple;
+	bh=GxZVsYyO+dGhZVkNFl2G7bu9vGg6fGca6a+LddvN29s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kHFoeX9nJjDxLsUAEtCkrUux7TQHooDtASBTeQ+WwHvncvD+JnhSW+5Ex0ma7XQG0yL1GcNURIDZfKJZ+QDWxs48YZ17Bke5NLGFfR2Hv+hPHuSueYpVeC5y4K1wcWMtPVgDTPx2Xj/ST6TP0fYgGg93l87carRFKHZobn+9gFo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=ncBipncI; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4HSFDsj"
-Received: by mail-yx2-f43.google.com with SMTP id 00721157ae682-85d43f9b120so13283867b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 10:01:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789578069; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Xaaw5Y+7Zl0fF87FGCXhpnCxIIenZ96p55S1KWfYoI9o7NTED8RFG4IEI40ev8tsdW
-         hGkmCoP1dB0Ih4R4/Qdo6rZy7XfmUesmD9daJ5c7CQh3gVfIk22g9U+F4mB6QqJecIBD
-         feQLhNbrwrxbCLpS7ErQT4GJ/92YTjLPrl9xNJJUV95boV77k/cviMGJPk1m9svWM9vB
-         Zq2kl5upsillWijm5PSzaqQr0hJaFcZp49RXR/MhqMkq4qk7yIzK+IcCnmapLcGMcZ10
-         7LHecTpwRTItOJT2JO9i4ZGuzeBWtkKiYNnzH5mBd5JsFVExBssqJCUcisBUccibQIPX
-         qv5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=b7CDerk9Kv6Wt48CRQ26z/u0LA4JNke+gmOl8Aq5Yh4=;
-        fh=m5gim8lSaS/PeVFtnntMCecCNRHtsmZ38RKVZ6SyAGo=;
-        b=I7m8hwKcqu7PXTD7IRTA2R6y5GRclYtryHgu1P+k5Xq3aXe2hYAwbIv3RO+z5Q6jED
-         FR4OJ4iu9CKwXNQSrStQPlvqCZVjN5WgaR4knWY8dEBGgwSNquNgjXQCh9YzciLAXYGm
-         TScUQzRk1v6+aIyJpciWExbqNjodCIx+K5mmDXL5OY2H5CfaGVhQOUS4Snu+DWUYJfT+
-         lrqkGr2nRlx8a6ifVf3LE4RTscRm1ET6BLR+G8raMS3fVdW9k+g6bT4iJFKeDqJMEvNi
-         o3CApthAs0Aj4FU9a3ApjtwvxdspmN/dHE2VUwVHkg5PJ2+rBxCC0fzCnW6JF93wHsF3
-         C6Bg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789578069; x=1790182869; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=b7CDerk9Kv6Wt48CRQ26z/u0LA4JNke+gmOl8Aq5Yh4=;
-        b=j4HSFDsjDkzjICBRk6NkjWqX/wMe6BvqY/fVTiP8aH5MP3o4BjP+PnscA8UWcvLNeg
-         9WVJCA70gRVgmYf85+8gPys+UG70Rp1NDEg3c6uBjJ2H1rY+rPZQq1Yhhre5MUK1z0EG
-         swZGlq18tMrPsS/CBtHVFF4fzLoYSRA1GqQm8sVfDlp2mFHcW7Vh8wUprX0RxeNgXarj
-         Haak8KT16MPpW3etG/JHq7WFm4Zc22NDk/ckKLWZwZ0u8SmLGzauXGbuZPYBGcv+kFgt
-         sl+dvqH5NKhzXMSGD5PKVhyA/Tb+6oCf22BzY7jZBXULZvzY6XC3iXnO/9R2lAz5Gs8y
-         ozrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789578069; x=1790182869;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=b7CDerk9Kv6Wt48CRQ26z/u0LA4JNke+gmOl8Aq5Yh4=;
-        b=tm2wv/u8uBmH4v/U8WzanQHcJ0mDVdOTDUYjfj/6l2FqVn3tE3eelyEWMmQHdnd9/H
-         jRxNp5qy1u+Y+y+zjJLU6xeI136RXl0LQP2W24Uq4LZTLw/xHYwK/DEpWmhj9Vms5hd9
-         P1sXAs4yhWQrasGagJtedct+chTbQhS0eZoRHP7+PsVVa00p1DTN2lawuY5r7ZbpYo70
-         u/5pdfBrb+30IBVxL+kVLc5VceEjqlhFyYNw2pTCODg9LJmYJHXq67KS8Qe7Vt0NXbaO
-         NiqgAI/hdwsF7/TZhI0LrtHA8QH/Lxi9BrxImyfxGR2uMcduycrnp+LRs+zRsf5Ssu/l
-         gcEQ==
-X-Gm-Message-State: AFuF++k3AxZ/rTGYZQcd0cRFlXF9BEPeAUJ9KOxlisMCLhV80awYFpp7
-	I0uKTyCEGifURqdLr0tIa0LlB80qgQC4Z+B8yqBkI+hXwIWO3WWS9C45ni6Jn74XjOnKedYrVVS
-	QZ6GAic7DfdjIQG2QQYRfWJlMWfZRo6fLTbbXT84=
-X-Gm-Gg: AYBFou27cuurenZzkDTcbiJ/ohIY6s7try8iLX4z34XzkTfLIh+gSKO49tKSj/Qbg5c
-	pieX1JfT9ZONDhe7vMP02gQDZZ99ERpifbaAPgzt5w2GwNGBj6I7HkGSXI1qsQR5j8A0ni4Amgn
-	XsSP/3og8mbVF8MWqvyXAuApSf3tweJvZOOiaW89obymwCE1SFdsNeccNi9AoeomrIYlP8aCzpM
-	3GcqT5ja3nDIUuOT2/k6o1TioPRBKDsFf5+VUVyoxZyloumDKZBSAkhoqMdAi8/xzXwWoJ9SC2L
-	rvXmWtCs0hqBNSLvTeb2hhcjkyCn/14H/WZgmn9D6cEU1OzP4Rvo2yzI20bE81g1F+oEEQne/fR
-	kMPcFQmzLvwT3PNuW/epo8uVTpHTJ9fqyjKO81Ew=
-X-Received: by 2002:a05:690e:809:10b0:66f:c1be:3186 with SMTP id
- 956f58d0204a3-671632d8d21mr921471d50.93.1789578062479; Wed, 16 Sep 2026
- 10:01:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="ncBipncI"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hlQQV48rFz49QKP;
+	Wed, 16 Sep 2026 20:11:14 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1789578676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ar4Xh04LVpsbbU5iorLfnkyCYqpy81z9xWfcNsmO9XI=;
+	b=ncBipncIjxOjuNySr7ee/BLe6QwEEIUOqwHK5kX4+7hZG7OpgecH5raGMVe12IkBqjZIk/
+	5ATVJg/MXMNLVAyEOWFEI9Necmp//xsarbo0PP2SJgUhQXGxBBM9bAh4LdUhClQ/zSjifa
+	vs2WGHnALVNVFX+aooYVxGphmlMTktthlcYPLdfPgw/xzwsWbKRjKzGfcIGbXscHHrsRTg
+	E4HHEehzeQtc7xQ7jM/n6Oe6AjKjZAL3lXjY6Pnje4oZiAk6bfCJOR9/I6FQ9HD9itXF47
+	MMkIisCCbaH0NErIguFBoQ4U0Cr7rpQ6Gw/jPHOvUiOSsry2oQ6l8lLcvyJEkg==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1789578676;
+	b=Lv7b3Z8PzWZdH5ghCl6V5/44sggZgV7p6bLpV5Dxo2BcBMKKYExrpLDBapTWd1zufcbosB
+	Xo3EjwGqxFJ5QO1hipEx6vhwYHAaUcuJzEvSGyjnf27puLFIbk83/LlIsiAMLOp5P6d+S0
+	MVu1YQQQ9AYxHXTZP6NFaslnDEltRBsUkZC/S8kPYcb46p4tdvGJVVDsKcrJ/txZbttIH1
+	ec4FOaelm8OpB/uFhWzUIub85OPEuvzJPXSozZrh0LvEAJzksombKuEJ+3QKzaKnY7rYtK
+	tRdgDUwDqgXGWhH4e0nd+cb7zN1FxPubBKFh03qld0me7vG5r3DABDTHSFGbTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1789578676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ar4Xh04LVpsbbU5iorLfnkyCYqpy81z9xWfcNsmO9XI=;
+	b=diO2BS0ueli/KdnFA2fwvTCDyze49/k/9oniOO7g+A2XDSJvvLP6tp2eP/2nWab20ZSd7U
+	XBo1X3K1Nh/QOoYtGpr68RpxYkLyBklbnZqOwoXWPQw1mT8s9Ze4aIt+ZC6kkRROlOVrvQ
+	Kcs1WBeUkMIXX4RSJgjgkXgGUof1ITJSzNEIKwLZN01Im6nmGlj4Eq+3Us21t+G8q0pci6
+	ZP3J+6nl/gYMuSZRVXBpcPhVou8WZrTQDCBWFrwkodhDcMp25r+M1RupuqecxQqLUg1zH4
+	HxvVfzISdCIRRwceSAJPyF/9I0bGWVVBren/2N32TuTLxHPHU28c1AsDkgUqMA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <1baff112d1ebd255575c7e52936b13db10f218b7.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: af_bluetooth: hold a reference on parent in
+ accept_q
+From: Pauli Virtanen <pav@iki.fi>
+To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>, Marcel Holtmann
+	 <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, 
+	syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Date: Wed, 16 Sep 2026 20:11:13 +0300
+In-Reply-To: <20260916153818.24916-1-ngocthang2710.1999@gmail.com>
+References: <20260916153818.24916-1-ngocthang2710.1999@gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260916100206.3062073-1-valentin.kindschi@fiveco.ch> <6aaa7552.8a922079.27013f.aa03@mx.google.com>
-In-Reply-To: <6aaa7552.8a922079.27013f.aa03@mx.google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 16 Sep 2026 13:00:51 -0400
-X-Gm-Features: AcwNN1UZMooI5FcFINBxnpmniGZU7npLwECBCOtMurEe9uB6NwUnFdQZFQHg4TM
-Message-ID: <CABBYNZJajx60mY+Fx9PPMSxhkaug_+3hY5L6C6aXeQoM=NSAFA@mail.gmail.com>
-Subject: Re: [v4] Bluetooth: hci_sync: pause advertising for the scan address update
-To: linux-bluetooth@vger.kernel.org
-Cc: valentin.kindschi@fiveco.ch
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Valentin,
+Hi,
 
-On Wed, Sep 16, 2026 at 7:18=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
+ke, 2026-09-16 kello 22:38 +0700, Nguyen Ngoc Thang kirjoitti:
+> bt_sk(sk)->parent is a raw pointer with no refcount backing it, so a
+> child sitting in the listening socket's accept_q can outlive it. When
+> the child's channel is torn down independently (e.g. hci_error_reset()
+> -> l2cap_conn_del() -> l2cap_sock_teardown_cb()), bt_accept_unlink()
+> dereferences the freed parent, corrupting its accept_q_lock and list.
 >
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/series/1166333/
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.75 seconds
-> VerifyFixes                   PASS      0.10 seconds
-> VerifySignedoff               PASS      0.10 seconds
-> GitLint                       PASS      0.37 seconds
-> SubjectPrefix                 PASS      0.10 seconds
-> BuildKernel                   PASS      27.71 seconds
-> CheckAllWarning               PASS      31.65 seconds
-> CheckSparse                   PASS      34.36 seconds
-> BuildKernel32                 PASS      27.89 seconds
-> CheckKernelLLVM               PASS      33.42 seconds
-> TestRunnerSetup               PASS      726.62 seconds
-> TestRunner_l2cap-tester       PASS      16.64 seconds
-> TestRunner_iso-tester         PASS      44.72 seconds
-> TestRunner_bnep-tester        PASS      3.09 seconds
-> TestRunner_mgmt-tester        FAIL      60.30 seconds
-> TestRunner_rfcomm-tester      PASS      4.40 seconds
-> TestRunner_sco-tester         PASS      7.56 seconds
-> TestRunner_ioctl-tester       PASS      4.63 seconds
-> TestRunner_mesh-tester        FAIL      7.81 seconds
-> TestRunner_smp-tester         PASS      4.30 seconds
-> TestRunner_userchan-tester    PASS      3.14 seconds
-> TestRunner_6lowpan-tester     PASS      4.36 seconds
-> IncrementalBuild              PASS      26.44 seconds
->
-> Details
-> ##############################
-> Test: TestRunner_mgmt-tester - FAIL
-> Desc: Run mgmt-tester with test-runner
-> Output:
-> Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
->
-> Failed Test Cases
-> Read Exp Feature - Success                           Failed       0.019 s=
-econds
-> ##############################
-> Test: TestRunner_mesh-tester - FAIL
-> Desc: Run mesh-tester with test-runner
-> Output:
-> Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
->
-> Failed Test Cases
-> Mesh - Send cancel - 1                               Timed out    2.462 s=
-econds
-> Mesh - Send cancel - 2                               Timed out    1.998 s=
-econds
->
->
-> https://github.com/bluez/bluetooth-next/pull/781
->
+> Take a reference on parent in bt_accept_enqueue() and drop it in
+> bt_accept_unlink() to keep it alive for as long as a child points to
+> it.
+
+AFAIK the UAF described above cannot occur in current kernel:
+
+https://lore.kernel.org/linux-bluetooth/3674f5d34d731403bfa0e680c9e57182376=
+12315.camel@iki.fi/
+
+> Reported-by: syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D534002670dd34a114fdc
+> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 > ---
-> Regards,
-> Linux Bluetooth
-
-Looks like sashiko found a problem:
-
-https://sashiko.dev/#/patchset/20260916100206.3062073-1-valentin.kindschi%4=
-0fiveco.ch
-
+>  net/bluetooth/af_bluetooth.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 411d66f24393..f9aae18c6733 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -224,6 +224,10 @@ void bt_accept_enqueue(struct sock *parent, struct s=
+ock *sk, bool bh)
+>  	else
+>  		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+> =20
+> +	/* Hold a reference on parent so it cannot be freed while sk keeps
+> +	 * a raw pointer to it via bt_sk(sk)->parent.
+> +	 */
+> +	sock_hold(parent);
+>  	bt_sk(sk)->parent =3D parent;
+> =20
+>  	spin_lock_bh(&par->accept_q_lock);
+> @@ -265,6 +269,7 @@ void bt_accept_unlink(struct sock *sk)
+>  	sk_acceptq_removed(parent);
+>  	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
+>  	bt_sk(sk)->parent =3D NULL;
+> +	sock_put(parent);
+>  	sock_put(sk);
+>  }
+>  EXPORT_SYMBOL(bt_accept_unlink);
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
