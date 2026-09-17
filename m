@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208C83A8FE1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 20:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9DB38F65B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 20:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789677958; cv=none; b=B8iPkQFwOySgE3516wz3AhbKFSziYTLmkvFhUCFoh8430VCUf7ALxRKhsnCjqmsGcMnaQJRRebOjCXMsoZQ5qOrGQ9h9xFj8XILX7DG+MJkbNeGFkN543U1vD0a1jniCodzD9+DHg+746+9dnSwt/FsEiyVTVwUMBrxFZIDW2Mw=
+	t=1789677958; cv=none; b=cM63ST3YhLJnI742gxyyX8B+r224ZVVafaJYQRMPrGVMKAvwI2S5ih94LVEJMRMAcpmSx4cxs3mFrNAPl1yj0RRT/iMhak0FEvnwvyolzOpm1O9dX7J90MQs8CD45hETRZlzhuAnVz+4fjigUq3Gok4TD78ZeN48wjr/Y97aAss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789677958; c=relaxed/simple;
-	bh=Q4wHW0A27V9yDQYikHhBvHhNu80F9fk5V0Y34Nqukrk=;
+	bh=d9ok8sgbhroF4ZpslVW9jDDuXqHJDA4NUUbIHM5t55w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LKCTfWOt5vLvlxl+FcjrAS1JIjDQSPEojXYsY+9KvAO5NUjjdzKBa64D9/c0zoaqqvY2BQA47qSY50MbyH7+nWsJYo9znqxRwqrUAaRBHFq+fwkcFFaVEfO999XNoH0bp1vuZ3P0PY0wE5HDQJcPPBrFThr7NLgb9Sh24WJYLfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PoIWOUsZ; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=sdOIcm646bZMFYik7QTjFCfoZGQwRyOKX/oetsu8EZXEFNb2D5YCn0PSCoZP6cV3lE9CkLkqQnjHCRC2lM6i7SxyDv/xffdYjMQPusm914C54A4hUMXi0h6/eMsPEq+gnLCDISQXJ5CUO8R5It7cjN4KtmFCXv0MylGgsmWjHKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cjkdC/4c; arc=none smtp.client-ip=74.125.227.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PoIWOUsZ"
-Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-78564421fdbso29898137.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 13:45:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjkdC/4c"
+Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-785692e59a4so39374137.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 13:45:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789677954; x=1790282754; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789677955; x=1790282755; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=e3jkzUd3llzx4qjah+d4CJEGQya6IxJPjHjl12qTdd0=;
-        b=PoIWOUsZL8ml1Xe8lT9j2QH9YP+OOFKRLBvflmtdabPUgpkN/lyv8brkfTgtlR3Lcj
-         gflJT+CR1i7uTSjpcddpa1OA3nUR5eRkvSsAVnqW4B543xnjhc5QQMVV6b4aFBZ8KqYT
-         b1u0VYlT1dKIjV8IcTA74sW9x3ZDISACKvB2b1S6IsZ1WycnzVJ5DH6+9ZIOSo5+wC40
-         gkw/LO+Ue9ohtufXCJc16emYQxeKkxNAET/G7F30wRdY5WjD4KIfl1X73CKB3SDhfCI9
-         KPtbD3z2UKUFbWj4tmjHZp70TR6GdkF6apZ3i58w17oLEqgC70+0Ehb+oPNmWNhQQf3l
-         az4A==
+        bh=UceWGS2HIgXIrwvBkBXBlsVgY1IL8nC2X37/yjozcNc=;
+        b=cjkdC/4czn1kexzXXLPFpIUld5lDsaKXSZijiztJohXkf/XmC30BFjz7WWKloV013E
+         cNllpbogW12GemCUGW9DXrMSZqz7s49Hx1qaCVjbK8UVAKJh7NpP2Q9yWgzTd8rAlZEb
+         +1688syrz9basGQpOPGqsEEilh9T4pIrQf+i8or82oOqEotnXI7x5fThnu14NiEGy2nw
+         qw86VlOsd2NtQawg6FwR1uPlXY5bN1bapNAcZTm9YNjMsX82CWMqY5ow+q0Guv7iFeYb
+         0Qc9PYRJAnMQF2ImoYnkKfZWexWFt/gcgflDtb9P2FkLwxgeKar7dbPihhtp8ynNChI+
+         OYEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789677954; x=1790282754;
+        d=1e100.net; s=20260707; t=1789677955; x=1790282755;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=e3jkzUd3llzx4qjah+d4CJEGQya6IxJPjHjl12qTdd0=;
-        b=PQvgmNXlVMnRwa4I3rfSQS3sl9LSHeAoXp2TcodA3rWJD0rXtvN9Zy6+ZdSJS79EGG
-         +DsZC3OHJtgMM+z+3gr8/Mby44ljPYGi8h8blXp1DNSsoNrQgBvuVbN9uJffRFrhzTE2
-         h5ToN3ZFBfK5ZqGwDGEAWC265nDLPrEiun2mQwROI17+X8o03FjUSAtmBNNZNVLxHVBg
-         zXy58jVRmIq8On+/H+EGPxxNk+ZmOZZ5zzStkV3ujFUVZ9HLCRI6UdA3PBStdKzpBIm3
-         gZwkofRAvyH2UkoVHfuIOYDOz+C9RlhW+H5jKvAZ1Yv/ut6Gm6Cgnvb3z+95/n2ZAWVL
-         VjbQ==
-X-Gm-Message-State: AFuF++nMPCLtE8OA6c/4SCw1vnMyHiaJ8Jfh0BAj6Ghb5+ELP13UU505
-	c/bUZnzJknkA/kKmosU1epygTvFrOmLGqqw/zhyCWMHgH5cI4W73n1GO62qyoZlah51CkA==
-X-Gm-Gg: AYBFou3T20h0YTUjiw1dBeuTBDVeesVnTsaNWRaKv8e98CWZl0MEHa2MkUOygXyJKKs
-	g5NA1mH0jH0cYTge/aFO4h8D6LnY5bCIktJtPNosf7ozAqev505eoBKI0IHx2Xe7YY2l0z7gjx7
-	UdDlOoh4V3YAKM1qxPCyE2fG1iSQeY80h++P8F4QBCeX7ELwvSVEa5S7X6ZEbNNe39xFsgFL6Os
-	3fc5lC0l0s8+IecaLCvjqsiIrkz1NGVhz7Vpr7Pa6AzBJLr045sCpvE96fgSCRHE6gV7SqE1lvy
-	oFCfa/kwGfWhMzE4qRxRv2r0ZfMXahhcfo0R4Gs95jjbui7sQJnjmq/CaB+3hoNaXp0yAP1eiJx
-	0pBL0BkNqJUffnbwmAN0f98pkNRQoQXDaZ8VKQkWdY8o7/gLIhtPX+To6W7UeJQ0hWMPnZOO+6f
-	7l/rQVCjyWGIBdXkVN53vuWzjjBF8qUsirTonwxAAwnjw7j/ix3Gq2zjblx2L7MQKp1RjaOgmkN
-	e+/rGlbOlsK7IJOeOx61E6Ad5mkXUDrYPDMuUgKaW0241sc5rTf9X9PcqvjE54P2K5tE6AG2DBS
-X-Received: by 2002:a05:6102:809e:b0:7a1:fa0f:1106 with SMTP id ada2fe7eead31-7a55cd7f911mr125104137.36.1789677953244;
-        Thu, 17 Sep 2026 13:45:53 -0700 (PDT)
+        bh=UceWGS2HIgXIrwvBkBXBlsVgY1IL8nC2X37/yjozcNc=;
+        b=ywn6aFDsTWjFDVbfs69ZHh45jVzGE7hrnFVIm9kPIgndarB49luailUWbuCDa4UV4A
+         RA+N8xDyimAC1xkC5eNC+MpkAYlpF8gAPossez1gHDZuYC8SZGKiFV3OkRzwgb5L0+pX
+         eHlmRzdDynG4YemVMTtfPP1saOjcT1HV/S5OwwV2fn9UiH7fDJgBIAjjoMkN7mj1zB4t
+         mGNmNHnYP4xqpNoxeC28uq/USXj1ikeey2yuwkiqq7y/a/SM9ZUbG0UZAX72v1qK3AIM
+         lIX+8akA7g6vcNHzakoj6BVkXplJNq2Ltgeq+b2YedvoCxb4dDQDeDZT9euW4njvdABa
+         KONQ==
+X-Gm-Message-State: AFuF++knFXIME61O6s+LZ/sQ2hdyIeg83bR0EijTw92B9/0YavrvNvM7
+	uKv4UM4X2vEZnXYPfqYb1vD58jttkaVqVP8C3UrVhh134pZGeghhQsyVSdT8WPt+S0qCAg==
+X-Gm-Gg: AYBFou2qNqoQuiV/IQPUo3WCxFJkv90r5uoikTadSWUn9gUGisrYleLRO0PyKf5E1qf
+	oYj3bu8Sa4cpUpqEQ+U77auj2bzwU6YgUsA09bJwVDD0CHdG91r0CyWmh88CXE1rEgmTRsHXV/v
+	ZdoQj4wd6HPPFVuYhsVu+vJb+lm7M8Lh+BwiIxqyvTQAoaCJnFk4I6iCYglwibYziINLl9S5Xu+
+	AML93b26niIDaU6b3GZdjadp9mO6iUJg7vSA1ZsfRBNCW315loIqC1cvQXTIBARCGvQ+aQ72y9u
+	ubAmRNTmX2xoZVVuEGWU+tG4XelAJ9ofNFRvtoawWuWmzrbUtZvfWI+4AhzAiJNMSQbXIvhprap
+	ieV7TcRXx7ccb+DWy5lhB/QN0xRNau2fFNJaqlEFlia6UorAOTo/lgb6XEuV0gMdRRFUuJsAQK+
+	DMbmMEp2srtZrXoJfQjX7nko3HwsK7xQceh+NlmDee2zHn3q7LZ+9oABvbxczMeutkU1SIR1uFX
+	zYNkvsn5ZmwD1RB5thf21XvYdNR2o3q8+9eKcKDXu9i8uEdTn5olWHs1ZKFAv4n8A==
+X-Received: by 2002:a05:6102:b11:b0:7a1:f951:664b with SMTP id ada2fe7eead31-7a55c888b37mr170636137.18.1789677954981;
+        Thu, 17 Sep 2026 13:45:54 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7a1dcea8a67sm4584833137.0.2026.09.17.13.45.51
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7a1dcea8a67sm4584833137.0.2026.09.17.13.45.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2026 13:45:52 -0700 (PDT)
+        Thu, 17 Sep 2026 13:45:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/6] monitor: Route the decoding output through a single function
-Date: Thu, 17 Sep 2026 16:45:36 -0400
-Message-ID: <20260917204541.2176720-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/6] monitor: Hand the captured frames to the pager on Ctrl-R
+Date: Thu, 17 Sep 2026 16:45:38 -0400
+Message-ID: <20260917204541.2176720-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260917204541.2176720-1-luiz.dentz@gmail.com>
 References: <20260917204541.2176720-1-luiz.dentz@gmail.com>
@@ -77,1299 +77,606 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The decoding output is written straight to stdout, partly through the
-print_indent() macro and partly through some 167 direct printf() calls,
-several of which build a single line across multiple calls. There is no
-point at which the output of a frame can be observed as a whole.
+Looking for something in a running capture means stopping it and reading
+back the log, losing whatever would have arrived meanwhile, or scrolling
+the terminal by hand while the trace keeps moving.
 
-Send all of it through display_printf(), which writes to a redirectable
-stream, so that a caller can capture a frame and decide what to do with
-it rather than having it go straight to the terminal. Capturing at the
-stream level keeps the partially built lines working without having to
-find and restructure them.
+Collect the frames as they are printed and hand them to the pager on
+Ctrl-R, in the manner of the shell. The capture keeps running underneath,
+and closing the pager returns to it, printing whatever arrived while it
+was up so that the trace on the terminal has no gap.
 
-This is a pure redirection and the output is unchanged. The messages
-jlink emits while connecting are left alone, as they are not part of the
-decoding.
+The capture is never paused for this. Anything not read in time is
+dropped by the kernel, so the pager runs on its own and is only checked
+for having closed, rather than being waited for.
 
-l2test uses the printing helpers from the header without linking the
-monitor, so it gains its own display_printf() next to the use_color() it
-already defines for the same reason.
+The frames are handed over as a file rather than through a pipe, so that
+filling it cannot block the monitor and cost the capture any packets,
+separated as they are elsewhere when the pager is going to read records.
 
-The model performed the conversion, which the author reviewed and
-verified by comparing the output of both modes over a set of traces
-before and after, byte for byte.
+Frames are only collected when the output is a terminal, so a capture
+that is piped or redirected behaves exactly as it always has. The
+terminal is switched to reading keys as they are typed, but signals are
+left enabled so that Ctrl-C still interrupts the capture as before.
+
+A capture runs for as long as it is left running, so the frames are held
+in a ring and the oldest are dropped once it is full.
+
+The model wrote this, which the author reviewed and verified against a
+capture fed through a terminal, covering the printing before and after,
+the capture continuing to be collected while the pager was up, the
+frames arriving then being printed on close, and a piped capture being
+left alone.
 
 Assisted-by: opencode:claude-opus-5
 ---
- monitor/analyze.c |  44 +++++++-------
- monitor/avctp.c   |  68 ++++++++++-----------
- monitor/control.c | 148 +++++++++++++++++++++++-----------------------
- monitor/display.c |  20 +++++++
- monitor/display.h |  11 +++-
- monitor/l2cap.c   |  34 +++++------
- monitor/lmp.c     |   4 +-
- monitor/main.c    |  12 ++--
- monitor/packet.c  |  18 +++---
- monitor/rfcomm.c  |   6 +-
- tools/l2test.c    |  10 ++++
- 11 files changed, 207 insertions(+), 168 deletions(-)
+ monitor/find.c | 485 ++++++++++++++++++++++++++++++++++++++++++-------
+ monitor/find.h |   2 +-
+ monitor/main.c |   5 +-
+ 3 files changed, 428 insertions(+), 64 deletions(-)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 154303eb7330..fcd13dce8fdd 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -277,11 +277,11 @@ static void chan_destroy(void *data)
- 
- 	fixed = fixed_channel_name(chan->cid);
- 	if (fixed)
--		printf("  Found %s L2CAP channel with CID %u (%s)\n",
-+		display_printf("  Found %s L2CAP channel with CID %u (%s)\n",
- 					chan->out ? "TX" : "RX", chan->cid,
- 					fixed);
- 	else
--		printf("  Found %s L2CAP channel with CID %u\n",
-+		display_printf("  Found %s L2CAP channel with CID %u\n",
- 					chan->out ? "TX" : "RX", chan->cid);
- 
- 	if (chan->psm)
-@@ -370,7 +370,7 @@ static void conn_destroy(void *data)
- 		break;
- 	}
- 
--	printf("  Found %s connection with handle %u\n", str, conn->handle);
-+	display_printf("  Found %s connection with handle %u\n", str, conn->handle);
- 	packet_print_addr("Address", conn->bdaddr, conn->bdaddr_type);
- 	if (!conn->setup_seen)
- 		print_field("Connection setup missing");
-@@ -482,29 +482,29 @@ static void dev_destroy(void *data)
- 		break;
- 	}
- 
--	printf("Found %s controller with index %u\n", str, dev->index);
--	printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
-+	display_printf("Found %s controller with index %u\n", str, dev->index);
-+	display_printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
- 			dev->bdaddr[5], dev->bdaddr[4], dev->bdaddr[3],
- 			dev->bdaddr[2], dev->bdaddr[1], dev->bdaddr[0]);
- 	if (dev->manufacturer != 0xffff)
--		printf(" (%s)", bt_compidtostr(dev->manufacturer));
--	printf("\n");
-+		display_printf(" (%s)", bt_compidtostr(dev->manufacturer));
-+	display_printf("\n");
- 
- 
--	printf("  %lu commands\n", dev->num_cmd);
--	printf("  %lu events\n", dev->num_evt);
--	printf("  %lu ACL packets\n", dev->num_acl);
--	printf("  %lu SCO packets\n", dev->num_sco);
--	printf("  %lu ISO packets\n", dev->num_iso);
--	printf("  %lu vendor packets\n", dev->num_vendor);
--	printf("  %lu vendor diagnostics\n", dev->vendor_diag);
--	printf("  %lu system notes\n", dev->system_note);
--	printf("  %lu user logs\n", dev->user_log);
--	printf("  %lu control messages \n", dev->ctrl_msg);
--	printf("  %lu unknown opcodes\n", dev->unknown);
-+	display_printf("  %lu commands\n", dev->num_cmd);
-+	display_printf("  %lu events\n", dev->num_evt);
-+	display_printf("  %lu ACL packets\n", dev->num_acl);
-+	display_printf("  %lu SCO packets\n", dev->num_sco);
-+	display_printf("  %lu ISO packets\n", dev->num_iso);
-+	display_printf("  %lu vendor packets\n", dev->num_vendor);
-+	display_printf("  %lu vendor diagnostics\n", dev->vendor_diag);
-+	display_printf("  %lu system notes\n", dev->system_note);
-+	display_printf("  %lu user logs\n", dev->user_log);
-+	display_printf("  %lu control messages \n", dev->ctrl_msg);
-+	display_printf("  %lu unknown opcodes\n", dev->unknown);
- 
- 	if (dev->num_cmd_rsp)
--		printf("  Command latency: %lld-%lld msec "
-+		display_printf("  Command latency: %lld-%lld msec "
- 				"(~%lld msec +/- %lld msec)\n",
- 				TV_MSEC(dev->cmd_latency.min),
- 				TV_MSEC(dev->cmd_latency.max),
-@@ -513,12 +513,12 @@ static void dev_destroy(void *data)
- 
- 	/* Whatever is left never got a Command Complete or Command Status */
- 	if (!queue_isempty(dev->cmd_list))
--		printf("  Commands without response: %u\n",
-+		display_printf("  Commands without response: %u\n",
- 					queue_length(dev->cmd_list));
- 
- 	queue_destroy(dev->cmd_list, free);
- 	queue_destroy(dev->conn_list, conn_destroy);
--	printf("\n");
-+	display_printf("\n");
- 
- 	free(dev);
- }
-@@ -1639,7 +1639,7 @@ void analyze_trace(const char *path)
- 		num_packets++;
- 	}
- 
--	printf("Trace contains %lu packets\n\n", num_packets);
-+	display_printf("Trace contains %lu packets\n\n", num_packets);
- 
- 	queue_destroy(dev_list, dev_destroy);
- 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 75afaca8342f..d6eb603d2905 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1049,16 +1049,16 @@ response:
- 
- 		print_field("%*cStringLength: 0x%02x", (indent - 8), ' ', len);
- 
--		printf("String: ");
-+		display_printf("String: ");
- 		for (; len > 0; len--) {
- 			uint8_t c;
- 
- 			if (!l2cap_frame_get_u8(frame, &c))
- 				return false;
- 
--			printf("%1c", isprint(c) ? c : '.');
-+			display_printf("%1c", isprint(c) ? c : '.');
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	return true;
-@@ -1125,16 +1125,16 @@ response:
- 
- 		print_field("%*cStringLength: 0x%02x", (indent - 8), ' ', len);
- 
--		printf("String: ");
-+		display_printf("String: ");
- 		for (; len > 0; len--) {
- 			uint8_t c;
- 
- 			if (!l2cap_frame_get_u8(frame, &c))
- 				return false;
- 
--			printf("%1c", isprint(c) ? c : '.');
-+			display_printf("%1c", isprint(c) ? c : '.');
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	return true;
-@@ -1405,16 +1405,16 @@ response:
- 								' ', status);
- 		switch (status) {
- 		case 0x00:
--			printf("(POWER_ON)\n");
-+			display_printf("(POWER_ON)\n");
- 			break;
- 		case 0x01:
--			printf("(POWER_OFF)\n");
-+			display_printf("(POWER_OFF)\n");
- 			break;
- 		case 0x02:
--			printf("(UNPLUGGED)\n");
-+			display_printf("(UNPLUGGED)\n");
- 			break;
- 		default:
--			printf("(UNKNOWN)\n");
-+			display_printf("(UNKNOWN)\n");
- 			break;
- 		}
- 		break;
-@@ -1873,16 +1873,16 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- 	print_field("%*cPlayStatus: 0x%02x (%s)", indent, ' ',
- 						status, playstatus2str(status));
- 
--	printf("%*cFeatures: 0x", indent+8, ' ');
-+	display_printf("%*cFeatures: 0x", indent+8, ' ');
- 
- 	for (i = 0; i < 16; i++) {
- 		if (!l2cap_frame_get_u8(frame, &features[i]))
- 			return false;
- 
--		printf("%02x", features[i]);
-+		display_printf("%02x", features[i]);
- 	}
- 
--	printf("\n");
-+	display_printf("\n");
- 
- 	print_features(features, indent + 2);
- 
-@@ -1898,15 +1898,15 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- 	print_field("%*cNameLength: 0x%04x (%u)", indent, ' ',
- 						namelen, namelen);
- 
--	printf("%*cName: ", indent+8, ' ');
-+	display_printf("%*cName: ", indent+8, ' ');
- 	for (; namelen > 0; namelen--) {
- 		uint8_t c;
- 
- 		if (!l2cap_frame_get_u8(frame, &c))
- 			return false;
--		printf("%1c", isprint(c) ? c : '.');
-+		display_printf("%1c", isprint(c) ? c : '.');
- 	}
--	printf("\n");
-+	display_printf("\n");
- 
- 	return true;
- }
-@@ -1920,7 +1920,7 @@ static bool avrcp_folder_item(struct avctp_frame *avctp_frame,
- 	uint64_t uid;
- 
- 	if (frame->size < 14) {
--		printf("PDU Malformed\n");
-+		display_printf("PDU Malformed\n");
- 		return false;
- 	}
- 
-@@ -1954,15 +1954,15 @@ static bool avrcp_folder_item(struct avctp_frame *avctp_frame,
- 	print_field("%*cNameLength: 0x%04x (%u)", indent, ' ',
- 					namelen, namelen);
- 
--	printf("%*cName: ", indent+8, ' ');
-+	display_printf("%*cName: ", indent+8, ' ');
- 	for (; namelen > 0; namelen--) {
- 		uint8_t c;
- 		if (!l2cap_frame_get_u8(frame, &c))
- 			return false;
- 
--		printf("%1c", isprint(c) ? c : '.');
-+		display_printf("%1c", isprint(c) ? c : '.');
- 	}
--	printf("\n");
-+	display_printf("\n");
- 
- 	return true;
- }
-@@ -1994,16 +1994,16 @@ static bool avrcp_attribute_entry_list(struct avctp_frame *avctp_frame,
- 		print_field("%*cAttributeLength: 0x%04x (%u)", indent, ' ',
- 						len, len);
- 
--		printf("%*cAttributeValue: ", indent+8, ' ');
-+		display_printf("%*cAttributeValue: ", indent+8, ' ');
- 		for (; len > 0; len--) {
- 			uint8_t c;
- 
- 			if (!l2cap_frame_get_u8(frame, &c))
- 				return false;
- 
--			printf("%1c", isprint(c) ? c : '.');
-+			display_printf("%1c", isprint(c) ? c : '.');
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	return true;
-@@ -2041,15 +2041,15 @@ static bool avrcp_media_element_item(struct avctp_frame *avctp_frame,
- 	print_field("%*cNameLength: 0x%04x (%u)", indent, ' ',
- 					namelen, namelen);
- 
--	printf("%*cName: ", indent+8, ' ');
-+	display_printf("%*cName: ", indent+8, ' ');
- 	for (; namelen > 0; namelen--) {
- 		uint8_t c;
- 		if (!l2cap_frame_get_u8(frame, &c))
- 			return false;
- 
--		printf("%1c", isprint(c) ? c : '.');
-+		display_printf("%1c", isprint(c) ? c : '.');
- 	}
--	printf("\n");
-+	display_printf("\n");
- 
- 	if (!l2cap_frame_get_u8(frame, &count))
- 		return false;
-@@ -2097,7 +2097,7 @@ static bool avrcp_get_total_number_of_items(struct avctp_frame *avctp_frame)
- 		goto response;
- 
- 	if (frame->size < 4) {
--		printf("PDU Malformed\n");
-+		display_printf("PDU Malformed\n");
- 		packet_hexdump(frame->data, frame->size);
- 		return false;
- 	}
-@@ -2146,7 +2146,7 @@ static bool avrcp_search_item(struct avctp_frame *avctp_frame)
- 		goto response;
- 
- 	if (frame->size < 4) {
--		printf("PDU Malformed\n");
-+		display_printf("PDU Malformed\n");
- 		packet_hexdump(frame->data, frame->size);
- 		return false;
- 	}
-@@ -2162,17 +2162,17 @@ static bool avrcp_search_item(struct avctp_frame *avctp_frame)
- 
- 	print_field("%*cLength: 0x%04x (%u)", indent, ' ', namelen, namelen);
- 
--	printf("%*cString: ", indent+8, ' ');
-+	display_printf("%*cString: ", indent+8, ' ');
- 	for (; namelen > 0; namelen--) {
- 		uint8_t c;
- 
- 		if (!l2cap_frame_get_u8(frame, &c))
- 			return false;
- 
--		printf("%1c", isprint(c) ? c : '.');
-+		display_printf("%1c", isprint(c) ? c : '.');
- 	}
- 
--	printf("\n");
-+	display_printf("\n");
- 
- 	return true;
- 
-@@ -2426,16 +2426,16 @@ response:
- 			continue;
- 		}
- 
--		printf("%*cFolder: ", indent+8, ' ');
-+		display_printf("%*cFolder: ", indent+8, ' ');
- 		for (; len > 0; len--) {
- 			uint8_t c;
- 
- 			if (!l2cap_frame_get_u8(frame, &c))
- 				return false;
- 
--			printf("%1c", isprint(c) ? c : '.');
-+			display_printf("%1c", isprint(c) ? c : '.');
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	return true;
-diff --git a/monitor/control.c b/monitor/control.c
-index 1eab9c4fe0bd..8ed221e08a02 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -69,28 +69,28 @@ static void free_data(void *user_data)
- 
- static void mgmt_index_added(uint16_t len, const void *buf)
- {
--	printf("@ Index Added\n");
-+	display_printf("@ Index Added\n");
- 
- 	packet_hexdump(buf, len);
- }
- 
- static void mgmt_index_removed(uint16_t len, const void *buf)
- {
--	printf("@ Index Removed\n");
-+	display_printf("@ Index Removed\n");
- 
- 	packet_hexdump(buf, len);
- }
- 
- static void mgmt_unconf_index_added(uint16_t len, const void *buf)
- {
--	printf("@ Unconfigured Index Added\n");
-+	display_printf("@ Unconfigured Index Added\n");
- 
- 	packet_hexdump(buf, len);
- }
- 
- static void mgmt_unconf_index_removed(uint16_t len, const void *buf)
- {
--	printf("@ Unconfigured Index Removed\n");
-+	display_printf("@ Unconfigured Index Removed\n");
- 
- 	packet_hexdump(buf, len);
- }
-@@ -100,11 +100,11 @@ static void mgmt_ext_index_added(uint16_t len, const void *buf)
- 	const struct mgmt_ev_ext_index_added *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Extended Index Added control\n");
-+		display_printf("* Malformed Extended Index Added control\n");
- 		return;
- 	}
- 
--	printf("@ Extended Index Added: %u (%u)\n", ev->type, ev->bus);
-+	display_printf("@ Extended Index Added: %u (%u)\n", ev->type, ev->bus);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -117,11 +117,11 @@ static void mgmt_ext_index_removed(uint16_t len, const void *buf)
- 	const struct mgmt_ev_ext_index_removed *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Extended Index Removed control\n");
-+		display_printf("* Malformed Extended Index Removed control\n");
- 		return;
- 	}
- 
--	printf("@ Extended Index Removed: %u (%u)\n", ev->type, ev->bus);
-+	display_printf("@ Extended Index Removed: %u (%u)\n", ev->type, ev->bus);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -134,11 +134,11 @@ static void mgmt_controller_error(uint16_t len, const void *buf)
- 	const struct mgmt_ev_controller_error *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Controller Error control\n");
-+		display_printf("* Malformed Controller Error control\n");
- 		return;
- 	}
- 
--	printf("@ Controller Error: 0x%2.2x\n", ev->error_code);
-+	display_printf("@ Controller Error: 0x%2.2x\n", ev->error_code);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -160,21 +160,21 @@ static void mgmt_new_config_options(uint16_t len, const void *buf)
- 	unsigned int i;
- 
- 	if (len < 4) {
--		printf("* Malformed New Configuration Options control\n");
-+		display_printf("* Malformed New Configuration Options control\n");
- 		return;
- 	}
- 
- 	options = get_le32(buf);
- 
--	printf("@ New Configuration Options: 0x%4.4x\n", options);
-+	display_printf("@ New Configuration Options: 0x%4.4x\n", options);
- 
- 	if (options) {
--		printf("%-12c", ' ');
-+		display_printf("%-12c", ' ');
- 		for (i = 0; i < NELEM(config_options_str); i++) {
- 			if (options & (1 << i))
--				printf("%s ", config_options_str[i]);
-+				display_printf("%s ", config_options_str[i]);
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	buf += 4;
-@@ -196,21 +196,21 @@ static void mgmt_new_settings(uint16_t len, const void *buf)
- 	unsigned int i;
- 
- 	if (len < 4) {
--		printf("* Malformed New Settings control\n");
-+		display_printf("* Malformed New Settings control\n");
- 		return;
- 	}
- 
- 	settings = get_le32(buf);
- 
--	printf("@ New Settings: 0x%4.4x\n", settings);
-+	display_printf("@ New Settings: 0x%4.4x\n", settings);
- 
- 	if (settings) {
--		printf("%-12c", ' ');
-+		display_printf("%-12c", ' ');
- 		for (i = 0; i < NELEM(settings_str); i++) {
- 			if (settings & (1 << i))
--				printf("%s ", settings_str[i]);
-+				display_printf("%s ", settings_str[i]);
- 		}
--		printf("\n");
-+		display_printf("\n");
- 	}
- 
- 	buf += 4;
-@@ -224,11 +224,11 @@ static void mgmt_class_of_dev_changed(uint16_t len, const void *buf)
- 	const struct mgmt_ev_class_of_dev_changed *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Class of Device Changed control\n");
-+		display_printf("* Malformed Class of Device Changed control\n");
- 		return;
- 	}
- 
--	printf("@ Class of Device Changed: 0x%2.2x%2.2x%2.2x\n",
-+	display_printf("@ Class of Device Changed: 0x%2.2x%2.2x%2.2x\n",
- 						ev->dev_class[2],
- 						ev->dev_class[1],
- 						ev->dev_class[0]);
-@@ -244,11 +244,11 @@ static void mgmt_local_name_changed(uint16_t len, const void *buf)
- 	const struct mgmt_ev_local_name_changed *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Local Name Changed control\n");
-+		display_printf("* Malformed Local Name Changed control\n");
- 		return;
- 	}
- 
--	printf("@ Local Name Changed: %s (%s)\n", ev->name, ev->short_name);
-+	display_printf("@ Local Name Changed: %s (%s)\n", ev->name, ev->short_name);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -274,7 +274,7 @@ static void mgmt_new_link_key(uint16_t len, const void *buf)
- 	};
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed New Link Key control\n");
-+		display_printf("* Malformed New Link Key control\n");
- 		return;
- 	}
- 
-@@ -285,7 +285,7 @@ static void mgmt_new_link_key(uint16_t len, const void *buf)
- 
- 	ba2str(&ev->key.addr.bdaddr, str);
- 
--	printf("@ New Link Key: %s (%d) %s (%u)\n", str,
-+	display_printf("@ New Link Key: %s (%d) %s (%u)\n", str,
- 				ev->key.addr.type, type, ev->key.type);
- 
- 	buf += sizeof(*ev);
-@@ -301,7 +301,7 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed New Long Term Key control\n");
-+		display_printf("* Malformed New Long Term Key control\n");
- 		return;
- 	}
- 
-@@ -335,7 +335,7 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
- 
- 	ba2str(&ev->key.addr.bdaddr, str);
- 
--	printf("@ New Long Term Key: %s (%d) %s 0x%02x\n", str,
-+	display_printf("@ New Long Term Key: %s (%d) %s 0x%02x\n", str,
- 			ev->key.addr.type, type, ev->key.type);
- 
- 	buf += sizeof(*ev);
-@@ -351,14 +351,14 @@ static void mgmt_device_connected(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Connected control\n");
-+		display_printf("* Malformed Device Connected control\n");
- 		return;
- 	}
- 
- 	flags = le32_to_cpu(ev->flags);
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Connected: %s (%d) flags 0x%4.4x\n",
-+	display_printf("@ Device Connected: %s (%d) flags 0x%4.4x\n",
- 						str, ev->addr.type, flags);
- 
- 	buf += sizeof(*ev);
-@@ -375,7 +375,7 @@ static void mgmt_device_disconnected(uint16_t len, const void *buf)
- 	uint16_t consumed_len;
- 
- 	if (len < sizeof(struct mgmt_addr_info)) {
--		printf("* Malformed Device Disconnected control\n");
-+		display_printf("* Malformed Device Disconnected control\n");
- 		return;
- 	}
- 
-@@ -389,7 +389,7 @@ static void mgmt_device_disconnected(uint16_t len, const void *buf)
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Disconnected: %s (%d) reason %u\n", str, ev->addr.type,
-+	display_printf("@ Device Disconnected: %s (%d) reason %u\n", str, ev->addr.type,
- 									reason);
- 
- 	buf += consumed_len;
-@@ -404,13 +404,13 @@ static void mgmt_connect_failed(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Connect Failed control\n");
-+		display_printf("* Malformed Connect Failed control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Connect Failed: %s (%d) status 0x%2.2x\n",
-+	display_printf("@ Connect Failed: %s (%d) status 0x%2.2x\n",
- 					str, ev->addr.type, ev->status);
- 
- 	buf += sizeof(*ev);
-@@ -425,13 +425,13 @@ static void mgmt_pin_code_request(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed PIN Code Request control\n");
-+		display_printf("* Malformed PIN Code Request control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ PIN Code Request: %s (%d) secure 0x%2.2x\n",
-+	display_printf("@ PIN Code Request: %s (%d) secure 0x%2.2x\n",
- 					str, ev->addr.type, ev->secure);
- 
- 	buf += sizeof(*ev);
-@@ -446,13 +446,13 @@ static void mgmt_user_confirm_request(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed User Confirmation Request control\n");
-+		display_printf("* Malformed User Confirmation Request control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ User Confirmation Request: %s (%d) hint %d value %d\n",
-+	display_printf("@ User Confirmation Request: %s (%d) hint %d value %d\n",
- 			str, ev->addr.type, ev->confirm_hint, ev->value);
- 
- 	buf += sizeof(*ev);
-@@ -467,13 +467,13 @@ static void mgmt_user_passkey_request(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed User Passkey Request control\n");
-+		display_printf("* Malformed User Passkey Request control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ User Passkey Request: %s (%d)\n", str, ev->addr.type);
-+	display_printf("@ User Passkey Request: %s (%d)\n", str, ev->addr.type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -487,13 +487,13 @@ static void mgmt_auth_failed(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Authentication Failed control\n");
-+		display_printf("* Malformed Authentication Failed control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Authentication Failed: %s (%d) status 0x%2.2x\n",
-+	display_printf("@ Authentication Failed: %s (%d) status 0x%2.2x\n",
- 					str, ev->addr.type, ev->status);
- 
- 	buf += sizeof(*ev);
-@@ -509,14 +509,14 @@ static void mgmt_device_found(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Found control\n");
-+		display_printf("* Malformed Device Found control\n");
- 		return;
- 	}
- 
- 	flags = le32_to_cpu(ev->flags);
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Found: %s (%d) rssi %d flags 0x%4.4x\n",
-+	display_printf("@ Device Found: %s (%d) rssi %d flags 0x%4.4x\n",
- 					str, ev->addr.type, ev->rssi, flags);
- 
- 	buf += sizeof(*ev);
-@@ -530,11 +530,11 @@ static void mgmt_discovering(uint16_t len, const void *buf)
- 	const struct mgmt_ev_discovering *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Discovering control\n");
-+		display_printf("* Malformed Discovering control\n");
- 		return;
- 	}
- 
--	printf("@ Discovering: 0x%2.2x (%d)\n", ev->discovering, ev->type);
-+	display_printf("@ Discovering: 0x%2.2x (%d)\n", ev->discovering, ev->type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -548,13 +548,13 @@ static void mgmt_device_blocked(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Blocked control\n");
-+		display_printf("* Malformed Device Blocked control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Blocked: %s (%d)\n", str, ev->addr.type);
-+	display_printf("@ Device Blocked: %s (%d)\n", str, ev->addr.type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -568,13 +568,13 @@ static void mgmt_device_unblocked(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Unblocked control\n");
-+		display_printf("* Malformed Device Unblocked control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Unblocked: %s (%d)\n", str, ev->addr.type);
-+	display_printf("@ Device Unblocked: %s (%d)\n", str, ev->addr.type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -588,13 +588,13 @@ static void mgmt_device_unpaired(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Unpaired control\n");
-+		display_printf("* Malformed Device Unpaired control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Unpaired: %s (%d)\n", str, ev->addr.type);
-+	display_printf("@ Device Unpaired: %s (%d)\n", str, ev->addr.type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -609,7 +609,7 @@ static void mgmt_passkey_notify(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Passkey Notify control\n");
-+		display_printf("* Malformed Passkey Notify control\n");
- 		return;
- 	}
- 
-@@ -617,7 +617,7 @@ static void mgmt_passkey_notify(uint16_t len, const void *buf)
- 
- 	passkey = le32_to_cpu(ev->passkey);
- 
--	printf("@ Passkey Notify: %s (%d) passkey %06u entered %u\n",
-+	display_printf("@ Passkey Notify: %s (%d) passkey %06u entered %u\n",
- 				str, ev->addr.type, passkey, ev->entered);
- 
- 	buf += sizeof(*ev);
-@@ -632,14 +632,14 @@ static void mgmt_new_irk(uint16_t len, const void *buf)
- 	char addr[18], rpa[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed New IRK control\n");
-+		display_printf("* Malformed New IRK control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->rpa, rpa);
- 	ba2str(&ev->key.addr.bdaddr, addr);
- 
--	printf("@ New IRK: %s (%d) %s\n", addr, ev->key.addr.type, rpa);
-+	display_printf("@ New IRK: %s (%d) %s\n", addr, ev->key.addr.type, rpa);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -654,7 +654,7 @@ static void mgmt_new_csrk(uint16_t len, const void *buf)
- 	char addr[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed New CSRK control\n");
-+		display_printf("* Malformed New CSRK control\n");
- 		return;
- 	}
- 
-@@ -678,7 +678,7 @@ static void mgmt_new_csrk(uint16_t len, const void *buf)
- 		break;
- 	}
- 
--	printf("@ New CSRK: %s (%d) %s (%u)\n", addr, ev->key.addr.type,
-+	display_printf("@ New CSRK: %s (%d) %s (%u)\n", addr, ev->key.addr.type,
- 							type, ev->key.type);
- 
- 	buf += sizeof(*ev);
-@@ -693,13 +693,13 @@ static void mgmt_device_added(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Added control\n");
-+		display_printf("* Malformed Device Added control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Added: %s (%d) %d\n", str, ev->addr.type, ev->action);
-+	display_printf("@ Device Added: %s (%d) %d\n", str, ev->addr.type, ev->action);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -713,13 +713,13 @@ static void mgmt_device_removed(uint16_t len, const void *buf)
- 	char str[18];
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Device Removed control\n");
-+		display_printf("* Malformed Device Removed control\n");
- 		return;
- 	}
- 
- 	ba2str(&ev->addr.bdaddr, str);
- 
--	printf("@ Device Removed: %s (%d)\n", str, ev->addr.type);
-+	display_printf("@ Device Removed: %s (%d)\n", str, ev->addr.type);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -734,7 +734,7 @@ static void mgmt_new_conn_param(uint16_t len, const void *buf)
- 	uint16_t min, max, latency, timeout;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed New Connection Parameter control\n");
-+		display_printf("* Malformed New Connection Parameter control\n");
- 		return;
- 	}
- 
-@@ -744,7 +744,7 @@ static void mgmt_new_conn_param(uint16_t len, const void *buf)
- 	latency = le16_to_cpu(ev->latency);
- 	timeout = le16_to_cpu(ev->timeout);
- 
--	printf("@ New Conn Param: %s (%d) hint %d min 0x%4.4x max 0x%4.4x "
-+	display_printf("@ New Conn Param: %s (%d) hint %d min 0x%4.4x max 0x%4.4x "
- 		"latency 0x%4.4x timeout 0x%4.4x\n", addr, ev->addr.type,
- 		ev->store_hint, min, max, latency, timeout);
- 
-@@ -759,11 +759,11 @@ static void mgmt_advertising_added(uint16_t len, const void *buf)
- 	const struct mgmt_ev_advertising_added *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Advertising Added control\n");
-+		display_printf("* Malformed Advertising Added control\n");
- 		return;
- 	}
- 
--	printf("@ Advertising Added: %u\n", ev->instance);
-+	display_printf("@ Advertising Added: %u\n", ev->instance);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -776,11 +776,11 @@ static void mgmt_advertising_removed(uint16_t len, const void *buf)
- 	const struct mgmt_ev_advertising_removed *ev = buf;
- 
- 	if (len < sizeof(*ev)) {
--		printf("* Malformed Advertising Removed control\n");
-+		display_printf("* Malformed Advertising Removed control\n");
- 		return;
- 	}
- 
--	printf("@ Advertising Removed: %u\n", ev->instance);
-+	display_printf("@ Advertising Removed: %u\n", ev->instance);
- 
- 	buf += sizeof(*ev);
- 	len -= sizeof(*ev);
-@@ -894,7 +894,7 @@ void control_message(uint16_t opcode, const void *data, uint16_t size)
- 		mgmt_advertising_removed(size, data);
- 		break;
- 	default:
--		printf("* Unknown control (code %d len %d)\n", opcode, size);
-+		display_printf("* Unknown control (code %d len %d)\n", opcode, size);
- 		packet_hexdump(data, size);
- 		break;
- 	}
-@@ -1200,7 +1200,7 @@ static void server_accept_callback(int fd, uint32_t events, void *user_data)
- 		return;
- 	}
- 
--	printf("--- New monitor connection ---\n");
-+	display_printf("--- New monitor connection ---\n");
- 
- 	data = malloc(sizeof(*data));
- 	if (!data) {
-@@ -1339,14 +1339,14 @@ static bool tty_parse_header(uint8_t *hdr, uint8_t len, struct timeval **tv,
- 			*tv = ctv;
- 			break;
- 		default:
--			printf("Unknown extended header type %u\n", type);
-+			display_printf("Unknown extended header type %u\n", type);
- 			return false;
- 		}
- 	}
- 
- 	if (total) {
- 		*drops += total;
--		printf("* Drops: cmd %u evt %u acl_tx %u acl_rx %u sco_tx %u "
-+		display_printf("* Drops: cmd %u evt %u acl_tx %u acl_rx %u sco_tx %u "
- 			"sco_rx %u other %u\n", cmd, evt, acl_tx, acl_rx,
- 			sco_tx, sco_rx, other);
- 	}
-@@ -1453,7 +1453,7 @@ int control_tty(const char *path, unsigned int speed)
- 		return err;
- 	}
- 
--	printf("--- %s opened ---\n", path);
-+	display_printf("--- %s opened ---\n", path);
- 
- 	data = malloc(sizeof(*data));
- 	if (!data) {
-@@ -1510,7 +1510,7 @@ int control_rtt(char *jlink, char *rtt)
- 		return -ENODEV;
- 	}
- 
--	printf("--- RTT opened ---\n");
-+	display_printf("--- RTT opened ---\n");
- 
- 	data = new0(struct control_data, 1);
- 	data->channel = HCI_CHANNEL_MONITOR;
-diff --git a/monitor/display.c b/monitor/display.c
-index d61a79a383f5..b540155319a0 100644
---- a/monitor/display.c
-+++ b/monitor/display.c
-@@ -15,6 +15,7 @@
- 
- #define _GNU_SOURCE
- #include <stdio.h>
-+#include <stdarg.h>
- #include <errno.h>
- #include <unistd.h>
+diff --git a/monitor/find.c b/monitor/find.c
+index 649d722ee197..32600964faf1 100644
+--- a/monitor/find.c
++++ b/monitor/find.c
+@@ -17,19 +17,399 @@
  #include <stdlib.h>
-@@ -28,6 +29,25 @@
- #include "display.h"
+ #include <string.h>
+ #include <unistd.h>
++#include <errno.h>
++#include <termios.h>
++#include <signal.h>
++#include <sys/epoll.h>
++#include <sys/mman.h>
++#include <sys/wait.h>
++#include <sys/prctl.h>
  
- static pid_t pager_pid = 0;
-+static FILE *display_out = NULL;
++#include "src/shared/mainloop.h"
+ #include "monitor/display.h"
+ #include "monitor/find.h"
+ 
++/*
++ * A capture runs for as long as it is left running, so the oldest frames
++ * are dropped once this many are held rather than letting the monitor be
++ * killed for using too much memory.
++ */
++#define FIND_MAX_FRAMES 200000
++
++/* How often the pager is checked for having been closed */
++#define FIND_POLL_MSEC 100
++
++struct find_frame {
++	char *text;
++	size_t len;
++	uint64_t seq;
++};
 +
 +/*
-+ * Redirect the decoding output, so that a caller can capture a frame and
-+ * decide what to do with it. Passing NULL restores the normal output.
++ * The frames are held in a ring, so that the oldest can be dropped once it
++ * is full without having to move the rest.
 + */
-+void display_set_output(FILE *fp)
-+{
-+	display_out = fp;
-+}
++static struct find_frame *frames;
++static unsigned int num_frames;		/* Held right now */
++static unsigned int max_frames;		/* Allocated */
++static unsigned int first_frame;	/* Oldest, within the ring */
++static uint64_t next_seq;
 +
-+void display_printf(const char *fmt, ...)
-+{
-+	va_list ap;
+ static bool enabled;
++static bool store;	/* Keep the frames for handing to the pager */
+ static bool records;	/* Separate the frames with a NUL */
+ static bool printed;	/* Something has been written out already */
+ static bool print0;
++static bool raw_mode;
++static int poll_id = -1;
++static struct termios saved_term;
 +
-+	va_start(ap, fmt);
-+	vfprintf(display_out ? display_out : stdout, fmt, ap);
-+	va_end(ap);
-+}
- int default_pager_num_columns = FALLBACK_TERMINAL_WIDTH;
- enum monitor_color setting_monitor_color = COLOR_AUTO;
++static pid_t pager_pid;
++static int saved_stdout = -1;
++static uint64_t pager_seq;	/* Frames from here are yet to be printed */
  
-diff --git a/monitor/display.h b/monitor/display.h
-index 5f83a9a18273..93773e651ef1 100644
---- a/monitor/display.h
-+++ b/monitor/display.h
-@@ -12,9 +12,18 @@
+ static char *capture_buf;
+ static size_t capture_len;
+ static FILE *capture;
+ 
++static struct find_frame *frame_at(unsigned int n)
++{
++	return &frames[(first_frame + n) % max_frames];
++}
++
++static void frame_free(struct find_frame *frame)
++{
++	free(frame->text);
++	memset(frame, 0, sizeof(*frame));
++}
++
++/* Make room for one more frame, dropping the oldest once the ring is full */
++static struct find_frame *frame_next(void)
++{
++	struct find_frame *frame;
++
++	if (num_frames == FIND_MAX_FRAMES) {
++		frame = &frames[first_frame];
++		frame_free(frame);
++		first_frame = (first_frame + 1) % max_frames;
++		return frame;
++	}
++
++	if (num_frames == max_frames) {
++		unsigned int size = max_frames ? max_frames * 2 : 1024;
++		void *tmp;
++
++		if (size > FIND_MAX_FRAMES)
++			size = FIND_MAX_FRAMES;
++
++		tmp = realloc(frames, size * sizeof(*frames));
++		if (!tmp)
++			return NULL;
++
++		frames = tmp;
++		max_frames = size;
++	}
++
++	frame = &frames[(first_frame + num_frames) % max_frames];
++	num_frames++;
++
++	return frame;
++}
++
++void find_frame_begin(void)
++{
++	if (!enabled)
++		return;
++
++	capture_buf = NULL;
++	capture_len = 0;
++
++	capture = open_memstream(&capture_buf, &capture_len);
++	if (!capture)
++		return;
++
++	display_set_output(capture);
++}
++
++void find_frame_end(void)
++{
++	struct find_frame *frame;
++
++	if (!enabled || !capture)
++		return;
++
++	display_set_output(NULL);
++	fclose(capture);
++	capture = NULL;
++
++	/* A frame that was filtered out produces no output */
++	if (!capture_len) {
++		free(capture_buf);
++		capture_buf = NULL;
++		return;
++	}
++
++	/*
++	 * Keep the trace on the terminal while the pager is not up. What
++	 * arrives while it is up is printed once it closes, so that the
++	 * trace on the terminal has no gap.
++	 */
++	if (!pager_pid) {
++		const char nul = '\0';
++		size_t len = capture_len;
++
++		/*
++		 * Only what is read as records is written as records. While
++		 * capturing this is the trace on the terminal, which keeps
++		 * its newlines or the next frame carries on the same line.
++		 * The pager is given its own copy.
++		 */
++		if (records && !store) {
++			/*
++			 * The newline ending the frame is what separates
++			 * the lines within it, so leave it out of a record
++			 * or it shows as a blank line at the end of the
++			 * entry.
++			 */
++			if (len && capture_buf[len - 1] == '\n')
++				len--;
++
++			if (printed)
++				fwrite(&nul, 1, 1, stdout);
++		}
++
++		fwrite(capture_buf, 1, len, stdout);
++		fflush(stdout);
++		printed = true;
++	}
++
++	if (!store) {
++		free(capture_buf);
++		capture_buf = NULL;
++		return;
++	}
++
++	frame = frame_next();
++	if (!frame) {
++		free(capture_buf);
++		capture_buf = NULL;
++		return;
++	}
++
++	frame->text = capture_buf;
++	frame->len = capture_len;
++	frame->seq = next_seq++;
++	capture_buf = NULL;
++}
++
++/*
++ * Read the keys as they are typed rather than a line at a time. Signals are
++ * left enabled so that Ctrl-C still interrupts the capture as it always has.
++ */
++static void term_raw(void)
++{
++	struct termios term;
++
++	if (raw_mode)
++		return;
++
++	if (tcgetattr(STDIN_FILENO, &saved_term) < 0)
++		return;
++
++	term = saved_term;
++	term.c_lflag &= ~(ICANON | ECHO);
++	term.c_cc[VMIN] = 1;
++	term.c_cc[VTIME] = 0;
++
++	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) < 0)
++		return;
++
++	raw_mode = true;
++}
++
++static void term_restore(void)
++{
++	if (!raw_mode)
++		return;
++
++	tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
++	raw_mode = false;
++}
++
++/*
++ * Hand the frames over as a file rather than through a pipe, so that
++ * filling it cannot block the monitor and cost the capture any packets.
++ * They are separated by a NUL so that a pager able to take records, such
++ * as fzf with --read0, sees a whole frame as one entry instead of matching
++ * the individual lines within it.
++ */
++static int frames_to_file(void)
++{
++	unsigned int i;
++	int fd;
++
++	fd = memfd_create("btmon-frames", MFD_CLOEXEC);
++	if (fd < 0)
++		return -1;
++
++	for (i = 0; i < num_frames; i++) {
++		const struct find_frame *frame = frame_at(i);
++		const char nul = '\0';
++		size_t len = frame->len;
++
++		if (records) {
++			if (i && write(fd, &nul, 1) < 0)
++				break;
++
++			/* Leave out the newline ending the frame */
++			if (len && frame->text[len - 1] == '\n')
++				len--;
++		}
++
++		if (write(fd, frame->text, len) < 0)
++			break;
++	}
++
++	if (lseek(fd, 0, SEEK_SET) < 0) {
++		close(fd);
++		return -1;
++	}
++
++	return fd;
++}
++
++static void pager_close(void)
++{
++	unsigned int i;
++
++	if (!pager_pid)
++		return;
++
++	pager_pid = 0;
++
++	/* Put the monitor back in charge of the terminal */
++	if (saved_stdout >= 0) {
++		dup2(saved_stdout, STDOUT_FILENO);
++		close(saved_stdout);
++		saved_stdout = -1;
++	}
++
++	term_raw();
++
++	/* Print whatever arrived while the pager was up */
++	for (i = 0; i < num_frames; i++) {
++		const struct find_frame *frame = frame_at(i);
++
++		if (frame->seq >= pager_seq)
++			fwrite(frame->text, 1, frame->len, stdout);
++	}
++
++	fflush(stdout);
++}
++
++static void pager_open(void)
++{
++	const char *pager;
++	int fd;
++
++	if (pager_pid || !num_frames)
++		return;
++
++	fd = frames_to_file();
++	if (fd < 0)
++		return;
++
++	pager = getenv("PAGER");
++	if (pager && (!*pager || !strcmp(pager, "cat")))
++		pager = NULL;
++
++	fflush(stdout);
++
++	/* The pager reads the terminal from here on */
++	term_restore();
++	mainloop_remove_fd(STDIN_FILENO);
++
++	saved_stdout = dup(STDOUT_FILENO);
++
++	pager_pid = fork();
++	if (pager_pid < 0) {
++		pager_pid = 0;
++		close(fd);
++		close(saved_stdout);
++		saved_stdout = -1;
++		term_raw();
++		return;
++	}
++
++	if (!pager_pid) {
++		dup2(fd, STDIN_FILENO);
++		close(fd);
++
++		if (prctl(PR_SET_PDEATHSIG, SIGTERM) < 0)
++			_exit(EXIT_FAILURE);
++
++		if (pager) {
++			execlp(pager, pager, NULL);
++			execl("/bin/sh", "sh", "-c", pager, NULL);
++		}
++
++		execlp("pager", "pager", NULL);
++		execlp("less", "less", NULL);
++		execlp("more", "more", NULL);
++
++		_exit(EXIT_FAILURE);
++	}
++
++	close(fd);
++
++	pager_seq = next_seq;
++}
++
++static void key_callback(int fd, uint32_t events, void *user_data)
++{
++	char buf[32];
++	ssize_t len, i;
++
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_quit();
++		return;
++	}
++
++	len = read(STDIN_FILENO, buf, sizeof(buf));
++	if (len <= 0)
++		return;
++
++	/*
++	 * Anything else typed at a running capture is left alone, so that
++	 * the terminal behaves as it did before.
++	 */
++	for (i = 0; i < len; i++) {
++		if (buf[i] == 0x12) {	/* Ctrl-R */
++			pager_open();
++			return;
++		}
++	}
++}
++
++static void arm_keys(void)
++{
++	mainloop_add_fd(STDIN_FILENO, EPOLLIN, key_callback, NULL, NULL);
++}
++
++/*
++ * The pager runs on its own so that the monitor keeps draining the socket
++ * while it is up, as anything not read in time is dropped by the kernel.
++ */
++static void poll_callback(int id, void *user_data)
++{
++	if (pager_pid && waitpid(pager_pid, NULL, WNOHANG) == pager_pid) {
++		pager_close();
++		arm_keys();
++	}
++
++	mainloop_modify_timeout(id, FIND_POLL_MSEC);
++}
++
+ void find_set_print0(void)
+ {
+ 	print0 = true;
+@@ -52,77 +432,60 @@ static bool want_records(void)
+ 	return pager && strstr(pager, "--read0");
+ }
+ 
+-void find_setup(void)
++void find_setup(bool live)
+ {
+ 	records = want_records();
+ 
++	if (live && isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
++		enabled = true;
++		store = true;
++
++		term_raw();
++		arm_keys();
++
++		poll_id = mainloop_add_timeout(FIND_POLL_MSEC, poll_callback,
++								NULL, NULL);
++		return;
++	}
++
+ 	/*
+-	 * Nothing is kept, but the output still has to be seen to know
+-	 * where one frame ends and the next begins.
++	 * Nothing is kept when only the separators are wanted, but the
++	 * output still has to be seen to know where a frame ends.
+ 	 */
+ 	if (records)
+ 		enabled = true;
+ }
+ 
+-void find_frame_begin(void)
+-{
+-	if (!enabled)
+-		return;
+-
+-	capture_buf = NULL;
+-	capture_len = 0;
+-
+-	capture = open_memstream(&capture_buf, &capture_len);
+-	if (!capture)
+-		return;
+-
+-	display_set_output(capture);
+-}
+-
+-void find_frame_end(void)
+-{
+-	if (!enabled || !capture)
+-		return;
+-
+-	display_set_output(NULL);
+-	fclose(capture);
+-	capture = NULL;
+-
+-	/* A frame that was filtered out produces no output */
+-	if (!capture_len) {
+-		free(capture_buf);
+-		capture_buf = NULL;
+-		return;
+-	}
+-
+-	if (records) {
+-		const char nul = '\0';
+-		size_t len = capture_len;
+-
+-		/*
+-		 * The newline ending the frame is what separates the lines
+-		 * within it, so leave it out of a record or it shows as a
+-		 * blank line at the end of the entry.
+-		 */
+-		if (len && capture_buf[len - 1] == '\n')
+-			len--;
+-
+-		if (printed)
+-			fwrite(&nul, 1, 1, stdout);
+-
+-		fwrite(capture_buf, 1, len, stdout);
+-	} else {
+-		fwrite(capture_buf, 1, capture_len, stdout);
+-	}
+-
+-	fflush(stdout);
+-	printed = true;
+-
+-	free(capture_buf);
+-	capture_buf = NULL;
+-}
+-
+ void find_cleanup(void)
+ {
++	unsigned int i;
++
++	if (pager_pid) {
++		kill(pager_pid, SIGTERM);
++		waitpid(pager_pid, NULL, 0);
++		pager_pid = 0;
++	}
++
++	if (saved_stdout >= 0) {
++		dup2(saved_stdout, STDOUT_FILENO);
++		close(saved_stdout);
++		saved_stdout = -1;
++	}
++
++	term_restore();
++
++	if (poll_id >= 0) {
++		mainloop_remove_timeout(poll_id);
++		poll_id = -1;
++	}
++
++	for (i = 0; i < num_frames; i++)
++		frame_free(frame_at(i));
++
++	free(frames);
++	frames = NULL;
++	num_frames = 0;
++	max_frames = 0;
++	first_frame = 0;
+ 	enabled = false;
+ }
+diff --git a/monitor/find.h b/monitor/find.h
+index c6b2036ba3a6..3048ab69e4c9 100644
+--- a/monitor/find.h
++++ b/monitor/find.h
+@@ -11,7 +11,7 @@
  #include <stdbool.h>
- #include <inttypes.h>
- #include <ctype.h>
-+#include <stdio.h>
  
- bool use_color(void);
+ void find_set_print0(void);
+-void find_setup(void);
++void find_setup(bool live);
  
-+/*
-+ * All decoding output goes through here so that it can be captured, for
-+ * example to match a whole frame against a query before showing it.
-+ */
-+void display_printf(const char *fmt, ...)
-+			__attribute__((format(printf, 1, 2)));
-+void display_set_output(FILE *fp);
-+
- enum monitor_color { COLOR_AUTO, COLOR_ALWAYS, COLOR_NEVER };
- void set_monitor_color(enum monitor_color);
- 
-@@ -44,7 +53,7 @@ void set_monitor_color(enum monitor_color);
- 
- #define print_indent(indent, color1, prefix, title, color2, fmt, args...) \
- do { \
--	printf("%*c%s%s%s%s" fmt "%s\n", (indent), ' ', \
-+	display_printf("%*c%s%s%s%s" fmt "%s\n", (indent), ' ', \
- 		use_color() ? (color1) : "", prefix, title, \
- 		use_color() ? (color2) : "", ## args, \
- 		use_color() ? COLOR_OFF : ""); \
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index a132bcf397f4..716cb255013c 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -443,73 +443,73 @@ static char *mode2str(uint8_t mode)
- 
- static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
- {
--	printf("      %s:",
-+	display_printf("      %s:",
- 		ctrl & L2CAP_EXT_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
- 
- 	if (ctrl & L2CAP_EXT_CTRL_FRAME_TYPE) {
--		printf(" %s",
-+		display_printf(" %s",
- 		supervisory2str((ctrl & L2CAP_EXT_CTRL_SUPERVISE_MASK) >>
- 						L2CAP_EXT_CTRL_SUPER_SHIFT));
- 
- 		if (ctrl & L2CAP_EXT_CTRL_POLL)
--			printf(" P-bit");
-+			display_printf(" P-bit");
- 	} else {
- 		uint8_t sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
- 						L2CAP_EXT_CTRL_SAR_SHIFT;
--		printf(" %s", sar2str(sar));
-+		display_printf(" %s", sar2str(sar));
- 		if (sar == L2CAP_SAR_START) {
- 			uint16_t len;
- 
- 			if (!l2cap_frame_get_le16(frame, &len))
- 				return;
- 
--			printf(" (len %d)", len);
-+			display_printf(" (len %d)", len);
- 		}
--		printf(" TxSeq %d", (ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
-+		display_printf(" TxSeq %d", (ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
- 						L2CAP_EXT_CTRL_TXSEQ_SHIFT);
- 	}
- 
--	printf(" ReqSeq %d", (ctrl & L2CAP_EXT_CTRL_REQSEQ_MASK) >>
-+	display_printf(" ReqSeq %d", (ctrl & L2CAP_EXT_CTRL_REQSEQ_MASK) >>
- 						L2CAP_EXT_CTRL_REQSEQ_SHIFT);
- 
- 	if (ctrl & L2CAP_EXT_CTRL_FINAL)
--		printf(" F-bit");
-+		display_printf(" F-bit");
- }
- 
- static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
- {
--	printf("      %s:",
-+	display_printf("      %s:",
- 			ctrl & L2CAP_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
- 
- 	if (ctrl & 0x01) {
--		printf(" %s",
-+		display_printf(" %s",
- 			supervisory2str((ctrl & L2CAP_CTRL_SUPERVISE_MASK) >>
- 						L2CAP_CTRL_SUPER_SHIFT));
- 
- 		if (ctrl & L2CAP_CTRL_POLL)
--			printf(" P-bit");
-+			display_printf(" P-bit");
- 	} else {
- 		uint8_t sar;
- 
- 		sar = (ctrl & L2CAP_CTRL_SAR_MASK) >> L2CAP_CTRL_SAR_SHIFT;
--		printf(" %s", sar2str(sar));
-+		display_printf(" %s", sar2str(sar));
- 		if (sar == L2CAP_SAR_START) {
- 			uint16_t len;
- 
- 			if (!l2cap_frame_get_le16(frame, &len))
- 				return;
- 
--			printf(" (len %d)", len);
-+			display_printf(" (len %d)", len);
- 		}
--		printf(" TxSeq %d", (ctrl & L2CAP_CTRL_TXSEQ_MASK) >>
-+		display_printf(" TxSeq %d", (ctrl & L2CAP_CTRL_TXSEQ_MASK) >>
- 						L2CAP_CTRL_TXSEQ_SHIFT);
- 	}
- 
--	printf(" ReqSeq %d", (ctrl & L2CAP_CTRL_REQSEQ_MASK) >>
-+	display_printf(" ReqSeq %d", (ctrl & L2CAP_CTRL_REQSEQ_MASK) >>
- 						L2CAP_CTRL_REQSEQ_SHIFT);
- 
- 	if (ctrl & L2CAP_CTRL_FINAL)
--		printf(" F-bit");
-+		display_printf(" F-bit");
- }
- 
- #define MAX_INDEX 16
-@@ -2732,7 +2732,7 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 				l2cap_ctrl_parse(&frame, ctrl16);
- 			}
- 
--			printf("\n");
-+			display_printf("\n");
- 			break;
- 		}
- 
-diff --git a/monitor/lmp.c b/monitor/lmp.c
-index d415699e4607..f58dde13de87 100644
---- a/monitor/lmp.c
-+++ b/monitor/lmp.c
-@@ -913,12 +913,12 @@ void lmp_todo(void)
- {
- 	int i;
- 
--	printf("LMP operations with missing decodings:\n");
-+	display_printf("LMP operations with missing decodings:\n");
- 
- 	for (i = 0; lmp_table[i].str; i++) {
- 		if (lmp_table[i].func)
- 			continue;
- 
--		printf("\t%s\n", lmp_table[i].str);
-+		display_printf("\t%s\n", lmp_table[i].str);
- 	}
- }
+ void find_frame_begin(void);
+ void find_frame_end(void);
 diff --git a/monitor/main.c b/monitor/main.c
-index cc947af1ffc4..dc37294c5c27 100644
+index ce7bae7f5cae..25de945446a9 100644
 --- a/monitor/main.c
 +++ b/monitor/main.c
-@@ -44,10 +44,10 @@ static void signal_callback(int signum, void *user_data)
+@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
+ 		if (ellisys_server)
+ 			ellisys_enable(ellisys_server, ellisys_port);
  
- static void usage(void)
- {
--	printf("btmon - Bluetooth monitor\n"
-+	display_printf("btmon - Bluetooth monitor\n"
- 		"Usage:\n");
--	printf("\tbtmon [options]\n");
--	printf("options:\n"
-+	display_printf("\tbtmon [options]\n");
-+	display_printf("options:\n"
- 		"\t-r, --read <file>      Read traces in btsnoop format\n"
- 		"\t-w, --write <file>     Save traces in btsnoop format\n"
- 		"\t-a, --analyze <file>   Analyze traces in btsnoop format\n"
-@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
- 			lmp_todo();
- 			return EXIT_SUCCESS;
- 		case 'v':
--			printf("%s\n", VERSION);
-+			display_printf("%s\n", VERSION);
- 			return EXIT_SUCCESS;
- 		case 'h':
- 			usage();
-@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
+-		find_setup();
++		find_setup(false);
+ 
+ 		control_reader(reader_path, use_pager);
+ 		return EXIT_SUCCESS;
+@@ -309,7 +309,8 @@ int main(int argc, char *argv[])
+ 	if (jlink && control_rtt(jlink, rtt) < 0)
  		return EXIT_FAILURE;
- 	}
  
--	printf("Bluetooth monitor ver %s\n", VERSION);
-+	display_printf("Bluetooth monitor ver %s\n", VERSION);
+-	find_setup();
++	/* Watch for the key that brings the pager up */
++	find_setup(true);
  
- 	keys_setup();
+ 	exit_status = mainloop_run_with_signal(signal_callback, NULL);
  
-@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	if (writer_path && !control_writer(writer_path)) {
--		printf("Failed to open '%s'\n", writer_path);
-+		display_printf("Failed to open '%s'\n", writer_path);
- 		return EXIT_FAILURE;
- 	}
- 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 3ee53c2340a5..de3c6c5026da 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -709,7 +709,7 @@ void packet_select_index(uint16_t index)
- 	index_filter = true;
- }
- 
--#define print_space(x) printf("%*c", (x), ' ');
-+#define print_space(x) display_printf("%*c", (x), ' ');
- 
- void packet_set_fallback_manufacturer(uint16_t manufacturer)
- {
-@@ -919,12 +919,12 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
- 	}
- 
- 	if (ts_len > 0) {
--		printf("%s", line);
-+		display_printf("%s", line);
- 		if (len < col)
- 			print_space(col - len - ts_len - 1);
--		printf("%s%s\n", use_color() ? COLOR_TIMESTAMP : "", ts_str);
-+		display_printf("%s%s\n", use_color() ? COLOR_TIMESTAMP : "", ts_str);
- 	} else
--		printf("%s\n", line);
-+		display_printf("%s\n", line);
- }
- 
- static const struct {
-@@ -18654,7 +18654,7 @@ void packet_todo(void)
- {
- 	int i;
- 
--	printf("HCI commands with missing decodings:\n");
-+	display_printf("HCI commands with missing decodings:\n");
- 
- 	for (i = 0; opcode_table[i].str; i++) {
- 		if (opcode_table[i].bit < 0)
-@@ -18663,22 +18663,22 @@ void packet_todo(void)
- 		if (opcode_table[i].cmd_func)
- 			continue;
- 
--		printf("\t%s\n", opcode_table[i].str);
-+		display_printf("\t%s\n", opcode_table[i].str);
- 	}
- 
--	printf("HCI events with missing decodings:\n");
-+	display_printf("HCI events with missing decodings:\n");
- 
- 	for (i = 0; event_table[i].str; i++) {
- 		if (event_table[i].func)
- 			continue;
- 
--		printf("\t%s\n", event_table[i].str);
-+		display_printf("\t%s\n", event_table[i].str);
- 	}
- 
- 	for (i = 0; le_meta_event_table[i].str; i++) {
- 		if (le_meta_event_table[i].func)
- 			continue;
- 
--		printf("\t%s\n", le_meta_event_table[i].str);
-+		display_printf("\t%s\n", le_meta_event_table[i].str);
- 	}
- }
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index b03f44fe90c9..4199101275a2 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -139,15 +139,15 @@ static inline bool mcc_test(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
- 	uint8_t data;
- 
--	printf("%*cTest Data: 0x ", indent, ' ');
-+	display_printf("%*cTest Data: 0x ", indent, ' ');
- 
- 	while (frame->size > 1) {
- 		if (!l2cap_frame_get_u8(frame, &data))
- 			return false;
--		printf("%2.2x ", data);
-+		display_printf("%2.2x ", data);
- 	}
- 
--	printf("\n");
-+	display_printf("\n");
- 	return true;
- }
- 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 08d2269936b9..2e2606db13b9 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -16,6 +16,7 @@
- 
- #define _GNU_SOURCE
- #include <stdio.h>
-+#include <stdarg.h>
- #include <stdbool.h>
- #include <errno.h>
- #include <ctype.h>
-@@ -334,6 +335,15 @@ bool use_color(void)
- 	return false;
- }
- 
-+void display_printf(const char *fmt, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, fmt);
-+	vprintf(fmt, ap);
-+	va_end(ap);
-+}
-+
- static const struct bitfield_data phy_table[] = {
- 	{  0, "BR1M1SLOT" },
- 	{  1, "BR1M3SLOT" },
 -- 
 2.55.0
 
