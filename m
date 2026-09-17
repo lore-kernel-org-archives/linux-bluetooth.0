@@ -1,125 +1,99 @@
-Received: from mail-10699.protonmail.ch (mail-10699.protonmail.ch [79.135.106.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE5639DBD4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 19:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628A33D75BE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 19:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789672571; cv=none; b=iMG0yyfVSPrke0FiyCmoeAzeDNhVW1tcPCOc20DKAy9UcmXt2ahaYE41t9FVgEhw9jLI05JEJRYEDcsCS/KgEBL7QfDW2fFwSQLiEq5Q0JdDmqTOob1bSPUn5VFj4A+ZNdRYsxiywiz7e56u8TITUEnEGlob5JaeOdzfb0ZLsHM=
+	t=1789672659; cv=none; b=pkt7F9GUxQq+ZlWxjNepbTgZrT7WjWHDmIQytG7bDK/mbLVcxpYW0SdirpfRN5IJnBByHevtiM5BpMBsLbrfjeqRh+cHMQnzstgZ9Mqa/Jjbs+CPCScWXN76i4ht4oK9NEoxKMVAYKyck+HbivLljVCQUzJYxdP8I3DiYO/TYIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789672571; c=relaxed/simple;
-	bh=QCUVm+K8oPLVtIHK961QOeH+GGEE+jS2Hcu+nnKR6JI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cwPCwIWU/xVytIB0FjviX4ph2qxfeSzmJAX8AdCppZqugHiIaxvX0Q+nDmhwp5Bku4kZ3hOdOiuZdAZHkKR1vlSAPkzkn+/M2qlc89NCCoPRdfpV5TVgejTctTHLnAWOTqibtcrxX/xeDbJ+QtsUaaEoJ0ybVXkyLpqpqHNBEII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ieCq58LV; arc=none smtp.client-ip=79.135.106.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1789672659; c=relaxed/simple;
+	bh=2Aj4sSbh/RVl/sL5CSHTVfFz7egKcIs3WnBI+6A3060=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YEXuLXIimbLFaSLVsaAa6whxPN7eefYbONgu82z5AhcBc67FLWXMWfygj8EStbAGJmai2zhM42F7wrTnrtm+zKYH+o+rS/1L+hrBcfCc2a5nz/crelu92qsZVnYgY/Rlj0P39KHE7NAehlcqYTgXf8rsHPWCMKrA5CoIjwA9jkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o3z8A82U; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ieCq58LV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1789672559; x=1789931759;
-	bh=QCUVm+K8oPLVtIHK961QOeH+GGEE+jS2Hcu+nnKR6JI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ieCq58LVHOPTFHpDM16OrHJjk3WfyUrqd7dkSS9SYJwVbyjx7WDmmqGbJYZakfsIG
-	 44GDWRf6kj73KwteA551cKES2Q0id9OlKAffP0K+pksA8vhWKWuxvfVT+gzvQoIPvJ
-	 KelFsJry0IieK1j3xj2KznNthoIpy/hO0molkq7/Pa8Wuy003kMsxLEE0yJ5mYHZJb
-	 az4spB27UBpI7624Dz7a+ig+XzhZ7us+iYMoEuIpyxNfweA43Y62bs/bHy4/1676NA
-	 RoIiFOQ927aKIYUQrIuXWas8cNeAWyE9k5hX5WUvVhYgVVp9dHwnQuK+Od8udI4DGW
-	 hTqt1B6smqC9g==
-Date: Thu, 17 Sep 2026 19:15:56 +0000
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: dt <derektern@proton.me>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH BlueZ v5 2/3] client: Pass unicast preset metadata to config
-Message-ID: <bAsGrY3-7F2-GlQXHH1h-gzPEZeWQVAazpGLK26IZrhLNgbP5QWANKfd9bVMsn1mV8bT0kGBbekgBMZTOmeEDg_twEcwOoWfjnBexvBjVK0=@proton.me>
-In-Reply-To: <ys4-B1PGqhV2wgPjUFnZLGOi_QkoCs1ZyOZl679pGV8nNJLfR28E4wDuGQti0eyGwIYHgFGa4GqfTi5Vg_nvOqQBqEhRaTlA_D9MxgEblZo=@proton.me>
-References:
-	=?us-ascii?Q?<IGuo=5FED6hoZcdNfKi5TCkYNNfYCJKn1CUSYS4a4ZNZ9WjaZCMI3rmBzLoslV22TvEjShB4iyBBAec3nrM4mMGI=5Fr8dHKBUfAGLjZxXmgfIE=3D@proton.me>_<pEIogdpm1KrQokz6n7Vp2rMm4FqyjlQ2X2YtxXFBhhWy=5FIaqXXNp8K7EwDeohmT6yelHFNOy7IuYYi7ooLtT2zeODVf8LPoBiOTrs7ua3O4=3D@proton.me>_<CABBYNZ+hzc=5Fv=5Ft5xtwsMPDzrhFgLzUwcN6QmABy=5F=3DGqJjMHEHg@mail.gmail.com>_<6TMaqpYkRT0WXnrX1OlkxzNfaStK17vM4wQJWLFJWEP4ZZ=5FVRyfVhUEMg8KwzWWQzOsyUY8zEzSg1SBT04BDh9F9yC4Y9rft9GtBAzekwF4=3D@proton.me>_<70Tk7oozT7RMA83SmYEKlhm5sNES1V664l63179SDXwOnzZnXOurvxWa-gGmSDBQ=5FOS7=5F2m1ibyKcUr1=5FCBNoNFsnm-PdGGSOWGeXsgBH9k=3D@proton.me>_<CABBYNZ+OqjfHErzn96k6vw=5Fend=5FLLM8uECOgyeuncTxt0MJFFA@mail.gmail.com>_<BL2ma9jjRAUeT3MnEg6XM7bojQ-aauPDy75cebC98yo5E9OVFN0uhsKtemymwe6669o08bpgH5T9=5Ftqgx9tZ9NISnATcThQ8fJ4qujO7fZE=3D@proton.me>_<N6chZc2PG1IpFdftdUK9QY8V8u64pnKS9bvFVoOvdqLwVBN0WBY7gx=5FUOLAA74ICFbjI0iguwbG0GrndRQP5fbaSG9IK14SZxr6Y-bPQJ-o=3D@proton.me>_<CABBYNZL22xwzZ5ZgV+k66nNLprgvOM59vEdkq2dq+JX3C2ZMsA@mail.gmail.com>_<ys4-B1?=
- =?us-ascii?Q?PGqhV2wgPjUFnZLGOi=5FQkoCs1ZyOZl679pGV8nNJLfR28E4wDuGQti0eyGwIYHgFGa4GqfTi5Vg=5FnvOqQBqEhRaTlA=5FD9MxgEblZo=3D@proton.me>?=
-Feedback-ID: 213585229:user:proton
-X-Pm-Message-ID: b863245c28646b6bdcc3a0e4d2488b15a3c85c50
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o3z8A82U"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e620fa473so7332405e9.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 12:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789672656; x=1790277456; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=A289qtxLP8KsJ4uN800Ibixjj5f1NjJiFBl0Y2uxPic=;
+        b=o3z8A82UCobC5AA/3SfCNcIZKFBM78UkbGnURaVSvU+RwoAVxqEn44tYP+C/pVX2wl
+         W6DspVXv/3Fc5M+dSCyzPd0PHsKcq/KKzx/hXhnTjRIraSb81KwYBR0HGIq6bdFN0+7i
+         HpBQSVJoFuheZjYF9wJ74vA8JP85VE0jJqED6BLBpfc+sSxHoQ408n9SUQ2GHPfThQa2
+         EkS00PmM4eR3p6/aJihOoA6p+3UJDsCEJ2+bGgsUi82IUiSc81/JB5ykvOIBd1Ab5/em
+         XPyYN79+x+VxQXLYnY6MUd+BOhU3Ab/vHolDeLI7K4gKqqWeYEWlXOjw3SyLKHq8Ukdc
+         DUpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789672656; x=1790277456;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=A289qtxLP8KsJ4uN800Ibixjj5f1NjJiFBl0Y2uxPic=;
+        b=LXQCvmbSxRl7ARbWM07pYp9Ndbl4LR7jtUBCoqRiag6HVJR1GAiV8RGD8u5ZgF99ck
+         iBS6qT4yojQVsM163bGBknAHQV4PXk2TNzY32kNuf5gvYeN3LJsMgEkdGrHlfirlaTMK
+         VEAbKpbbqJwDqaqJYhouOK7NzZEd1Fl6zeMibHFBUZT1FAreG6WGM8L401K1DQJfu1a6
+         uLCDIQxeL1rWxn8PgxdVXvO4yCFZgmHcdViTxVf+898NcALwOTpnPAD/b3RTaryrtr4G
+         ouj0MeqOYGmak+Iui2TjfCHzaDT5QQ/dLfKMDDqGKUOPOTHlAk0KyWJ2rsBvbvPy1F01
+         KQjA==
+X-Gm-Message-State: AFuF++kHDsXXEEjCzlORJdcIR5iQ+WzTxFVv5Dcu0DYTeGa5bW/8OICS
+	tdAf/sQhhR8yzlRNkcrPE3BlPfhjK1+QUy7AktWihAk19OhKQtQ7ps69
+X-Gm-Gg: AYBFou3dIhP8ZJneipfAiLzd7vh5Xp7Q2iooWrXKzs1wQUVpT4lHtJLhHCr4omS+NW+
+	ooWXwlehmez1Cv/4qW9Rzn0OyxbqXfsU9jX/r1bWwAxzMEowV6Nb44d196V3SQo7+32Cppap1f0
+	b+WZu/ga4rm3S5Y3kRY5tquRjp3r1idJz/mkivH9DAp+6YuTyUwtQ7uJYrnckfjoSwkAbDrFuXi
+	qvy0kjcPm7SMI8Wqgw5yhnWRONnoRLWFWQcu2fUkpW77gdCwjtO09F/q+tpjk+hvZFd3EHaRQX1
+	dRpXj5L9HRkOPfMvS8ykdSfsVRNYJBgPkrjgkL/d4eT11AHTgqnFPNijFgV4eOpoa/wUlzJguf7
+	Xgu5l0tMCQxtPo+wKlLUdSpFn9fsbi7CrerrdqrAKRHdzI+RctuF0iiUx2JfCHLuhAT4L5z3rst
+	/VRohZHlo0uhqb9qhpfAUrpDg5d0FCj3MkfvbiNpPHQopELwXTX6qHQAhf6bfor5s48wQ=
+X-Received: by 2002:a05:600c:8b21:b0:49c:dada:f581 with SMTP id 5b1f17b1804b1-49ea528e1e4mr91418045e9.0.1789672656445;
+        Thu, 17 Sep 2026 12:17:36 -0700 (PDT)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4870bf27198sm17948470f8f.15.2026.09.17.12.17.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Sep 2026 12:17:35 -0700 (PDT)
+Date: Thu, 17 Sep 2026 22:17:32 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [bug report] Bluetooth: btusb: Add support for Qualcomm
+ multi-subsystem QCC2072
+Message-ID: <aqw8zNc6tXeaNPNV@stanley.mountain>
+References: <aqw8ShHyjdZhPc4U@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqw8ShHyjdZhPc4U@stanley.mountain>
 
-From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
+On Thu, Sep 17, 2026 at 10:15:22PM +0300, Dan Carpenter wrote:
+> Hello Zijun Hu,
+> 
+> Commit 2e63b55654e0 ("Bluetooth: btusb: Add support for Qualcomm
+> multi-subsystem QCC2072") from Sep 13, 2026 (linux-next), leads to
+> the following Smatch static checker warning:
+> 
+> 	drivers/bluetooth/btusb_qcom.c:2516 btqcom_set_bdaddr()
+> 	warn: passing positive error code '(-4095)-(-62),(-60)-(-1),1-255' to 'ERR_PTR'
+> 
 
-Custom presets retain metadata, but endpoint.config copies only their
-codec capabilities and QoS into SetConfiguration. Copy the metadata too,
-and free configuration buffers on completion and immediate failure.
----
- client/player.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+See also:
 
-diff --git a/client/player.c b/client/player.c
-index 6cd5aeb4a..ae2ce66f0 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -3797,15 +3797,20 @@ static void config_endpoint_setup(DBusMessageIter *=
-iter, void *user_data)
- =09append_properties(iter, cfg);
- }
-=20
-+static void config_endpoint_free(struct endpoint_config *cfg)
-+{
-+=09util_iov_free(cfg->caps, 1);
-+=09util_iov_free(cfg->meta, 1);
-+=09free(cfg);
-+}
-+
- static void config_endpoint_reply(DBusMessage *message, void *user_data)
- {
- =09struct endpoint_config *cfg =3D user_data;
- =09struct endpoint *ep =3D cfg->ep;
- =09DBusError error;
-=20
--=09free(cfg->caps->iov_base);
--=09free(cfg->caps);
--=09free(cfg);
-+=09config_endpoint_free(cfg);
-=20
- =09dbus_error_init(&error);
-=20
-@@ -3827,6 +3832,7 @@ static void endpoint_set_config(struct endpoint_confi=
-g *cfg)
- =09=09=09=09=09=09config_endpoint_setup,
- =09=09=09=09=09=09config_endpoint_reply,
- =09=09=09=09=09=09cfg, NULL)) {
-+=09=09config_endpoint_free(cfg);
- =09=09bt_shell_printf("Failed to config endpoint\n");
- =09=09return bt_shell_noninteractive_quit(EXIT_FAILURE);
- =09}
-@@ -4050,8 +4056,10 @@ static void cmd_config_endpoint(int argc, char *argv=
-[])
-=20
- =09=09if (cfg->ep->broadcast)
- =09=09=09endpoint_set_config_bcast(cfg);
--=09=09else
-+=09=09else {
-+=09=09=09cfg->meta =3D util_iov_dup(&preset->meta, 1);
- =09=09=09endpoint_set_config(cfg);
-+=09=09}
-=20
- =09=09return;
- =09}
-@@ -4062,7 +4070,7 @@ static void cmd_config_endpoint(int argc, char *argv[=
-])
- =09return;
-=20
- fail:
--=09g_free(cfg);
-+=09config_endpoint_free(cfg);
- =09return bt_shell_noninteractive_quit(EXIT_FAILURE);
- }
-=20
---=20
-2.55.0
+drivers/bluetooth/btusb_qcom.c:2931 btusb_qcom_shutdown_unified() warn: passing positive error code '(-4095)-(-62),(-60)-(-1),1-255' to 'ERR_PTR'
+drivers/bluetooth/btusb_qcom.c:2947 btusb_qcom_shutdown_unified() warn: passing positive error code '(-4095)-(-62),(-60)-(-1),1-255' to 'ERR_PTR'
+drivers/bluetooth/btusb_qcom.c:3562 btusb_post_download_unified_bt() warn: passing positive error code '(-4095)-(-62),(-60)-(-1),1-255' to 'ERR_PTR'
+drivers/bluetooth/btusb_qcom.c:3977 btusb_qcom_setup_unified() warn: passing positive error code '(-4095)-(-62),(-60)-(-1),1-255' to 'ERR_PTR'
 
+regards,
+dan carpenter
 
