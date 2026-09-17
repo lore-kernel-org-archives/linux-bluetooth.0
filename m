@@ -1,156 +1,91 @@
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from mail-24428.protonmail.ch (mail-24428.protonmail.ch [109.224.244.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40775221EB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 14:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4348D51123A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 14:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789655767; cv=none; b=hzMas2N+dyInNuFR5baj00/v93p8925X0rSLPfhMZJ0i0h9vKBRl3DkrMWt2LwHmLXPx+z6S3Yv2Tt6u8SbZQl29gRJEBF5oDcdKAEvUpkma+iEtif9/r6a1G1nQjQjfrELtJSVYak5T2hPEkSSKDXO3YQGoOrCuNSIDkx6kltM=
+	t=1789655838; cv=none; b=s70iuqz92o5CCnovUbNnSy71LhcEarGYmG0B1qs3E8N7lq9lNqXMrp9ZnMsCNzScmfmhdkL6Hgh9f2UGdVyWfnMv+lm64NPNNIIm8+otik9DkvoXMiwjFBFOlCRcQf9Y9qaNHOu9oeF5PR5XtCxLgy6ULzfZZ4Adx45ylUxAhaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789655767; c=relaxed/simple;
-	bh=Rm79OSI9lgvRt6dFLmTgNTLlxXatsIad63SGMRa5ddk=;
+	s=arc-20240116; t=1789655838; c=relaxed/simple;
+	bh=hB6a63ZT8vaG0GXHliNlf8JFKUvAukl4f4D11VIjUe8=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qtmwKronmyghkVAGS6gG5m6V9Pbg8eorEtBpJUE/EecmFJfdiQdRIhgd9EdgyJq27VhIivK+nwWF6z25nw3JfvFGWl+fDAR9Rid9ojlGHPitsbJZ7nb6XvI2Cnjj6gRLrI8+2soBVlOnKKPZOkip7/jlwGD12sOjDrKY9izJsyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=lbxMkjhl; arc=none smtp.client-ip=185.70.43.25
+	 MIME-Version:Content-Type; b=JDE0YG1uCsv/Db5gQZuj8q4QIjyeMHya57BB2PNCmMeIXGC4oN0BXOzJ2aCklUFMU7zLWN28RH+lFCvc8PQqtmoNI7LasiL3W/j9aAiudFGQD6o867bEpPfJYezm6xRJT1kp0acxBF2HrfTMJDH+1cmFJZbYLhB2mhPdse9WTkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=N8MtCrAO; arc=none smtp.client-ip=109.224.244.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="lbxMkjhl"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="N8MtCrAO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1789655755; x=1789914955;
-	bh=Rm79OSI9lgvRt6dFLmTgNTLlxXatsIad63SGMRa5ddk=;
+	s=protonmail; t=1789655827; x=1789915027;
+	bh=hB6a63ZT8vaG0GXHliNlf8JFKUvAukl4f4D11VIjUe8=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=lbxMkjhlxCjOGW11TgwTAZRUN8cf/UCQhLjNSPK+jvextT/5zT8YcUkYbZkfrItnT
-	 wwnkUQwLShcjfrSzQkbnsRGD2zKc3AmIW1E0fovI/YJFCaDk3aTXJ4674/NvjxLEcc
-	 grxjMQyAYIvb4qob6Lpx6pq4KSOAjNut+YrW00ap6/T0aPj7Vo2kmuUg1qiz/kul9U
-	 plF9z5zGsfgsYAyDvkvh4j0ZVv9ikWz0b9KU2snF0XHuDpYDxyO+97rDCBJe5wonhN
-	 wYEvNRiGWSqjRDwKBWYYOs+56LtoBNU60+H4QG/6pTLlpWd8VF9Mnv9/m4CUo68yhD
-	 btrKt8a5xx9Iw==
-Date: Thu, 17 Sep 2026 14:35:53 +0000
+	b=N8MtCrAOt/dul6hCO0zR8xUlSPKtucNQptLonEp3JpVJYcB2qZNplRcmn4Fo0txvw
+	 jLVUm9zWW2eOPg+O6XJ/CGSwLy9YKEoaIRgQCAXGEcl0HUoCAFMUTg/+lyUvdmS4uv
+	 z7ZJUOuN25Zp/zn41jgmd+Ea05w22YvNVN2d/OuxYXUV/vqGCOKhNm7Sa3qgcXXOxe
+	 GTbNW2FJedEhnG1C5o28R677fZhj4GNYw9ym5ESqIb9k4icHlin1JLI6ZMz7jroDEJ
+	 cLtuM3a5xBCHl4y8kA7mOKLhYnDbpOChXTLq3C2GK16ZzkddtoXFVHGr6hR0cIGZcU
+	 JVo+vcNvL52pA==
+Date: Thu, 17 Sep 2026 14:37:00 +0000
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 From: dt <derektern@proton.me>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] shared/bap: Skip local metadata Config callbacks
-Message-ID: <XYQtlFqqw_ZyrPdcYQ8cYKMqYCDW99aPYKb47MIGl5MLnODpiz2hExn5bhWnytTbJYE0BvqP7fSaVpj50M5jk7T4579tsjdYGncAPcCshvQ=@proton.me>
+Subject: [PATCH BlueZ v2 1/2] shared/bap: Skip local metadata Config callbacks
+Message-ID: <jqqyJM7RdaKVlEMJ4PZERpmPxyPBru6C9bQXb9ycHNKYLueOCkf0-7VQY6eXP6d4insUcrxuJfEw-nvKLEfieSqZfNWpj-vxmAgUKpCLH20=@proton.me>
 In-Reply-To: <CABBYNZ+tf1SZb3ONdaySGEk=n27XofWepzfg2y_VTujTUc4eCg@mail.gmail.com>
 References: <IGuo_ED6hoZcdNfKi5TCkYNNfYCJKn1CUSYS4a4ZNZ9WjaZCMI3rmBzLoslV22TvEjShB4iyBBAec3nrM4mMGI_r8dHKBUfAGLjZxXmgfIE=@proton.me> <VPeeCvkuNkEcQo9M5HlwGnyftq-hu4hT1wqkc3pjPtao6HWEoFu2rWyFMtz0K6vG4l2DDbyg4ZfvO5CQb2zR44-UcNh3l6qOfjf90ThTyxg=@proton.me> <CABBYNZ+tf1SZb3ONdaySGEk=n27XofWepzfg2y_VTujTUc4eCg@mail.gmail.com>
 Feedback-ID: 213585229:user:proton
-X-Pm-Message-ID: 7d602b1bfc9ede0136692922a4271d4546315281
+X-Pm-Message-ID: 3fcd76614876b2a38e46e443d92cc0aab8ab4145
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU"
-
---b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-V2 moves the client CONFIG exception into the existing switch. I kept the c=
-hange limited to client CONFIG; ENABLING/STREAMING notifications and server=
- handling are unchanged.
+From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
 
-Attached is a control-only excerpt from the BlueZ 5.87 capture, plus an off=
-line decode with the two local QoS errors. They occur before fresh playback=
- CONFIG status. The PCAP retains 13 original ATT packets; timestamps and li=
-nk identifiers are normalized, and audio/address/key traffic is excluded. I=
-t is an excerpt, not a complete capture.
+When reconfiguring a client stream that is already Codec Configured,
+setup_config() queues Codec Configuration and then caches metadata.
+stream_metadata() emits a same-state CONFIG notification for that local
+update. The profile callback treats it as the peer's configuration
+completion and clears config_pending before the peer has responded.
 
-Both new regression tests fail without the fix. With it, 699 BAP tests and =
-all 35 make-check programs pass.
+If the control point response precedes the ASE state notification, QoS
+setup can run while need_reconfig is still set and fail locally.
 
-The CI BASS/PAST timeout also occurred on the earlier documentation-only PR=
- 2532:
-https://github.com/bluez/bluez/pull/2532#issuecomment-5688971480
+Cache client metadata in CONFIG without emitting a state notification.
+Keep genuine peer CONFIG notifications and server metadata handling
+unchanged.
+---
+v2: Handle client CONFIG in the existing switch. Other states unchanged.
+Rebased on f87a79667. The second patch contains the unchanged regressions.
 
---b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU
-Content-Type: application/vnd.tcpdump.pcap; name=ascs-control-only.pcap
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=ascs-control-only.pcap
+ src/shared/bap.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-1MOyoQIABAAAAAAAAAAAAP//AAD+AAAAAAAAAAAAAAATAAAAEwAAAAAAAAQBAAsABwAEAFKcAAgC
-AQIAAAAA9kcEABcAAAAXAAAAAAAABQEgDwALAAQAG5wACAIBAAACAAAAAAAAYgcFABEAAAARAAAA
-AAAABQEgCQAFAAQAG4oAAQYAAAAAYwcFABEAAAARAAAAAAAABQEgCQAFAAQAG40AAgYAAAAAYwcF
-ADsAAAA7AAAAAAAABQEgMwAvAAQAG4oAAQEAAhtQAECcAECcAAAAAAAAAAYAAAAAEwIBCAICAQUD
-AQAAAAMEmwACBQEAAAAALg8FADsAAAA7AAAAAAAABQEgMwAvAAQAG40AAgEAAhtQAECcAECcAAAA
-AAAAAAYAAAAAEwIBCAICAQUDAgAAAAMEmwACBQEAAAAApWAFAIEAAACBAAAAAAAABAEAeQB1AAQA
-UpwAAQQFAgIGAAAAABMCAQMCAgEFAwEAAAADBCgAAgUBBgICBgAAAAATAgEDAgIBBQMCAAAAAwQo
-AAIFAQECAgYAAAAAEwIBCAICAQUDAQAAAAMEmwACBQECAgIGAAAAABMCAQgCAgEFAwIAAAADBJsA
-AgUBAAAAAJlFBwAdAAAAHQAAAAAAAAUBIBUAEQAEABucAAEEBQAABgAAAQAAAgAAAAAAAJxFBwA7
-AAAAOwAAAAAAAAUBIDMALwAEABuWAAUBAAIbUABAnABAnAAAAAAAAAAGAAAAABMCAQMCAgEFAwEA
-AAADBCgAAgUBAAAAAJxFBwA7AAAAOwAAAAAAAAUBIDMALwAEABuZAAYBAAIbUABAnABAnAAAAAAA
-AAAGAAAAABMCAQMCAgEFAwIAAAADBCgAAgUBAAAAAG1NBwA7AAAAOwAAAAAAAAUBIDMALwAEABuK
-AAEBAAIbUABAnABAnAAAAAAAAAAGAAAAABMCAQgCAgEFAwEAAAADBJsAAgUBAAAAAHFNBwA7AAAA
-OwAAAAAAAAUBIDMALwAEABuNAAIBAAIbUABAnABAnAAAAAAAAAAGAAAAABMCAQgCAgEFAwIAAAAD
-BJsAAgUBAAAAAOdtBwATAAAAEwAAAAAAAAQBAAsABwAEAFKcAAgCAQI=
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 891a2f4fd..6d351d010 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2282,6 +2282,11 @@ static uint8_t stream_metadata(struct bt_bap_stream =
+*stream, struct iovec *meta,
+ =09case BT_BAP_STREAM_STATE_IDLE:
+ =09=09/* Initial metadata */
+ =09=09break;
++=09case BT_BAP_STREAM_STATE_CONFIG:
++=09=09/* Local client metadata does not confirm the peer config. */
++=09=09if (stream->client)
++=09=09=09break;
++=09=09/* Fallthrough */
+ =09default:
+ =09=09/* Force state change to the same state to update metadata */
+ =09=09stream_set_state(stream, bt_bap_stream_get_state(stream));
+--=20
+2.55.0
 
---b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU
-Content-Type: text/plain; name=ascs-control-excerpt.txt
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=ascs-control-excerpt.txt
-
-Qmx1ZVogNS44NywgQkFQIHNpbmsgLT4gZHVwbGV4IHRyYW5zaXRpb24KT2ZmbGluZSBkZWNvZGVk
-IEFTQ1MgY2FwdHVyZSArIGxvY2FsIEJsdWVaIGpvdXJuYWw7IHRoaXMgaXMgbm90IGJ0bW9uIHRl
-eHQuClRYID0gaG9zdCB0byBwZWVyOyBSWCA9IHBlZXIgdG8gaG9zdC4gQVNFcyAxLzIgPSBwbGF5
-YmFjayAocmVtb3RlIFNpbmspLApBU0VzIDUvNiA9IGNhcHR1cmUgKHJlbW90ZSBTb3VyY2UpLiBU
-aW1lcyBpbiBtaWxsaXNlY29uZHMgcmVsYXRpdmUgdG8gdGhlCnN1Y2Nlc3NmdWwgbmV3IENvZGVj
-IGNvbnRyb2wtcG9pbnQgcmVzcG9uc2UgZm9yIEFTRXMgNSw2LDEsMi4KCiAgLTQ3Ni41NjkgbXMg
-IFRYICBSZWxlYXNlIHJlcXVlc3QsIEFTRXMgMSwyCiAgLTE5Ni4wMDMgbXMgIFJYICBSZWxlYXNl
-IHJlc3BvbnNlLCBBU0VzIDEsMjogc3VjY2VzcyAoY29kZSAwLCByZWFzb24gMCkKICAtMTQ2Ljk5
-OSBtcyAgUlggIEFTRSAxOiBSZWxlYXNpbmcKICAtMTQ2Ljk5OCBtcyAgUlggIEFTRSAyOiBSZWxl
-YXNpbmcKICAtMTQ2Ljk5OCBtcyAgUlggIEFTRSAxOiBDb2RlY0NvbmZpZ3VyZWQ7IExDMyA0OCBr
-SHosIDE1NSBvY3RldHMsIDEwIG1zCiAgLTE0NS4wMDMgbXMgIFJYICBBU0UgMjogQ29kZWNDb25m
-aWd1cmVkOyBMQzMgNDgga0h6LCAxNTUgb2N0ZXRzLCAxMCBtcwogIC0xMjQuMTQ4IG1zICBUWCAg
-Q29kZWMgcmVxdWVzdCwgQVNFcyA1LDYsMSwyOyBBU0VzIDUvNjogTEMzIDE2IGtIeiwgNDAgb2N0
-ZXRzOyBBU0VzIDEvMjogTEMzIDQ4IGtIeiwgMTU1IG9jdGV0czsgMTAgbXMgZnJhbWVzCiAgICAr
-MC4wMDAgbXMgIFJYICBDb2RlYyByZXNwb25zZSwgQVNFcyA1LDYsMSwyOiBzdWNjZXNzIChjb2Rl
-IDAsIHJlYXNvbiAwKQogICAgKzAuMDAzIG1zICBSWCAgQVNFIDU6IENvZGVjQ29uZmlndXJlZDsg
-TEMzIDE2IGtIeiwgNDAgb2N0ZXRzLCAxMCBtcwogICAgKzAuMDAzIG1zICBSWCAgQVNFIDY6IENv
-ZGVjQ29uZmlndXJlZDsgTEMzIDE2IGtIeiwgNDAgb2N0ZXRzLCAxMCBtcwogICAgKzAuMTgyIG1z
-ICBMT0cgcHJvZmlsZXMvYXVkaW8vYmFwLmM6c2V0dXBfcW9zKCkgRmFpbGVkIHRvIENvbmZpZ3Vy
-ZSBRb1MKICAgICswLjIyMCBtcyAgTE9HIHByb2ZpbGVzL2F1ZGlvL2JhcC5jOnNldHVwX3Fvcygp
-IEZhaWxlZCB0byBDb25maWd1cmUgUW9TCiAgICArMi4wMDQgbXMgIFJYICBBU0UgMTogQ29kZWND
-b25maWd1cmVkOyBMQzMgNDgga0h6LCAxNTUgb2N0ZXRzLCAxMCBtcwogICAgKzIuMDA4IG1zICBS
-WCAgQVNFIDI6IENvZGVjQ29uZmlndXJlZDsgTEMzIDQ4IGtIeiwgMTU1IG9jdGV0cywgMTAgbXMK
-ICAgKzEwLjMxOCBtcyAgVFggIFJlbGVhc2UgcmVxdWVzdCwgQVNFcyAxLDIKClRoZSB0d28gbG9j
-YWwgUW9TIGZhaWx1cmVzIHByZWNlZGUgZnJlc2ggcGxheWJhY2sgQ29kZWNDb25maWd1cmVkIHN0
-YXR1cy4KTGF0ZXIgUW9TIHJlcXVlc3RzIHN1Y2NlZWRlZCBhbmQgYWxsIGZvdXIgQVNFcyBldmVu
-dHVhbGx5IHJlYWNoZWQgU3RyZWFtaW5nLgpUaGUgZXhjZXJwdCBlc3RhYmxpc2hlcyBvcmRlcmlu
-Zywgbm90IHRoZSBpbnRlcm5hbCBmbGFnIHRyYW5zaXRpb25zLgpDYXB0dXJlIHRpbWVzIGFyZSBm
-aW5hbC1BQ0wtZnJhZ21lbnQgaG9zdCB0aW1lc3RhbXBzOyBMT0cgdGltZXMgYXJlIGpvdXJuYWwK
-dXNlcnNwYWNlIHRpbWVzdGFtcHMuIEFUVCBoYW5kbGVzIHdlcmUgaWRlbnRpZmllZCBmcm9tIHZl
-cmlmaWVkIGNhY2hlZCBHQVRUCm1ldGFkYXRhOyBkaXNjb3Zlcnkgd2FzIG5vdCBwcmVzZW50IGlu
-IHRoaXMgY2FwdHVyZS4gTm8gYWRkcmVzc2VzLCBuYW1lcywKYWJzb2x1dGUgdGltZXN0YW1wcywg
-a2V5cywgb3IgYXVkaW8gYXJlIGluY2x1ZGVkLgo=
-
---b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU
-Content-Type: text/plain; name=ascs-control-only-readme.txt
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=ascs-control-only-readme.txt
-
-U2FuaXRpemVkIEFTQ1Mtb25seSBQQ0FQLCAxMyBvcmlnaW5hbCBmaXhlZC1BVFQgUERVcywgODM5
-IGJ5dGVzLgpMaW51eCBCbHVldG9vdGggbW9uaXRvciBsaW5rIHR5cGUgMjU0LiBPcmlnaW5hbCBB
-U0NTIEFUVCBieXRlcyBhcmUgdW5jaGFuZ2VkOwpvbmx5IGNhcHR1cmUgdGltZXN0YW1wcyBhbmQg
-dGhlIGxvY2FsIEFDTCBpZGVudGlmaWVyIGFyZSBub3JtYWxpemVkLgoKUENBUCB0aW1lIHplcm8g
-aXMgdGhlIGluaXRpYWwgUmVsZWFzZSByZXF1ZXN0LiBUaGUgc3VjY2Vzc2Z1bCBmb3VyLUFTRSBD
-b2RlYwpyZXNwb25zZSBpcyBhdCArMC40NzY1Njkgc2Vjb25kcyAoemVybyBpbiBhc2NzLWNvbnRy
-b2wtZXhjZXJwdC50eHQpLgpBZGFwdGVyIGluZGV4IGlzIDA7IEFDTCBoYW5kbGUgaXMgbm9ybWFs
-aXplZCB0byAxLiBBVFQgdmFsdWUgaGFuZGxlczoKMHgwMDhhLzB4MDA4ZDogcGxheWJhY2sgU2lu
-ayBBU0VzIDEvMgoweDAwOTYvMHgwMDk5OiBjYXB0dXJlIFNvdXJjZSBBU0VzIDUvNgoweDAwOWM6
-IEFTQ1MgY29udHJvbCBwb2ludAoKT25seSBDb2RlYy9SZWxlYXNlIGNvbnRyb2wtcG9pbnQgcmVx
-dWVzdHMvcmVzcG9uc2VzIGFuZCBDb2RlY0NvbmZpZ3VyZWQvClJlbGVhc2luZyBBU0Ugbm90aWZp
-Y2F0aW9ucyBhcmUgcmV0YWluZWQuIE9uZSBpbnRlcnZlbmluZyBRb1NDb25maWd1cmVkCm5vdGlm
-aWNhdGlvbiBpcyBvbWl0dGVkLiBUaGUgdHdvIGxvY2FsIFFvUyBmYWlsdXJlcyBhcmUgam91cm5h
-bCBlbnRyaWVzIGluCnRoZSB0ZXh0IGV4Y2VycHQsIG5vdCBwYWNrZXRzLiBObyBIQ0kgZXZlbnRz
-LCBhZGRyZXNzZXMsIG5hbWVzLCBhYnNvbHV0ZQpjYXB0dXJlIHRpbWVzLCBrZXlzLCB2ZW5kb3Ig
-ZGF0YSwgSVNPL1NDTyBhdWRpbywgb3Igb3RoZXIgQVRUIGF0dHJpYnV0ZXMgYXJlCmluY2x1ZGVk
-LiBJZGVudGlmaWNhdGlvbiB1c2VzIGNhY2hlZCBHQVRUIG1ldGFkYXRhLCBub3QgaW4tY2FwdHVy
-ZSBkaXNjb3ZlcnkuCg==
-
---b1=_9gPQHMs8sonK6FK2IjQmXwnRGws4wYDnahQRV321PU--
 
