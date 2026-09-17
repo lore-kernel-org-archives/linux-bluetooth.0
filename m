@@ -1,64 +1,64 @@
 Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FEB4E3247
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 21:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E3149A3A8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 21:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789680001; cv=none; b=pNYYnTAB/s4f0BLwWu3ejjQPsoPQU6ND0xJqnb5OzA0LRw2p+t9C1EqlM+aKe32lFLLPMDV/SpdKbZsc2XtHryAbONXNDxmLIESfvDhV6Me1CTCY7oDny4e048YiNjbbd2nLerwdU0bydcAbMOjRj8LDrRrR8ck60RBOzM0485U=
+	t=1789680001; cv=none; b=fITuT/38dGeo3Kpgzg+Oh6sNdZwBgRDNO8LoiqeG2PaTDCdczl7Ssr7rEOlUoivv6E8eKcyVni97UzwcNBwCCMsIYYBw7scsvwqdWipHFWWAn6Io/IPP6sZm0b0jrgmSg2ZLEdzxM63vvicpxv0ekimjWa024tGq2ivrpKeN0fA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789680001; c=relaxed/simple;
-	bh=LZSYtjDL6rm8OvTl3dPnZdBgXJ4Krf0C8RDMVYvhpEA=;
+	bh=0yG5Mzjj5RRPDhIbFihrV0EOzpaeq5JgcYZ/sNLs0LQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LFEHcskYAuF4rBlyMTG8rx2QMLYlyZQUeJT95F22bQ67P8ti1FLxpXYzyiamx02sbj4obrcJgX7djo6nbnLk/LeHG6PxtVYzpEikoc60B3IaVdj2sccafG6k3Uk696877lLpW+IH08TFOLtY7xXRyyEdyvPp0cM0V8AXqRJ94ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b=VYxTMxcp; arc=none smtp.client-ip=74.125.225.76
+	 MIME-Version; b=XJHnYNUoyiQaC/h2pr4O72Mhfe9kOBf03ejFLLm+NHPZrVutEvTZyJoH/slUezdCQK85POqShqKO1HT2PGhDlQx0VEdjgJV5DoF0qJKs/ZEOCTAbJQ0njCVj1SdOZhy1W6qLxZz3LnI8ZBL5IxJy5jDxM0a6XoauSm1XCF4BaLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b=QANsuZGs; arc=none smtp.client-ip=74.125.225.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b="VYxTMxcp"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-4843c3ea1f6so14449f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 14:19:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b="QANsuZGs"
+Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f633cd78so12330f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 14:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=starlabs-systems.20251104.gappssmtp.com; s=20251104; t=1789679996; x=1790284796; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WP+SvTWO/ZPwSJKpdGUFyW4Q/3Pnzr6Y0d7TgXRZl/o=;
-        b=VYxTMxcp7tA5lGA4BEqF26q+tfaT3B6fbUay846gOumc6aJL3f3brTI9W3v4wK+Z5P
-         SktgngZIwTrRcoYepxIwqLd52f7nqW+vWU2CMaV0BwiackXY+aalE+1k847zWBWA/wQe
-         CiMKNT0C/cJ4r7Sx4FGa3tIzX6YWlRPRUulfibfSsxrV2B15Gsc6VCNdzg0Rb0pGVoyy
-         ZyF/lnDp1IETrYQW0mKyVswEFOVswD9b3kXDb0cVDcClBQ32e0uGYFD6UNxRCnOa+dpj
-         tbqF7SXnT3SdeREuKX4Q8EKwCr6NcxghWmCRKgs9AyahdTaTp4p9+d50HHPWFBmV+BEr
-         JaTA==
+        bh=91ImVwNngQnn0ksChHIZQSGgHwJR1v4uR7PjsKwQ3bY=;
+        b=QANsuZGsVAr/g35glxaH3WidlAiIflSYiJQWA4JDfXAu89gXaEXWQABlxDfPuaZjjG
+         Ax+9lC68i/1CPaeBnMhSmUuMJ7EewLNnoD3lAIDUKHVBYcNdyThKUo1f8g8uUbybDA5A
+         217wO4FIjVDdGJQd5LhjnTC6EJ2WGOsozBrOL+fEPslMsBOOc2KwtFJ595x1ghF9Yjnq
+         Ou+d4+FIvaifiXwd57a2Sw22SvDf0xRiS6i0/71P/wmdvhlGO2kXSfvT1bOW2Up8PUy3
+         f1ocDJ7aY7xQFy1rhL11b70ZBUXZTZPmm46fITkxZX5QsYucGIvZaEbUxvl3AmPrm++I
+         mUrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1789679996; x=1790284796;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WP+SvTWO/ZPwSJKpdGUFyW4Q/3Pnzr6Y0d7TgXRZl/o=;
-        b=zz7/CgdndpsTMTs00dt6FrbGqYNKWtnxL4exGxsP45ZXre0V/Wt02ku8FEEHn1/iP/
-         KoVuKKf7ayT4pkmeyRS8POumwulz8dgzwZQ68OImC/5pmMn3fAlvrB1Zvrr0J1U3+w8/
-         FUdNDUJlHZzDTH0jQVbYl44672I9XAMIjBM335CdAbuQpdmuDPmrjZ0UQqkVFzM0BVPU
-         K/47ZmdRiMYdPcvTT4jtOLCpidcfk9/4FjF/JmJ+CV4DDs/yqL8814r4xHrj/xsu/qly
-         apov1Ze4oljK0Z6D+mnUSMzwczOIDp53yN6vgZgnmkL1ErEPDniF9csPdIBNX8BVMDxt
-         +aQA==
-X-Gm-Message-State: AFuF++nqdTeXLZVLGSkSUgI4Fut5hC+vqXr/evg6xRDUURZffvYd9/xU
-	UT8mqOzJ6nqkJ5ZpNikU2VwAfrlF8dk5CbjbL3IXq9Kaz31AIFeQsozf0D5R7QZ2PxJRJkoQDnQ
-	2C/FZsSCm
-X-Gm-Gg: AYBFou2rV2xch5zyzvTOi9QXAc0/V9mvh8qSNmAgp7Wm023pocmO6iICrISbwrVfIYf
-	03oatrY9BXMl1kWpnjHPlkXlTlAusT74AktRlhfcKt6FP1kHrzoEi3GOCDcJQSwS6lADsWFea8y
-	AucX08jFxOpurd+Rnk4V+7zBLd1yi2QmsxDWYKp+dvBU+wEEcEvZw1o4zPGwO6J8eSKQsNSIN66
-	9cEAv123n6ta72WtmYqS9m5PZQUbFR8bjlkuamYRwLXQsP/SFoZiU4QN1WGrV9gGJZTqq54l+X5
-	Oxflr8V+lUUzorUYey1VlDZCqG9f+I6o60pew9MN141JDpfFgND0bWYrFKB9FpI6U8PLQXZ4sHN
-	IWwmU67Jkd1BCX75zMeIWczSqtdNHLJCd5X/fAqTjIDkiiZmo8aEB7LFyRDCRbwA55fwB2wlhso
-	Yz79U0WVQpz2BliN5CEGnGR3PEMsxE9z/ovAFdMPIbNbGU2ZQ02LkSHUoIZyWx2LZjw7ioCZzs3
-	LhIQbrWoedwiPRy7HxWwQpPiQ==
-X-Received: by 2002:a05:6000:220f:b0:487:34c:81e with SMTP id ffacd0b85a97d-4871e226b3bmr226024f8f.20.1789679996270;
-        Thu, 17 Sep 2026 14:19:56 -0700 (PDT)
-Received: from fighter ([217.155.46.38])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4870bf1f6cfsm19086828f8f.13.2026.09.17.14.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=91ImVwNngQnn0ksChHIZQSGgHwJR1v4uR7PjsKwQ3bY=;
+        b=OMfwHqsqSyohZSNvotsIh/ptFqgGkhdCIhIaBUkMMM3mZ+rbCmqAPniZyuV//C2Fbj
+         yv65A8gJdsW1Jdq2MxHjdNjurbQv35mBvI03BwXEOpUg4ZV3u8CGkbHfmdHQj8fi0dpL
+         Th8qRQk5jhMlvogJvlfwS8k67TeV72cZ4DSloGEoSmJA6FTlfEqcl/NQG10PpwYKvQTz
+         BjYQt3GLFWB+bFHaQA7aukvJk+mSXgj0Yt4OyflP5C2AQDQkPwfDHyT3uPSDN52ylJE5
+         ACuaoFxHo8nCKqLvjV+CWAuQAvdzOxn8do0vFSI780lBLfiGZE0H5/J7TZZ95157JK75
+         hMnQ==
+X-Gm-Message-State: AFuF++mymll1BqVh0+RzTgBJ6F+t1eU5bpKb5oIwk+QlEjrKwYPVZJKV
+	osEyqPloxXP121KGeeZXaWBU+F1o3unyVGpJpa4KesCScReh+7Ijr9e2iQ2/jcqjySomWpWhUWC
+	HSNbWaLVj
+X-Gm-Gg: AYBFou0j09hEr7wWdBsz+n1fb8sYYrJ9NFG4SIcrmCOe+olihIzgRK7M8Z+p0Lv4S5K
+	crylSmoWvFDL5yuBnc2IrQbXjtpopz71IwN1BnTx5qKgcmpMJ4emEeQiGjuY/2htj8c8gLLE2V7
+	BM93YF3iNgW3IHaEISuGqCURj498FaC3t5FGbaelWXcWBTmFu+XBqoBnaLQCm1H2o0+d46OBNqc
+	1sbod7jxfykwTU7AhUVnsWhwOpjR+8v10r/+aa+Ck786esdWiGmUI7hJDmgJQ6BYOHvFk3A8pmu
+	sH2LSHVhZtACj1x/gBA01LdF48i5mIL8CVYwn3mMikfJBMgaffIHrHLZ68hK6NlVj7CxBdJqYNd
+	0QJUeUZfKiKdyA9UX21sorgzsb32Q/aT0qKKecPLPGZDlyQyWAqS8STED3T1wuJuKG1yqJp6GA/
+	4V2E1q/UG5ZX3aphDMPcLnXVAyG6lHNzRyYhK+A2n0jGpDh0WYv4fKVtxod2634CAWS1POql5V9
+	y2xMoE9MY2aN8LDopeqc1RJTg==
+X-Received: by 2002:adf:e19a:0:b0:486:fba3:b95d with SMTP id ffacd0b85a97d-4871e2161fbmr249670f8f.7.1789679995473;
         Thu, 17 Sep 2026 14:19:55 -0700 (PDT)
+Received: from fighter ([217.155.46.38])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4870bf1f6cfsm19086828f8f.13.2026.09.17.14.19.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Sep 2026 14:19:54 -0700 (PDT)
 From: Sean Rhodes <sean@starlabs.systems>
 To: linux-bluetooth@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -72,9 +72,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v2 2/2] Bluetooth: btusb: restore powered-off Intel adapters
-Date: Thu, 17 Sep 2026 22:19:52 +0100
-Message-ID: <479fdb2638f34ccb02f35a40a34fcdc7cc41ccdf.1789679981.git.sean@starlabs.systems>
+Subject: [PATCH v2 1/2] usb: core: check ACPI port power during registration
+Date: Thu, 17 Sep 2026 22:19:51 +0100
+Message-ID: <332acbc859506a0c313a21c14d177a5cde07fb74.1789679981.git.sean@starlabs.systems>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1789679980.git.sean@starlabs.systems>
 References: <cover.1789679980.git.sean@starlabs.systems>
@@ -86,93 +86,95 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ACPI-managed internal USB ports can lose power while the Bluetooth
-adapter is closed. The USB core then reset-resumes the device and, because
-btusb has no reset-resume callback, rebinds its interfaces.
+usb_hub_create_port_device() checks whether a port is power manageable
+before hdev->maxchild is set. usb_acpi_power_manageable() looks up the
+hub through usb_hub_to_struct_hub(), which rejects hubs while maxchild is
+zero.
 
-For a closed, fixed Intel combined adapter on an ACPI-power-manageable
-port, preserve the binding and run the Intel setup again when the adapter
-is next opened. Keep the existing rebind behavior while HCI is running and
-keep runtime autosuspend blocked for other reset-resume-quirked adapters.
+The port device has already been registered and its ACPI companion bound
+at this point. Check that companion directly.
 
-Tested on a Star Labs Lite Mk IV with Intel 8087:0aaa. Three Bluetooth
-off/on cycles reached ACPI D3cold, restored the same hci0 without a USB
-disconnect, and discovery found nearby devices after resume.
+Fixes: 8020c41b39f5 ("usb: core: allow ACPI-managed hard-wired ports to power off")
 
 Signed-off-by: Sean Rhodes <sean@starlabs.systems>
 ---
- drivers/bluetooth/btusb_main.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ drivers/usb/core/port.c     | 7 +++----
+ drivers/usb/core/usb-acpi.c | 7 +++++++
+ drivers/usb/core/usb.h      | 6 ++++++
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index be47ac894b6c..4b6ac67f182f 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -2190,6 +2190,16 @@ static void btusb_prepare_reset(struct hci_dev *hdev)
- 	usb_kill_anchored_urbs(&data->tx_anchor);
+diff --git a/drivers/usb/core/port.c b/drivers/usb/core/port.c
+index b4452b665f59..59c3ab31f030 100644
+--- a/drivers/usb/core/port.c
++++ b/drivers/usb/core/port.c
+@@ -21,8 +21,7 @@ static int usb_port_block_power_off;
+ 
+ static const struct attribute_group *port_dev_group[];
+ 
+-static bool usb_port_allow_power_off(struct usb_device *hdev,
+-				     struct usb_hub *hub,
++static bool usb_port_allow_power_off(struct usb_hub *hub,
+ 				     struct usb_port *port_dev)
+ {
+ 	if (hub_is_port_power_switchable(hub))
+@@ -32,7 +31,7 @@ static bool usb_port_allow_power_off(struct usb_device *hdev,
+ 		return false;
+ 
+ 	return port_dev->connect_type == USB_PORT_CONNECT_TYPE_HARD_WIRED &&
+-	       usb_acpi_power_manageable(hdev, port_dev->portnum - 1);
++	       usb_acpi_port_power_manageable(port_dev);
  }
  
-+static bool btusb_intel_acpi_power_manageable(struct btusb_data *data)
-+{
-+	return IS_ENABLED(CONFIG_ACPI) &&
-+	       data->match_id->driver_info & BTUSB_INTEL_COMBINED &&
-+	       data->udev->dev.removable == DEVICE_FIXED &&
-+	       data->udev->parent && data->udev->portnum &&
-+	       usb_acpi_power_manageable(data->udev->parent,
-+					 data->udev->portnum - 1);
-+}
-+
- static int btusb_close(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -4595,6 +4605,9 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->send = btusb_send_frame_intel;
- 		hdev->reset = btusb_intel_reset;
+ static ssize_t early_stop_show(struct device *dev,
+@@ -825,7 +824,7 @@ int usb_hub_create_port_device(struct usb_hub *hub, int port1)
+ 	 * Keep hidden the ability to enable port-poweroff if neither the
+ 	 * USB hub nor platform firmware can manage downstream port power.
+ 	 */
+-	if (!usb_port_allow_power_off(hdev, hub, port_dev))
++	if (!usb_port_allow_power_off(hub, port_dev))
+ 		return 0;
  
-+		if (btusb_intel_acpi_power_manageable(data))
-+			hci_set_quirk(hdev, HCI_QUIRK_NON_PERSISTENT_SETUP);
-+
- 		if (id->driver_info & BTUSB_INTEL_NO_WBS_SUPPORT)
- 			btintel_set_flag(hdev, INTEL_ROM_LEGACY_NO_WBS_SUPPORT);
- 
-@@ -4912,6 +4925,12 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	BT_DBG("intf %p", intf);
- 
-+	/* reset_resume is only safe for the Intel ACPI path below. */
-+	if (PMSG_IS_AUTO(message) &&
-+	    (data->udev->quirks & USB_QUIRK_RESET_RESUME) &&
-+	    !btusb_intel_acpi_power_manageable(data))
-+		return -EBUSY;
-+
- 	/*
- 	 * It is reported that remote wakeup events could sometimes cause some
- 	 * adapters completely unresponsive. Resetting the xHCI root hub doesn't
-@@ -5076,6 +5095,19 @@ static int btusb_resume(struct usb_interface *intf)
- 	return err;
+ 	/* Attempt to let userspace take over the policy. */
+diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
+index 489dbdc96f94..5163ef363eef 100644
+--- a/drivers/usb/core/usb-acpi.c
++++ b/drivers/usb/core/usb-acpi.c
+@@ -37,6 +37,13 @@ bool usb_acpi_power_manageable(struct usb_device *hdev, int index)
  }
+ EXPORT_SYMBOL_GPL(usb_acpi_power_manageable);
  
-+static int btusb_reset_resume(struct usb_interface *intf)
++bool usb_acpi_port_power_manageable(struct usb_port *port_dev)
 +{
-+	struct btusb_data *data = usb_get_intfdata(intf);
++	struct acpi_device *adev = ACPI_COMPANION(&port_dev->dev);
 +
-+	if (!btusb_intel_acpi_power_manageable(data) ||
-+	    test_bit(HCI_RUNNING, &data->hdev->flags)) {
-+		intf->needs_binding = 1;
-+		return 0;
-+	}
-+
-+	return btusb_resume(intf);
++	return adev && acpi_device_power_manageable(adev);
 +}
 +
- #ifdef CONFIG_DEV_COREDUMP
- static void btusb_coredump(struct device *dev)
- {
-@@ -5093,6 +5125,7 @@ static struct usb_driver btusb_driver = {
- 	.disconnect	= btusb_disconnect,
- 	.suspend	= pm_ptr(btusb_suspend),
- 	.resume		= pm_ptr(btusb_resume),
-+	.reset_resume	= pm_ptr(btusb_reset_resume),
- 	.id_table	= btusb_table,
- 	.supports_autosuspend = 1,
- 	.disable_hub_initiated_lpm = 1,
+ #define UUID_USB_CONTROLLER_DSM "ce2ee385-00e6-48cb-9f05-2edb927c4899"
+ #define USB_DSM_DISABLE_U1_U2_FOR_PORT	5
+ 
+diff --git a/drivers/usb/core/usb.h b/drivers/usb/core/usb.h
+index a9b37aeb515b..356d36ccbdd3 100644
+--- a/drivers/usb/core/usb.h
++++ b/drivers/usb/core/usb.h
+@@ -8,6 +8,7 @@
+ 
+ struct usb_hub_descriptor;
+ struct usb_dev_state;
++struct usb_port;
+ 
+ /* Functions local to drivers/usb/core/ */
+ 
+@@ -211,7 +212,12 @@ extern int usb_acpi_register(void);
+ extern void usb_acpi_unregister(void);
+ extern acpi_handle usb_get_hub_port_acpi_handle(struct usb_device *hdev,
+ 	int port1);
++bool usb_acpi_port_power_manageable(struct usb_port *port_dev);
+ #else
+ static inline int usb_acpi_register(void) { return 0; };
+ static inline void usb_acpi_unregister(void) { };
++static inline bool usb_acpi_port_power_manageable(struct usb_port *port_dev)
++{
++	return false;
++}
+ #endif
