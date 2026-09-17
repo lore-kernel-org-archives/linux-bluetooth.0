@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CA352F29E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 17:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666575349AE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 17:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789666272; cv=none; b=Y9I8gIyO9LltbL/Eigt3VCupH2kyBRc1TrWc3fF6uh3Bwgrsr3ss4J+sK7tAed5Yx2Fc+f80Vun7CgZkhV3jjP4STvBtOx32LkCrNYPXFnyGVHEzPRctcBPA1f3dKat3Gg9LoBipny98Fvoh9GgMLz1jEg1trRjEWGjLjZK8n6w=
+	t=1789666275; cv=none; b=cQBoTtTdubwb6qEGNht20103zd1XEPu/Gizr4FyZyJEakwpB7cE9p1X1GoNOpfa0uBs3iQBsCJKiu5IbTRo/yI6nMXVNfaG6PZKb0razNvP7igdmBlZegfsBPmGRwVLAkW+V2bzlorHP2VeV1eYtOXmRoZj9J6ANKafRPqqouM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789666272; c=relaxed/simple;
-	bh=EhMLd+W0LPmCulzCAgjxYAowPiFzjvLR6qFtlM9SVa4=;
+	s=arc-20240116; t=1789666275; c=relaxed/simple;
+	bh=bGVM47mB3HmFGULnc5Julujv7bn1zhVkGReX20C2hD4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DGV/dG1MY9MrKh9Z6mdGZ5lq0B0lY3cdQW6qKt/eCyKMyiSx5rvOhZzmUmcOg407aeuT5/UUAu7dWm6PXh4YJyWPq86oIFNk4+pV86yew3jm6rC49e3eVHPCkCPnO0GhtLu4NNcYpbpnFCMREDYpJGuC8QT2mJMHOODr5B4rHO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOUAWiis; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=hfa8rOexchzDKKKXdtXAabwsVU95eCjn3zZaugzJYmhOADsvSnIcvGPFW1XJ4e+kZmikolqW9rjWpxXTFgLMauu7SgThV+AlYayi4u1t2HCsC7dZcitO6W/hL64cFDvpNvrOdzDffVqAE9SA2dsNc0Bo81nm5Cuiy7u/7Hw6dB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTY2uEbb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOUAWiis"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1232B1F00898;
-	Thu, 17 Sep 2026 17:31:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTY2uEbb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C99E1F00893;
+	Thu, 17 Sep 2026 17:31:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789666271;
-	bh=IiR+htvtaFf4QhW3fSAbFvooy2LDP2QSA84s9D9S1KU=;
+	s=k20260515; t=1789666272;
+	bh=g3crRsXgYWeelSCmewRkR7jQX0C9RKfRsozRq3IfXNI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fOUAWiisqqywGSxKj60mWJZAU4lCP2mNLdRif1gqmnPVZIiwjWLlBl9Q+j1Vieai+
-	 qrA0K388hN2c04zaLxo8sF1EbnKBoBtjIk5i5TnPCc+lvgrwf+QLl50hmN2+N9O2CB
-	 88ScrmRfDpB8FE18ZhBTC9ABy20FY0UVPVdz0J/TSB1LBjJrtMsoJKSk++jEYvMGyw
-	 crZT9b5Kdv3ly13WDuTRYNHutWPFpiiwMWVIEgmAlJ7PGe+8jQ2jkTeZO1Rnf0sSkT
-	 Og0xWJEBNnnpLIIAMahkVcR5uH/ZMUwwImjEGC5zbpSs+EQA12akcTOQQ2lSZfe128
-	 sO3fljnaIUaHg==
+	b=JTY2uEbb1qgKm03eKSkOkanFBzqrM7KdxCX+SfegLsd0rgNYRCOx50VywfWdG0jXJ
+	 Hu3U+KMwAOmLll0vtDX2OEmCGbH3GdPjGtk0L5GbIrH4VmFb4cOUMyHgCXQ31i3cTZ
+	 FJW2KsGmVkTzfLVhRdHcLnuRhRhmCkCNCqXJircIw7tSTXYKb8Nei5/bsNdCDSkgpq
+	 AlrbNhjI8iOVXF6Ibi9MO2iuQrfHx/EUoJuFQuOqAS9IRuuok1an2WI97ITp8WTCUc
+	 7UVIk0d5UixnvPB03kyfT0F9JWlpidBwLN5iofDkG1x9ZxT+9ZNDWv/rtnlEsUsrCw
+	 QQ7BA4GmJwrMA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A51381197E;
-	Thu, 17 Sep 2026 17:30:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198B7381197E;
+	Thu, 17 Sep 2026 17:30:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,16 +37,18 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/4] gatt-server: Check prepare write length
- before
- reallocating
+Subject: Re: [PATCH BlueZ v2 1/3] emulator: bthost: add function for sending
+ raw
+ L2CAP sig commands
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178966620463.3782583.6861381345742673420.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Sep 2026 17:30:04 +0000
-References: <20260910184216.1601639-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260910184216.1601639-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <178966620587.3782583.17922597380682982550.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Sep 2026 17:30:05 +0000
+References: 
+ <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
+In-Reply-To: 
+ <66d2971217dc632b10049fef7a5e9e735715bca2.1788119838.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -54,26 +56,24 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 10 Sep 2026 14:42:13 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Sun, 30 Aug 2026 22:57:22 +0300 you wrote:
+> Add bthost_l2cap_sig_raw() that tests can use to send raw L2CAP
+> signaling commands.
+> ---
 > 
-> append_prep_data() grew the buffer and copied the new fragment into it
-> before rejecting a total length above UINT16_MAX. On overflow the
-> allocation had already been enlarged and written while prep_data->length
-> was left at its previous value, desynchronising the buffer from its
-> tracked size.
+> Notes:
+>     v2:
+>     - no changes
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v1,1/4] gatt-server: Check prepare write length before reallocating
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=985ee7b3ab0e
-  - [BlueZ,v1,2/4] adapter: Unify the A2DP admin allowlist UUID mapping
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0ccdf019681c
-  - [BlueZ,v1,3/4] battery: Document the unknown sentinels and fix a stale name
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2ffbcf6f9d38
-  - [BlueZ,v1,4/4] client/bluetoothctl: Declare the controller helper in its own header
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e5dc89d28253
+  - [BlueZ,v2,1/3] emulator: bthost: add function for sending raw L2CAP sig commands
+    (no matching commit)
+  - [BlueZ,v2,2/3] tools/l2cap-server: add test for invalid Conn Req on Ext-Flowctl server
+    (no matching commit)
+  - [BlueZ,v2,3/3] tools/l2cap-tester: test closing sockets with ECRED defer
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e9b6ee3808ab
 
 You are awesome, thank you!
 -- 
