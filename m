@@ -1,65 +1,65 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725D33CDBD3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 20:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D874A4842
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 20:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789675890; cv=none; b=EFxpRLCfk65+whsnqmpySr3ZPpRBdrp6oSuTXDPqQ8gI3O7UGRxweeWf/NhkQuEU+gOgvFUicgT2qQwDhCVCbJWQ9jRzGiwWDlhqQYXAPQS6lyWdPlbyiq60vDlWDNl1D+GjC4gXXBhcFVA8JwdKjaCFZZ+yv6QG+HIXHCecBV8=
+	t=1789676804; cv=none; b=k2B6L9RavswYCd/LbxF3EBs++1lI5R5xi2X7BKeWJv9jaNKR8gSJzzyrTszK2fLYyG9A/0YyQt/JFg5pY5GI6Mzn2BdnoOIH7e9VWW/00Emiph5Dp0sA1biLb0cYkevMVncD1xi2yRPvKJ+ITnA+3rv9V1cPntbLtF6pxlc6Ffg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789675890; c=relaxed/simple;
-	bh=Pld+KJDf/y0brTSHAZfyNj7LwB26z/vcvvMjg82D16g=;
+	s=arc-20240116; t=1789676804; c=relaxed/simple;
+	bh=/wm6upxZhNKjCNldD9EE0n5yIdNuPgK9lrIwGU6QUEc=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=J/zEBhewu9nTU+BGImUah6OCtUAKOpZeN7GchKbXe7HrrJgrr98/0k0/g0mYoNrmzNjt1Q1zjCtNOl9pcNuXAkmkbD+QdtIxzfM8zvQEacgTiSZq+LDxVyPD4Jwur+tgWQJBOJcEgxOnkLCkAqYSdOAe7VDXNZ5AkE2YYSgL76k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEG1HNV1; arc=none smtp.client-ip=74.125.228.12
+	 References:In-Reply-To; b=lNsLj7UzrpoAQqh8JP+KreZXPNGB3R1u2Q/hS20OUzoSpnHVIo8I2WlmzPec9WmmmrntRTCmClbzQD4rZBDtTpg00v6TScUNJT5YVIyy1xzNJRzcZOgCatsiJ93d6FIUZLjWuqq0mmb61XA57t4w+aKtiGAZ5QU/HEepoafb7kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yi6MDRhJ; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEG1HNV1"
-Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-85469a34908so72015b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 13:11:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi6MDRhJ"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2caced6038eso11358305ad.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 13:26:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789675884; x=1790280684; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789676802; x=1790281602; darn=vger.kernel.org;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-type:content-transfer-encoding:mime-version:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=Pld+KJDf/y0brTSHAZfyNj7LwB26z/vcvvMjg82D16g=;
-        b=jEG1HNV1nB356xIIlFyTqdaGPUUh9EjM/3PMbUs+3AGI4ehoP6+sJVH1PhlKRJdi74
-         49iLVhT9tC9NObKt7CYqbEQamlyNxL8drgZcjYZ9wTLMuI4t48nW91cDfveXf0Si7vCw
-         54dSWTEmPbs9HqyhwNdcIeab67Tty0F+QyFDkFaySQpj76fSQNllBZtFFvlb1jacOCR2
-         FmpL9hmFxdFK867OkjHeAXKI83GK8UB4CV1xuosFIQTGXxVsJUsjkAlXWhAILWlyh4HL
-         lpFK8QRjRmw0sPKGRoO7Aa3cih6io/pYDi7ISzk1TEp/o6Wckao1szsQ3Um6dWzlqWkz
-         9vEA==
+        bh=cSGFqbf3XjQKoM9IeVQurnJH7q0lWkBYjjfyEjg57UQ=;
+        b=Yi6MDRhJ9LrvWVAkj858t/31R0nZadrF8vfYStOZG6VVyMneMCehw1cRw5T1Ukg2If
+         c6/LHD1Rt9lbG6IlNFhtXa69i8tWPEYRQxfT2z4DrU1AKEejkn9mlVbRUADkQno0ixiD
+         zHCMLkudWX7+7bM1IroDrKu9LWJlrr4tO7+P7xZDnVnfQwB+qJAl9oE5GLtk4RkaEK2P
+         dTn27ty04JD/u5DcpT0EE39WRj9GQG0QeRw008o8tJuL6aCMbJv9G8aai/sH0NZpO142
+         51QUNNOYC5rwN42gTi8hK8/HWiRsgmalboFahfbRy/h9m/EiDCVKWC6U6mjXdkEgkjET
+         vgIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789675884; x=1790280684;
+        d=1e100.net; s=20260707; t=1789676802; x=1790281602;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-type:content-transfer-encoding:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Pld+KJDf/y0brTSHAZfyNj7LwB26z/vcvvMjg82D16g=;
-        b=KOsW4wy4LyYFCQd49o1zBr8RN/ydpDs+TwBsEKf6FWsSyzbvTM28bidw/YqN4MdJRd
-         kupldP6ESevetN7F56irw3l1NJ/EJdLX42DWEIjQugcbkxxquJu6JJSfsb8mxNwlM/ZU
-         zNwOQoCDjv3jSG/JCfMfZP4JsH5zammXdKyY5Hf6d3qvK7EmIV3FN+YCSwhR4OXo9SeW
-         qUTdRprE3e8iRu91u3YCuquRqdNlSyUQiuSu9lzqRt6m/VEqabt/4HZ41zBbOVZsneDr
-         4H7kKcaAyT6QJfxP/JqUEsm4ZkhUBaJd53y2/1OiKAWnx2t8Qv60peFbXlIANeiXztqV
-         KzgQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwdqjX29xr42nJGK/0kb2oEkT79eE0xtJldOfFz5VP8oE1ff6LnzKyoQjyN2nim9c3gW5D3QTfeEVy8HNtz44s=@vger.kernel.org
-X-Gm-Message-State: AFuF++kBMwAYozvgIDnflnZTKfWE+zTmyNt/9lpN0ks8yPJHuxL/v6gR
-	eXEEsklfD0NZw7vbj4zI0usDdvKgbh2y0/GB0JzBFdaWnWm57Sf3im6d
-X-Gm-Gg: AYBFou2Lb9v4SM9uJ7yILeWJ8l1/61UrW5/dLs0m4diOge3to/u4N3eq6+r46JwKQGl
-	wmbT9MEohCTpI7ipI27pSnw0t6ffvLVmkHMwN6jYf1Y+Ma9j3tf06ZXdBYYEQyyyXwXl/o2+ve5
-	G3smZ6nniUYdqGMiZHIzyvPowD9ojDto0kWX5xcA+mWzSSeSjWyrVUeVfuoA7S1Ot94aUNTgxB/
-	NYs0oywlS/hWzufMsa5W83lV+We7WV0y/SSPn2k+N4/OTpLIiD9Fgq5F8i1HwjaWNk6dnnpRMQf
-	S49y28OsoyYY8xkQKtVYEfhsozoARR1owZdwO8/z6YkiMevG5ASiY67F7qhSMEspdKIh3uCP2nn
-	9IoCvwhCRN473/xqyU6h1pmuRpW9Nj8Rymonti8DOaXjsimr+NE6M0vpFzQjFfIv4JDGamzo5E4
-	yvrXx6q4EDVF4te2knJABp8acmS+oltkoL4+EshYmhkL8okzuFHo7BFSDi0Hgt+RyqzQMxrRc2M
-	Mjy43VaffzO0EO4JoDHQBA9wzw=
-X-Received: by 2002:a05:6a20:cfa2:b0:3dd:5831:ef58 with SMTP id adf61e73a8af0-3dd8c456190mr204908637.15.1789675883461;
-        Thu, 17 Sep 2026 13:11:23 -0700 (PDT)
+        bh=cSGFqbf3XjQKoM9IeVQurnJH7q0lWkBYjjfyEjg57UQ=;
+        b=urLat+Vz+ecew3rlhT9N4z9QJeGAWd2+94h6KkNpmbP0SclJrLrdOHLGIMLsCTc1j3
+         CQJrV7KC/wbwULiJnw9c134TBu1VpFF+dtHR7B9dS0OiMFcX7UKp2O5bByaBM6azT8KK
+         90AzJzDDsqFOLvJZT2HLg2nL8PvHdx9SS8je9ylL/GzB8tn5EUY1V+nPE5ZrUKel1LBX
+         hCyR9urQ9ICGyoMYkYQtFJGqCit4V+vRv0JJd1S0pcmV8PL1GUog56HDwiKLXq0dwFXB
+         /7bqk/KpOYS/ZwP6V5c6TFoPOY9ed9mmJ2zkM9ixjuugVDRnYEVXPrq1LWHfGJucmAD/
+         RvCw==
+X-Forwarded-Encrypted: i=1; AKwUvByk3UJGYu3Xb1vWB5aWG8O2bWsC7WTDkFXNOY4vnTMDOu313iYxmI00hBhwNToxpXu6N8OaipSSV+OC7mdjXd8=@vger.kernel.org
+X-Gm-Message-State: AFuF++m+X+zWkBJMb79y3Qsn2sl16XI4+T55b9DmbS/qpaLRrj2r+9NQ
+	TwOl5uPUl8jNOI2JUWtxHsGem4OUJUTChN3bULtdxn9mZRkH58kjwV54
+X-Gm-Gg: AYBFou0D4gd6FY4zcam/cionLZslzt4vjtgeo3wqlXegMHNpktr4HKEd8Yxjk0VfghI
+	1Jsj+1rzhqsPhZohjAzOLqNL4CKa73eA8qb3OhpNXXCR/sJ5qGPmrDI15nZg+8fjIW+OhHmpcEj
+	EOff+8z7d14U7rDDZDf03fXD1PQBxV/6W8zp26Hkk2yIzBS5ShVcSmbMl4LK4j36Iz+7yOq1y70
+	qiY4ToQKUsfBaCBjvDCpX8YTC0KBDt2ys+SziNPDErm1f+02cMNYvOtp7mgxwKHlPrEs+XsQhyE
+	OMWUleH3P/MD+x7z/BmmDZUwn9YhV4N/RNvBORbGTY0uYF5jVrfQAsxKyB9nZkp21KSmIjjCrir
+	EaETVsjs2f1bugEdvMvS7/yWQtob2cGNoSlSYqA11IMma0cvBJtGkuvki/bIJbsYRAfFOmYrLT+
+	dad2krzqd15NgwBhjwY4bs3r9I3py4jr6dv/az/XO1HeTCmkKyUiBc+La5Efvo7+gysROPVszI4
+	lkTM652W4lqST9VPrP3490tGcLQhDV/gY7Qwg==
+X-Received: by 2002:a17:903:1a4e:b0:2d8:d4d2:d13a with SMTP id d9443c01a7336-2dd9ca3f373mr62050225ad.22.1789676801756;
+        Thu, 17 Sep 2026 13:26:41 -0700 (PDT)
 Received: from localhost ([13.93.150.60])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14395d13ee7sm16211287c88.8.2026.09.17.13.11.19
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bf5a93f1fsm17829614eec.11.2026.09.17.13.26.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Sep 2026 13:11:22 -0700 (PDT)
+        Thu, 17 Sep 2026 13:26:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,59 +68,120 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 17 Sep 2026 20:11:18 +0000
-Message-Id: <DLHV5GF21AY4.3GAK241ZI2UR8@gmail.com>
-Cc: "David Ahern" <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Randy Dunlap" <rdunlap@infradead.org>,
- <netdev@vger.kernel.org>, "Arun Ajith S" <aajith@arista.com>, "Roopa
- Prabhu" <roopa@nvidia.com>, "Jaehee Park" <jhpark1013@gmail.com>, "Jonathan
- Corbet" <corbet@lwn.net>, "Shuah Khan" <skhan@linuxfoundation.org>, "Shuah
- Khan" <shuah@kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- "Alexander Aring" <alex.aring@gmail.com>, <linux-wpan@vger.kernel.org>,
- <linux-bluetooth@vger.kernel.org>
+Date: Thu, 17 Sep 2026 20:26:39 +0000
+Message-Id: <DLHVH7E0GSI7.EEUHJ5ZOUYIM@gmail.com>
+Cc: <dsahern@kernel.org>, <idosch@nvidia.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <horms@kernel.org>, <rdunlap@infradead.org>, <netdev@vger.kernel.org>,
+ <aajith@arista.com>, <roopa@nvidia.com>, <jhpark1013@gmail.com>,
+ <corbet@lwn.net>, <skhan@linuxfoundation.org>, <shuah@kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <alex.aring@gmail.com>,
+ <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 Subject: Re: [PATCH net-next v2 1/2] ipv6: update NUD_FAILED neighbors from
  NA messages
 From: "Lawrence Lee" <lfqlee314@gmail.com>
-To: "Ido Schimmel" <idosch@nvidia.com>
+To: <netdev-bot+sashiko@kernel.org>
 X-Mailer: aerc 0.17.0
-References: <cover.1789448374.git.lfqlee314@gmail.com>
- <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com> <20260916120202.GA935660@shredder> <DLGXDIB879EO.IDZNAIRY0VFJ@gmail.com> <20260917143750.GA1332286@shredder>
-In-Reply-To: <20260917143750.GA1332286@shredder>
+References: <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com> <178966456087.22033.11671220306303617581@kernel.org>
+In-Reply-To: <178966456087.22033.11671220306303617581@kernel.org>
 
-On Thu Sep 17, 2026 at 2:37 PM UTC, Ido Schimmel wrote:
-> On Wed, Sep 16, 2026 at 05:43:11PM +0000, Lawrence Lee wrote:
-> > I added the lowpan changes after my local Sashiko review run=20
-> > identified an issue where a FAILED neighbor can retain an outdated=20
-> > private short address if it's moved to STALE by a non-override NA.=20
-> > Happy to drop all lowpan-related changes or update comments/commit=20
-> > message to reflect the changes, please let me know your preference.
->
-> And if the entry is INCOMPLETE and we get a non-override NA?
-> lowpan_ndisc_update() will ignore it. It's a pre-existing issue and
-> there is a TODO comment about this:
->
-> "/* react on overrides only. TODO check if this is really right. */"
->
-> You can mention that it's a pre-existing issue under the '---'. That
-> way, hopefully, Sashiko will not flag it and it won't clutter the git
-> log.
->
-> > This was added in response to another Sashiko local review finding. =20
-> > Let's say we have some FAILED neighbor T with NTF_ROUTER set. If we=20
-> > get an NA from source address S with target address T and with the=20
-> > Router bit clear, existing kernel code will cleanup routes with=20
-> > gateway S, but IMO we should clean routes with gateway T instead=20
-> > since that is the neighbor which was updated by the NA. I can either=20
-> > update comments/commit message to reflect this or remove the change=20
-> > entirely, please let me know your preference.
->
-> And if the neighbour was in a different state than FAILED? It seems like
-> another pre-existing issue. I guess that in practice, most of the time,
-> the source address of the NA is also the target address in the payload.
-> You can mention this under the '---'.
+On Thu Sep 17, 2026 at 5:02 PM UTC,  wrote:
 
-I will remove both of these changes, add comments below the '---' as=20
-suggested, and resubmit.
+> > diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> > index 90cd5d8525698..84d70c09205a2 100644
+> > --- a/net/ipv6/ndisc.c
+> > +++ b/net/ipv6/ndisc.c
+>
+> [ ... ]
+>
+> > @@ -972,14 +982,18 @@ static enum skb_drop_reason ndisc_recv_ns(struct =
+sk_buff *skb)
+> > =20
+> >  static int accept_untracked_na(struct inet6_dev *idev, struct in6_addr=
+ *saddr)
+> >  {
+> > +    /* For any given neighbor IP address, consider it an untracked nei=
+ghbor if
+> > +     * it is absent from the neighbor cache or if it has a NUD_FAILED =
+entry in
+> > +     * the neighbor cache
+> > +     */
+>         ^^^^
+>
+> [Severity: Low]
+> This isn't a bug, but this comment block in accept_untracked_na() is
+> indented with spaces while the switch statement right below it uses tabs,
+> so checkpatch reports "ERROR: code indent should use tabs where possible"=
+.
+>
+> The comment also describes what the caller considers "untracked", based o=
+n
+> the neighbour cache, but accept_untracked_na() only reads the sysctl valu=
+e
+> and never sees the neighbour entry. Would it fit better next to
+>
+> 	neigh_untracked =3D !neigh || neigh_failed;
+>
+> in ndisc_recv_na(), where the RFC 9131 decision table already documents t=
+he
+> same concept?
+This comment will be removed as per maintainer feedback.
+
+
+> [Severity: Low]
+> Is the new FAILED handling covered by an in-tree test at this point in th=
+e
+> series? As of this commit, ndisc_unsolicited_na_test.sh and
+> arp_ndisc_untracked_subnets.sh only seed absent entries, so the whole
+> FAILED to STALE half of the knob, including the mode 2 same-subnet
+> qualification, would still pass if it were broken.
+>
+> For the record, this looks resolved later in the same series: the follow-=
+up
+> patch "selftests: net: test untracked NA recovery of FAILED neighbors"
+> (7be3b5fcfd3f9adb7489aff8013c6d4beacbf20c) seeds entries with
+>
+> 	ip neigh replace ... nud failed extern_learn
+>
+> and adds the failed combinations covering every row of the new table,
+> including the in-prefix and out-of-prefix mode 2 cases. Mentioning it her=
+e
+> only for completeness.
+>
+The tests are added in the next patch of this series
+
+> [Severity: Medium]
+> Why does the gateway address handed to rt6_clean_tohost() now depend on t=
+he
+> previous NUD state of the entry? Before this patch the same "router to
+> host" event always flushed routes keyed by saddr.
+>
+> fib6_clean_tohost() in net/ipv6/route.c matches the argument against the
+> gateway of RA-installed routes and against cached exceptions:
+>
+> 	if (((rt->fib6_flags & RTF_RA_ROUTER) =3D=3D RTF_RA_ROUTER) &&
+> 	    nh->fib_nh_gw_family && ipv6_addr_equal(gateway, &nh->fib_nh_gw6))
+> 		return -1;
+>
+> so it expects the address of the node that stopped being a router, which =
+is
+> unrelated to whether the cache entry happened to be in NUD_FAILED.
+>
+> When saddr differs from msg->target, and that is allowed since RFC 4861 4=
+.4
+> only requires the NA source to be an address of the sending interface (a
+> router advertising a global target from its link-local source, or the pro=
+xy
+> NA case handled a few lines above via pneigh_lookup()), the FAILED recove=
+ry
+> path flushes routes keyed by msg->target while every other path flushes
+> routes keyed by saddr. Can both be right for the identical event?
+>
+> If saddr was the wrong key all along, would it make sense to fix that
+> separately for all cases, with a Fixes: tag, rather than changing it only
+> for the FAILED path? The changelog describes only the FAILED to STALE
+> transition and does not mention this change of key.
+This change will be removed in the next version of the series as=20
+discussed in another thread:=20
+https://lore.kernel.org/all/DLHV5GF21AY4.3GAK241ZI2UR8@gmail.com/
