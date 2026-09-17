@@ -1,170 +1,103 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f13.google.com (mail-oi2-f13.google.com [74.125.231.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9303F1AAD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 05:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A229239E80
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 06:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789622506; cv=none; b=DWW9SgBvXQotWpWp3cAA45hMWCYDFHTXRoNlaLu1FXQab92QnhvpamMPztjqTviwgD5/qkxdQrtFIhSGJNQ8Z731VxhvlwzIGW9ZOhk0Ev0+jYwOKkO53oEFnjPHGGQyul7GoQ0zPoDnhlCMtshaqFs9UO7au0iRZfZerVdXlus=
+	t=1789627409; cv=none; b=eiecj13/RvFeWXHlhHn3Nxl6flpx1vJRE7BedG4gMbebnMKgP/m4MCAFLzVXx29SBr5mKLLDv+lQjAqXcjnKt8K4XmIKQEIfuF16mWxwb5tt+eFgXCCoxQ5qMK/mI7ybzBQx4fuUTLbadAmUJwbycsmqSf+x/ucl102iIy+TZTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789622506; c=relaxed/simple;
-	bh=tHQnlaNnIhflWs6DGeQyyNsrKir/ABIuh2HIQiTNH1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OZpcEg+KDi+RCRTjrM0H7yS8YOk0y65/PTFpTNh7iXLY5HA1qxObjeZstGffsLWuO9L659GeWFAXbLmr3HrS1JCpBr6RMGh7RBm27KloErcGH1VhHD29e7c9acBknCuhZ1HYoq2Fmd/0vG1ALFfkLlOwRskNXC16if/IIb3aVTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; dkim=pass (2048-bit key) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.b=EP2sEfnm; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+	s=arc-20240116; t=1789627409; c=relaxed/simple;
+	bh=L93RkV+OkOmlIJgeYm8hClHkkW+7T1nbLdPCRvj+2ss=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject; b=VXb1EkHpj5rxUfyE1EkeS3iuijjQfJ4SrevbTadYJkcHRyRGBQhFPphGSrZAsYe4CBNTH7oaOYYfgPO54YGMS0nhYRAONJugR2U2houxi+4dhGCD23iSjG3N2qk2lwKjTV42rw1H+OpCtWj8j4tYHDWmfP+KunOxDhB9FEN103U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hVwTt5+q; arc=none smtp.client-ip=74.125.231.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.b="EP2sEfnm"
-Received: from [192.168.2.217] (p5dc55dbb.dip0.t-ipconnect.de [93.197.93.187])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2C2714C442F90F;
-	Thu, 17 Sep 2026 07:21:19 +0200 (CEST)
-Message-ID: <2547d76b-98a9-4fc4-b240-d8cfb25cbffe@molgen.mpg.de>
-Date: Thu, 17 Sep 2026 07:21:15 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVwTt5+q"
+Received: by mail-oi2-f13.google.com with SMTP id 5614622812f47-4b37dcfe9b2so192204b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2026 23:43:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789627406; x=1790232206; darn=vger.kernel.org;
+        h=reply-to:subject:to:from:mime-version:content-type:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=wyyJnAkN6dHHatypLoeDne83x7EBu/2wzO8Zvr3Btdc=;
+        b=hVwTt5+qvUQTo6nXMCYO1xbh8gVXH2RJohTIFRgebUXvDxannd1P9TG7MJ4W9hMC/A
+         64sgDVytyzXsZrI9buW7FH3/tMtV8QsjQN8E9DHvrLFK21X/7ihiaJcGAXsbHwjP6wV2
+         z9VAuHN/+FKmj2XwBr0z6b++IkqAompNtO+sGNdo3enI27yP8V49qQRrvWW3/w1caZNE
+         uges2assELWRrCwk8f5nkOYK3iCp2c+1HsQQCpRUAV3jsLcP9NEy3dFVbSbjNOR4Li8P
+         T3fbb9alF/UolltpY3iq2XGyLURwZ5LAdOEfR56/nIRxppCN4ZOE81l3PLnEhcFE2z33
+         vtDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789627406; x=1790232206;
+        h=reply-to:subject:to:from:mime-version:content-type:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wyyJnAkN6dHHatypLoeDne83x7EBu/2wzO8Zvr3Btdc=;
+        b=v1Mk5WjYJUq7j3JMuVS2YmWj9NRnVzlffiG8maBAdYxw2ehNWpdUNkNy2UaPQZAE9o
+         FUQcU37jsVxRuGCvh7icrMo4+YFZrKecZg4yfxB5QiDXjRa6nJRC00JbowmNOmBRI60S
+         ZeDd4LjzQajkPdTea5eE/D3q5XgNbdVxMFzaHxteuDBSLcHccoT4eOZMsn388LeKbpMH
+         vRjNT2RwR3uW++QYMnJRSpV7EfpEobv7kIqcU9Dn0cLp5auFErJME8S4ZUC4SA4qRK+l
+         yiODVYABHDKvEQd/YIOK4tHrbWiCvNMOhMgrlVo1vqAaS1my6cGfAAAvUBjsyMrVbPcr
+         Vqkg==
+X-Gm-Message-State: AFuF++mm+ir7KiRtQ8NzlRG5Ys+kopslFVe7qmd4lSOxL0C7gd/1aIjb
+	lZLGY1U/y6eZyB3YZuTDI1PadJWF97WS2q2nRuCDNqJ7IoQZ/7ZwQvAXPeXMKw==
+X-Gm-Gg: AYBFou1o+d/QIa0KqEvVVxTXZuw9/mRZbvl58E8JiyBLXAxaSm9cXG2ff0nUjIlihp3
+	Y5pl1aHeSVRAAuGTanop6kXCB4ZYTT5IRuKCUBpaS4wBQeFc1MDF/msCj+hVhUWz+p1A28VPrzt
+	dsLgOXKkREPqKUU468jF/B/H7n4pVRp4tTVxv2FXstDis47lFHlOZtBKcLkMD1in7EmHpQhKEMz
+	lmeYwa+j17xfHbeUENHqLkcTVB8frbIiePtdmFnvdrKkd8YVusXf3v6Qib48VRhrbQ+AyZW/x70
+	GZL6xsr4Vvs80Gsui2zSZPMTLCHdMEFqQN97CJe6sxEK/zDOK4hTS+9RHciOKYTXz8v7HTuTIVE
+	5SvTNO2uCsotuam+9LyNvQvsLh2bKMXpgr/XwpD3LNWVQ64s02U++QJTZenzlDkqSS4f3kBCXTt
+	i0eLXK495Dbdm+1wPHYY4tB37bzvN7L7eZ2Wjrjnoc7cgi4FcJSeCmPNGEsJMgbNkZc+UIdsVKU
+	H5l0w==
+X-Received: by 2002:a05:6808:5183:b0:4c4:5f5b:6933 with SMTP id 5614622812f47-4ca468760e2mr9551350b6e.0.1789627406005;
+        Wed, 16 Sep 2026 23:43:26 -0700 (PDT)
+Received: from [172.17.0.2] ([158.23.19.148])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-80c46199e96sm1941649a34.6.2026.09.16.23.43.25
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Sep 2026 23:43:25 -0700 (PDT)
+Message-ID: <6aab8c0d.dbb9105a.6a28.9441@mx.google.com>
+Date: Wed, 16 Sep 2026 23:43:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8194515108489031206=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btintel: read ROM debug registers on FW
- download failure
-To: Ravindra <ravindra@intel.com>
-Cc: chethan.tumkur.narayan@intel.com, kiran.k@intel.com,
- linux-bluetooth@vger.kernel.org
-References: <20260917040853.2719484-1-ravindra@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260917040853.2719484-1-ravindra@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=molgen.mpg.de; s=20260906; 
-	t=1789622479; 
-	h=from:from:subject:date:message-id:mime-version:content-type:content-transfer-encoding; 
-	bh=dCNt0cdvWdec6J0Phqn1KHiLOxlK4X5WgIgq85W/c6o=; 
-	b=EP2sEfnmCd+E72HYy9BTLZktTYdUknvPnIHxLDlvcYfEPCOMVGN2e7RiBhhYkV+1ecEFsHxy/BiN
-	dwp2F/AxFMGWX0qFzdU8jqzzjidk6fKuYGNy2FRjZ8ZffgnjYR7outgM9b2sMc2FWpc1y3qCyuC+1b
-	EoKkocOd7rHcNtyoQxN2iDWPyiBKro9uS8c8P/4QdY80ghqHWyuIthhCBVhy7JYOpXIOmJS43nP5Pu
-	hapqF1AHv3DUpkkWTjspK8GKDbrYopYB2Q+u+Ys7VqZW+P4S6B+CJixBNSnWugGK6sc+QcatiWKHA3
-	PG6vuEyf7L4zZ0POnpWDlkw9fC1SkJ6A==
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ] Pull Request #2470 was closed: device: correct bdaddr_type when the LE bearer already exists
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Ravindra,
+--===============8194515108489031206==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is an automated email and please do not reply to this email.
 
-Thank you for your patch.
+The following pull request was open for more than 2 weeks in the BlueZ
+Github repository and it was closed automatically without taking any action.
 
-Am 17.09.26 um 06:08 schrieb Ravindra:
-> The bootloader records init sequence progress and debug information in
-> four core debug registers, which helps debugging FW download failures.
-> 
-> Add btintel_get_rom_debug_info() to issue the vendor-specific HCI
-> command BTINTEL_GET_ROM_DEBUG_INFO (0xfcde) and log these registers, and
-> invoke it from the error path in btintel_prepare_fw_download_tlv()
-> before resetting to the bootloader.
+   Pull Request: #2470
+   Title:        device: correct bdaddr_type when the LE bearer already exists
+   Submitter:    monperrus
+   Created:      2026-09-02 05:28:11+00:00
+   URL:          https://github.com/bluez/bluez/pull/2470
 
-Please paste an example to the commit message.
+Note that the BlueZ repo in Github is only for CI and testing purposes and
+it doesn't accept any pull request. The patches should be sent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) for review.
 
-> Signed-off-by: Ravindra <ravindra@intel.com>
-> ---
->   drivers/bluetooth/btintel.c | 40 +++++++++++++++++++++++++++++++++++++
->   drivers/bluetooth/btintel.h |  9 +++++++++
->   2 files changed, 49 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 964d2de30e65..15366a6b54c6 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -963,6 +963,43 @@ int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param)
->   }
->   EXPORT_SYMBOL_GPL(btintel_send_intel_reset);
->   
-> +static void btintel_get_rom_debug_info(struct hci_dev *hdev)
-> +{
-> +	struct btintel_rp_get_rom_debug_info *rom_debug_info;
-> +	struct sk_buff *skb;
-> +
-> +	skb = __hci_cmd_sync(hdev, BTINTEL_GET_ROM_DEBUG_INFO, 0, NULL,
-> +			     HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Failed to send intel get rom debug info command (%ld)",
-> +			   PTR_ERR(skb));
-> +		return;
-> +	}
-> +
-> +	if (skb->len != sizeof(*rom_debug_info)) {
-> +		bt_dev_err(hdev, "Intel get rom debug info command parameters size mismatch");
+If the change should still be considered, it must be resent as a patch to
+the Linux Bluetooth mailing list (linux-bluetooth@vger.kernel.org). Closing
+the pull request doesn't submit anything on the submitter's behalf and no
+further action is taken on it.
 
-Please add both sizes to the log message.
+---
+Regards,
+Linux Bluetooth
 
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
-> +	rom_debug_info = (struct btintel_rp_get_rom_debug_info *)skb->data;
-> +
-> +	if (rom_debug_info->status) {
-> +		bt_dev_err(hdev, "Intel get rom debug info command failed (%02x)",
-> +			   rom_debug_info->status);
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
-> +	bt_dev_info(hdev, "Intel get rom debug info: dr0:0x%08x dr1:0x%08x dr2:0x%08x dr3:0x%08x",
-> +		    le32_to_cpu(rom_debug_info->debug_reg0),
-> +		    le32_to_cpu(rom_debug_info->debug_reg1),
-> +		    le32_to_cpu(rom_debug_info->debug_reg2),
-> +		    le32_to_cpu(rom_debug_info->debug_reg3));
-> +
-> +	kfree_skb(skb);
-> +}
-> +
->   int btintel_read_boot_params(struct hci_dev *hdev,
->   			     struct intel_boot_params *params)
->   {
-> @@ -2465,6 +2502,9 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
->   			goto done;
->   		}
->   
-> +		/* FW download failed, hence collecting rom debug info */
-
-Use imperative mood: collecting → collect
-
-> +		btintel_get_rom_debug_info(hdev);
-> +
->   		/* When FW download fails, send Intel Reset to retry
->   		 * FW download.
->   		 */
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index c00f793d9dc8..dedda3e77487 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -178,6 +178,15 @@ struct hci_ppag_enable_cmd {
->   	__le32	ppag_enable_flags;
->   } __packed;
->   
-> +#define BTINTEL_GET_ROM_DEBUG_INFO	0xFCDE
-> +struct btintel_rp_get_rom_debug_info {
-> +	__u8	status;
-> +	__le32	debug_reg0;
-> +	__le32	debug_reg1;
-> +	__le32	debug_reg2;
-> +	__le32	debug_reg3;
-> +} __packed;
-> +
->   #define INTEL_TLV_TYPE_ID		0x01
->   
->   #define INTEL_TLV_SYSTEM_EXCEPTION	0x00
-
-With my comments addressed, feel free to add:
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+--===============8194515108489031206==--
