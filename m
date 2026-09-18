@@ -1,154 +1,101 @@
-Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA12C4CCDC7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 10:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FE14DA9B0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 10:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789728496; cv=none; b=tX9hjR+03MiD5VTXyucaW5v9vjWmVJLoMMA9om2wTGaMsuY7Cq5Q3ZgQdNAYMgpmwD3toeo7v1+O/WxQmlL0vt8pZUsU2y9qDG+yfN2sWH2YzfTD0RVoA56bwPx92QUX1gnVsIEreAcWzleylDu+mJmngwG8hJMBg56sGSu5xL4=
+	t=1789728804; cv=none; b=K2dIB74t1N+tv0j+QD2K+vCTm41DY9mrcgJXbefxrD3TJ3Ztqo9VhSPwVcBCsgEyS+exvcum6vocX0dSQFkbVc1uOf0AMS4EjIGw2Glhl92xFgxuNMF4yUXQOV8IHzZ+BHVF4nJ4WLSu67msy//ZZk4L9jserOPoav1aw6FLrYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789728496; c=relaxed/simple;
-	bh=GUoNXGoRu/YXogOq9X/rgu4d8MQqhVuvIq9UPe1IZDw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nSpcLnIzbWOnivs/Bw2yZdLmBiqBVOD7D0ox2hviMmss2NzLPpbTGwoejai5V8qKTe/sQqoPtyhTb3jq+E+fpNNSjS09L30Y7Ohwilne0N/DkiEaWr16PQ7429I6HTlfRb+uwA2ONZfG3XXmU7drfra9xnLPrXFmGHCCTbIwhoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ue0vSpnM; arc=none smtp.client-ip=74.125.227.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789728804; c=relaxed/simple;
+	bh=sUIo4J9sgY/l2QXvdaw/TJQA4BnLcsVhc0Di39akJtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=SesHiQqnZR8ooaNolZmMpP1UaK34jlbwNDbHCEIWa4BxjW4anszydyvNrd9yTOBa0YQfQMk7KeDC5mK0HyseJ1c8uDw8pqEia60NsLshvDqyr9Nw4c3YGtFPwAITZp0adUw4cr/F4LRWcssxpdSEkhm00B+bf0fhKGn7BCWAlAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kZmDi5j/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=i4wBzwzz; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ue0vSpnM"
-Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-39b350c6920so505129a91.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 03:48:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789728494; x=1790333294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JwK7hDaTxVvRj/kN5UmwJrv3y8N+AsYHVz6dYPsaA6Y=;
-        b=Ue0vSpnM/eNgywHjWRcnJb8fS+J5eC9h1EOhCvMjPxddPdbeWVGmXAqNad7ILHi0OY
-         vrJEbN1IhwYsZD4NoCxj0eNmbQZyAeZliuXFlRIVyeww+gCJRe8/5azssph+J7yW3HE+
-         8dyGVdmtWw/zXm97VcOEk8aXwVlULlhngeEmOjJu7lOBb/JjJD7pksM5h5NwkQsH64o1
-         gIRAyPDNbeoj5rz3scRaMkEd+jGqX8IYUF38D6LrYqrsvaE5sEBrCSY10TKs+u5ACsAc
-         BQLnY/OEi/P6FV/I5ZMSEhPQP248kLK6sZatbwdwFDkbx88robT/12X0N8exJ1l4pslE
-         Swwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789728494; x=1790333294;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=JwK7hDaTxVvRj/kN5UmwJrv3y8N+AsYHVz6dYPsaA6Y=;
-        b=WCfBdVUzsqf6XBSZKEl6KYmHma0GpXyJvxH4wsABpYytQqDlgbKFYM5PM0noFDHXE0
-         4MQyN2+8lTN2kQKboH0It6mktnwK9E1iRm3K6meMRD3SeM89TAVTubLdQtV5m3CPjq2x
-         lNoGoZp+Zk87fqmuaEPf93iwg6mXrU22p6LshPPXaa8DE07Wo5oZ9J2SiSfPBZrhWlxb
-         R3P+8pRC2p05U/55Lo/PWdcIpRkp+utfqlD3VeVjb7NzNdt4PjMHZKSQW3KJN6CjEBZp
-         qhPNbAyuEHtSSV+aopUEAZUb1BrHiMg44siDiQWuPJzpFd8U7wVISsUis/UaUzMbKf6K
-         dQrw==
-X-Gm-Message-State: AFuF++mhxsa7d9QlZpzO+82uUWyw2gXLQF8zUCEcH1lqHCxke8d9fTHP
-	niBM52MhVDXxDav3iOz0nHQRcqpTBv0qM82MOzfwp8RIoaNwZMpIFnsyP7UFVA==
-X-Gm-Gg: AYBFou304rYc5o//U4AQT5tlqfVTm3VbHKD34lP7x6fXY0iar9qg5gETrxoA1s+em+O
-	OVFCmrLjzX2gmIVQPQu7NnXGFiZwxGxLaALcP3UxbKJlZwfK+3IWs1J0ObbCw9ubARB1zeO+8Xl
-	G923JY21d2QOxMkpIgEzycaBdYZEMNL77nkMyY31jAxxkNdSYlSvXPh0iDOwhZuqqO1Z1lgJK6m
-	EWn3xdltVAGtuc5NY8V7fzlYrv8pmXkkaFsrMm02Cn6CedJstW4aLhZl0f/0s+S9/Jc7R26srG9
-	0p013g9P+RS+6iUUO/Cuo+Byz5W4yVECS7hI5w0O5qM5mPdUmfscFpldhCBNVvh90NhbJ5b4X4e
-	bwd3wlV9qcZjeRCqhT0VdNa+uRDBG2pj2sHiAqZ4PSwHU22qFtoETtAU8Ulj0atC6XzKl7TK4MU
-	GZtSD6bDICBFAn5nGsTs5R8nTF5Qxd+x1MlignzLpkiHiAt3MXdGEFAspguNqtJ+BO7npaVLG9v
-	blZBD9aRWp28SoAavFUy/eK0pZkiF8f
-X-Received: by 2002:a17:90b:2d8a:b0:39e:2e79:7ce7 with SMTP id 98e67ed59e1d1-39e54d38b59mr5317868a91.6.1789728493789;
-        Fri, 18 Sep 2026 03:48:13 -0700 (PDT)
-Received: from thangnn-Dell.vingroup.local ([202.60.105.126])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e5a50d332sm2659573a91.9.2026.09.18.03.48.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 03:48:13 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kZmDi5j/";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i4wBzwzz"
+Date: Fri, 18 Sep 2026 12:53:18 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1789728799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=17bunrb+PPPmbHmf8iUWt0t3E5kLCszSkie89gk4y38=;
+	b=kZmDi5j/ReEnY+Zf053inN/ZWuGtA6cEEhG5gEdU1ghBpguHScj3p/fopNFtUtHcrlrPvZ
+	r1WKUwZWO8PXVuTd/8X7RJi45zemXN0U5VamjDhYKCnzqURHmGVc8Tpl45fWoPEVhgikYp
+	BgwI+hLd2difTty/gpdm8TUpbn4LtGpipuJ/xpcV6F14qURSFmjWiEZokJoVc7c44i1oK2
+	+lu6fz83Ebxb7/95KnEEADULVqIBGsMuk/qydf6z8RsaglNCkCvKEllfuFoyLkPq4jJSfi
+	Jo0PR1YknXI7aKnDcGBv42V/hITZQ1arDiSI5577fXjHuR8d1mgLRKrh4yFERg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1789728799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=17bunrb+PPPmbHmf8iUWt0t3E5kLCszSkie89gk4y38=;
+	b=i4wBzwzzZ1lRvRDBJe04Qp5KmmoCZALM5m5xrzkpe7J4OAQ2GKrXOYsDqElF6ADPCho+ZK
+	AFB3t5Ouy9Tr9YDA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Subject: [PATCH v3] Bluetooth: af_bluetooth: Fix double list_del and UAF in accept_q
-Date: Fri, 18 Sep 2026 17:47:36 +0700
-Message-ID: <20260918104736.958613-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Remove %pK formatting
+Message-ID: <20260918105318.PdvCbvuJ@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-bt_sk(sk)->parent is a raw pointer with no refcount backing it, so a
-child sitting in the listening socket's accept_q can outlive it. When
-the child's channel is torn down independently (e.g. hci_error_reset()
--> l2cap_conn_del() -> l2cap_sock_teardown_cb()), bt_accept_unlink()
-dereferences the freed parent, corrupting its accept_q_lock and list.
+Commit 71338aa7d050c ("net: convert %p usage to %pK") which is from
+2011 and changed the %p annotation for pointer to %pK. Back then the
+default behaviour for %p was to print the pointer. The %pK modifier was
+introduced to able to control the behaviour of specific pointer values
+without changing the behaviour of %p for everyone. It was dedicated to
+avoid leaking pointers via /proc.
+With the introduction of bt_procfs_init(), bluetooth followed this %pK
+semantic.
 
-Additionally, if multiple threads concurrently tear down the child
-socket, bt_accept_unlink() can be called multiple times. Without
-checking if the socket is still in the list, the second thread will
-perform a double list_del_init(), causing list_del corruption (kernel BUG).
+Things changed over time. Since printing the pointer did not add any
+value, networking prints now 0 instead of the socket pointer.
 
-Fix this by:
-1. Taking a reference on parent in bt_accept_enqueue() and dropping it
-   only when actually unlinked in bt_accept_unlink().
-2. Checking !list_empty(&bt_sk(sk)->accept_q) inside the accept_q_lock
-   to prevent double unlinking.
-3. Moving sock_put() outside of the spinlock to avoid sleeping in an
-   atomic context.
+Replace %pK with 0 value, update the header line to match column names.
 
-Reported-by: syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=534002670dd34a114fdc
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/bluetooth/af_bluetooth.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+
+The relevant net commit is 7c0ec6288b497 ("net: Replace %pK output with
+0") which is net-next.
+
+ net/bluetooth/af_bluetooth.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 411d66f24393..7797b1052808 100644
+index 411d66f24393d..8dc06fc1811ec 100644
 --- a/net/bluetooth/af_bluetooth.c
 +++ b/net/bluetooth/af_bluetooth.c
-@@ -224,6 +224,10 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- 	else
- 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+@@ -846,7 +846,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 	struct bt_sock_list *l = pde_data(file_inode(seq->file));
  
-+	/* Hold a reference on parent so it cannot be freed while sk keeps
-+	 * a raw pointer to it via bt_sk(sk)->parent.
-+	 */
-+	sock_hold(parent);
- 	bt_sk(sk)->parent = parent;
+ 	if (v == SEQ_START_TOKEN) {
+-		seq_puts(seq, "sk               RefCnt Rmem   Wmem   User   Inode  Parent");
++		seq_puts(seq, "sk  RefCnt Rmem   Wmem   User   Inode  Parent");
  
- 	spin_lock_bh(&par->accept_q_lock);
-@@ -257,15 +261,24 @@ EXPORT_SYMBOL(bt_accept_enqueue);
- void bt_accept_unlink(struct sock *sk)
- {
- 	struct sock *parent = bt_sk(sk)->parent;
-+	bool unlinked = false;
+ 		if (l->custom_seq_show) {
+ 			seq_putc(seq, ' ');
+@@ -859,8 +859,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 		struct bt_sock *bt = bt_sk(sk);
  
--	BT_DBG("sk %p state %d", sk, sk->sk_state);
-+	if (!parent)
-+		return;
- 
- 	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
--	list_del_init(&bt_sk(sk)->accept_q);
--	sk_acceptq_removed(parent);
-+	if (!list_empty(&bt_sk(sk)->accept_q)) {
-+		list_del_init(&bt_sk(sk)->accept_q);
-+		sk_acceptq_removed(parent);
-+		unlinked = true;
-+	}
- 	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
--	bt_sk(sk)->parent = NULL;
--	sock_put(sk);
-+
-+	if (unlinked) {
-+		bt_sk(sk)->parent = NULL;
-+		sock_put(parent);
-+		sock_put(sk);
-+	}
- }
- EXPORT_SYMBOL(bt_accept_unlink);
- 
+ 		seq_printf(seq,
+-			   "%pK %-6d %-6u %-6u %-6u %-6llu %-6llu",
+-			   sk,
++			   " 0  %-6d %-6u %-6u %-6u %-6llu %-6llu",
+ 			   refcount_read(&sk->sk_refcnt),
+ 			   sk_rmem_alloc_get(sk),
+ 			   sk_wmem_alloc_get(sk),
 -- 
-2.43.0
+2.55.0
 
