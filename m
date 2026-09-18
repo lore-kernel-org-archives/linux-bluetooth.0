@@ -1,174 +1,144 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi2-f12.google.com (mail-oi2-f12.google.com [74.125.231.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CF95C613
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 06:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C629825783C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 06:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789711273; cv=none; b=o61AWGWZ842aKBdWueHbpjiKNzOla3F1URFHryyRvy2W/LZsAq0GFOtDLR56T/iA+eCnTry0qgwFqXo8/1tTVjjljlOVJIyQjY5BzTPdnNKd1SwrC61yA7ZTFbx+1V/x0GoRdeR/LLrySxwKLXQkxtbFjhiyXSomzHSzdlXItuQ=
+	t=1789711755; cv=none; b=LqUksUVPXAkA+VozJGhIrFGNlmQa/hbiYkkxBdp+shFKsi7Bfe1uCm5JVWl97D8Mgrn8h2+Y6XS4HJPEzmnrHQWMqWOJbI/kPpwhRk0Yhlc47DEI7Dk2OfIhHS+1zADLpswoQ7tWQy0TCq0NhswmnNoUNplVR6rot5i6jig0XBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789711273; c=relaxed/simple;
-	bh=L1hyg7PvBcrXGVvoJZhZ3USMgc8rFLrkKrlawhh4E0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t1AkaTvwHNz5vrKtDE/PehlsQ42bKXMhCaVO/O+cl5EyWBZGD706mW0xZWw1RpVl4KYEQRFRab0hYsI5y1rB9b2jI9GXpEtPCaQleDWhj7QcFxCQm3OoHa3jz60xhyH6Ww4ThzicLCQCfaT7S2hGv1v62iMY4JbSjpW7JpcZgAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mauv18sn; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789711755; c=relaxed/simple;
+	bh=zcT+swDnJpb3D39psUf0Qe9afSEhYqd4OSOoxiTPv0E=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bnzdQFS/owmYR2WBXTYecWCWdCuHf09e/8yfz0W7Yw/iqzN9reJRBUtzRmP/IjHHyx+GcEG+5ChbQ8Vqya3ZgOXEOgcqo/zdWU1HFHuNm1sO53J57d+cS002ME968XjHXIOEAktP6YYzweWnrsN/ttqdna47dcnXLZb5X0SMrlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3JjzLyv; arc=none smtp.client-ip=74.125.231.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mauv18sn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789711272; x=1821247272;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=L1hyg7PvBcrXGVvoJZhZ3USMgc8rFLrkKrlawhh4E0Y=;
-  b=mauv18snAXW0KtOq8pGszZCesYRQ7BS8ZsAcwFS7mMqMobujjTcAW6S8
-   sZ3EVXa+UVX1U0VJ2MNhnIjOBZOVyLOG0s3Ch0JzDYld4eN8B93dhxEXZ
-   0b4OsOAY4qWqYFt01FsMtp47luvgxav/38EF3qom/YhSRqUy67cQgUZ+T
-   udTMuaV66jxbB/zKLY4gBC4hD8DGrTXv0bLO7mmLmvLxPUPFNJuIdZ5vQ
-   yghYkDuNXAi0WFakKIWS+zIlEcHrIX2k2eWobK6nxsy2yWvJ13pzHoQYz
-   trZG1yittLpMAqwGBpMYPwF/mzY+mZfRcESQKIuoMwjYhuXKLZN1Ueg6p
-   A==;
-X-CSE-ConnectionGUID: d6Wjp/9FQC+pZHHxJWMaDQ==
-X-CSE-MsgGUID: TUX/dWwWS7CcfbmfFu0Lbw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="90327162"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="90327162"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2026 23:01:08 -0700
-X-CSE-ConnectionGUID: AEEzu3CDQ8aFv5Eqyi+AUQ==
-X-CSE-MsgGUID: qIY3O+HmTXq2tykkp8rYvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="2411835"
-Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
-  by fmviesa012.fm.intel.com with ESMTP; 17 Sep 2026 23:01:07 -0700
-From: Ravindra <ravindra@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	Ravindra <ravindra@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v2] Bluetooth: btintel: read ROM debug registers on FW download failure
-Date: Fri, 18 Sep 2026 11:33:36 +0530
-Message-ID: <20260918060336.2740434-1-ravindra@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3JjzLyv"
+Received: by mail-oi2-f12.google.com with SMTP id 46e09a7af769-7f4f0d37f94so192854a34.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2026 23:09:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789711752; x=1790316552; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=il6DPxbYBRmLPiIwxy2Gxn2XsLBvB1XLdS/SdecVGPY=;
+        b=b3JjzLyv9otXG0YG2TDZIRrpR4EL3q0iJcTpFAIG40ehpM/37lWQdL+MDqn2P5ozAo
+         pyjSJiGqV1WQyAMptQZuqepzuwYdzoXWHpTV6KJeXd4UPb3V6ptF/3U8iy+DYCuC5EBy
+         qVog11xD5vJCBz+EIpabYzJZ23jEdkSjtQTdfGRCEmGSo6HVvNJzB/USURq5kV1t5H7i
+         y26q7PtPkOF61pJDCN1dPcojnHKtLojpOlCEkav/QHoBbdxoHNqtYhj/dW8ePqR+gxUR
+         Zu6e+FcmHMJdzrGRtAp02cV1uTxe0q+UKtA9M/G7rnZgsYOSfPixdfNtP/ewrbYJw5Uf
+         mjyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789711752; x=1790316552;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=il6DPxbYBRmLPiIwxy2Gxn2XsLBvB1XLdS/SdecVGPY=;
+        b=Htjp/eU2lI95e8LIO9wG9bs8GZu1aAD66s6eNqnCefTCZO5327bALn2K1XKwl/7YXt
+         F+CRDV8zUer+VcLje2nHAqsg9SocgX03KwVXE0aKmKJI7QnXoew2xyoQAUHQEggA0Jmx
+         xgK9g0RYao2vEAlK/wQQn0C1fk7srqbqXioK3L+55rMLkFUXJvfg/k2veMtx9KTfpAeA
+         7gHpq0XzyktyJn63M5lPRzKYzDQHFvB9zmZjeHISJX+FfLaU63pMRjW3tJihuhtBd2Qd
+         2SruASRDytqi8oOpWGLCyiB2M+yQRxDSM5Tibx7Y3fBPIhI5qy69DabWWrgIq3EKFJ0s
+         e1TA==
+X-Gm-Message-State: AFuF++lLC00AFVt3ngfZOQ3yONKS5u7LNkUzYqq4doOse9xcUZBgbpEv
+	CSN4Ui8fpjwDcCw+0BKgTUVSXLqaLY0qjix4eviUb0b9GayZhdapebt5cx2bnkku
+X-Gm-Gg: AYBFou2+K0bLgv+JsbahxcCU3vQOjFwb2oDgpi2554ZhqVw1/dOXVOhhIv5ZJ2Nrdqz
+	MVEkoIPZJmyxceVBEd0xIi3rX5RhjmpgpKsA3zpU3lPaNquygw9p70IXXrmla2TdPS7w0ioeMSz
+	qUZ+B6faxEl4KQCZK2+hXK/ZFVRGu2GLvlxXgdmFGt4mQmKCvdj2G5QRdl6PE4SWqUU/dVJPP1/
+	DO2dhRL1pxGEsKEcuzp73zZ9WWTQEY4e/yGNj+eCzwXiRgpx4M6o06d2xttKlJX9HtGN6N/ZzMY
+	Kb1fPdVaD1GoGuZylWiJS19I3z7EreJ3N1VF70rfXup2vKhbn2+k4LP98XJuH2jsJrNYKuYuxN2
+	SdX2x+/TQNWvXBijxcwEErHQ0REtim4stY1YIoS9GbH7xDbsQNrcL/4IeCwlE2h9OkX8XSjSOFD
+	jX0vgRf0ZoPn0Xu1MVAN/HuQ3LmXIMkVLKJ31Qra2fPcyQ0U/avRr5L1xhZNLmhguGzaQteUlFP
+	W+ohJk=
+X-Received: by 2002:a05:6830:25d0:b0:7fa:5c49:5258 with SMTP id 46e09a7af769-80de3ef3732mr1799362a34.31.1789711752619;
+        Thu, 17 Sep 2026 23:09:12 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.201.83])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-80e51d5ff0esm592800a34.16.2026.09.17.23.09.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Sep 2026 23:09:11 -0700 (PDT)
+Message-ID: <6aacd587.142a58de.228d93.786d@mx.google.com>
+Date: Thu, 17 Sep 2026 23:09:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4970233939097895636=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xujiakai24@mails.ucas.ac.cn
+Subject: RE: Bluetooth: hci_core: Fix leak of request command on tx timeout
+In-Reply-To: <20260918013501.1851186-1-xujiakai24@mails.ucas.ac.cn>
+References: <20260918013501.1851186-1-xujiakai24@mails.ucas.ac.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The bootloader records init sequence progress and debug info in four
-core debug registers, useful for debugging FW download failures.
+--===============4970233939097895636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add btintel_get_rom_debug_info() to issue BTINTEL_GET_ROM_DEBUG_INFO
-(0xfcde) and log these registers, invoked from the error path in
-btintel_prepare_fw_download_tlv() before resetting to the bootloader.
+This is automated email and please do not reply to this email!
 
-Tested by corrupting the operational firmware file to force a
-download timeout; the driver logged the debug registers on each
-failure and retry, e.g.:
+Dear submitter,
 
-  Bluetooth: hci0: Firmware loading timeout
-  Bluetooth: Intel get rom debug info: dr0:0x80000001 dr1:0x00000000 dr2:0x00000001 dr3:0x00df0071
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1168176/
 
-Signed-off-by: Ravindra <ravindra@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.55 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      28.35 seconds
+CheckAllWarning               PASS      32.12 seconds
+CheckSparse                   PASS      34.74 seconds
+BuildKernel32                 PASS      28.23 seconds
+CheckKernelLLVM               PASS      32.98 seconds
+TestRunnerSetup               PASS      726.33 seconds
+TestRunner_l2cap-tester       PASS      16.27 seconds
+TestRunner_iso-tester         PASS      26.55 seconds
+TestRunner_bnep-tester        PASS      3.21 seconds
+TestRunner_mgmt-tester        FAIL      59.84 seconds
+TestRunner_rfcomm-tester      PASS      4.94 seconds
+TestRunner_sco-tester         PASS      7.53 seconds
+TestRunner_ioctl-tester       PASS      4.62 seconds
+TestRunner_mesh-tester        FAIL      8.18 seconds
+TestRunner_smp-tester         PASS      4.28 seconds
+TestRunner_userchan-tester    PASS      3.58 seconds
+TestRunner_6lowpan-tester     PASS      4.35 seconds
+IncrementalBuild              PASS      25.94 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.031 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.451 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/786
+
 ---
- drivers/bluetooth/btintel.c | 42 ++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h |  9 ++++++++
- 2 files changed, 50 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 964d2de30e65..c78d507f4380 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -963,6 +963,40 @@ int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param)
- }
- EXPORT_SYMBOL_GPL(btintel_send_intel_reset);
- 
-+static void btintel_get_rom_debug_info(struct hci_dev *hdev)
-+{
-+	struct btintel_rp_get_rom_debug_info *rom_debug_info;
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, BTINTEL_GET_ROM_DEBUG_INFO, 0, NULL,
-+			     HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Failed to send intel get rom debug info command (%ld)",
-+			   PTR_ERR(skb));
-+		return;
-+	}
-+
-+	if (skb->len != sizeof(*rom_debug_info)) {
-+		bt_dev_err(hdev, "Intel get rom debug info command parameters size mismatch (%u != %zu)",
-+			   skb->len, sizeof(*rom_debug_info));
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	rom_debug_info = (struct btintel_rp_get_rom_debug_info *)skb->data;
-+
-+	/* A non-zero status here would have already been turned into an
-+	 * error by the HCI core and reported via the IS_ERR(skb) check above.
-+	 */
-+	bt_dev_info(hdev, "Intel get rom debug info: dr0:0x%08x dr1:0x%08x dr2:0x%08x dr3:0x%08x",
-+		    le32_to_cpu(rom_debug_info->debug_reg0),
-+		    le32_to_cpu(rom_debug_info->debug_reg1),
-+		    le32_to_cpu(rom_debug_info->debug_reg2),
-+		    le32_to_cpu(rom_debug_info->debug_reg3));
-+
-+	kfree_skb(skb);
-+}
-+
- int btintel_read_boot_params(struct hci_dev *hdev,
- 			     struct intel_boot_params *params)
- {
-@@ -2231,8 +2265,11 @@ static int btintel_download_fw(struct hci_dev *hdev,
- 	 * of this device.
- 	 */
- 	err = btintel_download_wait(hdev, calltime, 5000);
--	if (err == -ETIMEDOUT)
-+	if (err == -ETIMEDOUT) {
-+		/* FW download timed out, collect rom debug info */
-+		btintel_get_rom_debug_info(hdev);
- 		btintel_reset_to_bootloader(hdev);
-+	}
- 
- done:
- 	release_firmware(fw);
-@@ -2465,6 +2502,9 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 			goto done;
- 		}
- 
-+		/* FW download failed, collect rom debug info */
-+		btintel_get_rom_debug_info(hdev);
-+
- 		/* When FW download fails, send Intel Reset to retry
- 		 * FW download.
- 		 */
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index c00f793d9dc8..dedda3e77487 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -178,6 +178,15 @@ struct hci_ppag_enable_cmd {
- 	__le32	ppag_enable_flags;
- } __packed;
- 
-+#define BTINTEL_GET_ROM_DEBUG_INFO	0xFCDE
-+struct btintel_rp_get_rom_debug_info {
-+	__u8	status;
-+	__le32	debug_reg0;
-+	__le32	debug_reg1;
-+	__le32	debug_reg2;
-+	__le32	debug_reg3;
-+} __packed;
-+
- #define INTEL_TLV_TYPE_ID		0x01
- 
- #define INTEL_TLV_SYSTEM_EXCEPTION	0x00
--- 
-2.43.0
 
+--===============4970233939097895636==--
