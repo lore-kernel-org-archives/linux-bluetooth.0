@@ -1,72 +1,35 @@
-Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872FD515982
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 16:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890003955E3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 16:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789748078; cv=none; b=nGaX1QgmwCcSewzGIyMs3aKJ9EpMvO0qKYozXmRQ9BT6kkaWin6StGztoXB0cCmIUVzvNlqBauI9yMNFAYpTIJcqSQVD8NmpYEsdqnQYK2LU8iYMmcMUpt0l50FKX0XZf2kdU5GijG0np2lDRS9jfwtkjH0wJFrqAKVuPa+CIGs=
+	t=1789749116; cv=none; b=RFhmnKe6c2Nbd0E1FXCYqqQmG+jEbWxHLz46oJ65+DhdBlLW2a4eHmwXNK/eggS3lpENPz4GWn/a46D22t1aKDojE1wbFd6G99ekat9oD8dKhPlVpt5ddfwhLGBJEAV66Um04lFWqHcDVHrxnYfVOCa0/Dc0BingqdVzJLLarBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789748078; c=relaxed/simple;
-	bh=x8UmwSXqVIE2dBhK1kRHEU06FEePyOGiR6VBgnacKQE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UeaiTWE7j0bO7nH84YT/P63QJKeI/e5DDCzU13x0sMwoO9N/RBASkpSB4RKeU7qgS+hMnEhgRPA1S++RKRDzSkA9XZq9lGsJIGrNJNJV82l7FImUmf12Y/yVnItQwc99WMgkmCX6rrbQzd/mmPrnQAD4h47EEqR6Sp8S5Znj5PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7hcB2nd; arc=none smtp.client-ip=74.125.227.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789749116; c=relaxed/simple;
+	bh=F9eiycObOPA1fJdiDrbH5FjZNknmcOBXsPHpSUXEE5E=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rl+O77CIztiB4Xiyrl5S46h5ojMMJkdTvkIFWHB/Ks48laPAgo1SWFM1UE/aIJbPPuRrsG89w3s8tRBlo0SFzSSYuS5UT9tuWYw9AoHRgDkxovO+jEK2KSJJEAKpo9xAzGVV2m3Lt8pTqdcjF1dv3JGjG4f/QpXpV60Yx8dUQQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=knjKdBLA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7hcB2nd"
-Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-78565b4db79so495162137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 09:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789748075; x=1790352875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=DI6DLxKdBCo8DHw5/kJAQks7ELgBwsb1MmOkLxNciQ8=;
-        b=W7hcB2ndZ8t0AoyLpq+ftG0BGeoQk2OuEtXHDzbSRC7PRsCANXSkO77My+Cs3BQWwn
-         BKLS4ecf4TeUhx8F2UQKqF0e7uXewtugDD8cEdBeqmjU7++oZkAulSj4fSQq7Q/vqE2T
-         60JE5GUSctVAjvvA2MNkedcpGqyP2ehP/RUvpNkweM33Q6QRfMa3+xfUcFKldgC6H/lS
-         RqJL9t0FowH8psEdHbX8KHwE+0pq7hQNgxUOBP8KeF4MAbcGVNTuf5kNlri3vohM93Uo
-         8aW7y4CIZ5TC1zz8WYM9VL6V58FufWjj2n7m/GOLMc4bRiug5RH4zC23iRFb1tKs0b3i
-         6Q2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789748075; x=1790352875;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=DI6DLxKdBCo8DHw5/kJAQks7ELgBwsb1MmOkLxNciQ8=;
-        b=QgOzZc68n/KbCWkmyM6ZlAtsIhjvaBJryoFIBCZ3GhgdtbBNfvtFM0RGZ3oUm91ThQ
-         W0N3b04N2szpykClrXVcmz/3/PE08SyrrjKBNXaU2lG+WbIKYbQEw/cLcqZ2O9lCLh0F
-         ROD1TudoZ0KNm6VEK9fVDFSz6VpT/3C0w0u1TYLPPqg3ZvALyJydPkjaUFN101pYtwpq
-         17qrhmv/zKAedpjk5gbSe8wJRp8c8rNqe12bNY2wNX31IlmszOF9lupdtuxKSlVBybW9
-         7g2IixlBcwS1DIC25G7t+fSD4mXRloETljygO5xJwb5EFWnZXg7cIaWluNL6vV6f21at
-         2nMg==
-X-Gm-Message-State: AFuF++misd6XqsYNIiruB/MU0Q5sSpbYh5ApR5suWQxySZ/SAQMBeBeg
-	K8a2xZnkn5Hfh5VXhBnXAObk4IlODGiQCPbS4UxkJHf1NI3dz5mLHjCkJkqNZT8G
-X-Gm-Gg: AYBFou1jayq7XEq5Z+M9PgoXeTaO086W3NX9xQqJW1bwFXXnwbo1MVgefWW9YgnqHM/
-	TBK9At1N8T6x81o16J6iqDFX+t+1HjEwqPiuGm5FF0i++OokVKlLg7QJ0AprpCGrFQL3jnrvXPl
-	motDBRIR3kVcCHV24eqLPOVrSQMScHrqRoegKoe3BUqXYrTKl1fBj94NHTNcX+BW7Ikxu9mknlP
-	FKk2kLXzRy2k82yCGE6TjM+Krc1L2aTdytXD8yb0oT9mA70A51xqAOTOx/qgMkwqtp6w6iWzx9r
-	iHVC8l51hI4H2tu7UDmsMTO+cWibQMq6RHpPQf0z0f4MLcxJUl+As/PGvhkraCVIJwKlv5baoom
-	N42MQrgzl7XagnCLic40MMewcqmHoH1i7D2obHYeN+l1jQBs5m6SKvjfgm1PdFD9HHgPq+wTRfO
-	h5ayZldBrCUe/HIqmoUe9qyVxEfBTfouzaqRy5gcB9gGTiMTeElPY+Jsush3O6wqbMORfUBUpRs
-	LYopG/i4AHe2iKWDbWjD03sgV3nG9lHFMynHvyvk6YTLuglfyY4oK4cufaBfbfw
-X-Received: by 2002:a05:6102:54a4:b0:79e:b1cd:86f7 with SMTP id ada2fe7eead31-7a55ab35d7fmr1771811137.1.1789748075365;
-        Fri, 18 Sep 2026 09:14:35 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7a59c569181sm2104078137.11.2026.09.18.09.14.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 09:14:33 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 9/9] doc/btmon: Document the pager choice
-Date: Fri, 18 Sep 2026 12:14:08 -0400
-Message-ID: <20260918161408.2464981-10-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260918161408.2464981-1-luiz.dentz@gmail.com>
-References: <20260918161408.2464981-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knjKdBLA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A4541F000FF;
+	Fri, 18 Sep 2026 16:31:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789749115;
+	bh=ZvsEGUDgR1/D5JvJwHjuVdY+KzATEShkkSNMVOhSwvQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=knjKdBLAFbCa9UOp7OagcDFY/1W++CSQgNoG7oDybhdom9WroOiEMDpXwHD8WgXFQ
+	 9cldBSUsXeRptT7aK0tO+W/lMu59yFEsjunB0MBU2e4fHu2pj0+aQNAJFNnBYlJVNQ
+	 IP+Rfa0M1W0DXNh54cq+9+qVpyBkBDVxwwTAOvAX4KTLwaCdZLIYqdxKmCxg/XAZQ4
+	 H5X/GrQo6E4UVlQgSw5ZlbLm5rq2JM8PPEmELuRqft/kot8dxNFhw+3dOQiafiMRB2
+	 omOtPzrzyfWV034pdKHb8/Yg5lUwSqDxAVLUBidLXufp4uMVr0wSquE8knNkzdu9O7
+	 sUDdQyl7VOH/A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93A59380CFE4;
+	Fri, 18 Sep 2026 16:30:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,52 +37,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/4] device: Fix resolving a coordinated set over
+ Secure
+ Connections
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178974904814.1035983.12606949586547695456.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Sep 2026 16:30:48 +0000
+References: <cover.1789689632.git.pav@iki.fi>
+In-Reply-To: <cover.1789689632.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-Describe that fzf is used when PAGER is not set, the options it is given,
-and that it needs --ansi to render the colours when named explicitly.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Assisted-by: opencode:claude-opus-5
----
- doc/btmon.rst | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+On Fri, 18 Sep 2026 03:02:25 +0300 you wrote:
+> CSIP coordinator was not finding its LTKs with Secure Connections, as
+> the fix in 9251e630efdd to make legacy pairing to work doesn't work with
+> SC.
+> 
+> Fix by keeping track of what kind of LTK we have, and not distinguishing
+> between central/peripheral key slots for SC, which kernel doesn't do and
+> AFAIK the role difference doesn't exist in SC.
+> 
+> [...]
 
-diff --git a/doc/btmon.rst b/doc/btmon.rst
-index 163289bd1ef0..1129ceb2e616 100644
---- a/doc/btmon.rst
-+++ b/doc/btmon.rst
-@@ -639,7 +639,9 @@ separates the lines within one and would otherwise show as a blank line at
- the end of every entry.
- 
- Nothing is separated unless it was asked for, so a pager reading lines,
--such as ``less``, is unaffected and never shows the separator.
-+such as ``less``, is unaffected and never shows the separator. Redirected
-+output is never separated either unless ``--print0`` says so, since nothing
-+is then reading it as records.
- 
- Searching a running capture
- ---------------------------
-@@ -657,8 +659,17 @@ Whatever arrives while the pager is up is printed once it closes, so the
- trace on the terminal has no gap. The capture is never paused, as anything
- not read in time would be dropped by the kernel.
- 
--The pager is taken from ``PAGER``, falling back to ``less``. Setting it to
--``cat`` or leaving it empty disables the pager, as elsewhere.
-+The pager is taken from ``PAGER``. When that is not set and ``fzf`` is
-+installed it is used instead of the plain pager, as it suits a trace far
-+better. Wherever ``fzf`` is used it is given the options it needs, adding
-+whichever of them are missing::
-+
-+   fzf --ansi --read0 --tac
-+
-+``--read0`` is what makes an entry a whole frame rather than a single line
-+of one, ``--ansi`` renders the colours instead of showing the escape
-+sequences, and ``--tac`` puts the most recent frame first. Setting
-+``PAGER`` to ``cat`` or leaving it empty disables the pager, as elsewhere.
- 
- Frames are only collected when the output is a terminal, so a capture that
- is piped or redirected behaves exactly as it always has. The terminal is
+Here is the summary with links:
+  - [BlueZ,1/4] mgmt: Add defines for the long term key types
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=37e483b0687e
+  - [BlueZ,2/4] device: Remove unused central field from struct ltk_info
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a82606b8e1f8
+  - [BlueZ,3/4] device: Fix resolving a coordinated set over Secure Connections
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4d97be27a1fb
+  - [BlueZ,4/4] test: functional: run CSIP test for Secure Connections & Legacy Pairing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c67833ce2ff8
+
+You are awesome, thank you!
 -- 
-2.55.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
