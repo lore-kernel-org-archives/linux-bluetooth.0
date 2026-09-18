@@ -1,101 +1,161 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FE14DA9B0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 10:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782B9318EC7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 11:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789728804; cv=none; b=K2dIB74t1N+tv0j+QD2K+vCTm41DY9mrcgJXbefxrD3TJ3Ztqo9VhSPwVcBCsgEyS+exvcum6vocX0dSQFkbVc1uOf0AMS4EjIGw2Glhl92xFgxuNMF4yUXQOV8IHzZ+BHVF4nJ4WLSu67msy//ZZk4L9jserOPoav1aw6FLrYE=
+	t=1789729507; cv=none; b=Fdz4xcftxeqEIekI4KtUR0SuA1dl/jZY9VrThm/zWHyEnIAoSqDoY/G0rEaH66sydvwuCQ/1w/a3biboSQv20MbDYHdE+UCPKDiYq21Ce4ZS2LjUkO60GCGDApUZh83jBVu8ukkG5ONUhdoGde36rvudGMHhV2nUAXuq5dj0pk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789728804; c=relaxed/simple;
-	bh=sUIo4J9sgY/l2QXvdaw/TJQA4BnLcsVhc0Di39akJtU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SesHiQqnZR8ooaNolZmMpP1UaK34jlbwNDbHCEIWa4BxjW4anszydyvNrd9yTOBa0YQfQMk7KeDC5mK0HyseJ1c8uDw8pqEia60NsLshvDqyr9Nw4c3YGtFPwAITZp0adUw4cr/F4LRWcssxpdSEkhm00B+bf0fhKGn7BCWAlAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kZmDi5j/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=i4wBzwzz; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1789729507; c=relaxed/simple;
+	bh=hdGV9Rod4bKk1pn0ysqjINe5v1tsNuHRn/fqJlq0wGw=;
+	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=tV3+x+9pGzNCHJK7UOrZWzBAGtch3giHvrMqQhX4pyHTFyFY0LH+kR4TFoluI/k6daahDVqifoIm1Kkb/SHanTHHKxQh6g0sAo2gQ9wOlbocRRYHRhW7AO5WPbOsD7IzDqwwquiQOC87vgXo5VCiFHLiiqNXCjVyZ96TwSg4A2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=XowiIlFp; arc=none smtp.client-ip=46.14.118.250
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kZmDi5j/";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i4wBzwzz"
-Date: Fri, 18 Sep 2026 12:53:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1789728799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=17bunrb+PPPmbHmf8iUWt0t3E5kLCszSkie89gk4y38=;
-	b=kZmDi5j/ReEnY+Zf053inN/ZWuGtA6cEEhG5gEdU1ghBpguHScj3p/fopNFtUtHcrlrPvZ
-	r1WKUwZWO8PXVuTd/8X7RJi45zemXN0U5VamjDhYKCnzqURHmGVc8Tpl45fWoPEVhgikYp
-	BgwI+hLd2difTty/gpdm8TUpbn4LtGpipuJ/xpcV6F14qURSFmjWiEZokJoVc7c44i1oK2
-	+lu6fz83Ebxb7/95KnEEADULVqIBGsMuk/qydf6z8RsaglNCkCvKEllfuFoyLkPq4jJSfi
-	Jo0PR1YknXI7aKnDcGBv42V/hITZQ1arDiSI5577fXjHuR8d1mgLRKrh4yFERg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1789728799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=17bunrb+PPPmbHmf8iUWt0t3E5kLCszSkie89gk4y38=;
-	b=i4wBzwzzZ1lRvRDBJe04Qp5KmmoCZALM5m5xrzkpe7J4OAQ2GKrXOYsDqElF6ADPCho+ZK
-	AFB3t5Ouy9Tr9YDA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: Remove %pK formatting
-Message-ID: <20260918105318.PdvCbvuJ@linutronix.de>
+	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="XowiIlFp"
+Received: from [192.168.16.44] (port=43574 helo=remote.fiveco.ch)
+	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <valentin.kindschi@fiveco.ch>)
+	id 1x7WO8-000000002Ql-3GJT;
+	Fri, 18 Sep 2026 13:04:16 +0200
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
+	t=1789729456; h=from:subject:to:date:message-id;
+	bh=hdGV9Rod4bKk1pn0ysqjINe5v1tsNuHRn/fqJlq0wGw=;
+	b=XowiIlFpwZ+qGdbPolRgzsApF80ZwL4fapz8cBI0BA4D5LR8mGyIL26JVnd5Io6OK5QBJ2HaEMa
+	nwvpCzyzWHpsqHg1fBBH2xwFZzSUvVlib4KeTSxwvSe4VyKX2pbC0b/M6aaprOwsJNInRM1Y6CAmS
+	TOK7MnKfOBpsOUCioz8=
+Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
+ FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Fri, 18 Sep 2026 13:04:16 +0200
+From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+	<linux-kernel@vger.kernel.org>, Valentin Kindschi
+	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
+Subject: [PATCH v5 1/2] Bluetooth: hci_sync: re-enable legacy advertising on resume
+Date: Fri, 18 Sep 2026 13:03:57 +0200
+Message-ID: <20260918110358.3863635-1-valentin.kindschi@fiveco.ch>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
+ FIVECO-MX01.fiveco.local (192.168.16.44)
+X-Sophos-OBS: success
+X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.9.18.102719
+X-SASI-RCODE: 200
+X-SASI-SpamProbability: 8%
+X-SASI-Hits: BODY_SIZE_3000_3999 0.000000, BODY_SIZE_5000_LESS 0.000000,
+ BODY_SIZE_7000_LESS 0.000000, CTE_8BIT 0.000000, DKIM_ALIGNS 0.000000,
+ DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
+ MULTIPLE_RCPTS 0.100000, NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000,
+ NO_URI_HTTPS 0.000000, OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000,
+ SENDER_NO_AUTH 0.000000, WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000,
+ WEBMAIL_X_IP_HDR 0.000000, __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
+ __BODY_VOICEMAIL 0.000000, __BULK_NEGATE 0.000000, __CC_NAME 0.000000,
+ __CC_NAME_DIFF_FROM_ACC 0.000000, __CC_REAL_NAMES 0.000000, __CT 0.000000,
+ __CTE 0.000000, __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000,
+ __DKIM_ALIGNS_2 0.000000, __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000,
+ __DQ_NEG_IP 0.000000, __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000,
+ __HAS_FROM 0.000000, __HAS_MSGID 0.000000, __HAS_XOIP 0.000000,
+ __HAS_X_MAILER 0.000000, __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000,
+ __MIME_TEXT_P1 0.000000, __MIME_VERSION 0.000000,
+ __MULTIPLE_RCPTS_CC_X2 0.000000, __NO_HTML_TAG_RAW 0.000000,
+ __OUTBOUND_SOPHOS_FUR 0.000000, __OUTBOUND_SOPHOS_FUR_IP 0.000000,
+ __OUTBOUND_SOPHOS_FUR_RDNS 0.000000, __RCVD_CTE 0.000000,
+ __RCVD_EXIM_4_96_AES_128 0.000000, __RCVD_FROM_HOMEUSER 0.000000,
+ __SANE_MSGID 0.000000, __SL_HEAVY 0.000000, __SUBJ_ALPHA_END 0.000000,
+ __SUBJ_STARTS_S_BRACKETS 0.000000, __TO_MALFORMED_2 0.000000,
+ __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000, __URI_NO_WWW 0.000000,
+ __URI_NS 0.000000
 
-Commit 71338aa7d050c ("net: convert %p usage to %pK") which is from
-2011 and changed the %p annotation for pointer to %pK. Back then the
-default behaviour for %p was to print the pointer. The %pK modifier was
-introduced to able to control the behaviour of specific pointer values
-without changing the behaviour of %p for everyone. It was dedicated to
-avoid leaking pointers via /proc.
-With the introduction of bt_procfs_init(), bluetooth followed this %pK
-semantic.
+hci_resume_advertising_sync() never re-enables advertising on a
+controller without extended advertising.
 
-Things changed over time. Since printing the pointer did not add any
-value, networking prints now 0 instead of the socket pointer.
+It restores HCI_ADVERTISING from advertising_old_state, then calls
+hci_schedule_adv_instance_sync(), which starts with:
 
-Replace %pK with 0 value, update the header line to match column names.
+  if (hci_dev_test_flag(hdev, HCI_ADVERTISING) && !ext_adv_capable(hdev))
+          return -EPERM;
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+The flag it tests was set a few lines earlier by the resume itself, so
+the call returns -EPERM without sending anything. The return value is
+discarded by every caller, so the failure is silent: advertising_paused
+is cleared, HCI_ADVERTISING is set, and the controller is not
+advertising.
+
+Observed on a BCM43455 (no extended advertising) after an active scan:
+btmon shows the pause disabling advertising and no re-enable in the ten
+seconds that follow, the device does not appear in another controller's
+scan, and btmgmt info still reports "advertising" in current settings.
+
+Enable instance 0x00 directly in that case, the way reenable_adv_sync()
+already does for the same situation. Instances continue to go through
+hci_schedule_adv_instance_sync() so the software rotation loop is
+rearmed.
+
+This affects every caller of hci_resume_advertising_sync(), not only the
+scan path: address resolution changes, accept list updates, discovery
+stop, suspend/resume and the end of an LE connection attempt all leave
+advertising disabled on such a controller today.
+
+err is initialised because the extended branch leaves it unset when
+adv_instances is empty and HCI_LE_ADV_0 is clear.
+
+Fixes: ad383c2c65a5 ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-5 btmon
+Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
 ---
+Changes in v5:
+- New patch. v4 of the scan fix resumed advertising through
+  hci_schedule_adv_instance_sync(), which refuses HCI_ADVERTISING on a
+  controller without extended advertising, so the resume never sent
+  anything. Patch 2 depends on this.
 
-The relevant net commit is 7c0ec6288b497 ("net: Replace %pK output with
-0") which is net-next.
+ net/bluetooth/hci_sync.c | 10 ++++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
- net/bluetooth/af_bluetooth.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 411d66f24393d..8dc06fc1811ec 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -846,7 +846,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 	struct bt_sock_list *l = pde_data(file_inode(seq->file));
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2679,7 +2679,7 @@ static int hci_resume_advertising_sync(struct hci_dev *hdev)
+ static int hci_resume_advertising_sync(struct hci_dev *hdev)
+ {
+ 	struct adv_info *adv, *tmp;
+-	int err;
++	int err = 0;
  
- 	if (v == SEQ_START_TOKEN) {
--		seq_puts(seq, "sk               RefCnt Rmem   Wmem   User   Inode  Parent");
-+		seq_puts(seq, "sk  RefCnt Rmem   Wmem   User   Inode  Parent");
+ 	/* If advertising has not been paused there is nothing  to do. */
+ 	if (!hdev->advertising_paused)
+@@ -2712,13 +2712,18 @@ static int hci_resume_advertising_sync(struct hci_dev *hdev)
+ 		 */
+ 		if (hci_dev_test_and_clear_flag(hdev, HCI_LE_ADV_0))
+ 			err = hci_enable_ext_advertising_sync(hdev, 0x00);
+-	} else {
++	} else if (hdev->cur_adv_instance) {
+ 		/* Schedule for most recent instance to be restarted and begin
+ 		 * the software rotation loop
+ 		 */
+ 		err = hci_schedule_adv_instance_sync(hdev,
+ 						     hdev->cur_adv_instance,
+ 						     true);
++	} else {
++		/* hci_schedule_adv_instance_sync() rejects instance 0x00 while
++		 * HCI_ADVERTISING is set, so enable it directly.
++		 */
++		err = hci_start_adv_sync(hdev, 0x00);
+ 	}
  
- 		if (l->custom_seq_show) {
- 			seq_putc(seq, ' ');
-@@ -859,8 +859,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 		struct bt_sock *bt = bt_sk(sk);
- 
- 		seq_printf(seq,
--			   "%pK %-6d %-6u %-6u %-6u %-6llu %-6llu",
--			   sk,
-+			   " 0  %-6d %-6u %-6u %-6u %-6llu %-6llu",
- 			   refcount_read(&sk->sk_refcnt),
- 			   sk_rmem_alloc_get(sk),
- 			   sk_wmem_alloc_get(sk),
--- 
-2.55.0
-
+ 	hdev->advertising_paused = false;
+--
+2.34.1
