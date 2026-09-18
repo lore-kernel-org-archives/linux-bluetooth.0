@@ -1,69 +1,69 @@
-Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
+Received: from mail-ua2-f12.google.com (mail-ua2-f12.google.com [74.125.226.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C197A4FDA4A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 16:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DA5511E99
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 16:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789748062; cv=none; b=bjbjjmfFoiDB2CnEuAeB3ZPSlXikw18Yusx9IQfV6xfwGxIoraLSw12FLsjUjLZnZiFtQ6xMsHIK3Dwf4/K1UaF3i+vmm3Uc6SmrIJAv0k5C9fQa4rjC60+R9l2jN50YNf5gY4hXwhNX6AN+auxhJoYTWeEmo0kcLszm6YZxNyE=
+	t=1789748063; cv=none; b=Wv8tKgL3Gcp3YdxWIx+bxGkl7ZU/2d4Cqtbmk/6Op1Ljyd786fHCpn066DRY7d/rCmDViHg3m1Gub35TKEmTc6DNYm65803yfo5zuILp9PSvRXddNMwmjxfbvHMA+1ZC4xi5d0lQDg3LbHbDaeYR1ZiXr5H9ZYJgX3aPd6nIYEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789748062; c=relaxed/simple;
-	bh=FD6l1FQ6PhJ2sFRpMo5q2e+ZJnrrGI7a3Q3JUapsHm8=;
+	s=arc-20240116; t=1789748063; c=relaxed/simple;
+	bh=cln7gZrDn0TpF9mriJZREUBl+EH/s32tThHytkBdsuo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VCFiZ97MkfqfsyXEAM8IFZhkw6c5EHNkZlJgMYZxBGRR9rrrI5u1FXhQVlzMduemWrQoTLHG7EfWA2jJ1sRnPnGHB31Rb+eRT4P+8Rn6UZicQFaRMRCX/tCn/y/DOmyYquyUvUMVzNEy5Pheb1N4MkOPJvWmCCER/rnJxY20vzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUnMlgT6; arc=none smtp.client-ip=74.125.227.43
+	 MIME-Version; b=F3Q9s7Ulmvl88FBZo6zZ3KKEjfe1PvtlU3cMlODKWtWdj8GaeqWz2JKBZL68xqVzM7nIUWA7DnD/sUn/h1YqcPzqATdqct2/0Zg4XCvZG5tSLiTkKTyfspWRV2ii9jJ++CrhIOg+whFmPEAZxISfmW2G6UN34jF7jKlhMUCB5sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4+Hr2Zw; arc=none smtp.client-ip=74.125.226.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUnMlgT6"
-Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-78a5e045187so410513137.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 09:14:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4+Hr2Zw"
+Received: by mail-ua2-f12.google.com with SMTP id a1e0cc1a2514c-97eaa1155b1so454437241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 09:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789748059; x=1790352859; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789748060; x=1790352860; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=I3BuChxq/K/tVHQ3Morzr9dEpNMWxLBD7m6hfDex+Ng=;
-        b=LUnMlgT652DatHymDMgK+ZBR3rZn0QRBZsTFZyxXx3YCh/+0afJfKU/r7hpswCTg2b
-         Ln/xLRX9629E1zVr9zcqgYExay0SdcrkmmCeLxjDCSfdelPurWKy+Dy4vxfLYn8I5nsa
-         V0a7p7h+QJ1WU+edl8gfDDoq8U2U5EIJWiBpjf4BnIG7wYtJDmIXsoaXNzZ95ALAuaBV
-         kxvFjeESFxUr+s0HrwRSOfZodk7HfjL8ZeBZftEUctWOlfj6ChPFsTSlrlrhxZH7YJqZ
-         NYWeVW3UuZpAHNYBgQ3JIaV6nMdwm2g34ZyfsZMz4N7ZgXOffYrYuD7r/3SOOl6F+9AS
-         DP3g==
+        bh=tZuJafYx6HZUhoGvm0TMM7HYzRbxHW1k4b2Lp6kWXWg=;
+        b=R4+Hr2ZwZlVrWVrpaa3JN7OS/yIQA09cIy3zzhoqYXGV4QmKr1hmnjIA+TAN4mWl5n
+         W1EY/pgzNr90EOi7qjLKLp4DjklJXbbNCTtl5btqCfEilgVcxP0FTnpHLQgvwLT4BBIi
+         2R0TJqa+wWWyFQP4mYT9vYVxP+w2z5vA3ZTVZIe6I8GQ+Gpvh5Yy78cHtL/i81foWJfi
+         xlogTOAovJN85VOwZ0AGKEsEmic1joNZWojctoqmGpW08zXWQODI39a2NzWcjUANcs70
+         U99mP0cHU96kolRy9XytLnIIBK8AWR/NFN7uSd5ljvKt7kf1mUiOMtVpA745mHo5DkZD
+         Hdsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789748059; x=1790352859;
+        d=1e100.net; s=20260707; t=1789748060; x=1790352860;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=I3BuChxq/K/tVHQ3Morzr9dEpNMWxLBD7m6hfDex+Ng=;
-        b=lkfmkdhYuf86UU8Gs92uw8S1KHSVjZIyhr+EQpLwQCuFxOsR3itidKWAGiu0TCbWSU
-         Lx1oFvGuf99LzLdBH8epnI2+EcjmGHsGSMFdvEKyTI0onHGtp12CJrEyCn/K4c+VhRj8
-         GY8s8KHS+HTgyVcBj1XG/Ks70fzOJtpAux7G6io+bObnwxfFVPUDWpZVLh9/sTa9alQe
-         nz2eOqnsYCXo393TV89dfPS6aWiLq487gjehqY3E88fmtUhnXnUlYUVfkzPXEkfwTMw9
-         l8NELtAjs4rNdpsrgwynFfnx1yocqrAHHYaJKKJ0TstrU+ezQSROq6/erdD0zzMZl8fr
-         POVQ==
-X-Gm-Message-State: AFuF++mZbjJvAkNxbNbiB3hKLI1ml6MXxMYnIj2YtsigYbhWIEXwuKgt
-	KkQjSPm4qFbu7JcAn4arKJTnd9+95XFg0HYXBvIdvcUR/WIq5u+xb+0vOlg4hSSN
-X-Gm-Gg: AYBFou1qOPi4JQoXs/Lbd22Dy9kdcdByM0oP3R9iXpgpQxOMRjSwgzVXZmfnVDiKpWZ
-	eStBUIzYiUkdAn6jpL2P5GxUnc8Vww310Iix8EjJMUmpqz0oFrANJnAOnsEtNOKMOS296Aiq44e
-	ZvYxpefK5T2XjOJNByHzU03F+pjunC3KjMkupU9N6+EaCv5hFKvO13vO9SoNufvrva6IU6GsjOF
-	PiTrrGn9ST3ZDJxooM3PPkwdL96JGtT1y4ewfuQwbMdiBf23RcZdHIO/ZYd4VQtU05BQJQ33FCc
-	KiILCj6xd6hytDZ/0oo0EBbUdJToF66/Hiqy5vJTWj0MdbvBv1crB0F2KAI5ErdFMd5Fm9gNI9/
-	f1Euc4F9ZYDYG5ceW2rs4yw5xd3JJQPCXTKswu1aD9fM6ggsO8lziczvNyL5ZW6qoZ2HZZFStBs
-	l54X89O/RrMcLoEawChaa6EIjJW+DsBNmL8EN3jbdpdg+5OJ+3mql7+MZslHYQg5VTVqsa5UoQF
-	PXM6pTXAeGWezp4wyNMuTR1G5K78QPjYA3Y9R+sLMJQiCRw7XfJUDe0FQULnmwH
-X-Received: by 2002:a05:6102:5812:b0:7a4:fb71:25d1 with SMTP id ada2fe7eead31-7a55b143293mr1542996137.7.1789748059131;
-        Fri, 18 Sep 2026 09:14:19 -0700 (PDT)
+        bh=tZuJafYx6HZUhoGvm0TMM7HYzRbxHW1k4b2Lp6kWXWg=;
+        b=HgiF6ndUb4jaLDbye+6HZ2EYz/KWKDlx3UUrmT6RFHpuvbcb1AjKOnDXAP5n9IiL2I
+         VlZi7BVvVF3MhBOrEFDJTcuQumqj1+mXlYX+epVCmqoT6BpDDX5Utg21OvJ1bWy67j6q
+         25M/XP4FrA6lnRHFnqUm5Q9i6ugvKmWLBbE+aAPLXjEpDS6jG/c/jHsQ4631YLzIk5wB
+         b0KLVy1VEF0bAlotssxxtfyx5k9WLpH5AOOedxC+mBtixN41Wg/wkNHrKCT/qcLVF8ya
+         VfFv+IQjXfePERHVsUEp4Y87W1+hrhML1kXm8eCIK7HaAqFwFmIGTCIVwowXSmQGBGM3
+         cwpg==
+X-Gm-Message-State: AFuF++kG7DDfubd3kog74BTKQqBaNLYperkGNY6QoeMSi8hrxIcB3nmQ
+	/y8hhg5jy689//2pRWAF6+nz+TRl0T7qXHzGnrSlZ7YVz8f/nbi5K1Htv2t+GFOH
+X-Gm-Gg: AYBFou2DXte/KkvqJm5fUXa31q3ElwAAJDFFcPr0iCNzxcqT0bBY7VC/+banbG3nzHc
+	Iu9VqEsMTVGNNdp6qJfFk5KY7NbsxgsJK0pzTStLSNPtTBzjskB198fDlsu4K9r6uGbYSV5zn/Z
+	LfHCISK4s6nFIKt+do9JJ3+jWMmA/uuAerz4jxhAra257yaSXormye4rAahyg1IIsolp7iEqna1
+	aSyR1YrqhiWeUTey8YUJQobfh16k1j9HxvhocRWaqniOXb+BrQepwQLujhBAv4HnaMIVwsC3GNH
+	mTb7NIxIHrBZUwydbhR35OQ+nWde4XM/WV7+JhAjai4XVJDW94Pv8GA8CKeZHTV5o571CW1Go4P
+	GFpKSgUWey364BCkZM+RugsxcpAoWAdTYpAi1eaPXXFO9/nrhrSgMeGKYcMyN14+zMMsfTFgRoF
+	Ol0Tn30fDVe9HFvTme+VsEYjnN/Oj76SrTBsS9M7lGfRuZTJmmdar9k6MW8cu0iB9LtlMXAvnkU
+	v3BsanqtccYGn41n8epskbAAP+gL9Sk8ytRF2+CfXgkw5LGyMRMBFVXlikfml6zd4eMSSrbSZk=
+X-Received: by 2002:a05:6102:3c9f:b0:7a1:f7c3:3a48 with SMTP id ada2fe7eead31-7a55ce82e7emr1564510137.21.1789748060357;
+        Fri, 18 Sep 2026 09:14:20 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7a59c569181sm2104078137.11.2026.09.18.09.14.17
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7a59c569181sm2104078137.11.2026.09.18.09.14.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 09:14:18 -0700 (PDT)
+        Fri, 18 Sep 2026 09:14:19 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/9] monitor/analyze: Free the channel latency plots
-Date: Fri, 18 Sep 2026 12:14:00 -0400
-Message-ID: <20260918161408.2464981-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/9] monitor/l2cap: Report the channel latency deviation
+Date: Fri, 18 Sep 2026 12:14:01 -0400
+Message-ID: <20260918161408.2464981-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260918161408.2464981-1-luiz.dentz@gmail.com>
 References: <20260918161408.2464981-1-luiz.dentz@gmail.com>
@@ -77,47 +77,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-A channel keeps a plot of its latencies for as long as it exists, but
-destroying one frees only the channel itself, leaking both plots and
-everything queued on them. A connection already frees its own.
+The channel latency is reported as a range and a moving average, while
+the two latency lines either side of it also report the standard
+deviation, which is what tells a channel that is consistently slow apart
+from one that is unstable.
+
+Report it here as well, so that all three read the same way:
+
+  Channel Latency: 108 msec (48-108 msec ~79 msec +/- 27 msec)
 
 Assisted-by: opencode:claude-opus-5
 ---
- monitor/analyze.c | 2 ++
- monitor/l2cap.c   | 6 ++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ monitor/analyze.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 154303eb7330..5a3adedc211c 100644
+index 5a3adedc211c..154303eb7330 100644
 --- a/monitor/analyze.c
 +++ b/monitor/analyze.c
-@@ -298,6 +298,8 @@ static void chan_destroy(void *data)
+@@ -298,8 +298,6 @@ static void chan_destroy(void *data)
  	print_stats(&chan->tx, "TX");
  
  done:
-+	queue_destroy(chan->rx.plot, free);
-+	queue_destroy(chan->tx.plot, free);
+-	queue_destroy(chan->rx.plot, free);
+-	queue_destroy(chan->tx.plot, free);
  	free(chan);
  }
  
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index a132bcf397f4..3eaca5bc226b 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2913,9 +2913,11 @@ void l2cap_dequeue_frame(struct timeval *delta, struct packet_conn_data *conn)
- 			frame->cid, frame->psm, mode2str(frame->mode),
- 			frame->mode, frame->chan);
- 
--	print_field("Channel Latency: %lld msec (%lld-%lld msec ~%lld msec)",
-+	print_field("Channel Latency: %lld msec (%lld-%lld msec ~%lld msec "
-+			"+/- %lld msec)",
- 			TV_MSEC(*delta), TV_MSEC(chan->tx_l.min),
--			TV_MSEC(chan->tx_l.max), TV_MSEC(chan->tx_l.med));
-+			TV_MSEC(chan->tx_l.max), TV_MSEC(chan->tx_l.med),
-+			packet_latency_stddev(&chan->tx_l));
- 
- 	free(frame);
- }
 -- 
 2.55.0
 
