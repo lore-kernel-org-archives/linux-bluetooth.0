@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDF12561A7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 00:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E7621CC59
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 00:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789689767; cv=pass; b=sSzhMRaBYr/4THX9mSuu53FCgZoGaq9UIwwlqgAHk6P6yJXrt8JPronpwflryw9sRl/cybVHzG1t9aJ9wnMbP1PQAWhDxBoWrSCpFPYMt2McHeevYuTNK2DfUEfGyYdRsy+z1LXvdNMD6eOO8oMkhPvRkEUhaa7vv7Kn5ntKvCA=
+	t=1789689770; cv=pass; b=so6A73TP8Q6ku6YmKEuVjGpPOPsnuisPBkTBvftzeonPgM/RdUoUmUzxSD0Prkvpask8hqkuqjPPkRg1asLSPa1VPuh9WtM8nrCjVhIAHgXfEQRIYObslqZdH8FJfMpa1YPF2h97G273TrXVaOvt4UdXbaSACMffQE8Qorf/3kQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789689767; c=relaxed/simple;
-	bh=i2+//srnHrdi2hkp6e5HGsmav5MkgKWviwuMouI1HjA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=imVmPMnAEgd8HR0eFozgpxL2a46+9D1qsrlpuwsxUz/jVMoYAHjxVZAjDI3gILRpgxoVorhTxhIcvv8f/emtlt35Wfm7oCY9OvCm/cbE30GSgl98ktLVvH0svWZhKdMz+sDuiPTf6EoMI6arBpZoCAxeT+hINQQin59O7IEtQBk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=NbUs1YHn; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1789689770; c=relaxed/simple;
+	bh=+SYvN7Gzao7QWaxlIRHzKY+fJ1QGT1tZYK424Z9ntZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PFFCVscTH5q73qoyhJ4KaYsAai1hnEQ8J3U1BVDXRSSRL46cS+zks45OYFBplYKcB8RhRsUnkB9CSx8QMb5oy2wAxPXdz56PvWQ9NOTcSblpxgq9xfoTLHDkC9KTWWx2PqgbJPo5WqwoJ8RHHdDYltWaBN4gbOtWKxpssEtRJ4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=PrPjaOeg; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="NbUs1YHn"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="PrPjaOeg"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:1:f410::dc01])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hmCVc2XllzyQ6;
-	Fri, 18 Sep 2026 03:02:32 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4hmCVp2SMMz10rS;
+	Fri, 18 Sep 2026 03:02:42 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1789689752;
+	t=1789689762;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Cm1Y4b6xLDlUqqsXF9gOIJANWmKXi9UBsTJYsFViUXs=;
-	b=NbUs1YHnxLn1bu4S/LNTT0R/3s4v3rXM4ns/ILsrzSnNkU6QuynZHHqXO4IoRw3bB3KWnd
-	P6ScqcIsKSQIaoOkwnddh7wA209TBcpiD8Es0kA+NLIudmjRVkYrtWcLufMi0d1P1nDx8t
-	YAmnhXpa1G4F/h3UgpEmA2nPG3dlRX8=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1789689752;
-	b=AajDWd0ksdw5AOzSN/0tvNr1i8LMI/ryVLP14tqBj4XQOiheIK6zJJhUxDdr6pOduROc8k
-	45H6PR90SvmQ7bNHq3q7U7svsZKIKfE8SnkSLwmo7dBHDazst4ahYdztOBU2BrL70RnyaK
-	HcKlJEiOK0wfvRe1dc5lp9ywcqAIyuo=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cc6zIfz8/G3AjgpLhBdijWBuMX8pQ3IzircyjM4lKks=;
+	b=PrPjaOegNm/nD2SDGYicXvjtVrdDBNrem7EFu0VnS/eNbw3DWqgdxCRC0PLp8QMYJOFawq
+	WSopV4YEwott4h8SjFx9IfbBxzvVI1KHbF7ldNcz250D38bTSAfwcfFYzSAnCgfFuS6HHd
+	9RNOuHv4n3yFXQeuA3w//2m00ZwyI7E=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1789689762;
+	b=lXAHzkPw37ZhPbmU1E9+AL3cqWedaZfc3pUKuFkdQK3H9FEA+JFal49ne04dWsoJfx2e/Z
+	2K2Ssxp65ZNCwpmYX6zJekFGqX2s3ZQ8hOCDUHq8D3HGuavS/ptBeYTP2IPb0L0SG8Fb4L
+	4sci3DrQ2ipzB63hCy01qHMopgBLSb4=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1789689752;
+	s=meesny; t=1789689762;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Cm1Y4b6xLDlUqqsXF9gOIJANWmKXi9UBsTJYsFViUXs=;
-	b=kWQLKqUbrA6oj8ucOD4qz3d3HB0vlRZhlpI/7xc1LEzA5ZOKM0H+xqYcie4lUracvqt4md
-	bL4MEcv8ff6605nNOH9W2oBsM98cD1K9IRQqFFOeGbHLCgABMnBCDsTZICZGM8a9qkDYo3
-	7Lvp+GrxnxUm5KDnG+DOUWqjn4Vo2n0=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cc6zIfz8/G3AjgpLhBdijWBuMX8pQ3IzircyjM4lKks=;
+	b=J0+3XVygdFu5Mtbl5mhFlda1XBHlRAsFBxA9BXoa8R15tzyiFDilw8z5vCtmRwAR8wztRL
+	+WB+qemSZNyx21T4KT8NE2iwZOkMUfJnE0quc/4kiU8zgzKCjw7So4HBiZNkSbpXCiPZ9F
+	YJPaReq3wYxOzwlVsYb68FtS41EI+SA=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 0/4] device: Fix resolving a coordinated set over Secure Connections
-Date: Fri, 18 Sep 2026 03:02:25 +0300
-Message-ID: <cover.1789689632.git.pav@iki.fi>
+Subject: [PATCH BlueZ 2/4] device: Remove unused central field from struct ltk_info
+Date: Fri, 18 Sep 2026 03:02:27 +0300
+Message-ID: <4d30c78a719d9da058a36a17e679c785255a47b0.1789689632.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <cover.1789689632.git.pav@iki.fi>
+References: <cover.1789689632.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,34 +67,83 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-CSIP coordinator was not finding its LTKs with Secure Connections, as
-the fix in 9251e630efdd to make legacy pairing to work doesn't work with
-SC.
+struct ltk_info::central is only read in btd_device_get_ltk(), but its
+only caller in csip.c does not use the output parameter.
 
-Fix by keeping track of what kind of LTK we have, and not distinguishing
-between central/peripheral key slots for SC, which kernel doesn't do and
-AFAIK the role difference doesn't exist in SC.
-
-LLM was used for bug triage and write initial version, but these are now
-almost manually done.
+Remove the unused field and adjust btd_device_get_ltk() accordingly.
 
 Assisted-by: opencode:qwen3.8-flash-next
+---
+ profiles/audio/csip.c | 2 +-
+ src/device.c          | 7 +------
+ src/device.h          | 2 +-
+ 3 files changed, 3 insertions(+), 8 deletions(-)
 
-Pauli Virtanen (4):
-  mgmt: Add defines for the long term key types
-  device: Remove unused central field from struct ltk_info
-  device: Fix resolving a coordinated set over Secure Connections
-  test: functional: run CSIP test for Secure Connections & Legacy
-    Pairing
-
- lib/bluetooth/mgmt.h        |  6 ++++++
- profiles/audio/csip.c       |  2 +-
- src/adapter.c               |  5 +++--
- src/device.c                | 39 ++++++++++++++++++++++++++-----------
- src/device.h                |  4 ++--
- test/functional/test_bap.py | 21 +++++++++++++++++---
- 6 files changed, 58 insertions(+), 19 deletions(-)
-
+diff --git a/profiles/audio/csip.c b/profiles/audio/csip.c
+index d766c3da9..bbd9e4ffd 100644
+--- a/profiles/audio/csip.c
++++ b/profiles/audio/csip.c
+@@ -328,7 +328,7 @@ static bool csis_encrypt(struct bt_att *att, uint8_t val[16])
+ 		return false;
+ 	}
+ 
+-	if (!btd_device_get_ltk(device, ltk, NULL, NULL)) {
++	if (!btd_device_get_ltk(device, ltk, NULL)) {
+ 		error("Unable to get device LTK");
+ 		return false;
+ 	}
+diff --git a/src/device.c b/src/device.c
+index c140a2e36..443fbbca9 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -163,7 +163,6 @@ struct bearer_state {
+ 
+ struct ltk_info {
+ 	uint8_t key[16];
+-	bool central;
+ 	uint8_t enc_size;
+ };
+ 
+@@ -2147,7 +2146,6 @@ void device_set_ltk(struct btd_device *device, const uint8_t val[16],
+ 		*ltk = new0(struct ltk_info, 1);
+ 
+ 	memcpy((*ltk)->key, val, sizeof((*ltk)->key));
+-	(*ltk)->central = central;
+ 	(*ltk)->enc_size = enc_size;
+ 	bt_att_set_enc_key_size(device->att, enc_size);
+ 
+@@ -2156,7 +2154,7 @@ void device_set_ltk(struct btd_device *device, const uint8_t val[16],
+ }
+ 
+ bool btd_device_get_ltk(struct btd_device *device, uint8_t key[16],
+-				bool *central, uint8_t *enc_size)
++				uint8_t *enc_size)
+ {
+ 	struct ltk_info *ltk;
+ 
+@@ -2174,9 +2172,6 @@ bool btd_device_get_ltk(struct btd_device *device, uint8_t key[16],
+ 
+ 	memcpy(key, ltk->key, sizeof(ltk->key));
+ 
+-	if (central)
+-		*central = ltk->central;
+-
+ 	if (enc_size)
+ 		*enc_size = ltk->enc_size;
+ 
+diff --git a/src/device.h b/src/device.h
+index 7683be82e..7c3f45333 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -151,7 +151,7 @@ bool device_is_connecting(struct btd_device *device);
+ void device_set_ltk(struct btd_device *device, const uint8_t val[16],
+ 				bool central, uint8_t enc_size);
+ bool btd_device_get_ltk(struct btd_device *device, uint8_t val[16],
+-				bool *central, uint8_t *enc_size);
++				uint8_t *enc_size);
+ void device_set_csrk(struct btd_device *device, const uint8_t val[16],
+ 				uint32_t counter, uint8_t type,
+ 				bool store_hint);
 -- 
 2.55.0
 
