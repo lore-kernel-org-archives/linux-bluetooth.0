@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3343630AF;
-	Fri, 18 Sep 2026 00:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D8E36F8E5;
+	Fri, 18 Sep 2026 00:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789692779; cv=none; b=BMGnS7R7iUcnVKZ0/57veItGKNSrj0ngrJcEZSWHxtxn2NVYTjqHNnTDd9LwHXbXmQmL9aDFU6+Oyxuvph8NZNXaLet4O/X0ID9H7lInTKtsen5ZtMZl9B0EuvvUS7siRrs1StxboNxkegplJkdRDdiB94kFnCwciEaqLQZs3Vk=
+	t=1789692783; cv=none; b=pXMiZtRw0yBHEDfQzXkztoItWNTMbgy0pfqubx44q+88esfoQLJxP17G3m3z5UlDpijhkJg8TxbSKKyg6k7CVMFBejO8zaNb+8/iuaSxuaT5icpxGh6xKnjqJzNMRAo0hlB9jkQPLe5et139pjvGGFzMRhfS3Vazh91gnxt/+cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789692779; c=relaxed/simple;
-	bh=MAGcvP6geABCHMrgoyp0wiFaGxNP98/yBIKndJkGMzM=;
+	s=arc-20240116; t=1789692783; c=relaxed/simple;
+	bh=g5RZNF9tPHYnxTjTao/Qe4K5FWQrk358BezNw7gSAN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RUe4/NtmxjHweC90JFNfwC1fBp54ram91oUlnIxSL1MWRzMapMP0sHm+q1Nm5DWYJ4Ocfdy66ZIF/o2NF8h8ARao86Lm7UZhP9Y7ItPKnIJHsi+/uCKVfczSZiHFM/oBSMSnhDXjuHlADOovEbrd80hTgg+XAyJ9iZqxEsRaoHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghhB9O26; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=WK/RjS4LSgqMiPuzUdVVwiTMIfUTB4tB3bMeK1Th6Y5gYZ5+VMmTqPJVbM51I0XAEX/oUF6xOpPEN4NFp45BPwMOl1b/TT0IdkMcmT2r32F8hHn3S344STfX3VoISuxZczdAiGnxr6dgcmO8wix94o7EAAlpp+S8eLeliz5wosA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLLxNoII; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghhB9O26"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4518C1F00898;
-	Fri, 18 Sep 2026 00:52:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLLxNoII"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39DDB1F0089A;
+	Fri, 18 Sep 2026 00:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789692777;
-	bh=5BNIj8BNGyST6arfh5kwxyIl6omywdbjBlhFJKJwhCQ=;
+	s=k20260515; t=1789692781;
+	bh=KW7JYefcv10fFdJtdqBL6oXYa+3elg1lBk14sv+TqT4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ghhB9O2692MT4im0KMC8DxoRkDUJMw3+K5grZTmpqIYsKoU0gKTk+PJYy5rGC1n04
-	 odzqsKgm4QHXWEJDAHYBgZ2pE+1AP34OUiDEVZdYmfi/N2dGrdiswZndNbByoGzj6u
-	 g8FtYPcps1PKy2QWONeWlv9kpNeKFv6dKxJVorL4SaTMsBz2K+pfxL95kF6lgfpOXt
-	 vt3ZT+xHTmpeFpJ3ku84odLZC8kV5SLwFURFsnlb2Jc45qOk0ESmyMciSJItZT56L/
-	 sV2mwTkt8WL7rn41ZtpAA7zStlmHlJ1wYz3T02+uyaOWNTJ8E5SzG2iF0NumSSswef
-	 /8Xo2XltfHYqg==
+	b=mLLxNoIIw6DM814yZ11ckfQuWZ5biVUA6HXJifbqdZRiySvfSXeBFqLNQkMIZi+Y9
+	 aLp10Z0d+yTcoo681yiwv8VPD5hDEb82bjAwvL8Nd1KvkgWY7m8cmrEljhAjH4nu/o
+	 BsjBvhJnEYxjMEu4rp5FEezH84p0kClcVZpfzZdjZt9JYiaw9t8ohoV7ixnSytgjo9
+	 JxAuDfT9rGuoKv2sSMSMhmLZzdTFa1pWcVDaiX2xmwinre0mS49KCVa6eF8n/Pxgop
+	 23bVP+16o0J1EdQHdo+9fSPzgJ243rLokmJWVVKBd3OU/KLorovazQLlLc225phH3j
+	 jFoGDNG8r3F2g==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
@@ -36,6 +36,7 @@ Cc: Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	eadavis@qq.com,
+	pav@iki.fi,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	linux-bluetooth@vger.kernel.org,
@@ -43,12 +44,12 @@ Cc: Sasha Levin <sashal@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	patches@lists.linux.dev,
 	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Subject: Re: [PATCH 5.10.y] Bluetooth: L2CAP: Fix deadlock
-Date: Thu, 17 Sep 2026 20:52:35 -0400
-Message-ID: <2026-09-17-daily-reply-0008-l2cap-deadlock-5-10@kernel.org>
+Subject: Re: [PATCH 5.15.y 0/2] Bluetooth: L2CAP: fix connectionless receive path
+Date: Thu, 17 Sep 2026 20:52:37 -0400
+Message-ID: <2026-09-17-daily-reply-0010-l2cap-connectionless-5-15@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260916193454.9996-1-kmehltretter@gmail.com>
-References: <20260916193454.9996-1-kmehltretter@gmail.com>
+In-Reply-To: <20260917040004.21041-1-kmehltretter@gmail.com>
+References: <20260917040004.21041-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,15 +58,13 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-> [ Upstream commit f1a8f402f13f94263cf349216c257b2985100927 ]
->
-> This fixes the following deadlock introduced by 39a92a55be13
-> ("bluetooth/l2cap: sync sock recv cb and release")
+> 5.15.y has two problems on the L2CAP connectionless receive path. The first
+> comes from a backport that landed without its prerequisite, the second from
+> a fix that never landed at all. Upstream contains both fixes.
 
-Queued for 5.10, thanks.
-
-89e856e124f9 ("bluetooth/l2cap: sync sock recv cb and release") is back
-on 5.10 as well, so the tree now has both halves rather than the revert.
+Queued the series for 5.15, thanks. The write-up of why only the
+l2cap_core.c half of f1a8f402f13f ("Bluetooth: L2CAP: Fix deadlock")
+belongs here was useful.
 
 -- 
 Thanks,
