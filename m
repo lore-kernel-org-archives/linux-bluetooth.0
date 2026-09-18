@@ -1,296 +1,143 @@
-Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EA052CCFE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 21:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789767886; cv=pass; b=oY38msDQLpbs7lqsjSWnk3z3HIQmtlXN3NVjv7Mpd8psfpk2ii87cxjoHWh4ssal14ubCdl5jEosNg42+xXAB3CoStq5RMjBFJJAvkGDbOUuqckxlYUohobdTB/gjmbS1nCTPaDBAxoeN7o9minBzwYW6zQgJPy/JVY8op90sIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789767886; c=relaxed/simple;
-	bh=zS6Zmv0ZfROEWi3veQMipP8pqIp75NYaPnea7MOM28Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rkhUmDfnBmK/OZd/dz8YonT+/TLat4Y3aYS3/iHGy2ZdmMUIdAYqiBlL9sk8cmPG4BozW3ke/7mWsd2xTJ5L57osKbdUMS2V7LTRmSkIMDxsxF1WEVkp0U1LFs/4qhpIUmuzO+tzaK6wR1KrHSpG5CR5or/+x6JhNBZekz7tO1Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwA67NsJ; arc=pass smtp.client-ip=74.125.224.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01FC522EE7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 21:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789768764; cv=none; b=UKWBhSU1wfkPB3Hb8JBF5jSaj5bYtn4SaueNdadHeFiWmBDpePsMrl2L5IDn927JRxh+PG2AL6lT/WJtFVo7IBAh4M0UGnI50XOBUAOKYsPPRB2R2eX0dNMg424rFHQwuCbcaX0zZHAsWFvKF5KOXu4tF0RGaiJiY876EvA2nIM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789768764; c=relaxed/simple;
+	bh=tsxnqOfgHrCVa0KIwC6bB1iOkZyZ5uHz1J0+CXWgHRQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bQUOZC5p08r7n7LkHYir8yvRCoCbRK6uVj8YunDh4ItB1YD1QEbIftnIPYA10G6MN9RT0m07bi+YBdLY9vJFds7AIxnYWIW29w9HaLJYwWANdpWRWD7SN7wKJs7HRu4wCyLGnwa1V4r0NblM0N7Xp7GzsZOt7WIJ6pgjSRLmZfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f5TUSP7U; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwA67NsJ"
-Received: by mail-yx2-f12.google.com with SMTP id 956f58d0204a3-66e56a1fe3fso1225466d50.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 14:44:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789767884; cv=none;
-        d=google.com; s=arc-20260327;
-        b=XuMxi3sL6irf8umygPKeC2aBBjFeGIzoEN1xUwpxCd0I/idLJ0SzdwQdUdLo9Xg9xi
-         BS5jX5cGmaers7nZQpAoKyYPAFARjt3hAmGb7IV0bNK9uVSa+QEYavW6zFKMllNPh4pi
-         wFhNHfD1wGMe4p/S/tfBaznfSbLp7YXndlNv/EODd/08mQxVF8XMnW4EPQA6eKQTDXW/
-         zntgsiGn8EsmdUCHrALh0R8fEa4pCOm0Xl+mKT2EvN2phLKrfhrV60kWqFd7as1AtHaY
-         W4lAI9jioqdFJo6bDHXbFdSZfhEUBgbA/EnMXO3klwGhf9rTMhSIY55hy0KPHVJhFBuX
-         VI8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=08tN3YpqUvcfjRk5DoF60k9QmITiPhJmX4y3qhseqZU=;
-        fh=rhg0Gle/4xL7toZLvPTXiQYaR5XkHzpydvfLlubNvfM=;
-        b=nsjIUV/APx41rSGq9uGYXj+Vl8HNgeUs+nsGfHqJA7KATFp9hIB3SzVKd81Sbp1Q1U
-         vxY+B8iJo1OD8PD5xjuKSYnND0jiA0qx9P9n5yqxetQZJxqlvJJ0icbg0t42d1FZ52nC
-         ZoPHxqAW4L+fs1wYs+Haf4OxmQ0bjPDnK/8Xy4pbMbDKp8Je92vtDOh0jHAPMKyFPYAz
-         vbij4iYlkcLNVFlLL5asd8NGn48OcWyBIDPJ2Uof5aB201sdgnz2eoBIG1/9xXt5QiD7
-         HkR3nMDS2pssEUig2ylrxQeMm5up/uEuQMv5u7V4PAsN/GoJeBupQQm5x0JxZ5wkdc7L
-         pDdA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5TUSP7U"
+Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c83be8db39so693439e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 14:59:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789767884; x=1790372684; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=08tN3YpqUvcfjRk5DoF60k9QmITiPhJmX4y3qhseqZU=;
-        b=lwA67NsJ5UC4y0ucyU2eEDvTj8rW16jQTe0pmuAhRxxcnQyACXwmZYkqwWmYWBU8Qk
-         PQj2M/RtHShEED5uwB3gu5roacqQojCJ16GXayyV78fNrnm1jpjuCR+c2899xVPc52/5
-         t8ABVJzGd4fShTmTsZGwN3UDQeQ7YUYcHv0HeVTf956K9iCrQebmZhlGZHQN4deN1ZY2
-         ioMZNnuHCSnga0NOVLxwmx62vGXK7DCE/speqv4NjW7ffDHs5wUq8Kha4HKUaa/ryhIW
-         +CYH8Xsp21hwvHWU7LSYx/VvTqQbNHIZCieMgCRPG+JkAEkHGUUlPstCZbdG5+pWfvbV
-         Wv4A==
+        d=gmail.com; s=20251104; t=1789768761; x=1790373561; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=A6IyTXSk5/vu9RCb313HxCIHu9BZ5jHrNuxe5/3bihI=;
+        b=f5TUSP7Us41XvoGTA0/7PXoNeqpfjPHQO/OsYOTf+66hB1qmT1+gb/CAnHMOp5YXfH
+         T86WfEOgzRq8M4BCqUanOZXtc1mGiZGZvsGz3Pq3uwOCr5eCgk5TW9toz3vAoxVWnpyz
+         h+gL5enbzCKHF5S0msxNlT5u8BlrEkoK56sgXA17gpULi49Ig/Rv/a+YM8BKS2HT/ID8
+         w1vgfIpFMRnQ0i8jQDWSr1F/uEP3RQja6BviQS4pkxkCi2zrhVgTniSlblwY5HV1HnDU
+         FG0eU0bwOClJUiNMeEJn6k1V58/5/OB9Ks8BzkRJqKphdJGKkXswSojND5j9jd/99gVT
+         8W7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789767884; x=1790372684;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=08tN3YpqUvcfjRk5DoF60k9QmITiPhJmX4y3qhseqZU=;
-        b=OhUix4PvyQp2C9hPwo6jTQ735vSSw6s1EArzia6cHlGvKLRj9/3idmdNvD9MzUktPE
-         XONthxb20mUNvOCMroU3kHVvEMhxNytdo+ztMhtYw1oDKKObEIGc1jkcCfHwvz/PSQmZ
-         +9uoep0HjRJb15ACUbTH7y0MHQtWlVwoHx1wyzUXEW3NRWFJMsm6rIEcJmrLlO3HrD50
-         6uzA6t2ieAmFL0SXFg9Q3q2/r5ur9mGp845BrxIIgyfNW6mt2VNqZyWQSJy07MeN19yK
-         g/U/FfDXtWR92+H/83uHyM7UiZ3vKpy4Cg7avzUJHflRVRLQQYnkdtsrsJcqgoHWWvNf
-         k06g==
-X-Gm-Message-State: AFuF++nqfVVHiZMLmUozyhAhqPzUnFeQjuIywx2ReY/QeZE7JcaR442M
-	Jbbjkw97sitvyfZe61Qu5++1BHH45ntTcvhLreOk6UIiK2wxEEoYBsLK5h68gA8Py3dSHYDHqe0
-	9YB23H2l0OUZf0Ay+FU8A+LFdnoohmzc=
-X-Gm-Gg: AYBFou0Q/at/Ff/cZuE9MepmJ+AfUJjnK7a2XYCo3GA9DbcKBZ5kbguXMFAanNvEOeO
-	iIWk4zZBvvZF84rzpMLO9HatTqoiby1tqWHjct8o8WR0jXVT45j/JIvZ6cEuY9DQ+G54Y0ktTwb
-	PMa8QdLczXwT7S9R9ceVlMwnC2FpdMy4PGIzioY/g5owTCKY56wOzFbVJkIYUsVFbqRZMWUzcC+
-	hAeubAyrO7YNI412x4FJE4tidWK2CvjcjnM0hhiQLgSmWCo5W6Uk1lEkprJK4rmpgV0goH+Qden
-	4gkn+z8l8sAWjmMleIkHwC9XFaFTQQUKEsC8gGHE3jQ2fuvqieumcJ18qorF1qFbhN8gNn3lxKx
-	6+MYFu9GnU34R12AEkk6WE4r/Rp7HW509+QreAnMnCg==
-X-Received: by 2002:a05:690e:4894:10b0:671:3c99:c857 with SMTP id
- 956f58d0204a3-6717fcb43admr893046d50.24.1789767883793; Fri, 18 Sep 2026
- 14:44:43 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1789768761; x=1790373561;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=A6IyTXSk5/vu9RCb313HxCIHu9BZ5jHrNuxe5/3bihI=;
+        b=DV8T2WRHVgkoo0iosv4AXJqf230VJwZbw7vLbQEtsXDzSy6SJ4A8N9HAzjAPV2BnG2
+         Hxb4wvr7bQQgbCZwCVGdLoqhnVdLtwP17oznon4BX7aBjB4C2EbXUGOPKIyr5Tmz4Qlo
+         tQ/LT2J4+bHFrHCYQlOchUQbY3RuIgs5smdMU8RsXMvhnQPe8JN+rko0numv4Ie3fq6v
+         3q9qJWDAyWL145/pVvRAFP7MjemBqJSFYZcdbhfzIsSPpXFbk6tnLogUVWqzI1hlpw6l
+         AencexEv19EMcImNSiE8+bpCRW7r4YXp6bfmercWYBM0PhAkhYlvgSB+acFac35taiQx
+         BfxQ==
+X-Gm-Message-State: AFuF++meuiI2/axzw1P33YG1AaitSCf6ZevgkXoRR4vOEdiFkxj0TrCX
+	gXh31F1zBtD91smXzOtEKB9ts/vYTCW1L7Pc0bm/ncsH2X3qsAGrq/KBRqbKdzbu
+X-Gm-Gg: AYBFou0beEmv80I9iQPEAQkzdKUl0+gqZ5/WxEtLHG6skayxBUvV6pSLjTJmVoQQ18F
+	u7MqV13gId4rRi6tcpsZjpEWFsH6t3YeQ3B1LILmYzbYuyhKc14DCPPrJFCsbS4EdljkKp9/wJx
+	OC0ok2pB988E1wZYZssQuJ9u1pKqmKVqc/VR8YaaRv4s1T0E1hvdZkRelWcco6eqYWtYaPImxAs
+	keOEoLK34zz4OyvCuSLVdlHVZAHIqi1MLUlw4fQuVQd0k1alTlBxn9dp0XlGlTZHe0fW0vFqFiZ
+	x1f0d1UXfVlJljNI056wrMQUpDE7sJWr7VpgW5R95ShkrPdyDTCqnBak3wR2pR6dgzoodrmKrT4
+	96b4dqM4KHIGB0omZQtF7eehl0hMOZYBRnpt59wAE7DWeEG1Av6Oo6nF6p8SjTAA180GNf+c4x/
+	YqvbsW5jrLmi3ComDsrtFVKX1dRLFXBfrvd0pj1ntwrG6CHVp/VIiW6D+ksOfCNN7fK8DUhzpyS
+	Sa8qdwi3usyHRvGva2TSWTS9/CneTBD4FTdFFMXDBVYlb2pwrWTBqNVlNsSlaAq
+X-Received: by 2002:a05:6122:3c46:b0:5c6:7f44:b001 with SMTP id 71dfb90a1353d-5c9b578a7b6mr2046211e0c.0.1789768761401;
+        Fri, 18 Sep 2026 14:59:21 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c9c195a6desm763109e0c.14.2026.09.18.14.59.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Sep 2026 14:59:20 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] adapter: remove the devices from the list before freeing them
+Date: Fri, 18 Sep 2026 17:59:15 -0400
+Message-ID: <20260918215915.2572126-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5yh1Rc6x2sD0mB4Zq0o-3_jmYYKB43NbYyd-ZXGrHGZRN61HyoWYmLVVTTHE2-SyPhNj8g2ktGAB0Zy_Jnq-Htnc1JspqPSHvIsZDC3KFlM=@proton.me>
- <bJzWf-DKkZ2NJt0LruBxuNgW3xnTzD5zu2ll54ZFD3hN89Bul7SbBAeOcvTK_S8vnaM-F5QpmQ0wZuDs9_M_G0fAbPTS8NMxFxctkbXnr2I=@proton.me>
-In-Reply-To: <bJzWf-DKkZ2NJt0LruBxuNgW3xnTzD5zu2ll54ZFD3hN89Bul7SbBAeOcvTK_S8vnaM-F5QpmQ0wZuDs9_M_G0fAbPTS8NMxFxctkbXnr2I=@proton.me>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 18 Sep 2026 17:44:32 -0400
-X-Gm-Features: AcwNN1VPWhIk0zak2tcT-PnclcsmgvVnPJuKz1NeSu6sqxUYAy2FE76xQgpWCgo
-Message-ID: <CABBYNZ+MCKEz_v2Uz+hDU0sn0COYj=guj9P8Fxu-qzp93XEufQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/3] test: Cover BAP transport release and reacquire
-To: dt <derektern@proton.me>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Sep 18, 2026 at 4:24=E2=80=AFPM dt <derektern@proton.me> wrote:
->
-> From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
->
-> Acquire both unicast transports, close their sockets and release them
-> through the same D-Bus owner. Require an empty Release reply so a late
-> ready callback cannot pass unnoticed by returning an Acquire payload.
->
-> Repeat three times with immediate, 100 ms and one-second reacquisition.
-> Check Acquire reply types and active transport states. Close returned
-> FDs even when a reply is malformed.
+The devices of an adapter are freed one by one when it is removed, but
+the list keeps pointing at them until every one of them is gone, so it
+refers to freed devices while the remaining ones are being removed.
 
-I don't think this is valid behavior, though; successive
-Release/Acquire calls should wait for the reply not just enqueue.
-Applications have the state to track if the transport is ready to be
-called again.
+Freeing a device looks devices up though, e.g. cleaning up its GATT
+server reports the disconnection, which searches the list for the
+device it belongs to, and the search reads the devices already freed:
 
-> ---
->  doc/functional-bap.rst      |  20 +++++++
->  test/functional/test_bap.py | 102 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 122 insertions(+)
->
-> diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-> index 60c38c5ed..96e398a43 100644
-> --- a/doc/functional-bap.rst
-> +++ b/doc/functional-bap.rst
-> @@ -105,6 +105,26 @@ test_bap_unicast_transport_acquire
->         be established, as `bluetoothd` sets up the ISO listener on its o=
-wn
->         when the stream is enabled.
->
-> +test_bap_unicast_transport_resume[0|0.1|1.0]
-> +------------------------------------------
-> +
-> +:Setup: As above, with both transports already created.
-> +
-> +:Steps:
-> +       1. Acquire both transports through one D-Bus connection.
-> +       2. Close both acquired sockets and call ``MediaTransport1.Release=
-``
-> +          for both transports without waiting between requests.
-> +       3. After both replies, reacquire immediately or after 0.1 or 1 se=
-cond.
-> +       4. Repeat the release/reacquire cycle three times.
-> +
-> +:Expected: Each ``Release`` succeeds with an empty reply. Every ``Acquir=
-e``
-> +       returns an FD and MTUs, and both transports become active again.
-> +
-> +:Notes: D-Bus is used directly to check the Release reply signature and
-> +       close the client sockets before releasing the transports. A late =
-ready
-> +       callback must not answer a pending Release with an Acquire payloa=
-d.
-> +       These tests do not force ISO disconnection to overlap the next En=
-able.
-> +
->  test_bap_unicast_reconfigure_metadata[empty|media]
->  ------------------------------------------------
->
-> diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-> index 7bd59777b..76b2c9f6e 100644
-> --- a/test/functional/test_bap.py
-> +++ b/test/functional/test_bap.py
-> @@ -4,7 +4,9 @@
->  Tests for BAP (LE Audio) using bluetoothctl in VM instances
->  """
->
-> +import os
->  import threading
-> +import time
->  import warnings
->
->  import dbus
-> @@ -276,6 +278,106 @@ def test_bap_unicast_transport_acquire(unicast_host=
-s):
->      )
->
->
-> +def resume_transports(paths, delay):
-> +    """Release and reacquire all CIS in a CIG through the same D-Bus own=
-er."""
-> +    bus =3D None
-> +    interfaces =3D []
-> +    fds =3D {}
-> +
-> +    @mainloop_wrap
-> +    def setup():
-> +        nonlocal bus, interfaces
-> +        bus =3D get_dbus(private=3DTrue)
-> +        interfaces =3D [
-> +            dbus.Interface(
-> +                bus.get_object("org.bluez", path, introspect=3DFalse),
-> +                "org.bluez.MediaTransport1",
-> +            )
-> +            for path in paths
-> +        ]
-> +
-> +    def operation(method):
-> +        done =3D threading.Event()
-> +        replies =3D []
-> +        errors =3D []
-> +
-> +        def finished(index, error=3DNone, values=3D()):
-> +            replies.append(index)
-> +            if error is not None:
-> +                errors.append((paths[index], str(error)))
-> +            elif method =3D=3D "Acquire" and tuple(type(value) for value=
- in values) =3D=3D (
-> +                dbus.types.UnixFd,
-> +                dbus.UInt16,
-> +                dbus.UInt16,
-> +            ):
-> +                fds[index] =3D values[0].take()
-> +            elif method =3D=3D "Acquire" or values:
-> +                # Release has an empty reply: a late ready callback must=
- not
-> +                # answer it with an Acquire payload. Dispose of any stra=
-y FDs.
-> +                for value in values:
-> +                    if isinstance(value, dbus.types.UnixFd):
-> +                        os.close(value.take())
-> +                errors.append((paths[index], f"invalid {method} reply"))
-> +            if len(replies) =3D=3D len(paths):
-> +                done.set()
-> +
-> +        @mainloop_wrap
-> +        def submit():
-> +            for index, interface in enumerate(interfaces):
-> +                if method =3D=3D "Release":
-> +                    os.close(fds.pop(index))
-> +                getattr(interface, method)(
-> +                    reply_handler=3Dlambda *values, i=3Dindex: finished(=
-i, values=3Dvalues),
-> +                    error_handler=3Dlambda error, i=3Dindex: finished(i,=
- error=3Derror),
-> +                    timeout=3DDEFAULT_TIMEOUT,
-> +                )
-> +
-> +        submit()
-> +        assert done.wait(DEFAULT_TIMEOUT + 1), f"{method} did not comple=
-te"
-> +        assert not errors, (method, errors)
-> +
-> +    @mainloop_wrap
-> +    def check_active():
-> +        objects =3D dbus.Interface(
-> +            bus.get_object("org.bluez", "/"),
-> +            "org.freedesktop.DBus.ObjectManager",
-> +        ).GetManagedObjects()
-> +        for path in paths:
-> +            assert objects[path]["org.bluez.MediaTransport1"]["State"] =
-=3D=3D "active"
-> +
-> +    @mainloop_wrap
-> +    def cleanup():
-> +        for fd in fds.values():
-> +            os.close(fd)
-> +        fds.clear()
-> +        if bus is not None:
-> +            bus.close()
-> +
-> +    try:
-> +        setup()
-> +        operation("Acquire")
-> +        check_active()
-> +        for _ in range(3):
-> +            # Close the client sockets before Release, then reacquire as=
- soon
-> +            # as both replies arrive (or after a short playback pause).
-> +            operation("Release")
-> +            if delay:
-> +                time.sleep(delay)
-> +            operation("Acquire")
-> +            check_active()
-> +    finally:
-> +        cleanup()
-> +
-> +
-> +@unicast_host_config
-> +@pytest.mark.parametrize("delay", [0, 0.1, 1.0])
-> +def test_bap_unicast_transport_resume(unicast_hosts, delay):
-> +    host0, host1, initiator, acceptor =3D unicast_hosts
-> +    transports =3D expect_transports(initiator)
-> +    expect_transports(acceptor)
-> +    host0.call(resume_transports, transports, delay)
-> +
-> +
->  def clear_remote_transports(remote):
->      """Release the peer ASEs while retaining the connected GATT session.=
-"""
->      done =3D threading.Event()
->
+  ERROR: AddressSanitizer: heap-use-after-free
+    in bacmp lib/bluetooth/bluetooth.h:438
+    in device_addr_type_cmp src/device.c:5657
+    in btd_adapter_find_device src/adapter.c:1055
+    in att_disconnected src/gatt-database.c:335
+    in gatt_server_cleanup src/device.c:842
+    in device_free src/device.c:918
 
+Take each device out of the list before removing it, so only the ones
+still to be removed are ever found.
 
---=20
-Luiz Augusto von Dentz
+This needs more than one device on the adapter to show up, which the
+test of a coordinated set is the first to leave behind.
+
+Assisted-by: opencode:claude-opus-5
+---
+ src/adapter.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 717db2ea9bfe..50b4dc6d724e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7293,7 +7293,6 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
+ 
+ static void adapter_remove(struct btd_adapter *adapter)
+ {
+-	GSList *l;
+ 	struct gatt_db *db;
+ 	struct btd_ranging_provider_manager *ranging_manager;
+ 
+@@ -7302,13 +7301,19 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->connect_list);
+ 	adapter->connect_list = NULL;
+ 
+-	for (l = adapter->devices; l; l = l->next) {
+-		device_removed_drivers(adapter, l->data);
+-		device_remove(l->data, FALSE);
+-	}
++	while (adapter->devices) {
++		struct btd_device *device = adapter->devices->data;
+ 
+-	g_slist_free(adapter->devices);
+-	adapter->devices = NULL;
++		/* Take the device out of the list before removing it, as
++		 * freeing it looks devices up, e.g. when cleaning up its
++		 * GATT server, and the ones already freed would still be
++		 * found.
++		 */
++		adapter->devices = g_slist_remove(adapter->devices, device);
++
++		device_removed_drivers(adapter, device);
++		device_remove(device, FALSE);
++	}
+ 
+ 	g_slist_free(adapter->discovery_found);
+ 	adapter->discovery_found = NULL;
+-- 
+2.55.0
+
