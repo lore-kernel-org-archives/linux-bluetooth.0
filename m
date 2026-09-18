@@ -1,66 +1,66 @@
-Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C6D3AEB39
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 14:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75824F85D9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 14:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789740190; cv=none; b=ptN/AnF1divehy0EfRwARpas6roTHMRRLdBB4CXzI7WXohNNjiNjtiXFHpSlbQfk+V5Rwm355oWs2bD2tSOwMV0PjpxGKPdlyXP3uDUvb1G1UmisezBk01Yp9HV4g3EEeEVe2A5Z1TA8C07OSqYj4qB+WbIqCnvs5aQAb5aPx40=
+	t=1789740193; cv=none; b=l3VWfRJDdpO3h7AYKIdrrT/zryjS/29Xb/iNkDJ/fS3ItTKubOgl+SzROhD8TxHK+YeOcESi5pHBa8voBOL6mbhif1Wje6+paQw8ptnRVJTFYatt9YA0LuObTb/irt6eKKVSNvpyCjpkDCcu6USn2mW+w584d4EyPgg6GRVpMak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789740190; c=relaxed/simple;
-	bh=AzXIS8vwCKzuCzXCNzxGISSSialQnH47UPBPNzVue88=;
+	s=arc-20240116; t=1789740193; c=relaxed/simple;
+	bh=TtTazJu50jA//PC14UTMBWJ/zYy687s+fK9iKvZzVsc=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=BWOBczvLZ5YXXbBQDhdzoOadP4gfl5W9jjnb3WavcWXGUCPCx9C3F8vbt5wYT31kJORsoKgxBnjGCmst770wDiQZTph4Xfzo5GrPXXP/XS+5X1CVT4ZrEeZtC9pzm9oEKgUavGfrliLLhTjMj1VI0uM44eI4d2XeQh+QLpSy7c0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/XLeL+v; arc=none smtp.client-ip=74.125.224.140
+	 In-Reply-To:References; b=mbiZm81RjVQ+abSnUgHauKg5ubSwDulMnkf7GkIGyBJRctY4wodQY7QdivPV38kvwbMWHnowR3/kN8oVfxzPhaR8F8dcGjE+6Ip4TzoLRZMHsMU6WMlFNeniEhPKlBcHNgKCQDEON81tqotvk15ulSRyiMyVATL+zXyujWSvcI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJKMZpZH; arc=none smtp.client-ip=74.125.230.205
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/XLeL+v"
-Received: by mail-yx2-f12.google.com with SMTP id 00721157ae682-85d45ae011aso5911327b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 07:03:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJKMZpZH"
+Received: by mail-qk2-f13.google.com with SMTP id af79cd13be357-939109fafddso52373285a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 07:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789740188; x=1790344988; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789740190; x=1790344990; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=01amu/6I7ztE2sTzGC1Ad2l29FKsmbXiZ6uQRauUB/c=;
-        b=h/XLeL+vHLEGynauKho3i3k5vFw0Hl5qCdMVC0Txs9v2VnTczRGq2cZxAuKCoM0Wvi
-         1Hoh6CQ6VJvHzHAw9OphfBpu5/r19n5lSUIaFDQ4QsHnrv9bJkkENzOzXuWf3V/dPYGe
-         u1i4U0nsvBEwOyycxleN0JaJys1Xx0NWK/t8y+4zrv6/U3l+gqVwLDmvrbsbhM2n2Jdt
-         rpec75eOTNdmwrYqx1B4l7kn+sw+0hT77jNp72zLLemjq+XFFnW4BaQXM25bIIO7bRSV
-         oSl4hasz5w7Zq8OlE527ZDj4efijZE581dVGzHhm1wiGyDtTD12yt3xz7F/o2o6SeFma
-         DTuw==
+        bh=YSi91eoQrwZl+MiliNXOc86RBLuUL1M1xJlwHDYZv4I=;
+        b=gJKMZpZHgkgNq0ymbZXo+CAzC6v9rJfttVJ+f8W+9v8c9QJfUTcQ349UEldkiLqnso
+         ouFcTTAtWOYXg6fXGLq05YuBMW557K+ALFwfv2dKd9FTiX7AMYElkRBp+NocYRihtGT7
+         pBmS0p8+txPdolcpqvtZuWIxgId6SlIBliry5u7Aej9Y8OYG9MO2SGIUb28gvL90wiFC
+         fxS//Fstn/2Mm05EWTy27O/LDK8lYnnZviZ1cNrpGlD2cuSoEaAnGn7x8hvCR1TQmTQb
+         BqqBUstYTsB2NWnD9YCeixsGwCoR+OXbm9WAOSFXH63vv2w/RRCcH2Evkar+zYeShKNw
+         /qyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789740188; x=1790344988;
+        d=1e100.net; s=20260707; t=1789740190; x=1790344990;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=01amu/6I7ztE2sTzGC1Ad2l29FKsmbXiZ6uQRauUB/c=;
-        b=iLDt4VijZguegLzU+7IADkm52o6IaaVjfirz0TPZTdxswsd7I4JPEr7kQqC/5aJRS2
-         CrbNa8ioL7BpCEyf01l3Aoa6WQG2iL50TuMBeS3DplA4gdtXW3TjOey6XyjP4vdJar0x
-         +FN4nOQyYPWRS2ArxiO+A2cuL69ZO5FWfF0n94Cr6X5mWrX9ml3y1favNxg4UErz16dO
-         JE21HdId8WumI4AWpN4ezG7g61F9oZsSfq/RQPsnXh3IF91fLk9DT3ayk3dU5hO+vU3C
-         s79y/lSoZ8MscDz2QcDC/Vt+xSc//NR1eZB2yAi+NbGdgegAyq2LoPgZDa/xY5z+7FrJ
-         AD+A==
-X-Gm-Message-State: AFuF++kaGelYiS4RSbVb5EH7gB3Ha+R/lMJSic+HWfzEJpN5bphq6bXt
-	P/MaloFB3mnnYapx/GEBeEgLPqWKOyt4PWp+KpXCDhrreWDf+qk6JCFdCQgFmA==
-X-Gm-Gg: AYBFou1B9PdPXRxD0mxteMN18GzLaJlckf+st33YunAH79o4pUPaQ8GXNrlhsV0ki0a
-	lG9tQh1bN6s76FKDCb3Mf9iZyh4tDFnLj/5W79qPwd536b55FOGRJ8on4BVXlH+g/sXbfAzM4At
-	gMWxEVfQl+zeFKseMkT+PBwXXhOU7MWaiIkd3peNuHFwMwpt0yT0uwngjeB8mRpQjy+NVzul7nn
-	Wk6c2vQNpdJhD8WRux9B3zO8o94ZGQZa6CgJS0pNNiZ2qo17nRS4VSBxCAIQnOPl2Lhh3M7kbLe
-	7brEsVk5eFblxfmA4K7l9J3+zkYgn573+EME6iAePj/8ZoBXghhPpam2/BLCzo2YzOkCejEa2A6
-	/ObDBjeOGbtFBnyib5/8H1+xKm0LbWJHhw8Tr9AGdMkjA4tMGagVB2w5IAUmpC8UeosEOpwiDWa
-	BPSBEAGbANVtZNoFmzkuNKiks+hLjZ4g2cr/qdWdY9h0TLjS9Gneg8+et1z0a1kc8FPCcCatMl9
-	glS7w==
-X-Received: by 2002:a05:690c:e682:10b0:873:5bb2:6c3d with SMTP id 00721157ae682-8973701efe1mr6482907b3.68.1789740188183;
-        Fri, 18 Sep 2026 07:03:08 -0700 (PDT)
+        bh=YSi91eoQrwZl+MiliNXOc86RBLuUL1M1xJlwHDYZv4I=;
+        b=Vbf5OXkGYTKYh+qU7aTMNLjeFIGPMvw69JRKivK9Dhfkn6pX/Ed3eeBAB3o0R0Nhjn
+         RyQkMT+VU/mNCDAIW+/o5342focDkQ3+YmRMYjIhn2VrWACa4uw0VQd+aI6PBaTm8ZsP
+         cn0tHXT6jpn6Mm70WZHvQD0g6u8xubqYLTMcQLCfrfcI4lPFMF4+CdNwhppYV0Vq/gEf
+         T3e4XDJt6C4Rg34q9PHjtzvqa/7amb2Mbz7tn/jQeRbzUhlw93fKUDwNWvHoh+DEcuOk
+         CVxz/ug1vP/7y0i/umnCsH/MyoyaziG/9ILPL00hSeeVAAVlbmzPdg6sYvzXgh03aJWo
+         QW+w==
+X-Gm-Message-State: AFuF++k6h3xnX8Y76+ai3/cpEmWEzzMq31o4rA+U6yrY55hkl+TF/7IE
+	m0g9axaLnSZMyV8GLliqWJnyDFOoo+9f/Too/s+tziuCqPC5Yxjt0D20YB7how==
+X-Gm-Gg: AYBFou0y3GUcAv+dnj7zZ+EVy9jw1dTAvBoal3CESwx0Q8Ds7/fMx/Ku9tp4EcmKrqO
+	ftrxsL+FNJm996mIMg8ifc5jMg+JYvkp25m+ldlXQFjIT6iOzN+HCpEh4aO5AWjg3+e4CPr4xWq
+	xld0JRXAj1wVbYWHH6szZOq/bDDIJdGuvVJDdLDvOJ7j/gbwCQfAqrNyLOVlcCCGanreFCmoN3V
+	53DkBN4RNDoJGvZiLHZkB8xQsBpTEVvMAEpd6JP/zMFu+SaF8xrXwAaM8WnyTWxQVvhDtPUUVz8
+	5zfM4/kcDjF8MUcS/SIJCWGsLenV5AfX6D+10HiKl0+1cRn0TV5VAtrRO7EUSOqUqW8hZlxadYe
+	m9g+zXTPvRdfuR9nX+5xDw0EuBzYIgu/lBqB1oNILc9PFc5QKxgCLmfCgvdseeukRU7kjorwvXk
+	stuaICj1cZ09j1MR4a8vhf6cFBGFyT6cpH/y/N+GUZmMz6XqlA6dm6LX8q8d45pU8x4YfrnsxdX
+	hDnIg==
+X-Received: by 2002:a05:620a:1a01:b0:93a:2e4d:9f52 with SMTP id af79cd13be357-93bdc6a1399mr371612585a.19.1789740190289;
+        Fri, 18 Sep 2026 07:03:10 -0700 (PDT)
 Received: from [172.17.0.2] ([20.127.247.38])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91258056585sm13139336d6.32.2026.09.18.07.03.07
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93be0ecd455sm144047785a.29.2026.09.18.07.03.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 07:03:07 -0700 (PDT)
-Message-ID: <6aad449b.d2b8f92c.1fbfea.b9bc@mx.google.com>
-Date: Fri, 18 Sep 2026 07:03:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0595230926559491727=="
+        Fri, 18 Sep 2026 07:03:09 -0700 (PDT)
+Message-ID: <6aad449d.b41fd234.46d10.7f66@mx.google.com>
+Date: Fri, 18 Sep 2026 07:03:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5464793765843931288=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,13 +68,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nithibert@gmail.com
-Subject: RE: [BlueZ,v2] adapter/advertising: fix mgmt endian bug
-In-Reply-To: <20260903091059.161705-1-nithibert@gmail.com>
-References: <20260903091059.161705-1-nithibert@gmail.com>
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,1/3] doc/qualification: Add PICS and howto for the BAP qualification
+In-Reply-To: <20260903085716.741578-1-frederic.danis@collabora.com>
+References: <20260903085716.741578-1-frederic.danis@collabora.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0595230926559491727==
+--===============5464793765843931288==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -87,9 +87,9 @@ This series was picked up by the CI more than 2 weeks ago and the pull
 request created for it is still open, which means the series was never
 applied to the tree.
 
-   Series:       [BlueZ,v2] adapter/advertising: fix mgmt endian bug
-   Pull Request: https://github.com/bluez/bluez/pull/2478
-   Created:      2026-09-03 11:13:00+00:00
+   Series:       [BlueZ,1/3] doc/qualification: Add PICS and howto for the BAP qualification
+   Pull Request: https://github.com/bluez/bluez/pull/2477
+   Created:      2026-09-03 11:12:57+00:00
 
 The pull request has been closed and no further action is taken on this
 series.
@@ -102,4 +102,4 @@ picked up again.
 Regards,
 Linux Bluetooth
 
---===============0595230926559491727==--
+--===============5464793765843931288==--
