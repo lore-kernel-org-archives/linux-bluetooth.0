@@ -1,39 +1,43 @@
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from mail-24431.protonmail.ch (mail-24431.protonmail.ch [109.224.244.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E34A524B1F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 20:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7444144AB6B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 20:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789762929; cv=none; b=Ydksk1ZGGnZw/HaDn53vxqs0s+jdK9x94Lo/bXcnCjfd+SzibZfRjsfyoIEZj3kLFGau3ElR1SrHeer6gywY3zg9A2dI97RNJonHfkGUi+OjAkee0kpmPeM8tKFkE6fJ64PbH1UfU1ftWIjCn6sxuL0Y5HsRtyDMmG5D7XWkoCE=
+	t=1789762995; cv=none; b=GOqCv9GQ5489EisjrhEKLtV9SKE2hlq1136BOaZ6RVGa1lhHgr3Jsdy6tFDaTbyAu9yMXP2ucoH8v0u5l9rtZF9i2qtWhfSaKgU+QriCZWYpkBPRy3REK7RKHgAHx9MnvtrdpBfN2O8UMYoEShFmXRbNx6+ijinCswItddoHCGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789762929; c=relaxed/simple;
-	bh=vxUwUD6vkFeQpYVHUCkrFraiXvY81h4bdsdzp2kJ3Ig=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=q6giGXqzkIY+EP4UY0kCjzrga6FEkwwH9NO+cW04rbizjGozx4Y+SEcrY27k9VRtW1yZ4FC/m6xUW+KZVYKE0aomr+8aNJl3tZlSdeAKMLpZ6isKRKnNGsGHVo23s6OrhxG8VoiIEqH495Q5P60JuuZVc4JhBg2Zf+AX4uj7Po0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=R2IBXwq5; arc=none smtp.client-ip=185.70.43.25
+	s=arc-20240116; t=1789762995; c=relaxed/simple;
+	bh=iW36Lz1m7JhGxd50TOlPXz36kiQO/hb4Gka7rJWhLH0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jZYVxIdg8LieNImQIslcEVkxfwHxVg+K46s2BUz/3/ZALew827tW4Hpp1wfrmrOTJzrCn0mt9UEqr6Lxjr/XWVd4Evc0JcIovkrZlExI3RBb77flCeGePUSYjl7CkL4T0tzTCL3edRgccOUdf0h15fCZshsNnmI/82GEyg0jbFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=LEnuiowm; arc=none smtp.client-ip=109.224.244.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="R2IBXwq5"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="LEnuiowm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=agnrh2bxffavxbhdloo5wgdowm.protonmail; t=1789762914; x=1790022114;
-	bh=vxUwUD6vkFeQpYVHUCkrFraiXvY81h4bdsdzp2kJ3Ig=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=R2IBXwq58rAiYR/NAcjCSR2Q1IRe+HeOThphc7KxZF2l9blPsfCYLG77xaptZcGRs
-	 6TCJ9TzIXQl8TBsxV3YoLytS9MruPbRvrvboiQkd1hwvkZZLNJCvhsk7X2Xukqn/7U
-	 fSdt/PQvWuJUCQrUy6NFXKcbBhEUIKFK2YkiKKp6onk+onaiKpMck6AQmq/TD2bRYF
-	 a8r5k/mhWtKvnsRO8nv0+JoqpQPBr/lPqOKz7KLwXkELnDGg4cnOzqzUZgKf6O30rK
-	 jtIgffDNAduzuK16Rys9hinfZ0tqgPXu3hFb8x2TgrHIeTngUJ591dPKG54zQGDyzn
-	 WJVKca5jWpG9g==
-Date: Fri, 18 Sep 2026 20:21:51 +0000
+	s=rknkw4o7yvaklfjnoh5dzfnozq.protonmail; t=1789762982; x=1790022182;
+	bh=iW36Lz1m7JhGxd50TOlPXz36kiQO/hb4Gka7rJWhLH0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=LEnuiowmUzIb1JdB+sppvzuIZ+zLonlADXlxrSErtLJ46IgZ/HXJg/yBoVk7BzSIn
+	 1Y7v6Bc+bPHWm+8CsQk76toKCrkQldr+0Pmwyh09U9KLTyMMH5Wg+sz80kez6UT8HC
+	 m6fK1bQZ8Mc2wb1t6LmQbcDLyBFfzs1JCBLvVo05a3vqffFlRm1AgFFg0aqSt25OiP
+	 IbTNRb9vCwRwnQQtC8PRJFEqVA7Z5lGYXlziTowckOh1zGB57puUf/9oBUGShbP0Ox
+	 tzIbf7YLOsJVuK9mFIX0jKDtU0l+DH9I2xmBVdFiPfp1P2T+pQz9ibEPMaxhpcch/L
+	 ijYusajRqylmQ==
+Date: Fri, 18 Sep 2026 20:22:57 +0000
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 From: dt <derektern@proton.me>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH BlueZ 1/3] transport: Preserve Release on late BAP ready
-Message-ID: <5yh1Rc6x2sD0mB4Zq0o-3_jmYYKB43NbYyd-ZXGrHGZRN61HyoWYmLVVTTHE2-SyPhNj8g2ktGAB0Zy_Jnq-Htnc1JspqPSHvIsZDC3KFlM=@proton.me>
+Subject: [PATCH BlueZ 2/3] bap: Recreate stream IO after an early Enable
+Message-ID: <ZKE2YTCY4vSeMRG22gAE_m0EaMZ-c9O3kDGGU2YzPPFnkcZFexHMBMWbshUyc5nSPg6bgtyhVB4JwKOoeAGRRCgWWcfSzi0LvsND9Qxe6xY=@proton.me>
+In-Reply-To: <5yh1Rc6x2sD0mB4Zq0o-3_jmYYKB43NbYyd-ZXGrHGZRN61HyoWYmLVVTTHE2-SyPhNj8g2ktGAB0Zy_Jnq-Htnc1JspqPSHvIsZDC3KFlM=@proton.me>
+References: <5yh1Rc6x2sD0mB4Zq0o-3_jmYYKB43NbYyd-ZXGrHGZRN61HyoWYmLVVTTHE2-SyPhNj8g2ktGAB0Zy_Jnq-Htnc1JspqPSHvIsZDC3KFlM=@proton.me>
 Feedback-ID: 213585229:user:proton
-X-Pm-Message-ID: 056f9c44e49680fcc22c9d61a1e7574c31ca5ff7
+X-Pm-Message-ID: e376ec8077009877b7b4f7f01aa56224fb2ad5a1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,43 +49,48 @@ Content-Transfer-Encoding: quoted-printable
 
 From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
 
-A late stream-ready event can reach bap_resume_complete() after Release
-has queued Disable. It then replies to Release with an Acquire payload
-and drops the Disable request ID. Client disconnection can subsequently
-free the owner while the Disable callback still refers to it.
+When reacquiring a transport, the stream can reach Enabling before its
+previous CIS finishes disconnecting. Once teardown completes, IO
+recreation accepts only QoS, while CIS enabling requires existing IO.
+The pending Acquire consequently stalls.
 
-Only complete pending Acquire/TryAcquire requests from this path. Leave
-Release and its request ID for the Disable callback or cancellation.
+Allow deferred IO recreation in Enabling too. Keep the existing CIG-busy
+checks and recreate all IO before enabling CISes.
 ---
-Based on master ebbb4ee31. The new resume test fails all three pause
-variants on that base with malformed Release replies and a Disable
-cleanup crash. With the series: 7 targeted functional tests and all 697
-BAP unit tests pass. The tests check transport lifecycle, not audio data.
+Additional local A/B: hold the userspace disconnect callback for one
+active CIS for 500 ms, then reacquire about 118 ms after Release replies.
+With patch 1 in both builds, the old predicate leaves both Acquires
+unanswered until the client's 26-second timeout; this patch completes
+both in about 374 ms, after deferred cleanup.
 
- profiles/audio/transport.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+The delay fixture is not included here. It delays userspace cleanup,
+not the HCI event; the regular regression does not force this ordering.
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index e3f3df50e..02c5c7ac0 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1952,8 +1952,16 @@ static void bap_resume_complete(struct media_transpo=
-rt *transport)
- =09if (!owner)
+ profiles/audio/bap.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 5771c9ae0..308e0fd05 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -2576,12 +2576,17 @@ static void update_cig_setup_io(void *data, void *m=
+atch_data)
+ =09struct update_cig_data *info =3D match_data;
+ =09struct bt_bap_stream *stream =3D setup->stream;
+ =09struct bt_bap_qos *qos =3D bt_bap_stream_get_qos(stream);
++=09uint8_t state;
+=20
+ =09if (qos && qos->ucast.cig_id !=3D info->cig)
+ =09=09return;
+ =09if (!setup->want_io || !stream || setup->io || setup->closing)
+ =09=09return;
+-=09if (bt_bap_stream_get_state(stream) !=3D BT_BAP_STREAM_STATE_QOS)
++
++=09/* Enable may complete while the previous IO is still disconnecting. */
++=09state =3D bt_bap_stream_get_state(stream);
++=09if (state !=3D BT_BAP_STREAM_STATE_QOS &&
++=09=09=09=09=09state !=3D BT_BAP_STREAM_STATE_ENABLING)
  =09=09return;
 =20
--=09if (owner->pending)
-+=09if (owner->pending) {
-+=09=09const char *member;
-+
-+=09=09member =3D dbus_message_get_member(owner->pending->msg);
-+=09=09/* A late ready event must not complete a pending Release. */
-+=09=09if (strcmp(member, "Acquire") && strcmp(member, "TryAcquire"))
-+=09=09=09return;
-+
- =09=09owner->pending->id =3D 0;
-+=09}
-=20
- =09if (transport->fd < 0) {
- =09=09media_transport_remove_owner(transport);
+ =09DBG("%p", setup);
 
