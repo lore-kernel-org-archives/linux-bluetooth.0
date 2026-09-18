@@ -1,73 +1,72 @@
-Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51DF35E1A9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 07:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50993546D7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 07:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789718172; cv=none; b=DhXdgyTo5YwDq8JCfO23bb0elRGMfTnXKujdIBvn6ib7qYoAskBeMlYdan5LkSyR8Sa+/HjDYbDV3KE92cammNjVv9OVM8mHBDY6kJFnsL7dGS4azynDpQ8ARZFbQk9ogCJJorqJIhR7OpM52rBXn/j9jGH8o1jUEnzspM9nbV8=
+	t=1789718315; cv=none; b=QJMr2sdkWxK46RLgKGDWXZGXE+Hrgz6HVeffgDo5NzhavAdr+vHD7KSuPWDn6H03SMurf0xG9ARuD69Yl2XhHBCCixHoBons+Kdigr6UhzhvBY9DLMsPxQTPTXABy/JdYASwM391pTtuiEKd9mSY2hCMS+fa5UxkOzmeF49Umf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789718172; c=relaxed/simple;
-	bh=E5lJFa48JLe3JtulsGSEAqeCO2Wce69bO6my0/dJXaA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QESvzwD4rb9or1fWjdwyMmkQBMaEvFS5TBSmke5XDNvGNmYzWS5LLQ4dpeOd8M8Iu8AZXeCUQlQzWVXu22JSxsrWqy/dRI4W2Og8cI0qJ22b1YMwuzPs4djx2AhMPJcG47TCvFP99Ku7syjxQ7NnHilkpJVwStNm1tiJFtzAQk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeIwTZlW; arc=none smtp.client-ip=74.125.227.171
+	s=arc-20240116; t=1789718315; c=relaxed/simple;
+	bh=58Ov7X4cQiiV8yVtiAcfIEpAgynsoG2QRdaTFGCXiZc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Aa3YezPf6LelTYkDc+Bc3mYTDBwlmhqH/mlId/U6gpIdcfatYqObg+YmjW9Qe5N1pFf2WRAg2S2xVHLGBkM69kCin0xV9Fl58Cmr6REPXWdRUorjyO9afP1Z/Cw0Igrk3cPsfopVQtCbyaH3xcO8zc53U6yTEOaCgLdUFyOLYr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1w/lVsy; arc=none smtp.client-ip=74.125.228.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeIwTZlW"
-Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-398b3b189e0so398048a91.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 00:56:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1w/lVsy"
+Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cebad4adso295826a12.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 00:58:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789718170; x=1790322970; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789718311; x=1790323111; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yn5DIqQw4q6rC7tHkuAinbNEk6nv+wVGhTyoKH5xIz4=;
-        b=HeIwTZlWILDeufklzoptdsOj1F9yRTeRz7F/1qtWhAIo2WreN7eNzC6Ep2OMafAsne
-         MHDK6QoMmov7zBdZekQ627nhezJxTlakqfNbF9r0CYr1REiq+oXeq8y0CtiF8I5sU6KB
-         e+3TK8cV5bhS98ACLWjHBAcJ+m1jioS3LbZN/FeU+QvfG+zCnbLQuFp8Aa6a7MWiUrDN
-         qSKBv2qMu8QEIjiVPqmUW7lH8i6vSTOESfXwm4mqGf7A68XT0LlhWsDTBeSLIP4+ldP1
-         IVSHtjXTCwei38sCi+BSgirpTorM4S4ubc1vBntDiU4exZdvMpLF5MLK5pOKxq2D6dMl
-         Qv0Q==
+        bh=h7AV/9Z4iSdAqXfI+wA+QLkfqj4NMH3iyjMDb2Tzlg0=;
+        b=d1w/lVsyKIY9Kqx9HaICxKXkuHz/uDIpcXI4tDmrOHdWzdwW7//j92Rd7UMuyaDP/L
+         tcTSOA1YAxN1LTnudj82nKe6aJAGoR2vwxLn93irkxo+fNeQ84264H5lSttvo9DoBNjz
+         W+HcKcG1B+ctM4y2nW6rUTBiT2g7kHsLen2Wk36B9ln5NqpgLoNMNxENgw1vFE1tBsj4
+         rqtKSagcFO+1K6jKYr7jbxMiKiVLZNvF1OnByfCz/u2bvJFfJLPmK8gQJ8s0HM2uDvLb
+         2YJxnY1woCwHwtIv6YCelvQOxZq6NRueeBuQRK7UZlOSs4IwQaNiyBGjwfCqSlaHzX2l
+         GcaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789718170; x=1790322970;
+        d=1e100.net; s=20260707; t=1789718311; x=1790323111;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=yn5DIqQw4q6rC7tHkuAinbNEk6nv+wVGhTyoKH5xIz4=;
-        b=IsGmYmX/e6t3FIYZLkiXgJJ0t8hJrBGl7+OkkT2N/9aL1UNunanTY+Z8EiPGiqruep
-         i6djZPY0w2cYPRPdMpLIqCiaxZPWkWmfPPFrWmIqu4vASpPNvoaiSJArOIGEjVf4j9Va
-         UczOQR6mxKmxO/Aehr9eX16v5mXPqTJkmChW+9tSOoiyAt+8EoskC5V2P8u/xAWMHTcj
-         5pIS/48C1v8bj6PHWaVR4N7YV/d/UA2ACsM5KywdOQiZNQ2lha5vX0XO3lbITXMkoup+
-         4BSJ3V90shMA6XUTfc7TZKKwBWBiUH0XuGA9L5lSO9pJ6slmNSxmyRx8po0ktvB3yAdn
-         WgBA==
-X-Gm-Message-State: AFuF++lT7lhRe6wvRqerb8RbbOIHdo9R0///DeY2RrBFvUnbiw/qUO6P
-	6hToR7BgYv7xHMbFXkD4D/8oiwEuT3CvcB06K46KFmCzyqBWZDxXYPmgonL3mg==
-X-Gm-Gg: AYBFou1vXzvk0TlhGJubTfOXHQcioqodFTNE5yayXA1TpiEM0Z9WYEb3DwmyZNUSp9i
-	Y+18L0elI3jIUt37zteYB7/KS1dpRGmoVhibFLeH8TFF3gkV3sgXnNWRr40NWQoIkv3OJ3Tvzpn
-	Pu/LRQBeZb4MzNeUmtrMdmXT4XZM1o+QwkU/wRCDjoFzDHeHHPOI3TZyLnrELa50jFpJxtPYe95
-	es/rz0sj/cLvNECYDZGrgZRftG++SrAS+HGDo6VVqIdSgeFngSpLgwxwypUYGMz2SbV7hYAsefY
-	ite4cbeumX21g1+9R/IsUZaGsHEulTgILisa1YfHS7TMkDW9ieOcxo8otMLGuk9PRyhzsjg3mAd
-	xcy6DFrEqixLpLbw2w9veLr2d2tFb1MBN+8UF+ukC/taaSxhbDi4eGodmF2iQTDoDTbGvwTrDPO
-	NGdwnsyZrL81MRakgP4w+060lGjAlEu5nWWyqO0EkDgvreenRBP2eXfIHyq1uzUqQJHdCRvykSz
-	04AZI/2f3Vm6Ef1lkYLpmWvCUmxv7oM
-X-Received: by 2002:a17:90b:4e8c:b0:39b:2c55:365 with SMTP id 98e67ed59e1d1-39e54b457a8mr4076007a91.12.1789718169851;
-        Fri, 18 Sep 2026 00:56:09 -0700 (PDT)
-Received: from thangnn-Dell.vingroup.local ([202.60.105.126])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e36116884sm9214715a91.6.2026.09.18.00.56.07
+        bh=h7AV/9Z4iSdAqXfI+wA+QLkfqj4NMH3iyjMDb2Tzlg0=;
+        b=r6tdR/4bTP9zhc86E+IQgssKocYtRga+QdWQQQRle2zOd6xs1czfJqaqYehHNJ66pE
+         PO5/niJLt5K2R+ASTvzPG4Wj5pQBR3NJmGRXjJKo3/3XXnOp59BvLUhTayBbRKomoFTy
+         sqKuPKhQzSN77Dgr6z4Hy42ST9I9EbFItBc59gNMRbxjlL/37qfyxtdq2lv/TwZJMm8i
+         uE2Ou/CEq1G+uh/2YZZwDM6XGgCKX2llKK3z2PcLGuKLvDxOz00nVpExIcIBvMQv3MzN
+         dxDIAtUdaS2uB3gqnfFlOTeW7DTYt31gUXNysc2qrN7oBEPWcKMUSdgptu0M2piddmaD
+         ezdQ==
+X-Gm-Message-State: AFuF++lm+6isebf7/xZINAZEcaRKbvAAumIOl6pazYaHEB06hyklgyA7
+	9MndEw/ig4rE5OagsQu3y231MDjWsJkoGTEBI9+uaMEvG/bQu7DAfEiG
+X-Gm-Gg: AYBFou1/4WOdI9XA+eU551O5ckJ5vOmqZ9JDEXn6yvjmLA6NflwZ1Ut5MdDVaWU1BJg
+	MR/UAZ13pTn3TPBQ0UVkRW4JLb0l++XPoLRNkhLn+IQHwnnafFEeSqtE1Ozrt5/DpN537UNdcfb
+	PCFsgBjbBj6FQY0lKKrz4Zm/oFQ8i16qOyYbwYIFUEULOMp8IxwTaxMqpb/vgZVuFoqA1NNJxt2
+	Dh3LApmYuzv/tQeEXijZezr8iVggxssB3HTCynP35XQsH8QOkHqEN14ev92FatZjCJPELNrnHDC
+	CWjgAR0O+oRdzN1pkxKaiPdkb1ciyFXB3oe2JvHw4/5sR7DHntwEF2bvhthbc0Wuhd72YFG4QMb
+	TqnfWayl3Gsokf/x7Aqou4TTWEj/iEXRvDlYOzXrdXQdfSIjD9W3PcnTjHfDEjS37xd8y/dkPRI
+	1B5KbaKpPMiCjlHoU4nMuKT2T+Siutq68iwqRDIQ5lgPhW8cfU+wfn7YS1desjt0d6xw1m3lR9R
+	Q9qV9EsFetY5YzjO5eC6zvBnn2tbXuFjE8enqxkqonULGk/ng9h5LLniusk8e+yMibWxX/JyKIo
+	bnBvdBkMJw==
+X-Received: by 2002:a17:90b:2243:b0:39d:f773:37b5 with SMTP id 98e67ed59e1d1-39e549c5057mr6360189a91.0.1789718310947;
+        Fri, 18 Sep 2026 00:58:30 -0700 (PDT)
+Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e36115cc8sm9018249a91.3.2026.09.18.00.58.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 00:56:09 -0700 (PDT)
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Subject: [PATCH v2] Bluetooth: af_bluetooth: Fix double list_del and UAF in accept_q
-Date: Fri, 18 Sep 2026 14:55:35 +0700
-Message-ID: <20260918075535.886816-1-ngocthang2710.1999@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 18 Sep 2026 00:58:30 -0700 (PDT)
+From: Hui Peng <benquike@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hui Peng <benquike@gmail.com>
+Subject: [PATCH] Bluetooth: RFCOMM: Reject short EA=0 frames in rfcomm_recv_frame()
+Date: Fri, 18 Sep 2026 07:58:28 +0000
+Message-ID: <20260918075829.2203887-1-benquike@gmail.com>
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,83 +75,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bt_sk(sk)->parent is a raw pointer with no refcount backing it, so a
-child sitting in the listening socket's accept_q can outlive it. When
-the child's channel is torn down independently (e.g. hci_error_reset()
--> l2cap_conn_del() -> l2cap_sock_teardown_cb()), bt_accept_unlink()
-dereferences the freed parent, corrupting its accept_q_lock and list.
+While rfcomm_recv_frame() verifies that skb->len is at least
+sizeof(*hdr) + 1 (4 bytes: 3-byte header + 1-byte FCS), an RFCOMM frame
+with an extended 2-byte length field (!__test_ea(hdr->len)) has a 4-byte
+header plus a 1-byte FCS (5 bytes minimum, sizeof(*hdr) + 2).
 
-Additionally, if multiple threads concurrently tear down the child
-socket, bt_accept_unlink() can be called multiple times. Without
-checking if the socket is still in the list, the second thread will
-perform a double list_del_init(), causing list_del corruption (kernel BUG).
+When a 4-byte RFCOMM frame with EA == 0 arrives:
+1. The initial skb->len < sizeof(*hdr) + 1 check passes (4 < 4 is false).
+2. Trimming the FCS byte decrements skb->len to 3.
+3. If __check_fcs() succeeds, skb_pull(skb, 4) fails (4 > 3) and returns
+   NULL without advancing skb->data.
+4. Because the return value of skb_pull() is ignored, the un-pulled
+   3-byte struct rfcomm_hdr remains at skb->data and is either queued as
+   application payload via rfcomm_recv_data() or parsed as a multiplexer
+   control command via rfcomm_recv_mcc() on DLCI 0.
 
-Fix this by:
-1. Taking a reference on parent in bt_accept_enqueue() and dropping it
-   only when actually unlinked in bt_accept_unlink().
-2. Checking !list_empty(&bt_sk(sk)->accept_q) inside the accept_q_lock
-   to prevent double unlinking.
-3. Moving sock_put() outside of the spinlock to avoid sleeping in an
-   atomic context.
+Fix this by extending the length check in rfcomm_recv_frame() to also
+require skb->len >= sizeof(*hdr) + 2 when !__test_ea(hdr->len).
 
-Reported-by: syzbot+534002670dd34a114fdc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=534002670dd34a114fdc
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Signed-off-by: Hui Peng <benquike@gmail.com>
 ---
-v2:
- - Add !list_empty() check inside accept_q_lock to prevent double list_del.
- - Move sock_put() outside of the spinlock to avoid sleeping in atomic context (suggested by Paavo Helde).
+ net/bluetooth/rfcomm/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- net/bluetooth/af_bluetooth.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 411d66f24393..7797b1052808 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -224,6 +224,10 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- 	else
- 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index f7463f092..d91e2a6ee 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1817,7 +1817,8 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 		return s;
+ 	}
  
-+	/* Hold a reference on parent so it cannot be freed while sk keeps
-+	 * a raw pointer to it via bt_sk(sk)->parent.
-+	 */
-+	sock_hold(parent);
- 	bt_sk(sk)->parent = parent;
- 
- 	spin_lock_bh(&par->accept_q_lock);
-@@ -257,15 +261,24 @@ EXPORT_SYMBOL(bt_accept_enqueue);
- void bt_accept_unlink(struct sock *sk)
- {
- 	struct sock *parent = bt_sk(sk)->parent;
-+	bool unlinked = false;
- 
--	BT_DBG("sk %p state %d", sk, sk->sk_state);
-+	if (!parent)
-+		return;
- 
- 	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
--	list_del_init(&bt_sk(sk)->accept_q);
--	sk_acceptq_removed(parent);
-+	if (!list_empty(&bt_sk(sk)->accept_q)) {
-+		list_del_init(&bt_sk(sk)->accept_q);
-+		sk_acceptq_removed(parent);
-+		unlinked = true;
-+	}
- 	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
--	bt_sk(sk)->parent = NULL;
--	sock_put(sk);
-+
-+	if (unlinked) {
-+		bt_sk(sk)->parent = NULL;
-+		sock_put(parent);
-+		sock_put(sk);
-+	}
- }
- EXPORT_SYMBOL(bt_accept_unlink);
- 
+-	if (skb->len < sizeof(*hdr) + 1) {
++	if (skb->len < sizeof(*hdr) + 1 ||
++	    (!__test_ea(hdr->len) && skb->len < sizeof(*hdr) + 2)) {
+ 		kfree_skb(skb);
+ 		return s;
+ 	}
 -- 
-2.43.0
+2.55.0.1082.g2b9226bbc0-goog
 
