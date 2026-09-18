@@ -1,259 +1,239 @@
-Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021130.outbound.protection.outlook.com [52.101.65.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6AD4E3222
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 11:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.14.118.250
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789729523; cv=none; b=dzASDcHOfgio69ljO9TPHgtccAuY+OP776I/zf5lbHmIUViopgSwcJQUOs+Wk47FCsch3F3C31+X7+Yc0+Tw/JXFVc6YvzSoD9Enurj8ZxR7bYRGggUFma+jNMug7UfCNYiQJQrJaY5UfxeB4g19zcr9nwNaAT1D2j7r0vMYKrw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789729523; c=relaxed/simple;
-	bh=0FJ7/88WdZZITzJIreUYjTVNk2kYMCw/QA7eNVZh1OA=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version; b=jhWaeBn6eWJlwoPRnrutHQlh8kS3vWbyI1GBGWKhRLUsDTMA/0srzf50NDbEddK0DsWthv4gdbGXwVg8whFbiqarb/TeiG6uZJTQ8zgG0S1UyKFI72/GDNcs/QhdACeSVV78lM9fKH9s6QW32o2rAU7txZEZKZtMkToB6kuLxZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch; spf=pass smtp.mailfrom=fiveco.ch; dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b=vFcH0wDB; arc=none smtp.client-ip=46.14.118.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E093B47C6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Sep 2026 13:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.130
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789738047; cv=fail; b=gHrpW9GjddenlmpHdWwF2/R/cP6wP2mkP7sWJdCTEbWKN76G9dlk6Mc2oKHcTNm757aN8LEVNnRsCA89bCGV1hjz75JXQ7gy2EVwYp5HE2sXFXrRXSRsUhxFr2XiYgAFSASVnbTRbP7aTVpUKMSK5cukoNhMqsSJvYHxCTfDL5M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789738047; c=relaxed/simple;
+	bh=SbiDmxmluGOyCAsq5KYvEMltBjPAGkZVJT3+C8IoAAg=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MvhRaTuDJgvJoAZi+CKXCPsaBYnUsTLLaiTqVmEWD9ngVFGDpBFFwj/n1etH6wIPJSukmoDlt5WFcuiFMRa88/YMvsVBPnpz+DhWpu4ciwuNRBwLpbGLxukb3a7U2z4uogK2iozN26JQQBL0Osnvz+JMKTgFoavB5WpKA8tzd0k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk; spf=pass smtp.mailfrom=bang-olufsen.dk; dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b=WSRnIPTz; arc=fail smtp.client-ip=52.101.65.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bang-olufsen.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fiveco.ch header.i=@fiveco.ch header.b="vFcH0wDB"
-Received: from [192.168.16.44] (port=43574 helo=remote.fiveco.ch)
-	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <valentin.kindschi@fiveco.ch>)
-	id 1x7WO8-000000002Ql-3UT1;
-	Fri, 18 Sep 2026 13:04:16 +0200
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
-	t=1789729456; h=from:subject:to:date:message-id;
-	bh=0FJ7/88WdZZITzJIreUYjTVNk2kYMCw/QA7eNVZh1OA=;
-	b=vFcH0wDB5asHvJDldioPwx30qhzhndSnN1reUeqXTx6CWJQFdHYCEh6cw8inpVLv0VdKg7WXq2a
-	k1LxwBDCR8AZqf+TAG95LUyMLO+jPAJLCKDEiSzl3678BNbhCDG74jgmn6PdUbG6RJtPst7o9pvRC
-	b/1nPQ9t0XjzmQz54G4=
-Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
- FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Fri, 18 Sep 2026 13:04:16 +0200
-From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-	<linux-kernel@vger.kernel.org>, Valentin Kindschi
-	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
-Subject: [PATCH v5 2/2] Bluetooth: hci_sync: pause advertising for the scan address update
-Date: Fri, 18 Sep 2026 13:03:58 +0200
-Message-ID: <20260918110358.3863635-2-valentin.kindschi@fiveco.ch>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260918110358.3863635-1-valentin.kindschi@fiveco.ch>
-References: <20260918110358.3863635-1-valentin.kindschi@fiveco.ch>
+	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="WSRnIPTz"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=E6dzdXaQU4Vp3fL7HWzVHW+hHi42MKd4231nU6rfufGp6PXBRdpejy4X5uSAxB5jjl0OWQIqJ8ZCKOVWIKEIArKhWmmsHrsV+4w1aVzOxBJnK3wO8WEagz6m9Rvf6lnKAEUYdgDzvHiCWTB4Hs9bqUDmr3pPMwBa5mkdatVxOKsjM2ptM2BbD8Z4fKWNqkGCJhXHR61xPWhBzuZF3iyx4uNzqaQGz68vqR3b53xmdH3oPGTdleQR34nC6bCfw5Fj6BnXraoGBcJIgihw2QYPPodQpmYJ6iFphYAIkAUKvjuwaNIsNUSzt+evzNr9SFgSWlqinlmEDOGGc/9pXkHV/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=97YUpIuai1QYj7d0FP9S+YbVpYKiB/At4Gd4gFA5+Jc=;
+ b=NQpVOtO9i+NhrK8MKWtbRQtMABgnJH6DJdnUiBkUarQC51a+pM/FKOmMy2GKJCBOUIUkJH1puOHFT2vrQd3Up3Mxu8R2FMTjL8I4JrojAnwkmYhK3PwZJV9PUrBLk0xK8oO0KGyzjXTmJCCfjsmZp1Ynmwx8axwSE+7KBkO+2xyS0X+5hhc5IeEJDcJAJPCw/t1ACacw953UtbXX0yGD/Nchpu5thVqSiFtmAmAEw5e4KIe/vs/UgqYwzjMDPG/CMVMSab8xLCb58F27DARPFzoM17MRIVT6fyi9Y20ajekmlr7yWZw8YsHKN/jmU+icJAapfrlT5XB2iguhiCNCZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
+ header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=97YUpIuai1QYj7d0FP9S+YbVpYKiB/At4Gd4gFA5+Jc=;
+ b=WSRnIPTzu14Um+nHjUbspL2u1R+XIGZa71Kq4ofxE1Xm5IZN8TQTM7e2O72tXXD7SXUWA1joETIUvJwj9J28eIAkR04MV8lOfxSx1DK0GUeqRuI2I/sby1vGzUaX1KXT/o6XEwfflGDkDWNsFpemp+9gKAe/WYQk+FpvS/WJvmg=
+Received: from PA4PR03MB7150.eurprd03.prod.outlook.com (2603:10a6:102:f1::17)
+ by AS2PR03MB9221.eurprd03.prod.outlook.com (2603:10a6:20b:5fd::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.9; Fri, 18 Sep
+ 2026 13:27:21 +0000
+Received: from PA4PR03MB7150.eurprd03.prod.outlook.com
+ ([fe80::e397:f26c:9c11:ef66]) by PA4PR03MB7150.eurprd03.prod.outlook.com
+ ([fe80::e397:f26c:9c11:ef66%2]) with mapi id 15.21.0428.009; Fri, 18 Sep 2026
+ 13:27:21 +0000
+From: Mathias Grelck Johnsen <MAJO@bang-olufsen.dk>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "luiz.von.dentz@intel.com" <luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ] adapter: Set Audio service class bit for A2DP sink
+Thread-Topic: [PATCH BlueZ] adapter: Set Audio service class bit for A2DP sink
+Thread-Index: AQHdR3FurO5AKN2Hw0CJ5lQlpmxgdQ==
+Date: Fri, 18 Sep 2026 13:27:20 +0000
+Message-ID: <ee9afb98a878284f53ec62d5d19a3d34048d3372.camel@bang-olufsen.dk>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.52.3-0ubuntu1.1 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PA4PR03MB7150:EE_|AS2PR03MB9221:EE_
+x-ms-office365-filtering-correlation-id: 77ce0185-ed25-4e77-32c3-08df1588917c
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|38070700021|56012099006|10067099003|55112099003|18002099003|11063799006|3023799007;
+x-microsoft-antispam-message-info:
+ uIpbOfWND68aJTkyyrLD8P7MPinQ/GQKU6cX5A20wjS+Mb1sSF2SJtxZ4DGOXETOGbD4B1sEjCrLDi9FhzmdEq1dyanABhNnwjP8RBl9alhsvs2ltQISSV/YAMTQSz/rZR6EK0rpb8E1c6AB6tJ6DyVE2OMOr+RYtkVcPX6itCBP7B1/02yBu6BTak6U6AGKjJaKjcI+zUjC1tofPI3f3gCIh7VRvkpMUy8dwgkwhNmakISMmLI71yWjSiTPG60XBCperkmW8d8nLxwgtVHSXbH2iDa4JH5iXoVo4MNVojBIvPA57B8Esj6Qj053xUlq9+KsHRQAoPZJF2BF1AEyoTHRbDiazGnLJFizz0B1dlqSi62J7XRtNQCZ+V4iuXu0jvL5Wz6YlzHCSxbWFU/w6gaDrT5FZMpxUa0+YaGvtdOhGfpbWRkvqKU7QZ0HalAXtchWCMoDi9sIH2xgHP8CTF4pxh7eIi8bSGyKV8nI/8F/VSCeW2s/eb60bi3N7oEG5Jv0uiZ0HRcBNJ+g86+ksG/TrmufY8UMKOTmUBo6AEgnOQh9e0y4cM4T5mvefaG83SoKPhH/RrPEWfldtlJQAVvFgI7GjNBbJXAe3wHA+t5xDRW9X0pFEf0y4nM4rjtrm9hr2RIAWiP8ACbVFT7C/2kI7ML21/115bnyY4XiI5rSCChVYrR6PPx6IIdoZvTD0tfgUcOobctlduRViNXuUsZ9XCcPeVVTAojqCzafhAM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR03MB7150.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(38070700021)(56012099006)(10067099003)(55112099003)(18002099003)(11063799006)(3023799007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?mzR+8/ZNMrFnVbcStvM4t3yWM8N6oPgmUyetbBu3R5EezR3KwbRbEKK8yOir?=
+ =?us-ascii?Q?AL3Uuhvllw/L2ozw4LjXHycUnSchr6dVU0+oTimPIGylf+gBygNpfgTisBa4?=
+ =?us-ascii?Q?1WyPdB/73quW2u/qIo+gX/3WyDNHb2RZIH8wZjnrmThmpEEIz9ncsbOzodWl?=
+ =?us-ascii?Q?sDNzFLqMie6xqZ7E19NSXzZpHDzW3k3fdlFO9BHBAN98WPJjK9EtDfAXA0dC?=
+ =?us-ascii?Q?2VwWoMBTGIz2h1z1y68A8T1QQ+mbNfY5Ds2AMshXqE1BjwHWhXZc7dmG6D8V?=
+ =?us-ascii?Q?IsvmgweUYcZo5B8o0pJCeN7LpsWTQTwnBQ0r99NN2TgqqrkdSMVoP16+OUWU?=
+ =?us-ascii?Q?MQAvyCZviznVBCzSmQr9BRKN/lFhczVhuuokz4DQS1tiA8kAqPK6ILJDphQB?=
+ =?us-ascii?Q?N0Oi3xYD+fUuNnhCclR+B3QlErvgtD02JxPKkxW2BBFBx5FQhJboML5qXAYm?=
+ =?us-ascii?Q?k7TbUyqWUP6alHsTAKUmae3mWO84JFuBjdTWhnY40qUf8R4y7Ysugml4dEem?=
+ =?us-ascii?Q?/ZBWhCUxRGFzvFLLRdPtjd8QplQOscI2L27I+VtjP2wrgnOxuCh5ynoxw61J?=
+ =?us-ascii?Q?GRbpQHAnmxDwx5VQUHvFnJ0ILWcAMAM7vBMl+iqGBmaf8hItxAb93nZzDf/v?=
+ =?us-ascii?Q?8F0rFsoPZtDI++xM11o9bMB7ps0szEjsKvund9zMAknUgRKiqzpnEzgdg+U0?=
+ =?us-ascii?Q?L3nPggON92tMHra2LfpFiM0buiOxhgCZjPLHMkotWmIGcP46LsjTLX96VJUx?=
+ =?us-ascii?Q?aaBen+2xtv7otg8jSiRTxpQ02o5ffZgHXsTbvbsw3djD2l3uE893D+l+/wap?=
+ =?us-ascii?Q?uJZlP0RmdZN9pczMpQfN/puKJf0b0n9NAXusELFGGJ6F//K4QFLfEJPMljMx?=
+ =?us-ascii?Q?e9LaSlhUKtnR0voTwfLdIVhuSanO1mQvJpBvHcX4S03dDdzP1rjZerpcc+g4?=
+ =?us-ascii?Q?gapTA9wdih9xk9VHkG92Suor/4QMYdn5b51timZI8oxDpQMaiK6ie4TmODVB?=
+ =?us-ascii?Q?Uvjxewtk4NJDsb7srT0HUHt6GYmK/a5yPP3IVMNxwPlhc5+9B33ry1XebAWG?=
+ =?us-ascii?Q?szgSRPuX83OXOqFGsiWQD+nCtQC9w6s7fRybQaPZrsIPiMNB7aMiKhq8cjC5?=
+ =?us-ascii?Q?7/N+Ph+SxOkKTIc+QD2xTkC7T1wS9m8BcT7hsTphsTRGBeDBnBnyN2eaKPLd?=
+ =?us-ascii?Q?3pcVrg1EnqGW1DhRW9R1Gu8YoWZXRqTxuOyDrSWWwGzfFw0WENV87VG5xEy/?=
+ =?us-ascii?Q?kZ0x3Ox76txg/SFRhkuLMMTIZnFxyj5txO13aIxbBQ5UtmXuQ65Kp//9wuci?=
+ =?us-ascii?Q?mwbMXuJZSsEeRaQq+EKl0POdTuaMXQ6oaEjY4o5P64Td9QrWZZr6qB8f5iUs?=
+ =?us-ascii?Q?cYkBLOHf0aM7J9rvU3RdTJxjMOku2vCIIFBgSNhl8jzS+zdpJRH3RpSkUXeR?=
+ =?us-ascii?Q?2pK+qiGH5rwnBQQ1nyIREoyjILi4KIMKsWuUH0G5lb8mgeE4rdIAud7gNBcD?=
+ =?us-ascii?Q?5I4+nfynQJ7RhMTkRgl/kaUVGzUod9dnUSVkoYnvlAF4tAeVpwdsLAhgd9yO?=
+ =?us-ascii?Q?EkAITKA48v0JePSrtskve+H0cQfAFXgepA9F486UW9R5Jr3PiF2r2fcwT3Tw?=
+ =?us-ascii?Q?MBjW+0ECZ3gwst+GAlz3PsmavL6XL3jVgCcYbBOQFsLkQeJvO3yVdX9guwBc?=
+ =?us-ascii?Q?ZyWDnQWPzBNB5u71YBUpOlWR/DOWbjkvfvyAZatWnTFoPwdU3iBh6QnIWR3M?=
+ =?us-ascii?Q?J2jKE7x8Qg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E48A56F49A791941B8C6587A7C6FA07D@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
- FIVECO-MX01.fiveco.local (192.168.16.44)
-X-Sophos-OBS: success
-X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.9.18.102719
-X-SASI-RCODE: 200
-X-SASI-SpamProbability: 8%
-X-SASI-Hits: BODY_SIZE_8000_8999 0.000000, CTE_8BIT 0.000000,
- DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000,
- HTML_00_10 0.050000, IN_REP_TO 0.000000, MULTIPLE_RCPTS 0.100000,
- NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000,
- OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, REFERENCES 0.000000,
- SENDER_NO_AUTH 0.000000, WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000,
- WEBMAIL_X_IP_HDR 0.000000, __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
- __BULK_NEGATE 0.000000, __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
- __CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
- __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
- __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
- __FRAUD_CONTACT_ADDY 0.000000, __FUR_RDNS_SOPHOS 0.000000,
- __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000, __HAS_MSGID 0.000000,
- __HAS_REFERENCES 0.000000, __HAS_XOIP 0.000000, __HAS_X_MAILER 0.000000,
- __IN_REP_TO 0.000000, __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000,
- __MIME_TEXT_P1 0.000000, __MIME_VERSION 0.000000,
- __MSGID_DOMAIN_IN_REFERENCES 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
- __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
- __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
- __PHISH_SPEAR_SUBJ_PREDICATE 0.000000, __RCVD_CTE 0.000000,
- __RCVD_EXIM_4_96_AES_128 0.000000, __RCVD_FROM_HOMEUSER 0.000000,
- __REFERENCES 0.000000, __SANE_MSGID 0.000000, __SHIPPING_ACTION 0.000000,
- __SL_HEAVY 0.000000, __SUBJ_ALPHA_END 0.000000, __SUBJ_ALPHA_NEGATE 0.000000,
- __SUBJ_STARTS_S_BRACKETS 0.000000, __TO_MALFORMED_2 0.000000,
- __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000, __URI_NO_WWW 0.000000,
- __URI_NS 0.000000
+X-OriginatorOrg: bang-olufsen.dk
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR03MB7150.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77ce0185-ed25-4e77-32c3-08df1588917c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2026 13:27:21.0231
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vpOZWJniim3pYr0kFymAaRPRB7G7LjgOkbiWJcPIWI+DP1knYTLj35nxxCpKYGF0FKt7173UvRN/tsGZQ0ATLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR03MB9221
 
-hci_active_scan_sync() programs a non-resolvable private address with LE
-Set Random Address on every active scan start.
+From: Mathias Johnsen <majo@bang-olufsen.dk>
 
-BLUETOOTH CORE SPECIFICATION Vol 4, Part E, 7.8.4 says the controller
-shall return Command Disallowed (0x0C) for that command while legacy
-advertising or scanning is enabled. hci_pause_addr_resolution(), called
-just above, only stops advertising when LL privacy is in use, so on a
-controller without it the command is issued while advertising is still
-on:
+Problem: The Nintendo Switch refuses to connect to a device that does
+not advertise the CoD 'Audio' (0x20) service class bit. It completes
+pairing, takes the link key, then terminates the ACL with reason 0x13
+without ever authenticating, encrypting, or connecting AVDTP on PSM 25.
 
-  Bluetooth: hci0: Opcode 0x2005 failed: -16
+Cause: get_uuid_mask() currently only grants the Audio service class
+bit to HEADSET and HANDSFREE, so a device implementing A2DP sink
+without HFP or HSP advertises 'Rendering' with no Audio bit set.
 
-It does not converge either. hdev->random_addr is only set on a
-successful command complete, so it stays BDADDR_ANY, and the deferral
-added by commit c2994b008492 ("Bluetooth: hci_sync: Fix not setting
-Random Address when required") requires it to be set. Unlike the
-resolvable address a few lines above, which is reused while rpa_valid(),
-the non-resolvable one is regenerated and rewritten on every call, so a
-controller that refuses the write is asked again at the scan restart
-period of about 10 s, for as long as discovery keeps restarting.
-Observed on a BCM43455, which has no LL privacy and no extended
-advertising, 190 rejections in one capture, every one retrying the same
-address:
+Fix: Report 'Audio' in addition to 'Rendering' (0x04) for
+AUDIO_SINK_SVCLASS_ID in get_uuid_mask().
 
-  < LE Set Random Address  Address: 02:16:91:90:F1:D4 (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
-  < LE Set Random Address  Address: 26:90:57:96:9A:3E (Non-Resolvable)
-  > Command Complete       LE Set Random Address, Command Disallowed
+Tested on a Yocto-based speaker running bluez 5.65 with this change
+backported and compile-tested on current master. Note get_uuid_mask()
+is unchanged between 5.65 and current master. The speaker under test is
+purely an A2DP sink; the patch changes the CoD from 0x040414 to
+0x240414, after which the Switch connects and streams normally.
 
-Pause advertising for the address update, and resume it once the update
-is done and before the scan is started. The pause does not outlive the
-function: it is taken only when nothing else holds it, and released on
-every exit. A failed pause returns before marking anything paused, so
-the error path is a no-op.
+Note that A2DP v1.4 section 5.5.1 mandates only the 'Rendering' bit for
+a sink, so the current behavior is conformant as it stands. Conversely,
+adding the bit is not a violation either: Assigned Numbers section
+2.8.1 defines bit 21 as 'Audio (Speaker, Microphone, Headset service,
+...)', which a loudspeaker A2DP sink fits.
 
-The resume in the error path is no longer guarded by ll_privacy_capable().
-That guard matched a pause taken only under LL privacy; the pause added
-here is unconditional, and hci_resume_advertising_sync() returns early
-when nothing was paused.
+This is the same kind of device-specific workaround as the
+HANDSFREE_AGW telephony bit for Nokia 616 carkit also present in the
+get_uuid_mask() switch-statement.
 
-One caveat this widens, raised on the previous posting. When
-HCI_ADVERTISING is set, hci_pause_advertising_sync() also clears
-HCI_DISCOVERABLE and HCI_LIMITED_DISCOVERABLE and zeroes discov_timeout,
-and hci_resume_advertising_sync() restores only HCI_ADVERTISING, so the
-discoverable state is lost. It reproduces today on an LL privacy
-controller through hci_pause_addr_resolution(); the unconditional pause
-makes it reachable without LL privacy as well. hci_suspend_sync() also
-pauses unconditionally, so a device that suspends loses the same state
-on any controller today. That asymmetry is pre-existing and is left
-alone here rather than folded into a scan path fix.
-
-Legacy controllers have one random address register, shared by the
-scanner and the advertiser. Restoring the advertiser here can reprogram
-it when the advertiser is non-connectable, so the scan then uses that
-address rather than the one generated for it. Both are non-resolvable
-and neither is linkable to the identity address. With privacy enabled
-both roles already share one resolvable address the same way.
-
-With the patch, on the same hardware:
-
-  < LE Set Advertising Enable    Enable: 0x00              Success
-  < LE Set Random Address                                  Success
-  < LE Set Advertising Parameters                          Success
-  < LE Set Advertising Enable    Enable: 0x01              Success
-  < LE Set Scan Parameters                                 Success
-  < LE Set Scan Enable           Enable: 0x01              Success
-
-The address write is accepted, and advertising is restored before the
-scan is started.
-
-Over 119369 btmon records and about 12 minutes of the normal workload of
-that device, alternating active and passive scanning with ten outgoing
-connection attempts, every LE Set Random Address succeeded and there were
-no Command Disallowed responses of any opcode, against one per scan
-restart before.
-
-Patch 1 is required: without it the resume added here returns -EPERM on
-the controllers this fixes and leaves advertising disabled.
-
-Fixes: 3c44a431d62b ("Bluetooth: hci_sync: Resume adv with no RPA when active scan")
-Cc: stable@vger.kernel.org # depends on "Bluetooth: hci_sync: re-enable legacy advertising on resume"
-Assisted-by: Claude:claude-opus-5 btmon
-Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+Assisted-by: Claude:claude-opus-5
 ---
-Changes in v5:
-- Split into two patches. v4's resume was reached through
-  hci_schedule_adv_instance_sync(), which refuses HCI_ADVERTISING on a
-  controller without extended advertising, so advertising was never
-  re-enabled. Patch 1 fixes that and is a prerequisite for this one.
-- Do not resume on the success path. hci_resume_advertising_sync()
-  reaches hci_update_random_address_sync(), which for a non-connectable
-  advertiser programs a fresh address, and doing that with the scan
-  already enabled is refused the same way. Resume before the scan is
-  started instead.
-- Take the pause only when nothing else holds it and release it on every
-  exit, so it cannot be released by another user of
-  hdev->advertising_paused.
-- v4 claimed the resume commands in the capture were issued with the scan
-  already running and succeeded. That capture came from a build whose
-  resume ran elsewhere; the claim is dropped. The capture above is from
-  this version, on the device, under its normal workload.
-- Fixes: now points at 3c44a431d62b, where the pause became conditional
-  on LL privacy, rather than at the introduction of the scan function.
+Switch system version 22.5.0. The speaker under test implements A2DP
+sink and AVRCP only, no HFP or HSP, so get_uuid_mask() never grants it
+the Audio bit.
 
-Changes in v4:
-- Report the HCI_DISCOVERABLE asymmetry raised in review rather than fix
-  it, with a reproducer in the commit message.
-- Keep the explicit return on the success path, so the resume runs there
-  and the function no longer falls through into failed:.
-- Shorten the added comments to one line each.
+CoD before: 0x040414  (Rendering | Audio/Video | Loudspeaker)
+CoD after:  0x240414  (Audio | Rendering | Audio/Video | Loudspeaker)
 
-Changes in v3:
-- Resend, no code change; v2 had no reply. Rechecked that it still applies
-  to bluetooth-next.
-- Added the second capture described above, taken with the two patches from
-  the "endless adv params retry" series applied, since in bluetooth-next,
-  confirming the fix holds with cancelled outgoing connections in the mix.
+btmon excerpt of a failing connection, before the change. BD_ADDRs and
+the link key are removed; nested SDP data elements are elided and
+summarised in parentheses.
 
-Changes in v2:
-- Rebased onto bluetooth-next: mainline renamed use_ll_privacy() to
-  ll_privacy_capable(). No functional change.
+> HCI Event: Connect Complete (0x03) plen 11           #21308 302.177551
+        Status: Success (0x00)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
 
- net/bluetooth/hci_sync.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+> ACL Data RX: Handle 2 flags 0x02 dlen 28             #21350 302.288211
+      Channel: 64 len 24 [PSM 1 mode Basic (0x00)] {chan 0}
+      SDP: Service Search Attribute Request (0x06) tid 0 len 19
+        [...]
+      (search pattern: Audio Sink 0x110b; attribute IDs 0x0001, 0x0004,
+       0x0009)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6246,6 +6246,7 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 	u8 filter_policy = 0x00;
- 	/* Default is to enable duplicates filter */
- 	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	bool paused;
- 	int err;
- 
- 	bt_dev_dbg(hdev, "");
-@@ -6269,6 +6270,12 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 	if (err)
- 		goto failed;
- 
-+	/* LE Set Random Address is disallowed while advertising is enabled. */
-+	paused = !hdev->advertising_paused;
-+	err = hci_pause_advertising_sync(hdev);
-+	if (err)
-+		goto failed;
-+
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
- 	 * private address.
-@@ -6278,6 +6285,9 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 	if (err < 0)
- 		own_addr_type = ADDR_LE_DEV_PUBLIC;
- 
-+	if (paused)
-+		hci_resume_advertising_sync(hdev);
-+
- 	if (hci_is_adv_monitoring(hdev) ||
- 	    (hci_test_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER) &&
- 	    hdev->discovery.result_filtering)) {
-@@ -6301,9 +6311,8 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 		return err;
- 
- failed:
--	/* Resume advertising if it was paused */
--	if (ll_privacy_capable(hdev))
--		hci_resume_advertising_sync(hdev);
-+	/* No-op when advertising was not paused. */
-+	hci_resume_advertising_sync(hdev);
- 
- 	/* Resume passive scanning */
- 	hci_update_passive_scan_sync(hdev);
---
-2.34.1
+< ACL Data TX: Handle 2 flags 0x00 dlen 58             #21351 302.288706
+      Channel: 82 len 54 [PSM 1 mode Basic (0x00)] {chan 0}
+      SDP: Service Search Attribute Response (0x07) tid 0 len 49
+        [...]
+      (Service Class ID List: Audio Sink 0x110b; Protocol Descriptor
+       List: L2CAP PSM 25, AVDTP 0x0019; Bluetooth Profile Descriptor
+       List: A2DP 0x0103)
+
+> ACL Data RX: Handle 2 flags 0x02 dlen 12             #21353 302.293176
+      L2CAP: Disconnection Request (0x06) ident 6 len 4
+
+> HCI Event: IO Capability Response (0x32) plen 9      #21357 302.298185
+        IO capability: NoInputNoOutput (0x03)
+        Authentication: General Bonding - MITM not required (0x04)
+
+> HCI Event: Simple Pairing Complete (0x36) plen 7     #21398 302.649188
+        Status: Success (0x00)
+
+> HCI Event: Link Key Notification (0x18) plen 23      #21402 302.672037
+        Link key: <redacted>
+        Key type: Unauthenticated Combination key from P-192 (0x04)
+
+> HCI Event: Disconnect Complete (0x05) plen 4         #21403 302.675468
+        Status: Success (0x00)
+        Reason: Remote User Terminated Connection (0x13)
+
+The Switch tears down the ACL 3 ms after receiving the link key.
+There is no Authentication Complete, no Encryption Change, and no
+L2CAP connect to PSM 25 anywhere in the capture. The following
+attempt repeats the full SSP exchange rather than authenticating
+with the stored key, so the bond is not retained on the Switch
+side.
+
+ src/adapter.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index fc734424b..98d758cdc 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1303,9 +1303,17 @@ static uint8_t get_uuid_mask(uuid_t *uuid)
+ 	case AUDIO_SOURCE_SVCLASS_ID:
+ 	case VIDEO_SOURCE_SVCLASS_ID:
+ 		return 0x08;	/* Capturing */
+-	case AUDIO_SINK_SVCLASS_ID:
+ 	case VIDEO_SINK_SVCLASS_ID:
+ 		return 0x04;	/* Rendering */
++	/*
++	 * A2DP v1.4 section 5.5.1 mandates only the 'Rendering'
++	 * bit for a sink, but the Nintendo Switch will not connect
++	 * to an audio device whose Class of Device is missing the
++	 * 'Audio' bit, which is otherwise only set for HEADSET and
++	 * HANDSFREE.
++	 */
++	case AUDIO_SINK_SVCLASS_ID:
++		return 0x24;	/* Audio & Rendering */
+ 	case PANU_SVCLASS_ID:
+ 	case NAP_SVCLASS_ID:
+ 	case GN_SVCLASS_ID:
+--=20
+2.43.0
+
+
