@@ -1,107 +1,151 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7D44078E9
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 11:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B33E391E77
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 11:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789818550; cv=none; b=GNert3qhphQRYsWqSkoUZ9JVNlOqeccMrM6GJkOaEi4xvrQcfnc/BQm4W9Kb4tzwlObY1EGkpETeyd5sOMg2ZkVKmbwIQNA9aC32Ym3aS4Whs4b1qldSRyReMm9RE8X04XQY0LMx8CmFzBkiFXl//YiFzSq+eI59WD4roHRBwXE=
+	t=1789818883; cv=none; b=aTN7pjU0P0rPYVLd5JicOjW0U8ocHnb9b5oS9/wZ+8r+sA22qQgl76UXlfiLnSGeYw7FJ4YI69wE+1mK48tvUw4u4ww7v/zz4uiDR5NIh4wOUAPJTuF/EIYanKpCtJIVaLWvmIsBrN+2aee9ZhPjEVy/m5uwXKl660aHBma2QoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789818550; c=relaxed/simple;
-	bh=pjsidj9m0prL6vE/XSVQUcfiP/pGnx78DnqB7NpNcp8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=L6pRHUy8AzO8KUT4e3B2rlSLqlhq8MX1WCqXDXK8EUqdaEH259IS2FVpIC3ZiG3h7WoCmWUt3DV9xql50ocFpwsH15/MyjnCNEImnlFg5kvjuGhy8YH8hHc7rI37wIwavpFcE1x2W/C7nxNuH5c/WbBC3fVUB69tZRR0d14vrsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MtALczw/; arc=none smtp.client-ip=74.125.227.140
+	s=arc-20240116; t=1789818883; c=relaxed/simple;
+	bh=PcK8N3BxOxk67bO+mZZK3Y+/zdG2dUvb7AKovVOVUy4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BB1+QoHQpDeTF92+dQofDTY7eWCwCGozPO/rU8zzy9LwK3Jyh3NOs2XsdSzhcaS0YMF+ARt+FcJe6aNArVkRVITwDe0dYQ62QXKVxsqIu/gqJAaqsQ7W8V4EMUhS8bKr1Ev3ve9eWMJ4W3G2hbms7BYzM94UKUHQYfbUqCoZABg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CsORNgXx; arc=none smtp.client-ip=74.125.227.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtALczw/"
-Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d91a931f66so10476995ad.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 04:49:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsORNgXx"
+Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-396ccb652d7so1526093a91.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 04:54:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789818545; x=1790423345; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=pjsidj9m0prL6vE/XSVQUcfiP/pGnx78DnqB7NpNcp8=;
-        b=MtALczw/k0UTLF2Jj0xzXqSPtN2tUlxA/Ga5V9+j1n1NxkkgeGGcw4CQLzbFxX/uLt
-         LO7tPCag4CadFPgNy77hwRWrjpHRRQiibm9BnqMuVig7wAo21iQ1vRSvFSFYqYv2H8SV
-         MDoCUwZhuNp9vI105xLmSTd10L42dIZaCPGUXLqyUKVpW49OuH3NYkb2H1h56w0kHEnM
-         ZeFhOUIGBSaapR8ExCm7ofDPii92jUIrLdHXJzq8CSbWMB5fsIFTyuFdXAqI3BFZEPP4
-         xBE/ePUwSaVhy7eDiKiA08nu/jnlakIGBScMux0kS2wCZGYmNwNt9EQ7psUTDgiSO57Q
-         BlpQ==
+        d=gmail.com; s=20251104; t=1789818878; x=1790423678; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=akwQw+wJq7zH43Cu7tG4CkD0sq1rzb82/u77w44ntGo=;
+        b=CsORNgXxC+pUdH23lE0Cq11Pf9123avrQL+GJq8qA4NnHYLkTM6BOQAW0PogELwK65
+         Wlk8F794kQcpRcER5G9v26Q3qVciTWvi9RsFrNIU3Bw1QnyMWgx4fWEcQRzAxesNSkTg
+         KrhSFRZKgWL2ffGpxREbkr9Rd8ssUJNLembglW5r742W9RKuj9fTm+kLFdDfklwEsIBv
+         u0yLn2PDyBf7MMpHtil0/ioL1jRMgqdBB1dHWO70zbPkoddnvUu3Z/hF7GlYuHjwfcBd
+         eDBFe+t2NY1UrOrhMCc+BXd/dGy8TlBDQYV/iGeHLEbmEz0IwJZtABjVinHIjZfvxYtG
+         QiSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789818545; x=1790423345;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=pjsidj9m0prL6vE/XSVQUcfiP/pGnx78DnqB7NpNcp8=;
-        b=Zf6T3Jr78BiqBrkHIr65r1ivxG35e1+thLV8mMR66tNZRi6+O+OP1/jMernvkNYolz
-         POrDnez+g8a/FaBCtE2xuel6JhStGS2+a7OQjzAeHAszAEe0dNre2p5+q4rpdkf6yag3
-         pMdWPExMA359y6pE207GTUIq8RW/EIi7z9x0jSnMmg/IlRTxhjduKX2zRmMbd/mH89mk
-         8kRmIC11xMlyViASBGt2WZggM9ob1u3sL0rAT0Bxm0H9JR961DsvRD0yoFE7+97lbu3c
-         CyDGFCnygdCuZFyNnZtWSeOlidz4umPSvThIN9xkk6Vr+IQzGBS7figISGnk8lov7fnj
-         NZ8Q==
-X-Gm-Message-State: AFuF++kO1bKbPDMTeRV+YH4E0aXtW+5lsS9gssHlgenMYdUgIIKcraBK
-	/ppM9LD5CH1gfEwDo2dIR+B+/bQ9vZJJCFF7RomztAug+I/XFZGFgBQ2qL30iA==
-X-Gm-Gg: AYBFou32wiXO7H1ORgEPmvV4tNFHksHM0r5O9l4ATxRq2ymQv4SPU7lWkjmBaiIxvfD
-	2SPt1tYQbCxGKQriaxl5KsBip7rBe62HWi+o5N10RupHVQM/ljkYTsLeoGIhGN8bEq/Uq5mtNLq
-	NXhmTj3Q711Za5GX52eq38mFhBjZNRVpwLOMaWyupCfsyLVxIGgdLP31Dwt1DnAK75dfLjsC3u5
-	Ze5fdeJ7oGOcr3qqBlZmvD5jB6SWuGzuzBsv9arf+plAthbQTGkiJLC5XvOaCII89srfi4voOx8
-	kKcTcurIJ2WUmHxizPdz/ki06xaTSFRvK2qFZmdywLdb/CplnjcfDK0DXfad3l29cTF6ttsnPvO
-	xVYDEKvwSPxRw1YKDbSQSFkh1oWKxvPOZ5IXXoXICtVUvCTjP0FMfNPb9ncpUsb/nQv9vnwZJEO
-	JvI4S1uhwePOuRemCX4Cpr3FQkeE7FZYDVkmzw0Q9oKwMNlAc49J71qEiBPJg+YDnIZ85iwe/Ua
-	rNB
-X-Received: by 2002:a17:902:f542:b0:2d7:2edd:d140 with SMTP id d9443c01a7336-2ddb1aac6e0mr95460475ad.3.1789818545202;
-        Sat, 19 Sep 2026 04:49:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.157.2.243])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33c331aeeddsm5433888eec.24.2026.09.19.04.49.04
+        d=1e100.net; s=20260707; t=1789818878; x=1790423678;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=akwQw+wJq7zH43Cu7tG4CkD0sq1rzb82/u77w44ntGo=;
+        b=xjeDhdT78QYkKnfDyuJWF3BmA4hV20JhRVHIXkNJeQYHRruZHCCCQRtCoPszSYf3qZ
+         3ysunk3WXr9WdzWmavF6bYXsrp3lhI8y50Q7S9Jr4rqE6VMGrje9gcQOWFmOQrbHYYBt
+         Vsdtr6WJxToR3iXjny9+jiZvoi9wFTAlb5uq0m0+WeY134iirgD6WQhXmkTmDGMXypot
+         hoLxQqzeBvkcv1giubOgf5e9vHsqI6AWDQctf+wR31+10sdIUhOJqVzJzXVhP8zztL6Y
+         LHLF2Mt6dnYIgdcidFHJfhKU1WFkQn0zy0lE4T75iSr6J/k1T9/Fz2mVKBqKQEqR9erA
+         m5Ag==
+X-Forwarded-Encrypted: i=1; AKwUvByTb0GpjVDEMpcMneqzwMaAZgEeZqcwxk4MsriDwe9Z10T9pGt6Lhe1yJwAL/Bf5/Vj1YXZ8Zjgou213CcsyN0=@vger.kernel.org
+X-Gm-Message-State: AFuF++kB0Orym4/BExU0JkdK6pCj4WJS1hSHKs5r0u1kiHU0zMtPpVNE
+	fyBpNcjuA9qINIHeu/VXC6GyJkIKqp8X1v2y7Mt+EsHPIDmZVvkUp/awpgSTqmpQ
+X-Gm-Gg: AYBFou06yoLkfbX0JeL/NLliDB7C8gyTizGpAs0oHqKDfYfxif1HQ7gKm2x3cLGUS79
+	aop5ZmRj45bZeNyL5IJiausDi6VoqMJIuaISRl6kegLuGeRWVBhcugnlYX6NVa/zrzwXElwOVMx
+	2+mUssbN/GWq0ZJM3YFhUcxZB0QR4MANRK8dWVvn6ACpQgM3dKooRJv7VGP3zQYhxwBo29JPSyb
+	1kRAMvmJdD+fiF7ncf+E/MdRgVcGZGGxu8ULN8TkxxrTN1uorUdgLpZCByUXinTwxXchqhn5Ea2
+	buV5hu2t8O8ZcKHNLGDWLYftC548FXp/HA1Lbp8XpSYu/13xk12tth//pe4SFDmqXTLLoaDxjqL
+	IXhzgOkFunrRCqyt0jRTWZ+NZ5paPFBNo6Lo9uhO+8LX3AdUuM9JR8HveJs+mPhhMXW1JJFWe2g
+	iwibbBosyecTBnkDF78zfYKmWne+UTQx6XdeaTbyC7aCo/5IcbDZ2DpXPSeIBp0+iY6OhD8TorR
+	WcCvEWy9HHZK7Vx39JmKDAdPkxRSyNTHSX8vsI9DyXI710VFm7wdy/bfGM68CXNZc9jCYWRNFYJ
+	k05UpgxgH0E+lkhNh8LQ
+X-Received: by 2002:a17:90b:35c3:b0:3a0:2503:854d with SMTP id 98e67ed59e1d1-3a025038c48mr2051455a91.18.1789818877974;
+        Sat, 19 Sep 2026 04:54:37 -0700 (PDT)
+Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e6c4bc0d2sm4231535a91.12.2026.09.19.04.54.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 04:49:04 -0700 (PDT)
-Message-ID: <6aae76b0.ed8a271b.1811f0.0a2a@mx.google.com>
-Date: Sat, 19 Sep 2026 04:49:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6791446515394249226=="
+        Sat, 19 Sep 2026 04:54:37 -0700 (PDT)
+From: Hui Peng <benquike@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: lee@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: MGMT: fix mesh_tx leak on hci_cmd_sync_queue() failure
+Date: Sat, 19 Sep 2026 11:54:36 +0000
+Message-ID: <20260919115436.3998954-1-benquike@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, benquike@gmail.com
-Subject: RE: [v3] Bluetooth: MGMT: Fix mesh_tx Use-After-Free and leak in mesh_send()
-In-Reply-To: <20260919112517.3871992-1-benquike@gmail.com>
-References: <20260919112517.3871992-1-benquike@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6791446515394249226==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+mesh_send() only queues mesh_send_sync() when no transmission is already
+in progress:
 
-This is an automated email and please do not reply to this email.
+	sending = hci_dev_test_flag(hdev, HCI_MESH_SENDING);
+	mesh_tx = mgmt_mesh_add(sk, hdev, send, len);
 
-Dear Submitter,
+	if (!mesh_tx)
+		err = -ENOMEM;
+	else if (!sending)
+		err = hci_cmd_sync_queue(hdev, mesh_send_sync, mesh_tx,
+					 mesh_send_start_complete);
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+so the only way to reach the error path with a live mesh_tx is for that
+hci_cmd_sync_queue() call to fail, which can only happen when sending is
+false. The cleanup, however, is guarded the other way round:
 
------ Output -----
+	if (mesh_tx) {
+		if (sending)
+			mgmt_mesh_remove(mesh_tx);
+	}
 
-error: patch failed: net/bluetooth/mgmt.c:2306
-error: net/bluetooth/mgmt.c: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+With mesh_tx non-NULL the inner condition is therefore always false, and
+mgmt_mesh_remove() is never reached: the entry stays on
+hdev->mesh_pending even though the command has been failed back to
+userspace with MGMT_STATUS_FAILED. It is only released when the socket
+is closed or the controller goes away, and until then it counts against
+the MESH_HANDLES_MAX budget enforced by send_count(), so repeated
+failures eventually make MGMT_OP_MESH_SEND return MGMT_STATUS_BUSY.
 
-Please resolve the issue and submit the patches again.
+Conversely, when sending is true err is left at 0 and the success branch
+runs, so the guard never protects anything either.
 
+Drop the inner condition and remove the entry whenever one was added.
 
+Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+Assisted-by: LLM
+Signed-off-by: Hui Peng <benquike@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+This is the remaining half of
+https://lore.kernel.org/all/20260919112517.3871992-1-benquike@gmail.com/
+("[PATCH v3] Bluetooth: MGMT: Fix mesh_tx Use-After-Free and leak in
+mesh_send()"), which I am withdrawing.
 
+That patch bundled this leak together with a fix for the mesh_tx
+use-after-free, and was written against mainline, so it neither applied
+to bluetooth-next nor was still needed: 71af682ba469 ("Bluetooth: mgmt:
+Dequeue pending mesh_send_sync entries on cancel") already fixed the
+use-after-free, and did it better than I had - dequeuing the pending
+mesh_send_sync entry at the point of the free rather than locking
+around the dereference. Only the leak was left, so this is just that,
+rebased onto bluetooth-next.
 
---===============6791446515394249226==--
+Found by code inspection while investigating the use-after-free. I have
+not reproduced the leak on its own; hci_cmd_sync_queue() only fails on
+-ENOMEM or when the controller is going down, which I did not manage to
+induce reliably. Compile tested only.
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9d3de5a..8991aa8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2543,10 +2543,8 @@ static int mesh_send(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_MESH_SEND,
+ 				      MGMT_STATUS_FAILED);
+ 
+-		if (mesh_tx) {
+-			if (sending)
+-				mgmt_mesh_remove(mesh_tx);
+-		}
++		if (mesh_tx)
++			mgmt_mesh_remove(mesh_tx);
+ 	} else {
+ 		hci_dev_set_flag(hdev, HCI_MESH_SENDING);
+ 
