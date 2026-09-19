@@ -1,105 +1,143 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-4.smtp.github.com (out-4.smtp.github.com [192.30.252.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E3E2652B2
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 21:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475BA345EB7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 21:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789851914; cv=none; b=Vvsb2h4glZMv8pOVQMZbNbMTVVIOe0jui5Dt+tBVHP/EZT3AtNKhJDFIlIg10dOZ4CVriLcbPEuZUOXNcScTHrIPu0Zht/O9YlBYj7DWqTshw5q6yj/Z9T7UQHxKX4O57gmDW2PmSDV+r34SdNgRwkDIKCoYZBVbjQjdMdttj+4=
+	t=1789851986; cv=none; b=WNbfOU+MRNfnpj4BRz9FZRIwO6ZErpBjUtG90yCx9uQ16xgNq1z/NonNazQakQy9qjXdJ9oC8GV85CFGx0PkgLMoUymN09S/91kSqQBX9yGzqjOSLf7Iuiuz0QxuB3viQheTL4HUlPkrs0stIsieStPMR35YXpL0fDg0IMOi2tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789851914; c=relaxed/simple;
-	bh=PjmSsVS4CGfbxj85Mc+XLgpdvNGyVC0+qll0WCDsN+A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rXs3RMV3TLSnOfizYfbHRfBfSvz3NnEynaF2sT326/A0NS09XgpBP9RVkJJDyP1sQdJBjQsOmRhjbrTbpJNav35tDJGj2EbsKPamR/oADBpRlod/iQ5U4E0rCTRjMAZJ79HxCk3Q/o+tZXqKCNh5nsTZJCZOg25EFH5jAk2wd2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFqFbI5o; arc=none smtp.client-ip=74.125.227.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789851986; c=relaxed/simple;
+	bh=RhcBC1opaxz6ucneYCRW99pMwOcmZd7fLJjVUOWrM6Q=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CIUzUFSRLTACvWTF4ME9koqRG7MiM+CKvVd4LlYpR5WbjDFHFlqS3i//bESUcVfKvRdC39phMzdOh8Rj7nvsaifDoqrbAlrf8etDcjzCTuC9nNjDQ5iUf/HqJQyktQH9pWX0YXdHZxdFaE3se/NC89hPgxPMXbxxW/m24zMFiGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kZORGPIM; arc=none smtp.client-ip=192.30.252.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFqFbI5o"
-Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396cccbba92so1694961a91.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 14:05:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789851913; x=1790456713; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qtCjJb5tJjcqVyo+sawtvKj2skjgEr5fk4tOlllnSDg=;
-        b=NFqFbI5ovmoDI8byOuJkRB15tiPJLNZYTKvJHIRXwqXIu7P0JQKJEhJsU+ffWdHF3c
-         6UQCaP6S7glPws6KJ8Nm/QY4A+xepD/+zZYav5TZF5BV2uOwtz1enfDRkCCckpxRzkd9
-         /XJq0ybVxvcwn37eaoxC5U5VEN3q//TCzcRrwBLcFutezSCrzauHMKEMukaIwgZzxp28
-         RBmTX4iBT23kTqlykIDfjB3vHl/9BM3+c+nlb3dte5ZGcnf5Hky8tzkkC/yrgfxMTgFv
-         tkymc18ZPf918EzRPhFJ4okalVWD6lCvS7qsoAsy5da7nHcHOUp3RkvL3zeOtJSmQE9U
-         gKvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789851913; x=1790456713;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qtCjJb5tJjcqVyo+sawtvKj2skjgEr5fk4tOlllnSDg=;
-        b=gG+2UrlhN2XVii2OWke6/wVXrBRp0Fu6mozi1h+mQY+xbL7BM+wfluGseQMLUuu8AZ
-         ybZAZpqUIUMQ0eCYiplic41iDE6RfF0vFVrvie5A9mOZJKh7ItxvIHL/Oux15lnMBzT5
-         EmeF0WQUbV+TdJ3e9uBORGGuJayH0t2m/yviIHKnDWa0sV1BYBJsCT0Hx8yAUqBR6oDn
-         CNqi7KzdHHrId8bAHL9YeIr8hghAr9BQUh4HNv4bl8yE9/EWY5g/QE67gVGB/oXtsF52
-         wuviR89yEswA35gZ3v48csdNwr7wto6wQ4ODo/ZhVa7/io3FyzQqm3pNo0LQvX76TFfl
-         oikg==
-X-Gm-Message-State: AFuF++mQA/QRyB6h8n1y7naS40C5pZaFBgdRHIYmhavMVBbG6BJmp2uB
-	Ad2G4P95FD5p+N4g1nUG3IVGF7rvq2BXMW+n7I/4vH+waZzFctJePbXmiZywjXqb
-X-Gm-Gg: AYBFou1YqVYI+3t/T1qNB9z04NMBOnS8Oad0Q1DJ+lFHe8K39M5QUXRo4T7mKziaaqJ
-	5YQGsBIy1g6CLMWBHif1tyI6c9MIsm7Bc4cIRnx2JjCuaij3adGm7pmMVw3md5MoI9I4XjglCP1
-	Kg4B9Nru4iLiHxyCtC+yj1t2tfohg1bUW1W6UOLp07ToZtkbD+CnkDwdlVGMXZ91lOq1l/XdxH0
-	V7Ft9u5CEsGcVwcDDG/FKBJgqaBLwau6cpmt8HdFzFKyVkR89+Eb2UIJY4hYFlrbDyXDuirWSZ9
-	2AxRDp7vu8zSKurSnzArsG+c5zPrbubSqk5xIqbQSeJCDJTTd2THhR2KTEQagasyeJ4IrQVLgqI
-	1NtMKg4jxKkCJ5ERrNBscw1lkHfSIpXHzyp7qE3Qk1z7CnQ/eUqgLXO4k/kOfGZ5/tRQpJZ9Tkh
-	yoAaC6a3b4nevPR73q6ZBk4DR39jmGhT9bJWqIzHEZIjjf5g2VEipflQfRjD4xQUZpJwv5WHZcE
-	abF
-X-Received: by 2002:a17:90b:5706:b0:39e:6c6a:209e with SMTP id 98e67ed59e1d1-39e6c6a234emr4150287a91.63.1789851912744;
-        Sat, 19 Sep 2026 14:05:12 -0700 (PDT)
-Received: from [172.17.0.2] ([20.29.189.64])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e6c6dd585sm5738911a91.0.2026.09.19.14.05.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 14:05:11 -0700 (PDT)
-Message-ID: <6aaef907.a24da115.1ec4a2.5d29@mx.google.com>
-Date: Sat, 19 Sep 2026 14:05:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5601605335597347956=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kZORGPIM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789851983;
+	bh=AqhRnWc542IIrFRGxxovT3AMLPcjX4HQKCL8U+81P5Q=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=kZORGPIMA9dE3qZauuMAqIIgmyG26/vvaAxs8f2kAnH4bBV9w2MoNMiajyoWp+Sqk
+	 mfSVQsmXMjGavmgql74wqa5eZt8lYHakZbTahGmxczY9Lt159pdp4QzTp/r0flMiPI
+	 ieMdT1oKNIkwrrYs0kZ2rdg4yQxcMZ4fegftnXVM=
+Received: from github.com (hubbernetes-node-d3edd9b.va3-iad.github.net [10.48.147.32])
+	by smtp.github.com (Postfix) with ESMTPA id 414DF340139
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 14:06:23 -0700 (PDT)
+Date: Sat, 19 Sep 2026 14:06:23 -0700
+From: IAROSLAV VOITOVYCH <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1169362/000000-1bc658@github.com>
+Subject: [bluez/bluez] 1bc658: adapter: Fix crash on short start discovery
+ reply
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, proxy-alt@proxy-alt.dev
-Subject: RE: [BlueZ,v2] shared/gatt-client: confirm a synthesized CCC handle before writing to it
-In-Reply-To: <20260904182833.59624-1-proxy-alt@proxy-alt.dev>
-References: <20260904182833.59624-1-proxy-alt@proxy-alt.dev>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5601605335597347956==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is an automated email and please do not reply to this email.
+  Branch: refs/heads/1169362
+  Home:   https://github.com/bluez/bluez
+  Commit: 1bc658e29d68c03ec3ee4aa79e153d591df01af3
+      https://github.com/bluez/bluez/commit/1bc658e29d68c03ec3ee4aa79e153d591df01af3
+  Author: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+  Date:   2026-09-19 (Sat, 19 Sep 2026)
 
-Dear Submitter,
+  Changed paths:
+    M src/adapter.c
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+  Log Message:
+  -----------
+  adapter: Fix crash on short start discovery reply
 
-   Series:       [BlueZ,v2] shared/gatt-client: confirm a synthesized CCC handle before writing to it
-   Pull Request: https://github.com/bluez/bluez/pull/2493
-   Created:      2026-09-04 19:27:13+00:00
+start_discovery_complete() validates the reply length before using the
+returned parameters:
 
-The pull request has been closed and no further action is taken on this
-series.
+	if (length < sizeof(*rp)) {
+		btd_error(adapter->dev_id,
+			"Wrong size of start discovery return parameters");
+		discovery_complete(adapter, MGMT_STATUS_FAILED);
+		return;
+	}
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
+but that check sits below the branch taken when the discovery client
+list has emptied while the command was pending, and that branch has
+already dereferenced the reply:
 
----
-Regards,
-Linux Bluetooth
+	if (!adapter->discovery_list) {
+		struct mgmt_cp_stop_discovery cp;
 
---===============5601605335597347956==--
+		if (status != MGMT_STATUS_SUCCESS)
+			return;
+
+		/* Stop discovering as there are no clients left */
+		cp.type = rp->type;      <-- rp may be NULL here
+
+mgmt_cp_start_discovery is a single uint8_t, so rp->type is a one-byte
+read at offset 0 and a NULL rp faults immediately.
+
+The mgmt layer can invoke a command callback with no reply parameters:
+src/shared/mgmt.c passes length 0 and a NULL param on the Command
+Status path:
+
+	case MGMT_EV_CMD_STATUS:
+		...
+		DBG(mgmt, "[0x%04x] command 0x%02x status: 0x%02x", ...);
+		request_complete(mgmt, cs->status, opcode, index, 0, NULL);
+
+Observed as a crash on a QCA9377 (13d3:3503) whose controller stops
+answering HCI during audio use. The archived session logs show exactly
+that sequence: the daemon's debug log (bluez 5.72) ends with the
+Command Status delivery and the callback entry, for the Start Discovery
+it had sent 2.05 s earlier, ten seconds after its last discovery client
+had gone; the contemporaneous kernel log records the resulting fault:
+
+  bluetoothd:
+  21:03:16.750  discovery_remove() owner :1.125
+  21:03:24.943  send_request() [0x0000] command 0x0023
+  21:03:26.994  can_read_data() [0x0000] command 0x23 status: 0x00
+  21:03:26.994  start_discovery_complete() status 0x00
+  kernel:
+  21:03:26.995  bluetoothd[2821]: segfault at 0 ...
+
+"command ... status:" is the Command Status branch (Command Complete
+logs "complete:"), so the callback ran with status 0, length 0 and a
+NULL param, found discovery_list empty, and faulted on rp->type. The
+crash site was resolved from the shipped binary:
+
+  bluetoothd[2821]: segfault at 0 ip 00005d6eb1ad1986 sp 00007ffef8e784b0 \
+      error 4 in bluetoothd[a6986,5d6eb1a50000+f3000]
+
+  a6986:  41 0f b6 45 00    movzbl 0x0(%r13),%eax     <-- cp.type = rp->type
+  a698b:  0f b7 53 04       movzwl 0x4(%rbx),%edx     <-- adapter->dev_id
+  a6992:  4c 8d 45 d7       lea    -0x29(%rbp),%r8    <-- &cp
+
+The same delivery, a Command Status with status 0x00 answering a Start
+Discovery just sent, was logged five more times on that machine: four
+in the crashing daemon's own lifetime and once on a later day. On each
+of those the client list was non-empty, so the existing check below
+the branch handled it ("Wrong size of start discovery return
+parameters"); when the list is empty the branch above is reached
+first.
+
+Why the kernel answers Start Discovery with a successful Command
+Status rather than the usual one-byte Command Complete is not
+established here. The crashing instance arrived while the controller
+was timing out HCI commands; the fix does not depend on the cause.
+
+Perform the same length validation before using the reply in the
+no-clients branch. The check is added inside that branch rather than
+hoisted above it, so that no other path changes behaviour.
+
+Fixes: 3597d1377723 ("adapter: Fix not waiting for start discovery result")
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
