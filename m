@@ -1,123 +1,145 @@
-Received: from out-36.smtp.github.com (out-36.smtp.github.com [192.30.252.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f42.google.com (mail-pz2-f42.google.com [74.125.228.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E787E3955F3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 21:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB882D97B7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 21:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789852004; cv=none; b=BMLhhxhGi+8FrE1Ji92EAhoc4RznfGhf2qViHzQt6NBVKF4wi+4deJh4kDQqclXaXSu90g049NjciYyA4LDt1UAoQRtQfaOUGA8v9xHsVpipPRjuoVqAPVqK3qDA1zga+20Sy2XYRjYmdqL/pPjjTdla1yJkRqt9DmbGOb4R83w=
+	t=1789853804; cv=none; b=WYIUYozgHYERf8JJENxY+HGlS3JX0VDjITKw3nBze+VNWD9aKzt5nUbM9VYMqQlm7Z4EkJVuyswk3X+ILqDYMGvLf93UuR2d6qu19Kw6b6efQI3ndxdtrIAaFa3pY1i07IvBs7K0ewE3WEBIU2ytxScEar4UOa7XJrUDne8jQb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789852004; c=relaxed/simple;
-	bh=Mj20bHk11Xz1k/8jClvLrdrJmX/TpErl3vWhLSoJe88=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=C0KImUhGTFFuhmNETytA5okTTRjXuirv7gSZV/IwDnfHpdgGboKbs8yd2ODenC3/Hx0JLJbm3vxNdRX8LgnLN4JceGgNqTEJULW4NxaknxcCWgjsN8NyNbWyY3LLLvtXML7ukNzi2ohEjMM91Fyo4Y8FzqPDE84oEay0LbMFfME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OKPuZw4b; arc=none smtp.client-ip=192.30.252.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1789853804; c=relaxed/simple;
+	bh=JzVmTdq3Q7Iq2TH3qdkMpYUeDuu0LJqEMcRNJCqtMFQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jYaeVVUOyUFtDvSJQsKOyf/s1tCZZpdS1G7JF2Cx+8mx5WlAmXDrScp7IP3Cts6+cJdBCLW39THspPfPhi53Ns4lYpMOgdIISS716QHanh0u0hfNTvLAzwyFegxDrIYXS8D9GCSBcXzjn/CFeL923YCeQ97A1MN79//snxJkyc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSkGLWk9; arc=none smtp.client-ip=74.125.228.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OKPuZw4b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1789851986;
-	bh=rkNyMlVAZ8WtK1sHANDSeaHZZtFEIZHX/ttsXmr+cMo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=OKPuZw4bspeEnk5u+AePGHQj67kZkJUgCiO4bN4uVcmIb1D13f+98HUcQwp56NVau
-	 tNXhoqiMdL5YazWSc75Bi0UF8gBlWymKkqiuKkAWy/ubTR4vfeRcK/wey+g0U7khPW
-	 YqrqkOB2bChDqFCymUyEiyII4t6ADIxoiNo1jrdk=
-Received: from github.com (hubbernetes-node-66db4b1.ac4-iad.github.net [10.52.137.32])
-	by smtp.github.com (Postfix) with ESMTPA id DEDAC740752
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 14:06:26 -0700 (PDT)
-Date: Sat, 19 Sep 2026 14:06:26 -0700
-From: IAROSLAV VOITOVYCH <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1169363/000000-0e2503@github.com>
-Subject: [bluez/bluez] 0e2503: a2dp: Fix crash on NULL stream in transport_cb
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSkGLWk9"
+Received: by mail-pz2-f42.google.com with SMTP id 41be03b00d2f7-cc1cebcb8d7so566900a12.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 14:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789853799; x=1790458599; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lRiAGPXf/bDE6W3u+fknYqS6n6eKeAu3CAyIqYAtulg=;
+        b=aSkGLWk93vpkFmPKP4eU5BGpqsr026Sz1L4HmhdQCM/eM4pQD+q5xWUZ5X+VGDsdHx
+         fk+sXPrMbzKOHgzjUsiOnNeEBwWcJZ9zxo7W+jxoYwWlcvU/kU6HEOqPr0IIfdSlZsJy
+         HlROJgXVKQTEzh+k3+By4yQ6/qFC9To3ehNs6o7firnZZhnWBUiUCCM2FF9Iw+GCY3Ro
+         vgCYu/Vm/S/4DZvG5FtQwtmex/w7xK2EsoJ8NuWnO6dzjrBCfM1oIGly2q7cTdKvSdkU
+         gKSGX780UkR2b5GR9xXuJJRrRCMTnd+Fey/bJOmO2pGjLdc4yt5OECDxJJFv4w/Wf3Lx
+         QEVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789853799; x=1790458599;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lRiAGPXf/bDE6W3u+fknYqS6n6eKeAu3CAyIqYAtulg=;
+        b=oV06RYW6ulPCH2ndbjzTQmVo8OenaKGKhtXTLZmJneT+LjTWbvh3nPfuu4OIsxHU9g
+         IyEyj7KSb/xg8myhrh4pwtYkI4AncvimBjbsC5ozW/jVN6jjg871rmOYicA1F7cAdXh8
+         egJzVDBxAmcdgsuiEMHSX6mXsnL+43C2sBYtU9ZZSytuoGg9VObN7PL6G6f9QgJLvw/8
+         W19UvMuZQnikVq/z1Y1W0AAI19H2PLg+hMssGD3WGkam/P75fHHG8abuSVNRe3/DexCn
+         VFi6E72sqBsigjSRL9E/nSLxRsGJzMIcr0pUTPbDkgi3ifTqsbNLtoIp8Q5okKin1s4o
+         O3TQ==
+X-Gm-Message-State: AFuF++l9yapXbO5Fdf4Ah1nOvOTGVCbSmmDRUULFt/nWBcacBD4RP6nN
+	oX+ifDavVozjeA5gQosZ0s5bPQaFzo6MiymihFo09ZB3BICc2+UowjGP
+X-Gm-Gg: AYBFou1c/kuFjR49UnmeZRjlZ5B8PjKCDO9L+RP8J5sGq4/PW3JYtnbyz7CcIyF28vc
+	kw4xH6ddSStXbC030H2N3nDRcGOCFmOYASOJvbRrwBkDxzUlzaAa9i3ZxiHHqae2Udn1IBEI/mW
+	hykTVhu/tiHAXsYuWXcyHWgm0a22mVT8pagtijEYvOit/OGQnc4PcffigC1W6tgRrZ9fKaGKdfM
+	j4cvjOlhiLdSgsF8Nsvh4IBNfS7I1txkEcOWkm3BJfLrUoZFes0jhnONHZxFiV3/O0RLgYQYtUk
+	1kln89Pa9Ik+T3xnIvUyiRw28kHNDyCdFJfzp6Q32tsHQsGhEC9D0ZCmmAgXIXA3bV9BTwtpjzV
+	9gE28JsXRDr9cls5Vig318sZwWx2/brjwpAkSN/EwuT04AhFL86BkD0/3CWdGibtpLPB1W+9KMO
+	fK58VblazepVZIoYKOYjqd0YXNA+dovBrtfAx+8bDa/1eC9aUTlFW39iog7qQbN40uraAUsenxN
+	JhRHlxybzEEgo2+kQLyRAL8zKhxJsbYWMZZwmpmWcI8SlIIdvqdBZ3J1Fj5IjqRaIB3nZEzj9O1
+	BGI967UBTw==
+X-Received: by 2002:a17:902:e946:b0:2dd:c100:2516 with SMTP id d9443c01a7336-2ddc1002577mr36107355ad.31.1789853799128;
+        Sat, 19 Sep 2026 14:36:39 -0700 (PDT)
+Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ddc1803813sm12928885ad.82.2026.09.19.14.36.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Sep 2026 14:36:38 -0700 (PDT)
+From: Hui Peng <benquike@gmail.com>
+To: alex.aring@gmail.com,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] 6lowpan: add missing pskb_may_pull() checks in IPHC and NHC compression
+Date: Sat, 19 Sep 2026 21:36:38 +0000
+Message-ID: <20260919213638.3314763-1-benquike@gmail.com>
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1169363
-  Home:   https://github.com/bluez/bluez
-  Commit: 0e2503425c486cb6326c4d200d04ef709fe9d00f
-      https://github.com/bluez/bluez/commit/0e2503425c486cb6326c4d200d04ef709fe9d00f
-  Author: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
-  Date:   2026-09-19 (Sat, 19 Sep 2026)
+In `lowpan_header_compress()` (`net/6lowpan/iphc.c`) and
+`lowpan_nhc_do_compression()` (`net/6lowpan/nhc.c`), the transmit
+compression path reads `ipv6_hdr(skb)` (`sizeof(struct ipv6hdr)`) and
+the next-header transport header (`nhc->nexthdrlen`, e.g.,
+`sizeof(struct udphdr)`), and then calls `skb_pull(skb,
+nhc->nexthdrlen)` and `skb_pull(skb, sizeof(struct ipv6hdr))` without
+verifying via `pskb_may_pull()` that those headers are present in the
+linear data area of `skb`.
 
-  Changed paths:
-    M profiles/audio/a2dp.c
+When a short or non-linear `ETH_P_IPV6` frame is transmitted over a
+6LoWPAN interface (for example, via `AF_PACKET`),
+`lowpan_header_compress()` and `lowpan_nhc_do_compression()` read past
+`skb_tail_pointer(skb)` and trigger `BUG_ON(skb->len < skb->data_len)`
+in `skb_pull()`.
 
-  Log Message:
-  -----------
-  a2dp: Fix crash on NULL stream in transport_cb
+Check `pskb_may_pull(skb, sizeof(struct ipv6hdr))` in
+`lowpan_header_compress()` and `pskb_may_pull(skb, sizeof(struct
+ipv6hdr) + nhc->nexthdrlen)` in `lowpan_nhc_do_compression()`.
 
-transport_cb() runs from bt_io_accept() and begins by confirming that
-the a2dp_setup it was handed still exists:
+Fixes: 8df8c56a5abc ("6lowpan: Moving generic compression code into 6lowpan_iphc.c")
+Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
+Assisted-by: LLM
+Signed-off-by: Hui Peng <benquike@gmail.com>
 
-	if (!g_slist_find(setups, setup)) {
-		warn("bt_io_accept: setup %p no longer valid", setup);
-		...
-	}
+---
+ net/6lowpan/iphc.c | 3 +++
+ net/6lowpan/nhc.c  | 5 +++++
+ 2 files changed, 8 insertions(+)
 
-That establishes the lifetime of the setup, not of the stream it
-points at. Several paths in a2dp.c clear setup->stream while leaving
-the setup itself on the list, so by the time the accept completes the
-setup can be valid and its stream NULL. confirm_cb() already refuses
-to start the accept when setup->stream is NULL; nothing re-checks it
-when the accept completes, and it is then passed on unchecked:
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 37eaff3f7b69..b2be70036ee7 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -1140,6 +1140,9 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 	if (skb->protocol != htons(ETH_P_IPV6))
+ 		return -EINVAL;
+ 
++	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
++		return -EINVAL;
++
+ 	hdr = ipv6_hdr(skb);
+ 	hc_ptr = head + 2;
+ 
+diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+index a4dde85664f2..a9bf340c090a 100644
+--- a/net/6lowpan/nhc.c
++++ b/net/6lowpan/nhc.c
+@@ -79,6 +79,11 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
+ 		goto out;
+ 	}
+ 
++	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr) + nhc->nexthdrlen)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
+ 	/* In the case of RAW sockets the transport header is not set by
+ 	 * the ip6 stack so we must set it ourselves
+ 	 */
+-- 
+2.55.0.1082.g2b9226bbc0-goog
 
-	if (!avdtp_stream_set_transport(setup->stream,
-					g_io_channel_unix_get_fd(io),
-					imtu, omtu))
-
-and avdtp_stream_set_transport() dereferences it immediately:
-
-	gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, ...)
-	{
-		GIOChannel *io = g_io_channel_unix_new(fd);
-
-		if (stream != stream->session->pending_open) {
-
-Observed as a crash on a QCA9377 (13d3:3503) whose controller stops
-answering HCI during audio use. From the retained core, %r13 held NULL
-and the faulting instruction was the first field load off it:
-
-  bluetoothd[398112]: segfault at 10 ip 0000635d944b47e5 sp 00007ffefcba28d0 \
-      error 4 in bluetoothd[367e5,635d944a3000+f3000]
-
-  r13  0x0
-  => 0x635d944b47e5:  mov 0x10(%r13),%rdi
-
-With the check in place and the daemon logging before it bails, the
-guard fired four times in 19 days of ordinary use on the same machine
-(once on 2026-08-26, three times on 2026-09-02, across two daemon
-lifetimes and three distinct setup pointers). Each of those is an
-accept that completed after the stream had been cleared; unpatched,
-each is the dereference above.
-
-Check the stream immediately before it is used, so every existing path
-keeps its current behaviour up to the point that was previously
-unsafe. In particular a bt_io_accept() error or a bt_io_get() failure
-still reports the real I/O error rather than this secondary lifecycle
-condition.
-
-commit 125a2e237e7c ("a2dp: Fix possible crash when accepting stream
-transport") previously hardened this same asynchronous accept window
-against the whole setup disappearing while the accept was pending.
-This covers the remaining case where the setup survives and its stream
-does not.
-
-commit 90a600895d80 ("avdtp: Handle case where remote send L2CAP
-connect ahead of Open") also changed avdtp_stream_set_transport()
-itself, to handle a transport arriving before Open. The function still
-dereferences stream before reaching that handling, so it does not
-cover a NULL argument from transport_cb().
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
