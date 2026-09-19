@@ -1,119 +1,141 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967722F7F15
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 10:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D93472795
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 11:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789814623; cv=none; b=YO0eDyP4HgOsxHSHKT5/GU8T1NpOodsg8cA3kDQF5dW4t2SNWjCGhdtYi4VOX2H+/bK1ACY0SGSYCMFbzgEI8w4T2ilFAWGOitXNyhbE7+Dbes/Jx+pGEMAWF16Gnud/oCJRW8h+d4WSBM/qLx1UYHLeoyB6kw/TD93iIFr4p80=
+	t=1789817119; cv=none; b=ASli4x1cKC0hHwW8FlTHxjtW364AZNAy6LRtlYhbSxxPJrSH7+vPWS80bL1XIpimovY9xWF6521E05ipBXWcRGb1A6ivCxjOIdkCJbyKIRdBWI/nHE49UMwxMmQ4Iaspb6WSfoK0vdRAI2anejmzsm/+l/mgTJFJn4EyiIAFYJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789814623; c=relaxed/simple;
-	bh=Kb6GJ+6exjuqmNy32cYks6dmD87Wc90upHw+/ODzcdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gebYO756MTvhAaUArzKJsRKsl1c5Ue6/3TxvdE7Bav2zA3xhXeI7aOCp3lbTpMGt/TgsfjstEuYwjjzChZ4NIOD/V8wxxGvpGwy+arW+oe1MyeUAjKJTlCCq+LGf2prbNJE+Ei94PWUuUYegzhuScgzYonioIy+Y7+Yq2lCwmis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIwz1I9J; arc=none smtp.client-ip=74.125.225.140
+	s=arc-20240116; t=1789817119; c=relaxed/simple;
+	bh=dJJB6/BdV7/ypHadf92Y/zPWc61GpbUUbHljnw4SybU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WCy/JYNZGb6dviNw6jBKDeYBAjMnywGombti9/DAll5RxJj+WF280ZKO63BLOXI7rtDjOTAAwHYQQhxvGax9e+9aRIucH20QR1LSTDm25h6I4gIi97mzaymjEw4Xpd3jqW2Y9YT0F3WkiK3Sk5IRfzNoGqq0Oz/kqPFhn66EaYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=foSqugei; arc=none smtp.client-ip=74.125.227.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIwz1I9J"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd5462b69so8171215e9.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 03:43:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foSqugei"
+Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-396ccd78e6eso606728a91.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 04:25:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789814619; x=1790419419; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=jAiOs4ftLN5jbwUNxbjAHqs++vwR8RTHCuoDXv12AGw=;
-        b=LIwz1I9J68G6bZdBxuXkOVgtqTg/4K6F5kv9AYpwP9UWHDKGl8jtxJDHk/oT9FSx8D
-         ch9zeEm00Wmzfl9AqqMJ3Nw4wmP3rei4vGlFkieumC57zp1zUD4IlDkS00hTGB5q5Oql
-         sJcKQEnHo/08l5bsS7pL0yWy6NTuOCXk0s3fwVT8CzTq9yBrcMSqoqEXPmtfXvx4UlJg
-         kWOaY20IWgoURKdAxlxK+pQ06/XfjxWi1GlHPwr9wwiTbBxmF/CPDzEwNTlFTS2Yy11B
-         zjWPTxuunhwNKUzHJZigsZKhxgtcT8m+jTccyQZwZYdYj5ZLwkurply0ojvLVOZKAl8l
-         tHBw==
+        d=gmail.com; s=20251104; t=1789817117; x=1790421917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=jHGttpk3OiKS8m1dDVvKx2gO19FWdtH1Vw9wND10/ZI=;
+        b=foSqugeixIsmafnl0j5O3dGNpNi12xdNls3J9bD40WCOZCrPvPArhKW/jhpWxI/AFi
+         Yp4YO4EskLf3lGfmhpzv0D8xlk/iNztO+5d9ECwDMz0gj00XM/mEQfTIKr3GNQcu2W/j
+         SrhKdfMQ+2uy5mLU6Wpxc3qRpZI+q4i/YvXOQSWvcO8tG4LVIOV9pF2e/Nd9Srt33OKP
+         8pyWCAH1xRmZt3WZTF19PCecjW8rUaGua+DDqngVvBI0g19SakYufc0/Lde+ktcGBhkF
+         QJshOsHGXgrIN9HyeDiXB90UtNxgalxl3pnKn2fTRiTdaQ0Q6KNENcnzd82J+SKGh5hc
+         CZLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789814619; x=1790419419;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jAiOs4ftLN5jbwUNxbjAHqs++vwR8RTHCuoDXv12AGw=;
-        b=Ui9pf6YfbpX4z5aYNOlYZVzzoVd055IyrJ1OUlUQ00V+vj0HAkdWtT4CkXVFdB7HlF
-         5IeqKJ47XNUNdBYDrv4n+UXuT0xRbbr4LyHnHwsGlslC+gB4c9qmblRf9pk9Mg4cAOIu
-         Cw7qQz8sRGNqqXy+fWnch7Zv2CjgPgsbx68KL8EoGnEgOHlGF993R0YXPD5xLhlyN9YS
-         gI6kqjSxevErNZ46I9OSWvSGLi3ELvrD18h8cLttSSwA6HGviptS+pPodU3+vL4HjyZK
-         qGuUR/676q+mgnRHigfG5/CngKv/ahv3kMFAdfUGWsgT/60c+uonbxJZjdL09UOkhRen
-         NV8A==
-X-Gm-Message-State: AFuF++nGSUB5n+Q+3RrnsBDTcQdF503curOyzhX3DcP5I7yyGQbYm91Z
-	qKLASeKuuLHQVjPZKul8/as6vDorb+9xqPqkUtWzKWl4+X9GrXAGkcVjS3foAkSJ1G3PCg==
-X-Gm-Gg: AYBFou261wAqd4s4h+9den2DIK9Z8ScJTo194hDBpUmyVjNiXQt8folUZZ0kNnbKKHp
-	AeGDbL+Mmoxo6pJKQt4+sKy1uXaEAdAOSTXZkNaY2ZD6J4gxJ1jbrAO2bPx7le7qVkal0q7d8OA
-	ah/Mr1GfHWRHABm7jSOxj8sSz4uaKeLxBY/IMnRDmD5A5P55EymeOXckEfg5dsd7gY15yKNnRYJ
-	TUUOFEk3fQZAFl/5D43z7Ci+D/IFLs4QK2nryFncjl07a5YV1SoNIZ03F0fEufRdbTAjfj7Lip6
-	UmIYXkn87rP+PbtUu/z9iaYabsaaItFH+F/tWH+HXqai9PmVjtFrh0YPldztbgIhISfDWTeZWj8
-	JDrtvXq/Kq8+qcSgVWYhK7gQn4y1iaLIeXKZViUKJfah1m8yQAeE56g90oLssdFd7wt7hCsrWfh
-	asQCcMSAsVackrGikWmc2yHtdry/CxX5s0Q54i2LwL4ZChcPMAdE7ZH6BKGJ8rM7/VtAA=
-X-Received: by 2002:a05:600c:8b24:b0:49f:ce78:3563 with SMTP id 5b1f17b1804b1-49fce78360emr15128345e9.20.1789814618806;
-        Sat, 19 Sep 2026 03:43:38 -0700 (PDT)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fc6ca43edsm128396395e9.0.2026.09.19.03.43.37
+        d=1e100.net; s=20260707; t=1789817117; x=1790421917;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jHGttpk3OiKS8m1dDVvKx2gO19FWdtH1Vw9wND10/ZI=;
+        b=L1nk5iO7qLuHuCV4H3ylZGtn6ibaEXJTTK6sGBSZafVkpARvoK8VDhFduSjCqX7c5U
+         BjWIqFDfVw/gWu8E9+GXo1uBcy1V8VPR52eS5dAq1NZnx88YNcNbxMng9tqN04zsATrP
+         oFH180ppfb1CZWoOFD0dsRwrEvPkbgz3cGtTA+efrrcBaPgA+2n2x5422KuffQUkMiLD
+         PFGFliYw5in91rleDG7j6BpQUJ9EeYuC2rQXTewoxYC2G5wBW/FHAIab7foWT6wEwA1R
+         Pt93S4fV4dhrgIkdG6XQ87cwnCf8nT2hOqgrexJZpnmXQeuNFwC2RbLLMkwV5llN2LNr
+         kDDQ==
+X-Gm-Message-State: AFuF++kJbCszvVkYoPP+A5GIH8PdRI6d3Rjg08tYt/RSMaOmmNbXBSkF
+	4gQWSeGnouRyyQ4WLATmj9JWz8bagyZIt66aDDKIFVnjh5nKD5JzTyrf
+X-Gm-Gg: AYBFou2neA+6M0GBY0j9vlZBBtTF1OsD5UM4eQIrf0gRpcLjg6R0PZoLNNl5jypt/fb
+	pK0LiMhiioUPpJiYCscdDBtVV44/ugSAV4wcukJbdQ7wWg9NfAODie6lRpNU3NlY0oMetfTt+6o
+	E0r6j8FRN8yP97P8rc6LOHDR8Jl1JHmPt8xj3N1dtqJZw0L/v6ZLiyfCeudgaFEvYx3OWpq319M
+	V1e1uOH0wAJ6rcZm6xYfJzZPi8VH1hIPM+GfF4tMsR61X3bv/Gk1G1lnFMhu30rDu40GGpByk6S
+	mYx2ExSMGO7tP+CCBrR+fdCjKr8Hi55lS9/B8Dv6W/oQee3JKRvqJsdkgBPDxphXOwm2S4G1SgR
+	a3KBekXcK7QYoS99cR7SYBZ67vgN4W7gnnog+Ch7Nfr2TvOe1drbTprvBK1/pLF1VLcFRCs5kgn
+	LrQRxBwjT8EiHYrL0InsCJ6KTxydc4V8DpLVYIA1vbuVF/R3/hRvSXh+wTy1zfXqrw62Sh36zx9
+	7iCbJJZRB0mfcRCo8Q1ECkrup5NU3JvqK8kxQqj2BePi53ItHxTF0VQHyBrJ0glgu2SWshBnvjn
+	VhNT+mTHVg==
+X-Received: by 2002:a17:90b:57d0:b0:39e:4c7e:bc3 with SMTP id 98e67ed59e1d1-39e556e00c5mr5825456a91.17.1789817116925;
+        Sat, 19 Sep 2026 04:25:16 -0700 (PDT)
+Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e6cb400c3sm4207228a91.17.2026.09.19.04.25.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 03:43:37 -0700 (PDT)
-Date: Sat, 19 Sep 2026 13:43:34 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [bug report] Bluetooth: btusb: Add support for Qualcomm
- multi-subsystem QCC2072
-Message-ID: <aq5nVkN4TvIJNh4y@stanley.mountain>
-References: <aqw8ShHyjdZhPc4U@stanley.mountain>
- <aqw8zNc6tXeaNPNV@stanley.mountain>
- <74e197ab-7bb7-46c8-9485-70ba64b4b552@oss.qualcomm.com>
- <aq4YdQS3RhUEIm9z@stanley.mountain>
- <988c4737-16a8-4c79-b3d6-e96de8dd174d@oss.qualcomm.com>
+        Sat, 19 Sep 2026 04:25:16 -0700 (PDT)
+From: Hui Peng <benquike@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: RFCOMM: Reject short EA=0 frames in rfcomm_recv_frame()
+Date: Sat, 19 Sep 2026 11:25:14 +0000
+Message-ID: <20260919112514.3871857-1-benquike@gmail.com>
+In-Reply-To: <20260918075829.2203887-1-benquike@gmail.com>
+References: <20260918075829.2203887-1-benquike@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <988c4737-16a8-4c79-b3d6-e96de8dd174d@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 19, 2026 at 03:04:06PM +0800, Zijun Hu wrote:
-> On 9/19/2026 1:07 PM, Dan Carpenter wrote:
-> > Zero, sure.
-> > 
-> >    268  
-> >    269          if (IS_ERR(skb)) {
-> >    270                  if (!event)
-> >    271                          bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld", opcode,
-> >    272                                     PTR_ERR(skb));
-> >    273                  return PTR_ERR(skb);
-> >                         ^^^^^^^^^^^^^^^^^^^
-> > Error pointer.  Fine.
-> > 
-> >    274          }
-> >    275  
-> >    276          status = skb->data[0];
-> >    277  
-> >    278          kfree_skb(skb);
-> >    279  
-> >    280          return status;
-> >                 ^^^^^^^^^^^^^
-> > But this seems like it could be a positive...
-> > 
-> 
-> For HCI_OP_RESET, execution cannot reach this point when status != 0.
-> 
-> >    281  }
+While rfcomm_recv_frame() verifies that skb->len is at least
+sizeof(*hdr) + 1 (4 bytes: 3-byte header + 1-byte FCS), an RFCOMM frame
+with an extended 2-byte length field (!__test_ea(hdr->len)) has a 4-byte
+header plus a 1-byte FCS (5 bytes minimum, sizeof(*hdr) + 2).
 
-Actually even for the other opcodes it looks like doing:
+When a 4-byte RFCOMM frame with EA == 0 arrives:
+1. The initial skb->len < sizeof(*hdr) + 1 check passes (4 < 4 is false).
+2. Trimming the FCS byte decrements skb->len to 3.
+3. If __check_fcs() succeeds, skb_pull(skb, 4) fails (4 > 3) and returns
+   NULL without advancing skb->data.
+4. Because the return value of skb_pull() is ignored, the un-pulled
+   3-byte struct rfcomm_hdr remains at skb->data and is either queued as
+   application payload via rfcomm_recv_data() or parsed as a multiplexer
+   control command via rfcomm_recv_mcc() on DLCI 0.
 
-	status = skb->data[0];
-	return status;
+Fix this by extending the length check in rfcomm_recv_frame() to also
+require skb->len >= sizeof(*hdr) + 2 when !__test_ea(hdr->len).
 
-is just a more complicated way to write "return 0;".  :/
+Fixes: b230e5bf501c ("Bluetooth: RFCOMM: validate skb length in rfcomm_recv_frame")
+Assisted-by: LLM
+Signed-off-by: Hui Peng <benquike@gmail.com>
+---
+v2: Add a Fixes: tag, and add the Assisted-by: LLM tag that v1 was
+missing - apologies, v1 predated my reading of
+Documentation/process/coding-assistants.rst.
 
-regards,
-dan carpenter
+The tag points at b230e5bf501c ("Bluetooth: RFCOMM: validate skb length
+in rfcomm_recv_frame"), which added the skb->len < sizeof(*hdr) + 1
+bound that this patch widens. Its changelog justifies the bound as "the
+minimum frame must have a 3-byte header and a 1-byte FCS", which holds
+only for EA=1; an EA=0 frame has a 4-byte header plus the FCS.
+
+To be upfront: b230e5bf501c is not where the underlying exposure began.
+Before it there was no length check at all, so a 4-byte EA=0 frame
+already reached skb_pull(skb, 4) with skb->len == 3 and the ignored
+return value already left the un-pulled header to be parsed. That goes
+back to the initial Bluetooth stack import, 1da177e4c3f4
+("Linux-2.6.12-rc2"). I have tagged b230e5bf501c instead because it is
+the commit that introduced the insufficient bound this patch corrects,
+and because the single line of context this hunk relies on does not
+exist in any tree older than v7.2 - pointing stable at 2.6.12 would be
+actively unhelpful.
+
+ net/bluetooth/rfcomm/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index f7463f092..d91e2a6ee 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1817,7 +1817,8 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 		return s;
+ 	}
+ 
+-	if (skb->len < sizeof(*hdr) + 1) {
++	if (skb->len < sizeof(*hdr) + 1 ||
++	    (!__test_ea(hdr->len) && skb->len < sizeof(*hdr) + 2)) {
+ 		kfree_skb(skb);
+ 		return s;
+ 	}
+-- 
+2.55.0.1082.g2b9226bbc0-goog
