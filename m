@@ -1,148 +1,59 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-24424.protonmail.ch (mail-24424.protonmail.ch [109.224.244.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D2C3ED109
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 09:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF209281530
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 10:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789809083; cv=none; b=W3sWN9q9Vmr4/umvCZWpGO55bRFT+jYKzhjwf80IAsGdvno5Lm6tFXIGZSBNHPV5dRb2oR9gAQQmvBIsoJpkO8XQG70nQ8orxq2otUcKSVc9o0d+dVcGVObC050x6LYrCP3y8qjQLcdk7lojNrXJ0YYOn69MPMiJDcN4PJGLnMA=
+	t=1789812427; cv=none; b=Uma2sjGy5rIBra90AZRXqNOKctNUOEF/6rqjGcgUK5zKX7HOoZfOlHXPOGsz9mPCIGebJmOk6FyvofHU7PZv7ZXYZgIh8Q3idnzTEcdhO5iePEa3Qb1QZk1WozwcBZhM5OSv2V4BczmVuvw4eVe/Bj36Vmmr7Ye+ADmQXOWcV3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789809083; c=relaxed/simple;
-	bh=D6ph7n5q0URhHNzxQIE75QUv6yBpzCie/CEQlOfn/y8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=onZxql8XmauXOxEA0JYrW9nucuLt3cL1zgs9BRc08wYmxuTI7rA80QE+dO8g4x21pucw5yxAi81pb3Wu6OwOyaN+fPwnq0fm0CQGaKtuS1as5Ei2FUm+paRhiWpHDUjXmhrr/taWBNKIqASN2v9Hyf3CBUBu45fFoSRycpvNIn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ga3RmkaU; arc=none smtp.client-ip=74.125.227.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789812427; c=relaxed/simple;
+	bh=elqOL6SOduchc6fNzEwyeHOTm/LbyRxNpbFTpQaPiD4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QDM2Qq76A/EOCNgdrdFfDLYzZPiyAVdYykNU0zJiugUxs+p8n/AUeyzY9K4iVEmcoOU/t4WP8gbnIxUexzC76X/IlNE1tCcqcgANXi+/PllJ+oF5HE7/2E32QZg/kL7yNkv7AL3pmBraxxgMOWLPkIfBK0PIHmyFenGKFS7y4vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=kkWuhE0l; arc=none smtp.client-ip=109.224.244.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ga3RmkaU"
-Received: by mail-pj2-f12.google.com with SMTP id 98e67ed59e1d1-396ccafb74fso1660964a91.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Sep 2026 02:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789809081; x=1790413881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DsV9Fsd7Kx2vmgwJA0Z2vvtQ9MytD8CHEdEDo7dy1uA=;
-        b=Ga3RmkaUi8qnXWAqUoVgRrVYSKjZyCt9fdn2t5YWupGHz2Gc5we7iSsTIdJn9rnKNu
-         QX8Ni59WOGrrwts08zJ6Ye9UXDzPoheqe0QA3dIwNnpfPvJCG5NWn5EbaaCiD+7+yy82
-         QRrPBuOkEF2oI3gkOJOBMewAbfztMZTpbWS3dK0OpXs9Z29aoznjAzqkKr3NYj/seIoC
-         8hHGuSjk0DsmQIuJy1bA4y/04YS8b3ZWW5XOTjXSbZ1D5+rtBNWvHvrDoqjkaYrQ21py
-         YEwu+UOL4jmHPMja8i6GccIL7AArrqLWvPSZ0wMFW7mpmfBWvzKzsceAxr2nfXL4HnE+
-         4dxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789809081; x=1790413881;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DsV9Fsd7Kx2vmgwJA0Z2vvtQ9MytD8CHEdEDo7dy1uA=;
-        b=WS71dF1acCqK7UZCwztrrI2+t6vHoz60IuPJB9O6cE+5sNnxe9xK+whAg7HvnmzZsI
-         WncEeQNnng0z8gx7+Fziftf/xbwXeNFSuQGWCn3ZagbgvKxIRc74ojyQnuC/p5o1rfyu
-         JyRSCot7LMs06+Y+O2ChXmIYk5xxmNY22XHKZsyPEtFN0au4l5GIBIytPIjQlHUlTVru
-         jGr00DgglAN7pEqL+7R8mkomoqCR3p8mMTBmSUcP4b5uPJoUcDXJvMkX0ZQ+IwdK7ejh
-         tiHRjDuVAUQ4H4hfv9Y5fCjwDWp3vD1K+2eASPzj8RkID60Pr7rZY04IGaXjsn9D7Dla
-         ZnbQ==
-X-Gm-Message-State: AFuF++kNjjRDvR0mcxkANzHwzY2Lj/HaVnmkXQAIzTYBLrP/ko0Bk99l
-	oF+g60aUJYgaiLGB6uBbhhcI3DrdQMfr/l4tuX2mHBOgoV/hgPy3d0Gt
-X-Gm-Gg: AYBFou0af0EYGPvtLi8lOKJ9RP6FAJtIJKL5FdcyKEXdDwSsPEDb/e0eJXaZDtJdxrE
-	d3Q1RoNA8a+6l4l5qn0423Zt9dMESFDLRvuIyLJYb9MYsnBhFkYymi1OtFtHnaABYByDiIwrhUA
-	GsAA3Ujt5vOFRS5bCFU16/jQ5Z87KHX48xFe+/WK0KeTFsPuhjS4v+v4o7qOx4MexHCGnVA400o
-	thZWnd5KwktcsAslVPPJ4NRiWzIqq9xfjXuWYpMgxAsn6+Pxprr9ANccZKbBgm3S4QGu3btQWzF
-	RfB07l7uaOp9dk788hPldn0C8pETOmZ9VsWTJCPqAs3a7itbSDlQfoedsoV+yK09pdpxn5cvqkQ
-	I62YOeDeTSpYO/hdKZ60aIQXvZ2w6CxAxv5NMsPTI/v14J/A/J1eflv80FreH0DI9kieSzEXJUA
-	8uPCYVEojAh2qMgmAliGP8UHKHc1btFdPd0plcvDmR9snpuEc88PBh40AL/8hYPvxtE8asoSIcU
-	Wl1jGtUxutUTuvLT2K5pbyd4XqIv0+caFLat+Pq1E9sg9FFLSfNliszW9sKra15Z3s0gdL55MW5
-	CEnrgk2dYw==
-X-Received: by 2002:a17:90b:280a:b0:39e:2530:2102 with SMTP id 98e67ed59e1d1-39e54f4221amr17113972a91.11.1789809081235;
-        Sat, 19 Sep 2026 02:11:21 -0700 (PDT)
-Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e6cae997csm3596214a91.11.2026.09.19.02.11.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 02:11:20 -0700 (PDT)
-From: Hui Peng <benquike@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hui Peng <benquike@gmail.com>
-Subject: [PATCH] Bluetooth: RFCOMM: fix NULL dereference of dlc->session in RFCOMM_CONNINFO
-Date: Sat, 19 Sep 2026 09:11:20 +0000
-Message-ID: <20260919091120.3273038-1-benquike@gmail.com>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="kkWuhE0l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1789812420; x=1790071620;
+	bh=elqOL6SOduchc6fNzEwyeHOTm/LbyRxNpbFTpQaPiD4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=kkWuhE0lc5ebpFlcMKYeRI2LWa4MofpOuAUAwqjAv5PILTzEkx/zobqmSEK4bGpK0
+	 xelUlfxX8UqpsNo4gURI1u7CXAQKAtmyUBKgLwGGPurszUfMqbZg35nG5MpbTX1fqg
+	 cWLDmBsFgnVgGf/wMep2I7x/vAy5pOtFs1/JaKOM1MgM7Qgx9BFGNYtZftF9eo+DL8
+	 exTXCZbOweqUPzXvP6kd2dODuGCz0YdYUSmVhPW1r5yjzMEGLq3t1/EybaYJSDf/G6
+	 dTS2BOeRWyKFxHFMd6IskAetJ3DRrGHqH2DGZzup91jRvF+dmm8/9iRx0ytB6lq190
+	 nWM40OwW9G/Tg==
+Date: Sat, 19 Sep 2026 10:06:56 +0000
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: dt <derektern@proton.me>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 3/3] test: Cover BAP transport release and reacquire
+Message-ID: <11nf7-aOUmEZfPJBokiWAsKwmmf53Zaknwv4rq6dYD-tSfU-yOp8Xu5zVo2WU5H49KTNTfQszWrAc2z3ErthHPbOiN5hgMmyjstPc-_Ozus=@proton.me>
+In-Reply-To: <CABBYNZ+MCKEz_v2Uz+hDU0sn0COYj=guj9P8Fxu-qzp93XEufQ@mail.gmail.com>
+References: <5yh1Rc6x2sD0mB4Zq0o-3_jmYYKB43NbYyd-ZXGrHGZRN61HyoWYmLVVTTHE2-SyPhNj8g2ktGAB0Zy_Jnq-Htnc1JspqPSHvIsZDC3KFlM=@proton.me> <bJzWf-DKkZ2NJt0LruBxuNgW3xnTzD5zu2ll54ZFD3hN89Bul7SbBAeOcvTK_S8vnaM-F5QpmQ0wZuDs9_M_G0fAbPTS8NMxFxctkbXnr2I=@proton.me> <CABBYNZ+MCKEz_v2Uz+hDU0sn0COYj=guj9P8Fxu-qzp93XEufQ@mail.gmail.com>
+Feedback-ID: 213585229:user:proton
+X-Pm-Message-ID: 758ea425a8cc1945b69edc3cc4cb548eef7f1d0b
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The RFCOMM_CONNINFO getsockopt handler accepts a socket that is not
-connected as long as deferred setup is enabled:
+The test waits for both Acquire replies before Release, and both Release re=
+plies before reacquiring (done.wait() in operation()). Only requests for th=
+e two distinct CIS paths run concurrently, matching the existing acquisitio=
+n test.
 
-	if (sk->sk_state != BT_CONNECTED &&
-				!rfcomm_pi(sk)->dlc->defer_setup) {
-		err = -ENOTCONN;
-		break;
-	}
-	l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+Did you mean Releases on different CIS paths should also be serialized?
 
-BT_DEFER_SETUP can be set on a listening socket, and it is stored in
-rfcomm_pi(sk)->dlc->defer_setup while dlc->session is still NULL. A
-local user can therefore create an RFCOMM socket, call listen(), set
-BT_DEFER_SETUP, and then call getsockopt(SOL_RFCOMM, RFCOMM_CONNINFO)
-to skip the -ENOTCONN path and dereference the NULL session:
+All three new resume variants passed CI. The failures were in the existing =
+coordinated-set setup/teardown cases; I am tracking those separately.
 
- Oops: general protection fault, probably for non-canonical address
- 0xdffffc0000000002
- KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
- CPU: 1 UID: 0 PID: 150 Comm: init Tainted: G B 7.3.0-rc3-g5dd1818b15d9 #1
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
- RIP: 0010:rfcomm_sock_getsockopt+0x529/0x780
- Call Trace:
-  <TASK>
-  do_sock_getsockopt+0x3ad/0x7d0
-  __sys_getsockopt+0x10e/0x1b0
-  __x64_sys_getsockopt+0xc2/0x160
-  do_syscall_64+0xda/0x4b0
-  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  </TASK>
-
-Deferred setup only leaves a socket usable here once it has reached
-BT_CONNECT2, so restrict the exception to that state and check that a
-session is actually present before following it.
-
-Assisted-by: LLM
-Signed-off-by: Hui Peng <benquike@gmail.com>
----
-No Fixes: tag: I could not pin the change that introduced this with
-confidence, so I left it out rather than guess.
-
-Reproduced on Linux 7.3.0-rc3 (5dd1818b15d9) with KASAN under QEMU with
-a virtual HCI device:
-
-  s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-  bind(s, ...); listen(s, 1);
-  setsockopt(s, SOL_BLUETOOTH, BT_DEFER_SETUP, &one, 4);
-  getsockopt(s, SOL_RFCOMM, RFCOMM_CONNINFO, &ci, &len);   /* boom */
-
-With this patch the getsockopt() returns -ENOTCONN instead.
-
- net/bluetooth/rfcomm/sock.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -786,8 +786,10 @@ static int rfcomm_sock_getsockopt_old(st
- 		break;
- 
- 	case RFCOMM_CONNINFO:
--		if (sk->sk_state != BT_CONNECTED &&
--					!rfcomm_pi(sk)->dlc->defer_setup) {
-+		if ((sk->sk_state != BT_CONNECTED &&
-+		     !(sk->sk_state == BT_CONNECT2 &&
-+		       rfcomm_pi(sk)->dlc->defer_setup)) ||
-+		    !rfcomm_pi(sk)->dlc->session) {
- 			err = -ENOTCONN;
- 			break;
- 		}
--- 
-2.43.0
