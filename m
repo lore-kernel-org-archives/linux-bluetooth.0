@@ -1,71 +1,153 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E3A3CF039
-	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Sep 2026 20:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789936575; cv=pass; b=eOCf/db0XDeigi6xiRKy5EuItYriZLanL45CtyOMYQo9ijeBE+QIX51gpRLti5BarRjbHIoRSb0p1jypbGyzrJDuCfC5Mw2I8rMCnD+6FcZAhvbdz4l3zgWGNYl0jYczBM2uPyEvsIc7iS/58m2KY/40P1FzeipFb9zXJmT89Co=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789936575; c=relaxed/simple;
-	bh=ssma0IlAA0p3v0J+aBmc94QVcF+GudLV9aI8hTEYEyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HLOor2Ko52ZbTPMHjsMVyNjQwBRt36q3AieSj4nppezbNZL2L/LQWhDO6OOxn/NkegIQbLrlODhowNnuk1b70tmcb/EEYxU8K55u2i518G2L+RyMHuRsT7PuIKbj2DgTibihsvMMerA4hWLMfiWMO3Q+si49pKmJhNAu+U9Sn9E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=JB3XGF7I; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4956383C84
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Sep 2026 21:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789941072; cv=none; b=q4nQDuOMbZqulICmBlB1szELWhRDuQg7qthZEZDOjJsAL5U1YVVnyNO9o84GNii9kaOcpIGhtpODcNkBFPIkDdoP5wimpbY+fwLt5Eh0gjHISQ5nbZKNk9+pRMPbgBrZkZXm9CDxcgpwZ/S5RBE3xR0u630db4dgPWjYcJce+58=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789941072; c=relaxed/simple;
+	bh=ROlmX/XTqY6y6y0+M35xUExLpZ5JUiS5TB68GEsja7Y=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CVA2WG3s8pps5w+XzKwu/4bZl888JrbJ1P7lg13eyJQHQP1SmJFzw439xbw5rGjZb7df7/DBqG4DMfLe/7vvh+xAxG8R0Txyaj5wT80abFe6mbIzx0TCuylBQl+dOuilUgf/HmsS+wbR/hU0cMeWHwt1mANcodfewOA+J7AT14E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OHfE1UKe; arc=none smtp.client-ip=192.30.252.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="JB3XGF7I"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:4:f011::d901])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4hnyn34xhRzyxN;
-	Sun, 20 Sep 2026 23:36:07 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1789936568;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NixDsMVULeLqFFy+LfTXI3R7XZlfin8MRIr0mlv99qw=;
-	b=JB3XGF7IbSunNeMwhCQhtsnhory46BdhT/+w1Kg+1axVqCDYWRZl/F04Zqk9WcacCN+biK
-	fS2ukxR7QSAY1zUALZDCAUkbNi2qk7wDUJ70oflB+1JwNIjZwQixuGtjcPgGyyUeosTb/g
-	j0/G9oAqR0UE4hxNjgoOf3unsnkrtz8=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1789936568;
-	b=UCttb/Vc7QYlWVtMDVid0hw5gou2ffVSpn/7zr10deaAx80qFJrwA1gY8O0ktBGbkRpYur
-	W01fot4870t8DMjQ2MIv+E6LXIl6pniSHONjMPIC9sNTybg3LZEWbsd1b9vWoyhaBKY2eY
-	vUzmfaGCE+03JYNHSa8agCXWwHE96BQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1789936568;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NixDsMVULeLqFFy+LfTXI3R7XZlfin8MRIr0mlv99qw=;
-	b=YIev0PNDNqPhMRWt/p3FtIx+B2m1FwLMaroRH13J835zd9diYCH1tobLGhuYEP3dLUQFIh
-	BAJEftjWezSgO+czcBQkHp5rwRAOrdFbS4UDkXqVYBQCOfZtUGVU3o4O23u0E4MSOZk0iI
-	e3lRWhJJAYXY2kcibTKXXR9VbLYIKiY=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OHfE1UKe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1789941059;
+	bh=1thCogaO/LMdzcbPTt8NWZEESHmoj7U617hHIGfb5hQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OHfE1UKe4zxClj6SibnE6WTnIw6mzVuIQLaqt00oIL9XWUBPsP+yhBcgOiEmwqzxh
+	 6sS7lMZtFnsAm8uMYdxTjaJMHfwHIiHkyZSDvoUjH7f0l0YOh8PyZx+xX/LuwberE6
+	 5vJFNlpVZsvmGOlpwqBb4bRSYreaRwwjN+wmux6Q=
+Received: from github.com (hubbernetes-node-5a9e995.ash1-iad.github.net [10.56.211.67])
+	by smtp.github.com (Postfix) with ESMTPA id 66C318407A2
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Sep 2026 14:50:59 -0700 (PDT)
+Date: Sun, 20 Sep 2026 14:50:59 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 5/5] shared/tester: Count setup failures as test failures
-Date: Sun, 20 Sep 2026 23:35:13 +0300
-Message-ID: <fcbafe2932c7040a2036a2a1816985f7ee7802af.1789934710.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1789934710.git.pav@iki.fi>
-References: <cover.1789934710.git.pav@iki.fi>
+Message-ID: <bluez/bluez/push/refs/heads/1169895/000000-24a2c7@github.com>
+Subject: [bluez/bluez] 9a560b: mgmt-tester: ignore Debug feature in Read Exp
+ Feat...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1169895
+  Home:   https://github.com/bluez/bluez
+  Commit: 9a560bf5f3f63eb07365dccfced7227688620a55
+      https://github.com/bluez/bluez/commit/9a560bf5f3f63eb07365dccfced7227688620a55
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-20 (Sun, 20 Sep 2026)
+
+  Changed paths:
+    M test/functional/test_kernel_testers.py
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: ignore Debug feature in Read Exp Feature tests
+
+CONFIG_BT_FEATURE_DEBUG controls whether Debug experimental feature is
+present. mgmt-tester hardcodes one configuration.
+
+CONFIG_BT_FEATURE_DEBUG is incompatible with DYNAMIC_DEBUG, so requiring
+test configurations to have it enabled is inconvenient.
+
+Instead, adjust test to accept either debug present or not.
+
+Fixes failures in "Read Exp Feature - Success"
+
+
+  Commit: 0a8a880e2113fc7b73b5fdd39bc7c1706431685b
+      https://github.com/bluez/bluez/commit/0a8a880e2113fc7b73b5fdd39bc7c1706431685b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-20 (Sun, 20 Sep 2026)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Fix expected status for invalid key entries
+
+Kernel commit 1e9683c9b6ca ("Bluetooth: MGMT: Ignore keys being loaded
+with invalid type") made Load Link Keys and Load Long Term Keys skip
+entries with an invalid address type or initiator value instead of
+rejecting the whole command with Invalid Parameters.
+
+Update "Load Link Keys - Invalid Parameters 3" and "Load Long Term Keys
+- Invalid Parameters 2 and 3" to expect success.
+
+Assisted-by: opencode:qwen3.8-flash-next
+
+
+  Commit: d9993216e9e0b3576eab2c119d8126e6008f44e4
+      https://github.com/bluez/bluez/commit/d9993216e9e0b3576eab2c119d8126e6008f44e4
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-20 (Sun, 20 Sep 2026)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: mark Pair Device - Power off 1 as fail_tolerant
+
+The pending Pair Device command is completed by whichever path wins
+the race against HCIDEVDOWN: if it is still queued when the controller
+is closed, __mgmt_power_off() responds with Not Powered; if the
+connection failure callbacks run first, pairing_complete_cb() responds
+with Disconnected.
+
+Both are valid outcomes, so mark the test fail_tolerant, as done for
+Get Conn Info - Power off
+
+Assisted-by: opencode:qwen3.8-flash-next
+
+
+  Commit: 4ecbe91214e452c2e132a7953058e08934d19572
+      https://github.com/bluez/bluez/commit/4ecbe91214e452c2e132a7953058e08934d19572
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-20 (Sun, 20 Sep 2026)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Report unexpected status as test failure
+
+command_generic_callback() used tester_test_abort() when the command
+status differed from the expected one, making the test result in
+"Not Run" and hiding real failures from the summary. Treat such status
+mismatches as a test failure, warning with both statuses. Mismatches
+tolerated through fail_tolerant are unaffected.
+
+Assisted-by: opencode:qwen3.8-flash-next
+
+
+  Commit: 24a2c70dcbbb4202d654574aaa2f7c84b341fb29
+      https://github.com/bluez/bluez/commit/24a2c70dcbbb4202d654574aaa2f7c84b341fb29
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-09-20 (Sun, 20 Sep 2026)
+
+  Changed paths:
+    M src/shared/tester.c
+
+  Log Message:
+  -----------
+  shared/tester: Count setup failures as test failures
 
 A test whose setup stage fails ends up as "Not Run", without counting as
 a failure.
@@ -77,31 +159,8 @@ Intentional skips through tester_pre_setup_abort() still report "Not
 Run".
 
 Assisted-by: opencode:qwen3.8-flash-next
----
- src/shared/tester.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 7a0145b46..e99cc452c 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -558,6 +558,8 @@ void tester_pre_setup_failed(void)
- 		test->timeout_id = 0;
- 	}
- 
-+	test->result = TEST_RESULT_FAILED;
-+
- 	print_progress(test->name, COLOR_RED, "pre setup failed");
- 
- 	g_idle_add(done_callback, test);
-@@ -624,6 +626,7 @@ void tester_setup_failed(void)
- 	if (test->stage != TEST_STAGE_SETUP)
- 		return;
- 
-+	test->result = TEST_RESULT_FAILED;
- 	test->stage = TEST_STAGE_POST_TEARDOWN;
- 
- 	if (test->timeout_id > 0) {
--- 
-2.55.0
 
+Compare: https://github.com/bluez/bluez/compare/9a560bf5f3f6%5E...24a2c70dcbbb
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
