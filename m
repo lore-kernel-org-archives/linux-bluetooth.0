@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1AF64ABBA5;
-	Mon, 21 Sep 2026 14:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6B84AB1DC;
+	Mon, 21 Sep 2026 14:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789999876; cv=none; b=t8QfnkqsMDxRWV+Yyp7MPAnGSGs2SqoI8TxEis0K1gVKGVnP/fyt0+M4vVuJf8Pfl08asKcPDJ+mwGpr+TN4YTwTPjYnUm60DxDj28J8fcGvYkY4SORwITFsXeap3v6Y4tVo2wKo/upwPUn64S4pOcxkzTSQDvRFHu5iBDagpik=
+	t=1789999877; cv=none; b=JC0FP9F70r2okoCAFxMNHM6FIhrAHRutrWbr5ks2Di3uoDgwR0tz8ds9ht6+nPLKsy57OJHkeyJ1GjcCF/e/MCvYLlmsJaWBys2tnYBRcjtUtaiPpChFi2M507ZmY7MJKJuAUI0H1KoJVjdMedNTwcJxyV9luCrzhBJGrkiNPAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789999876; c=relaxed/simple;
-	bh=3L3Bap18qjSXCX6iBqqNWpCfPu57syouIoubX54xDLw=;
+	s=arc-20240116; t=1789999877; c=relaxed/simple;
+	bh=vz4FTYgtNHaHXhuOi1Jvhl+cWX0aFTf36PBkXtqOixI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CISkX++ByESOZATJMrzGif1THAPZTvB9auM+pu07s0/fCNSwvcQNyULaqql71eZB6e4rE7G+N8Lt6x4E5eDdjgC7Whf5Y7RdDXplQddmBVwsYFqaQ5oPuKOa2KryglN5vXqAZRKFe66QR2WhraveZaB333yNNVdHqZ5D+WZQnEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uf9ONZLU; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=sJhhd22f0p1LJvzNgkPVkpo6fhjni4nzLlIx6OYYqfTTPW8ej08auUTRuutsQqHTlIwO1v9awUzk2thABXH0Tjp2nxFg5nfzRQ4JL/CAyYQjKNE6RPura9UNPXaAYcn76GyFV5MuV7gwXPxN9YggehtfGk7mSOjyrXqwk32PD0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhLTtYkn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uf9ONZLU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34AFB1F000FF;
-	Mon, 21 Sep 2026 14:11:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhLTtYkn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B13161F00893;
+	Mon, 21 Sep 2026 14:11:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789999874;
-	bh=0A7d1TA37X32rbycSEftVefofy1c+Cm7HUxx/sK2yYs=;
+	s=k20260515; t=1789999875;
+	bh=hng+xFMbMb1nZdiHSvG7kUa78GiD5OvvA8A5MGrqdbc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Uf9ONZLUPefg8+Y+geX7lyIkJT+o6wzkWjWAmyM4x20ij+Az63pl9NFEM+lYeInlS
-	 I9YrcJlx2dA7qhEf1OlV3LyS5CFCHdPeb5DrgXXwWyLLZeCz7VzMuerPcQqOHqUw4p
-	 5MQr+bZfBtr181t+c2m4d5avQ18xuzo+G5dv9OoRxQiP7pdpZgOpuol9MWUl9iCXEj
-	 HK+5aYd6t/PiFM/v/B6RBq6hfJoes39hKCRpH8V5mS1pn4IaD6j9lbx53sqQ8P7uP7
-	 /J9S9ImlfRUWRM98L11sS6c1IieYAzC6Xn4DnjrKDY3o5eek93zXvptKuwM5YBEFZg
-	 sjrQxY+0HLU2A==
+	b=nhLTtYkn9CRxb7znW9OisguWRdluegXO4dNqxtW66uFC/B7jGSkgZiB5vn6fJhuho
+	 92PBGAcaMDwVUW1wKHuxyxQm/R7onoVrqleIWSb79ZRAJjsTkGy7AiMu2YO0egSjt4
+	 jvRMsyPO6n9ynMvF+AJVq8lqD7y3IPBySkUXQOkS/9Pdh39LASeJ8bHuLujEgWp7d9
+	 N9//2lGzXN3kEBShzAk4/GBF9ELy5B4IXMAfqs0oqJfoHnxYaq4vPy1sKoIrGXk2sB
+	 LsuxBgqYwtYAsYO9WRjNZ7ibfu3I2WgFR5t+ImEN6jafLso0anljIO+Wej7fNUdCHp
+	 fxKtm3WoRXoaw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199503926659;
-	Mon, 21 Sep 2026 14:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939263926659;
+	Mon, 21 Sep 2026 14:10:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: RFCOMM: Reject short EA=0 frames in
- rfcomm_recv_frame()
+Subject: Re: [PATCH] Bluetooth: use assign_bit() where applicable
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178999980590.3047822.8989068429457180405.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Sep 2026 14:10:05 +0000
-References: <20260919112514.3871857-1-benquike@gmail.com>
-In-Reply-To: <20260919112514.3871857-1-benquike@gmail.com>
-To: Hui Peng <benquike@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <178999980714.3047822.7600652499809584862.git-patchwork-notify@kernel.org>
+Date: Mon, 21 Sep 2026 14:10:07 +0000
+References: <20260920022610.3145618-1-peng.fan@oss.nxp.com>
+In-Reply-To: <20260920022610.3145618-1-peng.fan@oss.nxp.com>
+To: Peng Fan <peng.fan@oss.nxp.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, kees@kernel.org,
+ nicoyip.dev@gmail.com, aliamemis@disroot.org, kuba@kernel.org,
+ imv4bel@gmail.com, pengpeng@iscas.ac.cn, suunj1331@gmail.com,
+ tim.bird@sony.com, peng.fan@nxp.com, leitao@debian.org,
+ jcperdomo100@gmail.com, safa.karakus@secunnix.com, rollkingzzc@gmail.com,
+ linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com, oss@fourdim.xyz,
+ pav@iki.fi, linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 19 Sep 2026 11:25:14 +0000 you wrote:
-> While rfcomm_recv_frame() verifies that skb->len is at least
-> sizeof(*hdr) + 1 (4 bytes: 3-byte header + 1-byte FCS), an RFCOMM frame
-> with an extended 2-byte length field (!__test_ea(hdr->len)) has a 4-byte
-> header plus a 1-byte FCS (5 bytes minimum, sizeof(*hdr) + 2).
+On Sun, 20 Sep 2026 10:26:02 +0800 you wrote:
+> From: Peng Fan <peng.fan@nxp.com>
 > 
-> When a 4-byte RFCOMM frame with EA == 0 arrives:
-> 1. The initial skb->len < sizeof(*hdr) + 1 check passes (4 < 4 is false).
-> 2. Trimming the FCS byte decrements skb->len to 3.
-> 3. If __check_fcs() succeeds, skb_pull(skb, 4) fails (4 > 3) and returns
->    NULL without advancing skb->data.
-> 4. Because the return value of skb_pull() is ignored, the un-pulled
->    3-byte struct rfcomm_hdr remains at skb->data and is either queued as
->    application payload via rfcomm_recv_data() or parsed as a multiplexer
->    control command via rfcomm_recv_mcc() on DLCI 0.
+> Convert open-coded if/else with set_bit/clear_bit the assign_bit API.
+> 
+> Done with Coccinelle semantic patch:
+>     // set_bit -> clear_bit => assign_bit
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: RFCOMM: Reject short EA=0 frames in rfcomm_recv_frame()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6d91041bb38b
+  - Bluetooth: use assign_bit() where applicable
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5f639837ba47
 
 You are awesome, thank you!
 -- 
