@@ -1,113 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD87A457E61
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 09:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C45645348A;
+	Mon, 21 Sep 2026 10:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789984293; cv=none; b=cNK/BRkt0QvR2ghGPMQGu58NkaHqohjbEunYWSO547A/CVq3BoHeK11bkrC21fywks5hKtuCouScm5BHOrIE+8Akc8XUy0MTtQ6ygoTbGW7HZ4bOehuv2qe5PTOkDl6Cn9Czee7I3ujgCvZqceMvrPB1uLQUpvDQDxUAUF+5QXw=
+	t=1789985176; cv=none; b=r+jlRU8QUeOUGCyicP2HfQS3Uz2gme1jesIv9EiZWu+SXC7Q9SV3ydUPqRxJuO6U5HGi40S7fyx95MDREmZGkkiOOIPmGrv+0G/bIugJDiZBxqXJYDHsbwcUVt8dJ/vGJ7LTfx7k4RVFdSGRt+szsI3oYTViPA188vyYQKO/E8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789984293; c=relaxed/simple;
-	bh=R9F7eCs5hlVe0XrQOYg+00J2R1c/rmdJwPU5ijIE2p4=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E2tHnWNJTuiPisyl3pqcYITpfwjJ18iM/9paxo8t4Bl8jboImpZD5LXu4+IR1y+MKVB8qLlqnyDHolOPa8U9FuJnOtqIaqC/UtZaWxrwrV+IaYpt4YDnygU04tdns/wXG7/ItQgOJs9ETEYmO9q9xgffcb7URiASgI4wOWVFXJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0w6cxpR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789985176; c=relaxed/simple;
+	bh=TQHvv65J/zzLh+WKmHIXrutEiyIav2kG0laQR/4vRNo=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=OyEOkiQxF9ywVS9ZIZZNfCcz9kjJMOEQmtG88/0Kj81AorjhSmgFraAvVB7MlGbinmbEWdIypVO1n9rI+iB5GelQT4oGFnYAYfmZC15+eGiwKzUZd/BYG2hV85V/J78vIR2SiCNAb2TR4/Q/qg2Ba0q9qXF2U+k038JTVTnD1fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mfHurCId; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0w6cxpR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CA81F008A4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 09:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789984291;
-	bh=R9F7eCs5hlVe0XrQOYg+00J2R1c/rmdJwPU5ijIE2p4=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=J0w6cxpROIX6TE4J6DIgJu76eJyynKDstTTr+tfblPFjw2DpF0VReVyWoC8LMaHGO
-	 r1/PyRV3pBHDz2rfJkTnrbV1korY59q41VfoZZ3HWiHwYt5oF0nV3BLMA1e2xLmXSB
-	 mkU5CfqPdkI94cNEUd7p+fiS1Z1bEI0Up8CZzMk+QIgu/atRjd0/F6za9Gwv4ObiE/
-	 ET3v/p9ig6JEpn4PNtqCU/y9HiM52wJQqzDPgQDLFz8e5klse5Dp+3S+3/ucCIDUnW
-	 0bBn8c+UEBJA2Ika5GCuU4YTXyn9buv3OkjlGYZph77CSkHoka8ezapPxlziSh9+cG
-	 RbipTfsze7Kow==
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f16c72so2159995e87.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 02:51:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwIkvCMXKj/iOtLSLwzLve7e47eVQduCz04/IoVFdYGLznjMakntmf6oaYkuisqwOJ3s3jtGGdf/J7ncMR8zEI=@vger.kernel.org
-X-Gm-Message-State: AFuF++mFl86546Ld2Lp78FAcdazhNag0Zcg6cvxPimUmTZ6GhmffBM9G
-	ag+MFKskQhvNwQNUDhJB4KKc7LlHFUaaNdK79hSoOV5vhTxN8+BG7vi+NJXR/7HjSY5wcO8vm02
-	lQoC3SPc4Hv7miPShxrRwBpZWgvDYoe1U9MUD7wNBdQ==
-X-Received: by 2002:a05:6512:4023:b0:5b6:1a7c:fd96 with SMTP id
- 2adb3069b0e04-5b8c197532bmr3127147e87.60.1789984290166; Mon, 21 Sep 2026
- 02:51:30 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 21 Sep 2026 05:51:28 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 21 Sep 2026 05:51:28 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <CAMRc=MdHy6M9cY-ZqMXP_F6yLuVuipDkZwHoBF0D9W3A5VkOSQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="mfHurCId"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=TQHvv65J/zzLh+WKmHIXrutEiyIav2kG0laQR/4vRNo=; b=m
+	fHurCIdd6pZ+l1e9CpYBqFCJMxIBNafyLwL9pGmwXRBczsiAAid8TY6JJCRkbZ2D
+	9EupvXYNrphuGowruKXROz1aeCulrlUonjTpVIkA+QtTlo8iuKxOumFVudGUPDHp
+	2aiqofV1byWABRQzoOYNSX1sk/dF4qnRB3oXGV3uaw=
+Date: Mon, 21 Sep 2026 18:05:47 +0800 (CST)
+From: CJ <firefly0158@163.com>
+To: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+	davem@davemloft.net, kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [BUG] Bluetooth: rfcomm: possible circular locking dependency in
+ the SAK vs. connect path
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
+X-NTES-SC: AL_Qu2TC/WTukkv4SebY+kdmEsTju82UcS4ufQl245Xc/sEuADE1wYGfV5FGUX59tmTLwSKmzOZcTJQ8uBIdIhWn0u3hFgcDWHkBgsk1SueKg==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
- <20260915-pci-m2-bt-rework-v1-3-3c7d9cf9c010@oss.qualcomm.com>
- <CAMRc=MdJgXDUb-Uac0TRB8u1WUpLng51C4yMH6iMEMoK56tQYA@mail.gmail.com>
- <p2qiwwig7ap74puja6mgnz37lofljhexiapmpp6y3xmwkhs2dn@v2mxawoivkn4> <CAMRc=MdHy6M9cY-ZqMXP_F6yLuVuipDkZwHoBF0D9W3A5VkOSQ@mail.gmail.com>
-Date: Mon, 21 Sep 2026 05:51:28 -0400
-X-Gmail-Original-Message-ID: <CAMRc=McfFtRi_kwPh6Dfz6MwGEy_Q7ojFmJ3ibJ6V4PiEDPetw@mail.gmail.com>
-X-Gm-Features: AcwNN1XisqOT1G4P_pz-zd8sYeXwsQoqqLC2dtscBpTlrZOqZnjSykzHCvQdieE
-Message-ID: <CAMRc=McfFtRi_kwPh6Dfz6MwGEy_Q7ojFmJ3ibJ6V4PiEDPetw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] power: sequencing: pcie-m2: Create auxiliary device
- for the M.2 BT interface
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Rahul Samana <rahul.samana@oss.qualcomm.com>, 
-	Wei Deng <wei.deng@oss.qualcomm.com>, Loic Poulain <loic.poulain@oss.qualcomm.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Amitkumar Karwar <amitkumar.karwar@nxp.com>, 
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Manivannan Sadhasivam <mani@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <6572ca06.97a1.1a0c36dcb5f.Coremail.firefly0158@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cSgvCgDXf1J7AbFq5FxLAA--.44295W
+X-CM-SenderInfo: piluvw1o1qikqy6rljoofrz/xtbC3RtlF2qxAXvzYwAA3F
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Mon, 21 Sep 2026 11:08:58 +0200, Bartosz Golaszewski <brgl@kernel.org> said:
-> On Mon, 21 Sep 2026 09:58:27 +0200, Manivannan Sadhasivam <mani@kernel.org> said:
->> On Wed, Sep 16, 2026 at 04:19:16AM -0500, Bartosz Golaszewski wrote:
->>> On Tue, 15 Sep 2026 16:24:04 +0200, Manivannan Sadhasivam via B4 Relay
->>> <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
->>> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->>> >
->>> > Currently, the driver instantiates the BT interface of the WCN6855 and
->>> > WCN7850 combo modules by creating a devicetree node at runtime using an
->>> > of_changeset, with the compatible passed through the PCI ID table. But this
->>> > method of creating a devicetree node just for matching with the driver is
->>> > not recommended.
->>> >
->>> > So create an auxiliary device for the BT interface instead. The serdev
->>> > transport is still allocated here and handed over to the Bluetooth driver
->>> > through the auxiliary device, along with the power sequencing target used
->>> > to power up the controller. Also extend the provider match so that the
->>> > auxiliary device created for this connector is matched as its power
->>> > sequencing consumer.
->>> >
->>> > Since the runtime node creation is now gone, select AUXILIARY_BUS in
->>> > place of OF_DYNAMIC.
->>> >
->>> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->>> > ---
->>>
->>> That's some nice stuff, thanks for doing it!
->>>
->>> It looks like there's no build-time dependency on this, only run-time? Can I
->>> take it independently?
->>>
->>
->> Yeah sure!
->>
->
-> Nevermind that, it still needs is_controllable().
->
-
-Patch 3/5 also needs the header patch 1/5 adds, so we'll need a different
-merge strategy here.
-
-Bart
+CkhpLAoKCkkgYW0gcmVwb3J0aW5nIGFuIGlzc3VlIHRyaWdnZXJlZCBieSBhIHN5emthbGxlciBy
+ZXByb2R1Y2VyIG9uIExpbnV4CjcuMy4wLXJjMi4gVGhlIGlzc3VlIGlzIHJlcHJvZHVjaWJsZSB3
+aXRoIEhFQUQgY29tbWl0CmRmMjkwODA5MGNkYTM2OGIwMWZmNDM3MDlmNTE4OTAwNzZjNTYxNTcu
+CgoKVGhlIHJlcHJvZHVjZXIgY3JlYXRlcyBhbiBSRkNPTU0gc29ja2V0IG9uIGEgdmhjaS1iYWNr
+ZWQgSENJIGRldmljZSwgYmluZHMKYW5kIGxpc3RlbnMgb24gaXQsIGFuZCB0aGVuIGluamVjdHMg
+Zm91ciBjcmFmdGVkIFJGQ09NTSBmcmFtZXMgdGhyb3VnaApzeXpfZW1pdF92aGNpKCkuIFRoZSBm
+cmFtZXMgZHJpdmUgdGhlIFJGQ09NTSByZWNlaXZlciBpbnRvIHRoZSBjb25uZWN0aW9uCmluZGlj
+YXRpb24gcGF0aC4KCgpMb2NrZGVwIHJlcG9ydHMgYSBjaXJjdWxhciBsb2NraW5nIGRlcGVuZGVu
+Y3kgaW52b2x2aW5nIHJmY29tbS4gT24gdGhlCnJlcG9ydGluZyBzaWRlIHRoZSB0YXNrIGhvbGRz
+IGNvbnNvbGVfbG9jayAodGFrZW4gaW4gdmNfU0FLKSBhbmQgdHJpZXMgdG8KYWNxdWlyZSB0aGUg
+dHR5IGJ1ZmZlciBsb2NrICgmYnVmLT5sb2NrLCBhdCB0dHlfYnVmZmVyX2ZsdXNoKTsgdGhlIHJl
+dmVyc2UKZGVwZW5kZW5jeSBjaGFpbiBzaG93cyBjb25zb2xlX2xvY2sgYmVpbmcgYWNxdWlyZWQg
+YnkgY29uX2ZsdXNoX2NoYXJzKCkgZnJvbQpuX3R0eV93cml0ZSgpLiBUaGUgbG9jayBjbGFzcyBv
+ZiBpbnRlcmVzdCBmb3IgcmZjb21tIGlzIGVudGVyZWQgdGhyb3VnaApsb2NrX3NvY2tfbmVzdGVk
+KCkgZnJvbSByZmNvbW1fY29ubmVjdF9pbmQoKSwgd2hpY2ggdGhlIGVhcmxpZXIgcmVwb3J0IG9u
+CmxpbnV4LTYuMSBhbHNvIHNob3dlZC4KCgpUaGlzIGxvb2tzIGxpa2UgYSBsb2NrIG9yZGVyaW5n
+IHByb2JsZW0gYmV0d2VlbiB0aGUgUkZDT01NIHJlY2VpdmUvc2V0dXAKcGF0aCBhbmQgdGhlIHR0
+eS9jb25zb2xlIHRlYXJkb3duIHBhdGgsIHJhdGhlciB0aGFuIGEgc3BlY2lmaWMgYmFkIHBvaW50
+ZXIuClRoZSBlYXJsaWVyIHJlcG9ydCBhZ2FpbnN0IHRoZSBzYW1lIHJlcHJvZHVjZXIgZGVzY3Jp
+YmVkIHRoZSBtYXRjaGluZyBlZGdlCm9mIHRoZSBjeWNsZSwgd2l0aCB0dHkgdGVybWlvc19yd3Nl
+bSB0YWtlbiBhdCBuX3R0eV9mbHVzaF9idWZmZXIoKSB3aGlsZQpob2xkaW5nIHRoZSB0dHkgYnVm
+ZmVyIGxvY2ssIHNvIHRoZSBjeWNsZSBoYXMgYmVlbiByZWFjaGFibGUgZm9yIGEgd2hpbGUgYW5k
+CnRoZSBwYXJ0aWNpcGF0aW5nIGxvY2tzIGFyZSB0aGUgc2FtZS4gU2VyaWFsaXppbmcgdGhlIFJG
+Q09NTSBzZXNzaW9uIHNldHVwCmFuZCB0ZWFyZG93biBhZ2FpbnN0IHRoZSBzb2NrZXQgbG9jayB3
+b3VsZCBiZSB0aGUgZGlyZWN0aW9uOyBJIGhhdmUgbm90CnZlcmlmaWVkIHdoaWNoIG9mIHRoZSBy
+ZWNlbnQgUkZDT01NIGxvY2tpbmcgY2hhbmdlcyBhbHJlYWR5IGNvdmVycyBpdC4KCgpUaGlzIGZh
+aWx1cmUgd2FzIHJlcG9ydGVkIGVhcmxpZXIgYWdhaW5zdCB0aGUgbGludXgtNi4xIGxvbmd0ZXJt
+IHNlcmllcyBhdApodHRwczovL3N5emthbGxlci5hcHBzcG90LmNvbS9idWc/ZXh0aWQ9M2ExZjg2
+OWRjZDhmMjZlNWMyMTYsIGFuZCB0aGUKcmVwcm9kdWNlciBiZWxvdyBpcyB0aGUgb25lIGZyb20g
+dGhhdCByZXBvcnQuIEl0IHN0aWxsIHJlcHJvZHVjZXMgb24gdGhlCnRlc3RlZCBtYWlubGluZSBr
+ZXJuZWwuCgoKUmVwcm9kdWNlcjoKCgpzeXogcmVwcm9kdWNlcjoKVGhlIHJlcHJvZHVjZXIgaXMg
+dGhlIHByb2dyYW0gYmVsb3csIHdoaWNoIHJlcXVpcmVzIG5vIGxhcmdlIGVuY29kZWQgaW1hZ2U6
+CgoKcjAgPSBzeXpfaW5pdF9uZXRfc29ja2V0JGJ0X3JmY29tbSgweDFmLCAweDEsIDB4MykKYmlu
+ZCRidF9yZmNvbW0ocjAsICYoMHg3ZjAwMDAwMDAwMDApPXsweDFmLCBAYW55LCAweDF9LCAweGEp
+Cmxpc3RlbihyMCwgMHg1KQpzeXpfZW1pdF92aGNpKCYoMHg3ZjAwMDAwMDAyMDApPUFOWT1bQEFO
+WUJMT0I9IjAyYzgyMDBjMDAwODAwMDEwMDAyMDIwNDAwMDMwMDQwMDAiXSwgMHgxMSkKc3l6X2Vt
+aXRfdmhjaSgmKDB4N2YwMDAwMDAwMzAwKT1BTlk9W0BBTllCTE9CPSIwMmM4MjAwYzAwMDgwMDAx
+MDAwNDAzMDQwMDQwMDAwMDAwIl0sIDB4MTEpCnN5el9lbWl0X3ZoY2koJigweDdmMDAwMDAwMDQw
+MCk9QU5ZPVtAQU5ZQkxPQj0iMDJjODIwMGUwMDBhMDAwMTAwMDUwMTA2MDA0MDAwMDAwMDAwMDAi
+XSwgMHgxMykKc3l6X2VtaXRfdmhjaSgmKDB4N2YwMDAwMDAwNjAwKT1BTlk9W0BBTllCTE9CPSIw
+MmM4MjAxMjAwMGUwMDQwMDAwM2VmMTU4MzExMDIwMDA3MDA3ZjAwMDAwNzcwIl0sIDB4MTcpCgoK
+Y29uc29sZSBvdXRwdXQ6wqBodHRwczovL3Bhc3RlYmluLmNvbS9yYXcvekx5VkdoaTUKa2VybmVs
+IGNvbmZpZzogaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20vdGV4dD90YWc9S2VybmVsQ29u
+ZmlnJng9MzFkZmVmYzRhMTRlZmVhMwoKCktlcm5lbDoKCgpIRUFEIGNvbW1pdDogZGYyOTA4MDkw
+Y2RhMzY4YjAxZmY0MzcwOWY1MTg5MDA3NmM1NjE1NwpnaXQgdHJlZTogbWFpbmxpbmUKa2VybmVs
+IHZlcnNpb246IDcuMy4wLXJjMgp0ZXN0ZWQgdGFnOiB2Ny4zLXJjMiAoYW5ub3RhdGVkIHRhZyBv
+YmplY3QgNWUwMzZjZTEyZGU5MWM2ZmQ2NzRkYWQzM2IxNjljNjE1MGJlMmE3YSkKCgpMZXQgbWUg
+a25vdyBpZiB5b3UgbmVlZCBtb3JlIGRldGFpbHMgb3IgdGVzdGluZy4KCgpCZXN0IHJlZ2FyZHMs
+CkNoYW5namlhbiBMaXXCoA==
