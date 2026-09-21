@@ -1,111 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8739E48592E;
-	Mon, 21 Sep 2026 11:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CB744A3E0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 11:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789988609; cv=none; b=Hkp6SmefFg8cng+AWgnS4ysZPITe6pe8Vj/2Fe+k6UgRdYYsu4o68iDNHs+RMFSe5QJYvF/NmVaV7/Bhyz4rjLXW0bMLg/di+4HyaCiXyhNa3Jrz45fAE3byx/JyzUq7SY55tKumze37PT9tzqmYnPf2vLI6iA+Ofx+AufpoZAc=
+	t=1789990964; cv=none; b=Jeje1VSv8dGS38E1aNsKmfkMfKzkntwlbKV2Uv+6m/81KfGOH4Y5M8Q2//B5lzlkuBH6eXU6V+VmjUdfo70LmfJuXxZxBH8rPZ6KZ8yOona3+gI/Qu7T63jLB9xwYJziqFMNtmPDfpd62ExGRrqkhfdmpsbcfFhdeyfGec5tXRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789988609; c=relaxed/simple;
-	bh=ezU9jJ7MwFvgarT3S7gLFpCf2ozU1aFJ3fwy76l486A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TpFh+/PUjGeoItWn4lucYnO/4md818BfW1D+FBs5PMW7EHgYUQoysBCiL72ChEHtin9pEkTRA25AlVf7Y2JHqmki4trOCoz23XvwpZohmugJ+hk1SH79aspxobQxMPG0k31RziGx46Qm5ZNT/0gm47OASQdUrp9PpNOxMXcOV5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6YiJMw6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789990964; c=relaxed/simple;
+	bh=aJDx7LcrYksmNsmRE/A6JsdBWCS5UUfOXF09n3MRe7s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ggeaFDGrgkIL3/hqyifzQT13PjwvtvG+F0BTevhuUT0w/uSSWPaRvbEmt1500WREigPsbzJUzkPdouBie7IQXENavV27SJmihGGLbkwOg3gFCDyhTs1fn3njr2jomCLw11OiwbXWBq8KRd9gdEa6lKUkniCrFEBRBQf+zXOVLNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXD0jhjK; arc=none smtp.client-ip=74.125.228.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6YiJMw6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9235D1F000FF;
-	Mon, 21 Sep 2026 11:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789988603;
-	bh=Li5iIHYzXEeTCCbpZpScuMu1gMxmua3kiHF7nAY7gSw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=k6YiJMw6Bf7VQeWmaIFvGtDr0Q1CP2K9zPn8eV5D/uOYZjCrlAqFSpIKCPnMw82ng
-	 4sl3t4Z9/J2IpgoH5cxc4l52jn6CUYb4aPZQwcaGGmhDKFqBJ1i7SK7tDO9FvLHK8T
-	 Tm69OGIGGqf4qCUjlvbOTj0pAZB0FIjBmv14TmQ6plBkUUmAPp0sU/g+Pj5cjR9efn
-	 IIm9KGlIkHzdrr3zb4TiWCD2pdyymcHOQnJJ51fRgwuO5oT3VWps3oiu6qLRA5boex
-	 kAS0AD58ciEv8r6eGOfoccVNIjz/kaMWXsamdWYCzOERK2rRGm+0dIrwbCOxVpeujR
-	 JbAc+9J+WOJYA==
-Date: Mon, 21 Sep 2026 13:03:14 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: 
-	Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Rahul Samana <rahul.samana@oss.qualcomm.com>, Wei Deng <wei.deng@oss.qualcomm.com>, 
-	Loic Poulain <loic.poulain@oss.qualcomm.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>, Neeraj Kale <neeraj.sanjaykale@nxp.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>
-Subject: Re: [PATCH 3/5] power: sequencing: pcie-m2: Create auxiliary device
- for the M.2 BT interface
-Message-ID: <u2x4y5jochtvdrbzaofqpvf7pkufbljrogqy67renxhuubitbt@h5ogih6h2okx>
-References: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
- <20260915-pci-m2-bt-rework-v1-3-3c7d9cf9c010@oss.qualcomm.com>
- <CAMRc=MdJgXDUb-Uac0TRB8u1WUpLng51C4yMH6iMEMoK56tQYA@mail.gmail.com>
- <p2qiwwig7ap74puja6mgnz37lofljhexiapmpp6y3xmwkhs2dn@v2mxawoivkn4>
- <CAMRc=MdHy6M9cY-ZqMXP_F6yLuVuipDkZwHoBF0D9W3A5VkOSQ@mail.gmail.com>
- <CAMRc=McfFtRi_kwPh6Dfz6MwGEy_Q7ojFmJ3ibJ6V4PiEDPetw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXD0jhjK"
+Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-85469b35611so1834325b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 04:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789990962; x=1790595762; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=LQbxkqYzxejT8pK3benmla1cFlEVULvOROnPxxopYGg=;
+        b=jXD0jhjK4UHho3f8jh4CH8Q1AbC46n38EkrsrsvDf3VxrRKQUORGfebuMhkq5516w1
+         i9tibBNayCwNr/stw1QfqUUIyPDcR1lYNzGlx9m0qvHuIB8Hqy3sWc1eLQKg5QBVHwcq
+         hTx93yl457xNV0Vi8on/HElYQw/O3v7rFuszS9D/qn/aGBO7Rz682j42iUwrkmxjQA1d
+         juXue6WGD2G8CMnu+xY5EPIloiRvk6if/Leckd62FkBN+DXc+pgOTbDIUGahXwjWuLeS
+         w0lhdk4OcEqJX3OxwyuEUNZ01kMswMRNqAALlaHX21ZJ3iSze1NdkuHUkCdPUFVSNw1S
+         WiNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789990962; x=1790595762;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=LQbxkqYzxejT8pK3benmla1cFlEVULvOROnPxxopYGg=;
+        b=PY01qJvM8tWW/f+GYRDyIwQt20yFyAZpzEbWh3pmG+ldi8FUTg40264rTQoxpiNH9P
+         Up1o90Dq3sOXd0yx67KA4r7WJShFYt243sLWv71cPP6Q2rmhz5WCEGkQbRH8RBEPZn0m
+         Wgl+GZXNX4K967fvaqk5yloKMA1TVCN/ooE3BSaB2o/c+vipbXyqCvL3ZAAdNHlFuabL
+         smxRsnmZdKjuGJ/uoQLnEjYpdFaSwyii3Fl45bFsctauWObFVZ+4Td1I4uGvpMZx0ovA
+         XWMu76R402lbXBVLyXYxHgqAT260fg3oxwZFN1Z8Tw7u3icQ9Dj1w4n3820c/YiNefcz
+         wqGA==
+X-Gm-Message-State: AFuF++nM17rQDYcvXUSVKhNq7pSx3/e46E78y4KXvCagvfucS3ajnqfb
+	TW313rHfG5qCK6tMhJ6ipoB3Xm8qLMX5YkbKLasvTNx6jmQF+8RulQNm6yq3YQ==
+X-Gm-Gg: AYBFou1wy41kAmlbqB13poWObrMldyTY5SKioMTlOTUBryCPHokZLCOcEFihXuGk97C
+	6MDQRimAI2mK3kUQ1/guVcDAIqBprar5F3afJjlF3YcJBMDbAXyl+/M0LBoGBLMUkGo3nKaD7TI
+	oLbm4BAyh+WPcCpDu9SOGT7Y20MEC1q3BYPIiF+r2f4CBEMrDFOIA9oq9Zyoe3gDjItVosSQwuE
+	IWcBPSvuLPX5538cP7RtwZh7bt0SsDquWp3yYj0cbAiOqszrG4ckdsXtH6hcjri7V6p39teed+g
+	sfjfegYlalpMc2Qqcslg3UFSQoe1leiHJ9ImZj/JmfH4zHL+839G658hb8J2raLGWt4A6t0UgR5
+	9YgRVUeNTZfbxUjb6nGOrUt0h7Il5rEIue6aPuHnmNe/jY+5aV3hhD9dkIQbQB1JF9W7nLJJmed
+	rB/xxBx+K8wHp7W8eWpU9kT9UHGlJeP058lZTf/AeRPE6gbnC6cLJy0kNNewK7fPdsFd3QK7qsZ
+	jlbFPwf
+X-Received: by 2002:a05:6a21:6b05:b0:3dd:85a9:559f with SMTP id adf61e73a8af0-3dd8c5960dbmr18735906637.33.1789990961824;
+        Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.247.224])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33c3318c49dsm18991154eec.22.2026.09.21.04.42.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
+Message-ID: <6ab11831.98a076dd.29d9d3.b8d0@mx.google.com>
+Date: Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8530060378698035367=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=McfFtRi_kwPh6Dfz6MwGEy_Q7ojFmJ3ibJ6V4PiEDPetw@mail.gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ravindra@intel.com
+Subject: RE: [v3] Bluetooth: btintel: read ROM debug registers on FW download failure
+In-Reply-To: <20260921054830.2770046-1-ravindra@intel.com>
+References: <20260921054830.2770046-1-ravindra@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 21, 2026 at 05:51:28AM -0400, Bartosz Golaszewski wrote:
-> On Mon, 21 Sep 2026 11:08:58 +0200, Bartosz Golaszewski <brgl@kernel.org> said:
-> > On Mon, 21 Sep 2026 09:58:27 +0200, Manivannan Sadhasivam <mani@kernel.org> said:
-> >> On Wed, Sep 16, 2026 at 04:19:16AM -0500, Bartosz Golaszewski wrote:
-> >>> On Tue, 15 Sep 2026 16:24:04 +0200, Manivannan Sadhasivam via B4 Relay
-> >>> <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
-> >>> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> >>> >
-> >>> > Currently, the driver instantiates the BT interface of the WCN6855 and
-> >>> > WCN7850 combo modules by creating a devicetree node at runtime using an
-> >>> > of_changeset, with the compatible passed through the PCI ID table. But this
-> >>> > method of creating a devicetree node just for matching with the driver is
-> >>> > not recommended.
-> >>> >
-> >>> > So create an auxiliary device for the BT interface instead. The serdev
-> >>> > transport is still allocated here and handed over to the Bluetooth driver
-> >>> > through the auxiliary device, along with the power sequencing target used
-> >>> > to power up the controller. Also extend the provider match so that the
-> >>> > auxiliary device created for this connector is matched as its power
-> >>> > sequencing consumer.
-> >>> >
-> >>> > Since the runtime node creation is now gone, select AUXILIARY_BUS in
-> >>> > place of OF_DYNAMIC.
-> >>> >
-> >>> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> >>> > ---
-> >>>
-> >>> That's some nice stuff, thanks for doing it!
-> >>>
-> >>> It looks like there's no build-time dependency on this, only run-time? Can I
-> >>> take it independently?
-> >>>
-> >>
-> >> Yeah sure!
-> >>
-> >
-> > Nevermind that, it still needs is_controllable().
-> >
-> 
-> Patch 3/5 also needs the header patch 1/5 adds, so we'll need a different
-> merge strategy here.
-> 
+--===============8530060378698035367==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Oops... I replied without checking the patch order and trusting my memory :/
-But even without the dependencies, merging just the pwrseq driver will break the
-functionality. So a better strategy would be to merge the series in a single go
-to the Bluetooth tree.
+This is automated email and please do not reply to this email!
 
-- Mani
+Dear submitter,
 
--- 
-மணிவண்ணன் சதாசிவம்
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1170015/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.09 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.08 seconds
+GitLint                       FAIL      0.24 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      29.91 seconds
+CheckAllWarning               PASS      34.05 seconds
+CheckSparse                   PASS      37.61 seconds
+BuildKernel32                 PASS      30.12 seconds
+CheckKernelLLVM               PASS      34.46 seconds
+TestRunnerSetup               PASS      793.74 seconds
+IncrementalBuild              PASS      28.08 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v3] Bluetooth: btintel: read ROM debug registers on FW download failure
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#94: 
+  Bluetooth: Intel get rom debug info: dr0:0x80000001 dr1:0x00000000 dr2:0x00000001 dr3:0x00df0071
+
+total: 0 errors, 1 warnings, 94 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14833867.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3] Bluetooth: btintel: read ROM debug registers on FW download failure
+
+17: B1 Line exceeds max length (98>80): "  Bluetooth: Intel get rom debug info: dr0:0x80000001 dr1:0x00000000 dr2:0x00000001 dr3:0x00df0071"
+
+
+https://github.com/bluez/bluetooth-next/pull/806
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8530060378698035367==--
