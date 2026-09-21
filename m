@@ -1,63 +1,63 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85E84BB278
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 15:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770774C6811
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 15:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790005163; cv=none; b=N4Knr+KUOEMxZQ73NlxrCm2CcrHMO7dsDqe01GRgCS1Cxb4BoImb2xiktl8D21KDaAdjQL84Xt889s6Qfs4/8aDcKP2eOPSqioGeQ/heEtAIgttOu6VV3JY4yrS3yEaOj1LAB3X/PJn7jPP8y8jWu3u3ImO0X6niqtQY6gsFO94=
+	t=1790005170; cv=none; b=taRiLhOqS67iYO8jN5VgjSGZOho0n1pcvqqXjFiOThtInZ/TdPV4LmEyRdy6RMaqSP5tc5XqKNCuDStfbHu9QQ27AT0DFn7tWP/85E7tT4hxmA8P7AHElOzF3gkDM1p/lzAzPriQRHf51lzCc3HESqTFEioCRGYyXmyz5oy0Q48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790005163; c=relaxed/simple;
-	bh=lJmFUvv1y720XfvJovLrsTCuIMar34mvrHnhguM16E8=;
+	s=arc-20240116; t=1790005170; c=relaxed/simple;
+	bh=tK/DOiKTS9+8p6418bETPstSP0bDfPyum5QKnVTwCQk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ff1G26/6W7Kuf+ExQmovng5+6Xxcz7zGzGTC4CJ+/tg0ljuIq6qZ80jaZ/LDqKQTN64IOZHpFj0zAjPQG/ygDWWq5R4BrUlUJHdHxbAd6j1uqg0HR+I3PCskdpjyEEJerqRa5TxXNc0Ic3Z0vf4v80nzXR2+b4hkyv5mSN1PPyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o/29qR3i; arc=none smtp.client-ip=209.85.215.176
+	 MIME-Version; b=fUtYyrSu6rdsX2fYsMOpftBba5QRYEAX3liVjS4Bdtg/VYeGGcvw7zQqkXquM49sqeeI5Y72orl0SnFbv2/F0yKPXWKGPIY4DkwXvKR/FWIgtXqLQubee3FfIj35wXNispaQ20eo5bGMBNjxf3C7LFlDq+AeDPENQV51dV4VlQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IFZWYHfe; arc=none smtp.client-ip=74.125.228.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o/29qR3i"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-cc147d86bebso29903a12.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 08:39:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFZWYHfe"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-868cfc5c244so1656727b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 08:39:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790005161; x=1790609961; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790005166; x=1790609966; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=O3XTZ9CTE6oB6PdoqCRQ1HTKuKJNIEpv7/7Iapup7c0=;
-        b=o/29qR3iKcg5Ry9P8efXUMukhuo0aUcZ/mKz63l4RNnhFmDFTk3en/x0KD3ixGrOGR
-         OwkgI3Ab+/hoBnRbtb2Gb8HkUw+taY+1ENWWDpX5CWZ0X8rGtm4Q/HZFrZLyTPfSivV1
-         o3AZRrcuJ9x3DsjxJo43e+RDqSGk5FoMOQP4FpP/0v8qwnNP7LH66wvrpRdP/2CDhi+g
-         3uAIfNu5ONpff2gz6JCZjbRJhL57cq6wDw7pXg3nwU4ef/VXBwkkA2mmjszzx3H246Mx
-         Yk7tAvqx7YuvEHgMt5y1fDvhdN0LIqHzRCX1C4AVvcimF5sKY1ys/dpM5tKUxx3sy2bx
-         deuQ==
+        bh=xLGIKtekCp4Iv+F6FSHNltwIt7TcrRN5peUWusm9SWk=;
+        b=IFZWYHfeYxiuJDvpIp2lKYUueQ4Uv/GyEM8X/JXmrNWIHmDnVZIvvxofGK20KLcNM3
+         df/zA8GC4UDgifIrhFH0AYIzxTCVWEs5fxHz+7E/mruz3AfHpAr4hzmSdoK2uvM/WeL7
+         q0WahKIuTTncQiH4Sy1wWpIF2426W13LYrnnn/QR4i/W5AiFi1518DPkgIpdAYKIgLrA
+         V+J7vfczRyX21R6kY/ImaSTXrG6ORUw3DVAi40FHOBv9JypnnBQlSj6otSCIi2AdQHb0
+         zgN0y7IrUavW89zb2XIkOyyXyeYC7FchQNtU6tqxC1vUBBG56KAcIOHE/BFYaWIW2cei
+         BidQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790005161; x=1790609961;
+        d=1e100.net; s=20260707; t=1790005166; x=1790609966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=O3XTZ9CTE6oB6PdoqCRQ1HTKuKJNIEpv7/7Iapup7c0=;
-        b=WYNWqor2ZJL4x/5c0xCo4877tXTaKa3rOos5Fs4GpmLVND6J0rRvXl3ejeNAVBt0hF
-         Rlq+yERZurrSzLCAY8zbSZ3mXIrm9P5lEaTSO+XUyqK9KIFsWoQ79G5Wxn70BW8OdPTS
-         SpE9vzrYAl9W34ad4B4JX/9t9Axj1GMzvMtZM/BB1bU5Y0NSgllNAs+JUPQLte91oQrO
-         HPRdq3QTZFDdi6tDU1IM7GwtdTM00M5e47DyInirQ5fdy6H7qiAFHBzpUjvNTTodvNRc
-         rdNGPMA6sCk6b9dLVOYlf22oVytLNAYiUE0uVTOxKrw0wsNTFvYUA2X3RIyDwyQfVRge
-         lpIQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzP6ktvnRyVrqHtDrcDeaOGhZLgJJiO3cPgkH8xHCy+Ku+7Onyz5dRSyzRvYvGeyNIQEb4oekcRzqA5oNWkGJU=@vger.kernel.org
-X-Gm-Message-State: AFuF++njfYDKkCjibhvy1XOAmVsL0bmXTNGoGIEoUGQOqM6w+3uXAElm
-	a6r7IFEu4618wt5p49r/rNUgpppGyBK1eAGX1Rnq1ImWKeqzTC4U+r9j
-X-Gm-Gg: AYBFou2+4p8V2kM6Yh17yfWQwBcc4APsc3K23cavup0ahNy181zYHgJF2TUU4kVQtti
-	A6GwIrXD1wfJCcELSjS79wDGkRkjvSUbCX3DVheIoKBFuEAOZG+ITvEwwgwNXhCO6sjUCVIgr26
-	g21gjJ+18MkEuXMxIl1lUpsramBxOQAxBgzPAjNcqKtU+lyd8kIMlZEvZhwWOt41JoMBxPX71fm
-	tMDqrjyOuzJhWE3TpA8nOVfxKn86IcfRJ3Pb9s0mfdf9nZBgGE1N0v5UdqZUF1maqHok0+3JzxJ
-	DL46Yao6wwZKGq18HMQYtfmZnrRhEODsCx4h8S0k31jnlULyD5JrjhN3wWg+MyJXlLlxXSmGHbG
-	5XZwrZf0TEwjSHzGkj/0gyF7VxzD2/KzIAUBEPHDTQ9kYZ7b57zrhfXjaUVo4Nw3Eg6NlGNMgEf
-	hKy+uWyPvSK17Z5o4BsgXsG5v1v0FGVdm9EBW+pTf7gpSsTBsgdvG658OqBq7h4hNwvnw=
-X-Received: by 2002:a05:6a00:158c:b0:878:3705:5726 with SMTP id d2e1a72fcca58-87837055eb1mr4496461b3a.50.1790005161045;
-        Mon, 21 Sep 2026 08:39:21 -0700 (PDT)
+        bh=xLGIKtekCp4Iv+F6FSHNltwIt7TcrRN5peUWusm9SWk=;
+        b=V562dXzL6UDpwIUVcNnqKvlg+KodT5xq2VQ0wFOXQWX0I4UOeB7uILAcMBj6wBPol8
+         n6D/sxWOptkw1GODYBhUylmeO+GNT0uSWNAAvV2qghvUb3g3R7exM/vLG9uEi/P1AR/W
+         n/IxS0e+HCS0sJJcXhZYHzm8zJePZz8DRaQf5hGRha3QfNXSg1jlZ+Rxy6+b1iXscfAc
+         t6Ryes/D9alloxfHr+jumFwKql4owvOcto0PPu9pUN0spuB0q6rBLS+D9lkXg4LJBudp
+         UHf+P9kwLhnaQN4J+PhazxxPKb68jg1fcqnbPWIjjJPF/8dAtKZgV55mJXKgft2/Cmpw
+         Cd8w==
+X-Forwarded-Encrypted: i=1; AKwUvBwod9j2w97xCidpbau7mWoqhg7s2tzySNbgQTf9MERGJhdfS3/n1ptFJu8E1jaZ3J9JB+1AXtfivuZh/b14KIY=@vger.kernel.org
+X-Gm-Message-State: AFuF++l0AjsjT/Fm0Z7bTCiz3DCBnoADimWl8rudGmQe5HeZXXKD0NgA
+	GThmNe3/gVjF4YD70/HDZpu0nbmZV2UdtAF9bZeDrGnMXxtmeo8pA+AN
+X-Gm-Gg: AYBFou3FD9P4qHxfL+tOmQ+aXnh9NDAedfAHYt+PtRPpWueJl/nHBmnihjW2zCG/Mzq
+	RfIlPAiKZOGlg3zraStoL/p/sgXDk4hduHh6RcmnNEEHSl6jAmeDVSSfVjad68Fio3mGF0gr4/B
+	wyHnRP7vc3snE2MLFgEYrkptgGT6NpsPQsDufYAVr3bnym422oIVL7KzoXsymELLt19gR5X6OX+
+	hwbCJox5vXbWwHxkThQZtXvuDqFymQhM3nF7ZKzpcX4qaBkDz05WXuhT4RFExy8vi/IfCpkmYJD
+	z5AobWLxiyCZ+f7YLNoHdour617rZOJWjSRykDSLdGTRm4JlWYI/N+b5mF6ISiJGUBLb/CQ2/pF
+	kSaVNwOomtlFZogXOjjljFclmk/Rp++LJj87maa63rdHgCbdCnm/3By0Adzf1pNlx0J0IKT2BA7
+	GLi+dz77niqU3R9KXiAQSy9VDF7IE3mBnDFgJKCdLUvM0OyL1vDVxvECuAytrz5JHnnA==
+X-Received: by 2002:a05:6a00:288a:b0:87b:784b:455c with SMTP id d2e1a72fcca58-87b784b5205mr1078518b3a.56.1790005165964;
+        Mon, 21 Sep 2026 08:39:25 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-877a6ae7d71sm3448186b3a.2.2026.09.21.08.39.16
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-877a6ae7d71sm3448186b3a.2.2026.09.21.08.39.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 08:39:20 -0700 (PDT)
+        Mon, 21 Sep 2026 08:39:25 -0700 (PDT)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: Tejun Heo <tj@kernel.org>,
 	Lai Jiangshan <jiangshanlai@gmail.com>,
@@ -70,9 +70,9 @@ Cc: linux-kernel@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH 2/5] workqueue: add support for module-owned work
-Date: Mon, 21 Sep 2026 23:38:59 +0800
-Message-Id: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-2@gmail.com>
+Subject: [PATCH 3/5] Bluetooth: L2CAP: drain channel timers on connection teardown
+Date: Mon, 21 Sep 2026 23:39:00 +0800
+Message-Id: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-3@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-0@gmail.com>
 References: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-0@gmail.com>
@@ -84,129 +84,183 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Queueing a callback on a system workqueue does not take a reference to
-the module containing that callback. A caller which releases its last
-module reference after queueing work can therefore leave a callback in
-unloaded text. Releasing the reference from the callback itself also
-leaves its return path unprotected.
+L2CAP channel timers run on system_percpu_wq. Connection deletion cancels
+them without waiting because callbacks may need conn->lock, but HCI
+unregister does not drain that workqueue after releasing the lock. A
+running callback can therefore outlive HCI-driver unregister. If it drops
+the last channel reference and releases a protocol module, it still has
+to return through Bluetooth code after those dependencies are gone.
 
-Add module_work and schedule_module_work() to hold the callback's owner
-from queueing until the callback returns. Run the dispatch and final
-module_put() in workqueue core, which remains present when the callback's
-module is unloaded. Cache the function and owner before invoking the
-callback so that it can free the containing work item.
+Individual channel deletion has another cancellation race. It cancels
+timers before calling the socket teardown callback, which can wait for
+sk lock. A concurrent recvmsg holding that lock can clear local busy and
+rearm the monitor timer. Deletion then unlinks the channel, so connection
+teardown can no longer find that delayed work through the channel list.
 
-6LoWPAN needs this for deferred network-device deletion after removing
-the last peer.
+Give each connection an ordered timer workqueue. Serialize timer queueing
+with channel and connection stop flags, and stop each channel before
+canceling its timers or calling teardown. At connection deletion, stop
+queueing for the connection, cancel all four timer types, then drop
+conn->lock and drain running callbacks before releasing the connection.
+This lets callbacks acquire their locks, observe FLAG_DEL and return
+before HCI unregister completes.
+
+The channel stop flag also ensures that no unlinked channel can leave
+delayed work behind on the new queue. The queue remains allocated until
+the drained connection is freed. This adds one workqueue per connection
+and serializes that connection's channel timers.
 
 Assisted-by: LLM
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
- include/linux/workqueue.h | 15 ++++++++++++++
- kernel/workqueue.c        | 43 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ include/net/bluetooth/l2cap.h | 23 ++++++++++++++++++++++-
+ net/bluetooth/l2cap_core.c    | 34 ++++++++++++++++++++++++++++++----
+ 2 files changed, 52 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index c8a36423cb34..9920796c8822 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -128,6 +128,14 @@ struct rcu_work {
- 	struct workqueue_struct *wq;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index efb9b7f422d1..b4af087a0a81 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -611,6 +611,7 @@ struct l2cap_chan {
+ 
+ 	void			*data;
+ 	const struct l2cap_ops	*ops;
++	bool			timers_stopped; /* protected by conn->timer_lock */
+ 	struct mutex		lock;
  };
  
-+struct module;
-+
-+struct module_work {
-+	struct work_struct work;
-+	struct module *owner;
-+	work_func_t func;
-+};
-+
- enum wq_affn_scope {
- 	WQ_AFFN_DFL,			/* use system default */
- 	WQ_AFFN_CPU,			/* one pod per CPU */
-@@ -220,6 +228,11 @@ static inline struct rcu_work *to_rcu_work(struct work_struct *work)
- 	return container_of(work, struct rcu_work, work);
- }
+@@ -636,6 +637,10 @@ struct l2cap_conn {
  
-+static inline struct module_work *to_module_work(struct work_struct *work)
-+{
-+	return container_of(work, struct module_work, work);
-+}
+ 	struct sk_buff_head	pending_rx;
+ 	struct work_struct	pending_rx_work;
++	struct workqueue_struct	*timer_workqueue;
++	spinlock_t		timer_lock; /* protects timer scheduling */
 +
- struct execute_work {
- 	struct work_struct work;
- };
-@@ -634,6 +647,8 @@ extern void __flush_workqueue(struct workqueue_struct *wq);
- extern void drain_workqueue(struct workqueue_struct *wq);
++	bool			timers_stopped __guarded_by(&timer_lock);
  
- extern int schedule_on_each_cpu(work_func_t func);
-+bool schedule_module_work(struct module_work *mwork, work_func_t func,
-+			  struct module *owner);
+ 	struct delayed_work	id_addr_timer;
  
- int execute_in_process_context(work_func_t fn, struct execute_work *);
+@@ -856,13 +861,29 @@ static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
+ static inline void l2cap_set_timer(struct l2cap_chan *chan,
+ 				   struct delayed_work *work, long timeout)
+ {
++	struct l2cap_conn *conn = chan->conn;
++	unsigned long flags;
++	bool pending;
++
+ 	BT_DBG("chan %p state %s timeout %ld", chan,
+ 	       state_to_string(chan->state), timeout);
  
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 1ae3732a2c51..1a16bc5dfb68 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -48,6 +48,7 @@
- #include <linux/hashtable.h>
- #include <linux/rculist.h>
- #include <linux/nodemask.h>
-+#include <linux/module.h>
- #include <linux/moduleparam.h>
- #include <linux/uaccess.h>
- #include <linux/sched/isolation.h>
-@@ -4808,6 +4809,48 @@ int execute_in_process_context(work_func_t fn, struct execute_work *ew)
- }
- EXPORT_SYMBOL_GPL(execute_in_process_context);
- 
-+static void module_work_func(struct work_struct *work)
-+{
-+	struct module_work *mwork = to_module_work(work);
-+	struct module *owner = mwork->owner;
-+	work_func_t func = mwork->func;
++	if (WARN_ON_ONCE(!conn))
++		return;
 +
-+	func(work);
-+	module_put(owner);
-+}
-+
-+/**
-+ * schedule_module_work - schedule work owned by a module
-+ * @mwork: module work to schedule
-+ * @func: work function to schedule
-+ * @owner: module owning @func
-+ *
-+ * Take a reference to @owner before scheduling @func. The reference is
-+ * released by workqueue core after the callback returns. The callback may
-+ * free @mwork. @mwork must not be pending.
-+ *
-+ * Return: %false if the module is being removed or the work could not be
-+ * queued, %true otherwise.
-+ */
-+bool schedule_module_work(struct module_work *mwork, work_func_t func,
-+			  struct module *owner)
-+{
-+	if (!try_module_get(owner))
-+		return false;
-+
-+	INIT_WORK(&mwork->work, module_work_func);
-+	mwork->owner = owner;
-+	mwork->func = func;
-+
-+	if (!schedule_work(&mwork->work)) {
-+		module_put(owner);
-+		return false;
++	spin_lock_irqsave(&conn->timer_lock, flags);
++	if (conn->timers_stopped || chan->timers_stopped) {
++		spin_unlock_irqrestore(&conn->timer_lock, flags);
++		return;
 +	}
 +
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(schedule_module_work);
+ 	l2cap_chan_hold(chan);
+ 
+ 	/* put(chan) if timer was already queued so it already has a ref */
+-	if (mod_delayed_work(system_percpu_wq, work, timeout))
++	pending = mod_delayed_work(conn->timer_workqueue, work, timeout);
++	spin_unlock_irqrestore(&conn->timer_lock, flags);
 +
- /**
-  * free_workqueue_attrs - free a workqueue_attrs
-  * @attrs: workqueue_attrs to free
++	if (pending)
+ 		l2cap_chan_put(chan);
+ }
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 65e957fdc7ae..0df7bda54473 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -686,9 +686,21 @@ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 
+ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ {
++	struct l2cap_conn *conn = chan->conn;
++	unsigned long flags;
++
+ 	lockdep_assert(!chan->conn || lockdep_is_held(&chan->conn->lock));
+ 
++	if (conn) {
++		spin_lock_irqsave(&conn->timer_lock, flags);
++		chan->timers_stopped = true;
++		spin_unlock_irqrestore(&conn->timer_lock, flags);
++	}
++
+ 	__clear_chan_timer(chan);
++	__clear_retrans_timer(chan);
++	__clear_monitor_timer(chan);
++	__clear_ack_timer(chan);
+ 
+ 	BT_DBG("chan %p, err %d, state %s", chan, err,
+ 	       state_to_string(chan->state));
+@@ -723,10 +735,6 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
+-		__clear_retrans_timer(chan);
+-		__clear_monitor_timer(chan);
+-		__clear_ack_timer(chan);
+-
+ 		skb_queue_purge(&chan->srej_q);
+ 
+ 		l2cap_seq_list_free(&chan->srej_list);
+@@ -1879,6 +1887,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	struct l2cap_chan *chan, *l;
++	unsigned long flags;
+ 
+ 	if (!conn)
+ 		return;
+@@ -1891,6 +1900,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	cancel_work_sync(&conn->pending_rx_work);
+ 
+ 	mutex_lock(&conn->lock);
++	spin_lock_irqsave(&conn->timer_lock, flags);
++	conn->timers_stopped = true;
++	spin_unlock_irqrestore(&conn->timer_lock, flags);
+ 
+ 	kfree_skb(conn->rx_skb);
+ 
+@@ -1925,6 +1937,11 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	spin_unlock(&hcon->proto_lock);
+ 
+ 	mutex_unlock(&conn->lock);
++
++	/* Channel deletion canceled pending timers. Drop conn->lock before
++	 * waiting for running callbacks so they can acquire it and return.
++	 */
++	drain_workqueue(conn->timer_workqueue);
+ 	l2cap_conn_put(conn);
+ }
+ 
+@@ -1932,6 +1949,7 @@ static void l2cap_conn_free(struct kref *ref)
+ {
+ 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
+ 
++	destroy_workqueue(conn->timer_workqueue);
+ 	hci_conn_put(conn->hcon);
+ 	kfree(conn);
+ }
+@@ -7416,6 +7434,14 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 		return NULL;
+ 	}
+ 
++	conn->timer_workqueue = alloc_ordered_workqueue("l2cap", WQ_MEM_RECLAIM);
++	if (!conn->timer_workqueue) {
++		kfree(conn);
++		hci_chan_del(hchan);
++		return NULL;
++	}
++	spin_lock_init(&conn->timer_lock);
++
+ 	kref_init(&conn->ref);
+ 	conn->hchan = hchan;
+ 
 -- 
 2.43.0
 
