@@ -1,165 +1,163 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f13.google.com (mail-yx2-f13.google.com [74.125.224.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C044D9F77;
-	Mon, 21 Sep 2026 16:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7525E3BFE2B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 16:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.141
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790009823; cv=pass; b=GbZ85/qC2tA0N6l0oCg74yD8fpeSACBg2Oc0FASRLJt4PZsHjQbCLLir1MamgshPC6e2xBJsPNbFVW/tG5nxdzugdxLV1kEYwvdqMJZN6WjiFPBb0ZsLbUBLz/SoetTrLzzijwFtkwRd6CROzMMzqD8ghUGbet2HHyrrtBabof4=
+	t=1790009966; cv=pass; b=a3AaCtMyszJNDKLmeXoza/XwYKH1+Bj8qGTgMht+WrwYXzjd83/qCWWmPUntJ1pFz1Ve957G1poGbOhHZ8zeJvNPp4pML0BalDYaKOfF41mBVceK2ivT5w+2NhDVmGsTaxfjljvwEArmmQsnaRXYRRYCPhWSmcaXoYR9PXZiQJQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790009823; c=relaxed/simple;
-	bh=a9JHPLzL8uadT1BYJ5SmI2W45iYhN70ewHYi/XhrxzE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IyNUySb/MLq4bPJx0ZYyyhR3KnO0LECosqwe26/gcckqPQKy2t1wD8wOizZ2uC9Mxen68jcv9/bohqPjb47O3ApDh3Xo9wZrz2gca5w5aif14Dq7hhZqM5o3Wuz9nbNUA6Fl2X7ntv4kWVs3idvyqGW06rCnpFS5tm3dZU64LKo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=PsigL38f; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1790009966; c=relaxed/simple;
+	bh=yWngzaaOkrrGGD5OTkD0qpL0wQ8vMcgQMR/dSnwLmgQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E/7qP7rIGPd0m51Z1+zZisrN37DD9BZXRwFl9ThptedSO1/JjEb9tQcqPqp2mv/sOhLVn8pFwgLw6O+JLgQ4Io88IcPH/cxrZYWa6eoYPGZ5gvXbqMBahRFLT/BLOLsezFBSKSUAvRdzDv+XlmP/iQPUb3E0yyXMFXgQXvaPIYk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQdMKaYg; arc=pass smtp.client-ip=74.125.224.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="PsigL38f"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:4:f011::d901])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4hpTsW2G1fz49Q7P;
-	Mon, 21 Sep 2026 19:56:47 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1790009809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2Uc9fDI+27C4yl9EmZRkeFOxnfPE6pVGIux3WmNo0LQ=;
-	b=PsigL38fzfR9kmGyc+40q+3NmZmSAvGLgFzYeVhhrH2B44H+41yDGzQVhTaTJqLPBlmWOk
-	vHS7ddTuJtNoGMVrFiH1O9EKfMohH/Va822y+LxuE/X+95R1rj8nG9rOtnB908qNNJDs3Y
-	qXxn26HIwHN6CPsveAl9C/JQOPQCzGjjH1XRU/0XgxRwmNtf0psD/tVIHIml9E/a7JgTf8
-	9LSv1La5mV2mRso1QN8E9ruMihG/V8ahwg9x3eMp7avAgYSfUgOZs8hRm+SpS7kUTVw8OZ
-	dJSE+d8LotOsiV5hI3Jb+itUvN1CoQ0f4X7lUm9nCA4i5ei/+garKV7Rtre55Q==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1790009809;
-	b=rr2CT7wlyMgxn6GXdm5J53dfhsnaezbr0TgBtH1N8i+ZfHd915sETWVW3UdT1LhxinxZTo
-	NblHBIDL7ppUK1tB+mlMvU2Jlfx+EABhnWFignEwjbYXlBBhdz0wJ8/Rgs6tD+pM32hcNR
-	wJVYHx0P46W72+ffdWFncE1quku3dNvdY7dLpMcfh3Hk/RQE9xV2rp8MjYLyZW1OEsLOso
-	kj8tHSNyH8bf9c/mUsVnHYZAW8hdyl0icsFAB+ZJbnnytuuy2Mi0DONOt9k4PyU4WBdYq6
-	JB4F0W01o/CFUHzuPppN6UEqgv/Tgh0iGbDbrKtFDnAEi3eeSwYWWBGIbxYYmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1790009809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2Uc9fDI+27C4yl9EmZRkeFOxnfPE6pVGIux3WmNo0LQ=;
-	b=u8kbxClr+WR0RVTqu5FQZiZHlHyTiQHNtNk29TjiaTrd/9RmhvkY5Czz1QmFNn5g+d2NWM
-	i/5eb4ot4b/B1knwh3dIVzhZoLv1PMElVcSJCFm9F2G9LIOQmKpUDNYLMBf4YlLZ7+Zhoa
-	yl5Rt5+zitHqon4lyajqR/odcp1ZqpzF1yJoTc/WBwalfPxuZBIeCoGPcj+gA1wU2IAtVY
-	jX/3S65ZfOHhSIeWk5dgBYU2ODh55anT8XIhtty3pWOUg7g1uqbmHPjbfr1MthuPzQMR0G
-	IZaW000CoAt/ukNz1pjX3j11kn32/0u//oJWMablBIP4tX1b60JxodJq14EQGw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <a0d9ba78f7d3598494f2a6ed31afd789972a1d72.camel@iki.fi>
-Subject: Re: [PATCH 1/5] Bluetooth: L2CAP: ignore close requests for deleted
- channels
-From: Pauli Virtanen <pav@iki.fi>
-To: Cen Zhang <zzzccc427@gmail.com>, Tejun Heo <tj@kernel.org>, Lai
- Jiangshan	 <jiangshanlai@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marco Elver
- <elver@google.com>, Jukka Rissanen	 <jukka.rissanen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	baijiaju1990@gmail.com, jjzuming@gmail.com
-Date: Mon, 21 Sep 2026 19:56:44 +0300
-In-Reply-To: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-1@gmail.com>
-References: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-0@gmail.com>
-	 <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-1@gmail.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-2.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQdMKaYg"
+Received: by mail-yx2-f13.google.com with SMTP id 00721157ae682-8716a5baf64so29416187b3.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 09:59:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790009963; cv=none;
+        d=google.com; s=arc-20260327;
+        b=nlZSFu6yIdx+cDBiTOP6XAeAKdZpqhIyZV+5fJfYElH5SVvbZobS/ssrcj4I4b0o17
+         Fv1+lo1ATRX0breP+6vwfs+Lx7QM3bcHDjc/d5eFzbkVii0299whB0Evrzf9r9FkilDv
+         /bWJRdMRWJMUtGrE1WHk7XMZ1nDJOAEXb82C8uJmZ9jVgpkxrI6Z1T0hrZC2WzKpykxy
+         74aFTaHLYkv/9I3Xgdbv53LMCrzlOS16CoH27Y7ucNgfEseQPkeoaX9tmHG0/7XqHtwk
+         x8kQHrt6IME/QUhjWcL1+qiAmUbryv7GJuk6zsZfKT2kFVMfurhmhu8j2gT2ca1RdCog
+         OIFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mIoNQQFkO9KYjaAfdTZ5ScyMF1bXg0TUiegkh1VG1RM=;
+        fh=hPYciCO3OGQyiJXXgqC5KV5EJx1Q+1/Xh2tEEYHGOJU=;
+        b=qWISoBz+Ow75YavUfagg/KPfZE47tgiA05XMvrqgoBXfOCEjHdOgPkMDe2o8KhpNBA
+         3AbQbYUk2fUT2FVO5bjEVWauPab1LSz5H83diMAi8N6jlhQd2DuFTGGLIqz+vKcmm5wq
+         JK7+n9ZhmzIAhkOU9lIZVcUjagXg3V7ap8MhG2gq7g84FI+wf/urusp8lkh59NWE9GVt
+         hDXKc53T6TuTtva++xZXp6zPEEhvAAFQy5RY3wpuoUbA6AQIZiVeSU9ROSPVcNzyah9U
+         DF/LxQl7s3t0lneAPluzBzLdJ5+oysdsJfR9KISz8lvTb1RRyeSKr0Cggp5ntyDqZp5G
+         Ri/g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790009963; x=1790614763; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=mIoNQQFkO9KYjaAfdTZ5ScyMF1bXg0TUiegkh1VG1RM=;
+        b=WQdMKaYgHH+WEMz4OsEyoJO9xQFCwSMHeSptPPYvbYZ+z0y0xxT3dt5yMNzvKcihqR
+         KCv/dtC6vaAKQnhHwSq8NCdhwMNZh3JcO+9KaH3FYzuxptl+8Pj8Zn1R4iEpV1R6RL7i
+         mHC5QLmk7/tRFz2yhv4nXWmQqZKybdVft49fqNwY0SYk9uyPVkX78aAsIg0w7ZhV8a7V
+         QEVOjCZTfc6G60IKGhGfxVugJjesWZEFgGnpSPWE7cdmPqaT82EJ5V3CxbN3Ump5zH5q
+         94pqstyaW46EA0QoSum1uXmjCYzcwfKwnIDj7U8rtdc36oKEIV+WTiRDhowc6OI4KNDT
+         nVbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790009963; x=1790614763;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mIoNQQFkO9KYjaAfdTZ5ScyMF1bXg0TUiegkh1VG1RM=;
+        b=wDrz0GxplwJ4zOCR78OSaqa/7bIAc5Z8xNv39FgJ/LYbaNeKY23Hna3vrrrSBF2yw0
+         IsauNAkHn+sVZvHUVMiR/b/C/ltF3/jiGP3zQpAANQhxSuqLbPQoH7H95YrHqPDKXbuo
+         jpthBtuxc2TwHjUq7DyngXuSCXWaORhwvQFms932m3b7uAkykivJZzA2kJOegXBk5GI+
+         I4/AwZMOC+THGDhHdKTgofP6wCCEdKbMuc7gjAX+A42WbphgKk/QTjvz3P6AT+dKLJ25
+         F1DyzdLT0zkIjpmhNS5QCtS+txhCC/XIfGUt4pjhi7DysAxw79evpCJ9S4FUPEZuPBss
+         Tuhw==
+X-Forwarded-Encrypted: i=1; AKwUvBzj/FRsSm2X/K2lmlA8w0A8sy8mlC8gx0nSZ8hVPtCy9d3fulEbGjrm/XKVo+EEv5AysfPBlRCT5bj0gyd6M0A=@vger.kernel.org
+X-Gm-Message-State: AFuF++lDAYTuIGXPyuT2+9+bdPKxqcp11IMr/lXEAyANUVJvtcVI6DAV
+	+bEjimFH4t4o3GgVTLV2GFxmMkVGOiUY0Mk1IqeaQS63Z659JGdTcjOoo1eLUvL1RsBHqcTw5IL
+	/SVXnsG+9mDOfuwBJxjb+mjTsimPt2+4=
+X-Gm-Gg: AYBFou1HVHPL0rklrNZ1dlyN/mBggWpwRDedH/ShsR5Tpe3GunNbHDoj+3gebymPUrL
+	e0wJaaLmLTlo277a/99igmacRXHNxAWpDCG8pLFbAMMie17L3wrfCiy2ApTcBie5/frZ/RQX/u1
+	GtPhB66KGUL+2zgkJ2OEZTFFWpSzyQhgg2EQSB7rzXIaB3oSZ4pa0CrJgJMxK4Snw2/Z1liZwVH
+	MaPBWADE1niq0aSU4u0w1CqyrAIhlYaK3gw1JNnYj9vg+aJN4QTGIp6wBOQPADi8hQ/D13v2Ed9
+	XMAdImXAH4XSw7/3/5JnbVo5MG5j6Lc2EuaUEJ5doJQQExBK+btzw3Of/xlsW4mMG1I=
+X-Received: by 2002:a05:690c:e3e5:b0:81e:6a10:f90f with SMTP id
+ 00721157ae682-897318a8c2amr33910247b3.17.1790009963258; Mon, 21 Sep 2026
+ 09:59:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <pm-series-6lowpan-lifecycle-82fab5876048c8c9503c-0@gmail.com> <CABBYNZK2fK_iPL3u5YC8msj853QeGgH1o2i=nPqDFKXMV9UVAw@mail.gmail.com>
+In-Reply-To: <CABBYNZK2fK_iPL3u5YC8msj853QeGgH1o2i=nPqDFKXMV9UVAw@mail.gmail.com>
+From: Cen Zhang <zzzccc427@gmail.com>
+Date: Tue, 22 Sep 2026 00:59:10 +0800
+X-Gm-Features: AcwNN1Uq46xoUGPgL9i4HHsx-ydXPi2nll3UuwhNdNAS647pgGVLfVMVJlygHDU
+Message-ID: <CAFRLqsWydYv7xuTYxy8wsMm2DFQfo7ysg7S28+vaMz_T0mwWpQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Bluetooth: 6LoWPAN lifecycle fixes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Marco Elver <elver@google.com>, 
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, baijiaju1990@gmail.com, jjzuming@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Luiz,
 
-ma, 2026-09-21 kello 23:38 +0800, Cen Zhang kirjoitti:
-> l2cap_chan_del() keeps chan->conn alive until channel destruction and
-> marks removal with FLAG_DEL, but does not necessarily change the state.
-> A caller retaining a temporary reference can therefore enter
-> l2cap_chan_close_unlocked() after deletion and follow a stale connected
-> state, rearming the channel timer and sending another disconnection
-> request for a channel no longer on the connection list.
->=20
-> Check FLAG_DEL after taking the channel and connection locks so that
-> concurrent deletion is serialized with the decision to close. Return
-> without further timer or signaling work when the channel is deleted.
->=20
-> Fixes: b66774b48dd9 ("Bluetooth: L2CAP: Fix UAF in channel timeout by hol=
-ding conn ref")
-> Assisted-by: LLM
-> Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
-> ---
->  net/bluetooth/l2cap_core.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 49a998804908..65e957fdc7ae 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -939,8 +939,10 @@ void l2cap_chan_close_unlocked(struct l2cap_chan *ch=
-an, int reason)
-> =20
->  	have_conn =3D l2cap_chan_lock_conn(chan);
-> =20
-> -	/* Context analysis: consider chan->conn->lock held also if conn NULL *=
-/
-> -	context_unsafe(__l2cap_chan_close(chan, reason));
-> +	if (!test_bit(FLAG_DEL, &chan->flags)) {
-> +		/* Consider chan->conn->lock held also if conn NULL */
-> +		context_unsafe(__l2cap_chan_close(chan, reason));
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> =E4=BA=8E2026=E5=B9=B49=E6=9C=
+=8822=E6=97=A5=E5=91=A8=E4=BA=8C 00:07=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Something suggests none of this was tested, as IPSP was never
+> mentioned once in this set.
+>
+Thank you for the feedback, and sorry that the patch series is not clear en=
+ough.
 
-This probably would better be further down in __l2cap_chan_close()
-together with the other state check.
+This series addresses six Bluetooth 6LoWPAN/IPSP lifetime bugs found
+by our tools.
+They were not submitted as static guesses: each bug was confirmed by dynami=
+c
+execution in a controlled, instrumented kernel. Two of them produced
+native reports:
+a KASAN use-after-free in send_pkt(), and an instruction-fetch fault
+after unloading
+bluetooth_6lowpan. The other four were confirmed as semantic or state-manag=
+ement
+bugs where the harmful state or broken invariant was observed at runtime.
 
-> +	}
-> =20
->  	l2cap_chan_unlock_conn(chan, have_conn);
->  }
->=20
-> base-commit: 019debf20bfd648b40ba10377ee0168db5eb241e
+Because these bugs are related, I tried to fix them together in one series.
+However, this turned out to be more difficult than I expected, and the
+current result is not good enough. I will try either to narrow the fixes or
+to send detailed bug reports first and work through the solutions together.
 
---=20
-Pauli Virtanen
+Do you think it would be better to start from separate bug reports, or from
+narrower patches for a smaller subset of these issues?
+
+For reference, the six bugs were:
+
+    - A transmit race between ndo_start_xmit() and peer/channel removal,
+      producing a native KASAN use-after-free report in send_pkt().
+    - A module-lifetime bug where Bluetooth 6LoWPAN callback code could kee=
+p
+      executing or return through module text after the module reference wa=
+s
+      dropped, producing a native instruction-fetch-fault report after unlo=
+ad.
+    - A pre-publication setup failure where an IPSP channel could be delete=
+d
+      before lowpan_peer publication, leaving the creator-side channel
+      reference without an owner.
+    - A close-path race where local close could continue from stale connect=
+ed
+      state after concurrent deletion had set FLAG_DEL, rearming the timer =
+and
+      sending another disconnect for the deleted channel.
+    - A listener/disable race where a request that had already looked up th=
+e
+      listener could still create and publish a child peer after 6LoWPAN ha=
+d
+      been disabled and existing peers swept.
+    - A ready/publication failure where add_peer_chan() could fail while th=
+e
+      void ready callback returned normally, leaving a connected channel
+      without a peer and running ifup() on a zero-peer netdev.
+
+
+Best regards,
+
+Cen Zhang
