@@ -1,69 +1,69 @@
-Received: from mail-vs2-f26.google.com (mail-vs2-f26.google.com [74.125.227.26])
+Received: from mail-vs2-f16.google.com (mail-vs2-f16.google.com [74.125.227.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4090E51476B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 21:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C303D4E73BA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 21:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790024512; cv=none; b=gIrn8qNyeXU5R9IuCM4ySlKI9e4i8GfR8lBG8/0IqBBZSlMM/4jYTjp99ObO7zY3k2MttU/oAPB/DPknIREgGSg0k3MONefm2h5GHHRzOW013iYSjWxyX86fTl1tIox5/F6+shGguDVBIa6tUmQ5lHiTRZT+zUB+UQFYPstbgWQ=
+	t=1790024514; cv=none; b=BCeH+3CT8xEDjjiXUoMH599hCPYclQtrNJRfXrDKOdO+xDMBOJxtfPaLpLInzAx/MWs6cGTAqQKk2BHlBMPPT0uXLMc8OsRIDnQF54GZNw2c41kh0YIafwlGBGg5BNzV8OxB+ORjSS6Kj0YfItCCqfDH+yi1osUvl317adysDyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790024512; c=relaxed/simple;
-	bh=L3oGAlDAZ1bV+Obg5iRxW9Iy895ZFOSq2hrOcxKb5yo=;
+	s=arc-20240116; t=1790024514; c=relaxed/simple;
+	bh=HUzCRBXInCG79yrELn+5UE2gAU1vsdh0iwdF2hanxRo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F7ZmOixdiPiywknzq4xOjIW1LmZeN+BdeP8u2TMhSGO/xVLy1hi3fr1sUwaAEO8Jek3tnsXbmVqnoN0vl+hHDaGj7qsdMJCUXf0diAxmZifuWjDbxPUADPWdxQh78o4n4oDOVeBfQIg/P2awVJWYDUZqqDYP7Ca8DpkS7bNGFBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jSU4SiAk; arc=none smtp.client-ip=74.125.227.26
+	 MIME-Version; b=ZZhBdA3i+R2H9kbi9Bvgdw8scpgiCq409Sp/l+CI0XlpJZz8IUnv8pu6JKWuJ6FWmubF8YvyMC/cEzhrMCQI6cqO1PivulZ9iT5NGqfARE+RisY3iWF94YvN92B1DWFCAfqmkjZJsZEMdXPfL1uY0MN3P1rO9uqOux+wv3OMT2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkBX130p; arc=none smtp.client-ip=74.125.227.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSU4SiAk"
-Received: by mail-vs2-f26.google.com with SMTP id 71dfb90a1353d-5c67e529da9so1267693e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 14:01:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkBX130p"
+Received: by mail-vs2-f16.google.com with SMTP id 71dfb90a1353d-5c67e5292fdso1250756e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 14:01:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790024510; x=1790629310; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790024511; x=1790629311; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=vEdh73Be0jPgEiK/B/oYi0n0+lHCaiWMs/AxZ9D8d5Y=;
-        b=jSU4SiAkJpBBIpSm0bUs/cwiVMuxFcPA9nGxCy9sHewmAgZcS+ggqR6BY+gJJTGKjz
-         RzCCfQ5I1SYCvtRLkWBCzta+Wh0sJDrVRDlJIKCQZJUOyhuCXLGQWMyEZLdEaxky1pZO
-         ScakrO2miJGBzAMs7VDWewqv70Jvikg9nbPGkLFi5MdATApTsV0ioySiL8dYhloPbqOH
-         aRKww7dRabUIgZQVR2JGZJpcawUR8cn1Ij2StVOSKHQKdkj5mfegLkz5KIP0qk0ojlrN
-         XdyLjesOtJRgt0RY7L+FJsTiN6wLIjfW8ePRrrBwAsAmjhFmHDJ4NAKKYdDqQeiz0LP6
-         ESNQ==
+        bh=vOVL+WSUz3aFG1YKnpOf/j6fyGZ29l7IeErDxRKkIiM=;
+        b=bkBX130psIaccxRFcqng9M0S7nGTBM0QGSUdnyyIaOYbcJV+Jyz6FV2XE33+Vh9Xke
+         WgcgREO89bf7ieELQJi2ziQMLcg4KLmE84LEGNXheHdlU9NXytc/J7Si8kQ9RQUXeleo
+         qEB2PJiD48Bx7RfL0IBA+e/zruJ7BIX5bH7tQUzZOrqVYKs5eoKxUvzHTZLHxYJr0vCm
+         +sg1MtJawyHlmW0M3VpQ5EpuYrg18jmRVSr+30wokjs0QoM93pZK1g+CNRYfL5wlQUMa
+         Eb49oGuy05WsVAquXoB8Kk68LWWYr0XKqWpHmi/mxDdUwhHSl7rpsmu306Ts9ZiR9Pp/
+         ZD4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790024510; x=1790629310;
+        d=1e100.net; s=20260707; t=1790024511; x=1790629311;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=vEdh73Be0jPgEiK/B/oYi0n0+lHCaiWMs/AxZ9D8d5Y=;
-        b=D7ZFW6SWQiwUesM7cTKvuhrllydSKxWvTmce9qOQrPkYThMXF+K4nLU9DrLEE/xqST
-         zQ5LxSqvfYITsOFHyRJROtauWeu1Lp0qpvxeGEzN34FV8KMjcBIOBzUjMVRQ4+6vL/LK
-         RcAAV5H/jf+wBaKriD7mi1kDjgi30Pe8MREdNSz0qLlPWJvX+eFbWIwCjNFRVgU4IicP
-         lN11LvfhcOMXM/mf3igX32h/CoEyivAOWht90THjVPFDZc04OHXHgaeMRtgRhX319wM+
-         XzN7j+FLxy8BXOktxAN2wJtG7o2if575kcSDTa5u03okf3QrAzMbQYyX2l3p6NojmMrE
-         v6Vg==
-X-Gm-Message-State: AFuF++nz/Q+DJHcZAK5m9o3KVmnC9IeC3AMCP3lX9fTILtqO2GNDJ37x
-	JNNGECf3FZJri4gy1N6LUWZHxH3UuRgqdMaShYRSiAsF9oR47xuaPSqSEMbPV/Zd
-X-Gm-Gg: AYBFou0RT5A63zH6o7egv+ydsD/4RbLjFFt/j1pejOfEH7r1K7d6YlqHY5dvZ/LYnhf
-	mbbaIQ8AxdXBKUCquS8FaJo2jLR7i3lvJ81RuzF979vw1p/JR5geAYuA2Fce/J7S1UMQ3HgYmcd
-	8XAVSQFMGzcOD4nlLDbs/9fhoWoHDK8Hf1LhAVBMcevfxNADWFXxxVtG7nEW90qUju8Iv/1G+Qz
-	oV6uYWKp0MMOGYKmi9EqUZRuvAzFe4MIPvog8i7/biKG/2y6DqBDFu5rlEc010oTt9uUEcU0j1r
-	0dKBpb2G+YR6F+wudMtZKLvlAVvd8Ohvi89a5YLDTdOfHtQFPJxhNN+YuhMHI3FEpsN26n24BNm
-	eU2cz+DURntuPqBizXK0dGHmXLiV6yA8VkRfl+O+7vj6CD5oFT0I9+sWGdLn1whiRNQZVcyduAp
-	eBjAiRqKSpVgU5rNbf4kldn/Cw93I3RPK6RDv13d0IL8jS9henQZi/QTYGAY81IGdfBitVhw4dK
-	/gRnx2PMHlr7ERxCuDeJ3RaYYc3Iso/t1QiQCDrm/Rtk4O89oLTeDislqpeZA3z
-X-Received: by 2002:a05:6123:12f:b0:5c7:ab80:2922 with SMTP id 71dfb90a1353d-5c9b591f65cmr6478497e0c.6.1790024504920;
-        Mon, 21 Sep 2026 14:01:44 -0700 (PDT)
+        bh=vOVL+WSUz3aFG1YKnpOf/j6fyGZ29l7IeErDxRKkIiM=;
+        b=BCTs7Bxga73g9JVskXRYyx0fw0V4qG1exJiIUdz58QNxwcGa7oL0/B7KkhJNOGLRaK
+         QXyb66XjKGT+Ofl2l6WQ8QFUCwJs/4OEErMIJIio5q/RH+DyUUtpjfiGDDrQBIL9MdDu
+         yxep0+YspuOjx4KG/o/vJP15lXWvDtDBB1a+eHCkENbafagHhUnNNsaiTC01xUVouFYt
+         TuqGmIVMglhkdW7vC7qXCikdX9tBSejIM74sXMIDu96qUOo0UASdYte9489hP1N0UJlK
+         R/ZzpJxNuVmwraodY7kkNHmyJCPTG5R/ZoOdU2CplPKyzzlqOtkA2GtkYaTJ1HFh2mBI
+         VE5g==
+X-Gm-Message-State: AFuF++k0VWUDw7TIzUcOjgw+xSKgkfMbkyVzi2sJVcz0RfQvIzkzlAaa
+	GumU1aHL4sdM3cbjYR6ngDRewOKDnY8lcjICAjE1HumTdPKX3CVv8pznI7DgHKUm
+X-Gm-Gg: AYBFou38oRZkOsYLc7K1l4A/Ls3ZKrFcnz7306H4OD8xHZ/tLxxFYbgvl921Kt2r4nr
+	h1VNsEAKoqvaBIpSf2+lu+FJZY08WeGODVt2Is4NSfTw58kaCHB5dZ0bivMjDUki/kDvHDWd4yI
+	891KJbwrosv+F6Ykzf+KeLAeriViylBgNyFssq9KvZK+6i3UGIBIdMVuEeORdQQA3FN+JofgrKY
+	nO2yLK6NwlDRRa7gFdkqgktBWDM1+FB1UfdvvUcEOVMi/m96TUcJGBlFOICKMaabh9CKcdc7QeK
+	eSdXpxy5xnJNFHyPqWKCyhh7dVnaaqXMZUEUGBF/3zPQ7fuEhLihGPW6o9gHfF0dX8UulPhWFol
+	y83aNQiuW5G/MjsKyTr8I42crk0X5HhrFQ7ArSs8eDUpyF7xGMkxrpNhkrMEe3NrFpbHd4RiM/b
+	8UIJZbw9lEKJjVnBODMisq4+S8rBIy1CHbWO9m0vln0dg7Wgsa3++IJYnNccIQPRDvay0+Z2DUj
+	Zox2D8TCI5jxNIcTVwRhSirBpXE0NJMJKrD163nUmqwTHGF+0r+hrbSQFBFObl3
+X-Received: by 2002:a05:6122:390a:b0:5c1:781:7122 with SMTP id 71dfb90a1353d-5c9b58f8e64mr5641623e0c.3.1790024508222;
+        Mon, 21 Sep 2026 14:01:48 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9850c318641sm83527241.9.2026.09.21.14.01.37
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9850c318641sm83527241.9.2026.09.21.14.01.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 14:01:37 -0700 (PDT)
+        Mon, 21 Sep 2026 14:01:47 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/6] test: functional: add the true wireless broadcast tests
-Date: Mon, 21 Sep 2026 17:01:20 -0400
-Message-ID: <20260921210123.3690449-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 6/6] test: functional: add the true wireless broadcast assistant test
+Date: Mon, 21 Sep 2026 17:01:23 -0400
+Message-ID: <20260921210123.3690449-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260921210123.3690449-1-luiz.dentz@gmail.com>
 References: <20260921210123.3690449-1-luiz.dentz@gmail.com>
@@ -79,26 +79,27 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Assisted-by: opencode:claude-opus-5
 ---
- client/scripts/broadcast-sink-left.bt  |  23 ++++++
- client/scripts/broadcast-sink-right.bt |  23 ++++++
- doc/functional-bap.rst                 |  10 ++-
- test/functional/test_bap.py            | 104 +++++++++++++++++++++++++
- 4 files changed, 158 insertions(+), 2 deletions(-)
- create mode 100644 client/scripts/broadcast-sink-left.bt
- create mode 100644 client/scripts/broadcast-sink-right.bt
+ client/scripts/broadcast-delegator-left.bt  |  32 ++++
+ client/scripts/broadcast-delegator-right.bt |  32 ++++
+ doc/functional-bap.rst                      |   6 +
+ test/functional/test_bap.py                 | 181 ++++++++++++++++++--
+ 4 files changed, 239 insertions(+), 12 deletions(-)
+ create mode 100644 client/scripts/broadcast-delegator-left.bt
+ create mode 100644 client/scripts/broadcast-delegator-right.bt
 
-diff --git a/client/scripts/broadcast-sink-left.bt b/client/scripts/broadcast-sink-left.bt
+diff --git a/client/scripts/broadcast-delegator-left.bt b/client/scripts/broadcast-delegator-left.bt
 new file mode 100644
-index 000000000000..d5ad2ed25abb
+index 000000000000..818b30567be6
 --- /dev/null
-+++ b/client/scripts/broadcast-sink-left.bt
-@@ -0,0 +1,23 @@
++++ b/client/scripts/broadcast-delegator-left.bt
+@@ -0,0 +1,32 @@
 +power on
 +#
 +#
 +# Register a Broadcast Sink endpoint with LC3 taking a single channel,
-+# to act as the left side of a true wireless pair. Each side syncs to
-+# the Broadcast Source on its own, with no assistant involved.
++# to act as the left member of a coordinated set of Scan Delegators.
++# The members of the set are programmed with the same SIRK, see [CSIS]
++# in main.conf.
 +#
 +endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
 +# Auto Accept: accept the configuration chosen by the peer
@@ -111,23 +112,32 @@ index 000000000000..d5ad2ed25abb
 +4
 +#
 +#
-+# Scan for Broadcast Sources: the sink syncs to the periodic
-+# advertising and creates a transport for the BIS matching its own
-+# location.
++# Select and acquire automatically the transports of the streams the
++# Broadcast Assistant adds.
 +#
-+scan on
-diff --git a/client/scripts/broadcast-sink-right.bt b/client/scripts/broadcast-sink-right.bt
++transport.select auto
++transport.acquire auto
++#
++#
++# Advertise the Resolvable Set Identifier, so the assistant is able to
++# resolve this device as a member of the set, and connecting one member
++# connects the other.
++#
++advertise.rsi on
++advertise on
+diff --git a/client/scripts/broadcast-delegator-right.bt b/client/scripts/broadcast-delegator-right.bt
 new file mode 100644
-index 000000000000..58f07dbe67ec
+index 000000000000..bfd1888987bc
 --- /dev/null
-+++ b/client/scripts/broadcast-sink-right.bt
-@@ -0,0 +1,23 @@
++++ b/client/scripts/broadcast-delegator-right.bt
+@@ -0,0 +1,32 @@
 +power on
 +#
 +#
 +# Register a Broadcast Sink endpoint with LC3 taking a single channel,
-+# to act as the right side of a true wireless pair. Each side syncs to
-+# the Broadcast Source on its own, with no assistant involved.
++# to act as the right member of a coordinated set of Scan Delegators.
++# The members of the set are programmed with the same SIRK, see [CSIS]
++# in main.conf.
 +#
 +endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
 +# Auto Accept: accept the configuration chosen by the peer
@@ -140,161 +150,267 @@ index 000000000000..58f07dbe67ec
 +4
 +#
 +#
-+# Scan for Broadcast Sources: the sink syncs to the periodic
-+# advertising and creates a transport for the BIS matching its own
-+# location.
++# Select and acquire automatically the transports of the streams the
++# Broadcast Assistant adds.
 +#
-+scan on
++transport.select auto
++transport.acquire auto
++#
++#
++# Advertise the Resolvable Set Identifier, so the assistant is able to
++# resolve this device as a member of the set, and connecting one member
++# connects the other.
++#
++advertise.rsi on
++advertise on
 diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-index 87917065e1eb..7059e0c735f1 100644
+index 7059e0c735f1..74a6604ad285 100644
 --- a/doc/functional-bap.rst
 +++ b/doc/functional-bap.rst
-@@ -290,8 +290,9 @@ test_bap_broadcast_earbuds_transport_created
- :Steps:
- 	1. Start `bluetoothctl` with the source script on host0.
- 	2. Start `bluetoothctl` with the sink scripts on host1 and host2.
--	3. Each side: ``transport.list``, to check that nothing besides
--	   the transport of its own BIS was created.
-+	3. Each side: list its **org.bluez.MediaTransport1** objects, to
-+	   check that nothing besides the transport of its own BIS was
-+	   created.
+@@ -648,6 +648,12 @@ test_bass_past_earbuds_transport_acquire
+ 	characteristic of each member is read over its own connection,
+ 	which is why the services of both are waited for.
  
- :Expected:
- 	1. ``Endpoint /local/endpoint/ep0 registered``, then two
-@@ -307,6 +308,11 @@ test_bap_broadcast_earbuds_transport_created
- :Notes: The BIS index of the path is what tells the two apart, as each
- 	side only ever sees its own.
- 
-+	The objects are listed over D-Bus rather than with
-+	``transport.list``: the endpoint prints the transport it was
-+	configured with as well, so a listing cannot be told apart from
-+	it in the output.
++	The hosts are reused between tests, so the members may be bonded
++	already, in which case ``pair`` connects them instead, see
++	**bluetoothctl(1)**. What is already in place is then checked over
++	D-Bus rather than waited for on the output, as a device whose
++	services are already resolved does not report it again.
 +
- 	Both transports of the source have to be acquired, as for the CIS
- 	of a CIG: the BIG is only created once every BIS of it is ready.
- 
+ 	Each member gets a push of its own: BASS has no notion of a set,
+ 	so the assistant adds the source to the Broadcast Receive State
+ 	of each delegator separately, and each of them receives the
 diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-index 7bd59777b53b..bfcb43c0ad67 100644
+index bfcb43c0ad67..8d0b4489d766 100644
 --- a/test/functional/test_bap.py
 +++ b/test/functional/test_bap.py
-@@ -312,6 +312,20 @@ def remote_transport_properties(remote):
-     }
+@@ -5,6 +5,7 @@ Tests for BAP (LE Audio) using bluetoothctl in VM instances
+ """
+ 
+ import threading
++import time
+ import warnings
+ 
+ import dbus
+@@ -113,7 +114,7 @@ def pair_le(host0, ctl0, host1, ctl1, advertise=True, services=False):
+     ctl0.expect(f"Device {host1.bdaddr.upper()}")
+     ctl0.send(f"pair {host1.bdaddr.upper()}\n")
+ 
+-    pending = ["Pairing successful"]
++    pending = [PAIRED]
+     if services:
+         pending.append(f"Device {host1.bdaddr.upper()} ServicesResolved: yes")
+ 
+@@ -170,6 +171,11 @@ def remove_device(ctl0, host):
+     )
+ 
+ 
++# A device that is already paired is connected instead, see cmd_pair in
++# client/main.c, so a pairing reports one or the other
++PAIRED = r"Pairing successful|Connection successful"
++
++
+ def pair_wait(ctl0, ctl1, pending):
+     """
+     Wait for the given events while answering the pairing requests.
+@@ -326,6 +332,41 @@ def transport_paths():
+     )
  
  
 +@mainloop_wrap
-+def transport_paths():
-+    """Paths of every MediaTransport1 object of the host."""
++def device_properties(paths):
++    """Properties of the given devices, empty for those that are unknown."""
 +    objects = dbus.Interface(
 +        get_dbus().get_object("org.bluez", "/"),
 +        "org.freedesktop.DBus.ObjectManager",
 +    ).GetManagedObjects()
-+    return sorted(
-+        str(path)
-+        for path, props in objects.items()
-+        if "org.bluez.MediaTransport1" in props
-+    )
++    return {
++        path: {
++            str(key): bool(value)
++            for key, value in objects.get(path, {}).get("org.bluez.Device1", {}).items()
++            if key in ("Paired", "Connected", "ServicesResolved")
++        }
++        for path in paths
++    }
++
++
++def wait_properties(host, paths, name):
++    """
++    Wait for the given property of the given devices to be set.
++
++    Polled rather than waited for on the output, as a device that is
++    already in that state does not report it again.
++    """
++    deadline = time.monotonic() + DEFAULT_TIMEOUT
++
++    while True:
++        props = host.call(device_properties, paths)
++        if all(props[path].get(name) for path in paths):
++            return
++
++        assert time.monotonic() < deadline, f"{name} not set on {paths}: {props}"
++        time.sleep(0.2)
 +
 +
  def add_preset(ctl, name, props, metadata):
      """Make a custom preset from a transport's codec configuration and QoS."""
  
-@@ -460,6 +474,96 @@ def test_bap_broadcast_transport_acquire(hosts, source_script):
+@@ -571,6 +612,28 @@ past_host_config = host_config(
+ 
+ LOCAL_ASSISTANT_RE = r"Assistant (/org/bluez/\S+/sid\d+/bis\d+)"
+ 
++# Local MediaAssistant object of a given BIS of the local broadcast
++LOCAL_ASSISTANT = r"Assistant (/org/bluez/hci0/sid\d+/bis{})"
++
++
++def push_assistant(source, assistant_path, host):
++    """
++    Share the local stream of the given MediaAssistant object with the
++    given delegator, which receives the periodic advertising sync over
++    the connection (PAST).
++    """
++    source.send(f"assistant.push {assistant_path}\n")
++    source.expect(r"Enter Device \(path\):")
++    source.send(f"/org/bluez/hci0/dev_{dev_addr(host)}\n")
++
++    # The local stream may already know the broadcast code
++    idx, _ = source.expect(
++        [r"Enter Broadcast Code \(auto/value\):", r"Assistant \S+ pushed"]
++    )
++    if idx == 0:
++        source.send(f"{BCAST_CODE}\n")
++        source.expect(r"Assistant \S+ pushed")
++
+ 
+ @past_host_config
+ def test_bass_past_transport_acquire(hosts):
+@@ -602,17 +665,7 @@ def test_bass_past_transport_acquire(hosts):
+ 
+     # Share the local broadcast: the delegator receives the periodic
+     # advertising sync over the connection (PAST)
+-    source.send(f"assistant.push {assistant_path}\n")
+-    source.expect(r"Enter Device \(path\):")
+-    source.send(f"/org/bluez/hci0/dev_{dev_addr(delegator_host)}\n")
+-
+-    # The local stream may already know the broadcast code
+-    idx, _ = source.expect(
+-        [r"Enter Broadcast Code \(auto/value\):", r"Assistant \S+ pushed"]
+-    )
+-    if idx == 0:
+-        source.send(f"{BCAST_CODE}\n")
+-        source.expect(r"Assistant \S+ pushed")
++    push_assistant(source, assistant_path, delegator_host)
+ 
+     # A transport is created on the delegator, selected and acquired
+     # automatically
+@@ -795,3 +848,107 @@ def test_bap_unicast_set_transport_acquire(set_hosts):
+         [acquired, acquired]
+         + [f"Transport {transport} State: active" for transport in transports],
      )
- 
- 
-+ACQUIRED = r"Acquire successful: fd \d+ MTU \d+:\d+"
 +
-+# Transport of a given BIS of a broadcast the sink is synced to
-+BIS_TRANSPORT = r"Transport (/org/bluez/\S+/bis{}/fd\d+)"
 +
-+earbuds_host_config = host_config(
++def discover_set(source_host, source, left_host, right_host):
++    """
++    Scan until both members of the set have been found.
++
++    The set is resolved from the RSI of the members that are already
++    known, so connecting before both have been found would leave the
++    one found later out of it.
++    """
++    source.send("scan on\n")
++    source.expect(f"Controller {source_host.bdaddr.upper()} Discovering: yes")
++
++    expect_all(
++        source,
++        [
++            f"Device {left_host.bdaddr.upper()}",
++            f"Device {right_host.bdaddr.upper()}",
++        ],
++    )
++
++    # Stop scanning before connecting, so the discovery does not
++    # interfere with the connections to the members
++    source.send("scan off\n")
++    source.expect(f"Controller {source_host.bdaddr.upper()} Discovering: no")
++
++
++bass_set_host_config = host_config(
 +    [Bluetoothd(conf=BAP_CONF), Pexpect()],
-+    [Bluetoothd(conf=BAP_CONF), Pexpect()],
-+    [Bluetoothd(conf=BAP_CONF), Pexpect()],
++    [Bluetoothd(conf=csip_conf(1)), Pexpect()],
++    [Bluetoothd(conf=csip_conf(2)), Pexpect()],
 +)
 +
 +
-+def start_earbuds_broadcast(hosts):
-+    """
-+    Source broadcasting one BIS per channel, with the two sides of a
-+    true wireless pair scanning for it, each one taking a single
-+    channel.
-+    """
++@bass_set_host_config
++def test_bass_past_earbuds_transport_acquire(hosts):
 +    source_host, left_host, right_host = hosts
 +
++    # Source broadcasting one BIS per channel, with its own streams
++    # exposed as local MediaAssistant objects, one per BIS
 +    source = start_bluetoothctl(source_host, "broadcast-source-2bis.bt")
++    groups = expect_all(
++        source,
++        [LOCAL_ASSISTANT.format(1), LOCAL_ASSISTANT.format(2), ACQUIRED, ACQUIRED],
++    )
++    assistants = [m[0].decode("utf-8") for m in groups[:2]]
 +
-+    # The BIG is only created once every BIS of it is ready, so the
-+    # script acquires both transports
-+    expect_all(source, [ACQUIRED, ACQUIRED])
++    # Delegators advertising, selecting and acquiring automatically
++    left = start_bluetoothctl(left_host, "broadcast-delegator-left.bt")
++    right = start_bluetoothctl(right_host, "broadcast-delegator-right.bt")
 +
-+    left = start_bluetoothctl(left_host, "broadcast-sink-left.bt")
-+    right = start_bluetoothctl(right_host, "broadcast-sink-right.bt")
++    # Every member has to be advertising before connecting, so the set
++    # can be resolved and the remaining members found
++    left.expect("Advertising object registered")
++    right.expect("Advertising object registered")
 +
-+    return source, left, right
++    paths = [
++        f"/org/bluez/hci0/dev_{dev_addr(host)}" for host in (left_host, right_host)
++    ]
 +
++    # The hosts are reused, so a previous test may have left the
++    # members bonded, in which case they are known already and the
++    # discovery below would report nothing for them, as only what
++    # changes is reported: they are connected directly instead.
++    props = source_host.call(device_properties, paths)
 +
-+def expect_bis_transport(ctl, host, bis):
-+    """
-+    Transport a side created for the BIS carrying its own channel,
-+    checking it is the only one it has.
-+    """
-+    _, m = ctl.expect(BIS_TRANSPORT.format(bis))
-+    transport = m[0].decode("utf-8")
++    if not all(props[path].get("Paired") for path in paths):
++        discover_set(source_host, source, left_host, right_host)
 +
-+    # Checked over D-Bus rather than with transport.list, as the
-+    # endpoint prints the transport it was configured with as well, so
-+    # a listing cannot be told apart from it in the output
-+    assert host.call(transport_paths) == [transport]
++    # Connecting one member connects the rest of the set, so a single
++    # request covers both, and pairing a member that is bonded already
++    # connects it, see cmd_pair in client/main.c
++    source.send(f"pair {left_host.bdaddr.upper()}\n")
++    pair_wait(source, left, [PAIRED])
 +
-+    return transport
++    # The Broadcast Receive State of each member is read over its own
++    # connection, so the services of both have to be resolved, and an
++    # encrypted link is required for the read to succeed.
++    #
++    # Checked over D-Bus rather than waited for on the output, as a
++    # device whose services are already resolved does not report it
++    # again, e.g. when the members were bonded already.
++    wait_properties(source_host, paths, "ServicesResolved")
 +
++    # One push per member, each carrying the BIS of its own channel:
++    # BASS has no notion of a set, so the source is added to the
++    # Broadcast Receive State of each delegator separately, and each of
++    # them receives the periodic advertising sync over its own ACL
++    for assistant, host in zip(assistants, (left_host, right_host)):
++        push_assistant(source, assistant, host)
 +
-+@earbuds_host_config
-+def test_bap_broadcast_earbuds_transport_created(hosts):
-+    source_host, left_host, right_host = hosts
-+    source, left, right = start_earbuds_broadcast(hosts)
-+
-+    # Each side syncs to the periodic advertising on its own and only
-+    # creates a transport for the BIS whose channel allocation matches
-+    # its own location
++    # A transport is created on each side for the BIS that was pushed
++    # to it, and selected and acquired automatically
 +    for ctl, host, bis in ((left, left_host, 1), (right, right_host, 2)):
 +        transport = expect_bis_transport(ctl, host, bis)
-+
-+        ctl.send(f"transport.show {transport}\n")
-+        ctl.expect(f"Transport {transport}")
-+        ctl.expect(r"Codec: 0x06")
-+        ctl.expect("State: idle")
-+
-+
-+@earbuds_host_config
-+def test_bap_broadcast_earbuds_transport_acquire(hosts):
-+    source_host, left_host, right_host = hosts
-+    source, left, right = start_earbuds_broadcast(hosts)
-+
-+    # The two sides sync independently, so each of them is given the
-+    # broadcast code of its own, and both are checked
-+    for ctl, host, bis in ((left, left_host, 1), (right, right_host, 2)):
-+        transport = expect_bis_transport(ctl, host, bis)
-+
-+        # Selecting the transport syncs to the BIG and starts acquiring
-+        ctl.send(f"transport.select {transport}\n")
-+        ctl.expect(r"Enter bcode\[value/no\]:")
-+        ctl.send(f"{BCAST_CODE}\n")
 +
 +        expect_all(
 +            ctl,
 +            [
-+                f"Transport {transport} State: broadcasting",
 +                ACQUIRED,
++                f"Transport {transport} State: broadcasting",
 +                f"Transport {transport} State: active",
 +            ],
 +        )
-+
-+
- past_host_config = host_config(
-     [Bluetoothd(conf=BAP_CONF), Pexpect()],
-     [Bluetoothd(conf=BAP_CONF), Pexpect()],
 -- 
 2.55.0
 
