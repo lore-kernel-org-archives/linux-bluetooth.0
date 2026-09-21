@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508F54AC15A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 14:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FF24AE115;
+	Mon, 21 Sep 2026 14:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789999878; cv=none; b=ZwE880lofpqBLlxl1M6mCMQkPHU9OFAVWXsgw+bWCiwI6+pTustNo9J+gEeoA94cwBlxC4gE9LlQkV6brbutWtwNgVIRynK87qk2uVdtQDsyZPwvQezpBOg52wqPMBEyA1dFivCj6xiank1jxERsxqAIzywpKsVEjwuun3PviGs=
+	t=1789999880; cv=none; b=guuDdnAZhIp9QNqA2Zl2KzRrNu7d4DfKNnFSDJR+qS4LEg/5p1I1WPTst/WHIH+Q0mYpfa/iPzLg288YvmbslFbq0aBf1DrWpNkv+QSg48jos9WgTIrOPIlo1OXzab2Hxyn8Gz97g8sT/xPm7zopPETFdqJZLYB5tkqZDX9CujE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789999878; c=relaxed/simple;
-	bh=FG1JERJBiVrCyVIZ23/Ff53d+3wyMHwOn2SMbnql+wU=;
+	s=arc-20240116; t=1789999880; c=relaxed/simple;
+	bh=Ehym4n96rUZvpBrP8HSzMj25eBmSFVGkY6+/plprqhc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mVrIl+NtMGa+X8cuDEeHAGhuLwkk3tXSCpvayVOrtb5fn9zhCeMJ0BmEPH5PtQCF9c1nkrGFV2oJM4ReMTpVPCB+r67rT1jdhagEktexROuAYhSSe4oempCLJHNZYzK5DQgpas5IHp1cYz0fLULsstxJM8SUZZBBskl3RaJep/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLVYdui4; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=SokABEXnmLQ2GZSBiwwEyn7PDV/Kd/EIPxFVnhvA742rlSzJ8q0ypFdjGZ8NS8fZaLbo6dezNYshlRarqOwqeF5bSZLEPtc4oe+2/9DKXFf28pX1QahL6FuLmqSOxN/10vJ2MwzbMf6eQ6G8pVGqDxdN4V4i30r3I0lmXrMB0/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHKi+zJU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLVYdui4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 357621F000FF;
-	Mon, 21 Sep 2026 14:11:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHKi+zJU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF4AC1F000FF;
+	Mon, 21 Sep 2026 14:11:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789999877;
-	bh=NxbJ2tH1ywWihwm6MD4WfOUPZohMgqeLPXnTS35zjWU=;
+	s=k20260515; t=1789999878;
+	bh=ivNGp2q8KD+P9kEhu1jO5o74Tk0ERD8qvmT5KDgIyxM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=GLVYdui4jWdwkkxdq91mmmPytM73ClHPadtjYhFyvEw5OZL9nVZ4VyPq1JybDu0nV
-	 mD8enOavjUGK2LtvwVWggl/Y9AGfmqdDR8dOa0CoEPJWhjvhsLv5aHLTcM5dCIIdAR
-	 yft11i3oenP2BdvpqQwrsiCdb7z4Nfi/yaw/f8+N72xYfpOXA0roRzRF7rbhxGHIo0
-	 FD5c9fYuj5eVJIBQlBptid97prZ/zcXuFpIoqASe2rGG0JSk94CrWuluhykIqoibL2
-	 ETaPCR05GldYVLihNt3SuXGd05mNHUW+b3sS6m0OaEg37NUrKIkahnMxvMhyWIkSaj
-	 CxFm9xMCAmtUg==
+	b=AHKi+zJU+q/3G1Cso07AWPjsfRVn/t6peVk/+IxbMXn90PZzS0qrorQ7KpUGXVKel
+	 xpEbgwpBc9qkDp729Ooo2ABxSECr0DX/CcuoTqJOFJFtABJrllUam4dmvIX88vtShJ
+	 wgsmxNN09YzT7Vr/DIw8JVEsTZliXeGM6YTKlv+r4F8X6Znrf5p2+GLMYl7ZSQF7HD
+	 ssfJlRSwUq+GMxCiWrnuWvaKQxz5srV6V3tBheXuBg9r5ozxCxHwoIQAZHHKHbjJBV
+	 lVjYROKTuuX5AMmx9/BWRVsVAvWyuqlGc74+ky73l1ctezaNVHCq2DSu2PBH7Ysg6j
+	 4pKgst3gODNZQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 196E93926659;
-	Mon, 21 Sep 2026 14:10:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938713926659;
+	Mon, 21 Sep 2026 14:10:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: btintel: read ROM debug registers on FW
- download failure
+Subject: Re: [PATCH v2] Bluetooth: RFCOMM: fix NULL dereference of
+ dlc->session in
+ RFCOMM_CONNINFO
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178999980864.3047822.15306584107639595745.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Sep 2026 14:10:08 +0000
-References: <20260921131047.2780402-1-ravindra@intel.com>
-In-Reply-To: <20260921131047.2780402-1-ravindra@intel.com>
-To: Ravindra <ravindra@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
- kiran.k@intel.com, pmenzel@molgen.mpg.de
+ <178999981014.3047822.12082632672865973363.git-patchwork-notify@kernel.org>
+Date: Mon, 21 Sep 2026 14:10:10 +0000
+References: <20260919112518.3872094-1-benquike@gmail.com>
+In-Reply-To: <20260919112518.3872094-1-benquike@gmail.com>
+To: Hui Peng <benquike@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 21 Sep 2026 18:40:47 +0530 you wrote:
-> The bootloader records init sequence progress and debug info in four
-> core debug registers, useful for debugging FW download failures.
+On Sat, 19 Sep 2026 11:25:18 +0000 you wrote:
+> The RFCOMM_CONNINFO getsockopt handler accepts a socket that is not
+> connected as long as deferred setup is enabled:
 > 
-> Add btintel_get_rom_debug_info() to issue BTINTEL_GET_ROM_DEBUG_INFO
-> (0xfcde) and log these registers, and invoke it from every FW download
-> failure and timeout path: btintel_download_fw() (legacy .sfi flow) and
-> btintel_prepare_fw_download_tlv() (TLV flow), before resetting to the
-> bootloader.
+> 	if (sk->sk_state != BT_CONNECTED &&
+> 				!rfcomm_pi(sk)->dlc->defer_setup) {
+> 		err = -ENOTCONN;
+> 		break;
+> 	}
+> 	l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: btintel: read ROM debug registers on FW download failure
-    https://git.kernel.org/bluetooth/bluetooth-next/c/06d991977eef
+  - [v2] Bluetooth: RFCOMM: fix NULL dereference of dlc->session in RFCOMM_CONNINFO
+    https://git.kernel.org/bluetooth/bluetooth-next/c/46f8ffd0a1f1
 
 You are awesome, thank you!
 -- 
