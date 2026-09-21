@@ -1,108 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157AA45041C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 09:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC97463B7C;
+	Mon, 21 Sep 2026 09:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789981743; cv=none; b=buvUDGwzX99uEa9xeEKZ0LMBMBA0WZ3HxmdEh/ruVYI8sZaxvPnWim7tl5j4lVDUZLt/OZ+Xz9MnZTE04gTxvGmUgeAHDZZl1JxBJpfgHQfDGZBVKgi9KTCheT0ce5xLbCOFOwPmuS04tmiJ1kXQaXy8c++GEGrCwlWDBxSHAqA=
+	t=1789982828; cv=none; b=j54F9nBMCJ0oj14OkwjaIvegoyqZnYtNOs0H51Wqxl5E5P9F34sZFgJlDCDOyTS2rEt8njhmPTAdumYwOIEVtOmaEttQrH2qTimv+hKY0fcO5fOxmQ5K+3pWO6soEm8J6LiapU816t012D0fNKuxo9Rf2hQKWlH+srDXxcgOXQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789981743; c=relaxed/simple;
-	bh=6jCtNbzvAFfnCkQvIJdZvE2yI4m1pEyatz+z0ebGt7Q=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s/TaY020GlUhELnW0k4VFKCveLpAkqXgHEuHbdsc864AJD4MKTa5gIzQ5iyl8xVoBCTDiEbdit9u1aveomDDpNor9ZvQoweQxvwxOTunCGVzJuMJeVeHPFyBzKZcLVpZfJ2MBTgEHhHlFKykAEjE9Y/lKhO52z3JElosMV9Wb4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjmuDHjb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789982828; c=relaxed/simple;
+	bh=v6JpBp3AArOdnsctwqjfY3ZCGJR9JA0h+WUyTMdr+WI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Lu/0q62QMKvnEHPFB/dbFp+ZQRij6V1cIBlla0vZ4UeCpLiwY6Rb8rzbmGcEn15AN8m2D6E+MhWn1OrXlX+oj22q9vBk4muI2fk0MmU+zsk00fXvCVxns2AgBk3BHf3gTbo9fZ8XCLeJhh59ilmmSQaluUw/Jeu+Ev0jjmeblvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCPakuZ0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjmuDHjb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC97C1F0089D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 09:09:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCPakuZ0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C1B31F000FF;
+	Mon, 21 Sep 2026 09:26:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789981741;
-	bh=6jCtNbzvAFfnCkQvIJdZvE2yI4m1pEyatz+z0ebGt7Q=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=LjmuDHjbkOR3/7rHtGdfeVrBzYXeLYJMOatv4fto1oYsMSduTQ6p1BSpZrkjSNqjU
-	 aJ4ezS/BKOdfPGlMC8sErOlNKw2hszGXbpCXglYmJibp1wO5Po/QqueVB9r8IWKbJN
-	 NP/2cvqPuJzJ2ZEr2B/EPZ3Yae3TvFmf8JtJ3SHC5FQIEuORjcxxh1VyQ9IypER/me
-	 EfXbH9DQl0mSnMfXO5ErytVrwpDzx5Zb9VHM1FPkSfuYY8lEv9HxN6XMHgdZUwrTCC
-	 GsCXfYfy1wrtgSWgCyx1qpHxfy9e+PrcIumAClL/EysBcVu+5RplzLy5U2cYh77mY1
-	 VOgQs63lmwlAg==
-Received: by mail-lf2-f13.google.com with SMTP id 2adb3069b0e04-5b5e4f15b78so2389620e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 02:09:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxKDdWeLa8Nx57kqPuBLQDDPUeKdb7t54N3qlqWh5E2IX3Wne51o5Xmq8FNM/pFanmFzZfChDY5cdMgc+/pfIE=@vger.kernel.org
-X-Gm-Message-State: AFuF++niE4NITtReag9r1TSb1t5RtVlDvuqeQzqvTD8QqtwfWwgWHU+v
-	H8s8KUyLKhnMplnSZs2qL0p28e5SjD7+oIGpxQW9+1VHmJcuPCAkX7tUWAxYN5nyIooCl74SlK5
-	P7myI1pue10nES4/H3lFESqzHEKY5WY6BLL9+VzcOCw==
-X-Received: by 2002:ac2:4e15:0:b0:5b8:bc5e:b580 with SMTP id
- 2adb3069b0e04-5b8c19583a7mr3502274e87.56.1789981740260; Mon, 21 Sep 2026
- 02:09:00 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 21 Sep 2026 05:08:58 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 21 Sep 2026 05:08:58 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <p2qiwwig7ap74puja6mgnz37lofljhexiapmpp6y3xmwkhs2dn@v2mxawoivkn4>
+	s=k20260515; t=1789982826;
+	bh=HDN5tiTALp2HjdaynTUWOVRoE4KJy7qUfZYfcVAfO6M=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=SCPakuZ00OQvwOBru74VDnsKgxqtvVnrpR4I4DTicBqplzKxQ1/JHVYalVOy+fBXi
+	 phx16fde0X+tPcXeoa0K3HI7/4FErzYLoUE19z7668esyTacgyXRl2vi0aqLXzrzny
+	 xE3I9ulze6NBKfB8UUyrdOi+/sNT/7ZKDg+Yj4RTK2u9fr8JYKuMo1E5yCg0K9LYcX
+	 9kFWWkaRbnDDmv8uANkCdutrg7zm6ZK2w1zE5nXsd6D3TjbJUPJmmDupo0zzl94mcR
+	 vTNy3USx3CuoctNsxdOYI2NHDisLrB/u7y1ol6g+vlVg4HRks82m8D8b3NVJK4T08o
+	 8wktRkjTt4ZAQ==
+From: Srinivas Kandagatla <srini@kernel.org>
+To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Saravana Kannan <saravanak@kernel.org>, 
+ Christian Marangi <ansuelsmth@gmail.com>, 
+ Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, daniel@makrotopia.org, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+ Christoph Hellwig <hch@lst.de>, 
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260806-block-as-nvmem-v10-0-be598b2a5606@oss.qualcomm.com>
+References: <20260806-block-as-nvmem-v10-0-be598b2a5606@oss.qualcomm.com>
+Subject: Re: (subset) [PATCH v10 00/10] Support for block device NVMEM
+ providers
+Message-Id: <178998281449.889291.7893229102394463283.b4-ty@kernel.org>
+Date: Mon, 21 Sep 2026 10:26:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260915-pci-m2-bt-rework-v1-0-3c7d9cf9c010@oss.qualcomm.com>
- <20260915-pci-m2-bt-rework-v1-3-3c7d9cf9c010@oss.qualcomm.com>
- <CAMRc=MdJgXDUb-Uac0TRB8u1WUpLng51C4yMH6iMEMoK56tQYA@mail.gmail.com> <p2qiwwig7ap74puja6mgnz37lofljhexiapmpp6y3xmwkhs2dn@v2mxawoivkn4>
-Date: Mon, 21 Sep 2026 05:08:58 -0400
-X-Gmail-Original-Message-ID: <CAMRc=MdHy6M9cY-ZqMXP_F6yLuVuipDkZwHoBF0D9W3A5VkOSQ@mail.gmail.com>
-X-Gm-Features: AcwNN1WxEae6jjegpliI2fL_J2GC3AMnE_px_o8YJ5SvWUKC9-5ouNBZ6FP8184
-Message-ID: <CAMRc=MdHy6M9cY-ZqMXP_F6yLuVuipDkZwHoBF0D9W3A5VkOSQ@mail.gmail.com>
-Subject: Re: [PATCH 3/5] power: sequencing: pcie-m2: Create auxiliary device
- for the M.2 BT interface
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Rahul Samana <rahul.samana@oss.qualcomm.com>, 
-	Wei Deng <wei.deng@oss.qualcomm.com>, Loic Poulain <loic.poulain@oss.qualcomm.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Amitkumar Karwar <amitkumar.karwar@nxp.com>, 
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Bartosz Golaszewski <brgl@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Mon, 21 Sep 2026 09:58:27 +0200, Manivannan Sadhasivam
-<mani@kernel.org> said:
-> On Wed, Sep 16, 2026 at 04:19:16AM -0500, Bartosz Golaszewski wrote:
->> On Tue, 15 Sep 2026 16:24:04 +0200, Manivannan Sadhasivam via B4 Relay
->> <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
->> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->> >
->> > Currently, the driver instantiates the BT interface of the WCN6855 and
->> > WCN7850 combo modules by creating a devicetree node at runtime using an
->> > of_changeset, with the compatible passed through the PCI ID table. But this
->> > method of creating a devicetree node just for matching with the driver is
->> > not recommended.
->> >
->> > So create an auxiliary device for the BT interface instead. The serdev
->> > transport is still allocated here and handed over to the Bluetooth driver
->> > through the auxiliary device, along with the power sequencing target used
->> > to power up the controller. Also extend the provider match so that the
->> > auxiliary device created for this connector is matched as its power
->> > sequencing consumer.
->> >
->> > Since the runtime node creation is now gone, select AUXILIARY_BUS in
->> > place of OF_DYNAMIC.
->> >
->> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->> > ---
->>
->> That's some nice stuff, thanks for doing it!
->>
->> It looks like there's no build-time dependency on this, only run-time? Can I
->> take it independently?
->>
->
-> Yeah sure!
->
 
-Nevermind that, it still needs is_controllable().
+On Thu, 06 Aug 2026 16:38:33 +0200, Loic Poulain wrote:
+> On embedded devices, it is common for factory provisioning to store
+> device-specific information, such as Ethernet or WiFi MAC addresses,
+> in a dedicated area of an eMMC partition. This avoids the need for
+> and additional EEPROM/OTP and leverages the persistence of eMMC.
+> 
+> One example is the Arduino UNO-Q, where the WiFi MAC address and the
+> Bluetooth Device address are stored in the eMMC Boot1 partition.
+> 
+> [...]
 
-Bart
+Applied, thanks!
+
+[04/10] nvmem: layouts: Support fixed-layout as the nvmem device node itself
+        commit: 9c6cab93dcd47c3075d896c777567b9d8f813d18
+
+Best regards,
+-- 
+Srinivas Kandagatla <srini@kernel.org>
+
