@@ -1,69 +1,69 @@
-Received: from mail-vs2-f16.google.com (mail-vs2-f16.google.com [74.125.227.16])
+Received: from mail-yx2-f12.google.com (mail-yx2-f12.google.com [74.125.224.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C303D4E73BA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 21:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A579551599D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 21:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790024514; cv=none; b=BCeH+3CT8xEDjjiXUoMH599hCPYclQtrNJRfXrDKOdO+xDMBOJxtfPaLpLInzAx/MWs6cGTAqQKk2BHlBMPPT0uXLMc8OsRIDnQF54GZNw2c41kh0YIafwlGBGg5BNzV8OxB+ORjSS6Kj0YfItCCqfDH+yi1osUvl317adysDyo=
+	t=1790024519; cv=none; b=q/qowUB8ZtdViPyJkO0z20Y4ZU5JLMUPY/41pnigsOU01LZbMz+4/8vJBgXOL7KH25nUFK+MuEqHxA+zf+bPdX9nd2WDa634FsHQN9q04q74BONMXvah/HsoKC2EBFBc5uG7DiUxyqj6kOvM93oTiabj2PfjSLnlKpAE9Cz8Vg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790024514; c=relaxed/simple;
-	bh=HUzCRBXInCG79yrELn+5UE2gAU1vsdh0iwdF2hanxRo=;
+	s=arc-20240116; t=1790024519; c=relaxed/simple;
+	bh=2O8eleONipRqGE11jMHDLf9pJpK4Q/N+R7kS1Wqkkak=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZZhBdA3i+R2H9kbi9Bvgdw8scpgiCq409Sp/l+CI0XlpJZz8IUnv8pu6JKWuJ6FWmubF8YvyMC/cEzhrMCQI6cqO1PivulZ9iT5NGqfARE+RisY3iWF94YvN92B1DWFCAfqmkjZJsZEMdXPfL1uY0MN3P1rO9uqOux+wv3OMT2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkBX130p; arc=none smtp.client-ip=74.125.227.16
+	 MIME-Version; b=o3d2yLo0Cj58o4qZSqelsD3M8PI5D/mIndGc8zTt+e7csFqYInlZnv7qd1ddnIcvrgfdaVFuY9VsLWz5I+KzvN9V80WJXi+aZxKzJey0RAuSt6RF17F5STiSRipRKGnkYk3KjF4SmjNwllssLPdNCKJQxGNMDxmpb8mIIaIWyMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+Mdwy7a; arc=none smtp.client-ip=74.125.224.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkBX130p"
-Received: by mail-vs2-f16.google.com with SMTP id 71dfb90a1353d-5c67e5292fdso1250756e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 14:01:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+Mdwy7a"
+Received: by mail-yx2-f12.google.com with SMTP id 00721157ae682-85d4eb63f16so11951197b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 14:01:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790024511; x=1790629311; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790024516; x=1790629316; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=vOVL+WSUz3aFG1YKnpOf/j6fyGZ29l7IeErDxRKkIiM=;
-        b=bkBX130psIaccxRFcqng9M0S7nGTBM0QGSUdnyyIaOYbcJV+Jyz6FV2XE33+Vh9Xke
-         WgcgREO89bf7ieELQJi2ziQMLcg4KLmE84LEGNXheHdlU9NXytc/J7Si8kQ9RQUXeleo
-         qEB2PJiD48Bx7RfL0IBA+e/zruJ7BIX5bH7tQUzZOrqVYKs5eoKxUvzHTZLHxYJr0vCm
-         +sg1MtJawyHlmW0M3VpQ5EpuYrg18jmRVSr+30wokjs0QoM93pZK1g+CNRYfL5wlQUMa
-         Eb49oGuy05WsVAquXoB8Kk68LWWYr0XKqWpHmi/mxDdUwhHSl7rpsmu306Ts9ZiR9Pp/
-         ZD4w==
+        bh=//v28d/5ze6BKBbAIPpH2GR+PljyoMJUFyW9zNGJrPw=;
+        b=V+Mdwy7arR7xNcfGTOzqxYXC/MHGzClzeXlj3Hpmh6s1QuQzLRuX/DqA78Lr6XwR+m
+         mIOS6EM7ao9P1trkkzmHfpEXr9wtly/kzU61T1DhTajfpp9pX4xIjs8NyEtmKcJqEyeI
+         I4Yi7MhS3hUoX+W5lxtfm1voFKeZ7KkqKX8TGq3NSGuMWl8vCMwHdDfeVKHQ28gGofnO
+         8xVoZLvq1C30TKJdf+NM223h/IM1DuYJfquf72PIBrZroPdTdR+w9OBgJjuMRv9ik7gG
+         89ZAq8hywnwGyCRMrmye/LlxqSkqJ11AKeHB0a8AME3YmlWLSA6jheN8jILc0hGoe8P5
+         w4lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790024511; x=1790629311;
+        d=1e100.net; s=20260707; t=1790024516; x=1790629316;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=vOVL+WSUz3aFG1YKnpOf/j6fyGZ29l7IeErDxRKkIiM=;
-        b=BCTs7Bxga73g9JVskXRYyx0fw0V4qG1exJiIUdz58QNxwcGa7oL0/B7KkhJNOGLRaK
-         QXyb66XjKGT+Ofl2l6WQ8QFUCwJs/4OEErMIJIio5q/RH+DyUUtpjfiGDDrQBIL9MdDu
-         yxep0+YspuOjx4KG/o/vJP15lXWvDtDBB1a+eHCkENbafagHhUnNNsaiTC01xUVouFYt
-         TuqGmIVMglhkdW7vC7qXCikdX9tBSejIM74sXMIDu96qUOo0UASdYte9489hP1N0UJlK
-         R/ZzpJxNuVmwraodY7kkNHmyJCPTG5R/ZoOdU2CplPKyzzlqOtkA2GtkYaTJ1HFh2mBI
-         VE5g==
-X-Gm-Message-State: AFuF++k0VWUDw7TIzUcOjgw+xSKgkfMbkyVzi2sJVcz0RfQvIzkzlAaa
-	GumU1aHL4sdM3cbjYR6ngDRewOKDnY8lcjICAjE1HumTdPKX3CVv8pznI7DgHKUm
-X-Gm-Gg: AYBFou38oRZkOsYLc7K1l4A/Ls3ZKrFcnz7306H4OD8xHZ/tLxxFYbgvl921Kt2r4nr
-	h1VNsEAKoqvaBIpSf2+lu+FJZY08WeGODVt2Is4NSfTw58kaCHB5dZ0bivMjDUki/kDvHDWd4yI
-	891KJbwrosv+F6Ykzf+KeLAeriViylBgNyFssq9KvZK+6i3UGIBIdMVuEeORdQQA3FN+JofgrKY
-	nO2yLK6NwlDRRa7gFdkqgktBWDM1+FB1UfdvvUcEOVMi/m96TUcJGBlFOICKMaabh9CKcdc7QeK
-	eSdXpxy5xnJNFHyPqWKCyhh7dVnaaqXMZUEUGBF/3zPQ7fuEhLihGPW6o9gHfF0dX8UulPhWFol
-	y83aNQiuW5G/MjsKyTr8I42crk0X5HhrFQ7ArSs8eDUpyF7xGMkxrpNhkrMEe3NrFpbHd4RiM/b
-	8UIJZbw9lEKJjVnBODMisq4+S8rBIy1CHbWO9m0vln0dg7Wgsa3++IJYnNccIQPRDvay0+Z2DUj
-	Zox2D8TCI5jxNIcTVwRhSirBpXE0NJMJKrD163nUmqwTHGF+0r+hrbSQFBFObl3
-X-Received: by 2002:a05:6122:390a:b0:5c1:781:7122 with SMTP id 71dfb90a1353d-5c9b58f8e64mr5641623e0c.3.1790024508222;
-        Mon, 21 Sep 2026 14:01:48 -0700 (PDT)
+        bh=//v28d/5ze6BKBbAIPpH2GR+PljyoMJUFyW9zNGJrPw=;
+        b=mN5OulJjPb60LYePbwca30ysTuK2HUFOWnnaxW0s7/Sv7MYHbi9ABOAzRdpzpI1+bj
+         s5st4YHqIGqdmLdWfv/R2qHdfkneFr6bVLLBcLjyi7j2TOUs0xNtOiFdiN8HKOSBitHH
+         OxSwDfK6DN8XPLjqcx0qYy+T3kHib37eG0jcP5RRSVJHOgPRIpRk3mjx1muKMfpCAdh7
+         4hyFKzYae0oR92X0F31TzocgdqhMcS3PFsMzN2QLE3UGcya23Pqj++BFqwcyzDPaUzay
+         wY7RQICipwY/qDtpa6mzMRRoZwyqIogDhA9fTk88wJjGn/5WnpunW+f3W9slNmPxLWNr
+         wXqw==
+X-Gm-Message-State: AFuF++nppjn3Xql0V1OwUUa2xwScA5i0PWKc4bE5Fb7GAF55uyTvOnrA
+	s6fU5PZ56aCproEn5l2F0NUZDN/UTwZCd+d469pcUflbQ59Xou0/NsVFrhsHbJNE
+X-Gm-Gg: AYBFou1aCYriWJ6xzM/967jFf/Sxv6ypRbfKzxv2V1p3eIJXBg7i6RioLT+fy8rW/2M
+	6i9X386ueQUB3L/nWO4zQ9vGo5F/B0i8d6qzFaxwrfH/by/p+0ASncli9Ha4gJ8q7qovpbrHHaf
+	xK/+/swAp24q+SSnQ9B7QVfOOAELxtFnllfAPSQ7y0gxJdoOKafEz738af2oDSdLvAJuINn4kWV
+	Oec14Xowl/9JAivqgoT017yil7IbY6cZdhCKbCSHpXTur4jEnbcgWBw0zC+0KbUa02QCfZX7iSq
+	3k5PRawh2pCmr04LGG8OWk8KfPvKMZhDFcJkjJqpo0JJX7dSeRxUTGWZT0oOW/PfaHds51FfklB
+	AZbcvkW2VLeo/WaPU0WwjoePb2hwA2FMosDF363JAzVOLnENb0qVjkz/6Z5Y/zIxmritowDlJ0N
+	vUEnOwzbBejPgWIQwyTlojyZqZzNdxibIDwdmQnCqW+UNbrinc7e/2KqPYu1rFS5MdCvk3enyL5
+	dzLLxND77Hk0VQ6HBNehTjq779bc0MqIkH/3wPWaeh8G1IhhQawNKaeo1AG5xbsovSucHVXcZ3t
+X-Received: by 2002:a05:6122:2210:b0:5c9:a5be:7b4f with SMTP id 71dfb90a1353d-5c9e349e72dmr1298562e0c.6.1790024505763;
+        Mon, 21 Sep 2026 14:01:45 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9850c318641sm83527241.9.2026.09.21.14.01.47
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9850c318641sm83527241.9.2026.09.21.14.01.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 14:01:47 -0700 (PDT)
+        Mon, 21 Sep 2026 14:01:45 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 6/6] test: functional: add the true wireless broadcast assistant test
-Date: Mon, 21 Sep 2026 17:01:23 -0400
-Message-ID: <20260921210123.3690449-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/6] bass: keep the push target per MediaAssistant object
+Date: Mon, 21 Sep 2026 17:01:21 -0400
+Message-ID: <20260921210123.3690449-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260921210123.3690449-1-luiz.dentz@gmail.com>
 References: <20260921210123.3690449-1-luiz.dentz@gmail.com>
@@ -77,340 +77,158 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Every MediaAssistant object of a local broadcast shares the bass_data of
+the adapter, and pushing one stored the session of the delegator it was
+pushed to by overwriting the bass of that shared data.
+
+With a single delegator this goes unnoticed, but with one delegator per
+side of a true wireless pair the second push replaces the target of the
+first one, so the Broadcast Code of a request coming from the first
+delegator is written to the second one, and the first never syncs.
+
+Keep the session of the push in the assistant itself, and only handle
+the changes reported by the delegator an assistant was pushed to.
+
 Assisted-by: opencode:claude-opus-5
 ---
- client/scripts/broadcast-delegator-left.bt  |  32 ++++
- client/scripts/broadcast-delegator-right.bt |  32 ++++
- doc/functional-bap.rst                      |   6 +
- test/functional/test_bap.py                 | 181 ++++++++++++++++++--
- 4 files changed, 239 insertions(+), 12 deletions(-)
- create mode 100644 client/scripts/broadcast-delegator-left.bt
- create mode 100644 client/scripts/broadcast-delegator-right.bt
+ profiles/audio/bass.c | 39 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/client/scripts/broadcast-delegator-left.bt b/client/scripts/broadcast-delegator-left.bt
-new file mode 100644
-index 000000000000..818b30567be6
---- /dev/null
-+++ b/client/scripts/broadcast-delegator-left.bt
-@@ -0,0 +1,32 @@
-+power on
-+#
-+#
-+# Register a Broadcast Sink endpoint with LC3 taking a single channel,
-+# to act as the left member of a coordinated set of Scan Delegators.
-+# The members of the set are programmed with the same SIRK, see [CSIS]
-+# in main.conf.
-+#
-+endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-+# Auto Accept: accept the configuration chosen by the peer
-+y
-+# Max Transports: no limit
-+a
-+# Locations: Front Left, so only the BIS carrying that channel is synced
-+1
-+# Supported Context: Media
-+4
-+#
-+#
-+# Select and acquire automatically the transports of the streams the
-+# Broadcast Assistant adds.
-+#
-+transport.select auto
-+transport.acquire auto
-+#
-+#
-+# Advertise the Resolvable Set Identifier, so the assistant is able to
-+# resolve this device as a member of the set, and connecting one member
-+# connects the other.
-+#
-+advertise.rsi on
-+advertise on
-diff --git a/client/scripts/broadcast-delegator-right.bt b/client/scripts/broadcast-delegator-right.bt
-new file mode 100644
-index 000000000000..bfd1888987bc
---- /dev/null
-+++ b/client/scripts/broadcast-delegator-right.bt
-@@ -0,0 +1,32 @@
-+power on
-+#
-+#
-+# Register a Broadcast Sink endpoint with LC3 taking a single channel,
-+# to act as the right member of a coordinated set of Scan Delegators.
-+# The members of the set are programmed with the same SIRK, see [CSIS]
-+# in main.conf.
-+#
-+endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-+# Auto Accept: accept the configuration chosen by the peer
-+y
-+# Max Transports: no limit
-+a
-+# Locations: Front Right, so only the BIS carrying that channel is synced
-+2
-+# Supported Context: Media
-+4
-+#
-+#
-+# Select and acquire automatically the transports of the streams the
-+# Broadcast Assistant adds.
-+#
-+transport.select auto
-+transport.acquire auto
-+#
-+#
-+# Advertise the Resolvable Set Identifier, so the assistant is able to
-+# resolve this device as a member of the set, and connecting one member
-+# connects the other.
-+#
-+advertise.rsi on
-+advertise on
-diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-index 7059e0c735f1..74a6604ad285 100644
---- a/doc/functional-bap.rst
-+++ b/doc/functional-bap.rst
-@@ -648,6 +648,12 @@ test_bass_past_earbuds_transport_acquire
- 	characteristic of each member is read over its own connection,
- 	which is why the services of both are waited for.
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index c9a9111e010f..fd05195f36d2 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -108,6 +108,13 @@ struct bass_assistant {
+ 	struct btd_adapter *adapter;	/* Broadcast source device */
+ 	struct btd_device *device;	/* Broadcast source device */
+ 	struct bass_data *data;		/* BASS session with peer device */
++	struct bt_bass *bass;		/* BASS session the stream is pushed
++					 * to, which for a local stream is
++					 * chosen by the push, so it is kept
++					 * per assistant: the session of the
++					 * data is shared by every assistant
++					 * of the adapter.
++					 */
+ 	uint8_t sgrp;
+ 	uint8_t sid;
+ 	uint8_t bis;
+@@ -803,6 +810,7 @@ assistant_new(struct btd_adapter *adapter,
+ 	assistant->adapter = adapter;
+ 	assistant->device = device;
+ 	assistant->data = data;
++	assistant->bass = bt_bass_ref(data->bass);
+ 	assistant->sgrp = sgrp;
+ 	assistant->sid = sid;
+ 	assistant->bis = bis;
+@@ -991,10 +999,10 @@ static int assistant_parse_props(struct bass_assistant *assistant,
+ 				goto fail;
+ 			}
  
-+	The hosts are reused between tests, so the members may be bonded
-+	already, in which case ``pair`` connects them instead, see
-+	**bluetoothctl(1)**. What is already in place is then checked over
-+	D-Bus rather than waited for on the output, as a device whose
-+	services are already resolved does not report it again.
-+
- 	Each member gets a push of its own: BASS has no notion of a set,
- 	so the assistant adds the source to the Broadcast Receive State
- 	of each delegator separately, and each of them receives the
-diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-index bfcb43c0ad67..8d0b4489d766 100644
---- a/test/functional/test_bap.py
-+++ b/test/functional/test_bap.py
-@@ -5,6 +5,7 @@ Tests for BAP (LE Audio) using bluetoothctl in VM instances
- """
+-			if (assistant->data->bass)
+-				bt_bass_unref(assistant->data->bass);
++			if (assistant->bass)
++				bt_bass_unref(assistant->bass);
  
- import threading
-+import time
- import warnings
+-			assistant->data->bass = bt_bass_ref(data->bass);
++			assistant->bass = bt_bass_ref(data->bass);
+ 		}
  
- import dbus
-@@ -113,7 +114,7 @@ def pair_le(host0, ctl0, host1, ctl1, advertise=True, services=False):
-     ctl0.expect(f"Device {host1.bdaddr.upper()}")
-     ctl0.send(f"pair {host1.bdaddr.upper()}\n")
+ 		dbus_message_iter_next(props);
+@@ -1040,7 +1048,7 @@ static void assistant_past(struct bass_assistant *assistant)
+ 		return;
  
--    pending = ["Pairing successful"]
-+    pending = [PAIRED]
-     if services:
-         pending.append(f"Device {host1.bdaddr.upper()} ServicesResolved: yes")
+ 	if (!device) {
+-		struct bt_bass *bass = assistant->data->bass;
++		struct bt_bass *bass = assistant->bass;
+ 		struct bass_data *data;
  
-@@ -170,6 +171,11 @@ def remove_device(ctl0, host):
-     )
+ 		data = queue_find(sessions, match_bass, bass);
+@@ -1095,7 +1103,7 @@ static DBusMessage *push_mod_src(struct bass_assistant *assistant,
+ 		util_iov_append(&iov, &meta_len, sizeof(meta_len));
+ 	}
  
+-	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
++	err = bt_bass_send(assistant->bass, &hdr, &iov);
+ 	if (err) {
+ 		DBG("Unable to send BASS Write Command");
+ 		return btd_error_failed(msg, strerror(-err));
+@@ -1109,7 +1117,7 @@ static DBusMessage *push_mod_src(struct bass_assistant *assistant,
+ 		struct bass_src *src;
  
-+# A device that is already paired is connected instead, see cmd_pair in
-+# client/main.c, so a pairing reports one or the other
-+PAIRED = r"Pairing successful|Connection successful"
-+
-+
- def pair_wait(ctl0, ctl1, pending):
-     """
-     Wait for the given events while answering the pairing requests.
-@@ -326,6 +332,41 @@ def transport_paths():
-     )
+ 		src = queue_remove_if(assistant->srcs, match_src_data,
+-						assistant->data->bass);
++						assistant->bass);
+ 		free(src);
+ 	}
  
+@@ -1210,7 +1218,7 @@ static DBusMessage *push_add_src(struct bass_assistant *assistant,
+ 	util_iov_append(&iov, assistant->meta->iov_base,
+ 				assistant->meta->iov_len);
  
-+@mainloop_wrap
-+def device_properties(paths):
-+    """Properties of the given devices, empty for those that are unknown."""
-+    objects = dbus.Interface(
-+        get_dbus().get_object("org.bluez", "/"),
-+        "org.freedesktop.DBus.ObjectManager",
-+    ).GetManagedObjects()
-+    return {
-+        path: {
-+            str(key): bool(value)
-+            for key, value in objects.get(path, {}).get("org.bluez.Device1", {}).items()
-+            if key in ("Paired", "Connected", "ServicesResolved")
-+        }
-+        for path in paths
-+    }
-+
-+
-+def wait_properties(host, paths, name):
-+    """
-+    Wait for the given property of the given devices to be set.
-+
-+    Polled rather than waited for on the output, as a device that is
-+    already in that state does not report it again.
-+    """
-+    deadline = time.monotonic() + DEFAULT_TIMEOUT
-+
-+    while True:
-+        props = host.call(device_properties, paths)
-+        if all(props[path].get(name) for path in paths):
-+            return
-+
-+        assert time.monotonic() < deadline, f"{name} not set on {paths}: {props}"
-+        time.sleep(0.2)
-+
-+
- def add_preset(ctl, name, props, metadata):
-     """Make a custom preset from a transport's codec configuration and QoS."""
+-	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
++	err = bt_bass_send(assistant->bass, &hdr, &iov);
+ 	if (err) {
+ 		DBG("Unable to send BASS Write Command");
+ 		return btd_error_failed(msg, strerror(-err));
+@@ -1219,7 +1227,7 @@ static DBusMessage *push_add_src(struct bass_assistant *assistant,
+ 	free(iov.iov_base);
  
-@@ -571,6 +612,28 @@ past_host_config = host_config(
+ 	if (assistant->state == ASSISTANT_STATE_LOCAL)
+-		assistant_add_src(assistant, assistant->data->bass, 0);
++		assistant_add_src(assistant, assistant->bass, 0);
+ 	else
+ 		assistant_set_state(assistant, ASSISTANT_STATE_PENDING);
  
- LOCAL_ASSISTANT_RE = r"Assistant (/org/bluez/\S+/sid\d+/bis\d+)"
+@@ -1235,7 +1243,7 @@ static DBusMessage *push_src(struct bass_assistant *assistant,
+ 		struct bass_src *src;
  
-+# Local MediaAssistant object of a given BIS of the local broadcast
-+LOCAL_ASSISTANT = r"Assistant (/org/bluez/hci0/sid\d+/bis{})"
-+
-+
-+def push_assistant(source, assistant_path, host):
-+    """
-+    Share the local stream of the given MediaAssistant object with the
-+    given delegator, which receives the periodic advertising sync over
-+    the connection (PAST).
-+    """
-+    source.send(f"assistant.push {assistant_path}\n")
-+    source.expect(r"Enter Device \(path\):")
-+    source.send(f"/org/bluez/hci0/dev_{dev_addr(host)}\n")
-+
-+    # The local stream may already know the broadcast code
-+    idx, _ = source.expect(
-+        [r"Enter Broadcast Code \(auto/value\):", r"Assistant \S+ pushed"]
-+    )
-+    if idx == 0:
-+        source.send(f"{BCAST_CODE}\n")
-+        source.expect(r"Assistant \S+ pushed")
-+
+ 		src = queue_find(assistant->srcs, match_src_data,
+-						assistant->data->bass);
++						assistant->bass);
+ 		if (src) {
+ 			assistant->src_id = src->src_id;
+ 			return push_mod_src(assistant, msg);
+@@ -1274,7 +1282,7 @@ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+ 	 * be enabled yet and the state changes it triggers, e.g. a request to
+ 	 * transfer the sync info, would be missed.
+ 	 */
+-	data = queue_find(sessions, match_bass, assistant->data->bass);
++	data = queue_find(sessions, match_bass, assistant->bass);
+ 	if (data && !data->ready) {
+ 		DBG("Session not ready, queueing request");
  
- @past_host_config
- def test_bass_past_transport_acquire(hosts):
-@@ -602,17 +665,7 @@ def test_bass_past_transport_acquire(hosts):
+@@ -1391,6 +1399,7 @@ static void assistant_free(void *data)
+ 	util_iov_free(assistant->meta, 1);
+ 	util_iov_free(assistant->caps, 1);
+ 	queue_destroy(assistant->srcs, free);
++	bt_bass_unref(assistant->bass);
  
-     # Share the local broadcast: the delegator receives the periodic
-     # advertising sync over the connection (PAST)
--    source.send(f"assistant.push {assistant_path}\n")
--    source.expect(r"Enter Device \(path\):")
--    source.send(f"/org/bluez/hci0/dev_{dev_addr(delegator_host)}\n")
--
--    # The local stream may already know the broadcast code
--    idx, _ = source.expect(
--        [r"Enter Broadcast Code \(auto/value\):", r"Assistant \S+ pushed"]
--    )
--    if idx == 0:
--        source.send(f"{BCAST_CODE}\n")
--        source.expect(r"Assistant \S+ pushed")
-+    push_assistant(source, assistant_path, delegator_host)
+ 	free(assistant);
+ }
+@@ -2237,7 +2246,7 @@ static void bass_handle_bcode_req(struct bass_assistant *assistant, int id)
  
-     # A transport is created on the delegator, selected and acquired
-     # automatically
-@@ -795,3 +848,107 @@ def test_bap_unicast_set_transport_acquire(set_hosts):
-         [acquired, acquired]
-         + [f"Transport {transport} State: active" for transport in transports],
-     )
+ 	util_iov_push_mem(&iov, sizeof(params), &params);
+ 
+-	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
++	err = bt_bass_send(assistant->bass, &hdr, &iov);
+ 	if (err) {
+ 		DBG("Unable to send BASS Write Command");
+ 		return;
+@@ -2280,6 +2289,14 @@ static void bass_src_changed(uint8_t id, uint32_t bid, uint8_t state,
+ 		struct bass_assistant *assistant = entry->data;
+ 		uint32_t bis = 1 << (assistant->bis - 1);
+ 
++		if (assistant->bass != data->bass)
++			/* Only handle assistant objects that have been
++			 * pushed to the delegator reporting the change,
++			 * otherwise e.g. the Broadcast Code of a request
++			 * would be sent to a different delegator.
++			 */
++			continue;
 +
-+
-+def discover_set(source_host, source, left_host, right_host):
-+    """
-+    Scan until both members of the set have been found.
-+
-+    The set is resolved from the RSI of the members that are already
-+    known, so connecting before both have been found would leave the
-+    one found later out of it.
-+    """
-+    source.send("scan on\n")
-+    source.expect(f"Controller {source_host.bdaddr.upper()} Discovering: yes")
-+
-+    expect_all(
-+        source,
-+        [
-+            f"Device {left_host.bdaddr.upper()}",
-+            f"Device {right_host.bdaddr.upper()}",
-+        ],
-+    )
-+
-+    # Stop scanning before connecting, so the discovery does not
-+    # interfere with the connections to the members
-+    source.send("scan off\n")
-+    source.expect(f"Controller {source_host.bdaddr.upper()} Discovering: no")
-+
-+
-+bass_set_host_config = host_config(
-+    [Bluetoothd(conf=BAP_CONF), Pexpect()],
-+    [Bluetoothd(conf=csip_conf(1)), Pexpect()],
-+    [Bluetoothd(conf=csip_conf(2)), Pexpect()],
-+)
-+
-+
-+@bass_set_host_config
-+def test_bass_past_earbuds_transport_acquire(hosts):
-+    source_host, left_host, right_host = hosts
-+
-+    # Source broadcasting one BIS per channel, with its own streams
-+    # exposed as local MediaAssistant objects, one per BIS
-+    source = start_bluetoothctl(source_host, "broadcast-source-2bis.bt")
-+    groups = expect_all(
-+        source,
-+        [LOCAL_ASSISTANT.format(1), LOCAL_ASSISTANT.format(2), ACQUIRED, ACQUIRED],
-+    )
-+    assistants = [m[0].decode("utf-8") for m in groups[:2]]
-+
-+    # Delegators advertising, selecting and acquiring automatically
-+    left = start_bluetoothctl(left_host, "broadcast-delegator-left.bt")
-+    right = start_bluetoothctl(right_host, "broadcast-delegator-right.bt")
-+
-+    # Every member has to be advertising before connecting, so the set
-+    # can be resolved and the remaining members found
-+    left.expect("Advertising object registered")
-+    right.expect("Advertising object registered")
-+
-+    paths = [
-+        f"/org/bluez/hci0/dev_{dev_addr(host)}" for host in (left_host, right_host)
-+    ]
-+
-+    # The hosts are reused, so a previous test may have left the
-+    # members bonded, in which case they are known already and the
-+    # discovery below would report nothing for them, as only what
-+    # changes is reported: they are connected directly instead.
-+    props = source_host.call(device_properties, paths)
-+
-+    if not all(props[path].get("Paired") for path in paths):
-+        discover_set(source_host, source, left_host, right_host)
-+
-+    # Connecting one member connects the rest of the set, so a single
-+    # request covers both, and pairing a member that is bonded already
-+    # connects it, see cmd_pair in client/main.c
-+    source.send(f"pair {left_host.bdaddr.upper()}\n")
-+    pair_wait(source, left, [PAIRED])
-+
-+    # The Broadcast Receive State of each member is read over its own
-+    # connection, so the services of both have to be resolved, and an
-+    # encrypted link is required for the read to succeed.
-+    #
-+    # Checked over D-Bus rather than waited for on the output, as a
-+    # device whose services are already resolved does not report it
-+    # again, e.g. when the members were bonded already.
-+    wait_properties(source_host, paths, "ServicesResolved")
-+
-+    # One push per member, each carrying the BIS of its own channel:
-+    # BASS has no notion of a set, so the source is added to the
-+    # Broadcast Receive State of each delegator separately, and each of
-+    # them receives the periodic advertising sync over its own ACL
-+    for assistant, host in zip(assistants, (left_host, right_host)):
-+        push_assistant(source, assistant, host)
-+
-+    # A transport is created on each side for the BIS that was pushed
-+    # to it, and selected and acquired automatically
-+    for ctl, host, bis in ((left, left_host, 1), (right, right_host, 2)):
-+        transport = expect_bis_transport(ctl, host, bis)
-+
-+        expect_all(
-+            ctl,
-+            [
-+                ACQUIRED,
-+                f"Transport {transport} State: broadcasting",
-+                f"Transport {transport} State: active",
-+            ],
-+        )
+ 		if (bid && assistant->bid != bid)
+ 			/* Only handle assistant objects
+ 			 * that match the source
 -- 
 2.55.0
 
