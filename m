@@ -1,66 +1,66 @@
-Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+Received: from mail-oi2-f13.google.com (mail-oi2-f13.google.com [74.125.231.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CB744A3E0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 11:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB9F1CAA92
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 11:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789990964; cv=none; b=Jeje1VSv8dGS38E1aNsKmfkMfKzkntwlbKV2Uv+6m/81KfGOH4Y5M8Q2//B5lzlkuBH6eXU6V+VmjUdfo70LmfJuXxZxBH8rPZ6KZ8yOona3+gI/Qu7T63jLB9xwYJziqFMNtmPDfpd62ExGRrqkhfdmpsbcfFhdeyfGec5tXRE=
+	t=1789991077; cv=none; b=fdxRzSXkpDVhbZ/brdCgUeGCfiYhsOj1jaIlkaqYH1MxpGKztGYxDP8sm8SIcEgIucnvzdOZbClUqE4pfP4omg9np0YQAPJkdl8Aw7GJ3EvpNh8fJ3uKZwvF6WtFDftF0Sw2Wq7b7Y9hw2dLP2JhuBZWln+/vmnExtgJr3D3EbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789990964; c=relaxed/simple;
-	bh=aJDx7LcrYksmNsmRE/A6JsdBWCS5UUfOXF09n3MRe7s=;
+	s=arc-20240116; t=1789991077; c=relaxed/simple;
+	bh=y3XlIrsvIdqUKW7kMBY2bN1VgEriEiPbixnA/AwqiSI=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ggeaFDGrgkIL3/hqyifzQT13PjwvtvG+F0BTevhuUT0w/uSSWPaRvbEmt1500WREigPsbzJUzkPdouBie7IQXENavV27SJmihGGLbkwOg3gFCDyhTs1fn3njr2jomCLw11OiwbXWBq8KRd9gdEa6lKUkniCrFEBRBQf+zXOVLNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXD0jhjK; arc=none smtp.client-ip=74.125.228.43
+	 In-Reply-To:References; b=BPJPJXj3unRTPOUE8uks454bLDyEjo3/9y54F0qd8Be9DQZ2BiVDxhEEBqIhOLVjkqOoP3bcV5A5tQpdK5Fw1pwWUooCKe5nXGj9CcewPpcO5j2ZwAzYXG/ZCi8cFC5o/FLzDEt5TvL5junBv4uKyRSAtPsRCwVXxQKtcGWs3ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bWP6n0YS; arc=none smtp.client-ip=74.125.231.205
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXD0jhjK"
-Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-85469b35611so1834325b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 04:42:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWP6n0YS"
+Received: by mail-oi2-f13.google.com with SMTP id 5614622812f47-4b37a36887bso1476126b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 04:44:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789990962; x=1790595762; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789991074; x=1790595874; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=LQbxkqYzxejT8pK3benmla1cFlEVULvOROnPxxopYGg=;
-        b=jXD0jhjK4UHho3f8jh4CH8Q1AbC46n38EkrsrsvDf3VxrRKQUORGfebuMhkq5516w1
-         i9tibBNayCwNr/stw1QfqUUIyPDcR1lYNzGlx9m0qvHuIB8Hqy3sWc1eLQKg5QBVHwcq
-         hTx93yl457xNV0Vi8on/HElYQw/O3v7rFuszS9D/qn/aGBO7Rz682j42iUwrkmxjQA1d
-         juXue6WGD2G8CMnu+xY5EPIloiRvk6if/Leckd62FkBN+DXc+pgOTbDIUGahXwjWuLeS
-         w0lhdk4OcEqJX3OxwyuEUNZ01kMswMRNqAALlaHX21ZJ3iSze1NdkuHUkCdPUFVSNw1S
-         WiNQ==
+        bh=iC399ZF5xA633nIK/7n0mbYJgvJpdHpId9EFRhQw5RQ=;
+        b=bWP6n0YS9ebBecBWj1ig7A8NVH50OwM193ttUqA03dEkqB+jCuBUS7ytK2L2Uqfk1X
+         AJYsMOqaussgRFM/frzGwWnTSVpYmqne1Fk4XhcyEA5p5tEcXOOfjqAQ42L6Hxdq3jF8
+         X+8N3e02+Da39Fzzx7AUKx66NFptoASeO8X2AXGVWG04Y8UxNmFwkt82dWlyw6OXK0L/
+         nJPBgXxROrmG+QaZ8R9m2w8puXXgMaRnm/IrGdOgYFUVmvb+DF1bz1llMECQRdR0xVxM
+         CYgQzSEWg1FYtIsP0uZd7mhO/c5bAQdf6AMslLxCt0bOe6uuauJ6Qw2RezSska+D/tu3
+         V76g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789990962; x=1790595762;
+        d=1e100.net; s=20260707; t=1789991074; x=1790595874;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=LQbxkqYzxejT8pK3benmla1cFlEVULvOROnPxxopYGg=;
-        b=PY01qJvM8tWW/f+GYRDyIwQt20yFyAZpzEbWh3pmG+ldi8FUTg40264rTQoxpiNH9P
-         Up1o90Dq3sOXd0yx67KA4r7WJShFYt243sLWv71cPP6Q2rmhz5WCEGkQbRH8RBEPZn0m
-         Wgl+GZXNX4K967fvaqk5yloKMA1TVCN/ooE3BSaB2o/c+vipbXyqCvL3ZAAdNHlFuabL
-         smxRsnmZdKjuGJ/uoQLnEjYpdFaSwyii3Fl45bFsctauWObFVZ+4Td1I4uGvpMZx0ovA
-         XWMu76R402lbXBVLyXYxHgqAT260fg3oxwZFN1Z8Tw7u3icQ9Dj1w4n3820c/YiNefcz
-         wqGA==
-X-Gm-Message-State: AFuF++nM17rQDYcvXUSVKhNq7pSx3/e46E78y4KXvCagvfucS3ajnqfb
-	TW313rHfG5qCK6tMhJ6ipoB3Xm8qLMX5YkbKLasvTNx6jmQF+8RulQNm6yq3YQ==
-X-Gm-Gg: AYBFou1wy41kAmlbqB13poWObrMldyTY5SKioMTlOTUBryCPHokZLCOcEFihXuGk97C
-	6MDQRimAI2mK3kUQ1/guVcDAIqBprar5F3afJjlF3YcJBMDbAXyl+/M0LBoGBLMUkGo3nKaD7TI
-	oLbm4BAyh+WPcCpDu9SOGT7Y20MEC1q3BYPIiF+r2f4CBEMrDFOIA9oq9Zyoe3gDjItVosSQwuE
-	IWcBPSvuLPX5538cP7RtwZh7bt0SsDquWp3yYj0cbAiOqszrG4ckdsXtH6hcjri7V6p39teed+g
-	sfjfegYlalpMc2Qqcslg3UFSQoe1leiHJ9ImZj/JmfH4zHL+839G658hb8J2raLGWt4A6t0UgR5
-	9YgRVUeNTZfbxUjb6nGOrUt0h7Il5rEIue6aPuHnmNe/jY+5aV3hhD9dkIQbQB1JF9W7nLJJmed
-	rB/xxBx+K8wHp7W8eWpU9kT9UHGlJeP058lZTf/AeRPE6gbnC6cLJy0kNNewK7fPdsFd3QK7qsZ
-	jlbFPwf
-X-Received: by 2002:a05:6a21:6b05:b0:3dd:85a9:559f with SMTP id adf61e73a8af0-3dd8c5960dbmr18735906637.33.1789990961824;
-        Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.247.224])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33c3318c49dsm18991154eec.22.2026.09.21.04.42.41
+        bh=iC399ZF5xA633nIK/7n0mbYJgvJpdHpId9EFRhQw5RQ=;
+        b=aEkw09ga6brSwEooBMD7lzppkDsFQcB3OqlaAMhiVItPdE36HYb0n5MFHEBLF3UM1Z
+         NzNSTE/6X9WRiWJr1bba0aufy+TghdOSIZtwZWrewTrwjeFCWguKdc2QgajubwclBbiX
+         h16FWxXOYB1oMROSznPZeD5Ozoq1CTICnqOdoUUE4uKmg2Hj6uIjTWDKn/Ezl60s+kQO
+         Xg5c/UTie4ROyit8dRw+OJ72bgy1f7cq6+1pIvHj7cRUS3Eo+UIL/qj4ZzQgC2yVXQxE
+         MUU4Wk5aBbDKJColqs+o5XksP/i4H5jtSzzm1S24BzZMAaJRDyXU8tpBeofGa3Ow8e+U
+         as+g==
+X-Gm-Message-State: AFuF++lDJaT4pTMkMWNtZ9XGQwe8aSz+YKHP4GMUzQwEUoEqRVdE6OqK
+	1R0GH99vnW5mKva8p7vI8FNLQGs7yXDoSQHqCMdmPPP9GJItE3RYzY78l9RLvQ==
+X-Gm-Gg: AYBFou3IpEjtZJcWFwb4AfVZQGc0h3gPE7LmiX6AsMThnpHhk1cJcxYOZ9y4mkRTGEY
+	oD3XoU4JmFh3V+iwbW9/Z19e9Ge+fP0xqgfZREqxXsJnDrIDj6zbGElBTfADwSdEqwwTfjaqneC
+	1/pz1LJ2WEFkMdndHOQ+84A3clm9FJ2KRql0hEyBmEI2c773O2P7UlRbBLVUQIgWjJUR1pC3dV5
+	6ae8ckWjY8zoRqnV9ZNuCaSap0i08FpZdhNYdM4WY4I+UYA2E2G6pG8yajmgHP5ltEwXt+DtTp0
+	DQ1OLqjUKSPPUcYmq1A99G9tCx6HYjPSNl8MvRJnFB8zxqpL3uuMXprLf9ulMka1WKtIhLvjW9T
+	apgU/Rk1CwivPiOZ03TowWniYYyOWnw1alCz8C2VD+jZ8ReR4RLOFkwYxXq7vhWOXE3l7I2gOPh
+	wGI2PKLFc9WerkFJLQjXiMUV6y9zovrJpRCCVd4bA9sMWhLlRe9aemRqRNDgkhxCVjTT10+NyKL
+	VWnwq/7
+X-Received: by 2002:a05:6808:6808:b0:4bc:3b8f:2a38 with SMTP id 5614622812f47-4ccf977661cmr11789845b6e.43.1789991074394;
+        Mon, 21 Sep 2026 04:44:34 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.200.214])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4cf3ef44580sm5831032b6e.11.2026.09.21.04.44.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
-Message-ID: <6ab11831.98a076dd.29d9d3.b8d0@mx.google.com>
-Date: Mon, 21 Sep 2026 04:42:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8530060378698035367=="
+        Mon, 21 Sep 2026 04:44:33 -0700 (PDT)
+Message-ID: <6ab118a1.6510e82a.29e60.5c06@mx.google.com>
+Date: Mon, 21 Sep 2026 04:44:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4154921050428468811=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,13 +68,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ravindra@intel.com
-Subject: RE: [v3] Bluetooth: btintel: read ROM debug registers on FW download failure
-In-Reply-To: <20260921054830.2770046-1-ravindra@intel.com>
-References: <20260921054830.2770046-1-ravindra@intel.com>
+To: linux-bluetooth@vger.kernel.org, yanli.yang@bedmex.com
+Subject: RE: Bluetooth: Add AIC8800D80 support
+In-Reply-To: <b6dc98c56da4c5ef8da3fad8004d6e0245a73b2a.1789974593.git.yanli.yang@bedmex.com>
+References: <b6dc98c56da4c5ef8da3fad8004d6e0245a73b2a.1789974593.git.yanli.yang@bedmex.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8530060378698035367==
+--===============4154921050428468811==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -85,61 +85,67 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1170015/
+PW Link:https://patchwork.kernel.org/series/1170116/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      1.09 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       FAIL      0.24 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      29.91 seconds
-CheckAllWarning               PASS      34.05 seconds
-CheckSparse                   PASS      37.61 seconds
-BuildKernel32                 PASS      30.12 seconds
-CheckKernelLLVM               PASS      34.46 seconds
-TestRunnerSetup               PASS      793.74 seconds
-IncrementalBuild              PASS      28.08 seconds
+CheckPatch                    PASS      5.29 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       FAIL      1.00 seconds
+SubjectPrefix                 PASS      0.35 seconds
+BuildKernel                   PASS      28.40 seconds
+CheckAllWarning               PASS      32.90 seconds
+CheckSparse                   PASS      35.55 seconds
+BuildKernel32                 PASS      28.49 seconds
+CheckKernelLLVM               PASS      34.42 seconds
+TestRunnerSetup               PASS      751.80 seconds
+TestRunner_l2cap-tester       PASS      16.32 seconds
+TestRunner_iso-tester         PASS      28.59 seconds
+TestRunner_bnep-tester        PASS      3.14 seconds
+TestRunner_mgmt-tester        FAIL      60.07 seconds
+TestRunner_rfcomm-tester      PASS      4.45 seconds
+TestRunner_sco-tester         PASS      7.54 seconds
+TestRunner_ioctl-tester       PASS      4.62 seconds
+TestRunner_mesh-tester        FAIL      8.76 seconds
+TestRunner_smp-tester         PASS      4.67 seconds
+TestRunner_userchan-tester    PASS      3.20 seconds
+TestRunner_6lowpan-tester     PASS      13.28 seconds
+IncrementalBuild              PASS      33.50 seconds
 
 Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v3] Bluetooth: btintel: read ROM debug registers on FW download failure
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#94: 
-  Bluetooth: Intel get rom debug info: dr0:0x80000001 dr1:0x00000000 dr2:0x00000001 dr3:0x00df0071
-
-total: 0 errors, 1 warnings, 94 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14833867.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
 ##############################
 Test: GitLint - FAIL
 Desc: Run gitlint
 Output:
-[v3] Bluetooth: btintel: read ROM debug registers on FW download failure
+[RFC,v3,2/3] Bluetooth: dt-bindings: Add AIC8800D80
 
-17: B1 Line exceeds max length (98>80): "  Bluetooth: Intel get rom debug info: dr0:0x80000001 dr1:0x00000000 dr2:0x00000001 dr3:0x00df0071"
+18: B1 Line exceeds max length (90>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/aic,aic8800d80-bt.yaml"
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 501, Passed: 496 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.019 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.452 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
 
 
-https://github.com/bluez/bluetooth-next/pull/806
+https://github.com/bluez/bluetooth-next/pull/807
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============8530060378698035367==--
+--===============4154921050428468811==--
