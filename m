@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B9B4A68BC;
-	Mon, 21 Sep 2026 15:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B44E4A8418;
+	Mon, 21 Sep 2026 15:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790003506; cv=none; b=o36sSfhZ9566F5/g0Rd6QUXfFY/K+DaYtFXcgymEpOD6U0t/Fp5pW7au3oYp0p/wwsqScb+GnqxvtSr84HvCy7HBMOTmUsd25JQ+VyUm78IpvlFY3biiMN24l5xQ3CfLu7ttUVcTZIC8i0nX7s4wL61x2IAXclUaJJtRDl61A0g=
+	t=1790003789; cv=none; b=D8hZepv/yLW92kVnBo3HKBA2LNdp5pZ7KIvmLPXM9oJJRocNxQ6i4X59ZdyV4iq4yMOW0FF4mwSOz5DNTP6uKw2Z9HwhZUBw9HuNWaY6X35/+KGI9gP5vPCWsWvb4ug04CW+8LIP+OHWgpPzsPPfVN1iYYXqB19CU/hrl5mihF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790003506; c=relaxed/simple;
+	s=arc-20240116; t=1790003789; c=relaxed/simple;
 	bh=KaqL/InmAr946gzZ9RxUGpN8vi1n6pHbS0s43B6mpvI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NbjMoLYtLWar6z1vO3V61bl8zTNPRsNDcZ9MyB7biz2/tscD4jt7qGO+dbsCH+ou7qAkLSopGtNONZwwWM1DkiDCLdx9vl5cwEmUy0fLmXklFn8T6C2na1n27TK2W2E3ztInQvDNJlV5W09vLxsG1WuWqw6jcyoBxerk0isXAsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YS1ngKlr; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=hCP5ezLd5DaKXFu0SbBtaP39jRgnkj7qkcloYHCsrqD2Zm7gMcf+S6l/8+VXVqJ2n8tz5A0f2f5O2R5bsZNhVJNKnoV3SPtIISmpP5YRdpySZ+gCLwTw2DSmz9GlXIDcBKoszvlT7IBIyLIwDLtDcTCdWKYVSmwogux5gIzRSW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CKoTmb/N; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YS1ngKlr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F38E01F00893;
-	Mon, 21 Sep 2026 15:11:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CKoTmb/N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AFC21F000FF;
+	Mon, 21 Sep 2026 15:16:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790003504;
+	s=k20260515; t=1790003788;
 	bh=pUplAqI0T/vC9i94K4G8o/0LOgXdEtNWcNU4n393ysc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YS1ngKlrpm1CYuXPz5OEzwSDz+KIVNV2eKoR9OnpnrcE33czHGrVKvUzt7RWSimvu
-	 L7BSPx6dohW5SS11PuGr3hWfCxkgEo8y1bLsa0Ac+n4Ir0aOqrk+V6BuIboJYMreJE
-	 kDX7Dh/ir9EQOYWgMUHGCk5cu9CHj/lhQF0QMHCevweglP2HaaLu3kTotkMWp+xKQ+
-	 KY1zZ4WTKEi/ehjdVZYpzKEUWtrrw+NDiU+dIEQkJ833Eykou6gLHzmwqBZ4gfliDY
-	 JfGaluVBow21UkZ4r35/UG6E7oOVYaVN7Gj07PKxl4rGt9QNKj+PAbGB9Birq5vzJP
-	 07TVt3SxErR7g==
-Date: Mon, 21 Sep 2026 17:11:41 +0200
+	b=CKoTmb/N5IutXaJ6GkJU0Cnc+AWqz/iwccCkrzi/u8LlfN8xcTgWj+H3Z18YIMblV
+	 3vBlNk06lwl8VUImPYezIMw5D8D5IxW7qbByHAyrSILJT4EPcnTGGw2iUIXSTZXbST
+	 ZLn2tHwkynbypesH2qaLB1EvpGMISgbnuOh70VT0nhJmXuVoUt3YRNlNPiJW5BLIZe
+	 yzyXDM+5wFdUwk3EpHRjxpBMiwmxbKEJ4gPRZv2JRU200zQztt0S++x3LGCdij6L8M
+	 SvBDzvKfu36uJZ/TTVMyetCyAzQCv7Ii7pep5467+HeVKRSMczV+HCdLTd3IERXhKm
+	 1+mNhUzTMSHJw==
+Date: Mon, 21 Sep 2026 17:16:25 +0200
 From: krzk@kernel.org
 To: Hui Peng <benquike@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, marcel@holtmann.org, 
+	luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: hidp: fix out-of-bounds reads on short frames
  and report_return skb leak
-Message-ID: <arFJLN-u5MuzjjCL@quoll>
+Message-ID: <arFKSC0NALKj3BkD@quoll>
 References: <20260919221741.3709254-1-benquike@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
