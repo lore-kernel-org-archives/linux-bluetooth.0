@@ -1,35 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx5.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606D755292C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 15:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A45954CF6C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 15:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790089287; cv=none; b=sSsUWk72Wcf2xzN/KdWX8w3zQ8/BGwJcUBpup5SXA3QgmNpkz5F8np8pumpk+eX1WjSs+Fp4dE66z/sjPpPDbA07/jPi1HU9dynvTorcJSI4w3IdvupGRHXzhfHixh0KUPnaAxzd4hcygH1R82AHwDeiaXer0EtFuJA1CH60NmI=
+	t=1790089291; cv=none; b=LoFb55pIJpJoH6/RiBUhSHYU/fYYREQe40Prz3ONCDNWbFPXpotT7CtJwTLe8ZIkQi6xkZf8AdWyXDeivxZFgbobx2X2L/Gx3yRfFybAIX3u9GAgMD63Ma8dEpRiDtNNTRcXiXaHaNQ8QHBcNvNQLiItU0Do+VhQIrNYOtXJ1kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790089287; c=relaxed/simple;
-	bh=YKCAhqudMCMfXwyfyLtouwCDR5zpWZvHJ3pBxLDcDuk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pMQXCO0DEP2xeQ1z6M0NX0eECo+z3GM79GMkxlk2mFCOnsVRodOzrTPjIk1RcLzOqM2+apIRshb/Kv4bIYcB6Zlb9JZa0bvq6Wdcx1XjejEksLZhSmZ/a9PJX4DcWrq4b5/Y4l7Bw0eUwa/Bv8NceBwODoeFWRqBYioBJ8iX798=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4nHpSzZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790089291; c=relaxed/simple;
+	bh=CwSHuejyrDyEN+aGJIvukjmzTuBSsgqgeIfYvC5POEs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pNxL+rzWHfsIUJvVwWAGmlG5XxO46zhGnNYzvn8Hf7W0kiiz8Bkxxh5Wzys/2FBNpLpXLkh2EKLEdPjUJsPp/1uBDOFVPsXjUaZqqoIjvcY1AdOr/o2tlrWcUtdNHfaP9p2THucNoqOp8emMvo4/UnBfCoDDhSUeaTh37n6ezxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=RJWx730H; arc=none smtp.client-ip=95.181.183.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4nHpSzZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E1701F000FF;
-	Tue, 22 Sep 2026 15:01:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790089286;
-	bh=x42p5uV605QBbk8AeZnhcLf7dMAHVOREIfb0NGhPu3U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=X4nHpSzZc2IVU+jYHMb6pfzSti6zcyU5x2ERQRT5wxkCnCCGWXqaaVpncgjqCmyiT
-	 ugSWBxKlpYoHWnkBET14QDo174joIQnKhmaooB49LbgeJBrA7fBmYsa60EqNksSYtU
-	 XXqX/TEba0T8ooIQ7sC//JnPCP7vlwtHSz1vTvMQlqo0QzInL7Kid3lEuk1Wm/ijyK
-	 GD99CuVS6M4wchSJmSFDg0DCaEZYKeZn2KVVdScB8aV94wCSC7wYbGCVegPuAK1wyX
-	 oL4SRG1JMwsL7BlEmkuzZNIv10s2Nyxyqtd85I2N9iE2raj/JMUhgWBH0ZeOc2jvtk
-	 VZmEgpGYeg7Kg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 567BF3811A4B;
-	Tue, 22 Sep 2026 15:00:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="RJWx730H"
+Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx5.sberdevices.ru (Postfix) with ESMTP id 8ADC824002B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:01:23 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx5.sberdevices.ru 8ADC824002B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1790089283;
+	bh=JFRa0CinHSoR0HP0S0l71kNWo+3XjnGu3pYwW2ysLhc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=RJWx730HP4BKDsaCxtQTUkndWb3Zvp3qY3oC2is90D6yveHQlpRboWmoKDoyHeQsv
+	 RUD+pNGSSj22CeL0dW7qJSneR5g1z2SVrdbMlE4rau/LVf7/dxE8s8SBnoA1HmRpx+
+	 zShfRl442Rx6GKQUzqymL2aEsbcyPS0MEUyXKC7CeqILw1j26jIAHrz180Os2eit5d
+	 h2Lu5ty6F6o3GL8o55WSugx+3J0byIKzcVw/8UpgOiWiI/ddXQ65dEuQlT1ze4QO7i
+	 E2Zy/4A4YsKjin6ZNQG0y+ku9a7acsJpJ+vJV/yETKtO9cnUUyejinnSviNACrZobG
+	 Ew9yQfXkfvo9A==
+Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "YR2" (not verified))
+	by mx5.sberdevices.ru (Postfix) with ESMTPS
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:01:23 +0300 (MSK)
+From: Pavel Bozhko <pvbozhko@salutedevices.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Pavel Bozhko <pvbozhko@salutedevices.com>
+Subject: [PATCH BlueZ 1/1] audio/avrcp: Add AvrcpVersion config option
+Date: Tue, 22 Sep 2026 18:00:30 +0300
+Message-ID: <20260922150030.26340-2-pvbozhko@salutedevices.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260922150030.26340-1-pvbozhko@salutedevices.com>
+References: <20260922150030.26340-1-pvbozhko@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,52 +51,155 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 0/6] Add true wireless BAP broadcast tests
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179008921688.4126096.7132229331196034449.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Sep 2026 15:00:16 +0000
-References: <20260921210123.3690449-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260921210123.3690449-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: p-exch-cas-s-m1.sberdevices.ru (172.16.210.2) To
+ p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: pvbozhko@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 123 0.3.123 0a3d77c148601a24a80cc37b49c8995c1e141098, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 206173 [Sep 22 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.27
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/09/22 14:27:00 #28611256
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
-Hello:
+Some devices advertise AVRCP 1.3 in SDP but still support absolute
+volume (SetAbsoluteVolume and EVENT_VOLUME_CHANGED), which the
+specification introduced in version 1.4.  Examples include certain
+TVs such as LG webOS UM7450PLA and Xiaomi Mi TV 4A 43 when acting
+as the audio source.
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Add an AvrcpVersion option under [AVRCP] and apply it to the target
+in target_init(), so the version check in avrcp_volume_supported()
+can succeed for such peers.
+---
+ profiles/audio/avrcp.c |  7 +++++++
+ src/btd.h              |  1 +
+ src/main.c             | 32 ++++++++++++++++++++++++++++++++
+ src/main.conf          |  8 ++++++++
+ 4 files changed, 48 insertions(+)
 
-On Mon, 21 Sep 2026 17:01:17 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds functional tests for broadcast setups where the left and the
-> right side are separate devices, as in a pair of earbuds, which so far
-> were only covered with a single sink taking both channels.
-> 
-> The source broadcasts one BIS per channel, and each side registers a
-> single location, so each of them only gets a transport for the BIS
-> carrying its own channel: the sides are told apart by the BIS index of
-> the transport path.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v1,1/6] doc: describe the true wireless broadcast test cases
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=086a30e3cf47
-  - [BlueZ,v1,2/6] doc: describe the true wireless broadcast assistant test case
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4c8102eecc20
-  - [BlueZ,v1,3/6] test: functional: add the true wireless broadcast tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=547afc7ef35c
-  - [BlueZ,v1,4/6] bass: keep the push target per MediaAssistant object
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bb59c19e299f
-  - [BlueZ,v1,5/6] client: connect a device that is already paired
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e691da62c62f
-  - [BlueZ,v1,6/6] test: functional: add the true wireless broadcast assistant test
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=98d6d1350a6a
-
-You are awesome, thank you!
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index df5f97eaf..3c11ac064 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -4304,6 +4304,13 @@ static void target_init(struct avrcp *session)
+ 	target = data_init(session, AVRCP_REMOTE_UUID);
+ 	session->target = target;
+ 
++	if (btd_opts.avrcp.version &&
++			target->version < btd_opts.avrcp.version) {
++		DBG("Forcing AVRCP version 0x%04x (SDP 0x%04x)",
++					btd_opts.avrcp.version, target->version);
++		target->version = btd_opts.avrcp.version;
++	}
++
+ 	DBG("%p version 0x%04x", target, target->version);
+ 
+ 	btd_service_connecting_complete(service, 0);
+diff --git a/src/btd.h b/src/btd.h
+index d70276b1d..4ae46100d 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -124,6 +124,7 @@ struct btd_avdtp_opts {
+ struct btd_avrcp_opts {
+ 	bool		volume_without_target;
+ 	bool		volume_category;
++	uint16_t	version;
+ };
+ 
+ struct btd_advmon_opts {
+diff --git a/src/main.c b/src/main.c
+index c7a55d30f..763fd2c8d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -181,6 +181,7 @@ static const char *avdtp_options[] = {
+ static const char *avrcp_options[] = {
+ 	"VolumeWithoutTarget",
+ 	"VolumeCategory",
++	"AvrcpVersion",
+ 	NULL
+ };
+ 
+@@ -1350,6 +1351,35 @@ static void parse_avdtp(GKeyFile *config)
+ 	parse_avdtp_stream_mode(config);
+ }
+ 
++static void parse_avrcp_version(GKeyFile *config)
++{
++	char *str = NULL;
++	char *endptr = NULL;
++	unsigned int major, minor;
++	unsigned long val;
++	int n = 0;
++
++	if (!parse_config_string(config, "AVRCP", "AvrcpVersion", &str))
++		return;
++
++	if (sscanf(str, "%u.%u%n", &major, &minor, &n) == 2 && !str[n] &&
++					major <= 0xff && minor <= 0xff) {
++		btd_opts.avrcp.version = (major << 8) | minor;
++		g_free(str);
++		return;
++	}
++
++	val = strtoul(str, &endptr, 0);
++	if (endptr && *endptr == '\0' && val > 0 && val <= 0xffff) {
++		btd_opts.avrcp.version = val;
++		g_free(str);
++		return;
++	}
++
++	error("Invalid AVRCP version \"%s\"", str);
++	g_free(str);
++}
++
+ static void parse_avrcp(GKeyFile *config)
+ {
+ 	parse_config_bool(config, "AVRCP",
+@@ -1358,6 +1388,7 @@ static void parse_avrcp(GKeyFile *config)
+ 	parse_config_bool(config, "AVRCP",
+ 		"VolumeCategory",
+ 		&btd_opts.avrcp.volume_category);
++	parse_avrcp_version(config);
+ }
+ 
+ static void parse_advmon(GKeyFile *config)
+@@ -1433,6 +1464,7 @@ static void init_defaults(void)
+ 
+ 	btd_opts.avrcp.volume_without_target = false;
+ 	btd_opts.avrcp.volume_category = true;
++	btd_opts.avrcp.version = 0;
+ 
+ 	btd_opts.advmon.rssi_sampling_period = 0xFF;
+ 	btd_opts.csis.encrypt = true;
+diff --git a/src/main.conf b/src/main.conf
+index 1d8e97dc6..79048ea25 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -380,6 +380,14 @@
+ # notifications.
+ #VolumeCategory = true
+ 
++# Override the AVRCP version used for the local Target role.  Some peers
++# report an older profile version (e.g. 1.3) while still supporting features
++# introduced later, such as absolute volume (SetAbsoluteVolume and
++# EVENT_VOLUME_CHANGED, AVRCP 1.4).
++# Possible values: 1.3, 1.4, 1.5, 1.6 or hexadecimal (e.g. 0x0104).
++# Defaults to using the version from the remote SDP record.
++#AvrcpVersion = 1.4
++
+ [Policy]
+ #
+ # The ReconnectUUIDs defines the set of remote services that should try
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1 (Apple Git-155)
 
