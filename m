@@ -1,69 +1,56 @@
-Received: from sonic308-3.consmr.mail.bf2.yahoo.com (sonic308-3.consmr.mail.bf2.yahoo.com [74.6.130.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A04311977
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 03:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.130.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259923A3815
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 03:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790046088; cv=none; b=OyBp1GWoLfAOEIEMI607DxwX3UBHr//WS9a13zMtNw5+PqH+VoSveILau9PUDcniq159zZLd2lv5K4hfmWNY9DLRqGXHUhkwfeBaNxCp3z1EKCEqXHAcs7hkkCDKvrdl3BF5ISyayGEERgQH6EGPCOCg6lBtbo4EL3Lqz2VOZX4=
+	t=1790046677; cv=none; b=tfqxLy+Pvr7mghpw3D8xnI6x/WiQDeWnUj6xEXBGHhUa+piqkgRcZWp+pqfabNV++/EAzeRp4usdRkrTVdvaZQj1YA1MiCv7nt80O8acqbbNzrXUa26XpN/q/wMYOePDeezDMUe4jrXqC5kQUYTULzr6ebEvzqpmJ1PLAUHBJgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790046088; c=relaxed/simple;
-	bh=M69x0aqCF6oiv3HOsvWjK9BqgjEoU0/1TCky7rbvixM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZAkQ5pNe4BcKeNttdejQzbBwafUjwzR2fZxEJ6W+sIhYyMtLep9Rfbcf641aeNcorubchFIy+RjBfItXzg9jkXsDkJ0OqdeOjqj8jVKDuGwHD7AzSXMOmNfExh4iV0+Ld8HKYdrGT9uMgmGrYJ8BcCYPv8DHJ+Pf7yKDrKRxNPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=IpOucBMq; arc=none smtp.client-ip=74.6.130.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1790046677; c=relaxed/simple;
+	bh=yDSB/QvpZhB36aji7mu4J47AV4InJCzK38MPms4UfIA=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=HWt3AvHVKL12tsaQApbuIB//T4tG/dY3OohIN7TXLaiiSW6hXvH7OlXodUv5xlcX5U3kD9b5SuHYiq28o23GiLVpiSd2nS2V952f/cX+7Qj5nW0ZeTRBX1/8rvaMR8gnmXSeXNkMcBwi04eJwErcrirlSqDkmXjwEwyLv5eAs+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=nh5+6mLL; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="IpOucBMq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1790046085; bh=YEmmChf+epWup6RqSFhltCuFNz7hbH+toteeObo8z7U=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=IpOucBMqznCpj+cwXcdyhJz697cQ9HG6TpYfGPVIUW3lX/vF/ihOvwXDO7z1ZTWJGjSniOMt7PzaAE1fCMZvNWhkD9vB/PAcaGKxPZL1NhSB/ipFjOVCSPMPKzuk1UcV0kGO985WcC5B+KLb8yToWGdK5VlVIyDhN2OWVdSmw24xHYbr0EozrP8J/1sYOtKtMuWkIqWxgO2+WtpSwaaV2+0l47IatJswaIoB8cmiUWBfEMENlZvPRSXTLoUGqwsFxvPZGNsDXjHaQ2Jx2Lv2ZmDEHwbtsvsEldQn36Gr2VOmFsy7Fy6yOcICeEt2DSG/659TfXxFKeL/2iC7Jqwe5A==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1790046085; bh=cqgxfJAexHWpayVSKfBD7tLtyllMQ4Zi36jhPjOOh61=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=M3nKlkSgBOHz8L2iBfBWP4/WhLzp/BgtYpkimfngFPC70NdGred3wB2TIV8VICbnN8ymSN7GYhg06aZvd/rqez+AgSyhiImyPnbxEHCgZy+1kMOIyHjBbhfwBE7Fg11UdavblUvHWx1oZ8pRwGSkZjsFnAsgGUPaQUgSUhA/n7P+Du30UYUFx8uMI1GEXXNUIXe/rHQ94fRdXhON8VPSM6GFloUBEM396h9OBDDhNg9yAR9+7niFpmWPecFeirEvzmo0FG2ndHcDD4CFON3YS5jgENqo++v7HtT/M19/rPnOWq3F/3BHJuVgfEC5WnUu4KY4582pv1rhMTRPLuVPRw==
-X-YMail-OSG: QbjFSMcVM1nVOSqbRC3nzSquDu1JOYFU_hLO_bqUeg5B48wgMRXRylQ9tYOJgfz
- OVmN__V0lkCE0cwWJWlxOkNlvVw_DCKEdAt_j76X50CVsSkBsG5ggXBbF5iiKM2ckcJm3ol_eLe1
- hTlaKh4USwGyB5ZvTIkDgbTGSW4sf_fKwE9jyjO6rR4QCLqFMcdhmtQQEdTesjuEmLUNSdWhwD1f
- WXWNsqWLYAnjI4RqgdFTfaXHhrBebe3QsfjI4wD5byVlRwl8SWkUQW1Ns8EIg8Z5fYI24U9oqCE3
- iVdsxFmhd1IUb9llKI9LUCaAT1bXHbp18_Bq1GrSL0T2Lgt2wVD8GEiLpLF7jR9yXXlNl9dKRZEF
- 9FioHEeBsgnuPgrUduzX_sMbeVYD2Yu8Htv7Y4S1egn.PL54Wi9f8Fl9ljDvGaA_m7r4R9xjd83B
- Ultxy3cCDWHDtrSkUtpdx9ZD9tSqIQRFLVjvjfLwvC.YNinsYZXf3jSYsyZAXaHGGkTS8dtuUV_6
- suwVf5yPivEpmtlSMLBaSYHJUWChWhkYyUyu0kyddBHGF1QxXsUKY2fPJfHeZzpSQ8bVuoiiApWv
- Muc5aAZBZyFxdZKlcUQJa8qN.wnofYbjLCnxSd9GPNlEwFBlqabGbYAUYnllZLX5Dq4rcc0zbwZE
- KPXIyJ_HHHw4X2QeSLECkURWWFa5Z_8nM2y1pbGW7faDe40JuKaHrplefCec20AAaDthlVlohAUs
- I9AE27_.fE5BdRvioCSX9Wjr2LaVwknUtln5TGWEqVtK.c.98VUMv8IB11TjwHEwEbY1caOhhWij
- JgE4JqLWPkh_BSBYkgezd5yZfaxpB84ciN8uQU7mUykgAB6pQIs1SVCzPZoe4bcSyPFoMR_ayN71
- aAIw16TFXUTI3hNLANDp5FHuLpCVwxb9T8c3Mtd7E9zIwfPqAhFfs_GT67fgFNQycb7go6tqKEEs
- OVTS_QIB_IPuaQJ61FQopi_uRxrhLFkdzOvRm.FViYfuSEMClE3Z0w5gktlZdqiye.howDRv26g3
- M99yaPR53Zpzz5.y9PGNJS3mQgbUq3_W54poTsW.b711z6uw8d5su8A16S5raBDPyni2BeWBrn68
- vGenFpi.X4EDP6EJIaMC9oEYQ9m3QXP32MdfFbKHCldUGxlRFY6DmvUsEy21HJhYR_PTRl5snrbl
- OO2iI5U2BuA6syDegO9Vf3vugM.5QZOfqEfhbNh3dZznop1wPCU1vXUvY6hMKsof00K7T1F6bNFo
- ZzmWnBv5iQbUJQ7UUa4V.qkkRVuO3gHFWfJ763hBp4UADr3RxkHMEyl_sXBevjnWZMS17VJ5vmWf
- JJtI3scJ2ZDdfcD4s5PgWcGQfljQU90HWdYKeX586UIyLtBUDEsgJMiWSFZvFL54izLvpU1ek10F
- nSELxN6oCx8N0h7.vnPZNcPMWy3eLO7VISpAtSTPrNjdDn1f5XgTtOBcLUGefDvEMpuqhzIA9qha
- GMA_MAVtdxCQ3zx7GVJf.27HzN.dn_2k0gwPqIL5T5OIZyBKYoalpTzmklCdXEBEi7IRsXlrGvGF
- QIEjEvtIjK4p519uFR.yc2qEF.EzNEP7F3goxFEyawjVxOTgiy_D9VLRT6hB_UnBSpPCpEgft2Rn
- QUtpuFD1PzSt_YBrj73Iwx28hYjYs4N4InF1n7rQt2j5V5RmMYeanF0aUF8YARbfvYe8pVCz7RC8
- xNjH9mwLYbZYDLTsAr97d66b4O0aj5kY.E004ixecCmN.Qhyl3B6XrXStZ41pc8rWLpeTgXz4aP0
- 6iisYqmynNZ3VoaBX5e8Jbs3phH.QVNHMrTPHyKPmyoD3yAeARflYKMMqsY_1og0FEOs4rG4faPA
- y5tK9ElImBx9ColXQ8a.qPAc4B.ine9Y_kJfiUfGopgEeaqsWKTQHtULWIh0KWqQuuoFNCQl0UMO
- vXlPbjTEB5RAZEqqgsgTY3cw3nbZ5Xo6jbXlaHY6MgmXbnMV5d7iQVei8Y6ihIEpqCmwvbA6zpuI
- c.VZhgKVB4LruP4zb6WD9Ac4ejJP6LzBJLzx6c_WsMoFrUWcoAI9lapbQ3f4.nUkv0Es1oMLn9.D
- 0NgcRr7O7xqDpKJmG11dj7FCNdRhVJBO0QPCpRrRKI1hKn4VOJwTf47jMWOCUOanha4HjZWXLXLF
- v6J3dCetSECtaX1_YtFz9fF0Np2CgqEKxPYy0WH4uZGU0iI7AoJTJooB6rDgI5RX78bFDbH6WdOV
- it98Lx8Gn_zHI0A2CcK_xhTt8d0tq
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: e31c7aa3-6d32-413c-b674-226308120b9a
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.bf2.yahoo.com with HTTP; Tue, 22 Sep 2026 03:01:25 +0000
-Received: by hermes--production-bf1-54b5569bdc-ssl2t (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 09a0407219f3495d733b1aa163761047;
-          Tue, 22 Sep 2026 02:40:47 +0000 (UTC)
-From: Jeremy Dean <deaner92@yahoo.com>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="nh5+6mLL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1790046669; bh=VB+P4zcykqaFhKuchSO6MsElU2jECMVD+OiH2ZIcOCc=;
+	h=From:To:Cc:Subject:Date;
+	b=nh5+6mLL9Hxd07TAzzC6oi81YfsqQ0F5kTgA0jF83k+yVG5Z1Tl8wJ7RxGe5BYFUI
+	 PqZR3/LBZOmtLPv36Cb3ZOM4DXGqogwM4eC96mRR2ATEXYGi/0oQaN/x/GhW9JjSZl
+	 uT6mm1XcIv8tulWI7XaB0wJPN90onGlyEZ3S3weA=
+Received: from caitao123456-pc.. ([116.128.244.169])
+	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
+	id 2C710849; Tue, 22 Sep 2026 11:11:07 +0800
+X-QQ-mid: xmsmtpt1790046667tzgqlimca
+Message-ID: <tencent_27EA4A683B87E3DCF400C26D990DD9364507@qq.com>
+X-QQ-XMAILINFO: NsBBv6AnqV8OI4Lj3/ZAkQAWgazZ5vgJ4swDtHSHvRoABmzadpBTQF1vp53fqi
+	 AEv8dbz9CUyf62/R9jVAeIRnkZPYEfpdpata8ihswYp7a5PlZ9gzjah1D5C5Dq/mMvmSXJp3z8El
+	 fTkiD5LtYuf+I7K8WOSEHL1HqyT3cObOGw4cpAhJNIciBY5R/nbvCNBJzLuY0URWvpKmYrYotkqU
+	 QCijWYw4esbZLN9Zq7v31kS74HA5TYTMMypjnM0MUvMvLdGDq7YfTx96aH+uuTDTOG16wZs+vs12
+	 N90YizK4CHT6r/24jw/juBkQAfAOvIQGL3r1/CnClsqBn69Z/332veQ9KS8rhojkJawY7JEarGYv
+	 a/M4FDvfdaoQtrosleh8+BycTC2iD8s/6xUW/A9cfQm3nD96Sf38VrV7UBMWZYwR2PAvYWnomS0h
+	 jvfFxxmyheqfxJ2kz6T9e/Ax4YTJ2zKwG36jH+o9QpOmw+rhU/BHZ6qCUmC/gbIzDWeq/2qRIcLf
+	 ns8IMchl8runkpZT86aem+gTPygIF91uMFW3ro+Yq+WmVFHphXrcKiSAFwPIqoESscSPZ6EJpZTn
+	 wx0YRexKmhPN4DI41mCvsKxgOMFdwf0hHymWXV0TadutCKHhrzPOceoDhk1sUMKxkH3V7OOPkMOt
+	 uv/CxlOEZ9wyitko2vosoYxRLUIe+au30v7wdgl6ZU3TlLsQVEJvuIxfnAM9RYs3Gjb1rpsN1ryY
+	 IhthOUFqUW5AGZOshPim3l+7k/ZH9qUx5ai1137w9mzBoJZ0cKaRNuLiN8AqcgER6l5b/b0M607S
+	 FqNPgDNELEoUA1sYuJ2dbUV2oqTn87Y3YQSrlAn8jtr3pZBrTY4f73pGtdNCApaXqUiMSDbpBL+w
+	 GzNIl1tEhN1Dy6cCjkjcfwweDhiX3PTfV7DzHYBbfXzT/ehF+IjMiSTjbUYM7NhR2sU/JKX/O5Gv
+	 ElUE8oN5PIIGr6GYXPYA87xve+73CUTg9QBPASapVqYyQjvKP7zCMN7uoxWOR8nawJ884EN1nPFK
+	 mNlcq+Z2MxdnyGR8IUW08IXmU9TD+9VYVkDgmSwcXNOg4p4qpw
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+From: Tao Cai <294305068@qq.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel: validate DDC record lengths
-Date: Tue, 22 Sep 2026 02:40:34 +0000
-Message-ID: <20260922024034.2186-1-deaner92@yahoo.com>
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	Tao Cai <294305068@qq.com>
+Subject: [PATCH BlueZ] device: Fix NULL pointer dereference in dev_property_get_uuids
+Date: Tue, 22 Sep 2026 11:10:17 +0800
+X-OQ-MSGID: <20260922031017.104438-1-294305068@qq.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260918083838.23676-1-aluvala.sai.teja@intel.com>
-References: <20260918083838.23676-1-aluvala.sai.teja@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,31 +59,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sai,
+The bluetoothd process crashes during D-Bus property serialization when
+the device UUID list contains a NULL entry. Add a NULL check before
+calling dbus_message_iter_append_basic().
 
-A couple of things could be worth a second look here.
+---
+Crash Stack Trace (BlueZ 5.71 AArch64):
+#0  0x0000ffff8ecfbe98 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
+#1  0x0000ffff8ecfe548 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
+#2  0x0000ffff8ecff120 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
+#3  0x0000ffff8ed005c8 in realloc () at /lib/aarch64-linux-gnu/libc.so.6
+#4  0x0000ffff8f250204 in ??? () at /lib/aarch64-linux-gnu/libdbus-1.so.3
+#5  0x0000ffff8f251c34 in _dbus_string_copy_len () at /lib/aarch64-linux-gnu/libdbus-1.so.3
+#6  0x0000ffff8f254294 in ??? () at /lib/aarch64-linux-gnu/libdbus-1.so.3
+#7  0x0000ffff8f23f968 in _dbus_type_writer_write_basic () at /lib/aarch64-linux-gnu/libdbus-1.so.3
+#8  0x0000ffff8f243208 in dbus_message_iter_append_basic () at /lib/aarch64-linux-gnu/libdbus-1.so.3
+#9  0x0000aaaabe2f64d0 in dev_property_get_uuids (property=<optimized out>, iter=0xffffd510cf28, data=0xaaaac18514e0) at src/device.c:1339
+...
+#21 main (argc=<optimized out>, argv=<optimized out>) at src/main.c:1456
+---
+ src/device.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-cmd_plen is still declared as u8:
+diff --git a/src/device.c b/src/device.c
+index 6d82ea3e2..c5d8e4c6e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1455,9 +1455,13 @@ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
+ 	else
+ 		l = dev->uuids;
+ 
+-	for (; l != NULL; l = l->next)
+-		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+-							&l->data);
++	for (; l != NULL; l = l->next) {
++		const char *uuid = l->data;
++		if (uuid != NULL) {
++			dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++							&uuid);
++		}
++	}
+ 
+ 	dbus_message_iter_close_container(iter, &entry);
+ 
+-- 
+2.43.0
 
-    u8 cmd_plen = fw_ptr[0] + 1U;
-
-The addition itself happens in a wider type due to integer promotion,
-but the result is truncated back down the moment it's stored in
-cmd_plen. 
-
-So if fw_ptr[0] is 0xFF, cmd_plen still wraps to 0, the same
-as before this patch. The commit message says this parses the length
-"in unsigned storage so 0xFF does not wrap". It will wrap as soon as it 
-is placed back into the u8 cmd_plen variable.
-
-It happens to get caught afterward by the cmd_plen < 3 check, 
-since a wrapped value of 0 is less than 3. Is that the intended fix?
-The commit message seems to mismatch what is diffed.
-
-Also, the cmd_plen > U8_MAX check can never be true. Since
-cmd_plen is a u8, its value is bounded by U8_MAX by definition.
-There's no input that will make this branch fire.
-
-Regards,
-Jeremy Dean
-~             
