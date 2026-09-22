@@ -1,84 +1,84 @@
 Received: from mail-vs2-f40.google.com (mail-vs2-f40.google.com [74.125.227.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A0936A017
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 01:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F7736C5BF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 01:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.40
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790039738; cv=pass; b=h02NjRn51/9r1fjAVmDxAOHkgPDaOMvRA+lihAtTw3nY129pwSN+69AIslMBP3zYrbJwWX4NDGQGx+517lMKrEDtxyjxdP6obuToNmS+CtYmgFHJIcpWJNO0BzViEYJ0Jz+DS3PwHOidmwJ4Z2TR26w/7z4NuBsOuXVxhiUtQe8=
+	t=1790039739; cv=pass; b=OLQgG6cnXDxLluWdDSzx74rAOLFI+nmxbf6eVLsfZC8wPs8zz9uy3yU4iqSDQX10uc/LnnAkbsGyyb+qW1IhMr0maTXD3ut5SsdlcWS42ogE1Y8wZi6C+KOHeyXFdvCC07DVPcjgcgxGYoYb08CNpqVtdlrJm2436Wv0xlJDdOw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790039738; c=relaxed/simple;
-	bh=RNxIktQz9Ys8nPNKZ3/5Tq4DO/2Q5ycbmgJVeYdl0Iw=;
+	s=arc-20240116; t=1790039739; c=relaxed/simple;
+	bh=UWclIBpmxPgYztZsO45chnI+sq+qtnZqn1jQ7VJhKy4=;
 	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=KjKUMExUSbThHx+D5zU53X4c3zSutoHAcOYopIKqZLOZXK1wmSuiKjvwb0etaucOld8rzQBB4Mu1sehWLkEf3kR7QHDVn+HEXYv9+JwovbD1U7vmxRBHQsUlF/upt0/A0IBxwO176IKxxFdgbT2R87UkWftcLUXAci0yh/sX9Mo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qP8CPR0r; arc=pass smtp.client-ip=74.125.227.40
+	 To:Content-Type; b=scGofhWYBonEO1zfxvJHbHP2ZqPfu1E4OhhmjO3EPUngw19c5awJF0X4pf3FIMXkHgH/rmF80FjiP2VSGXBBpWAs2+OiAZ+hJIDU8ITXOlCE68miHimvOoSzmaFJjIauMkDXuUeZYmyJUTd/zI0JZovxwgZO1TT7Qemq7e3WnCE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MxpS6Xx8; arc=pass smtp.client-ip=74.125.227.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qP8CPR0r"
-Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9d8b323d9so979206e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 18:15:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790039734; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxpS6Xx8"
+Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9d8b323d9so979212e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 18:15:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790039735; cv=none;
         d=google.com; s=arc-20260327;
-        b=Ep289zQ8RhuypgCKCU5jC/ZqMqpZ1n+l9kjqT2RzbsbM08TEeHyidigzgTYepjC5H9
-         AWqYg1KuU8VkGNmLR4joDWsiFRe6iuBGngOAqmp/8uZCMcZhpleI3225yZhdugQCR7br
-         6OSUEoLPml97JZJzRDs9u6X1o8+FKgpgpT+Th5doJlTGzKw+Fcmr0+Hzxrvt6RfjrY+A
-         lsPHE6bq+w5aAiO9FbDQxQXb2SMIPfhmI01FCw/NdSMf35q9R+qBH3sFfA3lnnHQQLUY
-         Fb0VxMOYDavGZMvh1oXSwQZ2oRnhXlhI7FCvyfvy0PUC0CytSHxUXNDaooTBCWZG0/M8
-         lupA==
+        b=WcNCtmIIPx1eHh9je7nGoD+/4rdU32xIRvuGGm63lLknWQLrpY6UUbh90UU2xSExwB
+         9M3K0+g39vdAXzrdOO0yJYCXQoQklYUzz/AzU6PtAKTcDjHDU8cdTUssZmBPZ9VP2lF0
+         U3iYhzeW2X8nu+8xIOgedGnEQvcatNHXPtK42V1UFlaRns9pSzF1yyKhnJSmA7ru1qHi
+         i2ojq4+QOyX8XE/QxRl4QiC8F3ggYuZMHVLICeMvzBQCoZIgLbcZh3ho4ouSkuKYckZW
+         RIepn3RXyrizBGZdj48nvrnpUM3P1ANO+1wPeZD0TNb9dNf34n5LTIIBSknHB0gl1BJS
+         LVIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=to:subject:message-id:date:from:references:in-reply-to:mime-version
          :dkim-signature;
-        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
+        bh=9PVuIbPluKxAloU9gtVnRyJstTGdPKzl5rAInSTlRdA=;
         fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
-        b=VnpBimUtnU53eMiFKM+LX+CZ3lO2Am75UuxBbU9bBIC2QCuHDobKand7qoGJKaHYpy
-         dlf4x02lU+iG/1svsmPsut5JCyBTkai0tWoUQoBBmY9lK9P0Ghvio4Znz/un3IfxKllo
-         N9utPbXWgw/lSIPICjjedm0sh6Q5vq2BPfnlPzBTgumdA++GVv9e9jfehYnuJD+Y6zYk
-         4h47BrTCVQ9+/elvxztPZMtwwVcNVnCll4cWgwEKDOHjFR7/8Iaj1CPOQEHs+OhtJ+B7
-         6j9C/Dc1LGI+ZhR1dBQpwGuADxwFeiMWWzf+8ghPQofUPTOCzMTx0hPJdSeWSGwMx+LB
-         FY/g==;
+        b=LBViErC3kUec+Iyf2I60csTwJktupd5KCfwPQzqoofsOPFP+LGbFBJAAq2mpzf1YCv
+         f++rvFHRxAQfyyrVuTG9/YTm/3Eqb+EdnOCzqKtusG3FzUpsD08H7idd7jmxIB0eVNwh
+         7+vBVdv41r+DZ7RhllreL4xwMrx8Zb7U7jh+RxPg0eLpKIZmmxIkitPRhiXqa3fD2RDj
+         w+suWdOPOZIIUu8DHbARuYwMTFJEYeEx2ka7GlOBGoezwYKzv5niS45wFYVwe468aqu9
+         MY1GyI6Dj14aS5udSNkgEyXunOcGcTac09WExzuUPZbwTbudjf6vwX0f0bjIdwOEaY6E
+         gchA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790039734; x=1790644534; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790039735; x=1790644535; darn=vger.kernel.org;
         h=content-type:to:subject:message-id:date:from:references:in-reply-to
          :mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
-        b=qP8CPR0r6T43Rn0858Kk/o9YmrkVtqM+rMzekbINB6SStRseI9y9EUv5KEW1iszz25
-         3h5zgIuL9U6nRajqm/ax1vApSQnvW/BzZ5nxGWKhOnpw69BjGvhVbAIOWsMVEYmX3sgA
-         UjoELZ2fiVMDnpNxAPdfgNqvC66BmDv2GTOeed1G6ZPeM7zRjO/D1kIyL+e/tx6mBncU
-         VnXMEreQHaD4t9eff0HT3ua54iOgg0CLXBvhrkHqmtnBl22Z+V6mCN8hEcS83BOrZkeQ
-         gu3UiSVzpfBfUs9EU19uLIwun5f1bYDFO0yEHqP8lcgOgQvnv3Trjt+lA4AgMkQTAACV
-         4tyQ==
+        bh=9PVuIbPluKxAloU9gtVnRyJstTGdPKzl5rAInSTlRdA=;
+        b=MxpS6Xx8EZKyyYE3VwyTrgnJCh2wqP7VhlDIw6LITAtBkdG7Xkykg+VmPZPNCbYrdx
+         WLh4Ak01k10zniLukH27JCJHfS688d5cWF59W2r+AJVIdKGF5t04A7wSgI4T/FgDDPGu
+         2nDtUbt0v+SCBUhKtNOnm392vqaedBhVsMGUakI/jbdKkLRRWG/qYPNlnZPKdLQgRKct
+         CIcHtSmDkdvuap2lyGnUU1pngMDL3o5epXqIcRBNI4kuHz4JTKp2biMVv0tT3TjcjWRW
+         nSz0jj6PNklPREdR0hetDl0c1ganaM8nIbiSY9nMPq1yUYFmzmuDUrr9ptQ5uDD9HsOp
+         iKUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790039734; x=1790644534;
+        d=1e100.net; s=20260707; t=1790039735; x=1790644535;
         h=content-type:to:subject:message-id:date:from:references:in-reply-to
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
-        b=MvqJQlqbpdzwhKneKYDfFh/i1priueQhq2RlUCHzGczJ/HhBuN5J8vQ5il8REOc9NO
-         wU9xRcIPNRaTip7u0VKj9a6klYGhoVyYS1y+orT392sIsz8qfZB+bnFU7qIFWShbWvgk
-         CEAVxT+b/RMQhZ4vsLh+OAWLUrlW3zbfwKVO2a659rK2OBpHxv8YmmSTuoB43+vB0YPy
-         ew7qYNwtR0os17wJqKB64Ww4uBaLRmYmCggSojFRKg9bLYco6/wGbzLp0VGPUAhmZ7/i
-         gTc4uwg6GcHqiy+Uv5g8SOEawe9KeHOCicxgbVHLXr1dxm54Cy8XvmFUkOUcXAaZtDzs
-         lkhg==
-X-Gm-Message-State: AFuF++lmSPnrsPIb2nhF3MpAVlttfNdcu8Ie+01z3R1q/Uz/X2uBM0/S
-	Xq4iXKdoUFXZ/WRLNmRxcUmF8as4S/RTCVcz+J9O9jBz0xFZ6f4hnxhCXkAqwybhZafd6XjRLoN
-	i1j7tSBePMlsHQW/0e/rtlmOyzadZoqb7tw==
-X-Gm-Gg: AYBFou3e7fwxqHoZt9ryaiWz8wV2cTrwxT2DG3N95cWNS/mbdhiR5S/prz0VOM1K2+Y
-	CuLZwmWT3E1BBb0VPV1i9y3afGSr6nmHs9ZWzX8QGAhYstevkuLGrP54PL0RVZOwrqT5SzcD9k9
-	71U5hslHKAt7D21nyTMUHEVsm71JUhdZ8OUZ0A6o2FAAHZfnDMaYWtG+goo6N8bGxSx9F8g0/nY
-	2tb7TVIGOQbb1Ww49iR3YbliqbejgZnFo7D1yoh4igLz611XUv8L8oCBB47Qgyl5sV5jBnYa7o4
-	zryiheMWk79Be5QMFqBJGJhKT0ysWXz1EhEaZPKDjrUS7WKzU3OWn4rkOEJ/WFcQeN6PCUwcViM
-	QG2R7QRMmGHepMaR/JFnH
-X-Received: by 2002:a05:6122:3116:b0:5c9:a60b:e5b1 with SMTP id
- 71dfb90a1353d-5c9b5934364mr7991262e0c.10.1790039734263; Mon, 21 Sep 2026
+        bh=9PVuIbPluKxAloU9gtVnRyJstTGdPKzl5rAInSTlRdA=;
+        b=Asi9adeLfdk55yRursxmmvRuoHNwLpNtzuTMwwZ1mATNhs4xGUKEde3xIvPM4Aa1g8
+         5E2iY/ZP6MN8mX4uwhkGQlTPXIEtrVqYYlKdDI6R/fFy/9x+i8DKJqvmrKdMnnu/SK+O
+         zPRL/3n1kDfD70ZtKYpQsLe1yL5LoXtShUrut6gIxeOpePJeMDPs3Bm6Rfaol6rqvvP2
+         /vWeIxQuq+/aY9/rwJs2wGml2ieEyKuMbMkgrra+uJbp9DE0Fyy7wTqfJxvYHXboQMv3
+         Zy9D4RRRWg5A/1c5yZowj1gAo4UW81SQKAGNhVE/7NcCFL5V/Yqz/0EeCckxZq0NIFvg
+         gj5A==
+X-Gm-Message-State: AFuF++mym+XkbaVoT3GJpk2tfxR9tFwNvRXrcHY0WhdeUBpKZd9AyGyt
+	xRP5APjtviW6BVG54e/QlmMMqve0DdFb/xOzIGG7wQ4XOnqGr/TkKiM12rWpOwePMcE/5YsaTA/
+	JkA/XefcGQoMJ/PXK53u2rJZ+1mRWxPxgSw==
+X-Gm-Gg: AYBFou3tYiwbJc3xaVwhZm7KLxbu0+tnPyFSCTPIY5ICy67BX8TSBHK0Mda3cWnuTR5
+	KJUXsbb3hjYTMutl0gt8XQLLdqYNC0AAjchqrdYI5oREMZxm4YlZ86vAt26fUDKVgGgfER51iSu
+	Stqla61v3nVv1UvScQhXmLzNZASgZ+PEyk0N/p4mkYxKTjJU7AqvCyM4I63aU/+xyD0IBM2AzlJ
+	OFiZcZy49I8+v5OfDzCMCwHg12db1oXZJrd1OWyBf4ZElZ0iCWfngF7wjisbPYwi3+nfnLf8VdA
+	7kXfMKPLwugcpsVl0W6+PWuPOqeyCvpS9MiVZqo9ctacR+Kz7ZVvw68AHAhZZM7tZ7OTpiEoQqA
+	6Y/zXBhg13w==
+X-Received: by 2002:a05:6122:d89:b0:5c9:a60b:e5b3 with SMTP id
+ 71dfb90a1353d-5c9b5933a2cmr8428553e0c.12.1790039734999; Mon, 21 Sep 2026
  18:15:34 -0700 (PDT)
 Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 21 Sep 2026 18:15:33 -0700
+ Mon, 21 Sep 2026 18:15:32 -0700
 Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 21 Sep 2026 18:15:33 -0700
+ Mon, 21 Sep 2026 18:15:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -88,49 +88,195 @@ MIME-Version: 1.0
 In-Reply-To: <CAB2hQnQ+aahjM-Q=1CJx-Ek+icwzNa1LauWDAgtPj6O1G5GSqQ@mail.gmail.com>
 References: <CAB2hQnQ+aahjM-Q=1CJx-Ek+icwzNa1LauWDAgtPj6O1G5GSqQ@mail.gmail.com>
 From: Nicholas Hammond <nicholas.hammond0@gmail.com>
-Date: Mon, 21 Sep 2026 18:15:33 -0700
-X-Gm-Features: AcwNN1VStQeLsvms3401qJwMCuaH2lOQI25bR0HEe2oCUx3IB2msBMTqRsiJKv4
-Message-ID: <CAB2hQnQhLS1Wc0-m=vGiJY-6zdfd0wEjznWouf6+3-f_V85O3Q@mail.gmail.com>
-Subject: [PATCH BlueZ 3/3] build: Register the HoG report lifetime tests
+Date: Mon, 21 Sep 2026 18:15:32 -0700
+X-Gm-Features: AcwNN1XhnciLgJjSBz2OTVI9X50Lg84I3P_nNsj45gaC3twflP_CrxAEZ4I1Ym8
+Message-ID: <CAB2hQnRNL1ivYNupM6fKfP=Z-r-4yQ58NpAUU4WLRFu3qfUPYQ@mail.gmail.com>
+Subject: [PATCH BlueZ 2/3] unit: Test pending HoG reports across detach
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 From: Nick Hammond <blender7@gmail.com>
 
-Build and run test-hog-lifetime with the existing unit test suite. Link
-its support sources without a second copy of hog-lib.c, which the test
-includes to exercise the private report callbacks.
+Exercise the real HoG, GAttrib and ATT implementations with socketpairs
+for ATT and UHID, without requiring a controller or /dev/uhid.
+
+Cover pending reads, READ_BLOB continuations and writes whose responses
+arrive after detach and object destruction. Also check normal completion
+and reuse of a surviving object after detach. Keep another GAttrib
+reference alive to model the connection shared with other profiles.
+
+Include hog-lib.c to construct a single report and invoke its request
+handlers without unrelated service discovery or new production APIs.
+The follow-up build change registers this test with make check.
+
+Without the preceding fix, the three teardown cases fail under
+AddressSanitizer and the reuse case receives a stale reply. All five
+cases pass with the fix and leak detection enabled.
 
 Assisted-by: Codex:gpt-6 AddressSanitizer
 ---
- Makefile.am | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ unit/test-hog-lifetime.c | 152 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 152 insertions(+)
+ create mode 100644 unit/test-hog-lifetime.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 1d46b9b93..87a3b4f64 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -779,6 +779,20 @@ unit_test_hog_SOURCES = unit/test-hog.c \
- unit_test_hog_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
-
-+unit_tests += unit/test-hog-lifetime
+diff --git a/unit/test-hog-lifetime.c b/unit/test-hog-lifetime.c
+new file mode 100644
+index 000000000..53a563c40
+--- /dev/null
++++ b/unit/test-hog-lifetime.c
+@@ -0,0 +1,152 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Regression for outstanding HID report requests surviving detach.
++ * Uses socketpairs and the real HoG/GAttrib/ATT implementation; no hardware.
++ */
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+unit_test_hog_lifetime_SOURCES = unit/test-hog-lifetime.c \
-+			$(btio_sources) \
-+			profiles/input/hog-lib.h \
-+			profiles/scanparam/scpp.h profiles/scanparam/scpp.c \
-+			profiles/battery/bas.h profiles/battery/bas.c \
-+			profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
-+			src/log.h src/log.c \
-+			attrib/att.h attrib/att.c \
-+			attrib/gatt.h attrib/gatt.c \
-+			attrib/gattrib.h attrib/gattrib.c
-+unit_test_hog_lifetime_LDADD = $(unit_test_hog_LDADD)
++#include <errno.h>
++#include <unistd.h>
++#include <sys/socket.h>
 +
- unit_tests += unit/test-gattrib
-
- unit_test_gattrib_SOURCES = unit/test-gattrib.c attrib/gattrib.c \
++#include <glib.h>
++
++#include "profiles/input/hog-lib.c"
++
++static void pump(void)
++{
++	while (g_main_context_iteration(NULL, FALSE))
++		;
++}
++
++static void test_report(gconstpointer data)
++{
++	const char *name = data;
++	bool blob = !strcmp(name, "blob");
++	bool write_test = !strcmp(name, "write");
++	bool normal = !strcmp(name, "normal");
++	bool reconnect = !strcmp(name, "reconnect");
++	int attfd[2], uhidfd[2];
++	GIOChannel *io;
++	GAttrib *attrib;
++	struct bt_hog *hog;
++	struct report *report;
++	struct uhid_event ev = { 0 }, reply;
++	uint8_t pdu[64];
++	uint8_t response[2] = {
++		write_test ? 0x13 : blob ? 0x0d : 0x0b, 0x55
++	};
++	size_t size = write_test ? 1 : 2;
++	ssize_t n;
++
++	g_assert_cmpint(socketpair(AF_UNIX,
++			SOCK_SEQPACKET | SOCK_NONBLOCK, 0, attfd), ==, 0);
++	g_assert_cmpint(socketpair(AF_UNIX,
++			SOCK_SEQPACKET | SOCK_NONBLOCK, 0, uhidfd), ==, 0);
++	io = g_io_channel_unix_new(attfd[0]);
++	g_io_channel_set_close_on_unref(io, TRUE);
++	attrib = g_attrib_new(io, 23, false);
++	g_io_channel_unref(io);
++	hog = bt_hog_new(uhidfd[0], "lifetime-test", 2, 1, 1, 0, NULL);
++	g_assert(hog && attrib);
++	hog->attrib = g_attrib_ref(attrib);
++	report = g_new0(struct report, 1);
++	report->hog = hog;
++	report->type = HOG_REPORT_TYPE_FEATURE;
++	report->value_handle = 0x31;
++	hog->reports = g_slist_append(hog->reports, report);
++
++	if (write_test) {
++		ev.type = UHID_SET_REPORT;
++		ev.u.set_report.id = 123;
++		ev.u.set_report.rtype = UHID_FEATURE_REPORT;
++		ev.u.set_report.size = 1;
++		ev.u.set_report.data[0] = 0x55;
++		set_report(&ev, hog);
++		g_assert(hog->setrep_att != 0);
++	} else {
++		ev.type = UHID_GET_REPORT;
++		ev.u.get_report.id = 123;
++		ev.u.get_report.rtype = UHID_FEATURE_REPORT;
++		get_report(&ev, hog);
++		g_assert(hog->getrep_att != 0);
++	}
++
++	pump();
++	n = read(attfd[1], pdu, sizeof(pdu));
++	g_assert(n >= 3 && pdu[0] == (write_test ? 0x12 : 0x0a));
++
++	if (blob) {
++		uint8_t first[23] = { 0x0b };
++
++		g_assert_cmpint(write(attfd[1], first, sizeof(first)),
++						==, sizeof(first));
++		pump();
++		n = read(attfd[1], pdu, sizeof(pdu));
++		g_assert(n == 5 && pdu[0] == 0x0c);
++	}
++
++	if (!normal) {
++		bt_hog_detach(hog, true);
++
++		if (!reconnect) {
++			bt_hog_unref(hog);
++			hog = NULL;
++		}
++	}
++
++	g_assert(write(attfd[1], response, size) == size);
++	pump();
++	n = read(uhidfd[1], &reply, sizeof(reply));
++
++	if (normal) {
++		g_assert(n == sizeof(reply));
++		g_assert(reply.type == UHID_GET_REPORT_REPLY);
++		g_assert(reply.u.get_report_reply.id == 123);
++		g_assert(reply.u.get_report_reply.err == 0);
++		g_assert(reply.u.get_report_reply.data[0] == 0x55);
++	} else {
++		g_assert(n == -1 && errno == EAGAIN);
++	}
++
++	if (reconnect) {
++		/* Reuse the detached object for another report request. */
++		g_assert(hog->getrep_att == 0 && hog->setrep_att == 0);
++		hog->attrib = g_attrib_ref(attrib);
++		ev.u.get_report.id = 124;
++		get_report(&ev, hog);
++		pump();
++		n = read(attfd[1], pdu, sizeof(pdu));
++		g_assert(n == 3 && pdu[0] == 0x0a);
++		g_assert(write(attfd[1], response, 2) == 2);
++		pump();
++		g_assert_cmpint(read(uhidfd[1], &reply, sizeof(reply)),
++						==, sizeof(reply));
++		g_assert(reply.u.get_report_reply.id == 124);
++		g_assert(reply.u.get_report_reply.err == 0);
++	}
++
++	if (hog)
++		bt_hog_unref(hog);
++
++	g_attrib_unref(attrib);
++	close(attfd[1]);
++	close(uhidfd[0]);
++	close(uhidfd[1]);
++	pump();
++}
++
++int main(int argc, char *argv[])
++{
++	g_test_init(&argc, &argv, NULL);
++
++	g_test_add_data_func("/hog/detach/read", "read", test_report);
++	g_test_add_data_func("/hog/detach/blob", "blob", test_report);
++	g_test_add_data_func("/hog/detach/write", "write", test_report);
++	g_test_add_data_func("/hog/normal", "normal", test_report);
++	g_test_add_data_func("/hog/reconnect", "reconnect", test_report);
++
++	return g_test_run();
++}
 -- 
 2.43.0
 
