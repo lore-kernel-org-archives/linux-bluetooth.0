@@ -1,84 +1,84 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vs2-f40.google.com (mail-vs2-f40.google.com [74.125.227.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC56370AC0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 01:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A0936A017
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 01:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.227.40
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790039737; cv=pass; b=dT/+9jdyFToJ09ymQkbWHS1V64K1e+Ojl9svzhAwGF1i/FcNukj9VSaBrSSxc/YgHtyETQx5T6AaZhAajimCI+RuZtOINZLZAibZ8hUWbLrotV33L35ulALKQXIRXGTk3JBXjcoT22txIlL7vO2vFeoF52TRsyo/8s7T2M6gcSM=
+	t=1790039738; cv=pass; b=h02NjRn51/9r1fjAVmDxAOHkgPDaOMvRA+lihAtTw3nY129pwSN+69AIslMBP3zYrbJwWX4NDGQGx+517lMKrEDtxyjxdP6obuToNmS+CtYmgFHJIcpWJNO0BzViEYJ0Jz+DS3PwHOidmwJ4Z2TR26w/7z4NuBsOuXVxhiUtQe8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790039737; c=relaxed/simple;
-	bh=Uyd2OTvu5O6MaTZX00VeQ96AdLguQq+zOU0EwypyWbc=;
+	s=arc-20240116; t=1790039738; c=relaxed/simple;
+	bh=RNxIktQz9Ys8nPNKZ3/5Tq4DO/2Q5ycbmgJVeYdl0Iw=;
 	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=siZpOXNoiIkc/BCFxN70h03w1CR3nkMTFVOBG8DSH4Jgxe+icVHlsYe10ndVAA+YS1LK2D0fbKgegCHfVWNdcupr5bshq3zaaEuL7r4bgOIK1BReuoa2/+p2KecuSdl5tfsoH4xcxbwQRf93BcdL5uAvIuMzsnDbXinDmkrRTs0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8cguiEC; arc=pass smtp.client-ip=74.125.227.12
+	 To:Content-Type; b=KjKUMExUSbThHx+D5zU53X4c3zSutoHAcOYopIKqZLOZXK1wmSuiKjvwb0etaucOld8rzQBB4Mu1sehWLkEf3kR7QHDVn+HEXYv9+JwovbD1U7vmxRBHQsUlF/upt0/A0IBxwO176IKxxFdgbT2R87UkWftcLUXAci0yh/sX9Mo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qP8CPR0r; arc=pass smtp.client-ip=74.125.227.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8cguiEC"
-Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e4fff62so1354600e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 18:15:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790039732; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qP8CPR0r"
+Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9d8b323d9so979206e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 18:15:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790039734; cv=none;
         d=google.com; s=arc-20260327;
-        b=K1YnMh/jAQ8MUEILjUiU9ajfbZAtEESHprbWixF9Zisdsf2kti12EKm4kP2JtrySt0
-         AxZBNnrWRpQPEIIdIgZW+zU2dDXWnZOr1VCcRDAP3GzMaHQolZ0cQUxM6HzqmOni/CeK
-         RXOmpbmsxUaNHbxP7TJbom9swTMY5Sj8qGEZqyIoLGEf/mw6FZu5A3h35fvKNJwfCNGA
-         8fFkQO4xCoDvboJQt2JwdkvJhTOaOO+ESPrKNe1DbP4swzZ6AZlx5VOHMl6Z7OAMzjvj
-         1fZLnINaSuigZs9qrKwJ+sxVDQMhD4Q06CZq1YM8Ku3No2esat5FaGfBAv/C/ADD6VDR
-         Kz6w==
+        b=Ep289zQ8RhuypgCKCU5jC/ZqMqpZ1n+l9kjqT2RzbsbM08TEeHyidigzgTYepjC5H9
+         AWqYg1KuU8VkGNmLR4joDWsiFRe6iuBGngOAqmp/8uZCMcZhpleI3225yZhdugQCR7br
+         6OSUEoLPml97JZJzRDs9u6X1o8+FKgpgpT+Th5doJlTGzKw+Fcmr0+Hzxrvt6RfjrY+A
+         lsPHE6bq+w5aAiO9FbDQxQXb2SMIPfhmI01FCw/NdSMf35q9R+qBH3sFfA3lnnHQQLUY
+         Fb0VxMOYDavGZMvh1oXSwQZ2oRnhXlhI7FCvyfvy0PUC0CytSHxUXNDaooTBCWZG0/M8
+         lupA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=to:subject:message-id:date:from:references:in-reply-to:mime-version
          :dkim-signature;
-        bh=tIIZOsQtQIwliMFXWp6mvizqCjdWbZZ68uM4ejxmiVE=;
+        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
         fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
-        b=W9Ud1r3NB1456yqElrXFig5S+C5ZNncyJ3RGtzNNONUmR+AVghvWw+gp3G4r/6SfCZ
-         vQzcoPWpODSiUVxeWKAKVhlduYKDCmdBeqeT5xcRdiBcSjmLZh/fIp4GCaAiyMpCCnBw
-         2FCY/5kSld4gqTi0+3/l0Br0UcZR1Z2vA7Hid8EtoCjkymGfzyaa9QQNk2UG0QAtZC4u
-         H529tNKqeiaPmO3skCq3O4otMPfGeG3pn0fanyoTUt1J5wBGAjZZAndGmFu2fFFsrXuE
-         WUv9TTEG8Ws1Px/IofZnw7fFkSowEMPTvWfF1DVm715Xa+uRSbcgkTnRHFxklY7S1z+4
-         wArw==;
+        b=VnpBimUtnU53eMiFKM+LX+CZ3lO2Am75UuxBbU9bBIC2QCuHDobKand7qoGJKaHYpy
+         dlf4x02lU+iG/1svsmPsut5JCyBTkai0tWoUQoBBmY9lK9P0Ghvio4Znz/un3IfxKllo
+         N9utPbXWgw/lSIPICjjedm0sh6Q5vq2BPfnlPzBTgumdA++GVv9e9jfehYnuJD+Y6zYk
+         4h47BrTCVQ9+/elvxztPZMtwwVcNVnCll4cWgwEKDOHjFR7/8Iaj1CPOQEHs+OhtJ+B7
+         6j9C/Dc1LGI+ZhR1dBQpwGuADxwFeiMWWzf+8ghPQofUPTOCzMTx0hPJdSeWSGwMx+LB
+         FY/g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790039732; x=1790644532; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790039734; x=1790644534; darn=vger.kernel.org;
         h=content-type:to:subject:message-id:date:from:references:in-reply-to
          :mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=tIIZOsQtQIwliMFXWp6mvizqCjdWbZZ68uM4ejxmiVE=;
-        b=S8cguiEC/6mrJ0q2O5qiGMA58sVH2/20AT5nDwGEryGm/RpBV9uwnz0yt8N5Ng6lb3
-         vxQxM4nEobVt8w4gVfJk+RGm/YW06fCNz3BcqCbHOtZz9IOz3vyHv2xs35ap1BrEEZgz
-         AshLTLi4qSempV6QqM7Nr7c9htZCr0UfBlUY0YYk3MdCW+/v5DS2g8mi2WknHx3/L0Ec
-         pF8W0ra0w2dumeskvzi3IDeOTVik0++yQV1lpv/J/rx61BRCvWUY7Xu35iLym27J7LsM
-         GTgZlzIsirYTUQ9F2TnGOGFs6gYWMmsV+je/kPc015+4Nw7nJVPqZORmOdSe+ZyNqEJ4
-         55bg==
+        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
+        b=qP8CPR0r6T43Rn0858Kk/o9YmrkVtqM+rMzekbINB6SStRseI9y9EUv5KEW1iszz25
+         3h5zgIuL9U6nRajqm/ax1vApSQnvW/BzZ5nxGWKhOnpw69BjGvhVbAIOWsMVEYmX3sgA
+         UjoELZ2fiVMDnpNxAPdfgNqvC66BmDv2GTOeed1G6ZPeM7zRjO/D1kIyL+e/tx6mBncU
+         VnXMEreQHaD4t9eff0HT3ua54iOgg0CLXBvhrkHqmtnBl22Z+V6mCN8hEcS83BOrZkeQ
+         gu3UiSVzpfBfUs9EU19uLIwun5f1bYDFO0yEHqP8lcgOgQvnv3Trjt+lA4AgMkQTAACV
+         4tyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790039732; x=1790644532;
+        d=1e100.net; s=20260707; t=1790039734; x=1790644534;
         h=content-type:to:subject:message-id:date:from:references:in-reply-to
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=tIIZOsQtQIwliMFXWp6mvizqCjdWbZZ68uM4ejxmiVE=;
-        b=y0H6Ce7Xt3OfYOnB91+de7LPDowZUR0W0mJphdtsM+CiS2hZDLuP+7BHZ7QqJEjJE0
-         eibNyrLWB1zRr67MFQBOY9cr8vVHniJ5uwgSwrkaWe92281VHk3OGOdv/7xUySrHn6aJ
-         RUybhAPeKnpq6Vsm84gtr/JIeF8PEspb6m+m2I761DZ2kiXx0ygJ4FVWc3SuUE4VfgZ0
-         +tQTERP3KQF7V0Uq5++0FEmd/Um/sDve9dm66DteAzdAV0O5KQRK+PPbWFsHCvaDIXDk
-         wsyQgCD3F5GE9KKZzC2ppnYzDwkyR4Dn/81KL+zWS5atV4cTTH0lSqwq8ZoSiIXANXVb
-         qmmg==
-X-Gm-Message-State: AFuF++mA8XeTDFk+GJFrCAmzND7VxBrqRAleZrBNzaaJp863Y71/JOK1
-	eUkpSNtbD8R/w+Hs89THNbDFv0CF2aBQejyJXc9UCrWr3G7FomhNgvgGcd+Fa576l2qD2F7JVUC
-	StTz50yOU33VTibkAzOJUyfVHD4YCS9Z2Ag==
-X-Gm-Gg: AYBFou1zaHB66M60wvOvCtbmuc8RCUS+MaJ43klgvuefGaE48+eei9Qb+/CeCzZMpuL
-	CYyoyleycj3SqJpJpQmwFugcRHJRobTPBsKzZ75nHZhWvDiUs1/6vwxQtW8cwIhxkTgiXkZ6fFF
-	YRPQWUy5yV7Q2nZauCy8veUeoVlb/TQieITOkuzpJHpVCfcPOZ+OgHGN2O1LAIjViBJH5ykQtw7
-	tMLWpqBdS87RnKt778kQkV3f+f67OReHcFnYzIbGVOq3fZzYCmxH4O+EJC05rYJ5JUxUrMQSWHn
-	LnX0DFugBZVZScne6pvVlZc2TGhnLfsIQzxHhQCMIKveUH7QK0k9p2l7hLXMwWgoDixnsoa6U89
-	w6zryiX2BBg==
-X-Received: by 2002:a05:6122:181a:b0:5c9:a60b:e5bf with SMTP id
- 71dfb90a1353d-5c9b5980fb9mr6852927e0c.15.1790039732089; Mon, 21 Sep 2026
- 18:15:32 -0700 (PDT)
+        bh=IsuAIO48ThaF0LOYLKvmy4Op4I9kTbXd9bEW/0x9Fck=;
+        b=MvqJQlqbpdzwhKneKYDfFh/i1priueQhq2RlUCHzGczJ/HhBuN5J8vQ5il8REOc9NO
+         wU9xRcIPNRaTip7u0VKj9a6klYGhoVyYS1y+orT392sIsz8qfZB+bnFU7qIFWShbWvgk
+         CEAVxT+b/RMQhZ4vsLh+OAWLUrlW3zbfwKVO2a659rK2OBpHxv8YmmSTuoB43+vB0YPy
+         ew7qYNwtR0os17wJqKB64Ww4uBaLRmYmCggSojFRKg9bLYco6/wGbzLp0VGPUAhmZ7/i
+         gTc4uwg6GcHqiy+Uv5g8SOEawe9KeHOCicxgbVHLXr1dxm54Cy8XvmFUkOUcXAaZtDzs
+         lkhg==
+X-Gm-Message-State: AFuF++lmSPnrsPIb2nhF3MpAVlttfNdcu8Ie+01z3R1q/Uz/X2uBM0/S
+	Xq4iXKdoUFXZ/WRLNmRxcUmF8as4S/RTCVcz+J9O9jBz0xFZ6f4hnxhCXkAqwybhZafd6XjRLoN
+	i1j7tSBePMlsHQW/0e/rtlmOyzadZoqb7tw==
+X-Gm-Gg: AYBFou3e7fwxqHoZt9ryaiWz8wV2cTrwxT2DG3N95cWNS/mbdhiR5S/prz0VOM1K2+Y
+	CuLZwmWT3E1BBb0VPV1i9y3afGSr6nmHs9ZWzX8QGAhYstevkuLGrP54PL0RVZOwrqT5SzcD9k9
+	71U5hslHKAt7D21nyTMUHEVsm71JUhdZ8OUZ0A6o2FAAHZfnDMaYWtG+goo6N8bGxSx9F8g0/nY
+	2tb7TVIGOQbb1Ww49iR3YbliqbejgZnFo7D1yoh4igLz611XUv8L8oCBB47Qgyl5sV5jBnYa7o4
+	zryiheMWk79Be5QMFqBJGJhKT0ysWXz1EhEaZPKDjrUS7WKzU3OWn4rkOEJ/WFcQeN6PCUwcViM
+	QG2R7QRMmGHepMaR/JFnH
+X-Received: by 2002:a05:6122:3116:b0:5c9:a60b:e5b1 with SMTP id
+ 71dfb90a1353d-5c9b5934364mr7991262e0c.10.1790039734263; Mon, 21 Sep 2026
+ 18:15:34 -0700 (PDT)
 Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 21 Sep 2026 18:15:31 -0700
+ Mon, 21 Sep 2026 18:15:33 -0700
 Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Mon, 21 Sep 2026 18:15:31 -0700
+ Mon, 21 Sep 2026 18:15:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -88,59 +88,49 @@ MIME-Version: 1.0
 In-Reply-To: <CAB2hQnQ+aahjM-Q=1CJx-Ek+icwzNa1LauWDAgtPj6O1G5GSqQ@mail.gmail.com>
 References: <CAB2hQnQ+aahjM-Q=1CJx-Ek+icwzNa1LauWDAgtPj6O1G5GSqQ@mail.gmail.com>
 From: Nicholas Hammond <nicholas.hammond0@gmail.com>
-Date: Mon, 21 Sep 2026 18:15:31 -0700
-X-Gm-Features: AcwNN1VCXkET3qfwFlICySdjl3eiG5d9CTA3sCL8UnrtBViCQhFQD2rGQ4SS9kc
-Message-ID: <CAB2hQnT9LEYHqAk2k5=C9o32JBN3PHb9URLpA_Srw35dEdvGLQ@mail.gmail.com>
-Subject: [PATCH BlueZ 1/3] input/hog: Cancel pending report requests on detach
+Date: Mon, 21 Sep 2026 18:15:33 -0700
+X-Gm-Features: AcwNN1VStQeLsvms3401qJwMCuaH2lOQI25bR0HEe2oCUx3IB2msBMTqRsiJKv4
+Message-ID: <CAB2hQnQhLS1Wc0-m=vGiJY-6zdfd0wEjznWouf6+3-f_V85O3Q@mail.gmail.com>
+Subject: [PATCH BlueZ 3/3] build: Register the HoG report lifetime tests
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 From: Nick Hammond <blender7@gmail.com>
 
-GET_REPORT and SET_REPORT requests are tracked by getrep_att and
-setrep_att rather than gatt_op. Cancelling gatt_op during detach leaves
-these callbacks registered on the shared GAttrib connection.
-
-A reply delivered after the HoG object is freed can therefore access a
-freed report in get_report_cb or a freed hog in set_report_cb. A long
-GET_REPORT read can also retain its callback through a READ_BLOB
-continuation. If the HoG object survives detach, the callback can instead
-send a stale UHID reply.
-
-Cancel both outstanding requests before releasing attrib and clear their
-IDs so a later attachment starts without stale request state.
-
-This was investigated following a bluetoothd crash on Ubuntu BlueZ 5.72
-during keyboard reconnection. A socketpair regression reproduces the
-use-after-free on current master with AddressSanitizer as well.
+Build and run test-hog-lifetime with the existing unit test suite. Link
+its support sources without a second copy of hog-lib.c, which the test
+includes to exercise the private report callbacks.
 
 Assisted-by: Codex:gpt-6 AddressSanitizer
 ---
- profiles/input/hog-lib.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ Makefile.am | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index 054356371..6c75c607f 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -1896,6 +1896,17 @@ void bt_hog_detach(struct bt_hog *hog, bool force)
- 	if (hog->dis)
- 		bt_dis_detach(hog->dis);
+diff --git a/Makefile.am b/Makefile.am
+index 1d46b9b93..87a3b4f64 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -779,6 +779,20 @@ unit_test_hog_SOURCES = unit/test-hog.c \
+ unit_test_hog_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la $(GLIB_LIBS)
 
-+	/* Report requests are tracked separately from gatt_op. */
-+	if (hog->getrep_att) {
-+		g_attrib_cancel(hog->attrib, hog->getrep_att);
-+		hog->getrep_att = 0;
-+	}
++unit_tests += unit/test-hog-lifetime
 +
-+	if (hog->setrep_att) {
-+		g_attrib_cancel(hog->attrib, hog->setrep_att);
-+		hog->setrep_att = 0;
-+	}
++unit_test_hog_lifetime_SOURCES = unit/test-hog-lifetime.c \
++			$(btio_sources) \
++			profiles/input/hog-lib.h \
++			profiles/scanparam/scpp.h profiles/scanparam/scpp.c \
++			profiles/battery/bas.h profiles/battery/bas.c \
++			profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
++			src/log.h src/log.c \
++			attrib/att.h attrib/att.c \
++			attrib/gatt.h attrib/gatt.c \
++			attrib/gattrib.h attrib/gattrib.c
++unit_test_hog_lifetime_LDADD = $(unit_test_hog_LDADD)
 +
- 	queue_remove_all(hog->gatt_op, cancel_gatt_req, hog, destroy_gatt_req);
- 	g_attrib_unref(hog->attrib);
- 	hog->attrib = NULL;
+ unit_tests += unit/test-gattrib
+
+ unit_test_gattrib_SOURCES = unit/test-gattrib.c attrib/gattrib.c \
 -- 
 2.43.0
 
