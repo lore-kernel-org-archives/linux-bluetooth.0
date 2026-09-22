@@ -1,107 +1,132 @@
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259923A3815
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 03:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08354AA419
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 06:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790046677; cv=none; b=tfqxLy+Pvr7mghpw3D8xnI6x/WiQDeWnUj6xEXBGHhUa+piqkgRcZWp+pqfabNV++/EAzeRp4usdRkrTVdvaZQj1YA1MiCv7nt80O8acqbbNzrXUa26XpN/q/wMYOePDeezDMUe4jrXqC5kQUYTULzr6ebEvzqpmJ1PLAUHBJgE=
+	t=1790057738; cv=none; b=Pt+rHPEEz0JDE5OZUX7z6RwlQKEiJfl8jYqxF1hzgjB2AIb8TTSZ/5xxD25kHju14fWhLl6OvqoZYc6XoGj7vC/i867PnU/bj1joAPMSgtVPid0t+uTPRZoe3xpFLAoV6MHOz1HE6JPr93086WIv6FY8cfkZL5kyscx4/jVz0js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790046677; c=relaxed/simple;
-	bh=yDSB/QvpZhB36aji7mu4J47AV4InJCzK38MPms4UfIA=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=HWt3AvHVKL12tsaQApbuIB//T4tG/dY3OohIN7TXLaiiSW6hXvH7OlXodUv5xlcX5U3kD9b5SuHYiq28o23GiLVpiSd2nS2V952f/cX+7Qj5nW0ZeTRBX1/8rvaMR8gnmXSeXNkMcBwi04eJwErcrirlSqDkmXjwEwyLv5eAs+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=nh5+6mLL; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1790057738; c=relaxed/simple;
+	bh=0h3wyvz7+XebApSKmIxqNuKHiFlD5/dJmalJqXLCz5s=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UbWj55R3pB35KDC5jlsj24JNC+9ToJmYMouOp+VjuagQFvDv9luA0b8AKNnhpYyXKgdIP6cUlLquCXOaEPcfEEx83F9Y5iyjFzekfenYoCDyXJRqg3uwaik05ADVQ+Um1nLa/KsFKedQECfZmEUeWslV8yTEc8pxJ2EjOPH8L0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YyKH34fY; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="nh5+6mLL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1790046669; bh=VB+P4zcykqaFhKuchSO6MsElU2jECMVD+OiH2ZIcOCc=;
-	h=From:To:Cc:Subject:Date;
-	b=nh5+6mLL9Hxd07TAzzC6oi81YfsqQ0F5kTgA0jF83k+yVG5Z1Tl8wJ7RxGe5BYFUI
-	 PqZR3/LBZOmtLPv36Cb3ZOM4DXGqogwM4eC96mRR2ATEXYGi/0oQaN/x/GhW9JjSZl
-	 uT6mm1XcIv8tulWI7XaB0wJPN90onGlyEZ3S3weA=
-Received: from caitao123456-pc.. ([116.128.244.169])
-	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
-	id 2C710849; Tue, 22 Sep 2026 11:11:07 +0800
-X-QQ-mid: xmsmtpt1790046667tzgqlimca
-Message-ID: <tencent_27EA4A683B87E3DCF400C26D990DD9364507@qq.com>
-X-QQ-XMAILINFO: NsBBv6AnqV8OI4Lj3/ZAkQAWgazZ5vgJ4swDtHSHvRoABmzadpBTQF1vp53fqi
-	 AEv8dbz9CUyf62/R9jVAeIRnkZPYEfpdpata8ihswYp7a5PlZ9gzjah1D5C5Dq/mMvmSXJp3z8El
-	 fTkiD5LtYuf+I7K8WOSEHL1HqyT3cObOGw4cpAhJNIciBY5R/nbvCNBJzLuY0URWvpKmYrYotkqU
-	 QCijWYw4esbZLN9Zq7v31kS74HA5TYTMMypjnM0MUvMvLdGDq7YfTx96aH+uuTDTOG16wZs+vs12
-	 N90YizK4CHT6r/24jw/juBkQAfAOvIQGL3r1/CnClsqBn69Z/332veQ9KS8rhojkJawY7JEarGYv
-	 a/M4FDvfdaoQtrosleh8+BycTC2iD8s/6xUW/A9cfQm3nD96Sf38VrV7UBMWZYwR2PAvYWnomS0h
-	 jvfFxxmyheqfxJ2kz6T9e/Ax4YTJ2zKwG36jH+o9QpOmw+rhU/BHZ6qCUmC/gbIzDWeq/2qRIcLf
-	 ns8IMchl8runkpZT86aem+gTPygIF91uMFW3ro+Yq+WmVFHphXrcKiSAFwPIqoESscSPZ6EJpZTn
-	 wx0YRexKmhPN4DI41mCvsKxgOMFdwf0hHymWXV0TadutCKHhrzPOceoDhk1sUMKxkH3V7OOPkMOt
-	 uv/CxlOEZ9wyitko2vosoYxRLUIe+au30v7wdgl6ZU3TlLsQVEJvuIxfnAM9RYs3Gjb1rpsN1ryY
-	 IhthOUFqUW5AGZOshPim3l+7k/ZH9qUx5ai1137w9mzBoJZ0cKaRNuLiN8AqcgER6l5b/b0M607S
-	 FqNPgDNELEoUA1sYuJ2dbUV2oqTn87Y3YQSrlAn8jtr3pZBrTY4f73pGtdNCApaXqUiMSDbpBL+w
-	 GzNIl1tEhN1Dy6cCjkjcfwweDhiX3PTfV7DzHYBbfXzT/ehF+IjMiSTjbUYM7NhR2sU/JKX/O5Gv
-	 ElUE8oN5PIIGr6GYXPYA87xve+73CUTg9QBPASapVqYyQjvKP7zCMN7uoxWOR8nawJ884EN1nPFK
-	 mNlcq+Z2MxdnyGR8IUW08IXmU9TD+9VYVkDgmSwcXNOg4p4qpw
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-From: Tao Cai <294305068@qq.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YyKH34fY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1790057725;
+	bh=VGd8sZKyMYtsOdx2/gQ8D1V2OGdqXZjp04vY34nWCJo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YyKH34fYM2zTyQ5NnT10ZohcZ4uAr0/37emfO9T/4CuOFLQFcrC8f7vvUsOO5zOGm
+	 SM87WudW+dNb7L0M/f2RBmCfEgl60KZ53JnXE+zGrqTwYIehJXZaEccm7EAAsQVMr6
+	 6uru+Hj1miIa71SSPZtiDJ89jDuT0YySAd52hCmg=
+Received: from github.com (hubbernetes-node-c304087.ac4-iad.github.net [10.52.148.30])
+	by smtp.github.com (Postfix) with ESMTPA id 84F20A1317
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 23:15:25 -0700 (PDT)
+Date: Mon, 21 Sep 2026 23:15:25 -0700
+From: birddog87 <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	Tao Cai <294305068@qq.com>
-Subject: [PATCH BlueZ] device: Fix NULL pointer dereference in dev_property_get_uuids
-Date: Tue, 22 Sep 2026 11:10:17 +0800
-X-OQ-MSGID: <20260922031017.104438-1-294305068@qq.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/1170874/000000-8fb194@github.com>
+Subject: [bluez/bluez] 5e5bca: input/hog: Cancel pending report requests on
+ detach
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-The bluetoothd process crashes during D-Bus property serialization when
-the device UUID list contains a NULL entry. Add a NULL check before
-calling dbus_message_iter_append_basic().
+  Branch: refs/heads/1170874
+  Home:   https://github.com/bluez/bluez
+  Commit: 5e5bca93ee19f1097efe6b8bbe799e8abe4219b8
+      https://github.com/bluez/bluez/commit/5e5bca93ee19f1097efe6b8bbe799e8abe4219b8
+  Author: Nick Hammond <blender7@gmail.com>
+  Date:   2026-09-22 (Tue, 22 Sep 2026)
 
----
-Crash Stack Trace (BlueZ 5.71 AArch64):
-#0  0x0000ffff8ecfbe98 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
-#1  0x0000ffff8ecfe548 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
-#2  0x0000ffff8ecff120 in ??? () at /lib/aarch64-linux-gnu/libc.so.6
-#3  0x0000ffff8ed005c8 in realloc () at /lib/aarch64-linux-gnu/libc.so.6
-#4  0x0000ffff8f250204 in ??? () at /lib/aarch64-linux-gnu/libdbus-1.so.3
-#5  0x0000ffff8f251c34 in _dbus_string_copy_len () at /lib/aarch64-linux-gnu/libdbus-1.so.3
-#6  0x0000ffff8f254294 in ??? () at /lib/aarch64-linux-gnu/libdbus-1.so.3
-#7  0x0000ffff8f23f968 in _dbus_type_writer_write_basic () at /lib/aarch64-linux-gnu/libdbus-1.so.3
-#8  0x0000ffff8f243208 in dbus_message_iter_append_basic () at /lib/aarch64-linux-gnu/libdbus-1.so.3
-#9  0x0000aaaabe2f64d0 in dev_property_get_uuids (property=<optimized out>, iter=0xffffd510cf28, data=0xaaaac18514e0) at src/device.c:1339
-...
-#21 main (argc=<optimized out>, argv=<optimized out>) at src/main.c:1456
----
- src/device.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+  Changed paths:
+    M profiles/input/hog-lib.c
 
-diff --git a/src/device.c b/src/device.c
-index 6d82ea3e2..c5d8e4c6e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1455,9 +1455,13 @@ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
- 	else
- 		l = dev->uuids;
- 
--	for (; l != NULL; l = l->next)
--		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
--							&l->data);
-+	for (; l != NULL; l = l->next) {
-+		const char *uuid = l->data;
-+		if (uuid != NULL) {
-+			dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+							&uuid);
-+		}
-+	}
- 
- 	dbus_message_iter_close_container(iter, &entry);
- 
--- 
-2.43.0
+  Log Message:
+  -----------
+  input/hog: Cancel pending report requests on detach
 
+GET_REPORT and SET_REPORT requests are tracked by getrep_att and
+setrep_att rather than gatt_op. Cancelling gatt_op during detach leaves
+these callbacks registered on the shared GAttrib connection.
+
+A reply delivered after the HoG object is freed can therefore access a
+freed report in get_report_cb or a freed hog in set_report_cb. A long
+GET_REPORT read can also retain its callback through a READ_BLOB
+continuation. If the HoG object survives detach, the callback can instead
+send a stale UHID reply.
+
+Cancel both outstanding requests before releasing attrib and clear their
+IDs so a later attachment starts without stale request state.
+
+This was investigated following a bluetoothd crash on Ubuntu BlueZ 5.72
+during keyboard reconnection. A socketpair regression reproduces the
+use-after-free on current master with AddressSanitizer as well.
+
+Assisted-by: Codex:gpt-6 AddressSanitizer
+
+
+  Commit: 6286e10b54a581740fe7c974d8da3b488a50a724
+      https://github.com/bluez/bluez/commit/6286e10b54a581740fe7c974d8da3b488a50a724
+  Author: Nick Hammond <blender7@gmail.com>
+  Date:   2026-09-22 (Tue, 22 Sep 2026)
+
+  Changed paths:
+    A unit/test-hog-lifetime.c
+
+  Log Message:
+  -----------
+  unit: Test pending HoG reports across detach
+
+Exercise the real HoG, GAttrib and ATT implementations with socketpairs
+for ATT and UHID, without requiring a controller or /dev/uhid.
+
+Cover pending reads, READ_BLOB continuations and writes whose responses
+arrive after detach and object destruction. Also check normal completion
+and reuse of a surviving object after detach. Keep another GAttrib
+reference alive to model the connection shared with other profiles.
+
+Include hog-lib.c to construct a single report and invoke its request
+handlers without unrelated service discovery or new production APIs.
+The follow-up build change registers this test with make check.
+
+Without the preceding fix, the three teardown cases fail under
+AddressSanitizer and the reuse case receives a stale reply. All five
+cases pass with the fix and leak detection enabled.
+
+Assisted-by: Codex:gpt-6 AddressSanitizer
+
+
+  Commit: 8fb194ba6d72dab24450271e8e14972d8ef22318
+      https://github.com/bluez/bluez/commit/8fb194ba6d72dab24450271e8e14972d8ef22318
+  Author: Nick Hammond <blender7@gmail.com>
+  Date:   2026-09-22 (Tue, 22 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+
+  Log Message:
+  -----------
+  build: Register the HoG report lifetime tests
+
+Build and run test-hog-lifetime with the existing unit test suite. Link
+its support sources without a second copy of hog-lib.c, which the test
+includes to exercise the private report callbacks.
+
+Assisted-by: Codex:gpt-6 AddressSanitizer
+
+
+Compare: https://github.com/bluez/bluez/compare/5e5bca93ee19%5E...8fb194ba6d72
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
