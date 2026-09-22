@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64907552956;
-	Tue, 22 Sep 2026 15:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5099554090
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 15:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790089280; cv=none; b=McpvXsNOnhF61bclgmAcWIXMBJD25XT0/TDwR1P/BehiVJBhQoApZW6ALc3P4ioFpTcNep5iYuD+SZVnbMxRXuTqfnez3ue87U+8ekVikbYxXcdYqY0dnwbMfbOGsbkG7gTfpfaNHKxij/eBe4EzcKiTt1gcW3ou0iuBHX8fqs8=
+	t=1790089282; cv=none; b=u7eyF8fWaAj7BvsK1qiJXhq/WM38S5KIuI/xGBaMsjL0MqPlEwf7gRzUZDRBEdX4WTGW2r/5cdE8bniM2MLAD1GaZGsW/WuTrL04kb/krSUJFteN+oERjAA/G0fXm/insM05zqKaH01K96F3ehddOrD7UAywmP2WBOn0WJCAVZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790089280; c=relaxed/simple;
-	bh=ZpI5mIjmV46iqD++tBY206x/Udwgi0fzSLq0wOO5V+U=;
+	s=arc-20240116; t=1790089282; c=relaxed/simple;
+	bh=vvo3M+oQyasOstHhlX21hyU252HO+79FJHxEUyjjGJk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AaCfySk0MLWTuQVF2JAc62vPhIGpF4p36Qpw6iPV7jRwlotFOAETSnS37CxsJGbOGYEhMq7oB02kAfJYSVN+ykEjtTS2aQaFiP8Gujv0rwBTaP7/6LgRLAr7ehJGfBRqFaPy5TET3xwZAld6JwkhKnucHPW6O+IKy2rePig/mS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B26CdTGW; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=s5VKMOttWfqxUjPUnA7+zym+ljf7AnaNmFMZBISD2sJ0GPVY7ot4W0crmTbPbdJyq8dOcQ0zXVO2zw8DFmiP7cuEBKFDiwaJpAXZKMk06qysi0eQPlU/o9I4K5Ri3TMQlGtKblJC97CDYB2ugtCZyi75poEDhx+xlSbX/7lDoG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CPvYVvMK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B26CdTGW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A66F1F000FF;
-	Tue, 22 Sep 2026 15:01:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CPvYVvMK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08A31F000FF;
+	Tue, 22 Sep 2026 15:01:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790089279;
-	bh=7oMw4XnCSKbkwDJXFO11SnmPfzz/ci+tLNPOI24UQRI=;
+	s=k20260515; t=1790089280;
+	bh=yn7aVbY41Ibq0pui9j4NZSAnTGyDkuhXxPYplM813SU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=B26CdTGW7eR01r50fyOJaiC/KNsl4EUD8ptPrPc9JgjnyM92r1qkY7GeuSrbaxf/u
-	 Y+n3rOgrQ+kB4mPHhqtxPDeipExCcb63nWHDnypdSxZBjneX+rZsk5QVSsaBPIZmgR
-	 TVnnEYiFjd2Lnuz5FsPKgcYcgRcYnqzQ5UhTnDbbEyOxx0/yRiNSnj8Zi1X18IKcJ1
-	 iDDXtlwl1gGo5xKINUqjdF2rnTrO+tKIl8ru48WkovdSwYWNvILbzrLmBKtLisVJNm
-	 ALJ5rq2qkGfecljunkJ4G+KSs4/ILk0kW6rx64L9o1YrdDGVk62Deag0wCJxY6LVBl
-	 jWVFu98kpmMZw==
+	b=CPvYVvMKH9GfGfAQV13pOAoNbN01iu5o2FokTjzX6pRJDMWo0CSMpVBbB6s6YG8x5
+	 IN/nQQFFkcgQDmPYJ7Xr6i/2c1B7GRjaucVfffzbdr7eWh/DqXh45yfZ9oUZ1tPSkA
+	 YX+22AjLNeZDM1BPNsmd/gU+1IGB8DTeBlUe8OVaMeSq6m21R6nfPewZuu+hlq7UYu
+	 Qp+rsciWrq2eGpeK4Err8WpEJ6fDwid+mSuqZDCcYAjDZNVnX5rcrxoqW0C7wDQZRL
+	 VXPif1oYYUNWZWo0tkum18KcZ4m6eT+WvUkMj/7uKj/Mqr0Mp/PxRbOxrAlujAAEPu
+	 MkRUYljFUdBmQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93A4A3811A4B;
-	Tue, 22 Sep 2026 15:00:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE4B3811A4B;
+	Tue, 22 Sep 2026 15:00:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,46 +37,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_core: Fix inquiry cache timestamps on
- 64-bit
- systems
+Subject: Re: [PATCH] Bluetooth: hci_core: free the HCI ID if naming fails
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179008921025.4126096.7212004044919126524.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Sep 2026 15:00:10 +0000
-References: <20260922020141.389269-1-lilinmao@kylinos.cn>
-In-Reply-To: <20260922020141.389269-1-lilinmao@kylinos.cn>
-To: Linmao Li <lilinmao@kylinos.cn>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <179008921164.4126096.15229522129695848397.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Sep 2026 15:00:11 +0000
+References: <179001656830.91284.12508704070539939097.idr-bug-55@gmail.com>
+In-Reply-To: <179001656830.91284.12508704070539939097.idr-bug-55@gmail.com>
+To: Sang-Hoon Choi <csh0052@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, lcy8047@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 22 Sep 2026 10:01:41 +0800 you wrote:
-> On 64-bit systems, outgoing BR/EDR connections always fall back to page
-> scan repetition mode R2 with no clock offset once the system has been
-> up for more than five minutes, even when inquiry found the peer only
-> seconds earlier. This lengthens paging and can increase the risk of a
-> Page Timeout.
+On Tue, 22 Sep 2026 03:49:28 +0900 you wrote:
+> hci_register_dev() allocates an ID before calling dev_set_name().
+> If naming fails, it returns without releasing that ID. The device has
+> not been registered and hdev->id has not been assigned, so the normal
+> unregister path cannot release it.
 > 
-> The inquiry cache stores jiffies in __u32 timestamps, but its age
-> helpers subtract them from unsigned long jiffies. INITIAL_JIFFIES casts
-> -300 * HZ through unsigned int, so jiffies crosses 2^32 five minutes
-> after boot on 64-bit systems. Assigning it to __u32 then drops the upper
-> 32 bits. In one trace, a 7.6-second-old entry (HZ=1000) was reported as
-> 2^32 + 7620 ticks old and rejected by hci_acl_create_conn_sync().
-> hci_inquiry() is affected by the same truncation when checking the whole
-> cache. 32-bit systems are unaffected because unsigned long is 32 bits
-> wide there.
+> Free the allocated ID before returning the naming error.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_core: Fix inquiry cache timestamps on 64-bit systems
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ea983244b99a
+  - Bluetooth: hci_core: free the HCI ID if naming fails
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7348abd83a3b
 
 You are awesome, thank you!
 -- 
