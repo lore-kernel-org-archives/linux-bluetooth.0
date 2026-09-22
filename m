@@ -1,119 +1,136 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08EF37B030;
-	Tue, 22 Sep 2026 02:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9931A724C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 02:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790042518; cv=none; b=BQbCHjfC1TgW9uys2x6DCNMOmo+6440sclA4hPR1IQ3Hsehyph3Nrhka8JHXW/sjq0doTqjxhsWqs5HWS+AZazARv4sPh6MCtaYOxZ2Hr2H+ECQm0shKqGW9k/lMSfXyNaGOCSkc68pPWor5VL7ckJPxQMu25rBH+QTit+vkFzE=
+	t=1790044305; cv=none; b=MYnwzC17NadPt8Ae+kL/Yn5QmlfAaaWqv1ksBIvwJqyOMG0amOm4lxV7ZqrCUb9wydgEeE+R0P587UmLvp/EGEjsjBM64dK0Q6pEzCMnm67vjYWNUhupLXpHYB+kF8oaZlmFYQdjIXbGtNdvkvkqeiPH4kyfXHG3tqyIWADB/0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790042518; c=relaxed/simple;
-	bh=P6dYgJxGG8rVhsXBuE+XyyKHSnnOHUAQMNn7iMezy10=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eWwiSevrCRqW7c/4fuh4V3D1YA2jYbLVbWM37aWgDqAy/xAllCzshgGBOPZxbqK8+wnpIb92YdE9pOSJyJdKqC2LQUBVOKC+DCMBxKNb6MSSYkHecg2EQ8wW6flNug4o/F2evcrsCWfzsy1PTDRSwvoTBKJwA0l3sjdDakb0MNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 911b2e7ab62911f19a56ed5b684f684d-20260922
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:0d9230ce-21c4-4d91-abf0-feadfc1adc08,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:7db8b62,CLOUDID:3eed73de39325b084e66fd99e071f5bd,BulkI
-	D:nil,BulkQuantity:0,SF:102|136|850|865|898,TC:nil,Content:0|15|50|99,EDM:
-	-3|-100,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,O
-	SA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 911b2e7ab62911f19a56ed5b684f684d-20260922
-X-User: lilinmao@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lilinmao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1783181564; Tue, 22 Sep 2026 10:01:46 +0800
-From: Linmao Li <lilinmao@kylinos.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Linmao Li <lilinmao@kylinos.cn>
-Subject: [PATCH] Bluetooth: hci_core: Fix inquiry cache timestamps on 64-bit systems
-Date: Tue, 22 Sep 2026 10:01:41 +0800
-Message-Id: <20260922020141.389269-1-lilinmao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1790044305; c=relaxed/simple;
+	bh=W6peptFeaqI5K7AemM989CuwrVXvmJmi3AtrfsnHFag=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Oh+XejTGbdT8n9iuZt73kHJSavfKOUQpe4Hn/hiVV9IlpE3DPFjJbQgj6ObcNHVfxnz0K6LFkQvbvjjBC/iDIXNNUlioZwwKoxboWZ0tLVvcZIhtrS3SODIjpykSO52oKucDJXFbaWK74DphkNnhpf3sM2a8KL9TYSc5EqNOMIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N+sNPRgG; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+sNPRgG"
+Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cea4c79fso1559626a12.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2026 19:31:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790044303; x=1790649103; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=+32iDjxZMJY9yUI6YF3GaFA7ia9+i4rHsgYs0mtAjB8=;
+        b=N+sNPRgGAtr+wZBJiir1qRbeOCamPOtLysj1IY0iU9I+NyklpUWvdTMRhUV7QrzEBM
+         BKMBm4ogXEZb+q4HVcBJ8R9Tbzq/RQ/ywvl4Mf2XYsCT/Fv3XIMXzKEy2dxH94c9jD4z
+         Lxst7PIAaifQ8Mcp09eJEtOM4pDI6ukk/DaXQQaXtVnat/QXnfCYNdfjoy4wUxH1qvnE
+         sa9zwu1VpKgaMsujoYJ74RsvuEuXPzyAxOFInWvK8JGSyVYnLIYMxswNXfsLPlCWR9k8
+         8qWdf2OOjh6hNh3Frlpbfl0pALQrEoSUMVz/qGhwi8y+adm8yvC4BHoil8LcFiWFGh2Z
+         d1aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790044303; x=1790649103;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=+32iDjxZMJY9yUI6YF3GaFA7ia9+i4rHsgYs0mtAjB8=;
+        b=unTIPvMrBN3zumG8Z3MOcP2xatYECUAdSgmvz4uy3i/fd746WQuopIMXP1e+31+nHf
+         z4sMcemin7gik+4/bGt2tlZ+iT+/P5H5ndZQBsHIgkpeCaza2vIUMEa5ndo+jJmweNJj
+         mTR2ccnmLP0Z1+lgQ8pxFy3Y1QoqkzfKUbVrEw3AATrW+wgdKOIxrut+JE+l+VfHGdg4
+         uSMn2Hk/2i0GsTrxvEmHqdCcaiQ/bnQDwvKIllME5JfVmRAUYQiB9CfZGtvk4uI23YqI
+         ft1dNTOEzbfnrvVFFaif3/yPHtHoEnME1+AWS29c2Bi7iYjXJ1gX/SBYIAEqF7K72+lT
+         5jzQ==
+X-Gm-Message-State: AFuF++nqKC/KtbvYWV4h8PHJ3eJl7H8uETfUJQ+Jty+kG0GnRXi199iT
+	YAkiCTxYBb/skbDPnMDjz/SoeX73JNZ9741skbD4mpxObALHQj3B19AaJE41YA==
+X-Gm-Gg: AYBFou3y3MrE251lxVW6GkY9XPZZsp6yL10eqm1SdQUvnX76AGGv4zcdsSYx0V326XJ
+	OGO12/TLOtVzPAPclIwFowdSYGmQdKT3CzMJZCwMVwl2HcNwZzsWkFR/AxkQRzklCQZZQZwaGtP
+	t4weXkA8UMyoPInIHVjnWt79o5VrCn0EqxkxZFYDSzylN98rjZp5Eq7+9KLqc2TLsWsKVDN1FgL
+	KBIB3x+4otcpnQvqbf43ZmCnUJMPyvYYE+C8VMzc02RG71w5ZLOoZqPlNKvntMm/LLem9GaWLXA
+	c7qdUL3QaO04PSO5RWDy6ioHbGKbHqCbOxcgfCDqalcxHBP9UwyOmLZ6mCrQcuhOT29IKaW1rpA
+	/4uQoJg0ZYHcDudj5F79JSEDE5doWvnLgZg8XATsdPd4LSSoh0ss2YKUniXPW+8uC8gaR1YkV30
+	Chs39pDqQw1FKIzCJFoGYJHCVTLmSEsEO018jdDq6Cpn8Y7LNDEad+ugJEY1+YCWxtJUfRT8qWs
+	Tzd
+X-Received: by 2002:a05:6a21:6282:b0:3dd:a197:7362 with SMTP id adf61e73a8af0-3dda1977457mr14237393637.59.1790044303487;
+        Mon, 21 Sep 2026 19:31:43 -0700 (PDT)
+Received: from [172.17.0.2] ([134.33.68.247])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e61271695sm1064668eec.8.2026.09.21.19.31.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Sep 2026 19:31:43 -0700 (PDT)
+Message-ID: <6ab1e88f.3efc6ce7.2c1da4.018f@mx.google.com>
+Date: Mon, 21 Sep 2026 19:31:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7466788648166593760=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lilinmao@kylinos.cn
+Subject: RE: Bluetooth: hci_core: Fix inquiry cache timestamps on 64-bit systems
+In-Reply-To: <20260922020141.389269-1-lilinmao@kylinos.cn>
+References: <20260922020141.389269-1-lilinmao@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On 64-bit systems, outgoing BR/EDR connections always fall back to page
-scan repetition mode R2 with no clock offset once the system has been
-up for more than five minutes, even when inquiry found the peer only
-seconds earlier. This lengthens paging and can increase the risk of a
-Page Timeout.
+--===============7466788648166593760==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The inquiry cache stores jiffies in __u32 timestamps, but its age
-helpers subtract them from unsigned long jiffies. INITIAL_JIFFIES casts
--300 * HZ through unsigned int, so jiffies crosses 2^32 five minutes
-after boot on 64-bit systems. Assigning it to __u32 then drops the upper
-32 bits. In one trace, a 7.6-second-old entry (HZ=1000) was reported as
-2^32 + 7620 ticks old and rejected by hci_acl_create_conn_sync().
-hci_inquiry() is affected by the same truncation when checking the whole
-cache. 32-bit systems are unaffected because unsigned long is 32 bits
-wide there.
+This is automated email and please do not reply to this email!
 
-Use unsigned long for both timestamps so they have the same width as
-jiffies on 32-bit and 64-bit systems, and update the debugfs format
-specifier accordingly.
+Dear submitter,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1170901/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.61 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.16 seconds
+GitLint                       PASS      0.26 seconds
+SubjectPrefix                 PASS      0.92 seconds
+BuildKernel                   PASS      18.39 seconds
+CheckAllWarning               PASS      23.54 seconds
+CheckSparse                   PASS      26.65 seconds
+BuildKernel32                 PASS      22.17 seconds
+CheckKernelLLVM               PASS      21.37 seconds
+TestRunnerSetup               PASS      477.87 seconds
+TestRunner_l2cap-tester       PASS      17.38 seconds
+TestRunner_iso-tester         PASS      24.92 seconds
+TestRunner_bnep-tester        PASS      3.23 seconds
+TestRunner_mgmt-tester        PASS      53.59 seconds
+TestRunner_rfcomm-tester      PASS      3.92 seconds
+TestRunner_sco-tester         PASS      6.86 seconds
+TestRunner_ioctl-tester       PASS      4.01 seconds
+TestRunner_mesh-tester        FAIL      6.66 seconds
+TestRunner_smp-tester         PASS      3.88 seconds
+TestRunner_userchan-tester    PASS      3.04 seconds
+TestRunner_6lowpan-tester     PASS      3.94 seconds
+IncrementalBuild              PASS      18.33 seconds
+
+Details
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.758 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/810
+
 ---
- include/net/bluetooth/hci_core.h | 4 ++--
- net/bluetooth/hci_debugfs.c      | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b26004a05368..788d6600f500 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -63,7 +63,7 @@ struct inquiry_entry {
- 		NAME_PENDING,
- 		NAME_KNOWN,
- 	} name_state;
--	__u32			timestamp;
-+	unsigned long		timestamp;
- 	struct inquiry_data	data;
- };
- 
-@@ -79,7 +79,7 @@ struct discovery_state {
- 	struct list_head	all;	/* All devices found during inquiry */
- 	struct list_head	unknown;	/* Name state not known */
- 	struct list_head	resolve;	/* Name needs to be resolved */
--	__u32			timestamp;
-+	unsigned long		timestamp;
- 	bdaddr_t		last_adv_addr;
- 	u8			last_adv_addr_type;
- 	s8			last_adv_rssi;
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index aadffaaff20e..2559fb6324d6 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -364,7 +364,7 @@ static int inquiry_cache_show(struct seq_file *f, void *p)
- 
- 	list_for_each_entry(e, &cache->all, all) {
- 		struct inquiry_data *data = &e->data;
--		seq_printf(f, "%pMR %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %u\n",
-+		seq_printf(f, "%pMR %d %d %d 0x%.2x%.2x%.2x 0x%.4x %d %d %lu\n",
- 			   &data->bdaddr,
- 			   data->pscan_rep_mode, data->pscan_period_mode,
- 			   data->pscan_mode, data->dev_class[2],
--- 
-2.25.1
 
+--===============7466788648166593760==--
