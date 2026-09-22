@@ -1,49 +1,46 @@
 Received: from mx5.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A45954CF6C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 15:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF0054DACC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 15:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790089291; cv=none; b=LoFb55pIJpJoH6/RiBUhSHYU/fYYREQe40Prz3ONCDNWbFPXpotT7CtJwTLe8ZIkQi6xkZf8AdWyXDeivxZFgbobx2X2L/Gx3yRfFybAIX3u9GAgMD63Ma8dEpRiDtNNTRcXiXaHaNQ8QHBcNvNQLiItU0Do+VhQIrNYOtXJ1kc=
+	t=1790089598; cv=none; b=lBAmPBGAvtt3CoRh2ks7GNb4k5VIhCIe51Rfm+LXF1WFNUOuxYlHT/EKTbhRRWvwOuKfTNaxv0Dbg9KtB9BSUPTrA8olcCryGZjAtNjmnGcMeegJJjvm2rCIhTr4UQWC+jzprRbcCF3UvAIka8ImVx2cOb8hOx7d9wcxDZlYj7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790089291; c=relaxed/simple;
-	bh=CwSHuejyrDyEN+aGJIvukjmzTuBSsgqgeIfYvC5POEs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pNxL+rzWHfsIUJvVwWAGmlG5XxO46zhGnNYzvn8Hf7W0kiiz8Bkxxh5Wzys/2FBNpLpXLkh2EKLEdPjUJsPp/1uBDOFVPsXjUaZqqoIjvcY1AdOr/o2tlrWcUtdNHfaP9p2THucNoqOp8emMvo4/UnBfCoDDhSUeaTh37n6ezxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=RJWx730H; arc=none smtp.client-ip=95.181.183.35
+	s=arc-20240116; t=1790089598; c=relaxed/simple;
+	bh=hqRsVus9uMUDdLiRslxAERmgGJK565MHIDIGCETwGow=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ByixC5yrWufAuJKsaWbDWlYQhqjTUALzr/kJXHbBTuHrtDcUi0KY9KsGtppOu+WSf3c7ziMqvoPUTqP+2r9+1mNkcjp1k5SPqg8ait7Bf6fHWv7mtmN9aSEm63HJqycsauhbmrVpwzg6B+HH7y3Qp9CXL9TM3yy+kRMbTKBOdjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=mFN9qUA0; arc=none smtp.client-ip=95.181.183.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="RJWx730H"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="mFN9qUA0"
 Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx5.sberdevices.ru (Postfix) with ESMTP id 8ADC824002B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:01:23 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx5.sberdevices.ru 8ADC824002B
+	by mx5.sberdevices.ru (Postfix) with ESMTP id A1A17240020
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:00:38 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx5.sberdevices.ru A1A17240020
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1790089283;
-	bh=JFRa0CinHSoR0HP0S0l71kNWo+3XjnGu3pYwW2ysLhc=;
+	s=post; t=1790089238;
+	bh=AQqlVriYjKQJrGHf3oPtDGj9OQ2N3mUWcixKjgvRKDg=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=RJWx730HP4BKDsaCxtQTUkndWb3Zvp3qY3oC2is90D6yveHQlpRboWmoKDoyHeQsv
-	 RUD+pNGSSj22CeL0dW7qJSneR5g1z2SVrdbMlE4rau/LVf7/dxE8s8SBnoA1HmRpx+
-	 zShfRl442Rx6GKQUzqymL2aEsbcyPS0MEUyXKC7CeqILw1j26jIAHrz180Os2eit5d
-	 h2Lu5ty6F6o3GL8o55WSugx+3J0byIKzcVw/8UpgOiWiI/ddXQ65dEuQlT1ze4QO7i
-	 E2Zy/4A4YsKjin6ZNQG0y+ku9a7acsJpJ+vJV/yETKtO9cnUUyejinnSviNACrZobG
-	 Ew9yQfXkfvo9A==
+	b=mFN9qUA0Z6gctIaV5P9YprB+Xg1Alu8bZUW+bCQ7QEGeMdEgAIZDBmkisQxWlbcOn
+	 hKpeXF3TVpq8vXC1ZRhIatzk4OfUi5X7S//NyXXip8A2nl1JgkDoILyukr/eDuvHvi
+	 ifvt++7q263xN08nEkyf9NzEj+ONviD4W2DUGGlPPh/J4HVgxc8yMw7u3SkVuL82D4
+	 bSwyAccrRhDNb7BwbSNDxOgxWhOYCbhTQ4xoW9hOUoW99WRJUpz2KaeMpn+7g7VrgH
+	 rr4Aqm6M6JGCDN5FTTtseyCeRxp9bQ3OxVAuKaoVBy4nKSYQIkuGnkIBVJStXULGv2
+	 zK7oIpSXBNpIA==
 Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(Client CN "sberdevices.ru", Issuer "YR2" (not verified))
 	by mx5.sberdevices.ru (Postfix) with ESMTPS
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:01:23 +0300 (MSK)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 18:00:38 +0300 (MSK)
 From: Pavel Bozhko <pvbozhko@salutedevices.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Pavel Bozhko <pvbozhko@salutedevices.com>
-Subject: [PATCH BlueZ 1/1] audio/avrcp: Add AvrcpVersion config option
-Date: Tue, 22 Sep 2026 18:00:30 +0300
-Message-ID: <20260922150030.26340-2-pvbozhko@salutedevices.com>
+Subject: [PATCH BlueZ 0/1] audio/avrcp: Add AvrcpVersion config option
+Date: Tue, 22 Sep 2026 18:00:29 +0300
+Message-ID: <20260922150030.26340-1-pvbozhko@salutedevices.com>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260922150030.26340-1-pvbozhko@salutedevices.com>
-References: <20260922150030.26340-1-pvbozhko@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,7 +54,7 @@ X-ClientProxiedBy: p-exch-cas-s-m1.sberdevices.ru (172.16.210.2) To
 X-KSMG-AntiPhishing: NotDetected
 X-KSMG-AntiSpam-Auth: dkim=none
 X-KSMG-AntiSpam-Envelope-From: pvbozhko@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 123 0.3.123 0a3d77c148601a24a80cc37b49c8995c1e141098, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Info: LuaCore: 123 0.3.123 0a3d77c148601a24a80cc37b49c8995c1e141098, {diag_burst_silent}, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiSpam-Lua-Profiles: 206173 [Sep 22 2026]
 X-KSMG-AntiSpam-Method: none
@@ -72,134 +69,22 @@ X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 5
 
 Some devices advertise AVRCP 1.3 in SDP but still support absolute
-volume (SetAbsoluteVolume and EVENT_VOLUME_CHANGED), which the
-specification introduced in version 1.4.  Examples include certain
-TVs such as LG webOS UM7450PLA and Xiaomi Mi TV 4A 43 when acting
-as the audio source.
+volume (SetAbsoluteVolume and EVENT_VOLUME_CHANGED), introduced in
+AVRCP 1.4.  Examples include certain TVs such as LG webOS UM7450PLA
+and Xiaomi Mi TV 4A 43 when they act as the audio source.
 
-Add an AvrcpVersion option under [AVRCP] and apply it to the target
-in target_init(), so the version check in avrcp_volume_supported()
-can succeed for such peers.
----
+This patch adds an AvrcpVersion option under [AVRCP] so the local
+target version can be raised when the peer SDP record is too old.
+
+Pavel Bozhko (1):
+  audio/avrcp: Add AvrcpVersion config option
+
  profiles/audio/avrcp.c |  7 +++++++
  src/btd.h              |  1 +
  src/main.c             | 32 ++++++++++++++++++++++++++++++++
  src/main.conf          |  8 ++++++++
  4 files changed, 48 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index df5f97eaf..3c11ac064 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -4304,6 +4304,13 @@ static void target_init(struct avrcp *session)
- 	target = data_init(session, AVRCP_REMOTE_UUID);
- 	session->target = target;
- 
-+	if (btd_opts.avrcp.version &&
-+			target->version < btd_opts.avrcp.version) {
-+		DBG("Forcing AVRCP version 0x%04x (SDP 0x%04x)",
-+					btd_opts.avrcp.version, target->version);
-+		target->version = btd_opts.avrcp.version;
-+	}
-+
- 	DBG("%p version 0x%04x", target, target->version);
- 
- 	btd_service_connecting_complete(service, 0);
-diff --git a/src/btd.h b/src/btd.h
-index d70276b1d..4ae46100d 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -124,6 +124,7 @@ struct btd_avdtp_opts {
- struct btd_avrcp_opts {
- 	bool		volume_without_target;
- 	bool		volume_category;
-+	uint16_t	version;
- };
- 
- struct btd_advmon_opts {
-diff --git a/src/main.c b/src/main.c
-index c7a55d30f..763fd2c8d 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -181,6 +181,7 @@ static const char *avdtp_options[] = {
- static const char *avrcp_options[] = {
- 	"VolumeWithoutTarget",
- 	"VolumeCategory",
-+	"AvrcpVersion",
- 	NULL
- };
- 
-@@ -1350,6 +1351,35 @@ static void parse_avdtp(GKeyFile *config)
- 	parse_avdtp_stream_mode(config);
- }
- 
-+static void parse_avrcp_version(GKeyFile *config)
-+{
-+	char *str = NULL;
-+	char *endptr = NULL;
-+	unsigned int major, minor;
-+	unsigned long val;
-+	int n = 0;
-+
-+	if (!parse_config_string(config, "AVRCP", "AvrcpVersion", &str))
-+		return;
-+
-+	if (sscanf(str, "%u.%u%n", &major, &minor, &n) == 2 && !str[n] &&
-+					major <= 0xff && minor <= 0xff) {
-+		btd_opts.avrcp.version = (major << 8) | minor;
-+		g_free(str);
-+		return;
-+	}
-+
-+	val = strtoul(str, &endptr, 0);
-+	if (endptr && *endptr == '\0' && val > 0 && val <= 0xffff) {
-+		btd_opts.avrcp.version = val;
-+		g_free(str);
-+		return;
-+	}
-+
-+	error("Invalid AVRCP version \"%s\"", str);
-+	g_free(str);
-+}
-+
- static void parse_avrcp(GKeyFile *config)
- {
- 	parse_config_bool(config, "AVRCP",
-@@ -1358,6 +1388,7 @@ static void parse_avrcp(GKeyFile *config)
- 	parse_config_bool(config, "AVRCP",
- 		"VolumeCategory",
- 		&btd_opts.avrcp.volume_category);
-+	parse_avrcp_version(config);
- }
- 
- static void parse_advmon(GKeyFile *config)
-@@ -1433,6 +1464,7 @@ static void init_defaults(void)
- 
- 	btd_opts.avrcp.volume_without_target = false;
- 	btd_opts.avrcp.volume_category = true;
-+	btd_opts.avrcp.version = 0;
- 
- 	btd_opts.advmon.rssi_sampling_period = 0xFF;
- 	btd_opts.csis.encrypt = true;
-diff --git a/src/main.conf b/src/main.conf
-index 1d8e97dc6..79048ea25 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -380,6 +380,14 @@
- # notifications.
- #VolumeCategory = true
- 
-+# Override the AVRCP version used for the local Target role.  Some peers
-+# report an older profile version (e.g. 1.3) while still supporting features
-+# introduced later, such as absolute volume (SetAbsoluteVolume and
-+# EVENT_VOLUME_CHANGED, AVRCP 1.4).
-+# Possible values: 1.3, 1.4, 1.5, 1.6 or hexadecimal (e.g. 0x0104).
-+# Defaults to using the version from the remote SDP record.
-+#AvrcpVersion = 1.4
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
 -- 
 2.50.1 (Apple Git-155)
 
