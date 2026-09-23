@@ -1,66 +1,66 @@
-Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
+Received: from mail-oi2-f12.google.com (mail-oi2-f12.google.com [74.125.231.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823C73A6EE9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 15:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2A3374756
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 15:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790178755; cv=none; b=VMwcA70dWx3YkLqHBBpQ1/yOWyOIlSO+9TNpBOD15Quh1T+ge8J9+PZJrb/NzQP42h2Vl6T0rx3l/73xZZO8vH/Yv0zPw9S8HnE49zBSVhP1DQG8fEXHDfvwjXiHiO60o0rkqb3UuUswmE6V/nkNVOTmljli4GyCYJz8MvXJyiI=
+	t=1790178860; cv=none; b=STW34IBK4BEMQq9iaB0pvimetDJ1P2sNi2UAZUD2ZsC2Obi5JFV6cqYzIaiJl9wLwlOf8hEVoHwc8yi/F9VQ1XShHqrplPc61noPcMNUt1c9IsIOQhz1VQnvLH71AQojES+SEvIdXmXk19qLiw34n1qKX+QUb1LERQOci5sDyVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790178755; c=relaxed/simple;
-	bh=vZ2AG1iyIFS6L9Fs/N5tOEcsypvg9E2/ZExaK2OVpfI=;
+	s=arc-20240116; t=1790178860; c=relaxed/simple;
+	bh=fcoe1MOxqI1VZIz1B29Mf6E4sawRgABpFys5QQbLsIE=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=q/oVaxD0Cv5u2giTsTKp78yMI/FOepEgwFNxMQRzz+EhCsKJDZJHn40Ruh/YBEgHxlc2EOVyHBiK5GQK4mg+kIQbD+mCbwHcNvoKq93CssXNLoCywzl8tP1NG8DeRP4jmvsuHfk6nFq7fJbBnGpmlJCEa4hd6Ek+xSblBepv0NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+gziMAt; arc=none smtp.client-ip=74.125.229.43
+	 In-Reply-To:References; b=btqk20qNLWkjui8bBMtHDdNQJUmWtYJqKbYlmVxwj99WloaZuZWQuMvOzVkcCrmNF1ocPa7wtR2C2zJTCGx8JLldpVUAl65d3Km17hbvhF3Rz6DEDK+isjxtD2beIdBrQhSnxzUef+DXyu3osURtqtui17O693iZW9w+jgnALok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p8ITL9An; arc=none smtp.client-ip=74.125.231.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+gziMAt"
-Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33e62211987so1231853eec.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 08:52:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p8ITL9An"
+Received: by mail-oi2-f12.google.com with SMTP id 46e09a7af769-7f4f0d298caso759412a34.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 08:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790178752; x=1790783552; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790178858; x=1790783658; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=p6FH2c1DqBe/5vl+PVT4/JWmYSNgG3MPqvURGsC/F00=;
-        b=H+gziMAtCE9nj0osIu6t53blpjmJYBIjDEW5eqZagxjzxdfZR9w8xLEM9BRX9Ip3Ed
-         FjGngMHOoHuvVPkilUxNF45i6lj99hdnhGjVfZSH2jx6VQjiCR51tt/1HbsNkjeX1dlA
-         8CPEElJAEVPv/cLiI7WSJfktvOWmimNKruaab/1dYOX4TuQhyQwnWhxJ6rH8YSc4VY5D
-         jWTL2sdMUb2i23gMjnYmCefX7wP4/MxmZMe/7onfT1PZ2CHE/FpmxPu9ZvdBVqMVugKD
-         NgDVZ09JPnyXHrLJ65JEjngOZJazUqyn30qUP8rB6MgrLO/5PNUY1pBxQ6KcQwmXeYds
-         prvg==
+        bh=a14GeqcQUUgY534ml8ZdmRYxbSBrcqnxOPEMJrgzKGk=;
+        b=p8ITL9An31yyI9HZIn4Bpruupweno5FbwQ/aFqLu4Lsn2WpgGibFdRA8obyrnw1vrT
+         KrUT3SdJRiZHjtwSBOxX4WTh7uE3Uyc0IgkQeNXHNewNn/dNVNdvocXfYCPjW+uW0Wpd
+         CxwZuRyVNUFwy8gokOuV80VYjqHiZkSk9t6TOYfLAD2GE6no1XqxNtK6N1MliT0eOFe5
+         SWg0pQbpCJC00rDDpKsMTpaJsiDUG/94h3mRFNqcPIkyJVyyr0x+nle6KC6LXLPJYnLF
+         Zszt0CI2aCo1OkBAn0wjXFV/PqMe1ySaCEycxqLSGjtGqK3b0OQ15GxGUOthPTqCBL+z
+         xFHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790178752; x=1790783552;
+        d=1e100.net; s=20260707; t=1790178858; x=1790783658;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=p6FH2c1DqBe/5vl+PVT4/JWmYSNgG3MPqvURGsC/F00=;
-        b=Zu7eWdsrj5g/yq8AY/c+PLvoigxY/uS8rNiJh19iZO6KGt/xCr2d1FjjmXDR5Y/KJo
-         9TdX8u/hc3+PqOUqa6XDvnyyR8rt4pWlU/WS4UO8PnDAa9uGT7z2QN6Nz8qbe3jJxaKa
-         HJLqB28pm1HSfMyOW1+BpFjPesOkWJzocUPABBmRpr8lJCGsHETmcdZ1KX64+QS75Uie
-         wEL6mTY4ptGQi0cNW0QpTLFp7Jrs+MdcyAKn0szXNmcFNNrv4zcczKxDDwyEJfc4+CVk
-         ++lwHFofrt5m+udOeuZHs5Ib252oHi2Mh6s0ZQXV4UPEqpGJDVbC8zaxIGbBgfHjzso+
-         dYrA==
-X-Gm-Message-State: AFuF++n9TRq7/TzabuIIvx3mw5Ylh88DlIvnw/wDGe/5JKO4a2ogeUXA
-	65p/UYlIK1m2RQS7frJX3Ic9yNRdkKbhN5RdseL4Nb++jIF8R9taAw8UMCDIrg==
-X-Gm-Gg: AYBFou0cwv/a18EsOdG6IpUNggvKdSKfyRW0XJDj9js/da2ACnyXsie5HQluHSoVnGp
-	hILmDKzRvZYOMdU3gXFIASnOpOfEYbS0/RhOVgG8Gq8VBPUa6YMabm5V6T3Aemqz/jK1NdPyW0L
-	pgSvwoPOO1EAWXdQ0UZHyv3/+bNnw2RQ65vcK4DI/R5LU9F1EqGxfk0SUNdIfZ5un6OLWhhR27w
-	yMQ+MsoXQcNZI73fHdWSt07xcRCxa9aLX0BkCxXAKmhdHlmU0ZhJOwL/UhVRijQzAhJeT7nxBqJ
-	jXHImd71Pg3ANuk4MoR+tYGtMkPVgmkWlYTQ/6cwZhKk7EcGgqBCSf8zfIruJmAUcWb94PhosCU
-	9Pkx/JzUO42j355z7R2IdCLcCepNneFq9Lr7E/1PUdPFXjiplIXdQuFwJuo6LzhSyAqEQ3aROb4
-	CL3g81oJnDiTI+44GBw5Y20FjdNvl2gkc+qfCkwk7cEEJkssEvXXCP6/Q3fmjPWXCWXRl1JYzto
-	lGV54uOf5pJXyWO
-X-Received: by 2002:a05:7300:5989:b0:33c:268f:1e92 with SMTP id 5a478bee46e88-33e88b32065mr2697611eec.0.1790178752151;
-        Wed, 23 Sep 2026 08:52:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.111.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e95c7cfd9sm7405140eec.5.2026.09.23.08.52.31
+        bh=a14GeqcQUUgY534ml8ZdmRYxbSBrcqnxOPEMJrgzKGk=;
+        b=2YH/ZxlC2QbCcDArd6NBL3nqzgvF/RtLjokWZVMvKOVVApVt0X/iRWuwpUXq/1cWMa
+         iZ0sL2B+aPqYM7sXgn6uaYaU3Ng5wUJFaprXCypo2gWycadqifKkhBIr/k2/gCkfKkqq
+         kMFCH+pfwDziY2MuvBY+ZgTLLg7HbwHJTiFHGNzMeiJqnLPJtPIgbiO7AXAmixjyoIYW
+         vGVVEabJHLUAHD80dVMyALQuqc3/0DvYDpY6FNw+G6mR184qLhFkAhooMXQsJdxxk81h
+         uUvDZLGdZQnMhLOt8CWMUYd/01JiZeqCrC2zMgiiP6HI9XInphFwgCzc7HpQDbySTreR
+         7Tgw==
+X-Gm-Message-State: AFuF++k3HObqfuT4u0PlwdArBx+p/peeycEj4okU0PTnnj114Wav9M8R
+	eu92FmIkJtGFHy93s7+Q6UwUr+doW+mX2IEVWe2JMpSPoEjDq89nHWTpK6wrTg==
+X-Gm-Gg: AYBFou3w4037yKk/zqVn14eqiOpfmtdmzek62oU3qs8tzeWgG0v5vBvSykZh4wHMDsy
+	XD4psOe3SzRos3U+rUdNUsjyNvIPckTZjbnDLGGAu+H7USpqDB5iY/hO5Gv9u42DKJ2hU3T5MTB
+	PbUIJAvv4Xumyu14rc8bHoHgQKFH2TcA7zIYN7Rz+lieoqN+2mJXx21E6Y09UYwNbeFrFfYz0yp
+	5RlHpHwnfM/nTQCUEm81p7XDZnV0MMbWOMVDxJq1SYxdP9yjm/peTLEYYxLzPm3Z8XBlscAjbex
+	Qcgvt0rmDhHqCd1eyn9hYvG0phhUVdwxqG9z2MliWaezJTj0rsj6LvR54sps9oFz6nGjErdM8W9
+	8VhRPUSEQdORuFBfXUzHJ2LK3yUM6ScncBNnBxNM4euxpnCKxoTAfsF0E2yFUtUa5oRNm+0Dcki
+	oQcYp3Xs9cy9LpknQypbMfuc38YYSmPeGD2eDWabGiI4O9E/Pqxzd+PCC4XMfpzr12jBGnKKj9N
+	jPP
+X-Received: by 2002:a05:6830:4ac5:b0:7fe:e653:9535 with SMTP id 46e09a7af769-815f2238604mr3062268a34.16.1790178857670;
+        Wed, 23 Sep 2026 08:54:17 -0700 (PDT)
+Received: from [172.17.0.2] ([20.98.23.167])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-816018d81ebsm3467612a34.1.2026.09.23.08.54.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 08:52:31 -0700 (PDT)
-Message-ID: <6ab3f5bf.80a95698.1b311a.89cd@mx.google.com>
-Date: Wed, 23 Sep 2026 08:52:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8301726257733302667=="
+        Wed, 23 Sep 2026 08:54:17 -0700 (PDT)
+Message-ID: <6ab3f629.95c05185.a6d39.38f3@mx.google.com>
+Date: Wed, 23 Sep 2026 08:54:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4855687897713097290=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,13 +68,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hildawu@realtek.com
-Subject: RE: [v8] Bluetooth: btrtl: Add firmware format v3 support
-In-Reply-To: <20260923104521.1706251-1-hildawu@realtek.com>
-References: <20260923104521.1706251-1-hildawu@realtek.com>
+To: linux-bluetooth@vger.kernel.org, qwe.aldo@gmail.com
+Subject: RE: [v3] Bluetooth: SCO: serialise sco_conn lifetime against sco_recv_scodata()
+In-Reply-To: <20260923122026.3465391-1-qwe.aldo@gmail.com>
+References: <20260923122026.3465391-1-qwe.aldo@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8301726257733302667==
+--===============4855687897713097290==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -85,85 +85,38 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1172140/
+PW Link:https://patchwork.kernel.org/series/1172219/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      2.25 seconds
-VerifyFixes                   PASS      0.36 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       FAIL      0.27 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      28.75 seconds
-CheckAllWarning               PASS      31.97 seconds
-CheckSparse                   PASS      34.99 seconds
-BuildKernel32                 PASS      28.20 seconds
-CheckKernelLLVM               PASS      29.79 seconds
-TestRunnerSetup               PASS      702.36 seconds
-IncrementalBuild              PASS      27.22 seconds
+CheckPatch                    PASS      0.81 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      30.39 seconds
+CheckAllWarning               PASS      35.31 seconds
+CheckSparse                   WARNING   38.18 seconds
+BuildKernel32                 PASS      30.64 seconds
+CheckKernelLLVM               PASS      34.68 seconds
+TestRunnerSetup               PASS      823.31 seconds
+TestRunner_sco-tester         PASS      10.86 seconds
+IncrementalBuild              PASS      29.02 seconds
 
 Details
 ##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
 Output:
-[v8] Bluetooth: btrtl: Add firmware format v3 support
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#801: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 1386 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14841085.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:151:35: warning: array of flexible structures
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v8] Bluetooth: btrtl: Add firmware format v3 support
-
-21: B1 Line exceeds max length (85>80): "[    1.838104] Bluetooth: btrtl_read_chip_id() hci0: RTL: chip_id status=0x00 id=0x3e"
-22: B1 Line exceeds max length (116>80): "[    1.838331] Bluetooth: btrtl_initialize() hci0: RTL: examining hci_ver=0e hci_rev=000d lmp_ver=0e lmp_subver=8922"
-23: B1 Line exceeds max length (90>80): "[    1.838571] Bluetooth: rtl_read_rom_version() hci0: RTL: rom_version status=0 version=0"
-24: B1 Line exceeds max length (82>80): "[    1.838821] Bluetooth: btrtl_initialize() hci0: RTL: btrtl_initialize: key id 0"
-25: B1 Line exceeds max length (84>80): "[    1.838825] Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_fw.bin"
-26: B1 Line exceeds max length (88>80): "[    1.843021] Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_config.bin"
-28: B1 Line exceeds max length (118>80): "[    1.843325] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f000:00), chip id 62, cut 0x01, len 0000c704"
-29: B1 Line exceeds max length (90>80): "[    1.843342] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection version: c5900782"
-30: B1 Line exceeds max length (103>80): "[    1.843347] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f000.bin"
-31: B1 Line exceeds max length (126>80): "[    1.843363] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f000.bin not found, use default"
-32: B1 Line exceeds max length (118>80): "[    1.843366] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f002:00), chip id 62, cut 0x01, len 00034378"
-33: B1 Line exceeds max length (90>80): "[    1.843417] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection version: 2b84a8b2"
-34: B1 Line exceeds max length (103>80): "[    1.843421] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f002.bin"
-35: B1 Line exceeds max length (109>80): "[    1.843647] Bluetooth: rtlbt_parse_config() hci0: RTL: config file: rtl_bt/rtl8922du_config_f002.bin found"
-36: B1 Line exceeds max length (118>80): "[    1.843654] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f000:00), chip id 62, cut 0x01, len 0000c704"
-37: B1 Line exceeds max length (90>80): "[    1.843658] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip, key_id mismatch (1, 0)"
-38: B1 Line exceeds max length (118>80): "[    1.843661] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f002:00), chip id 62, cut 0x01, len 00034378"
-39: B1 Line exceeds max length (90>80): "[    1.843664] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip, key_id mismatch (1, 0)"
-40: B1 Line exceeds max length (118>80): "[    1.843672] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f000:00), chip id 62, cut 0x01, len 0000c704"
-41: B1 Line exceeds max length (90>80): "[    1.843674] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip, key_id mismatch (2, 0)"
-42: B1 Line exceeds max length (118>80): "[    1.843676] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: subsection (f002:00), chip id 62, cut 0x01, len 00034378"
-43: B1 Line exceeds max length (90>80): "[    1.843678] Bluetooth: rtlbt_parse_section_v3() hci0: RTL: skip, key_id mismatch (2, 0)"
-44: B1 Line exceeds max length (109>80): "[    1.843680] Bluetooth: rtlbt_parse_firmware_v3() hci0: RTL: firmware section payload total len: 0x00040a7c"
-45: B1 Line exceeds max length (85>80): "[    2.293192] Bluetooth: rtl_finalize_download() hci0: RTL: Watchdog reset status 00"
-46: B1 Line exceeds max length (82>80): "[    2.293957] Bluetooth: rtl_finalize_download() hci0: RTL: fw version 0x2b84a8b2"
-
-
-https://github.com/bluez/bluetooth-next/pull/814
+https://github.com/bluez/bluetooth-next/pull/815
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============8301726257733302667==--
+--===============4855687897713097290==--
