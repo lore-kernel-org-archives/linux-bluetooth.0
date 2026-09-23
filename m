@@ -1,232 +1,287 @@
-Received: from sender5-pp-e103.zoho.com (sender5-pp-e103.zoho.com [165.173.182.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr2-f20.google.com (mail-wr2-f20.google.com [74.125.225.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29095326AB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 14:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=165.173.182.103
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790173633; cv=pass; b=tbsymypmggDMHHtTvvso99Nsp6GBIk8EuqnYxj9zatjSORs+dNnheCuq8zlWLp6kRTLaqxTO3FBFdJG96iofoRodCFc2GqAe7Og+9tcpo5CqlhOi6kYJMAp3ReTi/vYWXZfD/DR+Z9RG4L7NL01TxyAfRKxw8ptci+u1myb2J3E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790173633; c=relaxed/simple;
-	bh=HlME1C0DyF+/6nDowtZzHMXL5JXKmSiNweQIyMAMCnY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHW/9Mm1cFqzKF9dArFwlF5Dfy8ZE8ROmriKf9DhTElzmH7bgY7NERLAWEYKulTcyrGOyqc3RiN+1QdwYtAcSpK0myTQBqhtGaFneC8P8T6/mbyBmO19+6JCmkuu3wT3ek+snzJUJLWohUWL90ymPgYOeTTioYAO3g/Oxn239UU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=fG5gLdjz; arc=pass smtp.client-ip=165.173.182.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEE754EEAD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 15:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.84
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790176801; cv=none; b=thKiaLjcCFRjz3Do3gDAqEHgZSNmHvnt9/9xMIux++xwsae8oGcbP9GPLGiFddVd8Yc1i5FG4/015CbVZeF5N7N+6veaP1XJNZIbTCSHAdzH5nAEREU3EHjOZDaKuiiAIpCxd1BZBtSvZthDS3Q5Bvz2OzP3HSmOLQSyRc79rik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790176801; c=relaxed/simple;
+	bh=IpX7s9sD2SJ6Vh3wv+PA5CUDmk+Gh5MmCtwPY+xbKWc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=msOvLnf82ltCZV3KAidg2DO3zqn99rtBYyprL9OzzXXd/iL4LAeEIWfiTJGBUvPCzVYT5zN5WazKIIeVgZJ6wn/esZD7eeLq8ZWHkVqlrvQRYLwbNuaEtyWB92kyjMA9lS0CAH3wlPu2goEGLz+fXzTJn6ZHpLIOnhDp6oyYSGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=IdyJpFgG; arc=none smtp.client-ip=74.125.225.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="fG5gLdjz"
-ARC-Seal: i=1; a=rsa-sha256; t=1790173629; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=nqtiJDxB98HMjVk0GHid3UYnLNJ/SpW8bchNO+wncJP6AQI3zbnnw9zJoQqM9Le0djFGckcugypAE07+hzh19A03ACgBDrjcw8uXo64ZY7sE8BzYtMLBa0Up5XZlxgZpjqKCM3tWTKLfnV65OYCxynIF9NZt4oO4P2ksDmQKnnQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1790173629; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=7zpn2vVGBzcn6WKIUcm8cmcGIouPtZADQRFzx1tWiUY=; 
-	b=JIzeppTQIIqCLuZunYxaFoIHonDwjBx9L+bnGWSCxZP0OlzHTmDSvEAKy3SMDdr+ql8pGjoRSq2lXUZnBgtdt/ep+kA8lDbQtbHJ8+ZkUhVmwfiOtjPRCFLCZilgRIzxB9A9x78eo61cGZ3zyzdJG1M2Y9D8SXfJ68JyqOk7Pgo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1790173629;
-	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=7zpn2vVGBzcn6WKIUcm8cmcGIouPtZADQRFzx1tWiUY=;
-	b=fG5gLdjzU5Moe6GPRWLzl+E56/5lBPCJLF/zl+/Fc3kdejd++HfXZWjVs16Zm0xq
-	nH8tOVkv5lBhyxUkCrUSdaKQBTHOfdwErTK5FUxTKG+fCNDLX4D+8uYvE28JjYRO4DX
-	+F4YRIa+etnGGVfTZ6jK+bQq+46Fn49JuaRHUXZc=
-Received: by smtp.zohomail.com with SMTPS id 1790173627924227.31422876288696;
-	Wed, 23 Sep 2026 07:27:07 -0700 (PDT)
-Message-ID: <53355fb8-db74-427d-9135-cfeccb66e4b0@collabora.com>
-Date: Wed, 23 Sep 2026 16:27:05 +0200
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="IdyJpFgG"
+Received: by mail-wr2-f20.google.com with SMTP id ffacd0b85a97d-482f6356256so390384f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 08:19:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1790176795; x=1790781595; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KpLtUIdAS32+TeIAyOIp7sheWUBHL/dS4EF5FKpV+ZE=;
+        b=IdyJpFgGAaZFWUHn7cM2nwSHztR2hmqLqVQZ6eVkiNAqQhVyZB3PEtZfevILTody1V
+         1EdpF9QOpfXALoZbSyexz7jdum6KpfE8QsFuaWVmjqmowycINUr1ofdVcUiA0wXFbbd7
+         YLmxh6+54PgcnW5sx+nxHBS4ieMXF922Pg9+w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790176795; x=1790781595;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KpLtUIdAS32+TeIAyOIp7sheWUBHL/dS4EF5FKpV+ZE=;
+        b=ez1owQDi4YUhl73m0fw2QaJ7SfNrhGGZe0H7HgUxKjio+hzte3Hprhr3mbFM+SQlLW
+         x6IR79vnYYUxUnPY9AJmCZY6n198MIZJd/DN7AKxc5nNdmrJf5creFrUcm+jJJZrJAQy
+         Jm+TR9/6tcHyKN3iZsgfx9L0VTeCBkvXDaWQhthqkP9v5J5GqDs1ZW+Lj44SKK+DJDUT
+         lR0I9s8bPf08rV20BLEoZjQBMNA52pNQ3mYMnF1H37GFueRszS2e0W5p7DRP2f87ejks
+         X2/rauX+hJHYqGqM1xlReO5k+1rKBGFaDRnEzwkexCr8qHEj19fRs1VBPn7hWFy48lvD
+         4SCw==
+X-Forwarded-Encrypted: i=1; AKwUvBx9zxLZTq4BKzt2omy2cNF4h7wfx9k+398OzkjJcfbzCckhLDYlu/NJbCbYEofIZbEJjsXnWRpKzp0lPrmauEU=@vger.kernel.org
+X-Gm-Message-State: AFuF++k8zt5HB+Jcu9C0+mm3Yr2O++yGRx8MSznB4/I3La20UsC575ED
+	s1KCd5zPou3lbaIrx9JwKyPdqQZfOyBv8E/3IVzaEXli9cnIdPJsogyX56QbI+R6Pw==
+X-Gm-Gg: AYBFou06h0KoEwNJdInh4wsQ55A0pb8jS1tMwCNTx2fEb97fDvM3SllGDVgvqmj/P8v
+	LNhcnelJDzJw4V+abr2M1/gPcBi3UzbW0fJodCR7JerVURj0eENPwWgQH5xwRIxlI4ixRsmXj1K
+	SoW0NhD0aAQZ3g6H2vh+EJKtE8SJi4R369xFxLQEdqY16npaoJxwULZamjePhmJYld3BXOuO6Ay
+	wgVoo0fqoMsEIwURDUPk+1GhXtLRvuXx9GLWj6tbE9PLc/iok3I6n0nfsplG+wb/lwEFr1+6ZFH
+	8EWJ0ySckWCNe9yZ7n3vM2053aohL7MN1N5QuIK6ysefQ6n8mK/9HVUvnhdO8dfPrCH7lcfjdhP
+	rQAbxfos4QuDa+qDcQgxVT835mBTXsno9AbKAyq2UhcNYl0I7Llbqbe+OG1qAmvLlIb8rYJMD8Q
+	W2Hsk2zas98r7j9OLAo9AW253+tcqK1YF+RS5xndyDSP2pcZy68EIpWnSdr2Mc0TMShCaA74Q8i
+	xum9ygxxkC3G9+u9I636Y+ETnSx9MYArco74axhNAe35Fo=
+X-Received: by 2002:a05:600c:1f90:b0:49e:6836:5386 with SMTP id 5b1f17b1804b1-49fde20e848mr45212555e9.0.1790176795253;
+        Wed, 23 Sep 2026 08:19:55 -0700 (PDT)
+Received: from [192.168.1.186] (public-gprs180755.centertel.pl. [46.134.45.84])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fde1a0e00sm72027285e9.10.2026.09.23.08.19.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Sep 2026 08:19:54 -0700 (PDT)
+Message-ID: <0667c660-e0ad-4aba-a4de-947cb54bd204@streamunlimited.com>
+Date: Wed, 23 Sep 2026 17:19:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] audio/avrcp: Poll GetPlayStatus when position
- changed event unsupported
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20260923080003.317019-1-frederic.danis@collabora.com>
- <CABBYNZKN2C_65XH_LOptU_GVoarEa_BQmhvzr+7O68Y+Um9Zzg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [BlueZ] adapter: remove bondable mode hijacking when setting IO
+ capabilities
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+References: <20260922111249.415422-1-michal.dzik@streamunlimited.com>
+ <6ab27391.dd457072.37cb9e.1e86@mx.google.com>
+ <CABBYNZJd83=-_a8=LPvfKSoRWZ_bYEDAYu1nXVrnDr4ezyAMtg@mail.gmail.com>
 Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <CABBYNZKN2C_65XH_LOptU_GVoarEa_BQmhvzr+7O68Y+Um9Zzg@mail.gmail.com>
+From: Michal Dzik <michal.dzik@streamunlimited.com>
+In-Reply-To: <CABBYNZJd83=-_a8=LPvfKSoRWZ_bYEDAYu1nXVrnDr4ezyAMtg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
 Hi Luiz,
+The worst part is that those two tests 
+(test_bap_unicast_set_transport_created, 
+test_bap_unicast_set_transport_acquire) are always failing on my PC. 
+Every time, even on clean master branch. I guess I have to hold this for 
+now and get back when I have more time to dig deeper into those bap tests.
+Michal
 
-On 23/09/2026 15:55, Luiz Augusto von Dentz wrote:
-> Hi Frederic,
+On 22/09/2026 17:12, Luiz Augusto von Dentz wrote:
+> Hi Michal,
 >
-> On Wed, Sep 23, 2026 at 4:02 AM Frédéric Danis
-> <frederic.danis@collabora.com> wrote:
->> Some remote targets do not support the AVRCP_EVENT_PLAYBACK_POS_CHANGED
->> notification, meaning bluetoothd never learns about track position
->> updates for such devices.
+> On Tue, Sep 22, 2026 at 8:34 AM <bluez.test.bot@gmail.com> wrote:
+>> This is automated email and please do not reply to this email!
 >>
->> When this event is not present in the capabilities reported by the
->> remote, fall back to polling AVRCP_GET_PLAY_STATUS once a second so
->> the media player position stays in sync. Polling is only kept running
->> while playback is actively progressing (playing/forward-seek/
->> reverse-seek) and is stopped otherwise, and is torn down on session
->> destruction.
-> Back in the days AVRCP was introduced we decided not to poll the
-> status and instead have the upper layer trigger it via
-> https://github.com/bluez/bluez/blob/master/doc/org.bluez.MediaPlayer.rst#uint32-position-readonly,
-> that said I do agree that perhaps it is better to it with directly by
-> bluetoothd since so many years have passed and some manufactorers
-> insist in not having AVRCP_EVENT_PLAYBACK_POS_CHANGED implemented.
-This property may be cached by the DBus framework used, and so iiuc 
-reading it will not trigger GetPlayStatus.
-
->> Assisted-by: Copilot CLI:claude-sonnet-5
->> ---
->>   profiles/audio/avrcp.c | 64 +++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 63 insertions(+), 1 deletion(-)
+>> Dear submitter,
 >>
->> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
->> index df5f97eaf..105538cdc 100644
->> --- a/profiles/audio/avrcp.c
->> +++ b/profiles/audio/avrcp.c
->> @@ -247,7 +247,9 @@ struct avrcp {
->>          unsigned int control_id;
->>          unsigned int browsing_id;
->>          unsigned int browsing_timer;
->> +       unsigned int position_timer;
->>          uint16_t supported_events;
->> +       bool pos_changed_supported;
->>          uint8_t transaction;
->>          struct pending_pdu *pending_pdu;
->>   };
->> @@ -341,6 +343,7 @@ static const uint32_t company_ids[] = {
+>> Thank you for submitting the patches to the linux bluetooth mailing list.
+>> This is a CI test results with your patch series:
+>> PW Link:https://patchwork.kernel.org/series/1171262/
 >>
->>   static void avrcp_register_notification(struct avrcp *session, uint8_t event);
->>   static GList *player_list_settings(struct avrcp_player *player);
->> +static void avrcp_get_play_status(struct avrcp *session);
+>> ---Test result---
 >>
->>   static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *version)
->>   {
->> @@ -2224,6 +2227,56 @@ static const char *status_to_string(uint8_t status)
->>          }
->>   }
+>> Test Summary:
+>> CheckPatch                    PASS      0.34 seconds
+>> GitLint                       PASS      0.26 seconds
+>> BuildEll                      PASS      14.57 seconds
+>> BluezMake                     PASS      228.44 seconds
+>> CheckSmatch                   PASS      176.03 seconds
+>> bluezmakeextell               PASS      65.22 seconds
+>> TestFunctional                FAIL      909.09 seconds
+>> IncrementalBuild              PASS      224.88 seconds
+>> ScanBuild                     PASS      635.16 seconds
 >>
->> +static bool avrcp_poll_play_status(gpointer user_data)
->> +{
->> +       struct avrcp *session = user_data;
->> +
->> +       avrcp_get_play_status(session);
->> +
->> +       return TRUE;
->> +}
->> +
->> +static void avrcp_stop_pos_polling(struct avrcp *session)
->> +{
->> +       if (session->position_timer == 0)
->> +               return;
->> +
->> +       timeout_remove(session->position_timer);
->> +       session->position_timer = 0;
->> +}
->> +
->> +static void avrcp_start_pos_polling(struct avrcp *session)
->> +{
->> +       if (session->position_timer > 0)
->> +               return;
->> +
->> +       session->position_timer = timeout_add_seconds(1,
->> +                                               avrcp_poll_play_status,
->> +                                               session, NULL);
->> +}
->> +
->> +/*
->> + * Poll GetPlayStatus once a second to resync position while playing when
->> + * the remote does not support AVRCP_EVENT_PLAYBACK_POS_CHANGED. Polling is
->> + * paused whenever playback is not actively progressing.
->> + */
->> +static void avrcp_update_pos_polling(struct avrcp *session, uint8_t status)
->> +{
->> +       if (session->pos_changed_supported)
->> +               return;
->> +
->> +       switch (status) {
->> +       case AVRCP_PLAY_STATUS_PLAYING:
->> +       case AVRCP_PLAY_STATUS_FWD_SEEK:
->> +       case AVRCP_PLAY_STATUS_REV_SEEK:
->> +               avrcp_start_pos_polling(session);
-> Btw, if I recall correctly, position tracking really breaks when the
-> user seeks the stream using the player progression bar, which
-> interrupts the continuous timer. So, if the player does either
-> AVRCP_PLAY_STATUS_FWD_SEEK or AVRCP_PLAY_STATUS_REV_SEEK then we can
-> resink the position once, afaik iOS media player doesn't use them
-> either, thus why the whole polling thing is needed to capture non
-> continuguos skips that are not advertised.
+>> Details
+>> ##############################
+>> Test: TestFunctional - FAIL
+>> Desc: Run test-functional
+>> Output:
+>> FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts8-vm3-sc]: failed on setup with "pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      Remote traceback:
+>>          Traceback (most recent call last):
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+>>              result = method(*msg["a"], **msg["kw"])
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
+>>              return getattr(self.plugins[name], method)(*a, **kw)
+>>                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 441, in expect
+>>              ret = ctl.expect(*a, **kw)
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
+>>              return self.expect_list(compiled_pattern_list,
+>>                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+>>                      timeout, searchwindowsize, async_)
+>>                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
+>>              return exp.expect_loop(timeout)
+>>                     ~~~~~~~~~~~~~~~^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
+>>              return self.timeout(e)
+>>                     ~~~~~~~~~~~~^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
+>>              raise exc
+>>          pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>          <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')"
+>> FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts8-vm3-legacy]: failed on setup with "pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      Remote traceback:
+>>          Traceback (most recent call last):
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+>>              result = method(*msg["a"], **msg["kw"])
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
+>>              return getattr(self.plugins[name], method)(*a, **kw)
+>>                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 441, in expect
+>>              ret = ctl.expect(*a, **kw)
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
+>>              return self.expect_list(compiled_pattern_list,
+>>                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+>>                      timeout, searchwindowsize, async_)
+>>                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
+>>              return exp.expect_loop(timeout)
+>>                     ~~~~~~~~~~~~~~~^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
+>>              return self.timeout(e)
+>>                     ~~~~~~~~~~~~^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
+>>              raise exc
+>>          pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>          <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')"
+>> FAIL functional.test_bap::test_bap_unicast_set_transport_acquire[hosts8-vm3]: failed on setup with "pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>      searcher: searcher_re:
+>>          0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>          1: re.compile(b'(Device \\S+ not available)')
+>>          2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>          3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>          4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>      Remote traceback:
+>>          Traceback (most recent call last):
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+>>              result = method(*msg["a"], **msg["kw"])
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
+>>              return getattr(self.plugins[name], method)(*a, **kw)
+>>                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+>>            File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 441, in expect
+>>              ret = ctl.expect(*a, **kw)
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
+>>              return self.expect_list(compiled_pattern_list,
+>>                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+>>                      timeout, searchwindowsize, async_)
+>>                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
+>>              return exp.expect_loop(timeout)
+>>                     ~~~~~~~~~~~~~~~^^^^^^^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
+>>              return self.timeout(e)
+>>                     ~~~~~~~~~~~~^^^
+>>            File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
+>>              raise exc
+>>          pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')
+>>          <pexpect.popen_spawn.PopenSpawn object at 0x7f83a2bc2a50>
+>>          searcher: searcher_re:
+>>              0: re.compile(b'(Failed to \\w+[^\\r\\n]*)')
+>>              1: re.compile(b'(Device \\S+ not available)')
+>>              2: re.compile(b'DeviceSet /org/bluez/hci0/set_fb34645b15340bc5f081d63e70ae1f86')
+>>              3: re.compile(b'Device 00:AA:01:02:00:42 Bonded: yes')
+>>              4: re.compile(b'Transport (/org/bluez/hci0/dev_00_AA_01_02_00_42/pac_sink\\d+/fd\\d+)')"
+>>
+>>
+>> https://github.com/bluez/bluez/pull/2566
+> This one seems to be causing some instability on test-functional. I'm
+> not quite sure why but I'm afraid it is related to changing the
+> bonding behavior.
 >
->> +               break;
->> +       default:
->> +               avrcp_stop_pos_polling(session);
->> +               break;
->> +       }
->> +}
->> +
->>   static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
->>                                          uint8_t subunit, uint8_t transaction,
->>                                          uint8_t *operands, size_t operand_count,
->> @@ -2252,6 +2305,8 @@ static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
->>          media_player_set_position(mp, position);
->>          media_player_set_status(mp, status_to_string(status));
->>
->> +       avrcp_update_pos_polling(session, status);
->> +
->>          return FALSE;
->>   }
->>
->> @@ -4128,6 +4183,9 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
->>                  }
->>          }
->>
->> +       session->pos_changed_supported =
->> +                       !!(events & (1 << AVRCP_EVENT_PLAYBACK_POS_CHANGED));
->> +
->>          if (!session->controller || !session->controller->player)
->>                  return FALSE;
->>
->> @@ -4140,7 +4198,8 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
->>                          !(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
->>                  avrcp_list_player_attributes(session);
->>
->> -       if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
->> +       if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)) ||
->> +                       !session->pos_changed_supported)
->>                  avrcp_get_play_status(session);
->>
->>          if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
->> @@ -4470,6 +4529,9 @@ static void session_destroy(struct avrcp *session, int err)
->>          if (session->browsing_timer > 0)
->>                  timeout_remove(session->browsing_timer);
->>
->> +       if (session->position_timer > 0)
->> +               timeout_remove(session->position_timer);
->> +
->>          if (session->controller != NULL)
->>                  controller_destroy(session);
->>
->> --
->> 2.43.0
->>
->>
 >
-
 -- 
-Frédéric Danis
-Senior Software Engineer
+Michał Dzik
+Software Engineer
 
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
+StreamUnlimited Engineering GmbH - part of Bose Audio Technology
+High Tech Campus Vienna, Gutheil-Schoder-Gasse 10, 1100 Vienna, Austria
 
+michal.dzik@streamunlimited.com, www.streamunlimited.com
+Offices: Vienna | Bratislava | Shenzhen | Osaka | Boston
 
