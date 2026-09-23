@@ -1,323 +1,275 @@
-Received: from mail-vs2-f32.google.com (mail-vs2-f32.google.com [74.125.227.32])
+Received: from mail-yx2-f18.google.com (mail-yx2-f18.google.com [74.125.224.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5598C4D4896
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 12:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790166048; cv=none; b=JLvtWemxvymK8QOIIJkY/0bPBgnnL+hqfJ6LdbBwEM1n4ogQ9pt5boNBgd2BPDab/B5dXK1Pa8ea9KIcTrB2dUya44TrPbjDU4r/hC8CPo+hkwvUbHq8nxz7JOSuSWrZL0DPnkn8MJQIma9X4E79EyxMqgXnpl/BzXS4oMNld3I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790166048; c=relaxed/simple;
-	bh=fuV87aaUHDzuJt3uwaIZDnGcoihmJ6JF26OZkzkIRdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tImnx6rFWOUVFAhsJ25XJoxPWQOZZD2lYj1iuymCvmvzFt5qbZQdWNcyFhQZWOqesjkwCisTtzJBxWO5duHgV+Lk60Qp3nu0h5nW0ZroEZ6w1t0mVkx/jHE2qC5MWVaVfDhAyZOwLSskTjyACkaChVG2qOYBNiaRwQ8LkkDUQeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K4PxMkdT; arc=none smtp.client-ip=74.125.227.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0CC51FCB8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 13:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.146
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790171729; cv=pass; b=EIbGJUIoRQRduOaVgr4Jy0F/9OlWgtJ0W9meyJKsQm2TpOkDoUqhpIj3L3cSGxKbHl2+ji7jlx3tounCqShhrEEOcOFycqLb1dkfC/IqeWzQQ0QdTkvnZm+SY2eo9ydmA4qDS7SJJncddyNL2XeQndh2nCo+FfNJpgNMzf+ukcM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790171729; c=relaxed/simple;
+	bh=7+Avl/fKXhPY/bUWzQawFz9yYQWqO66fCVM4Psdlbek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KI7yLl5QVDBYIYXwP4HtjY1urz4irojLDToWc8/SemKUdR5dWQTunihUd+fuDeKGxYpD16GuNB+G40XEppG8BtScnH+iMH5Fp7Z0Hr4eMizpB6ULPHRvAIZhqoAzZ+6CY++ay+kJCVhB3FcMCF+MZ5sk7sU+qXnR1exw8J7r4R8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEqomvga; arc=pass smtp.client-ip=74.125.224.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4PxMkdT"
-Received: by mail-vs2-f32.google.com with SMTP id 71dfb90a1353d-5c67e4d8d8aso615392e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 05:20:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEqomvga"
+Received: by mail-yx2-f18.google.com with SMTP id 956f58d0204a3-66e4aac92dbso889006d50.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 06:55:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790171727; cv=none;
+        d=google.com; s=arc-20260327;
+        b=IuDOuaJKa4ywllB5S9vlhF9vK4+/y9RhcrfADsqSeHEJ01hTsI6j6ky+Q7MwhtwkHQ
+         eKNC4YoEql2K5klF6TK6aqXeWv+gYTFm//gHFDBhbNePf2nzMP+pTyzXtEtWBEsrGkB2
+         OX6tX2aFoZyt3qsp8rFIS0ELHgJamRPbopxEuOCkMIXAGYTnYSrnk0XYGaLHnEhvXaQJ
+         EZhlzmzOx6c6mgQHpU1NY4l1Xa6P2JZ815AEBEyELjwOCuz/axLkVBR58obbA97406be
+         sOtlJNxl/uZjd1U6uTKPgXsij0guLKzltSeOIOeJZg5+hO3SOcSYE4FwbeeYFF+sL1an
+         4Xzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vPp6aOrYg8Ur9w6++HZ9tsXCq4SxnZ3n79cpjzN5naU=;
+        fh=ImHaVp9LKIGjD0tRyxgUyPXd5WNSYdKgZ1TGxuDzvzM=;
+        b=D08SQKl1fqXu0dUlKpt9SJRiQnONjjue+IAU3gtJxYpiq6Z5qUQ/eg6lWRcSGHc58e
+         ujFGnbqUlOUE31BdMYYgfEfy3QTeqT55LY7uo8PQdjhMeNTsmZ1IwDFhPyIt/d+GEiGu
+         /PD9m5NRFtSNYIGqLw/fKXRKg2wUNo35KVqkmXaz5uJWPdF9zs3SIdXo8lX0u8yjCwfB
+         zol23TeubwykdE2X3gpcYPp+o0sTDtSlK6HfG6GRnc/Fn/NnOOdrUFNjESj3nPKkJF5N
+         bd75oK01ug6GT3DVefVhb047py3NxSX3hLOzFq7cuspfDxxRIAcxsv64cDLOAX2ygel/
+         EoiA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790166045; x=1790770845; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YpFKYfPhZapcpo9PA/CRrUdbEtZcRrxPPY3WKgYlFtE=;
-        b=K4PxMkdTQB2bDuEmS4q5QCJQurd7Rlw8a3YbYw//nXnnaEung5UdNAuZAQEm68dk/L
-         bn6it3U7PynZabpQAGyvJ9T1AWQB6PFcdAFrvZp+mfUjXl76hwz1HQX9CibbvX4c4DDA
-         AoIcZoszpR5Bq+MzsvFV85pN1v/TgvDObPzAa8jEM2IeppPsD2WEzPqIFLHVQGzDb05h
-         gKgxU13gfEdhbg02tjJeG0PS6Gk+2cOao9TvTdq8W+zlRdE4sqbQAo88TBKeg2G7o0yI
-         a82pnERO62QE6hE7US9fwq0anUCCFDBR6wCbpO5uxlA7KLQlZtxUl5yrs6BU/dkrWjnK
-         JaNg==
+        d=gmail.com; s=20251104; t=1790171727; x=1790776527; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vPp6aOrYg8Ur9w6++HZ9tsXCq4SxnZ3n79cpjzN5naU=;
+        b=jEqomvgaWVITnOzHCGIRmQlTd17BzNeaD052jO4RSInFww6Q5rdHiHVGC22jAriQUp
+         v8I552jWa1vFrlbibqR9h6/upVYWy3JcK+SAf2rqR8xg9ojCRC+EqxnylscW9J/G0MGf
+         DSPeQaWXl2TYvGnoyD637Mt0arL7Ek2GeJPRFYxcupu+IMLiTik+AyW10qJgNhwgNEXD
+         da8NnF/j2AgCCJYczUq4KflILDw1a4Owj/JOpMSZfQDO5Q5y4yZ+HbD9RQmriFG11ooB
+         HALOnMhL3oLPyNN/L1qEfpWvcoUypPd92QxkClmO2ha1KkFXHqn4qicfoAOiLwVhr88N
+         02EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790166045; x=1790770845;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YpFKYfPhZapcpo9PA/CRrUdbEtZcRrxPPY3WKgYlFtE=;
-        b=0AXMG4lc1HUSV6DhnWJKwDJiQ/tAMVdy5b321FsIZvLJ0IQDKq9n+KLx7LiOZ9H9eF
-         iOLy4IHOd6Bm56KNcvQsVCCCZ0w5tpGli0cAhebzjvmf4u51bmyTCNLXEs7BLzveCZS/
-         cS0I85PzXCzBGmWsMCH0/khItNq9ep4rhIaQRu43li19sloAzo4ARGDohaKFeaBElPZH
-         PhKg1qEI5zvyjjgyr2BhbaP196fniJgk9Ug4u9wG/nrDiLqjqy9zPfD//dAXDgjHeuGv
-         RC+XFS6oCIIo9Nwn+f7Poh5B7ijjiz2CO+/I74Ra/AihGQlL82pnsgpalcBj+U2cYcvt
-         RfOw==
-X-Forwarded-Encrypted: i=1; AKwUvBy0xuQlPSAMKZOtOcgQruOOV1j+IpZv3/bdzlYORj4OgE5+dgUoBOoJc3WAwJqBChTYpzSrZyn4UAk/pJ1jH0c=@vger.kernel.org
-X-Gm-Message-State: AFuF++nGpbm4gbFcRF+vFd8g/OKcIuB/paSaJeqy5Xd5TZGoq7LvZhIa
-	4TL4uHZHlkRGLPBxMVAwsgsvXYwNg346Fb0LahnU0aWzZR6gbVA+CLbU
-X-Gm-Gg: AYBFou1NGgvtj2IfEfS76SyxmsFFoTFkxza6vBjQBPzjCeZUKRJV3g9sYiE+c5hWvLy
-	/pxfbv6Daru+UpQhV53CnGy2RbOA6m7FWuX8DOikoKoDD1TPHny1ELrf5mfXdQZ+f8Z54S1sRzD
-	ScS0jRhjw/n9c70TmL5ix22gfzW6V2WzfEexv9gljE5zxKYZO3Fq0aR110RC80m+LXCHBpp/ChI
-	vUbfvwQwynQG0Qnrolt+dEKsUWSZ48ClZLzZPgBUnFNT4y4s2sRUIVbWCgH7oklvexAKKuTuGE1
-	zOhaHBJjP1kOQ1C77Ky4Wav//K3urIxYuPNCQTLPlPqauk321pWkDefQSv+1llY7Y3ioLg68BB2
-	A7bzxthdjz69PkyLYDsD5xNT+iOfOEAjlVmcSsFPacgoH6F8/Q07azBMhkvN8uBnafAmIE3xKfB
-	CxQLgQAp7yt3xPZdksb6e7mZFiLQ0W9o3Pa0/fQrpAMkbtC9Gy951pg8rGMtKTQ7hnIPeHnCF5D
-	A==
-X-Received: by 2002:a05:6122:e191:b0:5c7:ebed:1018 with SMTP id 71dfb90a1353d-5c9f15c8919mr2844793e0c.8.1790166045066;
-        Wed, 23 Sep 2026 05:20:45 -0700 (PDT)
-Received: from beelink.. ([187.13.30.172])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ca4604daf9sm872471e0c.17.2026.09.23.05.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 05:20:44 -0700 (PDT)
-From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
-To: pav@iki.fi,
-	luiz.dentz@gmail.com
-Cc: marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Aldo Ariel Panzardo <qwe.aldo@gmail.com>
-Subject: [PATCH v3] Bluetooth: SCO: serialise sco_conn lifetime against sco_recv_scodata()
-Date: Wed, 23 Sep 2026 09:20:26 -0300
-Message-ID: <20260923122026.3465391-1-qwe.aldo@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1790171727; x=1790776527;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vPp6aOrYg8Ur9w6++HZ9tsXCq4SxnZ3n79cpjzN5naU=;
+        b=Bz4/tDAFjBTRUpjTRTf9Pp1cjeYeVsei5dTOQeKyAw1GcBHuTvIMlt42WlsxzSBZT1
+         MpwI9xTmc40fBbSYKE/JVWRpdUXGbVJwY+hHBtvuWxrg504u5eYkD4QNRv/h9+MNprW0
+         8WoAWxtp4+pdnBmh1gzF+h++I6+d13Cu2FucAw2ACLzWIwMIBbGbsUVrJFK1ftuJ5dwh
+         c8I/o3iMe1mZ4YnpNwvMY2Ts+AD/9ycx4yZLywHeI+Bje2k4RLz2LeLCohpJ4kuusnVX
+         EUOJ37z6igwqGJKilOk97OxwpOx9z/d2WxJ1feolEjkvexz2IJNu956jps4En/0vTGUT
+         V4Xg==
+X-Gm-Message-State: AFuF++kyTINmv/4fJODMO3LvO+WgHRJFiiILkx2eAwrKdTYSDl2KmHZW
+	ldlUjDzgrPl/th6SHYBvAt07OauYRSIhBWE7tNyjlej1bB5cIkBi3DJoFj6Ic4GJpSSmh1GkEQS
+	LwUeHNduwl4eqMULbBPnO0qWsitLcZ+PFLL1oq7n6M0lR
+X-Gm-Gg: AYBFou241fFgwGAq2eSYvYCHAdxIuMfwyayabqswuwEC97beAI7kN2LkMSegNRWel6s
+	IgW5Hxrpx19ibs6eUZVf6yFv8M4e155qIPz9adaU4xXTMkg5lBTPqjBFb9qjGTql8V9Hwo1GlRc
+	xuLIWE3fuzSC8ASbY+jXNdxUCSl8pfYj7Jk73DXUbk5kd/gFv0tfqL7hRXT9NahjqEcW4z78xJ9
+	FJhBCHAHGX2TKAn8R86vrR75w5dsA7ZSNrlJKSYC7jQgTuW7ZMwq8DG0xRN/UNibzLG21Sk1p/a
+	pbBu/APqqJ2Keoo98hla05vqbTWEPcIFdsHZd1HWaMHvnISth2RXucEYjfbvEwvwH+nMgk/rtMB
+	KWHq/DaIOzN1Lg8gdyOrl6bR26E3fltvIpdGsEgN9gA==
+X-Received: by 2002:a05:690e:43d6:b0:671:3cf6:e1ab with SMTP id
+ 956f58d0204a3-672d578f736mr1091881d50.32.1790171726876; Wed, 23 Sep 2026
+ 06:55:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260923080003.317019-1-frederic.danis@collabora.com>
+In-Reply-To: <20260923080003.317019-1-frederic.danis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 23 Sep 2026 09:55:15 -0400
+X-Gm-Features: AclHuK-eX89lYm0yOJu_w7E80pRyWp3sINdh8AB6J8C2gvEvw4mXQrPs6tP9rGM
+Message-ID: <CABBYNZKN2C_65XH_LOptU_GVoarEa_BQmhvzr+7O68Y+Um9Zzg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/avrcp: Poll GetPlayStatus when position
+ changed event unsupported
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-sco_recv_scodata() upgrades the weak hcon->sco_data back-pointer to a
-strong reference under hdev->lock:
+Hi Frederic,
 
-    hci_dev_lock(hdev);
-    hcon = hci_conn_hash_lookup_handle(hdev, handle);
-    ...
-    conn = sco_conn_hold_unless_zero(hcon->sco_data);
-    hci_dev_unlock(hdev);
+On Wed, Sep 23, 2026 at 4:02=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> Some remote targets do not support the AVRCP_EVENT_PLAYBACK_POS_CHANGED
+> notification, meaning bluetoothd never learns about track position
+> updates for such devices.
+>
+> When this event is not present in the capabilities reported by the
+> remote, fall back to polling AVRCP_GET_PLAY_STATUS once a second so
+> the media player position stays in sync. Polling is only kept running
+> while playback is actively progressing (playing/forward-seek/
+> reverse-seek) and is stopped otherwise, and is torn down on session
+> destruction.
 
-but the pointer is cleared from the other side without that lock. When
-the last sco_conn reference is dropped, sco_conn_free() ran
+Back in the days AVRCP was introduced we decided not to poll the
+status and instead have the upper layer trigger it via
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.MediaPlayer.rst#ui=
+nt32-position-readonly,
+that said I do agree that perhaps it is better to it with directly by
+bluetoothd since so many years have passed and some manufactorers
+insist in not having AVRCP_EVENT_PLAYBACK_POS_CHANGED implemented.
 
-    conn->hcon->sco_data = NULL;
+> Assisted-by: Copilot CLI:claude-sonnet-5
+> ---
+>  profiles/audio/avrcp.c | 64 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 63 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index df5f97eaf..105538cdc 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -247,7 +247,9 @@ struct avrcp {
+>         unsigned int control_id;
+>         unsigned int browsing_id;
+>         unsigned int browsing_timer;
+> +       unsigned int position_timer;
+>         uint16_t supported_events;
+> +       bool pos_changed_supported;
+>         uint8_t transaction;
+>         struct pending_pdu *pending_pdu;
+>  };
+> @@ -341,6 +343,7 @@ static const uint32_t company_ids[] =3D {
+>
+>  static void avrcp_register_notification(struct avrcp *session, uint8_t e=
+vent);
+>  static GList *player_list_settings(struct avrcp_player *player);
+> +static void avrcp_get_play_status(struct avrcp *session);
+>
+>  static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *vers=
+ion)
+>  {
+> @@ -2224,6 +2227,56 @@ static const char *status_to_string(uint8_t status=
+)
+>         }
+>  }
+>
+> +static bool avrcp_poll_play_status(gpointer user_data)
+> +{
+> +       struct avrcp *session =3D user_data;
+> +
+> +       avrcp_get_play_status(session);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static void avrcp_stop_pos_polling(struct avrcp *session)
+> +{
+> +       if (session->position_timer =3D=3D 0)
+> +               return;
+> +
+> +       timeout_remove(session->position_timer);
+> +       session->position_timer =3D 0;
+> +}
+> +
+> +static void avrcp_start_pos_polling(struct avrcp *session)
+> +{
+> +       if (session->position_timer > 0)
+> +               return;
+> +
+> +       session->position_timer =3D timeout_add_seconds(1,
+> +                                               avrcp_poll_play_status,
+> +                                               session, NULL);
+> +}
+> +
+> +/*
+> + * Poll GetPlayStatus once a second to resync position while playing whe=
+n
+> + * the remote does not support AVRCP_EVENT_PLAYBACK_POS_CHANGED. Polling=
+ is
+> + * paused whenever playback is not actively progressing.
+> + */
+> +static void avrcp_update_pos_polling(struct avrcp *session, uint8_t stat=
+us)
+> +{
+> +       if (session->pos_changed_supported)
+> +               return;
+> +
+> +       switch (status) {
+> +       case AVRCP_PLAY_STATUS_PLAYING:
+> +       case AVRCP_PLAY_STATUS_FWD_SEEK:
+> +       case AVRCP_PLAY_STATUS_REV_SEEK:
+> +               avrcp_start_pos_polling(session);
 
-with no hdev->lock held, so the RX path could read hcon->sco_data and
-call kref_get_unless_zero() on an sco_conn that was concurrently freed:
+Btw, if I recall correctly, position tracking really breaks when the
+user seeks the stream using the player progression bar, which
+interrupts the continuous timer. So, if the player does either
+AVRCP_PLAY_STATUS_FWD_SEEK or AVRCP_PLAY_STATUS_REV_SEEK then we can
+resink the position once, afaik iOS media player doesn't use them
+either, thus why the whole polling thing is needed to capture non
+continuguos skips that are not advertised.
 
-    BUG: KASAN: slab-use-after-free in sco_conn_hold_unless_zero+0xbe/0x160
-    Write of size 4 by task kworker/u17:0
-    Workqueue: hci0 hci_rx_work
-    Call Trace:
-     sco_conn_hold_unless_zero+0xbe/0x160
-     sco_recv_scodata+0x13f/0x490
-     hci_rx_work+0x3af/0x730
+> +               break;
+> +       default:
+> +               avrcp_stop_pos_polling(session);
+> +               break;
+> +       }
+> +}
+> +
+>  static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t co=
+de,
+>                                         uint8_t subunit, uint8_t transact=
+ion,
+>                                         uint8_t *operands, size_t operand=
+_count,
+> @@ -2252,6 +2305,8 @@ static gboolean avrcp_get_play_status_rsp(struct av=
+ctp *conn, uint8_t code,
+>         media_player_set_position(mp, position);
+>         media_player_set_status(mp, status_to_string(status));
+>
+> +       avrcp_update_pos_polling(session, status);
+> +
+>         return FALSE;
+>  }
+>
+> @@ -4128,6 +4183,9 @@ static gboolean avrcp_get_capabilities_resp(struct =
+avctp *conn, uint8_t code,
+>                 }
+>         }
+>
+> +       session->pos_changed_supported =3D
+> +                       !!(events & (1 << AVRCP_EVENT_PLAYBACK_POS_CHANGE=
+D));
+> +
+>         if (!session->controller || !session->controller->player)
+>                 return FALSE;
+>
+> @@ -4140,7 +4198,8 @@ static gboolean avrcp_get_capabilities_resp(struct =
+avctp *conn, uint8_t code,
+>                         !(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
+>                 avrcp_list_player_attributes(session);
+>
+> -       if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
+> +       if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)) ||
+> +                       !session->pos_changed_supported)
+>                 avrcp_get_play_status(session);
+>
+>         if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
+> @@ -4470,6 +4529,9 @@ static void session_destroy(struct avrcp *session, =
+int err)
+>         if (session->browsing_timer > 0)
+>                 timeout_remove(session->browsing_timer);
+>
+> +       if (session->position_timer > 0)
+> +               timeout_remove(session->position_timer);
+> +
+>         if (session->controller !=3D NULL)
+>                 controller_destroy(session);
+>
+> --
+> 2.43.0
+>
+>
 
-kref_get_unless_zero() only guards against a zero refcount, not against
-the backing memory already being freed.
 
-Give hcon->sco_data an actual reference on the sco_conn it points to, so
-the object cannot be freed while the pointer is still installed, and only
-clear and drop it from sco_conn_del(), which runs under hdev->lock (its
-callers, sco_connect_cfm() and sco_disconn_cfm(), hold it). The reader in
-sco_recv_scodata() also takes hdev->lock, so the store and the read are
-now serialised: the RX path either observes NULL or a reference that is
-guaranteed to stay valid until it drops its own.
-
-sco_conn_add() no longer hands its kref_init() reference to the caller as
-the connection's only reference; that initial reference is the one owned
-by hcon->sco_data, and callers get their own via sco_conn_hold().
-
-Because the sco_conn can now outlive the socket (the association keeps it
-alive until the link goes down), the hci_conn can no longer be dropped
-from sco_conn_free() without regressing socket close: closing a connected
-SCO socket must still tear the link down. Move hci_conn ownership to the
-socket instead: __sco_chan_add() takes an hci_conn reference and it is
-released from sco_chan_del() and sco_sock_destruct(), exactly once. The
-sco_conn no longer owns an hci_conn reference, so sco_conn_add() stops
-consuming one and sco_connect() drops the hci_connect_sco() reference on
-every path; sco_connect_cfm() no longer needs its hci_conn_hold() dance.
-
-Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
-Cc: stable@vger.kernel.org
-Suggested-by: Pauli Virtanen <pav@iki.fi>
-Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
----
-v3: fix two UAFs found by Pauli Virtanen in the v2 review:
-    - sco_chan_del(): drop hci_conn ref before clearing conn->sk so that
-      sco_conn_del() on another CPU cannot free hci_conn under our feet
-    - sco_sock_destruct(): same ordering fix
-    - remove dead branch in sco_conn_add() (conn->hcon == NULL impossible)
-    - move hci_conn_drop in sco_connect() tighter after __sco_chan_add()
-v2: quote inlined code and KASAN splat with spaces (bluez CI gitlint);
-    no functional change.
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 3d4362a..a2f17ab 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -84,12 +84,14 @@ static void sco_conn_free(struct kref *ref)
- 	if (conn->sk)
- 		sco_pi(conn->sk)->conn = NULL;
- 
--	if (conn->hcon) {
--		conn->hcon->sco_data = NULL;
--		hci_conn_drop(conn->hcon);
--	}
-+	/* hcon->sco_data is cleared and the association's reference on the
-+	 * sco_conn is dropped in sco_conn_del() under hdev->lock, and the
-+	 * hci_conn is now owned by the socket (held in __sco_chan_add() and
-+	 * dropped in sco_chan_del()/sco_sock_destruct()), so there is nothing
-+	 * left to release towards hcon here.
-+	 */
- 
--	/* Ensure no more work items will run since hci_conn has been dropped */
-+	/* Ensure no more work items will run before the connection is freed */
- 	disable_delayed_work_sync(&conn->timeout_work);
- 
- 	kfree(conn);
-@@ -188,25 +190,19 @@ static void sco_sock_clear_timer(struct sock *sk)
- }
- 
- /* ---- SCO connections ---- */
--/* Consumes a reference on @hcon, which the returned sco_conn owns until it is
-- * freed. On failure (NULL return) the reference is left for the caller to drop.
-+/* Returns a new reference the caller must drop with sco_conn_put(). The
-+ * hcon->sco_data association holds its own reference on the sco_conn for the
-+ * connection's lifetime; it is dropped in sco_conn_del() under hdev->lock.
-+ * @hcon is not consumed: the hci_conn reference is taken and owned by the
-+ * socket in __sco_chan_add().
-  */
- static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
- {
- 	struct sco_conn *conn = hcon->sco_data;
- 
- 	conn = sco_conn_hold_unless_zero(conn);
--	if (conn) {
--		if (!conn->hcon) {
--			sco_conn_lock(conn);
--			conn->hcon = hcon;
--			sco_conn_unlock(conn);
--		} else {
--			/* conn already owns a reference on hcon */
--			hci_conn_drop(hcon);
--		}
-+	if (conn)
- 		return conn;
--	}
- 
- 	conn = kzalloc_obj(struct sco_conn);
- 	if (!conn)
-@@ -227,7 +223,10 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
- 
- 	BT_DBG("hcon %p conn %p", hcon, conn);
- 
--	return conn;
-+	/* kref_init() above set the association reference owned by
-+	 * hcon->sco_data; hand the caller its own reference.
-+	 */
-+	return sco_conn_hold(conn);
- }
- 
- /* Delete channel.
-@@ -242,6 +241,19 @@ static void sco_chan_del(struct sock *sk, int err)
- 	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
- 
- 	if (conn) {
-+		struct hci_conn *hcon;
-+
-+		sco_conn_lock(conn);
-+		hcon = conn->hcon;
-+		sco_conn_unlock(conn);
-+
-+		/* Drop the socket's hci_conn reference BEFORE clearing
-+		 * conn->sk, so sco_conn_del() on another CPU cannot free
-+		 * the hci_conn while we still hold a pointer to it.
-+		 */
-+		if (hcon)
-+			hci_conn_drop(hcon);
-+
- 		sco_conn_lock(conn);
- 		conn->sk = NULL;
- 		sco_conn_unlock(conn);
-@@ -266,6 +278,13 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 
- 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
- 
-+	/* Detach from the hci_conn and drop the association's reference.
-+	 * The caller holds hdev->lock, which serialises this against the
-+	 * read of hcon->sco_data in sco_recv_scodata().
-+	 */
-+	hcon->sco_data = NULL;
-+	sco_conn_put(conn);
-+
- 	sco_conn_lock(conn);
- 	sk = sco_sock_hold(conn);
- 	sco_conn_unlock(conn);
-@@ -290,6 +309,11 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
- 	sco_pi(sk)->conn = sco_conn_hold(conn);
- 	conn->sk = sk;
- 
-+	/* The socket owns an hci_conn reference for as long as it stays
-+	 * attached; it is dropped in sco_chan_del()/sco_sock_destruct().
-+	 */
-+	hci_conn_hold(conn->hcon);
-+
- 	if (parent)
- 		bt_accept_enqueue(parent, sk, true);
- }
-@@ -371,6 +395,7 @@ static int sco_connect(struct sock *sk)
- 	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
- 		release_sock(sk);
- 		sco_conn_put(conn);
-+		hci_conn_drop(hcon);
- 		err = -EBADFD;
- 		goto unlock;
- 	}
-@@ -379,9 +404,13 @@ static int sco_connect(struct sock *sk)
- 	sco_conn_put(conn);
- 	if (err) {
- 		release_sock(sk);
-+		hci_conn_drop(hcon);
- 		goto unlock;
- 	}
- 
-+	/* __sco_chan_add() took its own hci_conn reference; drop ours. */
-+	hci_conn_drop(hcon);
-+
- 	/* Update source addr of the socket */
- 	bacpy(&sco_pi(sk)->src, &hcon->src);
- 
-@@ -495,9 +524,26 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
- 
- static void sco_sock_destruct(struct sock *sk)
- {
-+	struct sco_conn *conn = sco_pi(sk)->conn;
-+
- 	BT_DBG("sk %p", sk);
- 
--	sco_conn_put(sco_pi(sk)->conn);
-+	/* If the channel was not already torn down via sco_chan_del(), drop
-+	 * the socket's own references here.
-+	 */
-+	if (conn) {
-+		struct hci_conn *hcon;
-+
-+		sco_conn_lock(conn);
-+		hcon = conn->hcon;
-+		sco_conn_unlock(conn);
-+
-+		if (hcon)
-+			hci_conn_drop(hcon);
-+		sco_pi(sk)->conn = NULL;
-+		sco_conn_put(conn);
-+		return;
-+	}
- 
- 	skb_queue_purge(&sk->sk_receive_queue);
- 	skb_queue_purge(&sk->sk_write_queue);
-@@ -1511,12 +1557,10 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
- 	if (!status) {
- 		struct sco_conn *conn;
- 
--		conn = sco_conn_add(hci_conn_hold(hcon));
-+		conn = sco_conn_add(hcon);
- 		if (conn) {
- 			sco_conn_ready(conn);
- 			sco_conn_put(conn);
--		} else {
--			hci_conn_drop(hcon);
- 		}
- 	} else
- 		sco_conn_del(hcon, bt_to_errno(status));
--- 
-2.43.0
+--=20
+Luiz Augusto von Dentz
