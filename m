@@ -1,208 +1,323 @@
-Received: from mail-oa2-f22.google.com (mail-oa2-f22.google.com [74.125.231.86])
+Received: from mail-vs2-f32.google.com (mail-vs2-f32.google.com [74.125.227.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF3B3ACA64
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 11:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5598C4D4896
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 12:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790161496; cv=none; b=VnIeNccs8ATKEiuww2SeSWHUNQ/yN5cBpUU+cXJMBgQzMIRKvhkym1/xfkn+9RVR6ham0Avs5A9wcvde1lc0SO3gqoc3iIQIYhKFxewEJusnFKHzn83qPKmrIFt0+3d1ZezY2iGMBKkQ47CeAr5e06HA4uircOZvPMjfdjRG18U=
+	t=1790166048; cv=none; b=JLvtWemxvymK8QOIIJkY/0bPBgnnL+hqfJ6LdbBwEM1n4ogQ9pt5boNBgd2BPDab/B5dXK1Pa8ea9KIcTrB2dUya44TrPbjDU4r/hC8CPo+hkwvUbHq8nxz7JOSuSWrZL0DPnkn8MJQIma9X4E79EyxMqgXnpl/BzXS4oMNld3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790161496; c=relaxed/simple;
-	bh=5eaBsaOTdhJ15+1WFgjmNdeMAIpVuJxMq4MsdktNOds=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=o0Pgdm5N5dnFvreoM0LPRK4IIUXqRmH6Up2wlUpHOjGI8BGJPSd8kKRINX2Wjzd3h6IliVSJKwzzlxksQcvTtuZtMvsQxPGcemsMr9VJuDgeZETAXiTf/21vLNnU/xPqgy78v78xwMluxIHWemhond3IuUIU6NkCc77XvQk9jMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwNa7S6E; arc=none smtp.client-ip=74.125.231.86
+	s=arc-20240116; t=1790166048; c=relaxed/simple;
+	bh=fuV87aaUHDzuJt3uwaIZDnGcoihmJ6JF26OZkzkIRdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tImnx6rFWOUVFAhsJ25XJoxPWQOZZD2lYj1iuymCvmvzFt5qbZQdWNcyFhQZWOqesjkwCisTtzJBxWO5duHgV+Lk60Qp3nu0h5nW0ZroEZ6w1t0mVkx/jHE2qC5MWVaVfDhAyZOwLSskTjyACkaChVG2qOYBNiaRwQ8LkkDUQeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K4PxMkdT; arc=none smtp.client-ip=74.125.227.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwNa7S6E"
-Received: by mail-oa2-f22.google.com with SMTP id 586e51a60fabf-48e46240b38so523849fac.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 04:04:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4PxMkdT"
+Received: by mail-vs2-f32.google.com with SMTP id 71dfb90a1353d-5c67e4d8d8aso615392e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 05:20:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790161488; x=1790766288; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=dVe/YuZmPR1eElbCrL39wX+A2bOAnwO1I6QJ6MPw0/o=;
-        b=SwNa7S6EaI4SoFP/GNO9eF/a1D3nlb9qX4pXkOJx1pwzybisaVHY05+gDTi5Q11xmm
-         iPSJGFLRX4A3uLWjPUrBYAknxy/Kg/SuDL1GlaDbnXFLpTLBb3vfsaz2J+pJxZlskybA
-         YAPV9hdiseo95RHUZrjqC0cYbixTSD6MtUhtdvvDKL2cFhrNUP9o8O2msXtQjEXXvT3D
-         7TqXZUF71sJ7GNwgw1DzS5uROupXKcTOXPGrQ4PfKgB1h7uOil07kBrbQxeINjNMUCWt
-         auWwT178ydSsdRshgFPWnnh6xvYFIuc4j5LxZ5vwJlRbPjia9CE9g/Z7A58+wruv9onV
-         urIQ==
+        d=gmail.com; s=20251104; t=1790166045; x=1790770845; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YpFKYfPhZapcpo9PA/CRrUdbEtZcRrxPPY3WKgYlFtE=;
+        b=K4PxMkdTQB2bDuEmS4q5QCJQurd7Rlw8a3YbYw//nXnnaEung5UdNAuZAQEm68dk/L
+         bn6it3U7PynZabpQAGyvJ9T1AWQB6PFcdAFrvZp+mfUjXl76hwz1HQX9CibbvX4c4DDA
+         AoIcZoszpR5Bq+MzsvFV85pN1v/TgvDObPzAa8jEM2IeppPsD2WEzPqIFLHVQGzDb05h
+         gKgxU13gfEdhbg02tjJeG0PS6Gk+2cOao9TvTdq8W+zlRdE4sqbQAo88TBKeg2G7o0yI
+         a82pnERO62QE6hE7US9fwq0anUCCFDBR6wCbpO5uxlA7KLQlZtxUl5yrs6BU/dkrWjnK
+         JaNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790161488; x=1790766288;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=dVe/YuZmPR1eElbCrL39wX+A2bOAnwO1I6QJ6MPw0/o=;
-        b=O87VSSi6angctisIfMxrz0KBlia5eSmDARe/X8O3fIeforEZ0uk3rWoRRfoMHXJKYm
-         0RtdjQddZnoyLy9QVbq8lyx3pJGBV1uL6tQ2wh+YO6ntmtUQGZneteYChe//Z/lWNTfp
-         tvvx5qzEepvJwK1pD74CjLv8+/mbVsq1NBf+FzqWVMi6GPW00B0Myx93iYTU8/gN/AIN
-         OmbhR69oKotyDHGRS48EsdwZsSsiRfg1i3pqUDETZLhFgwhCTi+UjqK06CbQz+Eh1jkv
-         9rYs2PkOt4rUOA+dQQRt3POjSHW9o6tqpM7dIC4Fkg9NKS++Om0Wyb4QUavbH3YAZDyQ
-         uW0Q==
-X-Gm-Message-State: AFuF++n7PDwIkji/Ah8cjxNE0SdYVvU5u94oOeQcsrPpcjpxLuARn8uj
-	HxAqXmqArxhBB1hhCrP/nrV5CUFbjzvEeVWHnnja0f2UmWT7mVLluwpsZjjPhbnd
-X-Gm-Gg: AYBFou0YkTjlDTK0iIs4S44B5EW4gQhZ+5Ia2iEJm6F+WPklxbjOq0z8z0IkY/8oDHY
-	Zh+ZAnHSfXF52/9PxMK0ZGMhr0Dx3CdhZVwka2e3Mng/ZddAY/9ywb2JtIKp+Z4UOvBDv2fVdbI
-	U+ewzAx74KtyVPU9IjZivfeShLL1w4juc26s5srcYdgpnr6b2lqsfC6SqPYuiO7DEQMAZDtC+Fd
-	sFAMME9cETwEr0fBnQh6Uqe8vtpioU7yw1xtzZObgUrxlGw1ZVolecQ1Ie+CeiEvKyVu0cxPNeN
-	hRJ1mAMsJ1yNLTvnD+xEFbZP+8dw03+UCavKdf6uaTJJYkf3A2eVHwMc5GevQJxP5wIb48tV/i3
-	w1EUW4cfbyu0jv/bQ4DBIpO4sQkAbdQB0Xh6zmpeUP7zOSJj1ubPQNC/6ygFSoVyvvNXtYjjzTa
-	HcbWGrx/c1tuM7z9riAcJoxfGzJy18wiZUTvjrMIbz0MvpnS8W0dNmZFJU5jlZ9pMll0lJH3te2
-	NesZ6JLdi1eHGjs
-X-Received: by 2002:a05:6870:d202:b0:48f:e21d:f753 with SMTP id 586e51a60fabf-4908b5fb2a5mr1945705fac.60.1790161488224;
-        Wed, 23 Sep 2026 04:04:48 -0700 (PDT)
-Received: from [172.17.0.2] ([20.40.254.226])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4908e11e7acsm1562391fac.5.2026.09.23.04.04.47
+        d=1e100.net; s=20260707; t=1790166045; x=1790770845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=YpFKYfPhZapcpo9PA/CRrUdbEtZcRrxPPY3WKgYlFtE=;
+        b=0AXMG4lc1HUSV6DhnWJKwDJiQ/tAMVdy5b321FsIZvLJ0IQDKq9n+KLx7LiOZ9H9eF
+         iOLy4IHOd6Bm56KNcvQsVCCCZ0w5tpGli0cAhebzjvmf4u51bmyTCNLXEs7BLzveCZS/
+         cS0I85PzXCzBGmWsMCH0/khItNq9ep4rhIaQRu43li19sloAzo4ARGDohaKFeaBElPZH
+         PhKg1qEI5zvyjjgyr2BhbaP196fniJgk9Ug4u9wG/nrDiLqjqy9zPfD//dAXDgjHeuGv
+         RC+XFS6oCIIo9Nwn+f7Poh5B7ijjiz2CO+/I74Ra/AihGQlL82pnsgpalcBj+U2cYcvt
+         RfOw==
+X-Forwarded-Encrypted: i=1; AKwUvBy0xuQlPSAMKZOtOcgQruOOV1j+IpZv3/bdzlYORj4OgE5+dgUoBOoJc3WAwJqBChTYpzSrZyn4UAk/pJ1jH0c=@vger.kernel.org
+X-Gm-Message-State: AFuF++nGpbm4gbFcRF+vFd8g/OKcIuB/paSaJeqy5Xd5TZGoq7LvZhIa
+	4TL4uHZHlkRGLPBxMVAwsgsvXYwNg346Fb0LahnU0aWzZR6gbVA+CLbU
+X-Gm-Gg: AYBFou1NGgvtj2IfEfS76SyxmsFFoTFkxza6vBjQBPzjCeZUKRJV3g9sYiE+c5hWvLy
+	/pxfbv6Daru+UpQhV53CnGy2RbOA6m7FWuX8DOikoKoDD1TPHny1ELrf5mfXdQZ+f8Z54S1sRzD
+	ScS0jRhjw/n9c70TmL5ix22gfzW6V2WzfEexv9gljE5zxKYZO3Fq0aR110RC80m+LXCHBpp/ChI
+	vUbfvwQwynQG0Qnrolt+dEKsUWSZ48ClZLzZPgBUnFNT4y4s2sRUIVbWCgH7oklvexAKKuTuGE1
+	zOhaHBJjP1kOQ1C77Ky4Wav//K3urIxYuPNCQTLPlPqauk321pWkDefQSv+1llY7Y3ioLg68BB2
+	A7bzxthdjz69PkyLYDsD5xNT+iOfOEAjlVmcSsFPacgoH6F8/Q07azBMhkvN8uBnafAmIE3xKfB
+	CxQLgQAp7yt3xPZdksb6e7mZFiLQ0W9o3Pa0/fQrpAMkbtC9Gy951pg8rGMtKTQ7hnIPeHnCF5D
+	A==
+X-Received: by 2002:a05:6122:e191:b0:5c7:ebed:1018 with SMTP id 71dfb90a1353d-5c9f15c8919mr2844793e0c.8.1790166045066;
+        Wed, 23 Sep 2026 05:20:45 -0700 (PDT)
+Received: from beelink.. ([187.13.30.172])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ca4604daf9sm872471e0c.17.2026.09.23.05.20.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 04:04:47 -0700 (PDT)
-Message-ID: <6ab3b24f.e782ec0c.249bf4.3d5c@mx.google.com>
-Date: Wed, 23 Sep 2026 04:04:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2252320409481295464=="
+        Wed, 23 Sep 2026 05:20:44 -0700 (PDT)
+From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+To: pav@iki.fi,
+	luiz.dentz@gmail.com
+Cc: marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+Subject: [PATCH v3] Bluetooth: SCO: serialise sco_conn lifetime against sco_recv_scodata()
+Date: Wed, 23 Sep 2026 09:20:26 -0300
+Message-ID: <20260923122026.3465391-1-qwe.aldo@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] audio/avrcp: Poll GetPlayStatus when position changed event unsupported
-In-Reply-To: <20260923080003.317019-1-frederic.danis@collabora.com>
-References: <20260923080003.317019-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2252320409481295464==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+sco_recv_scodata() upgrades the weak hcon->sco_data back-pointer to a
+strong reference under hdev->lock:
 
-This is automated email and please do not reply to this email!
+    hci_dev_lock(hdev);
+    hcon = hci_conn_hash_lookup_handle(hdev, handle);
+    ...
+    conn = sco_conn_hold_unless_zero(hcon->sco_data);
+    hci_dev_unlock(hdev);
 
-Dear submitter,
+but the pointer is cleared from the other side without that lock. When
+the last sco_conn reference is dropped, sco_conn_free() ran
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1172004/
+    conn->hcon->sco_data = NULL;
 
----Test result---
+with no hdev->lock held, so the RX path could read hcon->sco_data and
+call kref_get_unless_zero() on an sco_conn that was concurrently freed:
 
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      1.17 seconds
-BuildEll                      PASS      19.48 seconds
-BluezMake                     PASS      386.90 seconds
-MakeCheck                     PASS      2.67 seconds
-MakeDistcheck                 PASS      138.47 seconds
-CheckValgrind                 PASS      149.37 seconds
-CheckSmatch                   PASS      287.84 seconds
-bluezmakeextell               PASS      93.00 seconds
-TestFunctional                FAIL      1132.21 seconds
-IncrementalBuild              PASS      383.61 seconds
-ScanBuild                     PASS      1124.56 seconds
+    BUG: KASAN: slab-use-after-free in sco_conn_hold_unless_zero+0xbe/0x160
+    Write of size 4 by task kworker/u17:0
+    Workqueue: hci0 hci_rx_work
+    Call Trace:
+     sco_conn_hold_unless_zero+0xbe/0x160
+     sco_recv_scodata+0x13f/0x490
+     hci_rx_work+0x3af/0x730
 
-Details
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts9-vm3-legacy]: failed on setup with "pytest_bluezenv.rpc.RemoteError: End Of File (EOF).
-    <pexpect.popen_spawn.PopenSpawn object at 0x7f0ab7b1e7b0>
-    searcher: searcher_re:
-        0: re.compile(b'Device has been removed|Device 00:AA:01:00:00:42 not available')
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
-            return getattr(self.plugins[name], method)(*a, **kw)
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 441, in expect
-            ret = ctl.expect(*a, **kw)
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
-            return self.expect_list(compiled_pattern_list,
-                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-                    timeout, searchwindowsize, async_)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
-            return exp.expect_loop(timeout)
-                   ~~~~~~~~~~~~~~~^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 179, in expect_loop
-            return self.eof(e)
-                   ~~~~~~~~^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 122, in eof
-            raise exc
-        pexpect.exceptions.EOF: End Of File (EOF).
-        <pexpect.popen_spawn.PopenSpawn object at 0x7f0ab7b1e7b0>
-        searcher: searcher_re:
-            0: re.compile(b'Device has been removed|Device 00:AA:01:00:00:42 not available')"
-FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts9-vm3-legacy]: failed on teardown with "pytest_bluezenv.plugin.CoredumpWarning: Core dump: test-bluezenv-hosts9.2-bluetoothctl-1790159931-120.core
-        /usr/bin/gdb: warning: Couldn't determine a path for the index cache directory.
-        [New LWP 120]
-        [Thread debugging using libthread_db enabled]
-        Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
-        Core was generated by `/home/runner/work/bluez/bluez/src/src/client/bluetoothctl -a auto:NoInputNoOutput --init-script /home/runner/work/bluez/bluez/src/src/test/../client/scripts/bap-sink-lc3-right.bt'.
-        Program terminated with signal SIGABRT, Aborted.
-        #0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44
+kref_get_unless_zero() only guards against a zero refcount, not against
+the backing memory already being freed.
 
-        warning: 44	./nptl/pthread_kill.c: No such file or directory
+Give hcon->sco_data an actual reference on the sco_conn it points to, so
+the object cannot be freed while the pointer is still installed, and only
+clear and drop it from sco_conn_del(), which runs under hdev->lock (its
+callers, sco_connect_cfm() and sco_disconn_cfm(), hold it). The reader in
+sco_recv_scodata() also takes hdev->lock, so the store and the read are
+now serialised: the RX path either observes NULL or a reference that is
+guaranteed to stay valid until it drops its own.
 
-        Thread 1 (Thread 0x7fba8f957d40 (LWP 120)):
-        #0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44
-                tid = <optimized out>
-                ret = 0
-                pd = <optimized out>
-                old_mask = {__val = {140730558660480}}
-                ret = <optimized out>
-        #1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89
-        No locals.
-        #2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100
-        No locals.
-        #3  0x00007fba8ff96b7e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
-                ret = <optimized out>
-        #4  0x00007fba8ff798ec in __GI_abort () at ./stdlib/abort.c:77
-                act = {__sigaction_handler = {sa_handler = 0x7c2a8ede1440, sa_sigaction = 0x7c2a8ede1440}, sa_mask = {__val = {140439258023203, 140730558660496, 140439256476592, 7791336406271877491, 140439258023072, 140730558660576, 140439267555473, 140439268605984, 140439246334784, 0, 140439258023072, 4294967295, 140439239786496, 140730558660624, 140439256147459, 140439258023072}}, sa_flags = -1897983936, sa_restorer = 0x7cda8ede01c0}
-        #5  0x00007fba907f7fe2 in ?? () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
-        No symbol table info available.
-        #6  0x00007fba908234c1 in _dbus_warn_check_failed () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
-        No symbol table info available.
-        #7  0x000055a7c4f7200a in cancel_request (conn=<optimized out>, msg=0x7cba8edf1040, user_data=<optimized out>) at client/agent.c:258
-        No locals.
-        #8  0x000055a7c5006131 in process_message (connection=0x7cda8ede01c0, message=0x7cba8edf1040, method=0x55a7c50e75e0 <auto_methods+320>, iface_user_data=<optimized out>) at gdbus/object.c:293
-                reply = <optimized out>
-        #9  0x00007fba908040f4 in dbus_connection_dispatch () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
-        No symbol table info available.
-        #10 0x000055a7c4ff5d98 in message_dispatch (data=0x7cda8ede01c0) at gdbus/mainloop.c:59
-                conn = 0x7cda8ede01c0
-        #11 0x00007fba9089bb9b in ?? () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #12 0x00007fba9089d1d7 in ?? () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #13 0x00007fba9089d577 in g_main_loop_run () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #14 0x000055a7c5039539 in mainloop_run () at src/shared/mainloop-glib.c:65
-        No locals.
-        #15 0x000055a7c5039e6b in mainloop_run_with_signal (func=func@entry=0x55a7c5030eb0 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-notify.c:196
-                data = 0x7bea8ede1810
-                io = 0x7bfa8ede1f50
-                ret = <optimized out>
-        #16 0x000055a7c503508c in bt_shell_run () at src/shared/shell.c:1476
-                status = <optimized out>
-                submenu = <optimized out>
-        #17 0x000055a7c4f5a915 in main (argc=<optimized out>, argv=<optimized out>) at client/main.c:4228
-                client = 0x7cba8ede0440
-                status = <optimized out>
-                timeout = <optimized out>
-                timeout_id = <optimized out>"
+sco_conn_add() no longer hands its kref_init() reference to the caller as
+the connection's only reference; that initial reference is the one owned
+by hcon->sco_data, and callers get their own via sco_conn_hold().
 
+Because the sco_conn can now outlive the socket (the association keeps it
+alive until the link goes down), the hci_conn can no longer be dropped
+from sco_conn_free() without regressing socket close: closing a connected
+SCO socket must still tear the link down. Move hci_conn ownership to the
+socket instead: __sco_chan_add() takes an hci_conn reference and it is
+released from sco_chan_del() and sco_sock_destruct(), exactly once. The
+sco_conn no longer owns an hci_conn reference, so sco_conn_add() stops
+consuming one and sco_connect() drops the hci_connect_sco() reference on
+every path; sco_connect_cfm() no longer needs its hci_conn_hold() dance.
 
-https://github.com/bluez/bluez/pull/2570
-
+Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
+Cc: stable@vger.kernel.org
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+v3: fix two UAFs found by Pauli Virtanen in the v2 review:
+    - sco_chan_del(): drop hci_conn ref before clearing conn->sk so that
+      sco_conn_del() on another CPU cannot free hci_conn under our feet
+    - sco_sock_destruct(): same ordering fix
+    - remove dead branch in sco_conn_add() (conn->hcon == NULL impossible)
+    - move hci_conn_drop in sco_connect() tighter after __sco_chan_add()
+v2: quote inlined code and KASAN splat with spaces (bluez CI gitlint);
+    no functional change.
 
-
---===============2252320409481295464==--
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 3d4362a..a2f17ab 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -84,12 +84,14 @@ static void sco_conn_free(struct kref *ref)
+ 	if (conn->sk)
+ 		sco_pi(conn->sk)->conn = NULL;
+ 
+-	if (conn->hcon) {
+-		conn->hcon->sco_data = NULL;
+-		hci_conn_drop(conn->hcon);
+-	}
++	/* hcon->sco_data is cleared and the association's reference on the
++	 * sco_conn is dropped in sco_conn_del() under hdev->lock, and the
++	 * hci_conn is now owned by the socket (held in __sco_chan_add() and
++	 * dropped in sco_chan_del()/sco_sock_destruct()), so there is nothing
++	 * left to release towards hcon here.
++	 */
+ 
+-	/* Ensure no more work items will run since hci_conn has been dropped */
++	/* Ensure no more work items will run before the connection is freed */
+ 	disable_delayed_work_sync(&conn->timeout_work);
+ 
+ 	kfree(conn);
+@@ -188,25 +190,19 @@ static void sco_sock_clear_timer(struct sock *sk)
+ }
+ 
+ /* ---- SCO connections ---- */
+-/* Consumes a reference on @hcon, which the returned sco_conn owns until it is
+- * freed. On failure (NULL return) the reference is left for the caller to drop.
++/* Returns a new reference the caller must drop with sco_conn_put(). The
++ * hcon->sco_data association holds its own reference on the sco_conn for the
++ * connection's lifetime; it is dropped in sco_conn_del() under hdev->lock.
++ * @hcon is not consumed: the hci_conn reference is taken and owned by the
++ * socket in __sco_chan_add().
+  */
+ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ {
+ 	struct sco_conn *conn = hcon->sco_data;
+ 
+ 	conn = sco_conn_hold_unless_zero(conn);
+-	if (conn) {
+-		if (!conn->hcon) {
+-			sco_conn_lock(conn);
+-			conn->hcon = hcon;
+-			sco_conn_unlock(conn);
+-		} else {
+-			/* conn already owns a reference on hcon */
+-			hci_conn_drop(hcon);
+-		}
++	if (conn)
+ 		return conn;
+-	}
+ 
+ 	conn = kzalloc_obj(struct sco_conn);
+ 	if (!conn)
+@@ -227,7 +223,10 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ 
+ 	BT_DBG("hcon %p conn %p", hcon, conn);
+ 
+-	return conn;
++	/* kref_init() above set the association reference owned by
++	 * hcon->sco_data; hand the caller its own reference.
++	 */
++	return sco_conn_hold(conn);
+ }
+ 
+ /* Delete channel.
+@@ -242,6 +241,19 @@ static void sco_chan_del(struct sock *sk, int err)
+ 	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
+ 
+ 	if (conn) {
++		struct hci_conn *hcon;
++
++		sco_conn_lock(conn);
++		hcon = conn->hcon;
++		sco_conn_unlock(conn);
++
++		/* Drop the socket's hci_conn reference BEFORE clearing
++		 * conn->sk, so sco_conn_del() on another CPU cannot free
++		 * the hci_conn while we still hold a pointer to it.
++		 */
++		if (hcon)
++			hci_conn_drop(hcon);
++
+ 		sco_conn_lock(conn);
+ 		conn->sk = NULL;
+ 		sco_conn_unlock(conn);
+@@ -266,6 +278,13 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
++	/* Detach from the hci_conn and drop the association's reference.
++	 * The caller holds hdev->lock, which serialises this against the
++	 * read of hcon->sco_data in sco_recv_scodata().
++	 */
++	hcon->sco_data = NULL;
++	sco_conn_put(conn);
++
+ 	sco_conn_lock(conn);
+ 	sk = sco_sock_hold(conn);
+ 	sco_conn_unlock(conn);
+@@ -290,6 +309,11 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 	sco_pi(sk)->conn = sco_conn_hold(conn);
+ 	conn->sk = sk;
+ 
++	/* The socket owns an hci_conn reference for as long as it stays
++	 * attached; it is dropped in sco_chan_del()/sco_sock_destruct().
++	 */
++	hci_conn_hold(conn->hcon);
++
+ 	if (parent)
+ 		bt_accept_enqueue(parent, sk, true);
+ }
+@@ -371,6 +395,7 @@ static int sco_connect(struct sock *sk)
+ 	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
+ 		release_sock(sk);
+ 		sco_conn_put(conn);
++		hci_conn_drop(hcon);
+ 		err = -EBADFD;
+ 		goto unlock;
+ 	}
+@@ -379,9 +404,13 @@ static int sco_connect(struct sock *sk)
+ 	sco_conn_put(conn);
+ 	if (err) {
+ 		release_sock(sk);
++		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
++	/* __sco_chan_add() took its own hci_conn reference; drop ours. */
++	hci_conn_drop(hcon);
++
+ 	/* Update source addr of the socket */
+ 	bacpy(&sco_pi(sk)->src, &hcon->src);
+ 
+@@ -495,9 +524,26 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 
+ static void sco_sock_destruct(struct sock *sk)
+ {
++	struct sco_conn *conn = sco_pi(sk)->conn;
++
+ 	BT_DBG("sk %p", sk);
+ 
+-	sco_conn_put(sco_pi(sk)->conn);
++	/* If the channel was not already torn down via sco_chan_del(), drop
++	 * the socket's own references here.
++	 */
++	if (conn) {
++		struct hci_conn *hcon;
++
++		sco_conn_lock(conn);
++		hcon = conn->hcon;
++		sco_conn_unlock(conn);
++
++		if (hcon)
++			hci_conn_drop(hcon);
++		sco_pi(sk)->conn = NULL;
++		sco_conn_put(conn);
++		return;
++	}
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
+ 	skb_queue_purge(&sk->sk_write_queue);
+@@ -1511,12 +1557,10 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
+ 	if (!status) {
+ 		struct sco_conn *conn;
+ 
+-		conn = sco_conn_add(hci_conn_hold(hcon));
++		conn = sco_conn_add(hcon);
+ 		if (conn) {
+ 			sco_conn_ready(conn);
+ 			sco_conn_put(conn);
+-		} else {
+-			hci_conn_drop(hcon);
+ 		}
+ 	} else
+ 		sco_conn_del(hcon, bt_to_errno(status));
+-- 
+2.43.0
