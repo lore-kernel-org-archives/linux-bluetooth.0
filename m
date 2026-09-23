@@ -1,69 +1,112 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD8D41F5D4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 05:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2202233149
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2026 06:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790140404; cv=none; b=Blcol7XhyeLOyYMOEOO5NZ7o6+62sbhKahSMAJESkXySYBC1nWWPZERufpR2mFJDZiPAX07Z+VrLt51lss2mZveppPy57r0EbgZD1JEGF/TyOcvYqzLT/XwraZ7qrH+RZem7r3jrG4ZmPDCC3gEc1Zu3Q++e7Bcz8lXy/CVZZPg=
+	t=1790143884; cv=none; b=EIf92SGGyEP+8HE+wEsun+TaGPr2KlVQUz3YrJ3W6oGSIJC3L5rQeFc4yYSbGWLX3ECO/KqOmNc9OfLj7SusN/bznDuYlnBrVvNNmmjJhDb2qqUwmdM+jD81zMNR8/XlrtBnvHeKyCQWqNvBCON30mOrDIF0T7YFcfAOBahvWbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790140404; c=relaxed/simple;
-	bh=nS0+HxF8QJv+0P5uOHVy+Wcc683+fDVFi5o+6euYcA0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PeJgAh1cHccw2mAt/A9yQYXeOqzVcFT9qxu071DicF1Yqsy4GkxFVxDQOWBvd8D6duZdGtGcP62oZEIIaCnEY8j0kPFHU5UfRfYljsC02aIKq2PFaNdB3Vj45Qa2WKUejK6VGdBD/ChHeUYx0CpFPKCNuOkh2Kf8ZikJr6KpKxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=l1PpDyre; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1790143884; c=relaxed/simple;
+	bh=auB5xpnOGmV+oG2/Loxkdx6u4u/LBKBNaCpPoE5h/D4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hoLTMy2/9ldWDARVsyKjQXBpOYtdpqp7ZbjgaygqMB+HiVhl7pJEqF41FwZ+e+pTu0rh5pi3dUX/Riscl69LNItbak5wxkaz4gcyODfo27bWazH2n61ckFs7iCepKH/aqdLVggbLa91AvpOeccMSs1bPbuNH1LS7vWRHIoW7kv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OnD8YhH0; arc=none smtp.client-ip=74.125.230.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="l1PpDyre"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1790140400;
-	bh=2aVEODEfk+JoGb5/Jjso4YkxZWx1NEy8b5L+PaWwLmk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=l1PpDyrePr4P2FGIqGOYOkp8vi3SykbrEZ0qc+2wgjt2HTn+W3ma0BPZmEg/gBgMS
-	 /FIVT5cCoBe68vao5+3bUUY7t6QHzExYJSWhE9GSY5Cavmegd9F2/EAvKbfQGluAcR
-	 QhCSf/8Y/CeOJtjjVOK+bM4PlMERaWw1+2WWKEg0=
-Received: from github.com (hubbernetes-node-e97c30f.ac4-iad.github.net [10.52.162.21])
-	by smtp.github.com (Postfix) with ESMTPA id D3EEE7810D0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 22:13:20 -0700 (PDT)
-Date: Tue, 22 Sep 2026 22:13:20 -0700
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1171825/000000-3dc313@github.com>
-Subject: [bluez/bluez] 3dc313: obexd/pbap: Fix u128_to_string skipping data[4]
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OnD8YhH0"
+Received: by mail-qk2-f13.google.com with SMTP id af79cd13be357-93910cc46c8so83071385a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2026 23:11:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790143882; x=1790748682; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=7GupjMxE4c3JOF19v9RE4GBBn7VZKZrRumJJYApP5v4=;
+        b=OnD8YhH0ReVHXe/whqCEwI3y8Kfo49hAALbj5W+txO6ATQmDBGWJLyC/2hJR1vBa0z
+         A0pwRgPurTkKdNOnb4VgHdrGCkrlja8iCgq/De+bPjkllNhoD6P+A2BiFQgync/8vM3K
+         /75p3Md6KAWdaAlqdawzimkLDkAzYCvm2uToNFDIQuFuIjZMhGQv04wTq7M1iySosXdM
+         Jf/1QIYbkMIcJ/M2IceYv8jywGlkXe/9lKxDoegmBt6yIA4xkujTi+s5ryZ8km3QraUl
+         NEoeGvw1+3H6mmL043/kklIqJcLKBpTnfqdIQFABX6uAjQaStqSgFg0hNiqt552soEl1
+         vb/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790143882; x=1790748682;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=7GupjMxE4c3JOF19v9RE4GBBn7VZKZrRumJJYApP5v4=;
+        b=zWdSLub+/D0Cyqvpt+9tqzof8KEF496KPTMOThYDemtA4akfXJJ+Ya6aqqaAMOyAhC
+         Y+wDp/3YlvJuX1haxtDIQFyMjky4n8Hj8QcQm6K1AMBNMLtKQUAHjp+f929wFzOMaqc1
+         s1ivR3G8Y0jHIZv06YNO89xcHWItRKnd/lj/x8U9E39ltkdMG0CliCavAcfJIhtpBDWl
+         NF1FHwbK3HHTdMOAsG3fKzSJNYoxUnfjapyj0jVY8NDJfBSwR2j0dMJ2I6h4z4iFDmsp
+         d3R+A0lVsDobnsAO7qSS7RpOKBOCz2RasuR7zFiBoqH5/QDFwg09m8/Iqjtv2J5zq1+b
+         jNag==
+X-Gm-Message-State: AFuF++npTiB9A5kd2dk2WuLW8CZ9zS+W3QgVf+vxsaxBPrSH7lqq8/FP
+	QRr0iS8M/LKGaVjXbZzk6DZK8UPp1YJk0E6jVleuGw6VOB1HN9MoOnQmj3pGc6sO
+X-Gm-Gg: AYBFou32RY8mxlh1PUU5YmVr6Z+L4AWKA7ua9mzD9Y1+tRsEOQE0EpRALtCOXCI5JoB
+	9Tf2Op4dKco1RJewtTPGX6n/jbvAKvPQUxTXT0ssdZcgMII1qRYvpvcH20VA8knqacAK4E0Uy58
+	XZGXlMVEM2izTlvIp5WZZbvIqomN2QraJxBTlEPEuvMIfoWeyN/i8i7Vb5FLcRy5nk1GTFqP+X8
+	TwZu4RRn4oQR7RMkw7xA3+BVj1c+K25eyNfTbMm2kuoC7LKmXDisTSuzmIflYGuSzFkUNiXCQ+Y
+	MxllZGcyachcrA7eqwxJWuaUOiBL6CkQ675nT5yhDrOz/u22xQc4LQUUTsnfR3pXilHIVBc+fao
+	3Q41S1DH6ppexyOpsIUpxSE7+IaTcnO3LLFEDNc1dxfoL5pJyXQWCDYvwD6HR+ktfgHKhPCOSzU
+	tH+7+KnKb741tcGYYhbh0nn9GSVieADc6Kr2W9yGtA1HNwtU6C0TGEbVabGeepUkUjFjeFusJst
+	7aBr36bIqyaCAoisw==
+X-Received: by 2002:a05:620a:269b:b0:93b:d7a0:d9e6 with SMTP id af79cd13be357-93c25236c3dmr256120085a.64.1790143881771;
+        Tue, 22 Sep 2026 23:11:21 -0700 (PDT)
+Received: from [172.17.0.2] ([20.127.214.209])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93c247521f5sm159970585a.5.2026.09.22.23.11.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 23:11:21 -0700 (PDT)
+Message-ID: <6ab36d89.6ccac100.f6bb2.45e9@mx.google.com>
+Date: Tue, 22 Sep 2026 23:11:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8125018033068117944=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jinwang.li@oss.qualcomm.com
+Subject: RE: [v1] obexd/pbap: Fix u128_to_string skipping data[4]
+In-Reply-To: <20260923032957.4133667-1-jinwang.li@oss.qualcomm.com>
+References: <20260923032957.4133667-1-jinwang.li@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8125018033068117944==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1171825
-  Home:   https://github.com/bluez/bluez
-  Commit: 3dc313067796aaaa397a5cf1dd9e594ae6be671c
-      https://github.com/bluez/bluez/commit/3dc313067796aaaa397a5cf1dd9e594ae6be671c
-  Author: Jinwang Li <jinwang.li@oss.qualcomm.com>
-  Date:   2026-09-23 (Wed, 23 Sep 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M obexd/client/pbap.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  obexd/pbap: Fix u128_to_string skipping data[4]
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1171825/
 
-u128_to_string uses data[3] twice causing data[4] to be skipped and
-DatabaseIdentifier, PrimaryCounter and SecondaryCounter properties to
-be printed with wrong values.
+---Test result---
 
-Fixes: 5ee26d43c65c ("obexd/client: Add DatabaseIdentifier property")
-Assisted-by: opencode:claude-sonnet-5
-Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Test Summary:
+CheckPatch                    PASS      0.51 seconds
+GitLint                       PASS      0.35 seconds
+BuildEll                      PASS      19.55 seconds
+BluezMake                     PASS      376.17 seconds
+CheckSmatch                   PASS      293.19 seconds
+bluezmakeextell               PASS      95.53 seconds
+TestFunctional                PASS      1104.66 seconds
+IncrementalBuild              PASS      377.54 seconds
+ScanBuild                     PASS      1158.87 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2568
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8125018033068117944==--
