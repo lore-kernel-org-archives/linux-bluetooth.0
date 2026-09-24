@@ -1,69 +1,69 @@
-Received: from mail-ua2-f43.google.com (mail-ua2-f43.google.com [74.125.226.235])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D324A4839
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EE64A3F32
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790264813; cv=none; b=o6qPTNNFnJWUPKtSyZak0+5BZg1ZKB7KIM/qW2E/FCE97CcNKFy1dQ0TwSB+qsFA0X5xh0lgd8uyYQ6vkSV0B+/GjZoETz6wL/0rC7Wj3kKQWCkvNHDzub/eCd4jFsBzXRIZ2hig9NMlwhKIA9ONc+zHCDKnv7X78MZ9a9t+PYQ=
+	t=1790264813; cv=none; b=Frzfab1ANi1PJ/o9F7p4K9zuFLmlE/xaQjfg5yOkicil0TH/JuYMEJio9IKzkL9HmBftX5jLwE8lAr6ncoIeaUgo5doIc7ORgxDFqHcmWHq2o/7gDhac/V7gYhdWZ1hVC7Ke8BuMKfskPzc+MRAFi6UWftNXc7fQdObUD33OoPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790264813; c=relaxed/simple;
-	bh=Iy8UPHChv766YCQn/t/ewPfHSl8ZPtzuVBy8LGnLDN4=;
+	bh=KQwRYm/aNDZ1btBCRSFZPaKhe8kcUGeaUHrhlVrG8xc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VfycMOCTnBrexvGq3SKafa/HDRWFalrPx6oPunmI3qoflW0N1QP9vBDBRgcncSGNiLnoXnKgU2pUjt/7PgxtAH7ZarRSB72C7P6JKCnx8t81YSGVV9vscC5TTuA58Qp/LQMCDFYNaQ3aMlCn1ofLBjJ5ZvJwfUUdSOD7oLzQ/As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYDXOmNH; arc=none smtp.client-ip=74.125.226.235
+	 MIME-Version; b=RIy9Yql9NG5gXUHEZGbyH+5DhgHsj9DeA3/cVKR8N6Aw817a+s2r99RL/c86vkaqA8E9roeM7/ehGqjECQeMI7rFxqIZikSdlNe4HoaNpkylDXtQkFBw6z8EOXMPGTSiUjEF859yLm/yFtGVS24MvTX1Tw4vX4T+3U9IbxkzOiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BkqOpe3o; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYDXOmNH"
-Received: by mail-ua2-f43.google.com with SMTP id a1e0cc1a2514c-97e96a8ba8cso1529955241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 08:46:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BkqOpe3o"
+Received: by mail-vs2-f12.google.com with SMTP id ada2fe7eead31-79028ca9371so832657137.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 08:46:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790264810; x=1790869610; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790264811; x=1790869611; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=e2z2Iyn5JDjFQKQjN0TLPBXJlosUmaljJRWpgiaxZqA=;
-        b=lYDXOmNHbD0gSj3zGWxEwlIVllabE3SL1Jz8v4oCO6MZAX34Y2XiHGTLLCPTzB4fqr
-         ORtpZWvoQwa3B9xIRcEM0ex1xmsi+poxWGSYVWJdDIST9clc1JvY3MDc6pKNBSAUEoPe
-         knW6OY3Z6K9wxgauQiHPCwleQ2LMkxow39yu+sbjb5tr/NqcYkg6qwiRf3iLIKqUV+dA
-         J1rd/VXiYMtIXPewO66xZnu2D6Q48fqdgPu7ba75lgNnjiLhJBZSK467FgRP3N51oQ3r
-         GTfRnTMXtBiVk4+X2KWJukPbS7Upb/FN/PqS8qAma5yngHEZxb2rdkchCujWeY4xf9Os
-         etTg==
+        bh=X19tE9bayHnx+DLaAl8nIwbaEBPDQbyfMULguRiCdQI=;
+        b=BkqOpe3oHA2hlFy3KAMLv9OLzRbJEj9bvoJ4Fk03TYG8AGhQdxosyUvqi0lMYaKFsa
+         LLuIrRUlDWhl9poHhTV7cMO+mjvO66jv87sIJgguqvE5yuspOLaSfjoZST+O6eXsfOuM
+         s/TwkB0zdgwPyNMjk1JFUehenhT6BL++he4d3dxGJEpw0kK4vEqSWYT5BLL4zDJ2fIb8
+         TBVVHwybbP5BgUBLgUQvIsbCyu2VQ4HwfzUZ9843X3se9bDo4JmlPXVCwYw+fCUFgETW
+         AqiK8PcOA+SbiSTR/w0XWSN+i85fYAIR4Hon2pD4Kh9hQ9ah7UbuA3YBjBLsCjvNKmAG
+         yBWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790264810; x=1790869610;
+        d=1e100.net; s=20260707; t=1790264811; x=1790869611;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=e2z2Iyn5JDjFQKQjN0TLPBXJlosUmaljJRWpgiaxZqA=;
-        b=teiehHwomodExZy/xCtihy4WO9pwyybpNsvOHbKI0d//8BCZ0jeFpVDKgrrdb5RYoS
-         mqM1ykGehqThEIv2g32aMUo/PJSLPKsnGFd+7+IUyO4LuFSD+fCGF/zOKVRoKDUYPsUd
-         HgfZOE69ALC9rIeJ3TYguybeWb+MK/tYY2+TIz3m0B81uU6bD/CGTlmX/7O2t1LZyPGJ
-         Nt0Ciy55VQWRXbuBKxqRsoxzB6gJ2y+Ry4EghQlnLPpAg0A6xYeQERxZmXEu65qhlpb2
-         IB+WpAGkrzeLhjarCD1WbS4r/RnL4zy5i92N/HGQg8E+MyBMXPl/1pmpLDjKs98e9bMR
-         TrdQ==
-X-Gm-Message-State: AFuF++myNpw/R53aHGGlAU+zRi5aPYcuIssGebCE+3zpFjmEdqMCLYQj
-	Zna3/GgEGFWXK+nFs6bmWAixhY4UOS+qqJRR50ot5SjEGzG+ZO4a4DaqscLQDrPxsUVqaQ==
-X-Gm-Gg: AYBFou1R2iZKktq/h8i4m7G+zepP1u/5yOrH2ZjPhIN0wsydo5M6w3KL0l8bXy8MzgB
-	FnYUkAGKCBQFqCwvyEtmgc9O2O4UHWnu+Q4ype8u0j1Gg0rInFcJWa6cAAa6g1XQ/7EPko4T1SU
-	sXvtaNy2W+Po9TsKiqUeHQv/ac1Kyn9ztDtk1Ozm01N4v2YC/L040WrA3QDOPjKXXEtAHNz0b+g
-	rhho5gdtesl4KpGU/R6lugERyjxgp0fFcUIyg+I+bCGa/WizVMZ04sJzBCgbuVr+z8fsvR6DbQ7
-	VbfTVMt5tYQHquALb2WI23e6sEnEdq0QoS7PctOBi6fofpBD39H5qG+ljwv5OO2TFbjwOlk3dev
-	puIU8EGSkyLdqVZ+uB2f+lRoWm3Y76Odrs2RQ4ZoTypZeuKyATFG/I+sURZG9T3pN107dDY/BuY
-	ebk3ADg5XgI64wbKP6csud7dZPH27XAp/K7LckBPo9u1G4zVYF+8IhrYKQuLMGfGcspondYna3E
-	BY7YWE9OyFITTXwiLJll2U/rR3rpi9rUrhnENyu8U8xF9FFb39n5g14DH5W+LOf
-X-Received: by 2002:a05:6102:3f06:b0:7a7:3485:33e4 with SMTP id ada2fe7eead31-7af1f2fce8cmr1620593137.33.1790264810000;
-        Thu, 24 Sep 2026 08:46:50 -0700 (PDT)
+        bh=X19tE9bayHnx+DLaAl8nIwbaEBPDQbyfMULguRiCdQI=;
+        b=HH7F7Mhg7V39vsO8ub3WKQ6K2wko6ClWd1TYhF4AwNMzRZO3eLo0apSSVr/QMVQO/U
+         XNQADqDU46InS87Y6FzbszsxMlfbl0GG4+o+dFLhrZyu0cDIBmQlxbMseCVt/ZPhGWkE
+         lDGAZqieQfz4BTz7w7DzKwRcIWCMZKp89kvweR38tn3Qv4pwPZCCblClT9bkhLAYU9Z9
+         TngBW2O3QPaJF824KqJYAdoXY8aoc8aMTgTl7C+cE4ZVj5wSAX9ORTEQHPU2jb5lZ99x
+         jPFtvYEvEDD/2u8YRWZAK3icmdzp44HbbvnrDvX5KzjQ6M1g5zbCRbL1YcMzsD7zgOHW
+         YNnA==
+X-Gm-Message-State: AFuF++mVwVI2gUrNIM/1XF3fvdhi1g+9UR4478297k8XT3IXjdW2y33o
+	bMQtVe5jQZufIOSa254oZeIbw/SwwDVhzyrwzi814GY9JT2AG+31nlJVkeanOttGiy7Gzg==
+X-Gm-Gg: AYBFou37umAOQeEzDaJBzMYfbYviXVZSU8R0PU+nydKmKoXJ1clH7wY9RBA6EnIOTmh
+	4r/tE+20SthaNjb01uHE69G9t+lVTYL1GAr/0o0w+q16dvvoKuo159yUxNCh7No+yd+RinhdQFl
+	OKhkowVhzlPokdWEfpMwKyR+g5w8Rf9qGJDqIBV+Z02LSy54HtqnTGy7dwnZIQjrO73nURcapfG
+	zVbaW3xDXwQw21VI8aXSLiG62D1fcHzq/B8BvRuvCwLe7Sg1xvFQS7iYOH2Jg0EKM273l29H6TL
+	e8yotPSOk5DKawFA/a8UkVcqUiTdE5JC3LN5PZLK9qpRX3WSZBMaxN/Fv4ir28tz1gbA1KpBkkG
+	6+MRyOg3dziNqGflmbzKOvzIsp72extOCqxDwVrWDG4nJvaQIp/CKpl0ylvkUdozfEq68Euhlbw
+	+L0RISSpLxnOD8rDgrsn0ucX9RUf7m4CGByXADN92mHcSKpuU3NEFSxwuJKNEbPcNDTwRFPtaKr
+	qccrQyy6urIG7odBk5fqEdNTXyvj0WhOJGVrispPkoOagi3gbW7r0zq1HSsCOqm
+X-Received: by 2002:a05:6102:2907:b0:7a8:1b8b:6d04 with SMTP id ada2fe7eead31-7af1c9a1ce8mr1464686137.2.1790264811112;
+        Thu, 24 Sep 2026 08:46:51 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7abf5674f44sm7412428137.3.2026.09.24.08.46.49
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7abf5674f44sm7412428137.3.2026.09.24.08.46.50
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 08:46:49 -0700 (PDT)
+        Thu, 24 Sep 2026 08:46:50 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 8/9] test: functional: add HoG tests
-Date: Thu, 24 Sep 2026 11:46:30 -0400
-Message-ID: <20260924154631.369299-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 9/9] test: functional: limit the workers by the memory available
+Date: Thu, 24 Sep 2026 11:46:31 -0400
+Message-ID: <20260924154631.369299-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260924154631.369299-1-luiz.dentz@gmail.com>
 References: <20260924154631.369299-1-luiz.dentz@gmail.com>
@@ -77,275 +77,133 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add tests where bluetoothctl registers a HID Service, with and without
-SCI support, using client/scripts/hog-device*.bt, and the HID host
-checks the service, receives Input Reports and, with SCI support,
-changes the SCI mode and the connection rate.
+Each worker of pytest-xdist runs VM instances, so using one worker per
+CPU could run out of memory, with the OOM killer terminating some of
+them and tests failing at random.
 
-See doc/functional-hog.rst for details.
+With -n auto, limit the number of workers by the memory available,
+estimating each worker needs memory for 3 VM instances of 256M of guest
+memory plus the overhead of qemu, and use -n auto for check-functional
+by default, which can be overridden with CHECK_FUNCTIONAL_JOBS.
 ---
- test/functional/test_hog.py | 252 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 252 insertions(+)
- create mode 100644 test/functional/test_hog.py
+ Makefile.am                 |  7 +++++-
+ doc/test-functional.rst     | 25 ++++++++++++++++++++
+ test/functional/conftest.py | 46 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+), 1 deletion(-)
 
-diff --git a/test/functional/test_hog.py b/test/functional/test_hog.py
-new file mode 100644
-index 000000000000..ea54882d059d
---- /dev/null
-+++ b/test/functional/test_hog.py
-@@ -0,0 +1,252 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+"""
-+Tests for HID over GATT (HoG) using bluetoothctl in VM instances
+diff --git a/Makefile.am b/Makefile.am
+index 17348788a30b..e5587c55d2dd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -885,9 +885,14 @@ check-TESTS recheck: AM_MAKEFLAGS += -j$(CHECK_JOBS)
+ 
+ # The functional tests are parallelized by pytest-xdist, loadgroup is required
+ # since pytest-bluezenv groups the tests sharing a host/VM setup together.
++# Each worker runs VM instances, so by default the number of workers is limited
++# by the memory available (see test/functional/conftest.py), override with e.g.
++# CHECK_FUNCTIONAL_JOBS=4.
++CHECK_FUNCTIONAL_JOBS ?= auto
 +
-+The HID device (host1) registers a HID Service (HIDS) with bluetoothctl,
-+using client/scripts/hog-device.bt or client/scripts/hog-device-sci.bt,
-+and the HID host (host0) pairs with it and checks the service over GATT.
-+"""
+ check-functional: all
+ 	python3 -m pytest "$(srcdir)/test/functional" -v \
+-		-n $(CHECK_JOBS) --dist loadgroup \
++		-n $(CHECK_FUNCTIONAL_JOBS) --dist loadgroup \
+ 		-m "not tester" \
+ 		--kernel="$(FUNCTIONAL_TESTING_KERNEL)" \
+ 		--bluez-build-dir="$(top_builddir)" \
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+index 3ffcbf6dec5c..9cf0a8bb48e5 100644
+--- a/doc/test-functional.rst
++++ b/doc/test-functional.rst
+@@ -472,6 +472,31 @@ pytest-xdist is required for parallel execution. To run:
+ 
+ 	$ test/test-functional -n auto --dist loadgroup
+ 
++With ``-n auto`` the number of workers is limited by the memory
++available, rather than using one worker per CPU, as each worker runs
++VM instances and running out of memory makes the OOM killer terminate
++some of them, failing tests at random. Each worker is estimated to need
++memory for 3 VM instances (the maximum used by a test) of 256M of guest
++memory plus the overhead of qemu, see `test/functional/conftest.py`.
++The estimate is printed when starting:
 +
-+import warnings
++.. code-block::
 +
-+import pytest
++	Using 9 workers: 22 CPUs, 12159 MiB available, 1218 MiB per worker (3 VMs of 406 MiB)
 +
-+from pytest_bluezenv import Bluetoothd, Pexpect, find_exe, host_config
-+from pytest_bluezenv.utils import bluez_src_dir
++To use a given number of workers instead:
 +
-+pytestmark = [pytest.mark.vm]
++.. code-block::
 +
-+# The HID Service is claimed by the input plugin of the HID host, so it
-+# has to be exported read-write for bluetoothctl to write HID SCI Mode
-+HOG_CONF = """[General]
-+ControllerMode = le
++	$ test/test-functional -n 4 --dist loadgroup
 +
-+[GATT]
-+ExportClaimedServices = read-write
-+"""
++``make check-functional`` uses ``-n auto`` as well, which can be
++overridden with ``CHECK_FUNCTIONAL_JOBS``:
 +
-+HIDS_UUID = "00001812-0000-1000-8000-00805f9b34fb"
++.. code-block::
 +
-+# Local attributes registered by client/scripts/hog-device*.bt
-+LOCAL_REPORT = "/org/bluez/app/service0/chrc2"
-+LOCAL_SCI_MODE = "/org/bluez/app/service0/chrc5"
++	$ make check-functional CHECK_FUNCTIONAL_JOBS=4
 +
-+# Keyboard Input Reports: Modifiers, Reserved, then 6 Key Codes
-+REPORTS = [
-+    "00 00 04 00 00 00 00 00",  # a pressed
-+    "02 00 05 00 00 00 00 00",  # Left Shift + b pressed
-+    "00 00 00 00 00 00 00 00",  # released
-+]
+ Logging in to a test VM instance
+ --------------------------------
+ 
+diff --git a/test/functional/conftest.py b/test/functional/conftest.py
+index 4e0bda882de3..4d4193a95cd9 100644
+--- a/test/functional/conftest.py
++++ b/test/functional/conftest.py
+@@ -208,6 +208,52 @@ def _setup_progress(config):
+     )
+ 
+ 
++# Estimate of the memory used by a VM instance: 256M of guest memory, the
++# default of test-runner as the tests do not set it, plus the overhead of
++# qemu itself
++VM_MEM = (256 + 150) * 1024 * 1024
 +
-+# HID SCI Mode: Fast Mode
-+SCI_FAST_MODE = "03"
-+
-+# LE Connection Rate parameters requested with mgmt.conn-subrate once in
-+# SCI Fast Mode: interval 1 ms to 2 ms (units of 0.125 ms), within the
-+# range given in HID SCI Information, no subrating, no latency and 5 s
-+# supervision timeout (units of 10 ms)
-+SCI_RATE = ["0x0008", "0x0010", "1", "1", "0", "0", "0x01f4"]
-+
-+# Reported when an operation cannot complete, so a test does not have to
-+# wait for its timeout to know it is not going to
-+FAILURES = [
-+    r"(Failed to \w+[^\r\n]*)",
-+    r"(Device \S+ not available)",
-+    r"(No device connected)",
-+    r"(No attribute selected)",
-+]
-+
-+# What a command reports is printed as it runs, unlike what the peers
-+# report over the air, so waiting the default timeout for it only makes
-+# a failure slower
-+REPLY_TIMEOUT = 5
-+
-+
-+def script(name):
-+    src = bluez_src_dir()
-+    if src is None:
-+        pytest.skip("BlueZ source directory not known")
-+
-+    path = src / "client" / "scripts" / name
-+    if not path.exists():
-+        pytest.skip(f"{path} not found")
-+
-+    return str(path)
++# Maximum number of VM instances used by a test, i.e. by an xdist worker
++# as it runs one test at a time
++VM_MAX_HOSTS = 3
 +
 +
-+def spawn_bluetoothctl(host, init_script=None):
-+    exe = find_exe("client", "bluetoothctl")
-+    # Accept pairing and authorize services without prompting, with a
-+    # capability pairing Just Works, as there is no one to answer the
-+    # entry of a passkey
-+    args = [exe, "-a", "auto:NoInputNoOutput"]
-+    if init_script:
-+        args += ["--init-script", script(init_script)]
-+    return host.pexpect.spawn(args)
++def _mem_available():
++    try:
++        with open("/proc/meminfo") as f:
++            for line in f:
++                if line.startswith("MemAvailable:"):
++                    return int(line.split()[1]) * 1024
++    except (OSError, ValueError, IndexError):
++        pass
++
++    return None
 +
 +
-+def expect(ctl, patterns, **kwargs):
++@pytest.hookimpl(optionalhook=True)
++def pytest_xdist_auto_num_workers(config):
 +    """
-+    Expect one of the patterns, failing as soon as one of the failures
-+    shows up. Return the index of the pattern matched and its groups.
++    Number of workers used with -n auto: limited by the memory available,
++    so running a VM instance per worker does not end up with the OOM
++    killer terminating some of them, instead of one worker per CPU.
 +    """
-+    if isinstance(patterns, str):
-+        patterns = [patterns]
++    cpus = os.cpu_count() or 1
++    mem = _mem_available()
++    if mem is None:
++        return cpus
 +
-+    idx, m = ctl.expect(FAILURES + list(patterns), **kwargs)
-+    if idx < len(FAILURES):
-+        raise AssertionError(m[0].decode("utf-8") if m else "failed")
++    per_worker = VM_MAX_HOSTS * VM_MEM
++    workers = max(1, min(cpus, mem // per_worker))
 +
-+    return idx - len(FAILURES), m
-+
-+
-+def expect_all(ctl, patterns, **kwargs):
-+    """Expect all the given patterns, in any order."""
-+    pending = list(patterns)
-+
-+    while pending:
-+        idx, _ = expect(ctl, pending, **kwargs)
-+        pending.pop(idx)
-+
-+
-+def pair_le(host0, ctl0, host1, ctl1):
-+    ctl0.send("scan on\n")
-+    expect(ctl0, f"Controller {host0.bdaddr.upper()} Discovering: yes")
-+
-+    ctl1.send("advertise on\n")
-+    expect(ctl1, "Advertising object registered")
-+
-+    expect(ctl0, f"Device {host1.bdaddr.upper()}")
-+    ctl0.send(f"pair {host1.bdaddr.upper()}\n")
-+
-+    # See test_bluetoothctl_pair_le: passkey confirmation is handled by
-+    # the auto agent, but legacy passkey entry still needs an answer
-+    legacy = r"\[agent\].*Passkey:.*m(\d+)"
-+    pending = [
-+        r"Pairing successful",
-+        f"Device {host1.bdaddr.upper()} ServicesResolved: yes",
-+    ]
-+
-+    while pending:
-+        idx, m = expect(ctl0, [legacy] + pending)
-+        if idx == 0:
-+            warnings.warn(
-+                "BUG: we got passkey authentication, bluetoothd/kernel "
-+                "should be fixed"
-+            )
-+            ctl1.expect(r"\[agent\] Enter passkey \(number in 0-999999\):")
-+            ctl1.send(f"{m[0].decode('utf-8')}\n")
-+            continue
-+        pending.pop(idx - 1)
-+
-+    ctl0.send("scan off\n")
-+
-+
-+def read_attribute(ctl, uuid):
-+    """Read the given remote attribute, returning its value as hex string."""
-+    ctl.send(f"gatt.select-attribute {uuid}\n")
-+    ctl.send("gatt.read\n")
-+    expect(ctl, r"Attempting to read \S+", timeout=REPLY_TIMEOUT)
-+    return expect_hexdump(ctl)
-+
-+
-+def hexbytes(value):
-+    """Turn a hex string into the format taken by gatt.write."""
-+    return " ".join(f"0x{byte}" for byte in value.split())
-+
-+
-+def expect_hexdump(ctl, **kwargs):
-+    """Expect a value printed by bluetoothctl, returning it as hex string."""
-+    _, m = expect(ctl, r"((?: [0-9a-f]{2})+)  ", **kwargs)
-+    return m[0].decode("utf-8").strip()
-+
-+
-+def expect_notification(ctl):
-+    """Expect a notification of the remote attribute, returning its value."""
-+    expect(ctl, rf"CHG.*? Attribute /\S+ Value:")
-+    return expect_hexdump(ctl)
-+
-+
-+def enable_notifications(ctl, device, uuid, local):
-+    """Enable notifications of the given attribute, on the HID host."""
-+    ctl.send(f"gatt.select-attribute {uuid}\n")
-+    ctl.send("gatt.notify on\n")
-+    expect(ctl, r"Notify started", timeout=REPLY_TIMEOUT)
-+    # Either subscribed with StartNotify, or with AcquireNotify as done by
-+    # the input plugin of the HID host for the Input Reports
-+    expect(
-+        device,
-+        rf"Attribute {local} (\S+ )?(notifications enabled|Notify sock acquired)",
++    sys.stderr.write(
++        f"Using {workers} workers: {cpus} CPUs, {mem >> 20} MiB available,"
++        f" {per_worker >> 20} MiB per worker ({VM_MAX_HOSTS} VMs of"
++        f" {VM_MEM >> 20} MiB)\n"
 +    )
 +
-+
-+def notify(device, local, value):
-+    """Notify the given value of a local attribute, on the HID device."""
-+    device.send(f"gatt.select-attribute local {local}\n")
-+    device.send(f'gatt.write "{hexbytes(value)}"\n')
-+    expect(device, rf"Attribute {local} .*written", timeout=REPLY_TIMEOUT)
++    return workers
 +
 +
-+@host_config(
-+    [Bluetoothd(conf=HOG_CONF), Pexpect()],
-+    [Bluetoothd(conf=HOG_CONF), Pexpect()],
-+)
-+@pytest.mark.parametrize(
-+    "init_script, flags, sci",
-+    [
-+        ("hog-device.bt", "02", None),
-+        ("hog-device-sci.bt", "06", ("00", "08 01 08 00 50 00 08 00")),
-+    ],
-+    ids=["no-sci", "sci"],
-+)
-+def test_hog(hosts, init_script, flags, sci):
-+    host0, host1 = hosts
-+
-+    device = spawn_bluetoothctl(host1, init_script)
-+    expect(device, "Application registered")
-+
-+    ctl = spawn_bluetoothctl(host0)
-+    pair_le(host0, ctl, host1, device)
-+
-+    ctl.send(f"info {host1.bdaddr.upper()}\n")
-+    expect(ctl, rf"Human Interface Device\s+\({HIDS_UUID}\)", timeout=REPLY_TIMEOUT)
-+
-+    # HID Information: bcdHID 1.11, bCountryCode 0x00 and Flags
-+    assert read_attribute(ctl, "2a4a") == f"11 01 00 {flags}"
-+
-+    # Input Reports: the HID device notifies a few key presses
-+    enable_notifications(ctl, device, "2a4d", LOCAL_REPORT)
-+
-+    for report in REPORTS:
-+        notify(device, LOCAL_REPORT, report)
-+        assert expect_notification(ctl) == report
-+
-+    if sci is None:
-+        return
-+
-+    mode, info = sci
-+    assert read_attribute(ctl, "2c39") == mode
-+    assert read_attribute(ctl, "2c3a") == info
-+
-+    # SCI mode change: the HID host writes the new mode to the HID device
-+    enable_notifications(ctl, device, "2c39", LOCAL_SCI_MODE)
-+
-+    ctl.send(f'gatt.write "{hexbytes(SCI_FAST_MODE)}"\n')
-+    expect(device, rf"\[{LOCAL_SCI_MODE} .*\] WriteValue:")
-+    assert expect_hexdump(device) == SCI_FAST_MODE
-+
-+    # The HID host, as central, changes the connection rate accordingly
-+    ctl.send(f"mgmt.conn-subrate {host1.bdaddr} {' '.join(SCI_RATE)}\n")
-+    # The connection rate may change before the command completes, so the
-+    # event may be printed before the reply
-+    rate = rf"{{}} type .* connection subrate interval {SCI_RATE[0]}"
-+    expect_all(
-+        ctl,
-+        [r"Connection Subrate loaded successfully", rate.format(host1.bdaddr.upper())],
-+    )
-+    expect(device, rate.format(host0.bdaddr.upper()))
-+
-+    # Then the HID device confirms the mode has been changed
-+    notify(device, LOCAL_SCI_MODE, SCI_FAST_MODE)
-+    assert expect_notification(ctl) == SCI_FAST_MODE
+ def pytest_configure(config):
+     _setup_progress(config)
+ 
 -- 
 2.55.0
 
