@@ -1,69 +1,69 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4560940B110
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE3F408031
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790289073; cv=none; b=rosiM/Z/mtUR9FQSSoxWqLcA14mbIXxwqPPdQ5by7qmxMFXsak4su8WLBEjEilYtxdePJzRDJe5yFewABs1A4QlgxtsLBIUDTGYqM/XvcbDTQ6Bf/56D8T5813X3oGAUFxJHEJdcFzetEOrdVlghpppPeq88WB5oWYmPBQwoojc=
+	t=1790289073; cv=none; b=Cg6CiNwtkgXqdWuiZCM2qBZtSpLowTgio1++VJF2L/QnByNUjf3Eyln8L4Me0OqFyNTm/xuEbTp576GKATTF+79vqQZim65hlcdsuBVjiCGe2I1BH3QFjwDrIU7bGY54tjnIabRWQPMYxhtF6v1uuvAE23MaC8+4/xg7FIlmI9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790289073; c=relaxed/simple;
-	bh=1SGxfSMRGl+9fc9c1Q8GuKW9LL7zBat4Ja4/t6Wg2mY=;
+	bh=3hn+ZpyNzcVsjzXiSfHsUwN6z7RyiigQ6PuPxdj6PCg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KpNlwJj9ru8A0l1UnDTFQP8N+ZelJYTahiluVRJ9TO/DAsXZm9INIvCMWbG5Cc8MqW0Dn28BhDWq2l9p/ekoEvavcqMdzhVLrHAnkrQG0cW849y77aziQx2kkecObK8Z6vXgQQH+j9VAgBkr3GaEpPNJtcSPcrnKqL86iPY9ZUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rESMu5ky; arc=none smtp.client-ip=209.85.221.180
+	 MIME-Version; b=q6FreCdmJdzp4ub6IboEnav4cGNsnjkQGNWRNCO+flT9p1fZ7SUOMBZ6OdasnJpH8EK8Zact3HJdTBtq7D+0AFS5B+sXgwvf8JTCyxoHdq/e2Ze8dQEb3aZEI4q/2qCvPgMw4acA26aNk/nCbiqqcCUXGQNklc2ywJ6AklcyUo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgIqMqKV; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rESMu5ky"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5c985f055b9so391344e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgIqMqKV"
+Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e512ee9so91151e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790289070; x=1790893870; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790289068; x=1790893868; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=M+8Bm9PsjLuJxkzM+pquNz7uJGIXVQpDu0pf420C7lE=;
-        b=rESMu5ky9g4k0ACe/48kVA2ZmYTtlFLm8JNHTkgmL9M3viWIJuhHA/a84QuPsUtsak
-         JqUJOR0s6E45WvmBH7zXJNVWund0oHABAB6URpr1V8R3Tui/vthj5878mItQ9ZxRLTdH
-         bDlceGsD614H4tdnp5SeIPgkxaM9xqN6U5kUsui2oAYwRlrKHA6grQgT5sOPh+tl8eCY
-         a0QJz3l/CZyN26DbPKrNF7AmWY2HISH3aSiNVp/athGtDYDlutKNi3pBz4HHygxDeItm
-         +MP6IZjElZkqCN/1Hshz2DQ4u5+sNPgnTItpSPOPybOguUwbhPbsGpty9AuCaS7Z7zgr
-         rbiQ==
+        bh=ibUmFRWPumvlQfyNWyXZI5SOzKD4YNjTNffl4Kzfr7I=;
+        b=OgIqMqKVCf5ktsWqNUaKI+jQZaMagXI4jZwZ+SvWMUd07To1+Oz58P0uEeXbAP5dnl
+         9NLJJO8s5QwLfxVDfixYr6E44NFnI6x14mozdTOaNZ8htOqewK9FQW5O/VaNIQKondRW
+         01tLifTT5c/IEoGFpcWbIA3EU0U4C6N6aVu+rjvWumGKKncVG8EN8gIEuo6UxAgy/4ZR
+         iHX6RxpFWwDSRjQEjvGmGIV0P5zGep5O3nET+QN3+HB37AUhLOGyAF+WCRQiYwlyvB/p
+         z/b5dZ/NIWtBSTlDNXXpWMHlUtNBvyj8vf7NRygu8Nr3JLFjcQcV6cKkIKEgiOTBAmuY
+         RUvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790289070; x=1790893870;
+        d=1e100.net; s=20260707; t=1790289068; x=1790893868;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=M+8Bm9PsjLuJxkzM+pquNz7uJGIXVQpDu0pf420C7lE=;
-        b=BgLUIxbtsfLQRvKan/xAohwBCucV5Hl03miuk1fes8WzQpWPuXrpoyq9ISgRVgnbn1
-         7Ee9fVjWJ2VABT66UTJRmC5oBpGrKqykC+q7+HUEIWNjmA9FCXfHYuzwD0Enu75gT6dp
-         r2QfRjjgU2eIktTIb3km/v0vkAbgUjS1tJ7IdpDnW8s9FbM1h1Oww24t6qWgRxrK3LOD
-         piPK8fLzRjCe8Ji/grpA+xO+ol/MwaEiNPkS6wdqjDdYHqB+YjY4ba7Gseev83v0/w/k
-         cG9502WDqAMJEC0dLpVVuOyFPYgUPiq2PJND/gRJ1Bji1iecmokrgNieTgJInwjSkZ6y
-         6K+g==
-X-Gm-Message-State: AFuF++nrnlY75YR4JijBHyHpFqs3fGKwmb8siiMq9ROjQFXTW1Uj83l2
-	ObUItQEjBV4a6kyxp1aOlOubuDjxH7Od1l045M4SGvSbPTK7BzlIhnHs52F6xWKrycPUMQ==
-X-Gm-Gg: AYBFou1Vwc5ot0xNGoqSNjXOPa53Awz136zV8h8SA4AvlMKrJAndlO47J54yBKspv1F
-	1QLRpamRP02mM7kLGvAu+bpC0aB9N7Zh3Y46pAPMdqXTbHW35idkLhYBwcgV14bd1knPe2e2x0b
-	u4PZ1SvOMCH/ck23HyNMP3uLJ8/AZi068AHpluJgALJBKwgh7EnGAVmRIO1yg55Pjj215fR8wDj
-	TUNaJYYS3SrAuE2VS8xhF1WDa3KFq0RGXlHQb8i2Z3nKtH7HN7OVXb6WMWkFMcy4pMvY/SgggJb
-	tfmkXIJGjj4tybk5xCzaggGXV3GnXh+j0LcXMeTePTwUIRFz3joI2vMGqZVq5g1wOxQnQanW4Bt
-	Sx00GB6GYM/0I8vETeQUFnzYosna+y3uvfrP1Tz/st6wT5KP3lwVva+THiWbOz3jxf//6HXwkdj
-	N+Wj0Glf6qIIw5C8oH7xS7ZEXbo9pyktE4NXq/I4pDC+swd+TjzzXGCyEqjNz68S5hJB7U4Fzsg
-	UoiySSQaquh3dXxueMAkzUrJs2KWNGA90tLEeKT8wINunFI1TVaFQ1lDmdECluU
-X-Received: by 2002:a05:6123:592:20b0:5c9:a5b6:27b7 with SMTP id 71dfb90a1353d-5cb0c04820fmr1409698e0c.20.1790289069989;
-        Thu, 24 Sep 2026 15:31:09 -0700 (PDT)
+        bh=ibUmFRWPumvlQfyNWyXZI5SOzKD4YNjTNffl4Kzfr7I=;
+        b=COZlTj6VC49T2fD/H3t1VpSHTrQ5zZdhlaWZCBdtba3w1Qg9O+FO3+pTT894FyU6uP
+         Vv1l3RswgSH2z5DneD9apqC2/exz7SHywlQFZA+9+mY5wlj6G6vdEHz7tYTMYWSkKQU5
+         sdynaI7WFb49i8bjwdNs9mF7waWwaVcdTCUNY0yBCTBRqwS4IH+iQ+Emf7hDAjqtYF5S
+         qIigK/ma7qHmmpIBxmM8H5niGf9sWFviYs9yqA8z9Y6HY0EiP5RrIzdQ98Nuom51mEGh
+         3YzIDsN4jF3mkKmKCogkinr/GKaiibth/8G3klrAvJM3uhr2QCcCgADfejxtlsLRgUpz
+         PAXQ==
+X-Gm-Message-State: AFuF++n8MROfzT9nLk3IhttLRQLfiWHp+/1ev0VVonnQTLRPC6SCG+uk
+	04qcRQz76B3l8jVheZjHUmqiSyS5qEea9reIBvQWG9QAm3rJJjtRyYwX5QiVVhX445dcuA==
+X-Gm-Gg: AYBFou2qv298udNTNDMryhVNhFHWHxg2wdV1a9aKLzMLHtOl1jV/tvKn70YmBtewCbp
+	5oaCUimcRyAjzcLLJE0E7TuM8F6dJQrfWuYIEYk8RCqHPDxFA4A02TYl82GpjSo+/o4wgCt9NeG
+	VFsxHVhuI5NGdG9nZIFaUrh3By0hSUIRltymnDejWXSXDfFv6vfvzfsT/qQlMrNsf5f5AjJ/fLk
+	c8I0WJ3IRJ/SbJjCsBz/sPpl5GfYTMOqD3sHG6VFLbs4KRZmu5oD7x8YE0u6Nq5gJYksMw/r/BL
+	IbtGIKqukLtMz7Fy0MSqpO7/l5k+SgwzAYNmeSzNwr3oZ7bzsihKdo09flwlTOFpfzWtmSd8MSO
+	30DPIVfP/YwZJP+YTDJoJ1OeUSaKebhxgyido9lpkBWF6QZPzInfAzCXSontD/SC5jLJsqkN/eN
+	fBXqnrn0HgMPhU2iDUZIZgwAU45Hh2FglwqOmbVwU3l7cyI2+KO9uz2m4e4Uhcw31HzArf6ORUk
+	ye5FZKtmlfz2LPwD9qFYBVu6KrkYEapHSSNLb2rYH6Pco+LybJVgHCdsHVbdx7w
+X-Received: by 2002:a05:6122:1824:b0:5c9:a60d:3279 with SMTP id 71dfb90a1353d-5cc9725e832mr124760e0c.13.1790289067790;
+        Thu, 24 Sep 2026 15:31:07 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.31.09
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.31.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 15:31:09 -0700 (PDT)
+        Thu, 24 Sep 2026 15:31:07 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 15/20] test: functional: change the HoG SCI mode with the HID Control Point
-Date: Thu, 24 Sep 2026 18:30:40 -0400
-Message-ID: <20260924223046.605543-16-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 13/20] shared/hog: Add initial implementation
+Date: Thu, 24 Sep 2026 18:30:38 -0400
+Message-ID: <20260924223046.605543-14-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260924223046.605543-1-luiz.dentz@gmail.com>
 References: <20260924223046.605543-1-luiz.dentz@gmail.com>
@@ -77,236 +77,1793 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-As specified by HOGP.TS 4.6.1 and the HIDS/HOGP SCI FIPD, the HID host
-requests a HID SCI mode by writing it to the HID Control Point, the HID
-device then confirming it with a notification of HID SCI Mode, which is
-Read and Notify only.
+Add a HID over GATT implementation based on bt_gatt_client and
+gatt_db, meant as a drop-in replacement of profiles/input/hog-lib
+which is based on GAttrib:
 
-Write the mode to the HID Control Point instead of HID SCI Mode, which
-is no longer writable, and don't expect HID SCI Mode notifications to
-be subscribed by bluetoothctl as the input plugin of the HID host may
-already have done it.
+- bt_hog_attach takes a bt_gatt_client
+- the services and characteristics are only looked up in the gatt_db,
+  the one given to bt_hog_new or otherwise the one of the client
+- notifications of the Input Reports are enabled with
+  bt_gatt_client_register_notify, once their CCC has been read
+- the Report Map is read with a long read once every other read is
+  complete, so the report IDs are known before creating the uHID device
+- the addresses of the uHID device are taken from the ATT socket
+- pending requests are cancelled when detaching, and notifications are
+  unregistered so they are disabled if still connected
 
-The connection rate is still changed by the HID host, as the kernel
-only issues the LE Connection Rate Request as central.
+Unlike hog-lib, the Scan Parameters, Device Information and Battery
+services are not handled, as they are by the scanparam, deviceinfo and
+battery plugins, so bt_hog_set_ids is added to set the vendor, product
+and version once known, e.g. from the PnP ID. A debug callback can be
+set with bt_hog_set_debug.
+
+HID SCI is supported as specified by the HIDS/HOGP SCI FIPD:
+bt_hog_set_sci_mode requests the HID Device to enable a HID SCI mode by
+writing it to the HID Control Point, and the notifications of HID SCI
+Mode, with which the HID Device confirms the mode once the connection
+rate has been changed, are enabled and reported with the callback set
+with bt_hog_set_sci_mode_callback.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- client/scripts/hog-device-sci.bt |  6 ++--
- doc/functional-hog.rst           | 52 +++++++++++++++++++++-----------
- test/functional/test_hog.py      | 29 ++++++++++++++----
- 3 files changed, 60 insertions(+), 27 deletions(-)
+ Makefile.am      |    1 +
+ src/shared/hog.c | 1659 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hog.h |   67 ++
+ 3 files changed, 1727 insertions(+)
+ create mode 100644 src/shared/hog.c
+ create mode 100644 src/shared/hog.h
 
-diff --git a/client/scripts/hog-device-sci.bt b/client/scripts/hog-device-sci.bt
-index 1bf3a0a90db7..7500eeb105bf 100644
---- a/client/scripts/hog-device-sci.bt
-+++ b/client/scripts/hog-device-sci.bt
-@@ -26,12 +26,12 @@ gatt.register-descriptor 0x2908 read
- gatt.register-characteristic 0x2a4e read,write-without-response
- 0x01
- #
--# HID Control Point
-+# HID Control Point: Suspend, Exit Suspend and Enable SCI modes
- gatt.register-characteristic 0x2a4c write-without-response
- 0x00
- #
--# HID SCI Mode: None (0x00), notified when changed
--gatt.register-characteristic 0x2c39 read,write,notify
-+# HID SCI Mode: None (0x00), notified once changed with the HID Control Point
-+gatt.register-characteristic 0x2c39 read,notify
- 0x00
- #
- # HID SCI Information (intervals in units of 0.125 ms):
-diff --git a/doc/functional-hog.rst b/doc/functional-hog.rst
-index d748f241a378..795a066a6f1a 100644
---- a/doc/functional-hog.rst
-+++ b/doc/functional-hog.rst
-@@ -16,7 +16,7 @@ SETUP
- Two hosts, connected over LE, both running **bluetoothd(8)** with
- ``ControllerMode = le`` and ``ExportClaimedServices = read-write``, as
- the HID Service is claimed by the input plugin of the HID host and
--bluetoothctl has to write HID SCI Mode:
-+bluetoothctl has to write the HID Control Point:
- 
- .. code-block::
- 
-@@ -102,24 +102,26 @@ test_hog[no-sci]
- 
- 		[bluetoothctl]> gatt.select-attribute 2a4a
- 		[bluetoothctl]> gatt.read
--		Attempting to read /org/bluez/hci0/dev_XX/service0013/char001e
-+		Attempting to read /org/bluez/hci0/dev_XX/serviceXX/charXX
- 		  11 01 00 02                                      ....
- 
- 	6. ``Notify started``, and the Report subscribed on host1
--	   (``Notify sock acquired``, as the input plugin already
--	   subscribed with AcquireNotify).
-+	   (``Notify sock acquired``, as bluetoothd on host1 forwards the
-+	   subscription with AcquireNotify, the input plugin of host0
-+	   having already enabled the notifications).
- 	7. Each report is notified to host0, in order:
- 
- 	   .. code-block::
- 
--		[CHG] Attribute /org/bluez/hci0/dev_XX/service0013/char0018 Value:
-+		[CHG] Attribute /org/bluez/hci0/dev_XX/serviceXX/charXX Value:
- 		  00 00 04 00 00 00 00 00                          ........
- 
- :Notes: The service is checked at the GATT level only, so the test
- 	does not depend on the kernel supporting uhid. The HID Service is
--	claimed by the input plugin on host0, but it is still exported
--	read-only over D-Bus by default (see ``ExportClaimedServices`` in
--	**bluetoothd(8)**), so it can be read with bluetoothctl.
-+	claimed by the input plugin on host0, but it is still exported over
-+	D-Bus, read-write as configured in SETUP (see
-+	``ExportClaimedServices`` in **bluetoothd(8)**), so it can be read
-+	with bluetoothctl.
- 
- test_hog[sci]
- -------------
-@@ -131,25 +133,30 @@ test_hog[sci]
- 	8. host0: ``gatt.select-attribute 2c39`` and ``gatt.read``.
- 	9. host0: ``gatt.select-attribute 2c3a`` and ``gatt.read``.
- 	10. host0: ``gatt.select-attribute 2c39`` and ``gatt.notify on``.
--	11. host0: ``gatt.write "0x03"``, i.e. SCI Fast Mode.
-+	11. host0: ``gatt.select-attribute 2a4c`` and ``gatt.write "0x03"``,
-+	    i.e. Enable SCI Fast mode written to the HID Control Point.
- 	12. host0: ``mgmt.conn-subrate <host1 bdaddr> 0x0008 0x0010 1 1 0 0
- 	    0x01f4``, i.e. interval 1 ms to 2 ms, within the range given in
- 	    HID SCI Information, no subrating, no latency and 5 s
- 	    supervision timeout.
- 	13. host1: ``gatt.select-attribute local
--	    /org/bluez/app/service0/chrc5`` and ``gatt.write "0x03"``.
-+	    /org/bluez/app/service0/chrc5`` and ``gatt.write "0x03"``,
-+	    notifying the new mode with HID SCI Mode.
- 
- :Expected: As for test_hog[no-sci], except HID Information reads
- 	``11 01 00 06``, then:
- 
- 	8. HID SCI Mode reads ``00``.
- 	9. HID SCI Information reads ``08 01 08 00 50 00 08 00``.
--	10. ``Notify started`` and HID SCI Mode subscribed on host1.
--	11. host1 receives the write:
-+	10. ``Notify started``. HID SCI Mode is already subscribed on host1,
-+	    by the input plugin of host0 once HID Information tells SCI is
-+	    supported.
-+	11. host1 receives the write, over the socket acquired with
-+	    AcquireWrite as it is a Write Without Response:
- 
- 	    .. code-block::
- 
--		[/org/bluez/app/service0/chrc5 (HID SCI Mode)] WriteValue: XX offset 0 link LE
-+		[CHG] Attribute /org/bluez/app/service0/chrc4 (HID Control Point) written:
- 		  03                                               .
- 
- 	12. ``Connection Subrate loaded successfully``, then the MGMT
-@@ -160,11 +167,12 @@ test_hog[sci]
- 		hci0 XX type LE Public connection subrate interval 0x0008 subrate 0x0001 latency 0x0000 cont_num 0x0000 timeout 0x01f4
- 
- 	13. The new mode is notified to host0, confirming it has been
--	    changed:
-+	    changed, which the input plugin reports in the
-+	    **bluetoothd(8)** debug output (``SCI Mode changed: 0x03``):
- 
- 	    .. code-block::
- 
--		[CHG] Attribute /org/bluez/hci0/dev_XX/service0015/char0018 Value:
-+		[CHG] Attribute /org/bluez/hci0/dev_XX/serviceXX/charXX Value:
- 		  03                                               .
- 
- 	.. code-block::
-@@ -180,9 +188,17 @@ test_hog[sci]
- :Notes: As the SCI Supported flag is set, the input plugin on host0
- 	reads HID SCI Mode and HID SCI Information as well, which can be
- 	seen in the **bluetoothd(8)** debug output (``SCI Mode:`` and
--	``SCI Info:``).
-+	``SCI Info:``), and enables the notifications of HID SCI Mode.
- 
--	The kernel only issues the LE Connection Rate Request as central,
--	so the connection rate is changed by the HID host. This requires
-+	As specified by HOGP.TS 4.6.1, the HID host requests a HID SCI
-+	mode by writing it to the HID Control Point (0x02 Default, 0x03
-+	Fast, 0x04 Low Power, 0x05 Full Range), HID SCI Mode being Read and
-+	Notify only. The Control Point is written with bluetoothctl, as the
-+	input plugin has no D-Bus API to request a mode.
+diff --git a/Makefile.am b/Makefile.am
+index e5587c55d2dd..5419b31e21d5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -239,6 +239,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/mcs.h src/shared/mcp.h src/shared/mcp.c \
+ 			src/shared/vcp.c src/shared/vcp.h \
+ 			src/shared/micp.c src/shared/micp.h \
++			src/shared/hog.c src/shared/hog.h \
+ 			src/shared/csip.c src/shared/csip.h \
+ 			src/shared/bass.h src/shared/bass.c \
+ 			src/shared/ccp.h src/shared/ccp.c \
+diff --git a/src/shared/hog.c b/src/shared/hog.c
+new file mode 100644
+index 000000000000..f5dd631e805a
+--- /dev/null
++++ b/src/shared/hog.c
+@@ -0,0 +1,1659 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation.
++ *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2012  Nordic Semiconductor Inc.
++ *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ */
 +
-+	The HID device is meant to change the connection rate once the
-+	mode is written, but the kernel only issues the LE Connection Rate
-+	Request as central, so the connection rate is changed by the HID
-+	host. This requires
- 	the controllers to support Shorter Connection Intervals, which
- 	btvirt emulates as a BR/EDR/LE 6.2 controller.
-diff --git a/test/functional/test_hog.py b/test/functional/test_hog.py
-index ea54882d059d..7ff0965275d1 100644
---- a/test/functional/test_hog.py
-+++ b/test/functional/test_hog.py
-@@ -18,7 +18,8 @@ from pytest_bluezenv.utils import bluez_src_dir
- pytestmark = [pytest.mark.vm]
- 
- # The HID Service is claimed by the input plugin of the HID host, so it
--# has to be exported read-write for bluetoothctl to write HID SCI Mode
-+# has to be exported read-write for bluetoothctl to write the HID Control
-+# Point
- HOG_CONF = """[General]
- ControllerMode = le
- 
-@@ -30,6 +31,7 @@ HIDS_UUID = "00001812-0000-1000-8000-00805f9b34fb"
- 
- # Local attributes registered by client/scripts/hog-device*.bt
- LOCAL_REPORT = "/org/bluez/app/service0/chrc2"
-+LOCAL_CP = "/org/bluez/app/service0/chrc4"
- LOCAL_SCI_MODE = "/org/bluez/app/service0/chrc5"
- 
- # Keyboard Input Reports: Modifiers, Reserved, then 6 Key Codes
-@@ -39,7 +41,8 @@ REPORTS = [
-     "00 00 00 00 00 00 00 00",  # released
- ]
- 
--# HID SCI Mode: Fast Mode
-+# HID Control Point: Enable SCI Fast mode, the value then notified with
-+# HID SCI Mode
- SCI_FAST_MODE = "03"
- 
- # LE Connection Rate parameters requested with mgmt.conn-subrate once in
-@@ -229,14 +232,27 @@ def test_hog(hosts, init_script, flags, sci):
-     assert read_attribute(ctl, "2c39") == mode
-     assert read_attribute(ctl, "2c3a") == info
- 
--    # SCI mode change: the HID host writes the new mode to the HID device
--    enable_notifications(ctl, device, "2c39", LOCAL_SCI_MODE)
-+    # The input plugin of the HID host enables the notifications of HID
-+    # SCI Mode on its own, so they only have to be started on bluetoothctl
-+    # to be printed
-+    ctl.send("gatt.select-attribute 2c39\n")
-+    ctl.send("gatt.notify on\n")
-+    expect(ctl, r"Notify started", timeout=REPLY_TIMEOUT)
- 
-+    # SCI mode change, see HOGP.TS 4.6.1: the HID host writes the mode to
-+    # enable to the HID Control Point, with Write Without Response
-+    ctl.send("gatt.select-attribute 2a4c\n")
-     ctl.send(f'gatt.write "{hexbytes(SCI_FAST_MODE)}"\n')
--    expect(device, rf"\[{LOCAL_SCI_MODE} .*\] WriteValue:")
-+    # Received with WriteValue, or over the socket acquired with
-+    # AcquireWrite
-+    expect(
-+        device,
-+        rf"\[{LOCAL_CP} .*\] WriteValue:|Attribute {LOCAL_CP} .*written:",
-+    )
-     assert expect_hexdump(device) == SCI_FAST_MODE
- 
--    # The HID host, as central, changes the connection rate accordingly
-+    # The HID device is meant to change the connection rate, but the kernel
-+    # only requests it as central, so the HID host does it instead
-     ctl.send(f"mgmt.conn-subrate {host1.bdaddr} {' '.join(SCI_RATE)}\n")
-     # The connection rate may change before the command completes, so the
-     # event may be printed before the reply
-@@ -248,5 +264,6 @@ def test_hog(hosts, init_script, flags, sci):
-     expect(device, rate.format(host0.bdaddr.upper()))
- 
-     # Then the HID device confirms the mode has been changed
-+    ctl.send("gatt.select-attribute 2c39\n")
-     notify(device, LOCAL_SCI_MODE, SCI_FAST_MODE)
-     assert expect_notification(ctl) == SCI_FAST_MODE
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++#include <stdbool.h>
++#include <stdarg.h>
++#include <string.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <sys/socket.h>
++#include <sys/uio.h>
++
++#include "bluetooth/bluetooth.h"
++#include "bluetooth/l2cap.h"
++#include "bluetooth/uuid.h"
++
++#include "src/shared/util.h"
++#include "src/shared/uhid.h"
++#include "src/shared/queue.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/hog.h"
++
++#define DBG(_hog, fmt, arg...) \
++	hog_debug(_hog, "%s:%s() " fmt, __FILE__, __func__, ##arg)
++
++#define HOG_UUID16		0x1812
++
++#define HOG_INFO_UUID		0x2A4A
++#define HOG_REPORT_MAP_UUID	0x2A4B
++#define HOG_REPORT_UUID		0x2A4D
++#define HOG_PROTO_MODE_UUID	0x2A4E
++#define HOG_CP_UUID		0x2A4C
++#define HOG_SCI_MODE_UUID	0x2C39
++#define HOG_SCI_INFO_UUID	0x2C3A
++
++#define HOG_REPORT_TYPE_INPUT	1
++#define HOG_REPORT_TYPE_OUTPUT	2
++#define HOG_REPORT_TYPE_FEATURE	3
++
++#define HOG_PROTO_MODE_BOOT    0
++#define HOG_PROTO_MODE_REPORT  1
++
++#define HOG_INFO_FLAG_SCI_SUPPORTED	0x04
++#define HOG_INFO_FLAG_SCI_LOW_POWER	0x08
++
++#define HID_INFO_SIZE			4
++
++struct bt_hog {
++	int			ref_count;
++	char			*name;
++	uint16_t		vendor;
++	uint16_t		product;
++	uint16_t		version;
++	uint8_t			type;
++	struct gatt_db		*db;
++	struct gatt_db_attribute *attr;
++	struct bt_gatt_client	*client;
++	struct queue		*reports;
++	struct bt_uhid		*uhid;
++	int			uhid_fd;
++	uint64_t		uhid_flags;
++	uint16_t		bcdhid;
++	uint8_t			bcountrycode;
++	uint16_t		proto_mode_handle;
++	uint16_t		cp_handle;
++	uint8_t			flags;
++	unsigned int		getrep_att;
++	uint32_t		getrep_id;
++	unsigned int		setrep_att;
++	uint32_t		setrep_id;
++	unsigned int		report_map_id;
++	struct gatt_db_attribute *report_map_attr;
++	uint16_t		sci_mode_handle;
++	uint8_t			sci_mode_props;
++	unsigned int		sci_mode_id;
++	uint8_t			sci_mode;
++	uint16_t		sci_info_handle;
++	bt_hog_sci_mode_func_t	sci_mode_func;
++	void			*sci_mode_data;
++	/* Requests to cancel when detaching */
++	struct queue		*reqs;
++	/* Reads pending before reading the Report Map */
++	unsigned int		pending;
++	struct queue		*instances;
++	bt_hog_debug_func_t	debug_func;
++	bt_hog_destroy_func_t	debug_destroy;
++	void			*debug_data;
++};
++
++struct report {
++	struct bt_hog		*hog;
++	bool			numbered;
++	uint8_t			id;
++	uint8_t			type;
++	uint16_t		handle;
++	uint16_t		value_handle;
++	uint8_t			properties;
++	uint16_t		ccc_handle;
++	unsigned int		notify_id;
++	uint16_t		len;
++	uint8_t			*value;
++};
++
++/* Request tracked so it is cancelled when detaching, freed once complete or
++ * cancelled.
++ */
++struct hog_req {
++	struct bt_hog		*hog;
++	void			*data;
++	unsigned int		id;
++};
++
++static void hog_debug(struct bt_hog *hog, const char *format, ...)
++{
++	va_list ap;
++
++	if (!hog || !format || !hog->debug_func)
++		return;
++
++	va_start(ap, format);
++	util_debug_va(hog->debug_func, hog->debug_data, format, ap);
++	va_end(ap);
++}
++
++static void read_report_map(struct bt_hog *hog);
++
++static void req_free(void *data)
++{
++	struct hog_req *req = data;
++
++	if (req->hog)
++		queue_remove(req->hog->reqs, req);
++
++	free(req);
++}
++
++static struct hog_req *req_new(struct bt_hog *hog, void *data)
++{
++	struct hog_req *req;
++
++	req = new0(struct hog_req, 1);
++	req->hog = hog;
++	req->data = data;
++
++	return req;
++}
++
++static bool req_track(struct hog_req *req, unsigned int id)
++{
++	if (!id) {
++		free(req);
++		return false;
++	}
++
++	req->id = id;
++	queue_push_tail(req->hog->reqs, req);
++
++	return true;
++}
++
++static void req_cancel(void *data)
++{
++	struct hog_req *req = data;
++	struct bt_gatt_client *client = req->hog->client;
++
++	/* Already removed from the queue, req is freed by req_free */
++	req->hog = NULL;
++	bt_gatt_client_cancel(client, req->id);
++}
++
++static unsigned int read_char(struct bt_hog *hog, uint16_t handle,
++				bt_gatt_client_read_callback_t func,
++				void *data)
++{
++	struct hog_req *req = req_new(hog, data);
++
++	if (!req_track(req, bt_gatt_client_read_value(hog->client, handle,
++						func, req, req_free))) {
++		DBG(hog, "Could not read handle 0x%04x", handle);
++		return 0;
++	}
++
++	hog->pending++;
++
++	return req->id;
++}
++
++static void req_done(struct hog_req *req, bool success)
++{
++	struct bt_hog *hog = req->hog;
++
++	if (hog->pending)
++		hog->pending--;
++
++	/* Report Map must be read last since that can result in uhid being
++	 * created and the driver may start to use UHID_SET_REPORT which
++	 * requires the report->id to be known what attribute to send to.
++	 *
++	 * Read it even if a request failed, e.g. reading an optional
++	 * attribute, otherwise the uHID device would never be created.
++	 */
++	if (!hog->pending)
++		read_report_map(hog);
++}
++
++static const char *type_to_string(uint8_t type)
++{
++	switch (type) {
++	case HOG_REPORT_TYPE_INPUT:
++		return "input";
++	case HOG_REPORT_TYPE_OUTPUT:
++		return "output";
++	case HOG_REPORT_TYPE_FEATURE:
++		return "feature";
++	}
++
++	return NULL;
++}
++
++static void report_value_cb(uint16_t value_handle, const uint8_t *value,
++					uint16_t length, void *user_data)
++{
++	struct report *report = user_data;
++	struct bt_hog *hog = report->hog;
++	bool numbered = report->numbered;
++	int err;
++
++	/* Drop the reports until the uHID device is created, as they would be
++	 * queued with no limit until then, e.g. if the HID device never lets
++	 * the Report Map be read.
++	 */
++	if (!bt_uhid_created(hog->uhid))
++		return;
++
++	/* Until UHID_START tells which reports are numbered, rely on the
++	 * Report ID since it is 0 when the Report Map does not use them.
++	 */
++	if (!bt_uhid_started(hog->uhid))
++		numbered = report->id;
++
++	err = bt_uhid_input(hog->uhid, numbered ? report->id : 0, value,
++								length);
++	if (err < 0)
++		DBG(hog, "bt_uhid_input: %s (%d)", strerror(-err), -err);
++}
++
++static void report_notify_registered(uint16_t att_ecode, void *user_data)
++{
++	struct report *report = user_data;
++	struct bt_hog *hog = report->hog;
++
++	if (att_ecode) {
++		DBG(hog, "Unable to enable notifications: handle 0x%04x "
++					"error 0x%02x", report->value_handle,
++					att_ecode);
++		return;
++	}
++
++	DBG(hog, "Report 0x%04x: notifications enabled",
++						report->value_handle);
++}
++
++static void report_enable_notify(struct report *report)
++{
++	struct bt_hog *hog = report->hog;
++
++	if (report->notify_id || !hog->client ||
++			report->type != HOG_REPORT_TYPE_INPUT ||
++			!(report->properties & BT_GATT_CHRC_PROP_NOTIFY))
++		return;
++
++	report->notify_id = bt_gatt_client_register_notify(hog->client,
++					report->value_handle,
++					report_notify_registered,
++					report_value_cb, report, NULL);
++	if (!report->notify_id)
++		DBG(hog, "Unable to register report notification: "
++				"handle 0x%04x", report->value_handle);
++}
++
++static void ccc_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct report *report = req->data;
++
++	if (!success)
++		DBG(req->hog, "Error reading CCC value: 0x%02x", att_ecode);
++	else if (length == 2)
++		DBG(req->hog, "Report 0x%04x: CCC 0x%04x",
++				report->value_handle, get_le16(value));
++
++	/* Enable notifications regardless, as the HID Device may not
++	 * persist them.
++	 */
++	report_enable_notify(report);
++
++	req_done(req, success);
++}
++
++static void report_reference_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct report *report = req->data;
++	struct bt_hog *hog = req->hog;
++
++	if (!success) {
++		DBG(hog, "Read Report Reference descriptor failed: 0x%02x",
++								att_ecode);
++		goto done;
++	}
++
++	if (length != 2) {
++		DBG(hog, "Malformed Report Reference: length %u", length);
++		goto done;
++	}
++
++	report->id = value[0];
++	report->type = value[1];
++
++	DBG(hog, "Report 0x%04x: id 0x%02x type %s", report->value_handle,
++				report->id, type_to_string(report->type));
++
++	/* Enable notifications only for Input Reports, reading the CCC
++	 * first to know its current value.
++	 */
++	if (report->type == HOG_REPORT_TYPE_INPUT && report->ccc_handle)
++		read_char(hog, report->ccc_handle, ccc_read_cb, report);
++	else
++		report_enable_notify(report);
++
++done:
++	req_done(req, success);
++}
++
++static void report_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct report *report = req->data;
++
++	if (!success) {
++		DBG(req->hog, "Error reading Report value: 0x%02x", att_ecode);
++		goto done;
++	}
++
++	free(report->value);
++	report->value = util_memdup(value, length);
++	report->len = length;
++
++done:
++	req_done(req, success);
++}
++
++static void foreach_hog_report(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct report *report = user_data;
++	struct bt_hog *hog = report->hog;
++	const bt_uuid_t *uuid;
++	bt_uuid_t ref_uuid, ccc_uuid;
++	uint16_t handle;
++
++	handle = gatt_db_attribute_get_handle(attr);
++	uuid = gatt_db_attribute_get_type(attr);
++
++	bt_uuid16_create(&ref_uuid, GATT_REPORT_REFERENCE);
++	if (!bt_uuid_cmp(&ref_uuid, uuid)) {
++		read_char(hog, handle, report_reference_cb, report);
++		return;
++	}
++
++	bt_uuid16_create(&ccc_uuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	if (!bt_uuid_cmp(&ccc_uuid, uuid))
++		report->ccc_handle = handle;
++}
++
++static bool match_report_handle(const void *data, const void *match_data)
++{
++	const struct report *report = data;
++	uint16_t handle = PTR_TO_UINT(match_data);
++
++	return report->handle == handle;
++}
++
++static struct report *report_add(struct bt_hog *hog,
++					struct gatt_db_attribute *attr)
++{
++	struct report *report;
++	uint16_t handle = gatt_db_attribute_get_handle(attr);
++
++	/* Skip if report already exists, e.g. when reconnecting, only
++	 * enabling its notifications again.
++	 */
++	report = queue_find(hog->reports, match_report_handle,
++						UINT_TO_PTR(handle));
++	if (report) {
++		report_enable_notify(report);
++		return report;
++	}
++
++	report = new0(struct report, 1);
++	report->hog = hog;
++
++	gatt_db_attribute_get_char_data(attr, &report->handle,
++					&report->value_handle,
++					&report->properties,
++					NULL, NULL);
++
++	queue_push_tail(hog->reports, report);
++
++	read_char(hog, report->value_handle, report_read_cb, report);
++
++	gatt_db_service_foreach_desc(attr, foreach_hog_report, report);
++
++	return report;
++}
++
++static void foreach_external_report(struct gatt_db_attribute *attr,
++							void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	bt_uuid_t uuid, report_uuid;
++
++	gatt_db_attribute_get_char_data(attr, NULL, NULL, NULL, NULL, &uuid);
++
++	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
++	if (!bt_uuid_cmp(&report_uuid, &uuid))
++		report_add(hog, attr);
++}
++
++static void foreach_external_service(struct gatt_db_attribute *attr,
++							void *user_data)
++{
++	bt_uuid_t uuid, hog_uuid;
++
++	gatt_db_attribute_get_service_uuid(attr, &uuid);
++
++	/* Reports of HID services belong to their own instance */
++	bt_uuid16_create(&hog_uuid, HOG_UUID16);
++	if (!bt_uuid_cmp(&hog_uuid, &uuid))
++		return;
++
++	gatt_db_service_foreach_char(attr, foreach_external_report, user_data);
++}
++
++static void external_report_reference_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct bt_hog *hog = req->hog;
++	uint16_t uuid16;
++
++	if (!success) {
++		DBG(hog, "Read External Report Reference descriptor failed: "
++							"0x%02x", att_ecode);
++		goto done;
++	}
++
++	if (length != 2) {
++		DBG(hog, "Malformed External Report Reference: length %u",
++								length);
++		goto done;
++	}
++
++	uuid16 = get_le16(value);
++	DBG(hog, "External report reference read, external report "
++				"characteristic UUID: 0x%04x", uuid16);
++
++	/* Do not add if is not a Report */
++	if (uuid16 != HOG_REPORT_UUID)
++		goto done;
++
++	gatt_db_foreach_service(hog->db, NULL, foreach_external_service, hog);
++
++done:
++	req_done(req, success);
++}
++
++static void foreach_hog_external(struct gatt_db_attribute *attr,
++							void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	const bt_uuid_t *uuid;
++	bt_uuid_t ext_uuid;
++
++	uuid = gatt_db_attribute_get_type(attr);
++
++	bt_uuid16_create(&ext_uuid, GATT_EXTERNAL_REPORT_REFERENCE);
++	if (!bt_uuid_cmp(&ext_uuid, uuid))
++		read_char(hog, gatt_db_attribute_get_handle(attr),
++					external_report_reference_cb, hog);
++}
++
++static int report_cmp(const struct report *ra, const struct report *rb)
++{
++	/* sort by type first.. */
++	if (ra->type != rb->type)
++		return ra->type - rb->type;
++
++	/* skip id check in case of reports not being numbered  */
++	if (!ra->numbered && !rb->numbered)
++		return 0;
++
++	/* ..then by id */
++	return ra->id - rb->id;
++}
++
++static bool match_report(const void *data, const void *match_data)
++{
++	return !report_cmp(data, match_data);
++}
++
++static struct report *find_report(struct bt_hog *hog, uint8_t type, uint8_t id)
++{
++	struct report cmp;
++
++	memset(&cmp, 0, sizeof(cmp));
++	cmp.type = type;
++	cmp.id = id;
++
++	switch (type) {
++	case HOG_REPORT_TYPE_FEATURE:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_FEATURE_REPORTS)
++			cmp.numbered = true;
++		break;
++	case HOG_REPORT_TYPE_OUTPUT:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_OUTPUT_REPORTS)
++			cmp.numbered = true;
++		break;
++	case HOG_REPORT_TYPE_INPUT:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_INPUT_REPORTS)
++			cmp.numbered = true;
++		break;
++	}
++
++	return queue_find(hog->reports, match_report, &cmp);
++}
++
++static struct report *find_report_by_rtype(struct bt_hog *hog, uint8_t rtype,
++								uint8_t id)
++{
++	uint8_t type;
++
++	switch (rtype) {
++	case UHID_FEATURE_REPORT:
++		type = HOG_REPORT_TYPE_FEATURE;
++		break;
++	case UHID_OUTPUT_REPORT:
++		type = HOG_REPORT_TYPE_OUTPUT;
++		break;
++	case UHID_INPUT_REPORT:
++		type = HOG_REPORT_TYPE_INPUT;
++		break;
++	default:
++		return NULL;
++	}
++
++	return find_report(hog, type, id);
++}
++
++static void output_written_cb(bool success, uint8_t att_ecode,
++							void *user_data)
++{
++	struct hog_req *req = user_data;
++
++	if (!success)
++		DBG(req->hog, "Write output report failed: 0x%02x", att_ecode);
++}
++
++static void write_output(struct bt_hog *hog, struct report *report,
++					const uint8_t *data, size_t size)
++{
++	struct hog_req *req = req_new(hog, report);
++
++	if (!req_track(req, bt_gatt_client_write_value(hog->client,
++					report->value_handle, data, size,
++					output_written_cb, req, req_free)))
++		DBG(hog, "Could not write report 0x%04x",
++						report->value_handle);
++}
++
++static void write_report(struct bt_hog *hog, struct report *report,
++					const uint8_t *data, size_t size)
++{
++	if (report->properties & BT_GATT_CHRC_PROP_WRITE)
++		write_output(hog, report, data, size);
++	else if (report->properties & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP)
++		bt_gatt_client_write_without_response(hog->client,
++						report->value_handle, false,
++						data, size);
++}
++
++static void forward_report(struct uhid_event *ev, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	struct report *report;
++	uint8_t *data;
++	int size;
++
++	report = find_report_by_rtype(hog, ev->u.output.rtype,
++							ev->u.output.data[0]);
++	if (!report)
++		return;
++
++	data = ev->u.output.data;
++	size = ev->u.output.size;
++
++	if (report->numbered && size > 0) {
++		data++;
++		--size;
++	}
++
++	DBG(hog, "Sending report type %d ID %d to handle 0x%X", report->type,
++				report->id, report->value_handle);
++
++	if (!hog->client)
++		return;
++
++	write_report(hog, report, data, size);
++}
++
++static void set_numbered(void *data, void *user_data)
++{
++	struct report *report = data;
++	struct bt_hog *hog = user_data;
++
++	switch (report->type) {
++	case HOG_REPORT_TYPE_INPUT:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_INPUT_REPORTS)
++			report->numbered = true;
++		break;
++	case HOG_REPORT_TYPE_OUTPUT:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_OUTPUT_REPORTS)
++			report->numbered = true;
++		break;
++	case HOG_REPORT_TYPE_FEATURE:
++		if (hog->uhid_flags & UHID_DEV_NUMBERED_FEATURE_REPORTS)
++			report->numbered = true;
++		break;
++	}
++}
++
++static void start_flags(struct uhid_event *ev, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	hog->uhid_flags = ev->u.start.dev_flags;
++
++	DBG(hog, "uHID device flags: 0x%16" PRIx64, hog->uhid_flags);
++
++	if (hog->uhid_flags)
++		queue_foreach(hog->reports, set_numbered, hog);
++}
++
++static void uhid_destroy(struct bt_hog *hog, bool force)
++{
++	int err;
++
++	if (!hog->uhid)
++		return;
++
++	bt_uhid_unregister_all(hog->uhid);
++
++	err = bt_uhid_destroy(hog->uhid, force);
++	if (err < 0)
++		DBG(hog, "bt_uhid_destroy: %s", strerror(-err));
++}
++
++static void set_report_reply(struct bt_hog *hog, uint8_t status)
++{
++	int err;
++
++	hog->setrep_att = 0;
++
++	err = bt_uhid_set_report_reply(hog->uhid, hog->setrep_id, status);
++	if (err < 0)
++		DBG(hog, "bt_uhid_set_report_reply: %s", strerror(-err));
++}
++
++static void set_report_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	if (!success)
++		DBG(hog, "Error setting Report value: 0x%02x", att_ecode);
++
++	set_report_reply(hog, success ? 0 : att_ecode);
++}
++
++static void set_report(struct uhid_event *ev, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	struct report *report;
++	uint8_t *data;
++	int size;
++
++	/* Destroy input device if there is an attempt to communicate with it
++	 * while disconnected.
++	 */
++	if (!hog->client) {
++		uhid_destroy(hog, true);
++		return;
++	}
++
++	/* uhid never sends reqs in parallel; if there's a req, it timed out */
++	if (hog->setrep_att) {
++		bt_gatt_client_cancel(hog->client, hog->setrep_att);
++		hog->setrep_att = 0;
++	}
++
++	hog->setrep_id = ev->u.set_report.id;
++
++	report = find_report_by_rtype(hog, ev->u.set_report.rtype,
++							ev->u.set_report.rnum);
++	if (!report) {
++		set_report_reply(hog, ENOTSUP);
++		return;
++	}
++
++	data = ev->u.set_report.data;
++	size = ev->u.set_report.size;
++
++	if (report->numbered && size > 0) {
++		data++;
++		--size;
++	}
++
++	DBG(hog, "Sending report type %d ID %d to handle 0x%X", report->type,
++				report->id, report->value_handle);
++
++	hog->setrep_att = bt_gatt_client_write_value(hog->client,
++						report->value_handle,
++						data, size, set_report_cb,
++						hog, NULL);
++	if (!hog->setrep_att)
++		set_report_reply(hog, ENOMEM);
++}
++
++static void report_reply(struct bt_hog *hog, uint8_t status, uint8_t id,
++			uint16_t len, const uint8_t *data)
++{
++	int err;
++
++	hog->getrep_att = 0;
++
++	err = bt_uhid_get_report_reply(hog->uhid, hog->getrep_id, id, status,
++					data, len);
++	if (err < 0)
++		DBG(hog, "bt_uhid_get_report_reply: %s", strerror(-err));
++}
++
++static void get_report_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct report *report = user_data;
++	struct bt_hog *hog = report->hog;
++	uint8_t status = 0;
++
++	if (!success) {
++		DBG(hog, "Error reading Report value: 0x%02x", att_ecode);
++		status = att_ecode;
++	} else if (!length) {
++		DBG(hog, "Error reading Report, length %d", length);
++		status = EIO;
++	}
++
++	report_reply(hog, status, report->numbered ? report->id : 0,
++					status ? 0 : length, value);
++}
++
++static void get_report(struct uhid_event *ev, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	struct report *report;
++
++	/* Destroy input device if there is an attempt to communicate with it
++	 * while disconnected.
++	 */
++	if (!hog->client) {
++		uhid_destroy(hog, true);
++		return;
++	}
++
++	/* uhid never sends reqs in parallel; if there's a req, it timed out */
++	if (hog->getrep_att) {
++		bt_gatt_client_cancel(hog->client, hog->getrep_att);
++		hog->getrep_att = 0;
++	}
++
++	hog->getrep_id = ev->u.get_report.id;
++
++	report = find_report_by_rtype(hog, ev->u.get_report.rtype,
++							ev->u.get_report.rnum);
++	if (!report) {
++		report_reply(hog, ENOTSUP, 0, 0, NULL);
++		return;
++	}
++
++	hog->getrep_att = bt_gatt_client_read_value(hog->client,
++						report->value_handle,
++						get_report_cb, report, NULL);
++	if (!hog->getrep_att)
++		report_reply(hog, ENOMEM, 0, 0, NULL);
++}
++
++static void get_addrs(struct bt_hog *hog, bdaddr_t *src, bdaddr_t *dst)
++{
++	struct sockaddr_l2 addr;
++	socklen_t len;
++	int fd;
++
++	bacpy(src, BDADDR_ANY);
++	bacpy(dst, BDADDR_ANY);
++
++	fd = bt_att_get_fd(bt_gatt_client_get_att(hog->client));
++	if (fd < 0)
++		return;
++
++	memset(&addr, 0, sizeof(addr));
++	len = sizeof(addr);
++	if (!getsockname(fd, (struct sockaddr *) &addr, &len) &&
++					addr.l2_family == AF_BLUETOOTH)
++		bacpy(src, &addr.l2_bdaddr);
++
++	memset(&addr, 0, sizeof(addr));
++	len = sizeof(addr);
++	if (!getpeername(fd, (struct sockaddr *) &addr, &len) &&
++					addr.l2_family == AF_BLUETOOTH)
++		bacpy(dst, &addr.l2_bdaddr);
++}
++
++static void uhid_register(struct bt_hog *hog)
++{
++	/* The handlers are unregistered when detaching, even if the uHID
++	 * device is kept, e.g. keyboards.
++	 */
++	bt_uhid_unregister_all(hog->uhid);
++
++	bt_uhid_register(hog->uhid, UHID_START, start_flags, hog);
++	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
++	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
++	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
++}
++
++static bool uhid_create(struct bt_hog *hog, const uint8_t *report_map,
++							size_t report_map_len)
++{
++	bdaddr_t src, dst;
++	int err;
++
++	get_addrs(hog, &src, &dst);
++
++	err = bt_uhid_create(hog->uhid, hog->name, &src, &dst,
++				hog->vendor, hog->product, hog->version,
++				hog->bcountrycode, hog->type,
++				(void *) report_map, report_map_len);
++	if (err < 0) {
++		DBG(hog, "bt_uhid_create: %s", strerror(-err));
++		return false;
++	}
++
++	uhid_register(hog);
++
++	DBG(hog, "HoG created uHID device");
++
++	return true;
++}
++
++static void db_report_map_write_value_cb(struct gatt_db_attribute *attr,
++						int err, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	if (err)
++		DBG(hog, "Error writing report map value to gatt db");
++}
++
++static void report_map_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	hog->report_map_id = 0;
++
++	if (!success) {
++		DBG(hog, "Report Map read failed: 0x%02x", att_ecode);
++		return;
++	}
++
++	if (!uhid_create(hog, value, length))
++		return;
++
++	/* Cache the report map, once known to be usable */
++	gatt_db_attribute_write(hog->report_map_attr, 0, value, length, 0,
++					NULL, db_report_map_write_value_cb,
++					hog);
++}
++
++static void read_report_map(struct bt_hog *hog)
++{
++	uint16_t handle;
++
++	if (!hog->client || !hog->report_map_attr ||
++			bt_uhid_created(hog->uhid) || hog->report_map_id)
++		return;
++
++	handle = gatt_db_attribute_get_handle(hog->report_map_attr);
++
++	/* The Report Map is usually longer than the MTU, which is handled
++	 * by reading it with Read Blob.
++	 */
++	hog->report_map_id = bt_gatt_client_read_long_value(hog->client,
++						handle, 0, report_map_read_cb,
++						hog, NULL);
++	if (!hog->report_map_id)
++		DBG(hog, "Could not read Report Map");
++}
++
++static void sci_mode_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct bt_hog *hog = req->hog;
++
++	if (!success) {
++		DBG(hog, "HID SCI Mode read failed: 0x%02x", att_ecode);
++		goto done;
++	}
++
++	if (length != 1) {
++		DBG(hog, "Malformed HID SCI Mode: length %u", length);
++		goto done;
++	}
++
++	hog->sci_mode = value[0];
++
++	DBG(hog, "SCI Mode: 0x%02X", value[0]);
++
++done:
++	req_done(req, success);
++}
++
++static void sci_info_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct bt_hog *hog = req->hog;
++	uint8_t min_conn_interval;
++	uint8_t num_grps;
++	uint8_t i;
++
++	if (!success) {
++		DBG(hog, "HID SCI Information read failed: 0x%02x", att_ecode);
++		goto done;
++	}
++
++	if (length < 2) {
++		DBG(hog, "Malformed HID SCI Information: length %u", length);
++		goto done;
++	}
++
++	min_conn_interval = value[0];
++	num_grps = value[1];
++
++	DBG(hog, "SCI Info: Minimum Supported Connection Interval: %.3f ms "
++		"(0x%02x) Number of Supported Subgroups: %d",
++		min_conn_interval * 0.125, min_conn_interval, num_grps);
++
++	for (i = 0; i < num_grps && (2 + i * 6 + 5) < length; i++) {
++		uint16_t min, max, stride;
++		size_t off = 2 + i * 6;
++
++		min = get_le16(&value[off]);
++		max = get_le16(&value[off + 2]);
++		stride = get_le16(&value[off + 4]);
++
++		DBG(hog, "  Subgroup[%u]: Min %.3f ms Max %.3f ms "
++				"Stride %.3f ms", i, min * 0.125, max * 0.125,
++				stride * 0.125);
++	}
++
++done:
++	req_done(req, success);
++}
++
++static void sci_mode_notify_cb(uint16_t value_handle, const uint8_t *value,
++					uint16_t length, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	if (length != 1) {
++		DBG(hog, "Malformed HID SCI Mode notification: length %u",
++								length);
++		return;
++	}
++
++	hog->sci_mode = value[0];
++
++	DBG(hog, "SCI Mode changed: 0x%02X", hog->sci_mode);
++
++	if (hog->sci_mode_func)
++		hog->sci_mode_func(hog->sci_mode, hog->sci_mode_data);
++}
++
++static void sci_mode_registered(uint16_t att_ecode, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	if (att_ecode)
++		DBG(hog, "Unable to enable SCI Mode notifications: 0x%02x",
++								att_ecode);
++}
++
++static void sci_mode_enable_notify(struct bt_hog *hog)
++{
++	if (hog->sci_mode_id || !hog->client || !hog->sci_mode_handle ||
++			!(hog->flags & HOG_INFO_FLAG_SCI_SUPPORTED) ||
++			!(hog->sci_mode_props & BT_GATT_CHRC_PROP_NOTIFY))
++		return;
++
++	hog->sci_mode_id = bt_gatt_client_register_notify(hog->client,
++					hog->sci_mode_handle,
++					sci_mode_registered,
++					sci_mode_notify_cb, hog, NULL);
++	if (!hog->sci_mode_id)
++		DBG(hog, "Unable to register SCI Mode notification");
++}
++
++static void info_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct bt_hog *hog = req->hog;
++
++	if (!success) {
++		DBG(hog, "HID Information read failed: 0x%02x", att_ecode);
++		goto done;
++	}
++
++	if (length != HID_INFO_SIZE) {
++		DBG(hog, "Malformed HID Information: length %u", length);
++		goto done;
++	}
++
++	hog->bcdhid = get_le16(&value[0]);
++	hog->bcountrycode = value[2];
++	hog->flags = value[3];
++
++	DBG(hog, "bcdHID: 0x%04X bCountryCode: 0x%02X Flags: 0x%02X",
++			hog->bcdhid, hog->bcountrycode, hog->flags);
++
++	/* Read SCI attributes if SCI is supported */
++	if (hog->flags & HOG_INFO_FLAG_SCI_SUPPORTED) {
++		if (hog->sci_mode_handle)
++			read_char(hog, hog->sci_mode_handle, sci_mode_read_cb,
++									hog);
++		if (hog->sci_info_handle)
++			read_char(hog, hog->sci_info_handle, sci_info_read_cb,
++									hog);
++
++		/* The HID Device notifies the mode once changed */
++		sci_mode_enable_notify(hog);
++	}
++
++done:
++	req_done(req, success);
++}
++
++static void proto_mode_read_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct hog_req *req = user_data;
++	struct bt_hog *hog = req->hog;
++
++	if (!success) {
++		DBG(hog, "Protocol Mode characteristic read failed: 0x%02x",
++								att_ecode);
++		goto done;
++	}
++
++	if (length < 1) {
++		DBG(hog, "Malformed Protocol Mode: length %u", length);
++		goto done;
++	}
++
++	if (value[0] == HOG_PROTO_MODE_BOOT) {
++		uint8_t nval = HOG_PROTO_MODE_REPORT;
++
++		DBG(hog, "HoG is operating in Boot Protocol Mode");
++
++		bt_gatt_client_write_without_response(hog->client,
++						hog->proto_mode_handle, false,
++						&nval, sizeof(nval));
++	} else if (value[0] == HOG_PROTO_MODE_REPORT)
++		DBG(hog, "HoG is operating in Report Protocol Mode");
++
++done:
++	req_done(req, success);
++}
++
++static void db_report_map_read_value_cb(struct gatt_db_attribute *attrib,
++						int err, const uint8_t *value,
++						size_t length, void *user_data)
++{
++	struct iovec *map = user_data;
++
++	if (err || !length)
++		return;
++
++	map->iov_len = length;
++	map->iov_base = (void *) value;
++}
++
++static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	bt_uuid_t uuid, report_uuid, report_map_uuid, info_uuid;
++	bt_uuid_t proto_mode_uuid, cp_uuid, sci_mode_uuid, sci_info_uuid;
++	uint16_t handle, value_handle;
++	uint8_t props;
++	struct iovec map = {};
++
++	gatt_db_attribute_get_char_data(attr, &handle, &value_handle, &props,
++					NULL, &uuid);
++
++	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
++	if (!bt_uuid_cmp(&report_uuid, &uuid)) {
++		report_add(hog, attr);
++		return;
++	}
++
++	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
++	if (!bt_uuid_cmp(&report_map_uuid, &uuid)) {
++		/* Try to read the cache of report map if available */
++		hog->report_map_attr = gatt_db_get_attribute(hog->db,
++								value_handle);
++		gatt_db_attribute_read(hog->report_map_attr, 0,
++					BT_ATT_OP_READ_REQ, NULL,
++					db_report_map_read_value_cb, &map);
++
++		if (map.iov_len) {
++			/* Report map found in the cache, straight to creating
++			 * UHID to optimize reconnection.
++			 */
++			uhid_create(hog, map.iov_base, map.iov_len);
++		}
++
++		gatt_db_service_foreach_desc(attr, foreach_hog_external, hog);
++		return;
++	}
++
++	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
++	if (!bt_uuid_cmp(&info_uuid, &uuid)) {
++		read_char(hog, value_handle, info_read_cb, hog);
++		return;
++	}
++
++	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
++	if (!bt_uuid_cmp(&proto_mode_uuid, &uuid)) {
++		hog->proto_mode_handle = value_handle;
++		read_char(hog, value_handle, proto_mode_read_cb, hog);
++		return;
++	}
++
++	bt_uuid16_create(&cp_uuid, HOG_CP_UUID);
++	if (!bt_uuid_cmp(&cp_uuid, &uuid)) {
++		hog->cp_handle = value_handle;
++		return;
++	}
++
++	bt_uuid16_create(&sci_mode_uuid, HOG_SCI_MODE_UUID);
++	if (!bt_uuid_cmp(&sci_mode_uuid, &uuid)) {
++		hog->sci_mode_handle = value_handle;
++		hog->sci_mode_props = props;
++		return;
++	}
++
++	bt_uuid16_create(&sci_info_uuid, HOG_SCI_INFO_UUID);
++	if (!bt_uuid_cmp(&sci_info_uuid, &uuid))
++		hog->sci_info_handle = value_handle;
++}
++
++static void report_free(void *data)
++{
++	struct report *report = data;
++
++	free(report->value);
++	free(report);
++}
++
++static void hog_free(struct bt_hog *hog)
++{
++	bt_hog_detach(hog, true);
++	uhid_destroy(hog, true);
++
++	queue_destroy(hog->instances, (void *) bt_hog_unref);
++	bt_uhid_unref(hog->uhid);
++	queue_destroy(hog->reports, report_free);
++	queue_destroy(hog->reqs, NULL);
++	free(hog->name);
++	gatt_db_unref(hog->db);
++
++	if (hog->debug_destroy)
++		hog->debug_destroy(hog->debug_data);
++
++	free(hog);
++}
++
++static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					uint8_t type,
++					struct gatt_db_attribute *attr)
++{
++	struct bt_uhid *uhid;
++	struct bt_hog *hog;
++
++	if (fd < 0)
++		uhid = bt_uhid_new_default();
++	else
++		uhid = bt_uhid_new(fd);
++
++	if (!uhid)
++		return NULL;
++
++	hog = new0(struct bt_hog, 1);
++	hog->reports = queue_new();
++	hog->instances = queue_new();
++	hog->reqs = queue_new();
++	hog->uhid_fd = fd;
++	hog->uhid = uhid;
++	hog->name = strdup(name ? name : "");
++	hog->vendor = vendor;
++	hog->product = product;
++	hog->version = version;
++	hog->type = type;
++	hog->attr = attr;
++
++	return hog;
++}
++
++static void foreach_hog_service(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	struct bt_hog *instance;
++
++	if (!hog->attr) {
++		hog->attr = attr;
++		return;
++	}
++
++	instance = hog_new(hog->uhid_fd, hog->name, hog->vendor, hog->product,
++				hog->version, hog->type, attr);
++	if (!instance)
++		return;
++
++	instance->db = gatt_db_ref(hog->db);
++
++	/* The debug callback is owned by the parent */
++	instance->debug_func = hog->debug_func;
++	instance->debug_data = hog->debug_data;
++	instance->sci_mode_func = hog->sci_mode_func;
++	instance->sci_mode_data = hog->sci_mode_data;
++
++	queue_push_tail(hog->instances, bt_hog_ref(instance));
++}
++
++static bool hog_set_db(struct bt_hog *hog, struct gatt_db *db)
++{
++	bt_uuid_t uuid;
++
++	hog->db = gatt_db_ref(db);
++
++	/* Handle the HID services */
++	bt_uuid16_create(&uuid, HOG_UUID16);
++	gatt_db_foreach_service(db, &uuid, foreach_hog_service, hog);
++
++	if (!hog->attr) {
++		/* Look up the services again on the next attempt */
++		gatt_db_unref(hog->db);
++		hog->db = NULL;
++		return false;
++	}
++
++	return true;
++}
++
++struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					uint8_t type, struct gatt_db *db)
++{
++	struct bt_hog *hog;
++
++	hog = hog_new(fd, name, vendor, product, version, type, NULL);
++	if (!hog)
++		return NULL;
++
++	/* Without a db the services are looked up once attached */
++	if (db && !hog_set_db(hog, db)) {
++		hog_free(hog);
++		return NULL;
++	}
++
++	return bt_hog_ref(hog);
++}
++
++struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					uint8_t type, struct gatt_db *db)
++{
++	return bt_hog_new(-1, name, vendor, product, version, type, db);
++}
++
++struct bt_hog *bt_hog_ref(struct bt_hog *hog)
++{
++	if (!hog)
++		return NULL;
++
++	__sync_fetch_and_add(&hog->ref_count, 1);
++
++	return hog;
++}
++
++void bt_hog_unref(struct bt_hog *hog)
++{
++	if (!hog)
++		return;
++
++	if (__sync_sub_and_fetch(&hog->ref_count, 1))
++		return;
++
++	hog_free(hog);
++}
++
++static void instance_set_debug(void *data, void *user_data)
++{
++	struct bt_hog *instance = data;
++	struct bt_hog *hog = user_data;
++
++	instance->debug_func = hog->debug_func;
++	instance->debug_data = hog->debug_data;
++}
++
++bool bt_hog_set_debug(struct bt_hog *hog, bt_hog_debug_func_t func,
++			void *user_data, bt_hog_destroy_func_t destroy)
++{
++	if (!hog)
++		return false;
++
++	if (hog->debug_destroy)
++		hog->debug_destroy(hog->debug_data);
++
++	hog->debug_func = func;
++	hog->debug_destroy = destroy;
++	hog->debug_data = user_data;
++
++	queue_foreach(hog->instances, instance_set_debug, hog);
++
++	return true;
++}
++
++void bt_hog_set_ids(struct bt_hog *hog, uint16_t vendor, uint16_t product,
++							uint16_t version)
++{
++	const struct queue_entry *entry;
++
++	if (!hog)
++		return;
++
++	hog->vendor = vendor;
++	hog->product = product;
++	hog->version = version;
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next)
++		bt_hog_set_ids(entry->data, vendor, product, version);
++}
++
++static void report_reattach(void *data, void *user_data)
++{
++	report_enable_notify(data);
++}
++
++bool bt_hog_attach(struct bt_hog *hog, struct bt_gatt_client *client)
++{
++	const struct queue_entry *entry;
++
++	if (!hog || !client || hog->client)
++		return false;
++
++	if (!hog->db && !hog_set_db(hog, bt_gatt_client_get_db(client))) {
++		DBG(hog, "No HID service found");
++		return false;
++	}
++
++	hog->client = bt_gatt_client_ref(client);
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next)
++		bt_hog_attach(entry->data, client);
++
++	/* The uHID device may have been kept while detached, e.g. keyboards,
++	 * in which case its handlers have to be registered again.
++	 */
++	if (bt_uhid_created(hog->uhid)) {
++		uhid_register(hog);
++	} else {
++		DBG(hog, "HoG discovering characteristics");
++		gatt_db_service_foreach_char(hog->attr, foreach_hog_chrc, hog);
++
++		/* Nothing to wait for before reading the Report Map */
++		if (!hog->pending)
++			read_report_map(hog);
++
++		/* Unless created with the Report Map in the cache, wait for it
++		 * to be read.
++		 */
++		if (!bt_uhid_created(hog->uhid))
++			return true;
++	}
++
++	/* If UHID is already created, set up the report value handlers to
++	 * optimize reconnection, as reports already known from a previous
++	 * connection are not read again when discovering them.
++	 */
++	queue_foreach(hog->reports, report_reattach, NULL);
++	sci_mode_enable_notify(hog);
++
++	/* Replay any pending input reports sent while disconnected, e.g.
++	 * when the device was reconnected by pressing a key.
++	 */
++	bt_uhid_replay(hog->uhid);
++
++	return true;
++}
++
++static void report_detach(void *data, void *user_data)
++{
++	struct report *report = data;
++	struct bt_hog *hog = user_data;
++
++	if (!report->notify_id)
++		return;
++
++	bt_gatt_client_unregister_notify(hog->client, report->notify_id);
++	report->notify_id = 0;
++}
++
++void bt_hog_detach(struct bt_hog *hog, bool force)
++{
++	const struct queue_entry *entry;
++	struct bt_gatt_client *client;
++
++	if (!hog)
++		return;
++
++	if (!hog->client)
++		goto done;
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next)
++		bt_hog_detach(entry->data, force);
++
++	queue_foreach(hog->reports, report_detach, hog);
++
++	if (hog->sci_mode_id) {
++		bt_gatt_client_unregister_notify(hog->client,
++							hog->sci_mode_id);
++		hog->sci_mode_id = 0;
++	}
++
++	/* Cancel the pending requests, as the client may still be in use,
++	 * e.g. the notifications are disabled when still connected.
++	 */
++	queue_remove_all(hog->reqs, NULL, NULL, req_cancel);
++
++	if (hog->getrep_att) {
++		bt_gatt_client_cancel(hog->client, hog->getrep_att);
++		hog->getrep_att = 0;
++	}
++
++	if (hog->setrep_att) {
++		bt_gatt_client_cancel(hog->client, hog->setrep_att);
++		hog->setrep_att = 0;
++	}
++
++	if (hog->report_map_id) {
++		bt_gatt_client_cancel(hog->client, hog->report_map_id);
++		hog->report_map_id = 0;
++	}
++
++	hog->pending = 0;
++
++	client = hog->client;
++	hog->client = NULL;
++	bt_gatt_client_unref(client);
++
++done:
++	uhid_destroy(hog, force);
++}
++
++int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
++{
++	uint8_t value = suspend ? 0x00 : 0x01;
++
++	if (!hog)
++		return -EINVAL;
++
++	if (!hog->client)
++		return -ENOTCONN;
++
++	if (!hog->cp_handle)
++		return -ENOTSUP;
++
++	bt_gatt_client_write_without_response(hog->client, hog->cp_handle,
++						false, &value, sizeof(value));
++
++	return 0;
++}
++
++int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
++{
++	const struct queue_entry *entry;
++	struct report *report;
++
++	if (!hog)
++		return -EINVAL;
++
++	if (!hog->client)
++		return -ENOTCONN;
++
++	report = find_report(hog, type, 0);
++	if (!report)
++		return -ENOTSUP;
++
++	DBG(hog, "Write report, handle 0x%X", report->value_handle);
++
++	if (report->properties & BT_GATT_CHRC_PROP_WRITE)
++		write_output(hog, report, data, size);
++
++	if (report->properties & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP)
++		bt_gatt_client_write_without_response(hog->client,
++						report->value_handle, false,
++						data, size);
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next)
++		bt_hog_send_report(entry->data, data, size, type);
++
++	return 0;
++}
++
++static struct bt_hog *find_cp(struct bt_hog *hog)
++{
++	const struct queue_entry *entry;
++
++	if (hog->cp_handle)
++		return hog;
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next) {
++		struct bt_hog *instance = entry->data;
++
++		if (instance->cp_handle)
++			return instance;
++	}
++
++	return NULL;
++}
++
++int bt_hog_set_sci_mode(struct bt_hog *hog, uint8_t mode)
++{
++	struct bt_hog *cp;
++
++	if (!hog)
++		return -EINVAL;
++
++	if (mode < BT_HOG_SCI_MODE_DEFAULT || mode > BT_HOG_SCI_MODE_FULL_RANGE)
++		return -EINVAL;
++
++	if (!hog->client)
++		return -ENOTCONN;
++
++	if (!(hog->flags & HOG_INFO_FLAG_SCI_SUPPORTED))
++		return -ENOTSUP;
++
++	if (mode == BT_HOG_SCI_MODE_LOW_POWER &&
++			!(hog->flags & HOG_INFO_FLAG_SCI_LOW_POWER))
++		return -ENOTSUP;
++
++	/* The command affects the whole HID Device, regardless of the
++	 * instance of HID Service the HID Control Point belongs to.
++	 */
++	cp = find_cp(hog);
++	if (!cp || !cp->client)
++		return -ENOTSUP;
++
++	DBG(hog, "Enable SCI mode 0x%02x", mode);
++
++	if (!bt_gatt_client_write_without_response(cp->client,
++					cp->cp_handle, false,
++					&mode, sizeof(mode)))
++		return -EIO;
++
++	return 0;
++}
++
++uint8_t bt_hog_get_sci_mode(struct bt_hog *hog)
++{
++	if (!hog)
++		return 0;
++
++	return hog->sci_mode;
++}
++
++bool bt_hog_set_sci_mode_callback(struct bt_hog *hog,
++					bt_hog_sci_mode_func_t func,
++					void *user_data)
++{
++	const struct queue_entry *entry;
++
++	if (!hog)
++		return false;
++
++	hog->sci_mode_func = func;
++	hog->sci_mode_data = user_data;
++
++	for (entry = queue_get_entries(hog->instances); entry;
++							entry = entry->next)
++		bt_hog_set_sci_mode_callback(entry->data, func, user_data);
++
++	return true;
++}
+diff --git a/src/shared/hog.h b/src/shared/hog.h
+new file mode 100644
+index 000000000000..910a2261b611
+--- /dev/null
++++ b/src/shared/hog.h
+@@ -0,0 +1,67 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <stddef.h>
++
++struct bt_hog;
++struct gatt_db;
++struct bt_gatt_client;
++
++/* HID Control Point values enabling the HID SCI modes */
++#define BT_HOG_SCI_MODE_DEFAULT		0x02
++#define BT_HOG_SCI_MODE_FAST		0x03
++#define BT_HOG_SCI_MODE_LOW_POWER	0x04
++#define BT_HOG_SCI_MODE_FULL_RANGE	0x05
++
++typedef void (*bt_hog_debug_func_t)(const char *str, void *user_data);
++typedef void (*bt_hog_destroy_func_t)(void *user_data);
++typedef void (*bt_hog_sci_mode_func_t)(uint8_t mode, void *user_data);
++
++struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					uint8_t type, struct gatt_db *db);
++
++struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					uint8_t type, struct gatt_db *db);
++
++struct bt_hog *bt_hog_ref(struct bt_hog *hog);
++void bt_hog_unref(struct bt_hog *hog);
++
++bool bt_hog_set_debug(struct bt_hog *hog, bt_hog_debug_func_t func,
++			void *user_data, bt_hog_destroy_func_t destroy);
++
++/* Set the vendor, product and version used when creating the uHID device,
++ * e.g. once known from the PnP ID of the Device Information Service.
++ */
++void bt_hog_set_ids(struct bt_hog *hog, uint16_t vendor, uint16_t product,
++							uint16_t version);
++
++bool bt_hog_attach(struct bt_hog *hog, struct bt_gatt_client *client);
++void bt_hog_detach(struct bt_hog *hog, bool force);
++
++int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
++
++/* Request the HID Device to enable the given HID SCI mode, by writing it to
++ * the HID Control Point. There is no response, the HID Device updates the
++ * connection rate and then notifies the new mode with HID SCI Mode.
++ */
++int bt_hog_set_sci_mode(struct bt_hog *hog, uint8_t mode);
++
++/* Current HID SCI mode, as read or notified with HID SCI Mode */
++uint8_t bt_hog_get_sci_mode(struct bt_hog *hog);
++
++/* Called when the HID Device notifies a new HID SCI mode */
++bool bt_hog_set_sci_mode_callback(struct bt_hog *hog,
++					bt_hog_sci_mode_func_t func,
++					void *user_data);
++int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
 -- 
 2.55.0
 
