@@ -1,69 +1,70 @@
-Received: from mail-vs2-f42.google.com (mail-vs2-f42.google.com [74.125.227.42])
+Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AE6440632
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF7B42047D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790289062; cv=none; b=lVYOF9m1jmYf2/7g2ijiAzNKN3cFeptfjbATHd+wnRXlrpF+yPuqTYdOSBOxBa+vS3C1DxM9jnv2I3xLaTp7DU7/pPG2RodOL7NGbWRNx/ULUlKsj7xyw/iZgxND+vMLhbSxbjjSEReTPtBvO87jb7rRx09t5gLbfKm9b5L9nAE=
+	t=1790289063; cv=none; b=gG1KJiwYdzhW8DB7w7S0ZnyxKrQ62OJNze/y00KGkQp/tnhWpYSsBrVL/FFSr0icBAsXvcAlGji5MpIGKtENDwKPngwaqStIK5dsUtU9LQaPgNsvXvCL1781XHWQ9rfJOmDp1psCkKjFxe1TH6O3yXtuHQdQHGIYSVeiyrQDmLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790289062; c=relaxed/simple;
-	bh=bdAagqAs0b1MGOUcgJ2e3vFE/avgZo8hvzyvybGoe4g=;
+	s=arc-20240116; t=1790289063; c=relaxed/simple;
+	bh=cXuasgiFiW+AMbYj9pSxxfxlNE6GTEcQSe3q+CToo48=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gS2+bst693kGVERV/sCqQD0gpCwJqQwAdUHpFGsK5+3C2R0B8i9qHvJderEKp/Q+vKez4Gx04/aMoXfO1xjgko1EVkKJfdA8kvDd/Pfq5XK5iwUAbNSS0YjDFKMNGIeQIn9GqxnXS/spnH/G0S91tvAup0YbnD3+4jIMH+upu/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lE08dhQH; arc=none smtp.client-ip=74.125.227.42
+	 MIME-Version:Content-Type; b=LZOAL40ZDKeXy6OhOqfWawUBn5j1Vo1KTgveAt3OA2hv5zdhIhGGPgMIy9mUdwnfHs3SNi9D0zVRnGzKOaxVRPVjg6vQgwdi8jHUIIrjvcNs0rAQUQHc8DLyoflamuFmzhiwYJd03sHbjWwCi3bzE2qRCp3f1SHWGHd8POjDptk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pv8RKPAr; arc=none smtp.client-ip=74.125.227.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lE08dhQH"
-Received: by mail-vs2-f42.google.com with SMTP id 71dfb90a1353d-5c98e1942dfso214988e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pv8RKPAr"
+Received: by mail-vs2-f43.google.com with SMTP id 71dfb90a1353d-5c67e5059f8so88743e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790289059; x=1790893859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=LnFmf7TyEvcV1AIaMAYFTJhUcAWz8WBQusWqysASTdc=;
-        b=lE08dhQHhUeH0IRLk8PYJs4HlPLKFlJs9MB/TzXI560eo4JxnaOuKrEydnTkRhmfJZ
-         Qi3eLAefb/JeQPizVAqSCFypWGSaU2vxPDchfnQCx/1xUpx9MO+3T9Tg2xGJjFopGNb3
-         1NXvCDIW4MxZZfGxOnUPXXZIsKJ/+u9HkGMjv2QU6oRYDh2H33A8sRdfL6IMb1Z8pPlA
-         bqnNGDxdv7xXQ7K9nLmfE1DC57VbmC4mxn5vrWDwYIfUQxoEUIdlMzmZwRHgEDQopLfA
-         MXET0oLy5dimQB1d7Mfd4BIhbAMNIzUky87yeim95OXLVAOyO6rsZ8MM6gu/4iDL3VOG
-         IF2w==
+        d=gmail.com; s=20251104; t=1790289060; x=1790893860; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=T9jycbnHJKQRW0bmwa+crip9eqUgy8bTsRbBitNSamg=;
+        b=Pv8RKPArhDW3Hqua+bQGVbWsLI0TE1hStjTHes72Klwy9TnPgaa4JzdjPXmXJd/dcl
+         dPgdmOUQBuMaG+eS9Ttz+GYddHWbkiM6ZFZwek06t49ePAtOEIEGZuuRqVDIDnIC8Xw3
+         aYdtGCNIb0/qKjFRvJktq+2tB3EYrtqWnozXSHP5iKruO/KG2b/BdZHixDNcyIjV9LFQ
+         5ksXlNB/ExoNlrwnE98r7cDes5NYDf2ggfQHETN1KumxQQ2SG5yDhiG6Dpw79zHXRlYf
+         RUVNRP7lBuOF9dpwmxh1EK0pr3NM3dpbaTr6BHMcRZ1WBCzgn8Y5MBiHL8UfW1ziiTHv
+         Sdeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790289059; x=1790893859;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=LnFmf7TyEvcV1AIaMAYFTJhUcAWz8WBQusWqysASTdc=;
-        b=L+7E09ikSlsAqKD0RKNpCaz3sPB64Bag8MnCxqJ6Fc18w92CkAvln0G6MCBQ0+oQ1A
-         G6HB4z66BOCwa0mfkxO5/PW8ecFZSXcAm/FF2aqQznOceXYtnKbboNPhM3sBRXURa6QS
-         TRq1wCRIQuWVMxQMidTZqmkXwpxokvZ+eNi59wpcnMzpUTAs/zHFdCYKcFTBPhxMcGhx
-         cErcFHCEvfq1b4cRV+8kYnvHlj/QPG7XrvcgtuY+O/Blw533UxTUPCChVCQifTP3JmaB
-         5f8qXivtyJxb1TpXUe35m5pDMTZKy6JUQX4/fWjthvGQ7T7ptMdlHxT7FgiAXfTMjQkq
-         psdQ==
-X-Gm-Message-State: AFuF++nReCaLzldMVqc3HInAcI1zKuScM8K3cA3XVa1ZEFFavEw3FxP4
-	dyybQzp14aLmxDDGTQXDov25zx39QeEchvTDxf7CiqLsLXvRHyHwb+mTgUkDqZtU421hkQ==
-X-Gm-Gg: AYBFou2ogWupPFEjccbOEwFqWevT1OPijWFbTlnDecrU+gTE6j9D++KzwabHP4rvWEE
-	eqZ8kUV9lH0MVj/n1jJbaInAmcLTtADCYMkdnGgIMgskzjD0Q+vfVsHPMQybPJmhVfb2lcwq9mo
-	LpMNObhf+knBiU5GLvrxi/YHmeYeXW+290SdQRE4kiwE9h199Jg/vgsSZyS/KHWIRKXLYOHtS8e
-	J62/1/oTduXR/MIm64eesBEHmUQbkPJ9X3CrKs3QISguJtD/pZ8cunALjCARtTZzyNhYCdUsdtb
-	jX+rfFQMQYaIUgdbmlU1K+pVFMVEROXqwpHUs4JOlwAo6t9/O4BXjJ7ZUHiKsAFyy/GQ/LZ7Veu
-	jVTmuyi3Ni8z9NKq+pTRYybu95DHK7mKaG0t4QkGbiwjBtdmAcveZIhr9AIE4frV1Qgp0Xcy2fU
-	wmeU137RCsnC6gCXhk96qu+Ards7YfrG/K1wLROwIPNoKjgAW5PEDxAxHmwALQQ3CAAPFh2cGiT
-	2qA6GDhfJzXQG8Q0UXKj7Kxwx0TaxAW4Qfhse7yc8bFinziequfd33swCpW840cEtp25Txpg5U=
-X-Received: by 2002:a05:6122:198d:b0:5c9:82a1:a6a3 with SMTP id 71dfb90a1353d-5cb08753a03mr2177843e0c.6.1790289059535;
-        Thu, 24 Sep 2026 15:30:59 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790289060; x=1790893860;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=T9jycbnHJKQRW0bmwa+crip9eqUgy8bTsRbBitNSamg=;
+        b=DaW9SI05L/rhVJPjO8K087YNk1Ufk5smvsq2xvfgLvuJkINmzh71E5KZVb5lXp3y8p
+         bu9cI3Vl05h3tj5qQKMIzhRlhfZhXhAoRpyDNRuXbzLJXzo/MnZKvO+HL6fv1xWq8qLo
+         2xh3S3AGSrsqp9qN+3aipZt2gUQajaSHouzo9LYxHtnH+8XI0R1qOoh72kd9tr2pM0fr
+         P4GvvIw8nXtBXXUMZVVnsrPZMQDqvPieJqHkyYTaJByFMXG67FLJPYY/HIgn8le2cFkO
+         v4LFQCrakSoLL7hwLxDmtOnr9iQHkylrC1pPBP8Xxw1GeRKHTTI21MgnJRYPKrDdM2Kf
+         pH/Q==
+X-Gm-Message-State: AFuF++mASyzDkuOLgtLbpYpjPOkGUZt04GJ0cxfQgAIzoIMkHtjS08iL
+	tuEevWVBf+Wke3LzGu51+XNgtyuReTAMitfTGtEmPUNWkGQlhSvCqC61KbhcM4yrAfCunA==
+X-Gm-Gg: AYBFou2jUgXKN7FZP4uU+de06TGODmBCJHs0taq4iegFprZLVv8E6dPHhB69WsVpHgs
+	r3Z6IWk5PLJLIDAc1uImdXiSuFg0Uz7Fc+gHj3xEjP1lrz5k/1Z4oi5tnwHjx4GPNFDlDYlnjd4
+	2NqTrfArcLGo7sZnxCNT/oXOTah4Di0Hd1/lNQC6XJ+jDe20w3ZulJLewAE+8bIFJcWVEbjL80i
+	WCYtt+redZ6OGZTCxdGsHQmy0D8lD5iwShBPc/CucjuMFCMtSeuloCMhKX2poDfFlAXgNbcNr+f
+	AkzDZy5VmXahhLonHLmpPHQZuLtod1tEA7qe1eF4lTQmGIZpHdDP6J0avuAgnHVWXnamMsY/57K
+	3pYOiM9UbHmmPb0g/9b9PAo1zwj5y/krh7HIL4067BUfktwfMPvpcZsI0+wRWsXDGbeaO6mLReq
+	g3Ztlf0aCS2xvtJId2LJomeNSuaZFYI2VR3iZaHP9ZqNj92x7A0wL1IGfLKIDnLxmyWBItWOrGS
+	eHAeUTPYn0fxYpeEhHTQsbQI4ss0EgO9YIO5Zkwp/Y/agcDpAEa1lhjxIBh1fsd
+X-Received: by 2002:a05:6122:288b:b0:5c9:a617:5814 with SMTP id 71dfb90a1353d-5cb0ba6c14fmr2242448e0c.17.1790289060280;
+        Thu, 24 Sep 2026 15:31:00 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.30.58
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.30.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 24 Sep 2026 15:30:59 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 03/20] client/mgmt: Print Connection Subrate event
-Date: Thu, 24 Sep 2026 18:30:28 -0400
-Message-ID: <20260924223046.605543-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 04/20] emulator: Default to the latest BR/EDR+LE version
+Date: Thu, 24 Sep 2026 18:30:29 -0400
+Message-ID: <20260924223046.605543-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260924223046.605543-1-luiz.dentz@gmail.com>
 References: <20260924223046.605543-1-luiz.dentz@gmail.com>
@@ -73,69 +74,244 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Print the MGMT Connection Subrate event, generated as a result of a
-LE Connection Rate Request, e.g. after mgmt.conn-subrate, or a change
-initiated by the remote device, so the new connection rate can be
-confirmed.
+Emulate BR/EDR+LE 6.2 controllers by default, for both local (-l) and
+server (--server, --tcp) controllers, so the latest features such as
+Shorter Connection Intervals (LE Connection Rate Request) are
+supported, e.g. by test-functional which uses --server.
+
+Add the -C/--core=<version> option to emulate older versions instead:
+5.0, 5.2, 6.0 or 6.2.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- client/mgmt.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ doc/test-functional.rst |  4 ++-
+ emulator/main.c         | 55 ++++++++++++++++++++++++++++++++++++++---
+ emulator/server.c       | 15 ++++++++++-
+ emulator/server.h       |  2 ++
+ 4 files changed, 71 insertions(+), 5 deletions(-)
 
-diff --git a/client/mgmt.c b/client/mgmt.c
-index cd2ef80221ad..a7069e5bbb37 100644
---- a/client/mgmt.c
-+++ b/client/mgmt.c
-@@ -499,6 +499,35 @@ static void disconnected(uint16_t index, uint16_t len, const void *param,
- 			index, addr, typestr(ev->addr.type), reason);
- }
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+index 3ffcbf6dec5c..826210b73ce7 100644
+--- a/doc/test-functional.rst
++++ b/doc/test-functional.rst
+@@ -227,7 +227,9 @@ Controllers
  
-+static void conn_subrate(uint16_t index, uint16_t len, const void *param,
-+							void *user_data)
+ By default a single ``btvirt`` process runs on the developer machine and
+ provides an emulated BR/EDR/LE controller to every VM host over a UNIX
+-socket, also bridging the air interface between them::
++socket, also bridging the air interface between them. The controllers
++emulate the latest Core Specification version supported by ``btvirt``,
++6.2, older ones can be emulated with its ``-C/--core`` option::
+ 
+     VM host #0                 developer machine              VM host #1
+     ┌────────────┐            ┌─────────────────┐            ┌────────────┐
+diff --git a/emulator/main.c b/emulator/main.c
+index c21640adc359..b0e295b17609 100644
+--- a/emulator/main.c
++++ b/emulator/main.c
+@@ -24,8 +24,8 @@
+ #include "src/shared/util.h"
+ 
+ #include "serial.h"
+-#include "server.h"
+ #include "btdev.h"
++#include "server.h"
+ #include "vhci.h"
+ #include "le.h"
+ 
+@@ -54,6 +54,10 @@ static void usage(void)
+ 		"\t-U[num]               Number of test LE controllers\n"
+ 		"\t-B                    Create BR/EDR only controller\n"
+ 		"\t-A                    Create AMP controller\n"
++		"\t-C, --core=<version>  Core Specification version of the\n"
++		"\t                      BR/EDR/LE controllers created with\n"
++		"\t                      -l, -s and -t:\n"
++		"\t                      5.0, 5.2, 6.0 or 6.2 (default)\n"
+ 		"\t-T[num]               Number of test AMP controllers\n"
+ 		"\t-h, --help            Show help options\n");
+ }
+@@ -67,12 +71,37 @@ static const struct option main_options[] = {
+ 	{ "le",      no_argument,       NULL, 'L' },
+ 	{ "bredr",   no_argument,       NULL, 'B' },
+ 	{ "amp",     no_argument,       NULL, 'A' },
++	{ "core",    required_argument, NULL, 'C' },
+ 	{ "letest",  optional_argument, NULL, 'U' },
+ 	{ "version", no_argument,	NULL, 'v' },
+ 	{ "help",    no_argument,	NULL, 'h' },
+ 	{ }
+ };
+ 
++static const struct {
++	const char *version;
++	enum btdev_type type;
++} core_versions[] = {
++	{ "5.0", BTDEV_TYPE_BREDRLE50 },
++	{ "5.2", BTDEV_TYPE_BREDRLE52 },
++	{ "6.0", BTDEV_TYPE_BREDRLE60 },
++	{ "6.2", BTDEV_TYPE_BREDRLE62 },
++};
++
++static bool parse_core_version(const char *version, enum btdev_type *type)
 +{
-+	const struct mgmt_ev_conn_subrate *ev = param;
-+	char addr[18];
++	size_t i;
 +
-+	if (len < sizeof(*ev)) {
-+		error("Invalid connection subrate event length (%u bytes)",
-+									len);
-+		return;
++	for (i = 0; i < ARRAY_SIZE(core_versions); i++) {
++		if (!strcmp(core_versions[i].version, version)) {
++			*type = core_versions[i].type;
++			return true;
++		}
 +	}
 +
-+	ba2str(&ev->addr.bdaddr, addr);
-+
-+	if (ev->status) {
-+		print("hci%u %s type %s connection subrate failed status "
-+			"0x%02x (%s)", index, addr, typestr(ev->addr.type),
-+			ev->status, mgmt_errstr(ev->status));
-+		return;
-+	}
-+
-+	print("hci%u %s type %s connection subrate interval 0x%04x "
-+		"subrate 0x%04x latency 0x%04x cont_num 0x%04x timeout 0x%04x",
-+		index, addr, typestr(ev->addr.type),
-+		le16_to_cpu(ev->interval), le16_to_cpu(ev->subrate),
-+		le16_to_cpu(ev->latency), le16_to_cpu(ev->cont_num),
-+		le16_to_cpu(ev->supv_timeout));
++	return false;
 +}
 +
- static void conn_failed(uint16_t index, uint16_t len, const void *param,
- 							void *user_data)
+ static void vhci_debug(const char *str, void *user_data)
  {
-@@ -6006,6 +6035,8 @@ static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
- 								NULL, NULL);
- 	mgmt_register(mgmt, MGMT_EV_CONNECT_FAILED, index, conn_failed,
- 								NULL, NULL);
-+	mgmt_register(mgmt, MGMT_EV_CONN_SUBRATE, index, conn_subrate,
-+								NULL, NULL);
- 	mgmt_register(mgmt, MGMT_EV_AUTH_FAILED, index, auth_failed,
- 								NULL, NULL);
- 	mgmt_register(mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED, index,
+ 	int i = PTR_TO_UINT(user_data);
+@@ -101,7 +130,10 @@ int main(int argc, char *argv[])
+ 	bool serial_enabled = false;
+ 	int letest_count = 0;
+ 	int vhci_count = 0;
+-	enum btdev_type type = BTDEV_TYPE_BREDRLE60;
++	/* Default to the latest version supported by the emulator */
++	enum btdev_type bredrle_type = BTDEV_TYPE_BREDRLE62;
++	enum btdev_type type;
++	bool type_set = false;
+ 	int i;
+ 
+ 	mainloop_init();
+@@ -109,7 +141,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "dSs::t::l::LBAU::T::vh",
++		opt = getopt_long(argc, argv, "dSs::t::l::LBAC:U::T::vh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -140,12 +172,22 @@ int main(int argc, char *argv[])
+ 			break;
+ 		case 'L':
+ 			type = BTDEV_TYPE_LE;
++			type_set = true;
+ 			break;
+ 		case 'B':
+ 			type = BTDEV_TYPE_BREDR;
++			type_set = true;
+ 			break;
+ 		case 'A':
+ 			type = BTDEV_TYPE_AMP;
++			type_set = true;
++			break;
++		case 'C':
++			if (!parse_core_version(optarg, &bredrle_type)) {
++				fprintf(stderr, "Unsupported version: %s\n",
++								optarg);
++				return EXIT_FAILURE;
++			}
+ 			break;
+ 		case 'U':
+ 			if (optarg)
+@@ -164,6 +206,9 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	if (!type_set)
++		type = bredrle_type;
++
+ 	if (letest_count < 1 && vhci_count < 1 && !server_enabled &&
+ 						!tcp_port && !serial_enabled) {
+ 		fprintf(stderr, "No emulator specified\n");
+@@ -214,6 +259,8 @@ int main(int argc, char *argv[])
+ 		server1 = server_open_unix(SERVER_TYPE_BREDRLE, path);
+ 		if (!server1)
+ 			fprintf(stderr, "Failed to open BR/EDR/LE server\n");
++		else
++			server_set_bredrle_type(server1, bredrle_type);
+ 
+ 		snprintf(path, sizeof(path), "%s/%s", server_path,
+ 							"bt-server-bredr");
+@@ -255,6 +302,8 @@ int main(int argc, char *argv[])
+ 		tcp_server = server_open_tcp(SERVER_TYPE_BREDRLE, tcp_port);
+ 		if (!tcp_server)
+ 			fprintf(stderr, "Failed to open TCP port\n");
++		else
++			server_set_bredrle_type(tcp_server, bredrle_type);
+ 		fprintf(stderr, "Listening TCP on 127.0.0.1:%d\n", tcp_port);
+ 	}
+ 
+diff --git a/emulator/server.c b/emulator/server.c
+index e3eda8458ae0..5a827b24531e 100644
+--- a/emulator/server.c
++++ b/emulator/server.c
+@@ -38,6 +38,7 @@
+ 
+ struct server {
+ 	enum server_type type;
++	enum btdev_type bredrle_type;
+ 	uint16_t id;
+ 	int fd;
+ 	struct queue *clients;
+@@ -281,7 +282,7 @@ static void server_accept_callback(int fd, uint32_t events, void *user_data)
+ 
+ 	switch (server->type) {
+ 	case SERVER_TYPE_BREDRLE:
+-		type = BTDEV_TYPE_BREDRLE52;
++		type = server->bredrle_type;
+ 		break;
+ 	case SERVER_TYPE_BREDR:
+ 		type = BTDEV_TYPE_BREDR;
+@@ -361,6 +362,7 @@ struct server *server_open_unix(enum server_type type, const char *path)
+ 
+ 	memset(server, 0, sizeof(*server));
+ 	server->type = type;
++	server->bredrle_type = BTDEV_TYPE_BREDRLE62;
+ 	server->id = 0x42;
+ 
+ 	server->fd = open_unix(path);
+@@ -429,6 +431,7 @@ struct server *server_open_tcp(enum server_type type, uint16_t port)
+ 
+ 	memset(server, 0, sizeof(*server));
+ 	server->type = type;
++	server->bredrle_type = BTDEV_TYPE_BREDRLE62;
+ 	server->id = 0x43;
+ 
+ 	server->fd = open_tcp(port);
+@@ -455,6 +458,16 @@ void server_close(struct server *server)
+ 	mainloop_remove_fd(server->fd);
+ }
+ 
++bool server_set_bredrle_type(struct server *server, enum btdev_type type)
++{
++	if (!server || server->type != SERVER_TYPE_BREDRLE)
++		return false;
++
++	server->bredrle_type = type;
++
++	return true;
++}
++
+ bool server_set_debug(struct server *server, server_debug_func_t callback,
+ 			void *user_data, server_destroy_func_t destroy)
+ {
+diff --git a/emulator/server.h b/emulator/server.h
+index 1844a9871af1..5fc3a284f53f 100644
+--- a/emulator/server.h
++++ b/emulator/server.h
+@@ -25,6 +25,8 @@ struct server *server_open_unix(enum server_type type, const char *path);
+ struct server *server_open_tcp(enum server_type type, uint16_t port);
+ void server_close(struct server *server);
+ 
++bool server_set_bredrle_type(struct server *server, enum btdev_type type);
++
+ typedef void (*server_debug_func_t)(const char *str, void *user_data);
+ typedef void (*server_destroy_func_t)(void *user_data);
+ bool server_set_debug(struct server *server, server_debug_func_t callback,
 -- 
 2.55.0
 
