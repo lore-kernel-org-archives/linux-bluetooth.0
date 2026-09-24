@@ -1,69 +1,69 @@
 Received: from mail-vs2-f40.google.com (mail-vs2-f40.google.com [74.125.227.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9713FC5C3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3937E3E7BCC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790289074; cv=none; b=cXL+jAiueqmju1KS10eNaJlQTbL1mTrbQLqveacMV/QE9we9ap5eL4eQypHYiioj6cjF4am/1sN+46M8UjXzE/fPZ0oVQauUN/vH77z0YIOoHkTUOzbraT3w0Y4K36IErAmPR+mDcrEtZr5zqCeBEHMn3vgr8D8acnNiLv8HZzg=
+	t=1790289075; cv=none; b=nqJeqs480pf85DIntob1nDQvVpxOPucy8p+hABBlGv9BBZIA/x6F7h8GgRcqgFpXlppwJqQKsnXGGMbpUzxKRXnHwjUXYEoUzC6I1Exa4E4VLVE+o9TmQcyJYuiRkka48GWmZzQJvZYaGV2OyhzCU7IiMAweq0QdZurxMW/CZYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790289074; c=relaxed/simple;
-	bh=6F2wGlcLFdi5e9+GY58oy+JRIYpmOylnLyvKYoSAoXc=;
+	s=arc-20240116; t=1790289075; c=relaxed/simple;
+	bh=MZQwnfYT3UwdlQmGZySVVDi8eHsWT+RKnyX4/g4RUk0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lVw26cNPlebEjZiWzP2xuHTV7+4bbjcskBBNhigdQD7I8MoA/If1R1edUfzQtzAb08cONDzrDIva0MAjTSr9vflSQwp//SzqDT5Mh+qOWp46jAvOW8rcgw2eefWclrJ/OgTggGgLl4tvJOOSaPYyQrIwTkArcITR+365645Pqig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCpcxgu2; arc=none smtp.client-ip=74.125.227.40
+	 MIME-Version; b=m4bXdo7xUiomD6PinQj6mkSEsMuecuoq9uKC8pDWW07l1klkV4DmmF/qI2P2tDQXSrLesF831d/sa4okj3GHqHGShee0LC8fAHRa2DwBEOBO96IQhtGP8hIm5cEXgbPPubbwq5BPrIhEbHDNBW+B+548NiyzkBwDXA1W5ywGi5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y5pcJnyJ; arc=none smtp.client-ip=74.125.227.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCpcxgu2"
-Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9a1536864so189510e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5pcJnyJ"
+Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9b0bdf5b5so108226e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790289071; x=1790893871; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790289070; x=1790893870; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Kdtul5kQ3tdjkQenjhTtE2ahfxZCGeAX7k9lx3BO/a8=;
-        b=FCpcxgu2FD0KwoYYoGEzQfHVpAuPnSL/jCCSdwil+s+zs7Gb1wRDiEn6CAeWdi7jKw
-         JpDXkS3ZzPItLzRicystx45GxiHMPRPzOSstWrcEWqFOLFsyD6aBh+ApoJwp1Lx6MAN5
-         q3/CIzLDHGO1eNvu62Nw9anJMkXHmDmbW9nkiTIREpbQvRyoGaxLaRa2CY6bMGoaUWD+
-         5Lz1v6B/EaV/a/V9HC3hlAGDJOpyldtBGadfDDSjNYj5AovIGEzMxkVEnlEw4ClLtpUb
-         MeVxgp9VPGVbrbBySE7KrLCBlxEWpnqk+d1mmKUsKbIUup+8u5Wv+074tntnx7MjWJ3L
-         Nwqg==
+        bh=+WR8sVMT21YksGOVT+DMfz3xxMmk3BE3NLD1cfiM+lI=;
+        b=Y5pcJnyJYZH0rVXtugCRPKYHnqiwgvOe6wk/GiKXlCxpXf+z3RPILpJZPf0IrCFyYi
+         ij2PIE47nmv+Pu0X/RCfrEF295PvlGh59ByEYTCgjLCxW96D49JdJWIMGSGo7M1rJXso
+         mWOhs6plnKwwx7gNzEJ/gYrUU5tJmimwcT/5EeXjD8yVv3ieek/HV9m0g3VQc1Smm3js
+         qtUJnZqYlPHj0ViJVYmlBaX6cInahCzXhAsELBzqSFqVPyS/sw2W2HVyEkVkeGahivdV
+         +5Mp0JIWJZPWauoMqx2LZT34QK5HDvpfBLjfzXVRIgV6rFYRDvypeCy9UVCULimHxk+s
+         Y7xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790289071; x=1790893871;
+        d=1e100.net; s=20260707; t=1790289070; x=1790893870;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Kdtul5kQ3tdjkQenjhTtE2ahfxZCGeAX7k9lx3BO/a8=;
-        b=LE1HvNkKNjQJQjdFs5HSMyWLf1uZlKYohtkMQzeIgGI1RPQhCH43DgHle+R5oxMIFd
-         /OEvo9ScIGYwyj+7ZSB4v63fHiG3weQv5ClYNvNJUAz4Jne3oy/XVJm3G6HkNcp7uPsd
-         EeUVpZahdnKu4IrYuPqHHFD+Rd3xR1HY1897g3a8bvnMsHTacHm1lM0vFe13TM915wjJ
-         tav+oI/Zdo3krvDtw3BHFLKneaic+TdPiFNtEKR8pZaADboxrCxFAxqPD6oHxdIVK5Gr
-         92mT/1xj1wWIwF7lhd5V1E86GubpuuatlOtj4n4KxoyYkZo+RbPLPfLmdSkYbwEuyED5
-         afGw==
-X-Gm-Message-State: AFuF++nkI/GsUUOsZkmr8T0XUCASdV5Njp1mhpB5blBocaWOG6erjhKg
-	jh75ccZwKwblXZvIGjendF2rQYXtVHWPIkzYmZRR055It02F3dr4jDp5Hj0sysG3iYIVWw==
-X-Gm-Gg: AYBFou0NzJs6tkynbKQDJ1FhYPD5M7R7TOQO1YAECggNS9E8/Db2WFA4KPWht3CXjAs
-	umMxK1cYLc+E67WAR0bRVJhAUt6hApJyLmq0hTPNr7pcGWFzgb/iX/guQAOy9VJEwSFHQkDEYc9
-	XXqVNnA+0K4EE/bmj7NIDRCt9A73L94JS8dlXgXqs3D+/Ro7cGEeOA62aMdMtdTblv0AVVnuXDe
-	wlXTGeMjwFjYLCcsImVex4mgozPunFCl5JQvF/E1p4pT3u4IBXqtzgphQQZU0Nfnwe1sTiBoe4c
-	FBkNLEFuMUyZCehpCOhXYnlGg8PoVZUEy5xGIzNnwVqv7IH2YY+as3puWu2uz10ZVfn2iVMgefi
-	J2BI3QJlv5dI0tgFoeyZLNL5xtIQ6FZeTkmnMWElD5ezd2W3nRMY4FYyP+K+e9C10BGtJmpBDJf
-	MVwbtOvMrNk/KGd8ItVfwXsLraARB7x9mMuGneO1X5vawUOZDvZgU3tmF2BTyW8iL9+SB8RzAAr
-	vGce7T8P1iFuHDrZJs20+pG2Fix7rBQRmiH+29kKYKFwG8GUKCVZJRL5zkLB4+S
-X-Received: by 2002:a05:6122:548:b0:5c9:c26b:528e with SMTP id 71dfb90a1353d-5cb0bc5f6d0mr2152121e0c.20.1790289071653;
-        Thu, 24 Sep 2026 15:31:11 -0700 (PDT)
+        bh=+WR8sVMT21YksGOVT+DMfz3xxMmk3BE3NLD1cfiM+lI=;
+        b=MRQT6xliyy5H0ypcOhP/PLRLoxNmVzVS0J8cgT/IKrItuMnHbYoQY8v22q+lNWR39E
+         +4y41T+I6ASdYst54hOurzV0BsBSd6c7pDwC1Z70LC+NQyWxef/iSAG9v6CA5L5kylQO
+         8yes5MwLuxkvpXoX70dJUSDVpnAKL+O+ASDB89+wucoZrz8KpSToj8kzwc/GN0MTmReJ
+         yCj/kPtKCD1C41ktnqjhPb6rGEgBx+VeUbd+95xfIsH2ADwksvEJjWvOef6ChH2ypjOQ
+         RFDXA8etsJsne5uZ8T8J2lJFffyldbAAgkcYH61h9uxa91wal17Kcj/XrNNUHt79rC7E
+         CWNg==
+X-Gm-Message-State: AFuF++lM/WBc0Recq29ZEQyqTepdsmjliQGNI2KOlaHTm1XI2YzBKK/X
+	RIrsB/CkO4yw5vLMIR886HqOvAmQypT2o+ZDSdhnKkqoOCMCFo5KxD5KksAvpjikuF9Wjg==
+X-Gm-Gg: AYBFou0RDzlci9T8l/XkKazjO/xwyBiyP036RbOxeobZdhkfq8LuwzGCjgMcKVoA/Ve
+	1mrnhyRs5Fw8KTmNkNThKBxPnkk9scbbEPwv5UhQbdIbgmOfKNJMdzcWt5LJAY0R7vMdeglc8Mi
+	CQJXIbx2q2kgaZ+mzdBZ1UNRyBjvCv7qThACLGHbg/0JaygugzR7knYHusK1K6FX64weJ0R0wV+
+	ASGQYW/21rxzJPfUz3B/IQwKbyckrI+CY4Jg+fgCZicxr/2KBvP1riK1VoleDJaWFhnshjLK7S2
+	5RE4u7OUnH1E4ealzcV0s7mVypuepYwtFKak3ew61735yRheSuKcbn7MPBTwTfpprNvwpMz5Ngk
+	o/a3NYDC+1xYe5EmrrG5puMVd6X+ryxrmj1FlL/ODK0HtdoQxSEktSeX+b9OS7Z+WZYm/W+JYKW
+	EOGYs9wfAFgKhn9arBhRNJKIWzE9G1sbi5Yi6Q8m7ccWT32tYK2CP73nZZBgJL6s6f9benHB0T9
+	97PPpz82PzCi53SOA1NrxPbyS0lx0yMDcUHn0t2bUe0cilsInBifMTu46hDF3Ho
+X-Received: by 2002:a05:6122:488e:b0:5c9:ef0d:155d with SMTP id 71dfb90a1353d-5cb08b4038bmr2188953e0c.10.1790289069020;
+        Thu, 24 Sep 2026 15:31:09 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.31.11
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.31.08
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 15:31:11 -0700 (PDT)
+        Thu, 24 Sep 2026 15:31:08 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 17/20] doc: Add CONFIG_HIDRAW to the tester kernel config
-Date: Thu, 24 Sep 2026 18:30:42 -0400
-Message-ID: <20260924223046.605543-18-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 14/20] unit/test-hog: Use shared/hog
+Date: Thu, 24 Sep 2026 18:30:39 -0400
+Message-ID: <20260924223046.605543-15-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260924223046.605543-1-luiz.dentz@gmail.com>
 References: <20260924223046.605543-1-luiz.dentz@gmail.com>
@@ -77,44 +77,1562 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Enable hidraw so unit/test-uhid, when run as root e.g. with test-runner,
-can request reports through a hidraw device, as HIDIOCGFEATURE does, and
-check the replies to the requests the kernel sends to the uHID device.
+Port the tests to src/shared/hog, with the discovery done by
+bt_gatt_client, and the uHID device emulated with a socket pair so the
+events are checked.
+
+The test cases are renamed after HOGP.TS p13, and the missing ones for
+the Report Host are added, except for HID ISO which is not supported:
+
+- Discovery: HGDC/BV-03-C (two instances of the HID Service),
+  HGDC/BV-04-C and HGDC/BV-05-C
+- Read: HGRF/BV-02-C to BV-08-C, BV-18-C and BV-19-C, with the Report
+  values also read with UHID_GET_REPORT
+- Write: HGWF/BV-01-C, BV-02-C and BV-04-C with UHID_SET_REPORT and
+  UHID_OUTPUT, BV-05-C and BV-06-C (Suspend and Exit Suspend), BV-07-C
+  (Set Report Protocol Mode)
+- HID SCI: HGWF/BV-08-C to BV-11-C, writing each mode to the HID
+  Control Point with two instances of the HID Service, then changing
+  to another mode once notified with HID SCI Mode
+- Configuration: HGCF/BV-01-C and BV-02-C (notifications disabled when
+  detaching)
+- Notifications: HGNF/BV-01-C, forwarded as UHID_INPUT2, and BI-01-C
+  and BI-02-C, ignoring the Boot Keyboard and Boot Mouse Input Reports,
+  and HGNF/BV-01-C once reconnected, with the reports already known and
+  the Report Map cached
+- Characteristic GGIT: CHA/BV-01-C to BV-04-C, BV-09-C, BV-10-C and
+  DES/BV-01-C
+
+The Battery Level and PnP ID GGIT test cases are left to the battery
+and deviceinfo plugins which handle these services.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- doc/test-runner.rst | 5 +++++
- doc/tester.config   | 1 +
- 2 files changed, 6 insertions(+)
+ Makefile.am     |   11 +-
+ unit/test-hog.c | 1431 +++++++++++++++++++++++++++++++++++------------
+ 2 files changed, 1079 insertions(+), 363 deletions(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index dc1e51305c51..52178244fce8 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -205,6 +205,11 @@ Bluetooth
- 	CONFIG_UNIX=y
+diff --git a/Makefile.am b/Makefile.am
+index 5419b31e21d5..621892055c05 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -768,16 +768,7 @@ unit_test_gatt_LDADD = src/libshared-glib.la \
  
- 	CONFIG_UHID=y
-+	CONFIG_HIDRAW=y
+ unit_tests += unit/test-hog
+ 
+-unit_test_hog_SOURCES = unit/test-hog.c \
+-			$(btio_sources) \
+-			profiles/input/hog-lib.h profiles/input/hog-lib.c \
+-			profiles/scanparam/scpp.h profiles/scanparam/scpp.c \
+-			profiles/battery/bas.h profiles/battery/bas.c \
+-			profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
+-			src/log.h src/log.c \
+-			attrib/att.h attrib/att.c \
+-			attrib/gatt.h attrib/gatt.c \
+-			attrib/gattrib.h attrib/gattrib.c
++unit_test_hog_SOURCES = unit/test-hog.c
+ unit_test_hog_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la $(GLIB_LIBS)
+ 
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index 45ffe718e7de..b808ea30d9f6 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -12,11 +12,12 @@
+ #include <config.h>
+ #endif
+ 
+-#define _GNU_SOURCE
+-#include <unistd.h>
++#include <stdlib.h>
++#include <stdbool.h>
+ #include <string.h>
++#include <unistd.h>
++#include <errno.h>
+ #include <sys/socket.h>
+-#include <fcntl.h>
+ 
+ #include <glib.h>
+ 
+@@ -24,404 +25,1128 @@
+ #include "bluetooth/uuid.h"
+ 
+ #include "src/shared/util.h"
++#include "src/shared/io.h"
+ #include "src/shared/tester.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/att.h"
+ #include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/uhid.h"
++#include "src/shared/hog.h"
+ 
+-#include "attrib/gattrib.h"
++/*
++ * HOGP Report Host tests, see HOGP.TS. The HID Device (Lower Tester) is
++ * emulated with the PDUs below, and the uHID device with a socket pair.
++ *
++ * The HID Service of the HID Device is laid out as follows, the SCI
++ * variant adding the HID SCI Mode and HID SCI Information characteristics
++ * and the multiple instances variant having a second HID Service at
++ * 0x0021 with the same layout as the SCI variant:
++ *
++ * 0x0001 HID Service
++ * 0x0003   Protocol Mode (Read, Write Without Response)
++ * 0x0005   Report Map (Read)
++ * 0x0006     External Report Reference: Battery Level
++ * 0x0008   HID Information (Read)
++ * 0x000a   HID Control Point (Write Without Response)
++ * 0x000c   Report (Read, Notify): Input Report 1
++ * 0x000d     Client Characteristic Configuration
++ * 0x000e     Report Reference
++ * 0x0010   Report (Read, Write, Write Without Response): Output Report 1
++ * 0x0011     Report Reference
++ * 0x0013   Report (Read, Write): Feature Report 1
++ * 0x0014     Report Reference
++ * 0x0016   Boot Keyboard Input Report (Read, Notify)
++ * 0x0017     Client Characteristic Configuration
++ * 0x0019   Boot Mouse Input Report (Read, Notify)
++ * 0x001a     Client Characteristic Configuration
++ * 0x001c   HID SCI Mode (Read, Notify) - SCI variant
++ * 0x001d     Client Characteristic Configuration
++ * 0x001f   HID SCI Information (Read) - SCI variant
++ *
++ * followed by a Battery Service with the Battery Level characteristic.
++ *
++ * The Client Characteristic Configuration descriptors following a
++ * characteristic with no other descriptor are not discovered with Find
++ * Information, as bt_gatt_client assumes them in that case.
++ */
+ 
+-#include "profiles/input/hog-lib.h"
++#define HOG_GATT_CLIENT_MTU	64
+ 
+-struct test_pdu {
+-	bool valid;
+-	const uint8_t *data;
+-	size_t size;
++#define REPORT_MAP_LEN		73
 +
-+CONFIG_HIDRAW is used by unit/test-uhid, when run as root e.g. with
-+test-runner, to check the replies to the reports requested by the kernel
-+through a hidraw device, as HIDIOCGFEATURE does.
++enum action {
++	ACT_NONE,
++	ACT_NOTIFY,
++	ACT_GET_INPUT,
++	ACT_GET_OUTPUT,
++	ACT_GET_FEATURE,
++	ACT_SET_INPUT,
++	ACT_SET_OUTPUT,
++	ACT_SET_FEATURE,
++	ACT_OUTPUT,
++	ACT_SUSPEND,
++	ACT_RESUME,
++	ACT_DETACH,
++	ACT_REATTACH,
++	ACT_SCI,
++};
++
++struct test_config {
++	enum action action;
++	/* Number of uHID devices created, once the Report Map is read */
++	unsigned int creates;
++	/* HID SCI modes to enable, the second once the first is notified */
++	uint8_t mode[2];
++	/* Number of HID SCI Mode notifications per mode */
++	unsigned int notifications;
++	/* uHID event expected after the action */
++	uint32_t uhid_type;
++	const uint8_t *uhid_data;
++	size_t uhid_len;
+ };
  
- For 6lowpan-tester, the following are required:
+ struct test_data {
+-	char *test_name;
+-	struct test_pdu *pdu_list;
+-};
+-
+-struct context {
+-	GAttrib *attrib;
++	const struct iovec *setup;
++	size_t setup_cnt;
++	struct iovec *iov;
++	size_t iovcnt;
++	const struct test_config *cfg;
++	struct bt_gatt_client *client;
+ 	struct bt_hog *hog;
+-	guint source;
+-	guint process;
+-	int fd;
+-	unsigned int pdu_offset;
+-	const struct test_data *data;
++	int uhid_fd;
++	struct io *uhid_io;
++	unsigned int created;
++	unsigned int notified;
++	unsigned int mode_idx;
++	bool io_done;
++	bool uhid_done;
++	bool sci_done;
+ };
  
-diff --git a/doc/tester.config b/doc/tester.config
-index e68740dc0f44..34f1530e174c 100644
---- a/doc/tester.config
-+++ b/doc/tester.config
-@@ -54,6 +54,7 @@ CONFIG_CRYPTO_USER_API_SKCIPHER=y
- CONFIG_UNIX=y
+-#define data(args...) ((const unsigned char[]) { args })
+-
+-#define raw_pdu(args...)					\
+-{								\
+-	.valid = true,						\
+-	.data = util_memdup(data(args), sizeof(data(args))),	\
+-	.size = sizeof(data(args)),				\
+-}
+-
+-#define false_pdu()						\
+-{								\
+-		.valid = false,					\
+-}
+-
+-#define define_test(name, function, args...)			\
+-	do {							\
+-		const struct test_pdu pdus[] = {		\
+-			args, { }				\
+-		};						\
+-		static struct test_data data;			\
+-		data.test_name = g_strdup(name);		\
+-		data.pdu_list = util_memdup(pdus, sizeof(pdus));\
+-		tester_add(name, &data, NULL, function, NULL);	\
++#define define_test(name, _setup, _cfg, args...)			\
++	do {								\
++		const struct iovec iov[] = { args };			\
++		static struct test_data data;				\
++		data.setup = _setup;					\
++		data.setup_cnt = ARRAY_SIZE(_setup);			\
++		data.cfg = _cfg;					\
++		data.iovcnt = ARRAY_SIZE(iov);				\
++		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov));		\
++		tester_add_full(name, &data, NULL, test_setup,		\
++				test_hog, test_teardown, NULL, 2,	\
++				&data, test_free);			\
+ 	} while (0)
  
- CONFIG_UHID=y
-+CONFIG_HIDRAW=y
+-static gboolean context_quit(gpointer user_data)
++static void test_free(void *user_data)
+ {
+-	struct context *context = user_data;
++	struct test_data *data = user_data;
  
- CONFIG_DEBUG_KERNEL=y
- CONFIG_LOCKDEP_SUPPORT=y
+-	if (context->process > 0)
+-		g_source_remove(context->process);
+-
+-	if (context->source > 0)
+-		g_source_remove(context->source);
+-
+-	bt_hog_unref(context->hog);
+-
+-	g_attrib_unref(context->attrib);
+-
+-	g_free(context);
+-
+-	tester_test_passed();
+-
+-	return FALSE;
++	util_iov_free(data->iov, data->iovcnt);
+ }
+ 
+-static gboolean send_pdu(gpointer user_data)
++static void print_debug(const char *str, void *user_data)
+ {
+-	struct context *context = user_data;
+-	const struct test_pdu *pdu;
+-	ssize_t len;
++	const char *prefix = user_data;
+ 
+-	pdu = &context->data->pdu_list[context->pdu_offset++];
+-
+-	len = write(context->fd, pdu->data, pdu->size);
+-
+-	tester_monitor('<', 0x0004, 0x0000, pdu->data, len);
+-
+-	g_assert_cmpint(len, ==, pdu->size);
+-
+-	context->process = 0;
+-
+-	if (!context->data->pdu_list[context->pdu_offset].valid)
+-		context_quit(context);
+-
+-	return FALSE;
++	if (tester_use_debug())
++		tester_debug("%s%s", prefix, str);
+ }
+ 
+-static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+-							gpointer user_data)
++static void test_done(struct test_data *data)
+ {
+-	struct context *context = user_data;
+-	unsigned char buf[512];
+-	const struct test_pdu *pdu;
++	if (data->io_done && data->uhid_done && data->sci_done)
++		tester_test_passed();
++}
++
++static void test_complete_cb(const void *user_data)
++{
++	struct test_data *data = (void *) user_data;
++
++	data->io_done = true;
++	test_done(data);
++}
++
++static void uhid_send(struct test_data *data, uint32_t type, uint8_t rtype)
++{
++	struct uhid_event ev;
+ 	ssize_t len;
+-	int fd;
+ 
+-	pdu = &context->data->pdu_list[context->pdu_offset++];
++	memset(&ev, 0, sizeof(ev));
++	ev.type = type;
+ 
+-	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		context->source = 0;
+-		g_print("%s: cond %x\n", __func__, cond);
+-		return FALSE;
++	switch (type) {
++	case UHID_START:
++		ev.u.start.dev_flags = UHID_DEV_NUMBERED_FEATURE_REPORTS |
++					UHID_DEV_NUMBERED_OUTPUT_REPORTS |
++					UHID_DEV_NUMBERED_INPUT_REPORTS;
++		break;
++	case UHID_GET_REPORT:
++		ev.u.get_report.id = 1;
++		ev.u.get_report.rnum = 1;
++		ev.u.get_report.rtype = rtype;
++		break;
++	case UHID_SET_REPORT:
++		ev.u.set_report.id = 2;
++		ev.u.set_report.rnum = 1;
++		ev.u.set_report.rtype = rtype;
++		ev.u.set_report.size = 2;
++		ev.u.set_report.data[0] = 0x01;
++		ev.u.set_report.data[1] = 0x42;
++		break;
++	case UHID_OUTPUT:
++		ev.u.output.rtype = rtype;
++		ev.u.output.size = 2;
++		ev.u.output.data[0] = 0x01;
++		ev.u.output.data[1] = 0x07;
++		break;
+ 	}
+ 
+-	fd = g_io_channel_unix_get_fd(channel);
+-
+-	len = read(fd, buf, sizeof(buf));
+-
+-	g_assert(len > 0);
+-
+-	tester_monitor('>', 0x0004, 0x0000, buf, len);
+-
+-	g_assert_cmpint(len, ==, pdu->size);
+-
+-	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
+-
+-	context->process = g_idle_add(send_pdu, context);
+-
+-	return TRUE;
++	len = write(io_get_fd(data->uhid_io), &ev, sizeof(ev));
++	g_assert_cmpint(len, ==, sizeof(ev));
+ }
+ 
+-static struct context *create_context(gconstpointer data)
++static void do_action(struct test_data *data)
+ {
+-	struct context *context;
+-	GIOChannel *channel, *att_io;
+-	int err, sv[2], fd;
+-	char name[] = "bluez-hog";
+-	uint16_t vendor = 0x0002;
+-	uint16_t product = 0x0001;
+-	uint16_t version = 0x0001;
++	const struct test_config *cfg = data->cfg;
+ 
+-	context = g_new0(struct context, 1);
+-	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+-	g_assert(err == 0);
+-
+-	att_io = g_io_channel_unix_new(sv[0]);
+-
+-	g_io_channel_set_close_on_unref(att_io, TRUE);
+-
+-	context->attrib = g_attrib_new(att_io, 23, false);
+-	g_assert(context->attrib);
+-
+-	g_io_channel_unref(att_io);
+-
+-	fd = open("/dev/null", O_WRONLY | O_CLOEXEC);
+-	g_assert(fd > 0);
+-
+-	context->hog = bt_hog_new(fd, name, vendor, product, version, 0, NULL);
+-	g_assert(context->hog);
+-
+-	channel = g_io_channel_unix_new(sv[1]);
+-
+-	g_io_channel_set_close_on_unref(channel, TRUE);
+-	g_io_channel_set_encoding(channel, NULL, NULL);
+-	g_io_channel_set_buffered(channel, FALSE);
+-
+-	context->source = g_io_add_watch(channel,
+-				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-				test_handler, context);
+-	g_assert(context->source > 0);
+-
+-	g_io_channel_unref(channel);
+-
+-	context->fd = sv[1];
+-	context->data = data;
+-
+-	return context;
++	switch (cfg->action) {
++	case ACT_NONE:
++		break;
++	case ACT_NOTIFY:
++		/* Have the HID Device send the notifications */
++		tester_io_send();
++		break;
++	case ACT_GET_INPUT:
++		uhid_send(data, UHID_GET_REPORT, UHID_INPUT_REPORT);
++		break;
++	case ACT_GET_OUTPUT:
++		uhid_send(data, UHID_GET_REPORT, UHID_OUTPUT_REPORT);
++		break;
++	case ACT_GET_FEATURE:
++		uhid_send(data, UHID_GET_REPORT, UHID_FEATURE_REPORT);
++		break;
++	case ACT_SET_INPUT:
++		uhid_send(data, UHID_SET_REPORT, UHID_INPUT_REPORT);
++		break;
++	case ACT_SET_OUTPUT:
++		uhid_send(data, UHID_SET_REPORT, UHID_OUTPUT_REPORT);
++		break;
++	case ACT_SET_FEATURE:
++		uhid_send(data, UHID_SET_REPORT, UHID_FEATURE_REPORT);
++		break;
++	case ACT_OUTPUT:
++		uhid_send(data, UHID_OUTPUT, UHID_OUTPUT_REPORT);
++		break;
++	case ACT_SUSPEND:
++		g_assert_cmpint(bt_hog_set_control_point(data->hog, true), ==,
++									0);
++		break;
++	case ACT_RESUME:
++		g_assert_cmpint(bt_hog_set_control_point(data->hog, false), ==,
++									0);
++		break;
++	case ACT_DETACH:
++		bt_hog_detach(data->hog, true);
++		break;
++	case ACT_REATTACH:
++		/* Reconnect, the uHID device being destroyed meanwhile */
++		bt_hog_detach(data->hog, true);
++		g_assert(bt_hog_attach(data->hog, data->client));
++		break;
++	case ACT_SCI:
++		g_assert_cmpint(bt_hog_set_sci_mode(data->hog, cfg->mode[0]),
++								==, 0);
++		break;
++	}
+ }
+ 
+-static void test_hog(gconstpointer data)
++static void uhid_check(struct test_data *data, const struct uhid_event *ev)
+ {
+-	struct context *context = create_context(data);
++	const struct test_config *cfg = data->cfg;
++	const uint8_t *buf = NULL;
++	size_t len = 0;
+ 
+-	g_assert(bt_hog_attach(context->hog, context->attrib));
++	if (ev->type != cfg->uhid_type)
++		return;
++
++	switch (ev->type) {
++	case UHID_INPUT2:
++		buf = ev->u.input2.data;
++		len = ev->u.input2.size;
++		break;
++	case UHID_GET_REPORT_REPLY:
++		g_assert_cmpint(ev->u.get_report_reply.id, ==, 1);
++		g_assert_cmpint(ev->u.get_report_reply.err, ==, 0);
++		buf = ev->u.get_report_reply.data;
++		len = ev->u.get_report_reply.size;
++		break;
++	case UHID_SET_REPORT_REPLY:
++		g_assert_cmpint(ev->u.set_report_reply.id, ==, 2);
++		g_assert_cmpint(ev->u.set_report_reply.err, ==, 0);
++		break;
++	}
++
++	if (cfg->uhid_data) {
++		g_assert_cmpint(len, ==, cfg->uhid_len);
++		g_assert(!memcmp(buf, cfg->uhid_data, len));
++	}
++
++	data->uhid_done = true;
++	test_done(data);
+ }
+ 
++static bool uhid_read(struct io *io, void *user_data)
++{
++	struct test_data *data = user_data;
++	struct uhid_event ev;
++	ssize_t len;
++
++	len = read(io_get_fd(io), &ev, sizeof(ev));
++	if (len < 0)
++		return errno == EAGAIN;
++
++	g_assert_cmpint(len, ==, sizeof(ev));
++
++	if (ev.type == UHID_CREATE2) {
++		g_assert_cmpstr((char *) ev.u.create2.name, ==, "bluez-hog");
++		g_assert_cmpint(ev.u.create2.vendor, ==, 0x0002);
++		g_assert_cmpint(ev.u.create2.product, ==, 0x0001);
++		g_assert_cmpint(ev.u.create2.version, ==, 0x0001);
++		g_assert_cmpint(ev.u.create2.bus, ==, BUS_BLUETOOTH);
++		g_assert_cmpint(ev.u.create2.rd_size, ==, REPORT_MAP_LEN);
++
++		uhid_send(data, UHID_START, 0);
++
++		/* Once all instances are created, perform the action of the
++		 * test.
++		 */
++		if (++data->created == data->cfg->creates)
++			do_action(data);
++
++		return true;
++	}
++
++	uhid_check(data, &ev);
++
++	return true;
++}
++
++static void sci_mode_cb(uint8_t mode, void *user_data)
++{
++	struct test_data *data = user_data;
++	const struct test_config *cfg = data->cfg;
++
++	g_assert_cmpint(mode, ==, cfg->mode[data->mode_idx]);
++
++	/* Wait for the notification of every HID SCI Mode characteristic */
++	if (++data->notified < cfg->notifications)
++		return;
++
++	data->notified = 0;
++
++	/* Change to another mode, see HOGP.TS 4.6.1 step 6 */
++	if (!data->mode_idx && cfg->mode[1]) {
++		data->mode_idx++;
++		g_assert_cmpint(bt_hog_set_sci_mode(data->hog, cfg->mode[1]),
++								==, 0);
++		return;
++	}
++
++	data->sci_done = true;
++	test_done(data);
++}
++
++static void test_hog(const void *user_data)
++{
++	struct test_data *data = (void *) user_data;
++	struct io *io;
++	int fds[2];
++
++	io = tester_setup_io(data->iov, data->iovcnt);
++	g_assert(io);
++
++	tester_io_set_complete_func(test_complete_cb);
++
++	data->uhid_done = !data->cfg->uhid_type;
++	data->sci_done = !data->cfg->notifications;
++
++	g_assert(!socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK |
++						SOCK_CLOEXEC, 0, fds));
++
++	data->uhid_io = io_new(fds[1]);
++	g_assert(data->uhid_io);
++	io_set_close_on_destroy(data->uhid_io, true);
++	io_set_read_handler(data->uhid_io, uhid_read, data, NULL);
++
++	/* Not closed by bt_hog, see test_teardown */
++	data->uhid_fd = fds[0];
++
++	data->hog = bt_hog_new(fds[0], "bluez-hog", 0x0002, 0x0001, 0x0001,
++								0, NULL);
++	g_assert(data->hog);
++
++	bt_hog_set_debug(data->hog, print_debug, "bt_hog: ", NULL);
++	bt_hog_set_sci_mode_callback(data->hog, sci_mode_cb, data);
++
++	g_assert(bt_hog_attach(data->hog, data->client));
++}
++
++static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++	if (!success) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_setup_complete();
++}
++
++static void test_setup(const void *user_data)
++{
++	struct test_data *data = (void *) user_data;
++	struct bt_att *att;
++	struct gatt_db *db;
++	struct io *io;
++
++	io = tester_setup_io(data->setup, data->setup_cnt);
++	g_assert(io);
++
++	att = bt_att_new(io_get_fd(io), false);
++	g_assert(att);
++
++	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att: ", NULL);
++
++	db = gatt_db_new();
++	g_assert(db);
++
++	data->client = bt_gatt_client_new(db, att, HOG_GATT_CLIENT_MTU, 0);
++	g_assert(data->client);
++
++	bt_gatt_client_set_debug(data->client, print_debug,
++						"bt_gatt_client: ", NULL);
++
++	bt_gatt_client_ready_register(data->client, client_ready_cb, data,
++									NULL);
++
++	bt_att_unref(att);
++	gatt_db_unref(db);
++}
++
++static void test_teardown(const void *user_data)
++{
++	struct test_data *data = (void *) user_data;
++
++	bt_hog_unref(data->hog);
++	data->hog = NULL;
++	close(data->uhid_fd);
++	io_destroy(data->uhid_io);
++	data->uhid_io = NULL;
++	bt_gatt_client_unref(data->client);
++	data->client = NULL;
++
++	data->created = 0;
++	data->notified = 0;
++	data->mode_idx = 0;
++	data->io_done = false;
++
++	tester_teardown_complete();
++}
++
++/* ATT: Read Request (0x0a) / Read Response (0x0b) */
++#define READ(hnd, value...) \
++	IOV_DATA(0x0a, hnd, 0x00), \
++	IOV_DATA(0x0b, ##value)
++
++/* ATT: Write Request (0x12) / Write Response (0x13) */
++#define WRITE(hnd, value...) \
++	IOV_DATA(0x12, hnd, 0x00, value), \
++	IOV_DATA(0x13)
++
++/* ATT: Write Command (0x52), which has no response */
++#define WRITE_CMD(hnd, value...) \
++	IOV_DATA(0x52, hnd, 0x00, value), \
++	IOV_NULL
++
++/* ATT: Handle Value Notification (0x1b), following another PDU sent */
++#define NOTIFY(hnd, value...) \
++	IOV_NULL, \
++	IOV_DATA(0x1b, hnd, 0x00, value)
++
++#define REPORT_MAP \
++	0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x85, 0x01, 0x05, 0x07, \
++	0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, \
++	0x95, 0x08, 0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01, \
++	0x95, 0x05, 0x75, 0x01, 0x05, 0x08, 0x19, 0x01, 0x29, 0x05, \
++	0x91, 0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x01, 0x95, 0x06, \
++	0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, 0x00, \
++	0x29, 0x65, 0x81, 0x00, 0x09, 0x01, 0x95, 0x01, 0x75, 0x08, \
++	0xb1, 0x02, 0xc0
++
++#define REPORT_MAP_1 \
++	0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x85, 0x01, 0x05, 0x07, \
++	0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, \
++	0x95, 0x08, 0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01, \
++	0x95, 0x05, 0x75, 0x01, 0x05, 0x08, 0x19, 0x01, 0x29, 0x05, \
++	0x91, 0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x01, 0x95, 0x06, \
++	0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, 0x00, \
++	0x29, 0x65, 0x81
++
++#define REPORT_MAP_2 \
++	0x00, 0x09, 0x01, 0x95, 0x01, 0x75, 0x08, 0xb1, 0x02, 0xc0
++
++#define INPUT_REPORT	0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00
++
++/* Protocol Mode: Report Protocol Mode */
++#define READ_PROTO_MODE		READ(0x03, 0x01)
++/* External Report Reference: Battery Level, which is not a Report */
++#define READ_EXT_REPORT_REF	READ(0x06, 0x19, 0x2a)
++/* HID Information: bcdHID 1.11, NormallyConnectable */
++#define READ_INFO		READ(0x08, 0x11, 0x01, 0x00, 0x02)
++/* HID Information: bcdHID 1.11, NormallyConnectable, SCI and SCI Low
++ * Power mode supported.
++ */
++#define READ_INFO_SCI		READ(0x08, 0x11, 0x01, 0x00, 0x0e)
++#define READ_INPUT		READ(0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, \
++					0x00, 0x00, 0x00)
++#define READ_INPUT_REF		READ(0x0e, 0x01, 0x01)
++#define READ_OUTPUT		READ(0x10, 0x00)
++#define READ_OUTPUT_REF		READ(0x11, 0x01, 0x02)
++#define READ_FEATURE		READ(0x13, 0x00)
++#define READ_FEATURE_REF	READ(0x14, 0x01, 0x03)
++#define READ_INPUT_CCC		READ(0x0d, 0x00, 0x00)
++#define ENABLE_INPUT_CCC	WRITE(0x0d, 0x01, 0x00)
++#define DISABLE_INPUT_CCC	WRITE(0x0d, 0x00, 0x00)
++#define READ_SCI_MODE		READ(0x1c, 0x00)
++#define READ_SCI_INFO		READ(0x1f, 0x08, 0x01, 0x08, 0x00, 0x50, \
++					0x00, 0x08, 0x00)
++#define ENABLE_SCI_MODE_CCC	WRITE(0x1d, 0x01, 0x00)
++#define DISABLE_SCI_MODE_CCC	WRITE(0x1d, 0x00, 0x00)
++
++/* The Report Map is longer than the MTU so it is read with Read Blob */
++#define READ_REPORT_MAP \
++	IOV_DATA(0x0a, 0x05, 0x00), \
++	IOV_DATA(0x0b, REPORT_MAP_1), \
++	IOV_DATA(0x0c, 0x05, 0x00, 0x3f, 0x00), \
++	IOV_DATA(0x0d, REPORT_MAP_2)
++
++/* The Report Map is read last, once every report is known */
++#define ATTACH \
++	READ_PROTO_MODE, \
++	READ_EXT_REPORT_REF, \
++	READ_INFO, \
++	READ_INPUT, \
++	READ_INPUT_REF, \
++	READ_OUTPUT, \
++	READ_OUTPUT_REF, \
++	READ_FEATURE, \
++	READ_FEATURE_REF, \
++	READ_INPUT_CCC, \
++	ENABLE_INPUT_CCC, \
++	READ_REPORT_MAP
++
++/* HID SCI Mode notifications are enabled once SCI support is known */
++#define SCI_ATTACH \
++	READ_PROTO_MODE, \
++	READ_EXT_REPORT_REF, \
++	READ_INFO_SCI, \
++	READ_INPUT, \
++	READ_INPUT_REF, \
++	READ_OUTPUT, \
++	READ_OUTPUT_REF, \
++	READ_FEATURE, \
++	READ_FEATURE_REF, \
++	READ_SCI_MODE, \
++	READ_SCI_INFO, \
++	ENABLE_SCI_MODE_CCC, \
++	READ_INPUT_CCC, \
++	ENABLE_INPUT_CCC, \
++	READ_REPORT_MAP
++
++/* Protocol Mode in Boot Protocol Mode, set to Report Protocol Mode */
++#define BOOT_ATTACH \
++	READ(0x03, 0x00), \
++	WRITE_CMD(0x03, 0x01), \
++	READ_EXT_REPORT_REF, \
++	READ_INFO, \
++	READ_INPUT, \
++	READ_INPUT_REF, \
++	READ_OUTPUT, \
++	READ_OUTPUT_REF, \
++	READ_FEATURE, \
++	READ_FEATURE_REF, \
++	READ_INPUT_CCC, \
++	ENABLE_INPUT_CCC, \
++	READ_REPORT_MAP
++
++/* Enable a HID SCI mode, with no response other than the notification
++ * of the HID SCI Mode characteristics once the connection rate has been
++ * changed.
++ */
++#define MULTI_SCI_MODE(mode) \
++	WRITE_CMD(0x0a, mode), \
++	NOTIFY(0x1c, mode), \
++	NOTIFY(0x3c, mode)
++
++/* Discovery by bt_gatt_client */
++#define DISC_MTU \
++	IOV_DATA(0x02, 0x40, 0x00), \
++	IOV_DATA(0x03, 0x40, 0x00)
++
++#define DISC_SR_FEATURES \
++	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b), \
++	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
++
++#define DISC_SECONDARY \
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28), \
++	IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a)
++
++#define DISC_HID_CHRC_1 \
++	IOV_DATA(0x09, 0x07, 0x02, 0x00, 0x06, 0x03, 0x00, 0x4e, 0x2a, \
++			0x04, 0x00, 0x02, 0x05, 0x00, 0x4b, 0x2a, 0x07, \
++			0x00, 0x02, 0x08, 0x00, 0x4a, 0x2a, 0x09, 0x00, \
++			0x04, 0x0a, 0x00, 0x4c, 0x2a, 0x0b, 0x00, 0x12, \
++			0x0c, 0x00, 0x4d, 0x2a, 0x0f, 0x00, 0x0e, 0x10, \
++			0x00, 0x4d, 0x2a, 0x12, 0x00, 0x0a, 0x13, 0x00, \
++			0x4d, 0x2a, 0x15, 0x00, 0x12, 0x16, 0x00, 0x22, \
++			0x2a)
++
++#define DISC_HID_DESC \
++	IOV_DATA(0x04, 0x06, 0x00, 0x06, 0x00), \
++	IOV_DATA(0x05, 0x01, 0x06, 0x00, 0x07, 0x29), \
++	IOV_DATA(0x04, 0x0d, 0x00, 0x0e, 0x00), \
++	IOV_DATA(0x05, 0x01, 0x0d, 0x00, 0x02, 0x29, 0x0e, 0x00, 0x08, \
++			0x29), \
++	IOV_DATA(0x04, 0x11, 0x00, 0x11, 0x00), \
++	IOV_DATA(0x05, 0x01, 0x11, 0x00, 0x08, 0x29), \
++	IOV_DATA(0x04, 0x14, 0x00, 0x14, 0x00), \
++	IOV_DATA(0x05, 0x01, 0x14, 0x00, 0x08, 0x29)
++
++static const struct iovec setup_basic[] = {
++	DISC_MTU,
++	DISC_SR_FEATURES,
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x1a, 0x00, 0x12, 0x18, 0x1b,
++			0x00, 0x1e, 0x00, 0x0f, 0x18),
++	IOV_DATA(0x10, 0x1f, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x01, 0x10, 0x1f, 0x00, 0x0a),
++	DISC_SECONDARY,
++	IOV_DATA(0x08, 0x01, 0x00, 0x1e, 0x00, 0x02, 0x28),
++	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
++	IOV_DATA(0x08, 0x01, 0x00, 0x1e, 0x00, 0x03, 0x28),
++	DISC_HID_CHRC_1,
++	IOV_DATA(0x08, 0x16, 0x00, 0x1e, 0x00, 0x03, 0x28),
++	IOV_DATA(0x09, 0x07, 0x18, 0x00, 0x12, 0x19, 0x00, 0x33, 0x2a,
++			0x1c, 0x00, 0x12, 0x1d, 0x00, 0x19, 0x2a),
++	IOV_DATA(0x08, 0x1d, 0x00, 0x1e, 0x00, 0x03, 0x28),
++	IOV_DATA(0x01, 0x08, 0x1d, 0x00, 0x0a),
++	DISC_HID_DESC,
++};
++
++static const struct iovec setup_sci[] = {
++	DISC_MTU,
++	DISC_SR_FEATURES,
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x20, 0x00, 0x12, 0x18, 0x21,
++			0x00, 0x24, 0x00, 0x0f, 0x18),
++	IOV_DATA(0x10, 0x25, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x01, 0x10, 0x25, 0x00, 0x0a),
++	DISC_SECONDARY,
++	IOV_DATA(0x08, 0x01, 0x00, 0x24, 0x00, 0x02, 0x28),
++	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
++	IOV_DATA(0x08, 0x01, 0x00, 0x24, 0x00, 0x03, 0x28),
++	DISC_HID_CHRC_1,
++	IOV_DATA(0x08, 0x16, 0x00, 0x24, 0x00, 0x03, 0x28),
++	IOV_DATA(0x09, 0x07, 0x18, 0x00, 0x12, 0x19, 0x00, 0x33, 0x2a,
++			0x1b, 0x00, 0x12, 0x1c, 0x00, 0x39, 0x2c, 0x1e,
++			0x00, 0x02, 0x1f, 0x00, 0x3a, 0x2c, 0x22, 0x00,
++			0x12, 0x23, 0x00, 0x19, 0x2a),
++	IOV_DATA(0x08, 0x23, 0x00, 0x24, 0x00, 0x03, 0x28),
++	IOV_DATA(0x01, 0x08, 0x23, 0x00, 0x0a),
++	DISC_HID_DESC,
++	IOV_DATA(0x04, 0x20, 0x00, 0x20, 0x00),
++	IOV_DATA(0x01, 0x04, 0x20, 0x00, 0x0a),
++};
++
++/* Two instances of the HID Service, with SCI support */
++static const struct iovec setup_multi[] = {
++	IOV_DATA(0x02, 0x40, 0x00),
++	IOV_DATA(0x03, 0x40, 0x00),
++	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b),
++	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x20, 0x00, 0x12, 0x18, 0x21,
++			0x00, 0x40, 0x00, 0x12, 0x18, 0x41, 0x00, 0x44,
++			0x00, 0x0f, 0x18),
++	IOV_DATA(0x10, 0x45, 0x00, 0xff, 0xff, 0x00, 0x28),
++	IOV_DATA(0x01, 0x10, 0x45, 0x00, 0x0a),
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),
++	IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a),
++	IOV_DATA(0x08, 0x01, 0x00, 0x44, 0x00, 0x02, 0x28),
++	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
++	IOV_DATA(0x08, 0x01, 0x00, 0x44, 0x00, 0x03, 0x28),
++	IOV_DATA(0x09, 0x07, 0x02, 0x00, 0x06, 0x03, 0x00, 0x4e, 0x2a,
++			0x04, 0x00, 0x02, 0x05, 0x00, 0x4b, 0x2a, 0x07,
++			0x00, 0x02, 0x08, 0x00, 0x4a, 0x2a, 0x09, 0x00,
++			0x04, 0x0a, 0x00, 0x4c, 0x2a, 0x0b, 0x00, 0x12,
++			0x0c, 0x00, 0x4d, 0x2a, 0x0f, 0x00, 0x0e, 0x10,
++			0x00, 0x4d, 0x2a, 0x12, 0x00, 0x0a, 0x13, 0x00,
++			0x4d, 0x2a, 0x15, 0x00, 0x12, 0x16, 0x00, 0x22,
++			0x2a),
++	IOV_DATA(0x08, 0x16, 0x00, 0x44, 0x00, 0x03, 0x28),
++	IOV_DATA(0x09, 0x07, 0x18, 0x00, 0x12, 0x19, 0x00, 0x33, 0x2a,
++			0x1b, 0x00, 0x12, 0x1c, 0x00, 0x39, 0x2c, 0x1e,
++			0x00, 0x02, 0x1f, 0x00, 0x3a, 0x2c, 0x22, 0x00,
++			0x06, 0x23, 0x00, 0x4e, 0x2a, 0x24, 0x00, 0x02,
++			0x25, 0x00, 0x4b, 0x2a, 0x27, 0x00, 0x02, 0x28,
++			0x00, 0x4a, 0x2a, 0x29, 0x00, 0x04, 0x2a, 0x00,
++			0x4c, 0x2a, 0x2b, 0x00, 0x12, 0x2c, 0x00, 0x4d,
++			0x2a),
++	IOV_DATA(0x08, 0x2c, 0x00, 0x44, 0x00, 0x03, 0x28),
++	IOV_DATA(0x09, 0x07, 0x2f, 0x00, 0x0e, 0x30, 0x00, 0x4d, 0x2a,
++			0x32, 0x00, 0x0a, 0x33, 0x00, 0x4d, 0x2a, 0x35,
++			0x00, 0x12, 0x36, 0x00, 0x22, 0x2a, 0x38, 0x00,
++			0x12, 0x39, 0x00, 0x33, 0x2a, 0x3b, 0x00, 0x12,
++			0x3c, 0x00, 0x39, 0x2c, 0x3e, 0x00, 0x02, 0x3f,
++			0x00, 0x3a, 0x2c, 0x42, 0x00, 0x12, 0x43, 0x00,
++			0x19, 0x2a),
++	IOV_DATA(0x08, 0x43, 0x00, 0x44, 0x00, 0x03, 0x28),
++	IOV_DATA(0x01, 0x08, 0x43, 0x00, 0x0a),
++	IOV_DATA(0x04, 0x06, 0x00, 0x06, 0x00),
++	IOV_DATA(0x05, 0x01, 0x06, 0x00, 0x07, 0x29),
++	IOV_DATA(0x04, 0x0d, 0x00, 0x0e, 0x00),
++	IOV_DATA(0x05, 0x01, 0x0d, 0x00, 0x02, 0x29, 0x0e, 0x00, 0x08,
++			0x29),
++	IOV_DATA(0x04, 0x11, 0x00, 0x11, 0x00),
++	IOV_DATA(0x05, 0x01, 0x11, 0x00, 0x08, 0x29),
++	IOV_DATA(0x04, 0x14, 0x00, 0x14, 0x00),
++	IOV_DATA(0x05, 0x01, 0x14, 0x00, 0x08, 0x29),
++	IOV_DATA(0x04, 0x20, 0x00, 0x20, 0x00),
++	IOV_DATA(0x01, 0x04, 0x20, 0x00, 0x0a),
++	IOV_DATA(0x04, 0x26, 0x00, 0x26, 0x00),
++	IOV_DATA(0x05, 0x01, 0x26, 0x00, 0x07, 0x29),
++	IOV_DATA(0x04, 0x2d, 0x00, 0x2e, 0x00),
++	IOV_DATA(0x05, 0x01, 0x2d, 0x00, 0x02, 0x29, 0x2e, 0x00, 0x08,
++			0x29),
++	IOV_DATA(0x04, 0x31, 0x00, 0x31, 0x00),
++	IOV_DATA(0x05, 0x01, 0x31, 0x00, 0x08, 0x29),
++	IOV_DATA(0x04, 0x34, 0x00, 0x34, 0x00),
++	IOV_DATA(0x05, 0x01, 0x34, 0x00, 0x08, 0x29),
++	IOV_DATA(0x04, 0x40, 0x00, 0x40, 0x00),
++	IOV_DATA(0x01, 0x04, 0x40, 0x00, 0x0a),
++};
++
++#define MULTI_ATTACH \
++	IOV_DATA(0x0a, 0x23, 0x00), \
++	IOV_DATA(0x0b, 0x01), \
++	IOV_DATA(0x0a, 0x26, 0x00), \
++	IOV_DATA(0x0b, 0x19, 0x2a), \
++	IOV_DATA(0x0a, 0x28, 0x00), \
++	IOV_DATA(0x0b, 0x11, 0x01, 0x00, 0x0e), \
++	IOV_DATA(0x0a, 0x2c, 0x00), \
++	IOV_DATA(0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), \
++	IOV_DATA(0x0a, 0x2e, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x01), \
++	IOV_DATA(0x0a, 0x30, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x31, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x02), \
++	IOV_DATA(0x0a, 0x33, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x34, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x03), \
++	IOV_DATA(0x0a, 0x03, 0x00), \
++	IOV_DATA(0x0b, 0x01), \
++	IOV_DATA(0x0a, 0x06, 0x00), \
++	IOV_DATA(0x0b, 0x19, 0x2a), \
++	IOV_DATA(0x0a, 0x08, 0x00), \
++	IOV_DATA(0x0b, 0x11, 0x01, 0x00, 0x0e), \
++	IOV_DATA(0x0a, 0x0c, 0x00), \
++	IOV_DATA(0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), \
++	IOV_DATA(0x0a, 0x0e, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x01), \
++	IOV_DATA(0x0a, 0x10, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x11, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x02), \
++	IOV_DATA(0x0a, 0x13, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x14, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x03), \
++	IOV_DATA(0x0a, 0x3c, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x3f, 0x00), \
++	IOV_DATA(0x0b, 0x08, 0x01, 0x08, 0x00, 0x50, 0x00, 0x08, 0x00), \
++	IOV_DATA(0x12, 0x3d, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x0a, 0x2d, 0x00), \
++	IOV_DATA(0x0b, 0x00, 0x00), \
++	IOV_DATA(0x0a, 0x1c, 0x00), \
++	IOV_DATA(0x0b, 0x00), \
++	IOV_DATA(0x0a, 0x1f, 0x00), \
++	IOV_DATA(0x0b, 0x08, 0x01, 0x08, 0x00, 0x50, 0x00, 0x08, 0x00), \
++	IOV_DATA(0x12, 0x1d, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x0a, 0x0d, 0x00), \
++	IOV_DATA(0x0b, 0x00, 0x00), \
++	IOV_DATA(0x12, 0x2d, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x0a, 0x25, 0x00), \
++	IOV_DATA(0x0b, 0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x85, 0x01, \
++			0x05, 0x07, 0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, \
++			0x25, 0x01, 0x75, 0x01, 0x95, 0x08, 0x81, 0x02, \
++			0x95, 0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x05, \
++			0x75, 0x01, 0x05, 0x08, 0x19, 0x01, 0x29, 0x05, \
++			0x91, 0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x01, \
++			0x95, 0x06, 0x75, 0x08, 0x15, 0x00, 0x25, 0x65, \
++			0x05, 0x07, 0x19, 0x00, 0x29, 0x65, 0x81), \
++	IOV_DATA(0x0c, 0x25, 0x00, 0x3f, 0x00), \
++	IOV_DATA(0x0d, 0x00, 0x09, 0x01, 0x95, 0x01, 0x75, 0x08, 0xb1, \
++			0x02, 0xc0), \
++	IOV_DATA(0x12, 0x0d, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x0a, 0x05, 0x00), \
++	IOV_DATA(0x0b, 0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x85, 0x01, \
++			0x05, 0x07, 0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, \
++			0x25, 0x01, 0x75, 0x01, 0x95, 0x08, 0x81, 0x02, \
++			0x95, 0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x05, \
++			0x75, 0x01, 0x05, 0x08, 0x19, 0x01, 0x29, 0x05, \
++			0x91, 0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x01, \
++			0x95, 0x06, 0x75, 0x08, 0x15, 0x00, 0x25, 0x65, \
++			0x05, 0x07, 0x19, 0x00, 0x29, 0x65, 0x81), \
++	IOV_DATA(0x0c, 0x05, 0x00, 0x3f, 0x00), \
++	IOV_DATA(0x0d, 0x00, 0x09, 0x01, 0x95, 0x01, 0x75, 0x08, 0xb1, \
++			0x02, 0xc0)
++
++static const uint8_t input_report[] = { 0x01, INPUT_REPORT };
++static const uint8_t input_value[] = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00 };
++static const uint8_t output_report[] = { 0x01, 0x00 };
++static const uint8_t feature_report[] = { 0x01, 0x00 };
++
++static const struct test_config cfg_none = {
++	.action = ACT_NONE,
++};
++
++static const struct test_config cfg_attach = {
++	.action = ACT_NONE,
++	.creates = 1,
++};
++
++static const struct test_config cfg_multi_attach = {
++	.action = ACT_NONE,
++	.creates = 2,
++};
++
++static const struct test_config cfg_notify = {
++	.action = ACT_NOTIFY,
++	.creates = 1,
++	.uhid_type = UHID_INPUT2,
++	.uhid_data = input_report,
++	.uhid_len = sizeof(input_report),
++};
++
++static const struct test_config cfg_get_input = {
++	.action = ACT_GET_INPUT,
++	.creates = 1,
++	.uhid_type = UHID_GET_REPORT_REPLY,
++	.uhid_data = input_value,
++	.uhid_len = sizeof(input_value),
++};
++
++static const struct test_config cfg_get_output = {
++	.action = ACT_GET_OUTPUT,
++	.creates = 1,
++	.uhid_type = UHID_GET_REPORT_REPLY,
++	.uhid_data = output_report,
++	.uhid_len = sizeof(output_report),
++};
++
++static const struct test_config cfg_get_feature = {
++	.action = ACT_GET_FEATURE,
++	.creates = 1,
++	.uhid_type = UHID_GET_REPORT_REPLY,
++	.uhid_data = feature_report,
++	.uhid_len = sizeof(feature_report),
++};
++
++static const struct test_config cfg_set_input = {
++	.action = ACT_SET_INPUT,
++	.creates = 1,
++	.uhid_type = UHID_SET_REPORT_REPLY,
++};
++
++static const struct test_config cfg_set_output = {
++	.action = ACT_SET_OUTPUT,
++	.creates = 1,
++	.uhid_type = UHID_SET_REPORT_REPLY,
++};
++
++static const struct test_config cfg_set_feature = {
++	.action = ACT_SET_FEATURE,
++	.creates = 1,
++	.uhid_type = UHID_SET_REPORT_REPLY,
++};
++
++static const struct test_config cfg_output = {
++	.action = ACT_OUTPUT,
++	.creates = 1,
++};
++
++static const struct test_config cfg_suspend = {
++	.action = ACT_SUSPEND,
++	.creates = 1,
++};
++
++static const struct test_config cfg_resume = {
++	.action = ACT_RESUME,
++	.creates = 1,
++};
++
++static const struct test_config cfg_detach = {
++	.action = ACT_DETACH,
++	.creates = 1,
++};
++
++static const struct test_config cfg_reattach = {
++	.action = ACT_REATTACH,
++	.creates = 1,
++	.uhid_type = UHID_INPUT2,
++	.uhid_data = input_report,
++	.uhid_len = sizeof(input_report),
++};
++
++#define define_cfg_sci(_name, _mode, _mode2, _notifications) \
++static const struct test_config _name = { \
++	.action = ACT_SCI, \
++	.creates = 2, \
++	.mode = { _mode, _mode2 }, \
++	.notifications = _notifications, \
++}
++
++/* HOGP.TS 4.6.1: change from the tested mode to Full Range if Default,
++ * otherwise to Default.
++ */
++define_cfg_sci(cfg_sci_default, BT_HOG_SCI_MODE_DEFAULT,
++				BT_HOG_SCI_MODE_FULL_RANGE, 2);
++define_cfg_sci(cfg_sci_fast, BT_HOG_SCI_MODE_FAST,
++				BT_HOG_SCI_MODE_DEFAULT, 2);
++define_cfg_sci(cfg_sci_low_power, BT_HOG_SCI_MODE_LOW_POWER,
++				BT_HOG_SCI_MODE_DEFAULT, 2);
++define_cfg_sci(cfg_sci_full_range, BT_HOG_SCI_MODE_FULL_RANGE,
++				BT_HOG_SCI_MODE_DEFAULT, 2);
++
++static const struct test_config cfg_sci_attach = {
++	.action = ACT_NONE,
++	.creates = 1,
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+ 
+-	define_test("/TP/HGRF/RH/BV-01-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
+-			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x02, 0x04, 0x00,
+-			0x4b, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x02, 0x08, 0x00,
+-			0x4b, 0x2a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+-			0x15, 0x16),
+-		raw_pdu(0x0c, 0x04, 0x00, 0x16, 0x00),
+-		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+-			0x15, 0x16),
+-		raw_pdu(0x0c, 0x04, 0x00, 0x2c, 0x00),
+-		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13),
+-		raw_pdu(0x0a, 0x08, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+-			0x15, 0x16),
+-		raw_pdu(0x0c, 0x08, 0x00, 0x16, 0x00),
+-		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+-			0x15, 0x16),
+-		raw_pdu(0x0c, 0x08, 0x00, 0x2c, 0x00),
+-		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+-			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+-			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13));
++	/* Discovery */
++	define_test("HOGP/RH/HGDC/BV-03-C [Discover Report Characteristics]",
++			setup_multi, &cfg_multi_attach,
++			MULTI_ATTACH);
++	define_test("HOGP/RH/HGDC/BV-04-C [Discover Report Characteristic "
++			"Client Characteristic Configuration Descriptors]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF,
++			READ_INPUT_CCC);
++	define_test("HOGP/RH/HGDC/BV-05-C [Discover Report Characteristic "
++			"Report Reference Characteristic Descriptors]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF);
+ 
+-	define_test("/TP/HGRF/RH/BV-08-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
+-			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x0a, 0x04, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x0a, 0x09, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x09, 0x00, 0x0a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0xee, 0xee, 0xff, 0xff),
+-		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
+-		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x09, 0x00),
+-		raw_pdu(0x0b, 0xff, 0xff, 0xee, 0xee),
+-		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
+-		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x05, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x03),
+-		raw_pdu(0x0a, 0x0a, 0x00),
+-		raw_pdu(0x0b, 0x02, 0x03));
++	/* Read */
++	define_test("HOGP/RH/HGRF/BV-02-C [Read External Report Reference "
++			"Characteristic Descriptors for Report Map]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF);
++	define_test("HOGP/RH/HGRF/BV-03-C [Read Report Characteristics - "
++			"Input Report]",
++			setup_basic, &cfg_get_input,
++			ATTACH, READ_INPUT);
++	define_test("HOGP/RH/HGRF/BV-04-C [Read Report Reference "
++			"Characteristic Descriptors for Report Characteristics "
++			"- Input Report]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF);
++	define_test("HOGP/RH/HGRF/BV-05-C [Read Client Characteristic "
++			"Configuration Descriptors for Report Characteristics "
++			"- Input Report]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF,
++			READ_INPUT_CCC);
++	define_test("HOGP/RH/HGRF/BV-19-C [Read Report Characteristics - "
++			"Output Report]",
++			setup_basic, &cfg_get_output,
++			ATTACH, READ_OUTPUT);
++	define_test("HOGP/RH/HGRF/BV-06-C [Read Report Reference "
++			"Characteristic Descriptors for Report Characteristics "
++			"- Output Report]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF);
++	define_test("HOGP/RH/HGRF/BV-07-C [Read Report Characteristics - "
++			"Feature Report]",
++			setup_basic, &cfg_get_feature,
++			ATTACH, READ_FEATURE);
++	define_test("HOGP/RH/HGRF/BV-08-C [Read Report Reference "
++			"Characteristic Descriptors for Report Characteristics "
++			"- Feature Report]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF);
++	define_test("HOGP/RH/HGRF/BV-18-C [Read Protocol Mode Characteristics "
++			"(Get Boot Protocol Mode Command) - RH]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE);
+ 
+-	define_test("/TP/HGRF/RH/BV-09-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
+-			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x02, 0x04, 0x00,
+-			0x4a, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x02, 0x08, 0x00,
+-			0x4a, 0x2a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x11, 0x00, 0x01),
+-		raw_pdu(0x0a, 0x08, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x11, 0x00, 0x01));
++	/* Write */
++	define_test("HOGP/RH/HGWF/BV-01-C [Write Report Characteristics - "
++			"Input Report]",
++			setup_basic, &cfg_set_input,
++			ATTACH, WRITE(0x0c, 0x42));
++	define_test("HOGP/RH/HGWF/BV-02-C [Write Report Characteristics - "
++			"Output Report]",
++			setup_basic, &cfg_output,
++			ATTACH, WRITE(0x10, 0x07));
++	define_test("HOGP/RH/HGWF/BV-02-C [Write Report Characteristics - "
++			"Output Report] - Set Report",
++			setup_basic, &cfg_set_output,
++			ATTACH, WRITE(0x10, 0x42));
++	define_test("HOGP/RH/HGWF/BV-04-C [Write Report Characteristics - "
++			"Feature Report]",
++			setup_basic, &cfg_set_feature,
++			ATTACH, WRITE(0x13, 0x42));
++	define_test("HOGP/RH/HGWF/BV-05-C [Write HID Control Point "
++			"Characteristics - Suspend]",
++			setup_basic, &cfg_suspend,
++			ATTACH, IOV_DATA(0x52, 0x0a, 0x00, 0x00));
++	define_test("HOGP/RH/HGWF/BV-06-C [Write HID Control Point "
++			"Characteristics - Exit Suspend]",
++			setup_basic, &cfg_resume,
++			ATTACH, IOV_DATA(0x52, 0x0a, 0x00, 0x01));
++	define_test("HOGP/RH/HGWF/BV-07-C [Write Protocol Mode "
++			"Characteristics - Set Protocol Command (Protocol Mode "
++			"= Report Protocol Mode)]",
++			setup_basic, &cfg_attach,
++			BOOT_ATTACH);
+ 
+-	define_test("/TP/HGRF/RH/BV-06-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
+-			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x0a, 0x04, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x0a, 0x09, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x09, 0x00, 0x0a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0xee, 0xee, 0xff, 0xff),
+-		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
+-		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x09, 0x00),
+-		raw_pdu(0x0b, 0xff, 0xff, 0xee, 0xee),
+-		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
+-		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x05, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x02),
+-		raw_pdu(0x0a, 0x0a, 0x00),
+-		raw_pdu(0x0b, 0x02, 0x02));
++	/* HID SCI, see HOGP.TS 4.6.1 */
++	define_test("HOGP/RH/HGWF/BV-08-C [Write HID Control Point "
++			"Characteristic, Enable SCI Default mode]",
++			setup_multi, &cfg_sci_default,
++			MULTI_ATTACH,
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_DEFAULT),
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_FULL_RANGE));
++	define_test("HOGP/RH/HGWF/BV-09-C [Write HID Control Point "
++			"Characteristic, Enable SCI Fast mode]",
++			setup_multi, &cfg_sci_fast,
++			MULTI_ATTACH,
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_FAST),
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_DEFAULT));
++	define_test("HOGP/RH/HGWF/BV-10-C [Write HID Control Point "
++			"Characteristic, Enable SCI Low Power mode]",
++			setup_multi, &cfg_sci_low_power,
++			MULTI_ATTACH,
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_LOW_POWER),
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_DEFAULT));
++	define_test("HOGP/RH/HGWF/BV-11-C [Write HID Control Point "
++			"Characteristic, Enable SCI Full Range mode]",
++			setup_multi, &cfg_sci_full_range,
++			MULTI_ATTACH,
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_FULL_RANGE),
++			MULTI_SCI_MODE(BT_HOG_SCI_MODE_DEFAULT));
+ 
+-	define_test("/TP/HGCF/RH/BV-01-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x06, 0x00, 0x12,
+-			0x18, 0x07, 0x00, 0x0c, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x0d, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x0d, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x06, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x1a, 0x04, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x06, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x07, 0x00, 0x0c, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x07, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x07, 0x00, 0x0c, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x09, 0x00, 0x1a, 0x0a, 0x00,
+-			0x4d, 0x2a),
+-		raw_pdu(0x08, 0x04, 0x00, 0x06, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x0a, 0x00, 0x0c, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x0a, 0x00, 0x0a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0xed, 0x00),
+-		raw_pdu(0x04, 0x05, 0x00, 0x06, 0x00),
+-		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x02, 0x29,
+-			0x06, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x0a, 0x00),
+-		raw_pdu(0x0b, 0xed, 0x00),
+-		raw_pdu(0x04, 0x0b, 0x00, 0x0c, 0x00),
+-		raw_pdu(0x05, 0x01, 0x0b, 0x00, 0x02, 0x29,
+-			0x0c, 0x00, 0x08, 0x29),
+-		raw_pdu(0x0a, 0x06, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x01),
+-		raw_pdu(0x0a, 0x0c, 0x00),
+-		raw_pdu(0x0b, 0x02, 0x01),
+-		raw_pdu(0x0a, 0x05, 0x00),
+-		raw_pdu(0x0b, 0x00, 0x00),
+-		raw_pdu(0x0a, 0x0b, 0x00),
+-		raw_pdu(0x0b, 0x00, 0x00),
+-		raw_pdu(0x12, 0x05, 0x00, 0x01, 0x00),
+-		raw_pdu(0x13),
+-		raw_pdu(0x12, 0x0b, 0x00, 0x01, 0x00),
+-		raw_pdu(0x13));
++	/* Configuration */
++	define_test("HOGP/RH/HGCF/BV-01-C [Report Characteristic - Input "
++			"Reports - enable notifications (write with 0x0001)]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF,
++			READ_INPUT_CCC, ENABLE_INPUT_CCC);
++	define_test("HOGP/RH/HGCF/BV-02-C [Report Characteristic - Input "
++			"Reports - disable notifications (write with 0x0000)]",
++			setup_basic, &cfg_detach,
++			ATTACH, DISABLE_INPUT_CCC);
+ 
+-	define_test("/TP/HGRF/RH/BV-02-I", test_hog,
+-		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
+-			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
+-		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
+-		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x02, 0x04, 0x00,
+-			0x4b, 0x2a),
+-		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
+-		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x02, 0x09, 0x00,
+-			0x4b, 0x2a),
+-		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
+-		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
+-		raw_pdu(0x01, 0x08, 0x09, 0x00, 0x0a),
+-		raw_pdu(0x0a, 0x04, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x02, 0x03),
+-		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
+-		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x07, 0x29),
+-		raw_pdu(0x0a, 0x09, 0x00),
+-		raw_pdu(0x0b, 0x01, 0x02, 0x03),
+-		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
+-		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x07, 0x29),
+-		raw_pdu(0x0a, 0x05, 0x00),
+-		raw_pdu(0x0b, 0x19, 0x2a),
+-		raw_pdu(0x0a, 0x0a, 0x00),
+-		raw_pdu(0x0b, 0x19, 0x2a));
++	/* Notifications */
++	define_test("HOGP/RH/HGNF/BV-01-C [Report Characteristic "
++			"Configuration, receive notifications]",
++			setup_basic, &cfg_notify,
++			ATTACH, IOV_DATA(0x1b, 0x0c, 0x00, INPUT_REPORT));
++	/* Reconnection: the reports are known and the Report Map cached, so
++	 * the uHID device is created right away and only the notifications
++	 * need to be enabled again.
++	 */
++	define_test("HOGP/RH/HGNF/BV-01-C [Report Characteristic "
++			"Configuration, receive notifications] - Reconnect",
++			setup_basic, &cfg_reattach,
++			ATTACH, DISABLE_INPUT_CCC,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO,
++			ENABLE_INPUT_CCC,
++			NOTIFY(0x0c, INPUT_REPORT));
++	define_test("HOGP/RH/HGNF/BI-01-C [Boot Keyboard Input Report "
++			"Characteristic Configuration, ignore notifications, "
++			"Report Host]",
++			setup_basic, &cfg_notify,
++			ATTACH,
++			IOV_DATA(0x1b, 0x16, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
++					0x00, 0x00, 0x00),
++			NOTIFY(0x0c, INPUT_REPORT));
++	define_test("HOGP/RH/HGNF/BI-02-C [Boot Mouse Input Report "
++			"Characteristic Configuration, ignore notifications, "
++			"Report Host]",
++			setup_basic, &cfg_notify,
++			ATTACH,
++			IOV_DATA(0x1b, 0x19, 0x00, 0x01, 0x02, 0x03),
++			NOTIFY(0x0c, INPUT_REPORT));
++
++	/* Characteristic GGIT, the discovery being done by bt_gatt_client */
++	define_test("HOGP/RH/CGGIT/CHA/BV-01-C [Characteristic GGIT - Report "
++			"Map - RH]",
++			setup_basic, &cfg_attach,
++			ATTACH);
++	define_test("HOGP/RH/CGGIT/CHA/BV-02-C [Characteristic GGIT - HID "
++			"Information - RH]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO);
++	define_test("HOGP/RH/CGGIT/CHA/BV-03-C [Characteristic GGIT - HID "
++			"Control Point]",
++			setup_basic, &cfg_resume,
++			ATTACH, IOV_DATA(0x52, 0x0a, 0x00, 0x01));
++	define_test("HOGP/RH/CGGIT/CHA/BV-04-C [Characteristic GGIT - "
++			"Protocol Mode - RH]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE);
++	define_test("HOGP/RH/CGGIT/DES/BV-01-C [Descriptor GGIT - External "
++			"Report Reference for Report Map]",
++			setup_basic, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF);
++	define_test("HOGP/RH/CGGIT/CHA/BV-09-C [Characteristic GGIT - HID SCI "
++			"Information]",
++			setup_sci, &cfg_sci_attach,
++			SCI_ATTACH);
++	define_test("HOGP/RH/CGGIT/CHA/BV-10-C [Characteristic GGIT - HID SCI "
++			"Mode]",
++			setup_sci, &cfg_none,
++			READ_PROTO_MODE, READ_EXT_REPORT_REF, READ_INFO_SCI,
++			READ_INPUT, READ_INPUT_REF, READ_OUTPUT,
++			READ_OUTPUT_REF, READ_FEATURE, READ_FEATURE_REF,
++			READ_SCI_MODE, READ_SCI_INFO, ENABLE_SCI_MODE_CCC);
+ 
+ 	return tester_run();
+ }
 -- 
 2.55.0
 
