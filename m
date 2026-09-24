@@ -1,69 +1,67 @@
-Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
+Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D78C4503E1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 11:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ADE2673AA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 13:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790250813; cv=none; b=QWvu+hwegEVj6imeYacsESuFqA9UOVSltiQSqkl+U4gpH3KjX7EKOmxANkh/iTqnYVafrmG/hfIW+rQTfEgDTkV7Gk9DFeYn/JOWwrd0noNTCONtTboK7Tm6eB4WOf8uSKWiFqcVllVYisWizNiUDFPby6TnoV2DIPvRKPslG0w=
+	t=1790258174; cv=none; b=jUSeIPK4YY0ZVJINaLOlEjIgCvk+2Mz2/7vG93a+BtpXcOHZ9ZpuPh63aBV6+uCaZ87LHTYBWEdM9rrzs5Yw9YZ6pWUsN71aFkHNmKRnCqHW9pwllEofDx7JaneYGxJEsYV+X0Kc2ZFXI6C3cGdr90frwkubm0MQ8gqwbYwts/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790250813; c=relaxed/simple;
-	bh=RZ2ueiZmuXAjA+9pBuGtmURS2Ox3cmUGORO0ZPacFIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cSM2Saw51ucv95ZGE/b2tv7ivnJdE/3tZ2UW9ZfmjFgT8Yd0pSRS04O2V5sdEHRGCu03OxqDepcxhm/fAD/Y6I8FaPSrqRx6M/5umIE6v+H41kr5xXwZvSThPdS+B4DdHowAw+GICS7RuGL9RxCesPPjVoTULnDEFHF5zqtye7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XeffTZDE; arc=none smtp.client-ip=74.125.225.99
+	s=arc-20240116; t=1790258174; c=relaxed/simple;
+	bh=JIHSqVj2uBLBMviuc7dpANILoriZD5BkRfbACr4Mg48=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=EQTNpqAVqwM1aRvd55EICPsSWwTkqrPhX9bgx4kaBwQfkWzAMVEwrCBZIyJvtIO+2pUn9dWOsMbBe+rIWmcJ2amyM16f1T9Wrnr8D5wDD0QhgAowVHDeWqwyMGFljVKJKxWobhSw5JfHzkXeDzKlnH3TwKgxQE9CTp4Rn/CAUWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e6N3KlDw; arc=none smtp.client-ip=74.125.227.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeffTZDE"
-Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-48434392b02so1488728f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 04:53:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6N3KlDw"
+Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-785692e59a4so1087783137.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 06:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790250810; x=1790855610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=HoCNZki4mLCOXFp4ND3ktutmcdSz2Nv/njaEWHHDgw8=;
-        b=XeffTZDEJgGDSYXEeqpvLBnfr0fcNV588PqnHp4dbZwBSP8/pa3iqOx2JetXeeWlni
-         TDf0FJyj2V/WBSAELUHk+8D0vPwn8pd86AHtCvzu6mtLJpcbHKdKInGyHb/uB26athkC
-         kymEmurJIe1vWLjcyynA0T4rEHINHR9ZNtqwQjEPJfD/wGsnqE7gawXaqvo04FRu0Tc6
-         kLcJ7ZojGdTzqKfzsC2OLnmS0lrbLSe3jzsgLipeOtdlkyMNjp6Jabx79apculQJqZC/
-         pbMl2aqDf2qq3cBBVhigRLNFrNWJTyzU1Uulk8fDdibBlBymVI/Zttbfty7woYbDdUwZ
-         CJtg==
+        d=gmail.com; s=20251104; t=1790258172; x=1790862972; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=mCPEAUXGiz6cbWBJSVm8BP79HYLb7Afh8BZPkZfGzyY=;
+        b=e6N3KlDwAeri/PUtPauM0tUpsO45TNg/rP7+GL9aLHIqyWqJJcVT2Va8i8SYFIavwt
+         Yie0ijxkaQDsWzSGambcEE1lAsk0ny/L/tNM3ZxImp8bcbNxCsvRDj61xA1LH2OVQyG3
+         Id33lF7FhIU7zjOaedFTss0QbQ5idgZ00D2O5zTHWZ+LeqX0CUXAg2LsGMFsDFiBUV++
+         4bt/G+6INt4yyiVkepcm/Sug+oAkXDfVAszPndIcLm8M92F/bmiA1l98Sb0kkrbrHpaX
+         0hT+ffOHcoaAZjNEtLDlL6wSCIEWnnRDjWNTuLRZPKF8RgwGYwNij/dc4NZ89Oc5gdWf
+         z+EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790250810; x=1790855610;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=HoCNZki4mLCOXFp4ND3ktutmcdSz2Nv/njaEWHHDgw8=;
-        b=EXtxz97rNMEjGu3KjYxkwDwXhGMExSqNOX87eoROZgFOeFM6d/2yq4ylK1HTTqlMzX
-         e7ZrVP3iQLWvTOOgQpPTD4Y9RLQb8vfJk2cgrLOaau6Sx6zxt19yNmeuYbuMgs3RrMNL
-         UAaopZwE9q4BBv16K0VgtzSqM/wdAliPQoxKwvzdCpfwVe/HEaOq0M38p2zqvPbbFkje
-         bjdPCPr/OPkJqnUxHx47UmiRLc3Rd51UIC9PuTHkErnzRskG/yUJx2RN6Pq1EaXmr/Ds
-         ADCH9YQOOiXDgreMY3lqm20V7sVbayWvQr0kLRGS/lZ8zjtJhyBrYurINHi7duL/OZ1L
-         yVWQ==
-X-Gm-Message-State: AFuF++k8o/34E4rLZBXk/kJV2hMBehslQKR6wwS8/m1n4Ud9WjoW26yQ
-	ks4fZFxi4LCC0PsLaVUXN5CHKKtyPdzFhLJJm2mIr35+NBDQJVPsXiisxeqfNmqd
-X-Gm-Gg: AYBFou0TxxaDwQ3YtdK8b79yHK4cSAnjnJfikitc1nnJXRFXCQt7IGIBIIJd87GU4ij
-	b9R/YYaog0bJgovMJviY30p/SsWd6Q6/eAmu9WgSsywZVgpjgvGheu1iopLjNUg6iED6F8ofuCM
-	es8XcsyRA4Z/4LZwzlpn4kfNx7qUckeySRCNfpYkBL1sGj3n892QirZ42GogRcx52eHxp+LAVsE
-	qSF4y1a/o6JyGcFe4wiTUTbBMyLhGWlJtJQoy5lHaUBx4BvixNBMA/gWURI1sUmeAmedHluMtBR
-	ByCNkPM1hVt20i25x0NSYKcbmnHZRiiSfY/Lh5t5rSztLa4PA9qNddCectyLSTIe9AP0sfVD3Vc
-	HVcgQk3HYgFjIRzDTmsPg9pE3DTilTXXOetd/mOw63RyepDJfAG9D9byELdgu4pLB7w/UPm4WA4
-	NKN7FSpkTrhiNAfRfXk+dlSLFgQyR7cbmVSEd8QlaQVy/PswnF3creGH3PjU4cfHdl3ABj0W3vo
-	qicMSZfeadrlUmNZiQ8y+LyOJi9VdwT3u/+e311yUbGWhM4Qc4qsNLIG5Pa0Rhs5HKuB0Y3tWoV
-	lMgsUB3RPYWdkpM=
-X-Received: by 2002:a05:6000:1886:b0:486:e8fa:f9b7 with SMTP id ffacd0b85a97d-488716c12f0mr3894515f8f.13.1790250809631;
-        Thu, 24 Sep 2026 04:53:29 -0700 (PDT)
-Received: from computer (ptr-178-51-241-237.dyn.orange.be. [178.51.241.237])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48868886e45sm14413282f8f.31.2026.09.24.04.53.29
+        d=1e100.net; s=20260707; t=1790258172; x=1790862972;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=mCPEAUXGiz6cbWBJSVm8BP79HYLb7Afh8BZPkZfGzyY=;
+        b=JhQRxorovo4+dFpJlW9oU/AGPhlm2bsIsplR4CosO4GDKKax9TlKo80Bdaa0u/z3JL
+         rKjCEmISFsat6GrKUuMsICkkU/ZCafbShoAgBz42sn4zR1Y+1zp8my8y1jeW06G5jmqo
+         dmuF1UU67jTwx3/98owzsAfffs7PkirhM4Jij6qa/vCVOQ9gedbyT0GEgMsuna1j7NcF
+         gwBurcjFgfAVQCLl98f4+WO37ev/KYt2r0dpgfadNbJiPVvYtwE4RYBKLA+q+PbAZrs0
+         jEV2MDDisu8cqA/8Y/cIQfZ2R+hry2OMQxUSNsmFHTxzvrIuM0OuyHo2lRoroXUlarnK
+         jZ/w==
+X-Gm-Message-State: AFuF++nVUAySBH4wh4lwmmhGObzmwvE+DpShgJiZKz0vLJBkdCFt7SId
+	c50NHqJOrNz2mwXHIWDkcbHiSgDl3DrKxRx4TSBPKLvgxgqcVz0dJcjTLvyChs8tqZY1AQ==
+X-Gm-Gg: AYBFou0TzsHxx+nzrBoTqN5WMwUcJ+4yh8g/kkg9z00prTiT4HOXkwFX9qqeNXKykuu
+	+v1CLtnwycF/vVEHlq57w8oxhPuUn2f3yz34WkIWzCn5kMlcQmKTkBoX9zjHd1/wWJkjT1uG+kS
+	z78zmV5EdIUhtEM2+FA911uQMJoc9N+gXFGFHJw6uNuD8m8QvGETXdPeuZFa8sW/wUtObijnQ9n
+	wZUjWL9qT2aPcETlMa6WV0yiM9gN272GTFZZRHrhVBDVAu85Y8GMGnUSuTog6HPFjSccxRypYQn
+	TcTcRy4EVcUBpZptHBhbPwsbDAd6ref5lG3H+OtOxNHle55fNxaj2b9Pdj3WnfSUhu+yeHAR7/J
+	7Eu+4yXii5uZwAH8iFzajD88K9Gm4/TLYpcGgi4FytJVCGeu4gfGfX0AjFZf1Bk2KMmNDjmmBae
+	w01OvdAMIpNQ8ztodQ1yewAfKU14Ozxb9y9qvcTn+ivn0BYC+g8Qlfyos+ZwTyHBTvJHtpD8nyz
+	5RlLYCGXSTg/cD/jxiitaiWZD4HpzC5UBwByG05Vk1ZmlT6dMo6eyiErO/teDvc
+X-Received: by 2002:a05:6102:6883:b0:7a7:19aa:8a83 with SMTP id ada2fe7eead31-7af1ecf279bmr1413629137.30.1790258171921;
+        Thu, 24 Sep 2026 06:56:11 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7af8bdcde81sm1493194137.10.2026.09.24.06.56.10
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 04:53:29 -0700 (PDT)
-From: Kenzi Voyer <kenzivoyer@gmail.com>
+        Thu, 24 Sep 2026 06:56:11 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Subject: [PATCH] Bluetooth: btusb: Add USB ID 13d3:3631 for MediaTek MT7925
-Date: Thu, 24 Sep 2026 13:53:28 +0200
-Message-ID: <20260924115328.15987-1-kenzivoyer@gmail.com>
+Subject: [PATCH BlueZ v2 0/8] Add HID over GATT functional tests
+Date: Thu, 24 Sep 2026 09:55:53 -0400
+Message-ID: <20260924135601.330277-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,35 +71,74 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Mercusys (TP-Link) MA37BE Wi-Fi/Bluetooth adapter uses a MediaTek
-MT7925 chip whose Bluetooth part enumerates as USB ID 13d3:3631.
-This ID is not present in the btusb device table, so the interfaces
-bind without MediaTek driver data and HCI initialization fails with:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-    Bluetooth: hci0: Opcode 0x0c03 failed: -16
+This adds functional tests for HID over GATT (HoG), with bluetoothctl
+registering a HID Service acting as a keyboard, with and without
+Shorter Connection Interval (SCI) support, using the new
+client/scripts/hog-device*.bt scripts, and the HID host:
 
-leaving no usable Bluetooth controller. Adding the ID to the MT7925
-section of the table makes the driver run the MediaTek setup path
-(firmware load) and the adapter works normally afterwards.
+ - checking HID Information, HID SCI Mode and HID SCI Information over
+   GATT with gatt.select-attribute/gatt.read
+ - receiving a few Input Reports notified by the HID device
+ - with SCI support, changing the SCI mode, followed by the connection
+   rate with mgmt.conn-subrate, and receiving the notification from
+   the HID device confirming the mode has been changed
 
-Signed-off-by: Kenzi Voyer <kenzivoyer@gmail.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+The tests are documented in doc/functional-hog.rst.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index dc7191bf4..68396d553 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -831,6 +831,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3630), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3631), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2c7c, 0x7009), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
+To support them:
+
+ - bluetoothctl can now set descriptor values from scripts, and prints
+   the MGMT Connection Subrate event
+ - btvirt defaults to the latest BR/EDR+LE version (6.2), so Shorter
+   Connection Intervals are supported by the emulated controllers,
+   with the new -C/--core option to emulate older versions
+
+Also, with -n auto, the number of functional test workers is now
+limited by the memory available instead of one per CPU, since running
+out of memory with so many VM instances made tests fail at random, and
+check-functional uses -n auto by default (override with
+CHECK_FUNCTIONAL_JOBS).
+
+v2:
+ - Add "attrib: Fix unregistering notifications registered with
+   bt_gatt_client", fixing the heap-use-after-free in
+   report_notify_destroy reported by TestFunctional on the HoG tests:
+   g_attrib_unregister did not unregister the notifications registered
+   with bt_gatt_client, so their destroy callback was called after
+   HoG had freed its reports.
+
+Luiz Augusto von Dentz (8):
+  attrib: Fix unregistering notifications registered with bt_gatt_client
+  client/gatt: Fix setting descriptor value from scripts
+  client/mgmt: Print Connection Subrate event
+  emulator: Default to the latest BR/EDR+LE version
+  client/scripts: Add HoG device scripts
+  doc: Add functional-hog documentation
+  test: functional: add HoG tests
+  test: functional: limit the workers by the memory available
+
+ Makefile.am                      |   8 +-
+ attrib/gattrib.c                 |  90 +++++++----
+ client/gatt.c                    |  25 ++-
+ client/mgmt.c                    |  31 ++++
+ client/scripts/hog-device-sci.bt |  49 ++++++
+ client/scripts/hog-device.bt     |  38 +++++
+ doc/functional-hog.rst           | 188 +++++++++++++++++++++++
+ doc/functional-testing.rst       |   1 +
+ doc/test-functional.rst          |  25 +++
+ emulator/main.c                  |  54 ++++++-
+ emulator/server.c                |  15 +-
+ emulator/server.h                |   2 +
+ test/functional/conftest.py      |  46 ++++++
+ test/functional/test_hog.py      | 252 +++++++++++++++++++++++++++++++
+ 14 files changed, 785 insertions(+), 39 deletions(-)
+ create mode 100644 client/scripts/hog-device-sci.bt
+ create mode 100644 client/scripts/hog-device.bt
+ create mode 100644 doc/functional-hog.rst
+ create mode 100644 test/functional/test_hog.py
+
 -- 
 2.55.0
 
