@@ -1,48 +1,70 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from mail.discnull.de (mail.discnull.de [46.224.56.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B421531C8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 18:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BD84C0426
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 18:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.224.56.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790274769; cv=none; b=n6YQ2k92hTifZbtoEuxFSUgYpzUzl+F/AmjpDeDalrbWo0scD2y05vVbjBQ2DofI3zGcu31UPsxF+00DTZVtc1QB5HNiyHve6d2syVl6bVP1lten6r+fCqTxzlBI2hD9YGbN5LEnovw6VHGVYXZwOHNB4ab58O/ynTF3HF43C8k=
+	t=1790276249; cv=none; b=YK06sdO1ce3vUS1znkCruhjuYo68T9oDXRwBGbyMBASWjcyboqIFZUPScLVdT1J8HKV094XMzfZb6qABFJ1vuz2LsJkjrp26iC1ud5fbyJcKKKflIYfuL9/9nXa0KQb0/Q+tfWvAUUhmgNhYT2yErCY9MuBsWUBr+ZWH8x2jACI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790274769; c=relaxed/simple;
-	bh=oh95yJPL7GwzYUZTEa6nrt0Qtvbap3kpAKexGQDTbg0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JI/qskqqoJ8GKk2ByIU8MkUoDbCAuzoameVgqao2AnMZathIia36ena/fvegxU3zTTWapPUSdSM8aSSng2oAmOdUBWWsJGp16zN0Rtl1m7WMrfHqX6m3EBY94JbR07uNmB2ZkMLwt9BgB+nPcdHGGj8zkTfMGU534ywwms8kxh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GoIO/KKK; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1790276249; c=relaxed/simple;
+	bh=ZTBCDpvvM8go96yw0ipbSR29F5obp/EEJEc5OXOyBbE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JANMlvIJCIwhhBb+NbKW1c5RPLJ6nIW8X5hec6NaWSgGuJlBrvwfO8b6i9tq4GjJW3UJ3gqkkMCZ8fQ74G2CU35yM2peradvauAJoOv2m2/Pa0HwI8T+SGKimmwUtxPBlfCzO+PLvUvpLT0GBRwDSPCX9QPb/eNmP5Q50+mHWYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=discnull.de; spf=pass smtp.mailfrom=discnull.de; dkim=pass (2048-bit key) header.d=discnull.de header.i=@discnull.de header.b=U0P2Ka3E; arc=none smtp.client-ip=46.224.56.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=discnull.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=discnull.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GoIO/KKK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1790274766;
-	bh=/lTiaDMjjDNeuIEM0ZTEwuKYoEHb9MP7byIGjKR2R/4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=GoIO/KKKTDgikWZuHIr2JLCP35PaBnQLScGG+eZpazOJ9U7geXd7+cnr/Q60KZC2r
-	 x4v6EfP/QfIucN1VJrsBLlKq2DvcQ5kvqgtMkHhLin24dP9pnnDMCrddmJpX9Iv3Fw
-	 874U6i+qadTp1WV8dMae0oARAF6WuZzrnFHuhwIw=
-Received: from github.com (hubbernetes-node-60fc855.ac4-iad.github.net [10.52.148.36])
-	by smtp.github.com (Postfix) with ESMTPA id B8086A1261
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 11:32:46 -0700 (PDT)
-Date: Thu, 24 Sep 2026 11:32:46 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1172525/b0c89b-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=discnull.de header.i=@discnull.de header.b="U0P2Ka3E"
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CADB27D45D;
+	Thu, 24 Sep 2026 20:57:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=discnull.de; s=dkim;
+	t=1790276243; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=ZTBCDpvvM8go96yw0ipbSR29F5obp/EEJEc5OXOyBbE=;
+	b=U0P2Ka3EQIG8G+mtXFM4LRcNl+MOBdXm7vhNZUvOrNR+9SRBCtDF2e/oz/jMZXQRaacII/
+	Bgp0p5vNIsROiPO5irEC3DRF0D7BES79N2J60UGjuk1g5iuC9pUYNOatPZw30FsY8oHf9H
+	c3MJmOXz/VH0LZXmdi64Nu9joRLNnntPjdRDkcmx7fEBtikJtDqHLsdIEiGfXTz/DSCt4M
+	bEdKaMeSWIzQPCW0qbyTgM6IAepNm2Bjk3DAmv7p11L+dpMCnShIvHY7qFZV9Ca3H8n9nA
+	m5Vz+d1eC0ZuYndA+ZFp2116PnsxdWJql0V+MrgiNRTGUBc4SaEYIJntOq6sXA==
+Date: Thu, 24 Sep 2026 20:57:20 +0200
+From: Alexander Sarmanow <as@discnull.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 0/2] org.bluez.LEAdvertisement: Add broadcast name
+ support
+Message-ID: <arVykKJmqbhL0pEo@machine>
+References: <20260924151720.1769259-1-as@discnull.de>
+ <CABBYNZJhvRubX7w7Wj6cKMPvSUFr-GsnqYBYJp66sWGW153Y6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJhvRubX7w7Wj6cKMPvSUFr-GsnqYBYJp66sWGW153Y6w@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-  Branch: refs/heads/1172525
-  Home:   https://github.com/bluez/bluez
+Hi Luiz,
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+thank you for your quick reply.
+
+> This is already supported on bluetoothctl; see:
+
+I was aware of the blutoothctl implementation, but my motiviation came
+from pipewire where to my knowledge no such mechanism is existing yet
+and thought it would be nice to shift it to bluetoothd. However I
+understand your perspective of what's the role of the client!
+
+> Now it doesn't seem to have the string limits you pointed out, so
+> perhaps it is worth extending it. We could, in theory move the
+> detection of the PBP uuid to bluetoothd
+
+I will take a look on both the extension of the string limits and moving
+the PBP UUID detection to the daemon.
+
+Thanks for your time.
+
+Best,
+Alexander
