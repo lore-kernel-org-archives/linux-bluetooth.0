@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13FB48B37E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F150F48CD56
 	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790342762; cv=none; b=I4DDRH5kcHbNLoTexZTLkXxr3dJcAOy/aAqFLZQuyq9hrpEqOZWgdBBgkbN95FSXveuoNj7sRnL4ZlKhZsVZ1i4QVFiPHFJiXrRtS9+Tuxa4Du1UIQDDIqceTs8zdETASD74x0vCGSJCASYHZDLzX0SyenMon2kNQ0Lb9qyAMOc=
+	t=1790342765; cv=none; b=eiEg5j997QAxVhZgVGn3VZgn1p1iPgDU7MS8nWbc/mK4BpPFI57TnxvQEPjUmDvimxsCjH6ruQrVdzURDP+OJ1HypXaJ7LEGLethQfZ9ChWd5yGH0XSAHLWIkxXZRt8NYckD8FAdSlFQnb76X32NYD1tDVPjyHo0O2cLA4+P2qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790342762; c=relaxed/simple;
-	bh=0Y5DblTUxZg5wLZPH2mclOUzvP4yRxQhUGhm0cp+FOA=;
+	s=arc-20240116; t=1790342765; c=relaxed/simple;
+	bh=m2brSgysUCkW+IVe0iXrR2XPybpfQ+o0rGk4AmUYcJo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bxSgbRbqWWDtzzSEp72DH94RiOQ1Hj8fCMPzbo4GUO40znzCy3oBEvBl3akUx00fPfTQoReBzEvZGO0wzjeZmRHTW0Gb+HEAVw4nRxAR+ray0qwQ/52RAda/aS1ALOZez1E4o564fMCDe5NC1HTi6fjhSon6rMvpMle4MFjX9ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=QkS8MbVg; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=nAPtDL0/qCALnw4ED7Wv9lzxxKbOgn/3UUWXHv0mLRXzCFyLHsbybMGD7kNFt3ZQKqKQ/etTKR7jQyOXAy9HAhHRvSjMaiTY7lXea+BUCFsYaW70lZUMTxWid90YK+BWqQqMtepqBG5qghQmb2bShe97SMt/9+Pv5ZvFGxkWJXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Xc8Jl/Ts; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="QkS8MbVg"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Xc8Jl/Ts"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1790342739;
-	bh=0Y5DblTUxZg5wLZPH2mclOUzvP4yRxQhUGhm0cp+FOA=;
+	s=mail; t=1790342738;
+	bh=m2brSgysUCkW+IVe0iXrR2XPybpfQ+o0rGk4AmUYcJo=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QkS8MbVgA0lsRhMajtZKCLOOPjthyrnwv/sWjNo7SaltzxncUASU48toddwsM2aeX
-	 V5AXpVpxTmBy1LbGsyVDlMhoPhoYekkOzcXcQoigRPslMYMb3vImtSzBjQyiOMBaJk
-	 c9GYBasz3sw5tU79TTVr0/X/rVp0QpW4ksfY4XkaNLvSak1X1scpgv1F5dkotvq4Tp
-	 mQf1cleULwYVisB3BKwa1hjjq1acOGLDeHMxxT9Cx07vslmFJ80z43WYD9OMYN4Vq3
-	 kEWsqFtQ17kXG2VHM0ZjqAhSHnMkLlpAGA13GUCktb9AavPfOlh9TTPfuNqOLzpZks
-	 nR2uHhhFKLf1g==
+	b=Xc8Jl/Tss/WqImQO1CYi91/wAO7jl0H6tMWkj+1OME7LlDDVqqh6etbiwxqyTES4d
+	 ows55HjI15YP7mqelFynWh0O+HhuvZuaWmflPPyu2N/Xk1zJuNMwgPLDh5S3OuLdyD
+	 4ZvRCBWVIAF12bhDRLNFKKrhgDDl3Xqr4Dc+9EzZmj0LOMSxzS+zQkAXHpJXBh8ZWd
+	 04KT0ejN7sAq8CAv0PIDnOSMaLcyg6i1hl2QKRyzn+V2WWnjN1u/9/d0SbAjOhRfNx
+	 yU7OFuEajxpxXln4WuXd8Y3/V/VDvY2CwR9YWb99aXTYYpVyOliOPalBMMZDeMrCtC
+	 gAGyY7hJ/Ax1A==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id F13B117E1168
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 260CC17E0E72
 	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 15:25:38 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/12] shared/hfp: Add codecs support
-Date: Fri, 25 Sep 2026 15:25:27 +0200
-Message-ID: <20260925132528.3361517-12-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 09/12] audio/hfp-hf: Add multi calls support
+Date: Fri, 25 Sep 2026 15:25:25 +0200
+Message-ID: <20260925132528.3361517-10-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260925132528.3361517-1-frederic.danis@collabora.com>
 References: <20260925132528.3361517-1-frederic.danis@collabora.com>
@@ -52,257 +52,172 @@ Content-Transfer-Encoding: 8bit
 
 From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-This send the AT+BAC command with the supported codec list during
-SLC connection.
-
-On reception of +BCS event to select a codec to use it replies with
-the same codec if it is available, or re-send the AT+BAC to re-trigger
-codec selection.
+This implements the SwapCalls, ReleaseAndAnswer, ReleaseAndSwap and
+HoldAndAnswer methods from org.bluez.Telephony1.
 ---
- src/shared/hfp.c | 164 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/hfp.h |   7 ++
- 2 files changed, 166 insertions(+), 5 deletions(-)
+ profiles/audio/hfp-hf.c | 142 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index dffad6fee..cf12f0637 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -100,6 +100,7 @@ struct hfp_hf {
- 	struct hfp_hf_callbacks *callbacks;
- 	void *callbacks_data;
- 
-+	uint32_t hf_features;
- 	uint32_t features;
- 	struct indicator ag_ind[HFP_INDICATOR_LAST];
- 	bool service;
-@@ -2235,6 +2236,101 @@ static void clip_cb(struct hfp_context *context, void *user_data)
- 							hfp->callbacks_data);
+diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
+index 1843b6758..25dce517f 100644
+--- a/profiles/audio/hfp-hf.c
++++ b/profiles/audio/hfp-hf.c
+@@ -503,6 +503,144 @@ static DBusMessage *dial(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
  }
  
-+static bool available_codecs_update(struct hfp_hf *hfp,
-+						hfp_response_func_t resp_cb,
-+						void *user_data)
++static DBusMessage *swap_calls(DBusConnection *conn, DBusMessage *msg,
++				void *profile_data)
 +{
-+	uint8_t codecs[UINT8_MAX];
-+	uint8_t len;
-+	uint32_t codecs_str_len;
-+	char *codecs_str, *ptr;
++	struct hfp_device *dev = profile_data;
++	const struct queue_entry *entry;
++	bool found_held = false;
++	bool ret;
 +
-+	len = hfp->callbacks->get_codecs(codecs, UINT8_MAX,
-+							hfp->callbacks_data);
-+	if (!len) {
-+		DBG(hfp, "hf: Failed to get supported codecs");
-+		return false;
-+	}
++	for (entry = queue_get_entries(dev->calls); entry;
++					entry = entry->next) {
++		struct call *call = entry->data;
 +
-+	/* Each codec can be up to 3 digits + comma + null terminator */
-+	codecs_str_len = len * 4 + 1;
-+	codecs_str = malloc(codecs_str_len);
-+	if (!codecs_str) {
-+		DBG(hfp, "hf: Failed to allocate memory for codecs");
-+		return false;
-+	}
-+
-+	ptr = codecs_str;
-+	for (uint8_t i = 0; i < len; i++) {
-+		int ret;
-+
-+		ret = snprintf(ptr, codecs_str_len - (ptr - codecs_str),
-+							"%u,", codecs[i]);
-+		if (ret < 0 || ret >= codecs_str_len - (ptr - codecs_str)) {
-+			DBG(hfp, "hf: Failed to format codecs string");
-+			free(codecs_str);
-+			return false;
-+		}
-+		ptr += ret;
-+	}
-+	/* Remove the trailing comma */
-+	if (ptr != codecs_str) {
-+		ptr--;
-+		*ptr = '\0';
-+	}
-+
-+	if (!hfp_hf_send_command(hfp, resp_cb, user_data, "AT+BAC=%s",
-+								codecs_str)) {
-+		DBG(hfp, "hf: Could not send AT+BAC=%s", codecs_str);
-+		free(codecs_str);
-+		return false;
-+	}
-+
-+	free(codecs_str);
-+
-+	return true;
-+}
-+
-+static void bac_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	if (result != HFP_RESULT_OK)
-+		DBG(hfp, "hf: BAC error: %d", result);
-+}
-+
-+static void bcs_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	if (result != HFP_RESULT_OK)
-+		DBG(hfp, "hf: BCS error: %d", result);
-+}
-+
-+static void bcs_cb(struct hfp_context *context, void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+	unsigned int val;
-+
-+	if (!hfp_context_get_number(context, &val))
-+		return;
-+
-+	if (!hfp->callbacks->select_codec(val, hfp->callbacks_data)) {
-+		DBG(hfp, "hf: Codec selection failed: %d", val);
-+
-+		if (!available_codecs_update(hfp, bac_resp, hfp)) {
-+			DBG(hfp, "hf: Could not re-trigger codec update");
-+			return;
++		if (call->state == CALL_STATE_HELD) {
++			found_held = true;
++			break;
 +		}
 +	}
 +
-+	if (!hfp_hf_send_command(hfp, bcs_resp, hfp, "AT+BCS=%u", val)) {
-+		DBG(hfp, "hf: Could not send AT+BCS=%u", val);
++	if (!found_held) {
++		return btd_error_failed(msg,
++					"Swap calls command failed: "
++					"no held calls");
 +	}
++
++	ret = hfp_hf_swap_calls(dev->hf, cmd_complete,
++					dbus_message_ref(msg));
++	if (!ret)
++		return btd_error_failed(msg, "Swap calls command failed");
++
++	return NULL;
 +}
 +
- static void nrec_resp(enum hfp_result result, enum hfp_error cme_err,
- 	void *user_data)
- {
-@@ -2794,17 +2890,15 @@ static void slc_brsf_cb(struct hfp_context *context, void *user_data)
- 		hfp->features = feat;
- }
- 
--static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
-+static void slc_bac_resp(enum hfp_result result, enum hfp_error cme_err,
- 	void *user_data)
- {
- 	struct hfp_hf *hfp = user_data;
- 
- 	DBG(hfp, "");
- 
--	hfp_hf_unregister(hfp, "+BRSF");
--
- 	if (result != HFP_RESULT_OK) {
--		DBG(hfp, "BRSF error: %d", result);
-+		DBG(hfp, "hf: BAC error: %d", result);
- 		goto failed;
- 	}
- 
-@@ -2829,6 +2923,46 @@ failed:
- 						hfp->callbacks_data);
- }
- 
-+static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
++static DBusMessage *release_and_answer(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data)
 +{
-+	struct hfp_hf *hfp = user_data;
++	struct hfp_device *dev = profile_data;
++	const struct queue_entry *entry;
++	bool found_active = false;
++	bool found_waiting = false;
++	bool ret;
 +
-+	DBG(hfp, "");
++	for (entry = queue_get_entries(dev->calls); entry;
++					entry = entry->next) {
++		struct call *call = entry->data;
 +
-+	hfp_hf_unregister(hfp, "+BRSF");
-+
-+	if (result != HFP_RESULT_OK) {
-+		DBG(hfp, "BRSF error: %d", result);
-+		goto failed;
++		if (call->state == CALL_STATE_ACTIVE)
++			found_active = true;
++		else if (call->state == CALL_STATE_WAITING)
++			found_waiting = true;
 +	}
 +
-+	/* Continue with SLC creation */
-+	if (!(hfp->hf_features & HFP_HF_FEAT_CODEC_NEGOTIATION) ||
-+			!(hfp->features & HFP_AG_FEAT_CODEC_NEGOTIATION)) {
-+		/* Jump to next setup state */
-+		slc_bac_resp(HFP_RESULT_OK, cme_err, user_data);
-+		return;
++	if (!found_active || !found_waiting) {
++		return btd_error_failed(msg,
++					"Release and answer command failed: "
++					"no active and waiting calls");
 +	}
 +
-+	if (!hfp_hf_register(hfp, bcs_cb, "+BCS", hfp, NULL)) {
-+		DBG(hfp, "hf: Could not register for +BCS");
-+		result = HFP_RESULT_ERROR;
-+		goto failed;
-+	}
++	ret = hfp_hf_release_and_accept(dev->hf, cmd_complete,
++					dbus_message_ref(msg));
++	if (!ret)
++		return btd_error_failed(msg,
++					"Release and answer command failed");
 +
-+	if (!available_codecs_update(hfp, slc_bac_resp, hfp)) {
-+		DBG(hfp, "hf: Could not send AT+BAC");
-+		result = HFP_RESULT_ERROR;
-+		goto failed;
-+	}
-+
-+failed:
-+	if (hfp->callbacks->session_ready)
-+		hfp->callbacks->session_ready(result, cme_err,
-+						hfp->callbacks_data);
++	return NULL;
 +}
 +
- bool hfp_hf_session_register(struct hfp_hf *hfp,
- 				struct hfp_hf_callbacks *callbacks,
- 				void *callbacks_data)
-@@ -2849,11 +2983,15 @@ bool hfp_hf_session(struct hfp_hf *hfp)
- 
- 	DBG(hfp, "");
- 
-+	hfp->hf_features = HFP_HF_FEATURES;
-+	if (hfp->callbacks->get_codecs && hfp->callbacks->select_codec)
-+		hfp->hf_features |= HFP_HF_FEAT_CODEC_NEGOTIATION;
-+
- 	if (!hfp_hf_register(hfp, slc_brsf_cb, "+BRSF", hfp, NULL))
- 		return false;
- 
- 	return hfp_hf_send_command(hfp, slc_brsf_resp, hfp,
--					"AT+BRSF=%u", HFP_HF_FEATURES);
-+					"AT+BRSF=%u", hfp->hf_features);
- }
- 
- const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
-@@ -3090,3 +3228,19 @@ bool hfp_hf_call_hangup(struct hfp_hf *hfp, uint id,
- 
- 	return false;
- }
-+
-+bool hfp_hf_request_codec_connection(struct hfp_hf *hfp,
-+				hfp_response_func_t resp_cb,
-+				void *user_data)
++static DBusMessage *release_and_swap(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data)
 +{
-+	if (!hfp)
-+		return false;
++	struct hfp_device *dev = profile_data;
++	const struct queue_entry *entry;
++	bool found_active = false;
++	bool found_held = false;
++	bool ret;
 +
-+	if (!(hfp->hf_features & HFP_HF_FEAT_CODEC_NEGOTIATION) ||
-+			!(hfp->features & HFP_AG_FEAT_CODEC_NEGOTIATION)) {
-+		DBG(hfp, "hf: Codec negotiation not supported");
-+		return false;
++	for (entry = queue_get_entries(dev->calls); entry;
++					entry = entry->next) {
++		struct call *call = entry->data;
++
++		if (call->state == CALL_STATE_WAITING) {
++			return btd_error_failed(msg,
++					"Release and swap command failed: "
++					"waiting call exists");
++		} else if (call->state == CALL_STATE_ACTIVE)
++			found_active = true;
++		else if (call->state == CALL_STATE_HELD)
++			found_held = true;
 +	}
 +
-+	return hfp_hf_send_command(hfp, resp_cb, user_data, "AT+BCC");
-+}
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 11610018e..a3b956cf5 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -220,6 +220,9 @@ struct hfp_hf_callbacks {
- 	void (*call_line_id_updated)(uint id, const char *number, uint type,
- 							void *user_data);
- 	void (*call_mpty_updated)(uint id, bool mpty, void *user_data);
-+	uint8_t (*get_codecs)(uint8_t *codecs, uint8_t max_codecs,
-+							void *user_data);
-+	bool (*select_codec)(uint8_t codec, void *user_data);
- };
- 
- struct hfp_hf *hfp_hf_new(int fd);
-@@ -270,3 +273,7 @@ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
- bool hfp_hf_call_hangup(struct hfp_hf *hfp, uint id,
- 				hfp_response_func_t resp_cb,
- 				void *user_data);
++	if (!found_active || !found_held) {
++		return btd_error_failed(msg,
++					"Release and swap command failed: "
++					"no active and held calls");
++	}
 +
-+bool hfp_hf_request_codec_connection(struct hfp_hf *hfp,
-+				hfp_response_func_t resp_cb,
-+				void *user_data);
++	ret = hfp_hf_release_and_accept(dev->hf, cmd_complete,
++					dbus_message_ref(msg));
++	if (!ret)
++		return btd_error_failed(msg,
++					"Release and swap command failed");
++
++	return NULL;
++}
++
++static DBusMessage *hold_and_answer(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data)
++{
++	struct hfp_device *dev = profile_data;
++	const struct queue_entry *entry;
++	bool found_active = false;
++	bool found_waiting = false;
++	bool ret;
++
++	for (entry = queue_get_entries(dev->calls); entry;
++					entry = entry->next) {
++		struct call *call = entry->data;
++
++		if (call->state == CALL_STATE_ACTIVE)
++			found_active = true;
++		else if (call->state == CALL_STATE_WAITING)
++			found_waiting = true;
++	}
++
++	if (!found_active || !found_waiting) {
++		return btd_error_failed(msg,
++					"Hold and answer command failed: "
++					"no active and waiting calls");
++	}
++
++	ret = hfp_hf_swap_calls(dev->hf, cmd_complete,
++					dbus_message_ref(msg));
++	if (!ret)
++		return btd_error_failed(msg,
++					"Hold and answer command failed");
++
++	return NULL;
++}
++
+ static DBusMessage *hangup_all(DBusConnection *conn, DBusMessage *msg,
+ 				void *profile_data)
+ {
+@@ -569,6 +707,10 @@ static DBusMessage *call_hangup(DBusConnection *conn, DBusMessage *msg,
+ 
+ struct telephony_callbacks hfp_callbacks = {
+ 	.dial = dial,
++	.swap_calls = swap_calls,
++	.release_and_answer = release_and_answer,
++	.release_and_swap = release_and_swap,
++	.hold_and_answer = hold_and_answer,
+ 	.hangup_all = hangup_all,
+ 	.send_tones = send_tones,
+ 	.call_answer = call_answer,
 -- 
 2.43.0
 
