@@ -1,331 +1,201 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D96449E130
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790342768; cv=none; b=McQgOspAZHVwipiMzp0G28D5ydw3x2XVf4AAZneAx69Q40+p+cif30AFqBbk8zMzGtcwhKBFr7ggyEq7dVeDg5/gnIptRx4QUf/Pu+WYjY5i5qQE5OA5wsKOh/I+Id/mqicTQJIQB1NZhPR3zybkaWMXHC+J1FLi1AT7qA/Abyg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790342768; c=relaxed/simple;
-	bh=RQJrnDTHo5SJuz0MJf3zL4xer+c0SjWHkyLRn73yZqE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=beyEL+ZwtNwXmIi/0MM1ob1nYc3t1nUnRIjASvdHwPMSi7JwWRCa9IZ8UoYZiONsTvVXYMjX5pc/mWX7/HqlMVZVkc4RaGbKJ3ZsRzpvGB3qmX9VMA9JDwT08K4R2w4sKFLayhW8CgeELuezvA9/AiIYUTtYnp8tb1nOTirABUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=KIVP3xc4; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12DD481FAA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790343551; cv=pass; b=U4EBeRT+0aWfgVUh/TMn5ai4lLXtz1km7NRY5VHlXZDijyR3tHshanm/D6suEvXfENN6uSdehHIDRiolckvPa/2J06ecGtuRZMeEd7qSsXbh9Mka2sBeOTVJBHV/R6En6yqMQ0XQsEwXfdOymJpofCXNymAhKiDDKTcsEdpCBRo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790343551; c=relaxed/simple;
+	bh=kqdNlwg778/987rRPFcemtjB5R0/alDQShoyszIUXi0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CZxoQFvZFFEa6hgQDmI51SHQhkVyt9ONzRjqH9FMAehvJsKl9YQiLJMQZOkEKdOytO7gfTlDtUPNLH72dRal5sxn54XzxERxAwJrQT8YTQM8pJJkEbi3Hdvla7lu4H8Y0sfav1lTz9THGj80ArHSnopINKSbIReLPvOVL3X3UAE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=CiFirrNM; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=OjLnN41T; arc=pass smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="KIVP3xc4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1790342739;
-	bh=RQJrnDTHo5SJuz0MJf3zL4xer+c0SjWHkyLRn73yZqE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=KIVP3xc4eq9wsGZGo6cmu33zxqqWsw2UBX5U1TG/c96mHJWedB64WcrA9JTChobLO
-	 7/avNokCayVHjTmjILdzRzJAo5WVUqC/pKyVImDiSrm4y5Pq4Y+nBBTUl4Y5lie/RB
-	 bnW9l82DqGEcq/mxBeBImj7vN9zdl34yrJfJ/TBX2QDgrXQdY5U3miqmWEk9SnGklg
-	 bGXR3uM4c2TbjHdjNtHDl325E2wPFg1oHtHU4ZHfU6RDY5JWoWmwtjCGKWp8fWBH/X
-	 Z3eK3uPo7mIwxwGM+uYzk/SM+/3QSItwpz8jFV6sCWIGoz9oAYoX+zcyIcfS2pJeiw
-	 u8SDBsmP1R26w==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4310617E12A1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 15:25:39 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/12] audio/hfp-hf: Add codecs support
-Date: Fri, 25 Sep 2026 15:25:28 +0200
-Message-ID: <20260925132528.3361517-13-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260925132528.3361517-1-frederic.danis@collabora.com>
-References: <20260925132528.3361517-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="CiFirrNM";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="OjLnN41T"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68P5JPWp3628311
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:39:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	kDqgsZ4XGZtl4jjOzkJ5PS9aFgMs5r1UIrTA9EsegCY=; b=CiFirrNMJE46vkez
+	ab/ALVoKzVYq3KdM+wurlRbp1B6pozl0+xZlajKqHYhciUozzuBY7HlW4B9bEgeq
+	01aTayxTFbLZjXcK2kUyA4C5CGDxayVgrjT12DPiulgqZp8+24MXVbQFUBKalGN5
+	p9GwIgBIhMFeCrnL/r+4yFxTmyyyZcUvwHKtmgVueHEfPC1dTHXv2IcCvaA5pY9E
+	bXsatblJpbCU9xw3/A1vAwABdtqMVYDxHNRpOtBokCQv+9P5D3KSurkRHYF8jsvl
+	7RxWADkv+Ho9B8J+D3C4m7HNizpmI3Gz6NL7dRH63YIWrYea4jFZFF+zLX2j8bQ9
+	XChfMQ==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gwjq39j43-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:39:08 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-530d206e2b4so19391831cf.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 06:39:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790343548; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ZQ1DqcCKVHtXnQuGQl+IXM4Fyy8MbVuFAbjIwKbjC7Y0jKD7Mt1Cibu6Tx88lYC+E1
+         h1sFfBI7tQfTkFltQ1YjgGhdXjSDD71sR6TU/mEjsPoJZ3Ws8vG+O2evtsGw1DVCiwHo
+         PnLr2e4oVEfWFiOcsmGtmqP8Gh5YjqbwvQwnBo5ws0PItS4skFDFx/7AJS2J2Qw47B0z
+         ElJ1yFN5V+NnWhTAejw7BcSDJbZ6F0tYM6OmX8qa1DUx4ZsCGNm/4R6xLNrTXrnUZcqe
+         gTd30TkXi9cZsVGwGbU2lMv+p61ttNR5uoC5JQQDExIuTUBQ+cPOhUKP0S95vI1eCTiN
+         BWog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=kDqgsZ4XGZtl4jjOzkJ5PS9aFgMs5r1UIrTA9EsegCY=;
+        fh=qCTzLkCwi1CYxLa9wfD1EEAvQlH6UTNiCeQW/erkZXI=;
+        b=N3CJAjuQHVH4cOa/RvsKX2X1caIMy7UNuKxcj7tkweoxxhX9EPsyhFUKi02biTXxXE
+         na8HkRV/fK1ipXIiSXkT8+tn13Kc5QHm3btKx0H2Z++xpb7NBUlXw3lXDxaqhiivbrUf
+         oVV1fotDTcAF3YdgM/DSUacq2kryNLOzwpm+SuvSYFXAhy7A5k0jpb97YQj75qQionk+
+         +6K4gyZJWPjYSZ//QEWv7i/YpqkEupdgJC1G+Kv+QUBjLMNlHd1XgtmV0tPLZxW5r5rG
+         f4sgvU/EA96pHqQaNoPpDYp3HgZBhYVwbhSPcpbN+IVI2PFZpEBV9YcmwSUXLZS3yPoe
+         nUvw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1790343548; x=1790948348; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=kDqgsZ4XGZtl4jjOzkJ5PS9aFgMs5r1UIrTA9EsegCY=;
+        b=OjLnN41TvHXUGa7MBrf9fj+CrpaWlDp6jgP20kUZ79RYwBnqHsD2K/ZHsBfxJr0C6X
+         5bLg4kK6XWXCGlWpS4+g8GmhWc5sivFMkZ6UPcPR0PfTiZKGAXGfrZJAn1JrUrO9v3pL
+         +o/3NTphHMc1pEr1w9tuiniwaSWa84DJXKLHsZJBOqqauXJKVeciIGSFjrUGEe+xevFE
+         0tu5GV/o/wBP/LDnwxL4ckGIva0g4Fy9erhgynszry1UC2kIN6hUmqZne6dnMQMW7GsT
+         RLoI9Iw1mSzZIhFcCnl5EDBJRUTgLvqYhyFIIEVyfYO8DPzOfGwQ8Vznq6kgHkRZsrq9
+         XTNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790343548; x=1790948348;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kDqgsZ4XGZtl4jjOzkJ5PS9aFgMs5r1UIrTA9EsegCY=;
+        b=EzOraPzR8zImNCD9Er0QcwtidHnv06cO+8AB9n/+n9q0kPcWGdMvyKE4+hu1Ma+BJ0
+         kUK9XLFHpP9e80V4R9pXFG0L++0CIXdWT/Tevvu7yD28flly3HhQxZ0WlSPqsOLAiDeD
+         tdBJfIO4dU+0tJD/VxHTSzC2ArrcBcuL61SiP94pmbUJE2uXlrUQO8YkVgz/kdaJ/Ll1
+         KYcNs4yrxFpzAVYRyfVeCz70KhVfeVZn54kqJV7TmsynSpdPv9eJsDLYvfgRaCrWreaz
+         YzhcayCzxRyNcqS8W0xMai9JbpnSlkH9cF1E6aXKHaqpwtVV4dPDnzQf2x7ZsDtbkbBH
+         obzQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwv6HysCe64UwnQZ3yda5MVe3uH10U6kqx8h4JWZi3IjVtGkVwtBtUvvDgDVF9PHIb2acV4HmeRAVfXOmIfHI0=@vger.kernel.org
+X-Gm-Message-State: AFuF++llvN5MzXrnqh9DI4BJKeti1zHmuTJCtdXF2N8FsCyKPAe0SczW
+	SG8vyUBwP8PXGbc2uUY56FYF9HRyvuf4nxYc0XuMQOfUOnoHovslt0h2fBsfLhAB0N6fDhw1otq
+	/5bwecTuhg6A54qgYOr+RCpTllvLt0Lm50sCumTQRGqeE0r75t57xSVJX+d+csnSZmT6FXWX/PF
+	HHK8JNBA5FmzFSxwCdso74PjOdv06FwgFooyAPtMmROq2hYA==
+X-Gm-Gg: AYBFou21DrHM5kXON+/irAw0KbIe08+qmKkn6tFlHusq+1oWvrZbrjtoJibLZZTQbCC
+	UW5ebq4PDkLpGZvyFpHJQLEghr7jpLrbRrOlO+WuTHum5/3boAK8HDzgim33DfL4EzguGt0A5Fn
+	IOR/iQuvAHaPJnX3Vv0PBCj3pKR6IXeP51NuJuJgyTgUW0hn24290HxWXJfsNRTZB35DFoZXCKu
+	ixnSERdyx9Vn5S7LhYV43LFt6pW9GfIBmEY2PncPO7W2J02oroJNpIe0BGolW19llUpbYDKG4k=
+X-Received: by 2002:a05:620a:4588:b0:93b:fbf0:8791 with SMTP id af79cd13be357-93c43bf1ff2mr431888985a.29.1790343547625;
+        Fri, 25 Sep 2026 06:39:07 -0700 (PDT)
+X-Received: by 2002:a05:620a:4588:b0:93b:fbf0:8791 with SMTP id
+ af79cd13be357-93c43bf1ff2mr431882585a.29.1790343547133; Fri, 25 Sep 2026
+ 06:39:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20260806-block-as-nvmem-v10-0-be598b2a5606@oss.qualcomm.com> <178998281449.889291.7893229102394463283.b4-ty@kernel.org>
+In-Reply-To: <178998281449.889291.7893229102394463283.b4-ty@kernel.org>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Fri, 25 Sep 2026 15:38:56 +0200
+X-Gm-Features: AclHuK99T0Ubawi22EyQadvbidnQEmVlySi-fMkWCvta4a9Udx0OX1G_I0L1lvQ
+Message-ID: <CAFEp6-2P14MdYJGuH6ygRL4ZKtLnJEj=PVMx2p+b9L1RuiX1dg@mail.gmail.com>
+Subject: Re: (subset) [PATCH v10 00/10] Support for block device NVMEM providers
+To: Jens Axboe <axboe@kernel.dk>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Srinivas Kandagatla <srini@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>,
+        Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        daniel@makrotopia.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI1MDA1NCBTYWx0ZWRfXz+wMyxzhx8Pv
+ ZGzXfCiiHucTnNSG9Ds+F3Tykz843y4HFz/HpiAL9VDrwQGIWT+H+k5MHIMgikqX0+byOyxbnJr
+ VOtlaQWTnqTGL2xxSSffnJIIaN7KHIM=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI1MDA1NCBTYWx0ZWRfXy5mDYjQ9qb/H
+ whtwM4URr8qkbgjjCiRTWAtgKBbZNJBchZRl2Nu9fhhTmB+TkixXvL5RsQyRPupJgZJPqLHkxMv
+ WyXUjhM2Psz++0Ldn69rd/lqkJ/jOgS9sY3fB8YmsfRsFxZwyNn+NzCid/S73uzuc9QaDM87Mp2
+ ry/MkjfcM2TNVDMohLUgIVUR6fUigG3mIfseguzfHjwf0Gl7AkhvV58jqV5EpSfh/GusJgaoi16
+ rgmLNqZ8GLUI8g9OFv6fugtO8EBJUecj/OOYRbZGgKPwC3JUnrMcqIrnIL8+sB2q9ybkz7NJ33b
+ 9kD4RRTHMWfSSGbfunUr49NsbtwgRLo20BrCBGjqECDoez6z7qBmWwdddy02ymk5hAuo+qBF8xq
+ rOieeVhHW4E3m+MBndpwaYl67SkYf4Qqz8Lz4BsdneMSQqlDAiPuEH0cDiGbpQWL+YmjDucvbNG
+ ndjtjuUjQ/O0/cs9+MQ==
+X-Authority-Analysis: v=2.4 cv=VuO2kO2n c=1 sm=1 tr=0 ts=6ab6797c cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=yx91gb_oNiZeI1HMLzn7:22 a=VwQbUJbxAAAA:8 a=MW6_J8xfeE2cRKj6bkYA:9
+ a=QEXdDO2ut3YA:10 a=a_PwQJl-kcHnX1M80qC6:22
+X-Proofpoint-GUID: Y6hErwtD6Xds_2rpf8GEgaV8TSPsj3SU
+X-Proofpoint-ORIG-GUID: Y6hErwtD6Xds_2rpf8GEgaV8TSPsj3SU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-25_02,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0 spamscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609250054
 
-From: Frédéric Danis <frederic.danis.oss@gmail.com>
+Hi Jens, Luiz,
 
----
- profiles/audio/hfp-hf.c | 171 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 152 insertions(+), 19 deletions(-)
+On Mon, Sep 21, 2026 at 11:27=E2=80=AFAM Srinivas Kandagatla <srini@kernel.=
+org> wrote:
+>
+>
+> On Thu, 06 Aug 2026 16:38:33 +0200, Loic Poulain wrote:
+> > On embedded devices, it is common for factory provisioning to store
+> > device-specific information, such as Ethernet or WiFi MAC addresses,
+> > in a dedicated area of an eMMC partition. This avoids the need for
+> > and additional EEPROM/OTP and leverages the persistence of eMMC.
+> >
+> > One example is the Arduino UNO-Q, where the WiFi MAC address and the
+> > Bluetooth Device address are stored in the eMMC Boot1 partition.
+> >
+> > [...]
+>
+> Applied, thanks!
+>
+> [04/10] nvmem: layouts: Support fixed-layout as the nvmem device node its=
+elf
+>         commit: 9c6cab93dcd47c3075d896c777567b9d8f813d18
 
-diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
-index 25dce517f..4e626653d 100644
---- a/profiles/audio/hfp-hf.c
-+++ b/profiles/audio/hfp-hf.c
-@@ -65,11 +65,19 @@
- 
- #define HFP_HF_SDP_FEATURES	(HFP_HF_SDP_ECNR | HFP_HF_SDP_3WAY |\
- 				HFP_HF_SDP_CLIP |\
--				HFP_HF_SDP_REMOTE_VOLUME_CONTROL)
-+				HFP_HF_SDP_REMOTE_VOLUME_CONTROL |\
-+				HFP_HF_SDP_WIDE_BAND_SPEECH |\
-+				HFP_HF_SDP_SUPER_WIDE_BAND_SPEECH)
- 
- #define URI	"tel"
- #define URI_PREFIX	URI ":"
- 
-+struct connect_data {
-+	struct hfp_device *dev;
-+	void (*cb)(int status, void *data);
-+	void *cb_user_data;
-+};
-+
- struct hfp_device {
- 	struct telephony	*telephony;
- 	uint16_t		version;
-@@ -81,6 +89,7 @@ struct hfp_device {
- 	struct queue		*calls;
- 	uint8_t			codec;
- 	unsigned int		resume_id;
-+	struct connect_data	*pending_connect;
- 	hfp_hf_sco_closed_cb	sco_closed_cb;
- 	void			*sco_closed_data;
- };
-@@ -169,6 +178,20 @@ static bool call_id_cmp(const void *data, const void *match_data)
- 	return call->idx == id;
- }
- 
-+static void sco_connect_complete(struct connect_data *connect_data, int status)
-+{
-+	if (!connect_data)
-+		return;
-+
-+	if (connect_data->dev->pending_connect == connect_data)
-+		connect_data->dev->pending_connect = NULL;
-+
-+	if (connect_data->cb)
-+		connect_data->cb(status, connect_data->cb_user_data);
-+
-+	g_free(connect_data);
-+}
-+
- static void device_destroy(struct hfp_device *dev)
- {
- 	struct hfp_server *server;
-@@ -177,6 +200,9 @@ static void device_destroy(struct hfp_device *dev)
- 
- 	telephony_set_state(dev->telephony, DISCONNECTING);
- 
-+	if (dev->pending_connect)
-+		sco_connect_complete(dev->pending_connect, -ENOTCONN);
-+
- 	if (dev->hf) {
- 		hfp_hf_unref(dev->hf);
- 		dev->hf = NULL;
-@@ -329,6 +355,49 @@ static void hfp_hf_call_line_id_updated(uint id, const char *number,
- 	telephony_call_set_line_id(call, number);
- }
- 
-+static uint8_t hfp_hf_get_codecs(uint8_t *codecs, uint8_t max_codecs,
-+							void *user_data)
-+{
-+	struct hfp_device *dev = user_data;
-+	struct btd_adapter *adapter;
-+	struct hfp_server *server;
-+	GSList *l;
-+	uint8_t i = 0;
-+
-+	adapter = device_get_adapter(telephony_get_device(dev->telephony));
-+	server = find_server(servers, adapter);
-+
-+	for (l = server->endpoints; l; l = l->next) {
-+		codecs[i++] = media_endpoint_get_codec(l->data);
-+		if (i >= max_codecs)
-+			break;
-+	}
-+
-+	return i;
-+}
-+
-+static bool hfp_hf_select_codec(uint8_t codec, void *user_data)
-+{
-+	struct hfp_device *dev = user_data;
-+	struct btd_adapter *adapter;
-+	struct hfp_server *server;
-+	GSList *l;
-+
-+	DBG("Selecting codec: %u", codec);
-+	adapter = device_get_adapter(telephony_get_device(dev->telephony));
-+	server = find_server(servers, adapter);
-+
-+	for (l = server->endpoints; l; l = l->next) {
-+		if (media_endpoint_get_codec(l->data) == codec) {
-+			dev->codec = codec;
-+			return true;
-+		}
-+	}
-+
-+	DBG("Unsupported codec: %u", codec);
-+	return false;
-+}
-+
- static struct hfp_hf_callbacks hf_session_callbacks = {
- 	.session_ready = hfp_hf_session_ready_cb,
- 	.update_indicator = hfp_hf_update_indicator,
-@@ -338,6 +407,8 @@ static struct hfp_hf_callbacks hf_session_callbacks = {
- 	.call_removed = hfp_hf_call_removed,
- 	.call_status_updated = hfp_hf_call_status_updated,
- 	.call_line_id_updated = hfp_hf_call_line_id_updated,
-+	.get_codecs = hfp_hf_get_codecs,
-+	.select_codec = hfp_hf_select_codec,
- };
- 
- static void hfp_disconnect_watch(void *user_data)
-@@ -991,23 +1062,6 @@ static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond, void *data)
- 	return FALSE;
- }
- 
--struct connect_data {
--	struct hfp_device *dev;
--	void (*cb)(int status, void *data);
--	void *cb_user_data;
--};
--
--static void sco_connect_complete(struct connect_data *connect_data, int status)
--{
--	if (!connect_data || !connect_data->cb)
--		goto done;
--
--	connect_data->cb(status, connect_data->cb_user_data);
--
--done:
--	g_free(connect_data);
--}
--
- static void sco_connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- {
- 	struct connect_data *connect_data = user_data;
-@@ -1109,6 +1163,62 @@ static void sco_connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	sco_connect_complete(connect_data, 0);
- }
- 
-+static void confirm_cb(GIOChannel *io, gpointer user_data)
-+{
-+	bdaddr_t src, dst;
-+	char address[18];
-+	struct btd_device *device;
-+	struct btd_service *service;
-+	struct hfp_device *dev = NULL;
-+	int voice;
-+	GError *err = NULL;
-+
-+	if (!bt_io_get(io, &err,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_INVALID)) {
-+		error("Unable to get destination address: %s", err->message);
-+		g_clear_error(&err);
-+		goto drop;
-+	}
-+
-+	DBG("Incoming SCO connection from %s", address);
-+
-+	device = btd_adapter_find_device(adapter_find(&src), &dst,
-+								BDADDR_BREDR);
-+	if (!device)
-+		goto drop;
-+
-+	service = btd_device_get_service(device, HFP_AG_UUID);
-+	if (!service)
-+		goto drop;
-+
-+	dev = btd_service_get_user_data(service);
-+	voice = dev->codec == 1 ? BT_VOICE_CVSD_16BIT : BT_VOICE_TRANSPARENT;
-+
-+	if (!bt_io_set(io, &err, BT_IO_OPT_VOICE, voice, BT_IO_OPT_INVALID)) {
-+		error("Could not set voice settings on SCO IO: %s",
-+								err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	if (!bt_io_accept(io, sco_connect_cb, dev->pending_connect, NULL,
-+								&err)) {
-+		error("bt_io_accept() failed: %s", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	return;
-+
-+drop:
-+	if (dev && dev->pending_connect)
-+		sco_connect_complete(dev->pending_connect, -EIO);
-+	g_io_channel_shutdown(io, TRUE, NULL);
-+}
-+
- bool hfp_hf_sco_listen(struct btd_adapter *adapter, void *endpoint)
- {
- 	struct hfp_server *server;
-@@ -1126,7 +1236,7 @@ bool hfp_hf_sco_listen(struct btd_adapter *adapter, void *endpoint)
- 	if (server->sco_io)
- 		return true;
- 
--	server->sco_io = bt_io_listen(sco_connect_cb, NULL, NULL, NULL,
-+	server->sco_io = bt_io_listen(NULL, confirm_cb, NULL, NULL,
- 				&err,
- 				BT_IO_OPT_SOURCE_BDADDR,
- 				btd_adapter_get_address(server->adapter),
-@@ -1190,6 +1300,16 @@ uint16_t hfp_hf_device_get_omtu(struct hfp_device *dev)
- 	return dev->omtu;
- }
- 
-+static void req_codec_connection_complete(enum hfp_result res,
-+						enum hfp_error cme_err,
-+						void *user_data)
-+{
-+	struct connect_data *connect_data = user_data;
-+
-+	if (res != HFP_RESULT_OK)
-+		sco_connect_complete(connect_data, -EIO);
-+}
-+
- static gboolean sco_start_cb(gpointer data)
- {
- 	struct connect_data *connect_data = data;
-@@ -1211,6 +1331,11 @@ unsigned int hfp_hf_sco_start(struct hfp_device *dev, void *cb, void *user_data)
- 
- 	DBG("codec %u", dev->codec);
- 
-+	if (dev->pending_connect) {
-+		error("SCO connect already in progress");
-+		return 0;
-+	}
-+
- 	connect_data = g_new0(struct connect_data, 1);
- 	connect_data->dev = dev;
- 	connect_data->cb = cb;
-@@ -1219,6 +1344,13 @@ unsigned int hfp_hf_sco_start(struct hfp_device *dev, void *cb, void *user_data)
- 	src = telephony_get_src(dev->telephony);
- 	dst = telephony_get_dst(dev->telephony);
- 	if (!dev->sco_io) {
-+		if (hfp_hf_request_codec_connection(dev->hf,
-+						req_codec_connection_complete,
-+						connect_data)) {
-+			dev->pending_connect = connect_data;
-+			goto done;
-+		}
-+
- 		io = bt_io_connect(sco_connect_cb, connect_data, NULL, &err,
- 			BT_IO_OPT_SOURCE_BDADDR, &src,
- 			BT_IO_OPT_DEST_BDADDR, &dst,
-@@ -1234,6 +1366,7 @@ unsigned int hfp_hf_sco_start(struct hfp_device *dev, void *cb, void *user_data)
- 		g_idle_add(sco_start_cb, connect_data);
- 	}
- 
-+done:
- 	return (++dev->resume_id);
- }
- 
--- 
-2.43.0
+If you're happy with the current state, would you mind picking up the
+block-related and Bluetooth-related patches in the respective trees?
+They are independent.
 
+Thanks,
+Loic
