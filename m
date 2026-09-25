@@ -1,81 +1,603 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D39F40B110
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 22:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B82171BB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 00:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790289081; cv=none; b=Gk9JxE5E/1mv1RVOadQ9UA0YLCYL4utIZ1SbNCQOAXcj4aT4FgRV8D1R6IpUeqFS6/7GmXN8fOco8QNX88A+ImHKqGIfDfHWahoeH5KhB/+R+saIaEzndc7aoMQcIVv0CXUg1MAbVSBh39J33YDb2g7n92ahixjEEVP9tB1qFYk=
+	t=1790294674; cv=none; b=bObLLIBWeB+f9+npT3ircZngx1RPaTD+pW6t19/YvDNQJRjkkKl7ZxJFPYVTIZA7chKF25GG12u7OvnqxCOJaM1JkqiN4p9HxGPaavMtJoehoMVMeAEnPCqDNlaZIsnRW/Dud3sp7MI2OlsCulDjdmmjISSXklyuo+CO+BGdTAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790289081; c=relaxed/simple;
-	bh=ecdIHZqVMLyWrrCv1Gr9B/OCHkzaS0oJJOD1x6wwPaQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T63HXJVVEHWolo+hp6o3W9dfCKlzog5p067gYdyFwN/NZJm3O3tXdg87wTqFXDqPHYrFeYDNGkUev6/08uNvorCDRJdViilXDZ2fo+YyEI+1gtapO5x1Q0kvwE3SKKRaryBCu5sUOVcS8Nry91gOBuvToPIgW0W2obviegVMbFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELS9s8DW; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790294674; c=relaxed/simple;
+	bh=G3XwY4/jJQshrHSpBbOtK4RJWXT2FCFY38ctKDZPJCg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PwP9ZEDQ8SZAWzg5OpvocalduM/iCwdokZI1DE1VTDHB9e+FWk0BTKXCMi+/J7V/fX3VyBjURLCMMkuN0P0A1kIqp9g0QGlJNS/rKTPNGKpY2ALbzgY/Jr+hcMibTejfnlwmShSp4sA1nEJrcZsBnC1jUf0B7xdOVtzFB4I4Xu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ijRckUCI; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELS9s8DW"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5c985f055b9so391388e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 15:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790289075; x=1790893875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=E8ZKs6ImyGHAlHvCd+FjTfbPpK8HFT9GvplULghOVmk=;
-        b=ELS9s8DWzanLXlwik3dgeeIHIFiukRRXccs/xL+u2MMf7TZ/2hsxneqiz2xxAISQfb
-         af/0uvpxDMcfsn/lPMoJGDgV67uUnoz084B5mlFqLY5ts0/FlFhbV8SC3BrC4fhhT2Hj
-         0YKh3cx30t5WidHYCSEd32xTK7UaZnptVNHu7CllmpabvJnPykBCjLOrHzvuaSMMsuR+
-         GxK78qhheyrwcWAXrWEW+BDVvPF55xi+j5JHsksYUVIQzIqb0Xs576Vl58FItZqcPB5G
-         A5L1LkanKyxNoucNx6dl4hRHoF+SH8enqGbH2AGapOoM+JwMsaUNmaAU1DGcwWSla7Ey
-         U6vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790289075; x=1790893875;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=E8ZKs6ImyGHAlHvCd+FjTfbPpK8HFT9GvplULghOVmk=;
-        b=SZ/PUCWwuPvtGk7aFbUW9XmTZSXJXiB0h0P3G2SgDYIuaJ2E6zDaeWYvjgaCW3rpIi
-         0DNHtGO0uaHSYetX/KlOxuvTG5Cn2peAz2H/jJEwiJSBZjBAQi7wu/Lm5/amVdnrOPWv
-         0PHyN+3ejGGVyGr7syyG+2ZST/f2pStWzG1fsuhsZwfCK/gV4DJGnPZEGkhfpw1/Yg0M
-         ccsXqrLxsy5+lXtc3bTAW8NKuvECRoeL8+rALyoQfQBjXHcQokLxNJDg4VsnW1MkoWc7
-         cr5ZdjC8R1J+7CpuWzH0M33v2k6eUAEQk5IwTLQIsWk10tT17KsgmGIb5v7V+xlWuuuT
-         8yxA==
-X-Gm-Message-State: AFuF++ncarXniNNk5ZV4pzb6fqgkvmSqoEs0JDRBMpBKYFlC8VyVDhlJ
-	zh2pLvrUHXhTA/erT2/5HtVMI23iPkFvRk0famTCz/GBGvAUM9JNfKVl6T9aEmkmEaBopg==
-X-Gm-Gg: AYBFou3dm/LIvSsstKwjE2Om+bOfRpnoYc7Yg2uHeM7Zb/23ceTpQkVw1HHXZWMHHG4
-	Nr9vA8viyU2UcEZP+CENux4nMQtYfxHgnDS1mtKYTk96Ig/qfyDa+h2kNvSccZTJKV5J+axB9/S
-	iDgPvrYrb6oO+6XCY2WrqJd86BKfi2DgWjs5FWoz6dzgRlbmtBGBTimY8EaMcqYOWIGu0BDs8YG
-	nBOpNgKIWHrTZwkbwPLXVsZcGDquTgAXEmagwSPFOJLSFo5on8u13syIuFNnlOmAGlSsqvi/nXD
-	iA7Azw31zJgqU04V0nfPoREUlafF6bB1nFBGgqVBN23wEhI29+yTPB9MOE4/drSARQ6ufmgVxwN
-	2fWMZgn/nLDvmkmwZD7uIJnRiJdhzL7QZJWXyFN3jcoURVbZ7vyyPrc44/Ko+XOc2I9WU3U0YtJ
-	GbrPUJeld0eW8uBwRD4oBVuXytWF6rjTdYhhSxknxWMAwLPcrIC64noHNTceNq8VF9MbmCw75n9
-	geRlfmxfsVrNrQFNaAqqhOHTaR4Q1Qylx5g22v6+/G8fc+Mftx4Z5Kq3ud1UX3ljA==
-X-Received: by 2002:a05:6122:2488:b0:5c9:a5b6:27af with SMTP id 71dfb90a1353d-5cb0b38fff2mr1894272e0c.12.1790289074326;
-        Thu, 24 Sep 2026 15:31:14 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cc64f9c59csm890924e0c.11.2026.09.24.15.31.13
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 15:31:13 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ijRckUCI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1790294672;
+	bh=OpWCGW4t/8vu3eeO4YhqAFJ+QW61JzJcmHlzbEJQvIo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ijRckUCIImrTZA453ZPnEIL7tWDkxUQoY63wdzHooKC2mmWjrAJ0Bod2jFJFj2w8C
+	 IeQXQTef5p/ZOWeSmeNCaKjtmyUJuDMb0LIWHOVmbOz0wCafyvsBpvyiRY3mqXhFYO
+	 bt0doBsj9XYvAy/dmZbJ4oNuotY3ggZwfygEHWhU=
+Received: from github.com (hubbernetes-node-ad6617f.ash1-iad.github.net [10.56.206.84])
+	by smtp.github.com (Postfix) with ESMTPA id 0FA781801A3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2026 17:04:32 -0700 (PDT)
+Date: Thu, 24 Sep 2026 17:04:32 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 20/20] attrib: Remove GAttrib and gatttool
-Date: Thu, 24 Sep 2026 18:30:45 -0400
-Message-ID: <20260924223046.605543-21-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260924223046.605543-1-luiz.dentz@gmail.com>
-References: <20260924223046.605543-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1173443/000000-755ffd@github.com>
+Subject: [bluez/bluez] 3bb537: shared/gatt-client: Fix calling destroy after
+ unre...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1173443
+  Home:   https://github.com/bluez/bluez
+  Commit: 3bb53743ee3c21c0568ac27a9f2810f84147b0af
+      https://github.com/bluez/bluez/commit/3bb53743ee3c21c0568ac27a9f2810f84147b0af
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M src/gatt-client.c
+    M src/shared/gatt-client.c
+
+  Log Message:
+  -----------
+  shared/gatt-client: Fix calling destroy after unregistering notify
+
+bt_gatt_client_unregister_notify resets the callbacks of the
+notification but not its destroy callback, which is called once the
+notify_data is freed. If a procedure is still pending at that point,
+e.g. the write of the CCC to disable the notifications, it holds a
+reference to notify_data so destroy is called later, once the user data
+may have been freed, e.g. the reports of HoG:
+
+ ERROR: AddressSanitizer: heap-use-after-free
+ #11 report_notify_destroy profiles/input/hog-lib.c:359
+ #12 attrib_callbacks_destroy attrib/gattrib.c:130
+ #13 notify_data_unref src/shared/gatt-client.c:256
+ #15 destroy_write_op src/shared/gatt-client.c:3189
+ #16 request_unref src/shared/gatt-client.c:201
+ #17 destroy_att_send_op src/shared/att.c:215
+ #18 bt_att_cancel src/shared/att.c:1925
+ #19 cancel_request src/shared/gatt-client.c:2783
+ ...
+ #21 bt_gatt_client_cancel_all src/shared/gatt-client.c:2811
+ #22 bt_gatt_client_free src/shared/gatt-client.c:2290
+
+Call destroy when unregistering instead, once done with notify_data and
+holding a reference to the client in case destroy drops the last one.
+
+As destroy is now called when unregistering, reply to StartNotify before
+freeing the notify client when enabling the notifications fails, since
+it frees the operation the reply is for.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: d88f8a44fc389434c2e3067dd81dd29dcba34a30
+      https://github.com/bluez/bluez/commit/d88f8a44fc389434c2e3067dd81dd29dcba34a30
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M client/gatt.c
+
+  Log Message:
+  -----------
+  client/gatt: Fix setting descriptor value from scripts
+
+gatt.register-descriptor completed the command right after prompting
+for the value, so when run from a script the line with the value was
+executed as a command instead of being passed to the prompt, causing
+the descriptor to be unregistered.
+
+Complete the command once the value is set, as done for
+characteristics, and parse a copy of the value so the input line is
+not truncated by strsep while still in use by the shell.
+
+As invalid values can now come from scripts, fix handling them: the
+attribute is no longer used once unregistered, which frees it, nor kept
+in the list of its parent, and the command fails. Also stop counting
+the empty entries between the values, which left bytes uninitialized,
+and reject negative values.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 51d8f422504a535fa38cb5f0b537ec718c684b98
+      https://github.com/bluez/bluez/commit/51d8f422504a535fa38cb5f0b537ec718c684b98
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M client/mgmt.c
+
+  Log Message:
+  -----------
+  client/mgmt: Print Connection Subrate event
+
+Print the MGMT Connection Subrate event, generated as a result of a
+LE Connection Rate Request, e.g. after mgmt.conn-subrate, or a change
+initiated by the remote device, so the new connection rate can be
+confirmed.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 4133111d005f892e0983b0162074089495dca75e
+      https://github.com/bluez/bluez/commit/4133111d005f892e0983b0162074089495dca75e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    M emulator/main.c
+    M emulator/server.c
+    M emulator/server.h
+
+  Log Message:
+  -----------
+  emulator: Default to the latest BR/EDR+LE version
+
+Emulate BR/EDR+LE 6.2 controllers by default, for both local (-l) and
+server (--server, --tcp) controllers, so the latest features such as
+Shorter Connection Intervals (LE Connection Rate Request) are
+supported, e.g. by test-functional which uses --server.
+
+Add the -C/--core=<version> option to emulate older versions instead:
+5.0, 5.2, 6.0 or 6.2.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 7eae87b5b7e48ad34085386c95fd00c19ba9056d
+      https://github.com/bluez/bluez/commit/7eae87b5b7e48ad34085386c95fd00c19ba9056d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    A client/scripts/hog-device-sci.bt
+    A client/scripts/hog-device.bt
+
+  Log Message:
+  -----------
+  client/scripts: Add HoG device scripts
+
+Add scripts registering a HID Service (HIDS) acting as a HID over GATT
+keyboard, with and without Shorter Connection Interval (SCI) support.
+
+HID SCI Mode can be notified so the device can confirm a mode change.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 47e240e8b350f61cb3f400b711db8225520b9aff
+      https://github.com/bluez/bluez/commit/47e240e8b350f61cb3f400b711db8225520b9aff
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/functional-hog.rst
+    M doc/functional-testing.rst
+
+  Log Message:
+  -----------
+  doc: Add functional-hog documentation
+
+Document the HoG functional tests, where bluetoothctl registers a HID
+Service with and without Shorter Connection Interval (SCI) support
+using client/scripts/hog-device*.bt, and the HID host:
+
+- checks HID Information, HID SCI Mode and HID SCI Information with
+  gatt.select-attribute/gatt.read
+- receives a few Input Reports notified by the HID device
+- changes the SCI mode, followed by the connection rate with
+  mgmt.conn-subrate, and receives the notification from the HID device
+  confirming the mode has been changed
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 773f2d860beb7d50ef10cb2174c290a827eebc97
+      https://github.com/bluez/bluez/commit/773f2d860beb7d50ef10cb2174c290a827eebc97
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    A test/functional/test_hog.py
+
+  Log Message:
+  -----------
+  test: functional: add HoG tests
+
+Add tests where bluetoothctl registers a HID Service, with and without
+SCI support, using client/scripts/hog-device*.bt, and the HID host
+checks the service, receives Input Reports and, with SCI support,
+changes the SCI mode and the connection rate.
+
+See doc/functional-hog.rst for details.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 741fbaded1e880830f46df10b563c3adcf112ff9
+      https://github.com/bluez/bluez/commit/741fbaded1e880830f46df10b563c3adcf112ff9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    M doc/test-functional.rst
+    M test/functional/conftest.py
+
+  Log Message:
+  -----------
+  test: functional: limit the workers by the memory available
+
+Each worker of pytest-xdist runs VM instances, so using one worker per
+CPU could run out of memory, with the OOM killer terminating some of
+them and tests failing at random.
+
+With -n auto, limit the number of workers by the memory available,
+estimating each worker needs memory for 3 VM instances of 256M of guest
+memory plus the overhead of qemu, and use -n auto for check-functional
+by default, which can be overridden with CHECK_FUNCTIONAL_JOBS.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: c76504177625d0573d5cfa718a8533e3da289f8e
+      https://github.com/bluez/bluez/commit/c76504177625d0573d5cfa718a8533e3da289f8e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M client/agent.c
+
+  Log Message:
+  -----------
+  client/agent: Fix crash on Cancel with no pending request
+
+The auto agent replies to the requests right away, so there is no
+pending request when bluetoothd cancels one, e.g. when pairing fails,
+and dbus_message_unref is then called with NULL, which libdbus aborts
+on:
+
+ #5  ?? () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
+ #6  _dbus_warn_check_failed () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
+ #7  cancel_request (...) at client/agent.c:258
+ #8  process_message (...) at gdbus/object.c:293
+
+Only release the pending request if there is one, as done when the
+agent is released.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: a23db1bc7d0a4a3a6dcfc946175c45d28934085b
+      https://github.com/bluez/bluez/commit/a23db1bc7d0a4a3a6dcfc946175c45d28934085b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M src/shared/uhid.c
+
+  Log Message:
+  -----------
+  shared/uhid: Fix size of Get Report reply with a Report ID
+
+The size of the reply did not account for the Report ID prepended to
+the data of numbered reports, dropping the last byte of the report,
+unlike Input Reports which already account for it.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: f5662b4b7f95f28aa70902c8041f05250acd5403
+      https://github.com/bluez/bluez/commit/f5662b4b7f95f28aa70902c8041f05250acd5403
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M src/shared/uhid.c
+
+  Log Message:
+  -----------
+  shared/uhid: Keep reading when an event is not available
+
+When the fd is non-blocking an event may have been consumed by another
+reader of the same fd, e.g. multiple instances of HID over GATT sharing
+the fd of the uHID device in unit tests, so keep reading on EAGAIN
+instead of stopping.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: ada09f019af064a1689a415df6e06c5f43027190
+      https://github.com/bluez/bluez/commit/ada09f019af064a1689a415df6e06c5f43027190
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M src/shared/tester.c
+
+  Log Message:
+  -----------
+  shared/tester: Allow expecting a PDU with no response
+
+IOV_NULL following an expected PDU used to send an empty PDU, unless
+followed by another IOV_NULL chaining the PDUs to send, so it was not
+possible to expect a PDU with no response, e.g. a Write Command,
+followed by another expected PDU.
+
+Wait for the next PDU instead of sending an empty one in that case.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 0087a7cc3943d37202a6bd928ed0eedeedbd6733
+      https://github.com/bluez/bluez/commit/0087a7cc3943d37202a6bd928ed0eedeedbd6733
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    A src/shared/hog.c
+    A src/shared/hog.h
+
+  Log Message:
+  -----------
+  shared/hog: Add initial implementation
+
+Add a HID over GATT implementation based on bt_gatt_client and
+gatt_db, meant as a drop-in replacement of profiles/input/hog-lib
+which is based on GAttrib:
+
+- bt_hog_attach takes a bt_gatt_client
+- the services and characteristics are only looked up in the gatt_db,
+  the one given to bt_hog_new or otherwise the one of the client
+- notifications of the Input Reports are enabled with
+  bt_gatt_client_register_notify, once their CCC has been read
+- the Report Map is read with a long read once every other read is
+  complete, so the report IDs are known before creating the uHID device
+- the addresses of the uHID device are taken from the ATT socket
+- pending requests are cancelled when detaching, and notifications are
+  unregistered so they are disabled if still connected
+
+Unlike hog-lib, the Scan Parameters, Device Information and Battery
+services are not handled, as they are by the scanparam, deviceinfo and
+battery plugins, so bt_hog_set_ids is added to set the vendor, product
+and version once known, e.g. from the PnP ID. A debug callback can be
+set with bt_hog_set_debug.
+
+HID SCI is supported as specified by the HIDS/HOGP SCI FIPD:
+bt_hog_set_sci_mode requests the HID Device to enable a HID SCI mode by
+writing it to the HID Control Point, and the notifications of HID SCI
+Mode, with which the HID Device confirms the mode once the connection
+rate has been changed, are enabled and reported with the callback set
+with bt_hog_set_sci_mode_callback.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 5692842048a1223d1e5fb5f219d18e742432fdb1
+      https://github.com/bluez/bluez/commit/5692842048a1223d1e5fb5f219d18e742432fdb1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M Makefile.am
+    M unit/test-hog.c
+
+  Log Message:
+  -----------
+  unit/test-hog: Use shared/hog
+
+Port the tests to src/shared/hog, with the discovery done by
+bt_gatt_client, and the uHID device emulated with a socket pair so the
+events are checked.
+
+The test cases are renamed after HOGP.TS p13, and the missing ones for
+the Report Host are added, except for HID ISO which is not supported:
+
+- Discovery: HGDC/BV-03-C (two instances of the HID Service),
+  HGDC/BV-04-C and HGDC/BV-05-C
+- Read: HGRF/BV-02-C to BV-08-C, BV-18-C and BV-19-C, with the Report
+  values also read with UHID_GET_REPORT
+- Write: HGWF/BV-01-C, BV-02-C and BV-04-C with UHID_SET_REPORT and
+  UHID_OUTPUT, BV-05-C and BV-06-C (Suspend and Exit Suspend), BV-07-C
+  (Set Report Protocol Mode)
+- HID SCI: HGWF/BV-08-C to BV-11-C, writing each mode to the HID
+  Control Point with two instances of the HID Service, then changing
+  to another mode once notified with HID SCI Mode
+- Configuration: HGCF/BV-01-C and BV-02-C (notifications disabled when
+  detaching)
+- Notifications: HGNF/BV-01-C, forwarded as UHID_INPUT2, and BI-01-C
+  and BI-02-C, ignoring the Boot Keyboard and Boot Mouse Input Reports,
+  and HGNF/BV-01-C once reconnected, with the reports already known and
+  the Report Map cached
+- Characteristic GGIT: CHA/BV-01-C to BV-04-C, BV-09-C, BV-10-C and
+  DES/BV-01-C
+
+The Battery Level and PnP ID GGIT test cases are left to the battery
+and deviceinfo plugins which handle these services.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 16ee8444270a84963169ef2dcfaee863eec2cbd5
+      https://github.com/bluez/bluez/commit/16ee8444270a84963169ef2dcfaee863eec2cbd5
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M client/scripts/hog-device-sci.bt
+    M doc/functional-hog.rst
+    M test/functional/test_hog.py
+
+  Log Message:
+  -----------
+  test: functional: change the HoG SCI mode with the HID Control Point
+
+As specified by HOGP.TS 4.6.1 and the HIDS/HOGP SCI FIPD, the HID host
+requests a HID SCI mode by writing it to the HID Control Point, the HID
+device then confirming it with a notification of HID SCI Mode, which is
+Read and Notify only.
+
+Write the mode to the HID Control Point instead of HID SCI Mode, which
+is no longer writable, and don't expect HID SCI Mode notifications to
+be subscribed by bluetoothctl as the input plugin of the HID host may
+already have done it.
+
+The connection rate is still changed by the HID host, as the kernel
+only issues the LE Connection Rate Request as central.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 770ac39c0debbb93c61a209465b16b77e2aa6365
+      https://github.com/bluez/bluez/commit/770ac39c0debbb93c61a209465b16b77e2aa6365
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M Makefile.plugins
+    R profiles/battery/bas.c
+    R profiles/battery/bas.h
+    R profiles/deviceinfo/dis.c
+    R profiles/deviceinfo/dis.h
+    R profiles/input/hog-lib.c
+    R profiles/input/hog-lib.h
+    M profiles/input/hog.c
+    R profiles/scanparam/scpp.c
+    R profiles/scanparam/scpp.h
+
+  Log Message:
+  -----------
+  input/hog: Use shared/hog
+
+Use src/shared/hog, based on bt_gatt_client, instead of hog-lib which
+is based on GAttrib, and remove it along with the GAttrib based Battery,
+Device Information and Scan Parameters implementations only used by it.
+
+These services are handled by the battery, deviceinfo and scanparam
+plugins, so the vendor, product and version of the uHID device are
+set from the device, which gets them from the PnP ID, when accepting
+the connection.
+
+With shared/hog the notifications of HID SCI Mode are enabled when the
+HID device supports SCI, so the mode is known once changed with the HID
+Control Point.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: d34fac93175d0c803ec39e87b7b81be3651c6e17
+      https://github.com/bluez/bluez/commit/d34fac93175d0c803ec39e87b7b81be3651c6e17
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: Add CONFIG_HIDRAW to the tester kernel config
+
+Enable hidraw so unit/test-uhid, when run as root e.g. with test-runner,
+can request reports through a hidraw device, as HIDIOCGFEATURE does, and
+check the replies to the requests the kernel sends to the uHID device.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: f25e21b6b87a7f489a602e56ac785bacb9541586
+      https://github.com/bluez/bluez/commit/f25e21b6b87a7f489a602e56ac785bacb9541586
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M unit/test-uhid.c
+
+  Log Message:
+  -----------
+  unit/test-uhid: Add Get Report tests
+
+Add tests replying to UHID_GET_REPORT for a numbered Feature Report:
+
+- /uhid/command/get_report_reply checks the reply contains the Report
+  ID followed by the report data, with its size accounting for both
+- /uhid/device/get_report creates a uHID device, requests the report
+  through hidraw with HIDIOCGFEATURE and checks it returns the Report ID
+  followed by the report data, as documented in
+  Documentation/hid/hidraw.rst, since uhid copies the reply to the buffer
+  of hid_hw_raw_request. It requires root and CONFIG_HIDRAW, otherwise
+  it is not run.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 0dbdd4c9fb5d948bd30cb4e570c141a37adbb30d
+      https://github.com/bluez/bluez/commit/0dbdd4c9fb5d948bd30cb4e570c141a37adbb30d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M profiles/deviceinfo/deviceinfo.c
+    M profiles/ranging/rap.c
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  device: Use bt_att instead of GAttrib
+
+GAttrib is no longer used other than to create the bt_att of the
+connection, so create it directly, and remove btd_device_get_attrib as
+there are no users left.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+  Commit: 755ffdeb29df8f0e20f7d19b250ef7ef37474a01
+      https://github.com/bluez/bluez/commit/755ffdeb29df8f0e20f7d19b250ef7ef37474a01
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-09-25 (Fri, 25 Sep 2026)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    M Makefile.tools
+    M attrib/gatt.c
+    M attrib/gatt.h
+    R attrib/gattrib.c
+    R attrib/gattrib.h
+    R attrib/gatttool.c
+    R attrib/gatttool.h
+    R attrib/interactive.c
+    R attrib/utils.c
+    R unit/test-gattrib.c
+
+  Log Message:
+  -----------
+  attrib: Remove GAttrib and gatttool
 
 GAttrib has no users left besides the deprecated gatttool, which is
 replaced by the gatt submenu of bluetoothctl and btgatt-client, so
@@ -84,4268 +606,8 @@ attrib/gatt.c, only keeping struct gatt_primary and gatt_parse_record
 which are still used by bluetoothd.
 
 Assisted-by: OpenCode:claude-opus-5.5
----
- .gitignore           |    2 -
- Makefile.am          |   11 +-
- Makefile.tools       |   12 -
- attrib/gatt.c        | 1150 +-----------------------------------------
- attrib/gatt.h        |   89 ----
- attrib/gattrib.c     |  473 -----------------
- attrib/gattrib.h     |   65 ---
- attrib/gatttool.c    |  612 ----------------------
- attrib/gatttool.h    |   17 -
- attrib/interactive.c | 1020 -------------------------------------
- attrib/utils.c       |  110 ----
- unit/test-gattrib.c  |  552 --------------------
- 12 files changed, 3 insertions(+), 4110 deletions(-)
- delete mode 100644 attrib/gattrib.c
- delete mode 100644 attrib/gattrib.h
- delete mode 100644 attrib/gatttool.c
- delete mode 100644 attrib/gatttool.h
- delete mode 100644 attrib/interactive.c
- delete mode 100644 attrib/utils.c
- delete mode 100644 unit/test-gattrib.c
 
-diff --git a/.gitignore b/.gitignore
-index b1d63e1d4a33..769354a072b1 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -45,7 +45,6 @@ tools/97-hid2hci.rules
- profiles/cups/bluetooth
- profiles/iap/iapd
- 
--attrib/gatttool
- tools/avinfo
- tools/bccmd
- tools/hwdb
-@@ -174,7 +173,6 @@ unit/test-avctp
- unit/test-avrcp
- unit/test-gatt
- unit/test-midi
--unit/test-gattrib
- unit/test-mesh-crypto
- unit/test-micp
- unit/test-vcp
-diff --git a/Makefile.am b/Makefile.am
-index 621892055c05..33a2f79fbff6 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -287,8 +287,7 @@ src_libshared_ell_la_CFLAGS = $(AM_CFLAGS)
- endif
- 
- attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
--		attrib/gatt.h attrib/gatt.c \
--		attrib/gattrib.h attrib/gattrib.c
-+		attrib/gatt.h attrib/gatt.c
- 
- btio_sources = btio/btio.h btio/btio.c
- 
-@@ -772,14 +771,6 @@ unit_test_hog_SOURCES = unit/test-hog.c
- unit_test_hog_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
- 
--unit_tests += unit/test-gattrib
--
--unit_test_gattrib_SOURCES = unit/test-gattrib.c attrib/gattrib.c \
--					$(btio_sources) src/log.h src/log.c
--unit_test_gattrib_LDADD = src/libshared-glib.la \
--				lib/libbluetooth-internal.la \
--				$(GLIB_LIBS) $(DBUS_LIBS) -ldl -lrt
--
- unit_tests += unit/test-bap
- 
- unit_test_bap_SOURCES = unit/test-bap.c
-diff --git a/Makefile.tools b/Makefile.tools
-index 671b40fb0e42..f0ed20969e7e 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -514,18 +514,6 @@ tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c \
- 			client/mgmt.c
- tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-glib.la \
- 				$(GLIB_LIBS) -lreadline
--if DEPRECATED
--noinst_PROGRAMS += attrib/gatttool
--
--attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
--				attrib/gattrib.c btio/btio.c \
--				attrib/gatttool.h attrib/interactive.c \
--				attrib/utils.c src/log.c client/display.c \
--				client/display.h
--attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
--			src/libshared-glib.la $(GLIB_LIBS) -lreadline
--
--endif
- endif
- 
- if CUPS
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 71367c083fc4..335094f37b09 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -15,1164 +15,18 @@
- 
- #include <stdint.h>
- #include <stdlib.h>
-+#include <string.h>
- 
- #include <glib.h>
- 
-+#include "bluetooth/bluetooth.h"
- #include "bluetooth/sdp.h"
- #include "bluetooth/sdp_lib.h"
- #include "bluetooth/uuid.h"
- 
--#include "src/shared/util.h"
- #include "att.h"
--#include "gattrib.h"
- #include "gatt.h"
- 
--struct discover_primary {
--	int ref;
--	GAttrib *attrib;
--	unsigned int id;
--	bt_uuid_t uuid;
--	uint16_t start;
--	GSList *primaries;
--	gatt_cb_t cb;
--	void *user_data;
--};
--
--/* Used for the Included Services Discovery (ISD) procedure */
--struct included_discovery {
--	GAttrib		*attrib;
--	unsigned int	id;
--	int		refs;
--	int		err;
--	uint16_t	start_handle;
--	uint16_t	end_handle;
--	GSList		*includes;
--	gatt_cb_t	cb;
--	void		*user_data;
--};
--
--struct included_uuid_query {
--	struct included_discovery	*isd;
--	struct gatt_included		*included;
--};
--
--struct discover_char {
--	int ref;
--	GAttrib *attrib;
--	unsigned int id;
--	bt_uuid_t *uuid;
--	uint16_t end;
--	uint16_t start;
--	GSList *characteristics;
--	gatt_cb_t cb;
--	void *user_data;
--};
--
--struct discover_desc {
--	int ref;
--	GAttrib *attrib;
--	unsigned int id;
--	bt_uuid_t *uuid;
--	uint16_t start;
--	uint16_t end;
--	GSList *descriptors;
--	gatt_cb_t cb;
--	void *user_data;
--};
--
--static void discover_primary_unref(void *data)
--{
--	struct discover_primary *dp = data;
--
--	dp->ref--;
--
--	if (dp->ref > 0)
--		return;
--
--	g_slist_free_full(dp->primaries, g_free);
--	g_attrib_unref(dp->attrib);
--	g_free(dp);
--}
--
--static struct discover_primary *discover_primary_ref(
--						struct discover_primary *dp)
--{
--	dp->ref++;
--
--	return dp;
--}
--
--static struct included_discovery *isd_ref(struct included_discovery *isd)
--{
--	__sync_fetch_and_add(&isd->refs, 1);
--
--	return isd;
--}
--
--static void isd_unref(struct included_discovery *isd)
--{
--	if (__sync_sub_and_fetch(&isd->refs, 1) > 0)
--		return;
--
--	if (isd->err)
--		isd->cb(isd->err, NULL, isd->user_data);
--	else
--		isd->cb(isd->err, isd->includes, isd->user_data);
--
--	g_slist_free_full(isd->includes, g_free);
--	g_attrib_unref(isd->attrib);
--	g_free(isd);
--}
--
--static void discover_char_unref(void *data)
--{
--	struct discover_char *dc = data;
--
--	dc->ref--;
--
--	if (dc->ref > 0)
--		return;
--
--	g_slist_free_full(dc->characteristics, g_free);
--	g_attrib_unref(dc->attrib);
--	free(dc->uuid);
--	g_free(dc);
--}
--
--static struct discover_char *discover_char_ref(struct discover_char *dc)
--{
--	dc->ref++;
--
--	return dc;
--}
--
--static void discover_desc_unref(void *data)
--{
--	struct discover_desc *dd = data;
--
--	dd->ref--;
--
--	if (dd->ref > 0)
--		return;
--
--	g_slist_free_full(dd->descriptors, g_free);
--	g_attrib_unref(dd->attrib);
--	free(dd->uuid);
--	g_free(dd);
--}
--
--static struct discover_desc *discover_desc_ref(struct discover_desc *dd)
--{
--	dd->ref++;
--
--	return dd;
--}
--
--static void put_uuid_le(const bt_uuid_t *uuid, void *dst)
--{
--	if (uuid->type == BT_UUID16)
--		put_le16(uuid->value.u16, dst);
--	else
--		/* Convert from 128-bit BE to LE */
--		bswap_128(&uuid->value.u128, dst);
--}
--
--static void get_uuid128(uint8_t type, const void *val, bt_uuid_t *uuid)
--{
--	if (type == BT_UUID16) {
--		bt_uuid_t uuid16;
--
--		bt_uuid16_create(&uuid16, get_le16(val));
--		bt_uuid_to_uuid128(&uuid16, uuid);
--	} else {
--		uint128_t u128;
--
--		/* Convert from 128-bit LE to BE */
--		bswap_128(val, &u128);
--		bt_uuid128_create(uuid, u128);
--	}
--}
--
--static guint16 encode_discover_primary(uint16_t start, uint16_t end,
--				bt_uuid_t *uuid, uint8_t *pdu, size_t len)
--{
--	bt_uuid_t prim;
--	guint16 plen;
--
--	bt_uuid16_create(&prim, GATT_PRIM_SVC_UUID);
--
--	if (uuid == NULL) {
--		/* Discover all primary services */
--		plen = enc_read_by_grp_req(start, end, &prim, pdu, len);
--	} else {
--		uint8_t value[16];
--		size_t vlen;
--
--		/* Discover primary service by service UUID */
--		put_uuid_le(uuid, value);
--		vlen = bt_uuid_len(uuid);
--
--		plen = enc_find_by_type_req(start, end, &prim, value, vlen,
--								pdu, len);
--	}
--
--	return plen;
--}
--
--static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
--					guint16 iplen, gpointer user_data)
--
--{
--	struct discover_primary *dp = user_data;
--	GSList *ranges, *last;
--	struct att_range *range;
--	uint8_t *buf;
--	guint16 oplen;
--	int err = 0;
--	size_t buflen;
--
--	if (status) {
--		err = status == ATT_ECODE_ATTR_NOT_FOUND ? 0 : status;
--		goto done;
--	}
--
--	ranges = dec_find_by_type_resp(ipdu, iplen);
--	if (ranges == NULL)
--		goto done;
--
--	dp->primaries = g_slist_concat(dp->primaries, ranges);
--
--	last = g_slist_last(ranges);
--	range = last->data;
--
--	if (range->end == 0xffff)
--		goto done;
--
--	/*
--	 * If last handle is lower from previous start handle then it is smth
--	 * wrong. Let's stop search, otherwise we might enter infinite loop.
--	 */
--	if (range->end < dp->start) {
--		err = ATT_ECODE_UNLIKELY;
--		goto done;
--	}
--
--	dp->start = range->end + 1;
--
--	buf = g_attrib_get_buffer(dp->attrib, &buflen);
--	oplen = encode_discover_primary(dp->start, 0xffff, &dp->uuid,
--								buf, buflen);
--
--	if (oplen == 0)
--		goto done;
--
--	g_attrib_send(dp->attrib, dp->id, buf, oplen, primary_by_uuid_cb,
--			discover_primary_ref(dp), discover_primary_unref);
--	return;
--
--done:
--	dp->cb(err, dp->primaries, dp->user_data);
--}
--
--static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
--							gpointer user_data)
--{
--	struct discover_primary *dp = user_data;
--	struct att_data_list *list;
--	unsigned int i, err;
--	uint16_t start, end;
--	uint8_t type;
--
--	if (status) {
--		err = status == ATT_ECODE_ATTR_NOT_FOUND ? 0 : status;
--		goto done;
--	}
--
--	list = dec_read_by_grp_resp(ipdu, iplen);
--	if (list == NULL) {
--		err = ATT_ECODE_IO;
--		goto done;
--	}
--
--	if (list->len == 6)
--		type = BT_UUID16;
--	else if (list->len == 20)
--		type = BT_UUID128;
--	else {
--		att_data_list_free(list);
--		err = ATT_ECODE_INVALID_PDU;
--		goto done;
--	}
--
--	for (i = 0, end = 0; i < list->num; i++) {
--		const uint8_t *data = list->data[i];
--		struct gatt_primary *primary;
--		bt_uuid_t uuid128;
--
--		start = get_le16(&data[0]);
--		end = get_le16(&data[2]);
--
--		get_uuid128(type, &data[4], &uuid128);
--
--		primary = g_try_new0(struct gatt_primary, 1);
--		if (!primary) {
--			att_data_list_free(list);
--			err = ATT_ECODE_INSUFF_RESOURCES;
--			goto done;
--		}
--		primary->range.start = start;
--		primary->range.end = end;
--		bt_uuid_to_string(&uuid128, primary->uuid, sizeof(primary->uuid));
--		dp->primaries = g_slist_append(dp->primaries, primary);
--	}
--
--	att_data_list_free(list);
--	err = 0;
--
--	/*
--	 * If last handle is lower from previous start handle then it is smth
--	 * wrong. Let's stop search, otherwise we might enter infinite loop.
--	 */
--	if (end < dp->start) {
--		err = ATT_ECODE_UNLIKELY;
--		goto done;
--	}
--
--	dp->start = end + 1;
--
--	if (end != 0xffff) {
--		size_t buflen;
--		uint8_t *buf = g_attrib_get_buffer(dp->attrib, &buflen);
--		guint16 oplen = encode_discover_primary(dp->start, 0xffff, NULL,
--								buf, buflen);
--
--
--		g_attrib_send(dp->attrib, dp->id, buf, oplen, primary_all_cb,
--						discover_primary_ref(dp),
--						discover_primary_unref);
--
--		return;
--	}
--
--done:
--	dp->cb(err, dp->primaries, dp->user_data);
--}
--
--guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
--							gpointer user_data)
--{
--	struct discover_primary *dp;
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
--	GAttribResultFunc cb;
--	guint16 plen;
--
--	plen = encode_discover_primary(0x0001, 0xffff, uuid, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	dp = g_try_new0(struct discover_primary, 1);
--	if (dp == NULL)
--		return 0;
--
--	dp->attrib = g_attrib_ref(attrib);
--	dp->cb = func;
--	dp->user_data = user_data;
--	dp->start = 0x0001;
--
--	if (uuid) {
--		dp->uuid = *uuid;
--		cb = primary_by_uuid_cb;
--	} else
--		cb = primary_all_cb;
--
--	dp->id = g_attrib_send(attrib, 0, buf, plen, cb,
--					discover_primary_ref(dp),
--					discover_primary_unref);
--
--	return dp->id;
--}
--
--static void resolve_included_uuid_cb(uint8_t status, const uint8_t *pdu,
--					uint16_t len, gpointer user_data)
--{
--	struct included_uuid_query *query = user_data;
--	struct included_discovery *isd = query->isd;
--	struct gatt_included *incl = query->included;
--	unsigned int err = status;
--	bt_uuid_t uuid128;
--	size_t buflen;
--	uint8_t *buf;
--
--	if (err)
--		goto done;
--
--	buf = g_attrib_get_buffer(isd->attrib, &buflen);
--	if (dec_read_resp(pdu, len, buf, buflen) != 16) {
--		err = ATT_ECODE_IO;
--		goto done;
--	}
--
--	get_uuid128(BT_UUID128, buf, &uuid128);
--
--	bt_uuid_to_string(&uuid128, incl->uuid, sizeof(incl->uuid));
--	isd->includes = g_slist_append(isd->includes, incl);
--	query->included = NULL;
--
--done:
--	if (isd->err == 0)
--		isd->err = err;
--}
--
--static void inc_query_free(void *data)
--{
--	struct included_uuid_query *query = data;
--
--	isd_unref(query->isd);
--	g_free(query->included);
--	g_free(query);
--}
--
--static guint resolve_included_uuid(struct included_discovery *isd,
--					struct gatt_included *incl)
--{
--	struct included_uuid_query *query;
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
--	guint16 oplen = enc_read_req(incl->range.start, buf, buflen);
--
--	query = g_new0(struct included_uuid_query, 1);
--	query->isd = isd_ref(isd);
--	query->included = incl;
--
--	return g_attrib_send(isd->attrib, query->isd->id, buf, oplen,
--				resolve_included_uuid_cb, query,
--				inc_query_free);
--}
--
--static struct gatt_included *included_from_buf(const uint8_t *buf, gsize len)
--{
--	struct gatt_included *incl = g_new0(struct gatt_included, 1);
--
--	incl->handle = get_le16(&buf[0]);
--	incl->range.start = get_le16(&buf[2]);
--	incl->range.end = get_le16(&buf[4]);
--
--	if (len == 8) {
--		bt_uuid_t uuid128;
--
--		get_uuid128(BT_UUID16, &buf[6], &uuid128);
--		bt_uuid_to_string(&uuid128, incl->uuid, sizeof(incl->uuid));
--	}
--
--	return incl;
--}
--
--static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
--							gpointer user_data);
--
--static guint find_included(struct included_discovery *isd, uint16_t start)
--{
--	bt_uuid_t uuid;
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
--	guint16 oplen;
--
--	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
--	oplen = enc_read_by_type_req(start, isd->end_handle, &uuid,
--							buf, buflen);
--
--	/* If id != 0 it means we are in the middle of include search */
--	if (isd->id)
--		return g_attrib_send(isd->attrib, isd->id, buf, oplen,
--				find_included_cb, isd_ref(isd),
--				(GDestroyNotify) isd_unref);
--
--	/* This is first call from the gattrib user */
--	isd->id = g_attrib_send(isd->attrib, 0, buf, oplen, find_included_cb,
--				isd_ref(isd), (GDestroyNotify) isd_unref);
--
--	return isd->id;
--}
--
--static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
--							gpointer user_data)
--{
--	struct included_discovery *isd = user_data;
--	uint16_t last_handle = isd->end_handle;
--	unsigned int err = status;
--	struct att_data_list *list;
--	int i;
--
--	if (err == ATT_ECODE_ATTR_NOT_FOUND)
--		err = 0;
--
--	if (status)
--		goto done;
--
--	list = dec_read_by_type_resp(pdu, len);
--	if (list == NULL) {
--		err = ATT_ECODE_IO;
--		goto done;
--	}
--
--	if (list->len != 6 && list->len != 8) {
--		err = ATT_ECODE_IO;
--		att_data_list_free(list);
--		goto done;
--	}
--
--	for (i = 0; i < list->num; i++) {
--		struct gatt_included *incl;
--
--		incl = included_from_buf(list->data[i], list->len);
--		last_handle = incl->handle;
--
--		/* 128 bit UUID, needs resolving */
--		if (list->len == 6) {
--			resolve_included_uuid(isd, incl);
--			continue;
--		}
--
--		isd->includes = g_slist_append(isd->includes, incl);
--	}
--
--	att_data_list_free(list);
--
--	/*
--	 * If last handle is lower from previous start handle then it is smth
--	 * wrong. Let's stop search, otherwise we might enter infinite loop.
--	 */
--	if (last_handle < isd->start_handle) {
--		isd->err = ATT_ECODE_UNLIKELY;
--		goto done;
--	}
--
--	isd->start_handle = last_handle + 1;
--
--	if (last_handle < isd->end_handle)
--		find_included(isd, isd->start_handle);
--
--done:
--	if (isd->err == 0)
--		isd->err = err;
--}
--
--unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
--					gatt_cb_t func, gpointer user_data)
--{
--	struct included_discovery *isd;
--
--	isd = g_new0(struct included_discovery, 1);
--	isd->attrib = g_attrib_ref(attrib);
--	isd->start_handle = start;
--	isd->end_handle = end;
--	isd->cb = func;
--	isd->user_data = user_data;
--
--	return find_included(isd, start);
--}
--
--static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
--							gpointer user_data)
--{
--	struct discover_char *dc = user_data;
--	struct att_data_list *list;
--	unsigned int i, err = 0;
--	uint16_t last = 0;
--	uint8_t type;
--
--	/* We have all the characteristic now, lets send it up */
--	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
--		err = dc->characteristics ? 0 : status;
--		goto done;
--	}
--
--	if (status) {
--		err = status;
--		goto done;
--	}
--
--	list = dec_read_by_type_resp(ipdu, iplen);
--	if (list == NULL) {
--		err = ATT_ECODE_IO;
--		goto done;
--	}
--
--	if (list->len == 7)
--		type = BT_UUID16;
--	else
--		type = BT_UUID128;
--
--	for (i = 0; i < list->num; i++) {
--		uint8_t *value = list->data[i];
--		struct gatt_char *chars;
--		bt_uuid_t uuid128;
--
--		last = get_le16(value);
--
--		get_uuid128(type, &value[5], &uuid128);
--
--		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid128))
--			continue;
--
--		chars = g_try_new0(struct gatt_char, 1);
--		if (!chars) {
--			att_data_list_free(list);
--			err = ATT_ECODE_INSUFF_RESOURCES;
--			goto done;
--		}
--
--		chars->handle = last;
--		chars->properties = value[2];
--		chars->value_handle = get_le16(&value[3]);
--		bt_uuid_to_string(&uuid128, chars->uuid, sizeof(chars->uuid));
--		dc->characteristics = g_slist_append(dc->characteristics,
--									chars);
--	}
--
--	att_data_list_free(list);
--
--	/*
--	 * If last handle is lower from previous start handle then it is smth
--	 * wrong. Let's stop search, otherwise we might enter infinite loop.
--	 */
--	if (last < dc->start) {
--		err = ATT_ECODE_UNLIKELY;
--		goto done;
--	}
--
--	dc->start = last + 1;
--
--	if (last != 0 && (dc->start < dc->end)) {
--		bt_uuid_t uuid;
--		guint16 oplen;
--		size_t buflen;
--		uint8_t *buf;
--
--		buf = g_attrib_get_buffer(dc->attrib, &buflen);
--
--		bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
--
--		oplen = enc_read_by_type_req(dc->start, dc->end, &uuid, buf,
--									buflen);
--
--		if (oplen == 0)
--			return;
--
--		g_attrib_send(dc->attrib, dc->id, buf, oplen,
--				char_discovered_cb, discover_char_ref(dc),
--				discover_char_unref);
--
--		return;
--	}
--
--done:
--	dc->cb(err, dc->characteristics, dc->user_data);
--}
--
--guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
--						bt_uuid_t *uuid, gatt_cb_t func,
--						gpointer user_data)
--{
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
--	struct discover_char *dc;
--	bt_uuid_t type_uuid;
--	guint16 plen;
--
--	bt_uuid16_create(&type_uuid, GATT_CHARAC_UUID);
--
--	plen = enc_read_by_type_req(start, end, &type_uuid, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	dc = g_try_new0(struct discover_char, 1);
--	if (dc == NULL)
--		return 0;
--
--	dc->attrib = g_attrib_ref(attrib);
--	dc->cb = func;
--	dc->user_data = user_data;
--	dc->end = end;
--	dc->start = start;
--	dc->uuid = util_memdup(uuid, sizeof(bt_uuid_t));
--
--	dc->id = g_attrib_send(attrib, 0, buf, plen, char_discovered_cb,
--				discover_char_ref(dc), discover_char_unref);
--
--	return dc->id;
--}
--
--guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
--					bt_uuid_t *uuid, GAttribResultFunc func,
--					gpointer user_data)
--{
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
--	guint16 plen;
--
--	plen = enc_read_by_type_req(start, end, uuid, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
--}
--
--struct read_long_data {
--	GAttrib *attrib;
--	GAttribResultFunc func;
--	gpointer user_data;
--	guint8 *buffer;
--	guint16 size;
--	guint16 handle;
--	guint id;
--	int ref;
--};
--
--static void read_long_destroy(gpointer user_data)
--{
--	struct read_long_data *long_read = user_data;
--
--	if (__sync_sub_and_fetch(&long_read->ref, 1) > 0)
--		return;
--
--	g_attrib_unref(long_read->attrib);
--
--	if (long_read->buffer != NULL)
--		g_free(long_read->buffer);
--
--	g_free(long_read);
--}
--
--static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
--							gpointer user_data)
--{
--	struct read_long_data *long_read = user_data;
--	uint8_t *buf;
--	size_t buflen;
--	guint8 *tmp;
--	guint16 plen;
--	guint id;
--
--	if (status != 0 || rlen == 1) {
--		status = 0;
--		goto done;
--	}
--
--	tmp = g_try_realloc(long_read->buffer, long_read->size + rlen - 1);
--
--	if (tmp == NULL) {
--		status = ATT_ECODE_INSUFF_RESOURCES;
--		goto done;
--	}
--
--	memcpy(&tmp[long_read->size], &rpdu[1], rlen - 1);
--	long_read->buffer = tmp;
--	long_read->size += rlen - 1;
--
--	buf = g_attrib_get_buffer(long_read->attrib, &buflen);
--	if (rlen < buflen)
--		goto done;
--
--	plen = enc_read_blob_req(long_read->handle, long_read->size - 1,
--								buf, buflen);
--	id = g_attrib_send(long_read->attrib, long_read->id, buf, plen,
--				read_blob_helper, long_read, read_long_destroy);
--
--	if (id != 0) {
--		__sync_fetch_and_add(&long_read->ref, 1);
--		return;
--	}
--
--	status = ATT_ECODE_IO;
--
--done:
--	long_read->func(status, long_read->buffer, long_read->size,
--							long_read->user_data);
--}
--
--static void read_char_helper(guint8 status, const guint8 *rpdu,
--					guint16 rlen, gpointer user_data)
--{
--	struct read_long_data *long_read = user_data;
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(long_read->attrib, &buflen);
--	guint16 plen;
--	guint id;
--
--	if (status != 0 || rlen < buflen)
--		goto done;
--
--	long_read->buffer = g_malloc(rlen);
--	if (long_read->buffer == NULL) {
--		status = ATT_ECODE_INSUFF_RESOURCES;
--		goto done;
--	}
--
--	memcpy(long_read->buffer, rpdu, rlen);
--	long_read->size = rlen;
--
--	plen = enc_read_blob_req(long_read->handle, rlen - 1, buf, buflen);
--
--	id = g_attrib_send(long_read->attrib, long_read->id, buf, plen,
--				read_blob_helper, long_read, read_long_destroy);
--	if (id != 0) {
--		__sync_fetch_and_add(&long_read->ref, 1);
--		return;
--	}
--
--	status = ATT_ECODE_IO;
--
--done:
--	long_read->func(status, rpdu, rlen, long_read->user_data);
--}
--
--guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
--							gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	guint16 plen;
--	guint id;
--	struct read_long_data *long_read;
--
--	long_read = g_try_new0(struct read_long_data, 1);
--
--	if (long_read == NULL)
--		return 0;
--
--	long_read->attrib = g_attrib_ref(attrib);
--	long_read->func = func;
--	long_read->user_data = user_data;
--	long_read->handle = handle;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--	plen = enc_read_req(handle, buf, buflen);
--	id = g_attrib_send(attrib, 0, buf, plen, read_char_helper,
--						long_read, read_long_destroy);
--	if (id == 0) {
--		g_attrib_unref(long_read->attrib);
--		g_free(long_read);
--	} else {
--		__sync_fetch_and_add(&long_read->ref, 1);
--		long_read->id = id;
--	}
--
--	return id;
--}
--
--struct write_long_data {
--	GAttrib *attrib;
--	GAttribResultFunc func;
--	gpointer user_data;
--	guint16 handle;
--	uint16_t offset;
--	uint8_t *value;
--	size_t vlen;
--};
--
--static guint execute_write(GAttrib *attrib, uint8_t flags,
--				GAttribResultFunc func, gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	guint16 plen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--	plen = enc_exec_write_req(flags, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
--}
--
--static guint prepare_write(struct write_long_data *long_write);
--
--static void prepare_write_cb(guint8 status, const guint8 *rpdu, guint16 rlen,
--							gpointer user_data)
--{
--	struct write_long_data *long_write = user_data;
--
--	if (status != 0) {
--		long_write->func(status, rpdu, rlen, long_write->user_data);
--		return;
--	}
--
--	/* Skip Prepare Write Response PDU header (5 bytes) */
--	long_write->offset += rlen - 5;
--
--	if (long_write->offset == long_write->vlen) {
--		execute_write(long_write->attrib, ATT_WRITE_ALL_PREP_WRITES,
--				long_write->func, long_write->user_data);
--		free(long_write->value);
--		g_free(long_write);
--
--		return;
--	}
--
--	prepare_write(long_write);
--}
--
--static guint prepare_write(struct write_long_data *long_write)
--{
--	GAttrib *attrib = long_write->attrib;
--	uint16_t handle = long_write->handle;
--	uint16_t offset = long_write->offset;
--	uint8_t *buf, *value = long_write->value + offset;
--	size_t buflen, vlen = long_write->vlen - offset;
--	guint16 plen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--
--	plen = enc_prep_write_req(handle, offset, value, vlen, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	return g_attrib_send(attrib, 0, buf, plen, prepare_write_cb, long_write,
--									NULL);
--}
--
--guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
--			size_t vlen, GAttribResultFunc func, gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	struct write_long_data *long_write;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--
--	/* Use Write Request if payload fits on a single transfer, including 3
--	 * bytes for the header. */
--	if (vlen <= buflen - 3) {
--		uint16_t plen;
--
--		plen = enc_write_req(handle, value, vlen, buf, buflen);
--		if (plen == 0)
--			return 0;
--
--		return g_attrib_send(attrib, 0, buf, plen, func, user_data,
--									NULL);
--	}
--
--	/* Write Long Characteristic Values */
--	long_write = g_try_new0(struct write_long_data, 1);
--	if (long_write == NULL)
--		return 0;
--
--	long_write->attrib = attrib;
--	long_write->func = func;
--	long_write->user_data = user_data;
--	long_write->handle = handle;
--	long_write->value = util_memdup(value, vlen);
--	long_write->vlen = vlen;
--
--	return prepare_write(long_write);
--}
--
--guint gatt_execute_write(GAttrib *attrib, uint8_t flags,
--				GAttribResultFunc func, gpointer user_data)
--{
--	return execute_write(attrib, flags, func, user_data);
--}
--
--guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
--					const uint8_t *value, size_t vlen,
--					GAttribResultFunc func,
--					gpointer user_data)
--{
--	uint8_t *buf;
--	guint16 plen;
--	size_t buflen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--
--	plen = enc_prep_write_req(handle, 0, value, vlen, buf, buflen);
--	if (!plen)
--		return 0;
--
--	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
--}
--
--guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
--							gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	guint16 plen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--	plen = enc_mtu_req(mtu, buf, buflen);
--	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
--}
--
--static void desc_discovered_cb(guint8 status, const guint8 *ipdu,
--					guint16 iplen, gpointer user_data)
--{
--	struct discover_desc *dd = user_data;
--	struct att_data_list *list;
--	unsigned int i, err = 0;
--	guint8 format;
--	uint16_t last = 0xffff;
--	uint8_t type;
--	gboolean uuid_found = FALSE;
--
--	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
--		err = dd->descriptors ? 0 : status;
--		goto done;
--	}
--
--	if (status) {
--		err = status;
--		goto done;
--	}
--
--	list = dec_find_info_resp(ipdu, iplen, &format);
--	if (!list) {
--		err = ATT_ECODE_IO;
--		goto done;
--	}
--
--	if (format == ATT_FIND_INFO_RESP_FMT_16BIT)
--		type = BT_UUID16;
--	else
--		type = BT_UUID128;
--
--	for (i = 0; i < list->num; i++) {
--		uint8_t *value = list->data[i];
--		struct gatt_desc *desc;
--		bt_uuid_t uuid128;
--
--		last = get_le16(value);
--
--		get_uuid128(type, &value[2], &uuid128);
--
--		if (dd->uuid) {
--			if (bt_uuid_cmp(dd->uuid, &uuid128))
--				continue;
--			else
--				uuid_found = TRUE;
--		}
--
--		desc = g_try_new0(struct gatt_desc, 1);
--		if (!desc) {
--			att_data_list_free(list);
--			err = ATT_ECODE_INSUFF_RESOURCES;
--			goto done;
--		}
--
--		bt_uuid_to_string(&uuid128, desc->uuid, sizeof(desc->uuid));
--		desc->handle = last;
--
--		if (type == BT_UUID16)
--			desc->uuid16 = get_le16(&value[2]);
--
--		dd->descriptors = g_slist_append(dd->descriptors, desc);
--
--		if (uuid_found)
--			break;
--	}
--
--	att_data_list_free(list);
--
--	/*
--	 * If last handle is lower from previous start handle or if iterating
--	 * to the next handle from the last possible offset would overflow, then
--	 * something is wrong. Let's stop search, otherwise we might enter
--	 * infinite loop.
--	 */
--	if (last < dd->start || last == G_MAXUINT16) {
--		err = ATT_ECODE_UNLIKELY;
--		goto done;
--	}
--
--	dd->start = last + 1;
--
--	if (last < dd->end && !uuid_found) {
--		guint16 oplen;
--		size_t buflen;
--		uint8_t *buf;
--
--		buf = g_attrib_get_buffer(dd->attrib, &buflen);
--
--		oplen = enc_find_info_req(dd->start, dd->end, buf, buflen);
--		if (oplen == 0)
--			return;
--
--		g_attrib_send(dd->attrib, dd->id, buf, oplen,
--				desc_discovered_cb, discover_desc_ref(dd),
--				discover_desc_unref);
--
--		return;
--	}
--
--done:
--	dd->cb(err, dd->descriptors, dd->user_data);
--}
--
--guint gatt_discover_desc(GAttrib *attrib, uint16_t start, uint16_t end,
--						bt_uuid_t *uuid, gatt_cb_t func,
--						gpointer user_data)
--{
--	size_t buflen;
--	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
--	struct discover_desc *dd;
--	guint16 plen;
--
--	plen = enc_find_info_req(start, end, buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	dd = g_try_new0(struct discover_desc, 1);
--	if (dd == NULL)
--		return 0;
--
--	dd->attrib = g_attrib_ref(attrib);
--	dd->cb = func;
--	dd->user_data = user_data;
--	dd->start = start;
--	dd->end = end;
--	dd->uuid = util_memdup(uuid, sizeof(bt_uuid_t));
--
--	dd->id = g_attrib_send(attrib, 0, buf, plen, desc_discovered_cb,
--				discover_desc_ref(dd), discover_desc_unref);
--
--	return dd->id;
--}
--
--guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
--			int vlen, GDestroyNotify notify, gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	guint16 plen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--	plen = enc_write_cmd(handle, value, vlen, buf, buflen);
--	return g_attrib_send(attrib, 0, buf, plen, NULL, user_data, notify);
--}
--
--guint gatt_signed_write_cmd(GAttrib *attrib, uint16_t handle,
--						const uint8_t *value, int vlen,
--						struct bt_crypto *crypto,
--						const uint8_t csrk[16],
--						uint32_t sign_cnt,
--						GDestroyNotify notify,
--						gpointer user_data)
--{
--	uint8_t *buf;
--	size_t buflen;
--	guint16 plen;
--
--	buf = g_attrib_get_buffer(attrib, &buflen);
--	plen = enc_signed_write_cmd(handle, value, vlen, crypto, csrk, sign_cnt,
--								buf, buflen);
--	if (plen == 0)
--		return 0;
--
--	return g_attrib_send(attrib, 0, buf, plen, NULL, user_data, notify);
--}
--
- static sdp_data_t *proto_seq_find(sdp_list_t *proto_list)
- {
- 	sdp_list_t *list;
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index e2c8c90a8add..0fe81db06fe6 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -9,101 +9,12 @@
-  *
-  */
- 
--/*
-- * GATT Characteristic Property bit field
-- * Reference: Core SPEC 4.1 page 2183 (Table 3.5: Characteristic Properties
-- * bit field) defines how the Characteristic Value can be used, or how the
-- * characteristic descriptors (see Section 3.3.3 - page 2184) can be accessed.
-- * In the core spec, regular properties are included in the characteristic
-- * declaration, and the extended properties are defined as descriptor.
-- */
--
--#define GATT_CHR_PROP_BROADCAST				0x01
--#define GATT_CHR_PROP_READ				0x02
--#define GATT_CHR_PROP_WRITE_WITHOUT_RESP		0x04
--#define GATT_CHR_PROP_WRITE				0x08
--#define GATT_CHR_PROP_NOTIFY				0x10
--#define GATT_CHR_PROP_INDICATE				0x20
--#define GATT_CHR_PROP_AUTH				0x40
--#define GATT_CHR_PROP_EXT_PROP				0x80
--
--/* Client Characteristic Configuration bit field */
--#define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
--#define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
--
--typedef void (*gatt_cb_t) (uint8_t status, GSList *l, void *user_data);
--
- struct gatt_primary {
- 	char uuid[MAX_LEN_UUID_STR + 1];
- 	gboolean changed;
- 	struct att_range range;
- };
- 
--struct gatt_included {
--	char uuid[MAX_LEN_UUID_STR + 1];
--	uint16_t handle;
--	struct att_range range;
--};
--
--struct gatt_char {
--	char uuid[MAX_LEN_UUID_STR + 1];
--	uint16_t handle;
--	uint8_t properties;
--	uint16_t value_handle;
--};
--
--struct gatt_desc {
--	char uuid[MAX_LEN_UUID_STR + 1];
--	uint16_t handle;
--	uint16_t uuid16;
--};
--
--guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
--							gpointer user_data);
--
--unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
--					gatt_cb_t func, gpointer user_data);
--
--guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
--					bt_uuid_t *uuid, gatt_cb_t func,
--					gpointer user_data);
--
--guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
--							gpointer user_data);
--
--guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
--					size_t vlen, GAttribResultFunc func,
--					gpointer user_data);
--
--guint gatt_discover_desc(GAttrib *attrib, uint16_t start, uint16_t end,
--						bt_uuid_t *uuid, gatt_cb_t func,
--						gpointer user_data);
--
--guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
--					const uint8_t *value, size_t vlen,
--					GAttribResultFunc func,
--					gpointer user_data);
--
--guint gatt_execute_write(GAttrib *attrib, uint8_t flags,
--				GAttribResultFunc func, gpointer user_data);
--
--guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
--			int vlen, GDestroyNotify notify, gpointer user_data);
--
--guint gatt_signed_write_cmd(GAttrib *attrib, uint16_t handle,
--						const uint8_t *value, int vlen,
--						struct bt_crypto *crypto,
--						const uint8_t csrk[16],
--						uint32_t sign_cnt,
--						GDestroyNotify notify,
--						gpointer user_data);
--guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
--				bt_uuid_t *uuid, GAttribResultFunc func,
--				gpointer user_data);
--
--guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
--							gpointer user_data);
--
- gboolean gatt_parse_record(const sdp_record_t *rec,
- 					uuid_t *prim_uuid, uint16_t *psm,
- 					uint16_t *start, uint16_t *end);
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-deleted file mode 100644
-index 3a988e131e94..000000000000
---- a/attrib/gattrib.c
-+++ /dev/null
-@@ -1,473 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2010  Nokia Corporation
-- *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <stdint.h>
--#include <stdbool.h>
--#include <string.h>
--
--#include <glib.h>
--
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/uuid.h"
--
--#include "btio/btio.h"
--#include "src/log.h"
--#include "src/shared/util.h"
--#include "src/shared/att.h"
--#include "src/shared/gatt-helpers.h"
--#include "src/shared/queue.h"
--#include "src/shared/gatt-db.h"
--#include "src/shared/gatt-client.h"
--#include "attrib/att.h"
--#include "attrib/gattrib.h"
--
--struct _GAttrib {
--	int ref_count;
--	struct bt_att *att;
--	struct bt_gatt_client *client;
--	GIOChannel *io;
--	GDestroyNotify destroy;
--	gpointer destroy_user_data;
--	struct queue *callbacks;
--	uint8_t *buf;
--	int buflen;
--	struct queue *track_ids;
--};
--
--struct attrib_callbacks {
--	unsigned int id;
--	GAttribResultFunc result_func;
--	GAttribNotifyFunc notify_func;
--	GDestroyNotify destroy_func;
--	gpointer user_data;
--	GAttrib *parent;
--	uint16_t notify_handle;
--};
--
--GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu, bool ext_signed)
--{
--	gint fd;
--	GAttrib *attr;
--
--	if (!io)
--		return NULL;
--
--	fd = g_io_channel_unix_get_fd(io);
--	attr = new0(GAttrib, 1);
--	if (!attr)
--		return NULL;
--
--	g_io_channel_ref(io);
--	attr->io = io;
--
--	attr->att = bt_att_new(fd, ext_signed);
--	if (!attr->att)
--		goto fail;
--
--	bt_att_set_close_on_unref(attr->att, true);
--	g_io_channel_set_close_on_unref(io, FALSE);
--
--	if (!bt_att_set_mtu(attr->att, mtu))
--		goto fail;
--
--	attr->buf = malloc0(mtu);
--	attr->buflen = mtu;
--	if (!attr->buf)
--		goto fail;
--
--	attr->callbacks = queue_new();
--	if (!attr->callbacks)
--		goto fail;
--
--	attr->track_ids = queue_new();
--	if (!attr->track_ids)
--		goto fail;
--
--	return g_attrib_ref(attr);
--
--fail:
--	free(attr->buf);
--	bt_att_unref(attr->att);
--	g_io_channel_unref(io);
--	free(attr);
--	return NULL;
--}
--
--GAttrib *g_attrib_ref(GAttrib *attrib)
--{
--	if (!attrib)
--		return NULL;
--
--	__sync_fetch_and_add(&attrib->ref_count, 1);
--
--	DBG("%p: g_attrib_ref=%d ", attrib, attrib->ref_count);
--
--	return attrib;
--}
--
--static void attrib_callbacks_destroy(void *data)
--{
--	struct attrib_callbacks *cb = data;
--
--	if (cb->destroy_func)
--		cb->destroy_func(cb->user_data);
--
--	free(data);
--}
--
--static void attrib_callbacks_remove(void *data)
--{
--	struct attrib_callbacks *cb = data;
--
--	if (!data || !queue_remove(cb->parent->callbacks, data))
--		return;
--
--	attrib_callbacks_destroy(data);
--}
--
--void g_attrib_unref(GAttrib *attrib)
--{
--	if (!attrib)
--		return;
--
--	DBG("%p: g_attrib_unref=%d ", attrib, attrib->ref_count - 1);
--
--	if (__sync_sub_and_fetch(&attrib->ref_count, 1))
--		return;
--
--	if (attrib->destroy)
--		attrib->destroy(attrib->destroy_user_data);
--
--	bt_gatt_client_unref(attrib->client);
--	bt_att_unref(attrib->att);
--
--	queue_destroy(attrib->callbacks, attrib_callbacks_destroy);
--	queue_destroy(attrib->track_ids, NULL);
--
--	free(attrib->buf);
--
--	g_io_channel_unref(attrib->io);
--
--	free(attrib);
--}
--
--GIOChannel *g_attrib_get_channel(GAttrib *attrib)
--{
--	if (!attrib)
--		return NULL;
--
--	return attrib->io;
--}
--
--struct bt_att *g_attrib_get_att(GAttrib *attrib)
--{
--	if (!attrib)
--		return NULL;
--
--	return attrib->att;
--}
--
--gboolean g_attrib_set_destroy_function(GAttrib *attrib, GDestroyNotify destroy,
--							gpointer user_data)
--{
--	if (!attrib)
--		return FALSE;
--
--	attrib->destroy = destroy;
--	attrib->destroy_user_data = user_data;
--
--	return TRUE;
--}
--
--
--static uint8_t *construct_full_pdu(uint8_t opcode, const void *pdu,
--								uint16_t length)
--{
--	uint8_t *buf = malloc0(length + 1);
--
--	if (!buf)
--		return NULL;
--
--	buf[0] = opcode;
--
--	if (pdu && length)
--		memcpy(buf + 1, pdu, length);
--
--	return buf;
--}
--
--static void attrib_callback_result(uint8_t opcode, const void *pdu,
--					uint16_t length, void *user_data)
--{
--	uint8_t *buf;
--	struct attrib_callbacks *cb = user_data;
--	guint8 status = 0;
--
--	if (!cb)
--		return;
--
--	buf = construct_full_pdu(opcode, pdu, length);
--	if (!buf)
--		return;
--
--	if (opcode == BT_ATT_OP_ERROR_RSP) {
--		/* Error code is the third byte of the PDU data */
--		if (length < 4)
--			status = BT_ATT_ERROR_UNLIKELY;
--		else
--			status = ((guint8 *)pdu)[3];
--	}
--
--	if (cb->result_func)
--		cb->result_func(status, buf, length + 1, cb->user_data);
--
--	free(buf);
--}
--
--static void attrib_callback_notify(struct bt_att_chan *chan, uint16_t mtu,
--					uint8_t opcode, const void *pdu,
--					uint16_t length, void *user_data)
--{
--	uint8_t *buf;
--	struct attrib_callbacks *cb = user_data;
--
--	if (!cb || !cb->notify_func)
--		return;
--
--	if (cb->notify_handle != GATTRIB_ALL_HANDLES && length < 2)
--		return;
--
--	if (cb->notify_handle != GATTRIB_ALL_HANDLES &&
--					cb->notify_handle != get_le16(pdu))
--		return;
--
--	buf = construct_full_pdu(opcode, pdu, length);
--	if (!buf)
--		return;
--
--	cb->notify_func(buf, length + 1, cb->user_data);
--
--	free(buf);
--}
--
--guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
--				GAttribResultFunc func, gpointer user_data,
--				GDestroyNotify notify)
--{
--	struct attrib_callbacks *cb = NULL;
--	bt_att_response_func_t response_cb = NULL;
--	bt_att_destroy_func_t destroy_cb = NULL;
--
--	if (!attrib)
--		return 0;
--
--	if (!pdu || !len)
--		return 0;
--
--	if (func || notify) {
--		cb = new0(struct attrib_callbacks, 1);
--		if (!cb)
--			return 0;
--		cb->result_func = func;
--		cb->user_data = user_data;
--		cb->destroy_func = notify;
--		cb->parent = attrib;
--		queue_push_head(attrib->callbacks, cb);
--		response_cb = attrib_callback_result;
--		destroy_cb = attrib_callbacks_remove;
--
--	}
--
--	if (id == 0)
--		id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1,
--					len - 1, response_cb, cb, destroy_cb);
--	else {
--		int err;
--
--		err = bt_att_resend(attrib->att, id, pdu[0], (void *) pdu + 1,
--					len - 1, response_cb, cb, destroy_cb);
--		if (err)
--			return 0;
--	}
--
--	if (!id)
--		return id;
--
--	/*
--	 * If user what us to use given id, lets keep track on that so we give
--	 * user a possibility to cancel ongoing request.
--	 */
--	if (cb) {
--		cb->id = id;
--		queue_push_tail(attrib->track_ids, UINT_TO_PTR(id));
--	}
--
--	return id;
--}
--
--gboolean g_attrib_cancel(GAttrib *attrib, guint id)
--{
--	if (!attrib)
--		return FALSE;
--
--	return bt_att_cancel(attrib->att, id);
--}
--
--static void cancel_request(void *data, void *user_data)
--{
--	unsigned int id = PTR_TO_UINT(data);
--	GAttrib *attrib = user_data;
--
--	bt_att_cancel(attrib->att, id);
--}
--
--gboolean g_attrib_cancel_all(GAttrib *attrib)
--{
--	if (!attrib)
--		return FALSE;
--
--	queue_foreach(attrib->track_ids, cancel_request, attrib);
--	queue_remove_all(attrib->track_ids, NULL, NULL, NULL);
--
--	return TRUE;
--}
--
--static void client_notify_cb(uint16_t value_handle, const uint8_t *value,
--				uint16_t length, void *user_data)
--{
--	uint8_t *buf = newa(uint8_t, length + 2);
--
--	put_le16(value_handle, buf);
--
--	if (length)
--		memcpy(buf + 2, value, length);
--
--	attrib_callback_notify(NULL, 0, ATT_OP_HANDLE_NOTIFY, buf, length + 2,
--							user_data);
--}
--
--guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
--				GAttribNotifyFunc func, gpointer user_data,
--				GDestroyNotify notify)
--{
--	struct attrib_callbacks *cb = NULL;
--
--	if (!attrib)
--		return 0;
--
--	if (func || notify) {
--		cb = new0(struct attrib_callbacks, 1);
--		if (!cb)
--			return 0;
--		cb->notify_func = func;
--		cb->notify_handle = handle;
--		cb->user_data = user_data;
--		cb->destroy_func = notify;
--		cb->parent = attrib;
--		queue_push_head(attrib->callbacks, cb);
--	}
--
--	if (opcode == ATT_OP_HANDLE_NOTIFY && attrib->client) {
--		unsigned int id;
--
--		id = bt_gatt_client_register_notify(attrib->client, handle,
--						NULL, client_notify_cb, cb,
--						attrib_callbacks_remove);
--		if (id)
--			return id;
--	}
--
--	if (opcode == GATTRIB_ALL_REQS)
--		opcode = BT_ATT_ALL_REQUESTS;
--
--	return bt_att_register(attrib->att, opcode, attrib_callback_notify,
--						cb, attrib_callbacks_remove);
--}
--
--uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
--{
--	uint16_t mtu;
--
--	if (!attrib || !len)
--		return NULL;
--
--	mtu = bt_att_get_mtu(attrib->att);
--
--	/*
--	 * Clients of this expect a buffer to use.
--	 *
--	 * Pdu encoding in shared/att verifies if whole buffer fits the mtu,
--	 * thus we should set the buflen also when mtu is reduced. But we
--	 * need to reallocate the buffer only if mtu is larger.
--	 */
--	if (mtu > attrib->buflen)
--		attrib->buf = g_realloc(attrib->buf, mtu);
--
--	attrib->buflen = mtu;
--	*len = attrib->buflen;
--	return attrib->buf;
--}
--
--gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
--{
--	if (!attrib)
--		return FALSE;
--
--	/*
--	 * Clients of this expect a buffer to use.
--	 *
--	 * Pdu encoding in sharred/att verifies if whole buffer fits the mtu,
--	 * thus we should set the buflen also when mtu is reduced. But we
--	 * need to reallocate the buffer only if mtu is larger.
--	 */
--	if (mtu > attrib->buflen)
--		attrib->buf = g_realloc(attrib->buf, mtu);
--
--	attrib->buflen = mtu;
--
--	return bt_att_set_mtu(attrib->att, mtu);
--}
--
--gboolean g_attrib_attach_client(GAttrib *attrib, struct bt_gatt_client *client)
--{
--	if (!attrib || !client)
--		return FALSE;
--
--	if (attrib->client)
--		bt_gatt_client_unref(attrib->client);
--
--	attrib->client = bt_gatt_client_clone(client);
--	if (!attrib->client)
--		return FALSE;
--
--	return TRUE;
--}
--
--gboolean g_attrib_unregister(GAttrib *attrib, guint id)
--{
--	if (!attrib)
--		return FALSE;
--
--	return bt_att_unregister(attrib->att, id);
--}
--
--gboolean g_attrib_unregister_all(GAttrib *attrib)
--{
--	if (!attrib)
--		return false;
--
--	return bt_att_unregister_all(attrib->att);
--}
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-deleted file mode 100644
-index 0111bfc3f2fa..000000000000
---- a/attrib/gattrib.h
-+++ /dev/null
-@@ -1,65 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-or-later */
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2010  Nokia Corporation
-- *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- */
--#ifndef __GATTRIB_H
--#define __GATTRIB_H
--
--#ifdef __cplusplus
--extern "C" {
--#endif
--
--#define GATTRIB_ALL_REQS 0xFE
--#define GATTRIB_ALL_HANDLES 0x0000
--
--struct bt_att;  /* Forward declaration for compatibility */
--struct bt_gatt_client;  /* Forward declaration for compatibility */
--struct _GAttrib;
--typedef struct _GAttrib GAttrib;
--
--typedef void (*GAttribResultFunc) (guint8 status, const guint8 *pdu,
--					guint16 len, gpointer user_data);
--typedef void (*GAttribDisconnectFunc)(gpointer user_data);
--typedef void (*GAttribDebugFunc)(const char *str, gpointer user_data);
--typedef void (*GAttribNotifyFunc)(const guint8 *pdu, guint16 len,
--							gpointer user_data);
--
--GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu, bool ext_signed);
--GAttrib *g_attrib_ref(GAttrib *attrib);
--void g_attrib_unref(GAttrib *attrib);
--
--GIOChannel *g_attrib_get_channel(GAttrib *attrib);
--
--struct bt_att *g_attrib_get_att(GAttrib *attrib);
--
--gboolean g_attrib_set_destroy_function(GAttrib *attrib,
--		GDestroyNotify destroy, gpointer user_data);
--
--guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
--			GAttribResultFunc func, gpointer user_data,
--			GDestroyNotify notify);
--
--gboolean g_attrib_cancel(GAttrib *attrib, guint id);
--gboolean g_attrib_cancel_all(GAttrib *attrib);
--
--guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
--				GAttribNotifyFunc func, gpointer user_data,
--				GDestroyNotify notify);
--
--uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
--gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
--gboolean g_attrib_attach_client(GAttrib *attrib, struct bt_gatt_client *client);
--
--gboolean g_attrib_unregister(GAttrib *attrib, guint id);
--gboolean g_attrib_unregister_all(GAttrib *attrib);
--
--#ifdef __cplusplus
--}
--#endif
--#endif
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-deleted file mode 100644
-index c984bef9dd39..000000000000
---- a/attrib/gatttool.c
-+++ /dev/null
-@@ -1,612 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2010  Nokia Corporation
-- *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <errno.h>
--#include <stdlib.h>
--#include <unistd.h>
--
--#include <glib.h>
--
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/hci.h"
--#include "bluetooth/hci_lib.h"
--#include "bluetooth/sdp.h"
--#include "bluetooth/uuid.h"
--
--#include "src/shared/att-types.h"
--#include "src/shared/util.h"
--#include "att.h"
--#include "btio/btio.h"
--#include "gattrib.h"
--#include "gatt.h"
--#include "gatttool.h"
--
--static char *opt_src = NULL;
--static char *opt_dst = NULL;
--static char *opt_dst_type = NULL;
--static char *opt_value = NULL;
--static char *opt_sec_level = NULL;
--static bt_uuid_t *opt_uuid = NULL;
--static int opt_start = 0x0001;
--static int opt_end = 0xffff;
--static int opt_handle = -1;
--static int opt_mtu = 0;
--static int opt_psm = 0;
--static gboolean opt_primary = FALSE;
--static gboolean opt_characteristics = FALSE;
--static gboolean opt_char_read = FALSE;
--static gboolean opt_listen = FALSE;
--static gboolean opt_char_desc = FALSE;
--static gboolean opt_char_write = FALSE;
--static gboolean opt_char_write_req = FALSE;
--static gboolean opt_interactive = FALSE;
--static GMainLoop *event_loop;
--static gboolean got_error = FALSE;
--static GSourceFunc operation;
--
--struct characteristic_data {
--	GAttrib *attrib;
--	uint16_t start;
--	uint16_t end;
--};
--
--static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--	uint8_t *opdu;
--	uint16_t handle, i, olen = 0;
--	size_t plen;
--
--	handle = get_le16(&pdu[1]);
--
--	switch (pdu[0]) {
--	case ATT_OP_HANDLE_NOTIFY:
--		g_print("Notification handle = 0x%04x value: ", handle);
--		break;
--	case ATT_OP_HANDLE_IND:
--		g_print("Indication   handle = 0x%04x value: ", handle);
--		break;
--	default:
--		g_print("Invalid opcode\n");
--		return;
--	}
--
--	for (i = 3; i < len; i++)
--		g_print("%02x ", pdu[i]);
--
--	g_print("\n");
--
--	if (pdu[0] == ATT_OP_HANDLE_NOTIFY)
--		return;
--
--	opdu = g_attrib_get_buffer(attrib, &plen);
--	olen = enc_confirmation(opdu, plen);
--
--	if (olen > 0)
--		g_attrib_send(attrib, 0, opdu, olen, NULL, NULL, NULL);
--}
--
--static gboolean listen_start(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--
--	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, GATTRIB_ALL_HANDLES,
--						events_handler, attrib, NULL);
--	g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
--						events_handler, attrib, NULL);
--
--	return FALSE;
--}
--
--static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
--{
--	GAttrib *attrib;
--	uint16_t mtu;
--	uint16_t cid;
--	GError *gerr = NULL;
--
--	if (err) {
--		g_printerr("%s\n", err->message);
--		got_error = TRUE;
--		g_main_loop_quit(event_loop);
--	}
--
--	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
--
--	if (gerr) {
--		g_printerr("Can't detect MTU, using default: %s",
--								gerr->message);
--		g_error_free(gerr);
--		mtu = ATT_DEFAULT_LE_MTU;
--	}
--
--	if (cid == BT_ATT_CID)
--		mtu = ATT_DEFAULT_LE_MTU;
--
--	attrib = g_attrib_new(io, mtu, false);
--
--	if (opt_listen)
--		g_idle_add(listen_start, attrib);
--
--	operation(attrib);
--}
--
--static void primary_all_cb(uint8_t status, GSList *services, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		g_printerr("Discover all primary services failed: %s\n",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	for (l = services; l; l = l->next) {
--		struct gatt_primary *prim = l->data;
--		g_print("attr handle = 0x%04x, end grp handle = 0x%04x "
--			"uuid: %s\n", prim->range.start, prim->range.end, prim->uuid);
--	}
--
--done:
--	g_main_loop_quit(event_loop);
--}
--
--static void primary_by_uuid_cb(uint8_t status, GSList *ranges, void *user_data)
--{
--	GSList *l;
--
--	if (status != 0) {
--		g_printerr("Discover primary services by UUID failed: %s\n",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	for (l = ranges; l; l = l->next) {
--		struct att_range *range = l->data;
--		g_print("Starting handle: %04x Ending handle: %04x\n",
--						range->start, range->end);
--	}
--
--done:
--	g_main_loop_quit(event_loop);
--}
--
--static gboolean primary(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--
--	if (opt_uuid)
--		gatt_discover_primary(attrib, opt_uuid, primary_by_uuid_cb,
--									NULL);
--	else
--		gatt_discover_primary(attrib, NULL, primary_all_cb, NULL);
--
--	return FALSE;
--}
--
--static void char_discovered_cb(uint8_t status, GSList *characteristics,
--								void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		g_printerr("Discover all characteristics failed: %s\n",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	for (l = characteristics; l; l = l->next) {
--		struct gatt_char *chars = l->data;
--
--		g_print("handle = 0x%04x, char properties = 0x%02x, char value "
--			"handle = 0x%04x, uuid = %s\n", chars->handle,
--			chars->properties, chars->value_handle, chars->uuid);
--	}
--
--done:
--	g_main_loop_quit(event_loop);
--}
--
--static gboolean characteristics(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--
--	gatt_discover_char(attrib, opt_start, opt_end, opt_uuid,
--						char_discovered_cb, NULL);
--
--	return FALSE;
--}
--
--static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	uint8_t value[plen];
--	ssize_t vlen;
--	int i;
--
--	if (status != 0) {
--		g_printerr("Characteristic value/descriptor read failed: %s\n",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
--	if (vlen < 0) {
--		g_printerr("Protocol error\n");
--		goto done;
--	}
--	g_print("Characteristic value/descriptor: ");
--	for (i = 0; i < vlen; i++)
--		g_print("%02x ", value[i]);
--	g_print("\n");
--
--done:
--	if (!opt_listen)
--		g_main_loop_quit(event_loop);
--}
--
--static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
--					guint16 plen, gpointer user_data)
--{
--	struct att_data_list *list;
--	int i;
--
--	if (status != 0) {
--		g_printerr("Read characteristics by UUID failed: %s\n",
--							att_ecode2str(status));
--		goto done;
--	}
--
--	list = dec_read_by_type_resp(pdu, plen);
--	if (list == NULL)
--		goto done;
--
--	for (i = 0; i < list->num; i++) {
--		uint8_t *value = list->data[i];
--		int j;
--
--		g_print("handle: 0x%04x \t value: ", get_le16(value));
--		value += 2;
--		for (j = 0; j < list->len - 2; j++, value++)
--			g_print("%02x ", *value);
--		g_print("\n");
--	}
--
--	att_data_list_free(list);
--
--done:
--	g_main_loop_quit(event_loop);
--}
--
--static gboolean characteristics_read(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--
--	if (opt_uuid != NULL) {
--
--		gatt_read_char_by_uuid(attrib, opt_start, opt_end, opt_uuid,
--						char_read_by_uuid_cb, NULL);
--
--		return FALSE;
--	}
--
--	if (opt_handle <= 0) {
--		g_printerr("A valid handle is required\n");
--		g_main_loop_quit(event_loop);
--		return FALSE;
--	}
--
--	gatt_read_char(attrib, opt_handle, char_read_cb, attrib);
--
--	return FALSE;
--}
--
--static void mainloop_quit(gpointer user_data)
--{
--	uint8_t *value = user_data;
--
--	g_free(value);
--	g_main_loop_quit(event_loop);
--}
--
--static gboolean characteristics_write(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--	uint8_t *value;
--	size_t len;
--
--	if (opt_handle <= 0) {
--		g_printerr("A valid handle is required\n");
--		goto error;
--	}
--
--	if (opt_value == NULL || opt_value[0] == '\0') {
--		g_printerr("A value is required\n");
--		goto error;
--	}
--
--	len = gatt_attr_data_from_string(opt_value, &value);
--	if (len == 0) {
--		g_printerr("Invalid value\n");
--		goto error;
--	}
--
--	gatt_write_cmd(attrib, opt_handle, value, len, mainloop_quit, value);
--
--	g_free(value);
--	return FALSE;
--
--error:
--	g_main_loop_quit(event_loop);
--	return FALSE;
--}
--
--static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	if (status != 0) {
--		g_printerr("Characteristic Write Request failed: "
--						"%s\n", att_ecode2str(status));
--		goto done;
--	}
--
--	if (!dec_write_resp(pdu, plen) && !dec_exec_write_resp(pdu, plen)) {
--		g_printerr("Protocol error\n");
--		goto done;
--	}
--
--	g_print("Characteristic value was written successfully\n");
--
--done:
--	if (!opt_listen)
--		g_main_loop_quit(event_loop);
--}
--
--static gboolean characteristics_write_req(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--	uint8_t *value;
--	size_t len;
--
--	if (opt_handle <= 0) {
--		g_printerr("A valid handle is required\n");
--		goto error;
--	}
--
--	if (opt_value == NULL || opt_value[0] == '\0') {
--		g_printerr("A value is required\n");
--		goto error;
--	}
--
--	len = gatt_attr_data_from_string(opt_value, &value);
--	if (len == 0) {
--		g_printerr("Invalid value\n");
--		goto error;
--	}
--
--	gatt_write_char(attrib, opt_handle, value, len, char_write_req_cb,
--									NULL);
--
--	g_free(value);
--	return FALSE;
--
--error:
--	g_main_loop_quit(event_loop);
--	return FALSE;
--}
--
--static void char_desc_cb(uint8_t status, GSList *descriptors, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		g_printerr("Discover descriptors failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	for (l = descriptors; l; l = l->next) {
--		struct gatt_desc *desc = l->data;
--
--		g_print("handle = 0x%04x, uuid = %s\n", desc->handle,
--								desc->uuid);
--	}
--
--	if (!opt_listen)
--		g_main_loop_quit(event_loop);
--}
--
--static gboolean characteristics_desc(gpointer user_data)
--{
--	GAttrib *attrib = user_data;
--
--	gatt_discover_desc(attrib, opt_start, opt_end, NULL, char_desc_cb,
--									NULL);
--
--	return FALSE;
--}
--
--static gboolean parse_uuid(const char *key, const char *value,
--				gpointer user_data, GError **error)
--{
--	if (!value)
--		return FALSE;
--
--	opt_uuid = g_try_malloc(sizeof(bt_uuid_t));
--	if (opt_uuid == NULL)
--		return FALSE;
--
--	if (bt_string_to_uuid(opt_uuid, value) < 0)
--		return FALSE;
--
--	return TRUE;
--}
--
--static const GOptionEntry primary_char_options[] = {
--	{ "start", 's' , 0, G_OPTION_ARG_INT, &opt_start,
--		"Starting handle (optional)", "0x0001" },
--	{ "end", 'e' , 0, G_OPTION_ARG_INT, &opt_end,
--		"Ending handle (optional)", "0xffff" },
--	{ "uuid", 'u', G_OPTION_FLAG_OPTIONAL_ARG, G_OPTION_ARG_CALLBACK,
--		parse_uuid, "UUID16 or UUID128 (optional)", "0x1801"},
--	{ NULL },
--};
--
--static const GOptionEntry char_rw_options[] = {
--	{ "handle", 'a' , 0, G_OPTION_ARG_INT, &opt_handle,
--		"Read/Write characteristic by handle (required)", "0x0001" },
--	{ "value", 'n' , 0, G_OPTION_ARG_STRING, &opt_value,
--		"Write characteristic value (required for write operation)",
--		"0x0001" },
--	{NULL},
--};
--
--static const GOptionEntry gatt_options[] = {
--	{ "primary", 0, 0, G_OPTION_ARG_NONE, &opt_primary,
--		"Primary Service Discovery", NULL },
--	{ "characteristics", 0, 0, G_OPTION_ARG_NONE, &opt_characteristics,
--		"Characteristics Discovery", NULL },
--	{ "char-read", 0, 0, G_OPTION_ARG_NONE, &opt_char_read,
--		"Characteristics Value/Descriptor Read", NULL },
--	{ "char-write", 0, 0, G_OPTION_ARG_NONE, &opt_char_write,
--		"Characteristics Value Write Without Response (Write Command)",
--		NULL },
--	{ "char-write-req", 0, 0, G_OPTION_ARG_NONE, &opt_char_write_req,
--		"Characteristics Value Write (Write Request)", NULL },
--	{ "char-desc", 0, 0, G_OPTION_ARG_NONE, &opt_char_desc,
--		"Characteristics Descriptor Discovery", NULL },
--	{ "listen", 0, 0, G_OPTION_ARG_NONE, &opt_listen,
--		"Listen for notifications and indications", NULL },
--	{ "interactive", 'I', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
--		&opt_interactive, "Use interactive mode", NULL },
--	{ NULL },
--};
--
--static const GOptionEntry options[] = {
--	{ "adapter", 'i', 0, G_OPTION_ARG_STRING, &opt_src,
--		"Specify local adapter interface", "hciX" },
--	{ "device", 'b', 0, G_OPTION_ARG_STRING, &opt_dst,
--		"Specify remote Bluetooth address", "MAC" },
--	{ "addr-type", 't', 0, G_OPTION_ARG_STRING, &opt_dst_type,
--		"Set LE address type. Default: public", "[public | random]"},
--	{ "mtu", 'm', 0, G_OPTION_ARG_INT, &opt_mtu,
--		"Specify the MTU size", "MTU" },
--	{ "psm", 'p', 0, G_OPTION_ARG_INT, &opt_psm,
--		"Specify the PSM for GATT/ATT over BR/EDR", "PSM" },
--	{ "sec-level", 'l', 0, G_OPTION_ARG_STRING, &opt_sec_level,
--		"Set security level. Default: low", "[low | medium | high]"},
--	{ NULL },
--};
--
--int main(int argc, char *argv[])
--{
--	GOptionContext *context;
--	GOptionGroup *gatt_group, *params_group, *char_rw_group;
--	GError *gerr = NULL;
--	GIOChannel *chan;
--
--	opt_dst_type = g_strdup("public");
--	opt_sec_level = g_strdup("low");
--
--	context = g_option_context_new(NULL);
--	g_option_context_add_main_entries(context, options, NULL);
--
--	/* GATT commands */
--	gatt_group = g_option_group_new("gatt", "GATT commands",
--					"Show all GATT commands", NULL, NULL);
--	g_option_context_add_group(context, gatt_group);
--	g_option_group_add_entries(gatt_group, gatt_options);
--
--	/* Primary Services and Characteristics arguments */
--	params_group = g_option_group_new("params",
--			"Primary Services/Characteristics arguments",
--			"Show all Primary Services/Characteristics arguments",
--			NULL, NULL);
--	g_option_context_add_group(context, params_group);
--	g_option_group_add_entries(params_group, primary_char_options);
--
--	/* Characteristics value/descriptor read/write arguments */
--	char_rw_group = g_option_group_new("char-read-write",
--		"Characteristics Value/Descriptor Read/Write arguments",
--		"Show all Characteristics Value/Descriptor Read/Write "
--		"arguments",
--		NULL, NULL);
--	g_option_context_add_group(context, char_rw_group);
--	g_option_group_add_entries(char_rw_group, char_rw_options);
--
--	if (!g_option_context_parse(context, &argc, &argv, &gerr)) {
--		g_printerr("%s\n", gerr->message);
--		g_clear_error(&gerr);
--	}
--
--	if (opt_interactive) {
--		interactive(opt_src, opt_dst, opt_dst_type, opt_psm);
--		goto done;
--	}
--
--	if (opt_primary)
--		operation = primary;
--	else if (opt_characteristics)
--		operation = characteristics;
--	else if (opt_char_read)
--		operation = characteristics_read;
--	else if (opt_char_write)
--		operation = characteristics_write;
--	else if (opt_char_write_req)
--		operation = characteristics_write_req;
--	else if (opt_char_desc)
--		operation = characteristics_desc;
--	else {
--		char *help = g_option_context_get_help(context, TRUE, NULL);
--		g_print("%s\n", help);
--		g_free(help);
--		got_error = TRUE;
--		goto done;
--	}
--
--	if (opt_dst == NULL) {
--		g_print("Remote Bluetooth address required\n");
--		got_error = TRUE;
--		goto done;
--	}
--
--	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
--					opt_psm, opt_mtu, connect_cb, &gerr);
--	if (chan == NULL) {
--		g_printerr("%s\n", gerr->message);
--		g_clear_error(&gerr);
--		got_error = TRUE;
--		goto done;
--	}
--
--	event_loop = g_main_loop_new(NULL, FALSE);
--
--	g_main_loop_run(event_loop);
--
--	g_main_loop_unref(event_loop);
--
--done:
--	g_option_context_free(context);
--	g_free(opt_src);
--	g_free(opt_dst);
--	g_free(opt_uuid);
--	g_free(opt_sec_level);
--
--	if (got_error)
--		exit(EXIT_FAILURE);
--	else
--		exit(EXIT_SUCCESS);
--}
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-deleted file mode 100644
-index 20cb42417e34..000000000000
---- a/attrib/gatttool.h
-+++ /dev/null
-@@ -1,17 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-or-later */
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011  Nokia Corporation
-- *
-- *
-- */
--
--int interactive(const char *src, const char *dst, const char *dst_type,
--								int psm);
--GIOChannel *gatt_connect(const char *src, const char *dst,
--			const char *dst_type, const char *sec_level,
--			int psm, int mtu, BtIOConnect connect_cb,
--			GError **gerr);
--size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-deleted file mode 100644
-index 0291fa876533..000000000000
---- a/attrib/interactive.c
-+++ /dev/null
-@@ -1,1020 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011  Nokia Corporation
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#define _GNU_SOURCE
--#include <string.h>
--#include <stdlib.h>
--#include <stdarg.h>
--#include <errno.h>
--#include <stdio.h>
--#include <unistd.h>
--#include <signal.h>
--#include <sys/signalfd.h>
--#include <glib.h>
--
--#include <readline/readline.h>
--#include <readline/history.h>
--
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/sdp.h"
--#include "bluetooth/uuid.h"
--
--#include "src/shared/att-types.h"
--#include "src/shared/util.h"
--#include "btio/btio.h"
--#include "att.h"
--#include "gattrib.h"
--#include "gatt.h"
--#include "gatttool.h"
--#include "client/display.h"
--
--static GIOChannel *iochannel = NULL;
--static GAttrib *attrib = NULL;
--static GMainLoop *event_loop;
--static GString *prompt;
--
--static char *opt_src = NULL;
--static char *opt_dst = NULL;
--static char *opt_dst_type = NULL;
--static char *opt_sec_level = NULL;
--static int opt_psm = 0;
--static int opt_mtu = 0;
--static int start;
--static int end;
--
--static void cmd_help(int argcp, char **argvp);
--
--static enum state {
--	STATE_DISCONNECTED,
--	STATE_CONNECTING,
--	STATE_CONNECTED
--} conn_state;
--
--#define error(fmt, arg...) \
--	rl_printf(COLOR_RED "Error: " COLOR_OFF fmt, ## arg)
--
--#define failed(fmt, arg...) \
--	rl_printf(COLOR_RED "Command Failed: " COLOR_OFF fmt, ## arg)
--
--static char *get_prompt(void)
--{
--	if (conn_state == STATE_CONNECTED)
--		g_string_assign(prompt, COLOR_BLUE);
--	else
--		g_string_assign(prompt, "");
--
--	if (opt_dst)
--		g_string_append_printf(prompt, "[%17s]", opt_dst);
--	else
--		g_string_append_printf(prompt, "[%17s]", "");
--
--	if (conn_state == STATE_CONNECTED)
--		g_string_append(prompt, COLOR_OFF);
--
--	if (opt_psm)
--		g_string_append(prompt, "[BR]");
--	else
--		g_string_append(prompt, "[LE]");
--
--	g_string_append(prompt, "> ");
--
--	return prompt->str;
--}
--
--
--static void set_state(enum state st)
--{
--	conn_state = st;
--	rl_set_prompt(get_prompt());
--}
--
--static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	uint8_t *opdu;
--	uint16_t handle, i, olen;
--	size_t plen;
--	GString *s;
--
--	handle = get_le16(&pdu[1]);
--
--	switch (pdu[0]) {
--	case ATT_OP_HANDLE_NOTIFY:
--		s = g_string_new(NULL);
--		g_string_printf(s, "Notification handle = 0x%04x value: ",
--									handle);
--		break;
--	case ATT_OP_HANDLE_IND:
--		s = g_string_new(NULL);
--		g_string_printf(s, "Indication   handle = 0x%04x value: ",
--									handle);
--		break;
--	default:
--		error("Invalid opcode\n");
--		return;
--	}
--
--	for (i = 3; i < len; i++)
--		g_string_append_printf(s, "%02x ", pdu[i]);
--
--	rl_printf("%s\n", s->str);
--	g_string_free(s, TRUE);
--
--	if (pdu[0] == ATT_OP_HANDLE_NOTIFY)
--		return;
--
--	opdu = g_attrib_get_buffer(attrib, &plen);
--	olen = enc_confirmation(opdu, plen);
--
--	if (olen > 0)
--		g_attrib_send(attrib, 0, opdu, olen, NULL, NULL, NULL);
--}
--
--static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
--{
--	uint16_t mtu;
--	uint16_t cid;
--
--	if (err) {
--		set_state(STATE_DISCONNECTED);
--		error("%s\n", err->message);
--		return;
--	}
--
--	bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
--
--	if (err) {
--		g_printerr("Can't detect MTU, using default: %s", err->message);
--		g_error_free(err);
--		mtu = ATT_DEFAULT_LE_MTU;
--	}
--
--	if (cid == BT_ATT_CID)
--		mtu = ATT_DEFAULT_LE_MTU;
--
--	attrib = g_attrib_new(iochannel, mtu, false);
--	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, GATTRIB_ALL_HANDLES,
--						events_handler, attrib, NULL);
--	g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
--						events_handler, attrib, NULL);
--	set_state(STATE_CONNECTED);
--	rl_printf("Connection successful\n");
--}
--
--static void disconnect_io(void)
--{
--	if (conn_state == STATE_DISCONNECTED)
--		return;
--
--	g_attrib_unref(attrib);
--	attrib = NULL;
--	opt_mtu = 0;
--
--	g_io_channel_shutdown(iochannel, FALSE, NULL);
--	g_io_channel_unref(iochannel);
--	iochannel = NULL;
--
--	set_state(STATE_DISCONNECTED);
--}
--
--static void primary_all_cb(uint8_t status, GSList *services, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		error("Discover all primary services failed: %s\n",
--						att_ecode2str(status));
--		return;
--	}
--
--	if (services == NULL) {
--		error("No primary service found\n");
--		return;
--	}
--
--	for (l = services; l; l = l->next) {
--		struct gatt_primary *prim = l->data;
--		rl_printf("attr handle: 0x%04x, end grp handle: 0x%04x uuid: %s\n",
--				prim->range.start, prim->range.end, prim->uuid);
--	}
--}
--
--static void primary_by_uuid_cb(uint8_t status, GSList *ranges, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		error("Discover primary services by UUID failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	if (ranges == NULL) {
--		error("No service UUID found\n");
--		return;
--	}
--
--	for (l = ranges; l; l = l->next) {
--		struct att_range *range = l->data;
--		rl_printf("Starting handle: 0x%04x Ending handle: 0x%04x\n",
--						range->start, range->end);
--	}
--}
--
--static void included_cb(uint8_t status, GSList *includes, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		error("Find included services failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	if (includes == NULL) {
--		rl_printf("No included services found for this range\n");
--		return;
--	}
--
--	for (l = includes; l; l = l->next) {
--		struct gatt_included *incl = l->data;
--		rl_printf("handle: 0x%04x, start handle: 0x%04x, "
--					"end handle: 0x%04x uuid: %s\n",
--					incl->handle, incl->range.start,
--					incl->range.end, incl->uuid);
--	}
--}
--
--static void char_cb(uint8_t status, GSList *characteristics, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		error("Discover all characteristics failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	for (l = characteristics; l; l = l->next) {
--		struct gatt_char *chars = l->data;
--
--		rl_printf("handle: 0x%04x, char properties: 0x%02x, char value "
--				"handle: 0x%04x, uuid: %s\n", chars->handle,
--				chars->properties, chars->value_handle,
--				chars->uuid);
--	}
--}
--
--static void char_desc_cb(uint8_t status, GSList *descriptors, void *user_data)
--{
--	GSList *l;
--
--	if (status) {
--		error("Discover descriptors failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	for (l = descriptors; l; l = l->next) {
--		struct gatt_desc *desc = l->data;
--
--		rl_printf("handle: 0x%04x, uuid: %s\n", desc->handle,
--								desc->uuid);
--	}
--}
--
--static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	uint8_t value[plen];
--	ssize_t vlen;
--	int i;
--	GString *s;
--
--	if (status != 0) {
--		error("Characteristic value/descriptor read failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
--	if (vlen < 0) {
--		error("Protocol error\n");
--		return;
--	}
--
--	s = g_string_new("Characteristic value/descriptor: ");
--	for (i = 0; i < vlen; i++)
--		g_string_append_printf(s, "%02x ", value[i]);
--
--	rl_printf("%s\n", s->str);
--	g_string_free(s, TRUE);
--}
--
--static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
--					guint16 plen, gpointer user_data)
--{
--	struct att_data_list *list;
--	int i;
--	GString *s;
--
--	if (status != 0) {
--		error("Read characteristics by UUID failed: %s\n",
--							att_ecode2str(status));
--		return;
--	}
--
--	list = dec_read_by_type_resp(pdu, plen);
--	if (list == NULL)
--		return;
--
--	s = g_string_new(NULL);
--	for (i = 0; i < list->num; i++) {
--		uint8_t *value = list->data[i];
--		int j;
--
--		g_string_printf(s, "handle: 0x%04x \t value: ",
--							get_le16(value));
--		value += 2;
--		for (j = 0; j < list->len - 2; j++, value++)
--			g_string_append_printf(s, "%02x ", *value);
--
--		rl_printf("%s\n", s->str);
--	}
--
--	att_data_list_free(list);
--	g_string_free(s, TRUE);
--}
--
--static void cmd_exit(int argcp, char **argvp)
--{
--	rl_callback_handler_remove();
--	g_main_loop_quit(event_loop);
--}
--
--static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
--				gpointer user_data)
--{
--	disconnect_io();
--
--	return FALSE;
--}
--
--static void cmd_connect(int argcp, char **argvp)
--{
--	GError *gerr = NULL;
--
--	if (conn_state != STATE_DISCONNECTED)
--		return;
--
--	if (argcp > 1) {
--		g_free(opt_dst);
--		opt_dst = g_strdup(argvp[1]);
--
--		g_free(opt_dst_type);
--		if (argcp > 2)
--			opt_dst_type = g_strdup(argvp[2]);
--		else
--			opt_dst_type = g_strdup("public");
--	}
--
--	if (opt_dst == NULL) {
--		error("Remote Bluetooth address required\n");
--		return;
--	}
--
--	rl_printf("Attempting to connect to %s\n", opt_dst);
--	set_state(STATE_CONNECTING);
--	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
--					opt_psm, opt_mtu, connect_cb, &gerr);
--	if (iochannel == NULL) {
--		set_state(STATE_DISCONNECTED);
--		error("%s\n", gerr->message);
--		g_error_free(gerr);
--	} else
--		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
--}
--
--static void cmd_disconnect(int argcp, char **argvp)
--{
--	disconnect_io();
--}
--
--static void cmd_primary(int argcp, char **argvp)
--{
--	bt_uuid_t uuid;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp == 1) {
--		gatt_discover_primary(attrib, NULL, primary_all_cb, NULL);
--		return;
--	}
--
--	if (bt_string_to_uuid(&uuid, argvp[1]) < 0) {
--		error("Invalid UUID\n");
--		return;
--	}
--
--	gatt_discover_primary(attrib, &uuid, primary_by_uuid_cb, NULL);
--}
--
--static int strtohandle(const char *src)
--{
--	char *e;
--	int dst;
--
--	errno = 0;
--	dst = strtoll(src, &e, 16);
--	if (errno != 0 || *e != '\0')
--		return -EINVAL;
--
--	return dst;
--}
--
--static void cmd_included(int argcp, char **argvp)
--{
--	int start = 0x0001;
--	int end = 0xffff;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp > 1) {
--		start = strtohandle(argvp[1]);
--		if (start < 0) {
--			error("Invalid start handle: %s\n", argvp[1]);
--			return;
--		}
--		end = start;
--	}
--
--	if (argcp > 2) {
--		end = strtohandle(argvp[2]);
--		if (end < 0) {
--			error("Invalid end handle: %s\n", argvp[2]);
--			return;
--		}
--	}
--
--	gatt_find_included(attrib, start, end, included_cb, NULL);
--}
--
--static void cmd_char(int argcp, char **argvp)
--{
--	int start = 0x0001;
--	int end = 0xffff;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp > 1) {
--		start = strtohandle(argvp[1]);
--		if (start < 0) {
--			error("Invalid start handle: %s\n", argvp[1]);
--			return;
--		}
--	}
--
--	if (argcp > 2) {
--		end = strtohandle(argvp[2]);
--		if (end < 0) {
--			error("Invalid end handle: %s\n", argvp[2]);
--			return;
--		}
--	}
--
--	if (argcp > 3) {
--		bt_uuid_t uuid;
--
--		if (bt_string_to_uuid(&uuid, argvp[3]) < 0) {
--			error("Invalid UUID\n");
--			return;
--		}
--
--		gatt_discover_char(attrib, start, end, &uuid, char_cb, NULL);
--		return;
--	}
--
--	gatt_discover_char(attrib, start, end, NULL, char_cb, NULL);
--}
--
--static void cmd_char_desc(int argcp, char **argvp)
--{
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp > 1) {
--		start = strtohandle(argvp[1]);
--		if (start < 0) {
--			error("Invalid start handle: %s\n", argvp[1]);
--			return;
--		}
--	} else
--		start = 0x0001;
--
--	if (argcp > 2) {
--		end = strtohandle(argvp[2]);
--		if (end < 0) {
--			error("Invalid end handle: %s\n", argvp[2]);
--			return;
--		}
--	} else
--		end = 0xffff;
--
--	gatt_discover_desc(attrib, start, end, NULL, char_desc_cb, NULL);
--}
--
--static void cmd_read_hnd(int argcp, char **argvp)
--{
--	int handle;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp < 2) {
--		error("Missing argument: handle\n");
--		return;
--	}
--
--	handle = strtohandle(argvp[1]);
--	if (handle < 0) {
--		error("Invalid handle: %s\n", argvp[1]);
--		return;
--	}
--
--	gatt_read_char(attrib, handle, char_read_cb, attrib);
--}
--
--static void cmd_read_uuid(int argcp, char **argvp)
--{
--	int start = 0x0001;
--	int end = 0xffff;
--	bt_uuid_t uuid;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp < 2) {
--		error("Missing argument: UUID\n");
--		return;
--	}
--
--	if (bt_string_to_uuid(&uuid, argvp[1]) < 0) {
--		error("Invalid UUID\n");
--		return;
--	}
--
--	if (argcp > 2) {
--		start = strtohandle(argvp[2]);
--		if (start < 0) {
--			error("Invalid start handle: %s\n", argvp[1]);
--			return;
--		}
--	}
--
--	if (argcp > 3) {
--		end = strtohandle(argvp[3]);
--		if (end < 0) {
--			error("Invalid end handle: %s\n", argvp[2]);
--			return;
--		}
--	}
--
--	gatt_read_char_by_uuid(attrib, start, end, &uuid, char_read_by_uuid_cb,
--									NULL);
--}
--
--static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	if (status != 0) {
--		error("Characteristic Write Request failed: "
--						"%s\n", att_ecode2str(status));
--		return;
--	}
--
--	if (!dec_write_resp(pdu, plen) && !dec_exec_write_resp(pdu, plen)) {
--		error("Protocol error\n");
--		return;
--	}
--
--	rl_printf("Characteristic value was written successfully\n");
--}
--
--static void cmd_char_write(int argcp, char **argvp)
--{
--	uint8_t *value;
--	size_t plen;
--	int handle;
--
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (argcp < 3) {
--		rl_printf("Usage: %s <handle> <new value>\n", argvp[0]);
--		return;
--	}
--
--	handle = strtohandle(argvp[1]);
--	if (handle <= 0) {
--		error("A valid handle is required\n");
--		return;
--	}
--
--	plen = gatt_attr_data_from_string(argvp[2], &value);
--	if (plen == 0) {
--		error("Invalid value\n");
--		return;
--	}
--
--	if (g_strcmp0("char-write-req", argvp[0]) == 0)
--		gatt_write_char(attrib, handle, value, plen,
--					char_write_req_cb, NULL);
--	else
--		gatt_write_cmd(attrib, handle, value, plen, NULL, NULL);
--
--	g_free(value);
--}
--
--static void cmd_sec_level(int argcp, char **argvp)
--{
--	GError *gerr = NULL;
--	BtIOSecLevel sec_level;
--
--	if (argcp < 2) {
--		rl_printf("sec-level: %s\n", opt_sec_level);
--		return;
--	}
--
--	if (strcasecmp(argvp[1], "medium") == 0)
--		sec_level = BT_IO_SEC_MEDIUM;
--	else if (strcasecmp(argvp[1], "high") == 0)
--		sec_level = BT_IO_SEC_HIGH;
--	else if (strcasecmp(argvp[1], "low") == 0)
--		sec_level = BT_IO_SEC_LOW;
--	else {
--		rl_printf("Allowed values: low | medium | high\n");
--		return;
--	}
--
--	g_free(opt_sec_level);
--	opt_sec_level = g_strdup(argvp[1]);
--
--	if (conn_state != STATE_CONNECTED)
--		return;
--
--	if (opt_psm) {
--		rl_printf("Change will take effect on reconnection\n");
--		return;
--	}
--
--	bt_io_set(iochannel, &gerr,
--			BT_IO_OPT_SEC_LEVEL, sec_level,
--			BT_IO_OPT_INVALID);
--	if (gerr) {
--		error("%s\n", gerr->message);
--		g_error_free(gerr);
--	}
--}
--
--static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	uint16_t mtu;
--
--	if (status != 0) {
--		error("Exchange MTU Request failed: %s\n",
--						att_ecode2str(status));
--		return;
--	}
--
--	if (!dec_mtu_resp(pdu, plen, &mtu)) {
--		error("Protocol error\n");
--		return;
--	}
--
--	mtu = MIN(mtu, opt_mtu);
--	/* Set new value for MTU in client */
--	if (g_attrib_set_mtu(attrib, mtu))
--		rl_printf("MTU was exchanged successfully: %d\n", mtu);
--	else
--		error("Error exchanging MTU\n");
--}
--
--static void cmd_mtu(int argcp, char **argvp)
--{
--	if (conn_state != STATE_CONNECTED) {
--		failed("Disconnected\n");
--		return;
--	}
--
--	if (opt_psm) {
--		failed("Operation is only available for LE transport.\n");
--		return;
--	}
--
--	if (argcp < 2) {
--		rl_printf("Usage: mtu <value>\n");
--		return;
--	}
--
--	if (opt_mtu) {
--		failed("MTU exchange can only occur once per connection.\n");
--		return;
--	}
--
--	errno = 0;
--	opt_mtu = strtoll(argvp[1], NULL, 0);
--	if (errno != 0 || opt_mtu < ATT_DEFAULT_LE_MTU) {
--		error("Invalid value. Minimum MTU size is %d\n",
--							ATT_DEFAULT_LE_MTU);
--		return;
--	}
--
--	gatt_exchange_mtu(attrib, opt_mtu, exchange_mtu_cb, NULL);
--}
--
--static const struct {
--	const char *cmd;
--	void (*func)(int argcp, char **argvp);
--	const char *params;
--	const char *desc;
--} commands[] = {
--	{ "help",		cmd_help,	"",
--		"Show this help"},
--	{ "exit",		cmd_exit,	"",
--		"Exit interactive mode" },
--	{ "quit",		cmd_exit,	"",
--		"Exit interactive mode" },
--	{ "connect",		cmd_connect,	"[address [address type]]",
--		"Connect to a remote device" },
--	{ "disconnect",		cmd_disconnect,	"",
--		"Disconnect from a remote device" },
--	{ "primary",		cmd_primary,	"[UUID]",
--		"Primary Service Discovery" },
--	{ "included",		cmd_included,	"[start hnd [end hnd]]",
--		"Find Included Services" },
--	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
--		"Characteristics Discovery" },
--	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
--		"Characteristics Descriptor Discovery" },
--	{ "char-read-hnd",	cmd_read_hnd,	"<handle>",
--		"Characteristics Value/Descriptor Read by handle" },
--	{ "char-read-uuid",	cmd_read_uuid,	"<UUID> [start hnd] [end hnd]",
--		"Characteristics Value/Descriptor Read by UUID" },
--	{ "char-write-req",	cmd_char_write,	"<handle> <new value>",
--		"Characteristic Value Write (Write Request)" },
--	{ "char-write-cmd",	cmd_char_write,	"<handle> <new value>",
--		"Characteristic Value Write (No response)" },
--	{ "sec-level",		cmd_sec_level,	"[low | medium | high]",
--		"Set security level. Default: low" },
--	{ "mtu",		cmd_mtu,	"<value>",
--		"Exchange MTU for GATT/ATT" },
--	{ NULL, NULL, NULL}
--};
--
--static void cmd_help(int argcp, char **argvp)
--{
--	int i;
--
--	for (i = 0; commands[i].cmd; i++)
--		rl_printf("%-15s %-30s %s\n", commands[i].cmd,
--				commands[i].params, commands[i].desc);
--}
--
--static void parse_line(char *line_read)
--{
--	char **argvp;
--	int argcp;
--	int i;
--
--	if (line_read == NULL) {
--		rl_printf("\n");
--		cmd_exit(0, NULL);
--		return;
--	}
--
--	line_read = g_strstrip(line_read);
--
--	if (*line_read == '\0')
--		goto done;
--
--	add_history(line_read);
--
--	if (g_shell_parse_argv(line_read, &argcp, &argvp, NULL) == FALSE)
--		goto done;
--
--	for (i = 0; commands[i].cmd; i++)
--		if (strcasecmp(commands[i].cmd, argvp[0]) == 0)
--			break;
--
--	if (commands[i].cmd)
--		commands[i].func(argcp, argvp);
--	else
--		error("%s: command not found\n", argvp[0]);
--
--	g_strfreev(argvp);
--
--done:
--	free(line_read);
--}
--
--static gboolean prompt_read(GIOChannel *chan, GIOCondition cond,
--							gpointer user_data)
--{
--	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
--		g_io_channel_unref(chan);
--		return FALSE;
--	}
--
--	rl_callback_read_char();
--
--	return TRUE;
--}
--
--static char *completion_generator(const char *text, int state)
--{
--	static int index = 0, len = 0;
--	const char *cmd = NULL;
--
--	if (state == 0) {
--		index = 0;
--		len = strlen(text);
--	}
--
--	while ((cmd = commands[index].cmd) != NULL) {
--		index++;
--		if (strncmp(cmd, text, len) == 0)
--			return strdup(cmd);
--	}
--
--	return NULL;
--}
--
--static char **commands_completion(const char *text, int start, int end)
--{
--	if (start == 0)
--		return rl_completion_matches(text, &completion_generator);
--	else
--		return NULL;
--}
--
--static guint setup_standard_input(void)
--{
--	GIOChannel *channel;
--	guint source;
--
--	channel = g_io_channel_unix_new(fileno(stdin));
--
--	source = g_io_add_watch(channel,
--				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--				prompt_read, NULL);
--
--	g_io_channel_unref(channel);
--
--	return source;
--}
--
--static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
--							gpointer user_data)
--{
--	static unsigned int __terminated = 0;
--	struct signalfd_siginfo si;
--	ssize_t result;
--	int fd;
--
--	if (condition & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
--		g_main_loop_quit(event_loop);
--		return FALSE;
--	}
--
--	fd = g_io_channel_unix_get_fd(channel);
--
--	result = read(fd, &si, sizeof(si));
--	if (result != sizeof(si))
--		return FALSE;
--
--	switch (si.ssi_signo) {
--	case SIGINT:
--		rl_replace_line("", 0);
--		rl_crlf();
--		rl_on_new_line();
--		rl_redisplay();
--		break;
--	case SIGTERM:
--		if (__terminated == 0) {
--			rl_replace_line("", 0);
--			rl_crlf();
--			g_main_loop_quit(event_loop);
--		}
--
--		__terminated = 1;
--		break;
--	}
--
--	return TRUE;
--}
--
--static guint setup_signalfd(void)
--{
--	GIOChannel *channel;
--	guint source;
--	sigset_t mask;
--	int fd;
--
--	sigemptyset(&mask);
--	sigaddset(&mask, SIGINT);
--	sigaddset(&mask, SIGTERM);
--
--	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
--		perror("Failed to set signal mask");
--		return 0;
--	}
--
--	fd = signalfd(-1, &mask, 0);
--	if (fd < 0) {
--		perror("Failed to create signal descriptor");
--		return 0;
--	}
--
--	channel = g_io_channel_unix_new(fd);
--
--	g_io_channel_set_close_on_unref(channel, TRUE);
--	g_io_channel_set_encoding(channel, NULL, NULL);
--	g_io_channel_set_buffered(channel, FALSE);
--
--	source = g_io_add_watch(channel,
--				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--				signal_handler, NULL);
--
--	g_io_channel_unref(channel);
--
--	return source;
--}
--
--int interactive(const char *src, const char *dst,
--		const char *dst_type, int psm)
--{
--	guint input;
--	guint signal;
--
--	opt_sec_level = g_strdup("low");
--
--	opt_src = g_strdup(src);
--	opt_dst = g_strdup(dst);
--	opt_dst_type = g_strdup(dst_type);
--	opt_psm = psm;
--
--	prompt = g_string_new(NULL);
--
--	event_loop = g_main_loop_new(NULL, FALSE);
--
--	input = setup_standard_input();
--	signal = setup_signalfd();
--
--	rl_attempted_completion_function = commands_completion;
--	rl_erase_empty_line = 1;
--	rl_callback_handler_install(get_prompt(), parse_line);
--
--	g_main_loop_run(event_loop);
--
--	rl_callback_handler_remove();
--	cmd_disconnect(0, NULL);
--	g_source_remove(input);
--	g_source_remove(signal);
--	g_main_loop_unref(event_loop);
--	g_string_free(prompt, TRUE);
--
--	g_free(opt_src);
--	g_free(opt_dst);
--	g_free(opt_sec_level);
--
--	return 0;
--}
-diff --git a/attrib/utils.c b/attrib/utils.c
-deleted file mode 100644
-index ca05baaa1e8a..000000000000
---- a/attrib/utils.c
-+++ /dev/null
-@@ -1,110 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011  Nokia Corporation
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdlib.h>
--
--#include <glib.h>
--
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/hci.h"
--#include "bluetooth/hci_lib.h"
--#include "bluetooth/sdp.h"
--#include "bluetooth/uuid.h"
--
--#include "src/shared/att-types.h"
--#include "btio/btio.h"
--#include "att.h"
--#include "gattrib.h"
--#include "gatt.h"
--#include "gatttool.h"
--
--GIOChannel *gatt_connect(const char *src, const char *dst,
--				const char *dst_type, const char *sec_level,
--				int psm, int mtu, BtIOConnect connect_cb,
--				GError **gerr)
--{
--	GIOChannel *chan;
--	bdaddr_t sba, dba;
--	uint8_t dest_type;
--	GError *tmp_err = NULL;
--	BtIOSecLevel sec;
--
--	str2ba(dst, &dba);
--
--	/* Local adapter */
--	if (src != NULL) {
--		if (!strncmp(src, "hci", 3))
--			hci_devba(atoi(src + 3), &sba);
--		else
--			str2ba(src, &sba);
--	} else
--		bacpy(&sba, BDADDR_ANY);
--
--	/* Not used for BR/EDR */
--	if (strcmp(dst_type, "random") == 0)
--		dest_type = BDADDR_LE_RANDOM;
--	else
--		dest_type = BDADDR_LE_PUBLIC;
--
--	if (strcmp(sec_level, "medium") == 0)
--		sec = BT_IO_SEC_MEDIUM;
--	else if (strcmp(sec_level, "high") == 0)
--		sec = BT_IO_SEC_HIGH;
--	else
--		sec = BT_IO_SEC_LOW;
--
--	if (psm == 0)
--		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
--				BT_IO_OPT_SOURCE_BDADDR, &sba,
--				BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
--				BT_IO_OPT_DEST_BDADDR, &dba,
--				BT_IO_OPT_DEST_TYPE, dest_type,
--				BT_IO_OPT_CID, BT_ATT_CID,
--				BT_IO_OPT_SEC_LEVEL, sec,
--				BT_IO_OPT_INVALID);
--	else
--		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
--				BT_IO_OPT_SOURCE_BDADDR, &sba,
--				BT_IO_OPT_DEST_BDADDR, &dba,
--				BT_IO_OPT_PSM, psm,
--				BT_IO_OPT_IMTU, mtu,
--				BT_IO_OPT_SEC_LEVEL, sec,
--				BT_IO_OPT_INVALID);
--
--	if (tmp_err) {
--		g_propagate_error(gerr, tmp_err);
--		return NULL;
--	}
--
--	return chan;
--}
--
--size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
--{
--	char tmp[3];
--	size_t size, i;
--
--	size = strlen(str) / 2;
--	*data = g_try_malloc0(size);
--	if (*data == NULL)
--		return 0;
--
--	tmp[2] = '\0';
--	for (i = 0; i < size; i++) {
--		memcpy(tmp, str + (i * 2), 2);
--		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
--	}
--
--	return size;
--}
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-deleted file mode 100644
-index 81573dfde142..000000000000
---- a/unit/test-gattrib.c
-+++ /dev/null
-@@ -1,552 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2014  Google, Inc.
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <unistd.h>
--#include <stdlib.h>
--#include <stdbool.h>
--#include <inttypes.h>
--#include <string.h>
--#include <fcntl.h>
--#include <sys/socket.h>
--
--#include <glib.h>
--
--#include "src/shared/util.h"
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/uuid.h"
--#include "attrib/att.h"
--#include "attrib/gattrib.h"
--#include "src/log.h"
--
--#define DEFAULT_MTU 23
--
--#define data(args...) ((const unsigned char[]) { args })
--
--struct test_pdu {
--	bool valid;
--	bool sent;
--	bool received;
--	const uint8_t *data;
--	size_t size;
--};
--
--#define pdu(args...)				\
--	{					\
--		.valid = true,			\
--		.sent = false,			\
--		.received = false,		\
--		.data = data(args),		\
--		.size = sizeof(data(args)),	\
--	}
--
--struct context {
--	GMainLoop *main_loop;
--	GIOChannel *att_io;
--	GIOChannel *server_io;
--	GAttrib *att;
--};
--
--static void setup_context(struct context *cxt, gconstpointer data)
--{
--	int err, sv[2];
--
--	cxt->main_loop = g_main_loop_new(NULL, FALSE);
--	g_assert(cxt->main_loop != NULL);
--
--	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
--	g_assert(err == 0);
--
--	cxt->att_io = g_io_channel_unix_new(sv[0]);
--	g_assert(cxt->att_io != NULL);
--
--	g_io_channel_set_close_on_unref(cxt->att_io, TRUE);
--
--	cxt->server_io = g_io_channel_unix_new(sv[1]);
--	g_assert(cxt->server_io != NULL);
--
--	g_io_channel_set_close_on_unref(cxt->server_io, TRUE);
--	g_io_channel_set_encoding(cxt->server_io, NULL, NULL);
--	g_io_channel_set_buffered(cxt->server_io, FALSE);
--
--	cxt->att = g_attrib_new(cxt->att_io, DEFAULT_MTU, false);
--	g_assert(cxt->att != NULL);
--}
--
--static void teardown_context(struct context *cxt, gconstpointer data)
--{
--	if (cxt->att)
--		g_attrib_unref(cxt->att);
--
--	g_io_channel_unref(cxt->server_io);
--
--	g_io_channel_unref(cxt->att_io);
--
--	g_main_loop_unref(cxt->main_loop);
--}
--
--
--static void test_debug(const char *str, void *user_data)
--{
--	const char *prefix = user_data;
--
--	g_print("%s%s\n", prefix, str);
--}
--
--static void destroy_canary_increment(gpointer data)
--{
--	int *canary = data;
--	(*canary)++;
--}
--
--static void test_refcount(struct context *cxt, gconstpointer unused)
--{
--	GAttrib *extra_ref;
--	int destroy_canary = 0;
--
--	g_attrib_set_destroy_function(cxt->att, destroy_canary_increment,
--							       &destroy_canary);
--
--	extra_ref = g_attrib_ref(cxt->att);
--
--	g_assert(extra_ref == cxt->att);
--
--	g_assert(destroy_canary == 0);
--
--	g_attrib_unref(extra_ref);
--
--	g_assert(destroy_canary == 0);
--
--	g_attrib_unref(cxt->att);
--
--	g_assert(destroy_canary == 1);
--
--	/* Avoid a double-free from the teardown function */
--	cxt->att = NULL;
--}
--
--static void test_get_channel(struct context *cxt, gconstpointer unused)
--{
--	GIOChannel *chan;
--
--	chan = g_attrib_get_channel(cxt->att);
--
--	g_assert(chan == cxt->att_io);
--}
--
--struct expect_response {
--	struct test_pdu expect;
--	struct test_pdu respond;
--	GSourceFunc receive_cb;
--	gpointer user_data;
--};
--
--static gboolean test_client(GIOChannel *channel, GIOCondition cond,
--								  gpointer data)
--{
--	struct expect_response *cr = data;
--	int fd;
--	uint8_t buf[256];
--	ssize_t len;
--	int cmp;
--
--	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
--		return FALSE;
--
--	fd = g_io_channel_unix_get_fd(channel);
--
--	len = read(fd, buf, sizeof(buf));
--
--	g_assert(len > 0);
--	g_assert_cmpint(len, ==, cr->expect.size);
--
--	if (g_test_verbose())
--		util_hexdump('?', cr->expect.data,  cr->expect.size,
--						   test_debug, "test_client: ");
--
--	cmp = memcmp(cr->expect.data, buf, len);
--
--	g_assert(cmp == 0);
--
--	cr->expect.received = true;
--
--	if (cr->receive_cb != NULL)
--		cr->receive_cb(cr->user_data);
--
--	if (cr->respond.valid) {
--		if (g_test_verbose())
--			util_hexdump('<', cr->respond.data, cr->respond.size,
--						   test_debug, "test_client: ");
--		len = write(fd, cr->respond.data, cr->respond.size);
--
--		g_assert_cmpint(len, ==, cr->respond.size);
--
--		cr->respond.sent = true;
--	}
--
--	return TRUE;
--}
--
--struct result_data {
--	guint8 status;
--	guint8 *pdu;
--	guint16 len;
--	GSourceFunc complete_cb;
--	gpointer user_data;
--};
--
--static void result_canary(guint8 status, const guint8 *pdu, guint16 len,
--								gpointer data)
--{
--	struct result_data *result = data;
--
--	result->status = status;
--	result->pdu = g_malloc0(len);
--	memcpy(result->pdu, pdu, len);
--	result->len = len;
--
--	if (g_test_verbose())
--		util_hexdump('<', pdu, len, test_debug, "result_canary: ");
--
--	if (result->complete_cb != NULL)
--		result->complete_cb(result->user_data);
--}
--
--static gboolean context_stop_main_loop(gpointer user_data)
--{
--	struct context *cxt = user_data;
--
--	g_main_loop_quit(cxt->main_loop);
--	return FALSE;
--}
--
--static void test_send(struct context *cxt, gconstpointer unused)
--{
--	int cmp;
--	struct result_data results;
--	struct expect_response data = {
--		.expect = pdu(0x02, 0x00, 0x02),
--		.respond = pdu(0x03, 0x02, 0x03, 0x04),
--		.receive_cb = NULL,
--		.user_data = NULL,
--	};
--
--	g_io_add_watch(cxt->server_io, G_IO_IN | G_IO_HUP | G_IO_ERR |
--						G_IO_NVAL, test_client, &data);
--
--	results.complete_cb = context_stop_main_loop;
--	results.user_data = cxt;
--
--	g_attrib_send(cxt->att, 0, data.expect.data, data.expect.size,
--				      result_canary, (gpointer) &results, NULL);
--
--	g_main_loop_run(cxt->main_loop);
--
--	g_assert(results.pdu != NULL);
--
--	g_assert_cmpint(results.len, ==, data.respond.size);
--
--	cmp = memcmp(results.pdu, data.respond.data, results.len);
--
--	g_assert(cmp == 0);
--
--	g_free(results.pdu);
--}
--
--struct event_info {
--	struct context *context;
--	int event_id;
--};
--
--static gboolean cancel_existing_attrib_event(gpointer user_data)
--{
--	struct event_info *info = user_data;
--	gboolean canceled;
--
--	canceled = g_attrib_cancel(info->context->att, info->event_id);
--
--	g_assert(canceled);
--
--	g_idle_add(context_stop_main_loop, info->context);
--
--	return FALSE;
--}
--
--static void test_cancel(struct context *cxt, gconstpointer unused)
--{
--	gboolean canceled;
--	struct result_data results;
--	struct event_info info;
--	struct expect_response data = {
--		.expect = pdu(0x02, 0x00, 0x02),
--		.respond = pdu(0x03, 0x02, 0x03, 0x04),
--	};
--
--	g_io_add_watch(cxt->server_io,
--				      G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--							    test_client, &data);
--
--	results.pdu = NULL;
--
--	info.context = cxt;
--	info.event_id = g_attrib_send(cxt->att, 0, data.expect.data,
--						data.expect.size, result_canary,
--								&results, NULL);
--
--	data.receive_cb = cancel_existing_attrib_event;
--	data.user_data = &info;
--
--	g_main_loop_run(cxt->main_loop);
--
--	g_assert(results.pdu == NULL);
--
--	results.pdu = NULL;
--	data.expect.received = false;
--	data.respond.sent = false;
--
--	info.event_id = g_attrib_send(cxt->att, 0, data.expect.data,
--						data.expect.size, result_canary,
--								&results, NULL);
--
--	canceled = g_attrib_cancel(cxt->att, info.event_id);
--	g_assert(canceled);
--
--	g_idle_add(context_stop_main_loop, info.context);
--
--	g_main_loop_run(cxt->main_loop);
--
--	g_assert(!data.expect.received);
--	g_assert(!data.respond.sent);
--	g_assert(results.pdu == NULL);
--
--	/* Invalid ID */
--	canceled = g_attrib_cancel(cxt->att, 42);
--	g_assert(!canceled);
--}
--
--static void send_test_pdus(gpointer context, struct test_pdu *pdus)
--{
--	struct context *cxt = context;
--	size_t len;
--	int fd;
--	struct test_pdu *cur_pdu;
--
--	fd = g_io_channel_unix_get_fd(cxt->server_io);
--
--	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++)
--		cur_pdu->sent = false;
--
--	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++) {
--		if (g_test_verbose())
--			util_hexdump('>', cur_pdu->data, cur_pdu->size,
--						test_debug, "send_test_pdus: ");
--		len = write(fd, cur_pdu->data, cur_pdu->size);
--		g_assert_cmpint(len, ==, cur_pdu->size);
--		cur_pdu->sent = true;
--	}
--
--	g_idle_add(context_stop_main_loop, cxt);
--	g_main_loop_run(cxt->main_loop);
--}
--
--#define PDU_MTU_RESP pdu(ATT_OP_MTU_RESP, 0x17)
--#define PDU_FIND_INFO_REQ pdu(ATT_OP_FIND_INFO_REQ, 0x01, 0x00, 0xFF, 0xFF)
--#define PDU_NO_ATT_ERR pdu(ATT_OP_ERROR, ATT_OP_FIND_INFO_REQ, 0x00, 0x00, 0x0A)
--#define PDU_IND_NODATA pdu(ATT_OP_HANDLE_IND, 0x01, 0x00)
--#define PDU_INVALID_IND pdu(ATT_OP_HANDLE_IND, 0x14)
--#define PDU_IND_DATA pdu(ATT_OP_HANDLE_IND, 0x14, 0x00, 0x01)
--
--struct expect_test_data {
--	struct test_pdu *expected;
--	GAttrib *att;
--};
--
--static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
--{
--	struct expect_test_data *expect = data;
--	struct test_pdu *expected = expect->expected;
--	int cmp;
--
--	if (g_test_verbose())
--		util_hexdump('<', pdu, len, test_debug,
--						      "notify_canary_expect: ");
--
--	while (expected->valid && expected->received)
--		expected++;
--
--	g_assert(expected->valid);
--
--	if (g_test_verbose())
--		util_hexdump('?', expected->data, expected->size, test_debug,
--						      "notify_canary_expect: ");
--
--	g_assert_cmpint(expected->size, ==, len);
--
--	cmp = memcmp(pdu, expected->data, expected->size);
--
--	g_assert(cmp == 0);
--
--	expected->received = true;
--
--	if (pdu[0] == ATT_OP_FIND_INFO_REQ) {
--		struct test_pdu no_attributes = PDU_NO_ATT_ERR;
--		int reqid;
--
--		reqid = g_attrib_send(expect->att, 0, no_attributes.data,
--					  no_attributes.size, NULL, NULL, NULL);
--		g_assert(reqid != 0);
--	}
--}
--
--static void test_register(struct context *cxt, gconstpointer user_data)
--{
--	guint reg_id;
--	gboolean canceled;
--	struct test_pdu pdus[] = {
--		/*
--		 * Unmatched PDU opcode
--		 * Unmatched handle (GATTRIB_ALL_REQS) */
--		PDU_FIND_INFO_REQ,
--		/*
--		 * Matched PDU opcode
--		 * Unmatched handle (GATTRIB_ALL_HANDLES) */
--		PDU_IND_NODATA,
--		/*
--		 * Matched PDU opcode
--		 * Invalid length? */
--		PDU_INVALID_IND,
--		/*
--		 * Matched PDU opcode
--		 * Matched handle */
--		PDU_IND_DATA,
--		{ },
--	};
--	struct test_pdu req_pdus[] = { PDU_FIND_INFO_REQ, { } };
--	struct test_pdu all_ind_pdus[] = {
--		PDU_IND_NODATA,
--		PDU_INVALID_IND,
--		PDU_IND_DATA,
--		{ },
--	};
--	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
--	struct test_pdu *current_pdu;
--	struct expect_test_data expect;
--
--	expect.att = cxt->att;
--
--	/*
--	 * Without registering anything, should be able to ignore everything but
--	 * an unexpected response. */
--	send_test_pdus(cxt, pdus);
--
--	if (g_test_verbose())
--		g_print("ALL_REQS, ALL_HANDLES\r\n");
--
--	expect.expected = req_pdus;
--	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_REQS,
--				      GATTRIB_ALL_HANDLES, notify_canary_expect,
--								 &expect, NULL);
--
--	send_test_pdus(cxt, pdus);
--
--	canceled = g_attrib_unregister(cxt->att, reg_id);
--
--	g_assert(canceled);
--
--	for (current_pdu = req_pdus; current_pdu->valid; current_pdu++)
--		g_assert(current_pdu->received);
--
--	if (g_test_verbose())
--		g_print("IND, ALL_HANDLES\r\n");
--
--	expect.expected = all_ind_pdus;
--	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND,
--				      GATTRIB_ALL_HANDLES, notify_canary_expect,
--								 &expect, NULL);
--
--	send_test_pdus(cxt, pdus);
--
--	canceled = g_attrib_unregister(cxt->att, reg_id);
--
--	g_assert(canceled);
--
--	for (current_pdu = all_ind_pdus; current_pdu->valid; current_pdu++)
--		g_assert(current_pdu->received);
--
--	if (g_test_verbose())
--		g_print("IND, 0x0014\r\n");
--
--	expect.expected = followed_ind_pdus;
--	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND, 0x0014,
--					notify_canary_expect, &expect, NULL);
--
--	send_test_pdus(cxt, pdus);
--
--	canceled = g_attrib_unregister(cxt->att, reg_id);
--
--	g_assert(canceled);
--
--	for (current_pdu = followed_ind_pdus; current_pdu->valid; current_pdu++)
--		g_assert(current_pdu->received);
--
--	canceled = g_attrib_unregister(cxt->att, reg_id);
--
--	g_assert(!canceled);
--}
--
--static void test_buffers(struct context *cxt, gconstpointer unused)
--{
--	size_t buflen;
--	uint8_t *buf;
--	gboolean success;
--
--	buf = g_attrib_get_buffer(cxt->att, &buflen);
--	g_assert(buf != 0);
--	g_assert_cmpint(buflen, ==, DEFAULT_MTU);
--
--	success = g_attrib_set_mtu(cxt->att, 5);
--	g_assert(!success);
--
--	success = g_attrib_set_mtu(cxt->att, 255);
--	g_assert(success);
--
--	buf = g_attrib_get_buffer(cxt->att, &buflen);
--	g_assert(buf != 0);
--	g_assert_cmpint(buflen, ==, 255);
--}
--
--int main(int argc, char *argv[])
--{
--	g_test_init(&argc, &argv, NULL);
--
--	if (g_test_verbose())
--		__btd_log_init("*", 0);
--
--	/*
--	 * Test the GAttrib API behavior
--	 */
--	g_test_add("/gattrib/refcount", struct context, NULL, setup_context,
--					      test_refcount, teardown_context);
--	g_test_add("/gattrib/get_channel", struct context, NULL, setup_context,
--					    test_get_channel, teardown_context);
--	g_test_add("/gattrib/send", struct context, NULL, setup_context,
--						   test_send, teardown_context);
--	g_test_add("/gattrib/cancel", struct context, NULL, setup_context,
--						 test_cancel, teardown_context);
--	g_test_add("/gattrib/register", struct context, NULL, setup_context,
--					       test_register, teardown_context);
--	g_test_add("/gattrib/buffers", struct context, NULL, setup_context,
--						test_buffers, teardown_context);
--
--	return g_test_run();
--}
--- 
-2.55.0
 
+Compare: https://github.com/bluez/bluez/compare/3bb53743ee3c%5E...755ffdeb29df
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
