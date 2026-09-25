@@ -1,138 +1,461 @@
-Received: from mail-dy2-f37.google.com (mail-dy2-f37.google.com [74.125.229.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AE1499F31
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 10:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08C241CB31
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 12:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790332865; cv=none; b=WcLR7uNhT4cdiIqOSOG0UqQR8vs05oMK0FgQ6Jxv1CXxnr/zp1LGg860P4EEJI1QZah7x3BJ735t7lpT50WZtKVFegmTLFA0bLdzG1ogUGS5NUPy4RJfOs0z/eSS6yEtPj4QGqECUEPAyJYRlhagKlipbnysLIziiHHf8xHRvVg=
+	t=1790340124; cv=none; b=ftrYVAIL/X3NqjFfdwiwEmPm2jcTNm82KqbTMoznFpL13VI+rifY8Ug75lXjJY96DBJ5gmCaY9771gOk2sorF6+TZx/KR6uzIqLYMM7Ah/kLuvGBE9P3isERDbphix6jNMqUGFE00CX2EdZwEjWxgF3YEPLUWeDPcfMX9RUOyXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790332865; c=relaxed/simple;
-	bh=7xJHCQKV21kilEPg0F+BSjndoOfavggH7xlwxvFZcpw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=utiktv8ZThIVDRsmNSSMwK+FdUEq2bJNdj6pSSCgiiEf+xyZdJwCG93iGKAG0XhEBYR6ahtDy6fnSJTbsO3Bkw9hh4bbAinbQ2OuZk+KYxv/oGeRQN96lNvBc3pGfRIb4HpgWCUL9xdV2C+YTDxbysCl8oqQK30eEvVo1t/qAO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ltPbDrg3; arc=none smtp.client-ip=74.125.229.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790340124; c=relaxed/simple;
+	bh=eURMf3Gv6pKOQfViX7L+yWxBasiMUK3YtMwOWKQM1Jc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jR4INzvloyy1crLedG9BbFonBGngMZAYwWrTYeUL3AH+yg+3NYzslMlQH405Pi3WcT/3+Z4BISIK3Jlg9kM+0m1EIMYSMVElJcMEg1WJSxSOHSZXmlTS1O3Jf/CvkQwxB1B53LR+XLNqC9lNoCcx04GbJA6ljkyOI411KiUNYW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=lg9fyh3v; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltPbDrg3"
-Received: by mail-dy2-f37.google.com with SMTP id 5a478bee46e88-328664b752eso456246eec.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 03:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790332861; x=1790937661; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Un4T+fjPmlfsZ10Drzda3eMjOflUpRzSms/xC3m8Cbk=;
-        b=ltPbDrg3kOESFse/D7vxlpnuKSztpkA748uim/xRCrKDSBBYkKksyqyBFeftIVwuDz
-         MVY74sUQ1MEiI5VUBia4ZM/fkpSgv7FyS1XE+iElviw/dAXYHDE3c66ecyPxsO0LUi8Q
-         GBUukedQNiVBGt0Wg0pFO9+shVQnRj1RsTqCjm81fLBAyCz8o6GPcQil04zcrUpVqOAB
-         U3u/LLQaYZlbpNWSPBLyC7Ez1X2JzvPsU9QIELLYSTANa2YgLLgjX0pQG40Mj1/LX6CM
-         XqTb6oE32EWxabiFmKliWgKxVh6R2E2JLmNAx6I+iVuybw4pYG9gTPDcfW6ogacUyOZ/
-         peKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790332861; x=1790937661;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Un4T+fjPmlfsZ10Drzda3eMjOflUpRzSms/xC3m8Cbk=;
-        b=d8Xw4M20gfwmYt7HC8S+R9wyu9exzxfeFQSZvAaIq29XXDu9bFB1iKqp04o+wlsM09
-         KPbynZz9ID++8D4+uc+AWVocpoxHoZRAw9zQ+c00AMbXN+EMQvyNdKthg0y/szfzV4qR
-         rSa7H8+zOVb8OoIejNntnNqdbmRk+C2v+xYEYoWqtpjNwZVf0PMWYJSSemIdxShepwSz
-         3MiSxMjkVvTe0w9izOG2M2QvBofZen5EVqaT7xTywShf8Ze/RtL5uOrilSZX0PCZahcZ
-         Q8xapucrggH8sHLCek9QYFEqg/B8MJJnUTcUZydjWFML8g5voaLlYOccKH0mhIJo1RIW
-         fi7A==
-X-Gm-Message-State: AFuF++m1aR6S4Elkras+DvTVelYn6TgOAaDnk7zdzxdwuMjtu5Hf0185
-	Ez6SdhVKg57cfSQKEH6iM5pri5PHjsqvLSQpbK+qDPTphU01dwBRuYpfsI7ShBk8
-X-Gm-Gg: AYBFou3gI+dr12j7dIL74V+ANVwXpMLS8162u0vhYw4GaFEiPc+nEM+lqXS8Bwtyfku
-	92HbqKYpe5uz0YAzcvouncd1gNt0imPR8+6/3MW3gAHIYQ+ROFZyTQwJhriquRq500zjjh8zYMj
-	Dzc2GubtUe2QzlelDrdoV74iviJnCelqSmUMwYn9rhHuS5Qx732rjo+/jGZuJ2TBRS9K4Dp4iGk
-	FAbkmsOXaYYDQB+Ybdv94G322MeRYOa4skeXkFPNXOugrEjIDkVxrBkKTFBymglDJRsAeyMgw3k
-	yg20UAT794ADfaxeuQEpF3k5racyRVceeZJiyOvianIzmjV0U6bgBsC2ycaE8TjP7K++j4uEUnf
-	dAMGQPbFGLni6wpJBcHFVQ1c9uy+7vOntBOzgFMv50lbC3kyaYHs2A1JijOx2a96X2eh0QuFTFV
-	EkJF0Ao3GctL8IwIzgI9F3zInBKvQF5qdKtSS9btnxkIDrcff3G4+JKlUiPePEcLi1ruZgfxJ6m
-	zBGksc=
-X-Received: by 2002:a05:701b:205c:20b0:145:15d:5313 with SMTP id a92af1059eb24-145f026e0fcmr1478853c88.25.1790332858712;
-        Fri, 25 Sep 2026 03:40:58 -0700 (PDT)
-Received: from [172.17.0.2] ([172.185.47.214])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-145ac67c0ccsm5279965c88.4.2026.09.25.03.40.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Sep 2026 03:40:58 -0700 (PDT)
-Message-ID: <6ab64fba.acba1091.2f156f.6d4f@mx.google.com>
-Date: Fri, 25 Sep 2026 03:40:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7320429805546684544=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lg9fyh3v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1790340119;
+	bh=eURMf3Gv6pKOQfViX7L+yWxBasiMUK3YtMwOWKQM1Jc=;
+	h=From:To:Subject:Date:From;
+	b=lg9fyh3vSQKwq/BC5tsf36sMkAitV8VUyspVqx5uiw61N/X6I6gVeJYG4FOVGMyYJ
+	 8/WeMkIDuhRIZotKiBkiWWF9By35Jh38tEqWo0jG15tVZDPBVgrL1NHcn/5l+9nhO8
+	 /JncCUGkDhwGnaVP+G6nCFIQKvdDRjEIeX92h/BQX2qK0Nx0dZdOXsFa15X8wlv88J
+	 xvD+l9prZ5RvPSbT2oXr6MaMNZ50ZdPpakrTTQ3yjCESCmRkIwnAtJUcSGrIWQYeG2
+	 DCO/K6GRurZiMGHTcXIYTsktFM4BXFu3YdcJnv1CiC+sOgkpnKslEAnVR3zzZOVGhs
+	 7/fTutSoWA4cQ==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id B687217E007B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 14:41:59 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] doc/qualification: Add CSIP PICS file
+Date: Fri, 25 Sep 2026 14:41:54 +0200
+Message-ID: <20260925124155.3344025-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, webgeek1234@gmail.com
-Subject: RE: [v2] Bluetooth: btbcm: Add entry for BCM4356A3 UART bluetooth
-In-Reply-To: <20260925-bcm4356a3-bt-v2-1-42098aca235b@gmail.com>
-References: <20260925-bcm4356a3-bt-v2-1-42098aca235b@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7320429805546684544==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1173569/
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.73 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.46 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      29.86 seconds
-CheckAllWarning               PASS      34.23 seconds
-CheckSparse                   PASS      37.97 seconds
-BuildKernel32                 PASS      31.37 seconds
-CheckKernelLLVM               PASS      34.87 seconds
-TestRunnerSetup               PASS      811.59 seconds
-IncrementalBuild              PASS      27.17 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: btbcm: Add entry for BCM4356A3 UART bluetooth
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#88: 
-  Bluetooth: hci0: BCM4356A3 'brcm/BCM4356A3.nvidia,p2894-2551-b00.hcd' Patch
-
-total: 0 errors, 1 warnings, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14846577.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluetooth-next/pull/819
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
 ---
-Regards,
-Linux Bluetooth
+ doc/qualification/csip-pics.rst | 398 ++++++++++++++++++++++++++++++++
+ 1 file changed, 398 insertions(+)
+ create mode 100644 doc/qualification/csip-pics.rst
 
+diff --git a/doc/qualification/csip-pics.rst b/doc/qualification/csip-pics.rst
+new file mode 100644
+index 000000000..af2aaba57
+--- /dev/null
++++ b/doc/qualification/csip-pics.rst
+@@ -0,0 +1,398 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++.. Copyright © 2026 Collabora Ltd.
++
++======================================
++Coordinated Set Identification Profile
++======================================
++(TCRL pkg103, CSIP.ICS.p7)
++
++Roles
++=====
++
++**Table 1: Role Requirements**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_1_1    |          | Set Member (C.1)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_1_2    | x        | Set Coordinator (C.1)                        |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support at least one.
++
++Transports
++==========
++
++**Table 2: Transport Requirements**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_2_1    |          | Profile supported over BR/EDR (C.1, C.3)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_2_2    | x        | Profile supported over LE (C.2, C.3)         |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Excluded for this Profile IF CORE 41/2 "LE Core Configuration" OR CORE
++  40/1 "Core-Controller".
++- C.2: Excluded for this Profile IF CORE 41/1 "BR/EDR Core Configuration" OR
++  CORE 40/1 "Core-Controller".
++- C.3: Mandatory to support at least one.
++
++Set Member role
++===============
++
++**Table 3: Set Member, X.Y Versions**
++
++Prerequisite: CSIP 1/1 "Set Member"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_3_1    |          | CSIP v1.0 (C.1, C.2)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_3_2    |          | CSIP v1.1 (C.1)                              |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support one and only one.
++- C.2: Can only be supported with an active X.Y.Z version after Deprecation
++  or Withdrawal.
++  Deprecated 2025-02-01. Withdrawn 2027-02-01.
++
++**Table 4: Set Member, X.Y.Z Versions**
++
++Prerequisite: CSIP 1/1 "Set Member"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_4_2    |          | CSIP v1.0.1 (C.1)                            |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory IF CSIP 3/1 "CSIP v1.0", otherwise Excluded.
++
++**Table 5: Services Requirements**
++
++Prerequisite: CSIP 1/1 "Set Member"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_5_1    |          | Coordinated Set Identification Service (M)   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_2    |          | PSRI AD Type field over LE (C.1)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_3    |          | PSRI AD Type over BR/EDR (C.2)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_4    |          | Encrypted SIRK (C.3)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_5    |          | Plaintext SIRK (C.3)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_6    |          | OOB SIRK Only (C.3)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_7    |          | Coordinated Set Size Characteristic (O)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_8    |          | Notifiable Coordinated Set Size              |
++|                  |          | Characteristic (C.7)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_9    |          | Coordinated Set Name Characteristic (C.4)    |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_10   |          | Notifiable Coordinated Set Name              |
++|                  |          | Characteristic (C.8)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_11   |          | Coordinated Set Name AD Type field over LE   |
++|                  |          | (C.5)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_5_12   |          | Coordinated Set Name AD Type over BR/EDR     |
++|                  |          | (C.6)                                        |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory IF CSIP 2/2 "Profile supported over LE", otherwise Excluded.
++- C.2: Mandatory IF CSIP 2/1 "Profile supported over BR/EDR", otherwise
++  Excluded.
++- C.3: Mandatory to support at least one.
++- C.4: Excluded IF CSIP 3/1 "CSIP v1.0", otherwise Optional.
++- C.5: Optional IF CSIP 5/9 "Coordinated Set Name Characteristic" AND CSIP
++  2/2 "Profile supported over LE", otherwise Excluded.
++- C.6: Optional IF CSIP 5/9 "Coordinated Set Name Characteristic" AND CSIP
++  2/1 "Profile supported over BR/EDR", otherwise Excluded.
++- C.7: Optional IF CSIP 5/7 "Coordinated Set Size Characteristic", otherwise
++  not defined.
++- C.8: Optional IF CSIP 5/9 "Coordinated Set Name Characteristic", otherwise
++  not defined.
++
++
++**Table 6: GAP Requirements (Set Member)**
++
++Prerequisite: CSIP 1/1 "Set Member"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_6_1    |          | LE security mode 1 (C.1)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_2    |          | Peripheral (C.1)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_3    |          | Bondable mode (LE) (C.7)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_4    |          | Privacy feature (C.7)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_5    |          | Bondable mode (BR/EDR) (C.8)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_6    |          | Unauthenticated Pairing (LE security mode 1  |
++|                  |          | level 2) with LE Secure Connections Pairing  |
++|                  |          | only (C.5)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_7    |          | Authenticated Pairing (LE security mode 1    |
++|                  |          | level 3) with LE Secure Connections Pairing  |
++|                  |          | only (C.5)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_8    |          | LE security mode 1 level 4 (C.5)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_9    |          | Minimum 128 Bit entropy key (LE) (C.6)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_10   |          | Derivation of LE LTK from BR/EDR Link Key    |
++|                  |          | (C.9)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_11   |          | Security mode 4, level 2 (C.2)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_12   |          | 128-bit encryption key size capable (BR/EDR) |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_13   |          | Derivation of BR/EDR Link Key from LE LTK    |
++|                  |          | (C.10)                                       |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_14   |          | BR/EDR Secure Connections (C.10)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_15   |          | LE Secure Connections (Peripheral) (C.9)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_16   |          | Out of Band (Peripheral) (C.9)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_6_17   |          | Out-of-Band (BR/EDR) (C.10)                  |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory IF CSIP 2/2 "Profile supported over LE", otherwise not
++  defined.
++- C.2: Mandatory IF CSIP 2/1 "Profile supported over BR/EDR", otherwise not
++  defined.
++- C.5: Mandatory to support at least one IF CSIP 2/2 "Profile supported over
++  LE", otherwise not defined.
++- C.6: Mandatory IF CSIP 6/6 "Unauthenticated Pairing (LE security mode 1
++  level 2) with LE Secure Connections Pairing only" OR CSIP 6/7
++  "Authenticated Pairing (LE security mode 1 level 3) with LE Secure
++  Connections Pairing only", otherwise not defined.
++- C.7: Optional IF CSIP 2/2 "Profile supported over LE", otherwise not
++  defined.
++- C.8: Optional IF CSIP 2/1 "Profile supported over BR/EDR", otherwise not
++  defined.
++- C.9: Mandatory to support at least one IF CSIP 2/2 "Profile supported over
++  LE", otherwise not defined.
++- C.10: Mandatory to support at least one IF CSIP 2/1 "Profile supported over
++  BR/EDR", otherwise not defined.
++
++Set Coordinator role
++====================
++
++**Table 8: Set Coordinator, X.Y Versions**
++
++Prerequisite: CSIP 1/2 "Set Coordinator"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_8_1    |          | CSIP v1.0 (C.1, C.2)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_8_2    | x        | CSIP v1.1 (C.1)                              |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support one and only one.
++- C.2: Can only be supported with an active X.Y.Z version after Deprecation
++  or Withdrawal.
++  Deprecated 2025-02-01. Withdrawn 2027-02-01.
++
++**Table 9: Set Coordinator, X.Y.Z Versions**
++
++Prerequisite: CSIP 1/2 "Set Coordinator"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_9_2    |          | CSIP v1.0.1 (C.1)
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory IF CSIP 8/1 "CSIP v1.0", otherwise Excluded.
++
++**Table 10: Service Support**
++
++Prerequisite: CSIP 1/2 "Set Coordinator"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_10_1   | x        | Discover Coordinated Set Identification      |
++|                  |          | Service (M)                                  |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++**Table 11: Characteristic Support Requirements**
++
++Prerequisite: CSIP 10/1 "Discover Coordinated Set Identification Service"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_11_1   | x        | Set Identity Resolving Key Characteristic (M)|
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_11_2   | x        | Coordinated Set Size Characteristic (M)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_11_3   | x        | Set Member Lock Characteristic (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_11_4   | x        | Set Member Rank Characteristic (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_11_5   |          | Coordinated Set Name Characteristic (C.1)    |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- C.1: Excluded IF CSIP 8/1 "CSIP v1.0 ", otherwise Optional.
++
++**Table 12: Procedure Support Requirements**
++
++Prerequisite: CSIP 10/1 "Discover Coordinated Set Identification Service"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_12_1   | x        | Coordinated Set Discovery (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_12_2   | x        | Set Members Discovery (M)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_12_3   | x        | Lock Request (M)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_12_4   | x        | Lock Release (M)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_12_5   | x        | Ordered Access (M)                           |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++**Table 13: Set Coordinator GATT Requirements**
++
++Prerequisite: CSIP 1/2 "Set Coordinator"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_13_1   | x        | Discover All Primary Services (C.1)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_2   | x        | Discover Primary Service by Service UUID     |
++|                  |          | (C.1)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_3   | x        | Find Included Services (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_4   | x        | Discover All Characteristics of a Service    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_5   | x        | Discover Characteristics by UUID (C.2)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_6   | x        | Discover All Characteristic Descriptors (M)  |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_7   | x        | Read Characteristic Value (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_8   | x        | Write Characteristic Value (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_9   |          | Single Notification (O)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_10  | x        | Read Characteristic Descriptor (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_11  |          | Write Characteristic Descriptor (C.3)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_12  | x        | GATT Client over LE (C.4)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_13  |          | GATT Client over BR/EDR (C.5)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_14  |          | Exchange MTU (C.6)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_13_15  |          | Read Long Characteristic Value (C.6)         |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory to support at least one.
++- C.2: Mandatory to support at least one.
++- C.3: Mandatory IF CSIP 13/9 "Single Notification", otherwise not defined.
++- C.4: Mandatory IF CSIP 2/2 "Profile supported over LE", otherwise not
++  defined.
++- C.5: Mandatory IF CSIP 2/1 "Profile supported over BR/EDR", otherwise not
++  defined.
++- C.6: Mandatory IF CSIP 11/5 "Coordinated Set Name Characteristic",
++  otherwise not defined.
++
++**Table 14: GAP Requirements (Set Coordinator)**
++
++Prerequisite: CSIP 1/2 "Set Coordinator"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_CSIP_14_1   |          | Bondable mode (BR/EDR) (C.1)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_2   | x        | Central (C.2)                                |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_3   | x        | LE security mode 1 (C.2)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_4   |          | dable mode (LE) (C.4)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_5   |          | Bonding procedure (C.4)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_6   |          | Unauthenticated Pairing (LE security mode 1  |
++|                  |          | level 2) with LE Secure Connections Pairing  |
++|                  |          | only (C.4)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_7   |          | Authenticated Pairing (LE security mode 1    |
++|                  |          | level 3) with LE Secure Connections Pairing  |
++|                  |          | only (C.4)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_8   |          | LE security mode 1 level 4 (C.4)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_9   |          | Minimum 128 Bit entropy key (LE) (C.7)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_10  | x        | Derivation of LE LTK from BR/EDR Link Key    |
++|                  |          | (C.8)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_11  |          | Security mode 4, level 2 (C.3)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_12  |          | 128-bit encryption key size capable (BR/EDR) |
++|                  |          | (C.3)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_13  |          | Derivation of BR/EDR Link Key from LE LTK    |
++|                  |          | (C.9)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_14  |          | BR/EDR Secure Connections (C.9)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_15  | x        | LE Secure Connections (Central) (C.8)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_16  |          | Out of Band (Central) (C.8)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_CSIP_14_17  |          | Out-of-Band (BR/EDR) (C.9)                   |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Optional IF CSIP 2/1 "Profile supported over BR/EDR", otherwise not
++  defined.
++- C.2: Mandatory IF CSIP 2/2 "Profile supported over LE", otherwise not
++  defined.
++- C.3: Mandatory IF CSIP 2/1 "Profile supported over BR/EDR", otherwise not
++  defined.
++- C.4: Optional IF CSIP 2/2 "Profile supported over LE", otherwise not
++  defined.
++- C.7: Mandatory IF CSIP 14/6 "Unauthenticated Pairing (LE security mode 1
++  level 2) with LE Secure Connections Pairing only" OR CSIP 14/7
++  "Authenticated Pairing (LE security mode 1 level 3) with LE Secure
++  Connections Pairing only", otherwise not defined.
++- C.8: Mandatory to support at least one IF CSIP 2/2 "Profile supported
++  over LE", otherwise not defined.
++- C.9: Mandatory to support at least one IF CSIP 2/1 "Profile supported
++  over BR/EDR", otherwise not defined.
+-- 
+2.43.0
 
---===============7320429805546684544==--
