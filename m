@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D794772A1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D394A1DF6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 13:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790342756; cv=none; b=e0YdmATResLcE82ltyl3rYCStL3ZnvSmyI5H3NzSeDcaK/1j87sYa1s/btIOtV4s4xgHNtJ9/1NGiG1E8EzcUrTFBkq6vWv6kIt7KiRUno03mwrno09Dx+CEkVTl9fxlGMlr5wofE3rb4B+y9CWzAdVVdg4mNPmMKiyXDXiU4FI=
+	t=1790342755; cv=none; b=lA88U1w3HJaye79rGGZb80hzKOd6K8OOV92O3TOoQXOgTg2mEHtHyVXNbSGas3knreu3Qf50uAfOTylhvF9vMHdZuUpcBwdv+GPPN/pWkWyEtsG0/wOdx3B3PBb4aZgrH6xh7VZIfr1cMFo8P87creae/y3A8OqECzoyzbryrO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790342756; c=relaxed/simple;
-	bh=ioV+/P0rkfyJKrLbJrwcL4nXGZWDt9+mW4anJtgIExc=;
+	s=arc-20240116; t=1790342755; c=relaxed/simple;
+	bh=6wDILU1MgvdsEkceu3pGbzlpufWrnEBTdujmRCTIipI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TYa9owqBlXk99pUybM2bLrxT5McsqIXHhcHAZVvzeY4M8IDHuVKcT4pESsPoDVjKilxKErhDT+fAqLZczQFcbfSQHaMooG1ymRGIQTtdl/8cBI6pLefYuzPxhSRKPMpopTx3CNthZ8b63EVXxFXjMw6dFgHGpP2RC995Q9EYzLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LqRFrZek; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=m5rwyWFNWTlHHdsjeMJqp1gtNF+l7Mv8OKUlyUTyes88qMG6mhYyWu/tkrRzQ9VxGRPDuQuBjQ/EvocBd7fi5KyzmRrMpW+P8sOvsGVwiZ1flhECoxkEke4KaWXFVdSJbTUSpsSCUNd0TKbcSbZB6N34eq44n7W2nMiwefTScgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=PJyAM9IW; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LqRFrZek"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="PJyAM9IW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1790342738;
-	bh=ioV+/P0rkfyJKrLbJrwcL4nXGZWDt9+mW4anJtgIExc=;
+	s=mail; t=1790342737;
+	bh=6wDILU1MgvdsEkceu3pGbzlpufWrnEBTdujmRCTIipI=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=LqRFrZekxwVvJNkCHNP239/Ph1U5Be0MNjgkYKm0cEx+Xv6EqyqF1vHIWWl6S8M5c
-	 M4NMvVhlnsJj9ruJKTRXPQB4hC0wgR1Psf0hG8DnjlgEJO0MFEk/hPcoBqMADZ9d0Y
-	 f/r9nAlS7ROpvejXZtIQlLG34gcF1JO4yvsyCmULLz5ItgQlt8AqcQ2sGSm2j+9QA2
-	 DoaBPqWQEOu7e3uRoYV3T8LxqypaoKjfrM/Uq9zjX3JPlLUX94CC6RbjNH5bIBOqB8
-	 HGoQQqkqpzL6qSHUUG1QOrtbOFHLZD+xLGELX4TRZX1GtdEeMidFX1zGOaoAnnAJsb
-	 kpgdGuhAJZ7DA==
+	b=PJyAM9IWHuYJldMZafZhxzC8fj/R0G/H96ft4MZAeSjrjzQD4i7aOBs17dd/Uq/1H
+	 IT7LzQjmpx3uJj+ZmjVPVG51XxBIFSEkBHtJJM+3iSh/dktKp2JUJRjdfwQ2DcYCMa
+	 ewb8nf1BO+hnNA8xC3kiVIsXMdiPFn+RzQcJKkqHPNFNkSRIO++0M+yCgCN22JCeR/
+	 Nw9b3i9vaf35suw6iDC3KB5nHkZp6zg1xpQD8uiwYB+xKe6TnYirq6wUgvvJENFLvw
+	 R/avhBx5fm/ScnOu5761A0JRd1jjrX/5Km4sTRTLgSsybc5neojSGUzgoUCt1D8P+a
+	 s2BPdKzFlI7hA==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id A77AE17E0FBB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 15:25:38 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 06B7917E0B59
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2026 15:25:36 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/12] client/telephony: Add multi calls support
-Date: Fri, 25 Sep 2026 15:25:26 +0200
-Message-ID: <20260925132528.3361517-11-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 05/12] audio/hfp-hf: Add hangup all calls support
+Date: Fri, 25 Sep 2026 15:25:21 +0200
+Message-ID: <20260925132528.3361517-6-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260925132528.3361517-1-frederic.danis@collabora.com>
 References: <20260925132528.3361517-1-frederic.danis@collabora.com>
@@ -52,220 +52,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-This adds menu entries for the SwapCalls, ReleaseAndAnswer,
-ReleaseAndSwap and HoldAndAnswer methods from org.bluez.Telephony1.
+This releases all calls except waiting calls. This includes
+multiparty calls.
 ---
- client/telephony.c | 190 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 190 insertions(+)
+ profiles/audio/hfp-hf.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/client/telephony.c b/client/telephony.c
-index ab2a93430..858c02c0b 100644
---- a/client/telephony.c
-+++ b/client/telephony.c
-@@ -232,6 +232,187 @@ static void cmd_dial(int argc, char *argv[])
- 	bt_shell_printf("Attempting to dial\n");
+diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
+index dddd56261..287b79f1f 100644
+--- a/profiles/audio/hfp-hf.c
++++ b/profiles/audio/hfp-hf.c
+@@ -503,6 +503,20 @@ static DBusMessage *dial(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
  }
  
-+static void swap_calls_reply(DBusMessage *message, void *user_data)
++static DBusMessage *hangup_all(DBusConnection *conn, DBusMessage *msg,
++				void *profile_data)
 +{
-+	DBusError error;
++	struct hfp_device *dev = profile_data;
++	bool ret;
 +
-+	dbus_error_init(&error);
++	ret = hfp_hf_hangup_all(dev->hf, cmd_complete,
++					dbus_message_ref(msg));
++	if (!ret)
++		return btd_error_failed(msg, "Hang up all command failed");
 +
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to swap calls: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Swap calls successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	return NULL;
 +}
 +
-+static void cmd_swap_calls(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (argc < 2) {
-+		if (check_default_ag() == FALSE)
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		proxy = default_ag;
-+	} else {
-+		proxy = g_dbus_proxy_lookup(ags, NULL, argv[1],
-+						BLUEZ_TELEPHONY_INTERFACE);
-+		if (!proxy) {
-+			bt_shell_printf("Audio gateway %s not available\n",
-+							argv[1]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "SwapCalls", NULL,
-+				swap_calls_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to swap calls\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to swap calls\n");
-+}
-+
-+static void release_answer_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to release and answer: %s\n",
-+								error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Release and answer successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_release_answer(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (argc < 2) {
-+		if (check_default_ag() == FALSE)
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		proxy = default_ag;
-+	} else {
-+		proxy = g_dbus_proxy_lookup(ags, NULL, argv[1],
-+						BLUEZ_TELEPHONY_INTERFACE);
-+		if (!proxy) {
-+			bt_shell_printf("Audio gateway %s not available\n",
-+							argv[1]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "ReleaseAndAnswer", NULL,
-+				release_answer_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to release and answer\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to release and answer\n");
-+}
-+
-+static void release_swap_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to release and swap: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Release and swap successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_release_swap(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (argc < 2) {
-+		if (check_default_ag() == FALSE)
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		proxy = default_ag;
-+	} else {
-+		proxy = g_dbus_proxy_lookup(ags, NULL, argv[1],
-+						BLUEZ_TELEPHONY_INTERFACE);
-+		if (!proxy) {
-+			bt_shell_printf("Audio gateway %s not available\n",
-+							argv[1]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "ReleaseAndSwap", NULL,
-+				release_swap_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to release and swap\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to release and swap\n");
-+}
-+
-+static void hold_answer_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to hold and answer: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Hold and answer successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_hold_answer(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (argc < 2) {
-+		if (check_default_ag() == FALSE)
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		proxy = default_ag;
-+	} else {
-+		proxy = g_dbus_proxy_lookup(ags, NULL, argv[1],
-+						BLUEZ_TELEPHONY_INTERFACE);
-+		if (!proxy) {
-+			bt_shell_printf("Audio gateway %s not available\n",
-+							argv[1]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "HoldAndAnswer", NULL,
-+				hold_answer_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to hold and answer\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to hold and answer\n");
-+}
-+
- static void hangupall_reply(DBusMessage *message, void *user_data)
+ static DBusMessage *call_answer(DBusConnection *conn, DBusMessage *msg,
+ 				void *call_data)
  {
- 	DBusError error;
-@@ -550,6 +731,15 @@ static const struct bt_shell_menu telephony_menu = {
- 						ag_generator},
- 	{ "dial",         "<number> [telephony]", cmd_dial, "Dial number",
- 						ag_generator},
-+	{ "swap-calls",   "[telephony]", cmd_swap_calls, "Swap calls",
-+						ag_generator},
-+	{ "release-answer", "[telephony]", cmd_release_answer,
-+						"Release and answer",
-+						ag_generator},
-+	{ "release-swap", "[telephony]", cmd_release_swap, "Release and swap",
-+						ag_generator},
-+	{ "hold-answer",  "[telephony]", cmd_hold_answer, "Hold and answer",
-+						ag_generator},
- 	{ "hangup-all",   "[telephony]", cmd_hangupall, "Hangup all calls",
- 						ag_generator},
- 	{ "send-tones",   "<tones> [telephony]", cmd_send_tones, "Send tones",
+@@ -535,6 +549,7 @@ static DBusMessage *call_hangup(DBusConnection *conn, DBusMessage *msg,
+ 
+ struct telephony_callbacks hfp_callbacks = {
+ 	.dial = dial,
++	.hangup_all = hangup_all,
+ 	.call_answer = call_answer,
+ 	.call_hangup = call_hangup,
+ };
 -- 
 2.43.0
 
