@@ -1,111 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC83B395AD5;
-	Fri, 25 Sep 2026 06:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A18836E489;
+	Fri, 25 Sep 2026 09:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790319185; cv=none; b=f+6Rdcy3Wxx7A/SbitC9bBUV6Xb7T8htASWftUVAGKZCadAZl2vPWiprOmL/L24peIy0yNR635TBAze/zYhh/GAxTAZe6Zjs4BMAUSMPT9uETO2vcq91RctqvLRzDwfHAeoU/m6qqYTcd4hHUSw6oVn13uLy+iaJR4p8PUXj4S8=
+	t=1790327133; cv=none; b=tfrl8EBHezjU9lkCYBa4c29IpG6PRC0/CS8E9vqrpU7aLP9+s1rfQDMARnAoB+gwvyp8ocB5reVlGrHzjvpwOVZJgxarHaH/IHTpT+unVtFbTCHIoDiPEL/6dGH7nxu+wqf2NszR96o0585Rpv/PLgaXrcO59HntGdg+R2dQU34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790319185; c=relaxed/simple;
-	bh=tP6AL9NAD9Ousxk21NIRHD539PB1usyQzleE9kn8HO8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Zw6A53U3fJek4Dtf9i6i7YEI5VnYq0UYZ9Docw1XtycUKBfazQ95eSUhVPivN9C3h2MzaetBc0iIyh4RCOtIwSK4ITs/n6+kauvlxxGetAp0vgkgonWZLEQwtWDjOAgKffEhivCequzRmi5nQjPDggpA568UxtwUsry7/i1Yjg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VYnPRp9s; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1790327133; c=relaxed/simple;
+	bh=oqdY50+Ua1sm0dA0riA3XKlPkPf5jSVWn6/Ar3bjEu0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=pk2UIvNyGBxBYT57oq9VvOIChhh1mNW446JDx1UncyVkjAEGr0B39v/j6rZRLXRoAxQeUUsWvHpkg5R3xxj3wW7TgVMF+I70fGEanCdVtQkvwpisYzGasL7cf5zs0UwBZk/CWWY8JF0IzpMb3PtTEbJq582oi3Xksx+16Lek93g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=iYRuMxE0; arc=none smtp.client-ip=188.68.63.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VYnPRp9s"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 25AD4C2BCB8;
-	Fri, 25 Sep 2026 06:53:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1790319185;
-	bh=tP6AL9NAD9Ousxk21NIRHD539PB1usyQzleE9kn8HO8=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=VYnPRp9svN2XG55lnhro2amywmuMeGRMRxgr6gv7PNLt1Jaj0Ayj4qy7PvfpgAO4v
-	 jXGZo9Sye0oqWVGrbDeofkFS6TSHzXxt44T2jPliDiUDYzbXU626iu8IJc/kKl4ukR
-	 A2gwJOsJRhkgQBzrCOLTyaaTBT9zF5cc3qIXwt7bYwRDzKg/72dyJ6NxuFRL1wDeDK
-	 jPCIldcfh2vr6DGWPW3OnAfML/GxXEgWjLNB0Fk3AqropxI9itabFoD1FZDACFcQjW
-	 cjXqIlT4v6JOTJezr29PNeKVSJTuy9zZhHpC5Mrb6kKytIJ2WInqgTcZKrEt85MyMi
-	 6b+i/sHPZ8J/g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03BEFC9830E;
-	Fri, 25 Sep 2026 06:53:05 +0000 (UTC)
-From: Aaron Kling via B4 Relay <devnull+webgeek1234.gmail.com@kernel.org>
-Date: Fri, 25 Sep 2026 01:52:50 -0500
-Subject: [PATCH v2] Bluetooth: btbcm: Add entry for BCM4356A3 UART
- bluetooth
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="iYRuMxE0"
+Received: from mors-relay8203.netcup.net (localhost [127.0.0.1])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4hrlCh6fxjz8lHj;
+	Fri, 25 Sep 2026 09:05:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1790327120;
+	bh=oqdY50+Ua1sm0dA0riA3XKlPkPf5jSVWn6/Ar3bjEu0=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=iYRuMxE0dV3cH+aUbVbxRfHsi0LAhWaU2Dj04PEF6IxobPWJO4tyfDOXPdj1liJMf
+	 ZDkYbgmB8/bKO+g31oTJ3QkPJE83vQcu4ogJTcxTHai9dQbov5XWk6W7ifUHODIivW
+	 WgQGZtHBhR3cG/cGPv2X0Z1ljahgNKggLH+hAJp3t/DzB8q6nAYnd4Q+yrGsMaHHrs
+	 vZoo4YrSEr9ln1WmboqBh1H2lKl8RAq+xjjsoZFN3bYq0UDjHC2QOdzGegap8o4M4M
+	 Nv/6Qll3nfqHd8jZRE3UB+Symmw2GoU8dj64HTb8Y75FW/aMm+rPwsqQwfaqUnY8xd
+	 NG4q0MfRwEp6g==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4hrlCh5xndz8lDL;
+	Fri, 25 Sep 2026 09:05:20 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.898
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4hrlCd4gTDz8tfB;
+	Fri, 25 Sep 2026 11:05:17 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id DCA7A5F8CC;
+	Fri, 25 Sep 2026 11:05:16 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <4f28488c-ff9e-46db-aa2a-687213c129d6@leemhuis.info>
+Date: Fri, 25 Sep 2026 11:05:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] RTL8761BU 0bda:a728: removing BROKEN_EXT_SCAN fixes
+ 0x200c timeout
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+To: Andy Tsvetinskiy <andrew.tsvetinskiy@gmail.com>
+Cc: regressions@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+ Kamil Serwus <kserwus@gmail.com>, Junjie Cao <junjie.cao@intel.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, LKML <linux-kernel@vger.kernel.org>,
+ Alexej Sidorenko <alexej@sidorenko.cz>
+References: 
+ <CAE4bxw+ofDFVx0aTHqCrzns9oP1CRQDm_wzeyHPeMBYOhSpcuA@mail.gmail.com>
+ <f322a3b2-71eb-45e7-aeaf-18ad87f938ce@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <f322a3b2-71eb-45e7-aeaf-18ad87f938ce@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260925-bcm4356a3-bt-v2-1-42098aca235b@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XMSwrDIBSF4a2EO67FR6Kho+6jZGB8JBdqLBqkJ
- bj32sw7/A+c74DsEroMt+6A5ApmjFsLfunArHpbHEHbGjjlkiqmyGxCLwapBZl3YqwajaG+526
- Ednkl5/F9co+p9Yp5j+lz6oX91j9QYYQR7zW3AxdCSHpfgsbn1cQAU631C4lyC7aoAAAA
-X-Change-ID: 20260717-bcm4356a3-bt-cd78cc0f42e8
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Aaron Kling <webgeek1234@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790319184; l=1578;
- i=webgeek1234@gmail.com; s=20250217; h=from:subject:message-id;
- bh=AD/eIUQbbqFcpJLnIHNzJvShs6PAafOnSxMSfdwR5aY=;
- b=hvB9VnfWyCfk/orBFrRCxM7ya3Prs06AZUE6g+o4iJ9UT+/QQ5vydsb3zumvsc7KNQhCG/lEZ
- rlBMHG/mB3GBinuH8/l/nFTEppldRBTlQzdwUNHmNfR4xec4AvesYvt
-X-Developer-Key: i=webgeek1234@gmail.com; a=ed25519;
- pk=TQwd6q26txw7bkK7B8qtI/kcAohZc7bHHGSD7domdrU=
-X-Endpoint-Received: by B4 Relay for webgeek1234@gmail.com/20250217 with
- auth_id=342
-X-Original-From: Aaron Kling <webgeek1234@gmail.com>
-Reply-To: webgeek1234@gmail.com
+X-PPP-Message-ID: <179032711737.4193479.59443090121703576@mxe9fb.netcup.net>
+X-NC-CID: VoNGq77+MfkMVWhdao7Mfl8yZM1MwjyjeQ/z56srSUi0NsajOO4=
 
-From: Aaron Kling <webgeek1234@gmail.com>
+On 9/18/26 15:37, Thorsten Leemhuis wrote:
+> Lo!
+> On 9/18/26 11:21, Andy Tsvetinskiy wrote:
+>>
+>>    This report concerns USB ID 0bda:a728, not 0bda:8771.
+>>
+>>    I have a Realtek RTL8761BUV USB Bluetooth adapter:
+>>
+>>    - USB ID: 0bda:a728
+>>    - Product: Bluetooth 5.4 Radio
+>>    - Firmware: rtl_bt/rtl8761bu_fw.bin
+>>    - Firmware version: 0xdfc6d922
+>>    - Running kernel: 6.18.51-1-lts
+>>    - Distribution: Arch Linux
+>>
+>>    With the stock btusb driver, Bluetooth repeatedly failed with:
+>>
+>>        Bluetooth: hci0: command 0x200c tx timeout
+>>        Bluetooth: hci0: Opcode 0x200c failed: -110
+>>        Bluetooth: hci0: Unable to disable scanning: -110
+>>        Bluetooth: hci0: Resetting usb device.
+>>        usb 1-2.2: reset full-speed USB device
+>>        Bluetooth: hci0: unexpected event for opcode 0x200c
+> 
+> Thx for the report. Just replying to bring a few people into the loop
+> that can help handling this: the Blutooth maintainers and developers
+> which were involved in ca0583c2466174 ("Bluetooth: btusb: limit RTL8761B
+> BROKEN_EXT_SCAN quirk to 0bda:a728") [v7.3-rc1] and 5ead2063611ae5
+> ("Bluetooth: btrtl: fix RTL8761B/BU broken LE extended scan")
+> [v7.2-rc1]. Ciao, Thorsten
 
-This patch adds the device ID for the bluetooth chip used in the
-Nvidia specific Broadcom BCM4356 PCI-E WiFi / UART BT chip.
+Hmm, seems nobody cares, so we need to go the next step: can you please
+test if latest mainline (7.3-rc4 or later) is affected to rule out that
+it's something specific to the stable series in question?
 
-Startup log:
-
-  Bluetooth: hci0: BCM: chip id 122
-  Bluetooth: hci0: BCM: features 0x0f
-  Bluetooth: hci0: BCM4356A3
-  Bluetooth: hci0: BCM4356A3 (001.004.009) build 0000
-  Bluetooth: hci0: BCM4356A3 'brcm/BCM4356A3.nvidia,p2894-2551-b00.hcd' Patch
-  Bluetooth: hci0: BCM: features 0x0f
-  Bluetooth: hci0: BCM4356A3 37.4MHz Class 1.5 Nvidia mDarcy-0108
-  Bluetooth: hci0: BCM4356A3 (001.004.009) build 0109
-
-Signed-off-by: Aaron Kling <webgeek1234@gmail.com>
----
-Changes in v2:
-- Add startup log to commit message
-- Link to v1: https://lore.kernel.org/r/20260717-bcm4356a3-bt-v1-1-ffa2d5233360@gmail.com
----
- drivers/bluetooth/btbcm.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 63c4c788d9c48..065536d4ec762 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -508,6 +508,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x6606, "BCM4345C5"	},	/* 003.006.006 */
- 	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
- 	{ 0x2310, "BCM4343A2"	},	/* 001.003.016 */
-+	{ 0x2409, "BCM4356A3"	},	/* 001.004.009 */
- 	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
- 	{ 0x420d, "BCM4349B1"	},	/* 002.002.013 */
- 	{ 0x420e, "BCM4349B1"	},	/* 002.002.014 */
-
----
-base-commit: 4c253ac4b29b8c6cc6fdef8f92d4facde62e63b9
-change-id: 20260717-bcm4356a3-bt-cd78cc0f42e8
-
-Best regards,
--- 
-Aaron Kling <webgeek1234@gmail.com>
-
+Ciao, Thorsten
+>>    The firmware was loaded successfully:
+>>
+>>        Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_fw.bin
+>>        Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_config.bin
+>>        Bluetooth: hci0: RTL: fw version 0xdfc6d922
+>>
+>>    The USB autosuspend setting was not the cause:
+>>
+>>        /sys/bus/usb/devices/1-2.2/power/autosuspend: -1
+>>
+>>    The current upstream fix ca0583c24661
+>>    ("Bluetooth: btusb: limit RTL8761B BROKEN_EXT_SCAN quirk to 0bda:a728")
+>>    is already present in my kernel. It sets BTUSB_BROKEN_EXT_SCAN for 0bda:a728.
+>>
+>>    I tested the opposite change locally in drivers/bluetooth/btusb.c:
+>>
+>>        - { USB_DEVICE(0x0bda, 0xa728), .driver_info = BTUSB_REALTEK |
+>>        -                    BTUSB_BROKEN_EXT_SCAN },
+>>        + { USB_DEVICE(0x0bda, 0xa728), .driver_info = BTUSB_REALTEK },
+>>
+>>    After rebuilding and reloading the btusb module:
+>>
+>>        systemctl stop bluetooth
+>>        modprobe -r btusb
+>>        modprobe btusb
+>>        systemctl start bluetooth
+>>
+>>    Bluetooth scanning worked normally. A 20-second scan completed with:
+>>
+>>        Discovery started
+>>        Discovering: yes
+>>
+>>    After loading the patched module, no new occurrences of the
+>> following messages appeared:
+>>
+>>        Opcode 0x200c failed: -110
+>>        Opcode 0x2042 failed
+>>        command tx timeout
+>>        Unable to disable scanning
+>>        Resetting usb device
+>>
+>>    The patched driver is currently loaded and Bluetooth remains operational.
+>>
+>>    This suggests that different RTL8761BUV devices or firmware
+>> revisions using USB ID 0bda:a728 may require different scan quirks. On
+>> my device, keeping BTUSB_BROKEN_EXT_SCAN causes the legacy 0x200c
+>> command to
+>>  time out, while removing the quirk fixes the issue.
+>>
+>>    Relevant upstream reports:
+>>
+>>    https://linux-regtracking.leemhuis.info/regzbot/regression/lore/20260822141115.58815-1-kserwus@gmail.com/
+>>
+>>    https://bugzilla.redhat.com/show_bug.cgi?id=2521504
+>>
+>>    https://lkml.iu.edu/2608.2/12212.html
+>>
+>>    Please let me know if more logs, a full patch, or additional
+>> testing is needed.
+>>
+> 
 
