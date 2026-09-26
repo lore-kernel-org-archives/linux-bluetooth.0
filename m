@@ -1,58 +1,62 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103567478
-	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 08:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE073A3821
+	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 08:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790412630; cv=none; b=hfO6k3wjxJ3JSij1BSnEMzi0yvEv97yvRieF9z+BNnMABFJC/Sm0cAGIt821+0hMI9vOLrruUnXM/o1GVeF/DwTIVr5UgNhu/Ul3frnr+/21vbDIiCWyV928wVhfhElWLWMwG+5FiMKmwlWHQAr0AYvm8BWcdE58ADvRIe1eaYE=
+	t=1790412634; cv=none; b=EDJKOVouv/JO46RBKKL1arlVh3GQXxc3GkPUDtJAcDPTgXS4EheVP3L3zqLAUwguV13h0irJO7nFqRyAfvoEtmFrvA+/aFvr2GGt6AXRcBtU+QNh1EtdVagOEnQf16TNgFPNo2Ul+bD681x5hed4ce85bpmKqsB8IDHfJVYuayo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790412630; c=relaxed/simple;
-	bh=oZil0vRLdVl+Orqq5d8PnMWTRJTHtrlz+ex7TNO2M4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YmfOVxO3uWsge9wio69lOaWRCoX32MUl5xKabz6w9k+SBO7HnxK2iV1zbF2eW1Mk8OlTxh+8d4lrZ+PfWiP627VhtMmKOXMJBZOqN3HiIEL8vEToKCxf8jPFg4HqEFQWd9pFZPKBEdOTuIDtUrQsXrMcpbseI9D8EqaUlJqd730=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q87xSTbZ; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1790412634; c=relaxed/simple;
+	bh=PCzjwzA1kfNsyIJ8Ntvjws0h7EFX9dydBuT/We6VlF0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ntc4wpkawyYsN5jIf2vpqzbkWlbAvU+ldxMqfk9I1PWaiu+EDcS7x4OcFau0f/6HaBvYAuFxCCHOXymC7jdH0/zemmIfmyyxhsQrAUI9P4kigT6XZX7ndA/ASnmEgHEeKGsat5ydCEUN4Cp8KcgbHaTJty1TEKvo9BcBWdSFRvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J07bFE4T; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q87xSTbZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J07bFE4T"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1790412628; x=1821948628;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oZil0vRLdVl+Orqq5d8PnMWTRJTHtrlz+ex7TNO2M4Q=;
-  b=Q87xSTbZK0ajrAruhM0oNg3ZyG9H7L/C/SzYKyMsPwbbehltFuHGZRQM
-   VuGXts9r+ewbvHcEt/OPNPmWUtKtl6JQNgLzow68yGVa7Jx+modiG5xaz
-   qBCIDsIZTucRvi8hnwlYK+IQ06MMycSK1YAix71PwqHdYTvN2tOxrgTe6
-   TCBvsBUt0G/n14f6n5DqbExQ+7fULt/V27LZt1spVdpXphAGCtKBn5Yyt
-   CIcCpEXh25IfzfYZXk1igLLE02DSFanapLHSYfMTNYDCClfv7Qc3BS2JN
-   hz8wfHT5AP3auS659WULIp3kI+TWHciT/u5OJ7QUxlIfWm4w3ALH6Fgfu
-   Q==;
-X-CSE-ConnectionGUID: y8Mx2TFITDGmX+h8QTLx6w==
-X-CSE-MsgGUID: we6sFy92SRSNwAE2p/AXkA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11916"; a="89952803"
+  t=1790412632; x=1821948632;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=PCzjwzA1kfNsyIJ8Ntvjws0h7EFX9dydBuT/We6VlF0=;
+  b=J07bFE4T2dsus6Zy73O/6RuGEDQkKgupz0oV1NyjyszUuUyke/KTmKcy
+   rOzLfXwpZHZLtuqRla+Q46IQhzYiJ33g4uUHCHgeKqqnzN5d8h7wNYw6T
+   0sGuc472fdGTsuUenSrfvbMPQzdP07WqRTFTC17nP1VcmCCS6QH0/UhoH
+   fJxXl/QzWnMxpuivAvKONJ7H7QJUv3DorFetYAnfrsk8ZieZRuhCZ4TdX
+   tVVqDfrhtwBIyXXXtUiqytui8WwjIElcATrk0QPijkU25jyGVkgyfHsTx
+   xlHAqG0ifKEpWqo19qvVnIoZqf/3bJbLAuuSVGhXQX1ZkUgtIEEfQkkPP
+   A==;
+X-CSE-ConnectionGUID: 4KXeBzgRSsu2wsZGpaLg4A==
+X-CSE-MsgGUID: SfRv8DqMTuaRbxCCAF116Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11916"; a="89952810"
 X-IronPort-AV: E=Sophos;i="6.27,124,1787036400"; 
-   d="scan'208";a="89952803"
+   d="scan'208";a="89952810"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2026 01:50:27 -0700
-X-CSE-ConnectionGUID: fFbDX0bGSxSKjMbaR/nWLg==
-X-CSE-MsgGUID: EnqWI6GrSKmOt+5XrRbI1A==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2026 01:50:32 -0700
+X-CSE-ConnectionGUID: 1RFFaaGHQwCpsGPyhjZP2Q==
+X-CSE-MsgGUID: Ov/KdTZmTXGpzBx5c8I47g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,124,1787036400"; 
-   d="scan'208";a="279264747"
+   d="scan'208";a="279264753"
 Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
-  by fmviesa004.fm.intel.com with ESMTP; 26 Sep 2026 01:50:25 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 26 Sep 2026 01:50:30 -0700
 From: Ravindra <ravindra@intel.com>
 To: linux-bluetooth@vger.kernel.org,
 	lsa.uz@pm.me,
 	vladimirkondratyev2@gmail.com
 Cc: chethan.tumkur.narayan@intel.com,
 	kiran.k@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v4 1/4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
-Date: Sat, 26 Sep 2026 14:22:59 +0530
-Message-ID: <20260926085302.2879093-1-ravindra@intel.com>
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Ravindra <ravindra@intel.com>
+Subject: [PATCH v4 2/4] Bluetooth: btintel_pcie: fix PM flow for S0ix, S3 and S4
+Date: Sat, 26 Sep 2026 14:23:00 +0530
+Message-ID: <20260926085302.2879093-2-ravindra@intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260926085302.2879093-1-ravindra@intel.com>
+References: <20260926085302.2879093-1-ravindra@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,73 +65,191 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
+Fix two issues in the PM suspend/resume path:
 
-btintel_pcie returns -16 (EBUSY) during suspend, causing the entire
-suspend operation to abort on Intel Lunar Lake hardware. The system
-immediately resumes after every suspend attempt:
+1. S3 was handled the same as S0ix, keeping the controller on the
+   D3hot-style path. That caused resume instability because S3 can
+   remove power from the controller, unlike s2idle/S0ix. Use
+   pm_suspend_target_state to distinguish them: D3_HOT for S0ix and
+   D3_COLD for S3/S4. Add .restore to force FLR-based firmware recovery
+   after S4 and S3 (PM_SUSPEND_MEM), as power is lost. S0ix resumes via
+   a normal D0 transition.
 
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1
-  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2
-  btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend [btintel_pcie] returns -16
-  btintel_pcie 0000:00:14.7: PM: dpm_run_callback(): pci_pm_suspend returns -16
-  btintel_pcie 0000:00:14.7: PM: failed to suspend async: error -16
-  PM: Some devices failed to suspend, or early wake event detected
+2. During hibernation, .freeze() puts the controller into the D3cold
+   state without any loss of power, and the flow normally continues to
+   .poweroff(). If hibernation instead fails, .thaw() is called to bring
+   the controller back up, and the old code routed it through
+   btintel_pcie_resume(), which forced FLR-based firmware recovery
+   whenever data->pm_sx_event was PM_EVENT_FREEZE. That check was
+   incorrect: since the controller's power was never actually removed on
+   this failed-hibernation path, FLR-based recovery is unnecessary. Remove
+   pm_sx_event and route .thaw through a normal D0 transition instead;
+   FLR-based recovery is retained only in .restore, where genuine S4
+   power loss requires it.
 
-btintel_pcie_set_dxstate() falls back to checking the controller state via
-btintel_pcie_in_d3/d0() when the alive interrupt is missed. However, these
-helpers read boot_stage_cache, which is only updated by the interrupt
-handler. As such, if the interrupt was missed, the cache is stale and the
-fallback check always fails, exhausting all retries and returning -EBUSY,
-causing suspend to abort.
+Tested with:
+  S0ix: sudo sh -c 'echo "+40" > /sys/class/rtc/rtc0/wakealarm' && \
+        echo freeze | sudo tee /sys/power/state
+  S3:   sudo rtcwake -m mem  -s 60
+  S4:   sudo rtcwake -m disk -s 60
 
-The fix involves re-reading the hardware register before the fallback state
-check, consistent with btintel_pcie_resume().
-
-Fixes: 88c6216a52ea ("Bluetooth: btintel_pcie: Suspend/Resume: Controller doorbell interrupt handling")
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221481
-Link: https://lore.kernel.org/linux-bluetooth/20260830151550.44687-1-lsa.uz@pm.me/
-Signed-off-by: Vladimir V. Kondratyev <vladimirkondratyev2@gmail.com>
+Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
+Assisted-by: GitHub-Copilot:GPT5
+Signed-off-by: Ravindra <ravindra@intel.com>
 Tested-by: Sergey Lebedev <lsa.uz@pm.me>
-Signed-off-by: Sergey Lebedev <lsa.uz@pm.me>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 ---
- drivers/bluetooth/btintel_pcie.c | 8 +++++---
- drivers/bluetooth/btintel_pcie.h | 1 +
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 58 +++++++++++++++++++++-----------
+ drivers/bluetooth/btintel_pcie.h |  2 --
+ 2 files changed, 39 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 59cf600014bb..677749903173 100644
+index 677749903173..082f5ec8ba71 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -4222,10 +4222,12 @@ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
- 					  BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
- 					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/acpi.h>
++#include <linux/suspend.h>
  
--		/* A hardware bug may cause the alive interrupt to be missed.
--		 * Check if the controller reached the expected state and retry
--		 * the operation only if it hasn't.
-+		/* A hardware bug may cause the alive interrupt to be missed. Refresh
-+		 * boot_stage_cache from hardware, since only the interrupt handler
-+		 * updates it. Finally retry only if the state check still fails.
- 		 */
-+		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
-+							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
- 		if (dxstate == BTINTEL_PCIE_STATE_D0) {
- 			if (btintel_pcie_in_d0(data))
- 				return 0;
+ #include <linux/unaligned.h>
+ #include <linux/devcoredump.h>
+@@ -4199,7 +4200,8 @@ static void btintel_pcie_coredump(struct device *dev)
+ 
+ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ {
+-	int retry = 0, status;
++	int retry = 0;
++	long status;
+ 	u32 dx_intr_timeout_ms = 200;
+ 
+ 	do {
+@@ -4251,18 +4253,23 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 
+ 	data = pci_get_drvdata(pdev);
+ 
+-	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
+-		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
+-
+-	data->pm_sx_event = mesg.event;
++	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
++	if (mesg.event == PM_EVENT_SUSPEND &&
++	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
++		dxstate = BTINTEL_PCIE_STATE_D3_HOT;
++	else
++		dxstate = BTINTEL_PCIE_STATE_D3_COLD;
+ 
+ 	start = ktime_get();
+ 
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+-	if (err)
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
++			   dxstate, err);
+ 		return err;
++	}
+ 
+ 	bt_dev_dbg(data->hdev,
+ 		   "device entered into d3 state from d0 in %lld us",
+@@ -4285,7 +4292,7 @@ static int btintel_pcie_freeze(struct device *dev)
+ 	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
+ }
+ 
+-static int btintel_pcie_resume(struct device *dev)
++static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct btintel_pcie_data *data;
+@@ -4293,19 +4300,15 @@ static int btintel_pcie_resume(struct device *dev)
+ 	int err;
+ 
+ 	data = pci_get_drvdata(pdev);
+-	data->gp0_received = false;
+ 
+ 	start = ktime_get();
+ 
+-	/* When the system enters S4 (hibernate) mode, bluetooth device loses
+-	 * power, which results in the erasure of its loaded firmware.
+-	 * Consequently, function level reset (flr) is required on system
+-	 * resume to bring the controller back into an operational state by
+-	 * initiating a new firmware download.
++	/* S3 and S4 may cut power, erasing the firmware. Force FLR to recover
++	 * instead of a normal D0 transition.
+ 	 */
+-
+-	if (data->pm_sx_event == PM_EVENT_FREEZE ||
+-	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
++	if (mesg.event == PM_EVENT_RESTORE ||
++	    (mesg.event == PM_EVENT_RESUME &&
++	     pm_suspend_target_state == PM_SUSPEND_MEM)) {
+ 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
+ 		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
+ 		return 0;
+@@ -4314,7 +4317,9 @@ static int btintel_pcie_resume(struct device *dev)
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, BTINTEL_PCIE_STATE_D0);
+ 
+-	if (err == 0) {
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
++	} else {
+ 		bt_dev_dbg(data->hdev,
+ 			   "device entered into d0 state from d3 in %lld us",
+ 			   ktime_to_us(ktime_get() - start));
+@@ -4339,13 +4344,28 @@ static int btintel_pcie_resume(struct device *dev)
+ 	return err;
+ }
+ 
++static int btintel_pcie_resume(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESUME);
++}
++
++static int btintel_pcie_restore(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESTORE);
++}
++
++static int btintel_pcie_thaw(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_THAW);
++}
++
+ static const struct dev_pm_ops btintel_pcie_pm_ops = {
+ 	.suspend = btintel_pcie_suspend,
+ 	.resume = btintel_pcie_resume,
+ 	.freeze = btintel_pcie_freeze,
+-	.thaw = btintel_pcie_resume,
++	.thaw = btintel_pcie_thaw,
+ 	.poweroff = btintel_pcie_hibernate,
+-	.restore = btintel_pcie_resume,
++	.restore = btintel_pcie_restore,
+ };
+ 
+ static struct pci_driver btintel_pcie_driver = {
 diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index f35f80f800ed..016795fcbccc 100644
+index 016795fcbccc..3030b4e8b750 100644
 --- a/drivers/bluetooth/btintel_pcie.h
 +++ b/drivers/bluetooth/btintel_pcie.h
-@@ -51,6 +51,7 @@
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_HALTED	(BIT(14))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
-+/* Reflects live D-state. Updated by hardware on every D-state transition. */
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
- 
- #define BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM	(BIT(4))
+@@ -713,7 +713,6 @@ struct btintel_pcie_ini_dump_info {
+  * @txq: TX Queue struct
+  * @rxq: RX Queue struct
+  * @alive_intr_ctxt: Alive interrupt context
+- * @pm_sx_event: PM event on which system got suspended
+  */
+ struct btintel_pcie_data {
+ 	struct pci_dev	*pdev;
+@@ -773,7 +772,6 @@ struct btintel_pcie_data {
+ 	struct btintel_pcie_dbgc	dbgc;
+ 	struct btintel_pcie_mdbgc	mdbgc;
+ 	struct btintel_pcie_dump_header dmp_hdr;
+-	u8	pm_sx_event;
+ 	u32	debug_evt_addr;
+ 	u32	debug_evt_size;
+ 	dma_addr_t	debug_table_addr;
 -- 
 2.43.0
 
