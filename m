@@ -1,260 +1,133 @@
-Received: from mailrelay-egress12.pub.mailoutpod3-cph3.one.com (mailrelay-egress12.pub.mailoutpod3-cph3.one.com [46.30.211.251])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79953A63FB
-	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 08:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103567478
+	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 08:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790412574; cv=none; b=I5h7sicRGgCrc2HaepOPZxSVT5oZSG0O9tJq4PLQ+O3ScAYZbR5OktmI/MBPyPnLQ1NzjDyW4tWIAHZtel8XSxke2LVLBO3dZPg1C7NkDTIgsB7SyDao3pOcCcp9exiIYoqwtfpsugcvEy1WiTCrEwqj/cXmyR/Zp1izaPg7/3E=
+	t=1790412630; cv=none; b=hfO6k3wjxJ3JSij1BSnEMzi0yvEv97yvRieF9z+BNnMABFJC/Sm0cAGIt821+0hMI9vOLrruUnXM/o1GVeF/DwTIVr5UgNhu/Ul3frnr+/21vbDIiCWyV928wVhfhElWLWMwG+5FiMKmwlWHQAr0AYvm8BWcdE58ADvRIe1eaYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790412574; c=relaxed/simple;
-	bh=krFWek1GDHqUjxRPt97GpNKCxcFaCMg1x/4WW41A1nU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=MWa8bY+7rDFmuFNffpV269/T/TVJ5lXRX1qxftwKbf8YgLBqwdCev1GHrqX5GwEXn4Rs4BiEc9G4PaUxCV9xZjUqpI4XUKksUg+Ka4VLm253LsMl+f4vCIFn1VFSRhzF+hVOTbprbOrbTNUyGy848IMO7OoYs4HAZmiQv6pUYJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=niemelat.fi; spf=none smtp.mailfrom=niemelat.fi; dkim=pass (2048-bit key) header.d=niemelat.fi header.i=@niemelat.fi header.b=08yY1h0b; dkim=permerror (0-bit key) header.d=niemelat.fi header.i=@niemelat.fi header.b=jhwwkpTs; arc=none smtp.client-ip=46.30.211.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=niemelat.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=niemelat.fi
+	s=arc-20240116; t=1790412630; c=relaxed/simple;
+	bh=oZil0vRLdVl+Orqq5d8PnMWTRJTHtrlz+ex7TNO2M4Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YmfOVxO3uWsge9wio69lOaWRCoX32MUl5xKabz6w9k+SBO7HnxK2iV1zbF2eW1Mk8OlTxh+8d4lrZ+PfWiP627VhtMmKOXMJBZOqN3HiIEL8vEToKCxf8jPFg4HqEFQWd9pFZPKBEdOTuIDtUrQsXrMcpbseI9D8EqaUlJqd730=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q87xSTbZ; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=niemelat.fi header.i=@niemelat.fi header.b="08yY1h0b";
-	dkim=permerror (0-bit key) header.d=niemelat.fi header.i=@niemelat.fi header.b="jhwwkpTs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1790412569; x=1791017369;
-	d=niemelat.fi; s=rsa1;
-	h=content-transfer-encoding:content-type:subject:from:cc:to:mime-version:date:
-	 message-id:from;
-	bh=smuX1zjGDYS7kVIRNbxjdVEp8V+SVplgbQdjEcjPMGk=;
-	b=08yY1h0bCmTnRytT+tjmBiS05dEbcUsoGbXhdLzjpJxGG/b53mim7z8ce//khy/xbfAv5tFoqWE+h
-	 Robqs27s21KzQeAhB4BTma3UIWnbX6VFgF898YUc6Vx17sk4lEf4Sybtco1Nzgv8vqXUVIJQNGTQ7C
-	 1llOQpk0dNcwXpj1ZGP+88C6uqid+IyYPs8cU5i91leLXa8NOemkaWrLvUk+T/ma+H5MnsIeI7mBwb
-	 4IE0xJ/v8vdq6XqKrYqsdEv+t3XxXzDD2LfO+dxTI6XRpyDAnLHU49SoYjGJk7hcQt/tJ0Co4VUuwR
-	 kSesQRCZ8oyRVMVCD/qxwJuZlcjGrZg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1790412569; x=1791017369;
-	d=niemelat.fi; s=ed1;
-	h=content-transfer-encoding:content-type:subject:from:cc:to:mime-version:date:
-	 message-id:from;
-	bh=smuX1zjGDYS7kVIRNbxjdVEp8V+SVplgbQdjEcjPMGk=;
-	b=jhwwkpTszLPWDHBvAuMlXCvi1CqjRC4trYzsJhwnPPeVbCQQfIFeFdOzozAB7BL1fHxrt3Lw1r9EA
-	 bRTAwR/DA==
-X-HalOne-ID: 2d9476d0-b987-11f1-957b-33fc7c51c1c8
-Received: from [192.168.100.222] (84-231-125-96.elisa-mobile.fi [84.231.125.96])
-	by mailrelay3.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
-	id 2d9476d0-b987-11f1-957b-33fc7c51c1c8;
-	Sat, 26 Sep 2026 08:49:28 +0000 (UTC)
-Message-ID: <be59323c-d616-4ce9-b886-e1a7be1a7b7e@niemelat.fi>
-Date: Sat, 26 Sep 2026 11:49:27 +0300
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q87xSTbZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1790412628; x=1821948628;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=oZil0vRLdVl+Orqq5d8PnMWTRJTHtrlz+ex7TNO2M4Q=;
+  b=Q87xSTbZK0ajrAruhM0oNg3ZyG9H7L/C/SzYKyMsPwbbehltFuHGZRQM
+   VuGXts9r+ewbvHcEt/OPNPmWUtKtl6JQNgLzow68yGVa7Jx+modiG5xaz
+   qBCIDsIZTucRvi8hnwlYK+IQ06MMycSK1YAix71PwqHdYTvN2tOxrgTe6
+   TCBvsBUt0G/n14f6n5DqbExQ+7fULt/V27LZt1spVdpXphAGCtKBn5Yyt
+   CIcCpEXh25IfzfYZXk1igLLE02DSFanapLHSYfMTNYDCClfv7Qc3BS2JN
+   hz8wfHT5AP3auS659WULIp3kI+TWHciT/u5OJ7QUxlIfWm4w3ALH6Fgfu
+   Q==;
+X-CSE-ConnectionGUID: y8Mx2TFITDGmX+h8QTLx6w==
+X-CSE-MsgGUID: we6sFy92SRSNwAE2p/AXkA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11916"; a="89952803"
+X-IronPort-AV: E=Sophos;i="6.27,124,1787036400"; 
+   d="scan'208";a="89952803"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2026 01:50:27 -0700
+X-CSE-ConnectionGUID: fFbDX0bGSxSKjMbaR/nWLg==
+X-CSE-MsgGUID: EnqWI6GrSKmOt+5XrRbI1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,124,1787036400"; 
+   d="scan'208";a="279264747"
+Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
+  by fmviesa004.fm.intel.com with ESMTP; 26 Sep 2026 01:50:25 -0700
+From: Ravindra <ravindra@intel.com>
+To: linux-bluetooth@vger.kernel.org,
+	lsa.uz@pm.me,
+	vladimirkondratyev2@gmail.com
+Cc: chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v4 1/4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+Date: Sat, 26 Sep 2026 14:22:59 +0530
+Message-ID: <20260926085302.2879093-1-ravindra@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-From: Niko <unknown@niemelat.fi>
-Subject: [REGRESSION] Bluetooth: ASUS USB-BT540 (0b05:1bef) fails after
- BTUSB_REALTEK quirk
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hello,
-
-I would like to report a regression affecting an ASUS USB-BT540 Bluetooth
-adapter (USB ID 0b05:1bef).
-
-The regression appears to be caused by commit:
-
-980084de4d9b25193398d89a1c0430ba3501b683
-Bluetooth: btusb: Add ASUS USB-BT540 for Realtek 8761CU
-
-which adds BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH for this USB ID.
-
-Hardware
-========
-
-Host:
-   Raspberry Pi
-   Debian 13 (Trixie)
-   Raspberry Pi kernel: 6.18.50+rpt-rpi-v8
-
-Adapter:
-   ASUS USB-BT540
-   USB ID: 0b05:1bef
-
-USB descriptors:
-
-   bcdUSB               1.10
-   bcdDevice            2.00
-   iManufacturer           1 Realtek
-   iProduct                2 Bluetooth Controller
-   iSerial                 0
-
-The descriptors appear to match the device reported in the original patch,
-including bcdUSB 1.10 and bcdDevice 2.00.
-
-Problem
-=======
-
-With the stock btusb driver containing:
-
-   { USB_DEVICE(0x0b05, 0x1bef), .driver_info = BTUSB_REALTEK |
-                                        BTUSB_WIDEBAND_SPEECH },
-
-the adapter fails during Realtek initialization.
-
-The kernel reports:
-
-   Bluetooth: hci1: RTL: examining ...
-   Bluetooth: hci1: RTL: Read reg16 failed (-32)
-
-I have also observed:
-
-   Bluetooth: hci1: RTL: Read reg16 failed (-110)
-
-The device then disconnects/re-enumerates and does not become a usable
-Bluetooth controller.
-
-I reproduced the failure after cold boots and using different Raspberry Pi
-USB ports.
-
-The same behavior was also observed with Raspberry Pi kernels 6.12.109 and
-6.18.50.
-
-Power/undervoltage problems were also checked on the Raspberry Pi:
-
-   vcgencmd get_throttled
-   throttled=0x0
-
-Test / workaround
-=================
-
-To isolate the problem, I built btusb.ko from the exact Raspberry Pi 6.18.50
-kernel source.
-
-I made only one functional change to drivers/bluetooth/btusb.c: I 
-removed the
-0b05:1bef entry which forces this device through BTUSB_REALTEK.
-
-The adjacent ASUS USB-BT600 0b05:1d70 entry and all other btusb code were
-left unchanged.
-
-With 0b05:1bef falling back to the generic btusb path, the same physical
-USB-BT540 works correctly.
-
-BlueZ detects the USB-BT540 as a second controller.
-
-The working controller reports:
-
-   Type: Primary
-   Bus: USB
-   HCI Version: 5.4 (0xd)
-   HCI Revision: 0x000e
-   LMP Version: 5.4 (0xd)
-   LMP Subversion: 0x8761
-   Manufacturer: Realtek Semiconductor Corporation (93)
-
-btmgmt also reports:
-
-   version 13
-   manufacturer 93
-
-and the controller remains powered and operational.
-
-hciconfig reports:
-
-   UP RUNNING PSCAN
-   RX errors: 0
-   TX errors: 0
-
-BLE operation
-=============
-
-This is not only an HCI enumeration test.
-
-With the generic btusb path the adapter successfully performs BLE scanning
-and discovers BLE devices.
-
-It is also currently being used continuously by a Python application using
-Bleak to communicate with Ensto ELTE6-BT BLE heating controllers.
-
-The complete path:
-
-   USB-BT540
-     -> generic btusb
-     -> BlueZ
-     -> Bleak
-     -> BLE heating controller
-     -> MQTT
-
-is working reliably.
-
-Therefore the controller appears to be fully usable through the generic
-btusb path rather than merely enumerating successfully.
-
-Test on another computer
-========================
-
-I also tested the same physical ASUS USB-BT540 on a separate Pop!_OS system
-running kernel 7.1.1.
-
-On that system the adapter worked as a second BlueZ controller using the
-generic btusb path.
-
-The only notable message there was:
-
-   Bluetooth: hci1: Failed to read codec capabilities (-22)
-
-but the controller itself was operational.
-
-Observation
-===========
-
-This is interesting because the USB descriptors of this adapter appear to
-match those from the device used for the original BTUSB_REALTEK patch:
-
-   VID:PID       0b05:1bef
-   bcdUSB        1.10
-   bcdDevice     2.00
-   Manufacturer  Realtek
-   Product       Bluetooth Controller
-
-However, the behavior of this unit appears to be the opposite of the unit
-described in the original patch.
-
-On this adapter:
-
-   BTUSB_REALTEK
-     -> Realtek initialization
-     -> Read reg16 fails (-32 or -110)
-     -> controller unusable
-
-while:
-
-   generic btusb
-     -> controller initializes
-     -> HCI operational
-     -> BLE scanning works
-     -> BLE GATT communication works reliably
-
-I am therefore not suggesting simply reverting the 0b05:1bef entry, since
-the USB-BT540 used for the original patch apparently required the Realtek
-firmware path to operate.
-
-It seems possible that ASUS/Realtek USB-BT540 adapters with the same VID:PID
-and bcdDevice exist with different internal hardware, ROM or firmware
-revisions, or that there is another distinction which is not represented by
-the USB descriptors.
-
-For comparison, this working unit identifies itself as:
-
-   HCI Version:    5.4
-   HCI Revision:   0x000e
-   LMP Version:    5.4
-   LMP Subversion: 0x8761
-   Manufacturer:   Realtek (93)
-
-I can provide additional logs, USB/HCI information, and test proposed driver
-changes if needed.
-
-Regards,
-Niko
+From: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
+
+btintel_pcie returns -16 (EBUSY) during suspend, causing the entire
+suspend operation to abort on Intel Lunar Lake hardware. The system
+immediately resumes after every suspend attempt:
+
+  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0
+  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1
+  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2
+  btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend [btintel_pcie] returns -16
+  btintel_pcie 0000:00:14.7: PM: dpm_run_callback(): pci_pm_suspend returns -16
+  btintel_pcie 0000:00:14.7: PM: failed to suspend async: error -16
+  PM: Some devices failed to suspend, or early wake event detected
+
+btintel_pcie_set_dxstate() falls back to checking the controller state via
+btintel_pcie_in_d3/d0() when the alive interrupt is missed. However, these
+helpers read boot_stage_cache, which is only updated by the interrupt
+handler. As such, if the interrupt was missed, the cache is stale and the
+fallback check always fails, exhausting all retries and returning -EBUSY,
+causing suspend to abort.
+
+The fix involves re-reading the hardware register before the fallback state
+check, consistent with btintel_pcie_resume().
+
+Fixes: 88c6216a52ea ("Bluetooth: btintel_pcie: Suspend/Resume: Controller doorbell interrupt handling")
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=221481
+Link: https://lore.kernel.org/linux-bluetooth/20260830151550.44687-1-lsa.uz@pm.me/
+Signed-off-by: Vladimir V. Kondratyev <vladimirkondratyev2@gmail.com>
+Tested-by: Sergey Lebedev <lsa.uz@pm.me>
+Signed-off-by: Sergey Lebedev <lsa.uz@pm.me>
+---
+ drivers/bluetooth/btintel_pcie.c | 8 +++++---
+ drivers/bluetooth/btintel_pcie.h | 1 +
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 59cf600014bb..677749903173 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -4222,10 +4222,12 @@ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ 					  BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
+ 					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
+ 
+-		/* A hardware bug may cause the alive interrupt to be missed.
+-		 * Check if the controller reached the expected state and retry
+-		 * the operation only if it hasn't.
++		/* A hardware bug may cause the alive interrupt to be missed. Refresh
++		 * boot_stage_cache from hardware, since only the interrupt handler
++		 * updates it. Finally retry only if the state check still fails.
+ 		 */
++		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
++							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
+ 		if (dxstate == BTINTEL_PCIE_STATE_D0) {
+ 			if (btintel_pcie_in_d0(data))
+ 				return 0;
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index f35f80f800ed..016795fcbccc 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -51,6 +51,7 @@
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_HALTED	(BIT(14))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
++/* Reflects live D-state. Updated by hardware on every D-state transition. */
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
+ 
+ #define BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM	(BIT(4))
+-- 
+2.43.0
 
