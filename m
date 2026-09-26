@@ -1,109 +1,327 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs2-f38.google.com (mail-vs2-f38.google.com [74.125.227.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE1D3655EC
-	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 20:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723414A2A5E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 21:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790456160; cv=none; b=j1vxWIDLJEvbvORYtys7Jdm9XG7J1QYA6wgF5XHndXSS5J85XRobcoGFXPLBmqs4kKQHkr1wX4wdo0q+YhKIr7C72uN4Lov1n+WOaare+X6vaqBD9H0fm7DQ1u2OKHtD4BUpDjoJkIzviWSKvHRuGMR8n/2LX5uEKMn5Q87Cc4I=
+	t=1790457722; cv=none; b=O54tKQjKnc5egYvNf9kY+31CziQLHVq8KIBxdyhf3kRrNpAIrJPSVvk0sRS4dE88uk1dnILUJ5eaKmz/NI7mr1xQ3Gq/MZMPBpfvVBGt8gR40rHp5Lmw5LY86WQB6LPO01mqX4RdeYI3zT028cSx6Cmyc/y95KT2ucPdMhnaJxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790456160; c=relaxed/simple;
-	bh=osEW03ROYnRlF4+9bLa4qn0UC/YwrajfExYiQlQbA6k=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=X/hMdaRCVoscRS8lpJZ89di/3z4hlh0Sn9JEs7hRwe58NgpDdR6gsLVLntkYJwtTcV/8fzZuKm+OMg1NzxP7ErRfvCbZFedCgIutSaOJ9cdKw9bCAtsC4n3ENtTHH3OqohgZsSEbBNf6jIAlKEVSo4oG9z8tg030n3gWUtCIWMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QEPwcNAC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1790457722; c=relaxed/simple;
+	bh=iUsKcuSqM8LKxJ3OF5Fci9kpal55BiJ0imcLGZ8OU2I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Mbz6IGf2o6y+JRUJFuQgosMxq50vfp0+FafK4JvitkQ3lm/02usMdfXg0wuGE72A163nP/u/aCZ4iN6ZKSR6rCJK3S1Eec+ZHFOfGzmirO3Gg9tEWH5QRoUx3XT0iR+0xAR41vKkBIMq7YSqlruIgCtERtT8wScZ/FOhVgOQ32c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grgApZfd; arc=none smtp.client-ip=74.125.227.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QEPwcNAC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AC35C2BCF7
-	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 20:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1790456160;
-	bh=osEW03ROYnRlF4+9bLa4qn0UC/YwrajfExYiQlQbA6k=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QEPwcNACJ6IkHpwt7tEhdNIwWGck27/o9PSCiXMKHYhUmbTzsjyUlm89HqLzs6Nod
-	 3NpBVPjnM1vsnY/RdR7eWOeTabXJxgMhkAyNzvCsfjCj3F5TorTb0tIEOy0PXvdSm8
-	 h9Qi5aXjXB0r8Kz5lgOIg/k0scq/FTF9b6NQfw5wT+Ut+++s5H+WzCc8XNMX+yoYUC
-	 KAoX8buhr3/LSFFVrYfHUqM05h9pLFezw7gvB8TJqGoo0/TruRNXwvvqOE2K860ceK
-	 SwTpMbSOsXpg778XeSsjzmJLQGGUIzCcy1N7Fc0YIn7wapBw0jSorHhK+CpdFEvimC
-	 /8X94uXThiOnw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id EE48CC433E1; Sat, 26 Sep 2026 20:55:59 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221754] RTL8852BE Bluetooth (0bda:b853) fails to init: Opcode
- 0xfcf0 failed: -16, hci0 never registers with mgmt (BD Address
- 00:00:00:00:00:00)
-Date: Sat, 26 Sep 2026 20:55:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: virtualfoxyloon@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-221754-62941-Y9oW7wOFMk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221754-62941@https.bugzilla.kernel.org/>
-References: <bug-221754-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grgApZfd"
+Received: by mail-vs2-f38.google.com with SMTP id 71dfb90a1353d-5cda985b0f5so419052e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2026 14:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790457718; x=1791062518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3//vnaiZHcbkMpFRtVySzfVBm8/5bMl7/bCO511VH1A=;
+        b=grgApZfdz5+U0TZw/wvPzM1+9xZfnzg8p4k7lRELDym+TTeEkw1F4i7ywoeRputXW+
+         gUlrd13/Bu1594dVnjBiEbE8r5wB8tmGuKpnsKaDTn7Qfe8Tg72rSY7bnCXYfqBqCRca
+         c7s03vfQXNpn7v7tHRkMV5P1v+sdQZq8OMZSIFBBu338rqiUpVoKXiUhUMCZKJtvXeN0
+         6TCKsSwVXQJ9zwclPqp56N38ks2M/NBvymJlcLqT9RPPxP1lhSFaivwD1tJyHRQHL/Hj
+         U6axNXc4DB1HjPvhvWVcLj3QmQLZ/6LCM0mcFvWfncd6pX/wgeANb4FMR6CMumOB0VE8
+         KFsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790457718; x=1791062518;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3//vnaiZHcbkMpFRtVySzfVBm8/5bMl7/bCO511VH1A=;
+        b=Shuun8WMTBTlh0/sMe7M40sfBHWaQNq0ygFIFu1cBRvgUNV5mD/orlz5EwhTMr6K9d
+         p2q7EEkuaoggE2H5ups3J8TBa8MsKfibvFxjsMzpSqRVeX7DzxJju/5y5R9a9ntfY92F
+         Mp7Tt+oB3aVUo4z7ZBi1yOb7T8vkxUUrztdFiMmDOxQ3qUkJKZMIfA4+E+ZihmRLOVgH
+         gmfaeTFpAmGJ3MMqbysZrb/U8sFc0y82pft5qr+JySMSl7bf97QSQbz485W5q5rKI74D
+         hzWV+wqd64f7eyOZh7KgFDX9czNlATxsNukmozVbhA2I/CQugrEHwtWkvx+5aYdG90qv
+         RSxQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxoiNHyDF6TX/mTiyvnw6c9DG2OeRg3PH8XpmjDaltrq2PTKTGbKMh25DI5NPshHgjVWjketBTqFv+FmiKG5nU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYI8yeT6jh8upg1OGIGZhxbhiycYad+DZTfAw/nmuckUW2VTvvzf
+	K2dflmKunlShavL4UZwE7eJk7H4zb1qucc2/vdHc0fHe7NfEcp358GCY
+X-Gm-Gg: AYBFou30U3qv5qV48M/Y5VpM98V0GlYMXdLbthhk9/ZqWBzu0tFKnZtV2ZIFDygvyLi
+	7KtFbYv6BBIEgOhvailo251M3oNl9+yGDXKlq4ynRo9leST5ukI5FSpQVDJeaGgBCdHSEKNUICi
+	ogR/yT5rVwuH7ofOokcxSVqQlPVK3KbrCuAgmSJoRk4XOL2cEqDF3rIa+g8hh51XiEc9CyKo8wc
+	1onbmPVLREdlyFwWn/SgKohp2H1u6A+6XRYMwOPC7zRRYEWVgQlqnbp7eeyAnmf6UJTCy7JVdFf
+	V07KSm5sx0c5G9tEwh2mOGg99wDLYRltBZAxLiDTT0vDfJSHtpOxiIztXXKh6EM5MCqfNsfe5Q4
+	Lt3QmNM53z1PAsoFlHS8gCHBrsUWDhFRuBWwxTqFzSifpHVRmuyeZelN70Wd4NowAu4pv3baE8G
+	AL2YLFiZJkKHeJnJBXSgEV/S2yeS9/CMxuV255H1+p+R2vdEO3F+JLEemg8HYmTGz7
+X-Received: by 2002:a05:6102:3e8e:b0:7a2:2068:6b5e with SMTP id ada2fe7eead31-7b1c751f228mr1543838137.24.1790457717860;
+        Sat, 26 Sep 2026 14:21:57 -0700 (PDT)
+Received: from beelink.. ([187.13.30.172])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5cde615a356sm3003222e0c.14.2026.09.26.14.21.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Sep 2026 14:21:57 -0700 (PDT)
+From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+To: pav@iki.fi,
+	luiz.dentz@gmail.com
+Cc: marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+Subject: [PATCH v4] Bluetooth: SCO: serialise sco_conn lifetime against sco_recv_scodata()
+Date: Sat, 26 Sep 2026 18:21:45 -0300
+Message-ID: <20260926212145.1343318-1-qwe.aldo@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260923122026.3465391-1-qwe.aldo@gmail.com>
+References: <20260923122026.3465391-1-qwe.aldo@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221754
+sco_recv_scodata() upgrades the weak hcon->sco_data back-pointer to a
+strong reference under hdev->lock:
 
-FoxyLoon (virtualfoxyloon@gmail.com) changed:
+    hci_dev_lock(hdev);
+    hcon = hci_conn_hash_lookup_handle(hdev, handle);
+    ...
+    conn = sco_conn_hold_unless_zero(hcon->sco_data);
+    hci_dev_unlock(hdev);
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |virtualfoxyloon@gmail.com
+but the pointer is cleared from the other side without that lock. When
+the last sco_conn reference is dropped, sco_conn_free() ran
 
---- Comment #10 from FoxyLoon (virtualfoxyloon@gmail.com) ---
-I'm also having this exact problem on my computer. I have a Lenovo LOQ
-Essential 15ARP11. This card also reports =E2=80=9C0bda:b853=E2=80=9D and =
-=E2=80=9Crom_version=3D3=E2=80=9D with
-the same symptoms described.
+    conn->hcon->sco_data = NULL;
 
-However, I tried to apply the fix by following the instructions, but
-unfortunately, I was unable to do so. I get the error =E2=80=9Cerror:
-rtl8852bd_mp_chip_new.dat not found...=E2=80=9D. I downloaded the Windows B=
-luetooth
-driver from Lenovo=E2=80=99s support page for my computer model and followe=
-d the
-instructions as stated, but I don=E2=80=99t know why it doesn=E2=80=99t inc=
-lude the required
-.dat file.
+with no hdev->lock held, so the RX path could read hcon->sco_data and
+call kref_get_unless_zero() on an sco_conn that was concurrently freed:
 
-I downloaded this one specifically from my computer=E2=80=99s model page (i=
-t was the
-only one available there as well):
-- Name: Bluetooth Driver (Realtek, Mediatek)
-- Version: 8852BE_18.4032.0.3008,MT7920_25.20.5.20
-- Date: Aug 18, 2026
+    BUG: KASAN: slab-use-after-free in sco_conn_hold_unless_zero+0xbe/0x160
+    Write of size 4 by task kworker/u17:0
+    Workqueue: hci0 hci_rx_work
+    Call Trace:
+     sco_conn_hold_unless_zero+0xbe/0x160
+     sco_recv_scodata+0x13f/0x490
+     hci_rx_work+0x3af/0x730
 
-I also don=E2=80=99t know which other driver might have this necessary .dat=
- file, since
-it was mentioned that it=E2=80=99s not something found in just one place or=
- specific to
-a single brand, but I=E2=80=99d rather play it safe.
+kref_get_unless_zero() only guards against a zero refcount, not against
+the backing memory already being freed.
 
-So, I=E2=80=99ll be waiting for them to fix this kernel bug.
+Give hcon->sco_data an actual reference on the sco_conn it points to, so
+the object cannot be freed while the pointer is still installed, and only
+clear and drop it from sco_conn_del(), which runs under hdev->lock (its
+callers, sco_connect_cfm() and sco_disconn_cfm(), hold it). The reader in
+sco_recv_scodata() also takes hdev->lock, so the store and the read are
+now serialised: the RX path either observes NULL or a reference that is
+guaranteed to stay valid until it drops its own.
 
---=20
-You may reply to this email to add a comment.
+sco_conn_add() no longer hands its kref_init() reference to the caller as
+the connection's only reference; that initial reference is the one owned
+by hcon->sco_data, and callers get their own via sco_conn_hold().
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Because the sco_conn can now outlive the socket (the association keeps it
+alive until the link goes down), the hci_conn can no longer be dropped
+from sco_conn_free() without regressing socket close: closing a connected
+SCO socket must still tear the link down. Move hci_conn ownership to the
+socket instead: __sco_chan_add() takes an hci_conn reference and it is
+released from sco_chan_del() and sco_sock_destruct(), exactly once. The
+sco_conn no longer owns an hci_conn reference, so sco_conn_add() stops
+consuming one and sco_connect() drops the hci_connect_sco() reference on
+every path; sco_connect_cfm() no longer needs its hci_conn_hold() dance.
+
+Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
+Cc: stable@vger.kernel.org
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+---
+v4: remove early return in sco_sock_destruct() that skipped
+    skb_queue_purge() when conn was non-NULL (found by sashiko.dev).
+v3: fix two UAFs found by Pauli Virtanen in the v2 review:
+    - sco_chan_del(): drop hci_conn ref before clearing conn->sk so that
+      sco_conn_del() on another CPU cannot free hci_conn under our feet
+    - sco_sock_destruct(): same ordering fix
+    - remove dead branch in sco_conn_add() (conn->hcon == NULL impossible)
+    - move hci_conn_drop in sco_connect() tighter after __sco_chan_add()
+v2: quote inlined code and KASAN splat with spaces (bluez CI gitlint);
+    no functional change.
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 3d4362a..a2f17ab 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -84,12 +84,14 @@ static void sco_conn_free(struct kref *ref)
+ 	if (conn->sk)
+ 		sco_pi(conn->sk)->conn = NULL;
+ 
+-	if (conn->hcon) {
+-		conn->hcon->sco_data = NULL;
+-		hci_conn_drop(conn->hcon);
+-	}
++	/* hcon->sco_data is cleared and the association's reference on the
++	 * sco_conn is dropped in sco_conn_del() under hdev->lock, and the
++	 * hci_conn is now owned by the socket (held in __sco_chan_add() and
++	 * dropped in sco_chan_del()/sco_sock_destruct()), so there is nothing
++	 * left to release towards hcon here.
++	 */
+ 
+-	/* Ensure no more work items will run since hci_conn has been dropped */
++	/* Ensure no more work items will run before the connection is freed */
+ 	disable_delayed_work_sync(&conn->timeout_work);
+ 
+ 	kfree(conn);
+@@ -188,25 +190,19 @@ static void sco_sock_clear_timer(struct sock *sk)
+ }
+ 
+ /* ---- SCO connections ---- */
+-/* Consumes a reference on @hcon, which the returned sco_conn owns until it is
+- * freed. On failure (NULL return) the reference is left for the caller to drop.
++/* Returns a new reference the caller must drop with sco_conn_put(). The
++ * hcon->sco_data association holds its own reference on the sco_conn for the
++ * connection's lifetime; it is dropped in sco_conn_del() under hdev->lock.
++ * @hcon is not consumed: the hci_conn reference is taken and owned by the
++ * socket in __sco_chan_add().
+  */
+ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ {
+ 	struct sco_conn *conn = hcon->sco_data;
+ 
+ 	conn = sco_conn_hold_unless_zero(conn);
+-	if (conn) {
+-		if (!conn->hcon) {
+-			sco_conn_lock(conn);
+-			conn->hcon = hcon;
+-			sco_conn_unlock(conn);
+-		} else {
+-			/* conn already owns a reference on hcon */
+-			hci_conn_drop(hcon);
+-		}
++	if (conn)
+ 		return conn;
+-	}
+ 
+ 	conn = kzalloc_obj(struct sco_conn);
+ 	if (!conn)
+@@ -227,7 +223,10 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ 
+ 	BT_DBG("hcon %p conn %p", hcon, conn);
+ 
+-	return conn;
++	/* kref_init() above set the association reference owned by
++	 * hcon->sco_data; hand the caller its own reference.
++	 */
++	return sco_conn_hold(conn);
+ }
+ 
+ /* Delete channel.
+@@ -242,6 +241,19 @@ static void sco_chan_del(struct sock *sk, int err)
+ 	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
+ 
+ 	if (conn) {
++		struct hci_conn *hcon;
++
++		sco_conn_lock(conn);
++		hcon = conn->hcon;
++		sco_conn_unlock(conn);
++
++		/* Drop the socket's hci_conn reference BEFORE clearing
++		 * conn->sk, so sco_conn_del() on another CPU cannot free
++		 * the hci_conn while we still hold a pointer to it.
++		 */
++		if (hcon)
++			hci_conn_drop(hcon);
++
+ 		sco_conn_lock(conn);
+ 		conn->sk = NULL;
+ 		sco_conn_unlock(conn);
+@@ -266,6 +278,13 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
++	/* Detach from the hci_conn and drop the association's reference.
++	 * The caller holds hdev->lock, which serialises this against the
++	 * read of hcon->sco_data in sco_recv_scodata().
++	 */
++	hcon->sco_data = NULL;
++	sco_conn_put(conn);
++
+ 	sco_conn_lock(conn);
+ 	sk = sco_sock_hold(conn);
+ 	sco_conn_unlock(conn);
+@@ -290,6 +309,11 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 	sco_pi(sk)->conn = sco_conn_hold(conn);
+ 	conn->sk = sk;
+ 
++	/* The socket owns an hci_conn reference for as long as it stays
++	 * attached; it is dropped in sco_chan_del()/sco_sock_destruct().
++	 */
++	hci_conn_hold(conn->hcon);
++
+ 	if (parent)
+ 		bt_accept_enqueue(parent, sk, true);
+ }
+@@ -371,6 +395,7 @@ static int sco_connect(struct sock *sk)
+ 	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
+ 		release_sock(sk);
+ 		sco_conn_put(conn);
++		hci_conn_drop(hcon);
+ 		err = -EBADFD;
+ 		goto unlock;
+ 	}
+@@ -379,9 +404,13 @@ static int sco_connect(struct sock *sk)
+ 	sco_conn_put(conn);
+ 	if (err) {
+ 		release_sock(sk);
++		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
++	/* __sco_chan_add() took its own hci_conn reference; drop ours. */
++	hci_conn_drop(hcon);
++
+ 	/* Update source addr of the socket */
+ 	bacpy(&sco_pi(sk)->src, &hcon->src);
+ 
+@@ -495,9 +524,25 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 
+ static void sco_sock_destruct(struct sock *sk)
+ {
++	struct sco_conn *conn = sco_pi(sk)->conn;
++
+ 	BT_DBG("sk %p", sk);
+ 
+-	sco_conn_put(sco_pi(sk)->conn);
++	/* If the channel was not already torn down via sco_chan_del(), drop
++	 * the socket's own references here.
++	 */
++	if (conn) {
++		struct hci_conn *hcon;
++
++		sco_conn_lock(conn);
++		hcon = conn->hcon;
++		sco_conn_unlock(conn);
++
++		if (hcon)
++			hci_conn_drop(hcon);
++		sco_pi(sk)->conn = NULL;
++		sco_conn_put(conn);
++	}
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
+ 	skb_queue_purge(&sk->sk_write_queue);
+@@ -1511,12 +1557,10 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
+ 	if (!status) {
+ 		struct sco_conn *conn;
+ 
+-		conn = sco_conn_add(hci_conn_hold(hcon));
++		conn = sco_conn_add(hcon);
+ 		if (conn) {
+ 			sco_conn_ready(conn);
+ 			sco_conn_put(conn);
+-		} else {
+-			hci_conn_drop(hcon);
+ 		}
+ 	} else
+ 		sco_conn_del(hcon, bt_to_errno(status));
+-- 
+2.43.0
