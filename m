@@ -1,280 +1,148 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo2-f39.google.com (mail-oo2-f39.google.com [74.125.231.167])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D903D649C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E423DAAC8
 	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 21:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790630996; cv=none; b=nN5/mXNjJBx6gA8aVOrVxzKYApsB/Uy8fqd/15Lj57IX5jfyrANQHB9DQHhr2DCnMlpirEkfX0z7qiQkPN5Xe0nlcu2R4xJYyQ/pzNGM8PHjNASu8+dWE7UeLjNSdv4/UXzZBGJqHpUlZDdvEb5kb0AhtoGe8umyKn98C5/34t0=
+	t=1790630996; cv=none; b=L/b9UlMq38AXf7FRiMbyo0H9/6OkYvBYIoD1UxS+5XiZ4HhvWsKVQGGWnRvwbrekgK7IPXQlJv+dNV/LmOFhMh1uVXFJKYT+fLknJZX+dQ625Jdp1KnUXOZ85x4azn/H+6UaDGgwH2wQDt9IZVmKIN9d57HgLiR4AH3d5SXrsTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790630996; c=relaxed/simple;
-	bh=Wb0VtH76TmieEgmVEPK/NFRYbnaQfy4ucFH6UhAK+jk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NgiSqKZv7WS4wB4vIP/43CxsJ9HtHnaRCmoioLoTZ6WcnrWeLGfe9XaQHOD+Fc/7Kiic6WQMwK3RHAZAbEVhfBB1LIX4h0V4W+lXb/8PZUDviwpUa7idtxCMzTX2IfIFD989AIsHdM9w1MxtHdbfiGjQhsEvxBwF/A6MPblt0os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=g9mVkUKK; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	bh=+X3+/9z5KVE5rnwxXNmjwJAK/N1+uuAEtCtLX+/5ekU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=E1ZPaLLzlMCdLtKh0Xqk+LrHD1wiCAoEP7JxmosaI3Q8pCf9BmzH+m8YlCgIXAvevsgpiUBZJxm0Va6a+F9GIJ9QJWNSUxqqlChOdaH5Wt9Chqtfrx5B07swAbR6zlAnZmxsP/vObeII7QGkM62d4GsdklhJiRJ6dum0G/VVZio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/WKUK2Y; arc=none smtp.client-ip=74.125.231.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="g9mVkUKK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1790630993;
-	bh=gIGxC32ein7C5oMchsx6uo+ybFrPiyDyyBP7P+PL0ag=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=g9mVkUKKALf7PzdIayAZrmun3vLAykz5t8Kkv9Nmbd3vAJiGuQRUVqD5FIWO4251O
-	 DzX+LYHmwk8eRFXRX7iPRA3ZZKnlo/+CG5nfW7YwvfcibqBSCR+Pe1nHlZEjiIASbI
-	 k3KDiDHZ84Z+WRIioHtH/1gcMW8pjTTQWyNdEIrDgvNUjPNfRY2j6hDmK8pcHuzf7x
-	 nJXLWlMhrSmkiKLeWkeoCNIGAO0L9ag05upj4+04oxVzFIcH4cnmXj2XJ0bxnhoE2N
-	 BZFMDM56vG6aFoi/M7oaVtnmvr6uowimsbyaWlkuJz69d1SCRJkGpucER8LDNXj7eZ
-	 Ji7Yls74ZPf6g==
-Received: from github.com (hubbernetes-node-3233862.ash1-iad.github.net [10.56.209.90])
-	by smtp.github.com (Postfix) with ESMTPA id 9E5A3520A9D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 14:29:53 -0700 (PDT)
-Date: Mon, 28 Sep 2026 14:29:53 -0700
-From: raghava447 <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/8b4a41-73e934@github.com>
-Subject: [bluez/bluez] 9066e2: doc/qualification: Add CSIP PICS file
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/WKUK2Y"
+Received: by mail-oo2-f39.google.com with SMTP id 006d021491bc7-6c24d19ebcfso1952748eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 14:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790630993; x=1791235793; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=o0HVfo1flGmQ2POi7e0NHE5Ih9avjOMAxKaON0tY/sU=;
+        b=P/WKUK2YLFc50rR/TrX/h4CuDYG5WaPGW3Z2vmBXy34rvagNXpL7bQdLVS9OZeSjwy
+         TwgD1pmh6ekSbhZMc1P9DmgzTDw6Zpe43ELkyxnwcFyf8CJF1NJW/v2HRG+Btoc5aAmP
+         BUX1ZFsa41d1LXtganv0bHmYfr8vxX9d9Pe7CnTgkwIcWOhUk33hGxR+qTwJVskQwjGa
+         fCVRcDyTn2/EfaqxzMn7RHjTeGHr8WnQ5N4/hCMgW84/CZXq5LGR7HwdXOiXIQd60R5d
+         EwZfFi4kD4YfACKGCsPtZm5BtufWJZjtjR4mCnlMbGUaMQp43CWrkyQGS0IQKgl1BQH3
+         keMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790630993; x=1791235793;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=o0HVfo1flGmQ2POi7e0NHE5Ih9avjOMAxKaON0tY/sU=;
+        b=zLZ0GYAQN6yDl9/6OPPPdFCQS/bcAiR4o/PDWpLiHPty7qOwnG6/+O7mxF8gM6lgZx
+         nTBlKTGkNDb4MeuWmJhYmGjEJCd6jrhJNGHu4lk070ZK4rT6FFMO0+qTgwga1qw1WCCl
+         yzQgZBkKynNNNrB/Z3F6gcixzPmOxBEGtVw5HJAqJDXbbM0O8whoXsWZS+5B1q/uOSuo
+         Xkx0HxD/Cw9RhecSLE4F9Rr7V3Sl8wpCTUrczangAAgs85HPFJeZ8bgYdqW4CJQB/OBi
+         7t9JPdhXn9xTHZTcVH+F2/FdCF23ib5wk8T+tGay8Sd1R8Hg60ww6yypdT1bYjgZLYPV
+         IQ7Q==
+X-Gm-Message-State: AFuF++kLQsPWBDhO+8GVzfNtJ1P7ZGRJUHrZzqZ1TgbK+X+W36q/OCUo
+	TrL+h535us3FzlWKitotJHCd/QfbY6h6g0LA/Y6JS5WiZBjgVSF/Hj1sEnAckbt2
+X-Gm-Gg: AYBFou0EFQlzc+ka3s9WBL0nv6QbFmNBFodyh1r6NzbXF1zoLpLbRtjc+Dq4Z0+wgw6
+	2BeBxpUJI8RJgG3sO7gRdr8Q9mkoj2kg8BqHzspV5jYttZuMeybXK3apBx8wN1SUNXMaas3GE5B
+	HHiamRRkFzYdxAtfq8Px99eOozNUKRKs0T/Inljkd2agbLVe8xYHpuySf7GS/xxyyHi1xuGIGcS
+	5bN2GyuIrzSh2HGH8c/8JWEEmwujg1v6HvYNykgOQIpiBxzeY1BqyKntagBF7C5LXe/XPOPwvSz
+	vOLfafD8y2boPUWrdNuvV56Dgl2jxWh5/yp1vPqOPjyyG47KCMqYyw1b/K2pBCk4bgxAC8FFwUS
+	CKgFF0oUcd2vrPpIK3WRC8iJMWqmd3YAMWVmXpDQWTqWqN0SlOAWskkZNUGS0Z7nodiHLCOXedG
+	8CJK1I2h9kRi2Zgw/rByW/X3R/shJkuRbCZ/LY7VTwZ28bjHr0Eas5HmigUgEqFbeswmtd1sRcH
+	Q4S
+X-Received: by 2002:a05:6820:80c8:b0:6cd:3fdc:5ff6 with SMTP id 006d021491bc7-6d4415b5b06mr14004049eaf.71.1790630993414;
+        Mon, 28 Sep 2026 14:29:53 -0700 (PDT)
+Received: from [172.17.0.2] ([40.86.29.166])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6d883395632sm6010109eaf.12.2026.09.28.14.29.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Sep 2026 14:29:52 -0700 (PDT)
+Message-ID: <6abadc50.7406aef7.f2df2.5d62@mx.google.com>
+Date: Mon, 28 Sep 2026 14:29:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2463465956708415457=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ravindra@intel.com
+Subject: RE: Bluetooth: btintel_pcie: fix D-state transitions and PM flows
+In-Reply-To: <20260928171003.2925480-2-ravindra@intel.com>
+References: <20260928171003.2925480-2-ravindra@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 9066e2678b3b9dfa8b3624fdddfcbc7a65d96fa4
-      https://github.com/bluez/bluez/commit/9066e2678b3b9dfa8b3624fdddfcb=
-c7a65d96fa4
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
+--===============2463465956708415457==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    A doc/qualification/csip-pics.rst
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  doc/qualification: Add CSIP PICS file
+Dear submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1175428/
 
-  Commit: 7333d54ed785f92a7f62d5e91e945857a1cf8b71
-      https://github.com/bluez/bluez/commit/7333d54ed785f92a7f62d5e91e945=
-857a1cf8b71
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
+---Test result---
 
-  Changed paths:
-    A doc/qualification/csip-pts.rst
+Test Summary:
+CheckPatch                    FAIL      4.04 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      1.09 seconds
+SubjectPrefix                 PASS      0.43 seconds
+BuildKernel                   PASS      20.10 seconds
+CheckAllWarning               PASS      24.77 seconds
+CheckSparse                   PASS      25.41 seconds
+BuildKernel32                 PASS      20.70 seconds
+CheckKernelLLVM               PASS      20.40 seconds
+TestRunnerSetup               PASS      494.06 seconds
+IncrementalBuild              PASS      23.04 seconds
 
-  Log Message:
-  -----------
-  doc/qualification: add CSIP PTS tests documentation
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v6,1/4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#94: 
+  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0
 
+total: 0 errors, 1 warnings, 22 lines checked
 
-  Commit: 83d3eb1f54a82da44e2003ece934a46500c95937
-      https://github.com/bluez/bluez/commit/83d3eb1f54a82da44e2003ece934a=
-46500c95937
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-  Changed paths:
-    A doc/qualification/mcp-pics.rst
-    A doc/qualification/mcs-pics.rst
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14852808.patch has style problems, please review.
 
-  Log Message:
-  -----------
-  doc/qualification: Add MCP/MCS PICS files
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-  Commit: b409d054248e37fc8561247f8d7d4638fc6c383e
-      https://github.com/bluez/bluez/commit/b409d054248e37fc8561247f8d7d4=
-638fc6c383e
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
 
-  Changed paths:
-    A doc/qualification/mcs-pts.rst
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v6,1/4] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
 
-  Log Message:
-  -----------
-  doc/qualification: add MCS tests documentation
+9: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 0"
+10: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 1"
+11: B1 Line exceeds max length (82>80): "  Bluetooth: hci0: Timeout (200 ms) on alive interrupt for D2 entry, retry count 2"
+12: B1 Line exceeds max length (98>80): "  btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_suspend [btintel_pcie] returns -16"
 
 
-  Commit: 07acc6ee5758f29c71e48e8547faf2f878948b79
-      https://github.com/bluez/bluez/commit/07acc6ee5758f29c71e48e8547faf=
-2f878948b79
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
+https://github.com/bluez/bluetooth-next/pull/834
 
-  Changed paths:
-    A doc/qualification/micp-pics.rst
+---
+Regards,
+Linux Bluetooth
 
-  Log Message:
-  -----------
-  doc/qualification: Add MICP PICS file
 
-
-  Commit: 0c19f5a09b906eb710a78ff6c4428d775f8bfe7c
-      https://github.com/bluez/bluez/commit/0c19f5a09b906eb710a78ff6c4428=
-d775f8bfe7c
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    A doc/qualification/micp-pts.rst
-
-  Log Message:
-  -----------
-  doc/qualification: add MICP tests documentation
-
-
-  Commit: f6e495f67becda0f76fd61e5674415d9eaed5566
-      https://github.com/bluez/bluez/commit/f6e495f67becda0f76fd61e567441=
-5d9eaed5566
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    A doc/qualification/vcp-pics.rst
-
-  Log Message:
-  -----------
-  doc/qualification: Add VCP PICS file
-
-
-  Commit: eb62c7d5e5f91f8e4a1c5ad9c817b5255ce0ff1b
-      https://github.com/bluez/bluez/commit/eb62c7d5e5f91f8e4a1c5ad9c817b=
-5255ce0ff1b
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    A doc/qualification/vcp-pts.rst
-
-  Log Message:
-  -----------
-  doc/qualification: add VCP PTS tests documentation
-
-
-  Commit: c2ef55e49f2b9340ea7b9446ed69a017b386dadc
-      https://github.com/bluez/bluez/commit/c2ef55e49f2b9340ea7b9446ed69a=
-017b386dadc
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    M src/shared/mainloop.c
-
-  Log Message:
-  -----------
-  shared: mainloop: Skip removed mainloop events
-
-mainloop_remove_fd() on an fd that occurs in the same epoll_wait batch
-as the current callback, causes ASan crash.
-
-Several callsites do this, crash is sporadic since it requires suitable
-timing.
-
-Fix by adding registration ID in each event and dispatching only if that
-registration is still active.
-
-Fixes random btvirt crashes.
-
-Log:
-ERROR: AddressSanitizer: heap-use-after-free on address 0x7b7576be3f18
-READ of size 8 at 0x7b7576be3f18 thread T0
-    #0 0x5637f7b4014f in mainloop_run src/shared/mainloop.c:104
-    #1 0x5637f7b41f79 in mainloop_run_with_signal src/shared/mainloop-not=
-ify.c:196
-    #2 0x5637f7aa598b in main emulator/main.c:310
-freed by thread T0 here:
-    #0 0x7f45788ee4cf in free.part.0 (/lib64/libasan.so.8+0xee4cf)
-    #1 0x5637f7b40d05 in mainloop_remove_fd src/shared/mainloop.c:213
-previously allocated by thread T0 here:
-    #0 0x7f45788ef24f in calloc (/lib64/libasan.so.8+0xef24f)
-    #1 0x5637f7b4034b in mainloop_add_fd src/shared/mainloop.c:142
-
-Assisted-by: opencode:gpt-6-sol
-
-
-  Commit: 45c3b69db034cf2a3fcf3de5bf0bb9cdc86f934c
-      https://github.com/bluez/bluez/commit/45c3b69db034cf2a3fcf3de5bf0bb=
-9cdc86f934c
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    M .gitignore
-    M Makefile.am
-    A unit/test-mainloop.c
-
-  Log Message:
-  -----------
-  unit: test-mainloop: add basic mainloop test
-
-Exercise basic mainloop fd add / remove / modify and timeouts.
-
-src/shared/tester.h depends on mainloop and cannot be used here, so
-write tests without the framework.
-
-Add tests:
-
-Test Modify File Descriptor
-Test Re-Add Other Callback
-Test Timeout
-
-Assisted-by: opencode:gpt-6-sol
-
-
-  Commit: d09935d34414728f23572a731190976343719762
-      https://github.com/bluez/bluez/commit/d09935d34414728f23572a7311909=
-76343719762
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    A doc/qualification/bap-pics.rst
-    A doc/qualification/bap-pts.rst
-
-  Log Message:
-  -----------
-  doc/qualification: Add PICS and howto for the BAP qualification
-
-
-  Commit: 5b37dbfb30153fc1d56457f4fed26725f8fdcee0
-      https://github.com/bluez/bluez/commit/5b37dbfb30153fc1d56457f4fed26=
-725f8fdcee0
-  Author: Raghavendra Rao Sidlagatta <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    M doc/qualification/bap-pts.rst
-
-  Log Message:
-  -----------
-  doc/qualification: Add BAP/UCL tests
-
-
-  Commit: 73e934ba80b6b437e8cf8c4789a2412f75bd2eb2
-      https://github.com/bluez/bluez/commit/73e934ba80b6b437e8cf8c4789a24=
-12f75bd2eb2
-  Author: Raghavendra Rao Sidlagatta <raghavendra.rao@collabora.com>
-  Date:   2026-09-28 (Mon, 28 Sep 2026)
-
-  Changed paths:
-    M doc/qualification/bap-pts.rst
-
-  Log Message:
-  -----------
-  doc/qualification: Add BAP/USR tests
-
-
-Compare: https://github.com/bluez/bluez/compare/8b4a41760638...73e934ba80=
-b6
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============2463465956708415457==--
