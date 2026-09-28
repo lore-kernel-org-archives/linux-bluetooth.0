@@ -1,69 +1,69 @@
-Received: from mail-vs2-f37.google.com (mail-vs2-f37.google.com [74.125.227.37])
+Received: from mail-ua2-f43.google.com (mail-ua2-f43.google.com [74.125.226.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7974E020A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 17:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6604E7807
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 17:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790616797; cv=none; b=FlxGNlebpdxA+gGbm6qHsiHhNjwFIva6GBNEhQhgX0L0Iwebkqp4bNT3R8Bq+ewqrpZ3vSoC4ujDcZZvb67knCyhPjJ8uZ6TmwuWHiMTG+e+B689QulsG1hhcxHhz0bKuAg4/hPQOu6xiczuSBaIquR1uXXnpWNknANC42CxBuA=
+	t=1790616802; cv=none; b=FLS3+HFVZ8G69jdNnzru1/9j/5u4yR930nj44BbHES8n7Z7o5zQNmlodMcV8z47VC8kHVo2b7AF7yjI/+3rz8o+9IoTqwxJnOonZSkah6zXJPQSj36CoituD75A7TMyGfOB/UkpbQhTd70xN4hT0EbLOILl4UrMl44R6b7m2y0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790616797; c=relaxed/simple;
-	bh=MCtXU6jORncu6C1mn/3nWvg3pyh0Yy/IZYXWD7L4gcY=;
+	s=arc-20240116; t=1790616802; c=relaxed/simple;
+	bh=1SGxfSMRGl+9fc9c1Q8GuKW9LL7zBat4Ja4/t6Wg2mY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YhcAEoLXP7YYn+Rd3onDTFP/pAjdWoSiimEl3b4/VT7gsF1MjmazedGBcFNowmEUD/asHEI8ZKb4JvMdcLg8PxEL2lGihNRBA2YePeGJifoP+y8UkM9WHxLie1rKhHAnAG0jqmlCx2biHomLN/kBJSGSQnkiYl7g4khBQi7rR5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvvNAurk; arc=none smtp.client-ip=74.125.227.37
+	 MIME-Version; b=cnSIG4MIBdPeKQTd9UUxtiOlSHohZfxXq07WBF/LuhMIjr9waiumFWwjRnjicNbZTCjO0+vbpjdpNb+SJP0rk33SoH1vsgmXGq9bMHyAtDkd+cqzpot6YDuMsgntzAUx/770Yd+sYZJXDfB9GD738ifM2YMdRAWSnIk57NX6hZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VS16GXy5; arc=none smtp.client-ip=74.125.226.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvvNAurk"
-Received: by mail-vs2-f37.google.com with SMTP id ada2fe7eead31-7b451f1e66fso1125049137.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 10:33:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VS16GXy5"
+Received: by mail-ua2-f43.google.com with SMTP id a1e0cc1a2514c-985369a13bbso864005241.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 10:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790616795; x=1791221595; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790616800; x=1791221600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
-        b=RvvNAurk3zRtpN7f/aVo8232LdG0vNZdoalvkdAf2ZgjNJ2Lf9x7MLy7X6MfXOm5C+
-         y//LDRbBMDjmElL4hYJ6VmEvO4EtfpU1uXyBLpH+YS3cQHvlDM7hlcq9TYDKWEY68HHS
-         nYV40+H+Zn1/fl6IjLPoX/aelnZ6CuG3iLiEwVa/vuV6aHA7TrE3lLe8ImXNCUyAGNv8
-         7YqaYJfr/Hxy2ANLr5A63C6h+CKqaCLHQo3r06PNUhUD0PHzFWpliL0Y6m2154GEXj93
-         Q8osNd8x/Ic2+VOVT8tbQLwogyHXQGlmO1Pi4c9xYZkqrlkC9nnLhoUvXClV4vwST3ea
-         wuYw==
+        bh=M+8Bm9PsjLuJxkzM+pquNz7uJGIXVQpDu0pf420C7lE=;
+        b=VS16GXy51m7X5nj8QCOEgmDncZfZXq7HnMLEpW2nMYQWGNlcz7KVo4ufKyVpWIGPp9
+         4fBhENduY7aSRzDCNExvDoFn6GicSV8ip+i8UXPGVryXIS8+SMd1yT5t629qxofSbUbD
+         jWvAwYWNd/MdFeRDj5ZgXJ+plEXOdvor9zkgmgEPe7SHah4//WD20Q52xCQstj24hNZV
+         YK7AFMBehbaLhqYsnUgcQ0Op87rVsjq21O0fIF1EkPBdodPg+NhWmblJXwqnZ4f14nXa
+         nQV1Y7PbcOYJrukwAZBoqeQ7OMNARUWQDm+8TBM6n94N7f7TG7VWICJUvpKOO+azgPnf
+         WC/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790616795; x=1791221595;
+        d=1e100.net; s=20260707; t=1790616800; x=1791221600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
-        b=RrBlf5alETITa6WnBg/pNMC/xal+PGAJ2fX5kUYbnP+/+f2cZicrKcqpkExY0k1B94
-         6WmQaojCyf6ooKgIU8jE5Mvhp/kemxA7rZuTI3rgbDkZS6radCHvbCTDC+drpWku+KZV
-         p9qg9oHu5gBZr2gNZRXLJcDYyJENxa7H9E/3fyPms3zgk4qAX6Pgcvi+ws3qD8RcR92U
-         GYCOu4eR3EWxUO9B+7DJQ0ayyR7pDzjOv6qL7r6JcVcJT7ePhS+aw+EtPVZtmlL1ty6g
-         HJVwaVwkgbegXXiqyQf1BuICXP8qz950Ag9aqvBx81O0UeDenJXDjulfAg1xtd1Bb7M7
-         Fk0Q==
-X-Gm-Message-State: AFq9FYJTIDfHpskXG15yuKGTI7wyPsD9D+OqVa+wC4lT2mk9rahJ0ObR
-	gWHhSOhIt2YpRPABW1OJZnp6NW4lfAonMFwlKO7XlXPnaZGz9hUyLTwkdhLPkB1HyTo=
-X-Gm-Gg: AYBFou0ElJVXl9VJfSV4+43dNe8Fb111yO00KMWNE/1LJKqU9cZoaQcvHrBZTnyf7Ab
-	B9BVjPJ1W7KAOcGrqrzr7hOBUieBXiSxqfWbhwF5l9tGgApwpzs90pnRkpn9EaO/8NpluR8RBFN
-	9uyxQRREkB/PcZTXJ/ysV9/f/rBV1cliznKdqgOdG/3RajtnaMQi0a9e39TT7MczIutbf/8y29Y
-	u0sk6ptTnO7ZrvrQezCJe/YpztoeP5A1EuzcEYRcxO5AvkU2PUQOsYnIPy9B9prK+lG0tniz4UL
-	zPZXnCGt+XYPVVs3xBLvCEPxMXd5NcA1K2FrLZrTW32RN5ghQKg7YYLLZQypgMbXi5xdO9T6ZAd
-	UI5ffb7vflgZCgRxlCu3c/fzPsLvGz47uNVk7sk+XBVIZkaedQxF6P6alkIDq+OhGxIN7onaDtO
-	55VtG5TEf70HN8lfwJUptqU2E/Piw7E1iMqnjxtgC7mw5alh29RHobJfxSLww4DzUxKj9NmgmZ4
-	VnItEBw1Xee5zgZ6I/OS2YY+RkB+aL9Dp5rqNqHF5ALOGGcgPL451s8g0XdZwoO58HUxMUjHXQ=
-X-Received: by 2002:a05:6102:2910:b0:7b3:54c7:7ce4 with SMTP id ada2fe7eead31-7b354d6cbb7mr2407361137.35.1790616794189;
-        Mon, 28 Sep 2026 10:33:14 -0700 (PDT)
+        bh=M+8Bm9PsjLuJxkzM+pquNz7uJGIXVQpDu0pf420C7lE=;
+        b=tXiIuRlMBFEH+bBXHgzbZ59SsEp5P1xOjs3pDARhXfXkN6tztX2nSp6vc6e7h1k0GU
+         95nSyM6pd7AJ7Sz14pMD13Nka/rm4jg+4rYsZBcFedSTrmUDm6PliKj6MSQYfydBkVsy
+         TbU7AvKTVZ0yRzZsd6zYo2Sl20r6u1N+Ov03/kZIfdB6F4IjmR6fhZ//xy1wJUiF2uVU
+         /1Ge3+CxjKBaG78L7ZIUWYU7kKmq+umjnMYA+bdZpNzrPhIAGnuDj+Ds+v9NtwmsKwqt
+         utY2eRkqy/UJ5Q9F8Djs4sFZNiyhTiAL0gfSz494JLdybGLAWS2hg+1qBJbR+6WczlRe
+         NLHw==
+X-Gm-Message-State: AFq9FYLfXpcHyp/qla9HG5m/7WkPhsbPfdI9eXSMletBLYR75n6K4+PC
+	O6oKhs2bN6WFjulnz5MF0onX5s5/1La6A0FKtkruvtVP9+EZRBxrMOwrFx69CSJqDwc=
+X-Gm-Gg: AYBFou0qwTGepPpHpdiaQ/Y3uR0mZflbBGrEFO13gdUIOlTzqSpwcuKZGriGo5i6Y/6
+	gEZLFWWPB/jUlE75/JFLWL6eRwjtfjQmJdoDsaufuNCU/rtaNwFu/3ixZX28unh012Lg6asnzTv
+	hcYsz/grojCmImVJRJ4udOuZM4Jotl9szLJvAf8dSpyQ20pPBUeSCflSD4qmrw+wQRt8Qg1nqew
+	uqOVxQLsb6MW+mQrveNqxwtysFnVveJn02sf4/T88Wy4dS9U4YlDEdz6yKcIKTVjjbnZRZ5NEgB
+	OUWs7EYpkRMlUoIk7LP7xkzxsKiMFjTyGRMa2hWa/FbHKBunPKl7SgoBmRKfCLwgo+cqZ2ujSlS
+	zjfnks/kA0ZwFYdJ4OXcpPIQQH02YOKxNWIz29wlaAiDgYJdmjCGggCrZXBRELnR1KGTgUXHWoD
+	WRlml1pbSWDDJKHbfomTebW7V+Oqo3rtk/L/n6PDoUi12Wwo68mFzPwL27luOinCDbJFb7+gp9q
+	ssMA0K91UGEKA7BRCfz22lPLuHWBHKTRxU1o/BhVh+e/+eopl9NDaHWGNd+0eNbfA==
+X-Received: by 2002:a05:6102:50a5:b0:7b5:8fd9:27e9 with SMTP id ada2fe7eead31-7b94bed9fe7mr36682137.2.1790616799410;
+        Mon, 28 Sep 2026 10:33:19 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7b39b6a6272sm10038880137.7.2026.09.28.10.33.13
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7b39b6a6272sm10038880137.7.2026.09.28.10.33.18
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 10:33:13 -0700 (PDT)
+        Mon, 28 Sep 2026 10:33:18 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 12/21] shared/tester: Allow expecting a PDU with no response
-Date: Mon, 28 Sep 2026 13:32:31 -0400
-Message-ID: <20260928173243.1073509-13-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v5 15/21] test: functional: change the HoG SCI mode with the HID Control Point
+Date: Mon, 28 Sep 2026 13:32:34 -0400
+Message-ID: <20260928173243.1073509-16-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928173243.1073509-1-luiz.dentz@gmail.com>
 References: <20260928173243.1073509-1-luiz.dentz@gmail.com>
@@ -77,48 +77,236 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-IOV_NULL following an expected PDU used to send an empty PDU, unless
-followed by another IOV_NULL chaining the PDUs to send, so it was not
-possible to expect a PDU with no response, e.g. a Write Command,
-followed by another expected PDU.
+As specified by HOGP.TS 4.6.1 and the HIDS/HOGP SCI FIPD, the HID host
+requests a HID SCI mode by writing it to the HID Control Point, the HID
+device then confirming it with a notification of HID SCI Mode, which is
+Read and Notify only.
 
-Wait for the next PDU instead of sending an empty one in that case.
+Write the mode to the HID Control Point instead of HID SCI Mode, which
+is no longer writable, and don't expect HID SCI Mode notifications to
+be subscribed by bluetoothctl as the input plugin of the HID host may
+already have done it.
+
+The connection rate is still changed by the HID host, as the kernel
+only issues the LE Connection Rate Request as central.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- src/shared/tester.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ client/scripts/hog-device-sci.bt |  6 ++--
+ doc/functional-hog.rst           | 52 +++++++++++++++++++++-----------
+ test/functional/test_hog.py      | 29 ++++++++++++++----
+ 3 files changed, 60 insertions(+), 27 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index e99cc452cd07..eb2e923fd790 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -948,6 +948,25 @@ static bool test_io_send(struct io *io, void *user_data)
- 	if (!iov)
- 		return false;
+diff --git a/client/scripts/hog-device-sci.bt b/client/scripts/hog-device-sci.bt
+index 1bf3a0a90db7..7500eeb105bf 100644
+--- a/client/scripts/hog-device-sci.bt
++++ b/client/scripts/hog-device-sci.bt
+@@ -26,12 +26,12 @@ gatt.register-descriptor 0x2908 read
+ gatt.register-characteristic 0x2a4e read,write-without-response
+ 0x01
+ #
+-# HID Control Point
++# HID Control Point: Suspend, Exit Suspend and Enable SCI modes
+ gatt.register-characteristic 0x2a4c write-without-response
+ 0x00
+ #
+-# HID SCI Mode: None (0x00), notified when changed
+-gatt.register-characteristic 0x2c39 read,write,notify
++# HID SCI Mode: None (0x00), notified once changed with the HID Control Point
++gatt.register-characteristic 0x2c39 read,notify
+ 0x00
+ #
+ # HID SCI Information (intervals in units of 0.125 ms):
+diff --git a/doc/functional-hog.rst b/doc/functional-hog.rst
+index d748f241a378..795a066a6f1a 100644
+--- a/doc/functional-hog.rst
++++ b/doc/functional-hog.rst
+@@ -16,7 +16,7 @@ SETUP
+ Two hosts, connected over LE, both running **bluetoothd(8)** with
+ ``ControllerMode = le`` and ``ExportClaimedServices = read-write``, as
+ the HID Service is claimed by the input plugin of the HID host and
+-bluetoothctl has to write HID SCI Mode:
++bluetoothctl has to write the HID Control Point:
  
-+	/* IOV_NULL following an expected PDU means there is no response to
-+	 * it, e.g. a Write Command: wait for the next PDU instead, unless
-+	 * followed by another IOV_NULL chaining the PDUs to send.
-+	 */
-+	if (!iov->iov_base) {
-+		/* Nothing left to send or to expect */
-+		if (!test->iovcnt) {
-+			if (test->io_complete_func)
-+				test->io_complete_func(test->test_data);
-+			return false;
-+		}
-+
-+		if (test->iov->iov_base)
-+			return false;
-+
-+		test_get_iov(test);
-+		return test_io_send(io, user_data);
-+	}
-+
- 	len = io_send(io, iov, 1);
+ .. code-block::
  
- 	tester_monitor('<', 0x0004, 0x0000, iov->iov_base, len);
+@@ -102,24 +102,26 @@ test_hog[no-sci]
+ 
+ 		[bluetoothctl]> gatt.select-attribute 2a4a
+ 		[bluetoothctl]> gatt.read
+-		Attempting to read /org/bluez/hci0/dev_XX/service0013/char001e
++		Attempting to read /org/bluez/hci0/dev_XX/serviceXX/charXX
+ 		  11 01 00 02                                      ....
+ 
+ 	6. ``Notify started``, and the Report subscribed on host1
+-	   (``Notify sock acquired``, as the input plugin already
+-	   subscribed with AcquireNotify).
++	   (``Notify sock acquired``, as bluetoothd on host1 forwards the
++	   subscription with AcquireNotify, the input plugin of host0
++	   having already enabled the notifications).
+ 	7. Each report is notified to host0, in order:
+ 
+ 	   .. code-block::
+ 
+-		[CHG] Attribute /org/bluez/hci0/dev_XX/service0013/char0018 Value:
++		[CHG] Attribute /org/bluez/hci0/dev_XX/serviceXX/charXX Value:
+ 		  00 00 04 00 00 00 00 00                          ........
+ 
+ :Notes: The service is checked at the GATT level only, so the test
+ 	does not depend on the kernel supporting uhid. The HID Service is
+-	claimed by the input plugin on host0, but it is still exported
+-	read-only over D-Bus by default (see ``ExportClaimedServices`` in
+-	**bluetoothd(8)**), so it can be read with bluetoothctl.
++	claimed by the input plugin on host0, but it is still exported over
++	D-Bus, read-write as configured in SETUP (see
++	``ExportClaimedServices`` in **bluetoothd(8)**), so it can be read
++	with bluetoothctl.
+ 
+ test_hog[sci]
+ -------------
+@@ -131,25 +133,30 @@ test_hog[sci]
+ 	8. host0: ``gatt.select-attribute 2c39`` and ``gatt.read``.
+ 	9. host0: ``gatt.select-attribute 2c3a`` and ``gatt.read``.
+ 	10. host0: ``gatt.select-attribute 2c39`` and ``gatt.notify on``.
+-	11. host0: ``gatt.write "0x03"``, i.e. SCI Fast Mode.
++	11. host0: ``gatt.select-attribute 2a4c`` and ``gatt.write "0x03"``,
++	    i.e. Enable SCI Fast mode written to the HID Control Point.
+ 	12. host0: ``mgmt.conn-subrate <host1 bdaddr> 0x0008 0x0010 1 1 0 0
+ 	    0x01f4``, i.e. interval 1 ms to 2 ms, within the range given in
+ 	    HID SCI Information, no subrating, no latency and 5 s
+ 	    supervision timeout.
+ 	13. host1: ``gatt.select-attribute local
+-	    /org/bluez/app/service0/chrc5`` and ``gatt.write "0x03"``.
++	    /org/bluez/app/service0/chrc5`` and ``gatt.write "0x03"``,
++	    notifying the new mode with HID SCI Mode.
+ 
+ :Expected: As for test_hog[no-sci], except HID Information reads
+ 	``11 01 00 06``, then:
+ 
+ 	8. HID SCI Mode reads ``00``.
+ 	9. HID SCI Information reads ``08 01 08 00 50 00 08 00``.
+-	10. ``Notify started`` and HID SCI Mode subscribed on host1.
+-	11. host1 receives the write:
++	10. ``Notify started``. HID SCI Mode is already subscribed on host1,
++	    by the input plugin of host0 once HID Information tells SCI is
++	    supported.
++	11. host1 receives the write, over the socket acquired with
++	    AcquireWrite as it is a Write Without Response:
+ 
+ 	    .. code-block::
+ 
+-		[/org/bluez/app/service0/chrc5 (HID SCI Mode)] WriteValue: XX offset 0 link LE
++		[CHG] Attribute /org/bluez/app/service0/chrc4 (HID Control Point) written:
+ 		  03                                               .
+ 
+ 	12. ``Connection Subrate loaded successfully``, then the MGMT
+@@ -160,11 +167,12 @@ test_hog[sci]
+ 		hci0 XX type LE Public connection subrate interval 0x0008 subrate 0x0001 latency 0x0000 cont_num 0x0000 timeout 0x01f4
+ 
+ 	13. The new mode is notified to host0, confirming it has been
+-	    changed:
++	    changed, which the input plugin reports in the
++	    **bluetoothd(8)** debug output (``SCI Mode changed: 0x03``):
+ 
+ 	    .. code-block::
+ 
+-		[CHG] Attribute /org/bluez/hci0/dev_XX/service0015/char0018 Value:
++		[CHG] Attribute /org/bluez/hci0/dev_XX/serviceXX/charXX Value:
+ 		  03                                               .
+ 
+ 	.. code-block::
+@@ -180,9 +188,17 @@ test_hog[sci]
+ :Notes: As the SCI Supported flag is set, the input plugin on host0
+ 	reads HID SCI Mode and HID SCI Information as well, which can be
+ 	seen in the **bluetoothd(8)** debug output (``SCI Mode:`` and
+-	``SCI Info:``).
++	``SCI Info:``), and enables the notifications of HID SCI Mode.
+ 
+-	The kernel only issues the LE Connection Rate Request as central,
+-	so the connection rate is changed by the HID host. This requires
++	As specified by HOGP.TS 4.6.1, the HID host requests a HID SCI
++	mode by writing it to the HID Control Point (0x02 Default, 0x03
++	Fast, 0x04 Low Power, 0x05 Full Range), HID SCI Mode being Read and
++	Notify only. The Control Point is written with bluetoothctl, as the
++	input plugin has no D-Bus API to request a mode.
++
++	The HID device is meant to change the connection rate once the
++	mode is written, but the kernel only issues the LE Connection Rate
++	Request as central, so the connection rate is changed by the HID
++	host. This requires
+ 	the controllers to support Shorter Connection Intervals, which
+ 	btvirt emulates as a BR/EDR/LE 6.2 controller.
+diff --git a/test/functional/test_hog.py b/test/functional/test_hog.py
+index ea54882d059d..7ff0965275d1 100644
+--- a/test/functional/test_hog.py
++++ b/test/functional/test_hog.py
+@@ -18,7 +18,8 @@ from pytest_bluezenv.utils import bluez_src_dir
+ pytestmark = [pytest.mark.vm]
+ 
+ # The HID Service is claimed by the input plugin of the HID host, so it
+-# has to be exported read-write for bluetoothctl to write HID SCI Mode
++# has to be exported read-write for bluetoothctl to write the HID Control
++# Point
+ HOG_CONF = """[General]
+ ControllerMode = le
+ 
+@@ -30,6 +31,7 @@ HIDS_UUID = "00001812-0000-1000-8000-00805f9b34fb"
+ 
+ # Local attributes registered by client/scripts/hog-device*.bt
+ LOCAL_REPORT = "/org/bluez/app/service0/chrc2"
++LOCAL_CP = "/org/bluez/app/service0/chrc4"
+ LOCAL_SCI_MODE = "/org/bluez/app/service0/chrc5"
+ 
+ # Keyboard Input Reports: Modifiers, Reserved, then 6 Key Codes
+@@ -39,7 +41,8 @@ REPORTS = [
+     "00 00 00 00 00 00 00 00",  # released
+ ]
+ 
+-# HID SCI Mode: Fast Mode
++# HID Control Point: Enable SCI Fast mode, the value then notified with
++# HID SCI Mode
+ SCI_FAST_MODE = "03"
+ 
+ # LE Connection Rate parameters requested with mgmt.conn-subrate once in
+@@ -229,14 +232,27 @@ def test_hog(hosts, init_script, flags, sci):
+     assert read_attribute(ctl, "2c39") == mode
+     assert read_attribute(ctl, "2c3a") == info
+ 
+-    # SCI mode change: the HID host writes the new mode to the HID device
+-    enable_notifications(ctl, device, "2c39", LOCAL_SCI_MODE)
++    # The input plugin of the HID host enables the notifications of HID
++    # SCI Mode on its own, so they only have to be started on bluetoothctl
++    # to be printed
++    ctl.send("gatt.select-attribute 2c39\n")
++    ctl.send("gatt.notify on\n")
++    expect(ctl, r"Notify started", timeout=REPLY_TIMEOUT)
+ 
++    # SCI mode change, see HOGP.TS 4.6.1: the HID host writes the mode to
++    # enable to the HID Control Point, with Write Without Response
++    ctl.send("gatt.select-attribute 2a4c\n")
+     ctl.send(f'gatt.write "{hexbytes(SCI_FAST_MODE)}"\n')
+-    expect(device, rf"\[{LOCAL_SCI_MODE} .*\] WriteValue:")
++    # Received with WriteValue, or over the socket acquired with
++    # AcquireWrite
++    expect(
++        device,
++        rf"\[{LOCAL_CP} .*\] WriteValue:|Attribute {LOCAL_CP} .*written:",
++    )
+     assert expect_hexdump(device) == SCI_FAST_MODE
+ 
+-    # The HID host, as central, changes the connection rate accordingly
++    # The HID device is meant to change the connection rate, but the kernel
++    # only requests it as central, so the HID host does it instead
+     ctl.send(f"mgmt.conn-subrate {host1.bdaddr} {' '.join(SCI_RATE)}\n")
+     # The connection rate may change before the command completes, so the
+     # event may be printed before the reply
+@@ -248,5 +264,6 @@ def test_hog(hosts, init_script, flags, sci):
+     expect(device, rate.format(host0.bdaddr.upper()))
+ 
+     # Then the HID device confirms the mode has been changed
++    ctl.send("gatt.select-attribute 2c39\n")
+     notify(device, LOCAL_SCI_MODE, SCI_FAST_MODE)
+     assert expect_notification(ctl) == SCI_FAST_MODE
 -- 
 2.55.0
 
