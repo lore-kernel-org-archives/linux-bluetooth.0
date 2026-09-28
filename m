@@ -1,69 +1,69 @@
-Received: from mail-vs2-f37.google.com (mail-vs2-f37.google.com [74.125.227.37])
+Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951074F7CA1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB134F7CAF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790625663; cv=none; b=DvKu9CXTlmzUZtuefr4fd5m9PuQP0Sw1/NYWLqyZ7HhiHUJBu66IYBNscb2r80L+ecgFDTzY46iRM2XaLbHZd6sgJ75p7Hsya9LG8r9CGwXfgJvjmvC0DiArQUxvCtEAyurJ8YovYwbV4Z0BDFlozw38hBorR5OVJboBiFVPNRs=
+	t=1790625664; cv=none; b=ZgEYv1sGFpXdFVdqZHEXjxW4zxfwhNCjkKicW2bg0PuefpXrkbti16MMzYPDSQEfc/5n8oG2CXjtXFym4opNUrAJVNJQDCtnt3sUprzMeD6Nd0A7Vr/lUn8G9KrMF8SEKlFXRliTop0Yp3N8SlTr7m8OA0IlmOOB1On7edEn+qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790625663; c=relaxed/simple;
-	bh=/gZvnzo2fk5i4++SMU8LU+1TF11LvdHLM5N4ISNHDwM=;
+	s=arc-20240116; t=1790625664; c=relaxed/simple;
+	bh=kMcWyTYb0L98QVIl4p5gDSEMPg0occSJqIvPJRstig4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uhfM0X8FtM7i/Z35+bl/f2AeH4yDYegs/fuFDnZ/rm+srS9vYwKIJJrMwltUusTq15JQGTdkvu0qY2EcVj96qhi/3Psf0P05BfQdrQP3w0zN81zl4LMh7mXRTN14SWpreiboJyF5QXhdBMJMvP65870l+8ahNVJeObu0ey5lWSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qSZXQi7K; arc=none smtp.client-ip=74.125.227.37
+	 MIME-Version; b=a+hPYhxoDzHokUUIXKivnDwficDvrlZg9T3COWPhEE70VdRipH73u+F5Axmxk+365wDeZkHVP8irsfJRxfVqKq7WQJj4394Am/h+7vBFhNcJfjdkrt27a+dmtO8uVCiccsvP9iGGrUGPeC9Bs7VqAqIZIMlTcR0ALjUAxzVzlWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvosZQvq; arc=none smtp.client-ip=74.125.227.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qSZXQi7K"
-Received: by mail-vs2-f37.google.com with SMTP id 71dfb90a1353d-5cfe8de4f54so1112480e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvosZQvq"
+Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e512ee5so1171876e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790625660; x=1791230460; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790625662; x=1791230462; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=EgvwXPEmAB/GBBILPXVv7PbHqG9ow0Kq/TKbS70/1lk=;
-        b=qSZXQi7KYPu4LKMeLK3yRbKbH+XHiE4kMl/txECMOR3bLSlVL3J3KXqGhLsti+K5uu
-         ECLGr0c+ij19mTNFiwsoinrUozk/d0rzq6k8/AQiBB3PiPpFssLBEFjcdfxVRxO6OrTc
-         2EuC6ceQckiXrEtt04U7xPkD5vq+2fltkRf9zZop8wZwUL1kKN9mIt82n0/EqxSVqwqf
-         Iw8DXpsLM5C5dI7xlfoVPmyuGsJQNYW7UBd3pyjkrcI+dJyQZ+hRyOxjTYQTzhrS4WeR
-         mIu7w8dp+Pfm1UtV/Jn6SIpJ6v9fpv6Dwz3mGejZ54BMclxDNSgmpv91dJOrzEmBJseo
-         stNg==
+        bh=vt9DTVwWOVFKkxYyXvnNVrbf98nmMxbog94vYtf3ZD0=;
+        b=lvosZQvqBQJ/WGw8V7+jtFPS83XmFiIdbdGMAC7ebYGgI64wny5F3vUmEnJJErCqS8
+         WRForGqrZ6m7j/ThXdRsATRQCeVdelx5oo712UYSoilyQzfE3yqn7GGrHwmhTTMzm5Jl
+         oPspnUZuuikoHDa2h5zzhvS1aRUIVgdHVco9yxgYOBg+BUpZjIGf5pS3QJlzhdec0Xfk
+         sJxEtnfnMCW0BOwWfNXwaXR9GiW6kMmATWb0b+2xg700i4k0I9JEm3qBSlogR58CyA/9
+         GRJ7Lq6+9g0+YGhTmE9sFcLqqzjf37F65/Bzi1Q3+m2KGgxG3s8IMol3Ty2VuKJ3uJT+
+         kzYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790625660; x=1791230460;
+        d=1e100.net; s=20260707; t=1790625662; x=1791230462;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=EgvwXPEmAB/GBBILPXVv7PbHqG9ow0Kq/TKbS70/1lk=;
-        b=BL6EFOiYzA81y4sIGBhX8osor1NO/+BaOfTexBX3+tWiVtIGndnsXEU7qSyZBXLxo+
-         +Qevu2c2bhM0wKCmvDZAcnTwYOLK4aQSr1MTMmcbyoM+EbpO1W9JzfZlI1aX2THGbIP6
-         LyyVmrFjz8m/fpYNPtj41kSg3cmO8YT6oxMgW1PEdV9ikUbziEGMlbntb1HPqEgQlCqR
-         4loqiDFM26HVOlfUSH2tZe3BhWqfjV6TH9WAdbdJ8Bo6BvNck5Xo8EvgrGP8kbiJ1v44
-         smG6D+7sLU25YMHgXNnn4e3PK4syNOibKqVJHXMN7fcvtbRm9KnA3p2qNjRckwTVRw69
-         eivQ==
-X-Gm-Message-State: AFq9FYILHtSdAs9LIVyXhAruaU5/FBxzLE03D7HWF/wtCNtbBYrnCKMa
-	rPxf8WcU5u11uhZrYVr49DBvbDrz4GZY9yYcXvyva1w2ASLA/I9fZQOdEJlP9TwWVFg=
-X-Gm-Gg: AYBFou19SjUu425NRQ8g9osv/4Ld8KZ0z9+BT0sCQikzmGYZEoDSQFjqlLKjfURl04k
-	ebBGu0cLdjMdqxGaCG/sZuGDWwwvMobpygOcNLM+xnmEOTrwEqKNzAerPNG+2ZeeZBlpNDfRGuz
-	RHESw3OfK1HZZWABWBpZ801QJyTvGmQX2qRVrtTLfgDad2ik8XNbo22R1DK4D4WaiIvedSyo9P5
-	+o2w5Y7tyCPARgqveLSvZ4B3MP/LM5Bzn1Elxe6SROI/plSBfet8WWYOacm+Vxfevo1ODqAYCWN
-	2kza+vA0V8UoaE9M/bNLVy8wZY30QrS7bjNkcDvwgpnWHimqpfM1FvxDbzqVej6SSOtFBGoUy1a
-	C8iilpCsuxGCvB6vxgoPc2mAf8IObrW8LFXJDWspaiukTdShol9NERAxB2VxNGh5pe/Vh8VTNIC
-	tLk+GXvLTES5NtveTnul9ucYZilAbIHY6/+xhG/onEH5TGBDOmJJ5+miPUBqeUA4w2QXET9OzrQ
-	Q1z5jpY9B9PiwjOgUQU0tnDjEQvM9yZp9XHllyPpV1uSJwZxHSF0VsGf3ufpCla
-X-Received: by 2002:a05:6122:3295:b0:5c9:a60c:273f with SMTP id 71dfb90a1353d-5cb0c04e48emr5957052e0c.23.1790625659946;
-        Mon, 28 Sep 2026 13:00:59 -0700 (PDT)
+        bh=vt9DTVwWOVFKkxYyXvnNVrbf98nmMxbog94vYtf3ZD0=;
+        b=KzCOWrPCwjx6IRMfOOA/JbQhuOZvrL7s4Y66fm1GkhsK/X2WU7B44YN0O0CeE1wH/l
+         iklt4ZRAy68+dsG02A5NRqy9fMUzw0hlHz748F1Z4yyFetS7Xj4J1jeyJ8lVUm6VKlSW
+         tdO1BzGnfS7n7z1+asJdRz3T1tgFWdSJsZy728xLnWEecBHPc9zEaWg9rc8Po1OTf5pH
+         njCDS9fyuEzQO0h7Z+dkq1ENpvm1ngmBX802nztfzQEAgINop2kXmEtoUjTHG2dBRNI8
+         c3RVCzvruqJwoj58/EgBl0EWZyQVsa38Hv3EqIX7DUMw5R/v0ShFAmP5iRZGK//hWlpz
+         3hgQ==
+X-Gm-Message-State: AFq9FYJCNyNqg4umPL+MzKEMRb/+AXiX7hSu88Qkn0nXClGOImVH9uAt
+	8B8d99lG6D+8KBzBXYr2Dd77dgos/X6CzVHk6xiM8O6ITKyVeqRjy7k4TpN1wrIT13c=
+X-Gm-Gg: AYBFou1nuINyP8A/loelh+Bx+BZReqH3nFbXYMnYhvy/WQYd/FzQgfWUoQ2N0Pfx4bH
+	/PgnvFJSgPUjfVerU9LZyp9lkg9ZOdlKUDw1aVKH2tD4n/fy2sk3SX086SLhL7msMWCWGQkC1qH
+	Rmt3I8xYEahKOpmyJkBw1FeKHNBrFISRlKjXxmqA6833kuIPAIOB6zEQi1j5aV94pCEudfp0W8D
+	264Y1ejkVmzUjF5QQ75IQCdw9JzwtwnmdukvPbrpzbDjOHYVwsxUhn+77xgfmE8J6sJvanwpHwT
+	FpOq17HeIeds+s+AjQ0OKVzObgkeWdGQwjYGPYqMKkAKoy1ulaAR6dwtf3xAMSzpVeElZeuBlbj
+	s2+3E8C1LTeRSRkGPYUMXYjnggYXOjM8dZ5xT5iWNr5ILhRv3iAZpuJSOhxpD4aCOlxNBJS8dK1
+	kWRAgIl1GpM8xCjbBJZ7bvvDgugQAFUPghZoj+JK9NyFTZ9zjqw/X3SH4C7FjeJHzFtjbCC47c4
+	XoaS7wbbUUZINsmwSBSvk8OlQ/qPPmyizCMNltLBilNkUKcsVLWuw5XmTCpeMRh
+X-Received: by 2002:a05:6122:54e:b0:5c9:c60a:e9b6 with SMTP id 71dfb90a1353d-5cc97f37a55mr3809455e0c.22.1790625661664;
+        Mon, 28 Sep 2026 13:01:01 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.00.58
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.00
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 13:00:59 -0700 (PDT)
+        Mon, 28 Sep 2026 13:01:00 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 08/23] test: functional: limit the workers by the memory available
-Date: Mon, 28 Sep 2026 16:00:14 -0400
-Message-ID: <20260928200031.1209311-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 09/23] client/agent: Fix crash on Cancel with no pending request
+Date: Mon, 28 Sep 2026 16:00:15 -0400
+Message-ID: <20260928200031.1209311-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200031.1209311-1-luiz.dentz@gmail.com>
 References: <20260928200031.1209311-1-luiz.dentz@gmail.com>
@@ -77,147 +77,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Each worker of pytest-xdist runs VM instances, so using one worker per
-CPU could run out of memory, with the OOM killer terminating some of
-them and tests failing at random.
+The auto agent replies to the requests right away, so there is no
+pending request when bluetoothd cancels one, e.g. when pairing fails,
+and dbus_message_unref is then called with NULL, which libdbus aborts
+on:
 
-With -n auto, limit the number of workers by the memory available,
-estimating each worker needs memory for 3 VM instances of 256M of guest
-memory plus the overhead of qemu, and use -n auto for check-functional
-by default, which can be overridden with CHECK_FUNCTIONAL_JOBS.
+ #5  ?? () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
+ #6  _dbus_warn_check_failed () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
+ #7  cancel_request (...) at client/agent.c:258
+ #8  process_message (...) at gdbus/object.c:293
+
+Only release the pending request if there is one, as done when the
+agent is released.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- Makefile.am                 |  7 ++++-
- doc/test-functional.rst     | 25 ++++++++++++++++
- test/functional/conftest.py | 58 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 89 insertions(+), 1 deletion(-)
+ client/agent.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index c88e81f937ff..439811492216 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -890,9 +890,14 @@ check-TESTS recheck: AM_MAKEFLAGS += -j$(CHECK_JOBS)
+diff --git a/client/agent.c b/client/agent.c
+index a678d5f785a9..2dd0113dc624 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -255,8 +255,14 @@ static DBusMessage *cancel_request(DBusConnection *conn,
+ 	bt_shell_printf("Request canceled\n");
  
- # The functional tests are parallelized by pytest-xdist, loadgroup is required
- # since pytest-bluezenv groups the tests sharing a host/VM setup together.
-+# Each worker runs VM instances, so by default the number of workers is limited
-+# by the memory available (see test/functional/conftest.py), override with e.g.
-+# CHECK_FUNCTIONAL_JOBS=4.
-+CHECK_FUNCTIONAL_JOBS ?= auto
+ 	agent_release_prompt();
+-	dbus_message_unref(pending_message);
+-	pending_message = NULL;
 +
- check-functional: all
- 	python3 -m pytest "$(srcdir)/test/functional" -v \
--		-n $(CHECK_JOBS) --dist loadgroup \
-+		-n $(CHECK_FUNCTIONAL_JOBS) --dist loadgroup \
- 		-m "not tester" \
- 		--kernel="$(FUNCTIONAL_TESTING_KERNEL)" \
- 		--bluez-build-dir="$(top_builddir)" \
-diff --git a/doc/test-functional.rst b/doc/test-functional.rst
-index 826210b73ce7..e2fcf34138b3 100644
---- a/doc/test-functional.rst
-+++ b/doc/test-functional.rst
-@@ -474,6 +474,31 @@ pytest-xdist is required for parallel execution. To run:
++	/* There is no pending request with the auto agent, which replies
++	 * right away, or if it has already been replied.
++	 */
++	if (pending_message) {
++		dbus_message_unref(pending_message);
++		pending_message = NULL;
++	}
  
- 	$ test/test-functional -n auto --dist loadgroup
- 
-+With ``-n auto`` the number of workers is limited by the memory
-+available, rather than using one worker per CPU, as each worker runs
-+VM instances and running out of memory makes the OOM killer terminate
-+some of them, failing tests at random. Each worker is estimated to need
-+memory for 3 VM instances (the maximum used by a test) of 256M of guest
-+memory plus the overhead of qemu, see `test/functional/conftest.py`.
-+The estimate is printed when starting:
-+
-+.. code-block::
-+
-+	Using 9 workers: 22 CPUs, 12159 MiB available, 1218 MiB per worker (3 VMs of 406 MiB)
-+
-+To use a given number of workers instead:
-+
-+.. code-block::
-+
-+	$ test/test-functional -n 4 --dist loadgroup
-+
-+``make check-functional`` uses ``-n auto`` as well, which can be
-+overridden with ``CHECK_FUNCTIONAL_JOBS``:
-+
-+.. code-block::
-+
-+	$ make check-functional CHECK_FUNCTIONAL_JOBS=4
-+
- Logging in to a test VM instance
- --------------------------------
- 
-diff --git a/test/functional/conftest.py b/test/functional/conftest.py
-index 4e0bda882de3..5ee3e15e43ea 100644
---- a/test/functional/conftest.py
-+++ b/test/functional/conftest.py
-@@ -208,6 +208,64 @@ def _setup_progress(config):
-     )
- 
- 
-+# Estimate of the memory used by a VM instance: 256M of guest memory, the
-+# default of test-runner as the tests do not set it, plus the overhead of
-+# qemu itself
-+VM_MEM = (256 + 150) * 1024 * 1024
-+
-+# Maximum number of VM instances used by a test, i.e. by an xdist worker
-+# as it runs one test at a time
-+VM_MAX_HOSTS = 3
-+
-+
-+def _mem_available():
-+    try:
-+        with open("/proc/meminfo") as f:
-+            for line in f:
-+                if line.startswith("MemAvailable:"):
-+                    return int(line.split()[1]) * 1024
-+    except (OSError, ValueError, IndexError):
-+        pass
-+
-+    return None
-+
-+
-+@pytest.hookimpl(optionalhook=True)
-+def pytest_xdist_auto_num_workers(config):
-+    """
-+    Number of workers used with -n auto: limited by the memory available,
-+    so running a VM instance per worker does not end up with the OOM
-+    killer terminating some of them, instead of one worker per CPU.
-+    """
-+    # Honour the override of pytest-xdist, as its own hook is not used
-+    env = os.environ.get("PYTEST_XDIST_AUTO_NUM_WORKERS")
-+    if env:
-+        try:
-+            return max(1, int(env))
-+        except ValueError:
-+            pass
-+
-+    try:
-+        cpus = len(os.sched_getaffinity(0))
-+    except (AttributeError, OSError):
-+        cpus = os.cpu_count() or 1
-+
-+    mem = _mem_available()
-+    if mem is None:
-+        return cpus
-+
-+    per_worker = VM_MAX_HOSTS * VM_MEM
-+    workers = max(1, min(cpus, mem // per_worker))
-+
-+    sys.stderr.write(
-+        f"Using {workers} workers: {cpus} CPUs, {mem >> 20} MiB available,"
-+        f" {per_worker >> 20} MiB per worker ({VM_MAX_HOSTS} VMs of"
-+        f" {VM_MEM >> 20} MiB)\n"
-+    )
-+
-+    return workers
-+
-+
- def pytest_configure(config):
-     _setup_progress(config)
- 
+ 	return dbus_message_new_method_return(msg);
+ }
 -- 
 2.55.0
 
