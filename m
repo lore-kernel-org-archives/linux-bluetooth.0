@@ -1,69 +1,69 @@
-Received: from mail-vs2-f42.google.com (mail-vs2-f42.google.com [74.125.227.42])
+Received: from mail-vs2-f37.google.com (mail-vs2-f37.google.com [74.125.227.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4382D4ED1A8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050474EE840
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790625649; cv=none; b=bfbH3r3potcP0LITV+RLitaUo8qx/Q+/ech+Kuxq0zhtcWly0N+scXREMJ6nhqQ4X/Cz6yNCTEpxDlULhuNUoPngCC02SDZixteDqTDVBFmedxJTcmdm3BWT7UaPdzRY4XSEegb0UlXP7r/QcFYkpAGjXJqC+S5ZLF/iBzVQ9r8=
+	t=1790625651; cv=none; b=bjXhO/cCP6XkbTcU/3zY1m66U3uuZ0PNIsMOEPl2ZJXGFFGewsheog2/0C6jJ84oR3r98Dan66ySlRpvrT9bGgeJbyPQrHm2RgVuGFKDU+L25GjzeJq6JAAXa/3mBm+SKOksyKyjZfRYNXzTI57qkLJBWzH4mj+fXHyZ/VyTM9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790625649; c=relaxed/simple;
-	bh=QRen8Kt6s9QWCE0zTVaWP4z2qIdNg8LcxyPOpyGlJ08=;
+	s=arc-20240116; t=1790625651; c=relaxed/simple;
+	bh=dup7L8R7FxiZ74gmsejuHt12RirHhbJEC2J2UDvlofM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VEbFCV+TzdH8fjUXIlPg3SpQxcIPH70AVyizryczZ0Tyc3UOftMM8Xf9xyD+E5cMGrZ81KuC2UCRVFNe3vVTLTOC/ygypP0Vm3UJV590Zi1u3/v67bAn6jaAthOmm2eFHEYaDCah9NBwMd7g+AsD/uLRVjxVlSw0kRmEYkrAJ2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F5xe5ygW; arc=none smtp.client-ip=74.125.227.42
+	 MIME-Version; b=ogkcBy2LpG02uywl/MPuBn7tEhlKMxbQ4AQICO+eBu6oGmK5bYCfA+jmMLUOQodMVZEwlZ3PhaUlnPNjFpfYtZhIeboNnUqEcf8voI/EIlYKICPtqYakW9iSJ3wHidhpJaaOgPTrj3x4fY6GBa1EHPoVfTPViMD/KpCsk9eFHTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BX2fmGJj; arc=none smtp.client-ip=74.125.227.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5xe5ygW"
-Received: by mail-vs2-f42.google.com with SMTP id 71dfb90a1353d-5c979c5eca8so2594762e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:00:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BX2fmGJj"
+Received: by mail-vs2-f37.google.com with SMTP id 71dfb90a1353d-5cfe8de4f54so1112311e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790625647; x=1791230447; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790625649; x=1791230449; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=pUaN9KPTk7t2VZMQgT7JDLA2N5WkGD/6mdC+l6C9rws=;
-        b=F5xe5ygWC8LQ8o/fnapWr4d3PC/M0jegi74Qox/rERxeTW04tfpI692TW4N/hBfWlp
-         vUk5vmuAb9K4/pPJGnN9C7+LBFPtuYSog8NXE6YNRcfp9Ak7jvR05Mtuia6a1/ZvMbMK
-         /mzozz87+rudZJo3eIVyWoIbXDdm5NUgGMlSdmfskzAXY0/jLEEaz9/p4d+lypv1KwLb
-         onA2pZnWNyNtE6haQmXhIUXTnMGWDGyMWMgMJUGLWQh5MDfp+MHPasdWzM25OiYYMc9i
-         nGh0H3NGgaHC+8w8eOAUJQDxgR9Lc2sdi0ucEHQS+URDZ2rnl5NUP9Ryt3Qe7SRm43Ko
-         1eBg==
+        bh=mEffHrWrxnpzptqwCy+9/9nISlwvU3rsWNVbUFda6I0=;
+        b=BX2fmGJj+Hu2n/2TIKUnOhe4eFqhq/F23eWOTXBgQppJG+JrZ375HCkyek9ot5LpuQ
+         MgTwDwwYU0Z6NOY3xB5/9Xlvc6hrn1LN2Rcl/UR1Vo8WLjP0Oj2vWR6/zLo3rlbmX5fa
+         y/Qe+lTM1bLPAFVd/pz/6cF4K84/tMgaNu19K+nK/h+jq8N5KvhXZSll1zko0h2E1nYU
+         4mBFCSWNl/Y5CwlAIxb0Wby+GZQvxjWxv84xCzTTRMeijsAVahvxwfGzODUFG/aDktsF
+         V/6j+L3Aa0jm7RyyapaXdtcwfh9S/EXmsjp/O+5xDo+sD+2ip/R/fvrkMpeUsfcxtGLX
+         s/rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790625647; x=1791230447;
+        d=1e100.net; s=20260707; t=1790625649; x=1791230449;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=pUaN9KPTk7t2VZMQgT7JDLA2N5WkGD/6mdC+l6C9rws=;
-        b=qJB33HMQ4IrmfZnk6ugnm3INANU7MZTLpFnzQta48/HEHV7jEEaqcD+2O8MFHFxsw8
-         pZVB+lg/7uHkZinhWTcjnCDbXOrVsW/Sdcqi4WFYN/g/5ldyFE3mp+Dxr2oIFXRhfgDB
-         6UduW0wbF6iZV6h5qesc3U9znkzHyauBn1j/dU8zJZ7sYO+p2nNVrLDRadBJR5d98I6u
-         k7ZG+I+z+ksFJP+jOhTIz84Yop0/4xNgPpIAoyiHs/Ydb6HXHK6Ud/54gLp6/jw0CiEM
-         LOetkBM11mPy1avOcRMmya5bYa8z4jLMGWqGj2TYRIIeqCYjPLIfy5S51CPdWaX3CP7T
-         JdNQ==
-X-Gm-Message-State: AFq9FYKxyiWAIp3poyc1xi9ZKbNjyNhgwucDlKbSztqCVIXhO9rcC96V
-	ILV6UEGlkYnpAtQqBSypvDh7HFDd3qnwK8fdH3zIuWM1wiRr7pxmvhXlwXSF5BV3pfo=
-X-Gm-Gg: AYBFou0EJCY6g0zys/3jAVCc+j7ADQM5KaoFVYnk3QKM/cy+WBi9phjc8mQHMTc+cpS
-	Th8PREMkwYzqWIFYXu9Z+RoaSPheIDkTcxbb8i8cLJoClgc8+d4MZ4wpiTwd3pCZV25vxulVSu2
-	O3M4gK6CtBPHvxMhzzH3wAWmvOYLLkXSWzSvC2X8iXjs9loNpxqVYzZ7TBUsLiKfn9s3mMBm6sq
-	GbFLBNmwvLQVLtup4odo+9phY0kcjbQhORvuz7x9nO/VpkO+eGvGBArIiuS7WJ5UeBwDHkjML8l
-	uCI4hJ9UntFuP3VK1mX9wYeqjg2UX9gmSNNjl0yo/d9+LCwiYKWVryZ0bF61NqsXnCII5ukVBDd
-	3mM6S368q3sg83iFM0Q7qNgBDmIy4Y1YiAaQuUYzY5BEUV+Bo+7gROnXDi3ujgy9f1v7pjbz0cP
-	2ylCs3ZhrSZXe1sU5gq8fyVRQbm4RJ4EvkrJbyLFyxZOgihhE9V9BEvnYQTF1VXmACGU9AWbfpl
-	tO8xEXvyBb0BmFADUIh5HieEagUou8De/KGj9q+lJLM0a3nEfmoAGxfRbamkXsJ11zAlI9fl+Q=
-X-Received: by 2002:a05:6122:1307:b0:5ce:b65d:22bd with SMTP id 71dfb90a1353d-5ceb65d285dmr2206772e0c.7.1790625647066;
-        Mon, 28 Sep 2026 13:00:47 -0700 (PDT)
+        bh=mEffHrWrxnpzptqwCy+9/9nISlwvU3rsWNVbUFda6I0=;
+        b=aORhBc4NOVrlYCWJ+h0yf2CV88b+Ow722Zu/kY6J0rsqoXokVO7fCOoEEVR3r+b0S/
+         YbSv4jd6wWbNLXyFe7qgZnHjKIW9bN93O00IxXCuV36EdC7nQ6oV8EmF6TWeLWhOZFIc
+         kYYlTcP29UPfyN5w0ARQqUrvDc0Jxgrb/Oxqf3934tZhVFDQq7F62oPBF89pA50P7Bqh
+         a6DJzW4SXspCT40cU2e0eYn6i1k1u8aksO0hRXBaef4IR/JRF/HpdU0s8ql2CvG4EQzb
+         6BG0CN2EmVsLU2UqL71bcCIWfif2pRwvrLIULb2t2xc1l6wcV+gFiwS9AspypElJDnHt
+         5opw==
+X-Gm-Message-State: AFq9FYK+IFKdtvLieZucK0hmgYlxG1h/IC9AoQoSdIcu09pxjH7GOqmj
+	Rdow7nHXHYzQja8fg8rC4T0bTHiZiimqz7LypeNpWkjI0o4mTNcop7OQZMj2zSnUo6k=
+X-Gm-Gg: AYBFou1Dq/iJzXo4m1cBSPQmM6LbPLBuUQVBV7LhJs05JFl9TH0YmVis6R55+puLNXO
+	NbvQ0V4EXUtuBf+xUJIHV3x43Akdyqln/fNJgO1Jt0YQzGHTrjcCCYrRNE+FTgEc5zqk8OBi20/
+	V57DcwJ7UD0nPWlocvCUPp0iz2TqT78wXBh/iT745RMu0WsbglZLQ5m1cdpCyvsav652oZ1SJfh
+	evUuglMfkyysEntSaKoSY1nhNR5uHCJezXcSEUfEXA8CZPdQeiGvUuNsiIsHJiS2A8utDHHjAZS
+	qsYsZ2p4TyNRSB4nuoj5dfqbVmIerPOSzKnJhP5CdWL7ESSgYiGPVoNbPEkfguOShX6HxiP7sSa
+	nH80LYunurNFVqbc64YuQKSeobPx6zenB6MKfVPaIq6uoW/paSIbJAOdCt5IqMwnSRyMh+g8+Ka
+	EXX3g4Z0huRaHwrAD30Ea252hnSjZnyeVTWuvz8nZO6WMcNJrzMSNr1oPOHw3u9jKDFk1535qMe
+	/imgV5NyX1X57qmPYwsWtjhSwv8F6SHIhFSUBjUt0zcq1v3N+gPJ685g0WIUR+1
+X-Received: by 2002:a05:6123:420b:10b0:5ce:5895:c94e with SMTP id 71dfb90a1353d-5ce5895ce72mr1593193e0c.6.1790625648716;
+        Mon, 28 Sep 2026 13:00:48 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.00.46
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.00.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 13:00:46 -0700 (PDT)
+        Mon, 28 Sep 2026 13:00:47 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 01/23] shared/gatt-client: Fix calling destroy after unregistering notify
-Date: Mon, 28 Sep 2026 16:00:07 -0400
-Message-ID: <20260928200031.1209311-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 02/23] client/gatt: Fix setting descriptor value from scripts
+Date: Mon, 28 Sep 2026 16:00:08 -0400
+Message-ID: <20260928200031.1209311-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200031.1209311-1-luiz.dentz@gmail.com>
 References: <20260928200031.1209311-1-luiz.dentz@gmail.com>
@@ -77,101 +77,127 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bt_gatt_client_unregister_notify resets the callbacks of the
-notification but not its destroy callback, which is called once the
-notify_data is freed. If a procedure is still pending at that point,
-e.g. the write of the CCC to disable the notifications, it holds a
-reference to notify_data so destroy is called later, once the user data
-may have been freed, e.g. the reports of HoG:
+gatt.register-descriptor completed the command right after prompting
+for the value, so when run from a script the line with the value was
+executed as a command instead of being passed to the prompt, causing
+the descriptor to be unregistered.
 
- ERROR: AddressSanitizer: heap-use-after-free
- #11 report_notify_destroy profiles/input/hog-lib.c:359
- #12 attrib_callbacks_destroy attrib/gattrib.c:130
- #13 notify_data_unref src/shared/gatt-client.c:256
- #15 destroy_write_op src/shared/gatt-client.c:3189
- #16 request_unref src/shared/gatt-client.c:201
- #17 destroy_att_send_op src/shared/att.c:215
- #18 bt_att_cancel src/shared/att.c:1925
- #19 cancel_request src/shared/gatt-client.c:2783
- ...
- #21 bt_gatt_client_cancel_all src/shared/gatt-client.c:2811
- #22 bt_gatt_client_free src/shared/gatt-client.c:2290
+Complete the command once the value is set, as done for
+characteristics, and parse a copy of the value so the input line is
+not truncated by strsep while still in use by the shell.
 
-Call destroy when unregistering instead, once done with notify_data and
-holding a reference to the client in case destroy drops the last one.
-
-As destroy is now called when unregistering, reply to StartNotify before
-freeing the notify client when enabling the notifications fails, since
-it frees the operation the reply is for.
+As invalid values can now come from scripts, fix handling them: the
+attribute is no longer used once unregistered, which frees it, nor kept
+in the list of its parent, and the command fails. Also stop counting
+the empty entries between the values, which left bytes uninitialized,
+and reject negative values.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- src/gatt-client.c        |  7 +++++--
- src/shared/gatt-client.c | 21 +++++++++++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ client/gatt.c | 39 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 3baf95c4f79c..d94dc9d7fbf6 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1488,12 +1488,15 @@ static void register_notify_cb(uint16_t att_ecode, void *user_data)
- 	struct characteristic *chrc = client->chrc;
- 
- 	if (att_ecode) {
-+		/* Reply first, as freeing the client unregisters the
-+		 * notification, which frees op with its destroy callback.
-+		 */
-+		create_notify_reply(op, false, att_ecode);
-+
- 		queue_remove(chrc->notify_clients, client);
- 		queue_remove(chrc->service->client->all_notify_clients, client);
- 		notify_client_free(client);
- 
--		create_notify_reply(op, false, att_ecode);
--
- 		return;
- 	}
- 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 92ad7c39c115..b3bc62220e16 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -3842,6 +3842,8 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 							unsigned int id)
- {
- 	struct notify_data *notify_data;
-+	bt_gatt_client_destroy_func_t destroy;
-+	void *user_data;
- 
- 	if (!client || !id)
- 		return false;
-@@ -3858,7 +3860,26 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 	notify_data->callback = NULL;
- 	notify_data->notify = NULL;
- 
-+	/* Call destroy once unregistered, as the user data may be freed then,
-+	 * while notify_data may still be referenced by a pending procedure,
-+	 * e.g. the write of the CCC, which would otherwise call it later.
-+	 */
-+	destroy = notify_data->destroy;
-+	user_data = notify_data->user_data;
-+	notify_data->destroy = NULL;
-+
-+	/* The client may be freed by destroy, e.g. if the user data holds
-+	 * its last reference.
-+	 */
-+	bt_gatt_client_ref(client);
-+
- 	complete_unregister_notify(notify_data);
-+
-+	if (destroy)
-+		destroy(user_data);
-+
-+	bt_gatt_client_unref(client);
-+
- 	return true;
+diff --git a/client/gatt.c b/client/gatt.c
+index 6dc80e2a31cd..a85f6003d9b8 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -700,13 +700,21 @@ void gatt_read_local_attribute(char *data, int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
  }
  
+-static uint8_t *str2bytearray(char *arg, size_t *val_len)
++static uint8_t *str2bytearray(const char *arg, size_t *val_len)
+ {
+ 	uint8_t value[MAX_ATTR_VAL_LEN];
+-	char *entry;
++	char *str, *next, *entry;
+ 	unsigned int i;
+ 
+-	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
++	/* Parse a copy as strsep modifies the string, which may still be
++	 * in use by the caller, e.g. the shell printing the input line.
++	 */
++	str = next = strdup(arg);
++	if (!str)
++		return NULL;
++
++	/* Only count the values, not the empty entries in between */
++	for (i = 0; (entry = strsep(&next, " \t")) != NULL;) {
+ 		long val;
+ 		char *endptr = NULL;
+ 
+@@ -715,18 +723,22 @@ static uint8_t *str2bytearray(char *arg, size_t *val_len)
+ 
+ 		if (i >= G_N_ELEMENTS(value)) {
+ 			bt_shell_printf("Too much data\n");
++			free(str);
+ 			return NULL;
+ 		}
+ 
+ 		val = strtol(entry, &endptr, 0);
+-		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
++		if (!endptr || *endptr != '\0' || val < 0 || val > UINT8_MAX) {
+ 			bt_shell_printf("Invalid value at index %d\n", i);
++			free(str);
+ 			return NULL;
+ 		}
+ 
+-		value[i] = val;
++		value[i++] = val;
+ 	}
+ 
++	free(str);
++
+ 	*val_len = i;
+ 
+ 	return util_memdup(value, i);
+@@ -2788,11 +2800,14 @@ static void chrc_set_value(const char *input, void *user_data)
+ 
+ 	g_free(chrc->value);
+ 
+-	chrc->value = str2bytearray((char *) input, &chrc->value_len);
++	chrc->value = str2bytearray(input, &chrc->value_len);
+ 
+ 	if (!chrc->value) {
+-		print_chrc(chrc, COLORED_DEL);
++		/* Unregistering frees chrc, so it is removed first */
++		chrc->service->chrcs = g_list_remove(chrc->service->chrcs,
++									chrc);
+ 		chrc_unregister(chrc);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	chrc->max_val_len = chrc->value_len;
+@@ -3078,14 +3093,18 @@ static void desc_set_value(const char *input, void *user_data)
+ 
+ 	g_free(desc->value);
+ 
+-	desc->value = str2bytearray((char *) input, &desc->value_len);
++	desc->value = str2bytearray(input, &desc->value_len);
+ 
+ 	if (!desc->value) {
+-		print_desc(desc, COLORED_DEL);
++		/* Unregistering frees desc, so it is removed first */
++		desc->chrc->descs = g_list_remove(desc->chrc->descs, desc);
+ 		desc_unregister(desc);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	desc->max_val_len = desc->value_len;
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+@@ -3134,8 +3153,6 @@ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 	print_desc(desc, COLORED_NEW);
+ 
+ 	bt_shell_prompt_input(desc->path, "Enter value:", desc_set_value, desc);
+-
+-	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+ static struct desc *desc_find(const char *pattern)
 -- 
 2.55.0
 
