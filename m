@@ -1,69 +1,69 @@
-Received: from mail-vs2-f12.google.com (mail-vs2-f12.google.com [74.125.227.12])
+Received: from mail-vs2-f41.google.com (mail-vs2-f41.google.com [74.125.227.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB134F7CAF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704514F7CA1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790625664; cv=none; b=ZgEYv1sGFpXdFVdqZHEXjxW4zxfwhNCjkKicW2bg0PuefpXrkbti16MMzYPDSQEfc/5n8oG2CXjtXFym4opNUrAJVNJQDCtnt3sUprzMeD6Nd0A7Vr/lUn8G9KrMF8SEKlFXRliTop0Yp3N8SlTr7m8OA0IlmOOB1On7edEn+qI=
+	t=1790625665; cv=none; b=dcBOUxkSlHdjdhErNmIhxijAv9oQVwekd2En6mrQoqLo6ELcZf1BF+hqCw81S3KRVswF0YjFKujIm22xJLaE+tzp1loQvYMmq+4ZBtu3+pG/KyfR7jCQxsVwKvDsIvJn94Ntheq+Yr4bZMAaQ/SjdbgOibTSUOqF8u+LG6kUkZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790625664; c=relaxed/simple;
-	bh=kMcWyTYb0L98QVIl4p5gDSEMPg0occSJqIvPJRstig4=;
+	s=arc-20240116; t=1790625665; c=relaxed/simple;
+	bh=/FEZTPT2L2/rGDOLXfjsNIFDX0IxbzgjtFtLjsrX9oY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a+hPYhxoDzHokUUIXKivnDwficDvrlZg9T3COWPhEE70VdRipH73u+F5Axmxk+365wDeZkHVP8irsfJRxfVqKq7WQJj4394Am/h+7vBFhNcJfjdkrt27a+dmtO8uVCiccsvP9iGGrUGPeC9Bs7VqAqIZIMlTcR0ALjUAxzVzlWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvosZQvq; arc=none smtp.client-ip=74.125.227.12
+	 MIME-Version; b=aeSQV4ShcmDbkDO1eYzkGiR1p70/YE9IGbSGjspffkARVeGPmhMygwnH5fS5W9z6f3UumWNri81XGCmn8Nc3wwTTFrHfBIUik0ovZUyKI2NVgH2Xvhd61pc5TBFJ8u6d0gZ954YnHl3EiJL19ibAQ1aEpltQc2Iu0CUZaX86QSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aW5y9h7N; arc=none smtp.client-ip=74.125.227.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvosZQvq"
-Received: by mail-vs2-f12.google.com with SMTP id 71dfb90a1353d-5c67e512ee5so1171876e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aW5y9h7N"
+Received: by mail-vs2-f41.google.com with SMTP id 71dfb90a1353d-5c963a787c9so1253969e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790625662; x=1791230462; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790625663; x=1791230463; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=vt9DTVwWOVFKkxYyXvnNVrbf98nmMxbog94vYtf3ZD0=;
-        b=lvosZQvqBQJ/WGw8V7+jtFPS83XmFiIdbdGMAC7ebYGgI64wny5F3vUmEnJJErCqS8
-         WRForGqrZ6m7j/ThXdRsATRQCeVdelx5oo712UYSoilyQzfE3yqn7GGrHwmhTTMzm5Jl
-         oPspnUZuuikoHDa2h5zzhvS1aRUIVgdHVco9yxgYOBg+BUpZjIGf5pS3QJlzhdec0Xfk
-         sJxEtnfnMCW0BOwWfNXwaXR9GiW6kMmATWb0b+2xg700i4k0I9JEm3qBSlogR58CyA/9
-         GRJ7Lq6+9g0+YGhTmE9sFcLqqzjf37F65/Bzi1Q3+m2KGgxG3s8IMol3Ty2VuKJ3uJT+
-         kzYw==
+        bh=rp41POhCiiUSxOFWV5cikekbyRUKV77FzUtqMDpkOfw=;
+        b=aW5y9h7NDDy8iDP840p1F1ZvE2P5IPaeC01MP11z4i+cxp1WobPLdMv3Uc9ACFFy1C
+         le0Paqdvv0nnHC3E36uc2d7LBNTZOW06G1fT+zb9W3F2T5ro4H9yHrYPdzSqj+V8XdSK
+         npn6LnmClQHJ6e5PizIlmD8GqCstX5QcNmmcdZAmz8u8m+27to0B6zf8QRkJdLaTCv7d
+         72ypHkl4d4GiZ387e7tM9umGqKbD8pUnQvHwwdttXaOPhFbdXGnzM8eGVgQN/onlHRbT
+         KkllFVWwkGxIFkGZmccGZsFiVBzeCGevvmSw2v0I2mjanvivSCjWM/pSWEgAkdtfUHFT
+         AyJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790625662; x=1791230462;
+        d=1e100.net; s=20260707; t=1790625663; x=1791230463;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=vt9DTVwWOVFKkxYyXvnNVrbf98nmMxbog94vYtf3ZD0=;
-        b=KzCOWrPCwjx6IRMfOOA/JbQhuOZvrL7s4Y66fm1GkhsK/X2WU7B44YN0O0CeE1wH/l
-         iklt4ZRAy68+dsG02A5NRqy9fMUzw0hlHz748F1Z4yyFetS7Xj4J1jeyJ8lVUm6VKlSW
-         tdO1BzGnfS7n7z1+asJdRz3T1tgFWdSJsZy728xLnWEecBHPc9zEaWg9rc8Po1OTf5pH
-         njCDS9fyuEzQO0h7Z+dkq1ENpvm1ngmBX802nztfzQEAgINop2kXmEtoUjTHG2dBRNI8
-         c3RVCzvruqJwoj58/EgBl0EWZyQVsa38Hv3EqIX7DUMw5R/v0ShFAmP5iRZGK//hWlpz
-         3hgQ==
-X-Gm-Message-State: AFq9FYJCNyNqg4umPL+MzKEMRb/+AXiX7hSu88Qkn0nXClGOImVH9uAt
-	8B8d99lG6D+8KBzBXYr2Dd77dgos/X6CzVHk6xiM8O6ITKyVeqRjy7k4TpN1wrIT13c=
-X-Gm-Gg: AYBFou1nuINyP8A/loelh+Bx+BZReqH3nFbXYMnYhvy/WQYd/FzQgfWUoQ2N0Pfx4bH
-	/PgnvFJSgPUjfVerU9LZyp9lkg9ZOdlKUDw1aVKH2tD4n/fy2sk3SX086SLhL7msMWCWGQkC1qH
-	Rmt3I8xYEahKOpmyJkBw1FeKHNBrFISRlKjXxmqA6833kuIPAIOB6zEQi1j5aV94pCEudfp0W8D
-	264Y1ejkVmzUjF5QQ75IQCdw9JzwtwnmdukvPbrpzbDjOHYVwsxUhn+77xgfmE8J6sJvanwpHwT
-	FpOq17HeIeds+s+AjQ0OKVzObgkeWdGQwjYGPYqMKkAKoy1ulaAR6dwtf3xAMSzpVeElZeuBlbj
-	s2+3E8C1LTeRSRkGPYUMXYjnggYXOjM8dZ5xT5iWNr5ILhRv3iAZpuJSOhxpD4aCOlxNBJS8dK1
-	kWRAgIl1GpM8xCjbBJZ7bvvDgugQAFUPghZoj+JK9NyFTZ9zjqw/X3SH4C7FjeJHzFtjbCC47c4
-	XoaS7wbbUUZINsmwSBSvk8OlQ/qPPmyizCMNltLBilNkUKcsVLWuw5XmTCpeMRh
-X-Received: by 2002:a05:6122:54e:b0:5c9:c60a:e9b6 with SMTP id 71dfb90a1353d-5cc97f37a55mr3809455e0c.22.1790625661664;
-        Mon, 28 Sep 2026 13:01:01 -0700 (PDT)
+        bh=rp41POhCiiUSxOFWV5cikekbyRUKV77FzUtqMDpkOfw=;
+        b=sgcT2LgcU8mpuEp9r9jnB++FLcCfYu94G6yUq4+5q8smRvOZIhg6kkVdTe6EnUivt6
+         uFBLcUgL0pc1wm7wzHU0wb+ZMQIMNAuyGTylVNbbvHZXarIiZpDeYiZjteE4XdZ8E9rt
+         os9SHUuUrhqObUIsizIPMz5h5RKKMcYwLddiB5omNERKx0haYZmrNuWyjr3nZj0iOAGI
+         A4GkTJnqgH/O21RYz4U5k/rkVx0MbjOgbFsaoUQgtMm7CRcR8la5bXd8oYUJYWSpI+Fo
+         b/hUtfrzHHHosVZaB5pwdQKCcb6e5JJqtip6MULYUJ0BpDy7uIvnGtxhJoDl4UOFNpiH
+         g02g==
+X-Gm-Message-State: AFq9FYILjSJrxpBgwPXJBYAeKfSQyB7qu2qtnrWzD2mHaAMambBjWGM5
+	6IvF7eKpwyd4/MORqbNSe35u0O82kiE3GI4TK7v9/sCFYQAhb/B3AScfTriMJ/cJ8BM=
+X-Gm-Gg: AYBFou1u+Fi0dOHIW13y4Uqv+BK0hHT4FWexQlpdn7os0VIA2mmot2rs8m9I2IwHjnE
+	+Dmqrl8W8MvTxq7z5wFc5yFxH7vKh9pxxXlWIY80LpwmWBCbR7E5P3vJKUYBrOgPBgqM9Q+rwiL
+	qB6Y0It+P5sC50KJwyGcp1cgj5J1gfqmpW9jCiCFccamPstURvcxaLdvQX+n3hHvq48NzNyDiMh
+	VvnRueCtXw3onqTp/6c9O8tKeVzFiNtPqo/Kr1rR3odXKVJV8N9E+WxOaC+ac15YTQ/yKpQyTqU
+	hS0Un+8jb0HBnbUFoXAHQvDofW/FSHb4fRH/UpYq+yc9TQztnlnar8FCE1973o/bqjiksQAgQ3w
+	iSCduEp2iPZA6HOx+EtbMo9xoliBhLrIRNzqOaqFMoFsiErNQBpCDoVdQSp9HQfzf8uprN5iX2Z
+	BxwMW1l9Daz1NWKvrC7j4NAU+YdT1S+rcKGHHoZPdzj4Jv9WKzPsS2DFg1K+j7sESHOB57B/x74
+	3EfENSqkZOnJI8R1vg66Mc1kSFoiuCMpW+pmLqXAHL+iSIATWoq3Nh3xrIFD3W6
+X-Received: by 2002:a05:6122:488e:b0:5c9:ef0d:155d with SMTP id 71dfb90a1353d-5cb08b4038bmr5824240e0c.10.1790625663130;
+        Mon, 28 Sep 2026 13:01:03 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.00
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 13:01:00 -0700 (PDT)
+        Mon, 28 Sep 2026 13:01:02 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 09/23] client/agent: Fix crash on Cancel with no pending request
-Date: Mon, 28 Sep 2026 16:00:15 -0400
-Message-ID: <20260928200031.1209311-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 10/23] shared/uhid: Fix size of Get Report reply with a Report ID
+Date: Mon, 28 Sep 2026 16:00:16 -0400
+Message-ID: <20260928200031.1209311-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200031.1209311-1-luiz.dentz@gmail.com>
 References: <20260928200031.1209311-1-luiz.dentz@gmail.com>
@@ -77,45 +77,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The auto agent replies to the requests right away, so there is no
-pending request when bluetoothd cancels one, e.g. when pairing fails,
-and dbus_message_unref is then called with NULL, which libdbus aborts
-on:
-
- #5  ?? () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
- #6  _dbus_warn_check_failed () from /usr/lib/x86_64-linux-gnu/libdbus-1.so.3
- #7  cancel_request (...) at client/agent.c:258
- #8  process_message (...) at gdbus/object.c:293
-
-Only release the pending request if there is one, as done when the
-agent is released.
+The size of the reply did not account for the Report ID prepended to
+the data of numbered reports, dropping the last byte of the report,
+unlike Input Reports which already account for it.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- client/agent.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ src/shared/uhid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/agent.c b/client/agent.c
-index a678d5f785a9..2dd0113dc624 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -255,8 +255,14 @@ static DBusMessage *cancel_request(DBusConnection *conn,
- 	bt_shell_printf("Request canceled\n");
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+index 919618a71b00..36a16c331e83 100644
+--- a/src/shared/uhid.c
++++ b/src/shared/uhid.c
+@@ -530,7 +530,7 @@ int bt_uhid_get_report_reply(struct bt_uhid *uhid, uint32_t id, uint8_t number,
  
- 	agent_release_prompt();
--	dbus_message_unref(pending_message);
--	pending_message = NULL;
-+
-+	/* There is no pending request with the auto agent, which replies
-+	 * right away, or if it has already been replied.
-+	 */
-+	if (pending_message) {
-+		dbus_message_unref(pending_message);
-+		pending_message = NULL;
-+	}
+ 	if (number) {
+ 		rsp->data[len++] = number;
+-		rsp->size += MIN(size, sizeof(rsp->data) - 1);
++		rsp->size = 1 + MIN(size, sizeof(rsp->data) - 1);
+ 	} else
+ 		rsp->size = MIN(size, sizeof(ev.u.input.data));
  
- 	return dbus_message_new_method_return(msg);
- }
 -- 
 2.55.0
 
