@@ -1,75 +1,35 @@
-Received: from mail-lf2-f13.google.com (mail-lf2-f13.google.com [74.125.229.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3034BD794
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 15:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB2D1A681B;
+	Mon, 28 Sep 2026 15:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790609936; cv=none; b=cQmm0xCW35zVAzkUUrckLeQ3ADJf+RMo3brnDCO+Wl+HRdAsfiy78BJFzLw+jj3WgR6Q0rbqOd2aRPmkONnppyLdg1a0Bm73WOLV6XBCLguMUpP76ChENvA6L9dvTipXmr/TykoDLs3WAugpEbDASO3cACZijBrGQTnJ+stL7vU=
+	t=1790610098; cv=none; b=dR8CPCQYXfFAsv4eoM2FIm4qjvZOmBwkd0tUlSHy82P57eCKxf2PUlgVaFD3GW/25n4lq5SGa9QbgYV0YOPsZO4GYi3X5Bjb9nUmVnr1FSV382nc5H9dDuVvr3Z/3ZXAGVNjPkV8h/qLj7zXWB22He3/WW8esQ2BuD3qaFelIjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790609936; c=relaxed/simple;
-	bh=vQbgwjl2Lv/6onjSG+rzPCPoufv7tprD55wyPNTjwns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MYpRJSRG+3nk3ETzmwMEJlv5LPJ+kkXIevjVG7B3lkJRZq6wtvRHa2I1JpinKSwYqoWUo9ig1OSsuUgYqGO1++n8pC+qH6CW9+rLUYi1obH2CGBN21lR+0Dn1T3CrtNHeWsG4DmLgCSf0gdi53opPf1rsGX1DPpflssJHWYwPw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caeAL0Up; arc=none smtp.client-ip=74.125.229.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790610098; c=relaxed/simple;
+	bh=YtZTkRT+KkFERghcrmO9yBE7MlbcCBw4KFwwn2D3gjY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HxVyTyaw8YeNgWgpkahpn1fjD5Q0l5EftrbeWEPfNdf9eBxiimSQq5kTcLUR7HCtQHdzjdLaDnia06Mr4LVXmxdidlfVlQ1gmZA/IcLb9HD6ACaalW+tUfbmExfll93X/Lrq43ZGWwzZV9JE4v9oLJ7o5lKSTrl/skfzvGs+2Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gEDwhQyX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caeAL0Up"
-Received: by mail-lf2-f13.google.com with SMTP id 2adb3069b0e04-5b8e6ec4e0bso2767573e87.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 08:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790609932; x=1791214732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vQbgwjl2Lv/6onjSG+rzPCPoufv7tprD55wyPNTjwns=;
-        b=caeAL0UpW7q0azF7dpGoItApATAX6L5lMRQ3vu+GMkYt/c3g/GqFOxpYSL+680OqHJ
-         SpXx/T73yDqAvawMecyN6fgA7DCOhO73Q+pMnttm1aIFTf05SP1N58Vda6P5eNDO/Md5
-         Vqkw2PYsEZhyxqPts83kcuXfc2pHCcuYdyFaDPFKS5LT0zW0A6/5AVrXlwCYD54D2rtR
-         kJYubTDgLLlvwZd/4WXvJYmRKOnvq8gXICayJHLz202U5FDvacl5a9By1wL5Q1PWyvSf
-         d+q4Zv2xh3fbG1u2VvfyHudhbJqgu317g9djvdkygmSfneaV3oqryVzEBZakd7fqhx0z
-         1G8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790609932; x=1791214732;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=vQbgwjl2Lv/6onjSG+rzPCPoufv7tprD55wyPNTjwns=;
-        b=hYTV1N9YcWIuzRYFDkg0FVMARtDs7T/oPMFzxO29w3zQBJUn+VDRVO6nnmLAYycA+W
-         Ti63C8zDfPZRQOKMHr+W18lfbJWk19op4LWp84OMby+ww4FWF6zkl0vHPZqzeNPXrbyO
-         iWBzAge9sdzJY+Yqd9dBmefeuzpLtanVRTmcbMyOk4lj7Hc5Sr/vi0hd8JTQrCAH+dsT
-         9ME2XYshfWtUwE5CP5PJgsZVnjfi8RpvCfPBCLnzUM7d1hzGZwnLdGvR0Iy5p1ubmqgi
-         CBLu6OGlMXtmAWZHqNM5rTmNupMRh5Ck7DCIHDP7mlLP3XO6FYuyYPwDYkdpZreR7d9S
-         jT0g==
-X-Forwarded-Encrypted: i=1; AKwUvBz/aiZPqlGM69DQ7D8wZx67aG7AXo6LCV1ityL3uu60dz4t0/ldaDFKmAl7FOH5yW1T7UlXCP8vuRXkE6Wdl3E=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJkH0sETg3b82YLEUED263KjweMd6js/257VKzhegzbDuNvJADj
-	0hIJFDEZAensTECkK09vs7e42x3vkWFebumZPXAZUDCSTjwC2G7D4NAgkujnIamwsmo=
-X-Gm-Gg: AYBFou24i1YdfFA+hgHaeElcAZE1cgeNvBhrWgvdvOMtwbgTa1DU7OEtx/WENtL2D0S
-	PUv2oxR6KNTfj4TI55QWld+0FdPyo6qP9swacYZifanMm1f40FFPOGz0ct7sSZo5LIaAWIHx4xe
-	gHtdH4HSCGaP4rfMddfe6r7HIr+V/fVGfxAEVnpYTIB3dI/BAE+WvYemTey/4TAxrDkH6DV7itZ
-	AEqPLeOqeiHyn26eTUlvWAqjEca0xlCNMpx3OKqVPchIPecUUdYqj/iXbZQSk17xHUeh7VMLYk0
-	yJhWZZavELA9pY8Zwt19B2GHFDFju6cxsIrhhZddDeopTTYqLBDIS9V8n7D1A+3Z8uzPDbqeaRs
-	pBeKFAqAHSm1wuFcjSdExnOngVgbC73bMKjVASnMhU3o3f33OlkS178k1A0XB7X4K5AajUZCc8u
-	BB5dn3umIoz8fNxWdxmZjapvdvsxsxHGMbzRxLauMHbO8MTj+mv4pAR6FQgiyVrFSCImKdIGrZ3
-	LavH0b+wXMtAQfB
-X-Received: by 2002:a05:6512:3054:b0:5b8:f52b:8135 with SMTP id 2adb3069b0e04-5b8f52b825fmr1684490e87.17.1790609932127;
-        Mon, 28 Sep 2026 08:38:52 -0700 (PDT)
-Received: from localhost.localdomain ([80.66.93.148])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b9debb8514sm635867e87.47.2026.09.28.08.38.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 08:38:51 -0700 (PDT)
-From: Maxim Skokov <skokovmaksimevg@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org,
-	mikhail.v.gavrilov@gmail.com
-Subject: Re: [PATCH v2] Bluetooth: RFCOMM: free the skb when the DLC has no owner
-Date: Mon, 28 Sep 2026 18:38:35 +0300
-Message-ID: <20260928153840.366359-1-skokovmaksimevg@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260915070119.45143-1-skokovmaksimevg@gmail.com>
-References: <20260915070119.45143-1-skokovmaksimevg@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEDwhQyX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA691F000FF;
+	Mon, 28 Sep 2026 15:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790610096;
+	bh=+CCrRpAw78jDH8mpX/ibpuK5hmAos3vXUBO90Hq/QP8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=gEDwhQyXOqavK/A6DymGtFseRbBfNkQT0/b77gAp9K+89BW11OVIq6IvOpYOYMV6I
+	 bl0YF8+TxBot/CG6HD54nrhUe/LbQSvXWNdnFwvbFpFQ65IcKh6Iay+BXx8IKlyEfB
+	 Ehs18UsHLDJBkRlMsIhYXBxTY4nsFyvP3zwKJgx8ZLe0OkYXCIY7+Vy3YtODE2xsD0
+	 /Jn8+vQcS31tNeT2OFrWgJitCBxmhssi8Js1S45UlEn29VRmCLgRBq4+B801oDB0Lr
+	 KadUOIWahYe+bVv41QrZTSNhpcJCUjpdQ6kgTZAoLXHuF5YwgIUbJv1RdG6RxySGJc
+	 8LncwyTaXYnIw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93CDA3924456;
+	Mon, 28 Sep 2026 15:40:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,5 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] Bluetooth: Serialize TX scheduling with teardown
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179061002143.4169639.3931590453704871029.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Sep 2026 15:40:21 +0000
+References: <cover.1790407061.git.nicoyip.dev@gmail.com>
+In-Reply-To: <cover.1790407061.git.nicoyip.dev@gmail.com>
+To: Chengfeng Ye <nicoyip.dev@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, padovan@profusion.mobi,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Gentle ping. Mikhail has reviewed it.
+Hello:
+
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Sun, 27 Sep 2026 01:04:01 +0800 you wrote:
+> The TX scheduler drops its RCU read lock before using the selected channel
+> or connection. Teardown on the separate request workqueue can then free
+> that object while transmission is still using it.
+> 
+> This series fixes two distinct lifetime bugs using the existing device
+> mutex:
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] Bluetooth: hci_core: Serialize ACL scheduling with channel deletion
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f4845ab191a4
+  - [net,2/2] Bluetooth: hci_core: Serialize SCO and ISO scheduling with teardown
+    https://git.kernel.org/bluetooth/bluetooth-next/c/848a7a91c7f0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
