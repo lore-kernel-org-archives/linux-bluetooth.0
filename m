@@ -1,69 +1,69 @@
-Received: from mail-vs2-f38.google.com (mail-vs2-f38.google.com [74.125.227.38])
+Received: from mail-vs2-f15.google.com (mail-vs2-f15.google.com [74.125.227.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06664F7CD8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFDB4DE728
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790625669; cv=none; b=ejfx6CbfqplBa3/o2nU/+KPQWtcjJaO7dWoD1bwUKXAgHmMIyzN8WMhJ9RmY7ezmLi3WpaQPuESQF+AR8oY2iJfWePS1VzdUUOjf/CgiOjvuHvpP13BD0qLnse5HgOeRaiKchspw/6vTJ6CTwaVkfbZUxMdXIoPLszDTOypvL/0=
+	t=1790625671; cv=none; b=Zk5TMJdvrqreJRkN5DMeZ152tPETvNe3GigqCFm7wVqyo/5jWOxvsp3cC4W+SsnaPNsG9k1mP9hYeDcxYxU80JxQC6s5gELfk5GdiWrJpGWjUycnbbBNYw+YOa4Hyei8Bjtn4V8J7k63d29oJZMrto+OrxQxSgRRHt6rVr7K/7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790625669; c=relaxed/simple;
-	bh=MCtXU6jORncu6C1mn/3nWvg3pyh0Yy/IZYXWD7L4gcY=;
+	s=arc-20240116; t=1790625671; c=relaxed/simple;
+	bh=WdDlv7DtXGfYiWwuDvRrF+i2+2dkTDDZtICXFcObAsA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E1hjoXjDKfECdLS5edv76ohRXXuAjGnBj/52rf483MN2Ahxf2xEGs8dt1HC8IaAnmRFsG4tqff8GvXqTTHuKf7DnPO+fOqexXNNU6ZUnEiqGp3vSxume6hnOv7XDx7p72k9x6bOgmWU1A6B2FS5AMM5lNM+sqaocSc9c9ZVZ920=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c4FJK3tD; arc=none smtp.client-ip=74.125.227.38
+	 MIME-Version; b=PEFcJFwWuLAdyKOiWmYtpSuV+Vi5m8P6RkyrKaf844kcimhb7I2koBhLSckAI9TcmG1TtAEo1AIxZ1P7DKNmhU4h9PQPV0xrEkb4XF9Ld1R5F6nKpWHzXuUY2HMDA4A2svzg8KZ/mq/qHpTHMfiutBOAF/nYWHaxodasPd/izXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPy2VKrh; arc=none smtp.client-ip=74.125.227.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4FJK3tD"
-Received: by mail-vs2-f38.google.com with SMTP id 71dfb90a1353d-5cda0838062so1717387e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPy2VKrh"
+Received: by mail-vs2-f15.google.com with SMTP id 71dfb90a1353d-5c981b0d59cso2432484e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790625667; x=1791230467; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790625668; x=1791230468; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
-        b=c4FJK3tDXEskwwbkJkOEirqcKj3GRIY8YSYlQROLHM/PkEmCd+65Z06Ctu1M8kqm+4
-         2dydECHtRVvuExQDs/zBA0bT9mIJsUSBPL2ubnfityBIyFRLPoji2dDjOHXP4S+yqPNI
-         dGWWXJKkrIoR0AQY+m4bmUSHNKWSd1VTkQWbP0HiQDMr1UsALgCW1TQEIr3ngfVvlETp
-         PpYIZn5mj4KSwXxUbtOK7I847GxOD2Tr55QZNX2WYv3dco1ArMHz06zRdb0okKSmA0ci
-         hUdnClNtFPzYgjs0uVwTAVWpnntO+79s//qMLrH9faYUZEXjnzSpEykk44M06V0HXtWp
-         pseQ==
+        bh=f/HCjL1eVZMUyMHJv9Y5tyeQ0OaBYhV2GuJ1H/y6S1E=;
+        b=RPy2VKrhe3vFn9blDEu+P/0yAEm9FTQk3JvGT6R439XiQ8BUyuqNwpgqafIug6znMh
+         OTcW1vdHhCXB1FIa9583TBpgc2VYzd1+0MmbCOeXXxEmNwWCzuYKHFIxsavfFHojFlTj
+         5abic4kS6Uu0qfBwNSDf3lIamjmp3CoGEhVTINvNY6Brh3JxaWGi716c/5A5cWs5/477
+         AxXi2UqAZ/J38jS7A6sknfkuGQNJpO7WlrAhAyEKmSajc4Xd5jTu1xv0HQPpWtceS5nb
+         wZVXMc9U08umLElPZyb5vixXa2DIB6Wp4/lDzVpHIFoEVR8atBSjcNNqNAdlXui61pVk
+         QYCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790625667; x=1791230467;
+        d=1e100.net; s=20260707; t=1790625668; x=1791230468;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
-        b=1nEmicsHkAeTcu2X5bqW4VaF4LtPjX9C2PAN8h2kCCfYVnHBtirL2RmiWy7ZQDVAM/
-         gnHt3MmjGswtx2Fqh6l4wWbTgx9bRC/Y9gwAtTtkPHqONAioBOMo0VicO2FLjqLpWOEu
-         htijBLwJVZW09ASu7ouCg8JuFkXGoiDyJYXEVNhTedMzMXDvhYNb+BVsChGjgT6iyYtL
-         thJnM5qkrmEUGlveNXMXkk/Tm+KhZV5dKo950McOFfTB6nLCnt/x+oI74Xy1VPoE9scK
-         pCM7SEzMOMAk+3OQdqfSgXHni7X5m4b2kIfqikwQikqUyGEziMH/Q97U2Fgm1Itobg5p
-         txyQ==
-X-Gm-Message-State: AFq9FYLSQovaQtiE7yH3+8hun50uFo4GAJG5S01fsF2HzhwkGFoodlyV
-	QiGK7hbLKvG4Xw4Ht9Kjo9HGCSXF7Ndq2ZdInuaXnAdyfGSLMd8HFG05zG6qdtbJR4g=
-X-Gm-Gg: AYBFou3Hwnxi9HgYY0IIAFkFyh+u9r1WZHOKjNAKhrPq3a77ZqAXZWaAoj/NMovY5Cy
-	FBgd1LctU6F2mXbFt9A8uZOFbAqPvuYl269DLHZI6HymMFGhpmFOXNsDqqeG7Bk3TkQkt5CvPME
-	m5GQH5Yt/jg564ZyU86LbhMSTQbzpZrZ+QsmzRYaNoKpBpUSByLbxa3Yvc6E4Cbe0hpVC+gGys+
-	iFCpb3k4IAHiefJIKeY0jscUS2rmWVTEmyO503UPpeKQ2FwK4/CKAGFxnGfbWeb5lI4KzifSzQK
-	m2PzHBhNw8FNWFU9iSXEibQ8Ik53WrjgqYjkGB91i6Au1PcS7UEEyRfyBUfo5K++6WXapQi/QzE
-	rNwM4G/GtSHGwxglOkH7AbgD1SRW4kvFyKPqI/SjniMXeJ/g5Av5YsnuDpPWvLrPBH409xpx3U8
-	7doGuR6jrdqGPFOLjIc8krP1rrNYNVUjMiJWKgNRDShwDHADw4/FQwJ3YjJhZ78CKlHJbHgDgBS
-	2wX7pp0Gk/pBVt5vSxolKf/ITAX7q/ibvZ5AmrRm3tl51sUZYDnFIn9ItcPxSxa9p+KJEpzdJw=
-X-Received: by 2002:a05:6122:f8c:b0:5c7:9445:f468 with SMTP id 71dfb90a1353d-5cb09707140mr6200162e0c.6.1790625666636;
-        Mon, 28 Sep 2026 13:01:06 -0700 (PDT)
+        bh=f/HCjL1eVZMUyMHJv9Y5tyeQ0OaBYhV2GuJ1H/y6S1E=;
+        b=TRsh6QYDI2sktyMgt877HKE4264KOmHjd0jUPPGC/kKfJDTPwhch5gFJ0mQgI0eFdh
+         D4zzWyKDB9BncVHCXkMw15Nvat5nkVcePUgyutPdo3/dZQ61a+sUaQVcoI9Ke62mQb+c
+         3MFbseQSWfni73Fl0AniSoywAhsDy32uAYKWtF3W9mGqZsDagUfMISq9zLDSFHPDK0NO
+         Z+CeDXm8ZmT9jdJzYBIOcgXROVsdshaO18BsRP4N4oihBO/mwExBaV/oCpoaA1Qdk39A
+         iHNNPjbasvwpNYrxuCoQUbnX+NzeKdj2tZCQ2I2iUR3LYKcCWuS5I53/qCRvgU2WNAfm
+         A/uA==
+X-Gm-Message-State: AFq9FYKsF97+5r0Bghecd9GwTicEtkab8vXkwTde7P72cbq3BFlUCsUd
+	BGTfiVxeeN90r314rSjqXZmoL7oqV7yA/13smCYtYKPZ84IyWiWbUkCEBHfwcRsfBFQ=
+X-Gm-Gg: AYBFou2uGKvq0IVTUNq6I0H28UMa6VimQsGhVnjkX+Cs9d65AefE91aL55dYykNpgDD
+	WngcllXevWDgxP0Oa9VopA3cXTIRduHL9HdafReKj+UWn1ddH2k0/FO4FH3TllB4x6Mzri+sy9F
+	bl4p2W8OoGs0YgK4RA69stuqTJm9mHlgsKCOr+FVOTiSOqfuwoGbRTm5HWsCnkXfyNvfQwMISXw
+	/ijaoX4227fMjrfue8tJ2LZlQgeiT5kW4VvC7Pcq5CN0kXdZxZVnHEIZMrgq+UzDI1x6V3rRlft
+	dAUVwgjo7cgB+UiftnMAHZ79tOTRJrqUjeN4O7SLhAowQMmDiORMs9kFX8TApoI8xWWFOdALR4V
+	KSmD2tp41P9QQzxUC1Ysy0EYj+9edrZHRjcz3OvEVvcREnvTY6y77/SyusYRa/dh01GND9hqdVF
+	LEWE/FTqYcu2mmhCxSKv2Qwm8lUaL1E9M5VEY61s7NPByBbasqiJ33To5QnAC9vmJmkDeq1bv4u
+	3QIXyC5QGTAEzBVE17NjYDbwEIKbTCjY1JN6VNKW8mpkHm2oZiEgnuz+uWb41x6
+X-Received: by 2002:a05:6122:21a1:b0:5c9:c60e:3a3d with SMTP id 71dfb90a1353d-5cb0bf50ba8mr6375742e0c.21.1790625668202;
+        Mon, 28 Sep 2026 13:01:08 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.04
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 13:01:05 -0700 (PDT)
+        Mon, 28 Sep 2026 13:01:07 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 12/23] shared/tester: Allow expecting a PDU with no response
-Date: Mon, 28 Sep 2026 16:00:18 -0400
-Message-ID: <20260928200031.1209311-13-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 13/23] shared/gatt-client: Fix calling idle callbacks again while notifying
+Date: Mon, 28 Sep 2026 16:00:19 -0400
+Message-ID: <20260928200031.1209311-14-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200031.1209311-1-luiz.dentz@gmail.com>
 References: <20260928200031.1209311-1-luiz.dentz@gmail.com>
@@ -77,48 +77,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-IOV_NULL following an expected PDU used to send an empty PDU, unless
-followed by another IOV_NULL chaining the PDUs to send, so it was not
-possible to expect a PDU with no response, e.g. a Write Command,
-followed by another expected PDU.
+The idle callbacks are called while being removed from the queue, so if
+one of them makes the client idle again, e.g. if a request it sends
+fails right away, they are called again while the queue is being
+iterated, corrupting it:
 
-Wait for the next PDU instead of sending an empty one in that case.
+ Invalid read of size 8
+    at queue_remove_if (queue.c:285)
+    by queue_remove_all (queue.c:321)
+    by notify_client_idle (gatt-client.c:187)
+    ...
+  Address is 8 bytes inside a block of size 16 free'd
+    at free
+    by queue_remove_if (queue.c:292)
+    by queue_remove_all (queue.c:321)
+    by notify_client_idle (gatt-client.c:187)
+    by request_unref (gatt-client.c:206)
+    by bt_gatt_client_read_long_value (gatt-client.c:3140)
+
+Detach the callbacks from the client before calling them.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- src/shared/tester.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/shared/gatt-client.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index e99cc452cd07..eb2e923fd790 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -948,6 +948,25 @@ static bool test_io_send(struct io *io, void *user_data)
- 	if (!iov)
- 		return false;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b3bc62220e16..5135283e4526 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -180,11 +180,21 @@ bt_gatt_client_ref_safe(struct bt_gatt_client *client)
  
-+	/* IOV_NULL following an expected PDU means there is no response to
-+	 * it, e.g. a Write Command: wait for the next PDU instead, unless
-+	 * followed by another IOV_NULL chaining the PDUs to send.
+ static void notify_client_idle(struct bt_gatt_client *client)
+ {
++	struct queue *idle_cbs;
++
+ 	client = bt_gatt_client_ref_safe(client);
+ 	if (!client)
+ 		return;
+ 
+-	queue_remove_all(client->idle_cbs, idle_notify, NULL, idle_destroy);
++	/* Detach the callbacks before calling them, as a callback may make
++	 * the client idle again, e.g. if a request it sends fails right away,
++	 * which would otherwise call them again while being removed.
 +	 */
-+	if (!iov->iov_base) {
-+		/* Nothing left to send or to expect */
-+		if (!test->iovcnt) {
-+			if (test->io_complete_func)
-+				test->io_complete_func(test->test_data);
-+			return false;
-+		}
++	idle_cbs = client->idle_cbs;
++	client->idle_cbs = queue_new();
 +
-+		if (test->iov->iov_base)
-+			return false;
-+
-+		test_get_iov(test);
-+		return test_io_send(io, user_data);
-+	}
-+
- 	len = io_send(io, iov, 1);
++	queue_remove_all(idle_cbs, idle_notify, NULL, idle_destroy);
++	queue_destroy(idle_cbs, NULL);
  
- 	tester_monitor('<', 0x0004, 0x0000, iov->iov_base, len);
+ 	bt_gatt_client_unref(client);
+ }
 -- 
 2.55.0
 
