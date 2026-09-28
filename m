@@ -1,69 +1,69 @@
-Received: from mail-vs2-f39.google.com (mail-vs2-f39.google.com [74.125.227.39])
+Received: from mail-vs2-f38.google.com (mail-vs2-f38.google.com [74.125.227.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C878E4F68C2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06664F7CD8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 20:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790625667; cv=none; b=n4koYK9lm46QAbQdIfB7mL3r1zdjG2nBt5Wl2gpBrFD9I/WeDdfRXOcLve7HynG+/FUg+1yP8PHGPwmbZtDt34HcwLqkI/BN+1kMlTWr95ONuwLObSblLDp7J9lDk2LTxKiHKDWCAK5dtfOE7QZW0BQ5kLfcXQtbQ5W2Nkx1TeI=
+	t=1790625669; cv=none; b=ejfx6CbfqplBa3/o2nU/+KPQWtcjJaO7dWoD1bwUKXAgHmMIyzN8WMhJ9RmY7ezmLi3WpaQPuESQF+AR8oY2iJfWePS1VzdUUOjf/CgiOjvuHvpP13BD0qLnse5HgOeRaiKchspw/6vTJ6CTwaVkfbZUxMdXIoPLszDTOypvL/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790625667; c=relaxed/simple;
-	bh=ncqkUYW50ac0++iN6nTDr/JlZhpfLWfwrOoC6057Ed0=;
+	s=arc-20240116; t=1790625669; c=relaxed/simple;
+	bh=MCtXU6jORncu6C1mn/3nWvg3pyh0Yy/IZYXWD7L4gcY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n3FIz884rM+ykjqmPoCodyYukWg61w+cMnYGH90Swb80KWuasU3HcXOC2W7lBZCa75w0+mVEH1p51lChKoqb44cLj2EPB9g/IMW/CvH6c8wt6B7ZFIzf4o/1Mrivaxgq406lVR+gij9Sm1q7I9RsHQzA6987HsJdEWZz1LRVduY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=op9NyMj+; arc=none smtp.client-ip=74.125.227.39
+	 MIME-Version; b=E1hjoXjDKfECdLS5edv76ohRXXuAjGnBj/52rf483MN2Ahxf2xEGs8dt1HC8IaAnmRFsG4tqff8GvXqTTHuKf7DnPO+fOqexXNNU6ZUnEiqGp3vSxume6hnOv7XDx7p72k9x6bOgmWU1A6B2FS5AMM5lNM+sqaocSc9c9ZVZ920=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c4FJK3tD; arc=none smtp.client-ip=74.125.227.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="op9NyMj+"
-Received: by mail-vs2-f39.google.com with SMTP id 71dfb90a1353d-5ccb36d5a57so1800546e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4FJK3tD"
+Received: by mail-vs2-f38.google.com with SMTP id 71dfb90a1353d-5cda0838062so1717387e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 13:01:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790625665; x=1791230465; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790625667; x=1791230467; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=gFs3sSjC3QU/qGM/StIg9u+W7HIgI8p0VPqO4E/7wSA=;
-        b=op9NyMj+doch9n6/2CHt1/PJ13ay9nBxl8yvoq6pHUGIhs1L02E3R5W9WswxMKFuxR
-         W1x1ZpEdCvvEKbCtaGUbD/HEO8hjNBMD/Ok3yz0/xS5lkA/fBBS3lR+uhvZ+ohOsBX2a
-         bGaTlpaPyujaLzdaAs/2epmB0vkaDgrDTlvuURpHjhXpkRrjc6uxNHvtb9BKRdpMyuTg
-         IqCf+GiHzDJhSghQjdzSl5fXuH9Xwkau9kaNRGLGSLeGURyWIXdVCMvK5MADpyiiEvjn
-         Ops5m5Z9Xc95X3KHve1r+nmV8Cplaho4ctLASGDJj38zehzX2dLcL+Oi+GvF3z0bz8NI
-         f/dA==
+        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
+        b=c4FJK3tDXEskwwbkJkOEirqcKj3GRIY8YSYlQROLHM/PkEmCd+65Z06Ctu1M8kqm+4
+         2dydECHtRVvuExQDs/zBA0bT9mIJsUSBPL2ubnfityBIyFRLPoji2dDjOHXP4S+yqPNI
+         dGWWXJKkrIoR0AQY+m4bmUSHNKWSd1VTkQWbP0HiQDMr1UsALgCW1TQEIr3ngfVvlETp
+         PpYIZn5mj4KSwXxUbtOK7I847GxOD2Tr55QZNX2WYv3dco1ArMHz06zRdb0okKSmA0ci
+         hUdnClNtFPzYgjs0uVwTAVWpnntO+79s//qMLrH9faYUZEXjnzSpEykk44M06V0HXtWp
+         pseQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790625665; x=1791230465;
+        d=1e100.net; s=20260707; t=1790625667; x=1791230467;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=gFs3sSjC3QU/qGM/StIg9u+W7HIgI8p0VPqO4E/7wSA=;
-        b=TYGi44Dnv/ntPSNzltPESzakQjL7BnKyWHwABAwaslvrqGqQb6Tn6TN5a0jdUQiwup
-         +ACVWhAlbmQr9+EH17l4B8CP0RPRSJucm9g5XUqIoGSzHKVs9X8TD/l3lg/rNJQquUb/
-         Fag9RmzN3z260GmZdUSTHtJ+3P7mVQerw6/p5fLXWe9tUAr4c6qVD8QlPpdFKrgnj4Ko
-         CN/8DSxIkwwpv78DEarchGJka+/kYBdSb94qJwQ5hnHM71qngPybyGQ1/qi7YR0N/7mO
-         TkhXBogZnTkQAMXG2+7/UHUhavAa9vv0aVXMGto5460K4ktjg+ziJI4lg7BPnIL+tUPw
-         C/XA==
-X-Gm-Message-State: AFq9FYKXlqjvxECHKH9g+0IIrHZ79TqXNcAbO6FtHhkVFtlgV1KviAFK
-	pZjwjK1N1dIKXiMs2X153SSVYDozkW4OIuF5HiumykBV/M+DLDkga2Y5fld77QBpLgs=
-X-Gm-Gg: AYBFou3TJX0Ej1rKqiynSH3/YsLtYxWe1EN2dKZ6XLyIaueERO1p/5dYAIWuEh6Lj1F
-	UEP5Yp9d3uLCXzaJAFnrtw6YgRzNL+v4cb2+lRzd5HdCshVUv8yy+Gj4dN4umQXrLUfy5rOOwJC
-	TOxwFn5jwB4DSpeGuD0ydzp4zHQHEJs+UniTFFuxFCAzuinLcOU7E0xqe8ldhx4HsbLrviUmxnU
-	qvugi/0U9gjSw5CeCI7vVWgfPViXHHwLeY64WBv/txMly+a6uHpnjm8bwdEGXLZwew4FU3CdtOZ
-	g/E8v9L2UJIt7qFqMsXcEBWs4KROqQo5owCb3ux8fCtMjH88wepcv4JlmrLOtRUxi9qkeFWGlck
-	1Y4Uf7ABbOOlEp0tuShMPvO7GsrwKz+HnIhvF7nLCqSxPoeA1qhfyvL/rPgttwqG4uC/Mz4FoLA
-	RDw4OzsQTqpxd14wDui+xB9Kd6d/vXmFF5iHkef4G3vzc6L8P0tJVR2FnKDGbRyE5k48yimI9UZ
-	s3k+jkR04WSFttDd5tD3H3356Y6V56RX69+Qa2xSXEx8RtfdmZP4FzjY0xVsyVc
-X-Received: by 2002:a05:6122:2895:b0:5c9:8bbb:3f13 with SMTP id 71dfb90a1353d-5cb08b3d4d9mr6057276e0c.7.1790625664414;
-        Mon, 28 Sep 2026 13:01:04 -0700 (PDT)
+        bh=Wmpled/rN0zNoXcxBvURKWw3It3zyjAw18vJYhST+ZY=;
+        b=1nEmicsHkAeTcu2X5bqW4VaF4LtPjX9C2PAN8h2kCCfYVnHBtirL2RmiWy7ZQDVAM/
+         gnHt3MmjGswtx2Fqh6l4wWbTgx9bRC/Y9gwAtTtkPHqONAioBOMo0VicO2FLjqLpWOEu
+         htijBLwJVZW09ASu7ouCg8JuFkXGoiDyJYXEVNhTedMzMXDvhYNb+BVsChGjgT6iyYtL
+         thJnM5qkrmEUGlveNXMXkk/Tm+KhZV5dKo950McOFfTB6nLCnt/x+oI74Xy1VPoE9scK
+         pCM7SEzMOMAk+3OQdqfSgXHni7X5m4b2kIfqikwQikqUyGEziMH/Q97U2Fgm1Itobg5p
+         txyQ==
+X-Gm-Message-State: AFq9FYLSQovaQtiE7yH3+8hun50uFo4GAJG5S01fsF2HzhwkGFoodlyV
+	QiGK7hbLKvG4Xw4Ht9Kjo9HGCSXF7Ndq2ZdInuaXnAdyfGSLMd8HFG05zG6qdtbJR4g=
+X-Gm-Gg: AYBFou3Hwnxi9HgYY0IIAFkFyh+u9r1WZHOKjNAKhrPq3a77ZqAXZWaAoj/NMovY5Cy
+	FBgd1LctU6F2mXbFt9A8uZOFbAqPvuYl269DLHZI6HymMFGhpmFOXNsDqqeG7Bk3TkQkt5CvPME
+	m5GQH5Yt/jg564ZyU86LbhMSTQbzpZrZ+QsmzRYaNoKpBpUSByLbxa3Yvc6E4Cbe0hpVC+gGys+
+	iFCpb3k4IAHiefJIKeY0jscUS2rmWVTEmyO503UPpeKQ2FwK4/CKAGFxnGfbWeb5lI4KzifSzQK
+	m2PzHBhNw8FNWFU9iSXEibQ8Ik53WrjgqYjkGB91i6Au1PcS7UEEyRfyBUfo5K++6WXapQi/QzE
+	rNwM4G/GtSHGwxglOkH7AbgD1SRW4kvFyKPqI/SjniMXeJ/g5Av5YsnuDpPWvLrPBH409xpx3U8
+	7doGuR6jrdqGPFOLjIc8krP1rrNYNVUjMiJWKgNRDShwDHADw4/FQwJ3YjJhZ78CKlHJbHgDgBS
+	2wX7pp0Gk/pBVt5vSxolKf/ITAX7q/ibvZ5AmrRm3tl51sUZYDnFIn9ItcPxSxa9p+KJEpzdJw=
+X-Received: by 2002:a05:6122:f8c:b0:5c7:9445:f468 with SMTP id 71dfb90a1353d-5cb09707140mr6200162e0c.6.1790625666636;
+        Mon, 28 Sep 2026 13:01:06 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.03
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5d1d23f8dc2sm749638e0c.6.2026.09.28.13.01.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 13:01:03 -0700 (PDT)
+        Mon, 28 Sep 2026 13:01:05 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 11/23] shared/uhid: Keep reading when an event is not available
-Date: Mon, 28 Sep 2026 16:00:17 -0400
-Message-ID: <20260928200031.1209311-12-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 12/23] shared/tester: Allow expecting a PDU with no response
+Date: Mon, 28 Sep 2026 16:00:18 -0400
+Message-ID: <20260928200031.1209311-13-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200031.1209311-1-luiz.dentz@gmail.com>
 References: <20260928200031.1209311-1-luiz.dentz@gmail.com>
@@ -77,32 +77,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When the fd is non-blocking an event may have been consumed by another
-reader of the same fd, e.g. multiple instances of HID over GATT sharing
-the fd of the uHID device in unit tests, so keep reading on EAGAIN
-instead of stopping.
+IOV_NULL following an expected PDU used to send an empty PDU, unless
+followed by another IOV_NULL chaining the PDUs to send, so it was not
+possible to expect a PDU with no response, e.g. a Write Command,
+followed by another expected PDU.
+
+Wait for the next PDU instead of sending an empty one in that case.
 
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- src/shared/uhid.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/shared/tester.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/src/shared/uhid.c b/src/shared/uhid.c
-index 36a16c331e83..20c55f63b82a 100644
---- a/src/shared/uhid.c
-+++ b/src/shared/uhid.c
-@@ -169,7 +169,10 @@ static bool uhid_read_handler(struct io *io, void *user_data)
- 
- 	len = read(fd, &ev, sizeof(ev));
- 	if (len < 0)
--		return false;
-+		/* Keep reading if the event was consumed by another reader of
-+		 * a non-blocking fd.
-+		 */
-+		return errno == EAGAIN || errno == EINTR;
- 
- 	if ((size_t) len < sizeof(ev.type))
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index e99cc452cd07..eb2e923fd790 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -948,6 +948,25 @@ static bool test_io_send(struct io *io, void *user_data)
+ 	if (!iov)
  		return false;
+ 
++	/* IOV_NULL following an expected PDU means there is no response to
++	 * it, e.g. a Write Command: wait for the next PDU instead, unless
++	 * followed by another IOV_NULL chaining the PDUs to send.
++	 */
++	if (!iov->iov_base) {
++		/* Nothing left to send or to expect */
++		if (!test->iovcnt) {
++			if (test->io_complete_func)
++				test->io_complete_func(test->test_data);
++			return false;
++		}
++
++		if (test->iov->iov_base)
++			return false;
++
++		test_get_iov(test);
++		return test_io_send(io, user_data);
++	}
++
+ 	len = io_send(io, iov, 1);
+ 
+ 	tester_monitor('<', 0x0004, 0x0000, iov->iov_base, len);
 -- 
 2.55.0
 
