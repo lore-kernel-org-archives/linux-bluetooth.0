@@ -1,123 +1,153 @@
-Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
+Received: from mail-oo2-f38.google.com (mail-oo2-f38.google.com [74.125.231.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADF447043E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 06:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790665149; cv=none; b=OEMGB1e0FiUpqzlZKU8mvjAq0IeWQ5cJ1hAEowAGPKo2nNjX5bhPpW9DoUsy6uDTzUAvIbEw3cSe5+u6R9b7QEdgLA86fjpfZoiCThiF8wG1difipGnOJaEoe482woWUk9tqWqwjJPAmEIUHMrBete2eU6nUVaRdeYldVfrwtDU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790665149; c=relaxed/simple;
-	bh=BXA8VF8ZkVXD+yceC+8y8pm7YzhoyOJ5LrwevgDrbuc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=P+9sVzMlZKxDNeqnuJvpdve+vRI+SXWu21F8WZdAsacgHLoy64mCR252hxLLjw+0BfeYweDTOYoUMSaFggfpxJfHDOLlYPNOd6+cgZ/MDoL6O45eDQdBtWavsa8F1z2b8CtN/lKwTWUkB2R+ALkNQv56aTXpT8KsQu6+qgJ7z20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7ITf98M; arc=none smtp.client-ip=74.125.229.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A883A1683
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 07:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790666763; cv=pass; b=s43l7nLyS0UJanOoBtwrTlWI8ZoAji0igcG2x3JAmvFiHpdkPoH9m/4n3hPctMViRqHqRgn1aAmKMA4QbrwLmwj+zNItai7FHI6+s/vivTcagvD6S9B7G0nhVNAwVaRTVhnOh4S7I8lfM3IdcRvE6zxAvIpuF9RYTOssOuICJCU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790666763; c=relaxed/simple;
+	bh=QP7qZgESzSMLgR7Y2qh+WpPtujTLFVV94zFRn/3wLJE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YKh+esStBZziooXY8mOX2lNxTa4hICGTVWtoeWuaaO/2ngUgxinzFbNsvqiSXoGwB3ueBXz3PrynYjmGLYNKtdQXulg2o/pbkwQYCKux1QclbvilbG4FaA14i5FNr8JhIJbJG+3j2tzdOL8XnZtusSt3nyARYW7mqGtb+3Q1vBk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brmjbkJJ; arc=pass smtp.client-ip=74.125.231.166
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7ITf98M"
-Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-341d5303884so2697469eec.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 23:59:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brmjbkJJ"
+Received: by mail-oo2-f38.google.com with SMTP id 46e09a7af769-81be5042c56so1634030a34.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 00:26:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790666761; cv=none;
+        d=google.com; s=arc-20260327;
+        b=AL285ThoEWZlJWVzu2QLCAA+Nwt0wBqee4V+KeyIdRM1Swp5vnJcVQmI6d8hKqo0LN
+         r/LPBLlJYgn1ranU4VD4Q2isBRBHCwHDkBGyhtdA6VaeNE3/Gaupp+YuvllrPt+t/OSz
+         YpS7t76tpmbdaJuH4tLAQAbGrKwQh0dWGN+y+BgL169luiejWi+/4e6kmHVswhCPvXvs
+         emP2Zr8FSljkHFvQNu/Oa+zLB7RF5epQqmODJNPc65kHpAG7ZWRBen0ynmmwQRuVbk/v
+         /1UDUnwhv5Fen7/9Wf1cm/Mi+4kx2Q2ANGptXmrSODcdeWTJnq4hgaUnhEXo9LDxnaSt
+         ioJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=MBklxLmUWGp5YMrkYX4HVlElUeVxv+Xuq5ehv5XgjC0=;
+        fh=RziVRvAeUZy61XJ1jsuwdXcbu5EVwG1flsHtXDPLdsc=;
+        b=Xbf+aqYjHUu9TwBmLbOYZAvKghrib0SsY+LdWi80N6C+/V22xLARWetnqlVgZD3T3Y
+         LB5exlK5gu37Okq7Qs1BnnCHUSxgSLgiVyfhLizXo4q36hIRy73UAtPxZy+H1ex/lbVw
+         8mApeorthY6lPxgJpqxVtV0RI30ioUFJ+KTYD0A1pW9MMW3reKtkadsXkpYmxdQLDygj
+         VSpJA/RiS6TGKu6JeTB0AxYCAmEHceneDZlUmowe/RNTs4ks+K/TvTnm6oRdsKRatiRL
+         6qRMZIFKWH5yy93vtVj6islk5jXuhnPCAe2Hbh9XBOGHVTk566B5GkI7ggRy4ZY+Uxn8
+         4oew==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790665148; x=1791269948; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=GPvuKApJB9KwaDNkCcSbrQPEOwJD/X5v7PYMkvjRbjU=;
-        b=k7ITf98MnJpEXQQbM0d06LCMGRkcHFErU9VeWjYn5vPN40sIxs5cDgSmKq7jcO7Uxh
-         h8/3uZXaCPwWNlczMuSklvVQ7+JjCa4WGjy+VsovwcCzJoctwRF1VlxMKX5d3EXH9UIl
-         PFPPzZEbjfps7mxgz7Qu6KMrSrcQs8uWyHTVYr6kx6nYAnwpla0kg4TPq6VXoaZDthsh
-         eV1e5APiY+MwhDqtDw8dwyPfCTHXlSc1NGo/cUkNHjQKKGaj5VePjZ5yt9Drvam7rmmH
-         w3QR7zwIF23EWnUwDqTANb8fY9Pd1qLoQ59mqC0KDvaEOJ4BT134SMXHb2P5Tz7JvTGl
-         HFbg==
+        d=gmail.com; s=20251104; t=1790666761; x=1791271561; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=MBklxLmUWGp5YMrkYX4HVlElUeVxv+Xuq5ehv5XgjC0=;
+        b=brmjbkJJ+NE/GonX6oNk69B4auQ4xZFqSdw1kuEABzG6Ni2QHGqsmFqelhnBv5iTcf
+         6KJ/DRkW+m3Ke822uP7HdZKmEEdCe0qcn5E8O3/AMIhRM4qQV9MYkD4zooQUKGNOw1Ax
+         d7t/mLMYmReXO3X4H9VePGR0Wi1cP+c4KlFyvwhlY3/msfPOT9jB1bX/+NDIjBWRdRPl
+         RDpZxc//WnyHRlek7aPraK2W5w4ix6shSp2DKKruYTPi84v6SNfys5nvKsQrVC8AYWc8
+         Roso+kK5uZLlJ1Af4rkSVKtEwuHEKgj8v7hFRFjDP5uFgEPB81Nz2FChuv8uegUvx/kx
+         sOQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790665148; x=1791269948;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=GPvuKApJB9KwaDNkCcSbrQPEOwJD/X5v7PYMkvjRbjU=;
-        b=R5sQaKQbpGd3BCatvUVO+OFTDfrzoes3TBbFarr+mNgYpkJsxtuqo/ORleqYBP+DA3
-         zpx9/mDg4NfWCSrI/JEDncDFqcj98lPRtmlqyDExEUySOPAo+sL6KQ/CwR+evndXB1rB
-         gYbDlrWNpJsRqhy0LYZzoG+yyhOwgT9suchiVrBo9euytBZKR6FGJtjGEy7DbaD++LVh
-         wHkXE3ZvRp86qE60voqirMS2qE9ZCNuJx1N1vhpMEzR4yfGXZ1qLpVFfr9U3sszT98To
-         XgMn/kkc3fyTiCnlE5qq+xGiCRwccau+GB5PhbURKqZItw9zVFWOg/Lp9Ax5qZvaLJf8
-         Hacw==
-X-Gm-Message-State: AFq9FYKD51PQrAT5A+YO7iGAp6dhOM87aSglcRAOn2jwxnPzE9BNbAlS
-	V0Ovx8AcwrE3dfLOOupLaG05cl05j8I9/dxmSVZReBTOhWmZd2qGcfHYdNiOdzFjb1Y=
-X-Gm-Gg: AYBFou1Pz1u1oVVBnPSgyJHqke7kHV8kDenBv/2xY893x0+ar48a60Af7YMtSC1DXC6
-	TNhaez/u5EFZNsS//u0B6BNzfnFDUjwYcBzqWBXtlUUTnOZsHy26dfKwFBJRWRK7J8qqA+nQrXA
-	Ix9tAhaQt1uXRyBhNZAwMLRklPck5pWeYXZABbpIUcapQ3Vb3/HMqx037U4xpjEgJUHOzgfvyk0
-	3vCElNRIPOjuQyCjDGMJQ4v0LAArTNZ0ZUPnt7r/nnKbFypVoNndnL70UTCKMucIu+QeMU1cqiV
-	R6K+zhpQYLonLgU1C55twc7jtJ8yhzTXkMSuDq61eq5mC++tEynMuha1RoFn4Bt/tn2iOWvicL5
-	AZZalYZu/jgezyp0/dWpBcdznvaLdPmCAv3rd04ea8QN9r93C+y7uD3ZYTpvHLx8zwzyVm94DRv
-	UDQZU0fic2p1X+B65uOF0VQ6f0536a92OsSgaosWY8+m9r/bjMaQl0bwCwdSzVb3+VqtEQCBdnt
-	35f
-X-Received: by 2002:a05:693c:8014:b0:343:f791:1d84 with SMTP id 5a478bee46e88-343f7912e95mr8870944eec.37.1790665147490;
-        Mon, 28 Sep 2026 23:59:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.56.114])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-341463ec3ecsm34058798eec.31.2026.09.28.23.59.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 23:59:07 -0700 (PDT)
-Message-ID: <6abb61bb.c21e2895.11c874.9a68@mx.google.com>
-Date: Mon, 28 Sep 2026 23:59:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5511248439726836025=="
+        d=1e100.net; s=20260707; t=1790666761; x=1791271561;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MBklxLmUWGp5YMrkYX4HVlElUeVxv+Xuq5ehv5XgjC0=;
+        b=2Tu+hLTvYHfmcU3UA6EfD7URGoHw8X29r+L5jD5Q8pl/1fJn+yoBE756qdu8S5U9IL
+         CIcZWdePqNgwysauy3o9dIJiakIcIXT39WHSKw7J3q/h7pLeIz5ZksxUzgQB7HdPcDEq
+         B2PJW5/ra0upBAqQUFlP600UGA94ecttCQORRNO8G8e6fxA9e6+Dc8cczu0HCAv4LJJt
+         r6+sJw1h+gvxyztMjSGs8Leum92U9oPWCKTdyjRBgk3MWqywwrJNkR0/TukRHr1G/DKk
+         RNZ6s6Naf+vdpDgm2xjgAjSVEfa+mShOBfi504fWlul5T/bmXT2pEs7qPnlM1nyFVuyz
+         CFgw==
+X-Forwarded-Encrypted: i=1; AKwUvBzHQSweBuDNbdPPfLZwCY2OODx8QolGL6ByREOSyfitms/g93WRvAIZ8AwML758ngd7KTY5UhnkFa4kUKMFe5E=@vger.kernel.org
+X-Gm-Message-State: AFuF++msGk8Vei6A72JNrj3P1PZoOFIqZ7QLNFDzBIBSeXWh72dAFgw6
+	rPxMR5G15aknnTdzO25MnwRkli2gPDmjhsZt/L25GqrBsXhK9vNrqxHfy1oCjvSBAiAWnCAxlsN
+	T0ywfENcifuex5ejO4BbEOTTNiI8O3DdGfHH0B9eBceR+
+X-Gm-Gg: AYBFou2ZYmwccjG0Ec5XM/Tz0QXXbFNCVx3sYoUTgalYoyvjx0ZBcsMl0ByS2xvFHoH
+	Pso4MoyNRC16jyCT1gwNftIh9Ea57ltEbXyZIR7R1k4APtIQIOIoNvy6qfZCDCSJzDd4j8FwyLi
+	4LdxXa+04lDEpDozn5ggM/2LDda3DPgrnslIeYACO3JLz1ilCLjJq9dySIJ/Rk+rRWP3Crme9h3
+	nvstdpX5YD+6B91HUi0V8BRSAZ5QEJuTE9cFq2qT2cvvhjFrmRyLM/mwJRb23lZiTALVs2n+yhy
+	Obdz02EBLPBFPzTihRBnCwbQ+EiMe+Y4tu92EC5oUpq96/2+OVrX2JqYi3atQIwLKZT0IpYZdMe
+	KlGdoLY58oMuuFdhs9J/H+j86mv3eFAt4PSRzaBzTqyo=
+X-Received: by 2002:a05:6830:6a95:b0:7fa:ab72:9df8 with SMTP id
+ 46e09a7af769-81916ef553cmr12515132a34.16.1790666760781; Tue, 29 Sep 2026
+ 00:26:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2] Bluetooth: btintel: load unlocker.sfi to allow unsigned firmware
-In-Reply-To: <20260929021056.1396791-1-kiran.k@intel.com>
-References: <20260929021056.1396791-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <CANypQFabseTuRiyz2pGkc_Qj0moGDnY7KEp1qdTOqkw6gAL3hw@mail.gmail.com>
+ <20260911183811.374433-1-aliamemis@disroot.org>
+In-Reply-To: <20260911183811.374433-1-aliamemis@disroot.org>
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Date: Tue, 29 Sep 2026 12:25:49 +0500
+X-Gm-Features: AclHuK-Of9yKGEJugUCKZw2ooiR4vfhfGUzCSb342ECJlyfoCnnZi-aVCEOTQv8
+Message-ID: <CABXGCsMfJwgYQ6nToU2PkyZeKHZPD4K=ObYtsTx87NvhvM0xBg@mail.gmail.com>
+Subject: Re: [Linux Kernel Bug] possible deadlock in l2cap_chan_connect
+To: =?UTF-8?Q?Ali_Ahmet_Memi=C5=9F?= <aliamemis@disroot.org>
+Cc: Jiaming Zhang <r772577952@gmail.com>, marcel@holtmann.org, luiz.dentz@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kees@kernel.org, kuba@kernel.org, nicoyip.dev@gmail.com, suunj1331@gmail.com, 
+	syzkaller@googlegroups.com, Pauli Virtanen <pav@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============5511248439726836025==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Sep 11, 2026 at 11:38=E2=80=AFPM Ali Ahmet Memi=C5=9F <aliamemis@di=
+sroot.org> wrote:
+>
+> On Sat, Sep 12, 2026 at 12:59:09AM +0800, Jiaming Zhang wrote:
+> > We are actively working on a patch, if the above solution is acceptable=
+,
+> > I would be happy to submit a formal patch for review.
+>
+> This is the same lock inversion syzbot reported as 74071deb, and Mikhail
+> already has a fix for it under review:
+>
+>   https://lore.kernel.org/linux-bluetooth/20260904012028.77590-1-mikhail.=
+v.gavrilov@gmail.com/
+>
+> It uses the same approach you describe, queue the confirmation and let
+> krfcommd handle it under rfcomm_mutex.
 
-This is automated email and please do not reply to this email!
+Hi Jiaming, Ali,
 
-Dear submitter,
+thanks for the report and for putting the reproducer up, and thanks
+Ali for connecting the two threads.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1175689/
+The deferral Jiaming suggests is what v2 of my patch did - that is the
+version Ali linked - but that approach was dropped during review.  Pauli
+pointed out that delaying the confirmation makes it hard to rule out new
+races against DLC setup, and Luiz asked to break the cycle on the connect
+side instead.
 
----Test result---
+v3 does that.  The session socket is created and connected without
+rfcomm_mutex held, and the lock is only taken again to put the new
+session on the list:
 
-Test Summary:
-CheckPatch                    PASS      0.86 seconds
-VerifyFixes                   PASS      0.10 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       FAIL      0.28 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      29.10 seconds
-CheckAllWarning               PASS      33.15 seconds
-CheckSparse                   PASS      35.38 seconds
-BuildKernel32                 PASS      29.08 seconds
-CheckKernelLLVM               PASS      36.56 seconds
-TestRunnerSetup               PASS      715.39 seconds
-IncrementalBuild              PASS      26.55 seconds
+  https://lore.kernel.org/linux-bluetooth/20260912100315.151674-1-mikhail.v=
+.gavrilov@gmail.com/
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: btintel: load unlocker.sfi to allow unsigned firmware
+That removes exactly the edge in your trace, rfcomm_dlc_open() holding
+rfcomm_mutex while l2cap_chan_connect() takes hdev->lock.  syzbot's own
+reproducer no longer triggers with it:
 
-35: B1 Line exceeds max length (82>80): "[  414.150089] Bluetooth: hci0: Firmware timestamp 2026.39 buildtype 3 build 86921"
+  https://lore.kernel.org/all/6ab100d7.71f81b7d.15fa6d.0029.GAE@google.com/
 
+v4 will follow shortly.  It adds a check for the socket being closed while
+it is being connected, which Luiz and the Sashiko review raised on v3.
+I will Cc you and add your report as Reported-by and Closes.
 
-https://github.com/bluez/bluetooth-next/pull/835
+Could you run your C reproducer against v4 once it is out?  A Tested-by
+from your side would be worth a lot, since your trace hits the cycle from
+the connect side, which is the edge the patch removes.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============5511248439726836025==--
+--=20
+Thanks,
+Mikhail
