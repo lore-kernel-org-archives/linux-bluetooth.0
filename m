@@ -1,38 +1,56 @@
-Received: from outbound.st.icloud.com (st-2001i-snip4-2.eps.apple.com [57.103.76.105])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E02837AA64
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 02:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788A425B090
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 05:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790649996; cv=none; b=Fx0/b9vT+XnwyvCaPucuwlpdWGiBp2GaJ4xHkHn/xIwt4f/yyIvgdU0hOs68xeiQzk/KERdfj1Lnl+e9/iiyikL8jgRlMT9FWA0YXX1OJwFdonqsedwnl0aV7pkOlAeiW3x9rMLhYMzXrN6CKqeXjg/sQk3yuIabmJYBjevE1XU=
+	t=1790658193; cv=none; b=CRpycRibCH4YYPQcoAgYwNFaQrZwz5CEESUfpJcb6Crme4F/zie1CmhbMbnXrutOmduyELcMtEJZ0c+04pO2qlqCMDd+jDzJLXsz1e47t1LU8D/6ZX3eebrCzqUNrjJZb5sMq9WwPCKbPkpkTdbz69xJcDjxV7OSJ00C9/QMBik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790649996; c=relaxed/simple;
-	bh=haXVpvpgoBo6reyNmEps6fOh0I07izO0IEWO26GwuUQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rVOucgEZCDWTibj5cUXmF/pMdsqDNTdFOqbViwmy8ZZI9DtiaBl7tVkAHjYvQjPM7/cnGqq/XI0/DZXtkTL/R+4TFImnaJzuyjq6T3m4oBtDPHPNOzIuaywHnBI0NK36rjs5+nXw0JTyqFOI68sCigzITI2TVO25D4KJH/7QxUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com; spf=pass smtp.mailfrom=me.com; dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b=Cp6MLYeO; arc=none smtp.client-ip=57.103.76.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=me.com
+	s=arc-20240116; t=1790658193; c=relaxed/simple;
+	bh=v4orIUMjfKygHZndCeBqfkZ6P9Xq6fKt21pme1BOit4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uFSWL26UTMN08hs/fIpHcgxvVU013g3jp6dJ+tJ/KCuu+TPPI86Fz87O2nYCUhrtLeWZ8oIkELAdzXuqASLlDD27XRJj4sh9RILLGNVy07I+H2rXyjZ0sB9Ic9t5fYCo8ZqEHq0KIHLFizkZXk1WlORoLGgCaiKeEYjqknMVEc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aSgTm448; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b="Cp6MLYeO"
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-7 (Postfix) with ESMTPS id 5E0C0180015A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 02:46:33 +0000 (UTC)
-X-ICL-RepId: 01a0eb0e-888c-7887-bc6b-883c5d84591e
-X-ICL-Out-Info: HUtFAUMHWwJACUgATUQeDx5WFlZNRAJCTQhPBkMFWgNeAUgdVQRLVxQEEl4eWgwDMFQdHQ5YBhIWXUVeCBkIXR0ZClBQBktaFVUXDgJCH1AfTBZXQ0QfHBlaFFwYU0VRH1RYQxlFVmlBC08dXRlbHEJkWFcJCgZXXloXXk1aAlZNBUoDXwFbC0IASAFZAVkHXgpBBFUDWANdCFVZAEQGVUF5FVZDVARfThkMSh1SVlsTVRdGCQ==
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai; t=1790649994; x=1793241994; bh=haXVpvpgoBo6reyNmEps6fOh0I07izO0IEWO26GwuUQ=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=Cp6MLYeO1OThjfhbujF9qXzTTufQntNsadLA/VArCCmeLQn8L+X1h6P35hEKLYyeJk6BnBrnJPNL4Z9kdJ+CZbqU7ndopfWtbWZyZGWvuC3OJgFhHH5ceqXoJZLMSJAtAwJ6RlLa/hlQdW3KjcjE7YBwa7ykVf/5LMl/mp/QUAinVaabjf0DOfc4SB1tcPUA0PdAdCvigDMu2ifLrzX3jc9p4UUjRkoJoCCfAiGPrrpMCZjPHKd9jpQijWsuMlym+H2dEKqe4LesBZCSg8FGGaj5/rvoPKazTFxPFav3xwuUFeW1dsInyMIDSQdNFmyeLGXBbRng/GoeaNZM4/BxXA==
-Received: from seonggoc (unknown [17.156.216.30])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-7 (Postfix) with ESMTPSA id 72ED218002B5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 02:46:32 +0000 (UTC)
-From: Seonggon Cho <jmsmg1@me.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aSgTm448"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1790658191; x=1822194191;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=v4orIUMjfKygHZndCeBqfkZ6P9Xq6fKt21pme1BOit4=;
+  b=aSgTm448Hdj25hIRRwmvixAXyAI9lJl4KOaeohrCUXzy7y6udbmfH/b1
+   SNmRbKyVjwaUi9eXD9FOcQjJZvsWyyTKDBnZ6fAG+EpetZBhEGiwO3PDt
+   rtH/YyEo/ZGDVO8cWXqBDXjoSizqmNrWV98eYPd7yb5yhdXQ4D0ithbmP
+   flGCQNq7ZBQFtmLBqgheBfzz/f8rzTsDAOx3qPou79QRZK7ytXw2C6vHl
+   WtEipdZiwVgjUthd52kOQ+bbHhy1aLbGTd2liUTAyQ2I4oh87lV8It2Yt
+   4bo0VnMMWgrbJH49TwmwN7IRhdtDziNczTpIP/jzaeLYHRVWXnswRZTJI
+   Q==;
+X-CSE-ConnectionGUID: ZyTQCIDhTwyixrelsNBQHQ==
+X-CSE-MsgGUID: A2s3arQGQTC+k6e8UWf5hw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11919"; a="93858100"
+X-IronPort-AV: E=Sophos;i="6.27,129,1787036400"; 
+   d="scan'208";a="93858100"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2026 22:03:10 -0700
+X-CSE-ConnectionGUID: JmLODqAHRFKP6mxrNrz7sQ==
+X-CSE-MsgGUID: 4j/BuNzMSxSjsPSYvwpUwQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,129,1787036400"; 
+   d="scan'208";a="301538253"
+Received: from weba0534.iind.intel.com ([10.66.226.131])
+  by fmviesa002.fm.intel.com with ESMTP; 28 Sep 2026 22:03:08 -0700
+From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] mpris-proxy: Line-buffer stdout
-Date: Tue, 29 Sep 2026 02:46:25 +0000
-Message-ID: <20260929024625.3978431-1-jmsmg1@me.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260929024302.3977246-1-jmsmg1@me.com>
-References: <20260929024302.3977246-1-jmsmg1@me.com>
+Cc: kiran.k@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Add shared HW reset for clean start
+Date: Tue, 29 Sep 2026 10:24:49 +0530
+Message-ID: <20260929045449.200096-1-aluvala.sai.teja@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,23 +58,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authority-Info-Out: v=2.4 cv=fKE0HJae c=1 sm=1 tr=0 ts=6abb2689
- cx=c_apl:c_pps:t_out a=oyWFxbOnq+dmhQrAPgaJYA==:117
- a=oyWFxbOnq+dmhQrAPgaJYA==:17 a=VdqzKS8jKosA:10 a=f7IdgyKtn90A:10
- a=x7bEGLp0ZPQA:10 a=_XrXW31pRgsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=HHGDD-5mAAAA:8 a=KupEsQc1amn5UGEYq6sA:9 a=UzISIztuOb4A:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDAxMCBTYWx0ZWRfX+AcnO6MZu1j7
- kVGVPmK4KdSWwzaC1VmXEJnjW2gy+i54VmEDGuccZzZz/vfoBgEApJN1sgex2ApJ/dVEIbzwN9x
- sa9uDETz9q/fiTWkFbhBHLczVmP3KCB4LAC7F4xvmZWRYjHUB/uLN3EzfF9EoFJC5jdSqxrOp8U
- 4R+ykGw6SDATECSCIgj/ZoUzCAdrnEQ8VfvpYtFAsh/N/JSZDr/2CUmT5qXZseoJu/1yJ/JHh9J
- LmEZEZEV5O727tVPvDezHl2ZrYUSyDB8KWPtFAFGft4FceE87MTDwZDTEJxFhySqYtMRUpRT6g8
- xhwADV+YM4CGyjJlv/M53glN2M7GSPBEUzucIUbyK2raqoIfy4qytCJ85uRoyk=
-X-Proofpoint-GUID: kcsKzLTenFBclaSeSzC6jZs3Lrb6TopD
-X-Proofpoint-ORIG-GUID: kcsKzLTenFBclaSeSzC6jZs3Lrb6TopD
-X-JNJ: AAAAAAABROaMqiNGmf/lStDNmw3C4EyydmsKVxgD647U1Cp9IlHUBpbXGqmOkMmJEuDXOUxYrga+dOMHVPIn3RSpkRDUU87YJ77WxO4sarSSPX1CWQAYXDMjZ46nP8R2C+oNCd8eAR1FyseNyY4yJVTCtnhzZscYbnCtUSoXDUIM3iwZvvzoP2bIHoo2+95F7GhTj/z95H5BkSQtFoDyQW/JThwNL/uvgg0A9cxyqNZaCiZt5teI2JLz/3qzTyDkT5Qnr07m369kseavJGE6KYWxwBRM1R4JyAs4lrMagkFhoskacpxV/OM2edITuwXUeSbJkV8dlVIh+gJ8+o+psTSg3hxKaw84QbajNV9FlJV6c5L2Rd4ec7l/WVEljmnIXNTSDAvQL6AB6AlSx5oOzNGntb8ybHyx3warixrRdrBp+wRg6jfMUrBByMZcYAKtO53vSDu0caHoAwXtlA85eNF4a8G6ibjnrus+N+U0eIAlgMvYxXkikUe4WbZtV0IjVzhmi9OcuZ1/SzHOP2CxS2imsnnc+K3dk9nAFBbv2RaW7RT/8ffN8Jk49mAo/HZjHbXn3FfTzlnqSJaBdgye9faC+l7KM7YYYBEHj1qUZBjdKmnfsvn7Em3pA7GTT9GJBpnigpWCmSpk6YjhDFIIGfagNqXgNVhCMnQmFGWzSlC8L8JR/q4P6XSxW7yPYXMd5DU3ngmb71Nc2qzduxAJyfoQ7ApabeLH93UTAYABi9wlTea2RaC+H8l1yMIYovfthhZQiMBLI1kP16lc45OM5pmZzwXKVWdvaBigntrIkNgCCZKWojmUnKIQQmj4/MvzY4m8BwofDqNra+/lqrriwYri0jWqjHqYSkX/I7tGuD7TH26MsCBC6BdeM6iKWktcn2rCk+1d/J3+YyRPTb02o3XSzFmkVELghyEorCCnRfXiCM8GoqZs9Crai+isxzxIXwMfiA0yf90npIToU32o2VrQG6TfT1J
- 1J2u++BjB9u1RDA77IxAyF10dGewMpPFbu08oFhV886xTwJm6dMJe0inayS6CoqaHQrLonzmqb6dVFYClPKc8BU8tESrkpIIniT5fHRaBPqkpAiFjyr9fZwFhZL9qCltEPOC7aGcjYfyYjS3fwWYCVcs64vIFqXInECL5pWEtMgBUNPKcHOHkNOFuay/Watr507beOvhV6QKB6Hzl1VR1bojLKA==
 
-This is an accidental duplicate of
-https://lore.kernel.org/linux-bluetooth/20260929003432.3937487-1-jmsmg1@me.com/
-(re-ran the wrong command). Please ignore this copy; v2 with the
-checkpatch fix is in the original thread.
+Reset shared Bluetooth hardware after mapping the BAR and before setting
+up MSI-X interrupts, so stale device state is cleared before IRQ handlers
+and interrupt masks are configured.
+
+Propagate reset errors so probe aborts rather than continuing when the
+reset fails.
+
+Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 84a6cf2f4920..6cde68ce0304 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2876,6 +2876,13 @@ static int btintel_pcie_config_pcie(struct pci_dev *pdev,
+ 	if (IS_ERR(data->base_addr))
+ 		return PTR_ERR(data->base_addr);
+ 
++	/* Do shared hardware reset to ensure a clean start before
++	 * configuring interrupts.
++	 */
++	err = btintel_pcie_reset_bt(data);
++	if (err)
++		return err;
++
+ 	err = btintel_pcie_setup_irq(data);
+ 	if (err)
+ 		return err;
+-- 
+2.53.0
+
