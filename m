@@ -1,76 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-6.smtp.github.com (out-6.smtp.github.com [192.30.252.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC542EAD15;
-	Tue, 29 Sep 2026 01:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7238C24A067
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 01:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790643615; cv=none; b=R4TuGFhYLdYClKcQ6B6nCLya2Q6h65rLyTLA1b88LrrWZ60FZWGIllE6ueVvEeaac+EAqLW/soqJeTCwxJ/v0P3HqX6Sqzpv5ehwryy66JyHUcKvXCwYU6PGP/WSv5zotZfBeZeFtfzrH311SevDnEOrx3op+1GCj4S3+cLtIoE=
+	t=1790644508; cv=none; b=TrdBd9DnLswysfchzFZXgOc+zfo0PdlAUG0Mdo22v4KEKIouLeJ4FzYzdqyLvbQUvU5YloWLq9OITLs0RZ+8wts8DLvf9roqBHu5wOE9prQPiwILx2wTozZ7mXM8p9TUcANCuX1oZJtYeZ2UxgK9qsj727uRlFEpF4dthn8htcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790643615; c=relaxed/simple;
-	bh=gkalNelW/D/0P3Ly3PJWns2c9Izn8LTjvaT89Zl3BZE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GnEaEHZ8esbxbLxZKfXAfjblF2tJmLUJ1h98JsuEs0Qcgmf7JQARcvLETvccv6EL+w1dHggWgX+MCtPjBTLhLndr1RvSl7IMQokfvF1Cqh5tm28X5jX+75UhgiWArn0E9pndbbU9y06AaPLbQD83XPdBuuC9oRRtK0kP/pUVkS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6OOJEFj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790644508; c=relaxed/simple;
+	bh=ixeqLvPWmBNNsdU8jWoijVawxRzt+5ivrMrEk93age4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eLOSbtKT4H3FTbVcI8BCxkZOL/iJl4N0tPRQQ51PhsY7QJsdud49IDt6xQh5j0U6ehuekbxkWR5jcbiltVfUhs8cryqcfUGsgbSvHAZ3QCIp6B0nFXuZo4Nai+RhWagJA2ijYepsD52S0k/+hIwDj3Dk2fqCK92fLU1RrYz7onw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SVCc4VDk; arc=none smtp.client-ip=192.30.252.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6OOJEFj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43D7B1F000FF;
-	Tue, 29 Sep 2026 01:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790643614;
-	bh=l7o+SthR0IG03K+lwiN1f5f7Rhh/++PQDpOdzUajsdY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=b6OOJEFjMf9jhmEawYnY0KNx/h4pK9lyKJmUgLMh2ecoVTpBhayCiQdEFRuVnDp4+
-	 bfrb3LapnniU7LKO9jv7XhQIOzxwiL73GtjIXI655VnhZ0cBSlG8cmCj76N7Woh9U2
-	 KpiHpS/GQVK3/DoUXJg9l71NroKeC+0s2w8QtSeocIp5Jqs66OMPt11cIj+yfV2JOV
-	 dI1tnf8xhWLYnLQkeZt9akZ6C459Iw844vzhvCVY3GH9vjEngU2PdTVC35kN1tMGdH
-	 mZ1eZ96Nb1KfB8d2gnoofFu9xCgyMQTAUV3ftbdurFH8yUfCRB+7V08SN2j029qbrl
-	 AU+DgPWS6VBEg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A2C23924FED;
-	Tue, 29 Sep 2026 01:00:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SVCc4VDk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1790644506;
+	bh=xn9151xtwAFK21XMcnXAfsJhMj81KvO7ix8e+B0gVXE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=SVCc4VDknHMYOwN9v3uIlFHx4l0fsPv6fQ5m981fZTyZm67csghJyG4S/E1WCtvmB
+	 wWKagHwBqiAu/XGOPqVZ/oxLd28uMwzlUf0stvRcrNGND8wqGvdzDiWowA5nrG9Jke
+	 cPw+eKpB52guld6ey0Elex1FnBfLxJb/6ULjYUro=
+Received: from github.com (hubbernetes-node-db2d540.va3-iad.github.net [10.48.76.63])
+	by smtp.github.com (Postfix) with ESMTPA id 75203781149
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 18:15:06 -0700 (PDT)
+Date: Mon, 28 Sep 2026 18:15:06 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1175652/000000-3ea197@github.com>
+Subject: [bluez/bluez] 458b11: org.bluez.Device: Add Connectable property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-09-28
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <179064361278.199999.16060652770128006151.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Sep 2026 01:00:12 +0000
-References: <20260928152919.942973-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260928152919.942973-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1175652
+  Home:   https://github.com/bluez/bluez
+  Commit: 458b112944943c3c20a349edb3f51b1ccabd6436
+      https://github.com/bluez/bluez/commit/458b112944943c3c20a349edb3f51b1ccabd6436
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  Changed paths:
+    M doc/org.bluez.Device.rst
 
-On Mon, 28 Sep 2026 11:29:19 -0400 you wrote:
-> The following changes since commit 6d91041bb38b97e2feb625123cc0529d7b83a0e1:
-> 
->   Bluetooth: RFCOMM: Reject short EA=0 frames in rfcomm_recv_frame() (2026-09-21 09:37:20 -0400)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-09-28
-> 
-> [...]
+  Log Message:
+  -----------
+  org.bluez.Device: Add Connectable property
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-09-28
-    https://git.kernel.org/netdev/net/c/382cf9768987
+This adds Connectable property which indicates whether the remote
+device accepts connections, as reported by its last advertising report
+or inquiry result.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+bluetoothd already tracks this per bearer from the Device Found event,
+but it is not exposed over D-Bus, so applications cannot tell
+connectable advertisers such as peripherals from non-connectable ones
+such as beacons without attempting a connection.
 
 
+  Commit: c358a6e18be841bc42682a1112b8694b9c51c571
+      https://github.com/bluez/bluez/commit/c358a6e18be841bc42682a1112b8694b9c51c571
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Add Connectable property
+
+This implements Connectable property using device_is_connectable, which
+reports whether the last advertising report on the device's bearer was
+connectable, and emits PropertiesChanged from device_update_last_seen
+when the value changes or first becomes known.
+
+
+  Commit: 3ea1977cdc6527711d50236b966904ef50873100
+      https://github.com/bluez/bluez/commit/3ea1977cdc6527711d50236b966904ef50873100
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Print Connectable in info
+
+This prints the Connectable property with the likes of info command:
+
+bluetoothctl> info <addr>
+...
+	Connectable: yes
+
+
+Compare: https://github.com/bluez/bluez/compare/458b11294494%5E...3ea1977cdc65
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
