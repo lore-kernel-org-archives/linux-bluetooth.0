@@ -1,191 +1,414 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5EA3A901D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 12:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC2351EE04
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 12:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790684278; cv=none; b=t5CXF0+ERGxehtDIQNjA18ddecslJwMk6TIwb+JKFxUyh+rTL51w0Xtj8jtXznNAlE4lPX6t3nR+/GsouB69C37gwTrn6RzCfhq1hmfqpVx0vmi/ZrSRkOcB3zkzufDkJiTDln4Jkp0PpTyTmu2X9ba7iAE4RIhV/fFzdJAQxXI=
+	t=1790684554; cv=none; b=njwQgzfhGtLQMWKhPAGI9tGuui3r9eivxgxl8tfj5SWMds28R6vA/dNJRjoa++//2Y3fbOfLmVWJML4+hBrt+pW3y/3yy0A1JGDIWVAkR8/BkwHPly7TtjcuVCYEnAAZaEjNbVmCCdf9QS2JjKk3mQ3EoL8p3qM8enw1LlJhY3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790684278; c=relaxed/simple;
-	bh=0iye1/uZC73Yi16adEYlllTJPXzTpBIjRkj4ou6+Nv8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eilXUft51BMMm6szSLGkrGHraR71Z3yKQHy6waMakvc6iaPL4gyeJeGe8rhx8fpoa/VD+hHCaugI85q4rTxg0fkwhBrPjQOweRV/+2jCK6gFBffjbDsNXVPBdkZsRZo9gDdA0SnMur/r5UgpFGnvWK9Uy/QSFJJqbRZvbYyh4l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=NEMguOk7; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1790684554; c=relaxed/simple;
+	bh=O8D84FTFBf1LiYsMUL6kZ7J896dKztzUtv7yg42eDus=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3QrxKvrQ/2oq2y7Ykibpm8n0G1r54Pab5TM6+4bJ99mQrJOdskyhG/ieiGou6UphpTSTBwxYM3XkcnHrhIAhTrnlIW/86FFaVxZWIwuRWo1qkigppRF+efS8JslDVAEBI22ld0xQjDTDb5L1KebHlaS5143vZ+b3t6nM4VHG3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sVt8K5fD; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="NEMguOk7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1790684275;
-	bh=0iye1/uZC73Yi16adEYlllTJPXzTpBIjRkj4ou6+Nv8=;
-	h=From:To:Subject:Date:From;
-	b=NEMguOk7HGSp/9dUbHGzAXELmSmllJKk5UcprZbdN+lFkwTBI0tzdvNwG8D49U85c
-	 8X/j2jvzchOv8wukkSC4e8D0CeFq4snZOEsgOTpM2pw1r3+VhMQpNLAloI5Bgzjubk
-	 nNVYmSFqR/c5USkgzF9Iu5Q+0EAgw5+F5mh8aW9cQVuLnOxkp0x4FU0XMaSizGGwmJ
-	 kKo03PF9qcbGqy5b9qXjLPCFIiEyX6LbDTzIqtij6FyocUe6u3tHch0icMdw17FS8E
-	 OC81sWob0yfj0i99UeG1IXZeu8IluTTh7cz89ySD4Hfnqf61C/CwjV3Vx/w64XLyZ2
-	 hc4/Awg3tbaoA==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5693917E04AB
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 14:17:55 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3] avrcp: Poll GetPlayStatus when position changed event unsupported
-Date: Tue, 29 Sep 2026 14:17:49 +0200
-Message-ID: <20260929121749.282866-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sVt8K5fD"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49b912d3931so31274855e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 05:22:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790684551; x=1791289351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=wsVWpdNqyR1ov4kzte6IkDcEo+/nTeP+Cd8I0+pKOW0=;
+        b=sVt8K5fDv8xmHYDpJbQs8Mk/ZZ8MJKL8C5kW+CZGiRc9w30ONUwcwkUBdt3MJuiEgW
+         gElqK3pw8h/QrbIClfq5q718tT5P01llF4daiYz0Sp+qbHx+Yp2sKG8/3t1Uc/1XnihK
+         GAyhLCONKZ7exROJc7MkPBvpRLce5475802T30pO5gKsF0m8Q9e83ZANJwgD7MMwcljl
+         kEs3Pb65fVFXx3AEUvtmawRfsIfgzCLUh43VK1GjqQctRunpwwv8Sy+Ii7CkjysO5L+A
+         M5HW6K2m1dt3dzAu+4lgZU9pu9nDCx1Un0+P8Cf6qtOGPxZ9wxrGH6wlOgxNwye4Spdc
+         JBPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790684551; x=1791289351;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=wsVWpdNqyR1ov4kzte6IkDcEo+/nTeP+Cd8I0+pKOW0=;
+        b=S0pO9u3PSHypNyEPJOk3KF4kXtSzCLGz1ERWEx1ZKjNl+6dqQZmSBmsPA6SecjthNF
+         XvKWmErE+K2wehDi2CXyddFVnU0/yWJeTXq5ZirlVE7RJv9h92xjmMb8u/9KxBnIrGpN
+         n7c0BcbAfV7bEfULQohItiCfc0cj9vqGLuvx/6sEb8JoatQeqCGsX+1ERz8s8/dUfTWw
+         xh11ExfFKei9Je1bjWqnNAMY0m1R05Y/G9hVpuXBtnJ4nPzE0R+mfaCE2xdO6dndAvkT
+         EvBNWQnELAH+xPtPgbDlhBNn28b1zHoK4INeBOwMyUKwwMAnO+/31GnhDco+BAuHmQXz
+         BaMw==
+X-Forwarded-Encrypted: i=1; AKwUvBwzEydqx1kH5WYuGtZREiMmpyu2sRI4P0/1tDesYmv4mn74U3b61MFZ+ZZAWFqDymI2zvL23RDSC+A/tDW1nG4=@vger.kernel.org
+X-Gm-Message-State: AFuF++nWDI7tbzqFUWeCFQ4OHWF5O9D5a9jRQ+xHRUE8e0Gerw9zQrM/
+	KpjUp5aqHBby/SBn0d4KkL9JgHKPlrT/fUJUQokMN6z6K8xzRIm/tfMT
+X-Gm-Gg: AYBFou36zmSEKuTB8ESI+vf+fwqOSGm2VlGi5fS50rNS0Jbw7J9AexgpBOKPyMe2/P5
+	/OQ6apBBI50IumC5NfHgDfUDJMS8P/kpe2FT0VwPdB4MOceQTP/tGFqGLpbxexWfKWoAWTExLPG
+	zzEcnSRFWhUxvfFaE1YOa+qxAbVG/TlOA2AAuJFGaXsHjxP2YCSXOi0xTXk//hMiYK0A3Ghbx4o
+	aGEVzUkXwQRROAFDwaHlQjnudvJjiNksIOGeiteGLA7TTvAttSNkRWtjFXu32grkoNC3U6rmJzR
+	JXjYz0OjGA/N/fZWy/vO1TkbfqBbx9q8HSusoZdYGkjAk/R684wYcwGWwj28HPRe95eMP9N7Cho
+	G2aQ2qDuJM5wyOr3u2mPccwaVbGuruXDnIWTj9kAKOdqtqL5Lxm6387kL735K/bIV4mdymLKn9Z
+	ircCMnfzSe0+X0+FzGB2OsHUddyQ4rzxVpkOlzl+w0qRY/wi8byQLvUpumQfZiKWBSi2Npy5n6i
+	Q+NqwKMVfbEA+DcjOCV23xYtuLiWioDGAcxvdBeKgwc1Tkuxsb2Y9DPULWHpBh4qzcbYrE=
+X-Received: by 2002:a05:600c:46c6:b0:49f:fe88:e7d1 with SMTP id 5b1f17b1804b1-49ffe88e87dmr141315145e9.15.1790684550378;
+        Tue, 29 Sep 2026 05:22:30 -0700 (PDT)
+Received: from localhost ([188.234.148.119])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a00ed06ea7sm55359085e9.4.2026.09.29.05.22.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Sep 2026 05:22:29 -0700 (PDT)
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: nicoyip.dev@gmail.com,
+	pav@iki.fi,
+	r772577952@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
+	syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
+Subject: [PATCH v4] Bluetooth: RFCOMM: connect the session socket without rfcomm_mutex
+Date: Tue, 29 Sep 2026 17:22:26 +0500
+Message-ID: <20260929122226.98970-1-mikhail.v.gavrilov@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Some remote targets do not support the AVRCP_EVENT_PLAYBACK_POS_CHANGED
-notification, meaning bluetoothd never learns about track position
-updates for such devices.
+An RFCOMM connect() issued while a BR/EDR link is being authenticated
+makes lockdep report a circular dependency, and the reported cycle is a
+real AB/BA between rfcomm_mutex and hdev->lock.
 
-When this event is not present in the capabilities reported by the
-remote, fall back to polling AVRCP_GET_PLAY_STATUS once a second so
-the media player position stays in sync. Polling is only kept running
-while playback is actively progressing (playing) and is stopped
-otherwise, and is torn down on session destruction.
+rfcomm_security_cfm() is called from the HCI event path, which already
+holds hdev->lock:
 
-Assisted-by: Copilot CLI:claude-sonnet-5
+  hci_rx_work()
+    hci_event_packet()
+      hci_cc_read_enc_key_size()   [hdev->lock]
+        hci_encrypt_cfm()          [hci_cb_list_lock]
+          rfcomm_security_cfm()    [rfcomm_mutex]
+
+while an RFCOMM connect() from userspace takes the same two locks the
+other way round:
+
+  rfcomm_sock_connect()
+    rfcomm_dlc_open()              [rfcomm_mutex]
+      __rfcomm_dlc_open()
+        rfcomm_session_create()
+          kernel_connect()
+            l2cap_sock_connect()
+              l2cap_chan_connect() [hdev->lock]
+
+  WARNING: possible circular locking dependency detected
+  kworker/u131:1/1128 is trying to acquire lock:
+  rfcomm_mutex, at: rfcomm_security_cfm+0x31/0x3e0 [rfcomm]
+  but task is already holding lock:
+  hci_cb_list_lock, at: hci_cc_read_enc_key_size+0x1d2/0xcc0
+  Chain exists of:
+    rfcomm_mutex --> &hdev->lock --> hci_cb_list_lock
+
+hci_auth_complete_evt() and hci_encrypt_change_evt() reach the callback
+the same way.
+
+Both orders have to be seen in the same boot, which is why a BR/EDR
+connection alone is not enough to show it: a session set up by the
+remote side is created by rfcomm_accept_connection() in krfcommd, which
+calls kernel_accept() and never takes hdev->lock under rfcomm_mutex.
+Connecting a device that authenticates and encrypts the link and then
+calling connect() on an RFCOMM socket towards any address - the connect
+does not have to succeed, the order is recorded before the page timeout
+- reports it every time.
+
+Only the session socket has to be connected with the lock held, and it
+does not: nothing else can see the socket before it is put on the
+session list.  So connect it first and take rfcomm_mutex afterwards,
+which removes the rfcomm_mutex -> hdev->lock order for good, rather
+than keeping the HCI event path out of rfcomm_mutex.
+
+rfcomm_session_create() becomes rfcomm_session_connect(), which returns
+the connected socket without touching the session list, and
+rfcomm_dlc_open() adds the session once it holds the lock again.  If
+another opener added a session for the same pair while this socket was
+connecting, that session is used and this socket is dropped.
+__rfcomm_dlc_open() now takes the session it should use, and its state
+check runs after the lock is re-acquired, so a DLC that was opened or
+closed in the meantime is still handled.
+
+Over an existing ACL link the connection can complete before the
+session reaches the list, and the wakeup from the socket callback is
+then lost, so krfcommd is woken once the session is visible.
+
+Connecting without the lock opens a window in which the socket can be
+closed.  The DLC is not on a session yet, so rfcomm_dlc_close() finds
+nothing to do and returns without touching it, and rfcomm_dlc_open()
+would then attach a DLC whose owner is gone.  rfcomm_dlc_close() now
+marks such a DLC with RFCOMM_CLOSED, and rfcomm_dlc_open() checks the
+mark once it holds rfcomm_mutex again and drops the socket instead of
+attaching the DLC.  The mark is cleared when an open starts, so a DLC
+that is reused is not affected.  This covers both callers of
+rfcomm_dlc_open(), the socket and the tty layer.
+
+Fixes: 759c185d0bbd ("Bluetooth: RFCOMM: serialize security confirmation handling")
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Reported-by: Pauli Virtanen <pav@iki.fi>
+Closes: https://lore.kernel.org/linux-bluetooth/5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi/
+Reported-by: syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/6a92fadc.08e933ee.dbf97.008f.GAE@google.com/
+Reported-by: Jiaming Zhang <r772577952@gmail.com>
+Closes: https://lore.kernel.org/all/CANypQFabseTuRiyz2pGkc_Qj0moGDnY7KEp1qdTOqkw6gAL3hw@mail.gmail.com/
+Cc: stable@vger.kernel.org
+Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 ---
-v1->v2: Remove polling during seek
-v2->v3: Change commit title to fit max length
 
- profiles/audio/avrcp.c | 67 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 66 insertions(+), 1 deletion(-)
+The commit this fixes is in v7.3-rc1 and is marked for stable, so this
+probably wants the bluetooth fixes tree rather than -next.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index df5f97eaf..a30709eaa 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -247,7 +247,9 @@ struct avrcp {
- 	unsigned int control_id;
- 	unsigned int browsing_id;
- 	unsigned int browsing_timer;
-+	unsigned int position_timer;
- 	uint16_t supported_events;
-+	bool pos_changed_supported;
- 	uint8_t transaction;
- 	struct pending_pdu *pending_pdu;
- };
-@@ -341,6 +343,7 @@ static const uint32_t company_ids[] = {
+v4:
+ - rfcomm_dlc_close() marks a DLC that is not on a session yet, and
+   rfcomm_dlc_open() drops the socket instead of attaching the DLC when
+   it finds the mark after taking rfcomm_mutex again (Luiz, and the
+   Sashiko review of v3)
+ - Reported-by/Closes for Jiaming Zhang's report, which hits the same
+   cycle from the connect side: rfcomm_dlc_open() holding rfcomm_mutex
+   while l2cap_chan_connect() takes hdev->lock
+ - syzbot tested v3 with its reproducer, no issue:
+   https://lore.kernel.org/all/6ab100d7.71f81b7d.15fa6d.0029.GAE@google.com/
+
+Tested on 7.3.0-rc5 with an MT7922 controller (btusb) and a JBL Tour
+Pro 3 headset.  An RFCOMM connect() towards an address that does not
+answer, run after the headset has authenticated its link, reports the
+inversion without the patch (checked on 7.3-rc2); with v4 it stays quiet
+and the validator is still armed afterwards (debug_locks: 1).  A connect
+towards the connected headset is answered in 23 ms with ECONNREFUSED -
+the session is established over the existing ACL link and the peer
+rejects the channel - and towards an idle one it fails with EHOSTDOWN
+after the page timeout.  The reproducer is in the v3 posting.
+
+v3: https://lore.kernel.org/linux-bluetooth/20260912100315.151674-1-mikhail.v.gavrilov@gmail.com/
+v2: https://lore.kernel.org/linux-bluetooth/20260904012028.77590-1-mikhail.v.gavrilov@gmail.com/
+v1: https://lore.kernel.org/linux-bluetooth/20260902235132.453044-1-mikhail.v.gavrilov@gmail.com/
+
+ include/net/bluetooth/rfcomm.h |   1 +
+ net/bluetooth/rfcomm/core.c    | 134 +++++++++++++++++++++++----------
+ 2 files changed, 96 insertions(+), 39 deletions(-)
+
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 102c278e3..9dc5fd4cb 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -207,6 +207,7 @@ struct rfcomm_dlc {
+ #define RFCOMM_AUTH_REJECT  7
+ #define RFCOMM_DEFER_SETUP  8
+ #define RFCOMM_ENC_DROP     9
++#define RFCOMM_CLOSED       10
  
- static void avrcp_register_notification(struct avrcp *session, uint8_t event);
- static GList *player_list_settings(struct avrcp_player *player);
-+static void avrcp_get_play_status(struct avrcp *session);
+ /* Scheduling flags and events */
+ #define RFCOMM_SCHED_WAKEUP 31
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index d91e2a6ee..54ec1136f 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -62,10 +62,9 @@ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr);
  
- static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *version)
+ static void rfcomm_process_connect(struct rfcomm_session *s);
+ 
+-static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+-							bdaddr_t *dst,
+-							u8 sec_level,
+-							int *err);
++static struct socket *rfcomm_session_connect(bdaddr_t *src, bdaddr_t *dst,
++					     u8 sec_level, int *err);
++static struct rfcomm_session *rfcomm_session_add(struct socket *sock, int state);
+ static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst);
+ static struct rfcomm_session *rfcomm_session_del(struct rfcomm_session *s);
+ 
+@@ -365,28 +364,17 @@ static int rfcomm_check_channel(u8 channel)
+ 	return channel < 1 || channel > 30;
+ }
+ 
+-static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 channel)
++static int __rfcomm_dlc_open(struct rfcomm_dlc *d, struct rfcomm_session *s,
++			     u8 channel)
  {
-@@ -2224,6 +2227,59 @@ static const char *status_to_string(uint8_t status)
- 	}
- }
+-	struct rfcomm_session *s;
+-	int err = 0;
+ 	u8 dlci;
  
-+static bool avrcp_poll_play_status(gpointer user_data)
-+{
-+	struct avrcp *session = user_data;
+-	BT_DBG("dlc %p state %ld %pMR -> %pMR channel %d",
+-	       d, d->state, src, dst, channel);
+-
+-	if (rfcomm_check_channel(channel))
+-		return -EINVAL;
++	BT_DBG("dlc %p state %ld session %p channel %d",
++	       d, d->state, s, channel);
+ 
+ 	if (d->state != BT_OPEN && d->state != BT_CLOSED)
+ 		return 0;
+ 
+-	s = rfcomm_session_get(src, dst);
+-	if (!s) {
+-		s = rfcomm_session_create(src, dst, d->sec_level, &err);
+-		if (!s)
+-			return err;
+-	}
+-
+ 	dlci = __dlci(__session_dir(s), channel);
+ 
+ 	/* Check if DLCI already exists */
+@@ -421,14 +409,84 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
+ 
+ int rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 channel)
+ {
+-	int r;
++	struct rfcomm_session *s;
++	struct socket *sock;
++	int err;
 +
-+	avrcp_get_play_status(session);
++	BT_DBG("dlc %p state %ld %pMR -> %pMR channel %d",
++	       d, d->state, src, dst, channel);
 +
-+	return TRUE;
-+}
-+
-+static void avrcp_stop_pos_polling(struct avrcp *session)
-+{
-+	if (session->position_timer == 0)
-+		return;
-+
-+	timeout_remove(session->position_timer);
-+	session->position_timer = 0;
-+}
-+
-+static void avrcp_start_pos_polling(struct avrcp *session)
-+{
-+	if (session->position_timer > 0)
-+		return;
-+
-+	session->position_timer = timeout_add_seconds(1,
-+						avrcp_poll_play_status,
-+						session, NULL);
-+}
-+
-+/*
-+ * Poll GetPlayStatus once a second to resync position while playing when
-+ * the remote does not support AVRCP_EVENT_PLAYBACK_POS_CHANGED. Polling is
-+ * paused whenever playback is not actively progressing.
-+ */
-+static void avrcp_update_pos_polling(struct avrcp *session, uint8_t status)
-+{
-+	if (session->pos_changed_supported)
-+		return;
-+
-+	switch (status) {
-+	case AVRCP_PLAY_STATUS_PLAYING:
-+		avrcp_start_pos_polling(session);
-+		break;
-+	case AVRCP_PLAY_STATUS_FWD_SEEK:
-+	case AVRCP_PLAY_STATUS_REV_SEEK:
-+		/* Position already resynced once via GetPlayStatus,
-+		 * no need for continuous polling on seek.
-+		 */
-+	default:
-+		avrcp_stop_pos_polling(session);
-+		break;
++	if (rfcomm_check_channel(channel))
++		return -EINVAL;
+ 
+ 	rfcomm_lock();
+ 
+-	r = __rfcomm_dlc_open(d, src, dst, channel);
++	clear_bit(RFCOMM_CLOSED, &d->flags);
+ 
++	/* Do not page the remote device for a DLC that cannot be opened
++	 * anyway.  __rfcomm_dlc_open() looks at the state again once the
++	 * lock has been re-acquired below.
++	 */
++	if (d->state != BT_OPEN && d->state != BT_CLOSED) {
++		rfcomm_unlock();
++		return 0;
 +	}
-+}
 +
- static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
-@@ -2252,6 +2308,8 @@ static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 	media_player_set_position(mp, position);
- 	media_player_set_status(mp, status_to_string(status));
- 
-+	avrcp_update_pos_polling(session, status);
++	s = rfcomm_session_get(src, dst);
++	if (s) {
++		err = __rfcomm_dlc_open(d, s, channel);
++		rfcomm_unlock();
++		return err;
++	}
+ 	rfcomm_unlock();
+-	return r;
 +
- 	return FALSE;
++	/* There is no session for this pair yet.  kernel_connect() ends up in
++	 * l2cap_chan_connect(), which takes hdev->lock, and the HCI event
++	 * path takes rfcomm_mutex while holding hdev->lock, so the socket has
++	 * to be connected with rfcomm_mutex released.
++	 */
++	sock = rfcomm_session_connect(src, dst, d->sec_level, &err);
++	if (!sock)
++		return err;
++
++	rfcomm_lock();
++
++	/* The DLC may have been closed while the socket was connecting.  It
++	 * was not on a session, so rfcomm_dlc_close() could only mark it;
++	 * attaching it now would leave it with no owner.
++	 */
++	if (test_bit(RFCOMM_CLOSED, &d->flags)) {
++		rfcomm_unlock();
++		sock_release(sock);
++		return -ECONNRESET;
++	}
++
++	/* Another opener may have added a session for the same pair in the
++	 * meantime; that one is used and this socket is dropped.
++	 */
++	s = rfcomm_session_get(src, dst);
++	if (!s) {
++		s = rfcomm_session_add(sock, BT_BOUND);
++		if (s) {
++			s->initiator = 1;
++			sock = NULL;
++		}
++	}
++
++	err = s ? __rfcomm_dlc_open(d, s, channel) : -ENOMEM;
++
++	rfcomm_unlock();
++
++	if (sock)
++		sock_release(sock);
++
++	/* Over an existing ACL link the connection can complete before the
++	 * session reaches the list, and that wakeup is then lost, so let
++	 * krfcommd look at the socket state now.
++	 */
++	rfcomm_schedule();
++
++	return err;
  }
  
-@@ -4128,6 +4186,9 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 		}
- 	}
+ static void __rfcomm_dlc_disconn(struct rfcomm_dlc *d)
+@@ -508,8 +566,14 @@ int rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 	rfcomm_lock();
  
-+	session->pos_changed_supported =
-+			!!(events & (1 << AVRCP_EVENT_PLAYBACK_POS_CHANGED));
-+
- 	if (!session->controller || !session->controller->player)
- 		return FALSE;
+ 	s = d->session;
+-	if (!s)
++	if (!s) {
++		/* Not on a session yet: rfcomm_dlc_open() may be connecting a
++		 * socket for it with rfcomm_mutex released.  Leave a mark so
++		 * that it does not attach the DLC once it holds the lock again.
++		 */
++		set_bit(RFCOMM_CLOSED, &d->flags);
+ 		goto no_session;
++	}
  
-@@ -4140,7 +4201,8 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 			!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
- 		avrcp_list_player_attributes(session);
+ 	/* after waiting on the mutex check the session still exists
+ 	 * then check the dlc still exists
+@@ -757,12 +821,12 @@ static struct rfcomm_session *rfcomm_session_close(struct rfcomm_session *s,
+ 	return rfcomm_session_del(s);
+ }
  
--	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
-+	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)) ||
-+			!session->pos_changed_supported)
- 		avrcp_get_play_status(session);
+-static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+-							bdaddr_t *dst,
+-							u8 sec_level,
+-							int *err)
++/* Creates the L2CAP socket a new session will run on and starts connecting
++ * it.  Must be called with rfcomm_mutex released.
++ */
++static struct socket *rfcomm_session_connect(bdaddr_t *src, bdaddr_t *dst,
++					     u8 sec_level, int *err)
+ {
+-	struct rfcomm_session *s = NULL;
+ 	struct sockaddr_l2 addr;
+ 	struct socket *sock;
+ 	struct sock *sk;
+@@ -792,24 +856,16 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+ 		l2cap_pi(sk)->chan->mode = L2CAP_MODE_ERTM;
+ 	release_sock(sk);
  
- 	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
-@@ -4470,6 +4532,9 @@ static void session_destroy(struct avrcp *session, int err)
- 	if (session->browsing_timer > 0)
- 		timeout_remove(session->browsing_timer);
+-	s = rfcomm_session_add(sock, BT_BOUND);
+-	if (!s) {
+-		*err = -ENOMEM;
+-		goto failed;
+-	}
+-
+-	s->initiator = 1;
+-
+ 	bacpy(&addr.l2_bdaddr, dst);
+ 	addr.l2_family = AF_BLUETOOTH;
+ 	addr.l2_psm    = cpu_to_le16(L2CAP_PSM_RFCOMM);
+ 	addr.l2_cid    = 0;
+ 	addr.l2_bdaddr_type = BDADDR_BREDR;
+ 	*err = kernel_connect(sock, (struct sockaddr_unsized *)&addr, sizeof(addr), O_NONBLOCK);
+-	if (*err == 0 || *err == -EINPROGRESS)
+-		return s;
++	if (*err && *err != -EINPROGRESS)
++		goto failed;
  
-+	if (session->position_timer > 0)
-+		timeout_remove(session->position_timer);
-+
- 	if (session->controller != NULL)
- 		controller_destroy(session);
+-	return rfcomm_session_del(s);
++	return sock;
  
+ failed:
+ 	sock_release(sock);
 -- 
 2.43.0
 
