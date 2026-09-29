@@ -1,237 +1,343 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1708225403
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 10:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.168.131
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790676212; cv=pass; b=KbGbhZBVORE+47VtjfrfBSNtfMw8TanNloBJBYEotxpN0UuLSE7nH6O+fYKEPcRd8m/GHoslsLTpj4IHoV07+RYDQxeBllIEmVR3Zq0UZRoiONb9/H4rIkGkhTh4XJclMIJ7j2lEDd0QnuDkPYbKOgJGrlwZZsfCx9w7bmhqYq0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790676212; c=relaxed/simple;
-	bh=428tXCbvtfrk+2zlh0uwJkqz4i0sMFragXvVb9rwGLA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AyaYX9XFnDZ2Q0GzA9orPKZPntZUQwgGRQXI4L/eABjRhbQAjkOAg7vNjrVum0/wBMwf7FVZZvNxEHm+T6H2l+TCEU/iCoFB+jgtG0BA+no+QkvjnbVj7i3DZe7ejI6g6UxYIyMtQytijb9zd1GLH34wOG1ezsvgCvfbyd07CHg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WRRIX5+w; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XXIQ3xzp; arc=pass smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814D73D9DBA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 10:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790676587; cv=none; b=ebJEtxaZS0CoMZatZl57g0me+N31bzLHKIFi2JNz8Jcd3niL2EYl/lczW2aILN888isqEr4fx0GnjZCC6sU0I8aWVMFr5cOGFBtu1UMY4If+JLsABk56F/oVSEr+9Dbv91y/4L+XedRGUdXIO11MD5I4+Q4Zw9yr8+0bHRfsecI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790676587; c=relaxed/simple;
+	bh=2f89lGzBj83QCpV/NBK2d1edoxrkBei/ReUM26OM7hU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=QPziNDd2D/0YfD9K1iGADebL9iwWxi2pU93ezZptOIKjXI1PPoJtmvkADm3lw9YUT0g9HyOnmG8jKWL+H5azBRV/U02tfFj6l9gqIIXjK7VD2+15OJkPGdoDOjs9ui//uaes9psPYrDK1mZfeBa2s199f1EtNIDGoT2uX2NpvFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UA7yFZzd; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WRRIX5+w";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XXIQ3xzp"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68T7TncW2570904
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 10:03:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	NmhBYMIxyetX32o034YORWUFSNbgOUrruLgW7i9+vds=; b=WRRIX5+wX7JM4mWz
-	/tShCvtr9UJWqMeykDUccHF6LMsQpbqWmaVY12gZj/uEzZtP2j0opy2dRARb7xGA
-	Fo0ktIRt7YSHn/D6MjrZon8SnLkUJ/AstmOal1R+1+OeTNTCCi39evHFEkl9CbK2
-	4RdnU9cMBMhmjqNzUbe6n+yIpNLNhSJI3W0kRAxxbRH+iz2r6nI3Dcv0g0yodmZl
-	inAmX/2fOHsCv27Y6V99QtXHabEaF3WKabjsWsDpn9N8OwfTOjudVGJkjsTN3uU5
-	uiRikW+Z07x6qwiRk7WFxz9pCZujAdfqgjMWkvpwaWloN5YdoVVAIT6cR/1rVYyO
-	uFXdBg==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h02mna353-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 10:03:25 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-934956beec8so846620485a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 03:03:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790676205; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DceA48PYmN4ab6hN0WzrU/2AhcJIy2bBg54jm9Uuub8sw6BAPWAXQLY/VA+Qb23puV
-         bRSh2VBRneOvlK9C9TwC2rylk7+rDifCuVCATII8TxRwtiwGhQn4AAPhW5sOssH6Q+oq
-         DLg1JT5ag9u8Ni2aLw53KsovwL65JfZ6v3D6bDATsxbmhjYL+VdLlKDYcGz8hdqyS/GS
-         AT+FPqnUW4dNg49zcWH3gzVLkCT6n/tUFBh4/gZcBAQsNo+Q7MOTJC921dMo2o17Km87
-         AirVITL3PQXEZDFH3tx0+H/1ElyL3WZfPFEl8qBp0tOtDiRo7nPNlai1syEr4HV1wr0h
-         Aj8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NmhBYMIxyetX32o034YORWUFSNbgOUrruLgW7i9+vds=;
-        fh=be7kvf1QRtprg8y6ynxrEzYF8NRxHBFhkSdVT0lISKY=;
-        b=OHeUk+Tw8d6noJsT26SVS6O75UPO7shu4Uot37lNkoOtivgmANfCeALXWM2mRHhLDq
-         2pDUP/QrtBrX5B8QXicBRPSp5S6kfF50SkOBfFnunsIywcfCQyzI4/BMEQih6tiLugGE
-         wK8PMuGx+u1zQwFxrQQItjTN3xp3WKRHoXRuJt9ph0Dn4JKN9o2aOKq82F9L2X874Veu
-         RL3auQhPf9P+sB59NycVY4k9/NkvAbbe9hW4icmkoVyc0UVK1IADC+hbEY5aKsSZs2B8
-         Yp3NsgOgoeszlGidN+L5qyOXnFv9VILPAAaNkvdhwIIT2hyWrghpaMmBtiL1G9K1UAK8
-         ejYg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1790676205; x=1791281005; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=NmhBYMIxyetX32o034YORWUFSNbgOUrruLgW7i9+vds=;
-        b=XXIQ3xzpCLCifScGQY/i4EzKS9Xo0Ff9FyJuZohg0ayu/OjBmSjYA5G4VfM+l73Mkp
-         Ufs+X/5p5Y59t711G29B/dnfCa5CFuSJekUtgvaMlZNUQG6LCwwe6V8UUR6gmYY5shaN
-         m2TaEX7AR60fi0MbAcNkmuy3VBg+FEbwNKgVJO70MgsoODXYaVG6WjRqS7TpOMAEjYO4
-         vkxvxEQjpmcYY53Wht+Kwn8VtdIGofQHLQwN4SlilvazUIKRSFZxU42Rzt9DlcgyvMFv
-         gsenduSDHM6m9l2tuv46S6gww+8DWSkLVHx/qluFpsi0ERL+V+VYtquA0R0iAnCFM3Fy
-         bALg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790676205; x=1791281005;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NmhBYMIxyetX32o034YORWUFSNbgOUrruLgW7i9+vds=;
-        b=RWEzfMpSGFg2KTZRFgT4ZnHNu11/YndVTxrM3sye4GBgFxsSfMQ1OzKgU2FSK82FyD
-         mvICugfQd0lokp0Ldb3Pnf4ZeRUhYCi/tHAG1In2HfJJQSD10u/yOR1j8DKcUGWzccpY
-         biHbs5/oC3yS8YB0wzlA0vzbD3Iy7qfA2ACzQV8/3iRiijXWlJ32zUvzbuauOWGN9eE2
-         plZO5qFJJq/SR0+g5xYrVnQfPB33qJwPZKgdjezkID7r01fOplBE3LSF0XTS71iU3WtC
-         QPz3LXtl8waiTOKcLKzlBJH6b4T8Pi3vb24LvRsP2+aE9q/WMu0aVg5+83ktfT5P73uv
-         T75A==
-X-Forwarded-Encrypted: i=1; AKwUvBx/uypGiOMcXrFs08sakc7CPITR7LJ+aIPwmYBl3Xz5MFshbOK1moSC/KlezytGMXekgUUCAW6tBHHF/8SN+Wc=@vger.kernel.org
-X-Gm-Message-State: AFuF++ktQcsxaMhnv1M9+cCcWxlqhKDeLKo9vSrpNXBQa0IvCtEPb1cM
-	6MJDvQwKy1Y+b30xsN5A9T+nBoipZ1xpT+1cSU8xGxpCPFfvoNJ7VE1EGI+CaYdUgMbBC82fu4v
-	4OL4B+MhvB6INdHUXcd59iFD9h09l5MrTuVENTH25A1IGGNWDmnFjpRA6AouSMHQkaJWEgNW0zC
-	pAue1ZUxShh3x7ifdIW/pA2pbuf34srK52x2GoH73u92k5tA==
-X-Gm-Gg: AYBFou0g3k4bixLJwKTFfAxpYJEG2gdTGZ/IomOTC7O9s0fS9pboTmxa3qbKVYqsz0B
-	FaKs9mfwxEXnzCFFTQsxw6tOn3WvUbAoAFG9LZ1iiLep/3TRIUa9opqC4mN10koYy8XjqaL5fcL
-	rTgk5IQj++ahrZF6OsboXxznyQ1Os4rnraIOAxw72zvh4JL/O+a8VNaBLQrT7iuwAXye+MJHDF9
-	8Y/VXKYwex29DuOeUlguSXh9D9xhzuvlDvMNY9u8BDLHi0AAZ81Lbkjar2zp8WviJ+VjEimJ0rg
-X-Received: by 2002:a05:620a:1724:b0:93c:2110:14e1 with SMTP id af79cd13be357-93c43cd61a7mr2588125385a.42.1790676204587;
-        Tue, 29 Sep 2026 03:03:24 -0700 (PDT)
-X-Received: by 2002:a05:620a:1724:b0:93c:2110:14e1 with SMTP id
- af79cd13be357-93c43cd61a7mr2588119585a.42.1790676204086; Tue, 29 Sep 2026
- 03:03:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UA7yFZzd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1790676569;
+	bh=2f89lGzBj83QCpV/NBK2d1edoxrkBei/ReUM26OM7hU=;
+	h=From:To:Subject:Date:From;
+	b=UA7yFZzddtc/gNyy5Vto/jGxDRxQvNHC1JatkYp06r5G2gGM9uBStVAHGSr7kqw0v
+	 3IAKSTezyfMd+lZlAoz628rWjvH9V/u06dQaLWIPl/x+uXdcLkI6V2/9I9S06jmjag
+	 T2Z+5+W3bBoIMVyJNXscwDavpK72Tvc8hCuM+zOe67WFQBBrAKub+qv1I4jKtu8R4V
+	 hScsjwpwk6lODpW+lemM5nztC6uSSoktz9yZMFV+L6QtasBv9Mn2Po82ksCDtsvAR8
+	 bmNt3S5+r7zAZK+Bt6gYg60TsR7ERaJnSP9VFCuh7Q2NluLckYmQpHxmgJdShTdhTG
+	 EVvXBxXySw0ig==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 31B5417E007B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 12:09:29 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5] Bluetooth: MGMT: Add management security level changed event
+Date: Tue, 29 Sep 2026 12:09:23 +0200
+Message-ID: <20260929100923.252597-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260925-bt-wcn-clk-enable-v1-0-30bee88c4de4@oss.qualcomm.com> <20260925-bt-wcn-clk-enable-v1-1-30bee88c4de4@oss.qualcomm.com>
-In-Reply-To: <20260925-bt-wcn-clk-enable-v1-1-30bee88c4de4@oss.qualcomm.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Tue, 29 Sep 2026 12:03:13 +0200
-X-Gm-Features: AclHuK8hrus5ifIhd0kBrHEFVRgKNmcLi6GGy2VwQ0rTLUBWrWRbn9i9ZtKBjZc
-Message-ID: <CAFEp6-1J_nnD1OY=GBET19p9+j28n9LFmt5CgoiyWr7FVSmOFQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: hci_qca: Add WCN clock management for
- pwrseq-based power path
-To: Yepuri Siddu <yepuri.siddu@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Imran Shaik <imran.shaik@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        quic_mohamull@quicinc.com, quic_hbandi@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=X9fHu2Te c=1 sm=1 tr=0 ts=6abb8ced cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=DJpcGTmdVt4CTyJn9g5Z:22 a=EUspDBNiAAAA:8 a=k-oZKQUuCPdrsXQy0KMA:9
- a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-GUID: tZHPWxlbxPT8PEcv8V-3L_R5Y35FJNpb
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI5MDAzOSBTYWx0ZWRfX/DkBfmE+bc7H
- H6FpFF/ImJmig75ZB9jRy+no1ZsOYWqGLsFFWxyjvMDBaUDNCzaZTv0Tu7lOfvMkxhKuYZ0rjFg
- OZVN5JzOpXWB3xZbUi8M5hfCNSGO1Aw=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDAzOSBTYWx0ZWRfX4vRVJaDJoyXB
- Yrr1/kcBHk4IcxT1KpoSRFiRdI+dwI/WuEqIyg0Kx2BgykIh2YDKmFmTTF3jXvzaLU/P96g3UgT
- YW0dauuur26cmHU3DojLkSkLZL6BTYqRJ4xsa2Q3tSBZwMXNoenxFXn9qkA85WUUKoMY+CBFQOC
- ik6BatwEkSKXYPjtvnG3V1u2ocBEuIs1IOL7P4btwvX0sewy8fixa4ZxxShm0iyn+51d8RlrTIZ
- jE098wB6QxoaPE01LR3Msj04qehQw+nXPe91CebO7csPJ9v7t766nJOrdUFTa4bQAW0WCbfiHgm
- QkLUbHOdXbGopCAxkcENHaG4PTURhpQXH7uQ2KGwNBomb5IhHPFGKmQwe5KKDvZMEEp36wdnCPm
- CCXcqayPpOcHV7tAPDRIwAy7GkZr6ylZA8I/0tAvRpo90+GgoEHtqa0wbXfbScMUDUp1S8fSMN/
- rOjYyTpqt+7hPbM7pcA==
-X-Proofpoint-ORIG-GUID: tZHPWxlbxPT8PEcv8V-3L_R5Y35FJNpb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-29_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0 spamscore=0
- bulkscore=0 impostorscore=0 phishscore=0 clxscore=1015 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609290039
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 25, 2026 at 8:21=E2=80=AFAM Yepuri Siddu
-<yepuri.siddu@oss.qualcomm.com> wrote:
->
-> RPMCC previously kept WCN clocks enabled via proxy votes, so the pwrseq
-> power path in hci_qca did not need to explicitly manage the clock.
-> With proxy vote removal, each consumer must explicitly enable and disable
-> its required clocks.
->
-> Extend the pwrseq-based power path to acquire and manage an optional
-> WCN clock. In qca_serdev_probe(), acquire the clock using
-> devm_clk_get_optional(). In qca_regulator_enable(), enable the clock
-> after a successful pwrseq_enable() with proper rollback on failure.
-> In qca_power_off(), disable the clock before pwrseq_disable().
->
-> Targets that do not define a clock in DTS are unaffected since
-> devm_clk_get_optional() returns NULL and all clock operations are
-> guarded accordingly.
->
-> Signed-off-by: Yepuri Siddu <yepuri.siddu@oss.qualcomm.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 7089e9b639b2..489a059e519a 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -2265,6 +2265,8 @@ static void qca_power_off(struct hci_uart *hu)
->         }
->
->         if (power && power->pwrseq) {
-> +               if (qcadev->susclk)
-> +                       clk_disable_unprepare(qcadev->susclk);
->                 pwrseq_disable(power->pwrseq);
->                 set_bit(QCA_BT_OFF, &qca->flags);
->                 return;
-> @@ -2324,8 +2326,17 @@ static int qca_regulator_enable(struct qca_serdev =
-*qcadev)
->         struct qca_power *power =3D qcadev->bt_power;
->         int ret;
->
-> -       if (power->pwrseq)
-> -               return pwrseq_enable(power->pwrseq);
-> +       if (power->pwrseq) {
-> +               ret =3D pwrseq_enable(power->pwrseq);
-> +               if (ret)
-> +                       return ret;
-> +               if (qcadev->susclk) {
-> +                       ret =3D clk_prepare_enable(qcadev->susclk);
+Add an event on device security level or encryption type change to
+let user space know which level is currently in use.
+Reset security level to 0 on disconnection so further connections
+will correctly report security level changes.
 
-Why is susclk guarded by the pwrseq? They seem unrelated to me.
+This will be used for BlueZ qualification automation.
 
-> +                       if (ret)
-> +                               pwrseq_disable(power->pwrseq);
-> +               }
-> +               return ret;
-> +       }
->
->         /* Already enabled */
->         if (power->vregs_on)
-> @@ -2472,8 +2483,14 @@ static int qca_serdev_probe(struct serdev_device *=
-serdev)
->                          */
->                         if (IS_ERR(qcadev->bt_power->pwrseq))
->                                 qcadev->bt_power->pwrseq =3D NULL;
-> -                       else
-> +                       else {
-> +                               qcadev->susclk =3D devm_clk_get_optional(=
-&serdev->dev, NULL);
-> +                               if (IS_ERR(qcadev->susclk)) {
-> +                                       dev_err(&serdev->dev, "failed to =
-acquire clk\n");
-> +                                       return PTR_ERR(qcadev->susclk);
-> +                               }
->                                 break;
-> +                       }
->                 }
->
->                 qcadev->bt_power->dev =3D &serdev->dev;
->
-> --
-> 2.34.1
->
->
+Assisted-by: GPT:GPT-5.3-Codex
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+---
+v1->v2:
+ - Add encryption type to the mgmt event
+ - Send event on security level or encryption type change
+v2->v3:
+ - Replace fixed security level and ancryption type parameters by TLV array
+   to allow later enhancement.
+v3->v4:
+ - Change MGMT_EV_SECURITY_LEVEL_CHANGED to 0x0034
+ - Add __counted_by for the tlv_data
+ - dynamically allow the mgmt_ev_security_level_changed structure
+v4->v5: Address Sashiko comments:
+ - stop overwriting tlv_count and replace it by tlv_length as kzalloc_flex()
+   should already set it to the byte length. This depends on compiler
+   supporting __builtin_counted_by_ref(), so explicitly set it too.
+ - filter on link type to prevent to send event for child connection
+ - remove premature calls to mgmt_security_level_changed()
+ - send events only on security level changes
+
+ include/net/bluetooth/hci_core.h | 15 ++++++++--
+ include/net/bluetooth/mgmt.h     | 14 +++++++++
+ net/bluetooth/hci_conn.c         | 10 +++++++
+ net/bluetooth/hci_event.c        | 28 ++++++++++++++++--
+ net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++
+ 5 files changed, 112 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fb85a0ccb250..0f4a345f492c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2255,6 +2255,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
+ 		conn->security_cfm_cb(conn, status);
+ }
+ 
++void mgmt_security_level_changed(struct hci_conn *conn);
++
+ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ {
+ 	struct hci_cb *cb;
+@@ -2277,11 +2279,20 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ 		encrypt = 0x01;
+ 
+ 	if (!status) {
+-		if (conn->sec_level == BT_SECURITY_SDP)
++		bool sec_level_changed  = false;
++
++		if (conn->sec_level == BT_SECURITY_SDP) {
+ 			conn->sec_level = BT_SECURITY_LOW;
++			sec_level_changed = true;
++		}
+ 
+-		if (conn->pending_sec_level > conn->sec_level)
++		if (conn->pending_sec_level > conn->sec_level) {
+ 			conn->sec_level = conn->pending_sec_level;
++			sec_level_changed = true;
++		}
++
++		if (sec_level_changed)
++			mgmt_security_level_changed(conn);
+ 	}
+ 
+ 	mutex_lock(&hci_cb_list_lock);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 1e22eab1081c..b02e915bb44c 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -1221,3 +1221,17 @@ struct mgmt_ev_conn_subrate {
+ 	__le16	cont_num;
+ 	__le16	supv_timeout;
+ } __packed;
++
++#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
++#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
++#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
++
++#define MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL	0x0000
++#define MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE	0x0001
++
++#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0034
++struct mgmt_ev_security_level_changed {
++	struct mgmt_addr_info addr;
++	__u8	tlv_length;
++	__u8	tlv_data[] __counted_by(tlv_length);
++} __packed;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cf44452e0766..5191fd72ac9e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1233,6 +1233,11 @@ static void hci_conn_unlink(struct hci_conn *conn)
+ 	if (!conn->parent) {
+ 		struct hci_link *link, *t;
+ 
++		conn->sec_level = BT_SECURITY_SDP;
++		clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
++		clear_bit(HCI_CONN_AES_CCM, &conn->flags);
++		mgmt_security_level_changed(conn);
++
+ 		list_for_each_entry_safe(link, t, &conn->link_list, list) {
+ 			struct hci_conn *child = link->conn;
+ 
+@@ -1543,6 +1548,11 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		conn->pending_sec_level = sec_level;
+ 	}
+ 
++	/* Do not report the security level here: conn->dst may still hold
++	 * the peer's RPA instead of its identity address, and the connection
++	 * is not established yet. le_conn_complete_evt() reports it once the
++	 * connection completes and the identity address has been resolved.
++	 */
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->conn_timeout = conn_timeout;
+ 	conn->le_adv_phy = phy;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5ac2357e92c9..e2961e1837aa 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -755,6 +755,7 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
+ 			status = HCI_ERROR_AUTH_FAILURE;
+ 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
+ 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
++			mgmt_security_level_changed(conn);
+ 		}
+ 
+ 		/* Update the key encryption size with the connection one */
+@@ -3210,6 +3211,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	if (!status) {
++		bool encrypt_change = false;
++
+ 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
+ 		if (status)
+ 			goto done;
+@@ -3232,8 +3235,10 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 		if (test_bit(HCI_AUTH, &hdev->flags))
+ 			set_bit(HCI_CONN_AUTH, &conn->flags);
+ 
+-		if (test_bit(HCI_ENCRYPT, &hdev->flags))
++		if (test_bit(HCI_ENCRYPT, &hdev->flags)) {
+ 			set_bit(HCI_CONN_ENCRYPT, &conn->flags);
++			encrypt_change = true;
++		}
+ 
+ 		/* "Link key request" completed ahead of "connect request" completes */
+ 		if (ev->encr_mode == 1 && !test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
+@@ -3243,11 +3248,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 			key = hci_find_link_key(hdev, &ev->bdaddr);
+ 			if (key) {
+ 				set_bit(HCI_CONN_ENCRYPT, &conn->flags);
++				encrypt_change = true;
+ 				hci_read_enc_key_size(hdev, conn);
+ 				hci_encrypt_cfm(conn, ev->status);
+ 			}
+ 		}
+ 
++		if (encrypt_change)
++			mgmt_security_level_changed(conn);
++
+ 		/* Get remote features */
+ 		if (conn->type == ACL_LINK) {
+ 			struct hci_cp_read_remote_features cp;
+@@ -3514,9 +3523,14 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 
+ 	if (!ev->status) {
++		bool sec_level_changed =
++				conn->sec_level != conn->pending_sec_level;
++
+ 		clear_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
+ 		set_bit(HCI_CONN_AUTH, &conn->flags);
+ 		conn->sec_level = conn->pending_sec_level;
++		if (sec_level_changed)
++			mgmt_security_level_changed(conn);
+ 	} else {
+ 		if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
+ 			set_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
+@@ -3632,9 +3646,12 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
+ 			    conn->type == LE_LINK)
+ 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
++
++			mgmt_security_level_changed(conn);
+ 		} else {
+ 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
+ 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
++			mgmt_security_level_changed(conn);
+ 		}
+ 	}
+ 
+@@ -5228,8 +5245,14 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
+ 	if (conn->type != LE_LINK)
+ 		goto unlock;
+ 
+-	if (!ev->status)
++	if (!ev->status) {
++		bool sec_level_changed =
++				conn->sec_level != conn->pending_sec_level;
++
+ 		conn->sec_level = conn->pending_sec_level;
++		if (sec_level_changed)
++			mgmt_security_level_changed(conn);
++	}
+ 
+ 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 
+@@ -5861,6 +5884,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 	mgmt_device_connected(hdev, conn, NULL, 0);
+ 
+ 	conn->sec_level = BT_SECURITY_LOW;
++	mgmt_security_level_changed(conn);
+ 	conn->state = BT_CONFIG;
+ 
+ 	/* Store current advertising instance as connection advertising instance
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9d3de5a0b8ee..77c958322496 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -177,6 +177,7 @@ static const u16 mgmt_events[] = {
+ 	MGMT_EV_CONTROLLER_RESUME,
+ 	MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
+ 	MGMT_EV_ADV_MONITOR_DEVICE_LOST,
++	MGMT_EV_SECURITY_LEVEL_CHANGED,
+ };
+ 
+ static const u16 mgmt_untrusted_commands[] = {
+@@ -10822,6 +10823,54 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, NULL);
+ }
+ 
++void mgmt_security_level_changed(struct hci_conn *conn)
++{
++	struct mgmt_ev_security_level_changed *ev;
++	struct mgmt_tlv *tlv;
++	u8 *tlv_data;
++	u8 tlv_len;
++
++	/* Only ACL, LE and BIS links are tracked as mgmt connections, so
++	 * restrict the event to those link types. Other transports (SCO,
++	 * CIS, PA sync, ...) share the parent's address and would otherwise
++	 * report a spurious security level change for it.
++	 */
++	if (conn->type != ACL_LINK && conn->type != LE_LINK &&
++	    conn->type != BIS_LINK)
++		return;
++
++	tlv_len = 2 * (sizeof(*tlv) + sizeof(__u8));
++	ev = kzalloc_flex(*ev, tlv_data, tlv_len, GFP_KERNEL);
++	if (!ev)
++		return;
++
++	bacpy(&ev->addr.bdaddr, &conn->dst);
++	ev->addr.type = link_to_bdaddr(conn->type, conn->dst_type);
++	ev->tlv_length = tlv_len;
++
++	tlv_data = ev->tlv_data;
++	tlv = (void *)tlv_data;
++	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL);
++	tlv->length = sizeof(__u8);
++	tlv->value[0] = conn->sec_level;
++
++	tlv_data += sizeof(*tlv) + sizeof(__u8);
++	tlv = (void *)tlv_data;
++	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE);
++	tlv->length = sizeof(__u8);
++	if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
++		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_NONE;
++	else if (test_bit(HCI_CONN_AES_CCM, &conn->flags))
++		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_AES_CCM;
++	else
++		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_E0;
++
++	mgmt_event(MGMT_EV_SECURITY_LEVEL_CHANGED, conn->hdev, ev,
++		   struct_size(ev, tlv_data, tlv_len), NULL);
++
++	kfree(ev);
++}
++
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len)
+ {
+-- 
+2.43.0
+
