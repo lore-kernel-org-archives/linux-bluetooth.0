@@ -1,414 +1,111 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-43101.protonmail.ch (mail-43101.protonmail.ch [185.70.43.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC2351EE04
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 12:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9AD4FDA71
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 12:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790684554; cv=none; b=njwQgzfhGtLQMWKhPAGI9tGuui3r9eivxgxl8tfj5SWMds28R6vA/dNJRjoa++//2Y3fbOfLmVWJML4+hBrt+pW3y/3yy0A1JGDIWVAkR8/BkwHPly7TtjcuVCYEnAAZaEjNbVmCCdf9QS2JjKk3mQ3EoL8p3qM8enw1LlJhY3c=
+	t=1790686664; cv=none; b=j96PE7kUmFf3EuWiCckveSpJ1AzuSADdL1zREiGc1I/7+KZpgKwSGXphT12BcufwcrdwqCecE8Lk9UiNW431UPQXv/JdviKyF5Poo/xLPx6ThIl6cuaVODlWCfrtcRJj4/fVIB+2P5nfhHU95nNYs2XrMOXUR6NoYs2FhUxY5E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790684554; c=relaxed/simple;
-	bh=O8D84FTFBf1LiYsMUL6kZ7J896dKztzUtv7yg42eDus=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3QrxKvrQ/2oq2y7Ykibpm8n0G1r54Pab5TM6+4bJ99mQrJOdskyhG/ieiGou6UphpTSTBwxYM3XkcnHrhIAhTrnlIW/86FFaVxZWIwuRWo1qkigppRF+efS8JslDVAEBI22ld0xQjDTDb5L1KebHlaS5143vZ+b3t6nM4VHG3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sVt8K5fD; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790686664; c=relaxed/simple;
+	bh=mvI99qjRlMfZTZ/WHaalnFFP3OsC8BTwgoHYYTXjjTc=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fi8s+3qKYHwrwEZCkMlfTAJpHOu1eKMn+ujagMmtDK5T68e/VgefyILpr+hPGvXu6n5L2Jb7yMesS1q+WXPomcNZ+UsWZu5rzXTN/U4+IK3bITDouF1wn5rKXdXW+vucKC7iVgfg2PT9cyR5fBt9zBVMt89ksgDJKTwKEG5KO5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=hIjOOeqO; arc=none smtp.client-ip=185.70.43.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sVt8K5fD"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49b912d3931so31274855e9.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 05:22:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790684551; x=1791289351; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wsVWpdNqyR1ov4kzte6IkDcEo+/nTeP+Cd8I0+pKOW0=;
-        b=sVt8K5fDv8xmHYDpJbQs8Mk/ZZ8MJKL8C5kW+CZGiRc9w30ONUwcwkUBdt3MJuiEgW
-         gElqK3pw8h/QrbIClfq5q718tT5P01llF4daiYz0Sp+qbHx+Yp2sKG8/3t1Uc/1XnihK
-         GAyhLCONKZ7exROJc7MkPBvpRLce5475802T30pO5gKsF0m8Q9e83ZANJwgD7MMwcljl
-         kEs3Pb65fVFXx3AEUvtmawRfsIfgzCLUh43VK1GjqQctRunpwwv8Sy+Ii7CkjysO5L+A
-         M5HW6K2m1dt3dzAu+4lgZU9pu9nDCx1Un0+P8Cf6qtOGPxZ9wxrGH6wlOgxNwye4Spdc
-         JBPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790684551; x=1791289351;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wsVWpdNqyR1ov4kzte6IkDcEo+/nTeP+Cd8I0+pKOW0=;
-        b=S0pO9u3PSHypNyEPJOk3KF4kXtSzCLGz1ERWEx1ZKjNl+6dqQZmSBmsPA6SecjthNF
-         XvKWmErE+K2wehDi2CXyddFVnU0/yWJeTXq5ZirlVE7RJv9h92xjmMb8u/9KxBnIrGpN
-         n7c0BcbAfV7bEfULQohItiCfc0cj9vqGLuvx/6sEb8JoatQeqCGsX+1ERz8s8/dUfTWw
-         xh11ExfFKei9Je1bjWqnNAMY0m1R05Y/G9hVpuXBtnJ4nPzE0R+mfaCE2xdO6dndAvkT
-         EvBNWQnELAH+xPtPgbDlhBNn28b1zHoK4INeBOwMyUKwwMAnO+/31GnhDco+BAuHmQXz
-         BaMw==
-X-Forwarded-Encrypted: i=1; AKwUvBwzEydqx1kH5WYuGtZREiMmpyu2sRI4P0/1tDesYmv4mn74U3b61MFZ+ZZAWFqDymI2zvL23RDSC+A/tDW1nG4=@vger.kernel.org
-X-Gm-Message-State: AFuF++nWDI7tbzqFUWeCFQ4OHWF5O9D5a9jRQ+xHRUE8e0Gerw9zQrM/
-	KpjUp5aqHBby/SBn0d4KkL9JgHKPlrT/fUJUQokMN6z6K8xzRIm/tfMT
-X-Gm-Gg: AYBFou36zmSEKuTB8ESI+vf+fwqOSGm2VlGi5fS50rNS0Jbw7J9AexgpBOKPyMe2/P5
-	/OQ6apBBI50IumC5NfHgDfUDJMS8P/kpe2FT0VwPdB4MOceQTP/tGFqGLpbxexWfKWoAWTExLPG
-	zzEcnSRFWhUxvfFaE1YOa+qxAbVG/TlOA2AAuJFGaXsHjxP2YCSXOi0xTXk//hMiYK0A3Ghbx4o
-	aGEVzUkXwQRROAFDwaHlQjnudvJjiNksIOGeiteGLA7TTvAttSNkRWtjFXu32grkoNC3U6rmJzR
-	JXjYz0OjGA/N/fZWy/vO1TkbfqBbx9q8HSusoZdYGkjAk/R684wYcwGWwj28HPRe95eMP9N7Cho
-	G2aQ2qDuJM5wyOr3u2mPccwaVbGuruXDnIWTj9kAKOdqtqL5Lxm6387kL735K/bIV4mdymLKn9Z
-	ircCMnfzSe0+X0+FzGB2OsHUddyQ4rzxVpkOlzl+w0qRY/wi8byQLvUpumQfZiKWBSi2Npy5n6i
-	Q+NqwKMVfbEA+DcjOCV23xYtuLiWioDGAcxvdBeKgwc1Tkuxsb2Y9DPULWHpBh4qzcbYrE=
-X-Received: by 2002:a05:600c:46c6:b0:49f:fe88:e7d1 with SMTP id 5b1f17b1804b1-49ffe88e87dmr141315145e9.15.1790684550378;
-        Tue, 29 Sep 2026 05:22:30 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a00ed06ea7sm55359085e9.4.2026.09.29.05.22.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 05:22:29 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: nicoyip.dev@gmail.com,
-	pav@iki.fi,
-	r772577952@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-	syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
-Subject: [PATCH v4] Bluetooth: RFCOMM: connect the session socket without rfcomm_mutex
-Date: Tue, 29 Sep 2026 17:22:26 +0500
-Message-ID: <20260929122226.98970-1-mikhail.v.gavrilov@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="hIjOOeqO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1790686652; x=1790945852;
+	bh=aW40yFsQQVBEhux8EBCqWRxfD9Vurz0F67UWu0vlI2A=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=hIjOOeqOa1kz+VzY7JBho1n6TRCkAemcgSTiHx66yM/KMQ52jqobiBw/vevA93QeI
+	 y3UFrudGr2tdb1ZT3NS7y1vVgSBC9ZPbQdZYGlmLD2ebZykt/KbCr+yDInkzW4m/Z4
+	 lotGDzG6Glwvk6kGclrPNnkBdccISlJhv6adV5j+YuTSOpnbN/H/UkFB092qZVC+d1
+	 2ECXMmvA3RPhZlq60QqmVZHjmXhaWyFHFpmYM0+qR22q7f9+oWP/SrZgEHGRCA4pBD
+	 3RdPj1iDGDuHFZIm/ydb/9jPiIPHQcWCsgiXWCzv4IUcX6dh08bYtzQKWTbqNIVJZU
+	 5UEb8zaJF16BQ==
+Date: Tue, 29 Sep 2026 12:57:27 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Sergey Lebedev <lsa.uz@pm.me>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Kiran K <kiran.k@intel.com>, Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Ravindra <ravindra@intel.com>, "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: btintel_pcie: controller left dead after a boot-stage error, 1 in 12 warm reboots
+Message-ID: <20260929125718.79878-1-lsa.uz@pm.me>
+In-Reply-To: <20260911093904.68667-1-lsa.uz@pm.me>
+References: <20260831124952.87484-1-lsa.uz@pm.me> <20260911093904.68667-1-lsa.uz@pm.me>
+Feedback-ID: 113843758:user:proton
+X-Pm-Message-ID: 37b5b9530ed77e19f4b606fdd979f0b3139276b0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-An RFCOMM connect() issued while a BR/EDR link is being authenticated
-makes lockdep report a circular dependency, and the reported cycle is a
-real AB/BA between rfcomm_mutex and hdev->lock.
+A correction to my message of 11 September, written as a summary so that
+this thread can be read from here.
 
-rfcomm_security_cfm() is called from the HCI event path, which already
-holds hdev->lock:
+That message said two things. One was wrong and I withdraw it; the other
+stands.
 
-  hci_rx_work()
-    hci_event_packet()
-      hci_cc_read_enc_key_size()   [hdev->lock]
-        hci_encrypt_cfm()          [hci_cb_list_lock]
-          rfcomm_security_cfm()    [rfcomm_mutex]
+Withdrawn: the failed probe and btintel_boot_wait_d0()
+------------------------------------------------------
 
-while an RFCOMM connect() from userspace takes the same two locks the
-other way round:
+The failed probes were my own doing. A recovery service I run reloaded
+btintel_pcie as soon as it saw a zero BD address, which is also what the
+adapter shows while the firmware setup is still running. The unload takes
+the interrupts away from that setup, and the probe of the reload then waits
+3 s for the alive interrupt and fails with -62. The same sequence does this
+to a healthy controller here.
 
-  rfcomm_sock_connect()
-    rfcomm_dlc_open()              [rfcomm_mutex]
-      __rfcomm_dlc_open()
-        rfcomm_session_create()
-          kernel_connect()
-            l2cap_sock_connect()
-              l2cap_chan_connect() [hdev->lock]
+btintel_boot_wait_d0() never gave up. The log I quoted has no "Device d0
+move timeout", none of the 59 boots I still have logs one, and every boot
+where the race struck logged "Device moved to D0". Please disregard the
+question.
 
-  WARNING: possible circular locking dependency detected
-  kworker/u131:1/1128 is trying to acquire lock:
-  rfcomm_mutex, at: rfcomm_security_cfm+0x31/0x3e0 [rfcomm]
-  but task is already holding lock:
-  hci_cb_list_lock, at: hci_cc_read_enc_key_size+0x1d2/0xcc0
-  Chain exists of:
-    rfcomm_mutex --> &hdev->lock --> hci_cb_list_lock
+Stands: the race, and how often it hits
+---------------------------------------
 
-hci_auth_complete_evt() and hci_encrypt_change_evt() reach the callback
-the same way.
+What fails is the race this thread began with. A gp1 mailbox interrupt
+arrives during the second-stage firmware download before the driver is
+waiting for it. The controller goes into error state, the Intel Reset after
+the download times out (alive context intel_reset1), the driver's one retry
+fails the same way, and the adapter is left DOWN at 00:00:00:00:00:00 with
+"Unsupported cnvi 0x00000000".
 
-Both orders have to be seen in the same boot, which is why a BR/EDR
-connection alone is not enough to show it: a session set up by the
-remote side is created by rfcomm_accept_connection() in krfcommd, which
-calls kernel_accept() and never takes hdev->lock under rfcomm_mutex.
-Connecting a device that authenticates and encrypts the link and then
-calling connect() on an RFCOMM socket towards any address - the connect
-does not have to succeed, the order is recorded before the page timeout
-- reports it every time.
+The cold and warm figures stand, as figures for that race. They counted
+failed probes, and in every boot I still have, the service caused a failed
+probe exactly when the race had struck and never otherwise:
 
-Only the session socket has to be connected with the lock held, and it
-does not: nothing else can see the socket before it is put on the
-session list.  So connect it first and take rfcomm_mutex afterwards,
-which removes the rfcomm_mutex -> hdev->lock order for good, rather
-than keeping the HCI event path out of rfcomm_mutex.
+  warm reboots, >=3D 200 s apart    4 of 10
+  cold boots, full power cycle    1 of 11    p =3D 0.03 against the warm ra=
+te
 
-rfcomm_session_create() becomes rfcomm_session_connect(), which returns
-the connected socket without touching the session list, and
-rfcomm_dlc_open() adds the session once it holds the lock again.  If
-another opener added a session for the same pair while this socket was
-connecting, that session is used and this socket is dropped.
-__rfcomm_dlc_open() now takes the session it should use, and its state
-check runs after the lock is re-acquired, so a DLC that was opened or
-closed in the meantime is still handled.
+So a full power cycle makes it much rarer but not impossible: left-over
+state makes it more likely, and a real race sits under it.
 
-Over an existing ACL link the connection can complete before the
-session reaches the list, and the wakeup from the socket callback is
-then lost, so krfcommd is woken once the session is visible.
+Since then
+----------
 
-Connecting without the lock opens a window in which the socket can be
-closed.  The DLC is not on a session yet, so rfcomm_dlc_close() finds
-nothing to do and returns without touching it, and rfcomm_dlc_open()
-would then attach a DLC whose owner is gone.  rfcomm_dlc_close() now
-marks such a DLC with RFCOMM_CLOSED, and rfcomm_dlc_open() checks the
-mark once it holds rfcomm_mutex again and drops the socket instead of
-attaching the DLC.  The mark is cleared when an open starts, so a DLC
-that is reused is not affected.  This covers both callers of
-rfcomm_dlc_open(), the socket and the tty layer.
+- Ubuntu's current 7.0.0-34 still has it: 9 of 28 boots here, same
+  signature.
+- Left alone, the adapter stays at the zero address, and a reload after
+  the firmware setup has given up brings it back.
+- bluetooth-next and 7.3 kernels built here: the race did not appear in
+  109 boots (82 in my other report, 27 since). Those builds carry about
+  270 modules against Ubuntu's 6709, so this does not yet tell a difference
+  in code from a difference in timing. A current kernel built with
+  Ubuntu's config would, and I can run that here. Details in the other
+  report:
+  https://lore.kernel.org/linux-bluetooth/20260911210634.87502-1-lsa.uz@pm.=
+me/
 
-Fixes: 759c185d0bbd ("Bluetooth: RFCOMM: serialize security confirmation handling")
-Suggested-by: Pauli Virtanen <pav@iki.fi>
-Reported-by: Pauli Virtanen <pav@iki.fi>
-Closes: https://lore.kernel.org/linux-bluetooth/5e76a95e934e451e7006db28827c2d64af5a88be.camel@iki.fi/
-Reported-by: syzbot+74071deb72339c215b2e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/linux-bluetooth/6a92fadc.08e933ee.dbf97.008f.GAE@google.com/
-Reported-by: Jiaming Zhang <r772577952@gmail.com>
-Closes: https://lore.kernel.org/all/CANypQFabseTuRiyz2pGkc_Qj0moGDnY7KEp1qdTOqkw6gAL3hw@mail.gmail.com/
-Cc: stable@vger.kernel.org
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
----
+Sorry for the noise.
 
-The commit this fixes is in v7.3-rc1 and is marked for stable, so this
-probably wants the bluetooth fixes tree rather than -next.
-
-v4:
- - rfcomm_dlc_close() marks a DLC that is not on a session yet, and
-   rfcomm_dlc_open() drops the socket instead of attaching the DLC when
-   it finds the mark after taking rfcomm_mutex again (Luiz, and the
-   Sashiko review of v3)
- - Reported-by/Closes for Jiaming Zhang's report, which hits the same
-   cycle from the connect side: rfcomm_dlc_open() holding rfcomm_mutex
-   while l2cap_chan_connect() takes hdev->lock
- - syzbot tested v3 with its reproducer, no issue:
-   https://lore.kernel.org/all/6ab100d7.71f81b7d.15fa6d.0029.GAE@google.com/
-
-Tested on 7.3.0-rc5 with an MT7922 controller (btusb) and a JBL Tour
-Pro 3 headset.  An RFCOMM connect() towards an address that does not
-answer, run after the headset has authenticated its link, reports the
-inversion without the patch (checked on 7.3-rc2); with v4 it stays quiet
-and the validator is still armed afterwards (debug_locks: 1).  A connect
-towards the connected headset is answered in 23 ms with ECONNREFUSED -
-the session is established over the existing ACL link and the peer
-rejects the channel - and towards an idle one it fails with EHOSTDOWN
-after the page timeout.  The reproducer is in the v3 posting.
-
-v3: https://lore.kernel.org/linux-bluetooth/20260912100315.151674-1-mikhail.v.gavrilov@gmail.com/
-v2: https://lore.kernel.org/linux-bluetooth/20260904012028.77590-1-mikhail.v.gavrilov@gmail.com/
-v1: https://lore.kernel.org/linux-bluetooth/20260902235132.453044-1-mikhail.v.gavrilov@gmail.com/
-
- include/net/bluetooth/rfcomm.h |   1 +
- net/bluetooth/rfcomm/core.c    | 134 +++++++++++++++++++++++----------
- 2 files changed, 96 insertions(+), 39 deletions(-)
-
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 102c278e3..9dc5fd4cb 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -207,6 +207,7 @@ struct rfcomm_dlc {
- #define RFCOMM_AUTH_REJECT  7
- #define RFCOMM_DEFER_SETUP  8
- #define RFCOMM_ENC_DROP     9
-+#define RFCOMM_CLOSED       10
- 
- /* Scheduling flags and events */
- #define RFCOMM_SCHED_WAKEUP 31
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index d91e2a6ee..54ec1136f 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -62,10 +62,9 @@ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr);
- 
- static void rfcomm_process_connect(struct rfcomm_session *s);
- 
--static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
--							bdaddr_t *dst,
--							u8 sec_level,
--							int *err);
-+static struct socket *rfcomm_session_connect(bdaddr_t *src, bdaddr_t *dst,
-+					     u8 sec_level, int *err);
-+static struct rfcomm_session *rfcomm_session_add(struct socket *sock, int state);
- static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst);
- static struct rfcomm_session *rfcomm_session_del(struct rfcomm_session *s);
- 
-@@ -365,28 +364,17 @@ static int rfcomm_check_channel(u8 channel)
- 	return channel < 1 || channel > 30;
- }
- 
--static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 channel)
-+static int __rfcomm_dlc_open(struct rfcomm_dlc *d, struct rfcomm_session *s,
-+			     u8 channel)
- {
--	struct rfcomm_session *s;
--	int err = 0;
- 	u8 dlci;
- 
--	BT_DBG("dlc %p state %ld %pMR -> %pMR channel %d",
--	       d, d->state, src, dst, channel);
--
--	if (rfcomm_check_channel(channel))
--		return -EINVAL;
-+	BT_DBG("dlc %p state %ld session %p channel %d",
-+	       d, d->state, s, channel);
- 
- 	if (d->state != BT_OPEN && d->state != BT_CLOSED)
- 		return 0;
- 
--	s = rfcomm_session_get(src, dst);
--	if (!s) {
--		s = rfcomm_session_create(src, dst, d->sec_level, &err);
--		if (!s)
--			return err;
--	}
--
- 	dlci = __dlci(__session_dir(s), channel);
- 
- 	/* Check if DLCI already exists */
-@@ -421,14 +409,84 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
- 
- int rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 channel)
- {
--	int r;
-+	struct rfcomm_session *s;
-+	struct socket *sock;
-+	int err;
-+
-+	BT_DBG("dlc %p state %ld %pMR -> %pMR channel %d",
-+	       d, d->state, src, dst, channel);
-+
-+	if (rfcomm_check_channel(channel))
-+		return -EINVAL;
- 
- 	rfcomm_lock();
- 
--	r = __rfcomm_dlc_open(d, src, dst, channel);
-+	clear_bit(RFCOMM_CLOSED, &d->flags);
- 
-+	/* Do not page the remote device for a DLC that cannot be opened
-+	 * anyway.  __rfcomm_dlc_open() looks at the state again once the
-+	 * lock has been re-acquired below.
-+	 */
-+	if (d->state != BT_OPEN && d->state != BT_CLOSED) {
-+		rfcomm_unlock();
-+		return 0;
-+	}
-+
-+	s = rfcomm_session_get(src, dst);
-+	if (s) {
-+		err = __rfcomm_dlc_open(d, s, channel);
-+		rfcomm_unlock();
-+		return err;
-+	}
- 	rfcomm_unlock();
--	return r;
-+
-+	/* There is no session for this pair yet.  kernel_connect() ends up in
-+	 * l2cap_chan_connect(), which takes hdev->lock, and the HCI event
-+	 * path takes rfcomm_mutex while holding hdev->lock, so the socket has
-+	 * to be connected with rfcomm_mutex released.
-+	 */
-+	sock = rfcomm_session_connect(src, dst, d->sec_level, &err);
-+	if (!sock)
-+		return err;
-+
-+	rfcomm_lock();
-+
-+	/* The DLC may have been closed while the socket was connecting.  It
-+	 * was not on a session, so rfcomm_dlc_close() could only mark it;
-+	 * attaching it now would leave it with no owner.
-+	 */
-+	if (test_bit(RFCOMM_CLOSED, &d->flags)) {
-+		rfcomm_unlock();
-+		sock_release(sock);
-+		return -ECONNRESET;
-+	}
-+
-+	/* Another opener may have added a session for the same pair in the
-+	 * meantime; that one is used and this socket is dropped.
-+	 */
-+	s = rfcomm_session_get(src, dst);
-+	if (!s) {
-+		s = rfcomm_session_add(sock, BT_BOUND);
-+		if (s) {
-+			s->initiator = 1;
-+			sock = NULL;
-+		}
-+	}
-+
-+	err = s ? __rfcomm_dlc_open(d, s, channel) : -ENOMEM;
-+
-+	rfcomm_unlock();
-+
-+	if (sock)
-+		sock_release(sock);
-+
-+	/* Over an existing ACL link the connection can complete before the
-+	 * session reaches the list, and that wakeup is then lost, so let
-+	 * krfcommd look at the socket state now.
-+	 */
-+	rfcomm_schedule();
-+
-+	return err;
- }
- 
- static void __rfcomm_dlc_disconn(struct rfcomm_dlc *d)
-@@ -508,8 +566,14 @@ int rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 	rfcomm_lock();
- 
- 	s = d->session;
--	if (!s)
-+	if (!s) {
-+		/* Not on a session yet: rfcomm_dlc_open() may be connecting a
-+		 * socket for it with rfcomm_mutex released.  Leave a mark so
-+		 * that it does not attach the DLC once it holds the lock again.
-+		 */
-+		set_bit(RFCOMM_CLOSED, &d->flags);
- 		goto no_session;
-+	}
- 
- 	/* after waiting on the mutex check the session still exists
- 	 * then check the dlc still exists
-@@ -757,12 +821,12 @@ static struct rfcomm_session *rfcomm_session_close(struct rfcomm_session *s,
- 	return rfcomm_session_del(s);
- }
- 
--static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
--							bdaddr_t *dst,
--							u8 sec_level,
--							int *err)
-+/* Creates the L2CAP socket a new session will run on and starts connecting
-+ * it.  Must be called with rfcomm_mutex released.
-+ */
-+static struct socket *rfcomm_session_connect(bdaddr_t *src, bdaddr_t *dst,
-+					     u8 sec_level, int *err)
- {
--	struct rfcomm_session *s = NULL;
- 	struct sockaddr_l2 addr;
- 	struct socket *sock;
- 	struct sock *sk;
-@@ -792,24 +856,16 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
- 		l2cap_pi(sk)->chan->mode = L2CAP_MODE_ERTM;
- 	release_sock(sk);
- 
--	s = rfcomm_session_add(sock, BT_BOUND);
--	if (!s) {
--		*err = -ENOMEM;
--		goto failed;
--	}
--
--	s->initiator = 1;
--
- 	bacpy(&addr.l2_bdaddr, dst);
- 	addr.l2_family = AF_BLUETOOTH;
- 	addr.l2_psm    = cpu_to_le16(L2CAP_PSM_RFCOMM);
- 	addr.l2_cid    = 0;
- 	addr.l2_bdaddr_type = BDADDR_BREDR;
- 	*err = kernel_connect(sock, (struct sockaddr_unsized *)&addr, sizeof(addr), O_NONBLOCK);
--	if (*err == 0 || *err == -EINPROGRESS)
--		return s;
-+	if (*err && *err != -EINPROGRESS)
-+		goto failed;
- 
--	return rfcomm_session_del(s);
-+	return sock;
- 
- failed:
- 	sock_release(sock);
--- 
-2.43.0
+Sergey
 
