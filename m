@@ -1,136 +1,164 @@
-Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-2.smtp.github.com (out-2.smtp.github.com [192.30.252.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A4F52BE32
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 13:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88D54E66AD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 13:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790689284; cv=none; b=RVrMzjGOKIeNXyFoX+df+PO61WXtUGDErj15qcIE4z7uAHQfeR7eDbj+TNNN2sCt2YKn408xkJtJkWOFVbymxrGXTEtWyoGGyUcksCC31hJ1WxfePmI5lFgAwOotX6c3XWldSqk1pBLQ4HCjCT8F25Kn6LXPZ2ZEvuiuZSRfFz4=
+	t=1790689878; cv=none; b=d8B2cQTHZqpPgylJ7CYKBi1LydlSc5pepPiSU96q+h58N948NmyyxzdN5w38ixr4sT9JgawYgip3X69+hEOLxTi42IygWmQU4Vp6Jvz0djop50TaWeVuOOsP6ihyAxxqCM1Ftk1m7rI8900zX9UQlKjQn7YKQb6vXCX6r5uqz9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790689284; c=relaxed/simple;
-	bh=hDQs7T11Iq+HPqkT3yKUSiIOsZkEOl2uAfbSIqWICcM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hjoPV8cUbaMyWUWDcJT+KUaElGBqWf4Jbo3gDnu5GDaPhZyFPONBYoXuA7RVZY15qrWRuryV0kSdtgAZFdukuO//yB8JnJ7O0V3cWBfzd08HcYU7VeyLjlCz+UExGdbYh4Owp17kQ3PxR7ODz1dsjKRhIxTDyKl2Oi5AIAYth84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rE+xs/cW; arc=none smtp.client-ip=74.125.230.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790689878; c=relaxed/simple;
+	bh=PphuBjra+6yKPYYihfkfdctCWpPTXQNUviJ2Ma/9Y/I=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=uc23226Be9Bb24NJHVuoiSloq0VDTt7mMT+FHCC+oWQ2uc6ADZMFmTnwmBkdzUMFK9TGn7YCq9RNWJk/rKRhiPkUtM2Jy7Y+EEMdKI29hBmguoU0pHEk3azwfy/0957eDLzlPkU2t94ardfeq2EGLCb3kiE+l5qorJNjvILBnBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=gxkgDtrM; arc=none smtp.client-ip=192.30.252.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rE+xs/cW"
-Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-91071ba92a8so18154186d6.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 06:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790689282; x=1791294082; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=ti4b1UVBRQwQ5jYLf+us6xchz9XGU2BudjQRmCysDfM=;
-        b=rE+xs/cW8AILbm72gfp8s2IAhdT3F+7IKytAZy+T486PMhGxynRRr+jVD/SBUvTa9c
-         S0LDhaK9SD9hPg66HtdB0QO7sfSsxVFORzXnVomFpUfkLHHOPicjtOzIM1SVGredRv8j
-         FRvI1fYwdwY75IlsKt54oVOr/0dcdHIxVHOwYpRRASiUEppScp/lutQZKl+qcwTeqjfC
-         UOZwyLTD/f2lF+WKMqDQ5CcqZ9S0XxLZ+mIsyQv7lMOHjuMptRuyPp5NauGfgcvZMRKn
-         KkBN4WVnVIiJ4gI8y1o1O2TrVqTwflbRxX4vbaOrLje+VZsXLHSA1PTIKucXYb84gGwV
-         2z3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790689282; x=1791294082;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ti4b1UVBRQwQ5jYLf+us6xchz9XGU2BudjQRmCysDfM=;
-        b=hUdoPAUp3uu1p/9dgXiRtlPKvICajcl18wP7yHDIK74Mf9sUxZqQQIWas92kQo0yVm
-         viyVO3EueSECw5HrtGcjPRcgTbarJJmnqa5BeA604pqwwVcvjE7voHS5D/2fGLJyhYNE
-         Ujy3JH9/LGkzT/nls89KLiXbzHtggcgSVE+n7g354Y6Fr0Y//OQfXrBobLTOCXfidJFO
-         K7tYwqv30PjRAU8jUddfF6tAH5QG+mK9CPAH2s87/ru1PoX2AhssKwmnPNz1hndm6CUv
-         UTZvWVRKaREuDS7PFr0vBVaP0M4mXJWG10bBxwB070Gp7dGp1uAZzXs/rZUmQny/+3zn
-         GfLg==
-X-Gm-Message-State: AFq9FYJNRcFIFLdXPtzUZBc8kTnz12TC2/2ZFlwrtuBOHZq8estYpOiS
-	/7nUR4WouT90oT01tjhHTO1OaJe/a7RJZjYJoC9WDR+1haUTbWC+RDNzMhAkFg==
-X-Gm-Gg: AYBFou0ZhetNEXPLEUhS9OvgDQw5PwcEfyRbgwqyrnYi7weAI4ovQXHJ0tydDOF8hYh
-	Ge58QARCsVii71u+2KmvjAChTkI518g7cwc/Q4AwMZ/5NA5INQnKa1ZTAWYAwM7T6C6qfSkyf1o
-	QQbAQMQRlU63Ziej6leJzhwDaVCOD1VeuATTFH5iRHZcmMMJ530rhi+IlCYGjRsLkFfs9uhMM2o
-	VwFApR9D8cPQSQYcs/FFo0Xm3EH45TKLoWzDcv3UjuACtvX7kVDtiHmyydigiqXez9hAJtOM85Q
-	r6n2qc2D5VVZQ3UBJBLE7DLh+tK7cckHAs0wi+DikaXSf1T3665kco+27UP//czOX6+y9HZUgx9
-	zZS3zWDuOaXHWK84htu1nRCK+icEcafQMNspCAC47XAcYKux3goEtGmPIi3cb2ComIlAoTsokpA
-	bqV9dFmztr/gKPbGSygQwLdi0w9MiE2TECUZ8QnEDQoH3bkLzQBKa78Hioka8Rb+2GDYnTNrKyH
-	6YJkg==
-X-Received: by 2002:a05:6214:c67:b0:917:8cb3:f31a with SMTP id 6a1803df08f44-9178cb3f895mr23864596d6.40.1790689281832;
-        Tue, 29 Sep 2026 06:41:21 -0700 (PDT)
-Received: from [172.17.0.2] ([52.179.93.132])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9178d3726b6sm10357246d6.39.2026.09.29.06.41.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 06:41:21 -0700 (PDT)
-Message-ID: <6abbc001.2842b724.394609.9de0@mx.google.com>
-Date: Tue, 29 Sep 2026 06:41:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2829466906803770881=="
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="gxkgDtrM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2026; t=1790689875;
+	bh=NA8qMrLzHi8cFCN5/HGYOOzb918vX95l2DXH4maf9o4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gxkgDtrMb7Gz4ZZbtV8ywJ/HBMWQdVLEP1Ut/4hOoAafDlQ+Z4lrGdEZinfYxAI34
+	 5taj/77qXn22i4BEVVUu9kTZeyfEDxh6Gu6GJgnsbVaMY9D6pazBznPUh8m2plt9XG
+	 mcMKV59ZKgWEoZD+P3xYqj+C9rpPAp8d/70gQlkPVyPNpmoA4y7R31XY75d+GmLi91
+	 daLpPL/StKOOY3BrZSVFQAxN38py3+36W5ZnR3Cr0ry7OOpt8htQynIvg1OuGQWnLv
+	 Vxtbt4kUuU4EtPylbXyZW+EKMvHJKDukzZLFxdYXo6MXSWS3sVfoQMY+sqOV36pL73
+	 EjBzpVOaaGvpw==
+Received: from github.com (hubbernetes-node-f059f6e.va3-iad.github.net [10.48.72.46])
+	by smtp.github.com (Postfix) with ESMTPA id A8E1D341CA3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 06:51:15 -0700 (PDT)
+Date: Tue, 29 Sep 2026 06:51:15 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1175995/000000-3c1e78@github.com>
+Subject: [bluez/bluez] 72a2ea: mgmt: Add Security Level Changed event
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mikhail.v.gavrilov@gmail.com
-Subject: RE: [v4] Bluetooth: RFCOMM: connect the session socket without rfcomm_mutex
-In-Reply-To: <20260929122226.98970-1-mikhail.v.gavrilov@gmail.com>
-References: <20260929122226.98970-1-mikhail.v.gavrilov@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============2829466906803770881==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/1175995
+  Home:   https://github.com/bluez/bluez
+  Commit: 72a2eadbe4f7bd8d945ab59a0a9f9470de9d5996
+      https://github.com/bluez/bluez/commit/72a2eadbe4f7bd8d945ab59a0a9f9=
+470de9d5996
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M doc/mgmt-protocol.rst
+    M lib/bluetooth/mgmt.h
 
-Dear submitter,
+  Log Message:
+  -----------
+  mgmt: Add Security Level Changed event
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1176103/
+This provides a TLV list of values related to the security level of
+the connection to a remote device.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.09 seconds
-VerifyFixes                   PASS      0.14 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.37 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      29.90 seconds
-CheckAllWarning               PASS      34.12 seconds
-CheckSparse                   PASS      36.66 seconds
-BuildKernel32                 PASS      30.07 seconds
-CheckKernelLLVM               PASS      36.83 seconds
-TestRunnerSetup               PASS      799.74 seconds
-TestRunner_l2cap-tester       PASS      12.68 seconds
-TestRunner_iso-tester         PASS      19.07 seconds
-TestRunner_bnep-tester        PASS      3.64 seconds
-TestRunner_mgmt-tester        PASS      61.28 seconds
-TestRunner_rfcomm-tester      PASS      4.49 seconds
-TestRunner_sco-tester         PASS      5.62 seconds
-TestRunner_ioctl-tester       PASS      4.68 seconds
-TestRunner_mesh-tester        FAIL      7.84 seconds
-TestRunner_smp-tester         PASS      4.37 seconds
-TestRunner_userchan-tester    PASS      3.25 seconds
-TestRunner_6lowpan-tester     PASS      4.42 seconds
-IncrementalBuild              PASS      27.15 seconds
-
-Details
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.404 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
+Currently Security Level and Encryption type are implemented.
 
 
-https://github.com/bluez/bluetooth-next/pull/841
+  Commit: 2413764a2b365463aa3a3d483ed8df418e51634c
+      https://github.com/bluez/bluez/commit/2413764a2b365463aa3a3d483ed8d=
+f418e51634c
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Add Security Level Changed event tests
+
+Test that MGMT_EV_SECURITY_LEVEL_CHANGED is correctly received during
+BREDR and LE secured connection.
+
+Assisted-by: GPT:GPT-5.3-Codex
 
 
---===============2829466906803770881==--
+  Commit: 9d9278579e597647d4c287147b50e5bc9e5dfd21
+      https://github.com/bluez/bluez/commit/9d9278579e597647d4c287147b50e=
+5bc9e5dfd21
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add support for Mgmt Security Level changed event
+
+@ MGMT Event: Security Level Changed (0x0034) plen 16
+        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
+        Security Level: No security (0x00000000)
+        Encryption Type: No encryption (0x00000000)
+
+
+  Commit: 07ebd1186895fcd7b442d3b15ea712e9c980344e
+      https://github.com/bluez/bluez/commit/07ebd1186895fcd7b442d3b15ea71=
+2e9c980344e
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  device: Add SecurityLevel properties to org.bluez.Device1
+
+This uses the new MGMT_EV_SECURITY_LEVEL_CHANGED event.
+
+It will be used by btpclient to reduce test time.
+
+
+  Commit: 9cc1ab28d052a4e52c8b35e4fff79d294b6abc63
+      https://github.com/bluez/bluez/commit/9cc1ab28d052a4e52c8b35e4fff79=
+d294b6abc63
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M doc/org.bluez.Device.rst
+
+  Log Message:
+  -----------
+  org.bluez.Device: Add Security Level related properties
+
+This adds the SecurityLevel and EncryptionType properties which can be
+used by clients to get the security level and encryption type in use
+for a connection.
+
+
+  Commit: 3c1e7855a1d353e39751db5c3157c5e775bda82b
+      https://github.com/bluez/bluez/commit/3c1e7855a1d353e39751db5c3157c=
+5e775bda82b
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Display SecurityLevel in device info
+
+
+Compare: https://github.com/bluez/bluez/compare/72a2eadbe4f7%5E...3c1e785=
+5a1d3
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
