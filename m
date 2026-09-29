@@ -1,115 +1,80 @@
-Received: from mail-oa2-f35.google.com (mail-oa2-f35.google.com [74.125.231.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EDF3CAE99
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 06:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6033F44C5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 06:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790664905; cv=none; b=GK8MmAoJGK4s0Lq8voRSo2PFloQ+Z8idjy4B2DZepC4xKgu8qLtSgpR9mstMWW+HynKik21h9IryXFvin1cfy28tnJSC+NtM64x8iuWpKbJ8OQpr/x2AtsiBwIwBBrVWb0b/ajLRcR7LJFig9qBEEvIJlG/Gw7PopfxBsm9V1dQ=
+	t=1790665115; cv=none; b=UwvRvxBF+xiVVWlvrnCzXmOqgX/swSsGRckdmC6tiSgzdkdpFeGXlgBEG29HA+pOc+wV+7uY//2Fi+qqOcALTS0VhNDFb/8NP3fxelHn5h/9dtST+x8yQ8m4kqyYyqlvgFY+tKqdtZyZcWnLMyrBbe+C3b1u+kUVOYe7q57DY14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790664905; c=relaxed/simple;
-	bh=x61S9bRZn5ofHsbSeBsFQGPEkeBHpU4wudfJfuERoBE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gbBJ0bH85P2accbOtfm7PShfqPRIYz3RSuSj4DVfqmQ2SNO3jfrqt7U62XsHJ4I5YIcgx7z+6ZtdGrBaIxLXANi1EzyV5SEm1mlFuvXeh2uxmIQlEwi7T+OKThojiWzZu3DDlW4XG7Sdas/XUMuXjWFDQhqeI4vovaKqZUZUYL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfdFAXnW; arc=none smtp.client-ip=74.125.231.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790665115; c=relaxed/simple;
+	bh=AJB1hVvqbdFleB3gDVyH4PMusFy32E4hcrL0eJGN09g=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VVoxD1HKubc+k9Dmjg0bWDNfsvu88M3LnmYSAW/AHXwcStQ/TXunirbhqrCyrCobxy9emUQX5zGgX6eHfY2h19OLdYEYw/K9umooiCnfFsPoACOE5s1LNOLYfsAlLoEi64OJQqGHIHJr0+f1AdYjQFwc6z7lNOoLANbZYtXebvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=UNU5noNQ; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HfdFAXnW"
-Received: by mail-oa2-f35.google.com with SMTP id 586e51a60fabf-4940ae3ff4dso1274778fac.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 23:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790664903; x=1791269703; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=JpAgAgx4Di5d8YPX5ooJJcz7CXez3fpL73YE9EkfIHw=;
-        b=HfdFAXnWXGY1RJLkFUbfqgfPHaO+D09uJeNXhY3sLSFQc5BGjOm3Gt9Mu3VccC1+tF
-         g4B4D8DrRbm0ylcATxwuLbRLGcUkC8vJgSlcRidTbvNhg57FLznT8dkvrXrJCO3GSpb6
-         oE0uE5OTe27/GSCqPXZuyx2VcF2TfSNSAAvVCRpanbMecy8BgxdnVccZIpjvIVrrfAp6
-         bvhP42pHc8o0rbpduCVjYSryq4eeAD6VRMalC4VPXYCQUsuNLu7ZlGAhBX1xH81zOsfg
-         tx8TZhDDI4QkbgJdnVGrT3W6jzTdBjv7CXVwFQUNNBos+VaKzgCGGmuvAuYGkVaZkkPC
-         ubSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790664903; x=1791269703;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=JpAgAgx4Di5d8YPX5ooJJcz7CXez3fpL73YE9EkfIHw=;
-        b=CG2KtRNgndovwZNFgCKgEdl7+Sj1R6VEwulV0h3RhM+VqpeW+qLAbrrDmslGnjpUiR
-         cXmz5PKDzCcGYVvzJIeqX9wc2ClCxXxrBao2fmjx7+GuFcJDGTcwCO7obeLhebTJQ8Fu
-         rwKv0cq44kiiF+gx5zWiavLpkpJkbh871p0I34eKbZeO345HhjfuPR9sn1G7oVdc3zrw
-         0/M6ME8aI1DnX6/Ff6sNwbSqaXwWuarufxJLBu2asKdoah4gOR4rXwkuikCfYp3HXWpM
-         rJ5Xc1ecRXmh5uteBXjKdKomn87Skg1fAODtlL/0YCltPKzFoRc/HNdMAL9+9eNQI5ws
-         FC2g==
-X-Gm-Message-State: AFuF++n4lj46qYwH2krNqVG+1OZYyC1QxFlZ85G4FtrYAG2f7I1j/rug
-	0d6QrvdhLK6RfbAjJSa2W5ocI4e+exdsPt2JinFkO3jIGSofFjwDKLV6hL/BYDqQ
-X-Gm-Gg: AYBFou3soGCtI8O6NHjYdCH2QPHPvBc3Paoqz9UwWJEiXcmxEU5FhhfxDDowH1SQ8p9
-	8DpqIM4JY5qoGlbt2Hw8KdlWHhN4Zxqvv4FkBjyLfuJ0/yUZma+vPYoEViRlC89LsS5vtS3i/bR
-	zsjG3Phw/Ugoso7pvmcLfIVZSR0b85RAZZHhyK7rSIWHWCZTTDI+dqsYlw0vU0hNRa4ezxqNody
-	btsmQXhTTkn4F08/pOkSFYuSHay6Cu4bkZwSZUmPQMcmjicoHGh44YVRKJ8EIFtOLMxeABJk5Wx
-	QRMIc1+T0awmNJg+okGvolan5l5YU383nljawXkcDW8qOqjEMrqOVDdvVFkQWxTcDyPAUpZYggT
-	hTCoXqqH1VLdelQmQPGN3gEI+Zwixv3ZQa+95ZfiEflcb9UwL5KZ1pUFNK1+WEe/AgzNlX//fmC
-	LyotnkANegnGvRFeBSkSGmbrYsXAXZY2g7DJ7bCzkpzydHj9ejqspGB0Pv9smgtZpCMDS2QvH7b
-	mEjGg==
-X-Received: by 2002:a05:6808:3c48:b0:4d6:92c3:868 with SMTP id 5614622812f47-4d72f151f71mr13936870b6e.65.1790664902976;
-        Mon, 28 Sep 2026 23:55:02 -0700 (PDT)
-Received: from [172.17.0.2] ([52.242.217.85])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4ebbc9a66bdsm4036163b6e.14.2026.09.28.23.55.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 23:55:02 -0700 (PDT)
-Message-ID: <6abb60c6.321a4155.2c061d.402a@mx.google.com>
-Date: Mon, 28 Sep 2026 23:55:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3205429962256896612=="
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="UNU5noNQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2026; t=1790665112;
+	bh=721nNjvp9v4DOe0fjezoUF1R5TNpCq9Y8u1I3JulX2c=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=UNU5noNQDnKKbvlYJtFSnLEt80UKe13RY+litakMZoWhmzd4s3cmZtc0078YAGqmV
+	 Ya7G7XQ7y7DRVlbhJclrqWtXKRsexYECP1N7vujDJpXK6vsaFQYCOhQKUIyNL+YH3G
+	 cNnr8ZUtmRtr4HmnUiR5dyz5PKwWUmlx3GYCpPbPkDF0d7JyAWkBOFhqh9ADG+pvRo
+	 QTJbZuQXq1cUfh++9vex7Id1bWL0zELHGOuEYc71KYHGWppY+iqnRBPdvByoGD9o7i
+	 XnyFVt9YKT83gAD3n+Fa9pHWKWFBXOirL9VhLuW49gFRsZKiQ7lFMOr1zKjRlOSLpc
+	 3BBjKSlWi6l/Q==
+Received: from github.com (hubbernetes-node-cd5de9e.ash1-iad.github.net [10.56.188.44])
+	by smtp.github.com (Postfix) with ESMTPA id 82162360734
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 23:58:32 -0700 (PDT)
+Date: Mon, 28 Sep 2026 23:58:32 -0700
+From: "Seonggon, Cho" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1175715/000000-b0e1cb@github.com>
+Subject: [bluez/bluez] b0e1cb: mpris-proxy: Line-buffer stdout
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, aluvala.sai.teja@intel.com
-Subject: RE: [v1] Bluetooth: btintel_pcie: Add shared HW reset for clean start
-In-Reply-To: <20260929045449.200096-1-aluvala.sai.teja@intel.com>
-References: <20260929045449.200096-1-aluvala.sai.teja@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============3205429962256896612==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1175715
+  Home:   https://github.com/bluez/bluez
+  Commit: b0e1cb166c363cdba07910caac8f8d436ac8cdf4
+      https://github.com/bluez/bluez/commit/b0e1cb166c363cdba07910caac8f8d436ac8cdf4
+  Author: Seonggon Cho <jmsmg1@me.com>
+  Date:   2026-09-29 (Tue, 29 Sep 2026)
 
-Dear submitter,
+  Changed paths:
+    M tools/mpris-proxy.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1175765/
+  Log Message:
+  -----------
+  mpris-proxy: Line-buffer stdout
 
----Test result---
+mpris-proxy reports adapter and player changes with printf() but never
+flushes stdout. When it runs as a service (tools/mpris-proxy.service)
+stdout is a pipe to the journal, so glibc fully buffers it and nothing
+is written until 4 KiB have accumulated or the process exits.
 
-Test Summary:
-CheckPatch                    PASS      0.58 seconds
-VerifyFixes                   PASS      0.11 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      23.73 seconds
-CheckAllWarning               PASS      27.24 seconds
-CheckSparse                   PASS      29.37 seconds
-BuildKernel32                 PASS      23.83 seconds
-CheckKernelLLVM               PASS      24.90 seconds
-TestRunnerSetup               PASS      596.05 seconds
-IncrementalBuild              PASS      24.51 seconds
+On a system whose Bluetooth adapter went away and came back every two
+minutes, the "Bluetooth Adapter /org/bluez/hci0 removed" and "... found"
+messages reached the journal in bursts of exactly 100 lines (about
+4096 bytes), all carrying the timestamp of the flush rather than of the
+event, i.e. up to about 80 minutes late.
 
+Set stdout to line buffered at startup, as bt_shell_init() already does,
+so every message reaches the journal with an accurate timestamp.
 
-
-https://github.com/bluez/bluetooth-next/pull/836
-
----
-Regards,
-Linux Bluetooth
+Assisted-by: Claude:claude-fable-5-1
 
 
---===============3205429962256896612==--
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
