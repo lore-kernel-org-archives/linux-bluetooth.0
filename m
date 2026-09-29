@@ -1,74 +1,36 @@
-Received: from mail-dl2-f42.google.com (mail-dl2-f42.google.com [74.125.229.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.st.icloud.com (st-2006g-snip4-2.eps.apple.com [57.103.76.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F4E4FD296
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 22:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED92258EE9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2026 00:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790635125; cv=none; b=p6ka9b93Cpa9bc9N4TzFDSQgsyMqEK1oXzhKvNS8/54AYL+vCyV7gOdzIY7DcQNIo7PNEDXAIe1Ge71Z6c0LFSr/PUnvqjqiAKeiNvdWIJR9oBHIBtm3JY5e+14JotSDVRUGTPldKn+8K9j5fCx4YBtCSko/qOEmDQ3dbwis5L4=
+	t=1790642086; cv=none; b=Y8euN8KFXIj9w2gOnobaot1cE7MrfekS/yf65Pi8ZhHpL9iDTqZzglwbu9jTL3rX94D8JOIjI3UAmOb0WEQxRe6BTbd7LZW2bYdKESMKLUmOVENwainreayW6SGKKi1JgY+B/Kbw4sKtyg1k05LvHQ2EQJqWG0snQBEwPAcuBkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790635125; c=relaxed/simple;
-	bh=5BgCB1wdLXA+XPp1eKm0La+ZsmzYrAI7eGMWPl3ewJc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W7UTPDh64TqOWCXIqWGAoHNqoIZBIdtuOqPHcoiIuEw+HWAlcozjBQ9FAZnEXAfk/X+JJiuIqxeB4EYz97HNONJ/5UOrLscPlsmo/IuC7j4/gu8WRdnACfZYCUUjC4GX6VdizNbu4U4RNgHc1GPguakSvInbnkyUeiJVoi4BkvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=nAB2Pl0l; arc=none smtp.client-ip=74.125.229.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
+	s=arc-20240116; t=1790642086; c=relaxed/simple;
+	bh=RffSBG0mDyYwLpKscZBXWhJAUMyCF3oW2SWtRGkawQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U2pKst5iNTQxnUoP6ClRFtDZAYda7ZvWcWAmeHVTn0qZlJQQ8AlgtF/QkGEET0tWblBXdmYEKZ8WCpCQyEbswTb8YuSURz1CLhM1WpaNW016bvEb9ghtgQy0X3Cls51xz3lq1iPFhwNhOenzt6qAeD/11+vqu/DFxapSrxztU4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com; spf=pass smtp.mailfrom=me.com; dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b=SbLqlwqg; arc=none smtp.client-ip=57.103.76.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=me.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=me.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="nAB2Pl0l"
-Received: by mail-dl2-f42.google.com with SMTP id a92af1059eb24-144f47a9b57so3143864c88.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2026 15:38:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1790635123; x=1791239923; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wx984YywDCF2rcoFZc8Zh3RZp3D7xEoWwZd7VcVuXDo=;
-        b=nAB2Pl0lLFSkT+FDW0YiB0/rLl8vWCHp9ZvL2FXRWfGl4flnzu0BtIJX/lYG1IjAp7
-         QNLCnN5j0SoWcfrs9jjwqRDnescdWmtykQi+aoe6aj+91HFJMOEe+6Ga5xLjSj7mHNfG
-         55fxyf302Gvrc5xmXL/nrnDD3zZlIjOyr7ehjHW+T8KMbbJRc3SJQFPyxDagq3bi2U0a
-         4ENvI+SIbxQRRDQTPGP6GwiTopNSNMS/+BQku4kYalbuHZFJ/0+LPMD9FB/TtmnWWd6c
-         zm9IdtluYIt26HbQGyliXjOFuIZVh4zxJpWru02xPE3c/EPwWj5U+PcDIKS2jlWXYwPT
-         PKpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790635123; x=1791239923;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wx984YywDCF2rcoFZc8Zh3RZp3D7xEoWwZd7VcVuXDo=;
-        b=OO/uGNUKimn900PSbMP1BnSvXHTt3kMtcV2KSGZ7bfn7/5GwZxkccdN+MpWPpfGV/O
-         0LbF0kZTc5J5napau63xCuei8L7Hf4X4VFGPvE62OUS6mg6q49gt2IPRxHJ80d4zi2mC
-         bHh+ERDgP0nNni9E5//sziEOvmSV/9CSRwI5D+7ELCxzTBiMKobSUPC1V4bq36KcyzFW
-         idaDonMxrkvVv6+wJHk8+IdWG51aw18cVXDfZTuz7KmokiqtKIpe5vrqOlY4jTa3V5ve
-         JPC5/GRq4EgHXjBxcG+d+iBdVLM3XI8R/AvCbeSCXDuWIHqM8QTc89FRwY30WpnXEokc
-         OKXw==
-X-Gm-Message-State: AFq9FYKsgvpINT0c98Z8lnN7TkXBPkXFCwlokLcKh8919A1sfiU6y2Q+
-	FNzwDlQG+kZTnyITETh5MoP0cA2V/8k+/CPN/F3H+aSaT/SI3EH1m1JGLGlvft2zx0ObTdyJA19
-	B84IKg7SK3g==
-X-Gm-Gg: AYBFou1grdNE80dYEOjJ425LHiE7eCTp/MimZt48if6CE16gEdy9f/86JQUUJDhv21Q
-	d9s38JPlwfQkAeNQZBe1zCbUpEfkgrpVwxgQnMvFaCtMrE1LeaS5oFP1TtfFZKlOML36croppQf
-	XagoiFAYdY8gJAUyjpvKJKk4ozJ24H369z4y3vXKz+17xLxb8QwgylVFpkBccdcmpDtohcTWfTp
-	N3qkV5VBGu7NSNWmOWqEYvhx0sCflBU2AsQK8v1aeQUOt132t7mM2MngPrpmrG+BvkR6KTKAOO+
-	dvOl1wJkd2RCEqqTiI6wWni1i6U6U7J49ticTja3JsCwnm6bMOupW6VZWUojWN7dEgKNJ2b/ATh
-	vRAOyPWVFefIwpIpUJI8KVd6iUT52MKg3Z04IORGDC15+Ly9vGRa3dog+OuKOHZIx4TBRqf+HWw
-	4PPJ1oHfqtsiMJKeJxNqbkk0RTkaRYXqOmTfZQGKzKKDmrmpy7Ff5yZdF6t7Q4f4ZbVo2TIARna
-	wV2WQSbH2gQw63XHmeLnAkYysPzy+Xp+5ese0uvfm+IjBfjf39aSATLbYiQ3WDhn7bcOn9WFdpS
-	0wR0Uz2HOIFfv56nrh2/BXFuoHBgeYphdcOW/7pE
-X-Received: by 2002:a05:7301:6781:b0:341:a4ed:d910 with SMTP id 5a478bee46e88-3426fcc826cmr14024590eec.7.1790635122649;
-        Mon, 28 Sep 2026 15:38:42 -0700 (PDT)
-Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3421dbb2971sm27182480eec.10.2026.09.28.15.38.42
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 28 Sep 2026 15:38:42 -0700 (PDT)
-From: Kevin Dewald <kevin@simpleble.org>
+	dkim=pass (2048-bit key) header.d=me.com header.i=@me.com header.b="SbLqlwqg"
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-4 (Postfix) with ESMTPS id 108871800116;
+	Tue, 29 Sep 2026 00:34:40 +0000 (UTC)
+X-ICL-RepId: 01a0ea95-cc8d-75b1-8966-18e51e2db338
+X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQhPBkMFWgNeAUgdVQRLVxQEEl4eWgwDMFQdHQ5YBhIWXUVeCBkIXR0ZClBQBUtaFVUXDgJCH1AfTBZXQ0QfHBlaFFwYU0VRH1RYQxlFVmlBC08dXRlbHEJkWFcJCgZXXloXXk1aAlZNBUoDXwFbC0IASANeA1gAXgpBAFoDUwVdCFVZAEQGVUF5FVZDVARfThkMSh1SVlsTVRdGCQ==
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai; t=1790642083; x=1793234083; bh=aUaYfWcZdNeOwkvhvJKoWQC92dTu8OSHU4r6yCFMrLk=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=SbLqlwqguzPCidIO1zwhpc1LMjwWxebWbmZsQ1FX3v+kGixx5VwLlr8H5SfigagPRjoci/F2d1ocYA9OxE43gb3uDou6tpMM44rQjQ+h17zcetpnA9Nh9FiL+8E1Kna5VFeKi7Ta38W5agWD+RvcU0aCSlBRUNNKjxTjal0fWei99JE2mooXRvRjitweyPcxCMjp9DdPMlisD/WUwTo0bgd76H0W1tJx/NKjDLLZoZexiGcKbWAC2pEmJdL4MobqN0zb4WPV9htOTJa37Zae3yHG95UVkuO3Dm30wMP817/FDWEQLKGfUolHv7D/SmjS9+EVB41H6YosSphGsy0Qow==
+Received: from seonggoc (unknown [17.156.216.30])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-4 (Postfix) with ESMTPSA id 32CB718000B4;
+	Tue, 29 Sep 2026 00:34:39 +0000 (UTC)
+From: Seonggon Cho <jmsmg1@me.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ 3/3] client: Print Connectable in info
-Date: Mon, 28 Sep 2026 15:38:15 -0700
-Message-ID: <20260928223815.11936-4-kevin@simpleble.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260928223815.11936-1-kevin@simpleble.org>
-References: <20260928223815.11936-1-kevin@simpleble.org>
+Cc: Seonggon Cho <jmsmg1@me.com>
+Subject: [PATCH BlueZ] mpris-proxy: Line-buffer stdout
+Date: Tue, 29 Sep 2026 00:34:32 +0000
+Message-ID: <20260929003432.3937487-1-jmsmg1@me.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,28 +38,57 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: FUBf4xje__pzGeGpStQ0ecNDhBUGqlaf
+X-Proofpoint-GUID: FUBf4xje__pzGeGpStQ0ecNDhBUGqlaf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDAwMSBTYWx0ZWRfXwR+mmW8+ZA7n
+ Q/qtkWNJP1OLIstlscpWZrelRig7SdqnFlxvjf4tAjVCjFCWW4UxE3PwzsqVt7edWVvCSzwZTOb
+ c6GiKoIl7J0yyfk1EQ5IZ8dFjecfX1LJ/GNoEIWAtRmJqULwQgDAycIMeCcMOxtN8oRhCQ9Y+bs
+ Kpn4YkWPyXS9Zg193FhWAvRnyQ8W/Spn8jYL+1U7jw+iKy2x7SEvauHVWg2n2tkygglSije9Q7q
+ pkUv58grZbhHz/X5jlcnmPQU5ifF8mcH9MpINOgcNCTquwSsURotv5qyVrBNJ/xix+Q61q+ZYt5
+ I0CbPMNilEicKIJPIjw+2q+NpsCDrYtNKZ0rboGE4UZlYFlReE7vkh5XK9yJeo=
+X-Authority-Info-Out: v=2.4 cv=WPByn3sR c=1 sm=1 tr=0 ts=6abb07a1
+ cx=c_apl:c_pps:t_out a=oyWFxbOnq+dmhQrAPgaJYA==:117
+ a=oyWFxbOnq+dmhQrAPgaJYA==:17 a=VdqzKS8jKosA:10 a=f7IdgyKtn90A:10
+ a=x7bEGLp0ZPQA:10 a=_XrXW31pRgsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=HoQ4qfohMmCRy--Nq4UA:9
+X-JNJ: AAAAAAABL4Ol1sY83AAUUEH8ckteTi5mOQ1B8SN7N63k+bdtx0fW2zCeptEduPrbMIB7AlWsD3e3Ala43Vh60eVLrc3RkOn9M85vtubYfgFjkwZJWVf3oaL9v6Z7ylYhOo6R/cSaLusGQCxpS8BOlFG4pVINcXMnWQCSgAcdmJDGSDlMlOlNBVA0Ww1yru7itOPynKV2jpvRaPO9n5NaC1D+uHa7B4J161inObmnkwWlXOlbdj7EQYWBYN3lzSQTg+aUL+4AhAyEHauu8WDqWpMTtd3PnvCAflW6Q6g1G6WYOTUW+dKNkgBSQVAXCrfSwKcViP6YDZmwvvbgB359C6ZUdLOwK3L2msVdBZjcmf0ozkbszo2ZpRzUz41oG8PE26F60/l2MXAd9E9Nelu6HhbGPi/dT8xncIic0Xrtn6foLoehSwXFGyIl6pBq9MfNaDTdZOzHydVbs6FZc0quUj4J95XlQvZLepRTHEAJO6osD65HjkFr2/VlvqcKhdTO8d/0gsVUL2Zh3bN4Pl4ofUNnJX8Xn53ZHqN+Hpg9l06zLGNJw7byz7uT5RwyOEwj0156HAucujdvYQ+Gbg9Dkpa7fSRqRPIJsmRw/1O5uaONeRy8reulK6S0fV4J11hKbRiCKXoM7Mj0YubhWURD2/migdN1045DrQgUBNKPpL9zn28hBgiIQHDbrvUrUDpzadMEwIYohBqpgEdoa5+J20WiyY5w/jpMUPvTdGLxlnAICzLprjIXz1HmJoITUCKhw1i8pdztDcekCqi1f9PJ16gLyiDUdk3sZJY3GPhukShLCcxNboUBNtaLAUy0QluPnkHI9GX1a8XR+kdueYh1JXJq7+q2qcuxDijgwdGJKt7/XxhmFQ7+v2CzF21mmzeCzB8BlLb2XcZ5xiCcrEAADBuwlviCbhwMfFMptKX4jct1gbch4GrIy8kC87oh1+co8lRuns28/I7ep9GxHp+NXocTsv4x7Nq
+ t2Gd1z9pNft0i3WaX6wZDSqe3J9zTj9/72TQ17fR2y+orrOlWnKcjI/uz7ahuQgDw4pkQ2BbI3FCEtDfdzMQeRFS1XmtwUARPNhR7eV2n17/ro6ky00j9CV9+DNYvG05ZgXG1NUaCtYNafuw=
+X-Apple-Category-Label: MTE0MjA1MDkwNTokY2F0ZWdvcnkkX1BlcnNvbmFsLA==
 
-This prints the Connectable property with the likes of info command:
+mpris-proxy reports adapter and player changes with printf() but never
+flushes stdout. When it runs as a service (tools/mpris-proxy.service)
+stdout is a pipe to the journal, so glibc fully buffers it and nothing
+is written until 4 KiB have accumulated or the process exits.
 
-bluetoothctl> info <addr>
-...
-	Connectable: yes
+On a system whose Bluetooth adapter went away and came back every two
+minutes, the "Bluetooth Adapter /org/bluez/hci0 removed" and "... found"
+messages reached the journal in bursts of exactly 100 lines (about
+4096 bytes), all carrying the timestamp of the flush rather than of the
+event, i.e. up to about 80 minutes late.
+
+Set stdout to line buffered at startup, as bt_shell_init() already does,
+so every message reaches the journal with an accurate timestamp.
+
+Assisted-by: Claude:claude-fable-5-1
 ---
- client/main.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/mpris-proxy.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/client/main.c b/client/main.c
-index 314aead..c44b81e 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2026,6 +2026,7 @@ static void cmd_info(int argc, char *argv[])
- 	print_property(proxy, "ServiceData");
- 	print_property(proxy, "RSSI");
- 	print_property(proxy, "TxPower");
-+	print_property(proxy, "Connectable");
- 	print_property(proxy, "AdvertisingFlags");
- 	print_property(proxy, "AdvertisingData");
- 	print_property(proxy, "Sets");
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 1d7a421e9..4a8dd71e2 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -2954,6 +2954,10 @@ int main(int argc, char *argv[])
+ 	guint owner_watch, properties_watch, signal_watch;
+ 	struct sigaction sa;
+ 
++	/* stdout is a pipe to the journal when running as a service, so make
++	 * it line buffered to get the messages out as they happen. */
++	setlinebuf(stdout);
++
+ 	context = g_option_context_new(NULL);
+ 	g_option_context_add_main_entries(context, options, NULL);
+ 
 -- 
-2.54.0 (Apple Git-157)
+2.55.0
 
