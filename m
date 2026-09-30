@@ -1,277 +1,150 @@
-Received: from mail-yx2-f38.google.com (mail-yx2-f38.google.com [74.125.224.166])
+Received: from mail-yx2-f40.google.com (mail-yx2-f40.google.com [74.125.224.168])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931B6492E27
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 12:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F0B4E3259
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 13:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.168
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790773013; cv=pass; b=SKSoWZzxZBct6Qrf0pVBZwOd4OLBCbp8jyjPbCy6X3F5j2Ce7xvr6Ax/w7Ki2jwSc02wlCQ/XiNYuI8vQOKvT+BL0nU0U0rlMWLCxrgfgbwnhHrJLpfQzMf5IHCE/N/YwJCWZ1oDHLiaOd+6k+udUAUxCOpCdHESzULQEc1KpYs=
+	t=1790774484; cv=pass; b=Z/GtwpiRkmyxVzmIxfb3wfCMUh1xodDZsIPr5MwFOqXxky9/UsRqNXf+EDc9BXOZCL7A56O/Ne//eo13cAKHlmDKC5u3T4G2eBZqoJ/rzmRT6kND98yhWsjZVhL7YfMDFX86Q7bOK5MwJN2fCVJahM8v2RwQOkIiGSTwLyjqSWE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790773013; c=relaxed/simple;
-	bh=aaVUs8rNGF9g/7HACM4BILlw57mnbDgh2PoYU1tdxUc=;
+	s=arc-20240116; t=1790774484; c=relaxed/simple;
+	bh=GlIAb3zJuAEtHyZP+WhEnmhLL4aBGhQS/dvHdkcq8fs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ahxs5XRf+Htpwvm4/pgVNIAAdXOrMEsLePwWHuiSBSKKiYcJ5++eRQk5P0cg7ekW2Os/vJCN+M8ZRLGpzi4u7sHr9lqBWF7AEronp+ziHsRxk/wcwH6AQpy2azr/OZOks+1SQycW+QNmcKqTZvbYTU1Mk8BF+jL8gdMbBVfcmxI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A60RKepi; arc=pass smtp.client-ip=74.125.224.166
+	 To:Cc:Content-Type; b=hFuM0Oxb9pVR9Eei9G/YwI9bxHJr/xxoQtuloOiB+I49sbgxzcQbrN4KtQoQhDBF6snI3p9ogLAahTC+/7jEDhVHYuzk7hKGDDAAnZZyLi1vwrzpliCtQ2kCTYBp+BtKo293PJh+LfOl6xqKUPTl6E4AjslCMAj4jJVjC5IayuU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pcaq+6aN; arc=pass smtp.client-ip=74.125.224.168
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A60RKepi"
-Received: by mail-yx2-f38.google.com with SMTP id 00721157ae682-8ab408a38bdso7884507b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 05:56:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790773008; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pcaq+6aN"
+Received: by mail-yx2-f40.google.com with SMTP id 956f58d0204a3-675686b026dso725330d50.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 06:21:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790774470; cv=none;
         d=google.com; s=arc-20260327;
-        b=dE+gowFUnRTjafK4jk6KIjNTVMtVgMFYCB95DkGpMc5Nn8Ol7HLgX4z3nUZHmIkZYx
-         Mf5XGvCdPsrwipiZ5cDNLm39S1tKUhUurzYQw06pj5V5zUc2jU/j9loy1l3SpzbR8kU6
-         Y1jAXZjKWTXXRcowegDtyyZ9QNq4dugk8UBWHb3fEfyh1l9bZgpKqj7VDM27Tg2SFQFJ
-         vQtCwwybm9WQPHF/4NIvHWU3pjlhEzITaNjwVOAaAmx5CxD7liR5YujANndodCthP6xR
-         qG7QVaCFNV6Dh2sr20XNE7ExopM6b3cyRGmfeRHiNR1+AlA9iwq/vZzC6Su472ApMBT3
-         /LTQ==
+        b=OczMmwatsDDrmM6rUyorXh3FC39x5qAo9cUDsf5nWaNyXZozQvZGL3OWfpdsUuVQzA
+         M42ihYCsheaP79Ut19pOBc6U2662dgnQ5ZQ7+jx87+w/fqOq9RT72O2al8LhFTpjO5v2
+         sNcT/QlrnCE6BOjkrRyyXWMypEGQGmhuvK9l0tWhILgGma59NV7+DP+o6hLmnDze8UUQ
+         mIT/bM+5PpnaLvLISirZwAb4SFEFwrR/GAwuouRd0+Rxcp4ic9XBBvPP1xNkJYSaDxVr
+         F2K30lRb37HzBjyuqCHRaZO40xuO2H9BNHh+ah6ioPVHwJBuHT47FfDRl6he6Pa8AwTU
+         b/TQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ev1zkCD6HNNPXhBPhO6KNE8pSyaKNyAcEndriqkNUH8=;
-        fh=XYDkU1TTZTlQiedNyhQBOXJRcm2xFOG4rWZzy7Q8TSk=;
-        b=WZ6xP417FPOfhHu0UO8hqVAEepUa8rpxIBV/zn51vpIVvVgwjQ2VoU+YTy9+e8JLlP
-         0lQIUCQvBFQzoGRxlJTZVc9otRRi5WkAQF9mJ1ZR66X3YX5HNeTI6HO7QxT21a6Ldbd9
-         vvXXtMMQf3rdSRVksqd8QzCyJwtgJJk1IchTh3O6Y/gziDuuwG5Ywv7gtfDJFF9RHOwC
-         pm51GRWie/5fbn1TswY36DfR+yN1r/nnIWfVilYGjOyeJLRvSQwh7dcVdMOin8h+J4nv
-         6GXHf6wpl3rgmNnH6ia0D/4/VDGOY4U0OAkpLAEEVr6yHbSDlo4pBdvX4WNccpHn7m17
-         uhCg==;
+        bh=z66v1e7nmyRtCcxr9rUVmVhozcNgooz7I7OW8D2IvWs=;
+        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
+        b=QkWm1MdXNDAS4QdsRHF7AbeL5SoKHBt6eRdkY55ZLUAO/nOGxUse2TOVuiC1f14Tri
+         41AxVPT6U82/oy4nnPWalJTzQMo5MfKKTzIC5qHQX2hfPwWmwnAW5XEN0pGJzOxkELoO
+         BiWzWSUB7V1b2a1QWQ7xNPw+AJDxkusGd3TlmYQAAjwOPhdZFGlLjZlQZZma67R0FCH4
+         wQL1i5bxpBrRAZt6St7YMKtfqZgurdg6cAXqf9vlCwp9ppjQrMVjNfaVy1If4LiRQgM+
+         JZ1/t7zv7vu97nJHbUTaYzCOJdRjBXcFH3b98lgHjzTV5FDEEImlXXusynRSERBDYSHU
+         Xsww==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790773008; x=1791377808; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790774470; x=1791379270; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=ev1zkCD6HNNPXhBPhO6KNE8pSyaKNyAcEndriqkNUH8=;
-        b=A60RKepizrcjEYVLDpQzMN1I6Khhy1oHpq3ruZ+vLmH73ssRZS1VWadISK4IUx9+YE
-         dFAzjMisKa9XDiWyYBKed9qMJNZMgkTBXeT7YAW80ITX/nrSJRTWhB8+Vi3mhnr4v9lt
-         UzcbeVsKSFvISaCX9qM5oVBB2K50z/gNeAx40m5wHgOqcqKGSUdy5t9VjI0my2EHkYwF
-         tToPRliLAO6RF3ZdBuRBLPIxlLMRXsXSIRASZ3ZhqgWVpmRXgJ26kaaSe58sxigPLWbH
-         rCMkhql3Gq/pw6EBa9YoZi0CVH7RF+EWyfrdYZgyI8n6UkKzhdEMLMqsCsnoT6rxVrbA
-         i6aA==
+        bh=z66v1e7nmyRtCcxr9rUVmVhozcNgooz7I7OW8D2IvWs=;
+        b=Pcaq+6aNdCJSqcArediU/Zg379TEkiI17CC8VN6hjy7ajS0FQsI0jSnT1JCYJc6MOw
+         BIMZKzbEr6YKFhhTT+Pyx6JNNInoZZ/HiM3B8LdNNWsvuFIkBj4NBlq+61O5SnNR/iVC
+         oqRBOZCA3YSS/l+asRHq9EdL+FM19d9fPk0FJuClSvLbOj0OdsFsic5fntsJNmPPSBWJ
+         kp9INbtBZEu82cLVCPs8difHruDtjn7ihu5p1ShnhOfr/WEamG5th8iWQiXioY+0L45Y
+         Nm+nSD7CzBURbfpoRmk2xPHMlVyXubHEBN+w9HyNjqCIb/IOHwnrettwFYYODgXYufbc
+         A6uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790773008; x=1791377808;
+        d=1e100.net; s=20260707; t=1790774470; x=1791379270;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=ev1zkCD6HNNPXhBPhO6KNE8pSyaKNyAcEndriqkNUH8=;
-        b=YrMgqGVuAjHkQr/KIcHMuH6wxghgOWURWrI5n2g8cK/C33vFKSfZjtBaf4S0j3+a6N
-         Et3HvOZb98ZMAjVsriviZ5DM/tGb15mQamRplkj1CR7h7bGd34rsD5iPs98kQi+Qy6nA
-         Z3wJW865nGXCasRUoUBoG8DuG1YWTFb4MXAF9bP37lhxyWX6+mGOUVkT9r0KHvPGB2Hk
-         TZsEiIlHBezab+88gQN8t4kPwloTs4oinjlPag5QnpNcYHhT+Z2PAe4GEw366AyEb9IH
-         cLH4KtM14XWhG3+BnSd8cAnb5PjhpUJD25d+licC1Q2Aj3ao+/FdspPmtASvqgqeoWo4
-         51/g==
-X-Gm-Message-State: AFq9FYJfHAQUGTOrmZyqX5Z2SRwdtSFJMAceX+NJIH1AN9pTY+ojUglG
-	9WEASsdQW/lWOLu1EeCL5rjxWGKmrRCTjsa1E6srWau8Fri/x0FnfR3cYIAnF1yPfR5hZKX+keM
-	z44O47LAWoN7wwNmOjckwFhSOAjrFdwk=
-X-Gm-Gg: AYBFou1aaLQ7yDgyonB88q13IUu3Mesvbxt1XQBdcItF9cJq5JQNzmtzKFIISQNyDo1
-	fl+Yxuv+AbsxTmOaLH+259kFMGsysCaF6fnXh1BHViFpPIHJ0NoXO0+U15ZvMaMPC+jysZM29N2
-	HYGSwHAsjsdXMfS2rnFuTNeUO9Skyq/wRPBljV21WoyQ+PGJrSjGDkbr/xIDzp8BhPPsisHbSII
-	KUrLSAHPjW7TWkekUqP0Zz7WdZWD+hKCUgQBWezSv0hkjIs58TaSJG0axPGUzQtimZ11rkr016R
-	ulZoQfBbKcII9rzDxW1VI2vF6eFAEvHHIK4z0cf5sXkb/aHIAUIPbkAaye8yYAmVqYr61SbYA3I
-	LwZTO8ex9pihCuD7Hxo2U3ijIwJ+e4uJE17n0noo=
-X-Received: by 2002:a05:690c:4f01:b0:86c:295c:8d1c with SMTP id
- 00721157ae682-8ac94db79b0mr3011597b3.4.1790773008483; Wed, 30 Sep 2026
- 05:56:48 -0700 (PDT)
+        bh=z66v1e7nmyRtCcxr9rUVmVhozcNgooz7I7OW8D2IvWs=;
+        b=wq4+s/InA7IWIdshxVT95heBnW+RBtdZYQQE5/WvccxOMdELaxbrBTm6uxxz3tSdCh
+         S22eRUtCOWaDDK/JYDARuIOoc9dxQtML+SaCbB6Y29/A1VhuaYEsnJeg5LqFQVUk3qHZ
+         MKgcFmDtXyQlCU89pDUT8zpDovugpVN66geGcEVnjitT6ux0Mpv+9adkR38HtRhg2D0W
+         NTOefOJT85YfTxy+LOePu6kmdaNy44ugZhztfxM1MdzJ88jCzxFsHuLMsNOHRa9jzgni
+         7ZGSs03PH+ganPqSV4A4qGuqZLh7yWLiJ7h6eq3apImIhuNqRUDAx12oZpkCKtuUMDgG
+         kUVA==
+X-Gm-Message-State: AFq9FYIgXqxv21V1BoIpijAWEWpjV5o7KUGlMxHEJoeadVZeGp/Gj+wE
+	jWK9sfPm6mnYYjETPJrPWdBMFdAEMlFgHNSh92PRlBaUsuPcpPvAt8M+RPjkRVm2CNw50PtK0SJ
+	Bzrg/OMHKDTJBRQr5+lVk322Nld80aSw=
+X-Gm-Gg: AYBFou3YW90LopBmq+bXeCvgQLn3jFTcdSsa15hMkVroRz/qZk7ZsLw+W3chkjZ3xn5
+	NkAEmAlfATAt5YzN9mGbBRC9YzaWRt8YQmXx5pIeyrsa1sj/JQLgeh+zVNZRe4JKLkerBEjcecO
+	uaQwPXt9CCitnWOebL10tVxqg5XKTjWVWBcCxj8FeHZqd3dOelk24xg5mlt1FW2GKwDA66MdMRl
+	Fza5WFayI0W7Bi8vhw1HBQv0fYli70RNo2OayyQRjJv7vITGNMVtI+obJCZyc9KB9QzhG1TKP/8
+	wl4at865/vTZxBqRHR82EVixzJ7L0ixTEQpojyA00j3qXvJVbsvWc3915j7R85zleAtF/NPFJuH
+	Im+sx/TudD/N/P01n/krHtbiwQYfQJtqPNEDgpQyjFl1rVwNSag==
+X-Received: by 2002:a05:690c:e205:20b0:8a7:ef2a:ff9c with SMTP id
+ 00721157ae682-8ac94db7632mr3236657b3.2.1790774469574; Wed, 30 Sep 2026
+ 06:21:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1790752799.git.aluvala.sai.teja@intel.com> <af7525184b7c910d8f5bc313805ac31293711c19.1790752799.git.aluvala.sai.teja@intel.com>
-In-Reply-To: <af7525184b7c910d8f5bc313805ac31293711c19.1790752799.git.aluvala.sai.teja@intel.com>
+References: <20260928223815.11936-1-kevin@simpleble.org>
+In-Reply-To: <20260928223815.11936-1-kevin@simpleble.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 30 Sep 2026 08:56:36 -0400
-X-Gm-Features: AclHuK-iahTkiAUnrjWorfya2F-paD8rBDewaeVB13yc8xTOsSwZAuuE7qjijFU
-Message-ID: <CABBYNZ+a8w5Xyeb_n3wKkhi2Fa=o4oo_X6rtYia=Z_7SJVSXzg@mail.gmail.com>
-Subject: Re: [PATCH v1 4/4] Bluetooth: hci_debugfs: add force_hw_rfkill test hook
-To: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, 
-	chethan.tumkur.narayan@intel.com
+Date: Wed, 30 Sep 2026 09:20:57 -0400
+X-Gm-Features: AclHuK-FPQ_UsXzh7sEA-jxSjxjDRmPDOr7LLYKeQMjECqaUOM11_15o7ZxQq3A
+Message-ID: <CABBYNZKebai0bQZ4Z_0+P6LwWN=-jniRMN0vctYTD0TC=y36cw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/3] Add Connectable property to org.bluez.Device
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sai,
+Hi Kevin,
 
-On Wed, Sep 30, 2026 at 3:50=E2=80=AFAM Sai Teja Aluvala
-<aluvala.sai.teja@intel.com> wrote:
+On Mon, Sep 28, 2026 at 6:39=E2=80=AFPM Kevin Dewald <kevin@simpleble.org> =
+wrote:
 >
-> Add a force_hw_rfkill entry under /sys/kernel/debug/bluetooth/hciN/ for
-> HCI devices with a registered rfkill handle. Writing Y/N sets the
-> hardware block state through hci_rfkill_set_hw_state(), which exercises
-> the generic Bluetooth HW rfkill handling without requiring a transport
-> driver to assert its physical rfkill line. Reading returns the hardware
-> block state from rfkill_hard_blocked(), independently of any software
-> block. Writing the current state returns -EALREADY.
-
-I guess the first thing we need to ask ourselves is why we need a
-dedicated entry for rfkill?
-
-> The read and write handlers check HCI_UNREGISTER and hdev->rfkill under
-> hdev->unregister_lock, so they fail with -ENODEV rather than use an
-> rfkill handle that is being destroyed. The entry uses custom open and
-> release operations that pin the debugfs file with debugfs_file_get() and
-> debugfs_file_put(), so hdev cannot be released while a descriptor is
-> open. After a successful write, the handler drops unregister_lock and
-> flushes hdev->rfkill_block, so the caller observes the settled
-> HCI_RFKILLED state without blocking the work, which may itself need that
-> lock.
+> bluetoothd records whether each advertising report was connectable,
+> from the Device Found event's Not Connectable flag, and uses it
+> internally, for example to pick the bearer to connect and to drop
+> temporary non-connectable devices when discovery stops. Applications
+> cannot read it over D-Bus, so they have to guess, e.g. from whether the
+> device has a name, which is wrong for named beacons and for unnamed
+> peripherals.
 >
-> The hook does not exercise driver-specific interrupt, doorbell or
-> register logic that detects the hardware event; that still requires
-> real hardware or transport-level emulation.
+> This series exposes it as a read-only Connectable property on
+> org.bluez.Device1, emitted when it first becomes known and whenever it
+> changes, and prints it in bluetoothctl info.
 >
-> Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-> ---
->  net/bluetooth/hci_debugfs.c | 107 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 107 insertions(+)
+> Tested with an nRF52840 switching between ADV_IND, ADV_SCAN_IND and
+> ADV_NONCONN_IND advertising: the property follows each change,
+> including PropertiesChanged in both directions on a device kept by
+> continuous discovery.
 >
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index 2559fb6324d6..a14d2ae8cab5 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -20,6 +20,7 @@
+> Kevin Dewald (3):
+>   org.bluez.Device: Add Connectable property
+>   device: Add Connectable property
+>   client: Print Connectable in info
 >
->  #include <linux/debugfs.h>
->  #include <linux/kstrtox.h>
-> +#include <linux/rfkill.h>
+>  client/main.c            |  1 +
+>  doc/org.bluez.Device.rst | 11 +++++++++++
+>  src/device.c             | 36 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 48 insertions(+)
 >
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -306,6 +307,108 @@ static const struct file_operations sc_only_mode_fo=
-ps =3D {
->         .llseek         =3D default_llseek,
->  };
->
-> +static int force_hw_rfkill_open(struct inode *inode, struct file *file)
-> +{
-> +       int err;
-> +
-> +       err =3D debugfs_file_get(file->f_path.dentry);
-> +       if (err)
-> +               return err;
-> +
-> +       err =3D simple_open(inode, file);
-> +       if (err)
-> +               debugfs_file_put(file->f_path.dentry);
-> +
-> +       return err;
-> +}
-> +
-> +static int force_hw_rfkill_release(struct inode *inode, struct file *fil=
-e)
-> +{
-> +       debugfs_file_put(file->f_path.dentry);
-> +
-> +       return 0;
-> +}
-> +
-> +/* Test-only hook to simulate a HW rfkill event without needing the
-> + * underlying transport driver to assert its real rfkill line. It drives
-> + * hci_rfkill_set_hw_state() directly, exercising the same rfkill core
-> + * notification (hci_rfkill_set_block()) and power on/off handling that =
-a
-> + * genuine HW rfkill interrupt from any driver would trigger.
-> + */
-> +static ssize_t force_hw_rfkill_read(struct file *file, char __user *user=
-_buf,
-> +                                    size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev =3D file->private_data;
-> +       char buf[3];
-> +       bool blocked;
-> +
-> +       mutex_lock(&hdev->unregister_lock);
-> +       if (hci_dev_test_flag(hdev, HCI_UNREGISTER) ||
-> +           IS_ERR_OR_NULL(hdev->rfkill)) {
-> +               mutex_unlock(&hdev->unregister_lock);
-> +               return -ENODEV;
-> +       }
-> +       blocked =3D rfkill_hard_blocked(hdev->rfkill);
-> +       mutex_unlock(&hdev->unregister_lock);
-> +
-> +       buf[0] =3D blocked ? 'Y' : 'N';
-> +       buf[1] =3D '\n';
-> +       buf[2] =3D '\0';
-> +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
-> +
-> +static ssize_t force_hw_rfkill_write(struct file *file,
-> +                                     const char __user *user_buf,
-> +                                     size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev =3D file->private_data;
-> +       bool enable;
-> +       int err;
-> +
-> +       err =3D kstrtobool_from_user(user_buf, count, &enable);
-> +       if (err)
-> +               return err;
-> +
-> +       mutex_lock(&hdev->unregister_lock);
-> +       if (hci_dev_test_flag(hdev, HCI_UNREGISTER) ||
-> +           IS_ERR_OR_NULL(hdev->rfkill)) {
-> +               err =3D -ENODEV;
-> +               goto unlock;
-> +       }
-> +
-> +       if (enable =3D=3D rfkill_hard_blocked(hdev->rfkill)) {
-> +               err =3D -EALREADY;
-> +               goto unlock_flush;
-> +       }
-> +
-> +       hci_rfkill_set_hw_state(hdev, enable);
-> +       err =3D count;
-> +
-> +unlock_flush:
-> +       mutex_unlock(&hdev->unregister_lock);
-> +
-> +       /* hci_rfkill_set_hw_state() updates the rfkill core state
-> +        * synchronously, but applies the HCI_RFKILLED flag and resulting
-> +        * power handling asynchronously via hdev->rfkill_block. Flush af=
-ter
-> +        * dropping unregister_lock because the work may submit a sync co=
-mmand
-> +        * that also takes this lock.
-> +        */
-> +       flush_work(&hdev->rfkill_block);
-> +       return err;
-> +
-> +unlock:
-> +       mutex_unlock(&hdev->unregister_lock);
-> +       return err;
-> +}
-> +
-> +static const struct file_operations force_hw_rfkill_fops =3D {
-> +       .open           =3D force_hw_rfkill_open,
-> +       .read           =3D force_hw_rfkill_read,
-> +       .write          =3D force_hw_rfkill_write,
-> +       .llseek         =3D default_llseek,
-> +       .release        =3D force_hw_rfkill_release,
-> +};
-> +
->  DEFINE_INFO_ATTRIBUTE(hardware_info, hw_info);
->  DEFINE_INFO_ATTRIBUTE(firmware_info, fw_info);
->
-> @@ -352,6 +455,10 @@ void hci_debugfs_create_common(struct hci_dev *hdev)
->         if (hdev->fw_info)
->                 debugfs_create_file("firmware_info", 0444, hdev->debugfs,
->                                     hdev, &firmware_info_fops);
-> +
-> +       if (!IS_ERR_OR_NULL(hdev->rfkill))
-> +               debugfs_create_file("force_hw_rfkill", 0644, hdev->debugf=
-s,
-> +                                   hdev, &force_hw_rfkill_fops);
->  }
->
->  static int inquiry_cache_show(struct seq_file *f, void *p)
 > --
-> 2.53.0
->
+> 2.54.0 (Apple Git-157)
+
+This is already exposed via AdvertisingFlags:
+
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.Device.rst#arrayby=
+te-advertisingflags-readonly
+
+bluetoothctl does already gray the devices that are not considered
+discoverable, see:
+
+commit 815f779aa8e477e399b78f03c0ea0e75f0270c4a
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon Mar 6 16:48:43 2023 -0800
+
+    client: Use AdvertisingFlags when available
+
+    This prints devices not discoverable in grey so the user are able to
+    distict when for example set members are actually visible.
 
 
 --=20
