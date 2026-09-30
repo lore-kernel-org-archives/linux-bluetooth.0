@@ -1,133 +1,105 @@
-Received: from mail-pj2-f41.google.com (mail-pj2-f41.google.com [74.125.227.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21C42EDD40
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 10:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD996364EA4;
+	Wed, 30 Sep 2026 11:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790763181; cv=none; b=qhN4a0Yj9JzvdVOdzsZN0CGsXIOqUKXuk0I0r81esa1r5s3L3o+3uLici0vB7EG9hSTc5mn8G3ErIqUvLj61pwGVDGeagC72oZ+BfTsLuapjeAnNR6Mvb636WzisK8Mt/PXtWwSKJIdvn2ui/rZTriqAoDOcdD6+pSrmb5OScvg=
+	t=1790768430; cv=none; b=dMuS6C22u5MZzPYw39S08F3cDNQ9XpK/Gr8m9GxY0H3bAiCbNOy9yjsl/jWtgwTD7J8mKt3Itbmb15qa1fIPBxXGi0yrHPB9RnuZsbzUYtUbNKmJlJO05RAnUDSJ4UCpNaQKsEwJjOhLL8sr0oN5U7sTXwRSwFj7/OGsDhDN1LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790763181; c=relaxed/simple;
-	bh=QW3A3LglbgqrfhIVCmI/pHu0FXSTQyDDp2KpxEICGNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qPZE7erGHzABOl2WnhJeGGl1FuNNkr9HbbSYtOZCy3LpJhs7z1pqYmBIrBUQqBebKJ8EclZPy1U7+4pMk0/yGOyDg10YMcL+Z7XQaPEhkJsE0mo7tG2nR5F283A/Lj2bGIKzGhi+aYHksc5ZQEIDwmgiVgzosPZgLFa/4bMeK00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pzEO7Avv; arc=none smtp.client-ip=74.125.227.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790768430; c=relaxed/simple;
+	bh=yAOnnwevtoD+Wz31eFyGSfUtSJZQIvw/mltJV+SrsEo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aKPie6G0J9xFU9LilahiAQSifx8sNEhkGzlpl1bSdtkTJrhdiFaiNSHmHGv1b0L8D01RzG55emYw5sPPfm6+RxD8sHXzV84G3gxl3kVDONGP+CkE9NoE5GBXQQFRr7LBEzgSIlsDcKUMg1dxxS/2FLdx53bGDFbV4zf4rPvIMSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=oJbfxDDi; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzEO7Avv"
-Received: by mail-pj2-f41.google.com with SMTP id 98e67ed59e1d1-3a0aa9d356eso4006976a91.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 03:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790763179; x=1791367979; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9nJguM5oSneDAdz6x2D/8S9jHeo9k8F3yuv0W8uop2U=;
-        b=pzEO7AvvzraFyyw/0o9v6bZ8lgtgkTxAWCcEmAdE65RY09NKJN0zGO1hfYtRVe+XFG
-         5pPEOmaVKa0VAu+BXIsgMjd6fEROwBhm4JxwsIxa9Dy7lp/Or8Fz+VTts9XGl4hagg5s
-         J940Y/kwDkTNG/QlfNzsQYfvfDFe6uNkEoIxHTJTmyw15pXRArrkYhK2d8URGfFQboKw
-         2y+ptB7enyjnOD+x6RjmdUa7AwbP3q5UxKQ4pLBTOJ3QKJXLbKoIVnp+WG2gqdYjTUWa
-         4qXd2G8u8hoMUnihT53YnFCmry6p/fzGmRQIpQwcRtLHm341rlcUutLWNaHMBO1xJMis
-         Dmkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790763179; x=1791367979;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=9nJguM5oSneDAdz6x2D/8S9jHeo9k8F3yuv0W8uop2U=;
-        b=LYfOypvJli8lqQq8n8b8JlgbRbezmnp60XK0/Oadu6U41AZK/JgB8FaQChsy4hhp2z
-         R+QC+6seXwLPCZgcPoMgt8ArHaKig3XAO/TzCqkD19yhSl+BS2SPNqt3BIfVcCKKD8pi
-         E2xJBhQEEZlY8BgdYhQQ8rYixeyeoygETDLGf1tRVBbU/NdDrg8odMMgH8kH+G961G0h
-         XqS+fdwcUCs7/ZnMeFmYixKx01S/IZXk+QfUG9lTLuFxiXRSTw9a4jfyafKDFwhq/vMz
-         ObJIEeBC2zXhqUMVCXckD1IC3SRKaz8bizv448qr5+Tib7lGn8s7yPECG9oYqDK4Xs/i
-         wHzg==
-X-Gm-Message-State: AFq9FYJUDlfaQ6V9dL3UA0DzBC3Bii1R4O8ut0dQBAZ+B4UGISsrva90
-	zqwW+22aIqlqPxg6bwpinNu8EI0EN588DBzAXf8XMUOuXHkkMtBEO1+YUHE5jL5IjEg=
-X-Gm-Gg: AYBFou2+StTvEkZFiIjd6LA5Ri8AYJaDdcc6LOJI2tnyYu8HQ9U6fTIYLXAUsTn+tk1
-	0vIp6YGutYCCHOGBvm3zt+JREZgt5+HFgbVRFQ8b3IzN8f4GX4MUFl/W0GHAJQIBEkj8cCgNQYr
-	4o+kW93srfG25+sfV1ZZG0+syqgfel4UhyISEJoNzcvKSUYmcsyxETZD3dV9CM7v7dvPmYz3bMO
-	0Xr4o9znAyROY4/J5TDtBlmlKaNKUa+ahV6dFUrcMlgrnB0K7un7u0TNYtqOStpbHKCG8PnVbjU
-	LxOYCdHexZSRJzRiMmoSJ3fJTYmoo6b+b4rJrZ0Ha1CC9VEXclKFrj1N5lCHlUd+xQK7UhD6Y2Q
-	n7Fv0qiq1Z3fhJmzX6ZL9kGVeccwxViOWHtgioGV6KQ0yiG2bvR/gV2nzAv6cwa714Q/7gxCZEY
-	QMXisV0/6O+ac3YphmfmGTClOctIhwbq4pkqmr7C11KnwtqSzDt0JKbfyHT9ysHhI0Q8eDiMY=
-X-Received: by 2002:a17:90b:39ac:b0:39e:2f57:67c7 with SMTP id 98e67ed59e1d1-3a4d102d0eamr766006a91.3.1790763178922;
-        Wed, 30 Sep 2026 03:12:58 -0700 (PDT)
-Received: from laptop-of-k ([203.175.12.242])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a4cb1919ecsm2799318a91.1.2026.09.30.03.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2026 03:12:58 -0700 (PDT)
-From: Kun Ma <mk02092022@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Kun Ma <mk02092022@gmail.com>
-Subject: [PATCH BlueZ] audio: Fix stale AVDTP connecting state
-Date: Wed, 30 Sep 2026 18:12:40 +0800
-Message-ID: <20260930101242.43592-1-mk02092022@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="oJbfxDDi"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=yAOnnwevtoD+Wz31eFyGSfUtSJZQIvw/mltJV+SrsEo=;
+	t=1790768428; x=1791978028; b=oJbfxDDiv2l0HEguvHfEOxwJyVpXd38cLNtxcWGLH5Ut56+
+	kktP3KOtRaE4cDUXp2+bC8h4a/9lOY9ZlswGu7JfO0fH87pscXqX+cBZ0XzdTrAu5ZKKAIFnWG2lt
+	bhdkF3fHDrF1dPhohN1T1aV+SZTx4xpXM3YDGOmD+tbWQ4WMB1UEJfocnHLzfEn1KaYkmqUEGXYQb
+	dV1ew4FLNekdpJrlJ/pPPEq+qpUsrdYY7Cp8Bo8SHXsKXe7wVy5sT96DgPT9FmtCQqeeIYUJ1ZJAY
+	tiaWnjy3RWqCfoNrJOT7gnmXw2ffs3CzmB4ouottmPj5r0jxc0xJVKIMLXvfo41Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__ECDSA_SECP256R1_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1xBsff-0000000GMHy-3MVx;
+	Wed, 30 Sep 2026 13:40:24 +0200
+Message-ID: <a612cb0f1cfc09b7ec7f494f22f8cc8d3ba61f10.camel@sipsolutions.net>
+Subject: Re: [PATCH v1 1/1] rfkill: add rfkill_hard_blocked() helper
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Sai Teja Aluvala <aluvala.sai.teja@intel.com>, 
+	linux-wireless@vger.kernel.org
+Cc: kiran.k@intel.com, chethan.tumkur.narayan@intel.com, Luiz Augusto von
+ Dentz	 <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
+Date: Wed, 30 Sep 2026 13:40:23 +0200
+In-Reply-To: <3305da8e844c9d0a5de5848b596d16de8d462048.1790752797.git.aluvala.sai.teja@intel.com>
+References: <cover.1790752797.git.aluvala.sai.teja@intel.com>
+	 <3305da8e844c9d0a5de5848b596d16de8d462048.1790752797.git.aluvala.sai.teja@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-2.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-When a remote dual-role A2DP device reconnects autonomously, both sink
-and source services transition to their respective CONNECTING states
-upon AVDTP_SESSION_STATE_CONNECTING.
+On Wed, 2026-09-30 at 13:12 +0530, Sai Teja Aluvala wrote:
+> rfkill_blocked() reports the effective block state, i.e. set when the
+> device is either hardware or software blocked, and rfkill_soft_blocked()
+> reports only the software state. There is no equivalent accessor for
+> the hardware-only state, and struct rfkill is opaque to drivers, so a
+> caller that needs to distinguish a hardware block from a software block
+> cannot do so.
+>=20
+> Add rfkill_hard_blocked(), which reads RFKILL_BLOCK_HW under
+> rfkill->lock in the same way as rfkill_soft_blocked(), together with a
+> stub returning false when CONFIG_RFKILL is disabled.
+>=20
+> The first user is the Bluetooth HCI debugfs force_hw_rfkill test hook,
+> which must report and compare against the hardware state only.
 
-If the remote device only configures one direction (e.g. initiating a
-stream from remote Source to local Sink), the unused direction's state
-remains stuck in CONNECTING even after the underlying AVDTP session has
-reached AVDTP_SESSION_STATE_CONNECTED.
+Probably should CC Bluetooth list (done now) for a change that's prep
+for BT infrastructure.
 
-Subsequently, when policy or userspace attempts to initiate audio
-playback (e.g. via sink_connect() or source_connect()), the call fails
-immediately with -EBUSY due to this stale CONNECTING state.
+The user is:
 
-Fix this by only returning -EBUSY if the underlying AVDTP session is
-actually still in AVDTP_SESSION_STATE_CONNECTING. In addition, check if
-a stream already exists on that service to prevent concurrent stream
-allocations while the session is connected.
+https://lore.kernel.org/linux-bluetooth/af7525184b7c910d8f5bc313805ac312937=
+11c19.1790752799.git.aluvala.sai.teja@intel.com/
 
-Link: https://github.com/bluez/bluez/issues/2381
----
- profiles/audio/sink.c   | 6 +++++-
- profiles/audio/source.c | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+which does two things with it:
 
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index 81d5a3a6b..3363f421f 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -281,7 +281,11 @@ int sink_connect(struct btd_service *service)
- 	if (sink->connect_id > 0 || sink->disconnect_id > 0)
- 		return -EBUSY;
- 
--	if (sink->state == SINK_STATE_CONNECTING)
-+	if (sink->state == SINK_STATE_CONNECTING &&
-+	    sink->session_state == AVDTP_SESSION_STATE_CONNECTING)
-+		return -EBUSY;
-+
-+	if (sink->stream)
- 		return -EBUSY;
- 
- 	if (sink->stream_state >= AVDTP_STATE_OPEN)
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index 6be4de74e..54f9c4a4e 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -282,7 +282,11 @@ int source_connect(struct btd_service *service)
- 	if (source->connect_id > 0 || source->disconnect_id > 0)
- 		return -EBUSY;
- 
--	if (source->state == SOURCE_STATE_CONNECTING)
-+	if (source->state == SOURCE_STATE_CONNECTING &&
-+	    source->session_state == AVDTP_SESSION_STATE_CONNECTING)
-+		return -EBUSY;
-+
-+	if (source->stream)
- 		return -EBUSY;
- 
- 	if (source->stream_state >= AVDTP_STATE_OPEN)
--- 
-2.55.0
+ 1) refuse debugfs write when it's already hw-blocked by some real hw
 
+ 2) show the rfkill's hw-blocked status in debugfs read
+
+The tool that's intended to use the debugfs file is this:
+
+https://lore.kernel.org/linux-bluetooth/66971d6f85d714f2728b29fada7136d5a2f=
+bb3c2.1790752800.git.aluvala.sai.teja@intel.com/
+
+It implicitly uses the write part by failing if the write fails, and
+explicitly uses the read part by checking that it applied.
+
+The write part could be easily checked in the tool from userspace via
+rfkill sysfs (it already accesses that), and the validation against
+sysfs already happens on the read as well there, so IMHO neither is
+necessary - the tool could check sysfs before starting the test and
+abort if it's already hw blocked before, and the debugfs read isn't
+necessary at all since it reflects the exact same value as the rfkill
+sysfs read, so validating both is useless.
+
+
+However, if BT folks disagree with my assessment then feel free to just
+merge this patch along with the user.
+
+johannes
