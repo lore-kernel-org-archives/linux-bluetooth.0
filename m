@@ -1,54 +1,36 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31054314D13
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 07:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D878395AD3;
+	Wed, 30 Sep 2026 07:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790754006; cv=none; b=Cw42usK6+4y3/TTy74dniwl1ZevwwAgSBp9iYRJfNB+aqAat/ZFHn1SuXM0sApSvFyBozr9jg6GZynwAIZLAyzjupRO1HoYyTGmTvORQ3KICHM3CJfLcnuRyGVfsWgBQ+FMadkdBwQw8e+njQUXwJ1WE4/1YN5iXepZFQEzsqag=
+	t=1790754313; cv=none; b=TEYLMxToImJZ6YVhfmaYtGsMwnBTriLLeoY3a1GcNIotmfLBws5aMEtYMhtfMWSWi0vCYU1hpzn9SagsrZO//vyAfCtRA8nNBiYoOb/uXafoRvz8SjbaSmohLrxkihuFoqJClsO1eaAWVX/zjfXunU99GwNDYB1BNPB2wZIIH5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790754006; c=relaxed/simple;
-	bh=hzonGxIowFUXC7GDNUxBxpE/UvBL8YFC07BvTKZ/ymc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q/8EGRvhIQds6r4gkSw1iHTEn36q4Crcvn8hcAhZqOsFNWNjbpRgw0TeTIgQ6JX/uTutNYTOKo7aFENwyczSvi3zovyr3QUjR5vLSxFeW1+0hGKf/0b5GVlg9yqlrgM9gzHbHZmIl99dXvVPizZjHbIPzB4CazNISjuwU+Bnds8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WJOj5BUp; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1790754313; c=relaxed/simple;
+	bh=LD2eEWzPPDtNqJdIoFhBZvPz9oTL3nR1ZEqgoKkyMwM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JOXrmBf4DZI8eoHYdL21xoDP8LbGl3yepWEu8e9mZcNvRGZpIUagmNSyaoj/9kq8T41jJ0UqJoZ+IwaGmiL5BIzmW/X3RCbt5W2Qi+seS617YMOMeedFtixrpHKkyVV1OiJc6liWbitOM6Vxv67J+EenNC1WpnIesZ3scbdplfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=mNjhto0Q; arc=none smtp.client-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WJOj5BUp"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68U7dduh3489291
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 07:40:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=Z1CmVigSTVwdLmAAU4RDDOfCyjhtN5I/aNY
-	gsS1o1mc=; b=WJOj5BUpBJDjmWUsKZGytFn0GnS2msdogcKD8ubHJ/deHcOhbD3
-	fABcECVIUkjwXY0Gz3zTiEEOj9drlLDDEGilDUUdJVbnrs9kq4tYKSD6dXw0DuDx
-	YAc3kIhS5H+ASS3ENA0OZMEI981qDDl4/dWJmk0keN1aK+4xdSLBHqM7skDcrYTE
-	uSrv5SE+auhzWdR6MLfXQbsAuYJiXc8WwHsqNDJ10txWmFTdPKCd5b43iIwFkYbi
-	0RQhbGwb0HES5bSiNaJEUGlAyJnNy5orvwHhXHS8C6318YereY8UmSxczYGz53Vx
-	ZIVZd4w7A/snAS4NQqX30ks7Dutdh1SpNYg==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h0j97u0yx-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 07:40:03 +0000 (GMT)
-Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 68U7e14h344794;
-	Wed, 30 Sep 2026 07:40:01 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 68U7e0pP344790
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 30 Sep 2026 07:40:01 +0000 (GMT)
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 0E857235D5; Wed, 30 Sep 2026 15:40:00 +0800 (CST)
-From: Jinwang Li <jinwang.li@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v1] obexd: Fix FILE* leak in phonebook-dummy
-Date: Wed, 30 Sep 2026 15:39:53 +0800
-Message-Id: <20260930073953.266930-1-jinwang.li@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="mNjhto0Q"
+Received: from PC-202605011814.localdomain (unknown [222.191.246.242])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 4f9ce890a;
+	Wed, 30 Sep 2026 15:44:59 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Kiran K <kiran.k@intel.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>,
+	Jianhao Xu <jianhao.xu@seu.edu.cn>
+Subject: [PATCH] Bluetooth: btintel_pcie: use managed IRQ teardown
+Date: Wed, 30 Sep 2026 15:44:53 +0800
+Message-Id: <20260930074453.2944525-1-runyu.xiao@seu.edu.cn>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -57,72 +39,67 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-GUID: Ni5Izp2Ni0w2S_UjAXgKiJKBNRIh9Rj2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTMwMDAzMCBTYWx0ZWRfX6rPbt+lUZvXF
- Me43nN0mY2ivKE2cFkt6BW21QW5WHljJng7xpfNSNfCulKXEdxCcg5KZYV6+aYHnel0EbaoQAlU
- 0SwvMKf05/wGsAWuN1rFb/nsaBYUJO6ZIQ58Qn2cGGh06JEEKZ0W2WSODwAIoRSekWkCHcNzQ5m
- PXGmN1q2tJ1b2MENDxVDP83NANzjcSQi9Efvz65izOLx+34I/1PmwLdDzlvTQ6wZB2OE0EPbMCR
- +GJql51oijF7Ae9zYivn8944fNo/JiraWNmlHkZs3GX1CpUxAU3Jl9+P+et9A39thARYsYS7qM/
- 3r++MfSlOGEB+0mj8tQlHXSFwVu3CUzIEXzOacpvB0C04+GsQSsIF15BmMG+2QS1c5mBX2j6ve7
- 2EPLNRsCiboZlb/7vEi8gOLQMyB2/W+dI4NcUNoyhr7Cj64qn/n8UPQj+LFxrP7wbZHORK8RYif
- eUJnt+8cijHcHdL9zAg==
-X-Proofpoint-ORIG-GUID: Ni5Izp2Ni0w2S_UjAXgKiJKBNRIh9Rj2
-X-Authority-Analysis: v=2.4 cv=BPImP1QG c=1 sm=1 tr=0 ts=6abcbcd3 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=EUspDBNiAAAA:8 a=lzL0-26TpD2ytX6A3hAA:9
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTMwMDAzMCBTYWx0ZWRfXzCqBu9zDNY6e
- 5Le3Xs1cdS0cSz4fXI6kaS+x5zo2r567qCx2cuvJ1N4D9yKzFkxryD/Cj/ji5ccMcjrP6HYdbsp
- 9ItDAyhGiZi2S5b4bFoNksQiYQLWI4s=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-30_01,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
- bulkscore=0 priorityscore=1501 suspectscore=0 impostorscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609300030
+X-HM-Tid: 0aa0f1461caa03a1kunm177f496726ffee
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZTUkfVhpIS04aTk0eGUtMHVYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSE
+	pPSExVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=mNjhto0Q6/0h+VdMMjvbpc5wOl6/gGelcX2ZEi8UTxYRgBCWhBzhBtNcqzWMVDrWQ+xP+2fu0V9TYfIa6tPJtJ5NWxkobnER0+imGl9jrZBjBeqpsbF+0EN/Bnu6yB8/saB7jTnoHyBmqAzmNF1gwo6Ai4LRs12D+C3yfMgQ17Q=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=Kldygyuza09FJbiu9Dxn2VxKHwsFITS3Z7kKFrpBHUU=;
+	h=date:mime-version:subject:message-id:from;
 
-fdopen(fd, "r") transfers ownership of fd to the FILE stream, but the
-loop was calling close(fd) directly instead of fclose(fp), leaking the
-FILE structure and its stdio buffer on every vCard read. Also handle
-fdopen() failure, which was previously unchecked.
+The PCIe driver registers its MSI-X handlers with
+devm_request_threaded_irq(), but remove() uses free_irq() directly. The
+devres actions then retain registrations and attempt to release them again
+during device cleanup.
 
-Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Use devm_free_irq() for the remove path and for already registered vectors
+when a later setup request fails. This removes the managed resource at the
+same time as the IRQ is released and keeps MSI-X vector teardown ordered
+after IRQ ownership is gone.
+
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
 ---
- obexd/plugins/phonebook-dummy.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel_pcie.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-index f308ea701..43be956a5 100644
---- a/obexd/plugins/phonebook-dummy.c
-+++ b/obexd/plugins/phonebook-dummy.c
-@@ -164,6 +164,13 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
- 		}
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 005c77a4f..f8901df7c 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1750,7 +1750,7 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ static int btintel_pcie_setup_irq(struct btintel_pcie_data *data)
+ {
+ 	int err;
+-	int num_irqs, i;
++	int num_irqs, i, j;
  
- 		fp = fdopen(fd, "r");
-+		if (fp == NULL) {
-+			err = errno;
-+			error("fdopen(%s): %s(%d)", filename, strerror(err), err);
-+			close(fd);
-+			continue;
-+		}
-+
- 		v = Parse_MIME_FromFile(fp);
- 		if (v != NULL) {
- 			func(filename, v, user_data);
-@@ -171,7 +178,7 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
- 			n++;
- 		}
+ 	for (i = 0; i < BTINTEL_PCIE_MSIX_VEC_MAX; i++)
+ 		data->msix_entries[i].entry = i;
+@@ -1779,6 +1779,10 @@ static int btintel_pcie_setup_irq(struct btintel_pcie_data *data)
+ 						KBUILD_MODNAME,
+ 						msix_entry);
+ 		if (err) {
++			for (j = 0; j < i; j++)
++				devm_free_irq(&data->pdev->dev,
++					      data->msix_entries[j].vector,
++					      &data->msix_entries[j]);
+ 			pci_free_irq_vectors(data->pdev);
+ 			data->alloc_vecs = 0;
+ 			return err;
+@@ -3101,7 +3105,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ 		struct msix_entry *msix_entry;
  
--		close(fd);
-+		fclose(fp);
+ 		msix_entry = &data->msix_entries[i];
+-		free_irq(msix_entry->vector, msix_entry);
++		devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry);
  	}
  
- 	g_slist_free_full(sorted, g_free);
+ 	pci_free_irq_vectors(pdev);
 -- 
 2.34.1
-
