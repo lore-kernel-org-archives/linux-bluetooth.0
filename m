@@ -1,57 +1,60 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE85F3C276E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 07:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD46D31D375
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Sep 2026 07:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790754643; cv=none; b=ZRdU/4GCNWuGIuds/A/753ofqxh+PTi0LL25mtaUszwQRPXvXenKwuX5H2MQ34qkVJZ5sRjmZGdT7QJBXG54K51gNb4UQ7i7gcXkGVMAwtAfpV+gsJviRA6e9ai9cpoPmGnbuXfehXXJldN/XqYefO5XEbgqYgeeCU9NCardZyo=
+	t=1790754645; cv=none; b=VdLW6lrXd9afIAH1BDvmqVEZ/dnW9ATRn1AAiU3gVWws0AuIQQlDKRCf65Pf5npElseko3CgikF6FojyiUsosbuR6IWCDWTCkXNSq000J0cOkEwSL8Icpjk5auIwV7QPgRvv9UM3UmL6v+NmNhkohYcqLF8JGLZ5dwMyzjwclTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790754643; c=relaxed/simple;
-	bh=OT2QWhCSlr6MIH5dWHjQyKjCLYN1JGxx71ba1Qno0jA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OI9KA1LyWzjiq7KGTQzN0TOSyV4LtXqAWQZ1bHh3q0pEQ8HCKw8Ta+MhZPPy6/aLXTi5OnXj61HE/RkW7SzKlIXnnIoIEWz2hPguW27FAcrZn0ku8Onj5UBupCXDqzmtCTtCA5OqAZnaPW67pT3XwTDSAlwBvF4Q2BPU7HyvLXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JiwMpdzW; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1790754645; c=relaxed/simple;
+	bh=uatU3Qumz9r+3mZltm9lwyncXt/mU8/WDEl1ZGErxIw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Bo3wq8/b19ViAfn7qM6FbcbaHK8VWUZ7jtZRegc9li+UNMb03tTcdla0oEiJSgIOi2UlANuwrkCGsHrEY9NIYRufa/bfpxggfSJdcs1QiGNpu/+A5QmRNc/gkNpugJaNrICSE7Elu4OkWp8rOnAbs+9UesdUkti8IdyFeHIOnko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+u7lV6V; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JiwMpdzW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+u7lV6V"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1790754641; x=1822290641;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OT2QWhCSlr6MIH5dWHjQyKjCLYN1JGxx71ba1Qno0jA=;
-  b=JiwMpdzWj/0dP1MtX6QGXuLXw26ymTNy5JUW71W0q7ZuDSrPItd7LeE9
-   4tl4TqzCGFHkYyTfVH4GO9/EBx4z6Uw63ygJ2PX7pn15yPfyt823rqWZg
-   RGZfIJFBoHPJWV5p5vxBG30q7Y1rlyYPSOa3ILc7qVhGHfu+dJEG/rYYl
-   zLhh+daJKhaya+8mqi4N6yXQu/q3bddyqVXfFGsPMMgJryltxOaAN4O9z
-   I0sK9LE6pgxp0mbE6dXVj1fA2tWIO81D/Upy3RTZIAVyAqZMxnSMwLso1
-   ahlFdP2LoDHRBAvzh1icX6RRMIY3PbkJxjPJEo0IzK8Mn4KYYOZTHnqRv
+  t=1790754642; x=1822290642;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=uatU3Qumz9r+3mZltm9lwyncXt/mU8/WDEl1ZGErxIw=;
+  b=h+u7lV6Vj0bK4ID95NoZ0IhGWhycsZI0U9GNtoVKakf5sUXp4Q4IKoLs
+   W2nY3PbEh+dymSPZjBLMDuGUSu9EbgQyOWzjplz50hgy4Y+2Dim5THQTK
+   7pEWqEFg65T4IRZrA/j0eCZnI7O0ES/C50SRwH9C3G9Hr8m3iJaP1TH+N
+   XCiTRoT3NCwOTOUpVdirRd7EzHN+2Tv61N9etBjMt3PEunpBE3xvMAy+9
+   pDDY+XudnPrNw+3wD70sbKZpaRLaVnjILkCmZze5Uy76DdLFPaSrJBzBH
+   BJ6OtXgGKbTXNB5vUmBJMQYfQwdNnOjzrnIc0tUgkHlRvQSfhPMwQIAYR
    w==;
-X-CSE-ConnectionGUID: 5J5IliPPRRysVWf2jD/uhg==
-X-CSE-MsgGUID: n/zE6FMLR7CENLIb9EXBJQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11920"; a="90386133"
+X-CSE-ConnectionGUID: fGgh6N6uQjmOezlC/614Ug==
+X-CSE-MsgGUID: 74rihDtgTRW03Vu5T49yow==
+X-IronPort-AV: E=McAfee;i="6800,10657,11920"; a="90386151"
 X-IronPort-AV: E=Sophos;i="6.27,132,1787036400"; 
-   d="scan'208";a="90386133"
+   d="scan'208";a="90386151"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2026 00:50:40 -0700
-X-CSE-ConnectionGUID: NHocWyxHSZSRCJRWaCd6mA==
-X-CSE-MsgGUID: Vdc6u12PTUGpYe+B8RR93A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2026 00:50:42 -0700
+X-CSE-ConnectionGUID: 9RTF+TiwTwSyx58FIovYbg==
+X-CSE-MsgGUID: usXZeSjNQK2QC73DokIk9A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,132,1787036400"; 
-   d="scan'208";a="274816246"
+   d="scan'208";a="274816259"
 Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa010.fm.intel.com with ESMTP; 30 Sep 2026 00:50:38 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 30 Sep 2026 00:50:40 -0700
 From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: kiran.k@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v1 0/4] Bluetooth: add hardware rfkill handling and test hook
-Date: Wed, 30 Sep 2026 13:12:16 +0530
-Message-ID: <cover.1790752799.git.aluvala.sai.teja@intel.com>
+Subject: [PATCH v1 1/4] Bluetooth: Add interface to allow stack to communicate hw rfkill events
+Date: Wed, 30 Sep 2026 13:12:17 +0530
+Message-ID: <ef968fe470971ee338366faf957e62d186af6858.1790752799.git.aluvala.sai.teja@intel.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1790752799.git.aluvala.sai.teja@intel.com>
+References: <cover.1790752799.git.aluvala.sai.teja@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,78 +63,120 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+Introduce hci_rfkill_set_hw_state() to allow drivers to notify the HCI
+stack about hardware rfkill events. The helper updates the rfkill core
+hardware state and schedules hdev->rfkill_block work, which applies the
+resulting block state through hci_rfkill_set_block(). This lets the
+stack handle hardware rfkill events through the same procedure as
+software rfkill events, without blocking the calling driver context.
 
-This series adds hardware rfkill handling for the Intel PCIe transport,
-the Bluetooth-side notification path, and a debugfs test hook for
-exercising the generic stack handling.
+Serialize the helper and rfkill teardown with hdev->unregister_lock, and
+reject notifications after HCI_UNREGISTER has been set. This prevents a
+late driver notification from accessing the rfkill object while it is
+being destroyed.
 
-The resulting flow is:
+The helper is a no-op when the device has no rfkill handle registered
+(rfkill_alloc() or rfkill_register() may fail and leave hdev->rfkill
+NULL). The work is disabled in hci_unregister_dev() before the rfkill
+handle is destroyed.
 
-  transport hardware event
-    -> hci_rfkill_set_hw_state()
-    -> rfkill hardware state
-    -> hdev->rfkill_block work
-    -> HCI_RFKILLED state and device power handling
+Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  3 +++
+ net/bluetooth/hci_core.c         | 34 ++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-For Intel PCIe controllers, the series adds GP2 and HW_RFKILL MSI-X
-handling, IPC_CONTROL doorbell synchronization, delayed state checking,
-reset/shutdown/remove lifecycle handling, and notification of the
-generic HCI rfkill layer.
-
-The debugfs hook exposes:
-
-  /sys/kernel/debug/bluetooth/hciN/force_hw_rfkill
-
-Writing Y or N simulates a hardware rfkill transition at the generic HCI
-rfkill interface. It intentionally does not emulate the transport
-driver's physical interrupt, doorbell, or register-detection logic.
-
-Dependency:
-
-  This series depends on the separately submitted RFKILL patch:
-
-    [PATCH v1 0/1] rfkill: expose hardware-only block state
-
-  That patch adds rfkill_hard_blocked() to:
-
-    include/linux/rfkill.h
-    net/rfkill/core.c
-
-The dependency is being submitted separately to wireless-next because
-include/linux/rfkill.h and net/rfkill/core.c are maintained by the
-RFKILL/linux-wireless maintainers. The RFKILL patch is not duplicated in
-this Bluetooth series. Once the RFKILL series is archived, its lore link
-is:
-
-  https://lore.kernel.org/linux-wireless/cover.1790752797.git.aluvala.sai.teja@intel.com/
-
-Patches:
-
-  1. Bluetooth: Add interface to allow stack to communicate hw rfkill events
-  2. Bluetooth: hci_core: clear hdev->rfkill after destroying it
-  3. Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
-  4. Bluetooth: hci_debugfs: add force_hw_rfkill test hook
-
-Changes in v1:
-  - Initial version.
-
-The series has been prepared against bluetooth-next/master.
-
-Sai Teja Aluvala (4):
-  Bluetooth: Add interface to allow stack to communicate hw rfkill
-    events
-  Bluetooth: hci_core: clear hdev->rfkill after destroying it
-  Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
-  Bluetooth: hci_debugfs: add force_hw_rfkill test hook
-
- drivers/bluetooth/btintel_pcie.c | 140 ++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel_pcie.h |  27 ++++++
- include/net/bluetooth/hci_core.h |   3 +
- net/bluetooth/hci_core.c         |  35 ++++++++
- net/bluetooth/hci_debugfs.c      | 107 +++++++++++++++++++++++
- 5 files changed, 308 insertions(+), 4 deletions(-)
-
-
-base-commit: fdd5964bd389936856971647fcac3442117009dc
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fb85a0ccb250..c2708a447386 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -586,6 +586,7 @@ struct hci_dev {
+ 	struct device		dev;
+ 
+ 	struct rfkill		*rfkill;
++	struct work_struct	rfkill_block;
+ 
+ 	DECLARE_BITMAP(dev_flags, __HCI_NUM_FLAGS);
+ 	hci_conn_flags_t	conn_flags;
+@@ -1822,6 +1823,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, u8 src_type);
+ 
+ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv);
+ 
++void hci_rfkill_set_hw_state(struct hci_dev *hdev, bool blocked);
++
+ static inline struct hci_dev *hci_alloc_dev(void)
+ {
+ 	return hci_alloc_dev_priv(0);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 05d1ca25f44f..ca75932acf84 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -900,6 +900,36 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 	return 0;
+ }
+ 
++void hci_rfkill_set_hw_state(struct hci_dev *hdev, bool blocked)
++{
++	mutex_lock(&hdev->unregister_lock);
++	if (hci_dev_test_flag(hdev, HCI_UNREGISTER) ||
++	    IS_ERR_OR_NULL(hdev->rfkill)) {
++		mutex_unlock(&hdev->unregister_lock);
++		return;
++	}
++
++	rfkill_set_hw_state(hdev->rfkill, blocked);
++	mutex_unlock(&hdev->unregister_lock);
++
++	/* schedule work to avoid blocking the driver context calling this api */
++	schedule_work(&hdev->rfkill_block);
++}
++EXPORT_SYMBOL(hci_rfkill_set_hw_state);
++
++static void hci_rfkill_block_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, rfkill_block);
++
++	if (!hdev->rfkill)
++		return;
++
++	if (rfkill_blocked(hdev->rfkill))
++		hci_rfkill_set_block(hdev, true);
++	else
++		hci_rfkill_set_block(hdev, false);
++}
++
+ static const struct rfkill_ops hci_rfkill_ops = {
+ 	.set_block = hci_rfkill_set_block,
+ };
+@@ -2518,6 +2548,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+ 	INIT_LIST_HEAD(&hdev->monitored_devices);
+ 
+ 	INIT_LIST_HEAD(&hdev->local_codecs);
++	INIT_WORK(&hdev->rfkill_block, hci_rfkill_block_work);
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
+@@ -2683,6 +2714,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	disable_work_sync(&hdev->tx_work);
+ 	disable_work_sync(&hdev->power_on);
+ 	disable_work_sync(&hdev->error_reset);
++	disable_work_sync(&hdev->rfkill_block);
+ 	disable_delayed_work_sync(&hdev->cmd_timer);
+ 	disable_delayed_work_sync(&hdev->ncmd_timer);
+ 	hci_devcd_shutdown(hdev);
+@@ -2707,10 +2739,12 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	hci_sock_dev_event(hdev, HCI_DEV_UNREG);
+ 
++	mutex_lock(&hdev->unregister_lock);
+ 	if (hdev->rfkill) {
+ 		rfkill_unregister(hdev->rfkill);
+ 		rfkill_destroy(hdev->rfkill);
+ 	}
++	mutex_unlock(&hdev->unregister_lock);
+ 
+ 	device_del(&hdev->dev);
+ 	/* Actual cleanup is deferred until hci_release_dev(). */
 -- 
 2.53.0
+
