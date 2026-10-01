@@ -1,72 +1,68 @@
-Received: from mail-dy2-f41.google.com (mail-dy2-f41.google.com [74.125.229.41])
+Received: from mail-yx2-f37.google.com (mail-yx2-f37.google.com [74.125.224.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3613A5456
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 14:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D6051FCB7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 15:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790865295; cv=none; b=ab/auMRSgvm/lPfGMQ3/MpZwXH9Upbg3piIZ5oxrtO1+F5flkg+FLvB48oc8imu9cqA6DpgH+nnQajrvfXYyAz8i4n3h+bj4xoEyt09M3qZhRSIkYbNPQr69uO9ZH97PZ1KnH/1EAKjFylUf/Qa8EeaaXOHVrpy7dUC1g4rB+II=
+	t=1790867465; cv=none; b=HMCjNSYI1xdsEz/qFZupLNVCsbC90r79QrEgZpFaPFGFOiw9SI+UuHgGg3A6cjWtxNvJWiU53Q7wG9ehy729xRGUmIVHL8rRdRP7lv2XczjBpD9Q285cK8mAQ/6IWwvlDf8Sf5aQAXG/UGVQEJZxLH8qmLMW0pVaZaGIs5onV/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790865295; c=relaxed/simple;
-	bh=gvBZPaZdZ0B7QwZliS8YKMbdlv1d1i0Ek5wCe7MM6DA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y36zgPSvtVhRRzJmZS1UR1rvrgwvwAGJjdeNG+gikcAGL7DvMwrqswmRtL7tcAuFO28zFlGsyqDdSHsWvSOiP6oRG+/phM80j558Mhe3NHTFRkXu/bSblu08DDXewR+51zCEWrs7QXp9m7k6BfSviLlwotrWKwB1TcZTP0eurjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jYDJDQpW; arc=none smtp.client-ip=74.125.229.41
+	s=arc-20240116; t=1790867465; c=relaxed/simple;
+	bh=d8v+dwvxIWjihrMIjMnPQ2uNF5GUM6fsAIGzwJPyK8o=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Zi3rcoFBQvhruQhOd7id6pTMb84os8/L95MHQHN0WFKUjUHnpRqfzOWcWP9KMHOjicLH1pThBrIucR4e/RO1ADANHmFqZPbQHGV7Xi/+XawE2l1EbqM2keTKLr2apl5Uqs7I5yDK/ORBTMUfqqnr6k2vC/bSb8XEFRtAlgd3EVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O/bcBKWd; arc=none smtp.client-ip=74.125.224.165
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYDJDQpW"
-Received: by mail-dy2-f41.google.com with SMTP id 5a478bee46e88-34bb8b31660so1831957eec.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 07:34:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/bcBKWd"
+Received: by mail-yx2-f37.google.com with SMTP id 956f58d0204a3-677a7faac73so353990d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 08:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790865284; x=1791470084; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=nSFmEfAT3pGWAonxpbRScToX1KOmu0Uq4u1RQWBATcI=;
-        b=jYDJDQpWDQslX+PzxGgQqj5X7TH+r6Zv3qbnzqIn8aDzOjKHGil6TBiQXKCQnr975x
-         5YtI3NHJmpWz4oN23Oo9v/EUtbrW2Nskt11Ntz00/CDVIE6hJ3gmn5uiVDmjQJHIOb+u
-         DqDazzWj+tLBPlmYzJA1oF/6pPRjD8ug8U/WQ64NIsxWNRAbpcttzLsDKj+AckLrWWGd
-         J3gfQP7QHlD9CrOe6G2h0wu3MMHtOD2Wb0U4HymPmqtEyRt4WhIjwPz8PwtruU2gWGKE
-         u+dOKOfi4V4faPHO+i+7vKB3CSVIo13lRF7tVEQb4gZGTTzpqXsR0SwedJIc2+wPFNAq
-         139A==
+        d=gmail.com; s=20251104; t=1790867463; x=1791472263; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=RiThxi5rs4Hw3/1oNf86LR3Q4paSNP/wrpyKnAPxelI=;
+        b=O/bcBKWd4ayb++uNiArKxjy2or4ZSBUfb7sbYxD61r/VvEaZvVjwU/qkRh28bEOCo4
+         pqlqXiTOtrcZLhsFFiq01hnv20t2Jy5RdQ6d66RjcsbN6fbnQ8cxtw/2u+cSHK3IDR+x
+         yM1Q6QJiX3461Clx9uv4QShCmoQcLXrl/tEbNChOrLn8I1SCNsK9pHUSSISVRPniS97a
+         aHqYL0nj1QwKNqsQkNwC+i6e/1nqNk14CloqSfT5v018jyAAvaxBiRLDi3mokulHAqs5
+         thOQqUfAA+wQkXbaVz0p/rsO9O8JJ0xygxck831+uh4Iu/nO7lOtEKmSPP5eJ2s3qg+Z
+         OP4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790865284; x=1791470084;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=nSFmEfAT3pGWAonxpbRScToX1KOmu0Uq4u1RQWBATcI=;
-        b=GZ5jUiA3fBakxAThtPBBhdSeBNRmoEoVQvQ4NyTJj5GwnqsWvLdWybnYyPF6lFjc/i
-         X3c8IjAfrKFI5kHuYj3XidZJoNKD8ZLWcpEi3lkN3svmK4a1tirGr5NRrZ5JrPwjCkr9
-         Vn/Lf9UGfzC8yYWUIMDSCv/5aldTEHBSGrhXfK4efzlSdIkzydqStXdE2Y5AmU0+37hF
-         pZ0zymBuB4sDpSu58ZlXha65SLZatIYoa/khnAuYNMU66+dMCSPbA0FyXiqWKsRvL/r7
-         wZH7DBux3vbdp7jLLIW7+WhPXFHybn+EfZ8NfmtAbI6WdeYPPZqb3IqCvXio3tHAiF+q
-         G+HQ==
-X-Gm-Message-State: AFq9FYIgAne3ztjOroMtjBzrKTsk4WWvTy8nSBmrkFPQ4WnG/o0FIoPd
-	Uc+lLy8NFLvmzqg+cGr7rB48Zh0fbnh+fNYm1UKMzL8cpmBpLLaZdkjOPOXwGQ==
-X-Gm-Gg: AYBFou1MdG01yQWqutl+jaqCdC0RQUXYmDfDW9tQRf0ToqLuWhGMSBVuKpMLdXRdH6h
-	ItM1Qd5/QPD/HnCea2omb0asUqiG7MobmPHQHkpZ2f0xTASCMMWG272MLFER1O+mEfVbI0FnGeC
-	mnzB/itt8iYpKmTDGlK71APuEhbg5ZzlBo+n1pUU6SDyswD0H6Z86mzUp03e3qvz/L/XiEN1Y+v
-	oey6MqJZWcpI3h2UB/49U8rlTgXo+KNZyfUnlpuHv8uIbeqLnY5wmOGZqLzHILHcxZFh9HiICWb
-	3dog6GSPnxPhoiWSJc1ml6UEk/v2yOqtwLa3rzqU/TqQ5FFRX3jMqahj9RpTl+P4YDbngA9yCMU
-	Skx5+/dF6Y+8MqYRrZ+vaqvPi1DEc96fRRBhM63hMRXZ3kw7id8NkmUwIQ87W2j1l5Aqp/sKAR8
-	TAdi5/QDLFByS237AxqFjW+f++zJRRwtA+GnYWN6tE1NmL51AeFXtWVD4IkNoWJe7oj9IBtav06
-	rkD2JwwrnE=
-X-Received: by 2002:a05:7301:18a1:b0:342:e7a0:2829 with SMTP id 5a478bee46e88-34cdd39de3cmr4805594eec.26.1790865283829;
-        Thu, 01 Oct 2026 07:34:43 -0700 (PDT)
-Received: from archlinux ([2804:952c:2:0:d3a1:f67e:6409:c184])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34db315e877sm8627416eec.9.2026.10.01.07.34.42
+        d=1e100.net; s=20260707; t=1790867463; x=1791472263;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=RiThxi5rs4Hw3/1oNf86LR3Q4paSNP/wrpyKnAPxelI=;
+        b=uQ1GFCFBQ7Z6gztBIj42cN9b9qQNyJxAwNaabMJttLFvAZjRFgtfQInArp1p5dPDEW
+         p9MtvkRQNfiyZEzrPwmwRNbEfIByP8qxvNMYgx1rlLSCE9GHSf8ZNuEyuzjgWQooAAbT
+         tKc8ADy8TT8QiaspnJVFy5wrRUv6LS7UCzwWxbw18PmvIu9YF67MupG24qzHY19ayC8O
+         uqOb6uTjf0CM2o7qNpHxSn8bNO0Be6wWTv+Lnzp/jB7mkpCMIDGdZ12hMK/8wT6fyzk/
+         eM0eo6DIigqSc3ulxdqYtG8fSqCsuGb2wUK2OSYI5wjUxDkDLyqVXvpbskQutjDrDkJd
+         4eqg==
+X-Gm-Message-State: AFq9FYJfWKN1lrPqh5lJpWGgRLcv62J3f37Ti99o7MTjt4UHvBLfHbaX
+	l5fLuHrHFXt3ApWRwD01VOwaS++skqxu8Ttb+i5SlbSVvCs6vjPpxVbFhO8k/Xo6LtjSfg==
+X-Gm-Gg: AYBFou3NPh/+yLM73SAoszItGkDcr/rTL+Wz9GZqgy5CBrS4jCwyfMNtBcbn45QClr4
+	JPyr1RoemJxV6M0+5UKx2YPjo4RjfFWFnmhgJy1DUI0H5+ZqsieNfLnNZhjXVtn74lbjTfDD3xq
+	bq9yey8TRobxcJ5PcA5NV5RsiVMUs2UqcnaZxK+s4xbZjyu0ZA1Yxbwo6HS8/1iGxUvs9QSbu1n
+	c0b3Y/nwH9DD2c+Wi88bx6zAqVuNwq2UE9gEt92g5hC2TjIpvH7u9ZaadDV5KC3t/wgYbyHOcDA
+	wmujTIXSFymfNhQ+q3CfSMomeFC9VJZRIVYLcGweEJbTJq5Th3KahXGakx4WPN82I2o2tszT4Nh
+	aCsCgAJioa6Ps2z5Qk8ppPH2ak6OFOVbudR2LTuey5kbZcZ6/VIZ5zwYTaV+8KW6SRvnl/voTx3
+	OikagWg7t3qx9zyAV4gP/wP71cSarRPIgGX2AdRNDf4nPIHrVK+66YAQCutYR+XukFONEUEwNsT
+	8jjgPq8OXeMc/xjUddQ9CPJXB64kVkORj+HSpeQQvGQWVWrTRfejnkCrcccfn3b
+X-Received: by 2002:a05:690e:4382:b0:675:6f9d:dd5c with SMTP id 956f58d0204a3-6768352a136mr1509388d50.73.1790867462685;
+        Thu, 01 Oct 2026 08:11:02 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-676917cee9asm1171933d50.3.2026.10.01.08.10.59
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Oct 2026 07:34:43 -0700 (PDT)
-From: Eduardo Alves <eduardoalves8006@gmail.com>
+        Thu, 01 Oct 2026 08:11:00 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eduardo Alves <eduardoalves8006@gmail.com>
-Subject: [PATCH BlueZ 1/2] a2dp: Fix UAF after rejected SetConfiguration
-Date: Thu,  1 Oct 2026 10:34:35 -0400
-Message-ID: <20261001143436.230557-2-eduardoalves8006@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261001143436.230557-1-eduardoalves8006@gmail.com>
-References: <20261001143436.230557-1-eduardoalves8006@gmail.com>
+Subject: [PATCH BlueZ v1 1/3] doc: Add commit message guidelines for AI coding assistants
+Date: Thu,  1 Oct 2026 11:10:52 -0400
+Message-ID: <20261001151054.2422165-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,59 +71,50 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the MediaEndpoint1 rejects SetConfiguration, auto_config() calls
-setconf_cb() with an error and avdtp frees the avdtp_stream, but the
-a2dp_stream wrapping it is left on sep->streams with a dangling stream
-pointer. The next stream configured on the same session finds it in
-a2dp_config() and reads the freed avdtp_stream:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  ERROR: AddressSanitizer: heap-use-after-free
-  READ of size 4
-    #0 avdtp_stream_get_state profiles/audio/avdtp.c:3952
-    #1 a2dp_config profiles/audio/a2dp.c:3282
-    #2 select_complete profiles/audio/source.c:200
-    #3 finalize_select profiles/audio/a2dp.c:486
-  freed by thread T0 here:
-    #1 stream_free profiles/audio/avdtp.c:747
-    #2 setconf_cb profiles/audio/avdtp.c:1504
-    #3 auto_config profiles/audio/a2dp.c:752
-    #4 endpoint_setconf_cb profiles/audio/a2dp.c:768
+Require commit messages to record only the changes and their rationale,
+to follow Rule 2 of the maintainer guidelines, and to have their factual
+claims checked against the diff.
 
-Fix it by destroying the a2dp_stream when the configuration is
-rejected, which also drops the session reference it holds.
+Inspired by WirePlumber's AGENTS.md:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/AGENTS.md
 
-This can be reproduced with test-functional using two VMs over btvirt,
-where the A2DP Sink endpoint replies to SetConfiguration with an error
-and the sink then connects to the source on the same session.
-
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: OpenCode:claude-opus-5.5
 ---
- profiles/audio/a2dp.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ doc/coding-assistants.rst | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index efbe73f1b..e4b6f03fe 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -748,9 +748,17 @@ static gboolean auto_config(gpointer data)
- 	}
+diff --git a/doc/coding-assistants.rst b/doc/coding-assistants.rst
+index 3a643527fd65..778b3e6d81b3 100644
+--- a/doc/coding-assistants.rst
++++ b/doc/coding-assistants.rst
+@@ -45,3 +45,25 @@ Basic development tools (git, gcc, make, editors) should not be listed.
+ Example::
  
- done:
--	if (setup->setconf_cb)
-+	if (setup->setconf_cb) {
-+		/* Rejecting the configuration frees the avdtp_stream */
-+		if (setup->err)
-+			a2dp_stream_destroy(setup->sep, setup->stream);
+   Assisted-by: Claude:claude-3-opus coccinelle sparse
 +
- 		setup->setconf_cb(setup->session, setup->stream, setup->err);
- 
-+		if (setup->err)
-+			setup->stream = NULL;
-+	}
++Commit Messages
++===============
 +
- 	finalize_config(setup);
- 
- 	setup_error_set(setup, NULL);
++Commit messages must follow Rule 2 in doc/maintainer-guidelines.rst.
++
++A commit message records only the changes being made and the rationale
++for them. For each sentence in a draft, ask what change it records or
++what decision it justifies. If the answer is neither, delete it. In
++particular, cut anything that:
++
++* explains something the project's developers already know
++* restates general knowledge about the language, toolkits, or codebase
++* restates what the diff already shows (e.g. listing touched functions)
++* narrates the reasoning behind an earlier, abandoned attempt
++
++Additionally:
++
++* Keep it brief; use bullets only when listing multiple distinct changes.
++* Use a subject prefix consistent with the history of the files touched.
++* Verify factual claims in the message (file counts, symbol names,
++  paths) against the actual diff before committing.
 -- 
-2.56.0
+2.55.0
 
