@@ -1,43 +1,53 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6577B49482F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 13:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3700A4AAC66
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 13:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790860441; cv=none; b=MPEFmW/V6rv6YLnUe4eUrlWXOt/sIaUTveMbFv5GRLI4ywugMKcUwUTmMgb/xdfVhk0+yctYVkmwcxqth37qjJSsxAUPwgumKAlX+5rPciYXviRhNjMuF802qFLoegFK0yhTdliwLI17SZdaye7pJCovK8gJBhkR5krcUwpFNKA=
+	t=1790860749; cv=none; b=g461eVmF7cvh2xh4V4pYHiFgMEgbiR8X8tVexCcM3QCxSKp+ZttTI1JYujixHW8gzlDTfgSairzaSvm2wSXVs3e34yNoiRBed/u12VLteSgGzWNTjzmat+iyNj9eQMsh+A/hLUUUdwvuR16pPQHioLY/jtJJT886S/tdc5I9CR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790860441; c=relaxed/simple;
-	bh=doMyjterot5qki5vtpBaioxk+luGzebBLfcYSW3pMpA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=ORZC6EM2ZhxX2P2B0UVS54ko/sccl/1TVZP/w/OH8738F9aMzCfrwgo1lxSusJf0ubK2KTLf5Hxr4XqmYULmG/JyvH2vlD6IOTj345vUtAcdlJnUoXJ0u+Oaa7VTCM8ZVMo2wjzPrrkJieJbSIEe1kD8Fd5ptA+x0erf+98ZshA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ZkJ9GdW5; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1790860749; c=relaxed/simple;
+	bh=xN05hoVy6QAUNnKLkhOUTWokcyzE+Nd8t6RM6ock7BY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WPZxy2HmziX0DSR/4jjosNhL6uwdsORORZk3KEl5vGUAFK5j8YlEfiYSAc+x/UE+QOVxL6/vp5w21ahEpnkcWVKMJrDHKJJiGGiOU0KRxDB14MDkK9o2K+xpIdP6J8iWVgl4J6nT9WpSrkT0CbWPuYr9h9yC584tjtvLUzD8hoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=R70S8Etg; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ZkJ9GdW5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1790860437;
-	bh=doMyjterot5qki5vtpBaioxk+luGzebBLfcYSW3pMpA=;
-	h=From:To:Subject:Date:From;
-	b=ZkJ9GdW5jL66BdsWLyX5hwFvYu9Dgrg1y1OEoDpY5/+0cfhuPThB3fN0bCeanMU4I
-	 +v7/5vNsxQuhI46nIPmAoyatss5JyemCnMpYPKcHrBoPwuB4MBkgH2GL51IxotPRl6
-	 L38deSsuBXFdNlVCI6JyVXz6ECLq8JgTKVEV2ztBIP0Ubs91m/svSKGl8fCAymMnfL
-	 pCTAm4cg/5ssDFmz1w3h4gU3vljlPZYHXzL1AiDJGk9/N3DB6T3OSVOb8hERrHUiUO
-	 XIAhzW5LiOjZMOOcY3xJ5qskN1qef380gGmJeiJdJ3FfjXv1zRUI6WkpcQmzJHr7iy
-	 FoYpEGzdMQXSA==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 70B1B17E0524
-	for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 15:13:57 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="R70S8Etg"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 691CqJ6R1933080
+	for <linux-bluetooth@vger.kernel.org>; Thu, 1 Oct 2026 13:19:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=Nks71KvS3RP22kUqC2hM/xyFdLWmkIQ1rf8
+	1FZkk5OY=; b=R70S8EtgTF36zJ1vt17xPwT+OA86koXkoFbRxDXm/bydnVqtIuh
+	K4kPbWP/kVPpkKplpuMnzxrTSR61WK/vxTE1BS6Q+PiCEnMx66pzxVCLD28Q7c5q
+	d/BCR8+7+/zCo08gl8HMyVTnp3eoI/gS6FDe++QyH74wwxTZjSLvuWvH1MgJr87Y
+	UP20Yh8JlKtcl7P2UKGLwjyQccq4JWRnX0LVXD5rO4uhAyy6MNDFB70lG8R9t4JJ
+	gVYpCFXOCtgoB8JDykQj+TgiamLKa002RG732TJBHvgz7HHGpzexdCxyIoSI1zEM
+	ZoCpe8XuR9wqo6YJZPUCNFJ32K+r2ay9bug==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h1jcfsppw-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 13:19:06 +0000 (GMT)
+Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 691DJ49W2501384;
+	Thu, 1 Oct 2026 13:19:04 GMT
+Received: from bt-iot-sh04-lnx.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 691DJ3iJ2501377
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 01 Oct 2026 13:19:04 +0000 (GMT)
+Received: by bt-iot-sh04-lnx.qualcomm.com (Postfix, from userid 37913)
+	id 1D0AC41C78; Thu,  1 Oct 2026 21:19:03 +0800 (CST)
+From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8] Bluetooth: MGMT: Add management security level changed event
-Date: Thu,  1 Oct 2026 15:13:52 +0200
-Message-ID: <20261001131352.945000-1-frederic.danis@collabora.com>
+Cc: jinwang.li@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
+        xiuzhuo.shang@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
+        Cheng Jiang <cheng.jiang@oss.qualcomm.com>
+Subject: [PATCH 00/11] Ranging Profile and Ranging Service PTS fixes
+Date: Thu,  1 Oct 2026 21:18:46 +0800
+Message-ID: <20261001131900.707485-1-cheng.jiang@oss.qualcomm.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -45,503 +55,121 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfX12v1Otm4Vcav
+ 5O8t6I7539LP32O3xBt3+Q/LsGGLTzE8vYFpYAQvDK059gmcFWd1csqKtuH0Z6BwDu6j69CSiKb
+ YNh9ZIXjzUs+NQ8xNV+8OdmiOQ5cpGI=
+X-Proofpoint-GUID: HlXYrLDGP4_EDICQpV1LUQH6mrim6LwC
+X-Authority-Analysis: v=2.4 cv=b4YncdGx c=1 sm=1 tr=0 ts=6abe5dca cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=gowsoOTTUOVcmtlkKump:22 a=1rL_R2W-7Xot260rqawA:9
+X-Proofpoint-ORIG-GUID: HlXYrLDGP4_EDICQpV1LUQH6mrim6LwC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfXwGBKxN0WKN1Y
+ Ul1v3h7aCFyLfbdBcxe49ZJtmv4WZRc0iMcYurnroc3e0HEUJ8qvMTc61DBP9A7de6ixF0D0jq2
+ JgoVAhhzwptG850ZQuXrvr0IqZRBOSc+xpmjsq7BBJyQrij3S5elxtfFTYHfiTzZ/SS+TXObuaU
+ ZNjsh4j7c33hO0RLRM4wnIoF5Rb8AtvVXa37FXScHOUtRr3oCRTdfx7dMy+9nDc/CoD/sogXFnn
+ jLHWnRz8vwFQgEx0dKy69OH+MKq/phv0ojxxP9vaNsnS0m7KTYZAPMHIc4jymkZj1yUYzxGH7n6
+ 0i4b9/wqo38ECXrUUVPvKlfn3bT8u5WK6zf3TaQxgDyYlWwXQMzssQAGf9RwdixkpoBk71PNqjN
+ h7ckgp0yPIof2T+Zg0EV3iLHiIWXSB6YYNcdFioJM/xWuFxInsnWybCsBk3VcantUSEF+ZpeYQ6
+ 3bN+bxbJHRrg9AEsB2w==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-01_03,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 spamscore=0 suspectscore=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610010053
 
-Add an event on device security level or encryption type change to
-let user space know which level is currently in use.
-Reset security level to 0 on disconnection so further connections
-will correctly report security level changes.
+Qualifying the existing Ranging Profile and Ranging Service code against PTS
+turned up behaviour that does not match the specifications, plus procedures
+that were not implemented at all. This series is what the RAP Requester and
+RAS Server needed to pass, and the PTS results it records.
 
-This will be used for BlueZ qualification automation.
+Most of it comes down to one thing the GATT layer could not express. RAS
+picks the notification or the indication transport per characteristic, and
+when a client enables both, the choice is not the same everywhere:
 
-Assisted-by: GPT:GPT-5.3-Codex
-Assisted-by: Copilot:claude-sonnet-5
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
----
-v1->v2:
- - Add encryption type to the mgmt event
- - Send event on security level or encryption type change
-v2->v3:
- - Replace fixed security level and ancryption type parameters by TLV array
-   to allow later enhancement.
-v3->v4:
- - Change MGMT_EV_SECURITY_LEVEL_CHANGED to 0x0034
- - Add __counted_by for the tlv_data
- - dynamically allow the mgmt_ev_security_level_changed structure
-v4->v5: Address Sashiko comments:
- - stop overwriting tlv_count and replace it by tlv_length as kzalloc_flex()
-   should already set it to the byte length. This depends on compiler
-   supporting __builtin_counted_by_ref(), so explicitly set it too.
- - filter on link type to prevent sending the event for child connections
- - remove premature calls to mgmt_security_level_changed()
- - send events only on security level changes
-v5->v6: Address Sashiko comments:
- - avoid a duplicate MGMT event in hci_conn_complete_evt() by not setting
-   encrypt_change when the link-key branch already reports the change via
-   hci_encrypt_cfm()
- - defer reporting for encrypted ACL links until hci_cc_read_enc_key_size()
-   has validated the encryption key size, instead of reporting a transient
-   state that a key-size downgrade could immediately invalidate
-v6->v7: Address Sashiko comments:
- - report the security level only from mgmt_device_connected(), right
-   after MGMT_EV_DEVICE_CONNECTED, when the connection is still being
-   set up (BT_CONFIG) at the time the change happens, so userspace is
-   never told about a security level before knowing about the connection
- - in hci_cc_read_enc_key_size(), always pre-apply hci_encrypt_cfm()'s
-   upgrade rules, since hci_encrypt_change_evt() can already have set
-   conn->sec_level directly and defeat hci_encrypt_cfm()'s own change
-   detection
- - in hci_cc_read_enc_key_size(), use
-   test_bit(HCI_CONN_MGMT_CONNECTED, ...) instead of
-   conn->state == BT_CONFIG to decide whether to report immediately or
-   defer to mgmt_device_connected(): the latter can already have fired
-   while still in BT_CONFIG (e.g. pairing with authentication pending),
-   which was silently dropping the encryption type update
- - keep reporting the security level reset in hci_conn_unlink() on
-   disconnection, after MGMT_EV_DEVICE_DISCONNECTED: userspace (e.g.
-   BlueZ) relies on this event to clear its cached security level and
-   encryption type
- - in le_conn_complete_evt(), set conn->sec_level to BT_SECURITY_LOW
-   before calling mgmt_device_connected() instead of after, to avoid
-   reporting a spurious initial SDP event before the real one
-v7->v8: Address Sashiko comments:
- - move the HCI_CONN_MGMT_CONNECTED check into
-   mgmt_security_level_changed() itself, dropping the now redundant
-   check from all call sites, to stop premature events for connections
-   not yet announced to userspace
- - change mgmt_connect_failed() to peek at HCI_CONN_MGMT_CONNECTED
-   instead of consuming it, so hci_conn_unlink() can still see it to
-   report the security level reset
- - remove the now dead mgmt_security_level_changed() call in
-   hci_conn_complete_evt()
- - stop reporting the security level right after authentication
-   completes in hci_auth_complete_evt(), before encryption is actually
-   confirmed
- - downgrade conn->sec_level to BT_SECURITY_LOW before reporting when
-   encryption is disabled (hci_encrypt_change_evt()) or the key-size
-   check fails (hci_cc_read_enc_key_size()), instead of advertising a
-   stale elevated level alongside MGMT_CONN_SEC_ENCRYPT_NONE
- - set conn->sec_level to BT_SECURITY_LOW for incoming BR/EDR
-   connections in hci_conn_request_evt(), like already done for LE in
-   le_conn_complete_evt()
- - skip the security level reset report in hci_conn_unlink() when hdev
-   is down, since no MGMT_EV_DEVICE_DISCONNECTED was ever sent in that
-   case
- - remove the dead pending_sec_level > sec_level upgrade check in
-   hci_encrypt_cfm(), unreachable since all callers already set
-   conn->sec_level = conn->pending_sec_level themselves
+- Ranging Data Ready and Ranging Data Overwritten must be indicated
+  (RAS 3.4.2, 3.5.2; RAS/SR/RCO/BV-08-C and BV-09-C).
+- On-demand and Real-time Ranging Data must be notified
+  (RAS 3.2.2, 3.2.3.1; RAS/SR/RCO/BV-05..07-C and RAS/SR/RRD/BV-03-C).
 
- include/net/bluetooth/hci_core.h |  18 +++--
- include/net/bluetooth/mgmt.h     |  14 ++++
- net/bluetooth/hci_conn.c         |  28 ++++++++
- net/bluetooth/hci_event.c        | 110 +++++++++++++++++++++++++++++--
- net/bluetooth/mgmt.c             |  67 ++++++++++++++++++-
- 5 files changed, 225 insertions(+), 12 deletions(-)
+gatt_db_attribute_notify() prefers notifications whenever the client enabled
+them, so a server cannot honour the first rule, and
+bt_gatt_client_register_notify() derives the CCC value from the
+characteristic properties, so a requester cannot ask for one transport
+specifically. Patches 1 and 2 add an entry point for each case, leaving
+gatt_db_notify_t and every existing caller of both functions untouched.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fb85a0ccb250..f631d9484a0b 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2255,6 +2255,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 		conn->security_cfm_cb(conn, status);
- }
- 
-+void mgmt_security_level_changed(struct hci_conn *conn);
-+
- static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- {
- 	struct hci_cb *cb;
-@@ -2277,11 +2279,19 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 		encrypt = 0x01;
- 
- 	if (!status) {
--		if (conn->sec_level == BT_SECURITY_SDP)
-+		/* Callers either set conn->sec_level = conn->pending_sec_level
-+		 * unconditionally before calling this function, or never
-+		 * reach here with status == 0 (e.g. conn->state == BT_CONFIG
-+		 * returns early above, or status is actually an error).  So
-+		 * conn->pending_sec_level is never greater than
-+		 * conn->sec_level at this point; only the initial
-+		 * BT_SECURITY_SDP -> BT_SECURITY_LOW bump can still happen
-+		 * here.
-+		 */
-+		if (conn->sec_level == BT_SECURITY_SDP) {
- 			conn->sec_level = BT_SECURITY_LOW;
--
--		if (conn->pending_sec_level > conn->sec_level)
--			conn->sec_level = conn->pending_sec_level;
-+			mgmt_security_level_changed(conn);
-+		}
- 	}
- 
- 	mutex_lock(&hci_cb_list_lock);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 1e22eab1081c..b02e915bb44c 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -1221,3 +1221,17 @@ struct mgmt_ev_conn_subrate {
- 	__le16	cont_num;
- 	__le16	supv_timeout;
- } __packed;
-+
-+#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
-+#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
-+#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
-+
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL	0x0000
-+#define MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE	0x0001
-+
-+#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0034
-+struct mgmt_ev_security_level_changed {
-+	struct mgmt_addr_info addr;
-+	__u8	tlv_length;
-+	__u8	tlv_data[] __counted_by(tlv_length);
-+} __packed;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index cf44452e0766..29da3fe2b953 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1233,6 +1233,29 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	if (!conn->parent) {
- 		struct hci_link *link, *t;
- 
-+		conn->sec_level = BT_SECURITY_SDP;
-+		clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+		clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+		/* mgmt_security_level_changed() reports the reset only if
-+		 * this connection was actually reported to userspace as
-+		 * connected (it checks HCI_CONN_MGMT_CONNECTED itself), so it
-+		 * must be called before the flag is cleared below.
-+		 * Callers that already know whether the connection was
-+		 * mgmt-connected (e.g. disconnect event handlers) only peek
-+		 * at the flag, so it is still set here; this is the place
-+		 * actually clearing it.
-+		 *
-+		 * Skip the report if hdev is down: this means
-+		 * hci_dev_close_sync()/hci_conn_hash_flush() is in progress
-+		 * and no MGMT_EV_DEVICE_DISCONNECTED was ever sent for this
-+		 * connection, so sending a security level reset here would
-+		 * be a spurious, order-less event; the adapter-wide powered
-+		 * off notification is enough for userspace to reset state.
-+		 */
-+		if (test_bit(HCI_UP, &hdev->flags))
-+			mgmt_security_level_changed(conn);
-+		clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
-+
- 		list_for_each_entry_safe(link, t, &conn->link_list, list) {
- 			struct hci_conn *child = link->conn;
- 
-@@ -1543,6 +1566,11 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		conn->pending_sec_level = sec_level;
- 	}
- 
-+	/* Do not report the security level here: conn->dst may still hold
-+	 * the peer's RPA instead of its identity address, and the connection
-+	 * is not established yet. le_conn_complete_evt() reports it once the
-+	 * connection completes and the identity address has been resolved.
-+	 */
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->conn_timeout = conn_timeout;
- 	conn->le_adv_phy = phy;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5ac2357e92c9..5018827b14bf 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -755,6 +755,25 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
- 			status = HCI_ERROR_AUTH_FAILURE;
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			/* Downgrade to reflect the connection no longer being
-+			 * encrypted, instead of advertising a stale elevated
-+			 * security level alongside MGMT_CONN_SEC_ENCRYPT_NONE.
-+			 */
-+			if (conn->sec_level > BT_SECURITY_LOW)
-+				conn->sec_level = BT_SECURITY_LOW;
-+		} else {
-+			/* Pre-apply hci_encrypt_cfm()'s own upgrade rules
-+			 * here unconditionally on success, so its internal
-+			 * change check below always finds nothing new: this
-+			 * function remains the sole place deciding whether
-+			 * and when to report the change, regardless of
-+			 * whether the caller already touched conn->sec_level
-+			 * (e.g. hci_encrypt_change_evt()) or not.
-+			 */
-+			if (conn->sec_level == BT_SECURITY_SDP)
-+				conn->sec_level = BT_SECURITY_LOW;
-+			if (conn->pending_sec_level > conn->sec_level)
-+				conn->sec_level = conn->pending_sec_level;
- 		}
- 
- 		/* Update the key encryption size with the connection one */
-@@ -764,6 +783,13 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
- 
- 	hci_encrypt_cfm(conn, status);
- 
-+	/* mgmt_security_level_changed() only reports the change for
-+	 * connections already announced to userspace (it checks
-+	 * HCI_CONN_MGMT_CONNECTED itself); otherwise it is a no-op here and
-+	 * reporting is deferred to mgmt_device_connected().
-+	 */
-+	mgmt_security_level_changed(conn);
-+
- done:
- 	hci_dev_unlock(hdev);
- 
-@@ -2762,7 +2788,11 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- 	if (hdev->suspended)
- 		conn->state = BT_CLOSED;
- 
--	mgmt_conn = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
-+	/* Only peek at the flag here: hci_conn_del() (via hci_conn_unlink())
-+	 * still needs it set to know whether to report the security level
-+	 * reset, so it is consumed there instead of here.
-+	 */
-+	mgmt_conn = test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
- 
- 	if (conn->type == ACL_LINK) {
- 		if (test_and_clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-@@ -3366,6 +3396,16 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 			bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
- 			goto unlock;
- 		}
-+
-+		/* Unlike outgoing BR/EDR connections, conn->sec_level is not
-+		 * set at connection request time for incoming connections,
-+		 * so it is still at its zero-initialized value
-+		 * (BT_SECURITY_SDP) here. Set it to BT_SECURITY_LOW so
-+		 * mgmt_device_connected() later reports the correct initial
-+		 * security level instead of a transient, never-really-in-use
-+		 * SDP value.
-+		 */
-+		conn->sec_level = BT_SECURITY_LOW;
- 	}
- 
- 	memcpy(conn->dev_class, ev->dev_class, 3);
-@@ -3432,7 +3472,11 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	conn->state = BT_CLOSED;
- 
--	mgmt_connected = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
-+	/* Only peek at the flag here: hci_conn_del() (via hci_conn_unlink())
-+	 * still needs it set to know whether to report the security level
-+	 * reset, so it is consumed there instead of here.
-+	 */
-+	mgmt_connected = test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
- 
- 	if (test_bit(HCI_CONN_AUTH_FAILURE, &conn->flags))
- 		reason = MGMT_DEV_DISCONN_AUTH_FAILURE;
-@@ -3516,6 +3560,15 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, void *data,
- 	if (!ev->status) {
- 		clear_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
- 		set_bit(HCI_CONN_AUTH, &conn->flags);
-+		/* Authentication alone does not imply encryption: for SSP
-+		 * capable devices, encryption is only requested below, and
-+		 * for legacy devices it is requested by a separate
-+		 * HCI_OP_SET_CONN_ENCRYPT command. Do not report the new
-+		 * security level yet, to avoid userspace seeing an elevated
-+		 * level alongside no encryption; hci_encrypt_change_evt()
-+		 * (possibly via hci_cc_read_enc_key_size() for ACL links)
-+		 * reports it once encryption is actually confirmed.
-+		 */
- 		conn->sec_level = conn->pending_sec_level;
- 	} else {
- 		if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
-@@ -3632,9 +3685,28 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
- 			    conn->type == LE_LINK)
- 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
-+
-+			/* For ACL links the encryption key size is still
-+			 * validated below via hci_read_enc_key_size(). Its
-+			 * completion handler, hci_cc_read_enc_key_size(),
-+			 * reports the final security level so userspace does
-+			 * not see a transient "encrypted" state that a
-+			 * key-size downgrade would immediately invalidate.
-+			 */
-+			if (conn->type != ACL_LINK)
-+				mgmt_security_level_changed(conn);
- 		} else {
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			/* Elevated security levels (MEDIUM and above) require
-+			 * encryption, so downgrade to reflect the connection
-+			 * no longer being encrypted before reporting, instead
-+			 * of advertising a stale elevated level alongside
-+			 * MGMT_CONN_SEC_ENCRYPT_NONE.
-+			 */
-+			if (conn->sec_level > BT_SECURITY_LOW)
-+				conn->sec_level = BT_SECURITY_LOW;
-+			mgmt_security_level_changed(conn);
- 		}
- 	}
- 
-@@ -3667,8 +3739,14 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 
- 	/* Try reading the encryption key size for encrypted ACL links */
- 	if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
--		if (hci_read_enc_key_size(hdev, conn))
-+		if (hci_read_enc_key_size(hdev, conn)) {
-+			/* Could not even issue the key-size read: report the
-+			 * security level now since hci_cc_read_enc_key_size()
-+			 * will not run to do it.
-+			 */
-+			mgmt_security_level_changed(conn);
- 			goto notify;
-+		}
- 
- 		goto unlock;
- 	}
-@@ -5228,8 +5306,14 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 	if (conn->type != LE_LINK)
- 		goto unlock;
- 
--	if (!ev->status)
-+	if (!ev->status) {
-+		bool sec_level_changed =
-+				conn->sec_level != conn->pending_sec_level;
-+
- 		conn->sec_level = conn->pending_sec_level;
-+		if (sec_level_changed)
-+			mgmt_security_level_changed(conn);
-+	}
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
- 
-@@ -5858,9 +5942,16 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 		goto unlock;
- 	}
- 
-+	/* Unlike outgoing BR/EDR connections, conn->sec_level is not set at
-+	 * connection request time for LE, so it is still at its
-+	 * zero-initialized value (BT_SECURITY_SDP) here. Set it to
-+	 * BT_SECURITY_LOW before reporting the connection so
-+	 * mgmt_device_connected() reports the correct initial security level
-+	 * instead of a transient, never-really-in-use SDP value.
-+	 */
-+	conn->sec_level = BT_SECURITY_LOW;
- 	mgmt_device_connected(hdev, conn, NULL, 0);
- 
--	conn->sec_level = BT_SECURITY_LOW;
- 	conn->state = BT_CONFIG;
- 
- 	/* Store current advertising instance as connection advertising instance
-@@ -7311,8 +7402,13 @@ static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
- 						     BT_CONNECTED,
- 						     HCI_ROLE_SLAVE))) {
- 		if (!mgmt_conn) {
--			mgmt_conn = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED,
--						       &bis->flags);
-+			/* Only peek at the flag here: hci_conn_del() (via
-+			 * hci_conn_unlink()) still needs it set to know
-+			 * whether to report the security level reset, so
-+			 * it is consumed there instead of here.
-+			 */
-+			mgmt_conn = test_bit(HCI_CONN_MGMT_CONNECTED,
-+					     &bis->flags);
- 			mgmt_device_disconnected(hdev, &bis->dst, bis->type,
- 						 bis->dst_type, ev->reason,
- 						 mgmt_conn);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9b4688015abf..b5b55fe4698c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -177,6 +177,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_CONTROLLER_RESUME,
- 	MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
- 	MGMT_EV_ADV_MONITOR_DEVICE_LOST,
-+	MGMT_EV_SECURITY_LEVEL_CHANGED,
- };
- 
- static const u16 mgmt_untrusted_commands[] = {
-@@ -10082,6 +10083,15 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
- 	ev->eir_len = cpu_to_le16(eir_len);
- 
- 	mgmt_event_skb(skb, NULL);
-+
-+	/* Report the security level currently in use now that the connection
-+	 * itself has been announced. For connections that negotiate
-+	 * encryption as part of setup (e.g. via an existing link key),
-+	 * conn->sec_level is already finalized by this point, so this is
-+	 * the first opportunity to report it without risking a premature
-+	 * event for a connection userspace does not know about yet.
-+	 */
-+	mgmt_security_level_changed(conn);
- }
- 
- static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
-@@ -10188,7 +10198,11 @@ void mgmt_connect_failed(struct hci_dev *hdev, struct hci_conn *conn, u8 status)
- {
- 	struct mgmt_ev_connect_failed ev;
- 
--	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
-+	/* Only peek at the flag here: hci_conn_del() (via hci_conn_unlink())
-+	 * still needs it set to know whether to report the security level
-+	 * reset, so it is consumed there instead of here.
-+	 */
-+	if (test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
- 		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
- 					 conn->dst_type,
- 					 hci_to_mgmt_reason(status), true);
-@@ -10822,6 +10836,57 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, NULL);
- }
- 
-+void mgmt_security_level_changed(struct hci_conn *conn)
-+{
-+	struct mgmt_ev_security_level_changed *ev;
-+	struct mgmt_tlv *tlv;
-+	u8 *tlv_data;
-+	u8 tlv_len;
-+
-+	if (!test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
-+		return;
-+
-+	/* Only ACL, LE and BIS links are tracked as mgmt connections, so
-+	 * restrict the event to those link types. Other transports (SCO,
-+	 * CIS, PA sync, ...) share the parent's address and would otherwise
-+	 * report a spurious security level change for it.
-+	 */
-+	if (conn->type != ACL_LINK && conn->type != LE_LINK &&
-+	    conn->type != BIS_LINK)
-+		return;
-+
-+	tlv_len = 2 * (sizeof(*tlv) + sizeof(__u8));
-+	ev = kzalloc_flex(*ev, tlv_data, tlv_len, GFP_KERNEL);
-+	if (!ev)
-+		return;
-+
-+	bacpy(&ev->addr.bdaddr, &conn->dst);
-+	ev->addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	ev->tlv_length = tlv_len;
-+
-+	tlv_data = ev->tlv_data;
-+	tlv = (void *)tlv_data;
-+	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_LEVEL);
-+	tlv->length = sizeof(__u8);
-+	tlv->value[0] = conn->sec_level;
-+
-+	tlv_data += sizeof(*tlv) + sizeof(__u8);
-+	tlv = (void *)tlv_data;
-+	tlv->type = cpu_to_le16(MGMT_SEC_LEVEL_CHANGED_PARAM_ENC_TYPE);
-+	tlv->length = sizeof(__u8);
-+	if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_NONE;
-+	else if (test_bit(HCI_CONN_AES_CCM, &conn->flags))
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_AES_CCM;
-+	else
-+		tlv->value[0] = MGMT_CONN_SEC_ENCRYPT_E0;
-+
-+	mgmt_event(MGMT_EV_SECURITY_LEVEL_CHANGED, conn->hdev, ev,
-+		   struct_size(ev, tlv_data, tlv_len), NULL);
-+
-+	kfree(ev);
-+}
-+
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len)
- {
+Patches 3 to 6 apply that on the responder and fill in what the RAS Server
+cases exercise: the transport of every notified characteristic now follows
+the peer's CCCD, Abort Operation is implemented and advertised in RAS
+Features, the requester's Control Point watchdog uses the 5 seconds
+RAP 4.5.4.1 specifies, and Real-time Ranging Data is queued so segments are
+not dropped when a procedure completes before they are all sent.
+
+Segmented ranging data was also queued a whole transfer at a time, which
+starves incoming ATT operations: notifications land on the att write queue,
+which pick_next_send_op() drains ahead of the request queue and with no flow
+control of its own. It now goes out a segment at a time, gated on
+confirmations for indications and on a short delay otherwise, so an Abort
+Operation stops a transfer the peer no longer wants instead of having to
+wait for it to drain. A real flow control for the notification path, driven
+by how much the att write queue has left to send, would be better than that
+delay and is left for later.
+
+Patches 7 to 9 add the requester side the RAP cases need: an API to select
+Real-time or On-demand reception together with the transport to configure on
+the peer, exposed as org.bluez.ChannelSounding1.SetRangingDataMode() and as
+a bluetoothctl ranging-data-mode command.
+
+Patches 10 and 11 document the new method and command, and record the
+results: 19 RAP and 31 RAS cases pass with PTS 8.14.0.4, run against PTS
+pre-generated ranging data (TSPX_test_method), since the PTS dongle in use
+does not support Channel Sounding. That covers the RAS protocol behaviour
+above but not the HCI Channel Sounding entry path. RAS/SR/SPE/BI-02-C is
+listed as not applicable, since RAS.TS Table 5.1 selects it only when Abort
+Operation is unsupported and the IUT supports it.
+
+Each patch builds on its own, and unit/test-rap, test-bap, test-bass,
+test-mcp, test-micp, test-vcp and test-gatt pass on every one of them.
+
+Cheng Jiang (11):
+  shared/gatt-client: Allow registering notify with explicit CCC value
+  shared/gatt-db: Add gatt_db_attribute_indicate()
+  shared/rap: Honor CCCD transport for RAS on-demand ranging data
+  shared/rap: Add RAS Control Point Abort Operation
+  shared/rap: Shorten the requester Control Point response timeout
+  shared/rap: Add real-time ranging data delivery on the responder
+  shared/rap: Add requester ranging data subscription API
+  profiles/ranging: Expose requester ranging data mode over D-Bus
+  client: Add Channel Sounding ranging data mode control
+  doc: Document Channel Sounding ranging data mode control
+  doc/qualification: Add RAP/RAS PTS qualification results
+
+ client/cs.c                        |  82 +++
+ doc/bluetoothctl-cs.rst            |  24 +
+ doc/org.bluez.ChannelSounding1.rst |  32 ++
+ doc/qualification/rap-pts.rst      | 180 +++++++
+ doc/qualification/ras-pts.rst      | 135 +++++
+ profiles/ranging/rap.c             |  34 ++
+ src/gatt-database.c                |   7 +-
+ src/shared/gatt-client.c           |  41 +-
+ src/shared/gatt-client.h           |   7 +
+ src/shared/gatt-db.c               |  35 +-
+ src/shared/gatt-db.h               |  17 +
+ src/shared/rap.c                   | 824 ++++++++++++++++++++++++-----
+ src/shared/rap.h                   |  21 +
+ unit/test-rap.c                    |  19 +-
+ 14 files changed, 1319 insertions(+), 139 deletions(-)
+ create mode 100644 doc/qualification/rap-pts.rst
+ create mode 100644 doc/qualification/ras-pts.rst
+
 -- 
 2.43.0
 
