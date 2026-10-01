@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF5F535FA8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4DA5372F6
 	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 21:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790889054; cv=none; b=YmacgFZFK+m0l1ukFTswsI6Dh2EcJIgktg+MkiPAJMdbDUZsoqJAnIB+ywBs/iKngK5EW02SSEYqZpHhuJFBYwsHl/dA5wGQc04PIxegTwmdTxUkBCsAFyaXeaq1DsI1TRffw3ttR568aM59D/xAvOXUs3lKNMlnLxJVoe1uZ54=
+	t=1790889055; cv=none; b=CAfVTvLUnLjBBFXwOkP43VHisCxr5LWkCQ8yXNlBf60vOJfSDZZzWTQQ6JpNIbYrespnboSPdpNjOsgnH4oWv6D+s52oFckz8Ie9BqvnQoIfhRSD/8lX6XmB/tUlQatWjKmNH5BiHOuJFRsRog+4dY4C5Kp5gLaEE6tamv6y6Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790889054; c=relaxed/simple;
-	bh=jFARBSWzB+9PnxuT6gv+e04kyK/p81QPLT9CP2EyhE8=;
+	s=arc-20240116; t=1790889055; c=relaxed/simple;
+	bh=HCI7oX8knxg9MwrEfDFdPRf5qNWgZssUvz0RdINNlfI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IoUX2070Zf9X6BaO8te4KiYdfkZJVZycoveQy9KNGB2DvrwdrVSC1kGJDZ3FJecL+/cYcf/iSoesYp0Y0R65C6KZF8pdRcAsQPRvI+7NQjqdijGNY3VwS7QZN3Cndfl1E8uPnuFn4XdqI7+375BkmBFGOftjNsxwIktC5IrKO9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=X+Clz+Uu; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=b/2oTVCcbrjYEjeW5a20Wce4wZ+33vn5LzzSf3eIuGK+zovmB8rAqThsmeI7ojpqfKxW7hY6lr64RhVmLtrLlpChAkRTwrixGHIalmOeu7bvQlWU0KfwZJxpHfdHv2gZwarT1gq2eMqUyLSJwHo+Y6S9vRP6Fa92Us467xEfSXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qKw+v0Nj; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="X+Clz+Uu"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qKw+v0Nj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1790889043;
-	bh=jFARBSWzB+9PnxuT6gv+e04kyK/p81QPLT9CP2EyhE8=;
+	bh=HCI7oX8knxg9MwrEfDFdPRf5qNWgZssUvz0RdINNlfI=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=X+Clz+Uu/fdcurlNUgynUiBBRV1ODJPTUdbEcTbBnw2M+pC2u4NmHNsut2uTkDLxH
-	 j4jgAsYgqAajU3cktUHsE7zx/eepSenDgkelLm07p8NZu6rlOa4LagV+ySFOOlgB9q
-	 Fry1rd5G6VNwplJwC/WBQC5vf5y+v8duRFJ5EWdaVBhiJCSKUiXCglb4sBBsS7Ro14
-	 PgUC+rcNbBzcialY4FYZl5AeJYPbEGCLC+ysvPDpoe0VmqU+/Jwa+h2wgn1vga+7Vk
-	 S8LfsGToEanzmOwiob4Fx+Vg80nsjrdXJZRLA+Qp85EdIp1BXOaHLn0eLYXo6rBSyX
-	 PFybUcvCPIXXw==
+	b=qKw+v0Nj0Ea9M2yMjYZd0TWnPaQSAmAFBZDPZH0W8fdgg58LuXhkfOLvogNGeJNP1
+	 smYT7zy2rjRrT03XCqjlTRWJe/2i0ivOGXACvj0T1WDIe28lLO0/tqj+SO1aKUklE1
+	 2gGop2hfFsuBr9Q3A1eMoLJblRzKuHu4fP3iM8wsn2opoTA7nfx3Kyoqyedvr/KK4U
+	 8UfbRYEixFczYkF/FmyZ93mnPkXTqKasHWkHYnK48Csbcvx4Lcyf9yh+g+R1zvoLzB
+	 4nusc2zl2HLhFJUq1hCfUqh1iIxuWM7WOH7xfeJAY8d3cCRAItzStumssiFPXlvFlw
+	 opfu2Pwr5RKuw==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E418F17E0906
-	for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 23:10:42 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2988217E0928
+	for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 23:10:43 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 07/12] audio/hfp-hf: Add Send Tones support
-Date: Thu,  1 Oct 2026 23:10:31 +0200
-Message-ID: <20261001211036.1760396-8-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 08/12] client/telephony: Add Send Tones menu entry
+Date: Thu,  1 Oct 2026 23:10:32 +0200
+Message-ID: <20261001211036.1760396-9-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001211036.1760396-1-frederic.danis@collabora.com>
 References: <20261001211036.1760396-1-frederic.danis@collabora.com>
@@ -53,48 +53,74 @@ Content-Transfer-Encoding: 8bit
 From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
 ---
- profiles/audio/hfp-hf.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ client/telephony.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
-index 287b79f1f..1843b6758 100644
---- a/profiles/audio/hfp-hf.c
-+++ b/profiles/audio/hfp-hf.c
-@@ -517,6 +517,26 @@ static DBusMessage *hangup_all(DBusConnection *conn, DBusMessage *msg,
- 	return NULL;
+diff --git a/client/telephony.c b/client/telephony.c
+index cc92fe33a..ab2a93430 100644
+--- a/client/telephony.c
++++ b/client/telephony.c
+@@ -277,6 +277,51 @@ static void cmd_hangupall(int argc, char *argv[])
+ 	bt_shell_printf("Attempting to hangup all calls\n");
  }
  
-+static DBusMessage *send_tones(DBusConnection *conn, DBusMessage *msg,
-+				void *profile_data)
++static void send_tones_reply(DBusMessage *message, void *user_data)
 +{
-+	struct hfp_device *dev = profile_data;
-+	const char *tones;
-+	bool ret;
++	DBusError error;
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &tones,
-+					DBUS_TYPE_INVALID)) {
-+		return btd_error_invalid_args(msg);
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to send tones: %s\n", error.name);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +
-+	ret = hfp_hf_send_tones(dev->hf, tones, cmd_complete,
-+					dbus_message_ref(msg));
-+	if (!ret)
-+		return btd_error_failed(msg, "Send tones command failed");
++	bt_shell_printf("Send tones successful\n");
 +
-+	return NULL;
++	return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +}
 +
- static DBusMessage *call_answer(DBusConnection *conn, DBusMessage *msg,
- 				void *call_data)
++static void cmd_send_tones(int argc, char *argv[])
++{
++	GDBusProxy *proxy;
++
++	if (argc < 3) {
++		if (check_default_ag() == FALSE)
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++		proxy = default_ag;
++	} else {
++		proxy = g_dbus_proxy_lookup(ags, NULL, argv[2],
++						BLUEZ_TELEPHONY_INTERFACE);
++		if (!proxy) {
++			bt_shell_printf("Audio gateway %s not available\n",
++							argv[1]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	}
++
++	if (g_dbus_proxy_method_call(proxy, "SendTones", dial_setup,
++				send_tones_reply, argv[1], NULL) == FALSE) {
++		bt_shell_printf("Failed to send tones\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("Attempting to send tones\n");
++}
++
+ static void cmd_list_calls(int argc, char *arg[])
  {
-@@ -550,6 +570,7 @@ static DBusMessage *call_hangup(DBusConnection *conn, DBusMessage *msg,
- struct telephony_callbacks hfp_callbacks = {
- 	.dial = dial,
- 	.hangup_all = hangup_all,
-+	.send_tones = send_tones,
- 	.call_answer = call_answer,
- 	.call_hangup = call_hangup,
- };
+ 	g_list_foreach(calls, print_call, NULL);
+@@ -507,6 +552,8 @@ static const struct bt_shell_menu telephony_menu = {
+ 						ag_generator},
+ 	{ "hangup-all",   "[telephony]", cmd_hangupall, "Hangup all calls",
+ 						ag_generator},
++	{ "send-tones",   "<tones> [telephony]", cmd_send_tones, "Send tones",
++						ag_generator},
+ 	{ "list-calls",   NULL, cmd_list_calls, "List calls" },
+ 	{ "show-call",    "<call>", cmd_show_call, "Show call information",
+ 						call_generator},
 -- 
 2.43.0
 
