@@ -1,38 +1,39 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from out-8.smtp.github.com (out-8.smtp.github.com [192.30.252.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A693E316E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 15:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B55E3E3C73
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 15:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790869562; cv=none; b=XmtifTHThGIJtJod4/trnHJVc+YrC2kWCtGo6cxv2SmyqY0g8vlG9QWp59yzvpAAwiOQ5RNJk2hOWSai/VnI5LU2BIXE/0VCywPugxLWxqtn1uBNT4omgFF9rSZPsQvPR/le1LVhR+yXb9+IjOwd2ifoblJorYANshxDP0j7q0w=
+	t=1790869568; cv=none; b=HioSlv3s30R2RS7smOYYuEafhQ2QKIrQ7DfWzHLN5O+l4y3wPP2kfah5sJw7c89od8flXJrSj9b7aGv+RgysaAS+P0/Ovq1VqrhAcmdSNLQY2rz1WXvK2NcvqgXMDDqvgRZMiE/qlMXNlCky7JSA6bnuxMbYx8KHlxLkiwghUwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790869562; c=relaxed/simple;
-	bh=yeREwaArJrrnCEovfUrnWpi3oa2FLeo4lun0bowzGlA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Q2FsY+Jy/YM9Gv8i/80q5mQ2sGU6s1DSCFuPFYEfy93cxeFeGMhKwUyf6hJCRd1CvVuFUZoATcONcdwgrCU5FUjmk9rFwVNLqwSbiUQxfhwRhfS9u05fMOa1fhZjAz3/dzW+t72sxfTnjDiNm8yfMZCCMDT0mxrvTA3Y8f2VvZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=RLEpYJUH; arc=none smtp.client-ip=192.30.252.202
+	s=arc-20240116; t=1790869568; c=relaxed/simple;
+	bh=4UDdSBXh1YUi1T7hukSoQMYkmoF22+T9S+7upYwreVQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZBb9NI1xFiAhI/0Wa/oM5RsvTk1XJlaMWkdhR3Ny23lBji92/BjirFIg+Ab42Cf2UF5HuiSWRHGffZvjV6n3Y1Xo8BmzV7Hh46BjMbmzWUalzxwB/J3uuO+sEJjpoBM6MaUlkvawaTRWqYjjchTVbAlceU8Y6ZvE4o0GF/9F1MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=PwR5KqGN; arc=none smtp.client-ip=192.30.252.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="RLEpYJUH"
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="PwR5KqGN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1790869559;
-	bh=upBMhZaT819x75i7O6BO3EYEu2Yq1szoi9p4Ol0Gy9s=;
+	s=pf2026; t=1790869564;
+	bh=gUTp2d9qFFvLFy7P++AfW8mKDYdf0ygPMCsyValKu4U=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RLEpYJUHibOKxRjnY5+XZVk0qew4wlub3d3u7k/uCTPApaqnBjn6ufuI3ugmJEM9D
-	 iu7y4BqxMb7YYtFu3sM5Gs27KM2Ne+m3i49EE+YJ9YMWnQs83tob79Re4zq993qCj8
-	 3G3FL1MPDtiaPwN4gDicsn9wZAzhCfyLFcMF9DiUjEleIYa/nRS6xxnsqoEiQ+ajzZ
-	 W3nmfAjXOJrLioDeM/3ZkDm6cJGgUa9oBtB/D+9txThu8iuYa3wjxIgaRknZohk0mJ
-	 2Osw1igqy0mK3wXwsBaBeZi3IAOtTii/hXFCYWS2NiEjCzMoGkEioQlAT2MtRNjnnr
-	 njOT7UNEuWefA==
-Received: from github.com (hubbernetes-node-bd2b122.va3-iad.github.net [10.48.148.41])
-	by smtp.github.com (Postfix) with ESMTPA id 9121F281353
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 08:45:59 -0700 (PDT)
-Date: Thu, 01 Oct 2026 08:45:59 -0700
-From: Eduardo de Souza Alves <noreply@github.com>
+	b=PwR5KqGNXcV0YVl+5mrMqcHunBh3KJdoJcPPqKupxigT0FwVEnHyEwSc3AV4Dnt9a
+	 AykSLowcVSvG4qsDyoT+d8bZ+X0ekR9Jc0UU7b00134DqHpMCj9pulDZwN2XqSE0g+
+	 j/mGDij3YmJt1kbCnG6D9jSbSsdvJTJtSgd2nVNTgmpeXIIKbCT2KOOf9oMN6MKyqo
+	 +yGkuDaCQJWdneWKSgY1xbod6Uwya5n513V44VQZpjeu62PufRsn9oqLZbaApPxeSP
+	 N1nZKIBny/OWYugl3Fe1F6UvMOMwV1+J6RlpYE7Hdu8qA2msW8GeXlkNcoEcla98a7
+	 Edc/DRd7G2/WA==
+Received: from github.com (hubbernetes-node-a9e0422.va3-iad.github.net [10.48.86.31])
+	by smtp.github.com (Postfix) with ESMTPA id BF1477813F8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 08:46:04 -0700 (PDT)
+Date: Thu, 01 Oct 2026 08:46:04 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1177732/000000-814917@github.com>
-Subject: [bluez/bluez] 7d263c: a2dp: Fix UAF after rejected SetConfiguration
+Message-ID: <bluez/bluez/push/refs/heads/1177764/000000-c60df5@github.com>
+Subject: [bluez/bluez] 39dff6: doc: Add commit message guidelines for AI
+ coding a...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,114 +46,70 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1177732
+  Branch: refs/heads/1177764
   Home:   https://github.com/bluez/bluez
-  Commit: 7d263ccc3d71d3e962b064606efab97f88863f49
-      https://github.com/bluez/bluez/commit/7d263ccc3d71d3e962b064606efab97f88863f49
-  Author: Eduardo Alves <eduardoalves8006@gmail.com>
+  Commit: 39dff637917dbf215666e808711800991917de08
+      https://github.com/bluez/bluez/commit/39dff637917dbf215666e808711800991917de08
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-10-01 (Thu, 01 Oct 2026)
 
   Changed paths:
-    M profiles/audio/a2dp.c
+    M doc/coding-assistants.rst
 
   Log Message:
   -----------
-  a2dp: Fix UAF after rejected SetConfiguration
+  doc: Add commit message guidelines for AI coding assistants
 
-When the MediaEndpoint1 rejects SetConfiguration, auto_config() calls
-setconf_cb() with an error and avdtp frees the avdtp_stream, but the
-a2dp_stream wrapping it is left on sep->streams with a dangling stream
-pointer. The next stream configured on the same session finds it in
-a2dp_config() and reads the freed avdtp_stream:
+Require commit messages to record only the changes and their rationale,
+to follow Rule 2 of the maintainer guidelines, and to have their factual
+claims checked against the diff.
 
-  ERROR: AddressSanitizer: heap-use-after-free
-  READ of size 4
-    #0 avdtp_stream_get_state profiles/audio/avdtp.c:3952
-    #1 a2dp_config profiles/audio/a2dp.c:3282
-    #2 select_complete profiles/audio/source.c:200
-    #3 finalize_select profiles/audio/a2dp.c:486
-  freed by thread T0 here:
-    #1 stream_free profiles/audio/avdtp.c:747
-    #2 setconf_cb profiles/audio/avdtp.c:1504
-    #3 auto_config profiles/audio/a2dp.c:752
-    #4 endpoint_setconf_cb profiles/audio/a2dp.c:768
+Inspired by WirePlumber's AGENTS.md:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/AGENTS.md
 
-Fix it by destroying the a2dp_stream when the configuration is
-rejected, which also drops the session reference it holds.
-
-This can be reproduced with test-functional using two VMs over btvirt,
-where the A2DP Sink endpoint replies to SetConfiguration with an error
-and the sink then connects to the source on the same session.
-
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: OpenCode:claude-opus-5.5
 
 
-  Commit: 81491780ae3af461d199e85904d27d3b3b5aa94e
-      https://github.com/bluez/bluez/commit/81491780ae3af461d199e85904d27d3b3b5aa94e
-  Author: Eduardo Alves <eduardoalves8006@gmail.com>
+  Commit: 491b715eb1b9625a50124f5a8a0a9834aefc42ba
+      https://github.com/bluez/bluez/commit/491b715eb1b9625a50124f5a8a0a9834aefc42ba
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-10-01 (Thu, 01 Oct 2026)
 
   Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/media.c
+    M doc/coding-assistants.rst
 
   Log Message:
   -----------
-  a2dp: Fix crash on NULL session in auto_config
+  doc: Add bug fixing procedure for AI coding assistants
 
-If the AVDTP channel is disconnected while bluetoothd is still waiting
-for the MediaEndpoint1 to reply to SetConfiguration, channel_free()
-sets setup->session to NULL but the setup stays alive since the pending
-endpoint request holds a reference to it. Once the endpoint replies, or
-the call times out and the request is canceled, endpoint_setconf_cb()
-calls auto_config() which passes the NULL session to avdtp_get_device()
-and then dereferences the resulting NULL device:
+Require AI assistants fixing bugs to verify them with a reproducer, test
+the fix, state what could not be verified and leave any submission to
+the human, with vulnerabilities following SECURITY.md.
 
-  bluetoothd[820]: profiles/audio/media.c:endpoint_reply() Endpoint
-    replied with an error: org.freedesktop.DBus.Error.NoReply
-  kernel: bluetoothd[820]: segfault at 1a0 ip 00005633dd741323
-    sp 00007ffe51923650 error 4 in bluetoothd
+Adapted from the Linux kernel's
+Documentation/process/coding-assistants.rst.
 
-  #0  auto_config (data=0x56340361a120) at profiles/audio/a2dp.c:723
-  #1  endpoint_setconf_cb (setup=...) at profiles/audio/a2dp.c:768
-  #2  media_endpoint_cancel (request=...) at profiles/audio/media.c:208
-  #3  media_endpoint_cancel_all () at profiles/audio/media.c:216
-  #4  clear_endpoint () at profiles/audio/media.c:379
-  #5  endpoint_reply (user_data=...) at profiles/audio/media.c:407
-
-  (gdb) p *setup
-  $1 = {chan = 0x0, session = 0x0, ...,
-        setconf_cb = 0x5633dd74c780 <setconf_cb>, ..., ref = 2}
-
-Commit 14750a2e48f4 ("audio/a2dp: Fix Access session device only when
-its valid") fixed the same crash, but commit 77932f2dac1a
-("profiles/audio: add nullity checks") moved avdtp_get_device() back
-ahead of the checks. Just reordering is not enough though: the
-a2dp_stream is still on sep->streams, so the aborted check passes and
-setconf_cb() would then be called with a NULL session as well.
-
-Fix it by rejecting the pending Set Configuration in channel_free()
-while the session is still valid, which also frees the pending
-avdtp_stream and the a2dp_stream, both previously leaked together with
-the session reference held by the latter, and by making auto_config()
-bail out when setup->session is NULL, releasing its setup reference.
-setconf_cb is cleared once called so it cannot be called twice.
-
-channel_free() also clears the endpoint configuration, which sends
-ClearConfiguration and removes the MediaTransport created for the
-request. Otherwise a late successful reply leaves the transport
-registered and the next connection fails with "Resource temporarily
-unavailable". Since the transport may now be freed while the request
-is pending, endpoint_remove_transport() resets the transport of the
-pending requests so a late error reply does not free it twice.
-
-The crash can be reproduced with test-functional using two VMs over
-btvirt, where the A2DP Sink endpoint delays or never sends its
-SetConfiguration reply and the A2DP Source disconnects meanwhile.
-
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: OpenCode:claude-opus-5.5
 
 
-Compare: https://github.com/bluez/bluez/compare/7d263ccc3d71%5E...81491780ae3a
+  Commit: c60df518ec4a6c4a6b68e803d9cb978b32624092
+      https://github.com/bluez/bluez/commit/c60df518ec4a6c4a6b68e803d9cb978b32624092
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-10-01 (Thu, 01 Oct 2026)
+
+  Changed paths:
+    A AGENTS.md
+
+  Log Message:
+  -----------
+  Add AGENTS.md symlink to doc/coding-assistants.rst
+
+Let AI coding assistants that look for AGENTS.md load the guidelines
+automatically.
+
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+Compare: https://github.com/bluez/bluez/compare/39dff637917d%5E...c60df518ec4a
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
