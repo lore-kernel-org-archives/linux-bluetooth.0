@@ -1,54 +1,54 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F524AAC66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B895E2D238F
 	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2026 13:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790860759; cv=none; b=V6TPqKYkyeAMUEN5bCfz06u3O7rs2/ATZ3JcCib3dgxe/E6clguvTqlAMJmcni7fW6coJ6KJ8KD6rylxlGphfnQJtoZ1LJu79Ay3tUjDX1Wdmz/Vtuqpd+piNT59k5BLWtBv88ZFPZrcImBKTKl3JLJv8NTm6JMIDBQy12SWcOY=
+	t=1790860759; cv=none; b=NpVsc8oKFhBSmgVfQneXX92mlbREOaeG6bdk3IVcnouNrcpPmvXw7/9x+iJY6k473D8ErQxhiVhnCmue7d14xLWx6nV1eiQ4ItX9sdwa3827pbZhwZvS2BeC2Cw6N63mKHM0C5nxFGBwYoys1nPEGSiJvD55c9ieohH+RQvKwsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790860759; c=relaxed/simple;
-	bh=lbp1/5IrGOYDjSlL9bZNIsWHUX/+FKrczPto2dbcdSo=;
+	bh=s9NG+vwJ3Z2RzA+kP/T+PdLndFlYJ+vdShbDw5dnmeA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jVyFZs9gvT50qG70XJTLjXG9B++koqzlrlt5O7MD+Kgv3sxuWyDqiVbALIHrSb5Jsmib9g2gyUroqnc36um2v+qnpbarJM2FxQCIBl3XzH0/mZhnFmz6k6IL4eZ6hShgXOB9E2ZZ7ziONCwg/wIgzXD9U8UtfGGzsZC03p82Xd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JNCUOC1Z; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version; b=OYXmaQQ46o4w+08sIMbuStHIQpGhRM8hcIvzFS3UkOjq7XC8ATO1393MSw+9A0QHlzf32x7Ce9irIVyDqMddc+SrRvSr5jdm4yTp3y68BsP13Ull+b5vujyJNTtUSNxKns3WuXn+8xMFtlLpaiJ1kanI+6+cY6hqA7iw7SHLKL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RLqgZzAb; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JNCUOC1Z"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 691CxYku1062199
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RLqgZzAb"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 691CiDwn1289076
 	for <linux-bluetooth@vger.kernel.org>; Thu, 1 Oct 2026 13:19:16 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=+4EBmF9Vr3x
-	hl0KtNh2UhIja7b8jdss+TevrMKE6Ymg=; b=JNCUOC1Zo4sJ6ZfdV9X/FSFw/7L
-	12jrvo5a8wkGxR3950GipGhq3p0zaWeOHz1yxKV2JphyrvugCkiiXJkIS9HHwB4L
-	ozIO5HAW+LUs9w6WlCAHuvuMBN4RAfY7nL+u85zUJm0uN5zc1A5fzuhqnehNeamz
-	9f52eyzFb3VyfElfRU+wzgoSp9I0SrdVNfjyvMT/uwM10Qsjnk/NyZ8hIesAksa5
-	KSyFwe9vDabWSet1H+ft0svakafpEB4LeBHveWaWWwft5PsiZix4OrgoFPFaf3dr
-	/6aIYRsTNltqJmF6hbBiX7b2AH9J4n2cm8hEQ/nOyHhYVwa6zJHPhFGWp6Q==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h17mvv356-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=lwffcUk6qQ2
+	DG0X+xQPuSek4ZkL2OL/AUfhiEJXi+3g=; b=RLqgZzAbI4J4+hUMgdJQ81e1+ZD
+	kJMoVvhzbaEwTZ9JGPO0W0JRZclCTGMqh6rcrJ6PQZjAt/vNCYImLC8+ObLpl+zg
+	oPnMsZGSs8xM2oge3GjNNGpl2c2DWEn/vpvshKvZ4/LEoQnj5lDadaG5ELOd58MX
+	rtmPmCzgZbFkqqH14FF+sbbJEaRvzVR7tmdjDeYLxd7NPSDs8k6jU5gAguXougql
+	lzaV5drq7SCu0JKvjHV9gbERmyFzpnCSqxPZuM5G7QZfs65+uxTrQZo2NMd50+fZ
+	bDqikk3sSeOwjzVgT81h6opCZpBBpwhr4pkVwGLI9XpOl67X6PtH8WQLWBg==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h17pjc5c8-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
 	for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 13:19:15 +0000 (GMT)
-Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 691DJEwR2496307;
+Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 691DJEkX2501458;
 	Thu, 1 Oct 2026 13:19:14 GMT
 Received: from bt-iot-sh04-lnx.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 691DJD9x2496294
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 691DJDww2501444
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Thu, 01 Oct 2026 13:19:13 +0000 (GMT)
 Received: by bt-iot-sh04-lnx.qualcomm.com (Postfix, from userid 37913)
-	id F1A5A41C78; Thu,  1 Oct 2026 21:19:12 +0800 (CST)
+	id 0214649BAE; Thu,  1 Oct 2026 21:19:13 +0800 (CST)
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: jinwang.li@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
         Cheng Jiang <cheng.jiang@oss.qualcomm.com>
-Subject: [PATCH 01/11] shared/gatt-client: Allow registering notify with explicit CCC value
-Date: Thu,  1 Oct 2026 21:18:47 +0800
-Message-ID: <20261001131900.707485-2-cheng.jiang@oss.qualcomm.com>
+Subject: [PATCH 02/11] shared/gatt-db: Add gatt_db_attribute_indicate()
+Date: Thu,  1 Oct 2026 21:18:48 +0800
+Message-ID: <20261001131900.707485-3-cheng.jiang@oss.qualcomm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001131900.707485-1-cheng.jiang@oss.qualcomm.com>
 References: <20261001131900.707485-1-cheng.jiang@oss.qualcomm.com>
@@ -62,164 +62,213 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: 2YLu961AzOUOqRQu7a2RT7QogSH7ld6u
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfXwl4GyLVKvqr/
- zrLbT8TSvos306DkfV3QKdATSBPlsxF2Jx+aCNnWGcRt7L5Kb2q5mY9gKfx67uuPgBu5IZkhhMZ
- Lp8Zn31cZH/MCn3BKGhbFhiiIfkYg9WwQbhJSRy0K9nlpejEK2hnrP2F3MEXFhN/bXn8rsrThIp
- CYbKoDpApuMBxDNe+bjqsPyXRzQ7OsyqRsyzVHSqifPiWVRbWQqoayaAKTfqGJV0JprbNsmId7+
- DNFYlgaNLgk1Uf/xrthvcyhK5At7eLHLRiXL+rC5tWiZSEphrXP4xp2XKtJ9D5vHzPo1hQC6krr
- Zu1nDMN7vFfv6sRu2ruHcVLdj7wPeCQa5pvos/BfTH6WFerlkXtklmc7BIuVDqgV7GZSh9otSxM
- nxvd9M/N+le4PKl38XhpxC0NWSlyG6TnHog35pPa0fsFsghJjwhxKDkiHXVsaKnm8BUUGXuWzDL
- DWFK4McT37W3O8uUbxw==
-X-Proofpoint-GUID: 2YLu961AzOUOqRQu7a2RT7QogSH7ld6u
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfX/fuJHBO5c4hD
- NEn4zOWCQWFlcIYXJsnPmsA4mfkGLrf6yLxI7Y6km1Q7RGmn0oqqhmUk4oLU0qyKzezrMSm+0Pd
- EsYAS+LDliLPmC34FJpxXZzp9Zy7HoE=
-X-Authority-Analysis: v=2.4 cv=KuvYSmWN c=1 sm=1 tr=0 ts=6abe5dd3 cx=c_pps
+X-Authority-Analysis: v=2.4 cv=eqpKXYpX c=1 sm=1 tr=0 ts=6abe5dd3 cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=YMgV9FUhrdKAYTUUvYB2:22 a=k-Iygp5wEp1O0Gt4uwcA:9
+ a=_K5XuSEh1TEqbUxoQ0s3:22 a=x0fDcO7K-zMjWE45GsUA:9
+X-Proofpoint-GUID: WJzr3PejoRchiNJ9ERUNQdmuOCpwgn8_
+X-Proofpoint-ORIG-GUID: WJzr3PejoRchiNJ9ERUNQdmuOCpwgn8_
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfXxj7payk0CvPS
+ 98Hyo8D0lOj4XKzwrZsiFEXUv+boBhOvxEWsL0XtQ2vnYnTe7hmGXCTs0B5PMgw/UdMs+dfotBh
+ pG595TyasXWBCT28NbR0GZTvq5lhnQM=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDA1MyBTYWx0ZWRfXyPLMSnNtDsVU
+ bCKz12Zd/UMvKo34j3ecSwZ6frSv6WPh/8wmHDhj3lkvMuK1qOr2J2Hs9+04vQhmzDa75U7DGUm
+ +ZyTYLkrJ65Y6Ae5Sr8bXgeYnZTyQuF5lqHd73JL19A31pM7zC37rsewJGub/t0NJVzcln9CiEJ
+ n84BCZ4hSDYl+j7Yx1OvgZZ9FylUkSX6vzmjoXlARYAhzi+9jbLiYv2M6X9eH8SdaH6Ui4EbiIf
+ 9hJ+eT37paMiKEQt6/r3Tt5niJMhQE/dhq4GV792RcyCNnn0jw4q4cbMxro7olB3T+muJSmGYaK
+ +iGV+QFd6/94mlzO4f0SHjVIXnRv5MrO3duOCHm/qnW16T4aGxuCAIUT2SImpDSMj1AH6a7EOYi
+ e5JCpQy2unJ4uj75kRWwIFhrLJUYhkvJzYezy5YekKIJfi2qweYuCimOkzGdpaPLs2BKwo34F7i
+ DWDL4fX/Q/aQlxGBobg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-10-01_03,2026-09-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0 spamscore=0 phishscore=0 impostorscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2610010053
+ impostorscore=0 spamscore=0 clxscore=1015 malwarescore=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610010053
 
-bt_gatt_client_register_notify() picks the CCC value to write based on
-the characteristic properties, preferring notifications over indications
-when both are supported. A client that specifically needs one of the two
-- for example the Ranging Service, which distinguishes notification and
-indication transports - has no way to request it.
+The notify callback leaves the choice between a notification and an
+indication entirely to the CCC value written by the client, preferring
+notifications whenever the client enabled them. Some services need the
+indication transport for a given characteristic regardless: the Ranging
+Service must indicate Ranging Data Ready and Ranging Data Overwritten
+even when the client subscribed to both transports (RAS 3.4.2, 3.5.2).
 
-Add bt_gatt_client_register_notify_with_ccc() which takes the desired
-CCC value (0x0001 for notifications, 0x0002 for indications) and writes
-it verbatim. register_notify() gains a ccc_value argument and rejects a
-value the characteristic does not support. The existing entry point
-keeps its behaviour by passing 0, which restores the property-based
-selection.
+Add gatt_db_attribute_indicate() alongside gatt_db_attribute_notify() and
+let the callback query which of the two it was invoked from through
+gatt_db_attribute_indicate_only(). Both entry points share a helper, so
+the CCC lookup stays in one place, and neither gatt_db_notify_t nor the
+existing gatt_db_attribute_notify() callers change.
+
+gatt-database honors the request by skipping the notification branch and
+sending an indication instead, provided the client enabled indications.
 
 Assisted-by: Claude:claude-opus-4.8
 ---
- src/shared/gatt-client.c | 41 +++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-client.h |  7 +++++++
- 2 files changed, 43 insertions(+), 5 deletions(-)
+ src/gatt-database.c  |  7 ++++++-
+ src/shared/gatt-db.c | 35 +++++++++++++++++++++++++++++++++--
+ src/shared/gatt-db.h | 17 +++++++++++++++++
+ unit/test-rap.c      | 13 +++++++++----
+ 4 files changed, 65 insertions(+), 7 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 92ad7c39c..1cf361f50 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -232,6 +232,7 @@ struct notify_data {
- 	uint8_t att_ecode;
- 	int ref_count;
- 	struct notify_chrc *chrc;
-+	uint16_t ccc_value;
- 	bt_gatt_client_register_callback_t callback;
- 	bt_gatt_client_notify_callback_t notify;
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 18b7aa667..800f76032 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -168,6 +168,7 @@ struct notify {
+ 	uint16_t len;
+ 	bt_gatt_server_conf_func_t conf;
  	void *user_data;
-@@ -1670,10 +1671,9 @@ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
- 	assert(notify_data->chrc->ccc_handle);
++	bool indicate_only;
+ };
  
- 	if (enable) {
--		/* Try to enable notifications or indications based on
--		 * whatever the characteristic supports.
--		 */
--		if (properties & BT_GATT_CHRC_PROP_NOTIFY)
-+		if (notify_data->ccc_value)
-+			value = cpu_to_le16(notify_data->ccc_value);
-+		else if (properties & BT_GATT_CHRC_PROP_NOTIFY)
- 			value = cpu_to_le16(0x0001);
- 		else if (properties & BT_GATT_CHRC_PROP_INDICATE)
- 			value = cpu_to_le16(0x0002);
-@@ -1749,6 +1749,7 @@ static bool match_notify_chrc_value_handle(const void *a, const void *b)
- 
- static unsigned int register_notify(struct bt_gatt_client *client,
- 				uint16_t handle,
-+				uint16_t ccc_value,
- 				bt_gatt_client_register_callback_t callback,
- 				bt_gatt_client_notify_callback_t notify,
- 				void *user_data,
-@@ -1778,10 +1779,20 @@ static unsigned int register_notify(struct bt_gatt_client *client,
- 	if (chrc->notify_count == INT_MAX)
- 		return 0;
- 
-+	if (ccc_value == 0x0001 && !(chrc->properties & BT_GATT_CHRC_PROP_NOTIFY))
-+		return 0;
-+
-+	if (ccc_value == 0x0002 && !(chrc->properties & BT_GATT_CHRC_PROP_INDICATE))
-+		return 0;
-+
-+	if (ccc_value != 0 && ccc_value != 0x0001 && ccc_value != 0x0002)
-+		return 0;
-+
- 	notify_data = new0(struct notify_data, 1);
- 	notify_data->client = client;
- 	notify_data->ref_count = 1;
- 	notify_data->chrc = chrc;
-+	notify_data->ccc_value = ccc_value;
- 	notify_data->callback = callback;
- 	notify_data->notify = notify;
- 	notify_data->user_data = user_data;
-@@ -1871,6 +1882,7 @@ static bool register_service_changed(struct bt_gatt_client *client)
+ #define CLI_FEAT_SIZE 1
+@@ -1446,7 +1447,7 @@ static void send_notification_to_device(void *data, void *user_data)
+ 	 * TODO: If the device is not connected but bonded, send the
+ 	 * notification/indication when it becomes connected.
  	 */
- 	client->svc_chngd_ind_id = register_notify(client,
- 					gatt_db_attribute_get_handle(attr),
-+					0x0002,
- 					service_changed_register_cb,
- 					service_changed_cb,
- 					client, NULL);
-@@ -3834,10 +3846,29 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
- 	if (client->in_svc_chngd)
- 		return 0;
+-	if (ccc->value & 0x0001) {
++	if (!notify->indicate_only && (ccc->value & 0x0001)) {
+ 		DBG("GATT server sending notification");
+ 		bt_gatt_server_send_notification(server,
+ 					notify->handle, notify->value,
+@@ -1455,6 +1456,9 @@ static void send_notification_to_device(void *data, void *user_data)
+ 		return;
+ 	}
  
--	return register_notify(client, chrc_value_handle, callback, notify,
-+	return register_notify(client, chrc_value_handle, 0, callback, notify,
- 							user_data, destroy);
++	if (!(ccc->value & 0x0002))
++		return;
++
+ 	DBG("GATT server sending indication");
+ 	bt_gatt_server_send_indication(server, notify->handle, notify->value,
+ 						notify->len, notify->conf,
+@@ -1486,6 +1490,7 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
+ 	notify.ccc_handle = gatt_db_attribute_get_handle(ccc);
+ 	notify.value = (void *) value;
+ 	notify.len = len;
++	notify.indicate_only = gatt_db_attribute_indicate_only(attrib);
+ 
+ 	if (attrib == database->svc_chngd)
+ 		notify.conf = service_changed_conf;
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 751d4c3da..1f6e9ae14 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -123,6 +123,11 @@ struct gatt_db_attribute {
+ 
+ 	unsigned int next_notify_id;
+ 	struct queue *notify_list;
++
++	/* Set only while notify_func is being called on behalf of
++	 * gatt_db_attribute_indicate().
++	 */
++	bool indicate_only;
+ };
+ 
+ struct gatt_db_service {
+@@ -2440,9 +2445,9 @@ gatt_db_attribute_get_ccc(struct gatt_db_attribute *attrib)
+ 	return ccc;
  }
  
-+unsigned int bt_gatt_client_register_notify_with_ccc(
-+				struct bt_gatt_client *client,
-+				uint16_t chrc_value_handle, uint16_t ccc_value,
-+				bt_gatt_client_register_callback_t callback,
-+				bt_gatt_client_notify_callback_t notify,
-+				void *user_data,
-+				bt_gatt_client_destroy_func_t destroy)
+-bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
++static bool attribute_notify(struct gatt_db_attribute *attrib,
+ 					const uint8_t *value, size_t len,
+-					struct bt_att *att)
++					struct bt_att *att, bool indicate_only)
+ {
+ 	struct gatt_db_attribute *ccc;
+ 	struct gatt_db *db;
+@@ -2468,11 +2473,37 @@ bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
+ 	else
+ 		notify_user_data = ccc->user_data;
+ 
++	attrib->indicate_only = indicate_only;
++
+ 	attrib->notify_func(attrib, ccc, value, len, att, notify_user_data);
+ 
++	attrib->indicate_only = false;
++
+ 	return true;
+ }
+ 
++bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
++					const uint8_t *value, size_t len,
++					struct bt_att *att)
 +{
-+	if (!client || !client->db || !chrc_value_handle ||
-+			(!callback && !notify) || !ccc_value)
-+		return 0;
-+
-+	if (client->in_svc_chngd)
-+		return 0;
-+
-+	return register_notify(client, chrc_value_handle, ccc_value, callback,
-+						notify, user_data, destroy);
++	return attribute_notify(attrib, value, len, att, false);
 +}
 +
- bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 							unsigned int id)
++bool gatt_db_attribute_indicate(struct gatt_db_attribute *attrib,
++					const uint8_t *value, size_t len,
++					struct bt_att *att)
++{
++	return attribute_notify(attrib, value, len, att, true);
++}
++
++bool gatt_db_attribute_indicate_only(const struct gatt_db_attribute *attrib)
++{
++	if (!attrib)
++		return false;
++
++	return attrib->indicate_only;
++}
++
+ bool gatt_db_attribute_reset(struct gatt_db_attribute *attrib)
  {
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 63cf99500..1b19c885b 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -122,6 +122,13 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
- 				bt_gatt_client_notify_callback_t notify,
- 				void *user_data,
- 				bt_gatt_client_destroy_func_t destroy);
-+unsigned int bt_gatt_client_register_notify_with_ccc(
-+				struct bt_gatt_client *client,
-+				uint16_t chrc_value_handle, uint16_t ccc_value,
-+				bt_gatt_client_register_callback_t callback,
-+				bt_gatt_client_notify_callback_t notify,
-+				void *user_data,
-+				bt_gatt_client_destroy_func_t destroy);
- bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 							unsigned int id);
+ 	if (!attrib)
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index da0600c01..63d7f3464 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -300,6 +300,23 @@ bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
+ 					const uint8_t *value, size_t len,
+ 					struct bt_att *att);
  
++/* Same as gatt_db_attribute_notify() but requests an indication even when the
++ * client has also enabled notifications. Some profiles mandate the indication
++ * transport for specific characteristics (e.g. the RAS Ranging Data Ready and
++ * Ranging Data Overwritten characteristics), which gatt_db_attribute_notify()
++ * cannot express since it prefers notifications whenever the client enabled
++ * them.
++ */
++bool gatt_db_attribute_indicate(struct gatt_db_attribute *attrib,
++					const uint8_t *value, size_t len,
++					struct bt_att *att);
++
++/* Valid only while a gatt_db_notify_t callback is running: tells whether it was
++ * triggered by gatt_db_attribute_indicate() rather than
++ * gatt_db_attribute_notify().
++ */
++bool gatt_db_attribute_indicate_only(const struct gatt_db_attribute *attrib);
++
+ bool gatt_db_attribute_reset(struct gatt_db_attribute *attrib);
+ 
+ void *gatt_db_attribute_get_user_data(struct gatt_db_attribute *attrib);
+diff --git a/unit/test-rap.c b/unit/test-rap.c
+index d7da2ff45..5c6033a4e 100644
+--- a/unit/test-rap.c
++++ b/unit/test-rap.c
+@@ -167,10 +167,15 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
+ 
+ 	printf("%s: notify.value:%d notify->len:%d\n", __func__,
+ 		(int)*(notify.value), notify.len);
+-	if (!bt_gatt_server_send_notification(data->server,
+-			notify.handle, notify.value,
+-			notify.len, false))
+-		printf("%s: Failed to send notification\n", __func__);
++	if (gatt_db_attribute_indicate_only(attrib)) {
++		if (!bt_gatt_server_send_indication(data->server, notify.handle,
++				notify.value, notify.len, NULL, NULL, NULL) &&
++				tester_use_debug())
++			tester_debug("Failed to send indication");
++	} else if (!bt_gatt_server_send_notification(data->server,
++			notify.handle, notify.value, notify.len, false) &&
++			tester_use_debug())
++		tester_debug("Failed to send notification");
+ }
+ 
+ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
 -- 
 2.43.0
 
