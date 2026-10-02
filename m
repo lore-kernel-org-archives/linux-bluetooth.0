@@ -1,73 +1,61 @@
-Received: from out-42.smtp.github.com (out-42.smtp.github.com [192.30.252.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7EC331200
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 21:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C303D2FEC;
+	Fri,  2 Oct 2026 21:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790974945; cv=none; b=Unk+ZHnZFIetE0ihRdV/WlzKN5mRi3TE2UCk60S7i3xQdTP/A/KpIoqgQKsWD+LCG8FKInW1xEBWTycdPyKGYunpi5vB8ENF5eh0Nt02hjIZkDJ0YUZdkBwgV1dx59DRbfUrXMlWhcZzcb/2vNYMOLt1LhDculqmDk8CW5JHbgc=
+	t=1790975445; cv=none; b=SHzspHTg5dTaFENrn8II78g3FTXuIhX7tEqOeSIkHsLl0EhxjNWuPE3kcFTrmJESDxaSofyv4ic5fDKLnaB/NycwUamljntTp9rSCTnPdfCQULOQvMWmiKTQgIphVLYgccAywz5qli0ooijCmLNJxy2R+bH4LGkDWG1ylPyI/Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790974945; c=relaxed/simple;
-	bh=Yphq4x7SFp3eG4MsEbNqtHdmkM9kwCaW03QybnZaEjA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=E5ng7W3lFHR+mmoBPWaZI3fZ+kbe+dGbaasOn1ebAqr0xh4+cBq3Kl4Jr4YmTP6Bcf6vihUdT8E5Hsc793qcZShJ/yoNgdofQD3IW/6/8soLEVYKvmGRssYkcv7JZz5bYf/h2bQu7QHpiP9o7euQdR9o90uHd71m3WasX59xpZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=E7eYM/Ol; arc=none smtp.client-ip=192.30.252.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1790975445; c=relaxed/simple;
+	bh=SnSaeyTdXmzNVrgymOXMNz6WX5KAW8htMVm8JeHF4Rw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GNoOng+M1JXvC9idRUUyXZlry3K3DDc8HJlX7hbI65GM7xWESx7ErLOXKbl/ts3mdWf5IteK2QBZfFX5Wyw/TvCVwOv1UUOanNM1MVYDecZzD/xrrqLMpwz6WF/Dkf+vmX/tyqrDT+MfwCF7pELJjcc1U0h7jpBUolypDvYRD98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKkczJWu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="E7eYM/Ol"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1790974943;
-	bh=FoorN8f5yR3Ql6YzVhMJyiOCFEYIMYh61XT9xZtwtk0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=E7eYM/OlT9COmn9rg6Lwtio3pJxWEeAKTCWlwQAUDax+Vp8zji4YBS711FvW92PI5
-	 ah/hgPMs3blM9ZsrBv7Gikeso9J0gwCokCHzUht+QHDmQNvZ5V+0/+hVaiyTDB5kSZ
-	 ZyZy3MRMpouyHm3OsKjtA5yp+RaWOCMUhwKHyjwI6SDAAfuyzSaZB9CZ9GB+FlMUag
-	 1DjHCnRJR3fUD67kgIXkHUOvQpBR0A6S79K85rQxEPRDXz434L5WXvs7ej/uvVousu
-	 uiIdWo2ZhJPjt+vPO5hVv1PG8BvLuwX1Ud+pZ5rr9DLevVe3dcCTSupAKjZ6jkPxUe
-	 E+t2aajV7UgdA==
-Received: from github.com (hubbernetes-node-c59729d.ash1-iad.github.net [10.56.128.79])
-	by smtp.github.com (Postfix) with ESMTPA id 6E1FF84099E
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 14:02:23 -0700 (PDT)
-Date: Fri, 02 Oct 2026 14:02:23 -0700
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1178588/000000-67d42a@github.com>
-Subject: [bluez/bluez] 67d42a: monitor: Fix legacy SCAN_RSP PDU type names
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKkczJWu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680E21F00899;
+	Fri,  2 Oct 2026 21:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790975444;
+	bh=UTd82VV5aLmCE8TeXxBJ+4PuiUKnaEX1gfylvQo2ivA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=PKkczJWudLpXRnMlLSpa1bjHUUJwTSOrs/BEbacU7+HW/N7cZ/SJ80Z/Ulck4ysWc
+	 yErQu7ENR1gBWn7RlMzJEiFSx7vcLDdoxvbQBq5QzC+FdgL2r+Iaix5UjzoriOL1+Y
+	 hXoq6tKKj9XsnAWYMHThOGoC3CcrTqiAApVV3uO7rlc6ESxSlBa23YyG11TjTXvEN0
+	 5yVj4eU9Vd3nMJgz72TuLkq7fwzKa0MXGsshtbliLJ4AszhNMmlMXIFyi5Zmrgq2+j
+	 mi0V/G92Yz82kZ6z4s7a+bQoYlWyJcNxZa+Q4ryB3WbOx1mteS/RjpL3CGSAmaE/5w
+	 luEN2AeYGE1sg==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	Tibor Harcsa <silurust@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+Subject: Re: Please backport dc16388d45ec ("Bluetooth: btusb: Add IMC Networks QCA9377 to quirks table") to stable
+Date: Fri,  2 Oct 2026 17:10:31 -0400
+Message-ID: <2026-10-02-1-daily-reply-0005-re-btusb-qca9377-imc-backport@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261002012542.473669-1-yaroslav.voytovych@gmail.com>
+References: <20261002012542.473669-1-yaroslav.voytovych@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1178588
-  Home:   https://github.com/bluez/bluez
-  Commit: 67d42a05a7e8c237e45e958bf5f702a955fe71a6
-      https://github.com/bluez/bluez/commit/67d42a05a7e8c237e45e958bf5f702a955fe71a6
-  Author: Kevin Dewald <kevin@simpleble.org>
-  Date:   2026-10-02 (Fri, 02 Oct 2026)
+> please consider for linux-7.2.y, linux-6.18.y, linux-6.12.y, linux-6.6.y
+> and linux-6.1.y:
+>
+>   dc16388d45ec ("Bluetooth: btusb: Add IMC Networks QCA9377 to quirks
+>   table")
 
-  Changed paths:
-    M monitor/packet.c
+Queued for 7.2, 6.18, 6.12, 6.6, 6.1, 5.15 and 5.10, thanks.
 
-  Log Message:
-  -----------
-  monitor: Fix legacy SCAN_RSP PDU type names
-
-The names of the two legacy scan response event types are swapped. A
-scan response keeps the properties of the advertisement it answers, so
-0x1b, which has the connectable bit set, is the response to ADV_IND and
-0x1a is the response to ADV_SCAN_IND, as listed in Core Specification
-Vol 4, Part E, 7.7.65.13, Table 7.1.
-
-Fixes: e29ef3b85116 ("monitor: Add LE Extended Scan commands decoding")
-Assisted-by: Claude:claude-opus-5.5
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+-- 
+Thanks,
+Sasha
