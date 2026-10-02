@@ -1,336 +1,139 @@
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+Received: from mail-wr2-f42.google.com (mail-wr2-f42.google.com [74.125.225.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BC0361DCB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 06:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88612411671
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 07:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790921737; cv=none; b=caJ1LAFeVYGrit20D5SLtIm5kZ2Q/CJgudJG+7+SqEahbtaTkaawrmfrtimTBcpc21yKiSIPDXfFsGf7oj1n6lY3uo2laVAXm0pyGlmPJJ7oEAeh3AyvWkHvMt9fSYYFSF/cGdp22mCX0vTEfG46cwKOlq2wvtum5nmSxqirhss=
+	t=1790924879; cv=none; b=b8X9zmL/eU7PtoZEYkJ773w3GbuokrMYVUSSGzH3AEJLh5sya/uJzrRkaKO7TgSi8yBPu7db1pSoKsx0higgHgp7eFqRA31tHyzaMZ7U6BaBSNPptO9BwcWKjFDTNnF7U59wDcr2y0ThShFlfyj+Gz7Y1fVIKWmV8b4m9MQ+9Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790921737; c=relaxed/simple;
-	bh=cCWTomR+IxE8n110azN/buoa+QOBIeOrS7DImRQP20I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q0Q/mtsFvmGhrRtrw6i+KlyIfE1n5z3s++iUzMe41RgtTEIXaEJUGpYc0XtYOBcFCMf/0ZYVeMFXc/Fk2PndXR63Rhb6IeqKO8XXMl8XbGz0W5jumwz/lA8UtVDrwHxmNwhdGFgp727ElwdNglOMdTmueDckIFCtJqhVjCn9RLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4ab4f652f9bso7310664b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 23:15:35 -0700 (PDT)
+	s=arc-20240116; t=1790924879; c=relaxed/simple;
+	bh=LpUy2Y1w/G5Q3IxHxcSWocshtWJTMQsLmw8IXEWGS88=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WyeoXyFTF7Fh0PrVQZEdiMcYlHGXdKZFJQOT5jUmTWEdB7+jcHLbj8Bn/lPV43jPWhazUrWMAmRja7Cvhxk+DOlpHgicZV706Yj3HyMXsPNDMfLaSf90iA16L37U3Ch61Qq3rUHu8ichL7Tc0vfJ0bRLW66JGKtBeoitJDMwu10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbbNHz7S; arc=none smtp.client-ip=74.125.225.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbbNHz7S"
+Received: by mail-wr2-f42.google.com with SMTP id ffacd0b85a97d-48b0622cc90so1088195f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Oct 2026 00:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790924876; x=1791529676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lqdQB+3qbWBs9BdmeFMcXI7bQfwAeguI+SXZ5In6E8g=;
+        b=FbbNHz7SpXi548wMWDsHOIc7RIAXt5QdgTwE5FHzMyMoAqZgvQjv/jw1AGeMMi8pEe
+         QVSrQ8qd7m8CimCLs7sr2mR8or/uvbn7YbWeL4S35hEVNsGwxD0lFCe53Ud7MRwkWc6E
+         cWyfbIgKY6xiw6j/F7FKKikcc+CbprDZ4Wq6209ydcT/s7oHc64Twovk4lxePKn/oi0S
+         wDLGjKFDSAlQnNq67kTbnt6NSbGLnbwbRIlRyTTR8Y8ivRIUtK9xqkGHK3akJIhGMtjJ
+         qCwNLE/3FNdeD0qp7tEkrVZdPpW9vixojpHzuRQDrPQCRK4L6nCjY6iBXf3uYyn2D2BB
+         gJtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790921734; x=1791526534;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VHl164KF9QmUiHMYC+0V/c2CfiNGjgIdO8kbSXlbTVs=;
-        b=RUS9v5/FXCmPFqskPtBDAH9UPFk33dQoKncAEPCq1BXj2gP1A9KNt9OtJ2Vk0QQlTc
-         Th3tg9sCTfmazFbcoRTJC+DiTv7K7VbU5io+1GdJfmVFSobTVyswyxE19NIXkRtjapXq
-         dmwzoNtFpbTR927jN0ZTCk+7OYnUKFQkDzAtDpFu9oYDYuiU4XCzvkOE3881FII3BGf3
-         SAJkmama6FiVy3DmlLa4jVqlTi4VEmCsoACfhGLN8sVCNy5+Khu4fyR5YGi0ntekUabP
-         1UI3jvXns/jS9x+o04lLVafeuH7/w/tgghU7r+UwBL9l0K+wE13SXrDO7kU24Kml9BfY
-         KEBw==
-X-Gm-Message-State: AFuF++nyjq/aMhttVlZ/SLv/X1SG3tuLzRPPxBJ98KciqCVfISLh3P84
-	UNrB0FCXPC5MZPmz38sHws03WpAB6yFPC3MOcVrUWqA4Wgog//E9obi8+T8VTbG1xWlrKppWog3
-	NSuUfeydMxF//sOqiW0iWy9zD5FSvXIWG28YPW+uO5/kbMqP96/TEIA6Mdx0=
+        d=1e100.net; s=20260707; t=1790924876; x=1791529676;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lqdQB+3qbWBs9BdmeFMcXI7bQfwAeguI+SXZ5In6E8g=;
+        b=Pyd4Jhp0mFTm0iQOP4ZvCjrpGYLldWioAVe+nA3AeFLJHViv8rBFecIphBBwLoKZVV
+         O7oyopvDGlOhNg25VoXsKh2ujCRlg11L6MszbiPr90BAqTEGt5djYK38+SRf/ZIS7lDY
+         9VSTWkvnze69ElciXCUk6eNUjwFzB6ba1qIVSyZmNthuR2qxe/oR91Fo6A4XfDAGPVzY
+         IOGG9LJEQQKJAYNNbe5sVE+DBuMUgwFCAU6yZTGVo1vCdLNAGnOi2Fm9UxyTaaNHvqm0
+         8xeEl/oc+r1HxxQxHtwdRE+t+kFAmwjslZpc6kCA3HC3pKhsbUhdFRyhW0FiAVqjP3gJ
+         VDvw==
+X-Gm-Message-State: AFq9FYLPYCiA3gMmM/hB/eJkzviHs7cW+vV7pvhoRnBjmmk7yOYAiXIU
+	fix5yZR51Xh8h0Fclpj73R918SDoKEq+Isi0m+EYKr+D60jGzJPU0dok
+X-Gm-Gg: AYBFou2hDjxF4b58Z/Wgozdz8zG0dQCE7iWd9bF7YtaKZgQfFTdf71O/FYViUP9mM6/
+	wCB40kFhfOoitvvjuhJp2Q+enNc2vSYAY0S9WL+jDVPrSfjld7AFVekNLTtLDkd+gTZEdkdJr0H
+	bAlFpQIVaKLUgQNw464YQv1HD9kbOjO/OOIeDNXL6MCEz7LB27grFIh7p5OwmDzrj90h11J1aGR
+	NbkobBwnB+sofIy0epv9BgQjBlkTVVOERzmMM7zzdLWcaNeB0bKmZwoey9+mrx9x9md3ngl82YI
+	38WUSazsIkI6NwzTFwug/LdQ4QL4x47UbIcLsskRY0FDCJ+hdFxBu1ORVEW7h3t5lGw/OEGSVKO
+	59nkDx5lZjYMuO9ph3Q6wP8Yps5pJ88q7X2i/y3IYQRXH6OS4MT3st4Qs+5tNiC/MSeyw8ZWT9o
+	ZBdenMS8v7nHM9w0XI9H/lLqItkbw2JEPsqXVnNMtNwIPAxL5s2lKtDbAMkeRHsHJSe9pA8ns2S
+	D62IqeuMlk71JYTD/0OZGlrVreu80E3l5DhP2ZHLKv7ezkMMMuHBjKR4yzHLEKkzBmr8zu4k8AP
+	GQ==
+X-Received: by 2002:a5d:5e84:0:b0:48b:1ed:db34 with SMTP id ffacd0b85a97d-48b12747ac0mr2993279f8f.45.1790924875458;
+        Fri, 02 Oct 2026 00:07:55 -0700 (PDT)
+Received: from Raghu007.. (sgyl-44-b2-v4wan-174108-cust110.vm6.cable.virginm.net. [80.1.81.111])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b82253e6bsm3121772f8f.6.2026.10.02.00.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Oct 2026 00:07:54 -0700 (PDT)
+From: Palla Raghunath <raghunathpalla.0209@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Chengfeng Ye <nicoyip.dev@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Shuah Khan <shuah@kernel.org>,
+	Brigham Campbell <me@brighamcampbell.com>,
+	linux-kernel-mentees@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	raghunathpalla.0209@gmail.com,
+	syzbot+4a807caf7680652d53b6@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: RFCOMM: Fix NULL tty_dev dereference in rfcomm_dev_shutdown
+Date: Fri,  2 Oct 2026 08:07:52 +0100
+Message-Id: <20261002070752.84486-1-raghunathpalla.0209@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1315:b0:4e6:76eb:b997 with SMTP id
- 5614622812f47-4f52a5776f4mr1201120b6e.62.1790921734140; Thu, 01 Oct 2026
- 23:15:34 -0700 (PDT)
-Date: Thu, 01 Oct 2026 23:15:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6abf4c06.9b478af7.e8d7a.0007.GAE@google.com>
-Subject: [syzbot] [bluetooth?] possible deadlock in rfcomm_run
-From: syzbot <syzbot+0adf2aef8ca78b84c4df@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+syzbot hit a NULL pointer dereference in rfcomm_dev_shutdown() when an
+RFCOMM tty is closed.
 
-syzbot found the following issue on:
+rfcomm_dev_add() puts the new device on rfcomm_dev_list first and only
+then registers the tty device and saves it in dev->tty_dev. If that
+registration fails, dev->tty_dev is never set at all. The device can be
+looked up in the meantime, so an open() of /dev/rfcommN gets through
+rfcomm_tty_install() and attaches to it. When that tty is closed again,
+rfcomm_dev_shutdown() uses dev->tty_dev without checking it:
 
-HEAD commit:    d266640c6c76 Merge tag 'driver-core-7.3-rc5' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1586b315580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7d012d9c67977ee4
-dashboard link: https://syzkaller.appspot.com/bug?extid=0adf2aef8ca78b84c4df
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+  Oops: general protection fault, probably for non-canonical address
+  KASAN: null-ptr-deref in range [0x0000000000000040-0x0000000000000047]
+  RIP: 0010:rfcomm_dev_shutdown+0x48/0xb0 net/bluetooth/rfcomm/tty.c:131
+  Call Trace:
+   tty_port_shutdown+0x1bf/0x220 drivers/tty/tty_port.c:372
+   tty_port_close+0x4e/0x150 drivers/tty/tty_port.c:705
+   tty_release+0x359/0x1670 drivers/tty/tty_io.c:1718
+   __fput+0x418/0xa50 fs/file_table.c:512
 
-Unfortunately, I don't have any reproducer for this issue yet.
+rfcomm_dev_destruct() already copes with a NULL dev->tty_dev. Add the
+same check to rfcomm_dev_shutdown(), so the tty device is only moved
+when it was actually registered.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d266640c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b8d2ccf5a23e/vmlinux-d266640c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0b1dbd9ea9d5/bzImage-d266640c.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0adf2aef8ca78b84c4df@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-krfcommd/3367 is trying to acquire lock:
-ffff888062feb940 ((wq_completion)hci3){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x9c/0x1c0 kernel/workqueue.c:4111
-
-but task is already holding lock:
-ffffffff90f83cc0 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_process_sessions net/bluetooth/rfcomm/core.c:2096 [inline]
-ffffffff90f83cc0 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_run+0x30b/0x5550 net/bluetooth/rfcomm/core.c:2205
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #6 (rfcomm_mutex){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
-       rfcomm_dlc_open+0x92/0xac0 net/bluetooth/rfcomm/core.c:426
-       rfcomm_dev_activate+0x83/0x110 net/bluetooth/rfcomm/tty.c:112
-       tty_port_open+0x156/0x1f0 drivers/tty/tty_port.c:769
-       rfcomm_tty_open+0xad/0x490 net/bluetooth/rfcomm/tty.c:745
-       tty_open+0x2cc/0xe20 drivers/tty/tty_io.c:2110
-       chrdev_open+0x234/0x6a0 fs/char_dev.c:411
-       do_dentry_open+0x6ab/0x14d0 fs/open.c:996
-       vfs_open+0x82/0x3f0 fs/open.c:1101
-       do_open fs/namei.c:4837 [inline]
-       path_openat+0x19fa/0x2440 fs/namei.c:5000
-       do_file_open+0x20e/0x430 fs/namei.c:5029
-       do_sys_openat2+0x10f/0x1e0 fs/open.c:1417
-       do_sys_open fs/open.c:1423 [inline]
-       __do_sys_open fs/open.c:1431 [inline]
-       __se_sys_open fs/open.c:1427 [inline]
-       __x64_sys_open+0xfe/0x1d0 fs/open.c:1427
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&port->mutex){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
-       class_mutex_constructor include/linux/mutex.h:253 [inline]
-       uart_set_termios+0x8e/0x690 drivers/tty/serial/serial_core.c:1646
-       tty_set_termios+0x64d/0x980 drivers/tty/tty_ioctl.c:341
-       set_termios+0x5c8/0x880 drivers/tty/tty_ioctl.c:516
-       tty_mode_ioctl+0x17e/0xd40 drivers/tty/tty_ioctl.c:803
-       n_tty_ioctl_helper+0x47/0x2b0 drivers/tty/tty_ioctl.c:982
-       n_tty_ioctl+0x53/0x340 drivers/tty/n_tty.c:2496
-       tty_ioctl+0x11b4/0x1640 drivers/tty/tty_io.c:2774
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl fs/ioctl.c:583 [inline]
-       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (&tty->termios_rwsem){++++}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       down_write+0x8b/0x1f0 kernel/locking/rwsem.c:1631
-       class_rwsem_write_constructor include/linux/rwsem.h:270 [inline]
-       n_tty_flush_buffer+0x25/0x1b0 drivers/tty/n_tty.c:349
-       tty_buffer_flush+0x239/0x310 drivers/tty/tty_buffer.c:248
-       tty_ldisc_flush+0x68/0xf0 drivers/tty/tty_ldisc.c:388
-       tty_port_close_start+0x306/0x500 drivers/tty/tty_port.c:648
-       tty_port_close+0x26/0x170 drivers/tty/tty_port.c:703
-       tty_release+0x40e/0x1300 drivers/tty/tty_io.c:1718
-       __fput+0x3ff/0xb50 fs/file_table.c:512
-       task_work_run+0x150/0x240 kernel/task_work.c:233
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       __exit_to_user_mode_loop kernel/entry/common.c:70 [inline]
-       exit_to_user_mode_loop+0x1d8/0x700 kernel/entry/common.c:101
-       __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
-       syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
-       syscall_exit_to_user_mode include/linux/entry-common.h:343 [inline]
-       do_syscall_64+0x661/0x790 arch/x86/entry/syscall_64.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (&buf->lock){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
-       tty_buffer_flush+0x72/0x310 drivers/tty/tty_buffer.c:236
-       tty_ldisc_flush+0xad/0xf0 drivers/tty/tty_ldisc.c:388
-       hci_uart_flush+0xed/0x630 drivers/bluetooth/hci_ldisc.c:255
-       hci_uart_close+0x1d/0x90 drivers/bluetooth/hci_ldisc.c:292
-       hci_dev_open_sync+0x126f/0x25e0 net/bluetooth/hci_sync.c:5480
-       hci_dev_do_open+0x2a/0xb0 net/bluetooth/hci_core.c:431
-       hci_power_on+0x131/0x630 net/bluetooth/hci_core.c:923
-       process_one_work+0xac7/0x1b10 kernel/workqueue.c:3396
-       process_scheduled_works kernel/workqueue.c:3479 [inline]
-       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3560
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #2 (&hdev->req_lock){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x1a4/0x1bd0 kernel/locking/mutex.c:821
-       hci_dev_do_open+0x22/0xb0 net/bluetooth/hci_core.c:429
-       hci_power_on+0x131/0x630 net/bluetooth/hci_core.c:923
-       process_one_work+0xac7/0x1b10 kernel/workqueue.c:3396
-       process_scheduled_works kernel/workqueue.c:3479 [inline]
-       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3560
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}:
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       process_one_work+0xa32/0x1b10 kernel/workqueue.c:3372
-       process_scheduled_works kernel/workqueue.c:3479 [inline]
-       worker_thread+0x5ef/0xe50 kernel/workqueue.c:3560
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 ((wq_completion)hci3){+.+.}-{0:0}:
-       check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
-       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
-       validate_chain kernel/locking/lockdep.c:3952 [inline]
-       __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
-       lock_acquire kernel/locking/lockdep.c:5942 [inline]
-       lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
-       touch_wq_lockdep_map+0xad/0x1c0 kernel/workqueue.c:4111
-       __flush_workqueue+0x131/0x1200 kernel/workqueue.c:4153
-       drain_workqueue+0x175/0x3b0 kernel/workqueue.c:4317
-       destroy_workqueue+0xc3/0xa30 kernel/workqueue.c:6155
-       hci_release_dev+0x14d/0x630 net/bluetooth/hci_core.c:2717
-       bt_host_release+0x6b/0xb0 net/bluetooth/hci_sysfs.c:100
-       device_release+0xd2/0x270 drivers/base/core.c:2640
-       kobject_cleanup lib/kobject.c:689 [inline]
-       kobject_release lib/kobject.c:720 [inline]
-       kref_put include/linux/kref.h:65 [inline]
-       kobject_put+0x1f7/0x640 lib/kobject.c:737
-       put_device+0x1f/0x30 drivers/base/core.c:3884
-       device_release+0xd2/0x270 drivers/base/core.c:2640
-       kobject_cleanup lib/kobject.c:689 [inline]
-       kobject_release lib/kobject.c:720 [inline]
-       kref_put include/linux/kref.h:65 [inline]
-       kobject_put+0x1f7/0x640 lib/kobject.c:737
-       put_device+0x1f/0x30 drivers/base/core.c:3884
-       hci_conn_put include/net/bluetooth/hci_core.h:1689 [inline]
-       l2cap_conn_free net/bluetooth/l2cap_core.c:1856 [inline]
-       kref_put include/linux/kref.h:65 [inline]
-       l2cap_conn_put net/bluetooth/l2cap_core.c:1869 [inline]
-       l2cap_chan_destroy net/bluetooth/l2cap_core.c:494 [inline]
-       kref_put include/linux/kref.h:65 [inline]
-       l2cap_chan_put+0x352/0x3f0 net/bluetooth/l2cap_core.c:521
-       l2cap_sock_release+0x1db/0x280 net/bluetooth/l2cap_sock.c:1533
-       __sock_release net/socket.c:735 [inline]
-       sock_release+0x91/0x1c0 net/socket.c:763
-       rfcomm_session_del.isra.0+0x16b/0x250 net/bluetooth/rfcomm/core.c:718
-       rfcomm_process_rx net/bluetooth/rfcomm/core.c:2030 [inline]
-       rfcomm_process_sessions net/bluetooth/rfcomm/core.c:2115 [inline]
-       rfcomm_run+0x6f6/0x5550 net/bluetooth/rfcomm/core.c:2205
-       kthread+0x373/0x450 kernel/kthread.c:436
-       ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-other info that might help us debug this:
-
-Chain exists of:
-  (wq_completion)hci3 --> &port->mutex --> rfcomm_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(rfcomm_mutex);
-                               lock(&port->mutex);
-                               lock(rfcomm_mutex);
-  lock((wq_completion)hci3);
-
- *** DEADLOCK ***
-
-locks held by krfcommd/3367: 1, last CPU#1:
- #0: ffffffff90f83cc0 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_process_sessions net/bluetooth/rfcomm/core.c:2096 [inline]
- #0: ffffffff90f83cc0 (rfcomm_mutex){+.+.}-{4:4}, at: rfcomm_run+0x30b/0x5550 net/bluetooth/rfcomm/core.c:2205
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 3367 Comm: krfcommd Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_circular_bug.cold+0x178/0x1be kernel/locking/lockdep.c:2087
- check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2219
- check_prev_add+0xeb/0xe60 kernel/locking/lockdep.c:3209
- check_prevs_add kernel/locking/lockdep.c:3328 [inline]
- validate_chain kernel/locking/lockdep.c:3952 [inline]
- __lock_acquire+0x1528/0x1f40 kernel/locking/lockdep.c:5288
- lock_acquire kernel/locking/lockdep.c:5942 [inline]
- lock_acquire+0x1d1/0x380 kernel/locking/lockdep.c:5899
- touch_wq_lockdep_map+0xad/0x1c0 kernel/workqueue.c:4111
- __flush_workqueue+0x131/0x1200 kernel/workqueue.c:4153
- drain_workqueue+0x175/0x3b0 kernel/workqueue.c:4317
- destroy_workqueue+0xc3/0xa30 kernel/workqueue.c:6155
- hci_release_dev+0x14d/0x630 net/bluetooth/hci_core.c:2717
- bt_host_release+0x6b/0xb0 net/bluetooth/hci_sysfs.c:100
- device_release+0xd2/0x270 drivers/base/core.c:2640
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1f7/0x640 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3884
- device_release+0xd2/0x270 drivers/base/core.c:2640
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1f7/0x640 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3884
- hci_conn_put include/net/bluetooth/hci_core.h:1689 [inline]
- l2cap_conn_free net/bluetooth/l2cap_core.c:1856 [inline]
- kref_put include/linux/kref.h:65 [inline]
- l2cap_conn_put net/bluetooth/l2cap_core.c:1869 [inline]
- l2cap_chan_destroy net/bluetooth/l2cap_core.c:494 [inline]
- kref_put include/linux/kref.h:65 [inline]
- l2cap_chan_put+0x352/0x3f0 net/bluetooth/l2cap_core.c:521
- l2cap_sock_release+0x1db/0x280 net/bluetooth/l2cap_sock.c:1533
- __sock_release net/socket.c:735 [inline]
- sock_release+0x91/0x1c0 net/socket.c:763
- rfcomm_session_del.isra.0+0x16b/0x250 net/bluetooth/rfcomm/core.c:718
- rfcomm_process_rx net/bluetooth/rfcomm/core.c:2030 [inline]
- rfcomm_process_sessions net/bluetooth/rfcomm/core.c:2115 [inline]
- rfcomm_run+0x6f6/0x5550 net/bluetooth/rfcomm/core.c:2205
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
+Fixes: cad348a17e17 ("Bluetooth: Implement .activate, .shutdown and .carrier_raised methods")
+Reported-by: syzbot+4a807caf7680652d53b6@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=4a807caf7680652d53b6
+Cc: stable@vger.kernel.org
+Signed-off-by: Palla Raghunath <raghunathpalla.0209@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I reproduced this on next-20261001 with a small program that creates and
+releases rfcomm0 in a loop while two other threads keep opening and
+closing /dev/rfcomm0, with a vhci controller up so the open gets as far
+as rfcomm_dev_activate(). It crashed within about ten seconds every time.
+With this patch applied it ran for five minutes without any problems.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ net/bluetooth/rfcomm/tty.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index dc3cdf614def..198c7dd1a95b 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -128,7 +128,7 @@ static void rfcomm_dev_shutdown(struct tty_port *port)
+ {
+ 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+ 
+-	if (dev->tty_dev->parent)
++	if (dev->tty_dev && dev->tty_dev->parent)
+ 		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
+ 
+ 	/* close the dlc */
+-- 
+2.34.1
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
