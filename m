@@ -1,110 +1,167 @@
-Received: from mail-dl2-f12.google.com (mail-dl2-f12.google.com [74.125.229.140])
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54796340400
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 04:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04F82F0C46
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 05:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790916539; cv=none; b=CqLTLh+rWbVVwHPbwDEop3daXocFRxfzY4ps7qN/gbRNYqYXpxfBqzl+P+6/KVK5HlMj/sGvih654bUX7S4IE7sosN8z4AgBUton7dnirtoCQ5vEL3EgQwVFha7Vu2EgVJhRpy42Gl9W0BtcpkwJBrsNRoHQeFDnrZR79dzXCf8=
+	t=1790919150; cv=none; b=b/rE8wcqJzeLdbeJCcDEoanuCsZMUog87tRQRIRP3KYRtqPap1knZF+C/tAlVxrwh3v3A7tHnKDU4eAqFurL8NbWAm2850i/qHmVdJSaw9xmEgDnKx/TLIMmo4qH/sO8m5Tx2QS2qIVQO2V8aXCIznklsAvnPM15Haa+UVEybbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790916539; c=relaxed/simple;
-	bh=s+RQLXyT4t2jYvXUa4+cRQf8b4fszo8lGoaqFtiNCko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hEb1cenAMybDPcAVaZAA7n6YCXZ4UUblDW+O+1cqdUfSh7sVWmkTN/jwYotPBgqHtrq80hh0Xh18wk+cr7QTggSyL0E7+i6Yvgx0Jhh19eTFKqCEo+VEExkPWbVK6znXTeHKLDbw4+rf9Dlfvmu5ACt9XoZed54yCLQx6eAUTco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KisJYlKI; arc=none smtp.client-ip=74.125.229.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KisJYlKI"
-Received: by mail-dl2-f12.google.com with SMTP id a92af1059eb24-142dd025d07so6150299c88.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 21:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790916537; x=1791521337; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=I1uO3OxtYozwByW7Bts8UG8cJ6huXdi0MymMUltj7RY=;
-        b=KisJYlKIKyYAo06ivHbwnH9Waf/1XggKYjTk/FgQSKaIB3bPYh22y6Nmp0eEnynzHz
-         vhtWoHBob7SJ3VbKf8nMzw5f/uhYQLWKbfzIYYPQU2/d8sCWqKYZLB49zvM8vB5PIanF
-         CXys23L6YsXZpX2N3RhULC0PNYjgzM1IgDnIkxRbJ3Kav1AcDRfo08RPC9E0lKnNvXno
-         AQ9NLoqmrpf+SISwbSkmk+Um8mci6fpcj+PWaa9CEZ4ekt3sMgYHdhntI3hGWMKG1uwB
-         CxWmNDMYZXpQoxvr55y7c2UuAKBSRinfhrxUHe00UnVqUuTPcjeCdflmLF/1+hUKd3xJ
-         5a9w==
+	s=arc-20240116; t=1790919150; c=relaxed/simple;
+	bh=2pSnaHR0dLqqhKvGwe1MH9NgzMKRsufCm8qL9qOs+Ew=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=p+Fwi2gairuq+UcnB6k2dI/1OGhDtzj7mBULDNV9ueDUr12gFSkKbmeIbTj7u+v077ZfiKGU/1f4rDranBZddGsD8n4ey0xI92gaHLZfIvzF3ZsxXwbs7dFHwwkLNJndnyy9Ft4/UE5wF6f2vIdwbUBjrKxVs/TmkVRxMYiJO8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4db3db8687fso2611447b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2026 22:32:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790916537; x=1791521337;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=I1uO3OxtYozwByW7Bts8UG8cJ6huXdi0MymMUltj7RY=;
-        b=yFvI2fVQWhij+qdorkYWGc1RFV9iQFDC116CzDbEQpC2OoriBmmQaOgNCNkAtXZY34
-         b+Gslp5JZtT9x1Pmz/YjRNnwuwRxuQbeYJBepBK/JeoxHYbW+kwP+iHXKd/mSu7PybnN
-         PNVcmfaUF6QWeyypGJbiCjUob56yTZ2mA0lT3Cz7+IICMTKTE9zingeje7anrzgJsF6X
-         OhyExO7azGMgu7KbnvuuqKhAM618ADnyhupWFz+iay5bqFCb2q0yJ1RTmmYOSbECdpSn
-         nfd4kHVcGRIYIUKOPlrKCMUsnCcEsAvPQZA5nNSayS7xz1fJyLjFXMXEUBrs+JCj99Aq
-         LNKg==
-X-Forwarded-Encrypted: i=1; AKwUvByPCV27clH0g8w9DCD8BoLP4NB+32X7h8fVqSaQCr8LlaM2+SKHGiczCP3jLEC0kUMHU65R14637EVHNvSmodo=@vger.kernel.org
-X-Gm-Message-State: AFuF++ktVf1mzXa6zGsfax13UaNGXOXdqDiBd2b9QUNR0p0amlYGZblo
-	X8cJZ5k38ZIOSOZvEj4tbWXlEgEy7hCFZ7SnNosGH/pId3crEzFukmdsCRbbEyYO9CY=
-X-Gm-Gg: AYBFou0QOSI7Xlcd12lB9ANDc9zOonJTXLjimAB5pDiZNKrkv1YX/30ZD0h4YtQeFAb
-	QdDLJbSmvMTV6JDedazq+k3zVmdPeyCgWHS2HjjndUTspAjvoL7zxt/CkEnZ3kEo0rESYSD5G6W
-	epx/P9TDYoD4qSLpXVJ4Ytn8Jn5MkDNDqf9VEwxFlOzdyAiKPUgvrwbXJ8q9cw5ytedLq348lls
-	mHpHnUiuBUGj1KdnNbCZkUXiuQmlqrxyES+ltJLDH2mIkn/JonRmOrX6iTDtwF87DWIHLLyAw2s
-	oLuFyiKZ/57/kCbUESMTGTiTLGFwKCeyPYKNbtNtW88fS/F/1mgIub8ts73i/XRZ4l3gRqR4lu9
-	J3QmtM1DPzjADQXBjubAjaPpsC/RFc/hEJLozNamVsKRPk1ENPKF5fBXxgqCzLdIpLJK0RS7gsA
-	abv92rSJqxhnD39pkj9jbUUvL0DhG9PHGj8cEu7N30jwlifMu5W2mK0lcMYC7AFrcO51Oo8FhOQ
-	y0TeDYTySos2yv7zO10xr1ODaNwXKuEwi+SIGH9cD2bzUbUitdLKV5+Ck+vkCElBzJ6XXyvnQpb
-	T0wnKCI2Bf5MK49PlFUj9d0fYLssSWajbqAQA5du
-X-Received: by 2002:a05:701b:2515:b0:14b:1757:fe5 with SMTP id a92af1059eb24-14f56062d90mr1844489c88.0.1790916537187;
-        Thu, 01 Oct 2026 21:48:57 -0700 (PDT)
-Received: from rabindra-loq.localdomain ([104.28.227.154])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14f46da52aesm2420126c88.10.2026.10.01.21.48.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Oct 2026 21:48:56 -0700 (PDT)
-From: rabindra789 <rabindrameher116@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>,
-	Chengfeng Ye <nicoyip.dev@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	rabindra789 <rabindrameher116@gmail.com>,
-	syzbot+48fc5b35b350240fd465@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: hci_sync: Cancel cmd_timer before draining workqueue
-Date: Fri,  2 Oct 2026 04:48:09 +0000
-Message-ID: <20261002044810.80340-1-rabindrameher116@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1790919148; x=1791523948;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8fhLhuAHVPy61Xa+qU8I+dMZ+S9hoNa+YZFJU+sQNQE=;
+        b=jqALezqarYCJhGdbgF/Ry1sfn6yGgtkiGMp3zguSdq2lHINCUQvr+Nuyki+WzFREkQ
+         ZuKe8HQUzpc06YKBBXbwlpq7khb2E5lbOhFjNMNZdlTnSVvrmay/xhjOA3gzvqneK2GA
+         UnI5RV39BXUfR26So0Vfc3I07We9zZ5a0LvnL2dDWwj74/rWpOH56VXDGxFNbzWwF8+D
+         5qEUag/XESXg7xpEjur54dhLSLtP5Jso0WzLldYXPz/OiUcRWlniSdv6nSiFyQkUFxnm
+         ktmdKLmpLVit0zS2rlewrCpKSc4ELAVwKGu2yMAopPrRzPNXu25toe3ilqzs81WYCWJ5
+         YQ6A==
+X-Gm-Message-State: AFuF++lpskeCj1wNHw2scxrB4b1gOezRpOeU9oPUprtMP4QqmRE2reY4
+	YGzh6/x4BRBIOwYGqEPg6TDu+tnxwbqgHhOND1pPmZB0ksIXKjnMzuKT0xhv84ThuZnSYqu8LTD
+	T1KT4v7sQeXUHLdP6ArsFggaaiFW4gX+M9JPyvQNf1MoqWDzFuPebtMkfCvE=
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:c169:b0:4f4:724e:34d7 with SMTP id
+ 5614622812f47-4f529c2b58cmr1178960b6e.28.1790919147837; Thu, 01 Oct 2026
+ 22:32:27 -0700 (PDT)
+Date: Thu, 01 Oct 2026 22:32:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6abf41eb.b50370da.302ea9.000a.GAE@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in rfcomm_dev_shutdown
+From: syzbot <syzbot+4a807caf7680652d53b6@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-cmd_timer can expire while hdev->workqueue is being drained,
-causing hci_cmd_timeout to be queued on a draining workqueue.
+Hello,
 
-Cancel cmd_timer before draining the workqueue.
+syzbot found the following issue on:
 
-Reported-by: syzbot+48fc5b35b350240fd465@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=48fc5b35b350240fd465
-Fixes: 40b87657200c ("Bluetooth: hci_core: Rework hci_dev_do_reset() to use hci_sync functions")
+HEAD commit:    551c722f4080 Merge tag 'rtc-7.3-fixes' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=155ee3f5580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9d4242cb1c54cdf7
+dashboard link: https://syzkaller.appspot.com/bug?extid=4a807caf7680652d53b6
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
 
-Signed-off-by: rabindra789 <rabindrameher116@gmail.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3e4fb9949c4f/disk-551c722f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fc47c1d4ab50/vmlinux-551c722f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d29008ae09f9/bzImage-551c722f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4a807caf7680652d53b6@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000008: 0000 [#1] SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000040-0x0000000000000047]
+CPU: 1 UID: 0 PID: 9467 Comm: syz.4.1031 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/16/2026
+RIP: 0010:rfcomm_dev_shutdown+0x48/0xb0 net/bluetooth/rfcomm/tty.c:131
+Code: 8d b3 e0 03 00 00 4c 89 f0 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 f7 e8 26 32 48 f7 4d 8b 36 4d 8d 7e 40 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 09 32 48 f7 49 83 3f 00 74 16 e8
+RSP: 0018:ffffc90006937bf0 EFLAGS: 00010212
+RAX: 0000000000000008 RBX: ffff8880538c2000 RCX: 0000000000080000
+RDX: ffffc9000f182000 RSI: 0000000000000325 RDI: 0000000000000326
+RBP: 0000000000000400 R08: ffff8880538c2237 R09: 1ffff1100a718446
+R10: dffffc0000000000 R11: ffffffff8aefbc10 R12: dffffc0000000000
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000040
+FS:  00007f1514ff66c0(0000) GS:ffff888124dc8000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c2cbda1 CR3: 0000000038298000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ tty_port_shutdown+0x1bf/0x220 drivers/tty/tty_port.c:372
+ tty_port_close+0x4e/0x150 drivers/tty/tty_port.c:705
+ tty_release+0x359/0x1670 drivers/tty/tty_io.c:1718
+ __fput+0x418/0xa50 fs/file_table.c:512
+ task_work_run+0x1d9/0x270 kernel/task_work.c:233
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ __exit_to_user_mode_loop kernel/entry/common.c:70 [inline]
+ exit_to_user_mode_loop+0x204/0x770 kernel/entry/common.c:101
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:343 [inline]
+ do_syscall_64+0x328/0x520 arch/x86/entry/syscall_64.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f1516d9e159
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1514ff6028 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
+RAX: 0000000000000000 RBX: 00007f1517026090 RCX: 00007f1516d9e159
+RDX: 0000000000000000 RSI: ffffffffffffffff RDI: 0000000000000000
+RBP: 00007f1516e3506b R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f1517026128 R14: 00007f1517026090 R15: 00007fff99ef4628
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:rfcomm_dev_shutdown+0x48/0xb0 net/bluetooth/rfcomm/tty.c:131
+Code: 8d b3 e0 03 00 00 4c 89 f0 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 f7 e8 26 32 48 f7 4d 8b 36 4d 8d 7e 40 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 09 32 48 f7 49 83 3f 00 74 16 e8
+RSP: 0018:ffffc90006937bf0 EFLAGS: 00010212
+RAX: 0000000000000008 RBX: ffff8880538c2000 RCX: 0000000000080000
+RDX: ffffc9000f182000 RSI: 0000000000000325 RDI: 0000000000000326
+RBP: 0000000000000400 R08: ffff8880538c2237 R09: 1ffff1100a718446
+R10: dffffc0000000000 R11: ffffffff8aefbc10 R12: dffffc0000000000
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000040
+FS:  00007f1514ff66c0(0000) GS:ffff888124dc8000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f508245e000 CR3: 0000000038298000 CR4: 0000000000350ef0
+----------------
+Code disassembly (best guess):
+   0:	8d b3 e0 03 00 00    	lea    0x3e0(%rbx),%esi
+   6:	4c 89 f0             	mov    %r14,%rax
+   9:	48 c1 e8 03          	shr    $0x3,%rax
+   d:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
+  12:	74 08                	je     0x1c
+  14:	4c 89 f7             	mov    %r14,%rdi
+  17:	e8 26 32 48 f7       	call   0xf7483242
+  1c:	4d 8b 36             	mov    (%r14),%r14
+  1f:	4d 8d 7e 40          	lea    0x40(%r14),%r15
+  23:	4c 89 f8             	mov    %r15,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	4c 89 ff             	mov    %r15,%rdi
+  34:	e8 09 32 48 f7       	call   0xf7483242
+  39:	49 83 3f 00          	cmpq   $0x0,(%r15)
+  3d:	74 16                	je     0x55
+  3f:	e8                   	.byte 0xe8
+
+
 ---
- net/bluetooth/hci_sync.c | 2 ++
- 1 file changed, 2 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c01c8b58d9e8..e1c28bffdc15 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5545,6 +5545,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 	 */
- 	hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
- 	synchronize_rcu();
-+	/* Explicitly cancel works in case scheduled after setting the flag. */
-+	cancel_delayed_work_sync(&hdev->cmd_timer);
- 
- 	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
- 		disable_delayed_work(&hdev->power_off);
--- 
-2.43.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
