@@ -1,113 +1,204 @@
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E97044605B;
-	Fri,  2 Oct 2026 21:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.76.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14D825B0B7
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 22:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790977763; cv=none; b=QsrAogwoJPCNDv9RdGTw0+lKOEpkYs/1ufUjAIDSuSYP554qi1ywsNJhY58O2nuWmtVPXGRH4w4v9b7OjaAjX3829Yg0ifWIzabIMvIOBIfU1Bg7VddoZct86lEZrHJSZXnVepxUrn6hheYaQScnz2IrwNBtlcSVuLtR6yss7Vk=
+	t=1790978828; cv=none; b=rDDHBSTyvRSBA6xtK9sFuL1b5v1Qd3RUrn8tSvveHRJr7WYQ88oK+gfgv4ulr1dONM0yneIqpy/SELAPfy2G55Ibr/e4PXQnK4zeY7VBsu/4sHLbcWYEQrOWKkx+0dHktl62SVwUS2qhy2W7lNE4d0D9dci0KcwhVVC/aB5sBN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790977763; c=relaxed/simple;
-	bh=BG3Nld4ztJdypc8LZ843cilgweII55GvAIzMdgcGHgw=;
-	h=From:Date:Message-ID:MIME-Version:Content-Type:To:Cc:Subject; b=TKQZgTk63la+D3+OaFCErbXMu+sBnjPjCdxrjHLqUUmL/JCjSsBsgh2t8j+nKRXM547ylYpN7S9SHQMgQP9BFVTjLgU7CXYOWneFNwLDvOAF7fLwu/HczOsTL1RixbatTLRRJnSg5WYReGYGYm2MhT6cNghHBagoS6Ax4UMeoFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz; spf=pass smtp.mailfrom=podgorny.cz; dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b=q63gFUDf; arc=none smtp.client-ip=77.75.76.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+	s=arc-20240116; t=1790978828; c=relaxed/simple;
+	bh=iq7NPv29PazUOG6fRQGAyeWehq6YTtQikEuLhCYiprY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LXlslu5VmeniQzolKUzYM+AtbUDLyZsouJfCaIDgMtNq31rnmw5Ouf09G38507rp5Oy/0Ojd4wN1p3deXOzgHL5U2d+91bN3ELxtdeWyZoEI+f9vWDG/Hvrdi/+hLA/AmjQ6Znh/07rcJzPgu9WUWouJrnREtNHvAenN2xCtmWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r9hRkwQ1; arc=none smtp.client-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=emailprofi.seznam.cz header.i=@emailprofi.seznam.cz header.b="q63gFUDf"
-Received: from email.seznam.cz
-	by smtpc-mxb-cd564bb46-95fjz
-	(smtpc-mxb-cd564bb46-95fjz [2a02:598:96:8a00::1200:520])
-	id 3581030d83bbae14300e1945;
-	Fri, 02 Oct 2026 23:49:13 +0200 (CEST)
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=emailprofi.seznam.cz; s=szn1; t=1790977753;
-	bh=vUKfugxund9IRMF/M3r1ILJXYCkNOUo5FBoe5bxfh9Q=;
-	h=From:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:To:Cc:Subject;
-	b=q63gFUDfACgSfK31PdGag/DPLddT9HR45akY+OtFGlHpsH8T8h4ro/gCFpO5/TLeO
-	 x9O/c7YUbj6DZgBVYUb/AfppopTqxY+UZrghXeKr7Wol15yLNJD5aV74LUFg5drEP5
-	 dvJ8J/VvyRygn9wJLHELe+u6QRG/UbIjQwueUuBFLKksoRsN5AnjqBZgByn9GT39dz
-	 v3xhOjJD8YllushPvsuuHOUhzhYPQ9okV8o5OEIMC2e7Rz4Am5TFw3yWV2PshYzYoA
-	 MT/23kG/2usEQ1Q5C1odfxy11cjIAQCQ5Pjha8txxopnopmdf/m06A/QjICqYGAf1o
-	 tqg3up00fLSBQ==
-Received: from [192.168.31.62] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
-	by smtpd-relay-7b9b5646b-rjdsf (szn-email-smtpd/2.0.87) with ESMTPA
-	id 9a49a7d1-01e6-4437-99b3-7b80def0a6d4;
-	Fri, 02 Oct 2026 23:45:46 +0200
-From: Radek Podgorny <radek@podgorny.cz>
-Date: Fri, 02 Oct 2026 23:45:45 +0200
-Message-ID: <179097754519.501890.1801734138080126989@podgorny.cz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r9hRkwQ1"
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3115c4451c8so56688eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Oct 2026 15:07:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790978826; x=1791583626; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=uS6Ahswo7Q1saGARE7k24iF57BHlxqgh7z4WtGnNpjg=;
+        b=r9hRkwQ1VnTZdomLMcGOWPUDMDPc5mdBq5006C8nKfUmjO58aAPpSkDBb4/F455Tj3
+         wKbi4IDcEab7L0Y70NPOgyzmZExjbxM2HLf4nETgHEans2k4fjYzd+zCY3qmL5PL/13s
+         l45KLGLAh4xeEuxCwoZZ3PSYxdj6HfsylnMhTRfFwUTKx7LagaDrwKXZvXYWUA2Q7rns
+         ylsr9XQrMOZB91p15Wzd9i4aWKUDJuAkN9o/v4QFFxOY5ekrGiJ1I7K81XImwKRXvDhh
+         10PyaoIDiUh1qEG1uGgZ2ApxUZao8TAhhj8WxqUuP+OcLxdkhyqTbjxAU4/stiZ5kXXO
+         TFeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790978826; x=1791583626;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=uS6Ahswo7Q1saGARE7k24iF57BHlxqgh7z4WtGnNpjg=;
+        b=UjBbqeLy4RWIFmKlQXqA6LdwJPbI98jt1Rij6bDtXOe0UaUIGwWmlKbqqNgn/5MEea
+         E/hDhy89hzmekLfKFxB0NECWiNM+oPZcRELiu7kjNaTtJwvhqMFkydMcK+tRsSoo4RJo
+         UUdwaFIZ1YbtD4L65wpS6GXribVlfaWHouvvS0aGEI8Bov9ckFc+dNTtJ2YK/BWQqYD0
+         /r7cARfCIlMbb0nZNB1Hn8GI4tiA4Zf68WJG3bw6+gRKFxMu5Q9qReaWe0sOCkF4Srbi
+         2lZ7op98NogSo0xnGSZHGapLr8l4HQZRpzt0x5at26XIlNpxAIzIbA+6ZybU2slMBL6t
+         ORFA==
+X-Gm-Message-State: AFq9FYL977CFgpe7PxxqC+97Mp81qqmIW1SAMuXeLJ2MZsHQckeLyvgG
+	H6qS+1DdS2R69Inmrp8jMpCiuTtSyqYmH5hr/eKA1TLCN8qo5bCL28R70R/50Q==
+X-Gm-Gg: AYBFou15gfFgaLZwkWv4AtU68yx0GAuEN+jRmmnQqdEY2xt6Xji4TRqgxGcszmkblHV
+	j0BYRWOXmV60nPIeXqKlOLcyjxN95HKfT2OW5pppPFkNDjdRKJel+FHkcDxouuqdX6i7HrlMaHZ
+	3SB2TFciPCnRokEufJkT8S2hWGEU+GNW1kgNMjXx294WP198JRg7H3o2tecvrcbhgmiPaaPcyt4
+	lqqvWQWx1gvNYb/WPh71SkB2e3cGia4+nySdlZX8mi0OXinQoXgGLlOipeqcFtMZKXRVJdqQsQZ
+	oHIFOiALhO9yKDeuGJ9YAhG/eI6TAHfSDBkRXGX7Qpwmu+r0frv3lYpvCgdFYOjWoZnIQ88Kzq4
+	q60ph/NrX3/NGSeIETe03zq6s9VdM0CLBhTQLBhvyaxyF0pfckDlu2HtaRV5OhMJ8H+pgMtN+J6
+	2zOVN9MKIcrJKn0Kue/WAgVCtk281XOMsSfNu0M8qEsYq/ikmWrcaJe5AHDylEY6rc8nsvt5MMO
+	9Ph
+X-Received: by 2002:a05:7301:1c1a:b0:34e:2150:e5a4 with SMTP id 5a478bee46e88-34e2150e886mr6882883eec.16.1790978825435;
+        Fri, 02 Oct 2026 15:07:05 -0700 (PDT)
+Received: from [172.17.0.2] ([40.65.59.119])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351123070cbsm1227083eec.31.2026.10.02.15.07.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Oct 2026 15:07:04 -0700 (PDT)
+Message-ID: <6ac02b08.84503012.2f9a79.6ee8@mx.google.com>
+Date: Fri, 02 Oct 2026 15:07:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7269246486445389367=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-    Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-    stable@vger.kernel.org,
-    Sasha Levin <sashal@kernel.org>,
-    Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: 7.2.y took the on-air address fix without its companion
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,vRFC,1/7] monitor: Add audio quality statistics for ISO streams
+In-Reply-To: <20261002192759.3071262-1-luiz.dentz@gmail.com>
+References: <20261002192759.3071262-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz, Marcel,
+--===============7269246486445389367==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-7.2.8 picked up, via AUTOSEL,
+This is automated email and please do not reply to this email!
 
-  a552b4bc058b Bluetooth: put the peer's on-air address on air when we
-               cannot resolve        (mainline 4914c4998961)
+Dear submitter,
 
-but not the patch that was sent and merged immediately before it:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1178559/
 
-  14b015afb556 Bluetooth: forget a peer's RPA once it advertises its
-               identity address      (bluetooth-next only)
+---Test result---
 
-They went out as a two-patch series because the second one depends on
-the first, and the commit message now in 7.2.8 says so itself:
+Test Summary:
+CheckPatch                    FAIL      4.07 seconds
+GitLint                       FAIL      1.59 seconds
+BuildEll                      PASS      19.30 seconds
+BluezMake                     PASS      372.71 seconds
+MakeCheck                     PASS      14.45 seconds
+MakeDistcheck                 PASS      139.51 seconds
+CheckValgrind                 PASS      228.69 seconds
+CheckSmatch                   WARNING   288.24 seconds
+bluezmakeextell               PASS      92.37 seconds
+TestFunctional                PASS      1112.13 seconds
+IncrementalBuild              PASS      424.40 seconds
+ScanBuild                     PASS      1110.12 seconds
 
-  Without that, a peer that turns privacy off would be dialled on the
-  address it abandoned rather than the one it is answering on.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,vRFC,1/7] monitor: Add audio quality statistics for ISO streams
+WARNING:COMMIT_LOG_LONG_LINE: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#105: 
+> LE-CIS: Handle 2304 SN... flags 0x02 dlen 4 sflags 2  #302 [hci0] 83.728300
 
-That is the situation in 7.2.y now, and it is a regression against
-7.2.6:
+/home/runner/work/bluez/bluez/src/patch/14864145.patch total: 0 errors, 1 warnings, 682 lines checked
 
- - hci_connect_le() substitutes the cached irk->rpa for the identity
-   address whenever the IRK has one.
- - __hci_conn_add() in 7.2.8 keeps that RPA when LL Privacy resolution
-   is off or the peer is not in the resolving list, which is the change
-   a552b4bc058b makes.
- - Nothing in 7.2.8 ever clears irk->rpa. The only writes to it install
-   a newer RPA, in hci_find_irk_by_rpa() and hci_add_irk().
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-So a bonded peer that stops using RPAs and advertises its identity
-address is dialled forever on an address it no longer answers on. In
-7.2.6 __hci_conn_add() converted the address unconditionally, so the
-same peer was dialled on its identity and the connection succeeded.
+/home/runner/work/bluez/bluez/src/patch/14864145.patch has style problems, please review.
 
-14b015afb556 is the invalidation that closes this: it clears irk->rpa
-in process_adv_report() once the peer is seen advertising its identity
-address. Nine added lines in one file.
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-Could it go to mainline as a fix during the 7.3 cycle rather than
-waiting for the 7.4 merge window? Once it is upstream it reaches 7.2.y
-by the normal route. I deliberately left a Fixes: tag off it when it
-was posted, so as not to invite a backport while __hci_conn_add() was
-still masking the stale address -- that reasoning does not hold any
-more now that a552b4bc058b is in a released stable kernel. I am glad to
-repost it with Cc: stable@vger.kernel.org if you would rather have it
-that way.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-For the stable team: if holding it is not workable, reverting
-a552b4bc058b from 7.2.y restores the 7.2.6 behaviour, at the cost of
-re-exposing the bug that patch fixes. Only 7.2.y is affected; 6.18.54,
-6.12.111 and 6.6.157 carry neither patch.
 
-Both have been running together here since September. 7.2.8 is the
-first kernel I have seen with only the second half.
+[BlueZ,vRFC,5/7] monitor: Add audio quality statistics for SCO data
+WARNING:COMMIT_LOG_LONG_LINE: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#106: 
+> BR-ESCO: Handle 257 [90:09.. flags 0x01 dlen 120  #1455 [hci0] 19979.296105
 
-Thanks,
-Radek Podgorny
+/home/runner/work/bluez/bluez/src/patch/14864148.patch total: 0 errors, 1 warnings, 396 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14864148.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,vRFC,6/7] monitor: Add ISO link details to the analyze mode
+WARNING:COMMIT_LOG_WRONG_LINK: 'Link:' should be followed by a public http(s) link
+#107: 
+        Link: ISO interval 30.00 msec NSE 12 BN 3 PTO 0 IRC 4 latency 28880 usec
+
+/home/runner/work/bluez/bluez/src/patch/14864149.patch total: 0 errors, 1 warnings, 182 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14864149.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,vRFC,7/7] monitor: Add audio quality statistics for A2DP streams
+WARNING:COMMIT_LOG_LONG_LINE: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#107: 
+< BR-ACL: Handle 256 [E8:EE:C.. flags 0x02 dlen 602  #15682 [hci0] 141.214796
+
+/home/runner/work/bluez/bluez/src/patch/14864150.patch total: 0 errors, 1 warnings, 442 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14864150.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,vRFC,2/7] monitor/analyze: Fix a new connection for each BIS or eSCO packet
+
+1: T1 Title exceeds max length (82>80): "[BlueZ,vRFC,2/7] monitor/analyze: Fix a new connection for each BIS or eSCO packet"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c:2290:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structuresmonitor/packet.c:2290:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structuresmonitor/packet.c:2290:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structuresmonitor/packet.c:2290:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structures
+
+
+https://github.com/bluez/bluez/pull/2623
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7269246486445389367==--
