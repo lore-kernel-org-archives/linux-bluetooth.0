@@ -1,240 +1,105 @@
-Received: from mail-dy2-f41.google.com (mail-dy2-f41.google.com [74.125.229.41])
+Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA0B41DE18
-	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Oct 2026 11:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791026766; cv=pass; b=FlAwQyxBXuuBql1vFwZhT5lDLSL59eMliBl+fyordkSVrTvr72yw+ZByOilj2ZbPbItt5xtBVaOd46ATFm1HC4k4UY2Jak7wQek/PgkBYxmJ4FX0ez+3XyO9Mra+keV7MmHMQWFXsv5rDT/II+jEs5Pw7scRWTY7ewD4/S9Y0qg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791026766; c=relaxed/simple;
-	bh=lBLmndi97S1WKeBFgGiKj82sLyoJqct98pipvkFSyZk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KGB8Z5M39wm4mzK9c6nEge0JX3p1A9hxt0s1eIWhafN+P/FWsjGLVK/eMlC5NE2okbQCt2KUpNXTNFTpcNF9DTyybEyHgun2+bcDGRW+YoKBw8uQbEUcOp4YV0P6ID3x8sw/I28wPZZW6Dlzcv25YfWjEfWaAkn8JQq7ar3/2AQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=opJvjkwN; arc=pass smtp.client-ip=74.125.229.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E34398EB
+	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Oct 2026 14:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791039209; cv=none; b=NdEwB3qQVLKrkxsw6ZAe8pDIsu26RJjd/G9zg4kxp6sXtqtPMMDtRjedOWwzhoJJefDrjZc4GoFaQsvY1lkVrkw3re1HsZYpY8GuHHAzi/u70dDIy98Z1VbwxWTFh6z20UL6kkCiUhKxOcwS4MagzMQAFdXi4zRn80223CP4zYU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791039209; c=relaxed/simple;
+	bh=rFJKqhS8mHohw0KSj3SlitaR2aQ0zecXqZFiaAgJbPc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=QRKyaCM902QDmEtl+lyzKfjzGAmJXVKgle2IH7/EjiK+cQLlykqeI+Mm2EPiAR75w6CZ/55eTSwGUZE+VoSYR+t/mFj1+cExzrYt/+i747SEb/H7T3J7V/qPmOh7QN3Zp3Z92czh4D6zJnV2I5omHwNC8PwUNTZAsqFedoeeL94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rpKWecqM; arc=none smtp.client-ip=74.125.229.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="opJvjkwN"
-Received: by mail-dy2-f41.google.com with SMTP id 5a478bee46e88-34daf1b9a1fso128637eec.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 03 Oct 2026 04:26:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791026763; cv=none;
-        d=google.com; s=arc-20260327;
-        b=WQuiOVDgEVMCfhNFR87vqY1EovJlohvgA7mhwcZQnSL1ITQ9MqdZpC3ACEoxeKlA5J
-         OjZnUrMhCjgdX4BOFlTPJ+Ug0pM0pIArZz1Kp0/XFWrghfZtV9UYlLXoMa9k2Ovurz8G
-         b3obUM7bLFqP0wJLaTBsgJuwFtOVk0vB8Ltizj+XPhxUfxFCCKnKp8Y/hVL8Qc7yIUCb
-         ExwH8fnA3P00Ojwj7aO8PQy8hRdW7tpGvxIu2pVOB6yhyG07bf6nYtsRYuQL/sqD7ZD3
-         SnfVAJxSlyw/TvSY80ZhVHgKhDHnnRXj/viGjHjvXKBy1/JOwLJQTv++pINlhh8BNZCi
-         OqCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5ORazFD3WD1rKxpd4RdCNH7N7Ig54yxyJrV0ajj3sYw=;
-        fh=P4ptTnbrqA6aV5S6l3Wg0+otRLnR2KaX+KECHxUJNZo=;
-        b=GAG9E4KmmGEVpC3hIs7ZVg8xPUZNJEhmjt275yeLjSf55etNUHW2bnmQEZFKRWIUK2
-         +aFYzjnFnI2z6DdBx5un++IWU5BuaTYOMUk+Ysles1UGceVnWSnElVYgoFg6Q4Ip3vkC
-         IpvuwESJwCFd+ZD0z+/OTdXR0EuniKSfrL3yl6pY1iy5WPa3bequREKumY1+tw2CRelu
-         y47rDuH/fcxQ/6SfOgbKInpI+zvGQm4lt1nydkJhg35tBTX5hExOPkZL+g4wx9ft58Sj
-         7hKySw3fCWrWjjp9ulC1o9hs/CD5aq5qEjwaBgBnEEYD2i6M7XeXLrqVpDtIMCSmMiRo
-         sDcg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rpKWecqM"
+Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-34b1743e9c7so328538eec.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 03 Oct 2026 07:53:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791026763; x=1791631563; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5ORazFD3WD1rKxpd4RdCNH7N7Ig54yxyJrV0ajj3sYw=;
-        b=opJvjkwNPeRNEPWhSX4fMiP3QIpybnZwXh3z1IlQGNEDPaXH+R6t0dVh4N/cYqdYrH
-         93uNRDCCwoTnjyX7QxIj8RbtvO7vISjkcCluwoT3Vk7OUp2pC3ZeV6BGU7gea04I/p/W
-         jMEJ51tzgQaqvEs6TVsX+wpIzIBnYqT+kurG9cQoCCnA/NydBlafwBjwpB1Lu4TKVfg2
-         PpIQr0/L8sMloKJh82UwPMqhgxF1qoGKa3pxCj+hymVlkb3qtiJD8x3tzwSXM0tdcC1c
-         PDiqJaSkO8H6B3WxDOSOyl2cuB5IOyzbFJJLTOFQOq5zh0tJlI4hHPm3ahDiWaxSHKsr
-         m86A==
+        d=gmail.com; s=20251104; t=1791039207; x=1791644007; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JIZZr30mT1dzloaWRTkPL8Up2UxyiGM7JHEN4N+quNw=;
+        b=rpKWecqMJ42HUJFsKiepfVUwx9OZQs/Xt6J0z27g+R+fAo82DW0oVDWlZ1iUeArWCm
+         SQtzWxtp990KL3aTp0eKJyl/g+UvthmjAp8nuReNLNnDkGeiWmS8YfhsSg3o715dD+ZS
+         ASaU1c3clpocK4dg1/cRhu4VzkOk33OUPQ4M2uVgotaCy8me5Icfv9xSyAXFyBA6dPyj
+         pq3GTWcZLFasp8nRzp+kCG9mIRFqjOmmukh5VfT3wTFAyBzUhQQMlCDMnbNwnGSCX6/0
+         7NC/tjY4gh7rQTzjY96Q0I77PLTg3ubSdU8ALGWL1y+p8NaUlyr064/QW8ZM2Saoz8aE
+         HNCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791026763; x=1791631563;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5ORazFD3WD1rKxpd4RdCNH7N7Ig54yxyJrV0ajj3sYw=;
-        b=BEb0G6ZsKh0QeKmApON4hh4+JnjoYWGKmoqw5vRmfub80rTPVfbaMpReZ9W7RHTro3
-         UjCI1A1RGD6lDgExOFZVvwhUWAvwxMxQfcT11pRQH38dvhloOwTceet1W/XVuGsXKbLX
-         /n6xodobrcra2OK+SVtJMNfrIrUlueWeVgN8AzQ4+e+x0Voy88YYixPd6hTJ2it7NxWv
-         M2AndC49kxHLjSjkR839WCNw3HhGD+KfN3xXv+K4j/ASJAQUzywdLZnJcaFmxkOhMwX2
-         BVWgv3Sfy1v5y8VquIakupwuQAc07CTVAP2icsP5KQbGtt5/t7EUecxgAjut/Z9+/Tbo
-         18+w==
-X-Forwarded-Encrypted: i=1; AKwUvBxMwCBahCrLOe2LaTPT+CKarYRpfRfRXsjTVN4VfrxnCtqMro+hOsSuMfJf57R54cfmNSwEu1aPNkq1rL+1ZZE=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKrqGHJrn5PUkNYcvZQ+iwz9REOQr3j0IpG8a5HQ32BXHL7ABNf
-	Evnm3bm1iLDEmHHWpPsJbQUZjpvWGr4RIXU/bSnMGi7X69QCm70Rfrjk4uBTmb/dBv3S1Nyy/lm
-	lxjLBVA/BnfaPyvhhsgHs8Rrs4CvDDIw=
-X-Gm-Gg: AYBFou3VoqdUsbk+AlWJo200hEbrDbjcpb8QmthHudwgTy9J+6bJ9EIrbj0rDS1tG5c
-	F669xTYjErDdQmwGtbdsX5dTzbX+kQNWlStlycGdg1obnes7CMVPOLfEUY2m6ar9ybXe8OV4mX9
-	ZfXiVKtyX/Xix73XGHLy7e0yoLgEtDcJmRacYAdvraf0UUX+AJtnQqqMsvPX4tcwohpEjsrxV7w
-	EeJqD1sOJeOzFGX3MRLuvolbu8vUbzeKEICE6GC4FDUpi2WyFpecmYPSYC852oDsvkQmRMDg+f9
-	+B1yyS59s8RRCufO9MEtTNozF+1w6qG42APn6lLP88n/XLPAcyStPi61Be6nCFywHfR7Ztx/BWg
-	Fjujfzkoh3ULbQOD70ModfEBAImUxdVEBPEot7EuRT3NHHqhvlmODcVANjGPOzymKea7YwPDgYv
-	ywCX7qHN2cp9/sxxVLVEE3MB0r93mg
-X-Received: by 2002:a05:693c:66cc:10b0:34e:e479:723 with SMTP id
- 5a478bee46e88-34f14f12d95mr5749579eec.5.1791026762760; Sat, 03 Oct 2026
- 04:26:02 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791039207; x=1791644007;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=JIZZr30mT1dzloaWRTkPL8Up2UxyiGM7JHEN4N+quNw=;
+        b=fT+JZ9Ya4+ES3LeWyzPpbDSkeWgEJvZwqxKtIt555DZweuO5KK+6oaeSP6f29MQPC6
+         Fb8rvOh93cZzW4V2ZU2v8gm2a3bS2KiRmhSupTZWvrfFARcIBhsFNcvxbzzx2wCozkEA
+         wQjcMLDubbTmJJfS0cIty1nnoaXBpyn/YthpkzRhOF1V/AXfrjmlqylUUZ3SysjiTg6T
+         3kcD3Ibu8kQ162tBJ0J5xzRmu3tgfQq0bT5R8VUDNGMPFXwlqDJJqD3KmENla+jtKky9
+         tn8wKCNgga1MI+befKKdhAk7SfPAg4ALoHLvshD/26pXBCZrDQ1bcC4vWTUb23zMsgcW
+         ZECg==
+X-Gm-Message-State: AFq9FYIvX1xKcW6t+iF1scha0zjpyIyLVIJout3zJT9bx6ziLdijEOZ7
+	YLLobe1c4eexZ/819IOVeyFr0HUxGth65QaA/rwKpDb1s9NSbd/ioouj4xDN7Q==
+X-Gm-Gg: AYBFou3Bq4BEBgKRthbBgPQsUYGdRwLywBYWE+g3EOuw/lCGLdkUY/iI9YAt6JAm/Im
+	63pLtNWTX+x6gzD1lXzF9skT4THQD6OX8D+g5QBWqtpissaN5squ3GXL+f6L7aQD/7sfawunige
+	S6XHJAF/WnNGSiLt7UHGZWV95unXpGou3meR6IwTTXLyiPZ9w9hO9M+sTvJUr42cfnHPn7xizJD
+	46z1mFPDishMg7lvPSCJrn3x6CWXxGDaQA4u8OwiCEsvbdcnK1LesDnnPCPoQ2ziFisjC2ooP7e
+	0C2PRIJnOUnNHaFvAbtD06KvN+rPvXvLaoNzHcToes66+SkZkGwp72Fg9WV3BPjLff+t27AcoEH
+	6EPOaafG7Ne77c4fpj+u/J4SfNgdwjBi412eK+Pxk6zqkNFhEjVLK8MN8tLsqIWB6qjmY1kI7Ik
+	VQhFsb5sRPOrWshsNKy9SzOGpjYXD1bJFD46iWXy90lNDUDOnTHF6PPjpbJoirPn40C9hK6DlLb
+	rs=
+X-Received: by 2002:a05:7301:fc10:b0:34f:21b5:5ea8 with SMTP id 5a478bee46e88-34f21b560dcmr6524486eec.27.1791039206629;
+        Sat, 03 Oct 2026 07:53:26 -0700 (PDT)
+Received: from [172.17.0.2] ([57.154.5.142])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3511b6f3a32sm9024886eec.2.2026.10.03.07.53.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Oct 2026 07:53:25 -0700 (PDT)
+Message-ID: <6ac116e5.c4e819fb.2d9a7f.b126@mx.google.com>
+Date: Sat, 03 Oct 2026 07:53:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5248393513686072636=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261002044810.80340-1-rabindrameher116@gmail.com>
- <CABBYNZLeHVQjsnjbPn76LVKT1RxSadYPZDqoNY7Lj-zEysU8-A@mail.gmail.com>
- <CABBYNZ+870EdpRWDpx22ZZX4=_+bVwjf3Fv4HazoV5u9+_ab6g@mail.gmail.com> <CAOa02aN_YgSB7L6eG-+Og3dx103kZpoRy1Ho27aMvo2dsoQCVw@mail.gmail.com>
-In-Reply-To: <CAOa02aN_YgSB7L6eG-+Og3dx103kZpoRy1Ho27aMvo2dsoQCVw@mail.gmail.com>
-From: Rabindra Kumar Meher <rabindrameher116@gmail.com>
-Date: Sat, 3 Oct 2026 16:55:51 +0530
-X-Gm-Features: AclHuK_4iYTRP4PQYtFMnSnx18fAYG0DGr1u7iStbi2UrNIiSRRh501rDzqoMNs
-Message-ID: <CAOa02aNrsiuvT-J+Wd3LTYEVRr2D0jdBQ=vsR0-CSeKUmRfuYA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Cancel cmd_timer before draining workqueue
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Pauli Virtanen <pav@iki.fi>, 
-	Chengfeng Ye <nicoyip.dev@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	syzbot+48fc5b35b350240fd465@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, MAJO@bang-olufsen.dk
+Subject: RE: [BlueZ] adapter: Set Audio service class bit for A2DP sink
+In-Reply-To: <ee9afb98a878284f53ec62d5d19a3d34048d3372.camel@bang-olufsen.dk>
+References: <ee9afb98a878284f53ec62d5d19a3d34048d3372.camel@bang-olufsen.dk>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============5248393513686072636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks, I checked the reported path again. And the warning is from a
-cmd_timer already armed before hci_dev_close_sync(). The re-arm path
-is already blocked by HCI_CMD_DRAIN_WORKQUEUE + synchronize_rcu().
-I think cmd_timer still needs to be canceled before drain_workqueue().
-Moving cancel_delayed_work_sync() into hci_cmd_sync_cancel_sync()
-would make hci_cmd_timeout() synchronouslly cancel its own cmd_timer.
-Also, in the reported path req_status has already been reset to 0
-before hci_dev_close_sync() calls hci_cmd_sync_cancel_sync(), so the
-HCI_REQ_PEND casewould not cover this warning.
+This is an automated email and please do not reply to this email.
 
-Thanks,
-Rabindra
+Dear Submitter,
 
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-On Sat, Oct 3, 2026 at 4:52=E2=80=AFPM Rabindra Kumar Meher
-<rabindrameher116@gmail.com> wrote:
->
-> Hi Luiz,
->
-> Thanks, I checked the reported path again. And the warning is from a cmd_=
-timer already armed before hci_dev_close_sync(). The re-arm path is already=
- blocked by HCI_CMD_DRAIN_WORKQUEUE + synchronize_rcu().
-> I think cmd_timer still needs to be canceled before drain_workqueue(). Mo=
-ving cancel_delayed_work_sync() into hci_cmd_sync_cancel_sync() would make =
-hci_cmd_timeout() synchronousllly cancel its own cmd_timer. Also, in the re=
-ported path req_status has already been reset to 0 before hci_dev_close_syn=
-c() calls hci_cmd_sync_cancel_sync() so the HCI_REQ_PEND case would not cov=
-er this warning.
->
-> Thanks,
-> Rabindra
->
-> On Fri, Oct 2, 2026 at 8:02=E2=80=AFPM Luiz Augusto von Dentz <luiz.dentz=
-@gmail.com> wrote:
->>
->> Hi,
->>
->> On Fri, Oct 2, 2026 at 10:29=E2=80=AFAM Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->> >
->> > Hi Rabindra,
->> >
->> > On Fri, Oct 2, 2026 at 12:48=E2=80=AFAM rabindra789 <rabindrameher116@=
-gmail.com> wrote:
->> > >
->> > > cmd_timer can expire while hdev->workqueue is being drained,
->> > > causing hci_cmd_timeout to be queued on a draining workqueue.
->> > >
->> > > Cancel cmd_timer before draining the workqueue.
->> > >
->> > > Reported-by: syzbot+48fc5b35b350240fd465@syzkaller.appspotmail.com
->> > > Closes: https://syzkaller.appspot.com/bug?extid=3D48fc5b35b350240fd4=
-65
->> > > Fixes: 40b87657200c ("Bluetooth: hci_core: Rework hci_dev_do_reset()=
- to use hci_sync functions")
->> > >
->> > > Signed-off-by: rabindra789 <rabindrameher116@gmail.com>
->> > > ---
->> > >  net/bluetooth/hci_sync.c | 2 ++
->> > >  1 file changed, 2 insertions(+)
->> > >
->> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
->> > > index c01c8b58d9e8..e1c28bffdc15 100644
->> > > --- a/net/bluetooth/hci_sync.c
->> > > +++ b/net/bluetooth/hci_sync.c
->> > > @@ -5545,6 +5545,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->> > >          */
->> > >         hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
->> > >         synchronize_rcu();
->> > > +       /* Explicitly cancel works in case scheduled after setting t=
-he flag. */
->> > > +       cancel_delayed_work_sync(&hdev->cmd_timer);
->> >
->> > I'm not following here. If a command is outstanding and times out
->> > while we are draining the queue that should be flagged. Or perhaps the
->> > problem is that hci_cmd_sync_cancel_sync don't actually behave like
->> > hci_cmd_sync_cancel which clears the cmd_timer whenever it cancels the
->> > cmd_sync work:
->> >
->> > static void hci_cmd_sync_cancel_work(struct work_struct *work)
->> > {
->> >         struct hci_dev *hdev =3D container_of(work, struct hci_dev,
->> > cmd_sync_cancel_work);
->> >
->> >         cancel_delayed_work_sync(&hdev->cmd_timer);
->> >         cancel_delayed_work_sync(&hdev->ncmd_timer);
->> >         atomic_set(&hdev->cmd_cnt, 1);
->> >
->> >         wake_up_interruptible(&hdev->req_wait_q);
->> > }
->>
->> Maybe something like the following:
->>
->> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
->> index 1fe11d3ef1aa..87b9f96af057 100644
->> --- a/net/bluetooth/hci_sync.c
->> +++ b/net/bluetooth/hci_sync.c
->> @@ -702,6 +702,12 @@ void hci_cmd_sync_cancel_sync(struct hci_dev
->> *hdev, int err)
->>                 hdev->req_result =3D err < 0 ? -err : err;
->>                 WRITE_ONCE(hdev->req_status, HCI_REQ_CANCELED);
->>
->> +               if (!hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
->> +                       cancel_delayed_work_sync(&hdev->cmd_timer);
->> +                       cancel_delayed_work_sync(&hdev->ncmd_timer);
->> +                       atomic_set(&hdev->cmd_cnt, 1);
->> +               }
->> +
->>                 wake_up_interruptible(&hdev->req_wait_q);
->>         }
->>  }
->>
->> > >         if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
->> > >                 disable_delayed_work(&hdev->power_off);
->> > > --
->> > > 2.43.0
->> > >
->> >
->> >
->> > --
->> > Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
->
->
-> --
-> Rabindra Kumar Meher
+   Series:       [BlueZ] adapter: Set Audio service class bit for A2DP sink
+   Pull Request: https://github.com/bluez/bluez/pull/2548
+   Created:      2026-09-18 14:04:06+00:00
 
+The pull request has been closed and no further action is taken on this
+series.
 
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
---=20
-Rabindra Kumar Meher
+---
+Regards,
+Linux Bluetooth
+
+--===============5248393513686072636==--
