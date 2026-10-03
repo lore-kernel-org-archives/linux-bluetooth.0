@@ -1,121 +1,106 @@
-Received: from mail-pj2-f40.google.com (mail-pj2-f40.google.com [74.125.227.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345EB25B0B7
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Oct 2026 22:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76142282F2A;
+	Sat,  3 Oct 2026 07:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790978843; cv=none; b=YNzpHwL6fHgCTJocKooCtzb8JoTtxMyD+ocLo4HP1gtu8amC9GclCmy4+entRjbqyKDsjepNjI/3OLKMvloHSOKAo/vkZC4jr1ipELY0LJq4Ag3DwPkyw5L/bipzQ31ptjxWNelkG+va0Nit8ZJlX00EfSys5UnrgHFHeVLR4wk=
+	t=1791013398; cv=none; b=ZOgRxfAPxmDNITE9JSye82DMAO1PQaEBWqKgb33UKzgc2V9ygM5ADtbQa4mxsTboIFlC/MqW72GActmRYq+UYOFeQdd/QqVGbL/55RyG0nn6VzqCAIwbKhqwY9CtkMEKl1T66eguqHtWo5fhgiRCxUYkItmNA/RGy5f+4SSqNHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790978843; c=relaxed/simple;
-	bh=L//qiXheCydEx3jQTQauQJf53qp+KfHzqwh6qjLJT70=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=KOwUTINojejXc/ckLXzkY7WHdLIpQmO2WuTBrnOALqvWcJ2aC1cANqK2J3qOlyLrA5+lf6nFPjnSq6IDYkOsbqrUMY7OgY9Ie2axvBw0CeOJg97hrqy9XCvujBWGy275c4q+EXzPHRMGyTf/c8//4yda6oSJGZoRlK6TUhpspPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPHc1b4S; arc=none smtp.client-ip=74.125.227.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791013398; c=relaxed/simple;
+	bh=8hpnAQ5IHvGQlpu8Mc/fUf4qUTHEVGC6KHm2a+KVWUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=thJxCuxrw2ANhjJlZ/SR9NLnm+H+9e6ZGiPlaK3jlYjB0rFU9HwmLNcJbfsmgopHof+nrJEloBFj49kTHsRdV6gAPE03Hn74VsS5gp9Dwx+K3x3eTFYEeSmF9k3SGFwUcXwmBRd/hmNIsH6THCVxRuM8W/1Xy/4mjp89lhJX/XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YzTtxB03; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPHc1b4S"
-Received: by mail-pj2-f40.google.com with SMTP id 98e67ed59e1d1-3a2adb9bc3cso197393a91.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Oct 2026 15:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790978841; x=1791583641; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=nlTWaQ1gfPQ6ygz2DAkKBsCuIPu2VDWnDRdcmIsccKc=;
-        b=NPHc1b4So9VtG07nNgZZSyngKIamWGnJ/uoe+UiT6sdRUOuVZfhdVNKULQFJEtxz4g
-         C6Abmao/5nGg5KUqEb2w/rh9oeLAx2AoHU4hu7uA3c6RUmsBYg2XGGYO0cuT4nF1RJXx
-         Fw9swsUqfnhl0ZVjXB+qLfFJA+llD4Z8ea1ItRgEw2fNsgtdQ0cr4jlvw4xMRVMniPT8
-         l88NkGokoTWMVEGPmy3QZY33q00UGc9UOjVGOxKmMnsfyu/OxxNJzYdh5Q71b0v4Jbqs
-         HA0wCEpuPAvtLw7aA/fchIBz8Nj7qW7u0iVWyMAeU5kmBv2n7dFjqtHgnpXlaxSgvIo+
-         ZSpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790978841; x=1791583641;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=nlTWaQ1gfPQ6ygz2DAkKBsCuIPu2VDWnDRdcmIsccKc=;
-        b=cvtTtf5z3kEuwoubWeKnjqUFoi2ezEx6WZTcwD2o6OAV1I3Fr1wL/s/9lNXzlsR9gq
-         uengrNDZV9SQilA402vz5dIdJISV7sK+XGsd72B4fr9XxL6wppcwZ6hLLkMpvrlCf4D5
-         n3r2qjgl8+4H9AzBZ08PUfDbzZtLtTyOxcEJln9/ZV6BruEdxYiFWaiI2cu/iNqruhOR
-         9gzmFr/MnojxOS9jOWgFzKWk7REsdpgyC4OvQnL/Odz67GeuzVXqcDOwN+uguIIIAN0W
-         J0VFZTdscv2ux500P1wmla2M4HN4H/wpy/TFzEZaNIhzeEE7v4t8lLiU8XOEFmCw/S9W
-         6hNg==
-X-Gm-Message-State: AFq9FYIBk45eEEzCBazc3XJo9tHoyWrqiTATO+XV8qCJpKHdhJ7wSV4k
-	rnOXKPPXgaD2qgteJwBr2+RsliN68Gfh7ffeDYKX4LsoNG197UsSyGxqwaRdEQ==
-X-Gm-Gg: AYBFou1cdXuKievWQMkUqbGg4GfC/BjXRDTBZ8Y74tla6BDCyDI/YTngp9J3C/9KAar
-	IUOTxH35ePQPpYGHkKwJGh1Qob7fmBJ5+JYuMlv8xVFrRELLNgCNTHCRepmj2VeVbXsPTglhQra
-	5PhlNF5vmorOllCbwFh1IVqm4EvARyXP/q6QZDFqMIinkS6r01hnfM1STQnE6BiLF1jqR49Hckx
-	fsJ97auFoRpH0MJ0EH4/fJDdLjjX98dzpQqBtkM+NhZFoDlN7L/dW/GK0nQppKEls0C4XsEbnLU
-	IUd99/D86j4O0E4ke97nmI/MBMy6g/dC3u/P29yXk0BGyssyZmGwTOXeXQImyIfRe9rs0TLulro
-	+W4UTEumtzQPvF210Zh6jk34OU26un/xrL1uniG5rpQfnOljbI3WdmXp0JtQ/2a9EJqKO+ZU0UE
-	kIYcdOTXX5wpSljBvvNCeF0IH9soBFK+MocWJvzUc190wzIa1dZuZQ/cuhTBKZVH/ocaGCVjyz4
-	+NsJfc=
-X-Received: by 2002:a17:90b:1a90:b0:3a0:aa50:48bb with SMTP id 98e67ed59e1d1-3a6ce79881bmr1780475a91.29.1790978841214;
-        Fri, 02 Oct 2026 15:07:21 -0700 (PDT)
-Received: from [172.17.0.2] ([20.29.206.229])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a78e4cd01asm199788a91.14.2026.10.02.15.07.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Oct 2026 15:07:20 -0700 (PDT)
-Message-ID: <6ac02b18.713ba3bd.c1377.b124@mx.google.com>
-Date: Fri, 02 Oct 2026 15:07:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3719423893693654193=="
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YzTtxB03"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C2561F0089B;
+	Sat,  3 Oct 2026 07:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1791013397;
+	bh=SF9K5Mghlg3GQOMOGKxFY3Re01imsf1abm6svs0RQ18=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YzTtxB03K+V+wsqeJ49G/xScy02Bioov3KJItO0rFb43XVyYiqSV8n5tvRXisv0Ue
+	 AH6yQuywcwkbT2tWcybdN0Ch2GA2hHFPkAQwNReDuiKeFGFQlPwvozknogZur73w5y
+	 PhsUEfWlYjutIpirKlBrcZc0XWui5/QAESbaGFZg=
+Date: Sat, 3 Oct 2026 09:43:13 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Radek Podgorny <radek@podgorny.cz>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: 7.2.y took the on-air address fix without its companion
+Message-ID: <2026100356-magnitude-esquire-89fc@gregkh>
+References: <179097754519.501890.1801734138080126989@podgorny.cz>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
-Subject: RE: [BlueZ] monitor: Fix legacy SCAN_RSP PDU type names
-In-Reply-To: <20261002200025.4418-1-kevin@simpleble.org>
-References: <20261002200025.4418-1-kevin@simpleble.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <179097754519.501890.1801734138080126989@podgorny.cz>
 
---===============3719423893693654193==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Oct 02, 2026 at 11:45:45PM +0200, Radek Podgorny wrote:
+> Hi Luiz, Marcel,
+> 
+> 7.2.8 picked up, via AUTOSEL,
+> 
+>   a552b4bc058b Bluetooth: put the peer's on-air address on air when we
+>                cannot resolve        (mainline 4914c4998961)
+> 
+> but not the patch that was sent and merged immediately before it:
+> 
+>   14b015afb556 Bluetooth: forget a peer's RPA once it advertises its
+>                identity address      (bluetooth-next only)
 
-This is automated email and please do not reply to this email!
+There is no such commit id in Linus's tree :(
 
-Dear submitter,
+> They went out as a two-patch series because the second one depends on
+> the first, and the commit message now in 7.2.8 says so itself:
+> 
+>   Without that, a peer that turns privacy off would be dialled on the
+>   address it abandoned rather than the one it is answering on.
+> 
+> That is the situation in 7.2.y now, and it is a regression against
+> 7.2.6:
+> 
+>  - hci_connect_le() substitutes the cached irk->rpa for the identity
+>    address whenever the IRK has one.
+>  - __hci_conn_add() in 7.2.8 keeps that RPA when LL Privacy resolution
+>    is off or the peer is not in the resolving list, which is the change
+>    a552b4bc058b makes.
+>  - Nothing in 7.2.8 ever clears irk->rpa. The only writes to it install
+>    a newer RPA, in hci_find_irk_by_rpa() and hci_add_irk().
+> 
+> So a bonded peer that stops using RPAs and advertises its identity
+> address is dialled forever on an address it no longer answers on. In
+> 7.2.6 __hci_conn_add() converted the address unconditionally, so the
+> same peer was dialled on its identity and the connection succeeded.
+> 
+> 14b015afb556 is the invalidation that closes this: it clears irk->rpa
+> in process_adv_report() once the peer is seen advertising its identity
+> address. Nine added lines in one file.
+> 
+> Could it go to mainline as a fix during the 7.3 cycle rather than
+> waiting for the 7.4 merge window? Once it is upstream it reaches 7.2.y
+> by the normal route. I deliberately left a Fixes: tag off it when it
+> was posted, so as not to invite a backport while __hci_conn_add() was
+> still masking the stale address -- that reasoning does not hold any
+> more now that a552b4bc058b is in a released stable kernel. I am glad to
+> repost it with Cc: stable@vger.kernel.org if you would rather have it
+> that way.
+> 
+> For the stable team: if holding it is not workable, reverting
+> a552b4bc058b from 7.2.y restores the 7.2.6 behaviour, at the cost of
+> re-exposing the bug that patch fixes. Only 7.2.y is affected; 6.18.54,
+> 6.12.111 and 6.6.157 carry neither patch.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1178588/
+I'll wait for this to hit Linus's tree before pulling it into the stable
+releases.  Please let us know when that happens.
 
----Test result---
+thanks,
 
-Test Summary:
-CheckPatch                    PASS      0.29 seconds
-GitLint                       PASS      0.22 seconds
-BuildEll                      PASS      19.97 seconds
-BluezMake                     PASS      400.93 seconds
-MakeCheck                     PASS      0.83 seconds
-MakeDistcheck                 PASS      143.06 seconds
-CheckValgrind                 PASS      148.04 seconds
-CheckSmatch                   WARNING   292.34 seconds
-bluezmakeextell               PASS      93.70 seconds
-TestFunctional                PASS      1158.36 seconds
-IncrementalBuild              PASS      404.38 seconds
-ScanBuild                     PASS      1157.22 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2289:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3924:52: warning: array of flexible structuresmonitor/bt.h:3912:40: warning: array of flexible structures
-
-
-https://github.com/bluez/bluez/pull/2624
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3719423893693654193==--
+greg k-h
