@@ -1,72 +1,71 @@
-Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
+Received: from mail-dl2-f43.google.com (mail-dl2-f43.google.com [74.125.229.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E0036998A
-	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2026 16:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D5536998A
+	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2026 16:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791131164; cv=none; b=f6XqFBNi+7CwlhdovOuVg3f7xHRNGAX3Zj4JkTkAn8UZHfUPiJqPs7kCT/+HPTL5TVLeoeKjEjoN4VA1JaPg2Fgi8tx/Mg9e/b4gQoQPLf6A5S3UEehDVtkyvsKuArdNMPXlv57iee/uTEbj1zUmzgCVEYuBSR+Jl6n8iWRnoO8=
+	t=1791131182; cv=none; b=lEOL5exynVSkgCWk/aTFyY5AeKqQqFaXAiKDVpeZhqY+V8K4EVO/UqX4ZOLJzyYP9x00eRlUy9Ok5eqg3/YjyyVKQVrX+maFkaBBi+w490rTR7NNGda+wijoIhP+cvgIpkClRG5Mua9ltEVeIxGV8G1DkKxWfVQLBicWzDJc76g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791131164; c=relaxed/simple;
-	bh=amK8ElqSX7xxn1c3t7Pk4XyCHGO72+Mj5UglIjSJuJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i6aRzP/aRVDH4RTVGVQnmjNvnRm+mpvOZvjNl4wNptdHAKislXKdW+qjXSrll0GxGPn4nSL95L/6PurTx+n4N99tolZiJAwTUHjZwq6tURH5tTm7PhirvsRm39esR3wTTWrGSvoJZJsqw4l1TLHelxGfsRgXycZsCUXtf+gdIRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O8FG3ZPe; arc=none smtp.client-ip=74.125.229.42
+	s=arc-20240116; t=1791131182; c=relaxed/simple;
+	bh=Rj63DgR20oiwFDDc12/4Ve6f46BYY+nTaOfWOvX5CNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eEPX02UpeUGkuQrDC+bKpPAgjOPh3FlNgXAKjMZrOWT4puS2IRYDUMiVFCa/ItfHf9ARyxCjAqJZm0S0HbDloFz8QSkIi9SC8+9bhsGJBZe2ufQLXsBlKWuMPpIlMAOZHNmgEW92Qt2KfPFbuwyce57fBtoiVcUloPY4Whb6HTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qvk0aRfI; arc=none smtp.client-ip=74.125.229.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8FG3ZPe"
-Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-3511990f211so48711eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2026 09:26:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qvk0aRfI"
+Received: by mail-dl2-f43.google.com with SMTP id a92af1059eb24-144fa6e60bcso36919c88.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2026 09:26:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791131163; x=1791735963; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791131178; x=1791735978; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jZ1eJoTadH6bv11VGShYOIfVRmew2zzu4O74pMeyNJs=;
-        b=O8FG3ZPef9jFyyxb6yzCGWm3oJKDaAmbrSZo7WpLSOz0hVZRI4JFAE/3AGzw9lzy3D
-         bREy/c48I0iOEQAu+RUHKEvT0ibRBziQW822LI6R2rJ4/0Jx7ebPDO7VM7fwD8+KC57j
-         p4x9V8zQN52SGuKyVGnBaaya9yKx2M8ib4c+8LFypciDRsJaf5UG5kva8+g3pkt3n8xO
-         Iwa5KsjHcg6gk/iJZD0GC4qXF+nGB83i7Ye8qLOkJ3mbYDEnV2iSuZu2brfPYOS8YpwQ
-         l+tGpBr2owT+mHWlhS6PssJVMk88YevVp+/JQYOjtRflGdqCcd9vOj7qn4UX4hY9qOqW
-         +FJA==
+        bh=yikDAY6J+GlEGObfqqnaCvM3+Krl2SbWGorcnJKWLX8=;
+        b=Qvk0aRfI4PS08pt2e3It3JwW7TiU0iMUNWzS377Mu/KEYZV9SMV4l71WT/RgjPR1pQ
+         cp7ubkA4aUGQoZbK2ZaKqjVIzLXkEaao0NpxuoViDazWZUCms/r2y6+jYMsS+/rMdEgS
+         WXs6Umj0r8GsAjWETon/uol3URFCG/q/HYNhESfkxZ6Am/GW+ZLp8nmT5UvhQUfWbO4j
+         XuTdgKrNmdmG1kMWLasUtS83TtdHI5IKJKeIcVAxPlITmyDdJvqxAOKf9shQVty7skdq
+         ixak08g3IwEHpRX6iZb9Juzjz2XEipv23z9G9RsrRM3zzACu3TtqoIhef8oNVb+ZNOpQ
+         I/aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791131163; x=1791735963;
+        d=1e100.net; s=20260707; t=1791131178; x=1791735978;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=jZ1eJoTadH6bv11VGShYOIfVRmew2zzu4O74pMeyNJs=;
-        b=wRU8zIVsNqDsCH8yfRu1WONt4iU51vD4AVSMvLulrSJkCxEUNEHD4VxN80fh/isPNb
-         5MO6WtON+v+7R4d2K+ZxNHpg9cXqkI5YkzdT19JNs96U/V/F4FAPsk0wsP6N1+7rJcly
-         o7v8ar86NQmUKc5HmuIcHsODPTI21Q9wSzioaH0TiUMx1ZdVygCwgdt966ahVUYhXyeG
-         JhyerHrkqiFg7bfzSqra387pY5+fEGcewnG6j8cvfjYuRzWWC8bH+cFW38PGUeT8ZuBM
-         zG+pVzTobfStYhD85a1RILJeYncG8HiGE8ZFMcNQlHujgbPnoB0vixGVYoFtdiuPPS5f
-         rsvw==
-X-Gm-Message-State: AFq9FYKrdomI//tlsDfg+KA31twdvUBinPZlf4LtkzBhgPnfPOdtnimN
-	WiZzVQjfUYCy3NrIXPBjKdzOIKyyFDc+3XrGrOuVqVzywDZpCWWmKT754txWEQ==
-X-Gm-Gg: AYBFou0J0D06Khi56vJ5atXrSigqnTPjzMpSZbAnVlyiQAS7YyKGMadUOvZbf7mYXu4
-	O49vuIc9jaSB/Mtaa8fUhQ2VVYEtqh/wXDLG1epqHRkJhhDeFKatBaZsZpiFhGEhvgYC64U0i5f
-	1OwwoHTjnYrlLpJjKcxGFVX1y++aaJS/tHLKNdgF4Id4ufJP4X17zFPozQvb0ay8p8VhutJLKoU
-	1azg2sg/JFZzzxdAN4d1kN4VlcBTAA7z7KC8NJ2ql2uEKnQIfqUwfkz2QJ+dkoPDLRh9HStRd9G
-	8qic3H5jKZtNxCqfxBjX5n+DA97UWtO5qesua14JVcvJ/AGqxtGrtrMfcQn5Et2lzd2Lhxkar9n
-	orjby59KfroUMf6Pzo/nGgZPkieSvUB3GnQ3U8zuIyUkrwo5x1K3sYnM06qx5MLGLo/6pB6Epn3
-	lVEDkDIi6+AuALAfP/oDZSpqFvXOmtTNb02fW3ZVqyDAwK2PUBCZOM9Ozv1ks8lJt3Pyh3WhG31
-	cDel40rNcUCpmcR8sjS2AiCxaok/P1O+zMM+kWtGhB//eTVFa+VqvjeyEB0p0HeGNfzYg==
-X-Received: by 2002:a05:7300:24c9:b0:343:fdea:9a0 with SMTP id 5a478bee46e88-34f15028c8fmr17583068eec.2.1791131162529;
-        Sun, 04 Oct 2026 09:26:02 -0700 (PDT)
+        bh=yikDAY6J+GlEGObfqqnaCvM3+Krl2SbWGorcnJKWLX8=;
+        b=AQ5oAby/XylfKsvePQ0Jc3tijFbDW+XJXTDMVcrQN807vroELrDh4Ecc1N+eWhb3n7
+         OQy4Gos3Py3Xa25rir9AS8ghk4SWN9eK1nkdpZ6WcAa9hXSO/nAOTA8mPHw5aLUVm9cB
+         LzX9P0CcC4KPzS8d3Gm//zUY9xnxbGkFkf3vI/XR+M7Zq13kCqwAceHaIRWT904gob/H
+         aCXVKmv4uc0ti6ydAiELujpG4ayIT2jBpB85N5lBeYVDqbVgF+og2QqVkkcI+MX6obw8
+         GPNXdZxRy96vBACWfpsI0n+SOhldSpHoY7CaKThoS+i19kvd6O+w2YaNeCryKimBB6Km
+         DBNg==
+X-Gm-Message-State: AFuF++knBbQJFmM1CZmbUEtW2qFUmuZeUdUk8hktFPzZ2YQVNMiiCsrV
+	33IfwE/cmVhFF4k/o0mn+zXhBtLLc3Oc7P44c1dBQrdDuSCDe0cjpq2U
+X-Gm-Gg: AYBFou0hZ0D00FmnzONf2GavYvONlphojTJh/nNQxGg6g/QfntEFiJs20etSKrVHXGG
+	24Y4Nhvz45ttZZBenR3f8tYiE5O2FGVfZW+1N5IuEifwv6ijolNC0PR7x/THI2jmT/GSySJdlW8
+	jNtUFrhlRnloKjhAKclyq9iAfv0IWRpHIiEbwdmm5OQHv5VCWyV2/c38QhiZ4v4VFuvTu7+V9vK
+	1az2LGwouGoi/hECcnjMhArMGG1c73Ss+32meJ3sAj6Vso/FZXfEHjoCVYZvUI+OH4hrrLq33Kp
+	FbZD9sUKBla5IdYgKjt4pWD6t1eICRmwdJ2aKLlH3fq6TA1GEh0DjBG6ceUUTItwjrsjJicjgcr
+	bI6F34QLDkxnFQWHxoUYsKnkYBXW4lDW9VCC4lkBX93J3vraTFtmwYCWGpSwvTsGTwuGgTI9MBT
+	1sb57fFKK7+s/80V1y1P0SSWvY+NKRf4w7HZMGVpcwNp8+af1L78QC1ef1Z089hDYpB0efvmvgA
+	979upmjpt38F319RUk3mxM6tHujFzxGJbNQFurVF5RhQFCpfuc5enySax9nsgKg3LNMAw==
+X-Received: by 2002:a05:7022:b047:20b0:14b:edb2:c3bc with SMTP id a92af1059eb24-14f5625d203mr17992869c88.0.1791131177596;
+        Sun, 04 Oct 2026 09:26:17 -0700 (PDT)
 Received: from localhost.localdomain (95.169.12.199.16clouds.com. [95.169.12.199])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351272ceb02sm11517960eec.25.2026.10.04.09.26.00
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-151fcec9f1dsm15511885c88.16.2026.10.04.09.26.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 09:26:02 -0700 (PDT)
+        Sun, 04 Oct 2026 09:26:17 -0700 (PDT)
 From: Chengfeng Ye <nicoyip.dev@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Chengfeng Ye <nicoyip.dev@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: Reject concurrent BIS listener setup
-Date: Mon,  5 Oct 2026 00:25:48 +0800
-Message-ID: <20261004162548.3968712-1-nicoyip.dev@gmail.com>
+Subject: [PATCH] Bluetooth: hci_sync: Fix command skb lifetime during scan setup
+Date: Mon,  5 Oct 2026 00:26:12 +0800
+Message-ID: <20261004162612.3968831-1-nicoyip.dev@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -76,72 +75,119 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_sock_listen() drops the socket lock before calling iso_listen_bis()
-to preserve the hdev->lock ordering. Two concurrent listen() calls on
-the same broadcast socket can therefore both observe BT_BOUND. Caller
-A can attach connA and release the locks, then caller B can acquire
-them and attach connB before A publishes BT_LISTEN.
+During PA sync scan setup, hci_le_set_ext_scan_param_sync() gets the
+address used for the PA_LINK lookup from hci_sent_cmd_data(). The
+returned pointer borrows storage from sent_cmd or req_skb, without
+holding a reference to either skb.
 
-__iso_chan_add() checks whether connB already has a socket, but not
-whether the socket already has a connection. The second attachment
-overwrites iso_pi(sk)->conn, leaking the connA reference and leaving
-connA->sk intact. Socket teardown follows connB, so later events on
-connA can cause a stale socket access.
+The scan worker runs on req_workqueue while hci_cmd_work() runs on the
+separate device workqueue. After the scan worker loads sent_cmd, the
+command worker can free and replace it before hci_sent_cmd_data()
+dereferences the skb. The command payload can also be freed between
+returning from the helper and comparing the address. The connection
+lookup's RCU critical section does not protect the command skb.
 
-Recheck BT_BOUND and require iso_pi(sk)->conn to be NULL after taking
-both the HCI device and socket locks in iso_listen_bis(). The connection
-check also covers the interval between attachment and publication of
-BT_LISTEN. Reject a competing setup with -EBADFD through the existing
-unlock path before allocating another connection.
+KASAN reported:
 
-A recorded KASAN report from an instrumented kernel shows:
-
-  BUG: KASAN: slab-use-after-free in iso_sock_hold+0x119/0x1f0
+  BUG: KASAN: slab-use-after-free in hci_sent_cmd_data+0x27c/0x2f0
+  Workqueue: hci0 hci_cmd_sync_work
   Call Trace:
-   iso_sock_hold+0x119/0x1f0
-   iso_conn_del+0xe4/0x270
-   hci_disconn_complete_evt+0x351/0x8c0
-   hci_event_packet+0x71b/0xb20
-   hci_rx_work+0x293/0x730
+   hci_sent_cmd_data+0x27c/0x2f0
+   hci_le_set_scan_param_sync+0x43a/0x850
+   hci_passive_scan_sync+0xb09/0x1460
+   hci_update_passive_scan_sync+0x47c/0x6e0
+   hci_le_pa_create_sync+0x200/0xa70
+   hci_cmd_sync_work+0x13c/0x290
 
-  Allocated by task 93:
-   sk_prot_alloc+0x113/0x220
-   sk_alloc+0x2b/0x6d0
-   bt_sock_alloc+0x29/0x370
-   iso_sock_alloc.constprop.0+0x19/0x300
-   iso_sock_create+0x94/0x100
+  Allocated by task 95:
+   skb_clone+0x13f/0x340
+   hci_cmd_work+0x2a9/0x7e0
 
-  Freed by task 93:
-   kfree+0x121/0x3c0
-   __sk_destruct+0x42b/0x540
-   iso_sock_release+0x29d/0x340
-   __sock_release+0xa1/0x260
-   sock_close+0x10/0x20
+  Freed by task 95:
+   kmem_cache_free+0xba/0x3a0
+   hci_cmd_work+0x29c/0x7e0
 
-Fixes: 168e28305b87 ("Bluetooth: iso: Fix circular lock in iso_listen_bis")
+Use hdev->lock to serialize the address snapshot with sent_cmd
+replacement. Protect req_skb replacement and completion cleanup with
+the same lock because the helper falls back to that skb. Copy the
+address before releasing the lock and use the copy for the existing
+RCU-protected connection lookup. Release the mutex before sending or
+waiting for commands, preserving the lookup and completion ordering.
+
+Fixes: 22cbf4f84c00 ("Bluetooth: hci_sync: Use QoS to determine which PHY to scan")
 Cc: stable@vger.kernel.org
 Assisted-by: GPT-6 Astra
 Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
 ---
- net/bluetooth/iso.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/hci_core.c |  4 ++++
+ net/bluetooth/hci_sync.c | 10 +++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7657c2a0abbf..2e70c0df9ef3 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1340,6 +1340,11 @@ static int iso_listen_bis(struct sock *sk)
- 	hci_dev_lock(hdev);
- 	lock_sock(sk);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2076689eb302..74d9865e08c2 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4115,9 +4115,11 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
  
-+	if (sk->sk_state != BT_BOUND || iso_pi(sk)->conn) {
-+		err = -EBADFD;
-+		goto unlock;
-+	}
+ 	bt_dev_dbg(hdev, "skb %p", skb);
+ 
++	hci_dev_lock(hdev);
+ 	kfree_skb(hdev->sent_cmd);
+ 
+ 	hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
++	hci_dev_unlock(hdev);
+ 	if (!hdev->sent_cmd) {
+ 		skb_queue_head(&hdev->cmd_q, skb);
+ 		queue_work(hdev->workqueue, &hdev->cmd_work);
+@@ -4138,8 +4140,10 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
+ 	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
++		hci_dev_lock(hdev);
+ 		kfree_skb(hdev->req_skb);
+ 		hdev->req_skb = skb_get(hdev->sent_cmd);
++		hci_dev_unlock(hdev);
+ 	}
+ 
+ 	return err;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c01c8b58d9e8..a92a81846e9d 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -32,8 +32,10 @@ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ 	WRITE_ONCE(hdev->req_status, HCI_REQ_DONE);
+ 
+ 	/* Free the request command so it is not used as response */
++	hci_dev_lock(hdev);
+ 	kfree_skb(hdev->req_skb);
+ 	hdev->req_skb = NULL;
++	hci_dev_unlock(hdev);
+ 
+ 	if (skb) {
+ 		struct sock *sk = hci_skb_sk(skb);
+@@ -3064,15 +3066,21 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
+ 		struct hci_cp_le_add_to_accept_list *sent;
++		bdaddr_t bdaddr;
+ 
++		hci_dev_lock(hdev);
+ 		sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_ACCEPT_LIST);
++		if (sent)
++			bacpy(&bdaddr, &sent->bdaddr);
++		hci_dev_unlock(hdev);
 +
- 	/* Fail if user set invalid QoS */
- 	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
- 		iso_pi(sk)->qos = default_qos;
+ 		if (sent) {
+ 			struct hci_conn *conn;
+ 
+ 			rcu_read_lock();
+ 
+ 			conn = hci_conn_hash_lookup_ba(hdev, PA_LINK,
+-						       &sent->bdaddr);
++						       &bdaddr);
+ 			if (conn) {
+ 				struct bt_iso_qos *qos = &conn->iso_qos;
+ 
 -- 
 2.43.0
 
