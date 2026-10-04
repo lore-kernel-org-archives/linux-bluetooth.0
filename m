@@ -1,71 +1,72 @@
-Received: from mail-dl2-f43.google.com (mail-dl2-f43.google.com [74.125.229.171])
+Received: from mail-dy2-f42.google.com (mail-dy2-f42.google.com [74.125.229.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411C63C1D42
-	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2026 16:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E0036998A
+	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2026 16:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791131107; cv=none; b=O3r5NEd2JMPAyHOOUic4qogY7kyko3mWkK+5sTcgfpCxHG+glvCcK5GUzLI85N6R1e56r7y8X9mjN4LdnHMRYy7eoWuxJx3Kl46B5YBhH//k3e/9n2iZ5U2mKDv1A72WoE+iSzCgwQqBj49V+KMQhOIOQFrwunK6fPBkXtmQPBE=
+	t=1791131164; cv=none; b=f6XqFBNi+7CwlhdovOuVg3f7xHRNGAX3Zj4JkTkAn8UZHfUPiJqPs7kCT/+HPTL5TVLeoeKjEjoN4VA1JaPg2Fgi8tx/Mg9e/b4gQoQPLf6A5S3UEehDVtkyvsKuArdNMPXlv57iee/uTEbj1zUmzgCVEYuBSR+Jl6n8iWRnoO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791131107; c=relaxed/simple;
-	bh=amhdPcPVOEFGlnnPFkrNr+qt4Al5SBeKg0Q5MTjsFPI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oou0thvk+ZuYEgI0gongN34D/W6exlL18M/XzOC+3tpmr0GbaSmsvXdSXOwYQYeW0oG3EcQuZfZ52gKfMAI9dUhrqPo5aQEDvydHWc3nb8nuE3EcxuAJ+iZ5WyAsaJtGtiUMlEfelhMpxvD09PTu+tp7kbOMJDmrn9lg7jLThlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qww9ZAsA; arc=none smtp.client-ip=74.125.229.171
+	s=arc-20240116; t=1791131164; c=relaxed/simple;
+	bh=amK8ElqSX7xxn1c3t7Pk4XyCHGO72+Mj5UglIjSJuJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i6aRzP/aRVDH4RTVGVQnmjNvnRm+mpvOZvjNl4wNptdHAKislXKdW+qjXSrll0GxGPn4nSL95L/6PurTx+n4N99tolZiJAwTUHjZwq6tURH5tTm7PhirvsRm39esR3wTTWrGSvoJZJsqw4l1TLHelxGfsRgXycZsCUXtf+gdIRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O8FG3ZPe; arc=none smtp.client-ip=74.125.229.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qww9ZAsA"
-Received: by mail-dl2-f43.google.com with SMTP id a92af1059eb24-144fa6e60bcso36903c88.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2026 09:25:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8FG3ZPe"
+Received: by mail-dy2-f42.google.com with SMTP id 5a478bee46e88-3511990f211so48711eec.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2026 09:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791131104; x=1791735904; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791131163; x=1791735963; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=1DqokxhodHH+LTo4EGPMt3+JXECLQQIzLpVVw3j5Xi8=;
-        b=Qww9ZAsAjDXbB81tv8XsmBmoDH7NxWsRQUiEcxzIKbgId+PniAqpEESp4oUNohNIx2
-         OejCFoNal557NabtEO+G5/SZNj774ALh7yp8dQYivhAqIRDmEpsUQ57wU05Q/7GRH6sl
-         d9lAhCN149rflPjgZi5EqaBQl5WBpwvh8vOkeukfY5rPnipSh3kKeIhiHpAO+dEiJHzI
-         UIpq9DjRsmkaQDeSScrrBh2qTySAPi34BbK+c02ZwyrKd+DZGOmEwbkZM5p/C91nCCUb
-         GAeXw9yBsY8DzGeXtVD8t2Syz+lySRSzwTx0VxL51G8+UjQ00YGCr/FsV2xA+SBx7lo/
-         74rg==
+        bh=jZ1eJoTadH6bv11VGShYOIfVRmew2zzu4O74pMeyNJs=;
+        b=O8FG3ZPef9jFyyxb6yzCGWm3oJKDaAmbrSZo7WpLSOz0hVZRI4JFAE/3AGzw9lzy3D
+         bREy/c48I0iOEQAu+RUHKEvT0ibRBziQW822LI6R2rJ4/0Jx7ebPDO7VM7fwD8+KC57j
+         p4x9V8zQN52SGuKyVGnBaaya9yKx2M8ib4c+8LFypciDRsJaf5UG5kva8+g3pkt3n8xO
+         Iwa5KsjHcg6gk/iJZD0GC4qXF+nGB83i7Ye8qLOkJ3mbYDEnV2iSuZu2brfPYOS8YpwQ
+         l+tGpBr2owT+mHWlhS6PssJVMk88YevVp+/JQYOjtRflGdqCcd9vOj7qn4UX4hY9qOqW
+         +FJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791131104; x=1791735904;
+        d=1e100.net; s=20260707; t=1791131163; x=1791735963;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=1DqokxhodHH+LTo4EGPMt3+JXECLQQIzLpVVw3j5Xi8=;
-        b=urzBXMtAttXWpU+lBDsSX6d/YdcQFsuW22SCO/H78MyDCvkGkSeChes8uNkQjdATJg
-         R8Bx2XAx02w9yYI4htdCKxmdRMkj8Xl29DQoovJyWKEgOijOFky4YVxIZIzndjvbQ2em
-         WwxdrVpDYvwlF5QNs0Z5oupUnwG0OsAluO23D1NeqcD1VavbAvOTjwsEhepHkkJZ8r4H
-         U3BI+ciVz2BAEOYPc/MVvBrWlYW6kX4EXbYeNlzexqXY2LHAfEQ94jqoM49qtuwnpjA0
-         T8CS65b5O5OmklfPZsNCtir+r8LBxHzFcN02WhaTz1l2p+7k8ZSURUJEU5QtFRDc+JDt
-         IkGA==
-X-Gm-Message-State: AFuF++mBuPNof+pws8LQCuhK6oPrFCmZtFiYlUNUU8vT69yD0HoTN50v
-	9NQEtLO2o3yfVnRHsFaQOVAw7qh9ieu6xjCtt9IPM/RZUHhFtK+l0v1K
-X-Gm-Gg: AYBFou1R/aELFglqsAdCBB5sQ8w3ZRAKOVngBWr9uC0QlFkC9C8Bto/J6xH8b8Ew0Dc
-	ZhbTdrl+ZEfo82mSTA2jugzASM6hAjp91RNyOvtrmHkSjphcUcRHWKwVExioL5qDwP9xPCVebpw
-	yjaqymNm/Rr7VCtoTnvjEASkJAbbn72vId2sIdrAk5VETsLMdaJy8JEZydReSy8m4RrOV27Uk7a
-	22/EBPAtsGMicbMmk7Nrh9xFJyBRFmeZzVjQwaY+vag6Fw1zpkozzFMaGVMuSNp2NgGBOiOXJv9
-	v418vrjsR3RP+QWnZqKH/kpWybvGtPXnoqros4nYX/8gdt+01pW4GbxMgi1cteSPPddfvj7rtvd
-	pWf8bzwzmi8ghFkctovGuZ9zM6eve2Gk74M7u2IPapKUAIRtp91UFC0BJosV7I2+09n1E3Fkm8f
-	xx4BBAbL/ywCJLf8r/hbaYxKwMFMmyQZieOEo5ce0tXxR6bGaJqBOOzcuW0ASE34D+fp61uvlZ4
-	qVfijZ+GuEgKKi29h0/Vne4se3ShLJX0uktQZCrL69lVn+yig+QndyAvuprCInNNEsbUQ==
-X-Received: by 2002:a05:701b:424d:20b0:146:ffa9:2117 with SMTP id a92af1059eb24-14f5aa4188fmr17146860c88.1.1791131103773;
-        Sun, 04 Oct 2026 09:25:03 -0700 (PDT)
+        bh=jZ1eJoTadH6bv11VGShYOIfVRmew2zzu4O74pMeyNJs=;
+        b=wRU8zIVsNqDsCH8yfRu1WONt4iU51vD4AVSMvLulrSJkCxEUNEHD4VxN80fh/isPNb
+         5MO6WtON+v+7R4d2K+ZxNHpg9cXqkI5YkzdT19JNs96U/V/F4FAPsk0wsP6N1+7rJcly
+         o7v8ar86NQmUKc5HmuIcHsODPTI21Q9wSzioaH0TiUMx1ZdVygCwgdt966ahVUYhXyeG
+         JhyerHrkqiFg7bfzSqra387pY5+fEGcewnG6j8cvfjYuRzWWC8bH+cFW38PGUeT8ZuBM
+         zG+pVzTobfStYhD85a1RILJeYncG8HiGE8ZFMcNQlHujgbPnoB0vixGVYoFtdiuPPS5f
+         rsvw==
+X-Gm-Message-State: AFq9FYKrdomI//tlsDfg+KA31twdvUBinPZlf4LtkzBhgPnfPOdtnimN
+	WiZzVQjfUYCy3NrIXPBjKdzOIKyyFDc+3XrGrOuVqVzywDZpCWWmKT754txWEQ==
+X-Gm-Gg: AYBFou0J0D06Khi56vJ5atXrSigqnTPjzMpSZbAnVlyiQAS7YyKGMadUOvZbf7mYXu4
+	O49vuIc9jaSB/Mtaa8fUhQ2VVYEtqh/wXDLG1epqHRkJhhDeFKatBaZsZpiFhGEhvgYC64U0i5f
+	1OwwoHTjnYrlLpJjKcxGFVX1y++aaJS/tHLKNdgF4Id4ufJP4X17zFPozQvb0ay8p8VhutJLKoU
+	1azg2sg/JFZzzxdAN4d1kN4VlcBTAA7z7KC8NJ2ql2uEKnQIfqUwfkz2QJ+dkoPDLRh9HStRd9G
+	8qic3H5jKZtNxCqfxBjX5n+DA97UWtO5qesua14JVcvJ/AGqxtGrtrMfcQn5Et2lzd2Lhxkar9n
+	orjby59KfroUMf6Pzo/nGgZPkieSvUB3GnQ3U8zuIyUkrwo5x1K3sYnM06qx5MLGLo/6pB6Epn3
+	lVEDkDIi6+AuALAfP/oDZSpqFvXOmtTNb02fW3ZVqyDAwK2PUBCZOM9Ozv1ks8lJt3Pyh3WhG31
+	cDel40rNcUCpmcR8sjS2AiCxaok/P1O+zMM+kWtGhB//eTVFa+VqvjeyEB0p0HeGNfzYg==
+X-Received: by 2002:a05:7300:24c9:b0:343:fdea:9a0 with SMTP id 5a478bee46e88-34f15028c8fmr17583068eec.2.1791131162529;
+        Sun, 04 Oct 2026 09:26:02 -0700 (PDT)
 Received: from localhost.localdomain (95.169.12.199.16clouds.com. [95.169.12.199])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-151fc872e43sm14904474c88.7.2026.10.04.09.25.01
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351272ceb02sm11517960eec.25.2026.10.04.09.26.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 09:25:03 -0700 (PDT)
+        Sun, 04 Oct 2026 09:26:02 -0700 (PDT)
 From: Chengfeng Ye <nicoyip.dev@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Chengfeng Ye <nicoyip.dev@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: Serialize concurrent connect calls
-Date: Mon,  5 Oct 2026 00:24:58 +0800
-Message-ID: <20261004162458.3968546-1-nicoyip.dev@gmail.com>
+Subject: [PATCH] Bluetooth: ISO: Reject concurrent BIS listener setup
+Date: Mon,  5 Oct 2026 00:25:48 +0800
+Message-ID: <20261004162548.3968712-1-nicoyip.dev@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -75,132 +76,72 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_sock_connect() checks the socket state before taking the socket lock
-and drops the lock again before setting up a connection. Two callers can
-both pass the admission check while the socket is open or bound.
+iso_sock_listen() drops the socket lock before calling iso_listen_bis()
+to preserve the hdev->lock ordering. Two concurrent listen() calls on
+the same broadcast socket can therefore both observe BT_BOUND. Caller
+A can attach connA and release the locks, then caller B can acquire
+them and attach connB before A publishes BT_LISTEN.
 
-Caller A can copy its destination for route selection, then caller B can
-replace the socket destination before A binds or connects the CIS. A
-then uses B's destination with the route selected for its own request.
-B can also proceed after A attaches a connection and sets BT_CONNECT.
-For deferred BIS setup, B can bind a second BIS and overwrite
-iso_pi(sk)->conn, leaving the first connection's reference and conn->sk
-back-pointer stranded. Concurrent CIS connects can likewise replace the
-socket's connection. Later teardown only detaches the current connection,
-so a callback on the old connection can race with socket release and
-access a freed socket.
+__iso_chan_add() checks whether connB already has a socket, but not
+whether the socket already has a connection. The second attachment
+overwrites iso_pi(sk)->conn, leaking the connA reference and leaving
+connA->sk intact. Socket teardown follows connB, so later events on
+connA can cause a stale socket access.
 
-KASAN reported:
+Recheck BT_BOUND and require iso_pi(sk)->conn to be NULL after taking
+both the HCI device and socket locks in iso_listen_bis(). The connection
+check also covers the interval between attachment and publication of
+BT_LISTEN. Reject a competing setup with -EBADFD through the existing
+unlock path before allocating another connection.
 
-  BUG: KASAN: slab-use-after-free in iso_sock_hold+0xf7/0x1b0
+A recorded KASAN report from an instrumented kernel shows:
+
+  BUG: KASAN: slab-use-after-free in iso_sock_hold+0x119/0x1f0
   Call Trace:
-   iso_sock_hold+0xf7/0x1b0
-   iso_conn_del+0x7b/0x1d0
-   iso_connect_cfm+0x186/0x16a0
-   hci_conn_failed+0x154/0x280
-   hci_abort_conn_sync+0x3dc/0x7d0
-   hci_cmd_sync_work+0x173/0x300
+   iso_sock_hold+0x119/0x1f0
+   iso_conn_del+0xe4/0x270
+   hci_disconn_complete_evt+0x351/0x8c0
+   hci_event_packet+0x71b/0xb20
+   hci_rx_work+0x293/0x730
 
-  Allocated by task 121:
+  Allocated by task 93:
+   sk_prot_alloc+0x113/0x220
    sk_alloc+0x2b/0x6d0
    bt_sock_alloc+0x29/0x370
    iso_sock_alloc.constprop.0+0x19/0x300
    iso_sock_create+0x94/0x100
 
-  Freed by task 121:
+  Freed by task 93:
    kfree+0x121/0x3c0
    __sk_destruct+0x42b/0x540
    iso_sock_release+0x29d/0x340
    __sock_release+0xa1/0x260
+   sock_close+0x10/0x20
 
-Check admission under the socket lock and mark the connect operation in
-progress before publishing its destination. Keep that flag set across
-route lookup and connection setup, rejecting another connect with
--EBADFD before it can change the destination or attach a connection.
-Clear the flag after either helper returns, including on failure, so a
-failed setup can be retried.
-
-A separate flag is needed because the socket lock must be released before
-acquiring the HCI device lock, while BT_CONNECT requires an attached
-connection. Keep the existing state transitions and the deferred CIS
-completion through iso_sock_recvmsg().
-
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+Fixes: 168e28305b87 ("Bluetooth: iso: Fix circular lock in iso_listen_bis")
 Cc: stable@vger.kernel.org
 Assisted-by: GPT-6 Astra
 Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
 ---
- net/bluetooth/iso.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ net/bluetooth/iso.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7657c2a0abbf..8113367c796e 100644
+index 7657c2a0abbf..2e70c0df9ef3 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -61,6 +61,7 @@ enum {
- 	BT_SK_BIG_SYNC,
- 	BT_SK_PA_SYNC,
- 	BT_SK_KILLED,
-+	BT_SK_CONNECTING,
- };
- 
- struct iso_pinfo {
-@@ -1269,17 +1270,26 @@ static int iso_sock_connect(struct socket *sock, struct sockaddr_unsized *addr,
- 	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
--	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
--		return -EBADFD;
-+	lock_sock(sk);
- 
--	if (sk->sk_type != SOCK_SEQPACKET)
--		return -EINVAL;
-+	if ((sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) ||
-+	    test_bit(BT_SK_CONNECTING, &iso_pi(sk)->flags)) {
-+		err = -EBADFD;
-+		goto done;
-+	}
-+
-+	if (sk->sk_type != SOCK_SEQPACKET) {
-+		err = -EINVAL;
-+		goto done;
-+	}
- 
- 	/* Check if the address type is of LE type */
--	if (!bdaddr_type_is_le(sa->iso_bdaddr_type))
--		return -EINVAL;
-+	if (!bdaddr_type_is_le(sa->iso_bdaddr_type)) {
-+		err = -EINVAL;
-+		goto done;
-+	}
- 
--	lock_sock(sk);
-+	set_bit(BT_SK_CONNECTING, &iso_pi(sk)->flags);
- 
- 	bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
- 	iso_pi(sk)->dst_type = sa->iso_bdaddr_type;
-@@ -1291,16 +1301,18 @@ static int iso_sock_connect(struct socket *sock, struct sockaddr_unsized *addr,
- 	else
- 		err = iso_connect_bis(sk);
- 
--	if (err)
--		return err;
--
+@@ -1340,6 +1340,11 @@ static int iso_listen_bis(struct sock *sk)
+ 	hci_dev_lock(hdev);
  	lock_sock(sk);
  
-+	clear_bit(BT_SK_CONNECTING, &iso_pi(sk)->flags);
-+	if (err)
-+		goto done;
++	if (sk->sk_state != BT_BOUND || iso_pi(sk)->conn) {
++		err = -EBADFD;
++		goto unlock;
++	}
 +
- 	if (!test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		err = bt_sock_wait_state(sk, BT_CONNECTED,
- 					 sock_sndtimeo(sk, flags & O_NONBLOCK));
- 	}
- 
-+done:
- 	release_sock(sk);
- 	return err;
- }
+ 	/* Fail if user set invalid QoS */
+ 	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
+ 		iso_pi(sk)->qos = default_qos;
 -- 
 2.43.0
 
