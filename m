@@ -1,29 +1,29 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA0E4052B6;
-	Mon,  5 Oct 2026 11:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FD643802B;
+	Mon,  5 Oct 2026 12:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791199199; cv=none; b=STRmtox0RT8fXNTfWVRzeXcKWtVRpYtIuEM2VUYK5B+NR2qhCBXJRmLWRza575cVt6M3uNcM41EVKEj2qb7lDCQym39XStRvEuCqjLyU9PBsvBYQtBT6A0r4ZnIqYFJ5pDoNGqT81fvPELRt0Gg1hBh8pnindry/DfQY7wwWVQM=
+	t=1791202328; cv=none; b=CqfRonoJyk6ETPLvnIS761FZKneVeeCGNXEif874Z3RvkmEuuQnihrWVjsGFiyR+J5GgPc9Gke/FVDNZuZDhP1LJ33kzqtZWGyDondr5/j3ZWDBk1TWTAVTAsFJSz9kIfoXR/fIqBghIUKyL6UsswviJx8HbIrh7Qnk/lcUGI/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791199199; c=relaxed/simple;
-	bh=bZkKFTEOKCSBNKWBICI7W4S1ffjnYddZ/cQBLWuV16s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jtDJ3HdyiETxBFHunx6+RRwK/3F1SJ2mHtiE1kbKTwbnGNnlmaRqOMMpRN5cssSb5sG0oeyk+ExSuFgTJKjaQziF5ba1C2Z1Hw+4legAYPFkyetREn8HuULozqcMS/p++VNX4IcS6WEf0azU5fuKzHsju1vZx/y8xIdro02i4tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=AysCdQ8j; arc=none smtp.client-ip=60.244.123.138
+	s=arc-20240116; t=1791202328; c=relaxed/simple;
+	bh=trIioT8ia3Cjh6nf8a7JSg4Aipn0wiMsH2LpcQtBV0U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hL4yqP/rBcjn+85owlOq5Baccn95U0zfiOPz4sfAFJMz8RUuZrK/BPNNCkB04X65rqsY7TAP2sK6535BRXQRABUUxxIjA6l6o6pIuc4YVlxxio/c31YSmnS7PGji0fmYDoClJiDZHdFa8p+6X9wkqkoRHgfE7dOZ7cFJVLC4Fds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=FflDUiC5; arc=none smtp.client-ip=210.61.82.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="AysCdQ8j"
-X-UUID: ada7a44ec0ae11f1b1788b6acf885367-20261005
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="FflDUiC5"
+X-UUID: f6e365ecc0b511f18dc8c9802ae25ab1-20261005
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=kvpTf8mMBbKbspl3w7SLBnqh+GxvxtJzvZ6JYZZzij0=;
-	b=AysCdQ8jYeeTh5r+2Y2vG8VfTy8xIKFIyHZ1mOs6YZHqHix+tB0TW+imAJJ5dORsOEcdx3vlbDurcouAndTxOfuV/5/66ACmnKpFjvSuto2YNyo5bfz0mLt1lf4ymAYkOEAeblgyJb04HYSNlEV4+BU9kqVTxpsWv7d6Zw0HKDU=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=9bT1DZuf4atgnFojYPgehgz0WmWJewuSRux9JSXf1TA=;
+	b=FflDUiC5bcyPawDlyg8q8EnGuN5vHYSjrRNv3e02jS0c6O9HsJgAeniWFU3qtTOTSdfW9yWEDmkd3/08we5iWa4qkIafVvkmpA79G7TUP2moAPFhAcg9fre7RDcgteXvMs/eEit09N4QGmL/iM9p72nfxxXxu7hFNMIJMSSOlHU=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.20,REQID:519331d7-5b27-4a37-abbc-4259039fc105,IP:0,U
+X-CID-O-INFO: VERSION:1.3.20,REQID:011380c2-be85-48c3-ad21-aebae0b50dbf,IP:0,U
 	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
 	N:release,TS:-25
-X-CID-META: VersionHash:291e20b,CLOUDID:f07e15f2-1b1b-4e78-a2b0-48c3f94393b9,B
+X-CID-META: VersionHash:291e20b,CLOUDID:010afd94-3103-4fdb-b79c-08de0e281a5d,B
 	ulkID:nil,BulkQuantity:0,SF:102|136|836|865|888|898,TC:-5,Content:0|15|50|
 	99,EDM:-3|-100,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI
 	:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
@@ -31,18 +31,18 @@ X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: ada7a44ec0ae11f1b1788b6acf885367-20261005
-Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+X-UUID: f6e365ecc0b511f18dc8c9802ae25ab1-20261005
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw02.mediatek.com
 	(envelope-from <chris.lu@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 642573757; Mon, 05 Oct 2026 19:19:49 +0800
+	with ESMTP id 925121951; Mon, 05 Oct 2026 20:11:58 +0800
 Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 5 Oct 2026 19:19:48 +0800
+ 15.2.2562.29; Mon, 5 Oct 2026 20:11:57 +0800
 Received: from mtksitap99.mediatek.inc (10.233.130.16) by
  mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Mon, 5 Oct 2026 19:19:48 +0800
+ 15.2.2562.29 via Frontend Transport; Mon, 5 Oct 2026 20:11:57 +0800
 From: Chris Lu <chris.lu@mediatek.com>
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
 	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
@@ -51,9 +51,9 @@ CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
 	<linux-bluetooth@vger.kernel.org>, linux-kernel
 	<linux-kernel@vger.kernel.org>, linux-mediatek
 	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH] Bluetooth: btmtk: Add MT7928 support
-Date: Mon, 5 Oct 2026 19:19:46 +0800
-Message-ID: <20261005111946.550573-1-chris.lu@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btmtk: Add MT7928 support
+Date: Mon, 5 Oct 2026 20:11:56 +0800
+Message-ID: <20261005121156.772369-1-chris.lu@mediatek.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -74,8 +74,12 @@ coordination between subsystems.
 Implement two-phase CBMCU firmware download: Phase 1 loads section with
 type 0x5 containing global descriptor, section maps and signature data;
 Phase 2 loads remaining firmware sections. The firmware is rejected if it
-has no Phase 1 section. The CBMCU patch status is polled while another
-download is in progress, to protect against concurrent downloads.
+has no Phase 1 section.
+
+The CBMCU is shared with the Wi-Fi driver, which may download the same
+firmware concurrently. While another download is in progress, wait for
+it to finish before querying each section. If it completes, skip the
+download instead of failing the probe.
 
 After CBMCU firmware loads successfully, the driver continues to load
 corresponding BT firmware based on device ID through fallthrough to
@@ -109,12 +113,17 @@ MT7928 bring-up kernel log:
 Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 Assisted-by: Claude:Sonnet-5
 ---
- drivers/bluetooth/btmtk.c | 352 ++++++++++++++++++++++++++++++++++++++
+Changes in v2:
+ - btmtk_query_cbmcu_section(): wait while another agent (e.g. the Wi-Fi driver)
+   is downloading the CBMCU firmware, and skip the download if it completes
+   instead of failing the probe with -EIO
+
+ drivers/bluetooth/btmtk.c | 371 ++++++++++++++++++++++++++++++++++++++
  drivers/bluetooth/btmtk.h |   3 +
- 2 files changed, 355 insertions(+)
+ 2 files changed, 374 insertions(+)
 
 diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 115a11fcb254..87116fbb2b04 100644
+index 115a11fcb254..f5fb75ab0fbb 100644
 --- a/drivers/bluetooth/btmtk.c
 +++ b/drivers/bluetooth/btmtk.c
 @@ -22,6 +22,12 @@
@@ -150,7 +159,7 @@ index 115a11fcb254..87116fbb2b04 100644
  		if (wmt_evt->whdr.flag == 2)
  			status = BTMTK_WMT_PATCH_DONE;
  		else if (wmt_evt->whdr.flag == 1)
-@@ -933,6 +945,327 @@ static u32 btmtk_usb_reset_done(struct hci_dev *hdev)
+@@ -933,6 +945,346 @@ static u32 btmtk_usb_reset_done(struct hci_dev *hdev)
  	return val & MTK_BT_RST_DONE;
  }
  
@@ -200,7 +209,7 @@ index 115a11fcb254..87116fbb2b04 100644
 +{
 +	struct btmtk_hci_wmt_params wmt_params;
 +	u8 cmd[64];
-+	int status = BTMTK_WMT_INVALID, err;
++	int status = BTMTK_WMT_INVALID, err, retry = 20;
 +
 +	cmd[0] = 0;
 +	cmd[1] = cbmcu_type;
@@ -218,19 +227,34 @@ index 115a11fcb254..87116fbb2b04 100644
 +	wmt_params.data = cmd;
 +	wmt_params.status = &status;
 +
-+	err = wmt_cmd_sync(hdev, &wmt_params);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to query CBMCU section (%d)", err);
-+		return err;
++	/* The CBMCU is shared with the Wi-Fi driver, which may be downloading
++	 * the firmware at the same time. Wait for it to finish; if it has
++	 * completed, tell the caller there is nothing left to download.
++	 */
++	while (retry--) {
++		err = wmt_cmd_sync(hdev, &wmt_params);
++		if (err < 0) {
++			bt_dev_err(hdev, "Failed to query CBMCU section (%d)", err);
++			return err;
++		}
++
++		switch (status) {
++		case BTMTK_WMT_PATCH_UNDONE:
++			return 0;
++		case BTMTK_WMT_PATCH_PROGRESS:
++			msleep(100);
++			break;
++		case BTMTK_WMT_PATCH_DONE:
++			return -EALREADY;
++		default:
++			bt_dev_err(hdev, "CBMCU section query status error (%d)",
++				   status);
++			return -EIO;
++		}
 +	}
 +
-+	/* Query should return UNDONE status for successful section query */
-+	if (status != BTMTK_WMT_PATCH_UNDONE) {
-+		bt_dev_err(hdev, "CBMCU section query status error (%d)", status);
-+		return -EIO;
-+	}
-+
-+	return 0;
++	bt_dev_err(hdev, "CBMCU section query timeout");
++	return -ETIMEDOUT;
 +}
 +
 +static int btmtk_download_cbmcu_section(struct hci_dev *hdev,
@@ -463,6 +487,10 @@ index 115a11fcb254..87116fbb2b04 100644
 +	bt_dev_info(hdev, "Loading CBMCU firmware: %s", cbmcu_fwname);
 +
 +	err = btmtk_load_cbmcu_firmware(hdev, cbmcu_fwname, wmt_cmd_sync, dev_id);
++	if (err == -EALREADY) {
++		bt_dev_info(hdev, "CBMCU firmware downloaded by another driver");
++		return 0;
++	}
 +	if (err < 0) {
 +		bt_dev_err(hdev, "Failed to download CBMCU firmware (%d)", err);
 +		return err;
@@ -478,7 +506,7 @@ index 115a11fcb254..87116fbb2b04 100644
  int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
  {
  	int reset_err = 0;
-@@ -997,6 +1330,14 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+@@ -997,6 +1349,14 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
  		if (err)
  			return err;
  		msleep(100);
@@ -493,7 +521,7 @@ index 115a11fcb254..87116fbb2b04 100644
  	} else {
  		/* It's Device EndPoint Reset Option Register */
  		bt_dev_dbg(hdev, "Initiating reset mechanism via uhw");
-@@ -1455,6 +1796,15 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+@@ -1455,6 +1815,15 @@ int btmtk_usb_setup(struct hci_dev *hdev)
  	case 0x7668:
  		fwname = FIRMWARE_MT7668;
  		break;
@@ -509,7 +537,7 @@ index 115a11fcb254..87116fbb2b04 100644
  	case 0x7922:
  	case 0x7925:
  	case 0x7961:
-@@ -1667,3 +2017,5 @@ MODULE_FIRMWARE(FIRMWARE_MT7961);
+@@ -1667,3 +2036,5 @@ MODULE_FIRMWARE(FIRMWARE_MT7961);
  MODULE_FIRMWARE(FIRMWARE_MT7920);
  MODULE_FIRMWARE(FIRMWARE_MT7925);
  MODULE_FIRMWARE(FIRMWARE_MT7927);
