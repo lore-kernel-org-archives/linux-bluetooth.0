@@ -1,116 +1,84 @@
-Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C545400974
-	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2026 18:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F24A2116F4;
+	Mon,  5 Oct 2026 04:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791140076; cv=none; b=eMaog3azkFhNx9lteWGrmR2JqUXG7yW359RmgDjFjTyRg2uvX8WJZjgCazhxpZ4CzHzU2PbgGtvOi9pwWzyDTbC2pse+H/2NSiV6gTohV4zEK+g2W6Uboc15Jbr6eIU9uCrsFevx1hMyJKkyN8A7n1sEotjcPzc9gw/ml/l92Fs=
+	t=1791173537; cv=none; b=rLroZzaGdsoDCzTKnE2SpbszyPhNCewhVCP9hay6SVgyYwCwlLm1qYem/esDSEmyw40fJb4Zim1eTGeQQG6eEgsjV6tTqRggHQ2+CQh0I7kiU5/s4EyOc4yovKcIDOjlhQuk5OEXpIFkucHLxX3Gv3tll5PWFfqRi24gWFGSMMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791140076; c=relaxed/simple;
-	bh=e4kmvDOCsSCk/RPxLPB6DvutcyT4UvGu7H1J4n/UjxE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ISam50fLh+RuIMQreIXg+cPy+kR8QKRV9b9YekM64eMs0d4aO/Lt7lGtf3dyJHcATfprIn5LOrMyJS7xwGrjepp6+F3RmrGb1V2pkNHYxc9nOywCrpN3ktEMUiIOf48IhEHzqDcCOlBXqMUmQdatp/ZzU48Cgt1J/RMr73l47CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzT1anrN; arc=none smtp.client-ip=74.125.229.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791173537; c=relaxed/simple;
+	bh=YQppuIDi9fm/QoM2Bn3vzbTb84ufmOlYG/KToC8U0TE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kW4+J3UthvoRmQgRK2xKaknkIzGUg+Dr7Y3k2wLcyaTeerEgKXv7pSljhbrJuovMz4Z5enUe0+XuufNwyStm+vJXhsDeY73uvWmnb8SbtLJon4c02UYZVIEicuhE0MgQtL0lRqHVCglrSwwLA98d1WojMTkOkRrjMazyj55lcNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YtVXVLm2; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzT1anrN"
-Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33e630052ebso1571111eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2026 11:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791140074; x=1791744874; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=+3yULhkYSB3iBKZa9DoSkWbOJn4z19fRO7J+vsvirbg=;
-        b=jzT1anrNHpIr6E55XF8HpMLUrJ5Zllqarye40EM9jzlCUQ4HRuA+q6hXFmShhA8c7L
-         aPxZMFfPi9sQ3KGmhSmcHQhdblc0r6QoXPUuM/NItCaV03JrsPYwYuCBsWeXBj/ixFxm
-         98lMxekjQrg+t3PJ1VAGhPuvOzSa9xcYA42po3DSNj1AGjNncGDEC1nVqFyt21/XCpiW
-         /2RzSB1sbqyQc7U4dRxQLd2syNkN46ZWAS2i/QPjIC+Uggifd6/MjiJV2ahZkljCttKW
-         P6cb4nNsus6rKHskuKgWOkbuEvQTdXYKwQO9U1F/TTHTidt+m8Q/nsN8VNJNPF6rieiK
-         fDCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791140074; x=1791744874;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=+3yULhkYSB3iBKZa9DoSkWbOJn4z19fRO7J+vsvirbg=;
-        b=gFxQp+qO11/otJYzUtIfrKIkMflIbxtT/H8lE0+bfMzVaQaFi4PhEV2xU6i0/d8rwz
-         ZCdhxWZapf99KxIQQIngWxUKvM0/PXkg4QsxRtsko9upH11pNZrKZ5YSZ7DBUvXZwnXw
-         whj0t5MtGJRRCBl1JQ0eW8QGzv0H2nMRxmOlREOLoRI5S6G1nFZiungAqiTsI3GxFB1Y
-         Hc+/qmfPHIKMq9nTC4pC++QoRqrtv+H9C/eAoJ/MlGaEqsH0NNNbEO9yQGR5a66G2T7+
-         6zUbRgo1MSHXj6c36TWng71bq2cKsog6kuhwAvubojUvnoKBU1b2PU+gijLLIscN+fSz
-         BmKA==
-X-Gm-Message-State: AFuF++nKT23TH+JSraEnrYWO630qjQVmkfUj36XTOXcbmKlxOzlCbf8l
-	XEFBrg2cpSGsyX8rIotp43E8bU+hGT9xNIeiqWqGJenU6My+jtmBUtnF50in3g==
-X-Gm-Gg: AYBFou3L84utSH9+Jl2Wg+SnFqAqvUWB+5kfBk6pvYgyEHct04CCfq5KfCK31BuXuZr
-	s89B0fNtKcY1/mr5+2N5qEAqiHzxlESclHb6wMvIV4WJf9xFUL045f+bmAReL+5EbLIg7k75CRt
-	BF9KJAH1WytAXKcxoTCILbdUf5hWv52CIl4XfD2Z+5E0cuks/vJNDeRkZVnXG6kLfr7G9CanNbI
-	Cw7zotX02dKaIsBf70jdpJumLf+aHvuGnoYuovni8B1ST7XxULL5rIsODwX0rW4DF4tUaOyb12A
-	QCnAItehHvfOJ06VcYMgJ7HTmThpYKWYOKM492ZOGM0Q4Y7+T9dInasUj2i3oSAMbdUPmCkSdt9
-	iVbrNPLha3anBRz8Qyu3JRm3jNrhAzwJ+mRciWZg9jNiMhPJFBZNNF9mJsLMp9AomP3ohkjsBRN
-	Hr9f30IxdBx8dGMvZxd4DFJm4UoUlp0yBsb0L4bROlcuRYSQQEIw3B+Cnerqa9pw7AItLZdFCgC
-	N3PcgL5OnwoZg6p
-X-Received: by 2002:a05:7301:9a90:b0:34b:d400:e999 with SMTP id 5a478bee46e88-34f14f0b486mr10796997eec.5.1791140074139;
-        Sun, 04 Oct 2026 11:54:34 -0700 (PDT)
-Received: from [172.17.0.2] ([128.24.163.69])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-35127138638sm8452957eec.8.2026.10.04.11.54.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 11:54:33 -0700 (PDT)
-Message-ID: <6ac2a0e9.1619dd05.1691b5.2a23@mx.google.com>
-Date: Sun, 04 Oct 2026 11:54:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3174082848888636735=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YtVXVLm2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791173535; x=1822709535;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YQppuIDi9fm/QoM2Bn3vzbTb84ufmOlYG/KToC8U0TE=;
+  b=YtVXVLm2ZkhsUTFu94xznkpfI1GsD/2JoFVKLU+bFca4+/3CpillDE2M
+   tfww2enhk9hT2wmy2yGSetHnrCjt2eDLzM0tClAU+4IC4voCFTZPnhpIm
+   Dx+yDsn/wMEG73sj7n5gojGXeKBshU8mbCgp2OSEP1TsmvQVuvQZdWBGM
+   PqYS6TiJ54l/f8sbcZUMJiBHQPmoX7Zwg5FnFQB/kM4qqTJcZcaYghTjt
+   zmIa9hCYBoW776htd/csX3c9vgJz059NLZyZG6nuiX+S3TubPLmVV7ZDs
+   X+CtfA89aULhOyHkviNSk/EMl3nnBb21T4e+3ut1WiG+/0OQQSE/GHlNJ
+   Q==;
+X-CSE-ConnectionGUID: kyFOxyS4QYmBsgozq641Iw==
+X-CSE-MsgGUID: jabr7qCtRa2w67/V1dbIVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11925"; a="94325671"
+X-IronPort-AV: E=Sophos;i="6.27,141,1787036400"; 
+   d="scan'208";a="94325671"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2026 21:12:14 -0700
+X-CSE-ConnectionGUID: dEjqj99XQvOCU6pOXgR+cw==
+X-CSE-MsgGUID: DFftWtHdREOR8SGEDprtyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,141,1787036400"; 
+   d="scan'208";a="274821563"
+Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
+  by orviesa010.jf.intel.com with ESMTP; 04 Oct 2026 21:12:13 -0700
+From: Ravindra <ravindra@intel.com>
+To: runyu.xiao@seu.edu.cn
+Cc: jianhao.xu@seu.edu.cn,
+	kiran.k@intel.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	stable@vger.kernel.org,
+	tedd.an@intel.com,
+	Ravindra <ravindra@intel.com>
+Subject: Re: [PATCH] Bluetooth: btintel_pcie: use managed IRQ teardown
+Date: Mon,  5 Oct 2026 09:44:57 +0530
+Message-ID: <20261005041457.3021139-1-ravindra@intel.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260930074453.2944525-1-runyu.xiao@seu.edu.cn>
+References: <20260930074453.2944525-1-runyu.xiao@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nicoyip.dev@gmail.com
-Subject: RE: Bluetooth: ISO: Reject concurrent BIS listener setup
-In-Reply-To: <20261004162548.3968712-1-nicoyip.dev@gmail.com>
-References: <20261004162548.3968712-1-nicoyip.dev@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3174082848888636735==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Runyu,
 
-This is automated email and please do not reply to this email!
+Thanks for the fix.
 
-Dear submitter,
+I have tested this patch with repeated Bluetooth load/unload cycles on
+an Intel PCIe Bluetooth device and did not observe any kernel warnings
+or issues with the patch applied.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1179170/
+Tested-by: Ravindra <ravindra@intel.com>
 
----Test result---
+Could you please send a v2 including the above Tested-by tag?
 
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-VerifyFixes                   PASS      0.15 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       PASS      0.27 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      27.08 seconds
-CheckAllWarning               PASS      30.87 seconds
-CheckSparse                   PASS      32.82 seconds
-BuildKernel32                 PASS      27.21 seconds
-CheckKernelLLVM               PASS      28.44 seconds
-TestRunnerSetup               PASS      671.77 seconds
-TestRunner_iso-tester         PASS      16.13 seconds
-IncrementalBuild              PASS      30.35 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/857
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3174082848888636735==--
+Thanks,
+Ravindra
