@@ -1,103 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744BB4DD3BE
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 20:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372D539449C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 20:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791231610; cv=none; b=OWcWWgUn2rRZ5DjQZ1gqHi3Q3H/lY3oWTUoeHJ0YxjcvUa6XjNKp59GUo+MF0zo7eUre/bs4spvReg50+rGyUSYcLQ5nJRd00UeBD61mY3ep77yDZpdT7gzvOy6twliU2CKCU1xLCtWPHlBxC48CWEYpvj0/TzYpmWRXK6v7g+k=
+	t=1791232420; cv=none; b=sUu/OacQW6ruqMuuhMYnmGNkVzSE+Ds6w1m4jHg3IlH70FDoR0rhrEPD5KY6ZAdhZ/8kLrQxtiBPhqEwadi2fPE9R8CGo47GwTlUKkXJk+72cXTo9fp49CvOFs3J+5zJdBJGGgCW4zMMg8JjoKu4BVohdNckB060+QJ1zhBaeHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791231610; c=relaxed/simple;
-	bh=AGzo3/8ZWCn0XkFZGjM95DUWbWM9JBrghqRtLdxqPoU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pIyAF4zoUf97HttcQjFTt87lBRrpnjyvhhxDaVRIAd52TAEZ3glSOpy/8mta2cNWcs7mKC1QAK7NVj71v5QaUwziHB1AimihxDWbL69SCrH5MzAmUIO87i/eTg27KXF5qG80xR8mDVQDC2dacxCCTPUDRSpAvhXoGgwltjLg0kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dubKwBnv; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dubKwBnv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46E541F000FF;
-	Mon,  5 Oct 2026 20:20:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791231608;
-	bh=5qDz7iHKcX1khSPiMlDZaAtGjpSSuGqT9tNoFmAhTt4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=dubKwBnvaT+4/AuK+1ZD7/pZ/u8QFoSm/hlwA9BgZ80Q7BGRwMtiqT7Dcwi3U/wyd
-	 Hv1zJfkagt+DBGRHLE3rMhIzcLr8yO0g09+pDw9tWVYGe0JWqlHgsKvYzdHja8ZGeL
-	 p2eQm5tG7nudoSAteh9THW5oXvhfC6KksqfcfLYgOLKpecYqvLj+un0s8lvkGHtb+M
-	 bgMinQioi/8xGp6RcyWlvKwbk77UdqHFc7ktwUwb7Hs5ontFiJPOV7jOJGu093e2HT
-	 1840poMScDI9b/S97yqUUZ7UZbiyXauvXA4Y1UGH0dnghlnFRs09M/uMCxr3cheDS7
-	 lA8p1h+HD8B6Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A34B392665B;
-	Mon,  5 Oct 2026 20:20:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1791232420; c=relaxed/simple;
+	bh=aqC6J1pX8uCkchw5pLxiomWWHNNpmjhOkKdPU8W05DU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=G5QQI+ezlWbfk9f4QjMttKfXDm6os34M38fFLKC0D3m2DkHfydsG3AZHO9kWjynjams7f/w1VCmaLyGHy9Y/46YS/5l6YFs3X/p4+7i+dIWi5iratPIp1veYM6Ca80o/tzRLFl0oY5B121E8MZAqYm4H8yZclGVBQnnaqpDkyQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4b37620eb73so48134b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 13:33:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791232417; x=1791837217;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nWJVyteYPhpAL55t3xiuah6R5d3c5HiSpVMSjRo5TW4=;
+        b=vFKKictyKBkG88lj9/r4JLz/IyJQn555pkox+XclhXjCpT/J2Oga/2rarCZTEzN785
+         OVED0F/hdfXMrF1/j1TXpmhcPbRDsWLPF0Od5yBx8kZfceFDIXq5ASWETxyGKop/Mb5G
+         3S5KcN82siKlDmdTtkFbPZv5kLSYWLyyeSdVNLW8Ociarm8QMJbNayaNPzR6f8xho+Zr
+         FCiojLkhQlbqQ9n0ik4Ksa8IaVbnMkcpb4tvQQtnrrz8qENJG7A7wpApx321SxXNx4US
+         sgziQx3NLCaJLPQHzwqu0C1is5ZM5tbXXAp0oh8kg4Eej0zHKMIvo18zNuKc5QV/OeAe
+         Y8yw==
+X-Gm-Message-State: AFuF++kj1IQoBetxo+9IRpxARqF1EJXgEqred7bINWXosJoG9Ugzriip
+	+k8CYYhV/CJgDIzOcvxzAZpx8fbcrbKQ4pbjmXsQ+1D+/Xmg1vzIIn8F1SAtP4c3kvAj1z1q1uy
+	CqyF0CJ0H7aKlVm3Ck273Zn3o8ZapXIpyRepMeIcVCDcjo7gmW5O+QxjROAg=
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 00/12] hfp-hf: Enhance HFP Hands-Free profile
- support
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179123160703.1879401.13552645753482333474.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Oct 2026 20:20:07 +0000
-References: <20261001211036.1760396-1-frederic.danis@collabora.com>
-In-Reply-To: <20261001211036.1760396-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6808:3448:b0:4d6:9355:7547 with SMTP id
+ 5614622812f47-4f52b4af0c5mr9368262b6e.66.1791232416899; Mon, 05 Oct 2026
+ 13:33:36 -0700 (PDT)
+Date: Mon, 05 Oct 2026 13:33:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6ac409a0.ae2c267a.265a6c.0005.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Oct 2026)
+From: syzbot <syzbot+list5bc61c5fbc38990b3a2a@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello bluetooth maintainers/developers,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-On Thu,  1 Oct 2026 23:10:24 +0200 you wrote:
-> This series enhanced the HFP Hands-Free (HF) role support in BlueZ:
-> 
->  - Registration:
->    - Register the HFP HF profile with an SDP record so BlueZ is
->      discoverable/connectable as a Hands-Free device.
-> 
->  - Audio path:
->    - Register a MediaEndpoint1 per supported HFP codec and wire up
->      MediaTransport creation/configuration so SCO audio is exposed
->      through the standard Media API instead of a bespoke interface.
->    - Extend bluetoothctl (client/player) with matching menu entries
->      to select/manage the HFP HF MediaEndpoints.
-> 
-> [...]
+During the period, 2 new issues were detected and 3 were fixed.
+In total, 14 issues are still open and 114 have already been fixed.
+There are also 4 low-priority issues.
 
-Here is the summary with links:
-  - [BlueZ,v2,01/12] audio/hfp-hf: Add HFP HF server and SDP record
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7878ae60a2e2
-  - [BlueZ,v2,02/12] audio/hfp-hf: Add MediaEndpoint for HFP codecs
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=89b91a4806fb
-  - [BlueZ,v2,03/12] client/player: Add MediaEndpoints for HFP HF codecs
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9e2a7ddbb178
-  - [BlueZ,v2,04/12] shared/hfp: Add hangup all calls support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f7fd0acef7ee
-  - [BlueZ,v2,05/12] audio/hfp-hf: Add hangup all calls support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0a8dfeff2f79
-  - [BlueZ,v2,06/12] shared/hfp: Add send tones support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=67883db59611
-  - [BlueZ,v2,07/12] audio/hfp-hf: Add Send Tones support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e9046f3fb78d
-  - [BlueZ,v2,08/12] client/telephony: Add Send Tones menu entry
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a9b8a5ef6ec7
-  - [BlueZ,v2,09/12] audio/hfp-hf: Add multi calls support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a4adbb2a717
-  - [BlueZ,v2,10/12] client/telephony: Add multi calls support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=45384edcd1c7
-  - [BlueZ,v2,11/12] shared/hfp: Add codecs support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=003db6420008
-  - [BlueZ,v2,12/12] audio/hfp-hf: Add codecs support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7edaa6140339
+Some of the still happening issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ref Crashes Repro Title
+<1> 9906    Yes   WARNING in call_timer_fn
+                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<2> 4849    Yes   INFO: task hung in synchronize_rcu (4)
+                  https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
+<3> 108     Yes   kernel panic: kernel: panic_on_warn set ... (3)
+                  https://syzkaller.appspot.com/bug?extid=fe5ea83cdd7fc263f452
+<4> 2       No    possible deadlock in rfcomm_run
+                  https://syzkaller.appspot.com/bug?extid=0adf2aef8ca78b84c4df
+<5> 1       No    KASAN: slab-use-after-free Read in l2cap_le_flowctl_send
+                  https://syzkaller.appspot.com/bug?extid=fd83abd5dea6cfbdfd79
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
