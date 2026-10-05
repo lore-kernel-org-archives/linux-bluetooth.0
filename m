@@ -1,136 +1,262 @@
-Received: from mail-vs2-f34.google.com (mail-vs2-f34.google.com [74.125.227.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53593ABD95
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 20:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F2C3905EA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 21:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791233076; cv=none; b=Pygn3bPlLFe+xSnZS9sCSaHH2BVfXxjZZnLxcKRCiUv2HjPDLGud+VOnaYxrOs5du3PVwJnUS9NPF+huBv1mbyWosTKtq4iXW7/XgSdQ47atS1m99pHaycvqdQNyl8GlzNZ4J8s52xO7hrnBotzGqsYjiUkNRrGLN30gMCX84WM=
+	t=1791237364; cv=none; b=eRvoTPFf+1C3SeXe/W2ZVoZk6FmJXT/exOu+ugUTTjNmIUPA7DQ2aqMg4cjPzUEQ+PqTGeRvuPYFbUkg/hdjL4nBXDL89TkMQoxegFYv3kWYp2cUFLIqvqmEZbPICnNJWczfo7f2PvZ9sVJJP99Ed0z9mHCd6WyZc1DKnPirLr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791233076; c=relaxed/simple;
-	bh=A9Fs5AdqBcb26lKcBnk0LX8wPrpvfCaXJLjQDzz3M34=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gog2z7DtXqsMZta+vPoN2KX/XO6cGekfuW1kIJh9qMk20Z2EPNbaZUgz4DBgeyhnRbaTBBT2M77ZJHjCib8Hfz8oUCWMzXReT1sKP8HrQ+J2kM78QOx9Gogobs2nL6yfY915jMPa/aTmyKfzcOK84UnNFYTTikasWzdUGUgJ8JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1Tah/eW; arc=none smtp.client-ip=74.125.227.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791237364; c=relaxed/simple;
+	bh=gHEP7qoiJwhGU+nLWSGM6heJYv90N6fIkLzTikDjECc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kojqRr8o4dZjXHQazUSD6HHIJ/QJLDc8KRj07wNDqOg1JLD21DomXlMd6iH8lfHAFZvU4rEK66DexkH3sYW01e9bqW/BClVY4JBESdEJMgHXfCrDgr/wV8awfiBf5MKM2zoQ/0aiiaXG8ZH/vZU6M7kqtd958ruL+PuYMIZhIzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=Wr4B/8Mj; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1Tah/eW"
-Received: by mail-vs2-f34.google.com with SMTP id 71dfb90a1353d-5e372be3cb5so341526e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 13:44:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791233073; x=1791837873; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=4sJHNxjiuA+irb0F/9g8MQWDNoCtIr1gYzlZjsXOV/I=;
-        b=Z1Tah/eWRMujgShjApG/4TucNS1IEdDNi8TFJqA8O7MVIuW1+gLQAXNX3JNSThsm0w
-         2467v5CtLavjWYY3rkDGLwbQ0r3TGoki+FTfAI1o0nqeHkHCmZLE9ZBHpZDIGLKjbFeW
-         GxEFzpSkXlffMtS6xXhO2T/tAZdOPZIK90jY9lG5Uqfy5rgw5Qo+1uqKMUiW4ihTIFuk
-         BoCkmLHozMrc04RwU6IitTzYU0lQxhAf2FFylHPkbCrMWXiXLRAoFMdv0s+Dbd0S9eK7
-         ItVh/01JzwCoDuLkx3K35aumbs0UenGuZQliRCTIepqDna3cSlcU5mJZQIzP/2enD2HW
-         AqxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791233073; x=1791837873;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=4sJHNxjiuA+irb0F/9g8MQWDNoCtIr1gYzlZjsXOV/I=;
-        b=n+fmuIXOtDSNshZHhP+9ZL36QcTlOSEKYw4Bxhe1QKAG6/8YBpMBgCjgq5U33r7/fK
-         oSE4Zq8atclAOG/o+WmjIBoJShWx9s/9sRCJL3C0ObNOTwxkJncl1Nw/rqSiEFn6JmAX
-         3omJ+L8ch1OBHoniZ2B+GQ5ddulXDRp9wHpyYV7w+nP7GR4h2lvRvpeQsmIc+gIVXn/2
-         x1fu+HtPNn+xBYsMw+Js42QxtYEMeQ2MgXW9fHJduuGXIJ5+oJ2bZE2KJjL6BDo079Qk
-         95WfSK/lq358YOZ+9N1dJQgNBfs4Ii0QMaO6MIwBU50hKlEOePaKzZyB201Q53+Yb7MP
-         N4yg==
-X-Gm-Message-State: AFq9FYJaeJwF+ivk/wQTbmMcCtR7O8b+1RIyRM4QGTHT0hrGZEc973qs
-	cHRoqhqB3c9i4x1b+Zltlca3AZAgtDguvrq97z14+lPYENJ5be0meEDa3s+kyWpw
-X-Gm-Gg: AYBFou03ufkExcDIXxtWxt3b5s0dHskPKd/ao1Hxt32JFQooKDlWwl13k36YlS7Oy2i
-	6ZJqXdKlYtW/9L8k9eKbtCMPjDrge1oGKzzWz7vdtaS6TVqPqQ9uyeTkBVTP/sKbDqjLgAkFgbi
-	w+HmYVoP6gHEOPxNAprx9URVZq8WRax+GhBV9eBXIXZqQAgZ75N8ZX5zbsigFE4w2JX3bqFANH1
-	xVjHfGCyuVHZJ2p8SY5w0qowApze5XPbNJoeSuW0+I1jx0Cd5lsGMY2shWewjJJxfimXRzyZI3U
-	b3fALISt+HLY7ryIlqhLi2mLsJoWkkGJ/1Bc3m8Hl9PUZL5IGXrhYG9ghtAH9n7KuxyCOw4IKGQ
-	EhW+QNxETxoMysqVFrCKITIprmViknPX3Aiu7euiq15IcjJgtfXWwaTfnjClMH86i0AiXMZL2if
-	WEBgbe8YxZULr4qQGEGA2OWPcMpwr051GY8S6hXX/9XgrcrHaJXq6AIAgJurK1zUxzFEH8D3KPZ
-	NLxEWo6DVKIXvPlImNIQlCgwFptumj7sp7ueBnTT9P0BdVmmEqJRtE+lnKGIrkq
-X-Received: by 2002:a05:6122:d1d:b0:5c9:a60b:e5c9 with SMTP id 71dfb90a1353d-5dab0dbf757mr3702179e0c.12.1791233073102;
-        Mon, 05 Oct 2026 13:44:33 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5e54ffb92a5sm531789e0c.18.2026.10.05.13.44.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 13:44:32 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="Wr4B/8Mj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2026; t=1791237360;
+	bh=Fj1xzhuhfNim5jOjHtOmfSTxQXPbffBAV2Iszghr3wc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Wr4B/8MjDpRvsN4soq6c6UVM2WSVDGDhV0b/8e9ApBH2oM92cUZSYVuzPK+g7wm3X
+	 glSnPCRc5JAjXsI7OeJNMWTPIZtZQN5Bm16yM6yo9xxATBC2wyNjuQRA9hlv8LPtml
+	 6GwCQHUguxf5D55UFXR6vWmwv2+M6mfuwvQJMDLxiayKram73ps9QrBOkVO/LatyyW
+	 0falfdJ7WkJB1c9/j3DOYc67770lzVrQE/vpWmTCON9ELPjtd4UMHKvru9QVre/S89
+	 Jk3ti74P613OtBKZhzk2V/aPG0kz24LB0DkhhpKdVHPbCTgVBga53lLIyPREA7jgrO
+	 NznLyKuSWPldg==
+Received: from github.com (hubbernetes-node-f2bcb60.ac4-iad.github.net [10.52.148.35])
+	by smtp.github.com (Postfix) with ESMTPA id C1ECE780765
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 14:56:00 -0700 (PDT)
+Date: Mon, 05 Oct 2026 14:56:00 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 4/4] Bluetooth: MGMT: Fix leaking instance on Add Extended Advertising Parameters
-Date: Mon,  5 Oct 2026 16:44:20 -0400
-Message-ID: <20261005204420.3684587-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261005204420.3684587-1-luiz.dentz@gmail.com>
-References: <20261005204420.3684587-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/4dc15b-7edaa6@github.com>
+Subject: [bluez/bluez] 7878ae: audio/hfp-hf: Add HFP HF server and SDP record
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7878ae60a2e2ba01fed06bf2850fcebd93d37b62
+      https://github.com/bluez/bluez/commit/7878ae60a2e2ba01fed06bf2850fc=
+ebd93d37b62
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
 
-If queueing the command fails the instance is never removed, despite it
-having already been added or modified by hci_add_adv_instance, so remove
-it as it is done by add_ext_adv_params_complete on failure, signaling
-it has been removed if it was previously added.
+  Changed paths:
+    M profiles/audio/hfp-hf.c
 
-Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
-Assisted-by: OpenCode:claude-opus-5.5
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/mgmt.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+  Log Message:
+  -----------
+  audio/hfp-hf: Add HFP HF server and SDP record
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 93872a5fc39c..ce091bf84642 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9361,14 +9361,15 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 				       data, data_len);
- 		if (!cmd) {
- 			err = -ENOMEM;
--			hci_remove_adv_instance(hdev, cp->instance);
--			goto unlock;
-+			goto remove;
- 		}
- 
- 		err = hci_cmd_sync_queue(hdev, add_ext_adv_params_sync, cmd,
- 					 add_ext_adv_params_complete);
--		if (err < 0)
-+		if (err < 0) {
- 			mgmt_pending_free(cmd);
-+			goto remove;
-+		}
- 	} else {
- 		rp.instance = cp->instance;
- 		rp.tx_power = HCI_ADV_TX_POWER_NO_PREFERENCE;
-@@ -9379,6 +9380,18 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 					MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
- 	}
- 
-+	goto unlock;
-+
-+remove:
-+	/* The instance may have been modified already so remove it, like it
-+	 * is done in add_ext_adv_params_complete, signaling it has been
-+	 * removed if it was previously added.
-+	 */
-+	if (!adv->pending)
-+		mgmt_advertising_removed(sk, hdev, cp->instance);
-+
-+	hci_remove_adv_instance(hdev, cp->instance);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 
--- 
-2.55.0
 
+  Commit: 89b91a4806fb76a26863f7e12e8a823c689d2e8c
+      https://github.com/bluez/bluez/commit/89b91a4806fb76a26863f7e12e8a8=
+23c689d2e8c
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M Makefile.plugins
+    M profiles/audio/hfp-hf.c
+    A profiles/audio/hfp-hf.h
+    M profiles/audio/media.c
+    M profiles/audio/media.h
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add MediaEndpoint for HFP codecs
+
+Register a MediaEndpoint1 (org.bluez.MediaEndpoint1) for each HFP
+codec supported by the remote AG, exposing SCO audio through the
+standard media transport API.
+
+Adds a SCO listening/connecting socket in hfp-hf, endpoint
+registration/unregistration tied to the HFP connection lifecycle,
+and wires MediaTransport creation/configuration for the HFP_AG_UUID
+endpoint in media.c.
+
+Assisted-by: Claude:claude-sonnet-5
+
+
+  Commit: 9e2a7ddbb178591ec3e30bf9bb942581c317f713
+      https://github.com/bluez/bluez/commit/9e2a7ddbb178591ec3e30bf9bb942=
+581c317f713
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Add MediaEndpoints for HFP HF codecs
+
+Assisted-by: Claude:claude-sonnet-5
+
+
+  Commit: f7fd0acef7ee1955dde4640fc5f47cb266f352f9
+      https://github.com/bluez/bluez/commit/f7fd0acef7ee1955dde4640fc5f47=
+cb266f352f9
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+
+  Log Message:
+  -----------
+  shared/hfp: Add hangup all calls support
+
+This releases all calls except waiting calls. This includes
+multiparty calls.
+
+
+  Commit: 0a8dfeff2f79670d80ce3def3b8bc9a3b8096ce3
+      https://github.com/bluez/bluez/commit/0a8dfeff2f79670d80ce3def3b8bc=
+9a3b8096ce3
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add hangup all calls support
+
+This releases all calls except waiting calls. This includes
+multiparty calls.
+
+
+  Commit: 67883db59611b38df858313e8e6e308666bd3b0c
+      https://github.com/bluez/bluez/commit/67883db59611b38df858313e8e6e3=
+08666bd3b0c
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+
+  Log Message:
+  -----------
+  shared/hfp: Add send tones support
+
+
+  Commit: e9046f3fb78d8833409708a2d569e9e7a84b53ed
+      https://github.com/bluez/bluez/commit/e9046f3fb78d8833409708a2d569e=
+9e7a84b53ed
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add Send Tones support
+
+
+  Commit: a9b8a5ef6ec791082ae41c7bd4c1bbc0bc7336ac
+      https://github.com/bluez/bluez/commit/a9b8a5ef6ec791082ae41c7bd4c1b=
+bc0bc7336ac
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M client/telephony.c
+
+  Log Message:
+  -----------
+  client/telephony: Add Send Tones menu entry
+
+
+  Commit: 2a4adbb2a7179573b6875f219c9fae5d1ae7a35e
+      https://github.com/bluez/bluez/commit/2a4adbb2a7179573b6875f219c9fa=
+e5d1ae7a35e
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add multi calls support
+
+This implements the SwapCalls, ReleaseAndAnswer, ReleaseAndSwap and
+HoldAndAnswer methods from org.bluez.Telephony1.
+
+
+  Commit: 45384edcd1c70b0883ce1927c462837972c77377
+      https://github.com/bluez/bluez/commit/45384edcd1c70b0883ce1927c4628=
+37972c77377
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M client/telephony.c
+
+  Log Message:
+  -----------
+  client/telephony: Add multi calls support
+
+This adds menu entries for the SwapCalls, ReleaseAndAnswer,
+ReleaseAndSwap and HoldAndAnswer methods from org.bluez.Telephony1.
+
+
+  Commit: 003db642000844d2ecd27ec5c81c7355561fbec2
+      https://github.com/bluez/bluez/commit/003db642000844d2ecd27ec5c81c7=
+355561fbec2
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+
+  Log Message:
+  -----------
+  shared/hfp: Add codecs support
+
+This send the AT+BAC command with the supported codec list during
+SLC connection.
+
+On reception of +BCS event to select a codec to use it replies with
+the same codec if it is available, or re-send the AT+BAC to re-trigger
+codec selection.
+
+
+  Commit: 7edaa61403390fe1cf2f1fb6d45fdd90fe6e93b3
+      https://github.com/bluez/bluez/commit/7edaa61403390fe1cf2f1fb6d45fd=
+d90fe6e93b3
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2026-10-05 (Mon, 05 Oct 2026)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add codecs support
+
+
+Compare: https://github.com/bluez/bluez/compare/4dc15be8ee3f...7edaa61403=
+39
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
