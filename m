@@ -1,71 +1,71 @@
-Received: from mail-dy2-f41.google.com (mail-dy2-f41.google.com [74.125.229.41])
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDCB48595E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 16:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B08B4B2029
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 16:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791217288; cv=none; b=UY3Le6qapJrWp0gHiDkvAy0g+R5sKFqEdcERGBWzcuyJKW85oZWRmFq42Pfl4VaBWsmhOKbPsIt8KKGm/GdKRspDqCDfJhpU8P+njF37FzpyTwa3hxfP4CLw+grE9ZQFuW7uze+38SbM3U5+3IYxCnjl7ARcAWJA5sGdjZxbvgE=
+	t=1791217288; cv=none; b=B1i7MsYJApqElbpNCQ3de1+ENAPCQWiEQ6IgYBVwJ+UE9D2+TQUnuZ6PSKWCGagcoxwfyxQps2kFwYRVKU/NnhRuzQyepP460CssPvn3//9ENV1XKy7SyBJmegATvSGyxuU5VtKXpAZXqwFTajJw4yJH+kyGL6Me+NIVn90ic90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791217288; c=relaxed/simple;
-	bh=W1H0gzF3roNOGQBG8h/e+KZVzY/A/FuldzS4K5+fDV4=;
+	bh=KEhQ8nhr0KH73QfD1meRDHFKuvaGmH5ibFZ2j5hQRHQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pPVbLuZUKuS8xNO/xdyeuS2JlKih9MUBNADZUTlbkfn/Gs2vKi0zWPpWxGH0Q6c7ajnS9/P0tcynMkCAzCwPzCaP4G0TjP6oGeIvpI09Wxd4C5gg90Nkx8yug33uokeVZ0581xID1y6eVbusxPy28xkGiXOCxybMP4qBo7irh2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=cPgx+WAz; arc=none smtp.client-ip=74.125.229.41
+	 MIME-Version; b=X+oyM29dXpmyNh3GDivxq7iMsa5Ga/u8GCVxHtYKYgy4WeDOXu/yxD9wsB1ARC4JYg/mRfVzUQ8RmDghdzVWdGaHxlt0ujdYBw2wOoToa39f4vuTaIrWv+CFpZDUz7rWEFa+esYezysaFC45WCAK0t62iVYknAC0g8uUUjr2U2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=M1CTxBxc; arc=none smtp.client-ip=74.125.82.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="cPgx+WAz"
-Received: by mail-dy2-f41.google.com with SMTP id 5a478bee46e88-34c0b552ccfso1528174eec.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 09:21:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="M1CTxBxc"
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-34c4a0868b6so1458175eec.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 09:21:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=simpleble.org; s=google; t=1791217286; x=1791822086; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=gj704BQ3G24WGzzMqddchw10G/ib4WetzNYgDWnn64Y=;
-        b=cPgx+WAzkrT2HWUowHI8QYqp5DS3RVIuVz2rcYQpJ03iiJVIIGZA4rOeTzT1tJpfm9
-         Mc4GLBnm888Z4YL3cSTujoK/u0vaFNPJfz7GWBYHu+6gMi02qMT9BnRD4K+sQaPbWapw
-         a3XtqW+WUg52C4asoXX+hrWKhgeLxPtEY/ryqIrDXYik+4sXqo0Xq+0mgibjqt62109I
-         INvQBsjAdZqfpql+boBKbuY2eHE079yhPU6wnBs63k5ipgFSS2G+JCcQ5vQhtKjp0bbf
-         5nLdGRV6Xoj8FHFi5HP+KKBuzUdP2ePY6mraACAFBjUenNorg1IZN4VLCo9TTKBzGd1Z
-         Mrug==
+        bh=lqv0viyL5wvLYnYOeXWC+yb02TU6zPYIMvXisT6EQE4=;
+        b=M1CTxBxcc2UZmhG63GAiormykVJhfH95YdSlQJmGdOSucVAQujkVqRoZv4WQbuzxHK
+         KXpn3LC5pSQmtoc0cW3cgYFhkChSD7zgec0Wgz6e7I8Wg92b5N7yHbQy0N4exY/TrEAD
+         WtQk4y+3GfoNlZV77aRHdYR1E7TuZedUjU+QjHSZZ9+nsCz5sYqn1QN5Isl1Dwfea88M
+         sb7NjuZnRRhMeIFiIu4GmTNvWuzlPvxW3WbfbM0uMH9fM5QCCtFZBdd40yMRSRWjVdnS
+         l9PFFyImcsgdRozqmFACpmWiIrm1n+LHDZa61r1cII2eXe+I+0076GSKkwPy9VyFiDHi
+         MfFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1791217286; x=1791822086;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=gj704BQ3G24WGzzMqddchw10G/ib4WetzNYgDWnn64Y=;
-        b=uoN4U+1t+5MfFxSUBXwVJGP8iLCCD/s9OMLtqf1UFQVaHt7idHAGsViITpBdiFzrxd
-         1CT75xuXnUHHMevp2qq8mgzYBTLN20gqTbAHSGzEVSdd8iLD/+dPoEhy01CQD9IUsSUU
-         PEjvj02bYDjq9JDs2pZIf7wFAv+dvGO8r1pSD8xFAX4V7kNubyN1FGowsOdSevFnvN3X
-         68D6kOIzTcwhNNUFqL+b9FcsCwM34NYDbwRKmK0mJd+kL6UPrBSYo9l9gyU/OzzwFoD5
-         /YqnAgncQ2Ip7a5R2Bx6aMqpVUU4vj5DPVi1smgR6QZ+Z2tVTnzaN1QLWA6Mxsm/rcWR
-         2J3g==
-X-Gm-Message-State: AFq9FYLGl+H8sFAKiTi71ZoJIt9yUV+mSLRHDJ8Cye4MtERg5S5nmGa1
-	Qrnuld9MviOf7xDrlApyWWXngFjvw20c7bcW4mOLMQpa+L17d7CjlV5Mo+cMUVIy5Ltk8jpLvWG
-	PEeXQ5Gg=
-X-Gm-Gg: AYBFou2iMPdaZu5XHMZifRhHPtxZJY2sDwXEYil5wGzNRBKpZLxm67fydrrKjboPNWn
-	+/mhJ1yLA4JLsDer2DAwbglci6lCt/2PtSfjGgwl8Hn34uz6gIGfPAbykil7d0UlJCgnIZmiq0U
-	MdBJzL7lfwpiMT+QrEMb6F9Ky4FTRkncBLxthuIEpwhGpcVVDmQwSaEHOIrx5ju3YWjvBlJ2Nu/
-	CQa8VIeevpBSKAzprh6u1pamBIhw9xvyS0hItegR8FNkhjN6SUmJFtGTkhqw7SJReHKf4m49m/2
-	xYCz/yuNF9t5ONnRTmhcPYgJcOPJyhfeMFvP5wA3IDya7iq8ATDJqBJ/kdW6d5sPkcGCzMN+pI2
-	/gBWGk8TTRkv7ngW9fntrEtniNeJv/p8RR+rRvKObiFUU4I+CXj741bZGRVoPmuVjZvqDkHXfdA
-	0ahHBZZ8UAGjy4heFr/PNHCYPjsK2WOmVIOC4xgyWQ1m3Dp9Wz6KEvAyY71k/TS/WwsSa8OJqYf
-	nN23t0Hlk5rNjCbaQ2faVGarU2HnoZiUwerTR/I29O9IMWgGCtUkqjz8IqgS2GIj68Af8OS+6O+
-	rWNwEfPN8eRdfJr66JFMncRlBgrLxxL3Ro5uEnyo
-X-Received: by 2002:a05:693c:66cc:10b0:34e:e479:723 with SMTP id 5a478bee46e88-34f14f12d95mr12691849eec.5.1791217285261;
-        Mon, 05 Oct 2026 09:21:25 -0700 (PDT)
+        bh=lqv0viyL5wvLYnYOeXWC+yb02TU6zPYIMvXisT6EQE4=;
+        b=Hxyj3t34vo27ML/6KgtC9GCM07llN20gYeJjefVp+SGNvwDpCT92E/HhDWrgLNCepM
+         KtXYnL3lYPhSX6+3YNkHBpC4VMzFcFzpPjZBd7mNqDkljYAiQncCML9vkoTzfR/USnIy
+         vsIeNsRuLMgxcwUDoPLntk4QiyyWraEbZL7A4qWWI4f10JHdpamswtBbIZrvAYSSWSjD
+         +M2SfzGQaiIdTSNMTatnYzu3mNU1ZVdSjiF3b88f3sDNP+krk11y8cnj3bndVGvSPRyA
+         eLAKIFMMrM7/KQLeAXe6K31O5psgoHNUMGyXs2ZV75I6kh3pXxdL5Ibsr50HiPbJyviH
+         /KnA==
+X-Gm-Message-State: AFuF++nUuGLVPMZ6a+jevUNat3fqZ7z8jJxTyeXZiqR1+9Lff3bK6POF
+	gxGbv9s8tAiHsbNjCvJGIgmiYh/4Bpzoo7lEAb8OE294m09TP+H/cTSz80jjIfDZL8ohFuTjokK
+	cO7K6Vn8=
+X-Gm-Gg: AYBFou1St4//+TZNQRjIYGq/IBsQoBlTxmoKwiORc1SARBfYQ/OvRvraSLBcxF4HXRp
+	ScDnjQfeW7/oecgSF7s4uaQSnXKtaiLI6vg12XUdgnImSnRcoFnzuaFMQ1HGyyC3dVFevAf/VeE
+	airia7EpKJ1di92VtQMptPar5jxH2d37vocoPMD0PfbxnJ/N6K1icHbMRunB8MTW8KHp4bafqI7
+	2yZJohBz+EJ5C9THG6dwQF1R2lXEtnSw9UbQ1rQPXX5LA3vVaQGCN/Rrd2CYe4ANhAxXtk2eH6h
+	K1OH2cc5GhxwHoHpWZsnojFQHld86oa5sY7mvQdTaMbnjGRKrXY4ld9Wd9v2s/IgmGduZvlbHoP
+	GaDJmSti92TVyrQaMmQDhbH8ERN57wKYSUv216QfHVI8QxzjYGugASJquBHXaXW3XgOE3UiEsaz
+	8phz8MRkJSHbkklXJFikdV9+oMEmqvfdEouL1L/dIXi8xDDNLPJV7amx+02IiEoINreogP2eYn/
+	NX2vOZXFGXDgV7Fv6d3GItRBLdfRlL5PUHJzWWPAmBHosdTFS/x7pbUq9htq3EJXAMNL23Awbdi
+	U6QtILMYuz0OHbjteQMhk4b9nHABMUHkix7aqDD9
+X-Received: by 2002:a05:7300:de47:b0:350:c7e7:57a0 with SMTP id 5a478bee46e88-3514530ab4cmr85694eec.24.1791217286115;
+        Mon, 05 Oct 2026 09:21:26 -0700 (PDT)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3512713809csm15646567eec.7.2026.10.05.09.21.24
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3512713809csm15646567eec.7.2026.10.05.09.21.25
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
         Mon, 05 Oct 2026 09:21:25 -0700 (PDT)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ 1/3] emulator: Remove unused le_ext_adv_type
-Date: Mon,  5 Oct 2026 09:21:15 -0700
-Message-ID: <20261005162117.4606-2-kevin@simpleble.org>
+Subject: [PATCH BlueZ 2/3] emulator: Fix extended scan response Event_Type
+Date: Mon,  5 Oct 2026 09:21:16 -0700
+Message-ID: <20261005162117.4606-3-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261005162117.4606-1-kevin@simpleble.org>
 References: <20261005162117.4606-1-kevin@simpleble.org>
@@ -77,69 +77,29 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Nothing has read le_ext_adv_type since advertising sets got their own
-struct le_ext_adv in commit 5145b1ea2e95 ("emulator/btdev: Add support
-multiple instance of extended advertising"). Remove it along with
-ext_legacy_adv_type, rather than fix that function's mapping of low
-duty cycle directed advertising (0x04) to ADV_SCAN_IND.
+The scan response to non-legacy scannable advertising was reported with
+Event_Type 0x0000, since the scan response bit was masked instead of
+set, so hosts saw it as a separate non-connectable advertisement.
 
+Fixes: 32339501a125 ("emulator: Add 5.0 feature support")
 Assisted-by: Claude:claude-opus-5.5
 ---
- emulator/btdev.c | 27 ---------------------------
- 1 file changed, 27 deletions(-)
+ emulator/btdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 26a8aff62..30eb183c0 100644
+index 30eb183c0..e11857c3b 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -269,8 +269,6 @@ struct btdev {
- 	uint32_t sync_train_timeout;
- 	uint8_t  sync_train_service_data;
+@@ -5542,7 +5542,7 @@ static bool ext_adv_broadcast(void *user_data)
+ 			else if (ext_adv->type == 0x12)
+ 				report_type = 0x1a;
+ 			else if (!(ext_adv->type & 0x10))
+-				report_type &= 0x08;
++				report_type |= 0x08;
+ 			else
+ 				continue;
  
--	uint16_t le_ext_adv_type;
--
- 	); /* reset_group */
- 
- 	/* Real time length of AL array */
-@@ -3773,29 +3771,6 @@ done:
- 	return 0;
- }
- 
--static uint16_t ext_legacy_adv_type(uint8_t type)
--{
--	switch (type) {
--	case 0x00:
--		/* Connectable undirected - ADV_IND" */
--		return 0x0013;
--	case 0x01:
--		/* Connectable directed - ADV_DIRECT_IND */
--		return 0x0015;
--	case 0x02:
--		/* Scannable undirected - ADV_SCAN_IND */
--		return 0x0012;
--	case 0x03:
--		/* Non connectable undirected - ADV_NONCONN_IND */
--		return 0x0010;
--	case 0x04:
--		/* Scan response - SCAN_RSP */
--		return 0x0012;
--	}
--
--	return 0x0000;
--}
--
- static int cmd_set_adv_params(struct btdev *dev, const void *data, uint8_t len)
- {
- 	const struct bt_hci_cmd_le_set_adv_parameters *cmd = data;
-@@ -3807,8 +3782,6 @@ static int cmd_set_adv_params(struct btdev *dev, const void *data, uint8_t len)
- 	}
- 
- 	dev->le_adv_type = cmd->type;
--	/* Use Legacy PDU if the remote is using EXT Scan */
--	dev->le_ext_adv_type = ext_legacy_adv_type(cmd->type);
- 	dev->le_adv_own_addr = cmd->own_addr_type;
- 	dev->le_adv_direct_addr_type = cmd->direct_addr_type;
- 	memcpy(dev->le_adv_direct_addr, cmd->direct_addr, 6);
 -- 
 2.54.0 (Apple Git-157)
 
