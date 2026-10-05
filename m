@@ -1,67 +1,67 @@
 Received: from mail-ua2-f42.google.com (mail-ua2-f42.google.com [74.125.226.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85904C33DA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 15:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D1C4C33D2
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2026 15:21:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.226.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791213636; cv=none; b=UAPd5n0Ya/Y9AE19Afv+ICbe/6u0mKvuhwyoJvrzpkjSvZYz6Cpq3HI2LVt09MJLFGy7+Z/S8Ht/ec10UObvZKrHgQiaCAdc2wsb+fswT99dOm87cvKo1uiuM53aO5KHGvk9bhyq6nI/MDRZm9YikGC77lTw89L+0oiF+1PVIEc=
+	t=1791213684; cv=none; b=uJ1GxLWkg4C4hVENLIWGceeMbGROoUjwod24PIzif0tJUR9JIlFHIrPV5t7BkOw6tWuKWMvhL1MHoWdGqOuTDfUhnxLqEMMu38pMbWW8amxRID6z26wENt6XgCfIK47V07THgEBrCtkKXh6tgc0Cws44MhnTUD+rKNA+bFqR74U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791213636; c=relaxed/simple;
-	bh=VFJOiXj9rjsInAxcn3/kUzTwRYzzd6GDXi31wyjPOQM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=jVQRWNZCzCS8GI+5lCeJGgOfObG799qWGP9/ZxE+OAaYoLfCD6KqUObIcaph551E74uks/mVWRy30SqPr+pCjspbiNwwbYB2hHshd/l8bjJoFecvFEh+eD5cJE+5ChgFpGybv+ma4cZPuC9uCblCJFihtg/TvyMDba74hdOUHMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g49dBXmY; arc=none smtp.client-ip=74.125.226.234
+	s=arc-20240116; t=1791213684; c=relaxed/simple;
+	bh=mncynWtNY2D5v+ODOmhzx8xUCu6sIq6IrJdpDhITpGU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=e9ueuX1LOUyjukOXPbvXfq9vp2MLLSQxaIc6iZ506gcx8keusSzddlzkwfAVfoAbY9A1ScDcKEf7aHael3I8zzCfRQn+rP6KxKvzM1gRo9SQn1shv0DFUSB8r3ruqj0Wggxry0qDnlypI8YXr70G5Yhhdg5ogQd+0RxkwjviYj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InDXahZ/; arc=none smtp.client-ip=74.125.226.234
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g49dBXmY"
-Received: by mail-ua2-f42.google.com with SMTP id a1e0cc1a2514c-988cac73538so433424241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 08:20:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InDXahZ/"
+Received: by mail-ua2-f42.google.com with SMTP id a1e0cc1a2514c-988ce00f22dso374394241.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2026 08:21:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791213634; x=1791818434; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791213681; x=1791818481; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TgbXmVyNsDrWlXB3LQZbpBW1JZ/Q9t7vtea3P+yHR6Q=;
-        b=g49dBXmYE5jqNRP+LB5eRchpZS+RHjxOpDtOVQaDa7vRJkwOX8y1gGdEpK4PVQ2xDK
-         k4Qc+F+o0IpEfthynwfvBiyfrDQiRE8BtNyPhMoZdisqB/sPQa35hgo0zhMfum9mHnWO
-         A0O1yWlyrNeXErO9de7GAG3mmVJwJDyM8cxdO70l3JYubIIuuXAhBYvbax++EZdDFF5I
-         1Y/Izeaiql/O2M4qMlru4NfkcOKhyQJQ8CeIHbD50ngwLDWSRQSAEM7Dlc8lNxIMlUiv
-         t0yL/5KocKi8sh4ecnBsTFkIUmr7Uzl7Gg6pfaUIthChQQWNqJ+bzKtyGO6+qVe6HdAZ
-         GKIw==
+        bh=+CNmjHL2vOLCnvcK1au7xOFwWD4AZs+YJ/iWE64mX3I=;
+        b=InDXahZ/rYWY3ArhdDJ5BN9BrU8+YB8pspiyYYeHa8Lo9lreVYw9S3b/vQrDxUSSHw
+         9p1QvHioIwjDSiZtENc/N77AppFOsUaC8klGhtuUMLWZR2osuE2ECkQBDSY7KgzrAb7P
+         VaUo9b2/zxuaLw0ezac7DwIWwSp57hWnW/96cc9ICGyrsrdah9XWq5en7W9YBG4V0p5s
+         yrb8bk4s6mOTs9Wmi/Dwcit6xkwMnVSCMbg3WVPNI6ZWRnj3qipy+R/ftvezM/IR0eRS
+         zDCjbVfnZbG951slQvY+CYZfmm1ZAk0aRITbH3LXi3pQBokLUmbpmOz/9SyVDAk5cWaO
+         VxhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791213634; x=1791818434;
+        d=1e100.net; s=20260707; t=1791213681; x=1791818481;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=TgbXmVyNsDrWlXB3LQZbpBW1JZ/Q9t7vtea3P+yHR6Q=;
-        b=1TlBHgZ5xN0IuI/US3y80XY9JEW8Fjjb38WVNP6TPMCSQ/eJkAT9dYgYgrJ5wM1vLr
-         tG/Ck4Zoz8b/AvrDZvzPLeEdufp5MbdOkwTF0oE0DqbUfYdBO31FH0/+QbgYmiTvFLNK
-         7ul8D9Y5acD1jTYJ/nBxmv73RGbJyMtIeNbji7FTCLzWHB/Q7Ea4O+IQimUGSMxzyxQH
-         HU5zeuus8MffDqm7+XykEwW307BCsRmeaf9CQLZ7e0C05JvENTgNF2y1bdenpNH9M8wF
-         ljsQUGCeSXplmBw5JDdf/c1C1EwJLI0RokxdE61m/rzJiq3a8TNnIPPHoFeG6qV1LcbZ
-         1plA==
-X-Gm-Message-State: AFq9FYJbrTnw0RbyrBM0lhVVIPzLf/Sm/1bI2U1fabT1W13VW3M0TyfB
-	hGPRF4bQuFQfoZpOARfs+Hh6FbuoNpO84e2ySSUYs3ghNMBm04lZ5I5IKOO/PymY
-X-Gm-Gg: AYBFou1cXY0v948Y+3qGA+0ld6qG9pCVpxIG7ELHBXN3gsnXVBx+8ugGWCIgLQBZHP2
-	nuhZdTemtPhMJkw2zzvWsieIWLChAJPMu46acNojdEB//lhEQfEP4920vn+VLM7h1WSVFxzZch7
-	7T5+BWPZe58bKF/m2n+ONxGMbij5GDnkTO7Htj5GT/TxoUvwWp6MTUjRkEGcabBoLG7r//NlP0A
-	pP+sQMmxBMWLd7P864PoKydJrKNATvhALG8RFOJyLm5KaIj5ufyBSHpnJaWF7NtL4J647mAKJzk
-	EcUEZMHuLs6dCtZfG6tQqaoi5l6ozweilsbFZT0ryQs0pzpF/ryogwHp5Po1MaLCncfEqkRd8Kr
-	zXP8/85SmII5AJDqDbXvBOU7YlyeeL9IUhzJM9z748lsYP/2Pwd2rEwwz8rAe/NgAiyeH9wC77s
-	G37+NptPPT6UjsI70yNRZ7/SsC0k+qttG6yo4CSOnwuyT8q0xnK9n7V0aAn+GUvzELnfX3MA2i9
-	vm5/DgBWk2vJs41Q+xnnwH7yriC97u91v0/YpeHeiWmX4u3Lw5CEtX177u3dJzIa/VVc8SqQb0=
-X-Received: by 2002:a05:6122:1903:b0:5c9:c60e:3a43 with SMTP id 71dfb90a1353d-5dab2206e65mr2747063e0c.21.1791213633538;
-        Mon, 05 Oct 2026 08:20:33 -0700 (PDT)
+        bh=+CNmjHL2vOLCnvcK1au7xOFwWD4AZs+YJ/iWE64mX3I=;
+        b=XBfzu6dzzoeEnE4bWd5hLTlTKUwFZEHMRRf3n1L3e+0Alx7JP8l9GX+6OQMR259Nbs
+         eOB8tzD3zCPiKPtEO+/P/QDjLEQovEQc/TSDNG7JZWVGIKlgZO22439DyAksY89zVVpt
+         vl9eSnFoLXZijo52Rkc8vIijNw7bykwu+4PxezZ6UyRkoTuaRDol/8nr+cej3XbxvEMc
+         2Q/L9pcdLI4eKMRRUKwhnYq4s0WeACWOO2s+3oPaVAQUW7+zAsgfhC4L+5l8G7ShgBdh
+         9RZ8ka7FcYrTCkVXJe/lNlUPBsVwXeUmSHOP/kCP4vq7oWnhky0nOlz5J3JTd39kefIE
+         aB0A==
+X-Gm-Message-State: AFq9FYKgzbjcozug+Mnf/G2IiTryyqKZPhdMtqkyuqt3ABa2Xrug5PSp
+	Db7A6QsrmSu/Eu9VIv8Cazz7uiWZSqzTzlUiG2xB8p5LVprmcF/ADL6l1wb9K7HS
+X-Gm-Gg: AYBFou0Ao+hvwrOHneT3QjERhw9hD4rLyQoLrSvc0aALqSl9tTjFaWACN2vsthgUUKI
+	luMz9V6fnREbgeohlyYBa9krh+rOCF17g8IaVzAMdOqM88TLsIhIScuH3YUMPFAvkjkqsqIB0rD
+	iswhLKhr5bOqlXIwRhno7ay7USM5LUeWftGXmqrhveL7n1xUYA12sxDE5xam5jxN+7FNlWwwg/T
+	8kouoXMHTlzb471Twoq8yYPYb+5HKcQYLJcYaF9Pdjbp3RCD/w4+IPV1aAdQIJLzCi5rQzxiFlZ
+	PVbaVyKMOrgQFrTYZWdmGY46PebbMxDLPVAyDMU1B46mkhBQ0FUtDlejj9KhP++FO3PJ+uktlOc
+	G53TreqRgmnVUSSnXIbpgEhUUWIBb80P5n9nzUkywLujp+MTBpGchPZjsQ2fTg7a104TSDn3hso
+	wlmLa/Ht5VBVbMXJIZV2CLkLLFKBJjNqKTCwL70x2WwPWZbXFqNlMi/RbZ5sZyAtos3JvsOswKo
+	ssyzDxXN3076eW9dsCocMuXjJ7fKJHiSH1H2+FacZ9vFuLVjkgbwkviFhMaEQtg
+X-Received: by 2002:a05:6122:8005:b0:5c9:a60d:3277 with SMTP id 71dfb90a1353d-5dab1481fa4mr2670568e0c.11.1791213681291;
+        Mon, 05 Oct 2026 08:21:21 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5da635c7209sm13903683e0c.15.2026.10.05.08.20.32
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5da62d10534sm14429707e0c.13.2026.10.05.08.21.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 08:20:32 -0700 (PDT)
+        Mon, 05 Oct 2026 08:21:20 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: MGMT: Fix advertising instances with Global Advertising
-Date: Mon,  5 Oct 2026 11:20:26 -0400
-Message-ID: <20261005152026.3419422-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 1/2] doc/mgmt: Document Advertising setting as Global Advertising
+Date: Mon,  5 Oct 2026 11:21:10 -0400
+Message-ID: <20261005152111.3419786-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,214 +73,146 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Global Advertising, enabled with MGMT_OP_SET_ADVERTISING, uses instance
-0 and with extended advertising it has its own advertising set, but
-instances were still being treated as if they shared the same set:
+The Advertising setting always uses instance 0, and with extended
+advertising it has a dedicated advertising set, so only instances
+sharing that set are overridden by it; the others are advertised
+concurrently and removing instances never disables it.
 
- - Add Advertising and Add Extended Advertising Data would return
-   success without ever enabling the instance.
- - Removing the last instance would disable all advertising sets,
-   stopping Global Advertising while leaving its setting enabled.
- - Disabling Global Advertising would disable all sets, including
-   active instances.
-
-Fix this by only overriding instances that share the advertising set of
-Global Advertising, and by tracking HCI_LE_ADV_0 rather than HCI_LE_ADV
-to determine the state of Global Advertising.
-
-Fixes: 0d92808024b4 ("Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00")
 Assisted-by: OpenCode:claude-opus-5.5
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_event.c        |  6 ++-
- net/bluetooth/hci_sync.c         |  2 +-
- net/bluetooth/mgmt.c             | 76 +++++++++++++++++++++++++++-----
- 4 files changed, 72 insertions(+), 13 deletions(-)
+ doc/mgmt-protocol.rst | 70 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 47 insertions(+), 23 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index a6579a868678..59cb918d1405 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -122,6 +122,7 @@ int hci_disable_per_advertising_sync(struct hci_dev *hdev, u8 instance);
- int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
- 				u8 instance, bool force);
- int hci_disable_advertising_sync(struct hci_dev *hdev);
-+int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev);
- int hci_clear_adv_instance_sync(struct hci_dev *hdev, struct sock *sk,
- 				u8 instance, bool force);
- int hci_update_passive_scan_sync(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a3359aaad001..a1512c9baec6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1686,8 +1686,12 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
- 				hci_dev_clear_flag(hdev, HCI_LE_ADV_0);
+diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
+index f4c6822bfec1..ed2bd3349f25 100644
+--- a/doc/mgmt-protocol.rst
++++ b/doc/mgmt-protocol.rst
+@@ -306,7 +306,7 @@ following available bits:
+     7, Basic Rate/Enhanced Data Rate
+     8, High Speed
+     9, Low Energy
+-    10, Advertising
++    10, Advertising (Global Advertising - instance 0)
+     11, Secure Connections
+     12, Debug Keys
+     13, Privacy
+@@ -1714,6 +1714,12 @@ Set Advertising (since 1.4)
+ :Return Parameters:	Current_Settings (4 Octets)
  
- 			/* If just one instance was disabled check if there are
--			 * any other instance enabled before clearing HCI_LE_ADV
-+			 * any other instance enabled, including instance 0,
-+			 * before clearing HCI_LE_ADV
- 			 */
-+			if (hci_dev_test_flag(hdev, HCI_LE_ADV_0))
-+				goto unlock;
+ This command is used to enable LE advertising on a controller that supports it.
++This is referred to as Global Advertising and it always uses advertising
++instance 0, its advertising data is generated by the kernel based on the
++current settings (e.g. Flags, TX Power, Local Name and Appearance) and is not
++related to the advertising instances added with Add Advertising or Add
++Extended Advertising Parameters/Data commands, which start at instance 1.
 +
- 			list_for_each_entry_safe(adv, n, &hdev->adv_instances,
- 						 list) {
- 				if (adv->enabled)
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 1fe11d3ef1aa..19917aa49cb2 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1156,7 +1156,7 @@ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
- 	return 0;
- }
+ The allowed values for the Advertising command parameter are:
  
--static int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev)
-+int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev)
- {
- 	struct hci_cp_le_set_ext_adv_enable *cp;
- 	struct hci_cp_ext_adv_set *set;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index aea3482e3893..87085702f4bd 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6546,7 +6546,12 @@ static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
- 		return;
- 	}
+ .. csv-table::
+@@ -1742,10 +1748,20 @@ The value 0x02 should be the preferred mode of operation when implementing
+ peripheral mode.
  
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
-+	/* With extended advertising global advertising (instance 0) has its
-+	 * own advertising set so only consider its state, other instances may
-+	 * still be enabled.
-+	 */
-+	if (ext_adv_capable(hdev) ? hci_dev_test_flag(hdev, HCI_LE_ADV_0) :
-+				    hci_dev_test_flag(hdev, HCI_LE_ADV))
- 		hci_dev_set_flag(hdev, HCI_ADVERTISING);
- 	else
- 		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
-@@ -6566,6 +6571,28 @@ static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
- 	    list_empty(&hdev->adv_instances))
- 		return;
- 
-+	/* With extended advertising instances are not overridden by global
-+	 * advertising, except the ones sharing its set, so only (re)start the
-+	 * instances that are not already enabled.
-+	 */
-+	if (ext_adv_capable(hdev)) {
-+		struct adv_info *tmp;
+ Using this command will temporarily deactivate any configuration made by the Add
+-Advertising command. This command takes precedence. Once a Set Advertising
+-command with value 0x00 is issued any previously made configurations via
+-Add/Remove Advertising, including such changes made while Set Advertising was
+-active, will be re-enabled.
++Advertising command that shares the same advertising set as Global Advertising.
++This command takes precedence. Once a Set Advertising command with value 0x00
++is issued any previously made configurations via Add/Remove Advertising,
++including such changes made while Set Advertising was active, will be
++re-enabled.
 +
-+		list_for_each_entry_safe(adv_instance, tmp,
-+					 &hdev->adv_instances, list) {
-+			instance = adv_instance->instance;
-+
-+			if (adv_instance->enabled)
-+				continue;
-+
-+			err = hci_schedule_adv_instance_sync(hdev, instance,
-+							     true);
-+			enable_advertising_instance(hdev, err);
-+		}
-+
-+		return;
-+	}
-+
- 	instance = hdev->cur_adv_instance;
- 	if (!instance) {
- 		adv_instance = list_first_entry_or_null(&hdev->adv_instances,
-@@ -6621,6 +6648,11 @@ static int set_adv_sync(struct hci_dev *hdev, void *data)
- 			hci_update_scan_rsp_data_sync(hdev, 0x00);
- 			hci_enable_advertising_sync(hdev);
- 		}
-+	} else if (ext_adv_capable(hdev)) {
-+		/* Only disable global advertising (instance 0) leaving other
-+		 * instances untouched.
-+		 */
-+		hci_disable_ext_adv_legacy_instance_sync(hdev);
- 	} else {
- 		hci_disable_advertising_sync(hdev);
- 	}
-@@ -8952,6 +8984,21 @@ static bool adv_busy(struct hci_dev *hdev)
- 	return pending_find(MGMT_OP_SET_LE, hdev);
- }
++If the controller does not support extended advertising, there is only a single
++advertising set, so all instances are deactivated while Global Advertising is
++enabled. If the controller supports extended advertising, Global Advertising
++uses a dedicated advertising set (handle 0x00) so instances using other
++advertising sets continue to be advertised concurrently and are not affected
++by this command. Only an instance that would need to share the advertising
++set of Global Advertising (e.g. when the controller supports a single
++advertising set) is deactivated.
  
-+/* Global advertising, enabled with MGMT_OP_SET_ADVERTISING, uses instance 0
-+ * and takes precedence over any instance that would share its advertising
-+ * set: with legacy advertising there is only a single set so all instances
-+ * are overridden, whereas with extended advertising only an instance using
-+ * handle 0x00 is.
-+ */
-+static bool adv_overridden_by_global(struct hci_dev *hdev,
-+				     struct adv_info *adv)
-+{
-+	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		return false;
-+
-+	return !ext_adv_capable(hdev) || !adv->handle;
-+}
-+
- static void add_adv_complete(struct hci_dev *hdev, struct sock *sk, u8 instance,
- 			     int err)
- {
-@@ -9113,12 +9160,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 		schedule_instance = cp->instance;
- 	}
+ A pre-requisite is that LE is already enabled, otherwise this command will
+ return a "rejected" response.
+@@ -2757,10 +2773,12 @@ This command is used to configure an advertising instance that can be used to
+ switch a Bluetooth Low Energy controller into advertising mode.
  
--	/* If the HCI_ADVERTISING flag is set or the device isn't powered or
--	 * there is no instance to be advertised then we have no HCI
--	 * communication to make. Simply return.
-+	/* If the instance is overridden by global advertising or the device
-+	 * isn't powered or there is no instance to be advertised then we have
-+	 * no HCI communication to make. Simply return.
- 	 */
- 	if (!hdev_is_powered(hdev) ||
--	    hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
-+	    adv_overridden_by_global(hdev, adv) ||
- 	    !schedule_instance) {
- 		rp.instance = cp->instance;
- 		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
-@@ -9293,8 +9340,11 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
+ Added advertising information with this command will not be visible immediately
+-if advertising is enabled via the Set Advertising command. The usage of the Set
+-Advertising command takes precedence over this command. Instance information is
+-stored and will be advertised once advertising via Set Advertising has been
+-disabled.
++if Global Advertising is enabled via the Set Advertising command and the
++instance shares the same advertising set (see Set Advertising command). The
++usage of the Set Advertising command takes precedence over this command.
++Instance information is stored and will be advertised once advertising via Set
++Advertising has been disabled. If the controller supports extended advertising
++the instance is advertised concurrently with Global Advertising.
  
--	/* Submit request for advertising params if ext adv available */
--	if (ext_adv_capable(hdev)) {
-+	/* Submit request for advertising params if ext adv available, unless
-+	 * the set is in use by global advertising in which case the params
-+	 * will be programmed once the instance is scheduled.
-+	 */
-+	if (ext_adv_capable(hdev) && !adv_overridden_by_global(hdev, adv)) {
- 		cmd = mgmt_pending_new(sk, MGMT_OP_ADD_EXT_ADV_PARAMS, hdev,
- 				       data, data_len);
- 		if (!cmd) {
-@@ -9444,11 +9494,11 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
- 		schedule_instance = cp->instance;
- 	}
+ The Instance identifier is a value between 1 and the number of supported
+ instances. The value 0 is reserved.
+@@ -2880,10 +2898,12 @@ When the Instance parameter is zero, then all previously added advertising
+ Instances will be removed.
  
--	/* If the HCI_ADVERTISING flag is set or there is no instance to
--	 * be advertised then we have no HCI communication to make.
-+	/* If the instance is overridden by global advertising or there is no
-+	 * instance to be advertised then we have no HCI communication to make.
- 	 * Simply return.
- 	 */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) || !schedule_instance) {
-+	if (adv_overridden_by_global(hdev, adv_instance) || !schedule_instance) {
- 		if (adv_instance->pending) {
- 			mgmt_advertising_added(sk, hdev, cp->instance);
- 			adv_instance->pending = false;
-@@ -9524,7 +9574,11 @@ static int remove_advertising_sync(struct hci_dev *hdev, void *data)
- 	if (err)
- 		return err;
+ Removing advertising information with this command will not be visible as long
+-as advertising is enabled via the Set Advertising command. The usage of the Set
+-Advertising command takes precedence over this command. Changes to Instance
+-information are stored and will be advertised once advertising via Set
+-Advertising has been disabled.
++as Global Advertising is enabled via the Set Advertising command and the
++instance shares the same advertising set (see Set Advertising command). The
++usage of the Set Advertising command takes precedence over this command.
++Changes to Instance information are stored and will be advertised once
++advertising via Set Advertising has been disabled. Removing instances never
++disables Global Advertising.
  
--	if (list_empty(&hdev->adv_instances))
-+	/* Don't disable advertising if global advertising (instance 0) is
-+	 * enabled since it is not affected by removing instances.
-+	 */
-+	if (list_empty(&hdev->adv_instances) &&
-+	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
- 		err = hci_disable_advertising_sync(hdev);
+ Removing an instance while it is being advertised will immediately cancel the
+ instance, even when it has been advertised less then its configured Timeout or
+@@ -3048,7 +3068,7 @@ currently the following available bits:
+ 	7, Basic Rate/Enhanced Data Rate
+ 	8, High Speed
+ 	9, Low Energy
+-	10, Advertising
++	10, Advertising (Global Advertising - instance 0)
+ 	11, Secure Connections
+ 	12, Debug Keys
+ 	13, Privacy
+@@ -3779,10 +3799,12 @@ advertising instance. This command is expected to be followed by an Add Extended
+ Advertising Data command to complete and enable the advertising instance.
  
- 	return err;
+ Added advertising information with this command will not be visible immediately
+-if advertising is enabled via the Set Advertising command. The usage of the Set
+-Advertising command takes precedence over this command. Instance information is
+-stored and will be advertised once advertising via Set Advertising has been
+-disabled.
++if Global Advertising is enabled via the Set Advertising command and the
++instance shares the same advertising set (see Set Advertising command). The
++usage of the Set Advertising command takes precedence over this command.
++Instance information is stored and will be advertised once advertising via Set
++Advertising has been disabled. If the controller supports extended advertising
++the instance is advertised concurrently with Global Advertising.
+ 
+ The Instance identifier is a value between 1 and the number of supported
+ instances. The value 0 is reserved.
+@@ -3936,11 +3958,13 @@ advertisement registration process.
+ 
+ If extended advertising is available, this call will initiate HCI commands to
+ set the instance's advertising data, set scan response data, and then enable the
+-instance. If extended advertising is unavailable, the advertising instance
+-structure maintained in kernel will have its advertising data and scan response
+-updated, and the instance will either be scheduled immediately or left in the
+-queue for later advertisement as part of round-robin advertisement rotation in
+-software.
++instance, regardless of Global Advertising being enabled via Set Advertising
++command, unless the instance shares the same advertising set (see Set
++Advertising command). If extended advertising is unavailable, the advertising
++instance structure maintained in kernel will have its advertising data and scan
++response updated, and the instance will either be scheduled immediately or left
++in the queue for later advertisement as part of round-robin advertisement
++rotation in software, or until Global Advertising is disabled.
+ 
+ If Scan_Rsp_Len is zero and the flags defined in Add Extended Advertising
+ Parameters command do not have connectable flag set and the global connectable
 -- 
 2.55.0
 
