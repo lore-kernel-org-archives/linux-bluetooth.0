@@ -1,62 +1,62 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692283BE643
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 07:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D333B388E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 07:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791272135; cv=none; b=XaMbvBa8PjOtCXTSfHdrsYF9cpsuHaZIeTiWh2GMc5G9RHSubspx8rDKnKTV3wCl8GwlmEGLZWs8W3nPCW7Ah5Xfpl4tIHlN3GMD6ORNS7wDh3QvsHcdNy1j/OuTOf+ekshFAjQhNXKCT2B0EEae+otp49VC9DsEzRuxDi+VLzo=
+	t=1791272328; cv=none; b=hIoQUICw4jinyKovORQPYBd5jxP45TE16+0WZsibE9b3/vbfD4/4T5OUpIujYsP1xAyCtPvJbZQMGSpsKCPVSGkNCswFOQu+szfQ5OTgQ692iR78fqUgr+f12jahk32pCdxn/vyMNSwrwEyu1Pajt730EncoOTSGDi2w7Kt477U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791272135; c=relaxed/simple;
-	bh=do1dMayp7U7ifv/lWJTLCMSukgZtOZVBd757AhYFjzQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VsF9TMIMzumFNPlWGXMgirtOTQ0LLnWaaUlxeSHYSBCZZGEIDwQzxRRVVkR5a5IAGDmRFjJliiFfYXLU0NQvc01n7dGalmyAMuN40tEAV+pLdLhL4/Ec5l6q74EfIPAsc7jVu4Ro6c50NzsH9OQcqOTo9aJF2lfPN5cDfX01yks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FlA1lkSi; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1791272328; c=relaxed/simple;
+	bh=hPmcaj3H3AEM8qZpP1+5wokb8tuw7g2fNniJ7lrgX1w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=sXfS6XAF8oC/YfYWZB6Hh2wmm6bPxF+j7w2Qswvym0MqGrD/p9ac4M0Tsy4uk8RPB3VPhvYkwxGGBhtWrRrRe2uFUxM3v1Hhb3BcpTib/L56x8FGVNFgDkoNjBcdpzwyQBW3yK8retSBLe6Pf/6skcTJnaR8EeoRG+oJ2GQz12k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b87YzJ6n; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlA1lkSi"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2e30b9f1441so26164345ad.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 00:35:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b87YzJ6n"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-887fb6c0ad1so791420b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 00:38:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791272131; x=1791876931; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791272326; x=1791877126; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=b4BrqLwRac07pdPdRF0B1ATcS+C3c1Au4CQIaLL2DKM=;
-        b=FlA1lkSixPOSeKNrplUUjjeGn0PLFKvHIj0sxzwz9PfCNlBuOLam5UbwHudBXwUYEx
-         4WA+B1VWplmtyQU81OO3rQbNofkfQcNX8HpjxH3Qp4hxe8giTstrlNTWTbjzfEnbszbR
-         co53rjmns7n3UzZPfvz7Wf0hdUe7KuWqmMpuIw6VQrc3q6e6/LPvJZhf81zm1dnJJJF0
-         nbHzElvL74YL64jCvM2lIoWBF9UEtIEkPBgsAYcx3r0A+LCA1sMxOq3OM7Tj/MWp/uEE
-         n79k6iCRo6NRJHjepn0XCLzX/6E1t1Ns47Sm1kv+DjsBHSuVAHUdTDjiOLEgDR4frQbK
-         QxsA==
+        bh=c0ZGsfSYK4KxoPW/IvXZVYvE65dGb1kq53ZNK4HaCQU=;
+        b=b87YzJ6nQgmP5dYYnyx9gvJ0JxivnV7LEWGFTJkr4AK5q+SwpLedvEwMqPOnAXw7KF
+         /iocuactrfAler3VqEAGglrlVC7/yQ26qhum4L3X0+Eb3pgD0j6EYFUAJk/tOk1qt5yT
+         ttFEpZDvfvt/6WfSjOPSTJH8OXLY/yJ1siDyMZtTVb6bAkFiNYhsIt/o9m17nJZZyfc7
+         fHYuXS/yzMRBgayvbCyGQNokOLFixqQHQSxcnIsw9XTMVY6zGrikTGDqYM+BYgnXITi5
+         c8IL1EiMYzvmoe6rSeUYgRkB8V63cTBpNQd9s8l/6+8E71uD24w3+U8D9XVybL4joce+
+         lSkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791272131; x=1791876931;
+        d=1e100.net; s=20260707; t=1791272326; x=1791877126;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=b4BrqLwRac07pdPdRF0B1ATcS+C3c1Au4CQIaLL2DKM=;
-        b=ku98yqXEEc2LWQbUiWEg1fFJtFjRliXZZsrjW9s9lh89L43XpixPlc1eA7RVOpEZrn
-         G82WN/aKerC+nCiiVv6bT8dFhYp4pIzse9EldSvIuLzWoDXcam1rMUNc9PGJgmLlh/1g
-         Oz610/ykypmThqoIqWGYYZrOu7lAOwyi8BxQa4uj/EfKe1D/zXSrwsyKzqLZiEXZYzg3
-         T2ACRD8a96DaCILnq0mauZ6KqInofIowX55nb8BpjXkcFM6xHCN3+dNPv2oqCJwNxCZz
-         ZqSzYwRT8UtsJWAj7vbS3Tfuhdf2rInjJNelDgsHS1KaZbViM+3f0Nf7OAY0hk9Td8Cu
-         QzcA==
-X-Gm-Message-State: AFq9FYKalwNCgduqcEjNjibEXEx2Qadwea7xcUPSzbbFQb3fQ9ZnLY3W
-	ORc/rznuVfoeoMBpZGIHg5rVlX7Vp4b2NY3eab56A8ohyWu1eeplXLUT
-X-Gm-Gg: AYBFou3K3u76rkvtC5Jczx+Ow5zVy+SchizB9VkgA/vfiJYh4tKYudSqvUv8dmGJKTZ
-	qaNkLHBnEjdCgMIaacqi6SkG0345CXp6fzTusTeRewL1eoJP21EiguHOdcJ0ISDy1eQ89UdTglP
-	oYWQu9y9UjrWJeMeFQbkjFt4aVsVS+dUfVvxsdxi8eF5BJ9qUgG6QKS3OnXWZBKEiNEyNjkxuV1
-	GyJhB+CP4fVgmbKn6PrWesD2vcdz49CdfOAItiuVVMtrHmGZMnEauFzbfnVv0v0m+Wo3vKPPJtR
-	MjbM5hbbyJK2vLNGi+Yazg8lgjk8JN1Nz0vNr1NRxB3yJrw7IZKl5d9mSrTuVogdnTfiROk5dYB
-	sWvbTA39HX0+DT2UTjOlEhPQorwh51G0wX7WADbQOD07GXxH1j/D+ZPwWXuIiZozmugg5l9LL49
-	19+AgHQLLwCe6SjQrSGtE3Brzl/tB0vwJ4H+Jgl15+qCGV/WLpksBKjtwqOJzGamvNVVbdZua7G
-	S3YmQ==
-X-Received: by 2002:a17:90b:2e48:b0:3a8:599b:2499 with SMTP id 98e67ed59e1d1-3a8599b2775mr1489621a91.10.1791272130560;
-        Tue, 06 Oct 2026 00:35:30 -0700 (PDT)
+        bh=c0ZGsfSYK4KxoPW/IvXZVYvE65dGb1kq53ZNK4HaCQU=;
+        b=TKkR/ILZ4HfDPMFxose1bpWx9GMsRoMzJrF6xWLLnWJtTl3KKyRCpPnZ+vkNIHb4eb
+         GjsKV+gfQBqG3glaUtqZm3INsSmOysXKmv9xI7tdKUPdSiasiAGabGU6D04sc/I/RQ+C
+         rQDjWoLqsxZVX2UDtb8NPrYLd8LXS75ZRoGIjLVJCW5bSCjJGr1tJCxDcMOH6ceMA3Jn
+         v8zBi9ZicewvYCfhapNeGM7DFleanARCt2wa7lHtNdCdd2/lQJO3RqqnuB8rgI63q37J
+         GYD9f+3aaiWTqW/MUB7XlO0vSbzi/5D4UwS8LkaZaCcBQZyJEUdXQzbXEHT1YHe/t/Uc
+         mHpg==
+X-Gm-Message-State: AFuF++lbZYEtRVt/QGUluUIp9iLCC81gCX0nWorLqGrJ5BmgcaRBXrxz
+	y85K4YZeS6NFTUt64/+dnKQhqjKkxxYEWnk3Zy3LVKQ+wfGSzS7p1Hp1
+X-Gm-Gg: AYBFou0LA5smnnlSMhfYuFJ33dbC9OLH56pts/W4KAd/1XdEm3k4jqheCdbyYM65PGd
+	Tfipr8XjlE9KyRsGTl+Kf5d75IVNxkTs7OMDDUpodlh2B253xtiaSyQ5iR88U0T363Eiqd+cecV
+	dJ+GYkTTwkeu4BK3Bo/jYYlV0kChWEqYdTHMhgaptr13tp0nxJq0NPOA9nkEoJhTZHU5M0ER4sT
+	AyKf7Yi5MbciKGqWiIEv07j0CcjTxzUNdo92blF/6/ujbQRhQm7Z6sjikvo0I7lOwD8FAi2cFVX
+	YxkPwQ3NkdjyO5S/WbX/KTh5t1a8DVRnAOWvAxDjLgGuyI+jAbW08ITWFW6rUM1IbsDDrpotA4G
+	4KtHPQ91h0cPSyRrtbcQX6RWfpEx7HmIvmvs6i0lbbpwTAE4nommG7uXbKhKy0yEQt1lcLxwxn2
+	CioMm1DWAEB7W22rRVO6Odc1TrpqVHhpxDLIDl6NDubZ3wPCRHJMpcA4QZBk48c7KBdQ6dxp89P
+	yCj
+X-Received: by 2002:a05:6a21:3b8e:b0:3dd:a197:7369 with SMTP id adf61e73a8af0-3e124925909mr504138637.66.1791272325965;
+        Tue, 06 Oct 2026 00:38:45 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a8533abe0asm3530707a91.1.2026.10.06.00.35.25
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cce68214cd2sm2036284a12.0.2026.10.06.00.38.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 00:35:29 -0700 (PDT)
+        Tue, 06 Oct 2026 00:38:44 -0700 (PDT)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -65,9 +65,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: 6LoWPAN: Use RCU-safe device list removal
-Date: Tue,  6 Oct 2026 15:35:23 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0231-v5-32295fa35099b0d50b92@gmail.com>
+Subject: [PATCH] Bluetooth: hci_core: Keep RCU protection through LTK filtering
+Date: Tue,  6 Oct 2026 15:38:38 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0123-v5-83023fa5b4741c350341@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -78,125 +78,119 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-RCU readers of bt_6lowpan_devices must be able to follow an adapter's
-forward link until their read-side critical section ends. The entries
-are published with list_add_rcu(), but device_event() removes an entry
-on NETDEV_UNREGISTER with list_del(), poisoning that link.
+The LTK selected by hci_find_ltk() must remain allocated while its
+value is checked against the blocked-key list. The finder releases RCU
+before passing k->val to hci_is_blocked_key(). The helper's own RCU
+section protects the blocked-key list, but the selected LTK may already
+have been reclaimed before that section starts.
 
-When an adapter is being unregistered and 6LoWPAN is enabled, a
-6lowpan_control debugfs write with an existing LE L2CAP connection can
-enter lookup_peer() after unregister's first synchronize_net(). If the
-connection has no peer on that adapter, the reader must advance to the
-next list entry. Neither RTNL nor devices_lock excludes this RCU reader.
+An LE ATT socket security request can reach smp_ltk_encrypt() without
+holding hdev->lock. With a matching stored LTK and an LTK-type
+blocked-key entry present, a concurrent MGMT_OP_LOAD_LONG_TERM_KEYS can
+remove the selected LTK in the following order:
 
-The last peer's chan_close_cb() schedules delete_netdev(), which reaches
-unregister_netdevice_many_notify() through unregister_dev() and
-lowpan_unregister_netdev(). The following ordering is possible:
+  Socket security                 Management / RCU reclamation
+  hci_find_ltk()
+    rcu_read_lock()
+    select k
+    rcu_read_unlock()
+                                  load_long_term_keys()
+                                    hci_dev_lock(hdev)
+                                    hci_smp_ltks_clear(hdev)
+                                      list_del_rcu(&k->list)
+                                      kfree_rcu(k, rcu)
+                                  grace period ends; k is freed
+    hci_is_blocked_key(..., k->val)
+      memcmp(b->val, val, ...)
 
-  Unregister worker                 Control writer
-  -----------------                 --------------
-  synchronize_net() returns
-                                    lowpan_control_write()
-                                    lookup_peer(): rcu_read_lock()
-                                    reach adapter; no matching peer
-  device_event(): devices_lock
-  list_del(&entry->list)
-  spin_unlock(&devices_lock)
-                                    follow poisoned next link
-                                    read invalid adapter address
-  post-notifier synchronize_net()
-    waits for the reader
+The final comparison reads freed LTK bytes. Entering a new RCU section
+in hci_is_blocked_key() cannot protect a pointer obtained before the
+completed grace period.
 
-This invalid pointer access can fault in lookup_peer(). The first grace
-period drains existing readers but permits new ones to start, and the
-later grace period cannot prevent the intervening poisoned-link access.
+Keep the finder's RCU read-side section active through the blocked-key
+comparison and the warning that reads k->bdaddr. Release it before
+returning on either matched-key path. This delays reclamation until the
+finder has finished using the selected record, following the existing
+IRK lookup pattern.
 
-Use list_del_rcu() under the existing devices_lock to preserve the
-forward link for readers that already reached the adapter. The existing
-post-notifier synchronize_net() waits for those readers before netdevice
-teardown frees the private storage containing lowpan_btle_dev.
+KFENCE report as below:
 
-KASAN report as below:
+    ==================================================================
+    BUG: KFENCE: use-after-free read in hci_is_blocked_key+0xdf/0x240
+    
+    Use-after-free read at 0x00000000b9ee38e4 (in kfence-#249):
+     hci_is_blocked_key+0xdf/0x240
+     blocked_key_wrapper+0xc5/0x140 [pmbd_ltk_probe]
+     hci_find_ltk+0x1aa/0x3e0
+     smp_ltk_encrypt.isra.0+0xad/0x340
+     smp_conn_security+0x3b8/0x8c0
+     l2cap_sock_setsockopt+0x1c4b/0x2270
+     do_sock_setsockopt+0x1fb/0x430
+     __sys_setsockopt+0x106/0x180
+     __x64_sys_setsockopt+0xc2/0x160
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    
+    kfence-#249: 0x00000000121f2ad9-0x000000005b5bfb3d, size=72, cache=kmalloc-96
+    
+    allocated by task 495 on cpu 0 at 36.722380s (2.603973s ago):
+     hci_add_ltk+0x1f5/0x3a0
+     load_long_term_keys+0x6d0/0x860
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    
+    freed by task 533 on cpu 0 at 36.993097s (2.339769s ago):
+     __rcu_free_sheaf_prepare+0x261/0x2a0
+     rcu_free_sheaf+0x1f/0xe0
+     rcu_core+0x661/0x1d10
+     handle_softirqs+0x201/0x930
+     __irq_exit_rcu+0x110/0x1e0
+     irq_exit_rcu+0xe/0x20
+     sysvec_apic_timer_interrupt+0x6c/0x80
+     asm_sysvec_apic_timer_interrupt+0x1a/0x20
+     srso_alias_return_thunk+0x0/0xfbef5
+     __asan_memcpy+0x23/0x60
+     create_monitor_ctrl_event+0x1a2/0x460
+     mgmt_cmd_complete+0x2da/0x580
+     load_long_term_keys+0x741/0x860
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    
+    CPU: 1 UID: 0 PID: 495 Comm: python3 Tainted: G           O        7.2.0-rc6-pmb-bt-functional-v1+ #1 PREEMPT(lazy) 
+    Tainted: [O]=OOT_MODULE
+    Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+    ==================================================================
 
-    [...]
-    [   45.867526] Oops: general protection fault, probably for non-canonical address 0xfbd59c0000000023: 0000 [#1] SMP KASAN NOPTI
-    [   45.869489] KASAN: maybe wild-memory-access in range [0xdead000000000118-0xdead00000000011f]
-    [   45.870981] CPU: 1 UID: 0 PID: 646 Comm: sh Not tainted 7.2.0-rc6-pmb-bt-functional-v1+ #4 PREEMPT(lazy) 
-    [   45.872609] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-    [   45.874380] RIP: 0010:lookup_peer+0x1ba/0x320
-    [   45.875067] Code: 48 89 d9 ba 04 00 00 00 4c 89 fe bf a0 06 00 00 e8 2b e8 ad fb e9 56 ff ff ff e8 01 1e c3 fb 49 8d 7f 18 48 89 f8 48 c1 e8 03 <80> 3c 28 00 0f 85 4a 01 00 00 4d 8b 47 18 4c 89 f1 ba 04 00 00 00
-    [   45.878206] RSP: 0018:ffff888114d67b90 EFLAGS: 00010212
-    [   45.879106] RAX: 1bd5a00000000023 RBX: 0000000000000000 RCX: ffffffff85c1d19f
-    [   45.880334] RDX: ffff88810dc35700 RSI: 0000000000000000 RDI: dead000000000118
-    [   45.881455] RBP: dffffc0000000000 R08: 0000000000000001 R09: 0000000000000001
-    [   45.882546] R10: ffffffff893d3057 R11: ffff88810dc35700 R12: ffff88810a690000
-    [   45.883839] R13: ffff888115451038 R14: ffff88810a690000 R15: dead000000000100
-    [   45.885186] FS:  00007fa889bac780(0000) GS:ffff8881fd852000(0000) knlGS:0000000000000000
-    [   45.886539] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-    [   45.887527] CR2: 00007ffe304f2f80 CR3: 0000000104f64005 CR4: 0000000000770ef0
-    [   45.888687] PKRU: 55555554
-    [   45.889183] Call Trace:
-    [   45.889666]  <TASK>
-    [   45.890061]  lowpan_control_write+0x445/0x9e0
-    [   45.890854]  ? __pfx_lowpan_control_write+0x10/0x10
-    [   45.891738]  ? srso_alias_return_thunk+0x5/0xfbef5
-    [   45.892603]  ? srso_alias_return_thunk+0x5/0xfbef5
-    [   45.893383]  ? __debugfs_file_get+0x1bd/0x7f0
-    [   45.894057]  ? srso_alias_return_thunk+0x5/0xfbef5
-    [   45.894902]  ? lock_acquire+0x17b/0x2f0
-    [   45.895593]  ? ksys_write+0x111/0x200
-    [   45.896290]  full_proxy_write+0x11f/0x180
-    [   45.896991]  vfs_write+0x25a/0x1010
-    [   45.897642]  ? __pfx_full_proxy_write+0x10/0x10
-    [   45.898440]  ? __pfx_vfs_write+0x10/0x10
-    [   45.899178]  ? lock_release+0x11f/0x280
-    [   45.899855]  ksys_write+0x111/0x200
-    [   45.900435]  ? __pfx_ksys_write+0x10/0x10
-    [   45.901074]  ? irqentry_exit+0xbe/0x820
-    [   45.901722]  ? srso_alias_return_thunk+0x5/0xfbef5
-    [   45.902489]  do_syscall_64+0x115/0x6a0
-    [   45.903064]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    [   45.903813] RIP: 0033:0x7fa889c3e687
-    [   45.904359] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-    [   45.906981] RSP: 002b:00007ffd7651b960 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-    [   45.908070] RAX: ffffffffffffffda RBX: 00007fa889bac780 RCX: 00007fa889c3e687
-    [   45.909102] RDX: 000000000000001c RSI: 00005570f25e8d10 RDI: 0000000000000001
-    [   45.910133] RBP: 00005570f25e8d10 R08: 0000000000000000 R09: 0000000000000000
-    [   45.911162] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000001
-    [   45.912190] R13: 000000000000001c R14: 0000000000000000 R15: 00005570f25e8a78
-    [   45.913208]  </TASK>
-    [   45.913530] Modules linked in:
-    [   45.914022] ---[ end trace 0000000000000000 ]---
-    [   45.914709] RIP: 0010:lookup_peer+0x1ba/0x320
-    [   45.915436] Code: 48 89 d9 ba 04 00 00 00 4c 89 fe bf a0 06 00 00 e8 2b e8 ad fb e9 56 ff ff ff e8 01 1e c3 fb 49 8d 7f 18 48 89 f8 48 c1 e8 03 <80> 3c 28 00 0f 85 4a 01 00 00 4d 8b 47 18 4c 89 f1 ba 04 00 00 00
-    [   45.919191] RSP: 0018:ffff888114d67b90 EFLAGS: 00010212
-    [   45.920046] RAX: 1bd5a00000000023 RBX: 0000000000000000 RCX: ffffffff85c1d19f
-    [   45.921129] RDX: ffff88810dc35700 RSI: 0000000000000000 RDI: dead000000000118
-    [   45.922553] RBP: dffffc0000000000 R08: 0000000000000001 R09: 0000000000000001
-    [   45.923653] R10: ffffffff893d3057 R11: ffff88810dc35700 R12: ffff88810a690000
-    [   45.925119] R13: ffff888115451038 R14: ffff88810a690000 R15: dead000000000100
-    [   45.926180] FS:  00007fa889bac780(0000) GS:ffff8881fd852000(0000) knlGS:0000000000000000
-    [   45.927817] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-    [   45.928726] CR2: 00007ffe304f2f80 CR3: 0000000104f64005 CR4: 0000000000770ef0
-    [   45.930069] PKRU: 55555554
-    [   45.930456] Kernel panic - not syncing: Fatal exception
-    [   45.931542] Kernel Offset: disabled
-    [   45.932040] Rebooting in 1 seconds..
-
-Fixes: 90305829635d ("Bluetooth: 6lowpan: Converting rwlocks to use RCU")
+Fixes: 600a87490ff9 ("Bluetooth: Implementation of MGMT_OP_SET_BLOCKED_KEYS.")
 Assisted-by: LLM
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 836add41f5..4b05409929 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -1274,7 +1274,7 @@ static int device_event(struct notifier_block *unused,
- 			if (entry->netdev == netdev) {
- 				BT_DBG("Unregistered netdev %s %p",
- 				       netdev->name, netdev);
--				list_del(&entry->list);
-+				list_del_rcu(&entry->list);
- 				break;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 05d1ca25f4..90905dabf7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1153,16 +1153,16 @@ struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			continue;
+ 
+ 		if (smp_ltk_is_sc(k) || ltk_role(k->type) == role) {
+-			rcu_read_unlock();
+-
+ 			if (hci_is_blocked_key(hdev, HCI_BLOCKED_KEY_TYPE_LTK,
+ 					       k->val)) {
+ 				bt_dev_warn_ratelimited(hdev,
+ 							"LTK blocked for %pMR",
+ 							&k->bdaddr);
++				rcu_read_unlock();
+ 				return NULL;
  			}
+ 
++			rcu_read_unlock();
+ 			return k;
  		}
+ 	}
