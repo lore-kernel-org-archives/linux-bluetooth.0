@@ -1,39 +1,43 @@
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from mail-10698.protonmail.ch (mail-10698.protonmail.ch [79.135.106.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D033E49C7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 10:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DAB72602
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 11:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791284394; cv=none; b=FaSeAX6GuB4vok6aMDaL5LULq7LCroeMezl3vj2ZMU6JAnjOOdrrqU9dY6Ui2Ozr/REU80m/lVk38VkIVlwMOP3BsDhIxasnsGaUAsGrYa520KxoGrO0RA+nDLXnNzpEGkyXz8SIWjXncscTHLADA2/LbFqYgMoglxaQBHKgoOE=
+	t=1791284438; cv=none; b=WPsnND9E6QEfeSAROHwyvk0bjYUJQXSc4g12n2lS4VKd/khFCT0+rUAtYhhA5Bc6B4zpbgav567Qp9ks8k2ATU4DRM4LzQTZejbuX85kEUMVF6uhYzLqLrgIVnvIMXbyeQEvzyrG5YDC1qvkD4hMgoa5SwY9wg1CVnWnD0ljcOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791284394; c=relaxed/simple;
-	bh=jKZ7jXy0Y3s2m0Il25OU6sSSAAO13IB/O/bqX1bcBE4=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=KAd84SJp+iCn1xCMgRAY+DvXdLN14vxPSCD0wvHEVdp/Jc98cDn2h9NR1U2836j6jJf/39PGCK8qHB/+b0cssDf6lsuj4X5EvXXefv2TYU++qzI9fOvesYc6+4MVxl6fKFHwDXrslXxZGnaco1bOrNi2T8zENvBt9O1w1vrqV4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Iwu6Gsza; arc=none smtp.client-ip=185.70.43.25
+	s=arc-20240116; t=1791284438; c=relaxed/simple;
+	bh=CstqVf7qbwr1IJ2+Y4rA4Jvoytx2dNE8SphheBb3WmY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fcYE6kzzciiKB6n8pihIzqzAajo72gFRMR9kBP+DJoneD39P5llRrnDtS3Zv9hugjWXJITZWxfYynd3tzw4Yf04mbshzwP9VWUF8lk9fiykFDu6sFAhZsRytHiNxR0BwT5/kFMfb6snG4chlVf0vVx7ZnEA3ClLqUjXXAbyC3Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=nMK13pGK; arc=none smtp.client-ip=79.135.106.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Iwu6Gsza"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="nMK13pGK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1791284387; x=1791543587;
-	bh=6/LtjHSWFeUXZFWKoIpmiWCnW6HjdOVRUtfhU8lJUxo=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Iwu6GszaQj+0JnK1SKr1ZcWNJWm0PJ1k5PBw2NWGiXCAQWv42GDQgrvXlPY4WbCi5
-	 S+zzXeGdOP5to0gf/HyhF8AugOkvzbI4OAmKLYgXDQReuv+zscZjjd+b4A3BJ5a0ib
-	 jry+UzC3YKho5NnGgVSu7ADpK5ci53GNCixe0t2gQSKKvWLXlD8FobnZ2I/sj5ZPEl
-	 eZG5hPB+zjLzd9oOrKFK/MZhHiLf5x9T/eHkOaghh74Md0aDK3N+/MslsLYGniLUf/
-	 bsKWfNOPsqOYWuVKGl5M0NoPF9480EeG4Gb/hPBkCK9YoFx1EAdd+OZaH3H9s+Or2M
-	 CVlncPRkmXqFw==
-Date: Tue, 06 Oct 2026 10:59:41 +0000
+	s=protonmail2; t=1791284427; x=1791543627;
+	bh=CstqVf7qbwr1IJ2+Y4rA4Jvoytx2dNE8SphheBb3WmY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=nMK13pGKZ8tlDRc4Jf4wldBCcAGGtExkGXwfQ4Qu4YLdvjQQ8vI7QSGqfTuHOhUXm
+	 kp0kDUuaWwS43mBNbL2YCmUZ5UeOv2xDUv43KbSXSGoJ7xAvR2ceJIyvHooksTdx7f
+	 SZspwpi2IbYP9GJ99Ku8s/gLZ4Z7cGI0oG2D7wPQPUTRDcdUwPfrlaRPjC12pIvRbd
+	 jNjzK0UOMMqWvD8S15u3kEKPsLk8SVS57ZDHB6ckCyDBtZg+hevJ1Xl/joGLMGN2Dy
+	 tmnTEWcb7ZCFJBJHcLWnyPvxDJo6R+SWcpSInMya2v9uQO6ZdbeDAISpUm/e21UHXd
+	 FTUJPo/qdqeTA==
+Date: Tue, 06 Oct 2026 11:00:24 +0000
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 From: dt <derektern@proton.me>
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH BlueZ v2 0/3] BAP transport Release and reacquire fixes
-Message-ID: <1u4ljEAFqePjPZEbN-y_9BTWLNsqBnUqRAbQRokpIgWxUtdGlZtDC3gN8xIf4ovMpyIQ_UKBvvo2U1qgLrd7AHY8a2x1weRU9PUXtwSzUbc=@proton.me>
+Subject: [PATCH BlueZ v2 1/3] transport: Preserve Release on late BAP ready
+Message-ID: <PYDC9kPUFiayBviaLIJziLbacU4BWxj1nr2x3XTYoyuEajR8F_65ogs4D3OS3dMS7pzzn-x-4ekzVz2lfDRlyviCh5T-ZRm6GV-wtf-Ud0s=@proton.me>
+In-Reply-To: <1u4ljEAFqePjPZEbN-y_9BTWLNsqBnUqRAbQRokpIgWxUtdGlZtDC3gN8xIf4ovMpyIQ_UKBvvo2U1qgLrd7AHY8a2x1weRU9PUXtwSzUbc=@proton.me>
+References: <1u4ljEAFqePjPZEbN-y_9BTWLNsqBnUqRAbQRokpIgWxUtdGlZtDC3gN8xIf4ovMpyIQ_UKBvvo2U1qgLrd7AHY8a2x1weRU9PUXtwSzUbc=@proton.me>
 Feedback-ID: 213585229:user:proton
-X-Pm-Message-ID: aa6d4648f1b599d8080124a110cbb462693d2491
+X-Pm-Message-ID: d9a15674421ebdc4459e57494f7d10d05944e2bc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,49 +47,47 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+From: Derek Tern <1263187-dt@users.noreply.gitlab.freedesktop.org>
 
-This v2 rebases the BAP Release/reacquire fixes onto master
-7edaa61403390fe1cf2f1fb6d45fdd90fe6e93b3 after the v1 CI PR expired:
-https://github.com/bluez/bluez/pull/2550
+A late stream-ready event can reach bap_resume_complete() after Release
+has queued Disable. It then replies to Release with an Acquire payload
+and drops the Disable request ID. Client disconnection can subsequently
+free the owner while the Disable callback still refers to it.
 
-The first fix prevents a late ready event from replying to Release with
-an Acquire payload and losing the pending Disable request. The second
-allows deferred IO recreation when a new Enable arrives before the old
-CIS has finished disconnecting.
+Only complete pending Acquire/TryAcquire requests from this path. Leave
+Release and its request ID for the Disable callback or cancellation.
 
-Changes since v1:
-- Rebased both fixes and the regression test onto current master.
-- Clarified the test's reply barriers in its description and comments.
-- Added source-history-verified Fixes and Assisted-by attribution tags.
+Fixes: 466fce0209a3 ("transport: handle BAP Enabling state correctly when r=
+esuming")
+Assisted-by: Codex:GPT-6
+---
+ profiles/audio/transport.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Regarding the sequencing review: the test waits for both initial Acquire
-replies before Release, and for both Release replies before reacquiring.
-Every following Acquire also completes before the next Release. Only
-calls on different transport paths run concurrently, as in the existing
-acquisition test; successive operations on one path are not queued
-without waiting for its previous reply.
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 8cfc98a52..e001f7315 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -1965,8 +1965,16 @@ static void bap_resume_complete(struct media_transpo=
+rt *transport)
+ =09if (!owner)
+ =09=09return;
+=20
+-=09if (owner->pending)
++=09if (owner->pending) {
++=09=09const char *member;
++
++=09=09member =3D dbus_message_get_member(owner->pending->msg);
++=09=09/* A late ready event must not complete a pending Release. */
++=09=09if (strcmp(member, "Acquire") && strcmp(member, "TryAcquire"))
++=09=09=09return;
++
+ =09=09owner->pending->id =3D 0;
++=09}
+=20
+ =09if (transport->fd < 0) {
+ =09=09media_transport_remove_owner(transport);
+--=20
+2.56.0
 
-Fresh validation on this base:
-- Current master plus the test: all three pause variants fail with
-  malformed Release replies and pending-Disable cleanup crashes.
-- Both fixes: all 10 selected BAP functional cases pass.
-- ASan/UBSan: coordinated-set creation with SC and legacy pairing, plus
-  coordinated-set acquisition, pass including teardown (3 cases).
-- make check: all 35 unit-test executables pass, including 697 BAP cases.
-- A separate 500 ms userspace-disconnect delay fixture isolates patch 2:
-  with only patch 1, both reacquires time out after 26 seconds; with both
-  fixes, they complete in about 375 ms and both transports become active.
-  This diagnostic instrumentation is excluded from the series.
-
-The v1 functional job failed in coordinated-set cleanup, while its new
-resume cases passed. This base includes eb82d81bf26b and 8a1c53517399,
-which address the recorded adapter-list and BAP-session lifetime stacks;
-the fresh sanitizer checks above cover those previously failing paths.
-
-These are virtual-controller lifecycle tests, not acoustic, full-duplex
-range, or physical-earbud validation. The ordinary resume test does not
-force the delayed-disconnect ordering exercised by the separate fixture.
-
-Derek
 
