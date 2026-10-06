@@ -1,180 +1,303 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290103F8232
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 13:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791294985; cv=pass; b=olTaA+g1Kff92vyPDjTy6Acw6bdWm68oc6YERseD0+z9QwZzCxmuqjMEaGYXfKyt8NkverrLvlP+eQXB00Up9FJMM2guN6Ur58r4ZKgEO/Utym+Z8LH5x9XA3P5xK+YBKtHiv+y17QmW9p8p7fj5rnWesrE2LYtX4Cbxnut/HgU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791294985; c=relaxed/simple;
-	bh=vbRT6nGrsubTAfIz8i+mXocImBW/c25hWjByl3J0uow=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UWCfaGmM+lfTv31e+nRNzH6ityEJJGkXw1eG6w+BYoBHgR381RUVGr0nx70DbmvkGruv1gV5R+67id3gyIuP2dY2tOReRFuGd0vRp6ia9RhNvJnRTsfhKV9BZXnMQXGmnqHeSQwjA6qthL3nEYte07Um+6woZi6MDyLeRI5txxc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cWgLPtGB; arc=pass smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C8E46D2AA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 14:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791296112; cv=none; b=kXv+bRDzF5LFwViwFExDBcSJ7OmLJZOdXmRDRrWGzg2vqOngXB3fEZl/681ly/InuZhzN0Q6HxOlbkN4kIDBcJ0BrsUlQzhlVUxxFJQ3MJaIdm9miYCedhHc6KJh6tGeGZWyT9wxmHiyzIC1wRSrCJJGjpqLOpd81iCLy8vntl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791296112; c=relaxed/simple;
+	bh=0Y63/p8hUefnir0qLXYF6rWRyh1p1Yoq6zZj6lxx0To=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=siMEsPs2oNtZGq+TKcCAlT/UoxWaP/LrLGFOEpMwMfJY35chwFj/8h4uvIdPTq6IdBB2wdD2/ckQTOGp5WNqFIpEeAOf6LhRzbSM1VpyVRaPbH4RISK2DgDo6TAeNE0/WNT9GgXMGb6kaZPWY3Jn3wiYsvGNDsG8SHy9wSRYOWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fJl9pOaG; arc=none smtp.client-ip=209.85.217.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cWgLPtGB"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-8ab3d3c5761so7049307b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 06:56:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791294983; cv=none;
-        d=google.com; s=arc-20260327;
-        b=NrusN3CRNPKyb10cdxTg0h3jNJ3UOjq0pOltTbzOxv1UW8EiXTE2HZVAbFgn4NQCYL
-         Wrg1SF58TQ1jxuvjTep7wlTdr/SN9dBMtHF510mxCqCnLJngAKzToncRWfLotD5GKg6Q
-         3tjk+vegAOIXI7KCv7n5w5rpRgfsFxbWt021Vph08IYdl8VZfwfCCAfDCpcY8ff8tqNP
-         KPU+q/qZ0W6BOnu0JX1qSYprfvjuUS1unUYn7rKBUCMHAqrmOR5S6yd5dNs66CvAZk51
-         6K0osfZsyxnTJFVpgeOkYq9CUNFaaADNZycewOiMJXO/+iugBaT3I6AnirIqJWhk8QM+
-         cqNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ydu+elXchGUSJ74vhM8S5kQyLVRWEBSg2Ux9RtIawfA=;
-        fh=uIYCtJMytpdINOlB5QD1IvdbxBMgDBenXmlNPdjb0GE=;
-        b=h7zqOdt/a6MrUxYsQGNVPJnlyvXPoOjvOgZzEYNZSz1OaKZkqENmB0HZlQgBWriCFP
-         +R+6aqIhAPo3HITV5snj4z8m6VeSDO9W+VjwfQDhG74RH+3Vl1wc+bZ7XxFiKMFh8rfk
-         wSiqL6Wh4z6Y8Vvx7p8VFFU5RFdLWN3NTL8myPoWl5I4sMx5mPje8MiBNcv8uu2g0KdB
-         axquOfUBb4wTTynbH2RBx5VoTXs91vwWqpVT52S38U3gGXhRBKXgtK1heCaZHE3aZkXl
-         bNQjafzNvr1siHrffACtnYqx0BGU3PnAxToxxd/5co4PMxUmM9KqLJi55olRTzlS9Ech
-         uWKg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fJl9pOaG"
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-7c19c6721a3so333703137.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 07:15:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791294983; x=1791899783; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ydu+elXchGUSJ74vhM8S5kQyLVRWEBSg2Ux9RtIawfA=;
-        b=cWgLPtGBzwiMGY7rSfq1+75nRh7jC1WaWBuDb3BmTWJ7TOy4fooiVn/lUKmS/jjYwk
-         6xu7C98s1Hj5wx1BLMMcFdyyj24nFSfrg2FO/A6X8jHJYE9jjryIUalWec9aLjx1TtLa
-         BINRcixxzps2M5S82NcOnt1xrfHunRXh+VmOBaK0VcUGWFDT5T17Mu7V0CN2R/C4hHyF
-         l/s9Vi86QZewK2K/NunDGkCv9h4J9N8wXV6u7JaqgT6Ay6qoLMlm2/ul14D/y3Qr67Qm
-         tDHcdgJGHTxpyrNa1OtWu6HkPd9a8+2hVWRrO+Uv9wbrXQpZ48rXQjL4Sb+CmeXINIFT
-         EKeg==
+        d=gmail.com; s=20251104; t=1791296109; x=1791900909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=S5DfRHc2PioX4e6AZizGT+cXgkDWPt03OHbEjOh688w=;
+        b=fJl9pOaG1+2vsbrtFL9V4z9/Ti56ihyR5FaagqtnsOL61z8PCMCfQt9eqF888zOEj8
+         LLwzGAE0AMMbE3CW19+cnDH3rOvyYOdVX/V/9CFhM1yz66KcvwUYmI5eZVaLyYsjdpKE
+         3j2nYrwAg6G7yvu2bb4qsyWGCyT+RmbwUsXMdylTwniM0KTe4esl2yr4KZeu1aBvalDP
+         Znca1dX8VpLD2gWaoAHou2M/zV1An2nHRcEVpkE6YFJ5Epc8MWobpjxQ0kUt2WPrQjkP
+         NXD0AfMZGfMFeetui8YmDWggf54LvSN3S6aanoeiaHeRFmJ+nt7/4SXfcFrPUU9pEWi2
+         6JDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791294983; x=1791899783;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ydu+elXchGUSJ74vhM8S5kQyLVRWEBSg2Ux9RtIawfA=;
-        b=BpeKr2xDeP56v6b1/rtliJarXMP0QlefWhIGTp+WA1rIsAPB0HJDvWx74BVqYfS7Gx
-         FStyg+IcjrshwnVQ4GcjbXQ9uDE8sFg5unCeEi0o2m+4sQOyWHpBx12WXXgzFuT14LcN
-         S9617DroeydbIT4jLL5ZB43I5zEgv80kQoW9+AfT8MXlfU4bjw59CkaCBwJiCO8UECRi
-         jEquiqrWRuOVIEfEntQeO17jjCEIYsNpWVXJ3vTXsM8NSCBC2RVWWlEwRPMiZE2idRuQ
-         aNGPWVGg68urXmj4GlnDB60twPZyw0ORUmyTsruAQBiUhFfrsr7IdSpJt+DQ+Qhioi3C
-         rGOg==
-X-Forwarded-Encrypted: i=1; AKwUvBwd3NUPV4zw2dgOOYyLZpjrssRULcr/n28QYaTl61620cEaQa2+6kqVCzqCzALlCdZqH3TX4vYlCEfl8yq5f8c=@vger.kernel.org
-X-Gm-Message-State: AFuF++mP/i9q0nXR3W2uVl+RugG4zxdTTFAx4gRWvTTdp3ovNYwX5bc8
-	TsEzk7K7LJ7QXohKj8eABqQB2he5dWNAbfdBve7BWKzZpgTIWyjI7dR2rDiQMxPbOs/MN9fp6Sa
-	Jb4P1pwyD4w9Jk4zoUlLUBaHQV9+tza8=
-X-Gm-Gg: AYBFou3ZRZF8RVq3PzrrfqgTlF75vbSIgJtBGCQvvBdMvJkikz0QBXdm/aU37xyXaMA
-	0kHJqON5YR3lvQYK2YIP939YI3NHxlDSDflWkrfjPuTI4akQMfJzKgLeFNNGvlEJUfMpmwzlAOv
-	sz9/TC+7FyFk1cqqCvSYBjv27ItIfB8xeuHH1AtCScm3+F3Nu9KQ0+YgaEL6CrY86qOlGPho2Y8
-	uEdmIupW+8alYocVYj65tHySow5it4FHWoz/evqwAjnCXfXvvfFD4PDB3kcgS9RtSUaEPEEaLTZ
-	IOj3IM7jNU/6JLB9KQjHWHXsY+0ZrlM7QkFCo8n8fp11kN9yK1xlc97Q0OONgR/9ffd8W23whCd
-	CXLPsgnpcmKEx1VJD00ErjRxzLyOHt+GucMhMw3o=
-X-Received: by 2002:a05:690c:c50f:b0:8ae:7fb9:8cc4 with SMTP id
- 00721157ae682-8b04f4d8cefmr7480477b3.33.1791294982904; Tue, 06 Oct 2026
- 06:56:22 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791296109; x=1791900909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=S5DfRHc2PioX4e6AZizGT+cXgkDWPt03OHbEjOh688w=;
+        b=XlbL21chBmW0wCtsRkFHr8tDcVV5S104QI1sGJmIXkmAucNWPov1XV+hjnzPzSsoX1
+         MHs7OuYDWYsXfg7tpH4NHYcT1kEj6MVl8qEt+RNI5KtFO+RnUm3bxXl2I2DAcweILiKt
+         8TfSZZ3onE0alDGEHckJK2GAG2Z0SbxRrzQm0IoByTcUokVMUi6e3heSUXaYHjYrahOj
+         76TMalw9Mc+VOwLWWm3akATDTylPfE+Ewj/QwuX+iVZ0leaDcl5rUnpoqsbOs/4k9jE4
+         Fn9JrojL5W1WF1RYY/SvxwZfxrDj3XE/4LAs9y5gtSilV3hwFo/zMJvw+4tAvlptb+DB
+         prZQ==
+X-Gm-Message-State: AFq9FYJlB9emTbRmNNOufJ0MTapTb2InMF8oLZAVAW4KI325pWIhre8A
+	P7JDWogg+8Jz1LCFGpRG/vojV1RbDmD8x75zyWnGoKR6U7MBzqQ2IoXY0kU8WeKZ
+X-Gm-Gg: AYBFou2Kq5wDeuAjg5E7wLeQcTOUI15m5BuQVotJTitQYcy2CHg7xxiG8U1mnM4MfDE
+	raQdORHcaEDky9x0Gp5CLQO+Ld/RA9JpIwWYMJKFEEFhPBhHZpEvsQ5O+lugN7xx9Tu6PCQRGtI
+	rMnZgCb4aH1RmUMCc1oaAChRIEKvqV6qr2hfBwErYkOA21V3ULrru8kXGne6osWgfjzvlRVUcZD
+	XbVZuDt/2zBooVsHBgtvNDy6IMlxbXa6PxqOWT/23/Ug8jTBALEEONY9w1e7YZtVCorZ2CEIvaU
+	IBB6V9y8Szlc5On6KYRDOJE4bEikpTVdC2w+XMhe5P6VDRK/5m0McGf8AikKiHt9Q0T3xVVsmLA
+	yDm5HFWFZyfxlMyTUxHKwcNhtm51oi2GzHjRocueBQlIp70pGDAN7/XUMZ+j9WT6nSaM9sSToOo
+	U9AEfNlg9wI39LI3gK0v5xXP5JqmzMkC1BscVfsaDn1nGaMQ9OauyzbJUsUPevDTw/cXYsugg6t
+	BKOTQ9mr/GacHdKmrqraEZXyzUqeEBxAeRpqhwEc4YtbQstqVPB94P+tKmVERHy
+X-Received: by 2002:a05:6102:a54:b0:7c3:978f:c5eb with SMTP id ada2fe7eead31-7c879efbbf5mr425124137.9.1791296109277;
+        Tue, 06 Oct 2026 07:15:09 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7c0ff5c49a9sm13235132137.4.2026.10.06.07.15.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2026 07:15:08 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5 1/4] Bluetooth: MGMT: Fix advertising instances with Global Advertising
+Date: Tue,  6 Oct 2026 10:14:59 -0400
+Message-ID: <20261006141502.3789138-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261005041457.3021139-1-ravindra@intel.com> <20261006095628.384343-1-runyu.xiao@seu.edu.cn>
-In-Reply-To: <20261006095628.384343-1-runyu.xiao@seu.edu.cn>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 6 Oct 2026 09:56:10 -0400
-X-Gm-Features: AclHuK-jEawYK6Z4T-kBMGawZzjTV2I3SyCTjKA6Wuad8-SZxYRE9_EtvKz7ESg
-Message-ID: <CABBYNZJsiNbgRsknuxYHJG-bX3s5mim6tiP-29LdzuaO_PS=CQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: use managed IRQ teardown
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Tedd Ho-Jeong An <tedd.an@intel.com>, Kiran K <kiran.k@intel.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Ravindra <ravindra@intel.com>, 
-	Jianhao Xu <jianhao.xu@seu.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Runyu,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Oct 6, 2026 at 5:56=E2=80=AFAM Runyu Xiao <runyu.xiao@seu.edu.cn> w=
-rote:
->
-> The PCIe driver registers its MSI-X handlers with
-> devm_request_threaded_irq(), but remove() uses free_irq() directly. The
-> devres actions then retain registrations and attempt to release them agai=
-n
-> during device cleanup.
->
-> Use devm_free_irq() for the remove path and for already registered vector=
-s
-> when a later setup request fails. This removes the managed resource at th=
-e
-> same time as the IRQ is released and keeps MSI-X vector teardown ordered
-> after IRQ ownership is gone.
->
-> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe trans=
-port")
-> Cc: stable@vger.kernel.org
-> Tested-by: Ravindra <ravindra@intel.com>
-> Assisted-by: LLM
-> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> ---
-> Changes in v2:
-> - Add Ravindra's Tested-by tag.
+Global Advertising, enabled with MGMT_OP_SET_ADVERTISING, uses instance
+0 and with extended advertising it has its own advertising set, but
+instances were still being treated as if they shared the same set:
 
-v1 has already been applied.
+ - Add Advertising and Add Extended Advertising Data would return
+   success without ever enabling the instance.
+ - Removing the last instance would disable all advertising sets,
+   stopping Global Advertising while leaving its setting enabled.
+ - Disabling Global Advertising would disable all sets, including
+   active instances.
 
->
->  drivers/bluetooth/btintel_pcie.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
-_pcie.c
-> index 005c77a4f..f8901df7c 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1750,7 +1750,7 @@ static irqreturn_t btintel_pcie_irq_msix_handler(in=
-t irq, void *dev_id)
->  static int btintel_pcie_setup_irq(struct btintel_pcie_data *data)
->  {
->         int err;
-> -       int num_irqs, i;
-> +       int num_irqs, i, j;
->
->         for (i =3D 0; i < BTINTEL_PCIE_MSIX_VEC_MAX; i++)
->                 data->msix_entries[i].entry =3D i;
-> @@ -1779,6 +1779,10 @@ static int btintel_pcie_setup_irq(struct btintel_p=
-cie_data *data)
->                                                 KBUILD_MODNAME,
->                                                 msix_entry);
->                 if (err) {
-> +                       for (j =3D 0; j < i; j++)
-> +                               devm_free_irq(&data->pdev->dev,
-> +                                             data->msix_entries[j].vecto=
-r,
-> +                                             &data->msix_entries[j]);
->                         pci_free_irq_vectors(data->pdev);
->                         data->alloc_vecs =3D 0;
->                         return err;
-> @@ -3101,7 +3105,7 @@ static void btintel_pcie_remove(struct pci_dev *pde=
-v)
->                 struct msix_entry *msix_entry;
->
->                 msix_entry =3D &data->msix_entries[i];
-> -               free_irq(msix_entry->vector, msix_entry);
-> +               devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry)=
-;
->         }
->
->         pci_free_irq_vectors(pdev);
-> --
-> 2.34.1
+Fix this by only overriding instances that share the advertising set of
+Global Advertising, and by tracking HCI_LE_ADV_0 rather than HCI_LE_ADV
+to determine the state of Global Advertising, which is now also cleared
+when all advertising sets are disabled.
 
+Fixes: 0d92808024b4 ("Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00")
+Assisted-by: OpenCode:claude-opus-5.5
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_sync.h |  1 +
+ net/bluetooth/hci_event.c        |  8 ++-
+ net/bluetooth/hci_sync.c         |  2 +-
+ net/bluetooth/mgmt.c             | 83 +++++++++++++++++++++++++++-----
+ 4 files changed, 81 insertions(+), 13 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index a6579a868678..59cb918d1405 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -122,6 +122,7 @@ int hci_disable_per_advertising_sync(struct hci_dev *hdev, u8 instance);
+ int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
+ 				u8 instance, bool force);
+ int hci_disable_advertising_sync(struct hci_dev *hdev);
++int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev);
+ int hci_clear_adv_instance_sync(struct hci_dev *hdev, struct sock *sk,
+ 				u8 instance, bool force);
+ int hci_update_passive_scan_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a3359aaad001..2c8f6f22a4ee 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1686,8 +1686,12 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
+ 				hci_dev_clear_flag(hdev, HCI_LE_ADV_0);
+ 
+ 			/* If just one instance was disabled check if there are
+-			 * any other instance enabled before clearing HCI_LE_ADV
++			 * any other instance enabled, including instance 0,
++			 * before clearing HCI_LE_ADV
+ 			 */
++			if (hci_dev_test_flag(hdev, HCI_LE_ADV_0))
++				goto unlock;
++
+ 			list_for_each_entry_safe(adv, n, &hdev->adv_instances,
+ 						 list) {
+ 				if (adv->enabled)
+@@ -1698,6 +1702,8 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
+ 			list_for_each_entry_safe(adv, n, &hdev->adv_instances,
+ 						 list)
+ 				adv->enabled = false;
++
++			hci_dev_clear_flag(hdev, HCI_LE_ADV_0);
+ 		}
+ 
+ 		hci_dev_clear_flag(hdev, HCI_LE_ADV);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 1fe11d3ef1aa..19917aa49cb2 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1156,7 +1156,7 @@ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
+ 	return 0;
+ }
+ 
+-static int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev)
++int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_le_set_ext_adv_enable *cp;
+ 	struct hci_cp_ext_adv_set *set;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index aea3482e3893..106b35c88c98 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6546,7 +6546,12 @@ static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
+ 		return;
+ 	}
+ 
+-	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
++	/* With extended advertising global advertising (instance 0) has its
++	 * own advertising set so only consider its state, other instances may
++	 * still be enabled.
++	 */
++	if (ext_adv_capable(hdev) ? hci_dev_test_flag(hdev, HCI_LE_ADV_0) :
++				    hci_dev_test_flag(hdev, HCI_LE_ADV))
+ 		hci_dev_set_flag(hdev, HCI_ADVERTISING);
+ 	else
+ 		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
+@@ -6566,6 +6571,34 @@ static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
+ 	    list_empty(&hdev->adv_instances))
+ 		return;
+ 
++	/* With extended advertising instances are not overridden by global
++	 * advertising, except the ones sharing its set, so only (re)start the
++	 * instances that are not already enabled.
++	 *
++	 * Lookup instances by identifier while holding hdev->lock since the
++	 * list may change while waiting for the HCI commands to complete.
++	 */
++	if (ext_adv_capable(hdev)) {
++		u16 i;
++
++		for (i = 1; i <= hdev->le_num_of_adv_sets + 1; i++) {
++			bool enabled;
++
++			hci_dev_lock(hdev);
++			adv_instance = hci_find_adv_instance(hdev, i);
++			enabled = !adv_instance || adv_instance->enabled;
++			hci_dev_unlock(hdev);
++
++			if (enabled)
++				continue;
++
++			err = hci_schedule_adv_instance_sync(hdev, i, true);
++			enable_advertising_instance(hdev, err);
++		}
++
++		return;
++	}
++
+ 	instance = hdev->cur_adv_instance;
+ 	if (!instance) {
+ 		adv_instance = list_first_entry_or_null(&hdev->adv_instances,
+@@ -6621,6 +6654,11 @@ static int set_adv_sync(struct hci_dev *hdev, void *data)
+ 			hci_update_scan_rsp_data_sync(hdev, 0x00);
+ 			hci_enable_advertising_sync(hdev);
+ 		}
++	} else if (ext_adv_capable(hdev)) {
++		/* Only disable global advertising (instance 0) leaving other
++		 * instances untouched.
++		 */
++		hci_disable_ext_adv_legacy_instance_sync(hdev);
+ 	} else {
+ 		hci_disable_advertising_sync(hdev);
+ 	}
+@@ -8952,6 +8990,21 @@ static bool adv_busy(struct hci_dev *hdev)
+ 	return pending_find(MGMT_OP_SET_LE, hdev);
+ }
+ 
++/* Global advertising, enabled with MGMT_OP_SET_ADVERTISING, uses instance 0
++ * and takes precedence over any instance that would share its advertising
++ * set: with legacy advertising there is only a single set so all instances
++ * are overridden, whereas with extended advertising only an instance using
++ * handle 0x00 is.
++ */
++static bool adv_overridden_by_global(struct hci_dev *hdev,
++				     struct adv_info *adv)
++{
++	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING))
++		return false;
++
++	return !ext_adv_capable(hdev) || !adv->handle;
++}
++
+ static void add_adv_complete(struct hci_dev *hdev, struct sock *sk, u8 instance,
+ 			     int err)
+ {
+@@ -9113,12 +9166,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		schedule_instance = cp->instance;
+ 	}
+ 
+-	/* If the HCI_ADVERTISING flag is set or the device isn't powered or
+-	 * there is no instance to be advertised then we have no HCI
+-	 * communication to make. Simply return.
++	/* If the instance is overridden by global advertising or the device
++	 * isn't powered or there is no instance to be advertised then we have
++	 * no HCI communication to make. Simply return.
+ 	 */
+ 	if (!hdev_is_powered(hdev) ||
+-	    hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
++	    adv_overridden_by_global(hdev, adv) ||
+ 	    !schedule_instance) {
+ 		rp.instance = cp->instance;
+ 		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+@@ -9293,8 +9346,11 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	/* Submit request for advertising params if ext adv available */
+-	if (ext_adv_capable(hdev)) {
++	/* Submit request for advertising params if ext adv available, unless
++	 * the set is in use by global advertising in which case the params
++	 * will be programmed once the instance is scheduled.
++	 */
++	if (ext_adv_capable(hdev) && !adv_overridden_by_global(hdev, adv)) {
+ 		cmd = mgmt_pending_new(sk, MGMT_OP_ADD_EXT_ADV_PARAMS, hdev,
+ 				       data, data_len);
+ 		if (!cmd) {
+@@ -9444,11 +9500,12 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		schedule_instance = cp->instance;
+ 	}
+ 
+-	/* If the HCI_ADVERTISING flag is set or there is no instance to
+-	 * be advertised then we have no HCI communication to make.
++	/* If the instance is overridden by global advertising or there is no
++	 * instance to be advertised then we have no HCI communication to make.
+ 	 * Simply return.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) || !schedule_instance) {
++	if (adv_overridden_by_global(hdev, adv_instance) ||
++	    !schedule_instance) {
+ 		if (adv_instance->pending) {
+ 			mgmt_advertising_added(sk, hdev, cp->instance);
+ 			adv_instance->pending = false;
+@@ -9524,7 +9581,11 @@ static int remove_advertising_sync(struct hci_dev *hdev, void *data)
+ 	if (err)
+ 		return err;
+ 
+-	if (list_empty(&hdev->adv_instances))
++	/* Don't disable advertising if global advertising (instance 0) is
++	 * enabled since it is not affected by removing instances.
++	 */
++	if (list_empty(&hdev->adv_instances) &&
++	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
+ 		err = hci_disable_advertising_sync(hdev);
+ 
+ 	return err;
+-- 
+2.55.0
 
---=20
-Luiz Augusto von Dentz
