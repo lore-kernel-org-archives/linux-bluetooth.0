@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A6E46C826;
-	Tue,  6 Oct 2026 14:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B3947276E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 14:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791297015; cv=none; b=tuWCYI3javH/O3d7RUXQJsooPELfJS6WoK5cNAsfHkRvmmjZdusCkKfxw2FBq1ZSEFuBIBb/y1V+5GZ9hi/K0TMteUFZ6E66ZUkVrPSW+qjydn8C8sYxGvyyH4pTFPQ2oEgXLUlC8DYU6m3nm1FbQyLRO0S29CeDlq4GD3e6hqA=
+	t=1791297017; cv=none; b=DcQOO8Yq0S0V6hNd/baQTAn/RyTO3yfj6Nc0YhkaaB+skFhvB4WY0nCln8kJnLLlxOMbzndJmy4pUD+nl44og1/twgWw36Co+keH7KUtGFwC1+TT8rmyBC3iLrEWQEnTi0esnqZ32s9gwggGvm5PbZN/KpoQ8+9q1vmL4qp/VpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791297015; c=relaxed/simple;
-	bh=HzR3bIkl7tqeptoaF03WRmK+k32y3BbzXLSjHdVXUxA=;
+	s=arc-20240116; t=1791297017; c=relaxed/simple;
+	bh=7I6UApENle9ejgjeUudENvj5dAlyLdI9Sa0aMW6fUjs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u2il8sbX54GbhOCK41Ivks4SrKDPYqKaX1ua9gvyzZrov/sBNOJR3wtClT+j9SL3zJHmdAMQEpQQ8uuRHGxDKaCw/vzNBYH6FMb9RnuYpJWNuu48YsliGBcc6FeWuM6J8ljAUypGX/6ChAhTFSYJtp+g2oqCaIoycEeSYjP+e/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9aEkOtP; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=apVy0+6MZlT4VZo/XhpqdZ8zX/PfV3+SXceLRqdes1SLMQXebUsKT4B92rOxyKKWkKM9/nKHmpU139qJkHWjJoyaMNuXgYAIbW9DYNZwKDAPepIgsnemF6zi3tIsuv8qnFpYwB9o+kRjsKTRlT3zrwTzf7BN+qxi2i+AXpmU910=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjVb+tQO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9aEkOtP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 099DA1F0089B;
-	Tue,  6 Oct 2026 14:30:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjVb+tQO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD4C1F0089C;
+	Tue,  6 Oct 2026 14:30:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791297014;
-	bh=h0Pok1qt68YrWEZKekYSCZycWEqtZTNZYOSMSlnREtQ=;
+	s=k20260515; t=1791297015;
+	bh=0EKiIeajMykvy3jk40Qfvu5kWD2M9aaMCb7OLgXx3eA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=b9aEkOtPb9kR4cgqq28dLQBF0Wthozxbw++/lPdcPIyL1WIo5+AQJM7BYNFaUpson
-	 Bsugrj/dY1iotsSR79oypgwuPu+SsGCq3ygxjVaeVlLWyoEPw24I1try4NlOFiUBqm
-	 dKGKCAiW5vpbXyLlwkdj/8PYzsoa5ysRyBRpUl7Gnjb/jZQuKjbfa3Tdeo7QkUAhVX
-	 qiMCljSFH8GBbym/f8QX07ysjJjCZeLiwSSxMvFzIU6GAq6gwhH2pWzvOKP5X2U4g4
-	 e7FOYEiWhkZ0iI9ZhkJRj/WiBBx1uRaRAEsePH05Y0ikTT1nuvVwOrc/tzTl/smBEt
-	 L2Gj4M4+uTy2w==
+	b=SjVb+tQOqbAfmaSV8gNJOdXswdWSm54RXMYvdnWbL/ftCdS9Et+8UI9BaBxI93prU
+	 7PVgYZMNtNAYoW2267ZDX2rfQdQgYQE5qdbbZPEMa7d3mJR5LW44Rkdm0psOixeCH+
+	 VpmB+3dU346hBF9U6CrD/rKp8LaEArbGl3EfZLPXy/58fQO8RwuQ/Pux9B+xRtcVKq
+	 FnW+PLrhhd7lTmSAnOwpTZ6aeUcdSnOQuECAzkNq2xpDIguPAVggwubfKlh/dOMFlK
+	 mYc7+bYJt+qFd6dRdzpD9946ttYr/wzs9ejRYzr36Ryff0QrL2IuHhi+kWlXiaNjgF
+	 E1F2z4p5TJkSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F147439D5FF3;
-	Tue,  6 Oct 2026 14:30:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 774DD39D5FF3;
+	Tue,  6 Oct 2026 14:30:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sock: Serialize dead-device detachment
+Subject: Re: [PATCH 0/2] Bluetooth: hci_sync: fix mesh adv timeout units
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179129701278.2655967.8493236646880910714.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Oct 2026 14:30:12 +0000
-References: <20261004162442.3968446-1-nicoyip.dev@gmail.com>
-In-Reply-To: <20261004162442.3968446-1-nicoyip.dev@gmail.com>
-To: Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- penguin-kernel@i-love.sakura.ne.jp, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <179129701402.2655967.18407429567239565101.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Oct 2026 14:30:14 +0000
+References: <cover.1791223958.git.pav@iki.fi>
+In-Reply-To: <cover.1791223958.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  5 Oct 2026 00:24:42 +0800 you wrote:
-> Rebinding an HCI socket after its controller is unregistered can race
-> monitor control replay and crash the kernel. hci_sock_bind() clears
-> hci_pi(sk)->hdev and drops the device reference under only the socket
-> lock, whereas send_monitor_control_replay() holds hci_sk_list.lock for
-> reading.
+On Mon,  5 Oct 2026 21:13:53 +0300 you wrote:
+> For mesh advertisements = adv_info::mesh nonzero, the time units are
+> milliseconds instead of seconds like normally.
 > 
-> Replay can observe a non-NULL hdev, then bind can clear it and drop the
-> last reference before create_monitor_ctrl_open() reads hdev->id. This
-> can cause a NULL pointer dereference if the pointer is reloaded, or a
-> use-after-free if the old pointer is retained.
+> This was forgotten in hci_schedule_adv_instance_sync() and
+> hci_enable_ext_advertising_sync() which scheduled 1000x too large
+> timeouts.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_sock: Serialize dead-device detachment
-    https://git.kernel.org/bluetooth/bluetooth-next/c/381a0925c556
+  - [1/2] Bluetooth: hci_sync: fix mesh adv timeout units
+    https://git.kernel.org/bluetooth/bluetooth-next/c/87a49b610708
+  - [2/2] Bluetooth: make hdev->adv_instance_timeout a boolean
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
