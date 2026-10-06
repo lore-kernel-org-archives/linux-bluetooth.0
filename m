@@ -1,66 +1,66 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077C749C4C9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 15:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A84A48F836
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 15:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791300280; cv=none; b=hbZDFj8xON6qiEDkW8NWrrIk0vQpRqApK/Kagf9wCDFF5UcyZZvuw6Mlu+vBkL66joGEsKpPYcEKOhvKO6ou99MucwHBRjr/AsI93KDrnbiZg/LawumF4ywyQh/bkGbg3uo7AtzZxLSG/9wYkqL3v0FHF/hAihscMei8t2HtQeo=
+	t=1791300558; cv=none; b=jO8M47an017jdwqKA9G6jPIjQ53135K3we6Vq/JTSn6Nt7QLNKR5vEA/0sy4XT3afHUhGu+PRKnMgg7EhhoLuPCb61D9q33MiaSpqzdaZXsZAWlE6zYyW69Hwf1ppMLeaF14YWE8vBEkxcrYqFQiU4ZXYP6XAPXnw2T3yWgtZh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791300280; c=relaxed/simple;
-	bh=BsZLHAhdpUYI9RwOCpVUWhS680zsyLb8Ltuxz+R4vc4=;
+	s=arc-20240116; t=1791300558; c=relaxed/simple;
+	bh=pQJrnuy6MGMa74o2P+2xazsKRjMqco/yFjEBZXrDYZg=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=O3MNlrPdSoKvnj3x+AoLLxaBOrwomIospJob/jyU//HFqMoNj+ETGu0O1rhSa9rMzoJXGPAwmRFdzrfFXLMSL8vldJTBmAwzAfBq9FqwpTI+8ZtJGjYprkPuByp3YMdgMpK6u7C1GRNKtZKNFMDf8OlTiFffuujUD+adOVrNSgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8YhpPuw; arc=none smtp.client-ip=209.85.215.169
+	 In-Reply-To:References; b=PVJZpuGvGX3bKsXPIwWMZu69lJVxW6jN63TqV/I889mu6SCQRAKJdXXLIxLCjDWOhQ1bXpE2yTHAh2FG8I+5UQOO6v7b12FyolpMWSzqaqv2K/L9WaZFdPIQ6SKr31wYvA1rcN6g71LjapQ8UCViFr7kevYMN05CLss2X4/7awY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MPfJnArY; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8YhpPuw"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-ccca948203aso514119a12.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 08:24:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MPfJnArY"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-93e6fb35f91so53855485a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 08:29:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791300278; x=1791905078; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791300555; x=1791905355; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=MT25F/NQUKdKOwfEYaquyw6zvV8VZN78HE5XPxy5IS4=;
-        b=e8YhpPuwYN4/JdeG+xhsxVmP57f7aDigd98Xwy6S7nq1i4ZsGYaMcZVWNoIW4yAcgH
-         ExwYl9MfcV2QXoyKjLvJNcFasZda0EApMwWwzw/EB0THC+Aey5A2m9j5mVvpiHyDM6ce
-         1ECBkfC0iUQMcSTgg4Yz80yVJrXmur99Cj7yx7d4WJN35bSDsVTNN/en/lV/pLOPcvRI
-         gw5L4HlL9B4lp5gpuEUVRglGDBrw8JVl9yViNU83QwSw+xjtGmGLa0P1DAC8/MkS2wR4
-         7fqwh4c6udZ3d1aCoMD/aZJ08JuW9OTVed90uXtDzyjMVDGqLzOTAajT1F6fsQuhsYFc
-         3oMw==
+        bh=2hQHPQPBvxJbb10LIzlswdI/9ahVUhdMV4LW4/rhrWA=;
+        b=MPfJnArY2LoEZWjf6F5L7RUSWJXevC/i8tAsH6uChZcW/vQlJL9bbxnyWyiYW0invR
+         flxnnkqjtUmmdTuw6kN0IBPC4BYx//rutUTxdxFlBY5I6T7Z+11nIQeEf9VbXUSBLQFK
+         RqNWxdrOovpBch44KLIkIr3PVcZbvHrkaMalcHXPJmnEV1QO4Sjw6AwjDevJ8DKPazel
+         xVtfsV0B0n6ckcV2cMCXlNfqJltBoV+EN2whL+H1x3aMo2U51mUyt8NgIHXNPHacxHYd
+         OgWukn+Rb4ujmUnUbQnhG3QVTXRZZA0Nq+1cVKq9xY1UsuAopH3YJe4CCs/JcFLq188u
+         JTFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791300278; x=1791905078;
+        d=1e100.net; s=20260707; t=1791300555; x=1791905355;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=MT25F/NQUKdKOwfEYaquyw6zvV8VZN78HE5XPxy5IS4=;
-        b=rBnR/xQxMHnvly0zZ85wmCVCvWE35UWW1ezbCKziUWd9XblfSix6pBo/4GDEOFVH9d
-         LDAtgQDJT6yvpC9seBkUdzHaLsFQp2cd1MSEHIStLwzeX1FBy5E/c0o4DxiyFQFIgIiV
-         9eCvGOuSSSw/didXA9PU7TYWjcKbjZAmUxOYRazwaX8gAuE7d7H5VEGpUWI/vH6h8zoo
-         FS0az/QZdcOeSGgr8fIPserG6wKVwykJU5r3b4A5k+6Z4xKvKWAO6YAFknD5k3fa4gDK
-         WwzIFMR6HD3Irgjn+bXrgjomBfoVnfnSV+Ldtz5V2brPs+3IDNO1RdyjcMnny04Z/c7/
-         6tVw==
-X-Gm-Message-State: AFuF++mTgfapI8E0y784SFSNtPtag93TPWZ6DuE9hzmyHsBFP0s15hNC
-	hp35COoN5n/CvOa+8N2KL2l9Bj+KqbwF0rQZQds/NXvAApSyLkPHlIyjIx9d+w1XIhc=
-X-Gm-Gg: AYBFou3pxePUDTXIQ9Sj8nAeukVzymg/uPsjNuoOJjamwFdbKlLa0vrISE0QTQ1/P8K
-	W1Lc8UinFCEqtPzR0LWGeQt5k5JDVEy1xAGE1+oNtVvfJbkTU7rafckjGzExxsY1dn/TOLSmFho
-	u1cbH6Rj+bVCIe9xvZIqGQ2OLHmig5KhNdTwNhcM8dqdFr40KTW+L0AYNbXpv6eBWgTkPmAv44E
-	o0dEZYKSUJNfSZ+T8/IdImOikkr5Xdc9jrXYl3cQRXrUE831HBWuEzMDYllt0ZhwWjSkTrpVSfB
-	OMU1yf42gb8p8psRnaXBE/ncPgt6PVb1yXr4GtZXd9pJI5x5HIBa2CQC/RsSiDO0FgIth9L5WZz
-	YEjjyHpz3WtX9Ao9j+a5+2gcr5JnEgU077s7ooWlS7GyIOcXtuNhxuD1Rw+E4rlvgOLBlJmjT7Z
-	SU/Sky8tBGyK+ZO0f1JhNgZRQVtZHqFe4ZX6DQB4dxYNfdri/E55g05xeckRfZKBncYTBBV599n
-	H9M
-X-Received: by 2002:a05:6a21:a395:b0:3e1:16f8:4a11 with SMTP id adf61e73a8af0-3e12479aa68mr1448066637.56.1791300278242;
-        Tue, 06 Oct 2026 08:24:38 -0700 (PDT)
-Received: from [172.17.0.2] ([4.154.166.11])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cce6ded11ebsm3001607a12.24.2026.10.06.08.24.37
+        bh=2hQHPQPBvxJbb10LIzlswdI/9ahVUhdMV4LW4/rhrWA=;
+        b=Sfv2ebfAAgLkc+V69H8UtWWWtcaNoy2HHHxyszNyqE6V7oqZia7LXIpqeM4Dbe1a+E
+         EIUAqp2K8wxgn4EGDkfooAQufjuv2LMKkCn62wtPHu3rpRVNkqVbZ83v0ukgHGgcqKwy
+         RuP0p9xNYzGcBljV6K1I+5Dr+aJ3ccnpFkFInLJSQY9XCzTfxHtqkNfNp+eiNEjBMW8x
+         +4DXGUOxEJ7rwQEOCXGbjNX9xFk83yXuUH00RgZa0mwF6He5dyaMb4GHsEvhhEjWbYTJ
+         24Falh7VOMYZZFitRR2+fFnul583B7U8omRuKlSykGy1ZmxLSdvL/trncodAvqZHBjRZ
+         z+Ww==
+X-Gm-Message-State: AFuF++mVsGmElcPtxjUXOj1qkBNQDOl/cxgFNvkaGl2K5Aolx92h3pRA
+	PUQvlO4kgtyll84yS8MX8lEfRMnsGRIe/U9mwTk6mH7vOxneuj/wM5CgukNuRU6r
+X-Gm-Gg: AYBFou3J9q7SiBBtq/Sos9b7q0PiLgfbR2FbptlL5gLZicpZthAnt2U0mbgrdUWrNXj
+	5nclnZnBZSWHn62NwwEXqo2VwGCGoQZ/wXtepjwgu/PQHmn9eGTD+ahUzGGa+qWWrGH1FORnOFn
+	AJwtjyRD0KD2TkbnFAd1c3da8REKHN1gUbtfAi/Q/S7cWNGNQouB6MuAqRrsMhZ+zTl4ijvlp5g
+	LeV7huJd4EmRa/KizI/Qa3U8WLxKMSPFwlRtgxjiaGAQ2A+0XnuYqmrsYRmvK3RRQr+tJ8R5C85
+	nTlu5G5im6RUHzwna3WbGsw8Imt94wX8vAToG062ciVd2bZ7TED1vNdYj9FzCt6iF9Ed1XBW5pg
+	C/GgvqIM/wWLD6h7kWYqgx72vZLkqFmHTKU81iCF1iuEiCZ7ZNOYWg88j9t8ONXoYxoseBiZuJr
+	j/LlHOQo8edBzfz89Vnu0Uq17JOsAjlGbTQp5wn1WKW3uttQofe4aeKnps9hxy5q0fRxWCLg6w0
+	wMhobyd
+X-Received: by 2002:a05:620a:c51:b0:93e:980a:2ff5 with SMTP id af79cd13be357-93e980a317dmr22436185a.73.1791300555434;
+        Tue, 06 Oct 2026 08:29:15 -0700 (PDT)
+Received: from [172.17.0.2] ([172.174.125.245])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93cca297e84sm1152785485a.37.2026.10.06.08.29.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 08:24:37 -0700 (PDT)
-Message-ID: <6ac512b5.24712c84.eb118.72bd@mx.google.com>
-Date: Tue, 06 Oct 2026 08:24:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2487967953358965300=="
+        Tue, 06 Oct 2026 08:29:15 -0700 (PDT)
+Message-ID: <6ac513cb.37e4897e.12bc9f.9516@mx.google.com>
+Date: Tue, 06 Oct 2026 08:29:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7921153228343088891=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,13 +68,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v5,1/4] Bluetooth: MGMT: Fix advertising instances with Global Advertising
-In-Reply-To: <20261006141502.3789138-1-luiz.dentz@gmail.com>
-References: <20261006141502.3789138-1-luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
+Subject: RE: Bluetooth: ISO: Hold the listener during disconnect notification
+In-Reply-To: <pm-bluetooth-objects-candidate-0210-v3-42a02e0ef5261660c606@gmail.com>
+References: <pm-bluetooth-objects-candidate-0210-v3-42a02e0ef5261660c606@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2487967953358965300==
+--===============7921153228343088891==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -85,78 +85,59 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1180355/
+PW Link:https://patchwork.kernel.org/series/1180371/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      2.15 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       FAIL      0.74 seconds
-SubjectPrefix                 PASS      0.84 seconds
-BuildKernel                   PASS      17.46 seconds
-CheckAllWarning               PASS      20.06 seconds
-CheckSparse                   WARNING   23.37 seconds
-BuildKernel32                 PASS      18.65 seconds
-CheckKernelLLVM               PASS      20.07 seconds
-TestRunnerSetup               PASS      448.04 seconds
-TestRunner_l2cap-tester       PASS      12.84 seconds
-TestRunner_iso-tester         FAIL      17.75 seconds
-TestRunner_bnep-tester        PASS      2.73 seconds
-TestRunner_mgmt-tester        FAIL      57.11 seconds
-TestRunner_rfcomm-tester      PASS      3.94 seconds
-TestRunner_sco-tester         PASS      4.90 seconds
-TestRunner_ioctl-tester       PASS      4.03 seconds
-TestRunner_mesh-tester        PASS      5.05 seconds
-TestRunner_smp-tester         PASS      3.88 seconds
-TestRunner_userchan-tester    PASS      2.78 seconds
-TestRunner_6lowpan-tester     PASS      3.91 seconds
-IncrementalBuild              PASS      26.97 seconds
+CheckPatch                    PASS      0.84 seconds
+VerifyFixes                   PASS      5.08 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       FAIL      0.36 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      31.47 seconds
+CheckAllWarning               PASS      35.00 seconds
+CheckSparse                   PASS      37.91 seconds
+BuildKernel32                 PASS      30.76 seconds
+CheckKernelLLVM               PASS      36.86 seconds
+TestRunnerSetup               PASS      816.68 seconds
+TestRunner_iso-tester         PASS      11.56 seconds
+IncrementalBuild              PASS      29.99 seconds
 
 Details
 ##############################
 Test: GitLint - FAIL
 Desc: Run gitlint
 Output:
-[v5,3/4] Bluetooth: MGMT: Fix pending state of instances added without HCI traffic
+Bluetooth: ISO: Hold the listener during disconnect notification
 
-1: T1 Title exceeds max length (82>80): "[v5,3/4] Bluetooth: MGMT: Fix pending state of instances added without HCI traffic"
-[v5,4/4] Bluetooth: MGMT: Fix leaking instance on Add Extended Advertising Parameters
-
-1: T1 Title exceeds max length (85>80): "[v5,4/4] Bluetooth: MGMT: Fix leaking instance on Add Extended Advertising Parameters"
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 141, Passed: 136 (96.5%), Failed: 5, Not Run: 0
-
-Failed Test Cases
-ISO Broadcaster PAST Info - Success                  Timed out    1.842 seconds
-ISO Broadcaster PAST Info RPA - Success              Timed out    2.000 seconds
-ISO Broadcaster PAST Sender - Success                Timed out    2.000 seconds
-ISO Broadcaster PAST Receiver - Success              Timed out    1.898 seconds
-ISO Broadcaster PAST Receiver Sync Lost - Success    Timed out    1.817 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 503, Passed: 502 (99.8%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Add Ext Advertising - Success 5 (Set Adv off override) Timed out    2.611 seconds
+39: B2 Line has trailing whitespace: "    "
+40: B2 Line has trailing whitespace: "        CPU: 2 UID: 0 PID: 50 Comm: kworker/2:1 Not tainted "
+41: B2 Line has trailing whitespace: "    7.2.0-rc6-pmb-bt-functional-v1+ #1 PREEMPT(lazy) "
+42: B2 Line has trailing whitespace: "        Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps "
+89: B2 Line has trailing whitespace: "    "
+106: B2 Line has trailing whitespace: "    "
+129: B2 Line has trailing whitespace: "    "
+131: B2 Line has trailing whitespace: "                                                                which "
+132: B2 Line has trailing whitespace: "                                belongs to the cache kmalloc-2k of size "
+135: B2 Line has trailing whitespace: "                                                                freed "
+136: B2 Line has trailing whitespace: "                                2048-byte region [ffff888105ca2000, "
+138: B2 Line has trailing whitespace: "    "
+140: B2 Line has trailing whitespace: "        page: refcount:0 mapcount:0 mapping:0000000000000000 "
+145: B2 Line has trailing whitespace: "        raw: 0200000000000240 ffff888100042f00 ffffea00042cd010 "
+147: B2 Line has trailing whitespace: "        raw: ffff888105ca5000 0000000000080005 00000000f5000000 "
+149: B2 Line has trailing whitespace: "        head: 0200000000000240 ffff888100042f00 ffffea00042cd010 "
+151: B2 Line has trailing whitespace: "        head: ffff888105ca5000 0000000000080005 00000000f5000000 "
+153: B2 Line has trailing whitespace: "        head: 0200000000000003 fffffffffffffe01 00000000ffffffff "
+155: B2 Line has trailing whitespace: "        head: ffff888105ca1000 0000000000000000 00000000ffffffff "
+158: B2 Line has trailing whitespace: "    "
 
 
-https://github.com/bluez/bluetooth-next/pull/869
+https://github.com/bluez/bluetooth-next/pull/872
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============2487967953358965300==--
+--===============7921153228343088891==--
