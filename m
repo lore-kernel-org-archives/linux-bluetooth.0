@@ -1,61 +1,61 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7BB3F1ACE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 14:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF7D370ADF
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 14:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791297728; cv=none; b=HrUJdK6ZS99y0OTCcwujT1KqNZMsXJJ90yGtqYDy/exxDEWyp02+Ls/TXh0F9tg95OuUEgqPCLQ9LVE3y12wJcysmx0iAG/EbBJ8+b/Q47p4MjMCIFstduGTacvvoq1FbG+XmKfV5XhtnUZbT7ZUiLPN7OlPRyZTrd6STvB477Q=
+	t=1791297961; cv=none; b=DpjI4PNIsNh2X+nJGLAMNj87j9zPe/c9GUC2flmW8WbtGHMUz1pPsZWFFaJVXv5gMezYLDJZyDqtAWDmQSHRVApbWX5OtHkWcr0MWzMMpWsaMF+e9mL2R6/zGRf0zImJOY2KhF5Vsg+7WUyRj91kFCFsz6lRKABbmRTerOkQ5SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791297728; c=relaxed/simple;
-	bh=L2VqtZMwYbLepI5bH97fRbczsyVO2KKJqi6sXW2cb4I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=S5UG36xcclH5BBdnQxSicis48DNeqsRVw/mQk7LD36OKyDzfXE1O5ERdQD2xGM10u2YKPfoBStkcGahmkse3njrZRlz7YZ3fiP46dpqixnnUOC3cIdK3I5o53CWyicoKdsusKCoWpV5xsQP77QOsNUK60T2Z/JRFCWDtFQ9jq8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OtztZ9CE; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1791297961; c=relaxed/simple;
+	bh=1Me3tJZAGBwUPmVJok2zbn+jJCRVmIDQ1ckCQupu2jM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Quve1OQ1hFSvQTTFQAzi/0BpwRZ9NxWySo4OR+Isttp4OCCRDorAjadh0bb6hajdsPFKvsG3djzmZSryOdW5srDxoQnkdOy+lKvYBWYOjNo1J1DwRAIyrOQMrv5sa8DCKRTAwhNjIijiGIvtES/7x/8i5ZK/tY9sH9VkrfIklYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJbK6A3Z; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OtztZ9CE"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-88b8f0a1bcdso512182b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 07:42:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJbK6A3Z"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-cc4dbcf2b85so1414604a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 07:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791297726; x=1791902526; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791297959; x=1791902759; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=sVsJKO3mMNc9jR4JoSeUwhUkamCfCXr37q0TfVsT0tY=;
-        b=OtztZ9CESrCbfg3p8OQca9PSFySQbWPiX0tolNFc/WGXzInFHlOoraZNj/Ibiv/u+H
-         IMKEvkDObJC3+9Z9BXSGYtlBFVwSjFkl3egzVdtxHk/aclK75QzNLyshmizIVpqjmyTw
-         4As3auvpFrn6P2gIoUCJTuIlFVpqMOpmGYMGs3cm3p/+smvSNQd5nEnyhmzS7kaoyfag
-         v4NnXJDp/l778sRBEi5s2GgvWMuuhHDOAQAeSz/zHjkVPkCsxMHZotAJQOSUyjR/WYvP
-         YcbsIH4yxewku3m1RgS6GROsodoyzxiOoXnfiVx2jVezVW6mArgi+TpW4BeztPxibR4W
-         DKtg==
+        bh=1MQNopcwszKpG8NcTiJd0UdzcXowyUVyXk3wAhzswYU=;
+        b=eJbK6A3Z1kfypTIdE7RFQLOrJay0MoBKryXvqhyuYEEKlYoqp5Cxp7yJk12p6kr13q
+         tnUtDjRbMr5+A0pEYefQBJPL8UOFZmBUD7FTeVIcPt7NckAEHjRksXKGnEThSL3Ajxy7
+         +k8T/w7Nt76bLMqFMtUoVDxsZStPs8A3OBrqKwktqnWJtfTEgvs+LlgA+ixJoX+QFWSC
+         5pH3DoiHRnZdixwHHvcypX/dty1caiJGakZiWGw1YLR6Hhdgo58M2nds2xAzR7Rzw3ro
+         S7YdYKfk2Fb+TJ1nf8h0KTFcWU02nH/Ar27ApA+7Py+lEiN+4s2HLUEcaNGupQ54IF0w
+         Llrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791297726; x=1791902526;
+        d=1e100.net; s=20260707; t=1791297959; x=1791902759;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=sVsJKO3mMNc9jR4JoSeUwhUkamCfCXr37q0TfVsT0tY=;
-        b=km41M4XF+Arsl0tWpBa18HseHZMGvuClmmhkFDTrOp+Cpknc2XpOplbJUf73ORCCML
-         yuFcqWvgoYDHOD/9DTtOTB+l1p+4fvO0WHzfWkq2Py9X9wXO34U7vmwYS5yulOMnKYIL
-         6/aJU3GJ5SlKFYTLGrMZGFgBuy1EbieizfUgXi+FoRHPnfPnBBV7QFMtjJknwbDqcqDP
-         o7BziIt9/tddCpORLQ3QGKRWq71r5sNfnwZJf8VV1v8VFW/M/BSJ5kJ9R9zqj780s/Vo
-         8Xtx2Wh1S+v+/VEzGTQeKXP34PYC8aWrqc5gKLRs2u7hSW6s3o5jvGYOSBREkR1JHNey
-         GDiw==
-X-Gm-Message-State: AFuF++kaUO2ovNzL3T5ILk824jJA+giGZ6cRWQ6yg0DUTirR3CPOBSFW
-	PBx9Texhjhz0jyMPLVmp9kzXtyPqRD404nA8TjzDYCfABmecs9/LbD6r
-X-Gm-Gg: AYBFou2Sn0A7z53AgR7owLZFefW4dRx1euflfAIYxwDOBmnij+KbkjCDiM16LVJR+2L
-	0dZ+k+8hG2YvX0/CEyAVRnluzUlvIgoE9XxTIYwK1g/fSjncr8ETurNbplF38UJPU9VtkslB4sk
-	/AEsngWnyb1zAlsO0qrAORzveP2zid+GQktDCtPfiaMNXPtix3OSEqKWKYSJHZ7EXj+Y06OTNSK
-	O4WEjJg62ZxobM4LN8aljabeqIWSWwX+GL0FhmD1fQi9bvxfZvGuzGJFDI450DjPxibXpTKXHK6
-	wTmxAnkQbcWjC5dnZQl+g+iL8FiFqWrkYu5j5XPL2uFT13KAEESjo9u4lxvgw9zMfxPR7oz8/Oc
-	QeJQDTfMc+sQcfFE7+g0OqhFNrw6SrpTOjwY9VReWjX7Nzksxevp6GlBsaWZUpKyta2DPKLcJBt
-	VyYojTJrrvhowoFUv1CzshzRzGF/zVkUJ8EeHTG0wW4J7Qf4GsDVkZGGuRY/Vq3Osj8w==
-X-Received: by 2002:a05:6a21:4eb8:b0:3de:463c:7fce with SMTP id adf61e73a8af0-3e1246abd57mr1429948637.12.1791297726337;
-        Tue, 06 Oct 2026 07:42:06 -0700 (PDT)
+        bh=1MQNopcwszKpG8NcTiJd0UdzcXowyUVyXk3wAhzswYU=;
+        b=2O0wPeVyI/zazQYDoAB81pfuNiOpH8lVdPstApXCduvixO6dmW8R0DmdaBeKgAuWgT
+         Y/+eElUxVHfSzd7+RqWJ/xNEL6S+UPB5RT2Un8ueH2B2k5/R6ZjN+feXalIU1UXuHYUy
+         uNSd6KHXMjf3F3Jkn/XZUgEb4ZdO2/6gSHRyir/tc2uwV5qFjUEd1aTiRpaNcFcGuGKi
+         gkztYaCxUDB5hkNzTJqktc7HQ4tP7fBhCCH6YnIiXxLVW+ZdG+qmKiPBcOLiiVEtWlmn
+         5yEwcP5ixdeMdYYh5u/5B9K23vPh0Qa76s1rBEEWXf1iVjeCKWuRB45TwotSCi2G0wFG
+         UYVg==
+X-Gm-Message-State: AFuF++l8Maoe9Rq6ODu2rtq9AyDs2boeiV2Z8mLXGLabRtRG5NY2MjAJ
+	/r3qHiJVy+XLhax59vuYYu36NpoD9CfBk3FotfvJE/6rY7IWqFMzrxkK
+X-Gm-Gg: AYBFou3EhnKAl4DHJPMcVw+yTOMeAmQWjDPgFfh/J/SuP93otWPLtvxpQN1A2TNZG5k
+	G6/LxmotB7pOF7taNCnNpndBu9+6CRaaaJ1Kk//ALlFoTUfoSjFY4PMeMaqXcTOx287iZXpbv6b
+	UzF/Cek8taP3ItmsirMzsUrQ1O9zSJd8iwU+p5dKquZoc4SeNjbRgIynoRy/UgweSBCbavY2Q63
+	yohwauLhg7B7KoxR7oaAEAEkgn+Pzd1KWYywWG89AHZfCA/mdOi6vwdIqMP361btTXvlCrWHdnE
+	G8cJkYzjq2Sd6fL6BYYYraG80x+Y3ogKeEWm+e6azoeAT8qt1Z2d3CvztDfmCitFkqCEZvcrlLD
+	DGbTKCDkRz/xnM6w7Gtn0LBGaT83MDorz8So9vRNgIkjMii5+q1XlwtqlGAifADazNbHZkczd/k
+	7GB6mtrgdarowpsXWA7A362oT17ZpruZY39KUo+srIJii6Z0O+ZPg3B9Mi94FsH3UVCg==
+X-Received: by 2002:a05:6a21:4516:b0:3da:15a9:a18e with SMTP id adf61e73a8af0-3e1247f0152mr1302584637.23.1791297959060;
+        Tue, 06 Oct 2026 07:45:59 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cce6b358307sm2968553a12.2.2026.10.06.07.42.01
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-88b0d247930sm5280866b3a.54.2026.10.06.07.45.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 07:42:05 -0700 (PDT)
+        Tue, 06 Oct 2026 07:45:58 -0700 (PDT)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -64,9 +64,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: msft: Lock failed probe cleanup against feature readers
-Date: Tue,  6 Oct 2026 22:41:57 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0233-v3-004a766561f1356a1b14@gmail.com>
+Subject: [PATCH] Bluetooth: ISO: Hold the listener during disconnect notification
+Date: Tue,  6 Oct 2026 22:45:53 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0210-v3-42a02e0ef5261660c606@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -77,178 +77,189 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The MSFT data must remain allocated while msft_get_features() reads
-its features. read_adv_mon_features() protects that access with
-hdev->lock, but msft_do_open() clears hdev->msft_data and frees the
-object without that lock when read_supported_features() fails.
+An ISO listener must remain alive until a queued child's disconnect
+notification completes. bt_accept_enqueue() retains only the child and
+stores a raw parent pointer; iso_conn_ready() drops its temporary
+listener reference after setup. iso_chan_del() saves that pointer,
+unlinks the child and then calls parent->sk_data_ready() without holding
+a listener reference.
 
-After a successful probe, the data survives a normal close. A later
-open can fail the probe while a management feature request is running.
-hci_mgmt_cmd() permits requests during HCI_INIT, and the opener's
-hdev->req_lock does not serialize the management reader:
+With an incoming CIS child still queued, disconnect and listener release
+can proceed in this order:
 
-  Management feature request            HCI open
-                                        hold hdev->req_lock
-                                        msft_do_open()
-  hold hdev->lock
-  msft_get_features(): save msft
-                                        read_supported_features() fails
-                                        hdev->msft_data = NULL
-                                        kfree(msft)
-  read msft->features
-  release hdev->lock                     release hdev->req_lock
+  HCI disconnect                   Listener release
+  iso_conn_del(): lock child
+  iso_chan_del(): save parent
+  bt_accept_unlink(child)
+                                   iso_sock_cleanup_listen():
+                                     drain empty accept queue
+                                   iso_sock_release():
+                                     orphan and kill listener
+                                     final sock_put(listener)
+  parent->sk_data_ready(parent)
 
-The saved pointer then refers to freed memory, causing a use-after-free
-read. Advertisement reporting through mgmt_device_found() also reads
-the features with hdev->lock held.
+After unlink, listener cleanup no longer has to take the child socket
+lock. The listener can therefore be freed before iso_chan_del() reads
+sk_data_ready, causing a use-after-free.
 
-Take hdev->lock around clearing and freeing msft_data in the failure
-branch. An existing feature reader finishes before the free, while a
-reader starting after cleanup sees NULL. Keep the synchronous probe
-outside this critical section, following the existing req_lock to
-hdev->lock ordering.
+Take a temporary parent reference before bt_accept_unlink() and drop it
+after the notification. The child lock excludes accept dequeue while the
+child is still queued, so listener cleanup cannot complete before
+sock_hold(). The reference then keeps the listener alive across unlink
+and through the callback without changing lock order.
 
 KASAN report as below:
 
     ==================================================================
-    BUG: KASAN: slab-use-after-free in msft_monitor_supported+0xa9/0xb0
-    Read of size 8 at addr ffff88811573ee00 by task mgmt-read-adv-m/532
+    BUG: KASAN: slab-use-after-free in iso_chan_del+0x302/0x320
+    Read of size 8 at addr ffff888105ca2188 by task kworker/2:1/50
     
-        CPU: 2 UID: 0 PID: 532 Comm: mgmt-read-adv-m Not tainted 
+        CPU: 2 UID: 0 PID: 50 Comm: kworker/2:1 Not tainted 
     7.2.0-rc6-pmb-bt-functional-v1+ #1 PREEMPT(lazy) 
         Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps 
     fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+    Workqueue: events iso_fixture_disconnect_work
     Call Trace:
      <TASK>
      dump_stack_lvl+0x93/0xd0
      print_report+0xce/0x630
-     ? msft_monitor_supported+0xa9/0xb0
+     ? iso_chan_del+0x302/0x320
      ? srso_alias_return_thunk+0x5/0xfbef5
      ? __virt_addr_valid+0x20d/0x410
-     ? msft_monitor_supported+0xa9/0xb0
+     ? iso_chan_del+0x302/0x320
      kasan_report+0xe0/0x110
-     ? msft_monitor_supported+0xa9/0xb0
-     msft_monitor_supported+0xa9/0xb0
-     read_adv_mon_features+0xdf/0x640
-     ? trace_hardirqs_on+0x18/0x160
+     ? iso_chan_del+0x302/0x320
+     iso_chan_del+0x302/0x320
+     iso_conn_del+0x19d/0x3c0
+     ? __pfx_iso_disconn_cfm+0x10/0x10
+     iso_disconn_cfm+0x78/0x120
+     hci_disconn_complete_evt+0x319/0xa30
+     ? find_held_lock+0x2b/0x80
+     hci_test_iso_disconn_event+0x85/0xb0
+     ? __pfx_hci_test_iso_disconn_event+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? __pfx_read_adv_mon_features+0x10/0x10
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? do_raw_read_unlock+0x49/0xe0
      ? srso_alias_return_thunk+0x5/0xfbef5
      ? _raw_read_unlock+0x23/0x40
-     hci_sock_sendmsg+0x12b5/0x2270
-     ? __pfx_hci_sock_sendmsg+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? selinux_socket_sendmsg+0x160/0x280
-     __sys_sendto+0x425/0x470
-     ? __pfx_hci_sock_sendmsg+0x10/0x10
-     ? __pfx___sys_sendto+0x10/0x10
+     ? __hci_dev_get+0x15d/0x280
+     iso_fixture_disconnect_work+0x67/0x290
+     process_one_work+0x908/0x19c0
+     ? __pfx_process_one_work+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_is_held_type+0x8f/0x100
      ? srso_alias_return_thunk+0x5/0xfbef5
+     worker_thread+0x65c/0xe40
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? __sys_setsockopt+0x119/0x180
-     __x64_sys_sendto+0xe5/0x1c0
-     ? lockdep_hardirqs_on_prepare+0xea/0x1a0
+     ? __kthread_parkme+0x175/0x220
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? trace_hardirqs_on+0x18/0x160
-     do_syscall_64+0x115/0x6a0
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    RIP: 0033:0x7f9ceb04a687
-        Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 
-    83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> 
-    c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-    RSP: 002b:00007ffe6ab96a70 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-    RAX: ffffffffffffffda RBX: 00007f9ceafb8780 RCX: 00007f9ceb04a687
-    RDX: 0000000000000006 RSI: 00007ffe6ab96aea RDI: 0000000000000003
-    RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
-    R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
-    R13: 00007ffe6ab96d50 R14: 00007f9ceb1f6000 R15: 00005625e427dd68
+     ? __pfx_worker_thread+0x10/0x10
+     kthread+0x34f/0x460
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork+0x659/0x940
+     ? __pfx_ret_from_fork+0x10/0x10
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __switch_to+0x74f/0xf80
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork_asm+0x1a/0x30
      </TASK>
     
-    Allocated by task 506:
+    Allocated by task 521:
      kasan_save_stack+0x33/0x60
      kasan_save_track+0x14/0x30
      __kasan_kmalloc+0xaa/0xb0
-     __kmalloc_cache_noprof+0x251/0x610
-     msft_register+0x54/0x260
-     hci_register_dev+0x6b7/0xc80
-     __vhci_create_device+0x330/0x840
-     vhci_write+0x287/0x440
-     vfs_write+0x637/0x1010
-     ksys_write+0x111/0x200
+     __kmalloc_noprof+0x2d7/0x770
+     sk_prot_alloc+0x13e/0x260
+     sk_alloc+0x37/0xb40
+     bt_sock_alloc+0x40/0x3b0
+     iso_sock_alloc.constprop.0+0x3a/0x360
+     iso_sock_create+0xc7/0x160
+     bt_sock_create+0x171/0x330
+     __sock_create+0x2c4/0x730
+     __sys_socket+0x141/0x210
+     __x64_sys_socket+0x77/0xc0
      do_syscall_64+0x115/0x6a0
      entry_SYSCALL_64_after_hwframe+0x77/0x7f
     
-    Freed by task 529:
+    Freed by task 521:
      kasan_save_stack+0x33/0x60
      kasan_save_track+0x14/0x30
      kasan_save_free_info+0x3b/0x60
      __kasan_slab_free+0x5f/0x80
      kfree+0x307/0x580
-     msft_do_open+0x604/0x9e0
-     hci_dev_open_sync+0x94a/0x2110
-     hci_dev_do_open+0x2f/0xb0
-     hci_dev_open+0x17d/0x300
-     hci_sock_ioctl+0x3c6/0x710
-     sock_do_ioctl+0x120/0x2b0
-     sock_ioctl+0x41b/0x670
-     __x64_sys_ioctl+0x163/0x1d0
-     do_syscall_64+0x115/0x6a0
+     __sk_destruct+0x64f/0x790
+     sk_destruct+0xb3/0xd0
+     __sk_free+0xdd/0x370
+     sk_free+0x51/0x80
+     iso_sock_release+0x46d/0x5b0
+     __sock_release+0xb8/0x270
+     sock_close+0x21/0x30
+     __fput+0x39f/0xa60
+     task_work_run+0x144/0x230
+     do_exit+0x834/0x2830
+     do_group_exit+0xc7/0x280
+     get_signal+0x20a9/0x2400
+     arch_do_signal_or_restart+0x94/0x6f0
+     exit_to_user_mode_loop+0xcf/0x570
+     do_syscall_64+0x4f0/0x6a0
      entry_SYSCALL_64_after_hwframe+0x77/0x7f
     
-    The buggy address belongs to the object at ffff88811573ee00
-     which belongs to the cache kmalloc-256 of size 256
-    The buggy address is located 0 bytes inside of
-     freed 256-byte region [ffff88811573ee00, ffff88811573ef00)
+    The buggy address belongs to the object at ffff888105ca2000
+                                                                which 
+                                belongs to the cache kmalloc-2k of size 
+                                2048
+    The buggy address is located 392 bytes inside of
+                                                                freed 
+                                2048-byte region [ffff888105ca2000, 
+                                ffff888105ca2800)
     
     The buggy address belongs to the physical page:
-        page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 
-    pfn:0x11573e
-    head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-    flags: 0x200000000000040(head|node=0|zone=2)
+        page: refcount:0 mapcount:0 mapping:0000000000000000 
+    index:0xffff888105ca5000 pfn:0x105ca0
+    head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+    flags: 0x200000000000240(workingset|head|node=0|zone=2)
     page_type: f5(slab)
-        raw: 0200000000000040 ffff888100042b40 dead000000000100 
-    dead000000000122
-        raw: 0000000000000000 0000000000100010 00000000f5000000 
+        raw: 0200000000000240 ffff888100042f00 ffffea00042cd010 
+    ffffea00042c9210
+        raw: ffff888105ca5000 0000000000080005 00000000f5000000 
     0000000000000000
-        head: 0200000000000040 ffff888100042b40 dead000000000100 
-    dead000000000122
-        head: 0000000000000000 0000000000100010 00000000f5000000 
+        head: 0200000000000240 ffff888100042f00 ffffea00042cd010 
+    ffffea00042c9210
+        head: ffff888105ca5000 0000000000080005 00000000f5000000 
     0000000000000000
-        head: 0200000000000001 ffffffffffffff81 00000000ffffffff 
+        head: 0200000000000003 fffffffffffffe01 00000000ffffffff 
     00000000ffffffff
-        head: 0000000000000000 0000000000000000 00000000ffffffff 
+        head: ffff888105ca1000 0000000000000000 00000000ffffffff 
     0000000000000000
     page dumped because: kasan: bad access detected
     
     Memory state around the buggy address:
-     ffff88811573ed00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-     ffff88811573ed80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-    >ffff88811573ee00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                       ^
-     ffff88811573ee80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-     ffff88811573ef00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+     ffff888105ca2080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+     ffff888105ca2100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    >ffff888105ca2180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                          ^
+     ffff888105ca2200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+     ffff888105ca2280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
     ==================================================================
 
-Fixes: 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle")
+Fixes: f764a6c2c1e4 ("Bluetooth: ISO: Add broadcast support")
 Assisted-by: LLM
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d9dd722db3ebd5daf1a19fc50996c55e44494378..6f4b7c38a2474511062f38d20ccac6900035f322 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -654,8 +654,10 @@ void msft_do_open(struct hci_dev *hdev)
- 	msft->features = 0;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index e52bd59ba1b3e3536a0c6017702487924c8513b5..971e02fd672ba5d8009b7a274654d5c84bb26080 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -286,8 +286,11 @@ static void iso_chan_del(struct sock *sk, int err)
  
- 	if (!read_supported_features(hdev, msft)) {
-+		hci_dev_lock(hdev);
- 		hdev->msft_data = NULL;
- 		kfree(msft);
-+		hci_dev_unlock(hdev);
- 		return;
+ 	parent = bt_sk(sk)->parent;
+ 	if (parent) {
++		/* Unlinking the child allows the parent to be freed. */
++		sock_hold(parent);
+ 		bt_accept_unlink(sk);
+ 		parent->sk_data_ready(parent);
++		sock_put(parent);
+ 	} else {
+ 		sk->sk_state_change(sk);
  	}
- 
