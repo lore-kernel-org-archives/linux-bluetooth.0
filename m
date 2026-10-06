@@ -1,113 +1,91 @@
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459853BFE26;
-	Tue,  6 Oct 2026 09:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D033E49C7
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 10:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791280607; cv=none; b=jLh5YN/0xAN3Fm66yTRzSKthRWbBAv54XrW0razGaf5jzo3uOiB1xzAYeUCy9zMVFIpfZ5qW0htIl52IaTRP228CAp/+oPZrUJZg4RApKmQNtc4gQpECe3oVNd+9gBrDflkYRnYGxbyQ2OoXCIBMHd8XKHEMFuSvqJX2co/cfr8=
+	t=1791284394; cv=none; b=FaSeAX6GuB4vok6aMDaL5LULq7LCroeMezl3vj2ZMU6JAnjOOdrrqU9dY6Ui2Ozr/REU80m/lVk38VkIVlwMOP3BsDhIxasnsGaUAsGrYa520KxoGrO0RA+nDLXnNzpEGkyXz8SIWjXncscTHLADA2/LbFqYgMoglxaQBHKgoOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791280607; c=relaxed/simple;
-	bh=oRa7GrgZ4YPytMnX/OHFsb6GJ+Kgbf77yuHcx4pKwKg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jtMGLScc+nLZhrL8waemYOZt+qyuO3Flx1SsOte6N0WtUh/zGcYNI6SVqoS64CxnQB+wbua7gqQ+irPrknqfIwdovyeDj+6pvIJVmg0XUC29NFdedytwZsl73QytT0G4CjiOytKzG0gdQxjjbc42ldD2Uq+VgB2jyhNP/Sp5xtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=W14NJvYy; arc=none smtp.client-ip=101.71.155.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+	s=arc-20240116; t=1791284394; c=relaxed/simple;
+	bh=jKZ7jXy0Y3s2m0Il25OU6sSSAAO13IB/O/bqX1bcBE4=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=KAd84SJp+iCn1xCMgRAY+DvXdLN14vxPSCD0wvHEVdp/Jc98cDn2h9NR1U2836j6jJf/39PGCK8qHB/+b0cssDf6lsuj4X5EvXXefv2TYU++qzI9fOvesYc6+4MVxl6fKFHwDXrslXxZGnaco1bOrNi2T8zENvBt9O1w1vrqV4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Iwu6Gsza; arc=none smtp.client-ip=185.70.43.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="W14NJvYy"
-Received: from PC-202605011814.localdomain (unknown [222.191.246.242])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 50127ae4f;
-	Tue, 6 Oct 2026 17:56:33 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>,
-	Kiran K <kiran.k@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Ravindra <ravindra@intel.com>,
-	Runyu Xiao <runyu.xiao@seu.edu.cn>,
-	Jianhao Xu <jianhao.xu@seu.edu.cn>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: use managed IRQ teardown
-Date: Tue,  6 Oct 2026 17:56:28 +0800
-Message-Id: <20261006095628.384343-1-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261005041457.3021139-1-ravindra@intel.com>
-References: <20261005041457.3021139-1-ravindra@intel.com>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Iwu6Gsza"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1791284387; x=1791543587;
+	bh=6/LtjHSWFeUXZFWKoIpmiWCnW6HjdOVRUtfhU8lJUxo=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Iwu6GszaQj+0JnK1SKr1ZcWNJWm0PJ1k5PBw2NWGiXCAQWv42GDQgrvXlPY4WbCi5
+	 S+zzXeGdOP5to0gf/HyhF8AugOkvzbI4OAmKLYgXDQReuv+zscZjjd+b4A3BJ5a0ib
+	 jry+UzC3YKho5NnGgVSu7ADpK5ci53GNCixe0t2gQSKKvWLXlD8FobnZ2I/sj5ZPEl
+	 eZG5hPB+zjLzd9oOrKFK/MZhHiLf5x9T/eHkOaghh74Md0aDK3N+/MslsLYGniLUf/
+	 bsKWfNOPsqOYWuVKGl5M0NoPF9480EeG4Gb/hPBkCK9YoFx1EAdd+OZaH3H9s+Or2M
+	 CVlncPRkmXqFw==
+Date: Tue, 06 Oct 2026 10:59:41 +0000
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: dt <derektern@proton.me>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 0/3] BAP transport Release and reacquire fixes
+Message-ID: <1u4ljEAFqePjPZEbN-y_9BTWLNsqBnUqRAbQRokpIgWxUtdGlZtDC3gN8xIf4ovMpyIQ_UKBvvo2U1qgLrd7AHY8a2x1weRU9PUXtwSzUbc=@proton.me>
+Feedback-ID: 213585229:user:proton
+X-Pm-Message-ID: aa6d4648f1b599d8080124a110cbb462693d2491
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0aa110a4bc1003a1kunmcdf004d13943e4
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaQh5DVhoYSUhDHh9LH0hCSVYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUJCSU
-	5LVUpLS1VKQktCWQY+
-DKIM-Signature: a=rsa-sha256;
-	b=W14NJvYyKf2F6qbcxRpGVIpvyhjxGpni+yHIzUwfoHHigLa9zaaSE9dK+kid8lbZsb79ufm/HEyxBrk1hZuyiwxwpDURmvkL3IYQxh+C6ajyp5tiD3kodXHH835C4gTCyQe/vRChARbdzUf7y/LVOkYZVBSv0+NXQf2NqZ7xdoA=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=SuTad1VLA3KUnQ+9L2QOdgd1nhmFBnxk3RWriIE+7cE=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The PCIe driver registers its MSI-X handlers with
-devm_request_threaded_irq(), but remove() uses free_irq() directly. The
-devres actions then retain registrations and attempt to release them again
-during device cleanup.
+Hi Luiz,
 
-Use devm_free_irq() for the remove path and for already registered vectors
-when a later setup request fails. This removes the managed resource at the
-same time as the IRQ is released and keeps MSI-X vector teardown ordered
-after IRQ ownership is gone.
+This v2 rebases the BAP Release/reacquire fixes onto master
+7edaa61403390fe1cf2f1fb6d45fdd90fe6e93b3 after the v1 CI PR expired:
+https://github.com/bluez/bluez/pull/2550
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Cc: stable@vger.kernel.org
-Tested-by: Ravindra <ravindra@intel.com>
-Assisted-by: LLM
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
----
-Changes in v2:
-- Add Ravindra's Tested-by tag.
+The first fix prevents a late ready event from replying to Release with
+an Acquire payload and losing the pending Disable request. The second
+allows deferred IO recreation when a new Enable arrives before the old
+CIS has finished disconnecting.
 
- drivers/bluetooth/btintel_pcie.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Changes since v1:
+- Rebased both fixes and the regression test onto current master.
+- Clarified the test's reply barriers in its description and comments.
+- Added source-history-verified Fixes and Assisted-by attribution tags.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 005c77a4f..f8901df7c 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1750,7 +1750,7 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
- static int btintel_pcie_setup_irq(struct btintel_pcie_data *data)
- {
- 	int err;
--	int num_irqs, i;
-+	int num_irqs, i, j;
- 
- 	for (i = 0; i < BTINTEL_PCIE_MSIX_VEC_MAX; i++)
- 		data->msix_entries[i].entry = i;
-@@ -1779,6 +1779,10 @@ static int btintel_pcie_setup_irq(struct btintel_pcie_data *data)
- 						KBUILD_MODNAME,
- 						msix_entry);
- 		if (err) {
-+			for (j = 0; j < i; j++)
-+				devm_free_irq(&data->pdev->dev,
-+					      data->msix_entries[j].vector,
-+					      &data->msix_entries[j]);
- 			pci_free_irq_vectors(data->pdev);
- 			data->alloc_vecs = 0;
- 			return err;
-@@ -3101,7 +3105,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 		struct msix_entry *msix_entry;
- 
- 		msix_entry = &data->msix_entries[i];
--		free_irq(msix_entry->vector, msix_entry);
-+		devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry);
- 	}
- 
- 	pci_free_irq_vectors(pdev);
--- 
-2.34.1
+Regarding the sequencing review: the test waits for both initial Acquire
+replies before Release, and for both Release replies before reacquiring.
+Every following Acquire also completes before the next Release. Only
+calls on different transport paths run concurrently, as in the existing
+acquisition test; successive operations on one path are not queued
+without waiting for its previous reply.
+
+Fresh validation on this base:
+- Current master plus the test: all three pause variants fail with
+  malformed Release replies and pending-Disable cleanup crashes.
+- Both fixes: all 10 selected BAP functional cases pass.
+- ASan/UBSan: coordinated-set creation with SC and legacy pairing, plus
+  coordinated-set acquisition, pass including teardown (3 cases).
+- make check: all 35 unit-test executables pass, including 697 BAP cases.
+- A separate 500 ms userspace-disconnect delay fixture isolates patch 2:
+  with only patch 1, both reacquires time out after 26 seconds; with both
+  fixes, they complete in about 375 ms and both transports become active.
+  This diagnostic instrumentation is excluded from the series.
+
+The v1 functional job failed in coordinated-set cleanup, while its new
+resume cases passed. This base includes eb82d81bf26b and 8a1c53517399,
+which address the recorded adapter-list and BAP-session lifetime stacks;
+the fresh sanitizer checks above cover those previously failing paths.
+
+These are virtual-controller lifecycle tests, not acoustic, full-duplex
+range, or physical-earbud validation. The ordinary resume test does not
+force the delayed-disconnect ordering exercised by the separate fixture.
+
+Derek
+
