@@ -1,72 +1,72 @@
-Received: from mail-dy2-f41.google.com (mail-dy2-f41.google.com [74.125.229.41])
+Received: from mail-dy2-f12.google.com (mail-dy2-f12.google.com [74.125.229.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28ED045C6E0
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 15:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE02D4BD379
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 15:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791387853; cv=none; b=r+RUaKml5Mrb1b5prp6PquUWVmz3heEQk5TvPpXpEAdASQzM0BW90Gr7JfhKhTZswnSE5NlDF+A/PMX2MrNE6XaFM+/aRC1gzBUChHN1X1p/tSb6Txaz7NXR79GVogD9FC8s+atCt8th/cKO8IAnwrmipZGy2mfwyp8DZlm95T4=
+	t=1791387855; cv=none; b=P+BIrmEBl3PLvSW2nGrHZu3iX2Z53orxmwQbXPI3SG07FFlR0RO6+11JoBq7aAIAlTdQz9aWxucaKrwM0ksrhgw88JoN4iLQQMQj2XxmzBC2BmrxZNbt5SDjCNzxaJy5Yh8q6i0xcj4v6iaVgmdVOciJkjtD4t1cTmJps05oSrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791387853; c=relaxed/simple;
-	bh=ujIhf5dXNFwk7pQ4zK4rhcG/WcsUBG2agGgkAUBKP3g=;
+	s=arc-20240116; t=1791387855; c=relaxed/simple;
+	bh=wZ6CozmUkheyMWSqRGV6kcV+PJZj5pgj7ODypAQ9KPY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=piQZllHHWs0NOeDNwtHSthWao0thU3bsK66CdoEwH4Qk+PhQUB6KROeSTzgiPa4nKnIU+RccYkasuAW7lO5efgibFH0T93FcN04zURgXg4cO4rpBbsHccGEL81dMHUoNNL34A0FMrOteM9O5Dscxbp7uDUodGkDxA8EsbxHWXas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C8DtEe9j; arc=none smtp.client-ip=74.125.229.41
+	 MIME-Version; b=FBwbbKibFeTkZmFbpKDnDtWe9HGZEGwNlokzOW2FD8ZQm8icWLV9ylFU+kbk4n7aXRCVCIdl7ENhzvtNzlalsUhb4/yk34U4sN2Gt5xOl3WDYU9ATljWctEAllZz0ztcOWvekNUrYlmhJqg1MfV+Czoc3hmYFQt0evJ58F+IDJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akrmrNzh; arc=none smtp.client-ip=74.125.229.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8DtEe9j"
-Received: by mail-dy2-f41.google.com with SMTP id 5a478bee46e88-34ba85727b6so529076eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 08:44:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akrmrNzh"
+Received: by mail-dy2-f12.google.com with SMTP id 5a478bee46e88-32be7127c64so603173eec.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 08:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791387849; x=1791992649; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791387852; x=1791992652; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DsnzOzDPEjaVflvgYk7f5xErna+YXNMqhlw1VDbZP4Y=;
-        b=C8DtEe9jk54QNYEqefDgVoGWJ0U8LkXjRIwVpA5F3WNM3yUa0RA9POcOtH7WPQQune
-         qaEi+AO3oqxqwpza9tMOyNHXMHTbDyQ6PEbv+xLlpkMJaH3lx8/+NfdVnmD1zWrWeCzY
-         8qXwVvmSo49POGyK845bzBZhCdfUTOxFmTUGyrCtjsGW1M7voR7KF1FqJbrqLhZh3O+W
-         sVwFcM8SqX12qDatO7bIwMndtO3+Ibr8mNFgmEsh2gVs3fm04jmwSocaF4RLojpfUQtk
-         IRSc/8xbUO6ZlLbtFKd7GB5US2ssuiLNDH/aUMGChCuImJOA7LpK1SsdaF7zHUaoSju/
-         24Xg==
+        bh=ozb/59ScS84H3e/TnN2LeOjW0OQv9TZinl1O9+31lFs=;
+        b=akrmrNzhxTG8QbsB7cDafx4iW8dni2O/jZfhKhAUHBhWrXVROiHc9J7j6GjTry7+Bn
+         UzHt7M+Q5K4621XTr0UujVikQT3ywZbSFJbC0jyCb+N78jZxKcVxKtnFD2HcRnypRQGm
+         h6a2keRZAZug4y5Qmjb2kW7fz7o196xKfv2sOZXCBQdCcFH3AkHK/fIekxLL5KJvP4yx
+         kMR+/8bkla6ls5lyVnPU+xcM2voT++QZCDVxj5ka08FROxnwhKTJ4hI+bRS+ntBzbyQl
+         VWgfoT5cX9FUkJznASc1c6nRgqZKgu4vn81EafOU2v6Fjl18d3RFO/ISw13K0d2+zF9+
+         4kWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791387849; x=1791992649;
+        d=1e100.net; s=20260707; t=1791387852; x=1791992652;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DsnzOzDPEjaVflvgYk7f5xErna+YXNMqhlw1VDbZP4Y=;
-        b=a5N+wkfSxxZFWv69fsoD9b0pbKxhjGLhABkbBCePe4Fvb301wV3E6CO7xeP0a41Hey
-         ZVIiYLJ0lqSjadOQLKkrVKDg+8ojwjuE5wB2mEY50V84RT5EcYagvfaJjaMqO6iT6FiU
-         4oGHryfmPR4G/VfhYiMrmCopSnOghacDm9eLaaAKbJgL7WuDPeI6t2me4sJCvq5xT7Cp
-         N3rSg4EZ3YoPLhM/lehwr0zRdkXFUmVwgkZMwBDZym9DQKyS3JMr543qt2kTV0yttfd4
-         DSjYdaBZs8X84BK7j8MxD3MMeNkKSZArnJwQJ/24K5pW6AKV9k/mrFOzc6mR+eN7kniG
-         dP+A==
-X-Gm-Message-State: AFq9FYK/lkclektSIE3W3NPD4pWLvjkchKBGEbkhJIgK/s50iTkIbrOw
-	IzYMofWnlyytznVG+hH9BoKzfVHkvDG9G6kRf8+e9zODY7mMLd2PpmhmFB6KWBP8FPg=
-X-Gm-Gg: AYBFou2Bnme85bbgVE9qx8fqbdTAxuajuPw6vwdrOPVHPog/bQnMSAqxZR7oquQem7v
-	kwj3f54jKsz8BDzZ8b2ZPb2F0GDIeAVGhvbryBKGJbm6kIMSnp1xPL00nOUZPSA4nZpv/lEW0jS
-	xpjynKKqHI6gO0G71LoKJcWvtnzb2SE+G97Aa2mT1UBWbYzgIF4ktKzWkd0SwM12jeVpf1N8CJo
-	sQjipL+CuIG/sK14SBUsgFgleIKZ6S+su0d7cbAw4Mm39D4anZ4F/9SlPHL7wQkHX/2b22jJvcd
-	Y0aO+ifGLlcGTah7ImJzZ/pFGrbmrzPAbnpOxs4OSQ9XImwz9OTsHMw7dEn8STK6BOM7Qkz9f+C
-	xGHX+93RRb8jm8R4xu+oWDmzXq6ZcT60o7pG6zixe5hwwqGxIdFScHxQ5yX2ioYhAXx+JrOCZlF
-	ECEuQnobjCmDRNEfQxneRuo01gd8nFRT8QMjTaophrTmuUoG4anrW5/71t1A5GV2fAJOPbihLV/
-	RujmkBMjYNU4u9SflWqg/KVa+zSX8Q2ysdo51lU
-X-Received: by 2002:a05:693c:400b:b0:34b:101f:cdaf with SMTP id 5a478bee46e88-3515dc1a998mr4087176eec.1.1791387849001;
-        Wed, 07 Oct 2026 08:44:09 -0700 (PDT)
+        bh=ozb/59ScS84H3e/TnN2LeOjW0OQv9TZinl1O9+31lFs=;
+        b=gvrQi2u75GoHLDAQ5CdXEDqdJiw7/6VHyH7QsgwVr9EXhWLjFTZV5peQhpljlYlhrb
+         Jpne9YD7W3qooRmt6SnSxha14L6aOOHVfwf0szwYb/Ym3UqGdxzUE38dQJyo9lEjFN+M
+         LSwk3gzhbvUG6yPhjbQYg+pUNK9CafplknxGxE5oIEvFCSIQE0L1e2SvOxJhFbXJRvdB
+         4XGnaF+QsnK6NgVFfC85dZp6hE5jnx1MOVMTdLKavAxl0BAurdcfBrVV0SMLqgjKJVQ4
+         MlJfrKrXVv6UvSVV03JT5oEPTL3dhrqbp0Nm924AjgRcWFfMIZ0prQ1BlL7GLf7d4IRK
+         zFwg==
+X-Gm-Message-State: AFq9FYIWbcIrkrrFnJ/EFrKYhS4jHuARdY+m54W9RnSj5XHaYiS8ratN
+	rjB5IsZ1zM5gVXW8gj6uI83S/PdRvDUaMdgSdfhv33SEHrISt3GgLMrURaIdfYnfr50=
+X-Gm-Gg: AYBFou0NRmOlHrF/2Vk7P1gSol2wLe3FEJRIUxs7gx27DNKfLFI35gPA1YKlvAVsUW3
+	3bnjrgnKBqG1fGzk67tD94hyPWkKcSTKoV+YPh0c8kO8kIPjfaCwDsOxKKWyNmPW+9jPtt6LUSI
+	uA4HKSSUaMuwKM1Q5K2W60AmuMA6KbMEQNOGCvyE6wGqXMyINgZ1E1zVtrLLADQJH+D1pz2MKfN
+	Jjj3bbO78ab5QYtxavmxiepqUsCqnXabIudDZBgBSGVqvcMoWowQNwULcym8MT8iyljzhF9p7XO
+	tSBOFEMXDHfVwNeN2D22fC5lgAzv20uppyNDC/h8c5XSUlfIu4FWxZMs5cAQ5ZSHsM/XwRuqJZE
+	H3El01LDHXVyw0Mn82Skv6S1QFXpN1AEMjPpHQlp74zQURMoFKkvyVnFIqDRG2QsLV/BWnwE+e6
+	bZTajodLjAl8SFFnI4Xs6kDmbMsBijQA6Y+n+PRxJ5TdeK3C6fbP7x9olcFf8cGoFJbXfrr7gz4
+	JuQXqy23xinNXBlQJXElb4/KQwZla9mFq8jOkJ0
+X-Received: by 2002:a05:7300:d589:b0:34c:3ae5:ebc with SMTP id 5a478bee46e88-3515d686992mr3751865eec.0.1791387851437;
+        Wed, 07 Oct 2026 08:44:11 -0700 (PDT)
 Received: from hitalo (190-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.190])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515af7ab9fsm7876955eec.18.2026.10.07.08.44.07
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515af7ab9fsm7876955eec.18.2026.10.07.08.44.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 08:44:08 -0700 (PDT)
+        Wed, 07 Oct 2026 08:44:10 -0700 (PDT)
 From: Hitalo Souza <enghitalo@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org,
 	Hitalo Souza <enghitalo@gmail.com>
-Subject: [PATCH 1/3] Bluetooth: hci_event: Don't fail a connected SCO link on setup errors
-Date: Wed,  7 Oct 2026 11:43:51 -0400
-Message-ID: <20261007154353.148223-2-enghitalo@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: hci_conn: Don't set up a SCO link that is already up
+Date: Wed,  7 Oct 2026 11:43:52 -0400
+Message-ID: <20261007154353.148223-3-enghitalo@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261007154353.148223-1-enghitalo@gmail.com>
 References: <20261007154353.148223-1-enghitalo@gmail.com>
@@ -78,84 +78,84 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When Add SCO Connection, Setup Synchronous Connection or Enhanced Setup
-Synchronous Connection fails in Command Status, the error handlers fail
-the first link on the ACL, whatever its state. If that link is already
-up, it is deleted while the controller keeps it: its socket gets an
-error and, as no Disconnect is sent, later setups to the device are
-rejected until the ACL drops.
+Since commit a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for
+aborting connections"), a SCO/eSCO setup abandoned while pending can
+complete after a new connection to the same device was made, and it is
+then matched to that connection by address. The new connection's own
+setup may not have been sent yet at that point: Enhanced Setup
+Synchronous Connection is sent later from the cmd_sync queue, and any
+setup is deferred while the ACL leaves sniff mode. When it runs, it
+sets the connection back to BT_CONNECT and sends a second setup, which
+the controller rejects since a link already exists. The connection that
+is up is then failed by the rejection, or left in BT_CONNECT and later
+deleted without a Disconnect when its socket is closed.
 
-A link that is up can be the first one on the ACL since commit
-a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting
-connections"). Aborting a pending SCO/eSCO setup, e.g. because its
-socket was closed, now deletes its hci_conn, so a socket that connects
-right after gets a new one and sends its own setup. The abandoned setup
-can still complete, and it is then matched to the new connection by
-address. When the controller rejects the new setup because a link
-already exists, the handler fails the connection that just came up.
-This was reported with an HFP headset, where the rejection was Invalid
-HCI Command Parameters and the microphone stayed silent.
+This is the order of events in the report: the second Enhanced Setup
+Synchronous Connection was sent after the first setup had completed,
+and was rejected with Invalid HCI Command Parameters.
 
-Only fail a link that is still waiting for its setup to complete.
+Don't send a setup for a connection that already has a handle. In
+hci_enhanced_setup_sync(), take hdev->lock before checking that, and
+check under it that the connection still exists, as
+configure_datapath_sync() runs without the lock.
 
-Link: https://github.com/bluez/bluez/issues/2562
+Closes: https://github.com/bluez/bluez/issues/2562
 Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
 Assisted-by: LLM
 Signed-off-by: Hitalo Souza <enghitalo@gmail.com>
 ---
- net/bluetooth/hci_event.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_conn.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c055d16cf..cbe53e19e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2400,13 +2400,19 @@ static void hci_cs_add_sco(struct hci_dev *hdev, __u8 status)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 29da3fe2b..399c7db77 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -290,6 +290,22 @@ static int hci_enhanced_setup_sync(struct hci_dev *hdev, void *data)
  
- 	acl = hci_conn_hash_lookup_handle(hdev, handle);
- 	if (acl) {
--		link = list_first_entry_or_null(&acl->link_list,
--						struct hci_link, list);
--		if (link && link->conn) {
-+		/* Only a link still waiting for its setup can be the one the
-+		 * failed command was for: one that is already up must be kept.
-+		 */
-+		list_for_each_entry(link, &acl->link_list, list) {
-+			if (link->conn->state != BT_CONNECT ||
-+			    !HCI_CONN_HANDLE_UNSET(link->conn->handle))
-+				continue;
+ 	configure_datapath_sync(hdev, &conn->codec);
+ 
++	hci_dev_lock(hdev);
 +
- 			link->conn->state = BT_CLOSED;
- 
- 			hci_connect_cfm(link->conn, status);
- 			hci_conn_del(link->conn);
-+			break;
- 		}
- 	}
- 
-@@ -2683,13 +2689,19 @@ static void hci_setup_sync_conn_status(struct hci_dev *hdev, __u16 handle,
- 
- 	acl = hci_conn_hash_lookup_handle(hdev, handle);
- 	if (acl) {
--		link = list_first_entry_or_null(&acl->link_list,
--						struct hci_link, list);
--		if (link && link->conn) {
-+		/* Only a link still waiting for its setup can be the one the
-+		 * failed command was for: one that is already up must be kept.
-+		 */
-+		list_for_each_entry(link, &acl->link_list, list) {
-+			if (link->conn->state != BT_CONNECT ||
-+			    !HCI_CONN_HANDLE_UNSET(link->conn->handle))
-+				continue;
++	/* configure_datapath_sync() runs without the lock */
++	if (!hci_conn_valid(hdev, conn)) {
++		hci_dev_unlock(hdev);
++		return -ECANCELED;
++	}
 +
- 			link->conn->state = BT_CLOSED;
++	/* The link may have come up while this was queued, see
++	 * hci_sco_setup().
++	 */
++	if (!HCI_CONN_HANDLE_UNSET(conn->handle)) {
++		hci_dev_unlock(hdev);
++		return 0;
++	}
++
+ 	conn->state = BT_CONNECT;
+ 	conn->out = true;
  
- 			hci_connect_cfm(link->conn, status);
- 			hci_conn_del(link->conn);
-+			break;
- 		}
- 	}
+@@ -302,8 +318,6 @@ static int hci_enhanced_setup_sync(struct hci_dev *hdev, void *data)
+ 	cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
  
+-	hci_dev_lock(hdev);
+-
+ 	switch (conn->codec.id) {
+ 	case BT_CODEC_MSBC:
+ 		if (!find_next_esco_param(conn, esco_param_msbc,
+@@ -625,6 +639,12 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ 	if (!link || !link->conn)
+ 		return;
+ 
++	/* The link may already be up: a setup abandoned while pending can
++	 * complete after a new connection was made and be matched to it.
++	 */
++	if (!HCI_CONN_HANDLE_UNSET(link->conn->handle))
++		return;
++
+ 	BT_DBG("hcon %p", conn);
+ 
+ 	if (!status) {
 -- 
 2.55.0
 
