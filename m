@@ -1,105 +1,307 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3769D3D954D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 12:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE3138F226
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 12:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791374780; cv=none; b=oLVh1tT4E6cNF5w80n0D5IYNehbumo5INee68yJoKzzTpLK1hiHRBE+BjIqeSdX91uOssuTuEiivVm++tMG/HbAQsP8yACKAO/WGiv0FIFLsQy6pGDwhaWMyTInUcJAMdxTNZfws//qC5tOnHbp9aQP8t+wgQAbJid1oWY2/HtI=
+	t=1791376043; cv=none; b=VXrZw0gyfGlvVassqxx28biBSdcoPDErJDeJM6dClqNposUUTm/qr0+Wy4qn8b7cEe9rIlHv2tFWTp5akxZqRvW3PdiUqlfonSl92y6T2UeNpWWIFJMg/PTTx98bu1cUex4NZgnt8PzlH+LZBnb1ylB1dvMsLOFB29z5VRKEz8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791374780; c=relaxed/simple;
-	bh=o7h8FIcEmmQ8YvkfOUP3oJWtw5waLwrFeZU8tbJUxyA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OI0w9WVg6tjzqU+SSsQCpgVDMAcJPO/XD/tjk9KNd8qKky6gewhBvzDrJeGrA8QaohFkq5Vg3GBQdWu32JOcmLuaCygu9Kafs77YRX4ZMxRZImZqLRUgBSL/dVm/ApW7uygLmvZQv1ApZ3XEkxGGk3yH2iKlqqespxXfqrRe/ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UkGak/XF; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791376043; c=relaxed/simple;
+	bh=OW72klToLOtdaNERl94LmvXKi7DxGMSkcVP9y9D2WF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hD/8G+Bt/0vaOLqYiMFX7euX9p27bQGaI+OnrVfB78I5eZQvTZKamZch3hTpcmCLipSnl1drXvhgTUenApV7GHAkbc+gADfLLNy3ozrmDoijtl4yQikXfP2XAZYmMj+VT2TilvdH7gJq6HgfRmZ3Wt4/GZThykrvdeZ7OpVd6/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KkeHgS9w; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UkGak/XF"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-6de1fd5f572so755058eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 05:06:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791374762; x=1791979562; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=4xE7tevLwNsxASknGT6jnYaKOv9RT/ZLTRmv3R+xhCQ=;
-        b=UkGak/XFt+H/Hv59We0AFGcpBRIt/EC4zwwRLmyXtdak6Jd4cj2zU866vRA5t2SGeH
-         8fCfYLQu/ja7R2QAac4rYpvXKtfAe8vsDv6RI9Idne3TxM0oq6JVgJX2nbq97Wxv6CUX
-         qanvwogzsivw/YOa6cWQ7ybGqI40R2GF+Cd9CQJzuXr1Kjy+9xWFstQyy3yLgJ37icyD
-         iQXCnN0qjl8Jv67acQ0yxxtPH7P4zs28YvxEmKQS5Kt8cc1uenbXJU77XMMLaJ5R0Tp6
-         xWib7XOXBvtn7gsjjwsKYNKNqNUkunZsDqVyLRL8pY9+4m7/Ugh6zB1lXpCEDHL5au40
-         iaUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791374762; x=1791979562;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=4xE7tevLwNsxASknGT6jnYaKOv9RT/ZLTRmv3R+xhCQ=;
-        b=e8a40Rrk076F9MR31/6HFOHDY/mH8v3YZmb2dBo1VA4KABNnCNhN1U84DZakO9JM5T
-         2hwXBXcM4KD4MBEGA1Df/cgkVIUTEQ3wDZEJjM18aKJPzoNKeUwnTdjKXm09upmEvJbP
-         P8lQZIEm4s6TPlODtVUuUsXX4E3ub9a6yJ1qzVFvJpwj84dyEvCZ7dvLPWIDqsQIEPKa
-         ksPDJeek9W1L26sfxQZotf40957ox4lEcpg93p4RBOjwkVbUA2TS2ro61FgmK6q7MktQ
-         61i5+kSJUqvLyVyEsCydQgsDUIbMWtsirMuNdM9gAbAkb/OEj/GM0XfR+LEI8oLRViq3
-         9uqw==
-X-Gm-Message-State: AFuF++lKxP7mib5nUGpRSJJI0EiZeLWxEwOkky8NJmsZ35l3Mrswq3zx
-	bXxywCdyBfKn7SdGRGuH8IXWzjVqTbXrZSEOMs9OxCPQC2YdzM/LYB0LA2M4EVHK
-X-Gm-Gg: AYBFou1dVQIpBAYULL9xpzqmOg69hxtKTa7GpsQoGfbRP+Lry8a+z2gPuLtL34DobXl
-	RN+AOrcYmRFfTy9MM9D4asM/GCUu5Uz0EeU4aAaypYAnWfAC2Gjfk5DRox4Y27M9qpCUtYLEEWb
-	xeVmBB8gqtZCGa5I3tABOjAJ2ZQbEJeczOSGcZv8WEeYCvWLoNmu9oMCmA8ME0eH8q8DILm5X8M
-	nhDW3lMfge4b0F8Qe53rlC4K9b3zI/2shYht40jqW1bfPza/h92gj0U8ohLQn/yNEDddc9BWObT
-	Oz55z7IFBmBTKSxT87fIuX4CNTCYtPXmOEPLCLjkNNEMlwjAUD/HeFouJR9x43uori6J4mWA3fT
-	BXwXST24O+BD6dR2OpGCtgtPc+IQwXYRyzB3lxaSoSJWgC6uKaxq+gQq3zixl9X5tIR5xCiFqTs
-	v28aO++5KMd1U5KczXrgNbhc4j397Y9Hky8a5sztWX2fmSe7LEn2XCtLLZklog4Wq3goVAfCcUe
-	XJNDqC/nwtF1GDMog==
-X-Received: by 2002:a05:6820:188c:b0:6dd:9790:7dd5 with SMTP id 006d021491bc7-6e7a58815d5mr1996869eaf.1.1791374762606;
-        Wed, 07 Oct 2026 05:06:02 -0700 (PDT)
-Received: from [172.17.0.2] ([52.165.250.245])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a257016f84sm1928381fac.5.2026.10.07.05.06.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 05:06:02 -0700 (PDT)
-Message-ID: <6ac635aa.e782ec0c.d8363.6d22@mx.google.com>
-Date: Wed, 07 Oct 2026 05:06:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4815738903781485774=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KkeHgS9w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791376033; x=1822912033;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OW72klToLOtdaNERl94LmvXKi7DxGMSkcVP9y9D2WF4=;
+  b=KkeHgS9wZF0OSdRGGsco2f/hOSsnxBOvid1LL9mzV/wHIUagF+8ev7BO
+   A77O6h13/QNj5pynTIm+t/SQwYRE8bpcdWssC4j90p1tgI+36qsUwgXI2
+   2Z6Dh+gXNAPqwp1kPUiDJB9fKsTCE4WyUs0lbw+aEDh39wpfDX+VytIL0
+   x8uqTptV8G3soW/cc/xmrEpeTZ+yRdlqieFuZ7o6GLO+pL0YqHMwPbrUh
+   hcAXbjPL/YfKNe8FYu+VeqKbMcKQswe+YNJKOMbGpzY1EhEPXVGQ2+bs4
+   YVjl24MgY4aa0diAG7Rq8+f+OCKJ4ngeW2UIjDxhOVuCux8d3UaHGsCCF
+   A==;
+X-CSE-ConnectionGUID: 6VQQ8OWlRLGeRtkMmQAraw==
+X-CSE-MsgGUID: Qhev5y1WRZa+SuJTqfWWPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11927"; a="19593"
+X-IronPort-AV: E=Sophos;i="6.27,144,1787036400"; 
+   d="scan'208";a="19593"
+Received: from fmviesa012.fm.intel.com ([10.60.135.152])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2026 05:27:13 -0700
+X-CSE-ConnectionGUID: XKZbSNvYTwm75KG49sC3wA==
+X-CSE-MsgGUID: HEwRhNN+RZKcIpMDRmE2vA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,144,1787036400"; 
+   d="scan'208";a="1524080"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa012.fm.intel.com with ESMTP; 07 Oct 2026 05:27:10 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>,
+	Ravindra <ravindra@intel.com>
+Subject: [PATCH v3] Bluetooth: btintel: load unlocker.sfi to allow unsigned firmware
+Date: Wed,  7 Oct 2026 18:17:21 +0530
+Message-ID: <20261007124721.2521956-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nicholas.hammond0@gmail.com
-Subject: RE: Cancel pending HoG reports before detach
-In-Reply-To: <CAB2hQnT9LEYHqAk2k5=C9o32JBN3PHb9URLpA_Srw35dEdvGLQ@mail.gmail.com>
-References: <CAB2hQnT9LEYHqAk2k5=C9o32JBN3PHb9URLpA_Srw35dEdvGLQ@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4815738903781485774==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When an unsigned operational firmware image is needed for debug, the
+controller requires intel/unlocker.sfi to be loaded first. Without the
+unlocker image, the controller rejects the unsigned operational firmware.
 
-This is an automated email and please do not reply to this email.
+Support both firmware download flows based on the unlock policy advertised
+in the version TLV:
 
-Dear Submitter,
+  BlazarI/BlazarIW/BlazarU/Gale Peak (unlock_policy == 0):
+      Boot ROM -> unlocker.sfi -> IML -> OPFW
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+  Scorpius Peak onwards (unlock_policy == 1):
+      Boot ROM -> IML -> unlocker.sfi -> OPFW
 
-   Series:       Cancel pending HoG reports before detach
-   Pull Request: https://github.com/bluez/bluez/pull/2563
-   Created:      2026-09-22 06:15:05+00:00
+Parse the new INTEL_TLV_UNLOCK_POLICY and INTEL_TLV_PLATFORM_ID TLVs
+into struct intel_version_tlv, track the pending unlocker load through
+a new btintel_data::unlocker flag, and pick intel/unlocker.sfi as the
+firmware filename when that flag is set. If the unlocker image is not
+present in the firmware search path, the driver silently falls through
+to the normal firmware download path. If the unlocker image is present
+but fails to download to the controller, the driver logs the error and
+aborts bootloader setup, since continuing would leave the controller in
+an inconsistent state.
 
-The pull request has been closed and no further action is taken on this
-series.
+[  413.375247] Bluetooth: hci0: Found device firmware: intel/unlocker.sfi
+[  413.501051] Bluetooth: hci0: Waiting for firmware download to complete
+[  413.501058] Bluetooth: hci0: Firmware loaded in 122864 usecs
+[  413.501537] Bluetooth: hci0: Found device firmware: intel/ibt-02a2-01a1.sfi
+[  413.501547] Bluetooth: hci0: Boot Address: 0x10001000
+[  413.501548] Bluetooth: hci0: Firmware Version: 137-39.26
+[  414.103473] Bluetooth: hci0: Waiting for firmware download to complete
+[  414.103478] Bluetooth: hci0: Firmware loaded in 587841 usecs
+[  414.149576] Bluetooth: hci0: Applying Intel DDC parameters completed
+[  414.150089] Bluetooth: hci0: Firmware timestamp 2026.39 buildtype 3 build 86921
+[  414.150092] Bluetooth: hci0: Firmware SHA1: 0xeb2e0a4b
+[  414.150093] Bluetooth: hci0: Platform ID: 570c6ffbcbe6
+[  414.150094] Bluetooth: hci0: Fseq status: Success (0x00)
+[  414.150730] Bluetooth: hci0: Fseq executed: 15.255.00.98
+[  414.150734] Bluetooth: hci0: Fseq BT Top: 06.32.00.02
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
-
+Assisted-by: Copilot:Claude Opus 4.7
+Signed-off-by: Ravindra <ravindra@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+changes in v3:
+- Address Sashiko review comments
+  https://sashiko.dev/#/patchset/20260929021056.1396791-1-kiran.k%40intel.com
+changes in v2:
+- Updated commit message
 
---===============4815738903781485774==--
+ drivers/bluetooth/btintel.c | 94 +++++++++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel.h |  5 ++
+ 2 files changed, 96 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index f298c91f4f4e..3bc59a2f3ba8 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -579,6 +579,11 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 	if (version->img_type == BTINTEL_IMG_OP)
+ 		bt_dev_info(hdev, "Firmware SHA1: 0x%8.8x", version->git_sha1);
+ 
++	if (!mem_is_zero(version->platform_id, sizeof(version->platform_id)))
++		bt_dev_info(hdev, "Platform ID: %6phN", version->platform_id);
++
++	bt_dev_info(hdev, "Unlock policy: 0x%2.2x", version->unlock_policy);
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
+@@ -604,11 +609,14 @@ static u8 btintel_version_tlv_min_len(u8 type)
+ 	case INTEL_TLV_DEBUG_LOCK:
+ 	case INTEL_TLV_LIMITED_CCE:
+ 	case INTEL_TLV_SBE_TYPE:
++	case INTEL_TLV_UNLOCK_POLICY:
+ 		return sizeof(u8);
+ 	case INTEL_TLV_MIN_FW:
+ 		return 3;
+ 	case INTEL_TLV_OTP_BDADDR:
+ 		return sizeof(bdaddr_t);
++	case INTEL_TLV_PLATFORM_ID:
++		return sizeof(((struct intel_version_tlv *)0)->platform_id);
+ 	default:
+ 		return 0;
+ 	}
+@@ -716,6 +724,13 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
+ 			snprintf(version->fw_id, sizeof(version->fw_id),
+ 				 "%.*s", tlv->len, tlv->val);
+ 			break;
++		case INTEL_TLV_UNLOCK_POLICY:
++			version->unlock_policy = tlv->val[0];
++			break;
++		case INTEL_TLV_PLATFORM_ID:
++			memcpy(version->platform_id, tlv->val,
++			       sizeof(version->platform_id));
++			break;
+ 		default:
+ 			/* Ignore rest of information */
+ 			break;
+@@ -2472,7 +2487,12 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+ 		else
+ 			btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
+ 	} else {
+-		btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
++		if (intel_data->unlocker) {
++			strscpy(fwname, "intel/unlocker.sfi");
++			intel_data->unlocker = false;
++		} else {
++			btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
++		}
+ 	}
+ 
+ 	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
+@@ -3489,6 +3509,36 @@ static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++/* Attempt to load intel/unlocker.sfi if it is present in the firmware
++ * search path. If the file is not available the device will be booted
++ * with a signed operational firmware, which is the common case, so its
++ * absence must be treated as normal and not logged as an error.
++ */
++static int btintel_try_load_unlocker(struct hci_dev *hdev,
++				     struct intel_version_tlv *ver)
++{
++	struct btintel_data *data = hci_get_priv(hdev);
++	const struct firmware *fw;
++	u32 boot_param = 0;
++	int err;
++
++	err = firmware_request_nowarn(&fw, "intel/unlocker.sfi", &hdev->dev);
++	if (err) {
++		bt_dev_dbg(hdev, "intel/unlocker.sfi not present (%d), skipping unlocker load",
++			   err);
++		return 0;
++	}
++	release_firmware(fw);
++
++	data->unlocker = true;
++	err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
++	if (err) {
++		bt_dev_err(hdev, "Failed to load intel/unlocker.sfi (%d)", err);
++		data->unlocker = false;
++	}
++	return err;
++}
++
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 				 struct intel_version_tlv *ver)
+ {
+@@ -3496,6 +3546,8 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	char ddcname[64];
+ 	int err;
+ 	struct intel_version_tlv new_ver;
++	struct btintel_data *data = hci_get_priv(hdev);
++	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+@@ -3514,6 +3566,31 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 
+ 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+ 
++	data->unlocker = false;
++
++	/* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak):
++	 * Boot ROM -> unlocker.sfi -> IML -> OPFW
++	 *
++	 * Skip the unlocker check when the controller is already running
++	 * operational firmware (can happen on USB); the unlocker flow is
++	 * only meaningful from the bootloader stage.
++	 */
++	if (ver->img_type != BTINTEL_IMG_OP &&
++	    ver->api_lock && ver->unlock_policy == 0) {
++		switch (hw_variant) {
++		case BTINTEL_HWID_BZRI:
++		case BTINTEL_HWID_BZRIW:
++		case BTINTEL_HWID_BZRU:
++		case BTINTEL_HWID_GAP:
++			err = btintel_try_load_unlocker(hdev, ver);
++			if (err)
++				return err;
++			break;
++		default:
++			break;
++		}
++	}
++
+ 	err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
+ 	if (err)
+ 		return err;
+@@ -3537,8 +3614,19 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 		return err;
+ 	}
+ 
+-	/* If image type returned is BTINTEL_IMG_IML, then controller supports
+-	 * intermediate loader image
++	/* New unlocker flow (Scorpius Peak onwards):
++	 * Boot ROM -> IML -> unlocker.sfi -> OPFW
++	 */
++	if (hw_variant >= BTINTEL_HWID_SCP &&
++	    ver->api_lock && ver->unlock_policy == 1) {
++		err = btintel_try_load_unlocker(hdev, ver);
++		if (err)
++			return err;
++	}
++
++	/* Transition to Operational Firmware
++	 * If image type returned is BTINTEL_IMG_IML, then controller supports
++	 * intermediate loader image.
+ 	 */
+ 	if (ver->img_type == BTINTEL_IMG_IML) {
+ 		err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index ff7c1d623007..9526acf65959 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -43,6 +43,8 @@ enum {
+ 	INTEL_TLV_OTP_BDADDR,
+ 	INTEL_TLV_UNLOCKED_STATE,
+ 	INTEL_TLV_GIT_SHA1,
++	INTEL_TLV_UNLOCK_POLICY = 0x3c,
++	INTEL_TLV_PLATFORM_ID = 0x3d,
+ 	INTEL_TLV_FW_ID = 0x50
+ };
+ 
+@@ -108,6 +110,8 @@ struct intel_version_tlv {
+ 	u32	git_sha1;
+ 	u8	fw_id[BTINTEL_FWID_MAXLEN];
+ 	bdaddr_t otp_bd_addr;
++	u8	unlock_policy;
++	u8	platform_id[6];
+ };
+ 
+ struct intel_version {
+@@ -261,6 +265,7 @@ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+ 	int (*acpi_reset_method)(struct hci_dev *hdev);
+ 	u32 cnvi_bt;
++	bool	unlocker;
+ };
+ 
+ #define btintel_set_flag(hdev, nr)					\
+-- 
+2.54.0
+
