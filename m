@@ -1,95 +1,70 @@
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f40.google.com (mail-dy2-f40.google.com [74.125.229.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F00C4A4848
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 14:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2E23B14D5
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 15:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791384471; cv=none; b=sNZ/ZwBwcFTVqtZLVq8t2CGiJV3+uiFz7u6fSs2LohnfU1YLD8XL+U+JBfCV19LAT0mmXi8zOlZCB9KzcRVbRv2gabqTfNs42RPYpWVi93wV3PDLNO9vsdkqTsXbKcM8SpGcUILUVDou05PGllhc/fyi7JoiWTiTRi7OeSN+VlM=
+	t=1791387847; cv=none; b=ndBqrlCeU9jx9JuqFEU5eoiEdaxoB25dx5pZOIQ/OpNyOl/4vBGYDxVABWmzny/osrFJwX3+NyO/OGii5xXa64sFuiqQyTIIg7Pag68f3cXGxuNkK7PtzAfOccWEBT4Nr0Tq+4NJKz2E2aEmYJ/SipRV6qZYsjF3rwFpAO0Umjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791384471; c=relaxed/simple;
-	bh=ZvY72hF5+7StL5VukGljL+W7ih5MrIUpuc3Tp4nv95Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PS9s/wZe4dKWE06ZhCqko+a7RBqbZ83xuNkrVDOvXqbVnnIOgUJZ5BnkEwmcRPFEf5ujb01zcr7NQlwF+T/Ls3crs/ku7dnyryRGGwoJjp5yX9o5yLZHxZhtqcCPMnAfwx3r/rpwUldWfMMaemowhLTppKAUMxhKcovgz8QMrTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=a481re3Z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nrwR7ouR; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	s=arc-20240116; t=1791387847; c=relaxed/simple;
+	bh=kyp2muq7rArJ3VUDCmhltLyzhdwPMovmSwQCFyt6sUQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MnXl3YDvzfRy2ii7yqB6PvuxKFIpHaJOFvndKpAECK95vUKY8M18ghiqOlWXsRIqSPhStFJz5flPTs5MDsCuHA1VbzeiZbtIJK4jOHNhm1uwyjkSXNgPcY0LM5WoJX/qiy6AcOgruS6yzfl09m4pUmCVuOwr/YkCfHCHdwRgppQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SgfB50QJ; arc=none smtp.client-ip=74.125.229.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="a481re3Z";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nrwR7ouR"
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id DE56EEC02AF
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 10:47:44 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Wed, 07 Oct 2026 10:47:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm1; t=1791384464; x=1791470864; bh=8E3MIFg3KplKFCNpJSZvO
-	dopS4OuMNyxVOqY76/UO7c=; b=a481re3Zg5vlA9F67r7v89zcfPNhQ53hXeB3m
-	lvcpIu4HbvwEYJ9jY2P1TgmsL3JbXgiXo4ZJXSALHKOPQCn4H76CRx02oWyj7nlb
-	NFFyu2SCgqLWiD0nn/WEMORAFmhnT46HQME/gyQ18Vb7jQbyxOpANGfDFDQ2dvhc
-	AgYxj4NSgkZiH9pvCZOaCOqXDw9r9dLlGOzR9idGzm1NipWy/yea6FpJ0H6uLqRX
-	Uq5FIgD6Fs6BhlLEJGJtpFLb/iVwGjOVhQR0wCfOy+q77qPqYIAj0Un1Zy8dWsls
-	NrW/9M1rOaLB6ewWeHRlwn/icRiHOocUKRX2xPjqrGWknr+nw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1791384464; x=1791470864; bh=8E3MIFg3KplKFCNpJSZvOdopS4OuMNyxVOq
-	Y76/UO7c=; b=nrwR7ouR/J288CjUNDOpzCGyQF2InPzL0sHS3w+NBGC+CdgRksw
-	hgsCOU37FRMQfhgyOYpNWlcuedwCxymoeONXEcKzvBgypojTRFKwoKDKmvM3ZDAR
-	pT8+aCufJ0Zfx4Up0hRn11IanMo7GVyT+JApRmkKLvlk1NHQZxHI1ihyAW5YLtCL
-	bOArDQ+umCkyErmTAkqtpopXJYDixWn4L9MlFD2VNNqypHU3MG/9G6b6s1l76lrS
-	7ggmaQML6rq1DsJeR7QZVTydkm3HDGgFyU8LozrplA9L6HkQ4/fQft/dbV7y9M1l
-	QWrSIbJI4Wb2+FiWWZETTfNzXQRZXyO9yzA==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
-	action=sign d=fourdim.xyz a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1791384464; d=fourdim.xyz;
-	mf=PG9zc0Bmb3VyZGltLnh5ej4=;
-	rt=PGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+;
-	s=fm1:rsa-sha256:rVhdCBXwgYgs3Uqc0E1p5jGdUmdNQvMzTud7ObJnuot+7om
-	h63K5H6Rr9h6eWH2fz4fOC2tQKBVue82Gu4tD9qnISkfRcuGjbScIi1kD/eqp7D+
-	6IiyOE6bkt9Mcw0k41fnaLL4fyq025BhgqPLN5HeunX4etNNx+e3sh7VJTHPzCES
-	bYNT5FlaOvu6wZErkFI90K/1ABuKS0kdFUIhm6Om0CLmgeeqeqzZklMuDb0s+YYe
-	sdPPP/FIgR53cGOy68gGCkuOi5wFI16nyL113yAd5OjHp+tIzowIXtvELkAEq4+Q
-	qdJWYqSGU0n2AVg38O1DVoYnnSK+P/oa5lIB8Uw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:qD5EaFYgeI0zCIqfr9ipvtFNSNp0T5k8/D56IBj1eWs=:ZvY72hF5+7StL5VukGljL+W7ih5MrIUpuc3Tp4nv95Y=;
-X-ME-Sender: <xms:kFvGaiCJgHpunE4iIZAHBva7IIS0kIQFc467I53olSSTf0xchraqrQ>
-    <xme:kFvGaj8aP38ly_rsgslC5q1GyEJfKdiXqOxY2ivw5-RG3g3ekgc9cDbsdz0dcaovD
-    IaKGeMM9WVKaLmmDBruPsmIuRycsJrrphJ4xhgifyXoHGfw_134PTlbOA>
-X-ME-Received: <xmr:kFvGai_PBOj1eOcBu4a0pyTEv31jIsTSkFbXOfUMHyMWREF1DZQvs63BBv3w6W-UfVWa400>
-X-ME-Proxy-Cause: dmFkZTGaLzm6RuLHgYnrxTw+tVFgj1Zlrv3fBg4pdbu/werRw/G4gdGWM6eWcAmQwvwdvt
-    skEze1Uqjz7z0UXmME2oybNtJMfhA/mztbdkHrdFifXUB3snGm6+wv+RMCcIsSq+ZI5ZdW
-    C9z25cFPuxiEs3Q7DsEi1g/ae8s1tiBBFUBJj2kag3DGF7VPIvKn8oYObc8nf12b70+eOW
-    mPRcGRfe1eqIzX3+ewpIxd0vyOp6xZV6U1Cz1uXu6w+j6KHc9YcNCgLzC4KKfp5JdCkZ69
-    dEQuAMxw5IXQ2pDFvsyN8jNFQwPR12gPPX/q6/qN89dnP6fwOIRB2gQ88HahEUTxiH8gSa
-    I+HsqtwzLqi3Y3aJRYUmujINnBZenC215n8/AgF9/fWeYa4kE+FbFj0TrBCM2WBlH2aPwm
-    xtwaq94ojzdmLjloQUvDZ4IuXcih+AUe35YNRVDn04w06CRlMSTM8Va06zDhhTbk61fjRN
-    4gp5iAC/uFio9oS542rxn2Kfvq8+j4tduWQDcydNPg2bf0mXmZoCZ/avNd8Wy49xgN31Td
-    nnGJz0X+ZHu+svg0yIeBTJrvR6nZJeYUKfuWgsJzh9E7FVQfTNzFVMHsANPLnaZyixK7y1
-    tsULIXzx6pdABNVMWXOXXftGAoOM/bLQ7PnpKZuCbw9TobPnytgLXSsiSinA
-X-ME-Proxy: <xmx:kFvGaqf0TsZHeHXwO_LLVpyrXzIPf2NefIPJpWfraBrh7wIXMMM2sQ>
-    <xmx:kFvGarGwwSXS1L4O16zCZABWWqgb50s4pC9PE7F7Gui2lEK8CDNGIw>
-    <xmx:kFvGaofC9IM_ba7UYUyj8S8fnc8wpDLClvyV01ekwy3G9Iv41VCwow>
-    <xmx:kFvGalEnQ-rnByVZaLV-AqS7TSh8hKbS10Oiwgmxeupw9JaQ6phy7A>
-    <xmx:kFvGaj9p3Y1CSNk1SPMA-n283Nm91-aQJ7nKNQgZAgTiF47t0oMSGHE5>
-Feedback-ID: if72e4b10:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Oct 2026 10:47:44 -0400 (EDT)
-From: Siwei Zhang <oss@fourdim.xyz>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v3] Bluetooth: L2CAP: Reject signalling responses in invalid states
-Date: Wed,  7 Oct 2026 10:47:10 -0400
-Message-ID: <20261007144717.3832330-1-oss@fourdim.xyz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SgfB50QJ"
+Received: by mail-dy2-f40.google.com with SMTP id 5a478bee46e88-35164c9597bso116758eec.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 08:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791387844; x=1791992644; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=spjUlaBDxebTzZFLN0amHOEGrJuFIyLTkHqrPHrusBw=;
+        b=SgfB50QJe5/a1Hf+fVvrOe6vSvXPrrpRbG4uOQHqWGBaavBkwZRN3r9DQtWPdoj4ci
+         c67mkwPCEweNnmI4y3maHdgeFXR2NtKRK67P1kJ2oInqw2tCmm2PeDEnLd9T6m1VxgBA
+         72MaXTT9g8+tFQ5mjEPI1Mlgs3ydCeGyGOEVosD1F0/brIZd6L28dyXsXANVbbhhgGSe
+         6yDgzgR+TsxGLHnCzXiBifpSrhxhomg40tEWieFAsXr3AIysqda2BcKdyICY0hH9XXJx
+         A+znePW4NTpKHwcEy+YwTYta+7Yhw0MdRXSArsETz0wTsA7sINOp1fYLNnPuskwKogGo
+         uL5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791387844; x=1791992644;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=spjUlaBDxebTzZFLN0amHOEGrJuFIyLTkHqrPHrusBw=;
+        b=dYAGMuYxaHrMGZ7kNpDkrVd2cmQB6RoSmumA38WnXB2HijSg/ezPr/e8bAFstToxFl
+         2oZ5naWQE5+83Vaws1HrZqrt5dMUCBmyPYwAgNutGpJxxAgnJGkK4+ZCKW2jfBIdicWz
+         2C63CSQtZ5/5ftLtYyJ5Rfs9IQ7QsGW6DQIrr+2iyhhIOWHK/rVejx5KbXDKzXkwukrh
+         yIcSuzKZhV9yDJ7HbBPG9zBjCtG7CNoJmRzF/rDHN3jaIk07TipT5alPeX13F9JRH36U
+         BUdUSmm76u3GJ3J6HIM12tsVJZR/5is+anSbW3xE8szjRBb7ufujeEamSiT/OdU3iL+i
+         6Qbg==
+X-Gm-Message-State: AFq9FYIuSe+BCsDoZTZYoyTfs1GQEEKDoAUfcCgTq38kq151uzzm0/7w
+	a+IOahiJoQYa4ZRu4qRurEZG+omHPlrwoDwBFyW2JmbVkj+sLgPHUFldwJrfoBAmeuM=
+X-Gm-Gg: AYBFou24c6MhRauBYB4qf0lorzFc/xeuHusHcA5s34WpHb4YzGWH/xFnyDPcQlJDtsG
+	UmN5cMHmZvz5vG3XWnChSn3CWbSMwMdT+M+EKAMqzlgGLRB9CJNHm6XiJ4jLkRhvlApN0GnKrFt
+	Yi8JHKdBk3KaLwKc5Nwo8xw3AfnGqNSdA9QQWkBdRK+pdtGyMZeBb5cbEoQDf6pqvvcuMunHFGl
+	p2e5upyKVA1YXj7hBntfdwmJa5aqETCVtAYIa7WE0+nTeHxr6qUFOUG8TuQmooEHO6aVx6npF+Z
+	XAu+vIiH4YaX2CLLgRrY0apBBU3d0bNYNFt+rkajVfyN0o2SdthPOmdQZbFPLrBfzlnLKZuQg68
+	xKIT2wuos3HVcWZeaElr4QPTGUB5WUpplc5SCQvoe4r/0+xwhf3PoZA9UZ41xP5HWgOPHCVWgNJ
+	4V+tlqkRc5cdVXWeJzevLOU5pqo0O3Uv3kDjojRGJI1azaEYsb53/fHwZ2ycUMds+jTWy1AjV0p
+	cyrWz8cotbZxoMVvGrpmlMC3Z/CAvNYNi4Ae56S
+X-Received: by 2002:a05:7300:3f11:b0:340:f698:fd56 with SMTP id 5a478bee46e88-3515dd83ba4mr4716331eec.2.1791387844231;
+        Wed, 07 Oct 2026 08:44:04 -0700 (PDT)
+Received: from hitalo (190-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.190])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515af7ab9fsm7876955eec.18.2026.10.07.08.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Oct 2026 08:44:03 -0700 (PDT)
+From: Hitalo Souza <enghitalo@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Hitalo Souza <enghitalo@gmail.com>
+Subject: [PATCH 0/3] Bluetooth: Fix SCO setup failures after an abandoned setup
+Date: Wed,  7 Oct 2026 11:43:50 -0400
+Message-ID: <20261007154353.148223-1-enghitalo@gmail.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -99,96 +74,161 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A peer can send configuration messages while an
-incoming channel is in BT_CONNECT2, before the
-security or deferred accept gate has completed. A
-configuration response can then promote the channel
-to BT_CONNECTED. Configuration responses can also
-act on channels that are closing, and a late connection
-response can move a disconnecting channel back to
-BT_CONFIG.
+Since commit a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for
+aborting connections"), closing a SCO socket while its setup is pending
+deletes the hci_conn, after a Create Connection Cancel that cannot
+cancel a synchronous connection. When a new socket connects right away,
+e.g. PipeWire recreating the HFP transport after a codec negotiation as
+in bluez/bluez#2562, the abandoned setup can still complete, and:
 
-Accept connection responses only while waiting in
-BT_CONNECT. Answer configuration requests in
-BT_CONNECT2, but defer our own request until
-BT_CONFIG so configuration cannot complete before
-the gate. Ignore configuration responses outside
-BT_CONFIG and BT_CONNECTED, and only complete
-configuration in BT_CONFIG.
+ 1. It is matched to the new connection by address, the controller then
+    rejects the new connection's own setup, and the rejection handler
+    fails the first link on the ACL, which is now the connected one,
+    without disconnecting it (patch 1).
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
----
-v3:
-  - git lint on comments
-v2: https://lore.kernel.org/linux-bluetooth/20260929154219.2366060-1-oss@fourdim.xyz/
-  - resolve the patch conflict
-v1: https://lore.kernel.org/linux-bluetooth/20260928173324.1837653-1-oss@fourdim.xyz/
+ 2. It is matched to the new connection before that connection's own
+    setup was sent: Enhanced Setup Synchronous Connection goes through
+    the cmd_sync queue, and any setup waits for the ACL to leave sniff
+    mode. The setup is then sent anyway and rejected. This is the order
+    of events in the report (patch 2).
 
- net/bluetooth/l2cap_core.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ 3. Nothing takes it over, it completes while its abort is still
+    queued, or it is a second link for a connection that is already up:
+    the link stays up in the controller with no connection for it, and
+    the controller rejects every further setup for the device until the
+    ACL drops (patch 3).
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 49a998804908..cb4ec42f99e3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4438,6 +4438,10 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 
- 	lockdep_assert_held(&chan->conn->lock);
- 
-+	/* Ignore a late response after the channel has left BT_CONNECT. */
-+	if (chan->state != BT_CONNECT)
-+		goto done;
-+
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
- 		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
-@@ -4467,6 +4471,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 		break;
- 	}
- 
-+done:
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
- 
-@@ -4604,7 +4609,13 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		goto unlock;
- 	}
- 
--	if (!test_and_set_bit(CONF_REQ_SENT, &chan->conf_state)) {
-+	/* A channel in BT_CONNECT2 has not passed security or userspace
-+	 * accept yet. Answer the peer's request, but hold our own until
-+	 * the channel reaches BT_CONFIG: the CONNECT2 -> CONFIG sites send
-+	 * it. Connected channels may also need to reconfigure.
-+	 */
-+	if ((chan->state == BT_CONFIG || chan->state == BT_CONNECTED) &&
-+	    !test_and_set_bit(CONF_REQ_SENT, &chan->conf_state)) {
- 		u8 buf[64];
- 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
- 			       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
-@@ -4657,6 +4668,10 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 
- 	lockdep_assert_held(&chan->conn->lock);
- 
-+	/* Connected channels may also receive reconfiguration responses. */
-+	if (chan->state != BT_CONFIG && chan->state != BT_CONNECTED)
-+		goto done;
-+
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
-@@ -4724,6 +4739,9 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 	if (test_bit(CONF_OUTPUT_DONE, &chan->conf_state)) {
- 		set_default_fcs(chan);
- 
-+		if (chan->state != BT_CONFIG)
-+			goto done;
-+
- 		if (chan->mode == L2CAP_MODE_ERTM ||
- 		    chan->mode == L2CAP_MODE_STREAMING)
- 			err = l2cap_ertm_init(chan);
+In 1 and 2 the new connection keeps the link of the abandoned setup,
+with the parameters of that setup: the completion event does not say
+which setup it belongs to. Its Air_Mode would show a change between
+CVSD and transparent data, but the series does not act on it. An
+abandoned setup that fails after a new connection was made is likewise
+applied to that connection. Before a13f316e90fd both happened in
+another way, as the next socket reused the pending hci_conn.
+
+With the disable_esco parameter of sco.c, a SCO_LINK connection can get
+an eSCO link, which it does not take: its connect times out and the
+link stays up until the ACL drops. That predates a13f316e90fd and is
+not changed here; patch 3 only makes sure such a link is not
+disconnected while the connection waits for it.
+
+Patch 2 relies on hci_enhanced_setup_sync() taking hdev->lock, since
+024e05f73a4c ("Bluetooth: hci_conn: Lock parent access during enhanced
+SCO setup"); a backport to a kernel without that commit needs the lock
+taken around the new checks.
+
+Testing:
+
+- QEMU/KVM, bluetooth-next at c85976511aa9 and with each patch applied
+  in turn, x86_64 defconfig + kvm_guest.config + BT=y, BT_HCIVHCI=y. A
+  userspace program emulates the controller and the headset over
+  hci_vhci; the controller allows one eSCO link per ACL and rejects
+  further setups with 0x0a (0x12 in T1, as in the report), except in
+  T5, where it allows a second one. Each case was run over Setup
+  Synchronous Connection (L), Enhanced Setup Synchronous Connection (E)
+  and Add SCO Connection (A, controller without eSCO):
+
+  T0  connect, receive SCO data, close
+  T1  close a socket with its setup pending, connect a new one; the
+      first setup completes, then the new one is rejected
+  T1b like T1, but the first setup completes before the new one is
+      sent, which waits for the ACL to leave sniff mode
+  T1c like T1b, but the new setup waits in the cmd_sync queue (E only)
+  T2  close a socket with its setup pending, the setup completes
+      afterwards, connect a new socket (cancel answered 0x0b and 0x02)
+  T2b like T2, but the setup completes while the abort still waits in
+      the cmd_sync queue
+  T3  a setup rejected with 0x0d in Command Status
+  T4  like T2, but the abandoned setup completes with 0x22
+  T5  like T1, but the new setup completes too, with a second link
+  T6  disable_esco set, the link comes up as eSCO (L and E): no
+      Disconnect while the SCO connection waits for it (the connect
+      still times out, with and without the series)
+
+  In T1c the cmd_sync queue waits for a Read RSSI (from mgmt Get
+  Connection Information) that the emulator leaves unanswered; in T2b
+  it waits for an ACL connection to another device, whose Connection
+  Complete the emulator holds as during a page.
+
+                      T0   T1   T1b  T1c  T2   T2b  T3   T4   T5   T6
+  bluetooth-next      pass FAIL FAIL FAIL FAIL FAIL pass pass FAIL pass
+  + patch 1           pass pass FAIL FAIL FAIL FAIL pass pass FAIL pass
+  + patches 1-2       pass pass (*)  pass FAIL FAIL pass pass FAIL pass
+  + patches 1-3       pass pass pass pass pass pass pass pass pass pass
+
+  The results are the same on L, E and A, except (*): pass on L and E,
+  FAIL on A, where the abandoned link is not taken over by a connection
+  that has not started its setup, and stays up until patch 3.
+
+  Without the series, the new socket gets EINVAL in T1 (the emulator
+  rejects with 0x12) and EMLINK in T1b and T1c (its duplicate setup is
+  rejected with 0x0a), the next connect gets EMLINK in T2 and T2b, and
+  the second link in T5 is never disconnected. With it, the new sockets
+  receive SCO data and no Create Connection Cancel is sent; the links
+  that nothing takes over (T1b on A, T2, T2b) and the second link in T5
+  are disconnected as soon as they complete, and T4 and T6 send no
+  Disconnect. No kernel warnings.
+
+- BlueZ tools/sco-tester (master f8f352d) in the same VM, on the
+  debug kernel below plus CRYPTO_USER_API_{HASH,SKCIPHER}: 30 of 30
+  pass with and without the series.
+
+- Real hardware: a MediaTek MT7921 (USB 04ca:3802, legacy Setup
+  Synchronous Connection because of
+  HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN) with a Sony WF-1000XM6, on
+  v7.1.13 with the series built as the bluetooth module (patch 2 needs
+  one change there, as hci_enhanced_setup_sync() does not take
+  hdev->lock in that version; the other functions touched are the same
+  as in bluetooth-next). With PipeWire 1.6.8 the abandoned setups were
+  first seen there: Create Connection Cancel was answered with Unknown
+  Connection Identifier, and the setup still completed afterwards.
+
+  A SCO socket was closed 150 ms into its setup and a new one connected
+  0.3 s or 2.5 s later, five times; each abandoned setup completed about
+  0.2 s after it started, before the new connect. Without the series the
+  first abandoned link after each ACL connect (two in the run) was left
+  up, and from then on the controller rejected every setup, plain
+  connects included, with Unsupported LMP Parameter Value (0x20) until
+  the ACL was dropped. With the series no Create Connection Cancel was
+  sent, each abandoned link was disconnected as soon as it completed,
+  and every new socket and the plain connects after them received SCO
+  data. An abandoned setup that failed (the headset rejects CVSD with
+  0x20) caused no Disconnect. Between the groups PipeWire switched the
+  headset from A2DP to HFP (mSBC) for a recording while I counted
+  aloud: speech was recorded all three times, with and without the
+  series. The cases of patches 1 and 2 did not occur there.
+
+- W=1 builds of net/bluetooth/ and drivers/bluetooth/, no warnings:
+  GCC 16.2.1 x86_64 allmodconfig and i386 defconfig, LLVM 22.1.8 arm64
+  defconfig, arm multi_v7_defconfig, riscv defconfig and powerpc
+  ppc64_defconfig (big-endian), with BT, BT_HCIBTUSB{,_MTK,_QCOM} and
+  BT_VIRTIO.
+
+- sparse v0.6.5-rc1 on the same directories: the same 16 reports with
+  and without the series, none on the lines touched here.
+
+- With the series, the same tests on a kernel with PROVE_LOCKING,
+  PROVE_RCU, KASAN, DEBUG_ATOMIC_SLEEP, DEBUG_LIST and
+  DEBUG_OBJECTS{,_WORK,_TIMERS} enabled: all pass on the three paths,
+  with no lockdep, KASAN or debugobjects reports.
+
+The patches, the commit messages, this letter and the test programs
+were prepared with an AI assistant (see the Assisted-by tags), which
+reproduced the report in the emulator and wrote and tested the fixes;
+the real-hardware runs were done on my laptop with my headset.
+
+Hitalo Souza (3):
+  Bluetooth: hci_event: Don't fail a connected SCO link on setup errors
+  Bluetooth: hci_conn: Don't set up a SCO link that is already up
+  Bluetooth: Don't leave abandoned SCO links up in the controller
+
+ net/bluetooth/hci_conn.c  | 24 ++++++++++-
+ net/bluetooth/hci_event.c | 85 ++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_sync.c  |  8 ++++
+ 3 files changed, 104 insertions(+), 13 deletions(-)
+
+
+base-commit: c85976511aa95b5ba68b57b0b3c87c67f3cedcce
 -- 
 2.55.0
 
