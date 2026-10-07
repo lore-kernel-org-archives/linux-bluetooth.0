@@ -1,214 +1,105 @@
-Received: from mail-vs2-f43.google.com (mail-vs2-f43.google.com [74.125.227.43])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CC2393DCD
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2026 21:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F68179A3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 00:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791321721; cv=none; b=VT0N8RFIz0/yTdxWfAPNnTFqwNFpJAcPhdEPXxtC9rVapGZlu8Py0ykvFpQWVec+9WL3iIHaiqqZ5RlcCkDMkYP8CpQ5ZMt/1429zNteoDrWu/s0j5VEL7m30hE95D9uEr4Cv1q82fshKjxYZDZD5M+hIQ4ZMARzFTDkSt5XsmA=
+	t=1791331477; cv=none; b=i5TJ05auNY5pkt07hoLU+HiGcx/QuMBcYfNs40w9eZYwCPCLXMwQRYU9g4X7Gu6ubQb+m/vv0JwEkwYOYagBVHHn2ly62IA1FaY0tu2Cc6s2CsmmzgMaQPtgAtpJFJKqbKh77PAj4PWYwC/YHHTm2Yn2ZvFMMrrb/HRcBdTyI7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791321721; c=relaxed/simple;
-	bh=byMrUcuXizhXLYsEYCDdvLYPqWlJmUU28xIbnW2zRWM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHD+qqoriSWya4+1oWOiUZmMCUX5ueth+hbMxWCXrPlqRk45mlUT82wLNRckt4PIEGLvIvZyo4o8JhCCwEsOoIg8CwCOkReagrc0w87yD2YhD2eclvG75aGpKRhF3z/WHlcOC8pEKwxAfXPXiVIjPw1GrAM0t5v+gmVp3s+HdZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N5SbWeym; arc=none smtp.client-ip=74.125.227.43
+	s=arc-20240116; t=1791331477; c=relaxed/simple;
+	bh=CKFQqjafDBKs+RDXjaV4m7rkjDK6LSUA6O78yxNJmvI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=NzFPwRBYKSN71miBEw3zEfYRhyaueH1P/Rqak4JDPVwwR3cl1hiGLriV3Cc+PhJ+9saj8IMpMj2ADASx4J8mUIU0Nt3m6kHmc+7vXoSbQpjIK0E9DrisWUx6lgam6ddtdcgT5qSblQ0lD8eBsicfLb3wdF1MGWnEwBPPEyul6xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mo5fjKk7; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N5SbWeym"
-Received: by mail-vs2-f43.google.com with SMTP id ada2fe7eead31-7bf1151c2f4so151832137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 14:21:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mo5fjKk7"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-93cbee4b010so208388085a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 17:04:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791321718; x=1791926518; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=747DO8pMObmlt2LsNi5++qG5AkL16Gja5YdprxdZyOE=;
-        b=N5SbWeymhIJPW7gJF7IGfNblh8dyfx5CpXEXaZE+k1WKu/ghWUzoyAtK6ZPhtbQiJ0
-         lzxZN37SelSoYzbS9p4NkIp32yIE8nC/W0HHIC6Ne9aG22xpKmmcdfSMLd35l04JFHKE
-         Wexzp2Pr8RVvzBmEMPtZ9t4X3zqBWj26XtZ3zUbdJetkrii94bb6Wo4DHlSCzacbpaSZ
-         njXWZidGTEhpbsuzX+mmwXkXpsFR3cq0z/rCCZTskYhebE5u63pkWjCUNQOPjOICPbG2
-         vmBcFuNjagE1jRnEi0sM0L/mPyoXAbApz9FOMn4mi1Zxjlm67TAu03E7OuAs5iX/nf/u
-         74ng==
+        d=gmail.com; s=20251104; t=1791331475; x=1791936275; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=B4Z22wO2kp+Fecjdee21OGa4188p/V4lv60Rq2qXt7A=;
+        b=Mo5fjKk7ThwLpgAU8MUYSFw8kXs006IY0OuRI6G1+FcrrnGVHzfdvno4N9rvTEK0yl
+         WpcigB9cTFTsqqi3jKRnXYs1YNW8PbGn4NQQMJuywM2A93bdqY3wYe5qqVDze7h4sLP+
+         w5egGCUqwl1VVTySOxqn6O1HvXuk7gut7QIB/4zZH2vd9SuD90G32dPp+Jzi8s/arOK2
+         j2xiM6Aply4P/wE3dcgy1CrzgBUI1sSYGBroAlUG6Z6x7ZDuOsb8uf3kZAzaHQrtW4pb
+         tSBbHdNdLLP+X/1JCETdM/5d2viBZmIaN2ujeFMWOEmQWMBhGlvfP1hb4ZI9Yv1tH4ZL
+         d8ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791321718; x=1791926518;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=747DO8pMObmlt2LsNi5++qG5AkL16Gja5YdprxdZyOE=;
-        b=ww1Y7lk6cOur8IICTm/fWWEc9lN1rjbm/27b7dodiUNiASFvjOrLOIvvJBfUVsAyiN
-         X4BuDE17lT8R7pPf8PcqEaUDTVjTNn8o0ssWh2tXllyycNDnGqbxsQl3yZEXXVUN4K7s
-         fq+VADWJxXFwHvbmRMH2c2bUDram5rPWgQsfOsiFXKMyapSed1Y7fvaHlRejXfL3hkHD
-         NwYE7h94PMkOiatsvXHwl3IyABLHORryNJajqG5DtVfNVUCdtAQWy8lfOMAKZDVyRcRt
-         5fjP2OYzmIMJ88nn0wnTVeD/ZdtF7JHb8UIDJ/d+FRQPEAKorxZLeqjhlQf4BDPL77OR
-         xG5g==
-X-Gm-Message-State: AFq9FYJqIMDiWnfuPFWj35l4gj0jaM1IAvpqE0qg1OJdoGPGpnB6Dpx2
-	4zwUJpEZ4ktB7vtdhHEw5KlSYjohmMEAL4cwptqmuxAmDn1cwIrgaV4Qc5FTUMBT
-X-Gm-Gg: AYBFou0jz1V88prKckgvqpWrQ8gIzH+cSYMhrxK6ZW+y/fU4OOgisGC854rdMetqBr4
-	uTw6Na8rv7aj75b/aMlS8hlUNsdJreOZ4Ixicwfu+ECVS9qQcN74sJknP6NIStkhtNPLblP64yI
-	c0FR/5JZhWEI7/uST6J6pg6rafxo0g6rsy8a4owHro1rmd7Xj/5o1OVlACx+hjeSOcYeVdIKgff
-	R3RlNy57D3q3JLNbHp1QQSw48/1Jkz3MWZ2VCFvFDP6dZ4tfeoNj5hFSDSiHnbGlcglwwAz+LiI
-	E/b+rV2GAfmmGJfjhYgpB7ARgE/l3vVynVFZI61D3O/EyOjKJbYaTsC7Y816+fBNi0PXaygeUk0
-	HWB9foeOEYGaJIbXycCazg8HpOXTmhME12so2zFczpSRXUfC4yWCUkcZMgnRr+GjDI4lpjKHXkU
-	kXaAVKOo7e0xq6961KO/bfy+1oFoGVY6H4yDCIj/wFut+K1IaViADpvaStRNnPei7aRg/mguchr
-	gWigd0gMnelwErCZHb22/5J1rvV6jRBRk2kGheG
-X-Received: by 2002:a05:6102:5087:b0:7bc:a347:2058 with SMTP id ada2fe7eead31-7ca38917256mr23051137.2.1791321718012;
-        Tue, 06 Oct 2026 14:21:58 -0700 (PDT)
-Received: from hitalo (190-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.190])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-98e399296casm512258241.0.2026.10.06.14.21.55
+        d=1e100.net; s=20260707; t=1791331475; x=1791936275;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=B4Z22wO2kp+Fecjdee21OGa4188p/V4lv60Rq2qXt7A=;
+        b=M1TO6PwWRwL82+BIJil3PPeq4gznKq5R95RZGvWF0KoLzHwXNOUyX0vcCunS2sYvNW
+         ccVldeHhnDf9he79GRHPe5kb0O1ijFs7TR196dEEp0mqqlIXvxGoP/+SJnfNU/ma+Bef
+         5KFa9LzfCHvofO7bxNiUmSGqAv4qcm1xriG/06ooYRi8f5E465LmTNP60F1NScQfRUx2
+         tlmxQUFjwBYL0QC40fUQouloMB5n1kSZLdtAfo6ehXeB0SwQeEXNbMuuYp8H6P1hXu5m
+         ywkloCpSa1MnBMmVgUffbCLWdCshQ1qXZg3Nrlndb9hrGQXFPVL5nwdq4XduhRuwiLym
+         miHg==
+X-Gm-Message-State: AFuF++li26j8VAVn6JpROX7g2L5s4QnkOKwLoy8jN8hceU1y0EwUEx/V
+	nzdsDbOKRNOZw6qBQ9jf7Zzq9wTv7YolIkUZE/R4UUcVqys5E/+fz2wmrvb40EtVZsA=
+X-Gm-Gg: AYBFou02yuoudacGpj5zjkl9wfE52llMoS0OwB9MngbAJMnNFN1xdJ/Vufqvd7TUIHe
+	GY6WheT7AsrkYvR80J9zS3aS+DgmSeV0t2qvqRTiEtKwBU6C4HYovANr3osELopY+nVSg82gHMX
+	6amHBWvJrV5/XD2IGB61VCoSKqElowi5CvfdNWhMKg1wjcR334HOAA2p6324pZEUK7KLZ+xM8+J
+	nM7K0OiiWoezrzf2+RAB3cfWjN1epmc1QZHHuW40JAVtHzRMUYsABDCLXHEIY+j8NAWDq7uEmZs
+	NgJbU7D5y+B1bnIuUbFJpYNL+2S+9HF+TnD97vFbkPuc9xN9OYcVUoZYf5RF6wLgvdMAte+oMvU
+	vSFaX9BI+lfPaAcbf/TEKIKIyulHwQeYJJouu4dXoMgBsjVedp8hS18Al/9H4FZjSPU1ogMDkDU
+	ut6hOJY1ImeGyQwe+X38h7yCelb77tY/PgSbzZ72w9hQZctUXTCilb/5kRNlRBt97ZB0Zz7jIph
+	OkCTIe7
+X-Received: by 2002:a05:620a:27cd:b0:93d:78e0:30b2 with SMTP id af79cd13be357-93e9b721dd7mr126271885a.29.1791331474500;
+        Tue, 06 Oct 2026 17:04:34 -0700 (PDT)
+Received: from [172.17.0.2] ([172.190.102.151])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93e991eeb5asm82225485a.41.2026.10.06.17.04.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 14:21:57 -0700 (PDT)
-From: Hitalo Souza <enghitalo@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	michael.bommarito@gmail.com,
-	Hitalo Souza <enghitalo@gmail.com>
-Subject: [PATCH] Bluetooth: Add missing newline to bt_dev_{err,warn}_ratelimited()
-Date: Tue,  6 Oct 2026 17:21:42 -0400
-Message-ID: <20261006212142.2168838-1-enghitalo@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        Tue, 06 Oct 2026 17:04:33 -0700 (PDT)
+Message-ID: <6ac58c91.efb6fa4e.234119.07d0@mx.google.com>
+Date: Tue, 06 Oct 2026 17:04:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5615874384673582027=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yaroslav.voytovych@gmail.com
+Subject: RE: [BlueZ,v2] a2dp: Fix crash on NULL stream in transport_cb
+In-Reply-To: <20260921204711.211409-1-yaroslav.voytovych@gmail.com>
+References: <20260921204711.211409-1-yaroslav.voytovych@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-bt_dev_err_ratelimited() and bt_dev_warn_ratelimited() pass the format
-string to bt_err_ratelimited()/bt_warn_ratelimited() without appending
-a newline, unlike bt_dev_err() and bt_dev_warn(), which go through
-BT_ERR()/BT_WARN() and add one. Only 2 of the 22 in-tree callers (both
-in virtio_bt) put the newline in their own format string.
+--===============5615874384673582027==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-A printk record without a trailing newline is stored with prb_commit()
-instead of prb_final_commit(), and readers of the log buffer (/dev/kmsg,
-syslog) do not see it until it is finalized, which only happens when the
-next record is reserved. These messages therefore stay invisible until
-some unrelated message is printed, and journald, which timestamps a
-record when it reads it, logs them with the time of that later message.
+This is an automated email and please do not reply to this email.
 
-This was observed with a MediaTek MT7921 controller (USB 04ca:3802):
-when an eSCO link is closed, the host still receives a few SCO packets
-for the handle after Disconnection Complete, so hci_scodata_packet()
-logs "SCO packet for unknown connection handle". Comparing the record's
-kernel timestamp (_SOURCE_MONOTONIC_TIMESTAMP) with the time journald
-received it, over one capture:
+Dear Submitter,
 
-  emitted       logged        delay
-  15:36:52.896  15:37:00.214    7.3 s
-  15:37:03.410  15:39:05.574  122.2 s
-  15:39:05.574  15:39:12.506    6.9 s
-  15:39:19.791  15:40:54.109   94.3 s
-  15:41:22.021  15:41:24.647    2.6 s
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-Each message showed up together with the next kernel message; the 94 s
-one looked as if it had been logged in the middle of a later, healthy
-eSCO connection.
+   Series:       [BlueZ,v2] a2dp: Fix crash on NULL stream in transport_cb
+   Pull Request: https://github.com/bluez/bluez/pull/2559
+   Created:      2026-09-21 22:42:40+00:00
 
-bt_dev_err_ratelimited() lost its newline in commit 657cc646475b
-("Bluetooth: Remove usage of BT_ERR_RATELIMITED macro"), which replaced
-BT_ERR_RATELIMITED(), the variant that appended "\n", with a direct call
-to bt_err_ratelimited(). bt_dev_warn_ratelimited() never had one.
+The pull request has been closed and no further action is taken on this
+series.
 
-Append the newline in both macros, as BT_ERR() and BT_WARN() do, and
-drop it from the two virtio_bt format strings so that their messages do
-not gain an empty line.
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
-Fixes: 36278a5d4d35 ("Bluetooth: Adding a bt_dev_warn_ratelimited macro.")
-Fixes: 657cc646475b ("Bluetooth: Remove usage of BT_ERR_RATELIMITED macro")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Hitalo Souza <enghitalo@gmail.com>
 ---
-Testing:
+Regards,
+Linux Bluetooth
 
-- Booted bluetooth-next (base c85976511aa9) with and without this patch
-  in QEMU/KVM (x86_64 defconfig + kvm_guest.config, BT=y, BT_HCIVHCI=y).
-  A small userspace program emulates a BR/EDR controller over hci_vhci,
-  brings it up with HCIDEVUP and injects one SCO packet for handle
-  0x0123, which has no connection, so hci_scodata_packet() logs through
-  bt_dev_err_ratelimited(). /dev/kmsg is then read 1 s and 10 s later,
-  and once more after writing another record to /dev/kmsg:
-
-                         without patch   with patch
-    after 1 s            not visible     visible
-    after 10 s           not visible     visible
-    after next printk    visible         visible
-
-  Without the patch the record (seq 411, 5.730471) only became readable
-  together with the next one (seq 412, 15.733219).
-
-- Same result on 7.1.13 (Manjaro) on real hardware, with a throwaway
-  module that calls bt_dev_err_ratelimited(NULL, ...) and the same macro
-  with "\n" appended.
-
-- GCC 16.2.1, W=1, net/bluetooth/ and drivers/bluetooth/: x86_64
-  defconfig + BT, BT_HCIBTUSB{,_MTK,_QCOM}, BT_VIRTIO; x86_64
-  allmodconfig (WERROR=y); i386 defconfig + the same options. No
-  warnings (the x86_64 defconfig build was also clean without the
-  patch). allnoconfig vmlinux builds (Bluetooth is off there; two
-  unrelated W=1 warnings in arch/x86/mm/pgtable.c and
-  fs/proc/proc_sysctl.c). Checked in the objects that all 22 format
-  strings end with exactly one newline.
-
-- LLVM 22.1.8 (LLVM=1), W=1, same directories and options: arm64
-  defconfig, arm multi_v7_defconfig, riscv defconfig and powerpc
-  ppc64_defconfig (big-endian). No warnings.
-
-- sparse v0.6.5-rc1 on the same directories: the same 16 reports before
-  and after, none on the lines touched here.
-
-The change, this changelog and the test harness were prepared with an
-AI assistant (Claude, see Assisted-by) while debugging HFP problems with
-an MT7921 adapter: it noticed the delayed log lines by comparing
-journald's receive time with the kernel timestamps, traced them to the
-missing newline, wrote the patch and the reproducers and ran the checks
-above.
-
- drivers/bluetooth/virtio_bt.c     | 4 ++--
- include/net/bluetooth/bluetooth.h | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 8c55b538d..638140406 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -228,7 +228,7 @@ static void virtbt_rx_handle(struct virtio_bluetooth *vbt, struct sk_buff *skb)
- 
- 	if (skb->len < min_hdr) {
- 		bt_dev_err_ratelimited(vbt->hdev,
--				       "rx pkt_type 0x%02x payload %u < hdr %zu\n",
-+				       "rx pkt_type 0x%02x payload %u < hdr %zu",
- 				       pkt_type, skb->len, min_hdr);
- 		kfree_skb(skb);
- 		return;
-@@ -251,7 +251,7 @@ static void virtbt_rx_work(struct work_struct *work)
- 
- 	if (!len || len > VIRTBT_RX_BUF_SIZE) {
- 		bt_dev_err_ratelimited(vbt->hdev,
--				       "rx reply len %u outside [1, %u]\n",
-+				       "rx reply len %u outside [1, %u]",
- 				       len, VIRTBT_RX_BUF_SIZE);
- 		kfree_skb(skb);
- 	} else {
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index b624da502..cd9189244 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -296,9 +296,9 @@ void bt_err_ratelimited(const char *fmt, ...);
- 	BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
- 
- #define bt_dev_warn_ratelimited(hdev, fmt, ...)			\
--	bt_warn_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-+	bt_warn_ratelimited("%s: " fmt "\n", bt_dev_name(hdev), ##__VA_ARGS__)
- #define bt_dev_err_ratelimited(hdev, fmt, ...)			\
--	bt_err_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-+	bt_err_ratelimited("%s: " fmt "\n", bt_dev_name(hdev), ##__VA_ARGS__)
- 
- /* Connection and socket states */
- enum bt_sock_state {
-
-base-commit: c85976511aa95b5ba68b57b0b3c87c67f3cedcce
--- 
-2.55.0
-
+--===============5615874384673582027==--
