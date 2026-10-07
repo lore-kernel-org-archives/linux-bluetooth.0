@@ -1,57 +1,96 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE3138F226
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 12:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F00C4A4848
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 14:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791376043; cv=none; b=VXrZw0gyfGlvVassqxx28biBSdcoPDErJDeJM6dClqNposUUTm/qr0+Wy4qn8b7cEe9rIlHv2tFWTp5akxZqRvW3PdiUqlfonSl92y6T2UeNpWWIFJMg/PTTx98bu1cUex4NZgnt8PzlH+LZBnb1ylB1dvMsLOFB29z5VRKEz8U=
+	t=1791384471; cv=none; b=sNZ/ZwBwcFTVqtZLVq8t2CGiJV3+uiFz7u6fSs2LohnfU1YLD8XL+U+JBfCV19LAT0mmXi8zOlZCB9KzcRVbRv2gabqTfNs42RPYpWVi93wV3PDLNO9vsdkqTsXbKcM8SpGcUILUVDou05PGllhc/fyi7JoiWTiTRi7OeSN+VlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791376043; c=relaxed/simple;
-	bh=OW72klToLOtdaNERl94LmvXKi7DxGMSkcVP9y9D2WF4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hD/8G+Bt/0vaOLqYiMFX7euX9p27bQGaI+OnrVfB78I5eZQvTZKamZch3hTpcmCLipSnl1drXvhgTUenApV7GHAkbc+gADfLLNy3ozrmDoijtl4yQikXfP2XAZYmMj+VT2TilvdH7gJq6HgfRmZ3Wt4/GZThykrvdeZ7OpVd6/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KkeHgS9w; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1791384471; c=relaxed/simple;
+	bh=ZvY72hF5+7StL5VukGljL+W7ih5MrIUpuc3Tp4nv95Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PS9s/wZe4dKWE06ZhCqko+a7RBqbZ83xuNkrVDOvXqbVnnIOgUJZ5BnkEwmcRPFEf5ujb01zcr7NQlwF+T/Ls3crs/ku7dnyryRGGwoJjp5yX9o5yLZHxZhtqcCPMnAfwx3r/rpwUldWfMMaemowhLTppKAUMxhKcovgz8QMrTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=a481re3Z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nrwR7ouR; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KkeHgS9w"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1791376033; x=1822912033;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OW72klToLOtdaNERl94LmvXKi7DxGMSkcVP9y9D2WF4=;
-  b=KkeHgS9wZF0OSdRGGsco2f/hOSsnxBOvid1LL9mzV/wHIUagF+8ev7BO
-   A77O6h13/QNj5pynTIm+t/SQwYRE8bpcdWssC4j90p1tgI+36qsUwgXI2
-   2Z6Dh+gXNAPqwp1kPUiDJB9fKsTCE4WyUs0lbw+aEDh39wpfDX+VytIL0
-   x8uqTptV8G3soW/cc/xmrEpeTZ+yRdlqieFuZ7o6GLO+pL0YqHMwPbrUh
-   hcAXbjPL/YfKNe8FYu+VeqKbMcKQswe+YNJKOMbGpzY1EhEPXVGQ2+bs4
-   YVjl24MgY4aa0diAG7Rq8+f+OCKJ4ngeW2UIjDxhOVuCux8d3UaHGsCCF
-   A==;
-X-CSE-ConnectionGUID: 6VQQ8OWlRLGeRtkMmQAraw==
-X-CSE-MsgGUID: Qhev5y1WRZa+SuJTqfWWPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11927"; a="19593"
-X-IronPort-AV: E=Sophos;i="6.27,144,1787036400"; 
-   d="scan'208";a="19593"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2026 05:27:13 -0700
-X-CSE-ConnectionGUID: XKZbSNvYTwm75KG49sC3wA==
-X-CSE-MsgGUID: HEwRhNN+RZKcIpMDRmE2vA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,144,1787036400"; 
-   d="scan'208";a="1524080"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa012.fm.intel.com with ESMTP; 07 Oct 2026 05:27:10 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>,
-	Ravindra <ravindra@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel: load unlocker.sfi to allow unsigned firmware
-Date: Wed,  7 Oct 2026 18:17:21 +0530
-Message-ID: <20261007124721.2521956-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="a481re3Z";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nrwR7ouR"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id DE56EEC02AF
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 10:47:44 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Wed, 07 Oct 2026 10:47:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1791384464; x=1791470864; bh=8E3MIFg3KplKFCNpJSZvO
+	dopS4OuMNyxVOqY76/UO7c=; b=a481re3Zg5vlA9F67r7v89zcfPNhQ53hXeB3m
+	lvcpIu4HbvwEYJ9jY2P1TgmsL3JbXgiXo4ZJXSALHKOPQCn4H76CRx02oWyj7nlb
+	NFFyu2SCgqLWiD0nn/WEMORAFmhnT46HQME/gyQ18Vb7jQbyxOpANGfDFDQ2dvhc
+	AgYxj4NSgkZiH9pvCZOaCOqXDw9r9dLlGOzR9idGzm1NipWy/yea6FpJ0H6uLqRX
+	Uq5FIgD6Fs6BhlLEJGJtpFLb/iVwGjOVhQR0wCfOy+q77qPqYIAj0Un1Zy8dWsls
+	NrW/9M1rOaLB6ewWeHRlwn/icRiHOocUKRX2xPjqrGWknr+nw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1791384464; x=1791470864; bh=8E3MIFg3KplKFCNpJSZvOdopS4OuMNyxVOq
+	Y76/UO7c=; b=nrwR7ouR/J288CjUNDOpzCGyQF2InPzL0sHS3w+NBGC+CdgRksw
+	hgsCOU37FRMQfhgyOYpNWlcuedwCxymoeONXEcKzvBgypojTRFKwoKDKmvM3ZDAR
+	pT8+aCufJ0Zfx4Up0hRn11IanMo7GVyT+JApRmkKLvlk1NHQZxHI1ihyAW5YLtCL
+	bOArDQ+umCkyErmTAkqtpopXJYDixWn4L9MlFD2VNNqypHU3MG/9G6b6s1l76lrS
+	7ggmaQML6rq1DsJeR7QZVTydkm3HDGgFyU8LozrplA9L6HkQ4/fQft/dbV7y9M1l
+	QWrSIbJI4Wb2+FiWWZETTfNzXQRZXyO9yzA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
+	action=sign d=fourdim.xyz a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1791384464; d=fourdim.xyz;
+	mf=PG9zc0Bmb3VyZGltLnh5ej4=;
+	rt=PGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+;
+	s=fm1:rsa-sha256:rVhdCBXwgYgs3Uqc0E1p5jGdUmdNQvMzTud7ObJnuot+7om
+	h63K5H6Rr9h6eWH2fz4fOC2tQKBVue82Gu4tD9qnISkfRcuGjbScIi1kD/eqp7D+
+	6IiyOE6bkt9Mcw0k41fnaLL4fyq025BhgqPLN5HeunX4etNNx+e3sh7VJTHPzCES
+	bYNT5FlaOvu6wZErkFI90K/1ABuKS0kdFUIhm6Om0CLmgeeqeqzZklMuDb0s+YYe
+	sdPPP/FIgR53cGOy68gGCkuOi5wFI16nyL113yAd5OjHp+tIzowIXtvELkAEq4+Q
+	qdJWYqSGU0n2AVg38O1DVoYnnSK+P/oa5lIB8Uw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:qD5EaFYgeI0zCIqfr9ipvtFNSNp0T5k8/D56IBj1eWs=:ZvY72hF5+7StL5VukGljL+W7ih5MrIUpuc3Tp4nv95Y=;
+X-ME-Sender: <xms:kFvGaiCJgHpunE4iIZAHBva7IIS0kIQFc467I53olSSTf0xchraqrQ>
+    <xme:kFvGaj8aP38ly_rsgslC5q1GyEJfKdiXqOxY2ivw5-RG3g3ekgc9cDbsdz0dcaovD
+    IaKGeMM9WVKaLmmDBruPsmIuRycsJrrphJ4xhgifyXoHGfw_134PTlbOA>
+X-ME-Received: <xmr:kFvGai_PBOj1eOcBu4a0pyTEv31jIsTSkFbXOfUMHyMWREF1DZQvs63BBv3w6W-UfVWa400>
+X-ME-Proxy-Cause: dmFkZTGaLzm6RuLHgYnrxTw+tVFgj1Zlrv3fBg4pdbu/werRw/G4gdGWM6eWcAmQwvwdvt
+    skEze1Uqjz7z0UXmME2oybNtJMfhA/mztbdkHrdFifXUB3snGm6+wv+RMCcIsSq+ZI5ZdW
+    C9z25cFPuxiEs3Q7DsEi1g/ae8s1tiBBFUBJj2kag3DGF7VPIvKn8oYObc8nf12b70+eOW
+    mPRcGRfe1eqIzX3+ewpIxd0vyOp6xZV6U1Cz1uXu6w+j6KHc9YcNCgLzC4KKfp5JdCkZ69
+    dEQuAMxw5IXQ2pDFvsyN8jNFQwPR12gPPX/q6/qN89dnP6fwOIRB2gQ88HahEUTxiH8gSa
+    I+HsqtwzLqi3Y3aJRYUmujINnBZenC215n8/AgF9/fWeYa4kE+FbFj0TrBCM2WBlH2aPwm
+    xtwaq94ojzdmLjloQUvDZ4IuXcih+AUe35YNRVDn04w06CRlMSTM8Va06zDhhTbk61fjRN
+    4gp5iAC/uFio9oS542rxn2Kfvq8+j4tduWQDcydNPg2bf0mXmZoCZ/avNd8Wy49xgN31Td
+    nnGJz0X+ZHu+svg0yIeBTJrvR6nZJeYUKfuWgsJzh9E7FVQfTNzFVMHsANPLnaZyixK7y1
+    tsULIXzx6pdABNVMWXOXXftGAoOM/bLQ7PnpKZuCbw9TobPnytgLXSsiSinA
+X-ME-Proxy: <xmx:kFvGaqf0TsZHeHXwO_LLVpyrXzIPf2NefIPJpWfraBrh7wIXMMM2sQ>
+    <xmx:kFvGarGwwSXS1L4O16zCZABWWqgb50s4pC9PE7F7Gui2lEK8CDNGIw>
+    <xmx:kFvGaofC9IM_ba7UYUyj8S8fnc8wpDLClvyV01ekwy3G9Iv41VCwow>
+    <xmx:kFvGalEnQ-rnByVZaLV-AqS7TSh8hKbS10Oiwgmxeupw9JaQ6phy7A>
+    <xmx:kFvGaj9p3Y1CSNk1SPMA-n283Nm91-aQJ7nKNQgZAgTiF47t0oMSGHE5>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Oct 2026 10:47:44 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v3] Bluetooth: L2CAP: Reject signalling responses in invalid states
+Date: Wed,  7 Oct 2026 10:47:10 -0400
+Message-ID: <20261007144717.3832330-1-oss@fourdim.xyz>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,248 +99,96 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When an unsigned operational firmware image is needed for debug, the
-controller requires intel/unlocker.sfi to be loaded first. Without the
-unlocker image, the controller rejects the unsigned operational firmware.
+A peer can send configuration messages while an
+incoming channel is in BT_CONNECT2, before the
+security or deferred accept gate has completed. A
+configuration response can then promote the channel
+to BT_CONNECTED. Configuration responses can also
+act on channels that are closing, and a late connection
+response can move a disconnecting channel back to
+BT_CONFIG.
 
-Support both firmware download flows based on the unlock policy advertised
-in the version TLV:
+Accept connection responses only while waiting in
+BT_CONNECT. Answer configuration requests in
+BT_CONNECT2, but defer our own request until
+BT_CONFIG so configuration cannot complete before
+the gate. Ignore configuration responses outside
+BT_CONFIG and BT_CONNECTED, and only complete
+configuration in BT_CONFIG.
 
-  BlazarI/BlazarIW/BlazarU/Gale Peak (unlock_policy == 0):
-      Boot ROM -> unlocker.sfi -> IML -> OPFW
-
-  Scorpius Peak onwards (unlock_policy == 1):
-      Boot ROM -> IML -> unlocker.sfi -> OPFW
-
-Parse the new INTEL_TLV_UNLOCK_POLICY and INTEL_TLV_PLATFORM_ID TLVs
-into struct intel_version_tlv, track the pending unlocker load through
-a new btintel_data::unlocker flag, and pick intel/unlocker.sfi as the
-firmware filename when that flag is set. If the unlocker image is not
-present in the firmware search path, the driver silently falls through
-to the normal firmware download path. If the unlocker image is present
-but fails to download to the controller, the driver logs the error and
-aborts bootloader setup, since continuing would leave the controller in
-an inconsistent state.
-
-[  413.375247] Bluetooth: hci0: Found device firmware: intel/unlocker.sfi
-[  413.501051] Bluetooth: hci0: Waiting for firmware download to complete
-[  413.501058] Bluetooth: hci0: Firmware loaded in 122864 usecs
-[  413.501537] Bluetooth: hci0: Found device firmware: intel/ibt-02a2-01a1.sfi
-[  413.501547] Bluetooth: hci0: Boot Address: 0x10001000
-[  413.501548] Bluetooth: hci0: Firmware Version: 137-39.26
-[  414.103473] Bluetooth: hci0: Waiting for firmware download to complete
-[  414.103478] Bluetooth: hci0: Firmware loaded in 587841 usecs
-[  414.149576] Bluetooth: hci0: Applying Intel DDC parameters completed
-[  414.150089] Bluetooth: hci0: Firmware timestamp 2026.39 buildtype 3 build 86921
-[  414.150092] Bluetooth: hci0: Firmware SHA1: 0xeb2e0a4b
-[  414.150093] Bluetooth: hci0: Platform ID: 570c6ffbcbe6
-[  414.150094] Bluetooth: hci0: Fseq status: Success (0x00)
-[  414.150730] Bluetooth: hci0: Fseq executed: 15.255.00.98
-[  414.150734] Bluetooth: hci0: Fseq BT Top: 06.32.00.02
-
-Assisted-by: Copilot:Claude Opus 4.7
-Signed-off-by: Ravindra <ravindra@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
 ---
-changes in v3:
-- Address Sashiko review comments
-  https://sashiko.dev/#/patchset/20260929021056.1396791-1-kiran.k%40intel.com
-changes in v2:
-- Updated commit message
+v3:
+  - git lint on comments
+v2: https://lore.kernel.org/linux-bluetooth/20260929154219.2366060-1-oss@fourdim.xyz/
+  - resolve the patch conflict
+v1: https://lore.kernel.org/linux-bluetooth/20260928173324.1837653-1-oss@fourdim.xyz/
 
- drivers/bluetooth/btintel.c | 94 +++++++++++++++++++++++++++++++++++--
- drivers/bluetooth/btintel.h |  5 ++
- 2 files changed, 96 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index f298c91f4f4e..3bc59a2f3ba8 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -579,6 +579,11 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 	if (version->img_type == BTINTEL_IMG_OP)
- 		bt_dev_info(hdev, "Firmware SHA1: 0x%8.8x", version->git_sha1);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 49a998804908..cb4ec42f99e3 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4438,6 +4438,10 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
  
-+	if (!mem_is_zero(version->platform_id, sizeof(version->platform_id)))
-+		bt_dev_info(hdev, "Platform ID: %6phN", version->platform_id);
+ 	lockdep_assert_held(&chan->conn->lock);
+ 
++	/* Ignore a late response after the channel has left BT_CONNECT. */
++	if (chan->state != BT_CONNECT)
++		goto done;
 +
-+	bt_dev_info(hdev, "Unlock policy: 0x%2.2x", version->unlock_policy);
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
-@@ -604,11 +609,14 @@ static u8 btintel_version_tlv_min_len(u8 type)
- 	case INTEL_TLV_DEBUG_LOCK:
- 	case INTEL_TLV_LIMITED_CCE:
- 	case INTEL_TLV_SBE_TYPE:
-+	case INTEL_TLV_UNLOCK_POLICY:
- 		return sizeof(u8);
- 	case INTEL_TLV_MIN_FW:
- 		return 3;
- 	case INTEL_TLV_OTP_BDADDR:
- 		return sizeof(bdaddr_t);
-+	case INTEL_TLV_PLATFORM_ID:
-+		return sizeof(((struct intel_version_tlv *)0)->platform_id);
- 	default:
- 		return 0;
- 	}
-@@ -716,6 +724,13 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
- 			snprintf(version->fw_id, sizeof(version->fw_id),
- 				 "%.*s", tlv->len, tlv->val);
- 			break;
-+		case INTEL_TLV_UNLOCK_POLICY:
-+			version->unlock_policy = tlv->val[0];
-+			break;
-+		case INTEL_TLV_PLATFORM_ID:
-+			memcpy(version->platform_id, tlv->val,
-+			       sizeof(version->platform_id));
-+			break;
- 		default:
- 			/* Ignore rest of information */
- 			break;
-@@ -2472,7 +2487,12 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 		else
- 			btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
- 	} else {
--		btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
-+		if (intel_data->unlocker) {
-+			strscpy(fwname, "intel/unlocker.sfi");
-+			intel_data->unlocker = false;
-+		} else {
-+			btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
-+		}
+ 	switch (result) {
+ 	case L2CAP_CR_SUCCESS:
+ 		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
+@@ -4467,6 +4471,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+ 		break;
  	}
  
- 	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
-@@ -3489,6 +3509,36 @@ static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
- 	return 0;
- }
++done:
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
  
-+/* Attempt to load intel/unlocker.sfi if it is present in the firmware
-+ * search path. If the file is not available the device will be booted
-+ * with a signed operational firmware, which is the common case, so its
-+ * absence must be treated as normal and not logged as an error.
-+ */
-+static int btintel_try_load_unlocker(struct hci_dev *hdev,
-+				     struct intel_version_tlv *ver)
-+{
-+	struct btintel_data *data = hci_get_priv(hdev);
-+	const struct firmware *fw;
-+	u32 boot_param = 0;
-+	int err;
-+
-+	err = firmware_request_nowarn(&fw, "intel/unlocker.sfi", &hdev->dev);
-+	if (err) {
-+		bt_dev_dbg(hdev, "intel/unlocker.sfi not present (%d), skipping unlocker load",
-+			   err);
-+		return 0;
-+	}
-+	release_firmware(fw);
-+
-+	data->unlocker = true;
-+	err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
-+	if (err) {
-+		bt_dev_err(hdev, "Failed to load intel/unlocker.sfi (%d)", err);
-+		data->unlocker = false;
-+	}
-+	return err;
-+}
-+
- int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 				 struct intel_version_tlv *ver)
- {
-@@ -3496,6 +3546,8 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 	char ddcname[64];
- 	int err;
- 	struct intel_version_tlv new_ver;
-+	struct btintel_data *data = hci_get_priv(hdev);
-+	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
+@@ -4604,7 +4609,13 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		goto unlock;
+ 	}
  
- 	bt_dev_dbg(hdev, "");
- 
-@@ -3514,6 +3566,31 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 
- 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
- 
-+	data->unlocker = false;
-+
-+	/* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak):
-+	 * Boot ROM -> unlocker.sfi -> IML -> OPFW
-+	 *
-+	 * Skip the unlocker check when the controller is already running
-+	 * operational firmware (can happen on USB); the unlocker flow is
-+	 * only meaningful from the bootloader stage.
+-	if (!test_and_set_bit(CONF_REQ_SENT, &chan->conf_state)) {
++	/* A channel in BT_CONNECT2 has not passed security or userspace
++	 * accept yet. Answer the peer's request, but hold our own until
++	 * the channel reaches BT_CONFIG: the CONNECT2 -> CONFIG sites send
++	 * it. Connected channels may also need to reconfigure.
 +	 */
-+	if (ver->img_type != BTINTEL_IMG_OP &&
-+	    ver->api_lock && ver->unlock_policy == 0) {
-+		switch (hw_variant) {
-+		case BTINTEL_HWID_BZRI:
-+		case BTINTEL_HWID_BZRIW:
-+		case BTINTEL_HWID_BZRU:
-+		case BTINTEL_HWID_GAP:
-+			err = btintel_try_load_unlocker(hdev, ver);
-+			if (err)
-+				return err;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
++	if ((chan->state == BT_CONFIG || chan->state == BT_CONNECTED) &&
++	    !test_and_set_bit(CONF_REQ_SENT, &chan->conf_state)) {
+ 		u8 buf[64];
+ 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+ 			       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
+@@ -4657,6 +4668,10 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 
+ 	lockdep_assert_held(&chan->conn->lock);
+ 
++	/* Connected channels may also receive reconfiguration responses. */
++	if (chan->state != BT_CONFIG && chan->state != BT_CONNECTED)
++		goto done;
 +
- 	err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
- 	if (err)
- 		return err;
-@@ -3537,8 +3614,19 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 		return err;
- 	}
+ 	switch (result) {
+ 	case L2CAP_CONF_SUCCESS:
+ 		l2cap_conf_rfc_get(chan, rsp->data, len);
+@@ -4724,6 +4739,9 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 	if (test_bit(CONF_OUTPUT_DONE, &chan->conf_state)) {
+ 		set_default_fcs(chan);
  
--	/* If image type returned is BTINTEL_IMG_IML, then controller supports
--	 * intermediate loader image
-+	/* New unlocker flow (Scorpius Peak onwards):
-+	 * Boot ROM -> IML -> unlocker.sfi -> OPFW
-+	 */
-+	if (hw_variant >= BTINTEL_HWID_SCP &&
-+	    ver->api_lock && ver->unlock_policy == 1) {
-+		err = btintel_try_load_unlocker(hdev, ver);
-+		if (err)
-+			return err;
-+	}
++		if (chan->state != BT_CONFIG)
++			goto done;
 +
-+	/* Transition to Operational Firmware
-+	 * If image type returned is BTINTEL_IMG_IML, then controller supports
-+	 * intermediate loader image.
- 	 */
- 	if (ver->img_type == BTINTEL_IMG_IML) {
- 		err = btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index ff7c1d623007..9526acf65959 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -43,6 +43,8 @@ enum {
- 	INTEL_TLV_OTP_BDADDR,
- 	INTEL_TLV_UNLOCKED_STATE,
- 	INTEL_TLV_GIT_SHA1,
-+	INTEL_TLV_UNLOCK_POLICY = 0x3c,
-+	INTEL_TLV_PLATFORM_ID = 0x3d,
- 	INTEL_TLV_FW_ID = 0x50
- };
- 
-@@ -108,6 +110,8 @@ struct intel_version_tlv {
- 	u32	git_sha1;
- 	u8	fw_id[BTINTEL_FWID_MAXLEN];
- 	bdaddr_t otp_bd_addr;
-+	u8	unlock_policy;
-+	u8	platform_id[6];
- };
- 
- struct intel_version {
-@@ -261,6 +265,7 @@ struct btintel_data {
- 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
- 	int (*acpi_reset_method)(struct hci_dev *hdev);
- 	u32 cnvi_bt;
-+	bool	unlocker;
- };
- 
- #define btintel_set_flag(hdev, nr)					\
+ 		if (chan->mode == L2CAP_MODE_ERTM ||
+ 		    chan->mode == L2CAP_MODE_STREAMING)
+ 			err = l2cap_ertm_init(chan);
 -- 
-2.54.0
+2.55.0
 
