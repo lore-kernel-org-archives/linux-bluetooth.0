@@ -1,66 +1,66 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F68179A3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 00:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7273B17D6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 00:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791331477; cv=none; b=i5TJ05auNY5pkt07hoLU+HiGcx/QuMBcYfNs40w9eZYwCPCLXMwQRYU9g4X7Gu6ubQb+m/vv0JwEkwYOYagBVHHn2ly62IA1FaY0tu2Cc6s2CsmmzgMaQPtgAtpJFJKqbKh77PAj4PWYwC/YHHTm2Yn2ZvFMMrrb/HRcBdTyI7o=
+	t=1791331908; cv=none; b=GNNdbg7DOCrXWkJHQDcC0ujcaa5xnw4IeWh42eEcXru8PFhEFUe40f9QH58lFwimNHZBl+vQ5LLpHUMMs9iMNb3Mw4StuUF3z4T3xfeq+7AfkI5gkXa9i006z3IJUc2ZTkpdE8GlkByTJvUax4hknAqi14DhUgjDGIW7fB88LhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791331477; c=relaxed/simple;
-	bh=CKFQqjafDBKs+RDXjaV4m7rkjDK6LSUA6O78yxNJmvI=;
+	s=arc-20240116; t=1791331908; c=relaxed/simple;
+	bh=8llGMgN/T92/UT4oJWEr4WTkL1LN6nC4ZAoLjR/cqYo=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NzFPwRBYKSN71miBEw3zEfYRhyaueH1P/Rqak4JDPVwwR3cl1hiGLriV3Cc+PhJ+9saj8IMpMj2ADASx4J8mUIU0Nt3m6kHmc+7vXoSbQpjIK0E9DrisWUx6lgam6ddtdcgT5qSblQ0lD8eBsicfLb3wdF1MGWnEwBPPEyul6xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mo5fjKk7; arc=none smtp.client-ip=209.85.222.175
+	 In-Reply-To:References; b=SuuOu8IDP7c+biY7b2fyaB2TRpgpl+xK78dtNxUwQeoJ4nNoqgq7E8YNXeqMg1vkOfmmJsC6WB8lrZhKDQgxbAa21BReTy3W0jJ0QNY8PHhNWPfv1WqWgLyW/463OejXljPScsuK64TALwzBtpNsx9+vfCMWm3MulJ1sXQQQSco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bP2o7vpB; arc=none smtp.client-ip=74.125.82.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mo5fjKk7"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-93cbee4b010so208388085a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 17:04:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bP2o7vpB"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-351297d9f8fso1925013eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2026 17:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791331475; x=1791936275; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791331906; x=1791936706; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=B4Z22wO2kp+Fecjdee21OGa4188p/V4lv60Rq2qXt7A=;
-        b=Mo5fjKk7ThwLpgAU8MUYSFw8kXs006IY0OuRI6G1+FcrrnGVHzfdvno4N9rvTEK0yl
-         WpcigB9cTFTsqqi3jKRnXYs1YNW8PbGn4NQQMJuywM2A93bdqY3wYe5qqVDze7h4sLP+
-         w5egGCUqwl1VVTySOxqn6O1HvXuk7gut7QIB/4zZH2vd9SuD90G32dPp+Jzi8s/arOK2
-         j2xiM6Aply4P/wE3dcgy1CrzgBUI1sSYGBroAlUG6Z6x7ZDuOsb8uf3kZAzaHQrtW4pb
-         tSBbHdNdLLP+X/1JCETdM/5d2viBZmIaN2ujeFMWOEmQWMBhGlvfP1hb4ZI9Yv1tH4ZL
-         d8ZQ==
+        bh=k8RxiBv9GBPKHdeQOAD2hO2JuKP+12InutioU8W7BQM=;
+        b=bP2o7vpBJJRnNxkG1XtvjtYzObae7eXAXy3/NcmPpnECxr5W9Yi4ERyPdCBbP7Lwgb
+         +VhPpHIOHTFz3tzVssS8Hd8LwY++jt5SJD5iQBpVBsQz64ZpglqOTRzgREEjHGkxDhB5
+         wSSB0u+Eqt2DNZIVSYnpOsQsKqCcks4+4XTEsX8Zi/7h5WzRqnnUe4L7AgFXovKviomy
+         LBkdHSr+XSpp0+wEWgdPLhm3/yiSRUcCc0KZ1cxKy6FS12E0gk0iJVQXlk1/MGzTeJnQ
+         oZIVwBmOsUgRz1qc+ghzqt9j9GdkU3IJimuanX+y36k192nN0+hVtgSY2gAyIYEaQp32
+         DRnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791331475; x=1791936275;
+        d=1e100.net; s=20260707; t=1791331906; x=1791936706;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=B4Z22wO2kp+Fecjdee21OGa4188p/V4lv60Rq2qXt7A=;
-        b=M1TO6PwWRwL82+BIJil3PPeq4gznKq5R95RZGvWF0KoLzHwXNOUyX0vcCunS2sYvNW
-         ccVldeHhnDf9he79GRHPe5kb0O1ijFs7TR196dEEp0mqqlIXvxGoP/+SJnfNU/ma+Bef
-         5KFa9LzfCHvofO7bxNiUmSGqAv4qcm1xriG/06ooYRi8f5E465LmTNP60F1NScQfRUx2
-         tlmxQUFjwBYL0QC40fUQouloMB5n1kSZLdtAfo6ehXeB0SwQeEXNbMuuYp8H6P1hXu5m
-         ywkloCpSa1MnBMmVgUffbCLWdCshQ1qXZg3Nrlndb9hrGQXFPVL5nwdq4XduhRuwiLym
-         miHg==
-X-Gm-Message-State: AFuF++li26j8VAVn6JpROX7g2L5s4QnkOKwLoy8jN8hceU1y0EwUEx/V
-	nzdsDbOKRNOZw6qBQ9jf7Zzq9wTv7YolIkUZE/R4UUcVqys5E/+fz2wmrvb40EtVZsA=
-X-Gm-Gg: AYBFou02yuoudacGpj5zjkl9wfE52llMoS0OwB9MngbAJMnNFN1xdJ/Vufqvd7TUIHe
-	GY6WheT7AsrkYvR80J9zS3aS+DgmSeV0t2qvqRTiEtKwBU6C4HYovANr3osELopY+nVSg82gHMX
-	6amHBWvJrV5/XD2IGB61VCoSKqElowi5CvfdNWhMKg1wjcR334HOAA2p6324pZEUK7KLZ+xM8+J
-	nM7K0OiiWoezrzf2+RAB3cfWjN1epmc1QZHHuW40JAVtHzRMUYsABDCLXHEIY+j8NAWDq7uEmZs
-	NgJbU7D5y+B1bnIuUbFJpYNL+2S+9HF+TnD97vFbkPuc9xN9OYcVUoZYf5RF6wLgvdMAte+oMvU
-	vSFaX9BI+lfPaAcbf/TEKIKIyulHwQeYJJouu4dXoMgBsjVedp8hS18Al/9H4FZjSPU1ogMDkDU
-	ut6hOJY1ImeGyQwe+X38h7yCelb77tY/PgSbzZ72w9hQZctUXTCilb/5kRNlRBt97ZB0Zz7jIph
-	OkCTIe7
-X-Received: by 2002:a05:620a:27cd:b0:93d:78e0:30b2 with SMTP id af79cd13be357-93e9b721dd7mr126271885a.29.1791331474500;
-        Tue, 06 Oct 2026 17:04:34 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.102.151])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93e991eeb5asm82225485a.41.2026.10.06.17.04.33
+        bh=k8RxiBv9GBPKHdeQOAD2hO2JuKP+12InutioU8W7BQM=;
+        b=AnVeABc9WUIxk03e2dRynDtTNBxPI2fvlEneLf16Zt3YyKKCWs6qg27snrLJK0A4ps
+         ZyrN0g/++vUivXIWJrZdvmafE4J3bhF7D3/jTPp8jDLePB8qrdUfudUlGoesG+YJdhOp
+         XtQBaR5cZUB1kMO4RaM/j2po566S9/olu2YzOTDyJwCFxMIRNR5kDlY8IdORU1RUGyTC
+         Gce5x+mxnyQtUo7HTP4URhUWXLgF7UYm2hpJWinOipj+yihGdiMNulFS293U+nj4YNkY
+         V1cunJKJh3t6A+oFCCQ/xb4s/UDJuznFoWIgHkXovfD4sLlMvDKVYejfC8bXlU4ySgC0
+         sgLA==
+X-Gm-Message-State: AFq9FYI5BIjwpX+jbC8koVfHhpOUCMDqW0cfN1IA9aembju6kLncNgfy
+	GFU+i5lOgvJJlD/DwYRIMQyhFPCbMQN1G4DZeRmonDVv7lOWVd5O/VTh2FFNyTOJQmQ=
+X-Gm-Gg: AYBFou3fwyAGemfYglz1HTOzMVdpy83yTG0DvFdJQdnJri9IKSTrWnwWrWrNfcqSMJo
+	74wl4f9d5vCrlfvg0xBFblQPAbNML+k6SNI9vQn24FdIlj7InyxlsQddRVjQz2XLrkT+C462oPu
+	CL9otA5AQzixKmeZLLxPwMdoSxj9BmETH/rdZJ9BbDmjylXPwsqwUY4kjQMmBi2iKjhibr6gYWt
+	vrQhuB62Bet6a7tKXrHJU4ymXlHmWqyCMgnjjD1jnJH2hEstxxDDjYBq8dtgxol1H2kmtkFzsr/
+	mHJWGXJnAkrXiUhYICUkXnYgV8K1NWszFPxLmXcokGS/g3nFrOPl4Kt82dFRp8/+zHYX3U6N+iT
+	yYhgC/6+oAeR+BkuHtUsWDKLGlC8aRaTeAPTmAo01FhBwgs0bUGzfEThSxMbzB+j8lG4r34Ju3j
+	77zq/NFjnoZJ/WXYDgaiteDI9Cx/3tsiBy7hFGwxS2IDOh4BC0sjRTnmwrwLR9E7T8ILzeZcm4p
+	4FuNqbEv0/bsc0=
+X-Received: by 2002:a05:7301:792:b0:351:60c2:538a with SMTP id 5a478bee46e88-35160c2542fmr15290eec.2.1791331906033;
+        Tue, 06 Oct 2026 17:11:46 -0700 (PDT)
+Received: from [172.17.0.2] ([134.33.79.169])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515aeb5b46sm1959687eec.7.2026.10.06.17.11.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 17:04:33 -0700 (PDT)
-Message-ID: <6ac58c91.efb6fa4e.234119.07d0@mx.google.com>
-Date: Tue, 06 Oct 2026 17:04:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5615874384673582027=="
+        Tue, 06 Oct 2026 17:11:45 -0700 (PDT)
+Message-ID: <6ac58e41.c704c85d.1da37b.589f@mx.google.com>
+Date: Tue, 06 Oct 2026 17:11:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5549122709154301130=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,38 +68,65 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yaroslav.voytovych@gmail.com
-Subject: RE: [BlueZ,v2] a2dp: Fix crash on NULL stream in transport_cb
-In-Reply-To: <20260921204711.211409-1-yaroslav.voytovych@gmail.com>
-References: <20260921204711.211409-1-yaroslav.voytovych@gmail.com>
+To: linux-bluetooth@vger.kernel.org, enghitalo@gmail.com
+Subject: RE: Bluetooth: Add missing newline to bt_dev_{err,warn}_ratelimited()
+In-Reply-To: <20261006212142.2168838-1-enghitalo@gmail.com>
+References: <20261006212142.2168838-1-enghitalo@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============5615874384673582027==
+--===============5549122709154301130==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-This is an automated email and please do not reply to this email.
+This is automated email and please do not reply to this email!
 
-Dear Submitter,
+Dear submitter,
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1180524/
 
-   Series:       [BlueZ,v2] a2dp: Fix crash on NULL stream in transport_cb
-   Pull Request: https://github.com/bluez/bluez/pull/2559
-   Created:      2026-09-21 22:42:40+00:00
+---Test result---
 
-The pull request has been closed and no further action is taken on this
-series.
+Test Summary:
+CheckPatch                    PASS      0.79 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      27.53 seconds
+CheckAllWarning               PASS      30.97 seconds
+CheckSparse                   WARNING   33.08 seconds
+BuildKernel32                 PASS      27.13 seconds
+CheckKernelLLVM               PASS      30.73 seconds
+TestRunnerSetup               PASS      698.02 seconds
+TestRunner_l2cap-tester       PASS      12.31 seconds
+TestRunner_iso-tester         PASS      10.34 seconds
+TestRunner_bnep-tester        PASS      2.86 seconds
+TestRunner_mgmt-tester        PASS      59.90 seconds
+TestRunner_rfcomm-tester      PASS      4.16 seconds
+TestRunner_sco-tester         PASS      5.29 seconds
+TestRunner_ioctl-tester       PASS      4.37 seconds
+TestRunner_mesh-tester        PASS      5.20 seconds
+TestRunner_smp-tester         PASS      4.03 seconds
+TestRunner_userchan-tester    PASS      2.94 seconds
+TestRunner_6lowpan-tester     PASS      4.10 seconds
+IncrementalBuild              PASS      25.44 seconds
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/virtio_bt.c:340:25: error: no generic selection for 'unsigned short virtio_cread_v'drivers/bluetooth/virtio_bt.c:340:25: error: incompatible types in comparison expression (different base types):drivers/bluetooth/virtio_bt.c:340:25:    bad type *drivers/bluetooth/virtio_bt.c:340:25:    unsigned short *drivers/bluetooth/virtio_bt.c:340:25: error: no generic selection for 'unsigned short [addressable] virtio_cread_v'drivers/bluetooth/virtio_bt.c:343:25: error: no generic selection for 'unsigned short virtio_cread_v'drivers/bluetooth/virtio_bt.c:343:25: error: incompatible types in comparison expression (different base types):drivers/bluetooth/virtio_bt.c:343:25:    bad type *drivers/bluetooth/virtio_bt.c:343:25:    unsigned short *drivers/bluetooth/virtio_bt.c:343:25: error: no generic selection for 'unsigned short [addressable] virtio_cread_v'drivers/bluetooth/virtio_bt.c:378:25: error: no generic selection for 'unsigned short virtio_cread_v'drivers/bluetooth/virtio_bt.c:378:25: error: incompatible types in comparison expression (different base types):drivers/bluetooth/virtio_bt.c:378:25:    bad type *drivers/bluetooth/virtio_bt.c:378:25:    unsigned short *drivers/bluetooth/virtio_bt.c:378:25: error: no generic selection for 'unsigned short [addressable] virtio_cread_v'drivers/bluetooth/virtio_bt.c:381:25: error: no generic selection for 'unsigned short virtio_cread_v'drivers/bluetooth/virtio_bt.c:381:25: error: incompatible types in comparison expression (different base types):drivers/bluetooth/virtio_bt.c:381:25:    bad type *drivers/bluetooth/virtio_bt.c:381:25:    unsigned short *drivers/bluetooth/virtio_bt.c:381:25: error: no generic selection for 'unsigned short [addressable] virtio_cread_v'
+
+
+https://github.com/bluez/bluetooth-next/pull/873
 
 ---
 Regards,
 Linux Bluetooth
 
---===============5615874384673582027==--
+
+--===============5549122709154301130==--
