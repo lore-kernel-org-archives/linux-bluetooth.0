@@ -1,259 +1,377 @@
-Received: from mail-dl2-f12.google.com (mail-dl2-f12.google.com [74.125.229.140])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC894BC007
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 15:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.140
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791387861; cv=none; b=TsSo7D+co4xa95GrowgzqYpgoEAHG6eRDihtnqcHuWCP2lLZqw9N+Rq9yIkYfoPt/oS+YrPT6AHmNnkcbuRcER1QSjhRBUPPqlDQOlbCpSt8EA4dK7MpLdjWh/cJKOkjow2RGPvMG1u2HsaHUMOyOA3iZN1YX4gMiO30H6jxWa0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791387861; c=relaxed/simple;
-	bh=kVkJ7OJMcommChG/sArz+rhq97PTn9T8YyHxi8wuhVM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZqZqVAIgdGqPmsCHVMu8yg0PfADS6AZG9YP0RxCtwB8EO215Qca5RIXz8+0grc/fY9ZGr5C4iKo0iSGwl2crBLRGZjasb7PUoSpBwQotPmSb+naTH/I5j9uKasxLJJ43SufvHeTHBwhUNMxoumJeOTVQZIS7tdx/uP4l2Hh0SYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hiEPUGPX; arc=none smtp.client-ip=74.125.229.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4013815D0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Oct 2026 15:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791387875; cv=pass; b=CU3rwiaH52iHYc3NV7rF8M4EL0vpRkBcQuW6LslPY33t9NoIqzdDZ8Pdn+Qxb7kEBiYzmY9TLjNSgvsWg0vdGbH6BiXnsX6xjeigyiEFVRkJKbAc2Hys2MAcjxwe6rg9pETX9k4jM6LX5HzyBTGrGoZn/347ZANQjHfdchfacwQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791387875; c=relaxed/simple;
+	bh=iHnaRSIkdbgUFeK5EBvMFGfrzG3huj1QvOgcFwqV+bk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KphruvYYos6AkRMWyidjqeURGfDMZFibKYsSriWSU8hWVGydYQdnWwQWk/1Ah/F1CuCTK9KuMscsxhsNt4kbEZF5iUZXrLYIS07YJBDl7vKs11XVjou+1h5J/g/jlDLCBoG/xuTOQUugOxw2V57cceZX6JxJe9VbytdQRtYlpiI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HBe5WEU1; arc=pass smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hiEPUGPX"
-Received: by mail-dl2-f12.google.com with SMTP id a92af1059eb24-141a5cf1371so736868c88.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 08:44:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HBe5WEU1"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-836ce6cbe1eso21751137b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 08:44:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791387871; cv=none;
+        d=google.com; s=arc-20260327;
+        b=J4aqiNWy+dS/AoknLKqGWD+ke9ei2/6xzrnUJQvbW6XzwRHmuEZZ2J4r3C0Qd3r9EW
+         wXWGjGkFEsedOWobBU299gt3fgCfxcOCe3TP6P+ZxEvN34K+sIcKv7iKoaontFSQpCY7
+         zjwZJ/YuxJTdGs19rQyejzb3kHjT2v5UyLigP1jW1aJeUTqx2dyOkIsdieJt/kLQdqxX
+         xGaKWs1ovH7JlGAlNGyrtmTTrgivi0OPJFDpOBRKZw0btiRqb8X9lr1qaa5nFgMUEmFO
+         wTU0cbsvU5mgnjlpWuTMFC18kpazxffBtZva0uQuOd5t4FGmDNKpkNA47z2yI3TNdS9N
+         FV/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Uj0q99pRzd2OhAPeKAKaDTTIE4ZFDBJpz0EgNUZL5PA=;
+        fh=4FIVDCMwcNku3Ck42oqGTL5zJeaPTUMSwL20JoVbcJE=;
+        b=GLTldlyYikcBcLXnzP4ie88vo6quFZCGrxJwa+OxuSMleUAzaYAzG0jeIMnUbuDvJT
+         S8pyU+gmS1IGnmEHNGjqaNzgeh4MWFKuNQc58RY795JsZ9wzMDmm6csLYUTb95AbPsDP
+         88heEI98/5nW2RO5Cux5vob8LFW/3HnO0gI61WzNfZNfMbbjWWOMKUS1rkyNzusYa1H+
+         JsiBwyIrQc5VbX2i6ENq0KAihh+FVR7EJnhoztmUjeZb1MEA2R5aoDEkCR+CWbsgV1FG
+         pv5k0YIOQDvcBMK/yPwZFxpWHavLBRDY8b29hxQIr3tE53OLidduh31lo6GZlj/Vs8Be
+         IQoA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791387854; x=1791992654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vwhFsVuhT0WTTw+YrQxYsYSj+h2QHZvVIQ6QQ3MaZf4=;
-        b=hiEPUGPXqU+nFwfjUSgKvPQ1I6vT0eq+GkqnZ2gWGlat6RY6/Y674Hs3gXDeI4x6k8
-         i/yzS3BiY/zsAPmqzk+3UNH8Txid4OmQqy8BFYdMMHo/PYbTLBk96GyAKZQ1nswl/O9P
-         aizAGHMbKRIgkroImBD7zxQV/H93Oeh2eLgRBePbMqTc2fPPyG4cLXM4XzeWDUckfqY9
-         mdQiteNl5Z8bx6gpfLKp0hitrY5oQoTrDVkYl+UqnofM9bsC/TGRh/QX87aFHnbSSLTO
-         UxHZJb13UGWvYgmQ2OeI3cRzPzxjUSnptpF3k7m2m6QLSGXbLLQWYacSBYCprZiw5jJy
-         QTHw==
+        d=gmail.com; s=20251104; t=1791387871; x=1791992671; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Uj0q99pRzd2OhAPeKAKaDTTIE4ZFDBJpz0EgNUZL5PA=;
+        b=HBe5WEU1/MPzFYlq2TJNpGOahGUyjZb3cOURiLi0O8BLMnmRqZ1LOOgkHmrtKxh5to
+         uMvawnq0V1eQQG/e9iiYSkGE2MNR2TXnq38PkLWoqAbn2wQcBZzRDi7nugz+nfeiiJm0
+         DtPMtssksInIwEEMXzhOSzf2hItpPWwkyFapvJSlqrb1BvA3boIQ0nlSX8dnkQEWSyPI
+         WtMCrOEBSNwRX8xxpV70amqmitzopKN4c+OUYqEPRTk/aYfHR935CaddGZ3SoY5amJ8Z
+         KeXMgPeIxR4SyD4/satpystmSJp1Aa5AN8JCDwLB9WYcJJEsaU+OBszrSFcitpTXFR4c
+         N1+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791387854; x=1791992654;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=vwhFsVuhT0WTTw+YrQxYsYSj+h2QHZvVIQ6QQ3MaZf4=;
-        b=WrzEAd7QmR/YeIuywwA5ufW9+LqfhuzmXHLcki/CodqQDB9CHpRRmlpM2w3y2hTUJF
-         Koc6yI7FVsmix4Oc1RPxvX7aCUdUjv12s2goHhfoJOIZ7GtDIBPjGX/kvuNaOW85BiRX
-         LllAtfaBJ2m3LZM1k0vqVNOJxxFV077qvo+vRkSHL5jd5wUM4oUxVzqSRzFV266Iry0E
-         TDFOgYQBsgxcU3uGdgYnK5PZc2MEIRx+aemxaR7Ff7IQyWMktyvIrpwa1y1y7oY49Xa8
-         E9tgVOSHmRYLRAhb0SMRDxnCzwshDu4lz8RbLKSg8aU7qihaqLACR2oCW3KJXP4OQTfp
-         lvDA==
-X-Gm-Message-State: AFq9FYIA0nZbnkbs0iuqCMz3/n2P+8fdkFI5E48K1AsdS0nKlLWz3Q9z
-	JzzHIBA8lP+mEeGNmbSrF28Dal7D9YDZqGZ0S3cDH49OMoMxSiNqEAmlHCrs/nq+EW0=
-X-Gm-Gg: AYBFou2paEtVAhbREJtxngKMmsa9Mod45MlVrWAMO7pGuYM3XL42bwm3amxiaDoBeQC
-	Svl7SHEgg5h1Jghm/1H4XCO1u77mlEqhnK9AWnLUE+eEIQlyE8Lm0G+Djd3Wpwvlkae0hXHSDFP
-	aFX/1Dtg8J1NyRJqedd4INhf6zBfSapwbRL79ZFWEwe9NDYnKCCbVHOMkQavLEQyxcHWVakUlNB
-	uoqaDHD1qDDgVUJxvhOrdntecdJIwK/RwZM1QGh74svgFeXuJhjwjOtUUzL7CBAUxJQJh9Gphlr
-	lIN6sQloA3vfN969HeGZMWlqyczFKy1C7ctPs/RCyB14BojhfDDWY1u/dDTiHemHogImPtml7m2
-	d8lfuYOdqrqTDIieUjdzdAdt3BQKZ/mWt+01kNwA+xOPGcmDce+vHJN11njuUUOthQVwICQli4I
-	wbqvOCHBxUM5D25wCvhNQ0bJgdHUqTHzHY5s5CawmtPh+ecaHj5fGQ5Xy/LnObX0cjs2fI856yY
-	vKLXpXytUYbeDSmrde8Qxlub9n41nkG6ZtFeSqh
-X-Received: by 2002:a05:7300:6810:b0:351:6528:b57c with SMTP id 5a478bee46e88-3516528d4a1mr2868028eec.0.1791387853904;
-        Wed, 07 Oct 2026 08:44:13 -0700 (PDT)
-Received: from hitalo (190-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.190])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3515af7ab9fsm7876955eec.18.2026.10.07.08.44.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 08:44:13 -0700 (PDT)
-From: Hitalo Souza <enghitalo@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Hitalo Souza <enghitalo@gmail.com>
-Subject: [PATCH 3/3] Bluetooth: Don't leave abandoned SCO links up in the controller
-Date: Wed,  7 Oct 2026 11:43:53 -0400
-Message-ID: <20261007154353.148223-4-enghitalo@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261007154353.148223-1-enghitalo@gmail.com>
-References: <20261007154353.148223-1-enghitalo@gmail.com>
+        d=1e100.net; s=20260707; t=1791387871; x=1791992671;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Uj0q99pRzd2OhAPeKAKaDTTIE4ZFDBJpz0EgNUZL5PA=;
+        b=bdYZ9cCKymhdesDLl9sVMgZheKJrO63+TIgPR3w/lkr7ZBgUe9GNkH7GsjxPbNyqzL
+         ISIK7OTwzos2ipIsFJMVOTlqr6o4wSdB/rVL106kGT0AFv1bWeX1LatWs3Mlu97bmHQc
+         lCsZbv7obUcjKEl+ByoO5Boc/ahopVm9Z8qnKWJR11uBuAUejcsnlu0mNQ+LK1+NyJk7
+         t9FtVU5d9kEC430SbYfflUCjcNYNBsS6ZA7gGFA7JEipOy7IHeGbi+YlhDoqj2IcdJ/X
+         HK21JUZgB6pHQTGFcKdn8hJJeyFvpkLbLhhwMiSwdTtWpv0uEY91aNPh/hliCgEQDjLa
+         6Dcw==
+X-Gm-Message-State: AFq9FYJfgr8pPQtKXDtBuvx8/dnstzJvEP2WwIOMJMlbiSkv8iI1kzmV
+	AeA6+hIZksMmuEGU8wusfCn7Jmqv4oa4MYt68zhoQ95YmtMb+cdJbqNSy2+LPls6UKlLIG4/8ER
+	iXYM0Esxu6BgFbg5nyOa41zQSeuQsxo4=
+X-Gm-Gg: AYBFou2Po8PMA9Rnqq1iwFfvRRZ1vw/j/tZ3XFl2xNTkHDSN4Pe4qKuQQxfNzkUpw47
+	LILUXSjoxh/HCHN1wymJvbyyg+J6kll+xUzu670HiNKVtIMFncShlrTO41JgSDb3oDTPf/rD/gH
+	ikyTLjZs9T4pFvK+wc1BBKP2ZNgX/tx+NoTF8U7TpeKZ8pTfEWom6rd91Y58knpghyi/Nkfqoy9
+	+I4GSmQg3jq/zhEBBxLj4JibN7bH2kx1ktkZy7ouGmSXsC9lbtH6PnT13r7N0alg8KVD4ZkrLht
+	qj7Yop7aLuOtSxz8gcULi2+W19cfeBEzwwVG4+st8+64CcJkay4jWK36JgOmGHu8iylhtczrYiZ
+	D9EOoY7an7BsPLNdbXu/2KsXf2eSu17rAH5P2TWxkhw==
+X-Received: by 2002:a05:690c:c3c4:b0:8af:18b5:d5e3 with SMTP id
+ 00721157ae682-8b05b085badmr15565297b3.68.1791387870960; Wed, 07 Oct 2026
+ 08:44:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261007124721.2521956-1-kiran.k@intel.com>
+In-Reply-To: <20261007124721.2521956-1-kiran.k@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 7 Oct 2026 11:44:19 -0400
+X-Gm-Features: AclHuK8iPy_DyCklHCKGdRGyoBYpuupmTt4OOCQvhWdJojbH_FkVAfEDVhmv9Ew
+Message-ID: <CABBYNZKOm_5Zcfe_etmR3dtBScajZRysfXxJbSVvG80WVMO-nQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: btintel: load unlocker.sfi to allow
+ unsigned firmware
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com, 
+	chandrashekar.devegowda@intel.com, Ravindra <ravindra@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since commit a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for
-aborting connections"), aborting a SCO/eSCO connection whose setup is
-pending, e.g. because its socket was closed, sends Create Connection
-Cancel and deletes the hci_conn. That command cannot cancel a
-synchronous connection, controllers just fail it (ACL Connection Already
-Exists or Unknown Connection Identifier), and the link may still
-complete afterwards. Unless another connection to the device takes it
-over, its completion event then finds no connection waiting for it and
-is ignored; if it comes while the abort is still queued, the connection
-refuses the handle as it is being aborted and is deleted all the same.
-Either way the link stays up in the controller, which rejects every
-later setup for the device until the ACL drops (with Unsupported LMP
-Parameter Value on a MediaTek MT7921). The same happens to a second
-link completing for a connection that is already up, e.g. its own setup
-after it took over the abandoned one.
+Hi Kiran,
 
-There is no command to cancel a pending SCO/eSCO setup, so don't send
-Create Connection Cancel for one, and disconnect a SCO/eSCO link that
-completes with no connection to take it.
+On Wed, Oct 7, 2026 at 8:44=E2=80=AFAM Kiran K <kiran.k@intel.com> wrote:
+>
+> When an unsigned operational firmware image is needed for debug, the
+> controller requires intel/unlocker.sfi to be loaded first. Without the
+> unlocker image, the controller rejects the unsigned operational firmware.
+>
+> Support both firmware download flows based on the unlock policy advertise=
+d
+> in the version TLV:
+>
+>   BlazarI/BlazarIW/BlazarU/Gale Peak (unlock_policy =3D=3D 0):
+>       Boot ROM -> unlocker.sfi -> IML -> OPFW
+>
+>   Scorpius Peak onwards (unlock_policy =3D=3D 1):
+>       Boot ROM -> IML -> unlocker.sfi -> OPFW
+>
+> Parse the new INTEL_TLV_UNLOCK_POLICY and INTEL_TLV_PLATFORM_ID TLVs
+> into struct intel_version_tlv, track the pending unlocker load through
+> a new btintel_data::unlocker flag, and pick intel/unlocker.sfi as the
+> firmware filename when that flag is set. If the unlocker image is not
+> present in the firmware search path, the driver silently falls through
+> to the normal firmware download path. If the unlocker image is present
+> but fails to download to the controller, the driver logs the error and
+> aborts bootloader setup, since continuing would leave the controller in
+> an inconsistent state.
+>
+> [  413.375247] Bluetooth: hci0: Found device firmware: intel/unlocker.sfi
+> [  413.501051] Bluetooth: hci0: Waiting for firmware download to complete
+> [  413.501058] Bluetooth: hci0: Firmware loaded in 122864 usecs
+> [  413.501537] Bluetooth: hci0: Found device firmware: intel/ibt-02a2-01a=
+1.sfi
+> [  413.501547] Bluetooth: hci0: Boot Address: 0x10001000
+> [  413.501548] Bluetooth: hci0: Firmware Version: 137-39.26
+> [  414.103473] Bluetooth: hci0: Waiting for firmware download to complete
+> [  414.103478] Bluetooth: hci0: Firmware loaded in 587841 usecs
+> [  414.149576] Bluetooth: hci0: Applying Intel DDC parameters completed
+> [  414.150089] Bluetooth: hci0: Firmware timestamp 2026.39 buildtype 3 bu=
+ild 86921
+> [  414.150092] Bluetooth: hci0: Firmware SHA1: 0xeb2e0a4b
+> [  414.150093] Bluetooth: hci0: Platform ID: 570c6ffbcbe6
+> [  414.150094] Bluetooth: hci0: Fseq status: Success (0x00)
+> [  414.150730] Bluetooth: hci0: Fseq executed: 15.255.00.98
+> [  414.150734] Bluetooth: hci0: Fseq BT Top: 06.32.00.02
+>
+> Assisted-by: Copilot:Claude Opus 4.7
+> Signed-off-by: Ravindra <ravindra@intel.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+> changes in v3:
+> - Address Sashiko review comments
+>   https://sashiko.dev/#/patchset/20260929021056.1396791-1-kiran.k%40intel=
+.com
+> changes in v2:
+> - Updated commit message
+>
+>  drivers/bluetooth/btintel.c | 94 +++++++++++++++++++++++++++++++++++--
+>  drivers/bluetooth/btintel.h |  5 ++
+>  2 files changed, 96 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index f298c91f4f4e..3bc59a2f3ba8 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -579,6 +579,11 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+>         if (version->img_type =3D=3D BTINTEL_IMG_OP)
+>                 bt_dev_info(hdev, "Firmware SHA1: 0x%8.8x", version->git_=
+sha1);
+>
+> +       if (!mem_is_zero(version->platform_id, sizeof(version->platform_i=
+d)))
+> +               bt_dev_info(hdev, "Platform ID: %6phN", version->platform=
+_id);
+> +
+> +       bt_dev_info(hdev, "Unlock policy: 0x%2.2x", version->unlock_polic=
+y);
+> +
+>         return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
+> @@ -604,11 +609,14 @@ static u8 btintel_version_tlv_min_len(u8 type)
+>         case INTEL_TLV_DEBUG_LOCK:
+>         case INTEL_TLV_LIMITED_CCE:
+>         case INTEL_TLV_SBE_TYPE:
+> +       case INTEL_TLV_UNLOCK_POLICY:
+>                 return sizeof(u8);
+>         case INTEL_TLV_MIN_FW:
+>                 return 3;
+>         case INTEL_TLV_OTP_BDADDR:
+>                 return sizeof(bdaddr_t);
+> +       case INTEL_TLV_PLATFORM_ID:
+> +               return sizeof(((struct intel_version_tlv *)0)->platform_i=
+d);
+>         default:
+>                 return 0;
+>         }
+> @@ -716,6 +724,13 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
+>                         snprintf(version->fw_id, sizeof(version->fw_id),
+>                                  "%.*s", tlv->len, tlv->val);
+>                         break;
+> +               case INTEL_TLV_UNLOCK_POLICY:
+> +                       version->unlock_policy =3D tlv->val[0];
+> +                       break;
+> +               case INTEL_TLV_PLATFORM_ID:
+> +                       memcpy(version->platform_id, tlv->val,
+> +                              sizeof(version->platform_id));
+> +                       break;
+>                 default:
+>                         /* Ignore rest of information */
+>                         break;
+> @@ -2472,7 +2487,12 @@ static int btintel_prepare_fw_download_tlv(struct =
+hci_dev *hdev,
+>                 else
+>                         btintel_get_fw_name_tlv(ver, fwname, sizeof(fwnam=
+e), "sfi");
+>         } else {
+> -               btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi=
+");
+> +               if (intel_data->unlocker) {
+> +                       strscpy(fwname, "intel/unlocker.sfi");
+> +                       intel_data->unlocker =3D false;
+> +               } else {
+> +                       btintel_get_fw_name_tlv(ver, fwname, sizeof(fwnam=
+e), "sfi");
+> +               }
+>         }
+>
+>         err =3D firmware_request_nowarn(&fw, fwname, &hdev->dev);
+> @@ -3489,6 +3509,36 @@ static int btintel_set_specific_absorption_rate(st=
+ruct hci_dev *hdev,
+>         return 0;
+>  }
+>
+> +/* Attempt to load intel/unlocker.sfi if it is present in the firmware
+> + * search path. If the file is not available the device will be booted
+> + * with a signed operational firmware, which is the common case, so its
+> + * absence must be treated as normal and not logged as an error.
+> + */
+> +static int btintel_try_load_unlocker(struct hci_dev *hdev,
+> +                                    struct intel_version_tlv *ver)
+> +{
+> +       struct btintel_data *data =3D hci_get_priv(hdev);
+> +       const struct firmware *fw;
+> +       u32 boot_param =3D 0;
+> +       int err;
+> +
+> +       err =3D firmware_request_nowarn(&fw, "intel/unlocker.sfi", &hdev-=
+>dev);
+> +       if (err) {
+> +               bt_dev_dbg(hdev, "intel/unlocker.sfi not present (%d), sk=
+ipping unlocker load",
+> +                          err);
+> +               return 0;
+> +       }
+> +       release_firmware(fw);
+> +
+> +       data->unlocker =3D true;
+> +       err =3D btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
+> +       if (err) {
+> +               bt_dev_err(hdev, "Failed to load intel/unlocker.sfi (%d)"=
+, err);
+> +               data->unlocker =3D false;
+> +       }
+> +       return err;
+> +}
+> +
+>  int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>                                  struct intel_version_tlv *ver)
+>  {
+> @@ -3496,6 +3546,8 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hd=
+ev,
+>         char ddcname[64];
+>         int err;
+>         struct intel_version_tlv new_ver;
+> +       struct btintel_data *data =3D hci_get_priv(hdev);
+> +       u8 hw_variant =3D INTEL_HW_VARIANT(ver->cnvi_bt);
+>
+>         bt_dev_dbg(hdev, "");
+>
+> @@ -3514,6 +3566,31 @@ int btintel_bootloader_setup_tlv(struct hci_dev *h=
+dev,
+>
+>         btintel_set_flag(hdev, INTEL_BOOTLOADER);
+>
+> +       data->unlocker =3D false;
+> +
+> +       /* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak=
+):
+> +        * Boot ROM -> unlocker.sfi -> IML -> OPFW
+> +        *
+> +        * Skip the unlocker check when the controller is already running
+> +        * operational firmware (can happen on USB); the unlocker flow is
+> +        * only meaningful from the bootloader stage.
+> +        */
+> +       if (ver->img_type !=3D BTINTEL_IMG_OP &&
+> +           ver->api_lock && ver->unlock_policy =3D=3D 0) {
+> +               switch (hw_variant) {
+> +               case BTINTEL_HWID_BZRI:
+> +               case BTINTEL_HWID_BZRIW:
+> +               case BTINTEL_HWID_BZRU:
+> +               case BTINTEL_HWID_GAP:
+> +                       err =3D btintel_try_load_unlocker(hdev, ver);
+> +                       if (err)
+> +                               return err;
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +       }
+> +
+>         err =3D btintel_prepare_fw_download_tlv(hdev, ver, &boot_param);
+>         if (err)
+>                 return err;
+> @@ -3537,8 +3614,19 @@ int btintel_bootloader_setup_tlv(struct hci_dev *h=
+dev,
+>                 return err;
+>         }
+>
+> -       /* If image type returned is BTINTEL_IMG_IML, then controller sup=
+ports
+> -        * intermediate loader image
+> +       /* New unlocker flow (Scorpius Peak onwards):
+> +        * Boot ROM -> IML -> unlocker.sfi -> OPFW
+> +        */
+> +       if (hw_variant >=3D BTINTEL_HWID_SCP &&
+> +           ver->api_lock && ver->unlock_policy =3D=3D 1) {
+> +               err =3D btintel_try_load_unlocker(hdev, ver);
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+> +       /* Transition to Operational Firmware
+> +        * If image type returned is BTINTEL_IMG_IML, then controller sup=
+ports
+> +        * intermediate loader image.
+>          */
+>         if (ver->img_type =3D=3D BTINTEL_IMG_IML) {
+>                 err =3D btintel_prepare_fw_download_tlv(hdev, ver, &boot_=
+param);
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index ff7c1d623007..9526acf65959 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -43,6 +43,8 @@ enum {
+>         INTEL_TLV_OTP_BDADDR,
+>         INTEL_TLV_UNLOCKED_STATE,
+>         INTEL_TLV_GIT_SHA1,
+> +       INTEL_TLV_UNLOCK_POLICY =3D 0x3c,
+> +       INTEL_TLV_PLATFORM_ID =3D 0x3d,
+>         INTEL_TLV_FW_ID =3D 0x50
+>  };
+>
+> @@ -108,6 +110,8 @@ struct intel_version_tlv {
+>         u32     git_sha1;
+>         u8      fw_id[BTINTEL_FWID_MAXLEN];
+>         bdaddr_t otp_bd_addr;
+> +       u8      unlock_policy;
+> +       u8      platform_id[6];
+>  };
+>
+>  struct intel_version {
+> @@ -261,6 +265,7 @@ struct btintel_data {
+>         DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+>         int (*acpi_reset_method)(struct hci_dev *hdev);
+>         u32 cnvi_bt;
+> +       bool    unlocker;
+>  };
+>
+>  #define btintel_set_flag(hdev, nr)                                     \
+> --
+> 2.54.0
 
-With the disable_esco parameter of sco.c, a SCO_LINK connection can get
-an eSCO link, which it does not take: its connect times out and the link
-stays up until the ACL drops. That is not changed here, and such a link
-is not disconnected while a SCO_LINK connection waits for its link.
+Sashiko found a couple of problems:
 
-Link: https://github.com/bluez/bluez/issues/2562
-Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
-Assisted-by: LLM
-Signed-off-by: Hitalo Souza <enghitalo@gmail.com>
----
- net/bluetooth/hci_event.c | 61 +++++++++++++++++++++++++++++++++++----
- net/bluetooth/hci_sync.c  |  8 +++++
- 2 files changed, 64 insertions(+), 5 deletions(-)
+https://sashiko.dev/#/patchset/20261007124721.2521956-1-kiran.k%40intel.com
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cbe53e19e..102a0a4d1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3217,6 +3217,27 @@ static int hci_read_enc_key_size(struct hci_dev *hdev, struct hci_conn *conn)
- 	return hci_send_cmd(hdev, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
- }
- 
-+/* A SCO/eSCO link that completes with no connection to take it, e.g.
-+ * because its setup was abandoned while pending, must be disconnected:
-+ * otherwise it stays up in the controller, which then rejects every further
-+ * setup for the device.
-+ */
-+static void hci_sco_disconnect_orphan(struct hci_dev *hdev, __le16 handle)
-+{
-+	struct hci_cp_disconnect cp;
-+	u16 h = __le16_to_cpu(handle);
-+
-+	/* Never for an invalid handle or one that a connection uses */
-+	if (h > HCI_CONN_HANDLE_MAX || hci_conn_hash_lookup_handle(hdev, h))
-+		return;
-+
-+	bt_dev_dbg(hdev, "handle 0x%4.4x", h);
-+
-+	cp.handle = handle;
-+	cp.reason = HCI_ERROR_REMOTE_USER_TERM;
-+	hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
-+}
-+
- static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 				  struct sk_buff *skb)
- {
-@@ -3273,8 +3294,10 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- 			conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK,
- 						       &ev->bdaddr);
--			if (!conn)
-+			if (!conn) {
-+				hci_sco_disconnect_orphan(hdev, ev->handle);
- 				goto unlock;
-+			}
- 
- 			conn->type = SCO_LINK;
- 		}
-@@ -3293,8 +3316,12 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	if (!status) {
- 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
--		if (status)
-+		if (status) {
-+			/* e.g. it is being aborted: the link is not taken */
-+			if (ev->link_type == SCO_LINK)
-+				hci_sco_disconnect_orphan(hdev, ev->handle);
- 			goto done;
-+		}
- 
- 		if (conn->type == ACL_LINK) {
- 			conn->state = BT_CONFIG;
-@@ -5178,8 +5205,18 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
- 	if (!conn) {
--		if (ev->link_type == ESCO_LINK)
--			goto unlock;
-+		if (ev->link_type == ESCO_LINK) {
-+			/* A SCO_LINK connection still waiting for its link can
-+			 * get an eSCO one, see disable_esco in sco.c. It does
-+			 * not take it, as before, and the link is left alone.
-+			 */
-+			conn = hci_conn_hash_lookup_ba(hdev, SCO_LINK,
-+						       &ev->bdaddr);
-+			if (conn && HCI_CONN_HANDLE_UNSET(conn->handle))
-+				goto unlock;
-+
-+			goto orphan;
-+		}
- 
- 		/* When the link type in the event indicates SCO connection
- 		 * and lookup of the connection object fails, then check
-@@ -5192,7 +5229,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 		 */
- 		conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
- 		if (!conn)
--			goto unlock;
-+			goto orphan;
- 	}
- 
- 	/* The HCI_Synchronous_Connection_Complete event is only sent once per connection.
-@@ -5202,6 +5239,13 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	 * whether the connection is already set up.
- 	 */
- 	if (!HCI_CONN_HANDLE_UNSET(conn->handle)) {
-+		/* Another link for a connection that is already up, e.g. its
-+		 * own setup completing after it took over an abandoned one,
-+		 * has no connection waiting for it either.
-+		 */
-+		if (__le16_to_cpu(ev->handle) != conn->handle)
-+			goto orphan;
-+
- 		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete event for existing connection");
- 		goto unlock;
- 	}
-@@ -5210,6 +5254,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	case 0x00:
- 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
- 		if (status) {
-+			/* e.g. it is being aborted: the link is not taken */
-+			hci_sco_disconnect_orphan(hdev, ev->handle);
- 			conn->state = BT_CLOSED;
- 			break;
- 		}
-@@ -5260,6 +5306,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	hci_connect_cfm(conn, status);
- 	if (status)
- 		hci_conn_del(conn);
-+	goto unlock;
-+
-+orphan:
-+	if (!status)
-+		hci_sco_disconnect_orphan(hdev, ev->handle);
- 
- unlock:
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9eca6757d..4e1c72fd2 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5940,6 +5940,14 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 		return 0;
- 	}
- 
-+	if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+		/* There is no command to cancel a pending SCO/eSCO setup. If
-+		 * the link completes anyway, it is disconnected then, unless
-+		 * a new connection to the device takes it.
-+		 */
-+		return 0;
-+	}
-+
- 	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
- 		return 0;
- 
--- 
-2.55.0
-
+--=20
+Luiz Augusto von Dentz
