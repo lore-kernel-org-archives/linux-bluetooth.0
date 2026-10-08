@@ -1,73 +1,117 @@
-Received: from out-33.smtp.github.com (out-33.smtp.github.com [192.30.252.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECFC35FF6C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 21:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5745E3939DB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 21:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791495835; cv=none; b=GPVZf4niwBX4fk+RTXvqQtB3iltIRiefASmnTQGsnFG8hRZjKmBDVXuaJA4CUIBBk/NWBdZ8cZsH73muhr5Ab9o+7Ihfjcw44Qf62TwrROoMVUijJS4Mbr+TIoCe4yEpR57/403T24ZJ/yi5VG3o585pqqINGHUQfTrXa7w/3eU=
+	t=1791496687; cv=none; b=nGardfnCZdB5R7vpBxiWwY1lXCEp53TLXU9mhTaAsYEB0lgjnaxTcx6kNZByKosPpeYP2ElJWaKr4apHPAa2kMjA9OphWC8HlfQTqF7Kz5ceVNAmoBFpj4CwadhSTYAtMFkKKK1m1mjr/KbB+Oi3nlqg30ELnO0LjGNE3HynB6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791495835; c=relaxed/simple;
-	bh=g8JypmdCyR4TTMIs2TOZf9Mxyl+KnDQgvZwdAjfBtqg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jbWNg7GOokhGmi4Ggt+/ilseHVo0QzyLft8xR3LoaAG1yeEsTqqVK8s5RbyUD0VLc1gNoAn8hJG/0seDclZeQUlIiY9Ri6i3d2tON98epUwY4h/kJ6Vz5SWRnyGm0WRWS+FZrB1E0XFDMEikYyjwMxbegaY9da+OC9p9ux3vy1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=KUtFsM3U; arc=none smtp.client-ip=192.30.252.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1791496687; c=relaxed/simple;
+	bh=uteNMRU9ob2QXhmU/w6rpKMBnXBjUIP/xvPz40+lxTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sTMkIQel9BufghaNSN5sRt5EthzOwHR7yEtHpuToRUTmW6k6lsRFhiAf73TY0ptPo8LrDx7P0Ov0G9thmnC+ngUg4RddnGmVq4n/4W8f3zwO8BvdMtgMxJEHqJ1iPR21CWsl7zffOZ+oMrhZrPkHtJsEhrN0B7cAX6zfj67iszU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZ8q5KUv; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="KUtFsM3U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791495833;
-	bh=6b23OWgff9btp1DDmffhrAdO2Bze8c8EZIIgcrW6l4I=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KUtFsM3U3AsudlhH61OUfO6PcRmi//SZ+U2jgkmwIzucDj0VHJwMRkGoc/WGdcLA6
-	 0JawY6FjTTH3JLodkMBw5XcvPZkrAKS1O2vpSJpz/aE9zhonTCpvGjYfp0W3MtpxRI
-	 v9fPLyAFP1B0L7HmDkvwbynWPbPWyGP4eleZoJChTLyTvUKFhRCV+b2nLXDMb8H+7W
-	 xnioZhWztzzgPezc5roq/SW67rvjmFJ/Ni+E9fpTQKEjDXOmM6vtMKz3I8i9414HZw
-	 8io1OAKchVUxMgn1nqDQYoh8sn9goT/JYiw1z1yTQRafn1GKnoQofxy2sb+NWLSIvb
-	 pMQV6Fa4dJcaw==
-Received: from github.com (hubbernetes-node-f46095d.ac4-iad.github.net [10.52.85.59])
-	by smtp.github.com (Postfix) with ESMTPA id 707D5741208
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 14:43:53 -0700 (PDT)
-Date: Thu, 08 Oct 2026 14:43:53 -0700
-From: GBerfield <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZ8q5KUv"
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-34e23e22666so155457eec.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Oct 2026 14:58:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791496685; x=1792101485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=OQs3bifwvpfzlIeed93Eu+mJNqw4FFjUGKmo6hag/3Y=;
+        b=kZ8q5KUvX/Iqqds+3IzVTB8ysMyt3b1ySKFVToN9xcm7jXQeP6B6WTzmTNkD9wKUHd
+         sc5W28kLTdt9A1GvJ24sJ5+KQ691k4YNV8n/dkz4lk5C/kp94WJrq1tUgLIBVcI1hgCN
+         ErXty9yWQ7Jl7NfXQanG7LBwdBMJFO4gsk4IB5yIBkfX+suUwOhf9ncYdxhtrJjrfXin
+         22tzNuO9pLV+hjEa+KxrIrrGZqcSHrFeYWGSycrVYkC7x8mPpXWe6d1U3MBCO4u3g/Kk
+         7An9AmArnHb1u3/rmPehUkxGq+VoJoXk3DuOX7KHRmtFhPWRkGIn1RWu4R5PQ0FcETfK
+         n62Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791496685; x=1792101485;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=OQs3bifwvpfzlIeed93Eu+mJNqw4FFjUGKmo6hag/3Y=;
+        b=TWjlV9SZ2DW1JNSX9aLuwb9mdbpWf/lRuzuv9HvSnU5rkrcmx7GvqFS2bWcokQmQc0
+         oEhEWcKoEpas7yT+ZUamk9WWLF6T/BSlEgqbuy+jYdPdqGD/B92KHmk59vhtBSudFtIz
+         XF8f5lEcea1iArFfI79vlzJ2IdHRB+96NgZpSscbzK9yXlC6Qs5RngkYAHLGWSGPxgmg
+         puHlH/HHvMAG8a5N1tSk6VdOxuTQWHei9MV8bYcdiBhUmVlAoM7EaVhCrTgwY4Tgaje9
+         IVi+WPQB/wVUPm1gsnI1N3UZfU/V9nf89kImzCUrS9gaaOj2oCMmBIriu4Y9w7qv8NaJ
+         Lubg==
+X-Gm-Message-State: AFuF++mC/qS7pcfqsoviYo4v9NTqbA6h1ZbiUgZtA3M/LlCkUAUrfav5
+	3bz0xWJ1OLIzEaz6BlLl2K2NIxYxTYwkDFRlyb9WrzKV4drbgLitppSsmXAnyxmNZWs=
+X-Gm-Gg: AYBFou1cZCe2VJOTrjs6iYdpP2ThFiQeBKyYcu3FKNT8Davd2pgzjETlkP9hHyYDore
+	RKupO+574jqdefNRMzQFgv+UNgrbnRb2jqn2Llsjqr0fBV3ZufKIqSf4D2QDBEdqEQMykLDBV2r
+	C52TECiI/oEvVwGJySoRYNM6Y53SZUsggv+/rNaIVTfszPltxepnonJC0ZkAEcEYvVwqw5lA+sV
+	FjR5jpyJQHfQbD+KnPIGYq4XiCr9ii/ZjHvFgc9QxeC6saBpV9D//+Vdsz2qwUJuMpGVYVYuAM7
+	u8sKCvUZVf3hOE6TRBVbv0UGgEghQIRebWokt9ZRphYqybFkHLRABNvaD2Xt5k9xvynchnHTZ8q
+	V55QnPB8qdnrbkSyEP+DE9R6fSvK/gYjsD5b/6GBS8CLqxynJjB/yQUXbB8r0Vvu0B7GHyOHfYv
+	BevlZK0E55SF5QQsYTbFuHtqmfDL+Lx2BgMGFPZ5H3fh39BT2hv0IUezMSfCWucFUueUWIk9D4Z
+	ugQto3wchvF1a0nL1WJ18164qc2aPiaToXzyPKJ
+X-Received: by 2002:a05:701b:42d3:10b0:14c:f3ae:c1a1 with SMTP id a92af1059eb24-1657b80bf6emr7155071c88.0.1791496684938;
+        Thu, 08 Oct 2026 14:58:04 -0700 (PDT)
+Received: from hitalo (208-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.208])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a1dd5cb5sm899823c88.6.2026.10.08.14.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2026 14:58:04 -0700 (PDT)
+From: Hitalo Souza <enghitalo@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1181803/000000-05c12b@github.com>
-Subject: [bluez/bluez] 05c12b: client: Handle system bus connection failures
+Cc: luiz.dentz@gmail.com,
+	Hitalo Souza <enghitalo@gmail.com>
+Subject: [PATCH BlueZ 0/2] Test links completing after their connection was aborted
+Date: Thu,  8 Oct 2026 17:57:54 -0400
+Message-ID: <20261008215756.2710812-1-enghitalo@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1181803
-  Home:   https://github.com/bluez/bluez
-  Commit: 05c12ba57bca7619df37922b23deeeef31a7a039
-      https://github.com/bluez/bluez/commit/05c12ba57bca7619df37922b23deeeef31a7a039
-  Author: Gabriel Berfield <gabriel.berfield@gmail.com>
-  Date:   2026-10-08 (Thu, 08 Oct 2026)
+Luiz asked for tests that abort a connection while its connection
+complete event is pending [1], for the kernel series "Bluetooth: Fix
+SCO setup failures after an abandoned setup" [2]. These close the
+socket while the emulator holds that event, by sleeping in the event
+hook as hook_delay_evt() does, so that the kernel aborts the connection
+before the link comes up. They expect the kernel to disconnect the
+link, which no connection takes:
 
-  Changed paths:
-    M client/main.c
+  eSCO CVSD - Close Before Complete
+  L2CAP BR/EDR Client - Close Before Complete
+  L2CAP LE Client - Close Before Complete
 
-  Log Message:
-  -----------
-  client: Handle system bus connection failures
+Results in a QEMU VM on bluetooth-next (c85976511aa9), without and with
+v2 of the series:
 
-Report the system-bus connection error and exit before attaching the
-object manager when the connection is unavailable. This avoids a libdbus
-assertion abort in restricted environments and releases the initialized
-shell state on failure.
+                       without    with v2
+  sco-tester (31)      30 pass    31 pass
+  l2cap-tester (113)   111 pass   113 pass
 
-Fixes: 8a05f2b1ac91 ("client: Add initial parts for the command line client")
-Link: https://github.com/bluez/bluez/issues/2446
-Assisted-by: Codex:GPT-6
+Without the series the three new tests time out, and btmon shows no
+Disconnect for the link. Repeated 20 times each with the CPUs loaded,
+they passed every time with v2 and timed out every time without it.
 
+The incoming case of patch 5 of v2, a connection aborted after it was
+accepted, is not covered: the emulator answers Create Connection Cancel
+only after it sends the held Connection Complete, so the connection is
+still there when its link completes, which is the case of patch 3.
+iso-tester is unchanged, as the series does not touch CIS or BIS.
 
+[1] https://lore.kernel.org/linux-bluetooth/CABBYNZK9Oy2iL5PosxRy1KPup0PgYDfPUxeHemjYjKyAUu4+=Q@mail.gmail.com/
+[2] https://lore.kernel.org/linux-bluetooth/20261008151238.2138665-1-enghitalo@gmail.com/
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Hitalo Souza (2):
+  tools/sco-tester: Add test closing the socket before the link is up
+  tools/l2cap-tester: Add tests closing the socket before the link is up
+
+ tools/l2cap-tester.c | 107 +++++++++++++++++++++++++++++++++++++++++++
+ tools/sco-tester.c   |  45 ++++++++++++++++++
+ 2 files changed, 152 insertions(+)
+
+-- 
+2.55.0
+
