@@ -1,154 +1,150 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC882931F4
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 03:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5B8175A95
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 04:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791430869; cv=none; b=auJ6LdGgNuXn78oERlvGqN3LsPcACayP1d0uqqZKJmDUNiSUQwVA5l7hIvMPl1xHwmRDEXTAOUhO7OzX9dzE0AWOUrLaDHE+K44TIWFfcj2da4I/wXNTtUlF295YbQNYTKA1bCwIoPtwC9fgBkmdc5Czjx17CIYCDuq64JuKCX0=
+	t=1791432114; cv=none; b=TkC8bhfLFLRRctLWFfXu643o25sE97ym+cfcj7QaL8INL9Z6vdeJvx7NAE/9t91nSIZL3+kJ5Y4TsjTJxeMvTbIIeLiUA/rAg1btmyt+oQhBhBmuqbKhXVdF/45qPHVLlw/yKYYXDDbiScGtuHT4VkPBOL1qkbklXdV00vf4aaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791430869; c=relaxed/simple;
-	bh=dKREz0BI7YLkafZWKbhGzx6A0RFItAzlw6QsfIV9e/g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hOq4n0eUkZrj3CTSqvTVQeS6IWXMgK8mDxnCcuw4ZFQlrq3b9XxqDwVKCz6aFww0cV6cN6MyoIUn0zRQH6EHtEDwhOIrW86zgNd9Ch8nSZHA4V7GpYA2RF8M6urWW3pZAsZ8Q7a1p+igGNPqVwITpLJHfUjaw4tc9HoSOeqIKYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XYtkoV6T; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1791432114; c=relaxed/simple;
+	bh=HWGlhnjAsKdJcawkVeuPvrsKBkaz2dTusqjN5Q+J2tE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rsn3s6PapKXsl4kVibo1WHDwTAeNBvku3bUY95jOwWUvUr98ulC9moUoStalVxuPyYIFAH38wvBT9Rn7aZCdrK9bMYCSkMyBYijNOeTYJ+pLZy1j2BV0IrDw7myGD5ApbgF1/sSNDRaA7JlHcJWHPb6NPEtTelTiVeCX1Ax/Ak8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts9Piag5; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XYtkoV6T"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-49fd4e9e1f6so466635e9.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 20:41:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts9Piag5"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc4e9e56e9aso1288878a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 21:01:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791430864; x=1792035664; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=y4rRgcr7K1sNtI7BtbsTT4OJRNyKHOotv9tUjEAu5b4=;
-        b=XYtkoV6T/QbSSPkPPMHB+LKEs3ruMmbFa6cQB4fRLb80rQ98liP+Mi/k4Ji19ohJpC
-         6pwmOiVrY8nfCcwUQgF+q9ApeDQn9FbQ+c5rQ6eIkSnAxFHYwx3EuEmfrhG7FdRsnvKv
-         R3qFCNAKOyuKnlsXh7/0z9WiO4SJe43dv5tcBA/hQoR1gpM/HAWLQPl8kpXxWwucVU0P
-         9GlXL4PiwheNEn8XqLqki+3aLwhGy5m3khqPI/Cp0rrBGMPy3FR0Np4exauk6QMvNN2q
-         fO3SPlTg+NsAkw9mzoi9GdYP6zVLHRefUhoPYR+gveStAcDdXoFPFO0iXLQ+r149w0Os
-         hTLg==
+        d=gmail.com; s=20251104; t=1791432112; x=1792036912; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rHUntJAA/mwo/FHuh8v4le2k0YfNGeacRBz3GsN1kMw=;
+        b=Ts9Piag5xkkTz/RebI0HKYBI93yR5LQqs/UcuKYKQc8WT/UO7YBcryHjFgkEF5vneV
+         ZhpGq7We16DJsWq5KNjWoPX6bLD7d2Z/kz7lWLp0kGFqBJ0OBMfhmiNfCUxfdF+BAne5
+         apWlaX0bYrYqM2diHjkWe4XPB599bNVzPdTAgLVyIFH3cuxyJve/ctwQJ6sGfMiikwz4
+         S3gmxfRw/kWz03aSIkzg35a4ra9zbzfAAnRBGM4xyMPYFdMmGHuYyE4EygOCkFUjuc/F
+         qpgnBryJ+g59ZkY744uI5s66wLqOQVzPxvQh5ud7ixi86juljOTAsGEkmmQMEexzfCPC
+         YGlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791430864; x=1792035664;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=y4rRgcr7K1sNtI7BtbsTT4OJRNyKHOotv9tUjEAu5b4=;
-        b=nyr9oqq3GwrtAggjJQN97px8EiWX4wMG7DHbKYQKzUF55qpbZGb2t6spcoHpU36/zE
-         vFaRJsDSWoi4BFNt2o2GslcCGOvODZbLUTQotv8f8UgP5ki79v96WkX2Ons81c7C296c
-         PO3lcQvxLIpbRG1nsRWbms9Sev5R5V/DoTiuOgbAy0eP6Q8C9LaAOWUia6SORWcwiH2Y
-         M4SczC9rIs3qPa5Lb143l0aO2UEwIdLrAREyu6vPk8qOoI5/NfpY4u1FI4H2KQTAmBwo
-         sn6+cG3Hn0uGdb79AxKqMSy4fz7z3D+Fm4elvblbsF3Z8hFjc33zjetdIW6mgGgS+8hF
-         RX3A==
-X-Gm-Message-State: AFq9FYKoOHNd2K0ZpIK5COG95pC4W1we5zKKdjte2OOl3DmfdWpSR/MS
-	m2e5lt+J94vKeXiUlFUzotiGKhCwz+qvdSGAPcVP7WAmmDCNG3+NqaphetzBZ/Arj+o=
-X-Gm-Gg: AYBFou09b2U4cLq48PVdLb2VXTMcCkzZO6DsnmWcdYCJ1ZZOxRDpM9vxafZxLIKUhV8
-	rNuLJ2uGlUI49+MunNxVgJpn8Nmay6loQ33QZyxpdGSK9wYd+kDYSvDlx7VY64CUGUztmwdtVl4
-	mDR3ewKnetX6ccFVwH1gK+zqufcb+qSqsDdC3Y3SExF02s5wd/GYKANEPl52SCSiyKXBtFOebC+
-	cax4XOPE7bUhoJt3zAioyEItmMVu9MSED7M6y6cNr7vbwrAvp/KFuh0tGy2jM2NbiPzTnYJzi+Q
-	tMFTl2wZQEOHHdlAWQccBNLNoqft8s82Im2fWnjN9gV7quFR+yz+zJEnvPGMOM+3u2qJ5xA+MpQ
-	JRNjGBKXQbFFouelI4C7FPLGWdXCIjubr6X3ceWJ/w0vTuN5kRWOwjBBkIzRDbV1sd7gl1VAvQ9
-	m2RpiM62AzcxVH0m8C5aOZvYdV9+mfRd4zaXIebHvhnUZz/yeDDUgZhDprkRz7mNCPy5qAfgPwE
-	r0knoTanEn6KLD525VjSt2lrRzR80sVGN6CuRpvyoMuMnJDW6GwTbSoCAX/WBrejw==
-X-Received: by 2002:a05:6000:2002:b0:48c:6611:82 with SMTP id ffacd0b85a97d-48c7e21f07cmr2075756f8f.1.1791430863843;
-        Wed, 07 Oct 2026 20:41:03 -0700 (PDT)
-Received: from localhost.localdomain ([194.36.104.180])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48c71d1f3f7sm8423010f8f.32.2026.10.07.20.41.03
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20260707; t=1791432112; x=1792036912;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=rHUntJAA/mwo/FHuh8v4le2k0YfNGeacRBz3GsN1kMw=;
+        b=NDk87vfwwtxbp3fj2CiAjDN/cKciMsXWmJHwKvSqYThG0sCvJbJ5hzVZQbGgOjC6nq
+         +aBNSpMZmmjsH5hdKbGQL64HBqSTeM8/8ijuyZZ5irnc+00mCkTIziIkdjVJJ8ilxBaa
+         hYgqrkG2rSK3Az4uU8zsQkQx4JhTX6SOPuuC/Fi2/XlZPkQhA+dVZhe6E2Jr8vWLkeIC
+         0G9JT2IVoN1SatuL+my/4+RE1i3syUgDj19qKrr2+67TVZ2+zOWNupttbvJAoUrXK9fu
+         8vYdmzYKxvkALNXeJZQYW4HnebOMkJeHRql8IDy7TbtiBfsUs03KKYmE9X9WH5YbPuqc
+         C6aQ==
+X-Gm-Message-State: AFq9FYJDimrw1b7EO8m1xXTIWftztlbHyGtB5SC9U56aGVLDvq27+zM+
+	00Hsa1EMB07ZUslRLyDw3k2964oKt45NlK1UdjHer6ZpClhavzE3CH6R
+X-Gm-Gg: AYBFou0t5onSTFf5b0aKyYSzRZGaMEfG2VspU8WHC4n8C2bDLjyZL+qORcAvb98vXKa
+	DrKGs+0nwQug+nPN2+QCYv1N3bf3xFfVdQD5RIMgSo6JCn1cu/CjwiL48r56dd0vOWn59aPbXcR
+	cR+6G1+wYd6Ff21nMw6QVcaIkKQneSJONkg8Xki7wL3VoLrO/t6RNZbC6Ou9qbv+r93oNd5ygYQ
+	r/A5qpbxwzMg3VYX0pE/41f9DifSht79Sch8tbD9uQKvFjhNA05Psuq0ongEWbhjSH2xQEnIbwg
+	YR5ZvjPTNZSpU2TeLeCZ+CQmtpJ725TXlgR+EIpwQbjTdSjdB0MU5aR5l+bvMIXR3LY+787icXJ
+	SfIsJOBwjWTyw9AKzoHOo3n9KRCjxx5D6q0zJi+wneDSiF31HX6KqltLExbkuLTsuREtynnM8h0
+	VxoPQbtw/59fEek3TKrJNwPDhgpT1cii62tAnzJE7mvuIq5V94rX4uRFp/7TWtx15jHw==
+X-Received: by 2002:a17:90a:1541:b0:3a8:c0cd:57f8 with SMTP id 98e67ed59e1d1-3a8c0dcd10cmr1695006a91.4.1791432112448;
+        Wed, 07 Oct 2026 21:01:52 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9f1bfbafasm2654738a91.11.2026.10.07.21.01.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 20:41:03 -0700 (PDT)
-From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/mgmt: Fix notify leak in mgmt_unregister()
-Date: Thu,  8 Oct 2026 05:41:01 +0200
-Message-ID: <20261008034102.707451-1-yaroslav.voytovych@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 07 Oct 2026 21:01:52 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	jjzuming@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH] Bluetooth: hci_debugfs: Pin the module for open dut_mode files
+Date: Thu,  8 Oct 2026 12:01:46 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0251-v5-7e4e8154d66ac0e60df2@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-mgmt_unregister() called from a notification callback takes the entry
-off notify_list and marks it removed instead of freeing it.
-process_notify() frees the removed entries still on notify_list once
-the walk is done, so this one is never freed and its destroy callback
-never runs.
+An open dut_mode file retains dut_mode_fops in the debugfs proxy state.
+The table must remain allocated until the final close has finished
+accessing it. However, dut_mode_fops has no owner, so fops_get()
+succeeds without taking a Bluetooth module reference.
 
-If the callback unregisters the next entry rather than its own, this
-is also a use-after-free: queue_foreach() has already saved that
-entry's queue node, and queue_remove_if() frees it. That is the crash
-fixed for mgmt_unregister_index() by commit 872729a91632
-("shared/mgmt: Fix crash when removing index"), still present in
-mgmt_unregister().
+With CONFIG_BT=m and Bluetooth debugfs enabled, a descriptor can remain
+open across controller removal and module unload if all other module
+references have been dropped. After hci_debugfs_create_basic() publishes
+the file, the following order is possible:
 
-Leave the entry on the list while notifying, as mgmt_unregister_index()
-and mgmt_unregister_all() do, and let process_notify() free it.
-Unregistering an entry that is already marked removed now returns
-false, since it is no longer registered; for an entry marked by
-mgmt_unregister_index() or mgmt_unregister_all(), mgmt_unregister()
-used to return true, take it off the list and leak it. No caller
-checks the return value.
+    File holder                     Controller/module teardown
+    -----------                     --------------------------
+    open dut_mode
+      full_proxy_open_regular()
+      fops_get(): owner == NULL
+      debugfs_file_put()
+    keep descriptor open            hci_unregister_dev()
+                                    hci_release_dev()
+                                      debugfs_remove_recursive()
+                                    delete_module()
+                                      bt_exit()
+                                      free_module()
+    close descriptor after unload
+      full_proxy_release()
+        read real_fops->release
 
-mgmt-tester, mesh-tester and userchan-tester unregister from event
-callbacks, and under ASan each reports these entries as leaked, for
-example userchan-tester:
+Debugfs removal drains active callbacks, but an idle open descriptor is
+not an active user. Its dentry retains the saved table pointer until
+close. full_proxy_release() then reads the release field, even though
+it is NULL, and fops_put() reads the owner field from freed module
+storage. The close can fault in full_proxy_release(), as shown below.
 
-  Direct leak of 80 byte(s) in 2 object(s) allocated from:
-    #0 in malloc
-    #1 in util_malloc src/shared/util.c:46
-    #2 in mgmt_register src/shared/mgmt.c:974
-    #3 in test_open_success tools/userchan-tester.c:275
+Set the owner of dut_mode_fops to THIS_MODULE, matching the tables
+created by DEFINE_SHOW_ATTRIBUTE in the same file. The existing debugfs
+fops_get()/fops_put() pair then keeps Bluetooth loaded until close has
+finished using the table, preventing normal unload with the file open.
 
-Fixes: 872729a91632 ("shared/mgmt: Fix crash when removing index")
+Oops report as below:
+    BUG: unable to handle page fault for address: fffffbfff8056f03
+    #PF: supervisor read access in kernel mode
+    #PF: error_code(0x0000) - not-present page
+    PGD 1a7ff6067 P4D 1a7ff6067 PUD 1a7ff2067 PMD 100ad6067 PTE 0
+    Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+    Call Trace:
+     <TASK>
+     __fput+0x39f/0xa60
+     fput_close_sync+0xff/0x200
+     ? __pfx_fput_close_sync+0x10/0x10
+     ? dnotify_flush+0x22/0x4b0
+     __x64_sys_close+0x8c/0xf0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Fixes: 4b4148e9acc1 ("Bluetooth: Add support for setting DUT mode")
+Assisted-by: LLM
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+
+Assisted-by: LLM
 ---
- src/shared/mgmt.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index f56bcee14..f5aeecf3f 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -999,18 +999,28 @@ bool mgmt_unregister(struct mgmt *mgmt, unsigned int id)
- 	if (!mgmt || !id)
- 		return false;
- 
--	notify = queue_remove_if(mgmt->notify_list, match_notify_id,
-+	/*
-+	 * While notifying, leave the entry on the list for process_notify()
-+	 * to free once it is done with it.
-+	 */
-+	if (mgmt->in_notify) {
-+		notify = queue_find(mgmt->notify_list, match_notify_id,
- 							UINT_TO_PTR(id));
--	if (!notify)
--		return false;
-+		if (!notify || notify->removed)
-+			return false;
-+
-+		notify->removed = true;
-+		mgmt->need_notify_cleanup = true;
- 
--	if (!mgmt->in_notify) {
--		destroy_notify(notify);
- 		return true;
- 	}
- 
--	notify->removed = true;
--	mgmt->need_notify_cleanup = true;
-+	notify = queue_remove_if(mgmt->notify_list, match_notify_id,
-+							UINT_TO_PTR(id));
-+	if (!notify)
-+		return false;
-+
-+	destroy_notify(notify);
- 
- 	return true;
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 2559fb6324d63d5fc84d530d2a19f2602ac06d3d..f17b5c960522cb22140322e4781775e4e2f6b711 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -1315,6 +1315,7 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
  }
-
-base-commit: d84171e6cd68a5ab95d0f3a384279c36bd108a13
--- 
-2.43.0
-
+ 
+ static const struct file_operations dut_mode_fops = {
++	.owner		= THIS_MODULE,
+ 	.open		= simple_open,
+ 	.read		= dut_mode_read,
+ 	.write		= dut_mode_write,
