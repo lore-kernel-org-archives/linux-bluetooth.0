@@ -1,133 +1,157 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6973328FD
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 14:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791469059; cv=none; b=mgcFERa5dcYhzoaZ77gXCtpuTz14yI7U76JBWDqniJRZVbmadTmVBcM8dzYSNgwBRBTCmJZ+QryMLevuj0BtiluJvvKChTPTVQP0JGiJ8TTeudowyCdJb5vhZQZUhlmCzV0EqGpuT/t8capFNyfg/72dml3ydsJ2kTjRI4NrZmU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791469059; c=relaxed/simple;
-	bh=rz+W2qWJAfAIWcKPZy9Q9ZEQ6tfB1EPzY+y2C9ewF4E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tKlp9c6Ma4yVEhx2C1KIh8nzdaXlTP4KocSDJ5OkXk0fLwPnCFFEqBccRNvgvVMjW5WqJkRQ6agaofU5egBqkehvog/z7XYdK6yZR6E+m7veI18wwSTusKll8hzqsHoRcPqJT21Vy3TaP89bOuNJlRkwXPnUmPi5151C4OunT40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=ky/w3nNy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=sOCbkAfE; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC523822A1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 14:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791470259; cv=pass; b=lOz6N384npidWrMPzX4PTpYlXK+j78d/fTPJu63qC6Q/MNnfC8cgYmEFJcdpnlsh+jslrVLHJyWT9j5o4hF/OvANks89sWULvA9PvYs+3GrfK5eBsfXYmfkejbC+tAc9Gqi1qkNJHhb7A0TUPeITTlB9SpJ1O+iWj+jp02iBw/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791470259; c=relaxed/simple;
+	bh=ysGe+DtigBhyFYc2jr6TG5beed0A3eRJIFdp036iw3Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OIp0OAa1C6jDJyFwiEQmxd1CzhEExdhDwLa5Lhivb3BeH9nfNLsrqdbW8SNoQ3Vs4r4YowWqmH+SfEyDpjTY/jNZUk32T1ZeHyXlKKBNguQPg6Yr/jhP4SVMFhf33cVWDngyExRtW3oM1qqkq8SIPt6rCadvJ/WxHmUogBUb7JA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GstEYvR7; arc=pass smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="ky/w3nNy";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="sOCbkAfE"
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id 33BDB1D000B5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 10:17:37 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Thu, 08 Oct 2026 10:17:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm1; t=1791469056; x=1791555456; bh=7s1NMy4MN7MdTqNfUXuv5
-	JXwf/6IrBCQeGvi8CTDpDU=; b=ky/w3nNyf2DZwRKKyTI6pg+z5jTRgqlnwq76H
-	G3nU7xYcMsVhdj343wUEC3shzmqZ8t+PFhRuPS+nuiMuNvHu08gfuVYGokirh3wg
-	PlbS/geStXzIyEPSDVKVz7MW8gT85/VTv8aHwheQDK+I/LXZHY2UoD1FGJFC4oIf
-	LHf+SIvEqj0hRL9zuOPfDITFMNYFx+kTksx4jT3M7Sg6L7+S9ooKBngaMTKroXbW
-	vEBvBqY9vN9dz90eAdbXaK/1BGkjiWnDbBkXLGKrTPO8gtsV0TZCOwMmTmpCB8YV
-	pLAQVwGvr9Khn+5nDU0r/AZkPBzO3EjNN/FZ+yN7xxHMP61fA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1791469056; x=1791555456; bh=7s1NMy4MN7MdTqNfUXuv5JXwf/6IrBCQeGv
-	i8CTDpDU=; b=sOCbkAfEeCGVAPh1Adaqu4y6cDI+UTFnUfI+xSZ53O6Td2YzyIV
-	K60CURHnBefPrmnxr8vAtbu4My7XxLMDG5o06n/Sj+vcFzw1cycYq193TFep/gUX
-	SIbxBov7n6VNv3CI14s/DvIHmU9K9t5Y7j7M3ZCaUuyIw9lyhW9Ya/r/TBZCjye/
-	SajMrEv8fc0cjSG8iWX7LNwTWvUgcnOpnOIV2QWaX+qd/lcLMuSrT4AwJX5dvn/a
-	5BtF9dZpVLxjy7BvP6f779qVhoSNYgObSpujeCAnRMCL/8U6V1O2AMsv8pXvNnBx
-	x7dtAjY+H7a4n2b5vXYh0J+TjBR1og0L2Nw==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
-	action=sign d=fourdim.xyz a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1791469056; d=fourdim.xyz;
-	mf=PG9zc0Bmb3VyZGltLnh5ej4=;
-	rt=PGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+;
-	s=fm1:rsa-sha256:AzyZhlQ+w9+IxK5btFpDL76y2GFpnpgDBuRfSjxTbGlqnm5
-	g7ub6FM++/B7kOpYCBlPNzvHYgiiCpCLNuzpxoxFM0X5O+y8Xc7/Ml9wbDAlvJ6B
-	6aTe/ACLdif6nuMGznVvZiz3XKv/Kj0tbXyVFp5DsmVmg3RNyIGvFY/92zQARxms
-	1THWd6eeWAtupupUqLP4dGXIB/qDRES1GhtAeMtRuTfYTrOT2+6Term8u+u2wtxp
-	0IsEafQgjBJHNpYFhes++jc1MTmeO217/A2phDOVTL8h68diz53pbXsS8GSppaN0
-	aOfkuNhXrkLCM0CX/lYAtHkUXpLDAlD7Nz6Ep2A==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-10-04; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:vZV6um0VQKQLLkrE8TNHJVAVk3eu71N5tgQtw9PsAjM=:rz+W2qWJAfAIWcKPZy9Q9ZEQ6tfB1EPzY+y2C9ewF4E=;
-X-ME-Sender: <xms:AKbHane0ohyec5HkSPFN6_gY_O8CSEnWMEocHrY6M7EPy_xxb2VKDA>
-    <xme:AKbHakq476BZbyxxob3m30r4X913DsPoj0tLX9Uc40YfYOusENtaqq3ze1tqXYcOV
-    I0vxwl5OKiI0vZJt1JcqBwJyLzthadhCghYXI5MyK4-9rUcjqbkL4Fz>
-X-ME-Received: <xmr:AKbHat77WSpni8A6dDzcaU_ghpMGu4iHYROB6jXhjiD_IiPmxhffXiKRpO4iRWe2Yu4uOho>
-X-ME-Proxy-Cause: dmFkZTGZ5nuwXcoaGxNAKXkzKvd/xk+Kv7JedPGk1syAZV7xXzfE+gElmkPQhfPOj8ZrSS
-    WTnFuJ9w+tGOtAGhTYq44u/q5/qp9NFEbpyrgoObaQEDZCDJR5WL7+e8B7ukWryL88aWIH
-    gZy7J3ExN8gntngyyxTzR4QaRdIq20Yb2FEgtjxUnJjzVmd76ylY0MNfKIP53jj4MYVrXF
-    y/iDZVsKIRfzcsnSG0ovr/zB2Smud25Tcbh7w2pJJ2jfPuc1mdMArX2aQ7zVPWesoBhAwi
-    cRHqbT3mXCioRVS9lsFSNV/iTgjWyxNHOtiJDJTKgMFKkIkcEBq5KGqowpJ/M91yOx1rUP
-    UJly8SbWE+L1k4jRIwK0TYs/SEMslkXuxpJyPm8mAg0YIVlyOHs8q5fDpeNbcK0AMoYiKU
-    qLnYQVhq/vqsQ/IwNF0ET9DteanUdB3Bw9JZRdeaTYPVocJ8NRi/lsJpfgLkpMidb9d6xf
-    DHWbJBonqR+MW9B0Y8qD43CddRZjMOejOfN5AL8Qp4F8sFmFKEpZWaLmW9dR4h0fSn9uQv
-    /Wk4WT2s9UK7iFkOpY95duydWndXh0xuJ+boSJ0bzCX3EXoD9FV+ZPzw11NwRrwchOiapf
-    x0TeQE6dctzrl3NC13qQSj/VJGwPNizxOKm+piTzyjpvswRNjIZqbXS/C9cw
-X-ME-Proxy: <xmx:AKbHaio1DH4gwnK90TOPo2nunX03egyDI5MnwD1M5oiJ1ft99ab5xA>
-    <xmx:AKbHanjaD3y1ESiQog2cfn9-2VlAL4dmR0CIccmlqV3iWfzGrbdVoQ>
-    <xmx:AKbHakJWOZJjOqTB9-ENZhba0I5Ot7d4NExhj8xhlSrYOJ3NK33M5A>
-    <xmx:AKbHavAPlPRKrQcmHENufhUEyOZYpJKIiJankuqdaF1eGXVbjsLMQQ>
-    <xmx:AKbHagrjUNzBwwmp8KQANx3Py7msYQmmj1RL1MobBKGI3qCs3rw2Wle9>
-Feedback-ID: if72e4b10:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 8 Oct 2026 10:17:36 -0400 (EDT)
-From: Siwei Zhang <oss@fourdim.xyz>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v1] Bluetooth: L2CAP: Reject mode changes on connected channels
-Date: Thu,  8 Oct 2026 10:17:07 -0400
-Message-ID: <20261008141714.95709-1-oss@fourdim.xyz>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GstEYvR7"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4f488ba6e90so1349615b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Oct 2026 07:37:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791470257; cv=none;
+        d=google.com; s=arc-20260327;
+        b=H6qZcmx/emcLv2V1NNLZNViVFJgXbkAJ8Tu31zjdsDHS/uj7822/6SFmVgOImiq1rR
+         KiQHfAfac0qeqgP2iRn3rhhpnLdQ2Dx3bBI5KqZr8IDbbRDa60HYwjqNTFUVD38Z8L8s
+         gFAW+hTEb6uHS5LvQtG0/lvD7PpJMdPk805YyBw85e4jA39+xGHGviRCl9F9Yvz3UrFA
+         JqlkqNGyihYaYm7A7mgkskrN1Ja0iqiBe6E6FUqpf8n4kz8JXoJhRx+cT1BUuLILp/2C
+         2JNcsNm842JA4XP0MdBh5uFTFCKZkk1JMWHe4ezACVt5xYa3BzXml489W0X3u+zoR3g/
+         pvWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JqA+eTaBuUjPdzpeuBirZgkrhbqs7tdFp54xvvq88yc=;
+        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
+        b=NrZdZCoNExwWVuOotKA2dafS5hR9OodZJV4Eg+ReyJ3BPOhUJtPv73cEUM/91ElQzy
+         DGgWvzHiGjfDUORtIO2/fEMboHC1+7TGwiT5AzMx+xmRowwy23H+/i+572HBTm/oUGC8
+         fvACp3ovcgdJ3BU/cMlj0J8b1YYMQkvMrVjRvmvnDUqr7gs7IO5/rvhPyMy9tBOpltvV
+         sScQW7ODtm3gUmTNBiAiIIXO+4H4uQDnGlegyo/HhJNt1040jUY1W0S6U5lA5F5MkmRU
+         wMgNx3ZET40qs/Nkrig95ETF2+2JN++XtjB8qRFVzjZK5cNfcyOLc0zJ5Q9tRpfgSuiF
+         KlCA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791470257; x=1792075057; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JqA+eTaBuUjPdzpeuBirZgkrhbqs7tdFp54xvvq88yc=;
+        b=GstEYvR7ajrV4gu8hAIQj2XwV2rn5wxj8Rss06uyuthbyD+XY34mckbREBP3DCVqT5
+         bPr/WOD2uHJUECNxce2teTn++Jm3Ls4l4fSWcxUrXepLApFjnDgEzLQasOiX9tZAJUzn
+         kw7y3YPBAv3khdwwpeKAaAyBFz2XQT3uERev90lV51qe8MTlK2di9rFw1XmeEwlsq4lM
+         kWY9WcfVErdQ/J7BFb8EHitjl9XWRScd0OSrIE7p47HjsGD6ugzugUKVnMH/4DV7P95x
+         QkuqF5kS3U8qQ6dKLSzwEU6IRc2uPCAO87QZumsLBYqGrHCXf5xCvViAfub88VfUH3t/
+         ME6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791470257; x=1792075057;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JqA+eTaBuUjPdzpeuBirZgkrhbqs7tdFp54xvvq88yc=;
+        b=XyH0FUDHDTeT9h4oigpeCbxTKLoOOdPmLUNFJ3qrW5adoiBeAZWJhqAVv+5003WrQc
+         haiA1PnMxjAmJV0c4Wnw1yZlXtncfnTdbVhQYx0/+hKKRecUz1mEB/VUZ1wfME5WuiQI
+         uq3cuZu749mzfevIDLug23LNlg2aipwGR9oKp6xtveb1OkxF2bsrx4zubvpHuCnT4WwX
+         IfFhpQEznvdHD99vhKg4XLbTuAvF/uMuADKqAaNZoEIn5Zk33LvA0jT9koHie5R0GPZM
+         p6IRAYC/X+/ETlpRog8fKcrZwxLamNUuaMEx4txTWOGkoWADLKaNRFprFmdsdBXKWOUf
+         +iWQ==
+X-Gm-Message-State: AFuF++lzBN5Fc1syPx4osN+uMBZkC14BPUro/+ML2Ouyjuay8ISyenRY
+	FQJeGfbnWnQleJNmnlkjmJq0wNgY4smB2JGjcUmwDAdVtVEOKuB9/Tw83KbkSEYngWmqn0TUavH
+	SYCpkpFDyH+NIALBotdRzKK3I4h3bo55n3QtZHVY=
+X-Gm-Gg: AYBFou1iuaCvAA028VPyAxf4oSKtzF8MthtOgG6Y8VJqi2Zx3G9iseangt0rvYoTtX/
+	JkCbFsRH/GEmBBljnm0Wya6dycBn6+QJPaW8HcuHy/i5V/LsUbqKoVfQM1Tzjjqe2sy36yvzvJB
+	Vn6mH3oeLwpZoZJ1122R2YMMkef3OlEXm2LKrCKZU66q0ApYF/qCWuPICk8j9mkkHRPYhRPI+uQ
+	0JrWucBS6+ALg+vJxhfXcz3DrwOQ8pVmuEj53NR3ASjybvx24Ky1ZMPmH6sviuGeFF9QCC4ofRx
+	qKBmUwroJaAd9LXqTZh3lcaSxPYhzNSQU9u8KVYtfryR8qmoBmjiIGH0dTu0S+y2SFZa33FEPpD
+	Y+nRzYCYn5qZ2WYTOWb6pVV5UghFb81m0z6WPl4C61A==
+X-Received: by 2002:a05:6808:50a7:b0:4c3:e93e:e331 with SMTP id
+ 5614622812f47-4fc45d52602mr6097323b6e.30.1791470256527; Thu, 08 Oct 2026
+ 07:37:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261008133634.30362-1-kevin@simpleble.org>
+In-Reply-To: <20261008133634.30362-1-kevin@simpleble.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 8 Oct 2026 10:37:24 -0400
+X-Gm-Features: AclHuK9kAFalRNOXa6pf1u3bGcaQ6zV6Q9s2ndwVoB9VUqXq2cMAPa9skI0z87A
+Message-ID: <CABBYNZJyKcO-TYUeFqvA4dHm6ju8GsHPrLKxt4Ha2Yz9mZAfJA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/3] Add Role property to org.bluez.Device
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Allowing mode changes on already-connected channel will
-skip necessary initialization on the new mode, resulting
-NULL ptr dereference.
+Hi Kevin,
 
-Cc: stable@vger.kernel.org
-Closes: https://sashiko.dev/#/patchset/20261007144717.3832330-1-oss%40fourdim.xyz
-Fixes: f2fcfcd67025 ("Bluetooth: Add configuration support for ERTM and Streaming mode")
-Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
----
-Please apply https://lore.kernel.org/linux-bluetooth/20261007144717.3832330-1-oss@fourdim.xyz/
-as well, thank you.
+On Thu, Oct 8, 2026 at 9:45=E2=80=AFAM Kevin Dewald <kevin@simpleble.org> w=
+rote:
+>
+> Applications acting as a peripheral, or in both roles, cannot tell
+> from org.bluez.Device1 whether a connected device is a central that
+> connected to the adapter or a peripheral the adapter connected to.
+> When several applications share the adapter, a device object can
+> appear because of any of them, so the order of events does not answer
+> it either.
+>
+> bluetoothd already knows: the kernel flags connections the adapter
+> initiated in the Device Connected event, and bluetoothd keeps that per
+> bearer and uses it, e.g. to decide whether to discover the remote GATT
+> database. This series exposes it as a Role property, "central" or
+> "peripheral", present only while the device is connected over LE, and
+> prints it in bluetoothctl info.
+>
+> It is limited to LE since an LE connection keeps its roles for its
+> lifetime, while BR/EDR roles can switch and the switch is not reported
+> to bluetoothd. It describes the link only, not GATT client and server
+> roles, and nothing is stored. Other stacks report the same per
+> connection, e.g. Zephyr's bt_conn_info role and NimBLE's
+> ble_gap_conn_desc role.
 
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yeah, but if a device ever connects using both bearers, I'm afraid it
+should be reported on a bearer interface so users don't assume the
+Role applies to all bearers. I'm also afraid this may create problems
+where the application might interpret this as all procedure roles
+being equivalent to the device role (e.g. central acts as GATT client
+vs peripheral is a GATT server). This was one of the reasons we didn't
+expose this before. And yes, I agree LE connections don't have a role
+switch procedure, but in GATT you can switch roles at will or even
+have both client and server roles for profiles that support
+simultaneous roles, so I'd leave this to be on a per-bearer basis only
+to make it clear it is per connection.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cb4ec42f99e3..2cb3f59112f5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3876,7 +3876,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 		}
- 	}
- 
--	if (chan->mode == L2CAP_MODE_BASIC && chan->mode != rfc.mode)
-+	if ((chan->mode == L2CAP_MODE_BASIC || chan->state == BT_CONNECTED) &&
-+	    chan->mode != rfc.mode)
- 		return -ECONNREFUSED;
- 
- 	chan->mode = rfc.mode;
--- 
-2.55.0
+> Tested with two btvirt controllers, where the advertising side reports
+> the other as "central" and the connecting side reports it as
+> "peripheral", and with a real adapter connecting to an nRF52840. The
+> property goes away when the connection does.
+>
+> Kevin Dewald (3):
+>   org.bluez.Device: Add Role property
+>   device: Add Role property
+>   client: Print Role in info
+>
+>  client/main.c            |  1 +
+>  doc/org.bluez.Device.rst | 20 ++++++++++++++++++++
+>  src/device.c             | 31 +++++++++++++++++++++++++++++++
+>  3 files changed, 52 insertions(+)
+>
+> --
+> 2.54.0 (Apple Git-157)
+>
+>
 
+
+--=20
+Luiz Augusto von Dentz
