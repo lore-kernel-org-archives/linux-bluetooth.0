@@ -1,113 +1,162 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795C34DDB48
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491F84B0495
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 15:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791473318; cv=none; b=r3vTWBZhChPL2umdyNxzyb8vvmeAqsmbnaJuKCU+rLg2+PTOou2zPnfuq0tCe6Q82+KP9Abgiw1XK4Eb9g+cryzTlDtBeucNg/gbkHZWzy348MRbHOcv2/FYjrdfUF33kpNxTIUI6nCWJaUIEEFK9e26/wQBHsYo+kFIsZlIifY=
+	t=1791473899; cv=none; b=ZaMaA4urXgu/pnjSB3jd265YTD2DV46yotrNKHcEUUcNJUifV1M4EYCGD2fXLMiUROf31cq9rBn5Fy66zpA0v1WomtYPIhufEjETuHhrL35V616NljnwLX4zfQLk2VgBjmL/JC0S+Hhb1g2duKdRO2Y3rScWhkHOHKb4f8L/LCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791473318; c=relaxed/simple;
-	bh=UduWFgcjFx26dvXZQ3b0k6+6sEMJYiOkZDWzbru0lGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UpVdYNX+2vXVrK7RyR1GZ1zSLDcReoQue0ioEvL2UnxMXWeQQoXOIDTWRjVn41OixZ3H67fuVFAQ0oB1rqlOFj66y63HlSdja97LgT1B4S7diYW/c46hlNChsPdV0jqbn1b8pMjoVIT28wjqrfOjHEVfF1z7x7G1ns6Ds7hdE3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GmlQxgqG; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791473899; c=relaxed/simple;
+	bh=bLB1AItXcAUQNnq/1+yKP8ZjbJ6fLnh9zNrIjYpLLxk=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MZSAFKi5d+i/4PMX9NGdhpk6e5VvmBor0AyDeRwMNqEx16t2ixZyHT5XX2y/RgvJFQ6vIFhf1mA0e2aCO9Xd81cie67Sx3M5BT+0iUGNVvFVZGv21NvYm5jyerW3SQucUHpXmZUyJvZF/Q5jphQLjHsIihw40haWeLc73xZfI1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rIRYJKB+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmlQxgqG"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6def0c340caso71774eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Oct 2026 08:28:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791473313; x=1792078113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=yLr72W86SUjY28bGb0k99cY9z9+6T4+Be+J7c8ckVoQ=;
-        b=GmlQxgqGUAgc2nGM35eQn3YWUUeoAgKOpSVyWkdRK11IV7f+ZSaGpP6v9a8QspEdCm
-         /cto1t/QC1J4P2G9zvXYegtWtgZt9IXpiOG4S895T3o3qTpLjbhK3Z2oEZGSoNeR4t/w
-         dZTWbsqnc4ZQ2M5cw4oTqDnCDMs89/IYXve6jPX4RU2LZY6rHuuknX++3QrTdNhAIShE
-         lKEzJ13zaYdLXZzvBZFgqrnLZJ+Dzr3u8OOYUn9TNhkwKVwTjkgi03Oogmrx7wCozXPe
-         Vvp0e367Nw8f/8w9xVwVeFxu/InblRGP/6W5TJiDzB3ELnEaQdibbQXyWLBnYOqbTZCu
-         mKCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791473313; x=1792078113;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yLr72W86SUjY28bGb0k99cY9z9+6T4+Be+J7c8ckVoQ=;
-        b=1fky9+1jnqWi1b+FO5dYq3sfW4XZYCOojcTv+ydmhRrh1mQeZF4SLSa+UCDw9F68Eu
-         eNPGkKCk7SWTTbWqxgeUkUDagYJGV+6eyjh3PJ5FNcDZ92FGGPPRsxJHfD8S9EigooeS
-         iVjnUYEV9jVzBnr4DqthXNju+9k/HJ5t/svXbtRl6phYl/CFIKww//6XQxu7QD4nvOQH
-         6cAcFSyNt76aVoMe6kNi2LWuiQMwJprP5d7QB8/efnJTc0wPm7nfMa35Vg1xJc7KS0Qd
-         blYT1MzDkfiuS0BVsEHPwqQU/O7C15q8vVnWauerktvohmZOHtFdI2XAExHZluzD6b4p
-         geTw==
-X-Gm-Message-State: AFuF++k2ghSmwoe3quPg+PyJVVbHDlBHaoGqYQOLvgHuqEeRfAppcX36
-	BheXJRwPvKCYLEkHoRxh+c7wAsa0zwknJ4D+MDPr0DlWo2wiciUNiy/b
-X-Gm-Gg: AYBFou0NjI+fwosSc81dzQXxgTP14QcZz5An9IoI9we+xAzrREtlwHn/oO1yz8Gzpgd
-	7DCPRbECaRQAxA+Sz9ucO+0kRyExxiSTbnolRMRr0ffUQSNPb/YXr6LhTypn7TpjdKTP6AzlSou
-	eI/FsN/dBGZ0b+KKe7DH7BNJxR2mEfFNbSYP6IF9O2+NFAmxeEbeURVuit2hMh6HWDDq6wM4ZNu
-	/sqsGdLn5EVUJv45gkG6PNNqAUKYgx11icjkRttChgMFxnrpRRtOMqVUEwSUC5sMoPaN+vK9ASE
-	vGaBjfWSWkVtnSMl0mQhpPGO09WM5N3B4SXiss9xSF/o27BOcr4aJpa+OdUp175hBcrKGnFpPtA
-	5L5JYPs7hcIUx/EKTWNhfI/UJYif/Py7hr2ekpzz8PTCgYF9m5Y1CPO6uAkfLrBplL0ySNSTrts
-	NsNZKhZnOSR/nMTf+FZyzUXp/jYVtBL/69yi5SzBOr7tVUM6qmobq/BSauZEGmwfQeTBdfWk7Ih
-	m9hPL+zdaZgO0v+rwNlSXjiweuCFXo47KtNBV3m
-X-Received: by 2002:a4a:d1b5:0:b0:6d4:8158:8d67 with SMTP id 006d021491bc7-6eaba1f4dbemr2277016eaf.0.1791473313150;
-        Thu, 08 Oct 2026 08:28:33 -0700 (PDT)
-Received: from hitalo (190-33-161-131.in-addr.arpa.host.souuni.com. [131.161.33.190])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a274aff8eesm3216671fac.5.2026.10.08.08.28.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 08:28:32 -0700 (PDT)
-From: Hitalo Souza <enghitalo@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Don't leave abandoned SCO links up in the controller
-Date: Thu,  8 Oct 2026 11:28:26 -0400
-Message-ID: <20261008152826.2162209-1-enghitalo@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <CABBYNZKoSV1_cVJRrdonHT=gKtS6pgoWDM3R5nj5aR0D17SqRg@mail.gmail.com>
-References: <20261007154353.148223-1-enghitalo@gmail.com> <20261007154353.148223-4-enghitalo@gmail.com> <CABBYNZKoSV1_cVJRrdonHT=gKtS6pgoWDM3R5nj5aR0D17SqRg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIRYJKB+"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CA686C2BCC7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 15:38:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1791473898;
+	bh=bLB1AItXcAUQNnq/1+yKP8ZjbJ6fLnh9zNrIjYpLLxk=;
+	h=From:To:Subject:Date:From;
+	b=rIRYJKB+qcBnQQEXHBvgBn8hdFsQPjd4Ne3MLOWbc/7ijYHdnS06eIePwTw3rAXg6
+	 oBrK7Sq4f7Z4RSvzkkS11Ro7MByDgFtRzmP11csvesflxCxJa2hI2U+xFlVaUVzSS/
+	 75ZEc9Nc3akYBFByhhvmYs6mBaslTYXqbNuHIS8Q+kQLdn8v0ftnecLfv80LAc6zNu
+	 JtDuLyaBDwOzMcQd6/TpnYLzILJOWcJPHFbDKI4RBX+NjvdW8mY7a+0BG5I4yLhoQR
+	 Bv5/G74XF+eewJXTzutlEP6jRyDbw+sGZ/f8F8t211ilIrPV2Zwr65SfC61P0G2Aqk
+	 CnuAsVzTDmo8Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A6FE6C3279F; Thu,  8 Oct 2026 15:38:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 222105] New: btintel_pcie (8086:e476, Panther Lake CNVi): BLE
+ device using a Resolvable Private Address fails to reconnect after
+ suspend/idle and requires re-pairing
+Date: Thu, 08 Oct 2026 15:38:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: przemekm83@interia.pl
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-222105-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222105
 
-On Wed, Oct 7, 2026 at 2:15 PM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Sashiko flagged quite a few problems:
->
-> https://sashiko.dev/#/patchset/20261007154353.148223-1-enghitalo%40gmail.com
->
-> We need to check if the logic of hci_sco_disconnect_orphan couldn't be
-> made more generically, so in case the connection was aborted but we
-> received the connection complete that shall always result in
-> HCI_OP_DISCONNECT so the handle don't stay active in the controller.
+            Bug ID: 222105
+           Summary: btintel_pcie (8086:e476, Panther Lake CNVi): BLE
+                    device using a Resolvable Private Address fails to
+                    reconnect after suspend/idle and requires re-pairing
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: przemekm83@interia.pl
+        Regression: No
 
-Thanks, agreed. v2 does that in two patches:
+Created attachment 311033
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D311033&action=3Dedit
+dmesg dump
 
-- when hci_conn_set_handle() refuses the handle because the connection
-  is being aborted, the Connection Complete, Synchronous Connection
-  Complete and LE Connection Complete handlers now disconnect the link,
-  with the abort reason;
-- an ACL link that completes after its connection was already aborted
-  and deleted (an incoming connection, where Create Connection Cancel
-  fails at once) is disconnected too, as SCO links already are.
+ENVIRONMENT
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Distro:      Fedora 44
+Kernel:      7.2.8-200.fc44.x86_64
+Driver:      btintel_pcie
+Controller:  00:14.7 Bluetooth [0d11]: Intel Corporation Core Ultra Process=
+ors
+             (Series 3) CNVi Bluetooth [8086:e476] (rev 01)
+Firmware:    intel/ibt-00a0-01a1-pci.sfi, firmware version 214-29.26
+Peripheral:  Logitech MX Anywhere 3S (BLE mouse), modalias usb:v046DpB037d0=
+003
 
-Both reproduce in an emulator (ACL outgoing and incoming, and LE):
-without them the link stays up. The SCO patch now uses the same helper.
+DESCRIPTION
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+A paired BLE mouse that has been working stops reconnecting after the laptop
+suspends (s2idle) or after an idle period. The device does not reappear in
+scans, and `bluetoothctl connect <bonded-MAC>` hangs with no result. Re-pai=
+ring
+fixes it, but the problem recurs. The same mouse reconnects flawlessly on
+macOS.
 
-The other two Sashiko findings are addressed as well: the legacy
-Connection Complete path in the SCO patch, and the air mode
-notification of a SCO link that failed in a separate patch, as it
-predates this series (1f8330ea1692).
+The device uses a Resolvable Private Address (RPA). The stored bond contain=
+s an
+IdentityResolvingKey:
 
-v2 is here:
-https://lore.kernel.org/linux-bluetooth/20261008151238.2138665-1-enghitalo@gmail.com/
+    AddressType=3Dstatic
+    [IdentityResolvingKey]
+    Key=3D...
 
-Hitalo
+Observed behaviour:
+- After suspend/resume, the mouse is invisible to `bluetoothctl scan on`, w=
+hile
+  other BLE devices in range ARE seen (so the radio receive path works).
+- The mouse's rotating RPA is not resolved back to its stable identity, so =
+the
+  host treats it as a new device and the existing bond is effectively lost.
+- On re-pairing, the device identity address is regenerated by the peripher=
+al
+  (last byte increments: DD:28:F7:5C:A0:49 -> DD:28:F7:5C:A0:4A). This is a
+  consequence of the forced re-pair, not the root cause.
+- No clean disconnect is logged in the kernel; the link drops silently.
+
+REGRESSION NOTE
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The problem started around 2026-10-06/07. The device had been stable for ~a
+month. Kernel 7.2.8 was installed on 2026-10-03 and is the most recent rele=
+vant
+update (the 7.2.8 changelog and recent linux-bluetooth patches touch RPA
+resolution and btintel_pcie). Not yet bisected against 7.2.7.
+
+REPRODUCTION
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1. Pair a BLE device that uses RPA (e.g. Logitech MX Anywhere 3S).
+2. Suspend (s2idle) or leave the device idle until it deep-sleeps.
+3. Resume / wake the device.
+4. The device does not reconnect; it is absent from `bluetoothctl devices`
+   (or a new address appears) and re-pairing is required.
+
+RELEVANT LOG LINES
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Bluetooth: hci0: Found device firmware: intel/ibt-00a0-01a1-pci.sfi
+Bluetooth: hci0: Firmware Version: 214-29.26
+Bluetooth: hci0: Failed to send Intel_Write_DDC (-95)
+
+RELATED EXISTING BUGS
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+- 221346  btintel_pcie (8086:e476) hang in shutdown path
+- 221481  btintel_pcie: suspend fails with -EBUSY on Intel Lunar Lake (s2id=
+le)
+- 220419  Bluetooth stops working on Intel BE201 (btintel_pcie)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
