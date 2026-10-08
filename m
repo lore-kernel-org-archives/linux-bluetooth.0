@@ -1,156 +1,116 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446B39A7EF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 06:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093003D47C3
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 07:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791439443; cv=none; b=qoB4Si+T1Q6aFb3ZGswBVYWr1aMkuYiPH/V0Ix42scmFTy34+COFt1/MHc26O07z50iPT/02e8q0xfUOwpQvHb4jT7tn0TwT5lNpO52NhDPIRTFKSs2np2AgrqL0HQ+YdLE8rmJs9jlwtd+7bEXEhx8wM/tScRBHbbwZ2Xqle1c=
+	t=1791446223; cv=none; b=kFHH31F4csyABmqVgKtxhw+LMsaJdvXXdjyO23A6dfOCQzQQbQTQL2OznzF3V70xyx8mUWTzdk9JpL20ibRsRjc0AMoECyEsYZyr+mcSwVmUmoro/1Qbr8ue5moUTARP99bnaluA9cEq2iL7uqZ8/xmGQ8MLLocCaHoj9MBj1I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791439443; c=relaxed/simple;
-	bh=PcW31aLcf7QLC4AFyS3qRN9LhPHMzg2IsGPcFvZQ/B0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=RTQsTTfC12TTvb8ejVbBssw4qI3GKimJZ0p/9J9CEFG4TGE3k4k+jNZ6rW6pBhkbHY6A8YU2nqHPg9yTvaoZmWcB4W9qjU6JdJ4yXcMNI4vqTBB2/OcwimrMU7QMgyn3cC1b2tE3Yw6W5NPnNVxELMX55+ai0U9rusfe6+YcGc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=boekfo6q; arc=none smtp.client-ip=209.85.215.177
+	s=arc-20240116; t=1791446223; c=relaxed/simple;
+	bh=H6I630vxbQByYsuaU9/JrQzydh79zzENvp/WfhKlcA4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=s23mJvJZp3XZVGdSrDAweFlNn+rO72W9fvlqKr9ySgBSx09T8NPgCqNUybdqzAl/XSruuCvR4dhiibco6t1nJ0MUIe8lc5SCArMG+pb0UdmORtlpBZon+p74qWXaZrVOl8wbMU8ZcHrOqE6i8wj3EeOZ0wm4duzb7WouHL2AF2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jOSvtzba; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boekfo6q"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-cc751eddf25so1486160a12.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 23:04:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOSvtzba"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3a4b9732d5aso2471557a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Oct 2026 00:57:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791439442; x=1792044242; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vVfVT+UFtA5oYCaZRmFTBLRBViF4NDwZkeVmLB9yJho=;
-        b=boekfo6qv/pvKGqXukdDZOIGXAEYcAewXA0vPEIQ4xwSZUf2nIT38jQxZAgQkYrxj8
-         D/aEApqm9/4JQL2w+QvpPq12bAOnK12IhdkK4J8+zbksdAX3irP4jO8M9aAaHbJF4t34
-         wYC/xwfw2dk0r5/G2/FLF4feidpxWhbFJNC1urPi6rb8ssQNuXC76A59TU4fO2s6IQb0
-         SCQa0iyqpkg0S7GTDwozs4LDmdrg0sdFAinFGvvzGjHOhfvirGQJ792vH82zvoDEwbZr
-         uSDDLjVkSk7l7OYV++JKJcgtrdqQEuRab1y5hjLNLVwf5R60GilgLyvoLbCuAJr5YHmK
-         BFLA==
+        d=gmail.com; s=20251104; t=1791446221; x=1792051021; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=4cSxBKCEtVDCXxgYQ5M53m/LRc4nVEp+fpXyoSQywhI=;
+        b=jOSvtzba/Tfchh/6sqANGY8Ibx56mjmjdXcSEBPo4TDQqHzUcSRzD1jaEfa7qD09a1
+         +4MrIytwGXVNoz2PY9AVP4/HeoUhPquzoXV8nHMmq2ULmAyrXqJ2/guRHC5MNOgQc8gS
+         33B4zIG/HZBtgGluSBVuvlO49RxC10AkQHyzgMIjtkUG6Hl6Lhh7HcRl/r0lt/4U6Ku7
+         hdJYGmZ9LkfUxkuz3MudTGnc2+s2JKY8sQ/40ACgZ5/gELxt7jmaIOFC8/ofllmmSvcL
+         cyCtKDww7KIUxIttiEmWurFhDJM0SZyVMZFPQdO45ziojpOXRyYmyXjfzZWJSNZla1KF
+         1O4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791439442; x=1792044242;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vVfVT+UFtA5oYCaZRmFTBLRBViF4NDwZkeVmLB9yJho=;
-        b=dxGF3pScOrQxquTfxwGilJLxHKc2FEYLhLVwhKyo4mDoFcDOsD5XDrX8kisPpbWJhM
-         rcxkbCGiBFXSOTllOZb+S62l957zrBJXD7U7L9Xu2yWH8uyQMz5uJ3kcWzC3X+jLj6o0
-         3MWBsMzPOW7Bq4AgZo7eMUhkHwU30czPav0iK+jBAv+6jA0R859Dd8mdCpHgRoIaKFVs
-         0EZBwZDcwg21jRzFnKJ4zml+1UU1E50VcdzCmAZEqCMah9mCcMUunpdTiUaGI/XmKDKj
-         ThTZPfEy4yq4YNwQa0rxDs9VAgUtei2DY8kXdpdkOYLoJcp1Fsk7ArEcy5y27GywRGsz
-         jFwA==
-X-Gm-Message-State: AFq9FYLE0awyxN3aOapf5u/5jFTwnj8/MVfnXiM4o3CT65lrpvcRBP/l
-	TdU6LdPAH9LO6c3O87Yj2jlagHt21Lb6A5M/N1qAQCxjrOg5a5lNp28h
-X-Gm-Gg: AYBFou2xF+inUfL883brbATyaiNst5haDHm51OwQhmmbi/uuWPh6LQTvML5zAxBXFAk
-	A3bMUsTp7uuDbU6CNFIvwHNLSz/Td6C96GWpCgkRWRTq3BLI/zn8ytv4FZ0JVSpsPXxXMhz6NUE
-	xj7UeQUORnHuU8gXbtkkkvTLgGh5BJU/rHovQT3geAD3wUL7+P7regCetVP2nAbuqmJYug6G+Y+
-	DojQpMb9Qox7UWhq1wT13BSvE6y11qLban/VprsuD7VXtP4DkhjkxLlXbAUlsRIprKvg7G3hvI5
-	7R+R+58c2jh+JpbGRdEmVOFuCgefBBuQykbSfy2JqclBjQihFNTN33GYJY4oMZTHnmZ1gDxPs/U
-	Sr11xqUEL8lOpopRpKY+J/WvR9OPOqO9HH5QY0mIxAbxiJJ+cSAUJjBuNv82a3RM8JtxLkhValT
-	Nu7kcD0N7CLhMgGls6gkU2D3VSWTpMZ+pdiCHh+edTB09hCGMjSf4ndoP5Oldl55v6MAMuct1pK
-	ejP
-X-Received: by 2002:a17:90b:4a89:b0:3a4:f6b0:7de with SMTP id 98e67ed59e1d1-3a8a08515acmr4074044a91.22.1791439441844;
-        Wed, 07 Oct 2026 23:04:01 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3aa0cbccea3sm2622298a91.15.2026.10.07.23.03.58
+        d=1e100.net; s=20260707; t=1791446221; x=1792051021;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=4cSxBKCEtVDCXxgYQ5M53m/LRc4nVEp+fpXyoSQywhI=;
+        b=V1paD6Rv0LpAncb0heTltYjPnu+CAOayxN588yGdfpag09HpxtCK3gps0cVdiQU/JD
+         gjYsY2qMGSOrwSYZoYI88MEV9itUBxBiE4eGNhE+nReA0cgILJrs36o9CNTqWI4eRwYn
+         m9jAqyHtZZCBruZcN1zMVL5NUJC27zFrm3SsdVbVrmOL/u5r0T3DH55fB+EGBZ328imG
+         4PiItqW+8pQ6KtlbKUxT/Acz3xbTQ2JKOp0rNUvVNZR3Gs2WfW7RFar0SynWsP8XU57Y
+         u0EwWKzE6cd+JWr7IdrrFSL+qD1Daeqkh+5KPtcy5wA1MWQp08VIzZQyEEq4UKU6eq8e
+         09tg==
+X-Gm-Message-State: AFq9FYKfMexWcDTw+MGGRtNKnZVkptea5lt38paW2AUEEh7YI91MHTug
+	qxLRoeUE00dBxzyEylPKt7QOc4Ph5zVtR6oIQXK4aveDx16ioWviUMhEj4PYOUYu
+X-Gm-Gg: AYBFou0KxEUpDyfMy39JxSEK1mRf+RAAgcCXJLH3hLwXPhNztUsQ2hQlMwEOJloXt7n
+	2+m8Ruyxnj9T1QChZcoLYUaLhLhSntai7he2BTz1LbhCcbPU2qpSdhYMGAQtbY0qEMBgSlK1CHZ
+	C8UEMQQU9IRCXyiQKQ3GVmwP6xL418gkjOWK9O2s9WFo7j3k4dG+gBZkb4yd0QRRbryFSaKFYpt
+	9MYIdqN4c8We/gRqMH+clr0mXg1yGzQixyvSsa9eWNlgPcEzaIixosVeH1x0D/otJrAmEctJ1rt
+	Vj8oaCI1wuU5q7rmGwproM8vJSHcDmQh9y/hMRjauUk7hSFyq3Dz2QH7W63f54nIp8NmykXH+2H
+	QtfO+FkBHuJumJCOlp/Sxt9kxUTCiB5DuszypRAlyKLn6qb6OxLMQxZjxJB4Pp4xfGP8R2GOYvh
+	/f48/oVXsrD3adivok/UTzegc9gveQOZfurRdGo7JU+bxLuAl1Hf63AxOJFt4rw1qDhR5QOsCuw
+	sCKcg==
+X-Received: by 2002:a17:90b:582b:b0:3ab:f38:2b46 with SMTP id 98e67ed59e1d1-3ab0f385364mr272372a91.35.1791446221269;
+        Thu, 08 Oct 2026 00:57:01 -0700 (PDT)
+Received: from [172.17.0.2] ([4.154.135.145])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9ff8d5896sm3120085a91.12.2026.10.08.00.57.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 23:04:01 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	jjzuming@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: MSFT: Serialize handle map cleanup with event processing
-Date: Thu,  8 Oct 2026 14:03:55 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0242-v6-e48e08db5265b66aeda9@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 08 Oct 2026 00:57:00 -0700 (PDT)
+Message-ID: <6ac74ccc.969afe5a.73c66.f664@mx.google.com>
+Date: Thu, 08 Oct 2026 00:57:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2897242171845932385=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dungvn2345@gmail.com
+Subject: RE: Bluetooth: 6lowpan: Pin module for 6lowpan_control debugfs file
+In-Reply-To: <20261008051129.508322-1-dungvn2345@gmail.com>
+References: <20261008051129.508322-1-dungvn2345@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-MSFT monitor handle mappings must remain valid while vendor events look
-up and use them under hdev->lock. msft_do_close() removes and frees the
-mappings without that lock.
+--===============2897242171845932385==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-hci_dev_close_sync() clears HCI_UP and drains the RX workqueue before
-MSFT cleanup. However, a transport callback that already passed
-hci_recv_frame()'s state check can queue a vendor event after the drain
-returns, if no earlier shutdown callback has quiesced reception. The
-driver close callback runs after MSFT cleanup, so event processing can
-overlap the unlocked removal. msft_monitor_device_evt() can then
-traverse freed list entries or read handle_data->mgmt_handle after it is
-freed.
+This is automated email and please do not reply to this email!
 
-Take hdev->lock while resetting monitor states and removing handle
-mappings in msft_do_close(), as normal monitor cancellation already
-does. An active event reader then finishes before its mapping is freed,
-and later lookups see an empty handle map.
+Dear submitter,
 
-An instrumented kernel produced the following report:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1181259/
 
-    BUG: KASAN: slab-use-after-free in msft_vendor_evt+0x1906/0x1990
-        [Thu Oct  1 15:01:51 2026] Read of size 2 at addr ffff888104df3602
-    by task kworker/u17:2/502
-    [...]
-    [Thu Oct  1 15:01:51 2026] Workqueue: hci0 hci_rx_work
-    [Thu Oct  1 15:01:51 2026] Call Trace:
-    [...]
-    [Thu Oct  1 15:01:51 2026]  msft_vendor_evt+0x1906/0x1990
-    [Thu Oct  1 15:01:51 2026]  hci_vendor_evt+0x6f/0x90
-    [Thu Oct  1 15:01:51 2026]  hci_event_packet+0x894/0xc70
-    [...]
-    [Thu Oct  1 15:01:51 2026]  hci_rx_work+0x3f8/0xfa0
-    [...]
-    [Thu Oct  1 15:01:51 2026] Freed by task 499:
-    [...]
-    [Thu Oct  1 15:01:51 2026]  kfree+0x307/0x580
-    [Thu Oct  1 15:01:51 2026]  msft_do_close+0x238/0x750
-    [Thu Oct  1 15:01:51 2026]  hci_dev_close_sync+0x546/0x1380
-    [...]
-        [Thu Oct  1 15:01:51 2026] The buggy address belongs to the object
-    at ffff888104df3600
-                                                                which
-                                belongs to the cache kmalloc-32 of size 32
-        [Thu Oct  1 15:01:51 2026] The buggy address is located 2 bytes
-    inside of
-                                                                freed
-                                32-byte region [ffff888104df3600,
-                                ffff888104df3620)
-    [...]
+---Test result---
 
-Fixes: 145373cb1b1f ("Bluetooth: Add framework for Microsoft vendor extension")
-Assisted-by: LLM
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+Test Summary:
+CheckPatch                    PASS      0.54 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.18 seconds
+SubjectPrefix                 PASS      0.15 seconds
+BuildKernel                   PASS      17.44 seconds
+CheckAllWarning               PASS      20.27 seconds
+CheckSparse                   PASS      21.86 seconds
+BuildKernel32                 PASS      17.87 seconds
+CheckKernelLLVM               PASS      19.16 seconds
+TestRunnerSetup               PASS      435.12 seconds
+TestRunner_6lowpan-tester     PASS      6.95 seconds
+IncrementalBuild              PASS      17.61 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/884
+
 ---
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d9dd722db3..667c9951c3 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -681,6 +681,8 @@ void msft_do_close(struct hci_dev *hdev)
- 
- 	bt_dev_dbg(hdev, "Cleanup of MSFT extension");
- 
-+	hci_dev_lock(hdev);
-+
- 	/* The controller will silently remove all monitors on power off.
- 	 * Therefore, remove handle_data mapping and reset monitor state.
- 	 */
-@@ -695,6 +697,8 @@ void msft_do_close(struct hci_dev *hdev)
- 		kfree(handle_data);
- 	}
- 
-+	hci_dev_unlock(hdev);
-+
- 	mutex_lock(&msft->filter_lock);
- 	list_for_each_entry_safe(address_filter, n, &msft->address_filters,
- 				 list) {
+Regards,
+Linux Bluetooth
+
+
+--===============2897242171845932385==--
