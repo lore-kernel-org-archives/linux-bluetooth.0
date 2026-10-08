@@ -1,105 +1,114 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9F83AF66D
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 16:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779003AEB35
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 16:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791478501; cv=none; b=fG2xd5SG1h8BDiQdQvfSOjQdI/JvBkLcCrHJu+3xnyY0VIhD8/Aubxh1z5b+9zrhpwe3J0j1Ip3pVnhj6U5W7cVMll3C+w/q7zpv9Le7qsVXQlq1Vn4t7w6sHWmGxT3iwahgyPbHp2teiO5afhnwn+wksNBH1889dyDy2dsjlJg=
+	t=1791478542; cv=none; b=EonHAQJpKMs19JQFPBJ6+cbFatZouZYkqkucQo3WRCbgCAjTOr52zKaaNksw7V6oZg8dBKiUlfWcHI5tBbOLa9T7qeX7VCukY+90ZdYJWOMqVQ0rwRKisJrLtp451Vh/pvFGbGOuhJqoVL11AL0Rsji3X+2exPH9oLohsa8Zt+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791478501; c=relaxed/simple;
-	bh=6sqq0B9YNKYopc6Qq40tmHWKqvSoKQi8RoY/pTmGEcY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Vnm7Dv9gPC7FFxR4zAetUF9HsoSBLfKYuXLeIma3uXlUKtuRNJ711GI4rL+Mi9M7v3Jr0spH/fNGjI4B7ZLza1eYPpXoYOQOGMAJRIf9UfVRtuYUWo5B0JPT6MkTCLkUTq5lxzPwLHqw0p8JS0At9JRgy8xoaMZmdjZQ+3m9QeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J9W48F5U; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791478542; c=relaxed/simple;
+	bh=mEuP4ip7xvTqgWC5sYLv8XBXHb8alNZvxwr8EJpvAu4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=K4U2bEND9RbljHW/u7lNUgGQbL+7hNYX03HhNxUA007YK1Yz2vymyoRuRy52JlE7rpjkhpOhbw+tSZXvJtZJEilh/a5prQ+x+X56ccXM6aVdWv2qeruIyDhKT3lVuqHON4ljMalrCScl1L/+C8WAQPFYjV1T2EGAiIr3uZwmNnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=lsSK+IUG; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J9W48F5U"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2e82462a3f1so4185945ad.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Oct 2026 09:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791478500; x=1792083300; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qbTOqWPQ1bbjJg46ShBlRHqEEJIXIOFkpW05qcUOMn8=;
-        b=J9W48F5U8fVDj3/k9jV9qcNvAhnD6EFOYBJLRXl9Y5w3+qY5IKrcmK1Tzz/+US/jTK
-         NZ+ZHGqJWEYwxFaA8O5VCF4YuKe1TBBDJBf4kXwEw1+EpvPjQlx+FbHrwsyYBufo8+Oa
-         qbE8T/CFxd20eiod4pT7ocbZIFhT4+3jpmV9goRAM0LqFScN21Eq7NXpbviODWzUTJmK
-         00EPtOh5sW0UCDsYlxS6obtpSr/oCN+AUdT08qkxPKFSBsHIsklYMSBSGiazYIqMIWYP
-         Mmfcw9WTp7VpnE1qMeGtzLF1IZs2aTyMK1AmR1laJ1gLP1avqTzabPBEyR50BeudTv8b
-         zFdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791478500; x=1792083300;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qbTOqWPQ1bbjJg46ShBlRHqEEJIXIOFkpW05qcUOMn8=;
-        b=WoxKvxczMUEnrAiBkHfm+yRTVpmKrr9teX28QABJ8nD+5Ws3RvJGnj1u/LBVBI5FgR
-         VIO+LXtP9Sofy3Rvbyc5iXDqXbXCaSlyX/aLeQrvP9RakV6Fo6YN1yWqPeqEOmeGXvfy
-         WffRtam8K8D+lzj1US9iUo4oD+yiegl9LX+t1hjvlpFzGz+66A6Ja5jpeZIe+hhvI/ik
-         cTQywQ64/ozKGNM8vgda3wZ1TdGj1mNPZDxvArE2Um6PcrQje3MFE42uHCKmunXZLZMI
-         ni7skLr4EONlPPTNfQ/2y3f4+fvNDp3dY1Qs80Un4Zxf7wd0mynMGXsCe0HJTcAPDSyJ
-         4BOQ==
-X-Gm-Message-State: AFq9FYJxiXcf/AWCOVGRTypnfUzJiVo0vqtyJ3OrecRMtvqDGS8U7IJI
-	+59OfA77Wpey0JGjsspeI0n2sLVSHM615TQUAQAmSI6SVpGV3yzj6JRxAd2zdmRB
-X-Gm-Gg: AYBFou18nEEgqifGUdMG5Za6k4Orb04CO9l6slMZdDW2uyzzRU3BBR3rLxSV5H4czKb
-	qWmwPWram7nzHrIfd1csNG6KJk3UT5BrHCVoJz/hngblRJ/asl9kA11NjvTJcILtIewusRQjpvW
-	stLIlPK7FekVMtgD7sqg8Y7rzG2jwWuCg5q8TQwshgdBl2DNQLW3HeM69681CCRRzv+t7uA6KeR
-	I9pymgYtlca1RCfjcBaXImGM1z7GpY9DbHCILP4nWP0xSUSSaRAFdkfwrhDPuPikEc8jDVfaCsY
-	cB2Zf3mc6tHOmZ8rDX9fY5flolmAFivfDw7D6IE93wz2UNIxSPCDadebi3ifsHcXGfkv3HJpGRX
-	bk/pmihqcjdrWSoub3yogC4ca7y7cfKH4uM4+QrJguDZBHbCantPy7zJ6iXwwbyNAkmhLpXT3in
-	p8AJ1FMfun7VAIiSktOBPvQMvLnyL+DrZJZDLW5KTI7SOAgMSnylmmpv10Jwo14Rao+m6TVf59M
-	5nC2g==
-X-Received: by 2002:a17:902:ef09:b0:2e5:9923:5582 with SMTP id d9443c01a7336-2e6004e36b0mr52447965ad.29.1791478499738;
-        Thu, 08 Oct 2026 09:54:59 -0700 (PDT)
-Received: from [172.17.0.2] ([4.154.236.225])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e6046fe3a7sm28946585ad.23.2026.10.08.09.54.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 09:54:59 -0700 (PDT)
-Message-ID: <6ac7cae3.db5799c8.16508.bfc1@mx.google.com>
-Date: Thu, 08 Oct 2026 09:54:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8671755831239423274=="
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="lsSK+IUG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2026; t=1791478540;
+	bh=8JP9IS37bWi0jPj+RTNnBhcj63EKOiNqqklDYyDKExY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lsSK+IUGJE7XnsYI5222MxqVX8BpLggXNOV1qyybAlwADC/1z5UTxCANhs2/FMBIO
+	 A1DIwCUKyhOEkNzx8WrFwNXdD1t1S+8v74nh98Hs1ewrKkiuYtin2aNhCjvknrj0QQ
+	 Wv7UfPiHFfvKIYOCUXMVvCmdxB8pkcFziKaEvq018z3yKRK2ALpID1/eK2E5OaxXk1
+	 QqG9dju4AF1jBxPx6SMQXkwlyiwjfPUELWWu2zXSzCJU1nzVEkNhTyc1miyXLz95/R
+	 jwrXZZGAsERnhXMINr1p4eFFhSw51IPMMz8nRSCPTsov0oddMVYgph5b+asZeaG8b3
+	 AobsdWukxReYA==
+Received: from github.com (hubbernetes-node-8716805.va3-iad.github.net [10.48.64.103])
+	by smtp.github.com (Postfix) with ESMTPA id A0E5D50168C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 09:55:40 -0700 (PDT)
+Date: Thu, 08 Oct 2026 09:55:40 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1181653/000000-2d7977@github.com>
+Subject: [bluez/bluez] 9fc9cb: org.bluez.Device: Add Role property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pvbozhko@salutedevices.com
-Subject: RE: audio/avrcp: Add AvrcpVersion config option
-In-Reply-To: <20260923091827.4496-2-pvbozhko@salutedevices.com>
-References: <20260923091827.4496-2-pvbozhko@salutedevices.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8671755831239423274==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is an automated email and please do not reply to this email.
+  Branch: refs/heads/1181653
+  Home:   https://github.com/bluez/bluez
+  Commit: 9fc9cb887477044ac90162170b1f031d598f3d7d
+      https://github.com/bluez/bluez/commit/9fc9cb887477044ac90162170b1f031d598f3d7d
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-08 (Thu, 08 Oct 2026)
 
-Dear Submitter,
+  Changed paths:
+    M doc/org.bluez.Device.rst
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
+  Log Message:
+  -----------
+  org.bluez.Device: Add Role property
 
-   Series:       audio/avrcp: Add AvrcpVersion config option
-   Pull Request: https://github.com/bluez/bluez/pull/2571
-   Created:      2026-09-23 10:01:20+00:00
+This adds Role property which indicates whether the remote device is
+the central or the peripheral of the current LE connection, so
+applications can tell a central that connected to the adapter from a
+peripheral the adapter connected to.
 
-The pull request has been closed and no further action is taken on this
-series.
+Assisted-by: Claude:claude-opus-5.5
 
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
 
----
-Regards,
-Linux Bluetooth
+  Commit: f447eeb2dd2fe46a98239cea8bc3fce0a10b0ae7
+      https://github.com/bluez/bluez/commit/f447eeb2dd2fe46a98239cea8bc3fce0a10b0ae7
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-08 (Thu, 08 Oct 2026)
 
---===============8671755831239423274==--
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Add Role property
+
+This implements Role property using the initiator flag of the Device
+Connected event, which the kernel sets when the adapter created the
+connection as central, and emits PropertiesChanged when an LE
+connection is added or removed.
+
+Assisted-by: Claude:claude-opus-5.5
+
+
+  Commit: 2d79772deecd82f3139f01e248148e56ae4ea340
+      https://github.com/bluez/bluez/commit/2d79772deecd82f3139f01e248148e56ae4ea340
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-08 (Thu, 08 Oct 2026)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Print Role in info
+
+This prints the Role property with the likes of info command:
+
+bluetoothctl> info <addr>
+...
+        Connected: yes
+        Role: central
+
+Assisted-by: Claude:claude-opus-5.5
+
+
+Compare: https://github.com/bluez/bluez/compare/9fc9cb887477%5E...2d79772deecd
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
