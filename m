@@ -1,61 +1,61 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5B8175A95
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 04:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A053B05B2
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 04:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791432114; cv=none; b=TkC8bhfLFLRRctLWFfXu643o25sE97ym+cfcj7QaL8INL9Z6vdeJvx7NAE/9t91nSIZL3+kJ5Y4TsjTJxeMvTbIIeLiUA/rAg1btmyt+oQhBhBmuqbKhXVdF/45qPHVLlw/yKYYXDDbiScGtuHT4VkPBOL1qkbklXdV00vf4aaM=
+	t=1791432705; cv=none; b=pDLLXyvhfg5x/pFcYoFo7ZlHHR/LdlqY/aZVaSNeHpxrwA7zd+u+bK8qmWFm68aA7SUS2UPCMgSqmTmYe3jG7wvifRSt7pkvpPWJFCU+uyu9z1Pf0FcQepuEQuln7CHS7dcEjLx7KHV4mlXN/j4V4PIU3j0jory1ojfp+Smo+Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791432114; c=relaxed/simple;
-	bh=HWGlhnjAsKdJcawkVeuPvrsKBkaz2dTusqjN5Q+J2tE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rsn3s6PapKXsl4kVibo1WHDwTAeNBvku3bUY95jOwWUvUr98ulC9moUoStalVxuPyYIFAH38wvBT9Rn7aZCdrK9bMYCSkMyBYijNOeTYJ+pLZy1j2BV0IrDw7myGD5ApbgF1/sSNDRaA7JlHcJWHPb6NPEtTelTiVeCX1Ax/Ak8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts9Piag5; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1791432705; c=relaxed/simple;
+	bh=qVAkxgdh/G5U3vm1BP7YXjq5X6bxNyh4PiAPpL5bkJo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=qhKQNJaKkaiXpUj8CoAX180gidTCYZeX6EFqkmK4MJsfal1VO4DTWUDDH/tZ0wxc0E88x2/PT4Jqaoyg28qOxsQD6REEqQlrDcKRePLzwEcl2fKMRzWxofsyJh6b8OBzWSvmM6dqTB+EsxyiP38IxO/Fuhlxix9LE8SXfVvhOcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JISp4qgM; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts9Piag5"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cc4e9e56e9aso1288878a12.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 21:01:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JISp4qgM"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-cbe6295f05bso154817a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 21:11:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791432112; x=1792036912; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791432702; x=1792037502; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=rHUntJAA/mwo/FHuh8v4le2k0YfNGeacRBz3GsN1kMw=;
-        b=Ts9Piag5xkkTz/RebI0HKYBI93yR5LQqs/UcuKYKQc8WT/UO7YBcryHjFgkEF5vneV
-         ZhpGq7We16DJsWq5KNjWoPX6bLD7d2Z/kz7lWLp0kGFqBJ0OBMfhmiNfCUxfdF+BAne5
-         apWlaX0bYrYqM2diHjkWe4XPB599bNVzPdTAgLVyIFH3cuxyJve/ctwQJ6sGfMiikwz4
-         S3gmxfRw/kWz03aSIkzg35a4ra9zbzfAAnRBGM4xyMPYFdMmGHuYyE4EygOCkFUjuc/F
-         qpgnBryJ+g59ZkY744uI5s66wLqOQVzPxvQh5ud7ixi86juljOTAsGEkmmQMEexzfCPC
-         YGlA==
+        bh=O8VFR6D6ebFNgdbFt4EuG+XkogkiZPMDN26ihda2G5Y=;
+        b=JISp4qgMwwCjhs5kGz04FDSsVWsXn2hYGaQ4tiGi9+Tx/X80HpYoO5SACQ8IIin/S7
+         PU3FuNDi8sf5mO9OFHjorhZFVeVbY2CTF+ZZqmjTgNst1YPwqGXZ/SPpcbWfoX05SPiI
+         r5stsAQ9job4ycdgh5YLthBIW7JaXweBbPkrZAvYTW7iIVG+sYaFQSSBOz/6qe+LuH/o
+         tVYDTy6oArOBJqXzW+K9n+Lst/3uAtqYUfotRRqT831pId2mzIfp4sqlynE86QVvvmWC
+         paQizXMnlh4kEF0+mgihhlLhdMcOikk7vZwyQd8/1wRUzOUImDtyQ8QgNeyZKhzteLTa
+         xoDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791432112; x=1792036912;
+        d=1e100.net; s=20260707; t=1791432702; x=1792037502;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=rHUntJAA/mwo/FHuh8v4le2k0YfNGeacRBz3GsN1kMw=;
-        b=NDk87vfwwtxbp3fj2CiAjDN/cKciMsXWmJHwKvSqYThG0sCvJbJ5hzVZQbGgOjC6nq
-         +aBNSpMZmmjsH5hdKbGQL64HBqSTeM8/8ijuyZZ5irnc+00mCkTIziIkdjVJJ8ilxBaa
-         hYgqrkG2rSK3Az4uU8zsQkQx4JhTX6SOPuuC/Fi2/XlZPkQhA+dVZhe6E2Jr8vWLkeIC
-         0G9JT2IVoN1SatuL+my/4+RE1i3syUgDj19qKrr2+67TVZ2+zOWNupttbvJAoUrXK9fu
-         8vYdmzYKxvkALNXeJZQYW4HnebOMkJeHRql8IDy7TbtiBfsUs03KKYmE9X9WH5YbPuqc
-         C6aQ==
-X-Gm-Message-State: AFq9FYJDimrw1b7EO8m1xXTIWftztlbHyGtB5SC9U56aGVLDvq27+zM+
-	00Hsa1EMB07ZUslRLyDw3k2964oKt45NlK1UdjHer6ZpClhavzE3CH6R
-X-Gm-Gg: AYBFou0t5onSTFf5b0aKyYSzRZGaMEfG2VspU8WHC4n8C2bDLjyZL+qORcAvb98vXKa
-	DrKGs+0nwQug+nPN2+QCYv1N3bf3xFfVdQD5RIMgSo6JCn1cu/CjwiL48r56dd0vOWn59aPbXcR
-	cR+6G1+wYd6Ff21nMw6QVcaIkKQneSJONkg8Xki7wL3VoLrO/t6RNZbC6Ou9qbv+r93oNd5ygYQ
-	r/A5qpbxwzMg3VYX0pE/41f9DifSht79Sch8tbD9uQKvFjhNA05Psuq0ongEWbhjSH2xQEnIbwg
-	YR5ZvjPTNZSpU2TeLeCZ+CQmtpJ725TXlgR+EIpwQbjTdSjdB0MU5aR5l+bvMIXR3LY+787icXJ
-	SfIsJOBwjWTyw9AKzoHOo3n9KRCjxx5D6q0zJi+wneDSiF31HX6KqltLExbkuLTsuREtynnM8h0
-	VxoPQbtw/59fEek3TKrJNwPDhgpT1cii62tAnzJE7mvuIq5V94rX4uRFp/7TWtx15jHw==
-X-Received: by 2002:a17:90a:1541:b0:3a8:c0cd:57f8 with SMTP id 98e67ed59e1d1-3a8c0dcd10cmr1695006a91.4.1791432112448;
-        Wed, 07 Oct 2026 21:01:52 -0700 (PDT)
+        bh=O8VFR6D6ebFNgdbFt4EuG+XkogkiZPMDN26ihda2G5Y=;
+        b=SN6W9GNYIYy5pF/lXqhW58yE/BpDc6IRhu8nfBxUE/uaiUkWOCFeNVmiJpZw8PDdFb
+         hm+UMPWQp+BTKvHDde9JjgVp/g6ptsQOTPILyl085p2JHWxDwBsUQ8OzItIeYKfXkaY2
+         m5/0EtFXXNGB60WfhGd33LgQN+l3meka6Gr8uFLzwSRJ8wyrgWxnQE5kUzllJDaqYo5O
+         iMa7LxtMPZpKk+Y4123GsO6dTEFyFK6TtO2XgjELlbusCCnhnhdk/0fya7pyL8Yda8rv
+         X1Z4ddXXZ/xThvAiloabhv/O5JsJUiQaa5rqqxsgHVwpMbQPtEBL+Ki7xu6rAH5T3DPV
+         Y0jw==
+X-Gm-Message-State: AFq9FYJb9aCMqvs+hXKcnf41y1304lL0iRGGI2y1saQaWJIpLSodv15B
+	X0nWUwY6Iz8UMM4iNSq99bW1syIaX/YuaPhLa1IWOGoyJaWqze9B3V4q
+X-Gm-Gg: AYBFou1Mb5rA6Qt/x8n6/6FS/qKVdKd9WQ42gnTncwP9B1xwdnbJh50kgbQCAP3w2VQ
+	MFZNIyjztC1ufIP48gFDMmtL0fj7yKZWlpoGQDzZW8fV+45NvgooOlKrsPhfYfobZ6JlM9/1TWU
+	HRzeWtt0aqY0D4uuJX7WMSEA6fLkiJGDCsFwBsNqWPLbAEym2OAzoDSrO+9yVKim6TI8y0CZmAg
+	aNdjb8PJptl26EDda3R/sQwRR5ekz+nuttvWavvSOR2cxAfMMe500UsDA5KjpEu3CN85L5nQohq
+	ZaWYRmPyz4pcuRZ2Z3EAotusmycbtSSLolF9apPsnuj+sw1Al6TtXKw0i8PDUw0bj7XxhI9lJxv
+	JD/fuPFJDlVYwnmlEa2SAGypQR6hQu7ap+FpF9D7GN6MIE2KoT94PsTWPf6VUQfvj44CGM5Yn2a
+	lerUKvwDS/aeX1TSOa8hTSupMV+R2KldX+n43zLtYU6vAPxS22QpP3Q1jbhRSwKPul0Oo=
+X-Received: by 2002:a17:90b:2d50:b0:3a4:930e:6c35 with SMTP id 98e67ed59e1d1-3aadff48864mr691084a91.4.1791432701701;
+        Wed, 07 Oct 2026 21:11:41 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9f1bfbafasm2654738a91.11.2026.10.07.21.01.49
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a8a4dbaa8csm3396151a91.4.2026.10.07.21.11.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 21:01:52 -0700 (PDT)
+        Wed, 07 Oct 2026 21:11:41 -0700 (PDT)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -64,9 +64,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: hci_debugfs: Pin the module for open dut_mode files
-Date: Thu,  8 Oct 2026 12:01:46 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0251-v5-7e4e8154d66ac0e60df2@gmail.com>
+Subject: [PATCH] Bluetooth: 6lowpan: Drain RCU readers on registration failure
+Date: Thu,  8 Oct 2026 12:11:35 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0230-v4-fd2c82b141a5bc3c5841@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -77,74 +77,211 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-An open dut_mode file retains dut_mode_fops in the debugfs proxy state.
-The table must remain allocated until the final close has finished
-accessing it. However, dut_mode_fops has no owner, so fops_get()
-succeeds without taking a Bluetooth module reference.
+A lowpan_btle_dev is embedded in its net_device allocation and must
+remain alive until readers of bt_6lowpan_devices have left their RCU
+sections. setup_netdev() publishes it before registration, but its
+error path only unlinks it before calling free_netdev().
 
-With CONFIG_BT=m and Bluetooth debugfs enabled, a descriptor can remain
-open across controller removal and module unload if all other module
-references have been dropped. After hci_debugfs_create_basic() publishes
-the file, the following order is possible:
+If a second controller's registration fails while multicast is sent
+on an existing 6LoWPAN interface, send_mcast_pkt() can already have
+selected the new entry. It reads entry->netdev before checking which
+interface owns it. An early failure, such as allocating the device's
+name node, leaves NETREG_UNINITIALIZED, so free_netdev() releases the
+storage immediately.
 
-    File holder                     Controller/module teardown
-    -----------                     --------------------------
-    open dut_mode
-      full_proxy_open_regular()
-      fops_get(): owner == NULL
-      debugfs_file_put()
-    keep descriptor open            hci_unregister_dev()
-                                    hci_release_dev()
-                                      debugfs_remove_recursive()
-                                    delete_module()
-                                      bt_exit()
-                                      free_module()
-    close descriptor after unload
-      full_proxy_release()
-        read real_fops->release
+The following ordering frees the selected entry before the reader
+loads its netdev field:
 
-Debugfs removal drains active callbacks, but an idle open descriptor is
-not an active user. Its dentry retains the saved table pointer until
-close. full_proxy_release() then reads the release field, even though
-it is NULL, and fops_put() reads the owner field from freed module
-storage. The close can fault in full_proxy_release(), as shown below.
+  Adapter creation (controller B)       Multicast on controller A
+  setup_netdev()
+    list_add_rcu()
+                                       rcu_read_lock()
+                                       select B's entry
+    lowpan_register_netdev() fails
+    list_del_rcu()
+    free_netdev()
+                                       read entry->netdev
+                                       rcu_read_unlock()
 
-Set the owner of dut_mode_fops to THIS_MODULE, matching the tables
-created by DEFINE_SHOW_ATTRIBUTE in the same file. The existing debugfs
-fops_get()/fops_put() pair then keeps Bluetooth loaded until close has
-finished using the table, preventing normal unload with the file open.
+Removing the list node does not wait for that reader, and
+devices_lock does not serialize the multicast reader. The subsequent
+field load is a use-after-free, reported by KASAN in bt_xmit().
 
-Oops report as below:
-    BUG: unable to handle page fault for address: fffffbfff8056f03
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 1a7ff6067 P4D 1a7ff6067 PUD 1a7ff2067 PMD 100ad6067 PTE 0
-    Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+Wait for an RCU grace period after dropping devices_lock and before
+free_netdev(). This keeps the failed adapter allocated until traversals
+that could have selected it complete. The callback is already sleepable,
+and the wait happens outside the list spinlock.
+
+KASAN report as below:
+
+    ==================================================================
+    BUG: KASAN: slab-use-after-free in bt_xmit+0x1d06/0x21e0
+    Read of size 8 at addr ffff88810ef45030 by task python3/556
+
     Call Trace:
      <TASK>
-     __fput+0x39f/0xa60
-     fput_close_sync+0xff/0x200
-     ? __pfx_fput_close_sync+0x10/0x10
-     ? dnotify_flush+0x22/0x4b0
-     __x64_sys_close+0x8c/0xf0
+     dump_stack_lvl+0x93/0xd0
+     print_report+0xce/0x630
+     ? bt_xmit+0x1d06/0x21e0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __virt_addr_valid+0x20d/0x410
+     ? bt_xmit+0x1d06/0x21e0
+     kasan_report+0xe0/0x110
+     ? bt_xmit+0x1d06/0x21e0
+     bt_xmit+0x1d06/0x21e0
+     ? __pfx_bt_xmit+0x10/0x10
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_acquire+0x17b/0x2f0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_is_held_type+0x8f/0x100
+     ? dev_hard_start_xmit+0x187/0x660
+     ? __pfx_bt_xmit+0x10/0x10
+     dev_hard_start_xmit+0x187/0x660
+     sch_direct_xmit+0x153/0x850
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __pfx_sch_direct_xmit+0x10/0x10
+     ? do_raw_spin_lock+0x130/0x270
+     ? __pfx_do_raw_spin_lock+0x10/0x10
+     ? lock_is_held_type+0x8f/0x100
+     __dev_queue_xmit+0x3111/0x3aa0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? look_up_lock_class+0x59/0x130
+     ? register_lock_class+0x41/0x790
+     ? __pfx___dev_queue_xmit+0x10/0x10
+     ? __lock_acquire+0x466/0x2260
+     ? find_held_lock+0x2b/0x80
+     ? ___neigh_create+0x1690/0x2540
+     ? __local_bh_enable_ip+0xa6/0x120
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lockdep_hardirqs_on_prepare+0xea/0x1a0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_acquire+0x17b/0x2f0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? find_held_lock+0x2b/0x80
+     ? ip6_finish_output2+0x8be/0x1840
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? neigh_connected_output+0x39f/0x4e0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     neigh_connected_output+0x33f/0x4e0
+     ip6_finish_output2+0x8be/0x1840
+     ip6_finish_output+0x424/0xd50
+     ip6_output+0x210/0x640
+     ? __pfx_ip6_mr_output+0x10/0x10
+     ip6_local_out+0x193/0x1c0
+     ip6_send_skb+0xfb/0x3e0
+     udp_v6_send_skb+0x6e1/0x1180
+     udpv6_sendmsg+0x1f9b/0x2a00
+     ? get_random_u32+0xaf/0x640
+     ? __pfx_udpv6_sendmsg+0x10/0x10
+     ? lock_release+0xc8/0x280
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lockdep_hardirqs_on_prepare+0xea/0x1a0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? trace_hardirqs_on+0x18/0x160
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __local_bh_enable_ip+0xa6/0x120
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __pfx_udpv6_sendmsg+0x10/0x10
+     ? inet6_sendmsg+0xff/0x140
+     inet6_sendmsg+0xff/0x140
+     __sys_sendto+0x320/0x470
+     ? __pfx___sys_sendto+0x10/0x10
+     ? exc_page_fault+0x5c/0xc0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_release+0xc8/0x280
+     ? handle_mm_fault+0x12e/0x580
+     __x64_sys_sendto+0xe5/0x1c0
+     ? lockdep_hardirqs_on_prepare+0xea/0x1a0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? trace_hardirqs_on+0x18/0x160
      do_syscall_64+0x115/0x6a0
      entry_SYSCALL_64_after_hwframe+0x77/0x7f
-Fixes: 4b4148e9acc1 ("Bluetooth: Add support for setting DUT mode")
+    Allocated by task 502:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     __kasan_kmalloc+0xaa/0xb0
+     __kvmalloc_node_noprof+0x353/0x930
+     alloc_netdev_mqs+0xa0/0x1250
+     chan_ready_cb+0x198/0x1110
+     l2cap_recv_frame+0x6dc0/0x8830
+     l2cap_recv_acldata+0xe9f/0x10e0
+     hci_rx_work+0x5a6/0xf00
+     process_one_work+0x908/0x19c0
+     worker_thread+0x65c/0xe40
+     kthread+0x34f/0x460
+     ret_from_fork+0x659/0x940
+     ret_from_fork_asm+0x1a/0x30
+
+    Freed by task 502:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     kasan_save_free_info+0x3b/0x60
+     __kasan_slab_free+0x5f/0x80
+     kfree+0x307/0x580
+     free_netdev+0x6ca/0x8f0
+     chan_ready_cb+0xd91/0x1110
+     l2cap_recv_frame+0x6dc0/0x8830
+     l2cap_recv_acldata+0xe9f/0x10e0
+     hci_rx_work+0x5a6/0xf00
+     process_one_work+0x908/0x19c0
+     worker_thread+0x65c/0xe40
+     kthread+0x34f/0x460
+     ret_from_fork+0x659/0x940
+     ret_from_fork_asm+0x1a/0x30
+
+    The buggy address belongs to the object at ffff88810ef44000
+                                                                which
+                                belongs to the cache kmalloc-8k of size
+                                8192
+    The buggy address is located 4144 bytes inside of
+                                                                freed
+                                8192-byte region [ffff88810ef44000,
+                                ffff88810ef46000)
+
+    The buggy address belongs to the physical page:
+        page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0
+    pfn:0x10ef40
+    head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+    flags: 0x200000000000040(head|node=0|zone=2)
+    page_type: f5(slab)
+        raw: 0200000000000040 ffff888100043180 dead000000000100
+    dead000000000122
+        raw: 0000000000000000 0000000000020002 00000000f5000000
+    0000000000000000
+        head: 0200000000000040 ffff888100043180 dead000000000100
+    dead000000000122
+        head: 0000000000000000 0000000000020002 00000000f5000000
+    0000000000000000
+        head: 0200000000000003 fffffffffffffe01 00000000ffffffff
+    00000000ffffffff
+        head: ffff88810ef41a80 0000000000000000 00000000ffffffff
+    0000000000000000
+    page dumped because: kasan: bad access detected
+
+    Memory state around the buggy address:
+     ffff88810ef44f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+     ffff88810ef44f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    >ffff88810ef45000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                         ^
+     ffff88810ef45080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+     ffff88810ef45100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+    ==================================================================
+    Disabling lock debugging due to kernel taint
+
+Fixes: 5857d1dbae7d ("Bluetooth: 6lowpan: Fix possible race")
 Assisted-by: LLM
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
-
-Assisted-by: LLM
 ---
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 2559fb6324d63d5fc84d530d2a19f2602ac06d3d..f17b5c960522cb22140322e4781775e4e2f6b711 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -1315,6 +1315,7 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
- }
- 
- static const struct file_operations dut_mode_fops = {
-+	.owner		= THIS_MODULE,
- 	.open		= simple_open,
- 	.read		= dut_mode_read,
- 	.write		= dut_mode_write,
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 836add41f5d16f1df81042cbf9ba9b927e883eb8..0f6a45509d71c20bd556ad987e05f2fa1b0ab26b 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -706,6 +706,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ 		spin_lock(&devices_lock);
+ 		list_del_rcu(&(*dev)->list);
+ 		spin_unlock(&devices_lock);
++		synchronize_rcu();
+ 		free_netdev(netdev);
+ 		goto out;
+ 	}
