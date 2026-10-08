@@ -1,156 +1,279 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1E033B6EF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 04:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D4B3644CF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Oct 2026 04:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791433647; cv=none; b=bq+xSL0K02Cjp4b1tRicTpB6EkGb8B3sVF269rdi0EiKSAzhTCjT+gE0VpYM45+j9r46KPFvHymsVeZ1qe4+my1t56k1SCy/iA3r5+rAd1UZ+h4+5dLN3dMBga86vOSGXajBFR9jYR2Xtj1EXy8NzXaXPjfqZ4bkwdhWeeZkfP0=
+	t=1791433681; cv=none; b=M0wtPa2cP3e0W4NA8l/CigMlDIrV5QadnoylnjOQojxeJK3EbeMCOCpqrMqwctJtcAQKcjVpEexuAdH7d5BQ1IkEnKZnD3ZNpsVWP9qzsXpRQgfXxsU1gZSwBHPRAC9E6RUqR5n0qhqaKMrQf5/MpsnriN98BqypoY2lGqphAig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791433647; c=relaxed/simple;
-	bh=dT2QpKz/3buSy8vB/Wept2jMCgV2t/Fjg1GQROnCjoc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c32pmsqbyPkWektWyaOojGWl1bF0BoFR//bUCFOrhklsbzjKMGsiHo5a38oDnQiK6JXOJLe5Ww4mAhqg76ILyANAbxSgAPx8Z4mD0L+eLJB7A1ttfP9FJrWqcvNcRXJ79v0wcXXOx6QeRfpAsDeZEq/2izc0mMaauJMPkbhz6L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rKIwXorL; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1791433681; c=relaxed/simple;
+	bh=8yxs7YfzqvRVtKhBlK7Og0qPenjCv6X/6aJgf1antmU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dgIN0QT70rapshePw4lxlXpolLrZY/cdAFfI09dKAn0zjsnUv0iioNzWWPTAef+O7ByuKP7jyf2TVucao/WR1y+n31D1eWUT7Np6cpGh6jQrFbnBGTudjSLdhorQiI9SYQuFYbLcwkRLTyNiJqFdEe0Nhj5DWUpgboknv5OBrAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o0pPywgs; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rKIwXorL"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-383b4a3755fso3387992a91.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 21:27:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0pPywgs"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-cd1e069cb19so175313a12.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Oct 2026 21:28:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791433645; x=1792038445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YXIleF80V9tD6g64hmF4dQJNHIEL3vW+DMhKPhWaMpU=;
-        b=rKIwXorLeCc9yujhCSQgqbQNz5kTwD3FihXFMCCJA9dzgon5GMvAY/AKMq0Ykb7dwE
-         enp5V+2lxV1ZzhkraTefYo937CL3FnKH/0N/LaCgzCRH2bhZ/9yU2HJV27PaxSjg2sS3
-         2a0a1FAMYa+CLxVe4SiS+6elzpyBHuTydsJ7aB0sSUB2wnvM4PNd/CLyR7w75G0CqHue
-         rEnWo+l0HnaOid2zv+jdzQ3h9S8vq5VHjdVNAbB7maUR3PdeVV/67poWTMDyZdagybUQ
-         Lu0h2uOnu8cBgFXWV8LMQrOFXEV5ICSyopHwK0sVER8g3iWrlpviH2drKh69RFb6uSeU
-         L30Q==
+        d=gmail.com; s=20251104; t=1791433679; x=1792038479; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AZ778jZsa/l446uvpFqFZ0Ls/7AJyjZNff1uctiZNtk=;
+        b=o0pPywgsOKUmeXzknQXH7kuIJh/IZK5y1/Fxhobje8t2HC0YhxpNfgGTh2aCpVvaEM
+         7mLXrnY4STfMPTsEJn88GzIXsiyTO65NLA0TC3NRzxARTA0ewUuujiYNHVRr+vfATBte
+         6CdOmHgzikifc7IkFY5iBu2wfVDRkodZYj/4GCuJJlwusl8ScliR42B8CizGaNKWIWbq
+         L1K353qqHI5yGBcG/J/HVLHnlPtEpk+Letf9Ks/Fa/a4QmRpzpxjimipmlKUctHVJEds
+         +9giLFYP5LCbhHdRZfEp4a56JJ6eQF49Z38/zB9Mtco8GeBfmrCVUPZM91gU1SMmtzUb
+         0C/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791433645; x=1792038445;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YXIleF80V9tD6g64hmF4dQJNHIEL3vW+DMhKPhWaMpU=;
-        b=w1IcZcD8eTnd1kdyy5fWEar3c6PogdGd5ltn6h0K4wKL6wLLjd5UWx7h/9AlkKdN5b
-         0mqiDI3rbnUaInm19UWcsz4EbO0cOohpcTpy42iFJkkKVdscToG77LIQTaWsQvcpPnkt
-         XOpUYTdoalOQeiiXljlXEWwTDAFBrQIi8KtagP0veXAjgWGS/DeVugd3mu6AM6V2Q72R
-         fddnzkRCPd+4m6GnrDh1NWPnuvP1KNXzog7h6VduTWqFz7MTaWka9WKVhQncX5vRPidC
-         +cW4+7w0fbH7waEVheHCz+wEZav/qvci6D6TlO03eYh3kHYnIu3DxvCP/zJuvLZUZ5rw
-         1cXA==
-X-Gm-Message-State: AFq9FYIKWLGF6kvQg1TuMLKm5ankqKuZ+gcYnsym5TlnHxa5PYdeCttP
-	Oe4WxaKBVUSxdzncH7Tr2nB75//mP0zD0G5s/x9ifZL8P/1kV2VUAqwiCHAvnFMl
-X-Gm-Gg: AYBFou2RPaJ7sJyCGjFhveBWAPr1Ly4u7Q5Tp1EfcCWFZfxx79pWUPC6urI+XxTATKu
-	vP1yyatQmIDekbFZy4+tnnKASEBiOg1OoJ7jr1jSg8H6pfb7TfZXj29lwsNyIJ2nJrF6Lym76Fx
-	tSgF4fPn/tIcCGWPcx+eS4A1NCzLAWmZj2ZVMHhzvtQWtj2sNunEtYp1Vsa1IT4vC3fZ/Q+LK+N
-	viZdV4eCrXfz2ceHQBs+Pp+MuCkvFzHByZDIBwvXZrwd2kjIFV43JXqx5PePs4iI4AEdAvMoErz
-	+w5rm/PJuZEFb0rznqDvVqeF8Q/jg8OrIKl+ywGoZvEXQCl1QS0bU10Z3ODKsQGyR2eDu1R6ZGC
-	9+M6AHtV9hpussCKdn8fxTOQTILB8zEzPs4KFlFouBYFpCacmFDObBI78fnbPcbxDGU8xZe5IxA
-	9MjRilfyI2mZ9ZVxR+VqCzU1wr3ektDx3wwrxTKEB0kdFHjBo238wf58gB8Q2DtE1FLob23npNk
-	u7Dchd7ehyp8bcRPvZbX//3k6eKhFPj9PqfJIB/wR8Bv7urYWaZt++t3cHgxPwssiJAiTu3r6sC
-	2u9yawnlsQ==
-X-Received: by 2002:a17:90b:3912:b0:3a4:aa26:21c7 with SMTP id 98e67ed59e1d1-3a8a1974b40mr4063197a91.25.1791433645070;
-        Wed, 07 Oct 2026 21:27:25 -0700 (PDT)
-Received: from phui-2.c.googlers.com.com (25.187.82.34.bc.googleusercontent.com. [34.82.187.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9f1bfbafasm2745439a91.11.2026.10.07.21.27.24
+        d=1e100.net; s=20260707; t=1791433679; x=1792038479;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=AZ778jZsa/l446uvpFqFZ0Ls/7AJyjZNff1uctiZNtk=;
+        b=ukoPqm5jbeRXqvMb76KJYdRy3dXYu5epT04jF4nqPK41OXUXNeoK+kUGIFJfClJaVA
+         HC0N6m+NuzYxAAJwEXc+sk+dzkhIthRm3bbrlI7qfFhZElbUbtQ+uW5hcHJfaborAfzr
+         cKEnOOOZ6LZGnLUKM0xQsNAMInsbPUDdzITqcEM1CwLxgkpDwQhMQqnmZPOlZyBx1KhD
+         frVqHN4TeNcj5EiMLi2SxOgDtRO14dqPEKi2sEczGfu9SHYpP2cxL5UqwLcfkIXN3hXk
+         IUPcv7pXFv7wvRK4F49rNaZ3LEw8thkd/zvv5GeSvNt1Bx7OLjXB+2pD5Cumz3JO0q3u
+         TSrw==
+X-Gm-Message-State: AFq9FYLVPq+cNkIF/tewf6xpA00P3kMyxfe/f9dLtlmZ/4KC+u/rSoTt
+	wzZ7l72ZOyW2TUWmQJ3PCnOXY1NhhQts/Pu6bcxuyQsxnNygCNgRhX+F
+X-Gm-Gg: AYBFou2KvWZn9JQSRiA/yAY2zA6yXFUgRqvcQANJPaJuCVPMhDGIqFrd3SCBvh5jYp9
+	4BEoraN/2tZagvWVbjfCsnmCw6sA4EOq4pCLpgnlT7FmXWCN5kVnwWrEG6PP38Fxs/n/3HrvPPo
+	bvtxaH8zPzpF30TwwDQRIkR7Wejz+L6gYhqCQGFB2gFY2I3l3Q71yHuWo0V0G6tNfrVEKL7r8uG
+	RwW9cdVXyA4wKvo9umm/zviKnToAlxuDRlQXes3+XLpAP342OsFVOZE4hiE0vKfiwlv4sIaox12
+	Nq8Ca1RS1tHa1H2qI59tqq8KDQ6AXSTeCo0uXojfvdrv/ZZx9iGm4EYcVvmWvW5LLCYcIh0TNaP
+	efjW5gY7Bf0/N12+p9hQ+dAgmHChKusixdEwAkr5FHwtMPbTBjNBbsqENWRsZx0ljV/6HjgHqqi
+	FSfESz+0Z0lv+gG7CRiZJoHn2K9ue66w1Top8J0gbBD1vt/D9q8sRQPVAZ71UAc8v+Xw==
+X-Received: by 2002:a17:90b:1e48:b0:3a2:aec0:6bc2 with SMTP id 98e67ed59e1d1-3a8a11974b2mr4050881a91.53.1791433679554;
+        Wed, 07 Oct 2026 21:27:59 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3aa0cbea8d3sm2319217a91.16.2026.10.07.21.27.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2026 21:27:24 -0700 (PDT)
-From: Hui Peng <benquike@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hovold <johan@kernel.org>,
-	Luiz Augusto von Dentz <luiz.von.dentz@gmail.com>
+        Wed, 07 Oct 2026 21:27:59 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
-	Hui Peng <benquike@gmail.com>
-Subject: [PATCH v2] sdp: Prevent integer underflow in string attribute length calculation
-Date: Thu,  8 Oct 2026 04:27:20 +0000
-Message-ID: <20261008042720.3134391-1-benquike@gmail.com>
-X-Mailer: git-send-email 2.56.0.360.g66cac248cb-goog
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	jjzuming@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH] Bluetooth: 6LoWPAN: Serialize multicast sends with peer removal
+Date: Thu,  8 Oct 2026 12:27:52 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0001-v6-7494fb26092a1231b75b@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In lib/bluetooth/sdp.c, attribute string length calculations subtract
-sizeof(uint8_t) from d->unitSize (e.g. d->unitSize - sizeof(uint8_t)).
-When d->unitSize is 0 or less than sizeof(uint8_t), this subtraction
-underflows in 32-bit integer arithmetic to a negative/huge length value,
-passing invalid sizes to memory allocation and length extraction
-functions.
+A peer's channel must remain alive until send_mcast_pkt() finishes using
+it. The multicast walk protects the lowpan_peer with RCU, but peer_del()
+defers only the peer allocation. On disconnect, l2cap_chan_del() drops
+the connection-list reference, chan_close_cb() removes the peer and drops
+the original channel reference, and l2cap_conn_del() drops its temporary
+reference. A ready channel can then be freed while multicast transmit
+still holds the peer, causing send_pkt() to write chan->data after free.
+Another peer can keep the interface up, so the last-peer shutdown does
+not drain this transmission.
 
-Add explicit lower-bound guards checking d->unitSize > (int)sizeof(uint8_t)
-to ensure that when d->unitSize <= sizeof(uint8_t), the calculated string
-length is safely set to 0.
+Hold devices_lock across the multicast walk and send_pkt() calls so that
+peer removal cannot release the channel reference until the send finishes.
+Use the bottom-half-safe variants for all devices_lock critical sections
+because transmit runs in softirq context. This prevents transmit from
+interrupting a process-context lock holder on the same CPU and deadlocking.
+The LE send path uses atomic allocations and does not acquire the channel
+or connection mutexes, preserving the existing lock order and teardown
+sequence.
 
-Assisted-by: Antigravity
+The reported access and release path were:
+
+        [Thu Oct  1 11:52:32 2026] BUG: KASAN: slab-use-after-free in
+    send_pkt+0x2c5/0x300
+        [Thu Oct  1 11:52:32 2026] Write of size 8 at addr ffff88810be0f4a0
+     by task python3/535
+    [...]
+    [Thu Oct  1 11:52:32 2026] Freed by task 502:
+    [...]
+    [Thu Oct  1 11:52:32 2026]  l2cap_chan_put+0x273/0x3a0
+    [Thu Oct  1 11:52:32 2026]  l2cap_conn_del+0x36d/0x770
+    [Thu Oct  1 11:52:32 2026]  l2cap_disconn_cfm+0x87/0xd0
+    [Thu Oct  1 11:52:32 2026]  hci_disconn_complete_evt+0x319/0xa30
+    [...]
+
+Fixes: 90305829635d ("Bluetooth: 6lowpan: Converting rwlocks to use RCU")
+Assisted-by: LLM
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-Changes in v2:
-- Cast sizeof(uint8_t) to (int) in comparison checks to fix
-  -Werror=sign-compare compiler warnings reported by BlueZ CI.
-- Refactor length calculation blocks to use clear if/else guards.
-
- lib/bluetooth/sdp.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/lib/bluetooth/sdp.c b/lib/bluetooth/sdp.c
-index 1e027f9..d31463b 100644
---- a/lib/bluetooth/sdp.c
-+++ b/lib/bluetooth/sdp.c
-@@ -730,7 +730,10 @@ static int sdp_get_data_size(sdp_buf_t *buf, sdp_data_t *d)
- 	case SDP_URL_STR8:
- 	case SDP_URL_STR16:
- 	case SDP_URL_STR32:
--		data_size = d->unitSize - sizeof(uint8_t);
-+		if (d->unitSize > (int)sizeof(uint8_t))
-+			data_size = d->unitSize - sizeof(uint8_t);
-+		else
-+			data_size = 0;
- 		break;
- 	case SDP_SEQ8:
- 	case SDP_SEQ16:
-@@ -1523,8 +1526,12 @@ static void *sdp_data_value(sdp_data_t *data, uint32_t *len)
- 	case SDP_URL_STR32:
- 	case SDP_TEXT_STR32:
- 		val = data->val.str;
--		if (len)
--			*len = data->unitSize - sizeof(uint8_t);
-+		if (len) {
-+			if (data->unitSize > (int)sizeof(uint8_t))
-+				*len = data->unitSize - sizeof(uint8_t);
-+			else
-+				*len = 0;
-+		}
- 		break;
- 	case SDP_ALT8:
- 	case SDP_ALT16:
-@@ -4852,7 +4859,11 @@ int sdp_set_supp_feat(sdp_record_t *rec, const sdp_list_t *sf)
- 			case SDP_TEXT_STR8:
- 			case SDP_TEXT_STR16:
- 				vals[j] = data->val.str;
--				lengths[j] = data->unitSize - sizeof(uint8_t);
-+				if (data->unitSize > (int)sizeof(uint8_t))
-+					lengths[j] = data->unitSize -
-+							sizeof(uint8_t);
-+				else
-+					lengths[j] = 0;
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 836add41f5..8732132c47 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -471,6 +471,11 @@
+ 	struct lowpan_btle_dev *entry;
+ 	int err = 0;
+ 
++	/*
++	 * Peer removal drops the channel reference, so RCU alone is not
++	 * enough.
++	 */
++	spin_lock_bh(&devices_lock);
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
+@@ -502,6 +507,7 @@
+ 	}
+ 
+ 	rcu_read_unlock();
++	spin_unlock_bh(&devices_lock);
+ 
+ 	return err;
+ }
+@@ -657,10 +663,10 @@
+ 
+ 	lowpan_iphc_uncompress_eui48_lladdr(&peer->peer_addr, peer->lladdr);
+ 
+-	spin_lock(&devices_lock);
++	spin_lock_bh(&devices_lock);
+ 	INIT_LIST_HEAD(&peer->list);
+ 	peer_add(dev, peer);
+-	spin_unlock(&devices_lock);
++	spin_unlock_bh(&devices_lock);
+ 
+ 	/* Notifying peers about us needs to be done without locks held */
+ 	if (new_netdev)
+@@ -695,17 +701,17 @@
+ 	(*dev)->hdev = chan->conn->hcon->hdev;
+ 	INIT_LIST_HEAD(&(*dev)->peers);
+ 
+-	spin_lock(&devices_lock);
++	spin_lock_bh(&devices_lock);
+ 	INIT_LIST_HEAD(&(*dev)->list);
+ 	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
+-	spin_unlock(&devices_lock);
++	spin_unlock_bh(&devices_lock);
+ 
+ 	err = lowpan_register_netdev(netdev, LOWPAN_LLTYPE_BTLE);
+ 	if (err < 0) {
+ 		BT_INFO("register_netdev failed %d", err);
+-		spin_lock(&devices_lock);
++		spin_lock_bh(&devices_lock);
+ 		list_del_rcu(&(*dev)->list);
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 		free_netdev(netdev);
+ 		goto out;
+ 	}
+@@ -788,7 +794,7 @@
+ 
+ 	BT_DBG("chan %p conn %p", chan, chan->conn);
+ 
+-	spin_lock(&devices_lock);
++	spin_lock_bh(&devices_lock);
+ 
+ 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
+ 		dev = lowpan_btle_dev(entry->netdev);
+@@ -808,7 +814,7 @@
+ 	}
+ 
+ 	if (!err && last && dev && !atomic_read(&dev->peer_count)) {
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 
+ 		cancel_delayed_work_sync(&dev->notify_peers);
+ 
+@@ -817,7 +823,7 @@
+ 		INIT_WORK(&entry->delete_netdev, delete_netdev);
+ 		schedule_work(&entry->delete_netdev);
+ 	} else {
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 	}
+ }
+ 
+@@ -918,18 +924,18 @@
+ 
+ 	BT_DBG("conn %p dst type %u", conn, dst_type);
+ 
+-	spin_lock(&devices_lock);
++	spin_lock_bh(&devices_lock);
+ 
+ 	peer = lookup_peer(conn);
+ 	if (!peer) {
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 		return -ENOENT;
+ 	}
+ 
+ 	chan = peer->chan;
+ 	l2cap_chan_hold(chan);
+ 
+-	spin_unlock(&devices_lock);
++	spin_unlock_bh(&devices_lock);
+ 
+ 	BT_DBG("peer %p chan %p", peer, chan);
+ 
+@@ -1053,7 +1059,7 @@
+ 
+ 		nchans = 0;
+ 
+-		spin_lock(&devices_lock);
++		spin_lock_bh(&devices_lock);
+ 
+ 		list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
+ 			list_for_each_entry_rcu(peer, &entry->peers, list) {
+@@ -1070,7 +1076,7 @@
+ 		}
+ 
+ done:
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 
+ 		for (i = 0; i < nchans; ++i) {
+ 			l2cap_chan_close_unlocked(chans[i], ENOENT);
+@@ -1195,7 +1201,7 @@
+ 	struct lowpan_btle_dev *entry;
+ 	struct lowpan_peer *peer;
+ 
+-	spin_lock(&devices_lock);
++	spin_lock_bh(&devices_lock);
+ 
+ 	list_for_each_entry(entry, &bt_6lowpan_devices, list) {
+ 		list_for_each_entry(peer, &entry->peers, list)
+@@ -1203,7 +1209,7 @@
+ 				   &peer->chan->dst, peer->chan->dst_type);
+ 	}
+ 
+-	spin_unlock(&devices_lock);
++	spin_unlock_bh(&devices_lock);
+ 
+ 	return 0;
+ }
+@@ -1269,7 +1275,7 @@
+ 
+ 	switch (event) {
+ 	case NETDEV_UNREGISTER:
+-		spin_lock(&devices_lock);
++		spin_lock_bh(&devices_lock);
+ 		list_for_each_entry(entry, &bt_6lowpan_devices, list) {
+ 			if (entry->netdev == netdev) {
+ 				BT_DBG("Unregistered netdev %s %p",
+@@ -1278,7 +1284,7 @@
  				break;
- 			case SDP_ALT8:
- 			case SDP_ALT16:
-@@ -4929,7 +4939,10 @@ int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
- 			case SDP_TEXT_STR8:
- 			case SDP_TEXT_STR16:
- 				val = dd->val.str;
--				length = dd->unitSize - sizeof(uint8_t);
-+				if (dd->unitSize > (int)sizeof(uint8_t))
-+					length = dd->unitSize - sizeof(uint8_t);
-+				else
-+					length = 0;
- 				break;
- 			case SDP_UINT8:
- 			case SDP_UINT16:
--- 
-2.47.3
+ 			}
+ 		}
+-		spin_unlock(&devices_lock);
++		spin_unlock_bh(&devices_lock);
+ 		break;
+ 	}
+ 
