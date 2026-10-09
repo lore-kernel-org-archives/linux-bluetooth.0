@@ -1,128 +1,83 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1940D2AF1D
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 14:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE0D4E324F;
+	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791555536; cv=none; b=kEdeimnl/brQ8dvnc8hKozSjgwlFV4kNyRloiOJtQ2cIEPVPK+ry3eVGVCzit7B3u0rgS6d85wNVUw39A+I8niROvDv9zV4+DmEwdtWBMkQA3xHMLeQLudrRx2eigYfMzMpcqZfKH1RgA/KLlQDsC0HwjVBT5uv0HghPopqsIJk=
+	t=1791555612; cv=none; b=hWT2gY2LjD93ycyB3cn8mUBf8i5PICDtYt/EN88b6V2mYMWYi+3JyLv7A0foa0hZgHHljuZ0Ozg+qvilroOoWv/nOXXfT+VnNMOhu3ODkOs4FkPKUVTjc8jUPY9kHFp9u6SnAvLjfedEaLJtYbfC+AJHnBuV+Iwf4NiiC4wsCVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791555536; c=relaxed/simple;
-	bh=SNCoOrLhN7F8Li2fDCuAeDNVMAzfQGCQN5KGIplBgjc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Dd4Yn5B1qIx2zv5bjvD8SnGm3sHklRSvuL2e9+jX7/l/CiSdpOt4x8GoP0IwsuBF+7zPhzcgHwHWFIVtwdw2ioD58D2UfpK/rZZGVAxr1qTEGPSnaN1WwMgC3uQWsFgFyT2/Jz+Ob7kiHcqWmK3UjNhysApMxHsCPKvbcdclcAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yf387e78; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791555612; c=relaxed/simple;
+	bh=FsOoSK9larQ1a8GxYHh826DxEKgeRxZCwAWMdUqFvoc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Iaj/2NPOk+IiSeEQYb6mh+CvQAVjQRYKGzBnum/1Y5iQLuDzEwBT6QiYdnOaSrFx/ZLETZd61pWcOAA7Q+YQbAsx+QYtUHTs+KJzd1R63NSm1WH7Rgma+v0bXlDYnIgC/TjhzfayhbweorMlgkEnHGkeHLmGmspDe0HOiJL0hHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GuW81jiS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yf387e78"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-917a707f37eso46386996d6.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 07:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791555530; x=1792160330; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=nKtmAbx50Fjs/QFxlhJyjCi/GseeZ7pfGdtK/Xgpjbc=;
-        b=Yf387e78pzqUeFT4hv9z6il6/iVzgEtGjGjPTWHwO2RSkKI2a9Ofd/oSk5rSE5A3CQ
-         AauDags0x9FIl3aQKCp3zqr3yEfWwLXXtwOa8Tf6hJMxSxgAgOu4twN83bi2vYC1Re1F
-         giUL55hYGj8DxNz6RY1bvP+HYnL2DlEwBdWl5DRy7d4j1DqTMEHlTZkCmb9lyWcE224u
-         BX4RPvQrsQ5T2JYZaksMyYRU8bxlJSudIu8eD4eRSu1esfHgVpKrQUvY8hA3vIl/9GTH
-         moddh6XSkv508Yvb39DjiXqBdj44S4YwOSY5LbVtUn5hxJaHNOjXTf01F8wULUWvUNxE
-         /DJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791555530; x=1792160330;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=nKtmAbx50Fjs/QFxlhJyjCi/GseeZ7pfGdtK/Xgpjbc=;
-        b=ASpfFh4iyApX0vbLGVhIkoXhEl7rwWK2AcLb4ysB0GTakdca7bCdczfD0CcdW6gZTh
-         yaRkoqDT4kXnhLcbfjmHwvNkL3J+mWznwuoRIO0bTYOCUHQmzaBhG3T1iLn48CqmxdzH
-         iTiPaZ1DbnROm3DovvfgalEKzhJUN0PHZKn93bADIn07Qx4T4MjgHEzoZhYiwmB8AuRX
-         m+qLcK6MD+Ch33bu6dcRJS0e14vwvaRUDMXQoAe1ANe5xvpwyr5oxVpPN03PAC6KcEya
-         cvps8VOoJVw1RuXvKJT0DRLJKe7DnnsC82p+T0phTwESUKsSqL+Hm78taOwhfLWrNrFK
-         CtIA==
-X-Gm-Message-State: AFq9FYLXwblN16MgGnNfcmH0EE4eEUROEROMuIIUYQ14j8yzCa1JRUah
-	0GOn9qK25qiH8CRMMg2sFpMDrIBYi4MCzhZFsKqPiKc5Lu0P59L/wKXbIVpDvQ==
-X-Gm-Gg: AYBFou2aa+5G3khOBvVZuZ5a71MB8TW5WoriJWhKfz94/H1hOdWSATB8T8lW2Ou6UxU
-	xmDkg1CbTw9wvSU+k8w7Ltfjf7ahIB+LUNUorT9nV5DYql/uYOU15ns9mvQpuH+s7WS5FfC0osv
-	wgwuw6OuqUbPf7JRr6O9dmmUILFs4Rk2wGtoVxoXjv3aD23RKPyw8xTYg2Jz3IAoKqtOD6Q4T6e
-	e/TbzaTrpN6wgL0EVp31qROfbUpLtJcgdzFCvMgAJj6Vdp+ZLjQNO7+bSNxjma20C/QePDljN8d
-	GBqp1QszysiTXJkz/NlJe0ZD3yHeJ8Mtcmx74BYR3N2o61PiA3e5DoveErim8U8WRWfiLdzTrsY
-	+eQzgXfj5czS2ycgjjpReUp6u7G1RAWIlhZZHvAb1j9bnOJpzLkrC0BRjyRDWcakcbxA9S5Hm72
-	rTKrOnlJtaRoywk0IvQ6gXTtmENaTNKFYfwXwF1plOBCyEwgEia1Qi0C6AvuOke9p7nDNCgvjyB
-	0Xf
-X-Received: by 2002:a05:6214:2502:b0:915:e85d:882c with SMTP id 6a1803df08f44-91b550cd3b2mr36846116d6.0.1791555529626;
-        Fri, 09 Oct 2026 07:18:49 -0700 (PDT)
-Received: from [172.17.0.2] ([20.62.207.9])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b55092ca8sm19214716d6.37.2026.10.09.07.18.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 07:18:49 -0700 (PDT)
-Message-ID: <6ac8f7c9.c2fc00b2.184e26.eb17@mx.google.com>
-Date: Fri, 09 Oct 2026 07:18:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5303112273999792983=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GuW81jiS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 832851F00898;
+	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791555607;
+	bh=0dU+CeDLS2/syMkumwBLuxcJ7FiQJnpdbMZTMAnDj6U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=GuW81jiSAOsw/I6oosp/8JM6s1PsIKfyCZRaYstsv/plYJyTXMlQHTynOiE5wVz9u
+	 tYpT8m9wBMOmvr1du4jg4hkvxfp4cpVHiYRah9xNv8Y3Qf99MisFxmiJt9X8aWy+cG
+	 CghgfNEldSD/yd3rgv0056DzisEwYGK5AdQ8RYK3gnR95ZEwm+bzdufPIX16sEgnSd
+	 CyVBtIuDAL0zrB2x2SFsxw/izCdjUn4lA/IKMWd3WbX2Mc1QzONWDMn80KfDdsqVmn
+	 EwvU2T5ELyHZ/o7r0KWMNypfiUgoETcBWxIOXXYopAcUGaW+pqHja07jsOqscthXXr
+	 vWLM/mdw2KLeQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 773C039253CC;
+	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, edumazet@kernel.org
-Subject: RE: Bluetooth: btmtk: fix skb double free on ISO padding failure
-In-Reply-To: <20261009083525.733804-1-edumazet@kernel.org>
-References: <20261009083525.733804-1-edumazet@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Pin module for 6lowpan_control
+ debugfs
+ file
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179155560628.812174.5344547417953773024.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Oct 2026 14:20:06 +0000
+References: <20261008051129.508322-1-dungvn2345@gmail.com>
+In-Reply-To: <20261008051129.508322-1-dungvn2345@gmail.com>
+To: Bui Viet Dung <dungvn2345@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
---===============5303112273999792983==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu,  8 Oct 2026 12:11:29 +0700 you wrote:
+> An open debugfs file retains lowpan_control_fops in the debugfs proxy
+> state. However, lowpan_control_fops has no .owner set to THIS_MODULE.
+> As a result, full_proxy_open_regular() calls fops_get() which succeeds
+> without taking a reference to the bluetooth_6lowpan module.
+> 
+> With CONFIG_BT_6LOWPAN=m, a userspace process can keep the debugfs file
+> descriptor for 6lowpan_control open across module unload
+> (delete_module / rmmod bluetooth_6lowpan). When the process subsequently
+> closes the file descriptor, full_proxy_release() accesses the already
+> freed and unmapped lowpan_control_fops table, causing a kernel page fault
+> or oops.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1182204/
+Here is the summary with links:
+  - Bluetooth: 6lowpan: Pin module for 6lowpan_control debugfs file
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b019e48cee2d
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       FAIL      0.33 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      29.62 seconds
-CheckAllWarning               PASS      34.12 seconds
-CheckSparse                   PASS      37.03 seconds
-BuildKernel32                 PASS      29.84 seconds
-CheckKernelLLVM               PASS      36.04 seconds
-TestRunnerSetup               PASS      817.51 seconds
-IncrementalBuild              PASS      29.71 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btmtk: fix skb double free on ISO padding failure
-
-9: B3 Line contains hard tab characters (\t): "	err = hdev->send(hdev, skb);"
-10: B3 Line contains hard tab characters (\t): "	if (err < 0) {"
-11: B3 Line contains hard tab characters (\t): "		bt_dev_err(hdev, "sending frame failed (%d)", err);"
-12: B3 Line contains hard tab characters (\t): "		kfree_skb(skb);"
-13: B3 Line contains hard tab characters (\t): "		return err;"
-14: B3 Line contains hard tab characters (\t): "	}"
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-https://github.com/bluez/bluetooth-next/pull/892
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5303112273999792983==--
