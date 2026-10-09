@@ -1,115 +1,194 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-3.smtp.github.com (out-3.smtp.github.com [192.30.252.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D02239CCFE
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 21:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A058939934C
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 23:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791579695; cv=none; b=r/RKGf5pdmjRDpiDOwGgW5QXck5qQqLr8N9zm3FbVjQxesVAkm5QIy4LtqtcqelzZihNSgZb5xFcSRrOz++yx4fPIUvdyeVR6rP2JbdXVUod9brRZHDyZRnOev54E9mnogp/W/TO5pIJbihcaO+jd+eWLyWSN5CQrAQaalStWfM=
+	t=1791589077; cv=none; b=Z7+dHpduyCmYLQgZtJYKhKXJlWE+WYitJp3LrmaRFtiTkYsK19YSbLyykhWfMD7L8lBznTF0OOs7sKeUqMKqkIO6qt28HdheJ7LIu5kIUnihcwG9bGqJhFLtmbTX/+Rjw+QCsbTCePWL3ksXNjtFuqGx8AFqGivgyTQOeRWb6Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791579695; c=relaxed/simple;
-	bh=1r/ci8qKhAH54fHcZTAKcAslBQfRJxklNwHxFyjVeeA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=HlBoP9QNUY06BaEtjloMuP65bFrU5qIVIza/nVJdcceAAr5eyIsvXHmBglzR9hKXiRQmSzNnTUTD4ss/S8VHwg++zn+p8zLVMHICHNFO75Oi0LAUpKLGtrAXiAuF9E8tPoK+cRy2I1zWfrt8JlwYlNvkLNX/oztMrYnoELVYaws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xwj0dul3; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791589077; c=relaxed/simple;
+	bh=JJ/3KBtCof523jub3N+ghgEFsS14LLkd1k7cMZBI0h4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jxtLQZeDWaCcQIWWiChyl8JOXnHldss56QRwf890QhKeDxC8e1ZfIUuboD9FaYZBYcoIR7Z783kWLp6yvGmOeP0Up+WNJZvjFOIG1fVWKD7h4RcTamP+jSXv7O77o6l6dQyHW5vJfmTQYEuCPYHf4cvcYttE+xj/6CXbJhDlBUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=YkR5TBSv; arc=none smtp.client-ip=192.30.252.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xwj0dul3"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5e3e525cf4bso110536e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 14:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791579692; x=1792184492; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=CZaZBEle1j0w30EYfQOHnRbl09ELOJsYUuewB93KAXQ=;
-        b=Xwj0dul3XSi2Ot20Y8wf4A3BRNTDlcWemidtYkW5y5v3MBDplOypb66eyPjmMi2rMI
-         iTG2RWbHvVLv42fFViPGsdJOO+Wba3yOjR+8j/YTQIPuP0hVo0HMWN+u7oiwIOynZYFq
-         +3g36y0Ss+2+JkVxsgS+J6PGx9I4zrOSld3g/SPl2pOI/dGbFngUcWxEIa+pj+bByLLK
-         93cZY/AWraeOnlLhYMbT9eRjvg7Y7Delzzxv83VXPdeYJ24MEcmN1o7Wxw4TU9qLZwSK
-         6eg1Z0ihVq4xh7UImqcenFA1RgLdsN7DXT/BVi2F6w/q1yQC3r4aKj+Ibbs0D6hCQDZV
-         hnZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791579692; x=1792184492;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CZaZBEle1j0w30EYfQOHnRbl09ELOJsYUuewB93KAXQ=;
-        b=oh3I+CMXnUHS8qn4b34ETXK+CBhxmUJzdSk2WwMMplZiKOaCeVP956aU0ylK/dutOx
-         jDHZ5GxQUq9+cY0BdZGtMleHWe29NTEQVhxtnGfsDLjUTYEwYGjzz7JGvfRJKUHR/xX9
-         A0geZneLF2ivXX/9ynmKqDxAUI2BJ941xZU8zTj8CvqNc6EnrsjBq42vq3VNsWiqwvGG
-         YePs0z/b9S5S3lYGEnrzquClTXl9OgQjru0ZwmaylxJcow40z+OkPIXyZCq3+oScbzFr
-         0aqGicMgG9ukH3O5Q1baXO/dHkkFjicx/w/WUpRDFo2vA8E6yyh2Vl7LfehBsmspW4RB
-         HjBg==
-X-Gm-Message-State: AFq9FYJ8/YY7S8+XhO4Emqm8DsS/lAIqdZnq/WKBRHqkmCGhYHUW/PoL
-	kq2S0Yk1UvRN7oRk1UcXrj/KiTUr7l4WhgDroQJULGE/pRjRR2orTsJdopyjPA==
-X-Gm-Gg: AYBFou2ZpNn2qYCtwDmX0VLYInxp4vziXvSsCOiHmZqf3pkBGyiSqLjLMzYGQHOigwf
-	iVJxUeHhbHO9E3ZjvhIW2OOTzwmOJ9udb27aXPnQvMulAIC5q7R1csB5daDBSxXHFcWqPeMf3WS
-	qVQfDSvBGHuC0fgHbXri/M+7eXwX3b+b/HjiXhuog6RzVm5ZUcfnxctcG6BVMzGZVVT9B1eD8/p
-	ywsCLBsuEA/aB1ecFnFMEL7bPtmYCSce0pkwWarnLj1fOiPT83U3n89O5X5o3anWyI12erTcGjc
-	rOiL7cCZaOySoPWf1lRZdhtdHfiIrJGw4J2kVdMS/OAE057w+N6j7I8pqN6jU9BKwSOEHuPbtYJ
-	Bt1qSSAv3Fj08Ehfb4OgBcUpe981un7v2dQtAMhIXJiVt2XqzMc+xMOaS5IadeCpx4oqEJ3lZ4/
-	nUg7/jkc/EfL9kCyqvc723t7Wr8UhhZcDUAsPgHEUAZuTFQiidMtV9cZXdmbpMlt40yfTxH80EH
-	qqY
-X-Received: by 2002:a05:622a:418c:b0:535:a5f7:d585 with SMTP id d75a77b69052e-535a5f7f25bmr41126681cf.63.1791579680643;
-        Fri, 09 Oct 2026 14:01:20 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.69.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b5504de42sm27917366d6.24.2026.10.09.14.01.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 14:01:20 -0700 (PDT)
-Message-ID: <6ac95620.a4ae4f1a.c0f8.b3e7@mx.google.com>
-Date: Fri, 09 Oct 2026 14:01:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2370043091216412931=="
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="YkR5TBSv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2026; t=1791589075;
+	bh=OukZv0ApzPRFbLVO+4VMHlK/t+AWtd2+jFz3ZNJJnas=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YkR5TBSv9Wh5zfge2UTXW8iKt1aiEedBagDKbXNUbBbfbj9cbKX5DW+2qLHRjp1zS
+	 x1fWY4sxWl53+rR6NA9GloGra7AqF6mRxjL6Qlnsa3iUFh5hYPQpaHMbtuo9v7NTUP
+	 AdVko19cMJJPhCXwlzl7abxQLMcoEJHyTvQrSJ8h/aLN6REAjyMFZ+HnhnZ+pfuHYw
+	 jVlCN2zOgOUk9Rnqn8vQm2gBYZNntpgXZ6c0GbSFoWHIfRowc06bavG3RbAdsdaSwE
+	 dHDVTAuPimdpZ6VH1I72WmCTFip++L//UEBc4hVVrd+QizIW3IPwKgZjPQhFtYprCt
+	 V9ruzeRLCoyQg==
+Received: from github.com (hubbernetes-node-ac264f9.va3-iad.github.net [10.48.67.62])
+	by smtp.github.com (Postfix) with ESMTPA id B59EE340E13
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 16:37:55 -0700 (PDT)
+Date: Fri, 09 Oct 2026 16:37:55 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b11135-7428ca@github.com>
+Subject: [bluez/bluez] c31e90: org.bluez.Bearer: Add Role property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
-Subject: RE: Add Role property to org.bluez.Bearer.LE1
-In-Reply-To: <20261009180448.29117-2-kevin@simpleble.org>
-References: <20261009180448.29117-2-kevin@simpleble.org>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2370043091216412931==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c31e9091e646b61cfce3634baac03636f2760ac8
+      https://github.com/bluez/bluez/commit/c31e9091e646b61cfce3634baac03636f2760ac8
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
 
-Dear submitter,
+  Changed paths:
+    M doc/org.bluez.Bearer.LE.rst
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1182613/
+  Log Message:
+  -----------
+  org.bluez.Bearer: Add Role property
 
----Test result---
+This adds Role property to org.bluez.Bearer.LE1 which indicates whether
+the remote device is the central or the peripheral of the current LE
+connection, so applications can tell a central that connected to the
+adapter from a peripheral the adapter connected to.
 
-Test Summary:
-CheckPatch                    PASS      2.34 seconds
-GitLint                       PASS      1.64 seconds
-BuildEll                      PASS      20.03 seconds
-BluezMake                     PASS      388.62 seconds
-MakeCheck                     PASS      14.38 seconds
-MakeDistcheck                 PASS      145.70 seconds
-CheckValgrind                 PASS      234.83 seconds
-CheckSmatch                   PASS      296.08 seconds
-bluezmakeextell               PASS      95.20 seconds
-TestFunctional                PASS      1219.26 seconds
-IncrementalBuild              PASS      440.58 seconds
-ScanBuild                     PASS      1152.57 seconds
-
+Assisted-by: Claude:claude-opus-5.5
 
 
-https://github.com/bluez/bluez/pull/2645
+  Commit: 76890c8fd3255bd1b0d64e3c35abb38ef3d87b22
+      https://github.com/bluez/bluez/commit/76890c8fd3255bd1b0d64e3c35abb38ef3d87b22
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M src/bearer.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  bearer: Add Role property
+
+This implements Role property for the LE bearer using the initiator
+flag of the Device Connected event, which the kernel sets when the
+adapter created the connection as central, and emits PropertiesChanged
+along with Connected.
+
+Assisted-by: Claude:claude-opus-5.5
 
 
---===============2370043091216412931==--
+  Commit: 2515706490c2d569885cd553a553de12cb2fc867
+      https://github.com/bluez/bluez/commit/2515706490c2d569885cd553a553de12cb2fc867
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Print LE.Role in info
+
+This prints the Role property of the LE bearer with the likes of info
+command:
+
+bluetoothctl> info <addr>
+...
+        LE.Connected: yes
+        LE.Connectable: yes
+        LE.Role: central
+
+Assisted-by: Claude:claude-opus-5.5
+
+
+  Commit: 926bbc5dfe29a19d579d29fd81d7c5a5952a3ecd
+      https://github.com/bluez/bluez/commit/926bbc5dfe29a19d579d29fd81d7c5a5952a3ecd
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/functional-bearer.rst
+    M doc/functional-testing.rst
+
+  Log Message:
+  -----------
+  doc: Add functional-bearer documentation
+
+Document the bearer functional tests, where two hosts connect or pair
+over LE or BR/EDR and each checks the org.bluez.Bearer.LE1 and
+org.bluez.Bearer.BREDR1 properties of the device object it has for the
+other:
+
+- Connected and Role on both sides of an LE connection, and the
+  Disconnected signal with its reason on both sides
+- Connectable for a connectable advertiser and for a broadcaster
+- Paired, Bonded and Connected after LE and BR/EDR pairing, Role being
+  only reported for LE
+
+Assisted-by: Claude:claude-opus-5.5
+
+
+  Commit: ce448a8a7a3bf538c443235c9c7b38d4aea841cf
+      https://github.com/bluez/bluez/commit/ce448a8a7a3bf538c443235c9c7b38d4aea841cf
+  Author: Kevin Dewald <kevin@simpleble.org>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
+
+  Changed paths:
+    A test/functional/test_bearer.py
+
+  Log Message:
+  -----------
+  test: functional: add bearer tests
+
+Add tests where host0 connects to or pairs with host1 over LE or
+BR/EDR, and both hosts check the properties and the Disconnected
+signal of the bearer interfaces of the device object they have for the
+other, including the LE Role of each side of the connection.
+
+See doc/functional-bearer.rst for details.
+
+Assisted-by: Claude:claude-opus-5.5
+
+
+  Commit: 7428ca2df9356363079db0f48412c20cbdb9471f
+      https://github.com/bluez/bluez/commit/7428ca2df9356363079db0f48412c20cbdb9471f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-10-09 (Fri, 09 Oct 2026)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix LE bearer Connect not replying
+
+If the ATT socket of an outgoing LE connection connects before the MGMT
+Device Connected event is processed, att_connect_cb sets the LE state as
+connected, so device_add_connection bails out as already connected and
+btd_bearer_connected is never called. Bearer.LE1.Connect is then left
+without a reply, the initiator flag is not set and Device1.Connected is
+not emitted.
+
+Fix it by calling device_add_connection from att_connect_cb when the LE
+state is not yet connected.
+
+Fixes: 4e21ebcaa5d0 ("bearer: Implement Connect/Disconnect methods")
+Assisted-by: OpenCode:claude-opus-5.5
+
+
+Compare: https://github.com/bluez/bluez/compare/b111351fd617...7428ca2df935
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
