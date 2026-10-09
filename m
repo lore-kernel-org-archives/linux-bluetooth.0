@@ -1,131 +1,93 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from tabos.org (krueger-it.net [145.239.1.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F6F3F3289
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 13:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791553392; cv=pass; b=QrmO1XSwK6tXlngrpqGshBLH6RvrxT4EDrndr62Ds7FD/oK/6dFfeG91+3tn+zZ/7PqP7uKrUdgMLNhBjvYHcLl744F3ewy8+THVvtknUHFKZUQdP0gKE7CsX/UeMwD8O7jrq6EqeoWm1p4BJ3fW1K6C7k3Y1cyTIFdEThRS2kY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791553392; c=relaxed/simple;
-	bh=jmMHYh5+puDektBWsaAAoA9FTSEyHLK+MbeBVeVZ28I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=siN9P1NlAs50SQFnkLu+uJzI9fUwsjUm8+uzdpyFAe6Bw6K2DtKK/ciTD7kMe/yBre0TkMwFUFFwZF9hPDyuYMoKcSBQHzZvESe6EYkqRKCW7YuYcyLW8v4QvmQAyWgru45g/er/6Q1V+278EbPi9Nc2o6pT5NDzBZtWnHLwLw4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=neeQ/Mvm; arc=pass smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1484C8C50
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 13:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.1.22
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791553786; cv=none; b=esOcXCowt5ut39rwhF4VtUph6Ri53aOMr70DyUQTYoi/HITpzp4pnpacfXGIynNsSCFulJuRVSMQp89o73nqTtWcwJcJdhghn/pYqjyldI6fDrj4oTEH7mYdrdDmRaLvAN3xFghUu4KhyOzOFA1/AUPfsl12nxiG/48eQyGDtwA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791553786; c=relaxed/simple;
+	bh=KDeNJnALSbMdXsmHWFbfiRC7gw44j+NXwpeiKyX4sLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E27y9IIRxGw0XVpJpn1zx2A8b/zSvyjXF6cnBXd4H1JWgpxln1bJc2skeX5kNy1JUfGUi4Po2MWIxwJdM6z9n/5rGfW8lIOk0lpJ/Tqdh6gtj6AVuWeok/d0P+4+yLKz/gmDrcF9mXgz5Oj0771N7Na+s6+a1302uhjYiwENNh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tabos.org; spf=pass smtp.mailfrom=tabos.org; dkim=pass (2048-bit key) header.d=tabos.org header.i=@tabos.org header.b=GYt/V9eJ; arc=none smtp.client-ip=145.239.1.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tabos.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tabos.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="neeQ/Mvm"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-67694513f2fso4030661d50.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 06:43:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791553390; cv=none;
-        d=google.com; s=arc-20260327;
-        b=iw2H00FlXQTSr71hxBJYYGpLIeYG73eAMUcMl3+K3n1xd+t2LDMEwVDxCZDGdq8i71
-         huSKfxaj0hgV+k16BxlS6q9lXjl01nsgOGcoQ8JQcZ4SFr2s1fnkBLny11CQNNqlhJfY
-         07z3JnJuY1MO1INCAiWVe7fGFvS7QViysC2Lk7HVmVAeCB9De6Mru6rDlA1tZNbuo6yY
-         nGQWJg0PrHlHAsMfFhBevQzoLU8gE8b+P2rqIxU2UsKI0v7E3dKi+xfyp3lFiiSSO4e9
-         eUe8/k7WcLDZLQV4iqdJb5vv8NZqeuIMMtaOHYc3VPf+I11z3pMDDPUM1vBaHPP9NquT
-         SFiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jmMHYh5+puDektBWsaAAoA9FTSEyHLK+MbeBVeVZ28I=;
-        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
-        b=aJKirVmlNMV62y69oJZOhPT4M01TcvaySyxOUKuZ19rw7w27Vyz2s2sTwD4m3m5GkA
-         BFK6jNQKqhl7CVm9fjkx+jfGXeFb2OJlbSZPe9RUB/Ww26ZPXxHgCBpTVtsPzcODV0a+
-         24isJf+xL/kDGsJ7NjoQwG/mMXMngwWZifbmzNh7DJREdAEw3fBmRlqhfN4UdpmSvV/L
-         OINnuDznKue2bdl+7ffgGixB/ISGeE4FidkLtE3mjBytY0mhUakz8uYzIb8PeLBDQE5e
-         RMjuTChiGafV4D2kBNcnGnx3BdBTEj6Iw4zzfxHs4LtFgXoe4Htp/biwLhBGAHtc+yuu
-         DbjA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791553390; x=1792158190; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=jmMHYh5+puDektBWsaAAoA9FTSEyHLK+MbeBVeVZ28I=;
-        b=neeQ/Mvmdp1UEPqIEPmJ/RmXLNmcfc8NCblJQh59AmUPLH9I9v6XtouYz9+GVJJPHX
-         YL7u2uV9CnQ08Alx3uggviCWD1ruwq6yWU7cJJO450R+YI1jV76l0XjU/cNzLkfm7Jrg
-         sQo5li+K7Yvh3PKhoWuA8xv2eSTzTBVePFFML13PPWwbnQmXTwumTK3oJiG6n+TIIk20
-         U6ul8CiGtw3ERH1INWa80txFvtKll1Ci0LDW/z6F6UVCMtQmjrVqckc2ThqMqB3jBvey
-         uP/OZCaITkxvUlCvgZc7GO2JpUcu1QLX2AQhx3yHAkLtgZysFgu1ePg8Iq05GOzvZ3Kx
-         NJ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791553390; x=1792158190;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jmMHYh5+puDektBWsaAAoA9FTSEyHLK+MbeBVeVZ28I=;
-        b=OPCaE4QljsjfZtAfomZKcRa1iMocntwHvJbna9QoOlxNOtlsOc+vCqnaI/Nr38DiJz
-         9utmcEZ7Ek3KTdN2NQ/3VcmHYD/a8mhVB6XJlSrBmjibrSNa664lEEN0RZIU7fNefEI0
-         xDei7gJxUERDEpb3fkbFRt4iLNPe/DlDLy1oemGQlx666ZE0p8AIMu00auj/SNjPgib8
-         ma6sYBuKxSHlohx45HmhhIpIn9fM9khUPMhReHrt5ZSui8cRq8sP0ZDA/BoqYT6xYv6T
-         duuVRfDHG19WR8O1xFIMG2iUImIBV/SkBSRmei5zWwrIYI+qFs6trkssq1lUNLUdm5Ud
-         Cs6A==
-X-Gm-Message-State: AFq9FYIdxNNHa9iLXUeXUAriuYCis2b/g2MQmySXQAF77yMqPuwQYiKd
-	QzA/a494K4Bg7ieFucudAYkKCJiMeFjjJZWHqimtBPb7ZHzSxLEEoBCmw0917SAKoLqB3yPhudn
-	Q3FYdw1j50dv+QJvGW9r6d3GZsCAxqkGlZQ==
-X-Gm-Gg: AYBFou3pjQ0N/SdF3or3/G3uBgbHXsO15GEH/tyILA9dtqil0cMhI5pFeojt6EsFSei
-	282x9MbTaby4mnQP8vM9RbQ1OC/dqxJjkB0F+9F3Na4dEWP87wDDyuKRdcoLrV8dZSu3FV8qk3S
-	eRQx9GNk85xQRgYYevv7LBiQsEg/ysfkagqX99z7mJyKgsgyus3aEVBiMI0hLLEjP266kskSw48
-	Re9ikiGWnSqmpYkzGDGBFCQYSdfoMbXXavTexDIIS//RFRct6wWApIxRJq+b7d08wYELal0wlcl
-	MXvUHldYIFl8oSZsrfYInE9ZoysOA9FHgFHEaN6GgQOpCr3R/hWa5/+0IhJMXx70xO2Jut/WpwN
-	Zc+e7iV8RuqLFOtiH+1yQVtv0qbfO2TKaocv82ZE=
-X-Received: by 2002:a05:690e:14cd:b0:677:cf5e:f58f with SMTP id
- 956f58d0204a3-67936331bbamr470845d50.143.1791553389881; Fri, 09 Oct 2026
- 06:43:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=tabos.org header.i=@tabos.org header.b="GYt/V9eJ"
+Received: from c0d1ngstat1on.fritz.box (unknown [94.31.74.100])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by dserver.krueger-it.net (Postfix) with ESMTPSA id ADFB762E02CD;
+	Fri,  9 Oct 2026 15:49:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tabos.org;
+	s=default; t=1791553775;
+	bh=Bl2d1gPTVaC8dlH+GOhj0OC9TJiuBnXbDdQBXYP/JQg=; h=From:To:Subject;
+	b=GYt/V9eJYj7Q4DRRD1xiYD/4T46w92XEOAqnm0m5kNEuFqRTZgxbpxJbllQf7yL/f
+	 HrGQf84k/ElXsAXeHHnHXNNEm781r5MiHkOjKmtXUuGlnTW9xMzFwmONgNFj3SHc/D
+	 9osigEZ/FkNrkGmA8PVWugomnNioCeadrxIGM5B0o+pV1YpKuQGU6Eck21e8kCBxUp
+	 W0KzaKVxb0AM8jsCuntZjBLTPnRmm2mOkJITBS6GSZCuFsmbjxUvFHi02JAU2QPmUd
+	 7JitQhtOUQ1ZOsonUokZQgIkRTtwIdYO4BK0QnNz+H7QUfASMk6JlgSgvhL87mCpKd
+	 zlF1CjCqh1IIg==
+Authentication-Results: dserver.krueger-it.net;
+        spf=pass (sender IP is 94.31.74.100) smtp.mailfrom=jan.brummer@tabos.org smtp.helo=c0d1ngstat1on.fritz.box
+Received-SPF: pass (dserver.krueger-it.net: connection is authenticated)
+From: Jan-Michael <jan.brummer@tabos.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: jan.brummer@tabos.org
+Subject: [PATCH v4 BlueZ 0/1] Add cover art support
+Date: Fri,  9 Oct 2026 15:49:23 +0200
+Message-ID: <20261009134924.122040-1-jan.brummer@tabos.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20260803195620.255866-1-jan.brummer@tabos.org>
+References: <20260803195620.255866-1-jan.brummer@tabos.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBYNZLS93hEBfkomBjisijsJWucuxJjz0oCsHsxJ9Cw=DDBww@mail.gmail.com>
- <20261009034543.54898-1-kevin@simpleble.org>
-In-Reply-To: <20261009034543.54898-1-kevin@simpleble.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Oct 2026 09:42:57 -0400
-X-Gm-Features: AclHuK8epGtxEU50eMEUZ2DxC0U0Bi9vDgOB9CSfN0dTV3se7AIu_3UWyeu3YSc
-Message-ID: <CABBYNZLqUTAR_=jb2CNEG1-7jJ+B_YyoFYopS1Tf=khSWcXRSQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/3] Add Role property to org.bluez.Bearer.LE1
-To: Kevin Dewald <kevin@simpleble.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Kevin,
+BlueZ wasn't able to display cover art in car's headunits due to missing
+cover art support. Add missing pieces to allow sending cover arts:
 
-On Thu, Oct 8, 2026 at 11:45=E2=80=AFPM Kevin Dewald <kevin@simpleble.org> =
-wrote:
->
-> Hi Luiz,
->
-> On Thu, Oct 8, 2026, Luiz Augusto von Dentz wrote:
-> > Good question. Perhaps we should consider marking them stable, but
-> > first we need to implement test automation using test-functional to
-> > ensure they are truly stable.
-> >
-> > For this type of testing we can use the test-functional framework
-> > nowadays, so we just have to create a few tests to validate our
-> > expectations. Prototyping something like doc/functional-bearer.rst for
-> > testing the interfaces.
->
-> I can write those: a test/functional/test_bearer.py with a matching
-> doc/functional-bearer.rst, covering Connect and Disconnect, Connected
-> and the Disconnected signal, Paired and Bonded on both bearers,
-> Connectable, and Role.
->
-> Would you like them added to this series as a v3, or sent separately so
-> this one can go in as it is?
+ - Add AVRCP BIP Cover Art Responder
+ - Advertise Cover Art Support
 
-Either approach works; we only recommend splitting the series if it
-grows too large (20+ commits).
+v2:
+Dropped the patch that relaxed the sandbox of the systemd unit.
+bluetoothd no longer touches the filesystem at all: instead of
+reading the file mpris:artUrl points to, it asks the player for the
+image data over D-Bus, and mpris-proxy answers that call
+for the players it registers (patch 5). ProtectHome= and the
+capability bounding set stay exactly as they are.
 
-> Kevin
+v3:
+Update based on review comments, e.g. moved to obex
 
+v4:
+Fix CheckPatch findings
 
+Tested on a Fairphone 5 and OnePlus 6T with a VW head unit.
 
---=20
-Luiz Augusto von Dentz
+Jan-Michael Brummer (1):
+  Add cover art support
+
+ Makefile.plugins           |   4 +-
+ doc/org.bluez.Media.rst    |  21 ++
+ profiles/audio/avrcp-bip.c | 608 +++++++++++++++++++++++++++++++++++++
+ profiles/audio/avrcp-bip.h |  46 +++
+ profiles/audio/avrcp.c     |  92 +++++-
+ profiles/audio/media.c     | 194 ++++++++++++
+ src/bluetooth.conf         |   1 +
+ tools/mpris-proxy.c        |  81 +++++
+ 8 files changed, 1041 insertions(+), 6 deletions(-)
+ create mode 100644 profiles/audio/avrcp-bip.c
+ create mode 100644 profiles/audio/avrcp-bip.h
+
+-- 
+2.55.0
+
