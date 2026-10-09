@@ -1,71 +1,75 @@
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF12E4F3902
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 18:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052E14F3923
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 18:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791569103; cv=none; b=T+GUbfHGPX70w/gYyHkURo7PLs6GKZ5etg6/4SE/zoA6ZB3uVWfxVGPm3Bar7pfvfeOUV5zhEr6Nb+WBffbPCnt2Fy22i1Db61MLDozefI+mb+Biyfx+hPpJwXl+mQNAs1tKZ59tkIucwW6KG2EBxglIQ/4wF9vBsiLJ+rC1rls=
+	t=1791569104; cv=none; b=Vx3QLs/KqjtNeuuJ7/KvUz4tJyy8RZPzy9jYWuczatbi0le6YORxm+Qzy2obXLIqmVo9SzGmcLXTa2c6qtQD+Mw59c8rlxLPHci40zCi4JMZ9p1BWTPKvzX6W1E9jXfAcdixYvfNkLiGlGuwUkYbV2y3TZzYxU4rb3RdSFWxaAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791569103; c=relaxed/simple;
-	bh=6y0TYQUckiQaWO7N22e1/KoZnOig61s/tKTQIvY2OQM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jCoHVuvo+VtKYiE8ZSAk0KwEuT16bElzFvEVe9CCNfUls/aQ1DD6Bk6iNFjAgprLKwNzJi+od+vPAxYtRIhoY8qV9Um2laDZr50xLMo6TxcaYIZV98YNk9WkPus8KYIlIvjLZcIJcFqyLZqSu2qoEFOVqysnPUGBzu+atWNqMoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=s1audmYX; arc=none smtp.client-ip=74.125.82.44
+	s=arc-20240116; t=1791569104; c=relaxed/simple;
+	bh=d21FiCqLKamxIWRWYyMQDpxRCgqHxaR8WzonKJrV4Q8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eLHXslam9iqQimXiuUKGLilO4pDYQREmOd3jAcgQr18VHz2wwMkJZc7pA7bwy9lqx77C8xcUweoCkMFFtBX2T7Gw12TqntJlJqIAk+8kA32HEkEfRu4gysjSpozvP1hL5KnCYxvZbW665t56rOx/Em2QUsGNBHmWBPMPnvC9qug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=kJnPTDZu; arc=none smtp.client-ip=74.125.82.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="s1audmYX"
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1517bda04a0so1455c88.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 11:05:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="kJnPTDZu"
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-15168a20b47so3061365c88.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 11:05:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1791569100; x=1792173900; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PHAnJkAqfbITKZFz1iefdhNPcWyX9Hrx+dBmTAy4aWk=;
-        b=s1audmYXL+weLSxqBTx659ZTIb/5D9agz9F6/mv4dI8zBYApyjs6D4pnlmV6BKGxla
-         qIAly+BLHj0hKFaa/C7JSrDQKhwrsr/+S1+NZp01FfzheHERlY3crww1wI2BjKP3s3r4
-         jH4o7pvMcsAv9wo+7gIF8U4QMHLjtvu3nlVg2Bd8AcphSIaGanIdVh4PYC/h7NXtsx5m
-         evaRQoT+0Rk4af2ZyrJwqtbkgwM11RIZXA60bjozhxQYgFO694OJbxAp1a4fkc2wbTDh
-         UXqtWaDJjJSEhaQ+zT0HXArhDJ2YI7+6Ci/GaXiVYgvtXvyac7WrS0ZGC9ChrhplR0n0
-         ijQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791569100; x=1792173900;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=simpleble.org; s=google; t=1791569102; x=1792173902; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=PHAnJkAqfbITKZFz1iefdhNPcWyX9Hrx+dBmTAy4aWk=;
-        b=z/qqLi3pRsYw9gAnsJOq3UffDUd74EjWtEc6cYBun2fdWVxY545V/C5nIv3H8WKD2e
-         hv+SASTuAfYE6Urz79T8dgcDI5RuKeVLioTVEtljHe0bJtTEPAGQ7c2hsxIFmokOdvam
-         5yh7haFI2Rln3t3GnmsXrewBZERklNfREGeN/0kcLK7xBCZ2MUO3c23Afnv8XenKruzN
-         AM/ywjSshlWtwdJcXI67pYZR9TbsUb4L3+YZdDZfyc68eFCrqELEvXFZbmDHGk8sMnuu
-         kp0UqfaNTkBiCPPuas03rFuy/pHrLe0TI9QGAT+gOCmeodVruqQ4LDAKnefkUwm1K7oE
-         Y4Xg==
-X-Gm-Message-State: AFuF++lLK/yNMaGeMAsv2La++P53avylJUx1780zJFjdngpCg/58nJzT
-	5uxVIpaUe1tHLeppqOn6+bGyaW2PaPQGPCiNPRstIXHhDj21whaky8coewckGrlht9QrlG87Xkj
-	n8Lmc
-X-Gm-Gg: AYBFou1DwoNnXKPkmnqdoZyTuSiS+Mt6U2UF46v4T0AXtm+PhfoSfobxrx4Tuo3RNnE
-	0D8X1KnPkLLYNQo7D4YS5e3f63WFtM3TqmlBJdL6fscB8PBfJ2WIXn+ooFnM+hU9E6uLt0kSkPV
-	wmtbNVLEQSnEJp3a5ikMjUJfjGuYKrSxFt9UyYh9/OZBaoBQZ4eKbb664WWGJjF+3b14adCJdTw
-	7TO76EmknOUt2YN8IrlEcopdg59vo+NXEYbVx9LMFrNYVhLMd6y6ggyLQ8sz+QBOox1mkkW7+lK
-	aY+RTC4T1H471+MYe2LibMnLOq2Bp0d1tcC8PwK/+r+0ddh1siySw94ec1dVhOeKG57CweWlkg3
-	yjM5FpM3mXWyRKFSeHAWPzD4cX7J0WqatpZCURYC3X6Kc2N1b4T+pwjJNFBfSOeyosFsCK5BsMY
-	IYtM6hYpcZCcxOzskF0gDjMW45cuMfk0xx6GqunKMZhFTzHADh5PXEHXGadupgWLjlGygQMsulc
-	o6y8xCLIXtkIihk0RCEl/rTUAlzParNaNMneeYyZ8fVsOBE+/IziWe5fpljIITGz8Z5w53Ui+YM
-	5vPOEK+6NNLGLeB+eCJ2t6J7qgWPZ3jnPyHlPHM=
-X-Received: by 2002:a05:701b:2806:b0:151:2e62:fe6d with SMTP id a92af1059eb24-16a5bf3f985mr3411997c88.22.1791569099493;
-        Fri, 09 Oct 2026 11:04:59 -0700 (PDT)
+        bh=L35wP0WkPyHLnL0l5gcSmULRno2ikdVqSpT5B0+inNo=;
+        b=kJnPTDZusF8SaZWbDA3VZNdsE6ZQK3tZEZFEmuIkl/c/YlQBJcVg57wlx/t3oyw25e
+         IpUX1ZNlUnTQ51tPte5LDr5URxKeQFhM7PmLKwtrW+CTByAD8zs6H2LOH7fV8NX+1c8p
+         Z5wXABoQELrHbf/s/QKHDPgJ42xY723JWGQF6CEL9LTLY03nghCmylcoVQj2Ac4eoAxz
+         HL4itK8zdLAo52TH7c1ADLCqgWGawH0xrW5RhLIjfpnOXW/ASjbQtI+8XnpcxJfHypGg
+         HdayZe/35G1CJszpBb9EFqdcoxin7UgzsCuiCcsvw9p0VvQ5Nkl96ek9GtnbltP3GaSZ
+         jggA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791569102; x=1792173902;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=L35wP0WkPyHLnL0l5gcSmULRno2ikdVqSpT5B0+inNo=;
+        b=GqjgTSZplKZsHe4BXSqqXEnLqNPjJwMK1ZlczXLAiO1ovkrdl0l7lpYEkxlH9v1QTW
+         l1wNwYHMQUsidloM0ydLKTZSqCZ0KHv2GhZ28huqYQMcqNK1o4lyy7qemJDZIvcO4YI+
+         WWGATP2GQw3XaJEouDMaUOTFzZdYmXMcD1nY6b/im9Ahdv8FYBOcwAiVk9ma7lGPHIe8
+         qVvNC1ZAITulH1iC1Kwxeb4Lj/mWzdqAEJFGvjKJoEJQ48ibnwYUtE6QUuZ8+zCR8oXP
+         00Tnvd24B+V4HEtMSIgRG7JwfDLO1FDoad6FLMj/z9cZ2DQ/Y6Bh8d+3xl/+QKrXxAe8
+         YEHQ==
+X-Gm-Message-State: AFuF++lO7sWuTCW3vJ9U3XH9j+4rpoaatKKwoJW5gGiUg7e/NEeKolhX
+	DAG9/MzHHZ0WpubSG2TvO35evAfWr7+nQJLdDWuDHjOZUelvpHacn3Zg5o4Khx11OzYL9H4cvWS
+	zumzP
+X-Gm-Gg: AYBFou1zZXdvdn5F7fMvejdiHzDjBEFJbPJmzkyCyW1gh3sy3826raS1USbMZnDKps1
+	MuvAF1zCMzpvcnQ+S2u48XYIzgy1yu3As14KhMr/hD9mHAHtnRj9Q1Ivzfmm0zua/xXMtwvxJQL
+	lK86dIK/eexeQfpLd7yCrCzbVynbQJ0ynZN55vvAmOIiTos/JB8HwitkIuUsdqNxHgqrrN9JfCR
+	STbLVF3JJJ68l9pAO1NRMszwrq0N/vtR41AtLzMTrKj+i1QnnzK0cEMYA3glmIO1qgAnh55Czed
+	GqzZ+sacexldmXPuHeeZcbQkJ8CAWApAw5QDBBsANLPvF2FwrPwlZsI3LiaodsFsRhOjoqIK6VD
+	Su6/1HCiGtYsA8aaOtfsHvc2tYYTbTdoZ6S2DiEaorr0ZgdP+lMYrqRP2yYqi/Yn7nCJHXng7S6
+	2sK9jjfe7biTfOlGUAIQJXqPXd/40ZYNW0VnvjyqgIzCuqbd6vU/6POuQC3n+nYa5aBOW4/SjN8
+	LC3SQMdo+IhJL800ozfqncEhMvAYvzkcWkWGJ9WeyMLj5jVdUPr2WXL0T0mRP86kJm1x5t91038
+	acv5e/mpPETFeXKeY8q/UlVEkDfsJMVMBgz39i+NhkXaYg1ZRQ==
+X-Received: by 2002:a05:7022:b057:10b0:160:a80f:3ed2 with SMTP id a92af1059eb24-16a5dbfecb9mr3189226c88.10.1791569101761;
+        Fri, 09 Oct 2026 11:05:01 -0700 (PDT)
 Received: from localhost.localdomain ([12.158.218.17])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a31f6be0sm16111163c88.13.2026.10.09.11.04.56
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a31f6be0sm16111163c88.13.2026.10.09.11.05.00
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 09 Oct 2026 11:04:59 -0700 (PDT)
+        Fri, 09 Oct 2026 11:05:01 -0700 (PDT)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ v3 0/5] Add Role property to org.bluez.Bearer.LE1
-Date: Fri,  9 Oct 2026 11:04:43 -0700
-Message-ID: <20261009180448.29117-1-kevin@simpleble.org>
+Subject: [PATCH BlueZ v3 2/5] bearer: Add Role property
+Date: Fri,  9 Oct 2026 11:04:45 -0700
+Message-ID: <20261009180448.29117-3-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20261009180448.29117-1-kevin@simpleble.org>
+References: <20261009180448.29117-1-kevin@simpleble.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,64 +78,120 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Applications acting as a peripheral, or in both roles, cannot tell
-whether a connected device is a central that connected to the adapter
-or a peripheral the adapter connected to. When several applications
-share the adapter, a device object can appear because of any of them,
-so the order of events does not answer it either.
+This implements Role property for the LE bearer using the initiator
+flag of the Device Connected event, which the kernel sets when the
+adapter created the connection as central, and emits PropertiesChanged
+along with Connected.
 
-bluetoothd already tracks this per bearer from the Device Connected
-event. This series exposes it as a Role property on
-org.bluez.Bearer.LE1, "central" or "peripheral", present only while
-the device is connected over LE, and prints it as LE.Role in
-bluetoothctl info. The documentation states that it is the link layer
-role and says nothing about GATT client and server roles.
+Assisted-by: Claude:claude-opus-5.5
+---
+ src/bearer.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ src/device.c |  5 +++++
+ src/device.h |  1 +
+ 3 files changed, 48 insertions(+)
 
-As a step towards marking the bearer interfaces stable, the series also
-adds functional tests for them, test/functional/test_bearer.py,
-described in doc/functional-bearer.rst. Two hosts connect or pair over
-LE or BR/EDR, and each checks the bearer interfaces of the device
-object it has for the other: Connect and Disconnect, Connected and the
-Disconnected signal with its reason, Paired and Bonded, Connectable for
-a connectable advertiser and for a broadcaster, and Role on both sides
-of an LE connection.
-
-The five tests take about 45 seconds and passed in five consecutive
-runs, and the rest of test-functional still passes.
-
-If these tests cover what you had in mind, I can follow up with a patch
-marking the bearer interfaces stable.
-
-Changes in v3:
-- Add functional tests for the bearer interfaces, with their
-  documentation (Luiz)
-
-Changes in v2:
-- Move the property from org.bluez.Device1 to org.bluez.Bearer.LE1, so
-  it is clearly per connection (Luiz)
-- State in the documentation that it says nothing about GATT roles
-  (Luiz)
-
-Kevin Dewald (5):
-  org.bluez.Bearer: Add Role property
-  bearer: Add Role property
-  client: Print LE.Role in info
-  doc: Add functional-bearer documentation
-  test: functional: add bearer tests
-
- Makefile.am                    |   1 +
- client/main.c                  |   1 +
- doc/functional-bearer.rst      | 141 +++++++++++++++
- doc/functional-testing.rst     |   1 +
- doc/org.bluez.Bearer.LE.rst    |  24 +++
- src/bearer.c                   |  42 +++++
- src/device.c                   |   5 +
- src/device.h                   |   1 +
- test/functional/test_bearer.py | 302 +++++++++++++++++++++++++++++++++
- 9 files changed, 518 insertions(+)
- create mode 100644 doc/functional-bearer.rst
- create mode 100644 test/functional/test_bearer.py
-
+diff --git a/src/bearer.c b/src/bearer.c
+index f3b7a2337..25224dcc7 100644
+--- a/src/bearer.c
++++ b/src/bearer.c
+@@ -274,6 +274,34 @@ static gboolean bearer_connectable_exists(const GDBusPropertyTable *property,
+ 	return btd_device_bdaddr_type_seen(bearer->device, bearer->type);
+ }
+ 
++static gboolean bearer_get_role(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_bearer *bearer = data;
++	const char *role;
++
++	/* The initiator of an LE connection is always the central */
++	if (btd_device_bdaddr_type_initiator(bearer->device, bearer->type))
++		role = "peripheral";
++	else
++		role = "central";
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &role);
++
++	return TRUE;
++}
++
++static gboolean bearer_role_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_bearer *bearer = data;
++
++	if (bearer->type == BDADDR_BREDR)
++		return FALSE;
++
++	return btd_device_bdaddr_type_connected(bearer->device, bearer->type);
++}
++
+ static const GDBusSignalTable bearer_signals[] = {
+ 	{ GDBUS_SIGNAL("Disconnected",
+ 			GDBUS_ARGS({ "name", "s" }, { "message", "s" })) },
+@@ -292,6 +320,8 @@ static const GDBusPropertyTable bearer_properties[] = {
+ 	{ "Connectable", "b", bearer_get_connectable, NULL,
+ 			bearer_connectable_exists,
+ 			G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Role", "s", bearer_get_role, NULL, bearer_role_exists,
++			G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{}
+ };
+ 
+@@ -416,6 +446,12 @@ void btd_bearer_connected(struct btd_bearer *bearer, int err)
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->path,
+ 					bearer_interface(bearer->type),
+ 					"Connected");
++
++	if (!err && bearer->type != BDADDR_BREDR)
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					bearer->path,
++					bearer_interface(bearer->type),
++					"Role");
+ }
+ 
+ void btd_bearer_disconnected(struct btd_bearer *bearer, uint8_t reason)
+@@ -444,6 +480,12 @@ void btd_bearer_disconnected(struct btd_bearer *bearer, uint8_t reason)
+ 					bearer_interface(bearer->type),
+ 					"Connected");
+ 
++	if (bearer->type != BDADDR_BREDR)
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					bearer->path,
++					bearer_interface(bearer->type),
++					"Role");
++
+ 	switch (reason) {
+ 	case MGMT_DEV_DISCONN_UNKNOWN:
+ 		name = "org.bluez.Reason.Unknown";
+diff --git a/src/device.c b/src/device.c
+index 1ab4e5342..4ccafd15a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3869,6 +3869,11 @@ bool btd_device_bdaddr_type_seen(struct btd_device *dev, uint8_t type)
+ 	return get_state(dev, type)->last_seen != 0;
+ }
+ 
++bool btd_device_bdaddr_type_initiator(struct btd_device *dev, uint8_t type)
++{
++	return get_state(dev, type)->initiator;
++}
++
+ static void clear_temporary_timer(struct btd_device *dev)
+ {
+ 	if (dev->temporary_timer) {
+diff --git a/src/device.h b/src/device.h
+index 756540056..5ead73958 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -129,6 +129,7 @@ bool btd_device_bearer_is_connected(struct btd_device *dev);
+ bool btd_device_bdaddr_type_connected(struct btd_device *dev, uint8_t type);
+ bool btd_device_bdaddr_type_connectable(struct btd_device *dev, uint8_t type);
+ bool btd_device_bdaddr_type_seen(struct btd_device *dev, uint8_t type);
++bool btd_device_bdaddr_type_initiator(struct btd_device *dev, uint8_t type);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+ bool device_is_retrying(struct btd_device *device);
+ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
 -- 
 2.54.0 (Apple Git-157)
 
