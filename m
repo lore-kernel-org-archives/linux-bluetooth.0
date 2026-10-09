@@ -1,51 +1,77 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A374E4319
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 19:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447E737A822
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 20:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791575610; cv=none; b=lTmNqQf2Zzvmwq6Mj5O5KV4lhIjCtJJiKD/O/OwnwbayO8OAgSAIZ25FBX4TPhzZmq/6AMOIkjHjfuf5QoqEcHkcEofV0h+RKvjR/kWp8YwnPCpOR+M8kzFDltjLqWQd1qz8kydOSi82DQwMUNSV4SFZnXqa04bbc853bDJ1ZzM=
+	t=1791576008; cv=none; b=ZhtI9Bgcw7IjIOUpM3ITvm4I9a9ibSfONFim5sUe40OlPTGJcKutXVlqcqemmSqenuxKaB5ck11cuvdrXf4P+oznZWpOZB5vZXMTAYfBgx3xNkS2F4WVsLNShy7CarGLk2nmgHfPOYJbAYwaKl4Vk4EbtmIWMvxskL/oaOYtGP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791575610; c=relaxed/simple;
-	bh=M2aOzDvgZKhkiK/s27+A41h9KiGsIZPRiQa/zSXImB8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nhulyGAyjra1qHaNawRiTHH8qycU8qubqyqp3M5OieWbNwUnbz0BXOWwBJy/7SHzXuSLwAo21aCwuvCbLjFivPMvSdnHLL2ka+xHi3jjjZl/FQG+zbvp3ZXh1n3viAUPZPIszVI7V783GUaKiw/IXilOWsIkezHKgqbw7yOF+dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=GKQg62Yl; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1791576008; c=relaxed/simple;
+	bh=rXUT08JYb+f/m+sKDtlOn76xAXCrHK5VK1h641/Jbzg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oaERJHBzj1pb0Rhwyq2j8sedqrPlA5L2hrIX1S+lH6Al50GErgMylQk3WgZYh2hbcOOXUJlIuEeao9kDcefiOw5Gbqw6UrKOfSK/krsXW5JWeSJdA/XUEDaL0Xs7uofOyKLcB/HKXR964CxOHLvFmmhyFKf+m7KZ6QukRHLmnJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuC73Rxw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="GKQg62Yl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791575605;
-	bh=uActavfuO73FruN7+RFYtan47atFSZdL+ZLHFGHYPro=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=GKQg62YlSpXKPOrN7iEzMNG3bH5Mlh/HQWtEr8oPyLb52sfFphVrI8VugLiBhf5/v
-	 02q0F13dObV2jSKoW3o315wKg9/aE9izjvh1Mk1QZClVV/IynqFF/oLJaI+vyF8tkj
-	 l4vqNbhGfPO5nJYb0rl/ziZj107ISt2D8VaLH+P/HyCCzqXkA6TUuAM9mss73PKGvy
-	 jqApSh+POBDD+XYGR3stJ9ZtSz+gvnwqKMEr6kZrSmh+iYSK1wejo5BRGyZtNlpcuJ
-	 V0ImP2xWrb3lujesWzIfkYAm9m6Gs33YrEixSeViPukL9PDnGH2tLbn2MsD4dsFOh2
-	 uK5VPSOdLlW7A==
-Received: from github.com (hubbernetes-node-1180a08.ash1-iad.github.net [10.59.98.31])
-	by smtp.github.com (Postfix) with ESMTPA id 98116520C59
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 12:53:25 -0700 (PDT)
-Date: Fri, 09 Oct 2026 12:53:25 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1181777/fc88f0-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuC73Rxw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 190721F000FF;
+	Fri,  9 Oct 2026 20:00:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791576006;
+	bh=SYBaxt1+IRYlujcMTZL5/JpCHipblzObpp8aJLYbEbg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=UuC73Rxw/zj1jZnblAwpSwod89c6lSbnQfXqAOVXSpNlMO5oYzL1bMwFGOunvfWIn
+	 OtHzGbQYdhwtoMtq/votHbI8XAKBP5a6ttJSBNtF+Ixk70sEpZyZvZJJ9JwZSqbm0n
+	 IUsZ025c1DYmFR13A9Ua2Olndc0n71gUwDZQQwaYMj71O4yOpf0iEbOsil9GGKe5Yz
+	 Srtv1UXo39GqEGYLRpeRqHg4yY6Fnftqipfnbg/Y7PwRU1XuPuY/lUGkLsQFNpQyGH
+	 zn2QuJjKXjhAJ0OlJhm22xVKS0GixB8tCgf35Hw/S2K8RJpU5B5kjklL7EhBx07+Pl
+	 repWxwubeWBng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F1552392627A;
+	Fri,  9 Oct 2026 20:00:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: btintel: load unlocker.sfi to allow
+ unsigned
+ firmware
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179157600477.981840.7983819101524117703.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Oct 2026 20:00:04 +0000
+References: <20261007124721.2521956-1-kiran.k@intel.com>
+In-Reply-To: <20261007124721.2521956-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com, ravindra@intel.com
 
-  Branch: refs/heads/1181777
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed,  7 Oct 2026 18:17:21 +0530 you wrote:
+> When an unsigned operational firmware image is needed for debug, the
+> controller requires intel/unlocker.sfi to be loaded first. Without the
+> unlocker image, the controller rejects the unsigned operational firmware.
+> 
+> Support both firmware download flows based on the unlock policy advertised
+> in the version TLV:
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3] Bluetooth: btintel: load unlocker.sfi to allow unsigned firmware
+    https://git.kernel.org/bluetooth/bluetooth-next/c/964430c03896
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
