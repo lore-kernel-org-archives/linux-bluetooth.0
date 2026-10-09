@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE0D4E324F;
-	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B1F473C8D;
+	Fri,  9 Oct 2026 14:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791555612; cv=none; b=hWT2gY2LjD93ycyB3cn8mUBf8i5PICDtYt/EN88b6V2mYMWYi+3JyLv7A0foa0hZgHHljuZ0Ozg+qvilroOoWv/nOXXfT+VnNMOhu3ODkOs4FkPKUVTjc8jUPY9kHFp9u6SnAvLjfedEaLJtYbfC+AJHnBuV+Iwf4NiiC4wsCVs=
+	t=1791555619; cv=none; b=VEzDN+VbPnepcxKf+Dm6+uiNDsx/zkpPRVJwVMnzxmJgRL7gt5PY0kD7gfKWV9WR92+ddik/4xU8t5KXyZ5FDAn1rYDuo2BQU4vgoG6o/s7aAHqBXThDW4YzywAESmeZCglXqiiiyzSRbyd7wcIokQbdhYT7uwVqpG2jstFqILA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791555612; c=relaxed/simple;
-	bh=FsOoSK9larQ1a8GxYHh826DxEKgeRxZCwAWMdUqFvoc=;
+	s=arc-20240116; t=1791555619; c=relaxed/simple;
+	bh=93bPqpFoIPN6Z9B08L/aHkYpIJxgxnZAssE/H4dKJnI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Iaj/2NPOk+IiSeEQYb6mh+CvQAVjQRYKGzBnum/1Y5iQLuDzEwBT6QiYdnOaSrFx/ZLETZd61pWcOAA7Q+YQbAsx+QYtUHTs+KJzd1R63NSm1WH7Rgma+v0bXlDYnIgC/TjhzfayhbweorMlgkEnHGkeHLmGmspDe0HOiJL0hHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GuW81jiS; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=trDdA1Y3bXC/0XjG7tKau5OADvz7h38MiqfVIQgRB4GbLlmpXHHGbDL/HVAxVpJgy5HuF/rSDqIxw2oSRgVnSER9+kfBuaT8p3FBGk9RfpnakUvUHvlVTARxDQltT3nR91Knhubq8n9qFWIhT0E4WhHLLXgdTX+wjwTUsOT48DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVfZMWoC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GuW81jiS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 832851F00898;
-	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVfZMWoC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F7801F00893;
+	Fri,  9 Oct 2026 14:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791555607;
-	bh=0dU+CeDLS2/syMkumwBLuxcJ7FiQJnpdbMZTMAnDj6U=;
+	s=k20260515; t=1791555613;
+	bh=X8JDPuCITIvBYfPyaWuVkIqvHqaAXP03lLiDoXVg+Qs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=GuW81jiSAOsw/I6oosp/8JM6s1PsIKfyCZRaYstsv/plYJyTXMlQHTynOiE5wVz9u
-	 tYpT8m9wBMOmvr1du4jg4hkvxfp4cpVHiYRah9xNv8Y3Qf99MisFxmiJt9X8aWy+cG
-	 CghgfNEldSD/yd3rgv0056DzisEwYGK5AdQ8RYK3gnR95ZEwm+bzdufPIX16sEgnSd
-	 CyVBtIuDAL0zrB2x2SFsxw/izCdjUn4lA/IKMWd3WbX2Mc1QzONWDMn80KfDdsqVmn
-	 EwvU2T5ELyHZ/o7r0KWMNypfiUgoETcBWxIOXXYopAcUGaW+pqHja07jsOqscthXXr
-	 vWLM/mdw2KLeQ==
+	b=LVfZMWoCIktdy+yKzzIjin7yREvDYZnSa1RlC5KSqKMoeoYeHI1aTHMiTHZ7mtc8w
+	 0IzTrhcH/JIHYyf8CpJcMVGAaMX0WGZ5Sh0C45XXT4sc3JfSQhbADiBqtNnDmWQC0y
+	 /wrEKQ94EQWZYuAmLHfHPlhkiTNbKrOay/Ua4yaiV2ldRaryEqChD1sqTJQby+Hji2
+	 cEJZHRx3ji5XQdeBy++stPIno3GB1CDwS6kFvdBSYfOyT7UBAsTi91/cCbR9zfDHr+
+	 aOaBE7qi1GlfPjYTrBGNBJAukQoOrxdJGZAH9zD4zMx5Eckvvu7TsDDP2oWTD2gxZQ
+	 B+duQTArN4mog==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 773C039253CC;
-	Fri,  9 Oct 2026 14:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 772B339253CC;
+	Fri,  9 Oct 2026 14:20:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,15 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Pin module for 6lowpan_control
- debugfs
- file
+Subject: Re: [PATCH] Bluetooth: hci_debugfs: Pin module for debugfs file
+ operations
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179155560628.812174.5344547417953773024.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Oct 2026 14:20:06 +0000
-References: <20261008051129.508322-1-dungvn2345@gmail.com>
-In-Reply-To: <20261008051129.508322-1-dungvn2345@gmail.com>
+ <179155561201.812174.6892291542337327416.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Oct 2026 14:20:12 +0000
+References: <20261008050140.483853-1-dungvn2345@gmail.com>
+In-Reply-To: <20261008050140.483853-1-dungvn2345@gmail.com>
 To: Bui Viet Dung <dungvn2345@gmail.com>
 Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -56,24 +55,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  8 Oct 2026 12:11:29 +0700 you wrote:
-> An open debugfs file retains lowpan_control_fops in the debugfs proxy
-> state. However, lowpan_control_fops has no .owner set to THIS_MODULE.
-> As a result, full_proxy_open_regular() calls fops_get() which succeeds
-> without taking a reference to the bluetooth_6lowpan module.
-> 
-> With CONFIG_BT_6LOWPAN=m, a userspace process can keep the debugfs file
-> descriptor for 6lowpan_control open across module unload
-> (delete_module / rmmod bluetooth_6lowpan). When the process subsequently
-> closes the file descriptor, full_proxy_release() accesses the already
-> freed and unmapped lowpan_control_fops table, causing a kernel page fault
-> or oops.
+On Thu,  8 Oct 2026 12:01:40 +0700 you wrote:
+> An open debugfs file retains its file_operations pointer in the
+> debugfs proxy state. However, the file_operations defined in
+> hci_debugfs.c (use_debug_keys_fops, sc_only_mode_fops,
+> ssp_debug_mode_fops, force_bredr_smp_fops, force_static_address_fops,
+> force_no_mitm_fops, dut_mode_fops, vendor_diag_fops, and the
+> DEFINE_QUIRK_ATTRIBUTE macro) have no .owner set to THIS_MODULE.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: 6lowpan: Pin module for 6lowpan_control debugfs file
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b019e48cee2d
+  - Bluetooth: hci_debugfs: Pin module for debugfs file operations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f0352b2c4a5b
 
 You are awesome, thank you!
 -- 
