@@ -1,72 +1,72 @@
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3B44F391B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 18:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4A74F3EB0
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 18:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791569105; cv=none; b=CsfcibGRL5tiqKlEBeHIvzjRk64rP39rZ51pG4J9Z/+cL2gTQ6wLFtHpmEmhO7yoMV6bVIDPJvzCySudsmmme+7xtRfBQJNT7souuh17+ywQFeHAJAH3jtteR9xdJHZsvRsO5rCVV7N79v2TJF+foWTf0zfnK1ukk0jYE4ijQ3I=
+	t=1791569106; cv=none; b=RvGGWyRfdxkzwS5sFhwvjiVsr8+Te+tt6DqbTyNyiR7S81Sq5Jx6IeSjVltnsvBsB7nHPqhdpUryScQTJo11gVVHLdHm4zal8QwtdbLVYF9b0dmOvdPRlT/ozZmqkXxSSjwuv7BQnRcN84DB6NCo90heQg9RbuIAwanuWDvOKAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791569105; c=relaxed/simple;
-	bh=bwKOBm6hKSzhsCCd7DEaYJBFZ1fHCwR+BTpXZgB6Svg=;
+	s=arc-20240116; t=1791569106; c=relaxed/simple;
+	bh=eQdT5RfQTz6BxPtDB1qDa77mG5fm28MVcbl+cZsKJYQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jA3qHJanzByIJn/wVgDQhfviefRJKnMmWfzhmm8TPOJJmPNUpTfqU0tJ7dBaZxWCh3Fvy1rqQL6K82EoQ4Ji+IXWqrqY02SvpeLPruRAPVL/RMgZJscRpfBrKUnn+9DpZo6LmXL3zAKQ653qttjNiX64C2xDELb34vn0cY8tAX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=iEZRHC3N; arc=none smtp.client-ip=74.125.82.45
+	 MIME-Version; b=Nub8AxROEt4BrKL+4pq9YpbujwhRfGpO+I3PBviS75hQ8w2DOc0LnKDgRr43QEZg4dXxq6SmRuqitGo0AwJC/cg1qZ3tcFwU2TX1uGWJCyf+UIeOmqTmaRm3RlIoV3Ok6JIVvzV92BlXUaA1PNQeFMx93iBEo4oNGsPzGVjO/QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b=g/W/BBPA; arc=none smtp.client-ip=74.125.82.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="iEZRHC3N"
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-16ad92569b5so985949c88.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 11:05:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.b="g/W/BBPA"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-15ea896ddc8so14112c88.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 11:05:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1791569102; x=1792173902; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1791569103; x=1792173903; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=P8JezxiIi3qKUt+OTQw4I6+VPylsUpmr8mmytM+2PnY=;
-        b=iEZRHC3Nr8ttwOJFwpmieyG0v/pyiLZSDhBfC08kZY7gkeHokjCkXjBynU0H078g7S
-         RxOF7NKMBAMrNCbyN3AGDHZAfvfFhfVUEF0w+RwMjEPE/KhAz7Z1Hq5JIk65OAt7HJfx
-         YMQEW+zcY2tH7EKQxz+T1S2yGgUPBX+0ADytBimdpnI+Q1bP17J8kBgP99lkK+ShL/RD
-         EABPwfirc/zOYXj83Oo0TiaLxL1pbo74BM8jf5jWDMhDAWn5VCcp+Z5TgYqmUFGVN2b5
-         PXsHnNpOkyp9BR5lpjFQRrkHnjj+ccEkPucSiphMa08VRh+eD9J64XIT6lXL1v+NgyUF
-         JstQ==
+        bh=XVP2rSyn2HXNY9pugbmXcSgq4LaQK43XQNcSZFxnakA=;
+        b=g/W/BBPA7QOy9HtTEh0uNfjPto+Jp5T3oK5MqyFG6Xj89dqftfdeuFXyk6938YiS8v
+         P17oB82iuSni6l66yV1tjH3m06CJ4j0jO0Wqub1ITQphZQnN129SvziePc2kK/9X2xNq
+         naTViCGVucERsPF/ughHMv36imfplKrxHVDcDdPGkbSVJ/2BvGzknXbEZc3gWpNlOd+O
+         kacwnjXJkydX3TWzCP2bs9YyNkjyNtsSsRvKMuPFj/bF9NDaii2NEBYP0BymDYQYMYfM
+         x//eYO4x3bTXWLE+hz4Yzfxi9VsuA96lX/2ON2y8HhLcHo7YwTqd32jZSaDZVf/EAtsA
+         VM/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791569102; x=1792173902;
+        d=1e100.net; s=20260707; t=1791569103; x=1792173903;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=P8JezxiIi3qKUt+OTQw4I6+VPylsUpmr8mmytM+2PnY=;
-        b=yYiyaTUnMVtHeF8unSqFA+DTUhMfHcgH/fxkfMvRuYYubbstzrE/ojpYtSHIuVD3x2
-         KyKjNtifovZWtOtPnSXLTMhxxys2wR2an1QSO0Skz6Anp5+boyHhamZRb/bleSy+g7Xi
-         Q5zfoB1XXOfMpOkEfmw145nKn3rqjq5hrFFCeDL65rc/lVkpJBwRUdHL2WJvc7f3JsPk
-         1A1NC2oMrHVbOXE2pTqpSr3UizmkCMD2vO5pFvlRfs85iDIfMdesXPmg0fHFXig39Ktr
-         8hyYEmF+ujIQGvskr4swkcJervRv1P/xmsn3Kx50xc3+1rTHL82YCziM7zEwHbzEwnO0
-         TLfQ==
-X-Gm-Message-State: AFuF++k/BWz4fs1JuaRP01MKZ5EKWEec5mJSDkvw4Uw6FLVRZaxuZhYO
-	Dm2deWNEAivK3X//oGH8BeZwNjtgkpuzBDKUNHaXpokeoFvO9inrjqm6tjbOeMc2jxlQlLaplGz
-	ubLY/
-X-Gm-Gg: AYBFou2DzPXkKOXL2ElnxIS/I4uQhmVQovkt+EssOZLNCBZu6tQ7cw797+r4lCL7ORS
-	fZuxpRjbyWOFFCUHYFWuhWb79KuF37wi1InAZsuqDfEJN20ztqFOKGcSK0tfWAwgl5IqE4+dauq
-	8N0OCjgWX+21B/xEsVidkS/nSMs9TaWl61J9+byyW0ma2AU+YmH3cOSXWIJjqnKmrOlYXzC6Wnb
-	gt64ww3asM8brEoXNwqR7l5W1y2uuOcWjwavlNoYg8wFlbF0H4c5qYcWAXCqTmXtoyzAwaDOY5z
-	YvU/SoXCN8b9i3+ZfND+2SSkjRSCGeTBz7QF6SXQNADWzy3q8taOUqdfnBngeSEqLhzh5KTHUzM
-	OnvkH0w6PkZ3p0RYW1+2B0iO63ECZ+XTcKn33VgGvPirYQtTIjRH1RNb1adYCgsAlzsRCC2r2YZ
-	UAzxGjX9CqUOs+Ik+jcLI/54YFNx90SEn4Du/Ek1LRbUCbmQxLzrVxt4+akQYnWIl2/N4u6WC/p
-	jqDgiXyRO1yl3cnRBgv+/NAoiJB+rHmkedNVuekNTVXVBAx59/lhnB01huAdEo+g6NRVcOHhzqk
-	UN8o5WZ9c4jlAX3XLug9jSR4AUSy2HdThqoTpj41rtsWTKX3ww==
-X-Received: by 2002:a05:7022:170a:b0:141:51fa:e609 with SMTP id a92af1059eb24-16a4c33923emr3124872c88.0.1791569100277;
-        Fri, 09 Oct 2026 11:05:00 -0700 (PDT)
+        bh=XVP2rSyn2HXNY9pugbmXcSgq4LaQK43XQNcSZFxnakA=;
+        b=XtEx6G0e6gFHV3cHFt7q3TkF/D4cDtRIKmhj0/nhF7XoRskqbb5xigv0Ir/WjhBIBQ
+         0ovp0hDUiPE4EGEFt1O6F34TC3EBnyyBMh/NHdsmXeGCQlPauUFMPubYhnCTuOQLBeV+
+         LwebISqN5U2uiKSMTvo8oL2LXKoZdsx0WcYtQ/ZBtb1Z9kEP1EjRdNJMLqyFq0omgGS0
+         ACXxybLNds74kQ5fRsnNPgim0uRdDrXg4oBbyFOmpuUgkGU6Wep2EgumYigIv0bRE7EF
+         /NOZRTNmbXh3V5aLBqg1L6qBkc1ycCBioeimeXW/+0XAoorzEA8GyyIXXyF0rMJbRw5M
+         RVHg==
+X-Gm-Message-State: AFuF++maR4X4BfYTmFMOuLnA6FUQ2+FELsIQgIoQlzHabvBjjhwjeT4G
+	FyNTPn2IbYF31zBD4qeAQRjwphBuf0ho5M1KuMraJXOM6gIxlJAxSj61AbYz35raAr4y2onKTHh
+	9ywYs
+X-Gm-Gg: AYBFou361sX2m8v8R7pBtjMz/vqwP7wHvhWX0nyIgQonTRJoHtBlQ+VCwWHRt1sAZ5u
+	5UsiKwwxJ1EHsIPypykxcwId57F0EEsSv3pphVXagl0uDj1ok5ZgqMb1rHVUFiGajkcvCw7X8+c
+	bgrSYbSLKwrfbIa0KmdydoAvlzDla3KZQ0A1LBU89n8eY585YMJQBEZ8dvx4qSyk4EoXxBgAX3F
+	pySOeQHwfWljWvgMYmB/jBx2FvqYJNVpEpGYxqYMSkEhgCNP730lUUzo0B2dquwtmC5W5a1G0gn
+	ZhasU1MWxJCTuxxxwqZJHVjw9oZ1zSCGtYQ7bs8DmJw6gun+Zyjvfe2Re16BYS9mLKIbsNcH8/o
+	rOML27ZQR21I0GH1ayuqXtqWGe+NQMS34D4tx3EX2zXF+UO1M9tk5IH7o7c2EbCArxDp+hg40HW
+	W9IyGM5zrOZAb9neHPa261RluW3Tyzdh2zM+I63Z94MVRpivyVHsESH3hJrM8ecWNxWe5/d0ix3
+	ylBR/IRvC2OOTPybfugSTjyCbtghoL0xjq3/z7eroZmLLkSUaonkw7K53JrrcnrSPMElCgtTgLA
+	qgqNM3mZbhs425/9476cy2TR69z6PJMUNLapK1mK
+X-Received: by 2002:a05:7022:171c:b0:14f:8e70:fad0 with SMTP id a92af1059eb24-16a6090d024mr3139777c88.33.1791569102981;
+        Fri, 09 Oct 2026 11:05:02 -0700 (PDT)
 Received: from localhost.localdomain ([12.158.218.17])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a31f6be0sm16111163c88.13.2026.10.09.11.04.59
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a31f6be0sm16111163c88.13.2026.10.09.11.05.02
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 09 Oct 2026 11:05:00 -0700 (PDT)
+        Fri, 09 Oct 2026 11:05:02 -0700 (PDT)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ v3 1/5] org.bluez.Bearer: Add Role property
-Date: Fri,  9 Oct 2026 11:04:44 -0700
-Message-ID: <20261009180448.29117-2-kevin@simpleble.org>
+Subject: [PATCH BlueZ v3 3/5] client: Print LE.Role in info
+Date: Fri,  9 Oct 2026 11:04:46 -0700
+Message-ID: <20261009180448.29117-4-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261009180448.29117-1-kevin@simpleble.org>
 References: <20261009180448.29117-1-kevin@simpleble.org>
@@ -78,48 +78,32 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds Role property to org.bluez.Bearer.LE1 which indicates whether
-the remote device is the central or the peripheral of the current LE
-connection, so applications can tell a central that connected to the
-adapter from a peripheral the adapter connected to.
+This prints the Role property of the LE bearer with the likes of info
+command:
+
+bluetoothctl> info <addr>
+...
+        LE.Connected: yes
+        LE.Connectable: yes
+        LE.Role: central
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- doc/org.bluez.Bearer.LE.rst | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ client/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/doc/org.bluez.Bearer.LE.rst b/doc/org.bluez.Bearer.LE.rst
-index ec92a5ce5..dfd809739 100644
---- a/doc/org.bluez.Bearer.LE.rst
-+++ b/doc/org.bluez.Bearer.LE.rst
-@@ -153,3 +153,27 @@ The property is only present once the device has been discovered or connected
- over LE bearer.
+diff --git a/client/main.c b/client/main.c
+index fff75056e..01ed00073 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2097,6 +2097,7 @@ static void cmd_info(int argc, char *argv[])
+ 		print_property_with_label(bearer, "Connected", "LE.Connected");
+ 		print_property_with_label(bearer, "Connectable",
+ 							"LE.Connectable");
++		print_property_with_label(bearer, "Role", "LE.Role");
+ 	}
  
- A PropertiesChanged signal indicate changes to this status.
-+
-+string Role [readonly, optional, experimental]
-+``````````````````````````````````````````````
-+
-+Indicates the role of the remote device in the current connection on LE bearer.
-+It is only present while the remote device is connected over LE bearer.
-+
-+It is the link layer role of the connection. It does not imply which side acts
-+as GATT client or server, as GATT roles are independent of it and both may be
-+used at the same time.
-+
-+Possible values:
-+
-+:"central":
-+
-+	The remote device initiated the connection, and the adapter is the
-+	peripheral.
-+
-+:"peripheral":
-+
-+	The adapter initiated the connection, and the remote device is the
-+	peripheral.
-+
-+A PropertiesChanged signal indicate changes to this status.
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 -- 
 2.54.0 (Apple Git-157)
 
