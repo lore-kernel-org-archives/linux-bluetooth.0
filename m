@@ -1,73 +1,105 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EA92D77F5
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCD94E4C43
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 14:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791557341; cv=none; b=BzXW/cbhwqUr2ZUVY0qxlpzYMroN7FeO9kn4D2su0d4SaxMiR0j4dHF9w+Z03hKTo0ASpSD4xnuq0DQigQd3AOxr5lqf/hjoWNi596uxX2ERHvGvf/Qhf/KzCN60E0ETrW/xznm+oBV1ffwEpWw5QV/WzXMktYfzesuTqvW2B6o=
+	t=1791557375; cv=none; b=k+hFq7btN6Fk6d6mXWkZHsV1FEI9KwpnkWR9uEbLnerJWvKVYRyGQyZFDgvv5rTl2h3Mmj4E7ijqxbKfuO51VHGGpvhjbKTdkBA3+wzS6Vmj/AFK2DF1llELZuY4HfKtyQH4nz/fi14E880E2X462oe8zf/PydJx68WSsB6pNoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791557341; c=relaxed/simple;
-	bh=YMaE7xjtO9olQTAe2651P3O2teKKFE7psqR9YWmXWfM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=FftqzDjmd+M38R4hoE5lUwLgMobSUEJW97Eu90PF8wex1gJ43svQjC0MPlwMW/59qXsPeCF2QildIw8q7tEwOg5LX+7aSoyJgKYhE4tpnRMKcS57wjrqodnwUV2m+cEpq2q/heLn5mJ51wiy/7yCtbVV3UlS3cSGjlDk1j83GoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=cZnkU83H; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1791557375; c=relaxed/simple;
+	bh=gjlVvJnHRL+z5iRriL+Fjs9l4WC/p1Pf4eg5Tn3PwIM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fyvGS4Uv/nrv1as23X73+G449STA9CF1F7rcz0vB+C7bsaBNJQgcdKkQb+lp9U/J1o3AdpMyABT29zSUbprUoYwV+BLKRXCfkqywxO4wl1yRbSEAK5BXdURkq1ZS2GLiCYrkNSCRbx0emWrxq7ijmUoUtr4wb1AelPVdh6iKH5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pPu0rsKi; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="cZnkU83H"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791557339;
-	bh=MKsnVbqCVfnWAqkwkQQKGFhCMv9GfesP2vxLpE9SN/o=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=cZnkU83HuFcQqf7BPlaiYfHefowvs/PAj07KU0to0QErQirKyuNoym9qIE3CDCgv3
-	 +z86LhJ0zB/FaUXdoTNtR1E6oZpKNv2H9U/MTk0yzAM54Em+tw/YVLn/KhHe0zX9qy
-	 6KEz6wE1ypGwWPBqJUhX5SXGtKrf/vpy16S7SYVw0xsaKgDKG96N6bNhdYR1p+p8I/
-	 1uZK+8Wz/y551D5xVAdiE2BJt5R7FsOJJpW1r65OibwvIORBn+mfr+odcbcImfVd4A
-	 FWuOjZBEUjQq+NYQoJT8hA+rOOoLNqmH4l+msuOvhpxnEt16aki9ln0vhWwSL0G/zb
-	 uL6x5cd5h87ZA==
-Received: from github.com (hubbernetes-node-e54636d.ash1-iad.github.net [10.56.128.65])
-	by smtp.github.com (Postfix) with ESMTPA id 65D851804CB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2026 07:48:59 -0700 (PDT)
-Date: Fri, 09 Oct 2026 07:48:59 -0700
-From: GBerfield <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/866b0b-a57c6d@github.com>
-Subject: [bluez/bluez] a57c6d: client: Handle system bus connection failures
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pPu0rsKi"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4f55a53898cso2324956b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 07:49:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791557373; x=1792162173; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=yU8ujqgeyE/frbQjpM9p7VMEZy/3VxBgRAs5Zq5wo1Y=;
+        b=pPu0rsKiExFsomVElrzrS5q2cF1untBYKgedv2r0E+9nbsSmZVzlZ0WD8acXVZijCQ
+         tenzjzTh383AkYnNBNpoBAcqGyKtOpkcIqOCwxrp/jb7A+cVWptPXnRKLBL7hszN8raD
+         maGcV4ijznSNLQMw3jeOjOgquLZv9A0JcRSTEqcbVIChDYnf2ZMo/gTf12m161tQIOP5
+         UWl8V62bNCAHNHIQoYkRLvWtCBDc6egsld//GuVNb2ecGBZwQMS1foKuv5UstwJOY9mw
+         eGqHz/KbwhR5AQ5YzdKnXJIJ90t51EUb2VQUiDv1bW8nZ0jBORssZl01aNV7K6BMU4Hb
+         fgMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791557373; x=1792162173;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=yU8ujqgeyE/frbQjpM9p7VMEZy/3VxBgRAs5Zq5wo1Y=;
+        b=IJhdxNgT/enXznDmbgRXC0er9aZaLeFFHp6xEIOPeCbkbEzjS3pxtIYjCUE1vGCWez
+         VElB1jxQKa5ftg+S3B75ejQbR4WWeomQn4UeNqa0UDMWZPzM7qZ655z8BsTDsEqlQRRq
+         gnQByTb/UhvyCFpa3+yC8affl+ptWUyUkHcmFOdX8I2tFW+kq+9vHtRtvU6tnNU9Sh7Y
+         5inf40Q0Y0YIrBhlk7L+hODmyKpvmha35pUOov2iKCKParRqAxI8nCR+TyXRXiR4sad7
+         iO3X1YqlkIdgEvrZXukROtKKRiOX4VGT5NgFI0pFd8+CKbqTl/rElbveyLIha5Ed1F1G
+         DYRw==
+X-Gm-Message-State: AFuF++ntYQgnJQd8b+adanInCuSzEzKvBaa8bh7njctkv3JXvkmT7GKC
+	vgwSEihT7gV4LIpTMw8JOuqYh4HZcL07hhordjRD1DoZ+hgU2TIQqCyz+MGr3g==
+X-Gm-Gg: AYBFou3KA9cMoXu5tCRoT8A1iGVMrTDCkZ2yJFUMel1e+2E3PWCWDKFzDgJzdTKlj0z
+	zGleOPkmsBoIi8HCxVZYY+dAEPsHbc6bc1hEqge3x1EZ8qlzX6vL6vktMwcwvu2d/TF1RqLtKwS
+	Y8z8wAeWTEMXNsN8hPh2MKbshgxs5HUpun2rU6Q55FiBb65r8UMvLxDHnCtM/8TO5iddyWeRx2w
+	fs55934Lk4JJDvkk4SjnnUq7Sa8Mzcyzsrd0xVeJmA928D4B7nSnNUgcDSful6WNKgT5TRpdiVQ
+	MTBY4jf49SOwfWAXvcV+XXpTP/OCcF7Y2SeyxNWZdEmZrrD27cxW1Nif5ELedFZWvwVzMtbEXPm
+	A5DaNXYAo9+jviJznZ+e85eyZJwMbra3AfvfzIysPrKHOIzTxLPpbU7o26GUK9nZqi/ZFTcrMZ5
+	5Bqv5YKQRPWXY6CVPorhLbiyhb7mLw2D8QfQr5VxBzn6NveO6n/vUVsycFokOVeu9mF469vgOOj
+	8tQFw==
+X-Received: by 2002:a05:6808:1918:b0:4f4:3f10:830d with SMTP id 5614622812f47-50c5b27c152mr1996731b6e.53.1791557373284;
+        Fri, 09 Oct 2026 07:49:33 -0700 (PDT)
+Received: from [172.17.0.2] ([4.151.214.110])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-50c1c120ae6sm2062543b6e.17.2026.10.09.07.49.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Oct 2026 07:49:32 -0700 (PDT)
+Message-ID: <6ac8fefc.e5f0f813.2078e9.7739@mx.google.com>
+Date: Fri, 09 Oct 2026 07:49:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9003466634910803654=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: [bluez] monitor: Fix stack-buffer-overflow in packet_hci_scodata()
+In-Reply-To: <20260924-fix_sco-v1-1-ddca18333914@oss.qualcomm.com>
+References: <20260924-fix_sco-v1-1-ddca18333914@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============9003466634910803654==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a57c6d52e7cc87e30768d09aadff4c7b3a736938
-      https://github.com/bluez/bluez/commit/a57c6d52e7cc87e30768d09aadff4c7b3a736938
-  Author: Gabriel Berfield <gabriel.berfield@gmail.com>
-  Date:   2026-10-09 (Fri, 09 Oct 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M client/main.c
+Dear Submitter,
 
-  Log Message:
-  -----------
-  client: Handle system bus connection failures
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-Report the system-bus connection error and exit before attaching the
-object manager when the connection is unavailable. This avoids a libdbus
-assertion abort in restricted environments and releases the initialized
-shell state on failure.
+   Series:       [bluez] monitor: Fix stack-buffer-overflow in packet_hci_scodata()
+   Pull Request: https://github.com/bluez/bluez/pull/2576
+   Created:      2026-09-24 14:24:18+00:00
 
-Fixes: 8a05f2b1ac91 ("client: Add initial parts for the command line client")
-Link: https://github.com/bluez/bluez/issues/2446
-Assisted-by: Codex:GPT-6
+The pull request has been closed and no further action is taken on this
+series.
 
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
+---
+Regards,
+Linux Bluetooth
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============9003466634910803654==--
