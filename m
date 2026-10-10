@@ -1,72 +1,68 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB943C3450
-	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 03:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E8B3C1F31
+	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 03:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791602337; cv=none; b=IUvRgPoomsH+WKG8QF22Y034gFUr4KvcxvNBu+lCt0JzbOs+7UT2ZUBCXu5qgUDOoOeDPaqSFYzwpqA5sPdAvTQ4MwQ0Y/dfLmTu85pEP25d3o1Vny+WTaJJPMi+McR3k/OAgsXhFpTx0OM7W3mdjhuC+IgKvcIe8fK5BJS0Fkg=
+	t=1791602338; cv=none; b=R79Qt7XZp0g3PbK4M4vG6YjQ+KzgqyR4NqKrZDYxc2DvvjZzFt6Y8k7aG/sLcMGQlL1mK2ZDZBQWtNBPJCxQFMvdlgNsa0XV+nJb+nOt99xlcxJWLYu3SaDK3Vq5IJr8TgiPTflGEEh9V6Oua6106x8YJ1+5GAbAyBBfG84jDcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791602337; c=relaxed/simple;
-	bh=xjWEaUZXs60yw+pKZM/bthVcL/B98QbcDhoLy//HNHY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=geuXp4kozD56bvcvP/XHnYtTyxuRSRZecwkA3TYG6KmzmmUxoCV4zLn2Kdho10gk4ylgaVTtmuxaUtf+HatWlK+uI4T4wQqWBpFYpodwa9HrP9QldVi1flBl7BruvQIPKM/VkCqnllNOE097VGjVoQkUTZIkNvzmRGZjWC4VrRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtcRAaDs; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1791602338; c=relaxed/simple;
+	bh=y2+z2tcRgHCayPQhbQYha1SAO0N59bDnnDJNsbmLTP4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=liizGJJxlo3YuXq6IcFF36FvWFhmxRo+CpUvRteDJ++rfuTdlZWuIlI7haPzXkjjitmFFsD2Qj1czUs5Px2ME0M974GDZPcXVV6ZwxUsuSlzdBg1uto76HCqs7+lgUNZiEHDeRiQDr8daU3UvmLjfi+tzuwJfIO/Nc51689ecbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KC1dV7hu; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtcRAaDs"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a17ce1dc00so398685e9.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 20:18:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KC1dV7hu"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49fd4e9e1f6so237395e9.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 20:18:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791602334; x=1792207134; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=EHxmkEUl5nl8/tcPAtdDPD5IXGMGzpWCjxYf2/fRiK8=;
-        b=DtcRAaDsbVvjE1D+sXqwIofUaHmyeN83msOfeETcPFL9hav82tyR8SaxtIDyTgmS9g
-         0S4UP/iKQV+NSOZXJlwM5gX9Nj0kxdyhNFBJ+KlGfqeMgOR7WN0UVEg3xUCFiMHEwNex
-         yjjmFkgM5MUC40i3RqVoXbjrS+WyvMfw9usjAQ6VuLW1ytWCAwY0KMhKFwdZkl5clp8e
-         z3HrJS6ain+CLBVaIXHC5FQrUNYtdcup7q58sVnPS61XOeRL782FdFg21CONt2SGa7Yg
-         cO3rZvnncsrWpZUtdUjzK8VQFCrtCrXofUNK1LG79WbQ+jRbHvFmRYqOUzOmk41j5X+X
-         A3tQ==
+        d=gmail.com; s=20251104; t=1791602333; x=1792207133; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JOwxQUStVxow2E3vGaa1SOF2WKO9sirLhRCiSFdWLsc=;
+        b=KC1dV7huRr5D2ltlXALMh4iHsJZHiyihulYcEa//aOr4iX3kkwIVKTGG3aroDufzo3
+         n7FDbDBXaGNNwrAIuwQ0lgRBxNtKoJ1MoMQHhqx7+xhtFvstApggu43cAlfmIKjMb9JZ
+         PwnDhrDleKEKnGCWjSW9qunwCTriwcSIIj7sDtaJeeRubNbJwhYF9zRDa6fgTzUbFdMm
+         O9JpG0eEdGqbp61yC6ct1/y0jw6S72d29cWjwqzRqfVpHDY3zb0qLeqMB84CtE9ewtzl
+         G/rDie16062G1rA120SicHd4fXAWr390pC8BMHh5XpCIvE/bjI/K+ELDQkAkREumI8u6
+         5Efg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791602334; x=1792207134;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=EHxmkEUl5nl8/tcPAtdDPD5IXGMGzpWCjxYf2/fRiK8=;
-        b=Ws7feud28CSXI9B5SdEdSZu/X1ztpLPZuw61Du82uJNXntTS+4k1nVXRf+88neCRAO
-         ILlZ/Rfh9AC5cTcR1KJkQCbZYIxEQm9KHsfFrEj3WeY7ygPRihpQvzpTUJz8y2nizzhq
-         ZTM7bdvDWJ4atzraKGwHfGVJ7Ao471/06SPcM0NhphltOTmIee0zIl8GzN6oFMBZLpr3
-         FsEsf5vSYPoi0n69ZdBic5c4cE9KffL3s3umz7Ll4D5mtwd3JdcsHE8NTkxpYwYSxUOa
-         k2PiaC9mWm3Slbiyj19WyHCzo3P7Z8iFiEK5LiwFYNjUKQnxAV3wVxqYZstXw4SF2agI
-         o0kg==
-X-Gm-Message-State: AFq9FYKjpsL6/DROSsCIz8xPBKYvjgdufx/fu23kTaa03PW1t4Pgdtfs
-	5E+KxQYnatEESd9i70gj1I2+ipRBXzfpDmd/gajuebeynHbRjZIk3ysA7gK/7UpMNyU=
-X-Gm-Gg: AYBFou2GUvPmFVMgBojrOH0TqvtPTPcrtNzeM8in/dDKvGfN5x6r3jqO2X5pZH5EPPT
-	n0uRkPe4F2y3bRjHLtobICr2t/OTBMiHRP75+zS7ESNXZnvImNprcS2Ph+n3UwHPU8LSY9JgHPo
-	WTTfyYRF88ArSnP2NENyYdyMYsimDgG/MlTeXeLq5okD1dU+IOj6Ejq8OpXi1AO3H9AKmOY54bt
-	o7RXVQ7wM5d/VYF7BsziLRp8wCTYJUaMXl/eLuKILTaassImdJRFF4MzcUukKZOCQGyCddreWFd
-	VzWzhzCqZAjYr3/+GqEy+SKN0Dr0LuTZXylIqsx0xBE5Pr4SiWD1Kys5ZSHeiRXPoJP7yRJ/RZ4
-	YXLIQ35ucN/9WQAPeOBcAIXsaTD1x1LX7+pcjA9oXjdDmo5fM0vBF2/u8UVCcJm9ocqR/wc8nzL
-	qo5mfv/Sq2JpTYlR0MHXJtX7xkeAPVZhNlmPb+Ef4YIqHIwJbDMW9u89wnJr7N8mMpFT4FuYo+T
-	kTtVG6h6FsgMMJNCskSfE10PHdA3HdICVn8nNspufGn7MB4SQ+btcE=
-X-Received: by 2002:a05:600c:6285:b0:4a1:715d:1913 with SMTP id 5b1f17b1804b1-4a18e4760demr71282855e9.1.1791602333516;
-        Fri, 09 Oct 2026 20:18:53 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791602333; x=1792207133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JOwxQUStVxow2E3vGaa1SOF2WKO9sirLhRCiSFdWLsc=;
+        b=mS+sCz5ZyVyNokKNmqejYsk1LU14hi9AKVnyerkBHnXlm/f7rJc3uFBI+Su94H+cTG
+         UYuX4KuCqap+lv7vlbzCNBm7Y/Ic/XuBoDy/QD1DfEkMHm4+fzeHU9sZATj/vJSIyNnu
+         UygSePKj7v5Cq+El1IxCUBbtfefqA+2YEW0eGe2mVxsU37wVvWMfni04WU+mpUY8uHfi
+         R2+wpMU6+ofPT6cv2ZdiBOJjYejIhEV5ZS4wvnNlj+M+8SwSI+QzrIQvVPv73h+gPjXp
+         Wb9yr0AonGa6Ow0AfHQpYlc23LWVzFpOEOf14o+hd06aQD9owIAggP1tEpJ+GheswzL+
+         AHBA==
+X-Gm-Message-State: AFq9FYKgjs89MQEWsQBIYyHpjAX7bL4XuBZZVxE14JRvjZnO4LZCvDZD
+	QTrkUViBMWbiTyv960v0o5zxr1F/ws0kxX2ysrIoqHIvIlpWSORpx97qoe+b1FZIS3Y=
+X-Gm-Gg: AYBFou2j2lcEXmp7dUTaSn6WUIhfXBvLGHxtWPdabVOTquGA4GRZYy6H48REM8Kakyy
+	T3OUldnHiW5YSwaJYAE1psQ0IlyWI9M0qEp4CZsUwSj1LWI6X287+4+MhL8QNXktkJqf9erqMm8
+	XJfhz1aVHNgQ+Z/oyGad+IolwN8hmrtgVE8mkgAQBDVDNkB6Ri7BeNqUizdQuTOXEyXDkM4v9Un
+	whg32pzibokcUoous64YY3xH0SYZBnkt7s0XVDR1u61lfA4etUP0hW188xZ/OofNYdumLkn69F/
+	3zLUQi61gUjZED10+dSvZUIR6cjhHzrFZVxdM1bafDSNKt/nBIeTHoGSAI2EgnIS+Oa/FjOUoDm
+	eYV+qtnr7JYAumHZju7Ry8EcXeS4U2c4MWHAmyQiAtB6fr/AV9kL7W/aBaNXBZ87q/ZgKCs69FS
+	xY5n53z+18fpffoWbgi7D1KARz14GXVGUM/HJp/l+k0Hmgy9gX88CPC8NJuTfiMS1TkXoxSGou7
+	HBCnJIFi01TKrfL/cNXr2ykItIG2/oJnE4TdD3wTnrGyhlchCz67iQ=
+X-Received: by 2002:a05:600c:1912:b0:4a0:73b:a222 with SMTP id 5b1f17b1804b1-4a18e3ee97dmr64486325e9.0.1791602332871;
+        Fri, 09 Oct 2026 20:18:52 -0700 (PDT)
 Received: from localhost.localdomain ([194.36.104.180])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a18bf2caf4sm110270805e9.10.2026.10.09.20.18.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 20:18:53 -0700 (PDT)
+        Fri, 09 Oct 2026 20:18:52 -0700 (PDT)
 From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] emulator: Add btdev_send_event
-Date: Sat, 10 Oct 2026 05:18:49 +0200
-Message-ID: <20261010031852.2842893-2-yaroslav.voytovych@gmail.com>
+Subject: [PATCH BlueZ 0/3] mgmt-tester: Add simultaneous discovery stop tests
+Date: Sat, 10 Oct 2026 05:18:48 +0200
+Message-ID: <20261010031852.2842893-1-yaroslav.voytovych@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261010031852.2842893-1-yaroslav.voytovych@gmail.com>
-References: <20261010031852.2842893-1-yaroslav.voytovych@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,44 +71,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow a tester to send an arbitrary event from the emulated controller,
-for instance from a command hook, so that the order of events around a
-command can be chosen by the test.
----
- emulator/btdev.c | 11 +++++++++++
- emulator/btdev.h |  3 +++
- 2 files changed, 14 insertions(+)
+These tests cover the kernel bug fixed by 96d006ae6445 ("Bluetooth:
+hci_event: fix simultaneous discovery stuck in FINDING"): with
+HCI_QUIRK_SIMULTANEOUS_DISCOVERY, an Inquiry Complete that arrives
+between LE Set Scan Enable (disable) and its Command Complete leaves
+discovery stuck, and Start Discovery is answered Busy. The fix is in
+7.2-rc1, 7.1.5 and 6.18.40, and backports for 6.12.y, 6.6.y and 6.1.y
+are on the stable list; on kernels without it the Late case fails.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e00f78288..fa326e72f 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -9158,3 +9158,14 @@ int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode)
- 		return -ENOTSUP;
- 	}
- }
-+
-+int btdev_send_event(struct btdev *btdev, uint8_t event, const void *data,
-+								uint8_t len)
-+{
-+	if (!btdev)
-+		return -EINVAL;
-+
-+	send_event(btdev, event, data, len);
-+
-+	return 0;
-+}
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 145f7edaa..aa04ca611 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -112,3 +112,6 @@ bool btdev_del_hook(struct btdev *btdev, enum btdev_hook_type type,
- int btdev_set_msft_opcode(struct btdev *btdev, uint16_t opcode);
- int btdev_set_aosp_capable(struct btdev *btdev, bool enable);
- int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode);
-+
-+int btdev_send_event(struct btdev *btdev, uint8_t event, const void *data,
-+								uint8_t len);
+Patch 1 lets a test send an HCI event from the emulator, patch 2 sets
+the quirk through the kernel's existing debugfs entry, patch 3 adds the
+two cases. Late forces the racy order; First is the normal-order
+control. Where the debugfs entry is missing both are Not Run. Each
+case takes about 13 s, most of it the kernel's LE scan timeout. The
+emulated controller is LE 4.0, so the cases use legacy scanning; the
+kernel ends extended scanning in the same le_set_scan_enable_complete().
+
+Tested in qemu with 4 CPUs on bluetooth-next with and without the fix,
+and on v6.12.112, v6.6.158 and v6.1.189 with and without a backport:
+Late fails without the fix (no Discovering disabled before the probe,
+Start Discovery answered Busy) and passes with it; First passes on all.
+In full mgmt-tester runs every existing case has the same verdict as on
+master, except two that time out intermittently with and without the
+series: "Pairing Acceptor - SMP over BR/EDR 2" and "LL Privacy - Remove
+Device 4 (Disable Adv)".
+
+BlueZ's CI runs mgmt-tester on Bluetooth kernel patches posted to the
+list, so once these cases are in, the Late case can catch a regression
+of 96d006ae6445 there.
+
+The series applies with or without "emulator: Free hooks in
+btdev_destroy", sent separately.
+
+Iaroslav Voitovych (3):
+  emulator: Add btdev_send_event
+  emulator/vhci: Add vhci_set_quirk_simultaneous_discovery
+  mgmt-tester: Add simultaneous discovery stop tests
+
+ emulator/btdev.c    |  11 ++
+ emulator/btdev.h    |   3 +
+ emulator/vhci.c     |  15 +-
+ emulator/vhci.h     |   1 +
+ tools/mgmt-tester.c | 395 ++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 423 insertions(+), 2 deletions(-)
+
+
+base-commit: 7428ca2df9356363079db0f48412c20cbdb9471f
 -- 
 2.43.0
 
