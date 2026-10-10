@@ -1,93 +1,124 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126BC45C715
-	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 11:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791630900; cv=pass; b=VzL4Uo56dbcmGkvfrLs493Qef3vM0kkYGDKNThTG/L4aV3SDXvlFKZ+8dpBpYfWtTP1np0bQdLiI/QT/gPj+eFIe7u93e1aPRfTPr4ZPbUrvtFoWf59xh+hGw7zdp8OiF2jXkbiHXcd4bLOUfZ+Uj2bAwN+aXCkVXxDmDB94fbA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791630900; c=relaxed/simple;
-	bh=ryTbbDO0PctQ5vQDxETOTsc71pG/zt9vXYk56w80TLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZYlXgm2FnvhINH8AaKRnNz3YONVM4j/HSpV10vD+daj7cDZJZViIE0qHyc3KtiMc57M26fkEOoP5ySuZQwyw8ZRCdEASQobrmBh7IcunwsIVIcN6v039dG7qemlh5epwCjFrpCh5tO/YbVE0xLfZRPCoyXwpjeMCVfiwK4ACipU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LEeo2kVV; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0C5475334;
+	Sat, 10 Oct 2026 11:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791632140; cv=none; b=toUPtqsJNJUe1HKYzHZG0k9xk4lGZaFRdD1KR3oPx7CoMBjx+1QUGfQ1rvjErlzC1fNVq2HiAU9ea1fblxhma7jbPSYpA8KsIfyLsvxOLYgzUzEklARDnqO7sUUag2YFbjk+9cwBiiyja5xc7y6KucuhXsSIRIYyhDMK87vvg8k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791632140; c=relaxed/simple;
+	bh=/itNkXNH1JxfAtbgLYU43ReT1lu9d2Vv6u4JiAK4MLo=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=FPSwbYCdcZB5aPwY/A3w9nW/8OOj5S1dx6akRZPeD+I2/3/sWfEi1cuY7rOU643qadzgmuC2JkcxdmT2yykQq59fLbeKbmUB7qcz3BBFnPOI5LcRd2lv0Y8lq0Z92fVSg9+c+XDEjDSsLKorsgLtzMUUQwN4nUpSMxvDCPOoZ7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=IQstWvGz; arc=none smtp.client-ip=109.224.244.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LEeo2kVV"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:1:f410::d101])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4j21N56dkNzySX;
-	Sat, 10 Oct 2026 14:14:45 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1791630886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=E+KSU1to9ebilJCc7WSXhGGwIMBlu7je591NS84tht4=;
-	b=LEeo2kVVKhA0xvxS3NnQc0JMk9EpMeZec9SpowaxkSa2yIrfMWONrFGoHVOLQePY5w03Jj
-	LQcNTzOh6qcLQ0DLU4E+YVNeCu+8pWqW4Kl56DXdk3yF4l7Npen/Kk1o5P+bXhnGzZpIQk
-	H+39Izsvk+pvhQvHBcjITntVSyTYNPk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1791630886;
-	b=mUhIkKI81Vz4K1OCRmJED4s23SLQTe2OtOOM+twB5q+2yMIO1zrc6VEhmQ+RzYBWTIAyzH
-	FNXvu0YL6cQwUqFYgkD8tCBQoknJgMmTr94iiWYAfajl3SanXt2f2mbHpZ44MqsqxOoLJO
-	twMx1Ejyy4VTHVcNOIkRjVvoUxXdeYI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1791630886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=E+KSU1to9ebilJCc7WSXhGGwIMBlu7je591NS84tht4=;
-	b=t0R1OHptxR2EcQw/z0zyFYmdF4hoUPv8ZStBazXe9nRk7IbWR2CT0mkzvZO3SQQFpdmx71
-	tHQsGLhGo6Zb/yBgVq4Ic9+9v+D3+yfCSvDxuSnCsjMpvi1B6iP9XiwF3b+/VoxhjZ4Bn+
-	lHiF3TcTyt9fWngzUizTJw0PXmyHl24=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] unit: test-rap: disable optimization to speed up compilation
-Date: Sat, 10 Oct 2026 14:14:42 +0300
-Message-ID: <ba9d7cd83367a994657de01f124f1fee19f7485b.1791630862.git.pav@iki.fi>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="IQstWvGz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1791632130; x=1791891330;
+	bh=u/XyS0fFwdXSO/nAyUmGOgyVOEMZmfrG8b3gOmGgnns=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=IQstWvGzGoGHE9qtWPZKn15AgkUBc9Y37IAtSf7cXw5Wjym8pRqR8Olw8iw7I7ZBo
+	 BLXGUajVCl/Jej5bolpLBedu25L8K5ve/STNLIx6Zdl4HiPOWU34W9ux3nMupyAlVe
+	 WwwRI0J7SfK0dQ4UE5ARATUqJ3tLdJQyNBVevj6X8Gy0DGQceSlRDbJPpYdjgkozGf
+	 9hfUvAmQC1qaNLGs9hnlk9WTna/B46xWP9KtjmTU3cDx6ZOOZubjKwm0uZJIzCDE+6
+	 9edbf9voQHuFWdqtDMCtrruPDLGApA3oNJzzg3mMj5C9eEQJ1jh5DS4Gqmvo9W8euN
+	 dK79ioPKjC+ew==
+Date: Sat, 10 Oct 2026 11:35:26 +0000
+To: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Birk Skyum <birk.skyum@pm.me>
+Cc: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_qca: Reset the in-band sleep state on power off
+Message-ID: <179163212446.46972.2306254853726299632@pm.me>
+Feedback-ID: 21326998:user:proton
+X-Pm-Message-ID: 884b30a7e7cc678a90e94af3bff0cc6b2f0676a5
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Compilation of this file with optimization takes 4 minutes with ASAN.
-Disable optimization to reduce to 2 sec.
+qca_power_off() cuts the power of the controller but leaves the host
+side of the in-band sleep (IBS) protocol as it was. tx_ibs_state and
+rx_ibs_state are initialised in qca_open() only, so a controller that
+qca_setup() powers on again meets whatever state the last session ended
+in.
 
-autoconf puts global -O2 in CFLAGS that cannot be overridden eg. with
-unit_test_bap_CFLAGS. Use pragma instead.
+If that state is HCI_IBS_TX_WAKING, the host is waiting for a wake
+acknowledgment, and qca_hci_shutdown() has deleted the timer that
+sends the wake indication again. The setup still works, because frames
+bypass IBS while QCA_IBS_DISABLED is set. Once the flag is cleared,
+qca_enqueue() puts every frame on tx_wait_q and nothing takes it off:
+
+  Bluetooth: hci0: QCA setup on UART is completed
+  Bluetooth: hci0: Opcode 0x0c03 failed: -110
+
+A restore from hibernation gets there on a Lenovo Yoga Slim 7x
+(WCN7850). The controller has been through a power cycle, while the
+restored kernel holds the state from before the image was taken. Its
+wake indications go unanswered, the commands behind them time out, and
+the core closes the device and sets it up again. From then on
+tx_ibs_state reads 1 in debugfs and Bluetooth stays dead until hci_uart
+is reloaded.
+
+When the controller loses power, put both sides back to asleep, which
+is where qca_open() starts, and stop the two IBS timers.
+
+Signed-off-by: Birk Skyum <birk.skyum@pm.me>
 ---
- unit/test-rap.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Tested on a Lenovo Yoga Slim 7x with Arch Linux ARM's v7.2 kernel and
+hci_uart rebuilt with this change. qca_open(), qca_enqueue() and
+qca_hci_shutdown() are the same there as in bluetooth-next, which this
+is based on and where it builds without warnings (W=3D1).
 
-diff --git a/unit/test-rap.c b/unit/test-rap.c
-index b05edf203..338f0babf 100644
---- a/unit/test-rap.c
-+++ b/unit/test-rap.c
-@@ -9,6 +9,12 @@
- #include <config.h>
- #endif
- 
-+#if defined(__GNUC__)
-+/* Speed up compilation */
-+#pragma GCC optimize ("O0")
-+#undef _FORTIFY_SOURCE
-+#endif
-+
- #define _GNU_SOURCE
- #include <unistd.h>
- #include <string.h>
--- 
+Each run is a fresh boot, a hibernation with a real power-off and a
+resume, with Bluetooth powered before it:
+
+- Without the patch Bluetooth is dead afterwards in four runs out of
+  four, with the log above. In the one run where I read it, debugfs
+  showed tx_ibs_state=3D1, ibs_sent_wakes=3D109 and ibs_recv_wake_acks=3D8.
+- With the patch it is powered again by itself in two runs out of two,
+  about 20 seconds after the resume. The log shows a failed version
+  read and "Retry BT power ON:0" before a setup that works. In the run
+  where I read it, debugfs showed tx_ibs_state=3D0 afterwards.
+- Powering the controller off and on with bluetoothctl still works.
+
+The 20 seconds are the commands that time out before the core gives up
+on the old session. This patch does not change that part.
+
+The kernel also carried the hibernation changes in [1], [2] and [3],
+without which this machine does not get this far, and a GENI serial
+change that is not ready for the list.
+
+[1] https://lore.kernel.org/r/179157746908.73485.2343672865542690797@pm.me
+[2] https://lore.kernel.org/r/179158127177.70185.5691100900886332545@pm.me
+[3] https://lore.kernel.org/r/179163141354.18006.80461347454353634@pm.me
+
+ drivers/bluetooth/hci_qca.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 7089e9b63..19a75faba 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2235,6 +2235,11 @@ static void qca_power_off(struct hci_uart *hu)
+ =09spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+ =09set_bit(QCA_IBS_DISABLED, &qca->flags);
+ =09qca_flush(hu);
++=09/* A controller that loses power is asleep when it comes back. */
++=09timer_delete(&qca->wake_retrans_timer);
++=09timer_delete(&qca->tx_idle_timer);
++=09qca->tx_ibs_state =3D HCI_IBS_TX_ASLEEP;
++=09qca->rx_ibs_state =3D HCI_IBS_RX_ASLEEP;
+ =09spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+=20
+ =09/* Non-serdev device usually is powered by external power
+--=20
 2.56.0
+
 
