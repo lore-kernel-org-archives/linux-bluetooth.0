@@ -1,134 +1,105 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E5C37CD4E
-	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 14:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C5338BF8D
+	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 15:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791641298; cv=none; b=uHG4EHwUgDeP3DeB89ujJbHxGTy22SWHdmbhfjBw67ug205DVRZAGLwv4qdjW5ElwN6lZEBj4NC7fLxT31Jc/h1H0zQ/WajRNf/Mfhil88tFtZp+/+dakXhGrd2bcO87rVhLa7yrcL0S2jxUqDZ1kzhMeHKT6PSUvu9izThw1ww=
+	t=1791645588; cv=none; b=mj4G/zxKpqkUALbVwEpd30Y8URkSl4zWamJ1/2QvzbY1PN12MXw8Xprdhxi8JopOFkM2NfuzQxrDL6Pr1JFxY18T4bGpJ7QBbGkhtd5e/eApagVBZAj6Y04/OHBEBJgs1SYGS37TAAlBCOVAAgCobDBQR79Bff6AaNreMEtoehE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791641298; c=relaxed/simple;
-	bh=fQDInI1W10eUugdQwet9qBPWjoYFjRiuPOXtMNncH3k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RW6JGWMSfXbuMbS5Hk2+cLebrkYXPmOeBHX7cQyuyz/7xpe6fsrQhKnOpstcZRoAnM1ahZlUmtcGF0i+hoM/paFBnMQeM+9ZQd/3lkNqapn7kbtNm8Cp6CNy4DIePgOzvF/t9Oilqp2cOhJdZsqlensyOm5TJBHjsLW6RhzNL04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LplsGtum; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1791645588; c=relaxed/simple;
+	bh=o63bOSKZC3NXmlFKu3tqCp7axmkpNVRHUTbailOWvos=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gdNsAERIMqSeKX3ccPXMXEscB1WmY8uVi+/zR7LhsQKPqhSMkeH6pkSNs9vUgvAa/VdAn37IELeqfTd46g9fy4ixgNzkzMl7ywok4MTl/aHqUjD73F7AZ6+3srE7JKDw3pnyOR/sNRshq0m4tf3CeJalMfOAu+Zdr2/zupSpCOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJ5nfCrJ; arc=none smtp.client-ip=74.125.82.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LplsGtum"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-ccc6b11a19aso195669a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 07:08:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJ5nfCrJ"
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-15943c9c005so883422c88.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 08:19:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791641296; x=1792246096; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UjpHf4PwjNUxYMxzaCqn9UvI9tlvLO9Xt3mhcZZZJjI=;
-        b=LplsGtumBvxlcxVCxVtDFskVDbhTW1C1o1HC5hbyu+af+SNe74BAAZ4xFnwo86gleC
-         GTZwwqbrz/OtjMrmK1YEojLlG0v+t9el8ub17p4/IY6ETeYEZeo59YKDfRJZPtsptzbF
-         0ddfLXaS/1dhR3y3Tol3BDo35XNeoAvuLqacgmxgEzMnC5d3dzdrGb/7Ih0Y+4REmZvw
-         ugsDmZpHm1DSEJG80BsRvjGFBg5racTIDE6pHj4iXRQRPs3v1BhMI+YtsTXK19lSBGVS
-         KZo264Irsmuc6d1GxXxmUc8Dv6IbRdf1Ewq2Mv+3GC2p3uFno5wFvk7bPr6n/nUM+hRt
-         Wt6w==
+        d=gmail.com; s=20251104; t=1791645587; x=1792250387; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=F8l5bvxKDHHWTKOftuncxDgtByEv9VJYrSkAPVmwcrk=;
+        b=QJ5nfCrJGMs7GmcEAoOQ7D72I6pUCYd/fTs4FGcGui9R8F34llSZaBBEYBqps8OfdG
+         Fnn7A+YoeydvEh//l6ByWjtgHhBu/Wbzxj82eMAkzBGNVj9Kjj0i4uGLjZ0Vffb67hi4
+         grtThqNhZ6ZJTCQwFRFvnRoPtpzd7FOcYM2OX5A64ekW/8KzxxA3a4B9Dn/oCHBdsYnB
+         3RuUxFrEI8oimVpVQcybAaFVPo5WAXXdQAKwQx3Lv9CMnjrQGQlNONf6nCWLncCIPwja
+         ED1BXTuo7qZIKt+56wzdvn5+r84YKjKV/K44cThZYnGKm6jONS2nLKMI9U+NAlDo9Plx
+         LL6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791641296; x=1792246096;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=UjpHf4PwjNUxYMxzaCqn9UvI9tlvLO9Xt3mhcZZZJjI=;
-        b=DaE1p7c0JhkZ6fbeLugwF9j4bxzBWmvL4E6NyjC5EhziDz9Shtfxnr4ivUnypW1AoF
-         FMQZReVBoImDiF9fHltPVrmkubTChULNZ4TTKHQfD/F7fNu/91BAW1Mbi50HndvK8kbQ
-         zIr58PAUEzW1ORGLhG4anDicJIg/Nar52Ml843kB8sBUzUwYrNV+9GPam1roVQjGq/6N
-         /Tb3nDL+4by2KkM2xHCQzMPA28qACY1rf/ISHbaT7qkm2hnpaCf+TI1HQeFINqIXJEoc
-         VC0krZJNAXU5DkUTF0gjEPV7A/K6w18Ymcsz6x6UwdvDC03TjB55pDMhSS/hRgdHRpIm
-         FHnQ==
-X-Gm-Message-State: AFq9FYKAhZWwpQKW3edmjnobwdDWEzlMmQuYb0yEjFU+tu/sFgWmD9cL
-	u29/y/14YwsBj9EhIYJEWSZdDKIoT8y0aXQ0rnK4/ooAG80C4lJMva+j
-X-Gm-Gg: AYBFou0NS7HdkCIJC8O8RFZ/+J1IKBN9/JcAPNN6PfcVisEKyQDPbFjYS8Mw6JRCNW2
-	Ri4mTSMSkzr7OsWfwzsBYlScvopznBTvxmjplrUNYNClUIKKr9O3HybzbMQi15YStDRMgbtjY/q
-	1d4GQHGMUDkROdvQt40fzajxfMMzfFiQAiWtZnuVA5SPu2qBkU0cNwgihsiqAXjsCZ1BTjJ+zdU
-	amzcQ+rRiUOFLkE2XI5CpCZ/jzT0TgmahpXSg6yGaetRvY1Mlu44C2cyl9bCTzYaNb4Ilqgtilp
-	QPGPQRwNMT9UUVrbno5DPyGrBvfJLwk8qT7Tcx9FvNfBQh3WTZGnvf9XPtVanXG/TkN+4EjlpUo
-	t5GMAxyks/z+NsKndOFkeYJG6qYbX3gqnhxxAeKKByYs1u3fhz3JBykxjC2XbApQB1mpB37mWn7
-	6gUdd7wIUbhp6SPoENL+AYNMBpPVPC1wSzkQP25qclRHwyh3GLKJOxJIqfqgJB43uaLelirAJ3g
-	utfQrCqF9/6NZsbXkUddkDUnQ49KODhsAhbVWEyNxl5gErYTtPkCunH
-X-Received: by 2002:a17:90b:2ec3:b0:3a8:240e:b493 with SMTP id 98e67ed59e1d1-3ab3acf5c6amr4385332a91.45.1791641296024;
-        Sat, 10 Oct 2026 07:08:16 -0700 (PDT)
-Received: from localhost.localdomain ([58.186.105.39])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab38b9639bsm7968831a91.4.2026.10.10.07.08.13
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 10 Oct 2026 07:08:15 -0700 (PDT)
-From: "Adrian.Nguyen-Qualgo" <thenguyen1024@gmail.com>
-X-Google-Original-From: "Adrian.Nguyen-Qualgo" <nguyen.ndt@qualgo.net>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Adrian Nguyen <thenguyen1024@gmail.com>
-Subject: [PATCH] Bluetooth: msft: Ignore vendor events shorter than the event prefix
-Date: Sat, 10 Oct 2026 21:08:06 +0700
-Message-ID: <20261010140806.65929-1-nguyen.ndt@qualgo.net>
-X-Mailer: git-send-email 2.55.0
+        d=1e100.net; s=20260707; t=1791645587; x=1792250387;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=F8l5bvxKDHHWTKOftuncxDgtByEv9VJYrSkAPVmwcrk=;
+        b=O2Ulyuvc5gJXbIvL37JGCOQV0XYgNlfgLI+ZbcUiFqihtTucqxZ1S2ejDJejbvSoqk
+         8pWzgakvnU21Re1cw6TeF31RuEeasLA8EXXLRoqJjmlREVzoeQkNqBDB5rXXNFY+bRGx
+         nVTmrhjm5J5YItEf8R2SHaEqNyHeDHG7+BnV4ojwRnNwo6gVzEu5WfuDgfSsLOTHEGSg
+         SMiJwJADwRHllgWronXkgNwmLyGd3wY1UkqZNbwYixZ3KUf1JW3mKFbMPO6We2RnaO0G
+         y16KRu8EggmgJ63S1TwKG0ghWpDUFjApjUkmrcPTCOBvVwYYoEuPtuSgoPyt2sKX7y6N
+         6LAg==
+X-Gm-Message-State: AFq9FYKqwd5DiYPnXXoZ9aWlRc2lWu58fopcFirw/52J2J+Jm2pBt+AR
+	AZCphYVLKAVHh4s5jaXfj16lBTw3JSh4o8Pgiq0OKR021bT4CqfsPbxEHZOeoQ==
+X-Gm-Gg: AYBFou0+D+GUDxublssxFV6I7LU7/KHVH0AfCFsPwRIxmAaiguvh4CD9E00DeVjHA0D
+	QHy4MfnKV+C1OvdfnvNVSCcfLvart/Hitn+S53FoIwqq/senC2vAILuFJjWD4O396pG53H2wP0r
+	n+oK+uF1hzIOgG38mnnp0PsTblOOBaNeP5cXdKk/iUPBAoNeamd0XiYbikOiXdLsOSr6rp7KOd8
+	0OtT6zMoA6bhrDa7nGRwEhpuqA6spStbHsgwEvnP0KBlJHacAMZkf7slvpknXD2U2uP9qJitJXu
+	iQmbanENg5fjsD9KllSWYOYJkcypH80CfocFb5+MsC6AfM3an8NyM72U8AofOdtQqo88SPizpbR
+	rWCVzXBBvZIzIcaMoqFfW3IcJ3ViyzFvKzrJtYqgQK8wWMchPofbxQsBFVHQeWxiFdkh23ui81a
+	e/BpGziapTkDMhfaAytoAp3O9NMl9dsz6W45xDkCWP2DJsSYxteMZVxjpwVa7txm0tV6M5UloX6
+	6Uw338ZDABr/ODr
+X-Received: by 2002:a05:7022:7e07:b0:15f:6789:2c2a with SMTP id a92af1059eb24-16a645d22eamr9566844c88.36.1791645586441;
+        Sat, 10 Oct 2026 08:19:46 -0700 (PDT)
+Received: from [172.17.0.2] ([20.168.128.81])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537c61eaa0sm19283776eec.0.2026.10.10.08.19.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Oct 2026 08:19:45 -0700 (PDT)
+Message-ID: <6aca5791.82a2a138.123ae1.a004@mx.google.com>
+Date: Sat, 10 Oct 2026 08:19:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5698485196393459878=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2] audio/avrcp: Poll GetPlayStatus when position changed event unsupported
+In-Reply-To: <20260925141047.3397212-1-frederic.danis@collabora.com>
+References: <20260925141047.3397212-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Adrian Nguyen <thenguyen1024@gmail.com>
+--===============5698485196393459878==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-msft_vendor_evt() is called for every HCI vendor event. When the
-controller defines an MSFT event prefix, it pulls the prefix with
-msft_skb_pull(), which logs "Malformed MSFT vendor event" when the
-event is too short. A vendor event shorter than the prefix cannot be
-an MSFT event, though, so it is reported as malformed for nothing.
-Before commit 3368aa357f3b ("Bluetooth: msft: Handle MSFT Monitor
-Device Event") such events were dropped silently.
+This is an automated email and please do not reply to this email.
 
-A WCN3990 logs this 20 times at every boot, while btqca downloads its
-firmware and the controller answers each segment with a short QCA
-vendor event.
+Dear Submitter,
 
-Return quietly when the event is shorter than the prefix. Events that
-match the prefix but are cut short still get reported.
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-Fixes: 3368aa357f3b ("Bluetooth: msft: Handle MSFT Monitor Device Event")
-Assisted-by: LLM
-Signed-off-by: Adrian Nguyen <thenguyen1024@gmail.com>
+   Series:       [BlueZ,v2] audio/avrcp: Poll GetPlayStatus when position changed event unsupported
+   Pull Request: https://github.com/bluez/bluez/pull/2589
+   Created:      2026-09-25 14:50:20+00:00
+
+The pull request has been closed and no further action is taken on this
+series.
+
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    An LLM helped track down the cause and draft the fix and changelog;
-    I reviewed the result and tested it.
-    
-    Tested on a Vsmart Active 1 (SDM660, WCN3990) with a 7.2-based kernel:
-    the errors are gone at boot and hci0 comes up as before. Build-tested
-    on bluetooth-next with W=1.
-
- net/bluetooth/msft.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index 6f4b7c38a247..a3f07f35a1b3 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -1082,9 +1082,13 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 		return;
- 
- 	/* When the extension has defined an event prefix, check that it
--	 * matches, and otherwise just return.
-+	 * matches, and otherwise just return. A vendor event shorter than the
-+	 * prefix cannot be an MSFT event, so it is not malformed either.
- 	 */
- 	if (msft->evt_prefix_len > 0) {
-+		if (skb->len < msft->evt_prefix_len)
-+			return;
-+
- 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
- 		if (!evt_prefix)
- 			return;
-
-base-commit: 964430c038967fd06643e866f68115664e1a1bd1
--- 
-2.43.0
-
+--===============5698485196393459878==--
