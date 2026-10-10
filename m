@@ -1,115 +1,191 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD5B17DFFA
-	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 00:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C613C1F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 02:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791592565; cv=none; b=hZRyyoj/6kSLsDudDJeX1R0FvPgFuxdhmkxJ/YkPDo/e2YedVWtnBhLQDNxy15JKrivUGAE2F18ioxBx7/XJdz1fVZdl/COn12XphOLMzWUjw/cVHe385ffQ8xJ9umoPcdBYaLcENJWRDqkuwW/owNAgbxXPNlqGa4sNAUoKSiA=
+	t=1791599128; cv=none; b=qzsobcq6ZRqg33NwNpUfpMyzPsHfahLneWAx+yAdveCASEBVsKvgFb8EGRGkBeDVYy7yVaT8rJqCLzkquShDn1agMgW3utxLE1MmczzFD/EJBg9PM/7iZoKt4OZkeOj1UGfmX06xC/OpfuOSAVVI6xDkfgGDMrg2brsXgKa5Aek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791592565; c=relaxed/simple;
-	bh=G4mixDfmhOppId3+jDkP+sOp6M/UmVBRqiNt63/B2GI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bvjlVrP6K1cMW+kI1vY8INDytrmsO0EGyI5D5cvguQCsf6liDwvHJVEZEizjUi69x74SeWH+0vMmnfjkg+CHc3Tbd2LAJrkqzUqBjiDB2Ue6golmv7j3awXwuc/BhcC5nvmXr6t7AnUXUdL7cVEeZFNuVpGn8OmOxWCl+cADi8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=siw/Nlja; arc=none smtp.client-ip=209.85.210.41
+	s=arc-20240116; t=1791599128; c=relaxed/simple;
+	bh=zxUd2nHeqKmz3e9OMVy0TLwrXVOVd2FlYOFEdJg87jg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cd0hb4Gx0f5PJ1Fuk1TFJNoBGCI+h/4az8G+ThyK4B/9ru/UOhvX1dYez8MJ/W0wy7aH/Gls1NmRfGPAI5sPKfVtCJl2BwxcPCeDpd/iA1lwdkvIujH24UA8OstM/L7ptNpm7QrTCkZuPyxqvzb6TV3p6NyFt9bVG2kVF48s40w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bpzInBcI; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="siw/Nlja"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-825b40f8a26so168255a34.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 17:36:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bpzInBcI"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-48b0f063b7bso33065f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2026 19:25:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791592562; x=1792197362; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MkbYJbVXpveWdN/D2QCEljoJoj29ZJtoCF2HF5XYp9k=;
-        b=siw/NljaIzOdlDTancI0Wb8Fa0kJzeHGz+hI2Jozi9vylBvUrqwkUworqTfcxYBrro
-         jQOXpoeXMwHI/0HFBxi1QmyLpGcczdd717IuxkAKaCtFonUPvfupiBWHBw3VhFseIEKu
-         rkfLI8K4s0EHpGv0H89ixOp7KRRmKmwS9GyIE1Oj0ntfzqJPthPAEJAlF6LE8xSqllQ5
-         8pn4fPuJhVHa3w/KRTslYbA+LWav5Iak0R8TcYvYQ8v6Ao2rDGVEDZiAy1EMGkrfj/2M
-         dryFZYQQ9AmXAPWOEzmAt376f0Mwng8HigdgxbPY9hH4/zPoGMoeMk+BYnUgJPca/3zw
-         DChg==
+        d=gmail.com; s=20251104; t=1791599125; x=1792203925; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LgNElsNMjnuc/Lyal8E5Ov47I9c5Dg/gjP8NoHfb0wQ=;
+        b=bpzInBcIpbGogCxzo8igXLZ0zoXRcUGX9VG65EOPJt4hMnbB4uit7EDT6Tk0ZM+c+x
+         l6kaGRy3d7pajuezeaQMQ6Bx8joQ1z8ABo/BaVmp2qtSMZjuarI1EcgVVx/PqKruO6S5
+         v+km3wkXjodBfkQzwY2DZH66AHa3S0EvI6EgnpTbwXi23giZGIfmnKQxXvP7dOA0Ln/k
+         JU4PaeEwsPTZupXcoVkJKTuM4T6OCkf6ZQvKVzAnHyRzXnNb0+ZyfVy7XVgnYNXyKBjh
+         3xCmmMt8VKaxd1JOlA1cS87Lq7cW9D6ODHNfJzAZ/dmWRfcBOGljxp3xCTBsSwJTJ7vu
+         qPVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791592562; x=1792197362;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=MkbYJbVXpveWdN/D2QCEljoJoj29ZJtoCF2HF5XYp9k=;
-        b=SKaF3keWpvpDVdWa9SdrhtEefqMFFou7ViR5p/EGk9o4rLfKqFkaXjq+jB7oX/Rn/w
-         WmlGlSau2P9HbGJ7TJhPW2sjPkqfDnb/gMPipRlrj28HWW+m5pEmlNoYVNAN9LuyOOHV
-         h4epF/l6n0/8TeAdZKkoYbfdBTzsyYgkFsNZiyPfa+1Fpliw47zYXgv5yiVIO+LyKV9E
-         2wdt6N7YH3cnLp5NB1APBTlf1Q0evapB+JRvAfRE+3SPj63f4qYq07+/vhLmhWcGqrim
-         dfagwK0KI7Rc943nrvubfKfxsiImP9fJVZVmaulm7RcRlWMnGslmTF/rrBM31WDrhHhn
-         EfMQ==
-X-Gm-Message-State: AFq9FYLX0EKzdmMbpF1pbOqvRb2UpuVFFaa967x6lKlHEZzkIHAdwrVn
-	unweoijDJDhX0JtCyBRIKR4JPXuVOODEoKYqrLl+0zLTocKs9bLW3v3AanhWE+AU
-X-Gm-Gg: AYBFou3uBzCSqhxqSwhIDOANlXBWJwj2L3jFGDCQOVB62D/sKJRfHe2uXElQt+oB3Mx
-	2BhoR+r+ntj//Or3h9uF4zgcOwGH9UIaK/JgKflpJ13ZfUPM4gbloimAO3o9f6M2DhJaHEENVBk
-	ORt9bhhAMjz6oNwWRLk2ucaJSxHQp8wLn1G6FdCQX9fycmJzd85NQx7fuSh9lwXN82Vu8F1DSho
-	TWNAWs8mcI8y/hYcortRGkyMBpD1BK0hRNvym4vP7Om5oK+/WNbO+EeGu2DQRLnEXxV7lYbQe0M
-	G9aCfvKkEGjwgUjAjWctDbXUdKtaVWFzz6fwVKbL8sWXaZHd/eabhUUkmA1Y0PGUK5rONThsCmc
-	otWlYSNMtR+kU2OgTKuW37KgTn55bzcUFmPZtJql4D1K65mzTZX+gy+dh8l3lJqx6Fyt6xHX1YN
-	35o+nUsFrQ8C8vCU6WdOHDna9/QUYRx6Hm+SBiX2mbxJlcMFbtAj2G3Epd0T14zZr35OzZwXN60
-	vMlOQ==
-X-Received: by 2002:a05:6808:1920:b0:4e9:6a47:be26 with SMTP id 5614622812f47-50c4e961ed1mr3593799b6e.22.1791592562452;
-        Fri, 09 Oct 2026 17:36:02 -0700 (PDT)
-Received: from [172.17.0.2] ([20.84.246.224])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-50c167544b5sm3936506b6e.3.2026.10.09.17.36.01
+        d=1e100.net; s=20260707; t=1791599125; x=1792203925;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LgNElsNMjnuc/Lyal8E5Ov47I9c5Dg/gjP8NoHfb0wQ=;
+        b=1GaN3++veMfQMk/pyR2w8Z4bAGUy08YWCavileAUbeFaNRYlYPUwASmcSftaAK8CBC
+         qg7DaZHcOjh1lMnhAfea8wJokt1oCwXiBl5JLhxQNgvaF9gZAn6IFVrhH2+5garZgwel
+         Uzg5PObJUTyDL+WWCONupLqpwuoPstbgGByCmF997h9zr1TuA6TS3hattWzKypCOWfqi
+         p8/i3urQb+DTRcP1Q9JkKOCEhV9KxveHpKV/UzSwq5U0eb2Lybt+NwjAQCtp6NhUK62a
+         S7tfx2FsvyZxKK9pSo6AcIlrAuFLdz4NvJR281/8QvVZuy4VYoAUWdvAXjiKmiDL40Q2
+         jt5g==
+X-Forwarded-Encrypted: i=1; AKwUvBy7oJEaQZ4q2YiSHQLsdoFr51XDiObyT42x+fVPVEBjdNpbC4uQO6WqpjCrjNVPR9G2QiRPXhM/F+mGiJu0HaU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLEII8ip6eWerIgts67MGZmQsMEl0+SUDIl3kgVtfxLkMsIsDE2
+	zf3r/qu5IKpBb/KL0nMTlLmBOOXW194asmRAO6tWM2UXdpFjUqp5y80k
+X-Gm-Gg: AYBFou3RPumYDYfzHTeO7m21nyikc6ESMYRQJ/ouEq0EYbDjBKOsRAnfVLUtY8oqBIM
+	X6qR/idmdkJAZ4jGdWjs81Ba/Ci/I+eO7Y15qz2dsK5PJd1m7IAkJq596lJNCIyLwpv+fTvSWtl
+	OHJLgwD7tW7AV8+1oeKwJnqgnU+ClefwyKMddB80dmifs0nMmSslvMgOJ4/YbF+Y+QzNyGek2hy
+	6jI+EKAvLVoSBq/fZN8CqoSfb7KS5L5ImmPWmWa6OTTE4u5JaSGEgyIa9U3OIJLEaOOnIH9JyWi
+	vFXnw7L0zQ3TQSxoCbJvGewnsbr4M/XVVPaUmYjOT6qX4XC8Ot1PPvYHY74PutUl25WdcuXRW1N
+	yOyD+MxPRAyT7EHoB9v3d82SWaSn9T3XKTgRVNgM2Kx3UYfQlu/Go0nE1JUnWwxOZQLI2J0hX/J
+	BURvu1VfIY1q7n9FDAU3nfmAj3KMI2vbNWEXAyEuaJS9vZ+pIvmOKEXeE/v0O+QHSkABB2EfmnI
+	SXokeV21XuAOWoLTETDma3ovlzvnowuM6Kk6DMKPsOonZ+7dVTAM5nK
+X-Received: by 2002:a05:600c:8b02:b0:4a0:1973:f05a with SMTP id 5b1f17b1804b1-4a18e47e19fmr76290995e9.2.1791599124595;
+        Fri, 09 Oct 2026 19:25:24 -0700 (PDT)
+Received: from localhost.localdomain ([194.36.104.180])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a18bf214a1sm109550225e9.7.2026.10.09.19.25.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2026 17:36:01 -0700 (PDT)
-Message-ID: <6ac98871.c41479e6.157a77.f624@mx.google.com>
-Date: Fri, 09 Oct 2026 17:36:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7374947402193797736=="
+        Fri, 09 Oct 2026 19:25:24 -0700 (PDT)
+From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+To: stable@vger.kernel.org
+Cc: Jiajia Liu <liujiajia@kylinos.cn>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6.12.y] Bluetooth: hci_event: fix simultaneous discovery stuck in FINDING
+Date: Sat, 10 Oct 2026 04:25:21 +0200
+Message-ID: <20261010022523.2789588-1-yaroslav.voytovych@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/rap: Track RAS CCC state per connection
-In-Reply-To: <20261009173341.1143848-1-luiz.dentz@gmail.com>
-References: <20261009173341.1143848-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7374947402193797736==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Jiajia Liu <liujiajia@kylinos.cn>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 96d006ae6445679436b945593950fd465eba7e76 ]
 
-Dear submitter,
+When hci_inquiry_complete_evt is called between le_scan_disable and
+le_set_scan_enable_complete and no remote name needs to be resolved,
+the interleaved discovery with SIMULTANEOUS quirk gets stuck in
+DISCOVERY_FINDING. le_set_scan_enable_complete does not check inquiry
+state. No one sets DISCOVERY_STOPPED in this process.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1182593/
+Add state check in le_set_scan_enable_complete and change state if
+the state is DISCOVERY_FINDING. Tested with AX201 (8087:0026) in Dell
+Vostro 13. Discovering disabled MGMT Event below is reported when
+running into the above condition.
 
----Test result---
+ @ MGMT Command: Start Discovery (0x0023)    {0x0001} [hci0] 10885.970873
+         Address type: 0x07
+           BR/EDR
+           LE Public
+           LE Random
+ ...
+ < HCI Command: LE Set Extended Scan Enable    #38205 [hci0] 10886.131438
+         Extended scan: Enabled (0x01)
+         Filter duplicates: Enabled (0x01)
+         Duration: 0 msec (0x0000)
+         Period: 0.00 sec (0x0000)
+ > HCI Event: Command Complete (0x0e) plen 4   #38206 [hci0] 10886.133295
+       LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
+         Status: Success (0x00)
+ @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10886.133414
+         Address type: 0x07
+           BR/EDR
+           LE Public
+           LE Random
+         Discovery: Enabled (0x01)
+ < HCI Command: Inquiry (0x01|0x0001) plen 5   #38207 [hci0] 10886.133528
+         Access code: 0x9e8b33 (General Inquiry)
+         Length: 10.24s (0x08)
+         Num responses: 0
+ > HCI Event: Command Status (0x0f) plen 4     #38208 [hci0] 10886.141333
+       Inquiry (0x01|0x0001) ncmd 2
+         Status: Success (0x00)
+ ...
+ < HCI Command: LE Set Extended Scan Enable    #38242 [hci0] 10896.381802
+         Extended scan: Disabled (0x00)
+         Filter duplicates: Disabled (0x00)
+         Duration: 0 msec (0x0000)
+         Period: 0.00 sec (0x0000)
+ > HCI Event: Inquiry Complete (0x01) plen 1   #38243 [hci0] 10896.383419
+         Status: Success (0x00)
+ > HCI Event: Command Complete (0x0e) plen 4   #38244 [hci0] 10896.394378
+       LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
+         Status: Success (0x00)
+ @ MGMT Event: Device Found (0x0012) plen 22 {0x0001} [hci0] 10896.394497
+         LE Address: 88:12:AC:92:43:69
+         RSSI: -101 dBm (0x9b)
+         Flags: 0x00000004
+           Not Connectable
+         Data length: 8
+         Company: Xiaomi Inc. (911)
+           Data[0]:
+         16-bit Service UUIDs (complete): 1 entry
+           Xiaomi Inc. (0xfdaa)
+ @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10896.394506
+         Address type: 0x07
+           BR/EDR
+           LE Public
+           LE Random
+         Discovery: Disabled (0x00)
 
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      17.65 seconds
-BluezMake                     PASS      308.92 seconds
-MakeCheck                     PASS      0.79 seconds
-MakeDistcheck                 PASS      131.48 seconds
-CheckValgrind                 PASS      140.30 seconds
-CheckSmatch                   PASS      248.33 seconds
-bluezmakeextell               PASS      94.48 seconds
-TestFunctional                PASS      1078.28 seconds
-IncrementalBuild              PASS      316.23 seconds
-ScanBuild                     PASS      1002.11 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2646
-
+Fixes: 8ffde2a73f2c ("Bluetooth: Convert le_scan_disable timeout to hci_sync")
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ Iaroslav: test the quirk with test_bit() on hdev->quirks, as
+  this branch does elsewhere; hci_test_quirk() does not exist here ]
+Signed-off-by: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+7.2.y and 6.18.y already have this fix; 5.15.y and 5.10.y predate
+8ffde2a73f2c. The same backport is sent separately for 6.6.y and 6.1.y.
 
+btintel, btrtl, hci_qca and several btusb entries (Qualcomm, CSR) set
+the quirk on this branch. On a 7.0-based kernel with dc16388d45ec, the
+13d3:3503 entry now queued for 6.12.y, 6.6.y and 6.1.y, that QCA9377
+hit this race twice within four days: discovery stayed stuck the first
+time for eight hours, until a suspend; the second time for days, with
+every Start Discovery answered Busy.
 
---===============7374947402193797736==--
+Tested in qemu on v6.12.112: a mgmt-tester case that forces this event
+order fails without this patch and passes with it.
+
+ net/bluetooth/hci_event.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8a7ab3e755af..53732f8ddf63 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1756,6 +1756,13 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
+ 
+ 		hci_dev_clear_flag(hdev, HCI_LE_SCAN);
+ 
++		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
++		    test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks) &&
++		    !test_bit(HCI_INQUIRY, &hdev->flags) &&
++		    hdev->discovery.state == DISCOVERY_FINDING) {
++			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		}
++
+ 		/* The HCI_LE_SCAN_INTERRUPTED flag indicates that we
+ 		 * interrupted scanning due to a connect request. Mark
+ 		 * therefore discovery as stopped.
+-- 
+2.43.0
+
