@@ -1,66 +1,66 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B16F345ED8
-	for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 23:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B19C8D9
+	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 01:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791676331; cv=none; b=bW7ZxusxX0VlIg924Htl/+Q1qJ5NC6iScb8b+9fkF+QKsm7LzP7LGNAGwthv0wJZjDfSTxkyubE342WBuK3Th5c2kLeOyIxscwlbNpvaQQbR0KOCR5mBwVCO44FKozwgCp+9aii2DWlcLoPE6dsBeo8ItbeFkFNt/HBpqoM8Ox8=
+	t=1791681604; cv=none; b=GnG5zydbIj7myEO2UlO+Na5yCkDmdXUQ6iR4WBq3v+yXz+vDsmfYYbq+tJHojxjhlcfP5VhXVsIm6yPhO5ovdAafpBh+qL7fsAuYOBujJr9f6nVeutuYZbUX1M5+ufhJsxd3WEy/MvlYVgyqiAGWMF619s4GIH3ccFiHD3cp4Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791676331; c=relaxed/simple;
-	bh=SG66B3/1oHsVCtTEh46swjiHXrnhetA4nTMghG4yk7g=;
+	s=arc-20240116; t=1791681604; c=relaxed/simple;
+	bh=lVhsNDvfEtDIsk5M9LEecp0jAxllyO8F010pQ5u/KeQ=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=i4WHdvCSEmMCWRidbrsYIjwks4Azq/6yNP8Q4RULoClRtKrwUXOPvLzs3sKdpkFyV7NJnB+GqhZ7S08yEdP5LchF7M1HgPPFkyMbBChpcfwNvvkcJ+O/deTFYFlmN6rLA8SjB07m2Jju2VYvPUOPsHfTJLubAlYpS48SA9vsuQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnApkw5y; arc=none smtp.client-ip=209.85.219.52
+	 In-Reply-To:References; b=NdQKg79zPPTWlKsrDvu/8yzFhWnqWxX09xlFl/I1tGLeyAAeDECPZzT9QW6TP19GxlwdRjexf8EUumkzeMcQIAuKbUCXwKZ1Onrs9l+vALjOC+i9Lpnx67WWC5Y24sIVMBimHEBEXUSHwc55nw+mb8vYnkz7bEyDaxvjt3mx87g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pDELqtJG; arc=none smtp.client-ip=74.125.82.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnApkw5y"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-91b55859245so16942166d6.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 16:52:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pDELqtJG"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-354ba08cfd1so1548685eec.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2026 18:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791676329; x=1792281129; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791681602; x=1792286402; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=pwatc6Rs0sQdr3Eu6LtVPQE37Wy33uJetIyUH7BC36Q=;
-        b=MnApkw5yITElPn1NRWIcLZ4FeeVvl4+tDxLZojAsCen4eN19dYsXLkphWv5nG4XjVe
-         dTljw1m1c5iUlxImZXRkZygHtkFXAuyNiEtJtcHkHvrSXP9AShnXG9TyCX0sgMLv+oQh
-         A2QoRLFA8JaKdCtz7Pltz2v41pl3bUHkG8LQV51pDuFjNo+Yia1vQSRIuUXzVeuPqJu0
-         7hefTGGE1UTkU3ZmSemDfEggfbhtpjaBH0syDIoXs3YIlpIFQhMydbXE/MshzDnne7k7
-         Z0+1/+Xy2XGuVjTSV5c/Nk/T4Pfo/NfMGBbhBr+LcGYL3c+hcLWhWipvHupvJ4j2TxM+
-         MbUg==
+        bh=hBPQTG3BVZCu2UOvogkn27K8uF7vC8yFQ3S6QFB63Ko=;
+        b=pDELqtJGVw+mL5TA+9JnzjDRv1MLaJPhBUGGQWt4UpfOt4lQptcLY4FHwm7PXX9xud
+         5+j156vIxFCJoBOUpiMgLCxe6cF7EdwnJw28hkDwVLIECVOYE2gTGtRyH6t+SCuNnUn5
+         felpzcG6B9zxbC3aqqLGFSM5G+2oy2Ev2cRLqhFVdXK1vijjJiRIFOD2Cqpv7OG79Guf
+         Ks+olcBSw/l8hnjJTrQAtkSpr7O8dgMxQtCgzTI7JeL5rSD8nUY0jsxKmizzvzVv+ASA
+         AZ2Th7btjOeVkgDVxiOufVGNcHI2Z2zoHQbQCGfTKyy6xPn+NYxqEegxowAVEYyu5e3J
+         IztQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791676329; x=1792281129;
+        d=1e100.net; s=20260707; t=1791681602; x=1792286402;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=pwatc6Rs0sQdr3Eu6LtVPQE37Wy33uJetIyUH7BC36Q=;
-        b=NFYdwQm99iIdfHFySUTqpULfl5T3Q4jFleRE9QuF8bUX52xNUs0giz6EKm2bw6quCE
-         YajPqmIkXhb3/n9yzpqj6d0wT+Y4loH+gIA/5EfgoY4IxiErCaT6AUOjOxkiZZi5Vm8m
-         E7z6k6gTenLFAwWpQoJYs06wUZO/+ZQn1sGsLCsGSScI3GN6paWH+UXu4xOSMyyc/CBS
-         gS617Kg+/nsAfza+E5XOwFSzVvk41yrRfYKXgRO7vzIOjv/fczcPiFqGpstyXMlB1Vq7
-         wW/ivQKLWCKSLiyNrfkn+g5x/mk6xmgfY5RKN/3f/lpgDnZdxsM/4mloHiyUzdkcSFMv
-         ZIaw==
-X-Gm-Message-State: AFq9FYJloYO1mst84mexynblMboK976kFaPlX0F+tJMGobJXnWL6EuqJ
-	NyW1eC3aJWyyNt0CPfPfempC4de8bXq7tQqsTI5pNBm6mOQn7jL43rKVJaWc0w==
-X-Gm-Gg: AYBFou0HHScqf7QpnbPnoEbu6uej5vVL8l7A2UqcvpkYVbJmn23BJ+q8JsK/vwHqIkZ
-	X80wpNWi1BAFGC1venBYxaM0TP6qtCU+GX6WR0UdXHpNyQd68U8HskRrHNMi5mL7Lape2wTUk69
-	0t+LVlK+1DStSyrY19Jf/RiFb43f+vTh6F4LgRbf8Kl5hZZRmLnz+GpSi9/vCyjnm8uJcs20xPn
-	JM/FOUHns68QWdNpUgQfcQjlAizvdvAFe/qlDc0wRIFQnqqW7wa4JruJicceYpYKxRiZp5SQ3mo
-	Omy43YFOCKkviRdmgz2cDUaM0sZIVmENlUh+gB+G3QvkguJCACOEIxRJfw8JChP5I5P3bt/5TGm
-	J2L9ET1MPeFkuTXJxNfRoQlUzIzQ4nvd+jCbscLAGUUtUUVOzRU1nfgmp/TlLaGeqaqMiGQPfo5
-	/xIPHtW4wzP463nyiK0yFaTC2gx7SDpyUofF9TuUHbJ2cZ7rU3r+7egpmLWyqcu7ZeTPoKtMQY+
-	JVW9Q==
-X-Received: by 2002:ad4:5dce:0:b0:914:525b:8ff3 with SMTP id 6a1803df08f44-91b55500fbamr114151956d6.23.1791676328969;
-        Sat, 10 Oct 2026 16:52:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.119.79.67])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b5501755asm57426796d6.12.2026.10.10.16.52.08
+        bh=hBPQTG3BVZCu2UOvogkn27K8uF7vC8yFQ3S6QFB63Ko=;
+        b=kGK9VOdr/I8LgfcB6gPAqMCjVQpxa2RJcC03cl6OMtm+UQ3M8i3ZMrMSkR7iGBUdYP
+         J5+WXWHRpOV3TXh4cGJ+4Q5R+3D2gwQK1U82NcrfnjEzHlzReNL64HMJhv/cYdmzihmW
+         HbrtGV/xnd8PKKZcdUpY3bscEQJZ/siZLN8of0w1GMpJP2yNhjXfLj9VWRQG/FiOqgGz
+         LZI1St2vq2QaVjX/QNLX6cKAe3ZCLsgUDwKYFQjvroxb4wCSP6nU4khlrtoJuF8FB50a
+         zCtLKG/u49sO6BcdL1x76edgs5KneYWFRqXI692UhxTW4o5OzHVTJIhrIdQwUU4flkG+
+         ab1A==
+X-Gm-Message-State: AFq9FYJ6USmmivuZoZzxdMFd7bkNB2jFPW2jgQmFE6IoyDBJeplaLJQQ
+	48DG9/LNlNkSS6QEh9v8/V1b0Um51t9FlOFuf5vv2Irgv5CqdJkt/PGHYD82AQ==
+X-Gm-Gg: AYBFou2E6iZxPmk9aJ3vdbxJDJjs8bfDQwFq/Q6LwuVJ05txgOWICch9dbn33OoE61j
+	ow+8wNCHwkc3OG9Eb6qEMINazB9u2Rx2Ixo+6XaFcSkNUCBkabxhy4Y/j8dysQxDZu4nRMHfB4/
+	aBYFtSX+ObtbIKZroXUZ2XJeKzEV+bjsYRO1UVhhxBB2vqcCJNaJLTC4zB5FbWTCI+663ULs7t4
+	QRtc7HwEfebd6CVUQJdYvvAMOeY04xbK6emrmLnmPp8T5b8p7YaKbVefzuK/80Yx5lv4agsWtui
+	88svPPQSlwXwmzVyfsE5bRgkwL8N4XRC86mvxWzPXyxE81h3aEpVsP4ukDVLtXDZqA73AMfuVu7
+	tnnYzuduNV4XsbV3s1cKqej/A7fvS6b5D8w91skQtrp+NXvZvLUC/Zgu81rRWrNPkgpX4jAy/g9
+	KrUMJT3kD4hXTC6RQ5ccRxSmjW2aosbVw1bKEFeKu2Dat+p0JILNn9IyshKcuYAOCOU8PfKzn2v
+	jUFpT4Yh41fCec7
+X-Received: by 2002:a05:701b:42c5:10b0:14d:4c0f:48a8 with SMTP id a92af1059eb24-16a5ce950cemr8179588c88.26.1791681602107;
+        Sat, 10 Oct 2026 18:20:02 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.126.214])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a1becefdsm17538949c88.7.2026.10.10.18.20.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 16:52:08 -0700 (PDT)
-Message-ID: <6acacfa8.33ea1a9e.2790f.b821@mx.google.com>
-Date: Sat, 10 Oct 2026 16:52:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1631775841882687131=="
+        Sat, 10 Oct 2026 18:20:01 -0700 (PDT)
+Message-ID: <6acae441.bdce4de1.160bb7.6f5d@mx.google.com>
+Date: Sat, 10 Oct 2026 18:20:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5103445905182782601=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,72 +68,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] test: functional: retry pairable when Busy
-In-Reply-To: <32b040dbaa0b8bffa4746203c5232791574604ee.1791671481.git.pav@iki.fi>
-References: <32b040dbaa0b8bffa4746203c5232791574604ee.1791671481.git.pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org, ooonea@gmail.com
+Subject: RE: None
+In-Reply-To: <CACmoRBYCiLYXr05CLjvAA4wPpbjje2BhFHe1v9fEfSFAWFR89w@mail.gmail.com>
+References: <CACmoRBYCiLYXr05CLjvAA4wPpbjje2BhFHe1v9fEfSFAWFR89w@mail.gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1631775841882687131==
+--===============5103445905182782601==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+This is an automated email and please do not reply to this email.
 
-Dear submitter,
+Dear Submitter,
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1183123/
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
----Test result---
+   Series:       None
+   Pull Request: https://github.com/bluez/bluez/pull/2593
+   Created:      2026-09-26 00:38:20+00:00
 
-Test Summary:
-CheckPatch                    PASS      0.43 seconds
-GitLint                       FAIL      0.33 seconds
-BuildEll                      PASS      19.45 seconds
-BluezMake                     PASS      395.99 seconds
-MakeCheck                     PASS      14.27 seconds
-MakeDistcheck                 PASS      140.10 seconds
-CheckValgrind                 PASS      231.14 seconds
-CheckSmatch                   PASS      291.30 seconds
-bluezmakeextell               PASS      94.29 seconds
-TestFunctional                FAIL      1192.23 seconds
-IncrementalBuild              PASS      388.67 seconds
-ScanBuild                     PASS      1125.24 seconds
+The pull request has been closed and no further action is taken on this
+series.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] test: functional: retry pairable when Busy
-
-22: B3 Line contains hard tab characters (\t): "[bluetoothctl]> 	SupportedUUIDs: 0000110a-0000-1000-8000-00805f9b34fb"
-23: B3 Line contains hard tab characters (\t): "[bluetoothctl]> 	SupportedUUIDs: 0000110b-0000-1000-8000-00805f9b34fb"
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bearer::test_bearer_le_connect[hosts14-vm2]: pytest_bluezenv.rpc.RemoteError: Got event.kind='org.bluez.Agent1.RequestAuthorization', expected kinds=('org.bluez.Adapter1.StartDiscovery:reply',)
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
-            return getattr(self.plugins[name], method)(*a, **kw)
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/agent.py", line 108, in expect
-            raise AssertionError(f"Got {event.kind=}, expected {kinds=}")
-        AssertionError: Got event.kind='org.bluez.Agent1.RequestAuthorization', expected kinds=('org.bluez.Adapter1.StartDiscovery:reply',)
-
-
-https://github.com/bluez/bluez/pull/2659
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
 ---
 Regards,
 Linux Bluetooth
 
-
---===============1631775841882687131==--
+--===============5103445905182782601==--
