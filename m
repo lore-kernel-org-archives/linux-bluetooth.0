@@ -1,152 +1,126 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EDE234973
-	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 22:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729483A759D
+	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 22:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791758527; cv=none; b=g+eIKdOi9I9NrgGO7MJhTgY5+6u3DE47ngHL8w45p/XHbhsIGIvv8HvKY0TtNWg8/WQ1NrGHhcD+PeLbtDIbsUlDP79bGOrbnjG23HPhuClkvgX9+Qz+4lfOK674bTDXjWUwBhHZhj3GVdd2zscHG+sqs6wQwE0MBC2E79YwDSc=
+	t=1791759120; cv=none; b=Mdg/dSaZ0lxPgVG8ex4SF4d7LeeUnD6O9m1kDCmwu2Y/5NMWiOBYLQ2Pi1D0rMYt5F5T+xIRFGM4ClKM0bT8s79uOwvX1h8bvgTXv6TVNlP3xZkJGf1DgyoU/5Ot8FfJR0iS5KDSoj7dZ4McaeaN3X0Si6Q428zEpBjvm9QsxrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791758527; c=relaxed/simple;
-	bh=ewOODvb9P4n5WMKzGgJCIrNDqGZ3fpFowCH6kx+MmDU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eleVoXANARaviqJ1a1b75raL1vJiqHf460VciCgOdGlm++kduGpIv+aZkGU6zDTAweB1NKDSherNO86zraTvTZHRCMGaDq34m6o68Q0v6eTETiWoRuH0mziZzo9c7u4Eer1ooCVW7IxO+lQLEtSqZATn+IlWcPr5UTOnjPRYnmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=f2gJhL5I; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1791759120; c=relaxed/simple;
+	bh=jmCPRKWbTVnxV/0+x+4lF9Svq08mhAhNZW2xAeKSXM0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=RWuot1vBvTRFe4LJ6dnWFG2iuf/Xi15uN5oKBUDbBGqopY4St9RHiybE5mLtDJg/s09fLnkMeKSxVEwATIWg2kWbDSdh8PISJ+0L4CiDSGLKA8zURb6eLGGWSoIF4LPkhndfsb0/ZfwfrKZsqNrQRWa7bTSYiB4TRz9LvosKUOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/Z4xBsC; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="f2gJhL5I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791758525;
-	bh=DoCkn3n2q2ARLsYRum8Hvblw3/Owkyi3bQ0No2EJLSg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=f2gJhL5IjdUAgKzV1cXmy6435XOP8zXzlwkKYderyHgeQgcM9tL59JrxliCthPV6D
-	 rVB0K8kWH3+QqprLonV/WcyeVw5uTQ9/0wphJJzpYRqCssmKwmDrhtNrG54s2bvOCd
-	 U68LI/xjq9n/w2+V7hjY2pbvLCmGaGwZldD9fTX8A69vBIs80b09wAPMbkO7vDjcgn
-	 9AtsWSxfmH8FVPTiaaDAcXCCy8TU4fXzLm/KRAoghwqBSrxLXkEXWe6JRZ0C3PusX8
-	 lf1s2hAxwBNJ5xzSgCchdTTBrsrq+IJ6k/taK3Uq2mRgT6eJN83acl4z1fjmSGlfVz
-	 mNLaTVvzX93YA==
-Received: from github.com (hubbernetes-node-6df8053.ash1-iad.github.net [10.56.165.33])
-	by smtp.github.com (Postfix) with ESMTPA id 2EB9E600734
-	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 15:42:05 -0700 (PDT)
-Date: Sun, 11 Oct 2026 15:42:05 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1183466/000000-d08111@github.com>
-Subject: [bluez/bluez] f6a305: iso-tester: remove IO sources during teardown
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/Z4xBsC"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3aacde0cc0fso448824a91.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 15:51:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791759119; x=1792363919; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=IeW4lWnzDrghpeTshx+eoq4ClBQkkB11qrbnH3gWBAY=;
+        b=T/Z4xBsCwo759LJISkhpQ+f7/T5EzfI3zonoCgufsCltTXpAwVnKXdTPyA1rFLyrIn
+         bt7rmNTCJWYFXcFnNV8D2RZz8OMJ/vvIoWmDzRCmGwNwh8SEnoY4GLZCvcvTAgOICVrA
+         v1aFkhCFCVJNZSea2+R6SzwDGwM8eXJ/hV7Q81EgGdyAVf8tV9ULSiTQzdX68ay2B+gH
+         R0aT5+D29d0KDTg9v/lDY7eyT3RMt1MBmyu8rcODb9Q7652lPTaCZ+YqfePH6E0W94g8
+         17mJOCX2gVlxnNekElL1yFB1DlVb8dZAkuw/L+X5EF+GYoqFEY3vt2SxOgcxSfpAsWq3
+         /B2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791759119; x=1792363919;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=IeW4lWnzDrghpeTshx+eoq4ClBQkkB11qrbnH3gWBAY=;
+        b=oOp9IsHrc8vHAFe+om0HY/QTgEL8B3pjJHA5PeUkiIUGlk7qokHVUEVAheUmc5PfF5
+         r7EHo3qZq2MyhlhTMPiOU5K5ZjV8ipVJHnwS5wirmENiHQojyK91Skaoi5+mdOzHZX/W
+         lRDajB7hm1qlR6LTZm4rlLd1LQ1dkVCxio/rv/jl4CDuaO3r1dvPB+Pw337W0zNH/obr
+         I0WQf/NahNpom4o1GMWPtAqAy22c5s8nO5M9LuQOyrpopEXQ0gnZusKWLmdUbchEjCWe
+         ByUk44KprBldi0d3MvkP9yhoLF905E0yPIczgYIq4+9wCM1fZn7BnKbDAxhhG3u/vAts
+         azGw==
+X-Gm-Message-State: AFq9FYJhvN2c7v7mQSJq9Pd9AyOo56jIwKID/Btvaei1954IBPZuJKi5
+	UTCE1xzMtgfVwTxeklNDa6PqJEJn+CwxKP5ZrT6+Ij20FFAETKBTJgb5PeNX7Q==
+X-Gm-Gg: AYBFou3ps4XpqWpmw4V9zdGCEfa4DPw0+hA4pTScn4oR4PkK7/C0kwfwquktsMZHQ9l
+	/Y7c3GZzgRsJF95IwiHJCF64lmFTM2R2OhWIO83id3k4obuvVbNWipA++S7b/bz70ORPWKfkh9l
+	ero5aIoMLxnjbtylH84xTSHhqf96FcKSHSL53hgVo9EhoRsIpjtJD9LTuNT9WROk5L4sRcnrtgb
+	WS+tvPBQQbqLUwzIZ1m2lIFuOm8INpSrWk1XM9FaYHGM5ytAF1qki02bQQBEcjB5bcKmOhMuYfm
+	V5/frcE1uAg/EfzIKZqOZut8pd3jbNG57gV8Kraj/XuvN+W2SUf7Q1u4C0elpZVcD/qruf7oVXA
+	H9KvosJs/E0BIz+U/TNoOvVfxxats4XQNpdcFdeZQijQzTu8rrTmihwf8H9BIO09Rh2qf+65PxK
+	1wrOwT6UVpTSFo+eOFkC6gUL9t/WxNjSGlz4rpr8VCJY4c8sBihHsaU/DGTO3LZbhXZlSgG6agZ
+	lYZkSP3iEATqQ==
+X-Received: by 2002:a17:90b:3c85:b0:3a7:8ef9:3bb5 with SMTP id 98e67ed59e1d1-3ab3a90b5e6mr6450422a91.10.1791759118706;
+        Sun, 11 Oct 2026 15:51:58 -0700 (PDT)
+Received: from [172.17.0.2] ([4.155.237.2])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab39234b62sm14081124a91.16.2026.10.11.15.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Oct 2026 15:51:58 -0700 (PDT)
+Message-ID: <6acc130e.687c8b1e.1539a0.1804@mx.google.com>
+Date: Sun, 11 Oct 2026 15:51:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0928603002493392056=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Indicate PAST RX ready to userspace
+In-Reply-To: <fda2d67929dd3888eecaf1faaa97b3f3c16829ed.1791750397.git.pav@iki.fi>
+References: <fda2d67929dd3888eecaf1faaa97b3f3c16829ed.1791750397.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0928603002493392056==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1183466
-  Home:   https://github.com/bluez/bluez
-  Commit: f6a3055dafa777051e9baedcc6faca9543c575b6
-      https://github.com/bluez/bluez/commit/f6a3055dafa777051e9baedcc6faca9543c575b6
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-10-11 (Sun, 11 Oct 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M tools/iso-tester.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  iso-tester: remove IO sources during teardown
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1183465/
 
-Drop watches / timers in test teardown, not after all tests have run.
-Avoids leaking them to following tests.
+---Test result---
 
-Assisted-by: opencode:gpt-6.1-sol
-
-
-  Commit: e7ba17f9aaa837dc00980b75317e5de55d8e2cf0
-      https://github.com/bluez/bluez/commit/e7ba17f9aaa837dc00980b75317e5de55d8e2cf0
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-10-11 (Sun, 11 Oct 2026)
-
-  Changed paths:
-    M lib/bluetooth/bluetooth.h
-
-  Log Message:
-  -----------
-  lib: add BT_ISO_PAST_POLLOUT socket option
-
-Add kernel uAPI definition for PAST listener readiness option.
-
-Assisted-by: opencode:qwen3.8-flash-next
+Test Summary:
+CheckPatch                    PASS      2.07 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.06 seconds
+GitLint                       PASS      0.40 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      29.46 seconds
+CheckAllWarning               PASS      33.16 seconds
+CheckSparse                   PASS      36.03 seconds
+BuildKernel32                 PASS      29.22 seconds
+CheckKernelLLVM               PASS      32.85 seconds
+TestRunnerSetup               PASS      771.93 seconds
+TestRunner_l2cap-tester       PASS      12.40 seconds
+TestRunner_iso-tester         PASS      10.56 seconds
+TestRunner_bnep-tester        PASS      3.13 seconds
+TestRunner_mgmt-tester        PASS      61.09 seconds
+TestRunner_rfcomm-tester      PASS      4.37 seconds
+TestRunner_sco-tester         PASS      5.56 seconds
+TestRunner_ioctl-tester       PASS      4.58 seconds
+TestRunner_mesh-tester        PASS      5.43 seconds
+TestRunner_smp-tester         PASS      4.22 seconds
+TestRunner_userchan-tester    PASS      3.09 seconds
+TestRunner_6lowpan-tester     PASS      4.32 seconds
+IncrementalBuild              PASS      47.37 seconds
 
 
-  Commit: ad56b9fe9446cdd95d67cb2e43e1f43af81a24a8
-      https://github.com/bluez/bluez/commit/ad56b9fe9446cdd95d67cb2e43e1f43af81a24a8
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-10-11 (Sun, 11 Oct 2026)
 
-  Changed paths:
-    M tools/iso-tester.c
+https://github.com/bluez/bluetooth-next/pull/897
 
-  Log Message:
-  -----------
-  tools: iso-tester: test PAST listener readiness
-
-Test POLLOUT notification after LE Set PAST Parameters completes, with
-and without deferred setup. Query BT_ISO_PAST_POLLOUT and skip the tests
-when listener readiness notifications are unavailable.
-
-Add tests:
-
-ISO Broadcaster PAST Listen Ready Receive - Success
-ISO Broadcaster PAST Listen Ready Defer - Success
-
-Assisted-by: opencode:gpt-6.1-sol
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 670dc23ddd789817bcb698c789cb3a64c342d7c2
-      https://github.com/bluez/bluez/commit/670dc23ddd789817bcb698c789cb3a64c342d7c2
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-10-11 (Sun, 11 Oct 2026)
-
-  Changed paths:
-    M doc/iso-protocol.rst
-
-  Log Message:
-  -----------
-  doc: iso: document ISO PAST listener readiness
-
-Document PAST receiver setup and waiting for POLLOUT before requesting
-PAST. Describe the read-only BT_ISO_PAST_POLLOUT capability query and
-handling kernels without readiness notifications.
-
-Assisted-by: LLM
-
-
-  Commit: d08111bd93ec3e668cda590bcc218fe20924c134
-      https://github.com/bluez/bluez/commit/d08111bd93ec3e668cda590bcc218fe20924c134
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-10-11 (Sun, 11 Oct 2026)
-
-  Changed paths:
-    M profiles/audio/bass.c
-
-  Log Message:
-  -----------
-  bass: wait for PAST listener readiness
-
-Defer SYNC_INFO_RE until the PA sync listener signals POLLOUT, so the
-Assistant cannot start PAST before receiver setup completes.
-
-Check kernel support via BT_ISO_PAST_POLLOUT, otherwise skip waiting.
-
-Fixes test_bass_past_transport_* test failures.
-
-Assisted-by: LLM
-
-
-Compare: https://github.com/bluez/bluez/compare/f6a3055dafa7%5E...d08111bd93ec
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============0928603002493392056==--
