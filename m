@@ -1,126 +1,137 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B482F7EE6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 08:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA8F361961;
+	Mon, 12 Oct 2026 09:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791792723; cv=none; b=nGfDU6gAppRtCA+vpW4lnYZUJHeNwixRtz6M+xKCSCk/h8LC+PfhpdpuIMCou/IotAnDpxLOoBKfbjQ7wdGdPy7n7hRGiNgfwMZb0kHLNbJSmDLJ5/NQDr8UDukknKfkJ1xvNH96kh4IBPq5rFZ79BKurA1I2YGWka1jpjItmMs=
+	t=1791796650; cv=none; b=qIFOgJi6rY8YfBl2n2oXzNevVGrXkCgZOfDV7aNaYdqVigriBdsYhLCjtjFmsPp+SRc/bwqh5BlDRkQBJmDzoBs04xeMngRBdrdylv2/cGX1RY6xJODVaid0LKSJm1Pzj0asfDj92VfLZLKXRXKEHW8QHALTchpJMW7WT8dafUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791792723; c=relaxed/simple;
-	bh=lswphrlLWofJtRvkbI2srT3OvzV0iw4JeRfKDMTPcR4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eTYm+w+2rGfTvnreYCQOlSFh7FlDUok+CwZSAN6jc+Odz1KkQ/nR7DKB3sXtPZtGSAO7At6xcr4BFT/0jWSkJB0e0aESWay4FVml1L6i9KvPmmMvXwdiLaTruOJ9gIb1MLxleiRWpt4+ZgAw4cHKZjTy0Lb71TocPZWbMkwmZoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YmHw06VI; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791796650; c=relaxed/simple;
+	bh=JZfaV6Skd9noWQaft/SPWX8ibTsCB1DjJC1fy1PM21Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uC+TLKOoMxkPU9r+rN6gZXDgoW4LHRs1eCr27Kd0u4Rl2hb3+OwXF+mSg2HVCc8mO4nJbuYDAXnAsZ+PbPeli8r0XRiRA5CYdMKrv1hBsA2VQSSRylMZt7ZoadEwZx5XyqHsPVG7zJFtAiH+P6jpLTttIxUQ9beXn0eMieLclIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gafx0wjV; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YmHw06VI"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-93e6eb77f0bso167554285a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 01:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791792721; x=1792397521; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=cASPHAEKulNsUDt0ZdgNqaf8FTWMNc9j4fUAbJI9o9g=;
-        b=YmHw06VIN0axoihogSbm+Tci8rhAXJXjYR0y5+fGZsgTfwXWAyE/cXwPoPeEvSgrb5
-         1tiw9Ne0xSlDFIdgt3XtD1+jCswOsCRBzeuaQONyVhY+miAoClHwF/VF7PxGcRyxehXB
-         9URlNGXcyKe0ei5bSPEN7eefub9tX9Pe04CNT8G/LpUMRauHaDPk7CSjN68KH4COO1a1
-         FcHzvCjeZPGx0dEN8DUGUP77a4Lc+GRmtsr9RrqWbSvchUwP0rT/BtVhjxX42KlC4peR
-         /YgBjWjnzKru3p4k9Mvb6t0QBGP0vyiY+qwGK71ZffcQFRak/gmdb5zmbHYW0iBB8UtI
-         fitg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791792721; x=1792397521;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=cASPHAEKulNsUDt0ZdgNqaf8FTWMNc9j4fUAbJI9o9g=;
-        b=kyr/HH5am+Z5BK/PajbrO7QOa0kBExMZFUKHpSPC5vR3ydlqV8ghja1odZ8i6QycrD
-         2FeGDkZQDfITsGpOXN8Kka8RBfH2qI7QeNyI8rZOztjgy3eapjFP//uwggvmM3PtpwLq
-         HHKz8bYO8LOhiN3mAsz28EmeA3JVB6JljpVjRgYOScEdX0fDu6ndTcUipZmA+PAu5GvQ
-         3IGY5HTZ5dnBwXRNT2SOSXBfVwoT5t6D9slliSAg5ok21DwUqOSExx45zFqd8QOBssg/
-         IYcJQcvGwqOCO9F5hoySL9MYgnFurnQGi92tP6LRpvN5W8IYWDl9aqZb+uXWGZ4qwkbq
-         WLWg==
-X-Gm-Message-State: AFq9FYKQjnz6/ZUArV75rf81J78V70LTidgrV/RCpSYzC1yU3uq43qeH
-	MeKCOruMk6N8fSiQ4EMd2vKuhgs9/6sGLUJHH8Qk6jTIUzrP5CIIm9s0IS/lhA==
-X-Gm-Gg: AYBFou2IfbUn+8ypt84xV1qD/nrEQTC56lBFYoBafIxAvjU8cEBAmx27/61O+9Xwwod
-	zspnaTl9ZR8iNO7Pa+NfhxMP0WZyMd+9gm7tp6gKCxAna3JjGoda/0MtGSUy74jWCm/fXUCogxs
-	LtVauAp0Dth66zLPlZwxsZDqFVXHRQY+YUkIj/yW40MzaYX2DwyzXl+IdXTK3dlE0SHWviQ6L82
-	Vs7yIjVoxhONBiswMbh4G5EEa3g/Alq8xu5wZHTuAice25zffNEF5Nl2Ilmjr5dUfmGqA6KQCuz
-	R5v1v4ew/5OfhSU8Nw+DdyRaFFtd0Ym109uTf9t6XeaaqQlTTmzYUT9cwT5W9orpf5uWMX6c4ji
-	aImqpz7RHf905nssOPWe3M8iOMqeEYIAnrQJfy0nAQ9hm6f7CkCMuEscF7UEWSygqHitz6I+m/b
-	JcVQ+/h0Muhv1sPqXGjttx2dLcui+478IV8a1n1745TC6AzjLYzUHu2peWQFlAT136X8ql6xqBZ
-	dl1CHU=
-X-Received: by 2002:a05:620a:371b:b0:93e:6c4f:bdfb with SMTP id af79cd13be357-93ebd22ab17mr1560817185a.48.1791792721187;
-        Mon, 12 Oct 2026 01:12:01 -0700 (PDT)
-Received: from [172.17.0.2] ([20.106.191.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93eb9896ac4sm797181285a.31.2026.10.12.01.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 01:12:00 -0700 (PDT)
-Message-ID: <6acc9650.a8f1d093.2e8c45.03a5@mx.google.com>
-Date: Mon, 12 Oct 2026 01:12:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5193331315117900671=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gafx0wjV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791796649; x=1823332649;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JZfaV6Skd9noWQaft/SPWX8ibTsCB1DjJC1fy1PM21Q=;
+  b=gafx0wjVYtH2ApV+lagHVZ/at5Cj5Y/6babxVjfR+Em9RNwsCjJpKunM
+   0K80lTrG86q9+g+um0OGpEg+7k/dDSfG8lSMrNAy5006skn4a9P1c/4Tx
+   Z2Ul2cU1jYqpz3Uyyq8MQnhmmR3TfwoRvBoLHRtzmcOd1+SWRFIX8+Vwt
+   QlXUk+r08bmIzUmbICANcgx2Oy3Y6zg9SiTZNjLSu2246wol4Mjok0v6l
+   LtnSxlI5Scg6vBnrMOkRF7TAEhz1v5ZjflT1KI+1tm6ynxefpk+pQPBW2
+   8oDmsNpxmck+eebebK0DtVT2so82x7pHBu/O1EBtNmdrDFhaWCAKsl0aX
+   A==;
+X-CSE-ConnectionGUID: C35jKtq8Q4mTxzlnvWh2kw==
+X-CSE-MsgGUID: sYb5/KxEQvuqSLJxJQCEqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11932"; a="489526"
+X-IronPort-AV: E=Sophos;i="6.27,153,1787036400"; 
+   d="scan'208";a="489526"
+Received: from fmviesa012.fm.intel.com ([10.60.135.152])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2026 02:17:29 -0700
+X-CSE-ConnectionGUID: TP8ESo+JSSySafOfxY2MVg==
+X-CSE-MsgGUID: kVtISodZSnqz0LgNGf5J6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,153,1787036400"; 
+   d="scan'208";a="2645055"
+Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
+  by fmviesa012.fm.intel.com with ESMTP; 12 Oct 2026 02:17:26 -0700
+From: Ravindra <ravindra@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: kiran.k@intel.com,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	stable@vger.kernel.org,
+	chethan.tumkur.narayan@intel.com,
+	Ravindra <ravindra@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Retry FLR on device lock contention
+Date: Mon, 12 Oct 2026 14:50:17 +0530
+Message-ID: <20261012092017.3275428-1-ravindra@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
-Subject: RE: Bluetooth: hci_core: Keep link keys alive during updates
-In-Reply-To: <pm-bluetooth-objects-candidate-0189-v6-def2692b4feebc514f3f@gmail.com>
-References: <pm-bluetooth-objects-candidate-0189-v6-def2692b4feebc514f3f@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5193331315117900671==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Several paths request an FLR asynchronously, including S3/S4 resume,
+resume recovery, HCI reset, and hardware-error recovery. When a request
+comes from a PM callback, reset work may run before the PM core releases
+the PCI device lock. pci_try_reset_function() then returns -EAGAIN
+without attempting the FLR. Other FLR requests can encounter the same
+error if another operation holds the device lock.
 
-This is automated email and please do not reply to this email!
+Retry the FLR on -EAGAIN. If all attempts fail, clear the recovery
+in-progress flag so a later reset request can try again.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1183562/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.77 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      29.46 seconds
-CheckAllWarning               PASS      33.59 seconds
-CheckSparse                   PASS      36.12 seconds
-BuildKernel32                 PASS      29.30 seconds
-CheckKernelLLVM               PASS      34.39 seconds
-TestRunnerSetup               PASS      781.38 seconds
-TestRunner_l2cap-tester       PASS      12.64 seconds
-TestRunner_iso-tester         PASS      10.64 seconds
-TestRunner_bnep-tester        PASS      3.13 seconds
-TestRunner_mgmt-tester        PASS      61.15 seconds
-TestRunner_rfcomm-tester      PASS      4.44 seconds
-TestRunner_sco-tester         PASS      5.63 seconds
-TestRunner_ioctl-tester       PASS      4.63 seconds
-TestRunner_mesh-tester        PASS      5.72 seconds
-TestRunner_smp-tester         PASS      4.61 seconds
-TestRunner_userchan-tester    PASS      3.21 seconds
-TestRunner_6lowpan-tester     PASS      4.41 seconds
-IncrementalBuild              PASS      28.54 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/902
-
+Fixes: 9c36951474d8 ("Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()")
+Signed-off-by: Ravindra <ravindra@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel_pcie.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 3a555aa50c87..251dd4e2ceb4 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -3743,7 +3743,7 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
+ static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
+ {
+ 	struct pci_dev *pdev = data->pdev;
+-	int err;
++	int err, retry;
+ 
+ 	/* pci_try_reset_function() avoids the device_lock ABBA against
+ 	 * btintel_pcie_remove(): .remove() runs with device_lock held and
+@@ -3751,7 +3751,16 @@ static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
+ 	 * pci_reset_function() would deadlock by trying to re-acquire
+ 	 * device_lock here.
+ 	 */
+-	err = pci_try_reset_function(pdev);
++	/* PM callbacks hold the device lock, so the queued resume reset may
++	 * run before the callback releases it. Retry after that lock is dropped.
++	 */
++	for (retry = 0; retry < 3; retry++) {
++		err = pci_try_reset_function(pdev);
++		if (err != -EAGAIN)
++			break;
++
++		usleep_range(1000, 2000);
++	}
+ 	if (err) {
+ 		BT_ERR("Failed resetting the pcie device (%d)", err);
+ 		return err;
+@@ -3817,6 +3826,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 		enable_work(&data->hwexp_work);
+ 		enable_work(&data->fwtrigger_work);
+ 		enable_work(&data->mbox_work);
++		clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
+ 	}
+ 
+ out:
+@@ -3841,10 +3851,9 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+  *     in-flight one (whose recovery will reinitialize the device
+  *     regardless of the dropped trigger's variant).
+  *
+- * The bit is cleared only by .remove() / re-probe via fresh devm
+- * allocation, which is the intended one-shot semantics: a reset
+- * tears down and re-probes 'data', so there is no "in-flight"
+- * reset to follow up after device_reprobe() succeeds.
++ * A successful reset clears the bit through .remove() / re-probe via
++ * fresh devm allocation. A failed FLR clears it in reset_work so a
++ * later request can retry; there is no in-flight reset after failure.
+  */
+ static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
+ 				       enum btintel_pcie_reset_type type)
+-- 
+2.43.0
 
---===============5193331315117900671==--
