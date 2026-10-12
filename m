@@ -1,232 +1,124 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF321A681E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 01:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECF3351C1C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 02:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791770324; cv=none; b=afr7hxCc9Fd18s0L6EHisQGRVwEA+O61m6+c729sbYsUOzRLhjQZ89UR5O8yWaYUHbq4+B9EffHdOvDqUz+LvS/XBzbaX0ib08EqknPtosLV8Qbl11cYlBKM7WSaADP8SbCFtLzcgdt86f6uBz9LGyk77Kzz6y8ONlevO7/L+3Q=
+	t=1791770415; cv=none; b=LNLbZsyueLC+PSPDIW8JK63RgdZR9gC2Y4a7mrE17dTIYohhaY8eZNKhD6XQQ6tLSEa9ISCJQmlQiqOXORqH8uXKgFEM4XMt0sxytkg9rKWGnyhW/RowMnz3lOTyNraPyuiMHFAOC1Lm/vRK1Z1F1+sGKBh32Cq6h+nbGv+TCzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791770324; c=relaxed/simple;
-	bh=abZ2VzGV+T1rrvWItpexx4Ss92dMIEPFRpbAZ8YEp08=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=lylYhMA2FQJFC9UMhG2EDnOmFQdmGqJTPQMU4qIp2b85UIY7vPaK1nsHAV88XQRIF8AVvqr8M46kE2oM2tyZMNlLU/UYsdIw303M11Dj4tm9A+KQT70GClKiYhq5tnXENm4kuYz6FuxX/ySqejfzhkzI+puIuRur7XfKfFX0d4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXOfWyDL; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1791770415; c=relaxed/simple;
+	bh=qhkyoOYa+sKXwQ0ZeuCoQruCrTV5mDxGOlxF4M6yGa4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Gvp4gh3NTxD5ymQDY16TZstXoSoW/hU2+0EeXit9HtkoiTw9vCkLrGN4dAw+kcN83nnlW/dxC07tMxHCwyHVUGYLjwmHhFDXcYfDCawOYT80lQlc8XMVviT8Gkaq5u5JydgGU3cAfthVZB8sgIQ2FRhKYump9lxsf0ygMXz0KWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DVZMzv7o; arc=none smtp.client-ip=74.125.82.50
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXOfWyDL"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-383b4a3755fso1001206a91.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 18:58:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVZMzv7o"
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-15dd124bbe7so2846820c88.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Oct 2026 19:00:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791770323; x=1792375123; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GPTKtpR6RNSVJ/MBAmueSNc/Qt+gv2fvFzalyTXmmk4=;
-        b=QXOfWyDLzLVZHhmr+btXbDD3R7Ie4sc27ShVEIM28Z1S5LboPEdNboP15Vf838LXvE
-         4/bCi0sBXzuWqpKszn5Dh+Rv0VZ1f8XFeARLFNer/7LT6l9LSUiKnpJCf2UuNRv9qdIf
-         7TZJ3kq4i1AxQsdRwUevFDTNidXeuRcEQsB0ISODAi51NVXfXKMQrY9/kijVNZyvvoeq
-         ittGZ/5NFYUzdB9qcjEJNh9youuEBtxcQyeks0MCnIM3JKM8jfaSyCPU8/XTkSn9ZCKY
-         q0d89bhVJ75gYwMUvhXz+4DDYfyLXkhMpoVqTAKSsk+qiVV3AQPzu2CbckWAgY370Vvs
-         U7TQ==
+        d=gmail.com; s=20251104; t=1791770412; x=1792375212; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ysfH7Z7c6P2Lzt6o07MeBszxNDbaOqmtdCSlvmOoOhs=;
+        b=DVZMzv7oCPdQy3pLHQQ+wjj5zvbeGYsWHMdtbTNZg/jpdkXhYgzAvq3Knmbyl7eOs0
+         wswBvz4iWjRYfx6AQ+BYdumcdvACcspv/C5KQZFplH49Q3v7sUr2jBEMlZQ7G+cbSdgc
+         DkzXBCBZHLisFiSSE4SxQHbtoX0XqUr9SdqibtfrvFzziTMBMiyci4SUO5mAsSlBQyUy
+         3oTddEvKdIryNOmOYVBlcNcnk+gyv1GKCO4jn/GEFPZ/uTQOYmJStPjfRgqL7hxgFF9H
+         Z+P4UItanWPfAHtxMCnu1/zjYNKBA+rSMGa6L/OF15s3gpg5KrSjaFei2B4Pbr/QIB03
+         /5JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791770323; x=1792375123;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=GPTKtpR6RNSVJ/MBAmueSNc/Qt+gv2fvFzalyTXmmk4=;
-        b=n3R1yWPPFYMZ3/CxuSjUQX+7QqTAMsNYwZBlKHsbcAZyIVCFXL7JibniRVy/81S1lE
-         PoFdwFeoDQnA1CjXebWMY8ypyIibr78+mJIUE73ruZeT0RNB92xFfkA66JNHF2EqZk3h
-         TmbH+sWNPKgKrBDwuyQAohkWue//cR4t1THqa8frYtXwBrU0jy0C4M6QMUOwtsTO3GRV
-         eNw2TXNcUj0MVYJWrkKrN1HI3LDN2eMMecgvlr6c8BCHGiXUgE2LN4kNQUQP9VWBSSLb
-         MOUN9D3iiSXR/VvFsEZMx4SNmlDANgu3WV+3sU6hG155SpMvSqN6ItXORpyLTTdJzDMx
-         vHEw==
-X-Gm-Message-State: AFq9FYKYXw4gjrNkxddqrTSrST803e+9UdN2SgJTLuTfO1rMazx/vF2l
-	Glyd/FVrtB33lgLrqqWLWyIhcBP57KO02vfGDd4gZhc4FazgM9ir4edu020ywA==
-X-Gm-Gg: AYBFou2VNLTfyO/CwsIB3LWD7StObbJPpnHBKwihTUzwJ8PoFrsdVTWazA42hJFAheo
-	XjsrJC1w8dZszbGdCC0Pp4H8LFjvlhCwpfvbuLPqGGpLLUKHeUDVlju6DUH3rYa1AA7mta5/EGx
-	X5uMZIXmUrJwo6I5avrWira6P0B3TfVaxic7F/DISOq8+/psZyItgOYRhARHe17qu5VO+8JZcSl
-	LYHZITZO+ecqu024icV93Qc5PNvRPRVHnFupH6iSbC/JPC4cN4Ig7Zmvdqs6okUcIKchDPu3NT5
-	kMtgg5WDbNA8ihxpxP9NzlL9h0A0kIZJJSDZRfLPvqwMjcyW/hdhFBofq0OZTV4FUKfPEAvlzan
-	V9cusTumM1BzSssooVOQ4+4nlvZFAeqG1q9bleySjncEF9pZwDMaYoiC82cH4QqgmwZAD/pUhPo
-	PYd6SyTMnaZTuXbpbZrIxarHfX+MOjuwk8VrXb05KxXrEWiyRfOoF8jZtVZlrjHAGUXQ==
-X-Received: by 2002:a17:90b:1dd1:b0:3a8:bb56:f1ed with SMTP id 98e67ed59e1d1-3ab3acf313fmr6806854a91.50.1791770322776;
-        Sun, 11 Oct 2026 18:58:42 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab36fdc75esm14467677a91.12.2026.10.11.18.58.38
+        d=1e100.net; s=20260707; t=1791770412; x=1792375212;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ysfH7Z7c6P2Lzt6o07MeBszxNDbaOqmtdCSlvmOoOhs=;
+        b=2YGc5MiB/t/D4CtiYN1h231em/AdlicML1m1buEEebUMMfQ7436Hpd+63o3MX3utgW
+         15HFvJyEt5typirYN/UEz00Kpf5KERPNWySPc94+kvkzWU0Gj4BdjLNHDKVVIy/pshq7
+         9mC7AYJ6bEtGtRDpblJXxw8O5m01PNxZpOiJlHAKESoG2iuAi+oKYZJ9xRpvNn5zHS/0
+         y39VvX7ab9X+YCSsyX0vhoSTyfNv8z5LdbG2QwQUT8BrK+bpjCDyF0P2WLJH56Jc88kG
+         MkCd/ct9j41F0iExiKfbNGF0ydMBgXsgcmKaKf5ULBn6d+w3CVPHzprkKl5xZZUogFSQ
+         NxEQ==
+X-Gm-Message-State: AFq9FYLSDVpFZbyA+KqZoVLvlo+UMmDB2zjfwW4x9XjnwIB+lhWrV1eW
+	zcLijSyRmgP7XlRHi6VRopsnUdtXnt8oRucHlc5oTFa1/3cbjFZj3Ij1Zbi1ng==
+X-Gm-Gg: AYBFou1HYCAvYjHkTy+BHxIQagZVc4as3XrmcZUWhYZvHcA5xhqC9GnEzQUX6sn5YrR
+	3/86guJa85CBsxBdvQN2ok76yMzrnDWIGSjf5lS1sszt4Agq41kS5LuDy4rVKrYmZ2pwx7L0hm2
+	d9sO/nMaDoyOySuYNolHtZ1BvFlvYRyOSsaknjvZfhwLmbLdfgT2fvlcStrYC28DJ/+FAHVIsA3
+	smH8oFfxp4XOmhr0RzBhw1YWUIBLgWaejby5R3dnAq2UTHjHVRdUf76zeH8mVN+Z3Wo/54raHoa
+	Pfz3SZXKGDQPmpgU5FCQrwYRnQBJfe/jVgE5ojiNqU6shF2TVcyFdNKQCvuap0fPjmSw15Fk4DI
+	IX/OXVQoJejwMGdOo8WrNdcbARLdvJ+0zWAFwBaHvtIUY9rkRXeUUhiL9bk5F4bSfTtlA/TDQ2B
+	w0QvaEXFaUB9JtWkZnTILOpd7zZHNm12zB9XzP9/B1YFfTqtVx29h8uyYP3lwve6upHBfUjIMYT
+	esC
+X-Received: by 2002:a05:701b:42c1:10b0:151:2068:e81f with SMTP id a92af1059eb24-16a5e873912mr11598355c88.27.1791770411948;
+        Sun, 11 Oct 2026 19:00:11 -0700 (PDT)
+Received: from [172.17.0.2] ([20.168.111.82])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a567aef5sm24888207c88.19.2026.10.11.19.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Oct 2026 18:58:42 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	brian.gix@intel.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	jjzuming@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: mgmt: Remove mesh cleanup from the socket destructor
-Date: Mon, 12 Oct 2026 09:58:36 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0156-v8-fac4256cb2701c21549a@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 11 Oct 2026 19:00:11 -0700 (PDT)
+Message-ID: <6acc3f2b.0b8a6e6d.28374a.a720@mx.google.com>
+Date: Sun, 11 Oct 2026 19:00:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1850972014219217022=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, me@andrei-z.com
+Subject: RE: Bluetooth: hci_core: program a public address set during auto off
+In-Reply-To: <20261011220813.1815075-1-me@andrei-z.com>
+References: <20261011220813.1815075-1-me@andrei-z.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-mgmt_mesh_add() takes a socket reference before linking a mesh
-transmission, and mgmt_mesh_remove() unlinks it before dropping that
-reference. A socket reaching hci_sock_destruct() therefore cannot own
-any entries in mesh_pending. Nevertheless, the destructor calls
-mgmt_cleanup(), which scans every controller's mesh_pending list without
-protecting the entries against request completion.
+--===============1850972014219217022==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-With mesh enabled on an LE controller, a pending transmission owned by
-socket B can complete while an unrelated socket A is being destroyed.
-For a successful send, mesh_send_start_complete() schedules
-mesh_send_done(), which queues mesh_send_done_sync() on the controller's
-request workqueue. While the controller remains registered, the paths
-can interleave as follows:
+This is automated email and please do not reply to this email!
 
-1. A enters hci_sock_destruct() -> mgmt_cleanup(), and mgmt_mesh_next()
-   obtains a pointer to B's linked mesh_tx.
-2. B's worker runs mesh_send_done_sync() -> mesh_send_complete() ->
-   mgmt_mesh_remove(), unlinks mesh_tx, drops B's socket reference and
-   frees the entry.
-3. A reads mesh_tx->sk to compare it with A's socket, accessing freed
-   memory.
+Dear submitter,
 
-The hci_dev_list_lock held by A protects controller membership, but B's
-completion does not acquire it and can free the entry before A's read.
-The socket reference held by the entry keeps B alive, but does not keep
-B's mesh_tx alive for A's traversal. Start-error completion can remove
-the same entry through mesh_send_start_complete() as well.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1183485/
 
-Remove the destructor's mesh cleanup call. The existing socket
-references ensure that all of that socket's mesh entries are unlinked
-before destruction. Mesh completion and cancellation already manage
-the entries' lifetime, so the destructor need only purge its queues.
+---Test result---
 
-KASAN report as below:
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.08 seconds
+GitLint                       PASS      8.82 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      33.63 seconds
+CheckAllWarning               PASS      33.49 seconds
+CheckSparse                   PASS      36.74 seconds
+BuildKernel32                 PASS      30.47 seconds
+CheckKernelLLVM               PASS      33.96 seconds
+TestRunnerSetup               PASS      707.44 seconds
+TestRunner_l2cap-tester       PASS      12.45 seconds
+TestRunner_iso-tester         PASS      10.43 seconds
+TestRunner_bnep-tester        PASS      2.86 seconds
+TestRunner_mgmt-tester        PASS      59.78 seconds
+TestRunner_rfcomm-tester      PASS      4.20 seconds
+TestRunner_sco-tester         PASS      5.31 seconds
+TestRunner_ioctl-tester       PASS      4.42 seconds
+TestRunner_mesh-tester        PASS      5.22 seconds
+TestRunner_smp-tester         PASS      4.08 seconds
+TestRunner_userchan-tester    PASS      7.61 seconds
+TestRunner_6lowpan-tester     PASS      4.13 seconds
+IncrementalBuild              PASS      27.48 seconds
 
-    ==================================================================
-    BUG: KASAN: slab-use-after-free in mgmt_mesh_next+0x119/0x140
-    Read of size 8 at addr ffff88810c25cf20 by task python3/490
 
-    CPU: 3 UID: 0 PID: 490 Comm: python3 Not tainted
-    7.2.0-rc6-pmb-bt-functional-v1+ #1 PREEMPT(lazy)
-    Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix,
-    1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-    Call Trace:
-     <TASK>
-     dump_stack_lvl+0x93/0xd0
-     print_report+0xce/0x630
-     ? mgmt_mesh_next+0x119/0x140
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? __virt_addr_valid+0x20d/0x410
-     ? mgmt_mesh_next+0x119/0x140
-     kasan_report+0xe0/0x110
-     ? mgmt_mesh_next+0x119/0x140
-     ? __pfx_sock_close+0x10/0x10
-     mgmt_mesh_next+0x119/0x140
-     mgmt_cleanup+0x6c/0xe0
-     ? __pfx_hci_sock_destruct+0x10/0x10
-     hci_sock_destruct+0x1a/0x50
-     __sk_destruct+0x85/0x790
-     ? __pfx_sock_close+0x10/0x10
-     sk_destruct+0xb3/0xd0
-     __sk_free+0xdd/0x370
-     sk_free+0x51/0x80
-     hci_sock_release+0x339/0x550
-     __sock_release+0xb8/0x270
-     sock_close+0x21/0x30
-     __fput+0x39f/0xa60
-     fput_close_sync+0xff/0x200
-     ? __pfx_fput_close_sync+0x10/0x10
-     ? dnotify_flush+0x22/0x4b0
-     __x64_sys_close+0x8c/0xf0
-     do_syscall_64+0x115/0x6a0
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    RIP: 0033:0x7f057299a687
-    Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8
-    fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f
-    1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-    RSP: 002b:00007fffcf66d4a0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-    RAX: ffffffffffffffda RBX: 00007f0572906780 RCX: 00007f057299a687
-    RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000005
-    RBP: 0000000000000005 R08: 0000000000000000 R09: 0000000000000000
-    R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000a83590
-    R13: 0000000000a83590 R14: 0000000000000000 R15: 00007f0572744188
-     </TASK>
 
-    Allocated by task 490:
-     kasan_save_stack+0x33/0x60
-     kasan_save_track+0x14/0x30
-     __kasan_kmalloc+0xaa/0xb0
-     __kmalloc_cache_noprof+0x251/0x610
-     mgmt_mesh_add+0x5d/0x3e0
-     mesh_send+0x22d/0x6c0
-     hci_sock_sendmsg+0x128b/0x22e0
-     __sys_sendto+0x425/0x470
-     __x64_sys_sendto+0xe5/0x1c0
-     do_syscall_64+0x115/0x6a0
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+https://github.com/bluez/bluetooth-next/pull/898
 
-    Freed by task 492:
-     kasan_save_stack+0x33/0x60
-     kasan_save_track+0x14/0x30
-     kasan_save_free_info+0x3b/0x60
-     __kasan_slab_free+0x5f/0x80
-     kfree+0x307/0x580
-     mesh_send_done_sync+0x115/0x180
-     hci_cmd_sync_work+0x1b3/0x450
-     process_one_work+0x908/0x19c0
-     worker_thread+0x65c/0xe40
-     kthread+0x34f/0x460
-     ret_from_fork+0x659/0x940
-     ret_from_fork_asm+0x1a/0x30
-
-    The buggy address belongs to the object at ffff88810c25cf00
-     which belongs to the cache kmalloc-96 of size 96
-    The buggy address is located 32 bytes inside of
-     freed 96-byte region [ffff88810c25cf00, ffff88810c25cf60)
-
-    The buggy address belongs to the physical page:
-    page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0
-    pfn:0x10c25c
-    flags: 0x200000000000000(node=0|zone=2)
-    page_type: f5(slab)
-    raw: 0200000000000000 ffff888100042280 dead000000000100
-    dead000000000122
-    raw: 0000000000000000 0000000000200020 00000000f5000000
-    0000000000000000
-    page dumped because: kasan: bad access detected
-
-    Memory state around the buggy address:
-     ffff88810c25ce00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-     ffff88810c25ce80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-    >ffff88810c25cf00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                                   ^
-     ffff88810c25cf80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-     ffff88810c25d000: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-    ==================================================================
-
-Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-Assisted-by: LLM
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b26f065d0c18ff3a7cd4b2be1f3fc44d1d2a0605..24cfa6db7654255e5192be75fad49478db251817 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -2186,7 +2186,6 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- static void hci_sock_destruct(struct sock *sk)
- {
--	mgmt_cleanup(sk);
- 	skb_queue_purge(&sk->sk_receive_queue);
- 	skb_queue_purge(&sk->sk_write_queue);
- 	skb_queue_purge(&sk->sk_error_queue);
+
+--===============1850972014219217022==--
