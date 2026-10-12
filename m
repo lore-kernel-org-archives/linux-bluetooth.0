@@ -1,170 +1,196 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C16336AB7C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 13:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791812418; cv=none; b=eolg07g+DhPOb3kDCCJt4PhDek2AraXOf0s6KkbfxRf5HhKUHMEeG6YyGCuTrzKOWr0HH3QFL6dvriqdQoZQQshAyA1nK9IDIRMiS/PJX4gNxxaE0PrM/ytvi/M+zQ0tLLmbx/cPEry24G0m+Tptv9vj7kTkHOb0aonwMH2XI10=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791812418; c=relaxed/simple;
-	bh=ObO1NlYssZkMqOHfmoyw5rb1Sdfdt+FEN9EgsBLC570=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cEkFcUdr1k9/RVXBiGcE907XGA10dB9QkGYyIl/kiWDm4rQ/+4sBPvNpJDFraOhF24U5YL6LzpdIv6gSMjY4MLPl2hIVj0TqXy8S6d5d1/lccsGxFUQ2TBgGFTYbWYB5mVAcEOT9pbgmzI4bvZ/uRJ1rMkwjcx8AQ1piY5Ug0I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=XDzdEbe1; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=S5M+6Ytn; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B274142FCD8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 14:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791816023; cv=pass; b=RIW6OIF2OiG0RsAIwVE84JNDqf6e55gQgyUYyBVp9ZEXw23iXOwowdSeQAHSdAFMCxWxWwDkv1KxKnhOOf2QIVcxPuxgFxxRKbAnx/n836y68LsFqVoyMfdSkki1kFUYlCWPBOpsGFQj1rC9slKP79Jd06hudXDzCkJlzwKywHY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791816023; c=relaxed/simple;
+	bh=vyjFk+OVzX73rkv+Vf4KwdMVbobAdz3wh39L0hTuAmo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P3fw8CEB8xhgHBkmu4SNgI4ZrXTh5atOgk20kKOWLlsUvKxioqsAuHS8114zod9OmrDl3SFSaNwMewmdNdEhuOZdSjJc/xKlI0WYA6oAYIvJRkEfHCoyJEZ0wSqgmg4dQbMkjBNkuuUBdxXmlQUPJjdio1fxZMxDd4qgWCp4EoQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYWzYxqI; arc=pass smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="XDzdEbe1";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="S5M+6Ytn"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69CC0Djp1686432
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 13:40:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	AhDDNYFPcv+zyLGx07rJHLV856ZktTY7eHtr9ZO4JBI=; b=XDzdEbe1RzaUGOkp
-	3Ybm0gfuP0/DsEbGrk+ys6EaYFMBhVWl/N7WU6I1jDJliqJ8nvjzVnySd5iiM7X/
-	qcjNJGEdUMJlNadkD4YvWU6cWJCRKTz7jBmH+e5OMST1mgOoddYosaaqp4tWHV2l
-	vmaPkF2kP7SA+tfNtvWtiWew6NhMc6TDPO8YX2WCIf7Aq/1sQom1xxtEGzXU6DPa
-	jxChgX+WfFoApQcJL+SJ1ugmrRMK7Hdblmes4Q4Taz95lzuc1nZQbbg/mzbUxurU
-	gFdKbicGlAxPbwnEcEwYo4c6elv45XfM0Mp04pLdTEJoWsLVUTZ/g0RsiJgS38BQ
-	/0rxMQ==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h8wbc10dx-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 13:40:16 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-35a04491c56so1132699eec.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 06:40:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYWzYxqI"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-8acda240937so12973377b3.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 07:40:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791816021; cv=none;
+        d=google.com; s=arc-20260327;
+        b=kRWF+bhQ8bEoBQejq+mRoDxRN6KrNDeUTziSgllf3ocB20o0VqJebm3ZzTx3KBMP1Z
+         va37C48CaRZn+kQNghCylQopuyfF0Y9mawJ6yLe2qju9rdxfjpFiLENdCjQj2zNIsEnz
+         01ONrzArh+KmoY5n68UiqWQlpT7r8gPu+VXthpSMka8Y5EEjdBJmZXcT1bSFxBXNgcux
+         jU0gRE5XZECo+5+SuK+YRy4NTLQQu4VT1ufi9JUAmL5sPXRq4NCZs+83nBHc94WvIStm
+         CYCZUPXydFwZm8KMNZsOyyCKBHUSvCE9tk5NtWWciPbDlHVrE/YfgkaqftZ3XJ/cnUVh
+         88PQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JCv8gBANZutmGTGlF/Uql5wg79snoB/nJkY2lKkKjE0=;
+        fh=Z2zAN9xr5NDqfMpxnYv8IVTT6hA8iqz8XLtGvvSXg8E=;
+        b=KEf6kh8LMfwgPZ/Rib34zbXNm7tLEsYEoYyekqg34/wL73GbF9BQqosdXmRACHEjAU
+         xHinhKCiuzLP0JWpfOeflnZztsjod06b7pCwIuWyexzDYvlcsCBmEZNn1WcguDoic1AT
+         /TFpmf9yONOplV28LvKxAyd/LMbDU9SvcK7EVOPK0ljvYNp/fDbXzANYOkeygQrpv0E3
+         HaqXVN3JN+phQXwmEEhmtssV+eybXKLe3Wzao3UZiSCpWxagsDDRNAQg2CyOXiPECekY
+         0PdY+hzK+QKuHe93/fplEUF+Vsy9Bq4QOq5mvsx92IdnYNyKLPtdKrF6kY843Zo4r1jB
+         8MKg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1791812416; x=1792417216; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=AhDDNYFPcv+zyLGx07rJHLV856ZktTY7eHtr9ZO4JBI=;
-        b=S5M+6Ytn0yAK6Xj/XlN1AGk/7Ufhy9Us9XEiM/Nn00+AxnN4i3WA/94YXs7z5nCp4N
-         df5Kj7sxHK24ieGlGpVceKURu1DLm8/gy02R9iabz4EHPMOkZGOu8/CepirK4DOXaFM+
-         phZJvw/C9CbCRKhg6fB4xSs3Y3k2LG1/lo+YaP8KkaJ2w8KJw/2IfPUn17N13MNqGACI
-         ixFiDLibh+o/kQNgabpt/2FrL6KGG7h923hUyl1wTEVDsdWSSkzIB7kNFjxOCT6fMX7j
-         8ECRoWgEWFt79VD9Ywzof6JLsxNSJF9CIKuyjd+ZAzRiK427lTwgbXyV1y3oxzRmnNBF
-         fDVQ==
+        d=gmail.com; s=20251104; t=1791816021; x=1792420821; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JCv8gBANZutmGTGlF/Uql5wg79snoB/nJkY2lKkKjE0=;
+        b=qYWzYxqIFGs3ZcdrTMmsoWwJ7uja2OrKnsz9Hwne++42sA9Kkc3LTKJb26bHqSrzRf
+         526eQ7aRiBtH0yqR8VoaaOsoVX602ReVnQVj15aOH7L7XzGo5Yu6Z8gclMxgn399S+0R
+         vqJnKYI+L5S7ihpEDfDYum+ttp5dmKeGJLlabUjSnjI0AP1dLpNO3EbZ3NPXkwNLooSW
+         yIzzPDbqDT9NCwww1bmsGLcoGXLMA91Bjk0AHkT7Wop7998l00FF/DYTjFROx1BYaKsy
+         gYftlevQY36i54UMOZQhMyzTuSLgG6pyjQDrAst7L8IQK2H65u02XArTiig8DHZeb3pA
+         AEpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791812416; x=1792417216;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=AhDDNYFPcv+zyLGx07rJHLV856ZktTY7eHtr9ZO4JBI=;
-        b=GpyRE0kMgFTNlKe9xM5mZhvMH14kaVqh7z2vNMiNgAmkzZG0Av60RaTnf1Rvd3Xcn3
-         n2bdid0lTxbT0eQ4kZRWvWISBej0dHZPnXE+senlKN2hjW+pg/tNcyk+6169NqDQlXm3
-         F62KKKaRHCtuopPPlbhkVvKXA/hxz/UWrxW0Ekidptufj6g67tVXGnLp95PbgrDFiafB
-         osiL+KYCYOxSdI12n1F27/w6DN5Z3AiAqXZgpAN4JIJ/wGvsu4B2ujRpr4uhpFW3RBYE
-         Py1m2sSIxJf0vGGnh+m84JIwgOg01UBG4ST7kwhZ7KscTd/a/H7HHbcT94AdAEjQBA10
-         xUqw==
-X-Gm-Message-State: AFq9FYLmn01ozHN6hPc+5WG9thTCYVBzG88NwYrAXXYkGUVqL7t0XCLx
-	TndFYgrUxLUK/2FhrSkkASiZuwI/Qc7ymD/G5T0u8OyS3R/AwT5QyxXVFQ1NEXG3GJsoWiyBJch
-	K0MhUN3XyVCLpPvQT45Z+zCaxAOwh0EG/YDsJNfC+J/GPgG0D2yduBJuy2NvGhDFtjtvy2yt2Z/
-	7B1dQ=
-X-Gm-Gg: AYBFou3Sby54VcSiH+P06m9Awsed2xoIAfaHqg8SB1tXtNWcQtzyIRLZVPHgbCjvq6R
-	ViN6NiD84mMvemJZq38Bx/J+eDusBW3A60A/itLWBIvv2fUxeVblvy6GL77bzUwDLA6n6U8Tf53
-	10F9d3Mt8UNyKpFUL7cINcpy3vg1tIsAQoLM3ZJfReKZWR5/oU0U6NeCrjFCNbd6FPr3yLn58/i
-	srlgcp4+/peNxvLdX6MFpUxT9BvOJwnOfJe6nrpHJqD06HqRDlC//K3cIcnMtJd+Aq+sFgV+Ht4
-	gFdpMHf0Iq4pliaYjaX92XjRRGJuvkMqreBPJHoI990tE+6hU5li9Dcp5nmalsg5UO0Hlhunyt6
-	4+j7VerZQLyXJY1Ob4SqczvbsZgA=
-X-Received: by 2002:a05:7022:5f1b:b0:16e:a290:12bc with SMTP id a92af1059eb24-16ea2b0303emr7013562c88.12.1791812415730;
-        Mon, 12 Oct 2026 06:40:15 -0700 (PDT)
-X-Received: by 2002:a05:7022:5f1b:b0:16e:a290:12bc with SMTP id a92af1059eb24-16ea2b0303emr7013541c88.12.1791812415156;
-        Mon, 12 Oct 2026 06:40:15 -0700 (PDT)
-Received: from [192.168.31.121] ([58.247.180.211])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a1becefdsm30195695c88.7.2026.10.12.06.40.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Oct 2026 06:40:14 -0700 (PDT)
-Message-ID: <dc6dc673-af60-4b59-89b7-7722fe355907@oss.qualcomm.com>
-Date: Mon, 12 Oct 2026 21:40:08 +0800
+        d=1e100.net; s=20260707; t=1791816021; x=1792420821;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JCv8gBANZutmGTGlF/Uql5wg79snoB/nJkY2lKkKjE0=;
+        b=XB6bi/wKsGDjblReDjzHNylW6O8HPb4Fo7bzEb0NIeyj1540+RRu692CbVAzPdOElA
+         C/Ct1FNRwSVDWzyLV8ypp+TmbE+FvPuz4yircLVWUzUU5LJQNRwz4lETF1UoT6u5X3/G
+         QzZMyRaQjM6lABobaE7iaub6crBd/zLsVppG4f+DwP6d3HT4f6nfW8Kuz/tDhLcq7g39
+         RhwIAy9gDSZ8Yim3nhtB+IK91Q1ZTQe1B0+bDg3ucrBZxoMpvEjfeNY9rkV8UQzZC0+p
+         jkDs/7+55xaSvRBo9S5/8RZEglFi7/wQmZnwSsixx8YuLfQKEermqy6OQluxAg0x/xWK
+         2PVQ==
+X-Gm-Message-State: AFq9FYLtHIYTgj/ifTnFRouAJx6829X5kVPtIDq5xtI/ByFF0miLie04
+	WJQ2qkRmKbBOj42uldo9oc6/LflRX4ILpqv7udPHDrWFOq0j7z2HTDS1sUNi8kc7tFJcz99IxeC
+	naOhnv/9Z1nq1CpoZMaBTL6IHe62Krg8=
+X-Gm-Gg: AYBFou1xi5b8R1Z9QYqcBCOLPPINWcNrtiBvC5ycl30S5PPugUO3q3jnKAMponDnAL/
+	0u0AVh2Bn8hQaaRmd5iknJ3O3+lCphJ9Ydb36Zw4pO04BImewQ0VHfVJmxdx9tsZnKmDSoC5HwE
+	WcgAt04a3WMkoypHa0NGSFDmVo7Tv6Uf9X+PntuYqKH8cTgYBaMT43pCRkxxOLKsgoNeWoPbt6d
+	6WurE3jh0HUV7puLjQXI0uCJVkP5Ya/jkxtzzhI5g59yQ8vUzCYS4V3NrDHgNU1YqgLhmKLaD8J
+	blWGRyS1htVj9NzI9MK2a7jZEfUjrF+Qs+pIoKAIoiDITlXlmYH/r28x/k0yCcWfvu/QQ30eZ6q
+	v7cL5UZq289dr1H4+2ZWnBziqKPV4oiLKXxcp4U25BA==
+X-Received: by 2002:a05:690c:ec5:b0:8b0:a5d3:7198 with SMTP id
+ 00721157ae682-8b0a5d37935mr8627877b3.47.1791816020580; Mon, 12 Oct 2026
+ 07:40:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] avdtp: Fix use-after-free in connection_lost
-To: linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com
-References: <20260807095809.2584501-1-jinwang.li@oss.qualcomm.com>
-Content-Language: en-US
-From: Jinwang Li <jinwang.li@oss.qualcomm.com>
-In-Reply-To: <20260807095809.2584501-1-jinwang.li@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEyMDA1NCBTYWx0ZWRfX9uMpMhNi4W0b
- yhWKqVi9AXGqGrJ9jph+lrdGn9aeuHoZK39gXW6PVJysHEQO13iEyoaj7WK5y+J9e8Khq0lZxnM
- +CplInysRfQddW6FWGHZ765PI3JIKBA=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEyMDA1NCBTYWx0ZWRfX/N5zKU3QFupP
- lZKupwtzKMCamN92RmbqqWc2EPFoiF1nI9zuoWUaF1FU8wwvWt5VtokRjf/GemAEf7ndXAVHL2O
- 6qKH0h25/Vb8ooxUyuY7ew4J5KGuM1qb6RTDx7lnTw8DG+RTW2T0/h9v1zDHLqIYKWpu79icspb
- 7udEChtjP6rwDt1lOYDeMln6rL4gOnjhBLYf0K5DwyoutCGNq+i8OrR6ImV6wwpua91rORZ5lx5
- cyUzXMRzOcmSrqghP6kEhVBXXTJrfytpg/2DVTMyOoWQo5yHo38kSG8fdM9hA3SRrzY87SacXAZ
- 7c6pYihRFgk3WNu/xS01Cm1h+OVBpZVsIYLoxNFPxuAnc/qQ7L3zm0er+WBY5RkXwEwgvDO4Qku
- u+rUp+DRZeEiDnW62+eYooinjz1lymiP1oWeZSYdFMvYI5ximOMZZCafew5AMSc0H/3ZMF8aHPp
- fWUAd/np6ZQT53/xkDw==
-X-Authority-Analysis: v=2.4 cv=C4p8WgP+ c=1 sm=1 tr=0 ts=6acce340 cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=6ys7802BvytzPDmX/GRlTg==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=EUspDBNiAAAA:8 a=FGPE5UJRS-2hhSFPCLIA:9 a=QEXdDO2ut3YA:10
- a=6Ab_bkdmUrQuMsNx7PHu:22
-X-Proofpoint-ORIG-GUID: j68PhLsc_py8o9MvNSfM8gB_chBzm4-E
-X-Proofpoint-GUID: j68PhLsc_py8o9MvNSfM8gB_chBzm4-E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-12_04,2026-10-09_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 spamscore=0 bulkscore=0 adultscore=0
- malwarescore=0 suspectscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610120054
+References: <20261012092017.3275428-1-ravindra@intel.com>
+In-Reply-To: <20261012092017.3275428-1-ravindra@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 12 Oct 2026 10:40:09 -0400
+X-Gm-Features: AclHuK_W5r3-kSFq8ZOrp8v14qXeljv26kcEUvDpgPt4bofmiSEXo2HZBIzWGUA
+Message-ID: <CABBYNZKHL4t+jfuLJ=6N4xge-XNYnqrsdJtjMRDo2fcubbuLJA@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Retry FLR on device lock contention
+To: Ravindra <ravindra@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, 
+	linux-kernel@vger.kernel.org, marcel@holtmann.org, stable@vger.kernel.org, 
+	chethan.tumkur.narayan@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Maintainers,
+Hi Ravindra,
 
-Friendly ping. Any feedback would be appreciated.
-
-Thanks,
-Jinwang
-
-On 8/7/2026 5:58 PM, Jinwang Li wrote:
-> release_stream() may free the session's a2dp_setup through
-> abort_cfm(). Subsequently, finalize_discovery() passes the same
-> freed a2dp_setup to discover_cb(), resulting in a use-after-free.
-> 
-> Call finalize_discovery() before release_stream() instead.
-> 
-> Assisted-by: Claude:claude-sonnet-5
-> Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+On Mon, Oct 12, 2026 at 5:17=E2=80=AFAM Ravindra <ravindra@intel.com> wrote=
+:
+>
+> Several paths request an FLR asynchronously, including S3/S4 resume,
+> resume recovery, HCI reset, and hardware-error recovery. When a request
+> comes from a PM callback, reset work may run before the PM core releases
+> the PCI device lock. pci_try_reset_function() then returns -EAGAIN
+> without attempting the FLR. Other FLR requests can encounter the same
+> error if another operation holds the device lock.
+>
+> Retry the FLR on -EAGAIN. If all attempts fail, clear the recovery
+> in-progress flag so a later reset request can try again.
+>
+> Fixes: 9c36951474d8 ("Bluetooth: btintel_pcie: Refactor FLR to use device=
+_reprobe()")
+> Signed-off-by: Ravindra <ravindra@intel.com>
 > ---
->   profiles/audio/avdtp.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 56d27b973..b8d9b8e94 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1158,11 +1158,11 @@ static void connection_lost(struct avdtp *session, int err)
->   	ba2str(device_get_address(session->device), address);
->   	DBG("Disconnected from %s", address);
->   
-> +	finalize_discovery(session, err);
+>  drivers/bluetooth/btintel_pcie.c | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
+_pcie.c
+> index 3a555aa50c87..251dd4e2ceb4 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -3743,7 +3743,7 @@ static void btintel_pcie_perform_pldr(struct btinte=
+l_pcie_data *data)
+>  static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
+>  {
+>         struct pci_dev *pdev =3D data->pdev;
+> -       int err;
+> +       int err, retry;
+>
+>         /* pci_try_reset_function() avoids the device_lock ABBA against
+>          * btintel_pcie_remove(): .remove() runs with device_lock held an=
+d
+> @@ -3751,7 +3751,16 @@ static int btintel_pcie_perform_flr(struct btintel=
+_pcie_data *data)
+>          * pci_reset_function() would deadlock by trying to re-acquire
+>          * device_lock here.
+>          */
+> -       err =3D pci_try_reset_function(pdev);
+> +       /* PM callbacks hold the device lock, so the queued resume reset =
+may
+> +        * run before the callback releases it. Retry after that lock is =
+dropped.
+> +        */
+> +       for (retry =3D 0; retry < 3; retry++) {
+> +               err =3D pci_try_reset_function(pdev);
+> +               if (err !=3D -EAGAIN)
+> +                       break;
 > +
->   	g_slist_foreach(session->streams, (GFunc) release_stream, session);
->   	session->streams = NULL;
->   
-> -	finalize_discovery(session, err);
-> -
->   	avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
->   
->   	avdtp_unref(session);
+> +               usleep_range(1000, 2000);
+> +       }
 
+We have to make our mind here, either we use pci_try_reset_function
+and gracefully handle -EAGAIN, or we don't then we must use
+pci_reset_function which awaits for the lock, retying a couple of
+times with sleep won't solve for it for good since we don't know how
+long it will take for pci_dev_trylock to be available.
+
+>         if (err) {
+>                 BT_ERR("Failed resetting the pcie device (%d)", err);
+>                 return err;
+> @@ -3817,6 +3826,7 @@ static void btintel_pcie_reset_work(struct work_str=
+uct *wk)
+>                 enable_work(&data->hwexp_work);
+>                 enable_work(&data->fwtrigger_work);
+>                 enable_work(&data->mbox_work);
+> +               clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags=
+);
+>         }
+>
+>  out:
+> @@ -3841,10 +3851,9 @@ static void btintel_pcie_reset_work(struct work_st=
+ruct *wk)
+>   *     in-flight one (whose recovery will reinitialize the device
+>   *     regardless of the dropped trigger's variant).
+>   *
+> - * The bit is cleared only by .remove() / re-probe via fresh devm
+> - * allocation, which is the intended one-shot semantics: a reset
+> - * tears down and re-probes 'data', so there is no "in-flight"
+> - * reset to follow up after device_reprobe() succeeds.
+> + * A successful reset clears the bit through .remove() / re-probe via
+> + * fresh devm allocation. A failed FLR clears it in reset_work so a
+> + * later request can retry; there is no in-flight reset after failure.
+>   */
+>  static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
+>                                        enum btintel_pcie_reset_type type)
+> --
+> 2.43.0
+>
+
+
+--=20
+Luiz Augusto von Dentz
