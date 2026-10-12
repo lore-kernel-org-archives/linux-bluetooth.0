@@ -1,137 +1,142 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA8F361961;
-	Mon, 12 Oct 2026 09:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313B73D5640
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 10:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791796650; cv=none; b=qIFOgJi6rY8YfBl2n2oXzNevVGrXkCgZOfDV7aNaYdqVigriBdsYhLCjtjFmsPp+SRc/bwqh5BlDRkQBJmDzoBs04xeMngRBdrdylv2/cGX1RY6xJODVaid0LKSJm1Pzj0asfDj92VfLZLKXRXKEHW8QHALTchpJMW7WT8dafUs=
+	t=1791799353; cv=none; b=pOjyv/yG+iXCscsicBr0Fmh6h1yeZp129njF4vXRIACSbi83jx48GSi51myN5U8sJSpx9E7rB6Rx9rguBV0tOpP66NitZzwJ3N4wosEa5EVEojxTHPctL1INffkWU3THWp/KwUncB+UUMFsXEp7wsfZNcjtAPcq0trqD7wkHaHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791796650; c=relaxed/simple;
-	bh=JZfaV6Skd9noWQaft/SPWX8ibTsCB1DjJC1fy1PM21Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uC+TLKOoMxkPU9r+rN6gZXDgoW4LHRs1eCr27Kd0u4Rl2hb3+OwXF+mSg2HVCc8mO4nJbuYDAXnAsZ+PbPeli8r0XRiRA5CYdMKrv1hBsA2VQSSRylMZt7ZoadEwZx5XyqHsPVG7zJFtAiH+P6jpLTttIxUQ9beXn0eMieLclIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gafx0wjV; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1791799353; c=relaxed/simple;
+	bh=vz4XB6ECs5NjPbE0paCAYmIysj8w4KhBpZWhpYkhdYQ=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hAh+eC1uEdKr3SrQnidQHgPPmyol5tKxFIZ02KMVn8/bC2yq1e3CGBXyc3kvcWDeye1PacEtQ356s0uyDwFesXNVUF4GqU7rchSL1HsKSnff35skWr5HVpzA7XqVTr2qyrcVIqsNyUrJcGv3OizjRZlVZxL4SLyhUnLNn8XEiAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rCGVcnqr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gafx0wjV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1791796649; x=1823332649;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JZfaV6Skd9noWQaft/SPWX8ibTsCB1DjJC1fy1PM21Q=;
-  b=gafx0wjVYtH2ApV+lagHVZ/at5Cj5Y/6babxVjfR+Em9RNwsCjJpKunM
-   0K80lTrG86q9+g+um0OGpEg+7k/dDSfG8lSMrNAy5006skn4a9P1c/4Tx
-   Z2Ul2cU1jYqpz3Uyyq8MQnhmmR3TfwoRvBoLHRtzmcOd1+SWRFIX8+Vwt
-   QlXUk+r08bmIzUmbICANcgx2Oy3Y6zg9SiTZNjLSu2246wol4Mjok0v6l
-   LtnSxlI5Scg6vBnrMOkRF7TAEhz1v5ZjflT1KI+1tm6ynxefpk+pQPBW2
-   8oDmsNpxmck+eebebK0DtVT2so82x7pHBu/O1EBtNmdrDFhaWCAKsl0aX
-   A==;
-X-CSE-ConnectionGUID: C35jKtq8Q4mTxzlnvWh2kw==
-X-CSE-MsgGUID: sYb5/KxEQvuqSLJxJQCEqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11932"; a="489526"
-X-IronPort-AV: E=Sophos;i="6.27,153,1787036400"; 
-   d="scan'208";a="489526"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2026 02:17:29 -0700
-X-CSE-ConnectionGUID: TP8ESo+JSSySafOfxY2MVg==
-X-CSE-MsgGUID: kVtISodZSnqz0LgNGf5J6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,153,1787036400"; 
-   d="scan'208";a="2645055"
-Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
-  by fmviesa012.fm.intel.com with ESMTP; 12 Oct 2026 02:17:26 -0700
-From: Ravindra <ravindra@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rCGVcnqr"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83B54C2BCC7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 10:02:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1791799352;
+	bh=vz4XB6ECs5NjPbE0paCAYmIysj8w4KhBpZWhpYkhdYQ=;
+	h=From:To:Subject:Date:From;
+	b=rCGVcnqrdCEbAg5WxsA/iLrbvNPajBDSOEXfxbAeVWeM6RUiCLozi+3eiu2hLRYAL
+	 S1Dw4QYR6SofIEx/Ia8ZfRayivQMTqvlATCxbH396lMUKYHtdE4fNKdqu5Ux8s+1Em
+	 xhEPOxIQNqs/Ch4BTGkULdslEYgfPsI1J208ZgC1+wB16fnBu8PJCaBCdNNhn4Py6M
+	 oxO65f1MWNxI39lpXGdTt7Qtpw/Dcg2moyj7edmiCrBe4sBE0Q1a/fbXGxXB3uKySi
+	 J7lZK3MSgbI38kC8ieCC7xr8WB1g1HlnMfbVpUatZ4NXuDWHyzgG+FvMdQl3fHiRnd
+	 ZdciIYeVGBdGA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5FE33C3279F; Mon, 12 Oct 2026 10:02:32 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	stable@vger.kernel.org,
-	chethan.tumkur.narayan@intel.com,
-	Ravindra <ravindra@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Retry FLR on device lock contention
-Date: Mon, 12 Oct 2026 14:50:17 +0530
-Message-ID: <20261012092017.3275428-1-ravindra@intel.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [Bug 222120] New: Intel CNVi: Wi-Fi roam drops active Bluetooth
+ audio, ACL stays up (8086:e440 / 8086:e476)
+Date: Mon, 12 Oct 2026 10:02:32 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nanericwang@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-222120-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Several paths request an FLR asynchronously, including S3/S4 resume,
-resume recovery, HCI reset, and hardware-error recovery. When a request
-comes from a PM callback, reset work may run before the PM core releases
-the PCI device lock. pci_try_reset_function() then returns -EAGAIN
-without attempting the FLR. Other FLR requests can encounter the same
-error if another operation holds the device lock.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222120
 
-Retry the FLR on -EAGAIN. If all attempts fail, clear the recovery
-in-progress flag so a later reset request can try again.
+            Bug ID: 222120
+           Summary: Intel CNVi: Wi-Fi roam drops active Bluetooth audio,
+                    ACL stays up (8086:e440 / 8086:e476)
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: nanericwang@gmail.com
+        Regression: No
 
-Fixes: 9c36951474d8 ("Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()")
-Signed-off-by: Ravindra <ravindra@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+Hardware
+  00:14.3 Wi-Fi      [8086:e440] iwlwifi
+                     firmware 106.c88d33af.0 sc-a0-wh-b0-c106.ucode (iwlmld)
+  00:14.7 Bluetooth  [8086:e476] btintel_pcie
+  Headset: EDIFIER ClearCall 200, 0C:AE:BD:D3:B9:40
+           A2DP (SBC XQ) and HFP. The device stayed connected.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 3a555aa50c87..251dd4e2ceb4 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -3743,7 +3743,7 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
- static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
- {
- 	struct pci_dev *pdev = data->pdev;
--	int err;
-+	int err, retry;
- 
- 	/* pci_try_reset_function() avoids the device_lock ABBA against
- 	 * btintel_pcie_remove(): .remove() runs with device_lock held and
-@@ -3751,7 +3751,16 @@ static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
- 	 * pci_reset_function() would deadlock by trying to re-acquire
- 	 * device_lock here.
- 	 */
--	err = pci_try_reset_function(pdev);
-+	/* PM callbacks hold the device lock, so the queued resume reset may
-+	 * run before the callback releases it. Retry after that lock is dropped.
-+	 */
-+	for (retry = 0; retry < 3; retry++) {
-+		err = pci_try_reset_function(pdev);
-+		if (err != -EAGAIN)
-+			break;
-+
-+		usleep_range(1000, 2000);
-+	}
- 	if (err) {
- 		BT_ERR("Failed resetting the pcie device (%d)", err);
- 		return err;
-@@ -3817,6 +3826,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 		enable_work(&data->hwexp_work);
- 		enable_work(&data->fwtrigger_work);
- 		enable_work(&data->mbox_work);
-+		clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
- 	}
- 
- out:
-@@ -3841,10 +3851,9 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
-  *     in-flight one (whose recovery will reinitialize the device
-  *     regardless of the dropped trigger's variant).
-  *
-- * The bit is cleared only by .remove() / re-probe via fresh devm
-- * allocation, which is the intended one-shot semantics: a reset
-- * tears down and re-probes 'data', so there is no "in-flight"
-- * reset to follow up after device_reprobe() succeeds.
-+ * A successful reset clears the bit through .remove() / re-probe via
-+ * fresh devm allocation. A failed FLR clears it in reset_work so a
-+ * later request can retry; there is no in-flight reset after failure.
-  */
- static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
- 				       enum btintel_pcie_reset_type type)
--- 
-2.43.0
+Software
+  Linux 7.2.9-2-cachyos (CachyOS build of tag cachyos-7.2.9-2)
+  BlueZ 5.87, PipeWire 1.6.9
+  Bluetooth firmware: intel/ibt-00a0-01a1-pci.sfi
+    version 214-29.26, timestamp 2026.29 build 96982, SHA1 0x239ed887
 
+Audio was playing. Wi-Fi roamed. The A2DP and SCO transports went idle.
+bluetoothd logged nothing. btintel_pcie logged nothing. PipeWire then
+printed:
+
+  spa.bluez5: Failure in Bluetooth audio transport .../sep1/fd0
+  pw.node: (bluez_output....) running -> error (Received error event)
+
+That PipeWire line is what it prints when an A2DP sink that was already
+running leaves the active state.
+
+Local time 2026-10-12, UTC+8. wlp0s20f3 lines are
+"disconnect from AP <bssid> for new auth to <bssid>", all under 20:df:73.
+
+  16:00:38  roam
+  16:00:54  A2DP sep1/fd0 dies
+  16:00:55  roam
+  16:01:12  roam
+  16:01:32  SCO fd49 dies
+  16:01:38  A2DP sep1/fd0 dies again
+  16:01:46  roam
+
+From 15:44 to 16:02 the same ESS roamed nine times. Those three audio
+failures are inside that window.
+
+btintel_pcie has no path that tears down A2DP or SCO because iwlwifi
+roamed. The ACL stayed up. The controller dropped the audio channel
+while Wi-Fi was using the radio.
+
+Boot log, separate from the drop. DSBR was applied. Bluetooth still
+came up. The .ddc file is 16 bytes. The first record is ID 0x0128,
+value 0x18. btintel_load_ddc_config() sends HCI 0xfc8b and returns on
+the first error, so ID 0x0126 is never sent. The caller ignores the
+error.
+
+  Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
+  Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-00a0-01a1-pci.ddc
+  Bluetooth: hci0: Failed to send Intel_Write_DDC (-95)
+
+This is not Launchpad 2088151. That one is Write_DDC -16, then hardware
+error 0x0f, on intel/ibt-0093-0291.ddc.
+
+Same PCI id, different bug: kernel bug 221346 is a shutdown hang in
+synchronize_irq().
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
