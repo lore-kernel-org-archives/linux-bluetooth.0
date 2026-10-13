@@ -1,68 +1,67 @@
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE41477281
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD8E476CE9
 	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791862952; cv=none; b=lCTLBf2oCd32PRcWoxK+Uw8P3oTtDvY+KsGMYDlSS7rsMP/trmjpf4GsZK2yx6TGpZzRFEmJ2yhpQtE6LNKI273eTm0IlwONHIbHrCwuKvF++4QiSESuJ6Nal04E2RoHhO9IgyPGvL7Nz49c5Xe7up4JlukDLxE25/96KpMQInQ=
+	t=1791862952; cv=none; b=li2VSSsjQR45eTFKjQwyIiCd8Y87Jow9X/Wz04Pn32COp36sYGKAu5cvUT7MWzwSkb99w+eU2c7lgm8S38OxXuAmgZBP7pHzQbEN+ZXfMBb0LT6BuDxQEinf6hiSi7hy0VcTyMlTS1Q4qM6Y0V12zBq36l78Za0s4XjgGw6+Lgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791862952; c=relaxed/simple;
-	bh=MW3pyeNZaeTw696bnv759T/r7OXQCBFEDxtk0xrWJu0=;
+	bh=t2Bum7GpUEdOyjJeHInjV042qhA04/3uM5P6PudeGd8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qTORg3Ef1225vJkFY5aD4P7M4uuDx76gn5l/yPJp8/yP5yyxxyfMD4DklchI2/o/5tMamQfYRX3B7tSf6SZO6O4Lnuxu3gnvH56ItORNko7Vu4fdwTLex9EkWWxKK9Rv7/wXH8fz9csWsQrqTindB3tsv+MEPN4mJ1LzEkyOxnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvTS6z9d; arc=none smtp.client-ip=74.125.82.172
+	 In-Reply-To:To:Cc; b=tDw4+sDyJsPHsiKinpNQt8893nmt2K3UQTYrJrac7/AGknMdRUJfbV4h1wHGRXzm7K4Z9ykTePWrS8jsijh/5qC438Iz4iMX6txws2Yf/1G2r4wwHhQPudrbovBjtmdrLRVNA8Jtxejyzf7wLBnEXA+ODXFFUZA+FBDU/0Ikzk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V5rw3nli; arc=none smtp.client-ip=74.125.82.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvTS6z9d"
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-3282db206d3so4784073eec.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5rw3nli"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-35829219da8so2217489eec.0
         for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791862949; x=1792467749; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791862951; x=1792467751; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=YRRv98G9cn0AlpTayBXQFsFs2oRDwoIU3+IQF5Vkek4=;
-        b=NvTS6z9ddnomUVb+xpfL3J4iJgBwGQjFiSH5xHwT8J+Sa8qImtpb+vmaTVF/tZBm1r
-         8GeEGIgakQJGcuVqPE3S4sjpSgEoSxg51rA/SEfqR4Q1sLd+Q8lJf0xnTn7mM/+t5rhT
-         V/79Jh7JBFhuP/HRmYGopf8VYWe1PhKE4LCX2UvqwM68deuhagRlb7oeZnWj/JDHH9iF
-         nuAPkwLXe4VVFQ2gSBYw5xlxVaeywV5QwEJDvb2kbYAwwoYUtFuLdy5N3ruaCCzasehQ
-         Glfn5GqwbV2jq88HF3tQGHQ7bX1/Xza9uMhYD0G4D2WciLhPofLzXgFgWG4N0FQ87Oq/
-         X+Gw==
+        bh=WE6Vuhv/fDlAsuH6U6LTbJbfMX4hUE168v6aPJguThM=;
+        b=V5rw3nlixE6Dw1mMRaZDMEG2Rdj2yepUVKmxY1sXheLKIkVBAvmyFzBE/2OPVHKcD6
+         VxLR8GJztz9lTMlotx9RtwnvTV/Pyg1sj4nq3A7X3v7W1fIDjqvGwTQmOjwnigEsy1Lp
+         pQ8YPzy/92C2VtjGrIppTuHb8mKt4CooPfN3LgfAe1a7J8YxRur6ZqW7vtDeqqXQWGHp
+         foIa7vF97yVZFO9VBAOD/2D2AeNC4AKorLhb9yBHew5wnNvd8hMTXsoDbSaSI0cx9YUM
+         5CcoOJtOEarmGVXZmI3wBQ6oZwnWUqzzoPznJRADrwHiXOTqfiVrhYKLG/KE6I0xveqq
+         JpxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791862949; x=1792467749;
+        d=1e100.net; s=20260707; t=1791862951; x=1792467751;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=YRRv98G9cn0AlpTayBXQFsFs2oRDwoIU3+IQF5Vkek4=;
-        b=o4q9aiG/1pF8VBLZX0tCy3C9NtGUrYYj5oTrvXBspFcFN+WVZrTteZTvZoeObNOd5K
-         M2RGuhqm9DL51sNXEEtBrUmZZt0og0PZzpEqQJdCCKKYbd/sNKw0Bn9Qv6qinliCRQdY
-         a/5jzmIiRq/NGEE/jSA2sBI5nrw/bE7HzhYKLQEKHU78Bny8nSGEhyfqfVUKlN3DWbhy
-         0Cl66ihI1hDP2ZivXK84n4ukI4ZKbMBMii79RBmyiGSXUGLU1x2+kds1eCBnguxgrcbT
-         zh6HAxX7MTfNmwERO9tcHaj0KdzHGk32oCxbeMhMCqVujl06rQigcjytQqS8Rs0hZevo
-         hXLw==
-X-Gm-Message-State: AFq9FYLYLZk/qEmVP+PfpXOnx7JXjsfndXy2Soa5+npt8eBTxbKu1t76
-	+IMwUtb5PmC3JZ+sZzVhP0U/PUqEw1vYMgBHCbTeO6Csf7NBbq/MAoUg
-X-Gm-Gg: AYBFou2AjqkNQ43Y43h4D923eY/qMTFBT8wl/WCefMjoRJSydWF4f2ePGozvdZnvYt1
-	MdHaeFQPzOs9WXgrw06j+5CBq2kUZtRKCiF3zg6TRogZALvqKuMiI6TuxLkTly2UOBjtgmyArkW
-	yfp5YPqa4w2URUvweUsAKEBxSqA+QDxUZW4QNKhh0VSnbPULj/Zj8zfOMTDDh1WYXNVc+DOkSc2
-	gzeIOMeECKE+h4vrv1AUXgcoJ3YRUbUfHAGYY82x0IHQxElrbr0t5vMPJbG8AjW0MZTcP2yXCkM
-	MafkLCMsvYJhE5nlZcujHEh5GEA2WbwYw1NqMCCgziwusfFSXOBv3z0tNXeeMU8XzTC68QlmfYU
-	8jKzbe+nK+ZWbbhA3lxa51/2uIw/pqmxF6Da07PrXqJWnbrx02oW9YIGch8x9D2FLK/1KJ2PUIJ
-	1q6rCPuRH+iNqDYXj0u7CkthcePrFOBtHzH7wmeT0a8H1BQpZwtPl0Hq/Q9C2ntHsieaDitNjX3
-	Veu0lF2XcJ4zuu+sXCwCemyzUv0+Byh1LpiMCcdGTgnz6WdXC7xuxEhbJpVcQc=
-X-Received: by 2002:a05:693c:41c7:10b0:353:5cf0:df09 with SMTP id 5a478bee46e88-3537df8d300mr16954343eec.8.1791862948560;
-        Mon, 12 Oct 2026 20:42:28 -0700 (PDT)
+        bh=WE6Vuhv/fDlAsuH6U6LTbJbfMX4hUE168v6aPJguThM=;
+        b=oilqjwaHISgqwqIJ6nfAC6Kz39NKU8IFcMtnUJD0M03/3tfIhKgrkWcJGvaM/YTlNp
+         OPVGasByu330p6WaQ4Qaf1BoQEie17+GbvIqJognKKoTM2Ri5wi6URxpol+kHmoCwGgH
+         JuVPezvfs4lO7TGutiq1PZiHT+yRbnmbKabPGve8Uk28snUTUS6tszKIJC4cdR4C2OKm
+         mSoq5tl6gsyvbPdyCgGTCeHKZDd0zyDMWb1Yg/NlbXuUbp81Glv1lgKhvCOICBHFkAFe
+         stUNMBpFIZ0Q4umgXX7a4UoMZtZHBfVk67oDWTMSU8KO3QqqERaKX1XLYWkrE6Wwbxc4
+         skRg==
+X-Gm-Message-State: AFq9FYJVE+LlEvqUflAjCTft2seObOBrKniqDCCxR0KeVnFi9d8kqDOe
+	lFcaVpkMbgSBkFvkeznW0se1SevtX2w3p/dl4AzN2ZF8lWK4jMSx4Ocg
+X-Gm-Gg: AYBFou3UfDwddOBtLS5vPGV+apMk7hzh8O4PJU9UCdGU8oXG3xa+b5DFsDbkb9NntFP
+	U8mIZfT3w6mwuvEoZOHGka7e6tX1pXrDpn/tPOdM4JuJmIkbkLVJIESTWCK0FBHDUmGM4IGM83V
+	t4uisNgLxrMq3h2fyN1h/sY78KWgevzyT9JbgaFAi1a8WJy9+t3Nvxco3OwXJyi/R/qN3C314Rv
+	dZ0JeelSV2kG7mTZwlemNK6OB1rvje8idLLLci2OkKKsM3J8BLHyiRvziBGMqUCNCKvEFYpxwn6
+	+RH3A8v3o8YLEha7Ob2nbrKP0uV3+Q7CiTVvGWNwxfd8kfQwMUDPla6xeYtC+otKK5pQYQLjWBE
+	RpiAS/HPbprLb3ST3KpIZ9yZLief7gXQmcm2lskbR8hLqCOha2CfVNRM0TJFqJX9SaQ3JqUlRgb
+	HdmibUO9vmAN58BCXjGVHHsiCymB+LeQ8mJBlqtCmx0vB+MDupldbgc32x5ZX9kCQdaDuuvRC+9
+	6irxAObPS5yQ1yeOxUJJQjmLLWsxK+VdFS+vRVT7Boxv7nwYuBD8QrlQkXy/Tw=
+X-Received: by 2002:a05:7301:6794:b0:351:606f:2832 with SMTP id 5a478bee46e88-3537df77e03mr21347424eec.3.1791862950452;
+        Mon, 12 Oct 2026 20:42:30 -0700 (PDT)
 Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:679a:f35b:7c29:e0f2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.27
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 20:42:27 -0700 (PDT)
+        Mon, 12 Oct 2026 20:42:29 -0700 (PDT)
 From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Date: Mon, 12 Oct 2026 20:42:19 -0700
-Subject: [PATCH 3/9] HID: core: Reject mixing numbered and unnumbered
- reports
+Date: Mon, 12 Oct 2026 20:42:20 -0700
+Subject: [PATCH 4/9] HID: core: Validate GET_REPORT report ID centrally
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,7 +70,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261012-hid-core-report-validation-v1-3-e0dd5cb60b2e@gmail.com>
+Message-Id: <20261012-hid-core-report-validation-v1-4-e0dd5cb60b2e@gmail.com>
 References: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 In-Reply-To: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -85,39 +84,80 @@ Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-input@vger.kernel.org, Shashikirana H K <shashikiranah@chromium.org>
 X-Mailer: b4 0.17-dev-e56a4
 
-According to the Device Class Definition for HID, if any report of a
-given type includes a Report ID tag, all reports of that type must
-include a Report ID tag. Mixing numbered and unnumbered reports within
-the same report enumeration is invalid and causes confusion when sizing
-and parsing incoming and outgoing transfers.
+Several transport drivers and device drivers individually check whether
+a successful report retrieval response returns the expected report ID.
 
-Reject descriptors that attempt to mix numbered and unnumbered reports
-within the same report enumeration by warning and aborting report
-registration.
+Centralize this check in the core HID raw request path so that all
+report retrieval requests verify that the start of the returned buffer
+matches the requested report ID. Introduce a new quirk,
+HID_QUIRK_IGNORE_REPORT_ID_MISMATCH, for hardware with buggy firmware
+(such as the ASUS ROG Flow Z13 touchpad) that returns mismatched report
+IDs on feature fetches.
 
 Assisted-by: LLM
 Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 ---
- drivers/hid/hid-core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/hid/hid-core.c   | 11 ++++++++++-
+ drivers/hid/hid-quirks.c |  2 ++
+ include/linux/hid.h      |  2 ++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index a33e864a25f9..3a9bd56dbf85 100644
+index 3a9bd56dbf85..cd099a420b9b 100644
 --- a/drivers/hid/hid-core.c
 +++ b/drivers/hid/hid-core.c
-@@ -96,6 +96,12 @@ struct hid_report *hid_register_report(struct hid_device *device,
- 	if (report_enum->report_id_hash[id])
- 		return report_enum->report_id_hash[id];
+@@ -2565,8 +2565,17 @@ int __hid_hw_raw_request(struct hid_device *hdev,
+ 	if (ret)
+ 		return ret;
  
-+	if ((id == 0 && report_enum->numbered) ||
-+	    (id != 0 && report_enum->report_id_hash[0])) {
-+		hid_warn(device, "not allowed to mix numbered and unnumbered reports\n");
-+		return NULL;
+-	return hdev->ll_driver->raw_request(hdev, reportnum, buf, len,
++	ret = hdev->ll_driver->raw_request(hdev, reportnum, buf, len,
+ 					    rtype, reqtype);
++	if (ret > 0 && reqtype == HID_REQ_GET_REPORT &&
++	    !(hdev->quirks & HID_QUIRK_IGNORE_REPORT_ID_MISMATCH) &&
++	    buf[0] != reportnum) {
++		hid_warn(hdev, "mismatched report ID %u (expected %u)\n",
++			 buf[0], reportnum);
++		return -EINVAL;
 +	}
 +
- 	report = kzalloc_obj(struct hid_report);
- 	if (!report)
- 		return NULL;
++	return ret;
+ }
+ 
+ /**
+diff --git a/drivers/hid/hid-quirks.c b/drivers/hid/hid-quirks.c
+index 96a36c5ba04f..0ea592d1c9e7 100644
+--- a/drivers/hid/hid-quirks.c
++++ b/drivers/hid/hid-quirks.c
+@@ -37,6 +37,8 @@ static const struct hid_device_id hid_quirks[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ALPS, USB_DEVICE_ID_IBM_GAMEPAD), HID_QUIRK_BADPAD },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_AMI, USB_DEVICE_ID_AMI_VIRT_KEYBOARD_AND_MOUSE), HID_QUIRK_ALWAYS_POLL },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_APPLE, USB_DEVICE_ID_APPLE_ALU_REVB_ANSI), HID_QUIRK_ALWAYS_POLL },
++	{ HID_USB_DEVICE(USB_VENDOR_ID_ASUSTEK, USB_DEVICE_ID_ASUSTEK_ROG_Z13_FOLIO),
++		HID_QUIRK_IGNORE_REPORT_ID_MISMATCH },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ATEN, USB_DEVICE_ID_ATEN_2PORTKVM), HID_QUIRK_NOGET },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ATEN, USB_DEVICE_ID_ATEN_4PORTKVMC), HID_QUIRK_NOGET },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ATEN, USB_DEVICE_ID_ATEN_4PORTKVM), HID_QUIRK_NOGET },
+diff --git a/include/linux/hid.h b/include/linux/hid.h
+index 8d17b741638c..8f5e485b1351 100644
+--- a/include/linux/hid.h
++++ b/include/linux/hid.h
+@@ -388,6 +388,7 @@ struct hid_item {
+  * | @HID_QUIRK_INCREMENT_USAGE_ON_DUPLICATE:
+  * | @HID_QUIRK_IGNORE_SPECIAL_DRIVER
+  * | @HID_QUIRK_POWER_ON_AFTER_BACKLIGHT
++ * | @HID_QUIRK_IGNORE_REPORT_ID_MISMATCH:
+  * | @HID_QUIRK_FULLSPEED_INTERVAL:
+  * | @HID_QUIRK_NO_INIT_REPORTS:
+  * | @HID_QUIRK_NO_IGNORE:
+@@ -416,6 +417,7 @@ struct hid_item {
+ #define HID_QUIRK_NOINVERT			BIT(21)
+ #define HID_QUIRK_IGNORE_SPECIAL_DRIVER		BIT(22)
+ #define HID_QUIRK_POWER_ON_AFTER_BACKLIGHT	BIT(23)
++#define HID_QUIRK_IGNORE_REPORT_ID_MISMATCH	BIT(24)
+ #define HID_QUIRK_FULLSPEED_INTERVAL		BIT(28)
+ #define HID_QUIRK_NO_INIT_REPORTS		BIT(29)
+ #define HID_QUIRK_NO_IGNORE			BIT(30)
 
 -- 
 2.56.0.385.gd3acb90ef8-goog
