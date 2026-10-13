@@ -1,164 +1,138 @@
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5BF47F2D6;
-	Tue, 13 Oct 2026 03:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FE647045E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791862530; cv=none; b=hQYWUFiF/f5WeNt/Nf6VHfrJ0k2VbqaiMBiuD9Iwb4LQDEXqmWJtrttFUhN4PFpMOxvjU99C6UZMQT1I5q6vrsKvH0LkYRlVmBmF7JfpsQb49CRypmHk2etzKl2T1bYcUEllfql5FYFHOBxaZRRytE8Ip0ijINqsRwG0wGHnXdU=
+	t=1791862945; cv=none; b=Eu/hxG20WwTzeO+v0q0Tgy0uDPgHjWmhTtxre9P+EM0DD6oZMx24+7EupCzGo5EC2qs92I0BTVFjYtK6/cLvnOBH3GwfZasyIM6MsveM3dlPBOWyYbtLu9+zwZcRTT8jgAG4wAlukRQAcN6KZp8Vw+llrA0xTtNm/VzTae6eyio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791862530; c=relaxed/simple;
-	bh=L0CmOLzhEVZkAmovFu48aO1CJgyIUR1itwOkk+4JmYY=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ZGKIA7uAvxHOtVgezTyUNvKk8TzYVMg3KVV9vcCsZ6cWEvhK33bOMQIw0v0KvcbCXWflAEyxF7lBJZm15MZHwOM7NP2QFGmRXhvCnftCLBD31YsXniKRCy2BjwP8FulXclVU/zHLqhhfkT6/5L5KWPxjrFpPH2sBPlRXGS57ub0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=pwIrqbvF; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1791862945; c=relaxed/simple;
+	bh=r+0rEvl16tl5MFS7IvaIWOTr/Pw7YJ+JGqq+rLFp9v0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=vGhRPBK2BBi6YXSlwRFF7DBqsOS5c0KyqWBd/EorjpMfXl7aAW4hKhDPAqHOlU3UHmHPHoi6aTf3lHP1/yKpfsnZyhtr0P6mFBSZEkKpQzVanmTehc1+mle3YU5V6aF/sdDw6xHTWBgKkyTDYsq76SuxmvkwVcmCrv8uC+2Uszo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSTvWEGG; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="pwIrqbvF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=73qcnm4bcva5xlomlaotnvt57i.protonmail2; t=1791862513;
-	x=1792121713; bh=czucG6/gefShWABLoyCoPYi9u23tHXRXHZure9Zps0s=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=pwIrqbvFvvpyHgIZy0JGwXhV1o2aZv9Eu3+UNh/loSrNWHxmeYJPaOtV3naDCWYSH
-	 Ujv0iGJglxg6ewdRgGS1/ZNziOfh4r0k10ePow+tj1B8cUOKTiFa6wKSUX55LgMBiK
-	 hJdY5NEr+O0rri5idTYOIG5SNOVRshe38tuTxMchg/2K99DQLO439enofPXLwIifJ9
-	 pPjPnv4TSH5B4nBhOshHidZr0UifK9QhIhfXg3dpiWy6i/t9cNWgAyZdb0byvCnkjs
-	 ZMYxnbcwHNuEj3dNlZZDf0IrLzgm7UdNo02rh5yMJUOwkD1mFLhowy+5mPI2LbWxqP
-	 jcPcxoKRHx6MQ==
-Date: Tue, 13 Oct 2026 03:35:09 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] Bluetooth: hci_event: negotiate LE Data Length after features
-Message-ID: <20261013033452.505349-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 7d3226e35ef6399e5338b354278e0e0364c6bf68
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSTvWEGG"
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-35aa0cf7c40so1796288eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791862943; x=1792467743; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=FcWhYyMaObwSepUpV7jMJrwtLJljkaTCoJTBVFoTJKo=;
+        b=SSTvWEGGy+9t+x43ncKuQSN+1W/Mmf6qGJgTVIcQWn3hBDHT6eaWSx/kKyU1HvwGLO
+         GbW0rzpiuIHU+5wG1ohOfQIvFH1paE6VUtcHd8IC+XQjrK0SA/Hf0u2U6waAhP95FiI/
+         8nEbfsS4cihUFXupVXEDofG6ZW+9YHxgERFl2z15e23f5EOB72eLKEW0BUXOWsEMBbbb
+         GU8t+mK+jEEpwPDAbnR4CbAq7BlquaYuoFkgDaiok5gHS0feosILKNW7GVGfMuRpLnOP
+         xCd2CU3l4eYrBG5rzRvuAaEDV2B2aqJk+G023onWsVpZXVesNOeSVva3cvBSFt5QU5fa
+         jDhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791862943; x=1792467743;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=FcWhYyMaObwSepUpV7jMJrwtLJljkaTCoJTBVFoTJKo=;
+        b=f9pBDCmf97hw7bI5fxU7tC6Yyr+2wzY/E2dbNnhtSk7NJOb+cWf4ubZUvACX1H6owr
+         f/v0IJ9urtQ3DFjbz0yxo5KVQHOVBo6ZxaOl7yWej9VDs7+pTDdPYPxASnzDwaDCnWeM
+         oBIfjkE57+F/OJbK88YgcbkspBiVtBicDGU+6ys48dsidIjV6BDpr3XVJhLWviqLnNLd
+         WC6nkOnAGkpDJ05iST9AGZJxUaHuW2PBwZbXLay6C8umAa3DC2NA/+murO9OjauW5Uqv
+         3o+FXs1d7sWzdtmDfLj7x8dLT8zH0FmGxHua74wg2ifCfMw3ueumqutP9P/YeqHXr84j
+         tWBA==
+X-Gm-Message-State: AFq9FYI1bIR+v0b7JP28NcWR397ONBxic133Mprmz3skYjR9HJy4FjZ5
+	GMB03LMCzxWCwufv2atdmRgZEQMKZYJl9uDg3KMbeD7jYfgKsW4VC0lh
+X-Gm-Gg: AYBFou3l1GCbmCyVWo4Hh6gSDgWnlTPHeUuhuS6LHeKg0YEjgPftgHYJHcKHKINTuOv
+	kabrmh+mk9r8/9EcN6+Q1ScaZD5NolMtpVvzxsCVJGgym/pfNxAI0Cv7wSARn4aij2uZVIA2rR2
+	XFeB8N1Hu+L3XX7qhmKL2Z/3fnwv3x4GGW75CTmhjlO2sIdh1HeJ/SRLH+Y32x1+LGJUlBEyLgP
+	jGjDf4c7vnA5teY3bFVnlcoMr/2JUULNJ9yKkK1i0f/PwB3vPhfvu8URmpSeRrFY5WuUYgsrRLi
+	ILdqBsslWxjk3KeL86+OZOMIWEEDtfiPK3JFtvdF9pvnw7l+B3XEqrgusFG9wzsHhiP9M5zzrfe
+	ma6TZd+/g+0TwWoH1BMLlQ+WK1nVmDUTVtUmMRiQiJ6mjKWIX5T0x9xRphbtFP5aId9Axkxn6y0
+	vAw70LE5tI4EOy9diPZhPyL/P4ZdJrMxiLMNdVZQFDKtld2VHwWBvoh5vr23JH+W6aV7tVEwipW
+	ir7L7PrN5sE+/8MIyxpZCyHjlirMzyPzuEw9+xvEO3jNZ1Xprc2HxS5ZcZLec85Me5Swp+qlg==
+X-Received: by 2002:a05:693c:87c8:20b0:358:90dd:78d with SMTP id 5a478bee46e88-35890dd07bemr11938388eec.19.1791862943383;
+        Mon, 12 Oct 2026 20:42:23 -0700 (PDT)
+Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:679a:f35b:7c29:e0f2])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Oct 2026 20:42:22 -0700 (PDT)
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: [PATCH 0/9] HID: Hardening report validation and unnumbered report
+ handling
+Date: Mon, 12 Oct 2026 20:42:16 -0700
+Message-Id: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJiozWoC/yXMwQrCMAyA4VcZORtYK3PFVxEPMY1bxlhHWocw9
+ u5WPX6H/98hi6lkuDY7mGyaNS0V7tQAj7QMghqrwbf+4lrncdSInEzQZE1WcKNZI5WaYWAKXTy
+ HjqmHOlhNnvr+zW/3v/PrMQmX7xGO4wMYWcr+fgAAAA==
+X-Change-ID: 20261012-hid-core-report-validation-8ca85d385ca7
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ David Rheinsberg <david@readahead.eu>, 
+ Frank Praznik <frank.praznik@oh.rr.com>, Jiri Kosina <jikos@kernel.org>, 
+ Benjamin Tissoires <bentiss@kernel.org>, Even Xu <even.xu@intel.com>, 
+ Xinpeng Sun <xinpeng.sun@intel.com>, 
+ Roderick Colenbrander <roderick.colenbrander@sony.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-input@vger.kernel.org, Shashikirana H K <shashikiranah@chromium.org>
+X-Mailer: b4 0.17-dev-e56a4
 
-Request the controller transmit limits once both peers support DLE.
-Queue the connection with a reference so pending requests coalesce and
-connection deletion cancels them. Check the connection under the device
-lock before constructing the command.
+This series improves validation and consistency across HID core,
+transport drivers, and individual device drivers for numbered and
+unnumbered reports.
 
-Assisted-by: OpenCode:gpt-6.1-sol
-Signed-off-by: Kyle Pepper <cochcoder@proton.me>
+Bluetooth HIDP and HID core report retrieval handling are updated to
+properly respect the kernel convention where raw report request buffers
+reserve the first byte for the report ID, using 0 for unnumbered
+reports.
+
+Report descriptors mixing numbered and unnumbered reports within the
+same report enumeration are rejected in accordance with the HID
+specification.
+
+Report ID verification for successful report retrieval transfers is
+centralized in the HID core, with a new device quirk to accommodate
+buggy firmware (such as the ASUS ROG Flow Z13 touchpad). Redundant
+report ID checks are removed across the I2C-HID, Goodix SPI, Intel
+QuickI2C, multitouch, and PlayStation drivers.
+
+Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 ---
-Submission review notes (not part of the commit message):
-The user reports that retaining the explicit DLE request enables the N8
-to disconnect automatically after audio stops, whereas removing it
-leaves the device connected. This idle-transition behavior is the
-reported reason for retaining the topic, not an in-stream timeout.
-October 9 no-DLE trials already negotiate TX 251 octets / 2120 us and
-stream successfully; startup throughput alone does not test idle behavior.
-The supplied captures do not establish a controlled post-STOP comparison
-or the causal mechanism. This patch requests data length during setup;
-it does not itself implement STOP or issue a disconnect command.
-The claimed ASHA idle-disconnect requirement needs a protocol citation.
-The corrected ownership implementation is included in the working kernel.
-Native disconnect/handle reuse, LL ordering and post-snapshot races remain
-unproved. Submit as an independent RFC with these limitations disclosed.
+Dmitry Torokhov (9):
+      Bluetooth: HIDP: Fix GET_REPORT and SET_REPORT for unnumbered reports
+      HID: core: Fix GET_REPORT input processing for unnumbered reports
+      HID: core: Reject mixing numbered and unnumbered reports
+      HID: core: Validate GET_REPORT report ID centrally
+      HID: i2c-hid: Drop redundant report ID validation
+      HID: goodix-spi: Drop redundant report ID validation
+      HID: intel-thc-hid: Drop redundant report ID validation in quicki2c
+      HID: multitouch: Drop redundant report ID validation in mt_get_feature
+      HID: playstation: Drop redundant report ID validation in ps_get_report
 
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_event.c        | 10 +++++++
- net/bluetooth/hci_sync.c         | 47 ++++++++++++++++++++++++++++++++
- 3 files changed, 58 insertions(+)
+ drivers/hid/hid-core.c                             | 26 ++++++++++++++++--
+ drivers/hid/hid-goodix-spi.c                       |  5 ----
+ drivers/hid/hid-multitouch.c                       | 32 ----------------------
+ drivers/hid/hid-playstation.c                      |  5 ----
+ drivers/hid/hid-quirks.c                           |  2 ++
+ drivers/hid/i2c-hid/i2c-hid-core.c                 |  7 -----
+ .../intel-quicki2c/quicki2c-protocol.c             |  6 ++--
+ include/linux/hid.h                                |  2 ++
+ net/bluetooth/hidp/core.c                          | 29 ++++++++++++++++----
+ 9 files changed, 53 insertions(+), 61 deletions(-)
+---
+base-commit: b018686719706a781c45a874ed51374a2dc4b767
+change-id: 20261012-hid-core-report-validation-8ca85d385ca7
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_s=
-ync.h
-index 59cb918d1..5a37d3e50 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -194,3 +194,4 @@ int hci_le_read_remote_features(struct hci_conn *conn);
-=20
- int hci_acl_change_pkt_type(struct hci_conn *conn, u16 pkt_type);
- int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys);
-+int hci_le_set_data_len(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c055d16cf..4035f2659 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6846,6 +6846,16 @@ static void hci_le_remote_feat_complete_evt(struct h=
-ci_dev *hdev, void *data,
- =09=09=09=09conn->le_tx_def_phys &=3D ~HCI_LE_SET_PHY_CODED;
- =09=09=09=09conn->le_rx_def_phys &=3D ~HCI_LE_SET_PHY_CODED;
- =09=09=09}
-+
-+=09=09=09/* Request the controller maximum when both sides support
-+=09=09=09 * LL Data Length Extension. The Link Layer negotiates
-+=09=09=09 * the remote limits (Core v5.4, Vol 6, Part B,
-+=09=09=09 * Sec. 4.5.10).
-+=09=09=09 */
-+=09=09=09if ((hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) &&
-+=09=09=09    (conn->le_features[0] & HCI_LE_DATA_LEN_EXT) &&
-+=09=09=09    hdev->le_max_tx_len > 0x001b)
-+=09=09=09=09hci_le_set_data_len(conn);
- =09=09}
-=20
- =09=09if (conn->state =3D=3D BT_CONFIG) {
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index efbd2e538..20c690007 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -8123,3 +8123,50 @@ int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys=
-, u8 rx_phys)
-=20
- =09return (err =3D=3D -EEXIST) ? 0 : err;
- }
-+
-+static void le_set_data_len_complete(struct hci_dev *hdev, void *data,
-+=09=09=09=09     int err)
-+{
-+=09struct hci_conn *conn =3D data;
-+
-+=09bt_dev_dbg(hdev, "err %d", err);
-+
-+=09hci_conn_put(conn);
-+}
-+
-+static int hci_le_set_data_len_sync(struct hci_dev *hdev, void *data)
-+{
-+=09struct hci_conn *conn =3D data;
-+=09struct hci_cp_le_set_data_len cp;
-+
-+=09hci_dev_lock(hdev);
-+
-+=09if (!hci_conn_valid(hdev, conn) || conn->type !=3D LE_LINK ||
-+=09    (conn->state !=3D BT_CONNECTED && conn->state !=3D BT_CONFIG)) {
-+=09=09hci_dev_unlock(hdev);
-+=09=09return -ECANCELED;
-+=09}
-+
-+=09cp.handle =3D cpu_to_le16(conn->handle);
-+=09cp.tx_len =3D cpu_to_le16(hdev->le_max_tx_len);
-+=09cp.tx_time =3D cpu_to_le16(hdev->le_max_tx_time);
-+
-+=09hci_dev_unlock(hdev);
-+
-+=09return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DATA_LEN,
-+=09=09=09=09     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+}
-+
-+int hci_le_set_data_len(struct hci_conn *conn)
-+{
-+=09struct hci_dev *hdev =3D conn->hdev;
-+=09int err;
-+
-+=09err =3D hci_cmd_sync_queue_once(hdev, hci_le_set_data_len_sync,
-+=09=09=09=09      hci_conn_get(conn),
-+=09=09=09=09      le_set_data_len_complete);
-+=09if (err)
-+=09=09hci_conn_put(conn);
-+
-+=09return (err =3D=3D -EEXIST) ? 0 : err;
-+}
+Thanks.
 
-base-commit: 964430c038967fd06643e866f68115664e1a1bd1
+-- 
+Dmitry
 
