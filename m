@@ -1,155 +1,115 @@
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3FD47A88D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 23:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4EC4EBAE6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 23:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791934555; cv=none; b=U06mPqiQccivuh2MlA9FPY/YgVHP8fo9E6BEa1JKh9BKRXuHFV7tkLXmGCsRmUr0K0OC7eg/omKjitixvL1fZULQAz46Cmqc6MGQn7dAHJ1BkcdDJZhxt791ZvWAveMnQubiuPUzNLDeiGjEMPdnSnfGO8jpS7M7nQtPXzoyZAY=
+	t=1791935584; cv=none; b=WQ0UA7n+8t2yhN5Z9do6xDc2XzTQ1u3tltNYyvhwOEYxpA2D+NEeBZGgQCTnWpSlpv67fLvobUBsixc88SZH1+tqEMtOqWYhGFa3Mqv8aZ99tcf07kiGB7tf6gWKJlsyUfWWJQNJbhVXK07/lLm2acpNy2lorM/7dfbLMO25NpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791934555; c=relaxed/simple;
-	bh=hKuzHhQ1AvSETF8XGUydiDZlFtzoU6214nbtFhLBtS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sa7xPAds1SGbkHcmb+CPY/1vn42OLHNYVshNsx3OI7UL1m8G5vXFfLIBPW4HIBzjKD430ZBPuYlE44m1PVQraDp/xyGTBL5s7ZFYn86S8h6QDxJz+/ZImLt7ERRi6sAXCIfLuj9/iniGaNCcqEJrZnvTYm7ooHaiKLcwvkls4Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UK0G06qA; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=canonical.com
+	s=arc-20240116; t=1791935584; c=relaxed/simple;
+	bh=8KefpZ8+e0reqMoRnV/hd5iC+FHXWJeq7Rj/49B4znM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lJ9uiRhZUVAmJIBUUy8ABGEjoNodXp0396owsc1+ijn/MobBX2jLD+BfMLSjabvKxbkiY5oMhKmSeEqncy7Yy+bSSuGyliySw4PabheJafkAhfkxpA04XJ1DZOVam1uG3w1476bMtRopD/iNywHZUwBHAt9ATX9Dq7KiDRdg70U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbGDi3QN; arc=none smtp.client-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UK0G06qA"
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-30b6dad2382so8165055eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 16:35:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbGDi3QN"
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-33c2520ad38so8151083eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 16:53:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791934553; x=1792539353; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=oUD08xhJaRRxHhZLFhhFLw3lNVBGk+s6r/0ppwaV3jk=;
-        b=UK0G06qAO6cH5kOagZH9MOzvCu2uq8DTDs5mSBBfQjEOOeLrNKZ53nUUrax424vKfb
-         fpihEa7SfhcAYyagn4Xc/feiqrrgVMnN318sB11BjGMgbEIuPfG3jaUWJTNcFQqHmgBR
-         iOZAvIHo+0RSggFEp1YXRVpIh8fsp7jRi+Qf33FQvsbMl1njxRpnDU/XW/50hRjwH+3E
-         ax8KtbUcmyh6GQZNUbQqWCyysD3k1q9PpRzXp58ejVJYS764obke/urG/m+b5EF2Fwsb
-         HyKzN2Q3Ouz8a3cHVWQWh1p/KXreGYBcr229zDfwgRFIMDjMCRzRR34H4XQQtqpcKrm8
-         K6Pw==
+        d=gmail.com; s=20251104; t=1791935582; x=1792540382; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=C6tJTEHrYgFnbnR6qIBmkaMJcmJMRpJvNA5Y0NJAJrg=;
+        b=GbGDi3QN00HIC9i/wHlRH2Nv2IPsfR6pznN4D47dQtonV7QYZyox6nxjDtRAXXq6V0
+         RSo/JeW7uOymFYVmcOMSXxsSGJJMnCVTwJ7sEmpWyBOA8Vo8YqWyataFMa58Yzq7VyQT
+         w9eC2gCgr54zIP8t4Xl7Yy4KMCHp0umKt4b/7vQ0EBhN9mC6IDOjNtxMt+2bC0g047H8
+         2i3Or12VhXD/m6XcmeNtWXma1qtM0UdvMMjv9XwEmBwmjKh84hd45wJlpH2zwiHUbAh5
+         wXkboqSF2YCJPzrQqSL1cnnAJwYh1rugzsjALdX8zF80c6bvQGcF2ZZoK9hRlbXWNkKg
+         7YpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791934553; x=1792539353;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=oUD08xhJaRRxHhZLFhhFLw3lNVBGk+s6r/0ppwaV3jk=;
-        b=xn/VYW1yxa4HdCz6DnQoAiIoVZQK27p5Sq0m8vHF/PfnvOrGU9QaEzrn0BGxU/7NCr
-         wFK+Va2LWXRaj2+vKShjfQ+4gKSzK7X3hqP2C9s6yAA6UUhm3xUSdoNhmzY07PMcs1rD
-         n5nGmbwg4N9Dfuej3aiWBd+9eFATdgLnb82WU7hVphgONQMeMSUIMFvSvE2qg/XIMafI
-         4M8mwXLVtKc13JrXtCLhESNJ3AFADsMVvAhuf17bUKwQqEk3SYhniHUp8UWijlLyidNv
-         in/ocz/6F4Dw+TGdKM02l/XuTgS/OHngb2wu3LUIlyDns5zfWrHbqjIp2YbB3WAN8tOy
-         mR1w==
-X-Forwarded-Encrypted: i=1; AKwUvBwga3fvhAsCw+8sM/jOQO8ozCrkGBskqFrbRks6YePZC3ZJAPimiQWCzJlfV/BOcplbzTsV2ToRsToWsgjN9m8=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKa07IcOs0AWN1ahMaWUNs6VYprxNIjHPsaLvpUrDqRQO6zYAtI
-	rS1lTpOiHnmhWgXVlXl4rqHoT3W5YefgvsrM5ieQoz22xy1Y4enwCben
-X-Gm-Gg: AYBFou1YNqvJJGHz2eoiuvoEOyRGScdMlz+Fi61qek11EPe1oHx01Sgyonofs3aHv1E
-	ecLjVAjHwZSbwsfvhmGWIe5eZyC9nUdDjCtD+bxzVfHTCP3vkNImPEk+IJZRyZBpvv2+jVZFvZG
-	Kjp7iv30L0ATnU0AhSwvpl8xbvuH+H/sJKrDQuWlmNlMjkF1FkrY4kISAvCW4eLzxKyS/GIHKgD
-	mW/3TLiFJSBK7xtcYQLTUqsIUunVZQ7fXtXD9nWNrVUaJ64CuftLuxbwjfOU45gWMWxd3EyrEDd
-	fg7rY14qrgj1ez0Piye7rqCW3fOk6L09HdP/oF0tLdPtHGgLaGeQwdgAhF/m2gOWpT+eWcGg1qj
-	joL3RrKa0xHtNDk6nmHoqr5KDRHEBrWbYV324fEtntrYsTwhfkF8qJakpeXZKXLJpWF//wzYMWW
-	UpUyDiEDS3CrStenTXYYnK71lF2MK02Cpsq6SqsKQ/IRMTYsPA6ZnkQOnk4WW4zphW6esriFgXW
-	ocARIK4ljMk8yTurCp2Qz4w64g=
-X-Received: by 2002:a05:7300:828a:b0:34c:d1f2:b552 with SMTP id 5a478bee46e88-3537dedaa87mr18409297eec.4.1791934552974;
-        Tue, 13 Oct 2026 16:35:52 -0700 (PDT)
-Received: from localhost (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537ca0e64csm50705110eec.10.2026.10.13.16.35.51
+        d=1e100.net; s=20260707; t=1791935582; x=1792540382;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=C6tJTEHrYgFnbnR6qIBmkaMJcmJMRpJvNA5Y0NJAJrg=;
+        b=i193eG+s6/Rn9CLEX4EG4cKyXIwPUYofnBG3zc3aPwADTx4xLHBnP9ApA47fIghtqB
+         Fb9v8EBFB/ffewxJF0XIolQxB169lQ8hHzwk4xCIRjKItqCyegbmClTPb3tJdM1Tn112
+         BqKRWyyN3xwtB9E11lgDQgidGLEniRpbM0u0LGtHQfOq9m7s13VaaVGKcrxuvWuafhaq
+         KXjXdV8vda1FhNcZsN+0MTf5MXDulSwhyDohMnZ9+H88aejFjscZkhLj0ftu+48vsqrE
+         aW3UCkJjPbVefdWWuCDBWLGV5A2qQs6PTPFoSxPDgUvwTiDaz7T4PN8Lh++Revvwrry0
+         PBhg==
+X-Gm-Message-State: AFq9FYKdSH7UXeIF0vW9aM4GgOqKYMFtjLIfEdfmFC7othOUGrN0Ecp+
+	cAC/xk+sict72jtfvSIfJY/JoEANU45TU3vcDd86oRZR6t2Sejf8RpolGLnjIA==
+X-Gm-Gg: AYBFou2IfSwFlbo7eKw9Zwdzn87pW9+2yxSivG175v/sl2YI1GBkhURigXy/83MwVKe
+	yWAJYHKPxfGDUOsVme6uyCD8Zhv7YJ6gHuEV3kP9DVapED+SdO94Aap/Yq4QJ/eRH7Z/CW7pxcQ
+	4+l6A+kUl/T4AZRzCMM/JIcGLOFGesT9eyrV+1kPy9L18STz9OE6XGLn76sdPXCsCJjqIiLfTrR
+	GAivXsRUJzYF934SmkgKJouX4z3ZH23n8Ep8veFTW/q0W3bNpITAm5Go22xYHdK8VAF1rcNm7Ke
+	PnoOHjI7s4uBkfra+9RO/gC1SUTZl1IAwX7Q22UOn2cCHSbFbQV4lzYfBP1hk5KnTW8Hob5naXZ
+	45oIBcMTa46k1KoYCq9EXV7VoFdojLQYkUPN5QvNi3NQPI7/iUK6JfylPM/OWNMMAkMlQIi9jkc
+	Ey+PQeGYODa4OzqSbbJCg79vZ7y7+tOtO+Fql9KSLo1mPRoi4wOPa2e/LcS68QzCuDp7KD7PbBS
+	3fxVFM=
+X-Received: by 2002:a05:7300:828c:b0:35a:5e11:bf81 with SMTP id 5a478bee46e88-35a5e211ce2mr11290426eec.21.1791935582398;
+        Tue, 13 Oct 2026 16:53:02 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.254.74])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537c61eaa0sm51297625eec.0.2026.10.13.16.53.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Oct 2026 16:35:52 -0700 (PDT)
-Sender: AceLan Kao <acelan@gmail.com>
-From: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Kiran K <kiran.k@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel_pcie: Fix NULL hdev dereference in debug register dump
-Date: Wed, 14 Oct 2026 07:35:48 +0800
-Message-ID: <20261013233548.3864360-1-acelan.kao@canonical.com>
-X-Mailer: git-send-email 2.53.0
+        Tue, 13 Oct 2026 16:53:01 -0700 (PDT)
+Message-ID: <6acec45d.82a2a138.123ae1.d590@mx.google.com>
+Date: Tue, 13 Oct 2026 16:53:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1015897893123475561=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
+Subject: RE: [RFC,v2] asha: Notify connection interval changes
+In-Reply-To: <20261013222556.513513-1-cochcoder@proton.me>
+References: <20261013222556.513513-1-cochcoder@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The MSI-X interrupts are set up in btintel_pcie_config_pcie() and the
-controller is brought out of reset in btintel_pcie_enable_bt(), both
-long before btintel_pcie_setup_hdev() allocates the hci_dev.  On top of
-that, data->hdev is only published after hci_register_dev() succeeds.
-Until then, any interrupt that reaches an error path sees a NULL
-data->hdev.
+--===============1015897893123475561==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-btintel_pcie_dump_debug_registers() is called from those error paths
-with data->hdev and dereferences it immediately via hci_get_drvdata().
-If the controller raises such an interrupt during probe, the IRQ thread
-oopses.  The bt_dev_*() logging helpers are fine with a NULL hdev (they
-print "null" as the device name), so the crash is only in the register
-dump.
+This is automated email and please do not reply to this email!
 
-This was seen on an HP ZBook X G2i (8086:e376) with v7.3-rc7, where the
-GP1 mailbox interrupt was handled right after the device was enabled:
+Dear submitter,
 
-  btintel_pcie 0000:00:14.7: enabling device (0000 -> 0002)
-  Bluetooth: null: Received gp1 mailbox interrupt
-  Oops: general protection fault, kernel NULL pointer dereference 0xda0
-  CPU: 11 UID: 0 PID: 671 Comm: irq/213-btintel
-  RIP: 0010:btintel_pcie_dump_debug_registers+0x20/0x910 [btintel_pcie]
-  Call Trace:
-   btintel_pcie_irq_msix_handler+0x1ca/0x6b0 [btintel_pcie]
-   irq_thread_fn+0x26/0x70
-   irq_thread+0x1b1/0x300
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1185115/
 
-The IRQ thread then dies in do_exit() and the module load and the
-following power off block behind it.  The GP1 handler no longer calls
-the dump helper in current linux-next, but the GP0 handler still does
-for the "Controller in error state" and "Controller in lockdown state"
-cases, which have the same exposure during probe.
+---Test result---
 
-Return early from btintel_pcie_dump_debug_registers() when there is no
-hci_dev yet.  The register dump is delivered through hci_recv_diag(),
-so there is nowhere to send it without an hdev anyway; the preceding
-bt_dev_err() has already reported the event.
+Test Summary:
+CheckPatch                    PASS      0.80 seconds
+GitLint                       PASS      0.18 seconds
+BuildEll                      PASS      15.22 seconds
+BluezMake                     PASS      219.33 seconds
+MakeCheck                     PASS      13.74 seconds
+MakeDistcheck                 PASS      110.60 seconds
+CheckValgrind                 PASS      179.65 seconds
+CheckSmatch                   PASS      214.37 seconds
+bluezmakeextell               PASS      70.29 seconds
+TestFunctional                PASS      908.59 seconds
+IncrementalBuild              PASS      219.86 seconds
+ScanBuild                     PASS      794.26 seconds
 
-Fixes: 190377500fde ("Bluetooth: btintel_pcie: Dump debug registers on error")
-Cc: stable@vger.kernel.org
-Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+
+
+https://github.com/bluez/bluez/pull/2675
+
 ---
- drivers/bluetooth/btintel_pcie.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 3a555aa50c87..fcdea1302cf7 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -433,12 +433,21 @@ static void btintel_pcie_prepare_tx(struct txq *txq, u16 tfd_index,
- 
- static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- {
--	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	struct btintel_pcie_data *data;
- 	u16 cr_hia, cr_tia;
- 	u32 reg, mbox_reg;
- 	struct sk_buff *skb;
- 	u8 buf[80];
- 
-+	/* The interrupts are enabled before the hci_dev is allocated and
-+	 * data->hdev is published only after hci_register_dev() succeeds, so
-+	 * an interrupt handler can get here with a NULL hdev.
-+	 */
-+	if (!hdev)
-+		return;
-+
-+	data = hci_get_drvdata(hdev);
-+
- 	skb = alloc_skb(1024, GFP_ATOMIC);
- 	if (!skb)
- 		return;
--- 
-2.53.0
 
+--===============1015897893123475561==--
