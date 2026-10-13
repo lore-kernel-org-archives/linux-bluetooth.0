@@ -1,85 +1,74 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84143321BD
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 05:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D242853F3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 07:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791869533; cv=none; b=vAJx2EM1JRF3V3Py/C498bWfT/Tf1hRsyJ4CzHu6IUR9QcuLegGGwCvjYF/X/zm3O5JTecjxEb83rjsTsKtoK0zx0FTRxlpBYlTqO4oT/ZAeqDGc2sKIE+hTbuBBIzQniy3NsaInBuosXJDnA4Gk6GjwekFz7cpahZopTVpY5NA=
+	t=1791875785; cv=none; b=bjMDEO+QSeHwchexdyLG1m+JNHQWCxGsCeuGOPn9dGgSVn+DYY1/WQozkmPlBRjnmStTgsZbxHkN2ceWTcmn5v8GvPVRs5tUMaZ2hj3MMU/wTqKKbCvzJhyuWNTOzxrnU9Gho7Hz0UkBKg4W7BT6Uaxm9khvhnu7I9vrkPt60FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791869533; c=relaxed/simple;
-	bh=WgQOnPTi1tnL6fDuSFpQKEm9yu58dR/NyozQFaFmFNM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WA4RQNgwETczTbiXaT8gZpiSqLUzdmAaTbhXudzClTMBXsGA5QkWegePGRW5d6bxVP3Q9wEG7OYRbPymNUxFxdTAI36TFFF13et70LnNsb+WkPNzd5kXnVKTSARmyoTfdPUxA2uXPUodYQ0zjuQ/THD+YYjz3MX7yebqmr96pAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=pIxbmAku; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1791875785; c=relaxed/simple;
+	bh=BjllpH7CylU0dPW7AL5duhTnu8amrkppktT7UN2ZuFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=APXSGMC5qDVSm+6YMTmqdndxKYDU3RIMYfFkolQ0JJxrbb3EcEPbUsMKC0lVIdjDqnR/2flQiNu0UYWCF7y/CQlTtxg+iyA8V4SObsmtCEm/JT7IDluI/5SbggiRRiyJX+04dzwM7I03ugOCpekKnAw8cZ0Mrht5owyzx3WhjtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=californiaopensource.com; spf=pass smtp.mailfrom=californiaopensource.com; dkim=pass (2048-bit key) header.d=californiaopensource.com header.i=@californiaopensource.com header.b=ChmmKHyo; arc=none smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=californiaopensource.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="pIxbmAku"
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0A4B73F2D6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 05:32:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1791869521;
-	bh=HdTkQACAxffrwnQrFwY6e5kcuV8v0fcWW79SSqTdU9M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=pIxbmAkuqA+4pOzYDiKGOBgI+vHOEY/eiLWosrnvJskHsJwUr6fYLx2D0W78k+Sdd
-	 rgeKl/SY6smaTLnRgkpE5eCNlWiE0HWd/AMg46qwTTzQKL5TGJHL3wXGhqGODgc3aw
-	 Hb/II4pPdENKtr3SlEVcMt9yWbbAvObXkab1n/jPSe7nV8m5yN3EoV5ZTqLj7tYgeP
-	 DTQJHuW6aRFnZetyxMAvlfth+aILxMwO7nPXiYmreEglhf4ViFJz/oC+D85r/O3eCR
-	 DqBp/zDyckOrMIDfbcKlGZXpZbLenIRy9qDoX4F2xXG29pAq3kXlVlZHbf9CZdTsCK
-	 F6LqMxQjZcE/CB+XmPXprYrPyBV/VNiUxSVb+l6dbgTDDUfyco3knXdTiA3Gd7Dnxa
-	 6lkubTh5S01jmGgucc8y0+NN7iqhMhrx51ig1slm47JNxPBbsgtUqMHZ21l8zxIX/r
-	 ED9UnzgE8khCdwfO8wv7BIa0JNv3H0rZR65k2VjfY9bw8Fom8GtkCFWs2bMwx3XZgN
-	 L5MPnLsSqn8OnHQMVRlWGRRGhRqWDKzrASBN5ODrYARK6+OyrQ+mAPTss/dT4Ylyvq
-	 tWs8juGP6crXaGcx7UuZpjjsWcdjxaEkXVbih/faFZXrzNq/wFOh4YrdePW7vvt3vN
-	 TWLFO33DWnBQzXnFEPzUFxb8=
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2e876e33e6cso5290185ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 22:32:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=californiaopensource.com header.i=@californiaopensource.com header.b="ChmmKHyo"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-30b6dad2382so6187042eec.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 00:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=californiaopensource.com; s=google; t=1791875782; x=1792480582; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bSyra3bHkuqWz+L9mTLMsQhLfl/JDwdmDNSp2PenKng=;
+        b=ChmmKHyoFVFvb8+3tfaxCipgmyxXZsKVTfepsJHinKAk7lKr6Rdkb9JdKBYSYXXFo5
+         68Qv+Q4FSiVSg/vstUfB5OucGdLWD8rFSH1/IvGCqJWJOnF+hP7taH0tuAPQA313rnVK
+         tnItZDMrv9aUchdd9Ib3XKXBG/gSRScEZV7uDacsbKG5kLrAjiqGObU9M3eBrBulpymM
+         sHINbGic7h6xXHSUZNzpJ5Aw0I77TtSMIg+w7nabXwr+ASPeOWrvetC5htfbkD9dexmi
+         YQt/OnACUZd9YilKq296keBVMFkVVB462pV0p+6fqHkhWtm3Lp82SLlWUqBqGuaE9FRV
+         MZJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791869519; x=1792474319;
+        d=1e100.net; s=20260707; t=1791875782; x=1792480582;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=HdTkQACAxffrwnQrFwY6e5kcuV8v0fcWW79SSqTdU9M=;
-        b=tfwmiMS6ZvlIK3twryQZNKEvV+cj/AGwnaZnTa1k6lCfDKMxx7PxRSXRuxF3jCAVUS
-         SqOvsCdfoYcAKtlh5Q03iw3Z9l5AOVwTB0eupqRTKSRqaVEM2vL3pvzjaIf8oFKEB2jb
-         Ks286Lx4PDGd4XAlwx7O0PwbT94VCKQb5lechxKs1wKxJCR703+HDSkYz4bWJoE21WwW
-         llvYropz0MXj6rEQWkCMZ5gRbicpUA7p4TZp8xRpvlgVV2v/qhqiFjIHDGXWba9PiNHt
-         2roQ0zuiT4YeBPex7D0smZk5RDJ6CXvwVsXLokxn2ThXbldOBsnaeOYHue47X77gW3H0
-         mu8w==
-X-Gm-Message-State: AFq9FYK97vUiz4FJflfsykgdAl9O/uuS/bTP2zO5Oghqj5EsFTHOfdHE
-	gEQXBHVaYuk75NYR4hMFC1zsHnvle6UYwMW/dRfAXX6F+jG+vHA3QyjtZjGXkMKU1lDN4kPNvr1
-	szBFUWan3pPofQLQtMQGeHasulu84Q0kmtWJxWq1mvlK/JoLu9WCTuPwBuMxN85gtkViM5z+iIn
-	bBHSKvSetbL7L0OjvkQg==
-X-Gm-Gg: AYBFou3rIUn2EhFRBHw3uASHcEeCIvYQlU9iOIbeDEK8MAeSGXA2rodgTKtqZkH9YHL
-	HODOLxsNBwZKypx00c9NGXdPCUP71pyxcei8RUA4xi0+/DPM8VUazcLUUzTPt9DGeI2W+Pt8K56
-	paC41JubqGwTp7SdqYa6d72vtEuodDSHsrYkH/uXS1ApbtuL5+XQvZxgFzp2ZWUCjxtTeD3ous3
-	o3A9pB52Dg9OU98QyaD6B9NDo3eYX4xcvua1NHFl5YT/4deJ0NDfkl2Pk/82ljga8qJguRtcIwq
-	BJSKmZy+bRr9yCoX5djynORRCfUIaj64rG65M5flmHtPCPJKAANov0g1ZyUqRyIiSIwE/vf9tjw
-	D8XTne7Entk95glbVzMehRmNpgFEUXrcGVEjOL9Ih2uHKQFWoaZ/2XTOxB4H8+oB1kUv9TZDuEF
-	L/NndRScK+pn4YNWvk2RM5bExoaeVOcnSoYEYyk2E4/zJ8p28tLF+gQa8CrX68twGUfChyt3Ig0
-	y3UsdbC9wEPX8z+JeYWWKYVkcXFsg/+r1bEw+rmNGs=
-X-Received: by 2002:a17:903:19e8:b0:2df:8909:f719 with SMTP id d9443c01a7336-2e842aa4aaamr159737395ad.3.1791869519251;
-        Mon, 12 Oct 2026 22:31:59 -0700 (PDT)
-X-Received: by 2002:a17:903:19e8:b0:2df:8909:f719 with SMTP id d9443c01a7336-2e842aa4aaamr159737065ad.3.1791869518908;
-        Mon, 12 Oct 2026 22:31:58 -0700 (PDT)
-Received: from an-XPS-15-9520.buildd (2001-b011-2008-445c-f0c9-fe5f-a459-fd93.dynamic-ip6.hinet.net. [2001:b011:2008:445c:f0c9:fe5f:a459:fd93])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e8483c3dfcsm48724735ad.24.2026.10.12.22.31.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 22:31:58 -0700 (PDT)
-From: ChunAn Wu <an.wu@canonical.com>
+        bh=bSyra3bHkuqWz+L9mTLMsQhLfl/JDwdmDNSp2PenKng=;
+        b=2THP3lYsH/YoSqLbrZTxG4Cc03CAjxJNbl5ntGqz002JRR+Tmh99uvKeOTccrR+12F
+         FOnkRqqMUN4iaJmyjC1l6Rw+WPcJ4HA95bURe2W7KAkc8AAY0ZlBdlvn8rNACzyTqJvP
+         M3FLjGyuA+F+x0yFlEHexZ6DofhpJAQ7Qg+7OR7MF9feQw69b6NgHjFw5PROAQiCdw2m
+         4uNQ/KkyYywKvqwOFk+Nm3ZEddyzCYxzqBEFnlVQAHkNVsDVn2Fs4HGS8CYo0LRXn+LS
+         QQQYofRj6Wq0b6aVfe9gb2cY9gCKhW8OWM9UvuaptfNYvhr2hl5V930z1gY/NvCxGMmr
+         H4aA==
+X-Gm-Message-State: AFq9FYKgsWuY64eiASZ+ChtouBk6rgHcsZ7PdxSOr2p1MTCLIkwdMHvk
+	b9QDoANDKHliJKx4jMlFxcMo+eg3zaDG8RgW7Um4q+Q90LHqjMWBnT0zKTKcxd3X1hlK5go0Izh
+	ioP0NSeA9FQ==
+X-Gm-Gg: AYBFou3mwPYYpqjr295wU4oheChto/8Zu+uhkZQWWzdMWTCBfSA8xpUue/lmaA1vCyF
+	9HNccH+G/MCzkNqC+g+A5GH1YpCCHXH3iQxye9mIN7Dqn9Af00JM6lUbD72f1Dn/ROUd+PG2rYD
+	kP69UKuK53s/mxEBL9O82Bu9fFUeE4mC+vJA7rXoO9/EyRmhjgmjg8JEQFug8KM3yFvQmzXMTzr
+	vjaGzsdkChZTNxPujaz6gJ27QLP0B5FDZe4FWwQopTVNxDZdiHbDDMyPl+5+DuEdI1gswtNLnMl
+	QA/Zt8KjLTTnMMTJxPEgDTKGUa0VEUInFtiBIOdJWEU0tcGcwEoEr6usE1yCm+pxdhNWLq1IzJQ
+	Gs10XeSjNrVrda/K7WfiVFMyMa1zsCfxflDJsH147owPHXcdw/6ZPOAQAgDJvWdn+ueBJPk3dzh
+	tucf6eP3X7KCL8IiWC6f7ioRUXLubJ4LXwJ8ZU3Bkzkak/jPX9WI++FvY7mCxMyB28NUVSbjIKE
+	KPQN30GURYiOLuisxXhOaLkrS3ARSPwHo3xkDSYvET/EwL96HefAwiDBbFAoPjRNwIK/PVzTYyZ
+	Ntx287JdQo4EQVFSk71Q6DI8KNv2UNUhqKT9O3Bm
+X-Received: by 2002:a05:693c:4196:20b0:35b:af:a075 with SMTP id 5a478bee46e88-35b00afb749mr6677708eec.22.1791875781388;
+        Tue, 13 Oct 2026 00:16:21 -0700 (PDT)
+Received: from localhost.localdomain ([147.185.47.151])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb2fd33sm39699307eec.28.2026.10.13.00.16.20
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 13 Oct 2026 00:16:20 -0700 (PDT)
+From: Kevin Dewald <kevin@californiaopensource.com>
+X-Google-Original-From: Kevin Dewald <kdewald@itba.edu.ar>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel_pcie: guard debug dump before hdev setup
-Date: Tue, 13 Oct 2026 13:31:18 +0800
-Message-Id: <20261013053118.1201636-1-an.wu@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	Kevin Dewald <kevin@simpleble.org>
+Subject: [PATCH] Bluetooth: hci_event: Fix LE link drop on remote features command status
+Date: Tue, 13 Oct 2026 00:16:15 -0700
+Message-ID: <20261013071615.76382-1-kdewald@itba.edu.ar>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -88,44 +77,113 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-An MSI-X interrupt can reach the debug-dump helper before
-btintel_pcie_setup_hdev() initializes data->hdev. The helper then
-passes NULL to hci_get_drvdata() and crashes the interrupt thread.
+From: Kevin Dewald <kevin@simpleble.org>
 
-Return early when hdev is not available. This covers the GP1 and GP0
-error paths while leaving interrupt handling unchanged.
+When the local controller supports peripheral-initiated features
+exchange, the LE Read Remote Features procedure also runs for incoming
+connections, and it fails with Unsupported Remote Feature (0x1a) if the
+central does not support that feature. hci_le_remote_feat_complete_evt()
+and hci_le_read_all_remote_features_evt() handle this and let the
+connection transition into connected state.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: ChunAn Wu <an.wu@canonical.com>
+A controller can also return that error in the Command Status event
+instead. An Intel controller does so for a central that does not
+support peripheral-initiated features exchange, presumably because it
+already has the features of the central. hci_cs_le_read_remote_features()
+and hci_cs_le_read_all_remote_features() then confirm the connection as
+failed while it is still in BT_CONFIG, and the hci_conn_drop() in
+le_read_features_complete() disconnects it right away:
+
+  > HCI Event: LE Meta Event (0x3e) plen 31
+      LE Enhanced Connection Complete (0x0a)
+        Status: Success (0x00)
+        Role: Peripheral (0x01)
+  < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+  > HCI Event: Command Status (0x0f) plen 4
+      LE Read Remote Used Features (0x08|0x0016) ncmd 1
+        Status: Unsupported Remote Feature / Unsupported LMP Feature (0x1a)
+  < HCI Command: Disconnect (0x01|0x0006) plen 3
+        Reason: Remote User Terminated Connection (0x13)
+
+Data the central sends afterwards is reported as:
+
+  Bluetooth: hci0: ACL packet for unknown connection handle 3585
+
+Handle Unsupported Remote Feature in the command status the same way as
+in the complete events.
+
+Fixes: 0fe29fd1cd77 ("Bluetooth: Read LE remote features during connection establishment")
+Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
+Assisted-by: Claude:claude-opus-5.5
+Signed-off-by: Kevin Dewald <kevin@simpleble.org>
 ---
- drivers/bluetooth/btintel_pcie.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Reproduced in test-runner on bluetooth-next with l2cap-tester, the
+emulator answering LE Read Remote Features and LE Read All Remote
+Features from the peripheral with Unsupported Remote Feature in the
+Command Status: "L2CAP LE Server - Success" and "L2CAP LE Server - SCI
+Default Mode" fail 5 out of 5 times without this patch, the link being
+dropped as above, and pass 5 out of 5 times with it. With the error in
+the complete events instead, they pass with and without the patch.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index ac7193400769..8d7927bd75b6 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -297,12 +297,17 @@ static void btintel_pcie_prepare_tx(struct txq *txq, u16 tfd_index,
- 
- static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- {
--	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	struct btintel_pcie_data *data;
- 	u16 cr_hia, cr_tia;
- 	u32 reg, mbox_reg;
- 	struct sk_buff *skb;
- 	u8 buf[80];
- 
-+	if (!hdev)
-+		return;
-+
-+	data = hci_get_drvdata(hdev);
-+
- 	skb = alloc_skb(1024, GFP_ATOMIC);
- 	if (!skb)
- 		return;
+The emulator change and a tester case can be sent as well if wanted.
 
-base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
+Not tested yet on the Intel controller the drop was seen with.
+
+ net/bluetooth/hci_event.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c055d16cf..cad6ed5d8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3015,8 +3015,25 @@ static void hci_cs_le_read_remote_features(struct hci_dev *hdev, u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+-	if (conn && conn->state == BT_CONFIG)
++	if (conn && conn->state == BT_CONFIG) {
++		/* If the local controller supports peripheral-initiated
++		 * features exchange, but the remote controller does not,
++		 * then the controller may already return the error code
++		 * 0x1a for unsupported remote feature in the command
++		 * status.
++		 *
++		 * Handle it as hci_le_remote_feat_complete_evt() does and
++		 * allow the connection to transition into connected state.
++		 */
++		if (!conn->out &&
++		    status == HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE &&
++		    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES)) {
++			conn->state = BT_CONNECTED;
++			status = 0x00;
++		}
++
+ 		hci_connect_cfm(conn, status);
++	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
+@@ -4113,8 +4130,17 @@ static void hci_cs_le_read_all_remote_features(struct hci_dev *hdev, u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+-	if (conn && conn->state == BT_CONFIG)
++	if (conn && conn->state == BT_CONFIG) {
++		/* See hci_cs_le_read_remote_features() */
++		if (!conn->out &&
++		    status == HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE &&
++		    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES)) {
++			conn->state = BT_CONNECTED;
++			status = 0x00;
++		}
++
+ 		hci_connect_cfm(conn, status);
++	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
+
+base-commit: 964430c038967fd06643e866f68115664e1a1bd1
 -- 
-2.34.1
+2.53.0
 
