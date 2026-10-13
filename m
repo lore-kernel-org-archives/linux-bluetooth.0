@@ -1,39 +1,39 @@
-Received: from mail-244123.protonmail.ch (mail-244123.protonmail.ch [109.224.244.123])
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EBC479890
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FD7418A46;
+	Tue, 13 Oct 2026 03:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791861242; cv=none; b=P4gXdy1feVvOV39NSTfDpr8kcJyuxK6fA9k3lYYxH3wl7iwwB/iD5HEnZb+R/CcW/Ciarq6utFtYx+m/JLqL0Xqx+JvEheuV0gF0xqRNnokuwx+GmnpG9nHJE/GqJ8+VOXEpYPDR2p4XPCeqt5gWUHvi+UsWvnwMzINmmdgGBnY=
+	t=1791861608; cv=none; b=tH2ZUI1P8iC1uel/8HxKpGjTMgnW/Kq5gnrcCzgekVgM+AlbcKoSl1ns/Q91E0Tcle5QVM4TM9EmG2KKey13/fbuYrOwrF5iMI/PPqdi2/ikYKRWPAF/4eM2X75CzUlj3ml7UaXC4c60DCLHLs8xjThk01xYIcORUr+6UeXy+3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791861242; c=relaxed/simple;
-	bh=fWiT9qYz9GXa8C4RDqGgwU5yH6Bj2XxxOLMaYOZ7rhc=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=gtorxQXB8ApeOHZDGjtLuhKMfEk/5pvo62yt3Nh8QWBtYo7RsxUYTFgQ9uCbEsPL7LYgNdHnYKH5xa6ILp2FHPhLoy/hBhvs7Z8d6JkCOA6gPNZLWCUZYbGsFNIcJ5Kbf7tDEXUEcVcroncD3i/Xk631gdg4ty0sBY4AvVte2CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NUbyfuG1; arc=none smtp.client-ip=109.224.244.123
+	s=arc-20240116; t=1791861608; c=relaxed/simple;
+	bh=9ZcLP/wiS6yfOqCEy+UUeVI0Yd06dr975LtFJkBVl5M=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=FgONkAKlZFu9Junu0whNPcIOk3iagjQ3umzuC+zagk8l5lv/4V4VJyAKChCkM8+SZDHw9S9rLFBCiuCY82xiwNiUVygtVphDcRphiFcWoXNUS7reOIg6XObZkaJ4fkTu6Izzg1gVFAcSC8ktbPBwnkzrzlOd9px2cNf03dkFoj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=WTAoi1eT; arc=none smtp.client-ip=79.135.106.121
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NUbyfuG1"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="WTAoi1eT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1791861233; x=1792120433;
-	bh=/flxWmjOQT873io2qPY+p7QiHU00nyqrTJb8WXIdw3g=;
+	s=protonmail2; t=1791861603; x=1792120803;
+	bh=frkNg8NqyYW3v9G6WLW/NUGDBIAwXJTkGr0PdRlAV0Q=;
 	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
 	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=NUbyfuG1QkDVpTM5zgTz+/5GVBfJ6LhP1jrR1bsIhvkODSui4liTB0htAAl2jDGqU
-	 e4OIvvMD2wM7G1PhiFpYA/ij6fF8+qZiGGOIYfBP1EJHw/ZLVQe4fgxv7kPxdMQaGP
-	 A+CTlv+N3QgRZ9UEEcBqhRC5XU9r45cMrfs0c63HWS9JYLl8DIUWrser0/w7eQ5m+f
-	 +ws6YjuiJnRgRSR8U0VmJk+1FUAOOS7hYfYoF3NS6HHODBrWEspHpDGQJA2T/+Knn6
-	 BhBXFBQeEO8qgT/2OEVIMQMnVSUApCWL2F2Jvr0KWidYP/eC/mDn8CqKvROrIRG/Gv
-	 eJz3Eiu2XMqUA==
-Date: Tue, 13 Oct 2026 03:13:49 +0000
+	b=WTAoi1eTO75ArOIfKJiNfQilSQockkGfufDwk9owyfQyxRYrUvZAuVWTti49TDYX0
+	 eq9uETzeIh/7TABG+22SChrTkVCiMXC6GypSQL8+ieA3ee/r0qDeNBG8OvYYNGQ+Pi
+	 CFX/gyl78wFW+b68QtZAEFkwHS/ykb4yFgOOMtnLYXl358wbcKxQL3CqCSLXB6J6Et
+	 UxoDMQe7y4+zC1EmCbYTqqHbdqGg/UAidZMJMBcn+VeH6ZHO+BaNcd3mvKVY6++TFU
+	 /i+eyXGAkuVdXXkLdKL35PuCJe7H2LP0ngPsXVSFWQuYGJ9hqbZGh/sJRO8MhB91jn
+	 aPI/LAQcql0zQ==
+Date: Tue, 13 Oct 2026 03:19:58 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sync: scan unfiltered for host-resolved RPAs
-Message-ID: <20261013031329.483597-1-cochcoder@proton.me>
+Subject: [RFC PATCH] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
+Message-ID: <20261013031943.489829-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: b8df25e2198dff611e922a6d1e796b12f58158e1
+X-Pm-Message-ID: 5e715a7472e6f12121efdd0d483cc4c441d1fe5c
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,91 +43,72 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On controllers without LL Privacy, the accept list cannot match a bonded
-peer identity against the peer Resolvable Private Address. Background
-scans using the accept-list filter therefore hide those advertisements
-from host-side address resolution and auto-connect never starts.
+A nonconforming ASHA peer sends identifier-zero credit indications
+that are discarded, reducing usable transmit credits until audio stalls.
 
-When a pending peer has an IRK but controller-side resolution is
-unavailable, use unfiltered scanning while the host is awake. Keep
-accept-list filtering during suspend, where host-side resolution cannot
-run.
+Tolerate only exact-size credit indications for a connected LE CoC.
+Preserve the channel reference, lock and credit-overflow checks and do
+not send a response with identifier zero. Other zero-ID commands and
+BR/EDR signaling remain unchanged.
+
+Core Vol 3 Part A section 4 forbids identifier zero. This is an
+interoperability RFC requiring maintainer agreement, not a conformance
+fix or a claim of automatic stream recovery.
 
 Assisted-by: OpenCode:gpt-6.1-sol
 Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
 Submission review notes (not part of the commit message):
-The downstream N8/UB500 recovers an ACL link after range loss.
-No patch-off comparison or changed-RPA necessity test was supplied.
-Do not equate link reconnection with automatic audio/application resume.
-Privacy-capable and suspend/wake regressions remain coverage gaps.
+Core specification forbids identifier zero. This is a narrow opcode
+interoperability exception, not a conformance fix. N8 captures contain
+zero-ID credit indications. Native malformed/overflow/teardown and
+lockdep/KASAN coverage and exception policy remain review gates.
 
- net/bluetooth/hci_sync.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ net/bluetooth/l2cap_core.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index efbd2e538..d0fbb3e08 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2907,6 +2907,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev =
-*hdev)
- =09struct bdaddr_list *b, *t;
- =09u8 num_entries =3D 0;
- =09bool pend_conn, pend_report;
-+=09bool rpa_no_llp =3D false;
- =09u8 filter_policy;
- =09size_t i, n;
- =09int err;
-@@ -3025,6 +3026,17 @@ static u8 hci_update_accept_list_sync(struct hci_dev=
- *hdev)
- =09=09=09kvfree(params);
- =09=09=09goto done;
- =09=09}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 49a998804..1a0868437 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5328,6 +5328,12 @@ static inline int l2cap_le_credits(struct l2cap_conn=
+ *conn,
+=20
+ =09l2cap_chan_lock(chan);
+=20
++=09/* Tolerate identifier-zero credits only for a live LE CoC. */
++=09if (!cmd->ident &&
++=09    (!credits || chan->state !=3D BT_CONNECTED ||
++=09     chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
++=09=09goto unlock;
 +
-+=09=09/* A bonded peer that advertises with a Resolvable Private
-+=09=09 * Address can only be matched by the controller's accept list
-+=09=09 * if the controller can resolve addresses itself (LL Privacy).
-+=09=09 * When it cannot, note the peer so the scan below can fall back
-+=09=09 * to host-side resolution instead of accept list filtering.
-+=09=09 */
-+=09=09if (!ll_privacy_capable(hdev) &&
-+=09=09    hci_find_irk_by_addr(hdev, &params[i].addr,
-+=09=09=09=09=09 params[i].addr_type))
-+=09=09=09rpa_no_llp =3D true;
+ =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
+ =09if (credits > max_credits) {
+ =09=09BT_ERR("LE credits overflow");
+@@ -5923,11 +5929,21 @@ static inline void l2cap_le_sig_channel(struct l2ca=
+p_conn *conn,
+=20
+ =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
+=20
+-=09if (len !=3D skb->len || !cmd->ident) {
++=09if (len !=3D skb->len) {
+ =09=09BT_DBG("corrupted command");
+ =09=09goto drop;
  =09}
 =20
- =09kvfree(params);
-@@ -3047,6 +3059,11 @@ static u8 hci_update_accept_list_sync(struct hci_dev=
- *hdev)
- =09=09=09kvfree(params);
- =09=09=09goto done;
- =09=09}
++=09if (!cmd->ident) {
++=09=09if (cmd->code !=3D L2CAP_LE_CREDITS ||
++=09=09    len !=3D sizeof(struct l2cap_le_credits))
++=09=09=09goto drop;
 +
-+=09=09if (!ll_privacy_capable(hdev) &&
-+=09=09    hci_find_irk_by_addr(hdev, &params[i].addr,
-+=09=09=09=09=09 params[i].addr_type))
-+=09=09=09rpa_no_llp =3D true;
- =09}
-=20
- =09kvfree(params);
-@@ -3061,6 +3078,16 @@ static u8 hci_update_accept_list_sync(struct hci_dev=
- *hdev)
- =09    hdev->interleave_scan_state !=3D INTERLEAVE_SCAN_ALLOWLIST)
- =09=09err =3D -EINVAL;
-=20
-+=09/* If a pending peer advertises with an RPA but the controller cannot
-+=09 * resolve addresses (no LL Privacy), accept list filtering would drop
-+=09 * its resolvable adverts and it could never be reconnected. Scan
-+=09 * unfiltered instead so the host resolves the RPA in software and
-+=09 * triggers the connection (see process_adv_report()). Skipped while
-+=09 * suspended, where host-side resolution is not available.
-+=09 */
-+=09if (rpa_no_llp && !hdev->suspended)
-+=09=09err =3D -EINVAL;
++=09=09/* Credits have no response or identifier-matched transaction. */
++=09=09l2cap_le_credits(conn, cmd, len, skb->data);
++=09=09goto drop;
++=09}
 +
- done:
- =09filter_policy =3D err ? 0x00 : 0x01;
-=20
+ =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
+ =09if (err) {
+ =09=09struct l2cap_cmd_rej_unk rej;
 
 base-commit: 964430c038967fd06643e866f68115664e1a1bd1
 
