@@ -1,68 +1,68 @@
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9FD481657
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FB7481238
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791862960; cv=none; b=kBZsebCJX2fZa3IJotaBX7SlTCAffbSOEFE+05oQ4mLbCc1X00SDGNNpryspgtUTfGS7XMHk08+VV6bfG03hq3j9rboMJWUv3HSE6+2FSQxnYfVJZV/y0UCzZ7oglLvxwjv7JZyxeaePYKB1VHf293sf1xLNm2ARDTcYp63DnDo=
+	t=1791862962; cv=none; b=ImK4DNMDMs0zxQvfBgfzN3TfpBwL25f61PCbb7KM4JIvC1fPARxbe4T8PsMLSWiMdEHBC+vsu2lPZdr8Bl/y8ByS6RyzSC9x/l2XIsR7pf4knKqGnsjz38tZ9eo3cUjLxGNoaUf07Y3vhtG4k1Pl5OV/KOOAaKv9B65QthTohF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791862960; c=relaxed/simple;
-	bh=+pwV1BLf376OQlAycLeQTh57nhL77y9ttRXyNGvVZIo=;
+	s=arc-20240116; t=1791862962; c=relaxed/simple;
+	bh=vOJczOjB0TyoKQuVkW2orzE70JFVuyQyf49j8eErCTk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nThuYov2HXD1Vpgl5LMq5T1idERn/5ZVxEAGAME3+mQddHRknCMzgFTaFdgiUb7wt8PhkSwmy+t9n2N0Y2n/zJThDRMpg7mSPDtdEBuWzxUos4c/Qe9TJ5n5hA41ozoNaEa1Qgx0LaZdkyDj4xG4QD9TAJzswPoIC9yvraQRjeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lu2XeH9x; arc=none smtp.client-ip=74.125.82.170
+	 In-Reply-To:To:Cc; b=cZp+hbpIsarZ4rI9bSzLlH/1028csKIFQ2M9EeJTem6+bbUqyxxrDDi4hj2ofLrQ+IK6lqB1wOca351sVQgsrYmc6AtmwO6aRyXfEhjb5WXiU6KTYKJb+n9fwifldLr+VpKymY1udziVAWldqvWQsXYB2eM1gKXk2Az1cwqAETo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dL7/Qskh; arc=none smtp.client-ip=74.125.82.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lu2XeH9x"
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-33e6279a1d7so1807627eec.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dL7/Qskh"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-354ba08cfd1so4387240eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791862957; x=1792467757; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791862959; x=1792467759; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=h/ZFTuU6ysHjMR8HpQwB0BVfItHewIjMEkFYMIjIRl0=;
-        b=lu2XeH9x9OYUNeD1xglje7J42RJ473BPx1x/29M3mz6+sivZkE+qMzZIaS/r6cLL3q
-         ZRz1oINzpKDB3BRU40BKfp/y265FkbfSTN1q9bM864gZQW7yAt4NP7g5kAlo6PIaPQI6
-         AX5igZmFiw1w0IjJd+MRLwGfybG00BCnggJPNkJdgejWMtjedp1igb+KfqM2HZ/aQymi
-         n5OBAUTsG80VF9QBO6KQzxFov0AGoXzw/JV0FH1nQ3PD3Pnq5vy43BbHL7pssWam86E7
-         oXlsYkNyENgEMRzeJRF9QfGVHJPhxAGH/D0HFa03j78LYJdR8Jk+qNnYUF3i50IuYAz6
-         jKhA==
+        bh=2jUpAcTrC5YTZFZzQ8gUcjDGHz/C/y6LLOxwXLI1DTw=;
+        b=dL7/QskhLLhR9SP9+FZZekIxX856Velzj7ahazF1Zt//zguqFw3lGjmS7wfTP95zBV
+         xJ7pI+IpvIJkA+7gAmjgnWN5DixYAqrSd0AT5LUpVup9LsPclxnKg2qWaSO+FAqwIX7q
+         e6+V4vu3oTVNIVA9jofoet4s3ebPu35e2a/Sen+ss4z5dQyB/VGM69ZrvyfDzZY9mTHr
+         h483MpyGkODTtCml8J4eDCizA+eHmj0lcC1cLKo0C4n8HYupZyHRBZFeUBt8Z5kI0c95
+         cT7mD+SM4VO+UGMb1VRYbJURBwWQfscy+nbBvxcwrlC5PU63N1FMrJ9gAx1JXKFHRlds
+         dPKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791862957; x=1792467757;
+        d=1e100.net; s=20260707; t=1791862959; x=1792467759;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=h/ZFTuU6ysHjMR8HpQwB0BVfItHewIjMEkFYMIjIRl0=;
-        b=R32jtIupW4GF5BQmcuSjGSOkqPkxf//W2psb/Vv1h53QadcgkhtzYVQUkE/LRwhdQR
-         7C7ZxsT0CTSEQJGcUQZkFdnne5FpNxbxYuewZ0E/27TW8RimcAhQEGWHDmAVH1sl9DEG
-         hshKyC1A6i+yAAyfpi6VEh0Tmk9NxNAQcUcIxNyTfWPC2H11WyW01+5zqfIjINJwLD6/
-         UhUkMJgwiewJbT5UYXN4wk3GtEVKXRXHa7HElarKewWARICErRDlU4nFvJsYlemkeS6i
-         zzWKxjckDzn40DW1P1EzxOplZwDYgwgixRPUxmzijcD+/OhcqMYgDYJDaf4LJP9opL37
-         ra8g==
-X-Gm-Message-State: AFq9FYJYYo2im4zH+Wb0PfOtM8kvIz/9hhqfEyzh6/5km5aBassAgyV0
-	lu11BFwfJEhCZkMn2W+VQ7csbVopIxa4ghb7T3wUAJGrKPNyzlaMBrrW
-X-Gm-Gg: AYBFou1NPbWSGqDFSRLyF4EEbRJOdndUOCQ3y0Awfht8yN7eb5FdxG7OneI05Ns+/59
-	fX2ZJiEMxZPXZ5LHsCPsBgYNgKDAAZQh9Xm71dVIuAIHM/wWjewO0C+nFGhYwI80Vh2O7mCPUCF
-	+3FLekzB8Alh2TtyUr2RN+BJ5u5juXhP08kaAmM/Va1NOEkjo5F6rnX+SF0a/q7Gmzy5WJwOGvz
-	EYVWuFCusrjScu4O42BqCzi5NncdNRxvUPXyPi7k8eAWjo0q3gmkgaHrFkP5yY4qtMmkUWywMr6
-	kGEKLK2jXEqDhy9WjF7fd4Wg0jZIRUgZRdECVSaDZ6K/XEwe1c2c0pMOpUjaQNXeVDT769LHb2x
-	I/r8X+1cuqpyoyKyIKiXIwYjPiiOsNOPrKMxAxp/UmfNFdHfUWZcPSCDzwyELiGMqF5R/lI26hy
-	h3RquPZiH8bcsIq3a0uQ8uhubGO9uROmiwN1VRfOkzY6lri41T4ACFcvU7CwLLTg40FIJuQSmua
-	KKbgvFDiAeMZuGzZLL4i14pcuev9DohhzqR5R3s7kKTQwVA9uyaNyImQXO9GlA=
-X-Received: by 2002:a05:7301:1826:b0:359:866d:5bea with SMTP id 5a478bee46e88-359866d78a0mr8979453eec.21.1791862957378;
-        Mon, 12 Oct 2026 20:42:37 -0700 (PDT)
+        bh=2jUpAcTrC5YTZFZzQ8gUcjDGHz/C/y6LLOxwXLI1DTw=;
+        b=1leRAtYYAypgT1/0X0YokRFeRKfGndSr5U8lZOQha6nRErkmciwLPr6CE+fb7T0tYS
+         gpfgDUxXOD7JmSiJD76wR9j2xEXhCgvGf9ADDN0g75cIaI4nfLfmplYIIKqPVgRsEfIb
+         9HfEpV1l4EBxUGDRYLJETW0kul1ZttKw4j5Ef8wLEFyp3DRSfcC8vggyTSmWZj8aPRIj
+         8YJ7x2uOgyogE2etBS85XPjBS/OgyUQz/0ROAz5gHO8wCn7/LoOWVBGr3LOC+L0oLt4u
+         dwLDdPRYemUOud0+fDcOE1drA5bqHFO0YE+iNsye/09yshYcRu7PsyZcmzlpxzrQwz9g
+         I5mA==
+X-Gm-Message-State: AFq9FYIYRPuUpmK+557n8wqVqw/kbUo4MBEyStt2ndVSl0XVtwpcFfd1
+	7glK7vSAmgGsE7xS++Cj1l0Io7PgGZXC28fvKWxG6SQ/EtjBM+uSNu2X
+X-Gm-Gg: AYBFou2VCJ+7rWFKCWKQ0s/eBGR/2JJbtruLFk0wUC8FTYfZJl9zL8T72LyfnhgPVPZ
+	WPsX8bsy4tvVVkEVuece898zddPHK0SZkQnZNTsgJ0stywMtwo6w9Zom3NPqNqS/8yaJWHnI896
+	cxCvEqCebwJQBGOV5TH17CnZM6zhmqyqAKhkYgvnvm703zJNOLX+e1WRAPywiUhMgf6rDERNFe4
+	zcNke09qcc+RTQk2uNYXDHpYsK9+BEywpVFytNgMwuiw4D/Vhg8JT6XL5rTFKrGOXNUOCFGWxop
+	pctO+g07HDJIVSo17vS6BzKBaMjRRJCyApSI3ZCTjEPvF0BsLvNYsjmlDM/vY4kUCJ/6ZOSvFwj
+	4viCZsNYBfr6jaE2jIhJOc7pFwIChziFkV2J0NvjkzPf93PNvnLR8chul2xRH3bRrG4iHuO/qnU
+	TdjjIvcgyP8xT0g3j55h0Ju0aKZ+VvtiVyqX97kOhtC5Aq/Vkj3h3NU/OgqHVcFyiqty4ndwQpU
+	NSxdFwn3bU3ZYhndHKgb4AqTI9hYRX1bwc5y3J5UiSTuBy7IqTDiOylDt6zzyc=
+X-Received: by 2002:a05:693c:4151:10b0:351:70ec:1071 with SMTP id 5a478bee46e88-3537e0866d5mr17875344eec.16.1791862959195;
+        Mon, 12 Oct 2026 20:42:39 -0700 (PDT)
 Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:679a:f35b:7c29:e0f2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.35
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 20:42:36 -0700 (PDT)
+        Mon, 12 Oct 2026 20:42:38 -0700 (PDT)
 From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Date: Mon, 12 Oct 2026 20:42:24 -0700
-Subject: [PATCH 8/9] HID: multitouch: Drop redundant report ID validation
- in mt_get_feature
+Date: Mon, 12 Oct 2026 20:42:25 -0700
+Subject: [PATCH 9/9] HID: playstation: Drop redundant report ID validation
+ in ps_get_report
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261012-hid-core-report-validation-v1-8-e0dd5cb60b2e@gmail.com>
+Message-Id: <20261012-hid-core-report-validation-v1-9-e0dd5cb60b2e@gmail.com>
 References: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 In-Reply-To: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -85,104 +85,32 @@ Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-input@vger.kernel.org, Shashikirana H K <shashikiranah@chromium.org>
 X-Mailer: b4 0.17-dev-e56a4
 
-Now that the core HID layer validates returned report IDs centrally and
-provides a quirk for devices with mismatched responses, remove the
-per-driver report ID check in the multitouch driver.
-
-Also drop the dedicated class and device entry for the ASUS ROG Flow
-Z13 touchpad, as the device now falls back cleanly to the generic Win 8
-multitouch entry.
+Now that the core HID request handling validates returned report IDs
+for report retrieval requests centrally, the report ID check in the
+PlayStation driver is redundant. Drop it.
 
 Assisted-by: LLM
 Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 ---
- drivers/hid/hid-multitouch.c | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+ drivers/hid/hid-playstation.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/hid/hid-multitouch.c b/drivers/hid/hid-multitouch.c
-index 4e19a0c4d238..69f770a5c430 100644
---- a/drivers/hid/hid-multitouch.c
-+++ b/drivers/hid/hid-multitouch.c
-@@ -79,7 +79,6 @@ MODULE_LICENSE("GPL");
- #define MT_QUIRK_APPLE_TOUCHBAR		BIT(23)
- #define MT_QUIRK_YOGABOOK9I		BIT(24)
- #define MT_QUIRK_KEEP_LATENCY_ON_CLOSE	BIT(25)
--#define MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH	BIT(26)
- 
- #define MT_INPUTMODE_TOUCHSCREEN	0x02
- #define MT_INPUTMODE_TOUCHPAD		0x03
-@@ -236,7 +235,6 @@ static void mt_post_parse(struct mt_device *td, struct mt_application *app);
- #define MT_CLS_APPLE_TOUCHBAR			0x0114
- #define MT_CLS_YOGABOOK9I			0x0115
- #define MT_CLS_EGALAX_P80H84			0x0116
--#define MT_CLS_ASUS_ROG_Z13_FOLIO		0x0117
- #define MT_CLS_SIS				0x0457
- 
- #define MT_DEFAULT_MAXCONTACT	10
-@@ -407,16 +405,6 @@ static const struct mt_class mt_classes[] = {
- 		.quirks = MT_QUIRK_ALWAYS_VALID |
- 			MT_QUIRK_CONTACT_CNT_ACCURATE |
- 			MT_QUIRK_ASUS_CUSTOM_UP },
--	{ .name = MT_CLS_ASUS_ROG_Z13_FOLIO,
--		.quirks = MT_QUIRK_ALWAYS_VALID |
--			MT_QUIRK_IGNORE_DUPLICATES |
--			MT_QUIRK_HOVERING |
--			MT_QUIRK_CONTACT_CNT_ACCURATE |
--			MT_QUIRK_STICKY_FINGERS |
--			MT_QUIRK_WIN8_PTP_BUTTONS |
--			MT_QUIRK_CONFIDENCE |
--			MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH,
--		.export_all_inputs = true },
- 	{ .name = MT_CLS_VTL,
- 		.quirks = MT_QUIRK_ALWAYS_VALID |
- 			MT_QUIRK_CONTACT_CNT_ACCURATE |
-@@ -519,7 +507,6 @@ static const struct attribute_group mt_attribute_group = {
- 
- static void mt_get_feature(struct hid_device *hdev, struct hid_report *report)
- {
--	struct mt_device *td = hid_get_drvdata(hdev);
- 	int ret;
- 	u32 size = hid_report_len(report);
- 	u8 *buf;
-@@ -541,25 +528,12 @@ static void mt_get_feature(struct hid_device *hdev, struct hid_report *report)
- 		dev_warn(&hdev->dev, "failed to fetch feature %d\n",
- 			 report->id);
- 	} else {
--		/*
--		 * The report ID in the request and the response should match.
--		 * Some firmware (e.g. the ASUS ROG Z13 Folio
--		 * touchpad) returns a mismatched ID on this specific fetch;
--		 * tolerate it only for devices explicitly flagged as such.
--		 */
--		if (report->id != buf[0] &&
--		    !(td->mtclass.quirks & MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH)) {
--			hid_err(hdev, "Returned feature report did not match the request\n");
--			goto free;
--		}
--
- 		ret = hid_report_raw_event(hdev, HID_FEATURE_REPORT, buf,
- 					   size, size, 0);
- 		if (ret)
- 			dev_warn(&hdev->dev, "failed to report feature\n");
+diff --git a/drivers/hid/hid-playstation.c b/drivers/hid/hid-playstation.c
+index f9dc9378cf77..de51a22ecf0c 100644
+--- a/drivers/hid/hid-playstation.c
++++ b/drivers/hid/hid-playstation.c
+@@ -813,11 +813,6 @@ static int ps_get_report(struct hid_device *hdev, u8 report_id, u8 *buf,
+ 		return -EINVAL;
  	}
  
--free:
- 	kfree(buf);
- }
- 
-@@ -2734,12 +2708,6 @@ static const struct hid_device_id mt_devices[] = {
- 		HID_DEVICE(BUS_I2C, HID_GROUP_MULTITOUCH_WIN_8,
- 			   I2C_VENDOR_ID_HANTICK, I2C_PRODUCT_ID_HANTICK_5288) },
- 
--	/* Asus ROG Flow Z13 (2025) GZ302EA keyboard-cover touchpad */
--	{ .driver_data = MT_CLS_ASUS_ROG_Z13_FOLIO,
--		HID_DEVICE(BUS_USB, HID_GROUP_MULTITOUCH_WIN_8,
--			USB_VENDOR_ID_ASUSTEK,
--			USB_DEVICE_ID_ASUSTEK_ROG_Z13_FOLIO) },
+-	if (buf[0] != report_id) {
+-		hid_err(hdev, "Invalid reportID received, expected %d got %d\n", report_id, buf[0]);
+-		return -EINVAL;
+-	}
 -
- 	/* Generic MT device */
- 	{ HID_DEVICE(HID_BUS_ANY, HID_GROUP_MULTITOUCH, HID_ANY_ID, HID_ANY_ID) },
- 
+ 	if (hdev->bus == BUS_BLUETOOTH && check_crc) {
+ 		/* Last 4 bytes contains crc32. */
+ 		u8 crc_offset = size - 4;
 
 -- 
 2.56.0.385.gd3acb90ef8-goog
