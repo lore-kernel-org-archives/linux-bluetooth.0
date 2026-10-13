@@ -1,180 +1,149 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D546F3FA5E9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 14:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791902650; cv=pass; b=LNWFRYf3MEBOzSFfuq6Nf6RTNmpXJ41odkKXGOdLfSs4KRLs7wXjrd1HwA6Sj6KX3bELD2PIebBaJBAW3LRox3Y+t7RidCMEv7TmcDke4ZePDKXeseIec6hcsXLc4mBwHykKBJqJrBNbcv5bJX6go8/MvES2isrpWxjUxyn7wbE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791902650; c=relaxed/simple;
-	bh=MA6sP6dXRxWesg/4OAgbGsLj9XIL/e42mlrA2trIl3k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PNWVNGbFf2OfqYb9DxvYjmEjCOltJpYB1j0sXbrkTZ3k49dkOa593KFifG0nHAuyetZKum1j/ESwxUlKr+hcpb+dCO1bwD5olQeY5hZPY7ZzgVqSk4v989AbbTftJCgetVH26bE/Om5MGkRJ6gLFwqoKE1/c5mkHxv1ZRY9o2Tg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oioxcsSV; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9016C501F55
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 15:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791903829; cv=none; b=OeNc3rp+2Tfg5Q3ZOaRT52P59WNt/ZMlWbuI5AK/Fa5rTyBEB5ooVITeav/xHhDFs/qboowqMH0tlsVn1jxjdZmY6Zh96WsfkSd3hYggUzaYPPwNcgdcAZ/BNLWcmFV/F5C/72ch07qzhDnQ1F8XNdYBuwRWvlsQYbFups58LBc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791903829; c=relaxed/simple;
+	bh=j8a2JRzCMgZtJXIIcnnLCTAKvYpdryQBpMZO0pLyjYc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ksDQgndXHq0sUcGpyKr77uMZWwKleS8BM2S2feBwJwwU3K/vXyoxkCjd3hw4j8BAvOfRmvcFocaxj7HmuBWBG+HNWhGdxWOgFg8geceMweQ1wElv9cwfKoch3DGAc2maFKQ+0NmlHP990QgKYodRFxeTR4d5t8c89nbfZ9wVQCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UlZsCS85; arc=none smtp.client-ip=209.85.217.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oioxcsSV"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-679334baa1fso2397607d50.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 07:44:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791902648; cv=none;
-        d=google.com; s=arc-20260327;
-        b=kyrW7anBgWQ7nn081gsExo5ZvKImGly7xa+JAlFmz9Lt2w0+xxoLjeNd3ydHB5ZKlN
-         i6+R4reZgOYQvlehTybL55ObxSvyq8fUyg9QmXwAOXFxHlwTRhbRWTyB3mUI5JtKotVO
-         GH9kY6aq2HYrCiZLQnu8PU2hZsIq7luQwawmghDIJFNzva8x/9YqPLyl9cSM2zSRtIGC
-         ZCaY65gzq9UtuGRLOrwDkDuN64Jr0t+eyeDku7oApbJAj9xzBiLE62qUzxtUmevV6mdI
-         iGWJLje8x/sLj2GBY4v1IJyh9h0iLhPCN28xn+h9uksZPCh9X2HsYe+c76g9XPajbSlP
-         tx6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=atduYo+ztkM6ugcnct8YLiRvmZz5QJJQ9yuNM0yfFDk=;
-        fh=bAf3uaujpCfZ+gfuJE9eD1gL5QYFdHZrAlQVfG7eWXo=;
-        b=VBT+1UwCWBcFIjXVvIL5JCbzKDQU63Y73keQsmwzieU1Lt4DLaSGA+ELhi0SBtjqXb
-         I3J14MaHODUlVfxPDYsj72DfnvY9gXcOd+nMut3O6+i2EGNEnl2zdB2X1ys6xoeLR4AS
-         9cAYEj3/QXiohaU5VAav5+C1ybh92r1P2h93bQMaNl4VQ+iCoa50Xh4I/lce8VldGRoe
-         QkoLKlhi2JGI5Y+AOcN0Bk9IaqoIo3Qq+7KhXblRU3UdyPsoDe4FLu5sMy551gfu/ktz
-         y1lOvFu6/Qy6dM1B/T7Zexo+m1ux6932FKnaE4cSdkMAUjHUJGI4ijx4jK3UiTp8lKcX
-         muuA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UlZsCS85"
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-784980b88acso207639137.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 08:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791902648; x=1792507448; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=atduYo+ztkM6ugcnct8YLiRvmZz5QJJQ9yuNM0yfFDk=;
-        b=oioxcsSV1jX4G6SkVvKEn08Rh1wVAG78rQv3RdEpdS/4e/XZvcfL4jqTBNT3z7CTTS
-         IjuwObMFQ0RlBIU+3NKn3H0p06yspFjapBEF2Bbw+fAaU8RIeos46SAQ1sFQdRJToo8x
-         i7RdOu3/ucEwQGkeDHbQpv2P812EfBULHcf/XkJJVvKobqAIqp+zPK8/2YFzRc97im5h
-         RUNOluwU/R8DSon4caf6kUZzlhymwHcru40ZzEcTWOfnBNcBmLRCUM+Kq/2lHBRSX+KJ
-         NzJvIMb4kSzdAHy/+DxLYPcOEY67xXJSNhhuahAwJntQtvj0PeixUiGAJTDfdHJZH5/A
-         oQ+Q==
+        d=gmail.com; s=20251104; t=1791903826; x=1792508626; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lJoABb3GxN4U1Xhe6qXyzuMwtAhFV261/FilCvV9uV4=;
+        b=UlZsCS85laj/Pqpl6iOUTaSk3puO50nv/44AgoCathza8gexq07W+PY6wwij9Lybh7
+         cTI/r7m/nTmRKyrHVqiZADxT1Ox1I9tiDGJAJK+VLgmELcy/J42j/GAq8bMRMhTLgmWa
+         gqviFCCEg3cucPw+LYWR5W18g+JycZvaopEXvVGVh0LzICqwMshNWy4MEN3YMHvvfkFd
+         iPQS3Th8SIS7PTpDtjSJxuslbDi3k5/b9atfZNZ0NWDPyJXKZXu0E2YCA7HcqheGvR58
+         nbnkZHpG2+nfbfC9zL7MSI6OEOyHUWdnnuxXpWA3uPq/24/jYPM5BoV8FL9HPndOyas+
+         rsfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791902648; x=1792507448;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=atduYo+ztkM6ugcnct8YLiRvmZz5QJJQ9yuNM0yfFDk=;
-        b=R3qLD8M7Q66wBZE9h5apIYEwkNIco063PVR6wa+m9VJ488FeKJXJ88ungXxvsbndfN
-         N0zyT7m79U+iyXoYl4ayGBZpimPo5TkALNHYbXTBRPKVMYi3pPtH/bf1YzGuIXemj2oA
-         SuiTef/IuR5ZWx0iE29BOG0tyrIrqFioVGklhMnToPPkAEi5diGL0EK/WCDuHOp+TOsR
-         AyxWp+h3rah/Gk4vsHy5ggIh/k1TM7sL//DiVXx8+sUmizgS7gFjs76yasyHF2GYFGaN
-         DyLyDQPWw9YfCe+01Bo6z7HUYrTlylMFkBVlQw4nsxtwl+OtyAG77W98aiJtjSeBuzmx
-         TjhQ==
-X-Gm-Message-State: AFq9FYK2D7Xw5o6NYNXvo19aNu17CsV2PwSy30wAJ0kUlcm//uuZLp7k
-	4wDX3JfXcbqu05M+0+++pyfHN7nwmq6PAg7nJgHsIu8i4xCTOz1iTavfdxba+HaciWbPYyxzZh5
-	OWrlU4evlj6zfh7YEnAvXlFLLLU5ksV8=
-X-Gm-Gg: AYBFou3BKFMmth935b9UUeBndz1ZiEV1V64qiRtX0tXTOfJJ2nBjbedzSisoC8e77Nz
-	jDHMBjMSEqAVna/IwKlISRNJvTyAP3pgY6a+5EIL6zfppsZpgrq2Ls5YyzWiygiVEPbCWAEilpY
-	CV8ESQvprnWzNPe9xYQd+01nIABewKWtELRxWVCga1H4Uv2ztKwXt0FJ9fx08+d/qP7W+vS3ZPQ
-	h6fdhZzvLZHlsnVVuvbhfohjR+1URuK1EywOwAILRox1mCfPizHUbK+2f0Ni23BnSRLK24am0DY
-	NXadv2bRyNWScWS/PC8nck6Vpiyhxa1KUNDfjEK8kfBiS/KDRJr44eYZse3R0yezusPUQBRpnOn
-	OCc9jso2QIgstHFbtlQbCfpDeMrhoRstAttHXRNV0+A==
-X-Received: by 2002:a05:690e:43c5:b0:671:3036:42bf with SMTP id
- 956f58d0204a3-679362d4543mr1887297d50.91.1791902647582; Tue, 13 Oct 2026
- 07:44:07 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791903826; x=1792508626;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=lJoABb3GxN4U1Xhe6qXyzuMwtAhFV261/FilCvV9uV4=;
+        b=rvjlz2hxwD2e0tLSX3Ie7K/WZ0tlRYftpTmorLc/MDJbtyYEbzW8Kon+jgPIgdC4SU
+         tOw2w5vv38D/w7nVW0HV/7wqiCKXwPxJbGzMy1GI5lr0MHtwGhEadg/COeQe+7cOK/V0
+         W5EjsNY0LMawhG+DGi5LusIppY6kZHT1Eqi6pio4dToMTKcenA4aCZl3pORF6PuDRtDm
+         6zcbiZewjPaU+qNmQ3hGrE8plBfTuLvVNA0XLB7kV+83Bqy4akiomysPxiZj8eHTNAgB
+         MdrnARJtgAUXLpDET72mEMM9sGsLKXbjZfjEAZbaXDp6kvfFAqB3PGXtjwzh8Z1/x84S
+         ydmQ==
+X-Gm-Message-State: AFq9FYJEteZLViW5bwy9Na+m6DU+XvfVjOO4M/PBhcxLcBkDKJt6YWYQ
+	iVYMmF7fJ0Rqw1H9jDb8dtaSdQWg/ZI1WpKWzAYqqCiM/SUctBZkp0YanJhHFw==
+X-Gm-Gg: AYBFou2PisH9tSq/TlGobOVuTIQcXiEJObq8a/x2pEhiqOVfaKtWdWGYjVF9P+VDO9h
+	cQRg4PSqAeVgA8NjQ5XF6yTXgYENxWyxdm8soaAVvaQnaOxUx00MsIElqNB72PP/oefNfKJlrwv
+	XrfPIK1VxqUirTVVbj1SNVZmU2pTbxnGtaFFKuX1BkFn6w0qt8hykFncliaOaTzlxJA1Lcncjxy
+	YK9XZVhXPE/lfGJP1y1eMvdCrK8y6mxjNDqf8+Nj7o/sRkV12LIZQQCMTGhn6pF5v4xVA2HmPk3
+	bwpj9A6NgHi3nNEtMSGJRIivC4ynxViDVmqgzwMuT8bOCMb+RRRiyFEA8fLOk+wCVVt6KFYHBJU
+	NyO9rf+Rip8cEFCcWcYQo7nl7XsWy7KxOm46QB9w2ZxcYzEvztlkeEKAdXFSs0TB+TmApJIMqah
+	CovUR+kRP4igY2FVG35ts8SBOgQqOXuzzWZP9VhUtK979kpgac31++noiqNmwNPZhR6fG2OjfHT
+	z0m8QdlFIA8CuCqLF9ZU4kf/l+Oa7Y58e4Eh3Z/t2ajhDX92pTLUoPyNSaJRDIx
+X-Received: by 2002:a05:6102:38c6:b0:7b5:4700:3a6a with SMTP id ada2fe7eead31-7cb37381bdfmr3358164137.26.1791903826138;
+        Tue, 13 Oct 2026 08:03:46 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7cb3539092esm8993812137.3.2026.10.13.08.03.45
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Oct 2026 08:03:45 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] test: functional: connect instead of pairing a bonded BAP device
+Date: Tue, 13 Oct 2026 11:03:36 -0400
+Message-ID: <20261013150336.579039-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261013031943.489829-1-cochcoder@proton.me>
-In-Reply-To: <20261013031943.489829-1-cochcoder@proton.me>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 13 Oct 2026 10:43:54 -0400
-X-Gm-Features: AclHuK_yIlUUXWCuWRRo25-uRMur7Xtx4RX0jWSulcxBiJ6GnOX20DiZb3u9uYo
-Message-ID: <CABBYNZJJf3owtAwGs4OuL6+YZz+zuY_kewKFDZPQdfcF-xyFFA@mail.gmail.com>
-Subject: Re: [RFC PATCH] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
-To: Kyle Pepper <cochcoder@proton.me>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Kyle,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Oct 12, 2026 at 11:20=E2=80=AFPM Kyle Pepper <cochcoder@proton.me> =
-wrote:
->
-> A nonconforming ASHA peer sends identifier-zero credit indications
-> that are discarded, reducing usable transmit credits until audio stalls.
->
-> Tolerate only exact-size credit indications for a connected LE CoC.
-> Preserve the channel reference, lock and credit-overflow checks and do
-> not send a response with identifier zero. Other zero-ID commands and
-> BR/EDR signaling remain unchanged.
->
-> Core Vol 3 Part A section 4 forbids identifier zero. This is an
-> interoperability RFC requiring maintainer agreement, not a conformance
-> fix or a claim of automatic stream recovery.
->
-> Assisted-by: OpenCode:gpt-6.1-sol
-> Signed-off-by: Kyle Pepper <cochcoder@proton.me>
-> ---
-> Submission review notes (not part of the commit message):
-> Core specification forbids identifier zero. This is a narrow opcode
-> interoperability exception, not a conformance fix. N8 captures contain
-> zero-ID credit indications. Native malformed/overflow/teardown and
-> lockdep/KASAN coverage and exception policy remain review gates.
->
->  net/bluetooth/l2cap_core.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 49a998804..1a0868437 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -5328,6 +5328,12 @@ static inline int l2cap_le_credits(struct l2cap_co=
-nn *conn,
->
->         l2cap_chan_lock(chan);
->
-> +       /* Tolerate identifier-zero credits only for a live LE CoC. */
-> +       if (!cmd->ident &&
-> +           (!credits || chan->state !=3D BT_CONNECTED ||
-> +            chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
-> +               goto unlock;
-> +
->         max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
->         if (credits > max_credits) {
->                 BT_ERR("LE credits overflow");
-> @@ -5923,11 +5929,21 @@ static inline void l2cap_le_sig_channel(struct l2=
-cap_conn *conn,
->
->         BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ide=
-nt);
->
-> -       if (len !=3D skb->len || !cmd->ident) {
-> +       if (len !=3D skb->len) {
->                 BT_DBG("corrupted command");
->                 goto drop;
->         }
->
-> +       if (!cmd->ident) {
-> +               if (cmd->code !=3D L2CAP_LE_CREDITS ||
-> +                   len !=3D sizeof(struct l2cap_le_credits))
-> +                       goto drop;
-> +
-> +               /* Credits have no response or identifier-matched transac=
-tion. */
-> +               l2cap_le_credits(conn, cmd, len, skb->data);
-> +               goto drop;
-> +       }
-> +
->         err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
->         if (err) {
->                 struct l2cap_cmd_rej_unk rej;
->
-> base-commit: 964430c038967fd06643e866f68115664e1a1bd1
+The hosts are shared between tests, so a device bonded by an earlier one
+is still bonded when a later one pairs it, and pairing it again fails
+with AlreadyExists. cmd_pair is meant to connect it instead, but it
+checks Paired, which is not set until the services are resolved, so it
+can still issue the pairing:
 
-Sashiko flagged a problem with this:
+  FAILED test/functional/test_bap.py::test_bass_past_transport_acquire
+  AssertionError: Failed to pair: org.bluez.Error.AlreadyExists
 
-https://sashiko.dev/#/patchset/20261013031943.489829-1-cochcoder%40proton.m=
-e
+Check Bonded, which is what the pairing is rejected for, and connect the
+device instead when it is set.
 
---=20
-Luiz Augusto von Dentz
+Assisted-by: OpenCode:claude-opus-5.5
+---
+ test/functional/test_bap.py | 33 ++++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
+index c4bd5fc6aa61..7cd9466bd5f7 100644
+--- a/test/functional/test_bap.py
++++ b/test/functional/test_bap.py
+@@ -112,12 +112,20 @@ def pair_le(host0, ctl0, host1, ctl1, advertise=True, services=False):
+         ctl1.send("advertise on\n")
+         ctl1.expect("Advertising object registered")
+ 
+-    ctl0.expect(f"Device {host1.bdaddr.upper()}")
+-    ctl0.send(f"pair {host1.bdaddr.upper()}\n")
++    addr = host1.bdaddr.upper()
++
++    ctl0.expect(f"Device {addr}")
++
++    # A device bonded by an earlier test on the same hosts is rejected
++    # with AlreadyExists if paired again, so connect it instead
++    if is_bonded(ctl0, addr):
++        ctl0.send(f"connect {addr}\n")
++    else:
++        ctl0.send(f"pair {addr}\n")
+ 
+     pending = [PAIRED]
+     if services:
+-        pending.append(f"Device {host1.bdaddr.upper()} ServicesResolved: yes")
++        pending.append(f"Device {addr} ServicesResolved: yes")
+ 
+     pair_wait(ctl0, ctl1, pending)
+ 
+@@ -155,6 +163,25 @@ def list_transports(ctl0, hosts):
+         transports[idx - 1] = m[0].decode("utf-8")
+ 
+ 
++def is_bonded(ctl0, addr):
++    """
++    Tell whether the given device is bonded already.
++
++    This is what pairing it is rejected for, which Paired does not
++    reflect until the services are resolved, so cmd_pair, which checks
++    Paired, can still end up pairing a bonded device.
++    """
++    ctl0.send(f"info {addr}\n")
++
++    # Tab indented: the [CHG] lines and the LE. and BREDR. ones are not
++    idx, m = ctl0.expect(
++        [r"\tBonded: (yes|no)", rf"Device {addr} not available"],
++        timeout=REPLY_TIMEOUT,
++    )
++
++    return idx == 0 and m[0] == b"yes"
++
++
+ def remove_device(ctl0, host):
+     """
+     Remove the given host, so the test starts from a state where it is
+-- 
+2.56.0
+
