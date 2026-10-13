@@ -1,155 +1,131 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC36279DCC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 05:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84143321BD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 05:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791867823; cv=none; b=I/blW33xMtS0l5VfOWaJAUXYoJf3MGJs+UpEHSgemvkG1jJHdl+ygOCNRjMggb7H9l6yK/udIuH6sed5gg01o65yyyDV2Ibg0sg6gBp0lT6wfzqDmgbE9uPKNqoDifJuKr4uKgrHYpDvIkacmqTdloPFhXxeVkckSTXjhi3NzDw=
+	t=1791869533; cv=none; b=vAJx2EM1JRF3V3Py/C498bWfT/Tf1hRsyJ4CzHu6IUR9QcuLegGGwCvjYF/X/zm3O5JTecjxEb83rjsTsKtoK0zx0FTRxlpBYlTqO4oT/ZAeqDGc2sKIE+hTbuBBIzQniy3NsaInBuosXJDnA4Gk6GjwekFz7cpahZopTVpY5NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791867823; c=relaxed/simple;
-	bh=umNMkQa9d3RkFNDXXomu3qPNDTJDmchU8mEBsuPtb9A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=pYycYgEqU+LSL4dksmU03sUuAz2di/NLr8sB+NkwBFxH43yutI1GFw59Dlhayapr+MwwxM6ENtg8oBRhqsP/6Sl2qp0PHTQ7xbz7PFQVufz2nTv1xz2lU/7GTx5YIMVwn+hAnZov323OObONITU3ltm8JWmL4kwMp/EWLJWvAVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oHyPeuzE; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791869533; c=relaxed/simple;
+	bh=WgQOnPTi1tnL6fDuSFpQKEm9yu58dR/NyozQFaFmFNM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WA4RQNgwETczTbiXaT8gZpiSqLUzdmAaTbhXudzClTMBXsGA5QkWegePGRW5d6bxVP3Q9wEG7OYRbPymNUxFxdTAI36TFFF13et70LnNsb+WkPNzd5kXnVKTSARmyoTfdPUxA2uXPUodYQ0zjuQ/THD+YYjz3MX7yebqmr96pAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=pIxbmAku; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oHyPeuzE"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-4a69499cefaso761212fac.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 22:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791867821; x=1792472621; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=RMRwh1tI20DqxK3nbOQkU2k/9V8HMTIpEpBqn4FE3zU=;
-        b=oHyPeuzEbsIBaRYYCvC+VB7VhSu1dpb1VVUb0vqP2b5N3/Xsj4MfDJaBLut4nCZGZk
-         71WnJFRe2Ds3TgAOcBwE8524AT13HyDpdNZV8jwSImTzXdel93QSmRalK+6zE+Z43Fo0
-         IA6g3UCXVx4lMu+1uQMkwv5rD9kjPAgmYnsPzNkq9rUfblDj5HJ13lG5GVNchrae24qK
-         8/YKCm4EPGqTHRvB5sEHkW09MyEZtCwdt0tqWLC97Rln7XruvRLbpU2Ub3JedMDP2/D1
-         XSc6maz9xQc7B1n8SSuNrwtFfEPAD9X06Fr1HWjzvBiKs+dEd4vSnjlkD7HZ4Sj8JfhG
-         4y7g==
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="pIxbmAku"
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0A4B73F2D6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 05:32:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1791869521;
+	bh=HdTkQACAxffrwnQrFwY6e5kcuV8v0fcWW79SSqTdU9M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=pIxbmAkuqA+4pOzYDiKGOBgI+vHOEY/eiLWosrnvJskHsJwUr6fYLx2D0W78k+Sdd
+	 rgeKl/SY6smaTLnRgkpE5eCNlWiE0HWd/AMg46qwTTzQKL5TGJHL3wXGhqGODgc3aw
+	 Hb/II4pPdENKtr3SlEVcMt9yWbbAvObXkab1n/jPSe7nV8m5yN3EoV5ZTqLj7tYgeP
+	 DTQJHuW6aRFnZetyxMAvlfth+aILxMwO7nPXiYmreEglhf4ViFJz/oC+D85r/O3eCR
+	 DqBp/zDyckOrMIDfbcKlGZXpZbLenIRy9qDoX4F2xXG29pAq3kXlVlZHbf9CZdTsCK
+	 F6LqMxQjZcE/CB+XmPXprYrPyBV/VNiUxSVb+l6dbgTDDUfyco3knXdTiA3Gd7Dnxa
+	 6lkubTh5S01jmGgucc8y0+NN7iqhMhrx51ig1slm47JNxPBbsgtUqMHZ21l8zxIX/r
+	 ED9UnzgE8khCdwfO8wv7BIa0JNv3H0rZR65k2VjfY9bw8Fom8GtkCFWs2bMwx3XZgN
+	 L5MPnLsSqn8OnHQMVRlWGRRGhRqWDKzrASBN5ODrYARK6+OyrQ+mAPTss/dT4Ylyvq
+	 tWs8juGP6crXaGcx7UuZpjjsWcdjxaEkXVbih/faFZXrzNq/wFOh4YrdePW7vvt3vN
+	 TWLFO33DWnBQzXnFEPzUFxb8=
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2e876e33e6cso5290185ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 22:32:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791867821; x=1792472621;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=RMRwh1tI20DqxK3nbOQkU2k/9V8HMTIpEpBqn4FE3zU=;
-        b=GZVRxu3g5S++Svyh1CglbwIlU499TPS96SFwdsF3yvraa04AeMlpnPEG4Wgftu6Glv
-         0+W0Mr0wbsgRESBihF4rwJmoWsXPvs8BvtZ7cVTf9bNALz+2u3tRBBjY5rxeE9bmQq5m
-         2fgrKj9hvJfpB/KZaLBqcplC/sTD43sIclAg6eBKLPnXgg90E5cYYixPYLH4FWQenKIW
-         EKW9Q1dbuMI2L6hWLBXufh32wga2y4ortCLrxRHDO/zZ/PCDrZcXHnVQQwfL/9AdkJ9y
-         RZXRfOx86ikh1HSxm6tTLQZIcvBISbji9DDXnk4rr20QP5IJe4x38j+rjjyTSO0D4sEY
-         eLAg==
-X-Gm-Message-State: AFq9FYKmEZjxUJ6exY/gYg+77HDjbEZwdoUOLrgO9yTE6H6D3yTaL/Jo
-	IrbUxNKtvYSv5PmFoQWN+UtiSElJ56vOw0lAg1E3o7p866dtOkcfLToOJTSfpQ==
-X-Gm-Gg: AYBFou3lHEOiDRhvHEzYO+Q9LN/23boLFvZY607AZZyR2sHG9dfpOt9B0/z/RVS+8Yc
-	3pfH1tNPRUyZ10S3BPoJrBTT7L3M0++iMNhcpr3PK87BiBndHL44sGDvokZYdSMseKc0XLpdlcV
-	M+pOY8QuAtHIXtqRE/JZR2oh1RcTE8D6khYJw1oLVztiU+ZNLIsKQmTB71Q8KcPMdEfb2JxGUoS
-	E1joorlhxgG/sDNGTqzm/VHBOykdSlj7MqPjmCFHmk6eLtSQNCCEn94+Rg9nlK+dEGN9pLxxHG/
-	E7M/sNghA0GISshELAL5Eicn5sGI920JELbjVyscbHnMiiJzlt+4QFDDTU/Yy659I9rFuzmnHcl
-	e8KSfPvqQx88J28c1w1kWonNZcroko9Di/95OJAJvHy4AODuaSR4vsPSTMBRjI9J9w4AVJjLJ1+
-	7m240NVJBwhNwXj5PxB4hscx6bxXeGQwP5mWNQXqk8SJfBYKl49Z+0jlUUTARCVvGfsn2Gv3cCX
-	jGlyvc=
-X-Received: by 2002:a05:6870:d624:b0:48f:e0f6:bd4d with SMTP id 586e51a60fabf-4a2a4b061f8mr7628648fac.34.1791867820971;
-        Mon, 12 Oct 2026 22:03:40 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.178.209])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a6972b4658sm5237373fac.1.2026.10.12.22.03.39
+        d=1e100.net; s=20260707; t=1791869519; x=1792474319;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=HdTkQACAxffrwnQrFwY6e5kcuV8v0fcWW79SSqTdU9M=;
+        b=tfwmiMS6ZvlIK3twryQZNKEvV+cj/AGwnaZnTa1k6lCfDKMxx7PxRSXRuxF3jCAVUS
+         SqOvsCdfoYcAKtlh5Q03iw3Z9l5AOVwTB0eupqRTKSRqaVEM2vL3pvzjaIf8oFKEB2jb
+         Ks286Lx4PDGd4XAlwx7O0PwbT94VCKQb5lechxKs1wKxJCR703+HDSkYz4bWJoE21WwW
+         llvYropz0MXj6rEQWkCMZ5gRbicpUA7p4TZp8xRpvlgVV2v/qhqiFjIHDGXWba9PiNHt
+         2roQ0zuiT4YeBPex7D0smZk5RDJ6CXvwVsXLokxn2ThXbldOBsnaeOYHue47X77gW3H0
+         mu8w==
+X-Gm-Message-State: AFq9FYK97vUiz4FJflfsykgdAl9O/uuS/bTP2zO5Oghqj5EsFTHOfdHE
+	gEQXBHVaYuk75NYR4hMFC1zsHnvle6UYwMW/dRfAXX6F+jG+vHA3QyjtZjGXkMKU1lDN4kPNvr1
+	szBFUWan3pPofQLQtMQGeHasulu84Q0kmtWJxWq1mvlK/JoLu9WCTuPwBuMxN85gtkViM5z+iIn
+	bBHSKvSetbL7L0OjvkQg==
+X-Gm-Gg: AYBFou3rIUn2EhFRBHw3uASHcEeCIvYQlU9iOIbeDEK8MAeSGXA2rodgTKtqZkH9YHL
+	HODOLxsNBwZKypx00c9NGXdPCUP71pyxcei8RUA4xi0+/DPM8VUazcLUUzTPt9DGeI2W+Pt8K56
+	paC41JubqGwTp7SdqYa6d72vtEuodDSHsrYkH/uXS1ApbtuL5+XQvZxgFzp2ZWUCjxtTeD3ous3
+	o3A9pB52Dg9OU98QyaD6B9NDo3eYX4xcvua1NHFl5YT/4deJ0NDfkl2Pk/82ljga8qJguRtcIwq
+	BJSKmZy+bRr9yCoX5djynORRCfUIaj64rG65M5flmHtPCPJKAANov0g1ZyUqRyIiSIwE/vf9tjw
+	D8XTne7Entk95glbVzMehRmNpgFEUXrcGVEjOL9Ih2uHKQFWoaZ/2XTOxB4H8+oB1kUv9TZDuEF
+	L/NndRScK+pn4YNWvk2RM5bExoaeVOcnSoYEYyk2E4/zJ8p28tLF+gQa8CrX68twGUfChyt3Ig0
+	y3UsdbC9wEPX8z+JeYWWKYVkcXFsg/+r1bEw+rmNGs=
+X-Received: by 2002:a17:903:19e8:b0:2df:8909:f719 with SMTP id d9443c01a7336-2e842aa4aaamr159737395ad.3.1791869519251;
+        Mon, 12 Oct 2026 22:31:59 -0700 (PDT)
+X-Received: by 2002:a17:903:19e8:b0:2df:8909:f719 with SMTP id d9443c01a7336-2e842aa4aaamr159737065ad.3.1791869518908;
+        Mon, 12 Oct 2026 22:31:58 -0700 (PDT)
+Received: from an-XPS-15-9520.buildd (2001-b011-2008-445c-f0c9-fe5f-a459-fd93.dynamic-ip6.hinet.net. [2001:b011:2008:445c:f0c9:fe5f:a459:fd93])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e8483c3dfcsm48724735ad.24.2026.10.12.22.31.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 22:03:40 -0700 (PDT)
-Message-ID: <6acdbbac.a8122b97.18c10f.fb67@mx.google.com>
-Date: Mon, 12 Oct 2026 22:03:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7627868625839565775=="
+        Mon, 12 Oct 2026 22:31:58 -0700 (PDT)
+From: ChunAn Wu <an.wu@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: btintel_pcie: guard debug dump before hdev setup
+Date: Tue, 13 Oct 2026 13:31:18 +0800
+Message-Id: <20261013053118.1201636-1-an.wu@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: shared/asha: prime volume before starting audio
-In-Reply-To: <20261013034613.516771-1-cochcoder@proton.me>
-References: <20261013034613.516771-1-cochcoder@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7627868625839565775==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+An MSI-X interrupt can reach the debug-dump helper before
+btintel_pcie_setup_hdev() initializes data->hdev. The helper then
+passes NULL to hci_get_drvdata() and crashes the interrupt thread.
 
-This is automated email and please do not reply to this email!
+Return early when hdev is not available. This covers the GP1 and GP0
+error paths while leaving interrupt handling unchanged.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1184354/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.47 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      19.44 seconds
-BluezMake                     PASS      291.44 seconds
-MakeCheck                     PASS      14.18 seconds
-MakeDistcheck                 PASS      145.25 seconds
-CheckValgrind                 PASS      231.58 seconds
-CheckSmatch                   PASS      290.49 seconds
-bluezmakeextell               PASS      93.58 seconds
-TestFunctional                FAIL      1198.04 seconds
-IncrementalBuild              PASS      293.18 seconds
-ScanBuild                     PASS      1131.33 seconds
-
-Details
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_bredr[hosts15-vm2]: pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7f9674e9e510>
-    searcher: searcher_re:
-        0: re.compile(b'Changing pairable on succeeded')
-    <pexpect.popen_spawn.PopenSpawn object at 0x7f9674e9e510>
-    searcher: searcher_re:
-        0: re.compile(b'Changing pairable on succeeded')
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
-            return getattr(self.plugins[name], method)(*a, **kw)
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 502, in expect
-            ret = self.ctl.expect(*a, **kw)
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
-            return self.expect_list(compiled_pattern_list,
-                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-                    timeout, searchwindowsize, async_)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
-            return exp.expect_loop(timeout)
-                   ~~~~~~~~~~~~~~~^^^^^^^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
-            return self.timeout(e)
-                   ~~~~~~~~~~~~^^^
-          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
-            raise exc
-        pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7f9674e9e510>
-        searcher: searcher_re:
-            0: re.compile(b'Changing pairable on succeeded')
-        <pexpect.popen_spawn.PopenSpawn object at 0x7f9674e9e510>
-        searcher: searcher_re:
-            0: re.compile(b'Changing pairable on succeeded')
-FAIL functional.test_hog::test_hog[sci-hosts18-vm2]: pytest_bluezenv.rpc.RemoteTimeoutError: Connection recv timed out
-
-
-https://github.com/bluez/bluez/pull/2665
-
+Cc: stable@vger.kernel.org
+Signed-off-by: ChunAn Wu <an.wu@canonical.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel_pcie.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index ac7193400769..8d7927bd75b6 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -297,12 +297,17 @@ static void btintel_pcie_prepare_tx(struct txq *txq, u16 tfd_index,
+ 
+ static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
+ {
+-	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++	struct btintel_pcie_data *data;
+ 	u16 cr_hia, cr_tia;
+ 	u32 reg, mbox_reg;
+ 	struct sk_buff *skb;
+ 	u8 buf[80];
+ 
++	if (!hdev)
++		return;
++
++	data = hci_get_drvdata(hdev);
++
+ 	skb = alloc_skb(1024, GFP_ATOMIC);
+ 	if (!skb)
+ 		return;
 
---===============7627868625839565775==--
+base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
+-- 
+2.34.1
+
