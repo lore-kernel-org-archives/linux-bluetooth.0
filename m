@@ -1,68 +1,68 @@
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA33480DD8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9FD481657
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791862958; cv=none; b=rr4SQHwC2W1bAC303eVq85lBBF5N91aqxJ56Az7+O4Rz7DThl+XVeG9HKjYD9hGFeWVjvaqi425Rv6U+goth2Gwi1xsDub9BHIO5pD7CYU0IU1PGQvvT2EZswNn/7V5Hkt3HKEqNw6im+BogWameS/WcovykysCznVJEJOnSQOA=
+	t=1791862960; cv=none; b=kBZsebCJX2fZa3IJotaBX7SlTCAffbSOEFE+05oQ4mLbCc1X00SDGNNpryspgtUTfGS7XMHk08+VV6bfG03hq3j9rboMJWUv3HSE6+2FSQxnYfVJZV/y0UCzZ7oglLvxwjv7JZyxeaePYKB1VHf293sf1xLNm2ARDTcYp63DnDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791862958; c=relaxed/simple;
-	bh=9lnw1Fa7+1ai8yMi6EJQc7Ex1qH5GtxsH56m2SS0SDM=;
+	s=arc-20240116; t=1791862960; c=relaxed/simple;
+	bh=+pwV1BLf376OQlAycLeQTh57nhL77y9ttRXyNGvVZIo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OwIyfIsmdkiz0JeOdBBcjMaSGLQqlFuR14e1WK6lkQ8sSmD+cuNfX0xJ/fQPxe3ZQnpLN6v7maC6chjr/M+0pmOPlCULFOEQ5J4USPpzfbybs0gxyIICOprE/Zj73Md6DYZR/gOqy1/p4YnMWzJHtVUo3YXBbplVwG5wtaNYeLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sEOJX5bP; arc=none smtp.client-ip=74.125.82.172
+	 In-Reply-To:To:Cc; b=nThuYov2HXD1Vpgl5LMq5T1idERn/5ZVxEAGAME3+mQddHRknCMzgFTaFdgiUb7wt8PhkSwmy+t9n2N0Y2n/zJThDRMpg7mSPDtdEBuWzxUos4c/Qe9TJ5n5hA41ozoNaEa1Qgx0LaZdkyDj4xG4QD9TAJzswPoIC9yvraQRjeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lu2XeH9x; arc=none smtp.client-ip=74.125.82.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sEOJX5bP"
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-3514e7cbbbaso6308812eec.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lu2XeH9x"
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-33e6279a1d7so1807627eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791862956; x=1792467756; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791862957; x=1792467757; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=HPW6ypWLxPBPK/wnHCdzFVOHN9Lae0KKKozgNa5aJtQ=;
-        b=sEOJX5bPJ9wDOYSoik+8biy/9ObTKHxxJJQq9BkWc+xvM2/zNZ454I3ak2+xEWj+0X
-         LtK8dIO2iOuBgtdEAAks+rB+wAn1GkpedyTyDjcm4KguhUAL0dSPfNrIIrLH7mG1QZU/
-         ux9xrkPs0RVsh3ASzK7/l4TlMEH35d1VFMwJOO4/rJFg77k5flyAhQsBVoAdLOdtRzIY
-         MMfUou6bhKLl2ASG6G0pwcAe2met/6tMJKw3j4R0wglQmszeRxhJSt+vwugbL/e3bRHG
-         1B8sDHnLf1F+LRO2vS55P9h8wa9Doui5dm4q469HjmyxLdgXVhwbw9NMcQGF/AO9bDDQ
-         wU+g==
+        bh=h/ZFTuU6ysHjMR8HpQwB0BVfItHewIjMEkFYMIjIRl0=;
+        b=lu2XeH9x9OYUNeD1xglje7J42RJ473BPx1x/29M3mz6+sivZkE+qMzZIaS/r6cLL3q
+         ZRz1oINzpKDB3BRU40BKfp/y265FkbfSTN1q9bM864gZQW7yAt4NP7g5kAlo6PIaPQI6
+         AX5igZmFiw1w0IjJd+MRLwGfybG00BCnggJPNkJdgejWMtjedp1igb+KfqM2HZ/aQymi
+         n5OBAUTsG80VF9QBO6KQzxFov0AGoXzw/JV0FH1nQ3PD3Pnq5vy43BbHL7pssWam86E7
+         oXlsYkNyENgEMRzeJRF9QfGVHJPhxAGH/D0HFa03j78LYJdR8Jk+qNnYUF3i50IuYAz6
+         jKhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791862956; x=1792467756;
+        d=1e100.net; s=20260707; t=1791862957; x=1792467757;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=HPW6ypWLxPBPK/wnHCdzFVOHN9Lae0KKKozgNa5aJtQ=;
-        b=zOMRPYd8vK5CNPxuhDOvr1N2paSf+ZGAHD8RhlBbED8B+nKIUErOkBX+5aDBpSTjIK
-         MnprMuzqd2Q+2xTL8GZ3J2RaPNTWDMeQPHyXBKiVtzGm9rW9ixfTYMoWskwjSW/1OWPx
-         oux7pDM/OaXxS+1Jj4745bPLGPrnwgM3qlo/Lf48dX6H1Q2/94xXto4t5GpZArKgK/PQ
-         sJOZh5AQbpGxqC9H/02X1rjJdHfnRfaXLY8Rl7qCYkF0Q72zrFlz/6nfXTfHHi0VV1p8
-         SFaJ+m1281hMofuelepB3MauxMGPNUfrf7uO+PLAH+9uF6iOvBxn8Z2exzIJ0BzdjSrr
-         2yjA==
-X-Gm-Message-State: AFq9FYInanYIeCiw5qIrtbtbFmqycVFqM1TrcoyASzgilKxO3zNBsFgX
-	E0fRCQY7+J4Gd2ODRTyVEr94BcODSOBn+Ijuc5E6NnImDH6RDlVcwpNV
-X-Gm-Gg: AYBFou2SmyiWebm/m0NOCyCr7kn/ezXGEAscKiI1lHypWxZSlxBLngotOpUh5KDaotE
-	W8jAeovuuT0AWB0FWR0prgijKAZNZ6/nSNYRd3kZyD/l7Ep1WAW7GhAWlbhsPqytPHetjmKoQnA
-	TbtAptlVrjWxzUp+bSgM4BWCQWPQUXyHuZijyRvs14oJeqpAn5+FHXMS6V84a14Sg2iigJsd0rM
-	PorDsaaxwGQS6WWxkYLZSgA1xx9d2roqPPFYZJfaZS+FY8c2p/t04fpbsmdrpz925YOaJ207yAB
-	2uvB9fKGPAKh73tziFjYoSe8WXOFs9NVYrT4w6UHc73AbsQJNfTMcAVXP2Dt8i1kjgTmZRfDaiu
-	BfcF9f6l3Suej9uSJW3JE/Yjzf8H9ch3bSaih7LxHJd1XBc9G2exiB/4nLMqU0Ck8aoB0Sr8kA2
-	zCvahpfaY/7J5DZMS/EFrZKBW9Hr75oACWRaJr8uto8vEnkfJfOihgs9tlA9C7dxA7+Vgqg3eyN
-	Yh5pa5RtOicEK+uqg049+eLbBwLn1Eqv106Cgl9dLl125N+C15U3/+ny092kq0=
-X-Received: by 2002:a05:7300:f582:b0:34c:5831:8a19 with SMTP id 5a478bee46e88-3537e0493a0mr15617210eec.40.1791862955569;
-        Mon, 12 Oct 2026 20:42:35 -0700 (PDT)
+        bh=h/ZFTuU6ysHjMR8HpQwB0BVfItHewIjMEkFYMIjIRl0=;
+        b=R32jtIupW4GF5BQmcuSjGSOkqPkxf//W2psb/Vv1h53QadcgkhtzYVQUkE/LRwhdQR
+         7C7ZxsT0CTSEQJGcUQZkFdnne5FpNxbxYuewZ0E/27TW8RimcAhQEGWHDmAVH1sl9DEG
+         hshKyC1A6i+yAAyfpi6VEh0Tmk9NxNAQcUcIxNyTfWPC2H11WyW01+5zqfIjINJwLD6/
+         UhUkMJgwiewJbT5UYXN4wk3GtEVKXRXHa7HElarKewWARICErRDlU4nFvJsYlemkeS6i
+         zzWKxjckDzn40DW1P1EzxOplZwDYgwgixRPUxmzijcD+/OhcqMYgDYJDaf4LJP9opL37
+         ra8g==
+X-Gm-Message-State: AFq9FYJYYo2im4zH+Wb0PfOtM8kvIz/9hhqfEyzh6/5km5aBassAgyV0
+	lu11BFwfJEhCZkMn2W+VQ7csbVopIxa4ghb7T3wUAJGrKPNyzlaMBrrW
+X-Gm-Gg: AYBFou1NPbWSGqDFSRLyF4EEbRJOdndUOCQ3y0Awfht8yN7eb5FdxG7OneI05Ns+/59
+	fX2ZJiEMxZPXZ5LHsCPsBgYNgKDAAZQh9Xm71dVIuAIHM/wWjewO0C+nFGhYwI80Vh2O7mCPUCF
+	+3FLekzB8Alh2TtyUr2RN+BJ5u5juXhP08kaAmM/Va1NOEkjo5F6rnX+SF0a/q7Gmzy5WJwOGvz
+	EYVWuFCusrjScu4O42BqCzi5NncdNRxvUPXyPi7k8eAWjo0q3gmkgaHrFkP5yY4qtMmkUWywMr6
+	kGEKLK2jXEqDhy9WjF7fd4Wg0jZIRUgZRdECVSaDZ6K/XEwe1c2c0pMOpUjaQNXeVDT769LHb2x
+	I/r8X+1cuqpyoyKyIKiXIwYjPiiOsNOPrKMxAxp/UmfNFdHfUWZcPSCDzwyELiGMqF5R/lI26hy
+	h3RquPZiH8bcsIq3a0uQ8uhubGO9uROmiwN1VRfOkzY6lri41T4ACFcvU7CwLLTg40FIJuQSmua
+	KKbgvFDiAeMZuGzZLL4i14pcuev9DohhzqR5R3s7kKTQwVA9uyaNyImQXO9GlA=
+X-Received: by 2002:a05:7301:1826:b0:359:866d:5bea with SMTP id 5a478bee46e88-359866d78a0mr8979453eec.21.1791862957378;
+        Mon, 12 Oct 2026 20:42:37 -0700 (PDT)
 Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:679a:f35b:7c29:e0f2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.34
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 20:42:34 -0700 (PDT)
+        Mon, 12 Oct 2026 20:42:36 -0700 (PDT)
 From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Date: Mon, 12 Oct 2026 20:42:23 -0700
-Subject: [PATCH 7/9] HID: intel-thc-hid: Drop redundant report ID
- validation in quicki2c
+Date: Mon, 12 Oct 2026 20:42:24 -0700
+Subject: [PATCH 8/9] HID: multitouch: Drop redundant report ID validation
+ in mt_get_feature
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261012-hid-core-report-validation-v1-7-e0dd5cb60b2e@gmail.com>
+Message-Id: <20261012-hid-core-report-validation-v1-8-e0dd5cb60b2e@gmail.com>
 References: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 In-Reply-To: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -85,33 +85,103 @@ Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-input@vger.kernel.org, Shashikirana H K <shashikiranah@chromium.org>
 X-Mailer: b4 0.17-dev-e56a4
 
-Now that the core HID request handling validates returned report IDs
-for report retrieval requests centrally, the report ID check in the
-Intel QuickI2C driver is redundant. Drop it while retaining packet
-length validation.
+Now that the core HID layer validates returned report IDs centrally and
+provides a quirk for devices with mismatched responses, remove the
+per-driver report ID check in the multitouch driver.
+
+Also drop the dedicated class and device entry for the ASUS ROG Flow
+Z13 touchpad, as the device now falls back cleanly to the generic Win 8
+multitouch entry.
 
 Assisted-by: LLM
 Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 ---
- drivers/hid/intel-thc-hid/intel-quicki2c/quicki2c-protocol.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/hid/hid-multitouch.c | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
 
-diff --git a/drivers/hid/intel-thc-hid/intel-quicki2c/quicki2c-protocol.c b/drivers/hid/intel-thc-hid/intel-quicki2c/quicki2c-protocol.c
-index 41271301215a..7a362a2ebe2b 100644
---- a/drivers/hid/intel-thc-hid/intel-quicki2c/quicki2c-protocol.c
-+++ b/drivers/hid/intel-thc-hid/intel-quicki2c/quicki2c-protocol.c
-@@ -160,9 +160,9 @@ int quicki2c_get_report(struct quicki2c_device *qcdev, u8 report_type,
- 		return ret;
+diff --git a/drivers/hid/hid-multitouch.c b/drivers/hid/hid-multitouch.c
+index 4e19a0c4d238..69f770a5c430 100644
+--- a/drivers/hid/hid-multitouch.c
++++ b/drivers/hid/hid-multitouch.c
+@@ -79,7 +79,6 @@ MODULE_LICENSE("GPL");
+ #define MT_QUIRK_APPLE_TOUCHBAR		BIT(23)
+ #define MT_QUIRK_YOGABOOK9I		BIT(24)
+ #define MT_QUIRK_KEEP_LATENCY_ON_CLOSE	BIT(25)
+-#define MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH	BIT(26)
+ 
+ #define MT_INPUTMODE_TOUCHSCREEN	0x02
+ #define MT_INPUTMODE_TOUCHPAD		0x03
+@@ -236,7 +235,6 @@ static void mt_post_parse(struct mt_device *td, struct mt_application *app);
+ #define MT_CLS_APPLE_TOUCHBAR			0x0114
+ #define MT_CLS_YOGABOOK9I			0x0115
+ #define MT_CLS_EGALAX_P80H84			0x0116
+-#define MT_CLS_ASUS_ROG_Z13_FOLIO		0x0117
+ #define MT_CLS_SIS				0x0457
+ 
+ #define MT_DEFAULT_MAXCONTACT	10
+@@ -407,16 +405,6 @@ static const struct mt_class mt_classes[] = {
+ 		.quirks = MT_QUIRK_ALWAYS_VALID |
+ 			MT_QUIRK_CONTACT_CNT_ACCURATE |
+ 			MT_QUIRK_ASUS_CUSTOM_UP },
+-	{ .name = MT_CLS_ASUS_ROG_Z13_FOLIO,
+-		.quirks = MT_QUIRK_ALWAYS_VALID |
+-			MT_QUIRK_IGNORE_DUPLICATES |
+-			MT_QUIRK_HOVERING |
+-			MT_QUIRK_CONTACT_CNT_ACCURATE |
+-			MT_QUIRK_STICKY_FINGERS |
+-			MT_QUIRK_WIN8_PTP_BUTTONS |
+-			MT_QUIRK_CONFIDENCE |
+-			MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH,
+-		.export_all_inputs = true },
+ 	{ .name = MT_CLS_VTL,
+ 		.quirks = MT_QUIRK_ALWAYS_VALID |
+ 			MT_QUIRK_CONTACT_CNT_ACCURATE |
+@@ -519,7 +507,6 @@ static const struct attribute_group mt_attribute_group = {
+ 
+ static void mt_get_feature(struct hid_device *hdev, struct hid_report *report)
+ {
+-	struct mt_device *td = hid_get_drvdata(hdev);
+ 	int ret;
+ 	u32 size = hid_report_len(report);
+ 	u8 *buf;
+@@ -541,25 +528,12 @@ static void mt_get_feature(struct hid_device *hdev, struct hid_report *report)
+ 		dev_warn(&hdev->dev, "failed to fetch feature %d\n",
+ 			 report->id);
+ 	} else {
+-		/*
+-		 * The report ID in the request and the response should match.
+-		 * Some firmware (e.g. the ASUS ROG Z13 Folio
+-		 * touchpad) returns a mismatched ID on this specific fetch;
+-		 * tolerate it only for devices explicitly flagged as such.
+-		 */
+-		if (report->id != buf[0] &&
+-		    !(td->mtclass.quirks & MT_QUIRK_IGNORE_FEATURE_ID_MISMATCH)) {
+-			hid_err(hdev, "Returned feature report did not match the request\n");
+-			goto free;
+-		}
+-
+ 		ret = hid_report_raw_event(hdev, HID_FEATURE_REPORT, buf,
+ 					   size, size, 0);
+ 		if (ret)
+ 			dev_warn(&hdev->dev, "failed to report feature\n");
  	}
  
--	if (HIDI2C_DATA_LEN(le16_to_cpu(rpt->len)) != buf_len || rpt->data[0] != reportnum) {
--		dev_err_once(qcdev->dev, "Invalid packet, len (%d vs %zu) report id (%d vs %d)\n",
--			     le16_to_cpu(rpt->len), buf_len, rpt->data[0], reportnum);
-+	if (HIDI2C_DATA_LEN(le16_to_cpu(rpt->len)) != buf_len) {
-+		dev_err_once(qcdev->dev, "Invalid packet length (%d vs %zu)\n",
-+			     le16_to_cpu(rpt->len), buf_len);
- 		return -EINVAL;
- 	}
+-free:
+ 	kfree(buf);
+ }
+ 
+@@ -2734,12 +2708,6 @@ static const struct hid_device_id mt_devices[] = {
+ 		HID_DEVICE(BUS_I2C, HID_GROUP_MULTITOUCH_WIN_8,
+ 			   I2C_VENDOR_ID_HANTICK, I2C_PRODUCT_ID_HANTICK_5288) },
+ 
+-	/* Asus ROG Flow Z13 (2025) GZ302EA keyboard-cover touchpad */
+-	{ .driver_data = MT_CLS_ASUS_ROG_Z13_FOLIO,
+-		HID_DEVICE(BUS_USB, HID_GROUP_MULTITOUCH_WIN_8,
+-			USB_VENDOR_ID_ASUSTEK,
+-			USB_DEVICE_ID_ASUSTEK_ROG_Z13_FOLIO) },
+-
+ 	/* Generic MT device */
+ 	{ HID_DEVICE(HID_BUS_ANY, HID_GROUP_MULTITOUCH, HID_ANY_ID, HID_ANY_ID) },
  
 
 -- 
