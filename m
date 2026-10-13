@@ -1,117 +1,226 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106119.protonmail.ch (mail-106119.protonmail.ch [79.135.106.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FB7481238
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD4C4718CF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 03:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791862962; cv=none; b=ImK4DNMDMs0zxQvfBgfzN3TfpBwL25f61PCbb7KM4JIvC1fPARxbe4T8PsMLSWiMdEHBC+vsu2lPZdr8Bl/y8ByS6RyzSC9x/l2XIsR7pf4knKqGnsjz38tZ9eo3cUjLxGNoaUf07Y3vhtG4k1Pl5OV/KOOAaKv9B65QthTohF8=
+	t=1791863052; cv=none; b=VYRoy1ZrLZairoHWldexQBgxPzovzk/QpUDnUsA+uRXZH+icxU0bhNb6VYI+t9GevdC+o1QJQC/tAuLzT69y9+GGGRO73nbS2VxrOA66YeGbHiZ8EpAWCiQHuBX9BEeoHwe4q0IlSscZ2qpkq6xyqegT8vYCxMpARdPacEoLViI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791862962; c=relaxed/simple;
-	bh=vOJczOjB0TyoKQuVkW2orzE70JFVuyQyf49j8eErCTk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cZp+hbpIsarZ4rI9bSzLlH/1028csKIFQ2M9EeJTem6+bbUqyxxrDDi4hj2ofLrQ+IK6lqB1wOca351sVQgsrYmc6AtmwO6aRyXfEhjb5WXiU6KTYKJb+n9fwifldLr+VpKymY1udziVAWldqvWQsXYB2eM1gKXk2Az1cwqAETo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dL7/Qskh; arc=none smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791863052; c=relaxed/simple;
+	bh=fREBOrSzaEYkZ0DMnh4y2g6Ix89+NWzLejauzh0XR10=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=AQbfREHs4rxIRi11JeREDq1tC7ls70Ew97llA6fYZZgDxHUWGX5zP0R54MwVmt1/Q/q4vpon2teTP0APjzC52NZpkI84hX2azvPyDhFYlcmToZsqqx7d4hhYpJp8cs8YAv98PPBqC/qgV8FLSMygoMHS6Gyoi9LY0gXvNk0hOkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=gM9Q043n; arc=none smtp.client-ip=79.135.106.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dL7/Qskh"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-354ba08cfd1so4387240eec.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Oct 2026 20:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791862959; x=1792467759; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2jUpAcTrC5YTZFZzQ8gUcjDGHz/C/y6LLOxwXLI1DTw=;
-        b=dL7/QskhLLhR9SP9+FZZekIxX856Velzj7ahazF1Zt//zguqFw3lGjmS7wfTP95zBV
-         xJ7pI+IpvIJkA+7gAmjgnWN5DixYAqrSd0AT5LUpVup9LsPclxnKg2qWaSO+FAqwIX7q
-         e6+V4vu3oTVNIVA9jofoet4s3ebPu35e2a/Sen+ss4z5dQyB/VGM69ZrvyfDzZY9mTHr
-         h483MpyGkODTtCml8J4eDCizA+eHmj0lcC1cLKo0C4n8HYupZyHRBZFeUBt8Z5kI0c95
-         cT7mD+SM4VO+UGMb1VRYbJURBwWQfscy+nbBvxcwrlC5PU63N1FMrJ9gAx1JXKFHRlds
-         dPKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791862959; x=1792467759;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2jUpAcTrC5YTZFZzQ8gUcjDGHz/C/y6LLOxwXLI1DTw=;
-        b=1leRAtYYAypgT1/0X0YokRFeRKfGndSr5U8lZOQha6nRErkmciwLPr6CE+fb7T0tYS
-         gpfgDUxXOD7JmSiJD76wR9j2xEXhCgvGf9ADDN0g75cIaI4nfLfmplYIIKqPVgRsEfIb
-         9HfEpV1l4EBxUGDRYLJETW0kul1ZttKw4j5Ef8wLEFyp3DRSfcC8vggyTSmWZj8aPRIj
-         8YJ7x2uOgyogE2etBS85XPjBS/OgyUQz/0ROAz5gHO8wCn7/LoOWVBGr3LOC+L0oLt4u
-         dwLDdPRYemUOud0+fDcOE1drA5bqHFO0YE+iNsye/09yshYcRu7PsyZcmzlpxzrQwz9g
-         I5mA==
-X-Gm-Message-State: AFq9FYIYRPuUpmK+557n8wqVqw/kbUo4MBEyStt2ndVSl0XVtwpcFfd1
-	7glK7vSAmgGsE7xS++Cj1l0Io7PgGZXC28fvKWxG6SQ/EtjBM+uSNu2X
-X-Gm-Gg: AYBFou2VCJ+7rWFKCWKQ0s/eBGR/2JJbtruLFk0wUC8FTYfZJl9zL8T72LyfnhgPVPZ
-	WPsX8bsy4tvVVkEVuece898zddPHK0SZkQnZNTsgJ0stywMtwo6w9Zom3NPqNqS/8yaJWHnI896
-	cxCvEqCebwJQBGOV5TH17CnZM6zhmqyqAKhkYgvnvm703zJNOLX+e1WRAPywiUhMgf6rDERNFe4
-	zcNke09qcc+RTQk2uNYXDHpYsK9+BEywpVFytNgMwuiw4D/Vhg8JT6XL5rTFKrGOXNUOCFGWxop
-	pctO+g07HDJIVSo17vS6BzKBaMjRRJCyApSI3ZCTjEPvF0BsLvNYsjmlDM/vY4kUCJ/6ZOSvFwj
-	4viCZsNYBfr6jaE2jIhJOc7pFwIChziFkV2J0NvjkzPf93PNvnLR8chul2xRH3bRrG4iHuO/qnU
-	TdjjIvcgyP8xT0g3j55h0Ju0aKZ+VvtiVyqX97kOhtC5Aq/Vkj3h3NU/OgqHVcFyiqty4ndwQpU
-	NSxdFwn3bU3ZYhndHKgb4AqTI9hYRX1bwc5y3J5UiSTuBy7IqTDiOylDt6zzyc=
-X-Received: by 2002:a05:693c:4151:10b0:351:70ec:1071 with SMTP id 5a478bee46e88-3537e0866d5mr17875344eec.16.1791862959195;
-        Mon, 12 Oct 2026 20:42:39 -0700 (PDT)
-Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:679a:f35b:7c29:e0f2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cb68e56sm35268677eec.29.2026.10.12.20.42.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2026 20:42:38 -0700 (PDT)
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Date: Mon, 12 Oct 2026 20:42:25 -0700
-Subject: [PATCH 9/9] HID: playstation: Drop redundant report ID validation
- in ps_get_report
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="gM9Q043n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1791863045; x=1792122245;
+	bh=UI92Wblirhltddft1bFBKlMJ+BzxtwJr+EaHryIUPeQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=gM9Q043nCItHEcpdbau/vIstYu0kStYP3ShhyxFZqalPYVWC+9ondogEXQ28gkSMb
+	 egIHrsdzPWRVaSMFjTfYhhAzrPQ91+lp+xOfoGO0lRWn8VK3zZr53a0WaCcfC12KZp
+	 JgmcjgoM7IJZ5skWT4FUDyoun5AJX3uzbCxMH+xO5S+tzLjEPjZc5yDCtAGUid+/Rf
+	 ZdxjD7u5F6qNM1FxIMlfcdaELDslZL6UIAdjChMgibG1pP1rfKogSVD6bUgC5WRAyZ
+	 x4FxnahIHGXHg46TTIdViPzP2CSR391cWOyjU4JhC1OziroquofxgScUndzqJXV2s/
+	 ByguAVT9JJpwQ==
+Date: Tue, 13 Oct 2026 03:44:02 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Kyle Pepper <cochcoder@proton.me>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] shared/asha: send STOP without waiting for a response
+Message-ID: <20261013034345.513789-1-cochcoder@proton.me>
+Feedback-ID: 97716137:user:proton
+X-Pm-Message-ID: bd9d9a5b6960381021c707517e91834b23e7399c
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261012-hid-core-report-validation-v1-9-e0dd5cb60b2e@gmail.com>
-References: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
-In-Reply-To: <20261012-hid-core-report-validation-v1-0-e0dd5cb60b2e@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- David Rheinsberg <david@readahead.eu>, 
- Frank Praznik <frank.praznik@oh.rr.com>, Jiri Kosina <jikos@kernel.org>, 
- Benjamin Tissoires <bentiss@kernel.org>, Even Xu <even.xu@intel.com>, 
- Xinpeng Sun <xinpeng.sun@intel.com>, 
- Roderick Colenbrander <roderick.colenbrander@sony.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, Shashikirana H K <shashikiranah@chromium.org>
-X-Mailer: b4 0.17-dev-e56a4
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Now that the core HID request handling validates returned report IDs
-for report retrieval requests centrally, the report ID check in the
-PlayStation driver is redundant. Drop it.
+STOP resets local state without consuming the ATT response. Use a Write
+Command so an unresponsive renderer does not hold the request queue
+until timeout.
 
-Assisted-by: LLM
-Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Test command semantics, failure handling and peer STATUS notification.
+
+Fixes: 9948168cca15 ("shared/asha: Don't wait for status notification on st=
+op")
+Assisted-by: OpenCode:gpt-6.1-sol
 ---
- drivers/hid/hid-playstation.c | 5 -----
- 1 file changed, 5 deletions(-)
+Submission review notes (not part of the commit message):
+Local validation is for base 7428ca2df9356363079db0f48412c20cbdb9471f.
+Compatibility with newer upstream tips has not been verified locally.
+This topic uses the verified STOP introducing commit as its Fixes tag.
+Existing N8 blocking-STOP failure evidence is retained; the new unit test
+mocks setup and GATT writes, not hardware or daemon concurrency.
 
-diff --git a/drivers/hid/hid-playstation.c b/drivers/hid/hid-playstation.c
-index f9dc9378cf77..de51a22ecf0c 100644
---- a/drivers/hid/hid-playstation.c
-+++ b/drivers/hid/hid-playstation.c
-@@ -813,11 +813,6 @@ static int ps_get_report(struct hid_device *hdev, u8 report_id, u8 *buf,
- 		return -EINVAL;
- 	}
- 
--	if (buf[0] != report_id) {
--		hid_err(hdev, "Invalid reportID received, expected %d got %d\n", report_id, buf[0]);
--		return -EINVAL;
--	}
--
- 	if (hdev->bus == BUS_BLUETOOTH && check_crc) {
- 		/* Last 4 bytes contains crc32. */
- 		u8 crc_offset = size - 4;
+ .gitignore            |  1 +
+ Makefile.am           |  6 +++
+ src/shared/asha.c     |  5 ++-
+ unit/test-asha-stop.c | 97 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 107 insertions(+), 2 deletions(-)
+ create mode 100644 unit/test-asha-stop.c
 
--- 
-2.56.0.385.gd3acb90ef8-goog
+diff --git a/.gitignore b/.gitignore
+index 06b24735df..8a4195c05a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -112,6 +112,7 @@ unit/test-lib
+ unit/test-mgmt
+ unit/test-uhid
+ unit/test-hfp
++unit/test-asha-stop
+ unit/test-crypto
+ unit/test-ecc
+ unit/test-hog
+diff --git a/Makefile.am b/Makefile.am
+index f742458d11..6016913145 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -706,6 +706,12 @@ unit_test_avrcp_LDADD =3D lib/libbluetooth-internal.la=
+ \
+=20
+ unit_tests +=3D unit/test-hfp
+=20
++unit_tests +=3D unit/test-asha-stop
++
++unit_test_asha_stop_SOURCES =3D unit/test-asha-stop.c
++unit_test_asha_stop_LDADD =3D src/libshared-glib.la \
++=09lib/libbluetooth-internal.la $(GLIB_LIBS)
++
+ unit_test_hfp_SOURCES =3D unit/test-hfp.c
+ unit_test_hfp_LDADD =3D src/libshared-glib.la $(GLIB_LIBS)
+=20
+diff --git a/src/shared/asha.c b/src/shared/asha.c
+index 79bb29bf9a..0e6261d37d 100644
+--- a/src/shared/asha.c
++++ b/src/shared/asha.c
+@@ -284,8 +284,9 @@ unsigned int bt_asha_stop(struct bt_asha *asha)
+=20
+ =09asha->state =3D ASHA_STOPPED;
+=20
+-=09ret =3D asha_send_acp(asha, acp_stop_cmd, sizeof(acp_stop_cmd), NULL,
+-=09=09=09NULL);
++=09/* State is reset below without waiting for an ATT response. */
++=09ret =3D asha_send_acp_without_response(asha, acp_stop_cmd,
++=09=09=09sizeof(acp_stop_cmd));
+ =09asha_set_send_status(asha, false);
+=20
+ =09/* We reset our state without waiting for a response */
+diff --git a/unit/test-asha-stop.c b/unit/test-asha-stop.c
+new file mode 100644
+index 0000000000..5ef6d03623
+--- /dev/null
++++ b/unit/test-asha-stop.c
+@@ -0,0 +1,97 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++#include <assert.h>
++
++/* Source-level mocks remain effective with link-time optimization. */
++#define bt_gatt_client_write_without_response test_write_command
++#define bt_gatt_client_write_value test_write_request
++#include "src/shared/asha.c"
++#undef bt_gatt_client_write_without_response
++#undef bt_gatt_client_write_value
++#include "src/shared/tester.h"
++
++static unsigned int commands, requests, peer_updates;
++static bool command_ok;
++
++void btd_error(uint16_t index, const char *format, ...)
++{
++}
++
++void btd_debug(uint16_t index, const char *format, ...)
++{
++}
++
++unsigned int test_write_command(struct bt_gatt_client *client, uint16_t ha=
+ndle,
++=09=09=09=09=09bool signed_write,
++=09=09=09=09=09const uint8_t *value, uint16_t length)
++{
++=09assert(client && handle =3D=3D 0x79 && !signed_write);
++
++=09if (value[0] =3D=3D 0x02) {
++=09=09assert(length =3D=3D 1);
++=09=09commands++;
++=09=09return command_ok;
++=09}
++
++=09assert(length =3D=3D 2 && value[0] =3D=3D 0x03 && value[1] =3D=3D 0x00)=
+;
++=09peer_updates++;
++=09return 1;
++}
++
++unsigned int test_write_request(struct bt_gatt_client *client, uint16_t ha=
+ndle,
++=09=09=09=09const uint8_t *value, uint16_t length,
++=09=09=09=09bt_gatt_client_callback_t callback, void *data,
++=09=09=09=09bt_gatt_client_destroy_func_t destroy)
++{
++=09requests++;
++=09return 1;
++}
++
++static void state_callback(int status, void *data)
++{
++=09assert(false);
++}
++
++static void test_stop(const void *user_data)
++{
++=09unsigned int fail;
++
++=09for (fail =3D 0; fail < 2; fail++) {
++=09=09struct bt_asha left =3D {
++=09=09=09.client =3D (void *) 1, .acp_handle =3D 0x79,
++=09=09=09.hisyncid =3D { 1 }, .state =3D ASHA_STARTED,
++=09=09=09.state_cb =3D state_callback, .state_cb_data =3D (void *) 1,
++=09=09};
++=09=09struct bt_asha right =3D {
++=09=09=09.client =3D (void *) 2, .acp_handle =3D 0x79,
++=09=09=09.hisyncid =3D { 1 }, .right_side =3D true,
++=09=09=09.state =3D ASHA_STARTED,
++=09=09};
++
++=09=09asha_devices =3D queue_new();
++=09=09update_asha_set(&left, true);
++=09=09update_asha_set(&right, true);
++=09=09commands =3D requests =3D peer_updates =3D 0;
++=09=09command_ok =3D !fail;
++=09=09assert(bt_asha_stop(&left) =3D=3D (fail ? (unsigned int) -1 : 0));
++=09=09assert(commands =3D=3D 1 && requests =3D=3D 0 && peer_updates =3D=3D=
+ 1);
++=09=09assert(left.state =3D=3D ASHA_STOPPED);
++=09=09assert(right.state =3D=3D ASHA_STARTED);
++=09=09assert(!left.state_cb && !left.state_cb_data);
++
++=09=09/* Repeated stop must not send another control command. */
++=09=09assert(bt_asha_stop(&left) =3D=3D 0);
++=09=09assert(commands =3D=3D 1 && requests =3D=3D 0 && peer_updates =3D=3D=
+ 1);
++=09=09update_asha_set(&left, false);
++=09=09update_asha_set(&right, false);
++=09=09assert(!asha_devices);
++=09}
++
++=09tester_test_passed();
++}
++
++int main(int argc, char *argv[])
++{
++=09tester_init(&argc, &argv);
++=09tester_add("ASHA/stop/command", NULL, NULL, test_stop, NULL);
++=09return tester_run();
++}
+
+base-commit: 7428ca2df9356363079db0f48412c20cbdb9471f
 
