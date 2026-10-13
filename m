@@ -1,38 +1,38 @@
-Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E05651C066
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 23:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB87F55C1DA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 23:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791932745; cv=none; b=Voo31tyZedhAYhGW6pqyggNgqQ6Tsk8vve47Elt8H1RXfznwY/dMuza42W9Wu9aFkEOjgJ23ozNpeSeX5jSq6jAYoUMESfAPc+T/CluvSyXWJyjNl88Rb8bRwQB84McbTNVpheFhgYqYhsgOgQD5PF5DzOb0jIgqFLHQe7cJ7ao=
+	t=1791932750; cv=none; b=OpZWlrLZj/jVmOTJn3p3TepFJGVIcBRZWKX1EsSNtseVWHt9su8unSb7gvY8NFp+URgBMFVncQyEp8cvxwQ5SAsfl5Sstu3n2hWq5iM04rG+0snPChgalkkrWTMbewneLp10gwENEVXLKA4+kplH1TEvUwI+fKkXqnreM/TkTTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791932745; c=relaxed/simple;
-	bh=8+ZzsnXVWMn92Qb0kvT83XdKbPB2Fr4B76Snp6Z7ZXo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WEU+MWd13SzFvKJmFXu702VbrXba1Pc5ATptw0WS+YBmOmdA/RjmtHPTjvBv5ML3kKxAwvi/z5ulB3FkIJA8cMCCmz8tRBAn3mlWzkQwEWQpRy9nKsN7FlqGdRP9KBtx62QJoO8VFpFBU43c0S7rA/8dn8hLA0yKicOjWobOy4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=QRfJ5vPG; arc=none smtp.client-ip=192.30.252.142
+	s=arc-20240116; t=1791932750; c=relaxed/simple;
+	bh=gTngj/tItek4lUcvz5K8WQIvsz/XFtyu+Pj/JyHfyz4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i9taEkX8Wbu2UaDoyoKfdCIzyMUNTcRJcI/hkuiM2SqsKnTxhfkRyPG96Zf5OZhwuY5OGS8W/vDHpKMiAUDB4+qI8sJPs/EC0YdYN+jecjtIM58adc/tD8kQ1zYj/3b1a0aShbiw9KVXWKQ3f2QxQ0B+wmpYt9Azbn5fy4TTfDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=StsP+VEA; arc=none smtp.client-ip=192.30.252.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="QRfJ5vPG"
+	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="StsP+VEA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791932743;
-	bh=cOB7Pi8ss/5AcVkFFWibnES370v4GSo+A2WnaZ6Pglc=;
+	s=pf2026; t=1791932748;
+	bh=tpnmyqXrN84pL3v/Kub8DlVUi9SF0cZ3ktbGns8FXj0=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=QRfJ5vPGojOGQkoE43qhHYDKC9pq5vPYcUxCuiCBm1DJIztLqplK4w+VQAd3crdM9
-	 ZCH7WOr6BV/P6FVGub9gTMwH1NVlRbyysUDhWHKQduRSzsG1JoCkcun3rHRXgtG1VL
-	 M1wd4dfY4xp/kaeChn9P6QWTf8gZKJ5PHfkpEDE2BZxSXG0sLjxRLPmkFkutFFFftv
-	 ODkrFYFsiGxekiZ1wae+7PnBylr7IyT9km/0n74HBBB3C2ADUOsYvYZHdP1ncYUTYt
-	 G+NMjJCeL8ASHPPBim7IibuQ4TLTrbU8b0IQDc4roO4CPcsz4ugGXg41XCyPbTNRbL
-	 oufwH74sWMQ/A==
-Received: from github.com (hubbernetes-node-8fb7d75.ash1-iad.github.net [10.56.200.65])
-	by smtp.github.com (Postfix) with ESMTPA id B88EF8405A7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 16:05:43 -0700 (PDT)
-Date: Tue, 13 Oct 2026 16:05:43 -0700
+	b=StsP+VEAfGfeE/5vmakuJuNUTk+j9TVEURZABLP/o+ih3bz0TqAwSKg2bRe6AGWn2
+	 Ag2ZLCfs/CK1XRcNlPnzZG3dOGNC6gPxxRw+/LfH/o0V4lVQ9qngAxURmODO3kBXbT
+	 z+yznwxXG0kXvagX3ffVkvnDx/4Cdg21o3q2wHx1epvIJC6SZTsuKSPJkgcImvoZst
+	 SrDOyq4RoQ3TUSCU6oT8hfks2a7T/+Hqurv7BxehJUDkton/VJDgulTA9mMFSp+Rrf
+	 IMFLOGVxabABbRoNVNwk03FqoKmkW1e+D5AmlGc13f8Aack0bs+O35ctrqTDKgLCER
+	 A2LnEYIjDoJDA==
+Received: from github.com (hubbernetes-node-9e5300e.ash1-iad.github.net [10.56.211.73])
+	by smtp.github.com (Postfix) with ESMTPA id 0E722600FA5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 16:05:48 -0700 (PDT)
+Date: Tue, 13 Oct 2026 16:05:48 -0700
 From: cochcoder <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1185114/000000-eab7a9@github.com>
-Subject: [bluez/bluez] eab7a9: asha: allow LE 2M PHY on the audio channel
+Message-ID: <bluez/bluez/push/refs/heads/1185115/000000-3ae2bb@github.com>
+Subject: [bluez/bluez] 3ae2bb: asha: Notify connection interval changes
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,10 +45,10 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1185114
+  Branch: refs/heads/1185115
   Home:   https://github.com/bluez/bluez
-  Commit: eab7a9c9bcc0c655389a043e6bff4244448b59ba
-      https://github.com/bluez/bluez/commit/eab7a9c9bcc0c655389a043e6bff4244448b59ba
+  Commit: 3ae2bbb6575df7d55bfc0b4e76c519a0a0df5f7a
+      https://github.com/bluez/bluez/commit/3ae2bbb6575df7d55bfc0b4e76c519a0a0df5f7a
   Author: Kyle Pepper <cochcoder@proton.me>
   Date:   2026-10-13 (Tue, 13 Oct 2026)
 
@@ -56,18 +56,35 @@ X-Auto-Response-Suppress: All
     M .gitignore
     M Makefile.am
     M profiles/audio/asha.c
-    A unit/test-asha-phy.c
+    M src/shared/asha.c
+    M src/shared/asha.h
+    A unit/test-asha-conn.c
+    A unit/test-asha-conn.h
+    A unit/test-asha-interval.c
 
   Log Message:
   -----------
-  asha: allow LE 2M PHY on the audio channel
+  asha: Notify connection interval changes
 
-Allow LE 2M on the CoC socket to increase available throughput for
-capable peers. Retain LE 1M fallback and treat BT_PHY as best effort
-for older kernels.
+Omitting the connection-update STATUS notification causes repeated N8
+supervision timeouts even with a negotiated 20 ms interval. Restoring
+the notification alone prevents the reported link failures.
 
-Test the PHY mask and continued startup when the preference is rejected.
+Observe successful LE connection and update events per adapter, associate
+them with the ATT socket's handle, and announce the observed interval
+before START and on subsequent successful updates. Clear the observation
+on disconnect so a reused handle cannot inherit another link's interval.
+Notify the attached HiSyncId peer as well, matching Android's
+connection-update STATUS handling, without truncating the interval byte.
 
+Reuse the verified socket handle when delivering a live update.
+
+Add tests for event delivery, controller isolation, disconnect/reuse,
+pre-START ordering, failed updates and peer notification.
+Use source-level mocks so the tests remain valid with link-time
+optimization enabled.
+
+Fixes: c26389c466a0 ("profiles/audio: Add an ASHA plugin")
 Assisted-by: OpenCode:gpt-6.1-sol
 
 
