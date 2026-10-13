@@ -1,43 +1,44 @@
 Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113D73822BB;
-	Tue, 13 Oct 2026 08:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC15395AD8;
+	Tue, 13 Oct 2026 08:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791879514; cv=none; b=uXVjvlLJA+w0ZDUHfjLgZrBRNorW/ln0D+pLYPwSQmJKeYdlT5rrbQeWG47Wzsunqiv4U+4UkWRu7Pebk3fEzn6Z26vQNaEKAmxkptbj20Pe24IeZhDS7YCBN5tXcmVQFPWahGA5NMTUG2j+/XbWTVQwWJyTQeftzlo10WVp06s=
+	t=1791879514; cv=none; b=EIy69Fq13LWLLacjpogAw5VizLKFnCt4n4S4mj7OaLwyGUp6r71MId3mgB4p0tIcy8x9sLJ600698p3oKkcUHz/bghKlJYm5gJg6nRL80zUY11tVifO2g5Whzi1bUFy4eDZR7d52yA5KEArb0pzxETSO0u5dTAweb+T7PLIe7ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791879514; c=relaxed/simple;
-	bh=ombfN8dcwctGQIDrX4gg69cAW+VBHVNB6WsNUHBIZK0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jKw+01sPBSgJsq0EXznj+Vr63QpcMePiVG/GgVxgyvRniV8L6g2YRqxZzAGNOlR4ZxJ78m/ik35aGeKtHU5qPXQyurMJX83VcSJPGdxCFnJ3YhIEtQRi6cZ4fxNLWhRKWCj2kNK1vx8G/XBwEMRvd568AACJBUVLOVSzMcv8AyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=nGANVuxp; arc=none smtp.client-ip=60.244.123.138
+	bh=iX1z4hYs1xGMKxZNFFSUBKA3OyBxB1X/Y69H5Q4/vv4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bG3hP5dyS41fcv35xW4i0C0KddFSQD0kXv5GA+/PNGIMwN/xGfcdN7Y0WzZe3LYEU//Tk3d4fj6937dMccC2X0hBk+7k2w97xR/7JqhydQKPlMWi2QB2c5rjZtf+M5bg9vw1vlOpEdIZ0zdUj/Jed4rhz8keh3fk4ZoAonAG2bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=QS4ceZSe; arc=none smtp.client-ip=60.244.123.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="nGANVuxp"
-X-UUID: aa27b35ac6de11f1b1788b6acf885367-20261013
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="QS4ceZSe"
+X-UUID: aa41f058c6de11f1b1788b6acf885367-20261013
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=rDqvCfFDMa3gC0A3oF+Ew8YWszwVZlkqSrTz8bpprnM=;
-	b=nGANVuxpoUWgs0ENFSTw6nGIwBX/8JWuxlzY9STA3o39hO7zD3uT7209cz+aLMsGGq5Hv4CXHDM4p2+e3zlsvvMMpMbdOu0L8EmxOLuhvSC9bssvLadhBh7TbM4HwQoq8S5CemWPoQ+lc/525QrxuJauSU8m5M3dTfXIfgZCCIc=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=2M+6YRfMNY+0ECvIUo2haTqwMfsnHsigkBlfpT0Km0M=;
+	b=QS4ceZSeBZrLNksdLCpMveSNh0tCMJo+0FUiUuNov2kw4t7xCNIxpPmA/53j/W5wINOgUOl2nP2WmfXkvFtMTwletzJjmYR4PF/G7rbrk+eGRYEJY9qITCJklkFCWV3ZvWSXx/m5RVJHvP+oY+L3ZwwOZOH0XSXhDM+0VrhYd80=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.20,REQID:8e3c5d5b-680c-44d0-8615-24a86648ff57,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:291e20b,CLOUDID:520bb461-631c-4dbe-b8dd-a62f5130cbf8,B
-	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50|99,E
-	DM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-O-INFO: VERSION:1.3.20,REQID:5b0897ca-4e43-428a-9c03-c66ff9edbf81,IP:0,U
+	RL:0,TC:0,Content:47,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:47
+X-CID-META: VersionHash:291e20b,CLOUDID:ff524995-3103-4fdb-b79c-08de0e281a5d,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:3|15|5
+	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,
+	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: aa27b35ac6de11f1b1788b6acf885367-20261013
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
+X-UUID: aa41f058c6de11f1b1788b6acf885367-20261013
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
 	(envelope-from <chris.lu@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 194355010; Tue, 13 Oct 2026 16:18:26 +0800
+	with ESMTP id 856566701; Tue, 13 Oct 2026 16:18:26 +0800
 Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.2562.29; Tue, 13 Oct 2026 16:18:25 +0800
 Received: from mtksitap99.mediatek.inc (10.233.130.16) by
@@ -52,10 +53,12 @@ CC: Hao Qin <hao.qin@mediatek.com>, Wenlong Tian
 	<linux-bluetooth@vger.kernel.org>, linux-kernel
 	<linux-kernel@vger.kernel.org>, linux-mediatek
 	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH 0/2] Bluetooth: btmtk: fix ISO data reception
-Date: Tue, 13 Oct 2026 16:18:21 +0800
-Message-ID: <20261013081823.817996-1-chris.lu@mediatek.com>
+Subject: [PATCH 1/2] Bluetooth: btmtk: drop zero-length ISO packets from endpoint padding
+Date: Tue, 13 Oct 2026 16:18:22 +0800
+Message-ID: <20261013081823.817996-2-chris.lu@mediatek.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20261013081823.817996-1-chris.lu@mediatek.com>
+References: <20261013081823.817996-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,35 +68,56 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Two problems in btmtk_recv_isopkt(), both found while debugging LE Audio
-on MT7925. The function is shared by every MediaTek USB controller that
-supports ISO data, so neither is specific to that part.
+The ISO interrupt IN endpoint delivers one HCI ISO packet per 264-byte
+transfer and zero-fills the remainder. btmtk_recv_isopkt() keeps parsing
+that padding: every four zero bytes look like an ISO header with handle 0
+and Data_Total_Length 0, and are passed to hci_recv_frame() as a complete
+frame. A single transfer can inject up to 64 of them, which is what fills
+the HCI log with malformed ISO packets. If handle 0 belongs to a live
+CIS/BIS, iso_recv() also drops the SDU it is reassembling.
 
-Patch 1 stops the zero padding emitted by the ISO interrupt IN endpoint
-from being parsed as ISO packets. The endpoint delivers one packet per
-264-byte transfer and zero-fills the rest; the driver turns every four
-zero bytes into a handle 0 packet with Data_Total_Length 0 and reports it
-to the stack. A single transfer can inject up to 64 of them, which is
-what fills the HCI log with malformed ISO frames, and a valid SDU is lost
-whenever handle 0 belongs to a live CIS/BIS.
+A zero Data_Total_Length carries no ISO Data Load at all, and the
+controller never emits one -- these are produced purely by parsing the
+padding. The padding always runs to the end of the transfer, so stop
+parsing once one is seen.
 
-Patch 2 corrects the receive skb being allocated 4 bytes too small, so
-that a 248..251 byte payload would be rejected with -EILSEQ.
-HCI_MAX_ISO_SIZE is a payload limit rather than a frame limit, and the
-allocation should reflect that.
+This was observed on MT7925, but btmtk_recv_isopkt() is shared by every
+MediaTek USB controller that supports ISO data.
 
-The two hunks are independent, so patch 1 applies on its own if you would
-rather not take patch 2.
+Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
+Co-developed-by: Hao Qin <hao.qin@mediatek.com>
+Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+Co-developed-by: Wenlong Tian <ot_wenlong.tian@mediatek.com>
+Signed-off-by: Wenlong Tian <ot_wenlong.tian@mediatek.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+ drivers/bluetooth/btmtk.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Based on bluetooth-next.
-
-Chris Lu (2):
-  Bluetooth: btmtk: drop zero-length ISO packets from endpoint padding
-  Bluetooth: btmtk: size the ISO receive skb to hold header plus payload
-
- drivers/bluetooth/btmtk.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index bdc85147b97f..869eb2176379 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1201,6 +1201,19 @@ static int btmtk_recv_isopkt(struct hci_dev *hdev, void *buffer, int count)
+ 			/* Complete ISO header */
+ 			hci_skb_expect(skb) = __le16_to_cpu(dlen);
+ 
++			/* The interrupt endpoint zero-fills the remainder of
++			 * each transfer, and that padding parses as a header
++			 * with a zero Data_Total_Length. Such a packet carries
++			 * no ISO Data Load at all and is never emitted by the
++			 * controller, so stop parsing here rather than hand a
++			 * bogus handle 0 packet to the stack.
++			 */
++			if (!hci_skb_expect(skb)) {
++				kfree_skb(skb);
++				skb = NULL;
++				break;
++			}
++
+ 			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
+ 				kfree_skb(skb);
+ 				skb = NULL;
 -- 
 2.45.2
 
