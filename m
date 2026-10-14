@@ -1,294 +1,153 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA1E428463
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 05:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FE333998
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 05:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791954822; cv=none; b=VxZ1qD0m+IOnzn8QbtS7333I+GIKug6Ua6YyJI71LpKdakGCGKGZ7L/NjF7bBOGt2+p3IxlPfBhHxmesK2AYWj71ZpGq6K2QhgkPOoBVmxJECVuUFqR25EvPzc4IhycFsaClvFtXrlk/jLlwQWfMQw9mqX4d2AGU3jBCeUuCIFU=
+	t=1791954999; cv=none; b=Gf0C+BW8h7pTYx53nd/1xezU0CSvQPUIeVrq6R9fofmnepGtZWfJHaNKrO3MVKJXM9JZlh/BLSo5Uv4CLRvBUCZf3YKvID4m18SL3sT+3bfevDj5n2kmnHHvmxZjzp/nURHijqYeGZO+zj+ke9mjxyn/uxsqCBeUL+JgeQs8VEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791954822; c=relaxed/simple;
-	bh=rpdjqRPo/nMEF5LGfSaxzBsb4+u1UPgA0QiSwAqrJHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IGXVU75d7B+o3drL/bJmv5NnxzZG2cUH+DmhC2NTm7GZ/DCUosIbbZbOMY5zvuzWjY/SyT8buBEQyVAZ/UlFtASGtIigp8OaeS6MMTnsC1sEz5iuED0tz/yHsgXPyTbW5ZcMbUGsyFQXBFZrqXrkVizY+GerVjiMjvXS3SEGADg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fp8zSGpN; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791954999; c=relaxed/simple;
+	bh=n3XgsC2XHNNQgSpWFPtJj++/Oex3opAT+FOm6qePyps=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V4AI7BLsjX1sy+xl3B6HgngTY/WdQI7s1AR9JIXTKVE/l20KO+ZNBGKwuwlIxXsXC8iKD54/GiHlxEyN+DNG8KxuG4a9dvLZdk+YjxdaXwZgGsizesDJA8IUAJ8ky8yYa4x+zTT7d83XWNSbS4BUW3VdpQOzPIIIMumjZaVtHbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=gD6t0glY; arc=none smtp.client-ip=79.135.106.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fp8zSGpN"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-3535a54bed9so835451eec.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2026 22:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791954820; x=1792559620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6B8ArzIo9Bbqhd/pBaN1TCTzyJMvGcjD8xg/cTLGFCA=;
-        b=fp8zSGpN09mZdm4jVPz448xjU8ePB9n3RMlv45zFAAhWjtXph3gXDnVqp4P33syAtg
-         0r8rQMK5mLVPKo5ki+gFjHld7tZMV+dOHfobCYG2PeNBRhMW7kbLWcPYPCOTgi1DmdNy
-         8MNnKm9Y+p9AHJeMxGNPWx4nLgN0DL4WOmJ4VORcbaoBOCnC+O3jIsSP2Kl8kjks2bR3
-         czkYpr4WjjalGoiVkzIy4rVJERCbJ7BnUNoWnD98kH9s5JoFQgmp6oNvSv+D5/MspryD
-         iVXyvdgcosyPPtelTTx4zTzAPHIbK0s2OqqDBdrBNw6q5jcTOpiz0VKnqnbyHSxAVN34
-         CQZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791954820; x=1792559620;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6B8ArzIo9Bbqhd/pBaN1TCTzyJMvGcjD8xg/cTLGFCA=;
-        b=B3Fbe8To6LaUPCu+V0+BCmp+stWZ1CycLL0eG7uT3WA/GjmF9M/STEvOll+fzQVTHV
-         Hyly5Or86m5FAVwdde4WMUJmxZI7vuI0zhztoqXuKP3ciaCWvoTWK8zaVUqv7iDLLF6b
-         +ftNuFnc+Ft9QnkNcz/aFYtCaKDxGfbC/GAgxeS3gvIGLN7AE1qmqyfCjDUSIdolUZhR
-         dAYpfuwrnCK1XLlS0+kAvazbsteSqF5tXynfDnN5K27ntG74OwhXOobGG/KUbLhE0cpY
-         M2U9opL13ywEVbxvHBeFhdj4h9+JiMdloltt1Yt1FNiblhyEDrbOABYGv8F0E7KzKm9O
-         BYWA==
-X-Forwarded-Encrypted: i=1; AKwUvBwmFG0WSG8WBhCioL9Ap3smPbTr1f6Ttcl2cOZ5fdk17qEGEcUO4uqXJKe3wxDfuziqyHBfMkUxCBmdHje1YcI=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIBD/WlLwyCjcCAguxwVusptSZzfkhXvsQFaE0Kp0y/FUsAMQow
-	VWQGuaYoe8sicL+k9g2EwjGF3eMLhJtdprbThx4jo22TZl+MlSuZJDa4
-X-Gm-Gg: AYBFou0jJxqCQqahNz9cYoyHWkss5ovecXozSofEsfBMgo2SlkVswTzn26SaNQxQh3O
-	WeUe7a3fVc8LJ2ZcZwhtgyYeZ8/9nWYvVRtH/0RQ12mUVSS2PKNq4YwE+p0VBh67J2qVLy9oO2k
-	Swc+FlpZ69Gy/nyZZDbDH7B2US1C3WIvDubuXtys4vkXUxaQXb7/spDWcjnlbhXYtehWtepoWVK
-	eVUzF1FqL/sHJyrfR7dII5yV3TNa9G+7yQkJEMS9xV1KlthSPJyvlS+fuv5UxLqtRF9/TpE3ZM7
-	kGWVUFDh+1iY3h7vxXjP+diX0k/kTb6ADU7MS24fPdYLepuhGXA9cbmqVnq7uybxDXp2KEPRket
-	1ORVQRhG+qtMBVL6QUfYaT+ZyOPcUoBoEa968nE+BSkbw4fKo5eOzCA+24Ww56RxaIT/z0QsMfy
-	XoVUMjdPY/XqF2rWip06poFkgsyLAP3tW5poEjhs1CgeJDnwYk45Mo7FGRAaT8R0AE8hHnLTrTv
-	yKnZP38+BSz81Dkqj24yvKAti+aSlCYhUZ+H5wkNJdsum7iqrXaUDc1Orriy+we4tphmyB+7Q==
-X-Received: by 2002:a05:7300:8803:b0:353:7b46:4819 with SMTP id 5a478bee46e88-3537e032905mr24065867eec.8.1791954819617;
-        Tue, 13 Oct 2026 22:13:39 -0700 (PDT)
-Received: from dtor-ws.sjc.corp.google.com ([2a00:79e0:2ebe:8:875a:117f:b9ea:5a08])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537cacb61asm51629125eec.21.2026.10.13.22.13.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Oct 2026 22:13:38 -0700 (PDT)
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Michael Zaidman <michael.zaidman@gmail.com>,
-	Rishi Gupta <gupt21@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	David Barksdale <dbarksdale@uplogix.com>,
-	Andrej Shadura <andrew@shadura.me>,
-	Johannes Roith <johannes@gnu-linux.rocks>,
-	linux-input@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] HID: hidraw: Make hidraw.h private to HID subsystem
-Date: Tue, 13 Oct 2026 22:13:25 -0700
-Message-ID: <20261014051326.3784498-6-dmitry.torokhov@gmail.com>
-X-Mailer: git-send-email 2.56.0.385.gd3acb90ef8-goog
-In-Reply-To: <20261014051326.3784498-1-dmitry.torokhov@gmail.com>
-References: <20261014051326.3784498-1-dmitry.torokhov@gmail.com>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="gD6t0glY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1791954985; x=1792214185;
+	bh=Ip7MS1InEgmWWN/AP6NfNP9i8MBdg2GqaAX9Ycdx6TM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=gD6t0glY3ICgdtcLDDDtOrCWTbG4jfEWTTp2VT9sChaQFau7FHWbP5a7qgqd8Op7U
+	 JleyF1a1Hbwe/hm+R0paJ2NWDca7H95IFrhzIVwTdxrCwMThmWOI5ogHgISPSXxhgm
+	 31OfSkNpmKW+L8MpCpaxfJETb+i0e5aGiB1ZL+T7E7iZmZUzn1NPBVj62HMwDriFCB
+	 GCfNTjxkOBSvvqivmUGM1VO1St/DrF4l8r1XowQC/stYsaG0Iq09O8f2aW6paOKxdB
+	 2Wc3gCzZHYdWDF9xTGVy5c/OjGvTcWzSLo6TWgnfIukRjX+G70I8oW9qqdbFdqhVbY
+	 D870Cyfn56wyw==
+Date: Wed, 14 Oct 2026 05:16:20 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Kyle Pepper <cochcoder@proton.me>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: hci_sync: scan unfiltered for host-resolved RPAs
+Message-ID: <20261014051600.408746-1-cochcoder@proton.me>
+In-Reply-To: <20261013031329.483597-1-cochcoder@proton.me>
+References: <20261013031329.483597-1-cochcoder@proton.me>
+Feedback-ID: 97716137:user:proton
+X-Pm-Message-ID: b13949a3691cca1257508faf3f82b01083f334c9
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-With all external consumers converted to use the hidraw instance helper,
-hidraw.h no longer needs to be exposed in include/linux.
+Restore unfiltered scanning for pending IRK peers when the controller
+cannot resolve private addresses. Keep accept-list filtering while
+suspended and when forced by periodic advertising synchronization.
 
-Move the header into drivers/hid, keep private buffer and list
-structures internal to hidraw.c, and drop unneeded symbol exports
-since hidraw and hid-core are built into the same module.
-
-Assisted-by: LLM
-Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Fixes: e209e5ccc5ac ("Bluetooth: MGMT: Mark LL Privacy as stable")
+Assisted-by: OpenCode:gpt-6.1-sol
+Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
- drivers/hid/hid-core.c                  |  2 +-
- drivers/hid/hid-cp2112.c                |  2 +-
- drivers/hid/hid-led.c                   |  2 +-
- drivers/hid/hid-u2fzero.c               |  2 +-
- drivers/hid/hidraw.c                    | 33 ++++++++++++++++++++++---
- {include/linux => drivers/hid}/hidraw.h | 29 +---------------------
- 6 files changed, 34 insertions(+), 36 deletions(-)
- rename {include/linux => drivers/hid}/hidraw.h (63%)
+Changes since v1:
+- Restore the host-resolution fallback in hci_le_add_accept_list_sync()
+  instead of adding per-loop and final-filter bookkeeping.
+- Preserve filtering during suspend and forced periodic advertising sync.
+- Identify the removal of the old fallback in e209e5ccc5ac.
+- Add native mgmt-tester reproduction in the companion BlueZ
+  patch "mgmt-tester: Add host-resolved RPA scan checks".
 
-diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index c430f2d0d779..a5d03504c061 100644
---- a/drivers/hid/hid-core.c
-+++ b/drivers/hid/hid-core.c
-@@ -31,10 +31,10 @@
- #include <linux/hid.h>
- #include <linux/hiddev.h>
- #include <linux/hid-debug.h>
--#include <linux/hidraw.h>
- 
- #include "hid-core.h"
- #include "hid-ids.h"
-+#include "hidraw.h"
- 
- /*
-  * Version Information
-diff --git a/drivers/hid/hid-cp2112.c b/drivers/hid/hid-cp2112.c
-index 148946b04bff..0f65ce44e677 100644
---- a/drivers/hid/hid-cp2112.c
-+++ b/drivers/hid/hid-cp2112.c
-@@ -20,7 +20,6 @@
- #include <linux/cleanup.h>
- #include <linux/gpio/driver.h>
- #include <linux/hid.h>
--#include <linux/hidraw.h>
- #include <linux/i2c.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-@@ -28,6 +27,7 @@
- #include <linux/string_choices.h>
- #include <linux/usb/ch9.h>
- #include "hid-ids.h"
-+#include "hidraw.h"
- 
- /**
-  * enum cp2112_child_acpi_cell_addrs - Child ACPI addresses for CP2112 sub-functions
-diff --git a/drivers/hid/hid-led.c b/drivers/hid/hid-led.c
-index 63fd723d9e69..f5a798c7979e 100644
---- a/drivers/hid/hid-led.c
-+++ b/drivers/hid/hid-led.c
-@@ -8,12 +8,12 @@
+Previous submission:
+https://lore.kernel.org/linux-bluetooth/20261013031329.483597-1-cochcoder@p=
+roton.me/
+
+Testing on bluetooth-next 609a23989d63, with KASAN and lockdep enabled:
+                                upstream   revised
+  Auto-connect with IRK           FAIL       PASS
+  Background report with IRK      FAIL       PASS
+  Auto-connect without IRK        PASS       PASS
+  Background report without IRK   PASS       PASS
+
+The cases check scan programming through emulated HCI, as requested by
+Luiz. They do not test actual address rotation or radio reconnection.
+The complete mgmt suite was also run: upstream 503/512 pass, four fail,
+five not run; revision 506/512 pass, one fail, five not run. Both runs
+time out in "Set Static Address - Success 2". The upstream run also
+fails the two new IRK cases and "LL Privacy - Set Flags 3 (2 Devices to
+RL)", already listed as flaky; its pass is not attributed to this fix.
+No KASAN/lockdep diagnostic was captured in these runs.
+
+The revised implementation has not been newly tested on physical
+hardware. Changed-RPA reconnect, privacy-capable-controller and
+suspend/wake regressions remain unverified. No automatic audio-resume
+claim is made.
+
+ net/bluetooth/hci_sync.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index efbd2e538..03f706c1f 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2618,7 +2618,7 @@ static int hci_le_set_privacy_mode_sync(struct hci_de=
+v *hdev,
   */
- 
- #include <linux/hid.h>
--#include <linux/hidraw.h>
- #include <linux/leds.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
- 
- #include "hid-ids.h"
-+#include "hidraw.h"
- 
- enum hidled_report_type {
- 	RAW_REQUEST,
-diff --git a/drivers/hid/hid-u2fzero.c b/drivers/hid/hid-u2fzero.c
-index 83e223c12cd6..4b9271b4e45e 100644
---- a/drivers/hid/hid-u2fzero.c
-+++ b/drivers/hid/hid-u2fzero.c
-@@ -12,7 +12,6 @@
-  */
- 
- #include <linux/hid.h>
--#include <linux/hidraw.h>
- #include <linux/hw_random.h>
- #include <linux/leds.h>
- #include <linux/module.h>
-@@ -21,6 +20,7 @@
- 
- #include "usbhid/usbhid.h"
- #include "hid-ids.h"
-+#include "hidraw.h"
- 
- #define DRIVER_SHORT		"u2fzero"
- 
-diff --git a/drivers/hid/hidraw.c b/drivers/hid/hidraw.c
-index 949e7546339f..9d0df711ed5d 100644
---- a/drivers/hid/hidraw.c
-+++ b/drivers/hid/hidraw.c
-@@ -27,8 +27,36 @@
- #include <linux/mutex.h>
- #include <linux/sched/signal.h>
- #include <linux/string.h>
-+#include <uapi/linux/hidraw.h>
-+
-+#include "hidraw.h"
-+
-+struct hidraw {
-+	unsigned int minor;
-+	int exist;
-+	int open;
-+	wait_queue_head_t wait;
-+	struct hid_device *hid;
-+	struct device *dev;
-+	spinlock_t list_lock;
-+	struct list_head list;
-+};
-+
-+struct hidraw_report {
-+	__u8 *value;
-+	int len;
-+};
- 
--#include <linux/hidraw.h>
-+struct hidraw_list {
-+	struct hidraw_report buffer[HIDRAW_BUFFER_SIZE];
-+	int head;
-+	int tail;
-+	struct fasync_struct *fasync;
-+	struct hidraw *hidraw;
-+	struct list_head node;
-+	struct mutex read_mutex;
-+	bool revoked;
-+};
- 
- static int hidraw_major;
- static struct cdev hidraw_cdev;
-@@ -594,7 +622,6 @@ int hidraw_report_event(struct hid_device *hid, u8 *data, int len)
- 	wake_up_interruptible(&dev->wait);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(hidraw_report_event);
- 
- int hidraw_connect(struct hid_device *hid)
+ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ =09=09=09=09       struct conn_params *params,
+-=09=09=09=09       u8 *num_entries)
++=09=09=09=09       u8 *num_entries, bool force_filter)
  {
-@@ -651,7 +678,6 @@ int hidraw_connect(struct hid_device *hid)
- 	return result;
- 
- }
--EXPORT_SYMBOL_GPL(hidraw_connect);
- 
- void hidraw_disconnect(struct hid_device *hid)
- {
-@@ -663,7 +689,6 @@ void hidraw_disconnect(struct hid_device *hid)
- 
- 	up_write(&minors_rwsem);
- }
--EXPORT_SYMBOL_GPL(hidraw_disconnect);
- 
- /**
-  * hidraw_instance - get hidraw instance minor number for a HID device
-diff --git a/include/linux/hidraw.h b/drivers/hid/hidraw.h
-similarity index 63%
-rename from include/linux/hidraw.h
-rename to drivers/hid/hidraw.h
-index 3021454ba513..a822007ce5f8 100644
---- a/include/linux/hidraw.h
-+++ b/drivers/hid/hidraw.h
-@@ -6,35 +6,8 @@
- #define _HIDRAW_H
- 
- #include <linux/errno.h>
--#include <uapi/linux/hidraw.h>
- 
--
--struct hidraw {
--	unsigned int minor;
--	int exist;
--	int open;
--	wait_queue_head_t wait;
--	struct hid_device *hid;
--	struct device *dev;
--	spinlock_t list_lock;
--	struct list_head list;
--};
--
--struct hidraw_report {
--	__u8 *value;
--	int len;
--};
--
--struct hidraw_list {
--	struct hidraw_report buffer[HIDRAW_BUFFER_SIZE];
--	int head;
--	int tail;
--	struct fasync_struct *fasync;
--	struct hidraw *hidraw;
--	struct list_head node;
--	struct mutex read_mutex;
--	bool revoked;
--};
-+struct hid_device;
- 
- #ifdef CONFIG_HIDRAW
- int hidraw_init(void);
--- 
-2.56.0.385.gd3acb90ef8-goog
+ =09struct hci_cp_le_add_to_accept_list cp;
+ =09int err;
+@@ -2631,6 +2631,11 @@ static int hci_le_add_accept_list_sync(struct hci_de=
+v *hdev,
+ =09=09return 0;
+ =09}
+=20
++=09/* Host-resolved peers need unfiltered scanning while awake. */
++=09if (!force_filter && !hdev->suspended && !ll_privacy_capable(hdev) &&
++=09    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type))
++=09=09return -EINVAL;
++
+ =09/* Select filter policy to accept all advertising */
+ =09if (*num_entries >=3D hdev->le_accept_list_size)
+ =09=09return -ENOSPC;
+@@ -2956,7 +2961,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev =
+*hdev)
+=20
+ =09=09=09num_entries =3D 1;
+ =09=09=09err =3D hci_le_add_accept_list_sync(hdev, &pa,
+-=09=09=09=09=09=09=09  &num_entries);
++=09=09=09=09=09=09=09  &num_entries, true);
+ =09=09=09goto done;
+ =09=09} else {
+ =09=09=09rcu_read_unlock();
+@@ -3020,7 +3025,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev =
+*hdev)
+=20
+ =09for (i =3D 0; i < n; ++i) {
+ =09=09err =3D hci_le_add_accept_list_sync(hdev, &params[i],
+-=09=09=09=09=09=09  &num_entries);
++=09=09=09=09=09=09=09=09&num_entries, false);
+ =09=09if (err) {
+ =09=09=09kvfree(params);
+ =09=09=09goto done;
+@@ -3042,7 +3047,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev =
+*hdev)
+=20
+ =09for (i =3D 0; i < n; ++i) {
+ =09=09err =3D hci_le_add_accept_list_sync(hdev, &params[i],
+-=09=09=09=09=09=09  &num_entries);
++=09=09=09=09=09=09=09=09&num_entries, false);
+ =09=09if (err) {
+ =09=09=09kvfree(params);
+ =09=09=09goto done;
+
+base-commit: 609a23989d637e2f90522a37c62e65c8c9b8b0ff
+
