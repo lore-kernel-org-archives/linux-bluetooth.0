@@ -1,582 +1,546 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E8A4A49A5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 08:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791966925; cv=none; b=KivnpgM5pI0nwCzviazJvBLDT+oWvv8+loK+kLctliOGQdzNrXpYVGTwNWvUWMXnEL6hZ1F8flXnYTNdKRMECqNWYi9QhHRj26RIB0YRrFYrO34hDpBc8M7+KTPL5/1sggckzlnOhtj6m66yAuYEcb4xJrvib49NYnZ3OPpyjik=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791966925; c=relaxed/simple;
-	bh=IOJ3kKSmi6APpDQQkw2Rez2HeIy8D5nUnQATTDdKki8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cCeBmp+APXN8zBRELGLkhaXA1jP44VFRJZqPtxpvmpXf7DoeOkFxa7gMIrjhc+XJmFOAf7QHy/UxYqfk/Y8OKLp4ecE9lU+GHyDb8RJp3Ivya6DUgpnGipAg/j5GDxuMOWgQRQEMvPxVjBCdtxBBUVmFSLA7mCmi+FwiNsn2a9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jw63SoEz; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7A34825C2;
+	Wed, 14 Oct 2026 09:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791968796; cv=fail; b=Wcek277CO0HTOWVnqyA1PagAzFjhxF9jXw5i2iVD29PfgarQfwboJ0RygcZerkMlkZXp6pWCcJ/zg84HmNhenClxFXsRqsIPSvbRjW9c1tNT1iXGdr3m0+an+uPY8oMpsJdWkk1KSK5+5ZZqZ8F7xPKAo1maPh/bOpJ/4aQXyE0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791968796; c=relaxed/simple;
+	bh=i1tqlW2gthEXtXEY1IPcQPGqEFw35SH4kOPzhRznqiA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bAJK0uusGmnQKMxm3zLUmYizADQoxckb8Zq9Qw6vGqsQpjci0/GVkvZc4gfHO00oUEBAiTskTri/7/zfVIrPhGa1uiB7q98+a+S6fkObUYTG89GsyBUk+qgEsuVfujEiTvu6xFVORBh1NT8sFok1ZAg6T0EtbA33zwRaG6K10qg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OB0FT5FK; arc=fail smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jw63SoEz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OB0FT5FK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1791966921; x=1823502921;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=IOJ3kKSmi6APpDQQkw2Rez2HeIy8D5nUnQATTDdKki8=;
-  b=jw63SoEzd+zATnBPGDcRn/L+fIekTFOPSksAUroLLPqhlc9BdAaLn28R
-   qbATsxeJpegKYqCGwiDgNsBcfh/7qWR91rL8MU2zkTick5jjqpPb6h6rj
-   GPyXknwfhAPqHYcB5k33e7cnlFxNsMAVkFL8LGBbWRmSBfxBkEyqDooAl
-   mAXmsPgrUOv4FFR7a9avvMvrMEFnN6ZGDwCLjgKprUic1oECNMRrBILGv
-   IYylk+aNW8Rk7sesS9w9kyMyAYXHQgVqo2jwpOJ/vATIawOyttNYVdAj1
-   F/yOJBIUrHgdCQZEGPeYOh4Aa1nf7wMTi3uXC+PQtp63cgVNnAvUXv/Xg
-   A==;
-X-CSE-ConnectionGUID: uKcNlHxBTkm8d85Y9E6fFQ==
-X-CSE-MsgGUID: 6WnQU4FwSBWch2alMw5KUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="593403"
+  t=1791968794; x=1823504794;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=i1tqlW2gthEXtXEY1IPcQPGqEFw35SH4kOPzhRznqiA=;
+  b=OB0FT5FKHB56emVzgSvdxeLDcYSjd7bG5JW0aSQYc0A2fKHv9aQ9BJaR
+   Qp2F1EVzZXoQtv2kjBLLhv+diNUc+RtzY3mRqZxkOm96o66MGirhEzOw9
+   VuYiWXPqNCYz7yo3F0+SisYaUAMk+VwrKNJf2mTUOPU3io8c/IL5G4V3I
+   QwElB0HCPdjkRfkyC+FsXN/cuMCH4gjvzYKef50s78fQ5v70x4n2MV440
+   e2mmKme0hvVPXe/587X53UhE1mk2EtAtaC1/HUAvIMPPOiIQz7j/VDrU4
+   +6vQfrLIJV/6b1JBzr5XlLmHtYKKXnj5+HlIHxWzex/1BSp0IywGhdgzK
+   Q==;
+X-CSE-ConnectionGUID: eKlE42GjTHGRgWWQ1oz9pw==
+X-CSE-MsgGUID: 7Le2qdFGQqi+f/gj0NOWeQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="726670"
 X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="593403"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 01:35:21 -0700
-X-CSE-ConnectionGUID: 6Z/5weY6QlCjkDPfo+SqLw==
-X-CSE-MsgGUID: AiPXpTBHS2e3wgmGzK6CWw==
+   d="scan'208";a="726670"
+Received: from fmviesa011.fm.intel.com ([10.60.135.151])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 02:06:32 -0700
+X-CSE-ConnectionGUID: 55qcC7KwQGukZfVS+el5XQ==
+X-CSE-MsgGUID: swWnh4EfTMeumF93L1BgJg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="1704438"
-Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa008.fm.intel.com with ESMTP; 14 Oct 2026 01:35:20 -0700
-From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v4 2/2] Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
-Date: Wed, 14 Oct 2026 13:56:50 +0530
-Message-ID: <20261014082650.1270679-3-aluvala.sai.teja@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261014082650.1270679-1-aluvala.sai.teja@intel.com>
-References: <20261014082650.1270679-1-aluvala.sai.teja@intel.com>
+   d="scan'208";a="3223524"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa011.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 02:06:30 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.49; Wed, 14 Oct 2026 02:06:28 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.49 via Frontend Transport; Wed, 14 Oct 2026 02:06:28 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.47) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.49; Wed, 14 Oct 2026 02:06:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LfpazQ9DnLNDGPEEC7MLYCu7MCHmmVe6TWS7Qqk/ZLDer6Hbhgg8SyyExQanLgBOEehe0AuJEC6Fl8vZU8eBfRm1LEmsQ150DCntwLCTjXwe8nmbfZ1ptauu/mv9CrpZmmykkcYeKAoxf6TwmotSiNcefuBmEPWak9+TjwsKNLYNWH/AAPjRCkEkTTe929uOcNBJ91TPreei2t6/7+VzL1eWGikgN7t8AhQZTtLHofbjioHOHcEJuoB6ZVpEyC3V/BnSdlG+zRk1vI8AkFD7o2IkuAkTnHgUUyG/fbaZ9nG9aXXu3n7imkH1+l3o4wCa8sj/VgWYfIHCydNAEfGZGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i1tqlW2gthEXtXEY1IPcQPGqEFw35SH4kOPzhRznqiA=;
+ b=srFG0RcBsrrDlUmqMhEb2QLexavIrSA34Epxz+Ssn9+ViGvvXKn5taY8cNvxTCJ4iGNGDpmqGdbuxt0JBJf2kASFpKZCPx2YfQcDoNMgxCy7ZXgbQIv1+H3JSbzTSfsL6wA4jHaqzpcrxfUKc3tofrhf7kswV1D8iPeDrgIGyS64xfbQ3yIbTA/gzxQ/0+ZjevwWfANkAJv9ivdUEM0osAwMITWll7RJJj/9Z49dliCPR9DF44O0CUQ5vc4tPIk7fgE0nzER6VPwUCuPWsOKYyb60oobhixHj+/APJ2ws8/j/3vW2dljrP8JIJ/R65eGw8l0HO8337V2K5tA8RvK8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA0PR11MB7790.namprd11.prod.outlook.com (2603:10b6:208:403::10)
+ by MW4PR11MB5934.namprd11.prod.outlook.com (2603:10b6:303:189::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Wed, 14 Oct
+ 2026 09:06:25 +0000
+Received: from IA0PR11MB7790.namprd11.prod.outlook.com
+ ([fe80::b5fa:4dfc:4cb9:b330]) by IA0PR11MB7790.namprd11.prod.outlook.com
+ ([fe80::b5fa:4dfc:4cb9:b330%6]) with mapi id 15.21.0496.021; Wed, 14 Oct 2026
+ 09:06:25 +0000
+From: "K V, Ajay" <ajay.k.v@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Devegowda, Chandrashekar" <chandrashekar.devegowda@intel.com>, "K, Kiran"
+	<kiran.k@intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "marcel@holtmann.org" <marcel@holtmann.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "Tumkur Narayan, Chethan"
+	<chethan.tumkur.narayan@intel.com>, "K, Lakshmipathi"
+	<lakshmipathi.k@intel.com>
+Subject: RE: [PATCH v1 1/3] Bluetooth: btintel_pcie: Add initial YoYo debug
+ support
+Thread-Topic: [PATCH v1 1/3] Bluetooth: btintel_pcie: Add initial YoYo debug
+ support
+Thread-Index: AQHdW0BpVIAN3J09G0CUEKW4BiQxlbb72EgAgADlkPA=
+Date: Wed, 14 Oct 2026 09:06:25 +0000
+Message-ID: <IA0PR11MB7790EE4229298462303F50E9C19D2@IA0PR11MB7790.namprd11.prod.outlook.com>
+References: <20261013182627.81957-1-ajay.k.v@intel.com>
+ <CABBYNZLgOHiL77ZQEXEnX=JuXeVGa_LFAuz4q3tjPhuazWyiZw@mail.gmail.com>
+In-Reply-To: <CABBYNZLgOHiL77ZQEXEnX=JuXeVGa_LFAuz4q3tjPhuazWyiZw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA0PR11MB7790:EE_|MW4PR11MB5934:EE_
+x-ms-office365-filtering-correlation-id: 9cc9c58d-e947-4382-57bd-08df29d26ca4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|23010399003|38070700021|11063799006|56012099006|5023799004|261009223027099003|4143699003|10067099003|22082099003|18002099003|6133799003|3023799007;
+x-microsoft-antispam-message-info: A6PIsZGMDWAFFmsXDfrHHtOiE/taBZnV7nUgqfMpVq4oM7fH6idWxj6L9ob4oJ5xzMPa3DYGlJhDn0tiCG8lipeFSvy8BNLuilSY+dyfK2/4OP0Kb/19hbZZdJw1SP+onlOUdXpzSn0+c3NiwgDrp5ccRQArcujBfPZyIhkDS6DmqxTx+QQc68YxLwK861Nk8t2EJM6atPf+mQhrgHHFnduItS6b3t21Hmnu32QT65c6pJ0oPnxYjhQIwnqfEyThoEWDp5m+0gEaXL/7xnZPZ2zcBSL9x6sF1Az+5M4fFB27h4swH2xOI3kM6PMM/vnKHLtGxEA4ACv7LsbRgPjPGaIcNkLtxh3r52/NGjB6QtAjN1fPCRlTGvwguo9LDXThp4teQrbt9a48ozaeKl052AKJG/hJFl1JnrKy0teZA9FBCNPA9yUn+v9hHn1/LSfYSiwmreS+u7lxQfxgoPj/glAgS1Ny4qk3Br7MsepuvXE+x3oFtEk0/155iZ6+UQgek4LP5XfDwkuo/aPTdQgA/ckIDMJETXL9S0SXIELPfm5qFp1+gqzyYycgYW0Gq60arx8W1D24XxJIhC5oE9EBLRAxrgtqhHPnUKK+w4mgT0jM6yE9CmyQQu14RGArM9H+bH3DTCzYKJhnM+jnGHYtPnzQlXl2ywbWlGDSkxUGfsw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR11MB7790.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(23010399003)(38070700021)(11063799006)(56012099006)(5023799004)(261009223027099003)(4143699003)(10067099003)(22082099003)(18002099003)(6133799003)(3023799007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bmpMV3B5L0FZTVVXejF1dFJkNW9hQktSNUtJek01N3EzS2VRMTJCL0t3N3Rz?=
+ =?utf-8?B?d2pOcWVLbUREa1VJUkFHbEQ4ZCtpOSt4NkJUZFNWSW4xQTArbElKNEFkVVBQ?=
+ =?utf-8?B?b2hwWDFxS0g4SFloWDNCdG1zWWFSYlBuMU9FdUxZNTJQbUpwMnV5d1RJSXBX?=
+ =?utf-8?B?TCtYems3K3RpK0t1N2JHNWxuRDRremh3dlV5VEFUUU5DbVMyTzJ2SUcxU3ho?=
+ =?utf-8?B?Ry9vRTFNT3YwbmRVSUVXbzZqV01LUG5KbEs0a0Jnd2VCcWVlM1kzQUM4QVNE?=
+ =?utf-8?B?N2xQRDZDYzRyS09wNllaSVIwUFk0MU9xK3poSklrenF6ZXlTWjFnT2VHL1pW?=
+ =?utf-8?B?SlVOeCtGdzBpU24zellKN01Pd05jUkJJZEdzOFBJWjlCOXN5QVAvTk9vUjVw?=
+ =?utf-8?B?WmlvUkRHZ092N1pEV2k2bncvSFBRL1FMY0I3Q1VoUzZmb1c5ekZLb1J2MjRT?=
+ =?utf-8?B?OXNSbndNUkw1TW81Z3NTcUoyckxIMnFIUklIS0FrV3V4QW5pUThOMWhjNjdw?=
+ =?utf-8?B?NVdhRm5DcTRsbWwwV2JNSW45Q2FDcEtMVVcyWkFsRDBPVzZlSTNZYmZ0QWwy?=
+ =?utf-8?B?M01mM0s3SzB0QW0yNGY3a0JlZVcyUE9RMkY2c245QnBYT093dW1pdjY5WGJ6?=
+ =?utf-8?B?WUFqQ2I4ZHIyS09NTTVUblU2NUYzTy85RW16YUp1TFhNdEprWEdCV2d2UkZq?=
+ =?utf-8?B?ZVBjNm9LcXZpbVJtNDBaNGJuS2pLNWtuTVZ6TnVCejQ3aXNaUnNxcWxTSi82?=
+ =?utf-8?B?a1JvamJ2SHBvYmltRzhkWEhtcjBydjczck1WcnU2SEJkWmNMRGVDb24zKzk1?=
+ =?utf-8?B?bldhZ1c3c0k5dlgyRXZBSDR0VU9NNTRPQUFVS1FoRkJqZnZubDltbFVhaFlG?=
+ =?utf-8?B?cEpNcGRENXpuQUlYaE5UbjFDWkZjbUpGNllxL0EvcXQ2UktCaHRQWmZ2QkJa?=
+ =?utf-8?B?RmlaQUhhd3lDUkRlcGg3VzVDQzM2UXVINFhnTXlzMEt2RHhVZlFFUTRtQ0Zo?=
+ =?utf-8?B?TFhabEQ0Sk1sMlp2di8vMXZ4ZlQwNzVZUmRwdEJZWFgvbzlKME81TmY1RzlC?=
+ =?utf-8?B?OENjSzRoSWlBeUVwcEU0Sm9ZV3YzWEZWY1RwYUlIak5iMmlSUjNwSlM1Y2tH?=
+ =?utf-8?B?QkNjZE91M0s3YjU0Um9mQm9RREFUMnlBNVNjS3NKeDBGaGtQYUNnejZoZzYr?=
+ =?utf-8?B?STNGVGdMNTcrN05oZ0sybWRkV2xnN2tEenpZUVhRdDJicHY2eGxvUFptY0tp?=
+ =?utf-8?B?TUdXQk5idE1NVEZKVG9WYjVITCtidkZ1M1M3MHdtRUYxWWhuSzdwMGI3TGxX?=
+ =?utf-8?B?bEFJVktEYUo0eWxYRUN2blV3d1BMY1VvVHFtaUR3WWs2a0UrV0RQSUxnOEdF?=
+ =?utf-8?B?OEVoZnRYd3V3cWYvTlFuZVVLR1ZrSXdxRDdZS1BhVElEY1RXUytyV1V5Zmd1?=
+ =?utf-8?B?WEkydGZWdEpFeFlEbEt4YWRnUDR1WmhhcWJ6YmVVRndmVkV3REF2U2RuU1Qz?=
+ =?utf-8?B?SjhMTmM2SmxGeFlrM2t4V0E5S0lYRWpYeE5UczIrWWpNRzNvSWQ3UWd5YURs?=
+ =?utf-8?B?dnh0S3VWelJtVk9nUWRQK21aY3Nnd2d1UmRhWHdJOFJMZVJGVEhaZGtZeDFm?=
+ =?utf-8?B?czV4b0RWM2EyYnhHV0dFTGJmazFTaXRLWkRoSUQ1SkZ6WFhvMlFVZHB6UEZw?=
+ =?utf-8?B?VUxraFJ3czkyV2pWOUE0V1ZQdUhER0NMMXIrWDJyNVNIam1JenJzTVZPN1BF?=
+ =?utf-8?B?a1M3elljZ3JVVlFCYmNBSzVpb1VINXpRL3krY2VveUNuVi9hajF1eG1PbE1W?=
+ =?utf-8?B?S2V4NUZDYTVhSThkK2UxOGp2aHV0d3VsVnZYak9HT0J6dFY3em5XdTFha09j?=
+ =?utf-8?B?MkswNUp3aDc5RWV2dU5ZaUdoVnlDTG1RQzRLSEtEVFJNeUc0RXhxRm8yYTZX?=
+ =?utf-8?B?VmRWN2tWdVdGQnRiTlBwZ2QvMnlxS29PaXRzbUZTUnoxL0U0b1ZWekhPZytJ?=
+ =?utf-8?B?a2tQSURXR2IyTVE0U2IyVnY5eFFGMnRFRVFuaEhWYWMwakJGODN6WDRGc3hl?=
+ =?utf-8?B?YkFsdDJ0Skg3UDF3Z3JPU0V6RHNVNll3NUszQW5wVlRXZWI2Q2tlU3BoNjlW?=
+ =?utf-8?B?ZnZpeFN2Z28vSkQ3bFNmdUt2M1ZuTGQyam55K2VIc1lHM3RTU1hSbXc1WGgr?=
+ =?utf-8?B?N1FUdWYrRENERUZiMlJ4S2ROam9sMHdwRWRteWNMR3cvMy9vQldEQ1NTRnNS?=
+ =?utf-8?B?VmxBU2MxcWlrVjlKVU9aeU1tZURTQ1UxRDJVVzhhRFRydDNzMnlQRUpURGtz?=
+ =?utf-8?Q?p9GtPjCUPG5jh0QQHb?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: ymWgZxEHSmWlMs3lQ3GqYrr3Iw5hTl5gXAjdEed6v1MhzIbVMMZVCAntJifGPZKpNFsdg0CsWjOIIn7HoLklucfel+3m1tZvDPtF41jnDBMD4/hf+HC4GCKDH+zVRP7R9Q6ZH1MtLoenEdb0U+R5tnw5ICsgVBsWM+nFpKC4VlII2jofU8zZzNEyDxIXzWfqEswDlIlPj23DGn8XupgW8QnRoqcFNYjgdEhvs//GeUpAaKo+v3DVmzdSeorL06vBbDZ2vJBWA4RTR8nNXoAs48d4j/n/MospHXo0TYdnVl6SFjuBaTw8fc64HjKLDrzsxE6r0IyJu7RuKn1iUxHfsw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR11MB7790.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cc9c58d-e947-4382-57bd-08df29d26ca4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2026 09:06:25.2268
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: h+n3YUcrmQttpDNXFuz6umC1MBg0A1VAr8cMClCgxMb+TnOG8cfh6b7oOUR3bRP6jRA0mQRaGc5wRQa29Sa0Zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5934
+X-OriginatorOrg: intel.com
 
-Add host-driven HW rfkill handling for Intel PCIe Bluetooth
-controllers and report state changes to the Bluetooth stack through
-hci_rfkill_set_hw_state(). The GP2 and HW_RFKILL MSI-X hardware
-causes are enabled so that the host can detect a HW rfkill assertion
-and hand its acknowledgment back to firmware.
-
-On a HW_RFKILL interrupt, a delayed worker reads the FUNC_CTRL and
-IPC_CONTROL registers to determine whether the switch is asserted or
-released. On assertion, the worker marks HW rfkill as active and
-reports a blocked state directly. On release, it clears the
-IPC_CONTROL HW rfkill doorbell bit, waits for the firmware's GP2
-acknowledgment that matches the requested transition, and reports
-an unblocked state to the stack only once that acknowledgment
-arrives. IPC_CONTROL register read-modify-write updates are
-serialized with a new ipc_lock, and the wait state/done flags use
-READ_ONCE()/WRITE_ONCE() since they are shared between the worker
-and the MSI-X handler.
-
-After a successful setup or resume, an initial state check is
-scheduled. That check reports an already-asserted HW rfkill state,
-and also reports a release if rfkill was asserted before suspend and
-cleared while the controller was asleep; otherwise it is a no-op so
-it cannot suppress a later genuine transition.
-
-The HW_RFKILL MSI-X cause is masked before synchronizing interrupts
-and canceling or draining the worker across setup retry, reset,
-shutdown, probe failure, remove, and suspend, and is unmasked again
-after setup and resume succeed. GP2 is left enabled throughout so
-that the shutdown path can still wait for the firmware's doorbell
-acknowledgment when re-asserting rfkill before the controller is
-powered down. If the shutdown is itself caused by an active HW
-rfkill assertion, monitoring is left enabled instead, so a later
-de-assertion can still be detected.
-
-Since a masked cause still latches, the MSI-X handler only queues the
-worker while HW_RFKILL is unmasked, and remove and probe failure
-disable the worker so it cannot be requeued after data is freed.
-
-Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 202 +++++++++++++++++++++++++++++--
- drivers/bluetooth/btintel_pcie.h |  30 +++++
- 2 files changed, 224 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 91b1ee9d6010..6c5665a9a10d 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2710,15 +2710,126 @@ static inline bool btintel_pcie_is_txackq_empty(struct btintel_pcie_data *data)
- 	return data->ia.cr_tia[BTINTEL_PCIE_TXQ_NUM] == data->ia.cr_hia[BTINTEL_PCIE_TXQ_NUM];
- }
- 
-+static bool btintel_pcie_hw_rfkill_doorbell(struct btintel_pcie_data *data,
-+					    bool state)
-+{
-+	unsigned long flags;
-+	u32 reg;
-+	int err;
-+
-+	WRITE_ONCE(data->rfkill_wait_done, false);
-+	WRITE_ONCE(data->rfkill_wait_state, state);
-+
-+	spin_lock_irqsave(&data->ipc_lock, flags);
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG);
-+	if (state)
-+		reg |= BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL;
-+	else
-+		reg &= ~BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL;
-+	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG, reg);
-+	spin_unlock_irqrestore(&data->ipc_lock, flags);
-+
-+	err = wait_event_timeout(data->rfkill_wait_q,
-+				 READ_ONCE(data->rfkill_wait_done),
-+				 msecs_to_jiffies(BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT));
-+	if (!err) {
-+		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for RFKILL",
-+			   BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
-+{
-+	struct btintel_pcie_data *data =
-+		container_of(wk, struct btintel_pcie_data, hw_rfkill_work.work);
-+	u32 func_ctrl, ipc_ctrl;
-+	bool set_rfkill, first_check;
-+
-+	if (!data->hdev)
-+		return;
-+
-+	/* Do not report an initial clear when rfkill was never asserted.
-+	 * After resume, however, a previously asserted rfkill must be
-+	 * cleared and reported to the HCI stack.
-+	 */
-+	first_check = test_and_clear_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK,
-+					 &data->flags);
-+
-+	func_ctrl = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
-+	ipc_ctrl = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG);
-+
-+	set_rfkill = !(func_ctrl & BTINTEL_PCIE_CSR_FUNC_CTRL_HW_RFKILL) &&
-+		     !(ipc_ctrl & BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL);
-+	if (set_rfkill) {
-+		bt_dev_dbg(data->hdev, "hw rfkill on");
-+		set_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
-+		hci_rfkill_set_hw_state(data->hdev, true);
-+	} else {
-+		bt_dev_dbg(data->hdev, "hw rfkill off");
-+		/* Nothing changed at the initial post-setup check, so there
-+		 * is no transition to report.
-+		 */
-+		if (first_check &&
-+		    !test_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags))
-+			return;
-+
-+		if (btintel_pcie_hw_rfkill_doorbell(data, false)) {
-+			clear_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
-+			hci_rfkill_set_hw_state(data->hdev, false);
-+		}
-+	}
-+}
-+
-+static void btintel_delayed_hw_rfkill(struct btintel_pcie_data *data,
-+				      bool delay)
-+{
-+	mod_delayed_work(system_wq, &data->hw_rfkill_work,
-+			 delay ? msecs_to_jiffies(BTINTEL_PCIE_HW_RFKILL_DELAY) : 0);
-+}
-+
-+static void btintel_pcie_msix_gp2_handler(struct btintel_pcie_data *data)
-+{
-+	u32 reg, boot_stage_reg;
-+	bool state;
-+
-+	boot_stage_reg = btintel_pcie_rd_reg32(data,
-+					       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_STATUS_REG);
-+	state = READ_ONCE(data->rfkill_wait_state);
-+
-+	if (state &&
-+	    (reg & BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL) &&
-+	    (boot_stage_reg & BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE)) {
-+		bt_dev_dbg(data->hdev,
-+			   "firmware done handling HW RF-KILL SET state update");
-+		WRITE_ONCE(data->rfkill_wait_done, true);
-+	}
-+
-+	if (!state &&
-+	    !(reg & BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL) &&
-+	    !(boot_stage_reg & BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE)) {
-+		bt_dev_dbg(data->hdev,
-+			   "firmware done handling HW RF-KILL CLEAR state update");
-+		WRITE_ONCE(data->rfkill_wait_done, true);
-+	}
-+
-+	if (READ_ONCE(data->rfkill_wait_done))
-+		wake_up(&data->rfkill_wait_q);
-+}
-+
- static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
- {
- 	struct msix_entry *entry = dev_id;
- 	struct btintel_pcie_data *data = btintel_pcie_get_data(entry);
--	u32 intr_fh, intr_hw;
-+	u32 intr_fh, intr_hw, hw_mask;
- 
- 	spin_lock(&data->irq_lock);
- 	intr_fh = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MSIX_FH_INT_CAUSES);
- 	intr_hw = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES);
-+	hw_mask = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK);
- 
- 	/* Clear causes registers to avoid being handling the same cause */
- 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_MSIX_FH_INT_CAUSES, intr_fh);
-@@ -2740,6 +2851,8 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
- 	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1)
- 		btintel_pcie_msix_gp1_handler(data);
- 
-+	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2)
-+		btintel_pcie_msix_gp2_handler(data);
- 
- 	/* For TX */
- 	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0) {
-@@ -2758,6 +2871,11 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
- 	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG)
- 		btintel_pcie_msix_fw_trigger_handler(data);
- 
-+	/* A masked cause still latches; ignore it once masked. */
-+	if ((intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL) &&
-+	    !(hw_mask & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL))
-+		btintel_delayed_hw_rfkill(data, false);
-+
- 	/* This interrupt is triggered by the firmware after updating
- 	 * boot_stage register and image_response register
- 	 */
-@@ -2835,8 +2953,10 @@ static struct btintel_pcie_causes_list causes_list[] = {
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x00 },
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x01 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
-+	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x22 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x23 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x25 },
-+	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x27 },
- };
- 
- /* This function configures the interrupt masks for both HW_INT_CAUSES and
-@@ -3353,6 +3473,22 @@ static void btintel_pcie_disable_interrupts(struct btintel_pcie_data *data)
- 	spin_unlock(&data->irq_lock);
- }
- 
-+static void btintel_pcie_mask_hw_rfkill(struct btintel_pcie_data *data)
-+{
-+	spin_lock(&data->irq_lock);
-+	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
-+				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL);
-+	spin_unlock(&data->irq_lock);
-+}
-+
-+static void btintel_pcie_unmask_hw_rfkill(struct btintel_pcie_data *data)
-+{
-+	spin_lock(&data->irq_lock);
-+	btintel_pcie_clr_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
-+				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL);
-+	spin_unlock(&data->irq_lock);
-+}
-+
- static void btintel_pcie_enable_interrupts(struct btintel_pcie_data *data)
- {
- 	spin_lock(&data->irq_lock);
-@@ -3535,8 +3671,10 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 		bt_dev_err(hdev, "Firmware download retry count: %d",
- 			   fw_dl_retry);
- 		btintel_pcie_dump_debug_registers(hdev);
--		btintel_pcie_disable_interrupts(data);
-+		btintel_pcie_mask_hw_rfkill(data);
- 		btintel_pcie_synchronize_irqs(data);
-+		cancel_delayed_work_sync(&data->hw_rfkill_work);
-+		btintel_pcie_disable_interrupts(data);
- 		err = btintel_pcie_reset_bt(data);
- 		if (err) {
- 			bt_dev_err(hdev, "Failed to do shr reset: %d", err);
-@@ -3554,8 +3692,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 		btintel_pcie_start_rx(data);
- 	}
- 
--	if (!err)
-+	if (!err) {
- 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
-+		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
-+		btintel_pcie_unmask_hw_rfkill(data);
-+		btintel_delayed_hw_rfkill(data, true);
-+	}
- 	return err;
- }
- 
-@@ -3783,18 +3925,20 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	if (!data)
- 		goto out;
- 
-+	btintel_pcie_mask_hw_rfkill(data);
-+	btintel_pcie_synchronize_irqs(data);
-+	disable_delayed_work_sync(&data->hw_rfkill_work);
- 	btintel_pcie_disable_interrupts(data);
- 	btintel_pcie_synchronize_irqs(data);
- 
- 	flush_work(&data->rx_work);
--	/* Drain any in-flight dump workers and block new ones across reset.
--	 * Safe from self-deadlock: they all run on a separate wq.
-+	/* Drain any in-flight dump/rfkill workers and block new ones across
-+	 * reset. Safe from self-deadlock: they all run on a separate wq.
- 	 */
- 	disable_work_sync(&data->coredump_work);
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
- 	disable_work_sync(&data->mbox_work);
--
- 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
- 
- 	/* Both reset paths follow the same contract: on success they
-@@ -3819,6 +3963,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 		enable_work(&data->hwexp_work);
- 		enable_work(&data->fwtrigger_work);
- 		enable_work(&data->mbox_work);
-+		enable_delayed_work(&data->hw_rfkill_work);
- 	}
- 
- out:
-@@ -4009,6 +4154,24 @@ static struct hci_drv btintel_pcie_hci_drv = {
- 	.specific_handlers      = btintel_pcie_hci_drv_specific_handlers,
- };
- 
-+static int btintel_pcie_shutdown(struct hci_dev *hdev)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+
-+	/* Keep monitoring if shutting down due to an active HW rfkill
-+	 * assertion, so a later de-assertion can still be detected.
-+	 */
-+	if (test_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags)) {
-+		btintel_pcie_hw_rfkill_doorbell(data, true);
-+	} else {
-+		btintel_pcie_mask_hw_rfkill(data);
-+		btintel_pcie_synchronize_irqs(data);
-+		cancel_delayed_work_sync(&data->hw_rfkill_work);
-+	}
-+
-+	return btintel_shutdown_combined(hdev);
-+}
-+
- static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- {
- 	int err;
-@@ -4028,7 +4191,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- 	hdev->close = btintel_pcie_close;
- 	hdev->send = btintel_pcie_send_frame;
- 	hdev->setup = btintel_pcie_setup;
--	hdev->shutdown = btintel_shutdown_combined;
-+	hdev->shutdown = btintel_pcie_shutdown;
- 	hdev->hw_error = btintel_pcie_hw_error;
- 	hdev->set_diag = btintel_set_diag;
- 	hdev->set_bdaddr = btintel_set_bdaddr;
-@@ -4069,6 +4232,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	spin_lock_init(&data->irq_lock);
- 	spin_lock_init(&data->hci_rx_lock);
-+	spin_lock_init(&data->ipc_lock);
- 
- 	init_waitqueue_head(&data->gp0_wait_q);
- 	data->gp0_received = false;
-@@ -4076,6 +4240,9 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	init_waitqueue_head(&data->tx_wait_q);
- 	data->tx_wait_done = false;
- 
-+	init_waitqueue_head(&data->rfkill_wait_q);
-+	data->rfkill_wait_done = false;
-+
- 	init_waitqueue_head(&data->mbox_parse_wait_q);
- 
- 	data->workqueue = alloc_ordered_workqueue(KBUILD_MODNAME, WQ_HIGHPRI);
-@@ -4090,6 +4257,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	skb_queue_head_init(&data->rx_skb_q);
- 	INIT_WORK(&data->rx_work, btintel_pcie_rx_work);
-+	INIT_DELAYED_WORK(&data->hw_rfkill_work,
-+			  btintel_pcie_hw_rfkill_delay_work);
- 	INIT_WORK(&data->reset_work, btintel_pcie_reset_work);
- 	INIT_WORK(&data->coredump_work, btintel_pcie_coredump_worker);
- 	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_worker);
-@@ -4135,6 +4304,10 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	return 0;
- 
- exit_error:
-+	btintel_pcie_mask_hw_rfkill(data);
-+	btintel_pcie_synchronize_irqs(data);
-+	disable_delayed_work_sync(&data->hw_rfkill_work);
-+
- 	/* reset device before exit */
- 	btintel_pcie_reset_bt(data);
- 
-@@ -4175,8 +4348,11 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	if (current_work() != &data->reset_work)
- 		disable_work_sync(&data->reset_work);
- 
--	btintel_pcie_disable_interrupts(data);
-+	btintel_pcie_mask_hw_rfkill(data);
-+	btintel_pcie_synchronize_irqs(data);
-+	disable_delayed_work_sync(&data->hw_rfkill_work);
- 
-+	btintel_pcie_disable_interrupts(data);
- 	btintel_pcie_synchronize_irqs(data);
- 
- 	flush_work(&data->rx_work);
-@@ -4317,6 +4493,10 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
- 
- 	data = pci_get_drvdata(pdev);
- 
-+	btintel_pcie_mask_hw_rfkill(data);
-+	btintel_pcie_synchronize_irqs(data);
-+	cancel_delayed_work_sync(&data->hw_rfkill_work);
-+
- 	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
- 	if (mesg.event == PM_EVENT_SUSPEND &&
- 	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
-@@ -4330,6 +4510,9 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
- 	err = btintel_pcie_set_dxstate(data, dxstate);
- 
- 	if (err) {
-+		btintel_pcie_unmask_hw_rfkill(data);
-+		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
-+		btintel_delayed_hw_rfkill(data, true);
- 		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
- 			   dxstate, err);
- 		return err;
-@@ -4384,6 +4567,9 @@ static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
- 	if (err) {
- 		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
- 	} else {
-+		btintel_pcie_unmask_hw_rfkill(data);
-+		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
-+		btintel_delayed_hw_rfkill(data, true);
- 		bt_dev_dbg(data->hdev,
- 			   "device entered into d0 state from d3 in %lld us",
- 			   ktime_to_us(ktime_get() - start));
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 3030b4e8b750..dda711f7755d 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -33,6 +33,7 @@
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT		(BIT(6))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT		(BIT(7))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS	(BIT(20))
-+#define BTINTEL_PCIE_CSR_FUNC_CTRL_HW_RFKILL		(BIT(27))
- 
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ	(BIT(21))
- 
-@@ -40,6 +41,12 @@
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON	(BIT(29))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET		(BIT(31))
- 
-+/* BTINTEL PCIE CSR IPC Control Register */
-+#define BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL		(BIT(7))
-+
-+/* BTINTEL PCIE CSR IPC Status Register */
-+#define BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL		(BIT(7))
-+
- /* Value for BTINTEL_PCIE_CSR_BOOT_STAGE register */
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ROM		(BIT(0))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_IML		(BIT(1))
-@@ -53,6 +60,7 @@
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
- /* Reflects live D-state. Updated by hardware on every D-state transition. */
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
-+#define BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE	(BIT(25))
- 
- #define BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM	(BIT(4))
- 
-@@ -135,8 +143,10 @@ enum msix_fh_int_causes {
- enum msix_hw_int_causes {
- 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0	= BIT(0),	/* cause 32 */
- 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1	= BIT(1),	/* cause 33 */
-+	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2	= BIT(2),	/* cause 34 */
- 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP	= BIT(3),	/* cause 35 */
- 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG	= BIT(5),	/* cause 37 */
-+	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL	= BIT(7),	/* cause 39 */
- };
- 
- /* PCIe device states
-@@ -155,6 +165,8 @@ enum {
- 	BTINTEL_PCIE_COREDUMP_INPROGRESS,
- 	BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
- 	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
-+	BTINTEL_PCIE_HWRFKILL_ON,
-+	BTINTEL_PCIE_HW_RFKILL_STATE_CHECK,
- 	BTINTEL_PCIE_SETUP_DONE,
- 	BTINTEL_PCIE_MAIL_BOX_INTR,
- 	BTINTEL_PCIE_MBOX_PARSE_PENDING,
-@@ -215,6 +227,12 @@ enum btintel_pcie_mbox_msg {
- 
- #define BTINTEL_PCIE_DX_TRANSITION_MAX_RETRIES	3
- 
-+/* HW rfkill interrupt timeout */
-+#define BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT	200
-+
-+/* HW rfkill check timeout */
-+#define BTINTEL_PCIE_HW_RFKILL_DELAY			1000
-+
- /* The number of descriptors in TX queues */
- #define BTINTEL_PCIE_TX_DESCS_COUNT	32
- 
-@@ -680,6 +698,7 @@ struct btintel_pcie_ini_dump_info {
-  * @flags: driver state
-  * @irq_lock: spinlock for MSI-X
-  * @hci_rx_lock: spinlock for HCI RX flow
-+ * @ipc_lock: spinlock for IPC control register read-modify-write
-  * @base_addr: pci base address (from BAR)
-  * @msix_entries: array of MSI-X entries
-  * @msix_enabled: true if MSI-X is enabled;
-@@ -696,6 +715,10 @@ struct btintel_pcie_ini_dump_info {
-  * @gp0_wait_q: wait_q for gp0 interrupt
-  * @tx_wait_done: condition for tx interrupt
-  * @tx_wait_q: wait_q for tx interrupt
-+ * @rfkill_wait_done: condition for HW rfkill GP2 interrupt
-+ * @rfkill_wait_state: requested HW rfkill transition (set or clear)
-+ *	being waited on, used to validate the GP2 acknowledgment
-+ * @rfkill_wait_q: wait_q for HW rfkill GP2 interrupt
-  * @workqueue: workqueue for RX work
-  * @rx_skb_q: SKB queue for RX packet
-  * @rx_work: RX work struct to process the RX packet in @rx_skb_q
-@@ -723,6 +746,8 @@ struct btintel_pcie_data {
- 	spinlock_t	irq_lock;
- 	/* lock to serialize rx events */
- 	spinlock_t	hci_rx_lock;
-+	/* lock to serialize IPC control register updates */
-+	spinlock_t	ipc_lock;
- 
- 	void __iomem	*base_addr;
- 
-@@ -747,9 +772,14 @@ struct btintel_pcie_data {
- 	bool	tx_wait_done;
- 	wait_queue_head_t	tx_wait_q;
- 
-+	bool	rfkill_wait_done;
-+	bool	rfkill_wait_state;
-+	wait_queue_head_t	rfkill_wait_q;
-+
- 	struct workqueue_struct	*workqueue;
- 	struct sk_buff_head	rx_skb_q;
- 	struct work_struct	rx_work;
-+	struct delayed_work	hw_rfkill_work;
- 	struct work_struct      reset_work;
- 
- 	struct workqueue_struct	*dump_workqueue;
--- 
-2.53.0
-
+SGkgTHVpcywNClRoYW5rIHlvdSBmb3IgeW91ciBmZWVkYmFjay4NCg0KSSBoYXZlIHB1c2hlZCB0
+aGUgdXBkYXRlZCBWMyBwYXRjaCBzZXQgaW5jb3Jwb3JhdGluZyBmaXhlcyBmb3IgdGhlIHJlcG9y
+dGVkIGlzc3Vlcy4gSG93ZXZlciwgSSBub3RpY2VkIHRoYXQgMiBhZGRpdGlvbmFsIGlzc3VlcyBo
+YXZlIGJlZW4gcmVwb3J0ZWQsIA0Kd2hpY2ggYXJlIG5vdCByZWxhdGVkIHRvIHRoZSByZWNlbnQg
+Y2hhbmdlcy4gVGhlc2UgYXBwZWFyIHRvIGJlIHByZS1leGlzdGluZyBnYXBzIGluIHRoZSBwcm9i
+ZSgpIGZ1bmN0aW9uIGNsZWFudXAuDQoNCkNvdWxkIHlvdSBwbGVhc2UgYWR2aXNlIHdoZXRoZXIg
+SSBzaG91bGQgYWRkcmVzcyB0aGVzZSBpc3N1ZXMgYXMgcGFydCBvZiB0aGUgY3VycmVudCBwYXRj
+aCBvciBoYW5kbGUgdGhlbSBhcyBhIHNlcGFyYXRlIHBhdGNoPw0KDQpQYXRjaCBWMzogIA0KDQpo
+dHRwczovL3Nhc2hpa28uZGV2LyMvcGF0Y2hzZXQvMjAyNjEwMTQwNzA4MTMuOTY3OTYtMS1hamF5
+LmsudiU0MGludGVsLmNvbQ0KDQpSZXBvcnRlZCBpc3N1ZSA6ICANCg0KPiBAQCAtNDEzMCwxMSAr
+NDI0MiwxNCBAQCBzdGF0aWMgaW50IGJ0aW50ZWxfcGNpZV9wcm9iZShzdHJ1Y3QgcGNpX2RldiAq
+cGRldiwNCj4gIGlmIChlcnIpDQo+ICAJZ290byBleGl0X2Vycm9yOw0KPiAgDQo+ICsJZGF0YS0+
+eW95by5oZGV2ID0gZGF0YS0+aGRldjsNCj4gIGJ0X2Rldl9kYmcoZGF0YS0+aGRldiwgImNudmk6
+IDB4JTguOHggY252cjogMHglOC44eCIsIGRhdGEtPmNudmksDQo+ICAJICBkYXRhLT5jbnZyKTsN
+Cj4gIHJldHVybiAwOw0KPiAgDQo+ICBleGl0X2Vycm9yOg0KPiArCWJ0aW50ZWxfcGNpZV95b3lv
+X2NsZWFudXAoJmRhdGEtPnlveW8pOw0KPiArDQo+ICAJLyogcmVzZXQgZGV2aWNlIGJlZm9yZSBl
+eGl0ICovDQo+ICAJYnRpbnRlbF9wY2llX3Jlc2V0X2J0KGRhdGEpOw0KDQpJZiBwcm9iZSBmYWls
+cyBlYXJseSwgZm9yIGV4YW1wbGUgd2hlbiBidGludGVsX3BjaWVfY29uZmlnX3BjaWUoKSBmYWls
+cyB0byBtYXAgdGhlIE1NSU8gcmVnaW9uLCBkYXRhLT5iYXNlX2FkZHIgcmVtYWlucyB1bmluaXRp
+YWxpemVkIG9yIGhvbGRzIGFuIEVSUl9QVFIuDQpXaWxsIHRoZSB1bmNvbmRpdGlvbmFsIGNhbGwg
+dG8gYnRpbnRlbF9wY2llX3Jlc2V0X2J0KCkgaGVyZSBjYXVzZSBhIGtlcm5lbCBwYW5pYz8gYnRp
+bnRlbF9wY2llX3Jlc2V0X2J0KCkgaW1tZWRpYXRlbHkgcmVhZHMgaGFyZHdhcmUgcmVnaXN0ZXJz
+IHZpYQ0KYnRpbnRlbF9wY2llX3JkX3JlZzMyKGRhdGEsIC4uLiksIHdoaWNoIGRlcmVmZXJlbmNl
+cyBkYXRhLT5iYXNlX2FkZHI6IA0KDQpzdGF0aWMgaW50IGJ0aW50ZWxfcGNpZV9yZXNldF9idChz
+dHJ1Y3QgYnRpbnRlbF9wY2llX2RhdGEgKmRhdGEpDQp7DQoJdTMyIHJlZzsNCi4uLg0KCXJlZyA9
+IGJ0aW50ZWxfcGNpZV9yZF9yZWczMihkYXRhLCBCVElOVEVMX1BDSUVfQ1NSX0ZVTkNfQ1RSTF9S
+RUcpOw0KDQoNClNpbmNlIHRoaXMgZXhpdF9lcnJvciBwYXRoIGlzIGJlaW5nIG1vZGlmaWVkIGhl
+cmUsIGlzIGl0IHBvc3NpYmxlIHRvIGFkZGEgY2hlY2sgdG8gZW5zdXJlIHRoZSBNTUlPIHJlZ2lv
+biBpcyBtYXBwZWQgYmVmb3JlIGF0dGVtcHRpbmcgYSBoYXJkd2FyZSByZXNldD8NClNpbWlsYXJs
+eSwgaWYgYW4gZXJyb3Igb2NjdXJzIGFmdGVyIHN1Y2Nlc3NmdWxseSBhbGxvY2F0aW5nIHJlc291
+cmNlcyBsaWtlZGF0YS0+d29ya3F1ZXVlLCBETUEgbWVtb3J5LCBvciBNU0ktWCB2ZWN0b3JzLCBk
+b2VzIHRoaXMgZXhpdF9lcnJvciBwYXRoIGxlYWsNCnRob3NlIHJlc291cmNlcz8NCg0KTG9va2lu
+ZyBhdCB0aGUgcmVzdCBvZiB0aGlzIGV4aXQgcGF0aCBpbiBidGludGVsX3BjaWVfcHJvYmUoKSwg
+aXQgb25seSBkZXN0cm95c2RhdGEtPmR1bXBfd29ya3F1ZXVlIGFuZCBjbGVhcnMgUENJIG1hc3Rl
+ci9kcnZkYXRhLiBJdCBzZWVtcyB0byBiZSBtaXNzaW5nDQp0ZWFyZG93biBjYWxscyBsaWtlIGRl
+c3Ryb3lfd29ya3F1ZXVlKGRhdGEtPndvcmtxdWV1ZSksIGJ0aW50ZWxfcGNpZV9mcmVlKGRhdGEp
+LGFuZCBwY2lfZnJlZV9pcnFfdmVjdG9ycyhwZGV2KSB0aGF0IGFyZSBub3JtYWxseSBwcmVzZW50
+IGluIGJ0aW50ZWxfcGNpZV9yZW1vdmUoKS4NCiANCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
+LS0NCkZyb206IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXouZGVudHpAZ21haWwuY29tPiAN
+ClNlbnQ6IFdlZG5lc2RheSwgT2N0b2JlciAxNCwgMjAyNiAxMjo0NyBBTQ0KVG86IEsgViwgQWph
+eSA8YWpheS5rLnZAaW50ZWwuY29tPg0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5v
+cmc7IERldmVnb3dkYSwgQ2hhbmRyYXNoZWthciA8Y2hhbmRyYXNoZWthci5kZXZlZ293ZGFAaW50
+ZWwuY29tPjsgSywgS2lyYW4gPGtpcmFuLmtAaW50ZWwuY29tPjsgbGludXgta2VybmVsQHZnZXIu
+a2VybmVsLm9yZzsgbWFyY2VsQGhvbHRtYW5uLm9yZzsgc3RhYmxlQHZnZXIua2VybmVsLm9yZzsg
+VHVta3VyIE5hcmF5YW4sIENoZXRoYW4gPGNoZXRoYW4udHVta3VyLm5hcmF5YW5AaW50ZWwuY29t
+PjsgSywgTGFrc2htaXBhdGhpIDxsYWtzaG1pcGF0aGkua0BpbnRlbC5jb20+DQpTdWJqZWN0OiBS
+ZTogW1BBVENIIHYxIDEvM10gQmx1ZXRvb3RoOiBidGludGVsX3BjaWU6IEFkZCBpbml0aWFsIFlv
+WW8gZGVidWcgc3VwcG9ydA0KDQpIaSBBamF5LA0KDQpPbiBUdWUsIE9jdCAxMywgMjAyNiBhdCAy
+OjI24oCvUE0gQWpheSBLViA8YWpheS5rLnZAaW50ZWwuY29tPiB3cm90ZToNCj4NCj4gRnJvbTog
+QWpheWt2IDxhamF5LmsudkBpbnRlbC5jb20+DQo+DQo+IEFkZCBhbiBvcHRpb25hbCBZb1lvIGZp
+cm13YXJlIGNvbmZpZ3VyYXRpb24gcGF0aCB0byB0aGUgSW50ZWwgUENJZSANCj4gQmx1ZXRvb3Ro
+IGRyaXZlci4gUmVhZCBEQkdfUEFUSCBhbmQgRU5BQkxFX0lOSSBmcm9tIA0KPiBpYnRfYnRfZGJn
+X2NmZy5pbmksIGFuZCBsb2FkIGludGVsL2lidF9kZWJ1Z195b3lvLmJpbiBvbmx5IHdoZW4gWW9Z
+byANCj4gaXMgZW5hYmxlZCBhbmQgaG9zdCBEUkFNIHJvdXRpbmcgaXMgc2VsZWN0ZWQuDQo+DQo+
+IEludHJvZHVjZSBhIHJ1bnRpbWUgY29udGV4dCBhbmQgYm91bmRlZCBUTFYtc3RyZWFtIHZhbGlk
+YXRpb24gaGVscGVyLg0KPiBJbml0aWFsaXplIGFuZCBjbGVhbiB1cCB0aGUgY29udGV4dCB3aXRo
+IFBDSSBwcm9iZSBhbmQgcmVtb3ZhbCwgd2hpbGUgDQo+IGZhbGxpbmcgYmFjayB0byBsZWdhY3kg
+ZGVidWcgYmVoYXZpb3IgaWYgb3B0aW9uYWwgWW9ZbyBkYXRhIGlzIG1pc3NpbmcgDQo+IG9yIGlu
+dmFsaWQuDQo+DQo+IFJ1bnRpbWUgdmFsaWRhdGlvbiBvZiB0aGUgY29tcGxldGUgUDEtUDMgc2Vy
+aWVzIHByb2R1Y2VkOg0KPiBbICAgIDMuMjg2NTA0XSBCbHVldG9vdGg6IENvcmUgdmVyIDIuMjIN
+Cj4gWyAgICAzLjI5NzM1OV0gQmx1ZXRvb3RoOiBIQ0kgZGV2aWNlIGFuZCBjb25uZWN0aW9uIG1h
+bmFnZXIgaW5pdGlhbGl6ZWQNCj4gWyAgICAzLjI5NzM3M10gQmx1ZXRvb3RoOiBIQ0kgc29ja2V0
+IGxheWVyIGluaXRpYWxpemVkDQo+IFsgICAgMy4yOTczNzZdIEJsdWV0b290aDogTDJDQVAgc29j
+a2V0IGxheWVyIGluaXRpYWxpemVkDQo+IFsgICAgMy4yOTczODRdIEJsdWV0b290aDogU0NPIHNv
+Y2tldCBsYXllciBpbml0aWFsaXplZA0KPiBbICAgIDMuMzMyODQ4XSBCbHVldG9vdGg6IFlvWW86
+IGNvbmZpZ3VyYXRpb24gbG9hZGVkIGFuZCB2YWxpZGF0ZWQNCj4gWzMuMzYwODU3LTMuMzYxNzEy
+XSBCbHVldG9vdGg6IERCR0MxLTM6IGVhY2ggMTYgeCAyNTYgS2lCICg0IE1pQikgDQo+IFszLjM2
+MTcxNV0gQmx1ZXRvb3RoOiBNREJHQyBEQkdDMS0zOiBlYWNoIDE2IHggMjU2IEtpQg0KPiBbICAg
+IDMuMzk3NDM5XSBCbHVldG9vdGg6IGhjaTA6IERldmljZSByZXZpc2lvbiBpcyAwDQo+IFsgICAg
+My4zOTc0NDJdIEJsdWV0b290aDogaGNpMDogU2VjdXJlIGJvb3QgaXMgZW5hYmxlZA0KPiBbICAg
+IDMuMzk3NDQzXSBCbHVldG9vdGg6IGhjaTA6IE9UUCBsb2NrIGlzIGRpc2FibGVkDQo+IFsgICAg
+My4zOTc0NDRdIEJsdWV0b290aDogaGNpMDogQVBJIGxvY2sgaXMgZW5hYmxlZA0KPiBbICAgIDMu
+Mzk3NDQ0XSBCbHVldG9vdGg6IGhjaTA6IERlYnVnIGxvY2sgaXMgZGlzYWJsZWQNCj4NCj4gU2ln
+bmVkLW9mZi1ieTogQWpheWt2IDxhamF5LmsudkBpbnRlbC5jb20+DQo+DQo+IGRpZmYgLS1naXQg
+YS9kcml2ZXJzL2JsdWV0b290aC9NYWtlZmlsZSBiL2RyaXZlcnMvYmx1ZXRvb3RoL01ha2VmaWxl
+IA0KPiBpbmRleCBkNWViMjU2OGFmMmUuLjdkOTMzNzU1YjI5MSAxMDA2NDQNCj4gLS0tIGEvZHJp
+dmVycy9ibHVldG9vdGgvTWFrZWZpbGUNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvTWFrZWZp
+bGUNCj4gQEAgLTE0LDcgKzE0LDcgQEAgb2JqLSQoQ09ORklHX0JUX0hDSUJUVVNCKSAgICAgKz0g
+YnR1c2Iubw0KPiAgb2JqLSQoQ09ORklHX0JUX0hDSUJUU0RJTykgICAgICs9IGJ0c2Rpby5vDQo+
+DQo+ICBvYmotJChDT05GSUdfQlRfSU5URUwpICAgICAgICAgKz0gYnRpbnRlbC5vDQo+IC1vYmot
+JChDT05GSUdfQlRfSU5URUxfUENJRSkgICAgKz0gYnRpbnRlbF9wY2llLm8gYnRpbnRlbC5vDQo+
+ICtvYmotJChDT05GSUdfQlRfSU5URUxfUENJRSkgICAgKz0gYnRpbnRlbF9wY2llLm8gYnRpbnRl
+bC5vIGJ0aW50ZWxfcGNpZV9kZWJ1Zy5vDQo+ICBvYmotJChDT05GSUdfQlRfQVRIM0spICAgICAg
+ICAgKz0gYXRoM2subw0KPiAgb2JqLSQoQ09ORklHX0JUX01SVkwpICAgICAgICAgICs9IGJ0bXJ2
+bC5vDQo+ICBvYmotJChDT05GSUdfQlRfTVJWTF9TRElPKSAgICAgKz0gYnRtcnZsX3NkaW8ubw0K
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llLmMgDQo+IGIvZHJp
+dmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llLmMNCj4gaW5kZXggM2E1NTVhYTUwYzg3Li5lMjhm
+NTI3ZDZkMjkgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5j
+DQo+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jDQo+IEBAIC0yMDMsNiAr
+MjAzLDEwMyBAQCBzdGF0aWMgaW5saW5lIGJvb2wgYnRpbnRlbF9wY2llX2RiZ190b193aWZpKHN0
+cnVjdCBidGludGVsX3BjaWVfZGF0YSAqZGF0YSkNCj4gICAgICAgICByZXR1cm4gZGF0YS0+ZGJn
+X3BhdGhfY2FjaGUgIT0gQlRJTlRFTF9QQ0lFX0RSQU07ICB9DQo+DQo+ICsvKiBOYW1lIG9mIHRo
+ZSBvcHRpb25hbCBJTkkgZmlsZSB1c2VkIHRvIG92ZXJyaWRlIHRoZSBkZWZhdWx0IA0KPiArZGJn
+X3BhdGgNCj4gKyAqIChkYXRhLT5kYmdfcGF0aF9jYWNoZSkgYW5kIHlveW8gaW5pIHNldHRpbmdz
+Lg0KPiArICovDQo+ICsjZGVmaW5lIEJUSU5URUxfUENJRV9EQkdfSU5JX0ZJTEUgImlidF9idF9k
+YmdfY2ZnLmluaSINCj4gKw0KPiArLyogTG9hZHMgb3B0aW9uYWwgIkRCR19QQVRIPTx2YWx1ZT4i
+IGFuZCBFTkFCTEVfSU5JPTx2YWx1ZT4NCj4gKyAqIG92ZXJyaWRlcyBmcm9tIEJUSU5URUxfUENJ
+RV9EQkdfSU5JX0ZJTEUNCj4gKyAqIGFuZCBhcHBsaWVzIHRoZW0gdG8gZGF0YS0+ZGJnX3BhdGhf
+Y2FjaGUgYW5kIGRhdGEtPmVuYWJsZV9pbmkuDQo+ICsgKg0KPiArICogREJHX1BBVEggYWNjZXB0
+cyBCVElOVEVMX1BDSUVfV0lGSV9EQkdDICgweDA2LCBkZWZhdWx0KSBhbmQNCj4gKyAqIEJUSU5U
+RUxfUENJRV9EUkFNICgweDAxLCBsZWdhY3kpOyBhbiBpbnZhbGlkIG9yIG1pc3NpbmcgZW50cnkg
+DQo+ICtsZWF2ZXMNCj4gKyAqIHRoZSBjYWNoZWQgdmFsdWUgc2V0IGJ5IHRoZSBjYWxsZXIgdW5j
+aGFuZ2VkLg0KPiArICoNCj4gKyAqIEVOQUJMRV9JTkkgYWNjZXB0cyAxIChlbmFibGVkKSBvciAw
+IChkaXNhYmxlZCk7IGFuIGludmFsaWQgb3IgDQo+ICttaXNzaW5nDQo+ICsgKiBlbnRyeSBsZWF2
+ZXMgZGF0YS0+ZW5hYmxlX2luaSB1bmNoYW5nZWQuDQo+ICsgKi8NCj4gK3N0YXRpYyB2b2lkIGJ0
+aW50ZWxfcGNpZV9sb2FkX2RiZ19wYXRoX2Zyb21faW5pKHN0cnVjdCANCj4gK2J0aW50ZWxfcGNp
+ZV9kYXRhICpkYXRhKSB7DQo+ICsgICAgICAgY29uc3Qgc3RydWN0IGZpcm13YXJlICpmdzsNCj4g
+KyAgICAgICBjb25zdCBjaGFyICppbmlfZmlsZSA9IEJUSU5URUxfUENJRV9EQkdfSU5JX0ZJTEU7
+DQo+ICsgICAgICAgY2hhciAqYnVmLCAqY3Vyc29yLCAqbGluZTsNCj4gKyAgICAgICBib29sIGRi
+Z19wYXRoX2FwcGxpZWQgPSBmYWxzZTsNCj4gKyAgICAgICBpbnQgZXJyOw0KPiArDQo+ICsgICAg
+ICAgZXJyID0gcmVxdWVzdF9maXJtd2FyZV9kaXJlY3QoJmZ3LCBpbmlfZmlsZSwgJmRhdGEtPnBk
+ZXYtPmRldik7DQo+ICsgICAgICAgaWYgKGVyciA8IDApIHsNCj4gKyAgICAgICAgICAgICAgIEJU
+X0VSUigiJXMgbm90IGZvdW5kICglZCksIHVzaW5nIGRiZ19wYXRoPTB4JTAyeCAiLA0KPiArICAg
+ICAgICAgICAgICAgICAgICAgIGluaV9maWxlLCBlcnIsIGRhdGEtPmRiZ19wYXRoX2NhY2hlKTsN
+Cj4gKyAgICAgICAgICAgICAgIHJldHVybjsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAgICBi
+dWYgPSBrbWVtZHVwX251bChmdy0+ZGF0YSwgZnctPnNpemUsIEdGUF9LRVJORUwpOw0KPiArICAg
+ICAgIHJlbGVhc2VfZmlybXdhcmUoZncpOw0KPiArICAgICAgIGlmICghYnVmKQ0KPiArICAgICAg
+ICAgICAgICAgcmV0dXJuOw0KPiArDQo+ICsgICAgICAgY3Vyc29yID0gYnVmOw0KPiArICAgICAg
+IHdoaWxlICgobGluZSA9IHN0cnNlcCgmY3Vyc29yLCAiXG4iKSkpIHsNCj4gKyAgICAgICAgICAg
+ICAgIGNoYXIgKmVxOw0KPiArICAgICAgICAgICAgICAgY2hhciAqdmFsOw0KPiArICAgICAgICAg
+ICAgICAgdWludCBwYXJzZWQ7DQo+ICsNCj4gKyAgICAgICAgICAgICAgIGxpbmUgPSBzdHJpbShs
+aW5lKTsNCj4gKyAgICAgICAgICAgICAgIGlmICghbGluZVswXSB8fCBsaW5lWzBdID09ICcjJyB8
+fCBsaW5lWzBdID09ICc7JykNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgY29udGludWU7DQo+
+ICsNCj4gKyAgICAgICAgICAgICAgIGVxID0gc3RyY2hyKGxpbmUsICc9Jyk7DQo+ICsgICAgICAg
+ICAgICAgICBpZiAoIWVxKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICBjb250aW51ZTsNCj4g
+Kw0KPiArICAgICAgICAgICAgICAgKmVxID0gJ1wwJzsNCj4gKyAgICAgICAgICAgICAgIGxpbmUg
+PSBzdHJpbShsaW5lKTsNCj4gKyAgICAgICAgICAgICAgIHZhbCA9IHN0cmltKGVxICsgMSk7DQo+
+ICsNCj4gKyAgICAgICAgICAgICAgIC8qIEFjY2VwdCAiREJHX1BBVEgiLyJkYmdfcGF0aCINCj4g
+KyAgICAgICAgICAgICAgICAqIGNhc2UtaW5zZW5zaXRpdmVseSBhcyB0aGUga2V5Lg0KPiArICAg
+ICAgICAgICAgICAgICovDQo+ICsgICAgICAgICAgICAgICBpZiAoIXN0cmNhc2VjbXAobGluZSwg
+IkRCR19QQVRIIikpIHsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgQlRfSU5GTygiUmVhZCBE
+QkdfUEFUSCBmcm9tICVzOiAnJXMnIiwgDQo+ICsgaW5pX2ZpbGUsIHZhbCk7DQo+ICsNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgLyogYmFzZSAwIGxldHMga3N0cnRvdWludCBhY2NlcHQgIjB4
+MDYiLCAiNiIsIGV0Yy4gKi8NCj4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYgKGtzdHJ0b3Vp
+bnQodmFsLCAwLCAmcGFyc2VkKSA9PSAwICYmDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAocGFyc2VkID09IEJUSU5URUxfUENJRV9EUkFNIHx8DQo+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgcGFyc2VkID09IEJUSU5URUxfUENJRV9XSUZJX0RCR0MpKSB7DQo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgZGF0YS0+ZGJnX3BhdGhfY2FjaGUgPSBwYXJzZWQ7DQo+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZGJnX3BhdGhfYXBwbGllZCA9IHRydWU7
+DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQlRfSU5GTygiV1JUIGRiZ19wYXRo
+IGFjY2VwdGVkOiAweCUwMngiLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgZGF0YS0+ZGJnX3BhdGhfY2FjaGUpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICB9
+IGVsc2Ugew0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJUX0VSUigiSW52YWxp
+ZCBEQkdfUEFUSD0nJXMnIGluICVzLCB1c2luZyBkYmdfcGF0aD0weCUwMngiLA0KPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWwsIGluaV9maWxlLCBkYXRhLT5kYmdf
+cGF0aF9jYWNoZSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAg
+ICAgIH0gZWxzZSBpZiAoIXN0cmNhc2VjbXAobGluZSwgIkVOQUJMRV9JTkkiKSkgew0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICBCVF9JTkZPKCJSZWFkIEVOQUJMRV9JTkkgZnJvbSAlczogJyVz
+JyIsIA0KPiArIGluaV9maWxlLCB2YWwpOw0KPiArDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
+IGlmIChrc3RydG91aW50KHZhbCwgMCwgJnBhcnNlZCkgPT0gMCAmJg0KPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgKHBhcnNlZCA9PSAwIHx8IHBhcnNlZCA9PSAxKSkgew0KPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEtPmVuYWJsZV9pbmkgPSAhIXBhcnNlZDsNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBCVF9JTkZPKCJXUlQgZW5hYmxlX2luaSBh
+Y2NlcHRlZDogJXUiLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ZGF0YS0+ZW5hYmxlX2luaSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIH0gZWxzZSB7DQo+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQlRfRVJSKCJJbnZhbGlkIEVOQUJMRV9J
+Tkk9JyVzJyBpbiAlcywgdXNpbmcgZW5hYmxlX2luaT0ldSIsDQo+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHZhbCwgaW5pX2ZpbGUsIGRhdGEtPmVuYWJsZV9pbmkpOw0K
+PiArICAgICAgICAgICAgICAgICAgICAgICB9DQo+ICsgICAgICAgICAgICAgICB9DQo+ICsgICAg
+ICAgfQ0KPiArDQo+ICsgICAgICAgaWYgKGRiZ19wYXRoX2FwcGxpZWQpDQo+ICsgICAgICAgICAg
+ICAgICBCVF9EQkcoIkxvYWRlZCBkYmdfcGF0aD0weCUwMnggZnJvbSAlcyIsIGRhdGEtPmRiZ19w
+YXRoX2NhY2hlLCBpbmlfZmlsZSk7DQo+ICsgICAgICAgZWxzZQ0KPiArICAgICAgICAgICAgICAg
+QlRfRVJSKCJObyB2YWxpZCBEQkdfUEFUSCBpbiAlcywgZGJnX3BhdGg9MHglMDJ4IiwgDQo+ICsg
+aW5pX2ZpbGUsIGRhdGEtPmRiZ19wYXRoX2NhY2hlKTsNCj4gKw0KPiArICAgICAgIEJUX0RCRygi
+RU5BQkxFX0lOSSBlZmZlY3RpdmUgc3RhdGU6ICV1IiwgZGF0YS0+ZW5hYmxlX2luaSk7DQo+ICsN
+Cj4gKyAgICAgICBrZnJlZShidWYpOw0KPiArfQ0KPiArDQo+ICAvKiBIZWxwZXIgZnVuY3Rpb24g
+dG8gYWxsb2NhdGUgYW5kIHNldHVwIGEgZGVidWcgYnVmZmVyIGdyb3VwDQo+ICAgKiBAZGF0YTog
+ZHJpdmVyIGRhdGEgc3RydWN0dXJlDQo+ICAgKiBAYnVmOiBwb2ludGVyIHRvIGRhdGFfYnVmIGFy
+cmF5IHBvaW50ZXIgQEAgLTQwOTcsMTAgKzQxOTQsMjUgQEAgDQo+IHN0YXRpYyBpbnQgYnRpbnRl
+bF9wY2llX3Byb2JlKHN0cnVjdCBwY2lfZGV2ICpwZGV2LA0KPiAgICAgICAgIGRhdGEtPmJvb3Rf
+c3RhZ2VfY2FjaGUgPSAweDAwOw0KPiAgICAgICAgIGRhdGEtPmltZ19yZXNwX2NhY2hlID0gMHgw
+MDsNCj4gICAgICAgICBkYXRhLT5kYmdfcGF0aF9jYWNoZSA9IEJUSU5URUxfUENJRV9XSUZJX0RC
+R0M7DQo+ICsgICAgICAgZGF0YS0+ZW5hYmxlX2luaSA9IGZhbHNlOw0KPiArICAgICAgIGJ0aW50
+ZWxfcGNpZV95b3lvX2luaXQoJmRhdGEtPnlveW8pOw0KPiAgICAgICAgIC8qIEZMUiBjYW4gYmUg
+aW52b2tlZCBieSBlY2hvaW5nIHRvIGRlYnVnZnMgcGF0aCwgc28gZXhwbGljaXRseQ0KPiAgICAg
+ICAgICAqIGluaXRpYWxpemVkDQo+ICAgICAgICAgICovDQo+ICAgICAgICAgZGF0YS0+cmVzZXRf
+dHlwZSA9IEJUSU5URUxfUENJRV9JT1NGX1BSUl9GTFI7DQo+ICsNCj4gKyAgICAgICBidGludGVs
+X3BjaWVfbG9hZF9kYmdfcGF0aF9mcm9tX2luaShkYXRhKTsNCj4gKyAgICAgICBpZiAoZGF0YS0+
+ZGJnX3BhdGhfY2FjaGUgIT0gQlRJTlRFTF9QQ0lFX0RSQU0pDQo+ICsgICAgICAgICAgICAgICBk
+YXRhLT5lbmFibGVfaW5pID0gZmFsc2U7DQo+ICsNCj4gKyAgICAgICBpZiAoZGF0YS0+ZW5hYmxl
+X2luaSkgew0KPiArICAgICAgICAgICAgICAgZXJyID0gYnRpbnRlbF9wY2llX3lveW9fbG9hZF9h
+bmRfcGFyc2UoJmRhdGEtPnlveW8sICZwZGV2LT5kZXYpOw0KPiArICAgICAgICAgICAgICAgaWYg
+KGVycikgew0KPiArICAgICAgICAgICAgICAgICAgICAgICBCVF9XQVJOKCJZb1lvIGlzIG5vdCBj
+b25maWd1cmVkICglZCkiLCBlcnIpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICBidGludGVs
+X3BjaWVfeW95b19jbGVhbnVwKCZkYXRhLT55b3lvKTsNCj4gKyAgICAgICAgICAgICAgIH0NCj4g
+KyAgICAgICB9DQo+ICsNCj4gICAgICAgICBlcnIgPSBidGludGVsX3BjaWVfY29uZmlnX3BjaWUo
+cGRldiwgZGF0YSk7DQo+ICAgICAgICAgaWYgKGVycikNCj4gICAgICAgICAgICAgICAgIGdvdG8g
+ZXhpdF9lcnJvcjsNCj4gQEAgLTQxMjgsMTEgKzQyNDAsMTQgQEAgc3RhdGljIGludCBidGludGVs
+X3BjaWVfcHJvYmUoc3RydWN0IHBjaV9kZXYgKnBkZXYsDQo+ICAgICAgICAgaWYgKGVycikNCj4g
+ICAgICAgICAgICAgICAgIGdvdG8gZXhpdF9lcnJvcjsNCj4NCj4gKyAgICAgICBkYXRhLT55b3lv
+LmhkZXYgPSBkYXRhLT5oZGV2Ow0KPiAgICAgICAgIGJ0X2Rldl9kYmcoZGF0YS0+aGRldiwgImNu
+dmk6IDB4JTguOHggY252cjogMHglOC44eCIsIGRhdGEtPmNudmksDQo+ICAgICAgICAgICAgICAg
+ICAgICBkYXRhLT5jbnZyKTsNCj4gICAgICAgICByZXR1cm4gMDsNCj4NCj4gIGV4aXRfZXJyb3I6
+DQo+ICsgICAgICAgYnRpbnRlbF9wY2llX3lveW9fY2xlYW51cCgmZGF0YS0+eW95byk7DQo+ICsN
+Cj4gICAgICAgICAvKiByZXNldCBkZXZpY2UgYmVmb3JlIGV4aXQgKi8NCj4gICAgICAgICBidGlu
+dGVsX3BjaWVfcmVzZXRfYnQoZGF0YSk7DQo+DQo+IEBAIC00MTczLDYgKzQyODgsOCBAQCBzdGF0
+aWMgdm9pZCBidGludGVsX3BjaWVfcmVtb3ZlKHN0cnVjdCBwY2lfZGV2ICpwZGV2KQ0KPiAgICAg
+ICAgIGlmIChjdXJyZW50X3dvcmsoKSAhPSAmZGF0YS0+cmVzZXRfd29yaykNCj4gICAgICAgICAg
+ICAgICAgIGRpc2FibGVfd29ya19zeW5jKCZkYXRhLT5yZXNldF93b3JrKTsNCj4NCj4gKyAgICAg
+ICBidGludGVsX3BjaWVfeW95b19jbGVhbnVwKCZkYXRhLT55b3lvKTsNCj4gKw0KPiAgICAgICAg
+IGJ0aW50ZWxfcGNpZV9kaXNhYmxlX2ludGVycnVwdHMoZGF0YSk7DQo+DQo+ICAgICAgICAgYnRp
+bnRlbF9wY2llX3N5bmNocm9uaXplX2lycXMoZGF0YSk7DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2JsdWV0b290aC9idGludGVsX3BjaWUuaCANCj4gYi9kcml2ZXJzL2JsdWV0b290aC9idGludGVs
+X3BjaWUuaA0KPiBpbmRleCAzMDMwYjRlOGI3NTAuLjBhNGU1MDhkMGJlYiAxMDA2NDQNCj4gLS0t
+IGEvZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llLmgNCj4gKysrIGIvZHJpdmVycy9ibHVl
+dG9vdGgvYnRpbnRlbF9wY2llLmgNCj4gQEAgLTYsNiArNiw4IEBADQo+ICAgKiAgQ29weXJpZ2h0
+IChDKSAyMDI0ICBJbnRlbCBDb3Jwb3JhdGlvbg0KPiAgICovDQo+DQo+ICsjaW5jbHVkZSAiYnRp
+bnRlbF9wY2llX2RlYnVnLmgiDQo+ICsNCj4gIC8qIENvbnRyb2wgYW5kIFN0YXR1cyBSZWdpc3Rl
+cihCVElOVEVMX1BDSUVfQ1NSKSAqLw0KPiAgI2RlZmluZSBCVElOVEVMX1BDSUVfQ1NSX0JBU0Ug
+ICAgICAgICAgICAgICAgICAoMHgwMDApDQo+ICAjZGVmaW5lIEJUSU5URUxfUENJRV9DU1JfRlVO
+Q19DVFJMX1JFRyAgICAgICAgIChCVElOVEVMX1BDSUVfQ1NSX0JBU0UgKyAweDAyNCkNCj4gQEAg
+LTczNyw2ICs3MzksOCBAQCBzdHJ1Y3QgYnRpbnRlbF9wY2llX2RhdGEgew0KPiAgICAgICAgIHUz
+MiAgICAgYm9vdF9zdGFnZV9jYWNoZTsNCj4gICAgICAgICB1MzIgICAgIGltZ19yZXNwX2NhY2hl
+Ow0KPiAgICAgICAgIHUzMiAgICAgZGJnX3BhdGhfY2FjaGU7DQo+ICsgICAgICAgYm9vbCAgICBl
+bmFibGVfaW5pOw0KPiArICAgICAgIHN0cnVjdCBidGludGVsX3BjaWVfeW95b19jdHggeW95bzsN
+Cj4NCj4gICAgICAgICB1MzIgICAgIGNudmk7DQo+ICAgICAgICAgdTMyICAgICBjbnZyOw0KPiBk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llX2RlYnVnLmMgDQo+IGIv
+ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llX2RlYnVnLmMNCj4gbmV3IGZpbGUgbW9kZSAx
+MDA2NDQNCj4gaW5kZXggMDAwMDAwMDAwMDAwLi4wZTkzM2Y0ZWMzNzYNCj4gLS0tIC9kZXYvbnVs
+bA0KPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9idGludGVsX3BjaWVfZGVidWcuYw0KPiBAQCAt
+MCwwICsxLDE2MSBAQA0KPiArLy8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAtb25s
+eQ0KPiArLyoNCj4gKyAqIEludGVsIEJsdWV0b290aCBZb1lvIERlYnVnIEZyYW1ld29yaw0KPiAr
+ICoNCj4gKyAqIENvcHlyaWdodCAoQykgMjAyNiBJbnRlbCBDb3Jwb3JhdGlvbg0KPiArICoNCj4g
+KyAqIFJ1bnRpbWUtY29uZmlndXJhYmxlIFRMVi1iYXNlZCBkZWJ1ZyBjb2xsZWN0aW9uIGZyYW1l
+d29yayBmb3IgDQo+ICtsb2FkaW5nIGFuZA0KPiArICogcGFyc2luZyB0aGUgb3B0aW9uYWwgWW9Z
+byBmaXJtd2FyZSBjb25maWd1cmF0aW9uIHVzZWQgdG8gZW5hYmxlIA0KPiArZGVidWcNCj4gKyAq
+IHJlZ2lvbnMsIHRyaWdnZXJzLCBIQ0kgY29tbWFuZHMsIGFuZCBjb25maWd1cmF0aW9uIHNldHMu
+DQo+ICsgKi8NCj4gKw0KPiArI2luY2x1ZGUgPGxpbnV4L2Vycm5vLmg+DQo+ICsjaW5jbHVkZSA8
+bGludXgvbW9kdWxlLmg+DQo+ICsjaW5jbHVkZSA8bGludXgvc3RyaW5nLmg+DQo+ICsjaW5jbHVk
+ZSA8bGludXgvdW5hbGlnbmVkLmg+DQo+ICsjaW5jbHVkZSA8bmV0L2JsdWV0b290aC9ibHVldG9v
+dGguaD4NCj4gKyNpbmNsdWRlICJidGludGVsX3BjaWVfZGVidWcuaCINCj4gKw0KPiArLyoNCj4g
+KyAqIFBhcnNlIHRoZSBvcHRpb25hbCBZb1lvIGZpcm13YXJlIFRMViBzdHJlYW0gYW5kIHZhbGlk
+YXRlIGVhY2ggcmVjb3JkLg0KPiArICogVGhpcyBpcyB0aGUgZW50cnkgcG9pbnQgZm9yIHRoZSBy
+dW50aW1lIGRlYnVnIGNvbmZpZ3VyYXRpb24gcGF5bG9hZC4NCj4gKyAqLw0KPiArc3RhdGljIGlu
+dCBidGludGVsX3BjaWVfeW95b19wYXJzZV90bHZfYnVmZmVyKHN0cnVjdCBidGludGVsX3BjaWVf
+eW95b19jdHggKmN0eCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGNvbnN0IHU4ICpidWYsIHNpemVfdCANCj4gK2J1Zl9sZW4pIHsNCj4gKyAgICAgICBj
+b25zdCBzdHJ1Y3QgYnRpbnRlbF9wY2llX3Rsdl9oZHIgKnRsdjsNCj4gKyAgICAgICBjb25zdCB1
+OCAqcHRyID0gYnVmOw0KPiArICAgICAgIHNpemVfdCByZW1haW5pbmcgPSBidWZfbGVuOw0KPiAr
+ICAgICAgIHUzMiBjb3VudCA9IDA7DQo+ICsNCj4gKyAgICAgICB3aGlsZSAocmVtYWluaW5nID49
+IHNpemVvZigqdGx2KSkgew0KPiArICAgICAgICAgICAgICAgc2l6ZV90IHRsdl9zaXplOw0KPiAr
+ICAgICAgICAgICAgICAgdTMyIHR5cGUsIGxlbjsNCj4gKw0KPiArICAgICAgICAgICAgICAgdGx2
+ID0gKGNvbnN0IHN0cnVjdCBidGludGVsX3BjaWVfdGx2X2hkciAqKXB0cjsNCj4gKyAgICAgICAg
+ICAgICAgIHR5cGUgPSBnZXRfdW5hbGlnbmVkX2xlMzIoJnRsdi0+dHlwZSk7DQo+ICsgICAgICAg
+ICAgICAgICBsZW4gPSBnZXRfdW5hbGlnbmVkX2xlMzIoJnRsdi0+bGVuZ3RoKTsNCj4gKw0KPiAr
+ICAgICAgICAgICAgICAgaWYgKGxlbiA+IHJlbWFpbmluZyAtIHNpemVvZigqdGx2KSkgew0KPiAr
+ICAgICAgICAgICAgICAgICAgICAgICBCVF9FUlIoIllvWW86IHRsdiAldSB0cnVuY2F0ZWQgKGxl
+bj0ldSByZW09JXp1KSIsIGNvdW50LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+bGVuLCByZW1haW5pbmcpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVCQURN
+U0c7DQo+ICsgICAgICAgICAgICAgICB9DQo+ICsgICAgICAgICAgICAgICB0bHZfc2l6ZSA9IHNp
+emVvZigqdGx2KSArIGxlbjsNCj4gKw0KPiArICAgICAgICAgICAgICAgc3dpdGNoICh0eXBlKSB7
+DQo+ICsgICAgICAgICAgICAgICBjYXNlIEJUSU5URUxfUENJRV9UTFZfVFlQRV9EQkdfSU5GTzoN
+Cj4gKyAgICAgICAgICAgICAgIGNhc2UgQlRJTlRFTF9QQ0lFX1RMVl9UWVBFX0RCR19SRUdJT046
+DQo+ICsgICAgICAgICAgICAgICBjYXNlIEJUSU5URUxfUENJRV9UTFZfVFlQRV9EQkdfVFJJR0dF
+UjoNCj4gKyAgICAgICAgICAgICAgIGNhc2UgQlRJTlRFTF9QQ0lFX1RMVl9UWVBFX0RCR19IQ01E
+Og0KPiArICAgICAgICAgICAgICAgY2FzZSBCVElOVEVMX1BDSUVfVExWX1RZUEVfREJHX0NPTkZJ
+R19TRVQ6DQo+ICsgICAgICAgICAgICAgICBjYXNlIEJUSU5URUxfUENJRV9UTFZfVFlQRV9EQkdf
+QlVGX0FMTE9DOg0KPiArICAgICAgICAgICAgICAgY2FzZSBCVElOVEVMX1BDSUVfVExWX1RZUEVf
+REJHX1BSRVNFVF9PVkVSUklERToNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgQlRfREJHKCJZ
+b1lvOiB2YWxpZCB0bHYgdHlwZSAweCV4IGxlbj0ldSIsIHR5cGUsIGxlbik7DQo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgICAgZGVmYXVsdDogLyogTG9n
+IGFuZCBjb250aW51ZSwgZG8gbm90IGZhaWwqLw0KPiArICAgICAgICAgICAgICAgICAgICAgICBC
+VF9EQkcoIllvWW86IHVua25vd24gdGx2IHR5cGUgMHgleCBsZW49JXUiLCB0eXBlLCBsZW4pOw0K
+PiArICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgICAgIH0NCj4g
+Kw0KPiArICAgICAgICAgICAgICAgcHRyICs9IHRsdl9zaXplOw0KPiArICAgICAgICAgICAgICAg
+cmVtYWluaW5nIC09IHRsdl9zaXplOw0KPiArICAgICAgICAgICAgICAgY291bnQrKzsNCj4gKyAg
+ICAgICB9DQo+ICsNCj4gKyAgICAgICAvKiBJZiBubyBUTFZzIHdlcmUgcGFyc2VkLCB0aGUgWW9Z
+byBiaW5hcnkgaXMgY29uc2lkZXJlZCBpbnZhbGlkICovDQo+ICsgICAgICAgaWYgKHJlbWFpbmlu
+ZyB8fCBjb3VudCA9PSAwKSB7DQo+ICsgICAgICAgICAgICAgICBCVF9FUlIoIllvWW86IHRyYWls
+aW5nICV6dSBieXRlcyBhZnRlciB0bHYgc3RyZWFtIiwgcmVtYWluaW5nKTsNCj4gKyAgICAgICAg
+ICAgICAgIHJldHVybiAtRUJBRE1TRzsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAgICBCVF9E
+QkcoIllvWW86IHBhcnNlZCAldSB0bHYncyIsIGNvdW50KTsNCj4gKyAgICAgICByZXR1cm4gMDsN
+Cj4gK30NCj4gKw0KPiArLyoqDQo+ICsgKiBidGludGVsX3lveW9faW5pdCAtIEluaXRpYWxpemUg
+dGhlIFlvWW8gY29udGV4dA0KPiArICogQGN0eDogICBQcmUtYWxsb2NhdGVkIGNvbnRleHQgKHR5
+cGljYWxseSBlbWJlZGRlZCBpbiBkcml2ZXIgZGF0YSkNCj4gKyAqLw0KPiAraW50IGJ0aW50ZWxf
+cGNpZV95b3lvX2luaXQoc3RydWN0IGJ0aW50ZWxfcGNpZV95b3lvX2N0eCAqY3R4KSB7DQo+ICsg
+ICAgICAgaWYgKCFjdHgpDQo+ICsgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gKw0K
+PiArICAgICAgIG1lbXNldChjdHgsIDAsIHNpemVvZigqY3R4KSk7DQo+ICsgICAgICAgSU5JVF9M
+SVNUX0hFQUQoJmN0eC0+cmVnaW9uX2xpc3QpOw0KPiArICAgICAgIElOSVRfTElTVF9IRUFEKCZj
+dHgtPnRyaWdnZXJfbGlzdCk7DQo+ICsgICAgICAgSU5JVF9MSVNUX0hFQUQoJmN0eC0+aGNtZF9s
+aXN0KTsNCj4gKyAgICAgICBJTklUX0xJU1RfSEVBRCgmY3R4LT5jb25maWdfc2V0X2xpc3QpOw0K
+PiArDQo+ICsgICAgICAgLyogc2V0IGl0IHRvIHRydWUgYWZ0ZXIgc3VjY2Vzc2Z1bCBUTFYgcGFy
+c2luZyAqLw0KPiArICAgICAgIGN0eC0+ZW5hYmxlZCA9IGZhbHNlOw0KPiArDQo+ICsgICAgICAg
+cmV0dXJuIDA7DQo+ICt9DQo+ICtFWFBPUlRfU1lNQk9MX0dQTChidGludGVsX3BjaWVfeW95b19p
+bml0KTsNCj4gKw0KPiArLyoqDQo+ICsgKiBidGludGVsX3lveW9fY2xlYW51cCAtIENsZWFuIHVw
+IHRoZSBZb1lvIGNvbnRleHQNCj4gKyAqIEBjdHg6ICBZb1lvIGNvbnRleHQgdG8gY2xlYW4gdXAN
+Cj4gKyAqLw0KPiArdm9pZCBidGludGVsX3BjaWVfeW95b19jbGVhbnVwKHN0cnVjdCBidGludGVs
+X3BjaWVfeW95b19jdHggKmN0eCkgew0KPiArICAgICAgIGlmICghY3R4KQ0KPiArICAgICAgICAg
+ICAgICAgcmV0dXJuOw0KPiArDQo+ICsgICAgICAgY3R4LT5lbmFibGVkID0gZmFsc2U7DQo+ICt9
+DQo+ICtFWFBPUlRfU1lNQk9MX0dQTChidGludGVsX3BjaWVfeW95b19jbGVhbnVwKTsNCj4gKw0K
+PiArLyoqDQo+ICsgKiBidGludGVsX3lveW9fbG9hZF9hbmRfcGFyc2UgLSBMb2FkIGlidF9kZWJ1
+Z195b3lvLmJpbiBhbmQgcGFyc2UgDQo+ICtUTFZzDQo+ICsgKiBAY3R4OiAgSW5pdGlhbGl6ZWQg
+WW9ZbyBjb250ZXh0DQo+ICsgKiBAZGV2OiAgRGV2aWNlIGZvciBmaXJtd2FyZSBsb2FkaW5nICh0
+eXBpY2FsbHkgJnBkZXYtPmRldikNCj4gKyAqDQo+ICsgKiBVc2VzIHJlcXVlc3RfZmlybXdhcmVf
+ZGlyZWN0LCBzaW5jZSB0aGUgWW9ZbyBiaW5hcnkNCj4gKyAqIGlzIG9wdGlvbmFsLiBPbiBzdWNj
+ZXNzLCBzZXRzIGN0eC0+ZW5hYmxlZC4NCj4gKyAqLw0KPiAraW50IGJ0aW50ZWxfcGNpZV95b3lv
+X2xvYWRfYW5kX3BhcnNlKHN0cnVjdCBidGludGVsX3BjaWVfeW95b19jdHggKmN0eCwNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBkZXZpY2UgKmRldikgew0K
+PiArICAgICAgIGNvbnN0IHN0cnVjdCBmaXJtd2FyZSAqZnc7DQo+ICsgICAgICAgaW50IHJldDsN
+Cj4gKw0KPiArICAgICAgIGlmICghY3R4KQ0KPiArICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5W
+QUw7DQo+ICsNCj4gKyAgICAgICByZXQgPSByZXF1ZXN0X2Zpcm13YXJlX2RpcmVjdCgmZncsIEJU
+SU5URUxfUENJRV9ZT1lPX0ZXX05BTUUsIGRldik7DQo+ICsgICAgICAgaWYgKHJldCkgew0KPiAr
+ICAgICAgICAgICAgICAgQlRfV0FSTigiWW9ZbzogZmFpbGVkIHRvIGxvYWQgJXMgKCVkKSIsDQo+
+ICsgICAgICAgICAgICAgICAgICAgICAgIEJUSU5URUxfUENJRV9ZT1lPX0ZXX05BTUUsIHJldCk7
+DQo+ICsgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiArICAgICAgIH0NCj4gKw0KPiArICAg
+ICAgIC8qIFNhbml0eSBjaGVjayBmaXJtd2FyZSBzaXplICovDQo+ICsgICAgICAgaWYgKGZ3LT5z
+aXplIDwgc2l6ZW9mKHN0cnVjdCBidGludGVsX3BjaWVfdGx2X2hkcikpIHsNCj4gKyAgICAgICAg
+ICAgICAgIHJlbGVhc2VfZmlybXdhcmUoZncpOw0KPiArICAgICAgICAgICAgICAgcmV0dXJuIC1F
+QkFETVNHOw0KPiArICAgICAgIH0NCj4gKw0KPiArICAgICAgIEJUX0RCRygiWW9ZbzogbG9hZGVk
+ICVzICglenUgYnl0ZXMpIiwgQlRJTlRFTF9QQ0lFX1lPWU9fRldfTkFNRSwNCj4gKyAgICAgICAg
+ICAgICAgZnctPnNpemUpOw0KPiArDQo+ICsgICAgICAgcmV0ID0gYnRpbnRlbF9wY2llX3lveW9f
+cGFyc2VfdGx2X2J1ZmZlcihjdHgsIGZ3LT5kYXRhLCBmdy0+c2l6ZSk7DQo+ICsgICAgICAgcmVs
+ZWFzZV9maXJtd2FyZShmdyk7DQo+ICsNCj4gKyAgICAgICAvKiBGaWxlIENvcnJ1cHRpb24gLyBU
+TFYgdmFsaWRhdGlvbiBmYWlsZWQgKi8NCj4gKyAgICAgICBpZiAocmV0KSB7DQo+ICsgICAgICAg
+ICAgICAgICBCVF9FUlIoIllvWW86IHRsdiBwYXJzaW5nIGZhaWxlZCAoJWQpIiwgcmV0KTsNCj4g
+KyAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICsgICAgICAgfQ0KPiArDQo+ICsgICAgICAg
+Y3R4LT5lbmFibGVkID0gdHJ1ZTsNCj4gKw0KPiArICAgICAgIEJUX0lORk8oIllvWW86IGZlYXR1
+cmUgZW5hYmxlZCBhbmQgY29uZmlndXJlZCIpOw0KPiArICAgICAgIHJldHVybiAwOw0KPiArfQ0K
+PiArRVhQT1JUX1NZTUJPTF9HUEwoYnRpbnRlbF9wY2llX3lveW9fbG9hZF9hbmRfcGFyc2UpOw0K
+PiArDQo+ICtNT0RVTEVfREVTQ1JJUFRJT04oIkludGVsIEJsdWV0b290aCB5b3lvIGRlYnVnIGZy
+YW1ld29yayIpOyANCj4gK01PRFVMRV9MSUNFTlNFKCJHUEwiKTsNCj4gZGlmZiAtLWdpdCBhL2Ry
+aXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZV9kZWJ1Zy5oIA0KPiBiL2RyaXZlcnMvYmx1ZXRv
+b3RoL2J0aW50ZWxfcGNpZV9kZWJ1Zy5oDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4
+IDAwMDAwMDAwMDAwMC4uYjBiOTRjMmExNjlkDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvZHJp
+dmVycy9ibHVldG9vdGgvYnRpbnRlbF9wY2llX2RlYnVnLmgNCj4gQEAgLTAsMCArMSw3NyBAQA0K
+PiArLyogU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAtb25seSAqLw0KPiArLyoNCj4g
+KyAqIEludGVsIEJsdWV0b290aCBZb1lvIERlYnVnIEZyYW1ld29yaw0KPiArICoNCj4gKyAqIENv
+cHlyaWdodCAoQykgMjAyNiBJbnRlbCBDb3Jwb3JhdGlvbg0KPiArICoNCj4gKyAqLw0KPiArDQo+
+ICsjaWZuZGVmIF9fQlRJTlRFTF9QQ0lFX0RFQlVHX0hfXw0KPiArI2RlZmluZSBfX0JUSU5URUxf
+UENJRV9ERUJVR19IX18NCj4gKw0KPiArI2luY2x1ZGUgPGxpbnV4L2xpc3QuaD4NCj4gKyNpbmNs
+dWRlIDxsaW51eC90eXBlcy5oPg0KPiArI2luY2x1ZGUgPGxpbnV4L2RldmljZS5oPg0KPiArI2lu
+Y2x1ZGUgPGxpbnV4L2Zpcm13YXJlLmg+DQo+ICsNCj4gKy8qIEV4dGVybmFsIFlvWW8gYmluYXJ5
+IGZpbGUgKi8NCj4gKyNkZWZpbmUgQlRJTlRFTF9QQ0lFX1lPWU9fRldfTkFNRSAgICAgICJpbnRl
+bC9pYnRfZGVidWdfeW95by5iaW4iDQo+ICsNCj4gKy8qIFRMViB0eXBlIGNvZGVzICovDQo+ICsj
+ZGVmaW5lIEJUSU5URUxfUENJRV9UTFZfVFlQRV9EQkdfSU5GTyAgICAgICAgIDB4MTAwMDAwNQ0K
+PiArI2RlZmluZSBCVElOVEVMX1BDSUVfVExWX1RZUEVfREJHX0JVRl9BTExPQyAgICAgICAgICAg
+IDB4MTAwMDAwNg0KPiArI2RlZmluZSBCVElOVEVMX1BDSUVfVExWX1RZUEVfREJHX0hDTUQgICAg
+ICAgICAweDEwMDAwMDcNCj4gKyNkZWZpbmUgQlRJTlRFTF9QQ0lFX1RMVl9UWVBFX0RCR19SRUdJ
+T04gICAgICAgICAgICAgICAweDEwMDAwMDgNCj4gKyNkZWZpbmUgQlRJTlRFTF9QQ0lFX1RMVl9U
+WVBFX0RCR19UUklHR0VSICAgICAgICAgICAgICAweDEwMDAwMDkNCj4gKyNkZWZpbmUgQlRJTlRF
+TF9QQ0lFX1RMVl9UWVBFX0RCR19DT05GSUdfU0VUICAgICAgICAgICAweDEwMDAwMEENCj4gKyNk
+ZWZpbmUgQlRJTlRFTF9QQ0lFX1RMVl9UWVBFX0RCR19QUkVTRVRfT1ZFUlJJREUgICAgICAweDEw
+MDAwMEINCj4gKw0KPiArLyogVExWIGhlYWRlciAqLw0KPiArc3RydWN0IGJ0aW50ZWxfcGNpZV90
+bHZfaGRyIHsNCj4gKyAgICAgICBfX2xlMzIgdHlwZTsNCj4gKyAgICAgICBfX2xlMzIgbGVuZ3Ro
+Ow0KPiArfSBfX3BhY2tlZDsNCj4gKw0KPiArLyogRGVidWcgaGVhZGVyIGNvbW1vbiB0byBhbGwg
+ZGVidWcgVExWcyAqLyBzdHJ1Y3QgDQo+ICtidGludGVsX3BjaWVfZGJnX2hkciB7DQo+ICsgICAg
+ICAgX19sZTMyIHRsdl9kYXRhX3ZlcnNpb247DQo+ICsgICAgICAgX19sZTMyIGRvbWFpbjsNCj4g
+K30gX19wYWNrZWQ7DQo+ICsNCj4gKy8qIEFkZHJlc3MvdmFsdWUgcGFpciAqLw0KPiArc3RydWN0
+IGJ0aW50ZWxfcGNpZV9hZGRyX3ZhbHVlIHsNCj4gKyAgICAgICBfX2xlMzIgYWRkcmVzczsNCj4g
+KyAgICAgICBfX2xlMzIgdmFsdWU7DQo+ICt9IF9fcGFja2VkOw0KPiArDQo+ICsvKg0KPiArICog
+c3RydWN0IGJ0aW50ZWxfcGNpZV95b3lvX2N0eC0gUnVudGltZSBzdGF0ZSBmb3IgWW9ZbyBkZWJ1
+ZyANCj4gK2NvbmZpZ3VyYXRpb24NCj4gKyAqIEBlbmFibGVkOiBXaGV0aGVyIHRoZSBsb2FkZWQg
+WW9ZbyBjb25maWd1cmF0aW9uIHBhc3NlZCB2YWxpZGF0aW9uDQo+ICsgKiBAcmVnaW9uX2xpc3Q6
+IFBhcnNlZCBkZWJ1Zy1yZWdpb24gZW50cmllcw0KPiArICogQHRyaWdnZXJfbGlzdDogUGFyc2Vk
+IGRlYnVnLXRyaWdnZXIgZW50cmllcw0KPiArICogQGhjbWRfbGlzdDogUGFyc2VkIEhDSSBjb21t
+YW5kIGVudHJpZXMNCj4gKyAqIEBjb25maWdfc2V0X2xpc3Q6IFBhcnNlZCBjb25maWd1cmF0aW9u
+LXNldCBlbnRyaWVzDQo+ICsgKiBAaGRldjogQXNzb2NpYXRlZCBIQ0kgZGV2aWNlOyBOVUxMIHVu
+dGlsIHN1Y2Nlc3NmdWwgSENJIA0KPiArcmVnaXN0cmF0aW9uDQo+ICsgKg0KPiArICogU3RvcmVz
+IHRoZSB2YWxpZGF0aW9uIHN0YXRlIGFuZCBwYXJzZWQgVExWIGRhdGEgZm9yIHRoZSBvcHRpb25h
+bCANCj4gK1lvWW8NCj4gKyAqIGZpcm13YXJlIGNvbmZpZ3VyYXRpb24uDQo+ICsgKi8NCj4gK3N0
+cnVjdCBidGludGVsX3BjaWVfeW95b19jdHggew0KPiArICAgICAgIGJvb2wgICAgICAgICAgICAg
+ICAgICAgICBlbmFibGVkOw0KPiArDQo+ICsgICAgICAgc3RydWN0IGxpc3RfaGVhZCAgICAgICAg
+IHJlZ2lvbl9saXN0Ow0KPiArICAgICAgIHN0cnVjdCBsaXN0X2hlYWQgICAgICAgICB0cmlnZ2Vy
+X2xpc3Q7DQo+ICsgICAgICAgc3RydWN0IGxpc3RfaGVhZCAgICAgICAgIGhjbWRfbGlzdDsNCj4g
+KyAgICAgICBzdHJ1Y3QgbGlzdF9oZWFkICAgICAgICAgY29uZmlnX3NldF9saXN0Ow0KPiArDQo+
+ICsgICAgICAgc3RydWN0IGhjaV9kZXYgICAgICAgICAgICpoZGV2Ow0KPiArfTsNCj4gKw0KPiAr
+aW50ICBidGludGVsX3BjaWVfeW95b19pbml0KHN0cnVjdCBidGludGVsX3BjaWVfeW95b19jdHgg
+KmN0eCk7IHZvaWQgDQo+ICtidGludGVsX3BjaWVfeW95b19jbGVhbnVwKHN0cnVjdCBidGludGVs
+X3BjaWVfeW95b19jdHggKmN0eCk7DQo+ICsNCj4gKy8qIExvYWQgYW5kIHBhcnNlIHRoZSBleHRl
+cm5hbCAuYmluIGZpbGUgKi8gaW50ICANCj4gK2J0aW50ZWxfcGNpZV95b3lvX2xvYWRfYW5kX3Bh
+cnNlKHN0cnVjdCBidGludGVsX3BjaWVfeW95b19jdHggKmN0eCwNCj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgZGV2aWNlICpkZXYpOw0KPiArDQo+ICsjZW5k
+aWYgLyogX19CVElOVEVMX1BDSUVfREVCVUdfSF9fICovDQo+IC0tDQo+IDIuNTMuMA0KDQpUaGVy
+ZSBhcmUgcXVpdGUgYSBmZXcgaXNzdWVzIGZsYWdnZWQgYnkgc2FzaGlrbzoNCg0KaHR0cHM6Ly9z
+YXNoaWtvLmRldi8jL3BhdGNoc2V0LzIwMjYxMDEzMTA0NDE2LjI2MTQzLTEtYWpheS5rLnYlNDBp
+bnRlbC5jb20NCg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
