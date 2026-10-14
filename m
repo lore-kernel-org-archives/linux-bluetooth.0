@@ -1,163 +1,379 @@
-Received: from mail-gw01.astralinux.ru (mail-gw01.astralinux.ru [37.230.196.243])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CC93E4C75;
-	Wed, 14 Oct 2026 10:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.230.196.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D684F4745
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791973321; cv=none; b=FjaVo6y+y1XwWHhVK357wQV8LIz6LVhUKlvIVtUpQwofUoypx2lEt5N2pCDD9asZTFVhtt3vvSyE3/0spNMBlxIBFYFHuGxpxroKaveuODcJEjkrR3XgT1+vlC4ayDHKj3Is7F4fi5Du394spOFoRXsfsrCSh76QSbYGV0ehT9E=
+	t=1791975496; cv=none; b=nUTyMFtbgLpXt6+V6A4ommQfqcNXy1oO9Y7xjWw54rz7i3yAydTdEHMJmmOBXoE3LO+8bx3McO6dniQCiRedH4NwsGAC/JJOBkDVPAM2g6wWDxPO7R9zcMw40owy6yzc59enwwk4mA2dYm1JZYzzV4sGDfYwDDp469nzeJ+SRNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791973321; c=relaxed/simple;
-	bh=6PhHbGJyneBOewtMI3bjV7aMDnFRJJreKrCh2fxs4bQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPiyZVBXQs2IVQXoyVF6+GpPZqOXHG75flnt1RNNQLZgYUhlRDLNx9ThTmirkl2zJMi3Y5Jf+g7lKb6I+VVfNlu/uzCYscVRb9AsyxhIiaa1c42QuiKSv+17+7azqq51qOaDDvQcR5o4kv5eXjQWAmgTLuWefXnpi3E8Qk7VtfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=L9633jGp; arc=none smtp.client-ip=37.230.196.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+	s=arc-20240116; t=1791975496; c=relaxed/simple;
+	bh=XFjyEVaeBhNDYnBugSL6q2bZEO/oJZtSKLBtNLWQY5c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=L9Tp+GssVep4ANyjern1arGnxoQEVTEGXInXppCX2GdMihk76d2bH0YbrV2luSMWH3TBMIJGrN6vgDkZgPoWluHr22w2Rvr1p0Yc7poqq8cgpwVwqscaJLMxsff/CNiSljjx1zCqctYYJWveYTMJNuJ5MIuNqMU9T7hDPkz4N7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rEC7a25c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="L9633jGp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1791973309;
-	bh=6PhHbGJyneBOewtMI3bjV7aMDnFRJJreKrCh2fxs4bQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=L9633jGpUrk8dtf/mexqpQnx6IQM6gonmO9MjX1BG0BieJWWyzJhAmbJP6he9LwOI
-	 4Mzql6nwvcKXlnALLLyzXUTl+dQnGoQMUA8Na9Jcx3YN0X2UW5lqMTLmKWArX8Qj2F
-	 jSCQmSi/LOn9omVshJhhF3zhFoEItGbl8nKwKdmabyMFF7FeMzjSltXExY6oG+5Q6J
-	 QwzrKWla2VwZn0Twe8rEcqBvop+Z8LwailI5jCSrZSUvRROHstBZfCm8FtiYlFvLRZ
-	 uHTBKgJXOcTHO3Ofy3BfAsdgvkiChLEk1C/4Hada2JWdKU0kDxY1kCGYbM3pQ3yWip
-	 QYN55YxkV+23g==
-Received: from gca-sc-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw01.astralinux.ru (Postfix) with ESMTP id 2EE2F25849;
-	Wed, 14 Oct 2026 13:21:49 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.205.207.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw01.astralinux.ru (Postfix) with ESMTPS;
-	Wed, 14 Oct 2026 13:21:48 +0300 (MSK)
-Received: from DESKTOP-D46TNHI (unknown [10.198.48.143])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4j4S175jJHzDqd;
-	Wed, 14 Oct 2026 13:21:47 +0300 (MSK)
-From: Mikhail Dmitrichenko <mdmitrichenko@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Mikhail Dmitrichenko <mdmitrichenko@astralinux.ru>,
-	Sasha Levin <sashal@kernel.org>,
-	Muhammad Bilal <meatuni001@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sangho Lee <kudo3228@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH 5.10] Bluetooth: HIDP: fix missing length checks in hidp_input_report()
-Date: Wed, 14 Oct 2026 13:20:14 +0300
-Message-ID: <20261014102016.1807-1-mdmitrichenko@astralinux.ru>
-X-Mailer: git-send-email 2.54.0.windows.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rEC7a25c"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A77AEC2BCF5;
+	Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1791975495;
+	bh=XFjyEVaeBhNDYnBugSL6q2bZEO/oJZtSKLBtNLWQY5c=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=rEC7a25chzDnGt1fj7xOwl8f2kR2d9wGLicZaXWCA79Ya3xHF6unJ38QTnlMsqcgL
+	 4b1Rhygfj7knJpR4aw/QgaAhJ8wbPI4yhSIFHHojzz7uo70yR6oho6wngOpjYoXnQ1
+	 K6Sw/hxflBwl3pGEyncH0cBNwF0jAVScA2dnJ6zU/9JCRYP0ujs5niWeJuAWmG1f1j
+	 XKsbjDhKeaoxxkpVN9T4bjSkDpzPxoOWBw2hOmTqC+t7HY92tsq2hXkA8Q3VVmqEDr
+	 Ql08PipRX70PRha6iMNX9zzNHQcAfIc5pG2SHV8Jd2DIZj59oKJA29wBnsHB+A5rn2
+	 KFwStUQNqUG4A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83362CC6B24;
+	Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 14 Oct 2026 18:58:11 +0800
+Subject: [PATCH BlueZ bluez] hci: add ext adv interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: mdmitrichenko@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 127 0.3.127 0884f7b061fa529b810563f359267cd65d2ec05c, {Tracking_from_domain_doesnt_match_to}, new-mail.astralinux.ru:7.1.1;127.0.0.199:7.1.2;astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 206666 [Oct 14 2026]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.27
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2026/10/14 09:13:00 #28683309
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261014-extend_adv_api-v1-1-6ad07ff280f2@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAEJgz2oC/x3MTQqAIBBA4avIrBOyH5GuEhGaUw2EiVZE0t2Tl
+ t/ivQQRA2GEjiUIeFGk3WWIgsG0arcgJ5sNVVlJUYqG432gs6O216g9cSmMUarWk1It5MgHnOn
+ +hz2Y7cQHhvf9AANHkN9nAAAA
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791975494; l=8890;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=WMUAa/cLymXgVr+hqSOhwpWmetN8h/ciU2P6dUS+h5c=;
+ b=ULgSsdKJ7auitPoC4RZsGqZOyx6N4zqb8Bmt75PNI/Nz3nFcdeX9qZGzeOlzO+bfxxoGOHU8M
+ q4sQ64yQcLOD18k9YtqBVgD8uJPI5bxqMUI3jCPZXhr3OChDN7mPd1N
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-From: Muhammad Bilal <meatuni001@gmail.com>
+From: Yang Li <yang.li@amlogic.com>
 
-commit 2a3ac9ee11dbb9845f3947cef4a79dba658cf6f6 upstream.
+Wrap extended advertising HCI command interfaces.
 
-hidp_input_report() reads keyboard and mouse payload data from an skb
-without first verifying that skb->len contains enough data.
-
-hidp_recv_intr_frame() pulls the 1-byte HIDP header before dispatching
-to hidp_input_report(). If a paired device sends a truncated packet,
-the handler reads beyond the valid skb data, resulting in an
-out-of-bounds read of skb data. The OOB bytes may be interpreted as
-phantom key presses or spurious mouse movement.
-
-Replace the open-coded length tracking and pointer arithmetic with
-skb_pull_data() calls. skb_pull_data() returns NULL if the requested
-bytes are not present, eliminating the need for a manual size variable
-and the separate skb->len guard.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Mikhail Dmitrichenko <mdmitrichenko@astralinux.ru>
 ---
-Backport fix for CVE-2026-63947
- net/bluetooth/hidp/core.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ lib/bluetooth/hci.c     | 193 ++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/bluetooth/hci.h     |  55 ++++++++++++++
+ lib/bluetooth/hci_lib.h |  16 ++++
+ 3 files changed, 264 insertions(+)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 153cda4ed820..299d59838a3b 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -179,12 +179,21 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
- {
- 	struct input_dev *dev = session->input;
- 	unsigned char *keys = session->keys;
--	unsigned char *udata = skb->data + 1;
--	signed char *sdata = skb->data + 1;
--	int i, size = skb->len - 1;
-+	unsigned char *udata;
-+	signed char *sdata;
-+	u8 *hdr;
-+	int i;
+diff --git a/lib/bluetooth/hci.c b/lib/bluetooth/hci.c
+index f50a30c61..646a0fe6f 100644
+--- a/lib/bluetooth/hci.c
++++ b/lib/bluetooth/hci.c
+@@ -3017,6 +3017,199 @@ int hci_le_set_advertise_enable(int dd, uint8_t enable, int to)
+ 	return 0;
+ }
+ 
++int hci_le_set_ext_adv_params(int dd, uint8_t handle, uint16_t evt_properties,
++				uint32_t min_interval, uint32_t max_interval,
++				uint8_t channel_map, uint8_t own_addr_type,
++				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
++				uint8_t filter_policy, int8_t tx_power,
++				uint8_t primary_phy, uint8_t secondary_max_skip,
++				uint8_t secondary_phy, uint8_t sid,
++				uint8_t notif_enable, int to)
++{
++	struct hci_request rq;
++	le_set_ext_adv_params_cp cp;
++	struct {
++		uint8_t status;
++		int8_t  tx_power;
++	} rsp;
 +
-+	hdr = skb_pull_data(skb, 1);
-+	if (!hdr)
-+		return;
- 
--	switch (skb->data[0]) {
-+	switch (*hdr) {
- 	case 0x01:	/* Keyboard report */
-+		udata = skb_pull_data(skb, 8);
-+		if (!udata)
-+			break;
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = handle;
++	cp.evt_properties = evt_properties;
++	cp.min_interval[0] = min_interval & 0xff;
++	cp.min_interval[1] = (min_interval >> 8) & 0xff;
++	cp.min_interval[2] = (min_interval >> 16) & 0xff;
++	cp.max_interval[0] = max_interval & 0xff;
++	cp.max_interval[1] = (max_interval >> 8) & 0xff;
++	cp.max_interval[2] = (max_interval >> 16) & 0xff;
++	cp.channel_map = channel_map;
++	cp.own_addr_type = own_addr_type;
++	cp.peer_addr_type = peer_addr_type;
++	if (peer_addr)
++		memcpy(&cp.peer_addr, peer_addr, sizeof(cp.peer_addr));
++	cp.filter_policy = filter_policy;
++	cp.tx_power = tx_power;
++	cp.primary_phy = primary_phy;
++	cp.secondary_max_skip = secondary_max_skip;
++	cp.secondary_phy = secondary_phy;
++	cp.sid = sid;
++	cp.notif_enable = notif_enable;
 +
- 		for (i = 0; i < 8; i++)
- 			input_report_key(dev, hidp_keycode[i + 224], (udata[0] >> i) & 1);
- 
-@@ -213,6 +222,10 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
- 		break;
- 
- 	case 0x02:	/* Mouse report */
-+		sdata = skb_pull_data(skb, 3);
-+		if (!sdata)
-+			break;
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_SET_EXT_ADV_PARAMS;
++	rq.cparam = &cp;
++	rq.clen = sizeof(cp);
++	rq.rparam = &rsp;
++	rq.rlen = sizeof(rsp);
 +
- 		input_report_key(dev, BTN_LEFT,   sdata[0] & 0x01);
- 		input_report_key(dev, BTN_RIGHT,  sdata[0] & 0x02);
- 		input_report_key(dev, BTN_MIDDLE, sdata[0] & 0x04);
-@@ -222,7 +235,7 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
- 		input_report_rel(dev, REL_X, sdata[1]);
- 		input_report_rel(dev, REL_Y, sdata[2]);
++	if (hci_send_req(dd, &rq, to) < 0)
++		return -1;
++
++	if (rsp.status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
++int hci_le_set_ext_adv_data(int dd, uint8_t handle, uint8_t operation,
++				uint8_t fragment_pref, const uint8_t *data,
++				uint8_t data_len, int to)
++{
++	struct hci_request rq;
++	le_set_ext_adv_data_cp *cp;
++	uint8_t status;
++	size_t plen = sizeof(*cp) + data_len;
++
++	cp = malloc(plen);
++	if (!cp) {
++		errno = ENOMEM;
++		return -1;
++	}
++
++	memset(cp, 0, plen);
++	cp->handle = handle;
++	cp->operation = operation;
++	cp->fragment_preference = fragment_pref;
++	cp->data_len = data_len;
++	if (data && data_len)
++		memcpy(cp->data, data, data_len);
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_SET_EXT_ADV_DATA;
++	rq.cparam = cp;
++	rq.clen = plen;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, to) < 0) {
++		free(cp);
++		return -1;
++	}
++
++	free(cp);
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
++int hci_le_set_ext_scan_rsp_data(int dd, uint8_t handle, uint8_t operation,
++				uint8_t fragment_pref, const uint8_t *data,
++				uint8_t data_len, int to)
++{
++	struct hci_request rq;
++	le_set_ext_adv_data_cp *cp;
++	uint8_t status;
++	size_t plen = sizeof(*cp) + data_len;
++
++	cp = malloc(plen);
++	if (!cp) {
++		errno = ENOMEM;
++		return -1;
++	}
++
++	memset(cp, 0, plen);
++	cp->handle = handle;
++	cp->operation = operation;
++	cp->fragment_preference = fragment_pref;
++	cp->data_len = data_len;
++	if (data && data_len)
++		memcpy(cp->data, data, data_len);
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_SET_EXT_SCAN_RSP_DATA;
++	rq.cparam = cp;
++	rq.clen = plen;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, to) < 0) {
++		free(cp);
++		return -1;
++	}
++
++	free(cp);
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
++int hci_le_set_ext_adv_enable(int dd, uint8_t enable, uint8_t num_of_sets,
++				const void *sets, int to)
++{
++	struct hci_request rq;
++	le_set_ext_adv_enable_cp *cp;
++	uint8_t status;
++	size_t set_entry_len = 4; /* handle (1) + duration (2) + max_events (1) */
++	size_t plen = sizeof(le_set_ext_adv_enable_cp) + (num_of_sets * set_entry_len);
++
++	cp = malloc(plen);
++	if (!cp) {
++		errno = ENOMEM;
++		return -1;
++	}
++
++	memset(cp, 0, plen);
++	cp->enable = enable;
++	cp->num_of_sets = num_of_sets;
++	if (sets && num_of_sets)
++		memcpy(cp->sets, sets, num_of_sets * set_entry_len);
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_SET_EXT_ADV_ENABLE;
++	rq.cparam = cp;
++	rq.clen = plen;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, to) < 0) {
++		free(cp);
++		return -1;
++	}
++
++	free(cp);
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
+ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
+ 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
+diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
+index 2e4aa394e..7d8b81f2d 100644
+--- a/lib/bluetooth/hci.h
++++ b/lib/bluetooth/hci.h
+@@ -1735,6 +1735,61 @@ typedef struct {
+ } __attribute__ ((packed)) le_set_address_resolution_enable_cp;
+ #define LE_SET_ADDRESS_RESOLUTION_ENABLE_CP_SIZE 1
  
--		if (size > 3)
-+		if (skb->len > 0)
- 			input_report_rel(dev, REL_WHEEL, sdata[3]);
- 		break;
- 	}
++#define OCF_LE_SET_EXT_ADV_PARAMS		0x0036
++typedef struct {
++	uint8_t  handle;
++	uint16_t evt_properties;
++	uint8_t  min_interval[3];
++	uint8_t  max_interval[3];
++	uint8_t  channel_map;
++	uint8_t  own_addr_type;
++	uint8_t  peer_addr_type;
++	bdaddr_t peer_addr;
++	uint8_t  filter_policy;
++	int8_t   tx_power;
++	uint8_t  primary_phy;
++	uint8_t  secondary_max_skip;
++	uint8_t  secondary_phy;
++	uint8_t  sid;
++	uint8_t  notif_enable;
++} __attribute__ ((packed)) le_set_ext_adv_params_cp;
++#define LE_SET_EXT_ADV_PARAMS_CP_SIZE 25
++
++typedef struct {
++	uint8_t status;
++	int8_t  selected_tx_power;
++} __attribute__ ((packed)) le_set_ext_adv_params_rp;
++#define LE_SET_EXT_ADV_PARAMS_RP_SIZE 9
++
++#define OCF_LE_SET_EXT_ADV_DATA			0x0037
++typedef struct {
++	uint8_t handle;
++	uint8_t operation;
++	uint8_t fragment_preference;
++	uint8_t data_len;
++	uint8_t data[0];
++} __attribute__ ((packed)) le_set_ext_adv_data_cp;
++#define LE_SET_EXT_ADV_DATA_CP_MAX_SIZE  (4 + 251)
++
++#define OCF_LE_SET_EXT_SCAN_RSP_DATA		0x0038
++typedef struct {
++	uint8_t advertising_handle;
++	uint8_t operation;
++	uint8_t fragment_preference;
++	uint8_t scan_response_data_length;
++	uint8_t scan_response_data[31];
++} __attribute__((packed)) le_set_ext_scan_rsp_data_cp;
++#define LE_SET_EXT_SCAN_RSP_DATA_CP_SIZE (4 + 31)
++
++#define OCF_LE_SET_EXT_ADV_ENABLE		0x0039
++typedef struct {
++	uint8_t enable;
++	uint8_t num_of_sets;
++	/* followed by ext adv set entries: handle(1), duration(2), max_events(1) */
++	uint8_t sets[0];
++} __attribute__ ((packed)) le_set_ext_adv_enable_cp;
++#define LE_SET_EXT_ADV_ENABLE_CP_SIZE (2 + 4)
++
+ /* Vendor specific commands */
+ #define OGF_VENDOR_CMD		0x3f
+ 
+diff --git a/lib/bluetooth/hci_lib.h b/lib/bluetooth/hci_lib.h
+index eeb51411a..4a06a9383 100644
+--- a/lib/bluetooth/hci_lib.h
++++ b/lib/bluetooth/hci_lib.h
+@@ -112,6 +112,22 @@ int hci_le_set_scan_enable(int dev_id, uint8_t enable, uint8_t filter_dup, int t
+ int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
+ 					uint16_t window, uint8_t own_type,
+ 					uint8_t filter, int to);
++int hci_le_set_ext_adv_params(int dev_id, uint8_t handle, uint16_t evt_properties,
++				uint32_t min_interval, uint32_t max_interval,
++				uint8_t channel_map, uint8_t own_addr_type,
++				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
++				uint8_t filter_policy, int8_t tx_power,
++				uint8_t primary_phy, uint8_t secondary_max_skip,
++				uint8_t secondary_phy, uint8_t sid,
++				uint8_t notif_enable, int to);
++int hci_le_set_ext_adv_data(int dev_id, uint8_t handle, uint8_t operation,
++				uint8_t fragment_pref, const uint8_t *data,
++				uint8_t data_len, int to);
++int hci_le_set_ext_scan_rsp_data(int dev_id, uint8_t handle, uint8_t operation,
++				uint8_t fragment_pref, const uint8_t *data,
++				uint8_t data_len, int to);
++int hci_le_set_ext_adv_enable(int dev_id, uint8_t enable, uint8_t num_of_sets,
++				const void *sets, int to);
+ int hci_le_set_advertise_enable(int dev_id, uint8_t enable, int to);
+ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
+
+---
+base-commit: 9dc7e40962f11d1d9a5568f8a7633a695288329c
+change-id: 20261014-extend_adv_api-61bb883ac885
+
+Best regards,
 -- 
-2.43.0
+Yang Li <yang.li@amlogic.com>
+
 
