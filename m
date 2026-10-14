@@ -1,138 +1,105 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6384F563FDD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 17:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E795650E5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 17:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791999145; cv=none; b=rwBBn+uU8ctHUOBdlNgrw9JwVYhR++U0GtPnDpN/kMZmCrK3i3LXLPtBlXWZUeWaohPYGvdl+aQoSDT/xMYTyCkZxFchRHKrc9asZItOclB2fBD167pQH34/A4yoo2wBYxq4JnTKFJZpi/lk97nubUVDsEt1anq9yd267oHkfOs=
+	t=1791999173; cv=none; b=Gmehuey73+VN/HAd71L7jV7JWqtty4O2S09q0HlfvEUgJiaXfCqFHN6rklyS8GW111ktXVBvY0cqP1vPZilG9RunxZ6+BEP+QGasDCZSyFAuZfvhHvDa+sUESMj7wGYaO2OQMtwUGAfdsn6DtDyK3uRItVEqM5GsYT2d9BReK0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791999145; c=relaxed/simple;
-	bh=ZorqTUPmY1ZUlVVL1GUAqW+XgZCV9a3HpJLnbZmqu30=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=peOmG6pa82qPP8cMCSi285Zb7Jhn9KKoAvphzpSFyWkqsL5nk7zeB/4U5Krb5jUybjO5aK0ROPc7oZsf+Pe/4BxXviQsVXoJljdnbDoGH4ahikN3aNxr8Qv3iGR1+gdQRHoqgeMSBDX+7vHgUtpmUATI7LjmXHCbgruWLAkBHKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b=ASD2UJbe; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1791999173; c=relaxed/simple;
+	bh=ObSYEgWgHpLaU20ZJcRAFl4oWCkj5SlE2lo9MQUBkTc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=kwrOc/P4iaiF+w9n+0hdtb8CCn7Cy3oizyxUbNoa9fbmr7AWQ1F/fhQfuPgVjSGT5YjGoJeRf8YEQdqDbwWL5tcD3d8SnDBderGRXrLMMvDPiTJcfJRMukwXrKZOnMdzBhpGvz2tM3Dsh/mcXch+++iemnZt+0pnj7CzaxxHORw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lt6FTb6d; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=github.com header.i=@github.com header.b="ASD2UJbe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2026; t=1791999140;
-	bh=0LpXw6mL8d3o9rUL1dScYBw+lgLZ1VHF39q84bAwLv4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ASD2UJbe1TcxIxhZU5p1cfNrIbQLt629sxZGZ4h5q7jh5A0DSVLuJ1wA+rWmaewa4
-	 Xzu8uMzAAtQcHwdiTg/7aWESTgSPi2nKFLXqQOsQtFe3pPG4X577mwRxva9pzySWSf
-	 yUZpFZBT7wrjihbkO1IG8NDbkkOsEdKF6Whf1BaNEerWB9W24FHG0cTKNYkXM8Tjcq
-	 CJWkMKlCTWGr+9SBJep06q/+YI6yEp6WPlmwdgx0Je8pjhX0dKNUoCblIbCXiY89C5
-	 HdkH2qj/YLp2sX+gLDG2PiTZdlvd08ZYxj0i8mulyITANwX+iLm5f09x8mBSqt6SE2
-	 cjQ5oKL/Kr1Qw==
-Received: from github.com (hubbernetes-node-97ff741.ash1-iad.github.net [10.59.90.34])
-	by smtp.github.com (Postfix) with ESMTPA id 36FF93601EE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 10:32:20 -0700 (PDT)
-Date: Wed, 14 Oct 2026 10:32:20 -0700
-From: cochcoder <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/9dc7e4-dd9d5b@github.com>
-Subject: [bluez/bluez] 02aa5e: monitor: Add Minimum Supported Connection
- Interval
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lt6FTb6d"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-91ba702cceaso7182496d6.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 10:32:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791999163; x=1792603963; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JSlMwem3baQkRMyP/NR4ZRWMPil0JVcn7IRrnRIb7oc=;
+        b=Lt6FTb6dG/eeEQ2eQc3nuykR93rufqPuu08keSYyCbq0TcrZgFLl1AQSO/oT6duRFb
+         F40YFXuTZGKnM05hGlInnyHrJB7wwn4eTpCLHNekpqqQ1UUfC0+1reeQqspJwz4Pjj/f
+         XJ952LQX+p8Pj7V3BN2sJF07IbVz0gOySOFlXL+LUiSlZrah1M3/N10RFRC+p5BjZI8R
+         RG27+p2JdsGNTRRY8NeBqi57mMCjsIriVvDxDo0SAlpHR9WQwBST7qLXBdTplBYtE8z9
+         V45+docOe6NzwVTSH+KbJ0yTAPGBv+0v4r+Vpul5pkAtWooStB2nqtfOyLv9DHDmG7M/
+         F0hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791999163; x=1792603963;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=JSlMwem3baQkRMyP/NR4ZRWMPil0JVcn7IRrnRIb7oc=;
+        b=QBmD8835tZYN3AjTmzwrfIX3L7Kw8ytggiyVZBQ47/l5qtkb6ObPZIrV7j1VnIhTXP
+         f5Ot3jrMCPPL2vlSnX3i3vF6D5vMFYrnTrWwgflEF3tU2qmHVjhyovjLe3U7iE0A9fek
+         E3F7bANmI9ofWxF5PvkMjDQ2LBZgEjhPqv4GTsUZOU6iCkXAlxzXEbAEC2R3rEqnRJPO
+         TkJjP92fp6NSh9rhJsUufSxc45nH0eHqAlsH9+9cyninK7aXTjLR4vLfFI96+TcldWsp
+         2u10uodscdRxz/8m0i596ub/ji1OOCSM19rRU7Am1OTDcO/GtExiT4XRysvm7sex0/a6
+         zTyA==
+X-Gm-Message-State: AFq9FYKP1jB33HLPSrAful6foNAPI5OmCyMFoIip/JhuCHjzwZNhLuMP
+	ZqhYLCA9lIMMucJUe4edCaLt52drnisoxl5rc2lbEH9w2FXE3wFcjINdu7/N8w==
+X-Gm-Gg: AYBFou0JpkWIDrzuKYwnTfjyzyf7oSNUcqhkuS6peJ1bAd/xjFLPQs3ebaOfg0GjXxY
+	JYjkPsse+1ZWlt68cawThFgpGzqfoOHZk5v82I+gDx0LjtjvEk2shvXiN7YOC654cnOy3c/tlWx
+	DO2YCwNxyc/19Z3gn/4uKDchdIxbg8WJZ7QruC3Vt2TvZf/Ocix+vnOlc2f2WsumAx/lZ1WjawY
+	boCT2o7esPAJcCJr55k5ajeAk69AZJOYCHemqndGLu2RtCUZgoCt3QF1RByjyaT+VK4kFbYdsTC
+	+vXTbbQbuq6RJtuoUgX6cQDrCOx67V1A38CnL4k/fuJWVi2/7gtYLLZRqb+nM9+BPycyCN5W29r
+	BH6fMveQj7DFhS5VifnfGDKf+tQa+sEkClY2M4WjeqiqjLEWZRUnw4XCEXr5xgPZQ7SplyxT4O5
+	NXz0fvYkp962N2c4q4cI1R69pwIc8FrEn8jZVH/eDMV2VXKOctOgRGDvAqgyLQgw2+oXtqc/Qj9
+	i0=
+X-Received: by 2002:a05:6214:2585:b0:919:5a24:d20d with SMTP id 6a1803df08f44-91b554b75edmr299046306d6.11.1791999163058;
+        Wed, 14 Oct 2026 10:32:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.9.227])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b97b9eaadsm57658676d6.33.2026.10.14.10.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Oct 2026 10:32:42 -0700 (PDT)
+Message-ID: <6acfbcba.9500dc99.31692.bb70@mx.google.com>
+Date: Wed, 14 Oct 2026 10:32:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1084371562119379226=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v3] avrcp: Poll GetPlayStatus when position changed event unsupported
+In-Reply-To: <20260929121749.282866-1-frederic.danis@collabora.com>
+References: <20260929121749.282866-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1084371562119379226==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 02aa5ea219edb9d4c4bae700fd978de8da5d787a
-      https://github.com/bluez/bluez/commit/02aa5ea219edb9d4c4bae700fd978de8da5d787a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-10-13 (Tue, 13 Oct 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
+Dear Submitter,
 
-  Log Message:
-  -----------
-  monitor: Add Minimum Supported Connection Interval
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-The LE Read Connection Interval response carries a
-Minimum_Supported_Connection_Interval octet between the status and
-Num_Groups, in units of 125 us with a range of 0x03 to 0x3C. Add it to
-the structure and decode it.
+   Series:       [BlueZ,v3] avrcp: Poll GetPlayStatus when position changed event unsupported
+   Pull Request: https://github.com/bluez/bluez/pull/2607
+   Created:      2026-09-29 13:51:02+00:00
 
-Assisted-by: OpenCode:claude-opus-5.5
+The pull request has been closed and no further action is taken on this
+series.
 
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
-  Commit: 8ebf7ffe7bc6ceb15d908073673f251ca3939df0
-      https://github.com/bluez/bluez/commit/8ebf7ffe7bc6ceb15d908073673f251ca3939df0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-10-13 (Tue, 13 Oct 2026)
+---
+Regards,
+Linux Bluetooth
 
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  emulator: Add Minimum Supported Connection Interval
-
-Fill the Minimum_Supported_Connection_Interval octet of the LE Read
-Connection Interval response, reporting 1 ms, the same lower bound as
-the interval group already returned.
-
-Assisted-by: OpenCode:claude-opus-5.5
-
-
-  Commit: 0a48b5ef5e3d55e3ce0cf1a462ff49c3f465f329
-      https://github.com/bluez/bluez/commit/0a48b5ef5e3d55e3ce0cf1a462ff49c3f465f329
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-10-13 (Tue, 13 Oct 2026)
-
-  Changed paths:
-    M test/functional/test_bap.py
-
-  Log Message:
-  -----------
-  test: functional: connect instead of pairing a bonded BAP device
-
-The hosts are shared between tests, so a device bonded by an earlier one
-is still bonded when a later one pairs it, and pairing it again fails
-with AlreadyExists. cmd_pair is meant to connect it instead, but it
-checks Paired, which is not set until the services are resolved, so it
-can still issue the pairing:
-
-  FAILED test/functional/test_bap.py::test_bass_past_transport_acquire
-  AssertionError: Failed to pair: org.bluez.Error.AlreadyExists
-
-Check Bonded, which is what the pairing is rejected for, and connect the
-device instead when it is set.
-
-Assisted-by: OpenCode:claude-opus-5.5
-
-
-  Commit: dd9d5ba1fa4f682b082b1275a8c38523d95a58fd
-      https://github.com/bluez/bluez/commit/dd9d5ba1fa4f682b082b1275a8c38523d95a58fd
-  Author: Kyle Pepper <cochcoder@proton.me>
-  Date:   2026-10-14 (Wed, 14 Oct 2026)
-
-  Changed paths:
-    M tools/mgmt-tester.c
-
-  Log Message:
-  -----------
-  mgmt-tester: Add host-resolved RPA scan checks
-
-Check unfiltered passive scanning for IRK peers on controllers without
-LL Privacy, with auto-connect and background-report controls.
-
-Assisted-by: OpenCode:gpt-6.1-sol
-
-
-Compare: https://github.com/bluez/bluez/compare/9dc7e40962f1...dd9d5ba1fa4f
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============1084371562119379226==--
