@@ -1,39 +1,39 @@
-Received: from mail-244121.protonmail.ch (mail-244121.protonmail.ch [109.224.244.121])
+Received: from mail-43101.protonmail.ch (mail-43101.protonmail.ch [185.70.43.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329AC2931FB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 05:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818252931FB
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 05:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791955230; cv=none; b=dGnvvrqg9899A2SmSvCPpzmWL1Rl5GKY192kdcRNNrRXn7ouq77i+LeH5VDwmAoymNUR4ebdZjHQbNtocFirWvibqt8IOWf0UC2fSWPoWm1bUIsgP9uFpE8gdLD+Fyh/PG8BgWHWyNhodyapv+ZKSbDqTJrK+gmip3cFREI0LdI=
+	t=1791955394; cv=none; b=mAQiZbQMQayVDdTPstdfekZpXGeiASkwfMUIaUCbsQ/6+efNcTGc8R4brCUgUlyjG6q4PETlJlO/nuETeP/9oMfl4JhRLdiRiQgfWd9CHvQbvn66JIIxV2b9NWmKeWXIc9Oz/RiHeqUTw6MTkX6R5lEacVd22z/WPSSXLpU9Y64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791955230; c=relaxed/simple;
-	bh=afBs2UiEp97B3JFfbnDn+98D24CP5NF1UrdpN4SAA+k=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=JrsU2Pee3zW12opX2WJQzeAPn5Oh+TOLXUO2rBqrDaQi0UJbZhvGo8LjbWPPNiIZbrlaX4mi8Iboeq7rZQhJVyS7kj0FKGCF/8faVBKUjNpAdB6vVq+BpOcBMLoLnIiqyUKvPes9x0dKb5WFqFgX0M75qM8NLnp174ftRty7MuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NKBnJIY2; arc=none smtp.client-ip=109.224.244.121
+	s=arc-20240116; t=1791955394; c=relaxed/simple;
+	bh=9ZcuQxhf8efgf6EBDA4WRKi21U1OXSfxwz+kGTqjfJA=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=qZDCDKBLxQM5Ka+3Pn+jkubutzhLQkrCH+hcdTv6aikYl4AiG2ahKdY/6E8IwtlZ0YWdRcGllKS6uD0uD2y3lZ4BNkDMkENGvjZecXkezuoi3EFt27Yo9FFsa6eIXgvx1oQt0dXGqOh23PWXS+nIE7TMLlUMc0k+2N9X5oT/XlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=jwtvE2+E; arc=none smtp.client-ip=185.70.43.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NKBnJIY2"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="jwtvE2+E"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1791955225; x=1792214425;
-	bh=WDmxS6CHUbj0SiI1lZs7AAkvRZdgLPOBaS+NVOtvvqI=;
+	s=protonmail2; t=1791955383; x=1792214583;
+	bh=Zq9sMICpVCiWyLkwpxHeqDMbAAaX7+gF6NfiADYu6Bs=;
 	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
 	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=NKBnJIY2mVpCRtLzUrr7nA1XVqhJIA6+hFxOtfNM3gjjKJ71K0XnaW+dwB5fZ+50S
-	 faxH3mXPWEt4ggpVASKRT9xuilcqDq0lNRwSJHRLTftGO+S7PhhS0CZshBW28PtpiH
-	 3d6P17PwiFpiEw1U1eqinYSlGLE9XW6jytONTwRwvNJoQaEplWPbIRO4YK1BTeb9aL
-	 2uaCIv4AqMnWYKi1lG2q1HO8/xpojx1vdQDY10WBPXo6vIP5a+65jxyUwY/wgeEU7F
-	 zyqqDHbncVTzbLXEhbkjDUh2a3g/moJ43ZA5edx7fw0qQeyhg9Njw2upoDFzueEKf3
-	 Vx7TpXztDt12Q==
-Date: Wed, 14 Oct 2026 05:20:22 +0000
+	b=jwtvE2+E344UCWuZ1kL4YG3DLZvbQ9+oeAjKO+DhhMFZ+XvUFxD3S/y636jZM8trN
+	 zPx1YYzb+cfXdlE2xjSMxiuPTGxEJtwXaprhQ+N7fVXniq/rWmErtEwyLbPnrXsdYy
+	 tsClc4xHyZJOsZA7d2lmPHJwX6Lc5VXH8heYWHv2ROCC2pU9E8JplBoOeYA1uXemLn
+	 uUrT2l4uOGVmNnaoCAjK9oNu/lNNae/bOR8nzf/Cd9twSZXv3Rpn0tGQ49q2lign51
+	 JDUfonIyDCoeDhS4OUd9qDgIr5GFqgq5XZHMdZw2HrF4ge/SHnLDY3wWV1dyTK+0wc
+	 DBxveMsSrSLzA==
+Date: Wed, 14 Oct 2026 05:22:58 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [RFC PATCH] mgmt-tester: Add host-resolved RPA scan checks
-Message-ID: <20261014052008.413209-1-cochcoder@proton.me>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci: Represent advertising report payloads as bytes
+Message-ID: <20261014052244.416087-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 4aedb34c7cddf6214ad058d47ce347b5eb93466f
+X-Pm-Message-ID: a29679195086d43955a75f0ff2f2d25f8f70278c
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,181 +43,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Check unfiltered passive scanning for IRK peers on controllers without
-LL Privacy, with auto-connect and background-report controls.
+Advertising records have variable-length data and cannot form a C
+array of flexible structures. Describe the report payloads as bytes
+to avoid Sparse warnings without changing their wire layout.
 
-Assisted-by: OpenCode:gpt-6.1-sol
+Assisted-by: OpenCode:gpt-6.1-sol sparse
+Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-Companion to the kernel v2 "Bluetooth: hci_sync: scan unfiltered for
-host-resolved RPAs", responding to Luiz's mgmt-tester request in:
-https://lore.kernel.org/linux-bluetooth/20261013031329.483597-1-cochcoder@p=
-roton.me/
+Separate cleanup of warnings inherited from upstream, not a v2 of the
+UB500 shared-buffer RFC. The same two "array of flexible structures"
+warnings reproduce on that RFC's parent and exact submitted commit.
+The public bot report only contains the matching include-file note;
+its complete Sparse output was not available.
 
-This is the first submission of these BlueZ tests, not a v2 and not a
-cross-project apply-order series. It applies independently on BlueZ
-9dc7e40962f1. The IRK cases intentionally fail on an unfixed kernel.
+Testing:
+- GCC W=3D1 C=3D2: hci_event.o and btusb_main.o, no diagnostics after clean=
+up.
+- Exact submitted UB500 commit plus this cleanup: same clean checks.
+- Strict GCC/Clang layout checks and LLVM/32-bit hci_event.o builds pass.
+- GCC hci_event .text section is byte-identical before/after cleanup.
+- A guest carrying the cleanup passes pairing and both HoG variants
+  on baseline BlueZ and each of four independent ASHA topics: 15/15.
 
-Native results on bluetooth-next 609a23989d63, KASAN/lockdep enabled:
-                                upstream   revised kernel
-  Auto-connect with IRK           FAIL       PASS
-  Background report with IRK      FAIL       PASS
-  Auto-connect without IRK        PASS       PASS
-  Background report without IRK   PASS       PASS
+This does not change the UB500 quirk or certify an unseen complete
+remote Sparse report. No full architecture/configuration build matrix
+or physical hearing-aid regression test is claimed.
 
-These assert passive-scan programming, not physical address rotation or
-successful radio reconnect. On the complete 512-case mgmt run, upstream
-has 503 pass/four fail/five not run; revision has 506 pass/one fail/five
-not run. Both have the "Set Static Address - Success 2" timeout. The
-upstream run also fails the two new IRK tests and the already-listed
-flaky "LL Privacy - Set Flags 3 (2 Devices to RL)" test. The latter's
-pass is not attributed to the RPA fix. No captured KASAN/lockdep alerts.
+ include/net/bluetooth/hci.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Maintainer-mode sanitizer build and 35/35 unit binaries pass. The
-complete mgmt suite is not clean; no physical hardware test is claimed.
-
- tools/mgmt-tester.c | 119 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
-
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 992351e2e3..850d38e4ce 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -10667,6 +10667,114 @@ static const char load_irks_le_public_param_1[] =
-=3D {
- =090x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
- };
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1641d879d..e873ffc15 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2972,7 +2972,7 @@ struct hci_ev_le_advertising_info {
 =20
-+static const uint8_t host_rpa_report_param[] =3D {
-+=090x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
-+=090x01,
-+=090x00,
-+};
-+
-+static const struct bt_hci_cmd_le_set_scan_parameters host_rpa_unfiltered =
-=3D {
-+=09.filter_policy =3D 0x00,
-+};
-+
-+static const struct bt_hci_cmd_le_set_scan_parameters host_rpa_filtered =
-=3D {
-+=09.filter_policy =3D 0x01,
-+};
-+
-+static int host_rpa_unfiltered_check(const void *param, uint16_t length)
-+{
-+=09const struct bt_hci_cmd_le_set_scan_parameters *cp =3D param;
-+
-+=09if (length !=3D sizeof(*cp))
-+=09=09return -EINVAL;
-+
-+=09return cp->type !=3D 0x00 || cp->filter_policy !=3D 0x00;
-+}
-+
-+static int host_rpa_filtered_check(const void *param, uint16_t length)
-+{
-+=09const struct bt_hci_cmd_le_set_scan_parameters *cp =3D param;
-+
-+=09if (length !=3D sizeof(*cp))
-+=09=09return -EINVAL;
-+
-+=09return cp->type !=3D 0x00 || cp->filter_policy !=3D 0x01;
-+}
-+
-+static const struct generic_data host_rpa_autoconnect =3D {
-+=09.setup_settings =3D settings_powered_le,
-+=09.setup_send_opcode =3D MGMT_OP_LOAD_IRKS,
-+=09.setup_send_param =3D load_irks_le_public_param_1,
-+=09.setup_send_len =3D sizeof(load_irks_le_public_param_1),
-+=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-+=09.send_param =3D add_device_le_public_param_1,
-+=09.send_len =3D sizeof(add_device_le_public_param_1),
-+=09.expect_param =3D add_device_rsp_le_public,
-+=09.expect_len =3D sizeof(add_device_rsp_le_public),
-+=09.expect_status =3D MGMT_STATUS_SUCCESS,
-+=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-+=09.expect_alt_ev_param =3D add_device_le_public_param_1,
-+=09.expect_alt_ev_len =3D sizeof(add_device_le_public_param_1),
-+=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+=09.expect_hci_param =3D &host_rpa_unfiltered,
-+=09.expect_hci_len =3D sizeof(host_rpa_unfiltered),
-+=09.expect_hci_param_check_func =3D host_rpa_unfiltered_check,
-+};
-+
-+static const struct generic_data host_rpa_report =3D {
-+=09.setup_settings =3D settings_powered_le,
-+=09.setup_send_opcode =3D MGMT_OP_LOAD_IRKS,
-+=09.setup_send_param =3D load_irks_le_public_param_1,
-+=09.setup_send_len =3D sizeof(load_irks_le_public_param_1),
-+=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-+=09.send_param =3D host_rpa_report_param,
-+=09.send_len =3D sizeof(host_rpa_report_param),
-+=09.expect_param =3D add_device_rsp_le_public,
-+=09.expect_len =3D sizeof(add_device_rsp_le_public),
-+=09.expect_status =3D MGMT_STATUS_SUCCESS,
-+=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-+=09.expect_alt_ev_param =3D host_rpa_report_param,
-+=09.expect_alt_ev_len =3D sizeof(host_rpa_report_param),
-+=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+=09.expect_hci_param =3D &host_rpa_unfiltered,
-+=09.expect_hci_len =3D sizeof(host_rpa_unfiltered),
-+=09.expect_hci_param_check_func =3D host_rpa_unfiltered_check,
-+};
-+
-+static const struct generic_data host_rpa_no_irk_autoconnect =3D {
-+=09.setup_settings =3D settings_powered_le,
-+=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-+=09.send_param =3D add_device_le_public_param_1,
-+=09.send_len =3D sizeof(add_device_le_public_param_1),
-+=09.expect_param =3D add_device_rsp_le_public,
-+=09.expect_len =3D sizeof(add_device_rsp_le_public),
-+=09.expect_status =3D MGMT_STATUS_SUCCESS,
-+=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-+=09.expect_alt_ev_param =3D add_device_le_public_param_1,
-+=09.expect_alt_ev_len =3D sizeof(add_device_le_public_param_1),
-+=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+=09.expect_hci_param =3D &host_rpa_filtered,
-+=09.expect_hci_len =3D sizeof(host_rpa_filtered),
-+=09.expect_hci_param_check_func =3D host_rpa_filtered_check,
-+};
-+
-+static const struct generic_data host_rpa_no_irk_report =3D {
-+=09.setup_settings =3D settings_powered_le,
-+=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-+=09.send_param =3D host_rpa_report_param,
-+=09.send_len =3D sizeof(host_rpa_report_param),
-+=09.expect_param =3D add_device_rsp_le_public,
-+=09.expect_len =3D sizeof(add_device_rsp_le_public),
-+=09.expect_status =3D MGMT_STATUS_SUCCESS,
-+=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-+=09.expect_alt_ev_param =3D host_rpa_report_param,
-+=09.expect_alt_ev_len =3D sizeof(host_rpa_report_param),
-+=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+=09.expect_hci_param =3D &host_rpa_filtered,
-+=09.expect_hci_len =3D sizeof(host_rpa_filtered),
-+=09.expect_hci_param_check_func =3D host_rpa_filtered_check,
-+};
-+
- static const uint8_t add_device_le_public_param_2[] =3D {
- =090x11, 0x22, 0x33, 0x44, 0x55, 0x66,=09/* BDADDR */
- =090x01,=09=09=09=09=09/* Type - LE Public */
-@@ -15737,6 +15845,17 @@ int main(int argc, char *argv[])
- =09=09=09=09&set_exp_feat_unknown,
- =09=09=09=09NULL, test_command_generic);
+ struct hci_ev_le_advertising_report {
+ =09__u8    num;
+-=09struct hci_ev_le_advertising_info info[];
++=09__u8    data[];
+ } __packed;
 =20
-+=09/* Bluetooth 4.0 has no controller-side address resolution. */
-+=09test_bredrle("Host RPA - Auto-connect with IRK", &host_rpa_autoconnect,
-+=09=09=09=09setup_command_generic, test_command_generic);
-+=09test_bredrle("Host RPA - Background report with IRK", &host_rpa_report,
-+=09=09=09=09setup_command_generic, test_command_generic);
-+=09test_bredrle("Host RPA - Auto-connect without IRK",
-+=09=09=09=09&host_rpa_no_irk_autoconnect, NULL,
-+=09=09=09=09=09=09=09test_command_generic);
-+=09test_bredrle("Host RPA - Background report without IRK",
-+=09=09=09&host_rpa_no_irk_report, NULL, test_command_generic);
-+
- =09/* LL Privacy
- =09 * Setup: Enable LE and Power On
- =09 * Run: Add new device
+ #define HCI_EV_LE_CONN_UPDATE_COMPLETE=090x03
+@@ -3058,7 +3058,7 @@ struct hci_ev_le_ext_adv_info {
+=20
+ struct hci_ev_le_ext_adv_report {
+ =09__u8     num;
+-=09struct hci_ev_le_ext_adv_info info[];
++=09__u8     data[];
+ } __packed;
+=20
+ #define HCI_EV_LE_PA_SYNC_ESTABLISHED=090x0e
 
-base-commit: 9dc7e40962f11d1d9a5568f8a7633a695288329c
+base-commit: 609a23989d637e2f90522a37c62e65c8c9b8b0ff
 
