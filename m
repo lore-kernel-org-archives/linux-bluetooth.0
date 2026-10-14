@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A42656511E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 17:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C31563FC3;
+	Wed, 14 Oct 2026 17:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791998419; cv=none; b=PxwMEhTxWAyEQkPw9YVRHWWSwbKO8WBmQxRlERavSrFHdgFAjdvG9deCneiUlr56yc2xFlGzJpI7mtNx35cfbJU+lJfXtxmCNkpD3Be83kGi8WB3zVUaZI8tuII+RkWrE/mo7qamGp5uW/I/O4kV0Bm+uzpyTOLz8JwpNWvzW28=
+	t=1791998419; cv=none; b=r+ZABu4OH2KO2uTaQu54f2hiKbVXQFtd5snqtKdk/iZ6toJqL0SJBYwFyjoBRcCwunglG5KKe7b/d46hXPSgu+WMLE8mt1o5DsrY3jkbSlAEBb/2dPsy2l04bdiMbH5L3OlVvp+G1VmSbTjWu348LdX30Bw8zuvpzt5J1ziqc1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1791998419; c=relaxed/simple;
-	bh=rE0D6UV79De1uj0xdxIK3XTSRPeT1PiQS2M5z9MUPBw=;
+	bh=SmDAHeqNpHq5ZwGxdFQbA6eY2UeS3wHt1600YBiVTys=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tqNOBgoQ1CJ+YQMzY5lUV75IlFAXLfoXiRCP4pA7yKVOYWjNpJ6/VsgRDiQPBUC8CTe5htKBa0RbIrU9P2ZqJG1D8WpoIeN4TtbCJS48eq8WtBqYHIT7R68/+NhZ2ap+JRgU6y5kxdoTFRLmz2TMLBbjEWCrgk4c6PejnjulbEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9OW0uMf; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=f+lkDg+cCSLBPRhgvMTRN/IarKQOJL+m2eCMldArxA8vAOE9oanT0Q4RsBDeWFaSMXG7Y5X4Ma0pAY5YTVt5/qN0nGZXMnKCXxXMcbiqAAgTsU3FGnTgC3q4po+NrllxXWgpk29i3iG77LG+MygI4Hyt58kuu6eN5qSVaorTmes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/0e50r9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9OW0uMf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0747C1F000C8;
-	Wed, 14 Oct 2026 17:20:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/0e50r9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06DE41F000C6;
+	Wed, 14 Oct 2026 17:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791998414;
-	bh=ylkMtOWfhw0GirPcY1Duv/YuidUcW5AtjuxGfIYPsKs=;
+	s=k20260515; t=1791998411;
+	bh=qSLt1H/hsi85IYc/dCAT4iYiTEKgBzRb5AHJ84ZqiuE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=H9OW0uMfYifPiOtio/Dc47YvQgiBl8QSnZ7247+FAt8Jmg9g/32FBYQV1lcsmhP8S
-	 +urQieYfJQ/DXZFCx1GtHH0KDX/GPbRv0f5VWfVKAdvQXSHB9NvcCj68aDYazF5yJt
-	 qpthTAwGjjuJqn1dQYunig5I4OkwzbYv5Kh/yMvpG1PQxWblvnPxQfsCAgcj3+fUTC
-	 zXLHnjUpmIBLyeG3o9kV8dn0/E7HAz/UZRKsoj/uxZNXj6hp3CraRXVhJRHX9NpNd5
-	 MSQWzYcUzxIgYRrPXIi8j3EihZfFSReNFP9iLUs3vtElPBZxXvDyg/ZUoVNDbw2pFH
-	 6beRHj0tKC5tw==
+	b=E/0e50r9ATkBcR4oV1xlFsi/BlEiTIq0H+M/CLxihxKZSUKdxl2lx4+ekxMaW0ANu
+	 ezQz6PnPpMvF7yO9+MLfiZdNQs7YmaB5tUAd4yAetxoPS2EZ1tmxtcUQvDwopF3/C3
+	 uofBU2+53506reIJXivz3mlKTDmqzaWEHiCLvLM/ShFzeU5RfQBTBDZ5d755yb0pZJ
+	 XZfM3KNmC6zxRhNaDrKuWci+xSIc3eQp5wjPoGH31spUrW920n1Wa/1qvACy8W8JAR
+	 SRTkkOZJnW7xzyFbXL6TGFrNA1XjgrQb4oxha0U6NynlSrkU7yMqFpa+KyP+iigh4g
+	 U0JasZN3SkYEA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F143339FD335;
-	Wed, 14 Oct 2026 17:20:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15D239FD335;
+	Wed, 14 Oct 2026 17:20:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,37 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: Fix the LE Read Connection Interval
- response
- layout
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: scan unfiltered for host-resolved
+ RPAs
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179199841251.2868755.14605653330503918734.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Oct 2026 17:20:12 +0000
-References: <20261013142202.544985-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261013142202.544985-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <179199840951.2868755.15045268904522230410.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Oct 2026 17:20:09 +0000
+References: <20261014051600.408746-1-cochcoder@proton.me>
+In-Reply-To: <20261014051600.408746-1-cochcoder@proton.me>
+To: Kyle Pepper <cochcoder@proton.me>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 13 Oct 2026 10:22:02 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 14 Oct 2026 05:16:20 +0000 you wrote:
+> Restore unfiltered scanning for pending IRK peers when the controller
+> cannot resolve private addresses. Keep accept-list filtering while
+> suspended and when forced by periodic advertising synchronization.
 > 
-> The response to HCI_OP_LE_READ_CONN_INTERVAL carries a
-> Minimum_Supported_Connection_Interval octet between the status and
-> Num_Groups, which was missing from the structure. Without it the minimum
-> interval was read as the number of groups, and every group after it
-> from one octet off.
+> Fixes: e209e5ccc5ac ("Bluetooth: MGMT: Mark LL Privacy as stable")
+> Assisted-by: OpenCode:gpt-6.1-sol
+> Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: Fix the LE Read Connection Interval response layout
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d7629e8dabbc
+  - [v2] Bluetooth: hci_sync: scan unfiltered for host-resolved RPAs
+    https://git.kernel.org/bluetooth/bluetooth-next/c/81a78b10d770
 
 You are awesome, thank you!
 -- 
