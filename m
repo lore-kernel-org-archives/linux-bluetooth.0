@@ -1,253 +1,150 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3890417D7A;
-	Wed, 14 Oct 2026 07:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6B9477292
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 07:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791961733; cv=none; b=qs/HTuECpBskGg+jEtPIaTvGu+5xh9q7GRv0yEEQrRaQFdAkHr7ASMmJJM77n99nV9ODF2xQzLDHJLrtPF1SN2u96BI7jAf0/T8sRFOWLD/8nkWfCNZZ3rCXs8ca8IX0G8LZQovRLAXvq5MhRkVc1ZGoecdupC3jIGYwoWztwlU=
+	t=1791961753; cv=none; b=A6suK+NWPYmvgRUwyQrf5iiXXgV5UN9uvag/pLuuylqYLuQdxNEVDTB/bxuZ3b9hvsfjTN3aqDXkbepvrHN0+X6HWpk0Sq0m2mXCkXVxOSwDFZAYJFlPPldn3bDlI3hNcSAn0xW1CRyB+Az47g8uknkOLw6oz9xmF6jTEhvNphI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791961733; c=relaxed/simple;
-	bh=yC1WRCeiq7ucioYsTgktt/uQi9fB/dzQmGzBnhikiQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iF1WC78TzQFehxS+xnqVBP4by1uvkHDh2tKacHEzh/xx3KFLGJjkI7+F1/ybzZid/hasquFKfrT3xoAgrmhmYFVxlBf3L8n0+EpejSgtK0KGIK6m59goEqOLwF3SHAMbTs5EDWRnW/RpwhP2ksTyTiYsOxRgHR04YvKb1DMBf5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g5Ki6d8+; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1791961753; c=relaxed/simple;
+	bh=xzJpKnr4646j+ZzwPpA7APNYTd+7lWsgikUQiA8HJAk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=oCRLEccI0bl5WbL9guZBfPPs0b/RFkntSukzWinolSj0nOUelTfzWkLshov9xmlTTDmDInt+sWcTQ/dma517b2n43lOgs5Bsq5bqwPvGsatenDYvJRweI0PTgkYKEUNYZBtEuPSgJEylSR7mmST0fgcxQsFKCI1HNTvQ00bv+rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUgMCYny; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g5Ki6d8+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1791961719; x=1823497719;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yC1WRCeiq7ucioYsTgktt/uQi9fB/dzQmGzBnhikiQE=;
-  b=g5Ki6d8+MnXuHjsQymWHJDAxPoMQgGAAXhyvDO00IE7jWuaTLM8s3/J/
-   QKbwYbUmE2jMqszSKI6uC12BxhEufqkrtWVGHE97pFESSSJlrR690vPC9
-   gy+xo0LNEACVOkUDyCHcudBycJsuOVG42PPbgc+skrjfXET254EwZ9WBQ
-   1Eupe44FGmaCILkK+XLl+xOdRWmwj6Xdj/0YXvdvAomCoFeYoXkMBChZC
-   wurQfwkZt0iVo44oN4oAj/oXLk7v4ju6ve+fsmdKWnf5jvSIpZXqekRGx
-   3noYZH6hIDwWgzD0JWRd2vH4jUmR1f0pRFW06DZH1VVgaSihJse+uI3bC
-   w==;
-X-CSE-ConnectionGUID: R4jfG+OkRP2reamOBW4OsA==
-X-CSE-MsgGUID: SJycUMyjQMuc4BJNE7jQIw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="690511"
-X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="690511"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 00:08:22 -0700
-X-CSE-ConnectionGUID: OcRWZg+jQ4uBTAEi88U+ww==
-X-CSE-MsgGUID: ddpI7zTWSQy6XoOxogqf5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="1709254"
-Received: from unknown (HELO WEBAPTLH032.iind.intel.com) ([10.66.250.231])
-  by fmviesa009.fm.intel.com with ESMTP; 14 Oct 2026 00:08:19 -0700
-From: Ajay KV <ajay.k.v@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	kiran.k@intel.com,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	stable@vger.kernel.org,
-	chethan.tumkur.narayan@intel.com,
-	lakshmipathi.k@intel.com,
-	Ajaykv <ajay.k.v@intel.com>
-Subject: [PATCH v3 2/3] Bluetooth: btintel_pcie: Validate the YoYo DEBUG_INFO TLV
-Date: Wed, 14 Oct 2026 10:08:12 +0300
-Message-ID: <20261014070813.96796-2-ajay.k.v@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261014070813.96796-1-ajay.k.v@intel.com>
-References: <20261014070813.96796-1-ajay.k.v@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUgMCYny"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-91b8306b9f8so41055736d6.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 00:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791961745; x=1792566545; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=o0FbIyk4ou38Cn3VRa1IydXwohIfX3/zUCpvGNNBkhA=;
+        b=AUgMCYnyzoRnLiXhC23ch2RVrGVxRzndtm045wWj7xTQz50/FeNx5uPTimCzLogwF3
+         QisqfH442YimRfR6+/rUiKyVKaL/Je5sJD/nabmeY391vv6i1oU1Q6StAB1JsOTm0FX2
+         z1wMfSkW54fc1IlrjoZhjByo54zXd/PvxEXYN3+bQj2clvRnFzOt8kG16P2F6HmaKZZY
+         Q3DfXeeVyeuayDDlWzS7m+AqPKBNrw6w9bgUcTM6gVvKlmdaVlwv+vWaIkwtKqgLbSwi
+         EZ/D4ZlLak7u2utL+CQsG8W5Ne3rB/q4CB2t7ZHLTQUuLSf3S+Qvuo0N73XS9aUpjHfE
+         xmHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791961745; x=1792566545;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=o0FbIyk4ou38Cn3VRa1IydXwohIfX3/zUCpvGNNBkhA=;
+        b=TlablbJdlGh/HDYwUPW5Gvi40x2UqOQGyGdd+/2I9zGyGxe+ktZ7Pjx5xbY6uAa95d
+         PMgyB/8VmyYIcpi/sTnTMj1rzS7v+qiEMk+oCzCUbw1e/rnvjONxvd7FxsMt45sMPUQZ
+         fUP9QxJuNbfPlGlHs1R18SKKW8moF/o5zA9/hTvCzWzi5eil2LnggUPi2LCouytOmEZb
+         DLe9ft+sdX1J1XqYLUj6HDN2nRbW2O7rNRujIlw2qtfTp4MgboL/7TcCsVfDiDWoaRG1
+         GJpidalEsf0VstYMWGWc0hovPDCqvtoqxpl7A7leVLgn/7PMFJOUH0OKeb2gwjwq07vf
+         Q2QA==
+X-Gm-Message-State: AFq9FYLfKYr6k2sLuzF+o9400834Y/bhrLb0f6Gu0puCwP3Y/yg3BeuY
+	SfFQ7K6P0q9riVbXuoxKm+qy3Hz0UDkfGQxJNtFXhvGtQxJziwmI86oIYOJ+0Q==
+X-Gm-Gg: AYBFou3wUOgAkdyv/DELaz/t4F+OiakYh20sZnZseb3zM8Hls+Nf+ds5SfhNhGPmq8t
+	x45JSWWF6lnc3O0Gmyi2ks43Sp+Ve9xq6G8L2u0zqVjvcAXCYyYh5osNGbFLLhqZo/DV2NECUWc
+	DCNH1b6dPhTHN1Hvkl4xdz6XchZq9HLZ0E/MNUVbx9X86YBaOIroxDI1P/20Yx6K7ZEcezrNyoI
+	5kqIYS1M2iWZZSQC3yCarThBsV6EwM9FR1ACrzUojEwVWIdBfgZDkw8CX+H16VmzXk/FJQRJNiF
+	F7cvmP9HyqV2PIPtfFpE3a4IIaNzWtb72wn7AI+AoqXQv1OKVmS+prhPEkAqwzse1M5rHuauUvk
+	qMoVAzYN/nc8cUm6I5qXT8DgHXhWAW7y5DxErgqWGusHCXqxANOp61/x/D2n8zKL40GwOyyM/a1
+	nvXDCaoFV22WvL8rgEn4+6zJG+o+EP/HH/qavztV5m/eRyTaO4o+fqgBkEnDcridyvOq0mxxhT6
+	xpz2A==
+X-Received: by 2002:a05:6214:ca6:b0:914:7df6:ca80 with SMTP id 6a1803df08f44-91b554c3d31mr272384276d6.20.1791961744763;
+        Wed, 14 Oct 2026 00:09:04 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.238.177])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91b97b3bca7sm45396756d6.10.2026.10.14.00.09.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Oct 2026 00:09:04 -0700 (PDT)
+Message-ID: <6acf2a90.4fa28f9c.26a03c.c795@mx.google.com>
+Date: Wed, 14 Oct 2026 00:09:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4251960895347061405=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, liu.yun@linux.dev
+Subject: RE: Bluetooth: hci_conn: Fix default RX PHY initialization
+In-Reply-To: <20261014020131.45467-1-liu.yun@linux.dev>
+References: <20261014020131.45467-1-liu.yun@linux.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Ajaykv <ajay.k.v@intel.com>
+--===============4251960895347061405==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Require a DEBUG_INFO TLV in the YoYo firmware configuration. Validate
-its payload length, TLV version, Bluetooth domain, external image type,
-and Bluetooth core type before accepting the configuration.
+This is automated email and please do not reply to this email!
 
-Reject missing or invalid metadata so the driver keeps legacy DBGC
-defaults instead of enabling an incompatible configuration.
+Dear submitter,
 
-Signed-off-by: Ajaykv <ajay.k.v@intel.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1185171/
 
-diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
-index 0e933f4ec376..615996232cdf 100644
---- a/drivers/bluetooth/btintel_pcie_debug.c
-+++ b/drivers/bluetooth/btintel_pcie_debug.c
-@@ -11,11 +11,59 @@
- 
- #include <linux/errno.h>
- #include <linux/module.h>
-+#include <linux/stddef.h>
- #include <linux/string.h>
- #include <linux/unaligned.h>
- #include <net/bluetooth/bluetooth.h>
- #include "btintel_pcie_debug.h"
- 
-+/* TLV-specific parser DEBUG_INFO TLV type */
-+static int btintel_pcie_yoyo_parse_dbg_info(struct btintel_pcie_yoyo_ctx *ctx,
-+					    const struct btintel_pcie_tlv_dbg_info *info,
-+					    u32 len)
-+{
-+	const u8 *data = (const u8 *)info;
-+	u32 domain, image_type, core_type, version;
-+
-+	if (len != sizeof(*info) - sizeof(struct btintel_pcie_tlv_hdr))
-+		return -EBADMSG;
-+
-+	image_type = get_unaligned_le32(data +
-+				       offsetof(struct btintel_pcie_tlv_dbg_info,
-+						image_type));
-+	core_type = get_unaligned_le32(data +
-+				      offsetof(struct btintel_pcie_tlv_dbg_info,
-+					       core_type));
-+	domain = get_unaligned_le32(data +
-+				   offsetof(struct btintel_pcie_tlv_dbg_info,
-+					    dbg_hdr.domain));
-+	version = get_unaligned_le32(data +
-+				     offsetof(struct btintel_pcie_tlv_dbg_info,
-+					      dbg_hdr.tlv_data_version));
-+
-+	if (domain != BTINTEL_PCIE_DOMAIN_BT ||
-+	    version != BTINTEL_PCIE_DBG_INFO_TLV_VERSION) {
-+		BT_WARN("YoYo: unsupported domain/version (%u/%u), disabling",
-+			domain, version);
-+		return -EINVAL;
-+	}
-+
-+	if (image_type != BTINTEL_PCIE_IMAGE_TLV_TYPE_EXTERNAL) {
-+		BT_WARN("YoYo: unsupported image_type 0x%x, disabling", image_type);
-+		return -EINVAL;
-+	}
-+
-+	if (core_type != BTINTEL_PCIE_CORE_TYPE_BT) {
-+		BT_WARN("YoYo: non BT core_type %u, disabling", core_type);
-+		return -EINVAL;
-+	}
-+
-+	ctx->dbg_info_present = true;
-+	BT_DBG("YoYo: config='%.64s' image=%u core=%u",
-+	       info->config_name, image_type, core_type);
-+	return 0;
-+}
-+
- /*
-  * Parse the optional YoYo firmware TLV stream and validate each record.
-  * This is the entry point for the runtime debug configuration payload.
-@@ -27,6 +75,7 @@ static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
- 	const u8 *ptr = buf;
- 	size_t remaining = buf_len;
- 	u32 count = 0;
-+	int ret = 0;
- 
- 	while (remaining >= sizeof(*tlv)) {
- 		size_t tlv_size;
-@@ -45,6 +94,13 @@ static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
- 
- 		switch (type) {
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_INFO:
-+			ret = btintel_pcie_yoyo_parse_dbg_info(ctx,
-+							       (const void *)tlv, len);
-+			if (ret) {
-+				ctx->dbg_info_present = false;
-+				return ret;
-+			}
-+			break;
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_REGION:
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER:
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_HCMD:
-@@ -105,6 +161,7 @@ void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
- 		return;
- 
- 	ctx->enabled = false;
-+	ctx->dbg_info_present = false;
- }
- EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_cleanup);
- 
-@@ -149,6 +206,10 @@ int btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
- 		BT_ERR("YoYo: tlv parsing failed (%d)", ret);
- 		return ret;
- 	}
-+	if (!ctx->dbg_info_present) {
-+		BT_ERR("YoYo: Invalid BT debug Info tlv, using legacy DBGC defaults");
-+		return -EBADMSG;
-+	}
- 
- 	ctx->enabled = true;
- 
-diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
-index b0b94c2a169d..717e8838c4d5 100644
---- a/drivers/bluetooth/btintel_pcie_debug.h
-+++ b/drivers/bluetooth/btintel_pcie_debug.h
-@@ -26,6 +26,19 @@
- #define BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET		0x100000A
- #define BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE	0x100000B
- 
-+/* Supported TLV type versions */
-+#define BTINTEL_PCIE_DBG_INFO_TLV_VERSION	2
-+/* Debug Info TLV */
-+#define BTINTEL_PCIE_CONFIG_NAME_LEN		64
-+#define BTINTEL_PCIE_DOMAIN_BT			0
-+#define BTINTEL_PCIE_CORE_TYPE_BT		1
-+
-+enum btintel_pcie_image_tlv_type {
-+	BTINTEL_PCIE_IMAGE_TLV_TYPE_EXTERNAL	= 0x1,
-+	BTINTEL_PCIE_IMAGE_TLV_TYPE_INTERNAL	= 0x2,
-+	BTINTEL_PCIE_IMAGE_TLV_TYPE_UNKNOWN	= 0xff,
-+};
-+
- /* TLV header */
- struct btintel_pcie_tlv_hdr {
- 	__le32 type;
-@@ -44,6 +57,25 @@ struct btintel_pcie_addr_value {
- 	__le32 value;
- } __packed;
- 
-+/*
-+ * struct btintel_pcie_tlv_dbg_info - YoYo DEBUG_INFO TLV
-+ * @hdr: TLV type and payload length
-+ * @dbg_hdr: Debug TLV version and domain
-+ * @image_type: Firmware image type
-+ * @core_type: Firmware core type
-+ * @config_name: Fixed-size name of the firmware configuration
-+ *
-+ * Describes the firmware image targeted by the YoYo configuration. Fields
-+ * are stored in little-endian format in the packed firmware TLV.
-+ */
-+struct btintel_pcie_tlv_dbg_info {
-+	struct btintel_pcie_tlv_hdr hdr;
-+	struct btintel_pcie_dbg_hdr dbg_hdr;
-+	__le32 image_type;
-+	__le32 core_type;
-+	u8 config_name[BTINTEL_PCIE_CONFIG_NAME_LEN];
-+} __packed;
-+
- /*
-  * struct btintel_pcie_yoyo_ctx- Runtime state for YoYo debug configuration
-  * @enabled: Whether the loaded YoYo configuration passed validation
-@@ -58,12 +90,11 @@ struct btintel_pcie_addr_value {
-  */
- struct btintel_pcie_yoyo_ctx {
- 	bool			 enabled;
--
-+	bool			 dbg_info_present;
- 	struct list_head	 region_list;
- 	struct list_head	 trigger_list;
- 	struct list_head	 hcmd_list;
- 	struct list_head	 config_set_list;
--
- 	struct hci_dev		 *hdev;
- };
- 
--- 
-2.53.0
+---Test result---
 
+Test Summary:
+CheckPatch                    FAIL      0.75 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.85 seconds
+CheckAllWarning               PASS      35.17 seconds
+CheckSparse                   PASS      37.19 seconds
+BuildKernel32                 PASS      30.54 seconds
+CheckKernelLLVM               PASS      37.42 seconds
+TestRunnerSetup               PASS      723.66 seconds
+TestRunner_l2cap-tester       PASS      12.66 seconds
+TestRunner_iso-tester         PASS      11.00 seconds
+TestRunner_bnep-tester        PASS      3.14 seconds
+TestRunner_mgmt-tester        PASS      87.60 seconds
+TestRunner_rfcomm-tester      PASS      4.50 seconds
+TestRunner_sco-tester         PASS      5.64 seconds
+TestRunner_ioctl-tester       PASS      4.60 seconds
+TestRunner_mesh-tester        PASS      5.53 seconds
+TestRunner_smp-tester         PASS      4.35 seconds
+TestRunner_userchan-tester    PASS      8.12 seconds
+TestRunner_6lowpan-tester     PASS      4.56 seconds
+IncrementalBuild              PASS      28.22 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: hci_conn: Fix default RX PHY initialization
+WARNING: Reported-by: should be immediately followed by Closes: or Link: with a URL to the report
+#69: 
+Reported-by: k2ci <kernel-bot@kylinos.cn>
+Cc: stable@vger.kernel.org
+
+total: 0 errors, 1 warnings, 0 checks, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14887278.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+https://github.com/bluez/bluetooth-next/pull/926
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4251960895347061405==--
