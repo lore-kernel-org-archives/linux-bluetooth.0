@@ -1,57 +1,57 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99403DAACD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 06:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E269377ABE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 06:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791959298; cv=none; b=jXv2uALcJPKyTnZEUII2PdrN7KpRWJ7qpXJDAhGZdxtbQWUUdW+garvMePHXE9jRDaf24VFP8w1hliGFYoSQ6LCF6DSk4GTRy7mnj9LeLkMc2UEvPCsAJdRLcSd+u1qDfOeLrqg5/c5SV99Hw8kfzXTEIRCfIr6+e6wPLX+QRNk=
+	t=1791959301; cv=none; b=sEXOPiIRNRBKC5NHe851e5NITY9tWtacQNMSATS/XTtUMvnzk8qY+c7Om3w3BfMDasCiE+Q1Hu3MWxW5en3b6jPkVu3UxfiqtBJf5+bXOXK0PUaG+jNHenp3pzJ5iudHoLLcbgexMilpk68gpVae2ZLoQWBeL3uP40DbdRvVpS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791959298; c=relaxed/simple;
-	bh=162MjQgso2Ll9CS+cY5eemnQfrBFU15dG/RubbtzwDE=;
+	s=arc-20240116; t=1791959301; c=relaxed/simple;
+	bh=o1LRRDr7HhJ2tZS3YIC4eiou3x7Hcuby8656MOsiBCg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHnEQ6fvPtpEWkxOQayvmQ17pQenymIitFCVklG+XeOfZFLW4PZhyoP2hwCXcwHnh3PH9laIdk2TTmUn0bRZZgsBqIsTstHQxvwtULxGR02VK09BTmlhUD7fTwMFa6FOiEbegeTS2Qcv0SiaSHo3W3wjNLIJIv3JLKGXc12TbTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=buRflpgG; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=G1eZuUfLt8036C4e39Tuls426MIaSwqTc89gFJgYCkj6/Lia2G7R5gSKcQf2OJtKbNR87c3CE91UOkbRXg6CCud1tOyoQzYblQpoMcP11FgZA0S9MFBMfRTz5qO1Jn0DZsiZuxZQm3hoKphBb5bTNP8Kq1Bsb+Zxmh+kN3hLm38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eBDylrQn; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="buRflpgG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eBDylrQn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1791959296; x=1823495296;
+  t=1791959298; x=1823495298;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=162MjQgso2Ll9CS+cY5eemnQfrBFU15dG/RubbtzwDE=;
-  b=buRflpgGTwoDhBuqN7+LuDegFwqW1njVlzYRQLuy7uXwMzda2EivkFFV
-   xXqiQBk5G9t/HZuYL+3exj4p+5IrUYg0Z41d9JiIfWhXo4OQYNeEB/QLG
-   ftMHRBRwbtlk2uq9ZSljqYaIJH9Q5SZL9gepdntbNyM0Xh1FvmKbm+dgu
-   FhWPH4CDLVDh87JyCzhBW8Eo8C97yZ9rcYbFDOsp4qwWgTlYxWRe87+mA
-   wkysmtNWwE8RZL6ukUg4s/LMOU+YCdtrvQ9DuinISUE0KY6lvgZFsP/g+
-   M6Ty6p0lUAMgxECJxBZNJZB86FjXbep52QBPz5fZRDKkAi9Q+ZgSKsd//
-   w==;
-X-CSE-ConnectionGUID: nEnxGuPzQ+uHW7hzy+7tbg==
-X-CSE-MsgGUID: wq7oq9P/QEer0c+DY8zeAw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="598748"
+  bh=o1LRRDr7HhJ2tZS3YIC4eiou3x7Hcuby8656MOsiBCg=;
+  b=eBDylrQn6QHlGRFRB5dD6bhQljfY0zRlkB9JBqfbkhkVX6zIiCRCSYd/
+   fnMn5nTHIzph1uuVhmKYZCPR+0XtwRn6X1m743PnnAswTbZ9L+AFnMJgY
+   ohofNvuOtxY4OYb123mNxIoiykVZBy46uszp+Mu7t6IH/GMgxzGTykn/l
+   mIyOBmvVuhElltJsJlamuWNx5bMx0OzYzQZWEy0ShNTb1WEY+lAUdZbVI
+   bZwXUcRJOQqIzjDGg3tVpsAkplze2QsRy6+kGG6yw0Y3ZJS7nWtKk5y98
+   1XFzz5HwRda/yBEyKOii1moOd7nDTs8HdsD6FMR7J512J68VlNCaHu1tC
+   Q==;
+X-CSE-ConnectionGUID: PZ4keJXdTkK0OoStOapUiw==
+X-CSE-MsgGUID: Yoxz8l/NSDOO4xb7cRLWbg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="598752"
 X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="598748"
+   d="scan'208";a="598752"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2026 23:28:16 -0700
-X-CSE-ConnectionGUID: abcLmT+3RTmUTwj9/MvYfg==
-X-CSE-MsgGUID: YaKU0wwsSfWdKQc2rXvbnA==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2026 23:28:18 -0700
+X-CSE-ConnectionGUID: O5neHeHNRx6EzunTBT3pew==
+X-CSE-MsgGUID: S+sN17fZTvW0d697hpfgHA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
-   d="scan'208";a="1449139"
+   d="scan'208";a="1449149"
 Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa005.fm.intel.com with ESMTP; 13 Oct 2026 23:28:15 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 13 Oct 2026 23:28:17 -0700
 From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: kiran.k@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v3 1/2] Bluetooth: Add HCI interface for HW rfkill events
-Date: Wed, 14 Oct 2026 11:49:46 +0530
-Message-ID: <20261014061947.1238279-2-aluvala.sai.teja@intel.com>
+Subject: [PATCH v3 2/2] Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
+Date: Wed, 14 Oct 2026 11:49:47 +0530
+Message-ID: <20261014061947.1238279-3-aluvala.sai.teja@intel.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261014061947.1238279-1-aluvala.sai.teja@intel.com>
 References: <20261014061947.1238279-1-aluvala.sai.teja@intel.com>
@@ -63,168 +63,503 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add hci_rfkill_set_hw_state() so that transport drivers can report
-hardware rfkill switch changes to the HCI stack through the same
-path used for software rfkill.
+Add host-driven HW rfkill handling for Intel PCIe Bluetooth
+controllers and report state changes to the Bluetooth stack through
+hci_rfkill_set_hw_state(). The GP2 and HW_RFKILL MSI-X hardware
+causes are enabled so that the host can detect a HW rfkill assertion
+and hand its acknowledgment back to firmware.
 
-hci_rfkill_set_hw_state() validates HCI_UNREGISTER and hdev->rfkill
-under hdev->unregister_lock, applies the new state via a new
-hdev->rfkill_block work item while still holding that lock, and
-flushes it before returning. This avoids hci_unregister_dev()
-destroying hdev->rfkill before the work runs, and avoids a racing
-userspace power-on (triggered by rfkill core's own async uevent)
-observing a stale HCI_RFKILLED flag before the work applies the new
-state.
+On a HW_RFKILL interrupt, a delayed worker reads the FUNC_CTRL and
+IPC_CONTROL registers to determine whether the switch is asserted or
+released. On assertion, the worker marks HW rfkill as active and
+reports a blocked state directly. On release, it clears the
+IPC_CONTROL HW rfkill doorbell bit, waits for the firmware's GP2
+acknowledgment that matches the requested transition, and reports
+an unblocked state to the stack only once that acknowledgment
+arrives. IPC_CONTROL register read-modify-write updates are
+serialized with a new ipc_lock, and the wait state/done flags use
+READ_ONCE()/WRITE_ONCE() since they are shared between the worker
+and the MSI-X handler.
 
-A new hdev->rfkill_lock serializes hdev->rfkill_block against the
-rfkill core's synchronous set_block callback, so a hardware rfkill
-event and a concurrent userspace soft block/unblock cannot race on
-HCI_RFKILLED and the controller's power state.
+After a successful setup or resume, an initial state check is
+scheduled. That check reports an already-asserted HW rfkill state,
+and also reports a release if rfkill was asserted before suspend and
+cleared while the controller was asleep; otherwise it is a no-op so
+it cannot suppress a later genuine transition.
+
+The HW_RFKILL MSI-X cause is masked before synchronizing interrupts
+and canceling or draining the worker across setup retry, reset,
+shutdown, probe failure, remove, and suspend, and is unmasked again
+after setup and resume succeed. GP2 is left enabled throughout so
+that the shutdown path can still wait for the firmware's doorbell
+acknowledgment when re-asserting rfkill before the controller is
+powered down. If the shutdown is itself caused by an active HW
+rfkill assertion, monitoring is left enabled instead, so a later
+de-assertion can still be detected.
 
 Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  4 +++
- net/bluetooth/hci_core.c         | 51 ++++++++++++++++++++++++++++++--
- 2 files changed, 53 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 197 +++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel_pcie.h |  30 +++++
+ 2 files changed, 220 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index aa04dec45153..8f32c860d492 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -503,6 +503,7 @@ struct hci_dev {
- 	struct list_head	cmd_sync_work_list;
- 	struct mutex		cmd_sync_work_lock;
- 	struct mutex		unregister_lock;
-+	struct mutex		rfkill_lock;
- 	struct work_struct	cmd_sync_cancel_work;
- 	struct work_struct	reenable_adv_work;
- 
-@@ -586,6 +587,7 @@ struct hci_dev {
- 	struct device		dev;
- 
- 	struct rfkill		*rfkill;
-+	struct work_struct	rfkill_block;
- 
- 	DECLARE_BITMAP(dev_flags, __HCI_NUM_FLAGS);
- 	hci_conn_flags_t	conn_flags;
-@@ -1822,6 +1824,8 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, u8 src_type);
- 
- struct hci_dev *hci_alloc_dev_priv(int sizeof_priv);
- 
-+void hci_rfkill_set_hw_state(struct hci_dev *hdev, bool blocked);
-+
- static inline struct hci_dev *hci_alloc_dev(void)
- {
- 	return hci_alloc_dev_priv(0);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 209244fd9391..7598a1044c5c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -868,13 +868,19 @@ static int hci_rfkill_set_block(void *data, bool blocked)
- 	struct hci_dev *hdev = data;
- 	int err;
- 
-+	mutex_lock(&hdev->rfkill_lock);
-+
- 	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
- 
--	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
-+	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		mutex_unlock(&hdev->rfkill_lock);
- 		return -EBUSY;
-+	}
- 
--	if (blocked == hci_dev_test_flag(hdev, HCI_RFKILLED))
-+	if (blocked == hci_dev_test_flag(hdev, HCI_RFKILLED)) {
-+		mutex_unlock(&hdev->rfkill_lock);
- 		return 0;
-+	}
- 
- 	if (blocked) {
- 		hci_dev_set_flag(hdev, HCI_RFKILLED);
-@@ -897,9 +903,45 @@ static int hci_rfkill_set_block(void *data, bool blocked)
- 		hci_dev_clear_flag(hdev, HCI_RFKILLED);
- 	}
- 
-+	mutex_unlock(&hdev->rfkill_lock);
-+
- 	return 0;
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 91b1ee9d6010..a7f79b9b09ee 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2710,6 +2710,116 @@ static inline bool btintel_pcie_is_txackq_empty(struct btintel_pcie_data *data)
+ 	return data->ia.cr_tia[BTINTEL_PCIE_TXQ_NUM] == data->ia.cr_hia[BTINTEL_PCIE_TXQ_NUM];
  }
  
-+void hci_rfkill_set_hw_state(struct hci_dev *hdev, bool blocked)
++static bool btintel_pcie_hw_rfkill_doorbell(struct btintel_pcie_data *data,
++					    bool state)
 +{
-+	mutex_lock(&hdev->unregister_lock);
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER) ||
-+	    IS_ERR_OR_NULL(hdev->rfkill)) {
-+		mutex_unlock(&hdev->unregister_lock);
-+		return;
++	unsigned long flags;
++	u32 reg;
++	int err;
++
++	WRITE_ONCE(data->rfkill_wait_done, false);
++	WRITE_ONCE(data->rfkill_wait_state, state);
++
++	spin_lock_irqsave(&data->ipc_lock, flags);
++	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG);
++	if (state)
++		reg |= BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL;
++	else
++		reg &= ~BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL;
++	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG, reg);
++	spin_unlock_irqrestore(&data->ipc_lock, flags);
++
++	err = wait_event_timeout(data->rfkill_wait_q,
++				 READ_ONCE(data->rfkill_wait_done),
++				 msecs_to_jiffies(BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT));
++	if (!err) {
++		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for RFKILL",
++			   BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT);
++		return false;
 +	}
 +
-+	rfkill_set_hw_state(hdev->rfkill, blocked);
-+
-+	/* Flush so HCI_RFKILLED is updated before rfkill core's async
-+	 * uevent reaches userspace, otherwise a racing power-on could see
-+	 * a stale flag and immediately close the device again.
-+	 */
-+	schedule_work(&hdev->rfkill_block);
-+	flush_work(&hdev->rfkill_block);
-+	mutex_unlock(&hdev->unregister_lock);
++	return true;
 +}
-+EXPORT_SYMBOL(hci_rfkill_set_hw_state);
 +
-+static void hci_rfkill_block_work(struct work_struct *work)
++static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
 +{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, rfkill_block);
++	struct btintel_pcie_data *data =
++		container_of(wk, struct btintel_pcie_data, hw_rfkill_work.work);
++	u32 func_ctrl, ipc_ctrl;
++	bool set_rfkill, first_check;
 +
-+	if (!hdev->rfkill)
++	if (!data->hdev)
 +		return;
 +
-+	if (rfkill_blocked(hdev->rfkill))
-+		hci_rfkill_set_block(hdev, true);
-+	else
-+		hci_rfkill_set_block(hdev, false);
++	/* Do not report an initial clear when rfkill was never asserted.
++	 * After resume, however, a previously asserted rfkill must be
++	 * cleared and reported to the HCI stack.
++	 */
++	first_check = test_and_clear_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK,
++					 &data->flags);
++
++	func_ctrl = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
++	ipc_ctrl = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG);
++
++	set_rfkill = !(func_ctrl & BTINTEL_PCIE_CSR_FUNC_CTRL_HW_RFKILL) &&
++		     !(ipc_ctrl & BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL);
++	if (set_rfkill) {
++		bt_dev_dbg(data->hdev, "hw rfkill on");
++		set_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
++		hci_rfkill_set_hw_state(data->hdev, true);
++	} else {
++		bt_dev_dbg(data->hdev, "hw rfkill off");
++		/* Nothing changed at the initial post-setup check, so there
++		 * is no transition to report.
++		 */
++		if (first_check &&
++		    !test_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags))
++			return;
++
++		if (btintel_pcie_hw_rfkill_doorbell(data, false)) {
++			clear_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
++			hci_rfkill_set_hw_state(data->hdev, false);
++		}
++	}
 +}
 +
- static const struct rfkill_ops hci_rfkill_ops = {
- 	.set_block = hci_rfkill_set_block,
++static void btintel_delayed_hw_rfkill(struct btintel_pcie_data *data,
++				      bool delay)
++{
++	mod_delayed_work(system_wq, &data->hw_rfkill_work,
++			 delay ? msecs_to_jiffies(BTINTEL_PCIE_HW_RFKILL_DELAY) : 0);
++}
++
++static void btintel_pcie_msix_gp2_handler(struct btintel_pcie_data *data)
++{
++	u32 reg, boot_stage_reg;
++	bool state;
++
++	boot_stage_reg = btintel_pcie_rd_reg32(data,
++					       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
++	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_STATUS_REG);
++	state = READ_ONCE(data->rfkill_wait_state);
++
++	if (state &&
++	    (reg & BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL) &&
++	    (boot_stage_reg & BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE)) {
++		bt_dev_dbg(data->hdev,
++			   "firmware done handling HW RF-KILL SET state update");
++		WRITE_ONCE(data->rfkill_wait_done, true);
++	}
++
++	if (!state &&
++	    !(reg & BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL) &&
++	    !(boot_stage_reg & BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE)) {
++		bt_dev_dbg(data->hdev,
++			   "firmware done handling HW RF-KILL CLEAR state update");
++		WRITE_ONCE(data->rfkill_wait_done, true);
++	}
++
++	if (READ_ONCE(data->rfkill_wait_done))
++		wake_up(&data->rfkill_wait_q);
++}
++
+ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ {
+ 	struct msix_entry *entry = dev_id;
+@@ -2740,6 +2850,8 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ 	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1)
+ 		btintel_pcie_msix_gp1_handler(data);
+ 
++	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2)
++		btintel_pcie_msix_gp2_handler(data);
+ 
+ 	/* For TX */
+ 	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0) {
+@@ -2758,6 +2870,9 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ 	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG)
+ 		btintel_pcie_msix_fw_trigger_handler(data);
+ 
++	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL)
++		btintel_delayed_hw_rfkill(data, false);
++
+ 	/* This interrupt is triggered by the firmware after updating
+ 	 * boot_stage register and image_response register
+ 	 */
+@@ -2835,8 +2950,10 @@ static struct btintel_pcie_causes_list causes_list[] = {
+ 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x00 },
+ 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x01 },
+ 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
++	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x22 },
+ 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x23 },
+ 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x25 },
++	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x27 },
  };
-@@ -2495,6 +2537,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	mutex_init(&hdev->req_lock);
- 	mutex_init(&hdev->mgmt_pending_lock);
- 	mutex_init(&hdev->remote_oob_lock);
-+	mutex_init(&hdev->rfkill_lock);
  
- 	ida_init(&hdev->unset_handle_ida);
+ /* This function configures the interrupt masks for both HW_INT_CAUSES and
+@@ -3353,6 +3470,22 @@ static void btintel_pcie_disable_interrupts(struct btintel_pcie_data *data)
+ 	spin_unlock(&data->irq_lock);
+ }
  
-@@ -2518,6 +2561,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	INIT_LIST_HEAD(&hdev->monitored_devices);
- 
- 	INIT_LIST_HEAD(&hdev->local_codecs);
-+	INIT_WORK(&hdev->rfkill_block, hci_rfkill_block_work);
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
- 	INIT_WORK(&hdev->tx_work, hci_tx_work);
-@@ -2683,6 +2727,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	disable_work_sync(&hdev->tx_work);
- 	disable_work_sync(&hdev->power_on);
- 	disable_work_sync(&hdev->error_reset);
-+	disable_work_sync(&hdev->rfkill_block);
- 	disable_delayed_work_sync(&hdev->cmd_timer);
- 	disable_delayed_work_sync(&hdev->ncmd_timer);
- 	hci_devcd_shutdown(hdev);
-@@ -2707,10 +2752,12 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 
- 	hci_sock_dev_event(hdev, HCI_DEV_UNREG);
- 
-+	mutex_lock(&hdev->unregister_lock);
- 	if (hdev->rfkill) {
- 		rfkill_unregister(hdev->rfkill);
- 		rfkill_destroy(hdev->rfkill);
++static void btintel_pcie_mask_hw_rfkill(struct btintel_pcie_data *data)
++{
++	spin_lock(&data->irq_lock);
++	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
++				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL);
++	spin_unlock(&data->irq_lock);
++}
++
++static void btintel_pcie_unmask_hw_rfkill(struct btintel_pcie_data *data)
++{
++	spin_lock(&data->irq_lock);
++	btintel_pcie_clr_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
++				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL);
++	spin_unlock(&data->irq_lock);
++}
++
+ static void btintel_pcie_enable_interrupts(struct btintel_pcie_data *data)
+ {
+ 	spin_lock(&data->irq_lock);
+@@ -3535,8 +3668,10 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 		bt_dev_err(hdev, "Firmware download retry count: %d",
+ 			   fw_dl_retry);
+ 		btintel_pcie_dump_debug_registers(hdev);
+-		btintel_pcie_disable_interrupts(data);
++		btintel_pcie_mask_hw_rfkill(data);
+ 		btintel_pcie_synchronize_irqs(data);
++		cancel_delayed_work_sync(&data->hw_rfkill_work);
++		btintel_pcie_disable_interrupts(data);
+ 		err = btintel_pcie_reset_bt(data);
+ 		if (err) {
+ 			bt_dev_err(hdev, "Failed to do shr reset: %d", err);
+@@ -3554,8 +3689,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 		btintel_pcie_start_rx(data);
  	}
-+	mutex_unlock(&hdev->unregister_lock);
  
- 	device_del(&hdev->dev);
- 	/* Actual cleanup is deferred until hci_release_dev(). */
+-	if (!err)
++	if (!err) {
+ 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
++		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
++		btintel_pcie_unmask_hw_rfkill(data);
++		btintel_delayed_hw_rfkill(data, true);
++	}
+ 	return err;
+ }
+ 
+@@ -3783,18 +3922,20 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 	if (!data)
+ 		goto out;
+ 
++	btintel_pcie_mask_hw_rfkill(data);
++	btintel_pcie_synchronize_irqs(data);
++	disable_delayed_work_sync(&data->hw_rfkill_work);
+ 	btintel_pcie_disable_interrupts(data);
+ 	btintel_pcie_synchronize_irqs(data);
+ 
+ 	flush_work(&data->rx_work);
+-	/* Drain any in-flight dump workers and block new ones across reset.
+-	 * Safe from self-deadlock: they all run on a separate wq.
++	/* Drain any in-flight dump/rfkill workers and block new ones across
++	 * reset. Safe from self-deadlock: they all run on a separate wq.
+ 	 */
+ 	disable_work_sync(&data->coredump_work);
+ 	disable_work_sync(&data->hwexp_work);
+ 	disable_work_sync(&data->fwtrigger_work);
+ 	disable_work_sync(&data->mbox_work);
+-
+ 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
+ 
+ 	/* Both reset paths follow the same contract: on success they
+@@ -3819,6 +3960,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 		enable_work(&data->hwexp_work);
+ 		enable_work(&data->fwtrigger_work);
+ 		enable_work(&data->mbox_work);
++		enable_delayed_work(&data->hw_rfkill_work);
+ 	}
+ 
+ out:
+@@ -4009,6 +4151,24 @@ static struct hci_drv btintel_pcie_hci_drv = {
+ 	.specific_handlers      = btintel_pcie_hci_drv_specific_handlers,
+ };
+ 
++static int btintel_pcie_shutdown(struct hci_dev *hdev)
++{
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++
++	/* Keep monitoring if shutting down due to an active HW rfkill
++	 * assertion, so a later de-assertion can still be detected.
++	 */
++	if (test_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags)) {
++		btintel_pcie_hw_rfkill_doorbell(data, true);
++	} else {
++		btintel_pcie_mask_hw_rfkill(data);
++		btintel_pcie_synchronize_irqs(data);
++		cancel_delayed_work_sync(&data->hw_rfkill_work);
++	}
++
++	return btintel_shutdown_combined(hdev);
++}
++
+ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ {
+ 	int err;
+@@ -4028,7 +4188,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 	hdev->close = btintel_pcie_close;
+ 	hdev->send = btintel_pcie_send_frame;
+ 	hdev->setup = btintel_pcie_setup;
+-	hdev->shutdown = btintel_shutdown_combined;
++	hdev->shutdown = btintel_pcie_shutdown;
+ 	hdev->hw_error = btintel_pcie_hw_error;
+ 	hdev->set_diag = btintel_set_diag;
+ 	hdev->set_bdaddr = btintel_set_bdaddr;
+@@ -4069,6 +4229,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 
+ 	spin_lock_init(&data->irq_lock);
+ 	spin_lock_init(&data->hci_rx_lock);
++	spin_lock_init(&data->ipc_lock);
+ 
+ 	init_waitqueue_head(&data->gp0_wait_q);
+ 	data->gp0_received = false;
+@@ -4076,6 +4237,9 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	init_waitqueue_head(&data->tx_wait_q);
+ 	data->tx_wait_done = false;
+ 
++	init_waitqueue_head(&data->rfkill_wait_q);
++	data->rfkill_wait_done = false;
++
+ 	init_waitqueue_head(&data->mbox_parse_wait_q);
+ 
+ 	data->workqueue = alloc_ordered_workqueue(KBUILD_MODNAME, WQ_HIGHPRI);
+@@ -4090,6 +4254,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 
+ 	skb_queue_head_init(&data->rx_skb_q);
+ 	INIT_WORK(&data->rx_work, btintel_pcie_rx_work);
++	INIT_DELAYED_WORK(&data->hw_rfkill_work,
++			  btintel_pcie_hw_rfkill_delay_work);
+ 	INIT_WORK(&data->reset_work, btintel_pcie_reset_work);
+ 	INIT_WORK(&data->coredump_work, btintel_pcie_coredump_worker);
+ 	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_worker);
+@@ -4135,6 +4301,10 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	return 0;
+ 
+ exit_error:
++	btintel_pcie_mask_hw_rfkill(data);
++	btintel_pcie_synchronize_irqs(data);
++	cancel_delayed_work_sync(&data->hw_rfkill_work);
++
+ 	/* reset device before exit */
+ 	btintel_pcie_reset_bt(data);
+ 
+@@ -4175,8 +4345,11 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ 	if (current_work() != &data->reset_work)
+ 		disable_work_sync(&data->reset_work);
+ 
+-	btintel_pcie_disable_interrupts(data);
++	btintel_pcie_mask_hw_rfkill(data);
++	btintel_pcie_synchronize_irqs(data);
++	cancel_delayed_work_sync(&data->hw_rfkill_work);
+ 
++	btintel_pcie_disable_interrupts(data);
+ 	btintel_pcie_synchronize_irqs(data);
+ 
+ 	flush_work(&data->rx_work);
+@@ -4317,6 +4490,10 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 
+ 	data = pci_get_drvdata(pdev);
+ 
++	btintel_pcie_mask_hw_rfkill(data);
++	btintel_pcie_synchronize_irqs(data);
++	cancel_delayed_work_sync(&data->hw_rfkill_work);
++
+ 	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
+ 	if (mesg.event == PM_EVENT_SUSPEND &&
+ 	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
+@@ -4330,6 +4507,9 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+ 	if (err) {
++		btintel_pcie_unmask_hw_rfkill(data);
++		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
++		btintel_delayed_hw_rfkill(data, true);
+ 		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
+ 			   dxstate, err);
+ 		return err;
+@@ -4384,6 +4564,9 @@ static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ 	if (err) {
+ 		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
+ 	} else {
++		btintel_pcie_unmask_hw_rfkill(data);
++		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
++		btintel_delayed_hw_rfkill(data, true);
+ 		bt_dev_dbg(data->hdev,
+ 			   "device entered into d0 state from d3 in %lld us",
+ 			   ktime_to_us(ktime_get() - start));
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index 3030b4e8b750..dda711f7755d 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -33,6 +33,7 @@
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT		(BIT(6))
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT		(BIT(7))
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS	(BIT(20))
++#define BTINTEL_PCIE_CSR_FUNC_CTRL_HW_RFKILL		(BIT(27))
+ 
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ	(BIT(21))
+ 
+@@ -40,6 +41,12 @@
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON	(BIT(29))
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET		(BIT(31))
+ 
++/* BTINTEL PCIE CSR IPC Control Register */
++#define BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL		(BIT(7))
++
++/* BTINTEL PCIE CSR IPC Status Register */
++#define BTINTEL_PCIE_CSR_IPC_STATUS_HW_RFKILL		(BIT(7))
++
+ /* Value for BTINTEL_PCIE_CSR_BOOT_STAGE register */
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_ROM		(BIT(0))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_IML		(BIT(1))
+@@ -53,6 +60,7 @@
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
+ /* Reflects live D-state. Updated by hardware on every D-state transition. */
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
++#define BTINTEL_PCIE_CSR_BOOT_STAGE_HW_RFKILL_STATE	(BIT(25))
+ 
+ #define BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM	(BIT(4))
+ 
+@@ -135,8 +143,10 @@ enum msix_fh_int_causes {
+ enum msix_hw_int_causes {
+ 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0	= BIT(0),	/* cause 32 */
+ 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1	= BIT(1),	/* cause 33 */
++	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2	= BIT(2),	/* cause 34 */
+ 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP	= BIT(3),	/* cause 35 */
+ 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG	= BIT(5),	/* cause 37 */
++	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HW_RFKILL	= BIT(7),	/* cause 39 */
+ };
+ 
+ /* PCIe device states
+@@ -155,6 +165,8 @@ enum {
+ 	BTINTEL_PCIE_COREDUMP_INPROGRESS,
+ 	BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
+ 	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
++	BTINTEL_PCIE_HWRFKILL_ON,
++	BTINTEL_PCIE_HW_RFKILL_STATE_CHECK,
+ 	BTINTEL_PCIE_SETUP_DONE,
+ 	BTINTEL_PCIE_MAIL_BOX_INTR,
+ 	BTINTEL_PCIE_MBOX_PARSE_PENDING,
+@@ -215,6 +227,12 @@ enum btintel_pcie_mbox_msg {
+ 
+ #define BTINTEL_PCIE_DX_TRANSITION_MAX_RETRIES	3
+ 
++/* HW rfkill interrupt timeout */
++#define BTINTEL_PCIE_HW_RFKILL_INTERRUPT_TIMEOUT	200
++
++/* HW rfkill check timeout */
++#define BTINTEL_PCIE_HW_RFKILL_DELAY			1000
++
+ /* The number of descriptors in TX queues */
+ #define BTINTEL_PCIE_TX_DESCS_COUNT	32
+ 
+@@ -680,6 +698,7 @@ struct btintel_pcie_ini_dump_info {
+  * @flags: driver state
+  * @irq_lock: spinlock for MSI-X
+  * @hci_rx_lock: spinlock for HCI RX flow
++ * @ipc_lock: spinlock for IPC control register read-modify-write
+  * @base_addr: pci base address (from BAR)
+  * @msix_entries: array of MSI-X entries
+  * @msix_enabled: true if MSI-X is enabled;
+@@ -696,6 +715,10 @@ struct btintel_pcie_ini_dump_info {
+  * @gp0_wait_q: wait_q for gp0 interrupt
+  * @tx_wait_done: condition for tx interrupt
+  * @tx_wait_q: wait_q for tx interrupt
++ * @rfkill_wait_done: condition for HW rfkill GP2 interrupt
++ * @rfkill_wait_state: requested HW rfkill transition (set or clear)
++ *	being waited on, used to validate the GP2 acknowledgment
++ * @rfkill_wait_q: wait_q for HW rfkill GP2 interrupt
+  * @workqueue: workqueue for RX work
+  * @rx_skb_q: SKB queue for RX packet
+  * @rx_work: RX work struct to process the RX packet in @rx_skb_q
+@@ -723,6 +746,8 @@ struct btintel_pcie_data {
+ 	spinlock_t	irq_lock;
+ 	/* lock to serialize rx events */
+ 	spinlock_t	hci_rx_lock;
++	/* lock to serialize IPC control register updates */
++	spinlock_t	ipc_lock;
+ 
+ 	void __iomem	*base_addr;
+ 
+@@ -747,9 +772,14 @@ struct btintel_pcie_data {
+ 	bool	tx_wait_done;
+ 	wait_queue_head_t	tx_wait_q;
+ 
++	bool	rfkill_wait_done;
++	bool	rfkill_wait_state;
++	wait_queue_head_t	rfkill_wait_q;
++
+ 	struct workqueue_struct	*workqueue;
+ 	struct sk_buff_head	rx_skb_q;
+ 	struct work_struct	rx_work;
++	struct delayed_work	hw_rfkill_work;
+ 	struct work_struct      reset_work;
+ 
+ 	struct workqueue_struct	*dump_workqueue;
 -- 
 2.53.0
 
