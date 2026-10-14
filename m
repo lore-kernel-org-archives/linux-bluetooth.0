@@ -1,379 +1,222 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D684F4745
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ECB43304D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 11:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791975496; cv=none; b=nUTyMFtbgLpXt6+V6A4ommQfqcNXy1oO9Y7xjWw54rz7i3yAydTdEHMJmmOBXoE3LO+8bx3McO6dniQCiRedH4NwsGAC/JJOBkDVPAM2g6wWDxPO7R9zcMw40owy6yzc59enwwk4mA2dYm1JZYzzV4sGDfYwDDp469nzeJ+SRNk=
+	t=1791978512; cv=none; b=cCMXx6OQzBXuD/bxfCmv5jmVH4BgOVwDVUbeVAkH4WA+hDDX0ESTQn+QHvGgeQumVG/lBsHnRYe3vFSe07eLIpxrY+jLnyzc+hwePhdy9NIbtppWCLrHytyS17xETmMu2gaEMT/sHJnZTyMhViWTXxn5KTg1ONFhrP7MI2yoFA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791975496; c=relaxed/simple;
-	bh=XFjyEVaeBhNDYnBugSL6q2bZEO/oJZtSKLBtNLWQY5c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=L9Tp+GssVep4ANyjern1arGnxoQEVTEGXInXppCX2GdMihk76d2bH0YbrV2luSMWH3TBMIJGrN6vgDkZgPoWluHr22w2Rvr1p0Yc7poqq8cgpwVwqscaJLMxsff/CNiSljjx1zCqctYYJWveYTMJNuJ5MIuNqMU9T7hDPkz4N7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rEC7a25c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1791978512; c=relaxed/simple;
+	bh=F6SfDQ2clZ1oVatBfLRZXUktNzf8J1y/s/PbKRbJbbQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tUl8JeQebOXHtkoZk28gkHLo5qU5feOwOGPeZvAljLqaowSAAuFW1L2F4zB8c6DEv3XACLx7OxR+fIrfGwwPaGoFgChunt2q42QgN6t8fP1Xotfj9+TV6Fo5RAso5VTNzSxNOt7+ZjBW1/ivIM6DE0xjQ+xu7rO7mYjpWeskXNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E1WpKXwb; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rEC7a25c"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A77AEC2BCF5;
-	Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1791975495;
-	bh=XFjyEVaeBhNDYnBugSL6q2bZEO/oJZtSKLBtNLWQY5c=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=rEC7a25chzDnGt1fj7xOwl8f2kR2d9wGLicZaXWCA79Ya3xHF6unJ38QTnlMsqcgL
-	 4b1Rhygfj7knJpR4aw/QgaAhJ8wbPI4yhSIFHHojzz7uo70yR6oho6wngOpjYoXnQ1
-	 K6Sw/hxflBwl3pGEyncH0cBNwF0jAVScA2dnJ6zU/9JCRYP0ujs5niWeJuAWmG1f1j
-	 XKsbjDhKeaoxxkpVN9T4bjSkDpzPxoOWBw2hOmTqC+t7HY92tsq2hXkA8Q3VVmqEDr
-	 Ql08PipRX70PRha6iMNX9zzNHQcAfIc5pG2SHV8Jd2DIZj59oKJA29wBnsHB+A5rn2
-	 KFwStUQNqUG4A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83362CC6B24;
-	Wed, 14 Oct 2026 10:58:15 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 14 Oct 2026 18:58:11 +0800
-Subject: [PATCH BlueZ bluez] hci: add ext adv interface
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E1WpKXwb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791978503; x=1823514503;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=F6SfDQ2clZ1oVatBfLRZXUktNzf8J1y/s/PbKRbJbbQ=;
+  b=E1WpKXwbUX0ZAuWZfkwyaeFG+XZuPl1mL4umhgzQH30QGdcm0nZMBHTX
+   wTqtpCti28z1dSyHEhlfTd2f2HpHwoDsJJAh1HSar28RZeGKnbFk/FIr2
+   kAkKO7NbSYXsm6fwXmVdF32eIvqEEn1yfimFtdpi7HQElrSjhUpj5e79J
+   frianZ1chDvwrvwEtemyf16AZmscnjc2XCcbAfRaV7Z1G9/xBeOrVFgGA
+   UbyntHaEOKkdSS6cbtPFuDzUsadk8rWdWlzGUMVbmWH69QctObbHWOjBM
+   bPFvuW6w/OTVf//sykjXtgRhkTuINr64XcMeyGgCSVdWtKF3cX4wEk4d9
+   Q==;
+X-CSE-ConnectionGUID: HLQ+VHjtSMCc3umLDlmL8g==
+X-CSE-MsgGUID: aBFD0mlGRS6z0lQBnEofew==
+X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="627111"
+X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
+   d="scan'208";a="627111"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 04:48:22 -0700
+X-CSE-ConnectionGUID: BgXZvhtKS7GFAM23Ec7LEw==
+X-CSE-MsgGUID: 0vrF0jo3T460vX67QL5dQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
+   d="scan'208";a="1873472"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by fmviesa010.fm.intel.com with ESMTP; 14 Oct 2026 04:48:21 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: [PATCH 1/2] Bluetooth: btintel: Add TOP silent reset hooks
+Date: Wed, 14 Oct 2026 17:17:50 +0530
+Message-ID: <20261014114752.174669-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261014-extend_adv_api-v1-1-6ad07ff280f2@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAEJgz2oC/x3MTQqAIBBA4avIrBOyH5GuEhGaUw2EiVZE0t2Tl
- t/ivQQRA2GEjiUIeFGk3WWIgsG0arcgJ5sNVVlJUYqG432gs6O216g9cSmMUarWk1It5MgHnOn
- +hz2Y7cQHhvf9AANHkN9nAAAA
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1791975494; l=8890;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=WMUAa/cLymXgVr+hqSOhwpWmetN8h/ciU2P6dUS+h5c=;
- b=ULgSsdKJ7auitPoC4RZsGqZOyx6N4zqb8Bmt75PNI/Nz3nFcdeX9qZGzeOlzO+bfxxoGOHU8M
- q4sQ64yQcLOD18k9YtqBVgD8uJPI5bxqMUI3jCPZXhr3OChDN7mPd1N
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+Content-Transfer-Encoding: 8bit
 
-From: Yang Li <yang.li@amlogic.com>
+Add an INTEL_TOP_RESET flag so btintel_boot() can abort with
+-ECANCELED and let the caller substitute its own reset sequence,
+and cache boot_addr in struct btintel_data so that sequence can
+replay btintel_send_intel_reset() without re-parsing firmware.
+Preserve the flag across the reset in btintel_bootloader_setup_tlv().
 
-Wrap extended advertising HCI command interfaces.
+Inert on its own; used by the follow-up btintel_pcie patch.
 
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 ---
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- lib/bluetooth/hci.c     | 193 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/bluetooth/hci.h     |  55 ++++++++++++++
- lib/bluetooth/hci_lib.h |  16 ++++
- 3 files changed, 264 insertions(+)
+ drivers/bluetooth/btintel.c | 68 +++++++++++++++++++++++++++++++++----
+ drivers/bluetooth/btintel.h |  2 ++
+ 2 files changed, 64 insertions(+), 6 deletions(-)
 
-diff --git a/lib/bluetooth/hci.c b/lib/bluetooth/hci.c
-index f50a30c61..646a0fe6f 100644
---- a/lib/bluetooth/hci.c
-+++ b/lib/bluetooth/hci.c
-@@ -3017,6 +3017,199 @@ int hci_le_set_advertise_enable(int dd, uint8_t enable, int to)
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 0709fb3212f9..f48cda37ffa0 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1238,6 +1238,17 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ {
+ 	const u8 *fw_ptr;
+ 
++	/* Invalidate any previously cached boot_addr up front so that if
++	 * this firmware image lacks CMD_WRITE_BOOT_PARAMS below, the TOP
++	 * silent reset replay path in btintel_pcie does not reuse a stale
++	 * address from an earlier firmware load.
++	 */
++	if (hdev->bus == HCI_PCI) {
++		struct btintel_data *data = hci_get_priv(hdev);
++
++		data->boot_addr = 0;
++	}
++
+ 	fw_ptr = fw->data;
+ 
+ 	while (fw_ptr - fw->data < fw->size) {
+@@ -1255,6 +1266,18 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ 
+ 			*boot_addr = le32_to_cpu(params->boot_addr);
+ 
++			/* boot_addr is cached only for the PCIe TOP silent
++			 * reset replay path. UART (hci_intel) devices have no
++			 * struct btintel_data allocated as hci_dev private
++			 * data, so hci_get_priv(hdev) would return memory past
++			 * the end of hdev; skip the cache write there.
++			 */
++			if (hdev->bus == HCI_PCI) {
++				struct btintel_data *data = hci_get_priv(hdev);
++
++				data->boot_addr = *boot_addr;
++			}
++
+ 			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+ 
+ 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+@@ -2059,11 +2082,30 @@ static int btintel_boot_wait_d0(struct hci_dev *hdev, ktime_t calltime,
  	return 0;
  }
  
-+int hci_le_set_ext_adv_params(int dd, uint8_t handle, uint16_t evt_properties,
-+				uint32_t min_interval, uint32_t max_interval,
-+				uint8_t channel_map, uint8_t own_addr_type,
-+				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
-+				uint8_t filter_policy, int8_t tx_power,
-+				uint8_t primary_phy, uint8_t secondary_max_skip,
-+				uint8_t secondary_phy, uint8_t sid,
-+				uint8_t notif_enable, int to)
++/* Returns true when a TOP silent reset is pending on this hdev and the
++ * caller must cancel whatever FW-download/boot step it was about to run
++ * instead of proceeding, so the reset dispatch in btintel_pcie_setup()
++ * is not bypassed.
++ */
++static bool btintel_top_reset_pending(struct hci_dev *hdev)
 +{
-+	struct hci_request rq;
-+	le_set_ext_adv_params_cp cp;
-+	struct {
-+		uint8_t status;
-+		int8_t  tx_power;
-+	} rsp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+	cp.evt_properties = evt_properties;
-+	cp.min_interval[0] = min_interval & 0xff;
-+	cp.min_interval[1] = (min_interval >> 8) & 0xff;
-+	cp.min_interval[2] = (min_interval >> 16) & 0xff;
-+	cp.max_interval[0] = max_interval & 0xff;
-+	cp.max_interval[1] = (max_interval >> 8) & 0xff;
-+	cp.max_interval[2] = (max_interval >> 16) & 0xff;
-+	cp.channel_map = channel_map;
-+	cp.own_addr_type = own_addr_type;
-+	cp.peer_addr_type = peer_addr_type;
-+	if (peer_addr)
-+		memcpy(&cp.peer_addr, peer_addr, sizeof(cp.peer_addr));
-+	cp.filter_policy = filter_policy;
-+	cp.tx_power = tx_power;
-+	cp.primary_phy = primary_phy;
-+	cp.secondary_max_skip = secondary_max_skip;
-+	cp.secondary_phy = secondary_phy;
-+	cp.sid = sid;
-+	cp.notif_enable = notif_enable;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_PARAMS;
-+	rq.cparam = &cp;
-+	rq.clen = sizeof(cp);
-+	rq.rparam = &rsp;
-+	rq.rlen = sizeof(rsp);
-+
-+	if (hci_send_req(dd, &rq, to) < 0)
-+		return -1;
-+
-+	if (rsp.status) {
-+		errno = EIO;
-+		return -1;
++	if (hdev->bus == HCI_PCI && btintel_test_flag(hdev, INTEL_TOP_RESET)) {
++		bt_dev_info(hdev, "INTEL_TOP_RESET flag set, cancel boot");
++		return true;
 +	}
 +
-+	return 0;
++	return false;
 +}
 +
-+int hci_le_set_ext_adv_data(int dd, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_data_cp *cp;
-+	uint8_t status;
-+	size_t plen = sizeof(*cp) + data_len;
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->handle = handle;
-+	cp->operation = operation;
-+	cp->fragment_preference = fragment_pref;
-+	cp->data_len = data_len;
-+	if (data && data_len)
-+		memcpy(cp->data, data, data_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_DATA;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int hci_le_set_ext_scan_rsp_data(int dd, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_data_cp *cp;
-+	uint8_t status;
-+	size_t plen = sizeof(*cp) + data_len;
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->handle = handle;
-+	cp->operation = operation;
-+	cp->fragment_preference = fragment_pref;
-+	cp->data_len = data_len;
-+	if (data && data_len)
-+		memcpy(cp->data, data, data_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_SCAN_RSP_DATA;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int hci_le_set_ext_adv_enable(int dd, uint8_t enable, uint8_t num_of_sets,
-+				const void *sets, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_enable_cp *cp;
-+	uint8_t status;
-+	size_t set_entry_len = 4; /* handle (1) + duration (2) + max_events (1) */
-+	size_t plen = sizeof(le_set_ext_adv_enable_cp) + (num_of_sets * set_entry_len);
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->enable = enable;
-+	cp->num_of_sets = num_of_sets;
-+	if (sets && num_of_sets)
-+		memcpy(cp->sets, sets, num_of_sets * set_entry_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_ENABLE;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
- 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
-diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
-index 2e4aa394e..7d8b81f2d 100644
---- a/lib/bluetooth/hci.h
-+++ b/lib/bluetooth/hci.h
-@@ -1735,6 +1735,61 @@ typedef struct {
- } __attribute__ ((packed)) le_set_address_resolution_enable_cp;
- #define LE_SET_ADDRESS_RESOLUTION_ENABLE_CP_SIZE 1
+ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ {
+ 	ktime_t calltime;
+ 	int err;
  
-+#define OCF_LE_SET_EXT_ADV_PARAMS		0x0036
-+typedef struct {
-+	uint8_t  handle;
-+	uint16_t evt_properties;
-+	uint8_t  min_interval[3];
-+	uint8_t  max_interval[3];
-+	uint8_t  channel_map;
-+	uint8_t  own_addr_type;
-+	uint8_t  peer_addr_type;
-+	bdaddr_t peer_addr;
-+	uint8_t  filter_policy;
-+	int8_t   tx_power;
-+	uint8_t  primary_phy;
-+	uint8_t  secondary_max_skip;
-+	uint8_t  secondary_phy;
-+	uint8_t  sid;
-+	uint8_t  notif_enable;
-+} __attribute__ ((packed)) le_set_ext_adv_params_cp;
-+#define LE_SET_EXT_ADV_PARAMS_CP_SIZE 25
++	/* TOP reset flag set, abort FW download before sending Intel soft reset */
++	if (btintel_top_reset_pending(hdev))
++		return -ECANCELED;
 +
-+typedef struct {
-+	uint8_t status;
-+	int8_t  selected_tx_power;
-+} __attribute__ ((packed)) le_set_ext_adv_params_rp;
-+#define LE_SET_EXT_ADV_PARAMS_RP_SIZE 9
-+
-+#define OCF_LE_SET_EXT_ADV_DATA			0x0037
-+typedef struct {
-+	uint8_t handle;
-+	uint8_t operation;
-+	uint8_t fragment_preference;
-+	uint8_t data_len;
-+	uint8_t data[0];
-+} __attribute__ ((packed)) le_set_ext_adv_data_cp;
-+#define LE_SET_EXT_ADV_DATA_CP_MAX_SIZE  (4 + 251)
-+
-+#define OCF_LE_SET_EXT_SCAN_RSP_DATA		0x0038
-+typedef struct {
-+	uint8_t advertising_handle;
-+	uint8_t operation;
-+	uint8_t fragment_preference;
-+	uint8_t scan_response_data_length;
-+	uint8_t scan_response_data[31];
-+} __attribute__((packed)) le_set_ext_scan_rsp_data_cp;
-+#define LE_SET_EXT_SCAN_RSP_DATA_CP_SIZE (4 + 31)
-+
-+#define OCF_LE_SET_EXT_ADV_ENABLE		0x0039
-+typedef struct {
-+	uint8_t enable;
-+	uint8_t num_of_sets;
-+	/* followed by ext adv set entries: handle(1), duration(2), max_events(1) */
-+	uint8_t sets[0];
-+} __attribute__ ((packed)) le_set_ext_adv_enable_cp;
-+#define LE_SET_EXT_ADV_ENABLE_CP_SIZE (2 + 4)
-+
- /* Vendor specific commands */
- #define OGF_VENDOR_CMD		0x3f
+ 	calltime = ktime_get();
  
-diff --git a/lib/bluetooth/hci_lib.h b/lib/bluetooth/hci_lib.h
-index eeb51411a..4a06a9383 100644
---- a/lib/bluetooth/hci_lib.h
-+++ b/lib/bluetooth/hci_lib.h
-@@ -112,6 +112,22 @@ int hci_le_set_scan_enable(int dev_id, uint8_t enable, uint8_t filter_dup, int t
- int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
- 					uint16_t window, uint8_t own_type,
- 					uint8_t filter, int to);
-+int hci_le_set_ext_adv_params(int dev_id, uint8_t handle, uint16_t evt_properties,
-+				uint32_t min_interval, uint32_t max_interval,
-+				uint8_t channel_map, uint8_t own_addr_type,
-+				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
-+				uint8_t filter_policy, int8_t tx_power,
-+				uint8_t primary_phy, uint8_t secondary_max_skip,
-+				uint8_t secondary_phy, uint8_t sid,
-+				uint8_t notif_enable, int to);
-+int hci_le_set_ext_adv_data(int dev_id, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to);
-+int hci_le_set_ext_scan_rsp_data(int dev_id, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to);
-+int hci_le_set_ext_adv_enable(int dev_id, uint8_t enable, uint8_t num_of_sets,
-+				const void *sets, int to);
- int hci_le_set_advertise_enable(int dev_id, uint8_t enable, int to);
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
-
----
-base-commit: 9dc7e40962f11d1d9a5568f8a7633a695288329c
-change-id: 20261014-extend_adv_api-61bb883ac885
-
-Best regards,
+ 	btintel_set_flag(hdev, INTEL_BOOTING);
+@@ -3543,12 +3585,13 @@ static int btintel_try_load_unlocker(struct hci_dev *hdev,
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 				 struct intel_version_tlv *ver)
+ {
+-	u32 boot_param;
+-	char ddcname[64];
+-	int err;
+-	struct intel_version_tlv new_ver;
+ 	struct btintel_data *data = hci_get_priv(hdev);
+ 	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++	struct intel_version_tlv new_ver;
++	bool backup = false;
++	char ddcname[64];
++	u32 boot_param;
++	int err, i;
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+@@ -3562,9 +3605,15 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	 * same hdev instance if there is any error on firmware download.
+ 	 * Need to clear stale bits of previous firmware download attempt.
+ 	 */
+-	for (int i = 0; i < __INTEL_NUM_FLAGS; i++)
++	if (btintel_test_flag(hdev, INTEL_TOP_RESET))
++		backup = true;
++
++	for (i = 0; i < __INTEL_NUM_FLAGS; i++)
+ 		btintel_clear_flag(hdev, i);
+ 
++	if (backup)
++		btintel_set_flag(hdev, INTEL_TOP_RESET);
++
+ 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+ 
+ 	data->unlocker = false;
+@@ -3597,8 +3646,15 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 		return err;
+ 
+ 	/* check if controller is already having an operational firmware */
+-	if (ver->img_type == BTINTEL_IMG_OP)
++	if (ver->img_type == BTINTEL_IMG_OP) {
++		/* A pending TOP reset must still be dispatched by the
++		 * caller even though there is no bootloader stage to run
++		 * through btintel_boot() in this case.
++		 */
++		if (btintel_top_reset_pending(hdev))
++			return -ECANCELED;
+ 		goto finish;
++	}
+ 
+ 	err = btintel_boot(hdev, boot_param);
+ 	if (err)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 9526acf65959..97fbe0ddf2d3 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -257,6 +257,7 @@ enum {
+ 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 	INTEL_ACPI_RESET_ACTIVE,
+ 	INTEL_WAIT_FOR_D0,
++	INTEL_TOP_RESET,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+@@ -265,6 +266,7 @@ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+ 	int (*acpi_reset_method)(struct hci_dev *hdev);
+ 	u32 cnvi_bt;
++	u32 boot_addr;
+ 	bool	unlocker;
+ };
+ 
 -- 
-Yang Li <yang.li@amlogic.com>
-
+2.43.0
 
