@@ -1,112 +1,165 @@
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C836E483BE1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 07:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230534A0F11
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 08:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791963519; cv=none; b=S1RZ/4amsNk6lMNHOX+gYyAi6Tn+iWvhF0UMZt6nh3oeocwdRWxVXQ3Lr1BZM55Qmx/Dkt6ANp9SFjwqwR6j94sGvBR6dNE6U6pGBAuAZtatwzT6bNK0Xoc6Fxo7fUOxdRzuq2proqmQ8t3/pj+oz86OqxPAUtln1rFMt7nJ2fg=
+	t=1791966920; cv=none; b=R34TC/Bs4WOU0XNTO3JZFzir8Mgys9R1Bam0Fzm/Cy9e0iEkfPunZyC0abvzc8eAloaAGWfVaL2841npqLC9ySspwZR28k0xc4wIEW3wKhtqpdhboe9Bk/iqLvhaOjvBfEf2CVBlLjRjgW6cbkar62BnAirDI8nIU2rC11F4h88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791963519; c=relaxed/simple;
-	bh=/IqhumwQkG2JliXPJzV9aSqkxoBUbJmFAYhAvkTFuAo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SGU6xz1dDnGHvWnX38L2BgRDerO5m1f6UmFuf++mhOIByjtjAt88sMQ7TBAA6Mu4uDSgxeIouNOIjaH66RMLb0SVdcGbEciI7k81Y0pOKgkrK26CwnyEYmqqdNO4EP/d4OZLaP6sHPE9yWVqu5rzNVUJv/T3wjNSYiYyHCzRUVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wm/Din0Y; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791966920; c=relaxed/simple;
+	bh=WF9mzXoojrS4n1l+4hsQgtqR2gazkpzBM5BX0qZTFr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=THwyxziQ1c9b3GtxDMaLUyMjhGdo8GWedK5YpxwFZLSTqBEk1tsa+M/Kt7EcqMBeFBneoEE1n7UGEDVqzuI08+5uclD6CgsvnWbgXx9/3urYKUzOYSUY9s97emV01/OhSJ1YVapBLpZ55IwDapj/ro5kQ5aVRNcRFShQNX98bkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VtcfNyyT; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wm/Din0Y"
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-35834f72d94so6884623eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 00:38:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791963516; x=1792568316; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=1TmMB/z+OsWAEnkslvUxL4l9idMuZ3dWZ0GBjrf6yLI=;
-        b=Wm/Din0YuKy0zcsow6RQCiz/wlNffXHH5qY0Hl/0zR9JvR7RTdwisZJtgPYA8uniJX
-         CkooGzoS0RKKdx6ZhWcd5xN4kwT5XMGyrPQcjrwKYy+aOyvUsXaNI6DIB4SgHneHTNLH
-         vLfME2Qi5bqy50a3eJ2x3xDhhux2vwgFRjd2OdXUJ3g4Cm3mfP/kDQHxxAmNz7DBgRAG
-         NP3imWw0Mwi3l0g++agG3DWjQtyLchQ/lfSjlipM8zYwcXKqr5Kimg8B2YPipadLF27x
-         l0ClT6Toh1qcR9LNor6GxmeGpp/sXFSvJ6mEDh6Xvvz54hnYKI/n66mcnYW9hEduFjo0
-         Lh7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791963516; x=1792568316;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=1TmMB/z+OsWAEnkslvUxL4l9idMuZ3dWZ0GBjrf6yLI=;
-        b=0eSdOfIquWhUKz2JDcMZ6Gx7pFOnmpqpCo9Hi+iVi2jNqhSSb9eYYQOWjVnwrMLLTd
-         iXqvs4pI/ONJvZ46f0XTMfwSiXimNeeFBb6ZA8qrts2VlZNN/pgpx1aJvALyAUflStGk
-         ilZwWOJqkq9Vpm+vpkxt0jPis08Ecu2MCJIO1inzri7blAMJzZ15gezmbPTQANuaIS3T
-         os/lKKmVY6ZA66xLCOLE9vbLpFVNPX7vvXCnejHl+QL3N6QLCsYDGw5/1g/3S/+vdsSB
-         0O7+NZidqvKIITkWWU3Cp9KWe9mx4/Drr2EIsH1aXjwjBQqXlE1kLj8SEZ9USUvrSO5e
-         kDog==
-X-Gm-Message-State: AFq9FYKFHEbBReZx9OQR0T/ycQ1Qq3rbqZzopWQp6bJDcCko6ZUfEe6E
-	LlTV/E9rRABaa3txO+gZmgw5nxDSFX5ICpnV4zSzNAQBtX+9mjjGrqW7315Kxg==
-X-Gm-Gg: AYBFou2F/r1nSFEb+tb06T5KToXMQw4pOqJCYzTys1m+yE2nWtXaqvpf4oqzgRTVcUb
-	YitRyTjYE9lkwNkByQ0IZQ1BZ5HFoxuq6Phx1IaTbxGH82dPMu29hJ45JDZW9cmUXIL/Acbs6xz
-	t1L9AsuHM+5u44wEnZrMS7ThfIj6o+TqE/9zrc4sXn0mLOcClJMdwZI3u2d0PjA/9OoXawpFfZL
-	lKfXj0N/gU7Hwtxb1EWKfUafeYBhNrnU/W45zrlcoNPRlYVZ3r4X2SAnGnf+SDz2bEtNCPLjuhR
-	GJn77vKWShCuXwSvKr6ucr7TXyFcja6Aud1GKG4Jme+DfD9FTh6cWz8DgYKVZnt31ywVHvnY/sV
-	c4XWofGe6Hp24Wzm2EAz5iKHs3gk1Zu9X3AEtPDo4B/u8W6dTcUwx/2gCNyCZy6HRIhiJd8juoW
-	ac9l8Ilb3LIB8QiD1fqfJdme6NPgbUFdYWUgtVDLKKibUiWWgATOC5i52yfYpOmTJGv+PAW2rof
-	Dmr
-X-Received: by 2002:a05:693c:2a0e:b0:34e:9923:e372 with SMTP id 5a478bee46e88-3537dff9325mr21143186eec.29.1791963515628;
-        Wed, 14 Oct 2026 00:38:35 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.36.117])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3537c841648sm56776836eec.3.2026.10.14.00.38.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 00:38:35 -0700 (PDT)
-Message-ID: <6acf317b.a5690e37.2bee02.bcb8@mx.google.com>
-Date: Wed, 14 Oct 2026 00:38:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8688872683866733248=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VtcfNyyT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1791966918; x=1823502918;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WF9mzXoojrS4n1l+4hsQgtqR2gazkpzBM5BX0qZTFr8=;
+  b=VtcfNyyTTfR7lOKmWurA1FBvJztBjqz4rJuLevsp6B3QnEB9CiyS/RIW
+   H7SuS8hyOUiLjevSWvzd4+4QTYmyZE0tw4ICuxytdI70jvnFvK1KgnEIe
+   LD3jjIwjj2fDuGqxJEq4oq3I5b2Q9hBt5TW7AuNg++u1DjFme+Z/It/AI
+   GCRvUuOiYjj5ObcK+dGVApbhdEc0qfL00Nl7BoD/Gi8bsDNl1jPsMJukj
+   QGig2e/T0kN2jPQEPNnAZl5U4BlAdhnC/RWLaFP0EvGTpe+GJbJQUTyF2
+   WLYEd8pQvyRwad3fr/tH2/WtKUOOxyjcSWLdbhJ5QyntDYgQGxeakQi8j
+   w==;
+X-CSE-ConnectionGUID: iSkqFLgZRoK5iAWlCa+39g==
+X-CSE-MsgGUID: HLeJsdiDQyyrct6PFJ6nIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11934"; a="593393"
+X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
+   d="scan'208";a="593393"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2026 01:35:17 -0700
+X-CSE-ConnectionGUID: 8ZhDvie6R0y7LSFYL4lOHQ==
+X-CSE-MsgGUID: f9MwVsvmTLSJhvJMr1Fwig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,157,1787036400"; 
+   d="scan'208";a="1704415"
+Received: from weba0534.iind.intel.com ([10.66.226.131])
+  by fmviesa008.fm.intel.com with ESMTP; 14 Oct 2026 01:35:16 -0700
+From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: kiran.k@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Subject: [PATCH v4 0/2] Bluetooth: add hardware rfkill handling
+Date: Wed, 14 Oct 2026 13:56:48 +0530
+Message-ID: <20261014082650.1270679-1-aluvala.sai.teja@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [RFC] mgmt-tester: Add host-resolved RPA scan checks
-In-Reply-To: <20261014052008.413209-1-cochcoder@proton.me>
-References: <20261014052008.413209-1-cochcoder@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8688872683866733248==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series adds hardware rfkill handling for the Intel PCIe transport
+and the Bluetooth-side notification path.
 
-This is automated email and please do not reply to this email!
+The resulting flow is:
 
-Dear submitter,
+  transport hardware event
+    -> hci_rfkill_set_hw_state()
+    -> rfkill hardware state
+    -> hdev->rfkill_block work
+    -> HCI_RFKILLED state and device power handling
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1185254/
+For Intel PCIe controllers, the series adds GP2 and HW_RFKILL MSI-X
+handling, IPC_CONTROL doorbell synchronization, delayed state checking,
+reset/shutdown/remove/suspend lifecycle handling, and notification of
+the generic HCI rfkill layer.
 
----Test result---
+Patches:
 
-Test Summary:
-CheckPatch                    PASS      0.40 seconds
-GitLint                       PASS      0.23 seconds
-BuildEll                      PASS      17.37 seconds
-BluezMake                     PASS      259.90 seconds
-CheckSmatch                   PASS      245.53 seconds
-bluezmakeextell               PASS      88.14 seconds
-TestFunctional                PASS      1025.63 seconds
-IncrementalBuild              PASS      266.77 seconds
-ScanBuild                     PASS      992.30 seconds
+  1. Bluetooth: Add HCI interface for HW rfkill events
+  2. Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
 
+Changes since v3:
 
+Sashiko's automated review of v3 is available at:
+  https://sashiko.dev/#/patchset/20261014061947.1238279-1-aluvala.sai.teja%40intel.com
 
-https://github.com/bluez/bluez/pull/2676
+Of the concerns raised, one was a genuine bug and is fixed in v4:
 
----
-Regards,
-Linux Bluetooth
+  - A masked HW_RFKILL MSI-X cause still latches, so an unrelated
+    interrupt during remove could requeue the HW rfkill worker after
+    it was canceled, leading to a use-after-free. The handler now only
+    queues the worker while HW_RFKILL is unmasked, and remove and the
+    probe failure path disable the worker instead of canceling it.
 
+The remaining concerns were reviewed; no further changes were made.
 
---===============8688872683866733248==--
+Changes since v2:
+
+Sashiko's automated review of v2 is available at:
+  https://sashiko.dev/#/patchset/cover.1790905146.git.aluvala.sai.teja%40intel.com
+
+The following genuine concerns it raised against this series have been
+addressed:
+
+  - hci_rfkill_set_hw_state() could race with hci_unregister_dev() and
+    let hdev->rfkill_block run after hdev->rfkill was destroyed; the
+    work is now scheduled while still holding hdev->unregister_lock.
+  - The asynchronous hardware rfkill work item and the rfkill core's
+    synchronous set_block callback could race on HCI_RFKILLED and
+    controller power state; both paths are now serialized with a new
+    hdev->rfkill_lock.
+  - The HW rfkill worker could dereference data->hdev before probe had
+    published it; an early NULL check was added.
+  - The worker and HW_RFKILL MSI-X cause could still run or fire during
+    shutdown, reset, probe failure, remove, and suspend, racing with
+    those lifecycle paths; the cause is now masked and the worker
+    drained before each of them, and unmasked again after setup/resume.
+  - A hardware rfkill release during suspend was not reported after
+    resume because the initial state check unconditionally suppressed
+    the first "off" result; it is now only suppressed when rfkill was
+    not previously asserted.
+  - GP2 completion could be falsely triggered by a stale interrupt
+    that happened to match the current register state; the firmware
+    acknowledgment is now checked against the specific requested
+    transition.
+
+Not reported by Sashiko, but found during this review and also fixed:
+
+  - hci_rfkill_set_hw_state() now flushes hdev->rfkill_block before
+    returning, closing a race where a userspace power-on could see a
+    stale HCI_RFKILLED flag.
+  - btintel_pcie_shutdown() keeps HW_RFKILL monitoring enabled when
+    shutdown is itself caused by an active assertion, so a later
+    de-assertion can still be detected.
+
+The rfkill registration-failure path was also reviewed and confirmed
+safe (hdev->rfkill is only published after hci_register_dev()
+succeeds).
+
+Pre-existing issues flagged by Sashiko that are unrelated to this
+series (a workqueue leak on an existing probe failure path, and an
+existing hci_unregister_dev() resource-ordering concern) were left
+unchanged, as requested.
+
+v2 also dropped the Bluetooth-specific debugfs test hook, the redundant
+hdev->rfkill pointer-clear patch, and the separate RFKILL-core helper
+dependency that were present in v1.
+
+The series has been prepared against bluetooth-next/master.
+
+Sai Teja Aluvala (2):
+  Bluetooth: Add HCI interface for HW rfkill events
+  Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
+
+ drivers/bluetooth/btintel_pcie.c | 202 +++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel_pcie.h |  30 +++++
+ include/net/bluetooth/hci_core.h |   4 +
+ net/bluetooth/hci_core.c         |  51 +++++++-
+ 4 files changed, 277 insertions(+), 10 deletions(-)
+
+-- 
+2.53.0
+
