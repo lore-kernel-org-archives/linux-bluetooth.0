@@ -1,226 +1,201 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8667F5111A7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 13:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E0C4DDB5D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 13:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791982998; cv=none; b=kxoXdnrCaXGroG0RG2V7kXOrEAI94eCSHttMAZKPgNvNYwXfO4xC0gAOo+TWA7en6oboc6oJxPuh8eBdFfrUPBodQKXV7MvPk5fMzrwKA3jst7R4rI5R8kp9sFES/SSUxmov3x1XvTZajxozZs9tQNPSksFJao8UxoUkuiZ1PnM=
+	t=1791983127; cv=none; b=RVVBv4C8yjkwOxtGG3KXxFpWQS2wmmck9GbgvuaZa97O4mbl4MpNk6m2dfqexmvn+qkHIHK6ttFcmiF+NF0UpvZ1yaDTStUpGxJhC6ZBp6AlvORG8Ur7/vpqmWBEjonVt4V2Ar/RodhtkKDr7GxB0RxMXuE3dppBzJl+GKioGlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791982998; c=relaxed/simple;
-	bh=E2C7ZTkYR9vN+vdiOw63P9ddewcVLDCC1y4LsZe6sNQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dfrIO1ldElPHaKwMEiTPdANUgFIPK4MOAlcLjv78ZbzhsNYATnJXNY3ytnWh3CEu1dtxzcwzXdsD+6nHlmv9GVNQoHqmx3QmVkF/JVYdrbPTvZDs8MD9Y230cIQaVwnsnzjbjfBfcK5eVH9jGCzZ5ZQSSFT4o80QmdOlz71mAkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RvMXjsif; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AQm1PBUl; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1791983127; c=relaxed/simple;
+	bh=brlJu40iEjxawLQ6+g97MEPWypNKonyh9EefVwMm348=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sA3CN9iT84MvgJSmAgs09xe7YKgTyPg7g155GNUhh7KClm0r2aZEeBxmeAEuR4lKlBjdi7pHNWRVHYdII5QAJnVRAKl73oZE17XJ4okEzQZ6SAK6oKjDhh0fmZkJ8hs0YEoIiwvLJuXwuiURvV/6eL/OBVCZJrCDmGblI/sMDk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d6AzjYp2; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RvMXjsif";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AQm1PBUl"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69E8iA093000934
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 13:03:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	RuVrYLINDl9vlbsbDPOgWI7Zdrcg/n64E24A5ZiJTBg=; b=RvMXjsifKlNt1rII
-	fO55X/g4p41W+W1KVzo87l1zL49WmC9d2lyhkP+VeqNWak5khUcmbcS/qlN/l8Ky
-	9rXz4vydkRJpeueZ3Sg6ulC3slMgtQsPCOAnDw3fhpdvOwEWE0dEM8Jl7CdChTsb
-	Q3AOSLmdngmrliLne8DPzQo7tQ9ZYLO4KXt+1mc5lgQ/qNlGdN2raFKf5fnz7kc6
-	VO/N3idg2CaGXT4FRxoB9YjM490GVx39VKuNKW8UI5rnASxSBjxrCxvsPg9MLKmN
-	lm7BiqXBvF3B6CcnOYYJWDOqtSXGculT6o3uixXE2B21MQJAQ+Hv/1VRy2Z7eOrG
-	yqnPog==
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com [209.85.221.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4h9sbev1vm-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 13:03:12 +0000 (GMT)
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-5e5a0ad2e81so4947675e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 06:03:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6AzjYp2"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5bce4e278baso1015959e87.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Oct 2026 06:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1791982991; x=1792587791; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=RuVrYLINDl9vlbsbDPOgWI7Zdrcg/n64E24A5ZiJTBg=;
-        b=AQm1PBUlG+4xeWeVVHwPvt38OXh7FvF5MCnjHnDDi0HT3R7UN74H31sVPZpyLksI55
-         yNT6pU522/f06iPhfsGxuVRNyU64aaOhPACeBR8pCw+E8tA63J88HT14yoDepIf7GcKf
-         9ez/Md9A2PPUgGhPgvLG21J0reRDVXXyughpC+N4tNM9xcdaePkKKFYsDQVsfKnCG8xx
-         RDcGQYnrTHOWVo/9Ec4HZgAojg7XJaTHmApeRJFpr1hpm0pRWGjv0pbO7uDnSvxKqet8
-         wKgg+zC3RMtYj+x+5c09tEUO/OsqCa5BGUkqhj1NrQGUmbnNnripwDUGPcsFdrfJbOi9
-         Eoyg==
+        d=gmail.com; s=20251104; t=1791983124; x=1792587924; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YK2/pjkkyflpNJ7QeYJrepnpMuIMjBVd9BqxAZIcz2g=;
+        b=d6AzjYp2z0fI98OT1x5XLpZP6YBzcTEk4mzbs/yxi/dwo1MCrriEz2jTmObyY4EBq4
+         v6l6/e/bk1dT01/mzES6rXEznLogjLoXA/JLY0VMRqyvLxdWWb4hWvZ+N2J6hUfRhsO4
+         dNnyA3+6VsHDNbfnNhs/eZwfmRS6gPC5a4KziYSodARlCu3HA4U7yT42o7I4p2Z17Hff
+         iCeLeTuWyFnak54MNMmmj+fCFvg4imrn3Wa8x0I3roVzVRg8+Nlz1CFH5Hi3fV6IIScw
+         XX2BorOb+O3RPFrBJ16j3mtL+mkUapTHtZKmQCd/T8FbYiRUFp/4qUkTd6d88KlGAImS
+         G8eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791982991; x=1792587791;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=RuVrYLINDl9vlbsbDPOgWI7Zdrcg/n64E24A5ZiJTBg=;
-        b=zsx3BdouWHuPF9iMuDyNGlq5+7rm8SOViFzrmMzSpvyTT+PG/7PFMtdUsuVlIw6QjZ
-         xGtsNg2PTzuwSu5iVGqIUFtez5URfIZRZxcOAjiqPe5ol9Qp4v3kUdB/QaggpDSGQWts
-         gCjcTjAmOGglqjAGKWUw/SGrJXIKXoCfBGw7hx9eaMseN8KeZ+CfbLdeC5VZZNXSQV37
-         uulTpyCrhM4h4YTjTt0/KhG0J5suboKnL+KQTUJGYQGYZ3km7m0Gw/MQ3AQcmA+JuN8N
-         3siJVJdgHJ+kv09wv8DNZTOTH0J9Zy71137sT+R1OHEcSXUF5wp1lcxW0K0JQlbqcgnx
-         b4nw==
-X-Forwarded-Encrypted: i=1; AKwUvBx912a5Ihoz7sbyN5gLCP4MVFAYGb33A7ai1Y0RWlsKNmIIFwTX8mUqVI0xFDM9vycS9F4tVxfGNHMGoEjkoUs=@vger.kernel.org
-X-Gm-Message-State: AFq9FYK3e+cJKhqs2KQODigYf/PO+jPAUxze/+O1xu7BgL0d6mkq/ZlF
-	KWgijb05Ttc7Pb+vYlBrhjpfqPhU/WqTuAzhdgravAKo9A8Xpt8skCojJWqX1REnlAmUKfviZWY
-	ejaz+p8UhnOBuo5uUX0UeUlRs81qnzJ9gq8cerAtmX2iGvqin/3TZwW3em165/dkqb9WoqOA=
-X-Gm-Gg: AYBFou0t6wvqOdIuASE7tl1Pt5G7zAv+Jny6J+/dd/+Bry8mpaFeHcR16MExK3RgCYe
-	lgknWUFTmUJp7vw9ivQ6Dfbn8SyhJY2GbCqbHnfrT+Y4eKEy3/zbeq52LqsKRACgsLB+PNFmQQ4
-	UUsRUv4M5UvoardlDCSweIdkcmUWHs00+Rbw2+uMQ8wyYuqx2sjL+/bjoUl0Ur6mXS3XA2ZUXPo
-	k3yESc54GX9rMko2e7QmdWtUnMwqSJ+NHhYLu1W7gHeEG7BIPo5edSonqhwfNkbxgASgUPY7Sk6
-	oAtRaiFjNeGWO5CJ7Qvwr9SBbaW3A98IozQX2rHFogwPSr8RoTD/oKCi+c5Oa0fbpLpRqW/Z+t8
-	w1gvwJQkOjA==
-X-Received: by 2002:a05:6122:2194:b0:5e2:dce7:2d35 with SMTP id 71dfb90a1353d-5e91f44e9c6mr5335591e0c.9.1791982991219;
-        Wed, 14 Oct 2026 06:03:11 -0700 (PDT)
-X-Received: by 2002:a05:6122:2194:b0:5e2:dce7:2d35 with SMTP id 71dfb90a1353d-5e91f44e9c6mr5335558e0c.9.1791982990526;
-        Wed, 14 Oct 2026 06:03:10 -0700 (PDT)
-Received: from [127.0.1.1] ([86.121.170.215])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bcece106sm567795e9.9.2026.10.14.06.03.08
+        d=1e100.net; s=20260707; t=1791983124; x=1792587924;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=YK2/pjkkyflpNJ7QeYJrepnpMuIMjBVd9BqxAZIcz2g=;
+        b=tycH2H/sVERnqnjBEdYDIFWDhDSf5wiFtWa8tdJ+xvq1HYiOMF/C8Qxk8UxGdncl0v
+         IhCZ+qfZ7Ge9JZOQEKh9yZg2cnzyAooc8cT7EevA4AVWNjbOO1PPQazCCmsEfQe+gnS/
+         N8j6XRXX5qtFbrQ1R88GljCdHotzoMBz9MdUBsaOaEsvNR53QTwx96Uth/6v0qQqI2YU
+         C27PmUzB/rrbJYmDrgpHARRS2Yze2vldeF3Glfjs+U/oHFJ+mwm0QrsaN4V4/tJSRan0
+         pzYrb9DzbSxmWD5kpAXtgLM6ZmdA0a7CYY6uaMSzXGeOVk0YQJDtzm9s00EjproWz2KQ
+         vL8A==
+X-Gm-Message-State: AFq9FYLpeFnlHBBETIF9p1R7EidsPv6F8oFxEPsJCGBroHWLUk7XP7dx
+	ZRzgGiXS7KbNx3tfB9zjaeDP4hpPdxQUAyfg9Zcsdacd4jXUvbfh3bLd
+X-Gm-Gg: AYBFou3Q0xVaVV5pRICO0tTRAN3++DOHQ3rD4YVyVXf/eRy54ertQvqFPOXnD5NIDHP
+	Nexne/IOWc10x49xCJAlj1fWsAxw9VohljTsSllsZ+DuJJGNe5js3MxS9xh3fDIE+QYpL9/36W3
+	3DrR3FpHn16M+ELO1vjOqoYrm7qS9N/YQqP66IM6OdUzByVmIm5F0xSbRuDB9mGicnt1d2opnQ6
+	8CrVlH8+v6YKrsNcMn+sA2Dn5bbhPONotdqW7dDfk26HxtGvQi6VLMCizJnfHUp3kupcmuyLYiT
+	iDVfOhcItZqBBPPJ3mvyU0+/BMsqVq0IuSdqCN9UuY7qgqu6YBN6fGQ8RFZoN33GOlc7y2cJzuf
+	ow6rNyyFmBvapckS2bXW4+l0i6u9r6/8QbATC7t7bDk70WXeVY53bjkvgxo764oJh63keXnfclT
+	atJpvWPYbbwNGvo3fedVJc0RxrOjjhR+6uGvpvk29n8YPI6ZxnszV6JN++Q/aGMkBc+jm5PSX6Y
+	Eb4u4C1aV0JuP1Q+M6cBd2qR9Q5RfKXaue+3DjismZGm/JdQX39vHq8gy/khRhtVweIDPXBNp+f
+	gg==
+X-Received: by 2002:a05:6512:3ba3:b0:5b8:b392:b40f with SMTP id 2adb3069b0e04-5bce00aee05mr4886849e87.5.1791983124146;
+        Wed, 14 Oct 2026 06:05:24 -0700 (PDT)
+Received: from x870steellegend.lan (95-25-166-65.broadband.corbina.ru. [95.25.166.65])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5be33d79c29sm629285e87.32.2026.10.14.06.05.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 06:03:09 -0700 (PDT)
-From: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Date: Wed, 14 Oct 2026 16:02:43 +0300
-Subject: [PATCH RFC 5/5] arm64: dts: qcom: glymur-crd: Source MAC addresses
- from a UEFI variable
+        Wed, 14 Oct 2026 06:05:23 -0700 (PDT)
+From: Igor Putko <igorpetindev@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+f20755f37da70df33a16@syzkaller.appspotmail.com,
+	Igor Putko <igorpetindev@gmail.com>
+Subject: [PATCH] Bluetooth: mgmt: Fix UAF in mesh_send_sync caused by race in mesh queue
+Date: Wed, 14 Oct 2026 19:05:04 +0300
+Message-ID: <20261014160504.42527-1-igorpetindev@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261014-b4-nvmem-efivar-v1-5-187c85f65018@oss.qualcomm.com>
-References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com>
-In-Reply-To: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com>
-To: Srinivas Kandagatla <srini@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Abel Vesa <abelvesa@kernel.org>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-        Abel Vesa <abel.vesa@oss.qualcomm.com>
-X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2060;
- i=abel.vesa@oss.qualcomm.com; h=from:subject:message-id;
- bh=E2C7ZTkYR9vN+vdiOw63P9ddewcVLDCC1y4LsZe6sNQ=;
- b=owEBbQKS/ZANAwAKARtfRMkAlRVWAcsmYgBqz319fp6TR+yR8jNw966xWlfX4ZKxxMxwQAtGC
- Y5X7z2YpXqJAjMEAAEKAB0WIQRO8+4RTnqPKsqn0bgbX0TJAJUVVgUCas99fQAKCRAbX0TJAJUV
- VobVD/9FR+oK6sjkKteWETGAXlgN3C8denxNZe0WyouXGAVyEW12pOEEF8fr0C2OgAREtKa8eWx
- CZb4fsGAvK8yJg3KZOKUfK5uk5m3ZMHS3HPIWJbYxJngQ1lCafkynQLa4H4o4FJwKhgr+ekSXda
- JF1SVnurtaW6JZ/ykrvQlE/NoktVV5grv3NIB8oS7qY6+ZaKslQWvS4t2urpFaIm4g7vB6bFCSB
- TmqO49Bu1lO+3aeGr9yzXDd2h2XwyLZg8ONQxt44WLSyR4XOx4TiERP901FshmhB8bnbyb8sImX
- ZgtkhQX1BmRyWve2OxnpimwSGJ9s4jDpa0YrLttVmpZadBf2FjEVGxGOyTJh5WcIkqmnmuie2me
- SJYwOTtAlSMM9uzP7yyeUKy7r4w4DsWBAxfjLPnhW+D0IAO2Gbkl5u9JBNgV6hGaTqRZXj7eSbT
- PPFg6alEbLkyqaXPSZTdCdqt4NQAFDmaktq7G6XOgfC51m4bkoZWQGT58xvxtpY2KLFvcBU4j1L
- hTyjsZqvlcFaH60ghHVuTjnLfSfOttEqAuPKd6FwxWngzOuoQN8icHerDTx7m+4zWk6ycrbU8dG
- b73v7BApj+nminpuLcxv9fGjYYgjQsEGZ+yJaT0vE/xlwuyfdUWYilXyMp/42KgLvBLZKiJ5VxO
- tYlAxVFim181Kuw==
-X-Developer-Key: i=abel.vesa@oss.qualcomm.com; a=openpgp;
- fpr=6AFF162D57F4223A8770EF5AF7BF214136F41FAE
-X-Proofpoint-ORIG-GUID: Wb6S901if7mMEPje_FltQYHA56DJB_kZ
-X-Proofpoint-GUID: Wb6S901if7mMEPje_FltQYHA56DJB_kZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE0MDA1MSBTYWx0ZWRfX0qmv4amymTve
- VqvF+SgfWVmiqvCQR/NCHVpS6RZ8Fwf4aZb5nT4tkM/HEpql0Giz6HV1h5xR67dX3/7p68c8nQy
- xHp24r6lYKpRESDnVAj7dpI73BEmSNBxf7ckDbvPlvJdqmNCTUK7hsTnTIzHDikw0HPwYuceMcU
- 0SJT+OAV3ED75ZKrxNATJ0Hwnuo3G/gH4d72emc9GqgkOpZ+3gOYttR96Kkch3QyUSwtTGJuNPX
- RVCWBzxzJOSIGOYS61LGzWVfnveAnYrdvAPsZs+hcU0QTLGyIBDwALCYFDVn7AiuBWwYUDb+phS
- vjEHAdNCgaIm1tiRTICKRcByVWcgY5xTkZ2F/orzazidMngzqIi2aJSD3ub7GD0SHYxWmcNhp+y
- i+EJDr8OhzMPpjT2FVfqpot+cNN8E0pBJMYprXvf+TJx4SSwrejxdUNm/VUGMLtmF8Cd8xtlJ5F
- 61pXQx7LAt1FI1buxQw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE0MDA1MSBTYWx0ZWRfX79os5mJKyaLS
- z0ooD3t4xrpT05dhyDFazkPDIL5s+XNkMB7335nWygeq932nBjqE+xDhyax8CzXzy+y7R5QnPOI
- e2Mo5e04Yo2IG6MKB+MVPzaeNJDWLaA=
-X-Authority-Analysis: v=2.4 cv=U7AHnuru c=1 sm=1 tr=0 ts=6acf7d90 cx=c_pps
- a=+D9SDfe9YZWTjADjLiQY5g==:117 a=Rt3kCFFBWhWisHNmluDamg==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=EUspDBNiAAAA:8 a=SUfgz0WXR8OkDwgVpNIA:9 a=QEXdDO2ut3YA:10
- a=vmgOmaN-Xu0dpDh8OwbV:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-13_01,2026-10-09_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- adultscore=0 impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
- definitions=main-2610140051
+Content-Transfer-Encoding: 8bit
 
-Add an nvmem-efivar provider exposing the "MacAddresses" UEFI variable,
-carrying the Bluetooth BD_ADDR (bytes 0-5) and the WLAN MAC address
-(bytes 6-11), both MSB first. The variable is looked up by name, so no
-vendor GUID needs to be hardcoded.
+A race condition between mesh_send() and mesh_next() can lead to the
+same struct mgmt_mesh_tx object being queued twice into the cmd_sync
+work list.
 
-Wire the bd-address cell to the Bluetooth controller and the mac-address
-cell to the WLAN endpoint (pci17cb,1107) via the standard nvmem-cells
-binding. Until the variable is provisioned the cells read as zeroes and
-the controllers keep using their default addresses.
+Specifically, mesh_send_done_sync() and mesh_send_start_complete() clear
+the HCI_MESH_SENDING flag before mesh_next() is executed or without
+holding hci_dev_lock. If a concurrent mesh_send() arrives during this
+window, it observes HCI_MESH_SENDING as cleared, adds the new mesh_tx
+to hdev->mesh_pending, and queues it via hci_cmd_sync_queue().
+Immediately thereafter, mesh_next() executes without holding
+hci_dev_lock, inspects hdev->mesh_pending with mgmt_mesh_next(), and
+queues the very same mesh_tx a second time.
 
-Assisted-by: LLM
-Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+When the first queued entry finishes, its completion callback invokes
+mesh_send_complete(), which frees the mesh_tx structure. When the worker
+subsequently picks up the duplicate second entry, mesh_send_sync()
+attempts to access fields in the already freed mesh_tx, triggering a
+KASAN slab-use-after-free read.
+
+Fix this by:
+1. Synchronizing mesh_next() under hci_dev_lock and checking if
+   HCI_MESH_SENDING is already set before queueing.
+2. Holding hci_dev_lock when modifying HCI_MESH_SENDING and completing
+   mesh transactions in mesh_send_done_sync() and
+   mesh_send_start_complete().
+3. Unconditionally removing mesh_tx if hci_cmd_sync_queue() fails in
+   mesh_send().
+
+Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+Reported-by: syzbot+f20755f37da70df33a16@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?id=d2762f31ce58dfcb900c2db500bf361f165c07bc
+Signed-off-by: Igor Putko <igorpetindev@gmail.com>
 ---
- arch/arm64/boot/dts/qcom/glymur-crd.dtsi | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ net/bluetooth/mgmt.c | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/glymur-crd.dtsi b/arch/arm64/boot/dts/qcom/glymur-crd.dtsi
-index 58158b51fe29..2dd09ab1d550 100644
---- a/arch/arm64/boot/dts/qcom/glymur-crd.dtsi
-+++ b/arch/arm64/boot/dts/qcom/glymur-crd.dtsi
-@@ -31,6 +31,22 @@ chosen {
- 		stdout-path = "serial0:115200n8";
- 	};
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 251a896babd5..0dda38af00ec 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1094,13 +1094,15 @@ static int mesh_send_done_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_mesh_tx *mesh_tx;
  
-+	/* BD_ADDR and WLAN MAC from the "MacAddresses" UEFI variable. */
-+	efivar_macs: nvmem-efivar {
-+		compatible = "nvmem-efivar";
-+		efivar-name = "MacAddresses";
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+
-+		bt_bdaddr: bd-address@0 {
-+			reg = <0x0 0x6>;
-+		};
-+
-+		net_mac: mac-address@6 {
-+			reg = <0x6 0x6>;
-+		};
-+	};
-+
- 	clocks {
- 		xo_board: xo-board {
- 			compatible = "fixed-clock";
-@@ -776,6 +792,9 @@ wifi@0 {
- 		compatible = "pci17cb,1107";
- 		reg = <0x10000 0x0 0x0 0x0 0x0>;
+-	hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
+ 	if (list_empty(&hdev->adv_instances))
+ 		hci_disable_advertising_sync(hdev);
+-	mesh_tx = mgmt_mesh_next(hdev, NULL);
  
-+		nvmem-cells = <&net_mac>;
-+		nvmem-cell-names = "mac-address";
-+
- 		vddaon-supply = <&vreg_pmu_aon_0p59>;
- 		vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
- 		vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
-@@ -1163,6 +1182,9 @@ bluetooth {
- 		compatible = "qcom,wcn7850-bt";
- 		max-speed = <3200000>;
++	hci_dev_lock(hdev);
++	mesh_tx = mgmt_mesh_next(hdev, NULL);
+ 	if (mesh_tx)
+ 		mesh_send_complete(hdev, mesh_tx, false);
++	hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
++	hci_dev_unlock(hdev);
  
-+		nvmem-cells = <&bt_bdaddr>;
-+		nvmem-cell-names = "bd-address";
+ 	return 0;
+ }
+@@ -1109,18 +1111,30 @@ static int mesh_send_sync(struct hci_dev *hdev, void *data);
+ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err);
+ static void mesh_next(struct hci_dev *hdev, void *data, int err)
+ {
+-	struct mgmt_mesh_tx *mesh_tx = mgmt_mesh_next(hdev, NULL);
++	struct mgmt_mesh_tx *mesh_tx;
++	int ret;
+ 
+-	if (!mesh_tx)
++	hci_dev_lock(hdev);
 +
- 		vddaon-supply = <&vreg_pmu_aon_0p59>;
- 		vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
- 		vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
-
++	if (hci_dev_test_flag(hdev, HCI_MESH_SENDING)) {
++		hci_dev_unlock(hdev);
+ 		return;
++	}
+ 
+-	err = hci_cmd_sync_queue(hdev, mesh_send_sync, mesh_tx,
+-				 mesh_send_start_complete);
++	mesh_tx = mgmt_mesh_next(hdev, NULL);
++	if (!mesh_tx) {
++		hci_dev_unlock(hdev);
++		return;
++	}
+ 
+-	if (err < 0)
++	ret = hci_cmd_sync_queue(hdev, mesh_send_sync, mesh_tx,
++				 mesh_send_start_complete);
++	if (ret < 0)
+ 		mesh_send_complete(hdev, mesh_tx, false);
+ 	else
+ 		hci_dev_set_flag(hdev, HCI_MESH_SENDING);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void mesh_send_done(struct work_struct *work)
+@@ -2309,9 +2323,12 @@ static void mesh_send_start_complete(struct hci_dev *hdev, void *data, int err)
+ 	/* Report any errors here, but don't report completion */
+ 
+ 	if (mgmt_err) {
++		hci_dev_lock(hdev);
+ 		hci_dev_clear_flag(hdev, HCI_MESH_SENDING);
+ 		/* Send Complete Error Code for handle */
+ 		mesh_send_complete(hdev, mesh_tx, false);
++		hci_dev_unlock(hdev);
++
+ 		if (err != -ECANCELED)
+ 			mesh_next(hdev, NULL, 0);
+ 		return;
+@@ -2541,10 +2558,8 @@ static int mesh_send(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_MESH_SEND,
+ 				      MGMT_STATUS_FAILED);
+ 
+-		if (mesh_tx) {
+-			if (sending)
+-				mgmt_mesh_remove(mesh_tx);
+-		}
++		if (mesh_tx)
++			mgmt_mesh_remove(mesh_tx);
+ 	} else {
+ 		hci_dev_set_flag(hdev, HCI_MESH_SENDING);
+ 
 -- 
-2.54.0
+2.47.3
 
