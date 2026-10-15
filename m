@@ -1,60 +1,64 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F6E4AB3CC;
-	Thu, 15 Oct 2026 08:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F4D4AB1BD;
+	Thu, 15 Oct 2026 08:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792051301; cv=none; b=FK1yKFZ7IbuF2imBerdZ5W9EIwc6PVkl9aavwvahmMeVZSjfwPR4/GAvoX30RfJE0rLm2Bem13vb9PzY0bWdf4LcWyLmssXi+InSar6zPIl6/rd3iuzwO8kNKJNtqTB4hB0p3LAk9XQ4LAU1pxaWIJ8STJFOnb/l1A+LqXfwiF4=
+	t=1792052102; cv=none; b=LWqxC5fzLMWucPlt7McK1/sa9i6Ko0KNkwYut1El9tSs1gDHhO4qMDpdbgJcJLyoIktnGTs6fi/bNvgSaAuFrmtSjI/Q0Uk2OnppJxQTkB/nUyJLUgd8daoYj7kMPbJoy7zQA6cU8/PGqxRKyDxOb1B07M4AnIHA3tHdIEv83P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792051301; c=relaxed/simple;
-	bh=TMBAise+eet+ZBmb0cxVaSMYfYf4z593ofd0AGvPruk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZsXpXWRdS0J++ebTWNdQ3uGTA43jVr6ryNvW/EbVPvGBis0iF+lFZI/PvoMM9jaG1bgzXIrZ84zEAMfzso4QoP8KRF8g0zB8bWT2Lreja9QgYK3fKvCf1IKLwuLRnua7TNr6jzbXgzhQMaXJf6mXnmgW7ECQqWHHXH/JEGStUeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bYz4gy4y; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1792052102; c=relaxed/simple;
+	bh=MpXQWuU/6pTmzsnH6jc5zSg0pvwduOYIIBJUHdngvXE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=beBkOBO8UayM0WoH1LV0WRb8NZ5/msgPIjwfXwiBEPaumN3YudvLfZc6HaM4zWmC87id6PpUTHR65wpTFa0cEkuTf1WcVlcJ9qn4frQmKblTs0VKVp7vMW0tHKFJ1InrPi9rErk/imrEjYf/TFD1tkIXQdXbHfaRfOmCmUfCFN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=vGIlXLrM; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bYz4gy4y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792051300; x=1823587300;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TMBAise+eet+ZBmb0cxVaSMYfYf4z593ofd0AGvPruk=;
-  b=bYz4gy4y7F4AWvYZANxsl+/9+y+YhUCJTVOkYEgnYZ36anNqD5tU1gbD
-   n3ARJTcvZVrqaRNHpmVbLmWzmYBNcYxq75tP7UVyuBiQLIYvwnWelZgco
-   Em/QyjM2+rO0YnG+4qZ7Ya4qHpfoyh19hECF+QZRmK9Njik7tAsQMDGtU
-   JNPwdf5prv1n1rfXLVwJmTyDEQY+CmOT/gtJMLsOiWakjUi/5wga3+SkQ
-   Y/W+CBFg/bTJjQI2whNKVTaFuaJJbKPr7QUmBLHa5P5tGVNFlwq7QLow2
-   rV9B26YjUBvS4edWZIvPHRlUVNFak4PK9W3x9rFBbDi7QG2YPGuuHjh3y
-   Q==;
-X-CSE-ConnectionGUID: NfiTUb7zSpiUK+1+SqhvFA==
-X-CSE-MsgGUID: Pwhx30+XRgilrpUkdcyBGg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11935"; a="916096"
-X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
-   d="scan'208";a="916096"
-Received: from fmviesa011.fm.intel.com ([10.60.135.151])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2026 01:01:39 -0700
-X-CSE-ConnectionGUID: gCHsrrWORraAVLo4TzRKtA==
-X-CSE-MsgGUID: H7au3/f+Sl65Wny6eb7b/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
-   d="scan'208";a="3465336"
-Received: from unknown (HELO WEBA2062.iind.intel.com) ([10.66.228.2])
-  by fmviesa011.fm.intel.com with ESMTP; 15 Oct 2026 01:01:37 -0700
-From: Ravindra <ravindra@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	stable@vger.kernel.org,
-	chethan.tumkur.narayan@intel.com,
-	Ravindra <ravindra@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: Use blocking reset for FLR
-Date: Thu, 15 Oct 2026 13:34:30 +0530
-Message-ID: <20261015080430.3336201-1-ravindra@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="vGIlXLrM"
+X-UUID: 800862b6c87011f1b1788b6acf885367-20261015
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=rY3D9mNBBjC7e3FDz4IfdKuwe8YGEsVKS9z7QrGZfpE=;
+	b=vGIlXLrMgzDorKLWy0QcccPGA9300yyHsqolaATEzBRZSfQ34NdSD5Ktvn+V0Dfoc+oFtUgx2y64qZkiYbur8Je8MIBasaVM4+5R5D9WX4niA2QePruj67FcWXxXOxgsyK3uhyxmr/J4RcZLzVNv6jBuzJdpryT3/HRAFTbQXiI=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.20,REQID:8e0f1815-c75a-45ba-95b8-5c83e39712c7,IP:0,U
+	RL:0,TC:0,Content:50,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:50
+X-CID-META: VersionHash:291e20b,CLOUDID:186ae3fc-d852-4ec7-93a7-9872a6d9e58d,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:3|15|5
+	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,
+	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 800862b6c87011f1b1788b6acf885367-20261015
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1954058223; Thu, 15 Oct 2026 16:14:53 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 15 Oct 2026 16:14:52 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Thu, 15 Oct 2026 16:14:52 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Hao Qin <hao.qin@mediatek.com>, Wenlong Tian
+	<ot_wenlong.tian@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Will Lee
+	<will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v2 1/3] Bluetooth: btmtk: drop zero-length ISO packets from endpoint padding
+Date: Thu, 15 Oct 2026 16:14:48 +0800
+Message-ID: <20261015081450.1241194-2-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20261015081450.1241194-1-chris.lu@mediatek.com>
+References: <20261015081450.1241194-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,66 +66,61 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Several paths request an FLR asynchronously, including S3/S4 resume,
-resume recovery, HCI reset, and hardware-error recovery. A queued reset
-may run before the PM callback releases the PCI device lock, causing
-pci_try_reset_function() to return -EAGAIN without attempting the FLR.
+The ISO interrupt IN endpoint delivers a fixed-size transfer that holds
+one HCI ISO packet and zero-fills the remainder. That padding belongs to
+the transfer rather than to the stream, so it has to be dropped instead of
+reported to the host.
 
-Use pci_reset_function() so reset work waits for the device lock and
-performs the FLR once the PM callback releases it. If the reset fails,
-clear the recovery in-progress flag so a later reset request can try
-again.
+btmtk_recv_isopkt() keeps parsing it: the zero bytes read as an ISO header
+with handle 0 and a Data_Total_Length of zero, and each one is passed to
+hci_recv_frame() as a complete frame. A single transfer yields a long run
+of them, which is what fills the HCI log with malformed ISO packets, and
+iso_recv() drops the SDU it is reassembling whenever handle 0 belongs to a
+live CIS/BIS.
 
-Fixes: 9c36951474d8 ("Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()")
-Signed-off-by: Ravindra <ravindra@intel.com>
+A zero Data_Total_Length carries no ISO Data Load, so such a packet is
+never part of the stream. The padding runs to the end of the transfer, so
+stop parsing once one is seen.
+
+This was observed on MT7925, but btmtk_recv_isopkt() is shared by every
+MediaTek USB controller that supports ISO data.
+
+Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
+Co-developed-by: Hao Qin <hao.qin@mediatek.com>
+Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+Co-developed-by: Wenlong Tian <ot_wenlong.tian@mediatek.com>
+Signed-off-by: Wenlong Tian <ot_wenlong.tian@mediatek.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
- drivers/bluetooth/btintel_pcie.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ drivers/bluetooth/btmtk.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 3a555aa50c87..92b91f058fce 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -3745,13 +3745,10 @@ static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
- 	struct pci_dev *pdev = data->pdev;
- 	int err;
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index bdc85147b97f..869eb2176379 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1201,6 +1201,19 @@ static int btmtk_recv_isopkt(struct hci_dev *hdev, void *buffer, int count)
+ 			/* Complete ISO header */
+ 			hci_skb_expect(skb) = __le16_to_cpu(dlen);
  
--	/* pci_try_reset_function() avoids the device_lock ABBA against
--	 * btintel_pcie_remove(): .remove() runs with device_lock held and
--	 * then waits for this work via disable_work_sync(); the blocking
--	 * pci_reset_function() would deadlock by trying to re-acquire
--	 * device_lock here.
-+	/* Reset work runs asynchronously, so it can wait for the device lock
-+	 * held by a PM callback to be released.
- 	 */
--	err = pci_try_reset_function(pdev);
-+	err = pci_reset_function(pdev);
- 	if (err) {
- 		BT_ERR("Failed resetting the pcie device (%d)", err);
- 		return err;
-@@ -3817,6 +3814,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 		enable_work(&data->hwexp_work);
- 		enable_work(&data->fwtrigger_work);
- 		enable_work(&data->mbox_work);
-+		clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
- 	}
- 
- out:
-@@ -3841,10 +3839,9 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
-  *     in-flight one (whose recovery will reinitialize the device
-  *     regardless of the dropped trigger's variant).
-  *
-- * The bit is cleared only by .remove() / re-probe via fresh devm
-- * allocation, which is the intended one-shot semantics: a reset
-- * tears down and re-probes 'data', so there is no "in-flight"
-- * reset to follow up after device_reprobe() succeeds.
-+ * A successful reset clears the bit through .remove() / re-probe via
-+ * fresh devm allocation. A failed FLR clears it in reset_work so a
-+ * later request can retry; there is no in-flight reset after failure.
-  */
- static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
- 				       enum btintel_pcie_reset_type type)
++			/* The interrupt endpoint zero-fills the remainder of
++			 * each transfer, and that padding parses as a header
++			 * with a zero Data_Total_Length. Such a packet carries
++			 * no ISO Data Load at all and is never emitted by the
++			 * controller, so stop parsing here rather than hand a
++			 * bogus handle 0 packet to the stack.
++			 */
++			if (!hci_skb_expect(skb)) {
++				kfree_skb(skb);
++				skb = NULL;
++				break;
++			}
++
+ 			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
+ 				kfree_skb(skb);
+ 				skb = NULL;
 -- 
-2.43.0
+2.45.2
 
