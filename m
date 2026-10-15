@@ -1,385 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010058.outbound.protection.outlook.com [52.101.84.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CACF4A0EFE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 09:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792055305; cv=none; b=pCxvKZwdSRo35egq0IQ2BIIpb3e28LPA3HyUwkFrKatWP5BKWQsGdDCKZyLLxDauhvJl87APQqw5KXMI41aaCp5IBGT6qdSdowO6yi49i+svfJSNjFqmlQ/z0L061ppWwEmxuPxS0RL+bUvx1GnaVYFVu/xYtpfbfhxcgvPFM2o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792055305; c=relaxed/simple;
-	bh=zgbHaYqqwL1oJQI9q3kDO0rZLapnFkK1ldJxSMGFAg0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=i/dhWEwUSmdsjvk473duWTZbvbtqxEZYH2TWrVI9thPM4fCsnPDUYj73lO6mL7g3b6ywuaVljZA9nS0jZQFTTBxNTHIxdu6t/drzrNG6ukE3OSTmd9M6Et5SF/jy/WrDHLO5XdZIsiJr0krua4PpJ+bhtnuYjROmbnKYoohmFdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+DilXh7; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900253E40EC;
+	Thu, 15 Oct 2026 09:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792055459; cv=fail; b=lSk8Njthd8RZxHPMnIUc1nf54nUh40GvxMp7xNF84tzJkFpqN7GnRECfOOb0PW8NETRRq8wp0rVYoj27USugtMrkGKBA9fnlJgnJ0JfwiNadLr7wlGE1ftgnsWoKNPJ5UvM/31475g8r8S+zz7rbmVAU9eEwXtePM6ehWoo5zXo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792055459; c=relaxed/simple;
+	bh=JfTy3i8C7u9+VCp2+K1fF3eAebDx+UxXf5+Wbtpd8z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=hWHCnjeFCOPicFxL9wGTr1CH3NF0FTCCizYoDe811peV3tMq2y808S7PAMuNTsNPvhaR6R5R2VOhWYJgJ1wwmnEHfOeusHtTAt7PyicuZPDZtzWd4oKRB+V/q0It6RhR/1rh+Bi2getvXd2ADb06mreryD2mY2gA6AeXlkr9F6Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LLUUzfN8; arc=fail smtp.client-ip=52.101.84.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k+DilXh7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B9729C2BCC7;
-	Thu, 15 Oct 2026 09:08:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792055304;
-	bh=zgbHaYqqwL1oJQI9q3kDO0rZLapnFkK1ldJxSMGFAg0=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=k+DilXh7J5PH3ZixUpoVMbQiRRbgPdiBLEypr/rYJPepdLymx8zG5qfhDa+S9VGEd
-	 r8bDLz6J4ICVuJOULL7vL1wo3r83V6M140bmxlt31FoupeFM8G0fQq5EuMJ0kWncB/
-	 o3UXdaa9Otnzh861KyLtfHWulBcVZslC3dTzvGvjFeBFOdBm8PWPA45rpdRwxc3geS
-	 0fpkcdwp6tPE6l7NzW6qkgxagZpLlpEAOLVdVwvWu80lsSaO9Srlhu9FNfZi2J3fJr
-	 9AaJy9PsFz3jEwE3EgVHJ7M+DhRuF2oCik8DJLdjcp7pHwdk3V0V3pld7UtcaeeuJz
-	 PldecmhFACbWw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B0CCC6B38;
-	Thu, 15 Oct 2026 09:08:24 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Thu, 15 Oct 2026 17:08:21 +0800
-Subject: [PATCH BlueZ bluez v2] hci: add ext adv interface
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LLUUzfN8"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BwA9A2p2Z+4FAUZMe1ngc3VLekk0Qz1GVKwtW8chtprTPJN46Pjh6gOQMIIWFATIlqIhLEly/4feKlHTk2AfY3iHfLUHV1kKbm5nTBpwY7Vzre+TUsuk7QdN6n3PBzj6Kw28ZjLutIQ+uzKOeWERe1A8UtT7MKgJ3WlusPdmBOBtlCoUYsJzhE9SMcrvr8aumsjBLjjaWR4XwVpE6D8waitsi+niQ4DYQuCODbzD/u/oH4ZdW4FLSocUgf4oz6pS0sgWqHx42HH7yaVRQ+Uka+JPhLrcRlkg/4FYb7T77Y/Z6UXaKJDkqhHFFP7BGL7kp4bRABlYyI5D5IQen4wNlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GezyzJn2Tw8UeD36j4p92uqPuR2jsB9/1yn3sEUR/Qk=;
+ b=AtXDzzblNT6ELc5B8i/HdjGhGSuprhSZCms9cLbm6MHO5Jyr2He+g7pLpc16sTby9Hxjdo0gDI/L00P6yw9kXURfatp9sR1ePJmuUqa3QG9YBcqKDHZANJxfqy9xvfBNazaYRXW7opH7VPEOPLsSdm/5ah/s+e+7pSVl6sdDqyC6uucMEZ058x/1xGi0jJ0UD+JPYSkflrZTUShm6sOBhkX+XdaUcmyaRRxckEZByuWWWXLPqT2lYftU3hbHJxBqmyOPRao/OPj7mqexgfRvEAOas3SLxnjk1jer0KgSafJ9R1NupQMoEAPHPKNMIYwy7s9FOv/35Hdo6zu41DUQFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GezyzJn2Tw8UeD36j4p92uqPuR2jsB9/1yn3sEUR/Qk=;
+ b=LLUUzfN8yEUHRNagzao+pht5wOFpKHRTefAHNQBZe+uPi0j48XjSrbJtTJeGKtpMO37e7VJf6bmZVSOikoIpwBc5hsr6u2e0dtxJdaoIXAgffLjUM1KMojIFKU3xk0+1aYFCnUBE3osV+5k7ySwAwyNSDOyIwapCnXa/nmZ/kRvy34Nqe1Z4dxy+khTDcPwGfgCto7Sjt4RhgdRN684eyYZ1gsoWUOHuvw73PesnzJ4LobVYQMREk0Rnv8KRiP4nICac/veaBov8vWbtz9fP/fu2olv+dS9lr0hfLMKrW+Wb0Odu9jxoKTXIxR0OJpgT5G7iaPPD8EpeN3xko3Sr7Q==
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from MI9PR04MB019273.eurprd04.prod.outlook.com
+ (2603:10a6:290:d3::17) by AS8PR04MB9063.eurprd04.prod.outlook.com
+ (2603:10a6:20b:446::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Thu, 15 Oct
+ 2026 09:10:54 +0000
+Received: from MI9PR04MB019273.eurprd04.prod.outlook.com
+ ([fe80::263c:943a:dcb0:29d8]) by MI9PR04MB019273.eurprd04.prod.outlook.com
+ ([fe80::263c:943a:dcb0:29d8%5]) with mapi id 15.21.0522.013; Thu, 15 Oct 2026
+ 09:10:54 +0000
+Date: Thu, 15 Oct 2026 12:10:47 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Raju Rangoju <Raju.Rangoju@amd.com>, 
+	Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
+	Ratheesh Kannoth <rkannoth@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	Bharat Bhushan <bbhushan2@marvell.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Alexander Aring <alex.aring@gmail.com>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>, 
+	Stephen Hemminger <stephen@networkplumber.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next] net: rename skb_unshare() to skb_unclone_full()
+Message-ID: <x5xra7sdnpwdqnmw3znv5eyoxd4qv4z4ybznyu7ajpg6sogazo@4fzejnx2aur7>
+References: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+X-ClientProxiedBy: FR3P281CA0044.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::7) To MI9PR04MB019273.eurprd04.prod.outlook.com
+ (2603:10a6:290:d3::17)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261015-extend_adv_api-v2-1-8b76d8a1c0ef@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAAWY0GoC/3WNyw6CMBREf4XctTVtVWxc+R+GkD5u4SZASYsNS
- vh3G/Yuz0zmzAYJI2GCR7VBxEyJwlRAniqwvZ46ZOQKg+SyFlxcGa4LTq7VLrd6JlYLY5S6aKv
- UDcpojuhpPYQvMMMbv9CUuKe0hPg5brI4yn/GLJhgtXb87r1U3MunHofQkT3bMEKz7/sPBmYTF
- rUAAAA=
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792055302; l=9022;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=CFVcfoepW0WE78+88YnEyXs9ltTQS4fleF18kRL6/CI=;
- b=d3UimNl8kHcTA8PTg4Znp8HGeHVNCwvUuMmk7nB517yopghqJapwixDuW/YOGK5j7wmXfsZvg
- vUk3GLUpyKAB8gdooKzKaB24rZaNE6Y59xVN28j0xDuioY31kYUlFbT
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MI9PR04MB019273:EE_|AS8PR04MB9063:EE_
+X-MS-Office365-Filtering-Correlation-Id: 069f95ad-8898-4789-9613-08df2a9c372a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|23010399003|7416014|1800799024|366016|19092799006|56012099006|11063799006|10067099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	0MQspB3Whq+8Tl0m6LmguvqMT1Ttt+NP25tHcA1MqojwuJR9LF05e5P9xDphXJJ/xUaycdFYs7R8fJnQkqsOlXDVYD4sVdVL945RF3x+vpNkbhZLE/+jj+mJc30VFAswXngd06imSXPEYRggOIWszT8RE5HBtAIkK5PGdPOTNkHbrkGsIadXf1xMO1zXelVe48z7bxGn08DkZoDh7zgQINIvlpUeGoR+gJE3KWA7nMpJ6RkCLLvSEuhMwFWbvvE1+x/KVVHSCIq5Yyd0/I40iBEJyzPsuR2fyiUeH9K0W1N5qMlIEMid9UlvwJJaDRuaXkpwt3UMuRwK+a/cRDqYns1gWuwsiYjCY5NTzY5TxMWYzWsnl5d9vf9nUBNE8/R9Cen2bvCksIQGluNJzdcYEoHsZT3UpcO4u8AUAuqO74Oo93R4QvFhzosDcU+BrRZtg5KoIlbOkc2sgEAz7LBKNZGN4jQx936OTLXx0pxri6DbulZlRnKGvkkq8pNHAOJHR1oBfE0qtN0wc0lfR+wiRJRQunMv2sIyKa3TxeU387AxmO2HC6iym472y0HLncUkCGV6hnZBORNuY5IfrT3KgtFZ6pUcTNuJiztm/FDFsp5Rb0zBNuNabaNJ5odo++w1A/r7Gq2eG3yv1EVQUVJGSGZib6w+HaU/ZLy2KdK8gtQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MI9PR04MB019273.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(7416014)(1800799024)(366016)(19092799006)(56012099006)(11063799006)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sXsf7Q8JhCFnEKc+Qxj6g5bkNVw12jGvm4j2+D2bWlYD91hEC80gxhTPPw39?=
+ =?us-ascii?Q?vvDBdHZNY5bBoK85qjamdEpqU4Y+pYyTMaOHFXWX7Zjrvqif+aMgIvfG5Nqp?=
+ =?us-ascii?Q?6/JarVMc+w5Qd1+qUwfzgbLh/39zxsJfI3qtgJkpAWRa3lAdav8xby8Jaf0F?=
+ =?us-ascii?Q?PfHqH9FsPmwIKhIIcQ2/VGUhnwHOYb9sArJC/G74TPTacvpclL4istZf0sMG?=
+ =?us-ascii?Q?2S90Ng1i1i0UjQf+iHCGlDmDyoo0ON2O6zwWQzFCATOHl+Iy5oxGe5kBo1Gi?=
+ =?us-ascii?Q?+f1m2l/3k7OTU7czxRQxdoGhaaTNoZ0OGdmdpualE1FjusfvXuczmsuaOgnu?=
+ =?us-ascii?Q?8oWViWRK/KHTPYUhjRHaNnuFkvOfqlCQoXWK3REc8s6aknBiVz5hnzGQXrVt?=
+ =?us-ascii?Q?rTEzr2xAkns7BFlHNh3oukm9IvBVAoxxwepx6pvXsccGboQ3Q9bpmevPrLXT?=
+ =?us-ascii?Q?diWWbfFBQBypRa+FQwWhYbuWqNkrO9xN1VNJwUFwKqwU3NneCkznt2Ds6PEg?=
+ =?us-ascii?Q?Rq4GLJFgbZKxV4KOUjGy2+muCHHmbjBxrwaYHCGM76xLoZlySmfIF32M4Fln?=
+ =?us-ascii?Q?P2fU12PcP++9/TIXM1X7id6vTcxZT8PDzV0AkJwU2wMKT3Btg6B5QxOIIkGP?=
+ =?us-ascii?Q?RDHQAdonMp2n1oW8c85fIFrzoUuNXHQQno9zt0zTIOGMqnM4c/Frxa7qAMZ/?=
+ =?us-ascii?Q?Ut+LrQpJtN5z1jm6rDf6MGQsTlM2kAincv5st/13130e+mksMhROSVIyVct9?=
+ =?us-ascii?Q?XCrfG36Q2hhdTIyzgz+HxjuRGkvQh/bEx/CGUHHlCQgnqCzrlS+w8KG//Rm6?=
+ =?us-ascii?Q?7Ua9ZL7HEYtKKjLUy5OFIbW7MvNY8oRFhSKnkFa0OzSLD7gY8IJ7nnyB/H0G?=
+ =?us-ascii?Q?j8y9FvKM3u0L69NTFXyT5zXu6+qg7KozULfpG4P5nMuUJZbRZ6Lb3OGzvHeS?=
+ =?us-ascii?Q?EV1LHWMZyrsk73jjBzgv63pC05zjyeAhSKwjH8HCviBR1QkxJvTWF3WaUE6R?=
+ =?us-ascii?Q?IaIzJA+qXO90o/VLuY4AYWEwZZChTjF8mWloeIGqMwhhEmpfHnOEiZ8D5hB0?=
+ =?us-ascii?Q?4QFKlyw0V86Elf0OfaMGBOO1i2xQmTYwodX1jX6TbIyRAAE+c7pukFPXDV7R?=
+ =?us-ascii?Q?xD444IIjBmzO7Re6i/6B2m9tntO4OtQNtbNip4molZ2kklUlZW0md1sOFGJh?=
+ =?us-ascii?Q?qBJBhoxiJ8PFj8Br3aWf3V4JZdXa2JzxP67A8ddoH18wNV1d++yKWxpHignY?=
+ =?us-ascii?Q?SdseZjBaFZLMH7DqoCIoFC1q7q/EqGsYYCvOTCd/7Z67CFuIl3DEORKrfdpS?=
+ =?us-ascii?Q?SDZ9AfFy7/4QVQbVGhPP87ZVgCYeK6xhYQMPJMAvOZ94rei4SxO2BKzM6xAN?=
+ =?us-ascii?Q?bUwDM1xlH3HU7RLn15hThSuP28JE7Ohrdu3lkmoU08uqdj+ogpuLYPocU2rG?=
+ =?us-ascii?Q?jhsfwUI+/7EyupczdZx9BStrxAvyXUfCyJzhQdbwKmXAsTL4mFRv5BF5/nl+?=
+ =?us-ascii?Q?5InBTO+jNl1m4AguweKahy+JI2Jjk2aRBNoyvzpk+whKBUKXpcYCcEkToL0P?=
+ =?us-ascii?Q?izlTe5W3KALlksp9qIKqYtajCAxXNu1YnyGQJO0ZMP6Lf+0pZrSFH2uykJsQ?=
+ =?us-ascii?Q?a9loSd8rG2uFVbHJdbKAOvyI7PMYQUariph4C/djbuQMxYW+zjMD8so6fWaV?=
+ =?us-ascii?Q?1wWpllb9lVlSy18LYFmZmvVLnYzV6/GP2xVkg8GiaZuSxda1eTyDE0pYCRlf?=
+ =?us-ascii?Q?ZV2D0qwnjQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 069f95ad-8898-4789-9613-08df2a9c372a
+X-MS-Exchange-CrossTenant-AuthSource: MI9PR04MB019273.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 09:10:53.9627
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fszJDd5z+GU2OWrPu1eXeN/KvM+6wyFdJYMVnj9U1lW7/40KhdK+znZdHlW8PRiFpUp040bYyoxEMj0CS0kh6w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9063
 
-From: Yang Li <yang.li@amlogic.com>
+On Thu, Oct 15, 2026 at 10:16:38AM +0200, Nicolai Buchwitz wrote:
+> skb_unshare() only copies cloned skbs. A shared skb that is not a clone
+> comes back unchanged, which the name doesn't suggest. The loopback
+> selftest hooks got caught by this and hit BUG_ON(skb_shared()).
+> 
+> Rename it to skb_unclone_full(). Like skb_unclone() it only acts on
+> clones, but it copies the whole skb, not just the head.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-Wrap extended advertising HCI command interfaces.
-
----
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v2:
-- Fixed coding style.
-- Link to v1: https://patch.msgid.link/20261014-extend_adv_api-v1-1-6ad07ff280f2@amlogic.com
----
- lib/bluetooth/hci.c     | 194 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/bluetooth/hci.h     |  55 ++++++++++++++
- lib/bluetooth/hci_lib.h |  16 ++++
- 3 files changed, 265 insertions(+)
-
-diff --git a/lib/bluetooth/hci.c b/lib/bluetooth/hci.c
-index f50a30c61..fe74ba2a5 100644
---- a/lib/bluetooth/hci.c
-+++ b/lib/bluetooth/hci.c
-@@ -3017,6 +3017,200 @@ int hci_le_set_advertise_enable(int dd, uint8_t enable, int to)
- 	return 0;
- }
- 
-+int hci_le_set_ext_adv_params(int dd, uint8_t handle, uint16_t evt_properties,
-+			uint32_t min_interval, uint32_t max_interval,
-+			uint8_t channel_map, uint8_t own_addr_type,
-+			uint8_t peer_addr_type, const bdaddr_t *peer_addr,
-+			uint8_t filter_policy, int8_t tx_power,
-+			uint8_t primary_phy, uint8_t secondary_max_skip,
-+			uint8_t secondary_phy, uint8_t sid,
-+			uint8_t notif_enable, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_params_cp cp;
-+	struct {
-+		uint8_t status;
-+		int8_t  tx_power;
-+	} rsp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+	cp.evt_properties = evt_properties;
-+	cp.min_interval[0] = min_interval & 0xff;
-+	cp.min_interval[1] = (min_interval >> 8) & 0xff;
-+	cp.min_interval[2] = (min_interval >> 16) & 0xff;
-+	cp.max_interval[0] = max_interval & 0xff;
-+	cp.max_interval[1] = (max_interval >> 8) & 0xff;
-+	cp.max_interval[2] = (max_interval >> 16) & 0xff;
-+	cp.channel_map = channel_map;
-+	cp.own_addr_type = own_addr_type;
-+	cp.peer_addr_type = peer_addr_type;
-+	if (peer_addr)
-+		memcpy(&cp.peer_addr, peer_addr, sizeof(cp.peer_addr));
-+	cp.filter_policy = filter_policy;
-+	cp.tx_power = tx_power;
-+	cp.primary_phy = primary_phy;
-+	cp.secondary_max_skip = secondary_max_skip;
-+	cp.secondary_phy = secondary_phy;
-+	cp.sid = sid;
-+	cp.notif_enable = notif_enable;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_PARAMS;
-+	rq.cparam = &cp;
-+	rq.clen = sizeof(cp);
-+	rq.rparam = &rsp;
-+	rq.rlen = sizeof(rsp);
-+
-+	if (hci_send_req(dd, &rq, to) < 0)
-+		return -1;
-+
-+	if (rsp.status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int hci_le_set_ext_adv_data(int dd, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_data_cp *cp;
-+	uint8_t status;
-+	size_t plen = sizeof(*cp) + data_len;
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->handle = handle;
-+	cp->operation = operation;
-+	cp->fragment_preference = fragment_pref;
-+	cp->data_len = data_len;
-+	if (data && data_len)
-+		memcpy(cp->data, data, data_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_DATA;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int hci_le_set_ext_scan_rsp_data(int dd, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_data_cp *cp;
-+	uint8_t status;
-+	size_t plen = sizeof(*cp) + data_len;
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->handle = handle;
-+	cp->operation = operation;
-+	cp->fragment_preference = fragment_pref;
-+	cp->data_len = data_len;
-+	if (data && data_len)
-+		memcpy(cp->data, data, data_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_SCAN_RSP_DATA;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int hci_le_set_ext_adv_enable(int dd, uint8_t enable, uint8_t num_of_sets,
-+				const void *sets, int to)
-+{
-+	struct hci_request rq;
-+	le_set_ext_adv_enable_cp *cp;
-+	uint8_t status;
-+	size_t set_entry_len = 4; /* handle(1) + duration(2) + max_events(1) */
-+	size_t plen =
-+		sizeof(le_set_ext_adv_enable_cp) + (num_of_sets * set_entry_len);
-+
-+	cp = malloc(plen);
-+	if (!cp) {
-+		errno = ENOMEM;
-+		return -1;
-+	}
-+
-+	memset(cp, 0, plen);
-+	cp->enable = enable;
-+	cp->num_of_sets = num_of_sets;
-+	if (sets && num_of_sets)
-+		memcpy(cp->sets, sets, num_of_sets * set_entry_len);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_EXT_ADV_ENABLE;
-+	rq.cparam = cp;
-+	rq.clen = plen;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0) {
-+		free(cp);
-+		return -1;
-+	}
-+
-+	free(cp);
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
- 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
-diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
-index 2e4aa394e..7d8b81f2d 100644
---- a/lib/bluetooth/hci.h
-+++ b/lib/bluetooth/hci.h
-@@ -1735,6 +1735,61 @@ typedef struct {
- } __attribute__ ((packed)) le_set_address_resolution_enable_cp;
- #define LE_SET_ADDRESS_RESOLUTION_ENABLE_CP_SIZE 1
- 
-+#define OCF_LE_SET_EXT_ADV_PARAMS		0x0036
-+typedef struct {
-+	uint8_t  handle;
-+	uint16_t evt_properties;
-+	uint8_t  min_interval[3];
-+	uint8_t  max_interval[3];
-+	uint8_t  channel_map;
-+	uint8_t  own_addr_type;
-+	uint8_t  peer_addr_type;
-+	bdaddr_t peer_addr;
-+	uint8_t  filter_policy;
-+	int8_t   tx_power;
-+	uint8_t  primary_phy;
-+	uint8_t  secondary_max_skip;
-+	uint8_t  secondary_phy;
-+	uint8_t  sid;
-+	uint8_t  notif_enable;
-+} __attribute__ ((packed)) le_set_ext_adv_params_cp;
-+#define LE_SET_EXT_ADV_PARAMS_CP_SIZE 25
-+
-+typedef struct {
-+	uint8_t status;
-+	int8_t  selected_tx_power;
-+} __attribute__ ((packed)) le_set_ext_adv_params_rp;
-+#define LE_SET_EXT_ADV_PARAMS_RP_SIZE 9
-+
-+#define OCF_LE_SET_EXT_ADV_DATA			0x0037
-+typedef struct {
-+	uint8_t handle;
-+	uint8_t operation;
-+	uint8_t fragment_preference;
-+	uint8_t data_len;
-+	uint8_t data[0];
-+} __attribute__ ((packed)) le_set_ext_adv_data_cp;
-+#define LE_SET_EXT_ADV_DATA_CP_MAX_SIZE  (4 + 251)
-+
-+#define OCF_LE_SET_EXT_SCAN_RSP_DATA		0x0038
-+typedef struct {
-+	uint8_t advertising_handle;
-+	uint8_t operation;
-+	uint8_t fragment_preference;
-+	uint8_t scan_response_data_length;
-+	uint8_t scan_response_data[31];
-+} __attribute__((packed)) le_set_ext_scan_rsp_data_cp;
-+#define LE_SET_EXT_SCAN_RSP_DATA_CP_SIZE (4 + 31)
-+
-+#define OCF_LE_SET_EXT_ADV_ENABLE		0x0039
-+typedef struct {
-+	uint8_t enable;
-+	uint8_t num_of_sets;
-+	/* followed by ext adv set entries: handle(1), duration(2), max_events(1) */
-+	uint8_t sets[0];
-+} __attribute__ ((packed)) le_set_ext_adv_enable_cp;
-+#define LE_SET_EXT_ADV_ENABLE_CP_SIZE (2 + 4)
-+
- /* Vendor specific commands */
- #define OGF_VENDOR_CMD		0x3f
- 
-diff --git a/lib/bluetooth/hci_lib.h b/lib/bluetooth/hci_lib.h
-index eeb51411a..4a06a9383 100644
---- a/lib/bluetooth/hci_lib.h
-+++ b/lib/bluetooth/hci_lib.h
-@@ -112,6 +112,22 @@ int hci_le_set_scan_enable(int dev_id, uint8_t enable, uint8_t filter_dup, int t
- int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
- 					uint16_t window, uint8_t own_type,
- 					uint8_t filter, int to);
-+int hci_le_set_ext_adv_params(int dev_id, uint8_t handle, uint16_t evt_properties,
-+				uint32_t min_interval, uint32_t max_interval,
-+				uint8_t channel_map, uint8_t own_addr_type,
-+				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
-+				uint8_t filter_policy, int8_t tx_power,
-+				uint8_t primary_phy, uint8_t secondary_max_skip,
-+				uint8_t secondary_phy, uint8_t sid,
-+				uint8_t notif_enable, int to);
-+int hci_le_set_ext_adv_data(int dev_id, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to);
-+int hci_le_set_ext_scan_rsp_data(int dev_id, uint8_t handle, uint8_t operation,
-+				uint8_t fragment_pref, const uint8_t *data,
-+				uint8_t data_len, int to);
-+int hci_le_set_ext_adv_enable(int dev_id, uint8_t enable, uint8_t num_of_sets,
-+				const void *sets, int to);
- int hci_le_set_advertise_enable(int dev_id, uint8_t enable, int to);
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
-
----
-base-commit: 9dc7e40962f11d1d9a5568f8a7633a695288329c
-change-id: 20261014-extend_adv_api-61bb883ac885
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
+Reviewed-by: Ioana Ciornei <ioana.ciornei@nxp.com> # dpaa2
 
