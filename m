@@ -1,55 +1,58 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E7B3CB56B;
-	Thu, 15 Oct 2026 11:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A59A485505;
+	Thu, 15 Oct 2026 11:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792062145; cv=none; b=qgHJJ7mSjtpMoYFny4twlKJh+cjvemhn9hCFuEBHgFfB1Ye6GQe1/MfiDkctfr0+71LAWHvSRnKv2Z3rVkXHEmlZimC/Z2Y4Sldz0rTAkkt4/c+Ob6Dq4ijznuGWT2oiqAonalUVjGGeCZfmbC5SZ0P+j6MD6XSdUsVExRK3MmE=
+	t=1792062146; cv=none; b=smYFBkH1ov5SExGEDc6w/JXJ8wOkeF+/DwyNF+27HQEonmYPQTEC6fA7nSw2xCYHqtsNe1sVnq8HV60PT4ybISamo/HxmFNdh5k+G3utwCHOxsBBG3dNVCly2EgArH8YFAYcAT1jq1Uu+UUBJOUkUpvRYNc6fNBXTNYyPNofxAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792062145; c=relaxed/simple;
-	bh=ITvtbFnfD1HGhLOTmI7RNN1uqniYqUorCXEmPuSE4y8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GOMekgB54pvKoTWjkd+ahJr/BObF45af5yNGAAWADQ40Pr4//hpZoxBEbcW2vRff59t25NAbu9x00eyK+kocZftmmXvNKWgbRd58W6yqmrHsNad2Igx+sRrf8DQsuI4uNPk+1mZq9yKbDWK9rCW/5lru+WNFyeULgDqiSXF+APU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DyWbSlV7; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1792062146; c=relaxed/simple;
+	bh=ESS2EiCaSpe8CqgEdQQHguXco7p+CSqoUFm/F/zwevs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=foA/pT/MNV4UOw8TSjb4u9TRlKgb3l4ivvhmtx9jWuMOs2oH0pZRuQEjGqFPlzjELGw3cIEbsmKp8EqdHqSMnZGxcvL4Gjb3Xce63qysY5FBl88XObhgKX8RF58egwkF5fXpyJnNwc1SP13zGX3R3Z951HD0Pz9E18IekMaKR+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PW1ywTgf; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DyWbSlV7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PW1ywTgf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792062144; x=1823598144;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ITvtbFnfD1HGhLOTmI7RNN1uqniYqUorCXEmPuSE4y8=;
-  b=DyWbSlV7snCcmDe0nvV6bojN7pdWFkts3o8qd5CT8TntpQl4tGvWAepX
-   HsqPlrKDM+VL0AeqhAPjT4yxjqOVjAPlVp4zvEnt0X663Zd5NNt1sp3DD
-   UtGpSAVKZGui11Dspv03t9Y2FNAP/ODlTrkycnAv85HOQPOGgPjjzVqJl
-   QTXPFhRnzhevn2YTM2MXZfzDqtWboJsYua0qxAY2DnHaxIJRIUBYuKHv0
-   ByhGWUBRyCiuIk9ViGC3H0uAPWbul4/+2v7jRxo9F8lA2ZwAVKcDjfZSs
-   ENnNMWFYg59o08s8bIZxHCKQ+YdLF0yFQ4EREqcNaTFeGIWN41do7RfPF
-   Q==;
-X-CSE-ConnectionGUID: Q45SVTxjRqaIXi8T1TObQA==
-X-CSE-MsgGUID: 5K1HAZ8BSaGWtxKPV80ufw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11935"; a="723509"
+  t=1792062145; x=1823598145;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ESS2EiCaSpe8CqgEdQQHguXco7p+CSqoUFm/F/zwevs=;
+  b=PW1ywTgfLlXUZXPFy/R8Djt/2jedljhP8San+O+FK9bEFEpLgD34S2ts
+   /OfLBmi5XTmvl6PV/jMa0Lh2PVNyJI6iC1SzvO9KUoGRbZu3bBUYTUcmK
+   zH0khE09TLVUnPjLFbrPxooXucDgfF7T79de5JsMAhrBGZh8XLWfAdTck
+   IlU9WzsWgtVWY6pXY5SYUZ5OsH4ZJD65uPF4uUJWaBW3AuSNj0jzI8XT7
+   dDJF2HyBRVfAwgXPB4q3dbKtZxOziy/JsN4WQQqkG/CPER6Qr/UG7/3ft
+   kISnYTGzk1Lpdl2a/ovxny+dYxtEle9DMt7wEgzUTB3bUNCtusICIGNDP
+   w==;
+X-CSE-ConnectionGUID: o9yvRi2fRaSaWP784ssFqw==
+X-CSE-MsgGUID: /cleY1I5SHaCBcmoIgxDcg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11935"; a="723513"
 X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
-   d="scan'208";a="723509"
+   d="scan'208";a="723513"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2026 04:02:23 -0700
-X-CSE-ConnectionGUID: CkJDWHquTvul6Wp2mxk9/Q==
-X-CSE-MsgGUID: LVUU0cCDT62ZxWH1Sgsw/w==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2026 04:02:24 -0700
+X-CSE-ConnectionGUID: FNrzUmJXTd6sRJ3E3BOyqg==
+X-CSE-MsgGUID: Q2wFBBc0QyOzFbXh3mTNyA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
-   d="scan'208";a="1549078"
+   d="scan'208";a="1549082"
 Received: from unknown (HELO WEBAPTLH032.iind.intel.com) ([10.66.250.231])
-  by orviesa007.jf.intel.com with ESMTP; 15 Oct 2026 04:02:21 -0700
+  by orviesa007.jf.intel.com with ESMTP; 15 Oct 2026 04:02:22 -0700
 From: Ajay KV <ajay.k.v@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Ajaykv <ajay.k.v@intel.com>
-Subject: [PATCH] Bluetooth: btintel_pcie: Add initial YoYo debug support
-Date: Thu, 15 Oct 2026 14:02:16 +0300
-Message-ID: <20261015110218.22585-1-ajay.k.v@intel.com>
+Subject: [PATCH v4 2/3] Bluetooth: btintel_pcie: Validate the YoYo DEBUG_INFO TLV
+Date: Thu, 15 Oct 2026 14:02:17 +0300
+Message-ID: <20261015110218.22585-2-ajay.k.v@intel.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261015110218.22585-1-ajay.k.v@intel.com>
+References: <20261015110218.22585-1-ajay.k.v@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,553 +63,184 @@ Content-Transfer-Encoding: 8bit
 
 From: Ajaykv <ajay.k.v@intel.com>
 
-Add an optional YoYo firmware configuration path to the Intel PCIe
-Bluetooth driver. Read DBG_PATH and ENABLE_INI from
-ibt_bt_dbg_cfg.ini, and load intel/ibt_debug_yoyo.bin only when YoYo
-is enabled and host DRAM routing is selected.
+Require a DEBUG_INFO TLV in the YoYo firmware configuration. Validate
+its payload length, version, Bluetooth domain, external image type,
+and Bluetooth core type before accepting the configuration.
 
-Introduce a runtime context and bounded TLV-stream validation helper.
-Initialize and clean up the context with PCI probe and removal, while
-falling back to legacy debug behavior if optional YoYo data is missing
-or invalid.
-
-Runtime validation of the complete P1-P3 series produced:
-[    3.286504] Bluetooth: Core ver 2.22
-[    3.297359] Bluetooth: HCI device and connection manager initialized
-[    3.297373] Bluetooth: HCI socket layer initialized
-[    3.297376] Bluetooth: L2CAP socket layer initialized
-[    3.297384] Bluetooth: SCO socket layer initialized
-[    3.332848] Bluetooth: YoYo: configuration loaded and validated
-[3.360857-3.361712] Bluetooth: DBGC1-3: each 16 x 256 KiB (4 MiB)
-[3.361715] Bluetooth: MDBGC DBGC1-3: each 16 x 256 KiB
-[    3.397439] Bluetooth: hci0: Device revision is 0
-[    3.397442] Bluetooth: hci0: Secure boot is enabled
-[    3.397443] Bluetooth: hci0: OTP lock is disabled
-[    3.397444] Bluetooth: hci0: API lock is enabled
-[    3.397444] Bluetooth: hci0: Debug lock is disabled
+Reject missing or invalid metadata so the driver keeps legacy DBGC
+defaults instead of enabling an incompatible configuration.
 
 Signed-off-by: Ajaykv <ajay.k.v@intel.com>
 
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index d5eb2568af2e..7d933755b291 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -14,7 +14,7 @@ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
- obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
- 
- obj-$(CONFIG_BT_INTEL)		+= btintel.o
--obj-$(CONFIG_BT_INTEL_PCIE)	+= btintel_pcie.o btintel.o
-+obj-$(CONFIG_BT_INTEL_PCIE)	+= btintel_pcie.o btintel.o btintel_pcie_debug.o
- obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
- obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 3a555aa50c87..313789cb290e 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -203,6 +203,108 @@ static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
- 	return data->dbg_path_cache != BTINTEL_PCIE_DRAM;
- }
- 
-+/* Name of the optional INI file used to override the default dbg_path
-+ * (data->dbg_path_cache) and yoyo ini settings.
-+ */
-+#define BTINTEL_PCIE_DBG_INI_FILE "ibt_bt_dbg_cfg.ini"
-+
-+/* Loads optional "DBG_PATH=<value>" and ENABLE_INI=<value>
-+ * overrides from BTINTEL_PCIE_DBG_INI_FILE
-+ * and applies them to data->dbg_path_cache and data->enable_ini.
-+ *
-+ * DBG_PATH accepts BTINTEL_PCIE_WIFI_DBGC (0x06, default) and
-+ * BTINTEL_PCIE_DRAM (0x01, legacy); an invalid or missing entry leaves
-+ * the cached value set by the caller unchanged.
-+ *
-+ * ENABLE_INI accepts 1 (enabled) or 0 (disabled); an invalid or missing
-+ * entry leaves data->enable_ini unchanged.
-+ */
-+static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
-+{
-+	const struct firmware *fw;
-+	const char *ini_file = BTINTEL_PCIE_DBG_INI_FILE;
-+	char *buf, *cursor, *line;
-+	bool dbg_path_applied = false;
-+	int err;
-+
-+	err = request_firmware_direct(&fw, ini_file, &data->pdev->dev);
-+	if (err < 0) {
-+		BT_DBG("%s not found (%d), using dbg_path=0x%02x",
-+		       ini_file, err, data->dbg_path_cache);
-+		if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
-+			data->enable_ini = false;
-+		return;
-+	}
-+
-+	buf = kmemdup_nul(fw->data, fw->size, GFP_KERNEL);
-+	release_firmware(fw);
-+	if (!buf)
-+		return;
-+
-+	cursor = buf;
-+	while ((line = strsep(&cursor, "\n"))) {
-+		char *eq;
-+		char *val;
-+		uint parsed;
-+
-+		line = strim(line);
-+		if (!line[0] || line[0] == '#' || line[0] == ';')
-+			continue;
-+
-+		eq = strchr(line, '=');
-+		if (!eq)
-+			continue;
-+
-+		*eq = '\0';
-+		line = strim(line);
-+		val = strim(eq + 1);
-+
-+		/* Accept "DBG_PATH"/"dbg_path"
-+		 * case-insensitively as the key.
-+		 */
-+		if (!strcasecmp(line, "DBG_PATH")) {
-+			BT_INFO("Read DBG_PATH from %s: '%s'", ini_file, val);
-+
-+			/* base 0 lets kstrtouint accept "0x06", "6", etc. */
-+			if (kstrtouint(val, 0, &parsed) == 0 &&
-+			    (parsed == BTINTEL_PCIE_DRAM ||
-+			     parsed == BTINTEL_PCIE_WIFI_DBGC)) {
-+				data->dbg_path_cache = parsed;
-+				dbg_path_applied = true;
-+				BT_INFO("WRT dbg_path accepted: 0x%02x",
-+					data->dbg_path_cache);
-+			} else {
-+				BT_WARN("Invalid DBG_PATH='%s' in %s, using dbg_path=0x%02x",
-+					val, ini_file, data->dbg_path_cache);
-+			}
-+		} else if (!strcasecmp(line, "ENABLE_INI")) {
-+			BT_INFO("Read ENABLE_INI from %s: '%s'", ini_file, val);
-+
-+			if (kstrtouint(val, 0, &parsed) == 0 &&
-+			    (parsed == 0 || parsed == 1)) {
-+				data->enable_ini = !!parsed;
-+				BT_INFO("WRT enable_ini accepted: %u",
-+					data->enable_ini);
-+			} else {
-+				BT_WARN("Invalid ENABLE_INI='%s' in %s, using enable_ini=%u",
-+					val, ini_file, data->enable_ini);
-+			}
-+		}
-+	}
-+
-+	if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
-+		data->enable_ini = false;
-+
-+	if (dbg_path_applied)
-+		BT_DBG("Loaded dbg_path=0x%02x from %s", data->dbg_path_cache, ini_file);
-+	else
-+		BT_WARN("No valid DBG_PATH in %s, dbg_path=0x%02x", ini_file, data->dbg_path_cache);
-+
-+	BT_DBG("ENABLE_INI effective state: %u", data->enable_ini);
-+
-+	kfree(buf);
-+}
-+
- /* Helper function to allocate and setup a debug buffer group
-  * @data: driver data structure
-  * @buf: pointer to data_buf array pointer
-@@ -3192,6 +3294,8 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	/* Initialize the CI */
- 	btintel_pcie_init_ci(data, data->ci);
- 
-+	data->pcie_alloc_init = true;
-+
- 	return 0;
- 
- exit_error_txq:
-@@ -3365,6 +3469,31 @@ static void btintel_pcie_synchronize_irqs(struct btintel_pcie_data *data)
- 		synchronize_irq(data->msix_entries[i].vector);
- }
- 
-+static void btintel_pcie_probe_cleanup(struct btintel_pcie_data *data)
-+{
-+	struct pci_dev *pdev = data->pdev;
-+
-+	btintel_pcie_disable_interrupts(data);
-+	btintel_pcie_synchronize_irqs(data);
-+
-+	disable_work_sync(&data->coredump_work);
-+	disable_work_sync(&data->hwexp_work);
-+	disable_work_sync(&data->fwtrigger_work);
-+	disable_work_sync(&data->mbox_work);
-+
-+	flush_work(&data->rx_work);
-+
-+	btintel_pcie_reset_bt(data);
-+	for (int i = 0; i < data->alloc_vecs; i++) {
-+		struct msix_entry *msix_entry;
-+
-+		msix_entry = &data->msix_entries[i];
-+		devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry);
-+	}
-+
-+	pci_free_irq_vectors(pdev);
-+}
-+
- static int btintel_pcie_get_debug_info_addr(struct hci_dev *hdev)
- {
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-@@ -4054,6 +4183,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 			      const struct pci_device_id *ent)
- {
- 	int err;
-+	bool pcie_configured = false;
- 	struct btintel_pcie_data *data;
- 
- 	if (!pdev)
-@@ -4097,15 +4227,30 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
- 	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
-+	data->pcie_alloc_init = false;
-+	data->enable_ini = false;
-+	btintel_pcie_yoyo_init(&data->yoyo);
- 	/* FLR can be invoked by echoing to debugfs path, so explicitly
- 	 * initialized
- 	 */
- 	data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
-+
-+	btintel_pcie_load_dbg_path_from_ini(data);
-+
- 	err = btintel_pcie_config_pcie(pdev, data);
- 	if (err)
- 		goto exit_error;
- 
-+	pcie_configured = true;
-+
- 	pci_set_drvdata(pdev, data);
-+	if (data->enable_ini) {
-+		err = btintel_pcie_yoyo_load_and_parse(&data->yoyo, &pdev->dev);
-+		if (err) {
-+			BT_WARN("YoYo is not configured (%d)", err);
-+			btintel_pcie_yoyo_cleanup(&data->yoyo);
-+		}
-+	}
- 
- 	err = btintel_pcie_alloc(data);
- 	if (err)
-@@ -4128,15 +4273,22 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto exit_error;
- 
-+	data->yoyo.hdev = data->hdev;
- 	bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
- 		   data->cnvr);
- 	return 0;
- 
- exit_error:
--	/* reset device before exit */
--	btintel_pcie_reset_bt(data);
-+	btintel_pcie_yoyo_cleanup(&data->yoyo);
-+
-+	if (pcie_configured)
-+		btintel_pcie_probe_cleanup(data);
-+
-+	if (data->pcie_alloc_init)
-+		btintel_pcie_free(data);
- 
- 	destroy_workqueue(data->dump_workqueue);
-+	destroy_workqueue(data->workqueue);
- 
- 	pci_clear_master(pdev);
- 
-@@ -4173,6 +4325,8 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	if (current_work() != &data->reset_work)
- 		disable_work_sync(&data->reset_work);
- 
-+	btintel_pcie_yoyo_cleanup(&data->yoyo);
-+
- 	btintel_pcie_disable_interrupts(data);
- 
- 	btintel_pcie_synchronize_irqs(data);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 3030b4e8b750..7bfb7615ed0d 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -6,6 +6,8 @@
-  *  Copyright (C) 2024  Intel Corporation
-  */
- 
-+#include "btintel_pcie_debug.h"
-+
- /* Control and Status Register(BTINTEL_PCIE_CSR) */
- #define BTINTEL_PCIE_CSR_BASE			(0x000)
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG		(BTINTEL_PCIE_CSR_BASE + 0x024)
-@@ -737,6 +739,8 @@ struct btintel_pcie_data {
- 	u32	boot_stage_cache;
- 	u32	img_resp_cache;
- 	u32	dbg_path_cache;
-+	bool	enable_ini;
-+	struct btintel_pcie_yoyo_ctx yoyo;
- 
- 	u32	cnvi;
- 	u32	cnvr;
-@@ -783,6 +787,7 @@ struct btintel_pcie_data {
- 	wait_queue_head_t	mbox_parse_wait_q;
- 	/* Timestamp captured in GP1 handler when mbox interrupt is received */
- 	ktime_t	mbox_intr_ts;
-+	bool		pcie_alloc_init;
- };
- 
- static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
 diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
-new file mode 100644
-index 000000000000..0e933f4ec376
---- /dev/null
+index 0e933f4ec376..615996232cdf 100644
+--- a/drivers/bluetooth/btintel_pcie_debug.c
 +++ b/drivers/bluetooth/btintel_pcie_debug.c
-@@ -0,0 +1,161 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Intel Bluetooth YoYo Debug Framework
-+ *
-+ * Copyright (C) 2026 Intel Corporation
-+ *
-+ * Runtime-configurable TLV-based debug collection framework for loading and
-+ * parsing the optional YoYo firmware configuration used to enable debug
-+ * regions, triggers, HCI commands, and configuration sets.
-+ */
-+
-+#include <linux/errno.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
-+#include <net/bluetooth/bluetooth.h>
-+#include "btintel_pcie_debug.h"
-+
-+/*
-+ * Parse the optional YoYo firmware TLV stream and validate each record.
-+ * This is the entry point for the runtime debug configuration payload.
-+ */
-+static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
-+					      const u8 *buf, size_t buf_len)
+@@ -11,11 +11,59 @@
+ 
+ #include <linux/errno.h>
+ #include <linux/module.h>
++#include <linux/stddef.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <net/bluetooth/bluetooth.h>
+ #include "btintel_pcie_debug.h"
+ 
++/* TLV-specific parser DEBUG_INFO TLV type */
++static int btintel_pcie_yoyo_parse_dbg_info(struct btintel_pcie_yoyo_ctx *ctx,
++					    const struct btintel_pcie_tlv_dbg_info *info,
++					    u32 len)
 +{
-+	const struct btintel_pcie_tlv_hdr *tlv;
-+	const u8 *ptr = buf;
-+	size_t remaining = buf_len;
-+	u32 count = 0;
++	const u8 *data = (const u8 *)info;
++	u32 domain, image_type, core_type, version;
 +
-+	while (remaining >= sizeof(*tlv)) {
-+		size_t tlv_size;
-+		u32 type, len;
++	if (len != sizeof(*info) - sizeof(struct btintel_pcie_tlv_hdr))
++		return -EBADMSG;
 +
-+		tlv = (const struct btintel_pcie_tlv_hdr *)ptr;
-+		type = get_unaligned_le32(&tlv->type);
-+		len = get_unaligned_le32(&tlv->length);
++	image_type = get_unaligned_le32(data +
++				       offsetof(struct btintel_pcie_tlv_dbg_info,
++						image_type));
++	core_type = get_unaligned_le32(data +
++				      offsetof(struct btintel_pcie_tlv_dbg_info,
++					       core_type));
++	domain = get_unaligned_le32(data +
++				   offsetof(struct btintel_pcie_tlv_dbg_info,
++					    dbg_hdr.domain));
++	version = get_unaligned_le32(data +
++				     offsetof(struct btintel_pcie_tlv_dbg_info,
++					      dbg_hdr.tlv_data_version));
 +
-+		if (len > remaining - sizeof(*tlv)) {
-+			BT_ERR("YoYo: tlv %u truncated (len=%u rem=%zu)", count,
-+			       len, remaining);
-+			return -EBADMSG;
-+		}
-+		tlv_size = sizeof(*tlv) + len;
-+
-+		switch (type) {
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_INFO:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_REGION:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_HCMD:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_BUF_ALLOC:
-+		case BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE:
-+			BT_DBG("YoYo: valid tlv type 0x%x len=%u", type, len);
-+			break;
-+		default: /* Log and continue, do not fail*/
-+			BT_DBG("YoYo: unknown tlv type 0x%x len=%u", type, len);
-+			break;
-+		}
-+
-+		ptr += tlv_size;
-+		remaining -= tlv_size;
-+		count++;
++	if (domain != BTINTEL_PCIE_DOMAIN_BT ||
++	    version != BTINTEL_PCIE_DBG_INFO_TLV_VERSION) {
++		BT_WARN("YoYo: unsupported domain/version (%u/%u), disabling",
++			domain, version);
++		return -EINVAL;
 +	}
 +
-+	/* If no TLVs were parsed, the YoYo binary is considered invalid */
-+	if (remaining || count == 0) {
-+		BT_ERR("YoYo: trailing %zu bytes after tlv stream", remaining);
++	if (image_type != BTINTEL_PCIE_IMAGE_TLV_TYPE_EXTERNAL) {
++		BT_WARN("YoYo: unsupported image_type 0x%x, disabling", image_type);
++		return -EINVAL;
++	}
++
++	if (core_type != BTINTEL_PCIE_CORE_TYPE_BT) {
++		BT_WARN("YoYo: non BT core_type %u, disabling", core_type);
++		return -EINVAL;
++	}
++
++	ctx->dbg_info_present = true;
++	BT_DBG("YoYo: config='%.64s' image=%u core=%u",
++	       info->config_name, image_type, core_type);
++	return 0;
++}
++
+ /*
+  * Parse the optional YoYo firmware TLV stream and validate each record.
+  * This is the entry point for the runtime debug configuration payload.
+@@ -27,6 +75,7 @@ static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
+ 	const u8 *ptr = buf;
+ 	size_t remaining = buf_len;
+ 	u32 count = 0;
++	int ret = 0;
+ 
+ 	while (remaining >= sizeof(*tlv)) {
+ 		size_t tlv_size;
+@@ -45,6 +94,13 @@ static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
+ 
+ 		switch (type) {
+ 		case BTINTEL_PCIE_TLV_TYPE_DBG_INFO:
++			ret = btintel_pcie_yoyo_parse_dbg_info(ctx,
++							       (const void *)tlv, len);
++			if (ret) {
++				ctx->dbg_info_present = false;
++				return ret;
++			}
++			break;
+ 		case BTINTEL_PCIE_TLV_TYPE_DBG_REGION:
+ 		case BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER:
+ 		case BTINTEL_PCIE_TLV_TYPE_DBG_HCMD:
+@@ -105,6 +161,7 @@ void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
+ 		return;
+ 
+ 	ctx->enabled = false;
++	ctx->dbg_info_present = false;
+ }
+ EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_cleanup);
+ 
+@@ -149,6 +206,10 @@ int btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
+ 		BT_ERR("YoYo: tlv parsing failed (%d)", ret);
+ 		return ret;
+ 	}
++	if (!ctx->dbg_info_present) {
++		BT_ERR("YoYo: Invalid BT debug Info tlv, using legacy DBGC defaults");
 +		return -EBADMSG;
 +	}
-+
-+	BT_DBG("YoYo: parsed %u tlv's", count);
-+	return 0;
-+}
-+
-+/**
-+ * btintel_yoyo_init - Initialize the YoYo context
-+ * @ctx:   Pre-allocated context (typically embedded in driver data)
-+ */
-+int btintel_pcie_yoyo_init(struct btintel_pcie_yoyo_ctx *ctx)
-+{
-+	if (!ctx)
-+		return -EINVAL;
-+
-+	memset(ctx, 0, sizeof(*ctx));
-+	INIT_LIST_HEAD(&ctx->region_list);
-+	INIT_LIST_HEAD(&ctx->trigger_list);
-+	INIT_LIST_HEAD(&ctx->hcmd_list);
-+	INIT_LIST_HEAD(&ctx->config_set_list);
-+
-+	/* set it to true after successful TLV parsing */
-+	ctx->enabled = false;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_init);
-+
-+/**
-+ * btintel_yoyo_cleanup - Clean up the YoYo context
-+ * @ctx:  YoYo context to clean up
-+ */
-+void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
-+{
-+	if (!ctx)
-+		return;
-+
-+	ctx->enabled = false;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_cleanup);
-+
-+/**
-+ * btintel_yoyo_load_and_parse - Load ibt_debug_yoyo.bin and parse TLVs
-+ * @ctx:  Initialized YoYo context
-+ * @dev:  Device for firmware loading (typically &pdev->dev)
-+ *
-+ * Uses request_firmware_direct, since the YoYo binary
-+ * is optional. On success, sets ctx->enabled.
-+ */
-+int btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
-+				     struct device *dev)
-+{
-+	const struct firmware *fw;
-+	int ret;
-+
-+	if (!ctx)
-+		return -EINVAL;
-+
-+	ret = request_firmware_direct(&fw, BTINTEL_PCIE_YOYO_FW_NAME, dev);
-+	if (ret) {
-+		BT_WARN("YoYo: failed to load %s (%d)",
-+			BTINTEL_PCIE_YOYO_FW_NAME, ret);
-+		return ret;
-+	}
-+
-+	/* Sanity check firmware size */
-+	if (fw->size < sizeof(struct btintel_pcie_tlv_hdr)) {
-+		release_firmware(fw);
-+		return -EBADMSG;
-+	}
-+
-+	BT_DBG("YoYo: loaded %s (%zu bytes)", BTINTEL_PCIE_YOYO_FW_NAME,
-+	       fw->size);
-+
-+	ret = btintel_pcie_yoyo_parse_tlv_buffer(ctx, fw->data, fw->size);
-+	release_firmware(fw);
-+
-+	/* File Corruption / TLV validation failed */
-+	if (ret) {
-+		BT_ERR("YoYo: tlv parsing failed (%d)", ret);
-+		return ret;
-+	}
-+
-+	ctx->enabled = true;
-+
-+	BT_INFO("YoYo: feature enabled and configured");
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_load_and_parse);
-+
-+MODULE_DESCRIPTION("Intel Bluetooth yoyo debug framework");
-+MODULE_LICENSE("GPL");
+ 
+ 	ctx->enabled = true;
+ 
 diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
-new file mode 100644
-index 000000000000..b0b94c2a169d
---- /dev/null
+index b0b94c2a169d..717e8838c4d5 100644
+--- a/drivers/bluetooth/btintel_pcie_debug.h
 +++ b/drivers/bluetooth/btintel_pcie_debug.h
-@@ -0,0 +1,77 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Intel Bluetooth YoYo Debug Framework
-+ *
-+ * Copyright (C) 2026 Intel Corporation
-+ *
-+ */
+@@ -26,6 +26,19 @@
+ #define BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET		0x100000A
+ #define BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE	0x100000B
+ 
++/* Supported TLV type versions */
++#define BTINTEL_PCIE_DBG_INFO_TLV_VERSION	2
++/* Debug Info TLV */
++#define BTINTEL_PCIE_CONFIG_NAME_LEN		64
++#define BTINTEL_PCIE_DOMAIN_BT			0
++#define BTINTEL_PCIE_CORE_TYPE_BT		1
 +
-+#ifndef __BTINTEL_PCIE_DEBUG_H__
-+#define __BTINTEL_PCIE_DEBUG_H__
-+
-+#include <linux/list.h>
-+#include <linux/types.h>
-+#include <linux/device.h>
-+#include <linux/firmware.h>
-+
-+/* External YoYo binary file */
-+#define BTINTEL_PCIE_YOYO_FW_NAME	"intel/ibt_debug_yoyo.bin"
-+
-+/* TLV type codes */
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_INFO		0x1000005
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_BUF_ALLOC		0x1000006
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_HCMD		0x1000007
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_REGION		0x1000008
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER		0x1000009
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET		0x100000A
-+#define BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE	0x100000B
-+
-+/* TLV header */
-+struct btintel_pcie_tlv_hdr {
-+	__le32 type;
-+	__le32 length;
-+} __packed;
-+
-+/* Debug header common to all debug TLVs */
-+struct btintel_pcie_dbg_hdr {
-+	__le32 tlv_data_version;
-+	__le32 domain;
-+} __packed;
-+
-+/* Address/value pair */
-+struct btintel_pcie_addr_value {
-+	__le32 address;
-+	__le32 value;
-+} __packed;
-+
-+/*
-+ * struct btintel_pcie_yoyo_ctx- Runtime state for YoYo debug configuration
-+ * @enabled: Whether the loaded YoYo configuration passed validation
-+ * @region_list: Parsed debug-region entries
-+ * @trigger_list: Parsed debug-trigger entries
-+ * @hcmd_list: Parsed HCI command entries
-+ * @config_set_list: Parsed configuration-set entries
-+ * @hdev: Associated HCI device; NULL until successful HCI registration
-+ *
-+ * Stores the validation state and parsed TLV data for the optional YoYo
-+ * firmware configuration.
-+ */
-+struct btintel_pcie_yoyo_ctx {
-+	bool			 enabled;
-+
-+	struct list_head	 region_list;
-+	struct list_head	 trigger_list;
-+	struct list_head	 hcmd_list;
-+	struct list_head	 config_set_list;
-+
-+	struct hci_dev		 *hdev;
++enum btintel_pcie_image_tlv_type {
++	BTINTEL_PCIE_IMAGE_TLV_TYPE_EXTERNAL	= 0x1,
++	BTINTEL_PCIE_IMAGE_TLV_TYPE_INTERNAL	= 0x2,
++	BTINTEL_PCIE_IMAGE_TLV_TYPE_UNKNOWN	= 0xff,
 +};
 +
-+int  btintel_pcie_yoyo_init(struct btintel_pcie_yoyo_ctx *ctx);
-+void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx);
+ /* TLV header */
+ struct btintel_pcie_tlv_hdr {
+ 	__le32 type;
+@@ -44,6 +57,25 @@ struct btintel_pcie_addr_value {
+ 	__le32 value;
+ } __packed;
+ 
++/*
++ * struct btintel_pcie_tlv_dbg_info - YoYo DEBUG_INFO TLV
++ * @hdr: TLV type and payload length
++ * @dbg_hdr: Debug TLV version and domain
++ * @image_type: Firmware image type
++ * @core_type: Firmware core type
++ * @config_name: Fixed-size name of the firmware configuration
++ *
++ * Describes the firmware image targeted by the YoYo configuration. Fields
++ * are stored in little-endian format in the packed firmware TLV.
++ */
++struct btintel_pcie_tlv_dbg_info {
++	struct btintel_pcie_tlv_hdr hdr;
++	struct btintel_pcie_dbg_hdr dbg_hdr;
++	__le32 image_type;
++	__le32 core_type;
++	u8 config_name[BTINTEL_PCIE_CONFIG_NAME_LEN];
++} __packed;
 +
-+/* Load and parse the external .bin file */
-+int  btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
-+				      struct device *dev);
-+
-+#endif /* __BTINTEL_PCIE_DEBUG_H__ */
+ /*
+  * struct btintel_pcie_yoyo_ctx- Runtime state for YoYo debug configuration
+  * @enabled: Whether the loaded YoYo configuration passed validation
+@@ -58,12 +90,11 @@ struct btintel_pcie_addr_value {
+  */
+ struct btintel_pcie_yoyo_ctx {
+ 	bool			 enabled;
+-
++	bool			 dbg_info_present;
+ 	struct list_head	 region_list;
+ 	struct list_head	 trigger_list;
+ 	struct list_head	 hcmd_list;
+ 	struct list_head	 config_set_list;
+-
+ 	struct hci_dev		 *hdev;
+ };
+ 
 -- 
 2.53.0
 
