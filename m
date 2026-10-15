@@ -1,39 +1,43 @@
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9013CB2EA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 05:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6319E3BBFD0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 05:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792041646; cv=none; b=ku6TyVPbdG/o0beUCgelujw2M9/PaTRY7ZJNnhgSz9YimPF3qj7WNyo5T9KNOOrN+gHkAE7s1JFoFaVJ54pXDRhJeA1eyRM7Ig0bQfrOQTC8oV657CLZXa6fvDaqR2xyRqzyaBJhRChJ+lX5Mumh9o57koZYZ+Q+pqQfg4SHySc=
+	t=1792042107; cv=none; b=uM0WX5qRe2i/ONf82gEr+HvDyELz8gCxbcoq8+xqlX809osIqpj2vi2fAifV23qZsMSux0DJ4tzNabzUMnHt9HrhImNDwqF0sbuRq1GJBWnhywtsWQDjkA18zGp5pX3ZU048kr5+3muR96e5OApjecC8GRErwtqXJJbz8MCQWOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792041646; c=relaxed/simple;
-	bh=o78/8ZgMwQ+c3Jml1c//wS7cCcxmyFPAi/4GoyOBxio=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=R3uw/15ul0OMM1hsKI7YhSWXvsHN62XYD6hC3k4A1xgVy5Ew8QDY/QGI4JIKgVJrJNbWHeScJyxtfxsavNPus3KYMFT31RKuMHmWlLUBz10L0UoUgG/ZrDoFkZVEx+3+1NxbA2DR1glTVFfhpXPM5OUPWDGKefZeU2Xea9rTj5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=At8cY24u; arc=none smtp.client-ip=79.135.106.29
+	s=arc-20240116; t=1792042107; c=relaxed/simple;
+	bh=U2gj/vaV65VNsUL7fPUVQ/1hnFH4ZW5FqtRa+wjwJM0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uXey+ujjVYfo9DPMUW25Daz7hx0LtmczO3vw3hiUlXb2exX1tng7NhMY8+5OWOVMBzKzeYUfB2Jk5TviV7YKIvKUolnDVKVzD5viJbyPcgVgGa0NK5E/OLNy0MhgaljDXa93L+eeK0pFeE3cRkOLU9vFa2b73g3sH8kWe6Io1so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=QPvLQWl+; arc=none smtp.client-ip=109.224.244.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="At8cY24u"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="QPvLQWl+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1792041638; x=1792300838;
-	bh=PcmXnfmK8y2euY70mI2xAIXpNV9stQYYQjVINHKgyuI=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=At8cY24ue5JIo+LLyvoGQGnI2dI5VTpjcYRvUNMGW4AA8xO+j3anqetii/Ni/Ot0o
-	 C2g+9ZQrjOOctkKL+kE6PWaFlJZ7uAiX2Y5QsC52KbKzV36DuqReDu55MWihqJtrSq
-	 8T3TOD5QmNQ+HVxvVj0bkW+khyge02hN3anbiynsJj++Uz+9UQZXJL2JQzFlz0XP7b
-	 RCjPL5oUwO6iBX1d3W2rs3zYsex8/PHE5ToPHQWqcUUAtcFeNYXGyPkKur0NNNPYsH
-	 SpYG1ty3ek69Mq305CC5qyR1Cq4vkdNOyVQHjv+3UnQuzLem0OJK6mrDYNr483puaU
-	 9bkHzKX+HFYuw==
-Date: Thu, 15 Oct 2026 05:20:33 +0000
+	s=protonmail2; t=1792042102; x=1792301302;
+	bh=cK+uFW9olimdOfTgCS7tswFXLY5ZJbA4nN3Y6M4+Al8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=QPvLQWl+JYE3NDjbfKXEBhqhLFae9WISTCmsq3HnhVBUuw26bapNuDMP1i8vuLU7s
+	 Jc7Hhclpm2/4WU862FqZefGlJXgYfYGPBqoA2q+1tBLTK7jZwpplvpU6xXbBuVjTGx
+	 nzZZEURQzd5Gg8/FjTgZeFU9IQb7L0BucfXqmKIJb++SeZWN/Xzlg2U9n0y6QIPn93
+	 vkV6el9jbhjARJnHcENwvQosBQFIJ/y1SiOwMIq01eUnH/z1BGfzqP/eK/STw+CnbY
+	 3gf8gvb+Uhxdq7QLGTJqLtpfA+ujBYTC3GzKti3cMGSrdEdjq9KhAsQ2Y/DzeY47yn
+	 LY+JG9slNrpGA==
+Date: Thu, 15 Oct 2026 05:28:18 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Keep credits from completing security upgrades
-Message-ID: <20261015052018.129971-1-cochcoder@proton.me>
+Subject: [RFC PATCH v2] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
+Message-ID: <20261015052751.137705-1-cochcoder@proton.me>
+In-Reply-To: <20261013031943.489829-1-cochcoder@proton.me>
+References: <20261013031943.489829-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: d3fd2344d0b46055654193950ccb3c168efe5603
+X-Pm-Message-ID: 0a035fcb2513a39e20eb97b1810c65016d85ce26
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,174 +47,116 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Credit indications can invoke resume on fixed or unready channels.
-Connected LE credit-based sockets can also resume during a security
-upgrade because credits and security share the socket suspend flag.
+Tolerate exact-size, nonzero credit grants with identifier zero only
+for connected LE credit-based channels. Keep the target and pending
+security checks shared with ordinary identifiers. Do not send a
+response with identifier zero or relax other signaling commands.
 
-Validate the target mode and state for every identifier. Track pending
-LE/ECRED security upgrades and retain credits without sending queued
-data or resuming the socket until encryption meets the requested level.
-Drain queued data after security completes and keep credit-starved
-sockets suspended.
+This is an interoperability exception to Core Vol 3 Part A section 4,
+not a conformance fix.
 
-Fixes: fad5fc89594d ("Bluetooth: Add LE flow control discipline")
 Assisted-by: OpenCode:gpt-6.1-sol
 Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-New standalone security/target-state fix, not a resend of the zero-identifi=
+Changes since v1:
+- Depend on the separately submitted target/state and pending-security fix.
+- Require a connected ordinary LE CoC, an exact-size indication and a nonze=
+ro
+  grant. Keep fixed/unready targets and ECRED identifier-zero grants exclud=
+ed.
+- Preserve shared target/security checks for normal and zero identifiers.
+- Do not generate any response with identifier zero or relax other commands=
+.
+
+REQUIRED security dependency, submitted separately and not resent here:
+https://lore.kernel.org/linux-bluetooth/20261015052018.129971-1-cochcoder@p=
+roton.me/
+Signed dependency commit: 61a7ca610078ddf616873e7d4914cb6ac9eae7a3.
+Apply it first. This mail includes its prerequisite patch-id against upstre=
+am
+397464709a20. The resulting source tree matches the validated refreshed pai=
+r.
+
+The Core specification still forbids identifier zero. This remains an
+interoperability RFC requiring maintainer policy agreement, not a conforman=
+ce
+fix. The separate security patch is independently useful without this excep=
+tion.
+
+Fresh current-base controls: all nine focused security cases pass with eith=
 er
-interoperability RFC. The zero-ID revision will be submitted separately and
-depends on this fix; this patch does not accept identifier zero.
+security-only or combined kernels. Public credit controls pass 13/14 with
+security-only (expected positive zero-ID failure), and 14/14 with this revi=
+sion
+added. No skips or captured KASAN/lockdep alerts occurred in these focused =
+runs.
+GCC W=3D1 changed objects and source-extracted security/target/zero-ID fixt=
+ures pass.
 
-Refreshed without functional changes from the reviewed candidate onto curre=
-nt
-bluetooth-next 397464709a20. The referenced Fixes commit's full ID and subj=
-ect
-were verified from its Git object:
-fad5fc89594de31388572a26f33caa7c30a23782
+The refreshed full suite is NOT claimed passing: SCI Fast Mode encounters a=
+n
+invalid response length for HCI opcode 0x20a3 and times out without a compl=
+ete
+summary. The same SCI failure reproduces on unpatched current upstream and =
+both
+revised guests. Initial spaced VM selectors selected broader tests; correct=
+ed
+space-free credit runs are the focused results above. Earlier 134/134 combi=
+ned
+results belong to the older reference base, not this fresh full-suite attem=
+pt.
 
-On this refreshed base, both security-only and security+compatibility guest
-kernels build with KASAN/lockdep and pass all nine focused security control=
-s.
-The 14 public credit controls pass 13/14 with this patch alone: the sole fa=
-ilure
-is the intentionally unsupported positive zero-ID case. With the separate
-compatibility patch they pass 14/14. No skips or captured KASAN/lockdep ale=
-rts
-occurred in these focused runs. GCC W=3D1 changed objects and source-extrac=
-ted
-target/security and zero-ID fixtures pass.
-
-The refreshed full-suite attempt is NOT a pass: SCI Fast Mode times out aft=
-er
-an invalid HCI Read Connection Interval response length for opcode 0x20a3, =
-and
-the runner reaches its outer timeout without a complete summary. The same S=
-CI
-failure reproduces on the unpatched current-base guest. It is not diagnosed=
- as
-a credit regression or claimed fixed here. An initial filter containing spa=
-ces
-was split by the VM runner; corrected space-free filtered runs are reported=
- above.
-
-Earlier reference-base results were security-only 133/134 (the expected zer=
-o-ID
-failure) and combined 134/134; those are historical, not fresh full-suite r=
-esults.
-The combined Arch integration was built and is reported working on hardware=
-,
-but that is not isolated attribution, over-the-air exploit evidence, comple=
-te
-security/lifetime coverage or a remote-CI pass. No severity/CVE claim is ma=
-de.
-The private reproducer and detailed private regression logs are not include=
+The combined Arch integration is reported working on hardware, not isolated
+attribution or exhaustive device/security/teardown coverage. No remote CI p=
+ass
+or severity claim is made. Private security reproducer/logs are not include=
 d.
+Confirm archive rendering of the dependency link before sending.
 
- net/bluetooth/l2cap_core.c | 33 +++++++++++++++++++++++++++++++--
- net/bluetooth/l2cap_sock.c |  9 +++++++--
- 2 files changed, 38 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4dd56e007..7a7f30531 100644
+index 7a7f30531..d805b1c62 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5391,6 +5391,11 @@ static inline int l2cap_le_credits(struct l2cap_conn=
+@@ -5396,6 +5396,10 @@ static inline int l2cap_le_credits(struct l2cap_conn=
  *conn,
+ =09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
+ =09=09goto unlock;
 =20
- =09l2cap_chan_lock(chan);
-=20
-+=09if (chan->state !=3D BT_CONNECTED ||
-+=09    (chan->mode !=3D L2CAP_MODE_LE_FLOWCTL &&
-+=09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
++=09/* Tolerate identifier-zero credits only for a live LE CoC. */
++=09if (!cmd->ident && (!credits || chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
 +=09=09goto unlock;
 +
  =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
  =09if (credits > max_credits) {
  =09=09BT_ERR("LE credits overflow");
-@@ -5404,6 +5409,9 @@ static inline int l2cap_le_credits(struct l2cap_conn =
-*conn,
+@@ -5994,11 +5998,21 @@ static inline void l2cap_le_sig_channel(struct l2ca=
+p_conn *conn,
 =20
- =09chan->tx_credits +=3D credits;
+ =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
 =20
-+=09if (test_bit(FLAG_PENDING_SECURITY, &chan->flags))
-+=09=09goto unlock;
+-=09if (len !=3D skb->len || !cmd->ident) {
++=09if (len !=3D skb->len) {
+ =09=09BT_DBG("corrupted command");
+ =09=09goto drop;
+ =09}
+=20
++=09if (!cmd->ident) {
++=09=09if (cmd->code !=3D L2CAP_LE_CREDITS ||
++=09=09    len !=3D sizeof(struct l2cap_le_credits))
++=09=09=09goto drop;
 +
- =09/* Resume sending */
- =09l2cap_le_flowctl_send(chan);
-=20
-@@ -7967,6 +7975,8 @@ static void l2cap_security_cfm(struct hci_conn *hcon,=
- u8 status, u8 encrypt)
- =09mutex_lock(&conn->lock);
-=20
- =09list_for_each_entry(chan, &conn->chan_l, list) {
-+=09=09bool pending_le;
++=09=09/* Credits have no response or identifier-matched transaction. */
++=09=09l2cap_le_credits(conn, cmd, len, skb->data);
++=09=09goto drop;
++=09}
 +
- =09=09l2cap_chan_lock(chan);
-=20
- =09=09lockdep_assert_held(&chan->conn->lock);
-@@ -7974,7 +7984,12 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
-, u8 status, u8 encrypt)
- =09=09BT_DBG("chan %p scid 0x%4.4x state %s", chan, chan->scid,
- =09=09       state_to_string(chan->state));
-=20
--=09=09if (!status && encrypt)
-+=09=09pending_le =3D hcon->type =3D=3D LE_LINK &&
-+=09=09=09     (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
-+=09=09=09      chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) &&
-+=09=09=09     test_bit(FLAG_PENDING_SECURITY, &chan->flags);
-+
-+=09=09if (!status && encrypt && !pending_le)
- =09=09=09chan->sec_level =3D hcon->sec_level;
-=20
- =09=09if (!__l2cap_no_conn_pending(chan)) {
-@@ -7984,7 +7999,21 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
-, u8 status, u8 encrypt)
-=20
- =09=09if (!status && (chan->state =3D=3D BT_CONNECTED ||
- =09=09=09=09chan->state =3D=3D BT_CONFIG)) {
--=09=09=09chan->ops->resume(chan);
-+=09=09=09if (pending_le) {
-+=09=09=09=09if (!encrypt ||
-+=09=09=09=09    !smp_sufficient_security(hcon, chan->sec_level,
-+=09=09=09=09=09=09=09    SMP_ALLOW_STK)) {
-+=09=09=09=09=09l2cap_chan_unlock(chan);
-+=09=09=09=09=09continue;
-+=09=09=09=09}
-+
-+=09=09=09=09clear_bit(FLAG_PENDING_SECURITY, &chan->flags);
-+=09=09=09=09chan->sec_level =3D hcon->sec_level;
-+=09=09=09=09l2cap_le_flowctl_send(chan);
-+=09=09=09}
-+
-+=09=09=09if (!pending_le || chan->tx_credits)
-+=09=09=09=09chan->ops->resume(chan);
- =09=09=09l2cap_check_encryption(chan, encrypt);
- =09=09=09l2cap_chan_unlock(chan);
- =09=09=09continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index c396987c5..2d7f2935c 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -993,10 +993,15 @@ static int l2cap_sock_setsockopt(struct socket *sock,=
- int level, int optname,
- =09=09} else if ((sk->sk_state =3D=3D BT_CONNECT2 &&
- =09=09=09    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
- =09=09=09   sk->sk_state =3D=3D BT_CONNECTED) {
--=09=09=09if (!l2cap_chan_check_security(chan, true))
-+=09=09=09if (!l2cap_chan_check_security(chan, true)) {
-+=09=09=09=09if (conn->hcon->type =3D=3D LE_LINK &&
-+=09=09=09=09    (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
-+=09=09=09=09     chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL))
-+=09=09=09=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
- =09=09=09=09set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
--=09=09=09else
-+=09=09=09} else {
- =09=09=09=09sk->sk_state_change(sk);
-+=09=09=09}
- =09=09} else {
- =09=09=09err =3D -EINVAL;
- =09=09}
+ =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
+ =09if (err) {
+ =09=09struct l2cap_cmd_rej_unk rej;
 
 base-commit: 397464709a204da9b8dc3b01d6ea42539d951cd2
+prerequisite-patch-id: 658bb8f3b3e38bbbb21f2619434affc641582b7f
 
