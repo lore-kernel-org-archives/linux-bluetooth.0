@@ -1,166 +1,269 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0910542EDA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 16:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC0549E139
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 16:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792081696; cv=none; b=olZ7vPzyPfsor+z0gkJG55Bhu8U3W3PeXWcc8E8XTcGuti5TDcffDv/5c7z9MjkVgtA4KXffHM+zmvC/yB7/C9YGD2pC0ra7Xam0kHwZeQrGxDMeQiq9rwvAl+LpZDlxBkzqpKabui/Rp9aWZsIO12Aw2t1ay50UNQo1zVXalwU=
+	t=1792082533; cv=none; b=ID1p4e6M/gTbic8L7A6Ql8vBADnSE/uuOirOIlRgwQlW2DBIuNSa4ZJJGEq1f1Ru9V/yEDqkcRR9xAK/TVzuCf5oC2VlZ9ryB0qiY54l8Q2kCGSdLEDi1TDOwCIoWtZAN9qbSXO1Qq/3Qhko2ROU8tTAetLqw7OKKZdZ9/R40+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792081696; c=relaxed/simple;
-	bh=VZN2fb2ga+rAimb+At5lfyPZ8DXcR0GMUzzVA+d4nj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tm/dtHhFAP0oQfAAJCE1kbUKnSnOaRxhbGp9PmSCNy8wRfFEASd3KFRwC1XjiwTIQEZ+S+a6Mq3zrXUEcCsIgPnqIOgFni1ale7+SpliHQ+pchm36M36hRrsN8WTAEuOVeG3XyE89KOUVCje511IsjtaAG3filspCbSWS3HiWVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jiCSaMqW; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1792082533; c=relaxed/simple;
+	bh=odYsqb6qlvwr9ql2stmc54Jy9XrBQEgexBY+u0gq+rY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bWc6xq5yjEiQp22L69Nn87/EJ9gDrszzkDQNAsk9zx7oJ4GFM2uQzJcRLjL73/EYDfY+6aTnWZTj7DOiaKGAf374NJ3MHixjSJHDcRzCfiW7L8uZURyUQD3GVAUDijCKtJW9s8iXozx9UZ3HcbL/pC4NV/E5L0UXsFpC3OFmaUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1kOCeiW; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jiCSaMqW"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-48441a2ba1bso1108827f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 09:28:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1kOCeiW"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2e812e2b31bso32286565ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 09:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1792081679; x=1792686479; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=KR4i4KxOGzdvwjOBg3czI4/01caQ5A7Fc1JHBGRwQTE=;
-        b=jiCSaMqWSm1g8TUDWxYHPti+M55ELsQiQrxtKGP52uFYZYTYxdWuJvy81ogtK4/FYH
-         eYojlAa9dNruOToL9q262x9QBLNiVycTqn3TTSI3JFsAeAb4ODZu+wXQHE3j7ViOo7W6
-         fxtmkQ9pmF9KFAxg/uO2SfrLvQ5tuNw0SciiITkvWBL5V12hqTvAx5EraDBAkCFzvS0N
-         HXtx4kiTdAVQcBTy3QUt9vPheKm0E1hMBujlQiYuDjVvNrYGeXsCYUX4er3OV0xafbPu
-         JazdYEL4mLksOGzfczVxBEMnd/hEQ169hWVoLk9jNZ9OvWW5Knir9hn+dMFIdbnCHG8a
-         T9wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792081679; x=1792686479;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1792082514; x=1792687314; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=KR4i4KxOGzdvwjOBg3czI4/01caQ5A7Fc1JHBGRwQTE=;
-        b=a50aE0KkXMAMJ5Ep7uUc2ii/qknuo5YAIEpQ+xMDAuVggq9aQjqgyeQPvYvJ6QNkQ+
-         B+L4sLeDSCOMKEPWPT2+3JBUnPK7TxgnhR2dNFjQmUDmKx6OloPee5DU9vObX4J/kuBo
-         eNrlmM4Yrw1W8kYgBYEMy/WQEV4RZuUqfocfbUx+ToSvJamp+y2ZO/oVGD/ZBu77SE1m
-         gatxPwAJ4PDXf8Wk4n8JWxNsaKl4miulxqE+VjLtjuX28WDS7xOLy7cDBiR4pl7rJrxM
-         27feeLHtghgFYaj2cZ0ewJFyXE+g4jbktJCiw9VY6QxS262xURFv9SRibPNURM9J869n
-         da1w==
-X-Forwarded-Encrypted: i=1; AKwUvBzWDYerNO/6Ee0STfftwjorHpBZoioswFVT2nPKq2ypuptxa+NgFFIPajyjZcudwvjMcElOS+TwNspzbXP86L4=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKGKxnjnnXOhRzZTFsjC+eYhmOUM9ZC8tT82DNZK9Ae2xBvHBLv
-	N2I2cJdNX2m4HMjs/MIxjsy2W5gu91vU/WPhewEJPUGRcR5oVXeCDdMOjSMkFinJJdI=
-X-Gm-Gg: AYBFou22EhKx+ITGEsERybd0W2JUnp4A+KFnPtpnWLWwfncQSVDwSl5j9WIrwyhfqmK
-	NafSFt+TVy0F6aPduA2HmuQM5ZgpnTvDshUGtODt7fNRaeSWo02R5wePHsrNSzYMPYX/zrCiDpb
-	gUmXNrCq8fcBZ0rHcU9yEmLgTX64SlamsHgVeXwCvj9cK0n3GRnzbtmNvPFGk1IqEUi3QIPto+m
-	IXrqFTtvf196GIKrQqiWugS7KKJ4p1vVkzBKYDD4Iz020EOMSVeOLF1xm9UqhFYLFaLtzSzYGbN
-	OFMG7Shczw/lOGe+v3ztIdd1QcayGY1eehk4IUPoowAHBWVjNKXBvR6el6syDok3vU5LJC/7GiS
-	W4tF+fwB46v9YdR8dg6jEp731T2ExFEs3mJlgODQxHP1m1IH3Ik9g8aGw0wgS1h3DlHHnZ/ODCK
-	2mAJqchhKLvTcBN4v+ffMacp4JQQx0k1UDt7w4yl4VldLUjt5uJN2dHV6EBGCsbVWqiYpYiOtvx
-	TBL6Nt9jYtwjYm6YUjw2g==
-X-Received: by 2002:adf:f341:0:b0:487:197a:5c1f with SMTP id ffacd0b85a97d-48dbaae84e0mr31568707f8f.49.1792081678765;
-        Thu, 15 Oct 2026 09:27:58 -0700 (PDT)
-Received: from linaro.org ([2a02:2454:ff25:4f41:7bdc:6c2a:a8d2:6ad3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48de0aaaa34sm19545964f8f.20.2026.10.15.09.27.57
+        bh=y81tg7aS+OL7WL9uwzHmpXBtWhblGVNn9iU+ZHCLidI=;
+        b=U1kOCeiWGVEsi5XJcXB/HbizsgiaS5Fe307yt7SYCR63orXCfuaGf9JnLbMsJhUHtC
+         0jbMVfEl1TLP14QqVDB0OMjT4TytPOFAK4VEMh+3/D78j9xE4oev6zaB0xHtEVuoSXz7
+         VM92aINRuZ4t/JV0l+txt3/+t41/pUynFIadugzXG7sxCzaLWiZNsUWMKrfzaSz9vvlr
+         bAUnOpNQgcm6oksYf4iXRFUFan7wtnaF22GZHgdgVXchYtTt3nVp2UgMmrPRegODVcqp
+         JpbC38xlgIQKGM5NKHDYM3+6/GnOS75shvalz+a9rR5Mtf2f3ATZ6BlxtxW8EnyVoMUf
+         h5/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792082514; x=1792687314;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=y81tg7aS+OL7WL9uwzHmpXBtWhblGVNn9iU+ZHCLidI=;
+        b=yMO355Sr4BWL+PrM7sRINcGGgjVjV74EKsbNLl3GqAcqlm0BYKXwYwWoIDCEIeCnbT
+         R4U/ODwi6yfNTMUlhNIYq5A7aC9Iq4b4resxRiB0/ONQmW9l8YUoZBJJ4bbClxexcfTX
+         HhYa95cXS9vy731EA0QBc7MnuJexaX2EnnU25w5Jrdp+2Fq9WMYoVvHypbwvpMEkSVh7
+         fOx4CxNKJNWpr40GbJfAvb+f6krfqJI1lI1WbuGuuz25U2JX3brBhGkz63WkRiBmPed9
+         odSJTScR5FMJ+szfUn0hq0wGd2qW4L4cthUEdYuoFzgVcUE1NwYs53a8AuuITFrbGTTT
+         j41Q==
+X-Gm-Message-State: AFq9FYIqCiXalETPsA82ajlwkmGJInxIAWnJrb40EUkbO7joDyqnM3Dt
+	oVVZ0Gav8N4FKv6F6d/cnVMvK8GGimQizeYsQxNhnhrMut8aqFD+DNjw
+X-Gm-Gg: AYBFou0SYlL9XvDwB4jICj57ruBs3SlaOR91UatCl/l5xi4SMy/FbvoHGjXTOCh5lWw
+	2DhjZ5WexOdhOkt4XrCTMU/UZMgSMhGmXy3UwawASEM7iZxHXP/ocRbLcaDAFlS6/FQ3OmpHbzL
+	17u82q7zI9cbC7COIsCJNYy5kCIDI1PMTHBPb3OEyeC/fPLgRSuyRvp0sp3KZcFcv7PLABHZdQX
+	KKDlMbNixjAlcl1FmD9pqo9Rjc3vjJWLwrMDv270EvvTuo9sYsNOgAKb0HsDm3F6JcmooR54kl+
+	MlMRccdh1nSAthRcJ54a00DxsSD2+4I5EKc1/8oKVD+eQ/hjMQpHh9v6U9dcpkgNU2sjkX2vGnZ
+	fdUq3hLsJM/0011qFcOnslDltSb475eVpi7NLyCzbsDn1lYJ12mOYa/Cs3rqFTiwCKZZWcKRHFK
+	VRBr4pmKADe5j5MPHZYUODSkDBMcPK3x9nBaw9oNTZZ42GW0jgocwhsdRtJU/WEtEz2Vc=
+X-Received: by 2002:a17:903:38cd:b0:2e9:660a:793a with SMTP id d9443c01a7336-2e9660a7b0bmr21795855ad.36.1792082514044;
+        Thu, 15 Oct 2026 09:41:54 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e95cf92dfesm11245915ad.11.2026.10.15.09.41.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 09:27:58 -0700 (PDT)
-Date: Thu, 15 Oct 2026 18:27:46 +0200
-From: Stephan Gerhold <stephan.gerhold@linaro.org>
-To: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Cc: Srinivas Kandagatla <srini@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Abel Vesa <abelvesa@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org
-Subject: Re: [PATCH RFC 0/5] nvmem: Add a UEFI variable backed NVMEM provider
-Message-ID: <atD_AjZKaF5UtSUB@linaro.org>
-References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com>
+        Thu, 15 Oct 2026 09:41:53 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	nathan@kernel.org,
+	ndesaulniers@google.com,
+	morbo@google.com,
+	justinstitt@google.com,
+	johan.hedberg@nokia.com,
+	padovan@profusion.mobi
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	baijiaju1990@gmail.com,
+	jjzuming@gmail.com,
+	zzzccc427@gmail.com,
+	lkp@intel.com
+Subject: [PATCH v2] Bluetooth: MGMT: Serialize power-on with power-off completion
+Date: Fri, 16 Oct 2026 00:41:46 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0063-v11-a70581b6877e5fe118a3@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 14, 2026 at 04:02:38PM +0300, Abel Vesa wrote:
-> This is an RFC: I do not expect it to be merged as-is, it is sent to get
-> feedback on the approach.
-> 
-> Some values a platform needs (for example the WLAN and Bluetooth MAC
-> addresses on the Qualcomm laptops) are not always available to the kernel
-> in a convenient form. They may live in firmware-owned SPI-NOR storage
-> (e.g. a DPP partition) for which there is no straightforward, universally
-> working way to read them from the non-secure world.
-> 
-> As an alternative, this series allows such values to be provisioned once
-> into a UEFI variable and consumed in the kernel. It adds a generic NVMEM
-> provider that exposes the contents of a UEFI variable as an NVMEM device,
-> so the data can be consumed through the standard nvmem-cells bindings.
-> MAC addresses are just the motivating use case; the provider itself is
-> generic.
-> 
-> The first two patches are the actual proposal:
-> 
->   - dt-bindings: nvmem: Add UEFI variable NVMEM provider
->   - nvmem: Add UEFI variable NVMEM provider
-> 
-> The remaining three patches are included only to illustrate how a
-> consumer would use the provider; they are not meant for merging as part
-> of this series:
-> 
->   - Bluetooth: hci_qca: consume a "bd-address" nvmem cell
->   - wifi: ath12k: consume a "mac-address" cell
->   - arm64: dts: qcom: glymur-crd: wire both to a "MacAddresses" variable
-> 
-> glymur-crd is used here only as a convenient example for the consumer
-> patches.
-> 
-> Feedback on the provider, and on whether sourcing such values from a UEFI
-> variable is a reasonable approach when they cannot be read from the
-> SPI-NOR directly, is very welcome.
-> 
-> Assisted-by: LLM
-> Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+mgmt_set_powered_complete() must only consume the pending command for
+its own request. However, __mgmt_power_off() removes and frees the
+SET_POWERED command before the request's destroy callback runs, and
+mgmt_pending_valid() identifies outstanding commands only by address.
 
-In general, I think the idea to take NVMEM information from a UEFI
-variable is reasonable. However, at the end the usability of this
-approach depends on vendors actually provisioning the UEFI variable.
+When a powered controller is switched off and another management socket
+requests power-on, the allocator can reuse the old command's address:
 
-Is that the case for your "MacAddresses" example on Glymur laptops?
-Is any of these laptops shipping with this UEFI variable provisioned?
+  Power-off request worker          Power-on management handler
+  ------------------------          ---------------------------
+  __mgmt_power_off(): free cmd
+  hci_dev_close_sync(): unlock
+  set_powered_sync(): return
+                                    set_powered(): lock hdev
+                                    allocate and link replacement
+  mgmt_pending_valid(): unlink
+    replacement at old address
+  read replacement's cp->val = 1
+  wait for hdev->lock
+                                    submit fails: remove/free cmd
+                                    unlock hdev
+  acquire hdev->lock
+  read freed cmd->opcode
 
-I can't really imagine end users manually provisioning this variable.
-We have too much manual setup required already to be able to use these
-laptops with Linux. Ideally, we should take the information from
-wherever Windows is taking it and make it work out of the box.
+The old callback can respond through and free the new command instead of
+completing its own request. If hci_cmd_sync_submit() fails to allocate
+its work entry after the callback has unlinked the replacement,
+set_powered() removes and frees it again while still holding hdev->lock.
+The old callback then acquires that lock and reads the freed command.
 
-For existing Qualcomm laptops with the DPP partition on SPI-NOR, there
-is prior work that could be extended. I would expect you only need:
+Serialize power-on publication with the existing request mutex, which
+hci_cmd_sync_work() holds across the request function and its destroy
+callback. Hold it through submission and error cleanup so the
+replacement cannot be published before the old callback finishes.
+Acquire it before hdev->lock to preserve the worker's lock order.
+Power-off retains its existing cancellation path.
 
- 1. SCM SPI-NOR storage support from
-    https://lore.kernel.org/linux-arm-msm/20260126-scm-storage-v2-v2-0-fa045c7e7699@radxa.com/
- 2. GPT partition parser (not sure if that exists for MTD but the format
-    is certainly well documented and supported already in Linux for
-    normal block devices)
- 3. DPP parser from
-    https://github.com/TravMurav/dtbloader/blob/main/src/qcom.c
- 4. Some way to hook it up in the device tree
+Put the shared command path in a helper and acquire the request mutex
+unconditionally around the power-on call. Keeping acquisition and
+release in the same control-flow path also allows Clang context analysis
+to verify balanced locking.
 
-See discussion in
-https://lore.kernel.org/linux-arm-msm/de081bdc-4b10-4cbe-9b09-4652b63bc4b9@packett.cool/
+KASAN report as below:
 
-The universal approach implemented here would obviously be cleaner, but
-in my opinion it depends on vendors provisioning this variable before
-shipping devices to customers.
+        BUG: KASAN: slab-use-after-free in
+    mgmt_set_powered_complete+0x450/0x4d0
+    Read of size 2 at addr ffff88810921ab10 by task kworker/u17:0/500
 
-Thanks,
-Stephan
+    Workqueue: hci0 hci_cmd_sync_work
+    Call Trace:
+     <TASK>
+     dump_stack_lvl+0x93/0xd0
+     print_report+0xce/0x630
+     ? mgmt_set_powered_complete+0x450/0x4d0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __virt_addr_valid+0x20d/0x410
+     ? mgmt_set_powered_complete+0x450/0x4d0
+     kasan_report+0xe0/0x110
+     ? mgmt_set_powered_complete+0x450/0x4d0
+     mgmt_set_powered_complete+0x450/0x4d0
+     ? __pfx_mgmt_set_powered_complete+0x10/0x10
+     hci_cmd_sync_work+0x207/0x450
+     ? __pfx_mgmt_set_powered_complete+0x10/0x10
+     process_one_work+0x908/0x19c0
+     ? __pfx_process_one_work+0x10/0x10
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? lock_is_held_type+0x8f/0x100
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     worker_thread+0x65c/0xe40
+     ? __pfx_worker_thread+0x10/0x10
+     kthread+0x34f/0x460
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork+0x659/0x940
+     ? __pfx_ret_from_fork+0x10/0x10
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? __switch_to+0x74f/0xf80
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork_asm+0x1a/0x30
+     </TASK>
+
+    Allocated by task 531:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     __kasan_kmalloc+0xaa/0xb0
+     __kmalloc_cache_noprof+0x251/0x610
+     mgmt_pending_new+0x60/0x230
+     mgmt_pending_add+0x3b/0x180
+     set_powered+0x2a8/0x7e0
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+    Freed by task 531:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     kasan_save_free_info+0x3b/0x60
+     __kasan_slab_free+0x5f/0x80
+     kfree+0x307/0x580
+     set_powered+0x336/0x7e0
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    ==================================================================
+
+Fixes: eec8d2bcc841 ("Bluetooth: Add support for set_powered management command")
+Assisted-by: LLM
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+---
+Changes in v2:
+- Move the common set_powered command path into a helper and acquire
+  req_lock in the explicit power-on branch, fixing Clang context-analysis
+  errors.
+- Preserve req_lock -> hdev->lock ordering and keep power-off cancellation
+  outside req_lock.
+- Rebase onto current bluetooth-next.
+
+Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0063-v7-35a6680c94a332fea155@gmail.com
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3b9c82bd2f027..90686ebec2399 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1395,19 +1395,13 @@ static int set_powered_sync(struct hci_dev *hdev, void *data)
+ 	return hci_set_powered_sync(hdev, cp.val);
+ }
+ 
+-static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
+-		       u16 len)
++static int __set_powered(struct sock *sk, struct hci_dev *hdev,
++			 void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+ 	int err;
+ 
+-	bt_dev_dbg(hdev, "sock %p", sk);
+-
+-	if (cp->val != 0x00 && cp->val != 0x01)
+-		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_POWERED,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!cp->val) {
+@@ -1454,6 +1448,32 @@ static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
++		       u16 len)
++{
++	struct mgmt_mode *cp = data;
++	int err;
++
++	bt_dev_dbg(hdev, "sock %p", sk);
++
++	if (cp->val != 0x00 && cp->val != 0x01)
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_POWERED,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	if (!cp->val)
++		return __set_powered(sk, hdev, data, len);
++
++	/*
++	 * Wait for the previous power-off completion before publishing a
++	 * new command that could reuse its freed pending-command address.
++	 */
++	hci_req_sync_lock(hdev);
++	err = __set_powered(sk, hdev, data, len);
++	hci_req_sync_unlock(hdev);
++
++	return err;
++}
++
+ int mgmt_new_settings(struct hci_dev *hdev)
+ {
+ 	return new_settings(hdev, NULL);
