@@ -1,467 +1,612 @@
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629F549A3A9;
-	Thu, 15 Oct 2026 09:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E7B3CB56B;
+	Thu, 15 Oct 2026 11:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792057845; cv=none; b=oklHv7CG+5yDe9MysoArTaZNaAdRM5Gx/E3sODC2AsnAuI/o5295AOCGlVcb8FKHzODCEsW5UoHVus5uQaODWJps5skzX0rEckFAYJaSeUbMajOWYvi+Q6yzRHBsizSwObxtkW49Zy2xqMyw7+4iWF3iOL3pTUpB/wZgaUaJudk=
+	t=1792062145; cv=none; b=qgHJJ7mSjtpMoYFny4twlKJh+cjvemhn9hCFuEBHgFfB1Ye6GQe1/MfiDkctfr0+71LAWHvSRnKv2Z3rVkXHEmlZimC/Z2Y4Sldz0rTAkkt4/c+Ob6Dq4ijznuGWT2oiqAonalUVjGGeCZfmbC5SZ0P+j6MD6XSdUsVExRK3MmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792057845; c=relaxed/simple;
-	bh=Xc1hYw7D6ZaqqHWFn6BUKh7r1NtME5QXhC1PSsJMpwI=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=UKIjgVAwSukl9brE0sd8lFihUBu+GTqNBGln950I+nSFspcKHB18cNs1qqhboZCb1n8+kkdacubpGqh3R56b69Mxdrp1IQA/BTBURdkyfvtj+hhMVWPTYhZcbeq6sQcPLicu8Y9njYCTjrN6z22xGaIDuF8SSmucunDa9Iw0REs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=YLUgKPjK; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+	s=arc-20240116; t=1792062145; c=relaxed/simple;
+	bh=ITvtbFnfD1HGhLOTmI7RNN1uqniYqUorCXEmPuSE4y8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GOMekgB54pvKoTWjkd+ahJr/BObF45af5yNGAAWADQ40Pr4//hpZoxBEbcW2vRff59t25NAbu9x00eyK+kocZftmmXvNKWgbRd58W6yqmrHsNad2Igx+sRrf8DQsuI4uNPk+1mZq9yKbDWK9rCW/5lru+WNFyeULgDqiSXF+APU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DyWbSlV7; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="YLUgKPjK"
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B1D90A157F;
-	Thu, 15 Oct 2026 11:50:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1792057837; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=b+1MJgfWUFrA4BRtF7VJVIaMVyc2kzmrHujQqeSpphw=;
-	b=YLUgKPjKiD5YhKJ8Gg7zPpNjfuXqDEQ4Zbbx+GDXT7hDnGk7BILNhNa+Kj5/J8XtgkBXBb
-	47ECAOR+t+8TcuXCPlLX27Sa/L76ieodAVu6rEUOg2M850I56+Eyv5Yery4yC+qUlkJfKM
-	ilLOkEMUahknUAP+lU69EWXKVqxESAIgXcJ1yFblZQ3/5QUdk/aF8MAnP0YWuZ9XvBNcZH
-	+VmpBJ34/6QHFb835vOd/l6qlO66vjiVsuNTVpuaiR5zYMlvdVC/wn8SlPfUIXCM4o9nW7
-	5H96WKMD7DAXP0z2TnyUa/Fp71yltFKa1jL6ei1RdmKTfKGB0+3AZbhcEXKZ8Q==
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DyWbSlV7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1792062144; x=1823598144;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ITvtbFnfD1HGhLOTmI7RNN1uqniYqUorCXEmPuSE4y8=;
+  b=DyWbSlV7snCcmDe0nvV6bojN7pdWFkts3o8qd5CT8TntpQl4tGvWAepX
+   HsqPlrKDM+VL0AeqhAPjT4yxjqOVjAPlVp4zvEnt0X663Zd5NNt1sp3DD
+   UtGpSAVKZGui11Dspv03t9Y2FNAP/ODlTrkycnAv85HOQPOGgPjjzVqJl
+   QTXPFhRnzhevn2YTM2MXZfzDqtWboJsYua0qxAY2DnHaxIJRIUBYuKHv0
+   ByhGWUBRyCiuIk9ViGC3H0uAPWbul4/+2v7jRxo9F8lA2ZwAVKcDjfZSs
+   ENnNMWFYg59o08s8bIZxHCKQ+YdLF0yFQ4EREqcNaTFeGIWN41do7RfPF
+   Q==;
+X-CSE-ConnectionGUID: Q45SVTxjRqaIXi8T1TObQA==
+X-CSE-MsgGUID: 5K1HAZ8BSaGWtxKPV80ufw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11935"; a="723509"
+X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
+   d="scan'208";a="723509"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2026 04:02:23 -0700
+X-CSE-ConnectionGUID: CkJDWHquTvul6Wp2mxk9/Q==
+X-CSE-MsgGUID: LVUU0cCDT62ZxWH1Sgsw/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,159,1787036400"; 
+   d="scan'208";a="1549078"
+Received: from unknown (HELO WEBAPTLH032.iind.intel.com) ([10.66.250.231])
+  by orviesa007.jf.intel.com with ESMTP; 15 Oct 2026 04:02:21 -0700
+From: Ajay KV <ajay.k.v@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ajaykv <ajay.k.v@intel.com>
+Subject: [PATCH] Bluetooth: btintel_pcie: Add initial YoYo debug support
+Date: Thu, 15 Oct 2026 14:02:16 +0300
+Message-ID: <20261015110218.22585-1-ajay.k.v@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 15 Oct 2026 11:50:30 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Raju Rangoju <Raju.Rangoju@amd.com>, Prashanth Kumar K R
- <PrashanthKumar.K.R@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ioana Ciornei
- <ioana.ciornei@nxp.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha
- sowjanya <gakula@marvell.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, Bharat Bhushan
- <bbhushan2@marvell.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Sabrina Dubroca <sd@queasysnail.net>, Simon
- Horman <horms@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Luiz
- Augusto von Dentz <luiz.dentz@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
- Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
- <matt@codeconstruct.com.au>, Stephen Hemminger <stephen@networkplumber.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Marcelo
- Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
- <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, Tung Quang Nguyen
- <tung.quang.nguyen@est.tech>, idosch@nvidia.com, kuniyu@google.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH net-next] net: rename skb_unshare() to skb_unclone_full()
-In-Reply-To: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
-References: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
-Message-ID: <5f6b4dfc8339d5147fc08ab7503adc79@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
-Patchwork claims that b4 aut missed Ido and Kuniyu in the list of 
-recipients:
+From: Ajaykv <ajay.k.v@intel.com>
 
-+TO both
+Add an optional YoYo firmware configuration path to the Intel PCIe
+Bluetooth driver. Read DBG_PATH and ENABLE_INI from
+ibt_bt_dbg_cfg.ini, and load intel/ibt_debug_yoyo.bin only when YoYo
+is enabled and host DRAM routing is selected.
 
-On 15.10.2026 10:16, Nicolai Buchwitz wrote:
-> skb_unshare() only copies cloned skbs. A shared skb that is not a clone
-> comes back unchanged, which the name doesn't suggest. The loopback
-> selftest hooks got caught by this and hit BUG_ON(skb_shared()).
-> 
-> Rename it to skb_unclone_full(). Like skb_unclone() it only acts on
-> clones, but it copies the whole skb, not just the head.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-> ---
-> Follow-up to Jakub's suggestion on the selftest shared-skb series:
-> https://lore.kernel.org/all/20261014130618.4c50f817@kernel.org/
-> ---
->  drivers/net/ethernet/amd/xgbe/xgbe-selftest.c            |  2 +-
->  drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c         |  4 ++--
->  drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c      |  4 ++--
->  drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c   |  2 +-
->  drivers/net/macsec.c                                     |  6 +++---
->  include/linux/if_vlan.h                                  | 16 
-> ++++++++--------
->  include/linux/skbuff.h                                   | 11 
-> +++++++----
->  net/bluetooth/6lowpan.c                                  |  2 +-
->  net/dsa/tag.c                                            |  2 +-
->  net/ieee802154/6lowpan/rx.c                              |  2 +-
->  net/ieee802154/6lowpan/tx.c                              |  2 +-
->  net/mctp/route.c                                         |  2 +-
->  net/sched/sch_netem.c                                    |  4 ++--
->  net/sctp/ulpqueue.c                                      |  2 +-
->  net/tipc/msg.c                                           |  2 +-
->  16 files changed, 34 insertions(+), 31 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c 
-> b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-> index cfdbd4639a1e..7ebae08ddf29 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-> @@ -44,7 +44,7 @@ static int xgbe_test_loopback_validate(struct sk_buff 
-> *skb,
->  	struct iphdr *ih;
->  	int eat;
-> 
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (!skb)
->  		goto out;
-> 
-> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c 
-> b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-> index def2d5c0e7f7..7227a35dfaf2 100644
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-> @@ -1418,9 +1418,9 @@ static netdev_tx_t __dpaa2_eth_tx(struct sk_buff 
-> *skb,
->  	/* We'll be holding a back-reference to the skb until Tx 
-> Confirmation;
->  	 * we don't want that overwritten by a concurrent Tx with a cloned 
-> skb.
->  	 */
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (unlikely(!skb)) {
-> -		/* skb_unshare() has already freed the skb */
-> +		/* skb_unclone_full() has already freed the skb */
->  		percpu_stats->tx_dropped++;
->  		return NETDEV_TX_OK;
->  	}
-> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c 
-> b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> index 8cabce0eb2ab..fe8ac5e85259 100644
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> @@ -1276,9 +1276,9 @@ static netdev_tx_t dpaa2_switch_port_tx(struct 
-> sk_buff *skb,
->  	}
-> 
->  	/* We'll be holding a back-reference to the skb until Tx confirmation 
-> */
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (unlikely(!skb)) {
-> -		/* skb_unshare() has already freed the skb */
-> +		/* skb_unclone_full() has already freed the skb */
->  		net_err_ratelimited("%s: Error copying the socket buffer\n", 
-> net_dev->name);
->  		goto err_exit;
->  	}
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c 
-> b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> index 77c5cfbe4ce4..4e418c7456b7 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> @@ -2117,7 +2117,7 @@ dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic 
-> *pfvf,
->  	/* Crypto hardware need write permission for ipsec crypto offload */
->  	if (unlikely(xfrm_offload(skb))) {
->  		dir = DMA_BIDIRECTIONAL;
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	}
-> 
->  	/* First segment is always skb->data */
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c 
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
-> index dbe8339947be..40811df8f2b7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c
-> @@ -920,7 +920,7 @@ static int stmmac_test_vlan_validate(struct sk_buff 
-> *skb,
-> 
->  	proto = tpriv->svlan ? ETH_P_8021AD : ETH_P_8021Q;
-> 
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (!skb)
->  		goto out;
-> 
-> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-> index 409fd855235b..b714052e1a37 100644
-> --- a/drivers/net/macsec.c
-> +++ b/drivers/net/macsec.c
-> @@ -639,7 +639,7 @@ static struct sk_buff *macsec_encrypt(struct 
-> sk_buff *skb,
->  			return ERR_PTR(-ENOMEM);
->  		}
->  	} else {
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (!skb) {
->  			macsec_txsa_put(tx_sa);
->  			return ERR_PTR(-ENOMEM);
-> @@ -948,7 +948,7 @@ static struct sk_buff *macsec_decrypt(struct 
-> sk_buff *skb,
-> 
->  		aead_request_set_crypt(req, sg, sg, len, iv);
->  		aead_request_set_ad(req, 
-> macsec_hdr_len(macsec_skb_cb(skb)->has_sci));
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (!skb) {
->  			aead_request_free(req);
->  			return ERR_PTR(-ENOMEM);
-> @@ -1154,7 +1154,7 @@ static rx_handler_result_t 
-> macsec_handle_frame(struct sk_buff **pskb)
->  	if (hdr->eth.h_proto != htons(ETH_P_MACSEC))
->  		return handle_not_macsec(skb);
-> 
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	*pskb = skb;
->  	if (!skb)
->  		return RX_HANDLER_CONSUMED;
-> diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-> index 975892367136..c863cdf60f01 100644
-> --- a/include/linux/if_vlan.h
-> +++ b/include/linux/if_vlan.h
-> @@ -427,8 +427,8 @@ static inline int __vlan_insert_tag(struct sk_buff 
-> *skb,
->   * Inserts the VLAN tag into @skb as part of the payload at offset 
-> mac_len
->   * Returns a VLAN tagged skb. This might change skb->head.
->   *
-> - * Following the skb_unshare() example, in case of error, the calling 
-> function
-> - * doesn't have to worry about freeing the original skb.
-> + * Following the skb_unclone_full() example, in case of error, the 
-> calling
-> + * function doesn't have to worry about freeing the original skb.
->   *
->   * Does not change skb->protocol so this function can be used during 
-> receive.
->   *
-> @@ -458,8 +458,8 @@ static inline struct sk_buff 
-> *vlan_insert_inner_tag(struct sk_buff *skb,
->   * Inserts the VLAN tag into @skb as part of the payload
->   * Returns a VLAN tagged skb. This might change skb->head.
->   *
-> - * Following the skb_unshare() example, in case of error, the calling 
-> function
-> - * doesn't have to worry about freeing the original skb.
-> + * Following the skb_unclone_full() example, in case of error, the 
-> calling
-> + * function doesn't have to worry about freeing the original skb.
->   *
->   * Does not change skb->protocol so this function can be used during 
-> receive.
->   *
-> @@ -480,8 +480,8 @@ static inline struct sk_buff 
-> *vlan_insert_tag(struct sk_buff *skb,
->   * Inserts the VLAN tag into @skb as part of the payload
->   * Returns a VLAN tagged skb. This might change skb->head.
->   *
-> - * Following the skb_unshare() example, in case of error, the calling 
-> function
-> - * doesn't have to worry about freeing the original skb.
-> + * Following the skb_unclone_full() example, in case of error, the 
-> calling
-> + * function doesn't have to worry about freeing the original skb.
->   *
->   * Return: modified @skb on success, NULL on error (@skb is freed).
->   */
-> @@ -524,8 +524,8 @@ static inline void __vlan_hwaccel_copy_tag(struct 
-> sk_buff *dst, const struct sk_
->   *
->   * Pushes the VLAN tag from @skb->vlan_tci inside to the payload.
->   *
-> - * Following the skb_unshare() example, in case of error, the calling 
-> function
-> - * doesn't have to worry about freeing the original skb.
-> + * Following the skb_unclone_full() example, in case of error, the 
-> calling
-> + * function doesn't have to worry about freeing the original skb.
->   */
->  static inline struct sk_buff *__vlan_hwaccel_push_inside(struct 
-> sk_buff *skb)
->  {
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 27ec1e38c828..cd969dd73841 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -2125,14 +2125,14 @@ static inline struct sk_buff 
-> *skb_share_check(struct sk_buff *skb, gfp_t pri)
->  }
-> 
->  /*
-> - *	Copy shared buffers into a new sk_buff. We effectively do COW on
-> + *	Copy cloned buffers into a new sk_buff. We effectively do COW on
->   *	packets to handle cases where we have a local reader and forward
->   *	and a couple of other messy ones. The normal one is tcpdumping
->   *	a packet that's being forwarded.
->   */
-> 
->  /**
-> - *	skb_unshare - make a copy of a shared buffer
-> + *	skb_unclone_full - make a private copy of a cloned buffer
->   *	@skb: buffer to check
->   *	@pri: priority for memory allocation
->   *
-> @@ -2142,10 +2142,13 @@ static inline struct sk_buff 
-> *skb_share_check(struct sk_buff *skb, gfp_t pri)
->   *	the original buffer is returned. When called with a spinlock held 
-> or
->   *	from interrupt state @pri must be %GFP_ATOMIC
->   *
-> + *	Unlike skb_unclone(), the paged data is copied as well. A buffer 
-> with
-> + *	skb->users > 1 that is not a clone is returned as is, use
-> + *	skb_share_check() for that case.
-> + *
->   *	%NULL is returned on a memory allocation failure.
->   */
-> -static inline struct sk_buff *skb_unshare(struct sk_buff *skb,
-> -					  gfp_t pri)
-> +static inline struct sk_buff *skb_unclone_full(struct sk_buff *skb, 
-> gfp_t pri)
->  {
->  	might_sleep_if(gfpflags_allow_blocking(pri));
->  	if (skb_cloned(skb)) {
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 30f4afa18bc8..a1c9c0d75da1 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -515,7 +515,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, 
-> struct net_device *netdev)
->  	/* We must take a copy of the skb before we modify/replace the ipv6
->  	 * header as the header could be used elsewhere
->  	 */
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (!skb)
->  		return NET_XMIT_DROP;
-> 
-> diff --git a/net/dsa/tag.c b/net/dsa/tag.c
-> index 991732d6eae2..6a5aa7fc331c 100644
-> --- a/net/dsa/tag.c
-> +++ b/net/dsa/tag.c
-> @@ -64,7 +64,7 @@ static int dsa_switch_rcv(struct sk_buff *skb, struct 
-> net_device *dev,
->  		return 0;
->  	}
-> 
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	skb = skb_unclone_full(skb, GFP_ATOMIC);
->  	if (!skb)
->  		return 0;
-> 
-> diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> index 517e6493f5d1..9148f1be7cba 100644
-> --- a/net/ieee802154/6lowpan/rx.c
-> +++ b/net/ieee802154/6lowpan/rx.c
-> @@ -294,7 +294,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct 
-> net_device *wdev,
->  	 */
->  	if (lowpan_is_frag1(*skb_network_header(skb)) ||
->  	    lowpan_is_iphc(*skb_network_header(skb))) {
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (!skb)
->  			goto out;
->  	}
-> diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-> index b261daedc290..d346e906e41e 100644
-> --- a/net/ieee802154/6lowpan/tx.c
-> +++ b/net/ieee802154/6lowpan/tx.c
-> @@ -279,7 +279,7 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct 
-> net_device *ldev)
->  			return NET_XMIT_DROP;
->  		}
->  	} else {
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (!skb)
->  			return NET_XMIT_DROP;
->  	}
-> diff --git a/net/mctp/route.c b/net/mctp/route.c
-> index e7c95eeacb48..d18ed9d0db1d 100644
-> --- a/net/mctp/route.c
-> +++ b/net/mctp/route.c
-> @@ -396,7 +396,7 @@ static int mctp_frag_queue(struct mctp_sk_key *key, 
-> struct sk_buff *skb)
->  		 * this will free the skb; callers can no longer access it
->  		 * safely.
->  		 */
-> -		key->reasm_head = skb_unshare(skb, GFP_ATOMIC);
-> +		key->reasm_head = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (!key->reasm_head)
->  			return -ENOMEM;
-> 
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index 8a1b89a289d8..1dc2924890eb 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -460,7 +460,7 @@ static int netem_enqueue(struct sk_buff *skb, 
-> struct Qdisc *sch,
->  			 struct sk_buff **to_free)
->  {
->  	struct netem_sched_data *q = qdisc_priv(sch);
-> -	/* We don't fill cb now as skb_unshare() may invalidate it */
-> +	/* We don't fill cb now as skb_unclone_full() may invalidate it */
->  	struct netem_skb_cb *cb;
->  	struct sk_buff *skb2 = NULL;
->  	struct sk_buff *segs = NULL;
-> @@ -528,7 +528,7 @@ static int netem_enqueue(struct sk_buff *skb, 
-> struct Qdisc *sch,
->  			qdisc_skb_cb(skb)->pkt_len = skb->len;
->  		}
-> 
-> -		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		skb = skb_unclone_full(skb, GFP_ATOMIC);
->  		if (unlikely(!skb)) {
->  			WRITE_ONCE(q->allocation_errors, q->allocation_errors + 1);
->  			qdisc_qstats_drop(sch);
-> diff --git a/net/sctp/ulpqueue.c b/net/sctp/ulpqueue.c
-> index b05daafd369a..93823eebd727 100644
-> --- a/net/sctp/ulpqueue.c
-> +++ b/net/sctp/ulpqueue.c
-> @@ -339,7 +339,7 @@ struct sctp_ulpevent 
-> *sctp_make_reassembled_event(struct net *net,
->  		if (skb_cloned(f_frag)) {
->  			/* This is a cloned skb, we can't just modify
->  			 * the frag_list.  We need a new skb to do that.
-> -			 * Instead of calling skb_unshare(), we'll do it
-> +			 * Instead of calling skb_unclone_full(), we'll do it
->  			 * ourselves since we need to delay the free.
->  			 */
->  			new = skb_copy(f_frag, GFP_ATOMIC);
-> diff --git a/net/tipc/msg.c b/net/tipc/msg.c
-> index b0bba0feef56..39dfd33c8eec 100644
-> --- a/net/tipc/msg.c
-> +++ b/net/tipc/msg.c
-> @@ -145,7 +145,7 @@ int tipc_buf_append(struct sk_buff **headbuf, 
-> struct sk_buff **buf)
->  		if (skb_has_frag_list(frag) && __skb_linearize(frag))
->  			goto err;
->  		*buf = NULL;
-> -		frag = skb_unshare(frag, GFP_ATOMIC);
-> +		frag = skb_unclone_full(frag, GFP_ATOMIC);
->  		if (unlikely(!frag))
->  			goto err;
->  		head = *headbuf = frag;
-> 
-> ---
-> base-commit: 0c20cb4cfb40cf270d6c4c2c2ff5e5d72322644a
-> change-id: 20261015-nb-skb-unclone-full-dafb147b8aa9
-> 
-> Best regards,
-> --
-> Nicolai Buchwitz <nb@tipi-net.de>
+Introduce a runtime context and bounded TLV-stream validation helper.
+Initialize and clean up the context with PCI probe and removal, while
+falling back to legacy debug behavior if optional YoYo data is missing
+or invalid.
+
+Runtime validation of the complete P1-P3 series produced:
+[    3.286504] Bluetooth: Core ver 2.22
+[    3.297359] Bluetooth: HCI device and connection manager initialized
+[    3.297373] Bluetooth: HCI socket layer initialized
+[    3.297376] Bluetooth: L2CAP socket layer initialized
+[    3.297384] Bluetooth: SCO socket layer initialized
+[    3.332848] Bluetooth: YoYo: configuration loaded and validated
+[3.360857-3.361712] Bluetooth: DBGC1-3: each 16 x 256 KiB (4 MiB)
+[3.361715] Bluetooth: MDBGC DBGC1-3: each 16 x 256 KiB
+[    3.397439] Bluetooth: hci0: Device revision is 0
+[    3.397442] Bluetooth: hci0: Secure boot is enabled
+[    3.397443] Bluetooth: hci0: OTP lock is disabled
+[    3.397444] Bluetooth: hci0: API lock is enabled
+[    3.397444] Bluetooth: hci0: Debug lock is disabled
+
+Signed-off-by: Ajaykv <ajay.k.v@intel.com>
+
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index d5eb2568af2e..7d933755b291 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -14,7 +14,7 @@ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
+ 
+ obj-$(CONFIG_BT_INTEL)		+= btintel.o
+-obj-$(CONFIG_BT_INTEL_PCIE)	+= btintel_pcie.o btintel.o
++obj-$(CONFIG_BT_INTEL_PCIE)	+= btintel_pcie.o btintel.o btintel_pcie_debug.o
+ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
+ obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
+ obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 3a555aa50c87..313789cb290e 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -203,6 +203,108 @@ static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
+ 	return data->dbg_path_cache != BTINTEL_PCIE_DRAM;
+ }
+ 
++/* Name of the optional INI file used to override the default dbg_path
++ * (data->dbg_path_cache) and yoyo ini settings.
++ */
++#define BTINTEL_PCIE_DBG_INI_FILE "ibt_bt_dbg_cfg.ini"
++
++/* Loads optional "DBG_PATH=<value>" and ENABLE_INI=<value>
++ * overrides from BTINTEL_PCIE_DBG_INI_FILE
++ * and applies them to data->dbg_path_cache and data->enable_ini.
++ *
++ * DBG_PATH accepts BTINTEL_PCIE_WIFI_DBGC (0x06, default) and
++ * BTINTEL_PCIE_DRAM (0x01, legacy); an invalid or missing entry leaves
++ * the cached value set by the caller unchanged.
++ *
++ * ENABLE_INI accepts 1 (enabled) or 0 (disabled); an invalid or missing
++ * entry leaves data->enable_ini unchanged.
++ */
++static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
++{
++	const struct firmware *fw;
++	const char *ini_file = BTINTEL_PCIE_DBG_INI_FILE;
++	char *buf, *cursor, *line;
++	bool dbg_path_applied = false;
++	int err;
++
++	err = request_firmware_direct(&fw, ini_file, &data->pdev->dev);
++	if (err < 0) {
++		BT_DBG("%s not found (%d), using dbg_path=0x%02x",
++		       ini_file, err, data->dbg_path_cache);
++		if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
++			data->enable_ini = false;
++		return;
++	}
++
++	buf = kmemdup_nul(fw->data, fw->size, GFP_KERNEL);
++	release_firmware(fw);
++	if (!buf)
++		return;
++
++	cursor = buf;
++	while ((line = strsep(&cursor, "\n"))) {
++		char *eq;
++		char *val;
++		uint parsed;
++
++		line = strim(line);
++		if (!line[0] || line[0] == '#' || line[0] == ';')
++			continue;
++
++		eq = strchr(line, '=');
++		if (!eq)
++			continue;
++
++		*eq = '\0';
++		line = strim(line);
++		val = strim(eq + 1);
++
++		/* Accept "DBG_PATH"/"dbg_path"
++		 * case-insensitively as the key.
++		 */
++		if (!strcasecmp(line, "DBG_PATH")) {
++			BT_INFO("Read DBG_PATH from %s: '%s'", ini_file, val);
++
++			/* base 0 lets kstrtouint accept "0x06", "6", etc. */
++			if (kstrtouint(val, 0, &parsed) == 0 &&
++			    (parsed == BTINTEL_PCIE_DRAM ||
++			     parsed == BTINTEL_PCIE_WIFI_DBGC)) {
++				data->dbg_path_cache = parsed;
++				dbg_path_applied = true;
++				BT_INFO("WRT dbg_path accepted: 0x%02x",
++					data->dbg_path_cache);
++			} else {
++				BT_WARN("Invalid DBG_PATH='%s' in %s, using dbg_path=0x%02x",
++					val, ini_file, data->dbg_path_cache);
++			}
++		} else if (!strcasecmp(line, "ENABLE_INI")) {
++			BT_INFO("Read ENABLE_INI from %s: '%s'", ini_file, val);
++
++			if (kstrtouint(val, 0, &parsed) == 0 &&
++			    (parsed == 0 || parsed == 1)) {
++				data->enable_ini = !!parsed;
++				BT_INFO("WRT enable_ini accepted: %u",
++					data->enable_ini);
++			} else {
++				BT_WARN("Invalid ENABLE_INI='%s' in %s, using enable_ini=%u",
++					val, ini_file, data->enable_ini);
++			}
++		}
++	}
++
++	if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
++		data->enable_ini = false;
++
++	if (dbg_path_applied)
++		BT_DBG("Loaded dbg_path=0x%02x from %s", data->dbg_path_cache, ini_file);
++	else
++		BT_WARN("No valid DBG_PATH in %s, dbg_path=0x%02x", ini_file, data->dbg_path_cache);
++
++	BT_DBG("ENABLE_INI effective state: %u", data->enable_ini);
++
++	kfree(buf);
++}
++
+ /* Helper function to allocate and setup a debug buffer group
+  * @data: driver data structure
+  * @buf: pointer to data_buf array pointer
+@@ -3192,6 +3294,8 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ 	/* Initialize the CI */
+ 	btintel_pcie_init_ci(data, data->ci);
+ 
++	data->pcie_alloc_init = true;
++
+ 	return 0;
+ 
+ exit_error_txq:
+@@ -3365,6 +3469,31 @@ static void btintel_pcie_synchronize_irqs(struct btintel_pcie_data *data)
+ 		synchronize_irq(data->msix_entries[i].vector);
+ }
+ 
++static void btintel_pcie_probe_cleanup(struct btintel_pcie_data *data)
++{
++	struct pci_dev *pdev = data->pdev;
++
++	btintel_pcie_disable_interrupts(data);
++	btintel_pcie_synchronize_irqs(data);
++
++	disable_work_sync(&data->coredump_work);
++	disable_work_sync(&data->hwexp_work);
++	disable_work_sync(&data->fwtrigger_work);
++	disable_work_sync(&data->mbox_work);
++
++	flush_work(&data->rx_work);
++
++	btintel_pcie_reset_bt(data);
++	for (int i = 0; i < data->alloc_vecs; i++) {
++		struct msix_entry *msix_entry;
++
++		msix_entry = &data->msix_entries[i];
++		devm_free_irq(&pdev->dev, msix_entry->vector, msix_entry);
++	}
++
++	pci_free_irq_vectors(pdev);
++}
++
+ static int btintel_pcie_get_debug_info_addr(struct hci_dev *hdev)
+ {
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
+@@ -4054,6 +4183,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 			      const struct pci_device_id *ent)
+ {
+ 	int err;
++	bool pcie_configured = false;
+ 	struct btintel_pcie_data *data;
+ 
+ 	if (!pdev)
+@@ -4097,15 +4227,30 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	data->boot_stage_cache = 0x00;
+ 	data->img_resp_cache = 0x00;
+ 	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
++	data->pcie_alloc_init = false;
++	data->enable_ini = false;
++	btintel_pcie_yoyo_init(&data->yoyo);
+ 	/* FLR can be invoked by echoing to debugfs path, so explicitly
+ 	 * initialized
+ 	 */
+ 	data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
++
++	btintel_pcie_load_dbg_path_from_ini(data);
++
+ 	err = btintel_pcie_config_pcie(pdev, data);
+ 	if (err)
+ 		goto exit_error;
+ 
++	pcie_configured = true;
++
+ 	pci_set_drvdata(pdev, data);
++	if (data->enable_ini) {
++		err = btintel_pcie_yoyo_load_and_parse(&data->yoyo, &pdev->dev);
++		if (err) {
++			BT_WARN("YoYo is not configured (%d)", err);
++			btintel_pcie_yoyo_cleanup(&data->yoyo);
++		}
++	}
+ 
+ 	err = btintel_pcie_alloc(data);
+ 	if (err)
+@@ -4128,15 +4273,22 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto exit_error;
+ 
++	data->yoyo.hdev = data->hdev;
+ 	bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
+ 		   data->cnvr);
+ 	return 0;
+ 
+ exit_error:
+-	/* reset device before exit */
+-	btintel_pcie_reset_bt(data);
++	btintel_pcie_yoyo_cleanup(&data->yoyo);
++
++	if (pcie_configured)
++		btintel_pcie_probe_cleanup(data);
++
++	if (data->pcie_alloc_init)
++		btintel_pcie_free(data);
+ 
+ 	destroy_workqueue(data->dump_workqueue);
++	destroy_workqueue(data->workqueue);
+ 
+ 	pci_clear_master(pdev);
+ 
+@@ -4173,6 +4325,8 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ 	if (current_work() != &data->reset_work)
+ 		disable_work_sync(&data->reset_work);
+ 
++	btintel_pcie_yoyo_cleanup(&data->yoyo);
++
+ 	btintel_pcie_disable_interrupts(data);
+ 
+ 	btintel_pcie_synchronize_irqs(data);
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index 3030b4e8b750..7bfb7615ed0d 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -6,6 +6,8 @@
+  *  Copyright (C) 2024  Intel Corporation
+  */
+ 
++#include "btintel_pcie_debug.h"
++
+ /* Control and Status Register(BTINTEL_PCIE_CSR) */
+ #define BTINTEL_PCIE_CSR_BASE			(0x000)
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG		(BTINTEL_PCIE_CSR_BASE + 0x024)
+@@ -737,6 +739,8 @@ struct btintel_pcie_data {
+ 	u32	boot_stage_cache;
+ 	u32	img_resp_cache;
+ 	u32	dbg_path_cache;
++	bool	enable_ini;
++	struct btintel_pcie_yoyo_ctx yoyo;
+ 
+ 	u32	cnvi;
+ 	u32	cnvr;
+@@ -783,6 +787,7 @@ struct btintel_pcie_data {
+ 	wait_queue_head_t	mbox_parse_wait_q;
+ 	/* Timestamp captured in GP1 handler when mbox interrupt is received */
+ 	ktime_t	mbox_intr_ts;
++	bool		pcie_alloc_init;
+ };
+ 
+ static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
+diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
+new file mode 100644
+index 000000000000..0e933f4ec376
+--- /dev/null
++++ b/drivers/bluetooth/btintel_pcie_debug.c
+@@ -0,0 +1,161 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Intel Bluetooth YoYo Debug Framework
++ *
++ * Copyright (C) 2026 Intel Corporation
++ *
++ * Runtime-configurable TLV-based debug collection framework for loading and
++ * parsing the optional YoYo firmware configuration used to enable debug
++ * regions, triggers, HCI commands, and configuration sets.
++ */
++
++#include <linux/errno.h>
++#include <linux/module.h>
++#include <linux/string.h>
++#include <linux/unaligned.h>
++#include <net/bluetooth/bluetooth.h>
++#include "btintel_pcie_debug.h"
++
++/*
++ * Parse the optional YoYo firmware TLV stream and validate each record.
++ * This is the entry point for the runtime debug configuration payload.
++ */
++static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
++					      const u8 *buf, size_t buf_len)
++{
++	const struct btintel_pcie_tlv_hdr *tlv;
++	const u8 *ptr = buf;
++	size_t remaining = buf_len;
++	u32 count = 0;
++
++	while (remaining >= sizeof(*tlv)) {
++		size_t tlv_size;
++		u32 type, len;
++
++		tlv = (const struct btintel_pcie_tlv_hdr *)ptr;
++		type = get_unaligned_le32(&tlv->type);
++		len = get_unaligned_le32(&tlv->length);
++
++		if (len > remaining - sizeof(*tlv)) {
++			BT_ERR("YoYo: tlv %u truncated (len=%u rem=%zu)", count,
++			       len, remaining);
++			return -EBADMSG;
++		}
++		tlv_size = sizeof(*tlv) + len;
++
++		switch (type) {
++		case BTINTEL_PCIE_TLV_TYPE_DBG_INFO:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_REGION:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_HCMD:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_BUF_ALLOC:
++		case BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE:
++			BT_DBG("YoYo: valid tlv type 0x%x len=%u", type, len);
++			break;
++		default: /* Log and continue, do not fail*/
++			BT_DBG("YoYo: unknown tlv type 0x%x len=%u", type, len);
++			break;
++		}
++
++		ptr += tlv_size;
++		remaining -= tlv_size;
++		count++;
++	}
++
++	/* If no TLVs were parsed, the YoYo binary is considered invalid */
++	if (remaining || count == 0) {
++		BT_ERR("YoYo: trailing %zu bytes after tlv stream", remaining);
++		return -EBADMSG;
++	}
++
++	BT_DBG("YoYo: parsed %u tlv's", count);
++	return 0;
++}
++
++/**
++ * btintel_yoyo_init - Initialize the YoYo context
++ * @ctx:   Pre-allocated context (typically embedded in driver data)
++ */
++int btintel_pcie_yoyo_init(struct btintel_pcie_yoyo_ctx *ctx)
++{
++	if (!ctx)
++		return -EINVAL;
++
++	memset(ctx, 0, sizeof(*ctx));
++	INIT_LIST_HEAD(&ctx->region_list);
++	INIT_LIST_HEAD(&ctx->trigger_list);
++	INIT_LIST_HEAD(&ctx->hcmd_list);
++	INIT_LIST_HEAD(&ctx->config_set_list);
++
++	/* set it to true after successful TLV parsing */
++	ctx->enabled = false;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_init);
++
++/**
++ * btintel_yoyo_cleanup - Clean up the YoYo context
++ * @ctx:  YoYo context to clean up
++ */
++void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
++{
++	if (!ctx)
++		return;
++
++	ctx->enabled = false;
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_cleanup);
++
++/**
++ * btintel_yoyo_load_and_parse - Load ibt_debug_yoyo.bin and parse TLVs
++ * @ctx:  Initialized YoYo context
++ * @dev:  Device for firmware loading (typically &pdev->dev)
++ *
++ * Uses request_firmware_direct, since the YoYo binary
++ * is optional. On success, sets ctx->enabled.
++ */
++int btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
++				     struct device *dev)
++{
++	const struct firmware *fw;
++	int ret;
++
++	if (!ctx)
++		return -EINVAL;
++
++	ret = request_firmware_direct(&fw, BTINTEL_PCIE_YOYO_FW_NAME, dev);
++	if (ret) {
++		BT_WARN("YoYo: failed to load %s (%d)",
++			BTINTEL_PCIE_YOYO_FW_NAME, ret);
++		return ret;
++	}
++
++	/* Sanity check firmware size */
++	if (fw->size < sizeof(struct btintel_pcie_tlv_hdr)) {
++		release_firmware(fw);
++		return -EBADMSG;
++	}
++
++	BT_DBG("YoYo: loaded %s (%zu bytes)", BTINTEL_PCIE_YOYO_FW_NAME,
++	       fw->size);
++
++	ret = btintel_pcie_yoyo_parse_tlv_buffer(ctx, fw->data, fw->size);
++	release_firmware(fw);
++
++	/* File Corruption / TLV validation failed */
++	if (ret) {
++		BT_ERR("YoYo: tlv parsing failed (%d)", ret);
++		return ret;
++	}
++
++	ctx->enabled = true;
++
++	BT_INFO("YoYo: feature enabled and configured");
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_load_and_parse);
++
++MODULE_DESCRIPTION("Intel Bluetooth yoyo debug framework");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
+new file mode 100644
+index 000000000000..b0b94c2a169d
+--- /dev/null
++++ b/drivers/bluetooth/btintel_pcie_debug.h
+@@ -0,0 +1,77 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Intel Bluetooth YoYo Debug Framework
++ *
++ * Copyright (C) 2026 Intel Corporation
++ *
++ */
++
++#ifndef __BTINTEL_PCIE_DEBUG_H__
++#define __BTINTEL_PCIE_DEBUG_H__
++
++#include <linux/list.h>
++#include <linux/types.h>
++#include <linux/device.h>
++#include <linux/firmware.h>
++
++/* External YoYo binary file */
++#define BTINTEL_PCIE_YOYO_FW_NAME	"intel/ibt_debug_yoyo.bin"
++
++/* TLV type codes */
++#define BTINTEL_PCIE_TLV_TYPE_DBG_INFO		0x1000005
++#define BTINTEL_PCIE_TLV_TYPE_DBG_BUF_ALLOC		0x1000006
++#define BTINTEL_PCIE_TLV_TYPE_DBG_HCMD		0x1000007
++#define BTINTEL_PCIE_TLV_TYPE_DBG_REGION		0x1000008
++#define BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER		0x1000009
++#define BTINTEL_PCIE_TLV_TYPE_DBG_CONFIG_SET		0x100000A
++#define BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE	0x100000B
++
++/* TLV header */
++struct btintel_pcie_tlv_hdr {
++	__le32 type;
++	__le32 length;
++} __packed;
++
++/* Debug header common to all debug TLVs */
++struct btintel_pcie_dbg_hdr {
++	__le32 tlv_data_version;
++	__le32 domain;
++} __packed;
++
++/* Address/value pair */
++struct btintel_pcie_addr_value {
++	__le32 address;
++	__le32 value;
++} __packed;
++
++/*
++ * struct btintel_pcie_yoyo_ctx- Runtime state for YoYo debug configuration
++ * @enabled: Whether the loaded YoYo configuration passed validation
++ * @region_list: Parsed debug-region entries
++ * @trigger_list: Parsed debug-trigger entries
++ * @hcmd_list: Parsed HCI command entries
++ * @config_set_list: Parsed configuration-set entries
++ * @hdev: Associated HCI device; NULL until successful HCI registration
++ *
++ * Stores the validation state and parsed TLV data for the optional YoYo
++ * firmware configuration.
++ */
++struct btintel_pcie_yoyo_ctx {
++	bool			 enabled;
++
++	struct list_head	 region_list;
++	struct list_head	 trigger_list;
++	struct list_head	 hcmd_list;
++	struct list_head	 config_set_list;
++
++	struct hci_dev		 *hdev;
++};
++
++int  btintel_pcie_yoyo_init(struct btintel_pcie_yoyo_ctx *ctx);
++void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx);
++
++/* Load and parse the external .bin file */
++int  btintel_pcie_yoyo_load_and_parse(struct btintel_pcie_yoyo_ctx *ctx,
++				      struct device *dev);
++
++#endif /* __BTINTEL_PCIE_DEBUG_H__ */
+-- 
+2.53.0
+
