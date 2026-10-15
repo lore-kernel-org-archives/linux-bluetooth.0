@@ -1,190 +1,456 @@
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BBC260565
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 12:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17BD52BE4F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 13:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792068365; cv=none; b=LlByMl2+z36JMUg/K2BPScZN4KwQ4rIm8qFOdG3BmE1qAn+k1XftEfLmiiDFUyWZ3Fql8wJ13NvrvJzwnSBJ4UsIHtauFzIYWwH2KRcXM6lpSIlMlp+DASn7YbJZycWfcHvquAFnZyZbDD7gsnYpvryYIzkG4Tylsjhp5voF0WM=
+	t=1792070538; cv=none; b=KrE75InavaPTyLoKWPZ8+817qar3NAKZtGSZWdOkAhEADYse3yD1rnIUg2i8xoAnUKap1RqEztnB8lrnwWpSKF34iHSN+lLQUFlSEkNvQLDFYE+WQPvL3Ogy3vXBW+T45LaJq+CzkoPRTLXJU7pYPhg9TOBd+MNLZdDY4h4DRvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792068365; c=relaxed/simple;
-	bh=XBANaX9XmxPomR/CFTc/c52ZequbUV3qGM5++oZWMgQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YWW6HyVKhSKcDJAa4p0LsYzCbwVW9TwwAC+aY4GbrWDxl80xeG0Bbpq8i6wV18om2rnC/a1myVPHP3BC4w5DcxV3uGvJnyTEZHtpCD5Aguhru9AVBh4wURyqTHiOMcMbBE8rXnab53Ud3IkKl8Sx+sxIfedKNfxRmvWLbd5CxXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0HNIvdZ; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792070538; c=relaxed/simple;
+	bh=Bvd3KlAPV/LoSwyVaQKOlcSewMN0hb53j3YhEQur7lI=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OS9kGBqQA1isuFaboiB7rHkx76pCSwICV/+i6GX/hBEGtW+Jdgrqm4e+i1Tf2W3FXXLZqZn66fRNxwHDdczw4SLmYa09cg6fW+mnknZoDaAGRbAa9tHt+Krb8FeqXso2NycIW1pNoGHVukk21GIf5G2PXVUwY5dLu7xB78gwfck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jvGKIciE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0HNIvdZ"
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6cf995766a3so4190785eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 05:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792068362; x=1792673162; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=HayCoFyHhTDZNbR5j1aFw0Wxi0UJun32AbqmUVyanN8=;
-        b=A0HNIvdZ69cRWuY0bxuL1zc9BsD5dLuf+I9Nynxb+bMgZ+e8PNF69T0+Kj7752QchR
-         zVFSaheXxyBGUhwq+GM/Jkl0P7K8MFBS0i5epxkQ/T0NN9xM99XnwxuWtsXz3zybuHnN
-         FSWSvsIEKrQtUnr27cbKfwE3gndEvQ9H44ebK8zeDUlplAUpcot3CJTgm81jK4DuQBrO
-         W2PTy/UWTBqw7lpzs6wsXV6MaTXF7hOyHdFQSTHawlv/xkvnwW91qKavtn6NZmQFqdx5
-         gv4iNzn4Ed9BWq4AEmYBdTUH90VYpcGoGRkABovO/4X9uyzBRL4Ws278H50Fa/6rdCK/
-         NJHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792068362; x=1792673162;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=HayCoFyHhTDZNbR5j1aFw0Wxi0UJun32AbqmUVyanN8=;
-        b=qNIg7nuL64bggnUu70tmfhz7Nu6m9xp5DckLxRR1kLSrM7jnZGEbzzHIyyHoJ/3Att
-         dEnh0GC9TqNR7J4FWEUYFbK5v5vmtd68msUZd+36g2rS6gPKIAmZeinX/A83E6OorkSR
-         9HOWL+p1KJwuZ2OCO5RaO/cowqm+jQBLQ4v7KSvcE1HW/RhPRRyh3u+HB9/nHUGIfcFM
-         OMTZzRuGDuL7OTNN9XobghLTFLWVR+38rrcq1+e9Ksc9sVeZ2bYTvzlE7gCWusZ2+2oO
-         6uVjCPizjcpj0aaBoOVE10ZQmcb1Y4lacmFMnJOy3HzRM/4pj0jD5sJpmkIZzyLX5+Cn
-         KfEQ==
-X-Gm-Message-State: AFq9FYL//nxXwTrgDREhXL0+C9riJGSvvv6yKgiXDa0f2aruyYCfbkb+
-	xjD/zVIJouNAOmi1GdgIJiHQAQPZ1Iqj3HTBUAsNXsj/MURQzs2EbC1J/9AyWg==
-X-Gm-Gg: AYBFou09mZ36IFg6ieCboYp73BhfwpiqtOmlJ7FEccNJmctsN3h5cjqjo5IdEv4TWUB
-	7tNzHX7QhlzW9oxtMLPW44aYVPgAMoYLXCKHdCjfFTgKgIDR7ILMW0Ox/q3dl/tbJBVkX2iRFgu
-	okS3VYZj7hZnZeBuhhxBG8UBTQzo0gfAjOoWP9VS+iioDyl1Afij/FhaPZ8GkQd6Swmz8FNCtUO
-	E+R1QCUImrzMw8Eu2vG+RUj0cF4fG7prLEXxa+jXQ+k1j80/xmQileDddK2XNvE+Hb4Qi+ooE/m
-	5FNFo0Qx1iJ76kk60pO8bmC7au2I0whUUypnAR+w6wA+fijWRCR93TFq1eqAWiSXY9ojk9HGG7B
-	72YhayZVUgfCMbC/iJK4AZ+Uhm6S9742W2A6825A2NoQbu1lbNyVbC7lYmADBHTuU3LkqRYFzqB
-	gxwRQvi/lWlhWgOp6ON6JMuMQE1CyLR//7zzygT/hvfAnZZ1Ln2/qZdgKpntyhvwWcgtUHdNy3U
-	ZR+
-X-Received: by 2002:a05:6820:2006:b0:6df:baf1:fb09 with SMTP id 006d021491bc7-6ef10e689ecmr14874407eaf.87.1792068362047;
-        Thu, 15 Oct 2026 05:46:02 -0700 (PDT)
-Received: from [172.17.0.2] ([20.29.31.252])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6eef6e22b46sm16566548eaf.0.2026.10.15.05.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 05:46:01 -0700 (PDT)
-Message-ID: <6ad0cb09.870d8f20.127c83.476d@mx.google.com>
-Date: Thu, 15 Oct 2026 05:46:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7930462483254281130=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jvGKIciE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 487F31F000C8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 13:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792070535;
+	bh=PtakM2rq+ivjR0e7DosmM9joh8D3XX6lnOGvhtqu8Yc=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=jvGKIciEueQGGCVpxvxDNWq25lUom4brJTJxQKGaWt2s0mCC0H2VC8KvrJ6CHU05Y
+	 Y3i0DSCcNUIZpSmWx+dA9MiIg2dzpM+h81xrqYLNkdALJqiEI59r55mnBGCUDOn1Fc
+	 SAFzZFw+g2kaH/4ZS1MuhVhcW+hcX5aArcf3ojFAIQwGMkw+13A3IBJmzTXL2PYBOz
+	 I5a8f+AMrdlQERHcbAn5hQDZ12SX4+76MvLwPCQJoa+XHefU0m0QF4ebwvWVerb+B8
+	 Wi0i8LRRd+4fGEo3oWIk2R7d44rbs8J+V71pNNtxGT627RD02Apb80dF/VPlSAej28
+	 mYbBq2bCoT4eg==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-3a980c01033so16040141fa.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 06:22:15 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByubXHckPCZo0GJTXORAVG/VPul7Ys8TuRDFSuQA1GGuH8qLDjVJoZCw/oNPJ6b6amVtNqppzSeq4vW++JDnAQ=@vger.kernel.org
+X-Gm-Message-State: AFq9FYIANU+TBdakWz3jZg8HxvQSvZL5Ml4quXRqpnInxI4LBl6AwMUP
+	I94ZwBoWAy5iI5ui5RVHGldiF6cCRIl9fnQf2NXpZpzIo1sYfKpT6LOx184XlhIZOdJUonmwKTi
+	Y40Kav9nFRUhqsjRa1+flfZxVIJr5X7v0TM6Ilfstdw==
+X-Received: by 2002:a2e:b888:0:b0:3a9:82c2:ec1e with SMTP id
+ 38308e7fff4ca-3a9c537ed07mr41696771fa.15.1792070533876; Thu, 15 Oct 2026
+ 06:22:13 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 15 Oct 2026 13:22:12 +0000
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 15 Oct 2026 13:22:12 +0000
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20261014-b4-nvmem-efivar-v1-2-187c85f65018@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: [BlueZ,bluez,v2] hci: add ext adv interface
-In-Reply-To: <20261015-extend_adv_api-v2-1-8b76d8a1c0ef@amlogic.com>
-References: <20261015-extend_adv_api-v2-1-8b76d8a1c0ef@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com> <20261014-b4-nvmem-efivar-v1-2-187c85f65018@oss.qualcomm.com>
+Date: Thu, 15 Oct 2026 13:22:12 +0000
+X-Gmail-Original-Message-ID: <CAMRc=McDsv0k0bD2LoaXfOh7uyFo=HRyO098H=N=QeMFDXsLKQ@mail.gmail.com>
+X-Gm-Features: AclHuK_mQfEq7d5o6k5CJtNKj-nIhBiWJK67TxDvSr-imzKrws_f6xRwLeLZhi8
+Message-ID: <CAMRc=McDsv0k0bD2LoaXfOh7uyFo=HRyO098H=N=QeMFDXsLKQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 2/5] nvmem: Add UEFI variable NVMEM provider
+To: Abel Vesa <abel.vesa@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath12k@lists.infradead.org, Srinivas Kandagatla <srini@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Jeff Johnson <jjohnson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
---===============7930462483254281130==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, 14 Oct 2026 15:02:40 +0200, Abel Vesa <abel.vesa@oss.qualcomm.com> said:
+> Add a provider that reads a UEFI variable via the EFI runtime
+> GetVariable service and publishes its bytes as a read-only NVMEM device.
+> NVMEM cells are described as device-tree child nodes and can be
+> referenced by consumers through nvmem-cells / nvmem-cell-names.
+>
+> The vendor GUID is optional: when it is not provided, the variable is
+> located by name by enumerating the variable store. This keeps working
+> on platforms where GetVariable is emulated by firmware (e.g. the
+> Qualcomm uefisecapp backend) and where direct flash access is
+> unavailable to the non-secure world, in particular when Linux boots at
+> EL2.
+>
+> If the variable has not been provisioned yet, the device is still
+> registered, sized to cover the described cells and filled with zeroes,
+> the same way an erased EEPROM would read. This keeps consumers probing
+> and falling back to their default addresses.
+>
+> Assisted-by: LLM
+> Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+> ---
+>  drivers/nvmem/Kconfig  |  12 +++
+>  drivers/nvmem/Makefile |   2 +
+>  drivers/nvmem/efivar.c | 273 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 287 insertions(+)
+>
+> diff --git a/drivers/nvmem/Kconfig b/drivers/nvmem/Kconfig
+> index 083a5e528960..3f619dfa1cf7 100644
+> --- a/drivers/nvmem/Kconfig
+> +++ b/drivers/nvmem/Kconfig
+> @@ -185,6 +185,18 @@ config NVMEM_BRCM_NVRAM
+>  	  This driver provides support for Broadcom's NVRAM that can be accessed
+>  	  using I/O mapping.
+>
+> +config NVMEM_EFIVAR
+> +	tristate "UEFI variable NVMEM provider"
+> +	depends on EFI || COMPILE_TEST
+> +	help
+> +	  Say y here to expose the contents of a UEFI variable as an NVMEM
+> +	  device. This allows the kernel to consume data provisioned in a UEFI
+> +	  variable, referenced from consumers via the standard nvmem-cells
+> +	  bindings.
+> +
+> +	  This driver can also be built as a module. If so, the module will
+> +	  be called nvmem-efivar.
+> +
+>  config NVMEM_IMX_IIM
+>  	tristate "i.MX IC Identification Module support"
+>  	depends on ARCH_MXC || COMPILE_TEST
+> diff --git a/drivers/nvmem/Makefile b/drivers/nvmem/Makefile
+> index 5e70bad9f0f9..038d3d9ee95c 100644
+> --- a/drivers/nvmem/Makefile
+> +++ b/drivers/nvmem/Makefile
+> @@ -27,6 +27,8 @@ obj-$(CONFIG_NVMEM_BCM_OCOTP)		+= nvmem-bcm-ocotp.o
+>  nvmem-bcm-ocotp-y			:= bcm-ocotp.o
+>  obj-$(CONFIG_NVMEM_BRCM_NVRAM)		+= nvmem_brcm_nvram.o
+>  nvmem_brcm_nvram-y			:= brcm_nvram.o
+> +obj-$(CONFIG_NVMEM_EFIVAR)		+= nvmem-efivar.o
+> +nvmem-efivar-y			:= efivar.o
+>  obj-$(CONFIG_NVMEM_IMX_IIM)		+= nvmem-imx-iim.o
+>  nvmem-imx-iim-y				:= imx-iim.o
+>  obj-$(CONFIG_NVMEM_IMX_OCOTP)		+= nvmem-imx-ocotp.o
+> diff --git a/drivers/nvmem/efivar.c b/drivers/nvmem/efivar.c
+> new file mode 100644
+> index 000000000000..699b1d67aea4
+> --- /dev/null
+> +++ b/drivers/nvmem/efivar.c
+> @@ -0,0 +1,273 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * nvmem-efivar - expose the contents of a UEFI variable as an NVMEM device
+> + *
+> + * Lets the kernel consume data provisioned in a UEFI variable through the
+> + * standard NVMEM cell bindings.  The variable is read at probe time through
+> + * the EFI runtime GetVariable service, which also works on platforms where
+> + * the variable store is emulated by firmware (for example the Qualcomm
+> + * uefisecapp backend) and where direct flash access is not available to the
+> + * non-secure world.  The variable contents are published as a read-only
+> + * NVMEM device, with cells described as child nodes in the device tree and
+> + * referenced by consumers through the standard "nvmem-cells" /
+> + * "nvmem-cell-names" properties.
+> + *
+> + * If the variable has not been provisioned yet, the device is still
+> + * registered, sized to cover the described cells and filled with zeroes,
+> + * the same way an erased EEPROM would read.  Consumers are expected to
+> + * validate the data they read so such systems keep working with their
+> + * defaults.
+> + *
+> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 
-This is automated email and please do not reply to this email!
+This should immediately follow the SPFX header I think.
 
-Dear submitter,
+> + */
+> +
+> +#include <linux/efi.h>
+> +#include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/nvmem-provider.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/property.h>
+> +#include <linux/slab.h>
+> +#include <linux/ucs2_string.h>
+> +#include <linux/uuid.h>
+> +
+> +struct efivar_nvmem {
+> +	void	*data;
+> +	size_t	size;
+> +};
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1186303/
+I would have preferred it without tabs but whatever.
 
----Test result---
+> +
+> +static int efivar_nvmem_reg_read(void *priv, unsigned int offset,
+> +				 void *val, size_t bytes)
+> +{
+> +	struct efivar_nvmem *p = priv;
+> +
+> +	if (offset >= p->size || offset + bytes > p->size)
+> +		return -EINVAL;
+> +
+> +	memcpy(val, p->data + offset, bytes);
+> +	return 0;
+> +}
+> +
+> +/* Size needed to cover all cells described as child nodes. */
+> +static size_t efivar_nvmem_cells_extent(struct device *dev)
+> +{
+> +	struct device_node *child;
+> +	size_t extent = 0;
+> +	u32 reg[2];
+> +
+> +	for_each_child_of_node(dev->of_node, child) {
 
-Test Summary:
-CheckPatch                    FAIL      0.45 seconds
-GitLint                       PASS      0.24 seconds
-BuildEll                      PASS      12.70 seconds
-BluezMake                     PASS      166.45 seconds
-MakeCheck                     PASS      0.53 seconds
-MakeDistcheck                 PASS      92.68 seconds
-CheckValgrind                 PASS      87.35 seconds
-CheckSmatch                   PASS      166.30 seconds
-bluezmakeextell               PASS      57.75 seconds
-TestFunctional                PASS      802.36 seconds
-IncrementalBuild              PASS      186.96 seconds
-ScanBuild                     PASS      607.08 seconds
+You're leaking the reference to the child node. You also probably don't need
+the OF variant, use device_for_each_child_node_scoped() instead.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,bluez,v2] hci: add ext adv interface
-WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-#261: FILE: lib/bluetooth/hci.c:3177:
-+		sizeof(le_set_ext_adv_enable_cp) + (num_of_sets * set_entry_len);
+> +		if (of_property_read_u32_array(child, "reg", reg, 2))
+> +			continue;
+> +		extent = max_t(size_t, extent, (size_t)reg[0] + reg[1]);
+> +	}
+> +
+> +	return extent;
+> +}
+> +
+> +/*
+> + * Find the vendor GUID of a variable given only its (UCS-2) name, by
+> + * enumerating the variable store.  Used when no 'efivar-guid' is provided.
+> + */
+> +static int efivar_nvmem_find_guid(const efi_char16_t *want, efi_guid_t *out)
+> +{
+> +	unsigned long max = 512; /* in UCS-2 chars; variable names are short */
+> +	efi_char16_t *name;
+> +	efi_guid_t vendor = {};
+> +	efi_status_t status;
+> +	int ret = -ENODEV;
+> +
+> +	name = kcalloc(max, sizeof(*name), GFP_KERNEL);
 
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#310: FILE: lib/bluetooth/hci.h:1739:
-+typedef struct {
+efi_char_16t *name __free(kfree) = kcalloc(...);
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#326: FILE: lib/bluetooth/hci.h:1755:
-+} __attribute__ ((packed)) le_set_ext_adv_params_cp;
+> +	if (!name)
+> +		return -ENOMEM;
+> +	name[0] = 0;
 
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#329: FILE: lib/bluetooth/hci.h:1758:
-+typedef struct {
+Doesn't kcalloc() imply it?
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#332: FILE: lib/bluetooth/hci.h:1761:
-+} __attribute__ ((packed)) le_set_ext_adv_params_rp;
+> +
+> +	for (;;) {
+> +		unsigned long name_size = max * sizeof(*name);
+> +
+> +		status = efivar_get_next_variable(&name_size, name, &vendor);
+> +		if (status == EFI_BUFFER_TOO_SMALL) {
+> +			efi_char16_t *tmp;
+> +
+> +			max = name_size / sizeof(*name) + 1;
+> +			tmp = krealloc_array(name, max, sizeof(*name), GFP_KERNEL);
+> +			if (!tmp) {
+> +				ret = -ENOMEM;
+> +				break;
+> +			}
+> +			name = tmp;
+> +			continue;
+> +		}
+> +		if (status != EFI_SUCCESS) /* EFI_NOT_FOUND ends the walk */
+> +			break;
+> +
+> +		if (!ucs2_strncmp(name, want, ucs2_strlen(want) + 1)) {
+> +			*out = vendor;
+> +			ret = 0;
+> +			break;
+> +		}
+> +	}
+> +
+> +	kfree(name);
+> +	return ret;
+> +}
+> +
+> +static int efivar_nvmem_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	const char *name, *guid_str;
+> +	struct nvmem_config cfg = {};
+> +	struct efivar_nvmem *priv;
+> +	struct nvmem_device *nvmem;
+> +	efi_char16_t *name16;
+> +	efi_guid_t guid;
+> +	guid_t g;
+> +	unsigned long size;
+> +	efi_status_t status;
+> +	u32 attr;
+> +	int i, len, ret;
+> +	void *buf;
+> +
+> +	/*
+> +	 * The EFI variable service may not be a native EFI runtime service;
+> +	 * backends such as the Qualcomm uefisecapp driver register the
+> +	 * efivars operations asynchronously.  Wait for them.
+> +	 */
+> +	if (!efivar_is_available())
+> +		return -EPROBE_DEFER;
+> +
+> +	ret = device_property_read_string(dev, "efivar-name", &name);
+> +	if (ret)
+> +		return dev_err_probe(dev, ret, "missing 'efivar-name'\n");
+> +
+> +	/* ASCII variable name -> UCS-2 as expected by the EFI service */
+> +	len = strlen(name);
+> +	name16 = kcalloc(len + 1, sizeof(*name16), GFP_KERNEL);
 
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#336: FILE: lib/bluetooth/hci.h:1765:
-+typedef struct {
+efi_char_16t name16 __free(kfree) = kcalloc(...);
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#342: FILE: lib/bluetooth/hci.h:1771:
-+} __attribute__ ((packed)) le_set_ext_adv_data_cp;
+> +	if (!name16)
+> +		return -ENOMEM;
+> +	for (i = 0; i < len; i++)
+> +		name16[i] = name[i];
+> +
+> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv) {
+> +		kfree(name16);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/*
+> +	 * The vendor GUID is optional: if it is not provided, look the
+> +	 * variable up by name across the whole store.  A variable that has
+> +	 * not been provisioned yet is reported as not found and handled
+> +	 * below like an erased EEPROM.
+> +	 */
+> +	if (!device_property_read_string(dev, "efivar-guid", &guid_str)) {
+> +		ret = guid_parse(guid_str, &g);
+> +		if (ret) {
+> +			kfree(name16);
+> +			return dev_err_probe(dev, ret, "invalid 'efivar-guid'\n");
+> +		}
+> +		memcpy(&guid, &g, sizeof(guid));
+> +		status = EFI_SUCCESS;
+> +	} else {
+> +		ret = efivar_nvmem_find_guid(name16, &guid);
+> +		if (ret && ret != -ENODEV) {
+> +			kfree(name16);
+> +			return dev_err_probe(dev, ret,
+> +					     "failed to look up variable '%s'\n",
+> +					     name);
+> +		}
+> +		status = ret ? EFI_NOT_FOUND : EFI_SUCCESS;
+> +	}
+> +
+> +	/* First attempt with a modest buffer; grow if the firmware asks. */
+> +	size = 512;
+> +	buf = kzalloc(size, GFP_KERNEL);
 
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#346: FILE: lib/bluetooth/hci.h:1775:
-+typedef struct {
+void *buf __free(kfree) = kzalloc(size, GFP_KERNEL);	
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#352: FILE: lib/bluetooth/hci.h:1781:
-+} __attribute__((packed)) le_set_ext_scan_rsp_data_cp;
+> +	if (!buf) {
+> +		kfree(name16);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	if (status == EFI_SUCCESS) {
+> +		status = efivar_get_variable(name16, &guid, &attr, &size, buf);
+> +		if (status == EFI_BUFFER_TOO_SMALL) {
+> +			kfree(buf);
+> +			buf = kzalloc(size, GFP_KERNEL);
 
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#356: FILE: lib/bluetooth/hci.h:1785:
-+typedef struct {
+krealloc()?
 
-WARNING:LONG_LINE_COMMENT: line length of 84 exceeds 80 columns
-#359: FILE: lib/bluetooth/hci.h:1788:
-+	/* followed by ext adv set entries: handle(1), duration(2), max_events(1) */
+> +			if (!buf) {
+> +				kfree(name16);
+> +				return -ENOMEM;
+> +			}
+> +			status = efivar_get_variable(name16, &guid, &attr,
+> +						     &size, buf);
+> +		}
+> +	}
+> +	kfree(name16);
+> +
+> +	if (status == EFI_NOT_FOUND) {
+> +		/*
+> +		 * Variable not provisioned yet: behave like an erased
+> +		 * EEPROM so that consumers still probe and fall back to
+> +		 * their defaults.
+> +		 */
+> +		kfree(buf);
+> +		size = efivar_nvmem_cells_extent(dev);
+> +		if (!size)
+> +			return dev_err_probe(dev, -ENODEV,
+> +					     "variable '%s' not found and no cells described\n",
+> +					     name);
+> +		buf = kzalloc(size, GFP_KERNEL);
+> +		if (!buf)
+> +			return -ENOMEM;
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#361: FILE: lib/bluetooth/hci.h:1790:
-+} __attribute__ ((packed)) le_set_ext_adv_enable_cp;
+Sprinkle in some newlines after return for better readability here and
+elsewhere.
 
-WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-#375: FILE: lib/bluetooth/hci_lib.h:115:
-+int hci_le_set_ext_adv_params(int dev_id, uint8_t handle, uint16_t evt_properties,
+> +		dev_info(dev, "variable '%s' not provisioned, reading as zeroes\n",
+> +			 name);
+> +	} else if (status != EFI_SUCCESS) {
+> +		kfree(buf);
+> +		return dev_err_probe(dev, -ENODEV,
+> +				     "GetVariable('%s') failed: 0x%lx\n",
+> +				     name, status);
+> +	} else {
+> +		dev_dbg(dev, "variable '%s' attr=0x%x size=%lu\n",
+> +			name, attr, size);
+> +	}
+> +
+> +	priv->data = devm_kmemdup(dev, buf, size, GFP_KERNEL);
+> +	kfree(buf);
+> +	if (!priv->data)
+> +		return -ENOMEM;
+> +	priv->size = size;
+> +
+> +	cfg.dev			= dev;
+> +	cfg.name		= "efivar";
+> +	cfg.id			= NVMEM_DEVID_AUTO;
+> +	cfg.owner		= THIS_MODULE;
+> +	cfg.type		= NVMEM_TYPE_OTP;
+> +	cfg.read_only		= true;
+> +	cfg.word_size		= 1;
+> +	cfg.stride		= 1;
+> +	cfg.size		= priv->size;
+> +	cfg.reg_read		= efivar_nvmem_reg_read;
+> +	cfg.priv		= priv;
+> +	cfg.of_node		= dev->of_node;
+> +	cfg.add_legacy_fixed_of_cells = true;
 
-WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-#378: FILE: lib/bluetooth/hci_lib.h:118:
-+				uint8_t peer_addr_type, const bdaddr_t *peer_addr,
+I think it looks better without tabs. Better yet, use compound literal:
 
-/home/runner/work/bluez/bluez/src/patch/14891171.patch total: 0 errors, 14 warnings, 283 lines checked
+	cfg = (struct nvmem_config){
+		.dev = dev,
+		...
+	};
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+> +
+> +	nvmem = devm_nvmem_register(dev, &cfg);
+> +	return PTR_ERR_OR_ZERO(nvmem);
 
-/home/runner/work/bluez/bluez/src/patch/14891171.patch has style problems, please review.
+return PTR_ERR_OR_ZERO(devm_nvmem_register(dev, &cfg)); ?
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+> +}
+> +
+> +static const struct of_device_id efivar_nvmem_of_match[] = {
+> +	{ .compatible = "nvmem-efivar" },
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(of, efivar_nvmem_of_match);
+> +
+> +static struct platform_driver efivar_nvmem_driver = {
+> +	.probe = efivar_nvmem_probe,
+> +	.driver = {
+> +		.name = "nvmem-efivar",
+> +		.of_match_table = efivar_nvmem_of_match,
+> +	},
+> +};
+> +module_platform_driver(efivar_nvmem_driver);
+> +
+> +MODULE_DESCRIPTION("NVMEM provider backed by a UEFI variable");
+> +MODULE_IMPORT_NS("EFIVAR");
+> +MODULE_LICENSE("GPL");
+>
+> --
+> 2.54.0
+>
+>
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluez/pull/2684
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7930462483254281130==--
+Bart
