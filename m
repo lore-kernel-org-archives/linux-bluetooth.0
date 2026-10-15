@@ -1,85 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820A851CF62
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 13:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018201FA272;
+	Thu, 15 Oct 2026 13:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792070571; cv=none; b=XCenBQBqARPa4vgTV+4g4m0pcTDpMVWyn5w/jhwlM0uEQy9WGb/eyuuW45ivh1ggCmVz99rnQFS30dGrc5tVUlQHniQuFAWJpK9KdP0WAXUu//tM+8STBmIE22zom04wVQV/V2F0x1AnjymhQxEzfCnhrWapE9BKUosxqWjIcAU=
+	t=1792071609; cv=none; b=OfTrHDgdTNZyBk8iyrsA4AhlH6rAF5dtdtoCodzp1vZMcJuUVaIUlgRkZFB6zo1LB5D2tlGftw9Z4Nlj2muS/r8BIJM/I8J6uR62ZjEA7MELjxY8XQZ3Gnp6o849hkmHbmkbgpVd0LwKTW4L4FqWo/W+osETcDVXF0xcffk/3tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792070571; c=relaxed/simple;
-	bh=vlGf1T13Z+dYbNgaE76AaMl6XNAcJozRNF/jbJktorc=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ACalmVcZuU6qs2wRsiUJGSf+DGUs765m4le0H+b+M3k62ktNvSBYEGD1bLjS6yDxohBvwV+wVfXZwN5Jw3lUNfKYorV87a0aQ6CZ0O7uR4nwuSNraiXnLdI8uon4gEWKM7Eqy0/J/CO7PuvMMOcIA9DGb2uNnwvKXtEoF5Mtjxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dBRqmuWK; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792071609; c=relaxed/simple;
+	bh=k4mM2IDQkXDme11YcBwJHpfnj2VVZBVHkpp151CHt+U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JrLgpr2A3Pa2wZAfqEihz2xmpuf2r7KcjUo1kw8DjZvfw/f0rWoVds5UJGCtuCtCRJ9e+zQRZPl+4YfhSqzwoXzqIBefrNQoZSrsyjHaGmwZVF2XfklmxwSW7/yYbPWq7cGk4aXqSQZcArDWx/WuIm7jAolmYJCDEjrY5NrCsCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFxxw6Rt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dBRqmuWK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 510721F000CB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 13:22:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFxxw6Rt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF831F000C4;
+	Thu, 15 Oct 2026 13:40:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792070569;
-	bh=vlGf1T13Z+dYbNgaE76AaMl6XNAcJozRNF/jbJktorc=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=dBRqmuWK2zLSWCkxNYW4OJpTwQKNTpkvCo/jQ6lhgNv16UISJugG6g32QJlrd5pDg
-	 Kwh5BEcx/Yrkl/ijOrJZWHJp1BvPWy03JD1CB3fRjV3oITasnByLO4Dkv/p9BqWJ7W
-	 YBg87zl7utcTaj47KB0Zvr1dD6GZJBc2mbUp0kBvwwgsRByrJchFu09zzjsLogM46G
-	 1A+ZiCP64ZT6DdgUU4KZe6wqWqafdrjpYtJPYzgeFB3RZ9dHRKYnyKT+O8eMe4kHrm
-	 PyiL0LQErfqQmH0g+6iIop1zb0MtNLx/2wp+POz8N6/nIqgVSQ4N62zYl9cooV3l54
-	 2Glt1U9KKXKSg==
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-3a1f628b1d1so39779731fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 06:22:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBybKWdOPPjHWHDBip9pGJg8AEt0kA9xlDtf9yuOrqq8XYoH7AlZ6+sFn6oBsNPRvq5tcS5N2DXQvyxIAcFwdxM=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKz15DTbc4vJiRkx7Vzf2aAPa9IMqdpqFMHEsn0N/t8jRR9q3du
-	rB+z5KXXDohWPPaAXklmcU0X9aVqPbPXnu9mkoJcGchaLgfdvZC92wLmufVwEyUn/luhzYN5+YX
-	KPe4l464nCLFsTtQqGMyWKP2URfmGVZGekK5WQaM3QA==
-X-Received: by 2002:a2e:bc23:0:b0:3a5:af50:bc99 with SMTP id
- 38308e7fff4ca-3a9c5354501mr44082971fa.13.1792070567993; Thu, 15 Oct 2026
- 06:22:47 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Oct 2026 06:22:46 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Oct 2026 06:22:46 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20261014-b4-nvmem-efivar-v1-5-187c85f65018@oss.qualcomm.com>
+	s=k20260515; t=1792071607;
+	bh=jjDER0mNzeDQlHOZq2YsXBJeSiABiPoqbl4QA16CmQQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=gFxxw6Rte22sXL9wdlxA7gjXLqnpMBLvncS8P/fNkE7IM51rr6O1VzjVHGBzFI2Cs
+	 jiIiiUakpo/D7r7GgeJ191n/3iO/BjqIuUy367qNioVy+OhkBtYBObM7TewPQ4HpmW
+	 vG6qPMYlmh/Pov9jO75HM9DOzOqGOh0leeLu761+7gqUh1nn3Oab0YyQxAaOfQPJHy
+	 miWoaTyyTHbUe9+sKf77HT3wWyDdE9Jbz2gO3r7+2/lTlEVAoakIw5P7x4R2Tfz3OJ
+	 FgaIbKo+6lvNHSRl5UmxkHEws2E+FDILH1iWNMmvkveUixnLVgfZz4aPLLVu1yl5P+
+	 6747IaAPR/F3g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7756B392EB04;
+	Thu, 15 Oct 2026 13:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com> <20261014-b4-nvmem-efivar-v1-5-187c85f65018@oss.qualcomm.com>
-Date: Thu, 15 Oct 2026 06:22:46 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MeDZZjDzCOwqyK5cKOuTz3zOScNS20NS+D8j2bEk=B6MQ@mail.gmail.com>
-X-Gm-Features: AclHuK8xL2vil4lfhLkzbT6CatB4Oy4PBPKqe80Zw3U5zHMs29jaaQ8CTSEyqXY
-Message-ID: <CAMRc=MeDZZjDzCOwqyK5cKOuTz3zOScNS20NS+D8j2bEk=B6MQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 5/5] arm64: dts: qcom: glymur-crd: Source MAC
- addresses from a UEFI variable
-To: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath12k@lists.infradead.org, Srinivas Kandagatla <srini@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Jeff Johnson <jjohnson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 1/3] Bluetooth: btintel_pcie: Add initial YoYo debug
+ support
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179207160627.3441573.10441193801394049903.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Oct 2026 13:40:06 +0000
+References: <20261015115431.27456-1-ajay.k.v@intel.com>
+In-Reply-To: <20261015115431.27456-1-ajay.k.v@intel.com>
+To: Ajay KV <ajay.k.v@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com,
+ kiran.k@intel.com, linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+ marcel@holtmann.org, stable@vger.kernel.org,
+ chethan.tumkur.narayan@intel.com, lakshmipathi.k@intel.com
 
-On Wed, 14 Oct 2026 15:02:43 +0200, Abel Vesa <abel.vesa@oss.qualcomm.com> said:
-> Add an nvmem-efivar provider exposing the "MacAddresses" UEFI variable,
-> carrying the Bluetooth BD_ADDR (bytes 0-5) and the WLAN MAC address
-> (bytes 6-11), both MSB first. The variable is looked up by name, so no
-> vendor GUID needs to be hardcoded.
->
-> Wire the bd-address cell to the Bluetooth controller and the mac-address
-> cell to the WLAN endpoint (pci17cb,1107) via the standard nvmem-cells
-> binding. Until the variable is provisioned the cells read as zeroes and
-> the controllers keep using their default addresses.
->
-> Assisted-by: LLM
-> Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
-> ---
+Hello:
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu, 15 Oct 2026 14:54:29 +0300 you wrote:
+> From: Ajaykv <ajay.k.v@intel.com>
+> 
+> Add an optional YoYo firmware configuration path to the Intel PCIe
+> Bluetooth driver. Read DBG_PATH and ENABLE_INI from
+> ibt_bt_dbg_cfg.ini, and load intel/ibt_debug_yoyo.bin only when YoYo
+> is enabled and host DRAM routing is selected.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,1/3] Bluetooth: btintel_pcie: Add initial YoYo debug support
+    (no matching commit)
+  - [v4,2/3] Bluetooth: btintel_pcie: Validate the YoYo DEBUG_INFO TLV
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d52ecdd482cf
+  - [v4,3/3] Bluetooth: btintel_pcie: Configure YoYo DBGC buffer allocations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ff8b09806b7b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
