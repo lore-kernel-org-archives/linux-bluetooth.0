@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C21452FE4F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2026 15:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315E152FE32;
+	Fri, 16 Oct 2026 15:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792165217; cv=none; b=iZZzrGfPIg6z8WmbC/uanj9erqCdov6QMLDcMFQiCNDWp1MuwPpgMjAl0h5ItFomE8AsnySK8zKpmDJOx79agX6xBfDI54r35lXBAxOyecmtmIQLU+5I2tmzkhJs93040p2PzXVsGqDRlQEYc6XGSvv93eOBUoSXwdGuPDUeSsQ=
+	t=1792165219; cv=none; b=qhu2a5feVkETBIQ6nJxPXBHV0vxX7WF8EFuelEHeQQ8hCsLCiqZtiYb011zeJBUyxtagexoKaoe0VLbqBzB4XAAfs/JwzCzpzbkcThcBEYFzlRi1C17V587iikC/JqJ46ajNjCYNM0e+/Ox4CLS1Fnyl2vlgEheayVsIFdZe/Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792165217; c=relaxed/simple;
-	bh=LIZvuSbbg64gKocqYPp3uow2UFw3CCUJMhc31PgY37g=;
+	s=arc-20240116; t=1792165219; c=relaxed/simple;
+	bh=o97ORKfUsnZwt7jloOd28FAvqIH28ncR7dv1D6etjLk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VEkUwNLZUWnoAdTnf+lUjs8ga/4BXWeedUmR1OJCQq3DZZfuCgcZ2WZVctNwaGop7hZO8fvNi22cR4rqoofbliNK+eTsgoyoyACa9qmYTL03jgXVAsy/5e6cjRKv6ETk6oqMCl1t+b9o5OQvfaCEXhModCAnfK1Ue0m/L9prgT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5Jivk8g; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=tuE5oLdUtp08+GOjj1WfBCZ0PLl2rXQaE4ayusoR7FD9IimovwS2CASB5txnBicSSLaiw0PA+/DEs0tYScQfE/YT7KtglQxOaUwlv8BcL+3jdP57tJJO7P+t7ctXW9ZDK+Rv10J8EYh5yRCs9iY3fp4ShgX0twGq0oX7c4+HW8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4Zt/1fs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5Jivk8g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44EB01F000C4;
-	Fri, 16 Oct 2026 15:40:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4Zt/1fs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE7461F000C5;
+	Fri, 16 Oct 2026 15:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792165216;
-	bh=CsyoLztQ3S8qBOeHwZ/krRNJg2/3/C212NrhEKJiR8Q=;
+	s=k20260515; t=1792165217;
+	bh=OrbLJr4eNLnAIX0UPfAXg9LAgL9Pj7OrkbnQfRvNlLY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=A5Jivk8gWi0bNYVOC470rcQLaIrnh9dMV5c3cz909CC82Be8BgcNoWpejMv9A+CEv
-	 Dv0SpS5ilUK6Ghn6Jk6N0363+nxdjozAqqN++vU6qoxR1CVQk2Ypv/lW4/Y3z+faAT
-	 9T7mOfLmXi6rFkF0ezK64wKTO316JIdaSPh6E2yKQkAG4e4IRlM+cL9yVOztfY/3r1
-	 w5PcISY2Tbd5Y2ENY/IDCyrayEhGkZYuRkcXIzyG9C8uPicruGvUEUS8nSiv85vFuV
-	 +Y1awAZ7cvacFVGaVRaWPdxUL2IaEP7talfJ7N4yMA6cP7G7T1wmQPgHc2OFP8xoX6
-	 yaiDkKRxoSIFw==
+	b=h4Zt/1fsjyiiDgQJICoyG7LXoAsv30b0Wr0nzJZb+O6ci3Yj+7zW5K61UeWimy8a4
+	 wL8RyRecqJR35JnTqRtQlJJbsIDhgxfBbUk7+LhmolD/VLRZopxXIqf/1z3nVuVR1Z
+	 c+PvOXavMDBalhb6Wx11EPJ9wEsblW/5MDyFSftC+5A+yb3DTnFLo9teYEHd7aMw3V
+	 uCnFty5bOPi8RAJxLHjm70pi1E/PgIv3mZIhO1OzyKpJRhfVYfwI6bglsUVHHPhpve
+	 KupjsG09g4MMJCkYPh2cQNJnXf4k9Ozt5tRqd/naYCSvtBUaWCellFAN6XJyqJ8R8x
+	 73/XnEvFhVWXQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A3D4380A96A;
-	Fri, 16 Oct 2026 15:40:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4474380A96A;
+	Fri, 16 Oct 2026 15:40:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,41 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v10 0/2] Bluetooth: add hardware rfkill handling
+Subject: Re: [PATCH -next] Bluetooth: hci_nokia: use skb_put_padto()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179216521476.826981.15138353307358957117.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Oct 2026 15:40:14 +0000
-References: <20261016025921.1719986-1-aluvala.sai.teja@intel.com>
-In-Reply-To: <20261016025921.1719986-1-aluvala.sai.teja@intel.com>
-To: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, kiran.k@intel.com,
- chethan.tumkur.narayan@intel.com
+ <179216521626.826981.6704041898422015598.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Oct 2026 15:40:16 +0000
+References: <20261016150314.2832131-1-edumazet@kernel.org>
+In-Reply-To: <20261016150314.2832131-1-edumazet@kernel.org>
+To: Eric Dumazet <edumazet@kernel.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 16 Oct 2026 08:29:19 +0530 you wrote:
-> This series adds hardware rfkill handling for the Intel PCIe transport
-> and the Bluetooth-side notification path.
+On Fri, 16 Oct 2026 17:03:14 +0200 you wrote:
+> skb_pad() does not change skb->len, callers have to follow it
+> with skb_put(), which is error prone.
 > 
-> The resulting flow is:
+> Use skb_put_padto() instead of the open-coded sequence in
+> nokia_enqueue().
 > 
->   transport hardware event
->     -> hci_rfkill_set_hw_state()
->     -> rfkill hardware state
->     -> hdev->rfkill_block work
->     -> HCI_RFKILLED state and device power handling
+> Signed-off-by: Eric Dumazet <edumazet@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v10,1/2] Bluetooth: Add HCI interface for HW rfkill events
-    https://git.kernel.org/bluetooth/bluetooth-next/c/09399227b038
-  - [v10,2/2] Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f600f753cc32
+  - [-next] Bluetooth: hci_nokia: use skb_put_padto()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/185c11232d5f
 
 You are awesome, thank you!
 -- 
