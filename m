@@ -1,109 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF8446A61A;
-	Fri, 16 Oct 2026 10:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA9A47A872
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2026 11:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792145761; cv=none; b=aVke3ddHjJRNejQ6gugeBhjzfSdmnocLCpYOoTT3hrFqSBp7k3QxYBtIgqJYu6BwA6S4Sw1K7MQ2Rt9CcXgXNokqvRQphC8NEgSKvyJ0GdOUXfpUJ3831d3qr5xr1yl25mkRDjv5Fd3GC1E1AXgWS79KyMFUpli0ImUMbrMSZvI=
+	t=1792150523; cv=none; b=kaGP0y21vklPwX6o36tYEm7coI6Lp1+9AyoW9SZu0wDMvt99uhW6lsTs6ozK61WP3nbuQJqHdNFXpky5+KUe+3U6nss/RHjsEN8y2DL6ZokYyJI8Pflb6ZF5NPORqSK2eVBJPJVOomRPjO6sXsSHOh6iVZ0NsvXvCaOpMJlugsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792145761; c=relaxed/simple;
-	bh=Ehcl0B7SfiHOi5RV/Sw2WoQYyYyKVSbATt4XSXVGjyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mmfhOqUWmeUUlPJsU3aY86gzbDAc1aqsswzErV8YcRaPak89ksmOAQJ8pzAoXgIQ6g0ms9XPgy9NF9I5rKrOBUeDjmLn/kQIV4uvA1Q9IDPTDV0w1aVcHmh4Y81I9oP5aAX7nw9Gie6u/7qQoUr4I/6FviZwmYUkskxrihPKvsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HC7SX4pR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792150523; c=relaxed/simple;
+	bh=n8/A+OK36nHeF741zjc08pPuCVQ4RUH9mzkh5SeyS6o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mIs8DG60VXgSqo3hon5mShDVWbk/E599b2AQuYpNbglB/P43t7RjVx8YhS/FH6pvZAKag3qx5++rcptVreIJ60T5On7IlHNy9duD8HeDHePMambtDd3prVje95ZzM7Bx2Rpyz2SAf2DV2bzUv2EGBUEiW1fMFYoChC1e1cOjbiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QiFaLmGt; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HC7SX4pR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79351F000C4;
-	Fri, 16 Oct 2026 10:15:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792145760;
-	bh=GP/kjuGx2fzgLmoe1V4NY3PcIUr3S0ZrKGtRNI+gTfM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HC7SX4pRK+hlrEuoHQyN5RYj8vBVz1YgeykYe0VsNkZD8FjZkc8UFPk/Ivapv2lDw
-	 bzeEDah3ABtpGm2yQLLllmv5F5Z6bRbGtT7jg6ePSRwWRuxA0yD3aSh5gr9xAsAXMY
-	 JeFI+EGjTfx65osDcMoHvxDdj9GNWaOMD/aiQkipfSbzm/FxtbeXMrMagGLyKLsLwj
-	 YjhV7cNe57AOW59HD7Xt0+DoMDZXfw33YlPAxAIuogfmI9G60NyfUgbuxl0sv6Svmj
-	 hipCYIO1keDL2+7Lc6GOdfmE2HKXOM/K+ZguARFPb0JsIfQiGUeoPBuF6TMjfefYD4
-	 jgcReGB8xShuA==
-Date: Fri, 16 Oct 2026 12:15:54 +0200
-From: Benjamin Tissoires <bentiss@kernel.org>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Jiri Kosina <jikos@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Michael Zaidman <michael.zaidman@gmail.com>, 
-	Rishi Gupta <gupt21@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	David Barksdale <dbarksdale@uplogix.com>, Andrej Shadura <andrew@shadura.me>, 
-	Johannes Roith <johannes@gnu-linux.rocks>, linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] HID: hidraw: Encapsulate struct hidraw and make
- hidraw.h private
-Message-ID: <atH4tx8B_alkLgu9@beelink>
-References: <20261014051326.3784498-1-dmitry.torokhov@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QiFaLmGt"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7fccba9c675so1275754a34.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2026 04:35:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792150520; x=1792755320; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=7TQRio0hQsYBdwR7pbehvumKluM/hf96Grp82iIAU7M=;
+        b=QiFaLmGtc8b8Hc23bKNa5hWtz46jSp3O3U6H25vbmfy/F7TsuDbDtsAfW6ZPWkEPVf
+         lRPC6CnpwyMhBIdarh0ei7MmdYIsH22+sANhhjk0QUtws0syJso2F8dJR4RorSU4+zIo
+         SSIAS2ZsXDyDJQFqcPIFAsBYAUyoOrOQWipGU9i7oFNfTW7uzgxeuNtz5MKGlrATg2RA
+         41QNL12UvUGIBqpNDO+wOJaVinZYV9ryIotzcE0ke/3J5LwWowAgcwWKz4UsddPWw+cF
+         IOQWCdU07zaGcEXLhelSWnI/x1PUmcJXyT5F3mO1VW1nHmILd238rjfuBQbZyra47EAh
+         4+AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792150520; x=1792755320;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=7TQRio0hQsYBdwR7pbehvumKluM/hf96Grp82iIAU7M=;
+        b=Yzzxiy6ekMdDivg1DcjfvrrNG+4Hu8+sPs3O1nGEP+GnpJbgo5GVtXDUU/nZaTnUMo
+         FCW22wa0tuva44sEdgGR5j6XYET7vq49UFMKg7JOb7O7Uuhoko7xVyYq+vPvcgTdf4p9
+         p0eJVvG56ap2xo4HcsyIM/SO2rIIzxxG2dlPqCWjIHhQn+nb1HOL16Y+wxlAnVeS/zhk
+         D+QVvucMfBSA/Zd6R6jY5w3dXB3aOM20b/HbIxScHTXtDk/4tGe6MhZdiPMVHwKBWpde
+         egp8ipITx5gh1jkS7sowGImI5inelY6r0SB7MfxRFc2eTEAvDmuhACCk2GXHyks0jVha
+         pQJw==
+X-Gm-Message-State: AFq9FYLBqDXacq4QRxgWKBHMxIlWZ2EKZ2+a74RDb4sawj6GUzwoX/P/
+	UDhOGuQEO8Cua0+G7ktIjff7p1wa1W7HL07zUWei23CDdkyQCx7b/0gOkD6+8w==
+X-Gm-Gg: AYBFou2PgzGMDY++Stku8qHWtS6YenXhuchgLZ7j7D98rrN3ciysYXmOkGdCzIKFznG
+	/spIgfX+b676Ka2hedKnZaKZqoibjDhnGSja/SyCQs9wh0E50222SlqVK8UKHcOfliF2yuAnVTY
+	UV5+ZEMps0cL4rKWFMccemnkG0xVCe3ZcKY+xX818eXT1ZR3lcVmn/DL4KpBKddDh0ptLuHoldg
+	1OBK0xt6kEWKyCZXY8yiDOyFv9E/lc+Wt/f3ADsp0J2QJvXLvphQ+f56Jfm3Ck5ZEnS8+LsuXt9
+	tmI1Ql+mZoEnQ0D9hor0HF/LJhO2C4hJe0MYfrMojq0MhaqhiAzGGgmUK+4YGScWoLmUY0RT6a/
+	bFf5CkXeogqbXRK44GQtC9eDyy8+jSj9MpBG9zWHz5KnG/aMmxDyEE+NBO2enEMaoOmizT/BaMx
+	tQVerwS1fOHb9TSFEheoR2kSzdn1nvRwRQbXQ/hBRfhr3ekCk1gMZXDcgNGw+dCy8lbIOI3oLIp
+	cTyow==
+X-Received: by 2002:a05:6830:a20b:20b0:7f9:555:1def with SMTP id 46e09a7af769-841fb4282e8mr1372996a34.11.1792150520164;
+        Fri, 16 Oct 2026 04:35:20 -0700 (PDT)
+Received: from [172.17.0.2] ([20.106.22.181])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-842a111dda4sm1584497a34.1.2026.10.16.04.35.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2026 04:35:19 -0700 (PDT)
+Message-ID: <6ad20bf7.95c05185.34e739.2d17@mx.google.com>
+Date: Fri, 16 Oct 2026 04:35:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6105247993044900752=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261014051326.3784498-1-dmitry.torokhov@gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jinwang.li@oss.qualcomm.com
+Subject: RE: [v2] avdtp: Fix use-after-free in connection_lost
+In-Reply-To: <20261016071408.2961576-1-jinwang.li@oss.qualcomm.com>
+References: <20261016071408.2961576-1-jinwang.li@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+--===============6105247993044900752==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Oct 13 2026, Dmitry Torokhov wrote:
-> This series cleans up internal HID core and hidraw header boundaries.
-> 
-> First, internal HID core declarations and unused symbol exports are
-> moved out of include/linux/hid.h into a private drivers/hid/hid-core.h
-> header. Next, a hidraw_instance() accessor is introduced in
-> include/linux/hidraw.h so HID drivers that only need the hidraw minor
-> number for naming or debug logging no longer dereference struct hidraw
-> directly. After converting the drivers and dropping unused
-> linux/hidraw.h includes, hidraw.h is moved to drivers/hid/hidraw.h and
-> struct hidraw along with its internal buffer and list structures are
-> made private to drivers/hid/hidraw.c.
+This is automated email and please do not reply to this email!
 
-Series looks good to me. However I have a couple of hiccups:
-- the series doesn't apply cleanly on v7.3 (conflict in
-	include/linux/hid.h, which seems 7.2 based), and also not on v7.2
-	(conflict in 2/5 this time around)
-- Jinmo kind of hijacked the series, and now b4 thinks 1/6 is Jinmo's patch.
+Dear submitter,
 
-Would you mind respinning it on top of 7.3-rc7 or hid.git/for-next?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1187029/
 
-Cheers,
-Benjamin
+---Test result---
 
-> 
-> Dmitry Torokhov (5):
->   HID: core: Move internal declarations and drop unused exports
->   HID: hidraw: Introduce hidraw_instance() helper
->   HID: Use hidraw_instance() in drivers
->   HID: Drop unused linux/hidraw.h includes
->   HID: hidraw: Make hidraw.h private to HID subsystem
-> 
->  drivers/hid/Kconfig                     |  3 ++
->  drivers/hid/hid-core.c                  |  7 ++--
->  drivers/hid/hid-core.h                  | 20 +++++++++++
->  drivers/hid/hid-cp2112.c                | 15 ++++----
->  drivers/hid/hid-ft260.c                 |  2 +-
->  drivers/hid/hid-input.c                 |  4 +--
->  drivers/hid/hid-led.c                   | 10 ++++--
->  drivers/hid/hid-mcp2200.c               |  1 -
->  drivers/hid/hid-mcp2221.c               |  1 -
->  drivers/hid/hid-quirks.c                |  1 +
->  drivers/hid/hid-u2fzero.c               | 10 ++++--
->  drivers/hid/hid-winwing.c               |  1 -
->  drivers/hid/hidraw.c                    | 48 ++++++++++++++++++++++---
->  {include/linux => drivers/hid}/hidraw.h | 32 +++--------------
->  drivers/hid/usbhid/hid-core.c           |  1 -
->  include/linux/hid.h                     |  8 -----
->  net/bluetooth/hidp/core.c               |  1 -
->  17 files changed, 100 insertions(+), 65 deletions(-)
->  create mode 100644 drivers/hid/hid-core.h
->  rename {include/linux => drivers/hid}/hidraw.h (58%)
-> 
-> -- 
-> 2.56.0.385.gd3acb90ef8-goog
-> 
+Test Summary:
+CheckPatch                    PASS      0.39 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      20.00 seconds
+BluezMake                     PASS      297.54 seconds
+MakeCheck                     PASS      3.51 seconds
+MakeDistcheck                 PASS      149.89 seconds
+CheckValgrind                 PASS      154.87 seconds
+CheckSmatch                   PASS      299.49 seconds
+bluezmakeextell               PASS      96.41 seconds
+TestFunctional                PASS      1125.89 seconds
+IncrementalBuild              PASS      303.29 seconds
+ScanBuild                     PASS      1186.10 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2685
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6105247993044900752==--
