@@ -1,35 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C6F4D9561;
-	Fri, 16 Oct 2026 00:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AB939280A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2026 02:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792108814; cv=none; b=Yekhm2X508KEj6hePNgHOs19n1YfW/+fY5OBYVTftEC2j8Z9wrEIhZlUw6p7TZE15onJzdmp/RlWkePa+L5iDPceHLFKKjuH14AW8XJK7N1xB4uAIz7kEZz5z7sT2cTWc64kyn6EeiJW32MuxZiXpKddD3V1QVhK+Z+K8pHcPbE=
+	t=1792116654; cv=none; b=Iyvhq6Jj9ov8Mv8P1aqd/aKxq3JaeO8YfruSSq6yzCKbm++kmSl0sHnMHDb35o93P2Ii+iSOtLHJ1k+Mlx09FesHz+wmOfQRZu4jRRsCC3rNRblZp256IRlxFGqe/Ix6mm7+UWSg0HExesctoyR94sxxRyVBgHwrjY/CHp4Y/ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792108814; c=relaxed/simple;
-	bh=AvtPLwaCpwF2Gw0JfpkxvGaovgVuWyHfAfVF/97CiT4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o8pfRUEvhiefkGiTDmUXDcBecSfisxT0HCclY05jQYaxw01LGQdrGX3eMszd/qhe2KfD5oPM6cVjaeTO6kKfbkbsFSImUQ9vyEMSOkiLQzuEyTvQMhIk0OHXAOQstCgwUJ4yXfTYXsCINCqNeXwO5dWDeNDE0pTKMPTm7+PXKJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T8jUCHGL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792116654; c=relaxed/simple;
+	bh=Zc1KZBlT+3PtjTuluFVY7wJcEB53Glf0TXffmrReo4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AO0GSE4UANi6DS3nm7haMjYcnfve9AUpXeQvrbI3JaSiWXAxml2d9ACGaQAbJ83zDwMUUXizqZc2d6QYxarHd/4vOklyPhR/DRhRQ6qO8tIPYgyGUjhOlj1O0yuMCi2Y8v0QbbgSJpM0NkXMhNj+dIJilTA/tVkTKeic5phdHC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=KMVjoYoe; arc=none smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T8jUCHGL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078D01F000C4;
-	Fri, 16 Oct 2026 00:00:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792108813;
-	bh=tL+KxbIRBqhL/Vs9+45Fh8r4UYWtakW6EBgqsM//EgQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=T8jUCHGLGlbJgDOdsrkMgh/TA3/xJhUiho1QGI7lw5Z53VfYWlrlsgAJJAWc6Ceff
-	 wyrN7Yhz4vlEfT6Yj7UFe7Aq6M5CMJmxXeNj2XQ/6tNRk092LTaQT9f6wP66Bd43By
-	 4ZaRsRjNAV4erTn9ZHkGWjsNmPoCIJttG/1xWUCpWwZiHooqErKk2iv1EkAx7NIwLs
-	 lz4e99TcEY6E4Ze7eIwW7idnqJiUUYMr4Uqt4HHYz20WKjYKzG2RbPvlXnT9Ox32ME
-	 DfMtxrvZ47kzpZRqUW6340E55QGkF+bQxX0F/GqS2uPiVTkq7qqQu1jm2Iw2GGbifY
-	 cNkxR2d3zYh2g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15673808209;
-	Fri, 16 Oct 2026 00:00:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b="KMVjoYoe"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-35b2c599f43so1954212eec.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2026 19:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1792116652; x=1792721452; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Zc1KZBlT+3PtjTuluFVY7wJcEB53Glf0TXffmrReo4A=;
+        b=KMVjoYoeQyigM+VZH6XAcg5wqw8j9cioBMRrldBW5lGSfcFuIKXKuiZz5wte/dOngr
+         b6WBk7jt32ibmKmqP2HUTh5zN9iI2uWYhSTj071OHXaL5YyGaropb5pjQlgb/tZgOMjC
+         5BcNhIW/qFxUFhxkw4SnUU40ki6lxxqhEPH/iZhyQYQ8K0J7k4QkbX8/GjBHQWZnXFPP
+         1h4ZBy4j7LfqRPQYv5McGmeBGM0clCh6GM3Wx3g+f7XO6vKaJoYHS5Vl/vwxKekHKlbp
+         hy/+FCRTe3zmyqepvwn50W2L0EDOCRU4QDUP8/4Gs6plfbZ3+TxxhNsOBuOXWKudlz4w
+         n97Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792116652; x=1792721452;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Zc1KZBlT+3PtjTuluFVY7wJcEB53Glf0TXffmrReo4A=;
+        b=d2kZGHzk9h+IczASbv6WAqAuGd4ODgi9qG4SWxKPbbt/DKP+drHEmTG59o3QpkQqhL
+         sfVgRRfok+Qyon7eu3feMI+oVRfjVP+9bjhCxT0Qimy5YPro07ATj9FIHvOhPGpwCqvf
+         ZGCtjrsuNU2zXJ5IUAYS/2PpnQrLhwwkngi6gMFlHIakprXHkn2jUwvyCiF6V9MrQbzS
+         OIvqPfyrL1iMIFjO+8E9zsFkN9oTHR80d8jmm5CQVuKVuK/9cvrmMWSr1tXcAeh+kSNg
+         oV3cHCCVby1cn1WYFP9txEf9J8v9gqjRYNXnGy+TyOvlU4G7sL7ZXdvRl6ilgNkJQBj7
+         McQA==
+X-Forwarded-Encrypted: i=1; AKwUvBzFl+2Ew9zyDSwD0i1duD6A4aSzdLXemaeXyVGg8YINEMy9mmpUDUfyBZQ4OoLNOcbEAOIs3uIHEZ05xeUgchg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYInyUsD7WCql+In8VNLg1hRNvTJxPUz9r0DNEcPDhKqNl9TFm+h
+	wqV6zeD9DN35aNECqRz7s6AgogtixRfHVXDnVcb6h4omnyhQ1UsQja6x1S/w7HJYypc=
+X-Gm-Gg: AYBFou2hiDfMJjnKdmfVPL4Rt2XRQ/Oim95qEk2Y97Bg8Xw5mZaMB4602yrYIr4WjtY
+	ZnegumvKrRbyPz/l5t4SItxSCJrajecC+33hWan6LmGp13Lm6645rmRX0vLzblkBkCS5l6FscA/
+	DD12OX1lKEriV2G2Q1JHOTjELHnAzBppjAd87i50XRd/2cO1oOXKt1pVwPTtO+aGN0sHzBtsYez
+	a5+GyzE2b4unV4gPqTZhQC8ZRNKZAA5vtgvgRHwobWdgFN/N7wLuJT6IZZucF+ezqVyPmmUA55X
+	Zd2h4gsv5uGj0RI1QukJq2547ms62iZb6gG8oMU8b4pLkT18cCTYaNJ44xWHjGVNtaiDneEVsrE
+	2pDzw6ddyGEux6BI3hePjX98tWDCZ1IRlPuu8b4G4Msjy8j+0AqUayHxmOYbKSOQF/77hT7u4Hz
+	kIpnp0OJN1zHbgQy4BM38g/rHkGEMCqBBlNW3eylAeZ5BjUKI7mgQoc5H9z7YerCpvLnFfUpBki
+	LQlt2MNKDI0TB4ha+qd/7ejFvZ0XOHZwpcRsACmtWg1JqDIuEr8MY3HU5n2JgBuR1KI8g==
+X-Received: by 2002:a05:7301:103:b0:35d:f7f4:bc1c with SMTP id 5a478bee46e88-35df7f4bd83mr8817165eec.6.1792116652320;
+        Thu, 15 Oct 2026 19:10:52 -0700 (PDT)
+Received: from localhost.localdomain ([2603:8001:5f01:8bab:d66:d0e8:dae3:3257])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3608308a87csm2638280eec.28.2026.10.15.19.10.50
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 15 Oct 2026 19:10:51 -0700 (PDT)
+From: Artem Dinaburg <artem@trailofbits.com>
+To: stable@vger.kernel.org
+Cc: halves@igalia.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	luiz.von.dentz@intel.com,
+	marcel@holtmann.org,
+	ngocthang2710.1999@gmail.com
+Subject: [PATCH 6.6.y 0/2] CVE-2026-63974, CVE-2026-98297: backport fix series
+Date: Thu, 15 Oct 2026 22:10:45 -0400
+Message-ID: <20261016021047.16461-1-artem@trailofbits.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +77,29 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth-next 2026-10-14
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <179210881178.4163852.17244496645953243826.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Oct 2026 00:00:11 +0000
-References: <20261014184327.1648397-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261014184327.1648397-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
 
-Hello:
+Hi,
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Please consider this backport series for CVE-2026-63974, CVE-2026-98297 to
+6.6.y.
 
-On Wed, 14 Oct 2026 14:43:25 -0400 you wrote:
-> The following changes since commit 05b5019b01fb9443b09ae4ed34af1135a80a84c8:
-> 
->   net: alacritech: fix dma_free_coherent() in error path (2026-10-13 15:48:29 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2026-10-14
-> 
-> [...]
+Apply the patches in this order:
+1. Bluetooth: hci_sync: Set HCI_CMD_DRAIN_WORKQUEUE during device close (fix)
+2. Bluetooth: hci_core: Fix queuing tx_work after workqueue is drained (fix)
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth-next 2026-10-14
-    https://git.kernel.org/netdev/net-next/c/07380336e09d
+Patch 1 marks the workqueue as draining during device close and waits for
+earlier RCU-protected producers before draining it.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Patch 2 makes ACL, SCO and ISO transmit scheduling check that drain flag
+under RCU, preventing new tx_work from being queued during close. The code
+changes in both patches are identical to upstream.
 
+The complete fix is already present in 6.12.y, 6.18.y and 7.2.y.
 
+Build-tested only as part of a cumulative 6.6.y series on x86_64
+(allmodconfig, CONFIG_WERROR=y); no runtime testing.
+
+An LLM assisted with preparing these backports.
+
+Thanks,
+Artem Dinaburg
