@@ -1,58 +1,57 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723CF340DB8;
-	Fri, 16 Oct 2026 02:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D421374E64
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2026 03:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792117394; cv=none; b=ZjA6q9do0jtUPACUe7RJugafd25ytWgm4H7hzT13Wx2uRJRAi6siTJ4Q0Kg4pxO8BiwqfNq0GMklabAkVprvojpEmRJhp3S/ZEVt9V9SabnXf09kWYAfm4uk7ftbRIxW4jPizKFj89ZyoDv49pmfLtZrWPwyKGP+alY84BBgblM=
+	t=1792120072; cv=none; b=b09fi60sh3rcmogj8XH25vmgHU8iq6WOYV1AljuZ08wYM7a341qeX+fGcEwkmPhApW1Qol3tPrGNJshklaOUM5pJVqnupabDE9w4gxBRLAhnZNFAt6rNXPQ8AsR/JI3uaQ/h+4ngGgu+0tOKA13pResIswoRAuMp5KHzw+3AE/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792117394; c=relaxed/simple;
-	bh=jQV+RVh2Qewbh4Vqk/FeyC0beSCtrHUBkc+3mWD6YIo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JTz7SUL7vXJlXNefsCR+4xhYfgHgS4lg8DfeTw/wPbp1FzE1FW6BvcQMaR4Edxzy8XnUuZCE9ntUyu7wWrZtoFlK/+zhuwVG9K8JW95b+dn3RNdAUr3OEs9vlbspXefcadLQk2J88GKNtIJ+N15mRD30L0sVqefogUybZVkZEAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=fJ8fWBA+; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1792120072; c=relaxed/simple;
+	bh=9oUJctlcXgwiu1ts0LsIaOYBCvL9octq/OdYN1zbSIc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DdbUc4UGMUcp1vkW9PeTgPM0y/K2OfbePTjknlu2FfUwVSPeuhV9c4fuaQE3ZJNT4C2cqKq5AQiNuXew/FYytXrMASVf5ON2WE6jihhehp+UsgCNp0zBrL4+J4NkZruud5Itxf9F4GcpfE4p2alFd3y7HYr+VFmtiuu/AvmKj5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNC5vN8x; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="fJ8fWBA+"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69FKKCUM3800036;
-	Fri, 16 Oct 2026 02:23:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=BGJhlOttxqSxiS7YwBNLr3QeGcUiZGXBjL/
-	x70jFWOE=; b=fJ8fWBA+18DXhZmLcNV4v5kymEKZh9gst1Vk/8G6CHZpvwtobCC
-	9nbwt4Ee1kQJ/ICQfl9BCLxakDEMvlCO8nFcFF38SuuI3PIlHq3TWZsRGIj5Q4Em
-	IanywhB0o/l0kWQLt91/O3QLyG5ciNnWwwBo88YLr163nNd/+MyCXEtDgN8T1+wx
-	chfvLdGgLdZzeuq123lIYhUSDhUuQBSeQp3R2ucN3cNcOtT5po2YtGo5sWI/vb88
-	74PUpMRfR9sti8mtp7b0qdRpzi+bYkIN4wD908tpoOzb3okCIE92DrZiJyO+Vati
-	Is/RyBn2rrHjjcuUB3quKodr5DZNk5SLb6Q==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hb5se945a-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 16 Oct 2026 02:23:06 +0000 (GMT)
-Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 69G2N48U2676934;
-	Fri, 16 Oct 2026 02:23:04 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 69G2N4dH2676926
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 16 Oct 2026 02:23:04 +0000 (GMT)
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 4510F644; Fri, 16 Oct 2026 10:23:03 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, chejiang@qti.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Subject: [PATCH v2] Bluetooth: hci_qca: Reopen port after power on for QCA2066
-Date: Fri, 16 Oct 2026 10:23:02 +0800
-Message-Id: <20261016022302.4003647-1-shuai.zhang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNC5vN8x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1792120071; x=1823656071;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9oUJctlcXgwiu1ts0LsIaOYBCvL9octq/OdYN1zbSIc=;
+  b=gNC5vN8xgbSRK6f7jvKzdAYKAidxxlc/pNS9GGi8TVYs4x+xOiz25KVQ
+   Ls17/JxX/9qtZX43DwR/vu8Vu7/oH4bZWsRPbJRepRUUVzzAcfYlHWTgg
+   zUp50rnlnXHtRI7FOFr8Rvkt+t4nLg+RWGthCw52onLISZpuAImacYL6Y
+   0Sanxc9xkxzPqNZ7W9pnOU0cayffdVofzwsOP9qhaM0yrv5eQbK55GY27
+   b6e5Knbm12DnbA0dXT1rmMljwX6O65kz/G3LGsUifki2qnHAzfaCtaYTg
+   TZo903r81Wf4Pfl1C3BOu/Rn49pNfvsFKaFz0J3UvNTvJFMCmwVkhmLZr
+   A==;
+X-CSE-ConnectionGUID: AQtXQEuCRZWq0+NO+EQNeQ==
+X-CSE-MsgGUID: FCocKoGISNW4A9LESsQlAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11936"; a="1004821"
+X-IronPort-AV: E=Sophos;i="6.27,161,1787036400"; 
+   d="scan'208";a="1004821"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2026 20:07:50 -0700
+X-CSE-ConnectionGUID: JsCH1+y9S5e1/6b2esQpKw==
+X-CSE-MsgGUID: cdQnhQelQym2KSe3Ep6M2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,161,1787036400"; 
+   d="scan'208";a="2316661"
+Received: from weba0534.iind.intel.com ([10.66.226.131])
+  by fmviesa010.fm.intel.com with ESMTP; 15 Oct 2026 20:07:48 -0700
+From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: kiran.k@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Subject: [PATCH v10 0/2] Bluetooth: add hardware rfkill handling
+Date: Fri, 16 Oct 2026 08:29:19 +0530
+Message-ID: <20261016025921.1719986-1-aluvala.sai.teja@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,74 +59,243 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE2MDAwOSBTYWx0ZWRfX1TO88fzVepLa
- z7G3pT4oNI8EuRX25A22yYJO9pWZBGMgDjF7D268thPkIrYmm2sFSa/H79D+XAPbnxu61IOI/26
- gQPfFaDZyjlCDc27LO6aAXRdqwiU6AI=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE2MDAwOSBTYWx0ZWRfX4lp3rOPvlDJU
- 6KTSSSEIM7fnnBVFlQZ3ShngkVYPn22nS29srmTE9SlJtUtKqc/MwDEtPXjGmuuxh3n6jRevl+V
- P2zs1E1MJZcYgFPygw/FHdiLE7gwzQkTHUAfbN5MofJjWLsw6a8+TDYcnkSsGTLHKHcwc4huJfI
- +twOpT+qez8GbgKjURxYTG3J+BA5rkqnlrIuRVGvQuK93Ckgs7h7ZCkFqFsbQoSuWLQsRwFVThz
- sqOnP0TMkBcbf6U8PxXc+FlcxTEcy5HT5SJDEhx2FcTrEYyGVv7WG8fdk5k8gwq88zqnWYUD2sb
- 6dprAlNaihKWdjnTvFfFV4HR08onUCfd+ltg2siebazncO8Z0ewUZ0SoyjRcU/DVXxHiiH1bYLj
- 1Dtll6+aKa2rDhVYzIs6BiE4CgeM9c8nP204DnwaAezPQGITWcYAroCnexNYqbOJQn8k5prOX2T
- VMmdWnq1IVkrHDg1Z5A==
-X-Authority-Analysis: v=2.4 cv=P4yvFSAu c=1 sm=1 tr=0 ts=6ad18a8a cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=_K5XuSEh1TEqbUxoQ0s3:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=i-ZuXnGKmWlNg_lG8XwA:9
-X-Proofpoint-ORIG-GUID: AbYkkqnYVznoksIJ9kCNKD_1eldMWyU1
-X-Proofpoint-GUID: AbYkkqnYVznoksIJ9kCNKD_1eldMWyU1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-14_01,2026-10-14_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 clxscore=1015
- malwarescore=0 impostorscore=0 bulkscore=0 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610160009
 
-QCA2066 needs the serial port reopened after the controller is powered
-on, otherwise the host and the device run into RTS/CTS synchronization
-issues.
+This series adds hardware rfkill handling for the Intel PCIe transport
+and the Bluetooth-side notification path.
 
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
----
-Changes for V2
- - Use a separate case for clearer logic.
- - V1 link
-   https://lore.kernel.org/all/20261015092224.262158-1-shuai.zhang@oss.qualcomm.com/
----
- drivers/bluetooth/hci_qca.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+The resulting flow is:
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 7089e9b63..ee3ccb59e 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1867,6 +1867,19 @@ static int qca_power_on(struct hci_dev *hdev)
- 		ret = qca_regulator_init(hu);
- 		break;
- 
-+	case QCA_QCA2066:
-+		qcadev = serdev_device_get_drvdata(hu->serdev);
-+		if (qcadev->bt_en) {
-+			gpiod_set_value_cansleep(qcadev->bt_en, 0);
-+			msleep(50);
-+			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-+			/* Controller needs time to bootup. */
-+			msleep(50);
-+		}
-+
-+		ret = qca_port_reopen(hu);
-+		break;
-+
- 	default:
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
- 		if (qcadev->bt_en) {
+  transport hardware event
+    -> hci_rfkill_set_hw_state()
+    -> rfkill hardware state
+    -> hdev->rfkill_block work
+    -> HCI_RFKILLED state and device power handling
+
+For Intel PCIe controllers, the series adds GP2 and HW_RFKILL MSI-X
+handling, IPC_CONTROL doorbell synchronization, delayed state checking,
+reset/shutdown/remove/suspend lifecycle handling, and notification of
+the generic HCI rfkill layer.
+
+Patches:
+
+  1. Bluetooth: Add HCI interface for HW rfkill events
+  2. Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
+
+Changes since v9:
+
+Sashiko's automated review of v9 is available at:
+  https://sashiko.dev/#/patchset/20261015181829.1692108-1-aluvala.sai.teja%40intel.com
+
+  - hdev->rfkill_block read rfkill_soft_blocked(), which may still
+    hold a soft change that set_block refused for a user channel and
+    rfkill core is about to revert, leaving HCI_RFKILLED out of sync.
+    The accepted soft state is now tracked in a new HCI_SW_RFKILLED
+    flag under hdev->rfkill_lock, and rfkill core state is not read.
+
+The hdev->rfkill registration concern was reviewed; no functional
+change was made. hci_rfkill_set_hw_state() is only valid for a
+registered hdev, which its kernel-doc now states.
+
+A HW rfkill block arriving between the setup power on path's
+HCI_RFKILLED check and its clearing of HCI_SETUP is not enforced, as
+is already the case for a soft block; a comment now documents this.
+
+Changes since v8:
+
+Sashiko's automated review of v8 is available at:
+  https://sashiko.dev/#/patchset/20261015175036.1690457-1-aluvala.sai.teja%40intel.com
+
+  - A HW rfkill block while a user channel was open returned -EBUSY
+    and left HCI_RFKILLED clear, so the device could be powered on
+    once the user channel was closed. The set_block callback still
+    refuses soft rfkill for a user channel, but hdev->rfkill_block
+    now sets HCI_RFKILLED and only skips the power off.
+
+The irq_lock deadlock concern was reviewed; no functional change was
+made. The MSI-X handler is a threaded IRQ with no primary handler, so
+irq_lock is never taken in hardirq context. A comment now documents
+this.
+
+Changes since v7:
+
+Sashiko's automated review of v7 is available at:
+  https://sashiko.dev/#/patchset/20261015160215.1658054-1-aluvala.sai.teja%40intel.com
+
+  - rfkill_wait_state/rfkill_wait_done were set without a lock, so a
+    late GP2 acknowledgment of a timed-out doorbell could complete the
+    next doorbell before firmware handled it. Both are now set under
+    ipc_lock, which the GP2 handler also takes.
+
+The shutdown concern was reviewed; no functional change was made.
+Firmware accepts HCI reset regardless of the HW rfkill state, and an
+assertion not yet seen by the worker is handled like one while HCI is
+down: the worker still reports the block and handles the release. A
+comment in btintel_pcie_shutdown() now documents this.
+
+Changes since v6:
+
+Sashiko's automated review of v6 is available at:
+  https://sashiko.dev/#/patchset/20261014172114.1426239-1-aluvala.sai.teja%40intel.com
+
+  - After shutdown acknowledged an assertion, IPC_CONTROL still held
+    that acknowledgment while the switch was asserted, so a later
+    worker run (e.g. after s2idle resume) treated it as a release and
+    reported an unblock. A release is now only handled once FUNC_CTRL
+    shows the switch released.
+
+Not reported by Sashiko, also fixed in v7:
+
+  - The check added in v5 to keep HCI_RFKILLED set on a soft unblock
+    while HW rfkill is asserted used rfkill_blocked(), which inside
+    set_block still reports the soft block being removed. A soft
+    block followed by a soft unblock therefore left HCI_RFKILLED set
+    on every controller. The hardware state is now tracked in a new
+    HCI_HW_RFKILLED flag instead.
+  - hdev->rfkill_block also used rfkill_blocked(), so if it ran just
+    after a soft unblock it could block the device again while rfkill
+    reported it unblocked. It now combines HCI_HW_RFKILLED with
+    rfkill_soft_blocked().
+  - With CONFIG_RFKILL=n, hci_rfkill_set_hw_state() returned early,
+    so a HW rfkill assertion neither powered off nor blocked the
+    device. The hardware state is now enforced without an rfkill
+    device too.
+
+Rebased onto the latest bluetooth-next, which added YoYo debug
+support to btintel_pcie. The HW rfkill worker is now also disabled
+in the new btintel_pcie_probe_cleanup(), which replaces the old
+probe failure reset.
+
+Changes since v5:
+
+Sashiko's automated review of v5 is available at:
+  https://sashiko.dev/#/patchset/20261014165156.1413500-1-aluvala.sai.teja%40intel.com
+
+The following concerns it raised have been addressed in v6:
+
+  - hci_rfkill_set_hw_state() checked the soft block state and cleared
+    HCI_RFKILLED without hdev->rfkill_lock, racing with a concurrent
+    soft block; it now runs under hdev->rfkill_lock.
+  - hdev->rfkill_block read rfkill_blocked() before taking
+    hdev->rfkill_lock, so a concurrent soft unblock could leave a stale
+    block applied; the state is now read under the lock.
+  - The worker's doorbell(false) and shutdown's doorbell(true) could
+    overlap and consume each other's GP2 acknowledgment; doorbell
+    transitions are now serialized with a new rfkill_doorbell_lock.
+  - HW_RFKILL is unmasked again during the setup firmware download
+    retry; the worker now does nothing until setup has completed, and
+    the setup retry path is left as in upstream.
+
+Changes since v4:
+
+Sashiko's automated review of v4 is available at:
+  https://sashiko.dev/#/patchset/20261014082650.1270679-1-aluvala.sai.teja%40intel.com
+
+Two genuine issues were found in the flush_work() added to
+hci_rfkill_set_hw_state() in v3, and are fixed in v5:
+
+  - Flushing hdev->rfkill_block under hdev->unregister_lock could
+    deadlock against hci_dev_close_sync() taking hdev->lock and a
+    mgmt command holding hdev->lock in hci_cmd_sync_submit().
+  - The flush did not order the work before rfkill core's async
+    event, so userspace could still see a stale HCI_RFKILLED flag.
+
+The flush is removed. On release, HCI_RFKILLED is now cleared before
+rfkill_set_hw_state() if the device is not soft blocked.
+
+Not reported by Sashiko, also fixed in v5:
+
+  - A soft unblock cleared HCI_RFKILLED while the hardware switch was
+    still asserted, allowing the controller to be powered on under a
+    hard block; the flag is now kept set in that case.
+  - hci_unregister_dev() no longer takes hdev->unregister_lock around
+    rfkill_unregister(), which created a lock-order inversion with
+    rfkill_global_mutex. HCI_UNREGISTER, already set under that lock,
+    stops further hci_rfkill_set_hw_state() calls.
+  - btintel_pcie_shutdown() no longer masks HW_RFKILL, so HW rfkill
+    events are still reported to the stack while HCI is down.
+
+The remaining concerns were reviewed; no further changes were made.
+
+Changes since v3:
+
+Sashiko's automated review of v3 is available at:
+  https://sashiko.dev/#/patchset/20261014061947.1238279-1-aluvala.sai.teja%40intel.com
+
+Of the concerns raised, one was a genuine bug and is fixed in v4:
+
+  - A masked HW_RFKILL MSI-X cause still latches, so an unrelated
+    interrupt during remove could requeue the HW rfkill worker after
+    it was canceled, leading to a use-after-free. The handler now only
+    queues the worker while HW_RFKILL is unmasked, and remove and the
+    probe failure path disable the worker instead of canceling it.
+
+The remaining concerns were reviewed; no further changes were made.
+
+Changes since v2:
+
+Sashiko's automated review of v2 is available at:
+  https://sashiko.dev/#/patchset/cover.1790905146.git.aluvala.sai.teja%40intel.com
+
+The following genuine concerns it raised against this series have been
+addressed:
+
+  - hci_rfkill_set_hw_state() could race with hci_unregister_dev() and
+    let hdev->rfkill_block run after hdev->rfkill was destroyed; the
+    work is now scheduled while still holding hdev->unregister_lock.
+  - The asynchronous hardware rfkill work item and the rfkill core's
+    synchronous set_block callback could race on HCI_RFKILLED and
+    controller power state; both paths are now serialized with a new
+    hdev->rfkill_lock.
+  - The HW rfkill worker could dereference data->hdev before probe had
+    published it; an early NULL check was added.
+  - The worker and HW_RFKILL MSI-X cause could still run or fire during
+    shutdown, reset, probe failure, remove, and suspend, racing with
+    those lifecycle paths; the cause is now masked and the worker
+    drained before each of them, and unmasked again after setup/resume.
+  - A hardware rfkill release during suspend was not reported after
+    resume because the initial state check unconditionally suppressed
+    the first "off" result; it is now only suppressed when rfkill was
+    not previously asserted.
+  - GP2 completion could be falsely triggered by a stale interrupt
+    that happened to match the current register state; the firmware
+    acknowledgment is now checked against the specific requested
+    transition.
+
+Not reported by Sashiko, but found during this review and also fixed:
+
+  - hci_rfkill_set_hw_state() now flushes hdev->rfkill_block before
+    returning, closing a race where a userspace power-on could see a
+    stale HCI_RFKILLED flag.
+  - btintel_pcie_shutdown() keeps HW_RFKILL monitoring enabled when
+    shutdown is itself caused by an active assertion, so a later
+    de-assertion can still be detected.
+
+The rfkill registration-failure path was also reviewed and confirmed
+safe (hdev->rfkill is only published after hci_register_dev()
+succeeds).
+
+Pre-existing issues flagged by Sashiko that are unrelated to this
+series (a workqueue leak on an existing probe failure path, and an
+existing hci_unregister_dev() resource-ordering concern) were left
+unchanged, as requested.
+
+v2 also dropped the Bluetooth-specific debugfs test hook, the redundant
+hdev->rfkill pointer-clear patch, and the separate RFKILL-core helper
+dependency that were present in v1.
+
+The series has been prepared against bluetooth-next/master.
+
+Sai Teja Aluvala (2):
+  Bluetooth: Add HCI interface for HW rfkill events
+  Bluetooth: btintel_pcie: add HW rfkill interrupt/doorbell flow
+
+ drivers/bluetooth/btintel_pcie.c | 227 ++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie.h |  33 +++++
+ include/net/bluetooth/hci.h      |   3 +
+ include/net/bluetooth/hci_core.h |   4 +
+ net/bluetooth/hci_core.c         | 110 ++++++++++++++-
+ 5 files changed, 365 insertions(+), 12 deletions(-)
+
 -- 
-2.34.1
+2.53.0
 
