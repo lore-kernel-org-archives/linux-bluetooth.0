@@ -1,85 +1,121 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB8539A060;
-	Sat, 17 Oct 2026 07:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CEE37F33D;
+	Sat, 17 Oct 2026 08:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792222655; cv=none; b=ZxIPZFdw14jjBuDLgt1+yu8BxhCUNUbDoVBGx2BgXrFs1kgMcM1HJgvnmpZX4PZG9wXM0na9X7ZaX9DtuwXo1OPX7HCvVhpsaggSZMUKagzpddn9zeyePOOAMUwOdcY49jAnb3in0Tr8rxfESXHSbtqw6ihtM640DVU1CLjKsu4=
+	t=1792227326; cv=none; b=l7gFMm2J/VrZ9WekrZGdFmHJ5QzcEBSGR4JpTKjANUHT2s6uKmCFwUMOQuMVeqpbG3l0VuFjWgW+L61Re9ihHd7sSP6IaWa4P9vltUJEag1OK/fnrLuYZmFtQ8yGHfas2yIsxPwv//VIWsncI9ApAYN536XendS3WHs61ddjVX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792222655; c=relaxed/simple;
-	bh=71F1a5zKwaom90xrHbsu9nKbmWtG+xFm2DAmJvjrXm8=;
-	h=Date:From:To:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=aF7bJMrwx/9nLhKNXVLgS6Dfz/1nLBrKrWbP2VU+T1NcGqiRCTvzEIrcoGyfboD+GfmH4ecnNOly0p1WBszyE/6q5oIMzn4Di6JqRoqUZOiUUvK8w6IxhtlwhurzOcoT80S0qlVy0Zh4/4pExqrDzUBCXfLVRPyHQ64UymdGzpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=WVJe+cNJ; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="WVJe+cNJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=71F1a5zKwaom90xrHbsu9nKbmWtG+xFm2DAmJvjrXm8=; b=W
-	VJe+cNJpzOvtG+xPsjBymjfNoO/oMzTEHfFRJsLG/3kVGL8C86edhkneJHy3ppvC
-	9GF/H1vMxeTC+WEHrRJLpxHYG6hM+oCbjDS4ub9AE21lRPOUiBg1Lo+t/+drMhMm
-	IhgXs5EkZ1oc9SbBToq7vGibZ+0cESjwg0RvTxCsq4=
-Date: Sat, 17 Oct 2026 15:37:19 +0800 (CST)
-From: "jiale yao" <19888972804@163.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>,
-	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re:[PATCH 2/2] Bluetooth: msft: free detached address filter on
- cancel
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <20261017031022.3616384-1-yaojiale02@163.com>
-References: <20261017031022.3616384-1-yaojiale02@163.com>
-X-NTES-SC: AL_Qu2SAP6ZvU4o7ymbZukdnEkQgO0/WsS1vfQu2Y5Wc+wEgCbN4z0YdHxaDHHN8e6DOSarnDiOagNHzNRcb4JHPvlxq4k8Psie8lna/ticSw==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1792227326; c=relaxed/simple;
+	bh=E0fjcsu40T6/F313XMJJ/NVd+RUC6tIve+FBSv42krc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=opRkH0w1oyWOKCVGcjMLOTx4kL1xUsTAoXDNjz6z5vGlTjEI5YvJZDYsaXv0yOYgrGjiEwNWxFEk2ehIvcbRG2vRWYRpg4J0CNla5JB+q9kKIQQapiR/KBVZ1aZLVrDwIzmfnoFR9JbhN6rhj17yIS01KSWLXLGgunCLh72miuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256:X25519MLKEM768)
+	 (Exim 4.100.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1xI0CG-000000004Fu-3V2H;
+	Sat, 17 Oct 2026 08:55:20 +0000
+Date: Sat, 17 Oct 2026 09:55:17 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Hans de Goede <hansg@kernel.org>, driver-core@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: [PATCH v4 0/4] device_schedule_reprobe(): core helper and conversions
+Message-ID: <cover.1792203271.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <994a66d.18b6.1a148cb3747.Coremail.19888972804@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:ZygvCgDXn7SwJdNq+vtaAA--.161W
-X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbCzRAFP2rTJbAjyAAA3g
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-QXQgMjAyNi0xMC0xNyAxMToxMDoyMiwgIkppYWxlIFlhbyIgPHlhb2ppYWxlMDJAMTYzLmNvbT4g
-d3JvdGU6Cj5BbiBhZGRyZXNzIGZpbHRlciBxdWV1ZWQgZm9yIGFkZGl0aW9uIGNhbiBiZSBkZXRh
-Y2hlZCBmcm9tIHRoZSBNU0ZUCj5maWx0ZXIgbGlzdCBhbmQgbWFya2VkIEFGX1NUQVRFX1JFTU9W
-SU5HIGJlZm9yZSBpdHMgY29tbWFuZC1zeW5jIHdvcmsKPnJ1bnMuIElmIHRoZSBxdWV1ZWQgZW50
-cnkgaXMgdGhlbiBjYW5jZWxsZWQsIGl0cyBOVUxMIGRlc3Ryb3kgY2FsbGJhY2sKPmxlYXZlcyB0
-aGUgZGV0YWNoZWQgZmlsdGVyIHdpdGhvdXQgYW4gb3duZXIuCj4KPkluc3RhbGwgYSBkZXN0cm95
-IGNhbGxiYWNrIHRoYXQgZnJlZXMgYSBjYW5jZWxsZWQgZmlsdGVyIG9ubHkgd2hlbiBpdAo+aGFz
-IHJlYWNoZWQgQUZfU1RBVEVfUkVNT1ZJTkcuIEZpbHRlcnMgdGhhdCBhcmUgc3RpbGwgbGlua2Vk
-IHJlbWFpbgo+b3duZWQgYnkgdGhlIG5vcm1hbCBjbG9zZSBjbGVhbnVwIHBhdGguCj4KCkZpeGVz
-OiA5ZTE0NjA2ZDhmMzggKCJCbHVldG9vdGg6IG1zZnQ6IEV4dGVuZGVkIG1vbml0b3IgdHJhY2tp
-bmcgYnkgYWRkcmVzcyBmaWx0ZXIiKQoKPlNpZ25lZC1vZmYtYnk6IEppYWxlIFlhbyA8eWFvamlh
-bGUwMkAxNjMuY29tPgo+LS0tCj4gbmV0L2JsdWV0b290aC9tc2Z0LmMgfCAxMiArKysrKysrKysr
-Ky0KPiAxIGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Cj5k
-aWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9tc2Z0LmMgYi9uZXQvYmx1ZXRvb3RoL21zZnQuYwo+
-aW5kZXggZDlkZDcyMmRiM2ViLi5iOWY4ZjA4OWNjNzIgMTAwNjQ0Cj4tLS0gYS9uZXQvYmx1ZXRv
-b3RoL21zZnQuYwo+KysrIGIvbmV0L2JsdWV0b290aC9tc2Z0LmMKPkBAIC05MjgsNiArOTI4LDE2
-IEBAIHN0YXRpYyBpbnQgbXNmdF9hZGRfYWRkcmVzc19maWx0ZXJfc3luYyhzdHJ1Y3QgaGNpX2Rl
-diAqaGRldiwgdm9pZCAqZGF0YSkKPiAJcmV0dXJuIDA7Cj4gfQo+IAo+K3N0YXRpYyB2b2lkIG1z
-ZnRfYWRkX2FkZHJlc3NfZmlsdGVyX2Rlc3Ryb3koc3RydWN0IGhjaV9kZXYgKmhkZXYsIHZvaWQg
-KmRhdGEsCj4rCQkJCQkgICAgaW50IGVycikKPit7Cj4rCXN0cnVjdCBtc2Z0X21vbml0b3JfYWRk
-cl9maWx0ZXJfZGF0YSAqYWRkcmVzc19maWx0ZXIgPSBkYXRhOwo+Kwo+KwlpZiAoZXJyID09IC1F
-Q0FOQ0VMRUQgJiYKPisJICAgIGFkZHJlc3NfZmlsdGVyLT5zdGF0ZSA9PSBBRl9TVEFURV9SRU1P
-VklORykKPisJCWtmcmVlKGFkZHJlc3NfZmlsdGVyKTsKPit9Cj4rCj4gLyogVGhpcyBmdW5jdGlv
-biByZXF1aXJlcyB0aGUgY2FsbGVyIGhvbGRzIG1zZnQtPmZpbHRlcl9sb2NrICovCj4gc3RhdGlj
-IHN0cnVjdCBtc2Z0X21vbml0b3JfYWRkcl9maWx0ZXJfZGF0YSAqbXNmdF9hZGRfYWRkcmVzc19m
-aWx0ZXIKPiAJCShzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdTggYWRkcl90eXBlLCBiZGFkZHJfdCAq
-YmRhZGRyLAo+QEAgLTk1OSw3ICs5NjksNyBAQCBzdGF0aWMgc3RydWN0IG1zZnRfbW9uaXRvcl9h
-ZGRyX2ZpbHRlcl9kYXRhICptc2Z0X2FkZF9hZGRyZXNzX2ZpbHRlcgo+IAlsaXN0X2FkZF90YWls
-KCZhZGRyZXNzX2ZpbHRlci0+bGlzdCwgJm1zZnQtPmFkZHJlc3NfZmlsdGVycyk7Cj4gCj4gCWVy
-ciA9IGhjaV9jbWRfc3luY19xdWV1ZShoZGV2LCBtc2Z0X2FkZF9hZGRyZXNzX2ZpbHRlcl9zeW5j
-LAo+LQkJCQkgYWRkcmVzc19maWx0ZXIsIE5VTEwpOwo+KwkJCQkgYWRkcmVzc19maWx0ZXIsIG1z
-ZnRfYWRkX2FkZHJlc3NfZmlsdGVyX2Rlc3Ryb3kpOwo+IAlpZiAoZXJyIDwgMCkgewo+IAkJYnRf
-ZGV2X2VycihoZGV2LCAiTVNGVDogQWRkIGFkZHJlc3MgJXBNUiBmaWx0ZXIgZXJyIiwgYmRhZGRy
-KTsKPiAJCWxpc3RfZGVsKCZhZGRyZXNzX2ZpbHRlci0+bGlzdCk7Cj4tLSAKPjIuMzQuMQo=
+iwlwifi and hci_h5 re-probe their own device from a work item in module
+text ending in module_put(THIS_MODULE), which a concurrent rmmod can
+race, and nothing ties the re-probe to the binding that asked for it.
+btintel_pcie re-probes synchronously from its own reset work. This
+series adds device_schedule_reprobe() to the driver core and converts
+all three.
+
+Tested on an Intel AX101 with patches 1 to 3, PROVE_LOCKING and
+DEBUG_OBJECTS_WORK: a re-probe, and an unbind, rmmod, PCI removal,
+suspend and reboot with one pending. The unbind and the removals
+cancelled it, and it ran after resume. The stock iwlwifi code undid
+the unbind, and rmmod with its work held just past module_put() oopsed
+in lockdep. Patches 3 and 4 are untested for lack of hardware.
+
+Changes since v3 [4]:
+ - patch 1 was reworked as patch 3/6 of the mxl862xx devlink flash
+   series, v13 to v19 [5][6], which netdev has deferred until this
+   lands; its history summarises the changes
+ - patch 1: Hans de Goede's tags dropped [7]; patch 3 keeps his, its
+   code being unchanged, but a re-test would be welcome
+ - patches 2 and 3: Fixes: tags
+ - patches 2 to 4: commit messages updated; rebased onto bluetooth-next
+
+Changes since v2 [3]:
+ - patch 1: use dev_err_probe() for the re-probe error path so a
+   re-probe deferred at resume no longer logs a spurious error; pick up
+   Hans de Goede's Tested-by/Reviewed-by
+ - patch 3: pick up Hans de Goede's Tested-by/Reviewed-by
+ - patch 4: rebased onto bluetooth-next, whose btintel_pcie has four
+   dump workers rather than the single one the v2 mainline snapshot had
+ - base the series on bluetooth-next instead of v7.2-rc7 so the
+   bluetooth patches apply for their maintainers
+
+Changes since the RFC (v1) [1]:
+ - pin the parent device across the deferred work and re-lock it across
+   device_attach() on need_parent_lock buses (found reviewing the
+   mxl862xx posting [2])
+ - schedule the work on system_dfl_wq instead of the deprecated
+   system_unbound_wq
+ - thread the series properly (the RFC's patches were unthreaded)
+ - drop RFC status
+
+[1] https://lore.kernel.org/all/anpxFdwNxk0XwPjQ@makrotopia.org/
+[2] https://lore.kernel.org/all/cover.1786922210.git.daniel@makrotopia.org/
+[3] https://lore.kernel.org/all/cover.1787185594.git.daniel@makrotopia.org/
+[4] https://lore.kernel.org/all/cover.1787281239.git.daniel@makrotopia.org/
+[5] https://lore.kernel.org/all/cover.1788783126.git.daniel@makrotopia.org/
+[6] https://lore.kernel.org/all/cover.1791035885.git.daniel@makrotopia.org/
+[7] https://lore.kernel.org/all/aqlPPyblTK8c6-zZ@makrotopia.org/
+
+---
+On LLM use: device_schedule_reprobe() was designed and first
+implemented by hand. Its later revisions answer AI review (Sashiko on
+the mxl862xx postings, and local runs of the same prompts); an LLM
+helped reproduce those findings and draft the changes and changelogs.
+Every decision and the final review were mine; the Assisted-by tag on
+patch 1 records this.
+
+Daniel Golle (4):
+  driver core: add device_schedule_reprobe()
+  wifi: iwlwifi: use device_schedule_reprobe()
+  Bluetooth: hci_h5: use device_schedule_reprobe()
+  Bluetooth: btintel_pcie: use device_schedule_reprobe() after reset
+
+ drivers/base/base.h                           |   4 +
+ drivers/base/dd.c                             | 171 ++++++++++++++++++
+ drivers/bluetooth/btintel_pcie.c              |  47 +++--
+ drivers/bluetooth/hci_h5.c                    |  43 +----
+ .../net/wireless/intel/iwlwifi/iwl-trans.c    |  40 +---
+ include/linux/device.h                        |   2 +
+ 6 files changed, 208 insertions(+), 99 deletions(-)
+
+
+base-commit: 185c11232d5f586489bb3b74e6bcc7a6560ddd40
+-- 
+2.56.0
