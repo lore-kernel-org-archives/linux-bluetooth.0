@@ -1,195 +1,90 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106102.protonmail.ch (mail-106102.protonmail.ch [79.135.106.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CF03C0601
-	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Oct 2026 17:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8B63909B5
+	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Oct 2026 18:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792259006; cv=none; b=b0tZKgW917OFKac0bg5SmNDWulkrG5x1VhjjhFhXSfpAZQwI1HQYYu0Iyn8G7CCA5tCTzyDTHD+UO3CFVr9SJdJP3BlTSAXcUt68PMuJisrRJp/UsI2k3ySQr7cfWVS8mJWlMPDrifv0+NotKmDH+DrRPUG327V/4sK13Yo2PN4=
+	t=1792262388; cv=none; b=h4rvksmQ1ua8s8yRew5x/7XzxjBcYZalwDDORw6GaXkq6ivpB/s5hcm08fxJXwKB3sv8MSQjqhuZ/A9dYlEMhBfAabBYFC5Y2Xt9mSl0bZvicBSUxqghLVZeq7Nxlpo0nmEEIuI5V3Z3GqAeWJ63KEASqc5+ON9nS7rXtyV3Sdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792259006; c=relaxed/simple;
-	bh=PXfTNimZxtPFUtjkyxv7iqfY7+4RBOfgiA2KMuVA39c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RJW+XOkOzfoabShTO4fbs4Jn57hRShwbiU3VDnWYAk4RHaMh4RQkFBrZkgPXa6FbDn4feHP2xyoZAac28lLNNokQejywovjahf6cmQ+/yyMYjQdsx4JSYhhNyE+SdVeLHK2r83lBLKHh4JUA+CrsRMkVdQWLhCiZx/qtV5K+7mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8d1RdMx; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792262388; c=relaxed/simple;
+	bh=akh/56Yw94wkRry0AovN9rjpnKvaCzb8QNThsPUKTqU=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=OeQtlHSu7230u1u5c2gVfauH18bESzHXlh6dq4AIFWIkOUv5f818Luj0rM7/Z2tgdQT2R/CozA0/F6bM8zNMM/HM9x+K2dycjWQjlLDS1ePKJNld2mBacGFpj2AdfT8oXEOb+bKvxKnMEtM8gRz8ISWM7irFkrpvHB+HrLaYfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=yB5cMpNx; arc=none smtp.client-ip=79.135.106.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8d1RdMx"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c2dc8cb0decso63985166b.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Oct 2026 10:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792259003; x=1792863803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PwF3jKNAYzszFL75qOBfeCsRKgDJQKcyrSL9S+2luJM=;
-        b=D8d1RdMx1cyLTjga3JNRISW6jP0kU+obJNJNbxV6jzdYf+Uh3uzrKBKmmy1qijCzxE
-         Gquraup66zzxhUM/Px4DEA3cruj2XsOaMBdgrALDDKxpdHgsLqE1kEt2sXHrGHS+QA+X
-         q0+VwBjUtFeelAyDBpLJWntNDnLijccOabpfM5aZLp+BaCUXcRS5x5ucNn7D0T6+iYuN
-         h10xrN60erLG6iu7b0dAqVSyUv0rrNHGroGFXlkxjZ+xSAv6u4r6T3PvfJwCyNejcaEO
-         6BY6YH/gNDtGjL9AsD18QD4hVQJSZuft/a9hGa6kiYDc/QQHbA7NDFxHlWNUNRTTr7Cu
-         JRxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792259003; x=1792863803;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=PwF3jKNAYzszFL75qOBfeCsRKgDJQKcyrSL9S+2luJM=;
-        b=ATC6SsOXNkuCDcKN3ncDCL6O67RRltuNGU4IXRmcUIlmHPoH0suNB+udUZOcokTm0T
-         nP8MlwIyg1PFGq06iK3+rm4t6ZsU6OiE+tSgoMJR0mOjPTHKLsxr6XoYnjgupgL2u1FV
-         9+PVR+Hc1edBhYWUB7FXDxxXome6Xd0tuutmvCNQD3jNUWFjz04UNcgcpP3Vjr2dEeel
-         aQF4r6Vv6nJKCWSMGDnmlH7M2ssIhqlKe86JlhZ6brTJZ4K7bGTcEPk9nhaThBveKXgQ
-         VNoAuerQLHs8HqaG6nAO2Q8lWNY79OeHoA7TN0vU4sm75P7QpdSpihmxxmqNtm98Ru48
-         3tKQ==
-X-Gm-Message-State: AFq9FYKtomnP/DwU8rudQxae295t4ax6VK+/7OcQ+Ug3Gwd3mwuIEvgO
-	h0gr50keR9GP2df+f9FMgXuNwHIhM/5EFgJ3ya3k9LIEVgvUYl9ZVEjm78Z6wtdB
-X-Gm-Gg: AYBFou2q+2S8H+h3k4Si5FGCJJF+uMsOHNfc/5Uja/828ezSlO8fP0gTPewW36CSbDu
-	2ocaHjylP/wEdBVs6qJ6oaixZ7CQgSBsaAPkpl2CpKnOkyCPL8YlmRkhN2IOuJGCT7QJ5huT9/v
-	fshtY0Oteb5nX7zeGo8G9bPAhhtOtxdp5PcPQkkvTcKV6LkiaYFdZgc1RKWwT9fwpSyEVgFEMuW
-	SsApzPuGdUhUsaeH2nQGYHsgtVh/hIePrsiyBTJLbJOU6pS7GP4/+ZjkxYVDFe88dw6xibfKKds
-	5xgyWEl9WasJE5TNHeuUkayqiuWSBDBJK8qsB7aOdW1/k9n4YeGrHgMV9uFxBNY7sOxJiDmbFWN
-	Jo/QbQM6HsM6kf/28/DVDy1d58Bwqpgi0Jw7Lgi2lXYzxlkTHvIDLyhaItBh24PC+Ud28S+pQol
-	msML2jhG8JUTJx5sqGIGflm0bEZqGo9cPTKfvp5tf9o9jqPpX3sbYl4oRAIt7F2E7fB2TvOLT0I
-	1xWBg==
-X-Received: by 2002:a17:907:c305:b0:c31:c767:adfb with SMTP id a640c23a62f3a-c4196aa9278mr216107766b.0.1792259002706;
-        Sat, 17 Oct 2026 10:43:22 -0700 (PDT)
-Received: from nb-xps.ts.zxczxc.org ([78.56.243.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4091eb164fsm190951066b.70.2026.10.17.10.43.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Oct 2026 10:43:20 -0700 (PDT)
-From: Nikolay Bryskin <nbryskin@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nikolay Bryskin <nbryskin@gmail.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_qca: Reprobe QCA6390 after hibernation
-Date: Sat, 17 Oct 2026 20:43:10 +0300
-Message-ID: <20261017174310.22484-1-nbryskin@gmail.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="yB5cMpNx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=nq7zwbmlmratrdeyhgoutmblnm.protonmail2; t=1792262373;
+	x=1792521573; bh=akh/56Yw94wkRry0AovN9rjpnKvaCzb8QNThsPUKTqU=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=yB5cMpNxXarvlJXM5A3OsdjY3XOutAD/PDazHqLu6V6jjncy//1AzosU3MQWVTZ2r
+	 7nQtT2ndgzk7fGaP64q3vJ1NLyPNk2qttNAEh0sZG8TLM7LGRydEoc7s05shGfgEwC
+	 AwlncRApEZIP/Ua8HFsCSxFUcWcW42Qnk3L6OVotoywhHlRmsD+Y1ZHxhq+K5KVW45
+	 QPJ1LPLFSK4AIt/+N9go6txC7Dcam8P669NAik9ILt5tOEn20FYXCWrpgUlaEdMTk5
+	 ZlH/adEtz9WYMl0hsQl6MNdnSWAhyyJHCO7shCB7bU9Mod5jv/OBv77H9sQFbIQ5QL
+	 6DdRKb4xsixMQ==
+Date: Sat, 17 Oct 2026 18:39:28 +0000
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: wonkru-dev@proton.me
+Subject: [PATCH BlueZ] build: Do not regenerate internal ELL headers with external ELL
+Message-ID: <x_EJuUS4KOJ6yHSe5ZA9ec4KemaHtdtTbgUuuJapF1iyjOWRcoz0WkTMwRnZD2b3_dY5baLu3artXUCE52dZF1lo5xAn2_sU01Di8oPiuUE=@proton.me>
+Feedback-ID: 220953440:user:proton
+X-Pm-Message-ID: ea57827344b1ebe1b6329ba5cd31d2d11a766152
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed;
+ boundary="b1=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs"
 
-Without a way to power-cycle the SoC (no BT_EN GPIO and no power
-sequencer, e.g. the ACPI-enumerated QCA6390 on the Dell XPS 13 9310),
-HCI_QUIRK_NON_PERSISTENT_SETUP is not set and hdev->setup() runs only
-once, at probe, on the assumption that the SoC keeps its firmware.
+--b1=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs
+Content-Type: multipart/alternative;
+ boundary="b2=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs"
 
-Hibernation breaks that assumption: the platform powers the SoC off,
-and after the image is restored it is back in its ROM state. The
-driver's resume callback, shared with suspend-to-idle via
-SIMPLE_DEV_PM_OPS(), only clears QCA_SUSPENDING, so the first command
-times out and the controller stays unusable. Error recovery and
-power-cycling the adapter from userspace don't help either, because
-none of them run setup again:
+--b2=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-  Bluetooth: hci0: Opcode 0x0c01 failed: -110
-  Bluetooth: hci0: command 0x0c01 tx timeout
-  Bluetooth: hci0: crash the soc to collect controller dump
-  Bluetooth: hci0: Opcode 0x0c05 failed: -110
-  Bluetooth: hci0: Frame reassembly failed (-84)
-  ...
-  Bluetooth: hci0: Opcode 0x0c03 failed: -110
+RW1wdHkgTWVzc2FnZQ==
 
-Give the restore phase its own callback which, in this configuration,
-rebinds the driver so that probe downloads the firmware again. The
-rebind is done from a work item on system_freezable_wq, as it can't
-run from within a PM callback and it frees the qca_serdev the callback
-works on. All other sleep transitions keep their existing callbacks.
+--b2=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
 
-Rebinding works here because the SoC is in its ROM state after the
-restore. Rebinding while it still runs the downloaded firmware fails
-the same way a warm reboot used to before commit 7e7bbddd029b
-("Bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot"),
-which this patch doesn't change.
+PGRpdj5FbXB0eSBNZXNzYWdlPC9kaXY+
 
-Tested on a Dell XPS 13 9310 (DLB16390): Bluetooth comes back about a
-second after resuming from hibernation, with no command timeouts.
-Suspend-to-idle is unaffected.
 
-Fixes: e5d6468fe9d8 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA6390")
-Assisted-by: LLM
-Signed-off-by: Nikolay Bryskin <nbryskin@gmail.com>
----
- drivers/bluetooth/hci_qca.c | 58 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+--b2=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs--
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 7089e9b639b2..7bca14d364b9 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2775,7 +2775,63 @@ static int __maybe_unused qca_resume(struct device *dev)
- 	return 0;
- }
- 
--static SIMPLE_DEV_PM_OPS(qca_pm_ops, qca_suspend, qca_resume);
-+struct qca_reprobe {
-+	struct work_struct work;
-+	struct device *dev;
-+};
-+
-+static void qca_reprobe_work(struct work_struct *work)
-+{
-+	struct qca_reprobe *reprobe = container_of(work, struct qca_reprobe,
-+						   work);
-+	int ret;
-+
-+	ret = device_reprobe(reprobe->dev);
-+	if (ret && ret != -EPROBE_DEFER)
-+		dev_err(reprobe->dev, "Failed to reprobe device (error %d)\n",
-+			ret);
-+
-+	put_device(reprobe->dev);
-+	kfree(reprobe);
-+}
-+
-+static int __maybe_unused qca_restore(struct device *dev)
-+{
-+	struct serdev_device *serdev = to_serdev_device(dev);
-+	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-+	struct hci_uart *hu = &qcadev->serdev_hu;
-+	struct qca_reprobe *reprobe;
-+
-+	qca_resume(dev);
-+
-+	/* Without power control hdev->setup() runs only once, at probe, as
-+	 * the SoC is expected to keep its firmware. Hibernation powers the
-+	 * SoC off, so rebind the driver to download the firmware again. The
-+	 * rebind can't run from a PM callback, and qcadev is gone once it
-+	 * does, so it gets a work item of its own.
-+	 */
-+	if (hci_test_quirk(hu->hdev, HCI_QUIRK_NON_PERSISTENT_SETUP))
-+		return 0;
-+
-+	reprobe = kzalloc_obj(*reprobe);
-+	if (!reprobe)
-+		return -ENOMEM;
-+
-+	INIT_WORK(&reprobe->work, qca_reprobe_work);
-+	reprobe->dev = get_device(dev);
-+	queue_work(system_freezable_wq, &reprobe->work);
-+
-+	return 0;
-+}
-+
-+static const struct dev_pm_ops qca_pm_ops = {
-+	.suspend = pm_sleep_ptr(qca_suspend),
-+	.resume = pm_sleep_ptr(qca_resume),
-+	.freeze = pm_sleep_ptr(qca_suspend),
-+	.thaw = pm_sleep_ptr(qca_resume),
-+	.poweroff = pm_sleep_ptr(qca_suspend),
-+	.restore = pm_sleep_ptr(qca_restore),
-+};
- 
- #ifdef CONFIG_OF
- static const struct of_device_id qca_bluetooth_of_match[] = {
--- 
-2.56.0
+--b1=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs
+Content-Type: text/x-patch; name=0001-Do-not-regenerate-internal-ELL-headers-with-external.patch
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=0001-Do-not-regenerate-internal-ELL-headers-with-external.patch
+
+RnJvbSBiYjczYjg0NGM1ODg0ZGIyNjljMzc4MmExMzIyZGJhMDhmZWJlNWJkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBvbGQgPDE1Mjg1MDY5MytDZWxlc3RpZnlYQHVzZXJzLm5vcmVw
+bHkuZ2l0aHViLmNvbT4KRGF0ZTogU2F0LCAxNyBPY3QgMjAyNiAxODozNTo0OCArMDIwMApTdWJq
+ZWN0OiBbUEFUQ0ggQmx1ZVpdIGJ1aWxkOiBEbyBub3QgcmVnZW5lcmF0ZSBpbnRlcm5hbCBFTEwg
+aGVhZGVycyB3aXRoIGV4dGVybmFsIEVMTAoKLS0tCiBNYWtlZmlsZS5hbSB8IDYgKysrKysrCiAx
+IGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvTWFrZWZpbGUuYW0g
+Yi9NYWtlZmlsZS5hbQppbmRleCBmNzQyNDU4ZDEuLmYzYTZkZWVmNiAxMDA2NDQKLS0tIGEvTWFr
+ZWZpbGUuYW0KKysrIGIvTWFrZWZpbGUuYW0KQEAgLTg1MCw4ICs4NTAsMTIgQEAgZW5kaWYKIGlm
+IE1FU0gKIHVuaXRfdGVzdHMgKz0gdW5pdC90ZXN0LW1lc2gtY3J5cHRvCiB1bml0X3Rlc3RfbWVz
+aF9jcnlwdG9fQ1BQRkxBR1MgPSAkKGVsbF9jZmxhZ3MpCitpZiBFWFRFUk5BTF9FTEwKK3VuaXRf
+dGVzdF9tZXNoX2NyeXB0b19TT1VSQ0VTID0gdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmMgbWVzaC9j
+cnlwdG8uaAorZWxzZQogdW5pdF90ZXN0X21lc2hfY3J5cHRvX1NPVVJDRVMgPSB1bml0L3Rlc3Qt
+bWVzaC1jcnlwdG8uYyBcCiAJCQkJbWVzaC9jcnlwdG8uaCBlbGwvaW50ZXJuYWwgZWxsL2VsbC5o
+CitlbmRpZgogdW5pdF90ZXN0X21lc2hfY3J5cHRvX0xEQUREID0gJChlbGxfbGRhZGQpCiBlbmRp
+ZgogCkBAIC05NzMsMTEgKzk3NywxMyBAQCBlbGwvaW50ZXJuYWw6IE1ha2VmaWxlCiAJCWZpIFwK
+IAlkb25lID4gJEAKIAoraWYgIUVYVEVSTkFMX0VMTAogZWxsL2VsbC5oOiBNYWtlZmlsZQogCSQo
+QU1fVl9hdCllY2hvIC1uID4gJEAKIAkkKEFNX1ZfR0VOKWZvciBmIGluICQoZWxsX2hlYWRlcnMp
+IDsgZG8gXAogCQllY2hvICIjaW5jbHVkZSA8JCRmPiIgPj4gJEAgOyBcCiAJZG9uZQorZW5kaWYK
+IAogbWFpbnRhaW5lci1jbGVhbi1sb2NhbDoKIAktcm0gLXJmIGVsbAotLSAKMi41NS4wCgo=
+
+--b1=_oOrNuvImwQugl2ENHefK01doZfn51NqxCLP6LRWAs--
 
