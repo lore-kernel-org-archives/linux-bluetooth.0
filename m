@@ -1,38 +1,38 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C2439E17E;
-	Sat, 17 Oct 2026 03:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E93535E549;
+	Sat, 17 Oct 2026 03:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792206600; cv=none; b=gvhSKuHhTYnn+cNSOIQ1nt9rK36mLpqwjlQBiWa24XOSAtX3Z9ulgYo5lGgmUOF8Vep00luGMILM6ON3kCSx4QPAIgoi7gsOwol2antJn9gz8KEHkuYwn4jqtRrTwMS6IQDZXpKtm6xVtbTyE+VzL6aL1rEVjpziN45aFIz26k4=
+	t=1792206636; cv=none; b=fGtA34mpSXjgFcP4Gp8WWte2yk3hEG/9UVSqdkfCrGoS8rC/R8woYMofqB4Maoy+VUw9kFmVFGgrvhq2ctjJxv0Sv/G33lFBfikvrRrBoxyyUbKkTjItMcxBcmuSD7CRZPp0MkayGqpxjdsUFOMWdIp9AeJg+bOYN/KWCLI4itQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792206600; c=relaxed/simple;
-	bh=RBmzk5eFImnz8QVhMBDJeVuGaDuuw8vbjC/yDh8EkC8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ew83xJZJrnFTvx5ajGhzcdafr6u3qde68crn3KbliTs/VbE5aX60fXPlNBXiopWpJwWRw9fnPG8Ld1gv5iSqkrgqR52K8sXODJT4SmcmiIOIr/DOcHrJT2gCUSy1vAIM5Tyl4xMm2J7YIZcNLKGGQSQdSzTjjofVr6rV5xptrSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=PT4rJ6XT; arc=none smtp.client-ip=220.197.31.3
+	s=arc-20240116; t=1792206636; c=relaxed/simple;
+	bh=EydJaeOPcgnwYauQrlKCmQrwboRabxLcEK0PX6C3A8Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XmbTcg7+694E6T1X5/nTe39S1aPglj/ltkmQ8e4GNlyhzhcrEdiewQaeRzWkQBy9Gt51O0yKJB1J88kqA2OLmnw9Prp7WpXW8rFppLqlLJ4HW42dICO5vHZMk6NYnNST8pgr6APSM8J1Yy5zIHlciMTLnTqDJdha76S+/LKSM5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JLafZMES; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="PT4rJ6XT"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JLafZMES"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=TZ
-	bQAYl73iXM1j+HknjAr1iw8iVQ1FkoYM8KWiyJ9Q0=; b=PT4rJ6XTU/A12BXk2T
-	EuoISpAFv/QAin4HnG0EiOTaRlGilyE8iWMaxebs643RcSRp82cvR7hXpeNiJP2I
-	EzgaT11tenRImTf8Ut7Mg4lV+t85fpw+qL6Wy0t1mKtNr/eaCGUWTFc3nrDc21xY
-	4S7RSVEcGsz9D9ZJofFPNnG5Q=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=zo
+	sLx/Bg7cCgbn2DO3c2rWFDXN4Y30T5DuUHyaOcvoE=; b=JLafZMESWcODdl9K9L
+	PjfhI/gjdA471r4/rfusWesTM3cq47oQhAyWcO+nsFDgsioJwLUc8q9lHKGxGh2+
+	X9e80yaZhJmw2O40H0WmPTCX5EBjEN86fPIX3fO5TfBu6IH4eB83FTYNc4xolapI
+	pDDF6KqeH37XCfQIMfmhQzYM4=
 Received: from pc.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wD3v7z25tJqac7FAg--.27446S2;
-	Sat, 17 Oct 2026 11:09:43 +0800 (CST)
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wD3Pw4g59JqTu_FAg--.28809S2;
+	Sat, 17 Oct 2026 11:10:24 +0800 (CST)
 From: Jiale Yao <yaojiale02@163.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Jiale Yao <yaojiale02@163.com>
-Subject: [PATCH 1/2] Bluetooth: MGMT: free remove monitor command on cancel
-Date: Sat, 17 Oct 2026 11:09:39 +0800
-Message-Id: <20261017030939.3615701-1-yaojiale02@163.com>
+Subject: [PATCH 2/2] Bluetooth: msft: free detached address filter on cancel
+Date: Sat, 17 Oct 2026 11:10:22 +0800
+Message-Id: <20261017031022.3616384-1-yaojiale02@163.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -41,42 +41,57 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3v7z25tJqac7FAg--.27446S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Gr4UXF1ruryrJF4kZw4kXrb_yoWDGFbE9w
-	1vv3yxXr4UJr1jyF1UuF4ruwn3K3Z8GF1xWanIvFW7J3s8Cws8Xr4kur13Z34fua1DCFn3
-	Ar1DCFyFyw4xtjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRtcTm7UUUUU==
-X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbCzhdGgGrS5ve4JwAA3p
+X-CM-TRANSID:_____wD3Pw4g59JqTu_FAg--.28809S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tFWDWw1xGr1DKryfWF47twb_yoW8Aw1kpF
+	9xG3Z8C3y8XF47J39rAr4UWF15ZFs3u3W7ur48u34FkFs0qrsFka17CryUt3Z5ZrWkJw4I
+	vFs8tw4xXan8Kw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piYFAdUUUUU=
+X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbC8ABRi2rS5yBBXgAA3K
 
-remove_adv_monitor() allocates its queued command with
-mgmt_pending_new(), so the command is not linked into
-hdev->mgmt_pending. If the command-sync entry is cancelled, its
-completion callback returns without freeing the command, leaking both
-the allocation and its socket reference.
+An address filter queued for addition can be detached from the MSFT
+filter list and marked AF_STATE_REMOVING before its command-sync work
+runs. If the queued entry is then cancelled, its NULL destroy callback
+leaves the detached filter without an owner.
 
-Free the pending command before returning from the cancellation path.
+Install a destroy callback that frees a cancelled filter only when it
+has reached AF_STATE_REMOVING. Filters that are still linked remain
+owned by the normal close cleanup path.
 
 Signed-off-by: Jiale Yao <yaojiale02@163.com>
 ---
- net/bluetooth/mgmt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/msft.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 251a896babd5..e54a838aeada 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5682,8 +5682,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
- 	struct mgmt_pending_cmd *cmd = data;
- 	struct mgmt_cp_remove_adv_monitor *cp;
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index d9dd722db3eb..b9f8f089cc72 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -928,6 +928,16 @@ static int msft_add_address_filter_sync(struct hci_dev *hdev, void *data)
+ 	return 0;
+ }
  
--	if (status == -ECANCELED)
-+	if (status == -ECANCELED) {
-+		mgmt_pending_free(cmd);
- 		return;
-+	}
++static void msft_add_address_filter_destroy(struct hci_dev *hdev, void *data,
++					    int err)
++{
++	struct msft_monitor_addr_filter_data *address_filter = data;
++
++	if (err == -ECANCELED &&
++	    address_filter->state == AF_STATE_REMOVING)
++		kfree(address_filter);
++}
++
+ /* This function requires the caller holds msft->filter_lock */
+ static struct msft_monitor_addr_filter_data *msft_add_address_filter
+ 		(struct hci_dev *hdev, u8 addr_type, bdaddr_t *bdaddr,
+@@ -959,7 +969,7 @@ static struct msft_monitor_addr_filter_data *msft_add_address_filter
+ 	list_add_tail(&address_filter->list, &msft->address_filters);
  
- 	hci_dev_lock(hdev);
- 
+ 	err = hci_cmd_sync_queue(hdev, msft_add_address_filter_sync,
+-				 address_filter, NULL);
++				 address_filter, msft_add_address_filter_destroy);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "MSFT: Add address %pMR filter err", bdaddr);
+ 		list_del(&address_filter->list);
 -- 
 2.34.1
 
