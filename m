@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C9457EDB0;
-	Mon, 19 Oct 2026 13:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5609A5A874C;
+	Mon, 19 Oct 2026 13:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418392; cv=none; b=T6q3NoJDGxg0AxwPAFZXLzQEXGIW+Ic0N4NFMGiJSu15w/EKAIyQ9JjwH1uswjbmP1ujo+G9BnCJ2mr55bjsJG6mOTrkVwd96QN/HVal/IGmQA0xRgs2uvN84dXDmkaLASxoYfKhyKeAN2+pXSjAWZgMTqwq9ulVRUgf+i86KWM=
+	t=1792418396; cv=none; b=cKmFoIIYi6b/xlzTVN9ImbYSZR+Ol3UKwffnka1kcL/jKG5kTBVhOSC5GETkDGogWcN3sxaPTcXzPbtMflKXcOBM9NeVCrcoRuZXv2colutKKJlLpbzMWkyT98G64vkeQz50qRe3l21OKI2Wk+FX2uGUWegwKdp3XeS+HhmWMi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418392; c=relaxed/simple;
-	bh=znw0jCi4tK2DDnYP0wUk8j9JGWuISqEE8fnVi62qINs=;
+	s=arc-20240116; t=1792418396; c=relaxed/simple;
+	bh=IUHvC2eVWuoAKR3ZpmygdGMK18/wVIpi8H0NEynEIg4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HF+S1IIqRO+gL7neB6r+/Mf7IvGJiqU4Vk1shvu9Gy8RfCELpHpZa+kPqCSUX0VwPaKegX9GoYBFe/Cr0J4tDsweJrogEPFbGzbpU81YlMQG4Ge3jPCLVTyHTmR95vi3XAGRrkeAIwu+PGW70LxsV6b8RgyplgM+7tb2z45et0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+QARUGY; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=RskB6tV1zCU43ap5nA+b+wWnV9ppwD0nlP6aMwxie+30TP06p8cAjwWws0w1NxiacAJDb8lW9X6bSTG/duvYkoUHg3nSFcexeGrIUnJUKWToeemucTJnVbuHzWIDBe9ZA/ITBMJyVjd1f7PqkHGsUL4wmy/yNK1loV+P7eItxG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Igd5f8lE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+QARUGY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 132DB1F000C7;
-	Mon, 19 Oct 2026 13:59:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Igd5f8lE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F24A1F000C7;
+	Mon, 19 Oct 2026 13:59:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418390;
-	bh=0mTnB3q6qurKbbisj70Dl3zQHIdtoxqYsW4cUmLxyc4=;
+	s=k20260515; t=1792418394;
+	bh=63KAFSVioMvmPAu9MJRGj2FZ+H5J2Cg2KBDtQ3FryQ8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=c+QARUGYOZHGORb6zT6nA2btLAmCjZiCCG0COl08XSJT9Tx0/7Y1B+3HLIBlYVwPS
-	 pL9+sTp1RwjEhZhG5l2I+bo03vRB5kaYBxWzCmJyo+NpLTdGhE2aY02aFlLaQWevAo
-	 Df0111gQFMOxm6ptDFcZXdAVjd8ZHYhEGiJjKJy/OtVsLjxq+vwc9BTYqhgVUCpHHY
-	 MPYYq7gqEa/AQ2AjJpcUVV+ma4eeMI0gkBO+0ytn0pq1O1UB1cSRLApy12Onsl+/zd
-	 TiX6ctG3rrcUDliciNF0QPSPcqVpgJ/IEc+H74JxTCz3M5zrKmiSLtDonEywAIEvZJ
-	 Cp9sHcmmO0qdg==
+	b=Igd5f8lEIQX7bw8KBMQCBhdf4/QuqUNrX2HEDADmWvp1zd19obyNMdqhvtkq5Zak2
+	 Vtc3qJCkSUp/zZRaDqlq0wWNSApwTpnD/LzKO7P51hOfk10QQflL7AffK4CfomP7jc
+	 ElQmBsz8rB0hce2InUOSFmCjGV3LJHf+nNJERRpugaEg9dw0VvOw1LW6bdlJJ6M6UR
+	 zDDDcvPBHCUVl2BuitDlg/mhJOTMVbLu5T1dv/TiG9RdrkFXAIDgHHRxUcGiy+dJVz
+	 vKm71WuugP2XD4MR1BMQQ60le4GULM+S5VgMglMdw5cXa7wI/xP5NsySRANTlR34gW
+	 w80Pesm8nyAxg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Pavel Zverev <playximik29@gmail.com>,
+Cc: Li Qiang <liqiang01@kylinos.cn>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] Bluetooth: btusb: Add support for 1357:c123 Realtek 8852BE device
-Date: Mon, 19 Oct 2026 09:48:26 -0400
-Message-ID: <20261019135441.1420968-215-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.10] Bluetooth: hci_bcsp: validate received packet lengths
+Date: Mon, 19 Oct 2026 09:48:29 -0400
+Message-ID: <20261019135441.1420968-218-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -54,352 +54,380 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Pavel Zverev <playximik29@gmail.com>
+From: Li Qiang <liqiang01@kylinos.cn>
 
-[ Upstream commit 335d7bd554a20f33acf762655cafe1089f7f5822 ]
+[ Upstream commit ceea75ad8925425ee6520ead964b55888fe871ec ]
 
-Wiko Hi MateBook 14 Ryzen 200 laptops (DMI system-product-name
-"MNCA-XX", board "M1060") are equipped with an RTL8852BE Wi-Fi/BT
-combo chip (rtw89_8852be), whose Bluetooth radio enumerates as
-1357:c123 instead of one of the already-supported 1358:c123 / 0bda:c123
-identifiers, presumably due to OEM rebranding. Without a matching
-entry it only matches the generic USB Bluetooth class fallback, so the
-Realtek firmware/config (rtl8852btu_fw.bin / rtl8852btu_config.bin) is
-never loaded and the adapter cannot discover or connect to any device,
-even though hciconfig reports it as powered and scanning.
+The BCSP transmit path reads an HCI command header when an extension
+packet has only been tested for a nonzero length. Its LE configuration
+packet handler also indexes bytes through offset seven without a length
+check.
 
-Device descriptor:
-  idVendor           0x1357
-  idProduct          0xc123
-  bcdDevice            0.00
-  iManufacturer           1 Realtek
-  iProduct                2 Bluetooth Radio
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
+Validate the complete command and LE configuration packet headers
+before accessing their fields.
 
-Adding the same BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH quirk already
-used for 1358:c123 and 0bda:c123 fixes firmware loading and normal
-operation.
-
-Signed-off-by: Pavel Zverev <playximik29@gmail.com>
+Signed-off-by: Li Qiang <liqiang01@kylinos.cn>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-This is a two-line USB ID addition for an existing Realtek path in
-`btusb`. The 6.18.53 tree already has that path and the sibling IDs;
-this OEM VID is missing, so Bluetooth never loads firmware on the
-affected laptop.
+The local tree is **6.12.111** (`p-6.12-3-g710455e2077bb`). The buggy
+BCSP length handling is in this checkout; the candidate is not. The
+verdict is for this tree only.
 
-## Phase 1: Commit message forensics
+===============================================================
+PHASE 1: COMMIT MESSAGE FORENSICS
+===============================================================
 
-**Step 1.1 — Subject**
-Record: `[Bluetooth/btusb] [Add] USB ID 1357:c123 for Realtek 8852BE
-(OEM rebrand of known c123 devices)`
+**Step 1.1: PARSE THE SUBJECT LINE**
+Record: `[Bluetooth / hci_bcsp] [validate] [check command and LE-config
+packet lengths before field access]`
 
-**Step 1.2 — Tags**
+**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
 Record:
-- Signed-off-by: Pavel Zverev \<playximik29@gmail.com\> (author)
-- Signed-off-by: Luiz Augusto von Dentz \<luiz.von.dentz@intel.com\>
-  (Bluetooth maintainer; applied the patch)
-- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Acked-by:, Link:,
-  or Cc: stable (absence of Fixes/Cc:stable is expected for this review
-  queue)
+- `Signed-off-by: Li Qiang <liqiang01@kylinos.cn>` (author)
+- `Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>`
+  (Bluetooth maintainer)
+- No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
+  by:`, `Link:`, or `Cc: stable@vger.kernel.org`
+- Ignore pipeline `Signed-off-by: Sasha Levin` / `[Upstream commit ...]`
+  markers
+- Absence of `Fixes:`/`Cc: stable` is expected for this review and is
+  **not** a negative signal
 
-**Step 1.3 — Body**
+**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
 Record:
-- Bug: Wiko Hi MateBook 14 Ryzen 200 (DMI `"MNCA-XX"` / board `"M1060"`)
-  has RTL8852BE (Wi-Fi `rtw89_8852be`). BT enumerates as **1357:c123**
-  instead of already-supported **1358:c123** / **0bda:c123**.
-- Symptom: generic USB Bluetooth class match only; `rtl8852btu_fw.bin` /
-  `rtl8852btu_config.bin` never load; adapter appears powered/scanning
-  but cannot discover or connect.
-- Root cause: missing `quirks_table` entry so `BTUSB_REALTEK` is never
-  applied.
-- Descriptor: vendor 0x1357, product 0xc123, class 224/1/1, manufacturer
-  “Realtek”.
-- Fix: same `BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH` flags as the sibling
-  IDs.
+- **Bug:** BCSP TX reads an HCI command header without a full-header
+  length check; LE config RX indexes through offset 7 without a length
+  check.
+- **Symptom:** Out-of-bounds read of skb/payload bytes on truncated
+  packets (cover letter: “out-of-bounds accesses … when data is
+  truncated”).
+- **Version info:** none in the commit; code dates to git origin (2005).
+- **Root cause (author):** fields are used before the complete header is
+  known to be present.
 
-**Step 1.4 — Hidden bug fix?**
-Record: Not hidden. It is an explicit hardware-enablement / device-ID
-quirk. Bluetooth is non-functional without it.
+**Step 1.4: DETECT HIDDEN BUG FIXES**
+Record: Not a disguised cleanup. It is a bounds-check / OOB fix, even
+though the series is titled “harden packet and transport parsing.”
 
-## Phase 2: Diff analysis
+===============================================================
+PHASE 2: DIFF ANALYSIS - LINE BY LINE
+===============================================================
 
-**Step 2.1 — Inventory**
-Record: `drivers/bluetooth/btusb.c` only; **+2 / -0** lines; table
-`quirks_table[]`; single-file surgical change.
-
-**Step 2.2 — Flow**
-Record: After `{ USB_DEVICE(0x0bda, 0xc123), ... }` insert `{
-USB_DEVICE(0x1357, 0xc123), .driver_info = BTUSB_REALTEK |
-BTUSB_WIDEBAND_SPEECH }`. Probe path only; no error-path or locking
-change.
-
-**Step 2.3 — Bug mechanism**
-Record: **Hardware workaround / device ID** (stable exception). Without
-the ID:
-1. Device matches generic `{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) }` in
-   `btusb_table` with `driver_info == 0`.
-2. `btusb_probe()` then calls `usb_match_id(intf, quirks_table)`.
-3. No match → no `BTUSB_REALTEK` → `hdev->setup` is not
-   `btusb_setup_realtek` → no `btrtl_download_firmware()`.
-
-Firmware is chosen later by chip identity (`btrtl_match_ic()` on LMP/HCI
-rev), not by USB PID, so this ID only gates the Realtek setup path.
-
-**Step 2.4 — Fix quality**
-Record: Obviously correct copy of sibling entries. Scope is this VID:PID
-only. Regression risk is negligible (wrong non-Realtek device with
-1357:c123 is not plausible given the descriptor). No API/structure
-change.
-
-## Phase 3: Git history
-
-**Step 3.1 — Blame**
-Record: Neighbor IDs:
-- `1358:c123` — `f496297e76a69` (Julian Pidancet, 2020) “Add support for
-  1358:c123 Realtek 8822CE” (Huawei Matebook); contained in v5.11-rc1.
-- `0bda:c123` — `24d6a6d24f01f` (Cadel Watson, 2020) “Support 0bda:c123
-  Realtek 8822CE”; also v5.11-rc1.
-The missing ID is new OEM VID 0x1357 with the same PID. Buggy “no
-Realtek quirk” behavior has existed for this VID:PID for as long as the
-device has existed; the table itself has been there since ~5.11.
-
-**Step 3.2 — Fixes: tag**
-Record: None. Not a regression from a specific commit; it is a missing
-ID.
-
-**Step 3.3 — File history**
-Record: Recent `btusb.c` history in this tree includes many of the same
-pattern (`Add Realtek RTL8922AE VID/PID 0bda/d923`, Mercusys/ASUS/TP-
-Link IDs, several RTL8852BE IDs). Standalone; not “patch X/Y”.
-
-**Step 3.4 — Author**
-Record: Pavel Zverev has no other `drivers/bluetooth/` commits in this
-tree. Applied by Luiz Augusto von Dentz (Bluetooth USB maintainer). Same
-class of ID adds is routinely accepted.
-
-**Step 3.5 — Dependencies**
-Record: Needs existing `BTUSB_REALTEK` / `quirks_table` /
-`btrtl_setup_realtek()` / RTL8852 firmware table. All are in this tree
-(`1fb9943146968` RTL8852BT/8852BE-VT firmware matching is an ancestor of
-HEAD). Standalone +2 lines.
-
-## Phase 4: Mailing list
-
-**Step 4.1 — Original discussion**
+**Step 2.1: INVENTORY THE CHANGES**
 Record:
-- SHA: `335d7bd554a20f33acf762655cafe1089f7f5822`
-- `b4 dig -c`:
-  https://patch.msgid.link/20260707221549.27269-1-playximik29@gmail.com
-- `b4 dig -a`: **v1 only**, 2026-07-08, no later revision
-- Thread: submission, BlueZ CI pass, patchwork-bot “applied to
-  bluetooth-next”
-- No NAK, no reviewer risk flags, no request for changes
-- Applied to bluetooth-next as `1386e748cfc0`; later on master as
-  `335d7bd554a20`
+- File: `drivers/bluetooth/hci_bcsp.c` only (`+4 / -1`)
+- Functions: `bcsp_prepare_pkt()`, `bcsp_handle_le_pkt()`
+- Scope: single-file surgical fix
 
-**Step 4.2 — Recipients (`b4 dig -w`)**
-Record: To Marcel Holtmann, Luiz Dentz; Cc linux-bluetooth@. Correct
-lists/maintainers. Luiz applied it.
+**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Record:
+- **Hunk 1 (`bcsp_prepare_pkt`):** before: if `hciextn && chan == 5`,
+  always read `hci_command_hdr.opcode` and `data[HCI_COMMAND_HDR_SIZE]`.
+  after: only if `len > HCI_COMMAND_HDR_SIZE` (3). Short commands skip
+  vendor-extension rewrite and are slipped as-is.
+- **Hunk 2 (`bcsp_handle_le_pkt`):** before: `data[1]`, `data[2]`,
+  `memcmp(&data[4], …, 4)` with no `skb->len` check. after: return if
+  `rx_skb->len < 8`.
 
-**Step 4.3 — Bug report**
-Record: No bugzilla/syzbot link. Author reports a specific laptop (DMI +
-USB descriptor) and that adding the ID restored discovery/connect.
-Direct user impact, one platform.
+**Step 2.3: IDENTIFY THE BUG MECHANISM**
+Record: **Memory safety / out-of-bounds read (category d).**
+- TX: `HCI_COMMAND_HDR_SIZE` is 3. Userspace HCI sockets accept `len >=
+  4` (1 type byte + 3-byte command). After `skb_pull(1)`, `skb->len` can
+  be **exactly 3**. For vendor OGF `0x3f`, the driver then does `*(data
+  + 3)` — one byte past `skb->len`.
+- If that byte has high nibble `0xc0`, `len -= 4` makes `len == -1`, and
+  the BCSP header is built with a bogus length (`hdr[1]/hdr[2]` from a
+  signed `-1`).
+- RX: `memcmp` of bytes 4–7 with no `len` check. The receive state
+  machine normally makes that path in-bounds when the header length
+  field is 4; the extra check is defensive.
 
-**Step 4.4 — Series**
-Record: Single standalone patch. CI: CheckPatch, build, sparse all PASS
-(Patchwork series 1123385).
+**Step 2.4: ASSESS THE FIX QUALITY**
+Record: Obviously correct and minimal. Skipping extension parsing on
+short packets is the safe default. Early-return on short LE frames does
+not drop valid conf/sync packets (those are 4-byte hdr + 4-byte payload
+= 8). Regression risk is very low. No API/data-structure change.
 
-**Step 4.5 — Stable list**
-Record: lore.kernel.org HTTP 403 from WebFetch; WebSearch for stable
-discussion failed. No local `git log --grep=1357:c123` hits. UNVERIFIED:
-no evidence this was already discussed on stable@; that is not a
-negative.
+===============================================================
+PHASE 3: GIT HISTORY INVESTIGATION
+===============================================================
 
-## Phase 5: Code semantics
+**Step 3.1: BLAME THE CHANGED LINES**
+Record: Buggy TX/RX logic is from `1da177e4c3f41` (Linux-2.6.12-rc2,
+2005), with later style/API churn only (`c5ec514016d1a6`,
+`8083ad1cf910dc`, `59ae1d127ac0ae`). Present for the entire life of this
+driver, including 6.12.
 
-**Step 5.1 — Functions**
-Record: No function body change. Data: `quirks_table[]`. Consumers:
-`btusb_probe()` via `usb_match_id()`.
+**Step 3.2: FOLLOW THE FIXES: TAG**
+Record: No `Fixes:` tag. Not applicable.
 
-**Step 5.2 — Callers**
-Record: USB probe when a matching interface is enumerated. `btusb_table`
-generic class entry binds first; then quirks_table supplies
-`driver_info`. Not irq/syscall hot path; once per device bind.
+**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+Record: Recent 6.12 BCSP work includes `b420a4c7f915f` (syzbot NULL
+deref in `bcsp_recv`), timer/kfree fixes. No prior length check. This
+commit is **standalone** (series 3/5; other patches touch `bfusb.c`,
+`btmrvl_main.c`, `hci_ldisc.c`, `hci_qca.c`).
 
-**Step 5.3 — Callees**
-Record: With the new flags, probe sets `hdev->setup =
-btusb_setup_realtek` → `btrtl_setup_realtek()` → `btrtl_initialize()` /
-`btrtl_download_firmware()`. Also `HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED`.
-`CONFIG_BT_HCIBTUSB_RTL` defaults to y.
+**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
+Record: Li Qiang has no other `drivers/bluetooth/` commits in this 6.12
+tree. Luiz von Dentz is a listed Bluetooth driver maintainer and applied
+the series to bluetooth-next (`a4c72c8c7cef`).
 
-**Step 5.4 — Reachability**
-Record: Yes, from plugging in / internal USB BT of that laptop.
-Unprivileged users then use BlueZ; the bug is “adapter never works,” not
-a crash.
+**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+Record: None. Uses existing `HCI_COMMAND_HDR_SIZE` and `rx_skb->len`. A
+surgical patch against this file applied cleanly (`git apply --check`
+exit 0).
 
-**Step 5.5 — Similar patterns**
-Record: Dozens of `BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH` IDs, including
-other 8852BE VIDs (`0bda:4853`, `13d3:3618`, `0489:e123`, …). Sibling
-`c123` IDs already present. Same fix applied many times.
+===============================================================
+PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+===============================================================
 
-## Phase 6: This tree (6.18.53)
+**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+Record:
+- `b4 dig -c a4c72c8c7cef` → https://patch.msgid.link/6fb9de3e499424f798
+  0a158798ea02b040b73b8f.1784191283.git.liqiang01@kylinos.cn
+- Cover: `[PATCH 0/5] Bluetooth: harden packet and transport parsing`
+  (2026-07-16)
+- `b4 dig -a`: **v1 only** (no v2/v3)
+- Applied 2026-07-20 by Luiz to bluetooth-next as `a4c72c8c7cef`
+- No NAK on patch 3/5. BlueZ CI failed **patch 5/5** (`hci_qca.c`
+  context), not this file.
+- Patch 2/5 (`btmrvl`) later caused a Chromebook regression (Marek
+  Szyprowski). That is a **different** patch; not this one.
 
-**Step 6.1 — Does the buggy code exist?**
+**Step 4.2: CHECK WHO REVIEWED THE PATCH**
+Record (`b4 dig -w`): To/Cc `linux-bluetooth@vger.kernel.org`, Marcel
+Holtmann, Luiz von Dentz, LKML. Maintainer applied it. No extra
+Reviewed-by on 3/5.
+
+**Step 4.3: SEARCH FOR THE BUG REPORT**
+Record: No syzbot/bugzilla report for this specific OOB. Cover letter
+describes truncated-header OOB as the failure mode. Trigger
+reconstructed from this tree’s `hci_sock_sendmsg` + `bcsp_prepare_pkt`.
+
+**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
+Record: Series of five independent driver/transport bounds checks. 3/5
+does not depend on 1/2/4/5. Do not pull the others as prerequisites.
+
+**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
+Record: lore.kernel.org WebFetch returned 403. No stable-thread hit via
+`b4`/openwall for this subject. UNVERIFIED whether anyone already asked
+stable@ for this SHA.
+
+===============================================================
+PHASE 5: CODE SEMANTIC ANALYSIS
+===============================================================
+
+**Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF**
+Record: `bcsp_prepare_pkt`, `bcsp_handle_le_pkt`
+
+**Step 5.2: TRACE CALLERS**
+Record:
+- `bcsp_prepare_pkt`: `bcsp_dequeue()` (unrel, rel, and ACK). Dequeue is
+  `hci_uart_proto.dequeue` → `hci_uart_tx_wakeup` / TTY write worker.
+- `bcsp_handle_le_pkt`: `bcsp_complete_rx_pkt()` when BCSP channel 1,
+  unreliable → `bcsp_recv()` → `hci_uart_tty_receive`. Syzbot has
+  already reached `bcsp_recv` via TTY (`TIOCSTI`) in this tree.
+
+**Step 5.3: TRACE CALLEES**
+Record: TX reads `hci_opcode_ogf` / raw `data[]`, then `alloc_skb` +
+SLIP. RX uses `memcmp`, `alloc_skb`, `skb_queue_head`,
+`hci_uart_tx_wakeup`.
+
+**Step 5.4: FOLLOW THE CALL CHAIN**
+Record: TX is reachable from userspace `sendmsg` on an HCI RAW/USER
+socket bound to a BCSP UART device. RAW vendor OGF 0x3f needs
+`CAP_NET_RAW` (`ogf > HCI_SFLT_MAX_OGF`); USER channel bind needs
+`CAP_NET_ADMIN`. Not unprivileged, but a real kernel OOB on a live HCI
+UART. RX is reachable from the UART/TTY receive path (including
+fuzzing).
+
+**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
+Record: Same series adds analogous header-length checks in
+bfusb/btmrvl/qca. H5 (`hci_h5.c`) does not implement this vendor-
+extension rewrite. No duplicate BCSP fix in this tree.
+
+===============================================================
+PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+===============================================================
+
+**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
 Record: Yes.
-- Tree: `pending-6.18`, `git describe HEAD` = `p-6.18-1-g03b85e06ca9bf`,
-  `make kernelversion` = **6.18.53**, merge-base with master = `Linux
-  6.18` (2025-11-30).
-- `git merge-base --is-ancestor 335d7bd554a20 HEAD` → **not in HEAD**.
-- `1358:c123` and `0bda:c123` are at lines 877–880 of
-  `drivers/bluetooth/btusb.c`; **1357:c123 is absent**.
-- Realtek setup and `rtl8852btu_*` firmware names exist in `btrtl.c`.
+- `drivers/bluetooth/hci_bcsp.c:197` `if (hciextn && chan == 5)` with no
+  length check
+- `drivers/bluetooth/hci_bcsp.c:405-406` LE handler indexes `data[4]`
+  without `len < 8`
+- Bug introduced in 2.6.12-era origin; not post-6.12
 
-The ID was added in mainline in Aug 2026, after 6.18; the **gap**
-(missing ID) is in this tree. That is the usual device-ID backport case,
-not “code not present.”
+**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
+Record: **Clean apply** for the actual edits (`git apply --check`
+succeeded). Nearby mainline context uses `timer_delete`; 6.12 still has
+`del_timer` in `bcsp_pkt_cull`. That is unused context for a tight hunk.
+No semantic rework needed.
 
-**Step 6.2 — Backport difficulty**
-Record: `git show 335d7bd554a20 | git apply --check` succeeded (hunk at
-line 878, offset -16). Clean apply, trivial offset.
+**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
+Record: `git log --grep='validate received'` on this file: empty. No
+earlier equivalent check.
 
-**Step 6.3 — Related fixes already here?**
-Record: No 1357:c123 entry. Other 8852BE IDs and firmware support are
-already here; this does not duplicate them.
+===============================================================
+PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+===============================================================
 
-## Phase 7: Subsystem context
+**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
+Record: Bluetooth HCI UART BCSP (`CONFIG_BT_HCIUART_BCSP`) — CSR
+BlueCore UART. **IMPORTANT** for those devices, not core mm/VFS. Still a
+production protocol path, and this file is actively fuzzed.
 
-**Step 7.1**
-Record: `drivers/bluetooth/btusb.c` — USB Bluetooth. **IMPORTANT** (very
-common laptop combo chips), not core mm/vfs, not staging.
+**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
+Record: Bluetooth in this tree is active (many btusb/btintel/hci_bcsp
+stable fixes). BCSP itself is mature; this is an old bug, not a new-
+feature fallout.
 
-**Step 7.2**
-Record: Actively maintained; this tree already backported many
-`Bluetooth: btusb: Add ...` ID patches (e.g. `b85ef6483d5b3` RTL8922AE
-0bda/d923). Mature table, ongoing OEM IDs.
+===============================================================
+PHASE 8: IMPACT AND RISK ASSESSMENT
+===============================================================
 
-## Phase 8: Impact and risk
+**Step 8.1: DETERMINE WHO IS AFFECTED**
+Record: Config-specific (`BT_HCIUART_BCSP`) + HCI UART BCSP hardware. TX
+trigger also needs an HCI socket send of a short vendor command.
 
-**Step 8.1 — Who is affected**
-Record: Driver + VID/PID specific. Users of 1357:c123, documented as
-Wiko Hi MateBook 14 Ryzen 200. No effect on other devices.
-
-**Step 8.2 — Trigger**
-Record: Every boot / BT bring-up on that hardware. Not a race.
-Unprivileged use of BT is broken until firmware loads.
-
-**Step 8.3 — Failure mode**
-Record: Adapter enumerates and looks “up” but cannot discover or
-connect. Severity **HIGH** for that hardware (Bluetooth unusable), not a
-panic. Device-ID exception still applies.
-
-**Step 8.4 — Risk vs benefit**
+**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
 Record:
-- Benefit: high for affected laptops; zero for everyone else.
-- Risk: very low (+2 lines, VID/PID gated, same flags as existing c123
-  entries).
-- Ratio: strongly in favor of backport.
+- TX: HCI command packet, `hciextn` (default true), `len == 3` after
+  type byte, OGF 0x3f. Constructible from userspace with
+  `CAP_NET_RAW`/`CAP_NET_ADMIN`.
+- RX: truncated LE frame; `memcmp` path is likely already in-bounds if
+  the state machine honors the header length field.
+- Not a hot every-packet path for well-formed kernel-generated commands
+  (`hci_cmd_sync_alloc` always includes the 3-byte header).
 
-## Phase 9: Synthesis
+**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
+Record: One-byte (or more, if `data` is short) read past `skb->len` on
+TX; possible wrong BCSP channel/length if the spilled byte looks like an
+HCI extension. May stay inside skb tailroom (not always a KASAN crash).
+**Severity: HIGH** (memory safety / OOB), not a guaranteed panic.
 
-**Evidence FOR**
-- Explicit stable exception: **new USB ID on an existing driver**.
-- Real user-visible bug: BT cannot pair/connect without Realtek
-  firmware.
-- +2 lines, identical to 1358:c123 / 0bda:c123 already in 6.18.53.
-- Applies cleanly; Realtek/8852 firmware path already present.
-- Maintainer-applied; CI passed; no NAKs.
-- This 6.18.y tree already takes the same class of ID adds.
+**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
+Record: Benefit medium-high (closes a long-standing OOB in a fuzzed UART
+protocol). Risk very low (4 lines, skip-on-short-packet). Ratio favors
+backport.
 
-**Evidence AGAINST**
-- Not a crash/UAF/security issue (not required for device IDs).
-- One OEM laptop family (still a real product).
-- Author is not a regular Bluetooth contributor (offset by Luiz applying
-  it).
-- Sibling IDs were labeled 8822CE in 2020; this commit says 8852BE.
-  Firmware is matched by chip ID after `BTUSB_REALTEK`, so a mis-named
-  chip in the subject would still load the correct image. Author cites
-  `rtl8852btu_*` from the working setup.
+===============================================================
+PHASE 9: FINAL SYNTHESIS
+===============================================================
 
-**Unresolved**
-- Could not fetch lore/stable@ via HTTP (403). Thread recovered via `b4
-  dig -m`.
-- Did not independently attach the laptop; relied on author’s descriptor
-  and “works after this ID.”
+**Step 9.1: COMPILE THE EVIDENCE**
 
-**Stable rules**
-1. Obviously correct and tested? **PASS** (same flags as siblings;
-   author + CI + maintainer).
-2. Real bug affecting users? **PASS** (BT unusable on that hardware).
-3. Important? **PASS** under the device-ID exception (hardware does not
-   work).
-4. Small and contained? **PASS** (+2 lines, one table).
-5. No new features/APIs? **PASS** (existing quirk flags only).
-6. Applies to this tree? **PASS** (`git apply --check` clean).
+FOR:
+- Real OOB read in `bcsp_prepare_pkt` when a 3-byte vendor HCI command
+  is sent on BCSP
+- RX handler indexes through byte 7 with no length guard
+- 4 insertions / 1 deletion, obviously correct
+- Code present in this 6.12 tree since origin
+- No prerequisites; applies here
+- Bluetooth maintainer applied it to bluetooth-next
+- Same class as other packet-length checks already landing in this tree
 
-**Exception category:** NEW DEVICE ID on existing `btusb` / Realtek
-path.
+AGAINST:
+- No syzbot/user crash report for this exact bug
+- TX trigger is privileged
+- RX `len < 8` check is likely redundant given the BCSP RX state machine
+- Sister patch 2/5 in the same series had a regression (different
+  driver)
+- Framed as “hardening”
 
-This should be backported to this 6.18.53 tree. The driver, Realtek
-firmware loader, and sibling `c123` quirks are already here; only
-1357:c123 is missing, and that is enough to leave this laptop’s
-Bluetooth non-functional.
+UNRESOLVED:
+- lore.kernel.org WebFetch 403; no confirmed stable@ discussion
+- Whether skb tailroom would make the 1-byte TX OOB a KASAN hit on this
+  kernel’s allocator
 
-Verification:
-- [Phase 1] Parsed subject/tags from `git show 335d7bd554a20`; no
-  Fixes/Cc:stable; Luiz SOB present
-- [Phase 2] Diff is +2 lines in `quirks_table`; confirmed
-  `btusb_probe()` uses generic class match then `usb_match_id(...,
-  quirks_table)` when `driver_info == 0` (btusb.c ~4064–4069, 82–83,
-  4309–4312)
-- [Phase 2] Firmware selected by `btrtl_match_ic()` /
-  `btrtl_setup_realtek()`, not USB PID (`btrtl.c` 342–345, 1359–1368)
-- [Phase 3] Blame: 1358:c123 = f496297e76a69, 0bda:c123 = 24d6a6d24f01f,
-  both v5.11-rc1 and in this tree
-- [Phase 3] `git merge-base --is-ancestor 335d7bd554a20 HEAD` → not in
-  this tree
-- [Phase 3] `git merge-base --is-ancestor 1fb9943146968 HEAD` →
-  8852BT/BE-VT firmware support is in this tree
-- [Phase 4] `b4 dig -c/-a/-w/-m`: v1, linux-bluetooth, Luiz applied, CI
-  PASS, no NAK
-- [Phase 4] lore WebFetch 403; stable@ search failed — UNVERIFIED beyond
-  b4 mbox
-- [Phase 5] `CONFIG_BT_HCIBTUSB_RTL` default y (Kconfig);
-  `BTUSB_WIDEBAND_SPEECH` → `HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED`
-  (btusb.c:4344)
-- [Phase 6] `git describe HEAD` p-6.18-1-g03b85e06ca9bf; kernel 6.18.53;
-  grep shows 1358/0bda:c123, not 1357:c123
-- [Phase 6] `git apply --check` succeeded with offset -16
-- [Phase 7/8] Same ID-add pattern already in this tree (e.g.
-  b85ef6483d5b3)
-- UNVERIFIED: physical confirmation of 8852BE vs 8822CE; does not change
-  the ID-add decision because firmware is chip-matched
+**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+1. Obviously correct and tested? **PASS** — maintainer-applied; logic is
+   local and readable
+2. Fixes a real bug that affects users? **PASS** — OOB on truncated
+   vendor commands over BCSP UART
+3. Important issue (crash, security, corruption, deadlock)? **PASS** —
+   OOB / memory-safety (HIGH, not proven panic)
+4. Small and contained? **PASS** — one file, five lines
+5. No new features or APIs? **PASS**
+6. Can apply to the local tree? **PASS** — buggy code present; surgical
+   apply succeeded
+
+**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
+Record: Not a device-ID/quirk/DT/docs exception. Ordinary small memory-
+safety fix.
+
+**Step 9.4: MAKE YOUR DECISION**
+This belongs on 6.12. The TX length check closes a real out-of-bounds
+field access on a path that HCI sockets can hit; the RX check is cheap
+and harmless. Scope, risk, and local applicability all fit stable rules.
+
+===============================================================
+Verification
+===============================================================
+- [Phase 1] Parsed subject/body/tags: author Li Qiang, SOB Luiz von
+  Dentz; no Fixes/syzbot/Cc-stable
+- [Phase 2] Diff: `hci_bcsp.c` +4/-1 in `bcsp_prepare_pkt` and
+  `bcsp_handle_le_pkt`
+- [Phase 2] `HCI_COMMAND_HDR_SIZE` is 3 in `include/net/bluetooth/hci.h`
+- [Phase 2] `hciextn` defaults to true (`module_param`)
+- [Phase 3] `git blame`: lines from `1da177e4c3f41` (2.6.12-rc2)
+- [Phase 3] `git merge-base --is-ancestor a4c72c8c7cef HEAD` → not in
+  this tree (exit 1); object exists as a commit
+- [Phase 3] `git log --grep='validate received' --
+  drivers/bluetooth/hci_bcsp.c` → empty
+- [Phase 4] `b4 dig -c a4c72c8c7cef`: lore msgid 6fb9de3e…; v1-only
+  series; applied to bluetooth-next
+- [Phase 4] `b4 dig -w`: linux-bluetooth, Holtmann, von Dentz
+- [Phase 4] mbox: no NAK on 3/5; CI fail was qca 5/5; btmrvl 2/5 later
+  regressed Chromebooks
+- [Phase 4] UNVERIFIED: stable@ mailing list (lore WebFetch 403)
+- [Phase 5] Callers: `bcsp_dequeue` → UART TX; `bcsp_complete_rx_pkt` →
+  `bcsp_recv`
+- [Phase 5] `hci_sock_sendmsg`: `len < 4` rejected; after type pull,
+  `skb->len` can be 3; OGF 0x3f on RAW needs `CAP_NET_RAW`
+- [Phase 6] `git describe HEAD` / Makefile: 6.12.111; buggy `if (hciextn
+  && chan == 5)` still present
+- [Phase 6] `git apply --check` of the two hunks: success
+- [Phase 8] Failure mode: OOB read past `skb->len` on TX vendor-
+  extension parse; severity HIGH
+- UNVERIFIED: whether this 1-byte read is always inside skb tailroom vs
+  KASAN-poisoned
+
+The TX path can read past a 3-byte HCI command; the fix is four lines
+and applies to this 6.12 tree without extra commits.
 
 **YES**
 
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/hci_bcsp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9257341b01399..3c9d5d0976936 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -882,6 +882,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0xc123), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x1357, 0xc123), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 591abe6d63ddb..6461492cf653b 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -194,7 +194,7 @@ static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
+ 		return NULL;
+ 	}
  
+-	if (hciextn && chan == 5) {
++	if (hciextn && chan == 5 && len > HCI_COMMAND_HDR_SIZE) {
+ 		__le16 opcode = ((struct hci_command_hdr *)data)->opcode;
+ 
+ 		/* Vendor specific commands */
+@@ -402,6 +402,9 @@ static void bcsp_handle_le_pkt(struct hci_uart *hu)
+ 	u8 sync_pkt[4]     = { 0xda, 0xdc, 0xed, 0xed };
+ 
+ 	/* spot "conf" pkts and reply with a "conf rsp" pkt */
++	if (bcsp->rx_skb->len < 8)
++		return;
++
+ 	if (bcsp->rx_skb->data[1] >> 4 == 4 && bcsp->rx_skb->data[2] == 0 &&
+ 	    !memcmp(&bcsp->rx_skb->data[4], conf_pkt, 4)) {
+ 		struct sk_buff *nskb = alloc_skb(4, GFP_ATOMIC);
 -- 
 2.53.0
 
