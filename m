@@ -1,140 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2E04973AF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 08:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D64835200F;
+	Mon, 19 Oct 2026 09:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792399511; cv=none; b=uZSRXebRqaylkyhlKVqozxTW543PaO9QxxJoTQTe/9pkL3UMfKPDAD5GEFmJvC4a9XAwCdmulE4zm/r52gF52LVCQCbOofViQNVBG08bfbpzM4928jJnZVsIxDO450MO9QsOG3zUudaMFqDDKn8zCBftVemUlQmXwEcbmUnfhoA=
+	t=1792401177; cv=none; b=NxcUMUBZak623D7L9i3nJl6JJPnwcYUXp2fs3BOAfNQJ3OEUHC8aRoZQV2kq9cTScVkToGnom4pqrPABhK5/H+Z5sGi+8MZO53rlLoed9uwCntj23YM+VtBnhcHauG1LvfzWEhZMgAb+Zb8k1MpKOdqND1sWR65qLNerENm7YTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792399511; c=relaxed/simple;
-	bh=q+PqqH48M4P+GK/GRd2J2eW3+Vcl4AhH27r7IBO69f4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mIb/UFq/sDEibnCH7xvYvsUanTL2SaUImORQuEaXCbCSrwF7grXmcKyeZXHoBzCDSSZ77Se9V3Df9gJmlT1xyohkM+uZpRjCNUJJ38aQKK+ak2Mm+oMYtSrj0xpgU+pa1E9112f73irjI7YHaiiEYAgRpc0drlwQAdnSUl3cRLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgbVqOZz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1792401177; c=relaxed/simple;
+	bh=uL2/yGEIJSp+Pcj0y8exu25lAl4mGrxzhwzvqxe8CmQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=di3w/S/JZ9ik6Mb28vGIS9DFyoOOpBxoYVFWi4XMEqOFo+WiJZE64kioq03Cb6HwFuL6WRRAWa9pYMFU4+VDrsC4M20naHbc1V+5xLFRIZQhY3+wbYbVeN60/pzWWOGadMAspoXiAsBY2db26SeMa699w09KYlz08c6dGf6KSko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=DwG/EqPv; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgbVqOZz"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BDB3EC2BCFC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 08:45:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792399510;
-	bh=q+PqqH48M4P+GK/GRd2J2eW3+Vcl4AhH27r7IBO69f4=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=mgbVqOZzlpmd4PFNJUCi4trQyPTiyL6ukC+3od+sQUyWVys4T7G6Lb3/caZjIFII0
-	 AhYEaJp8A5H+Sk1WW/OjigBBEugVnhyyTZFG+JlnykqeqosBf0NYA9U+gwhF+JBA5K
-	 kKn0VDWXDu8vv7c2Pj/LGWUfIR5goBfv7+uCr+8H5nR3K+kulQJkdc+6bjx5Zl5k5F
-	 mGGubJa/1IO1czBsqfpVhXk17viLefzL9qn9DQiupWTF7xJTKSdJDOnlfzhr4bvNUl
-	 fickYMXRCDhbPCL9BTGiOPGu6mmHLMUbylNJFg+DWD5w9czXqx/M97PtuVBbItddaY
-	 9zSARleFmb/Tg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9F7D4C53BC7; Mon, 19 Oct 2026 08:45:10 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221754] RTL8852BE Bluetooth (0bda:b853) fails to init: Opcode
- 0xfcf0 failed: -16, hci0 never registers with mgmt (BD Address
- 00:00:00:00:00:00)
-Date: Mon, 19 Oct 2026 08:45:10 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: virtualfoxyloon@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221754-62941-GxHZ9iytS2@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221754-62941@https.bugzilla.kernel.org/>
-References: <bug-221754-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DwG/EqPv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=hz
+	oy/JuyOeqUSt5dp280ZfevZdMIILMp2cAQA5QZXSk=; b=DwG/EqPvBd54lekfUK
+	getHV02quQfJ7HKaRYlTpIiBSRx0zjTkvgLDzKOJSVh8XAdONrqo78649CieBI6E
+	1CMGkV3qr2uZvhL3Dzvd54vR4QQiAw+9XMunMW4pb24WBSAwR5Ak/q11nA+nkEBX
+	DbfM7CjjcmCeZpKLGIN73vGDc=
+Received: from pc.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3NysM39VqKsG2BA--.42110S2;
+	Mon, 19 Oct 2026 17:12:45 +0800 (CST)
+From: Jiale Yao <yaojiale02@163.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jiale Yao <yaojiale02@163.com>
+Subject: [PATCH] Bluetooth: MGMT: Free cancelled adv monitor command
+Date: Mon, 19 Oct 2026 17:12:43 +0800
+Message-Id: <20261019091243.1847048-1-yaojiale02@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3NysM39VqKsG2BA--.42110S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7GrW7Kr43Kw4xGw4UXFW7CFg_yoWDKFgEgw
+	s8u34fAr4UGr4jyF1UuFWrWrnxKwn8GF1I9a9avFW7X3y5Gws0yrWkur13Aa4fu3WDCFn3
+	Ars8CayS9w4xtjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRtiSdUUUUUU==
+X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbCzg0LRWrV3w3rXQAA3W
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221754
+MGMT_OP_REMOVE_ADV_MONITOR uses mgmt_pending_new(), so its command is
+not on hdev->mgmt_pending. When the command sync callback is cancelled,
+mgmt_remove_adv_monitor_complete() returns without freeing the command.
+This leaks the command, its parameter buffer, and its socket reference.
 
---- Comment #12 from FoxyLoon (virtualfoxyloon@gmail.com) ---
-Hey Martinho P. (in response to Comment #11)
+Free the command before returning from the cancelled completion path.
 
-A few days after posting my previous message, I went through the discussion
-history on this page again and noticed a link to a drive that another user =
-had
-shared for their computer model. I tried it out of curiosity, but I forgot =
-to
-come back to this discussion and report what happened afterwards.
+Fixes: e6ed54e86aae ("Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_complete")
+Signed-off-by: Jiale Yao <yaojiale02@163.com>
+---
+ net/bluetooth/mgmt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I decided to give it a try because the GitHub repository containing the fix
-stated that, in theory, any drive related to the hardware in question should
-work.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 251a896babd5..e54a838aeada 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5682,8 +5682,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ 	struct mgmt_pending_cmd *cmd = data;
+ 	struct mgmt_cp_remove_adv_monitor *cp;
+ 
+-	if (status == -ECANCELED)
++	if (status == -ECANCELED) {
++		mgmt_pending_free(cmd);
+ 		return;
++	}
+ 
+ 	hci_dev_lock(hdev);
+ 
+-- 
+2.34.1
 
-After running the script again, it successfully detected the `.dat` file and
-installed the firmware. As a result, Bluetooth is now working on my system.
-
-However, it is only partially functional. Bluetooth can now be enabled and
-disabled, and I can connect devices, but establishing a stable connection c=
-an
-sometimes take up to five minutes or more.
-
-For example, when I try to connect my headphones, the following happens:
-
-- I enable Bluetooth.
-- I turn on my headphones.
-- A connection is established, but no audio comes through the headphones ye=
-t...
-- A few seconds later, the Bluetooth connection drops, even though Bluetooth
-itself is still enabled.
-- I try to reconnect the headphones, but the same thing happens again.
-- Sometimes in this process, the headphones volume slider appears in the KDE
-Plasma volume control, but audio still does not play through them, and if t=
-he
-Bluetooth disconnects again, the slider ends up disappearing as well.
-- After a few seconds, the connection drops again.
-- This cycle continues until the headphones finally connect successfully and
-start playing audio. Once that happens, the connection remains stable and
-everything works as expected until I manually disconnect the headphones or =
-shut
-down / suspend the computer.
-
-However, if I manually turn off the headphones, the same bug MAY occur the =
-next
-time I try to turn them on, repeating what I described above.
-
-The behaviour is quite inconsistent. Sometimes the headphones connect
-immediately and work without any problems. On other occasions, I have to wa=
-it
-several minutes for a successful connection because the connection repeated=
-ly
-drops and reconnects. The number of failed attempts also varies: for exampl=
-e,
-the connection may drop and reconnect anywhere from 2 to ~10 times before it
-finally works.
-
-So, this bug appears to be partially resolved for me with the drive provided
-above. Bluetooth is now functional, but establishing a connection can still=
- be
-unreliable, and sometimes I have to be patient and try several times before
-everything works properly.
-
-I'm not entirely sure what additional information would be useful to help
-diagnose this bug, but I've tried to describe the behaviour as accurately as
-possible.
-
-Take care!
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
