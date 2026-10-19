@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90514D3BE9;
-	Mon, 19 Oct 2026 14:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6835262E9;
+	Mon, 19 Oct 2026 14:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418528; cv=none; b=XRsiGO0uWFiqh35MUfEZGmimZ+T5ksYNa2o58yk2DDsbxG5AN/9nRCbUjzhpuYHKzbG4PPkmvn7r2dNAE7dqn0QFEAHlUkwwm0oTiLzD9xlV4ua28C/ghxcb1cebnX7GW6wekZDxcSUWkR7qYelBgLKultKsj/cakqIhlQabikY=
+	t=1792418561; cv=none; b=Y8Q+gz1B1gxL7J8c2ulcgs68b0M6F4BjNBr+X0GIOpTrIfhNovmkApysPD12AU0VwNX/1/osodq8GrYhQ4al/FWxC62TOkgWfe2rlKnwzvu+2SqJJmS8U0r10LnsSM1qmvjIMviM6biyrUGmdxcQUQkxtXa9iP9lwi5ZeqsmKlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418528; c=relaxed/simple;
-	bh=nE5FfG+pYYTPC0OyKRgz53QvfymAYOB+VQIEBp0O3+Q=;
+	s=arc-20240116; t=1792418561; c=relaxed/simple;
+	bh=0D66UXv4UTor3rPU3ZWN1Uq4Igt0YJ+WNUVz0SePj3w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KSX4TvG974YWddgH1eJgK6fPVVY5ZhEkKYh7PHZaeDrHIqjRC2R77WAC7on5TVn2PsDlP45ar+sdJm4k4VMzHodLVM32N4aBad9sYgGj636QUrQRsWqAxGLJHAiuksgq7IwuRDGOso0nJ65+US3kMDf8QbgPg+4gzd8/ki/wuTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSxwNkGE; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=rdDzEjeaxWBMrBGhD9istu0dxTt+/MThttB9f+Jlrq6crxnenivHTv37o67xKBtmBLS7zYrEUGsO5pJ6PwGpGjLJOBBT5B3ibUCCHHs6Ix9w2J1rT/YPw8QDmP61pQgbF60tm0sviYLeqxAKKcsWBhc8JHn/snYnAE6QX6y+M6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPt0zEyP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSxwNkGE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB9D1F000C7;
-	Mon, 19 Oct 2026 14:02:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPt0zEyP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C62D1F000C9;
+	Mon, 19 Oct 2026 14:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418525;
-	bh=L+ibHOfY5KmiuXXJl1hb6K9QV4mQ1gl7KNdsBLN1Wq4=;
+	s=k20260515; t=1792418559;
+	bh=Qx8ke/cX4j48s6qk9h51uWr5K7JchXPVSq0E6LqeBF4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fSxwNkGErqfgyoW74RbA3iDIXtvw9sq3JHTYSRqIIpQtyNiBY9EotjBjNIWCHrUmG
-	 OY3zp8bDJ9k0SQUl3fW49mjAakpEeDY+vPW5im3ykDITxQhg74McUSY7M8ZLEXX1tT
-	 XHg7aGzixEwtFS+8w68m4xRFWCldMgWlB2M7au5c4uodrkxhelr5eROBUGkTkNLYGr
-	 G+L4ElhQPHA7m4sGtRtqUNhiJXB1AMaUmSaj8seCiBKBhXUJ014XmxeggNc2FNWquM
-	 KRh2EUsMjbOWwjKe3rTMr7723ODG6l144Y6T1VPBI+bhO+GlgNn0qPkzQkhxgpYjXy
-	 ZXguL7qvLRZQA==
+	b=TPt0zEyPl3IDE8IFZTsZ/T15/kGEbSWqS2xLXIHvpOmN66vav3NoeWpJAGxui2ruH
+	 lqPTgXIXJCqYs8FH8pewN/1PBZImyWnUkzH6vAZEzwUPxkOTln41njA1c1prPLW05+
+	 +tdERJp4QuZSfXD58gswDFGS/Vp/0agSmNrq2zw53GBtqM8az9jD3Ttm+NmRpiBz1w
+	 aII/cGQGR4m6AXDOG4Jm88gUgtzJiJdSuUdfD3ufD5W8rXeAG3y1PSXK5GVEtaSQPM
+	 2lyc3ORxP+IQynUUS4HanVgSQ6csvRLzg2iiiEXjwq+rMJoFv/feY57bL8fAB216gy
+	 QAoFWbNZn0FSg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Gustavo Evgucci <monesss315@gmail.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
+Cc: Muhammad Saheed <muhammad.saheed.iam@gmail.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] Bluetooth: btusb: Add USB ID 13d3:3625 for MediaTek MT7922
-Date: Mon, 19 Oct 2026 09:50:01 -0400
-Message-ID: <20261019135441.1420968-310-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] Bluetooth: hci_sync: Disable legacy instance's ext adv before setup snapshot
+Date: Mon, 19 Oct 2026 09:50:25 -0400
+Message-ID: <20261019135441.1420968-334-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -55,526 +54,435 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Gustavo Evgucci <monesss315@gmail.com>
+From: Muhammad Saheed <muhammad.saheed.iam@gmail.com>
 
-[ Upstream commit 849a3bf1489093996859ba0c3c1c0cd314d6ff96 ]
+[ Upstream commit 75722cde87ee24029e93e4e32d85309989f55991 ]
 
-The IMC Networks MT7922 Bluetooth adapter with USB ID 13d3:3625 is not
-recognized as a MediaTek device because it is missing from the btusb
-device ID table. As a result, btmtk firmware loading is never triggered
-and the HCI reset command times out with -ETIMEDOUT.
+hci_setup_ext_adv_instance_sync(...) only disabled
+HCI_OP_LE_SET_EXT_ADV_ENABLE before setup snapshot in case of non-legacy
+instances (instance > 0) and never disabled the same for legacy instance
+(instance == 0). This would lead to failure in setting ext adv params
+with HCI_ERROR_COMMAND_DISALLOWED (0x0c) error like below, when toggling
+the discoverable/connectable property of a controller with advertising
+enabled.
+```
+$ btmgmt advertising off
+hci0 Set Advertising complete, settings: powered ssp br/edr le
+  secure-conn wide-band-speech cis-central cis-peripheral
+$ btmgmt connectable on
+hci0 Set Connectable complete, settings: powered connectable ssp br/edr
+  le secure-conn wide-band-speech cis-central cis-peripheral
+$ btmgmt connectable off
+hci0 Set Connectable complete, settings: powered ssp br/edr le
+  secure-conn wide-band-speech cis-central cis-peripheral
 
-Add the device with BTUSB_MEDIATEK | BTUSB_WIDEBAND_SPEECH flags,
-consistent with the neighboring 13d3:3627, 13d3:3628 and 13d3:3630
-entries which use the same chip.
+$ btmgmt advertising on
+hci0 Set Advertising complete, settings: powered connectable ssp br/edr
+  le advertising secure-conn wide-band-speech cis-central cis-peripheral
+$ btmgmt connectable on
+Set Connectable for hci0 failed with status 0x0a (Busy)
+$ btmgmt connectable off
+Set Connectable for hci0 failed with status 0x0a (Busy)
 
-Tested on: MediaTek MT7922 (Wi-Fi 6E combo card, IMC Networks BT USB
-interface), kernel 7.0.11-arch1-1.
+$ dmesg
+...
+[   21.970527] hci0: Opcode 0x2036
+[   21.970529] hci0: opcode 0x2036 plen 25
+[   21.970537] hci0: skb len 28
+[   21.970539] hci0: length 1
+[   21.976099] hci0: result 0x0c
+[   21.976105] hci0: end: err -16
+[   21.976114] Bluetooth: hci0: Opcode 0x2036 failed: -16
+```
 
-/sys/kernel/debug/usb/devices:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=12 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3625 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Signed-off-by: Gustavo Evgucci <monesss315@gmail.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Muhammad Saheed <muhammad.saheed.iam@gmail.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-This is a two-line USB ID addition for an existing MediaTek btusb path.
-The local tree is **6.18.53** (`pending-6.18`); `13d3:3625` is missing
-here, while neighboring MediaTek IDs and `BTUSB_MEDIATEK` setup already
-exist.
-
-===============================================================
-PHASE 1: COMMIT MESSAGE FORENSICS
-===============================================================
-
-**Step 1.1: PARSE THE SUBJECT LINE**
-
-Record: [Bluetooth / btusb] [Add] [USB ID 13d3:3625 for MediaTek MT7922]
-- Subsystem: Bluetooth USB driver (`btusb`)
-- Action verb: **Add** (device ID to an existing driver)
-- Claimed intent: enable an IMC Networks / MediaTek MT7922 adapter that
-  is already bound by generic Bluetooth USB matching but is not treated
-  as MediaTek
-
-**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
-
-Record:
-- **Fixes:** none (expected)
-- **Reported-by:** none
-- **Tested-by:** none as a tag; body says tested on kernel
-  7.0.11-arch1-1
-- **Reviewed-by:** Paul Menzel `<pmenzel@molgen.mpg.de>`
-- **Acked-by:** none
-- **Link:** none in the commit message
-- **Cc: stable:** none (expected)
-- **Signed-off-by:** Gustavo Evgucci `<monesss315@gmail.com>` (author);
-  Luiz Augusto von Dentz `<luiz.von.dentz@intel.com>` (Bluetooth
-  maintainer)
-- Ignore: any pipeline “Upstream commit …” / Sasha Levin SOB if present
-
-Notable: maintainer SOB plus an independent Reviewed-by. Bluetooth CI
-(bluez.test.bot) ran on v1 and v2.
-
-**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-
-Record:
-- **Bug:** USB ID `13d3:3625` is missing from the btusb ID/quirks table,
-  so the adapter is not flagged `BTUSB_MEDIATEK`.
-- **Symptom:** MediaTek firmware load (`btmtk`) never runs; HCI reset
-  times out with `-ETIMEDOUT` (`Opcode 0x0c03 failed: -110` in user
-  reports).
-- **Root cause:** generic Bluetooth class match binds `btusb` with
-  `driver_info == 0`; MediaTek setup is skipped.
-- **Fix:** add `{ USB_DEVICE(0x13d3, 0x3625), .driver_info =
-  BTUSB_MEDIATEK | BTUSB_WIDEBAND_SPEECH }` next to
-  `13d3:3627/3628/3630`.
-- **Version info:** tested on 7.0.11-arch1-1;
-  `/sys/kernel/debug/usb/devices` dump included (vendor 13d3, product
-  3625, Manufacturer=MediaTek Inc., class e0/01/01, Driver=btusb).
-
-**Step 1.4: DETECT HIDDEN BUG FIXES**
-
-Record: Not a disguised cleanup. It is an explicit hardware ID addition.
-That is a documented stable exception: new device IDs on an existing
-driver. It also fixes a real functional failure (HCI timeout, adapter
-unusable).
-
-===============================================================
-PHASE 2: DIFF ANALYSIS - LINE BY LINE
-===============================================================
-
-**Step 2.1: INVENTORY THE CHANGES**
-
-Record:
-- File: `drivers/bluetooth/btusb.c` only
-- Scope: **+2 lines** in `quirks_table[]` (single-file surgical ID add)
-- Functions: none; static `usb_device_id` table only
-- Classification: single-file device ID addition
-
-**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
-
-Record:
-- **Before:** `13d3:3625` is absent from `quirks_table`. Probe matches
-  generic `{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) }` in `btusb_table` with
-  empty `driver_info`. `btusb_probe()` only consults `quirks_table` when
-  `!id->driver_info` (lines 4064–4069). No MediaTek match →
-  `hdev->setup` is not set to `btusb_mtk_setup`.
-- **After:** `usb_match_id(intf, quirks_table)` hits the new entry.
-  `id->driver_info & BTUSB_MEDIATEK` is true, so probe sets `hdev->setup
-  = btusb_mtk_setup` and related MTK callbacks (lines 4244–4258).
-  `BTUSB_WIDEBAND_SPEECH` sets `HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED`
-  (lines 4344–4345).
-- Path affected: probe/init of this USB ID only.
-
-**Step 2.3: IDENTIFY THE BUG MECHANISM**
-
-Record: **Hardware workaround / device ID addition (category h)**
-- Broken: MediaTek combo card enumerates as generic Bluetooth USB;
-  firmware is never loaded; HCI reset times out.
-- Fix: same flags as neighboring IMC/MediaTek entries already in this
-  tree.
-
-**Step 2.4: ASSESS THE FIX QUALITY**
-
-Record:
-- Obviously correct: two-line table entry matching established pattern.
-- Minimal; no unrelated edits; no API/locking/data-structure change.
-- Regression risk: **very low**, scoped to VID/PID 13d3:3625. Wrong
-  flags would only affect that device; flags match 3627/3628/3630.
-- Chip naming is slightly inconsistent in history (3627 subject says
-  MT7925, body says MT7922); **flags are the same**, so the driver path
-  is identical.
-
-===============================================================
-PHASE 3: GIT HISTORY INVESTIGATION
-===============================================================
-
-**Step 3.1: BLAME THE CHANGED LINES**
-
-Record:
-- Insertion sits between `13d3:3613` (Youn Mélois, 2025-04-01,
-  `bbf56029322c06`) and `13d3:3627` (Chris Lu, 2025-09-04,
-  `576952cf981b7`).
-- This is not a regression in old code; it is a **missing ID** for
-  hardware that uses the long-standing MediaTek path.
-- MT7922 USB support: `8c0401b7308cb` (“Bluetooth: Add support for
-  MediaTek MT7922 device”), contained in v6.11-rc1 era. Present in this
-  6.18 tree.
-
-**Step 3.2: FOLLOW THE FIXES: TAG**
-
-Record: No `Fixes:` tag. Not applicable. The “bug” is omission of this
-VID/PID, not a later regression.
-
-**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-
-Record:
-- This tree already has many of the same class of commits, including:
-  - `576952cf981b7` 13d3/3627
-  - `f63f401130e5c` 13d3/3628
-  - `5bd5c716f7ec3` 13d3/3630
-  - `70cd38d22d465` 13d3/3633 for MT7922
-- Candidate `ddd25808d4c2` is **not** an ancestor of HEAD (`git merge-
-  base --is-ancestor` exit 1).
-- Standalone; not patch X/Y.
-
-**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-
-Record: `git log --author="Gustavo Evgucci" -- drivers/bluetooth/` is
-empty in this tree. Author is a first-time hardware-ID contributor, not
-the subsystem maintainer. Weight comes from Luiz’s merge and Paul
-Menzel’s Reviewed-by.
-
-**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-
-Record:
-- Needs `quirks_table`, `BTUSB_MEDIATEK`, `BTUSB_WIDEBAND_SPEECH`, and
-  `btusb_mtk_setup`. All exist here.
-- `CONFIG_BT_HCIBTUSB_MTK` exists (`drivers/bluetooth/Kconfig`).
-- No extra commits required.
-- Can apply standalone. Parent of `ddd25808d4c2` also has `13d3:3609`,
-  which this 6.18 tree lacks; that is **context only**. Insertion
-  between 3613 and 3627 is valid here.
-
-===============================================================
-PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-===============================================================
-
-**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-
-Record:
-- `b4 dig -c ddd25808d4c2` matched patch-id
-  `ce1685f940593b167015292f6b73b7f2fc9ec8d9`
-- Lore/msgid:
-  https://patch.msgid.link/20260625083230.300651-1-monesss315@gmail.com
-- Thread saved to `/tmp/btusb-3625.mbox` (7 messages)
-- **v1** (2026-06-23): `[PATCH] Bluetooth: btusb: Add IMC Networks
-  MT7922 device 0x13d3:0x3625`
-- **v2** (2026-06-25): added usb/devices dump, Reviewed-by, full
-  maintainer To/Cc. **Code hunk unchanged.**
-- Applied to bluetooth-next as `ddd25808d4c2` by Luiz (patchwork-bot,
-  2026-06-26).
-- Review: Paul Menzel asked for usb/devices dump and get_maintainer.pl
-  recipients; then Reviewed-by. **No NAK.**
-- Bluetooth CI: v1 all PASS; v2 GitLint FAIL only for an 82-char notes
-  line. Builds passed.
-- No reviewer asked for `Cc: stable`.
-
-**Step 4.2: CHECK WHO REVIEWED THE PATCH**
-
-Record (`b4 dig -w`):
-- Gustavo Evgucci (author)
-- Luiz Augusto von Dentz (Bluetooth driver maintainer)
-- Marcel Holtmann (Bluetooth maintainer)
-- linux-bluetooth@, linux-kernel@
-- Paul Menzel (reviewer)
-Appropriate maintainers were on the thread; Luiz applied it.
-
-**Step 4.3: SEARCH FOR THE BUG REPORT**
-
-Record:
-- User-tested on real hardware with a full usb/devices dump.
-- External confirmation: DKMS workarounds for Mercusys MA80XE / IMC
-  Networks `13d3:3625` (`hci0: Opcode 0x0c03 failed: -110`). That
-  matches the commit’s -ETIMEDOUT description.
-- Not syzbot; hardware enablement with a concrete timeout.
-
-**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-
-Record: Single-patch series (v1 → v2 documentation only). Neighboring
-IDs already in this tree.
-
-**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-
-Record: No useful stable@ thread found (lore.kernel.org/stable WebFetch
-blocked by anti-bot). Absence of prior stable discussion is not a
-negative signal for a device-ID add.
-
-===============================================================
-PHASE 5: CODE SEMANTIC ANALYSIS
-===============================================================
-
-semcode MCP: not available. Used grep/read.
-
-**Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF**
-
-Record: No functions modified. Data: `quirks_table[]`. Consumers:
-`btusb_probe()`.
-
-**Step 5.2: TRACE CALLERS**
-
-Record:
-- `btusb_probe()` ← USB core when `btusb` matches.
-- Generic match: `btusb_table` `{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) }`
-  (line 83), which matches this device’s If#0 Cls=e0 Sub=01 Prot=01.
-- Then `usb_match_id(intf, quirks_table)` when `driver_info` is 0.
-
-**Step 5.3: TRACE CALLEES**
-
-Record: With the new flags, probe assigns `btusb_mtk_setup`,
-`btusb_mtk_shutdown`, `btmtk_reset_sync`, `btmtk_set_bdaddr`,
-`btusb_send_frame_mtk`, USB suspend/resume/disconnect MTK hooks.
-
-**Step 5.4: FOLLOW THE CALL CHAIN**
-
-Record: Userspace-reachable: plug in / boot with the adapter.
-Unprivileged users do not need a special syscall; udev/bluetoothd open
-the HCI device. High priority for owners of this card. Not a universal
-path.
-
-**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-
-Record: Dozens of `USB_DEVICE(0x13d3, …) … BTUSB_MEDIATEK |
-BTUSB_WIDEBAND_SPEECH` entries. Same pattern as 3627/3628/3630 already
-in this file. Systematic missing-ID class, not a one-off logic bug.
-
-===============================================================
-PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-===============================================================
-
-**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-
-Record:
-- Local tree: `git describe HEAD` → `p-6.18-1-g03b85e06ca9bf`; `make
-  kernelversion` → **6.18.53**; branch `pending-6.18`.
-- `13d3:3625` is **not** in `drivers/bluetooth/btusb.c` (`rg` found only
-  unrelated Realtek `0x3625:0x010b`).
-- `quirks_table` MediaTek block **is** here, with 3613 then 3627 (lines
-  787–794).
-- Neighbor commits 3627/3628/3630 **are** ancestors of HEAD.
-- Candidate `ddd25808d4c2` is **not** an ancestor of HEAD.
-- Driver support for MT7922 has been in this lineage since ~v6.11
-  (`8c0401b7308cb`).
-
-**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-
-Record: **Clean / minor context fuzz.** Candidate parent has extra
-`13d3:3609` above 3613; 6.18 does not. Added lines themselves match. No
-refactor of `quirks_table` vs probe matching.
-
-**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-
-Record: No other 13d3:3625 MediaTek entry. `d9da920233ec8` is Realtek
-`3625:010b` (different vendor). Not a duplicate.
-
-===============================================================
-PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-===============================================================
-
-**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-
-Record: [drivers/bluetooth/btusb.c] [IMPORTANT]
-- Common USB Bluetooth driver, not core mm/fs.
-- MediaTek Wi-Fi 6E combo cards are widely used (laptops, USB adapters).
-  Device-specific, but the class of fix is standard for stable.
-
-**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-
-Record: Active. Recent 6.18 history includes many VID/PID adds and btusb
-bugfixes. ID table is the normal place for this change.
-
-===============================================================
-PHASE 8: IMPACT AND RISK ASSESSMENT
-===============================================================
-
-**Step 8.1: DETERMINE WHO IS AFFECTED**
-
-Record: Users of USB Bluetooth `13d3:3625` (IMC Networks / MediaTek
-MT7922, e.g. combo cards / Mercusys MA80XE). Others unchanged. Requires
-`CONFIG_BT_HCIBTUSB` and typically `CONFIG_BT_HCIBTUSB_MTK`.
-
-**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-
-Record: Every probe of this device (boot or plug-in). Not a race. Not
-unprivileged exploit; the device simply does not work. Reproduced by the
-author and by out-of-tree DKMS users.
-
-**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-
-Record: [Bluetooth adapter fails HCI reset / -ETIMEDOUT; no controller]
-[HIGH for affected hardware, LOW globally]
-- Not a panic/UAF, but the device is dead without the ID. That is the
-  usual severity for missing USB IDs.
-
-**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-
-Record:
-- **Benefit:** High for holders of this adapter on 6.18; zero for
-  everyone else.
-- **Risk:** Very low (2 lines, existing flags, existing probe path).
-- **Ratio:** Strongly favors backport. This is the textbook new-device-
-  ID exception.
-
-===============================================================
-PHASE 9: FINAL SYNTHESIS
-===============================================================
-
-**Step 9.1: COMPILE THE EVIDENCE**
+Connection lost, reconnecting to https://agentn.us.api5.cursor.sh
+(attempt 1)...
+Retry attempt 1...
+I have the local-tree picture: 6.12.111 still has the `instance > 0`
+hole, the prerequisites are already present, and the patch applies. The
+rest of this is the full nine-phase write-up.
+
+## Phase 1: Commit message forensics
+
+**Step 1.1: Subject line**
+- Record: `[Bluetooth / hci_sync] [Disable] legacy instance 0 extended
+  advertising must be turned off before setup snapshot, matching the
+  existing non-legacy path`
+
+**Step 1.2: Tags**
+- Record: No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`,
+  `Acked-by:`, `Link:`, or `Cc: stable`. Signed-off-by: Muhammad Saheed
+  (author), Luiz Augusto von Dentz (Bluetooth maintainer). Absence of
+  `Fixes`/`Cc: stable` is expected for this review pipeline and is not a
+  negative signal.
+
+**Step 1.3: Body**
+- Record: [Bug] `hci_setup_ext_adv_instance_sync()` only calls
+  `HCI_OP_LE_SET_EXT_ADV_ENABLE` disable for `instance > 0`. Legacy
+  instance 0 stays enabled, so `HCI_OP_LE_SET_EXT_ADV_PARAMS` (opcode
+  0x2036) is rejected with `HCI_ERROR_COMMAND_DISALLOWED` (0x0c).
+- [Symptom] `btmgmt connectable on/off` while advertising is enabled
+  fails with MGMT Busy (0x0a). dmesg: `Opcode 0x2036 failed: -16`.
+- [Version] none stated.
+- [Root cause] the disable-before-snapshot comment already describes the
+  HCI rule; instance 0 was left out because
+  `hci_disable_ext_adv_instance_sync(hdev, 0)` means “disable all sets”
+  (`num_of_sets = !!instance`).
+
+**Step 1.4: Hidden bug fix?**
+- Record: Not disguised. This is an explicit correctness fix for a
+  documented HCI restriction.
+
+## Phase 2: Diff analysis
+
+**Step 2.1: Inventory**
+- Record: One file, `net/bluetooth/hci_sync.c`, +30/−0. New helper
+  `hci_disable_ext_adv_legacy_instance_sync()`. Call added in
+  `hci_setup_ext_adv_instance_sync()` `instance == 0` branch.
+  Classification: single-file surgical fix.
+
+**Step 2.2: Code flow**
+- Before: `instance > 0` disables that set, then snapshots under lock.
+  `instance == 0` only sets `adv = NULL` and proceeds to
+  `hci_set_ext_adv_params_sync()`.
+- After: instance 0 first sends `LE_SET_EXT_ADV_ENABLE` disable for
+  handle 0x00 if `HCI_LE_ADV_0` is set; otherwise no-op. Then the
+  existing param-update path runs.
+- Path: normal MGMT connectable/discoverable/advertising
+  reconfiguration, not an error-only path.
+
+**Step 2.3: Bug mechanism**
+- Record: [Logic / HCI command-order] Spec forbids updating parameters
+  of an active extended advertising set. Non-legacy sets were already
+  disabled. Legacy set 0 was not. Cannot reuse
+  `hci_disable_ext_adv_instance_sync(hdev, 0)` because that function
+  treats 0 as “all sets” (`cp->num_of_sets = !!instance`). New helper
+  sends `num_of_sets=1`, `enable=0`, `handle=0x00`, gated on
+  `HCI_LE_ADV_0`.
+
+**Step 2.4: Fix quality**
+- Record: Obviously correct: mirrors the instance>0 path and the
+  existing enable command layout. Minimal. Regression risk is low:
+  disable is skipped unless instance 0 is actually enabled;
+  `hci_start_ext_adv_sync()` re-enables after setup. Same “if
+  disable/setup fails, advertising may stay off” behavior as the non-
+  legacy path. No public API change.
+
+## Phase 3: Git history
+
+**Step 3.1: Blame**
+- Record: Disable-before-snapshot intent is from `cba6b758711c`
+  (“Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2”,
+  2021-10). Current `if (instance > 0)` / `else { adv = NULL; }` shape
+  is from `95cdcd8c82a50` (“Bluetooth: hci_sync: Fix advertising data
+  UAFs”, Chengfeng Ye, already in this tree). `HCI_LE_ADV_0` is from
+  `3a9dfe641913b` (stable backport of `0d92808024b4e`, 2025-10-01), also
+  in this tree.
+
+**Step 3.2: Fixes tag**
+- Record: None. Bug is the incomplete original disable logic from
+  `cba6b758711c`, which is in this tree. The correct instance-0 disable
+  needs `HCI_LE_ADV_0`, which is also here.
+
+**Step 3.3: File history**
+- Record: Recent `hci_sync.c` work is UAF/locking (`95cdcd8c82a50`),
+  advertising instance free on failure, accept-list UAF. No conflicting
+  rewrite of this setup snapshot. Standalone patch, not `X/Y`.
+
+**Step 3.4: Author**
+- Record: Muhammad Saheed has this one Bluetooth commit on
+  origin/master. Applied by subsystem maintainer Luiz Augusto von Dentz.
+
+**Step 3.5: Prerequisites**
+- Record: Needs `HCI_LE_ADV_0` (present: `3a9dfe641913b`) and the post-
+  UAF `if (instance > 0) ... else { adv = NULL; }` shape (present:
+  `95cdcd8c82a50`). `git apply --check` of `75722cde87ee2` succeeded
+  (hunks at +21 lines). No later origin/master commit touches
+  `hci_disable_ext_adv_legacy_instance_sync`. Standalone.
+
+## Phase 4: Mailing list / external
+
+**Step 4.1: Original discussion**
+- Record: `b4 dig -c 75722cde87ee2` → https://patch.msgid.link/202608042
+  01051.484885-1-muhammad.saheed.iam@gmail.com. Single v1, no later
+  revision. Thread (gnuweeb lore, lore.kernel.org 403): submission,
+  BlueZ CI bot, patchwork “applied to bluetooth-next by Luiz”. No NAK,
+  no reviewer-requested changes.
+
+**Step 4.2: Recipients (`b4 dig -w`)**
+- Record: linux-bluetooth@vger.kernel.org, Luiz von Dentz, Marcel
+  Holtmann. Right maintainers/list.
+
+**Step 4.3: Bug report**
+- Record: No external bugzilla/syzbot. Author included a concrete
+  `btmgmt` repro and dmesg. Opcode 0x2036 is
+  `HCI_OP_LE_SET_EXT_ADV_PARAMS` in this tree. HCI 0x0c maps to `EBUSY`
+  in `bt_to_errno()`; mgmt maps `-EBUSY` to `MGMT_STATUS_BUSY` (0x0a).
+  Matches the reported userspace error.
+
+**Step 4.4: Series**
+- Record: Standalone v1. Not part of a multi-patch series.
+
+**Step 4.5: Stable list**
+- Record: gnuweeb `/stable/` search for this subject returned no
+  dedicated discussion (only unrelated release noise). No recorded
+  reason to exclude it.
+
+**CI note:** BlueZ bot: CheckPatch/build PASS. `mgmt-tester` 494/501 (LL
+Privacy unpair timeouts, Read Exp Feature); mesh send-cancel timeouts.
+Failures are not advertising/connectable cases. Maintainer still applied
+the patch (`2d4711f5ad1b` in bluetooth-next; `75722cde87ee2` on
+origin/master).
+
+## Phase 5: Semantic / impact surface
+
+**Step 5.1: Functions**
+- Record: Added `hci_disable_ext_adv_legacy_instance_sync()`. Modified
+  `hci_setup_ext_adv_instance_sync()`.
+
+**Step 5.2: Callers of setup**
+- Record (verified in this tree):
+  - `hci_start_ext_adv_sync()` → connectable update, set advertising,
+    discoverable+limited privacy, re-enable adv, periodic adv start
+  - `hci_powered_update_adv_sync()` with instance 0x00
+  - `set_le_sync()` in `mgmt.c` with 0x00
+  - `add_ext_adv_params_sync()` uses `cp->instance` (MGMT rejects
+    instance < 1, so not the legacy path)
+
+**Step 5.3: Callees**
+- Record: `__hci_cmd_sync_status(HCI_OP_LE_SET_EXT_ADV_ENABLE, ...)`.
+  Same command the existing disable helper uses.
+
+**Step 5.4: Reachability**
+- Record: Userspace MGMT (`btmgmt`/`bluetoothctl` Set Connectable / Set
+  Discoverable / Set Advertising). `hci_update_connectable_sync()` calls
+  `hci_start_ext_adv_sync(hdev, hdev->cur_adv_instance)` when
+  `HCI_ADVERTISING` is set; `set_adv_sync()` sets `cur_adv_instance =
+  0x00`. Repro path is real and unprivileged for a local Bluetooth admin
+  (typically root/netdev).
+
+**Step 5.5: Similar patterns**
+- Record: Instance > 0 already disabled before snapshot.
+  `hci_disable_ext_adv_instance_sync()` cannot target only handle 0.
+  `HCI_LE_ADV_0` was added specifically because instance 0 is not in
+  `adv_instances`. This commit fills that remaining hole.
+
+## Phase 6: Local tree (6.12.111, branch `pending-6.12`)
+
+**Step 6.1: Buggy code present?**
+- Record: Yes. `net/bluetooth/hci_sync.c`
+  `hci_setup_ext_adv_instance_sync()` lines 1387–1400 still skip disable
+  for instance 0. Helper name is absent (`grep` found no
+  `hci_disable_ext_adv_legacy_instance_sync`). `git merge-base --is-
+  ancestor 75722cde87ee2 HEAD` is false. Introduced conceptually in 2021
+  (`cba6b758711c`); instance-0 tracking needed for a correct fix landed
+  in this tree as `3a9dfe641913b`.
+
+**Step 6.2: Backport difficulty**
+- Record: Clean apply (`git apply --check` succeeded). Context matches
+  after Chengfeng UAF backport.
+
+**Step 6.3: Related fixes already here?**
+- Record: `HCI_LE_ADV_0` tracking is here. Chengfeng UAF restructure is
+  here. No substitute that disables legacy instance 0 before param
+  snapshot.
+
+## Phase 7: Subsystem context
+
+**Step 7.1:** Record: `net/bluetooth` HCI command-sync / LE extended
+advertising. Criticality: IMPORTANT (common controllers, BlueZ MGMT),
+not core mm/fs.
+
+**Step 7.2:** Record: Actively maintained; Luiz is the Bluetooth HCI
+maintainer and applied this. Advertising instance 0 is the legacy “Set
+Advertising” path used by typical desktop/embedded BlueZ setups.
+
+## Phase 8: Impact and risk
+
+**Step 8.1:** Record: Users of Bluetooth 5+ controllers
+(`ext_adv_capable`) who enable LE advertising and then change
+connectable/discoverable. Very common on modern hardware.
+
+**Step 8.2:** Record: Trigger is ordinary `btmgmt connectable on/off`
+(or equivalent bluetoothctl/DBus) while advertising is on. Not a rare
+race. Local mgmt socket; not a remote unprivileged network attack.
+
+**Step 8.3:** Record: Failure mode is HCI Command Disallowed → kernel
+`-EBUSY` → MGMT Busy. Advertising parameters are not updated;
+connectable/discoverable toggle fails. Not a panic/UAF. Severity: HIGH
+for Bluetooth management (core LE advertising reconfiguration is
+broken), MEDIUM overall versus crash/corruption.
+
+**Step 8.4:** Record: Benefit high for 6.12 users with BT5 controllers.
+Risk low: 30 lines, flag-gated, same command as existing helper, applies
+cleanly, no API/data-structure change.
+
+## Phase 9: Synthesis
+
+**Step 9.1: Evidence**
 
 FOR:
-- Explicit stable exception: new USB ID on an existing driver
-- Real user-visible bug: HCI reset -ETIMEDOUT, adapter unusable
-- 2-line, obviously correct, same flags as 3627/3628/3630 already in
-  this tree
-- MTK setup path (`btusb_mtk_setup`) present
-- Reviewed-by Paul Menzel; merged by Luiz von Dentz; CI built
-- Author tested on hardware; usb/devices dump matches
-- Independent DKMS users hit the same ID/symptom
-- Applies with at most minor context adjustment (missing 3609)
+- Real, reproduced user-visible bug with matching opcode/status mapping
+  in this tree
+- Completes an already-documented disable-before-update rule that
+  already exists for instance > 0
+- Small, surgical, obviously correct
+- Prerequisites (`HCI_LE_ADV_0`, setup-function shape) already in
+  6.12.111
+- Applies cleanly
+- Maintainer-applied; v1 only; no NAK
+- Common mgmt path, not staging/experimental
 
 AGAINST:
-- Not a crash/security/corruption bug (hardware enablement)
-- Author is not a regular Bluetooth contributor
-- Chip labeled MT7922 vs some neighbor commits saying MT7925 (flags
-  still match)
-- No Cc: stable (not a negative under these rules)
+- Not a crash, UAF, leak, or CVE
+- Workaround: turn advertising off, change connectable, turn it back on
+- First-time author (mitigated by maintainer SOB)
+- BlueZ CI had unrelated tester timeouts
 
 UNRESOLVED:
-- lore.kernel.org HTTP 403 for WebFetch; thread recovered via `b4 dig
-  -m`
-- No stable@ discussion found (search not useful)
+- lore.kernel.org HTTP 403; thread read via b4 + gnuweeb instead
+- No dedicated stable-list thread
 
-**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+**Step 9.2: Stable rules**
+1. Obviously correct and tested? **PASS** — mirrors existing disable
+   path; author repro; kernel + mgmt-tester build; maintainer applied
+2. Real bug affecting users? **PASS** — connectable toggle fails while
+   advertising
+3. Important? **PASS** — breaks LE advertising reconfiguration on ext-
+   adv hardware (Busy, not oops, but a serious functional failure of a
+   common mgmt operation)
+4. Small and contained? **PASS** — +30 lines, one file
+5. No new features/APIs? **PASS** — HCI command already used; no new
+   userspace API
+6. Applies to this tree? **PASS** — verified `git apply --check`
 
-1. Obviously correct and tested? **PASS** — 2-line ID; hardware test;
-   reviewer + maintainer
-2. Fixes a real bug that affects users? **PASS** — missing ID → firmware
-   never loads → HCI timeout
-3. Important issue? **PASS** under the device-ID exception; adapter
-   otherwise unusable
-4. Small and contained? **PASS** — +2 lines, one table
-5. No new features or APIs? **PASS** — ID only; no new driver/API
-6. Can apply to the local tree? **PASS** — insertion point 3613/3627
-   exists; 3625 absent
+**Step 9.3: Exceptions**
+- Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
+  contained functional HCI bug fix.
 
-**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-
-Record: **Device ID addition to existing driver** — automatic YES
-category.
-
-**Step 9.4: MAKE YOUR DECISION**
-
-Backport to this 6.18 tree. The bug exists here, the MediaTek path
-exists here, neighboring IDs exist here, and the change is a two-line
-USB ID with the established flags.
+**Step 9.4: Decision**
+This 6.12 tree still has the instance-0 hole. The helper it needs can
+use `HCI_LE_ADV_0`, which is already backported. The patch is small,
+applies, and restores a management operation that fails on typical
+Bluetooth 5 controllers. That is enough for this tree.
 
 ---
 
-**What the commit solves for this tree**
+### What the commit solves, and why it matters here
 
-On 6.18.53, `13d3:3625` still matches only the generic Bluetooth USB
-class, so `btusb_probe()` never sets `BTUSB_MEDIATEK` and never calls
-`btusb_mtk_setup`. HCI reset then times out. Adding the quirks_table
-entry with `BTUSB_MEDIATEK | BTUSB_WIDEBAND_SPEECH` is the same
-enablement already used for 3627/3628/3630 in this file.
+On 6.12.111, enabling LE advertising (legacy instance 0) and then
+changing connectable/discoverable issues `LE Set Extended Advertising
+Parameters` while that set is still enabled. Controllers reject it
+(`0x0c` → `-EBUSY` → MGMT Busy). Non-legacy instances were already
+disabled first; instance 0 was not, because the generic disable helper
+treats 0 as “all sets.” This commit disables only handle 0x00 when
+`HCI_LE_ADV_0` is set, then continues the existing snapshot/update/re-
+enable flow.
 
-**Risk vs benefit**
+### Risk vs benefit
 
-Benefit is making this MediaTek/IMC adapter work; risk is confined to
-that VID/PID. No locking, no API, no refactor.
+Benefit: restores a common BlueZ management operation on ext-adv
+hardware. Risk: low; disable is conditional, command layout matches the
+existing helper, and `hci_start_ext_adv_sync()` re-enables afterward. No
+follow-up fix exists on origin/master.
 
-**Concerns**
+### Concerns
 
-Parent context includes `13d3:3609`, which 6.18 does not have. Insert
-between existing 3613 and 3627. No other prerequisites.
+None that block backport on this tree. Prerequisites are present. Apply
+is clean. Not a crash, but the failure is user-visible and easy to hit.
 
-Verification:
-- [Phase 1] Parsed subject/tags/body from `git show -s ddd25808d4c2` and
-  the supplied message: Add USB ID; Reviewed-by Paul Menzel; SOB Luiz;
-  no Fixes/Cc stable
-- [Phase 2] Diff: +2 lines in `quirks_table`; confirmed `btusb_probe`
-  uses that table when `!id->driver_info` (btusb.c:4064–4069); MTK setup
-  at 4244–4258; WBS quirk at 4344–4345
-- [Phase 2] Generic match `USB_DEVICE_INFO(0xe0, 0x01, 0x01)` at line 83
-  matches the dumped interface class
-- [Phase 3] `git describe HEAD` / `make kernelversion`: p-6.18-1 /
-  6.18.53
-- [Phase 3] `git merge-base --is-ancestor ddd25808d4c2 HEAD` → not
-  ancestor; 3627/3628/3630 commits are ancestors
-- [Phase 3] `rg 0x3625 drivers/bluetooth/btusb.c`: no 13d3:3625; only
-  Realtek 3625:010b
-- [Phase 3] blame 785–796: 3613/3627/3628/3630 present as described
-- [Phase 3] MT7922 intro `8c0401b7308cb` contained around v6.11-rc1;
-  present in this tree
-- [Phase 3] author log empty in drivers/bluetooth/
-- [Phase 4] `b4 dig -c ddd25808d4c2` → msgid 20260625083230.300651-1;
-  v1+v2; applied as ddd25808d4c2
-- [Phase 4] `b4 dig -a`: v1 then v2 (docs only); `b4 dig -w`: Luiz,
-  Marcel, linux-bluetooth, Paul Menzel
-- [Phase 4] mbox: Paul Reviewed-by; CI pass (v2 gitlint notes-line
-  only); no NAK
-- [Phase 4] lore WebFetch 403; used b4 mbox instead. Stable list search:
-  no relevant hit
-- [Phase 5] semcode unavailable; callers via grep: quirks_table →
-  btusb_probe only
-- [Phase 6] 3613 and 3627 present, 3625 absent — insertion point
-  verified in this checkout
-- [Phase 8] Failure mode: HCI -ETIMEDOUT / no controller for this USB
-  ID; not a kernel oops
-- UNVERIFIED: live lore.kernel.org HTML of the thread (403); chip MT7922
-  vs MT7925 labeling of neighbors (flags verified identical)
+### Verification
+- [Phase 1] Parsed subject/body/tags from `git log -1 --format=fuller
+  75722cde87ee2`; no Fixes/Cc/Reported-by
+- [Phase 2] Diff: +30 in `hci_sync.c`; helper + 4-line call in
+  instance==0 branch
+- [Phase 2] Confirmed `hci_disable_ext_adv_instance_sync()` uses
+  `cp->num_of_sets = !!instance` so instance 0 disables all sets
+- [Phase 2] Confirmed opcode 0x2036 is `HCI_OP_LE_SET_EXT_ADV_PARAMS`;
+  `bt_to_errno(0x0c)=EBUSY`; mgmt `-EBUSY` → Busy 0x0a
+- [Phase 3] `git describe HEAD` / `make kernelversion`: pending-6.12,
+  6.12.111
+- [Phase 3] `git merge-base --is-ancestor 75722cde87ee2 HEAD`: not in
+  tree
+- [Phase 3] blame: disable comment from `cba6b758711c`; `if (instance >
+  0)` from `95cdcd8c82a50`; `HCI_LE_ADV_0` from `3a9dfe641913b`
+- [Phase 3] `git merge-base --is-ancestor 3a9dfe641913b HEAD`: yes;
+  `95cdcd8c82a50` in HEAD: yes
+- [Phase 3] `git apply --check` of 75722cde87ee2: success
+- [Phase 3] `git log origin/master -S
+  hci_disable_ext_adv_legacy_instance_sync -- net/bluetooth/hci_sync.c`:
+  only this commit
+- [Phase 4] `b4 dig -c 75722cde87ee2` / `-a` / `-w`: v1 only; Luiz +
+  linux-bluetooth; lore msgid as above
+- [Phase 4] gnuweeb thread: CI bot + patchwork applied; no NAK
+- [Phase 4] lore.kernel.org WebFetch: 403 (used b4/gnuweeb)
+- [Phase 5] Callers traced in `hci_sync.c` / `mgmt.c`; connectable path
+  uses `cur_adv_instance` (0 after Set Advertising)
+- [Phase 6] Local setup function still skips disable for instance 0
+- [Phase 8] Failure: MGMT Busy, not oops; severity HIGH for BT mgmt,
+  MEDIUM vs crash class
+- UNVERIFIED: Could not fetch lore.kernel.org HTML directly (403)
 
 **YES**
 
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/hci_sync.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 59fff918fd2de..9257341b01399 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -788,6 +788,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3613), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3625), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3627), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3628), .driver_info = BTUSB_MEDIATEK |
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 70fce6811d0a9..8da58c61e9723 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1184,6 +1184,32 @@ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
+ 	return 0;
+ }
+ 
++static int hci_disable_ext_adv_legacy_instance_sync(struct hci_dev *hdev)
++{
++	struct hci_cp_le_set_ext_adv_enable *cp;
++	struct hci_cp_ext_adv_set *set;
++	u8 data[sizeof(*cp) + sizeof(*set) * 1];
++	u8 size;
++
++	if (!hci_dev_test_flag(hdev, HCI_LE_ADV_0))
++		return 0;
++
++	memset(data, 0, sizeof(data));
++
++	cp = (void *)data;
++	set = (void *)cp->data;
++
++	cp->num_of_sets = 0x01;
++	cp->enable = 0x00;
++
++	set->handle = 0x00;
++
++	size = sizeof(*cp) + sizeof(*set) * cp->num_of_sets;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_ENABLE,
++				     size, data, HCI_CMD_TIMEOUT);
++}
++
+ static int hci_disable_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ {
+ 	struct hci_cp_le_set_ext_adv_enable *cp;
+@@ -1409,6 +1435,10 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ 			return -EINVAL;
+ 		}
+ 	} else {
++		err = hci_disable_ext_adv_legacy_instance_sync(hdev);
++		if (err)
++			return err;
++
+ 		adv = NULL;
+ 	}
+ 
 -- 
 2.53.0
 
