@@ -1,90 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945F64D4874
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 11:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126C64E3252;
+	Mon, 19 Oct 2026 11:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792408313; cv=none; b=K/pQRnztskmIBomm6hCKvBue/VakxJNamYlqsICw69BjJonAWpHbmBn6SmWbrpvfFv79qLjG5i/Q7/al3xmBQRtXZH1NysHNSXqKNVg76RX40h8Ahsoa748ZKob56l7Foa7etS5y8GPDr08AK4EzRlNc32MltxfRhNlnhzIjlJU=
+	t=1792408594; cv=none; b=IgYB08cl3Ld7QKji7WWAN6udZZ3WR3OZoimaoZ4zHh4Mva/2D7geFYEe9O9CFnF7mKE7IV5E+j7F3DxUR9/pjrQrKE+ir3UWYvs8NIgIv5SdktGkMJwLhSLTtUuyvED7cbPBnwXVZG8o6Cd3Dv637TJkSY66U6Q02Xkdye6bzwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792408313; c=relaxed/simple;
-	bh=lmWSM9PefrTSw8qNkWSb9TH7vtVxrYO5bcFASRVrSxY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DL63oONSamBgmw8H8Zz93+ETgDnIOloS7vytO8VyJ4yCzeatI03r622qT+c7uCRaCLoAtUI2MjsYWtr5boIiWJ3/ZRyT16g64JeDbUmVW2I6SOsqRHEFBDMgd8vwHl1h75naktKLHyq1tOvCilUJ1rqYWnS3xEgcZAeQ3dpZpi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jz4fUoqJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1792408594; c=relaxed/simple;
+	bh=8sS/vaJsVJSewGKtcemUEEWScFjW/75ASQ2eygZZLGM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YVKPcVdV3IOHYWCQnUKOl1AmBii65/O7cUWTZwpcinIgPql/TnhHGnkJtr89JdHb94T1bYZKjwUiDy4vsZ9q796fKjgc5I+DPEH6Yu55gPhMQHuMMFmfuF2L6Ab4O1gAJb3JkNxvcT63WCK9ehNj+x8QPrldSwNmoiVaOK6an2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=BnPfs31U; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jz4fUoqJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C632C2BD00
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 11:11:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792408313;
-	bh=lmWSM9PefrTSw8qNkWSb9TH7vtVxrYO5bcFASRVrSxY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=jz4fUoqJx7Qhbg3NugEMHVp9/2BeNnlZBro/G4a1IRVmysbuAHO24Y4nXLwWxXYYg
-	 XLaNQW1Js1oS+1VCh+/VHjsEKGccmwBsVUUJooIP8JCtAEV6ABW+DdmJ6ewyuL0P4f
-	 +rt5X07IxVwZQUZUHjNm43gag6ztzs/ohJYeCHSKLjdkJhAclHf03XsET0iG6+avb5
-	 U1zKkHxU3Q7o7oAWilivGjbTfXGCba9NsTpECPvbKQ5RAoTehgjbF+zv60n2bGCkF1
-	 uRqECAOfzdzsKl9y5d39y+31UsvLTxYCvmfokFd8ILMApjf13fnrFJqAsZz2IznEnl
-	 QtcgYPio8YmnQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 12E43C53BC7; Mon, 19 Oct 2026 11:11:53 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221722] Blanket HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for
- all MediaTek chips breaks HFP mSBC microphone on MT7925 (0489:e111)
-Date: Mon, 19 Oct 2026 11:11:52 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: purpleritza@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221722-62941-YRRbBrkYTv@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221722-62941@https.bugzilla.kernel.org/>
-References: <bug-221722-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="BnPfs31U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=el
+	ecKPnkoC6KLvYRG3csl1M9fv8lhMaW+KJrWAlcY08=; b=BnPfs31U2NR8sVfKH3
+	vBzkaPOug8/yiPReT6GoF7/OHxRbFqLWtf5OWJu2ynFPpvE2rboltJ+icKO8+xqp
+	Ir44IPqkLtmLPHAbUUbYEawY487LWQW12xODDs/iGCa2+vtBEMLhlyqPxx2e3SqI
+	qH+lM4oUj1Ykbb0ayEiEm4EFM=
+Received: from colol4bi5.localdomain (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgDHAXX8+9Vqx8LGAg--.64238S2;
+	Mon, 19 Oct 2026 19:16:13 +0800 (CST)
+From: Binbin Deng <18983559317@163.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@intel.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Binbin Deng <18983559317@163.com>
+Subject: [PATCH bluetooth v1] Bluetooth: hci_core: Initialize IRK before publication
+Date: Mon, 19 Oct 2026 19:16:11 +0800
+Message-ID: <20261019111611.491779-1-18983559317@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PCgvCgDHAXX8+9Vqx8LGAg--.64238S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KFWkKryDJry7Cw15uF4rXwb_yoW8Kry8pa
+	9xZ3Z3ury8KF15Ar1UKa1xu3Wrt3yvvFyUJ3yq93yS9Fn0q3Wvyw43CrWUta4furW8KFn5
+	XF4FvryvgrnrurDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRx9N3UUUUU=
+X-CM-SenderInfo: jprymmytvvmjmrxbiqqrwthudrp/xtbC3x1OMmrV+-1qlAAA35
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221722
+hci_add_irk() initializes the identity address and address type of a newly
+allocated IRK, publishes it on hdev->identity_resolving_keys, and only then
+initializes its value and RPA.  RCU readers such as hci_find_irk_by_rpa()
+and the debugfs identity_resolving_keys_show() can traverse the new entry
+during that window and see a zero or partially initialized IRK.
 
---- Comment #2 from purpleritza@gmail.com ---
-Update from the reporter: I can no longer reproduce the silent mSBC microph=
-one
-on
-this machine (0489:e111, kernel 7.2.8, BT firmware build 20260605184935).
-With HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN still applied ("HCI Enhanced
-Setup
-Synchronous Connection command is advertised, but not supported" is logged),
-recording from the headset mic gave real signal in both profiles:
+The race is reachable by racing an IRK addition with another CPU resolving
+or dumping IRKs.  In particular, userspace can issue MGMT_OP_LOAD_IRKS
+while another process reads the corresponding debugfs file or triggers RPA
+resolution.
 
-  headset-head-unit-cvsd  max -16.5 dB
-  headset-head-unit       max -18.3 dB  (mSBC)
+Initialize the IRK value and RPA before publishing a newly allocated IRK.
+Existing IRKs remain published and continue to be updated in place.
 
-The call failures I see now are tracked separately in bug 222151 (BT firmwa=
-re
-20260813113236 regression). Leaving this open since another reporter is
-affected
-on 0e8d:e025.
+Found during a static-analysis-assisted audit: candidate sites were
+surfaced by a Coccinelle rule, and the reader/writer paths were
+confirmed by LLM-assisted (GLM-5.3) code inspection.  The issue was
+not observed at runtime; it is identified by code inspection only.
 
---=20
-You may reply to this email to add a comment.
+Fixes: adae20cb2d20 ("Bluetooth: Convert IRK list to RCU")
+Assisted-by: GLM-5.3 coccinelle
+Signed-off-by: Binbin Deng <18983559317@163.com>
+---
+ net/bluetooth/hci_core.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d183efaf9063..6d6d4eb1268a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1315,9 +1315,10 @@ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			    u8 addr_type, u8 val[16], bdaddr_t *rpa)
+ {
+-	struct smp_irk *irk;
++	struct smp_irk *irk, *old_irk;
+ 
+-	irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
++	old_irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
++	irk = old_irk;
+ 	if (!irk) {
+ 		irk = kzalloc_obj(*irk);
+ 		if (!irk)
+@@ -1326,12 +1327,14 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		bacpy(&irk->bdaddr, bdaddr);
+ 		irk->addr_type = addr_type;
+ 
+-		list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
+ 	}
+ 
+ 	memcpy(irk->val, val, 16);
+ 	bacpy(&irk->rpa, rpa);
+ 
++	if (!old_irk)
++		list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
++
+ 	return irk;
+ }
+ 
+-- 
+2.43.0
+
