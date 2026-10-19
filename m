@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792422608;
-	b=sdkNwV7ZktrhmzQzq/kxBlIV4Sq2AW9o8yKPsUGc+ht9Oxvq48664CdWrJAVyMhf4bID
-	 V8/15XW25h2Zuiheaz8rPpBNdaBcQIV/NsKKdxY9opkf3LhyVOCfkjNeemojwZF6Dn0ig
-	 f5jYo2TcZBcVx4X1QajSG9EBAFaEJaKbN56p+Z0+ilq+4CylCjEpXQmkpBmghhi2vsy0H
-	 4L22So8DZ1PSWiUXzVZWyYlAipXef4jhGQ9yCAmaiOfn7AU4kF7vY0K5AqwiuPUzVYGuv
-	 Mj/KslH3S9Rpqm4kPm3qGSn6878ulJTxojxYoVQgJ2s81F9NN2d3Y+iap8yeYyfb99A==
+	t=1792422609;
+	b=tG8VoBFObGOY8E3NR9aY5DFmXedYGNLMjrTBIENzu+u9K17YQ5uqhR6xpkEuI4c/z/2H
+	 OxTuBIOYkJ6m3mRKEP3t/xo8Fj1XWZbQTxBNupzCwVniBLmmFd9jDKGtC+1LigZpYLKxh
+	 jk5Hes3pux8SzmGtQRIhv70u8KQPgzj0ZgLQ0DNE2a5AczE4xEO2W7v4hzvOrgudsbQuu
+	 2UUIFjvGQD18sD2yiRQ3nn3HmvBXySfJLN8parABwBhepijiP4aTPFZIKxjkQPh4BertD
+	 /E5Nda++dbrrXDAYE/eM1rNvobuEjOzCOJR1vKS3DO9BHOo1s6OlRop+u113aw6PYbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792422608;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792422609;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=PekFIsdLnYFlVmekJP0LZM8Uloi2ca7B572+nKMwfQo=;
-	b=JEZdGjmIGIOpRsKHbTF3ryGfF8WuCwAIYjjy3ob5zsNUq+wIEoUujtCQ06xNFOKOemK1
-	 pdMT40cdGr5Ds2/Qe+mK8Ftd+FpgvDcbc0xygSGCXRYIotn61VUaINx0bDWFDVo3X5qn/
-	 MiNZHMeWNfLJSmP7jIbtUThGXQ4AXOa5N0z6fdM/jd3S8RR/ifGpmZGXsYuvXyIpCD77w
-	 FGRzCaGCMyz05e+PJx3YNFaK9ojckF8tfA1xKNH33V62PN7oYhQxI1hJQ2vp/rFVrQsxB
-	 cOoph6g/JD4tYWxBWcsBfiOBsYkC5A1wI0SmvN24pCQ8Deu9OmXbWqamh6oPySFanCg==
+	bh=C2Fl+9VX9kusd3ElsXihmTd7vyfOMPR9tkZ862j4eI0=;
+	b=GH7woqHmZ+U98zHL26Zvw/XsBh5uQX03+iR1ZQ+2DxuRqOIKVcfijwr7NICCOlYgv2Ft
+	 a3rm+t9dMvAb5Uetr8hBkP34ZHcH7CEDetiT/922fWvf1qnuwlpQxEvF18NPdTHEIo+uR
+	 wkxSoyhqG0mCrVqX7R+vPlaUps9eN/osAD5jEMvxroTHvbxXxpcDSOIPsYOV14bvRn9sA
+	 Y266pJy6adVWG0b6Ds/0GrYO86MMZjwYciaMMg0vp1/wrTdOztKKaqcHRfrHBSv6qtUVT
+	 xwxiQ5xgUUjM8NHcaURZDUftIGJYn+ILu6Do5+EgHPmbD5nwrATMmV3NJnjOo08M5wg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ga7EhEzK;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JqTEyFVq;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08C06088290
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 15:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DD76088291
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ga7EhEzK
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4251E1F000C4;
-	Mon, 19 Oct 2026 15:10:07 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JqTEyFVq
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1FD1F000C4;
+	Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792422607;
-	bh=PekFIsdLnYFlVmekJP0LZM8Uloi2ca7B572+nKMwfQo=;
+	s=k20260515; t=1792422608;
+	bh=C2Fl+9VX9kusd3ElsXihmTd7vyfOMPR9tkZ862j4eI0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Ga7EhEzKin1nleFXgnUc8ve4kheHZL7ezYn5IRxntTYJLKGkmU99prav1WnRL9Dvo
-	 Bumo96Eizk8AlEX6AvhcGDmCJAlFuhvzLYqHkyL+dHwE6VQKR/xk0MaRa7Q/G2+Z8I
-	 eEQHv2/Wjs2x+R2gCxSHZsUJDNzm+z1Ly4i0xNfGFQMXGB2dqzp7WmdoHhAXjckKCk
-	 Oj8MwRQwqca8RJ+VR6zdp/K39vp5BcuVq4OeXpKcWWZfzCQwotJTpKc0lmqfHfjmAh
-	 OvI8GROTcTUBBpDD9ozW9c6FShocLRope2o/jBvVZQyZZY3nWO2TQXIZ/UXriWPV3U
-	 z3xdf1SWSHGEw==
+	b=JqTEyFVqio+BqhmtDLZKEo26M5b0oNtBSUwCBh1ArYjOdNSDODYpJB0CD4PQKKAak
+	 PAA18QEfQev2+GAOT4UHUAGZANfloCzS8OoyECLUvfSV0vlvOf7urEwXMu0d1uOih3
+	 bRsxuUVid41flgx/zuLC/nNYc5Stre9+Y90XaLMklLIVoQn3DJf/4E+AS09862Xlp3
+	 wxUid+YdKuTo3TP1gXJrArdY01HUdhpiKdTC4Gq55i8sY5Wn1Ls3TZ3yhCDPa/Gfv+
+	 EyBEtxLBYQspoySMNpVurIz7hehUn5XqYenRpBxp0MmwMZWMi52z2jRxKZR2ItUf4K
+	 K5DNwKWgsswdQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A26F3811A71;
-	Mon, 19 Oct 2026 15:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B445A3811A71;
+	Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,43 +54,36 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/2] Fix use-after-free in GATT client discovery
+Subject: Re: [PATCH BlueZ RESEND] monitor: Fix legacy SCAN_RSP PDU type names
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179242260603.2707801.7989097154493120709.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Oct 2026 15:10:06 +0000
-References: <20260930093928.360745-1-altomanigianluca@gmail.com>
-In-Reply-To: <20260930093928.360745-1-altomanigianluca@gmail.com>
-To: Gianluca Altomani <altomanigianluca@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <179242260727.2707801.480049428181551124.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Oct 2026 15:10:07 +0000
+References: <20261019041009.9720-1-kevin@simpleble.org>
+In-Reply-To: <20261019041009.9720-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 30 Sep 2026 11:39:26 +0200 you wrote:
-> bluetoothd crashes in discovery_op_complete() when a discovery of a
-> connected peer's GATT database is cut short, e.g. because the link
-> drops mid-discovery. Two separate bugs leave a freed service in the
-> discovery's pending_svcs queue, and each patch fixes one of them.
+On Sun, 18 Oct 2026 21:10:09 -0700 you wrote:
+> The names of the two legacy scan response event types are swapped. A
+> scan response keeps the properties of the advertisement it answers, so
+> 0x1b, which has the connectable bit set, is the response to ADV_IND and
+> 0x1a is the response to ADV_SCAN_IND, as listed in Core Specification
+> Vol 4, Part E, 7.7.65.13, Table 7.1.
 > 
-> It reproduces by connecting over LE, reading one characteristic and
-> disconnecting about once a second, with a peer that answers the
-> remote's GATT discovery. Each connection is short enough that the
-> remote's discovery of the peer is still running when the link drops.
-> On 5.72 bluetoothd crashed on the 15th connection in 4 runs out of 4.
-> With both patches it survived 381 connections in a row. On 5.83, 50
-> such connections crashed the unpatched daemon within the first minute
-> and pass with both patches.
+> Fixes: e29ef3b85116 ("monitor: Add LE Extended Scan commands decoding")
+> Assisted-by: Claude:claude-opus-5.5
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/2] shared/gatt-db: Always notify service removal
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6cdb936ebb6a
-  - [BlueZ,2/2] shared/gatt-client: Fix double-queued service
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a338533f913b
+  - [BlueZ,RESEND] monitor: Fix legacy SCAN_RSP PDU type names
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e348529cf4d
 
 You are awesome, thank you!
 -- 
