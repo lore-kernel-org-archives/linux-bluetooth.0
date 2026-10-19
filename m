@@ -1,112 +1,103 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5AC424D57;
-	Mon, 19 Oct 2026 09:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10651483823;
+	Mon, 19 Oct 2026 10:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792402214; cv=none; b=ez20cYLQkZyUtBLkvQ8p2ioLTMzSHZAaRsDOBbT7EHyY1n8ZxJHwkjAk82SPZmjwPIs2AWkmhLsvp1xwyN0cZYzHuGCWg6ps4zEBck5VzUMyXyAa+yvPR6C+n6tEcVHehSnZQQNXoF8bvNW+Pnzs+lrBcIPIIhB6kLN6tD6Ceto=
+	t=1792407407; cv=none; b=Xf9AWNr9XTIN5yCAA1SmHjIuocQkX5vICoP5FtAtWXo5xG26ocwFxBfLSuVI33CmqaN8/TLmBgcDP2FAr9jWRFyCo2jhGLJTRU3JaaP7wanVcgj4Oflngx03kd2pgiIhrQ565NfQyeEIOixG5G6rUR7mW6hC48TdLIVqiCH6cuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792402214; c=relaxed/simple;
-	bh=8fBAGo4l/9XbYvwi9LyJpj3fBw8t2XOPo3O+d8F89k4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQKVrw8XdpvwwEGTabsJchKNt2zWbmLs1GP6ajZ75gotPh02K869IZqseiw5inkFQY3VJTHA360RyBcvXg1IFozEzRcmFEsZyiqNEXA1BwUUTzL4P7LYHoJjRjK0ZAmZ67dRmi+W9MgYFQS7op1r/41zAwVObEJP2F0aBiskifE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256:X25519MLKEM768)
-	 (Exim 4.100.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1xIjh3-000000007Hk-0bIc;
-	Mon, 19 Oct 2026 09:30:09 +0000
-Date: Mon, 19 Oct 2026 10:30:06 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Nikolay Bryskin <nbryskin@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Hans de Goede <hansg@kernel.org>, linux-bluetooth@vger.kernel.org,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: Reprobe QCA6390 after hibernation
-Message-ID: <atXiYxot6UZ3MDrp@makrotopia.org>
-References: <20261017174310.22484-1-nbryskin@gmail.com>
+	s=arc-20240116; t=1792407407; c=relaxed/simple;
+	bh=1PM13OG7boptdV27S1KX5P/taAqG86KVUt56BO4CQ+s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AL3VjFiNLq9eZ/ikgxotWKL9J2zmB6apMv1l4Ll1wZ/LD7K1vUek0r+Xha6bbNJdiD7oU5YYLLACCbYDNEtXvGq4ZSuPBfSNePPOn7Xy3M7pH6E7HCkdSj36TgDHps7cG8ljJafC5TYEMQSfFxC8+a99gIDO/CSlZZnDtJeGM2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=BVCZ4Hz4; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="BVCZ4Hz4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=6a
+	iuWIc4kKOUC22IXyBQ8F2KwrWIr6kv4uHizyQhXlw=; b=BVCZ4Hz4pvHwTCTGvL
+	cL/Ikvy3zoeb8Xox5THHY5aum0YP1zIxlp/rZVLeZ4qMpXmF5fFSPMnr2T2f6QSN
+	CfNYdq8Az7m661BXtrv+AD685ovC+xYMgv4b4eRQy7bjmB6gNnsyxfsS681uLnDh
+	+1e7cG4kZHnoAXLm0UwVoK1hw=
+Received: from colol4bi5.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wDXX3Va99VqTTXJBA--.63914S2;
+	Mon, 19 Oct 2026 18:56:26 +0800 (CST)
+From: Binbin Deng <18983559317@163.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@intel.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Binbin Deng <18983559317@163.com>
+Subject: [PATCH bluetooth v1] Bluetooth: hci_core: Initialize LTK before publication
+Date: Mon, 19 Oct 2026 18:56:24 +0800
+Message-ID: <20261019105624.489859-1-18983559317@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261017174310.22484-1-nbryskin@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXX3Va99VqTTXJBA--.63914S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Zrykur1xur4DAr13Gr4DArb_yoW8Zr1rpa
+	9xuas3ZFWqqw4UAr48Aa1xua4rJw4kur17Gr9093y3Zwn5tws29w4Yyr4qg3W5urZ0y3WY
+	qF40v3yIgr1qywUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRx9N3UUUUU=
+X-CM-SenderInfo: jprymmytvvmjmrxbiqqrwthudrp/xtbC4BokCGrV91ofRwAA3c
 
-Hi Nikolay,
+hci_add_ltk() publishes a newly allocated LTK on hdev->long_term_keys
+before initializing its address, type, value, authentication state,
+encryption size, EDIV, and random value.  hci_find_ltk() and the debugfs
+long_term_keys_show() traverse this list under RCU and can therefore see
+a zero or partially initialized key before those stores complete.
 
-On Sat, Oct 17, 2026 at 08:43:10PM +0300, Nikolay Bryskin wrote:
-> +static void qca_reprobe_work(struct work_struct *work)
-> +{
-> +	struct qca_reprobe *reprobe = container_of(work, struct qca_reprobe,
-> +						   work);
-> +	int ret;
-> +
-> +	ret = device_reprobe(reprobe->dev);
-> +	if (ret && ret != -EPROBE_DEFER)
-> +		dev_err(reprobe->dev, "Failed to reprobe device (error %d)\n",
-> +			ret);
-> +
-> +	put_device(reprobe->dev);
-> +	kfree(reprobe);
-> +}
+The race is reachable by racing an LTK addition with another CPU looking
+up or dumping long-term keys.  For example, userspace can issue
+MGMT_OP_LOAD_LONG_TERM_KEYS while another process reads the corresponding
+debugfs file.
 
-This is the pattern hci_h5 and iwlwifi use today, and it has the same
-two problems, which the series at [1] addresses with a driver core
-helper, device_schedule_reprobe():
+Initialize all fields of a new LTK before list_add_rcu() makes it visible
+to RCU readers.  Existing LTKs remain published and continue to be updated
+in place.
 
-- qca_reprobe_work() lives in hci_uart.ko and nothing pins the module.
-  The work runs from thaw for the whole re-probe, firmware download
-  included, and an rmmod of hci_uart in that time frees the text it is
-  executing as well as the lock class key INIT_WORK() placed in module
-  data. On a lockdep kernel the latter ends in an oops; we reproduced
-  that with the equivalent iwlwifi work.
+Found during a static-analysis-assisted audit: candidate sites were
+surfaced by a Coccinelle rule, and the reader/writer paths were
+confirmed by LLM-assisted (GLM-5.3) code inspection.  The issue was
+not observed at runtime; it is identified by code inspection only.
 
-- device_reprobe() runs whatever is bound by then, so an unbind between
-  thaw and the work starting is undone.
+Fixes: 970d0f1b2803 ("Bluetooth: Convert LTK list to RCU")
+Assisted-by: GLM-5.3 coccinelle
+Signed-off-by: Binbin Deng <18983559317@163.com>
+---
+ net/bluetooth/hci_core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-With the helper the work item goes away entirely, and qca_restore()
-becomes:
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d183efaf9063..9500da51af85 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1297,7 +1297,6 @@ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		key = kzalloc_obj(*key);
+ 		if (!key)
+ 			return NULL;
+-		list_add_rcu(&key->list, &hdev->long_term_keys);
+ 	}
+ 
+ 	bacpy(&key->bdaddr, bdaddr);
+@@ -1309,6 +1308,9 @@ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	key->enc_size = enc_size;
+ 	key->type = type;
+ 
++	if (!old_key)
++		list_add_rcu(&key->list, &hdev->long_term_keys);
++
+ 	return key;
+ }
+ 
+-- 
+2.43.0
 
-static int __maybe_unused qca_restore(struct device *dev)
-{
-	struct serdev_device *serdev = to_serdev_device(dev);
-	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-	struct hci_uart *hu = &qcadev->serdev_hu;
-
-	qca_resume(dev);
-
-	if (hci_test_quirk(hu->hdev, HCI_QUIRK_NON_PERSISTENT_SETUP))
-		return 0;
-
-	return device_schedule_reprobe(dev, 0);
-}
-
-It may be called from .restore with the device lock held, runs on
-system_freezable_wq as yours does, and its request is cancelled if the
-device is unbound, removed or its module unloaded before it runs.
-
-Would you be fine basing your patch on it once it has landed?
-
-
-[1] https://lore.kernel.org/all/cover.1792203271.git.daniel@makrotopia.org/
-
-
-Cheers,
-
-
-Daniel
