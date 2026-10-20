@@ -1,49 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792422609;
-	b=tG8VoBFObGOY8E3NR9aY5DFmXedYGNLMjrTBIENzu+u9K17YQ5uqhR6xpkEuI4c/z/2H
-	 OxTuBIOYkJ6m3mRKEP3t/xo8Fj1XWZbQTxBNupzCwVniBLmmFd9jDKGtC+1LigZpYLKxh
-	 jk5Hes3pux8SzmGtQRIhv70u8KQPgzj0ZgLQ0DNE2a5AczE4xEO2W7v4hzvOrgudsbQuu
-	 2UUIFjvGQD18sD2yiRQ3nn3HmvBXySfJLN8parABwBhepijiP4aTPFZIKxjkQPh4BertD
-	 /E5Nda++dbrrXDAYE/eM1rNvobuEjOzCOJR1vKS3DO9BHOo1s6OlRop+u113aw6PYbQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792422609;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=C2Fl+9VX9kusd3ElsXihmTd7vyfOMPR9tkZ862j4eI0=;
-	b=GH7woqHmZ+U98zHL26Zvw/XsBh5uQX03+iR1ZQ+2DxuRqOIKVcfijwr7NICCOlYgv2Ft
-	 a3rm+t9dMvAb5Uetr8hBkP34ZHcH7CEDetiT/922fWvf1qnuwlpQxEvF18NPdTHEIo+uR
-	 wkxSoyhqG0mCrVqX7R+vPlaUps9eN/osAD5jEMvxroTHvbxXxpcDSOIPsYOV14bvRn9sA
-	 Y266pJy6adVWG0b6Ds/0GrYO86MMZjwYciaMMg0vp1/wrTdOztKKaqcHRfrHBSv6qtUVT
-	 xwxiQ5xgUUjM8NHcaURZDUftIGJYn+ILu6Do5+EgHPmbD5nwrATMmV3NJnjOo08M5wg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JqTEyFVq;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DD76088291
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792463945;
+	b=4RXoHzEt1IBjm0skWv1DpUzgoUWTBFjrSy4TsIXtzHwS3ipK4mWlHiDeyo9kFhCsFkhA
+	 nvlgHStAbqYPF+5dIl2ZmCmfgvtmYlo3w0RSaQ/U2B3lI25tEm5qZP2E2xq3FJ3kFOozt
+	 yqXwtnXT/hVJIqs7qqvJtBRHHkJmrs4h+K6H+YO6MJh+fe3Katm/zwJxf8SYJVsMxODYM
+	 sipjeq6GI3CDMJs2Cg8lTJcu43hrujl8hhEBOV30YwagBhQe3yQPqqFEhUPqMmRhvEJQa
+	 aQ5uNGTmMdIaDKoe+Fga4DLsE7Ny0jRDfRv0z2N2FnuzXLGyMxrnXPczSF7dPEugsHA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792463945;
+	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:Content-Type:Content-Transfer-Encoding:X-Bugzilla-URL:
+	 Auto-Submitted:MIME-Version;
+	bh=s8m/JDyg/lYow1mybC0XEOTp+msATD8Tuuahtq8Vsu4=;
+	b=jOORTfJdmMUVRNmdrk8mA0gXkgosir35Z3cfhFxzVcTy3qx5axt/wOP9bSfInd98IlZu
+	 dheAH+SGdtvptBTnmILGhqMcXJWsyGxMKvgBwd3/vDZlhujAtGs2OtoshbTrLsk4o/+Ek
+	 zghm6neL/9UYjQTSZMguJLr+soN9CfUmcGj/2Vtx1pvfGiy0EqZ60eLyY9fEyXjFELb89
+	 QbOX4pap7MYjkJRIIu8ICHhZgv7FKXTjxKrQb4ub1cywLezr9CGV8FC1WMcU9acvQY9bo
+	 MSG3aeAjQLGhQSoEUcqPGJeXpK51TpquIshqSx4cKDaMT/wFDZmlz1Y6YoqsL1ax5Ig==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b="ZwNd+TV/";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0336A606A319
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Tue, 20 Oct 2026 02:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JqTEyFVq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1FD1F000C4;
-	Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792422608;
-	bh=C2Fl+9VX9kusd3ElsXihmTd7vyfOMPR9tkZ862j4eI0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=JqTEyFVqio+BqhmtDLZKEo26M5b0oNtBSUwCBh1ArYjOdNSDODYpJB0CD4PQKKAak
-	 PAA18QEfQev2+GAOT4UHUAGZANfloCzS8OoyECLUvfSV0vlvOf7urEwXMu0d1uOih3
-	 bRsxuUVid41flgx/zuLC/nNYc5Stre9+Y90XaLMklLIVoQn3DJf/4E+AS09862Xlp3
-	 wxUid+YdKuTo3TP1gXJrArdY01HUdhpiKdTC4Gq55i8sY5Wn1Ls3TZ3yhCDPa/Gfv+
-	 EyBEtxLBYQspoySMNpVurIz7hehUn5XqYenRpBxp0MmwMZWMi52z2jRxKZR2ItUf4K
-	 K5DNwKWgsswdQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B445A3811A71;
-	Mon, 19 Oct 2026 15:10:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=ZwNd+TV/
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE67A25771
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 02:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792463944; cv=none; b=tLQcb93ry+IcidAiqPd/LqdfGtKqIs9dnD753pywdhtslKMh+1GMayHVth70V8/UotNc/tOcyFjQ+jNlcwc0uJnLFYDmXcIRLLzsHK79+JNqLAA3l/AsQaw4RHZOi8d8NA//e0PvO7flwVjkmVKilKUmX0S8UH9bP04TydE8LMk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792463944; c=relaxed/simple;
+	bh=ZasHqLZGE1ZbO2RBunseJtyWSkggCP1BZC7yqBoso64=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=UUTvE4UEZY3nELSrraxPwpCrxtRP9vCytaMwXPbgInU2ZlDFQUu4tZubLDLCM72V8ZOF8wGew1qlUrmnPyXX6CsSIrhdDy48NLYiyL/rXdYsAgKGXC7NxGLs998FG34oBX1vRP/n+bilXyboKlnEBtP59vtYL6udwtm6BHjJX5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwNd+TV/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4488CC2BCF4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 02:39:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1792463944;
+	bh=ZasHqLZGE1ZbO2RBunseJtyWSkggCP1BZC7yqBoso64=;
+	h=From:To:Subject:Date:From;
+	b=ZwNd+TV/iFP/hZsmstuKSoIjvdDeQTpXEGxZdzfBTcC3aLKWp2IdYEq68PG3DH2+0
+	 khkCSCEtX6wWFxTD/cudp2xUeyFg7qNkUzhqh/1rpcKr5Yo4flJqCD/PLRP3go+4Pj
+	 X0FwmDjRcEYugWlykl6k5ODhUEUJGsWkgHJC2inWN5ZHego6FesqiWbTks8gjdHaVx
+	 6FWhlh7SYBsGj/yJp8YipogDSdgiQtV3p7AYvAgeU2gsU/+6zdKFJBGst75R3EOhci
+	 KcjM8XOd8EjmUu/AsYQGcP8+GpyukRHObe6K85KYNY1qswfjZVUh/RZV+dsxmxquSk
+	 ItEPzYNdAgpVQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1CDFDC4160E; Tue, 20 Oct 2026 02:39:04 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 222157] New: Macbook 8,1 Bluetooth Fix
+Date: Tue, 20 Oct 2026 02:39:03 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: zach.robinson2e@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-222157-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -53,41 +92,46 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ RESEND] monitor: Fix legacy SCAN_RSP PDU type names
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179242260727.2707801.480049428181551124.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Oct 2026 15:10:07 +0000
-References: <20261019041009.9720-1-kevin@simpleble.org>
-In-Reply-To: <20261019041009.9720-1-kevin@simpleble.org>
-To: Kevin Dewald <kevin@simpleble.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222157
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+            Bug ID: 222157
+           Summary: Macbook 8,1 Bluetooth Fix
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: zach.robinson2e@gmail.com
+        Regression: No
 
-On Sun, 18 Oct 2026 21:10:09 -0700 you wrote:
-> The names of the two legacy scan response event types are swapped. A
-> scan response keeps the properties of the advertisement it answers, so
-> 0x1b, which has the connectable bit set, is the response to ADV_IND and
-> 0x1a is the response to ADV_SCAN_IND, as listed in Core Specification
-> Vol 4, Part E, 7.7.65.13, Table 7.1.
-> 
-> Fixes: e29ef3b85116 ("monitor: Add LE Extended Scan commands decoding")
-> Assisted-by: Claude:claude-opus-5.5
-> 
-> [...]
+Created attachment 311195
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D311195&action=3Dedit
+macbook8-1-bluetooth-linux fix
 
-Here is the summary with links:
-  - [BlueZ,RESEND] monitor: Fix legacy SCAN_RSP PDU type names
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e348529cf4d
+Built-in Bluetooth working on MacBook8,1 (Ubuntu 26.04, kernel 7.0.0-38):
+BCM4350C0 via hci_uart_bcm at 3 Mbaud. Four stacked issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1. DSDT: URT0 has two children, SSDC (apple-uart-ssdc) and BLTH (BCM2E7C).
+   serdev attaches SSDC first, so BLTH fails with -EBUSY. Workaround: remove
+   SSDC via a DSDT override (the mux Lukas Wunner described in 2017).
+2. LPSS UART (8086:9ce3, 8250_lpss) using DMA from dw_dmac_pci (8086:9ce0):
+   TX never completes (tx:0 in /proc/tty/driver/serial). Blacklisting
+   dw_dmac_pci forces PIO and TX works.
+3. BTLP(0) only sets GD54 as input, leaving the BT_WAKE line floating; the
+   chip stays asleep with CTS low. Workaround: make BTLP a no-op.
+4. The chip needs ~3 s after BTPU before it answers reliably (it emits a
+   ~167 KB burst ~2 s after power-on). Workaround: Sleep(4000) in BTPU.
 
+The UART mux (GPIO 36) already defaults to Bluetooth, and the 3 Mbaud from
+_DSM is correct. Full write-up with the DSDT patch steps attached.
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
