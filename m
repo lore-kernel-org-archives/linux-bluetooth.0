@@ -1,99 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.47
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792504674;
-	b=xEVDNNsPxfdgTBGLra5LLFovtVA1EszSROBfOG7WShg/gcK7sNkOax5CXTSAjS5XG4Ox
-	 720bPUxy4KpFyYBf+5xG2sP/Lip54QjzIhKtgLWgTvhZ9dkIUHd5npvnRHZecJl3rek6Y
-	 d1uISXpZPW/z/uM9rqwFwfRTugITasSd44v+Yf34opwZvzRgWhV5oPXUm7TNMFICETwEF
-	 gZuyEC4xs2WzjCab5DvW9k9R99f6LVWwucDLl21VJ4CLmUANiUQvC+ELlZuiBiIjjUSS2
-	 1bv+Dg1XZNK8MoJMMfdqSZ4rKkllVgAmvaYHc1Bg/3n/u+9qw+ALhshJ7pfv7DWJB4w==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792504674;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=0bBUx2eE/ZkBTMkp0dS9VbqTbGpxHTgvOCLFluNS2rk=;
-	b=HU3CMCJfFdK7E/2GzHJmIzsoepZz5cG3FFVzvsZCK51Mau7QPHG5kleenjyqHkdwXzbz
-	 6sNH7BpCV3e1Zx7lHnwKpU8faxIXA+3KLG2X9/ZMmUQ4muj1TIiD71CrYMTBcp1cWyqKE
-	 uOsX2U79SGw/IiD6qDa1hddPaltup0K4QGMZ8G9U/1ygSLWOEBtg/RNKzSVOClbF0Qa0r
-	 Rpu8unV6qOgr5fWb3pG77rYH+qP5mzZJdwIRVFD2xqK6C2KyOLfVBp9Th3LLpA2g0hnQQ
-	 tDJy1A+iErTwFzqhYlrAJ5VCrPffffOQmXyqfCeoZgnDoe5RA8Iz534/IGk+gZylBbQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=kgKb78CX;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.47
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.6.128.32
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792508017;
+	b=ULglVoTfJywuLy9L+G5FPCBFmC4mQzuPbiArWMeyHo0EueLrA63uD+9Fh7hLCn5NBOls
+	 1RYtp4ffcchyya+50+TupfL9T+lEeRQd1di34xxaGcvYs7maR9URkn6DyQEuHkS2inXpM
+	 Zlbv4qlO6t9UPE8QPZy8YUBuaCoRlusuenWKuFm+dg5S9Gix0gjgRGhzfXheOl0bkhcHh
+	 BkbRAzLCGLCj60W1S9dDMuxML6TeHEASjYSbTeLiYyWyo+dzZqhe8k1iJHf7hdoEdDSHC
+	 mt/GzLzSkShDyUQvgpf+iLC11cW/nd8FxXaaxwo4N7POywHV79RqCK6AtKWUwCU30qw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792508017;
+	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
+	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding:References;
+	bh=tTpV3ZIkgJtv86shuF+ZrfY4iEvhyoMN0YOMU7pRAGI=;
+	b=vm4+bWdN1AmdGQ0sNE9kJVBJsPgZDTNCYF2YT6y9MQDt3gPeq/esLC7Nvg1ItXvHLGN3
+	 Ms4gJT4VI9CW1Zio4hPuvr7m7h/1hKkR5pU9JVHh9cIssDtt52jHVeKNQ1HV4fkJccEo+
+	 nN8OdBn7xChBNB3F04Nfyct60RS2PnQCUIqgw/P+OVQndTSIWhA7PH4kUmVTSDOoOp+1+
+	 YtbjowNP1ZZYGHcwRHnpBUUqmu7RFtjzdvvJHom2+L9eN/eQmZ9WsQStxUuOnm0ddOjKJ
+	 yckUGtQMjTBJiPJB99pQZlskgB+RuHaT/Bow3GBwXJKO06bF6/Tj64FigpHStoKxtOg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=yahoo.com;
+	spf=pass smtp.mailfrom=yahoo.com;
+	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=NQKFR+VW;
+	arc=none smtp.remote-ip=74.6.128.32
+Received: from sonic304-9.consmr.mail.bf2.yahoo.com (sonic304-9.consmr.mail.bf2.yahoo.com [74.6.128.32])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495ED606A322
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 13:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 495ED606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22C0606A32F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 14:53:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C22C0606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=kgKb78CX
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-67a000ac7efso568943d50.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 06:57:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792504673; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GZ/2//kevUeb4mjtUwtmgvxk+925WE/ZgtRXJaVjgcoO3hPe2J984HZoSKpAf+6DAO
-         u/Vszk/g8NGzccCH6Aw2c3xqaGCeH5BUrP7z6fm0glUi/4bBEOibkDcn3JMcy/Ch3B9o
-         ZdANZyYqaikXYL44d0qQtbS4iM5/1c35DRUyPrQeTlMv7zom3NVucDuzNfcBBus4Ifhz
-         UjyXnzF3+IRIsHZW4m2O0yDJuLXiCumUDIVGrNsWNwNimXbsoP8qSffHL4+2TjdryAKk
-         d6JwPxebnpLoENmpUMZALQCX0DMkhdfnlVnBzsq8iUU2Y18qMT7FdpMpLRYgvyvaNNXy
-         OVsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0bBUx2eE/ZkBTMkp0dS9VbqTbGpxHTgvOCLFluNS2rk=;
-        fh=r2/m4wYGyqkyR6RxAWv7O3n5xNNRFG2ggCMOs0AlOdE=;
-        b=e7VWCRDnPYFYrpStCQxxtbv2bic8OgE5Gdlr0EL63wGmQxGiN/IEdx7UHK8G2ULfTM
-         mab3E9EoL4zTX7VhVdpv/4s3gVgSVD+kL0Vx9NFrlBW1jpiw9LxeN8/7o6ZOl7ltiJjC
-         GFFAQk2j/7u9tmkLP94wy8IIyPkiAOmiYvuCVHNyi2XL9y8BSMmc1cDCdXsw6PVIGC52
-         EuMdsN87t9vgqS9ow1jEj2uZqLamd3chlZyAfZ7gAX4mA1b5M863cT86zXJFI4vvIikL
-         D1NP1b/6tf1S8v5jzImegw9ryjwDEStibdLY2qMP1uBqAaxU6qUYo7whv4BDdKj5G11f
-         Sc3g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792504673; x=1793109473; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0bBUx2eE/ZkBTMkp0dS9VbqTbGpxHTgvOCLFluNS2rk=;
-        b=kgKb78CXwLR/wUFx/aEzJRnqK97WBTvv8rgpG0XWQkpCh9hdSaES3sZy/rTICXJq5Q
-         etLfUoEnM3LaIm+pJWXJq3nuiySRLBNdGKW9MSPL7KTALXENNxkD+mS0HHHpay7fEN9a
-         3DAsFeTwV8ERO0ZtR/SPwyRZOxaW5bv/KWaDMQ0EWTbxNaf4R35bSmLm3M7TxFaRd701
-         iL1iq8edixbvWRLucjpQqPKsro3/VU7Zp654frm9VRr0w0MMXpGB73iSE44CGWkUgv/D
-         hey24mbZfyhZ+CJ40hnHF6H3kXZKNFLbYCJ5Qb9sQ7dmo5y0+6TQBbYD5bkXDnnCLsss
-         qnAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792504673; x=1793109473;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0bBUx2eE/ZkBTMkp0dS9VbqTbGpxHTgvOCLFluNS2rk=;
-        b=cckgCPjBFD+E3Jdr/TgOYS1m60DoTQ67mej+VuwGRr1kV2dd3EIBEPEDBZU7aNleZn
-         ynjPCMv2h3xYRG20lF5qNBsWeht02llrzBEI78WuBWPMqpz3Pqx1wjFoBmgjVm+mDW+Y
-         9yFa2i85ILY53QG0ZdnuCEiS//naCH6/WAvkn3KU1nvRYbkJZObjtuiJgyy5Tb9EQn9a
-         wcJ45twl7em5g1HS59uEjK3cCdLq/5CnE5cN0VOasLST7nFSjrNO2Oq0eWlbyCJtbuLS
-         XqYyHUCQwt4843A/zA7k5I1eMa7uozgW3Ii0fO6YwCK4ttuI2s8crsHfYIO5Xe5SZdDT
-         UnXQ==
-X-Gm-Message-State: AFq9FYIBpIhbrOVSL3OEuJz+pbwrZ416Zu/kin6aPRGs+stHvqunh2wF
-	32Du2sMpIW1XIHw23MkeS6Ao6rqFF9k+rRQwCFSuXDmk+/I1MXhfjjaYAYpKWdv24GPdvBd85GK
-	GXdueJ1uRA9xQ4BR1dZyOYZV0XyfEgC2CuQ==
-X-Gm-Gg: AYBFou3LCzum1lRp/UNZmDZM0pTZfXpJh2x8ETsiM8NLcd9aQDM9yV3DS1qlCsQVeNd
-	hcYk2vmG1rm+TL1ZKccD4p3KUsUiM0Qh5V36Na6AGUqTDCXb+0ADlx53oy8JIDu9GqYkE3Kr8sb
-	WSUypTW6TflZlm0PQ0rsEZu5FERXC0OhCDmVaOVPIdNgewg1oFcMFb1/39aEEezDNRW132qwDDq
-	7SyhlmnxckDx4e8Dkl+Imxtdync0/rS73TIt36v//YkkgakAVGbJGpGrZyS97JuhSF8d6yfb1LX
-	I9TAIStu8/f5csDGC2oxole5B0McZagaj47JK/Wz5llaBAFwL8G/2P9WPhesPA+jgp6GCU7iay2
-	F/p9UcHnLdhtRZToZlMl2aDVhYCGDVDHwT74Fvj4=
-X-Received: by 2002:a05:690e:b8c:b0:679:bfcf:a10a with SMTP id
- 956f58d0204a3-679ca8b6767mr3389469d50.100.1792504673062; Tue, 20 Oct 2026
- 06:57:53 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=NQKFR+VW
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1792508015; bh=tTpV3ZIkgJtv86shuF+ZrfY4iEvhyoMN0YOMU7pRAGI=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=NQKFR+VWIwSPtn9Z5Ugdhb6ky2Dl4V7AqDepHpWM3hud3kWK1GNvPhAr5qNdkOwPwZMnTTW53neIjU3ieRyOl+FBfnmVY9d8IlA/jbq45KqYM+XH5gPGB83zXFm9YExdVOd/45HiwYuq/Mm8kdX9ykMvSOi87U23i+S1QMH09f1Li/r/7fW5GjnT0Dx8Nh9Hrl0W4gLpgmoJRM9nEcTi3UDEKT7QWxKNZhJMW3zbX/5WJx99XP5lGCn2rgeMR8067Quz2mazx7piuOoesX4PfsX0nctIfDycF38tfS+mdrbXpkvMbW1xknq96zayzm4i0XJvBzlbGAfhKN1vRKmfMw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1792508015; bh=vI0rBTf8cJ2hsmTA6PqswkFo3F8kflvaSNzOCyG7+4d=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=DwcSqh2+ZA1APqIaPu+r51rjPtO3RqzJkJUuXjAb6IBJ4LzUyHowwPEVeGeKvdtRhcOlV0FxzSKFLI49SXLJZMRZYAeRKhFlgz3llfi1aUDq03VNEIItUAQWKZQaRBNxwZAtRuOa3APpqshxCDW13E2xnVCKUkgKacvN2M3qbesStqo0FEGhMTSRJdC2JsiIcA/gAKDntnLL49Ky7c8lEDICXeXyT7tmfDyDxuQcCFWWaE0olw4IcpVcbQIdvL+xJEemr3JDhc+nAk2RxtR3gyvhfCAVrkPqtb+/uoR9EKbO0QtGsjoWIuItkqu0ga0Sn82RZpUN5Wx76Kw1khSx7Q==
+X-YMail-OSG: TQSkQ88VM1n7rzeQw8D.UvLGJavorU_Du.ByD4XMtatAVdR874wHDUmgBQh7jZ0
+ phhFOsZ0dMrhaDDT3s0fYGfiM2.5phSNgaKNrtuWT97LfHbdIzhR6bdejQIYcNTGFsmliJarxstP
+ UUVQGkEz7xsa3XMP1pdLxPaFsxZJiYjWAqvoDdV13Rb7Sr.0tI94yZxULONP_xx95UuwC9RTQ9Ek
+ oaYN30FcPf81CH3hjtjFpNvoht4nyTjDMbTD9oj9hEo105KiubXYTzvhlGKQKsFzpIEapCB1o1eM
+ OVhytW9EsS2tLeow.pIRM7AbTbZzQPjgtIWwn72uamlN3LP2vRvdKFF0dqd7hBFzSCpX2YVdZ5Az
+ 480HQGphE54DthQ9Kz5IBpS904BlrsW6VFrkdJXDfJ7Y__Z.0_2ITm6ZVC2vv1isGFEwAKNiKOFf
+ dWHT0JORZQL9W.RtrLFoiD7KjMLff3Xxcu0Cbntq9hEUcytA31bdUDly3qVjAsRkPhX9OX1Le9L3
+ qscx2g1PPvhKv2d9THaAKQWQ4OJ0lFyaJLmEPUBL8wtHmp_CNOGCkUP2dmX4MEsIMGIPTw2ZNXnG
+ 2Wa_cvfOl_nm2HBkKvTJcahuB0tYf.35y1LBBEjleU_kbSbfF448xIlqyfUkKKayvGdSSF7FJase
+ kIEsY4lO.zkF4Zj1TmnHcXk.oRvdq.vNzrQRen19d8JN5fWvtq9ai_2ID0jo6mz1iPNnr2aCFyUG
+ FoUfAod7.bLQ.BOi_cf9NQPWFrls6VCu1l4_9Wsja_zZ_ssOxTxhIllgwm3ZapPVlEYogikEbRjh
+ _b2xSPZJy9SZjVM_u56bNI01CM590eo740cWOj_z9F2HBr2iP0wUIa7UfNBmtdpXS4gsaB8mtnf7
+ FIy2lWAvZUCg3JNo7xSOaeYUQun7XGOt2Avl97UnazEa7hG1DytrypMtJNXiIJkWVZJNPl6DDdKC
+ v686uoiJfA2YXeJ6BLz.9wJMt6h60d0hIjsP2Jn85IeMOVSZZGL26G8DzPhgiDuHXiY_GM0HwTbC
+ Ku7vtdvm5a05_7JkekZkKI6BE2uNgGCV7kV88nZGD35W.o.PBi6bj4VXtugeNFnEvm8hbkk_s8Q8
+ nZhiO7ArbAWt_8xBxEmFhHFpMlxLlqnWfabNi78huJWLIKHK2q_XXiM4Aw5xIudq99wU9cHcdvx.
+ rv0tpWVLGClLeBhh0EmK5Rm1ZVkQiMVdnnQWQ8VFVmo.miMHeqRSVxOyzHe9AeUYx9oaq2MIjtn0
+ fj0klh2UIUI5wfnkhNjzHEPRfnqsy9P.zz366Jq8txQq6M7grZ4vjhKGnpdn2klNdPJBXkkEoPMP
+ rB3WS40lRLvJ9wVtRTNzAJu3tYPK92gfrVLwmV_S68lXQROUptUrB1.12J0O5VXLt46Nvju2Ow9A
+ 4f2UKvhmiYkLn9gDWEsDnaWaCy5WTK6o8IMcg8C4cPdtNQPsBo2WccwySqLlEXSkp10RhxfE43Wq
+ Zcnsn5.GPC9i7GKdmvHMffxW2KeUwC77LLRIITh4NieRjxEuUzOlLqavHsjEW4HalblLeKNhBUCL
+ X38tAZvt1T6HoRNI4QZ2bm.pz7MpIQOOZ1rhPRvZrvz.so6xOi5BRo0OUxiBuq4t0RPFun3bqdag
+ NpEjfibtCGOYvwgAzxV4xnovuaNprLzL0wKRy0wZ9u6G2cuFMa2Fb7CCipRUil0J1wFN4.229MZY
+ jm5EjuNcdtMKFdTTtVd1naXqwvTrXA0DPsQlNGgsWOzol8PvViVMz7GTcWZx2j_lOyJCZVp8rpBs
+ 1EDhziDR258KQYjfG1_FxeTx0GVoORtBvs_7R4xoE5hyTciHyam645BWEbMJ7uuMEb5RhWlypbkD
+ w1QlrdzQrjoCsIh9rwyqq0S5xBsVVG5kiWuh0L6z5yD0IuCHpBNAs2wdN7BxNTXmFMbbeG266XRy
+ IaAQI8YAoijnvF8Zy7v_XgO7dRsa7bbMIWN3frgoi3rd9Jcgg3zXz0c7VYfBMPEkMT2KwzxOYCT6
+ 2twcOa1rWX7pgeL3gmtv5j1_nM9Bhu76uS.PbGV8qqn5VS95e.YJStIqqc8yV.N2FRPd8rk5CBxa
+ JomFIgn_Q0ML_fhNJUwDqlQqoUCSxcacFcMmY89GiGDc1X0Q0FwXHeCtOYM0Zbx5sdjSwhX.XguL
+ 7dvBtjwa_gSf1xqyNijBnPYkuFrmP.4vB9pm.kRlQIC9rP5GihG5AI43Sra6cdEDC9o4dnHW.meC
+ Iodw26L._ZWmco1yfhi5kmLJ6zYTmIbTVYLSD7iTRpJA-
+X-Sonic-MF: <deaner92@yahoo.com>
+X-Sonic-ID: ebd0a12a-f1e6-420a-94e5-4b5bc2139d0c
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.bf2.yahoo.com with HTTP; Tue, 20 Oct 2026 14:53:35 +0000
+Received: by hermes--production-bf1-6d6877594b-mcfwx (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 2a5d645ec72f5aa086fa0f54b124814e;
+          Tue, 20 Oct 2026 14:53:30 +0000 (UTC)
+From: Jeremy Dean Clifton <deaner92@yahoo.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hillf Danton <hdanton@sina.com>,
+	Jeremy Dean Clifton <deaner92@yahoo.com>,
+	syzbot+5897b3c764f5989ea942@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: hci_core: Fix queuing disc_work while workqueue is drained
+Date: Tue, 20 Oct 2026 14:53:20 +0000
+Message-ID: <20261020145320.115333-1-deaner92@yahoo.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -103,48 +92,104 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <BR2PR01MB9652538FB65DC582F4A6C4DE80BA672@BR2PR01MB965253.eurprd01.prod.exchangelabs.com>
-In-Reply-To: <BR2PR01MB9652538FB65DC582F4A6C4DE80BA672@BR2PR01MB965253.eurprd01.prod.exchangelabs.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 20 Oct 2026 09:57:41 -0400
-X-Gm-Features: AclHuK96ReI591QV3Nutj29CVAJs9ut-vTQkd22zo93tooHQ7s0nxSey9tq31bE
-Message-ID: <CABBYNZ+_sEVNwpyQ+b0rQyB-Bq=-yF2Q+u_HrKG1CqCx-Y8XOQ@mail.gmail.com>
-Subject: Re: Plans for Periodic Advertising with Responses (PAwR) in kernel/BlueZ?
-To: Schober Roland <Roland.Schober@hoffmann-group.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+References: <20261020145320.115333-1-deaner92.ref@yahoo.com>
 
-Hi Schober,
+hci_conn_drop() queues conn->disc_work on hdev->workqueue unconditionally
+when the last reference to a connection is dropped. It can run from the
+socket connect path while hci_dev_close_sync() is draining
+hdev->workqueue (e.g. HCIDEVDOWN racing with an SCO connect). Since that
+queue_delayed_work() is not chained from a work item already running on
+the queue, __queue_work() sees the queue marked __WQ_DRAINING, warns and
+drops the work:
 
-On Tue, Oct 20, 2026 at 5:33=E2=80=AFAM Schober Roland
-<Roland.Schober@hoffmann-group.com> wrote:
->
-> Hi,
->
-> I am building an embedded Linux gateway (NXP i.MX93, kernel 6.6,
-> BlueZ 5.72) that should act as a Bluetooth 5.4 PAwR advertiser,
-> similar to an ESL access point, serving a few hundred battery-powered
-> BLE displays (nRF54L15, Zephyr). The gateway would run the periodic
-> advertising train with subevents, collect the displays' responses,
-> and hand new displays their sync via PAST after a short connection
-> for pairing.
->
-> As far as I can see, neither the kernel (no PAwR HCI commands/events
-> in hci.h up to current master, no mgmt interface for periodic
-> advertising outside the ISO broadcast path) nor BlueZ (no periodic
-> advertising in LEAdvertisement1, no btmon decoding) support PAwR yet,
-> and I could not find patches on the list.
->
-> Is PAwR support planned or being worked on by anyone? If not, is it
-> something you would want to see, and in which shape? That would help
-> me decide whether to run the PAwR advertiser on Linux or on a
-> co-processor.
+  workqueue: cannot queue hci_conn_timeout on wq hci4
+  WARNING: kernel/workqueue.c:2352 at __queue_work+0xdb7/0x1370
+  Call Trace:
+   __queue_delayed_work kernel/workqueue.c:2617
+   queue_delayed_work_on kernel/workqueue.c:2669
+   hci_conn_drop include/net/bluetooth/hci_core.h:1729 [inline]
+   hci_connect_sco net/bluetooth/hci_conn.c:1881
+   sco_connect net/bluetooth/sco.c:375 [inline]
+   sco_sock_connect net/bluetooth/sco.c:764
+   __sys_connect_file net/socket.c:2166
+   __sys_connect net/socket.c:2183
+   __x64_sys_connect net/socket.c:2186
 
-I guess nobody is working on it, PAwR is sort of not used by profiles
-directly it seems like PA is by LE Audio Broadcast, I guess we would
-need to start with adding PA and PAwR to MGMT and then to D-Bus APIs,
-adding emulator support so they can be test automated.
+hci_dev_close_sync() already sets HCI_CMD_DRAIN_WORKQUEUE and calls
+synchronize_rcu() before draining, and keeps the flag set until the
+device is fully closed. Skip queuing disc_work while the flag is set,
+checking it under rcu_read_lock().
 
---=20
-Luiz Augusto von Dentz
+hci_conn_hash_flush(), called from hci_dev_close_sync(),
+deletes the remaining connections.
+
+Fixes: 525daaea459f ("Bluetooth: hci_sync: Set HCI_CMD_DRAIN_WORKQUEUE during device close")
+Reported-by: syzbot+5897b3c764f5989ea942@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=5897b3c764f5989ea942
+Tested-by: syzbot+5897b3c764f5989ea942@syzkaller.appspotmail.com
+Suggested-by: Hillf Danton <hdanton@sina.com>
+Assisted-by: LLM
+Signed-off-by: Jeremy Dean Clifton <deaner92@yahoo.com>
+---
+
+Notes:
+    Testing:
+    
+    syzbot ran its reproducer for this bug on upstream 90201351a862:
+      - without this patch, the warning reproduces:
+        https://syzkaller.appspot.com/x/report.txt?x=17940305580000
+      - with this patch, the reproducer does not trigger any issue:
+        https://syzkaller.appspot.com/x/bisect.txt?x=1714618e580000
+    
+    The evidence is the pair of runs on
+    90201351a862, where the same kernel crashed without this patch and
+    did not crash with it. syzbot's own retest on
+    58161ead29e5 (Oct 17) still reproduces the warning without this
+    patch.
+    
+    This patch is based on bluetooth-next (185c11232d5f). I built
+    net/bluetooth and hci_vhci for arm64 with CONFIG_PROVE_LOCKING=y
+    with no new warnings, and the same change also builds on x86-64
+    against v7.3. I could not run the reproducer locally; all runtime
+    testing above is syzbot's.
+    
+    Hillf Danton tested an equivalent hci_conn_drop() check in February,
+    together with a hci_dev_close_sync() change that is now upstream via
+    525daaea459f:
+    https://lore.kernel.org/all/694c9ee9.050a0220.35954c.0030.GAE@google.com/T/
+    
+    Tool use: An LLM helped me analyse the syzbot
+    report, compare hci_conn_drop() with the existing
+    HCI_CMD_DRAIN_WORKQUEUE checks, draft the changelog and prepare the
+    syzbot test requests.
+    
+    I made the code change myself and checked the
+    locking: the RCU read section pairs with synchronize_rcu() in
+    hci_dev_close_sync(), and hci_conn_hash_flush() later deletes the
+    remaining connections, so not queuing disc_work loses nothing.
+
+ include/net/bluetooth/hci_core.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8f32c860d492..c8cc25d35195 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1775,8 +1775,11 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+ 		}
+ 
+ 		cancel_delayed_work(&conn->disc_work);
+-		queue_delayed_work(conn->hdev->workqueue,
+-				   &conn->disc_work, timeo);
++		rcu_read_lock();
++		if (!hci_dev_test_flag(conn->hdev, HCI_CMD_DRAIN_WORKQUEUE))
++			queue_delayed_work(conn->hdev->workqueue,
++					   &conn->disc_work, timeo);
++		rcu_read_unlock();
+ 	}
+ }
+ 
+-- 
+2.43.0
+
