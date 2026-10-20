@@ -1,173 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=94.100.128.99
-ARC-Seal: i=3; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
-	t=1792488788;
-	b=xTOlzmMxhOgAGniB0W12pcbyXypZYmN3SXgYMinBKxS2nvgEdqRzOLsHY5jgg9H4uDTX
-	 w1J6ce3O0TGP1Q+Dpp1xIzZfmWsvlaONOzPaZmnqDlPYjONiAsnC/JYj3NZli8kAl0CD2
-	 X+NXuC+UqyU7f6X8wRTPT0PFwZVIRArjx2SdXXKuSGDY0np9mO2SiwvYMQ3yknOh9jIK6
-	 2PNfzdoxhmSN++Kcksz+SU578teD4JqiDPwsTN50GZqVfFFVm82c5CVXxLLovwA5pmy1K
-	 +ImxHtXUo1oMoAi7ydBgCQmTZbZgjTtnI1jj0pyTKkw+UPzQbQY4JCMME0sVKAssQrw==
-ARC-Message-Signature: i=3; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792488788;
-	h=DMARC-Filter:Received:Received:Received:From:To:CC:Subject:
-	 Thread-Topic:Thread-Index:Date:Message-ID:Accept-Language:
-	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:msip_labels:
-	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
-	 x-ms-office365-filtering-correlation-id:x-ms-transport-rule:
-	 x-ms-exchange-senderadcheck:x-ms-exchange-antispam-relay:
-	 x-microsoft-antispam:x-microsoft-antispam-message-info:
-	 x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:
-	 x-ms-exchange-antispam-messagedata-1:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:
-	 X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:
-	 X-cloud-security-sender:X-cloud-security-recipient:
-	 X-cloud-security-crypt:X-cloud-security-Mailarchiv:
-	 X-cloud-security-Mailarchivtype:X-cloud-security-Virusscan:
-	 X-cloud-security-disclaimer:X-cloud-security-connect:
-	 X-cloud-security-Digest:X-cloud-security:DKIM-Signature;
-	bh=WV40d2TwBS1oKI/kHuVo9QvXYJNyk8YkZxiIwNKdyLc=;
-	b=WHcirMC4H+TkzFneF5yr55u1JQ2h2lYKC8vV/9PCXU/aoRou3DQiKK5ElPN62baLKESq
-	 6/RFZHtDM03ZRsVzsj+lJ3D9G4qcOC5zgIhUOd8KO3pmm/1PNXDbZsg2i9EQysii09pb1
-	 vwOJXY+c/U+kyrrxkwzirq5kpZfNWEq3IEfrpuOgpqMrpriqF0ls7jT/WfvqnLfOJ49rt
-	 /TFPAleJb1VZLgaL11u0KD4Pw/F6t2qTTdOzQ4a2PB6lKWwItUu7GWZmGpktoL2QDdHDU
-	 M9J2We+Uo0bUpYRMWTTVCFlxmwTer49KHogJh8uBaCKKKcwwovL0I3s69uYwJv6R6GQ==
-ARC-Authentication-Results: i=3; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hoffmann-group.com;
-	spf=pass smtp.mailfrom=hoffmann-group.com;
-	dkim=pass header.d=hoffmann-group.com header.i=@hoffmann-group.com header.a=rsa-sha256 header.s=hse1 header.b="AXVkc/8f";
-	arc=fail smtp.remote-ip=94.100.128.99
-Received: from mx-relay89-hz1-if1.hornetsecurity.com (mx-relay89-hz1-if1.hornetsecurity.com [94.100.128.99])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=46.14.118.250
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792493545;
+	b=KZ4x9tqZ+Nh3K6bHryR+dhlEIJAuSeGejwHTe4CzBtN5dhLdZ+yxpuSO0wwRuQafmdJX
+	 RmCnwaDFTtWgTwoXHUCuKNvQ5hpPz0mGAZh245O5w7EAsUrx9FbKTi/JZ2NxYFuWlrQQh
+	 b+7/Q+sMh29ikhjQ4U4NvWCX5EoQA1qlcjEylm7U+0s+AX5OSH3omQTho3uXD0Of2FpGv
+	 eADTBbkNWiVl87rcLWHRm4WhQMU9fO2qIFg0N9ViVkKJ+O6MJKSduooXHAuPlWsQhgSJN
+	 PwaV9OAK29lj0CIAd17Kpl3PpWMmHUDxUv9/BapoLj0T5jjJQX2+KLalz8KnrlyhAqw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792493545;
+	h=DMARC-Filter:Received:Content-Transfer-Encoding:Content-Type:
+	 DKIM-Signature:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:X-Originating-IP:
+	 X-ClientProxiedBy:X-Sophos-OBS:X-SASI-Version:X-SASI-RCODE:
+	 X-SASI-SpamProbability:X-SASI-Hits;
+	bh=MPlnQbS3zYwvieySg42VRGYnZTNOWpovzbRPo5skf6g=;
+	b=rm2VMpw5RLhXuRovVkqwTVUqm/l2k4twSrO4xMJy//OFiipv4UftaeilY1ceHpC139ip
+	 lWRryR6qkmsJ711zzLjbso6kWT/B9JWJ+AFSxUW+T3oHRIlsQPMOh3z+GHNOLBOnVSQFq
+	 wIMxBm4RDIjtpkO0X+D0fcuH67x8Kv2FugOuytzUjO9celBG/eDcWVEhnjuEOKL3po/Wi
+	 PyUXmGdYnrKslQUxdUavDV4IJnwNyj2Y2zPR2QaaZydRL4kjquSM/S65wj2A53/i25Lxa
+	 G9b3v7l+/SnbqQJ7G425GXj1oDDPhtBR/vvj7iPXcEniybDHPZKYw9SPjO5XjmHs5gA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fiveco.ch;
+	spf=pass smtp.mailfrom=fiveco.ch;
+	dkim=pass header.d=fiveco.ch header.i=@fiveco.ch header.a=rsa-sha256 header.s=fiveco header.b=Wz4EUHdX;
+	arc=none smtp.remote-ip=46.14.118.250
+Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B0E606A319
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 09:33:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71B0E606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hoffmann-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hoffmann-group.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C50A60A262A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 10:52:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C50A60A262A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=hoffmann-group.com header.i=@hoffmann-group.com header.a=rsa-sha256 header.s=hse1 header.b=AXVkc/8f
-ARC-Authentication-Results: i=2; mx-gate89-hz1.hornetsecurity.com 1; spf=pass
- reason=mailfrom (ip=52.101.66.111, headerfrom=hoffmann-group.com)
- smtp.mailfrom=hoffmann-group.com
- smtp.helo=duzpr83cu001.outbound.protection.outlook.com; dmarc=pass
- header.from=hoffmann-group.com orig.disposition=pass
-ARC-Message-Signature: a=rsa-sha256;
- bh=WV40d2TwBS1oKI/kHuVo9QvXYJNyk8YkZxiIwNKdyLc=; c=relaxed/relaxed;
- d=hornetsecurity.com; h=from:to:date:subject:mime-version; i=2; s=hse1;
- t=1792488776;
- b=sUqJA/OHH2gfygKI7ROr+qC4RpTloT9MlJINhwugVo7GOyPz5MP5J+3pKyp5u74nponvQvj7
- bUj0r6Y+KN98pSgvEnjsaBkXt6bk+crByRWKTTI8qLAg+tgjHdIPgOSdF62uej8/fBFiFNx386J
- 9yvq7uz4wmVvs0pXWHteavBMMTwKbGuPr3OOmAmScyw+BmBL2WWMdiPVjjyBQx1AZOFTLva4T3C
- Xv4YnGG07p4XxH3Vp+dmJfjw0AKwQcVAQUJz3NxsfNSATrnzuxt3VMQgfRGp425bs84McZZxmR3
- K5XMoHKelDiFvNcKP5c86IuZxQRuaPFyifN6Po1XijSJw==
-ARC-Seal: a=rsa-sha256; cv=pass; d=hornetsecurity.com; i=2; s=hse1;
- t=1792488776;
- b=TR8WHuUthhPS+tVnyRMT0O8sOj038K5MdJQoLwyie3zESW4ij+HLW9fKQq6vxq9ha2LNFRlc
- 1/rH3iDY21vmNudodC94m/DlxWThIIgdNxpBtf6xIjd0+fK0XaVOw8/Pcy8kFjAB7U7/abdmEXw
- 5IHVI1fXh6+Na2JdwaLYUfX0ywZuoYWw+YRnAtiyAZ4WHM6GKw8zRGhkM6cfwuTqCb4t3nq8DBA
- 1PRB2Uzgq/GuQZX7W28S8eg9eY5xmvIxitlnxXTofN9LpbVLLcxyqnht+aSZknXfyA3btEbBOts
- 24yPf53s1VgXXP/rdJXORyDPQHWuQS/gT8bIuba05C2Bg==
-Received: from mail-northeuropeazon11022111.outbound.protection.outlook.com ([52.101.66.111]) by mx-gate89-hz1;
- Tue, 20 Oct 2026 11:32:56 +0200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oh0bnMq+nbav61DywY3Ah+4j5bIrRD9lMD/ecpkMOg0xcERdVrW8F3mKhstssulLjq2Ahm7uuoyufdLAtVE9S+pPSvYCBagkh6ygRxIKEd62fD+szVh07pq3tVmDZ4s9t2pgWsNiWvv2BxHoQkx8WYhuxefpzntj3N5lkuyurBqgYq2lOzsniwqcwwikli0x2IwXb293X3SLf8zgXy9Uq6TJBvFFzHbLx7ckFa3wWBtb1cTb+fV6ApUbRsq2vwm2B04omeIU7qGvZorm0HFb0PfDyuLSgW5YYuMiFOziNZaH3E2aO1asKjZIjXeTfmTBsnBl82YEs5VAmWa+3h7XKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WV40d2TwBS1oKI/kHuVo9QvXYJNyk8YkZxiIwNKdyLc=;
- b=GwOB0OE6hV9rpY/u1VcKYHfxTh9eHzgrPK+POjQjWEIThRNin2ik/llcuLI7f5vGxnYtgyf/nOj8mv/cisAAIkdqAy84ParDCFzwfNaTq63n/nsx6qLBBDAQbtoOLp6DOp5J/xRV4sBqi3WrN4xL0X9NaSHqXAeuxyttwpxShv9bHJLVF5vTi+Ef5Dovg522MEv2JW0tBCv8bcgmbEv3NiYQp57WCejP2YmhEi9vDLZp+LCuJR5Ng4oXs+6y+2tIJaqu/k5D2fexORBr39PvqGDzCZKiR689XW8ipO4HT1ZiQ3esMwpnlzFDScDfaTm3tKeHhIFREot3AH+zLB2y0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hoffmann-group.com; dmarc=pass action=none
- header.from=hoffmann-group.com; dkim=pass header.d=hoffmann-group.com;
- arc=none
-Received: from BR2PR01MB965253.eurprd01.prod.exchangelabs.com
- (2603:10a6:2c8:8::23) by AM7PR01MB7122.eurprd01.prod.exchangelabs.com
- (2603:10a6:20b:1b7::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.17; Tue, 20 Oct
- 2026 09:32:43 +0000
-Received: from BR2PR01MB965253.eurprd01.prod.exchangelabs.com
- ([fe80::bd56:eea9:9d3f:8a3d]) by
- BR2PR01MB965253.eurprd01.prod.exchangelabs.com
- ([fe80::bd56:eea9:9d3f:8a3d%5]) with mapi id 15.21.0522.017; Tue, 20 Oct 2026
- 09:32:43 +0000
-From: Schober Roland <Roland.Schober@hoffmann-group.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Plans for Periodic Advertising with Responses (PAwR) in kernel/BlueZ?
-Thread-Topic: Plans for Periodic Advertising with Responses (PAwR) in
- kernel/BlueZ?
-Thread-Index: AQHdYHW6Rpc0oHg7BEyFYyTbihg2lw==
-Date: Tue, 20 Oct 2026 09:32:43 +0000
-Message-ID: 
- <BR2PR01MB9652538FB65DC582F4A6C4DE80BA672@BR2PR01MB965253.eurprd01.prod.exchangelabs.com>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
- MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_Enabled=True;MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_SiteId=bab8ae91-c774-40ac-9d72-282d0f55f03a;MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_SetDate=2026-10-20T09:32:43.150Z;MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_Name=Public;MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_ContentBits=1;MSIP_Label_cc64dcfd-d02e-4bc9-8e4b-d225121e8391_Method=Standard;
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hoffmann-group.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BR2PR01MB965253:EE_|AM7PR01MB7122:EE_
-x-ms-office365-filtering-correlation-id: a78b0315-7841-4498-b93a-08df2e8d17c5
-x-ms-transport-rule: HOG-Outbound-to-Hornetsecurity
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230040|23010399003|10070799003|1800799024|376014|366016|18002099003|10067099003|3023799007|38070700021|56012099006;
-x-microsoft-antispam-message-info: 
- PyJ/zh1SbRq507Di514VS0u16F2W4rrWDc1+RbBL9/7Om4iGOC7ivGOrISdGPvxqvXJkekLj4CgNN+u/qXIg91N05VhTauMeIRREU952Z3EVbir2TWgsO4pdi2OpsD/9z53R9s1xym2UEibwCI+uPapUoGMR8oN+5+NDaL6tNi4pm4p0Jk5vhlyjrCdWAuKu22WMCxyl89/frVskBG5o7EzAyJ4CGPZiYYV6ntP3LXn+UaXmINsbCa28IU6aM2hjZLtRY1mZpuIAG+QZL54L+sbDfNXmrKlkqZ1d/VuLb8ShhIFMS6KWqdBvT2Pd1T5yp1tYt8JyZWHsbmQjNUty6udUv1OtyBWTf3eyOGnwA57zaeiKFBtp75xfONrFfFkFTJnJ2Ojs5froUvU+QgMwadFjtqHxdXOtzNAhTmUiJOKUPQxzI/flQ5nrohU83cDAexbZhXUOpzMTFdWKbJ+WFkCU+c4wBzH6hxVWaFUDwvgSjhgIlZtkMn4JOvk9NwBAyiK4ONAADaa5Q/mBa2f1mcmHNhX5/CSSGl4t5mNNEeXo4wBy39isWx+73/Lpj0Ic6SGavXStYpRzs3SBSPg7Mv6jxhlsS9Sd1kyPetHW25B+BnsusXUUmoZwZv56mSIx4j8OZVhPCtWWjcTSdi/mRIe7nMsLtgDcgAQy+rpa+Qa7XrCbfoZY4CJw3BhihITqybpmaAwig5y4JkohQS+tI1Wu29sSikcEumEZKRofxVQ=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BR2PR01MB965253.eurprd01.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(10070799003)(1800799024)(376014)(366016)(18002099003)(10067099003)(3023799007)(38070700021)(56012099006);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0: 
- =?iso-8859-1?Q?6GFTPL0YoTpS4JSxXnTjPl94gVd1bxyHRylQpkmpiqUSkJ3FgC0eMl+6v5?=
- =?iso-8859-1?Q?9EE2HD/aN+xI4T0T/YncRb89foWFW7S2WmuMXBjq6gTRkxIDmpitvVNYgp?=
- =?iso-8859-1?Q?Yu1ROYIKTEjZz7LUuH1ucvCh9sIZSfhbig9sfDiH7jE5MHqJoxCiB912pa?=
- =?iso-8859-1?Q?2pBcR/5L1wJSwdd7LaaNk+25QBtlZ5DzrMFnPU0+oOPHDfYZTZWXcEmKXF?=
- =?iso-8859-1?Q?278iVMNwYJ3hjVuUWD6+jqrMcfiFNHSKhvSt2SFVGHuc0iXAZCpsLnw96A?=
- =?iso-8859-1?Q?UA88FB5xg1qCzXYDry5MyuHhJ68L/gfwrQwv/yPv3oglxaFdTi2ioOFXAW?=
- =?iso-8859-1?Q?PBSHK9zq0uQ+FIhOLTpzvT1kPF/PCiprS2QvQ6atwRRjNUuvrigBhwA9z9?=
- =?iso-8859-1?Q?umaeeGj+whuKDOlLtsTnD7wtpOG8Mol+AdX3T339GaYH6UdHAyL+EKnNJu?=
- =?iso-8859-1?Q?Ce0sBHo0bKk5D/NuLzbFuuAEfVOAzrm1jx99QycxUP80Rn48+i/x/VoIMm?=
- =?iso-8859-1?Q?E2UhcmH2zAwnxNgeC3BUJkPMKPwcLNFzHf455HOSKu4h/iQExcrJdJ+EpZ?=
- =?iso-8859-1?Q?ayNP/4kMJrRKY7JLNoFc7UQWZy1oIKsGElr/Hx4R70QhfE1lQgAQaIK3IY?=
- =?iso-8859-1?Q?6O7UZBICZ4Petw4e594fmI6QbKvfeTOWPUryJwT4jBeCwWC2nwruvlFlSY?=
- =?iso-8859-1?Q?IQd5BkopYxYUaM/H9eplRiwmontJPov6iXURhLCRmolzoempbMPrhuM8Ty?=
- =?iso-8859-1?Q?udDrgP3G3500sbhy91jcI0S34itqcrGbGrxVZgTWlk9Dn1wMPzgMKD8DYx?=
- =?iso-8859-1?Q?ok0b+Y+giPM7Jf3c/KkqMWyQSP1tHCz858PrsWCu5urS0/ucOvXqNuHLqJ?=
- =?iso-8859-1?Q?1eeVFk3KiEczMJS6WDOrAAojsLscpFZfMX+gbmjsiBeIH2gnL5TRmE0cR5?=
- =?iso-8859-1?Q?0LqS4CJWXO4Llo9rUOCs/UgkszAAMZM+QnH7Z6QLcJ+cHVzcVS0BLWkgI+?=
- =?iso-8859-1?Q?L0k8CV2qsRO6SF2HH0U3ytcL+nDl1rtv014I7ZjVJv5tofLRgESqLBGdCb?=
- =?iso-8859-1?Q?qjtB1sCCyCKFCq9YUwVYURtAg7cyXZ9hgEo+ypRFMQOR6wQ7U51r403R3j?=
- =?iso-8859-1?Q?QQLCSHg64EZFU57ymQ3wR2fwELNzzk1QRrM+YOWDz+8dYvEPGaQT3M0vYI?=
- =?iso-8859-1?Q?ZSKVSyWov7DbXkWgD1zX90cx+CFbtma4EVOpKl4DffOyxI24ZJ/Elh6qZZ?=
- =?iso-8859-1?Q?SbcB7b26awP79n2DBrvKvMsZiRl2zCx0jSlvldW8Y5eMFOOniZl+Znr8uU?=
- =?iso-8859-1?Q?8DPAo1aHfevD+hhOV6OVI0CUScqWid5VwbmGHRdKRPncv0jjfi7aao3+XL?=
- =?iso-8859-1?Q?RMBX83m+pM5gwUA5QinhqTqA3bPVb8vD+AONpQtQSw2EFkkqhb9lth1Hgv?=
- =?iso-8859-1?Q?O4KWDo+UbcUBy895r1B3giwqiQSDnVp15aZsjYGJqUseEvblczhasGP1nL?=
- =?iso-8859-1?Q?rX+MBIEH3gYJ6WKdPyo/SZK73U3WlVOeSDIdH3HJ1DkQoEATH/dR9OW1XB?=
- =?iso-8859-1?Q?y+W6zZeyvOK9k7COvQSKNQFbIqSPXZGGun83Qp/NkOS83AWP4/7hfvO2wm?=
- =?iso-8859-1?Q?G5M4EH6FBgCzWKep78pTbpRhzsVyZkQaE16ZqXLWlvkCix1UINyVtPI5Tt?=
- =?iso-8859-1?Q?cxoTGNhsIbLhw6x4M411lcXdmqMfcDRQJTDs/8sKN1TRpiXgPjue0i8x8N?=
- =?iso-8859-1?Q?4pWCam3Y2sBibw242giY6AnQZHo9Cae5tU1Lmr/f4l1odrqUqwk5wOtbdB?=
- =?iso-8859-1?Q?b+nKrouoXwZDVclsekF6kvYpkeiu5J278b8EaXHz1q6XTfNP+zJhcyhyCc?=
- =?iso-8859-1?Q?Zl?=
-x-ms-exchange-antispam-messagedata-1: Kh13JNR47mgV0/8yr7OyyFvVbXF03T5MzbQ=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key, unprotected) header.d=fiveco.ch header.i=@fiveco.ch header.a=rsa-sha256 header.s=fiveco header.b=Wz4EUHdX
+Received: from [192.168.16.44] (port=17419 helo=remote.fiveco.ch)
+	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <valentin.kindschi@fiveco.ch>)
+	id 1xJ7Rt-000000002B0-3Pl9;
+	Tue, 20 Oct 2026 12:52:05 +0200
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
+	t=1792493525; h=from:subject:to:date:message-id;
+	bh=DR3y0bZEPNOYkjkt7ODRIeUtKeqxRfd+IOzNXHqkZ4Q=;
+	b=Wz4EUHdXfY2YZ9Aw9n6Zq60fnT5rlfqUs3SNK1Fi2bK3oPjXz0SQLZFudhxA6wcfrbLMUuZefB3
+	pOcLEWWpD1/GKKkns2A0YtxYBQApgbMZWrOcACTpvETcyRS/P9HBf0rF9eSawgflsabMicuOj/1WQ
+	sYG2xrqtiA9+JLbVc2o=
+Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
+ FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Tue, 20 Oct 2026 12:52:05 +0200
+From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+	<linux-kernel@vger.kernel.org>, Valentin Kindschi
+	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
+Subject: [PATCH v8 2/2] Bluetooth: hci_sync: pause advertising for the scan address update
+Date: Tue, 20 Oct 2026 12:51:50 +0200
+Message-ID: <20261020105150.2863631-2-valentin.kindschi@fiveco.ch>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
+References: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -177,66 +73,224 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: 
- Sg8Mk8DngVakv0A7UKCqwqfBCtqoQD+foT8yqpR0R8VgguVuMrImAIDyUjbUuBD/b9d3CHTq++z/fCBZ/QaCpajyna6kZd5WhCgkmWrPi3Cm0wA4D1hIxzDOaxWFwXaIEvpirzvllc3ApVjcYOizP5Mm6TEycsHgL9P/zWgPxRx34HX4jMe6jqZ8cKNzsSV/j9xI2fMK6/60F2fMbMMeJB8xuThe3BIfaYyOHf9yZa8di8Ii6+qHzPPNbdvlQrqCmPhx6UItTti6bQ7lxW/ktoUnH2sIF/IyDANDdLXn8NE20idcdwFdFhQ9+gOsXReWwExT8Gu6xX6TZCOzZ1v2Hw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
- +n4waDJsPK91azI5jH/kxYJj1mo60PutSwk0MuWDTBQ9Yo1h0KSAMPGyhW7k6bP1IAiBFnNq5V4Rh0sV80APl0aES5xjlT4TYAA+qkxQ+jqHErqusTjIaUQ/jVGOdWgkE1Mpcph6WASrXtwozbfWJPsYti9mOPNwf5sZd9vRUJ6lKOi7X4ZZUmLFT8MkoexOaRdy0uBdB5T659xOJagaKQosUdyGiVqTh/agHMQgO+T9D0ZZ9WZus9DHPGG6ggDexrynrKnTXtZFkD3zlgftlspVSriG7/fwvB0f/X7cCVP4kErUjOLUwUcFXwFVy5fjVdorpM7HTcfdqrNyX8hNu4Vs1CtIdi9EBPSXBJNPJ7QU0DQufbnIyGUPyVaphSeVLSUDURghEsxOtQWdNMIIr7fkoex/sUWs3h4xKzZhwNE1PxHyH24OEhlhf2fLPhFHTUOEmV8RYBjOeABieaTL179ODoLJUmmJd9/j8jEabACjpwKSOw50bmItUqkR9iUt7jvGU37smDbr8K5N/5JAZnoAfBnhJvY9c4MnR6OyXbWFWp1LIh7qHsNHs+1JrvbRv1QkI4fXbvOyVqGnaUk+JNkI5bVpsglnR6egISSrMk9yM4jwq4SdkszH5OwY2dklex2Nid+sMSTL6M04VAxPCA==
-X-OriginatorOrg: hoffmann-group.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: 
- BR2PR01MB965253.eurprd01.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 
- a78b0315-7841-4498-b93a-08df2e8d17c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Oct 2026 09:32:43.3811
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bab8ae91-c774-40ac-9d72-282d0f55f03a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 
- RcRWRJ1gZEs8mZweaAwbOsaTkCjuBLNAOIV1/L7nFn/XuW4Ti+Wz9k9dsHLQlQdynP0SnpT0NlQDKGYNFf9neYWEu6J+7301sUZHw7YSc/5m6J0twwHwQKqWLOYHtrpd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR01MB7122
-X-cloud-security-sender:roland.schober@hoffmann-group.com
-X-cloud-security-recipient:linux-bluetooth@vger.kernel.org
-X-cloud-security-crypt: load encryption module
-X-cloud-security-Mailarchiv: E-Mail archived for: roland.schober@hoffmann-group.com
-X-cloud-security-Mailarchivtype:outbound
-X-cloud-security-Virusscan:CLEAN
-X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-gate89-hz1 with 4j86dp6YbNz2pNxt
-X-cloud-security-connect: mail-northeuropeazon11022111.outbound.protection.outlook.com[52.101.66.111], TLS=1, IP=52.101.66.111
-X-cloud-security-Digest:eaa640c38f31fb1f26aad3027ba6daae
-X-cloud-security:scantime:4.478
-DKIM-Signature: a=rsa-sha256;
- bh=WV40d2TwBS1oKI/kHuVo9QvXYJNyk8YkZxiIwNKdyLc=; c=relaxed/relaxed;
- d=hoffmann-group.com;
- h=content-type:mime-version:subject:from:to:message-id:date; s=hse1;
- t=1792488775; v=1;
- b=AXVkc/8ffH/x5zbd6n73QHG3ZGwt4VhjQg03NvE9xFMV6wIZ7p8pV4jAgql/5PquOlGae/wy
- AXohfooyyDV+RtrcsQlx3xQmryykaVQAC97Etfg8QTo3Ye6vR7Ig0VysSOOTXWsSMbC9RkTU8gt
- Op+v1lpXcsMOW05dj3hB2rtug5KNMV3PGIEE/5FFG650+NYQp8XoHi70+4gkdVbuvgLs1W2CI+7
- HJS5alDwBEOXnkKzJkyfq6bJrixd7TGPYJK1xeJXSEX7WPUuSFno94zd5E8Mr980okHnP8moXBy
- imQRGrockSd58iiNJXnrsWndCXx+CajYJYA2NemYu0Wew==
+X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
+ FIVECO-MX01.fiveco.local (192.168.16.44)
+X-Sophos-OBS: success
+X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.10.20.95719
+X-SASI-RCODE: 200
+X-SASI-SpamProbability: 8%
+X-SASI-Hits: BODY_SIZE_8000_8999 0.000000, CTE_8BIT 0.000000,
+ DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000,
+ HTML_00_10 0.050000, IN_REP_TO 0.000000, MULTIPLE_RCPTS 0.100000,
+ NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000,
+ OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, REFERENCES 0.000000,
+ SENDER_NO_AUTH 0.000000, WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000,
+ WEBMAIL_X_IP_HDR 0.000000, __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
+ __BULK_NEGATE 0.000000, __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
+ __CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
+ __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
+ __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
+ __FRAUD_CONTACT_ADDY 0.000000, __FUR_RDNS_SOPHOS 0.000000,
+ __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000, __HAS_MSGID 0.000000,
+ __HAS_REFERENCES 0.000000, __HAS_XOIP 0.000000, __HAS_X_MAILER 0.000000,
+ __IN_REP_TO 0.000000, __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000,
+ __MIME_TEXT_P1 0.000000, __MIME_VERSION 0.000000,
+ __MSGID_DOMAIN_IN_REFERENCES 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
+ __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
+ __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
+ __PHISH_SPEAR_SUBJ_PREDICATE 0.000000, __RCVD_CTE 0.000000,
+ __RCVD_EXIM_4_96_AES_128 0.000000, __RCVD_FROM_HOMEUSER 0.000000,
+ __REFERENCES 0.000000, __SANE_MSGID 0.000000, __SHIPPING_ACTION 0.000000,
+ __SL_HEAVY 0.000000, __SL_LIGHT 0.000000, __SUBJ_ALPHA_END 0.000000,
+ __SUBJ_ALPHA_NEGATE 0.000000, __SUBJ_STARTS_S_BRACKETS 0.000000,
+ __TO_MALFORMED_2 0.000000, __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000,
+ __URI_NO_WWW 0.000000, __URI_NS 0.000000
 
-Hi,=0A=
-=0A=
-I am building an embedded Linux gateway (NXP i.MX93, kernel 6.6,=0A=
-BlueZ 5.72) that should act as a Bluetooth 5.4 PAwR advertiser,=0A=
-similar to an ESL access point, serving a few hundred battery-powered=0A=
-BLE displays (nRF54L15, Zephyr). The gateway would run the periodic=0A=
-advertising train with subevents, collect the displays' responses,=0A=
-and hand new displays their sync via PAST after a short connection=0A=
-for pairing.=0A=
-=0A=
-As far as I can see, neither the kernel (no PAwR HCI commands/events=0A=
-in hci.h up to current master, no mgmt interface for periodic=0A=
-advertising outside the ISO broadcast path) nor BlueZ (no periodic=0A=
-advertising in LEAdvertisement1, no btmon decoding) support PAwR yet,=0A=
-and I could not find patches on the list.=0A=
-=0A=
-Is PAwR support planned or being worked on by anyone? If not, is it=0A=
-something you would want to see, and in which shape? That would help=0A=
-me decide whether to run the PAwR advertiser on Linux or on a=0A=
-co-processor.=0A=
-=0A=
-Thanks,=0A=
-Roland Schober=
+hci_active_scan_sync() programs a non-resolvable private address with LE
+Set Random Address on every active scan start.
+
+BLUETOOTH CORE SPECIFICATION Vol 4, Part E, 7.8.4 says the controller
+shall return Command Disallowed (0x0C) for that command while legacy
+advertising or scanning is enabled. hci_pause_addr_resolution(), called
+just above, only stops advertising when LL privacy is in use, so on a
+controller without it the command is issued while advertising is still
+on:
+
+  Bluetooth: hci0: Opcode 0x2005 failed: -16
+
+It does not converge either. hdev->random_addr is only set on a
+successful command complete, so it stays BDADDR_ANY, and the deferral
+added by commit c2994b008492 ("Bluetooth: hci_sync: Fix not setting
+Random Address when required") requires it to be set. Unlike the
+resolvable address a few lines above, which is reused while rpa_valid(),
+the non-resolvable one is regenerated and rewritten on every call, so a
+controller that refuses the write is asked again at the scan restart
+period of about 10 s, for as long as discovery keeps restarting.
+Observed on a BCM43455, which has no LL privacy and no extended
+advertising, 190 rejections in one capture, every one retrying the same
+address:
+
+  < LE Set Random Address  Address: 02:16:91:90:F1:D4 (Non-Resolvable)
+  > Command Complete       LE Set Random Address, Command Disallowed
+  < LE Set Random Address  Address: 26:90:57:96:9A:3E (Non-Resolvable)
+  > Command Complete       LE Set Random Address, Command Disallowed
+
+Pause advertising for the address update, and resume it once the update
+is done and before the scan is started. The pause does not outlive the
+function: it is taken only when nothing else holds it, and every exit
+resumes advertising, which also releases the pause taken by
+hci_pause_addr_resolution(). A failed pause returns before marking
+anything paused, so the error path is a no-op.
+
+The resume in the error path is no longer guarded by ll_privacy_capable().
+That guard matched a pause taken only under LL privacy; the pause added
+here is unconditional, and hci_resume_advertising_sync() returns early
+when nothing was paused.
+
+One caveat this widens, raised on the previous posting. When
+HCI_ADVERTISING is set, hci_pause_advertising_sync() also clears
+HCI_DISCOVERABLE and HCI_LIMITED_DISCOVERABLE and zeroes discov_timeout,
+and hci_resume_advertising_sync() restores only HCI_ADVERTISING, so the
+discoverable state is lost. It reproduces today on an LL privacy
+controller through hci_pause_addr_resolution(); the unconditional pause
+makes it reachable without LL privacy as well. hci_suspend_sync() also
+pauses unconditionally, so a device that suspends loses the same state
+on any controller today. That asymmetry is pre-existing and is left
+alone here rather than folded into a scan path fix.
+
+Legacy controllers have one random address register, shared by the
+scanner and the advertiser. Restoring the advertiser here can reprogram
+it when the advertiser is non-connectable, so the scan then uses that
+address rather than the one generated for it. Both are non-resolvable
+and neither is linkable to the identity address. With privacy enabled
+both roles already share one resolvable address the same way.
+
+With the patch, on the same hardware:
+
+  < LE Set Advertising Enable    Enable: 0x00              Success
+  < LE Set Random Address                                  Success
+  < LE Set Advertising Parameters                          Success
+  < LE Set Advertising Enable    Enable: 0x01              Success
+  < LE Set Scan Parameters                                 Success
+  < LE Set Scan Enable           Enable: 0x01              Success
+
+The address write is accepted, and advertising is restored before the
+scan is started.
+
+Over 119369 btmon records and about 12 minutes of the normal workload of
+that device, alternating active and passive scanning with ten outgoing
+connection attempts, every LE Set Random Address succeeded and there were
+no Command Disallowed responses of any opcode, against one per scan
+restart before.
+
+Patch 1 is required: without it the resume added here returns -EPERM on
+the controllers this fixes and leaves advertising disabled.
+
+Fixes: 3c44a431d62b ("Bluetooth: hci_sync: Resume adv with no RPA when active scan")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-5.5 btmon
+Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
+---
+Changes in v8:
+- No change; resent as part of the series.
+
+Changes in v7:
+- Reword the commit message: the resume on the error path also releases the
+  pause taken by hci_pause_addr_resolution(), so it is not conditional on
+  this function having taken a pause.
+
+Changes in v6:
+- Drop the comment from the Cc: stable trailer; it exceeded the line length
+  gitlint enforces. The dependency on patch 1 is stated in the commit message.
+
+Changes in v5:
+- Split into two patches. v4's resume was reached through
+  hci_schedule_adv_instance_sync(), which refuses HCI_ADVERTISING on a
+  controller without extended advertising, so advertising was never
+  re-enabled. Patch 1 fixes that and is a prerequisite for this one.
+- Do not resume on the success path. hci_resume_advertising_sync()
+  reaches hci_update_random_address_sync(), which for a non-connectable
+  advertiser programs a fresh address, and doing that with the scan
+  already enabled is refused the same way. Resume before the scan is
+  started instead.
+- Take the pause only when nothing else holds it and release it on every
+  exit, so it cannot be released by another user of
+  hdev->advertising_paused.
+- v4 claimed the resume commands in the capture were issued with the scan
+  already running and succeeded. That capture came from a build whose
+  resume ran elsewhere; the claim is dropped. The capture above is from
+  this version, on the device, under its normal workload.
+- Fixes: now points at 3c44a431d62b, where the pause became conditional
+  on LL privacy, rather than at the introduction of the scan function.
+
+Changes in v4:
+- Report the HCI_DISCOVERABLE asymmetry raised in review rather than fix
+  it, with a reproducer in the commit message.
+- Keep the explicit return on the success path, so the resume runs there
+  and the function no longer falls through into failed:.
+- Shorten the added comments to one line each.
+
+Changes in v3:
+- Resend, no code change; v2 had no reply. Rechecked that it still applies
+  to bluetooth-next.
+- Added the second capture described above, taken with the two patches from
+  the "endless adv params retry" series applied, since in bluetooth-next,
+  confirming the fix holds with cancelled outgoing connections in the mix.
+
+Changes in v2:
+- Rebased onto bluetooth-next: mainline renamed use_ll_privacy() to
+  ll_privacy_capable(). No functional change.
+
+ net/bluetooth/hci_sync.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index d215432db..e9b2d28ff 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6339,6 +6339,7 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
+ 	u8 filter_policy = 0x00;
+ 	/* Default is to enable duplicates filter */
+ 	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	bool paused;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "");
+@@ -6362,6 +6363,12 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
+ 	if (err)
+ 		goto failed;
+ 
++	/* LE Set Random Address is disallowed while advertising is enabled. */
++	paused = !hdev->advertising_paused;
++	err = hci_pause_advertising_sync(hdev);
++	if (err)
++		goto failed;
++
+ 	/* All active scans will be done with either a resolvable private
+ 	 * address (when privacy feature has been enabled) or non-resolvable
+ 	 * private address.
+@@ -6371,6 +6378,9 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
+ 	if (err < 0)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
++	if (paused)
++		hci_resume_advertising_sync(hdev);
++
+ 	if (hci_is_adv_monitoring(hdev) ||
+ 	    (hci_test_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER) &&
+ 	    hdev->discovery.result_filtering)) {
+@@ -6394,9 +6404,8 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
+ 		return err;
+ 
+ failed:
+-	/* Resume advertising if it was paused */
+-	if (ll_privacy_capable(hdev))
+-		hci_resume_advertising_sync(hdev);
++	/* No-op when advertising was not paused. */
++	hci_resume_advertising_sync(hdev);
+ 
+ 	/* Resume passive scanning */
+ 	hci_update_passive_scan_sync(hdev);
+-- 
+2.34.1
+
