@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792520412;
-	b=LSgvrraAcQccn/CNqmSlaAALdQfj0KZcW7CriYqX97GHUTUAkB2iPwfGbyYqb0TeI/jm
-	 iJmxD0OSSxvQvKEbfdW4uacD61LKIhR2l006r7FS1upTORev5v/2OJA7XdW2mKvH+0F6p
-	 Jr3+GeD9iqMH0/G7ETDttneyWG4IfDmom1qyKuYI3b4tov1KBZ31L4UeYDWAs/DJJ9cM+
-	 3bkJdbnksWOQxMjGqBYKIt9V9KmQaGRCzet7uY1Ao8AOAn0jc1jB8NpQLh/RxSRanMgeR
-	 KZ/f6AHZODaRAFCAQjemjncLHv3rGthPYbDA2RAh6GhJe6Auhin/4NR7PmUe3vHadRg==
+	t=1792522854;
+	b=ZwEp3xY3vlTV3hI1HwdcL+2MWo5mBBQ0ArOflo2q4aU8bX+QbHHz6TFNRuASvs/I92Nv
+	 3QjmO5zksn6hQJYJ4042cenKYH/WasMQF/xwF/Lk9zUcgVPDfeUzHz1hczp64byxuWG7Q
+	 vEmv6TjIhD4w2s02pJXZlUIdZEeKo/PeWal2XJdyIdsw2QxKotWpT94SXVEDdKswyZBmC
+	 q0AclysG0taySXx0HGwIJucmu8ClkxGKJ1l5HQmVvCWlzV4qMGlsA/YN1el8GIgLr0TfY
+	 VqyOPWK3kSGJZFzjtALE00+PTJ4NiGJRNnRJ/PZPWohCcpO9x88NhlZKdPvzdbbDbEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792520412;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792522854;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=7oMEYSj1AX5ECO2yJA62McxivgnzkTxG7lto+Y9bIAs=;
-	b=2h/IGOSa0ZDtLed532U7qjkXeM7zrO+Uq72kYxk8xt/qK+Qe3Fh/PBOZcsGUUuHOZIPb
-	 46jT5/0q9TrjzIr5UIQ+/tblPpwK+7WlRr4qBQ7d6hFqzDY6WFu+HhiNewKWj980CcHCP
-	 h5B8GON1D5vlMMO0wpho6QPtp5QiRXqf8YZCL/cm3w/s+sJaIsrXXFs2zG9f3fxTrtlEN
-	 DLAGyUzMj0t5+3XcamrlYSoeKfeh9pfP2Z7gkq3as7m4S5twEWJeiobZUZITFYzQSVzf1
-	 4vAETIn/iDOFX/5q5PU2lHksT7+HkdKLRCfIH1o+9alezNnTSdwK93vq8t+ZKuS136Q==
+	bh=doFwaVtFpS6sC4IuXaKfGyTb696NhEj7zirNI3zBSPk=;
+	b=B1YHYY9fuw6tUC3k7EUj15NCCvtJhsHH+hFV2iNjpB1k4v8Vu6kdCcXbLLiuP6nQFCty
+	 Ty3qI26U2Oktka39lc6fqiY5v7u4divoXWhIYVUAqKUhel/dt9q45LdTG4XZvB1GEaj+0
+	 fUYfesFmMWTpYozTeWVC6Y7nZ+SqbYFUdUPdPK2Lvyo70EOLkvbu7SHrhzfWf28EHvRo+
+	 GHpFkBfCoYDkEPGrVrOg7p/X3kEW/Xry5g4UCVr1wRCyNhv9leZ/zKkJ7iXDJLok3rE2M
+	 nqGZQdqNLWZBDCCOex7f16gj7toWkRWn6dPsisBBlNPS0Gpx4Z7CwCoMdgjC41/SEWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="I/PBpC2K";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nFmWSkIZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13CE60A261B;
-	Tue, 20 Oct 2026 18:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CBD606A32E;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=I/PBpC2K
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F8C41F000CD;
-	Tue, 20 Oct 2026 18:20:12 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nFmWSkIZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46E321F000C9;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792520412;
-	bh=7oMEYSj1AX5ECO2yJA62McxivgnzkTxG7lto+Y9bIAs=;
+	s=k20260515; t=1792522822;
+	bh=doFwaVtFpS6sC4IuXaKfGyTb696NhEj7zirNI3zBSPk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=I/PBpC2KW4T+bFibxainUDViU6unPSnk4wS4sVSWG814URBQEHQ1k30BcTVIMPFCW
-	 gdLG1TFCrhG8zOCP9CuNq3XmHfFkJ4eE4FICUZrtAfiHDBtBzBtAmz2R39q0WbtXpi
-	 37pbEGGSlZtA4gpAtirAAOPuOI+21k8Ik11q8w/hi/k4H7EYFjapEyjoYtXAQZFIeg
-	 NN+rETnCTVRrsgcke/7i6Di0pc9XSQWVo4+hIoGnf+PZGIvxcUZgJnPWUUPZR16sjD
-	 9Uj/FfAitkQSpm5xfxfaUBbhz6cZA1F0nA8oCT5+51V8UgqP6Q5j2rWCvhpp4sjDJh
-	 WwmV9XSJ5ahsA==
+	b=nFmWSkIZRpkljVSa23s6GPJ3aVIW5bIoTnLHx11JdS/V7eYtdXgjiNhXDsgVLmC/O
+	 u+AFoyP9sQoc5dZ0l4UCRVYYMNAPcBsoor0gCI7bZIXsBsI+jxaA5fjBNGQoNk/UcA
+	 U0HVGNjRC4Cq6kmD+gWSo9XYiQx3dXVYyZWF61RTmDmq5uPBXwr4iJy+gwCgJN3OQt
+	 zHIlSNFSl9131/EhLdLyd1T6AoUUE9J4kjC9BHVNqhPc2MUle2iBf3bKw4fehQ11gd
+	 ZLpEN5thUzwNIbwODsWVqSmZ3S1RaBdfxycFeTJ3TvcHMUrDUlsLEIzmxrqmFvhK/4
+	 CY+PdAjm1i3Tw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7753E3808209;
-	Tue, 20 Oct 2026 18:20:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A4EF3808209;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,40 +54,49 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bluetooth v1] Bluetooth: hci_core: Initialize IRK before
- publication
-From: patchwork-bot+bluetooth@kernel.org
+Subject: Re: [PATCH net-next] net: rename skb_unshare() to skb_unclone_full()
+From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <179252041102.143064.3010303850825539804.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Oct 2026 18:20:11 +0000
-References: <20261019111611.491779-1-18983559317@163.com>
-In-Reply-To: <20261019111611.491779-1-18983559317@163.com>
-To: Binbin Deng <18983559317@163.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@intel.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <179252282077.159319.7792031411876485115.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Oct 2026 19:00:20 +0000
+References: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+In-Reply-To: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Raju.Rangoju@amd.com, PrashanthKumar.K.R@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ ioana.ciornei@nxp.com, sgoutham@marvell.com, gakula@marvell.com,
+ rkannoth@marvell.com, sbhatta@marvell.com, bbhushan2@marvell.com,
+ maxime.chevallier@bootlin.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, sd@queasysnail.net, horms@kernel.org,
+ marcel@holtmann.org, luiz.dentz@gmail.com, olteanv@gmail.com,
+ alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+ jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+ stephen@networkplumber.org, jhs@mojatatu.com, jiri@resnulli.us,
+ marcelo.leitner@gmail.com, lucien.xin@gmail.com, jmaloy@redhat.com,
+ tung.quang.nguyen@est.tech, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 19 Oct 2026 19:16:11 +0800 you wrote:
-> hci_add_irk() initializes the identity address and address type of a newly
-> allocated IRK, publishes it on hdev->identity_resolving_keys, and only then
-> initializes its value and RPA.  RCU readers such as hci_find_irk_by_rpa()
-> and the debugfs identity_resolving_keys_show() can traverse the new entry
-> during that window and see a zero or partially initialized IRK.
+On Thu, 15 Oct 2026 10:16:38 +0200 you wrote:
+> skb_unshare() only copies cloned skbs. A shared skb that is not a clone
+> comes back unchanged, which the name doesn't suggest. The loopback
+> selftest hooks got caught by this and hit BUG_ON(skb_shared()).
 > 
-> The race is reachable by racing an IRK addition with another CPU resolving
-> or dumping IRKs.  In particular, userspace can issue MGMT_OP_LOAD_IRKS
-> while another process reads the corresponding debugfs file or triggers RPA
-> resolution.
+> Rename it to skb_unclone_full(). Like skb_unclone() it only acts on
+> clones, but it copies the whole skb, not just the head.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: hci_core: Initialize IRK before publication
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7404cfafe3e2
+  - [net-next] net: rename skb_unshare() to skb_unclone_full()
+    https://git.kernel.org/netdev/net-next/c/258c3ae4a4af
 
 You are awesome, thank you!
 -- 
