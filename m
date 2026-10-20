@@ -1,84 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.18.0.10
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792500712;
-	b=3Qgw5arjzOh0OMkK76kcSvtvMPoudde0TzX+YGUK2rMOcYN41NYJsvlEU/R9pRPO33n5
-	 Wm8WDfOygHfTgqF1AM8okPf4XLiX9ZK670dUQI6/GdNUAfNAojtmLBKPZJx7HSFq22dod
-	 KxdjHzrkfS49asMJSmXLQjJ+OoX98GtpcucVP/++uHuvtMYkqaOJvSTUxEMjuo7g3WvuY
-	 kdHnluAlcYN7fUSFfI2c7DNyvOxrW7/RedLB0p9gBZV32W+POnxZBcaNzttJYNuooMrlo
-	 NtRpQVWFvZ/U9uGMRFgNqMatVT44q+ITa6AS9sojr2uKH9AquxnVUq8TrzYClIy7J8Q==
+	t=1792502808;
+	b=LS46ufwkO0TtIbM9NKNq9sUHq0/iqWXNvV7wWfPb1UZNYXJ4nd9JYazxf7cpoUozmUYt
+	 H/au31fgZgZd0Ruuy/6g3GqdT1NNeRLPFEFCWEXA+igZsoKZn0I71/GlPdDon7V+kXuJ5
+	 oq4FpN08NpFrn4R3SEm0Q5OArjoaM0wevkVRVQBGwA25HbN6nO3++1BND41z952jR4rCl
+	 hxO0GhslHS6QfhHq20uxYqcxWqYBCcBYrPS5AUeTlzpn9Es0vNB99X0Nlnrykc22Uxphk
+	 YsleCr5Xpxz59GZL7n3bPBr2iZ2/2TOUvu2V1tvHXgooTZ31zM8c27XxZzVaoorpxBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792500712;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
-	b=5Pc+yX50+0oHIBvmv7zlvdA+PR2B/BeAOmTUtD0XJTMMsKQ0Gu+FhG/FPVGFZDSk+HDY
-	 Gd5y3w9S3qJ/ByEUoOXjqT/Qh3w+6LXnF+h7VGFGsDsxyaC2LlJDWVLbwiewoKCpjCgne
-	 Djn6QneVLm8NVy0Mvsv47TDXPHttlUTMHOltm1581CzQsT3uqyCvrwa5/ruzJSPZEh1y9
-	 7un5G7iaraA0250TVmoWhIjpJGzMUZYQ+Km/Gb4EIwoXpsryIcUb2SrVUMD9Hwk5oVSrf
-	 KPmk8H7zip9DvnGff+KC3jt5h9T5dUdA+M0euTCM3RGKrTzS9NCCne8ucAJi4Z9Z36Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792502808;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Virus-Scanned:Received:X-Auth-Info:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=jpWt/pMvPnNcWCjB76mm5IEbF3SFOZp71fCEp2it8SQ=;
+	b=ho2z5P9TbKWZYNmBPZl3rzMHzNIXKRhHP07aMX16JMHDcCF+max17vVE2+QFSlMWUx3v
+	 JsziYK/PEnqpy+YWwc+88xvF6Eph/eGThMPTUsg/330oY7yTKLVtXR+o3Fa3nZj7+DDcQ
+	 9dka7iNbc/LWUy6gmWbsHaq2VuVlPqesH2nuTC/LuTZo1MjwDKJP77n1yBU2J2XM4rbDl
+	 45n/9ZvrGbR6ralZwd9XmNT2GMh91eDGyFLuPcl8a+5ykOsg9SZi+DaekjRKt6aXaNHHm
+	 hjPcNvjQ7UakJWLCl5KuHq2fm/snRFvdAX5ImwyKGsO174UY2XK9qJX1fQ2MWVmHsFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PwDxaDug;
-	arc=none smtp.remote-ip=209.85.167.182
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=muenchen-mail.de;
+	spf=pass smtp.mailfrom=muenchen-mail.de;
+	dkim=pass header.d=muenchen-mail.de header.i=@muenchen-mail.de header.a=rsa-sha256 header.s=r1 header.b=w3IUetQH;
+	arc=none smtp.remote-ip=212.18.0.10
+Received: from mail-out.m-online.net (mail-out.m-online.net [212.18.0.10])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C81606A319
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 12:51:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11C81606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D146606A31E;
+	Tue, 20 Oct 2026 13:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D146606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=muenchen-mail.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=muenchen-mail.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PwDxaDug
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-53ec9237600so1244150b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 05:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792500711; x=1793105511; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
-        b=PwDxaDugi9VWo1Z/9rcUtwHpy18cTM3vPVrujd8QjTMxZp8K3z6Bpf2BH1uvvicTYs
-         NBTBKt7w6PeHTqBiWH7zdOzCruf30rjagoeEI7dQlDpsP4xh+YWZKEI8EptWBJczLF4I
-         uR85EdGPoWwT8ZZsAMiaPEAOQYCePO8FFDzc7naN8qn2I8rAiue6uTUGdmT2UZAewxrI
-         EsojKEx5F7woURmBc1s9pbqX2og/6MlClCHCIxRsH1mRCXlJVFTg9APqlHrcG9JMZ9IF
-         W9xTR+ZzGcdoL9Ltg+FupXGqyD3R2Ck0CIwku2FtjG5i9QWPIq7UDnaZR0wSQqZ9vd27
-         uIBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792500711; x=1793105511;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
-        b=2gNmt4dpo79xvzkExRfWUe2OyhsN7w/IccAuomvCwj8amPKDwmlX0EnEDKkpziZ2iu
-         G8IzsYli4xls0EVtIkMt40QfZKItkwvoZ7+LiEGgPfocTsQ6M8/UtJ4P41nCFPKvgng9
-         PaHd42jPbnRE/WmKnGnXcUsAWR4Ut3YkI7fWKYsVm0Je4buTPucLH8QPRsuLPFTUb50a
-         jem50GcSp3sPgKVl52Dcu4jCs/ghhABWYGqMk6Ztmi/eYLtxpmwyWsu1XMfnLfmVKvG7
-         7IlogH4/J0qeYxeT9nFVse2WRF/VOl5SpPOBf5Zt2fl0Csi/5bxUmdJMXgalnGXWhs+H
-         KD1A==
-X-Gm-Message-State: AFq9FYLZCQP8Av/9yLs8RCOixLGiOxZZ8j0TvH1xhThB4g6AIDfhThzz
-	zqtvuaKw8MLpypBraIXh2x8gNjMTS8Bzfops/JkEx3YD779HXVy9HYj2gUuTsOrj
-X-Gm-Gg: AYBFou1WbCMns0r8Uq/NPJ5ZIhGV2fogul1GIAKoa5VJzWT1GL53KzlNUDeRUS5GmKG
-	ROCRBFN4DN4PBVzwUegO5dLSAH7B32sCYjXs8TC9lfczihvZ2eKJau4MuirufO/WZgGCUU2HxQk
-	0XrumRf+1a6xG9YcuCs2bmV9fP0wdZsZSVYO5vuxtWfb2Dq7T3qcHwI61zwVucjZGkABsPRfkak
-	LwBRRnSnmxUckzlY2sITR9LmqNVKbqV82HEHTI9cLKwq1SSSTPwSyJ/EnabJdNbFiMNC2WrLuO1
-	bcj+k63pSeXWDjTszqCxvMEN70sg04fu7xGmhjkxGMQrn0LXlDXj0DBcHpH7anhh1aqvRji8JDr
-	ZQ61Vu91Pyv3tK/Z3cZs/6g6WIuFIYcO9tBCvPWBdqgrkj2EgoIjAv2p7fuFp7cKs4xXTBWeAcl
-	61sfAHzmL3AJJSSxoGhjpygWoYuRW3OKm7QJX1jCps789uqbyloV+aXJJElBwW52r8h5DKV7MrX
-	ggsT5Q=
-X-Received: by 2002:a05:6809:191:20b0:54c:7bef:90d6 with SMTP id 5614622812f47-54c7bef90e6mr1648834b6e.4.1792500710852;
-        Tue, 20 Oct 2026 05:51:50 -0700 (PDT)
-Received: from [172.17.0.2] ([130.131.215.84])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a73b5b2e59sm10576058fac.3.2026.10.20.05.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2026 05:51:49 -0700 (PDT)
-Message-ID: <6ad763e5.efea58c9.1b422d.41d7@mx.google.com>
-Date: Tue, 20 Oct 2026 05:51:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0389630855671462193=="
+	dkim=pass (2048-bit key, unprotected) header.d=muenchen-mail.de header.i=@muenchen-mail.de header.a=rsa-sha256 header.s=r1 header.b=w3IUetQH
+Received: from mail-out.m-online.net (mail-out.m-online.net [212.18.0.10])
+	by mail-out.m-online.net (Postfix) with ESMTP id 4j8Cqd5l97z1sRL3;
+	Tue, 20 Oct 2026 15:26:37 +0200 (CEST)
+DKIM-Signature: a=rsa-sha256; bh=jpWt/pMvPnNcWCjB76mm5IEbF3SFOZp71fCEp2it8SQ=;
+        c=relaxed/relaxed; d=muenchen-mail.de;
+        h=Date:From:To:Message-ID:Subject;
+        s=r1; t=1792502797; v=1;
+        b=w3IUetQHi9u+C73lf0vi3QevYSXepVNE+l2vs6fk34wTz7FR8+ui+616jsdmCSSe
+         KUUHK2weVV3Tb/R7E5tw+JnwxOuT8SF6H88uCA68iSx8RMZkkSAYvmrays2XkTUd
+         qinvm0VtgZ+lRuw3IjKUQX7SNxdX5wqlNAxzhEjah7dGN+HNGKTbc/CTgrWcyOro
+         TAuv4HwGsZYDdJH5C/4n7WHnrqvLUUl9tH0zfVR6gntfpW3YVta8yzasSM2pgBwG
+         Ql5bnUViZ2vryPqJVvwDMqfvc+ydGQDizIHrE0IVh2pHY3CUezOafy/ZE9fVraRO
+         hrEhkKJqKjs4DYZNYzKCzA==
+Received: from frontend03.mail.m-online.net (unknown [192.168.6.182])
+	by mail-out.m-online.net (Postfix) with ESMTP id 4j8Cqb009bz1sRL4;
+	Tue, 20 Oct 2026 15:26:34 +0200 (CEST)
+Received: from localhost (dynscan3.mnet-online.de [192.168.6.87])
+	by mail.m-online.net (Postfix) with ESMTP id 4j8CqZ2tf9z1qqlS;
+	Tue, 20 Oct 2026 15:26:34 +0200 (CEST)
+X-Virus-Scanned: amavis at mnet-online.de
+Received: from mail.mnet-online.de ([192.168.6.182])
+ by localhost (dynscan3.mail.m-online.net [192.168.6.87]) (amavis, port 10024)
+ with ESMTP id sbgV7B6_Tp6a; Tue, 20 Oct 2026 15:26:32 +0200 (CEST)
+X-Auth-Info: GSJntXyhLGrkHEzpWsj7VhWS4UOUak/bT46u6RSuBCo370N1q882lgF9DqVCziHl
+Received: from wiesel.intern (aftr-62-216-206-189.dynamic.mnet-online.de [62.216.206.189])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.mnet-online.de (Postfix) with ESMTPSA;
+	Tue, 20 Oct 2026 15:26:32 +0200 (CEST)
+Received: from murmel.intern (unknown [IPv6:fdea:9b79:8984:1:7b8d:a039:76a5:1596])
+	by wiesel.intern (Postfix) with ESMTP id 9EE5979A06C6;
+	Tue, 20 Oct 2026 15:26:30 +0200 (CEST)
+From: Thomas Gerner <thomas.gerner@muenchen-mail.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Drew Fustini <fustini@kernel.org>,
+	Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	Thomas Gerner <thomas.gerner@muenchen-mail.de>
+Subject: [PATCH v2 0/2] Enable bluetooth on BeagleV-Ahead
+Date: Tue, 20 Oct 2026 15:26:02 +0200
+Message-ID: <20261020132604.90708-1-thomas.gerner@muenchen-mail.de>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,60 +97,24 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, valentin.kindschi@fiveco.ch
-Subject: RE: [v8,1/2] Bluetooth: hci_sync: re-enable legacy advertising on resume
-In-Reply-To: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
-References: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0389630855671462193==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The single board system BeagleV-Ahead uses a Ampak AP6203BM chip for wifi
+and bluetooth. Wifi is already enabled for this board. The bluetooth
+module of the chip connects by UART and PCM to the TH1520 SOC. The PCM
+interface is currently not used because of missing I2S drivers for the
+SOC.
 
-This is automated email and please do not reply to this email!
+This patch set enables bluetooth.
 
-Dear submitter,
+Thomas Gerner (2):
+  riscv: dts: thead: Enable bluetooth on BeagleV-Ahead
+  Bluetooth: btbcm: disable read tx power for BeagleV-Ahead
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1189654/
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   | 85 +++++++++++++++++++
+ drivers/bluetooth/btbcm.c                     | 19 ++++-
+ 2 files changed, 101 insertions(+), 3 deletions(-)
 
----Test result---
+-- 
+2.53.0
 
-Test Summary:
-CheckPatch                    PASS      1.25 seconds
-VerifyFixes                   PASS      0.14 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       PASS      0.55 seconds
-SubjectPrefix                 PASS      0.22 seconds
-BuildKernel                   PASS      19.53 seconds
-CheckAllWarning               PASS      22.69 seconds
-CheckSparse                   PASS      24.50 seconds
-BuildKernel32                 PASS      19.81 seconds
-CheckKernelLLVM               PASS      21.35 seconds
-TestRunnerSetup               PASS      426.57 seconds
-TestRunner_l2cap-tester       PASS      15.02 seconds
-TestRunner_iso-tester         PASS      8.99 seconds
-TestRunner_bnep-tester        PASS      3.50 seconds
-TestRunner_mgmt-tester        PASS      80.87 seconds
-TestRunner_rfcomm-tester      PASS      3.99 seconds
-TestRunner_sco-tester         PASS      5.06 seconds
-TestRunner_ioctl-tester       PASS      4.22 seconds
-TestRunner_mesh-tester        PASS      5.13 seconds
-TestRunner_smp-tester         PASS      3.97 seconds
-TestRunner_userchan-tester    PASS      2.88 seconds
-TestRunner_6lowpan-tester     PASS      4.07 seconds
-IncrementalBuild              PASS      24.39 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/967
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0389630855671462193==--
