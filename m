@@ -1,63 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=46.14.118.250
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792493555;
-	b=fhH5oDYhheFhiBSbyaj9PMUT8hhGUwzoX44dOF8q/48rWU80BAzztZFNiuATcoQeCg9V
-	 h5vPu4kbiZqa/OYEzFhZS4yFp7lqoo6tmqlSWagoQHnu9yqLLcUIYl1xu52mACaadfO4N
-	 kbhby3F47fPSNRDzU2rS2dTFRDUkxBE9IOZnSMn3aKQbaXJSpE4hfp+Ip0FULQAfM9vvZ
-	 j8yHX2ltgcRjldaNY5v922yVi4g3mDmFDwCuB+aPlAnn8E2xPPFqr8Avrpv87OyXAy9Nm
-	 iB3ogEc7Pnq2agDfbU1i12dh+CxPrIWtrUh+KA0HtdsYEOOr+BQXTqiS82LAxixyPOQ==
+	t=1792500712;
+	b=3Qgw5arjzOh0OMkK76kcSvtvMPoudde0TzX+YGUK2rMOcYN41NYJsvlEU/R9pRPO33n5
+	 Wm8WDfOygHfTgqF1AM8okPf4XLiX9ZK670dUQI6/GdNUAfNAojtmLBKPZJx7HSFq22dod
+	 KxdjHzrkfS49asMJSmXLQjJ+OoX98GtpcucVP/++uHuvtMYkqaOJvSTUxEMjuo7g3WvuY
+	 kdHnluAlcYN7fUSFfI2c7DNyvOxrW7/RedLB0p9gBZV32W+POnxZBcaNzttJYNuooMrlo
+	 NtRpQVWFvZ/U9uGMRFgNqMatVT44q+ITa6AS9sojr2uKH9AquxnVUq8TrzYClIy7J8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792493555;
-	h=DMARC-Filter:Received:Content-Transfer-Encoding:Content-Type:
-	 DKIM-Signature:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:X-Originating-IP:X-ClientProxiedBy:X-Sophos-OBS:
-	 X-SASI-Version:X-SASI-RCODE:X-SASI-SpamProbability:X-SASI-Hits;
-	bh=nzDqId7rohNd7F8gR0YI1rYGcZuf65PaJTN3QFstVP8=;
-	b=wr2wH8qqs+Coxy5+wMzc9R8/OaRjPu6ZJj8V0Pc6zDqwk9AreygnmkKiQsMlK4VMknuj
-	 7HZplLCeFLEIr8JkS7DDCFatKsejA59qZXRiCKCM7VtYZo3WkOwvG154oL3x8M1G0Ey6K
-	 NhshCJxOSYXgllOUXi9kekCAWMrpKTzMdWTR2YbZGNO4Nrioe6lCga3DwfppaymIXc8tW
-	 euoWVLMJKHx0640shNL1sDlwg5qoJootDBa/zfFOjOVWzqALjoD6thsoY1O47kaefYLMg
-	 hLJJdC8JmESqiiIucfbynGuT13w0i20w7dV35POzOeWfvyvBCloDfEKFa9i4H3IAKAg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792500712;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
+	b=5Pc+yX50+0oHIBvmv7zlvdA+PR2B/BeAOmTUtD0XJTMMsKQ0Gu+FhG/FPVGFZDSk+HDY
+	 Gd5y3w9S3qJ/ByEUoOXjqT/Qh3w+6LXnF+h7VGFGsDsxyaC2LlJDWVLbwiewoKCpjCgne
+	 Djn6QneVLm8NVy0Mvsv47TDXPHttlUTMHOltm1581CzQsT3uqyCvrwa5/ruzJSPZEh1y9
+	 7un5G7iaraA0250TVmoWhIjpJGzMUZYQ+Km/Gb4EIwoXpsryIcUb2SrVUMD9Hwk5oVSrf
+	 KPmk8H7zip9DvnGff+KC3jt5h9T5dUdA+M0euTCM3RGKrTzS9NCCne8ucAJi4Z9Z36Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fiveco.ch;
-	spf=pass smtp.mailfrom=fiveco.ch;
-	arc=none smtp.remote-ip=46.14.118.250
-Received: from remote.fiveco.ch (remote.fiveco.ch [46.14.118.250])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PwDxaDug;
+	arc=none smtp.remote-ip=209.85.167.182
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A6C606A331
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 10:52:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52A6C606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fiveco.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiveco.ch
-Received: from [192.168.16.44] (port=17412 helo=remote.fiveco.ch)
-	by remote.fiveco.ch with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <valentin.kindschi@fiveco.ch>)
-	id 1xJ7Rq-000000002AK-2qQ3;
-	Tue, 20 Oct 2026 12:52:02 +0200
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=fiveco.ch; s=fiveco; c=simple/simple;
-	t=1792493522; h=from:subject:to:date:message-id;
-	bh=1xBBu1FERZbXbIeZlyLgOta86H3Ud+NDUuigX/nq814=;
-	b=BCCe+bGPWvcMWwUEFZgUb4AswlYNpqKV1yT+rh53+DPEb3o3z9tN+8GhKGwxomNjWCL18cztxM6
-	ATDetnC9+nmLlZfMZSyBTI0utOiOq0BKoPjHWzegZzS0nVJZ8RUccaOD7RAw06Hai16brYJGmtGUi
-	o5ws1R66p5w01vsO43s=
-Received: from fiveco-vm-vk1.fiveco.local (192.168.16.29) by
- FIVECO-MX01.fiveco.local (192.168.16.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Tue, 20 Oct 2026 12:52:02 +0200
-From: Valentin Kindschi <valentin.kindschi@fiveco.ch>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-	<linux-kernel@vger.kernel.org>, Valentin Kindschi
-	<valentin.kindschi@fiveco.ch>, <stable@vger.kernel.org>
-Subject: [PATCH v8 1/2] Bluetooth: hci_sync: re-enable legacy advertising on resume
-Date: Tue, 20 Oct 2026 12:51:49 +0200
-Message-ID: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C81606A319
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 12:51:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11C81606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PwDxaDug
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-53ec9237600so1244150b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 05:51:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792500711; x=1793105511; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
+        b=PwDxaDugi9VWo1Z/9rcUtwHpy18cTM3vPVrujd8QjTMxZp8K3z6Bpf2BH1uvvicTYs
+         NBTBKt7w6PeHTqBiWH7zdOzCruf30rjagoeEI7dQlDpsP4xh+YWZKEI8EptWBJczLF4I
+         uR85EdGPoWwT8ZZsAMiaPEAOQYCePO8FFDzc7naN8qn2I8rAiue6uTUGdmT2UZAewxrI
+         EsojKEx5F7woURmBc1s9pbqX2og/6MlClCHCIxRsH1mRCXlJVFTg9APqlHrcG9JMZ9IF
+         W9xTR+ZzGcdoL9Ltg+FupXGqyD3R2Ck0CIwku2FtjG5i9QWPIq7UDnaZR0wSQqZ9vd27
+         uIBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792500711; x=1793105511;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=vyqSXXPNW9QLVVN8l4pvx7x38LrynPTo1SZNHtiHHJs=;
+        b=2gNmt4dpo79xvzkExRfWUe2OyhsN7w/IccAuomvCwj8amPKDwmlX0EnEDKkpziZ2iu
+         G8IzsYli4xls0EVtIkMt40QfZKItkwvoZ7+LiEGgPfocTsQ6M8/UtJ4P41nCFPKvgng9
+         PaHd42jPbnRE/WmKnGnXcUsAWR4Ut3YkI7fWKYsVm0Je4buTPucLH8QPRsuLPFTUb50a
+         jem50GcSp3sPgKVl52Dcu4jCs/ghhABWYGqMk6Ztmi/eYLtxpmwyWsu1XMfnLfmVKvG7
+         7IlogH4/J0qeYxeT9nFVse2WRF/VOl5SpPOBf5Zt2fl0Csi/5bxUmdJMXgalnGXWhs+H
+         KD1A==
+X-Gm-Message-State: AFq9FYLZCQP8Av/9yLs8RCOixLGiOxZZ8j0TvH1xhThB4g6AIDfhThzz
+	zqtvuaKw8MLpypBraIXh2x8gNjMTS8Bzfops/JkEx3YD779HXVy9HYj2gUuTsOrj
+X-Gm-Gg: AYBFou1WbCMns0r8Uq/NPJ5ZIhGV2fogul1GIAKoa5VJzWT1GL53KzlNUDeRUS5GmKG
+	ROCRBFN4DN4PBVzwUegO5dLSAH7B32sCYjXs8TC9lfczihvZ2eKJau4MuirufO/WZgGCUU2HxQk
+	0XrumRf+1a6xG9YcuCs2bmV9fP0wdZsZSVYO5vuxtWfb2Dq7T3qcHwI61zwVucjZGkABsPRfkak
+	LwBRRnSnmxUckzlY2sITR9LmqNVKbqV82HEHTI9cLKwq1SSSTPwSyJ/EnabJdNbFiMNC2WrLuO1
+	bcj+k63pSeXWDjTszqCxvMEN70sg04fu7xGmhjkxGMQrn0LXlDXj0DBcHpH7anhh1aqvRji8JDr
+	ZQ61Vu91Pyv3tK/Z3cZs/6g6WIuFIYcO9tBCvPWBdqgrkj2EgoIjAv2p7fuFp7cKs4xXTBWeAcl
+	61sfAHzmL3AJJSSxoGhjpygWoYuRW3OKm7QJX1jCps789uqbyloV+aXJJElBwW52r8h5DKV7MrX
+	ggsT5Q=
+X-Received: by 2002:a05:6809:191:20b0:54c:7bef:90d6 with SMTP id 5614622812f47-54c7bef90e6mr1648834b6e.4.1792500710852;
+        Tue, 20 Oct 2026 05:51:50 -0700 (PDT)
+Received: from [172.17.0.2] ([130.131.215.84])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a73b5b2e59sm10576058fac.3.2026.10.20.05.51.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2026 05:51:49 -0700 (PDT)
+Message-ID: <6ad763e5.efea58c9.1b422d.41d7@mx.google.com>
+Date: Tue, 20 Oct 2026 05:51:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0389630855671462193=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,139 +88,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ClientProxiedBy: FIVECO-MX01.fiveco.local (192.168.16.44) To
- FIVECO-MX01.fiveco.local (192.168.16.44)
-X-Sophos-OBS: success
-X-SASI-Version: Antispam-Engine: 6.0.0.1, AntispamData: 2026.10.20.95719
-X-SASI-RCODE: 200
-X-SASI-SpamProbability: 8%
-X-SASI-Hits: BODY_SIZE_4000_4999 0.000000, BODY_SIZE_5000_LESS 0.000000,
- BODY_SIZE_7000_LESS 0.000000, CTE_8BIT 0.000000, DKIM_ALIGNS 0.000000,
- DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
- MULTIPLE_RCPTS 0.100000, NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000,
- NO_URI_HTTPS 0.000000, OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000,
- SENDER_NO_AUTH 0.000000, WEBMAIL_SOURCE 0.000000, WEBMAIL_XOIP 0.000000,
- WEBMAIL_X_IP_HDR 0.000000, __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
- __BODY_VOICEMAIL 0.000000, __BULK_NEGATE 0.000000, __CC_NAME 0.000000,
- __CC_NAME_DIFF_FROM_ACC 0.000000, __CC_REAL_NAMES 0.000000, __CT 0.000000,
- __CTE 0.000000, __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000,
- __DKIM_ALIGNS_2 0.000000, __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000,
- __DQ_NEG_IP 0.000000, __FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000,
- __HAS_FROM 0.000000, __HAS_MSGID 0.000000, __HAS_XOIP 0.000000,
- __HAS_X_MAILER 0.000000, __INVOICE_MULTILINGUAL 0.000000,
- __MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
- __MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
- __NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
- __OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
- __RCVD_CTE 0.000000, __RCVD_EXIM_4_96_AES_128 0.000000,
- __RCVD_FROM_HOMEUSER 0.000000, __SANE_MSGID 0.000000, __SL_HEAVY 0.000000,
- __SL_LIGHT 0.000000, __SUBJ_ALPHA_END 0.000000,
- __SUBJ_STARTS_S_BRACKETS 0.000000, __TO_MALFORMED_2 0.000000,
- __TO_NO_NAME 0.000000, __URI_MAILTO 0.000000, __URI_NO_WWW 0.000000,
- __URI_NS 0.000000
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, valentin.kindschi@fiveco.ch
+Subject: RE: [v8,1/2] Bluetooth: hci_sync: re-enable legacy advertising on resume
+In-Reply-To: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
+References: <20261020105150.2863631-1-valentin.kindschi@fiveco.ch>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_resume_advertising_sync() never re-enables advertising on a
-controller without extended advertising.
+--===============0389630855671462193==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It restores HCI_ADVERTISING from advertising_old_state, then calls
-hci_schedule_adv_instance_sync(), which starts with:
+This is automated email and please do not reply to this email!
 
-  if (hci_dev_test_flag(hdev, HCI_ADVERTISING) && !ext_adv_capable(hdev))
-          return -EPERM;
+Dear submitter,
 
-The flag it tests was set a few lines earlier by the resume itself, so
-the call returns -EPERM without sending anything. The return value is
-discarded by every caller, so the failure is silent: advertising_paused
-is cleared, HCI_ADVERTISING is set, and the controller is not
-advertising.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1189654/
 
-Observed on a BCM43455 (no extended advertising) after an active scan:
-btmon shows the pause disabling advertising and no re-enable in the ten
-seconds that follow, the device does not appear in another controller's
-scan, and btmgmt info still reports "advertising" in current settings.
+---Test result---
 
-Enable instance 0x00 directly in that case, the way reenable_adv_sync()
-already does for the same situation. Instances continue to go through
-hci_schedule_adv_instance_sync() so the software rotation loop is
-rearmed.
+Test Summary:
+CheckPatch                    PASS      1.25 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.10 seconds
+GitLint                       PASS      0.55 seconds
+SubjectPrefix                 PASS      0.22 seconds
+BuildKernel                   PASS      19.53 seconds
+CheckAllWarning               PASS      22.69 seconds
+CheckSparse                   PASS      24.50 seconds
+BuildKernel32                 PASS      19.81 seconds
+CheckKernelLLVM               PASS      21.35 seconds
+TestRunnerSetup               PASS      426.57 seconds
+TestRunner_l2cap-tester       PASS      15.02 seconds
+TestRunner_iso-tester         PASS      8.99 seconds
+TestRunner_bnep-tester        PASS      3.50 seconds
+TestRunner_mgmt-tester        PASS      80.87 seconds
+TestRunner_rfcomm-tester      PASS      3.99 seconds
+TestRunner_sco-tester         PASS      5.06 seconds
+TestRunner_ioctl-tester       PASS      4.22 seconds
+TestRunner_mesh-tester        PASS      5.13 seconds
+TestRunner_smp-tester         PASS      3.97 seconds
+TestRunner_userchan-tester    PASS      2.88 seconds
+TestRunner_6lowpan-tester     PASS      4.07 seconds
+IncrementalBuild              PASS      24.39 seconds
 
-This affects every caller of hci_resume_advertising_sync(), not only the
-scan path: address resolution changes, accept list updates, discovery
-stop, suspend/resume and the end of an LE connection attempt all leave
-advertising disabled on such a controller today.
 
-The resume does nothing when the controller is already advertising, as
-it is after directed advertising was started for a peripheral
-connection, so it does not replace that advertising.
 
-err is initialised because the extended branch leaves it unset when
-adv_instances is empty and HCI_LE_ADV_0 is clear.
+https://github.com/bluez/bluetooth-next/pull/967
 
-Fixes: ad383c2c65a5 ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-5.5 btmon
-Signed-off-by: Valentin Kindschi <valentin.kindschi@fiveco.ch>
 ---
-Changes in v8:
-- Do not restart advertising on resume when HCI_LE_ADV is already set.
-  With HCI_ADVERTISING set, a peripheral connection starts directed
-  advertising and the resume then replaced it with undirected
-  advertising; the l2cap-tester "Direct Advertising" tests failed in
-  CI.
+Regards,
+Linux Bluetooth
 
-Changes in v7:
-- Enable instance 0x00 only when HCI_ADVERTISING was restored from the
-  state before the pause. Without that check, removing the numbered
-  instance that was advertising while paused reset cur_adv_instance to
-  0x00 and the resume started advertising that was not running before.
-  Reported by Sashiko.
 
-Changes in v6:
-- No change; resent as part of the series.
-
-Changes in v5:
-- New patch. v4 of the scan fix resumed advertising through
-  hci_schedule_adv_instance_sync(), which refuses HCI_ADVERTISING on a
-  controller without extended advertising, so the resume never sent
-  anything. Patch 2 depends on this.
-
- net/bluetooth/hci_sync.c | 10 +++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 7ac26daba..d215432db 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2733,7 +2733,7 @@ static int hci_pause_advertising_sync(struct hci_dev *hdev)
- static int hci_resume_advertising_sync(struct hci_dev *hdev)
- {
- 	struct adv_info *adv, *tmp;
--	int err;
-+	int err = 0;
- 
- 	/* If advertising has not been paused there is nothing  to do. */
- 	if (!hdev->advertising_paused)
-@@ -2766,13 +2766,19 @@ static int hci_resume_advertising_sync(struct hci_dev *hdev)
- 		 */
- 		if (hci_dev_test_and_clear_flag(hdev, HCI_LE_ADV_0))
- 			err = hci_enable_ext_advertising_sync(hdev, 0x00);
--	} else {
-+	} else if (hdev->cur_adv_instance) {
- 		/* Schedule for most recent instance to be restarted and begin
- 		 * the software rotation loop
- 		 */
- 		err = hci_schedule_adv_instance_sync(hdev,
- 						     hdev->cur_adv_instance,
- 						     true);
-+	} else if (hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
-+		   !hci_dev_test_flag(hdev, HCI_LE_ADV)) {
-+		/* hci_schedule_adv_instance_sync() rejects instance 0x00 while
-+		 * HCI_ADVERTISING is set, so enable it directly.
-+		 */
-+		err = hci_start_adv_sync(hdev, 0x00);
- 	}
- 
- 	hdev->advertising_paused = false;
--- 
-2.34.1
-
+--===============0389630855671462193==--
