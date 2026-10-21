@@ -1,84 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.113
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792606077;
-	b=HwA259uGA96VjzsU3hjmuRYWOLPj6bIzhHkUXkp90hHgLMVplF3tOx53mvmfugE54TKP
-	 MwJ8u7OkPNgJtRWJj/WHMGb40uR/w0670eVeLVfWbjqWhTb3JzGr+wzrv5lcQePC2WWP+
-	 bSLNTguaOjtHpGXQtthTbyZ7kk2SjWLfmiwGXiX/v/viHOeQWpJtytYeGPZ9PX6uLkWcn
-	 L3clMAGWk90QxjkD3sJtAhPzwCB/nBgJaYvVObpnOVxLdp46PBX1E2iv755RyHFo/B1aH
-	 e6maLm8B9WBipKlCS95HViQV+IWo8UtqaAEvWkzL+gleGTOAXiCotK+aJW68SSORXOg==
+	t=1792613096;
+	b=tnGHi5iax19v6xDyeeoRkZdDoh3FUqBP8zXV4BOrFM6j5hOJRQxPfGnoTiYKgu3c8Tqe
+	 q0XlvkCV7HXPPXO90HBGjXcHiX6Ck/5hrawdafzYTMWbHyQHa7LMBI4WJDlGr72WCmstS
+	 LStxluVS+2vqf4fH7z6zG/Wi8OJDDO2Ncpa+hq1r58KxMFYJKrimlRCwTw+HkOKmD8PaZ
+	 7b6WB6p5A9rgXqVCbFOtOw+M1M0XK0jMMZH9g5gcg7oV2uBKTUPNYyvui21ralK0xXQ7g
+	 G8uAz90QGAGAe9u+fg/V1cSHxDM1nBqh+1n0L97RtAgo39zWyCle2aPEAWYtHqkSnRw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792606077;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=b7p6neCdKTCeluMRnM5H89C3yI9zdGAWd2qYWaPcdKQ=;
-	b=kBBkhkSD9+t1dVW1mbmZp8A4SG4oK5ID6u3jonno4lw9E/BvJD6+pCFl14LTLSmRIMqS
-	 hHDeH+7csk2nBAkpQeYQaTBUjzyoVhxIGVgOFzujPOW3PgDl4wWTfLOP0lLWhseslVofa
-	 tPloXLbm8u7c418G4ju/CoNrzjktsk9ETQ69yiTTjPVbaFYgbvII/fppafofZcuQonHNR
-	 9pv7xrCWLk9MRHQe91/Tw6+c0pBH5PNIno6p1kl8S8fdPY4L71r/2iEKrYLOMisZdpRUz
-	 +0I+DJ1wL7ZfYsF/wFVLliDPpncuDqkI7Dra98e19p1NeOxrZNm3JY8cEZuU70JO0RQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792613096;
+	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=7CSBl7GBrRosc5SfEFBaD29IOE+r3Frq6wKHsp5DwGA=;
+	b=ynxOrEOWAJ3Rw8v3yGxTWMC3R8V0jqgj7cAey+zUQl8wjFa/VHwdUGq3f7Upde58VgZq
+	 PvzLivAjAjcCz3yJG9woe16NGXBsJox9whAtiYburniB8YCtslOI2UPSN6tzAhchYSkdK
+	 LpZMlTK3AfU3sjXeF+b5lxt2lVO4iBxGcxg/EdlcVlJhVGpTaIHmkb8lEBjXGhgf+8xBK
+	 bcEAc+/60oA5QVKkON3oew5zd5ecIuoWdj4KgP9BjbZIEJxFYXAR4vvsR+sNN9d04471M
+	 4Zs6ME14bcmffbpkfJb6YAhdOG/83A7Lje8SJgvnfZI49emZZL+ANCnQtPsDEoGLzpA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sjG5sJn9;
-	arc=none smtp.remote-ip=74.125.82.175
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=michaelmcallister.org;
+	spf=pass smtp.mailfrom=michaelmcallister.org;
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Ti6wWXhy;
+	arc=none smtp.remote-ip=79.135.106.113
+Received: from mail-106113.protonmail.ch (mail-106113.protonmail.ch [79.135.106.113])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56675606A31B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 18:07:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 56675606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586D9606A31B;
+	Wed, 21 Oct 2026 20:04:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 586D9606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sjG5sJn9
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-3282db206d3so2333441eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 11:07:57 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Ti6wWXhy
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792606076; x=1793210876; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=b7p6neCdKTCeluMRnM5H89C3yI9zdGAWd2qYWaPcdKQ=;
-        b=sjG5sJn9EhgUWy5TrNZwpamGHzIzoj9UaSIXy9Dwv1d9/vHWsmwUz8+GYFE2C8Q+wN
-         t6T4QCQZrVJTqp5vsJk4NspjRmrGWHutUObUGznl4YW3h42s2Er9DrH7N5c2WHxlRH+s
-         U588SCnfHXCl7RSJQtsSwiXAOK3/k9tIFF0BwRDmLbr7q1RHoa1elzOrKPgDCDvm4Ex8
-         qCaJhduzYBExbAnQptUmfRiAQhMbfsMuA38AM5MypAh+5cQp0iSiI8lmPPykSJrJMJqK
-         cHGGAEeDLHXgfvBlttFCYlGuHVo6o9V6Em55TsXe2SDirX06fjDrVb6AsNFMp3xz8lDY
-         SOpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792606076; x=1793210876;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=b7p6neCdKTCeluMRnM5H89C3yI9zdGAWd2qYWaPcdKQ=;
-        b=lcvbrMi4L/ZmtPBzPCjSx5SDm9+5WVeJfNSAgHy2CKt1YzL9BNSPQh8F5ARkZCVmJ1
-         h4f98bED5Eq4gA3NrxAxfk4sHidbTSPKMWAZXD71w6TFVMMV9uvb/07I0BnoqJVv1y+Q
-         guTF6PJggK4EeDm+hF1F6zbWjaKwusnxpc/nsf6LbUWuxJcYju3xJoKwB4UJeWqq7Tuk
-         vilsCG9vqGAM+JiWFoIya5hjkdluE4GFHdN/gpcpe6X79k9dNozN4T+zKtF/5MKXoy69
-         CH5BB2ZcPqHqvR8MHyllf+wumRy1jGp7QOR+m14aw6K9M7G5a33tyeAh56hdtLobJlCc
-         i5kA==
-X-Gm-Message-State: AFq9FYL9aVZG0cu8pwvc5q58qotoEjAC44zWRrhGQrifpZ7nbLq1dVNM
-	MUtx43WZr73h2CKb3+500qP7sK4vug3SSfFh7d+GtPZCJ946iXmuTiDP7wajnw==
-X-Gm-Gg: AYBFou3ZrVkEMSk1kry1KnCBPu8xAGoIa4kprchMXbyhLXABWAmX7qzUI0Uhtv38WDz
-	wnGk+RO8bQ3vpFZfGCq1O8AmdMnDLZDjfABQShTU9tvJPNwdvZ2i4s+OTEzOHeteg4M897Jh3yk
-	XPtv5d/9IeE/iWN57bhqobYhya23a83DLTmYMeyvZGpshNLnqMdwajiVyVWVIJm2MZYjY1KwVCT
-	bCysjLVllIlY5BPmmD2oA3ozrN4zCVk2gWuxoU+1IE2fD/9cNbPmLLvFfRhfqIZ+rU96UTnuUsq
-	w7eq02MPna8ynCLODoKIlWRN8bwvxBBSWJQWGg7TL7THmrko/7+pgWPdVQd+CCIuNMIQeM39gKA
-	UF/wCDymQPiU2n9YWJw82O3ArOYDrueCAzJat1te0qbEf5OVKxAPbc+DDtkgyG2iwgMqe1Vw1Ca
-	XXjN1f37zbFw+eJUJfaVRKd3IWAtOMojYOFc/f9pcvPecmDIAs22X79oeI9nrLy/U0Zjbca14qR
-	bohU2mkyNyysBOp6mUtlQzygqFarNANaPumL+WWH46XYeYI6XWOq6ZzxwAOagg=
-X-Received: by 2002:a05:7301:b8a:b0:368:2548:c078 with SMTP id 5a478bee46e88-36825580755mr1666713eec.17.1792606076299;
-        Wed, 21 Oct 2026 11:07:56 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.195.92])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-367411bc89fsm11112195eec.16.2026.10.21.11.07.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 11:07:55 -0700 (PDT)
-Message-ID: <6ad8ff7b.be2e0958.24e6b4.1a25@mx.google.com>
-Date: Wed, 21 Oct 2026 11:07:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0414674285681999995=="
+	d=michaelmcallister.org; s=protonmail2; t=1792613091; x=1792872291;
+	bh=7CSBl7GBrRosc5SfEFBaD29IOE+r3Frq6wKHsp5DwGA=;
+	h=From:To:Cc:Subject:Date:Message-ID:From:To:Cc:Date:Subject:
+	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Ti6wWXhyqUya4ufLtUyzksctzGd79BIsLlXvnU+uRvs8Tu0qJCaBg20ZAQshl4Gau
+	 Kclqa07zPzIWx0A6R+a0KOa9HEa/+SbQelSaN8Q+H4KOYlhL+h3Jcotu1QN4CtZbiA
+	 v8QqZT40q8yVcJwMe1Dn+/YXdA21wVbwmzXYWRNjRp/6uKn2qb8wLkupkxVJwO4pN1
+	 aRxw1PG+f68y2+oAyTJYZhuortrn4Y9rx0WRtR+vD8afLahSR4wwharYgH06SrF0ep
+	 WjjQEmKHcX9S6W9Ml9++7mASsgIESF/9QSTQcQ7M/KxuoESvqvqEoG9HV0UqBEwtQ3
+	 mrzHa1IwwaLyA==
+X-Pm-Submission-Id: 4j90cd1jw7z1DDrD
+From: Michael McAllister <me@michaelmcallister.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: brgl@kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	lumag@kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bluetooth] Bluetooth: qca: Fix the WCN3950 NVM baud rate offset
+Date: Wed, 21 Oct 2026 20:51:12 +0100
+Message-ID: <20261021195112.41138-1-me@michaelmcallister.org>
+X-Mailer: git-send-email 2.50.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,49 +65,62 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v1] Bluetooth: btintel: check FIPS status before firmware download
-In-Reply-To: <20261021130424.3042597-1-kiran.k@intel.com>
-References: <20261021130424.3042597-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0414674285681999995==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+WCN3950 uses the HCI transport tag layout that stores the UART baud rate
+at byte 1, like WCN3991. However, QCA_WCN3950 precedes QCA_WCN3991 in
+qca_btsoc_type, so qca_tlv_check_data() writes the baud rate to byte 2
+instead.
 
-This is automated email and please do not reply to this email!
+On a Motorola Moto G10 with WCN3950 and cmnv12.bin, configuring a 3 Mbps
+UART therefore leaves the NVM baud rate at its default 3.2 Mbps and
+overwrites the following byte. Firmware download completes, but the
+subsequent HCI_RESET times out and Bluetooth initialization fails.
 
-Dear submitter,
+Include WCN3950 in the byte-1 case so the NVM baud rate matches the host
+UART without altering the following transport parameter.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1190499/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      7.16 seconds
-GitLint                       PASS      0.27 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      30.84 seconds
-CheckAllWarning               PASS      35.19 seconds
-CheckSparse                   PASS      38.01 seconds
-BuildKernel32                 PASS      30.63 seconds
-CheckKernelLLVM               PASS      35.04 seconds
-TestRunnerSetup               PASS      720.87 seconds
-IncrementalBuild              PASS      35.13 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/973
-
+Fixes: d5712c511cb3 ("Bluetooth: qca: add WCN3950 support")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Michael McAllister <me@michaelmcallister.org>
 ---
-Regards,
-Linux Bluetooth
+Tested on a Motorola Moto G10 (SM4250/WCN3950) with cmnv12.bin and a
+3 Mbps UART, using the same change on a local Linux 7.2.9 kernel:
 
+  NVM tag 17 before: 95 11 0e 00 2e 00
+  NVM tag 17 after:  95 0e 22 00 2e 00
 
---===============0414674285681999995==--
+Before the change, HCI_RESET after the NVM download times out (-110).
+After the change, controller setup, discovery and controller power
+cycling succeed. Other QCA controller variants were not hardware-tested.
+
+Built drivers/bluetooth/btqca.o for arm64 with W=1 against the base below.
+The current maintainer-tree build has not been booted on the phone.
+
+AI assistance: Codex helped analyze the saved UART traces and kernel
+source, prepare this change and commit message, and run the build and
+style checks. The task was to fix the observed WCN3950 initialization
+failure and prepare it for upstream submission.
+
+ drivers/bluetooth/btqca.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 22b08ab05..002307000 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -426,7 +426,8 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
+ 				tlv_nvm->data[0] |= 0x80;
+ 
+ 				/* UART Baud Rate */
+-				if (soc_type >= QCA_WCN3991)
++				if (soc_type == QCA_WCN3950 ||
++				    soc_type >= QCA_WCN3991)
+ 					tlv_nvm->data[1] = nvm_baud_rate;
+ 				else
+ 					tlv_nvm->data[2] = nvm_baud_rate;
+
+base-commit: 9b3b269829faa3a6264588cff6ef28da0ca5cee5
+-- 
+2.50.1 (Apple Git-155)
