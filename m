@@ -1,69 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792596879;
-	b=n2xuvLfsqlUWukp72Cd9u2CWrsjX5J/KX2vFhQ5WiAYrIcuvZp2Aw65B0NnaqLyd362d
-	 yFJfq81+6pIqAM5c/TaLVq9ftlb1EjiG5AruyyGM4Z5BdfYAl4/CQMZxNxndFe7GZfCen
-	 MXDSvbd9Ugj5uAHX+QP1NtKkcyP0hft8jCZ1dB4q8XiJFloI0RIIkbo0rrQW2VzpnNmJm
-	 3sT6pSlTN8h3eCHX2mGS/4B2dUl4D3QyNxmNUPoT+V1jCM4LMcp4OTP8gVP5OkraQ2q90
-	 L3FjjzsQifM6lYPVPV8Oztsk9TRosVe1MTX1Yx45EIu4mHJkDNWvoT3SFJONaBZjVOg==
+	t=1792597785;
+	b=ZS5DgGJk6L56R1gR6GFMJhe82K50ryfIDdtFLvV9QeuVJHZRaVVs7P0DEjeB36TfjumN
+	 Xb/z9UPVudaC/fh8jE/0NAczp5knuDar9GhhRcM19dpjAbx7GRxz9vzgsprA3OIPpt1r7
+	 OJBbebkSFHG4US2yvuBiLyWNo32FZmSGAbsguO77VMlDSXh+mqtYu8Y72BEsZhFcOvFkT
+	 7iV5YZ88PnCRiYcliZkUjUvCym0r5kozViyU9Hh6RRlJu1Kao2Rim14cl5MuDLrrMbi79
+	 ilywCByiHHhT4TvHZfi2xSSyzZPa+YStNUmK30qGk5P/dZpoUkGNQWttxIJWLlNSdAA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792596879;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792597785;
 	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
 	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
 	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
 	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
 	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
 	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:Content-Type:Content-Transfer-Encoding:X-Bugzilla-URL:
-	 Auto-Submitted:MIME-Version;
-	bh=XgjTRb80vhpOqUwQBBhxuFNjzB5nhJLth4WVYFG034Q=;
-	b=1wew4Rs9d4DqY+yWB3VLzRhANwGN5wDYxSaKQMKUubXNm0EetSv2wfD62GFrbkV+/FIL
-	 dtFC/lVb1V7pc8hOLFJW7AIJN5EsPZnt8JSMQ2e5vzUQzHPiTPtN2Oux/4BjgHeZxYrLS
-	 LYOaRkXGhEG2V3HB0X5HccGBX8NrDr8tyaPkGFcOMs17jWEOUKk9D7mH7OzV1/S5FSYDc
-	 Ir20AGTq0FNc6LehHkNg+M/BLSvtNVMu9M/JFuPiyZunYcPN0iIan8bFpG2CMhZmn7vx4
-	 SEDtVjTtfBrzzXW/UD5+S1OX12LoSUokMfGeO3yQCSxbi1jURXrqicdmo+2Pmk+03/A==
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
+	bh=xfjLnjDpy8Ee7zgmlC4JrWSADaaLcLfedzriSDQRn4U=;
+	b=OCS4Mo2Gw2zD7LpAHksKMkIsMA0OrViIIf8DcdVONiUCFneBrDmiy93F3t12PlWWyOcP
+	 1RxzaeNeMffs9CtoKnVSSQeMBnt7vjn6a4/9ZqQ2DpTEyQY8vqa1UTNpPlbv6l7CTbJG4
+	 G6PBdTCRVSTNzhMA8ltYnvzQCgMEZE144eGFHRH4NWNosv0xpCE0UD9wKuv0UlN69bUbI
+	 PyxjnHJhciFjENPJj+EZiiCuLoCIKujBChj7rdj8QVJJCZ+jfkK6pHQB4Uqui3AcVHCY6
+	 1JD1EMuI3tsJVULzvqnx6s97joKu+aly5l2wFyIuMsD+luxn5yOCGno4guLTSVlIi1A==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=tbez8Vhy;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=G1pju+7R;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
 Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49089606A320
-	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 15:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2DD606A31A
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 15:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=tbez8Vhy
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=G1pju+7R
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FB725771
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD0C25771
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792596879; cv=none; b=U+hs8Ow2ieImHFT43RuU+M8ybmV4TRMRgPwthWxfRrZXGJ+3sdUGLR0FnbKK2T1wEttgXCMegqXu9adyalMA1XBaNcBLeKkxu6kwJTc0hDGBLz16h6/K3r9XRuHmgCCwJksMGZn2+tTO3FEPIxqhTk287vRBMkKRu7oA8WHNXWE=
+	t=1792597785; cv=none; b=u7bgY7fQH6ZB4b5wDE1ownxzHNLHokJJ6i4L1pzCOtbYBHi50k/yBnmFoKfmzazlHzWP1EXxu3XLXjn7bKCAiTfBQQYGLnGGukX5IIBzMpLjOv4luTem4G40xudO3d8YTXKtdUHdDYYw4fBtxyBE+13ighLOjF6kRoarx3wkNmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792596879; c=relaxed/simple;
-	bh=cPEMrL5p19FCuPSngGxCqCwGlrm87zuRqifiEUnKe3Y=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Blc33yfWyHq5+8yiULt+JBZtXCfsgbIyVOTkyDXAiUyLAQsaiqK1wqdesMGJ9hpT6/QwAJq9pKQuLBxHY6cV2otANm14lA+B23LK/q5jGeCCU0NvsME60Ms2/3eLexqf1otsXxvZAQWagzXa2tjfJvLJo+oCgJOh8rhVhAIaaeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbez8Vhy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 92F8AC2BCF7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:34:38 +0000 (UTC)
+	s=arc-20240116; t=1792597785; c=relaxed/simple;
+	bh=3vDx7qhtoKfxXilcdZMZfBcSxZeT67WxVnafzTLkypM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=H9YzsTWP3gFlg25yagYRLPXxAgGNYaCVqlVn8jj9opyfdV6WmtkzBSOvpHwUk94+4VyEibQnp5EY5txnnQHLhJNrzLCaT8WL45MTAXjavCDC09E1ImVqgwIBJ1Qu0kF5E/ZEqNXximNUi8w/6pc4AjyJ+wye3kdtFeDhX0JT37g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1pju+7R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0C6CEC2BCF7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:49:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792596878;
-	bh=cPEMrL5p19FCuPSngGxCqCwGlrm87zuRqifiEUnKe3Y=;
-	h=From:To:Subject:Date:From;
-	b=tbez8VhyinoJrOqnOAeJgM0zA13LdzN/K2avjW1nfl6ngfgMjPQ2QTcFOozuWnL4I
-	 NcX/SwF+RNTJrnE88ffd9GWqt0rpupmXqz74tPVL12ztuIG0RA9mUiSWiDeLLWMEqX
-	 jTJL9S40zmM0lFaY6gsAFnxp7e3f5CTdm9Dj18BpQ0pg3IM7DdciQ4nzOjv1E3E8TS
-	 1BZCdIvMAUQYvjyIP9pZnFUmsDUbt7J4bbo8cg74a0MFQiywmHMwxlCgod0mmNAtxC
-	 oB4l3RapYZIWFWV35/JSBRZ5uz5frPtpTioI49hMFFEjOHaIHdPNqKAuA7OrhCAwW1
-	 e2zFVxAHWofTg==
+	s=k20201202; t=1792597785;
+	bh=3vDx7qhtoKfxXilcdZMZfBcSxZeT67WxVnafzTLkypM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=G1pju+7RErMZgYrrkgIPSnNICeCVf1WpcVLAhvGS9Lg3TKZJ/JQgiN8d+lJ71vpmG
+	 NrLj2SvlOziMnbTaauGsqtzWGGfFhc8YvhNaWqRbxNyUsqs/mSVK7A+mkDLjBGg7O2
+	 N6xVlpvL9Y9d9OdZuOdzY2b38/lchGbqIyoV6CdVRGPbmcNV1fgjMI0rsqRHPZghHe
+	 KO4ONbF3Nnq7HDQay7IQeljUi0yXSCE1eOFLsWj6e7gU87xmvzmzKKFHfbFD98CR8u
+	 HbLCqif/yaWp3OA30suIz+UPqmqfBsM6gTjE3+qTnGjacCRdWpHZgoXdKMXUdDMJUg
+	 CqcSfGuSA3h1w==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6A3F4C4160E; Wed, 21 Oct 2026 15:34:38 +0000 (UTC)
+	id D1D1DC4160E; Wed, 21 Oct 2026 15:49:44 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 222177] New: Bluetooth AX201 device does not work on Debian 13
- on Kernel 6.12.114, works on 6.12.113
-Date: Wed, 21 Oct 2026 15:34:38 +0000
+Subject: [Bug 222177] Bluetooth AX201 device does not work on Debian 13 on
+ Kernel 6.12.114, works on 6.12.113
+Date: Wed, 21 Oct 2026 15:49:44 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -76,10 +77,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-222177-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-222177-62941-ZHIhTAdHPL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-222177-62941@https.bugzilla.kernel.org/>
+References: <bug-222177-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -96,29 +97,11 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D222177
 
-            Bug ID: 222177
-           Summary: Bluetooth AX201 device does not work on Debian 13 on
-                    Kernel 6.12.114, works on 6.12.113
-           Product: Drivers
-           Version: 2.5
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: kalamlacki@gmail.com
-        Regression: No
+Lukasz Kalamlacki (kalamlacki@gmail.com) changed:
 
-After compiling Kernel 6.12.114 bluetooth device is not working in blueman =
-app
-on Debian 13, it works correctly on Kernel 6.12.113.
-
-My adapter is:
-
-00:14.3 Network controller: Intel Corporation Wi-Fi 6 AX201 (rev 20)
-Bus 001 Device 004: ID 8087:0026 Intel Corp. AX201 Bluetooth
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|                            |6.12.114
 
 --=20
 You may reply to this email to add a comment.
