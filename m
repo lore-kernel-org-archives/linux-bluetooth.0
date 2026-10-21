@@ -1,90 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792558602;
-	b=sKAg2NnkL3ivOpJKQOIaC6tklwdlX/FjMj7irNaeGjqakarrRf7t4ZHM8m1xEbITabeL
-	 IfT0hsK87AUWgOO4lYyhiExKQiwt7xe0iedmRDV3xG2eWYSA/ZVBedYaHXrA1ERbOuyiD
-	 7D4i/Dp1G1I2vxeVd668UUZH/Tbw+ffVi2vFocjzyxKX6i8pqJjd8vsP+PrAWjx/K94CM
-	 CrLN1RFAVZxrkU439o0kKV7rwEt52XTWmuavOLkSfZkyUkY2EuJJRvH6VwsTNUZwImeh9
-	 OsKy+iJXnE7YEFh35mg37yxOUdNJ0NC5nyB2ogkJ2s4V90Sol/d4UlNDaH9RMJr9Uqw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792558602;
-	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
-	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
-	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
-	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
-	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
-	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
-	bh=b5y9P59EMlZ+OPPP2FRpajZFydSCvyi8umiPandoCX0=;
-	b=C6IGLdjdDy+7fz3E7r1faWOc9HWc6SpxvLen1WW4sb/987nf2dJetaxPO5Qjr2pQwscZ
-	 JFBzNGorDba/qXh4aBXnX5+NsU59u1rc6Lt+J/EO4SAI2B8FTRH/R/3PQMW2lpU/fb4At
-	 ohzVo77ck+jsIq1K3a/+SmJd34axqH4KGGbKKg6gHCCzPPPy8IW19shDuSwVxhlkXucv8
-	 w/oqR59dSw6OhIVhtNKwv3Ueth42atJkjtBW6qsesCDm8Dnfm9BQ+abZk3YFMdozh1siX
-	 W7ARAi3aEJHFHXiASSn762Rodf4waIgNWvKp+xd1pBbko8ddlMzaXaoG7C0AABn3IyQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=ZWN+1LZ+;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
-Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375E1606A319
-	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 04:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=ZWN+1LZ+
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792565949;
+	b=uL7XUYnDEz0WEPMNEB1VZQ91koLWKoZbhQ5II67duQXhfWNxNsyh+4vCbHh/PjuqeprS
+	 sZyzOJa3zdiz7a0cc36CdPp4HnCncWfc0AfTBndsz81Xo1TC7ANSpgyyTwWZJdDHp5jIS
+	 kWfM6BAnBI6Khcp0bUBBz4m+XAY4XSe8Z3d1Odc3LcGvv/N8dz5ovF7zRYFr6MkqZtMHV
+	 voa7CogVlvSTQvU9JMeNI4GwwhJF/ibk2lXErmEtD3ij0R4W3l9I+q8reVxUXFEEge1VK
+	 Dwhsr28rJorInXqK/wJO+E7vk9nkF7DxO4+dPStZeU3UVlDygBHE/YG77YvuZKYr5Ug==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792565949;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=SLexcCgDK2SIVIMYs8/iOOF5BBjM2PxK0AQdb+qmIk0=;
+	b=c9YP5mxeLOUVajdoE9r5nwRyA0eNEYJ73uND5tzNZsyWtpQG91/vZ/C0rbFxhTNy32ap
+	 1mNA8x4maRkmThXGwQHSxLsiUtx8I+Sl+m5MZVaRGYf7mdIazu2tZVbcd8B+jt/+FQS7w
+	 zSgWpNP/mJ+W4/Iwk9RNIN4+OizHn/tRVf7wbV15QtIg8z3Vlzb/lwJ59LqvymDHgKbVq
+	 icjQ/cjdT3XNr/26miviZ79aGBSUO4OTerD0ku3G892UcFRVCu9ZgqmZdI/zncUChTkHf
+	 LNNWl89TGRDMFz1yXMZZcHnrR3y0+1B7Y0pbSiiYfE0DvYn1wfzkSY6NvExR3CNJpCA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=tooangel.de;
+	spf=pass smtp.mailfrom=tooangel.de;
+	dkim=pass header.d=tooangel.de header.i=@tooangel.de header.a=rsa-sha256 header.s=google header.b=m90sYhhv;
+	arc=none smtp.remote-ip=209.85.218.50
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFAC25771
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792558602; cv=none; b=b49Zlp95x+pIOw2Au8fpfllJGBMlF5QWr32IvR5n+F1qEtg0wWxcicCLeaW2V1G/1/A0MGSP7gaNUJ0r/mAqSgUF5sssBlgXSB07auggtnwTF2clZ6WBhd0SNmg8x3FInk1vHFPY3vTfj+0dkFgb1y7pTvxe2cT9h5ZzoI9dnjE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792558602; c=relaxed/simple;
-	bh=yw6b/XQ+v0IkUIuUmnvvKsA11QcNCM/JglTt3OPjOjw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GxI7ceDlsXJTDOA20FUyPYZpOkiuEWsb9deBA5eNv/6ek22LU2SJwOt+0I80gSocK9kQyF3oCgK9ID7zoCmCf1taaZme/UYi+9wugagrf35b6K+J73MPCqhU3rdjZ3ft0AlQDv/BURzmm4BnTXI/5aJXoVt/egLmzzey1udbqa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWN+1LZ+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D4ABC2BCF7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:56:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792558601;
-	bh=yw6b/XQ+v0IkUIuUmnvvKsA11QcNCM/JglTt3OPjOjw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ZWN+1LZ+MTt5gb+6nsgbTHQyOdGoKDwHjlxu1F5EsvmDg6anXnqIGUan2L/Zm38DE
-	 rozUjaYMGCmFAIFvUmpLt/wWtgZCa0FXbpdC4kyasvUxEr3wzJO6xZ5PS/iJCmaJvw
-	 YkZc87hpmZko3xK70NhCsH2NhooiF7VTScbjGV9+NIJQu+kMFpQKllmS3Nh9fsZwVy
-	 u/Sxd1C/hgSszL76ZSlqlPDwdlsq+sLFA6t4myGA+fvv1qphZLSi5GZvXOzZj3duaO
-	 tswpBLBp6eMOx9jOfC7cWGm1SyBLvmLYalJNKPrEklGfv4ep70uZCT+Uq0qoB/YSqE
-	 g8IDPQTdJx3gg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 54CB3C41616; Wed, 21 Oct 2026 04:56:41 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02546606A31A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 06:59:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02546606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tooangel.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tooangel.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=tooangel.de header.i=@tooangel.de header.a=rsa-sha256 header.s=google header.b=m90sYhhv
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c434376dbebso73931066b.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2026 23:59:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tooangel.de; s=google; t=1792565947; x=1793170747; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=SLexcCgDK2SIVIMYs8/iOOF5BBjM2PxK0AQdb+qmIk0=;
+        b=m90sYhhvzoPRuC4q2/O8LG3/PGBvy/AuAbSPQJ76i8q41A+oXDvG1F7diDOAyI70C1
+         wGS4ArVQcworN4xlnmSlEODt+YKzhEU+we9cAvqsfTJeN0EuvHUDQgdIRgrBZEEXQGoM
+         kWpSk/MyXY0Ff9wueuUe8msUTddTTl5RGVz5f9U8OXOenpiv3IF+MYAlsDea40r6y3Af
+         r2ByA2jDAU+lUnhOVsNJIjcLPanME2tmwNTg06bbZ8ZUua0blsPuns9g/kRp/BjFoUK4
+         /IW3QI3MxFsX81BaNdd1ypuF83apuXpwiXFpO0meT5Jpq2U3mgOHf+gz97LoU9VpOv3A
+         v0sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792565947; x=1793170747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SLexcCgDK2SIVIMYs8/iOOF5BBjM2PxK0AQdb+qmIk0=;
+        b=ezb8vF+xR83XrZWUEkociboy6gNu1s2jGF2Un23GO+b8/cWdsp38tZz7GEN1tUTLfb
+         Crrq9cS6z9MkAEOxyvLJvz857c1YfmEhp5vTY2R5S4QiQoi0RrU0WJJJRR9i44N+QU2Z
+         xtJzMMi+qfXJW+UIyWMRvM3hcymapOq8tf8LBhxOjfTyManALzazqHvUrnjrPUpOIpOT
+         7N/OHvdYwjRK1Vc6amrSScwgqm+Y4gqu6A3H3Wm2im6IbEsGEw6YNGM9Xes8TcDIZCWN
+         qV+kYaUGTlvBoywKJ8h7VyFA4pbdXSXL2LT39fvaIUulNdW2ce6dDCIyCyNYXZHwDVRo
+         PUsA==
+X-Gm-Message-State: AFq9FYJ/trV1e/qIBLUeBPHMjQ1y/8UUZHTLorCeTc2h4x2biyZUWfJd
+	rcpmpoTFpbCxYWS2qfTcMPmWV3iC2IOgiZNPDYltU5BpZVOBv3cT4LdGDUCWxZDAg5Z+TSucyPZ
+	5aD5wAq3Zzg==
+X-Gm-Gg: AYBFou31iiVXEqNYyhEfXFimDdLpYSTiLyDPCrCMhfPCL+2DXAAx/msFPv7UtTRVrbw
+	j1kyU2AsQf7whqq53+fwkfeTcLaEtACG71A7jbnpRhkWW3poMYrOGTKgOl/klHbyO8DwvOdCGFM
+	a/7LdTDxe8bs4w34dyrvgpfAH5hq3RoTGuhPjmDjjHAIU02kObzRDFcG0L9y9Vq2zFag/ezBwe1
+	J9rXp8zgumiNcmVDqkS/FbPX5AcvcP7j+JIhbZRYvcUeHGeTREz1E/nW9XW008ukYZQGsMgTN+V
+	brlajhY7c943JUtAsfNpH4ePhHQ0mcC0GNtGWYTwa8FG3TKrURt5P7J0nU89iJBHheFVCWKfUa3
+	9LkuVhgrBPf/Qay6IK4Lmhv60/pFd28WJPGsY+sUbl0muH2LnsyYC9tm47Z0vMeUQSixLHFrHuk
+	B7VaNT25c/pCaB6eZIXcn6gog3K9iJvvNKa2Ea8iksEKge/IH/GQYeIHwjjSd5N9AtYaJqeeXQs
+	fVx8f8vSdQ63mMkJj6VAfKF7tbwiEAT9AVnc6tdnIDYclvG2BvpdyQpJbgN8yuo3diA4CGDJbcI
+	+1Ui+U8jPvX/8sJi2IeDcCr02J4dXompbyGrQOtzXgfGC18fwg1hD0qvpxiFYPYODCkqqqQw4Kk
+	9oFmtzYWtKBA0+MobPnyt62RiUvlOyY9NNTk4P94Y8/gkyfZ8FPsvzJL557kGNQ==
+X-Received: by 2002:a17:907:b045:10b0:c46:7fa4:9212 with SMTP id a640c23a62f3a-c467fa4a4f2mr33166466b.23.1792565947131;
+        Tue, 20 Oct 2026 23:59:07 -0700 (PDT)
+Received: from toogaming.fritz.box (2a02-8206-7df6-9800-2fb8-381c-b7e8-86f2.dynamic.ewe-ip-backbone.de. [2a02:8206:7df6:9800:2fb8:381c:b7e8:86f2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4679006ffdsm45166366b.77.2026.10.20.23.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2026 23:59:05 -0700 (PDT)
+From: Tobias Wilken <tooangel@tooangel.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 222164] MT7902 Bluetooth: firmware coredump after ~10h uptime,
- then &amp;quot;subsys reset fail&amp;quot; and permanent USB disconnect
-Date: Wed, 21 Oct 2026 04:56:41 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hongweifei@cyue.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: short_desc
-Message-ID: <bug-222164-62941-IGjCAf8vML@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-222164-62941@https.bugzilla.kernel.org/>
-References: <bug-222164-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: MGMT: Return RFKILLED for Set Powered on a blocked controller
+Date: Wed, 21 Oct 2026 08:58:33 +0200
+Message-ID: <20261021065833.120347-1-tooangel@tooangel.de>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -94,142 +95,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D222164
+Since MGMT_OP_SET_POWERED runs through hci_cmd_sync, powering on a
+controller that is blocked by rfkill fails with -ERFKILL from
+hci_dev_open_sync(), and mgmt_set_powered_complete() reports it with
+mgmt_status(err). mgmt_errno_status() has no case for -ERFKILL, so
+userspace gets MGMT_STATUS_FAILED instead of MGMT_STATUS_RFKILLED.
 
-hongweifei@cyue.net changed:
+Before that conversion, power on went through hci_power_on(), whose
+error path mgmt_set_powered_failed() still maps -ERFKILL to
+MGMT_STATUS_RFKILLED. bluetoothd relies on that status: for
+RFKILLED it sets the adapter PowerState to "off-blocked" and returns
+org.bluez.Error.Blocked for the Powered property, for any other status
+it returns org.bluez.Error.Failed.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Summary|MT7902 Bluetooth: firmware  |MT7902 Bluetooth: firmware
-                   |coredump after ~10h uptime, |coredump after ~10h uptime,
-                   |then &quot;subsys reset     |then &amp;quot;subsys reset
-                   |fail&quot; and permanent    |fail&amp;quot; and
-                   |USB disconnect              |permanent USB disconnect
+With the controller soft blocked, "bluetoothctl power on" printed
+"Failed to set power on: org.bluez.Error.Failed" and btmon showed
+"Set Powered (0x0005) Status: Failed (0x03)". With this change it
+prints org.bluez.Error.Blocked and btmon shows "Status: RFKilled
+(0x12)".
 
---- Comment #6 from hongweifei@cyue.net ---
-I analyzed the captured HCI trace to answer whether the host side triggers
-this, and
-to separate two questions that the log actually supports differentiating:
+Map -ERFKILL to MGMT_STATUS_RFKILLED in mgmt_errno_status().
 
-  (a) what makes the firmware die, and
-  (b) why the driver cannot bring the controller back afterwards.
+Fixes: cf75ad8b41d2 ("Bluetooth: hci_sync: Convert MGMT_SET_POWERED")
+Assisted-by: LLM
+Signed-off-by: Tobias Wilken <tooangel@tooangel.de>
+---
 
-## (a) The host is not triggering the firmware crash
+Notes:
+    Tested on Debian's 7.2.9 kernel with a soft blocked MediaTek MT7922
+    (btusb) and on bluetooth-next in test-runner. mgmt-tester passes
+    515/515 with this patch; the new test "Set powered on - Blocked by
+    rfkill" fails without it (Failed (0x03) instead of RFKilled (0x12)).
+    The test is sent to BlueZ separately as "mgmt-tester: Add Set Powered
+    test for rfkill block".
+    
+    Not tested with a hard (hardware) rfkill block.
+    
+    This is my first kernel patch, so I'm happy about any feedback, also
+    on whether it fits the conventions here.
 
-From the btmon trace of occurrence #3, the host side was completely quiet f=
-or
-over
-ten minutes before the firmware fell over:
+ net/bluetooth/mgmt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-    12:30:45.022549   < HCI Command (0x08|0x0042) LE Set Extended Scan Enab=
-le
-                      -> Status: Success (0x00)
-                      (last HCI command sent by the host, ever)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3b9c82bd2f0..0f93e9e2728 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -304,6 +304,8 @@ static u8 mgmt_errno_status(int err)
+ 		return MGMT_STATUS_DISCONNECTED;
+ 	case -ECANCELED:
+ 		return MGMT_STATUS_CANCELLED;
++	case -ERFKILL:
++		return MGMT_STATUS_RFKILLED;
+ 	}
+ 
+ 	return MGMT_STATUS_FAILED;
+-- 
+2.47.3
 
-    12:30:45.02  ->  12:41:16.37     =3D 10 min 31 s with ZERO host commands
-
-    during that same window the firmware kept working normally, sending 19
-    HCI events of its own (Authentication (0x57), etc.)
-
-    12:41:16.374569   firmware starts emitting the Vendor Diagnostic flood
-    12:41:18.025926   Bluetooth: hci0: Mediatek coredump end
-
-So: no failed command, no error status, no unusual command sequence, no com=
-mand
-flood from the driver. The last thing the driver did was a routine scan-ena=
-ble
-that
-returned Success, and then it did nothing at all for 10.5 minutes. The firm=
-ware
-then
-entered an abnormal state on its own and produced ~6878 diagnostic
-events/second,
-ending in a 41 KB event and a coredump.
-
-Also worth stating explicitly: there is no KASAN, oops, or lockdep output
-anywhere
-in the kernel log for any of the three occurrences. So this is not memory
-corruption
-inside the driver either.
-
-## (b) But the recovery failure may still be ours
-
-This is where I think the kernel side could help, even though the crash its=
-elf
-looks
-firmware-side:
-
-The diagnostic flood arrives through the normal HCI event path, so `btmtk` =
-is
-processing it while the firmware is dying =E2=80=94 including that final 41=
- KB event,
-which
-is far larger than any normal HCI event. Two things I would like to underst=
-and:
-
-1. **Is `btmtk_process_coredump()` handling a pathological input stream
-safely?**
-   11348 events in 1.65 s, ending in a 41 KB event, with 2372 all-zero payl=
-oad
-   fragments mixed in. If the dump path allocates per-event or has any bound
-that
-   assumed sane firmware behaviour, this is exactly the input that would br=
-eak
-it.
-
-2. **Why does `subsys reset` fail, and can recovery be stronger?**
-   The failure is `Bluetooth: hci0: Can't get device id, subsys reset fail.`
-   after which the USB device stops answering descriptor reads entirely
-   (`device descriptor read/64, error -110`) and never comes back.
-
-   From the user side I tried and confirmed the following do NOT recover it
-   (details and the exact commands are in my original report):
-   USB port re-enumerate, driver reload (`btusb`/`btmtk`), unload-drivers-t=
-hen-
-   re-enumerate-then-reload, and finally xHCI controller unbind/bind. For t=
-he
-last
-   one, the controller re-bound fine and every other USB device on it (webc=
-am,
-   storage, keyboard) re-enumerated normally =E2=80=94 only the Bluetooth c=
-ontroller
-   stayed dead. That says the controller is not merely stuck in a bad driver
-state.
-
-   Question: is there a recovery path that re-downloads the firmware to the
-   controller over USB after a coredump (like a full re-initialisation rath=
-er
-than
-   a subsystem reset)? If the firmware can crash on its own after hours,
-"notify
-   the user, they must reboot" is a poor outcome when the device might be
-   recoverable by re-uploading firmware. I do not know whether the MT7902
-hardware
-   allows that after this particular failure mode =E2=80=94 hence asking ra=
-ther than
-   assuming.
-
-## Summary of where the evidence points
-
-- Firmware crash: appears to be firmware-side. Host idle for 10.5 min
-beforehand,
-  firmware answering normally right up to the moment it starts dumping.
-- Permanent controller loss afterwards: possibly improvable on the kernel s=
-ide,
-  either in coredump handling robustness or in a deeper recovery path than
-  `subsys reset`.
-
-Happy to collect more targeted data =E2=80=94 e.g. ftrace on the btmtk core=
-dump path,
-or a
-run with the flood piped through while watching allocation behaviour =E2=80=
-=94 if that
-would
-be useful.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
