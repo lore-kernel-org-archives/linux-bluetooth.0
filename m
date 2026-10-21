@@ -1,74 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792586657;
-	b=Wlsibxbyzy1seTF/OeE6RA4UhQRmZqncy8eS51R9ADE9lodcbnHsRAQ4q1b0PPQqwSlw
-	 HLcFrydLb5JHaGGN4r7qqvpzIkiWCJ9GipnesnQyv8tFVFGr22IBP3QTKJuETdCIHXuch
-	 uJPETfxCMnsF5QPqv+hv6qAKdfahJoDuD1BVXKnnKmNwkx4U7eER5xmitqThBFQPFY2PX
-	 owjz78OQ4iZzw72ssMGPwrw1zJuDzUoVoMCL3dcisTgYFK7cf3ysq0iJeShbWm9kF2Q7P
-	 Tt3Qi0F/+ErKkBG2ivhvnU/D0svlGc1gc5Uj12SJl7DmEWAN8tqdlQrOt0s3KG1/zEg==
+	t=1792587431;
+	b=gWnAkIqTz/Y4gO1e6srkpgsf3Xmvjy4pyRzvyvcUZPC+TU4h0K8nP32EdmgCNZswv2UJ
+	 NUpBT+12j74nWrLAMbgWzV7IYrvM7978I61c+PykJTKP2k9CC6VboD8dByvTL/wW2A18y
+	 JEjeBrwFaDj3f9fGVA/3qMdGjbMfcvMtJvt2IrWfoXING8P4mUcabZB0WVvl2klvxSadc
+	 AJCNTTdjyA1MxtR0KmPi1XbCk9Z29pq/x+iH2UyVhkRfShwlJbDflcd8DM3vWAikmpgJ+
+	 Vep8r9IXqtud8lcxTf2iw7hm2l+nr3N2NrI3lQXJ6vwAxODSpIQwKO+/mTN0w+OIVzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792586657;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=+ktZJnkfh9zHdZjz8vvQumSoqSoZNp6WgwE/N/5ViG8=;
-	b=iqY3ffuSUR5lkoSn0E0lBrievb4CEPb0VNTpMJzRZDl6oqynUO2xEYFys7dTPteWStj1
-	 U5YX/VsUPhhmSSiv8bZvbo5iFP/YuDzuRZQwWo/9iuTwXWixcl9tSueuOgfS3Y6czHsoE
-	 LqsG3myLKTrJpZanfqDaw6ub1WxUxOb6WsUehWtrxPA+nRcB7WloGaLOhCaPoZ376zdP9
-	 3PI/LIzWrU5uOkhPOlJ2KcOdV+rC8CarirYfKiMYacaGd5RoUiASUtlrvt4ygaKetmvgN
-	 ZrQO/hGD29DQAct0G+9KKQ/nuDIwZW/LyKHMj6gjwN6/F8VDFkx6/SznXHYREnvPlNA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792587431;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=ZPxqlfNOPHyYie8aVdhjG4kVhQIETaL8RCs42yACSmk=;
+	b=CmSwCvt5OYUkVeehGTT8sNgzW5JP5Tw0sV04qFND1DyTSAIucvdWbPeCKJ4tVE86UVkW
+	 q6UF2MJavBeMs0X9eIYVm0lD0uybuvvcmqOYSJoGOTqeuDOvHBDnjN31Nf4KtflOZL86q
+	 AWAz9wYrwjPjNcPs/rsd2RK0jWWPFPPl5vqNVXHSTw+aaV9EJYuxIGNi8SYH7pkZyj8MQ
+	 XLKmyPa9kYe2XvJlCehljCPudGl0UPQiSUzmA5/xLla8xxAdn4W5f5UToM92V4eCZgO8z
+	 OIqx//DxV0QFcTJvX0BdyGe1g3N4hdrSzVHV5latLzvwm2W/WXTsl3owQ7NgILXWWnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=ZscicndX;
-	arc=none smtp.remote-ip=198.175.65.18
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b="rq/pqejl";
+	arc=none smtp.remote-ip=209.85.161.52
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618D5606A32A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 12:44:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 618D5606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBE6606A319
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 12:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0CBE6606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=ZscicndX
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792586655; x=1824122655;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7hIXUyRPCGbZ/1AZhIUrwiZvUt7uvBWsMUOAec0fk68=;
-  b=ZscicndXgU8KhcOAECk73ZKW8bP+Z64fxDUwwzWgVXaUbFt5RXOmi9dh
-   7gFUHlRmzsan+XUHQF6kIeDoFJBb7gVy+4zI6ZuWyqFPGjs4bXz5bkT1+
-   5ZDdzyAu7G00+s8N9oUB1vJT6RjMha64KBq4DMXpI5pyje9/FcInCSwSq
-   5TvEYJClnxmQi8dZoaGglxxPyTb9u1H7sC1SPT+Uc52Ittd/WETcH9a0j
-   tRhpIVNeJS40Df7OceKzihRTGdPupLXcBb32rBKpT7C7kcNIM1gJ6729P
-   As/T2+OTm+vwi6tGO32y62k9RPZV+YpH0Rnp1/LpAkVpRzlEPA+KnNODE
-   g==;
-X-CSE-ConnectionGUID: 2UI1HXlZQl+/n908XdkiMQ==
-X-CSE-MsgGUID: WCxlpzYlR9itfk5CPJFJ4w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11941"; a="1319529"
-X-IronPort-AV: E=Sophos;i="6.27,170,1787036400"; 
-   d="scan'208";a="1319529"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2026 05:44:15 -0700
-X-CSE-ConnectionGUID: ig7pmxFQQXOoVUg5RAZflg==
-X-CSE-MsgGUID: BaOcdBIDT2uEyrSmog9dwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,170,1787036400"; 
-   d="scan'208";a="3136739"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa006.jf.intel.com with ESMTP; 21 Oct 2026 05:44:13 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel: check FIPS status before firmware download
-Date: Wed, 21 Oct 2026 18:34:24 +0530
-Message-ID: <20261021130424.3042597-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=rq/pqejl
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6dd059478dcso385484eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 05:57:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792587430; x=1793192230; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ZPxqlfNOPHyYie8aVdhjG4kVhQIETaL8RCs42yACSmk=;
+        b=rq/pqejlyiaaeyRfpTrKXypjW4APykjayvd0gt20sslE1BrZ/LKTn4y9G/MSQNbQk1
+         QOVLzgGsUBvxdyJHQLVKuT1E55wJZ2vznP/TMsKemmR/arbe8xGE150p2LbTPuoX7B5S
+         jPXkG97hB7KbgWgfV+CTcqnO3KMwe+xmlCWR5cczI/G8w8C0sawsiunZxyK7fYJCxMH+
+         7LMEthZCmEVb4fJe2IySX6nIf3AWTpnUECybOsHMb5BWT9nRw0mlo/85x3dvU2TR4yhc
+         jyhAQV9b8unVJ1cz+ak4WE2QCiYE4zFppoAGi2Obc6QrZJ4T+24pnZdtU8DMAMvgW/sk
+         cWIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792587430; x=1793192230;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ZPxqlfNOPHyYie8aVdhjG4kVhQIETaL8RCs42yACSmk=;
+        b=vCtru9W8ITLlAsRwXoU3F0gwZqYy1HafLieU9A8sp3M5rFDG+LfOmDAs7HdeKEaS/g
+         x0ZQJfDMaqS1t3POxLi1OnT6mbN/E6R0WQax2n8nD4aRGMmRge6oYb2ID/Wh2WqkDU2f
+         JJbZ4yTtrKt/gSFBNGb5vqWMIGNG+G2ujsIfDjio5D8L9ho5/jSIpLLReCOlVzOw/l75
+         taXlkuawN131msKlrxxS7m4E1jBuSzae6kNaQ5He8A7YK6QEuVsj2aRGRt//C2ShEWyM
+         hd6QT2iZzwmOoYOnUzxzEK2D8j4D2aFCl2EDDSKwA3KyAZfyWCTcTgdjA4IS9ChHOB07
+         8tFQ==
+X-Gm-Message-State: AFq9FYIw1ydHfdQ9OFxgk3Htty6pgB0h9vYcr3wEbg0FHvm3XwXc98Ra
+	vyMo/ke+rIjATzjXD6kDU8sMmWNSxTib3pTufPTf30Z7rBQ+JeHXv1G4bFrHp5RJ
+X-Gm-Gg: AYBFou2kXP3UX1IoU3RyOQo0dn3p+fBYca+9Cbeo9JVbuESxAydCMGB/KXyULTHeTtn
+	Je/E8FGA1YHwfVKjOJEBCpNXyBq+AmSRbDcb2nwhJNqLf/gZFFS8QK+VxBHQMkJOxEbaWy1D4gr
+	/6aJJghq9/Hl0j0j4yr2pLrSI3QxGFaNfKNAGPvAk48SCh3S2veVmUjq69DTmMEzLNMyBc0qfk+
+	TE/xuvc4+eD2/PMHbVBclAeZ7HR2ywak/Vf3/9FN9BmhTo+/jiVzbTqIckUCIZ7ZgftvjVuf+RZ
+	F96NoxgiTbn4qfFOIFyglD0QIJPg+/rKKNe+itD2GSYlS5REguRWg5Xq4bVbDmpG3HYtEJB/imE
+	4jsQeD0H0bdJqZtqiqS9j8FB0y/UugNkd/dDgwDOii9rlTJHaxTPsS+P2oAtCqQI4+q/cqVD5PF
+	AWkLO6tKBOZLdCe9/EdPPiKBdaCzHXW9jEsJWpx866P8Py9462xhb/AkGAKF7CaTxYElMLA5qCJ
+	pWMNOukhYQAVgdb136eJxq4UZFzpc943VqPiQAcsQrIJOcgCevh0F/hropQ3BJh
+X-Received: by 2002:a05:6820:1388:b0:6da:1f1:9e6 with SMTP id 006d021491bc7-7093fbb9e65mr1144484eaf.19.1792587429970;
+        Wed, 21 Oct 2026 05:57:09 -0700 (PDT)
+Received: from [172.17.0.2] ([172.202.55.20])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-709045b1555sm1870268eaf.14.2026.10.21.05.57.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2026 05:57:09 -0700 (PDT)
+Message-ID: <6ad8b6a5.2feceb42.42020.6a31@mx.google.com>
+Date: Wed, 21 Oct 2026 05:57:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0835058049324175888=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -78,248 +88,82 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, joeyli.kernel@gmail.com
+Subject: RE: Bluetooth: SMP: Fail if the X coordinate of remote and local public keys are identical
+In-Reply-To: <20261021093522.3536051-1-jlee@suse.com>
+References: <20261021093522.3536051-1-jlee@suse.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Intel Bluetooth controllers (PCIe and USB) from Scorpius Peak2 onwards
-report bootloader self-test results (CRC, security, patch) in the
-INTEL_TLV_FIPS_STS TLV of the Intel Read Version event. Act on them
-before firmware download:
+--===============0835058049324175888==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  1. CRC failure      -> abort download.
-  2. Security failure -> abort on USB / HW reset and retry on PCIe.
-  3. Patch failure    -> abort on USB / HW reset and retry on PCIe.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1190369/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.55 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      0.27 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      19.28 seconds
+CheckAllWarning               PASS      22.70 seconds
+CheckSparse                   PASS      24.06 seconds
+BuildKernel32                 PASS      19.64 seconds
+CheckKernelLLVM               PASS      20.36 seconds
+TestRunnerSetup               PASS      431.11 seconds
+TestRunner_smp-tester         PASS      7.00 seconds
+IncrementalBuild              PASS      19.39 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: SMP: Fail if the X coordinate of remote and local public keys are identical
+ERROR: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys are identical")'
+#120: 
+The 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys
+
+WARNING: From:/Signed-off-by: email address mismatch: 'From: Chun-Yi Lee <joeyli.kernel@gmail.com>' != 'Signed-off-by: Chun-Yi Lee <jlee@suse.com>'
+
+total: 1 errors, 1 warnings, 0 checks, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14904963.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: SMP: Fail if the X coordinate of remote and local public keys are identical
+
+1: T1 Title exceeds max length (86>80): "Bluetooth: SMP: Fail if the X coordinate of remote and local public keys are identical"
+
+
+https://github.com/bluez/bluetooth-next/pull/972
+
 ---
- drivers/bluetooth/btintel.c      | 66 +++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h      | 10 +++++
- drivers/bluetooth/btintel_pcie.c | 18 ++++++++-
- 3 files changed, 90 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 0709fb3212f9..f6deb3d7c5a0 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -485,10 +485,18 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
- }
- EXPORT_SYMBOL_GPL(btintel_read_version);
- 
-+/* FIPS self-test status is only reported by ScP2 onwards, except BlazarIW */
-+static bool btintel_fips_status_supported(u8 hw_variant)
-+{
-+	return hw_variant >= BTINTEL_HWID_SCP2 && hw_variant != BTINTEL_HWID_BZRIW;
-+}
-+
- int btintel_version_info_tlv(struct hci_dev *hdev,
- 			     struct intel_version_tlv *version)
- {
- 	const char *variant;
-+	bool fips_status = false;
-+	u8 hw_variant;
- 
- 	/* The hardware platform number has a fixed value of 0x37 and
- 	 * for now only accept this single value.
-@@ -505,7 +513,8 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 	 * This check has been put in place to ensure correct forward
- 	 * compatibility options when newer hardware variants come along.
- 	 */
--	switch (INTEL_HW_VARIANT(version->cnvi_bt)) {
-+	hw_variant = INTEL_HW_VARIANT(version->cnvi_bt);
-+	switch (hw_variant) {
- 	case 0x17:	/* TyP */
- 	case 0x18:	/* Slr */
- 	case 0x19:	/* Slr-F */
-@@ -521,10 +530,13 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 		break;
- 	default:
- 		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
--			   INTEL_HW_VARIANT(version->cnvi_bt));
-+			   hw_variant);
- 		return -EINVAL;
- 	}
- 
-+	fips_status = btintel_fips_status_supported(hw_variant) &&
-+		version->img_type == BTINTEL_IMG_BOOTLOADER;
-+
- 	switch (version->img_type) {
- 	case BTINTEL_IMG_BOOTLOADER:
- 		variant = "Bootloader";
-@@ -584,6 +596,9 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 
- 	bt_dev_info(hdev, "Unlock policy: 0x%2.2x", version->unlock_policy);
- 
-+	if (fips_status)
-+		bt_dev_info(hdev, "crc status: %u security status: %u patch status: %u",
-+			    version->crc_sts, version->sec_sts, version->patch_sts);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
-@@ -612,6 +627,7 @@ static u8 btintel_version_tlv_min_len(u8 type)
- 	case INTEL_TLV_UNLOCK_POLICY:
- 		return sizeof(u8);
- 	case INTEL_TLV_MIN_FW:
-+	case INTEL_TLV_FIPS_STS:
- 		return 3;
- 	case INTEL_TLV_OTP_BDADDR:
- 		return sizeof(bdaddr_t);
-@@ -720,6 +736,11 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
- 		case INTEL_TLV_GIT_SHA1:
- 			version->git_sha1 = get_unaligned_le32(tlv->val);
- 			break;
-+		case INTEL_TLV_FIPS_STS:
-+			version->crc_sts = tlv->val[0];
-+			version->sec_sts = tlv->val[1];
-+			version->patch_sts = tlv->val[2];
-+			break;
- 		case INTEL_TLV_FW_ID:
- 			snprintf(version->fw_id, sizeof(version->fw_id),
- 				 "%.*s", tlv->len, tlv->val);
-@@ -3831,6 +3852,43 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
- 
-+int btintel_check_fips_status(struct hci_dev *hdev,
-+			      struct intel_version_tlv *ver)
-+{
-+	u8 hw_variant;
-+
-+	/* FIPS status is reported only in the bootloader image */
-+	if (ver->img_type != BTINTEL_IMG_BOOTLOADER)
-+		return 0;
-+
-+	hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
-+
-+	if (!btintel_fips_status_supported(hw_variant))
-+		return 0;
-+
-+	/* 0 -> Test not executed
-+	 * 1 -> Test executed and it passed
-+	 * any other value -> Test failed
-+	 */
-+	if (ver->crc_sts > 1) {
-+		bt_dev_err(hdev, "crc test failed: %u", ver->crc_sts);
-+		return -ENOEXEC;
-+	}
-+
-+	if (ver->sec_sts > 1) {
-+		bt_dev_err(hdev, "security test failed: %u", ver->sec_sts);
-+		return -EAGAIN;
-+	}
-+
-+	if (ver->patch_sts > 1) {
-+		bt_dev_err(hdev, "patch test failed: %u", ver->patch_sts);
-+		return -EAGAIN;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_check_fips_status);
-+
- static int btintel_setup_combined(struct hci_dev *hdev)
- {
- 	const u8 param[1] = { 0xFF };
-@@ -4055,6 +4113,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		/* Display version information of TLV type */
- 		btintel_version_info_tlv(hdev, &ver_tlv);
- 
-+		err = btintel_check_fips_status(hdev, &ver_tlv);
-+		if (err)
-+			goto exit_error;
-+
- 		/* Apply the device specific HCI quirks for TLV based devices
- 		 *
- 		 * All TLV based devices support WBS
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 9526acf65959..d5e125ec5168 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -43,6 +43,7 @@ enum {
- 	INTEL_TLV_OTP_BDADDR,
- 	INTEL_TLV_UNLOCKED_STATE,
- 	INTEL_TLV_GIT_SHA1,
-+	INTEL_TLV_FIPS_STS = 0x3b,
- 	INTEL_TLV_UNLOCK_POLICY = 0x3c,
- 	INTEL_TLV_PLATFORM_ID = 0x3d,
- 	INTEL_TLV_FW_ID = 0x50
-@@ -112,6 +113,7 @@ struct intel_version_tlv {
- 	bdaddr_t otp_bd_addr;
- 	u8	unlock_policy;
- 	u8	platform_id[6];
-+	u8	crc_sts, sec_sts, patch_sts;
- };
- 
- struct intel_version {
-@@ -331,6 +333,8 @@ int btintel_shutdown_combined(struct hci_dev *hdev);
- void btintel_hw_error(struct hci_dev *hdev, u8 code);
- void btintel_print_fseq_info(struct hci_dev *hdev);
- int btintel_acpi_reset_method(struct hci_dev *hdev);
-+int btintel_check_fips_status(struct hci_dev *hdev,
-+			      struct intel_version_tlv *ver);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -468,4 +472,10 @@ static inline int btintel_acpi_reset_method(struct hci_dev *hdev)
- {
- 	return -ENODEV;
- }
-+
-+static inline int btintel_check_fips_status(struct hci_dev *hdev,
-+					    struct intel_version_tlv *ver)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index df95d16a163c..73822ba2acbb 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -3786,7 +3786,8 @@ static int btintel_pcie_get_debug_info_addr(struct hci_dev *hdev)
- 	return err;
- }
- 
--static int btintel_pcie_setup_internal(struct hci_dev *hdev)
-+static int btintel_pcie_setup_internal(struct hci_dev *hdev,
-+				       bool *fips_crc_failed)
- {
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 	const u8 param[1] = { 0xFF };
-@@ -3794,6 +3795,8 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 	struct sk_buff *skb;
- 	int err;
- 
-+	*fips_crc_failed = false;
-+
- 	BT_DBG("%s", hdev->name);
- 
- 	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-@@ -3855,6 +3858,12 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 		/* Display version information of TLV type */
- 		btintel_version_info_tlv(hdev, &ver_tlv);
- 
-+		err = btintel_check_fips_status(hdev, &ver_tlv);
-+		if (err) {
-+			*fips_crc_failed = (err == -ENOEXEC);
-+			goto exit_error;
-+		}
-+
- 		/* Apply the device specific HCI quirks for TLV based devices
- 		 *
- 		 * All TLV based devices support WBS
-@@ -3900,8 +3909,13 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- {
- 	int err, fw_dl_retry = 0;
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	bool fips_crc_failed;
-+
-+	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
-+	       fw_dl_retry++ < 1) {
-+		if (fips_crc_failed)
-+			break;
- 
--	while ((err = btintel_pcie_setup_internal(hdev)) && fw_dl_retry++ < 1) {
- 		bt_dev_err(hdev, "Firmware download retry count: %d",
- 			   fw_dl_retry);
- 		btintel_pcie_dump_debug_registers(hdev);
--- 
-2.54.0
 
+--===============0835058049324175888==--
