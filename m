@@ -1,13 +1,13 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792558266;
-	b=ZQ+zVlQf9nkmHWZb0SFA5A0Cxn9UklmXMYXojQP+NVL4v2QB5BaihXhw7e9U/cCe0HP8
-	 YbI2D4iLrQ1i2D68cPAdeNfPEDAe7G1l4G7GCT7IQRxNm+wRcqrRuxj0D/WYnpgQn29uV
-	 NYP5zSWQIGA/sXarcDg573AKwMggG5QJk3+g9BxoyeUHNlt44BqYmUFu7fOSWkkmVxaIk
-	 xQ5m4C2EaPl55v117J1slFSmLl5nQ9NwJ9yoSARmFI3KV+b7w1AiivM2O7IWQEd5+GLKM
-	 4/dZjNsBKxvI0X5lVJvgfOCPJ4WaT1NvK4m++gYhZe46WrPdyWwb8xADGWI4pi/J9eQ==
+	t=1792558275;
+	b=QyroiNDs6Ha/3sGVcx7AtOcykmtZNwh6/BDr83joZoIZ4+32fuoJ0KIdJBb6l02PgILW
+	 4dt5CeoeIbX0kJRlPBbpnzoo49ZPadrbfOLc9/RH16aQ31hMrWIjU1U7g+EyJ97GRVA0D
+	 bnucd3TuM0enrsYv1b8UXACCUou+9CfEsVkfs/YQyMOGy5HuSvUAxN/WTGmfRBaDCHgZq
+	 6+Cd3qeg86KCoaPAu6cPDhx0+CGEyRoZYRjwioIBO/VSHycmrmnLdxxrVSC/VjmiHTJ2r
+	 F+SIH0Kw5AG6hNPdBvlwKt5708WMYl0pFr6gHtN6+e/6+BJcW6EBCAXF/HitJBlHgiw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792558266;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792558275;
 	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
 	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
 	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
@@ -16,53 +16,53 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
 	 Message-ID:In-Reply-To:References:Content-Type:
 	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
-	bh=JJ1FSimwED83OgpUlTCJYtKR+z4lIh++IO3nflOYYXk=;
-	b=DjZfNsqhI8R9Kv1lWz2qbjo4zXGeiL16wlTZHWs901/8avD2z3r0ozHX9rOiMLLdlsf7
-	 06X3j9YZlaVUUyPu9NwSsCUCgWKEQaT/R6F84DpyoqUTOaS/UPOMY2aaZZepZCQa9iRiP
-	 VT2n0Mhee+rDlL8cBVXiSeb5m3QptUezqWT89+tU8XnDuKBatB0o00zRBzlU/aw2A6cLX
-	 M1mSuy+NxNEjC5zjFJOUn7MN7g2ibU206m+0GSGdnbayVpXyZux/B/o6REabze1RkFNtV
-	 HtRO2wAUTDNG4Zn4u17ltVg8u/51ndT73DF3Ye8SjIOsk9adRm+/5Bv7w1QTxGUshPw==
+	bh=ANAqsfLx39ab7ssdaaHtF1xenja3wxo6VXL5fM4Lfs8=;
+	b=N7KnYo+XEHTTiqguE2pfHmYZQGWKSL7HyQatRdhdR9MSQUzlHXoVkjUImb3ib4aGNw/n
+	 f5qbZVmhKePg4rE0mIelH+s/0uTBmRZTnOsXYYcm7lz86jLTBywoy98bSDnBVIhZLSeMx
+	 aCh6C94rbIh7aZOfNwQVHShBuViHc9mw0+IpTp9QTdhJvLuaWIWrvBac2I7NLU6I+njhw
+	 5qNeGXxQ2cqbBOUhG0tmtPdn0MsD1osnckusRzReIOJAErsgpFmFlk5UGioGfrXjgFDoV
+	 91JnqaEa1DfYT6OITKGgZxAgcarY7tGlRR9O/5hZ1bTZFHmbVpYGNn1K/evIX/nWKYw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=MKWEJGHz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b="LdHjbK/l";
 	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
 Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37199606A319
-	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 04:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D5B606A319
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 04:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=MKWEJGHz
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=LdHjbK/l
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B2125771
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4F625771
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792558266; cv=none; b=cPIhjv4mB+C2PGBxvO75NWcCeSAPn8NK260MuHWzBBI2MBtPt2zWKqZld9zNOEAfdbXyb6JHS1NEX0soUqM2tXy1GFU+f28W7BVLnnsLUikXDlOQ0GNJcqNdVULkT2ZA/NNye0fyXtOfcIziXpcIsZtsshANJaFN5W+Y9znEXTw=
+	t=1792558275; cv=none; b=XyYRe27tIpMPemb+8ZyUpAV20ERhdPNnDCAi6gOlwDCq0kVKkSXp4yd7kDnFDiNd0iBi3InIbykIG3zG0UYlbT+KawMqZKRpgUPTKEXQv+dkAXBbiE3tWhmQbkWzlH4pAwB+K/uFg7u+Xee3K/n1m87eY5fxDOSnWQqGXn3CtSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792558266; c=relaxed/simple;
-	bh=jmuSxAQmko1jhgiE7jTK28itcn/LP/njpaeRQVEWveY=;
+	s=arc-20240116; t=1792558275; c=relaxed/simple;
+	bh=Y4wc3e28hZ0CRb6jOB7Px0nykyanXw6gK5HBpTnNqS0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DibUM60j1vNXJ8SRsJV+lX4pu2bXb+Bx0YyIHhF6Dl5OKX8frrH8rpb9l59cPdVmWTyeYXPBJRHuDEH8Jb60etLJ5nFqbHuWpNKzIa+tykDmH4+NUOgYmlezqxYYYZUKDLCuOQtCgBOybKTRSJ3SV1nYvruGvLSvudh+kTFX/vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKWEJGHz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E077CC2BCF7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:51:05 +0000 (UTC)
+	 Content-Type:MIME-Version; b=kavR1JFJ3NCYMEchZUG0Zg7+8TiENm3csSsimk21x42BQRedSrXB/4WfrIR3JM7nfUXQs6/Bx1KwbP/25rLeng2v+xORC1hLood7eOOsOWCF1X4abrpYB+BP8zDQKUNuSnVA9ocz1AgwKjAbuQihSgzwyKdxClmxnjbqeF+k3zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdHjbK/l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5B34EC2BCF7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 04:51:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792558265;
-	bh=jmuSxAQmko1jhgiE7jTK28itcn/LP/njpaeRQVEWveY=;
+	s=k20201202; t=1792558275;
+	bh=Y4wc3e28hZ0CRb6jOB7Px0nykyanXw6gK5HBpTnNqS0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=MKWEJGHzfs0hTxlxe9PGF9MPUqERPekVGNSLMoI5FFJKHfvRxHE0YtqNspFWpYn8r
-	 iVyT5yBXelhN3BJc0q0GjdpP2+UDFGjLtma9U5ZE3vLXxyT2XrmHw4hIMm0lAe38XO
-	 Q227pa7dOgv4e0fc5oRdVfHb+xPO+Fh/Yc+EZpnVTqIkQuzoBcpCc9E1Yqu+1ka4+V
-	 XoHK2srtWcwcpGvkn65JNjhKmq+HvxFa5F4a3VM9a9YWTGmLyyT+dJTM9Iv4rWPHx6
-	 izl/na2O4xHk1e7MRI+Hm9REuDyUAE6vvJxOHae49KuxqqWKkQRMLBT9DSXnD4mARc
-	 iFejk5d+ZEV4w==
+	b=LdHjbK/lcKL99mRJhYTEfLVWsldsk6NIswZ1KE0fpeYIOTUzUeEYsihb28wl++a55
+	 1SD96HlHPICCVqNlAjKJ3BNYTH/1MVmDo5m3Gxr+eyxixYK7Z5zhYkRXpzPO/M/954
+	 mu5cR74se6z2CVjmyksGAOSdAE/7mxRrSE7blqiDWQwCHmBR/GyIAtMrCd8yb2+HAz
+	 F0wHT2FQoE/aC797WFMPXwJRDq235Nrf5j4hKaDiLioHcCn8IojxZonQCNDo1Fvfzp
+	 Yujc7J7kecDcxJr+/j7zmp0Aizxt7G9Z7HrNUqFn746MpaC7Brc3LcDfy1V9KftMKk
+	 FIJwZ61DuQymg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CD9D4C41616; Wed, 21 Oct 2026 04:51:05 +0000 (UTC)
+	id 48D09C41616; Wed, 21 Oct 2026 04:51:15 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 222164] MT7902 Bluetooth: firmware coredump after ~10h uptime,
  then &quot;subsys reset fail&quot; and permanent USB disconnect
-Date: Wed, 21 Oct 2026 04:51:05 +0000
+Date: Wed, 21 Oct 2026 04:51:15 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -78,7 +78,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-222164-62941-CYISdv6PE3@https.bugzilla.kernel.org/>
+Message-ID: <bug-222164-62941-E7FQkRJ4Nn@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-222164-62941@https.bugzilla.kernel.org/>
 References: <bug-222164-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -97,12 +97,12 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D222164
 
---- Comment #4 from hongweifei@cyue.net ---
-Created attachment 311214
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D311214&action=3Dedit
-Crash #3 quantitative analysis: 11348 Vendor Diagnostic events in 1.65s, 20=
- min
-of silence before coredump, uptime comparison
+--- Comment #5 from hongweifei@cyue.net ---
+Created attachment 311215
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D311215&action=3Dedit
+Crash #3 btmon excerpt: first 40 lines of the Vendor Diagnostic flood, midd=
+le
+sample, last 300 lines through close/delete index
 
 --=20
 You may reply to this email to add a comment.
