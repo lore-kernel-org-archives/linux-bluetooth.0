@@ -1,101 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792592644;
-	b=csSEpSzElUwty00qqbLVImNTFyvav6/NLb3HEp5j9WxkUBGlCeQ2a6Nuoq5yVeQPnHWv
-	 NBRVE/LRWMcFJL13aamRFpamFD+otUwM8MMcnQtnRqiQNJX62ksYdbRQFC5DrU21hPhRJ
-	 BEEhPONN7IzqSXRXdaWf7LtlYbualsnVEpJlclJjddgXMjwgMcMW/pBf6loF7vi+6Cais
-	 8TI5JhhQu1Qum5CvuMaUqlGBQfWKUpWMxZyzvW88tb0G5CScWQMQaNoX0fhFw3qDsr+lN
-	 rRr92y8Ohiaf3+BhV+y4axWXzPbX6QRifWOEwvjcvXtrBu5FaRXQ2t5VQE97Sf4Xm6Q==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792592644;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
-	b=dhFy22SsioFMv7E7snTrAzJV66UnLz3kcz1hLyftqZCRN6JS1Om2APO76VaNQCC8QFEh
-	 70EZhDkiXFteUTWYuiDjhzMpuwgyrCI0RLItYhMr7b2eaJfLB6V0H49KDRpW3BGRdoacF
-	 iNCpEp32apTX1ODmUjaEy2wRsnkUoM1c6JWpuu9U75j9sKNy0I6AWq9Tn2Y8QDUL8/+OK
-	 xrOPBwpW83jwSGlLoZw68eJhvu3SkkmKEo3qFFKhjutuwDGPI9sxbVcTy0xNqZ2Pf/WUP
-	 5v/qJdv/t/pypYxrwky3D+rKOmqK8WNgtba37Gh5v1eUhuxRncG99wzIK3TDpOpMBoA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=mVeuAnoF;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=188.165.48.29
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792594339;
+	b=bqkX5TFrqwYBoQgsTOKRiB6YitNmMLkLpplXcvlGHih1rXR2y5BEx1GJ1yLHhAKKrHk7
+	 ROhXI9JosFyJKpcyAL3h0OAingiP/nFv0eUC0E7Rz7axTcJps2lMYudf8EFDpA4cxkMRZ
+	 TuDpezrq3PhMK6/Oun/orf8+fSmHpZwzW1ZfFSLgAjhXBoaHEKBl+g8PgwZ5OvR244Q0+
+	 mDBIElYZFNHsypZpI0M8qF1GYPe92e/oU4qnmqLTrmp0XfZ+K16AmoJ/AwxGs18mboWlk
+	 RMqB64or5kENugQEgnkKoDq85oNnypG4DvhkgkMQbMILxpQ3yZeR0U6FN9uelcMzjhQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792594339;
+	h=DMARC-Filter:Received:Received:Received:X-OVh-ClientIp:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:x-ovh-tracer-id:X-VR-SPAMSTATE:
+	 X-VR-SPAMSCORE:X-VR-SPAMCAUSE:DKIM-Signature;
+	bh=xir/Ekev5N4mjzLj0xcz0Rsjkx36hw6Go6Z6J+0jWHo=;
+	b=PYBCq7PDsmlghAorj/da7gd/lFfa7FnR3h2FPtIzAQtObntqMZt+JLj7qWJ3+PU6NJ17
+	 Vn0dg0ifaVHbuhBY+uu8HRj7EWyXD/JhdRV+pQ0pgL1rdNvH4hKnrnQyWquGpZs/yS/We
+	 wiz5J4CFG9AwAgKCGNLHXLnMx4T9GRyvyuPnIcxzLiiUo1XkXe+VqTstlk8cIfZEdmC/8
+	 A0TQprtiiaGPukSJQATXYtseCWZ7zZukGBsAdSeIK9Kmi+XJ3LnfB66wWyky2J1liQe6b
+	 aPyfxw/lnBy3/ISWgb2dyEqG0n+39Bj2nZNSogiQrp6PAHvMhUyfbVi5Mt96nD0yLZg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=none header.from=medichon.fr;
+	spf=pass smtp.mailfrom=medichon.fr;
+	arc=none smtp.remote-ip=188.165.48.29
+Received: from 11.mo550.mail-out.ovh.net (11.mo550.mail-out.ovh.net [188.165.48.29])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751D4606A322
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:24:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 751D4606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=mVeuAnoF
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-8b06c0794cfso8797467b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 07:24:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792592643; cv=none;
-        d=google.com; s=arc-20260327;
-        b=sT2jU5JCoEHw2ShlWsTaPMNOjtbB9Y3Jdziky1GXaQvrXU/AkA7EJ23YFFf6V3t8X/
-         n4RrQcwSmY9xcZHsb2Rjrnit5qGG2Yhkt+V6FT/A1wmnsLUVQg2RLJiOPSdykEjGkIMK
-         ZMTw/APanZMDEJ+OvK4g/aQx0/p0kMmDR0X/o9tm5cIezKiKz7dpqjDwBinkC6wJV4wL
-         wPtw1jSWpzbsH3MfZxLwkR/i4e4ammPUz+np+nTcQ9rDtR0kPRH2gfoHUPg403KCiboP
-         DEVQcLk3xZhgtVA4zaps/yItVthPtGsmHI8F34qqUhYRxoPcAQeDdoetiN4uDBRsUFp5
-         YNnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
-        fh=nME6GmyW47RgWuYz61WS7XJ39VQi0sX210I1L4RCMlM=;
-        b=TyWy7AqBFFnGLiwq1/HpIXAou8viVz8K+eZIr4COoEGnwMH1jTOBSMeQc3NbcfntPm
-         8RKt7ab7Hn9MPff0rBm2GkPqIqrskax2aTbScg6ItEk/SDlHO6251UWYB8n1Ds33gN+r
-         zseuH9LHHcMGT1DnYkGVNRLdN2Fp0Hf0gl0GWKp7uuA4gxyaD/tHwYgkgOjwYwJadbPn
-         NvYdAfcNQnLqlJET/daKaiVtp/JoeSPicOkWcUKMfiRue6GlExS3XaKyJvmCBE3V6KdL
-         tPNslPfILAqFlro+d2EXUFpHEIDXh4lij0d0bEGhiHz+r04XfRZ8/2Rg1okMir/NDOUY
-         +AoA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792592643; x=1793197443; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
-        b=mVeuAnoFaOFhfQvLiTtQZZmds+N4yQc3zn1YhqdWZun1Ga2c060+QgCj5oa3Vpievy
-         W8h5lVHAmxwkk0w0uAndhgGUG1iTbAaNoHea7bm3PH3xe7Ck0crjFjM5EHNcYHzVn/x+
-         oqrKnkuYtOGcMXYMJLW5DRotaFfiSySwwMm1eSgHxzMLXGzQmIYEk3lXuYl6YuuK2b4G
-         /FESwOM1mLoiV0BgPtBDNktm8XVaDhb8GSNrJpnUWpVymDUzus5YThDdL7k+Fez3bDkA
-         LuCVCtCXN09raHfO8/VVqyW9wSGP0iWa+kxocdr265hovuU+Dwa0MVEXTu160uYy6Euf
-         XrlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792592643; x=1793197443;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
-        b=nn34DQG6YKNHseUm4idRZzuNTt9c+Nv96p7f2zEP6hythqoRZeSsc5zAzeWCP8Jj7S
-         vcSw+6YS5oAYHMljzxFarX6RhPZvcrd5pDFvsg4eB2QzkIJGNkz/S97lwHERj4WL5Pcp
-         z/MfbWVLV9dGewIRwbmJolsz2l2ewkcLLCqlomo+Jh3WDs9xIeemE6xv/w5Zh2VB6HvP
-         iRHy6dW1vs4FtcVxZS800+JDhnMgHC/NHYJgsUqF5slgFmSK9ZbslPVBa5yMLznqe4en
-         0UnJNM2Zygso7n7z5rinO04bDeoYjNl2A4dj/OyGKMXfXrLR3zLx+qZfRi/GL7fHsPAC
-         hg3g==
-X-Forwarded-Encrypted: i=1; AKwUvBylCCsZkAzkCbDvWWegux+Cl6ZK28cWnycT527Tz+kOCB7qWOXcus6RZCqCB7vSc8+guYWwCbYFAupjDjLcTY8=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKVU+nMUJnLG6p65pTMXGPKbn0SZCtC08ZlNNklPVqJBIbEjZXl
-	QRm+PWGqKaRdIOsgh2nKDuIq8H7qeIREiCylYmkVRW9O00OEF3P8B6wqRUym5GEOUjr1DdcNPFz
-	O+d3WHEqmN2IyBUHZy2Bqrl544f39DHk=
-X-Gm-Gg: AYBFou1G8iZ5Xvblzgg3vrybzipUVqQiQHcujMEcG0+kWDM4qkh68DxstUGTe5WL8su
-	XvMS9IYCPo86hapo1ozzJdaKrjNbm9Czzpu15uyZ8BlwCDFoCfnu0qEm42pQe+AoSJShsbK3IIX
-	4e/o540xWgUz0w8csctf3K1ffL9Y90ewHpyPrv8gVVpOCInu+EMTXDWrTFKaGiUd7/4JTJ+20ak
-	Ue0llhC8KzDsNxRZq94Xxpue35W2JuCh8rV7t18Qd2O5RyTW3+4YvFGc26C8cBpfjFKvQnSYrZO
-	scvsgKcHTMme/3Ki1gLaBQpwdq7YO1HMqnhC9bxCm/tP3WMQm4/+t55IlNalzqgjDkB47w401U5
-	AujVEqwjanLbJ8s/1/FMS98eAn13rwt9AyyBWrqOqKnBWlKREhCbpAp5GMijW4KAFF4fh0AFBEF
-	h8OTJ9TSjWS9EQYygHey2i
-X-Received: by 2002:a05:690c:e146:b0:8b0:aba3:a3e2 with SMTP id
- 00721157ae682-8b133d39371mr7017367b3.37.1792592643275; Wed, 21 Oct 2026
- 07:24:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD16D606A321
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:52:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD16D606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=medichon.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=medichon.fr
+Received: from director8.ghost.mail-out.ovh.net (unknown [10.110.58.202])
+	by mo550.mail-out.ovh.net (Postfix) with ESMTP id 4j8sgl4Hqkz5w1W
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:52:03 +0000 (UTC)
+Received: from ghost-submission-7ccd8bbbb6-gl4x5 (unknown [10.108.42.75])
+	by director8.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 786C6C0106;
+	Wed, 21 Oct 2026 14:52:02 +0000 (UTC)
+Received: from medichon.fr ([37.59.142.98])
+	by ghost-submission-7ccd8bbbb6-gl4x5 with ESMTPSA
+	id 8cfNEZLR2GrcIAwAWDeZ3g
+	(envelope-from <abo@medichon.fr>); Wed, 21 Oct 2026 14:52:02 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-98R002b4da53ac-d7f1-47df-9405-bc8493e0641b,
+                    05BFDA4BFEC350FDF8004146BCFDBCA9DF17BA8C) smtp.auth=abo@medichon.fr
+X-OVh-ClientIp:88.190.90.129
+From: Arnaud Bonnet <abo@medichon.fr>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	jkoolstra@xs4all.nl,
+	skhan@linuxfoundation.org,
+	Arnaud Bonnet <abo@medichon.fr>
+Subject: [PATCH] Bluetooth: btmtk: remove redundant memory barrier with helper
+Date: Wed, 21 Oct 2026 16:51:12 +0200
+Message-ID: <20261021145112.64213-1-abo@medichon.fr>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,81 +68,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261021084337.1515468-1-chris.lu@mediatek.com>
-In-Reply-To: <20261021084337.1515468-1-chris.lu@mediatek.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Oct 2026 10:23:51 -0400
-X-Gm-Features: AclHuK8FmV1TdL0_oevKDcXRfpa4yUifRgu3gHeeFUqDijVRdFDfONErTdM1fR0
-Message-ID: <CABBYNZKqAa+3V1k3U-NBodfAhYRV3ZqX4V7bp5NFrXY0ndgL7Q@mail.gmail.com>
-Subject: Re: [PATCH v3 RESEND 0/3] Bluetooth: btmtk: fix ISO data reception
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Hao Qin <hao.qin@mediatek.com>, Wenlong Tian <ot_wenlong.tian@mediatek.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
-	SS Wu <ss.wu@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+x-ovh-tracer-id: 15101413975834975838
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: dmFkZTF9qtoi3tSx1+QKyIGt9BUWZHYs30HfsfJ2N49k4rfwYUqUlZ2ZgIzqSeydFiP4LSuTwqmOg9zF5YWJqS/oVWKN7RLL2AF8sFyMIQrrbxqeZj7yvACIYYYqjObN2xIS1wCyz52VyMYQNVsllMnPoDQb0DqTihkGkKfb59TBse/3+OWKaY1dMjcHNxqHFn24rMkjMIW5up31Bicg+rYyswoQsz7Q23WuDGippsnh5+kyR1H7HvzYgXx3rHEKI2dQ9NvpT36r1GqsvgV2JRixe7YG9tqI2yk9fUR1koSWYrOyfdl68h1QrvunaVV+/oWfkXcgomWU+mvKvTrc9zA0e+TkXFtQBOvN5pYavJzvdevntOnxqxM4CeIiDgKNyQkep3UK9VvK9KvJrv06hET7LPVN6oDssF4eOG7h+D23/KaT8iVVr6Z6kSVJ7YPZMwlb6tIN6kdSvSjXS+5ueZVGPpQNJBEGXA6g8HHS2WrJm+Iv1pgqFHUe20Yi9x5Ti3+Jqcs6y1aIR3h6PWNurLQgtXjJ8JYv1gR14qpead15J0ijbJCA9NtuN/XmheLoIynzvFWFFACM4AGzNrrktK9j/VTia9IVxoiiKGmnrnL2GpXpowHSa9yDzleCmryYX8/Z2xGnYgwgWWgyEUD6XUKE6866s11qfCMrQWEyAgTp8i503w
+DKIM-Signature: a=rsa-sha256; bh=xir/Ekev5N4mjzLj0xcz0Rsjkx36hw6Go6Z6J+0jWHo=;
+ c=relaxed/relaxed; d=medichon.fr; h=From; s=ovhmo3801317-selector1;
+ t=1792594323; v=1;
+ b=DR4MDDXn1q6Ibrz+eXo8ZjhVyasqFfbWAStu16K5UneoeqPiFqKBZF4SCghcmA+rUw1noZXu
+ sZapgzGN58C/Xz3b/Zz65ympBiQlZRLsErq80QF/qSQXtWnUtHD73tqV0gPcLJBuy9VtfYpwpx8
+ WtSw4suDL656bpjaOq6oy3k6fvwfbYHYHjc+33CTMU+l9mQGc7+l8Opi9DgaEDffrd+hjH7fsHy
+ GcwaPrzxkTgiX3PrYG/Tbpiozh+ZLRHm9CWWpX+blsfFP4Dc2deifjYL/cNf5EMHrqdAEr1n/Ra
+ lGwYiTmtZTvTs0SqUHRxczSOcwoi9wkmeKC9DTm4E2WaQ==
 
-Hi Chris,
+The test_and_clear_bit() call works as a full memory barrier, thus it is
+not required to emit a barrier using smp_mb__after_atomic() before
+wake_up_bit().
 
-On Wed, Oct 21, 2026 at 4:43=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
-ote:
->
-> Resend due to rebase: the base this series was previously posted against
-> no longer exists in bluetooth-next's history, which is why it failed to
-> apply. Rebased onto current bluetooth-next; no content changes from v3.
->
-> Two fixes for btmtk_recv_isopkt(), found while debugging LE Audio on
-> MT7925, plus an update to the ISO data transmission setting. The function
-> is shared by every MediaTek USB controller that supports ISO data, so non=
-e
-> of this is specific to that part.
->
-> Patch 1 drops the zero padding that the ISO interrupt IN endpoint appends
-> to each transfer instead of parsing it as ISO packets.
->
-> Patch 2 bounds Data_Total_Length by hdev->iso_mtu.
->
-> Patch 3 updates the mt79xx ISO data transmission setting.
->
-> The three hunks do not overlap, so any prefix of the series applies on it=
-s
-> own.
->
-> Changes in v3 RESEND:
-> - Resend due to rebase. No content changes.
->
-> Changes in v3:
-> - Patch 1: instead of dropping a packet solely because Data_Total_Length
->   is zero, also confirm that the rest of the transfer is zero-filled
->   before treating it as padding.
-> - Patch 2, 3: unchanged.
->
-> Changes in v2:
-> - Patch 2 reworked and retitled.
-> - Patch 3 added.
->
-> Based on bluetooth-next.
->
-> Chris Lu (3):
->   Bluetooth: btmtk: drop zero-length ISO packets from endpoint padding
->   Bluetooth: btmtk: bound the ISO payload length by the controller's MTU
->   Bluetooth: btmtk: derive the firmware ISO setting from
->     MTK_ISO_THRESHOLD
->
->  drivers/bluetooth/btmtk.c | 44 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 39 insertions(+), 5 deletions(-)
->
-> --
-> 2.45.2
->
+Replace the whole sequence with test_and_clear_wake_up_bit(), which was
+introduced later in commit 52d633def56c ("sched: Add
+test_and_clear_wake_up_bit() and atomic_dec_and_wake_up()") as a wrapper
+for the correct sequence.
 
-Sashiko is still flagging a problem:
+Signed-off-by: Arnaud Bonnet <abo@medichon.fr>
+---
+Tested by building and manually checking generated assembly on x86, arm64
+and riscv64.
 
-https://sashiko.dev/#/patchset/20261021084337.1515468-1-chris.lu%40mediatek=
-.com
+ drivers/bluetooth/btmtk.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 75483d8230e1..a620e24b6c17 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -607,13 +607,7 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
+ 			return;
+ 		}
+ 
+-		if (test_and_clear_bit(BTMTK_TX_WAIT_VND_EVT,
+-				       &data->flags)) {
+-			/* Barrier to sync with other CPUs */
+-			smp_mb__after_atomic();
+-			wake_up_bit(&data->flags,
+-				    BTMTK_TX_WAIT_VND_EVT);
+-		}
++		test_and_clear_wake_up_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
+ 		kfree(urb->setup_packet);
+ 		return;
+ 	} else if (urb->status == -ENOENT) {
+-- 
+2.53.0
+
