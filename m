@@ -1,64 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=188.165.48.29
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792594339;
-	b=bqkX5TFrqwYBoQgsTOKRiB6YitNmMLkLpplXcvlGHih1rXR2y5BEx1GJ1yLHhAKKrHk7
-	 ROhXI9JosFyJKpcyAL3h0OAingiP/nFv0eUC0E7Rz7axTcJps2lMYudf8EFDpA4cxkMRZ
-	 TuDpezrq3PhMK6/Oun/orf8+fSmHpZwzW1ZfFSLgAjhXBoaHEKBl+g8PgwZ5OvR244Q0+
-	 mDBIElYZFNHsypZpI0M8qF1GYPe92e/oU4qnmqLTrmp0XfZ+K16AmoJ/AwxGs18mboWlk
-	 RMqB64or5kENugQEgnkKoDq85oNnypG4DvhkgkMQbMILxpQ3yZeR0U6FN9uelcMzjhQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792594339;
-	h=DMARC-Filter:Received:Received:Received:X-OVh-ClientIp:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:x-ovh-tracer-id:X-VR-SPAMSTATE:
-	 X-VR-SPAMSCORE:X-VR-SPAMCAUSE:DKIM-Signature;
-	bh=xir/Ekev5N4mjzLj0xcz0Rsjkx36hw6Go6Z6J+0jWHo=;
-	b=PYBCq7PDsmlghAorj/da7gd/lFfa7FnR3h2FPtIzAQtObntqMZt+JLj7qWJ3+PU6NJ17
-	 Vn0dg0ifaVHbuhBY+uu8HRj7EWyXD/JhdRV+pQ0pgL1rdNvH4hKnrnQyWquGpZs/yS/We
-	 wiz5J4CFG9AwAgKCGNLHXLnMx4T9GRyvyuPnIcxzLiiUo1XkXe+VqTstlk8cIfZEdmC/8
-	 A0TQprtiiaGPukSJQATXYtseCWZ7zZukGBsAdSeIK9Kmi+XJ3LnfB66wWyky2J1liQe6b
-	 aPyfxw/lnBy3/ISWgb2dyEqG0n+39Bj2nZNSogiQrp6PAHvMhUyfbVi5Mt96nD0yLZg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=medichon.fr;
-	spf=pass smtp.mailfrom=medichon.fr;
-	arc=none smtp.remote-ip=188.165.48.29
-Received: from 11.mo550.mail-out.ovh.net (11.mo550.mail-out.ovh.net [188.165.48.29])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792594909;
+	b=BI9uZUBTM0/L7hRIfDmP1rIsvFAA1mJdK5+1OpK7T89QaKsvL+P0TrgfgGTamy+iGp8n
+	 QAiOBghw4aRP/4dS71ppvYIoy5WGo92hn4Wpxvj5Qso2lUaNng0+YA2oM+I+RcjTkYVTX
+	 xZ5N+MwNj5Qktw6pIINsP7npCLJnhY6PKFQXC3if6lHVfJbC+6NVFVWxkCALmDTAL3Fon
+	 4VZ1tcMMJcSPBpzfSPQfReHKJOuTEzBzhopN3QlA487vtGN9PW9cFq3yNWThiDmFk9FMR
+	 XBShxkUEPcNFA14LFng12jU3KO7HSdiS2mTbux/Zmf6kmNLFjPl+cDOipsooXBKoK9A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792594909;
+	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
+	bh=MEuHMwMGpTvdAyx1HbAbs8pNbQFFOt3GVEoCCFvmVLk=;
+	b=wyfzLGSC+Fn178sbXRM05YASeiqkU2BXzeCjoZEh4a2SyT9leeohiEj5NazkoLWFbqLe
+	 vNs+WC4erkTYlHVpayDxmv7XE6NEYU7x/T55xDn03BQBcc8p5I5lRuCe06rAOT9ZoeSrD
+	 5Q8VcA2L7RPrJSEicPvebWRmBnsM/PSQY11/6RGSRu9G9DBBdKgvqSX6oaLubX4/qpOGx
+	 +U/QOJ0lXkhLZKqBgPntmHOsvPKevKN5aWNt+CnGmmizMWw/tgz7T5Jk03AopfzCZfSmN
+	 qtzFyOJMMwflFuIHKf96T6I5nC+ZhZKGunfIiWvPBT6lsftpm9eBBzgTdYRZia/aOzQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=NPviSmTj;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466F606A31A
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 21 Oct 2026 15:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=NPviSmTj
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD16D606A321
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:52:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD16D606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=medichon.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=medichon.fr
-Received: from director8.ghost.mail-out.ovh.net (unknown [10.110.58.202])
-	by mo550.mail-out.ovh.net (Postfix) with ESMTP id 4j8sgl4Hqkz5w1W
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:52:03 +0000 (UTC)
-Received: from ghost-submission-7ccd8bbbb6-gl4x5 (unknown [10.108.42.75])
-	by director8.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 786C6C0106;
-	Wed, 21 Oct 2026 14:52:02 +0000 (UTC)
-Received: from medichon.fr ([37.59.142.98])
-	by ghost-submission-7ccd8bbbb6-gl4x5 with ESMTPSA
-	id 8cfNEZLR2GrcIAwAWDeZ3g
-	(envelope-from <abo@medichon.fr>); Wed, 21 Oct 2026 14:52:02 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-98R002b4da53ac-d7f1-47df-9405-bc8493e0641b,
-                    05BFDA4BFEC350FDF8004146BCFDBCA9DF17BA8C) smtp.auth=abo@medichon.fr
-X-OVh-ClientIp:88.190.90.129
-From: Arnaud Bonnet <abo@medichon.fr>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	jkoolstra@xs4all.nl,
-	skhan@linuxfoundation.org,
-	Arnaud Bonnet <abo@medichon.fr>
-Subject: [PATCH] Bluetooth: btmtk: remove redundant memory barrier with helper
-Date: Wed, 21 Oct 2026 16:51:12 +0200
-Message-ID: <20261021145112.64213-1-abo@medichon.fr>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6847425771
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792594909; cv=none; b=SRkEEryFW9J97AYpMhgtUfAdGdsYOgrnrCVi96G5Xo482InzIx5Qmk5QwMq9e7O8KBG9iVrSdexMQPriNRV+OkeCGttAwDUWH0uzUbOcTL3SmNXmfQppyHA0DztlLfr+iKVmt5K8WLSJUv1Gj8cZ6V1mNFcMc5ASWKZyFVc+sdo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792594909; c=relaxed/simple;
+	bh=Rg5C0ZbB0qRpK0aRZszMi0jfKVv4LI8I0idJv4TwzD4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IFiQ2u7HUP6aLeIsXwxOT5bdZqRj3+jOf/nnogCXtkci5BILJWmAUFBMk2PuruBla6w48ck8ddXBEqxglBtqPqLze9y+HEq1uYXNDeS6T0nEdPb9Xn8sKoxCwEpwV5HrCT+Pw0rI5wrbrxa+Hx1xYgSPgb/SdAc9Bzk4SohqrSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NPviSmTj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5759AC2BCFF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 15:01:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1792594908;
+	bh=Rg5C0ZbB0qRpK0aRZszMi0jfKVv4LI8I0idJv4TwzD4=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=NPviSmTjvU/LBlCBTg88usr3sr6ycvAW0vA0KNvpRWlqZKk5ssFu6G3ybB2RO1hYW
+	 l4sbw1tXv2uLOrxI0/pogzhwfpotoMAKHylWUpWVWv1UhmW1Dd0XwDTOm+rfh9zee/
+	 Qb1XIUiYwlJXDC0ekit0HxIuXsMZMISv1V+DqZsuiYE93YW0OpUGxNn2Bs83+Zqn2G
+	 kM7DaPO2G5iT+PgKlClGn3GYQL34e1+xCkoeGHIHJKZJF/60UvLp5XGrUKewshlMsk
+	 6OrC1oAIklkuInVupM/ueamXMwvE8rXDzj5mOxZdEHtNPkXSuQxMqXc3qn7+lA7tZe
+	 OfTD08nWdtFwQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 46ED5C53BC5; Wed, 21 Oct 2026 15:01:48 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 222164] MT7902 Bluetooth: firmware coredump after ~10h uptime,
+ then subsys reset fail; followed by permanent USB disconnect
+Date: Wed, 21 Oct 2026 15:01:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: short_desc
+Message-ID: <bug-222164-62941-prynkCsvRH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-222164-62941@https.bugzilla.kernel.org/>
+References: <bug-222164-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -68,56 +94,21 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-x-ovh-tracer-id: 15101413975834975838
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: dmFkZTF9qtoi3tSx1+QKyIGt9BUWZHYs30HfsfJ2N49k4rfwYUqUlZ2ZgIzqSeydFiP4LSuTwqmOg9zF5YWJqS/oVWKN7RLL2AF8sFyMIQrrbxqeZj7yvACIYYYqjObN2xIS1wCyz52VyMYQNVsllMnPoDQb0DqTihkGkKfb59TBse/3+OWKaY1dMjcHNxqHFn24rMkjMIW5up31Bicg+rYyswoQsz7Q23WuDGippsnh5+kyR1H7HvzYgXx3rHEKI2dQ9NvpT36r1GqsvgV2JRixe7YG9tqI2yk9fUR1koSWYrOyfdl68h1QrvunaVV+/oWfkXcgomWU+mvKvTrc9zA0e+TkXFtQBOvN5pYavJzvdevntOnxqxM4CeIiDgKNyQkep3UK9VvK9KvJrv06hET7LPVN6oDssF4eOG7h+D23/KaT8iVVr6Z6kSVJ7YPZMwlb6tIN6kdSvSjXS+5ueZVGPpQNJBEGXA6g8HHS2WrJm+Iv1pgqFHUe20Yi9x5Ti3+Jqcs6y1aIR3h6PWNurLQgtXjJ8JYv1gR14qpead15J0ijbJCA9NtuN/XmheLoIynzvFWFFACM4AGzNrrktK9j/VTia9IVxoiiKGmnrnL2GpXpowHSa9yDzleCmryYX8/Z2xGnYgwgWWgyEUD6XUKE6866s11qfCMrQWEyAgTp8i503w
-DKIM-Signature: a=rsa-sha256; bh=xir/Ekev5N4mjzLj0xcz0Rsjkx36hw6Go6Z6J+0jWHo=;
- c=relaxed/relaxed; d=medichon.fr; h=From; s=ovhmo3801317-selector1;
- t=1792594323; v=1;
- b=DR4MDDXn1q6Ibrz+eXo8ZjhVyasqFfbWAStu16K5UneoeqPiFqKBZF4SCghcmA+rUw1noZXu
- sZapgzGN58C/Xz3b/Zz65ympBiQlZRLsErq80QF/qSQXtWnUtHD73tqV0gPcLJBuy9VtfYpwpx8
- WtSw4suDL656bpjaOq6oy3k6fvwfbYHYHjc+33CTMU+l9mQGc7+l8Opi9DgaEDffrd+hjH7fsHy
- GcwaPrzxkTgiX3PrYG/Tbpiozh+ZLRHm9CWWpX+blsfFP4Dc2deifjYL/cNf5EMHrqdAEr1n/Ra
- lGwYiTmtZTvTs0SqUHRxczSOcwoi9wkmeKC9DTm4E2WaQ==
 
-The test_and_clear_bit() call works as a full memory barrier, thus it is
-not required to emit a barrier using smp_mb__after_atomic() before
-wake_up_bit().
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222164
 
-Replace the whole sequence with test_and_clear_wake_up_bit(), which was
-introduced later in commit 52d633def56c ("sched: Add
-test_and_clear_wake_up_bit() and atomic_dec_and_wake_up()") as a wrapper
-for the correct sequence.
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Signed-off-by: Arnaud Bonnet <abo@medichon.fr>
----
-Tested by building and manually checking generated assembly on x86, arm64
-and riscv64.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+            Summary|MT7902 Bluetooth: firmware  |MT7902 Bluetooth: firmware
+                   |coredump after ~10h uptime, |coredump after ~10h uptime,
+                   |then &amp;quot;subsys reset |then subsys reset fail;
+                   |fail&amp;quot; and          |followed by permanent USB
+                   |permanent USB disconnect    |disconnect
 
- drivers/bluetooth/btmtk.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+--=20
+You may reply to this email to add a comment.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 75483d8230e1..a620e24b6c17 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -607,13 +607,7 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
- 			return;
- 		}
- 
--		if (test_and_clear_bit(BTMTK_TX_WAIT_VND_EVT,
--				       &data->flags)) {
--			/* Barrier to sync with other CPUs */
--			smp_mb__after_atomic();
--			wake_up_bit(&data->flags,
--				    BTMTK_TX_WAIT_VND_EVT);
--		}
-+		test_and_clear_wake_up_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
- 		kfree(urb->setup_packet);
- 		return;
- 	} else if (urb->status == -ENOENT) {
--- 
-2.53.0
-
+You are receiving this mail because:
+You are the assignee for the bug.=
