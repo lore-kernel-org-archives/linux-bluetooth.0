@@ -1,101 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792591255;
-	b=ma/FlFHd//7SF3Jes1zD3su6qxSXkz1eIsE9eFmk/ItPSfaIIfeXdpf1I+tdqYnGuVKa
-	 W8pFGDcMt/frgGXk5u25CbFHyYFfNIIpga2wRpfGjQ10uEiS6Qyu49WMwqP0HEtJxm8vz
-	 cfxZ6jYYTZhfHEs1pU4Ws0si7dwdQqouWHcE0msZOKb11pmoWgYLazO5YPYIYSpulOBGX
-	 ZHk6HsYnvbel4UyaImRhL6r5b6PuEaObnwwYFvyZkRFHPq5yybDjbXyopn7MkzlNfv6ko
-	 92Qi+xIxm9B1EPetXorT347DQFt1N8IjWRB4Q9QaqJ7V8OHsfDm/XLGMnER2a9mOd2Q==
+	t=1792592644;
+	b=csSEpSzElUwty00qqbLVImNTFyvav6/NLb3HEp5j9WxkUBGlCeQ2a6Nuoq5yVeQPnHWv
+	 NBRVE/LRWMcFJL13aamRFpamFD+otUwM8MMcnQtnRqiQNJX62ksYdbRQFC5DrU21hPhRJ
+	 BEEhPONN7IzqSXRXdaWf7LtlYbualsnVEpJlclJjddgXMjwgMcMW/pBf6loF7vi+6Cais
+	 8TI5JhhQu1Qum5CvuMaUqlGBQfWKUpWMxZyzvW88tb0G5CScWQMQaNoX0fhFw3qDsr+lN
+	 rRr92y8Ohiaf3+BhV+y4axWXzPbX6QRifWOEwvjcvXtrBu5FaRXQ2t5VQE97Sf4Xm6Q==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792591255;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792592644;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=FdVCBZfpYOZXVIwiE/Xpz5oZYVnx0Z/FsH1U5IHm83c=;
-	b=LcgJ9RKba08TO+2VOoFT8/5X71JvXDWoQaxENr8zcS9SFlTZ5cw/gCSoCI3gNPK6MHrJ
-	 aB3HJSymdnr106cCERc9W8Tj1JpvKtFeq+KVAPe29CoaIgqiNBk75Ubbea5PeVFr9GyEx
-	 Q0vs1/xzmtO7xEMmfm9qubWzaE9UCMF2BEc6izufCD1lGoAk6c07qQ8N6vR00a2R8S8RZ
-	 Bvg+2Hm35NNZ6V65tHr4I4la092f2Q5yZLuQKmNoxVHAKxXhcdUCZ6GwdmTSqhGyEUC4J
-	 Cux6MTn0HDHE4pdLpdfl++KCVTl1gFLmZLFemPGJLZ66kaSqnN3n5qiiSM6CxGOYMsw==
+	bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
+	b=dhFy22SsioFMv7E7snTrAzJV66UnLz3kcz1hLyftqZCRN6JS1Om2APO76VaNQCC8QFEh
+	 70EZhDkiXFteUTWYuiDjhzMpuwgyrCI0RLItYhMr7b2eaJfLB6V0H49KDRpW3BGRdoacF
+	 iNCpEp32apTX1ODmUjaEy2wRsnkUoM1c6JWpuu9U75j9sKNy0I6AWq9Tn2Y8QDUL8/+OK
+	 xrOPBwpW83jwSGlLoZw68eJhvu3SkkmKEo3qFFKhjutuwDGPI9sxbVcTy0xNqZ2Pf/WUP
+	 5v/qJdv/t/pypYxrwky3D+rKOmqK8WNgtba37Gh5v1eUhuxRncG99wzIK3TDpOpMBoA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b="hc7NQx/x";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.174
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=mVeuAnoF;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54933606A319
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:00:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54933606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751D4606A322
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 14:24:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 751D4606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=hc7NQx/x
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-8b0db268bd8so4755387b3.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 07:00:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792591254; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=mVeuAnoF
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-8b06c0794cfso8797467b3.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Oct 2026 07:24:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792592643; cv=none;
         d=google.com; s=arc-20260327;
-        b=P7Z0ZNKhqUq+leVWWxqVk2FdRcxgnE1Vjbk1W12CnKO5wYnSBI0sIiHYNILiKnDHHS
-         GDhivpMY6R1pkTaWO4/HhGzlAjU1l2G+bAGiL/2HNZ0+G5vfFanf2DyO/HsyrDhcMFwg
-         Q1N3v3aWcbJW7K8LU0bwIVv7IJ7M9WDjYG/iNca4UwbUebP6u/7LKUMLFsLE6Be1YJr8
-         yBAX+ulXOu7ykFjFvl8pAI3f/JctaLiOO8HmOubldIeZsF7FoRv8Rbs7sPveTcvwPv3X
-         L2b8Q90G3zlkHT+RGvI+6AgJjyhXQlexEz57Wq1AnYAPbY30TgVWD5TzyZpWNTQAjFqh
-         uQhA==
+        b=sT2jU5JCoEHw2ShlWsTaPMNOjtbB9Y3Jdziky1GXaQvrXU/AkA7EJ23YFFf6V3t8X/
+         n4RrQcwSmY9xcZHsb2Rjrnit5qGG2Yhkt+V6FT/A1wmnsLUVQg2RLJiOPSdykEjGkIMK
+         ZMTw/APanZMDEJ+OvK4g/aQx0/p0kMmDR0X/o9tm5cIezKiKz7dpqjDwBinkC6wJV4wL
+         wPtw1jSWpzbsH3MfZxLwkR/i4e4ammPUz+np+nTcQ9rDtR0kPRH2gfoHUPg403KCiboP
+         DEVQcLk3xZhgtVA4zaps/yItVthPtGsmHI8F34qqUhYRxoPcAQeDdoetiN4uDBRsUFp5
+         YNnQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=FdVCBZfpYOZXVIwiE/Xpz5oZYVnx0Z/FsH1U5IHm83c=;
-        fh=bsiDxbmAEmIqk4zDx25mjQYDczyDjME8oMNJO8NNA5g=;
-        b=CTBv5l2irYZgL2v+7aQO+CIu7JuQsUtA965oDlK6TU/zm0mA3NBb8QzCcnW3ResCVm
-         moK8Jv8yJLPOoebnyv/YXjmR65XEvjZD31Q2SiaM0EnUBVo9Gtc0S0Q6l4azQwPaiHOW
-         1qnKcbLSLVgJAABZ7Vt0/TWISGPA8dtKYrMmHM6K6ZAQsKU1Rk/xPEqAT/OmI7E1Z4dm
-         cbxTndEjJHwD7nm/uqXOOAlwcD0Y0Noof4/Jx9kfk9DLuGcD0hqUixe+eGBapFeAjmrD
-         8SFBWAspmqUk7lEg/TDxrCijeIcQow07JxJARfl0LxGlTDRhWimTL8wsxLJIC1hvdj0a
-         YuTw==;
+        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
+        fh=nME6GmyW47RgWuYz61WS7XJ39VQi0sX210I1L4RCMlM=;
+        b=TyWy7AqBFFnGLiwq1/HpIXAou8viVz8K+eZIr4COoEGnwMH1jTOBSMeQc3NbcfntPm
+         8RKt7ab7Hn9MPff0rBm2GkPqIqrskax2aTbScg6ItEk/SDlHO6251UWYB8n1Ds33gN+r
+         zseuH9LHHcMGT1DnYkGVNRLdN2Fp0Hf0gl0GWKp7uuA4gxyaD/tHwYgkgOjwYwJadbPn
+         NvYdAfcNQnLqlJET/daKaiVtp/JoeSPicOkWcUKMfiRue6GlExS3XaKyJvmCBE3V6KdL
+         tPNslPfILAqFlro+d2EXUFpHEIDXh4lij0d0bEGhiHz+r04XfRZ8/2Rg1okMir/NDOUY
+         +AoA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792591254; x=1793196054; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792592643; x=1793197443; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=FdVCBZfpYOZXVIwiE/Xpz5oZYVnx0Z/FsH1U5IHm83c=;
-        b=hc7NQx/xjAJG+jPo3n0dS7BH8KqSaoMxTMze7IR1gQCwLB0OvewHjps3egEsKbugVX
-         IWutPsxgYWJbfivTNI37Dx4dJsHBwuBjhlSJnn9roGQtPyzSWTi7QSo3sDyHGixUjBhL
-         vlvD+XEVs7r05Zm7WJ7iu1Z9qLualBs5STbupuZeIOJuZr3FUweQztNUhtC2wOD3bmnV
-         42bKomRRRyWKKGRsr6aGbh886xRyHzhZJzJ8GXzSo7gDePWjOA/PBMB9wjQXl9KUh0oA
-         koTubI4nGDqXZ7tDEBnOQFOVlHWvj/wPWryHmvJBFDyzXiVzory4HaU5NZG3OVwfzLoh
-         jMSQ==
+        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
+        b=mVeuAnoFaOFhfQvLiTtQZZmds+N4yQc3zn1YhqdWZun1Ga2c060+QgCj5oa3Vpievy
+         W8h5lVHAmxwkk0w0uAndhgGUG1iTbAaNoHea7bm3PH3xe7Ck0crjFjM5EHNcYHzVn/x+
+         oqrKnkuYtOGcMXYMJLW5DRotaFfiSySwwMm1eSgHxzMLXGzQmIYEk3lXuYl6YuuK2b4G
+         /FESwOM1mLoiV0BgPtBDNktm8XVaDhb8GSNrJpnUWpVymDUzus5YThDdL7k+Fez3bDkA
+         LuCVCtCXN09raHfO8/VVqyW9wSGP0iWa+kxocdr265hovuU+Dwa0MVEXTu160uYy6Euf
+         XrlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792591254; x=1793196054;
+        d=1e100.net; s=20260707; t=1792592643; x=1793197443;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=FdVCBZfpYOZXVIwiE/Xpz5oZYVnx0Z/FsH1U5IHm83c=;
-        b=ZVcP4jrE8BnGFQJSvsupnVv81rGtkjMFtR30B6ZmKkZZirAgIXH8mz1HyHcZ80iN3C
-         ovfz8HrHAB+gOcIZp5OSWmOtvkk2sh7Ig+UV9LvVBqTCaHaJXk65d7p6WYq1BxRrFkTb
-         ki5vdvK5ObOfypgDNYGtD0vMfmZEhRZR9QcsV+fJaJoiFuYwP5/0AIV4cgJNI0COIuiR
-         gCiLUHGKh+rHzpbasa3K+/DgN5cq/OXz5IbtYzaa0ZY7xauI5R4n1weiPxln8rs1EpSM
-         qmIkr+NU1P2axHl9A+OEtExIHNHSdw9kl5YgNpDXpSAmQA3g7q9FBhWPD69SHedXaIJ2
-         l9qw==
-X-Forwarded-Encrypted: i=1; AKwUvByziVbax28v9894CvXl+uKmhr/aERyLAj2P9sKbhyjQlQcGx305LVX1katXOxMsGsgj2QT3ipOjrwqEki99xzQ=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJIKMMVAymt2JByU77NICahBuBNlaDtfWcS59TH+6+GzGKwD0DH
-	1bAYutNgZeNm+pqDcGSgt2enWqUKcHgyKfXyhR96Tgljw92+2TSzJSRbXNW7rCjT5qJEOB4am7N
-	n+Gf76QgEULItEJaLcFgTfxXeBfmgHri+/C5h
-X-Gm-Gg: AYBFou3BZhXCR7urf0mdmM1yjX2ZYoWASh+OZPf1sxgB+zjEHVB4TDV2ChHB2cKtro0
-	xMKbwCKmy/TgTDjsi60M3En4/41iu1xIZk/hXRfKj2/6JlG2YN9EdEgiYkVprpU74pL97US/+oL
-	YTovcxetSvyMPZV7VM4PLnWfQnReDqeyKJZWcmzPn5jSKnFso/nRu10jRdgDNtjq3YsTqN/qiaa
-	lijKpaQ8lCrAWSvIJL3lJ6CZZmX7RE0gzLrkDmCgOdqYHNCtbKF/dXMKf7h9qAjQ4mitJmo+uGL
-	R2SFlluA4YoK+taAmFVoH37WINF+P2IisJDTBTtLpVUz7oe76abr1U4oQZn1uCvMhSbuJF+caVB
-	kVs7qkJWPA34iomPsALnx48DyWt4mTeOji3RHTV2gifFbRi0HXmzjUeOkx48idaz5IZgvIo+FRr
-	gnEcJWAwB0aPeKh4zceR3VVWQ=
-X-Received: by 2002:a05:690c:102:b0:8b0:5847:8829 with SMTP id
- 00721157ae682-8b1340b4359mr10303147b3.56.1792591253005; Wed, 21 Oct 2026
- 07:00:53 -0700 (PDT)
+        bh=CH6oHG3/Qp34ti4yckIWOW65CjO9OEZZdj56Vscx/3g=;
+        b=nn34DQG6YKNHseUm4idRZzuNTt9c+Nv96p7f2zEP6hythqoRZeSsc5zAzeWCP8Jj7S
+         vcSw+6YS5oAYHMljzxFarX6RhPZvcrd5pDFvsg4eB2QzkIJGNkz/S97lwHERj4WL5Pcp
+         z/MfbWVLV9dGewIRwbmJolsz2l2ewkcLLCqlomo+Jh3WDs9xIeemE6xv/w5Zh2VB6HvP
+         iRHy6dW1vs4FtcVxZS800+JDhnMgHC/NHYJgsUqF5slgFmSK9ZbslPVBa5yMLznqe4en
+         0UnJNM2Zygso7n7z5rinO04bDeoYjNl2A4dj/OyGKMXfXrLR3zLx+qZfRi/GL7fHsPAC
+         hg3g==
+X-Forwarded-Encrypted: i=1; AKwUvBylCCsZkAzkCbDvWWegux+Cl6ZK28cWnycT527Tz+kOCB7qWOXcus6RZCqCB7vSc8+guYWwCbYFAupjDjLcTY8=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKVU+nMUJnLG6p65pTMXGPKbn0SZCtC08ZlNNklPVqJBIbEjZXl
+	QRm+PWGqKaRdIOsgh2nKDuIq8H7qeIREiCylYmkVRW9O00OEF3P8B6wqRUym5GEOUjr1DdcNPFz
+	O+d3WHEqmN2IyBUHZy2Bqrl544f39DHk=
+X-Gm-Gg: AYBFou1G8iZ5Xvblzgg3vrybzipUVqQiQHcujMEcG0+kWDM4qkh68DxstUGTe5WL8su
+	XvMS9IYCPo86hapo1ozzJdaKrjNbm9Czzpu15uyZ8BlwCDFoCfnu0qEm42pQe+AoSJShsbK3IIX
+	4e/o540xWgUz0w8csctf3K1ffL9Y90ewHpyPrv8gVVpOCInu+EMTXDWrTFKaGiUd7/4JTJ+20ak
+	Ue0llhC8KzDsNxRZq94Xxpue35W2JuCh8rV7t18Qd2O5RyTW3+4YvFGc26C8cBpfjFKvQnSYrZO
+	scvsgKcHTMme/3Ki1gLaBQpwdq7YO1HMqnhC9bxCm/tP3WMQm4/+t55IlNalzqgjDkB47w401U5
+	AujVEqwjanLbJ8s/1/FMS98eAn13rwt9AyyBWrqOqKnBWlKREhCbpAp5GMijW4KAFF4fh0AFBEF
+	h8OTJ9TSjWS9EQYygHey2i
+X-Received: by 2002:a05:690c:e146:b0:8b0:aba3:a3e2 with SMTP id
+ 00721157ae682-8b133d39371mr7017367b3.37.1792592643275; Wed, 21 Oct 2026
+ 07:24:03 -0700 (PDT)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,97 +105,81 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261021093522.3536051-1-jlee@suse.com>
-In-Reply-To: <20261021093522.3536051-1-jlee@suse.com>
+References: <20261021084337.1515468-1-chris.lu@mediatek.com>
+In-Reply-To: <20261021084337.1515468-1-chris.lu@mediatek.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Oct 2026 10:00:41 -0400
-X-Gm-Features: AclHuK_pJcfVEZxvIrbjkfK0WdK1MAInOAt5cac-VrQ-ZEp57W-cMFA67ddroTs
-Message-ID: <CABBYNZ+7ro4EHt8DXL-Oo_tgN1bn5av_KkGtaXXU7YqoQ0vDxQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: SMP: Fail if the X coordinate of remote and
- local public keys are identical
-To: Chun-Yi Lee <joeyli.kernel@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	Chun-Yi Lee <jlee@suse.com>
+Date: Wed, 21 Oct 2026 10:23:51 -0400
+X-Gm-Features: AclHuK8FmV1TdL0_oevKDcXRfpa4yUifRgu3gHeeFUqDijVRdFDfONErTdM1fR0
+Message-ID: <CABBYNZKqAa+3V1k3U-NBodfAhYRV3ZqX4V7bp5NFrXY0ndgL7Q@mail.gmail.com>
+Subject: Re: [PATCH v3 RESEND 0/3] Bluetooth: btmtk: fix ISO data reception
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Hao Qin <hao.qin@mediatek.com>, Wenlong Tian <ot_wenlong.tian@mediatek.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
+	SS Wu <ss.wu@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chun-Yi,
+Hi Chris,
 
-On Wed, Oct 21, 2026 at 5:35=E2=80=AFAM Chun-Yi Lee <joeyli.kernel@gmail.co=
-m> wrote:
+On Wed, Oct 21, 2026 at 4:43=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
+ote:
 >
-> The 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys
-> are identical") patch be introduced since v5.13. Looks this patch can
-> handle the CVE-2021-37577 issue. However, it only checks if the full
-> 64-byte public key (X and Y coordinates) is identical, which is
-> insufficient.
+> Resend due to rebase: the base this series was previously posted against
+> no longer exists in bluetooth-next's history, which is why it failed to
+> apply. Rebased onto current bluetooth-next; no content changes from v3.
 >
-> In CVE-2021-37577:
-> Bluetooth LE and BR/EDR Secure Connections pairing and Secure Simple
-> Pairing using the Passkey entry protocol in Bluetooth Core
-> Specifications 2.1 through 5.3 may permit an unauthenticated
-> man-in-the-middle attacker to identify the Passkey used during pairing
-> by reflection of a crafted public key with the same X coordinate as the
-> offered public key and by reflection of the authentication evidence of
-> the initiating device, potentially permitting this attacker to complete
-> authenticated pairing with the responding device using the correct
-> Passkey for the pairing session. This is a related issue to
-> CVE-2020-26558.
+> Two fixes for btmtk_recv_isopkt(), found while debugging LE Audio on
+> MT7925, plus an update to the ISO data transmission setting. The function
+> is shared by every MediaTek USB controller that supports ISO data, so non=
+e
+> of this is specific to that part.
 >
-> And base on spec, the remote and local public key should not have
-> the same X coordinate:
+> Patch 1 drops the zero padding that the ISO interrupt IN endpoint appends
+> to each transfer instead of parsing it as ISO packets.
 >
-> Bluetooth Core Specification Version: v5.4
-> (7.1 PHASE 1: PUBLIC KEY EXCHANGE)
-> "If the two public keys have the same X coordinate and neither is the
-> debug key (see [Vol 4] Part E, Section 7.6.4), each device should fail
-> the pairing process."
+> Patch 2 bounds Data_Total_Length by hdev->iso_mtu.
 >
-> Bluetooth Core Specification Version: v6.0
-> (7.1 Phase 1: Public key exchange)
-> "If the two public keys have the same X coordinate and neither is the
-> debug key (see [Vol 4] Part E, Section 7.6.4), each device shall fail
-> the pairing process."
+> Patch 3 updates the mt79xx ISO data transmission setting.
 >
-> Update the check in smp_cmd_public_key() to only compare the 32-byte X
-> coordinate of the public keys, making the validation strictly compliant
-> with the specification and effectively mitigating CVE-2021-37577.
+> The three hunks do not overlap, so any prefix of the series applies on it=
+s
+> own.
 >
-> Fixes: 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public key=
-s are identical")
-> Link: https://nvd.nist.gov/vuln/detail/cve-2021-37577
-> Signed-off-by: Chun-Yi Lee <jlee@suse.com>
-> ---
->  net/bluetooth/smp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Changes in v3 RESEND:
+> - Resend due to rebase. No content changes.
 >
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 2df303f6a38f..80128b31e631 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2734,7 +2734,7 @@ static int smp_cmd_public_key(struct l2cap_conn *co=
-nn, struct sk_buff *skb)
->          * not in use.
->          */
->         if (!test_bit(SMP_FLAG_DEBUG_KEY, &smp->flags) &&
-> -           !crypto_memneq(key, smp->local_pk, 64)) {
-> +           !crypto_memneq(key, smp->local_pk, 32)) {
->                 bt_dev_err(hdev, "Remote and local public keys are identi=
-cal");
->                 return SMP_DHKEY_CHECK_FAILED;
->         }
+> Changes in v3:
+> - Patch 1: instead of dropping a packet solely because Data_Total_Length
+>   is zero, also confirm that the rest of the transfer is zero-filled
+>   before treating it as padding.
+> - Patch 2, 3: unchanged.
+>
+> Changes in v2:
+> - Patch 2 reworked and retitled.
+> - Patch 3 added.
+>
+> Based on bluetooth-next.
+>
+> Chris Lu (3):
+>   Bluetooth: btmtk: drop zero-length ISO packets from endpoint padding
+>   Bluetooth: btmtk: bound the ISO payload length by the controller's MTU
+>   Bluetooth: btmtk: derive the firmware ISO setting from
+>     MTK_ISO_THRESHOLD
+>
+>  drivers/bluetooth/btmtk.c | 44 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 39 insertions(+), 5 deletions(-)
+>
 > --
-> 2.51.0
+> 2.45.2
+>
 
-Sashiko is flagging a problem:
+Sashiko is still flagging a problem:
 
-https://sashiko.dev/#/patchset/20261021093522.3536051-1-jlee%40suse.com
-
-That said I do wonder if the check is only truly valid as an
-initiator, since as a responder, this could be checked before
-responding in the unlikely event that the X coordinate happens to be
-the exact same as the initiator's (if that is even possible).
-
+https://sashiko.dev/#/patchset/20261021084337.1515468-1-chris.lu%40mediatek=
+.com
 
 --=20
 Luiz Augusto von Dentz
