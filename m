@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792684041;
-	b=X1QbhDbHPj6WzRIdxpzqb2NFvC3/OmGq7yWySBjrEQN2AMy0FWNjGMyECN9xmU2krA4V
-	 M+FK2XaFKY4516RGmP+DqTQxE7W3rDDSb+djmchwyNMlll7vdHdcRvA3tyVBrMV/ukeCi
-	 NqMKRZxN62q+UHYDHZ8VAUnOHDFpr8lbt0PPE1hVuJTLoa8V2Kmj6MMpO1RnFIPNYX2Rt
-	 tiCVsk0hkh1XAczcRYe7LXHyN8qwQ9PAs/Arlm5SiQke1kEAwefWvpuoQQSZKiE1dJLB9
-	 A42Ty0fVu2ZKCTZdOQ9yRZbuLZ3IBdUJ5d19OLKAtAGLjs+4AhDjCqkQZYHr63AIdpw==
+	t=1792684042;
+	b=t3bSPkGU0QyB4jFviQ0JwgwpgB1iPf5ujdt8plOUjgeSgulR9jah4454UpkXAWT3TlfM
+	 iArIfpI4rKIYsEIaiEZeNCzQXR0IHNmSK2GTKL+BpH7ATSultl+oPEtOcgoP/tF62+Qy2
+	 dJeTIyLpzhoCocrxXOJq9Wz/26Wgy/ForfueITFKW/E832hL17tSWRUINu1u8O+ur2jJU
+	 Xa48D1dlcMi4IidTCF3k5Sq5y8a4BHxHSCp8RQcMZqAccgiwgDpvMB2uAmbO1JcIiotgg
+	 NsGiDEFweGxS4Qfu2A3LEkvJ4ozfgwyTEbttq6oQ8ItSoqs18ZhKYDjIXgevt10SDSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792684041;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792684042;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=BUpl1lfygDujmJjXPVqKQQ4cXgMxmJwku+xvzA0S5TA=;
-	b=kF40qE+4pC2Fz1IYlMcwxEfBLmqjvVltmU/A3+5vO90adEmTMxpSoEpjfpyjs31JGsGM
-	 W/xVXZMtGKXhfP4XwoQFoqNb6PoWRPXyJf0x7v4dBZwX8OClGqNrzNsx9ds8cMyEAhdcp
-	 fP3TsZdpXjRs2pETy/JeHeJ5dCnFT3hyT/pNwbpZ+tSjqXJex6uwsrfg2i0rNGbk0asM7
-	 FXSaX9S/esbwC/oYICrEKrK+rjH1Iw/73JRT+UD9nVRxMpEQ4lwPm9M+g35IxbaYLWwdR
-	 vPYPECD5Oi5vYGc326+8g38bb60VjiDAbXoft/7h7H2Kx6/jAJt67mrNC4hFgcLMTGA==
+	bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
+	b=pnmdUY0beOsLM4sTdYZld8hyn909neJqvjrKiG7IHFUaYoV3tbJ8rgQUtm/RyhAxgxvB
+	 K4VdPFbumiKCxwWfJeSHLGy/gazxcQAnuJQUCnl+FethXkomHJUAVGQ/FFcizo6ecDSrL
+	 zT9iGpyqcwDR5sVnaZo1/PhiPBxTnZBOunDuWEWcfGgsgUmm1Oys7UDZCljTZUDW0fwLN
+	 7FehRF/Wre44NZbuThLFQCTDhWXrbLat6D76nEV7Za4yeGF/mu8Al9lT/1hMb5t78V1GR
+	 lPPbqXCYxT89wHZScjF/DxV38YW8VibIfnS7FO70YgQCYL/RxrnV9UyIggsEQTCgPUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=tJMac8Kv;
-	arc=none smtp.remote-ip=209.85.221.176
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S4l1y7Q7;
+	arc=none smtp.remote-ip=209.85.221.180
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26AC606A31D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 15:47:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B26AC606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3FD606A31A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 15:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F3FD606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=tJMac8Kv
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5eaf34452a9so937168e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 08:47:20 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S4l1y7Q7
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5ead5ff47caso19358e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 08:47:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792684040; x=1793288840; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792684041; x=1793288841; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=BUpl1lfygDujmJjXPVqKQQ4cXgMxmJwku+xvzA0S5TA=;
-        b=tJMac8Kvc0AgZ/YTxcfG/aqy7zpDl2Fbjzx5orz/uPzGOAWH45kRYV2BV3xcC557UP
-         lWW14dSaBqql55F+LPHPWjhiqi2gdw5VoJatmg+4PXBk80pSDe8JqYW6CK2/bhk+Phn+
-         Ds4pNPxAKEZA95w6XZbldNdFiYwNTXFneGfNB3fnZiTj5auRQq4hugl8Uy9mNSb80T+J
-         3n95AYKAEeuKhiWpcLzjBbDzoTo5NaqKdEVRn3FWBquYq4nlZwCKyQXhc7bwRNna6kxy
-         ypsPCkX5wdro0JFhn+tPoY+FukVzBa3qk17qXGhv0LIm3WFlNxVyInANw/eYO867B4rW
-         Jz/Q==
+        bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
+        b=S4l1y7Q77WseVSqIU42SC3S2xWQgkWmSKcqD0zDDMDReC2kk96Z8CJT6oRvoIF8+50
+         hf+xAxco5DrTovkJSOufY4Kv9i9RZZacOgdPyNA+5ZRXb82iHjMviYRDFmTDEBCNN0Z0
+         Y0KZ7j/Nfoti/SESXyvb2ZF7IvM9KVwwLwCKt8lUalKj5LxWB7MOgP7t8Eoclp6cbwWk
+         H5RQdJD8vFvcq+XKaffgMUYozSwFKb1+aLOIBfOJ9J5950laSf/Rhe3V9nh8ZivuSiyF
+         k8QwGpQWV/zCCjmg6EI1zwP5rvQAYnAfAiw3CgUKEaGr6fYS+1+fWBjyW9OcNh0UjDDf
+         smzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792684040; x=1793288840;
+        d=1e100.net; s=20260707; t=1792684041; x=1793288841;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=BUpl1lfygDujmJjXPVqKQQ4cXgMxmJwku+xvzA0S5TA=;
-        b=wxxDfUBVorYALOgC7w5Ri3Ceg/pzx7x79emijjM84GQDRBPUyVWFl5e+qaShfwWPYa
-         Sk6+DfuwQQm0U8tCNSgR1E1mJUTzTB+UaqAw9d8zsF0feX/HVqflD6ui8mTQ5paZu8MN
-         s5BH65ygY0I1ngjN69EkFGkWLucoOhpoghLeErQ9MCkHS8ovsEY5eIq/KUlTopNH7WTi
-         0s+R+ayKyZtNgiOOtTdP14dPGCP1DJMK/xl6KNK5iloiLI2aI6f5o3sZk1Ti8AytNqI6
-         cf9pUb7VC4x+euK8UnrkxclXE/BYUTHhJ4lgt/fhrPCxaJBvdxmJQ0QRQ6pMY94s/eQ/
-         Dwyg==
-X-Gm-Message-State: AFq9FYKOlkMc559SVQCLkZgwZv3bUp2Q6OPGOsypalZ/OYbSsuVx5uCN
-	0tzDsD/AF82VtxXSLeZZ5lJNRUGA0YGsWAJ7iwQyjSOZ1vJaT4T9G1YC0ZslsxSc1ME=
-X-Gm-Gg: AYBFou1/e0Qp4wlD5OrG+7vQXUVWHDsBCyxIIQZxeNBkaX/6M9UX74KtiwGhmwFEvxu
-	pFxRX6CdXeVi/4wPk19SjIsovRFEIb1HNZQtN1ufN3wXsvMKW4t8KXxRWw6BBqXAydr9XbeYfbo
-	AgiQpacU5QmH/ELXsQUBbBdjwk9gxdqRwyHy8KVt+bw9oql2mLfHkIMOP3EAtJ+4nglJMwvLJSq
-	tY6/4Ce7YzrA//hcwaDKtHfai+Otf12q+nE5QOskUv9p2Ug1o/ytzMANxijfBZHcuI76vGics2F
-	VulNYE52y3pd8nWZI8fqVgixWp59VEhYX3Vh/VzjOqJ5UMBCF4W0qk33wr7atVlNo9MrfJ4NE7F
-	ipB0bAJlXUPBI+pgP6C3LyiaoJx2br5xCnj6eGdTWuRYrx7lzvpgv/hwa/0R5MsuA2UtdIqj3jq
-	nNl7n6SKX+TDTdfTDi/vBElJImLJfUskMiS+TXt/oOe1wau36AE/PthfzEbmGcfzZNvTskxUaLk
-	bEk/8/89iqSZrwoBgyIVbZfb7Roq3R6jgCbAbzkGRLBD4SfVnz6N4kSuoigSghUGtJSWR61gME6
-	DjHR6T+KJ8vkowqOPKwm/RuEZsxdrdlOEcRliUwYQUdUAA==
-X-Received: by 2002:a05:6122:4a1b:10b0:5cd:a80c:102c with SMTP id 71dfb90a1353d-5eafa45db6cmr670523e0c.7.1792684039537;
-        Thu, 22 Oct 2026 08:47:19 -0700 (PDT)
+        bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
+        b=sAy2NPgc9Duwzey0tRIHiH8VFevKOBwyxSa7wP2sTdd3eJe+bQUPuMwFoLaopdduUN
+         6pnKtAh5QrEzKOf3+OocjMcps8SrILan0QCN55H0+ZJe4GxJHpvwiZT3TFDo33Y6M1DS
+         yXxiSbAKJK+1+MtLL3AHARllNFWuPdcXG8q8sb7u/bgq1AfXBLhcmAwBsUflJej8QnUQ
+         MCBY2x/4sWrXJYh0+QexLItGPwq9Ej+JReIyVIp0oyVBE26/YJk9fICX3+wAJchgRrfO
+         wqloLtkVpw7czeO/HFhWzBdj51HVV56plNWlqMNrRS5mZHcFtf6MLp70XeuuIZwr5vZ0
+         M57Q==
+X-Gm-Message-State: AFq9FYII+qtYVFxlKKZbO1AS+LrV8pXvYMLo1c6zKxYawTxemb5Smavn
+	FZ8ZagrJLQGO61f09T5Qi2ED9mIQQ59woI3NIAVsdsFol98eL7raROTUna/ckaMZE0w=
+X-Gm-Gg: AYBFou3OFOs1mmwoToVCrMzlJ7nptXUgudFwGTStcQtNowRdCOwfDUvc52xVpf3vSy6
+	qLigp/QQpCtG55ZPMGP0OepxNk/HsaOE6i0k1MdWcKPavgIE4qBMCMNEifFPQkoVN+6K1dvMAZ3
+	GBB4nscvSZejEok1MOHXJhEs/Vt3I0XdPjhs/mheBifkwN/2FkAuUIHRHSTxUg8Q2uACXHGmdF2
+	I1ysQ79Eezki5Aqon3IDoProXdqtmHcykYxL+halUyQuyeKgoArpnIfoo02M3sDGht8cWepysvQ
+	znLzui3ThJtD+9TziWm2+kJhBjgc9mEBoCpGEUIsQx1+yYrR6SWZVKIfIyss0Dor86tatJHczpP
+	KA4QB4gohxx+nSazqISIsv+BC4lhaaWoB56WdAZjbMqOVac7hWrRP6CfjSl89pVaq8YtSfA2Uhv
+	YYNPHcjUVYxnCDoVAXoETh/bSsOR0FsCv6lpRQXQPn2LC7O83aYyDy6WWDZHjRvZA7X3fFKcK/c
+	88f5goaWoYasg67jBek8bnKMsSU4jOhcJCWt5pPgTrvrk4IHDPCGEP30L2WHHeGNqpikT9F+emx
+	bBrcPTfWgg3nTUao1hhUvdlti08bWIxsA5yHKSUTnZN8sw==
+X-Received: by 2002:a05:6122:4203:b0:5ea:dbae:3cbc with SMTP id 71dfb90a1353d-5eaebe5c775mr2304987e0c.19.1792684040577;
+        Thu, 22 Oct 2026 08:47:20 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.18
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 22 Oct 2026 08:47:19 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 10/27] doc: Add btvirt documentation
-Date: Thu, 22 Oct 2026 11:46:43 -0400
-Message-ID: <20261022154701.3959500-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 11/27] emulator: Add vhost-user backend
+Date: Thu, 22 Oct 2026 11:46:44 -0400
+Message-ID: <20261022154701.3959500-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261022154701.3959500-1-luiz.dentz@gmail.com>
 References: <20261022154701.3959500-1-luiz.dentz@gmail.com>
@@ -99,187 +99,1149 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Document the btvirt options, the ways it exposes the emulated
-controllers and which of them share the emulated air interface.
+Add a vhost-user back-end on top of the mainloop, so emulated devices
+can be provided to virtual machines as virtio devices. It supports the
+split virtqueue layout, the configuration space and kick/call file
+descriptors.
+
+Offer VHOST_USER_PROTOCOL_F_SLAVE_REQ and
+VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS, so the guest sends kicks as
+VHOST_USER_VRING_KICK messages and is notified with
+VHOST_USER_SLAVE_VRING_CALL requests. User Mode Linux with external time
+travel requires this, as it does not handle call file descriptors while
+it waits for the time controller. The front-end only acknowledges a
+notification after the time controller answered it, so a wait callback
+lets the user serve it in the meantime.
+
+Messages are read without blocking and may arrive in several parts, so
+one connection cannot hold up the others or the calendar, and
+vhost_process() handles them for a time travel calendar before it
+advances time; a nested call for a connection already being processed
+returns right away, so only the outer one removes it on failure. A
+can_notify callback holds notifications to the driver back until
+vhost_flush_notify(), for a back-end that may only notify while the
+calendar lets it run.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- Makefile.am    |   1 +
- doc/btvirt.rst | 153 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 154 insertions(+)
- create mode 100644 doc/btvirt.rst
+ Makefile.tools   |    3 +-
+ emulator/vhost.c | 1018 ++++++++++++++++++++++++++++++++++++++++++++++
+ emulator/vhost.h |   67 +++
+ 3 files changed, 1087 insertions(+), 1 deletion(-)
+ create mode 100644 emulator/vhost.c
+ create mode 100644 emulator/vhost.h
 
-diff --git a/Makefile.am b/Makefile.am
-index f742458d113e..26884a54ea06 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -494,6 +494,7 @@ EXTRA_DIST += SECURITY.md
- EXTRA_DIST += doc/assigned-numbers.rst doc/supported-features.txt \
- 				doc/test-coverage.txt \
- 				doc/test-runner.rst \
-+				doc/btvirt.rst \
- 				doc/test-functional.rst \
- 				doc/functional-testing.rst \
- 				doc/functional-a2dp.rst \
-diff --git a/doc/btvirt.rst b/doc/btvirt.rst
+diff --git a/Makefile.tools b/Makefile.tools
+index 2914bf1c0391..cb6c01e5e0d9 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -102,7 +102,8 @@ emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c \
+ 				emulator/phy.h emulator/phy.c \
+-				emulator/le.h emulator/le.c
++				emulator/le.h emulator/le.c \
++				emulator/vhost.h emulator/vhost.c
+ emulator_btvirt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la
+ 
+ emulator_b1ee_SOURCES = emulator/b1ee.c
+diff --git a/emulator/vhost.c b/emulator/vhost.c
 new file mode 100644
-index 000000000000..2e016406a4fc
+index 000000000000..a0b79c6bc02a
 --- /dev/null
-+++ b/doc/btvirt.rst
-@@ -0,0 +1,153 @@
-+======
-+btvirt
-+======
++++ b/emulator/vhost.c
+@@ -0,0 +1,1018 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation
++ *
++ *
++ */
 +
-+-----------------------------
-+Bluetooth controller emulator
-+-----------------------------
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under the terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: October 2026
-+:Manual section: 1
-+:Manual group: Linux System Administration
++#include <stdio.h>
++#include <stdarg.h>
++#include <stddef.h>
++#include <stdlib.h>
++#include <string.h>
++#include <errno.h>
++#include <unistd.h>
++#include <sys/epoll.h>
++#include <poll.h>
++#include <sys/mman.h>
++#include <sys/socket.h>
++#include <sys/ioctl.h>
 +
-+SYNOPSIS
-+========
++#include "src/shared/mainloop.h"
++#include "src/shared/util.h"
 +
-+**btvirt** [*OPTIONS*]
++#include "vhost.h"
 +
-+DESCRIPTION
-+===========
++/* vhost-user messages, see docs/interop/vhost-user.rst in QEMU */
++#define VHOST_USER_GET_FEATURES			1
++#define VHOST_USER_SET_FEATURES			2
++#define VHOST_USER_SET_OWNER			3
++#define VHOST_USER_RESET_OWNER			4
++#define VHOST_USER_SET_MEM_TABLE		5
++#define VHOST_USER_SET_VRING_NUM		8
++#define VHOST_USER_SET_VRING_ADDR		9
++#define VHOST_USER_SET_VRING_BASE		10
++#define VHOST_USER_GET_VRING_BASE		11
++#define VHOST_USER_SET_VRING_KICK		12
++#define VHOST_USER_SET_VRING_CALL		13
++#define VHOST_USER_SET_VRING_ERR		14
++#define VHOST_USER_GET_PROTOCOL_FEATURES	15
++#define VHOST_USER_SET_PROTOCOL_FEATURES	16
++#define VHOST_USER_SET_VRING_ENABLE		18
++#define VHOST_USER_SET_SLAVE_REQ_FD		21
++#define VHOST_USER_GET_CONFIG			24
++#define VHOST_USER_SET_CONFIG			25
++#define VHOST_USER_VRING_KICK			35
 +
-+**btvirt(1)** emulates Bluetooth controllers in software. It is used to test
-+the kernel Bluetooth subsystem and BlueZ without real hardware, most notably
-+by **test-runner(1)** and **test-functional(1)**.
++/* Back-end to front-end requests */
++#define VHOST_USER_SLAVE_VRING_CALL		4
 +
-+The controllers are implemented by the BlueZ emulator (``emulator/btdev.c``)
-+and speak HCI. They can be exposed to a Bluetooth stack in several ways:
++#define VHOST_USER_VERSION		0x1
++#define VHOST_USER_FLAG_REPLY		(1 << 2)
++#define VHOST_USER_FLAG_NEED_REPLY	(1 << 3)
 +
-+- as local virtual controllers through ``/dev/vhci`` (**-l**), which then
-+  appear as ``hciN`` on the machine running btvirt;
-+- as H:4 streams on Unix socket servers (**-s**) or a TCP server (**-t**),
-+  one controller per client connection;
-+- as an H:4 stream on a pseudo terminal (**-S**).
++#define VHOST_USER_VRING_INDEX_MASK	0xff
++#define VHOST_USER_VRING_NOFD_MASK	(1 << 8)
 +
-+All controllers created by one btvirt process share an emulated air
-+interface: they can discover, connect to and exchange data with each other,
-+regardless of how each one is exposed. Controllers in different btvirt
-+processes cannot see each other, except for the test LE controllers created
-+with **-U**, see below.
++#define VHOST_USER_F_PROTOCOL_FEATURES	30
++#define VHOST_USER_PROTOCOL_F_SLAVE_REQ		5
++#define VHOST_USER_PROTOCOL_F_CONFIG		9
++#define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS	14
 +
-+btvirt runs until it receives **SIGINT** or **SIGTERM**.
++/* How long to wait for the front-end to acknowledge a notification */
++#define VHOST_USER_REPLY_TIMEOUT	5000
 +
-+OPTIONS
-+=======
++#define VIRTIO_F_VERSION_1		32
 +
-+At least one of **-l**, **-s**, **-t**, **-S** or **-U** must be given.
-+Optional arguments must be attached to the option, as in **-l2**,
-+**-t45551** or **--server=/tmp/bt**.
++#define VRING_DESC_F_NEXT		1
++#define VRING_DESC_F_WRITE		2
++#define VRING_DESC_F_INDIRECT		4
 +
-+-l[num], --local[=num]      Create *num* local virtual controllers through
-+                            ``/dev/vhci`` (default: 1). Requires access to
-+                            ``/dev/vhci``. The controller type is selected
-+                            with **-L**, **-B**, **-A** or **-C**.
++#define VHOST_USER_MAX_FDS		8
++#define VHOST_USER_MAX_REGIONS		8
++#define VHOST_USER_MAX_QUEUES		8
++#define VHOST_USER_MAX_CONFIG		256
 +
-+-s[path], --server[=path]   Create Unix socket servers in the directory
-+                            *path* (default: ``/tmp``). Each client that
-+                            connects gets a new controller of the server's
-+                            type, attached as an H:4 stream. The following
-+                            sockets are created:
++struct vhost_hdr {
++	uint32_t request;
++	uint32_t flags;
++	uint32_t size;
++} __attribute__((packed));
 +
-+                            ``bt-server-bredrle``
-+                                BR/EDR/LE controllers, of the version given
-+                                with **-C**
-+                            ``bt-server-bredr``
-+                                BR/EDR-only controllers
-+                            ``bt-server-le``
-+                                LE-only controllers
-+                            ``bt-server-amp``
-+                                AMP controllers
-+                            ``bt-server-mon``
-+                                monitor socket, no controller is created
++struct vhost_vring_state {
++	uint32_t index;
++	uint32_t num;
++} __attribute__((packed));
 +
-+-t[port], --tcp[=port]      Create a TCP server on *port* (default: 45550).
-+                            Each client that connects gets a new BR/EDR/LE
-+                            controller, of the version given with **-C**,
-+                            attached as an H:4 stream. The server listens on
-+                            127.0.0.1 only.
++struct vhost_vring_addr {
++	uint32_t index;
++	uint32_t flags;
++	uint64_t desc;
++	uint64_t used;
++	uint64_t avail;
++	uint64_t log;
++} __attribute__((packed));
 +
-+-S, --serial                Create a pseudo terminal with a BR/EDR/LE
-+                            controller attached as an H:4 stream. The path of
-+                            the terminal is printed on startup; attach it
-+                            with **btattach(1)**.
++struct vhost_region {
++	uint64_t guest_addr;
++	uint64_t size;
++	uint64_t user_addr;
++	uint64_t mmap_offset;
++} __attribute__((packed));
 +
-+-U[num], --letest[=num]     Create *num* test LE controllers (default: 1)
-+                            through ``/dev/vhci``. Unlike the other
-+                            controllers, these exchange radio traffic with
-+                            test LE controllers in other btvirt processes,
-+                            using UDP broadcasts on port 45023.
++struct vhost_mem {
++	uint32_t num;
++	uint32_t padding;
++	struct vhost_region regions[VHOST_USER_MAX_REGIONS];
++} __attribute__((packed));
 +
-+-L, --le                    Make the controllers created with **-l** LE-only.
++struct vhost_config {
++	uint32_t offset;
++	uint32_t size;
++	uint32_t flags;
++	uint8_t payload[VHOST_USER_MAX_CONFIG];
++} __attribute__((packed));
 +
-+-B, --bredr                 Make the controllers created with **-l**
-+                            BR/EDR-only.
++struct vhost_msg {
++	struct vhost_hdr hdr;
++	union {
++		uint64_t u64;
++		struct vhost_vring_state state;
++		struct vhost_vring_addr addr;
++		struct vhost_mem mem;
++		struct vhost_config config;
++	} payload;
++} __attribute__((packed));
 +
-+-A, --amp                   Make the controllers created with **-l** AMP
-+                            controllers.
++struct vring_desc {
++	uint64_t addr;
++	uint32_t len;
++	uint16_t flags;
++	uint16_t next;
++} __attribute__((packed));
 +
-+-C version, --core=version  Core Specification version of the BR/EDR/LE
-+                            controllers created with **-l**, **-s** (on
-+                            ``bt-server-bredrle``) and **-t**. Supported
-+                            values are ``5.0``, ``5.2``, ``6.0`` and ``6.2``
-+                            (default).
++struct vring_avail {
++	uint16_t flags;
++	uint16_t idx;
++	uint16_t ring[];
++} __attribute__((packed));
 +
-+-d, --debug                 Enable debug output for the **-l** and **-s**
-+                            controllers.
++struct vring_used_elem {
++	uint32_t id;
++	uint32_t len;
++} __attribute__((packed));
 +
-+-v, --version               Show version.
++struct vring_used {
++	uint16_t flags;
++	uint16_t idx;
++	struct vring_used_elem ring[];
++} __attribute__((packed));
 +
-+-h, --help                  Show help options.
++struct region {
++	uint64_t guest_addr;
++	uint64_t user_addr;
++	uint64_t size;
++	void *map;
++	size_t map_len;
++	uint8_t *base;
++};
 +
-+VENDOR COMMANDS
-+===============
++struct queue {
++	unsigned int num;
++	struct vring_desc *desc;
++	struct vring_avail *avail;
++	struct vring_used *used;
++	uint16_t last_avail;
++	int kick_fd;
++	int call_fd;
++	bool enabled;
++	/* A notification is held back by the can_notify callback */
++	bool notify_pending;
++};
 +
-+Controllers created with **-l** answer two vendor commands, so the kernel
-+treats them as supporting the corresponding extensions:
++struct vhost {
++	int fd;
++	const struct vhost_ops *ops;
++	void *user_data;
++	uint64_t features;
++	uint64_t protocol_features;
++	int slave_fd;
++	struct region regions[VHOST_USER_MAX_REGIONS];
++	unsigned int num_regions;
++	struct queue queues[VHOST_USER_MAX_QUEUES];
++	/* Message being received, which may arrive in several parts */
++	struct vhost_msg rx;
++	size_t rx_len;
++	int rx_fds[VHOST_USER_MAX_FDS];
++	unsigned int rx_num_fds;
++	bool processing;
++	bool freeing;
++	vhost_debug_func_t debug_callback;
++	void *debug_data;
++};
 +
-+- opcode ``0xfc10``: emulator-specific vendor command;
-+- opcode ``0xfc1e``: Microsoft vendor extension (MSFT).
++static void vu_debug(struct vhost *vu, const char *format, ...)
++{
++	char str[128];
++	va_list ap;
 +
-+EXAMPLES
-+========
++	if (!vu->debug_callback)
++		return;
 +
-+Create two local controllers, which show up as ``hciN`` and can connect to
-+each other::
++	va_start(ap, format);
++	vsnprintf(str, sizeof(str), format, ap);
++	va_end(ap);
 +
-+    $ sudo btvirt -l2
++	vu->debug_callback(str, vu->debug_data);
++}
 +
-+Serve controllers to virtual machines, one per connecting VM, the way
-+**test-functional(1)** does::
++static void *gpa_to_va(struct vhost *vu, uint64_t addr, uint64_t len)
++{
++	unsigned int i;
 +
-+    $ btvirt --server=/tmp/bt
-+    $ test-runner -u/tmp/bt/bt-server-bredrle -k bzImage -- ...
++	for (i = 0; i < vu->num_regions; i++) {
++		struct region *r = &vu->regions[i];
 +
-+Emulate a Bluetooth 5.2 controller over TCP::
++		if (addr >= r->guest_addr && len <= r->size &&
++					addr - r->guest_addr <= r->size - len)
++			return r->base + (addr - r->guest_addr);
++	}
 +
-+    $ btvirt -C 5.2 -t
++	return NULL;
++}
 +
-+RESOURCES
-+=========
++static void *uva_to_va(struct vhost *vu, uint64_t addr)
++{
++	unsigned int i;
 +
-+http://www.bluez.org
++	for (i = 0; i < vu->num_regions; i++) {
++		struct region *r = &vu->regions[i];
 +
-+REPORTING BUGS
-+==============
++		if (addr >= r->user_addr && addr - r->user_addr < r->size)
++			return r->base + (addr - r->user_addr);
++	}
 +
-+linux-bluetooth@vger.kernel.org
++	return NULL;
++}
 +
-+SEE ALSO
-+========
++static void unmap_regions(struct vhost *vu)
++{
++	unsigned int i;
 +
-+**test-runner(1)**, **test-functional(1)**, **btattach(1)**
++	for (i = 0; i < vu->num_regions; i++)
++		munmap(vu->regions[i].map, vu->regions[i].map_len);
++
++	vu->num_regions = 0;
++}
++
++static void close_queue_fds(struct queue *q)
++{
++	if (q->kick_fd >= 0) {
++		mainloop_remove_fd(q->kick_fd);
++		close(q->kick_fd);
++		q->kick_fd = -1;
++	}
++
++	if (q->call_fd >= 0) {
++		close(q->call_fd);
++		q->call_fd = -1;
++	}
++}
++
++static void reset_queue(struct queue *q)
++{
++	close_queue_fds(q);
++	q->desc = NULL;
++	q->avail = NULL;
++	q->used = NULL;
++	q->num = 0;
++	q->last_avail = 0;
++	q->enabled = false;
++}
++
++static bool queue_ready(struct queue *q)
++{
++	return q->enabled && q->desc && q->avail && q->used && q->num;
++}
++
++/* Send a VRING_CALL request on the back-end channel and wait for the
++ * front-end to acknowledge it. While waiting, the wait callback lets the
++ * caller serve the front-end, e.g. as its time travel calendar.
++ */
++static void notify_inband(struct vhost *vu, unsigned int index)
++{
++	struct vhost_msg msg = {
++		.hdr.request = VHOST_USER_SLAVE_VRING_CALL,
++		.hdr.flags = VHOST_USER_VERSION | VHOST_USER_FLAG_NEED_REPLY,
++		.hdr.size = sizeof(msg.payload.state),
++		.payload.state.index = index,
++	};
++	struct pollfd pfd = { .fd = vu->slave_fd, .events = POLLIN };
++	unsigned int waited = 0;
++
++	if (write(vu->slave_fd, &msg, sizeof(msg.hdr) + msg.hdr.size) < 0) {
++		vu_debug(vu, "queue %u: notification failed", index);
++		return;
++	}
++
++	while (waited < VHOST_USER_REPLY_TIMEOUT) {
++		int ret = poll(&pfd, 1, 1);
++
++		if (ret > 0) {
++			if (read(vu->slave_fd, &msg, sizeof(msg.hdr) +
++					sizeof(msg.payload.u64)) < 0)
++				vu_debug(vu, "queue %u: no reply", index);
++			return;
++		}
++
++		if (ret < 0 && errno != EINTR)
++			break;
++
++		if (vu->ops->wait)
++			vu->ops->wait(vu, vu->user_data);
++
++		waited++;
++	}
++
++	vu_debug(vu, "queue %u: notification not acknowledged", index);
++}
++
++static void notify_driver(struct vhost *vu, unsigned int index)
++{
++	struct queue *q = &vu->queues[index];
++	uint64_t val = 1;
++
++	if (vu->ops->can_notify && !vu->ops->can_notify(vu, vu->user_data)) {
++		q->notify_pending = true;
++		return;
++	}
++
++	q->notify_pending = false;
++
++	if (q->call_fd >= 0) {
++		if (write(q->call_fd, &val, sizeof(val)) < 0)
++			vu_debug(vu, "queue %u: notification failed", index);
++		return;
++	}
++
++	if (vu->slave_fd >= 0 && (vu->protocol_features &
++			(1ULL << VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS)))
++		notify_inband(vu, index);
++}
++
++static void kick_callback(int fd, uint32_t events, void *user_data)
++{
++	struct vhost *vu = user_data;
++	unsigned int i;
++	uint64_t val;
++
++	if (read(fd, &val, sizeof(val)) < 0)
++		return;
++
++	for (i = 0; i < vu->ops->num_queues; i++) {
++		if (vu->queues[i].kick_fd != fd)
++			continue;
++
++		if (vu->ops->queue_notify)
++			vu->ops->queue_notify(vu, i, vu->user_data);
++		break;
++	}
++}
++
++/* Return the descriptor chain head of the next available buffer */
++static int next_avail(struct queue *q)
++{
++	uint16_t head;
++
++	if (!queue_ready(q))
++		return -1;
++
++	if (q->last_avail == le16_to_cpu(q->avail->idx))
++		return -1;
++
++	__sync_synchronize();
++
++	head = le16_to_cpu(q->avail->ring[q->last_avail % q->num]);
++	if (head >= q->num)
++		return -1;
++
++	q->last_avail++;
++
++	return head;
++}
++
++static void add_used(struct vhost *vu, unsigned int index, uint16_t head,
++								uint32_t len)
++{
++	struct queue *q = &vu->queues[index];
++	uint16_t idx = le16_to_cpu(q->used->idx);
++
++	q->used->ring[idx % q->num].id = cpu_to_le32(head);
++	q->used->ring[idx % q->num].len = cpu_to_le32(len);
++
++	__sync_synchronize();
++
++	q->used->idx = cpu_to_le16(idx + 1);
++
++	notify_driver(vu, index);
++}
++
++ssize_t vhost_pop(struct vhost *vu, unsigned int index,
++						void *buf, size_t len)
++{
++	struct queue *q;
++	unsigned int count = 0;
++	size_t offset = 0;
++	int head, i;
++
++	if (index >= vu->ops->num_queues)
++		return -1;
++
++	q = &vu->queues[index];
++
++	head = next_avail(q);
++	if (head < 0)
++		return 0;
++
++	for (i = head;; i = le16_to_cpu(q->desc[i].next)) {
++		struct vring_desc *d = &q->desc[i];
++		uint32_t dlen = le32_to_cpu(d->len);
++		void *data;
++
++		if (le16_to_cpu(d->flags) & (VRING_DESC_F_WRITE |
++						VRING_DESC_F_INDIRECT) ||
++				dlen > len - offset || ++count > q->num) {
++			vu_debug(vu, "queue %u: invalid buffer", index);
++			add_used(vu, index, head, 0);
++			return -1;
++		}
++
++		data = gpa_to_va(vu, le64_to_cpu(d->addr), dlen);
++		if (!data) {
++			vu_debug(vu, "queue %u: invalid address", index);
++			add_used(vu, index, head, 0);
++			return -1;
++		}
++
++		memcpy(buf + offset, data, dlen);
++		offset += dlen;
++
++		if (!(le16_to_cpu(d->flags) & VRING_DESC_F_NEXT))
++			break;
++
++		if (le16_to_cpu(d->next) >= q->num) {
++			add_used(vu, index, head, 0);
++			return -1;
++		}
++	}
++
++	add_used(vu, index, head, 0);
++
++	return offset;
++}
++
++bool vhost_push(struct vhost *vu, unsigned int index,
++					const struct iovec *iov, int iovcnt)
++{
++	struct queue *q;
++	size_t total = 0, len, offset = 0, space = 0;
++	unsigned int count = 0;
++	uint16_t saved;
++	int head, i, v = 0;
++
++	if (index >= vu->ops->num_queues)
++		return false;
++
++	q = &vu->queues[index];
++
++	for (i = 0; i < iovcnt; i++)
++		total += iov[i].iov_len;
++
++	len = total;
++	saved = q->last_avail;
++
++	head = next_avail(q);
++	if (head < 0)
++		return false;
++
++	/* Check that the whole packet fits before writing it */
++	for (i = head;; i = le16_to_cpu(q->desc[i].next)) {
++		struct vring_desc *d = &q->desc[i];
++		uint16_t flags = le16_to_cpu(d->flags);
++
++		if (!(flags & VRING_DESC_F_WRITE) ||
++				(flags & VRING_DESC_F_INDIRECT) ||
++				++count > q->num)
++			goto invalid;
++
++		space += le32_to_cpu(d->len);
++
++		if (!(le16_to_cpu(d->flags) & VRING_DESC_F_NEXT))
++			break;
++
++		if (le16_to_cpu(d->next) >= q->num)
++			goto invalid;
++	}
++
++	if (space < len) {
++		vu_debug(vu, "queue %u: %zu bytes do not fit in %zu",
++							index, total, space);
++		/* Leave the buffer to the driver, the packet is dropped */
++		q->last_avail = saved;
++		return false;
++	}
++
++	for (i = head; len; i = le16_to_cpu(q->desc[i].next)) {
++		struct vring_desc *d = &q->desc[i];
++		uint32_t dlen = le32_to_cpu(d->len);
++		uint8_t *data;
++		size_t done = 0;
++
++		data = gpa_to_va(vu, le64_to_cpu(d->addr), dlen);
++		if (!data)
++			goto invalid;
++
++		while (done < dlen && v < iovcnt) {
++			size_t n = MIN(dlen - done, iov[v].iov_len - offset);
++
++			memcpy(data + done, iov[v].iov_base + offset, n);
++			done += n;
++			offset += n;
++			len -= n;
++
++			if (offset == iov[v].iov_len) {
++				offset = 0;
++				v++;
++			}
++		}
++
++		if (!len)
++			break;
++	}
++
++	add_used(vu, index, head, total);
++
++	return true;
++
++invalid:
++	vu_debug(vu, "queue %u: invalid buffer", index);
++	add_used(vu, index, head, 0);
++	return false;
++}
++
++static int send_reply(struct vhost *vu, struct vhost_msg *msg,
++								size_t size)
++{
++	msg->hdr.flags = VHOST_USER_VERSION | VHOST_USER_FLAG_REPLY;
++	msg->hdr.size = size;
++
++	if (write(vu->fd, msg, sizeof(msg->hdr) + size) < 0)
++		return -errno;
++
++	return 0;
++}
++
++static int send_u64(struct vhost *vu, struct vhost_msg *msg,
++								uint64_t val)
++{
++	msg->payload.u64 = val;
++
++	return send_reply(vu, msg, sizeof(msg->payload.u64));
++}
++
++static int set_mem_table(struct vhost *vu, struct vhost_msg *msg,
++						int *fds, unsigned int num_fds)
++{
++	unsigned int i;
++
++	if (msg->payload.mem.num > VHOST_USER_MAX_REGIONS ||
++					msg->payload.mem.num != num_fds)
++		return -EINVAL;
++
++	unmap_regions(vu);
++
++	for (i = 0; i < msg->payload.mem.num; i++) {
++		struct vhost_region *m = &msg->payload.mem.regions[i];
++		struct region *r = &vu->regions[i];
++
++		r->map_len = m->size + m->mmap_offset;
++		r->map = mmap(NULL, r->map_len, PROT_READ | PROT_WRITE,
++						MAP_SHARED, fds[i], 0);
++		if (r->map == MAP_FAILED) {
++			vu_debug(vu, "failed to map region %u: %s", i,
++							strerror(errno));
++			unmap_regions(vu);
++			return -errno;
++		}
++
++		r->guest_addr = m->guest_addr;
++		r->user_addr = m->user_addr;
++		r->size = m->size;
++		r->base = r->map + m->mmap_offset;
++		vu->num_regions++;
++	}
++
++	return 0;
++}
++
++static int set_vring_fd(struct vhost *vu, struct vhost_msg *msg,
++						int *fds, unsigned int num_fds)
++{
++	unsigned int index = msg->payload.u64 & VHOST_USER_VRING_INDEX_MASK;
++	bool nofd = msg->payload.u64 & VHOST_USER_VRING_NOFD_MASK;
++	struct queue *q;
++	int fd = -1;
++
++	if (index >= vu->ops->num_queues)
++		return -EINVAL;
++
++	if (!nofd) {
++		if (num_fds != 1)
++			return -EINVAL;
++		fd = fds[0];
++		fds[0] = -1;
++	}
++
++	q = &vu->queues[index];
++
++	switch (msg->hdr.request) {
++	case VHOST_USER_SET_VRING_KICK:
++		if (q->kick_fd >= 0) {
++			mainloop_remove_fd(q->kick_fd);
++			close(q->kick_fd);
++		}
++		q->kick_fd = fd;
++		if (fd >= 0 && mainloop_add_fd(fd, EPOLLIN, kick_callback,
++							vu, NULL) < 0)
++			return -EIO;
++		/* Without VHOST_USER_F_PROTOCOL_FEATURES queues are enabled
++		 * once they have a kick file descriptor.
++		 */
++		if (!(vu->features & (1ULL << VHOST_USER_F_PROTOCOL_FEATURES)))
++			q->enabled = true;
++		break;
++	case VHOST_USER_SET_VRING_CALL:
++		if (q->call_fd >= 0)
++			close(q->call_fd);
++		q->call_fd = fd;
++		break;
++	default:
++		if (fd >= 0)
++			close(fd);
++		break;
++	}
++
++	return 0;
++}
++
++static int get_config(struct vhost *vu, struct vhost_msg *msg)
++{
++	struct vhost_config *c = &msg->payload.config;
++	uint32_t size = c->size;
++
++	if (size > VHOST_USER_MAX_CONFIG)
++		return -EINVAL;
++
++	memset(c->payload, 0, size);
++
++	if (c->offset < vu->ops->config_len)
++		memcpy(c->payload, vu->ops->config + c->offset,
++				MIN(size, vu->ops->config_len - c->offset));
++
++	return send_reply(vu, msg, offsetof(struct vhost_config,
++							payload) + size);
++}
++
++static int handle_msg(struct vhost *vu, struct vhost_msg *msg,
++						int *fds, unsigned int num_fds)
++{
++	struct queue *q;
++	unsigned int index;
++
++	vu_debug(vu, "request %u size %u", msg->hdr.request, msg->hdr.size);
++
++	switch (msg->hdr.request) {
++	case VHOST_USER_GET_FEATURES:
++		return send_u64(vu, msg, vu->ops->features |
++				(1ULL << VIRTIO_F_VERSION_1) |
++				(1ULL << VHOST_USER_F_PROTOCOL_FEATURES));
++	case VHOST_USER_SET_FEATURES:
++		vu->features = msg->payload.u64;
++		return 0;
++	case VHOST_USER_GET_PROTOCOL_FEATURES:
++		return send_u64(vu, msg,
++			(1ULL << VHOST_USER_PROTOCOL_F_CONFIG) |
++			(1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ) |
++			(1ULL << VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS));
++	case VHOST_USER_SET_PROTOCOL_FEATURES:
++		vu->protocol_features = msg->payload.u64;
++		return 0;
++	case VHOST_USER_SET_OWNER:
++		return 0;
++	case VHOST_USER_RESET_OWNER:
++		for (index = 0; index < vu->ops->num_queues; index++)
++			reset_queue(&vu->queues[index]);
++		unmap_regions(vu);
++		return 0;
++	case VHOST_USER_SET_MEM_TABLE:
++		return set_mem_table(vu, msg, fds, num_fds);
++	case VHOST_USER_SET_VRING_KICK:
++	case VHOST_USER_SET_VRING_CALL:
++	case VHOST_USER_SET_VRING_ERR:
++		return set_vring_fd(vu, msg, fds, num_fds);
++	case VHOST_USER_SET_SLAVE_REQ_FD:
++		if (num_fds != 1)
++			return -EINVAL;
++		if (vu->slave_fd >= 0)
++			close(vu->slave_fd);
++		vu->slave_fd = fds[0];
++		fds[0] = -1;
++		return 0;
++	case VHOST_USER_GET_CONFIG:
++		return get_config(vu, msg);
++	case VHOST_USER_SET_CONFIG:
++		return 0;
++	}
++
++	index = msg->payload.state.index;
++	if (index >= vu->ops->num_queues)
++		return -EINVAL;
++
++	q = &vu->queues[index];
++
++	switch (msg->hdr.request) {
++	case VHOST_USER_SET_VRING_NUM:
++		if (!msg->payload.state.num ||
++				msg->payload.state.num > 32768 ||
++				msg->payload.state.num &
++				(msg->payload.state.num - 1))
++			return -EINVAL;
++		q->num = msg->payload.state.num;
++		return 0;
++	case VHOST_USER_SET_VRING_BASE:
++		q->last_avail = msg->payload.state.num;
++		return 0;
++	case VHOST_USER_GET_VRING_BASE:
++		/* The driver stops the queue */
++		q->enabled = false;
++		close_queue_fds(q);
++		msg->payload.state.num = q->last_avail;
++		return send_reply(vu, msg, sizeof(msg->payload.state));
++	case VHOST_USER_SET_VRING_ADDR:
++		q->desc = uva_to_va(vu, msg->payload.addr.desc);
++		q->avail = uva_to_va(vu, msg->payload.addr.avail);
++		q->used = uva_to_va(vu, msg->payload.addr.used);
++		if (!q->desc || !q->avail || !q->used)
++			return -EINVAL;
++		return 0;
++	case VHOST_USER_VRING_KICK:
++		if (vu->ops->queue_notify)
++			vu->ops->queue_notify(vu, index, vu->user_data);
++		return 0;
++	case VHOST_USER_SET_VRING_ENABLE:
++		q->enabled = msg->payload.state.num;
++		if (q->enabled && vu->ops->queue_notify)
++			vu->ops->queue_notify(vu, index, vu->user_data);
++		return 0;
++	}
++
++	vu_debug(vu, "unsupported request %u", msg->hdr.request);
++
++	return -EOPNOTSUPP;
++}
++
++static void close_rx_fds(struct vhost *vu)
++{
++	unsigned int i;
++
++	for (i = 0; i < vu->rx_num_fds; i++)
++		close(vu->rx_fds[i]);
++
++	vu->rx_num_fds = 0;
++}
++
++/* Receive the next part of the message without blocking. Returns 0 once
++ * the message is complete, with its file descriptors moved to fds.
++ */
++static int recv_msg(struct vhost *vu, struct vhost_msg *msg,
++				int *fds, unsigned int *num_fds)
++{
++	char control[CMSG_SPACE(sizeof(int) * VHOST_USER_MAX_FDS)];
++	size_t hdr_len = sizeof(vu->rx.hdr);
++	struct iovec iov;
++	struct msghdr mh = {
++		.msg_iov = &iov,
++		.msg_iovlen = 1,
++		.msg_control = control,
++		.msg_controllen = sizeof(control),
++	};
++	struct cmsghdr *cmsg;
++	size_t total;
++	ssize_t len;
++
++	if (vu->rx_len < hdr_len)
++		total = hdr_len;
++	else
++		total = hdr_len + vu->rx.hdr.size;
++
++	iov.iov_base = (uint8_t *) &vu->rx + vu->rx_len;
++	iov.iov_len = total - vu->rx_len;
++
++	len = recvmsg(vu->fd, &mh, MSG_CMSG_CLOEXEC | MSG_DONTWAIT);
++	if (len < 0 && (errno == EAGAIN || errno == EINTR))
++		return -EAGAIN;
++	if (len <= 0)
++		return -EIO;
++
++	for (cmsg = CMSG_FIRSTHDR(&mh); cmsg; cmsg = CMSG_NXTHDR(&mh, cmsg)) {
++		unsigned int n, i;
++		int *cfds;
++
++		if (cmsg->cmsg_level != SOL_SOCKET ||
++					cmsg->cmsg_type != SCM_RIGHTS)
++			continue;
++
++		n = (cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
++		cfds = (int *) CMSG_DATA(cmsg);
++
++		for (i = 0; i < n; i++) {
++			if (vu->rx_num_fds < VHOST_USER_MAX_FDS)
++				vu->rx_fds[vu->rx_num_fds++] = cfds[i];
++			else
++				close(cfds[i]);
++		}
++	}
++
++	vu->rx_len += len;
++
++	if (vu->rx_len == hdr_len && vu->rx.hdr.size > sizeof(vu->rx.payload))
++		return -EINVAL;
++
++	if (vu->rx_len < hdr_len || vu->rx_len < hdr_len + vu->rx.hdr.size)
++		return -EAGAIN;
++
++	memcpy(msg, &vu->rx, vu->rx_len);
++	memcpy(fds, vu->rx_fds, vu->rx_num_fds * sizeof(int));
++	*num_fds = vu->rx_num_fds;
++
++	memset(&vu->rx, 0, sizeof(vu->rx));
++	vu->rx_len = 0;
++	vu->rx_num_fds = 0;
++
++	return 0;
++}
++
++static bool process_msg(struct vhost *vu, bool *failed)
++{
++	struct vhost_msg msg;
++	int fds[VHOST_USER_MAX_FDS];
++	unsigned int num_fds, i;
++	bool need_reply;
++	int err;
++
++	memset(&msg, 0, sizeof(msg));
++
++	err = recv_msg(vu, &msg, fds, &num_fds);
++	if (err == -EAGAIN)
++		return true;
++	if (err < 0) {
++		*failed = true;
++		return false;
++	}
++
++	need_reply = msg.hdr.flags & VHOST_USER_FLAG_NEED_REPLY;
++
++	err = handle_msg(vu, &msg, fds, num_fds);
++
++	/* File descriptors taken over are set to -1, the memory mappings
++	 * keep the memory referenced.
++	 */
++	for (i = 0; i < num_fds; i++) {
++		if (fds[i] >= 0)
++			close(fds[i]);
++	}
++
++	if (need_reply && msg.hdr.request != VHOST_USER_GET_FEATURES &&
++			msg.hdr.request != VHOST_USER_GET_PROTOCOL_FEATURES &&
++			msg.hdr.request != VHOST_USER_GET_VRING_BASE &&
++			msg.hdr.request != VHOST_USER_GET_CONFIG)
++		send_u64(vu, &msg, err < 0 ? 1 : 0);
++
++	if (err < 0)
++		vu_debug(vu, "request %u failed: %s", msg.hdr.request,
++							strerror(-err));
++
++	return true;
++}
++
++/* Handle the pending messages. A message may trigger the calendar, which
++ * processes the connections before advancing time, this one included, so
++ * a nested call returns right away and leaves its messages to the outer
++ * one, which alone may remove the connection, once done with it.
++ */
++static void process_msgs(struct vhost *vu)
++{
++	bool failed = false;
++	int avail;
++
++	if (vu->fd < 0 || vu->processing)
++		return;
++
++	vu->processing = true;
++
++	while (process_msg(vu, &failed)) {
++		if (ioctl(vu->fd, FIONREAD, &avail) < 0 || avail <= 0)
++			break;
++	}
++
++	vu->processing = false;
++
++	if (failed)
++		mainloop_remove_fd(vu->fd);
++}
++
++static void read_callback(int fd, uint32_t events, void *user_data)
++{
++	struct vhost *vu = user_data;
++
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_remove_fd(vu->fd);
++		return;
++	}
++
++	process_msgs(vu);
++}
++
++void vhost_flush_notify(struct vhost *vu)
++{
++	unsigned int i;
++
++	for (i = 0; i < vu->ops->num_queues; i++) {
++		if (vu->queues[i].notify_pending)
++			notify_driver(vu, i);
++	}
++}
++
++void vhost_process(struct vhost *vu)
++{
++	process_msgs(vu);
++}
++
++static void vu_destroy(void *user_data)
++{
++	struct vhost *vu = user_data;
++	unsigned int i;
++
++	for (i = 0; i < VHOST_USER_MAX_QUEUES; i++)
++		reset_queue(&vu->queues[i]);
++
++	unmap_regions(vu);
++	close_rx_fds(vu);
++
++	if (vu->slave_fd >= 0) {
++		close(vu->slave_fd);
++		vu->slave_fd = -1;
++	}
++
++	close(vu->fd);
++	vu->fd = -1;
++
++	if (!vu->freeing && vu->ops->disconnect)
++		vu->ops->disconnect(vu, vu->user_data);
++}
++
++struct vhost *vhost_new(int fd, const struct vhost_ops *ops,
++							void *user_data)
++{
++	struct vhost *vu;
++	unsigned int i;
++
++	if (ops->num_queues > VHOST_USER_MAX_QUEUES ||
++				ops->config_len > VHOST_USER_MAX_CONFIG)
++		return NULL;
++
++	vu = new0(struct vhost, 1);
++	vu->fd = fd;
++	vu->slave_fd = -1;
++	vu->ops = ops;
++	vu->user_data = user_data;
++
++	for (i = 0; i < VHOST_USER_MAX_QUEUES; i++) {
++		vu->queues[i].kick_fd = -1;
++		vu->queues[i].call_fd = -1;
++	}
++
++	if (mainloop_add_fd(fd, EPOLLIN, read_callback, vu, vu_destroy) < 0) {
++		free(vu);
++		return NULL;
++	}
++
++	return vu;
++}
++
++void vhost_free(struct vhost *vu)
++{
++	if (!vu)
++		return;
++
++	vu->freeing = true;
++
++	if (vu->fd >= 0)
++		mainloop_remove_fd(vu->fd);
++
++	free(vu);
++}
++
++void vhost_set_debug(struct vhost *vu,
++				vhost_debug_func_t callback, void *user_data)
++{
++	vu->debug_callback = callback;
++	vu->debug_data = user_data;
++}
+diff --git a/emulator/vhost.h b/emulator/vhost.h
+new file mode 100644
+index 000000000000..a5ec92f9594c
+--- /dev/null
++++ b/emulator/vhost.h
+@@ -0,0 +1,67 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation
++ *
++ *
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <stddef.h>
++#include <sys/types.h>
++#include <sys/uio.h>
++
++struct vhost;
++
++struct vhost_ops {
++	/* Device specific virtio feature bits, VERSION_1 is always offered */
++	uint64_t features;
++	unsigned int num_queues;
++	/* Device configuration space, read with VHOST_USER_GET_CONFIG */
++	const void *config;
++	size_t config_len;
++	/* The driver made buffers available on a queue */
++	void (*queue_notify)(struct vhost *vu, unsigned int index,
++							void *user_data);
++	/* The connection was closed */
++	void (*disconnect)(struct vhost *vu, void *user_data);
++	/* Called repeatedly while waiting for the front-end to acknowledge
++	 * an in-band notification
++	 */
++	void (*wait)(struct vhost *vu, void *user_data);
++	/* If set and returning false, notifications to the driver are held
++	 * back until vhost_flush_notify()
++	 */
++	bool (*can_notify)(struct vhost *vu, void *user_data);
++};
++
++struct vhost *vhost_new(int fd, const struct vhost_ops *ops,
++							void *user_data);
++void vhost_free(struct vhost *vu);
++
++/* Send the notifications held back by can_notify */
++void vhost_flush_notify(struct vhost *vu);
++
++/* Process the messages pending on the connection without blocking */
++void vhost_process(struct vhost *vu);
++
++typedef void (*vhost_debug_func_t)(const char *str, void *user_data);
++void vhost_set_debug(struct vhost *vu,
++				vhost_debug_func_t callback, void *user_data);
++
++/* Read the next buffer the driver made available on a driver-to-device
++ * queue into buf. Returns the number of bytes read, 0 if no buffer is
++ * available or -1 on error.
++ */
++ssize_t vhost_pop(struct vhost *vu, unsigned int index,
++						void *buf, size_t len);
++
++/* Write the data into the next buffer the driver made available on a
++ * device-to-driver queue and notify the driver. Returns false if no buffer
++ * is available or the data does not fit.
++ */
++bool vhost_push(struct vhost *vu, unsigned int index,
++					const struct iovec *iov, int iovcnt);
 -- 
 2.56.0
 
