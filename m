@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792684042;
-	b=t3bSPkGU0QyB4jFviQ0JwgwpgB1iPf5ujdt8plOUjgeSgulR9jah4454UpkXAWT3TlfM
-	 iArIfpI4rKIYsEIaiEZeNCzQXR0IHNmSK2GTKL+BpH7ATSultl+oPEtOcgoP/tF62+Qy2
-	 dJeTIyLpzhoCocrxXOJq9Wz/26Wgy/ForfueITFKW/E832hL17tSWRUINu1u8O+ur2jJU
-	 Xa48D1dlcMi4IidTCF3k5Sq5y8a4BHxHSCp8RQcMZqAccgiwgDpvMB2uAmbO1JcIiotgg
-	 NsGiDEFweGxS4Qfu2A3LEkvJ4ozfgwyTEbttq6oQ8ItSoqs18ZhKYDjIXgevt10SDSQ==
+	t=1792684044;
+	b=0KvGrvsoKCT2P+EHba7uYGnjS3hw90oBIsDRITyUYHRxEkZNhpObdidnDUz9+RmMmRsq
+	 lSyo6cslgsvyq13IJ1wYKvAMd3VK8bO1mW5TdSaNff/FLyCjwHGJwlmxGccfoCiPGltfH
+	 6DmKE9lN+MQ/C3dMQ0NKutuIRTjo3gguVyLKRB1KIU1N14NzllfI2R0Xaey+7UTwDLIho
+	 E8YyGLvXADYAzAFtCNUjp1Rw5wmNy9GA5ELdXZGINZK55D7v7CLeQdHj9ohJ3szKKcouV
+	 jWW4AEMGPd8iUBSjBc9kNJRMAE2C0rskLjoFQkmIq8meAoipm+EoZvYoKWY5oUyF/kg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792684042;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792684044;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
-	b=pnmdUY0beOsLM4sTdYZld8hyn909neJqvjrKiG7IHFUaYoV3tbJ8rgQUtm/RyhAxgxvB
-	 K4VdPFbumiKCxwWfJeSHLGy/gazxcQAnuJQUCnl+FethXkomHJUAVGQ/FFcizo6ecDSrL
-	 zT9iGpyqcwDR5sVnaZo1/PhiPBxTnZBOunDuWEWcfGgsgUmm1Oys7UDZCljTZUDW0fwLN
-	 7FehRF/Wre44NZbuThLFQCTDhWXrbLat6D76nEV7Za4yeGF/mu8Al9lT/1hMb5t78V1GR
-	 lPPbqXCYxT89wHZScjF/DxV38YW8VibIfnS7FO70YgQCYL/RxrnV9UyIggsEQTCgPUg==
+	bh=oAudEZUbian2xL+CZEXpZ2MwnCHJr7dH7/nTvNlUNS4=;
+	b=TeNCpun/g175gKpxZqvpovHf1Uc0MCVxewUdPjpM/bBirMmJPvtZTE/jsG20eG72AI7e
+	 IPTSMpeM/WHR8EMiNuHNzJP0CaiLWh6HH3HaF9lfRkHNKzZZMRoWo+qU8lbMUahB7OQsT
+	 EbwvJmEayhFGJqxV0snJO0Vp9ZfJYcksll1ZntYrMroKKZLRF0TQtBxuwi+zKTtM3mM7p
+	 /LuKICtxjxv40xyjEboqKksjDN5EY6YCYZQdy4NpqzxhoVkR6oT7Ek2Zezn589uwsqZpZ
+	 sZqDnyIYdNARn3pyVkH0nzLv8/7F/6NmkRfXtk8BnSxDLyB1rxbQxdMqMFD3Gp+W/3A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S4l1y7Q7;
-	arc=none smtp.remote-ip=209.85.221.180
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S7PPySRo;
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3FD606A31A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 15:47:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F3FD606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00E2606A329
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 15:47:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A00E2606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S4l1y7Q7
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5ead5ff47caso19358e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 08:47:21 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=S7PPySRo
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5eac319a6c2so28318e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 08:47:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792684041; x=1793288841; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792684042; x=1793288842; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
-        b=S4l1y7Q77WseVSqIU42SC3S2xWQgkWmSKcqD0zDDMDReC2kk96Z8CJT6oRvoIF8+50
-         hf+xAxco5DrTovkJSOufY4Kv9i9RZZacOgdPyNA+5ZRXb82iHjMviYRDFmTDEBCNN0Z0
-         Y0KZ7j/Nfoti/SESXyvb2ZF7IvM9KVwwLwCKt8lUalKj5LxWB7MOgP7t8Eoclp6cbwWk
-         H5RQdJD8vFvcq+XKaffgMUYozSwFKb1+aLOIBfOJ9J5950laSf/Rhe3V9nh8ZivuSiyF
-         k8QwGpQWV/zCCjmg6EI1zwP5rvQAYnAfAiw3CgUKEaGr6fYS+1+fWBjyW9OcNh0UjDDf
-         smzw==
+        bh=oAudEZUbian2xL+CZEXpZ2MwnCHJr7dH7/nTvNlUNS4=;
+        b=S7PPySRozAHBTJKemdyEBr8Yv7fpMz8aFmmW1xpJsiGS6+84RLwWhmTLx6KZ+Sd3ZV
+         f3Hnjoov7WfEB78Gmy+3ENYLFXEVsF/YozQ1MEG7391ALjmULf57pwqv8taGptHIEXop
+         ffHEx2UIlyyTlXdVKN0aLFOvoJCsDGAVyDB/LghNu0ZVJdHz8Wfnqbj+L/FTTYqFptbg
+         qIn67OsV7TdvZ+AQUaR2zr3JURGqn0pRk7M2a5rQ9YMPV/qUus+kBFsgBUvBgeDif7uj
+         +LbW8W013RsNdQ4I8PHodIED92j7DMrXZDgCb9afbdPwWVVChn2SLDRI8alpVGXCRlCr
+         /Qag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792684041; x=1793288841;
+        d=1e100.net; s=20260707; t=1792684042; x=1793288842;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Qy0VHKd54/jFG3qOxkmHI+wnsWyRbN2C4f2z9w2GaDw=;
-        b=sAy2NPgc9Duwzey0tRIHiH8VFevKOBwyxSa7wP2sTdd3eJe+bQUPuMwFoLaopdduUN
-         6pnKtAh5QrEzKOf3+OocjMcps8SrILan0QCN55H0+ZJe4GxJHpvwiZT3TFDo33Y6M1DS
-         yXxiSbAKJK+1+MtLL3AHARllNFWuPdcXG8q8sb7u/bgq1AfXBLhcmAwBsUflJej8QnUQ
-         MCBY2x/4sWrXJYh0+QexLItGPwq9Ej+JReIyVIp0oyVBE26/YJk9fICX3+wAJchgRrfO
-         wqloLtkVpw7czeO/HFhWzBdj51HVV56plNWlqMNrRS5mZHcFtf6MLp70XeuuIZwr5vZ0
-         M57Q==
-X-Gm-Message-State: AFq9FYII+qtYVFxlKKZbO1AS+LrV8pXvYMLo1c6zKxYawTxemb5Smavn
-	FZ8ZagrJLQGO61f09T5Qi2ED9mIQQ59woI3NIAVsdsFol98eL7raROTUna/ckaMZE0w=
-X-Gm-Gg: AYBFou3OFOs1mmwoToVCrMzlJ7nptXUgudFwGTStcQtNowRdCOwfDUvc52xVpf3vSy6
-	qLigp/QQpCtG55ZPMGP0OepxNk/HsaOE6i0k1MdWcKPavgIE4qBMCMNEifFPQkoVN+6K1dvMAZ3
-	GBB4nscvSZejEok1MOHXJhEs/Vt3I0XdPjhs/mheBifkwN/2FkAuUIHRHSTxUg8Q2uACXHGmdF2
-	I1ysQ79Eezki5Aqon3IDoProXdqtmHcykYxL+halUyQuyeKgoArpnIfoo02M3sDGht8cWepysvQ
-	znLzui3ThJtD+9TziWm2+kJhBjgc9mEBoCpGEUIsQx1+yYrR6SWZVKIfIyss0Dor86tatJHczpP
-	KA4QB4gohxx+nSazqISIsv+BC4lhaaWoB56WdAZjbMqOVac7hWrRP6CfjSl89pVaq8YtSfA2Uhv
-	YYNPHcjUVYxnCDoVAXoETh/bSsOR0FsCv6lpRQXQPn2LC7O83aYyDy6WWDZHjRvZA7X3fFKcK/c
-	88f5goaWoYasg67jBek8bnKMsSU4jOhcJCWt5pPgTrvrk4IHDPCGEP30L2WHHeGNqpikT9F+emx
-	bBrcPTfWgg3nTUao1hhUvdlti08bWIxsA5yHKSUTnZN8sw==
-X-Received: by 2002:a05:6122:4203:b0:5ea:dbae:3cbc with SMTP id 71dfb90a1353d-5eaebe5c775mr2304987e0c.19.1792684040577;
-        Thu, 22 Oct 2026 08:47:20 -0700 (PDT)
+        bh=oAudEZUbian2xL+CZEXpZ2MwnCHJr7dH7/nTvNlUNS4=;
+        b=M16f+93rI4jGTAC+DftHNE9YckHnjkf9TGbQ1l6TgQImmS8Px6MSEi964Id3pShKlc
+         N7se0aEV664JCDYftql4yqYcew/mF/1s2cSXWxORTHHg5jmRYCLCtKreqq0DOlQ7Iris
+         1MSLSws9IqcDSj3JGJLwyegvgfK2x4Olj636IzevbiIJa8+5v21t6I4eZtX6IjGFxOa3
+         MdGaXVDrX6gdaOUEyVFz3bIZQ0kAXpViHshw3WPHUpNOV5OqS4IPaSbyhHJ3DHxcFDQv
+         xh+26ySfE8y+l0R0K81TTmhXv+kdaDP5Up/tRQaNJ2uxHmEtdixnMYQ1iiKjGLMHffgs
+         KDWw==
+X-Gm-Message-State: AFq9FYIY7VMijpDenSfBqPeQNP48UVVEzogHqTHgmqqU01cpmkd3dDX/
+	zD9lgRWaqAi49FoFt6znoPKoPYhTvCON4OLndVkQPuoJ79g/HCtgO8OZpgs8aESarSM=
+X-Gm-Gg: AYBFou2aAKnMZ3xajcBAnLEDrQxKrGUfNKGu4Mu2ou4uEwGWF1ZJ5tzkQvR307Nvtak
+	31ake/kHnAFVdLm3TRM9b6/DWFkjuCBqbTif9ZOgs1IIroELxufjquWfKciAaQDW6TdUbgsWMgO
+	YBihO9u2NNBZctgGzllmMc/Sw1Wp/OlnVviWVYb6fJo/uKN4/duxTNECIL3qvKW7Mx17OmL37Q4
+	ldJ5PcySCW1X9XEIPdmKdEqvLDNy0BHqzpDFuwc/hEOZG4Zl8BinAQvzkxBg9MC98DyoH4oQDT1
+	JSOdQKXAVwvLL6ZZmpQAaP9O0ajoSyM97mKJ4+q0p1Mm5jBwxPzKsVDTzVBaC55r4SmGXulH1k2
+	3VfFp9LXRcVHLxalN8Uc4rK4JqzwEEXOJ45XOUA/SpU/AVfGeEWUqKFjA3qzmfrkcqfy1e+w+br
+	3XbY1rVDiOByz1R4NVjsQlqmhOnZ50LzSMHA08jP+Mpke9V9gq2MIKbuv/VeiVNOJmzvki0bPUD
+	8grrHXX6COANy0ophZVK6hHsLB9q/UFvrXAUJmtvw7d01m+PLp+6Pz5Xaaj+QPhLPbsd2v8VY7F
+	5+TM8F/WA0WSc7yDUiEOwmB0PAFgedloshHXWqo0z3Zryw==
+X-Received: by 2002:a05:6122:e1b2:b0:5ea:d2de:eff4 with SMTP id 71dfb90a1353d-5eaebe8a8edmr2154443e0c.22.1792684042169;
+        Thu, 22 Oct 2026 08:47:22 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.19
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2026 08:47:19 -0700 (PDT)
+        Thu, 22 Oct 2026 08:47:21 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 11/27] emulator: Add vhost-user backend
-Date: Thu, 22 Oct 2026 11:46:44 -0400
-Message-ID: <20261022154701.3959500-12-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 13/27] emulator: Add time travel calendar to btvirt
+Date: Thu, 22 Oct 2026 11:46:46 -0400
+Message-ID: <20261022154701.3959500-14-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261022154701.3959500-1-luiz.dentz@gmail.com>
 References: <20261022154701.3959500-1-luiz.dentz@gmail.com>
@@ -99,58 +99,199 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add a vhost-user back-end on top of the mainloop, so emulated devices
-can be provided to virtual machines as virtio devices. It supports the
-split virtqueue layout, the configuration space and kick/call file
-descriptors.
+Add the --time option, which makes btvirt the time travel calendar of
+User Mode Linux guests started with time-travel=ext, so they share a
+simulated clock with btvirt without an external time controller. Time
+only advances when every guest waits, and the timers of the emulated
+controllers run on the simulated clock. A guest runs exactly at the
+time it requested, and GET answers with the current time, which a guest
+takes as the time of an interrupt.
 
-Offer VHOST_USER_PROTOCOL_F_SLAVE_REQ and
-VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS, so the guest sends kicks as
-VHOST_USER_VRING_KICK messages and is notified with
-VHOST_USER_SLAVE_VRING_CALL requests. User Mode Linux with external time
-travel requires this, as it does not handle call file descriptors while
-it waits for the time controller. The front-end only acknowledges a
-notification after the time controller answered it, so a wait callback
-lets the user serve it in the meantime.
+The calendar only uses messages. UML uses the file descriptors of the
+START acknowledgment without checking how many it received, so send a
+shared memory it rejects and /dev/null.
 
-Messages are read without blocking and may arrive in several parts, so
-one connection cannot hold up the others or the calendar, and
-vhost_process() handles them for a time travel calendar before it
-advances time; a nested call for a connection already being processed
-returns right away, so only the outer one removes it on failure. A
-can_notify callback holds notifications to the driver back until
-vhost_flush_notify(), for a back-end that may only notify while the
-calendar lets it run.
+In lock-step, send FREE_UNTIL with the next event of any other client
+or timer before RUN, so a guest does not ask before each of its own
+events, about four round trips each, and lower it when an earlier event
+shows up. A guest sends UPDATE before each virtio notification, but does
+not wait for it to be handled, so take its time from UPDATE and stop it
+there before acknowledging: it may not run ahead of what the
+notification causes, such as an interrupt from the device.
+
+Add tt_set_skew() to let time advance up to a skew beyond the earliest
+running guest, and a hold callback for pacing: while held, time advances
+no faster than real time, and no FREE_UNTIL is given so pacing can stop
+a guest.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- Makefile.tools   |    3 +-
- emulator/vhost.c | 1018 ++++++++++++++++++++++++++++++++++++++++++++++
- emulator/vhost.h |   67 +++
- 3 files changed, 1087 insertions(+), 1 deletion(-)
- create mode 100644 emulator/vhost.c
- create mode 100644 emulator/vhost.h
+ Makefile.tools        |   4 +-
+ doc/btvirt.rst        |  22 +-
+ emulator/main.c       |  27 +-
+ emulator/timeout.c    | 102 ++++++
+ emulator/timetravel.c | 743 ++++++++++++++++++++++++++++++++++++++++++
+ emulator/timetravel.h |  55 ++++
+ emulator/virtio.c     |  33 ++
+ 7 files changed, 981 insertions(+), 5 deletions(-)
+ create mode 100644 emulator/timeout.c
+ create mode 100644 emulator/timetravel.c
+ create mode 100644 emulator/timetravel.h
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 2914bf1c0391..cb6c01e5e0d9 100644
+index 6b2adb2f6556..bc92bc02b83d 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -102,7 +102,8 @@ emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
- 				emulator/bthost.h emulator/bthost.c \
- 				emulator/smp.c \
+@@ -104,7 +104,9 @@ emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
  				emulator/phy.h emulator/phy.c \
--				emulator/le.h emulator/le.c
-+				emulator/le.h emulator/le.c \
-+				emulator/vhost.h emulator/vhost.c
+ 				emulator/le.h emulator/le.c \
+ 				emulator/vhost.h emulator/vhost.c \
+-				emulator/virtio.h emulator/virtio.c
++				emulator/virtio.h emulator/virtio.c \
++				emulator/timetravel.h emulator/timetravel.c \
++				emulator/timeout.c
  emulator_btvirt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la
  
  emulator_b1ee_SOURCES = emulator/b1ee.c
-diff --git a/emulator/vhost.c b/emulator/vhost.c
+diff --git a/doc/btvirt.rst b/doc/btvirt.rst
+index c8e2b0be3cc2..16ef55dbb7a0 100644
+--- a/doc/btvirt.rst
++++ b/doc/btvirt.rst
+@@ -47,8 +47,8 @@ btvirt runs until it receives **SIGINT** or **SIGTERM**.
+ OPTIONS
+ =======
+ 
+-At least one of **-l**, **-s**, **-t**, **-V**, **-S** or **-U** must be
+-given.
++At least one of **-l**, **-s**, **-t**, **-V**, **-S**, **-U** or
++**--time** must be given.
+ Optional arguments must be attached to the option, as in **-l2**,
+ **-t45551** or **--server=/tmp/bt**.
+ 
+@@ -89,6 +89,17 @@ Optional arguments must be attached to the option, as in **-l2**,
+                             Bluetooth device. See **virtio** for how to
+                             attach it to QEMU or User Mode Linux guests.
+ 
++--time[=path]               Create a time travel calendar socket ``bt-time``
++                            in the directory *path* (default: ``/tmp``) for
++                            User Mode Linux guests started with
++                            ``time-travel=ext:<path>/bt-time``. The guests
++                            and btvirt then share a simulated clock: time
++                            only advances when every guest waits, and the
++                            timers of the emulated controllers run on it.
++                            Notifications of **-V** controllers are
++                            exchanged in-band, so they are ordered with
++                            the guests' clocks.
++
+ -S, --serial                Create a pseudo terminal with a BR/EDR/LE
+                             controller attached as an H:4 stream. The path of
+                             the terminal is printed on startup; attach it
+@@ -151,6 +162,13 @@ devices, two from the same socket::
+     $ linux ... virtio_uml.device=/tmp/bt/bt-vhost-bredrle:40 \
+                 virtio_uml.device=/tmp/bt/bt-vhost-bredrle:40
+ 
++Run the same guests on a simulated clock shared with btvirt::
++
++    $ btvirt --time=/tmp/bt -V/tmp/bt
++    $ linux ... time-travel=ext:/tmp/bt/bt-time \
++                virtio_uml.device=/tmp/bt/bt-vhost-bredrle:40 \
++                virtio_uml.device=/tmp/bt/bt-vhost-bredrle:40
++
+ Emulate a Bluetooth 5.2 controller over TCP::
+ 
+     $ btvirt -C 5.2 -t
+diff --git a/emulator/main.c b/emulator/main.c
+index b448b6c00723..a3b9456bb642 100644
+--- a/emulator/main.c
++++ b/emulator/main.c
+@@ -28,6 +28,7 @@
+ #include "server.h"
+ #include "vhci.h"
+ #include "virtio.h"
++#include "timetravel.h"
+ #include "le.h"
+ 
+ static void signal_callback(int signum, void *user_data)
+@@ -52,6 +53,8 @@ static void usage(void)
+ 		"\t-t[port=45550]        Create a TCP server\n"
+ 		"\t-V[path=/tmp]         Create local vhost-user virtio\n"
+ 		"\t                      server socket\n"
++		"\t--time[=path=/tmp]    Create time travel calendar socket\n"
++		"\t                      for User Mode Linux guests\n"
+ 		"\t-l[num]               Number of local controllers\n"
+ 		"\t-L                    Create LE only controller\n"
+ 		"\t-U[num]               Number of test LE controllers\n"
+@@ -70,6 +73,7 @@ static const struct option main_options[] = {
+ 	{ "server",  optional_argument, NULL, 's' },
+ 	{ "tcp",     optional_argument, NULL, 't' },
+ 	{ "vhost",   optional_argument, NULL, 'V' },
++	{ "time",    optional_argument, NULL, 'I' },
+ 	{ "local",   optional_argument, NULL, 'l' },
+ 	{ "le",      no_argument,       NULL, 'L' },
+ 	{ "bredr",   no_argument,       NULL, 'B' },
+@@ -131,6 +135,7 @@ int main(int argc, char *argv[])
+ 	const char *server_path = "/tmp";
+ 	uint16_t tcp_port = 0;
+ 	const char *vhost_path = NULL;
++	const char *time_path = NULL;
+ 	bool serial_enabled = false;
+ 	int letest_count = 0;
+ 	int vhci_count = 0;
+@@ -145,7 +150,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "dSs::t::V::l::LBAC:U::vh",
++		opt = getopt_long(argc, argv, "dSs::t::V::I::l::LBAC:U::vh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -168,6 +173,9 @@ int main(int argc, char *argv[])
+ 			else
+ 				tcp_port = 45550;
+ 			break;
++		case 'I':
++			time_path = optarg ? optarg : "/tmp";
++			break;
+ 		case 'V':
+ 			vhost_path = optarg ? optarg : "/tmp";
+ 			break;
+@@ -217,13 +225,28 @@ int main(int argc, char *argv[])
+ 		type = bredrle_type;
+ 
+ 	if (letest_count < 1 && vhci_count < 1 && !server_enabled &&
+-				!tcp_port && !serial_enabled && !vhost_path) {
++				!tcp_port && !serial_enabled && !vhost_path &&
++				!time_path) {
+ 		fprintf(stderr, "No emulator specified\n");
+ 		return EXIT_FAILURE;
+ 	}
+ 
+ 	printf("Bluetooth emulator ver %s\n", VERSION);
+ 
++	/* Before any controller, so their timers use the simulated clock */
++	if (time_path) {
++		char path[PATH_MAX];
++
++		snprintf(path, sizeof(path), "%s/%s", time_path, "bt-time");
++		if (!tt_open(path)) {
++			fprintf(stderr, "Failed to open time travel socket\n");
++			return EXIT_FAILURE;
++		}
++
++		if (debug_enabled)
++			tt_set_debug(server_debug, "time");
++	}
++
+ 	for (i = 0; i < letest_count; i++) {
+ 		struct bt_le *le;
+ 
+diff --git a/emulator/timeout.c b/emulator/timeout.c
 new file mode 100644
-index 000000000000..a0b79c6bc02a
+index 000000000000..772cbfa4d4ce
 --- /dev/null
-+++ b/emulator/vhost.c
-@@ -0,0 +1,1018 @@
++++ b/emulator/timeout.c
+@@ -0,0 +1,102 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
@@ -161,785 +302,241 @@ index 000000000000..a0b79c6bc02a
 + *
 + */
 +
++/* Timeouts for btvirt: on the simulated clock of the time travel calendar
++ * when it is enabled, otherwise on the mainloop like
++ * src/shared/timeout-mainloop.c.
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++
++#include "src/shared/mainloop.h"
++#include "src/shared/util.h"
++#include "src/shared/timeout.h"
++
++#include "timetravel.h"
++
++/* Calendar timer IDs are kept apart from the mainloop ones */
++#define TT_TIMEOUT_ID	0x80000000U
++
++struct timeout_data {
++	int id;
++	timeout_func_t func;
++	timeout_destroy_func_t destroy;
++	unsigned int timeout;
++	void *user_data;
++};
++
++static void timeout_callback(int id, void *user_data)
++{
++	struct timeout_data *data = user_data;
++
++	if (data->func(data->user_data) &&
++			!mainloop_modify_timeout(data->id, data->timeout))
++		return;
++
++	mainloop_remove_timeout(data->id);
++}
++
++static void timeout_destroy(void *user_data)
++{
++	struct timeout_data *data = user_data;
++
++	if (data->destroy)
++		data->destroy(data->user_data);
++
++	free(data);
++}
++
++unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
++			void *user_data, timeout_destroy_func_t destroy)
++{
++	struct timeout_data *data;
++
++	if (tt_enabled())
++		return TT_TIMEOUT_ID | tt_timeout_add(timeout, func, user_data,
++								destroy);
++
++	data = new0(struct timeout_data, 1);
++	data->func = func;
++	data->user_data = user_data;
++	data->timeout = timeout;
++	data->destroy = destroy;
++
++	data->id = mainloop_add_timeout(timeout, timeout_callback, data,
++							timeout_destroy);
++	if (data->id < 0) {
++		free(data);
++		return 0;
++	}
++
++	return (unsigned int) data->id;
++}
++
++void timeout_remove(unsigned int id)
++{
++	if (!id)
++		return;
++
++	if (id & TT_TIMEOUT_ID) {
++		tt_timeout_remove(id & ~TT_TIMEOUT_ID);
++		return;
++	}
++
++	mainloop_remove_timeout((int) id);
++}
++
++unsigned int timeout_add_seconds(unsigned int timeout, timeout_func_t func,
++			void *user_data, timeout_destroy_func_t destroy)
++{
++	return timeout_add(timeout * 1000, func, user_data, destroy);
++}
+diff --git a/emulator/timetravel.c b/emulator/timetravel.c
+new file mode 100644
+index 000000000000..c1938ed23bdc
+--- /dev/null
++++ b/emulator/timetravel.c
+@@ -0,0 +1,743 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation
++ *
++ *
++ */
++
++#define _GNU_SOURCE
++
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
 +
 +#include <stdio.h>
 +#include <stdarg.h>
-+#include <stddef.h>
 +#include <stdlib.h>
 +#include <string.h>
 +#include <errno.h>
++#include <fcntl.h>
++#include <time.h>
 +#include <unistd.h>
 +#include <sys/epoll.h>
-+#include <poll.h>
 +#include <sys/mman.h>
 +#include <sys/socket.h>
-+#include <sys/ioctl.h>
++#include <sys/un.h>
 +
 +#include "src/shared/mainloop.h"
++#include "src/shared/queue.h"
 +#include "src/shared/util.h"
 +
-+#include "vhost.h"
++#include "timetravel.h"
 +
-+/* vhost-user messages, see docs/interop/vhost-user.rst in QEMU */
-+#define VHOST_USER_GET_FEATURES			1
-+#define VHOST_USER_SET_FEATURES			2
-+#define VHOST_USER_SET_OWNER			3
-+#define VHOST_USER_RESET_OWNER			4
-+#define VHOST_USER_SET_MEM_TABLE		5
-+#define VHOST_USER_SET_VRING_NUM		8
-+#define VHOST_USER_SET_VRING_ADDR		9
-+#define VHOST_USER_SET_VRING_BASE		10
-+#define VHOST_USER_GET_VRING_BASE		11
-+#define VHOST_USER_SET_VRING_KICK		12
-+#define VHOST_USER_SET_VRING_CALL		13
-+#define VHOST_USER_SET_VRING_ERR		14
-+#define VHOST_USER_GET_PROTOCOL_FEATURES	15
-+#define VHOST_USER_SET_PROTOCOL_FEATURES	16
-+#define VHOST_USER_SET_VRING_ENABLE		18
-+#define VHOST_USER_SET_SLAVE_REQ_FD		21
-+#define VHOST_USER_GET_CONFIG			24
-+#define VHOST_USER_SET_CONFIG			25
-+#define VHOST_USER_VRING_KICK			35
++/* Protocol of include/uapi/linux/um_timetravel.h in Linux */
++#define TT_ACK		0
++#define TT_START	1
++#define TT_REQUEST	2
++#define TT_WAIT		3
++#define TT_GET		4
++#define TT_UPDATE	5
++#define TT_RUN		6
++#define TT_FREE_UNTIL	7
++#define TT_GET_TOD	8
++#define TT_BROADCAST	9
 +
-+/* Back-end to front-end requests */
-+#define VHOST_USER_SLAVE_VRING_CALL		4
++#define TT_SHM_SIZE	4096
 +
-+#define VHOST_USER_VERSION		0x1
-+#define VHOST_USER_FLAG_REPLY		(1 << 2)
-+#define VHOST_USER_FLAG_NEED_REPLY	(1 << 3)
-+
-+#define VHOST_USER_VRING_INDEX_MASK	0xff
-+#define VHOST_USER_VRING_NOFD_MASK	(1 << 8)
-+
-+#define VHOST_USER_F_PROTOCOL_FEATURES	30
-+#define VHOST_USER_PROTOCOL_F_SLAVE_REQ		5
-+#define VHOST_USER_PROTOCOL_F_CONFIG		9
-+#define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS	14
-+
-+/* How long to wait for the front-end to acknowledge a notification */
-+#define VHOST_USER_REPLY_TIMEOUT	5000
-+
-+#define VIRTIO_F_VERSION_1		32
-+
-+#define VRING_DESC_F_NEXT		1
-+#define VRING_DESC_F_WRITE		2
-+#define VRING_DESC_F_INDIRECT		4
-+
-+#define VHOST_USER_MAX_FDS		8
-+#define VHOST_USER_MAX_REGIONS		8
-+#define VHOST_USER_MAX_QUEUES		8
-+#define VHOST_USER_MAX_CONFIG		256
-+
-+struct vhost_hdr {
-+	uint32_t request;
-+	uint32_t flags;
-+	uint32_t size;
++struct tt_msg {
++	uint32_t op;
++	uint32_t seq;
++	uint64_t time;
 +} __attribute__((packed));
 +
-+struct vhost_vring_state {
-+	uint32_t index;
-+	uint32_t num;
-+} __attribute__((packed));
-+
-+struct vhost_vring_addr {
-+	uint32_t index;
-+	uint32_t flags;
-+	uint64_t desc;
-+	uint64_t used;
-+	uint64_t avail;
-+	uint64_t log;
-+} __attribute__((packed));
-+
-+struct vhost_region {
-+	uint64_t guest_addr;
-+	uint64_t size;
-+	uint64_t user_addr;
-+	uint64_t mmap_offset;
-+} __attribute__((packed));
-+
-+struct vhost_mem {
-+	uint32_t num;
-+	uint32_t padding;
-+	struct vhost_region regions[VHOST_USER_MAX_REGIONS];
-+} __attribute__((packed));
-+
-+struct vhost_config {
-+	uint32_t offset;
-+	uint32_t size;
-+	uint32_t flags;
-+	uint8_t payload[VHOST_USER_MAX_CONFIG];
-+} __attribute__((packed));
-+
-+struct vhost_msg {
-+	struct vhost_hdr hdr;
-+	union {
-+		uint64_t u64;
-+		struct vhost_vring_state state;
-+		struct vhost_vring_addr addr;
-+		struct vhost_mem mem;
-+		struct vhost_config config;
-+	} payload;
-+} __attribute__((packed));
-+
-+struct vring_desc {
-+	uint64_t addr;
-+	uint32_t len;
-+	uint16_t flags;
-+	uint16_t next;
-+} __attribute__((packed));
-+
-+struct vring_avail {
-+	uint16_t flags;
-+	uint16_t idx;
-+	uint16_t ring[];
-+} __attribute__((packed));
-+
-+struct vring_used_elem {
-+	uint32_t id;
-+	uint32_t len;
-+} __attribute__((packed));
-+
-+struct vring_used {
-+	uint16_t flags;
-+	uint16_t idx;
-+	struct vring_used_elem ring[];
-+} __attribute__((packed));
-+
-+struct region {
-+	uint64_t guest_addr;
-+	uint64_t user_addr;
-+	uint64_t size;
-+	void *map;
-+	size_t map_len;
-+	uint8_t *base;
-+};
-+
-+struct queue {
-+	unsigned int num;
-+	struct vring_desc *desc;
-+	struct vring_avail *avail;
-+	struct vring_used *used;
-+	uint16_t last_avail;
-+	int kick_fd;
-+	int call_fd;
-+	bool enabled;
-+	/* A notification is held back by the can_notify callback */
-+	bool notify_pending;
-+};
-+
-+struct vhost {
++struct tt_client {
 +	int fd;
-+	const struct vhost_ops *ops;
-+	void *user_data;
-+	uint64_t features;
-+	uint64_t protocol_features;
-+	int slave_fd;
-+	struct region regions[VHOST_USER_MAX_REGIONS];
-+	unsigned int num_regions;
-+	struct queue queues[VHOST_USER_MAX_QUEUES];
-+	/* Message being received, which may arrive in several parts */
-+	struct vhost_msg rx;
-+	size_t rx_len;
-+	int rx_fds[VHOST_USER_MAX_FDS];
-+	unsigned int rx_num_fds;
-+	bool processing;
-+	bool freeing;
-+	vhost_debug_func_t debug_callback;
-+	void *debug_data;
++	uint16_t id;
++	bool waiting;
++	bool has_request;
++	uint64_t request;
++	/* Time the client runs at, as far as known */
++	uint64_t time;
++	/* Time the running client may run until without asking, 0 if none */
++	uint64_t free_until;
 +};
 +
-+static void vu_debug(struct vhost *vu, const char *format, ...)
++struct tt_flush {
++	tt_flush_func_t func;
++	void *user_data;
++};
++
++struct tt_timer {
++	unsigned int id;
++	uint64_t time;
++	uint64_t interval;
++	tt_timeout_func_t func;
++	tt_destroy_func_t destroy;
++	void *user_data;
++};
++
++static struct {
++	int fd;
++	struct queue *clients;
++	struct queue *timers;
++	uint64_t now;
++	uint64_t skew;
++	uint64_t tod;
++	uint16_t next_id;
++	unsigned int next_timer;
++	bool scheduling;
++	struct queue *flushes;
++	tt_hold_func_t hold;
++	void *hold_data;
++	/* While held, time advances no faster than real time from here */
++	bool held;
++	uint64_t held_sim;
++	uint64_t held_wall;
++	int pace_id;
++	tt_debug_func_t debug;
++	void *debug_data;
++} tt = { .fd = -1 };
++
++static void tt_debug(const char *format, ...)
 +{
 +	char str[128];
 +	va_list ap;
 +
-+	if (!vu->debug_callback)
++	if (!tt.debug)
 +		return;
 +
 +	va_start(ap, format);
 +	vsnprintf(str, sizeof(str), format, ap);
 +	va_end(ap);
 +
-+	vu->debug_callback(str, vu->debug_data);
++	tt.debug(str, tt.debug_data);
 +}
 +
-+static void *gpa_to_va(struct vhost *vu, uint64_t addr, uint64_t len)
++static void send_msg(struct tt_client *client, uint32_t op, uint32_t seq,
++							uint64_t time)
 +{
-+	unsigned int i;
++	struct tt_msg msg = { .op = op, .seq = seq, .time = time };
 +
-+	for (i = 0; i < vu->num_regions; i++) {
-+		struct region *r = &vu->regions[i];
-+
-+		if (addr >= r->guest_addr && len <= r->size &&
-+					addr - r->guest_addr <= r->size - len)
-+			return r->base + (addr - r->guest_addr);
-+	}
-+
-+	return NULL;
++	if (write(client->fd, &msg, sizeof(msg)) < 0)
++		tt_debug("client %u: write failed", client->id);
 +}
 +
-+static void *uva_to_va(struct vhost *vu, uint64_t addr)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < vu->num_regions; i++) {
-+		struct region *r = &vu->regions[i];
-+
-+		if (addr >= r->user_addr && addr - r->user_addr < r->size)
-+			return r->base + (addr - r->user_addr);
-+	}
-+
-+	return NULL;
-+}
-+
-+static void unmap_regions(struct vhost *vu)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < vu->num_regions; i++)
-+		munmap(vu->regions[i].map, vu->regions[i].map_len);
-+
-+	vu->num_regions = 0;
-+}
-+
-+static void close_queue_fds(struct queue *q)
-+{
-+	if (q->kick_fd >= 0) {
-+		mainloop_remove_fd(q->kick_fd);
-+		close(q->kick_fd);
-+		q->kick_fd = -1;
-+	}
-+
-+	if (q->call_fd >= 0) {
-+		close(q->call_fd);
-+		q->call_fd = -1;
-+	}
-+}
-+
-+static void reset_queue(struct queue *q)
-+{
-+	close_queue_fds(q);
-+	q->desc = NULL;
-+	q->avail = NULL;
-+	q->used = NULL;
-+	q->num = 0;
-+	q->last_avail = 0;
-+	q->enabled = false;
-+}
-+
-+static bool queue_ready(struct queue *q)
-+{
-+	return q->enabled && q->desc && q->avail && q->used && q->num;
-+}
-+
-+/* Send a VRING_CALL request on the back-end channel and wait for the
-+ * front-end to acknowledge it. While waiting, the wait callback lets the
-+ * caller serve the front-end, e.g. as its time travel calendar.
++/* The ACK to START may carry a shared memory and a log file descriptor.
++ * This calendar only uses messages, but UML uses the descriptors it
++ * receives without checking how many it got, so send a shared memory it
++ * rejects (version 0) and /dev/null.
 + */
-+static void notify_inband(struct vhost *vu, unsigned int index)
++static void send_start_ack(struct tt_client *client, uint32_t seq)
 +{
-+	struct vhost_msg msg = {
-+		.hdr.request = VHOST_USER_SLAVE_VRING_CALL,
-+		.hdr.flags = VHOST_USER_VERSION | VHOST_USER_FLAG_NEED_REPLY,
-+		.hdr.size = sizeof(msg.payload.state),
-+		.payload.state.index = index,
-+	};
-+	struct pollfd pfd = { .fd = vu->slave_fd, .events = POLLIN };
-+	unsigned int waited = 0;
-+
-+	if (write(vu->slave_fd, &msg, sizeof(msg.hdr) + msg.hdr.size) < 0) {
-+		vu_debug(vu, "queue %u: notification failed", index);
-+		return;
-+	}
-+
-+	while (waited < VHOST_USER_REPLY_TIMEOUT) {
-+		int ret = poll(&pfd, 1, 1);
-+
-+		if (ret > 0) {
-+			if (read(vu->slave_fd, &msg, sizeof(msg.hdr) +
-+					sizeof(msg.payload.u64)) < 0)
-+				vu_debug(vu, "queue %u: no reply", index);
-+			return;
-+		}
-+
-+		if (ret < 0 && errno != EINTR)
-+			break;
-+
-+		if (vu->ops->wait)
-+			vu->ops->wait(vu, vu->user_data);
-+
-+		waited++;
-+	}
-+
-+	vu_debug(vu, "queue %u: notification not acknowledged", index);
-+}
-+
-+static void notify_driver(struct vhost *vu, unsigned int index)
-+{
-+	struct queue *q = &vu->queues[index];
-+	uint64_t val = 1;
-+
-+	if (vu->ops->can_notify && !vu->ops->can_notify(vu, vu->user_data)) {
-+		q->notify_pending = true;
-+		return;
-+	}
-+
-+	q->notify_pending = false;
-+
-+	if (q->call_fd >= 0) {
-+		if (write(q->call_fd, &val, sizeof(val)) < 0)
-+			vu_debug(vu, "queue %u: notification failed", index);
-+		return;
-+	}
-+
-+	if (vu->slave_fd >= 0 && (vu->protocol_features &
-+			(1ULL << VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS)))
-+		notify_inband(vu, index);
-+}
-+
-+static void kick_callback(int fd, uint32_t events, void *user_data)
-+{
-+	struct vhost *vu = user_data;
-+	unsigned int i;
-+	uint64_t val;
-+
-+	if (read(fd, &val, sizeof(val)) < 0)
-+		return;
-+
-+	for (i = 0; i < vu->ops->num_queues; i++) {
-+		if (vu->queues[i].kick_fd != fd)
-+			continue;
-+
-+		if (vu->ops->queue_notify)
-+			vu->ops->queue_notify(vu, i, vu->user_data);
-+		break;
-+	}
-+}
-+
-+/* Return the descriptor chain head of the next available buffer */
-+static int next_avail(struct queue *q)
-+{
-+	uint16_t head;
-+
-+	if (!queue_ready(q))
-+		return -1;
-+
-+	if (q->last_avail == le16_to_cpu(q->avail->idx))
-+		return -1;
-+
-+	__sync_synchronize();
-+
-+	head = le16_to_cpu(q->avail->ring[q->last_avail % q->num]);
-+	if (head >= q->num)
-+		return -1;
-+
-+	q->last_avail++;
-+
-+	return head;
-+}
-+
-+static void add_used(struct vhost *vu, unsigned int index, uint16_t head,
-+								uint32_t len)
-+{
-+	struct queue *q = &vu->queues[index];
-+	uint16_t idx = le16_to_cpu(q->used->idx);
-+
-+	q->used->ring[idx % q->num].id = cpu_to_le32(head);
-+	q->used->ring[idx % q->num].len = cpu_to_le32(len);
-+
-+	__sync_synchronize();
-+
-+	q->used->idx = cpu_to_le16(idx + 1);
-+
-+	notify_driver(vu, index);
-+}
-+
-+ssize_t vhost_pop(struct vhost *vu, unsigned int index,
-+						void *buf, size_t len)
-+{
-+	struct queue *q;
-+	unsigned int count = 0;
-+	size_t offset = 0;
-+	int head, i;
-+
-+	if (index >= vu->ops->num_queues)
-+		return -1;
-+
-+	q = &vu->queues[index];
-+
-+	head = next_avail(q);
-+	if (head < 0)
-+		return 0;
-+
-+	for (i = head;; i = le16_to_cpu(q->desc[i].next)) {
-+		struct vring_desc *d = &q->desc[i];
-+		uint32_t dlen = le32_to_cpu(d->len);
-+		void *data;
-+
-+		if (le16_to_cpu(d->flags) & (VRING_DESC_F_WRITE |
-+						VRING_DESC_F_INDIRECT) ||
-+				dlen > len - offset || ++count > q->num) {
-+			vu_debug(vu, "queue %u: invalid buffer", index);
-+			add_used(vu, index, head, 0);
-+			return -1;
-+		}
-+
-+		data = gpa_to_va(vu, le64_to_cpu(d->addr), dlen);
-+		if (!data) {
-+			vu_debug(vu, "queue %u: invalid address", index);
-+			add_used(vu, index, head, 0);
-+			return -1;
-+		}
-+
-+		memcpy(buf + offset, data, dlen);
-+		offset += dlen;
-+
-+		if (!(le16_to_cpu(d->flags) & VRING_DESC_F_NEXT))
-+			break;
-+
-+		if (le16_to_cpu(d->next) >= q->num) {
-+			add_used(vu, index, head, 0);
-+			return -1;
-+		}
-+	}
-+
-+	add_used(vu, index, head, 0);
-+
-+	return offset;
-+}
-+
-+bool vhost_push(struct vhost *vu, unsigned int index,
-+					const struct iovec *iov, int iovcnt)
-+{
-+	struct queue *q;
-+	size_t total = 0, len, offset = 0, space = 0;
-+	unsigned int count = 0;
-+	uint16_t saved;
-+	int head, i, v = 0;
-+
-+	if (index >= vu->ops->num_queues)
-+		return false;
-+
-+	q = &vu->queues[index];
-+
-+	for (i = 0; i < iovcnt; i++)
-+		total += iov[i].iov_len;
-+
-+	len = total;
-+	saved = q->last_avail;
-+
-+	head = next_avail(q);
-+	if (head < 0)
-+		return false;
-+
-+	/* Check that the whole packet fits before writing it */
-+	for (i = head;; i = le16_to_cpu(q->desc[i].next)) {
-+		struct vring_desc *d = &q->desc[i];
-+		uint16_t flags = le16_to_cpu(d->flags);
-+
-+		if (!(flags & VRING_DESC_F_WRITE) ||
-+				(flags & VRING_DESC_F_INDIRECT) ||
-+				++count > q->num)
-+			goto invalid;
-+
-+		space += le32_to_cpu(d->len);
-+
-+		if (!(le16_to_cpu(d->flags) & VRING_DESC_F_NEXT))
-+			break;
-+
-+		if (le16_to_cpu(d->next) >= q->num)
-+			goto invalid;
-+	}
-+
-+	if (space < len) {
-+		vu_debug(vu, "queue %u: %zu bytes do not fit in %zu",
-+							index, total, space);
-+		/* Leave the buffer to the driver, the packet is dropped */
-+		q->last_avail = saved;
-+		return false;
-+	}
-+
-+	for (i = head; len; i = le16_to_cpu(q->desc[i].next)) {
-+		struct vring_desc *d = &q->desc[i];
-+		uint32_t dlen = le32_to_cpu(d->len);
-+		uint8_t *data;
-+		size_t done = 0;
-+
-+		data = gpa_to_va(vu, le64_to_cpu(d->addr), dlen);
-+		if (!data)
-+			goto invalid;
-+
-+		while (done < dlen && v < iovcnt) {
-+			size_t n = MIN(dlen - done, iov[v].iov_len - offset);
-+
-+			memcpy(data + done, iov[v].iov_base + offset, n);
-+			done += n;
-+			offset += n;
-+			len -= n;
-+
-+			if (offset == iov[v].iov_len) {
-+				offset = 0;
-+				v++;
-+			}
-+		}
-+
-+		if (!len)
-+			break;
-+	}
-+
-+	add_used(vu, index, head, total);
-+
-+	return true;
-+
-+invalid:
-+	vu_debug(vu, "queue %u: invalid buffer", index);
-+	add_used(vu, index, head, 0);
-+	return false;
-+}
-+
-+static int send_reply(struct vhost *vu, struct vhost_msg *msg,
-+								size_t size)
-+{
-+	msg->hdr.flags = VHOST_USER_VERSION | VHOST_USER_FLAG_REPLY;
-+	msg->hdr.size = size;
-+
-+	if (write(vu->fd, msg, sizeof(msg->hdr) + size) < 0)
-+		return -errno;
-+
-+	return 0;
-+}
-+
-+static int send_u64(struct vhost *vu, struct vhost_msg *msg,
-+								uint64_t val)
-+{
-+	msg->payload.u64 = val;
-+
-+	return send_reply(vu, msg, sizeof(msg->payload.u64));
-+}
-+
-+static int set_mem_table(struct vhost *vu, struct vhost_msg *msg,
-+						int *fds, unsigned int num_fds)
-+{
-+	unsigned int i;
-+
-+	if (msg->payload.mem.num > VHOST_USER_MAX_REGIONS ||
-+					msg->payload.mem.num != num_fds)
-+		return -EINVAL;
-+
-+	unmap_regions(vu);
-+
-+	for (i = 0; i < msg->payload.mem.num; i++) {
-+		struct vhost_region *m = &msg->payload.mem.regions[i];
-+		struct region *r = &vu->regions[i];
-+
-+		r->map_len = m->size + m->mmap_offset;
-+		r->map = mmap(NULL, r->map_len, PROT_READ | PROT_WRITE,
-+						MAP_SHARED, fds[i], 0);
-+		if (r->map == MAP_FAILED) {
-+			vu_debug(vu, "failed to map region %u: %s", i,
-+							strerror(errno));
-+			unmap_regions(vu);
-+			return -errno;
-+		}
-+
-+		r->guest_addr = m->guest_addr;
-+		r->user_addr = m->user_addr;
-+		r->size = m->size;
-+		r->base = r->map + m->mmap_offset;
-+		vu->num_regions++;
-+	}
-+
-+	return 0;
-+}
-+
-+static int set_vring_fd(struct vhost *vu, struct vhost_msg *msg,
-+						int *fds, unsigned int num_fds)
-+{
-+	unsigned int index = msg->payload.u64 & VHOST_USER_VRING_INDEX_MASK;
-+	bool nofd = msg->payload.u64 & VHOST_USER_VRING_NOFD_MASK;
-+	struct queue *q;
-+	int fd = -1;
-+
-+	if (index >= vu->ops->num_queues)
-+		return -EINVAL;
-+
-+	if (!nofd) {
-+		if (num_fds != 1)
-+			return -EINVAL;
-+		fd = fds[0];
-+		fds[0] = -1;
-+	}
-+
-+	q = &vu->queues[index];
-+
-+	switch (msg->hdr.request) {
-+	case VHOST_USER_SET_VRING_KICK:
-+		if (q->kick_fd >= 0) {
-+			mainloop_remove_fd(q->kick_fd);
-+			close(q->kick_fd);
-+		}
-+		q->kick_fd = fd;
-+		if (fd >= 0 && mainloop_add_fd(fd, EPOLLIN, kick_callback,
-+							vu, NULL) < 0)
-+			return -EIO;
-+		/* Without VHOST_USER_F_PROTOCOL_FEATURES queues are enabled
-+		 * once they have a kick file descriptor.
-+		 */
-+		if (!(vu->features & (1ULL << VHOST_USER_F_PROTOCOL_FEATURES)))
-+			q->enabled = true;
-+		break;
-+	case VHOST_USER_SET_VRING_CALL:
-+		if (q->call_fd >= 0)
-+			close(q->call_fd);
-+		q->call_fd = fd;
-+		break;
-+	default:
-+		if (fd >= 0)
-+			close(fd);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int get_config(struct vhost *vu, struct vhost_msg *msg)
-+{
-+	struct vhost_config *c = &msg->payload.config;
-+	uint32_t size = c->size;
-+
-+	if (size > VHOST_USER_MAX_CONFIG)
-+		return -EINVAL;
-+
-+	memset(c->payload, 0, size);
-+
-+	if (c->offset < vu->ops->config_len)
-+		memcpy(c->payload, vu->ops->config + c->offset,
-+				MIN(size, vu->ops->config_len - c->offset));
-+
-+	return send_reply(vu, msg, offsetof(struct vhost_config,
-+							payload) + size);
-+}
-+
-+static int handle_msg(struct vhost *vu, struct vhost_msg *msg,
-+						int *fds, unsigned int num_fds)
-+{
-+	struct queue *q;
-+	unsigned int index;
-+
-+	vu_debug(vu, "request %u size %u", msg->hdr.request, msg->hdr.size);
-+
-+	switch (msg->hdr.request) {
-+	case VHOST_USER_GET_FEATURES:
-+		return send_u64(vu, msg, vu->ops->features |
-+				(1ULL << VIRTIO_F_VERSION_1) |
-+				(1ULL << VHOST_USER_F_PROTOCOL_FEATURES));
-+	case VHOST_USER_SET_FEATURES:
-+		vu->features = msg->payload.u64;
-+		return 0;
-+	case VHOST_USER_GET_PROTOCOL_FEATURES:
-+		return send_u64(vu, msg,
-+			(1ULL << VHOST_USER_PROTOCOL_F_CONFIG) |
-+			(1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ) |
-+			(1ULL << VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS));
-+	case VHOST_USER_SET_PROTOCOL_FEATURES:
-+		vu->protocol_features = msg->payload.u64;
-+		return 0;
-+	case VHOST_USER_SET_OWNER:
-+		return 0;
-+	case VHOST_USER_RESET_OWNER:
-+		for (index = 0; index < vu->ops->num_queues; index++)
-+			reset_queue(&vu->queues[index]);
-+		unmap_regions(vu);
-+		return 0;
-+	case VHOST_USER_SET_MEM_TABLE:
-+		return set_mem_table(vu, msg, fds, num_fds);
-+	case VHOST_USER_SET_VRING_KICK:
-+	case VHOST_USER_SET_VRING_CALL:
-+	case VHOST_USER_SET_VRING_ERR:
-+		return set_vring_fd(vu, msg, fds, num_fds);
-+	case VHOST_USER_SET_SLAVE_REQ_FD:
-+		if (num_fds != 1)
-+			return -EINVAL;
-+		if (vu->slave_fd >= 0)
-+			close(vu->slave_fd);
-+		vu->slave_fd = fds[0];
-+		fds[0] = -1;
-+		return 0;
-+	case VHOST_USER_GET_CONFIG:
-+		return get_config(vu, msg);
-+	case VHOST_USER_SET_CONFIG:
-+		return 0;
-+	}
-+
-+	index = msg->payload.state.index;
-+	if (index >= vu->ops->num_queues)
-+		return -EINVAL;
-+
-+	q = &vu->queues[index];
-+
-+	switch (msg->hdr.request) {
-+	case VHOST_USER_SET_VRING_NUM:
-+		if (!msg->payload.state.num ||
-+				msg->payload.state.num > 32768 ||
-+				msg->payload.state.num &
-+				(msg->payload.state.num - 1))
-+			return -EINVAL;
-+		q->num = msg->payload.state.num;
-+		return 0;
-+	case VHOST_USER_SET_VRING_BASE:
-+		q->last_avail = msg->payload.state.num;
-+		return 0;
-+	case VHOST_USER_GET_VRING_BASE:
-+		/* The driver stops the queue */
-+		q->enabled = false;
-+		close_queue_fds(q);
-+		msg->payload.state.num = q->last_avail;
-+		return send_reply(vu, msg, sizeof(msg->payload.state));
-+	case VHOST_USER_SET_VRING_ADDR:
-+		q->desc = uva_to_va(vu, msg->payload.addr.desc);
-+		q->avail = uva_to_va(vu, msg->payload.addr.avail);
-+		q->used = uva_to_va(vu, msg->payload.addr.used);
-+		if (!q->desc || !q->avail || !q->used)
-+			return -EINVAL;
-+		return 0;
-+	case VHOST_USER_VRING_KICK:
-+		if (vu->ops->queue_notify)
-+			vu->ops->queue_notify(vu, index, vu->user_data);
-+		return 0;
-+	case VHOST_USER_SET_VRING_ENABLE:
-+		q->enabled = msg->payload.state.num;
-+		if (q->enabled && vu->ops->queue_notify)
-+			vu->ops->queue_notify(vu, index, vu->user_data);
-+		return 0;
-+	}
-+
-+	vu_debug(vu, "unsupported request %u", msg->hdr.request);
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+static void close_rx_fds(struct vhost *vu)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < vu->rx_num_fds; i++)
-+		close(vu->rx_fds[i]);
-+
-+	vu->rx_num_fds = 0;
-+}
-+
-+/* Receive the next part of the message without blocking. Returns 0 once
-+ * the message is complete, with its file descriptors moved to fds.
-+ */
-+static int recv_msg(struct vhost *vu, struct vhost_msg *msg,
-+				int *fds, unsigned int *num_fds)
-+{
-+	char control[CMSG_SPACE(sizeof(int) * VHOST_USER_MAX_FDS)];
-+	size_t hdr_len = sizeof(vu->rx.hdr);
-+	struct iovec iov;
++	struct tt_msg msg = { .op = TT_ACK, .seq = seq, .time = client->id };
++	char control[CMSG_SPACE(sizeof(int) * 2)];
++	struct iovec iov = { &msg, sizeof(msg) };
 +	struct msghdr mh = {
 +		.msg_iov = &iov,
 +		.msg_iovlen = 1,
@@ -947,234 +544,611 @@ index 000000000000..a0b79c6bc02a
 +		.msg_controllen = sizeof(control),
 +	};
 +	struct cmsghdr *cmsg;
-+	size_t total;
-+	ssize_t len;
++	int fds[2];
 +
-+	if (vu->rx_len < hdr_len)
-+		total = hdr_len;
-+	else
-+		total = hdr_len + vu->rx.hdr.size;
++	fds[0] = memfd_create("bt-time-shm", MFD_CLOEXEC);
++	fds[1] = open("/dev/null", O_WRONLY | O_CLOEXEC);
++	if (fds[0] < 0 || fds[1] < 0 || ftruncate(fds[0], TT_SHM_SIZE) < 0) {
++		tt_debug("client %u: no file descriptors for START",
++								client->id);
++		send_msg(client, TT_ACK, seq, client->id);
++		goto done;
++	}
 +
-+	iov.iov_base = (uint8_t *) &vu->rx + vu->rx_len;
-+	iov.iov_len = total - vu->rx_len;
++	memset(control, 0, sizeof(control));
++	cmsg = CMSG_FIRSTHDR(&mh);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(fds));
++	memcpy(CMSG_DATA(cmsg), fds, sizeof(fds));
 +
-+	len = recvmsg(vu->fd, &mh, MSG_CMSG_CLOEXEC | MSG_DONTWAIT);
-+	if (len < 0 && (errno == EAGAIN || errno == EINTR))
-+		return -EAGAIN;
-+	if (len <= 0)
-+		return -EIO;
++	if (sendmsg(client->fd, &mh, 0) < 0)
++		tt_debug("client %u: sendmsg failed", client->id);
 +
-+	for (cmsg = CMSG_FIRSTHDR(&mh); cmsg; cmsg = CMSG_NXTHDR(&mh, cmsg)) {
-+		unsigned int n, i;
-+		int *cfds;
++done:
++	if (fds[0] >= 0)
++		close(fds[0]);
++	if (fds[1] >= 0)
++		close(fds[1]);
++}
 +
-+		if (cmsg->cmsg_level != SOL_SOCKET ||
-+					cmsg->cmsg_type != SCM_RIGHTS)
-+			continue;
++static void find_running(void *data, void *user_data)
++{
++	struct tt_client *client = data;
++	uint64_t *min = user_data;
 +
-+		n = (cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
-+		cfds = (int *) CMSG_DATA(cmsg);
++	if (!client->waiting && client->time < *min)
++		*min = client->time;
++}
 +
-+		for (i = 0; i < n; i++) {
-+			if (vu->rx_num_fds < VHOST_USER_MAX_FDS)
-+				vu->rx_fds[vu->rx_num_fds++] = cfds[i];
-+			else
-+				close(cfds[i]);
++static void find_next_client(void *data, void *user_data)
++{
++	struct tt_client *client = data;
++	struct tt_client **next = user_data;
++
++	if (!client->waiting || !client->has_request)
++		return;
++
++	if (!*next || client->request < (*next)->request)
++		*next = client;
++}
++
++static void find_next_timer(void *data, void *user_data)
++{
++	struct tt_timer *timer = data;
++	struct tt_timer **next = user_data;
++
++	if (!*next || timer->time < (*next)->time)
++		*next = timer;
++}
++
++static void timer_free(void *data)
++{
++	struct tt_timer *timer = data;
++
++	if (timer->destroy)
++		timer->destroy(timer->user_data);
++
++	free(timer);
++}
++
++static void fire_timer(struct tt_timer *timer)
++{
++	if (timer->func(timer->user_data)) {
++		/* The callback may have removed the timer */
++		if (queue_find(tt.timers, NULL, timer)) {
++			timer->time = tt.now + timer->interval;
++			return;
 +		}
 +	}
 +
-+	vu->rx_len += len;
-+
-+	if (vu->rx_len == hdr_len && vu->rx.hdr.size > sizeof(vu->rx.payload))
-+		return -EINVAL;
-+
-+	if (vu->rx_len < hdr_len || vu->rx_len < hdr_len + vu->rx.hdr.size)
-+		return -EAGAIN;
-+
-+	memcpy(msg, &vu->rx, vu->rx_len);
-+	memcpy(fds, vu->rx_fds, vu->rx_num_fds * sizeof(int));
-+	*num_fds = vu->rx_num_fds;
-+
-+	memset(&vu->rx, 0, sizeof(vu->rx));
-+	vu->rx_len = 0;
-+	vu->rx_num_fds = 0;
-+
-+	return 0;
++	if (queue_remove(tt.timers, timer))
++		timer_free(timer);
 +}
 +
-+static bool process_msg(struct vhost *vu, bool *failed)
++static void run_flush(void *data, void *user_data)
 +{
-+	struct vhost_msg msg;
-+	int fds[VHOST_USER_MAX_FDS];
-+	unsigned int num_fds, i;
-+	bool need_reply;
-+	int err;
++	struct tt_flush *flush = data;
 +
-+	memset(&msg, 0, sizeof(msg));
-+
-+	err = recv_msg(vu, &msg, fds, &num_fds);
-+	if (err == -EAGAIN)
-+		return true;
-+	if (err < 0) {
-+		*failed = true;
-+		return false;
-+	}
-+
-+	need_reply = msg.hdr.flags & VHOST_USER_FLAG_NEED_REPLY;
-+
-+	err = handle_msg(vu, &msg, fds, num_fds);
-+
-+	/* File descriptors taken over are set to -1, the memory mappings
-+	 * keep the memory referenced.
-+	 */
-+	for (i = 0; i < num_fds; i++) {
-+		if (fds[i] >= 0)
-+			close(fds[i]);
-+	}
-+
-+	if (need_reply && msg.hdr.request != VHOST_USER_GET_FEATURES &&
-+			msg.hdr.request != VHOST_USER_GET_PROTOCOL_FEATURES &&
-+			msg.hdr.request != VHOST_USER_GET_VRING_BASE &&
-+			msg.hdr.request != VHOST_USER_GET_CONFIG)
-+		send_u64(vu, &msg, err < 0 ? 1 : 0);
-+
-+	if (err < 0)
-+		vu_debug(vu, "request %u failed: %s", msg.hdr.request,
-+							strerror(-err));
-+
-+	return true;
++	flush->func(flush->user_data);
 +}
 +
-+/* Handle the pending messages. A message may trigger the calendar, which
-+ * processes the connections before advancing time, this one included, so
-+ * a nested call returns right away and leaves its messages to the outer
-+ * one, which alone may remove the connection, once done with it.
-+ */
-+static void process_msgs(struct vhost *vu)
-+{
-+	bool failed = false;
-+	int avail;
++static void schedule(void);
 +
-+	if (vu->fd < 0 || vu->processing)
++struct free_limit {
++	struct tt_client *client;
++	uint64_t time;
++};
++
++static void find_free_limit(void *data, void *user_data)
++{
++	struct tt_client *client = data;
++	struct free_limit *limit = user_data;
++
++	if (client == limit->client)
 +		return;
 +
-+	vu->processing = true;
-+
-+	while (process_msg(vu, &failed)) {
-+		if (ioctl(vu->fd, FIONREAD, &avail) < 0 || avail <= 0)
-+			break;
-+	}
-+
-+	vu->processing = false;
-+
-+	if (failed)
-+		mainloop_remove_fd(vu->fd);
++	/* A client that has not waited yet may request any time */
++	if (!client->waiting)
++		limit->time = MIN(limit->time, tt.now);
++	else if (client->has_request)
++		limit->time = MIN(limit->time, client->request);
 +}
 +
-+static void read_callback(int fd, uint32_t events, void *user_data)
++static void find_timer_limit(void *data, void *user_data)
 +{
-+	struct vhost *vu = user_data;
++	struct tt_timer *timer = data;
++	uint64_t *limit = user_data;
++
++	*limit = MIN(*limit, timer->time);
++}
++
++/* How far a client may run without asking: up to the earliest event of any
++ * other client or timer. Only in lock-step, and not while time may be
++ * paced, as pacing must be able to stop the client.
++ */
++static uint64_t free_until(struct tt_client *client)
++{
++	struct free_limit limit = { client, UINT64_MAX };
++
++	if (tt.skew || tt.hold)
++		return 0;
++
++	queue_foreach(tt.clients, find_free_limit, &limit);
++	queue_foreach(tt.timers, find_timer_limit, &limit.time);
++
++	return limit.time;
++}
++
++/* Lower the limit of a running client when an earlier event appeared. This
++ * happens in response to a client, e.g. while it waits for its virtio
++ * notification to be acknowledged, so it receives the new limit before it
++ * runs further.
++ */
++static void update_free_until(void *data, void *user_data)
++{
++	struct tt_client *client = data;
++	uint64_t limit;
++
++	if (client->waiting || !client->free_until)
++		return;
++
++	limit = free_until(client);
++	if (limit >= client->free_until)
++		return;
++
++	client->free_until = limit;
++	send_msg(client, TT_FREE_UNTIL, 0, limit);
++}
++
++static uint64_t wall_now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++
++	return (uint64_t) ts.tv_sec * 1000000000ULL + ts.tv_nsec;
++}
++
++static void pace_callback(int id, void *user_data)
++{
++	mainloop_remove_timeout(id);
++	tt.pace_id = 0;
++	schedule();
++}
++
++/* Limit of time while held: real time elapsed since the hold started */
++static uint64_t hold_limit(void)
++{
++	bool hold = tt.hold && tt.hold(tt.hold_data);
++
++	if (!hold) {
++		tt.held = false;
++		return UINT64_MAX;
++	}
++
++	if (!tt.held) {
++		tt.held = true;
++		tt.held_sim = tt.now;
++		tt.held_wall = wall_now();
++	}
++
++	return tt.held_sim + (wall_now() - tt.held_wall);
++}
++
++/* Schedule again when real time catches up with the next event */
++static void pace(uint64_t next, uint64_t limit)
++{
++	unsigned int msec = (next - limit) / 1000000ULL + 1;
++
++	if (tt.pace_id > 0)
++		return;
++
++	tt.pace_id = mainloop_add_timeout(MIN(msec, 100U), pace_callback,
++								NULL, NULL);
++}
++
++/* Run whichever is due first, a timer of this process or the client with
++ * the earliest request. In lock-step (no skew) time only advances when
++ * every client waits. With a skew, time may advance up to that much beyond
++ * the earliest running client, so clients run their own events in parallel
++ * while others compute, which takes no simulated time.
++ */
++static void schedule(void)
++{
++	if (tt.scheduling)
++		return;
++
++	tt.scheduling = true;
++
++	while (1) {
++		struct tt_client *client = NULL;
++		struct tt_timer *timer = NULL;
++		uint64_t running = UINT64_MAX;
++		uint64_t limit = UINT64_MAX;
++		uint64_t hold;
++		uint64_t next;
++
++		queue_foreach(tt.flushes, run_flush, NULL);
++
++		if (queue_isempty(tt.clients))
++			break;
++
++		queue_foreach(tt.clients, find_running, &running);
++		if (running != UINT64_MAX) {
++			if (!tt.skew) {
++				queue_foreach(tt.clients, update_free_until,
++									NULL);
++				break;
++			}
++			limit = running + tt.skew;
++		}
++
++		hold = hold_limit();
++
++		queue_foreach(tt.clients, find_next_client, &client);
++		queue_foreach(tt.timers, find_next_timer, &timer);
++
++		if (timer && (!client || timer->time <= client->request)) {
++			next = timer->time;
++			client = NULL;
++		} else if (client) {
++			next = client->request;
++			timer = NULL;
++		} else {
++			break;
++		}
++
++		if (next > limit)
++			break;
++
++		if (next > hold) {
++			pace(next, hold);
++			break;
++		}
++
++		if (next > tt.now)
++			tt.now = next;
++
++		if (timer) {
++			fire_timer(timer);
++			continue;
++		}
++
++		client->waiting = false;
++		client->has_request = false;
++		client->time = next;
++
++		/* Let the client run until the next event of another one,
++		 * instead of asking for each of its own events.
++		 */
++		client->free_until = free_until(client);
++		if (client->free_until)
++			send_msg(client, TT_FREE_UNTIL, 0, client->free_until);
++
++		send_msg(client, TT_RUN, 0, next);
++	}
++
++	tt.scheduling = false;
++}
++
++void tt_schedule(void)
++{
++	if (tt_enabled())
++		schedule();
++}
++
++static void handle_msg(struct tt_client *client, struct tt_msg *msg)
++{
++	switch (msg->op) {
++	case TT_ACK:
++		/* ACK of a RUN */
++		return;
++	case TT_START:
++		client->id = tt.next_id++;
++		client->time = tt.now;
++		tt_debug("client %u started", client->id);
++		send_start_ack(client, msg->seq);
++		return;
++	case TT_REQUEST:
++		client->has_request = true;
++		/* The guest must run exactly at the time of its event */
++		client->request = msg->time;
++		send_msg(client, TT_ACK, msg->seq, 0);
++		break;
++	case TT_WAIT:
++		client->waiting = true;
++		client->free_until = 0;
++		send_msg(client, TT_ACK, msg->seq, 0);
++		break;
++	case TT_GET:
++		/* The guest takes it as the time of an interrupt: the current
++		 * time, which no guest is ahead of.
++		 */
++		client->time = MAX(client->time, tt.now);
++		send_msg(client, TT_ACK, msg->seq, client->time);
++		return;
++	case TT_UPDATE:
++		if (msg->time > client->time)
++			client->time = msg->time;
++		/* In lock-step the running client sets the time, which may be
++		 * ahead of the calendar when it runs until a FREE_UNTIL.
++		 */
++		if (!tt.skew && !client->waiting && client->time > tt.now)
++			tt.now = client->time;
++		/* The guest sends UPDATE before a virtio notification, which
++		 * it does not wait for, and runs on meanwhile. Stop it at this
++		 * time before acknowledging, so it cannot run ahead of what
++		 * the notification causes, e.g. the device's interrupt.
++		 */
++		if (client->free_until && client->free_until > client->time) {
++			client->free_until = client->time;
++			send_msg(client, TT_FREE_UNTIL, 0, client->time);
++		}
++		send_msg(client, TT_ACK, msg->seq, 0);
++		break;
++	case TT_GET_TOD:
++		send_msg(client, TT_ACK, msg->seq, tt.tod + tt.now);
++		return;
++	default:
++		tt_debug("client %u: unsupported op %u", client->id, msg->op);
++		send_msg(client, TT_ACK, msg->seq, 0);
++		return;
++	}
++}
++
++/* Returns 1 if a message was handled, 0 if none is pending and -1 if the
++ * connection failed.
++ */
++static int read_msg(struct tt_client *client)
++{
++	struct tt_msg msg;
++	ssize_t len;
++
++	len = recv(client->fd, &msg, sizeof(msg), MSG_DONTWAIT);
++	if (len < 0 && (errno == EAGAIN || errno == EINTR))
++		return 0;
++
++	if (len != sizeof(msg)) {
++		tt_debug("client %u: read %zd", client->id, len);
++		return -1;
++	}
++
++	handle_msg(client, &msg);
++
++	return 1;
++}
++
++static void client_destroy(void *data)
++{
++	struct tt_client *client = data;
++
++	tt_debug("client %u disconnected", client->id);
++
++	queue_remove(tt.clients, client);
++	close(client->fd);
++	free(client);
++
++	/* Clients and back-ends are destroyed in any order on shutdown, so
++	 * only schedule while the calendar is open.
++	 */
++	if (tt.fd >= 0)
++		schedule();
++}
++
++static void client_callback(int fd, uint32_t events, void *user_data)
++{
++	struct tt_client *client = user_data;
++
++	int ret;
 +
 +	if (events & (EPOLLERR | EPOLLHUP)) {
-+		mainloop_remove_fd(vu->fd);
++		mainloop_remove_fd(client->fd);
 +		return;
 +	}
 +
-+	process_msgs(vu);
-+}
++	/* Process everything that is pending before scheduling, messages
++	 * may also have been processed already by tt_process().
++	 */
++	while ((ret = read_msg(client)) > 0)
++		;
 +
-+void vhost_flush_notify(struct vhost *vu)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < vu->ops->num_queues; i++) {
-+		if (vu->queues[i].notify_pending)
-+			notify_driver(vu, i);
-+	}
-+}
-+
-+void vhost_process(struct vhost *vu)
-+{
-+	process_msgs(vu);
-+}
-+
-+static void vu_destroy(void *user_data)
-+{
-+	struct vhost *vu = user_data;
-+	unsigned int i;
-+
-+	for (i = 0; i < VHOST_USER_MAX_QUEUES; i++)
-+		reset_queue(&vu->queues[i]);
-+
-+	unmap_regions(vu);
-+	close_rx_fds(vu);
-+
-+	if (vu->slave_fd >= 0) {
-+		close(vu->slave_fd);
-+		vu->slave_fd = -1;
++	if (ret < 0) {
++		mainloop_remove_fd(client->fd);
++		return;
 +	}
 +
-+	close(vu->fd);
-+	vu->fd = -1;
-+
-+	if (!vu->freeing && vu->ops->disconnect)
-+		vu->ops->disconnect(vu, vu->user_data);
++	schedule();
 +}
 +
-+struct vhost *vhost_new(int fd, const struct vhost_ops *ops,
-+							void *user_data)
++static void process_client(void *data, void *user_data)
 +{
-+	struct vhost *vu;
-+	unsigned int i;
++	struct tt_client *client = data;
 +
-+	if (ops->num_queues > VHOST_USER_MAX_QUEUES ||
-+				ops->config_len > VHOST_USER_MAX_CONFIG)
-+		return NULL;
-+
-+	vu = new0(struct vhost, 1);
-+	vu->fd = fd;
-+	vu->slave_fd = -1;
-+	vu->ops = ops;
-+	vu->user_data = user_data;
-+
-+	for (i = 0; i < VHOST_USER_MAX_QUEUES; i++) {
-+		vu->queues[i].kick_fd = -1;
-+		vu->queues[i].call_fd = -1;
-+	}
-+
-+	if (mainloop_add_fd(fd, EPOLLIN, read_callback, vu, vu_destroy) < 0) {
-+		free(vu);
-+		return NULL;
-+	}
-+
-+	return vu;
++	while (read_msg(client) > 0)
++		;
 +}
 +
-+void vhost_free(struct vhost *vu)
++void tt_process(void)
 +{
-+	if (!vu)
++	queue_foreach(tt.clients, process_client, NULL);
++}
++
++static void accept_callback(int fd, uint32_t events, void *user_data)
++{
++	struct tt_client *client;
++	int nfd;
++
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_remove_fd(fd);
++		return;
++	}
++
++	nfd = accept(fd, NULL, NULL);
++	if (nfd < 0)
 +		return;
 +
-+	vu->freeing = true;
++	client = new0(struct tt_client, 1);
++	client->fd = nfd;
 +
-+	if (vu->fd >= 0)
-+		mainloop_remove_fd(vu->fd);
++	if (mainloop_add_fd(nfd, EPOLLIN, client_callback, client,
++						client_destroy) < 0) {
++		close(nfd);
++		free(client);
++		return;
++	}
 +
-+	free(vu);
++	queue_push_tail(tt.clients, client);
 +}
 +
-+void vhost_set_debug(struct vhost *vu,
-+				vhost_debug_func_t callback, void *user_data)
++static void tt_destroy(void *user_data)
 +{
-+	vu->debug_callback = callback;
-+	vu->debug_data = user_data;
++	close(tt.fd);
++	tt.fd = -1;
 +}
-diff --git a/emulator/vhost.h b/emulator/vhost.h
++
++bool tt_open(const char *path)
++{
++	struct sockaddr_un addr;
++	struct timespec ts;
++
++	if (tt.fd >= 0 || strlen(path) >= sizeof(addr.sun_path))
++		return false;
++
++	tt.fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
++	if (tt.fd < 0)
++		return false;
++
++	unlink(path);
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++	memcpy(addr.sun_path, path, strlen(path));
++
++	if (bind(tt.fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 ||
++						listen(tt.fd, 5) < 0)
++		goto fail;
++
++	if (mainloop_add_fd(tt.fd, EPOLLIN, accept_callback, NULL,
++							tt_destroy) < 0)
++		goto fail;
++
++	clock_gettime(CLOCK_REALTIME, &ts);
++	tt.tod = (uint64_t) ts.tv_sec * 1000000000ULL + ts.tv_nsec;
++	tt.clients = queue_new();
++	tt.timers = queue_new();
++	tt.next_id = 1;
++
++	return true;
++
++fail:
++	close(tt.fd);
++	tt.fd = -1;
++	return false;
++}
++
++void tt_close(void)
++{
++	if (tt.fd >= 0)
++		mainloop_remove_fd(tt.fd);
++}
++
++bool tt_enabled(void)
++{
++	return tt.fd >= 0;
++}
++
++uint64_t tt_now(void)
++{
++	return tt.now;
++}
++
++void tt_set_skew(unsigned int msec)
++{
++	tt.skew = (uint64_t) msec * 1000000ULL;
++}
++
++void tt_set_hold(tt_hold_func_t func, void *user_data)
++{
++	tt.hold = func;
++	tt.hold_data = user_data;
++}
++
++static bool match_flush(const void *data, const void *match_data)
++{
++	const struct tt_flush *flush = data;
++	const struct tt_flush *match = match_data;
++
++	return flush->func == match->func &&
++				flush->user_data == match->user_data;
++}
++
++void tt_remove_flush(tt_flush_func_t func, void *user_data)
++{
++	struct tt_flush match = { .func = func, .user_data = user_data };
++
++	free(queue_remove_if(tt.flushes, match_flush, &match));
++}
++
++void tt_add_flush(tt_flush_func_t func, void *user_data)
++{
++	struct tt_flush *flush;
++
++	if (!tt.flushes)
++		tt.flushes = queue_new();
++
++	flush = new0(struct tt_flush, 1);
++	flush->func = func;
++	flush->user_data = user_data;
++
++	queue_push_tail(tt.flushes, flush);
++}
++
++unsigned int tt_timeout_add(unsigned int msec, tt_timeout_func_t func,
++				void *user_data, tt_destroy_func_t destroy)
++{
++	struct tt_timer *timer;
++
++	timer = new0(struct tt_timer, 1);
++	timer->id = ++tt.next_timer;
++	timer->interval = (uint64_t) msec * 1000000ULL;
++	timer->time = tt.now + timer->interval;
++	timer->func = func;
++	timer->user_data = user_data;
++	timer->destroy = destroy;
++
++	queue_push_tail(tt.timers, timer);
++
++	return timer->id;
++}
++
++static bool match_timer(const void *data, const void *match_data)
++{
++	const struct tt_timer *timer = data;
++
++	return timer->id == PTR_TO_UINT(match_data);
++}
++
++void tt_timeout_remove(unsigned int id)
++{
++	struct tt_timer *timer;
++
++	timer = queue_remove_if(tt.timers, match_timer, UINT_TO_PTR(id));
++	if (timer)
++		timer_free(timer);
++}
++
++void tt_set_debug(tt_debug_func_t callback, void *user_data)
++{
++	tt.debug = callback;
++	tt.debug_data = user_data;
++}
+diff --git a/emulator/timetravel.h b/emulator/timetravel.h
 new file mode 100644
-index 000000000000..a5ec92f9594c
+index 000000000000..45b9d4ef69f2
 --- /dev/null
-+++ b/emulator/vhost.h
-@@ -0,0 +1,67 @@
++++ b/emulator/timetravel.h
+@@ -0,0 +1,55 @@
 +/* SPDX-License-Identifier: LGPL-2.1-or-later */
 +/*
 + *
@@ -1187,61 +1161,121 @@ index 000000000000..a5ec92f9594c
 +
 +#include <stdbool.h>
 +#include <stdint.h>
-+#include <stddef.h>
-+#include <sys/types.h>
-+#include <sys/uio.h>
 +
-+struct vhost;
++/* Time travel calendar for User Mode Linux (time-travel=ext) guests */
 +
-+struct vhost_ops {
-+	/* Device specific virtio feature bits, VERSION_1 is always offered */
-+	uint64_t features;
-+	unsigned int num_queues;
-+	/* Device configuration space, read with VHOST_USER_GET_CONFIG */
-+	const void *config;
-+	size_t config_len;
-+	/* The driver made buffers available on a queue */
-+	void (*queue_notify)(struct vhost *vu, unsigned int index,
-+							void *user_data);
-+	/* The connection was closed */
-+	void (*disconnect)(struct vhost *vu, void *user_data);
-+	/* Called repeatedly while waiting for the front-end to acknowledge
-+	 * an in-band notification
-+	 */
-+	void (*wait)(struct vhost *vu, void *user_data);
-+	/* If set and returning false, notifications to the driver are held
-+	 * back until vhost_flush_notify()
-+	 */
-+	bool (*can_notify)(struct vhost *vu, void *user_data);
-+};
++bool tt_open(const char *path);
++void tt_close(void);
++bool tt_enabled(void);
 +
-+struct vhost *vhost_new(int fd, const struct vhost_ops *ops,
-+							void *user_data);
-+void vhost_free(struct vhost *vu);
-+
-+/* Send the notifications held back by can_notify */
-+void vhost_flush_notify(struct vhost *vu);
-+
-+/* Process the messages pending on the connection without blocking */
-+void vhost_process(struct vhost *vu);
-+
-+typedef void (*vhost_debug_func_t)(const char *str, void *user_data);
-+void vhost_set_debug(struct vhost *vu,
-+				vhost_debug_func_t callback, void *user_data);
-+
-+/* Read the next buffer the driver made available on a driver-to-device
-+ * queue into buf. Returns the number of bytes read, 0 if no buffer is
-+ * available or -1 on error.
++/* Let time advance up to msec beyond the earliest running guest, so guests
++ * run in parallel; 0 (default) is lock-step.
 + */
-+ssize_t vhost_pop(struct vhost *vu, unsigned int index,
-+						void *buf, size_t len);
++void tt_set_skew(unsigned int msec);
 +
-+/* Write the data into the next buffer the driver made available on a
-+ * device-to-driver queue and notify the driver. Returns false if no buffer
-+ * is available or the data does not fit.
++/* Current simulated time in nanoseconds */
++uint64_t tt_now(void);
++
++/* Called before advancing time, to process pending device input */
++typedef void (*tt_flush_func_t)(void *user_data);
++void tt_add_flush(tt_flush_func_t func, void *user_data);
++void tt_remove_flush(tt_flush_func_t func, void *user_data);
++
++/* While the hold function returns true, time advances no faster than real
++ * time. Used while a peer outside the simulation, e.g. a test driver, has
++ * not asked anything of the guests, so they don't run ahead of it.
 + */
-+bool vhost_push(struct vhost *vu, unsigned int index,
-+					const struct iovec *iov, int iovcnt);
++typedef bool (*tt_hold_func_t)(void *user_data);
++void tt_set_hold(tt_hold_func_t func, void *user_data);
++
++/* Advance time if every guest waits, e.g. after processing device input */
++void tt_schedule(void);
++
++/* Process pending calendar messages without advancing time, used while
++ * waiting for a guest that may itself be waiting for the calendar.
++ */
++void tt_process(void);
++
++typedef bool (*tt_timeout_func_t)(void *user_data);
++typedef void (*tt_destroy_func_t)(void *user_data);
++unsigned int tt_timeout_add(unsigned int msec, tt_timeout_func_t func,
++				void *user_data, tt_destroy_func_t destroy);
++void tt_timeout_remove(unsigned int id);
++
++typedef void (*tt_debug_func_t)(const char *str, void *user_data);
++void tt_set_debug(tt_debug_func_t callback, void *user_data);
+diff --git a/emulator/virtio.c b/emulator/virtio.c
+index 47889027075c..34c8f5d3f93c 100644
+--- a/emulator/virtio.c
++++ b/emulator/virtio.c
+@@ -27,6 +27,7 @@
+ 
+ #include "btdev.h"
+ #include "vhost.h"
++#include "timetravel.h"
+ #include "virtio.h"
+ 
+ /* Virtio device ID 40, see include/uapi/linux/virtio_bt.h in Linux */
+@@ -160,6 +161,34 @@ static void queue_notify(struct vhost *vu, unsigned int index,
+ 		flush_pending(client);
+ 		break;
+ 	}
++
++	/* The guest may wait for the calendar now */
++	tt_schedule();
++}
++
++/* The guest acknowledges in-band notifications only after its calendar
++ * requests are answered, so keep serving the calendar meanwhile.
++ */
++static void vhost_wait(struct vhost *vu, void *user_data)
++{
++	tt_process();
++}
++
++static void flush_client(void *data, void *user_data)
++{
++	struct client *client = data;
++
++	vhost_process(client->vu);
++}
++
++/* Process guest notifications sent before the guest waited, so time does
++ * not advance past them.
++ */
++static void flush(void *user_data)
++{
++	struct vtio *vtio = user_data;
++
++	queue_foreach(vtio->clients, flush_client, NULL);
+ }
+ 
+ static void disconnect(struct vhost *vu, void *user_data)
+@@ -182,6 +211,7 @@ static const struct vhost_ops vhost_ops = {
+ 	.config_len = sizeof(config),
+ 	.queue_notify = queue_notify,
+ 	.disconnect = disconnect,
++	.wait = vhost_wait,
+ };
+ 
+ static void vu_debug(const char *str, void *user_data)
+@@ -247,6 +277,7 @@ static void vtio_destroy(void *user_data)
+ {
+ 	struct vtio *vtio = user_data;
+ 
++	tt_remove_flush(flush, vtio);
+ 	queue_destroy(vtio->clients, detach_client);
+ 	close(vtio->fd);
+ 	free(vtio);
+@@ -292,6 +323,8 @@ struct vtio *vtio_open(enum btdev_type type, const char *path)
+ 							vtio_destroy) < 0)
+ 		goto fail;
+ 
++	tt_add_flush(flush, vtio);
++
+ 	return vtio;
+ 
+ fail:
 -- 
 2.56.0
 
