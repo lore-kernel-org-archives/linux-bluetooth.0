@@ -1,111 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792661674;
-	b=RHqXhhoxZ1kvXywyiw7m5e+KZbEbylqF14NqvASfcg8gxJjMxyCdIzyoFpqO9jIyZ7QG
-	 MjL7yqgCYNdhC3qiBQ2geEPk2gJYVbsHbzOiiVp7NGU0xljVdNCtMiRhIrgpyDyc5rUNQ
-	 2uAOPawHbTU44uuBjix3traFa1oL8wcTUMp3pQj5drsIuVdc0NQE0d8q2GF+nB2V1b1m9
-	 kabWwFvWGoShCJ2tOdhSt3r5pBzAzdtX7H+8+hw+f4v7G010hn7RC+Riv9+D7S2b4F8qL
-	 Mbd1JzymQiLjBp2sF/EuGoXPIMwzW+RzpedqW5ZzSeO8PJ8ZS39b/dkE+JwKs6FHehA==
+	t=1792667765;
+	b=1IX9C33leikATDL1w97mha7i/fMMrhATqa9zqIV0JlQ/MhreEK+G3QJq7Bl2GkFB6z/U
+	 24nlBaOQaoLdH9gOqdFWRIxOvKKaw5G10ul3sxWR9UNCrTxVaMo+ucDWiNnu0W5ZTLBB2
+	 NNe+YQJHbHI6BjkB2CYQYH/g5cLe+GRf+YvjQHiRIiEToiue3GNq2VQ5DSx+femZDyOZT
+	 E4bEAWNeG8EMwlkJm6Cg9cCTTcxauGUr8Fc/qlzOuy1C40eVo7UU3nLZVRKjMHVsA9cJz
+	 nvpHqgOM/ZW/eMej8pqYsVMOYRKaHIhwE79SYtru+MxIXlDuPuE/ZJ26/RMbWJkh1JA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792661674;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Proofpoint-Spam-Info:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=1Rj1qoidH8EWT/n0srs42IuX9uVyDVj0QwR1LQZqHvM=;
-	b=vASMCir1trRHBCB/JBHwHq24nSKCU2fOdIpfOKVF6bmLW52N9VBVGqPlkajNG3USb7Cy
-	 LGmUJx5c62SX2Ef7tAusekDBqOMV3u33zC+GggLgSl3slaEiOTBhbz7eZOPeCjF5CCLYP
-	 9OGp4WTHYDErqPqw+uK2F2I/imDmmSP/2QQQW2bmB/rbL3nuKIXK3ChogeeZRucuRk+Ei
-	 5/OqP72zDYMQchOwTh1CsSHxhhzIS97dP9Y0bObgy8siFP17XiQN9r3st2NXWsTGa6i+p
-	 fIF0vuihOKRQWlEtlIboLFEgu6egldG1Nbc5JJp9noxWZhki4jpkmoY5qVVecVNwsuQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792667765;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=BrtZdZuRvHE7UaprIXjohtPs6I5PYcsDi23QTQ2VB7k=;
+	b=1nYgN4g2DFwsWN2+jJisLbrRhZS/d3IdrI9bL9EqizFxBPyEPqE6HBegIL6vF93Fe10B
+	 vDNaiv2u5YG+lWVPS34Fj6YecbpgkdKwmRZC0H5skBjDJAUyJpc0MAhz/n2dY/jHoRuHz
+	 j0Eh38P49kFED9u30LbrVuf8vmjbp6yYOfcwHsdTgbzZvzGhDBq5akghcG/wyEtLjrCzS
+	 iysHR0Vx6bRdntMyE39X60I1OwYXncESpb6asrmo2UrBB3HjQv12PuakR3AVmHbkkL7Lh
+	 DOCTWjblJp7GjlpbUWsBkz4X6kZP4v58DBHCAOjkGqr8WtMYi9nT0XjTc0qqM73ye2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=PwrcdF+D;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=hRMlyKlM;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=A2rz3DNx;
+	arc=none smtp.remote-ip=209.85.221.53
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6170F606A31D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 09:34:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6170F606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22589606A31D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 11:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 22589606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=PwrcdF+D;
-	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=hRMlyKlM
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69M9DrqI3889141
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 09:34:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1Rj1qoidH8EWT/n0srs42IuX9uVyDVj0QwR1LQZqHvM=; b=PwrcdF+DzUJmRnde
-	hI8F1YEjOk3dDfEL5mPGuYlg5y0weZGfzUQvhEGuLehfcUPQnezsoOltce4qCb4a
-	bmPBXs1OV01hZAOhn4bcnQWyIoJghdPK9LhVpFL5LaJGTb37Fm3u0Xlx2UnwiDXK
-	jsl9tPr5zVPw8tidZPUcLjYo3IInZ/qeMxL2AOkpLF6m+xmqOrz+9gM58ZkNOqH6
-	Ggkbama+CbUkq5ipxnbhKEBCjpb9Px3G45hfg7+A0eDpqgl6khjQCo6BC9sW6tPS
-	6+wo3Bkk0dpz/4EzjVlGUpkCGhHZrqmqE4tPEJjtwGY+0fxaeDeEwDK0H7u4IlZB
-	H721Gg==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hf93c9nvm-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 09:34:33 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-93ea8a9cfe6so44279185a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 02:34:33 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=A2rz3DNx
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-48e20edd106so1176748f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 04:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1792661673; x=1793266473; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1792667762; x=1793272562; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1Rj1qoidH8EWT/n0srs42IuX9uVyDVj0QwR1LQZqHvM=;
-        b=hRMlyKlM/PU0rsEmYtQAf6/7UWB0RhstTZv67YqjnA/LEr09Khj3cxON7Xmj85I//J
-         Y/BKpT00bzRF54MxWuIzCuliHKYX1WarCNYHimoJPohkKrXRWtVlKvwUNqL8XWkavRAC
-         w8WjIeVYh+KC5qQjQRbLBozfZdaQrMado8q7hJEJ1JtAuSNsg/m22GerQaQb6UAUz89b
-         hftNHCtZzv4vhtN0cgsQDWR8OWJPXmVfj87a34SLysAS9r9Bm5F3j/jx29/lP60QmYrG
-         eVsHJhs14jX92ahWfA1EkMSZyQMEH5Vf4MqJSjuYiL9kFSv1eX2HwNnxYakPeLQ1ztG9
-         8IyA==
+        bh=BrtZdZuRvHE7UaprIXjohtPs6I5PYcsDi23QTQ2VB7k=;
+        b=A2rz3DNxOwpE516/gjaffiFW2OJnETBppxpXTf4DPLWLfx06LkqXLJwSbh5QQ+T6Mc
+         NlJdvi0RQIwBoacbSuY18ZfApEzw3ubQvSGBmyYOvSxKod9IGl9rAC/y/eBfi9QyZfMm
+         9ViZeKOXzsVWsFARih1caoOSPo1ARCS6eoIiFKC3UJQMntv7eLMeKF9tHSMUSLzJ1Hcs
+         KswjoysneqomW7hLU+46Wu7dhbFBcFMuaMignWAzWnxewBWd+sl7LwlNxTJcxZbiHV5r
+         2aRpidu9HblJIYa5si0diJJGMGU4bTw+gTDM6y+FT2WAnB1NMBhZBQjqGqKpOcO6g2nw
+         XvAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792661673; x=1793266473;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=1Rj1qoidH8EWT/n0srs42IuX9uVyDVj0QwR1LQZqHvM=;
-        b=KonSbnIl1pKErXbYqergzPTekhxpiDQjW8pe+5CsQZ7rsSUcFlaT0f3x1gdSn+Q5hj
-         IaQnA4ApDOBwyjciIGMY3qnPs155al/SD40r1Bk20pqmvie1tUBlPZ2a+29Vj2zpz4R5
-         omA/1PJ8ZpqasrycgiocTg+4OqdErI8PAgjtmtxq8JF8SCEyAtyabIhNvozQmxOsNRqx
-         acAmZ5+k8goQkexxsb+MOBRVB5QIksOPYf2s1upXfJwGLqZjksmJvSY2ssefXX7OiZqk
-         Ja+cCwmYDmW+IHG6dcfMVoWxuvXSGOSMLz3y+YnwRMOZTgQVTR4OW9t4Lmw06OM50JYS
-         Ub9g==
-X-Forwarded-Encrypted: i=1; AKwUvBzaKEeJNO6mMTeZzwiYFvPQQYosXgpeHiqi7VUGc+SnlJhC3p9RaWo2ioKfCfeMKhWv8Z1XB0AVOG5m22slpIk=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIwEq42brLfZdE+ZH5NWqDgAXlYjp1lj3Hd4NSF3Rqv4MGNwxMW
-	ZpO1rv9akePwztKDMnTlgZF95J+DbYfeTU3Cz/BQSL9PmksqDVz7iF6ney814n0zQZnH1J7LuyJ
-	M6otYtOIZeMCGCMFF7yTutcyrdeawVN/wSlEjTESSJbohal+y/gcXEXw8R9PT9pWaGGY59qY=
-X-Gm-Gg: AYBFou1gJtOMhs9VdpVXiukghO0lzmMXCgFDwNS6oKBQR8M/bF6qc0lkGnxMEhTyOHh
-	yOeafqUdqZk0gJUZZNGQOTdUenf+aQwzp/6o6s7aJl7XHMBuCsCQb+tZcly5eOGMlEtxT2qdHP/
-	GAR1TQOmvyCO1m31+fJ4WAGECdc9Jbs36DvxEP9xae5to6nZVijCJfZTvi4opaX2LppH75FLwrv
-	S429ZAfeIgEUCSbRLE928X4VQry5/HUTEk4Itw6jCKbLk8uPgo1PRnd8bFttZU27kq3PomOrly0
-	rm8ogHRNw/I4xN/KEhenHhul5Ig9CY9NZO9UjJDYzDNKUZsg2XlAfAzWn6ovf8eOrpXibYUqf+M
-	MhYZb5SgJV9O3qV0FjUEVGg==
-X-Received: by 2002:a05:620a:19a0:b0:93e:54fc:2c79 with SMTP id af79cd13be357-93f57f72681mr930305685a.5.1792661672497;
-        Thu, 22 Oct 2026 02:34:32 -0700 (PDT)
-X-Received: by 2002:a05:620a:19a0:b0:93e:54fc:2c79 with SMTP id af79cd13be357-93f57f72681mr930303085a.5.1792661672043;
-        Thu, 22 Oct 2026 02:34:32 -0700 (PDT)
-Received: from [192.168.226.26] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c468a55c001sm84619866b.31.2026.10.22.02.34.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Oct 2026 02:34:31 -0700 (PDT)
-Message-ID: <e26f0360-aaed-4e40-b1b2-956c92d34db5@oss.qualcomm.com>
-Date: Thu, 22 Oct 2026 11:34:29 +0200
+        d=1e100.net; s=20260707; t=1792667762; x=1793272562;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=BrtZdZuRvHE7UaprIXjohtPs6I5PYcsDi23QTQ2VB7k=;
+        b=Cz8csRm0sgeV0f3zLz6eWRmkqg7YedaD0qRJ2F0F76Dlq7SqsbqRJyidt2AjmYrAik
+         EgSqei6r2C9t95LKUCZ5yNYngVEq/B8ItqwFCd3hNjcSHIt2j5Dv2QQdfDjgCpowxU4S
+         uelyOHQjkjjgRxj7pGYoTFbR+yCWs2bVDDgBckCniNMG37QfgN9F4qV6cHUvFPKCIDwO
+         HyL8Mh9xWQL04UkvB/b9KkcONadWKdE0nTBMSxZ+woeae9ZLiUtp9o/XTEJxTYZf8Ytv
+         a5USMzLDUKY31YlizfIpy8bOqonV+g62fNBKyg8B7K1w5u2G7Qtmsry4nCcMHPEUTeot
+         yn2g==
+X-Forwarded-Encrypted: i=1; AKwUvBzr6h/nsFm4i1cgIQBPNu924dOCCUG9hkn35JiS8nPAHcdlpymKKtEPrvDYmBiw53AAKHrMT7SJU7uPujYFL6A=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKf5iClghfBOwFp8KY/7bk5w1+Zbyug3l5xl7f4wyuIe5O5AFWV
+	dJayGz3Kkm3njyNglmREJNgGliCcJ/a2qI68y8AkEdcX5hkk2WlSTT0X
+X-Gm-Gg: AYBFou0EqIWUiPV9rC/thYGnRFvb3e04xsN/qrdlab34Ji0wuhcuH1bVJhLNeWeRYfD
+	hqdRGtTYOVq+r0aLwXYxKh0wrg72vEMWKc9AyVZq5iTjIVJnH9xD8alURJ/6hFKf1UZ51k4VW4t
+	eeYCMQ4WtSV+NnHAlEVdhRddZc7nH/CQNi2YvWiVtZmXsKireLHJydk2LDVh7W2wv7fr6NYfZDC
+	gB63CqeY/Ki3HxKZ3InY+YLcsXAA0UnAb49IqHok6pueh2dmPWtdVixAvj+hkbjMOQThWqAXrDv
+	bhAY3tIMY2otCmrewSd+wVnjvRXZ2sMYK6kuEQT2xb5X5DeEJx0XP39VfT9wVmHXlmTmf6bMA8f
+	rQ0nXne3vcr3AXc/vzzGqVBE5CI9KAooHj4dVq1WxFzeVAHGbuUnHLvHi9lPnB/kQsAO+pMc+nJ
+	Q05/rYnyf2/+c5v/aNchS0NDkHtKRhgcUQNlnfvHTLdHSytqEhNMAdNpUlssRauSUxC7hQ+asuX
+	GnZlo4o2Ds8vgBJ3xcY4TtOr+ObHsSXD6RUM3+2JGZOMhmVPvj58RGt5gdELLCXvKw1xAbKB9I0
+	zA53qK8WEwL5LK23XyEO7HSy7JX45hPiEOn74q2f58ik/S2xsMYZGB+BNaMkn2A7wLcj9sTJ
+X-Received: by 2002:a05:6000:1861:b0:48e:cd3:b3ec with SMTP id ffacd0b85a97d-48e264bc4a3mr9591983f8f.28.1792667761957;
+        Thu, 22 Oct 2026 04:16:01 -0700 (PDT)
+Received: from emanueleg-nb.corp.toradex.com (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e25828c6dsm12536753f8f.24.2026.10.22.04.16.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 04:16:01 -0700 (PDT)
+From: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+To: stable@vger.kernel.org
+Cc: Breno Leitao <leitao@debian.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	regressions@lists.linux.dev,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+Subject: [PATCH 6.12.y] net: call getsockopt_iter if available
+Date: Thu, 22 Oct 2026 13:15:21 +0200
+Message-ID: <20261022111535.528099-1-ghidoliemanuele@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -115,92 +103,184 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: monaco-evk: Describe the PCIe M.2
- Key E connector
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-        Wei Deng <wei.deng@oss.qualcomm.com>, andersson@kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, quic_chezhou@quicinc.com,
-        cheng.jiang@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com
-References: <0303224f-4c2c-46ec-9866-5ea1fd0fb4a3@oss.qualcomm.com>
- <20260825092715.5794-1-wei.deng@oss.qualcomm.com>
- <isbrpaztfrgwfcleujrn4w26cshbi2mgn57tbh5bubvsegn6lc@jh3ab6htvd24>
- <83b67ab2-ab68-427a-94aa-881454f457ba@oss.qualcomm.com>
- <CAFEp6-2KDxDrfTZLN7KPRg=aavj8nqQr7ftna23n9C1Cpbwwbg@mail.gmail.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <CAFEp6-2KDxDrfTZLN7KPRg=aavj8nqQr7ftna23n9C1Cpbwwbg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDIyMDAzNyBTYWx0ZWRfX9zQzRmsx9nB8
- 3Kk20tVAhBtoGUmRMge9YrWqLsuM3ZTmd0U8o7Ax50bKJAiVj0Uod2bfiLHas4Y7xoeAhadwpUi
- biqJ17YTlMEKEhHaPtXGDbqBijYZSLw=
-X-Authority-Analysis: v=2.4 cv=ReAFmFtv c=1 sm=1 tr=0 ts=6ad9d8a9 cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=EUspDBNiAAAA:8 a=9AbZo8Gtoo8lc68VITMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-GUID: rKfKmubmqVBxyKZQyd8f3aQU_vTQHMbr
-X-Proofpoint-ORIG-GUID: rKfKmubmqVBxyKZQyd8f3aQU_vTQHMbr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDIyMDAzNyBTYWx0ZWRfX/Im1t2KdBzG4
- 0s/b3pgsBNfDHRM/97H6WHl8D+9dwFvvQI1pfQ0nFK7Jy6h+sB2nIm/uAZDQXlzeqBoz6Plh/7T
- 3Y/eF+1DEZtoQ0VBPT7Pm8ucJ892Djk1wqk2zjshwQr/gx3X13z9K3mCZlQJ1NwbzBwpFgyAVco
- GMVG6vwIcuOe4EzwWkWgBiYQj/9LxiAT1qdvPDvUwnnCHZxSXOfeQy825z5+F5TamWbT+SEfNvs
- GfnSzdTs4qLZ7OA8rsD++VBZjZaakCQdXo+7wxaJOtd6sCIve/EF4Z8KGpGvdymEWOj223jg0Y3
- orCmgMDPBx3Jnl1c/rkPQ/7AJWmGJ57y1lCCI1GM4rkpr5yomUN6+2mVyS/xn09iLynLLNI3YkR
- BLDvWfYj5veR7XLpwzDgX0MVbnk/NeeiIYVWbgWRg/HTY9/pPtUIx5TI2vh9KsqDQHn3ZeLSScC
- 4ZgYu+5A+tDOCTmTGkA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-10-22_03,2026-10-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
- malwarescore=0 bulkscore=0 clxscore=1011 phishscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610220037
 
-On 10/13/26 10:13 AM, Loic Poulain wrote:
-> Hi Folks,
-> 
-> On Mon, Sep 21, 2026 at 2:38 PM Konrad Dybcio
-> <konrad.dybcio@oss.qualcomm.com> wrote:
+From: Breno Leitao <leitao@debian.org>
 
-[...]
+commit 5bd0dec150f56b6307d599132dcb7c01007bbecc upstream.
 
->>>> We are adding M.2 Key E connector support for monaco-evk [2]. Konrad
->>>> suggested moving the port/endpoint anchor nodes to the SoC DTSI
->>>> (monaco.dtsi) for clean DTS layering, so that board files only need to
->>>> fill in remote-endpoint for boards that actually have an M.2 connector.
->>>>
->>>
->>> This means, the dummy port/endpoint node will always be present even when the
->>> M.2 connector is not used. I don't see a compelling reason to do so.
->>
->> I don't really see a compelling reason to defer re-defining them to each
->> device DT either..
-> 
-> Adding an empty port/endpoint at the SoC level is problematic for
-> uart, port is not always expected, this depends if the uart is exposed
-> through a connector or to an onboard device. So we may end with an
-> unconnected endpoint but still have a bluetooth subnode, which can be
-> a bit confusing... Also why adding a port/endpoint only for a specific
-> uart in the dts, and not for the others? This is a board/SoC level
-> choice to use a specific uart for M2 or not.
+Update do_sock_getsockopt() to use the new getsockopt_iter callback
+when available. Add do_sock_getsockopt_iter() helper that:
 
-From my perspective it's removing boilerplate. Currently all USB and
-PCIe hosts already define their ports and endpoints in the SoC DTSI
-and if they're unconnected, then simply nothing happens.
+1. Reads optlen from user/kernel space
+2. Initializes a sockopt_t with the appropriate iov_iter (kvec for
+   kernel, ubuf for user buffers) and sets opt.optlen
+3. Calls the protocol's getsockopt_iter callback
+4. Writes opt.optlen back to user/kernel space
 
-Both 'ports' and 'endpoints' are an abstract property that signify
-'X can be related to Y' and I don't see how that's a problem here given
-UART is very much expected to be connected "somewhere" (with the
-"somewhere" perhaps being external/a pin header)
+The optlen is always written back, even on failure. Some protocols
+(e.g. CAN raw) return -ERANGE and set optlen to the required buffer
+size so userspace knows how much to allocate.
 
-Konrad
+The callback is responsible for setting opt.optlen to indicate the
+returned data size.
+
+Important to say that  iov_out does not need to be copied back in
+do_sock_getsockopt().
+
+When optval is not kernel (the userspace path), sockptr_to_sockopt()
+sets up opt->iter_out as a ITER_DEST ubuf iterator pointing directly at
+the userspace buffer (optval.user). So when getsockopt_iter
+implementations call copy_to_iter(..., &opt->iter_out), the data is
+written directly to userspace — no intermediate kernel buffer is
+involved.
+
+When optval.is_kernel is true (the in-kernel path, e.g. from io_uring),
+the kvec points at the already-provided kernel buffer (optval.kernel),
+so the data lands in the caller's buffer directly via the kvec-backed
+iterator.
+
+In both cases the iterator writes to the final destination in-place at
+protocol callback. There's nothing to copy back — only optlen needs to
+be written back.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Link: https://patch.msgid.link/20260408-getsockopt-v3-2-061bb9cb355d@debian.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+---
+Clean cherry-pick of the upstream commit, no changes. Needed in 6.12.y
+only.
+
+v6.12.114 picked up commit 41fbf726915b ("net: add getsockopt_iter
+callback to proto_ops", upstream 67fab22a7adc) and commit 22ebe6ab0b67
+("Bluetooth: L2CAP: convert to getsockopt_iter", upstream bf01627cc04b)
+as dependencies of commit 3af72bf8f73c ("Bluetooth: L2CAP: access
+chan->conn safely in get/setsockopt", upstream ca2c4c264986), but not
+this patch, which is the one making do_sock_getsockopt() actually call
+->getsockopt_iter().
+
+Since l2cap_sock_ops no longer provides ->getsockopt, every getsockopt()
+on an L2CAP socket at SOL_L2CAP/SOL_BLUETOOTH level fails with
+-EOPNOTSUPP on v6.12.114. As a result bluetoothd never registers the
+adapter and bluetoothctl reports "No default controller available":
+BlueZ's btio calls getsockopt(L2CAP_OPTIONS) while bluetoothd sets up
+the BR/EDR ATT listening socket of the GATT database, and the adapter
+is dropped when that fails. Our CI sees this on every Bluetooth-enabled
+board running v6.12.114 (i.MX 8M Plus and AM62 based, BlueZ 5.72),
+while v6.12.113 was fine. The same regression was reported with an
+Intel AX201 on Debian 13:
+https://bugzilla.kernel.org/show_bug.cgi?id=222177
+
+L2CAP is the only user of ->getsockopt_iter in 6.12.y. The other stable
+trees either did not get these backports or already contain the
+upstream commit. The patch applies cleanly on v6.12.114.
+
+Tested on a Verdin iMX8M Plus with our v6.12.114 based kernel plus
+this patch.
+
+The root cause analysis (comparing CI logs, reviewing the
+v6.12.113..v6.12.114 changes and reading the BlueZ code) was done with
+the help of an AI coding assistant (Claude); I reviewed the analysis
+and the backport.
+
+ net/socket.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 51 insertions(+), 3 deletions(-)
+
+diff --git a/net/socket.c b/net/socket.c
+index 723bc3a1ba5c..b8d662e19310 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -77,6 +77,7 @@
+ #include <linux/mount.h>
+ #include <linux/pseudo_fs.h>
+ #include <linux/security.h>
++#include <linux/uio.h>
+ #include <linux/syscalls.h>
+ #include <linux/compat.h>
+ #include <linux/kmod.h>
+@@ -2345,11 +2346,45 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
+ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+ 							 int optname));
+ 
++/*
++ * Initialize a sockopt_t from sockptr optval/optlen, setting up iov_iter
++ * for both input and output directions.
++ * It is important to remember that both iov points to the same data, but,
++ * .iter_in is read-only and .iter_out is write-only by the protocol callbacks
++ */
++static int sockptr_to_sockopt(sockopt_t *opt, sockptr_t optval,
++			      sockptr_t optlen, struct kvec *kvec)
++{
++	int koptlen;
++
++	if (copy_from_sockptr(&koptlen, optlen, sizeof(int)))
++		return -EFAULT;
++
++	if (koptlen < 0)
++		return -EINVAL;
++
++	if (optval.is_kernel) {
++		kvec->iov_base = optval.kernel;
++		kvec->iov_len = koptlen;
++		iov_iter_kvec(&opt->iter_out, ITER_DEST, kvec, 1, koptlen);
++		iov_iter_kvec(&opt->iter_in, ITER_SOURCE, kvec, 1, koptlen);
++	} else {
++		iov_iter_ubuf(&opt->iter_out, ITER_DEST, optval.user, koptlen);
++		iov_iter_ubuf(&opt->iter_in, ITER_SOURCE, optval.user,
++			      koptlen);
++	}
++	opt->optlen = koptlen;
++
++	return 0;
++}
++
+ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		       int optname, sockptr_t optval, sockptr_t optlen)
+ {
+ 	int max_optlen __maybe_unused = 0;
+ 	const struct proto_ops *ops;
++	struct kvec kvec;
++	sockopt_t opt;
+ 	int err;
+ 
+ 	err = security_socket_getsockopt(sock, level, optname);
+@@ -2362,15 +2397,28 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+ 		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
+-	} else if (unlikely(!ops->getsockopt)) {
+-		err = -EOPNOTSUPP;
+-	} else {
++	} else if (ops->getsockopt_iter) {
++		err = sockptr_to_sockopt(&opt, optval, optlen, &kvec);
++		if (err)
++			return err;
++
++		err = ops->getsockopt_iter(sock, level, optname, &opt);
++
++		/* Always write back optlen, even on failure. Some protocols
++		 * (e.g. CAN raw) return -ERANGE and set optlen to the
++		 * required buffer size so userspace can discover it.
++		 */
++		if (copy_to_sockptr(optlen, &opt.optlen, sizeof(int)))
++			return -EFAULT;
++	} else if (ops->getsockopt) {
+ 		if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
+ 			      "Invalid argument type"))
+ 			return -EOPNOTSUPP;
+ 
+ 		err = ops->getsockopt(sock, level, optname, optval.user,
+ 				      optlen.user);
++	} else {
++		err = -EOPNOTSUPP;
+ 	}
+ 
+ 	if (!compat)
+
+base-commit: 85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e
+-- 
+2.53.0
+
