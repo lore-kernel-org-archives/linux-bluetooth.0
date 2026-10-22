@@ -1,83 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792639324;
-	b=sNGZmGr4pHoOG7iEdfEEtWclW1Kn59d7xnqJdehzJPZofDnYZm+RyKjjUGf+zh7EJTM4
-	 8NmKSIuKY/e3erpn3ZW26bAvAcwE5jcRsy3Q4AT7cjbHL1+eswJj854V29NyO3BKwQ3KT
-	 skXAi9nAP3xn1v6Zwd8DYkBzrnjiuL9UgvENDC50aLe5iJOeV4OrkWaeSWR2Yb/CTnG2p
-	 mGhy60LSsdtYDbf4Twx9afYBsFyxWjxiQzA4bSkXj620UfoWswVvlerSX+8+oLM6NtoBg
-	 xYxlg9A8QwXx9k6CysQnKl2dTaP1ud6Nm/359ndMq/WNijcSrqFRfUYZgD2JQl0585A==
+	t=1792653873;
+	b=rX2GIjm0RK3INJnuwSxUYWcsCkwOI42fsh61Pv+z/PtqIOWzfLjRF4cbLtSAmgqT0IOA
+	 X0R79awjBkVBQPtt9kaDUfchs+M901mdKSPwYcntVxCQcc1G250dDyTnq5mFpzxcAi1Ot
+	 qOqlvFJJ/vEfg+3BNYI1MWBxn7Lt7eXZVvIv8hOEyoIolPE1XUeE7X2YVqR9djfJSX5Ve
+	 jBgzzEXfp79t2zVWEVN/6EraOOz0/8lyoVka7FcE5sF6OYUYRtiW9mlfe7bnmBuWkQRTl
+	 OxfaxVAEusLOTv6HC9amk2NoQKb0dTiEOL17q1nkivyhxt0HrDVGO1MsQ84Sq8wLK/Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792639324;
-	h=DMARC-Filter:X-UUID:DKIM-Signature:X-CID-P-RULE:X-CID-O-INFO:
-	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:Received:
-	 Received:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
-	 Content-Type;
-	bh=BRcTTOuABMbev2Vvx6K/Ogw8u913Ev/oz94OXx24R5o=;
-	b=OMLp19uqoVYv9b5mWf3qLwQ+oXrlN35awYmNhCp1wYasu/8aCPD8DYzq3iigIMY6ClLX
-	 ROWV9iy5emB+3W3Km0qpyJ6DqMXM3GHFvlrj5lnXMclXmeC61EoljW27DhPif50ey585v
-	 w1gE31HSuRNHowAQinyzQmY0vjEGrLd+w6eUdOZEFZQm5MFo2fblt5W8TvRL+LQuDQpaA
-	 ZXE+6Qd7OL+PCh5I/gzLfaJu7BJBiosvVEXksBo4tQURokR7hWiJeXLUmN4vIOCwoupum
-	 uau/+BSVHzQCVNQ7Gj2EVuNFjVKwS+Um0j1W4RByfd/yix5tPvzNm6y7/YfEgdh+Qbg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792653873;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=jXSxzkB2sjR3pOGRROQjJ86fgtukIAjB0AZzOEMLK0Y=;
+	b=VBBC8ZQoypOBRWi4xiQtNA8SMcn8761iu+Yh0Issq3C705qy/H5Ed4fQE4DTUSr+4PNt
+	 68j3wOdckVsfbNlQn9y2xvnmkD8QvoXg9T8Qx8mkjX1WF15yIsvylC8FNQqaYbCRLY2wW
+	 UGokw0+KvyRyKY9Rp3a8juuhhuFCMwjkYjH5rPxSt3Qfyug8GJBMUlRgJEkvCXqxi/x10
+	 5xvEElmu/+N1kaNPc+1T+aFz/ofkcfKjibQwd5fwdD5WO2XrwDjt47OZbz1ffOL07f4K8
+	 ofnsTpO2prtzMO6SQd6la/wBRhRBTLDQucH2PU3Xe8AnZV1kuVTYVxq+0HrtJzXBiLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=mediatek.com;
-	spf=pass smtp.mailfrom=mediatek.com;
-	dkim=pass header.d=mediatek.com header.i=@mediatek.com header.a=rsa-sha256 header.s=dk header.b=EMZcvojs;
-	arc=none smtp.remote-ip=210.61.82.184
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=E1q5ooFv;
+	arc=none smtp.remote-ip=209.85.219.50
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768BF606A31F;
-	Thu, 22 Oct 2026 03:22:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 768BF606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CF4606A319
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 07:24:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84CF4606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=mediatek.com header.i=@mediatek.com header.a=rsa-sha256 header.s=dk header.b=EMZcvojs
-X-UUID: bacff934cdc711f18dc8c9802ae25ab1-20261022
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=BRcTTOuABMbev2Vvx6K/Ogw8u913Ev/oz94OXx24R5o=;
-	b=EMZcvojsfg55ceJFMLHRKu32lyKDZLSgaxu32n+7Mb12ubHJS05r+Egd96D8QDIcVwg2UKh87Ka2g2bKqWj1ZYPHSsq30gvrNWBJhKZk96rgXiDOZNyXwRQhxB+GWhxoUznpygChyCI1NwLFJK6OHo+/rKZYRfYb30SHKb/ayog=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.20,REQID:c65742bc-3f25-4122-98f0-6bb05a055236,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:291e20b,CLOUDID:288fe6ba-4006-44bb-949c-6e25a7b8dad4,B
-	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
-	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,
-	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: bacff934cdc711f18dc8c9802ae25ab1-20261022
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1796106040; Thu, 22 Oct 2026 11:21:54 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 22 Oct 2026 11:21:52 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Thu, 22 Oct 2026 11:21:52 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Hao Qin <hao.qin@mediatek.com>, Wenlong Tian
-	<ot_wenlong.tian@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Will Lee
-	<will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v4 3/3] Bluetooth: btmtk: derive the firmware ISO setting from MTK_ISO_THRESHOLD
-Date: Thu, 22 Oct 2026 11:21:50 +0800
-Message-ID: <20261022032150.2213479-4-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20261022032150.2213479-1-chris.lu@mediatek.com>
-References: <20261022032150.2213479-1-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=E1q5ooFv
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-91c11468b5fso16237996d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 00:24:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792653872; x=1793258672; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=jXSxzkB2sjR3pOGRROQjJ86fgtukIAjB0AZzOEMLK0Y=;
+        b=E1q5ooFvjwuxLEpdQ24V3ucIWxkY47CwRfMa75DFoadvGnJVJrAdTCgNgY5OEW4L+l
+         o6Ii/e1+LIRgYnSGq5wnYU4i6O220zzJRcthWh1E9OCU8KcPocE7ikWh3usbTxsEHtkW
+         +xAcN4M7oICoBhtjdvmPb8SY6F1San2Ky44I+RqxU96cjYx5Xsn8qbhsI2FlTT2H3UEn
+         MmQfJJg6+o28lZW3SfpW21d4MC8er+X2acRjqZjVEGmygfE3KzYPEY8kS0IuQ0u8pmif
+         5bYJ/8YDYT2Ihr8rNEABfZs009fpnEbYSRHpgR0CoKQMph1NT9msarC//HreygaXJIGI
+         Puyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792653872; x=1793258672;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=jXSxzkB2sjR3pOGRROQjJ86fgtukIAjB0AZzOEMLK0Y=;
+        b=cYLujsu+7wmZY62u+zdIdUG/mnGIm36KrAfwr3eU4S7kofbQluDRp4GVzG3eyfY12B
+         Twi/2Mgujz/Wth+mKYecUcxMyn02gznkuUpNLLKlPnKT1V3MuLJprbhT7KUTxaTrmkfq
+         AiSqp5adK2t72kF3LQ2sUnjpc/43rPuw+yCzil1qJLzH7nQtGda5orFuGGaE2a/Dhqv6
+         /yhkBnIMwcnwXkhPQlWZHJy31UclU+8PLZEOe78dz8AagA0Qs+SUMaIoB48HU4HwIS/j
+         JFV0dn4TpuD4uaD/lzgn93qJbapA/G042MUdM4QSgscHINM8DJA2BNB1BkOdGxGSP4d2
+         fX6g==
+X-Gm-Message-State: AFq9FYKwL9fFoItbFvP8HrD3i7QpVtmxzkyrsI/ODotURAyH3hoTaGWA
+	Luao2U/EfdcBmIt4Cso8IwWDfhnue88HKOKKEsC689GachcqnBsDW5d1pP9FFA==
+X-Gm-Gg: AYBFou3gy4rR3vkM2M9Av2VQ8hL93w7O3jMp6pgiIqfSfQfxbkeokXl3hI8sT1tlyJe
+	9rnC1pEMK6K8KQrp2pTzcgcqnY8E2+C+3bDr49eqfFnVbQu+1dW8FmzCvSJ+PhV/EQnJnnBmG7r
+	GAIROuFfLAM71qqlgE5fCZdLjKblLAImYwNGFDnNNJ8QcHJBtPuSTKV0TZNkcxwT/IfxT3AgN8m
+	ZHei/5/dDy7yZJxl0E4pnmP18r2nc74R208BBDeX2N1XbhMzXr+aOpIJEtusoJGRXy24m5Syeio
+	MeiP04yHpYDZQC+Sfx1pxR5mILOxpQnH28MDwYo8PBP12RBGCTyLsiLy9V/W8P1fQrAEgoZD6SF
+	gf6wZRkDu7LN+cEwzrqxW2ojgt0qy9Cq7RRZJgocGS8/8CfjmGs4fHfJXjGvcs3oKtPDZbG4Iwd
+	Gwb4wNH1+FYD+0CyTr172sak8BIVLJzfaO6vgVY5+m80kWKj19puWyh6dBnSj+upnp5PL18Dn9h
+	kfOx1xTvcCxKIG3RDshBSR76/yPyHXXiXiHmYpNAmBMekmieUmnaqgd8KqAeu8=
+X-Received: by 2002:a05:620a:6889:b0:93e:e2a4:b0fe with SMTP id af79cd13be357-93f57f645d2mr819626585a.66.1792653872464;
+        Thu, 22 Oct 2026 00:24:32 -0700 (PDT)
+Received: from [172.17.0.2] ([172.208.13.51])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93f56dd0022sm457273385a.20.2026.10.22.00.24.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 00:24:31 -0700 (PDT)
+Message-ID: <6ad9ba2f.86577435.86da6.0d85@mx.google.com>
+Date: Thu, 22 Oct 2026 00:24:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2521685925103985750=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -87,52 +88,57 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: Bluetooth: btmtk: fix ISO data reception
+In-Reply-To: <20261022032150.2213479-2-chris.lu@mediatek.com>
+References: <20261022032150.2213479-2-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The ISO data transfer size is spelled out twice: as a raw byte pair in the
-vendor command sent by btmtk_usb_isointf_init(), and as MTK_ISO_THRESHOLD
-for the padding in btmtk_isopkt_pad(). Build the command payload from the
-macro so the size is stated once, and update the setting for current
-MediaTek controllers.
+--===============2521685925103985750==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1190983/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.43 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       FAIL      1.03 seconds
+SubjectPrefix                 PASS      0.39 seconds
+BuildKernel                   PASS      29.28 seconds
+CheckAllWarning               PASS      34.10 seconds
+CheckSparse                   PASS      36.96 seconds
+BuildKernel32                 PASS      29.51 seconds
+CheckKernelLLVM               PASS      35.31 seconds
+TestRunnerSetup               PASS      708.58 seconds
+IncrementalBuild              PASS      32.69 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4,3/3] Bluetooth: btmtk: derive the firmware ISO setting from MTK_ISO_THRESHOLD
+
+1: T1 Title exceeds max length (81>80): "[v4,3/3] Bluetooth: btmtk: derive the firmware ISO setting from MTK_ISO_THRESHOLD"
+
+
+https://github.com/bluez/bluetooth-next/pull/976
+
 ---
- drivers/bluetooth/btmtk.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index f2224eb0bf6b..bf9bfed3da23 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -31,7 +31,7 @@
- #define BTMTK_CBMCU_FLAG_ENABLE_PATCH	0xF1
- 
- /* It is for mt79xx iso data transmission setting */
--#define MTK_ISO_THRESHOLD	264
-+#define MTK_ISO_THRESHOLD	342
- 
- struct btmtk_patch_header {
- 	u8 datetime[16];
-@@ -1741,7 +1741,7 @@ static int btmtk_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
- static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- {
- 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
--	u8 iso_param[2] = { 0x08, 0x01 };
-+	__le16 iso_param = cpu_to_le16(MTK_ISO_THRESHOLD);
- 	struct sk_buff *skb;
- 	int err;
- 
-@@ -1756,7 +1756,7 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- 		return err;
- 	}
- 
--	skb = __hci_cmd_sync(hdev, 0xfd98, sizeof(iso_param), iso_param,
-+	skb = __hci_cmd_sync(hdev, 0xfd98, sizeof(iso_param), &iso_param,
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Failed to apply iso setting (%ld)", PTR_ERR(skb));
--- 
-2.45.2
 
+--===============2521685925103985750==--
