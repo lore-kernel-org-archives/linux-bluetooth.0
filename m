@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792684049;
-	b=HaGZZOmTJTad98LU5NDe8Hv0xT7kqEDHMbXRA9uIAwEoqqSYWUnlop7QDSDUfvrDQTK1
-	 06nGWRKuG4TABboDV8lE6valMd4eiZbcNxwW5MvVWW4rEkK1ot8RSxV+PH5uMA1bdr0La
-	 NPzTfC6CvkFKTfr5OG3oK4ErmO0tXm0hYy4pIIR3TI584kgkPY3k10FKumDRQE7oNsI0s
-	 xn44r0Wt6m/L0ZN5RY7W2ERC7PTLBo2at8oMZNAPbdkFT55R1igxDSTHB2acpeBA6p8Nr
-	 392Y7RHDCNW6l0aAX5pKFk4CcG87irlh+mt7IgsQ+Seh818hI4Los0Djft7ZTMy0wcQ==
+	t=1792684050;
+	b=oVOwNFZcx7rkyXkVSER4JbeX8GdXQ3y0WKODD+rQZTbX/UWdsZfJUOrujg4ves5ACSy2
+	 Fzrfe45XjpQcfrmHgtu0TF4E8VnIKiEDeK6fbMO19XdDfs/FPghkBEYXWjNkDAoAeK9aP
+	 9ZjGEBWofkiEvNs3sDfAWJ02xsXij8BRr34sztIlSTHpFYlvpruLGXBrG45GSblOXT30Q
+	 CP0eO2/j7A0iMZhODIa9h7c/74N/1WtHCdsVFrXpP0ntf8DyHngdhMTo/HnqVeO5tFMq6
+	 7cVrPx/SgER0ilohtBotPURtNXpMUCuamugye3PPAUk10QJ8PCeI8N3pP8VmGAvw5+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792684049;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792684050;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=qJBsN3LQougdf4dKQhgmDINoZ89vxcCCTRUPTcItNCo=;
-	b=bRQXt8FxdE5/LSNzWTGd91xVnzIdoEFUa4030NXfS74C7/YGiaKsc0QqGtALnzbxoqdI
-	 8LZjnlEo/JPHCKdkB048nlTURacPeog0qJ6Gd6f1Nq9VqfqdcPtxGGUtQHftXZcTgZSYN
-	 tqzUMhJCh7dCOAp9mEZk90S7Kcmy7AolGFyIvJk5pwkUMylpN54qq6XPEos7GUlkdwT93
-	 IE7WZGHJEFlqBC1GcDpY5jOFi/Bc+B6vF0X3pL0pwa39rB8JVHefFqtpyZ8gw6fLhxSFS
-	 0kXGXf0tEWV26KTBSKR02l9fTpa0uUBekMZuQFLx6XI7KX7PMKWZ6o4BYaA10IqwPBw==
+	bh=0fuonw0gAMTId2EhdrffDPRQf9AC1csj8HumJye5ZLw=;
+	b=sLxSltZd6MB//bE9FODPZfwcbDV0lE6NDAAhIDJTyAty2RILqtyGtttzKtv1yRSAZ2uH
+	 AeyKwhxDpB96yXAkZyqD80+vUqh9yeFBsUpHsz95vemQmIMfUdLFfi7wkqj0tzE4xf5K7
+	 BaFYdIlkUN1g/6aDi8DOffwZOjHDt9LpW8EBvOgzyXP9WoUe8tFgvfpZAHMmPZOq21lOc
+	 Z3S82BVAXvueg3+/9HZrSBMWqjVVUqKqfNgb2CYnJw+M6lkfFIXbkxHpg0VOIhEMNzUrS
+	 3JRGeAPXycTwkxUPwqExYRSosj4PSeEQ47SNXZZydsnXUeDVNIaXRjXw302QcJA6aIg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=IZWeZWGd;
-	arc=none smtp.remote-ip=209.85.217.52
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=k9IOw68M;
+	arc=none smtp.remote-ip=209.85.221.181
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55007606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1597B606A327
 	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 15:47:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55007606A31E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1597B606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=IZWeZWGd
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7cc7938c5e9so416338137.0
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=k9IOw68M
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5eae12762c9so9104e0c.1
         for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 08:47:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792684048; x=1793288848; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792684049; x=1793288849; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=qJBsN3LQougdf4dKQhgmDINoZ89vxcCCTRUPTcItNCo=;
-        b=IZWeZWGdCeGw8bwT5mEH3t7yDj34+Mj7ihXyf2wQP7WplGYH8SoQaQ1s+rUHSZX1ER
-         RBNlRHh9UeZbxqRTxeuocmYl+Z1fJNJV0pxSILuk0VCcYMTRxQboQVnmEjdty05/2VsG
-         QblOoOnVDk3kjqDJWTThIPgLD6Yt5RWYWh93reBJMs3cEU/gHP6+SqKpnJuvgM7LOmiE
-         GkLqNhD8zmNLkSG70os8tfsvSCgFCd88WoPp+6+2thqsrXTvZbmi7npvS9w5BGrrnMai
-         ry7trjICU2BHdokTyXE644Z3IxPAc0FEc0+LM0xZalTZokLmhTMgeuTqb15SOrKzZ9sW
-         kIuA==
+        bh=0fuonw0gAMTId2EhdrffDPRQf9AC1csj8HumJye5ZLw=;
+        b=k9IOw68MxKmJ7Y0+P4jRlfw078lo672OgIP9GMwBaa1Xs4d/WPHFM5TtuDnxgexNH9
+         3dVUEMQxF097iHWNeaa+VH7oPsGcKPqEVqPtWjjDDofQu8P/r89oxxgD1hS2UlWG3o5u
+         0DOZsdDu9y2ftLtCIgRw9Mnxo3ulDjmpKZ5ZsuKcQp4KX51c26R0+Dt/VuUq5MutAfbS
+         uaSwkhX4ByCVF57EeROpVNWQERREo81zB3w8oUUrr9DyVFneFQ54OGL928yehjy5TXo5
+         aNLmJsunDTMZEbvgOOXgQ0ff3JkmQjStfzU/NU3GBDA6GYNidjgPR9EdFflUre0INn51
+         PozA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792684048; x=1793288848;
+        d=1e100.net; s=20260707; t=1792684049; x=1793288849;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=qJBsN3LQougdf4dKQhgmDINoZ89vxcCCTRUPTcItNCo=;
-        b=c1h6itnEjfBDpJKJClBsWValiVchK8ZG1K74ZmNZkBPMumdm5b4OfXX+PVcCAvRqXr
-         VAGDUUaXEohR/K5JeZS6R229jTBKvmzjCcfi8+JR7xSA2UbdUa33PQA0+ufdOLDYymCm
-         aRh5wiIUB2n3S6yo3Uwm8mRN63uMzkYMjEqerPyZ+VcibHu0gTvdevkDhRHbMU/4SmmI
-         m1Dqsrq5hiirCCMURry88Lxx9CASvSX2rl68LyKITDxY+9zXkN77PoUR0IIBCRS/VsTs
-         /o4POshTT+R0qB06Fb7vbv5BRzKOV0GLVbbCi/psTJSjyhm+m1PcTd0UD3zvRH161pVH
-         FBUg==
-X-Gm-Message-State: AFq9FYK6fU+Vio297eDpychrZHkgj2cSuZd9gxmz7QVf1WJ5AAe1NF1y
-	GJ07z9EfVsCA+6UipOR5qPzGYEBaFmDiT3/HQxAMss6vEFAab+fSO9Kk13x3Lu2YWsE=
-X-Gm-Gg: AYBFou27cxeVMJtyS5TnGeGkWwsrXlCEdcOrx0dqiOdPhYHCXu5W8vJdPLrzeOgwSf2
-	5UPwVLCV+7sv0Eay3OEFu3mC5BZUZZIvfBAEUsah+zw95cD3eDC0/f7+zf78PozAgLm9pOrLPit
-	aOhtzLwNhR4SdR2UZlavlEIytd2SYF8arDpaHPKzF/EhPjQlIs/G6BppIUuBQ7/v+TjeHLEy87R
-	MqFKekt9UI5fptRxVSAhW4H11on11ssRxGMmPhrGP71zLni+oCSoSDJfXRIF+geho5meDWkAdvR
-	e00jGnaUUfRNlepaIE0wty6LR/Tr0HEbOOswMsgy7dt3L215Rw6t6JFfGFOehB/BVnTb7bXf/Hm
-	yvv8tztoZcVQjjiQRDyx6CZlN9YxBIA5m3Q+OhRHPwF3UDh1Kz1b8EbScmJz9Nd8HcyMsb9xO3b
-	R6GpSP68HDV/FogW7yNnpWZ/ofTE3TL6wmLgsULCOnWU0aBaONpwMdFaV8A0+7hZo+00/BNzb7V
-	Ki/xmZHvL9vUDs3Dt/aT1as7CDoflALKlEqdxFqAH+fWancWz+VSRHCWJLYssPukFfCxSDw92Ju
-	gwkztvRcZ2fCbS1EUOni1e/1mmL0V8zkUQBqi8vG6nGOqxGcjUsYsLgXPzOwFuG8Lf4=
-X-Received: by 2002:a05:6102:6f06:b0:7cc:148f:c531 with SMTP id ada2fe7eead31-7cca9b16518mr671203137.26.1792684048223;
-        Thu, 22 Oct 2026 08:47:28 -0700 (PDT)
+        bh=0fuonw0gAMTId2EhdrffDPRQf9AC1csj8HumJye5ZLw=;
+        b=0U8y7XJwQsPQfS/DEkSXScdiOD62tII47DSjjNAIzP+CyM3G/JXl7tWdOrVTRp0saU
+         V1DBqGXGpTFhTa2r4AYxTdyPUKsMpipCxNT65URHRa19C6g4TRisevoa63xqMwzjoWzh
+         I9GvYqx8KNvZH2lFjQORQha7gsipNoHh2iIaNyi7xmMpx+wEbVB5x17CPdHXVIA73pBv
+         URl6l37NH01r2iKOItg6ObG+UepFyg0MvyYgR2zhBURSae942jh8rqILnJq1SDAVOWgr
+         j/sEha55TTFcRz/79CsVpkh1GPyytnumhSG9CubFPWcIS6coW+6ixnpaYM5b5BCgvPEp
+         mrdg==
+X-Gm-Message-State: AFq9FYIdE4Q8ROEiS5upVE8+Cnpn9uYlIPzvMSTlIzfnyY0TRDHA4x0w
+	JN1Kuqim5R8rFziwnuQrbJExW6gHsemz4BFf0938Y4mXrLS1O/WE2mxWJW6iKfQi274=
+X-Gm-Gg: AYBFou0y8iC4TZJgNrb4NLtnfHCAJbqTmW+e4yImlCJ0QRd3K2BLf4ETbo7IZ9Q/ysL
+	/b1B3KyhQdC1iU4Hr8p7dfyzKU6N/Z0/Bwr6z5noxsIJKLuVXCsqVsmEt1HIzHZv3Sxqp6NgQbF
+	HODTrkjgnuGlCGk/l9by7l70Io+DZYj9h84M4sPiOkQhBtBUikN7XahLf0V+jyMI2zmHO2KCubY
+	8eWQaB/b9T+IhS5aFZXIbysBT2ox5RSPPJPrDwvxlYYRWqUMw/9daCqZ+QHigabXrIhLbNAU5qN
+	ivLOWxbHx1XE7m4Fgsurp8vRiEZbqScaYE7LILZbbRzicTd4Jf2jo5JaKUK+jgfvl+kqCzlgs4l
+	l5qIakV86fMb+6Gn0Uc+iKe7PV8PcenTLY1zbtEHGpoc5rKLvuInVmt7CSYGEDDLWJ+Z/Z2U1l5
+	OL944p9qAkYQyJrFaKHKVwfbWzj4ysMzyf2EzMb/yO9C0Lu9ynPQ1G0Z0vvGOzl/cB9HUAYX/dm
+	GXksKB+LDi2dfInjCrhS2g32W2OmJVIQ5Ps8kB7BeUaAuyF0iuctKpb/5nIFmIineEgLrPxRDUa
+	oKODFZUrCWzFwsUzlIaVQcylaUquG1IFhjBPMe1hsY9A9w==
+X-Received: by 2002:a05:6122:1d10:b0:5c6:81c2:5496 with SMTP id 71dfb90a1353d-5eaebd6d8bemr2743613e0c.4.1792684049007;
+        Thu, 22 Oct 2026 08:47:29 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.27
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5eae97df494sm7307079e0c.10.2026.10.22.08.47.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2026 08:47:27 -0700 (PDT)
+        Thu, 22 Oct 2026 08:47:28 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 20/27] emulator/hciemu: Remove GLib dependency
-Date: Thu, 22 Oct 2026 11:46:53 -0400
-Message-ID: <20261022154701.3959500-21-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 21/27] tools: Build testers that do not need GLib with the mainloop
+Date: Thu, 22 Oct 2026 11:46:54 -0400
+Message-ID: <20261022154701.3959500-22-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261022154701.3959500-1-luiz.dentz@gmail.com>
 References: <20261022154701.3959500-1-luiz.dentz@gmail.com>
@@ -99,281 +99,380 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Use struct io for the sockets between the emulated controllers and
-hosts, and timeout_add() with 0 for the deferred host start and the
-flushing of client events, so hciemu works with any mainloop backend.
+Remove the remaining GLib uses of mgmt-tester, smp-tester, bnep-tester,
+ioctl-tester, userchan-tester, mesh-tester and hci-tester, unused watch
+ids and g_assert() mostly, and link them with libshared-mainloop, which
+does not read the clock on every iteration.
+
+mgmt-tester under User Mode Linux with test-runner -T:
+
+  GLib      42.6 s
+  mainloop  20.3 s
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- emulator/hciemu.c | 122 +++++++++++++++++-----------------------------
- 1 file changed, 45 insertions(+), 77 deletions(-)
+ Makefile.tools          | 14 +++++++-------
+ tools/bnep-tester.c     |  7 -------
+ tools/ioctl-tester.c    |  6 ++----
+ tools/mesh-tester.c     |  1 -
+ tools/mgmt-tester.c     |  3 +--
+ tools/smp-tester.c      | 30 +++++++++++++-----------------
+ tools/tester.h          |  8 ++++----
+ tools/userchan-tester.c |  1 -
+ 8 files changed, 27 insertions(+), 43 deletions(-)
 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 48ed63b413f4..2f544f319bf2 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -24,8 +24,6 @@
+diff --git a/Makefile.tools b/Makefile.tools
+index 304dbf135e98..9f0dd897c607 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -136,7 +136,7 @@ tools_mgmt_tester_SOURCES = tools/mgmt-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_mgmt_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_mesh_tester_SOURCES = tools/mesh-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -145,7 +145,7 @@ tools_mesh_tester_SOURCES = tools/mesh-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_mesh_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c tools/tester.h monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -172,7 +172,7 @@ tools_bnep_tester_SOURCES = tools/bnep-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_bnep_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -181,7 +181,7 @@ tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_smp_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -204,7 +204,7 @@ tools_sco_tester_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
+ tools_hci_tester_SOURCES = tools/hci-tester.c monitor/bt.h
+-tools_hci_tester_LDADD = src/libshared-glib.la $(GLIB_LIBS)
++tools_hci_tester_LDADD = src/libshared-mainloop.la
+ 
+ tools_userchan_tester_SOURCES = tools/userchan-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -213,7 +213,7 @@ tools_userchan_tester_SOURCES = tools/userchan-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_userchan_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_iso_tester_SOURCES = tools/iso-tester.c tools/tester.h monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+@@ -231,7 +231,7 @@ tools_ioctl_tester_SOURCES = tools/ioctl-tester.c monitor/bt.h \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_ioctl_tester_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-glib.la $(GLIB_LIBS)
++				src/libshared-mainloop.la
+ 
+ tools_6lowpan_tester_SOURCES = tools/6lowpan-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+diff --git a/tools/bnep-tester.c b/tools/bnep-tester.c
+index 1c53d024c0f8..8c7382b815c4 100644
+--- a/tools/bnep-tester.c
++++ b/tools/bnep-tester.c
+@@ -18,7 +18,6 @@
+ #include <errno.h>
+ #include <stdbool.h>
+ 
+-#include <glib.h>
+ 
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/bnep.h"
+@@ -37,7 +36,6 @@ struct test_data {
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+ 	const void *test_data;
+-	unsigned int io_id;
+ 	uint16_t conn_handle;
+ };
+ 
+@@ -198,10 +196,6 @@ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	if (data->io_id > 0) {
+-		g_source_remove(data->io_id);
+-		data->io_id = 0;
+-	}
+ 
+ 	hciemu_unref(data->hciemu);
+ 	data->hciemu = NULL;
+@@ -288,7 +282,6 @@ static void test_basic(const void *test_data)
+ 			break; \
+ 		user->hciemu_type = HCIEMU_TYPE_BREDR; \
+ 		user->test_data = data; \
+-		user->io_id = 0; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, setup, func, NULL, \
+ 				test_post_teardown, 2, user, test_data_free); \
+diff --git a/tools/ioctl-tester.c b/tools/ioctl-tester.c
+index e957b0d01bfa..d9623d8f796c 100644
+--- a/tools/ioctl-tester.c
++++ b/tools/ioctl-tester.c
+@@ -20,7 +20,7 @@
+ #include <sys/ioctl.h>
  #include <sys/socket.h>
+ 
+-#include <glib.h>
++#include <assert.h>
+ 
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/mgmt.h"
+@@ -50,8 +50,6 @@ struct test_data {
+ 
+ 	uint16_t handle;
+ 	uint16_t acl_handle;
+-	GIOChannel *io;
+-	unsigned int io_id[2];
+ 	int step;
+ 	bool reconnect;
+ 
+@@ -782,7 +780,7 @@ static void test_ioctl_common(const void *test_data)
+ 			}
+ 		} else {
+ 			if (ioctl_data->param_len) {
+-				g_assert(req_len >= ioctl_data->param_len);
++				assert(req_len >= ioctl_data->param_len);
+ 				req_len = ioctl_data->param_len;
+ 			}
+ 			memcpy(req, ioctl_data->param, req_len);
+diff --git a/tools/mesh-tester.c b/tools/mesh-tester.c
+index 4412bfdb727e..896cfd1f208f 100644
+--- a/tools/mesh-tester.c
++++ b/tools/mesh-tester.c
+@@ -21,7 +21,6 @@
+ #include <errno.h>
+ #include <unistd.h>
+ 
+-#include <glib.h>
+ 
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/hci.h"
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index abfe57dad0c8..58dac1317623 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -22,7 +22,6 @@
+ #include <errno.h>
+ #include <unistd.h>
+ 
+-#include <glib.h>
+ 
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/hci.h"
+@@ -12599,7 +12598,7 @@ static void test_remove_device(const void *test_data)
+ static bool hook_delay_cmd(const void *data, uint16_t len, void *user_data)
+ {
+ 	tester_print("Delaying emulator response...");
+-	g_usleep(250000);
++	usleep(250000);
+ 	tester_print("Delaying emulator response... Done.");
+ 	return true;
+ }
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index 581f3a233704..29027d98a852 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -18,7 +18,7 @@
+ #include <stdbool.h>
+ #include <sys/socket.h>
+ 
+-#include <glib.h>
++#include <assert.h>
+ 
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/hci.h"
+@@ -31,6 +31,7 @@
+ #include "src/shared/crypto.h"
+ #include "src/shared/ecc.h"
+ #include "src/shared/tester.h"
++#include "src/shared/util.h"
+ #include "src/shared/mgmt.h"
+ 
+ #define SMP_CID 0x0006
+@@ -41,7 +42,6 @@ struct test_data {
+ 	uint16_t mgmt_index;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+-	unsigned int io_id;
+ 	uint8_t ia[6];
+ 	uint8_t ia_type;
+ 	uint8_t ra[6];
+@@ -229,10 +229,6 @@ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	if (data->io_id > 0) {
+-		g_source_remove(data->io_id);
+-		data->io_id = 0;
+-	}
+ 
+ 	if (data->crypto) {
+ 		bt_crypto_unref(data->crypto);
+@@ -293,7 +289,7 @@ static const struct smp_req_rsp nval_req_1[] = {
+ 
+ static const struct smp_data smp_server_nval_req_1_test = {
+ 	.req = nval_req_1,
+-	.req_count = G_N_ELEMENTS(nval_req_1),
++	.req_count = ARRAY_SIZE(nval_req_1),
+ };
+ 
+ static const uint8_t smp_nval_req_2[7] = { 0x01 };
+@@ -306,7 +302,7 @@ static const struct smp_req_rsp srv_nval_req_1[] = {
+ 
+ static const struct smp_data smp_server_nval_req_2_test = {
+ 	.req = srv_nval_req_1,
+-	.req_count = G_N_ELEMENTS(srv_nval_req_1),
++	.req_count = ARRAY_SIZE(srv_nval_req_1),
+ };
+ 
+ static const uint8_t smp_nval_req_3[] = { 0x01, 0xff };
+@@ -319,7 +315,7 @@ static const struct smp_req_rsp srv_nval_req_2[] = {
+ 
+ static const struct smp_data smp_server_nval_req_3_test = {
+ 	.req = srv_nval_req_2,
+-	.req_count = G_N_ELEMENTS(srv_nval_req_2),
++	.req_count = ARRAY_SIZE(srv_nval_req_2),
+ };
+ 
+ static const uint8_t smp_basic_req_1[] = {	0x01,	/* Pairing Request */
+@@ -353,7 +349,7 @@ static const struct smp_req_rsp srv_basic_req_1[] = {
+ 
+ static const struct smp_data smp_server_basic_req_1_test = {
+ 	.req = srv_basic_req_1,
+-	.req_count = G_N_ELEMENTS(srv_basic_req_1),
++	.req_count = ARRAY_SIZE(srv_basic_req_1),
+ };
+ 
+ static const struct smp_req_rsp cli_basic_req_1[] = {
+@@ -367,7 +363,7 @@ static const struct smp_req_rsp cli_basic_req_1[] = {
+ 
+ static const struct smp_data smp_client_basic_req_1_test = {
+ 	.req = cli_basic_req_1,
+-	.req_count = G_N_ELEMENTS(cli_basic_req_1),
++	.req_count = ARRAY_SIZE(cli_basic_req_1),
+ };
+ 
+ static const uint8_t smp_basic_req_2[] = {	0x01,	/* Pairing Request */
+@@ -390,7 +386,7 @@ static const struct smp_req_rsp cli_basic_req_2[] = {
+ 
+ static const struct smp_data smp_client_basic_req_2_test = {
+ 	.req = cli_basic_req_2,
+-	.req_count = G_N_ELEMENTS(cli_basic_req_1),
++	.req_count = ARRAY_SIZE(cli_basic_req_1),
+ 	.mitm = true,
+ };
+ 
+@@ -429,7 +425,7 @@ static const struct smp_req_rsp cli_sc_req_1[] = {
+ 
+ static const struct smp_data smp_client_sc_req_1_test = {
+ 	.req = cli_sc_req_1,
+-	.req_count = G_N_ELEMENTS(cli_sc_req_1),
++	.req_count = ARRAY_SIZE(cli_sc_req_1),
+ 	.sc = true,
+ };
+ 
+@@ -455,7 +451,7 @@ static const struct smp_req_rsp cli_sc_req_2[] = {
+ 
+ static const struct smp_data smp_client_sc_req_2_test = {
+ 	.req = cli_sc_req_2,
+-	.req_count = G_N_ELEMENTS(cli_sc_req_2),
++	.req_count = ARRAY_SIZE(cli_sc_req_2),
+ 	.sc = true,
+ };
+ 
+@@ -549,16 +545,16 @@ static const void *get_pdu(const uint8_t *pdu, size_t len)
+ 	uint8_t opcode = pdu[0];
+ 	static uint8_t buf[65];
+ 
+-	g_assert(len > 0);
++	assert(len > 0);
+ 
+ 	switch (opcode) {
+ 	case 0x01: /* Pairing Request */
+-		g_assert(len <= sizeof(data->preq));
++		assert(len <= sizeof(data->preq));
+ 		memset(data->preq, 0, sizeof(data->preq));
+ 		memcpy(data->preq, pdu, len);
+ 		break;
+ 	case 0x02: /* Pairing Response */
+-		g_assert(len <= sizeof(data->prsp));
++		assert(len <= sizeof(data->prsp));
+ 		memset(data->prsp, 0, sizeof(data->prsp));
+ 		memcpy(data->prsp, pdu, len);
+ 		break;
+diff --git a/tools/tester.h b/tools/tester.h
+index 9df600f900ad..2728a54e5c03 100644
+--- a/tools/tester.h
++++ b/tools/tester.h
+@@ -20,7 +20,7 @@
+ #include <net/if.h>
  #include <sys/ioctl.h>
  
 -#include <glib.h>
--
++#include <assert.h>
+ 
+ #define SEC_NSEC(_t)  ((_t) * 1000000000LL)
+ #define TS_NSEC(_ts)  (SEC_NSEC((_ts)->tv_sec) + (_ts)->tv_nsec)
+@@ -65,21 +65,21 @@ static inline int tx_tstamp_expect(struct tx_tstamp_data *data, size_t len)
+ 		data->sent += len - 1;
+ 
+ 	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SCHED) {
+-		g_assert(pos < ARRAY_SIZE(data->expect));
++		assert(pos < ARRAY_SIZE(data->expect));
+ 		data->expect[pos].type = SCM_TSTAMP_SCHED;
+ 		data->expect[pos].id = data->sent;
+ 		pos++;
+ 	}
+ 
+ 	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SOFTWARE) {
+-		g_assert(pos < ARRAY_SIZE(data->expect));
++		assert(pos < ARRAY_SIZE(data->expect));
+ 		data->expect[pos].type = SCM_TSTAMP_SND;
+ 		data->expect[pos].id = data->sent;
+ 		pos++;
+ 	}
+ 
+ 	if (data->so_timestamping & SOF_TIMESTAMPING_TX_COMPLETION) {
+-		g_assert(pos < ARRAY_SIZE(data->expect));
++		assert(pos < ARRAY_SIZE(data->expect));
+ 		data->expect[pos].type = SCM_TSTAMP_COMPLETION;
+ 		data->expect[pos].id = data->sent;
+ 		pos++;
+diff --git a/tools/userchan-tester.c b/tools/userchan-tester.c
+index 9164fc33f5d9..febc28371501 100644
+--- a/tools/userchan-tester.c
++++ b/tools/userchan-tester.c
+@@ -18,7 +18,6 @@
+ #include <errno.h>
+ #include <stdbool.h>
+ 
+-#include <glib.h>
+ 
  #include "bluetooth/bluetooth.h"
  #include "bluetooth/hci.h"
- 
-@@ -35,14 +33,16 @@
- #include "emulator/bthost.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
-+#include "src/shared/io.h"
-+#include "src/shared/timeout.h"
- #include "emulator/hciemu.h"
- 
- struct hciemu_client {
- 	struct bthost *host;
- 	struct btdev *dev;
--	guint start_source;
--	guint host_source;
--	guint source;
-+	unsigned int start_source;
-+	struct io *host_io;
-+	struct io *io;
- 	int sock[2];
- };
- 
-@@ -124,11 +124,11 @@ static void client_command_callback(uint16_t opcode,
- static void writev_callback(const struct iovec *iov, int iovlen,
- 								void *user_data)
- {
--	GIOChannel *channel = user_data;
-+	struct io *io = user_data;
- 	ssize_t written;
- 	int fd;
- 
--	fd = g_io_channel_unix_get_fd(channel);
-+	fd = io_get_fd(io);
- 
- 	written = writev(fd, iov, iovlen);
- 	if (written < 0) {
-@@ -162,99 +162,69 @@ static void writev_callback(const struct iovec *iov, int iovlen,
- 	}
- }
- 
--static gboolean receive_bthost(GIOChannel *channel, GIOCondition condition,
--							gpointer user_data)
-+static bool receive_bthost(struct io *io, void *user_data)
- {
- 	struct bthost *bthost = user_data;
- 	unsigned char buf[4096];
- 	ssize_t len;
--	int fd;
- 
--	if (condition & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
--		return FALSE;
--
--	fd = g_io_channel_unix_get_fd(channel);
--
--	len = read(fd, buf, sizeof(buf));
-+	len = read(io_get_fd(io), buf, sizeof(buf));
- 	if (len < 0)
--		return FALSE;
-+		return false;
- 
- 	bthost_receive_h4(bthost, buf, len);
- 
--	return TRUE;
-+	return true;
- }
- 
--static guint create_source_bthost(int fd, struct bthost *bthost)
-+static struct io *create_io_bthost(int fd, struct bthost *bthost)
- {
--	GIOChannel *channel;
--	guint source;
-+	struct io *io;
- 
--	channel = g_io_channel_unix_new(fd);
-+	io = io_new(fd);
-+	io_set_close_on_destroy(io, true);
- 
--	g_io_channel_set_close_on_unref(channel, TRUE);
--	g_io_channel_set_encoding(channel, NULL, NULL);
--	g_io_channel_set_buffered(channel, FALSE);
-+	bthost_set_send_handler(bthost, writev_callback, io);
- 
--	bthost_set_send_handler(bthost, writev_callback, channel);
-+	io_set_read_handler(io, receive_bthost, bthost, NULL);
- 
--	source = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT,
--				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--				receive_bthost, bthost, NULL);
--
--	g_io_channel_unref(channel);
--
--	return source;
-+	return io;
- }
- 
--static gboolean receive_btdev(GIOChannel *channel, GIOCondition condition,
--							gpointer user_data)
-+static bool receive_btdev(struct io *io, void *user_data)
- {
- 	struct btdev *btdev = user_data;
- 	unsigned char buf[4096];
- 	ssize_t len;
--	int fd;
- 
--	if (condition & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
--		return FALSE;
--
--	fd = g_io_channel_unix_get_fd(channel);
--
--	len = read(fd, buf, sizeof(buf));
-+	len = read(io_get_fd(io), buf, sizeof(buf));
- 	if (len < 0) {
- 		if (errno == EAGAIN || errno == EINTR)
--			return TRUE;
-+			return true;
- 
--		return FALSE;
-+		return false;
- 	}
- 
- 	if (len < 1)
--		return FALSE;
-+		return false;
- 
- 	btdev_receive_h4(btdev, buf, len);
- 
--	return TRUE;
-+	return true;
- }
- 
--static guint create_source_btdev(int fd, struct btdev *btdev)
-+static struct io *create_io_btdev(int fd, struct btdev *btdev)
- {
--	GIOChannel *channel;
--	guint source;
-+	struct io *io;
- 
--	channel = g_io_channel_unix_new(fd);
-+	io = io_new(fd);
-+	io_set_close_on_destroy(io, true);
- 
--	g_io_channel_set_close_on_unref(channel, TRUE);
--	g_io_channel_set_encoding(channel, NULL, NULL);
--	g_io_channel_set_buffered(channel, FALSE);
-+	btdev_set_send_handler(btdev, writev_callback, io);
- 
--	btdev_set_send_handler(btdev, writev_callback, channel);
-+	io_set_read_handler(io, receive_btdev, btdev, NULL);
- 
--	source = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT,
--				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--				receive_btdev, btdev, NULL);
--
--	g_io_channel_unref(channel);
--
--	return source;
-+	return io;
- }
- 
- static bool create_vhci(struct hciemu *hciemu)
-@@ -318,7 +288,7 @@ struct bthost *hciemu_client_get_host(struct hciemu *hciemu)
- 	return hciemu_client_host(client);
- }
- 
--static gboolean start_host(gpointer user_data)
-+static bool start_host(void *user_data)
- {
- 	struct hciemu_client *client = user_data;
- 
-@@ -326,18 +296,17 @@ static gboolean start_host(gpointer user_data)
- 
- 	bthost_start(client->host);
- 
--	return FALSE;
-+	return false;
- }
- 
- static void hciemu_client_destroy(void *data)
- {
- 	struct hciemu_client *client = data;
- 
--	if (client->start_source)
--		g_source_remove(client->start_source);
-+	timeout_remove(client->start_source);
- 
--	g_source_remove(client->host_source);
--	g_source_remove(client->source);
-+	io_destroy(client->host_io);
-+	io_destroy(client->io);
- 
- 	bthost_destroy(client->host);
- 	btdev_destroy(client->dev);
-@@ -385,9 +354,9 @@ static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
- 	client->sock[0] = sv[0];
- 	client->sock[1] = sv[1];
- 
--	client->source = create_source_btdev(sv[0], client->dev);
--	client->host_source = create_source_bthost(sv[1], client->host);
--	client->start_source = g_idle_add(start_host, client);
-+	client->io = create_io_btdev(sv[0], client->dev);
-+	client->host_io = create_io_bthost(sv[1], client->host);
-+	client->start_source = timeout_add(0, start_host, client, NULL);
- 
- 	btdev_get_mtu(client->dev, &acl_mtu, NULL, &iso_mtu);
- 	bthost_set_acl_mtu(client->host, acl_mtu);
-@@ -512,8 +481,7 @@ void hciemu_unref(struct hciemu *hciemu)
- 	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
- 	queue_destroy(hciemu->clients, hciemu_client_destroy);
- 
--	if (hciemu->flush_id)
--		g_source_remove(hciemu->flush_id);
-+	timeout_remove(hciemu->flush_id);
- 
- 	vhci_close(hciemu->vhci);
- 
-@@ -853,7 +821,7 @@ static bool client_is_pending(const void *data, const void *match_data)
- 	struct hciemu_client *client = (struct hciemu_client *)data;
- 	int used, i;
- 
--	if (!client->source || !client->host_source)
-+	if (!client->io || !client->host_io)
- 		return false;
- 
- 	for (i = 0; i < 2; ++i) {
-@@ -866,12 +834,12 @@ static bool client_is_pending(const void *data, const void *match_data)
- 	return false;
- }
- 
--static gboolean flush_client_events(gpointer user_data)
-+static bool flush_client_events(void *user_data)
- {
- 	struct hciemu *hciemu = user_data;
- 
- 	if (queue_find(hciemu->clients, client_is_pending, NULL))
--		return TRUE;
-+		return true;
- 
- 	hciemu->flush_id = 0;
- 
-@@ -879,7 +847,7 @@ static gboolean flush_client_events(gpointer user_data)
- 	if (hciemu->vhci)
- 		vhci_pause_input(hciemu->vhci, false);
- 
--	return FALSE;
-+	return false;
- }
- 
- void hciemu_flush_client_events(struct hciemu *hciemu)
-@@ -889,5 +857,5 @@ void hciemu_flush_client_events(struct hciemu *hciemu)
- 
- 	util_debug(hciemu->debug_callback, hciemu->debug_data, "vhci: pause");
- 	vhci_pause_input(hciemu->vhci, true);
--	hciemu->flush_id = g_idle_add(flush_client_events, hciemu);
-+	hciemu->flush_id = timeout_add(0, flush_client_events, hciemu, NULL);
- }
 -- 
 2.56.0
 
