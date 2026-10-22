@@ -1,84 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.170
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792699328;
-	b=L4keioPjtUZD/zA7Fb6u+dY4HNWlyT28qdDVkc2DQU+Th5ijiEhxKmAjBxc+IJVm7KFl
-	 2Rol7ZG/brJ9xPr+ZJ7FnD11ML+9KFXmbbcgBSd0Aef8ELsF4zmTo37Hd8dIDtLufWIoH
-	 t6XQN5CqFWBqbXlWd//YRIcBzTK1YLLwupIoi87wI0UGabBYZmehnBkN0bPhw1JM3mJRu
-	 FEGXXhwipQdVegSsJvGqdwxkw+RkRy39nxr+UhppVETPcfmulntc1QPkkpI+g60iqSzGz
-	 2HuHHHFENX5wwpDcMrRYeu+u7dx8FHQHIoSTC8DgLPev80eWWvo/cF2U+cfd1qOUo/Q==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792699328;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=6UpnyrJCBBnlr4q+a3qajlauIpjxQtOrXOYlU26TRm4=;
-	b=t6woB1K57ULgEOVVUZgqjYkmuRYcLqb1ICZB55fK4qyW7z10M3wacKbwvQxPwcyWPrdJ
-	 iqx7OKXsmpKl/rXHj2ijfpov/PDbkCwj8xaN05VhaN0CTQmzRr5MG72O9ckaHgmsLVouB
-	 Lzl22VVTkmRkxLodK+FTY07KLnJWFz+aqFCnvS5tL/gzPpV5Kp19o4jxgZjaJkjaTULNG
-	 BlLYGW8jDXB2coJGavKaTq26oPWkbXmLUFcGbfyqdFytLUMy3M9MNNlEC1qsDHSBlJ2zA
-	 G8hnI2553O3XJUnPYkXBJFEg1QqY4Y5SV28gMk78OhnDVpqpvjAEQvB8LE40GfSAL1A==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=KBYiudQW;
-	arc=none smtp.remote-ip=209.85.222.170
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF4A606A31D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 20:02:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CF4A606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792711416;
+	b=X+NFPfUqoLaqjH+j35paGV3cL3iSqEApeyFffju3F1g7ucQQx5PucgGuQIB3g9dPbk8F
+	 VW27uwvK5dFksd/Gvn7JiQrdrTH5rO7YpxqAZ95hf0dH7drLhkze67OF1AQWFQDaAvxWz
+	 EwkiLB1dlWNwSIT7pEYGsT6wnZl9B/ivhfMj+SirzD+s87FSgqjMLXaMaj/HK2a5QPn+V
+	 W6ki8ws6J4kKv+K5zdu/Pse6gLz5RpsFz2BgH8WOvvbOVUaT9wDzxpELuFQKvyoM704g0
+	 5vqTpwd+Uh+MPEcZLx3l2+R0LWjrXUEHjYJbRZTvGxKM3NSDzR7DQhu8KbUjnQ2c5Rg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792711416;
+	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
+	bh=6Vx4ebXF0tkiO/X4WqL2or6Fpg3v2ufDWlD/5ef9UZA=;
+	b=ZsDkuKfkDG7RgymydF9DHJebqFn+QW6qScW8HSWUs9tVq+hRkATLfZIseehTLwl8vc7a
+	 4euwPNEtr/a+BrCvnYOVSabTsENxy0+LcUStqUaeXs+JvaSEcDelopIkORP+rA5zR39PC
+	 y0RYJCxO/+gqNlbjyGUXQdEiLZ+ntvHAI6QUej8wj6/DfThWJLNopKCXnjUBkjzHjbhjD
+	 DKdPLYxcHN+jusJuLoZFqtEGHKWwl/mwKoCerq5C6cZkmib6fdGSHWpIdJnmYshW4PQUi
+	 tkVALRFSVesH4UhdhexuX2s/Q/9hsGhELGs5PwXQ4ye0fc5xwa1QyO2mhOqDJ8VHd4Q==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=poA5uC9H;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47BB606A31D
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=KBYiudQW
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-93cc1ab5f6cso16996685a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 13:02:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792699327; x=1793304127; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=6UpnyrJCBBnlr4q+a3qajlauIpjxQtOrXOYlU26TRm4=;
-        b=KBYiudQWP5N4khNj/0oS5t9+NW7xzgF6lEccQuQWG93wFHQeDaMHF7h+GUvVIuGtqs
-         8fKpbDelSF+fIj0WUwGkxkENSH8luITKZYd/Ih1K4aWSBIpxegzGDTnkZySBEqQfzCyw
-         N1WgR8iqgVIUQyMpMGxP9y873RUankm2sLBTY4Ay7nCzocLdlN/iQmnlgBTDP/fxSdcH
-         T4jj69QZvc4wd4u6MfB1CK+jEMTkba9zMP7bDg5jjhUWExioiZt2ELtuRrXZ4uRVpkr7
-         BX+KfhJQf3TgbCd0w9sVzojKfOvqSgOHjIv29bR3euly5Sh6uIXTti4tChH87ZrnLi0u
-         Tnbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792699327; x=1793304127;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=6UpnyrJCBBnlr4q+a3qajlauIpjxQtOrXOYlU26TRm4=;
-        b=T9qAFFXtLc32IMSI2/TySnvoT3s48kpDAh2XdYAufg6aQ924oSbYaafKC+u+d5wajW
-         jQ0vJ0nEjUTi6CDhs9FAu1xjc3AMI7o3BbIfq24FxV8cimME5S8VBPIpzEitIWbbs4TA
-         5+cygNuGlrYIK5bRZLDC4pM408O7lwTYAxmuI963goYrvBm+Fh0uIys23Y2xXVb3AHXC
-         f3g/E1w7DTDylJA0RX7UGMGoCW7QvMweFXrF/Ts249VMPV0jZUbjzTpi6LdpfrnVNqx7
-         lbysUedQcCOXcI3V6FybaZnWyCPrdWYluEicseEwf8YKQy7DMcRlddOo0FU19r5PgyIe
-         TgdA==
-X-Gm-Message-State: AFq9FYKHuT5sn/Ac0mwd8008vCwQ6of9w16oxkuObIav4R3VfLASAfxz
-	kHYL2ydbooElNypHfaK0ay6CLr9O4/dTpPy+rpGONAYwbOGXWTREE+ogcWGLDA==
-X-Gm-Gg: AYBFou1HeHi0uXJ/Bi0qi/1Yi4NIp0imLSyBW9wdiW1KHoAT//F1qzV9iLWgavWeLtF
-	6tdMkI9yEzQdloQm+ZgYtG3d9Kq2yV+w7Zx8Cn42eAQfMzps2hFjilsTF/aiGvLIAX9uG1hFlFr
-	/QnDjDuJU8/aRpgwD0w7sdRvoBM1A8EEuaDEnwxu8s7c8ylx9uIUrbkEvaYIg2XZp6XgAxODVxk
-	2kQVqQV72hay7erRaUKxc25TSjBXF/aqtLTtBapuuuIoiyE8J7JXhQfTDtwru/S6PSYsH1UlCaU
-	Lih7j2h4usP5DTohjSzqnNiTM4KlwXCH+wyA1fmYA3cwkEi60DuwpL7kWbgSglT1MPijdZv3M06
-	t4E1YV2tgjMxFrsSi2uP3APvLRIZO6d/vgva0Da8+rySdsjNcYlz5jc5ohynH81Ax506Jq0MS8A
-	eUbDZ11r76Vp4R+dE8xhiC8B7gJCJEkHsEyzSn8zhJJQDsouKoy0N761/XHL6DtxMdeItBxPfGP
-	j6Ew/NDl4DjNa/N65tAcc5ZnNNiL+6h1VUC0Em7RaPHXlQ5/c893wdC1b9AcCBRMw==
-X-Received: by 2002:a05:620a:462b:b0:93e:5cf8:e5aa with SMTP id af79cd13be357-93f6f9b885cmr92838785a.61.1792699327394;
-        Thu, 22 Oct 2026 13:02:07 -0700 (PDT)
-Received: from [172.17.0.2] ([172.174.223.101])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91c39505351sm1318706d6.3.2026.10.22.13.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2026 13:02:06 -0700 (PDT)
-Message-ID: <6ada6bbe.edc255e2.1a3c38.be1e@mx.google.com>
-Date: Thu, 22 Oct 2026 13:02:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4546929441923071726=="
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=poA5uC9H
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F4425771
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792711416; cv=none; b=VuPwpHmGHO45WML/n59ehXTgn2e+ydAPDQIFP1wpCa+4AFgTJmjNSdrCG+NYohVZ0i1/pwhqBaPqtFZ7E9hkTHY0D1wnuT6/U4lq3T2Q8Rrynox5SuWwDnbCG1LU6Y32B5Ny7wUtEuzRt0CWWc//2wXTouCMYc9Ua2WixSEMeCU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792711416; c=relaxed/simple;
+	bh=eI5F1HZrkY1Lu0pnBXR3b5fBLkLsqKBUkXclRiD69F4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tfgle8miTd9yIK5uMFnHXWJDoFAuCdm3q1KzrQ7zM6vGLGNWPTWa54wTPfXepCsnBJMpN6FZOftFUjkXAnJbEmCvY2PgXqF3O72srk9AVT5Vgo4kvDz6D9BKVQS/MHgWIPw0Ovvn1gmlbIXm/L73NDy347e8DmL1ARftYuamy5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=poA5uC9H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13B89C2BD00
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1792711416;
+	bh=eI5F1HZrkY1Lu0pnBXR3b5fBLkLsqKBUkXclRiD69F4=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=poA5uC9HDvXIa6b857eEE8kReJgDJfCdjWvb48XCNx3U6dtX5RndLcn+qKzh6Wnoi
+	 q4s25cMZ9VkYPESNVjYfIq7Sa9GmeihZtctv5YiQZABWb9rzoGAaDA69FtgiP1MLjn
+	 onAPLMfmMqxsX2Xt6IAJfP+XKt8Op8rTDXeXdC5DQlkchWDnyevENZqaKqq1ixw+Ps
+	 l1YL+0bIOAYJFlv5XFqnhGQV9042dQ8vMYwqLNdQrk8+xbm0dNjFwAoGUi2KktttQG
+	 jECYWS5bA0Uzf6DzOXYk/v8OOlo4WGRdYAX5Zq+h/nc0strtnA9h1FguwzNO/uYqNb
+	 lV/WSBo/VItnQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id E1AB8C53BC7; Thu, 22 Oct 2026 23:23:35 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
+ reconnects, started after kernel update
+Date: Thu, 22 Oct 2026 23:23:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: akshaym@leastaction.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220344-62941-ANEJMXA2iI@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
+References: <bug-220344-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,186 +94,225 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Run the testers under User Mode Linux with time travel
-In-Reply-To: <20261022154701.3959500-2-luiz.dentz@gmail.com>
-References: <20261022154701.3959500-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4546929441923071726==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
 
-This is automated email and please do not reply to this email!
+Akshay (akshaym@leastaction.net) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |akshaym@leastaction.net
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1191414/
+--- Comment #10 from Akshay (akshaym@leastaction.net) ---
+I have been encountering the same issue and it seems to be due to how the I=
+ntel
+CNVi Bluetooth chips interact with headphones that have both BLE and BR/EDR
+capabilities and how the kernel enabled L2CAP ecred and ertm by default.=20
 
----Test result---
+Setting "ControllerMode =3D bredr" in /etc/bluetooth/main.conf and restarti=
+ng=20=20=20
+bluetooth.service completely and permanently eliminates all dropouts.
 
-Test Summary:
-CheckPatch                    FAIL      18.23 seconds
-GitLint                       FAIL      9.50 seconds
-BuildEll                      PASS      19.55 seconds
-BluezMake                     PASS      301.82 seconds
-MakeCheck                     PASS      14.53 seconds
-MakeDistcheck                 PASS      144.54 seconds
-CheckValgrind                 PASS      237.04 seconds
-CheckSmatch                   WARNING   298.70 seconds
-bluezmakeextell               PASS      96.09 seconds
-TestFunctional                PASS      1154.77 seconds
-IncrementalBuild              PASS      635.83 seconds
-ScanBuild                     PASS      1186.64 seconds
+Here's a complete description (AI-assisted):
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v1,11/27] emulator: Add vhost-user backend
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#258: FILE: emulator/vhost.c:87:
-+} __attribute__((packed));
+A recurring Bluetooth audio dropout issue affecting Intel CNVi Bluetooth
+adapters (specifically the AX211, 8087:0033) paired with dual-mode (BR/EDR +
+LE) headsets such as the Sennheiser Momentum 4.=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#263: FILE: emulator/vhost.c:92:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#272: FILE: emulator/vhost.c:101:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#279: FILE: emulator/vhost.c:108:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#285: FILE: emulator/vhost.c:114:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#292: FILE: emulator/vhost.c:121:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#303: FILE: emulator/vhost.c:132:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#310: FILE: emulator/vhost.c:139:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#316: FILE: emulator/vhost.c:145:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#321: FILE: emulator/vhost.c:150:
-+} __attribute__((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#327: FILE: emulator/vhost.c:156:
-+} __attribute__((packed));
-
-/home/runner/work/bluez/bluez/src/patch/14908110.patch total: 0 errors, 11 warnings, 1094 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14908110.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+    Below is the detailed bug report along with evidence from=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+    btsnoop packet traces, root-cause analysis, and reproduction steps.=20=
+=20=20=20=20=20=20=20=20
 
 
-[BlueZ,v1,12/27] emulator: Add vhost-user virtio server to btvirt
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#368: FILE: emulator/virtio.c:48:
-+} __attribute__((packed));
-
-/home/runner/work/bluez/bluez/src/patch/14908117.patch total: 0 errors, 1 warnings, 491 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14908117.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,13/27] emulator: Add time travel calendar to btvirt
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#474: FILE: emulator/timetravel.c:54:
-+} __attribute__((packed));
-
-/home/runner/work/bluez/bluez/src/patch/14908111.patch total: 0 errors, 1 warnings, 1088 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14908111.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+    1. ENVIRONMENT & HARDWARE=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+    -------------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+    - Adapter: Intel Wi-Fi 6E AX211 160MHz CNVi (8087:0033, hci0)
+    - OS: Fedora Linux 44 (KDE Plasma Desktop Edition) x86_64
+    - Kernel: Linux 7.2.11-200.fc44.x86_64=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20
+    - Firmware: ibt-1040-0041.sfi (both production and build 82200 tested)=
+=20=20=20=20=20=20
+    - Driver: btusb / btintel (Linux 6.11.x through 7.2.x, Fedora 44)=20=20=
+=20=20=20=20=20=20=20=20=20
+    - Audio Stack: PipeWire 1.6.9 + WirePlumber 0.5.18, standard A2DP=20=20=
+=20=20=20=20=20=20=20=20=20
+      (reproduced on SBC, AAC, and aptX HD)=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20
+    - Headset: Sennheiser MOMENTUM 4 (80:C3:BA:4D:8A:F2)=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      (Also reproducible on other dual-mode BR/EDR+LE headphones)=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
 
 
-[BlueZ,v1,14/27] emulator: Add virtio console and time travel client to btvirt
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#345: FILE: emulator/ttclient.c:43:
-+} __attribute__((packed));
+    2. PROBLEM DESCRIPTION=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+    ----------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+    When streaming Classic A2DP audio from Linux to a dual-mode headset, th=
+e=20=20=20=20
+    stream suffers brief audible audio dropouts / glitches every 5.0 to 5.4=
+=20=20=20=20=20
+    seconds.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#737: FILE: emulator/vconsole.c:60:
-+} __attribute__((packed));
+    In extended listening sessions, cumulative starvation events eventually=
+=20=20=20=20=20
+    trigger an internal controller watchdog crash:=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      kernel: Bluetooth: hci0: Hardware error 0x0c=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#743: FILE: emulator/vconsole.c:66:
-+} __attribute__((packed));
-
-/home/runner/work/bluez/bluez/src/patch/14908112.patch total: 0 errors, 3 warnings, 1221 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14908112.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1,24/27] tools: Run sco-tester, rfcomm-tester and 6lowpan-tester on the mainloop
-
-1: T1 Title exceeds max length (88>80): "[BlueZ,v1,24/27] tools: Run sco-tester, rfcomm-tester and 6lowpan-tester on the mainloop"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth/bluetooth.h:237:31: warning: array of flexible structures
+    During each glitch, PipeWire logs:=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20
+      spa.bluez5.sink.media: Missing completion reports for packet:=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+      Bluetooth adapter firmware bug?=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20
 
 
-https://github.com/bluez/bluez/pull/2701
+    3. EVIDENCE FROM BTSNOOP TRACES=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20
+    ------------------------------------------=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+    In Bluetooth Core Specifications, baseband time is partitioned into=20=
+=20=20=20=20=20=20=20=20
+    discrete 625-microsecond slots.=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20
 
----
-Regards,
-Linux Bluetooth
+    Converting the measured stall intervals from btsnoop packet captures=20=
+=20=20=20=20=20=20=20
+    directly into baseband slots proves the collision originates inside the=
+=20=20=20=20=20
+    controller's internal LE baseband scheduling loop:=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+
+    Metric               Measured in btsnoop   Baseband Calculation (625 us=
+)=20=20=20=20
+    -----------------------------------------------------------------------=
+--=20=20=20
+    Recurrence Period    5.118s - 5.122s       8,192 slots * 625 us =3D 5.1=
+200s=20=20=20
+    Single-Window Stall  138.7ms - 146.5ms       224 slots * 625 us =3D 140=
+.00ms=20=20
+    Double-Window Stall  281.2ms - 287.0ms       448 slots * 625 us =3D 280=
+.00ms=20=20
+
+    Trace Snapshot (Buffer Credit Depletion):=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      Frame 758 | t =3D 5.0456s | ACL_TX     | in_flight =3D 0=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      Frame 759 | t =3D 5.0589s | ACL_TX     | in_flight =3D 1=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      Frame 760 | t =3D 5.0722s | ACL_TX     | in_flight =3D 2=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      Frame 761 | t =3D 5.0856s | ACL_TX     | in_flight =3D 3 (BUFFER FULL=
+: 0
+credits)=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+      ---------- INTEL CONTROLLER CEASES ACKing FOR 145.6 ms ----------=20=
+=20=20=20=20=20=20=20=20
+      Frame 762 | t =3D 5.2312s | EVT_ACK(1) | in_flight =3D 2 (Controller =
+ACKs)=20=20=20=20
+      Frame 763 | t =3D 5.2313s | ACL_TX     | in_flight =3D 3 (Host sends =
+next
+pkt)=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+
+    During normal streaming, ACL packet intervals are ~12.25 ms. Because th=
+e=20=20=20=20
+    Intel AX211 advertises an ACL buffer depth of only 3 packets (ACL max=
+=20=20=20=20=20=20=20
+    packets: 3), a radio pause of 140 ms requires at least 11 packets of bu=
+ffer=20
+    capacity. The 3-packet buffer fills in ~36 ms, blocking the host stack=
+=20=20=20=20=20=20
+    for the remaining >100 ms and starving the headset DSP buffer.=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
 
 
---===============4546929441923071726==--
+    4. ROOT CAUSE ANALYSIS=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+    ----------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+    1. When BlueZ boots in default "ControllerMode =3D dual", the kernel is=
+sues=20=20=20
+       HCI_OP_WRITE_LE_SUPPORT(1) to the controller.=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+    2. Even with zero active LE connections, entering Dual-Mode activates a=
+n=20=20=20=20
+       internal firmware baseband routine (LE calibration / periodic backgr=
+ound=20
+       scan reservation) scheduled on an exact 2^13 slot cadence
+       (8,192 slots =3D 5.120 seconds).
+    3. When this timer triggers, the AX211 baseband arbiter grants the radio
+       exclusively to the LE state machine for 224 to 448 slots (140 to 280
+ms),
+       completely halting BR/EDR transmission and packet acknowledgments.
+    4. Older audio architectures (PulseAudio with 250-500 ms ALSA buffers)
+       masked this radio blackout in software. Modern low-latency servers
+       (PipeWire) operate with tight pacing (10-20 ms), making the baseband
+       blackout directly audible.
+    5. In pure BR/EDR mode ("ControllerMode =3D bredr"), BlueZ commands
+       MGMT_SET_LE(0) -> HCI_OP_WRITE_LE_SUPPORT(0). The LE state machine
+       remains completely dormant, and the 5.120s timer never runs.
+
+
+    5. WORKAROUND & VERIFICATION
+    ----------------------------
+    Setting "ControllerMode =3D bredr" in /etc/bluetooth/main.conf and rest=
+arting
+    bluetooth.service completely and permanently eliminates all dropouts:
+    - Gaps > 25ms: 0
+    - Inter-packet interval: 12.25 ms +/- 0.08 ms
+    - Audible stutters / dropouts: 0
+    - Hardware error 0x0c resets: 0
+
+    No kernel configuration changes (enable_ecred, disable_ertm), no PipeWi=
+re
+    buffer overrides, no codec changes, and no power management overrides
+    were required. Pure BR/EDR mode alone fixes the issue.
+
+
+    6. PROPOSED PERMANENT SOLUTIONS
+    -------------------------------
+    1. Intel Firmware (ibt-*.sfi):
+       The AX211 baseband scheduler should prioritize active BR/EDR ACL aud=
+io
+       streams over internal LE background calibration/scanning, or preempt
+       the LE routine so that BR/EDR transmission is never paused for more
+       than 15-20 ms.
+
+    2. Kernel Driver (drivers/bluetooth/btintel.c):
+       If the firmware scheduler cannot be updated, btintel could provide a
+       mechanism or quirk to temporarily throttle or mask background LE
+       support/scheduling when high-throughput BR/EDR A2DP streams are acti=
+ve
+       on single-radio CNVi controllers.
+
+
+    I can provide btsnoop packet captures if needed.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
